@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhuanche.dao.AdminDao">
+    <resultMap id="resultMap" type="com.zhuanche.entity.Admin" >
+        <id column="ID" property="id" jdbcType="BIGINT" />
+        <result column="NAME" property="name" jdbcType="VARCHAR" />
+        <result column="MOBILE" property="mobile" jdbcType="VARCHAR" />
+        <result column="PASSWORD" property="password" jdbcType="VARCHAR" />
+        <result column="STATUS" property="status" jdbcType="INTEGER" />
+        <result column="EMAIL" property="email" jdbcType="VARCHAR" />
+        <result column="CREATE_AT" property="createAt" jdbcType="TIMESTAMP" />
+        <result column="LAST_LOGIN_DATE" property="lastLoginDate" jdbcType="TIMESTAMP" />
+        <result column="IS_INITIALIZED" property="isInitialized" jdbcType="INTEGER" />
+        <result column="LOGIN_NAME" property="loginName" jdbcType="VARCHAR" />
+        <result column="AUTH_TYPE" property="authType" jdbcType="INTEGER" />
+        <collection property="roles" ofType="com.zhuanche.entity.Role" >
+            <id column="role_id" property="id" jdbcType="BIGINT"/>
+            <result column="ROLE_NAME" property="roleName" jdbcType="VARCHAR"/>
+            <result column="ROLE_CODE" property="roleCode" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+    <sql id="Base_Column_List" >
+        ID,NAME,MOBILE,PASSWORD,STATUS,EMAIL,CREATE_AT,LAST_LOGIN_DATE,IS_INITIALIZED,LOGIN_NAME,AUTH_TYPE
+    </sql>
+    <insert id="save" parameterType="com.zhuanche.entity.Admin"  useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
+          insert into crm_admin (<include refid="Base_Column_List"/>) values
+        (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR},
+        #{mobile,jdbcType=VARCHAR},#{password,jdbcType=VARCHAR},
+        #{status,jdbcType=INTEGER}, #{email,jdbcType=VARCHAR},
+        #{createAt,jdbcType=TIMESTAMP}, #{lastLoginDate,jdbcType=TIMESTAMP},
+        #{isInitialized,jdbcType=INTEGER},
+        #{loginName,jdbcType=VARCHAR},
+        #{authType,jdbcType=INTEGER}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.zhuanche.entity.Admin">
+        update crm_admin
+        <set >
+            <if test="name != null" >
+                NAME = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="mobile != null" >
+                MOBILE = #{mobile,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null" >
+                PASSWORD = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null" >
+                STATUS = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="email != null" >
+                EMAIL = #{email,jdbcType=BIGINT},
+            </if>
+            <if test="createAt != null" >
+                CREATE_AT = #{createAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="lastLoginDate != null" >
+                LAST_LOGIN_DATE = #{lastLoginDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isInitialized != null" >
+                IS_INITIALIZED = #{isInitialized,jdbcType=INTEGER},
+            </if>
+            <if test="loginName != null" >
+                LOGIN_NAME = #{loginName,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where ID = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="findAdminById" parameterType="java.lang.Long" resultMap="resultMap">
+        select
+        *
+        from
+        crm_admin b where b.id=#{id}
+    </select>
+    <select id="findById" parameterType="java.lang.Long" resultMap="resultMap">
+        select
+            *
+        from
+            crm_admin b
+        inner join
+            crm_admin_role m
+        on
+            b.id=m.uid
+        inner join
+            crm_role c
+        on
+            m.rid=c.id
+            where b.id=#{id}
+    </select>
+
+    <select id="findByLoginName" parameterType="java.lang.String" resultMap="resultMap">
+        select
+        *
+        from
+        crm_admin b
+        inner join crm_admin_role m on b.ID=m.UID inner join crm_role c on m.RID=c.ID
+        where b.LOGIN_NAME=#{loginName}
+    </select>
+
+    <select id="findAdminByLoginName" parameterType="java.lang.String" resultMap="resultMap">
+        SELECT a.*, r.id AS role_id, r.role_code, r.role_name
+        FROM crm_admin a
+        LEFT JOIN crm_admin_role ar ON a.id = ar.uid
+        LEFT JOIN crm_role r ON r.id = ar.rid
+        WHERE a.login_name =#{loginName}
+    </select>
+
+    <select id="search" resultMap="resultMap" parameterType="map">
+        select <include refid="Base_Column_List"/>
+        from crm_admin where 1=1
+        <if test="loginName != null and loginName !=''">
+            AND LOGIN_NAME = #{loginName}
+        </if>
+        <if test="name != null and name !=''">
+            AND NAME like CONCAT(#{name},'%')
+        </if>
+        <if test="mobile != null and mobile !=''">
+            AND MOBILE = #{mobile}
+        </if>
+        limit #{pageNo},#{pageSize}
+    </select>
+    <select id="findAll" resultMap="resultMap">
+        select <include refid="Base_Column_List"/> from crm_admin
+    </select>
+    <select id="count" parameterType="map" resultType="java.lang.Integer">
+        select count(id)
+        from crm_admin where 1=1
+        <if test="loginName != null and loginName !=''">
+            AND LOGIN_NAME = #{loginName}
+        </if>
+        <if test="name != null and name !=''">
+            AND NAME like CONCAT(#{name},'%')
+        </if>
+        <if test="mobile != null and mobile !=''">
+            AND MOBILE = #{mobile}
+        </if>
+    </select>
+
+    <select id="findByName" resultType="com.zhuanche.entity.Admin">
+        select <include refid="Base_Column_List"/> from crm_admin where name like CONCAT(#{name},'%');
+    </select>
+    <select id="selectRoleByAdminPrimaryKey" parameterType="java.lang.Long" resultMap="resultMap">
+        SELECT a.*, r.id AS roleId,r.ROLE_CODE,r.ROLE_NAME
+        FROM crm_admin a
+        LEFT JOIN crm_admin_role ar ON a.id = ar.UID
+        LEFT JOIN crm_role r ON r.id = ar.RID
+        WHERE  a.id =#{id,jdbcType=BIGINT}
+    </select>
+</mapper>
