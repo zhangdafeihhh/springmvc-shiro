@@ -3,11 +3,12 @@
 .classpath
 .project
 src/main/assembly/bin/
+src/main/resources/application.properties
 src/main/resources/db.properties
-src/main/resources/log4j.xml
+src/main/resources/dubbo.properties
 src/main/resources/redis.properties
 .idea
 *.iml
 logs
-mp-rest.properties
-mp-rest.properties.lock
+mp-manage.properties
+mp-manage.properties.lock

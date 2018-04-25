@@ -8,9 +8,9 @@
         </filter>
     </appender>
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/data/logs/cms/logFile.log</file>
+        <file>/data/logs/mp-manage/logFile.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/data/logs/cms/logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>/data/logs/mp-manage/logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
@@ -21,7 +21,7 @@
     <appender name="accessLogFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>/data/logs/mp-rest/filter.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/data/logs/cms/filter.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>/data/logs/mp-manage/filter.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
