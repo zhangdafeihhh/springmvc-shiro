@@ -31,7 +31,7 @@
         <property name="defaultRoles" value="ROLE_USER"/>
         <property name="casServerUrlPrefix" value="${sso.server.url}"/>
         <!-- 客户端的回调地址设置，必须和下面的shiro-cas过滤器拦截的地址一致 -->
-        <property name="casService" value="${manage.login.url}"/>
+        <property name="casService" value="${cms.login.url}"/>
     </bean>
 
     <!-- 会话ID生成器 -->
