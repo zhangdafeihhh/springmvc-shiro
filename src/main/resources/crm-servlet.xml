@@ -4,12 +4,18 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:p="http://www.springframework.org/schema/p"
         xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:task="http://www.springframework.org/schema/task"
         xmlns:util="http://www.springframework.org/schema/util" xmlns:mvc="http://www.springframework.org/schema/mvc"
         xmlns:aop="http://www.springframework.org/schema/aop"
         xsi:schemaLocation="http://www.springframework.org/schema/beans
     http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
     http://www.springframework.org/schema/context
-    http://www.springframework.org/schema/context/spring-context-3.1.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+    http://www.springframework.org/schema/context/spring-context-3.1.xsd
+     http://www.springframework.org/schema/task
+ http://www.springframework.org/schema/task/spring-task.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+    http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
     <!--package-->
 
@@ -23,6 +29,15 @@
     </context:component-scan>
 
 
+    <task:executor
+            id="myexecutor"
+            pool-size="5-25"
+            queue-capacity="100"
+            keep-alive="120"
+            rejection-policy="CALLER_RUNS"/>
+
+    <task:annotation-driven executor="myexecutor"/>
+
 
     <mvc:annotation-driven>
         <mvc:message-converters register-defaults="true">
@@ -32,7 +47,10 @@
             <bean  class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
                 <property name="supportedMediaTypes">
                     <list>
-                        <value>application/json;charset=UTF-8</value>
+                        <value>text/plain;charset=utf-8</value>
+                        <value>text/html;charset=UTF-8</value>
+                        <value>text/json;charset=UTF-8</value>
+                        <value>application/json;charset=utf-8</value>
                     </list>
                 </property>
             </bean>
@@ -58,4 +76,5 @@
     <context:property-placeholder
             ignore-resource-not-found="false" ignore-unresolvable="true"
             location="classpath*:*.properties" />
+
 </beans>

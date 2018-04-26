@@ -15,12 +15,6 @@ public class DriverCityWhiteServiceImpl implements DriverCityWhiteService {
     private DriverCityWhiteMapper driverCityWhiteMapper;
 
     @Override
-    public DriverCityWhite selectByPrimaryKey(Integer id) {
-        return driverCityWhiteMapper.selectByPrimaryKey(id);
-
-    }
-
-    @Override
     public List<DriverCityWhite> findList() {
         return driverCityWhiteMapper.findList();
     }

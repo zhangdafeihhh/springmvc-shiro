@@ -7,6 +7,34 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 	<%@include file="/WEB-INF/pages/common/header.jsp"%>
+	<style type="text/css">
+		#tipTop {
+			background-color: #fff;
+			/*opacity:0.9; !*透明度*!*/
+			padding-left: 10px;
+			padding-right: 10px;
+			position: absolute;
+			font-size: 12px;
+			right: 10px;
+			top: 20px;
+			border-radius: 3px;
+			border: 1px solid #ccc;
+			line-height: 30px;
+		}
+		.button1 {
+			height: 28px;
+			line-height: 28px;
+			background-color: #0D9BF2;
+			color: #FFF;
+			border: 0;
+			outline: none;
+			padding-left: 5px;
+			padding-right: 5px;
+			border-radius: 3px;
+			margin-bottom: 4px;
+			cursor: pointer;
+		}
+	</style>
 </head>
 <body class="nav-md">
 <div class="container body">
@@ -24,24 +52,24 @@
 						<div class="x_panel">
 							<div class="x_content" style="height:550px;">
 								<div id="container"></div>
-								<div id="myPageTop">
+								<div id="tipTop">
 									<table>
+										<tbody>
 										<tr>
+											<td><strong>城市:&nbsp;&nbsp;</strong></td>
 											<td>
-												<label>按关键字搜索：</label>
+												<select name="cityId" id="cityId">
+													<%--<option value=""></option>--%>
+													<c:forEach var="city" items="${cityList}">
+														<option value="${city.cityId}">${city.cityName}</option>
+													</c:forEach>
+												</select>
 											</td>
-											<td class="column2">
-												<label>左击获取经纬度：</label>
-											</td>
+											<td>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="button1" onclick="district(1)" value="组合商圈"/>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+											<td><input type="button" class="button1" onclick="district(2)" value="大数据商圈"/>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+											<td><input type="button" class="button1" onclick="district(3)" value="默认商圈"/></td>
 										</tr>
-										<tr>
-											<td>
-												<input type="text" placeholder="请输入关键字进行搜索" id="tipinput">
-											</td>
-											<td class="column2">
-												<input type="text" readonly="true" id="lnglat">
-											</td>
-										</tr>
+										</tbody>
 									</table>
 								</div>
 							</div>
@@ -74,55 +102,151 @@
 <script src="http://webapi.amap.com/maps?v=1.4.4&key=db4b48fb15aecc4e23ffd395910dd5a6"></script>
 <script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
 <script>
+    var result1;
+    var result2;
+    var polygons = new Array();
+    var yuanCityId;
   var map = new AMap.Map('container', {
         resizeEnable: true,
         zoom:11,
         center: [116.397428, 39.90923]
     });
-  var tableHtml = '<div id="gridWin" >\
-	<form>\
-		<div id="searchForm" style="filter:alpha(opacity=1); background:#FFF; filter:alpha(Opacity=80);-moz-opacity:0.5;opacity: 0.5;" > </div>\
-	</form> \
-	<div id="mainGrid" style="margin:0; padding:0"></div>\
-</div>';
-  AMap.homeControlDiv = function() {
-  }
-  AMap.homeControlDiv.prototype = {
-      addTo : function(mymap, dom) {
-          dom.appendChild(this._getHtmlDom(map));
-          this.addMyownEvent();
-      },
-      addMyownEvent : function(){
-          $(".btn-clipboard").click(function(){
-              if(controlUI != null)
-                  controlUI.style.display='none';
-              homeControlbtn.style.display='block';
-          });
-      },
-      _getHtmlDom : function(mymap) {
-          this.map = mymap;
-          controlUI = document.createElement("DIV");
-          controlUI.className = ""; // 设置控件容器的宽度
-          controlUI.style.width = "1000px"; // 设置控件容器的宽度
-          controlUI.style.borderStyle = "solid";
-          controlUI.style.borderWidth = "0px";
-          controlUI.style.textAlign = "center"; // 设置控件的位置
-          controlUI.style.position = "absolute";
-          controlUI.style.left = "60px"; // 设置控件离地图的左边界的偏移量
-          controlUI.style.top = "1px"; // 设置控件离地图上边界的偏移量
-          controlUI.style.zIndex = "300"; // 设置控件在地图上显示 // 设置控件字体样式
-          controlUI.style.fontFamily = "Arial,sens-serif";
-          controlUI.style.fontSize = "12px";
-          controlUI.style.paddingLeft = "0px";
-          controlUI.style.paddingRight = "0px";
-          controlUI.innerHTML = tableHtml;
-          controlUI.onclick = function() {
-          }
-          return controlUI;
+
+  //点击按钮查看 1.组合商圈 2.大数据商圈 3.默认商圈
+  function district(value){
+      var cityId =   $("#cityId ").val();
+      if(!cityId||cityId==''){
+          alert('请选择城市');
+          return ;
+	  }
+      map.clearMap();
+      var cityName = $("#cityId").find("option:selected").text();
+      if (!cityName) {
+          cityName = '北京市';
       }
+      map.setCity(cityName);
+
+	  if(cityId==yuanCityId){
+          if(value==2&&result1.length>0){
+              setPoint(result1);
+          }else if(value==3&&result2.length>0){
+              setPoint2(result2);
+          }else if(value==1&&(result1.length>0||result2.length>0)){
+              setPoint(result1);
+              setPoint2(result2);
+		  }
+		  return ;
+	  }else{
+          yuanCityId = cityId;
+	  }
+      // alert(val + "=====" + city);
+      $.ajax({
+          type: "POST",
+          dataType: "json",
+          url: "${ctx}district/queryDistrictData.html",
+          data: {cityId:cityId},
+          success: function (data) {
+              result1 = data.result1;
+              result2 = data.result2;
+              if(value==1){
+                  if(result1.length>0){
+                      setPoint(result1);
+                  }else{
+                      alert("没有大数据商圈数据");
+                  }
+                  if(result2.length>0){
+                      setPoint2(result2);
+                  }else{
+                      alert("没有默认商圈数据");
+                  }
+			  }else if(value==2){
+                  if(result1.length>0){
+                      setPoint(result1);
+                  }else{
+                      alert("没有大数据商圈数据");
+                  }
+			  } else{
+                  if(result2.length>0){
+                      setPoint2(result2);
+                  }else{
+                      alert("没有默认商圈数据");
+                  }
+			  }
+          },
+          error: function (data) {
+              alert("网络错误");
+          }
+      })
   }
-  var homeControl = new AMap.homeControlDiv(map); // 新建自定义插件对象
-  map.addControl(homeControl);// 地图上添加插件
+    function setPoint(data){
+        if(data){
+            for(var i=0;i<data.length;i++){
+                var points = data[i].district;
+                var pointArrays = points.split(";");
+                if(pointArrays){
+                    for(var k=0;k<pointArrays.length;k++){
+                        var point = pointArrays[k];
+                        if(point){
+                            var arr = new Array(); //
+                            var pointArray = point.split(":");
+                            if(pointArray){
+                                for(var j=0;j<pointArray.length;j++){
+                                    if(pointArray[j]){
+                                        arr.push(new AMap.LngLat(pointArray[j].split(',')[0],pointArray[j].split(',')[1]));
+                                    }
+                                }
+                            }
+                            var _p = new AMap.Polygon({
+                                map: map,
+                                path: arr,
+                                strokeColor: "#0000ff",
+                                strokeOpacity: 1,
+                                strokeWeight: 2,
+                                fillColor: "#f5deb3",
+                                fillOpacity: 0
+                            });
+                            polygons.push(_p);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    function setPoint2(data){
+        if(data){
+            for(var i=0;i<data.length;i++){
+                var points = data[i].point;
+                var pointArrays = points.split("/");
+                if(pointArrays){
+                    for(var k=0;k<pointArrays.length;k++){
+                        var point = pointArrays[k];
+                        if(point){
+                            var arr = new Array(); //
+                            var pointArray = point.split(";");
+                            if(pointArray){
+                                for(var j=0;j<pointArray.length;j++){
+                                    if(pointArray[j]){
+                                        arr.push(new AMap.LngLat(pointArray[j].split(',')[0],pointArray[j].split(',')[1]));
+                                    }
+                                }
+                            }
+                            var _p = new AMap.Polygon({
+                                map: map,
+                                path: arr,
+                                strokeColor: "#0000ff",
+                                strokeOpacity: 1,
+                                strokeWeight: 2,
+                                fillColor: "#f5deb3",
+                                fillOpacity: 0
+                            });
+                            polygons.push(_p);
+                        }
+                    }
+                }
+            }
+        }
+    }
 </script>
 </body>
 </html>
