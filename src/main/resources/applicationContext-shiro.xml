@@ -119,7 +119,7 @@
     <bean id="shiroFilter" class="com.zhuanche.shiro.PlatformShiroFilterFactoryBean">
         <property name="securityManager" ref="securityManager" />
         <property name="loginUrl" value="${sso.login.url}" />
-        <property name="localLoginUrl" value="${manage.login.url}"/>
+        <property name="localLoginUrl" value="${cms.login.url}"/>
         <property name="successUrl" value="/index.html" />
         <property name="unauthorizedUrl" value="/unauthorized.html" />
         <property name="desSecret" value="${service.des.secret}"/>

@@ -8,9 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class MainController {
 
-//    @Autowired
-//    private AdminService adminService;
-
     @Value("${sso.server.url}")
     private String ssoServerUrl;
 
@@ -29,6 +26,10 @@ public class MainController {
         return "index";
     }
 
+    @RequestMapping("/main")
+    public String main(){
+        return "main";
+    }
 
     @RequestMapping("/login")
     public String login(){
