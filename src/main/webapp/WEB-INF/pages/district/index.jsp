@@ -98,9 +98,9 @@
 <script src="${ctx}resources/js/moment/moment.min.js"></script>
 <!-- Custom Theme Scripts -->
 <script src="${ctx}resources/js/custom.min.js"></script>
-<link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>
-<script src="http://webapi.amap.com/maps?v=1.4.4&key=db4b48fb15aecc4e23ffd395910dd5a6"></script>
-<script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+<link rel="stylesheet" href="//cache.amap.com/lbs/static/main1119.css"/>
+<script src="//webapi.amap.com/maps?v=1.4.4&key=db4b48fb15aecc4e23ffd395910dd5a6"></script>
+<script type="text/javascript" src="//cache.amap.com/lbs/static/addToolbar.js"></script>
 <script>
     var result1;
     var result2;
