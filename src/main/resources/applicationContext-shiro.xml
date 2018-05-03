@@ -136,6 +136,9 @@
                 /authenticated.html = authc
                 /getVerCode.html = anon
                 /upload/file.html = anon
+                /500.html = anon
+                /nginx.html = anon
+                /dataRecovery/** = anon
                 /** = user
                 <!--/** = ssl -->
             </value>

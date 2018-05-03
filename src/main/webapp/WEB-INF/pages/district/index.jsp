@@ -112,6 +112,16 @@
         center: [116.397428, 39.90923]
     });
 
+    $("#cityId").change(function(){
+        map.clearMap();
+        var cityName = $("#cityId").find("option:selected").text();
+        if (!cityName) {
+            cityName = '北京市';
+        }
+        console.log(cityName);
+        map.setCity(cityName);
+    });
+
   //点击按钮查看 1.组合商圈 2.大数据商圈 3.默认商圈
   function district(value){
       var cityId =   $("#cityId ").val();
