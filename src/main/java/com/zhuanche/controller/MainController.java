@@ -35,4 +35,9 @@ public class MainController {
     public String login(){
         return "login";
     }
+
+    @RequestMapping("/nginx")
+    public String nginx(){
+        return "common/nginx";
+    }
 }
