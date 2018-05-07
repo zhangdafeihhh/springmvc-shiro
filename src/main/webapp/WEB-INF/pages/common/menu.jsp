@@ -14,7 +14,7 @@
                 <ul class="nav side-menu">
                         <li class="${menu eq 'system'?'active':''}"><a><i class="fa fa-home"></i>商圈管理<span class="fa fa-chevron-down"></span></a>
                             <ul class="nav child_menu" style="${menu eq 'system'?'display: block;':''}">
-                                    <li class="${submenu eq 'user'?'current-page':''}"><a href="${ctx}district/index.html">商圈</a></li>
+                                    <li class="${submenu eq 'user'?'current-page':''}"><a href="${ctx}district/index.html">实时商圈</a></li>
                             </ul>
                         </li>
                 </ul>
