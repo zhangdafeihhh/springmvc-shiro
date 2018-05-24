@@ -16,7 +16,9 @@
 						<li>
 							<a><i class="fa fa-home"></i>商圈管理<span class="fa fa-chevron-down"></span></a>
 							<ul class="nav child_menu">
-								<li><a href="${ctx}district/index.html">实时商圈</a></li>
+								<shiro:hasPermission name="district_list">
+									<li><a href="${ctx}district/index.html">实时商圈</a></li>
+								</shiro:hasPermission>
 							</ul>
 						</li>
 					</ul>
@@ -25,8 +27,11 @@
 					<ul class="nav side-menu">
 						<li>
 							<a><i class="fa fa-home"></i>司机排班管理<span class="fa fa-chevron-down"></span></a>
-							<ul class="nav child_menu">
-								<li><a href="${ctx}">强制上班时长设置</a></li>
+							<ul class="
+							nav child_menu">
+								<shiro:hasPermission name="force_list">
+									<li><a href="${ctx}">强制上班时长设置</a></li>
+								</shiro:hasPermission>
 							</ul>
 						</li>
 					</ul>
