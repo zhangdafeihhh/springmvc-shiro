@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.zhuanche.dao.driver.DriverCityWhiteMapper" >
+<mapper namespace="mapper.driver.DriverCityWhiteMapper" >
   <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.DriverCityWhite" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="city_name" property="cityName" jdbcType="VARCHAR" />
@@ -11,16 +11,118 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
-
   <sql id="Base_Column_List" >
     id, city_name, city_id, status, validate_status, validate_date, create_time, update_time
   </sql>
-
-  <select id="findList" resultMap="BaseResultMap">
-    select
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
     <include refid="Base_Column_List" />
     from driver_city_white_list
-    where status=1
+    where id = #{id,jdbcType=INTEGER}
   </select>
-
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from driver_city_white_list
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.driver.DriverCityWhite" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into driver_city_white_list (city_name, city_id, status, 
+      validate_status, validate_date, create_time, 
+      update_time)
+    values (#{cityName,jdbcType=VARCHAR}, #{cityId,jdbcType=INTEGER}, #{status,jdbcType=TINYINT}, 
+      #{validateStatus,jdbcType=TINYINT}, #{validateDate,jdbcType=DATE}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.DriverCityWhite" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into driver_city_white_list
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="cityName != null" >
+        city_name,
+      </if>
+      <if test="cityId != null" >
+        city_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="validateStatus != null" >
+        validate_status,
+      </if>
+      <if test="validateDate != null" >
+        validate_date,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="cityName != null" >
+        #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="validateStatus != null" >
+        #{validateStatus,jdbcType=TINYINT},
+      </if>
+      <if test="validateDate != null" >
+        #{validateDate,jdbcType=DATE},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.driver.DriverCityWhite" >
+    update driver_city_white_list
+    <set >
+      <if test="cityName != null" >
+        city_name = #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="validateStatus != null" >
+        validate_status = #{validateStatus,jdbcType=TINYINT},
+      </if>
+      <if test="validateDate != null" >
+        validate_date = #{validateDate,jdbcType=DATE},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.DriverCityWhite" >
+    update driver_city_white_list
+    set city_name = #{cityName,jdbcType=VARCHAR},
+      city_id = #{cityId,jdbcType=INTEGER},
+      status = #{status,jdbcType=TINYINT},
+      validate_status = #{validateStatus,jdbcType=TINYINT},
+      validate_date = #{validateDate,jdbcType=DATE},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
 </mapper>

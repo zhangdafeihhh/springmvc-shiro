@@ -13,7 +13,6 @@
                         http://www.dangdang.com/schema/ddframe/rdb
                         http://www.dangdang.com/schema/ddframe/rdb/rdb.xsd">
 
-    <context:component-scan base-package="com.zhuanche"/>
 
     <bean id="baseDataSource" class="com.alibaba.druid.pool.DruidDataSource" abstract="true">
         <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
@@ -53,72 +52,6 @@
         <property name="password" value="${slave.jdbc.password}"/>
     </bean>
 
-    <bean id="mdbManageMasterDataSource" class="com.alibaba.druid.pool.DruidDataSource"
-          init-method="init" destroy-method="close" parent="baseDataSource">
-        <property name="url" value="${mdb.master.jdbc.url}"/>
-        <property name="username" value="${mdb.master.jdbc.username}"/>
-        <property name="password" value="${mdb.master.jdbc.password}"/>
-    </bean>
-
-    <bean id="mdbManageSlaveDataSource" class="com.alibaba.druid.pool.DruidDataSource"
-          init-method="init" destroy-method="close" parent="baseDataSource">
-        <property name="url" value="${mdb.slave.jdbc.url}"/>
-        <property name="username" value="${mdb.slave.jdbc.username}"/>
-        <property name="password" value="${mdb.slave.jdbc.password}"/>
-    </bean>
-
-    <!-- 增加查询司机信息的数据库配置 -->
-    <bean id="rentcarMasterDataSource" class="com.alibaba.druid.pool.DruidDataSource"
-          init-method="init" destroy-method="close" parent="baseDataSource">
-        <property name="url" value="${rentcar.master.jdbc.url}"/>
-        <property name="username" value="${rentcar.master.jdbc.username}"/>
-        <property name="password" value="${rentcar.master.jdbc.password}"/>
-    </bean>
-
-
-    <bean id="rentcarSlaveDataSource" class="com.alibaba.druid.pool.DruidDataSource"
-          init-method="init" destroy-method="close" parent="baseDataSource">
-        <property name="url" value="${rentcar.slave.jdbc.url}"/>
-        <property name="username" value="${rentcar.slave.jdbc.username}"/>
-        <property name="password" value="${rentcar.slave.jdbc.password}"/>
-    </bean>
-
-    <!--司机心跳-->
-    <bean id="driverLogMasterDataSource" class="com.alibaba.druid.pool.DruidDataSource"
-          init-method="init" destroy-method="close" parent="baseDataSource">
-        <property name="url" value="${mdblog.master.jdbc.url}"/>
-        <property name="username" value="${mdblog.master.jdbc.username}"/>
-        <property name="password" value="${mdblog.master.jdbc.password}"/>
-    </bean>
-
-    <bean id="driverLogSlaveDataSource" class="com.alibaba.druid.pool.DruidDataSource"
-          init-method="init" destroy-method="close" parent="baseDataSource">
-        <property name="url" value="${mdblog.slave.jdbc.url}"/>
-        <property name="username" value="${mdblog.slave.jdbc.username}"/>
-        <property name="password" value="${mdblog.slave.jdbc.password}"/>
-    </bean>
-
-    <bean id="mdbManageSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-        <property name="dataSource" ref="shardingmdbManageDataSource"/>
-        <property name="mapperLocations" value="classpath*:mapper/mdbManage/*.xml"/>
-        <!-- 注入分页属性方式  -->
-        <property name="configurationProperties">
-            <props>
-                <prop key="dialect">mysql</prop>
-            </props>
-        </property>
-    </bean>
-
-    <bean id="driverLogSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-        <property name="dataSource" ref="shardingdriverLogDataSource"/>
-        <property name="mapperLocations" value="classpath*:mapper/driverLog/*.xml"/>
-        <!-- 注入分页属性方式  -->
-        <property name="configurationProperties">
-            <props>
-                <prop key="dialect">mysql</prop>
-            </props>
-        </property>
-    </bean>
 
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="shardingDataSource"/>
@@ -131,49 +64,18 @@
         </property>
     </bean>
 
-    <!-- 增加查询司机信息的配置-->
-    <bean id="rentcarSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-        <property name="dataSource" ref="shardingRentcarDataSource"/>
-        <property name="mapperLocations" value="classpath*:mapper/rentcar/*.xml"/>
-        <!-- 注入分页属性方式  -->
-        <property name="configurationProperties">
-            <props>
-                <prop key="dialect">mysql</prop>
-            </props>
-        </property>
-    </bean>
 
-    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="basePackage" value="com.zhuanche.dao.mdbManage"/>
-        <property name="sqlSessionFactoryBeanName" value="mdbManageSqlSessionFactory"/>
-    </bean>
-    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="basePackage" value="com.zhuanche.dao.driverLog"/>
-        <property name="sqlSessionFactoryBeanName" value="driverLogSqlSessionFactory"/>
-    </bean>
+ 
     <!-- enable transaction demarcation with annotations -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage" value="com.zhuanche.dao.driver"/>
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
-    </bean>
-    <!-- 增加查询rentcar库配置 -->
-    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="basePackage" value="com.zhuanche.dao.rentcar"/>
-        <property name="sqlSessionFactoryBeanName" value="rentcarSqlSessionFactory"/>
     </bean>
 
     <rdb:master-slave-data-source id="dataSource" master-data-source-ref="masterDataSource"
                                   slave-data-sources-ref="slaveDataSource"/>
 
 
-    <rdb:master-slave-data-source id="rentcarDataSource" master-data-source-ref="rentcarMasterDataSource"
-                                  slave-data-sources-ref="rentcarSlaveDataSource"/>
-
-    <rdb:master-slave-data-source id="mdbManageDataSource" master-data-source-ref="mdbManageMasterDataSource"
-                                  slave-data-sources-ref="mdbManageSlaveDataSource"/>
-
-    <rdb:master-slave-data-source id="driverLogDataSource" master-data-source-ref="driverLogMasterDataSource"
-                                  slave-data-sources-ref="driverLogSlaveDataSource"/>
 
 
     <rdb:data-source id="shardingDataSource">
@@ -184,70 +86,9 @@
         </rdb:sharding-rule>
     </rdb:data-source>
 
-    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="shardingDataSource"/>
-    </bean>
 
-    <rdb:data-source id="shardingRentcarDataSource">
-        <rdb:sharding-rule data-sources="rentcarDataSource">
-            <rdb:table-rules>
-                <rdb:table-rule logic-table="car_biz_car_group_city" actual-tables="car_biz_car_group_city"/>
-                <rdb:table-rule logic-table="car_biz_car_group" actual-tables="car_biz_car_group"/>
-                <rdb:table-rule logic-table="car_biz_district_station" actual-tables="car_biz_district_station"/>
-                <rdb:table-rule logic-table="car_biz_district_station_relate" actual-tables="car_biz_district_station_relate"/>
-                <rdb:table-rule logic-table="car_biz_driver_info" actual-tables="car_biz_driver_info"/>
-                <rdb:table-rule logic-table="car_biz_city" actual-tables="car_biz_city"/>
-                <rdb:table-rule logic-table="car_biz_supplier" actual-tables="car_biz_supplier"/>
-                <rdb:table-rule logic-table="car_fact_order" actual-tables="car_fact_order"/>
-                <rdb:table-rule logic-table="car_biz_order_cost_detail" actual-tables="car_biz_order_cost_detail"/>
-                <rdb:table-rule logic-table="car_biz_order_cost_detail_extension" actual-tables="car_biz_order_cost_detail_extension"/>
-                <rdb:table-rule logic-table="car_biz_service_type_car_group_city" actual-tables="car_biz_service_type_car_group_city"/>
-                <rdb:table-rule logic-table="car_biz_service" actual-tables="car_biz_service"/>
-                <rdb:table-rule logic-table="car_biz_service_type_city" actual-tables="car_biz_service_type_city"/>
-                <rdb:table-rule logic-table="car_biz_car_info" actual-tables="car_biz_car_info"/>
-                <rdb:table-rule logic-table="car_biz_model" actual-tables="car_biz_model"/>
-            </rdb:table-rules>
-            <rdb:default-database-strategy sharding-columns="none"
-                                           algorithm-class="com.dangdang.ddframe.rdb.sharding.api.strategy.database.NoneDatabaseShardingAlgorithm"/>
-            <rdb:default-table-strategy sharding-columns="none"
-                                        algorithm-class="com.dangdang.ddframe.rdb.sharding.api.strategy.table.NoneTableShardingAlgorithm"/>
 
-        </rdb:sharding-rule>
 
-    </rdb:data-source>
 
-    <rdb:data-source id="shardingmdbManageDataSource">
-        <rdb:sharding-rule data-sources="mdbManageDataSource">
-            <rdb:table-rules>
-                <rdb:table-rule logic-table="car_driver_team" actual-tables="car_driver_team"/>
-                <rdb:table-rule logic-table="car_relate_team" actual-tables="car_relate_team"/>
-            </rdb:table-rules>
-        </rdb:sharding-rule>
-
-    </rdb:data-source>
-
-    <rdb:data-source id="shardingdriverLogDataSource">
-        <rdb:sharding-rule data-sources="driverLogDataSource">
-            <rdb:table-rules>
-                <rdb:table-rule logic-table="car_driver_team" actual-tables="car_driver_team"/>
-            </rdb:table-rules>
-        </rdb:sharding-rule>
-
-    </rdb:data-source>
-
-    <bean id="rentcarTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="shardingRentcarDataSource"/>
-    </bean>
-    <bean id="mdbManageTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="shardingmdbManageDataSource"/>
-    </bean>
-    <bean id="driverLogTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="shardingdriverLogDataSource"/>
-    </bean>
-
-    <tx:annotation-driven transaction-manager="transactionManager"/>
-    <tx:annotation-driven transaction-manager="rentcarTransactionManager"/>
-    <tx:annotation-driven transaction-manager="mdbManageTransactionManager"/>
-    <tx:annotation-driven transaction-manager="driverLogTransactionManager"/>
 
 </beans>

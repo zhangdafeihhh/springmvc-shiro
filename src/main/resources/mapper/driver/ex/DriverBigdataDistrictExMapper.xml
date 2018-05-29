@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.ex.DriverBigdataDistrictExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.DriverBigdataDistrict" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="time" property="time" jdbcType="CHAR" />
+    <result column="date" property="date" jdbcType="DATE" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.driver.DriverBigdataDistrict" extends="BaseResultMap" >
+    <result column="district" property="district" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, city_id, city_name, status, time, date, create_date, update_date
+  </sql>
+  <sql id="Blob_Column_List" >
+    district
+  </sql>
+  
+  <select id="findListByCityId" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />, <include refid="Blob_Column_List" />
+    from driver_bigdata_district
+    where city_id = #{cityId,jdbcType=INTEGER} and time = #{time,jdbcType=CHAR} and date = #{date,jdbcType=DATE}
+  </select>
+    
+</mapper>

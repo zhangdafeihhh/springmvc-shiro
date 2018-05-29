@@ -28,7 +28,6 @@
                                 expression="org.springframework.stereotype.Service" />
     </context:component-scan>
 
-
     <task:executor
             id="myexecutor"
             pool-size="5-25"

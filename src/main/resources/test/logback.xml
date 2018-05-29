@@ -29,16 +29,9 @@
         </encoder>
     </appender>
 
-    <logger name="com.zhuanche" level="DEBUG" additivity="false">
-        <appender-ref ref="FILE"/>
-    </logger>
 
-    <logger name="com.zhuanche.message.job" level="INFO" additivity="false">
-        <appender-ref ref="accessLogFile"/>
-    </logger>
 
     <!-- <logger name="com.alibaba" level="INFO"/> -->
-
     <logger name="jdbc.sqltiming" level="INFO"/>
     <logger name="com.ibatis" level="INFO" />
     <logger name="com.ibatis.common.jdbc.SimpleDataSource" level="INFO" />
@@ -50,6 +43,7 @@
     <logger name="java.sql.ResultSet" level="INFO" />
 
     <root level="INFO">
+        <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
     </root>
 

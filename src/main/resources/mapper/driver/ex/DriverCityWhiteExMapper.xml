@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.ex.DriverCityWhiteExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.DriverCityWhite" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="validate_status" property="validateStatus" jdbcType="TINYINT" />
+    <result column="validate_date" property="validateDate" jdbcType="DATE" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, city_name, city_id, status, validate_status, validate_date, create_time, update_time
+  </sql>
+  
+
+  <select id="findList" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from driver_city_white_list
+    where status=1
+  </select>
+   
+</mapper>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+    <!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"  
+    "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="cacheEnabled" value="false" />
+		<setting name="lazyLoadingEnabled" value="false" />
+		<setting name="aggressiveLazyLoading" value="true" />
+		<setting name="multipleResultSetsEnabled" value="true" />
+		<setting name="useColumnLabel" value="true" />
+		<setting name="autoMappingBehavior" value="FULL" />
+		<setting name="defaultExecutorType" value="SIMPLE" />
+		<setting name="defaultStatementTimeout" value="300" />
+	</settings>
+	<!-- <plugins>
+		<plugin interceptor="com.jrd.framework.mybatis.PagePlugin">
+			请修改此处：需改为实际使用的数据库方言名称
+			<property name="dialect" value="mysql" />
+			<property name="pageSqlId" value=".*ListPage.*" />
+		</plugin>
+	</plugins> -->
+	<plugins>
+	    <plugin interceptor="com.github.pagehelper.PageHelper">
+	        <property name="dialect" value="mysql"/>
+	        <property name="offsetAsPageNum" value="false"/>
+	        <property name="rowBoundsWithCount" value="false"/>
+	        <property name="pageSizeZero" value="true"/>
+	        <property name="reasonable" value="false"/>
+	        <property name="supportMethodsArguments" value="false"/>
+	        <property name="returnPageInfo" value="none"/>
+	    </plugin>
+	</plugins>
+</configuration>
