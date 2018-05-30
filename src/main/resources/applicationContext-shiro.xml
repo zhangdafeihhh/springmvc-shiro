@@ -1,190 +1,192 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
-       xsi:schemaLocation="
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <!-- cacheManager -->
+	<!-- ********************************配置cacheManager（用于shiro安全管理器，用来缓存用户会话、认证信息、授权信息）-->
+	<bean id="ehCacheManager"	class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="configLocation" value="classpath:ehcache.xml" />
+	</bean>
+	<bean id="shiroCacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+		<property name="cacheManager" ref="ehCacheManager" />
+	</bean>
+	
+	<!-- ********************************配置会话Session Cookie -->
+	<bean id="sessionIdGenerator" class="com.zhuanche.shiro.session.UuIdSessionIdGenerator" />
+	<!-- 会话Cookie模板 -->
+	<bean id="sessionIdCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+		<constructor-arg value="sid" />
+		<property name="httpOnly" value="true" />
+		<property name="maxAge" value="-1" />
+	</bean>
+	<!-- 会话DAO （在这里实现自定义的session信息执久化操作）-->
+	<bean id="sessionDAO" class="com.zhuanche.shiro.session.RedisSessionDAO">
+		<property name="activeSessionsCacheName" value="shiro-activeSessionCache" />
+		<property name="sessionIdGenerator" ref="sessionIdGenerator" />
+		<property name="redisTemplate" ref="redisTemplate" />
+	</bean>
+	<!-- 会话管理器 -->
+	<bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+		<property name="globalSessionTimeout" value="1800000" /> <!-- 这里设置为30分钟会话过期时效 -->
+		<property name="deleteInvalidSessions" value="true" />
+		<property name="sessionValidationSchedulerEnabled" value="true" />
+		<property name="sessionValidationScheduler" ref="sessionValidationScheduler" />
+		<property name="sessionDAO" ref="sessionDAO" />
+		<property name="sessionIdCookieEnabled" value="true" />
+		<property name="sessionIdCookie" ref="sessionIdCookie" />
+	</bean>
+	<!-- 会话过期校验调度器 -->
+	<bean id="sessionValidationScheduler" class="org.apache.shiro.session.mgt.quartz.QuartzSessionValidationScheduler">
+		<property name="sessionValidationInterval" value="900000" />
+		<property name="sessionManager" ref="sessionManager" />
+	</bean>
+
+	<!-- ********************************配置会话rememberMe Cookie -->
+	<bean id="rememberMeCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+		<constructor-arg value="mpRememberMe" />
+		<property name="httpOnly" value="true" />
+		<property name="maxAge" value="432000" /><!-- 5天 -->
+	</bean>
+	<bean id="rememberMeManager" class="org.apache.shiro.web.mgt.CookieRememberMeManager">
+		<!-- rememberMe cookie加密的密钥 建议每个项目都不一样 默认AES算法 密钥长度（128 256 512 位） -->
+		<property name="cipherKey"	value="#{T(org.apache.shiro.codec.Base64).decode('4AvVhmFLUs0KTA3Kprsdag==')}" />
+		<property name="cookie" ref="rememberMeCookie" />
+	</bean>
+	
+	<!-- ********************************配置Realm实现 -->
+	<bean id="shiroRealm" class="com.zhuanche.shiro.realm.ShiroRealm">
+		<property name="defaultRoles" value="ROLE_USER" />
+		<property name="casServerUrlPrefix" value="${sso.server.url}" />
+		<!-- 客户端的回调地址，必须和下面的shiro-cas过滤器拦截的地址一致 -->
+		<property name="casService" value="${cms.login.url}" />
+	</bean>
+	
+	<!-- ********************************配置SecurityManager安全管理器 -->
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="cacheManager" ref="shiroCacheManager" />
+		<property name="sessionManager" ref="sessionManager" />
+		<property name="rememberMeManager" ref="rememberMeManager" />
+		<property name="realms">
+			<list>
+				<ref bean="shiroRealm" />
+			</list>
+		</property>
+	</bean>
+	<bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="staticMethod" value="org.apache.shiro.SecurityUtils.setSecurityManager" />
+		<property name="arguments" ref="securityManager" />
+	</bean>
+
+	<!-- ********************************配置Shiro的Web过滤器 -->
+	<bean id="shiroFilter" class="com.zhuanche.shiro.PlatformShiroFilterFactoryBean">
+		<property name="securityManager" ref="securityManager" />
+		<property name="loginUrl" value="${sso.login.url}" />
+		<property name="localLoginUrl" value="${cms.login.url}" />
+		<property name="successUrl" value="/index.html" />
+		<property name="unauthorizedUrl" value="/unauthorized.html" />
+		<property name="desSecret" value="${service.des.secret}" />
+		<property name="filters">
+			<util:map>
+				<!-- 添加casFilter到shiroFilter -->
+				<entry key="casFilter" value-ref="casFilter" />
+			</util:map>
+		</property>
+		<property name="filterChainDefinitions">
+			<value>
+				/login.html = casFilter
+				/logout.html = logout
+				/authenticated.html = authc
+				/getVerCode.html = anon
+				/upload/file.html = anon
+				/500.html = anon
+				/nginx.html = anon
+				/dataRecovery/** = anon
+				/** = user
+				<!--/** = ssl -->
+			</value>
+		</property>
+	</bean>
+	<bean id="casFilter" class="org.apache.shiro.cas.CasFilter">
+		<!-- 配置验证错误时的失败页面 -->
+		<property name="failureUrl" value="/index.html" />
+	</bean>
+	<bean name="casSingleSignOutFilter" class="org.jasig.cas.client.session.SingleSignOutFilter">
+		<property name="casServerUrlPrefix" value="${sso.server.url}" />
+	</bean>
+	<!-- Shiro生命周期处理器 -->
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+
+
+
+
+
+
+
+	<!-- cacheManager -->
 	<!-- jedis pool配置 -->
 	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
 		<property name="maxTotal" value="${redis.maxActive}" />
 		<property name="maxIdle" value="${redis.maxIdle}" />
 		<property name="testOnBorrow" value="${redis.testOnBorrow}" />
 	</bean>
-	<bean id="redisSentinelConfiguration" class="org.springframework.data.redis.connection.RedisSentinelConfiguration">
+	<bean id="redisSentinelConfiguration"
+		class="org.springframework.data.redis.connection.RedisSentinelConfiguration">
 		<property name="master">
 			<bean class="org.springframework.data.redis.connection.RedisNode">
-				<property name="name" value="${redis.sentinel.name}"/>
-		</bean>
+				<property name="name" value="${redis.sentinel.name}" />
+			</bean>
 		</property>
 		<property name="sentinels">
 			<set>
 				<bean class="org.springframework.data.redis.connection.RedisNode">
-					<constructor-arg name="host" value="${redis.server1.host}"/>
-					<constructor-arg name="port" value="${redis.server1.port}"/>
+					<constructor-arg name="host" value="${redis.server1.host}" />
+					<constructor-arg name="port" value="${redis.server1.port}" />
 				</bean>
 				<bean class="org.springframework.data.redis.connection.RedisNode">
-					<constructor-arg name="host" value="${redis.server2.host}"/>
-					<constructor-arg name="port" value="${redis.server2.port}"/>
+					<constructor-arg name="host" value="${redis.server2.host}" />
+					<constructor-arg name="port" value="${redis.server2.port}" />
 				</bean>
 				<bean class="org.springframework.data.redis.connection.RedisNode">
-					<constructor-arg name="host" value="${redis.server3.host}"/>
-					<constructor-arg name="port" value="${redis.server3.port}"/>
+					<constructor-arg name="host" value="${redis.server3.host}" />
+					<constructor-arg name="port" value="${redis.server3.port}" />
 				</bean>
 			</set>
 		</property>
 	</bean>
-	<bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
-	 p:poolConfig-ref="jedisPoolConfig" p:usePool="true">
-		<constructor-arg name="sentinelConfig" ref="redisSentinelConfiguration"/>
+	<bean id="jedisConnectionFactory"
+		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
+		p:poolConfig-ref="jedisPoolConfig" p:usePool="true">
+		<constructor-arg name="sentinelConfig" ref="redisSentinelConfiguration" />
 	</bean>
-    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
-        <property name="connectionFactory" ref="jedisConnectionFactory" />
-        <property name="keySerializer">
-            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
-        </property>
-        <property name="valueSerializer">
-            <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />
-        </property>
-    </bean>
+	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+		<property name="connectionFactory" ref="jedisConnectionFactory" />
+		<property name="keySerializer">
+			<bean
+				class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="valueSerializer">
+			<bean
+				class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />
+		</property>
+	</bean>
 
-    <!-- 凭证匹配器 -->
-    <bean id="credentialsMatcher"
-          class="com.zhuanche.shiro.credentials.RetryLimitHashedCredentialsMatcher">
-        <constructor-arg ref="redisTemplate" />
-        <property name="hashAlgorithmName" value="md5" />
-        <property name="hashIterations" value="2" />
-        <property name="storedCredentialsHexEncoded" value="true" />
-    </bean>
+	<!-- 凭证匹配器 -->
+	<bean id="credentialsMatcher" class="com.zhuanche.shiro.credentials.RetryLimitHashedCredentialsMatcher">
+		<constructor-arg ref="redisTemplate" />
+		<property name="hashAlgorithmName" value="md5" />
+		<property name="hashIterations" value="2" />
+		<property name="storedCredentialsHexEncoded" value="true" />
+	</bean>
 
-    <!-- Realm实现 -->
-    <bean id="shiroRealm" class="com.zhuanche.shiro.realm.ShiroRealm">
-        <property name="defaultRoles" value="ROLE_USER"/>
-        <property name="casServerUrlPrefix" value="${sso.server.url}"/>
-        <!-- 客户端的回调地址设置，必须和下面的shiro-cas过滤器拦截的地址一致 -->
-        <property name="casService" value="${cms.login.url}"/>
-    </bean>
-
-    <!-- 会话ID生成器 -->
-    <bean id="sessionIdGenerator" class="com.zhuanche.shiro.session.UuIdSessionIdGenerator" />
-
-    <!-- 会话Cookie模板 -->
-    <bean id="sessionIdCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
-        <constructor-arg value="sid" />
-        <property name="httpOnly" value="true" />
-        <property name="maxAge" value="-1" />
-    </bean>
-
-    <bean id="rememberMeCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
-        <constructor-arg value="rememberMe" />
-        <property name="httpOnly" value="true" />
-        <property name="maxAge" value="2592000" /><!-- 30天 -->
-    </bean>
-
-    <!-- rememberMe管理器 -->
-    <bean id="rememberMeManager" class="org.apache.shiro.web.mgt.CookieRememberMeManager">
-        <!-- rememberMe cookie加密的密钥 建议每个项目都不一样 默认AES算法 密钥长度（128 256 512 位） -->
-        <property name="cipherKey"
-                  value="#{T(org.apache.shiro.codec.Base64).decode('4AvVhmFLUs0KTA3Kprsdag==')}" />
-        <property name="cookie" ref="rememberMeCookie" />
-    </bean>
-
-    <!-- 会话DAO -->
-    <bean id="sessionDAO"
-          class="com.zhuanche.shiro.session.RedisSessionDAO">
-        <property name="activeSessionsCacheName" value="shiro-activeSessionCache" />
-        <property name="sessionIdGenerator" ref="sessionIdGenerator" />
-        <property name="redisTemplate" ref="redisTemplate"/>
-    </bean>
-
-    <!-- 会话验证调度器 -->
-    <bean id="sessionValidationScheduler"
-          class="org.apache.shiro.session.mgt.quartz.QuartzSessionValidationScheduler">
-        <property name="sessionValidationInterval" value="1800000" />
-        <property name="sessionManager" ref="sessionManager" />
-    </bean>
-
-    <!-- 会话管理器 -->
-    <bean id="sessionManager"
-          class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
-        <property name="globalSessionTimeout" value="1800000" />
-        <property name="deleteInvalidSessions" value="true" />
-        <property name="sessionValidationSchedulerEnabled" value="true" />
-        <property name="sessionValidationScheduler" ref="sessionValidationScheduler" />
-        <property name="sessionDAO" ref="sessionDAO" />
-        <property name="sessionIdCookieEnabled" value="true" />
-        <property name="sessionIdCookie" ref="sessionIdCookie" />
-    </bean>
-
-    <!-- 安全管理器 -->
-    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
-        <property name="realms"  >
-            <list>
-                <ref bean="shiroRealm"/>
-            </list>
-        </property>
-        <property name="sessionManager" ref="sessionManager" />
-        <property name="rememberMeManager" ref="rememberMeManager" />
-    </bean>
-
-    <!-- 相当于调用SecurityUtils.setSecurityManager(securityManager) -->
-    <bean
-            class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-        <property name="staticMethod"
-                  value="org.apache.shiro.SecurityUtils.setSecurityManager" />
-        <property name="arguments" ref="securityManager" />
-    </bean>
-
-    <!-- 基于Form表单的身份验证过滤器 -->
-    <bean id="formAuthenticationFilter"
-          class="com.zhuanche.shiro.filter.ShiroFormAuthenticationFilter">
-        <property name="usernameParam" value="username" />
-        <property name="passwordParam" value="password" />
-        <property name="rememberMeParam" value="rememberMe" />
-        <property name="loginUrl" value="/login.html" />
-    </bean>
-
-    <bean id="sysUserFilter" class="com.zhuanche.shiro.filter.SysUserFilter" />
-
-    <!-- Shiro的Web过滤器 -->
-    <bean id="shiroFilter" class="com.zhuanche.shiro.PlatformShiroFilterFactoryBean">
-        <property name="securityManager" ref="securityManager" />
-        <property name="loginUrl" value="${sso.login.url}" />
-        <property name="localLoginUrl" value="${cms.login.url}"/>
-        <property name="successUrl" value="/index.html" />
-        <property name="unauthorizedUrl" value="/unauthorized.html" />
-        <property name="desSecret" value="${service.des.secret}"/>
-        <property name="filters">
-            <util:map>
-                <!-- 添加casFilter到shiroFilter -->
-                <entry key="casFilter" value-ref="casFilter"/>
-            </util:map>
-        </property>
-        <property name="filterChainDefinitions">
-            <value>
-                /login.html = casFilter
-                /logout.html = logout
-                /authenticated.html = authc
-                /getVerCode.html = anon
-                /upload/file.html = anon
-                /500.html = anon
-                /nginx.html = anon
-                /dataRecovery/** = anon
-                /** = user
-                <!--/** = ssl -->
-            </value>
-        </property>
-    </bean>
-
-    <bean name="casSingleSignOutFilter" class="org.jasig.cas.client.session.SingleSignOutFilter">
-        <property name="casServerUrlPrefix" value="${sso.server.url}"/>
-    </bean>
-
-    <bean id="casFilter" class="org.apache.shiro.cas.CasFilter">
-        <!-- 配置验证错误时的失败页面  -->
-        <property name="failureUrl" value="/index.html"/>
-    </bean>
-    <!-- Shiro生命周期处理器 -->
-    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+	<!-- 基于Form表单的身份验证过滤器 -->
+	<bean id="formAuthenticationFilter" class="com.zhuanche.shiro.filter.ShiroFormAuthenticationFilter">
+		<property name="usernameParam" value="username" />
+		<property name="passwordParam" value="password" />
+		<property name="rememberMeParam" value="rememberMe" />
+		<property name="loginUrl" value="/login.html" />
+	</bean>
+	<bean id="sysUserFilter" class="com.zhuanche.shiro.filter.SysUserFilter" />
 </beans>
