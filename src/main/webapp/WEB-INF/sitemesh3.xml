@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemesh>
+     <!-- 指明满足“/*”的页面，将被“/WEB-INF/pages/common/decorator/default_layout.jsp”所装饰 -->
+     <mapping path="/*" decorator="/WEB-INF/pages/common/decorator/default_layout.jsp" />
+ 
+     <!-- 指明满足“/nginx.html”的页面，将被排除，不被装饰 -->
+     <mapping path="/nginx.html" exclue="true" />
+     
+</sitemesh>

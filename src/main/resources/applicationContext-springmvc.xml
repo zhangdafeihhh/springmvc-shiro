@@ -62,11 +62,6 @@
 	    </mvc:interceptor>
 	</mvc:interceptors> -->
 	
-    <!-- 配置统一异常处理（暂时不配置，需要区分页面请求异常、XHR请求异常、文件上传请求异常时的特殊处理） -->
-    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
-        <!-- 定义默认的异常展现页面 -->
-        <property name="defaultErrorView" value="common/500"></property>
-        <!-- 定义异常处理页面用来获取异常信息的变量名，默认名为exception -->
-        <property name="exceptionAttribute" value="e"></property>
-    </bean>
+    <!-- 配置统一异常处理（需要区分页面请求异常、XHR请求异常、文件上传请求异常时的特殊处理） -->
+	<bean class="com.zhuanche.common.web.CustomExceptionResolver"></bean>
 </beans>
