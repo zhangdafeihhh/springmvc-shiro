@@ -40,9 +40,4 @@ public class MainController {
     public String nginx(){
         return "common/nginx";
     }
-
-    @RequestMapping("/demo")
-    public String demo(){
-        return "common/demo";
-    }
 }
