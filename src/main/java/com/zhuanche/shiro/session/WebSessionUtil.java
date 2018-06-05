@@ -11,6 +11,12 @@ public final class WebSessionUtil {
 		Subject subject = SecurityUtils.getSubject();
 		return (SSOLoginUser) subject.getPrincipal();
 	}
+	/**是否为：车管后台-超级管理员**/
+	public static boolean isSupperAdmin() {
+		Subject subject = SecurityUtils.getSubject();
+		return subject.hasRole("car_manage_admin");
+	}
+	
 	/**设置会话属性**/
 	public static void setAttribute(String key, Object value) {
 		Subject subject = SecurityUtils.getSubject();

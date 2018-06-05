@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.CarDriverTeamMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.CarDriverTeam" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="team_name" property="teamName" jdbcType="VARCHAR" />
+    <result column="sort" property="sort" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="city" property="city" jdbcType="VARCHAR" />
+    <result column="supplier" property="supplier" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="BIT" />
+    <result column="p_id" property="pId" jdbcType="INTEGER" />
+    <result column="duty_start_date" property="dutyStartDate" jdbcType="VARCHAR" />
+    <result column="duty_end_date" property="dutyEndDate" jdbcType="VARCHAR" />
+    <result column="charge1" property="charge1" jdbcType="VARCHAR" />
+    <result column="charge2" property="charge2" jdbcType="VARCHAR" />
+    <result column="charge3" property="charge3" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, team_name, sort, create_by, create_date, update_by, update_date, city, supplier, 
+    remark, status, p_id, duty_start_date, duty_end_date, charge1, charge2, charge3
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from car_driver_team
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from car_driver_team
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverTeam" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_driver_team (team_name, sort, create_by, 
+      create_date, update_by, update_date, 
+      city, supplier, remark, 
+      status, p_id, duty_start_date, 
+      duty_end_date, charge1, charge2, 
+      charge3)
+    values (#{teamName,jdbcType=VARCHAR}, #{sort,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{city,jdbcType=VARCHAR}, #{supplier,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
+      #{status,jdbcType=BIT}, #{pId,jdbcType=INTEGER}, #{dutyStartDate,jdbcType=VARCHAR}, 
+      #{dutyEndDate,jdbcType=VARCHAR}, #{charge1,jdbcType=VARCHAR}, #{charge2,jdbcType=VARCHAR}, 
+      #{charge3,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverTeam" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_driver_team
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="teamName != null" >
+        team_name,
+      </if>
+      <if test="sort != null" >
+        sort,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="city != null" >
+        city,
+      </if>
+      <if test="supplier != null" >
+        supplier,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="pId != null" >
+        p_id,
+      </if>
+      <if test="dutyStartDate != null" >
+        duty_start_date,
+      </if>
+      <if test="dutyEndDate != null" >
+        duty_end_date,
+      </if>
+      <if test="charge1 != null" >
+        charge1,
+      </if>
+      <if test="charge2 != null" >
+        charge2,
+      </if>
+      <if test="charge3 != null" >
+        charge3,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="teamName != null" >
+        #{teamName,jdbcType=VARCHAR},
+      </if>
+      <if test="sort != null" >
+        #{sort,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="city != null" >
+        #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="supplier != null" >
+        #{supplier,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=BIT},
+      </if>
+      <if test="pId != null" >
+        #{pId,jdbcType=INTEGER},
+      </if>
+      <if test="dutyStartDate != null" >
+        #{dutyStartDate,jdbcType=VARCHAR},
+      </if>
+      <if test="dutyEndDate != null" >
+        #{dutyEndDate,jdbcType=VARCHAR},
+      </if>
+      <if test="charge1 != null" >
+        #{charge1,jdbcType=VARCHAR},
+      </if>
+      <if test="charge2 != null" >
+        #{charge2,jdbcType=VARCHAR},
+      </if>
+      <if test="charge3 != null" >
+        #{charge3,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverTeam" >
+    update car_driver_team
+    <set >
+      <if test="teamName != null" >
+        team_name = #{teamName,jdbcType=VARCHAR},
+      </if>
+      <if test="sort != null" >
+        sort = #{sort,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="city != null" >
+        city = #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="supplier != null" >
+        supplier = #{supplier,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=BIT},
+      </if>
+      <if test="pId != null" >
+        p_id = #{pId,jdbcType=INTEGER},
+      </if>
+      <if test="dutyStartDate != null" >
+        duty_start_date = #{dutyStartDate,jdbcType=VARCHAR},
+      </if>
+      <if test="dutyEndDate != null" >
+        duty_end_date = #{dutyEndDate,jdbcType=VARCHAR},
+      </if>
+      <if test="charge1 != null" >
+        charge1 = #{charge1,jdbcType=VARCHAR},
+      </if>
+      <if test="charge2 != null" >
+        charge2 = #{charge2,jdbcType=VARCHAR},
+      </if>
+      <if test="charge3 != null" >
+        charge3 = #{charge3,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverTeam" >
+    update car_driver_team
+    set team_name = #{teamName,jdbcType=VARCHAR},
+      sort = #{sort,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      city = #{city,jdbcType=VARCHAR},
+      supplier = #{supplier,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      status = #{status,jdbcType=BIT},
+      p_id = #{pId,jdbcType=INTEGER},
+      duty_start_date = #{dutyStartDate,jdbcType=VARCHAR},
+      duty_end_date = #{dutyEndDate,jdbcType=VARCHAR},
+      charge1 = #{charge1,jdbcType=VARCHAR},
+      charge2 = #{charge2,jdbcType=VARCHAR},
+      charge3 = #{charge3,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

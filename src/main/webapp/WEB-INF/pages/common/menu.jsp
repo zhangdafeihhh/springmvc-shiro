@@ -23,16 +23,26 @@
 							</shiro:hasPermission>
 							
 							<!-- 司机排班管理 -->
-							<shiro:hasPermission name="driver_duty_menu">
+							<shiro:hasPermission name="driver_duty_menu" >
 							<ul class="nav side-menu">
 								<li>
 									<a><i class="fa fa-home"></i>司机排班管理<span class="fa fa-chevron-down"></span></a>
 									<ul class="nav child_menu">
-										<shiro:hasPermission name="force_list"><li><a href="${webctx}">强制上班时长设置</a></li></shiro:hasPermission>
+										<shiro:hasPermission name="force_list"><li><a href="${webctx}/a/b/c.html">强制上班时长设置</a></li></shiro:hasPermission>
 									</ul>
 								</li>
 							</ul>
 							</shiro:hasPermission>
+							
+							<!-- 车队管理 -->
+							<ul class="nav side-menu">
+								<li>
+									<a><i class="fa fa-home"></i>车队管理<span class="fa fa-chevron-down"></span></a>
+									<ul class="nav child_menu">
+										<li><a href="${webctx}/driverteam/list.html">车队列表</a></li>
+									</ul>
+								</li>
+							</ul>
 							
 							<!-- 测试菜单 -->
 							<ul class="nav side-menu">
