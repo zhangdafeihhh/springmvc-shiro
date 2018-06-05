@@ -41,6 +41,23 @@
 		<property name="typeAliasesPackage" value="com.zhuanche.entity.driver" />
 		<!-- 请修改此处： 请修改为实际的mybatis环境配置文件位置 -->
 		<property name="configLocation" value="classpath:mybatis-conf.xml" />
+        <!-- 分页插件 -->
+        <property name="plugins">
+            <array>
+                <bean class="com.github.pagehelper.PageInterceptor">
+                    <!-- 这里的几个配置主要演示如何使用，如果不理解，一定要去掉下面的配置 -->
+                    <property name="properties">
+                        <value>
+                            helperDialect=mysql
+                            reasonable=true
+                            supportMethodsArguments=true
+                            params=count=countSql
+                            autoRuntimeDialect=true
+                        </value>
+                    </property>
+                </bean>
+            </array>
+        </property>
 	</bean>
 
 	<!-- 配置mapper扫描 -->
