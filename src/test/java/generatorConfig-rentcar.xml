@@ -33,11 +33,17 @@
 		</javaClientGenerator>
 
 		<!-- 需要自动生成的表 -->
-		<table tableName="car_biz_district" domainObjectName="CarBizDistrict"
+		<!-- <table tableName="car_biz_district" domainObjectName="CarBizDistrict"
 			enableSelectByExample="false" enableDeleteByExample="false"
 			enableCountByExample="false" enableUpdateByExample="false">
 			<property name="useActualColumnNames" value="false" />
 			<generatedKey column="id" sqlStatement="MySql" identity="true" />
+		</table> -->
+		<table tableName="car_biz_supplier" domainObjectName="CarBizSupplier"
+			enableSelectByExample="false" enableDeleteByExample="false"
+			enableCountByExample="false" enableUpdateByExample="false">
+			<property name="useActualColumnNames" value="false" />
+			<generatedKey column="supplier_id" sqlStatement="MySql" identity="true" />
 		</table>
 
 	</context>

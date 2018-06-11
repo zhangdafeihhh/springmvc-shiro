@@ -6,7 +6,6 @@
 </head>
 
 <body>
-			<div class="right_col" role="main">
 				<div class="">
 					<div class="row top_tiles">
 						<div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
@@ -49,7 +48,6 @@
 				<button class="demobtn" urlsrc="${webctx}/demo/ajaxException.json">示例：AJAX请求异常</button>
 				<button class="demobtn" urlsrc="${webctx}/demo/abcdefgabcfa.json">示例：AJAX请求不存在的资源</button>
 				
-			</div>
 			
 			<script type="text/javascript">
 				$('button.demobtn').click(function (){

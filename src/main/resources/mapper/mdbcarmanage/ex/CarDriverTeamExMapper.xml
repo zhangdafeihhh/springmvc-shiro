@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.CarDriverTeamExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.CarDriverTeam" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="team_name" property="teamName" jdbcType="VARCHAR" />
+    <result column="sort" property="sort" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="city" property="city" jdbcType="VARCHAR" />
+    <result column="supplier" property="supplier" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="BIT" />
+    <result column="p_id" property="pId" jdbcType="INTEGER" />
+    <result column="duty_start_date" property="dutyStartDate" jdbcType="VARCHAR" />
+    <result column="duty_end_date" property="dutyEndDate" jdbcType="VARCHAR" />
+    <result column="charge1" property="charge1" jdbcType="VARCHAR" />
+    <result column="charge2" property="charge2" jdbcType="VARCHAR" />
+    <result column="charge3" property="charge3" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, team_name, sort, create_by, create_date, update_by, update_date, city, supplier, 
+    remark, status, p_id, duty_start_date, duty_end_date, charge1, charge2, charge3
+  </sql>
+  
+  <!-- 查询车队列表(根据城市ID，供应商ID、车队ID  ) -->
+  <select id="queryDriverTeam" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from car_driver_team
+    where p_id is null and status!=2
+    <if test="cityIds!=null and cityIds.size()>0">
+	    and city IN 
+	    <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
+	    #{cid}
+	    </foreach>
+    </if>
+    <if test="supplierIds!=null and supplierIds.size()>0">
+	    and supplier IN 
+	    <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
+	    #{sid}
+	    </foreach>
+    </if>
+    <if test="teamIds!=null and teamIds.size()>0">
+	    and id IN 
+	    <foreach collection="teamIds" open="(" close=")" separator="," item="tid" >
+	    #{tid}
+	    </foreach>
+    </if>
+	order by CITY, id
+  </select>
+  
+  
+  
+</mapper>

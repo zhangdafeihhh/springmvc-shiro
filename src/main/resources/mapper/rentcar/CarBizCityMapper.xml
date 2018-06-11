@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.CarBizCityMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarBizCity" >
+    <id column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="citySpell" property="cityspell" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="test_status" property="testStatus" jdbcType="INTEGER" />
+    <result column="sort" property="sort" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="centreLo" property="centrelo" jdbcType="VARCHAR" />
+    <result column="centreLa" property="centrela" jdbcType="VARCHAR" />
+    <result column="centreLoBD" property="centrelobd" jdbcType="VARCHAR" />
+    <result column="centreLaBD" property="centrelabd" jdbcType="VARCHAR" />
+    <result column="service_status" property="serviceStatus" jdbcType="INTEGER" />
+    <result column="multi_status" property="multiStatus" jdbcType="INTEGER" />
+    <result column="region_number" property="regionNumber" jdbcType="VARCHAR" />
+    <result column="cooperation_city" property="cooperationCity" jdbcType="INTEGER" />
+    <result column="invoice" property="invoice" jdbcType="INTEGER" />
+    <result column="startAddr" property="startaddr" jdbcType="INTEGER" />
+    <result column="is_postpaid" property="isPostpaid" jdbcType="INTEGER" />
+    <result column="is_show_time" property="isShowTime" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizCity" extends="BaseResultMap" >
+    <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    city_id, city_name, code, citySpell, status, test_status, sort, create_by, update_by, 
+    create_date, update_date, centreLo, centreLa, centreLoBD, centreLaBD, service_status, 
+    multi_status, region_number, cooperation_city, invoice, startAddr, is_postpaid, is_show_time
+  </sql>
+  <sql id="Blob_Column_List" >
+    memo
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from car_biz_city
+    where city_id = #{cityId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from car_biz_city
+    where city_id = #{cityId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.rentcar.CarBizCity" >
+    <selectKey resultType="java.lang.Integer" keyProperty="cityId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_biz_city (city_name, code, citySpell, 
+      status, test_status, sort, 
+      create_by, update_by, create_date, 
+      update_date, centreLo, centreLa, 
+      centreLoBD, centreLaBD, service_status, 
+      multi_status, region_number, cooperation_city, 
+      invoice, startAddr, is_postpaid, 
+      is_show_time, memo)
+    values (#{cityName,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, #{cityspell,jdbcType=VARCHAR}, 
+      #{status,jdbcType=INTEGER}, #{testStatus,jdbcType=INTEGER}, #{sort,jdbcType=INTEGER}, 
+      #{createBy,jdbcType=INTEGER}, #{updateBy,jdbcType=INTEGER}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{centrelo,jdbcType=VARCHAR}, #{centrela,jdbcType=VARCHAR}, 
+      #{centrelobd,jdbcType=VARCHAR}, #{centrelabd,jdbcType=VARCHAR}, #{serviceStatus,jdbcType=INTEGER}, 
+      #{multiStatus,jdbcType=INTEGER}, #{regionNumber,jdbcType=VARCHAR}, #{cooperationCity,jdbcType=INTEGER}, 
+      #{invoice,jdbcType=INTEGER}, #{startaddr,jdbcType=INTEGER}, #{isPostpaid,jdbcType=INTEGER}, 
+      #{isShowTime,jdbcType=INTEGER}, #{memo,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.rentcar.CarBizCity" >
+    <selectKey resultType="java.lang.Integer" keyProperty="cityId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_biz_city
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="cityName != null" >
+        city_name,
+      </if>
+      <if test="code != null" >
+        code,
+      </if>
+      <if test="cityspell != null" >
+        citySpell,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="testStatus != null" >
+        test_status,
+      </if>
+      <if test="sort != null" >
+        sort,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="centrelo != null" >
+        centreLo,
+      </if>
+      <if test="centrela != null" >
+        centreLa,
+      </if>
+      <if test="centrelobd != null" >
+        centreLoBD,
+      </if>
+      <if test="centrelabd != null" >
+        centreLaBD,
+      </if>
+      <if test="serviceStatus != null" >
+        service_status,
+      </if>
+      <if test="multiStatus != null" >
+        multi_status,
+      </if>
+      <if test="regionNumber != null" >
+        region_number,
+      </if>
+      <if test="cooperationCity != null" >
+        cooperation_city,
+      </if>
+      <if test="invoice != null" >
+        invoice,
+      </if>
+      <if test="startaddr != null" >
+        startAddr,
+      </if>
+      <if test="isPostpaid != null" >
+        is_postpaid,
+      </if>
+      <if test="isShowTime != null" >
+        is_show_time,
+      </if>
+      <if test="memo != null" >
+        memo,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="cityName != null" >
+        #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="cityspell != null" >
+        #{cityspell,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="testStatus != null" >
+        #{testStatus,jdbcType=INTEGER},
+      </if>
+      <if test="sort != null" >
+        #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="centrelo != null" >
+        #{centrelo,jdbcType=VARCHAR},
+      </if>
+      <if test="centrela != null" >
+        #{centrela,jdbcType=VARCHAR},
+      </if>
+      <if test="centrelobd != null" >
+        #{centrelobd,jdbcType=VARCHAR},
+      </if>
+      <if test="centrelabd != null" >
+        #{centrelabd,jdbcType=VARCHAR},
+      </if>
+      <if test="serviceStatus != null" >
+        #{serviceStatus,jdbcType=INTEGER},
+      </if>
+      <if test="multiStatus != null" >
+        #{multiStatus,jdbcType=INTEGER},
+      </if>
+      <if test="regionNumber != null" >
+        #{regionNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="cooperationCity != null" >
+        #{cooperationCity,jdbcType=INTEGER},
+      </if>
+      <if test="invoice != null" >
+        #{invoice,jdbcType=INTEGER},
+      </if>
+      <if test="startaddr != null" >
+        #{startaddr,jdbcType=INTEGER},
+      </if>
+      <if test="isPostpaid != null" >
+        #{isPostpaid,jdbcType=INTEGER},
+      </if>
+      <if test="isShowTime != null" >
+        #{isShowTime,jdbcType=INTEGER},
+      </if>
+      <if test="memo != null" >
+        #{memo,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.rentcar.CarBizCity" >
+    update car_biz_city
+    <set >
+      <if test="cityName != null" >
+        city_name = #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="cityspell != null" >
+        citySpell = #{cityspell,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="testStatus != null" >
+        test_status = #{testStatus,jdbcType=INTEGER},
+      </if>
+      <if test="sort != null" >
+        sort = #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="centrelo != null" >
+        centreLo = #{centrelo,jdbcType=VARCHAR},
+      </if>
+      <if test="centrela != null" >
+        centreLa = #{centrela,jdbcType=VARCHAR},
+      </if>
+      <if test="centrelobd != null" >
+        centreLoBD = #{centrelobd,jdbcType=VARCHAR},
+      </if>
+      <if test="centrelabd != null" >
+        centreLaBD = #{centrelabd,jdbcType=VARCHAR},
+      </if>
+      <if test="serviceStatus != null" >
+        service_status = #{serviceStatus,jdbcType=INTEGER},
+      </if>
+      <if test="multiStatus != null" >
+        multi_status = #{multiStatus,jdbcType=INTEGER},
+      </if>
+      <if test="regionNumber != null" >
+        region_number = #{regionNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="cooperationCity != null" >
+        cooperation_city = #{cooperationCity,jdbcType=INTEGER},
+      </if>
+      <if test="invoice != null" >
+        invoice = #{invoice,jdbcType=INTEGER},
+      </if>
+      <if test="startaddr != null" >
+        startAddr = #{startaddr,jdbcType=INTEGER},
+      </if>
+      <if test="isPostpaid != null" >
+        is_postpaid = #{isPostpaid,jdbcType=INTEGER},
+      </if>
+      <if test="isShowTime != null" >
+        is_show_time = #{isShowTime,jdbcType=INTEGER},
+      </if>
+      <if test="memo != null" >
+        memo = #{memo,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where city_id = #{cityId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zhuanche.entity.rentcar.CarBizCity" >
+    update car_biz_city
+    set city_name = #{cityName,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR},
+      citySpell = #{cityspell,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      test_status = #{testStatus,jdbcType=INTEGER},
+      sort = #{sort,jdbcType=INTEGER},
+      create_by = #{createBy,jdbcType=INTEGER},
+      update_by = #{updateBy,jdbcType=INTEGER},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      centreLo = #{centrelo,jdbcType=VARCHAR},
+      centreLa = #{centrela,jdbcType=VARCHAR},
+      centreLoBD = #{centrelobd,jdbcType=VARCHAR},
+      centreLaBD = #{centrelabd,jdbcType=VARCHAR},
+      service_status = #{serviceStatus,jdbcType=INTEGER},
+      multi_status = #{multiStatus,jdbcType=INTEGER},
+      region_number = #{regionNumber,jdbcType=VARCHAR},
+      cooperation_city = #{cooperationCity,jdbcType=INTEGER},
+      invoice = #{invoice,jdbcType=INTEGER},
+      startAddr = #{startaddr,jdbcType=INTEGER},
+      is_postpaid = #{isPostpaid,jdbcType=INTEGER},
+      is_show_time = #{isShowTime,jdbcType=INTEGER},
+      memo = #{memo,jdbcType=LONGVARCHAR}
+    where city_id = #{cityId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.rentcar.CarBizCity" >
+    update car_biz_city
+    set city_name = #{cityName,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR},
+      citySpell = #{cityspell,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      test_status = #{testStatus,jdbcType=INTEGER},
+      sort = #{sort,jdbcType=INTEGER},
+      create_by = #{createBy,jdbcType=INTEGER},
+      update_by = #{updateBy,jdbcType=INTEGER},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      centreLo = #{centrelo,jdbcType=VARCHAR},
+      centreLa = #{centrela,jdbcType=VARCHAR},
+      centreLoBD = #{centrelobd,jdbcType=VARCHAR},
+      centreLaBD = #{centrelabd,jdbcType=VARCHAR},
+      service_status = #{serviceStatus,jdbcType=INTEGER},
+      multi_status = #{multiStatus,jdbcType=INTEGER},
+      region_number = #{regionNumber,jdbcType=VARCHAR},
+      cooperation_city = #{cooperationCity,jdbcType=INTEGER},
+      invoice = #{invoice,jdbcType=INTEGER},
+      startAddr = #{startaddr,jdbcType=INTEGER},
+      is_postpaid = #{isPostpaid,jdbcType=INTEGER},
+      is_show_time = #{isShowTime,jdbcType=INTEGER}
+    where city_id = #{cityId,jdbcType=INTEGER}
+  </update>
+</mapper>

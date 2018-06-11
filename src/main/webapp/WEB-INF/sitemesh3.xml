@@ -6,4 +6,7 @@
      <!-- 指明满足“/nginx.html”的页面，将被排除，不被装饰 -->
      <mapping path="/nginx.html" exclue="true" />
      
+     <!-- <mapping path="/driverteam/*.html" exclue="true" /> -->
+     
+     
 </sitemesh>

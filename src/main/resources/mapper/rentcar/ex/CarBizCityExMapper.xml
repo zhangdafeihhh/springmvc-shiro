@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.ex.CarBizCityExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarBizCity" >
+    <id column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="citySpell" property="cityspell" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="test_status" property="testStatus" jdbcType="INTEGER" />
+    <result column="sort" property="sort" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="centreLo" property="centrelo" jdbcType="VARCHAR" />
+    <result column="centreLa" property="centrela" jdbcType="VARCHAR" />
+    <result column="centreLoBD" property="centrelobd" jdbcType="VARCHAR" />
+    <result column="centreLaBD" property="centrelabd" jdbcType="VARCHAR" />
+    <result column="service_status" property="serviceStatus" jdbcType="INTEGER" />
+    <result column="multi_status" property="multiStatus" jdbcType="INTEGER" />
+    <result column="region_number" property="regionNumber" jdbcType="VARCHAR" />
+    <result column="cooperation_city" property="cooperationCity" jdbcType="INTEGER" />
+    <result column="invoice" property="invoice" jdbcType="INTEGER" />
+    <result column="startAddr" property="startaddr" jdbcType="INTEGER" />
+    <result column="is_postpaid" property="isPostpaid" jdbcType="INTEGER" />
+    <result column="is_show_time" property="isShowTime" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizCity" extends="BaseResultMap" >
+    <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    city_id, city_name, code, citySpell, status, test_status, sort, create_by, update_by, 
+    create_date, update_date, centreLo, centreLa, centreLoBD, centreLaBD, service_status, 
+    multi_status, region_number, cooperation_city, invoice, startAddr, is_postpaid, is_show_time
+  </sql>
+  <sql id="Blob_Column_List" >
+    memo
+  </sql>
+
+  <!-- 根据城市ID，查询城市信息 -->
+  <select id="queryByIds" resultMap="ResultMapWithBLOBs" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from car_biz_city
+    where status=1 
+    <if test="cityIds!=null and cityIds.size()>0">
+    	and city_id IN 
+    	<foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
+    	#{cid}
+    	</foreach>
+    </if>
+    order by city_id
+  </select>
+  
+  </mapper>

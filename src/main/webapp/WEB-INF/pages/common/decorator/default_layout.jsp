@@ -19,6 +19,37 @@
 	<script src="${webctx}/resources/js/fastclick.js?v=${staticResourceVersion}"></script><!-- FastClick -->
 	<script src="${webctx}/resources/js/nprogress.js?v=${staticResourceVersion}"></script><!-- NProgress -->
 	<script src="${webctx}/resources/js/moment/moment.min.js?v=${staticResourceVersion}"></script><!-- bootstrap-daterangepicker -->
+	
+	<!-- 引入前端UI layui -->
+	<link href="${webctx}/resources/layui/css/layui.css?v=${staticResourceVersion}" rel="stylesheet" media="all">
+	<style type="text/css">
+	 /** 重写layui 的样式BEGIN**/
+	 .layui-form-label {
+	    float: left;
+	    display: block;
+	    padding: 8px 14px;
+	    width: 100px;
+	    font-weight: 400;
+	    line-height: 20px;
+	    text-align: right;
+	}
+	.layui-form-item {
+	    margin-bottom: 1px;
+	    clear: both;
+	    *zoom: 1;
+	}
+	.layui-table, .layui-table-view {
+	    margin: 0px 0px;
+	}	
+	.layui-btn-xs{
+	    height: 19px;
+	    line-height: 19px;
+	    padding: 0 5px;
+	    font-size: 12px;
+	}
+	 /** 重写layui 的样式end**/
+	</style>
+	<script src="${webctx}/resources/layui/layui.js?v=${staticResourceVersion}"  type="text/javascript"></script>
 	<script>
 	    var basePath = "${webctx}"; //JS中用到的URL根路径
 	</script>
@@ -40,7 +71,9 @@
 			<!-- *******************页头END**************** -->
 
 			<!-- *******************业务功能BEGIN************** -->
+			<div class="right_col" role="main" style="padding:1px;">
 			<sitemesh:write property='body' />
+			</div>
 			<!-- *******************业务功能END**************** -->
 			
 			<!-- *******************页脚BEGIN*************** -->

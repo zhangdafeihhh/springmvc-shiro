@@ -18,6 +18,7 @@
     <import resource="applicationContext-db-commons.xml"/>
     <import resource="applicationContext-db-driver.xml"/>
     <import resource="applicationContext-db-rentcar.xml"/>
+    <import resource="applicationContext-db-carmanage.xml"/>
 	<!-- 配置AOP以便支持基于注解的DB数据源自动主从切换 -->
     <aop:aspectj-autoproxy></aop:aspectj-autoproxy>
     <!-- 配置缓存 -->
