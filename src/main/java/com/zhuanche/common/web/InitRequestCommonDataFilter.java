@@ -62,6 +62,10 @@ public class InitRequestCommonDataFilter extends OncePerRequestFilter {
 		if(ssoLogoutUrl==null || cmsLogoutUrl==null) {
 			try {
 				String env = request.getServletContext().getInitParameter("env.name");
+				
+				if(env.equalsIgnoreCase("${env.name}")) {//有的IDE不能自动替换
+					env = "dev";
+				}
 				Properties pop = new Properties();
 				pop.load( this.getClass().getClassLoader().getResourceAsStream(env+"/application.properties") );
 				ssoLogoutUrl = pop.getProperty("sso.logout.url");

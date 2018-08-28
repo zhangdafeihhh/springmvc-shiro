@@ -3,6 +3,8 @@ package com.zhuanche.common.database;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
@@ -10,6 +12,7 @@ import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
  *  特别说明：对于本项目，主要是达到对某一个相同结构的数据库进行主从切换（此时Mybatis Mapper 是支持主从复用的：即同一个Mapper，既可以针对主库，也可以针对从库）。
  **/
 public class DynamicRoutingDataSource extends AbstractRoutingDataSource implements BeanNameAware{
+	private static final Logger log = LoggerFactory.getLogger(DynamicRoutingDataSource.class);
 	/**此动态路由数据源标识名：即给动态数据源起的名称，代表此动态路由数据源（这里采用了spring xml配置文件Bean定义中的id属性）**/
 	private String databaseTag;
 	/**此动态路由数据源的主从配置（值为master或slave）**/
@@ -22,7 +25,7 @@ public class DynamicRoutingDataSource extends AbstractRoutingDataSource implemen
 	public void setBeanName(String beanName) {
 		this.databaseTag = beanName;
 		allContextHolderMappings.put( this.databaseTag, dbContextHolder );
-		System.out.println("DynamicRoutingDataSource动态路由数据源初始化成功！动态路由数据源标识名：" + beanName );
+		log.info(">>>>>>>>>>>>>>>>>>>>>>>动态路由数据源初始化成功！动态路由数据源标识名：" + beanName );
 	}
 	/**重写此方法，以支持多个动态路由数据源**/
 	@Override
@@ -63,56 +66,4 @@ public class DynamicRoutingDataSource extends AbstractRoutingDataSource implemen
 		}
 		holder.remove();
     }
-    
-//	
-//	
-//    //-----------------------------------------driver 数据库-------------------------------------------------------BEGIN
-//    private static final ThreadLocal<String> driverContextHolder = new ThreadLocal<String>();
-//    /**设置为访问driver主库**/
-//    public static void setDriver2Master() {
-//    	driverContextHolder.set("master");
-//    }
-//    /**设置为访问driver从库**/
-//    public static void setDriver2Slave() {
-//    	driverContextHolder.set("slave");
-//    }
-//    /**设置为访问driver默认库**/
-//    public static void setDriver2Default() {
-//    	driverContextHolder.remove();
-//    }
-//    //-----------------------------------------driver 数据库-------------------------------------------------------END
-//    
-//    //-----------------------------------------rentcar 数据库-----------------------------------------------------BEGIN
-//    private static final ThreadLocal<String> rentcarContextHolder = new ThreadLocal<String>();
-//    /**设置为访问rentcar主库**/
-//    public static void setRentcar2Master() {
-//    	rentcarContextHolder.set("master");
-//    }
-//    /**设置为访问rentcar从库**/
-//    public static void setRentcar2Slave() {
-//    	rentcarContextHolder.set("slave");
-//    }
-//    /**设置为访问rentcar默认库**/
-//    public static void setRentcar2Default() {
-//    	rentcarContextHolder.remove();
-//    }
-    //-----------------------------------------rentcar 数据库-----------------------------------------------------END
-   
-    //TODO 此处将来可以继续进行增加，扩展更多的业务数据库达到主从切换的目的。（如下为demo代码模板）
-    //-----------------------------------------demo 数据库------------------------------------------------------BEGIN
-//    private static final ThreadLocal<String> demoContextHolder = new ThreadLocal<String>();
-//    /**设置为访问demo主库**/
-//    public static void setDemo2Master() {
-//    	demoContextHolder.set("master");
-//    }
-//    /**设置为访问demo从库**/
-//    public static void setDemo2Slave() {
-//    	demoContextHolder.set("slave");
-//    }
-//    /**设置为访问demo默认库**/
-//    public static void setDemo2Default() {
-//    	demoContextHolder.remove();
-//    }
-    //-----------------------------------------demo 数据库------------------------------------------------------END
-    
 }

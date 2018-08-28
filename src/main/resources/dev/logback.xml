@@ -7,18 +7,8 @@
             <level>INFO</level>
         </filter>
     </appender>
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/u01/tomcat_docker_8080/logs/logFile.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/u01/tomcat_docker_8080/logs/logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>30</maxHistory>
-        </rollingPolicy>
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] %X{reqId} - %logger{36} -%X{loginUser} %msg%n</pattern>
-        </encoder>
-    </appender>
 
-    <!-- <logger name="com.alibaba" level="INFO"/> -->
+    <logger name="com.alibaba" level="INFO"/>
     <logger name="jdbc.sqltiming" level="INFO"/>
     <logger name="com.ibatis" level="INFO" />
     <logger name="com.ibatis.common.jdbc.SimpleDataSource" level="INFO" />

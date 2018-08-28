@@ -3,7 +3,7 @@
   <display-name>mp-manage</display-name>
     <!-- 设置运行环境变量-->
     <context-param>
-        <param-name>env.name</param-name>  
+        <param-name>env.name</param-name>
         <param-value>${env.name}</param-value>
         <description>运行环境变量，如：dev、test、pro、online (当用MAVEN构建打WAR包时会设置上，但IDE不会)。在Servlet容器中可以获得到此值，利用此值可以做一些区分运行环境的业务逻辑</description>
     </context-param>
@@ -13,14 +13,6 @@
         <listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
 	</listener>
   
-  <!-- <context-param>
-    <param-name>contextConfigLocation</param-name>
-    <param-value>classpath*:applicationContext.xml</param-value>
-  </context-param> -->
-  <!-- <listener>
-    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-  </listener> -->
-
   <!-- 字符集编码 -->
   <filter>
     <filter-name>encoding-filter</filter-name>
