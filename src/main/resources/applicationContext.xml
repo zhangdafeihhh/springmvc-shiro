@@ -24,7 +24,9 @@
     <!-- 配置缓存 -->
     <import resource="applicationContext-redis.xml"/>
     <!-- 配置SSO及Shiro权限 -->
-    <import resource="applicationContext-shiro.xml"/>
+    <import resource="applicationContext-shiro2.xml"/>
+    <!-- 配置短信 -->
+    <import resource="applicationContext-sms.xml"/>
     <!-- 配置SpringMVC -->
     <import resource="applicationContext-springmvc.xml"/>
 </beans>
