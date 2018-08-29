@@ -40,7 +40,7 @@ public class DemoController{
     @ResponseBody
     public AjaxResponse ajaxOK(){
     	SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-    	AjaxResponse respJson = AjaxResponse.success("业务受理成功", loginUser);
+    	AjaxResponse respJson = AjaxResponse.success(loginUser);
         return respJson;
     }
     
@@ -50,7 +50,7 @@ public class DemoController{
     @ResponseBody
     public AjaxResponse ajaxNoPerm(){
     	SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-    	AjaxResponse respJson = AjaxResponse.success("业务受理成功", loginUser);
+    	AjaxResponse respJson = AjaxResponse.success( loginUser);
         return respJson;
     }
     
@@ -59,7 +59,7 @@ public class DemoController{
     @ResponseBody
     public AjaxResponse ajaxException(){
     	SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-    	AjaxResponse respJson = AjaxResponse.success("业务受理成功", loginUser);
+    	AjaxResponse respJson = AjaxResponse.success(loginUser);
     	Integer.parseInt("0000ajaxException");
         return respJson;
     }

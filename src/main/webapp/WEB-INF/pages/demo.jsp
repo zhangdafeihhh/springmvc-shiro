@@ -48,6 +48,7 @@
 				<button class="demobtn" urlsrc="${webctx}/demo/ajaxException.json">示例：AJAX请求异常</button>
 				<button class="demobtn" urlsrc="${webctx}/demo/abcdefgabcfa.json">示例：AJAX请求不存在的资源</button>
 				
+				<button class="demobtn" urlsrc="${webctx}/dologin.json">示例：LOGIN</button>
 			
 			<script type="text/javascript">
 				$('button.demobtn').click(function (){
