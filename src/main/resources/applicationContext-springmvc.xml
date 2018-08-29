@@ -54,13 +54,14 @@
     <!-- 配置静态资源 -->
     <mvc:resources location="/resources/" mapping="/resources/**"/>  
     <!-- 配置拦截器(暂时不配置) -->
-	<!-- <mvc:interceptors>  
-	    <mvc:interceptor>  
-	        <mvc:mapping path="/biz/demo1"/>  
-	        <mvc:mapping path="/biz/demo2"/>  
-	        <bean class="com.demo.RequestParamAuditInterceptor"/>  
+    <mvc:interceptors>
+	    <mvc:interceptor>
+	        <mvc:mapping path="/**"/>
+			<mvc:exclude-mapping path="/resources/**"/>
+			<mvc:exclude-mapping path="/nginx.html"/>
+	        <bean class="com.zhuanche.common.web.HttpParamVerifyInterceptor"/> <!-- 请求参数规则校验 -->
 	    </mvc:interceptor>
-	</mvc:interceptors> -->
+    </mvc:interceptors>
 	
     <!-- 配置统一异常处理（需要区分页面请求异常、XHR请求异常、文件上传请求异常时的特殊处理） -->
 	<bean class="com.zhuanche.common.web.CustomExceptionResolver"></bean>
