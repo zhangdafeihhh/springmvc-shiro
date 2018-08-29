@@ -1,4 +1,4 @@
-package com.zhuanche.controller.driverteam;
+package com.zhuanche.controller.driverScheduling;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
- * @description: 车队设置
+ * @description: 司机排班
  *
  * <PRE>
  * <BR>	修改记录
@@ -22,15 +22,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 @RequestMapping("/driverteam")
-public class DriverTeamController{
+public class DriverSchController {
 
-    private static final Logger logger = LoggerFactory.getLogger(DriverTeamController.class);
-	
-	/**车队列表**/
-	@RequestMapping("/list")
-	public String list(){
-		return "driverteam/driverlist";
-	}
+    private static final Logger logger = LoggerFactory.getLogger(DriverSchController.class);
 
 
 
