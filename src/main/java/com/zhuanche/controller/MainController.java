@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.alibaba.fastjson.JSON;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
 
 @Controller
 public class MainController{
@@ -43,14 +44,14 @@ public class MainController{
 		if( isAjax ) {//-------------------------返回AJAX 对象
 			PrintWriter out = null;
 			try{
-				response.setStatus(HttpStatus.SC_FORBIDDEN, "HTTP_STATUS_403：禁止访问！");
+				response.setStatus(HttpStatus.SC_OK, "HTTP_STATUS_403：禁止访问！");
 				out = response.getWriter();
 				response.setCharacterEncoding("UTF-8");
 				response.setContentType("application/json; charset=UTF-8");
 				response.setHeader("pragma", "no-cache");
 				response.setHeader("Cache-Control", "no-cache");
 				response.setDateHeader("Expires", 0);
-				AjaxResponse ajaxResponse = AjaxResponse.fail("HTTP_STATUS_403：禁止访问！",   null);
+				AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
 				out.write( JSON.toJSONString(ajaxResponse, true) );
 				out.close();
 			} catch (Exception e) {
@@ -79,14 +80,14 @@ public class MainController{
 		if( isAjax ) {//-------------------------返回AJAX 对象
 			PrintWriter out = null;
 			try{
-				response.setStatus(HttpStatus.SC_NOT_FOUND, "HTTP_STATUS_404：请求资源不存在！");
+				response.setStatus(HttpStatus.SC_OK, "HTTP_STATUS_404：请求资源不存在！");
 				out = response.getWriter();
 				response.setCharacterEncoding("UTF-8");
 				response.setContentType("application/json; charset=UTF-8");
 				response.setHeader("pragma", "no-cache");
 				response.setHeader("Cache-Control", "no-cache");
 				response.setDateHeader("Expires", 0);
-				AjaxResponse ajaxResponse = AjaxResponse.fail("HTTP_STATUS_404：请求资源不存在！",   null);
+				AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_NOT_FOUND);
 				out.write( JSON.toJSONString(ajaxResponse, true) );
 				out.close();
 			} catch (Exception e) {

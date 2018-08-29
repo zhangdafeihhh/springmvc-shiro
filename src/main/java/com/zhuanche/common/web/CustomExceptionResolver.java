@@ -41,7 +41,8 @@ public final class CustomExceptionResolver implements HandlerExceptionResolver{
 		}
 		//2.根据不同的请求类型，分别返回不同的结果
 		if(isAjax){
-			AjaxResponse ajaxResponse = AjaxResponse.fail("系统发生异常，异常ID："+ExceptionId+"，请联系管理员。",   null);
+			AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+			ajaxResponse.setMsg("系统发生异常，异常ID："+ExceptionId+"，请联系管理员。");
 			this.outJson(response, ajaxResponse);
 			return null;
 		}else{
@@ -58,7 +59,7 @@ public final class CustomExceptionResolver implements HandlerExceptionResolver{
 	private void outJson(HttpServletResponse response, AjaxResponse ajaxResponse){
 		PrintWriter out = null;
 		try{
-			response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR, ajaxResponse.getErrMsg() );
+			response.setStatus(HttpStatus.SC_OK, ajaxResponse.getMsg() );
 			out = response.getWriter();
 			response.setCharacterEncoding("UTF-8");
 			response.setContentType("application/json; charset=UTF-8");
