@@ -1,5 +1,7 @@
 package com.zhuanche.serv.rentcar.impl;
 
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.entity.rentcar.CarImportExceptionEntity;
 import com.zhuanche.entity.rentcar.DriverOutage;
 import com.zhuanche.entity.rentcar.DriverOutageVo;
@@ -29,6 +31,7 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 
 @Service
 public class DriverOutageServiceImpl implements DriverOutageService {
@@ -43,6 +46,7 @@ public class DriverOutageServiceImpl implements DriverOutageService {
     private MyRestTemplate carApiTemplate;
 
     @Override
+//    @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     public List<DriverOutage> queryForListObject(DriverOutage params) {
         return DriverOutageExMapper.queryForListObject(params);
     }
@@ -189,8 +193,8 @@ public class DriverOutageServiceImpl implements DriverOutageService {
             e.printStackTrace();
         }
 
-//        String url = "/webservice/outage/saveDriverOutage";
-//        result = carApiTemplate.postForObject(url, JSONObject.class, paramMap);
+        String url = "/webservice/outage/saveDriverOutage";
+        result = carApiTemplate.postForObject(url, JSONObject.class, paramMap);
 
         return result;
     }

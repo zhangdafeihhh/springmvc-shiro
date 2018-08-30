@@ -3,7 +3,7 @@ package com.zhuanche.dto.rentcar;
 import java.util.Date;
 
 public class DriverOutageDTO {
-    private Integer id;
+    private Integer outageId;
 
     private Integer driverId;
 
@@ -55,15 +55,17 @@ public class DriverOutageDTO {
     private String supplierName;
     private Integer carGroupId;//车组
     private String carGroupName;
-    private String startDateBegin;
-    private String startDateEnd;
 
-    private String outStartDateStr;
-    private String outEndDateStr;
-    private String factStartDateStr;
-    private String factEndDateStr;
-    private String createDateStr;
-    private String removeDateStr;
+
+//    private String startDateBegin;
+//    private String startDateEnd;
+//    private String outStartDateStr;
+//    private String outEndDateStr;
+//    private String factStartDateStr;
+//    private String factEndDateStr;
+//    private String createDateStr;
+//    private String removeDateStr;
+
 
     public String getDriverName() {
         return driverName;
@@ -137,76 +139,13 @@ public class DriverOutageDTO {
         this.carGroupName = carGroupName;
     }
 
-    public String getStartDateBegin() {
-        return startDateBegin;
+
+    public Integer getOutageId() {
+        return outageId;
     }
 
-    public void setStartDateBegin(String startDateBegin) {
-        this.startDateBegin = startDateBegin;
-    }
-
-    public String getStartDateEnd() {
-        return startDateEnd;
-    }
-
-    public void setStartDateEnd(String startDateEnd) {
-        this.startDateEnd = startDateEnd;
-    }
-
-    public String getOutStartDateStr() {
-        return outStartDateStr;
-    }
-
-    public void setOutStartDateStr(String outStartDateStr) {
-        this.outStartDateStr = outStartDateStr;
-    }
-
-    public String getOutEndDateStr() {
-        return outEndDateStr;
-    }
-
-    public void setOutEndDateStr(String outEndDateStr) {
-        this.outEndDateStr = outEndDateStr;
-    }
-
-    public String getFactStartDateStr() {
-        return factStartDateStr;
-    }
-
-    public void setFactStartDateStr(String factStartDateStr) {
-        this.factStartDateStr = factStartDateStr;
-    }
-
-    public String getFactEndDateStr() {
-        return factEndDateStr;
-    }
-
-    public void setFactEndDateStr(String factEndDateStr) {
-        this.factEndDateStr = factEndDateStr;
-    }
-
-    public String getCreateDateStr() {
-        return createDateStr;
-    }
-
-    public void setCreateDateStr(String createDateStr) {
-        this.createDateStr = createDateStr;
-    }
-
-    public String getRemoveDateStr() {
-        return removeDateStr;
-    }
-
-    public void setRemoveDateStr(String removeDateStr) {
-        this.removeDateStr = removeDateStr;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
+    public void setOutageId(Integer outageId) {
+        this.outageId = outageId;
     }
 
     public Integer getDriverId() {
