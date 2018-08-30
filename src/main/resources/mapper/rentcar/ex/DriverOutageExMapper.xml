@@ -1,0 +1,507 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhuanche.entity.rentcar.DriverOutage" >
+  <!-- mapper基础标准: 当前表所有字段映射结果集 -->
+  <resultMap id="baseResultMap" type="com.zhuanche.entity.rentcar.DriverOutage" >
+    <id column="id" property="outageId" jdbcType="INTEGER" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="out_start_date" property="outStartDate" jdbcType="TIMESTAMP" />
+    <result column="out_stop_long_time" property="outStopLongTime" jdbcType="DOUBLE" />
+    <result column="out_end_date" property="outEndDate" jdbcType="TIMESTAMP" />
+    <result column="fact_start_date" property="factStartDate" jdbcType="TIMESTAMP" />
+    <result column="fact_end_date" property="factEndDate" jdbcType="TIMESTAMP" />
+    <result column="outage_source" property="outageSource" jdbcType="INTEGER" />
+    <result column="outage_reason" property="outageReason" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="create_name" property="createName" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="remove_by" property="removeBy" jdbcType="INTEGER" />
+    <result column="remove_name" property="removeName" jdbcType="VARCHAR" />
+    <result column="remove_date" property="removeDate" jdbcType="TIMESTAMP" />
+    <result column="remove_reason" property="removeReason" jdbcType="VARCHAR" />
+    <result column="remove_status" property="removeStatus" jdbcType="INTEGER" />
+    <result column="order_nos" property="orderNos" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <select id="queryForListObject" resultType="com.zhuanche.entity.rentcar.DriverOutage" parameterType="com.zhuanche.entity.rentcar.DriverOutage">
+		SELECT   
+			o.id outageId,
+			o.driver_id driverId,
+			o.out_start_date outStartDate,
+			o.out_stop_long_time outStopLongTime,
+			o.out_end_date outEndDate,
+			o.fact_start_date factStartDate,
+			o.fact_end_date factEndDate,
+			o.outage_source outageSource,
+			o.outage_reason outageReason,
+			o.create_by createBy,
+			o.create_name createName,
+			o.create_date createDate,
+			o.remove_by removeBy,
+			o.remove_name removeName,
+			o.remove_date removeDate,
+			o.remove_reason removeReason,
+			o.remove_status removeStatus,
+			o.order_nos orderNos,
+			i.name driverName,
+			i.phone driverPhone,
+			i.license_plates licensePlates,
+			c.city_id cityId,
+			c.city_name cityName,
+			p.supplier_id supplierId,
+			p.supplier_full_name supplierName,
+			g.group_id carGroupId,
+			g.group_name carGroupName,
+			DATE_FORMAT(o.out_start_date, '%Y-%m-%d %H:%i:%s') outStartDateStr,
+			DATE_FORMAT(o.out_end_date, '%Y-%m-%d %H:%i:%s') outEndDateStr,
+			DATE_FORMAT(o.fact_start_date, '%Y-%m-%d %H:%i:%s') factStartDateStr,
+			DATE_FORMAT(o.fact_end_date, '%Y-%m-%d %H:%i:%s') factEndDateStr,
+			DATE_FORMAT(o.create_date, '%Y-%m-%d %H:%i:%s') createDateStr,
+			DATE_FORMAT(o.remove_date, '%Y-%m-%d %H:%i:%s') removeDateStr
+		FROM car_biz_driver_outage o
+		LEFT JOIN car_biz_driver_info i on i.driver_id = o.driver_id
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+		WHERE 1=1
+			<if test = "outageSource !=null and outageSource !=''" > 
+				and o.outage_source = #{outageSource}
+			</if> 
+			<if test = "removeStatus !=null and removeStatus !=''" > 
+				and o.remove_status = #{removeStatus}
+			</if> 
+			<if test = "driverName !=null and driverName !=''" > 
+				and i.name like '%${driverName}%'
+			</if> 
+			<if test = "driverPhone !=null and driverPhone !=''" > 
+				and i.phone like '%${driverPhone}%'
+			</if> 
+			<if test = "cityId !=null and cityId !=''" > 
+				and c.city_id = #{cityId}
+			</if> 
+			<if test = "cities !=null and cities !=''" > 
+				and c.city_id in (${cities})
+			</if> 
+			<if test = "supplierId !=null and supplierId !=''" > 
+				and p.supplier_id = #{supplierId}
+			</if> 
+			<if test = "supplierIds !=null and supplierIds !=''" > 
+				and p.supplier_id in (${supplierIds})
+			</if> 
+			<if test = "carGroupId !=null and carGroupId !=''" > 
+				and g.group_id = #{carGroupId}
+			</if> 
+			<if test = "startDateBegin !=null and startDateBegin !=''" > 
+				<![CDATA[AND o.out_start_date >= '${startDateBegin} 00:00:00' ]]> 
+			</if> 
+			<if test = "startDateEnd !=null and startDateEnd !=''" > 
+				<![CDATA[AND o.out_start_date<= '${startDateEnd} 23:59:59' ]]> 
+			</if>
+		ORDER BY o.create_date desc 
+		LIMIT ${offSet},${pagesize}
+  </select>
+  
+  <select id="queryForInt" resultType="int" parameterType="com.zhuanche.entity.rentcar.DriverOutage">
+		SELECT   
+			count(*)
+		FROM car_biz_driver_outage o
+		LEFT JOIN car_biz_driver_info i on i.driver_id = o.driver_id
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+		WHERE 1=1
+			<if test = "outageSource !=null and outageSource !=''" > 
+				and o.outage_source = #{outageSource}
+			</if> 
+			<if test = "removeStatus !=null and removeStatus !=''" > 
+				and o.remove_status = #{removeStatus}
+			</if> 
+			<if test = "driverName !=null and driverName !=''" > 
+				and i.name like '%${driverName}%'
+			</if> 
+			<if test = "driverPhone !=null and driverPhone !=''" > 
+				and i.phone like '%${driverPhone}%'
+			</if> 
+			<if test = "cityId !=null and cityId !=''" > 
+				and c.city_id = #{cityId}
+			</if> 
+			<if test = "cities !=null and cities !=''" > 
+				and c.city_id in (${cities})
+			</if> 
+			<if test = "supplierId !=null and supplierId !=''" > 
+				and p.supplier_id = #{supplierId}
+			</if> 
+			<if test = "supplierIds !=null and supplierIds !=''" > 
+				and p.supplier_id in (${supplierIds})
+			</if> 
+			<if test = "carGroupId !=null and carGroupId !=''" > 
+				and g.group_id = #{carGroupId}
+			</if> 
+			<if test = "startDateBegin !=null and startDateBegin !=''" > 
+				<![CDATA[AND o.out_start_date >= '${startDateBegin} 00:00:00' ]]> 
+			</if> 
+			<if test = "startDateEnd !=null and startDateEnd !=''" > 
+				<![CDATA[AND o.out_start_date<= '${startDateEnd} 23:59:59' ]]> 
+			</if>
+  </select>
+  <select id="queryForObject" resultType="com.zhuanche.entity.rentcar.DriverOutage" parameterType="com.zhuanche.entity.rentcar.DriverOutage">
+		SELECT     
+			o.id outageId, 
+			o.driver_id driverId,
+			o.out_start_date outStartDate,
+			o.out_stop_long_time outStopLongTime,
+			o.out_end_date outEndDate,
+			o.fact_start_date factStartDate,
+			o.fact_end_date factEndDate,
+			o.outage_source outageSource,
+			o.outage_reason outageReason,
+			o.create_by createBy,
+			o.create_name createName,
+			o.create_date createDate,
+			o.remove_by removeBy,
+			o.remove_name removeName,
+			o.remove_date removeDate,
+			o.remove_reason removeReason,
+			o.remove_status removeStatus,
+			o.order_nos orderNos,
+			i.name driverName,
+			i.phone driverPhone,
+			i.license_plates licensePlates,
+			c.city_id cityId,
+			c.city_name cityName,
+			p.supplier_id supplierId,
+			p.supplier_full_name supplierName,
+			g.group_id carGroupId,
+			g.group_name carGroupName,
+			DATE_FORMAT(o.out_start_date, '%Y-%m-%d %H:%i:%s') outStartDateStr,
+			DATE_FORMAT(o.out_end_date, '%Y-%m-%d %H:%i:%s') outEndDateStr,
+			DATE_FORMAT(o.fact_start_date, '%Y-%m-%d %H:%i:%s') factStartDateStr,
+			DATE_FORMAT(o.fact_end_date, '%Y-%m-%d %H:%i:%s') factEndDateStr,
+			DATE_FORMAT(o.create_date, '%Y-%m-%d %H:%i:%s') createDateStr,
+			DATE_FORMAT(o.remove_date, '%Y-%m-%d %H:%i:%s') removeDateStr
+		FROM car_biz_driver_outage o
+		LEFT JOIN car_biz_driver_info i on i.driver_id = o.driver_id
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+		WHERE 1=1
+			<if test = "outageId !=null and outageId !=''" > 
+				and o.id = #{outageId}
+			</if> 
+			<if test = "outageSource !=null and outageSource !=''" > 
+				and o.outage_source = #{outageSource}
+			</if> 
+			<if test = "removeStatus !=null and removeStatus !=''" > 
+				and o.remove_status = #{removeStatus}
+			</if> 
+			<if test = "driverName !=null and driverName !=''" > 
+				and i.name like '%${driverName}%'
+			</if> 
+			<if test = "driverPhone !=null and driverPhone !=''" > 
+				and i.phone like '%${driverPhone}%'
+			</if> 
+			<if test = "cityId !=null and cityId !=''" > 
+				and c.city_id = #{cityId}
+			</if> 
+			<if test = "cities !=null and cities !=''" > 
+				and c.city_id in (${cities})
+			</if> 
+			<if test = "supplierId !=null and supplierId !=''" > 
+				and p.supplier_id = #{supplierId}
+			</if> 
+			<if test = "supplierIds !=null and supplierIds !=''" > 
+				and p.supplier_id in (${supplierIds})
+			</if> 
+			<if test = "carGroupId !=null and carGroupId !=''" > 
+				and g.group_id = #{carGroupId}
+			</if> 
+			<if test = "startDateBegin !=null and startDateBegin !=''" > 
+				<![CDATA[AND o.out_start_date >= '${startDateBegin} 00:00:00' ]]> 
+			</if> 
+			<if test = "startDateEnd !=null and startDateEnd !=''" > 
+				<![CDATA[AND o.out_start_date<= '${startDateEnd} 23:59:59' ]]> 
+			</if>
+		ORDER BY o.create_date desc 
+  </select>
+  <select id="queryForListObjectNoLimit" resultType="com.zhuanche.entity.rentcar.DriverOutage" parameterType="com.zhuanche.entity.rentcar.DriverOutage">
+		SELECT      
+			o.id outageId,
+			o.driver_id driverId,
+			o.out_start_date outStartDate,
+			o.out_stop_long_time outStopLongTime,
+			o.out_end_date outEndDate,
+			o.fact_start_date factStartDate,
+			o.fact_end_date factEndDate,
+			o.outage_source outageSource,
+			o.outage_reason outageReason,
+			o.create_by createBy,
+			o.create_name createName,
+			o.create_date createDate,
+			o.remove_by removeBy,
+			o.remove_name removeName,
+			o.remove_date removeDate,
+			o.remove_reason removeReason,
+			o.remove_status removeStatus,
+			o.order_nos orderNos,
+			i.name driverName,
+			i.phone driverPhone,
+			i.license_plates licensePlates,
+			c.city_id cityId,
+			c.city_name cityName,
+			p.supplier_id supplierId,
+			p.supplier_full_name supplierName,
+			g.group_id carGroupId,
+			g.group_name carGroupName,
+			DATE_FORMAT(o.out_start_date, '%Y-%m-%d %H:%i:%s') outStartDateStr,
+			DATE_FORMAT(o.out_end_date, '%Y-%m-%d %H:%i:%s') outEndDateStr,
+			DATE_FORMAT(o.fact_start_date, '%Y-%m-%d %H:%i:%s') factStartDateStr,
+			DATE_FORMAT(o.fact_end_date, '%Y-%m-%d %H:%i:%s') factEndDateStr,
+			DATE_FORMAT(o.create_date, '%Y-%m-%d %H:%i:%s') createDateStr,
+			DATE_FORMAT(o.remove_date, '%Y-%m-%d %H:%i:%s') removeDateStr
+		FROM car_biz_driver_outage o
+		LEFT JOIN car_biz_driver_info i on i.driver_id = o.driver_id
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+		WHERE 1=1
+			<if test = "outageSource !=null and outageSource !=''" > 
+				and o.outage_source = #{outageSource}
+			</if> 
+			<if test = "removeStatus !=null and removeStatus !=''" > 
+				and o.remove_status = #{removeStatus}
+			</if> 
+			<if test = "driverName !=null and driverName !=''" > 
+				and i.name like '%${driverName}%'
+			</if> 
+			<if test = "driverPhone !=null and driverPhone !=''" > 
+				and i.phone like '%${driverPhone}%'
+			</if> 
+			<if test = "cityId !=null and cityId !=''" > 
+				and c.city_id = #{cityId}
+			</if> 
+			<if test = "cities !=null and cities !=''" > 
+				and c.city_id in (${cities})
+			</if> 
+			<if test = "supplierId !=null and supplierId !=''" > 
+				and p.supplier_id = #{supplierId}
+			</if> 
+			<if test = "supplierIds !=null and supplierIds !=''" > 
+				and p.supplier_id in (${supplierIds})
+			</if> 
+			<if test = "carGroupId !=null and carGroupId !=''" > 
+				and g.group_id = #{carGroupId}
+			</if> 
+			<if test = "startDateBegin !=null and startDateBegin !=''" > 
+				<![CDATA[AND o.out_start_date >= '${startDateBegin} 00:00:00' ]]> 
+			</if> 
+			<if test = "startDateEnd !=null and startDateEnd !=''" > 
+				<![CDATA[AND o.out_start_date<= '${startDateEnd} 23:59:59' ]]> 
+			</if>
+  </select>
+  <select id="queryDriverNameByPhone" resultType="com.zhuanche.entity.rentcar.DriverOutage" parameterType="com.zhuanche.entity.rentcar.DriverOutage">
+		SELECT   
+			i.driver_id driverId,
+			i.name driverName,
+			i.phone driverPhone
+		FROM car_biz_driver_info i 
+		WHERE i.phone = #{driverPhone}
+  </select>
+  
+  <!-- 永久 -->
+  <select id="queryAllForListObject" resultType="com.zhuanche.entity.rentcar.DriverOutage" parameterType="com.zhuanche.entity.rentcar.DriverOutage">
+		SELECT   
+			o.id outageId,
+			o.driver_id driverId,
+			o.out_start_date outStartDate,
+			o.out_end_date outEndDate,
+			o.outage_source outageSource,
+			o.outage_reason outageReason,
+			o.create_by createBy,
+			o.create_name createName,
+			o.create_date createDate,
+			o.remove_by removeBy,
+			o.remove_name removeName,
+			o.remove_date removeDate,
+			o.remove_reason removeReason,
+			o.remove_status removeStatus,
+			i.name driverName,
+			i.phone driverPhone,
+			i.license_plates licensePlates,
+			c.city_id cityId,
+			c.city_name cityName,
+			p.supplier_id supplierId,
+			p.supplier_full_name supplierName,
+			g.group_id carGroupId,
+			g.group_name carGroupName,
+			DATE_FORMAT(o.out_start_date, '%Y-%m-%d %H:%i:%s') outStartDateStr,
+			DATE_FORMAT(o.out_end_date, '%Y-%m-%d %H:%i:%s') outEndDateStr,
+			DATE_FORMAT(o.create_date, '%Y-%m-%d %H:%i:%s') createDateStr,
+			DATE_FORMAT(o.remove_date, '%Y-%m-%d %H:%i:%s') removeDateStr
+		FROM car_biz_driver_outage_all o
+		LEFT JOIN car_biz_driver_info i on i.driver_id = o.driver_id
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+		WHERE 1=1
+			<if test = "outageSource !=null and outageSource !=''" > 
+				and o.outage_source = #{outageSource}
+			</if> 
+			<if test = "removeStatus !=null and removeStatus !=''" > 
+				and o.remove_status = #{removeStatus}
+			</if> 
+			<if test = "driverName !=null and driverName !=''" > 
+				and i.name like '%${driverName}%'
+			</if> 
+			<if test = "driverPhone !=null and driverPhone !=''" > 
+				and i.phone like '%${driverPhone}%'
+			</if> 
+			<if test = "cityId !=null and cityId !=''" > 
+				and c.city_id = #{cityId}
+			</if> 
+			<if test = "cities !=null and cities !=''" > 
+				and c.city_id in (${cities})
+			</if> 
+			<if test = "supplierId !=null and supplierId !=''" > 
+				and p.supplier_id = #{supplierId}
+			</if> 
+			<if test = "supplierIds !=null and supplierIds !=''" > 
+				and p.supplier_id in (${supplierIds})
+			</if> 
+			<if test = "carGroupId !=null and carGroupId !=''" > 
+				and g.group_id = #{carGroupId}
+			</if> 
+			<if test = "startDateBegin !=null and startDateBegin !=''" > 
+				<![CDATA[AND o.out_start_date >= '${startDateBegin} 00:00:00' ]]> 
+			</if> 
+			<if test = "startDateEnd !=null and startDateEnd !=''" > 
+				<![CDATA[AND o.out_start_date<= '${startDateEnd} 23:59:59' ]]> 
+			</if>
+		ORDER BY o.create_date desc 
+		LIMIT ${offSet},${pagesize}
+  </select>
+  
+  <select id="queryAllForInt" resultType="int" parameterType="com.zhuanche.entity.rentcar.DriverOutage">
+		SELECT   
+			count(*)
+		FROM car_biz_driver_outage_all o
+		LEFT JOIN car_biz_driver_info i on i.driver_id = o.driver_id
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+		WHERE 1=1
+			<if test = "outageSource !=null and outageSource !=''" > 
+				and o.outage_source = #{outageSource}
+			</if> 
+			<if test = "removeStatus !=null and removeStatus !=''" > 
+				and o.remove_status = #{removeStatus}
+			</if> 
+			<if test = "driverName !=null and driverName !=''" > 
+				and i.name like '%${driverName}%'
+			</if> 
+			<if test = "driverPhone !=null and driverPhone !=''" > 
+				and i.phone like '%${driverPhone}%'
+			</if> 
+			<if test = "cityId !=null and cityId !=''" > 
+				and c.city_id = #{cityId}
+			</if> 
+			<if test = "cities !=null and cities !=''" > 
+				and c.city_id in (${cities})
+			</if> 
+			<if test = "supplierId !=null and supplierId !=''" > 
+				and p.supplier_id = #{supplierId}
+			</if> 
+			<if test = "supplierIds !=null and supplierIds !=''" > 
+				and p.supplier_id in (${supplierIds})
+			</if> 
+			<if test = "carGroupId !=null and carGroupId !=''" > 
+				and g.group_id = #{carGroupId}
+			</if> 
+			<if test = "startDateBegin !=null and startDateBegin !=''" > 
+				<![CDATA[AND o.out_start_date >= '${startDateBegin} 00:00:00' ]]> 
+			</if> 
+			<if test = "startDateEnd !=null and startDateEnd !=''" > 
+				<![CDATA[AND o.out_start_date<= '${startDateEnd} 23:59:59' ]]> 
+			</if>
+  </select>
+  <select id="queryDriverOutageByDriverId" resultType="com.zhuanche.entity.rentcar.DriverOutage" parameterType="com.zhuanche.entity.rentcar.DriverOutage">
+		SELECT      
+			o.id outageId,
+			o.driver_id driverId,
+			o.out_start_date outStartDate,
+			o.out_stop_long_time outStopLongTime,
+			o.out_end_date outEndDate,
+			o.fact_start_date factStartDate,
+			o.fact_end_date factEndDate,
+			o.outage_source outageSource,
+			o.outage_reason outageReason,
+			o.create_by createBy,
+			o.create_name createName,
+			o.create_date createDate,
+			o.remove_by removeBy,
+			o.remove_name removeName,
+			o.remove_date removeDate,
+			o.remove_reason removeReason,
+			o.remove_status removeStatus,
+			o.order_nos orderNos,
+			i.name driverName,
+			i.phone driverPhone,
+			i.license_plates licensePlates,
+			c.city_id cityId,
+			c.city_name cityName,
+			p.supplier_id supplierId,
+			p.supplier_full_name supplierName,
+			g.group_id carGroupId,
+			g.group_name carGroupName,
+			DATE_FORMAT(o.out_start_date, '%Y-%m-%d %H:%i:%s') outStartDateStr,
+			DATE_FORMAT(o.out_end_date, '%Y-%m-%d %H:%i:%s') outEndDateStr,
+			DATE_FORMAT(o.fact_start_date, '%Y-%m-%d %H:%i:%s') factStartDateStr,
+			DATE_FORMAT(o.fact_end_date, '%Y-%m-%d %H:%i:%s') factEndDateStr,
+			DATE_FORMAT(o.create_date, '%Y-%m-%d %H:%i:%s') createDateStr,
+			DATE_FORMAT(o.remove_date, '%Y-%m-%d %H:%i:%s') removeDateStr
+		FROM car_biz_driver_outage o
+		LEFT JOIN car_biz_driver_info i on i.driver_id = o.driver_id
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+		WHERE o.remove_status in (2,3)
+			  and o.driver_id = #{driverId}
+  </select>
+  <select id="queryDriverOutageAllByDriverId" resultType="com.zhuanche.entity.rentcar.DriverOutage" parameterType="com.zhuanche.entity.rentcar.DriverOutage">
+		SELECT   
+			o.id outageId,
+			o.driver_id driverId,
+			o.out_start_date outStartDate,
+			o.out_end_date outEndDate,
+			o.outage_source outageSource,
+			o.outage_reason outageReason,
+			o.create_by createBy,
+			o.create_name createName,
+			o.create_date createDate,
+			o.remove_by removeBy,
+			o.remove_name removeName,
+			o.remove_date removeDate,
+			o.remove_reason removeReason,
+			o.remove_status removeStatus,
+			i.name driverName,
+			i.phone driverPhone,
+			i.license_plates licensePlates,
+			c.city_id cityId,
+			c.city_name cityName,
+			p.supplier_id supplierId,
+			p.supplier_full_name supplierName,
+			g.group_id carGroupId,
+			g.group_name carGroupName,
+			DATE_FORMAT(o.out_start_date, '%Y-%m-%d %H:%i:%s') outStartDateStr,
+			DATE_FORMAT(o.out_end_date, '%Y-%m-%d %H:%i:%s') outEndDateStr,
+			DATE_FORMAT(o.create_date, '%Y-%m-%d %H:%i:%s') createDateStr,
+			DATE_FORMAT(o.remove_date, '%Y-%m-%d %H:%i:%s') removeDateStr
+		FROM car_biz_driver_outage_all o
+		LEFT JOIN car_biz_driver_info i on i.driver_id = o.driver_id
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+		WHERE o.remove_status = 1
+			and o.driver_id = #{driverId}
+		LIMIT 1
+  </select>
+</mapper>
