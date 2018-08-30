@@ -14,11 +14,14 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.dto.DriverVerifyDto;
+import com.zhuanche.entity.driver.DriverCert;
 import com.zhuanche.entity.driver.DriverVerify;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
+import com.zhuanche.util.IdCard;
 
+import mapper.driver.ex.DriverCertExMapper;
 import mapper.driver.ex.DriverVerifyExMapper;
 
 /**
@@ -36,6 +39,9 @@ public class DriverVerifyService {
 	@Autowired
 	DriverVerifyExMapper driverVerifyExMapper;
 
+	@Autowired
+	DriverCertExMapper driverCertExMapper;
+
 	/** 查询司机加盟注册信息 **/
 	public PageDTO queryDriverVerifyList(int page, int pageSize, Long cityId, String supplier, String mobile,
 			Integer verifyStatus, String createDateBegin, String createDateEnd) {
@@ -51,7 +57,8 @@ public class DriverVerifyService {
 			if (cityIdsForAuth.size() == 0 || cityId != null && !cityIdsForAuth.contains(cityId)) {
 				return null;
 			}
-			if (supplierIdsForAuth.size() == 0 || StringUtils.isNotBlank(supplier) && !supplierIdsForAuth.contains(supplier)) {
+			if (supplierIdsForAuth.size() == 0
+					|| StringUtils.isNotBlank(supplier) && !supplierIdsForAuth.contains(supplier)) {
 				return null;
 			}
 		}
@@ -98,4 +105,59 @@ public class DriverVerifyService {
 		}
 		return pageDto;
 	}
+
+	/** 查询司机加盟注册信息通过司机id **/
+	public DriverVerifyDto queryDriverVerifyById(Long driverId) {
+		// 查询司机加盟注册信息通过id
+		logger.info("查询司机加盟注册信息通过司机ID,driverId=" + driverId);
+		DriverVerifyDto dto = null;
+		try {
+			DriverVerify driverVerify = driverVerifyExMapper.selectByPrimaryKey(driverId);
+			if (null == driverVerify) {
+				return null;
+			}
+			// 车牌号码转大写
+			String plateNum = driverVerify.getPlateNum();
+			if (StringUtils.isNotBlank(plateNum)) {
+				driverVerify.setPlateNum(plateNum.toUpperCase());
+			}
+			dto = BeanUtil.copyObject(driverVerify, DriverVerifyDto.class);
+			// 获取司机的出生日期 性别
+			if (driverVerify.getIdCard() != null && !"".equals(driverVerify.getIdCard())) {
+				if (driverVerify.getIdCard() != null && !"".equals(driverVerify.getIdCard())) {
+					String gender = IdCard.getGenderByIdCard(driverVerify.getIdCard());
+					if (Integer.valueOf(gender) == 1) {
+						driverVerify.setIdcardSex("男");
+					} else {
+						driverVerify.setIdcardSex("女");
+					}
+					String d = IdCard.getBirthByIdCard(driverVerify.getIdCard());
+					if (d != null && d.length() == 8) {
+						driverVerify.setIdcardBirthday(
+								d.substring(0, 4) + "-" + d.substring(4, 6) + "-" + d.substring(6, 8));
+					} else {
+						driverVerify.setIdcardBirthday(d);
+					}
+				}
+			}
+			// 查询服务类型名称通过serviceType car_biz_car_group TODO
+			// 查询车型名称通过车型modelId car_biz_model TODO
+		} catch (Exception e) {
+			logger.error("查询司机加盟注册信息通过司机ID异常,driverId=" + driverId, e);
+		}
+		return dto;
+	}
+
+	/** 查询司机证件照片通过司机ID和证件照片类型 **/
+	public String queryImageByDriverIdAndType(Long driverId, Integer type) {
+		String image = "";
+		try {
+			logger.info("查询司机证件照片通过司机ID和证件照片类型,driverId=" + driverId);
+			image = driverCertExMapper.queryImageByDriverIdAndType(driverId, type);
+		} catch (Exception e) {
+			logger.error("查询司机证件照片通过司机ID和证件照片类型异常,driverId=" + driverId, e);
+		}
+		return image;
+	}
+
 }

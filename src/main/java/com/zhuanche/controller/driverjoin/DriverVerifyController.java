@@ -1,17 +1,15 @@
 package com.zhuanche.controller.driverjoin;
 
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.google.common.collect.Maps;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.dto.DriverVerifyDto;
 import com.zhuanche.serv.DriverVerifyService;
 
 /**
@@ -59,4 +57,33 @@ public class DriverVerifyController {
 		}
 		return AjaxResponse.success(pageDto);
 	}
+	
+	/**查询司机加盟注册信息通过司机ID**/
+	@RequestMapping(value = "/queryDriverVerifyById")
+	public AjaxResponse queryDriverVerifyById(Long driverId){
+		
+		DriverVerifyDto driverDto = null;
+		try {
+			driverDto = driverVerifyService.queryDriverVerifyById(driverId);
+		} catch (Exception e) {
+			logger.error("查询司机加盟注册信息通过司机ID异常",e);
+			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		}
+		return AjaxResponse.success(driverDto);
+	}
+	
+	/**查询司机证件照片通过司机ID和证件照片类型**/
+	@RequestMapping(value = "/queryImageByDriverIdAndType")
+	public AjaxResponse queryImageByDriverIdAndType(Long driverId,Integer type){
+		
+		String image = "";
+		try {
+			image = driverVerifyService.queryImageByDriverIdAndType(driverId,type);
+		} catch (Exception e) {
+			logger.error("查询司机证件照片通过司机ID和证件照片类型异常,driverId="+driverId,e);
+			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		}
+		return AjaxResponse.success(image);
+	}
+	
 }

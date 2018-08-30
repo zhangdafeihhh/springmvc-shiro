@@ -1,7 +1,14 @@
 package com.zhuanche.controller.driverjoin;
 
+import org.apache.http.HttpException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.http.HttpClientUtil;
 
 /** 
  * 司机注册邀请
@@ -15,7 +22,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/driverInvitation")
 public class DriverInvitationController {
+	
+	private static final Logger logger = LoggerFactory.getLogger(DriverInvitationController.class);
 
-	
-	
+	// 生成短链接
+	@RequestMapping(value = "/makeShortUrl")
+	public AjaxResponse makeShortUrl(String supplierId){
+		logger.info("供应商短链接生成,supplierId="+supplierId);
+        String url = "https://monline.01zhuanche.com/driverRegister/register.html?source=supplier-invite%26supplier="+supplierId;
+		String shortUrl  = null;
+		try {
+			shortUrl = HttpClientUtil.buildGetRequest("http://api.t.sina.com.cn/short_url/shorten.json?source=1681459862&url_long=" + url).setLimitResult(1).execute();
+			logger.info("供应商短链接生成,supplierId={},shortUrl={}",supplierId,shortUrl);
+		} catch (HttpException e) {
+			logger.error("供应商短链接生成异常",e);
+			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		}
+		return AjaxResponse.success(shortUrl);
+	}
 }
