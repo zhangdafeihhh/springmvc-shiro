@@ -7,6 +7,7 @@ src/main/resources/application.properties
 src/main/resources/db.properties
 src/main/resources/dubbo.properties
 src/main/resources/redis.properties
+src/main/resources/*.properties
 .idea
 *.iml
 logs
