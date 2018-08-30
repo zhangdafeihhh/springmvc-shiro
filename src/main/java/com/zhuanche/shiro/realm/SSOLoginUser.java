@@ -1,13 +1,15 @@
 package com.zhuanche.shiro.realm;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**当前的登录用户信息**/
-public  final class SSOLoginUser implements Serializable{
+public final class SSOLoginUser implements Serializable{
 	private static final long serialVersionUID = -1373760761780841081L;
 	//eg:   {"loginName":"wangjiaqi","mobile":"17600606250","name":"王佳琪","id":287,"type":2,"email":"wangjiaqi@01zhuanche.com","status":1}
 	/**用户ID**/
-	private long id;
+	private Integer id;
 	/**登录名**/
 	private String loginName;
 	/**手机号码**/
@@ -17,14 +19,23 @@ public  final class SSOLoginUser implements Serializable{
 	/**邮箱地址**/
 	private String email;
 	/**TODO：**/
-	private long type;
+	private Integer type;
 	/**状态**/
-	private long status;
-	
-	public long getId() {
+	private Integer status;
+	/**帐号类型：[100 普通用户]、[900 管理员]**/
+	private Integer accountType;
+	//---------------------------------------------------------------------------------------------------------数据权限BEGIN
+	/**此用户可以管理的城市ID**/
+	private Set<Integer> cityIds = new HashSet<Integer>();
+	/**此用户可以管理的供应商ID**/
+	private Set<Integer> supplierIds = new HashSet<Integer>();
+	/**此用户可以管理的车队ID**/
+	private Set<Integer> teamIds = new HashSet<Integer>();
+	//---------------------------------------------------------------------------------------------------------数据权限END
+	public Integer getId() {
 		return id;
 	}
-	public void setId(long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 	public String getLoginName() {
@@ -51,20 +62,47 @@ public  final class SSOLoginUser implements Serializable{
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public long getType() {
+	public Integer getType() {
 		return type;
 	}
-	public void setType(long type) {
+	public void setType(Integer type) {
 		this.type = type;
 	}
-	public long getStatus() {
+	public Integer getStatus() {
 		return status;
 	}
-	public void setStatus(long status) {
+	public void setStatus(Integer status) {
 		this.status = status;
 	}
+	public Integer getAccountType() {
+		return accountType;
+	}
+	public void setAccountType(Integer accountType) {
+		this.accountType = accountType;
+	}
+	public Set<Integer> getCityIds() {
+		return cityIds;
+	}
+	public void setCityIds(Set<Integer> cityIds) {
+		this.cityIds = cityIds;
+	}
+	public Set<Integer> getSupplierIds() {
+		return supplierIds;
+	}
+	public void setSupplierIds(Set<Integer> supplierIds) {
+		this.supplierIds = supplierIds;
+	}
+	public Set<Integer> getTeamIds() {
+		return teamIds;
+	}
+	public void setTeamIds(Set<Integer> teamIds) {
+		this.teamIds = teamIds;
+	}
+	
 	@Override
 	public String toString() {
-		return "SSOLoginUser [id=" + id + ", loginName=" + loginName + ", mobile=" + mobile + ", name=" + name + ", email=" + email + ", type=" + type + ", status=" + status + "]";
+		return "SSOLoginUser [id=" + id + ", loginName=" + loginName + ", mobile=" + mobile + ", name=" + name
+				+ ", email=" + email + ", type=" + type + ", status=" + status + ", accountType=" + accountType
+				+ ", cityIds=" + cityIds + ", supplierIds=" + supplierIds + ", teamIds=" + teamIds + "]";
 	}
 }
