@@ -57,6 +57,8 @@ public final class RestErrorCode{
 	public static final int DRIVER_NOT_EXIST = 2000;
 	@ResultMessage("该司机已存在启用的永久停运！")
 	public static final int DRIVER_OUTAGEALL_EXIST = 2001;
+	@ResultMessage("该司机已存在启用的临时停运！")
+	public static final int DRIVER_OUTAGE_EXIST = 2002;
 //	@ResultMessage("司机状态不是正常启用状态")
 //	public static final int DRIVER_STATUS_NOT_ENABLED                     = 1001;
 //	@ResultMessage("司机手机号码与身份证号码不符合")

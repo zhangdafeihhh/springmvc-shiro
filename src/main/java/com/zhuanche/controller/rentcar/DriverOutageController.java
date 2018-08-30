@@ -43,30 +43,6 @@ public class DriverOutageController {
     @Autowired
     private DriverOutageService driverOutageService;
 
-//    @Autowired
-//    private LogService logService;
-
-//    @AuthPassport
-//    @RequestMapping(value = "/queryDriverOutage", method = { RequestMethod.GET })
-//    public String queryDriverOutage(ModelMap model, DriverOutage params){
-//        try {
-//            logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"【司机停运】司机停运列表");
-//        } catch (Exception e) {
-//        }
-//        logger.info("【司机停运】queryDriverOutage:司机停运列表");
-//        return "driverOutage/driverOutageList";
-//    }
-//
-//    @AuthPassport
-//    @RequestMapping(value = "/queryDriverOutageNo", method = { RequestMethod.GET })
-//    public String queryDriverOutageNo(ModelMap model, DriverOutage params){
-//        try {
-//            logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"【司机停运】司机停运列表");
-//        } catch (Exception e) {
-//        }
-//        logger.info("【司机停运】queryDriverOutageNo:司机停运列表");
-//        return "driverOutage/driverOutageListNo";
-//    }
 
     /**
      * 查询临时停运司机列表
@@ -93,13 +69,6 @@ public class DriverOutageController {
                                               Integer removeStatus,
                                               Integer page,
                                               Integer pageSize){
-//        try {
-//            logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"【司机停运】司机停运列表数据");
-//        } catch (Exception e) {
-//        }
-
-
-
         logger.info("【司机停运】司机停运列表数据:queryDriverOutageData.json");
         DriverOutage params = new DriverOutage();
         params.setCityId(cityId);
@@ -117,7 +86,6 @@ public class DriverOutageController {
             params.setPagesize(pageSize);
 
         List<DriverOutage> rows = new ArrayList<>();
-        List<DriverOutageDTO> data = Lists.newArrayList();
         int total = 0;
         //权限
         String cities = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getCityIds(), ",");
@@ -127,7 +95,7 @@ public class DriverOutageController {
         //查数量
         total = driverOutageService.queryForInt(params);
         if(total==0){
-            PageDTO result = new PageDTO(params.getPage(), params.getPagerSize(), 0, data);
+            PageDTO result = new PageDTO(params.getPage(), params.getPagerSize(), 0, rows);
             return AjaxResponse.success(result);
         }
         //查数据
@@ -270,7 +238,7 @@ public class DriverOutageController {
      * @return
      */
     @RequestMapping(value="/updateDriverOutage", method = { RequestMethod.POST })
-    public Object updateDriverOutage(@Verify(param = "outageId",rule = "required")Integer outageId,
+    public AjaxResponse updateDriverOutage(@Verify(param = "outageId",rule = "required")Integer outageId,
                                      @Verify(param = "removeStatus",rule = "required")Integer removeStatus,
                                      @Verify(param = "removeReason",rule = "required")String removeReason){
         DriverOutage params = new DriverOutage();
@@ -281,12 +249,12 @@ public class DriverOutageController {
         logger.info("【司机停运】临时停运解除数据=="+params.toString());
         Map<String,Object> result = new HashMap<String,Object>();
         result = this.driverOutageService.updateDriverOutage(params);
-        return result;
+        return AjaxResponse.success(result);
     }
 
     @RequestMapping(value="/updateDriverOutages", method = { RequestMethod.POST })
     //outageIds:checkDriver,removeReason:value
-    public Object updateDriverOutages(@Verify(param = "outageIds",rule = "required")String outageIds,
+    public AjaxResponse updateDriverOutages(@Verify(param = "outageIds",rule = "required")String outageIds,
                                       @Verify(param = "removeReason",rule = "required")String removeReason){
         DriverOutage params = new DriverOutage();
         params.setOutageIds(outageIds);
@@ -294,7 +262,7 @@ public class DriverOutageController {
         logger.info("【司机停运】临时停运批量解除数据=="+params.toString());
         Map<String,Object> result = new HashMap<String,Object>();
         result = this.driverOutageService.updateDriverOutages(params);
-        return result;
+        return AjaxResponse.success(result);
     }
 
 }
