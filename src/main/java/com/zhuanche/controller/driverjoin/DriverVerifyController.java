@@ -12,7 +12,7 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.driver.DriverVerifyDto;
-import com.zhuanche.serv.DriverVerifyService;
+import com.zhuanche.serv.driverjoin.DriverVerifyService;
 
 /**
  * 司机加盟注册 ClassName: DriverVerifyController.java Date: 2018年8月29日

@@ -1,4 +1,4 @@
-package com.zhuanche.serv;
+package com.zhuanche.serv.driverjoin;
 
 import java.util.HashSet;
 import java.util.List;
