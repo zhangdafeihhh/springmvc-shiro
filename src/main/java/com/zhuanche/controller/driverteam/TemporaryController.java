@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.driver.CarBizCarInfoTempDTO;
 import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
 import com.zhuanche.serv.deiver.CarBizCarInfoTempService;
@@ -31,13 +32,52 @@ public class TemporaryController{
 	private CarBizCarInfoTempService carBizCarInfoTempService;
 
 
+    /**
+     *
+     * @param page 页数
+     * @param pageSize 条数
+     * @param licensePlates 车牌号
+     * @param carModelIds 车型
+     * @param cities 城市
+     * @param supplierIds 供应商
+     * @param createDateBegin 开始时间
+     * @param createDateEnd 结束时间
+     * @return
+     */
 	@ResponseBody
-	@RequestMapping(value = "/queryCarData.json", method =  RequestMethod.GET )
+	@RequestMapping(value = "/queryCarData", method =  RequestMethod.GET )
 	public AjaxResponse queryCarData(@RequestParam(value = "page",defaultValue="1") Integer page,
-                                     @RequestParam(value = "pageNum",defaultValue="10") Integer pageSize) {
+                                     @RequestParam(value = "pageNum",defaultValue="10") Integer pageSize,
+                                     @RequestParam(value = "licensePlates",required = false) String licensePlates,
+                                     @RequestParam(value = "carModelIds",required = false) String carModelIds,
+                                     @RequestParam(value = "cities",required = false) String cities,
+                                     @RequestParam(value = "supplierIds",required = false) String supplierIds,
+                                     @RequestParam(value = "createDateBegin",required = false) String createDateBegin,
+                                     @RequestParam(value = "createDateEnd",required = false) String createDateEnd) {
 	    int total = 0;
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         Map<String,Object> params = Maps.newHashMap();
+        String sessionCities = StringUtils.join(currentLoginUser.getCityIds().toArray(), ",");
+        String sessionSupplierIds = StringUtils.join(currentLoginUser.getSupplierIds().toArray(), ",");
+        String sessionCarModelIds = StringUtils.join(currentLoginUser.getTeamIds().toArray(), ",");
+        params.put("licensePlates",licensePlates);
+        params.put("createDateBegin",createDateBegin);
+        params.put("createDateEnd",createDateEnd);
+        if(StringUtils.isNotBlank(carModelIds)){
+            params.put("carModelIds",carModelIds);
+        }else{
+            params.put("carModelIds",sessionCities);
+        }
+        if(StringUtils.isNotBlank(cities)){
+            params.put("cities",cities);
+        }else{
+            params.put("cities",sessionSupplierIds);
+        }
+        if(StringUtils.isNotBlank(supplierIds)){
+            params.put("supplierIds",supplierIds);
+        }else{
+            params.put("supplierIds",sessionCarModelIds);
+        }
         params.put("cities",StringUtils.join(currentLoginUser.getCityIds().toArray(), ","));
         params.put("supplierIds",StringUtils.join(currentLoginUser.getSupplierIds().toArray(), ","));
         params.put("carModelIds",StringUtils.join(currentLoginUser.getTeamIds().toArray(), ","));
