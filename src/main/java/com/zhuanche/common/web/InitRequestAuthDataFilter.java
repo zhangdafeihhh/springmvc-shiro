@@ -19,15 +19,15 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 public class InitRequestAuthDataFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)throws ServletException, IOException {
-//		//一、当前登录用户(用于日志输出)
-//		SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-//		if(loginUser==null) {
-//			MDC.put("loginUser", "【游客身份】");
-//		}else {
-//			MDC.put("loginUser", "【"+ loginUser.getId() +"-"+ loginUser.getName() +"-"+ loginUser.getLoginName()+"】");
-//		}
-//		//二、用于页面渲染
-//		request.setAttribute("currentLoginUser", loginUser );
+		//一、当前登录用户(用于日志输出)
+		SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+		if(loginUser==null) {
+			MDC.put("loginUser", "【游客身份】");
+		}else {
+			MDC.put("loginUser", "【"+ loginUser.getId() +"-"+ loginUser.getName() +"-"+ loginUser.getLoginName()+"】");
+		}
+		//二、用于页面渲染
+		request.setAttribute("currentLoginUser", loginUser );
 		
 		filterChain.doFilter(request, response);
 	}

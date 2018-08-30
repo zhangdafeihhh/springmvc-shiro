@@ -1,8 +1,10 @@
 package com.zhuanche.entity.mdbcarmanage;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class CarAdmUser {
+public class CarAdmUser implements Serializable{
+	private static final long serialVersionUID = -1373760761780841082L;
     private Integer userId;
 
     private String account;

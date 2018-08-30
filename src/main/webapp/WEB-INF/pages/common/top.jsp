@@ -10,7 +10,7 @@
 						<ul class="nav navbar-nav navbar-right">
 							<li class="">
 								<a href="javascript:void(0);" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-									Admin
+									${currentLoginUser.name }  ( ${currentLoginUser.loginName } )
 			                        <span class=" fa fa-angle-down"></span>
 			                    </a>
 			                    <ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -19,7 +19,7 @@
 			                            <%--<a href="javascript:;"> <span>设置</span></a>--%>
 			                        <%--</li>--%>
 			                        <li>
-			                            <%-- <a href="${ssoLogoutUrl}?service=${cmsLogoutUrl}"><i class="fa fa-sign-out pull-right"></i>退出</a> --%>
+			                            <a href="${ssoLogoutUrl}?service=${cmsLogoutUrl}"><i class="fa fa-sign-out pull-right"></i>退出</a>
 			                        </li>
 			                    </ul>
 			                </li>
