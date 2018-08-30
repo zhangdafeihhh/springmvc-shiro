@@ -5,10 +5,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.DriverVerifyDto;
 import com.zhuanche.serv.DriverVerifyService;
 
@@ -42,6 +44,7 @@ public class DriverVerifyController {
 	 * @return
 	 */
 	@RequestMapping("/queryDriverVerifyData")
+	@ResponseBody
 	public AjaxResponse queryDriverVerifyData(int page, int pageSize, Long cityId, String supplier, String mobile,
 			Integer verifyStatus, String createDateBegin, String createDateEnd) {
 
@@ -60,7 +63,8 @@ public class DriverVerifyController {
 	
 	/**查询司机加盟注册信息通过司机ID**/
 	@RequestMapping(value = "/queryDriverVerifyById")
-	public AjaxResponse queryDriverVerifyById(Long driverId){
+	@ResponseBody
+	public AjaxResponse queryDriverVerifyById(@Verify(param="driverId", rule = "required")Long driverId){
 		
 		DriverVerifyDto driverDto = null;
 		try {
@@ -74,7 +78,8 @@ public class DriverVerifyController {
 	
 	/**查询司机证件照片通过司机ID和证件照片类型**/
 	@RequestMapping(value = "/queryImageByDriverIdAndType")
-	public AjaxResponse queryImageByDriverIdAndType(Long driverId,Integer type){
+	@ResponseBody
+	public AjaxResponse queryImageByDriverIdAndType(@Verify(param="driverId", rule = "required")Long driverId,@Verify(param="type", rule = "required")Integer type){
 		
 		String image = "";
 		try {

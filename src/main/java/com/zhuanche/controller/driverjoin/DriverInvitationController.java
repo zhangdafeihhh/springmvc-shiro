@@ -5,9 +5,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.http.HttpClientUtil;
 
 /** 
@@ -27,7 +29,8 @@ public class DriverInvitationController {
 
 	// 生成短链接
 	@RequestMapping(value = "/makeShortUrl")
-	public AjaxResponse makeShortUrl(String supplierId){
+	@ResponseBody
+	public AjaxResponse makeShortUrl(@Verify(param="supplierId", rule = "required")String supplierId){
 		logger.info("供应商短链接生成,supplierId="+supplierId);
         String url = "https://monline.01zhuanche.com/driverRegister/register.html?source=supplier-invite%26supplier="+supplierId;
 		String shortUrl  = null;
