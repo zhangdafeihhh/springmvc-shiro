@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd
+">
+<!-- 新的配置方式BEGIN ( 说明: 在JVM内只初始化一个全局的生产者，通过此生产者，可以发布任何主题的消息 )  -->
+	<bean id="commonRocketProducer"  class="com.zhuanche.common.rocketmq.CommonRocketProducer" init-method="init" destroy-method="destroy" scope="singleton">
+		<property name="namesrvAddr" value="${rocketmq.namesrvAddr}"/>
+	</bean>
+<!-- 新的配置方式END -->
+</beans>

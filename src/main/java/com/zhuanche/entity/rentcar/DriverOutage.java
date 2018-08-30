@@ -1,5 +1,7 @@
 package com.zhuanche.entity.rentcar;
 
+import com.zhuanche.entity.common.BaseEntity;
+
 import java.util.Date;
 
 
@@ -10,7 +12,7 @@ import java.util.Date;
  * @version 2017年05月04日 下午 18:47:40ce
  * @autor
  */
-public class DriverOutage{
+public class DriverOutage extends BaseEntity {
 
     /**
      * serialVersionUID

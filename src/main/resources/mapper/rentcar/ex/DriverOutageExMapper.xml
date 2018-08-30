@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.zhuanche.entity.rentcar.DriverOutage" >
+<mapper namespace="mapper.rentcar.ex.DriverOutageExMapper" >
   <!-- mapper基础标准: 当前表所有字段映射结果集 -->
   <resultMap id="baseResultMap" type="com.zhuanche.entity.rentcar.DriverOutage" >
     <id column="id" property="outageId" jdbcType="INTEGER" />

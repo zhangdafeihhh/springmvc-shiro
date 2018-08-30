@@ -57,11 +57,7 @@
 	</bean>
 	
 	<!-- ********************************配置Realm实现 -->
-	<bean id="shiroRealm" class="com.zhuanche.shiro.realm.UsernamePasswordMsgcodeRealm">
-		<!-- <property name="defaultRoles" value="ROLE_USER" /> -->
-		<!-- <property name="casServerUrlPrefix" value="${sso.server.url}" /> -->
-		<!-- 客户端的回调地址，必须和下面的shiro-cas过滤器拦截的地址一致 -->
-		<!-- <property name="casService" value="${cms.login.url}" /> -->
+	<bean id="shiroRealm" class="com.zhuanche.shiro.realm.UsernamePasswordRealm">
 	</bean>
 	
 	<!-- ********************************配置SecurityManager安全管理器 -->
@@ -83,11 +79,9 @@
 	<!-- ********************************配置Shiro的Web过滤器 -->
 	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
 		<property name="securityManager" ref="securityManager" />
-		<property name="loginUrl" value="http://www.login.com/aaaaaaaaaaaaa.jsp" />
-		<!-- <property name="localLoginUrl" value="${cms.login.url}" /> -->
-		<property name="successUrl" value="/index.html" />
+		<property name="loginUrl" value="${loginpage.url}" />
+		<property name="successUrl" value="${homepage.url}" />
 		<property name="unauthorizedUrl" value="/unauthorized.html" /><!-- 因为和CAS集成了，因框架存在BUG不起作用无法注入，只能是默认的unauthorized.jsp -->
-		<!-- <property name="desSecret" value="${service.des.secret}" /> -->
 		<property name="filters">
 			<util:map>
 				<!-- 添加casFilter到shiroFilter -->
@@ -96,6 +90,7 @@
 		</property>
 		<property name="filterChainDefinitions">
 			<value>
+				/getMsgCode.json = anon
 				/dologin.json = anon
 				/logout.html = logout
 				/nginx.html = anon
@@ -103,13 +98,6 @@
 				/** = user
 			</value>
 		</property>
-	</bean>
-	<!-- <bean id="casFilter" class="org.apache.shiro.cas.CasFilter">
-		配置验证错误时的失败页面
-		<property name="failureUrl" value="/index.html" />
-	</bean> -->
-	<bean name="casSingleSignOutFilter" class="org.jasig.cas.client.session.SingleSignOutFilter">
-		<property name="casServerUrlPrefix" value="${sso.server.url}" />
 	</bean>
 	<!-- Shiro生命周期处理器 -->
 	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
