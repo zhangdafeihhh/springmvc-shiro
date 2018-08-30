@@ -11,7 +11,7 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
-import com.zhuanche.dto.DriverVerifyDto;
+import com.zhuanche.dto.driver.DriverVerifyDto;
 import com.zhuanche.serv.DriverVerifyService;
 
 /**

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.paging.PageDTO;
-import com.zhuanche.dto.DriverVerifyDto;
+import com.zhuanche.dto.driver.DriverVerifyDto;
 import com.zhuanche.entity.driver.DriverCert;
 import com.zhuanche.entity.driver.DriverVerify;
 import com.zhuanche.shiro.realm.SSOLoginUser;

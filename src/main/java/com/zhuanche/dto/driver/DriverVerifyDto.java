@@ -1,4 +1,4 @@
-package com.zhuanche.dto;
+package com.zhuanche.dto.driver;
 
 import java.util.Date;
 
