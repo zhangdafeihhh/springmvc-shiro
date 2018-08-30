@@ -1,9 +1,13 @@
 package com.zhuanche.dto.driver;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class DriverCertDto {
-    private Long id;
+public class DriverCertDto implements Serializable{
+   
+	private static final long serialVersionUID = 1L;
+
+	private Long id;
 
     private Byte type;
 
