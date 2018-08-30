@@ -3,10 +3,13 @@ package com.zhuanche.serv.common;
 import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
+import com.zhuanche.request.DutyRequest;
+import com.zhuanche.request.SchCommonRequest;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +51,61 @@ public class CitySupplierTeamCommonService {
 
     @Autowired
     private CarDriverTeamExMapper carDriverTeamExMapper;
+
+    /** 
+    * @Desc: 处理包含数据权限和查询条件参数整合处理 
+    * @param:
+    * @return:  
+    * @Author: lunan
+    * @Date: 2018/8/30 
+    */ 
+    public synchronized SchCommonRequest paramDeal(SchCommonRequest paramRequest){
+        if(paramRequest == null){
+            return null;
+        }
+        //A--------------------------------------------------------------------------------设置SQL查询参数
+        Set<String> cityIds        = new HashSet<String>();
+        Set<String> supplierIds = new HashSet<String>();
+        Set<Integer> teamIds    = new HashSet<Integer>();
+        //A1城市ID
+        if(StringUtils.isNotEmpty(paramRequest.getCityId())) {//当有参数传入时，以传入的参数为准
+            cityIds.add(paramRequest.getCityId());
+        }else{                                       //当无参数传入时，超级管理员可以查询任何城市; 普通管理员只能查询自己数据权限内的城市
+            if( WebSessionUtil.isSupperAdmin() ) {
+                cityIds.clear();
+            }else {
+                for(Integer cityid : paramRequest.getPermOfCity()) {
+                    cityIds.add( String.valueOf(cityid)  );
+                }
+            }
+        }
+        //A2供应商ID
+        if(StringUtils.isNotEmpty(paramRequest.getSupplierId())) {//当有参数传入时，以传入的参数为准
+            supplierIds.add(paramRequest.getSupplierId());
+        }else{                                              //当无参数传入时，超级管理员可以查询任何供应商; 普通管理员只能查询自己数据权限内的供应商
+            if( WebSessionUtil.isSupperAdmin() ) {
+                supplierIds.clear();
+            }else {
+                for(Integer sid : paramRequest.getPermOfSupplier()) {
+                    supplierIds.add( String.valueOf(sid)  );
+                }
+            }
+        }
+        //A3车队ID
+        if(paramRequest.getTeamId() != null) {         //当有参数传入时，以传入的参数为准
+            teamIds.add(paramRequest.getTeamId());
+        }else{                         //当无参数传入时，超级管理员可以查询任何车队; 普通管理员只能查询自己数据权限内的车队
+            if( WebSessionUtil.isSupperAdmin() ) {
+                teamIds.clear();
+            }else {
+                teamIds.addAll( paramRequest.getTeamIds() );
+            }
+        }
+        paramRequest.setCityIds(cityIds);
+        paramRequest.setSupplierIds(supplierIds);
+        paramRequest.setTeamIds(teamIds);
+        return paramRequest;
+    }
 
 
     /**

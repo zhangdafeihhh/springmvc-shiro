@@ -24,7 +24,15 @@
     id, team_name, sort, create_by, create_date, update_by, update_date, city, supplier, 
     remark, status, p_id, duty_start_date, duty_end_date, charge1, charge2, charge3
   </sql>
-  
+
+    <select id="selectByCondition" resultMap="BaseResultMap" parameterType="com.zhuanche.request.DutyRequest" >
+        select
+        <include refid="Base_Column_List" />
+        from car_driver_team
+        where team_name like CONCAT('%',#{teamName,jdbcType=VARCHAR},'%')
+        limit 1
+    </select>
+
   <!-- 查询车队列表(根据城市ID，供应商ID、车队ID  ) -->
   <select id="queryDriverTeam" resultMap="BaseResultMap" >
     select 

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.CarBizDriverInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarBizDriverInfo" >
+    <id column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="gender" property="gender" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="age" property="age" jdbcType="INTEGER" />
+    <result column="current_address" property="currentAddress" jdbcType="VARCHAR" />
+    <result column="emergency_contact_person" property="emergencyContactPerson" jdbcType="VARCHAR" />
+    <result column="emergency_contact_number" property="emergencyContactNumber" jdbcType="VARCHAR" />
+    <result column="id_card_no" property="idCardNo" jdbcType="VARCHAR" />
+    <result column="superintend_no" property="superintendNo" jdbcType="VARCHAR" />
+    <result column="superintend_url" property="superintendUrl" jdbcType="VARCHAR" />
+    <result column="driving_license_type" property="drivingLicenseType" jdbcType="VARCHAR" />
+    <result column="driving_years" property="drivingYears" jdbcType="INTEGER" />
+    <result column="archives_no" property="archivesNo" jdbcType="VARCHAR" />
+    <result column="issue_date" property="issueDate" jdbcType="TIMESTAMP" />
+    <result column="expire_date" property="expireDate" jdbcType="TIMESTAMP" />
+    <result column="service_city" property="serviceCity" jdbcType="INTEGER" />
+    <result column="attachment_name" property="attachmentName" jdbcType="VARCHAR" />
+    <result column="attachment_addr" property="attachmentAddr" jdbcType="VARCHAR" />
+    <result column="account_bank" property="accountBank" jdbcType="VARCHAR" />
+    <result column="bank_account_no" property="bankAccountNo" jdbcType="VARCHAR" />
+    <result column="license_plates" property="licensePlates" jdbcType="VARCHAR" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="mac" property="mac" jdbcType="VARCHAR" />
+    <result column="photoSrct" property="photosrct" jdbcType="VARCHAR" />
+    <result column="push_id" property="pushId" jdbcType="VARCHAR" />
+    <result column="is_binding_credit_card" property="isBindingCreditCard" jdbcType="INTEGER" />
+    <result column="app_version" property="appVersion" jdbcType="VARCHAR" />
+    <result column="credit_card_no" property="creditCardNo" jdbcType="VARCHAR" />
+    <result column="storable_card_no" property="storableCardNo" jdbcType="VARCHAR" />
+    <result column="credit_open_account_bank" property="creditOpenAccountBank" jdbcType="VARCHAR" />
+    <result column="credit_card_period_of_validity" property="creditCardPeriodOfValidity" jdbcType="VARCHAR" />
+    <result column="grab_notice" property="grabNotice" jdbcType="INTEGER" />
+    <result column="credit_CVN2" property="creditCvn2" jdbcType="VARCHAR" />
+    <result column="credit_bind_date" property="creditBindDate" jdbcType="TIMESTAMP" />
+    <result column="quickpay_customerid" property="quickpayCustomerid" jdbcType="VARCHAR" />
+    <result column="is_read" property="isRead" jdbcType="INTEGER" />
+    <result column="bankid" property="bankid" jdbcType="VARCHAR" />
+    <result column="go_home_address" property="goHomeAddress" jdbcType="VARCHAR" />
+    <result column="go_home_point_loBD" property="goHomePointLobd" jdbcType="VARCHAR" />
+    <result column="go_home_point_laBD" property="goHomePointLabd" jdbcType="VARCHAR" />
+    <result column="go_home_point_la" property="goHomePointLa" jdbcType="VARCHAR" />
+    <result column="go_home_point_lo" property="goHomePointLo" jdbcType="VARCHAR" />
+    <result column="go_home_status" property="goHomeStatus" jdbcType="INTEGER" />
+    <result column="update_go_home_date" property="updateGoHomeDate" jdbcType="VARCHAR" />
+    <result column="imei" property="imei" jdbcType="VARCHAR" />
+    <result column="driverLicenseNumber" property="driverlicensenumber" jdbcType="VARCHAR" />
+    <result column="drivingLicenseImg" property="drivinglicenseimg" jdbcType="VARCHAR" />
+    <result column="firstDrivingLicenseDate" property="firstdrivinglicensedate" jdbcType="VARCHAR" />
+    <result column="firstMeshworkDrivingLicenseDate" property="firstmeshworkdrivinglicensedate" jdbcType="VARCHAR" />
+    <result column="nationality" property="nationality" jdbcType="VARCHAR" />
+    <result column="householdRegister" property="householdregister" jdbcType="VARCHAR" />
+    <result column="nation" property="nation" jdbcType="VARCHAR" />
+    <result column="marriage" property="marriage" jdbcType="VARCHAR" />
+    <result column="foreignLanguage" property="foreignlanguage" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="education" property="education" jdbcType="VARCHAR" />
+    <result column="courseName" property="coursename" jdbcType="VARCHAR" />
+    <result column="courseDate" property="coursedate" jdbcType="VARCHAR" />
+    <result column="courseDateStart" property="coursedatestart" jdbcType="VARCHAR" />
+    <result column="courseDateEnd" property="coursedateend" jdbcType="VARCHAR" />
+    <result column="courseTime" property="coursetime" jdbcType="VARCHAR" />
+    <result column="corpType" property="corptype" jdbcType="VARCHAR" />
+    <result column="trafficViolations" property="trafficviolations" jdbcType="VARCHAR" />
+    <result column="signDate" property="signdate" jdbcType="VARCHAR" />
+    <result column="signDateEnd" property="signdateend" jdbcType="VARCHAR" />
+    <result column="contractDate" property="contractdate" jdbcType="VARCHAR" />
+    <result column="isXyDriver" property="isxydriver" jdbcType="INTEGER" />
+    <result column="partTimeJobDri" property="parttimejobdri" jdbcType="VARCHAR" />
+    <result column="phoneType" property="phonetype" jdbcType="VARCHAR" />
+    <result column="phoneCorp" property="phonecorp" jdbcType="VARCHAR" />
+    <result column="appVersion" property="appversion" jdbcType="VARCHAR" />
+    <result column="mapType" property="maptype" jdbcType="VARCHAR" />
+    <result column="emergencyContactAddr" property="emergencycontactaddr" jdbcType="VARCHAR" />
+    <result column="assessment" property="assessment" jdbcType="VARCHAR" />
+    <result column="driverLicenseIssuingDateStart" property="driverlicenseissuingdatestart" jdbcType="VARCHAR" />
+    <result column="driverLicenseIssuingDateEnd" property="driverlicenseissuingdateend" jdbcType="VARCHAR" />
+    <result column="driverLicenseIssuingCorp" property="driverlicenseissuingcorp" jdbcType="VARCHAR" />
+    <result column="driverLicenseIssuingNumber" property="driverlicenseissuingnumber" jdbcType="VARCHAR" />
+    <result column="xy_driver_number" property="xyDriverNumber" jdbcType="VARCHAR" />
+    <result column="driver_license_issuing_register_date" property="driverLicenseIssuingRegisterDate" jdbcType="VARCHAR" />
+    <result column="driver_license_issuing_first_date" property="driverLicenseIssuingFirstDate" jdbcType="VARCHAR" />
+    <result column="driver_license_issuing_grant_date" property="driverLicenseIssuingGrantDate" jdbcType="VARCHAR" />
+    <result column="birth_day" property="birthDay" jdbcType="VARCHAR" />
+    <result column="house_hold_register_permanent" property="houseHoldRegisterPermanent" jdbcType="VARCHAR" />
+    <result column="is_upload_card" property="isUploadCard" jdbcType="INTEGER" />
+    <result column="is_must_confirmation" property="isMustConfirmation" jdbcType="INTEGER" />
+    <result column="contract_type" property="contractType" jdbcType="VARCHAR" />
+    <result column="contract_no" property="contractNo" jdbcType="VARCHAR" />
+    <result column="contract_file" property="contractFile" jdbcType="VARCHAR" />
+    <result column="cooperation_type" property="cooperationType" jdbcType="TINYINT" />
+    <result column="account_type" property="accountType" jdbcType="INTEGER" />
+    <result column="group_id" property="groupId" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizDriverInfo" extends="BaseResultMap" >
+    <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    driver_id, password, phone, gender, name, supplier_id, age, current_address, emergency_contact_person, 
+    emergency_contact_number, id_card_no, superintend_no, superintend_url, driving_license_type, 
+    driving_years, archives_no, issue_date, expire_date, service_city, attachment_name, 
+    attachment_addr, account_bank, bank_account_no, license_plates, update_date, create_date, 
+    update_by, create_by, status, mac, photoSrct, push_id, is_binding_credit_card, app_version, 
+    credit_card_no, storable_card_no, credit_open_account_bank, credit_card_period_of_validity, 
+    grab_notice, credit_CVN2, credit_bind_date, quickpay_customerid, is_read, bankid, 
+    go_home_address, go_home_point_loBD, go_home_point_laBD, go_home_point_la, go_home_point_lo, 
+    go_home_status, update_go_home_date, imei, driverLicenseNumber, drivingLicenseImg, 
+    firstDrivingLicenseDate, firstMeshworkDrivingLicenseDate, nationality, householdRegister, 
+    nation, marriage, foreignLanguage, address, education, courseName, courseDate, courseDateStart, 
+    courseDateEnd, courseTime, corpType, trafficViolations, signDate, signDateEnd, contractDate, 
+    isXyDriver, partTimeJobDri, phoneType, phoneCorp, appVersion, mapType, emergencyContactAddr, 
+    assessment, driverLicenseIssuingDateStart, driverLicenseIssuingDateEnd, driverLicenseIssuingCorp, 
+    driverLicenseIssuingNumber, xy_driver_number, driver_license_issuing_register_date, 
+    driver_license_issuing_first_date, driver_license_issuing_grant_date, birth_day, 
+    house_hold_register_permanent, is_upload_card, is_must_confirmation,
+    contract_type, contract_no, contract_file, cooperation_type, account_type, group_id
+  </sql>
+  <sql id="Blob_Column_List" >
+    memo
+  </sql>
+  <select id="selectDriverByKey" resultType="com.zhuanche.web.entity.driver.DriverEntity"  parameterType="com.zhuanche.web.entity.driver.DriverEntity">
+    SELECT
+    i.driver_id AS driverId,
+    i.phone AS phone,
+    i.gender gender,
+    i.NAME,
+    g.group_name AS carGroupName,
+    c.city_name AS serviceCity,
+    i.license_plates AS licensePlates,
+    i.supplier_id supplieId,
+    p.supplier_full_name AS supplierName,
+    i.STATUS AS status,
+    d.`name` createByName,
+    e.`name` updateByName,
+    i.id_card_no as idCardNo,
+    i.age as age,
+    i.memo as memo,
+    i.superintend_no AS superintendNo,
+    i.superintend_url AS superintendUrl,
+    i.current_address as currentAddress,
+    i.emergency_contact_number as emergencyContactNumber,
+    i.emergency_contact_person as emergencyContactPerson,
+    i.driving_license_type as drivingLicenseType,
+    DATE_FORMAT(i.issue_date,'%Y-%m-%d %T')as issueDate,
+    i.driving_years as drivingYears,
+    DATE_FORMAT(i.expire_date,'%Y-%m-%d %T')as expireDate,
+    i.archives_no as archivesNo,
+    DATE_FORMAT(i.create_date,'%Y-%m-%d %H:%i:%s') createDateStr,
+    DATE_FORMAT(i.update_date,'%Y-%m-%d %H:%i:%s') updateDateStr
+    FROM
+    car_biz_driver_info i
+    LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+    LEFT JOIN car_biz_car_info a ON a.license_plates = i.license_plates
+    LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+    LEFT JOIN car_biz_model m ON a.car_model_id = m.model_id
+    LEFT JOIN car_biz_car_group g ON m.group_id = g.group_id
+    left join car_sys_user d on d.user_id=i.create_by
+    left join car_sys_user e on e.user_id=i.update_by
+    where 1=1
+    <if test="status!=null">
+      and i.status= #{status}
+    </if>
+    <if test="licensePlates!=null and licensePlates!=''">
+      and i.license_plates LIKE '%${licensePlates}%'
+    </if>
+    <if test="driverId!=null and driverId !=''">
+      and i.driver_id in (${driverId})
+    </if>
+    <if test="name!=null and name!=''">
+      <!-- and i.name like '%name%' -->
+      and i.name LIKE CONCAT(#{name},'%')
+    </if>
+    <if test="supplierId!=null and supplierId!=''">
+      and i.supplier_Id = #{supplierId}
+    </if>
+    <if test="phone!=null and phone!=''">
+      and i.phone LIKE '%${phone}%'
+    </if>
+    <if test="serviceCityId!=null and serviceCityId!=''">
+      and i.service_city = #{serviceCityId}
+    </if>
+    <if test="cities !=null and cities !=''">
+      and i.service_city in (${cities})
+    </if>
+    <if test="suppliers !=null and suppliers !=''">
+      and i.supplier_id in (${suppliers})
+    </if>
+    order by i.update_date desc
+    LIMIT ${offSet},${pagesize}
+  </select>
+
+</mapper>
