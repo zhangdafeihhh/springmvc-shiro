@@ -121,7 +121,6 @@ public class DriverVerifyService {
 			if (StringUtils.isNotBlank(plateNum)) {
 				driverVerify.setPlateNum(plateNum.toUpperCase());
 			}
-			dto = BeanUtil.copyObject(driverVerify, DriverVerifyDto.class);
 			// 获取司机的出生日期 性别
 			if (driverVerify.getIdCard() != null && !"".equals(driverVerify.getIdCard())) {
 				if (driverVerify.getIdCard() != null && !"".equals(driverVerify.getIdCard())) {
@@ -140,6 +139,7 @@ public class DriverVerifyService {
 					}
 				}
 			}
+			dto = BeanUtil.copyObject(driverVerify, DriverVerifyDto.class);
 			// 查询服务类型名称通过serviceType car_biz_car_group TODO
 			// 查询车型名称通过车型modelId car_biz_model TODO
 		} catch (Exception e) {
