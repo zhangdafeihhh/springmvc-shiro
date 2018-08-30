@@ -7,6 +7,9 @@ src/main/resources/application.properties
 src/main/resources/db.properties
 src/main/resources/dubbo.properties
 src/main/resources/redis.properties
+src/main/resources/logback.xml
+src/main/resources/rocketmq.properties
+src/main/resources/sms.properties
 .idea
 *.iml
 logs
