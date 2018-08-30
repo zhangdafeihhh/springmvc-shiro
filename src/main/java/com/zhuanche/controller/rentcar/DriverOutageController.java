@@ -1,7 +1,5 @@
 package com.zhuanche.controller.rentcar;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,18 +8,20 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.common.collect.Lists;
+import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.dto.rentcar.DriverOutageDTO;
 import com.zhuanche.entity.rentcar.DriverOutage;
 import com.zhuanche.serv.rentcar.DriverOutageService;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.BeanUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 /**
@@ -66,32 +66,69 @@ public class DriverOutageController {
 //        return "driverOutage/driverOutageListNo";
 //    }
 
-//    @ResponseBody
-//    @RequestMapping(value = "/queryDriverOutageData", method = { RequestMethod.POST })
-//    public Object queryDriverOutageData(DriverOutage params){
-////        try {
-////            logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"【司机停运】司机停运列表数据");
-////        } catch (Exception e) {
-////        }
-//
-//        logger.info("【司机停运】司机停运列表数据:queryDriverOutageData");
-//        List<DriverOutage> rows = new ArrayList<DriverOutage>();
-//        int total = 0;
-//        //权限
-//        String cities = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getCityIds(), ",");
-//        String suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds(),",");
-//        params.setCities(cities);
-//        params.setSupplierIds(suppliers);
-//        //查数量
-//        total = this.driverOutageService.queryForInt(params);
-//        if(total==0){
-//            return this.gridJsonFormate(rows, total);
+    /**
+     * 查询临时停运司机列表
+     * @param cityId    城市
+     * @param supplierId    供应商
+     * @param carGroupId    服务类型
+     * @param outageSource  停运来源
+     * @param driverName    司机姓名
+     * @param driverPhone   手机号
+     * @param startDateBegin    停运开始日期
+     * @param startDateEnd      停运结束日期
+     * @param removeStatus      解除状态
+     * @return
+     */
+    @GetMapping(value = "/queryDriverOutageData.json")
+    public AjaxResponse queryDriverOutageData(Integer cityId,
+                                              Integer supplierId,
+                                              Integer carGroupId,
+                                              Integer outageSource,
+                                              String driverName,
+                                              String driverPhone,
+                                              String startDateBegin,
+                                              String startDateEnd,
+                                              Integer removeStatus,
+                                              Integer page,
+                                              Integer pageSize){
+//        try {
+//            logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"【司机停运】司机停运列表数据");
+//        } catch (Exception e) {
 //        }
-//        //查数据
-//        rows = this.driverOutageService.queryForListObject(params);
-//        return this.gridJsonFormate(rows, total);
-//    }
-//
+
+        logger.info("【司机停运】司机停运列表数据:queryDriverOutageData.json");
+        DriverOutage params = new DriverOutage();
+        params.setCityId(cityId);
+        params.setSupplierId(supplierId);
+        params.setCarGroupId(carGroupId);
+        params.setOutageSource(outageSource);
+        params.setDriverName(driverName);
+        params.setDriverPhone(driverPhone);
+        params.setStartDateBegin(startDateBegin);
+        params.setStartDateEnd(startDateEnd);
+        params.setRemoveStatus(removeStatus);
+        params.setPage(page);
+        params.setPagesize(pageSize);
+
+        List<DriverOutage> rows = new ArrayList<>();
+        List<DriverOutageDTO> data = Lists.newArrayList();
+        int total = 0;
+        //权限
+        String cities = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getCityIds(), ",");
+        String suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds(),",");
+        params.setCities(cities);
+        params.setSupplierIds(suppliers);
+        //查数量
+        total = driverOutageService.queryForInt(params);
+        if(total==0){
+            PageDTO result = new PageDTO(params.getPage(), params.getPagerSize(), 0, data);
+            return AjaxResponse.success(result);
+        }
+        //查数据
+        rows = driverOutageService.queryForListObject(params);
+        return AjaxResponse.success(new PageDTO(params.getPage(), params.getPagesize(), total, BeanUtil.copyList(rows, DriverOutageDTO.class)));
+    }
+
 //    /**
 //     *
 //     *导出司机停运操作

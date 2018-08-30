@@ -43,6 +43,164 @@ public class DriverOutageDTO {
 
     private Date updateDate;
 
+    /** 前端显示扩展字段 **/
+
+    //页面显示 查询
+    private String driverName;
+    private String driverPhone;
+    private String licensePlates;
+    private Integer cityId;
+    private String cityName;
+    private Integer supplierId;
+    private String supplierName;
+    private Integer carGroupId;//车组
+    private String carGroupName;
+    private String startDateBegin;
+    private String startDateEnd;
+
+    private String outStartDateStr;
+    private String outEndDateStr;
+    private String factStartDateStr;
+    private String factEndDateStr;
+    private String createDateStr;
+    private String removeDateStr;
+
+    public String getDriverName() {
+        return driverName;
+    }
+
+    public void setDriverName(String driverName) {
+        this.driverName = driverName;
+    }
+
+    public String getDriverPhone() {
+        return driverPhone;
+    }
+
+    public void setDriverPhone(String driverPhone) {
+        this.driverPhone = driverPhone;
+    }
+
+    public String getLicensePlates() {
+        return licensePlates;
+    }
+
+    public void setLicensePlates(String licensePlates) {
+        this.licensePlates = licensePlates;
+    }
+
+    public Integer getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(Integer cityId) {
+        this.cityId = cityId;
+    }
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
+
+    public Integer getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(Integer supplierId) {
+        this.supplierId = supplierId;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    public Integer getCarGroupId() {
+        return carGroupId;
+    }
+
+    public void setCarGroupId(Integer carGroupId) {
+        this.carGroupId = carGroupId;
+    }
+
+    public String getCarGroupName() {
+        return carGroupName;
+    }
+
+    public void setCarGroupName(String carGroupName) {
+        this.carGroupName = carGroupName;
+    }
+
+    public String getStartDateBegin() {
+        return startDateBegin;
+    }
+
+    public void setStartDateBegin(String startDateBegin) {
+        this.startDateBegin = startDateBegin;
+    }
+
+    public String getStartDateEnd() {
+        return startDateEnd;
+    }
+
+    public void setStartDateEnd(String startDateEnd) {
+        this.startDateEnd = startDateEnd;
+    }
+
+    public String getOutStartDateStr() {
+        return outStartDateStr;
+    }
+
+    public void setOutStartDateStr(String outStartDateStr) {
+        this.outStartDateStr = outStartDateStr;
+    }
+
+    public String getOutEndDateStr() {
+        return outEndDateStr;
+    }
+
+    public void setOutEndDateStr(String outEndDateStr) {
+        this.outEndDateStr = outEndDateStr;
+    }
+
+    public String getFactStartDateStr() {
+        return factStartDateStr;
+    }
+
+    public void setFactStartDateStr(String factStartDateStr) {
+        this.factStartDateStr = factStartDateStr;
+    }
+
+    public String getFactEndDateStr() {
+        return factEndDateStr;
+    }
+
+    public void setFactEndDateStr(String factEndDateStr) {
+        this.factEndDateStr = factEndDateStr;
+    }
+
+    public String getCreateDateStr() {
+        return createDateStr;
+    }
+
+    public void setCreateDateStr(String createDateStr) {
+        this.createDateStr = createDateStr;
+    }
+
+    public String getRemoveDateStr() {
+        return removeDateStr;
+    }
+
+    public void setRemoveDateStr(String removeDateStr) {
+        this.removeDateStr = removeDateStr;
+    }
+
     public Integer getId() {
         return id;
     }
