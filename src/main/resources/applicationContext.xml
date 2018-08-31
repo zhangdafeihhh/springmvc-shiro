@@ -33,4 +33,7 @@
     <import resource="applicationContext-sms.xml"/>
     <!-- 配置SpringMVC -->
     <import resource="applicationContext-springmvc.xml"/>
+    <!-- 配置rest接口服务 -->
+    <import resource="applicationContext-ctx-restful.xml"/>
+
 </beans>

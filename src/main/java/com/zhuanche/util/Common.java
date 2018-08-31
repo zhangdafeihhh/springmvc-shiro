@@ -1,6 +1,6 @@
 package com.zhuanche.util;
 
-import com.zhuanche.dto.CarImportExceptionEntity;
+import com.zhuanche.entity.rentcar.CarImportExceptionEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.util.TextUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -21,12 +21,52 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Common {
+
+	public static final String hostTime1 = "06:30:00";
+	public static final String hostTime2 = "09:00:00";
+	public static final String hostTime3 = "17:00:00";
+	public static final String hostTime4 = "19:00:00";
 	
 	//中国地图边界.
 	public static final Double ChinaEastEdge = 137.0417;
 	public static final Double ChinaWestEdge = 73.6667;
 	public static final Double ChinaNorthEdge = 53.55;
 	public static final Double ChinaSouthEdge = 3.8667;
+	
+	public static final String RESULT_ROWS = "Rows";
+	public static final String RESULT_TOTAL = "Total";
+	public static final String RESULT_ERRORMSG = "errorMsg";
+	public static final String RESULT_RESULT = "result";
+	
+	public static final String RESULT_MSG = "msg";
+	
+	public static final Integer DEFAULT_PAGE_SIZE = 10;
+	
+	public static final String BUSINESSID = ServerUtil.get("bus.order.businessId");
+	
+	public static final String KEY = ServerUtil.get("bus.order.key");
+
+	public static final String VALIDATECODE = ServerUtil.get("validateCode");
+
+	public static final String NEWRULESUPPLIER = ServerUtil.get("newRuleSupplier");
+
+	public static final String DISTRICTVALITE = ServerUtil.get("districtValite");
+
+	//拼车订单查询begin
+	public static final String GET_MAIN_ORDER_BY_ORDERNO = "/order/carpool/getMainOrderBySubOrderNo";
+	public static final String GET_MAIN_ORDER = "/order/carpool/getMainOrder";
+	public static final String BUSSINESSID = "27";
+	public static final String MAIN_ORDER_KEY = "5a49cc61e15f40c98e2dbd6d56581830";
+	//拼车订单查询end
+	
+	// redis key prefix~~~~~~~~~~~~~~~~~~~~~~start~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	public static final String V2_D_G_I = "mp_rest_driver_";
+	// 清理司机redis缓存
+	public static final String DRIVER_FLASH_REDIS_URL = "/api/v2/driver/flash/driverInfo";
+	// redis key prefix~~~~~~~~~~~~~~~~~~~~~~end~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	public static String REGULAR_IDCARDNO = "(^[A-Z]{1}[0-9]{6}[\\(]{1}[a-zA-Z0-9]{1}[\\)]{1}$)";
+	public static String REGULAR_IDCARDNO2 = "(^[A-Z]{1}[0-9]{10}$)";
 
 	public static Pattern COMPILE = Pattern.compile("[0-9]*");
 
@@ -119,8 +159,7 @@ public class Common {
 	   } 
 	   return true; 
 	}
-	
-	//数字
+
 	public static boolean isNumeric(String str){
 	   Matcher isNum = COMPILE.matcher(str);
 	   if( !isNum.matches() ){
@@ -219,5 +258,18 @@ public class Common {
 		Long timestamp = Long.parseLong(timestampString);
 		String date = new SimpleDateFormat(formats, Locale.CHINA).format(new Date(timestamp));
 		return date;
+	}
+
+	/**
+	 * 验证港澳身份证以及港澳内陆通行证
+	 * 一般身份证验证方法 ValidateUtils.IDCardValidate(idCardNo);
+	 * @param idCardNo
+	 * @return
+	 */
+	public static Boolean validateIdCarNo(String idCardNo) {
+		if(!Common.isRegular(idCardNo,REGULAR_IDCARDNO)&&!Common.isRegular(idCardNo,REGULAR_IDCARDNO2)){
+			return false;
+		}
+		return true;
 	}
 }

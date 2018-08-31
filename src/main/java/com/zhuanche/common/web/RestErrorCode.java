@@ -53,6 +53,10 @@ public final class RestErrorCode{
 	
 	
 	//-----------------------------------------------业务参数：司机
+	@ResultMessage("没有该手机号的司机，请仔细核对！")
+	public static final int DRIVER_NOT_EXIST = 2000;
+	@ResultMessage("该司机已存在启用的永久停运！")
+	public static final int DRIVER_OUTAGEALL_EXIST = 2001;
 //	@ResultMessage("司机状态不是正常启用状态")
 //	public static final int DRIVER_STATUS_NOT_ENABLED                     = 1001;
 //	@ResultMessage("司机手机号码与身份证号码不符合")
