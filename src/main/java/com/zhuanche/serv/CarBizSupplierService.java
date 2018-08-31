@@ -29,5 +29,9 @@ public class CarBizSupplierService{
 		}
 		return result;
 	}
+
+    public CarBizSupplier queryForObject(CarBizSupplier carBizSupplier){
+	    return carBizSupplierExMapper.queryForObject(carBizSupplier);
+    }
 	
 }

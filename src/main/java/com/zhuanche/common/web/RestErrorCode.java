@@ -74,8 +74,8 @@ public final class RestErrorCode{
 	
 	
 	//-----------------------------------------------业务参数：车辆
-//	@ResultMessage("车辆信息不存在")
-//	public static final int BUS_NOT_EXIST                                               = 1100;
+	@ResultMessage("车辆信息不存在")
+	public static final int BUS_NOT_EXIST                                               = 1100;
 //	@ResultMessage("车辆状态不是正常启用状态，被停止运营")
 //	public static final int BUS_STATUS_NOT_ENABLED                           = 1101;
 //	@ResultMessage("此车辆已被其他司机选取，请选择其它车辆")
