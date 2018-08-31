@@ -80,8 +80,7 @@ public class LoginController{
 		return AjaxResponse.success( result );
 	}
 	
-	/**执行登录
-	 * @throws IOException **/
+	/**执行登录**/
 	@RequestMapping("/dologin")
 	@ResponseBody
     public AjaxResponse dologin(HttpServletRequest request , HttpServletResponse response, String username, String password, String msgcode ) throws IOException{
@@ -150,5 +149,24 @@ public class LoginController{
 		}
 		return AjaxResponse.success( null );
 	}
-  
+ 
+	//-------------------------------------------------------------------------------------------------------------------------------------当前登录用户信息BEGIN
+	@RequestMapping("/currentUserinfo")
+	@ResponseBody
+    public AjaxResponse currentUserinfo( ){
+		//缓存机制（//TODO 后期加入）
+		
+		//用户基本信息
+		//用户的菜单信息
+		//用户的权限信息
+		//用户的数据权限
+		
+//		Subject subject = SecurityUtils.getSubject();
+//		if(subject.isAuthenticated()) {
+//			subject.logout();
+//		}
+		return AjaxResponse.success( null );
+	}
+	//-------------------------------------------------------------------------------------------------------------------------------------当前登录用户信息END
+	
 }

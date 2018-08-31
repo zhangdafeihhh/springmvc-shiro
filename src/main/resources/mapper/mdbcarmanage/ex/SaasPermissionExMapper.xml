@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.SaasPermissionExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.SaasPermission" >
+    <id column="permission_id" property="permissionId" jdbcType="INTEGER" />
+    <result column="parent_permission_id" property="parentPermissionId" jdbcType="INTEGER" />
+    <result column="permission_code" property="permissionCode" jdbcType="VARCHAR" />
+    <result column="permission_type" property="permissionType" jdbcType="TINYINT" />
+    <result column="permission_name" property="permissionName" jdbcType="VARCHAR" />
+    <result column="menu_url" property="menuUrl" jdbcType="VARCHAR" />
+    <result column="menu_open_mode" property="menuOpenMode" jdbcType="TINYINT" />
+    <result column="valid" property="valid" jdbcType="BIT" />
+    <result column="sort_seq" property="sortSeq" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    permission_id, parent_permission_id, permission_code, permission_type, permission_name, 
+    menu_url, menu_open_mode, valid, sort_seq
+  </sql>
+  
+  <!-- 根据权限ID、父权限ID、权限代码、权限类型、权限名称、状态进行查询 -->
+  <select id="queryPermissions" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from saas_permission
+    where 1=1
+    <if test="permissionIds !=null and permissionIds.size()>0">
+    and permission_id in 
+    <foreach collection="permissionIds" open="(" close=")" separator="," item="pid">
+	    #{pid}
+    </foreach>
+    </if>
+    <if test="parentId!=null">
+    and parent_permission_id = #{parentId}
+    </if>
+    <if test="permissionCode!=null">
+    and permission_code = #{permissionCode}
+    </if>
+    <if test="permissionTypes!=null and permissionTypes.size()>0">
+    and permission_type in 
+    <foreach collection="permissionTypes" open="(" close=")" separator="," item="type">
+	    #{type}
+    </foreach>
+    </if>
+    <if test="permissionName!=null">
+    and permission_name like #{permissionName}
+    </if>
+    <if test="valid!=null">
+    and valid = #{valid}
+    </if>
+    order by sort_seq , permission_id
+  </select>
+  
+  <!-- 根据用户ID，查询其拥有的所有有效的权限ID -->
+  <select id="queryPermissionIdsOfUser" resultType="java.lang.Integer">
+		select DISTINCT p.permission_id 
+		from saas_permission p,saas_role_permission_ralation rp, saas_role r, saas_user_role_ralation ur 
+		where p.permission_id=rp.permission_id and rp.role_id=r.role_id and r.role_id=ur.role_id
+		and p.valid=1 and r.valid=1 and ur.user_id=#{userId}
+  </select>
+  <!-- 根据用户ID，查询其拥有的所有有效的权限代码 -->
+  <select id="queryPermissionCodesOfUser" resultType="java.lang.String">
+		select DISTINCT p.permission_code 
+		from saas_permission p,saas_role_permission_ralation rp, saas_role r, saas_user_role_ralation ur 
+		where p.permission_id=rp.permission_id and rp.role_id=r.role_id and r.role_id=ur.role_id
+		and p.valid=1 and r.valid=1 and ur.user_id=#{userId}
+  </select>
+  
+
+</mapper>

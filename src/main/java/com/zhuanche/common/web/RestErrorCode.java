@@ -32,7 +32,6 @@ public final class RestErrorCode{
 	@ResultMessage("未知错误")
 	public static final int UNKNOWN_ERROR                   = 999;
 	
-	
 	//-----------------------------------------------用户
 	@ResultMessage("获取验证码太频繁")
 	public static final int GET_MSGCODE_EXCEED           = 1000;
@@ -48,6 +47,29 @@ public final class RestErrorCode{
 	public static final int MSG_CODE_INVALID                = 1005;
 	@ResultMessage("短信验证码不正确")
 	public static final int MSG_CODE_WRONG                = 1006;
+	@ResultMessage("账号已经存在")
+	public static final int ACCOUNT_EXIST                      = 1007;
+	
+	//----------------------------------------------权限管理
+	@ResultMessage("父权限不存在")
+	public static final int PARENT_PERMISSION_NOT_EXIST           = 10001;
+	@ResultMessage("权限代码已经存在")
+	public static final int PERMISSION_CODE_EXIST                        = 10002;
+	@ResultMessage("权限类型不合法")
+	public static final int PERMISSION_TYPE_WRONG                     = 10003;
+	@ResultMessage("权限不存在")
+	public static final int PERMISSION_NOT_EXIST                          = 10004;
+	@ResultMessage("存在已经生效的子权限，请先禁用子权限")
+	public static final int PERMISSION_DISABLE_CANT                    = 10005;
+	@ResultMessage("父权限已经被禁用，请先启用父权限")
+	public static final int PERMISSION_ENABLE_CANT                     = 10006;
+	
+	//----------------------------------------------角色管理
+	@ResultMessage("角色不存在")
+	public static final int ROLE_NOT_EXIST                          = 10100;
+	@ResultMessage("角色代码已经存在")
+	public static final int ROLE_CODE_EXIST                        = 10101;
+
 	
 	
 	
