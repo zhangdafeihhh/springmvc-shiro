@@ -33,7 +33,9 @@ public class GeneratorMySql{
 //        File configFile = new File("D:\\shouqi_project\\car\\mp-manage\\src\\test\\java\\generatorConfig-rentcar.xml");
         ConfigurationParser cp = new ConfigurationParser(warnings);
 //        Configuration config = cp.parseConfiguration(configFile);
-        Configuration config = cp.parseConfiguration(GeneratorMySql.class.getClassLoader().getResourceAsStream("generatorConfig-driver.xml"));
+//        Configuration config = cp.parseConfiguration(GeneratorMySql.class.getClassLoader().getResourceAsStream("generatorConfig-driver.xml"));
+      Configuration config = cp.parseConfiguration(GeneratorMySql.class.getClassLoader().getResourceAsStream("generatorConfig-rentcar.xml"));
+
         DefaultShellCallback callback = new DefaultShellCallback(overwrite);
         MyBatisGenerator myBatisGenerator = new MyBatisGenerator(config,
                 callback, warnings);

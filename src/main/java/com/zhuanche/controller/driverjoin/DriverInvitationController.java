@@ -27,15 +27,20 @@ public class DriverInvitationController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(DriverInvitationController.class);
 
+	/**司机加盟注册链接**/
+	private static final String DRIVER_JOIN_URL = "https://monline.01zhuanche.com/driverRegister/register.html?source=supplier-invite%26supplier=";
+	/**SINA提供短链接生成服务**/
+	private static final String SINA_API = "http://api.t.sina.com.cn/short_url/shorten.json?source=1681459862&url_long=";
+	
 	// 生成短链接
 	@RequestMapping(value = "/makeShortUrl")
 	@ResponseBody
 	public AjaxResponse makeShortUrl(@Verify(param="supplierId", rule = "required")String supplierId){
 		logger.info("供应商短链接生成,supplierId="+supplierId);
-        String url = "https://monline.01zhuanche.com/driverRegister/register.html?source=supplier-invite%26supplier="+supplierId;
+        String url = DRIVER_JOIN_URL+supplierId;
 		String shortUrl  = null;
 		try {
-			shortUrl = HttpClientUtil.buildGetRequest("http://api.t.sina.com.cn/short_url/shorten.json?source=1681459862&url_long=" + url).setLimitResult(1).execute();
+			shortUrl = HttpClientUtil.buildGetRequest(SINA_API + url).setLimitResult(1).execute();
 			logger.info("供应商短链接生成,supplierId={},shortUrl={}",supplierId,shortUrl);
 		} catch (HttpException e) {
 			logger.error("供应商短链接生成异常",e);

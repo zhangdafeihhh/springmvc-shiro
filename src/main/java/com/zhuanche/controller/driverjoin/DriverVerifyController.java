@@ -33,6 +33,7 @@ public class DriverVerifyController {
 
 	/**
 	 * 查询加盟司机审核列表数据
+	 * 
 	 * @param page
 	 * @param pageSize
 	 * @param cityId
@@ -45,50 +46,40 @@ public class DriverVerifyController {
 	 */
 	@RequestMapping("/queryDriverVerifyData")
 	@ResponseBody
-	public AjaxResponse queryDriverVerifyData(int page, int pageSize, Long cityId, String supplier, String mobile,
-			Integer verifyStatus, String createDateBegin, String createDateEnd) {
+	public AjaxResponse queryDriverVerifyData(Integer page, Integer pageSize, Long cityId, String supplier,
+			String mobile, Integer verifyStatus, String createDateBegin, String createDateEnd) {
 
+		if (null == page || page.intValue() <= 0) {
+			page = 1;
+		}
+		if (null == pageSize || pageSize.intValue() <= 0) {
+			pageSize = 10;
+		}
 		// 增加操作日志 TODO
 		PageDTO pageDto = new PageDTO();
-		try {
-			// 分页查询司机加盟注册信息
-			pageDto = driverVerifyService.queryDriverVerifyList(page, pageSize, cityId, supplier, mobile, verifyStatus,
-					createDateBegin, createDateEnd);
-		} catch (Exception e) {
-			logger.error("查询司机加盟注册信息异常", e);
-			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-		}
+		// 分页查询司机加盟注册信息
+		pageDto = driverVerifyService.queryDriverVerifyList(page, pageSize, cityId, supplier, mobile, verifyStatus,
+				createDateBegin, createDateEnd);
 		return AjaxResponse.success(pageDto);
 	}
-	
-	/**查询司机加盟注册信息通过司机ID**/
+
+	/** 查询司机加盟注册信息通过司机ID **/
 	@RequestMapping(value = "/queryDriverVerifyById")
 	@ResponseBody
-	public AjaxResponse queryDriverVerifyById(@Verify(param="driverId", rule = "required")Long driverId){
-		
-		DriverVerifyDto driverDto = null;
-		try {
-			driverDto = driverVerifyService.queryDriverVerifyById(driverId);
-		} catch (Exception e) {
-			logger.error("查询司机加盟注册信息通过司机ID异常",e);
-			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-		}
+	public AjaxResponse queryDriverVerifyById(@Verify(param = "driverId", rule = "required") Long driverId) {
+
+		DriverVerifyDto driverDto = driverVerifyService.queryDriverVerifyById(driverId);
 		return AjaxResponse.success(driverDto);
 	}
-	
-	/**查询司机证件照片通过司机ID和证件照片类型**/
+
+	/** 查询司机证件照片通过司机ID和证件照片类型 **/
 	@RequestMapping(value = "/queryImageByDriverIdAndType")
 	@ResponseBody
-	public AjaxResponse queryImageByDriverIdAndType(@Verify(param="driverId", rule = "required")Long driverId,@Verify(param="type", rule = "required")Integer type){
-		
-		String image = "";
-		try {
-			image = driverVerifyService.queryImageByDriverIdAndType(driverId,type);
-		} catch (Exception e) {
-			logger.error("查询司机证件照片通过司机ID和证件照片类型异常,driverId="+driverId,e);
-			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-		}
+	public AjaxResponse queryImageByDriverIdAndType(@Verify(param = "driverId", rule = "required") Long driverId,
+			@Verify(param = "type", rule = "required") Integer type) {
+
+		String image = driverVerifyService.queryImageByDriverIdAndType(driverId, type);;
 		return AjaxResponse.success(image);
 	}
-	
+
 }

@@ -19,16 +19,16 @@
 		</javaTypeResolver>
 
 		<!-- po实体类代码位置 -->
-		<javaModelGenerator targetPackage="com.zhuanche.entity.rentcar"	targetProject="C:\\Users\\admin\\git\\mp-manage\\src\main\\java">
+		<javaModelGenerator targetPackage="com.zhuanche.entity.rentcar"	targetProject="C:\\mp-manage\\src\main\\java">
 			<property name="enableSubPackages" value="true" />
 			<property name="trimStrings" value="true" />
 		</javaModelGenerator>
 		<!-- sql代码的xml映射文件位置 -->
-		<sqlMapGenerator targetPackage="mapper.rentcar" targetProject="C:\\Users\\admin\\git\\mp-manage\\src\main\\resources">
+		<sqlMapGenerator targetPackage="mapper.rentcar" targetProject="C:\\mp-manage\\src\main\\resources">
 			<property name="enableSubPackages" value="true" />
 		</sqlMapGenerator>
 		<!-- mapper接口位置 -->
-		<javaClientGenerator type="XMLMAPPER" targetPackage="mapper.rentcar" targetProject="C:\\Users\\admin\\git\\mp-manage\\src\main\\java">
+		<javaClientGenerator type="XMLMAPPER" targetPackage="mapper.rentcar" targetProject="C:\\mp-manage\\src\main\\java">
 			<property name="enableSubPackages" value="true" />
 		</javaClientGenerator>
 
@@ -38,8 +38,20 @@
 			enableCountByExample="false" enableUpdateByExample="false">
 			<property name="useActualColumnNames" value="false" />
 			<generatedKey column="id" sqlStatement="MySql" identity="true" />
-		</table> -->
+		</table>
 		<table tableName="car_biz_supplier" domainObjectName="CarBizSupplier"
+			enableSelectByExample="false" enableDeleteByExample="false"
+			enableCountByExample="false" enableUpdateByExample="false">
+			<property name="useActualColumnNames" value="false" />
+			<generatedKey column="supplier_id" sqlStatement="MySql" identity="true" />
+		</table> -->
+		<table tableName="car_biz_car_group" domainObjectName="CarBizCarGroup"
+			enableSelectByExample="false" enableDeleteByExample="false"
+			enableCountByExample="false" enableUpdateByExample="false">
+			<property name="useActualColumnNames" value="false" />
+			<generatedKey column="supplier_id" sqlStatement="MySql" identity="true" />
+		</table>
+		<table tableName="car_biz_model" domainObjectName="CarBizModel"
 			enableSelectByExample="false" enableDeleteByExample="false"
 			enableCountByExample="false" enableUpdateByExample="false">
 			<property name="useActualColumnNames" value="false" />
