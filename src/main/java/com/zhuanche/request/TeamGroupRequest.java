@@ -1,5 +1,7 @@
 package com.zhuanche.request;
 
+import java.util.Set;
+
 /**
   * @description: 接口请求参数封装类
   *
@@ -31,6 +33,26 @@ public class TeamGroupRequest extends PageRequest{
     private String groupId;
 
     private String groupName;
+
+    private Set<String> groupIds;
+
+    private Set<String> teamIds;
+
+    public Set<String> getGroupIds() {
+        return groupIds;
+    }
+
+    public void setGroupIds(Set<String> groupIds) {
+        this.groupIds = groupIds;
+    }
+
+    public Set<String> getTeamIds() {
+        return teamIds;
+    }
+
+    public void setTeamIds(Set<String> teamIds) {
+        this.teamIds = teamIds;
+    }
 
     public String getRelationId() {
         return relationId;

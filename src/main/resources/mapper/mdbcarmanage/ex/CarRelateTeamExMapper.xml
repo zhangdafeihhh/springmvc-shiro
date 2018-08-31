@@ -15,6 +15,16 @@
     from car_relate_team
     where relation_id = #{relationId,jdbcType=INTEGER}
   </select>
+
+  <select id="selectOneTeam" resultMap="BaseResultMap" parameterType="com.zhuanche.entity.mdbcarmanage.CarRelateTeam" >
+    select
+    <include refid="Base_Column_List" />
+    from car_relate_team
+    where team_id = #{teamId,jdbcType=INTEGER}
+    AND driver_id = #{driverId,jdbcType=INTEGER}
+    limit 1
+  </select>
+
   <select id="queryDriverTeamRelationList" parameterType="com.zhuanche.request.TeamGroupRequest" resultMap="BaseResultMap">
     SELECT
     <include refid="Base_Column_List" />
@@ -25,7 +35,7 @@
       AND relation_id = #{relationId}
     </if>
     <if test="teamId!=null and teamId!=''">
-      AND team_id in (#{teamId})
+      AND team_id = #{teamId}
     </if>
     <if test="driverId!=null and driverId!=''">
       AND driver_id = #{driverId}

@@ -14,4 +14,5 @@ public interface CarDriverTeamExMapper{
 
 	CarDriverTeam selectByCondition(DutyRequest dutyRequest);
 
+	List<CarDriverTeam> queryForListByPid(DutyRequest dutyRequest);
 }

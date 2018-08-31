@@ -9,4 +9,6 @@ public interface CarRelateGroupExMapper {
 
     List<CarRelateGroup> queryDriverGroupRelationList(TeamGroupRequest teamGroupRequest);
 
+    CarRelateGroup selectOneGroup(CarRelateGroup group);
+
 }
