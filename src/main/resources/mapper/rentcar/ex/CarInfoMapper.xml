@@ -1,0 +1,1043 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.ex.CarInfoExMapper" >
+  <resultMap id="BasicCarBizCarInfoMap" type="com.zhuanche.entity.rentcar.CarInfo">
+    <result property="carId" column="car_id" />
+ 
+    <result property="supplierId" column="supplier_id" />
+    <result property="licensePlates" column="license_plates" />
+    <result property="brand" column="brand" />
+    <result property="carModelId" column="car_model_id" />
+    <result property="modelDetail" column="model_detail" />
+    <result property="color" column="color" />
+    <result property="engineNo" column="engine_no" />
+    <result property="frameNo" column="frame_no" />
+    <result property="nextInspectDate" column="next_inspect_date" />
+    <result property="nextMaintenanceDate" column="next_maintenance_date" />
+    <result property="rentalExpireDate" column="rental_expire_date" />
+    <result property="memo" column="memo" />
+    <result property="status" column="status" />
+    <result property="createBy" column="create_by" />
+    <result property="updateBy" column="update_by" />
+    <result property="createDate" column="create_date" />
+    <result property="updateDate" column="update_date" />
+    <result property="imageUrl" column="car_photograph"/>
+    <result property="driverid" column="driver_id"/>
+    <result property="nextOperationDate" column="next_operation_date"/>
+    <result property="nextSecurityDate" column="next_security_date"/>
+    <result property="nextClassDate" column="next_class_date"/>
+    <result property="twoLevelMaintenanceDate" column="two_level_maintenance_date"/>
+  </resultMap>
+  
+  <resultMap id="BasicCarBizCarInfoVOMap" type="com.zhuanche.entity.rentcar.CarInfo" extends="BasicCarBizCarInfoMap">
+    <result property="cityName" column="cityName" />
+    <result property="cityId" column="city_id" />
+    <result property="createName" column="createName"/>
+    <result property="updateName" column="updateName"/>
+    <result property="modeName" column="modeName" />
+    <result property="supplierName" column="supplierName" />
+    <result property="purchaseDate" column="car_purchase_date" />
+    <result property="carPhotographName" column="car_photograph_name" />
+    <result property="driverName" column="driverName"/>
+
+    <result property="carryPassengers" column="carryPassengers" />
+    <result property="vehicleBrand" column="vehicle_brand" />
+    <result property="clicensePlatesColor" column="clicensePlatesColor" />
+    <result property="vehicleVINCode" column="vehicle_VIN_code" />
+    <result property="vehicleRegistrationDate" column="vehicle_registration_date" />
+    <result property="fuelType" column="fuelType" />
+    <result property="vehicleEngineDisplacement" column="vehicleEngineDisplacement" />
+    <result property="vehicleEnginePower" column="vehicle_engine_power" />
+    <result property="vehicleEngineWheelbase" column="vehicle_engine_wheelbase" />
+    <result property="transportNumber" column="transportNumber" />
+    <result property="certificationAuthority" column="certificationAuthority" />
+    <result property="operatingRegion" column="operatingRegion" />
+    <result property="transportNumberDateStart" column="transportNumberDateStart" />
+    <result property="transportNumberDateEnd" column="transportNumberDateEnd" />
+    <result property="firstDate" column="firstDate" />
+    <result property="overHaulStatus" column="overhaulStatus" />
+    <result property="auditingStatus" column="auditingStatus" />
+    <result property="auditingDate" column="auditing_date" />
+    <result property="equipmentNumber" column="equipmentNumber" />
+    <result property="gpsBrand" column="gpsBrand" />
+    <result property="gpsType" column="gpsType" />
+    <result property="gpsImei" column="gps_imei" />
+    <result property="gpsDate" column="gpsDate" />
+    <result property="vehicleOwner" column="vehicle_owner" />
+    <result property="vehicleType" column="vehicle_type" />
+    <result property="vehicleDrivingLicense" column="vehicle_driving_license" />
+    <result property="cooperationType" column="cooperation_type" />
+  </resultMap>
+  <select id="selectCarInfoByLicensePlates" resultMap="BasicCarBizCarInfoVOMap" parameterType="com.zhuanche.entity.rentcar.CarInfo">
+    	SELECT
+			car_id carId,
+			car.city_id cityId,
+			car.car_photograph imageUrl,
+			car.driver_id driverid,
+			DATE_FORMAT(car.car_purchase_date, '%Y-%m-%d ') AS purchaseDate,
+			DATE_FORMAT(car.next_operation_date, '%Y-%m-%d ') AS nextOperationDate,
+			DATE_FORMAT(car.next_security_date, '%Y-%m-%d ') AS nextSecurityDate,
+			DATE_FORMAT(car.next_class_date, '%Y-%m-%d ') AS nextClassDate,
+			DATE_FORMAT(car.two_level_maintenance_date, '%Y-%m-%d ') AS twoLevelMaintenanceDate,
+			city.city_name AS cityName,
+			model.model_name AS modeName,
+			car.supplier_id supplierId,
+			supplier.supplier_full_name AS supplierName,
+			license_plates licensePlates ,
+			brand,
+			car_model_id carModelId,
+			model_detail modelDetail,
+			color,
+			engine_no engineNo,
+			frame_no frameNo,
+			DATE_FORMAT(car.next_inspect_date, '%Y-%m-%d ') nextInspectDate,
+			DATE_FORMAT(car.next_maintenance_date, '%Y-%m-%d ') nextMaintenanceDate,
+			DATE_FORMAT(car.rental_expire_date, '%Y-%m-%d ') rentalExpireDate,
+			car.memo,
+			car. STATUS,
+			(case when car.driver_id =0 then 0 else 1 end)isFree,
+			car.create_by createBy,
+			car.update_by updateBy,
+			car.create_date createDate,
+			car.update_date updateDate,
+			u1. NAME AS createName,
+			u2. NAME AS updateName
+		FROM
+			car_biz_car_info car
+		LEFT JOIN car_biz_city city ON car.city_id = city.city_id
+		LEFT JOIN car_biz_model model ON model.model_id = car.car_model_id
+		LEFT JOIN car_biz_supplier supplier ON supplier.supplier_id = car.supplier_id
+		LEFT JOIN car_sys_user u1 ON u1.user_id = car.create_by
+		LEFT JOIN car_sys_user u2 ON u2.user_id = car.update_by
+		WHERE
+			license_plates = #{licensePlates}
+    </select>
+
+  <select id="selectCarInfoByCarId" resultMap="BasicCarBizCarInfoVOMap" parameterType="com.zhuanche.entity.rentcar.CarInfo">
+    SELECT
+    car_id carId,
+    car.city_id cityId,
+    car.car_photograph imageUrl,
+    car.fuelType,
+    car.carryPassengers,
+    car.auditingStatus,
+    car.auditing_date,
+    car.insuranceCompany,
+    car.insuranceNumber,
+    car.insuranceType,
+    car.insuranceMoney,
+    car.insuranceDateStart,
+    car.insuranceDateEnd,
+    car.freightType,
+    car.vehicleEngineDisplacement,
+    car.vehicle_engine_power,
+    car.vehicle_engine_wheelbase,
+    car.vehicle_registration_date,
+    car.vehicle_VIN_code,
+    car.vehicle_brand,
+    car.totalMileage,
+    car.overhaulStatus,
+    car.transportNumber,
+    car.certificationAuthority,
+    car.operatingRegion,
+    car.firstDate,
+    car.transportNumberDateStart,
+    car.transportNumberDateEnd,
+    car.equipmentNumber,
+    car.gpsBrand,
+    car.gpsType,
+    car.gpsDate,
+    REPLACE(car.gps_imei, CHAR(10),'') AS gps_imei,
+    car.clicensePlatesColor,
+    car.vehicle_owner,
+    car.vehicle_type,
+    car.vehicle_driving_license,
+    DATE_FORMAT(car.car_purchase_date, '%Y-%m-%d ') AS purchaseDate,
+    DATE_FORMAT(car.next_operation_date, '%Y-%m-%d ') AS nextOperationDate,
+    DATE_FORMAT(car.next_security_date, '%Y-%m-%d ') AS nextSecurityDate,
+    DATE_FORMAT(car.next_class_date, '%Y-%m-%d ') AS nextClassDate,
+    DATE_FORMAT(car.two_level_maintenance_date, '%Y-%m-%d ') AS twoLevelMaintenanceDate,
+    city.city_name AS cityName,
+    model.model_name AS modeName,
+    car.supplier_id supplierId,
+    supplier.supplier_full_name AS supplierName,
+    license_plates licensePlates ,
+    brand,
+    car_model_id carModelId,
+    model_detail modelDetail,
+    color,
+    engine_no engineNo,
+    frame_no frameNo,
+    DATE_FORMAT(car.next_inspect_date, '%Y-%m-%d ') nextInspectDate,
+    DATE_FORMAT(car.next_maintenance_date, '%Y-%m-%d ') nextMaintenanceDate,
+    DATE_FORMAT(car.rental_expire_date, '%Y-%m-%d ') rentalExpireDate,
+    car.memo,
+    car. STATUS,
+    (case when car.driver_id =0 then 0 else 1 end)isFree,
+    car.create_by createBy,
+    car.update_by updateBy,
+    car.create_date createDate,
+    car.update_date updateDate,
+    u1. NAME AS createName,
+    u2. NAME AS updateName,
+    supplier.cooperation_type cooperationType
+    FROM
+    car_biz_car_info car
+    LEFT JOIN car_biz_city city ON car.city_id = city.city_id
+    LEFT JOIN car_biz_model model ON model.model_id = car.car_model_id
+    LEFT JOIN car_biz_supplier supplier ON supplier.supplier_id = car.supplier_id
+    LEFT JOIN car_sys_user u1 ON u1.user_id = car.create_by
+    LEFT JOIN car_sys_user u2 ON u2.user_id = car.update_by
+    WHERE 1=1
+    <if test="carId !=null and carId !=''">
+      and car_id = #{carId}
+    </if>
+    <if test="licensePlates !=null and licensePlates !=''">
+      and car.license_plates like '%${licensePlates}%'
+    </if>
+  </select>
+
+  <select id="selectList" resultMap="BasicCarBizCarInfoVOMap" parameterType="com.zhuanche.entity.rentcar.CarInfo">
+    SELECT
+    car_id carId,
+    car.city_id cityId,
+    car.car_photograph imageUrl,
+    DATE_FORMAT(car.car_purchase_date, '%Y-%m-%d ') AS purchaseDate,
+    DATE_FORMAT(car.next_operation_date, '%Y-%m-%d ') AS nextOperationDate,
+    DATE_FORMAT(car.next_security_date, '%Y-%m-%d ') AS nextSecurityDate,
+    DATE_FORMAT(car.next_class_date, '%Y-%m-%d ') AS nextClassDate,
+    DATE_FORMAT(car.two_level_maintenance_date, '%Y-%m-%d ') AS twoLevelMaintenanceDate,
+    city.city_name AS cityName,
+    model.model_name AS modeName,
+    car.supplier_id supplierId,
+    supplier.supplier_full_name AS supplierName,
+    license_plates licensePlates ,
+    brand,
+    car_model_id carModelId,
+    model_detail modelDetail,
+    color,
+    engine_no engineNo,
+    frame_no frameNo,
+    DATE_FORMAT(car.next_inspect_date, '%Y-%m-%d ') nextInspectDate,
+    DATE_FORMAT(car.next_maintenance_date, '%Y-%m-%d ') nextMaintenanceDate,
+    DATE_FORMAT(car.rental_expire_date, '%Y-%m-%d ') rentalExpireDate,
+    car.memo,
+    car. STATUS,
+    (case when car.driver_id =0 then 0 else 1 end)isFree,
+    car.create_by createBy,
+    car.update_by updateBy,
+    car.create_date createDate,
+    car.update_date updateDate,
+    supplier.cooperation_type cooperationType
+    FROM
+    car_biz_car_info car
+    LEFT JOIN car_biz_city city ON car.city_id = city.city_id
+    LEFT JOIN car_biz_model model ON model.model_id = car.car_model_id
+    LEFT JOIN car_biz_supplier supplier ON supplier.supplier_id = car.supplier_id
+    WHERE
+    1 = 1
+    <if test="cityId !=null and cityId !=0">
+      and car.city_id = #{cityId}
+    </if>
+    <if test="status !=null">
+      and car.status = #{status}
+    </if>
+    <if test="status ==null">
+      and car.status != 2
+    </if>
+    <if test="isFree ==1 ">
+      and car.driver_id != 0
+    </if>
+    <if test="isFree ==0 ">
+      and car.driver_id = 0
+    </if>
+    <if test="supplierId !=null and supplierId !=''">
+      and car.supplier_id = #{supplierId}
+    </if>
+    <if test="carModelIds !=null and carModelIds !=''">
+      and car.car_model_id in (${carModelIds})
+    </if>
+    <if test=" licensePlates !=null and licensePlates !=''">
+      and license_plates like '%${licensePlates}%'
+    </if>
+    <if test="purchaseDateBegin !=null and purchaseDateBegin !=''">
+      <![CDATA[ and car.car_purchase_date >=  concat(#{purchaseDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="purchaseDateEnd !=null and purchaseDateEnd !=''">
+      <![CDATA[ and car.car_purchase_date <=  concat(#{purchaseDateEnd},' 23:59:59') ]]>
+    </if>
+    <if test="nextMaintenanceDateBegin !=null and nextMaintenanceDateBegin !=''">
+      <![CDATA[ and car.next_maintenance_date >=  concat(#{nextMaintenanceDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="nextMaintenanceDateEnd !=null and nextMaintenanceDateEnd !=''">
+      <![CDATA[ and car.next_maintenance_date <=  concat(#{nextMaintenanceDateEnd},' 23:59:59') ]]>
+    </if>
+    <if test="nextSecurityDateBegin !=null and nextSecurityDateBegin !=''">
+      <![CDATA[ and car.next_security_date >=  concat(#{nextSecurityDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="nextSecurityDateEnd !=null and nextSecurityDateEnd !=''">
+      <![CDATA[ and car.next_security_date <=  concat(#{nextSecurityDateEnd},' 23:59:59') ]]>
+    </if>
+    <if test="nextOperationDateBegin !=null and nextOperationDateBegin !=''">
+      <![CDATA[ and car.next_operation_date >=  concat(#{nextOperationDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="nextOperationDateEnd !=null and nextOperationDateEnd !=''">
+      <![CDATA[ and car.next_operation_date <=  concat(#{nextOperationDateEnd},' 23:59:59') ]]>
+    </if>
+    <if test="nextClassDateBegin !=null and nextClassDateBegin !=''">
+      <![CDATA[ and car.next_class_date >=  concat(#{nextClassDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="nextClassDateEnd !=null and nextClassDateEnd !=''">
+      <![CDATA[ and car.next_class_date <=  concat(#{nextClassDateEnd},' 23:59:59') ]]>
+    </if>
+    <if test="cities !=null and cities != ''">
+      and car.city_id in (${cities})
+    </if>
+    <if test="supplierIds !=null and supplierIds !=''">
+      and car.supplier_id in (${supplierIds})
+    </if>
+    <if test="createDateBegin !=null and createDateBegin !=''">
+      <![CDATA[ and car.create_date >=  concat(#{createDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="createDateEnd !=null and createDateEnd !=''">
+      <![CDATA[ and car.create_date <=  concat(#{createDateEnd},' 23:59:59') ]]>
+    </if>
+    order by car.update_date  desc
+    limit #{offSet},#{pagesize}
+  </select>
+
+  <select id="selectListCount" resultType="java.lang.Integer" parameterType="com.zhuanche.entity.rentcar.CarInfo">
+    SELECT count(*)
+    FROM
+    car_biz_car_info car
+    LEFT JOIN car_biz_city city ON car.city_id = city.city_id
+    LEFT JOIN car_biz_model model ON model.model_id = car.car_model_id
+    LEFT JOIN car_biz_supplier supplier ON supplier.supplier_id = car.supplier_id
+    WHERE
+    1 = 1
+    <if test="cityId !=null and cityId !=0">
+      and car.city_id = #{cityId}
+    </if>
+    <if test="status !=null">
+      and car.status = #{status}
+    </if>
+    <if test="status ==null">
+      and car.status != 2
+    </if>
+    <if test="isFree ==1 ">
+      and car.driver_id != 0
+    </if>
+    <if test="isFree ==0 ">
+      and car.driver_id = 0
+    </if>
+    <if test="supplierId !=null and supplierId !=''">
+      and car.supplier_id = #{supplierId}
+    </if>
+    <if test="carModelIds !=null and carModelIds !=''">
+      and car.car_model_id in (${carModelIds})
+    </if>
+    <if test=" licensePlates !=null and licensePlates !=''">
+      and license_plates like '%${licensePlates}%'
+    </if>
+    <if test="purchaseDateBegin !=null and purchaseDateBegin !=''">
+      <![CDATA[ and car.car_purchase_date >=  concat(#{purchaseDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="purchaseDateEnd !=null and purchaseDateEnd !=''">
+      <![CDATA[ and car.car_purchase_date <=  concat(#{purchaseDateEnd},' 23:59:59') ]]>
+    </if>
+    <if test="nextMaintenanceDateBegin !=null and nextMaintenanceDateBegin !=''">
+      <![CDATA[ and car.next_maintenance_date >=  concat(#{nextMaintenanceDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="nextMaintenanceDateEnd !=null and nextMaintenanceDateEnd !=''">
+      <![CDATA[ and car.next_maintenance_date <=  concat(#{nextMaintenanceDateEnd},' 23:59:59') ]]>
+    </if>
+    <if test="nextSecurityDateBegin !=null and nextSecurityDateBegin !=''">
+      <![CDATA[ and car.next_security_date >=  concat(#{nextSecurityDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="nextSecurityDateEnd !=null and nextSecurityDateEnd !=''">
+      <![CDATA[ and car.next_security_date <=  concat(#{nextSecurityDateEnd},' 23:59:59') ]]>
+    </if>
+    <if test="nextOperationDateBegin !=null and nextOperationDateBegin !=''">
+      <![CDATA[ and car.next_operation_date >=  concat(#{nextOperationDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="nextOperationDateEnd !=null and nextOperationDateEnd !=''">
+      <![CDATA[ and car.next_operation_date <=  concat(#{nextOperationDateEnd},' 23:59:59') ]]>
+    </if>
+    <if test="nextClassDateBegin !=null and nextClassDateBegin !=''">
+      <![CDATA[ and car.next_class_date >=  concat(#{nextClassDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="nextClassDateEnd !=null and nextClassDateEnd !=''">
+      <![CDATA[ and car.next_class_date <=  concat(#{nextClassDateEnd},' 23:59:59') ]]>
+    </if>
+    <if test="cities !=null and cities != ''">
+      and car.city_id in (${cities})
+    </if>
+    <if test="supplierIds !=null and supplierIds !=''">
+      and car.supplier_id in (${supplierIds})
+    </if>
+    <if test="createDateBegin !=null and createDateBegin !=''">
+      <![CDATA[ and car.create_date >=  concat(#{createDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="createDateEnd !=null and createDateEnd !=''">
+      <![CDATA[ and car.create_date <=  concat(#{createDateEnd},' 23:59:59') ]]>
+    </if>
+  </select>
+
+  <select id="selectListNoPage" resultMap="BasicCarBizCarInfoVOMap" parameterType="com.zhuanche.entity.rentcar.CarInfo">
+    SELECT
+    car_id,
+    car.city_id,
+    car.car_photograph imageUrl,
+    DATE_FORMAT(car.next_operation_date, '%Y-%m-%d ') AS next_operation_date,
+    DATE_FORMAT(car.next_security_date, '%Y-%m-%d ') AS next_security_date,
+    DATE_FORMAT(car.next_class_date, '%Y-%m-%d ') AS next_class_date,
+    DATE_FORMAT(car.two_level_maintenance_date, '%Y-%m-%d ') AS two_level_maintenance_date,
+    city.city_name AS cityName,
+    model.model_name AS modeName,
+    car.supplier_id,
+    supplier.supplier_full_name AS supplierName,
+    car_purchase_date,
+    car.license_plates licensePlates,
+    brand,
+    car_model_id carModelId,
+    model_detail modelDetail,
+    color,
+    engine_no engineNo,
+    frame_no frameNo,
+    DATE_FORMAT(car.next_inspect_date, '%Y-%m-%d ') nextInspectDate,
+    DATE_FORMAT(car.next_maintenance_date, '%Y-%m-%d ') nextMaintenanceDate,
+    DATE_FORMAT(car.rental_expire_date, '%Y-%m-%d ') rentalExpireDate,
+    car.fuelType,
+    car.carryPassengers,
+    car.auditingStatus,
+    car.auditing_date,
+    car.insuranceCompany,
+    car.insuranceNumber,
+    car.insuranceType,
+    car.insuranceMoney,
+    car.insuranceDateStart,
+    car.insuranceDateEnd,
+    car.freightType,
+    car.vehicleEngineDisplacement,
+    car.vehicle_engine_power,
+    car.vehicle_engine_wheelbase,
+    car.vehicle_registration_date,
+    car.vehicle_VIN_code,
+    car.vehicle_brand,
+    car.totalMileage,
+    car.overhaulStatus,
+    car.transportNumber,
+    car.certificationAuthority,
+    car.operatingRegion,
+    car.firstDate,
+    car.transportNumberDateStart,
+    car.transportNumberDateEnd,
+    car.equipmentNumber,
+    car.gpsBrand,
+    car.gpsType,
+    car.gpsDate,
+    car.gps_imei,
+    car.clicensePlatesColor,
+    car.vehicle_owner,
+    car.vehicle_type,
+    car.memo,
+    car. STATUS,
+    car.create_by createBy,
+    car.update_by updateBy,
+    car.create_date createDate,
+    car.update_date updateDate,
+    b.`name` AS createName,
+    c.`name` AS updateName,
+    driver.`name` AS driverName
+    FROM
+    car_biz_car_info car
+    LEFT JOIN car_biz_city city ON car.city_id = city.city_id
+    LEFT JOIN car_biz_model model ON model.model_id = car.car_model_id
+    LEFT JOIN car_biz_supplier supplier ON supplier.supplier_id = car.supplier_id
+    LEFT JOIN car_sys_user b on car.create_by=b.user_id
+    LEFT JOIN car_sys_user c on car.update_by=c.user_id
+    LEFT JOIN car_biz_driver_info driver ON car.driver_id=driver.driver_id
+    WHERE
+    1 = 1
+    <if test="cityId !=null and cityId !=0">
+      and car.city_id = #{cityId}
+    </if>
+    <if test="status !=null">
+      and car.status = #{status}
+    </if>
+    <if test="status ==null">
+      and car.status != 2
+    </if>
+    <if test="isFree ==1 ">
+      and car.driver_id != 0
+    </if>
+    <if test="isFree ==0 ">
+      and car.driver_id = 0
+    </if>
+    <if test="supplierId !=null and supplierId !=''">
+      and car.supplier_id = #{supplierId}
+    </if>
+    <if test="carModelIds !=null and carModelIds !=''">
+      and car.car_model_id in (${carModelIds})
+    </if>
+    <if test=" licensePlates !=null and licensePlates !=''">
+      and car.license_plates like '%${licensePlates}%'
+    </if>
+    <if test="purchaseDateBegin !=null and purchaseDateBegin !=''">
+      <![CDATA[ and car.car_purchase_date >=  concat(#{purchaseDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="purchaseDateEnd !=null and purchaseDateEnd !=''">
+      <![CDATA[ and car.car_purchase_date <=  concat(#{purchaseDateEnd},' 23:59:59') ]]>
+    </if>
+    <if test="nextMaintenanceDateBegin !=null and nextMaintenanceDateBegin !=''">
+      <![CDATA[ and car.next_maintenance_date >=  concat(#{nextMaintenanceDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="nextMaintenanceDateEnd !=null and nextMaintenanceDateEnd !=''">
+      <![CDATA[ and car.next_maintenance_date <=  concat(#{nextMaintenanceDateEnd},' 23:59:59') ]]>
+    </if>
+    <if test="nextSecurityDateBegin !=null and nextSecurityDateBegin !=''">
+      <![CDATA[ and car.next_security_date >=  concat(#{nextSecurityDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="nextSecurityDateEnd !=null and nextSecurityDateEnd !=''">
+      <![CDATA[ and car.next_security_date <=  concat(#{nextSecurityDateEnd},' 23:59:59') ]]>
+    </if>
+    <if test="nextOperationDateBegin !=null and nextOperationDateBegin !=''">
+      <![CDATA[ and car.next_operation_date >=  concat(#{nextOperationDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="nextOperationDateEnd !=null and nextOperationDateEnd !=''">
+      <![CDATA[ and car.next_operation_date <=  concat(#{nextOperationDateEnd},' 23:59:59') ]]>
+    </if>
+    <if test="nextClassDateBegin !=null and nextClassDateBegin !=''">
+      <![CDATA[ and car.next_class_date >=  concat(#{nextClassDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="nextClassDateEnd !=null and nextClassDateEnd !=''">
+      <![CDATA[ and car.next_class_date <=  concat(#{nextClassDateEnd},' 23:59:59') ]]>
+    </if>
+    <if test="createDateBegin !=null and createDateBegin !=''">
+      <![CDATA[ and car.create_date >=  concat(#{createDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="createDateEnd !=null and createDateEnd !=''">
+      <![CDATA[ and car.create_date <=  concat(#{createDateEnd},' 23:59:59') ]]>
+    </if>
+    <if test="cities !=null and cities != ''">
+      and car.city_id in (${cities})
+    </if>
+    <if test="supplierIds !=null and supplierIds !=''">
+      and car.supplier_id in (${supplierIds})
+    </if>
+    order by car.update_date  desc
+  </select>
+
+
+  <select id="selectByPrimaryKey" resultMap="BasicCarBizCarInfoVOMap" parameterType="java.lang.Integer">  
+		SELECT
+			car_id,
+			driver_id,
+			car.city_id,
+			car.car_photograph imageUrl,
+			DATE_FORMAT(car.next_operation_date, '%Y-%m-%d ') AS next_operation_date,
+			DATE_FORMAT(car.next_security_date, '%Y-%m-%d ') AS next_security_date,
+			DATE_FORMAT(car.next_class_date, '%Y-%m-%d ') AS next_class_date,
+			DATE_FORMAT(car.two_level_maintenance_date, '%Y-%m-%d ') AS two_level_maintenance_date,
+			car.car_photograph_name,
+			car.car_photograph,
+			city.city_name AS cityName,
+			model.model_name AS modeName,
+			car.supplier_id,
+			supplier.supplier_full_name AS supplierName,
+			license_plates,
+			brand,
+			car_model_id,
+			model_detail,
+			color,
+			engine_no,
+			frame_no,
+			next_inspect_date,
+			car_purchase_date,
+			next_maintenance_date,
+			rental_expire_date,
+			car.memo,
+			car. STATUS,
+			car.create_by,
+			car.update_by,
+			DATE_FORMAT(car.create_date, '%Y-%m-%d %T') AS create_date,
+			DATE_FORMAT(car.update_date, '%Y-%m-%d %T') AS update_date,
+			u1.name AS createName,
+			u2.name AS updateName
+		FROM
+			car_biz_car_info car
+		LEFT JOIN car_biz_city city ON car.city_id = city.city_id
+		LEFT JOIN car_biz_model model ON model.model_id = car.car_model_id
+		LEFT JOIN car_biz_supplier supplier ON supplier.supplier_id = car.supplier_id
+		LEFT JOIN car_sys_user u1 ON u1.user_id = car.create_by
+		LEFT JOIN car_sys_user u2 ON u2.user_id = car.update_by
+		WHERE
+			car_id = #{carId , jdbcType=BIGINT} 
+    </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+	    delete from car_biz_car_info 
+	    where 
+	        car_id = #{carId , jdbcType=BIGINT} 
+	    
+  	</delete>
+
+
+  <insert id="insert" parameterType="com.zhuanche.entity.rentcar.CarInfo" useGeneratedKeys="true" keyProperty="carId">
+    insert into
+    car_biz_car_info
+    (
+
+    <if test="supplierId!=null and supplierId!=''">
+      supplier_id,
+    </if>
+    <if test="cityId!=null and cityId!=''">
+      city_id,
+    </if>
+    <if test="licensePlates!=null and licensePlates!=''">
+      license_plates,
+    </if>
+    <if test="brand!=null and brand!=''">
+      brand,
+    </if>
+    <if test="carModelId!=null and carModelId!=''">
+      car_model_id,
+    </if>
+    <if test="purchaseDate !=null and purchaseDate !=''">
+      car_purchase_date,
+    </if>
+    <if test="modelDetail!=null and modelDetail!=''">
+      model_detail,
+    </if>
+    <if test="color!=null and color!=''">
+      color,
+    </if>
+    <if test="carPhotographName !=null and carPhotographName !=''">
+      car_photograph_name,
+    </if>
+    <if test="imageUrl !=null and imageUrl !=''">
+      car_photograph,
+    </if>
+    <if test="engineNo!=null and engineNo!=''">
+      engine_no,
+    </if>
+    <if test="frameNo!=null and frameNo!=''">
+      frame_no,
+    </if>
+    <if test="nextInspectDate!=null and nextInspectDate!=''">
+      next_inspect_date,
+    </if>
+    <if test="nextMaintenanceDate!=null and nextMaintenanceDate!=''">
+      next_maintenance_date,
+    </if>
+    <if test="rentalExpireDate!=null and rentalExpireDate!=''">
+      rental_expire_date,
+    </if>
+    <if test="nextOperationDate !=null and nextOperationDate !=''">
+      next_operation_date,
+    </if>
+    <if test="nextSecurityDate !=null and nextSecurityDate !=''">
+      next_security_date,
+    </if>
+    <if test="nextClassDate !=null and nextClassDate !=''">
+      next_class_date,
+    </if>
+    <if test="twoLevelMaintenanceDate !=null and twoLevelMaintenanceDate !=''">
+      two_level_maintenance_date,
+    </if>
+    <if test="memo!=null and memo!=''">
+      memo,
+    </if>
+    <if test="status!=null and status!=''">
+      status,
+    </if>
+    <if test="createBy!=null and createBy!=''">
+      create_by,
+    </if>
+    <if test="updateBy!=null and updateBy!=''">
+      update_by,
+    </if>
+    create_date,
+    update_date
+    )VALUES(
+    <if test="supplierId !=null and supplierId!=''">
+      #{supplierId},
+    </if>
+    <if test="cityId !=null and cityId!=''">
+      #{cityId},
+    </if>
+    <if test="licensePlates !=null and licensePlates!=''">
+      #{licensePlates},
+    </if>
+    <if test="brand!=null and brand!=''">
+      #{brand},
+    </if>
+    <if test="carModelId !=null and carModelId!=''">
+      #{carModelId},
+    </if>
+    <if test="purchaseDate !=null and purchaseDate !=''">
+      #{purchaseDate},
+    </if>
+    <if test="modelDetail !=null and modelDetail!=''">
+      #{modelDetail},
+    </if>
+    <if test="color !=null and color!=''">
+      #{color},
+    </if>
+    <if test="carPhotographName !=null and carPhotographName !=''">
+      #{carPhotographName},
+    </if>
+    <if test="imageUrl !=null and imageUrl !=''">
+      #{imageUrl},
+    </if>
+    <if test="engineNo!=null and engineNo!=''">
+      #{engineNo},
+    </if>
+    <if test="frameNo !=null and frameNo!=''">
+      #{frameNo},
+    </if>
+    <if test="nextInspectDate!=null and nextInspectDate!=''">
+      #{nextInspectDate},
+    </if>
+    <if test="nextMaintenanceDate !=null and nextMaintenanceDate!=''">
+      #{nextMaintenanceDate},
+    </if>
+    <if test="rentalExpireDate !=null and rentalExpireDate!=''">
+      #{rentalExpireDate},
+    </if>
+    <if test="nextOperationDate !=null and nextOperationDate !=''">
+      #{nextOperationDate},
+    </if>
+    <if test="nextSecurityDate !=null and nextSecurityDate !=''">
+      #{nextSecurityDate},
+    </if>
+    <if test="nextClassDate !=null and nextClassDate !=''">
+      #{nextClassDate},
+    </if>
+    <if test="twoLevelMaintenanceDate !=null and twoLevelMaintenanceDate !=''">
+      #{twoLevelMaintenanceDate},
+    </if>
+    <if test="memo!=null and memo!=''">
+      #{memo},
+    </if>
+    <if test="status!=null and status!=''">
+      #{status},
+    </if>
+    <if test="createBy !=null and createBy!=''">
+      #{createBy},
+    </if>
+    <if test="updateBy !=null and updateBy!=''">
+      #{updateBy},
+    </if>
+    now(),
+    now()
+    )
+  </insert>
+
+  <update id="updateCarInfo" parameterType="com.zhuanche.entity.rentcar.CarInfo" >
+    update car_biz_car_info
+    set
+    <if test="supplierId !=null ">
+      supplier_id=#{supplierId},
+    </if>
+    <if test="cityId !=null">
+      city_id=#{cityId},
+    </if>
+    <if test="licensePlates!=null and licensePlates!=''">
+      license_plates=#{licensePlates},
+    </if>
+    <if test="nextOperationDate !=null and nextOperationDate !=''">
+      next_operation_date=#{nextOperationDate},
+    </if>
+    <if test="nextSecurityDate !=null and nextSecurityDate !=''">
+      next_security_date=#{nextSecurityDate},
+    </if>
+    <if test="nextClassDate !=null and nextClassDate !=''">
+      next_class_date=#{nextClassDate},
+    </if>
+    <if test="twoLevelMaintenanceDate !=null and twoLevelMaintenanceDate !=''">
+      two_level_maintenance_date=#{twoLevelMaintenanceDate},
+    </if>
+    <if test="brand!=null and brand!=''">
+      brand=#{brand},
+    </if>
+    <if test="carModelId!=null ">
+      car_model_id=#{carModelId},
+    </if>
+    <if test="purchaseDate!=null and purchaseDate!=''">
+      car_purchase_date=#{purchaseDate},
+    </if>
+    <if test="modelDetail!=null and modelDetail!=''">
+      model_detail=#{modelDetail},
+    </if>
+    <if test="color!=null and color!=''">
+      color=#{color},
+    </if>
+    <if test="carPhotographName!=null and carPhotographName!=''">
+      car_photograph_name=#{carPhotographName},
+    </if>
+    <if test="imageUrl!=null and imageUrl!=''">
+      car_photograph=#{imageUrl},
+    </if>
+    <if test="engineNo!=null and engineNo!=''">
+      engine_no=#{engineNo},
+    </if>
+    <if test="frameNo!=null and frameNo!=''">
+      frame_no=#{frameNo},
+    </if>
+    <if test="nextInspectDate!=null and nextInspectDate!=''">
+      next_inspect_date=#{nextInspectDate},
+    </if>
+    <if test="nextMaintenanceDate!=null and nextMaintenanceDate!=''">
+      next_maintenance_date=#{nextMaintenanceDate},
+    </if>
+    <if test="rentalExpireDate!=null and rentalExpireDate!=''">
+      rental_expire_date=#{rentalExpireDate},
+    </if>
+    <if test="memo!=null and memo!=''">
+      memo=#{memo},
+    </if>
+    <if test="status!=null">
+      status=#{status},
+    </if>
+    <if test="updateBy !=null and updateBy!=''">
+      update_by=#{updateBy},
+    </if>
+    update_date =now()
+
+    where 1=1
+    and car_id=#{carId}
+  </update>
+  <!-- 根据车牌号更新 -->
+  <update id="updateByLicence" parameterType="com.zhuanche.entity.rentcar.CarInfo" >
+    update car_biz_car_info
+    set
+    <if test="supplierId !=null ">
+      supplier_id=#{supplierId},
+    </if>
+    <if test="cityId !=null">
+      city_id=#{cityId},
+    </if>
+    <if test="licensePlates!=null and licensePlates!=''">
+      license_plates=#{licensePlates},
+    </if>
+    <if test="nextOperationDate !=null and nextOperationDate !=''">
+      next_operation_date=#{nextOperationDate},
+    </if>
+    <if test="nextSecurityDate !=null and nextSecurityDate !=''">
+      next_security_date=#{nextSecurityDate},
+    </if>
+    <if test="nextClassDate !=null and nextClassDate !=''">
+      next_class_date=#{nextClassDate},
+    </if>
+    <if test="twoLevelMaintenanceDate !=null and twoLevelMaintenanceDate !=''">
+      two_level_maintenance_date=#{twoLevelMaintenanceDate},
+    </if>
+    <if test="brand!=null and brand!=''">
+      brand=#{brand},
+    </if>
+    <if test="carModelId!=null ">
+      car_model_id=#{carModelId},
+    </if>
+    <if test="purchaseDate!=null and purchaseDate!=''">
+      car_purchase_date=#{purchaseDate},
+    </if>
+    <if test="modelDetail!=null and modelDetail!=''">
+      model_detail=#{modelDetail},
+    </if>
+    <if test="color!=null and color!=''">
+      color=#{color},
+    </if>
+    <if test="carPhotographName!=null and carPhotographName!=''">
+      car_photograph_name=#{carPhotographName},
+    </if>
+    <if test="imageUrl!=null and imageUrl!=''">
+      car_photograph=#{imageUrl},
+    </if>
+    <if test="engineNo!=null and engineNo!=''">
+      engine_no=#{engineNo},
+    </if>
+    <if test="frameNo!=null and frameNo!=''">
+      frame_no=#{frameNo},
+    </if>
+    <if test="nextInspectDate!=null and nextInspectDate!=''">
+      next_inspect_date=#{nextInspectDate},
+    </if>
+    <if test="nextMaintenanceDate!=null and nextMaintenanceDate!=''">
+      next_maintenance_date=#{nextMaintenanceDate},
+    </if>
+    <if test="rentalExpireDate!=null and rentalExpireDate!=''">
+      rental_expire_date=#{rentalExpireDate},
+    </if>
+    <if test="memo!=null and memo!=''">
+      memo=#{memo},
+    </if>
+    <if test="status!=null">
+      status=#{status},
+    </if>
+    <if test="updateBy !=null and updateBy!=''">
+      update_by=#{updateBy},
+    </if>
+    update_date =now()
+
+    where 1=1
+    and license_plates=#{licensePlates}
+  </update>
+
+  <select id="selectCount" resultType="java.lang.Integer" parameterType="com.zhuanche.entity.rentcar.CarInfo">
+    SELECT
+    count(1)
+    FROM
+    car_biz_car_info
+    WHERE
+    1 = 1
+    <if test=" licensePlates !=null and licensePlates !=''">
+      and license_plates like '%${licensePlates}%'
+    </if>
+    <if test="cityId !=null and cityId !=0">
+      and city_id = #{cityId}
+    </if>
+    <if test="status !=null">
+      and status = #{status}
+    </if>
+    <if test="supplierId !=null and supplierId !=''">
+      and supplier_id = #{supplierId}
+    </if>
+    <if test="carModelId !=null and carModelId !=''">
+      and car_model_id = #{carModelId}
+    </if>
+    <if test="purchaseDateBegin !=null and purchaseDateBegin !=''">
+      <![CDATA[ and car_purchase_date >=  concat(#{purchaseDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="purchaseDateEnd !=null and purchaseDateEnd !=''">
+      <![CDATA[ and car_purchase_date <=  concat(#{purchaseDateEnd},' 23:59:59') ]]>
+    </if>
+    <if test="nextMaintenanceDateBegin !=null and nextMaintenanceDateBegin !=''">
+      <![CDATA[ and next_maintenance_date >=  concat(#{nextMaintenanceDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="nextMaintenanceDateEnd !=null and nextMaintenanceDateEnd !=''">
+      <![CDATA[ and next_maintenance_date <=  concat(#{nextMaintenanceDateEnd},' 23:59:59') ]]>
+    </if>
+    <if test="nextSecurityDateBegin !=null and nextSecurityDateBegin !=''">
+      <![CDATA[ and next_security_date >=  concat(#{nextSecurityDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="nextSecurityDateEnd !=null and nextSecurityDateEnd !=''">
+      <![CDATA[ and next_security_date <=  concat(#{nextSecurityDateEnd},' 23:59:59') ]]>
+    </if>
+    <if test="nextOperationDateBegin !=null and nextOperationDateBegin !=''">
+      <![CDATA[ and next_operation_date >=  concat(#{nextOperationDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="nextOperationDateEnd !=null and nextOperationDateEnd !=''">
+      <![CDATA[ and next_operation_date <=  concat(#{nextOperationDateEnd},' 23:59:59') ]]>
+    </if>
+    <if test="nextClassDateBegin !=null and nextClassDateBegin !=''">
+      <![CDATA[ and next_class_date >=  concat(#{nextClassDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="nextClassDateEnd !=null and nextClassDateEnd !=''">
+      <![CDATA[ and next_class_date <=  concat(#{nextClassDateEnd},' 23:59:59') ]]>
+    </if>
+  </select>
+
+
+  <select id="selectcarnum" resultType="com.zhuanche.web.entity.car.CarInfoVo" parameterType="map">
+    SELECT
+    car_id carId,
+    license_plates licensePlates
+    FROM
+    car_biz_car_info
+    WHERE driver_id = '0' and status=1
+    <if test="cityId !=null and cityId != ''">
+      and city_id = #{cityId}
+    </if>
+    <if test="supplierId !=null and supplierId != ''">
+      and supplier_id = #{supplierId}
+    </if>
+    <if test=" licensePlates !=null and licensePlates !=''">
+      and license_plates like '%${licensePlates}%'
+    </if>
+    <if test="driverId !=null and driverId != ''">
+      or driver_id = #{driverId}
+    </if>
+  </select>
+
+
+  <update id="update"  parameterType="Map" >
+	    UPDATE 
+	    	car_biz_car_info c
+		SET 
+			c.driver_id = #{id}
+		WHERE
+			c.license_plates = #{str} 
+    </update>
+
+
+  <select id="check" parameterType="java.lang.String" resultType="java.lang.Integer">
+    	SELECT 
+    		COUNT(1) 
+    	FROM 
+    		car_biz_car_info
+    	WHERE 
+    		license_plates = #{str}
+    </select>
+
+
+  <update id="updateCarStatus" parameterType="com.zhuanche.entity.rentcar.CarInfo">
+    UPDATE
+    car_biz_car_info
+    SET
+    <if test="driverId = -1">
+      driver_id = 0,
+    </if>
+    status = #{status},
+    update_date = NOW(),
+    update_by = #{updateBy}
+    WHERE
+    car_id = #{carId}
+  </update>
+
+  <!-- 根据车牌号 查询车辆的id -->
+  <select id="selectCarIdByLicence" parameterType="java.lang.String" resultType="java.lang.Integer">
+   	SELECT car_id
+   	
+	FROM car_biz_car_info 
+	
+	WHERE license_plates=#{license}
+   	</select>
+
+  <!-- 根据车组的名字 查询车型的id -->
+  <select id="getGroupId" parameterType="com.zhuanche.entity.rentcar.CarInfo" resultType="java.lang.Integer">
+    	SELECT
+			group_id
+		FROM
+			car_biz_car_group
+		WHERE
+			group_name  = #{groupName}
+    </select>
+  <select id="checkLicensePlates" resultType="java.lang.Integer" parameterType="java.lang.String">  
+		SELECT count(*)
+		FROM
+			car_biz_car_info car
+		WHERE 1 = 1 and license_plates = #{licensePlates} and status!=2
+    </select>
+
+  <update id="updatedriver"  parameterType="map" >
+		UPDATE
+		car_biz_car_info c
+		SET
+		c.driver_id = #{id},
+		update_date =now()
+		WHERE
+		c.license_plates = #{str}
+	</update>
+
+  <select id="selectCarByCarId" resultType="java.lang.String" parameterType="java.lang.Integer">
+		SELECT license_plates FROM car_biz_car_info WHERE car_id = #{carId}
+	</select>
+
+  <select id="selectModelNameByLicensePlates" resultType="java.lang.String" parameterType="java.lang.String">
+    	SELECT model.model_name AS modeName
+		FROM car_biz_car_info car
+		LEFT JOIN car_biz_model model ON model.model_id = car.car_model_id
+		WHERE car.license_plates = #{licensePlates}
+    </select>
+</mapper>
