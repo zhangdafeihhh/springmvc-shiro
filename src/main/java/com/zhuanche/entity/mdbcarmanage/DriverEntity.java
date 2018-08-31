@@ -1,11 +1,6 @@
 package com.zhuanche.entity.mdbcarmanage;
-import com.zhuanche.web.entity.common.BaseEntity;
 
 
-/***
- * dirverInfo
- * @author jz_pc
- */
 public class DriverEntity{
 
 	private static final long serialVersionUID = 7868838087731509604L;
