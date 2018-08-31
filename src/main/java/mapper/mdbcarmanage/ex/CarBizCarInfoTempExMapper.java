@@ -12,4 +12,11 @@ public interface CarBizCarInfoTempExMapper {
      * @return
      */
     List<CarBizCarInfoTemp> queryForPageObject(Map<String,Object> params);
+
+    /**
+     *查询详情
+     * @param params
+     * @return
+     */
+    CarBizCarInfoTemp queryForObject(Map<String,Object> params);
 }

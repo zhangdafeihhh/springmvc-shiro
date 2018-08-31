@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import mapper.rentcar.CarBizCityMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +16,10 @@ import mapper.rentcar.ex.CarBizCityExMapper;
 @Service
 public class CarBizCityService{
 	@Autowired
-	private CarBizCityExMapper carBizCityExMapper;
+    private CarBizCityExMapper carBizCityExMapper;
+
+    @Autowired
+    private CarBizCityMapper carBizCityMapper;
 
 	/**根据CITYID查询出城市信息**/
 	public Map<Integer, CarBizCity> queryCity( Set<Integer> cityIds ){
@@ -33,5 +37,8 @@ public class CarBizCityService{
 		return result;
 	}
 
+    public CarBizCity selectByPrimaryKey(Integer cityId){
+	    return carBizCityMapper.selectByPrimaryKey(cityId);
+    }
 	
 }

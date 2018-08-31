@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.rentcar.ex.CarBizModelExMapper">
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarBizModel">
+    <id column="model_id" jdbcType="INTEGER" property="modelId" />
+    <result column="model_name" jdbcType="VARCHAR" property="modelName" />
+    <result column="group_id" jdbcType="INTEGER" property="groupId" />
+    <result column="sort" jdbcType="INTEGER" property="sort" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="create_by" jdbcType="INTEGER" property="createBy" />
+    <result column="update_by" jdbcType="INTEGER" property="updateBy" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+      <result column="memo" jdbcType="VARCHAR" property="memo" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    model_id, model_name, group_id, sort, status, create_by, update_by, create_date, 
+    update_date,memo
+  </sql>
+    <!-- 根据车型查询 -->
+   <select id="queryCarModelByCarModelName" resultType="java.lang.Integer" parameterType="String" >
+    select
+    model_id modelId
+    from car_biz_model
+    where model_name = #{modelName}
+    limit 1
+  </select>
+</mapper>

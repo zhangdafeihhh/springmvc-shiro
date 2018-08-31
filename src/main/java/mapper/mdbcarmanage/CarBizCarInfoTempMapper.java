@@ -12,8 +12,4 @@ public interface CarBizCarInfoTempMapper {
     CarBizCarInfoTemp selectByPrimaryKey(Integer carId);
 
     int updateByPrimaryKeySelective(CarBizCarInfoTemp record);
-
-    int updateByPrimaryKeyWithBLOBs(CarBizCarInfoTemp record);
-
-    int updateByPrimaryKey(CarBizCarInfoTemp record);
 }

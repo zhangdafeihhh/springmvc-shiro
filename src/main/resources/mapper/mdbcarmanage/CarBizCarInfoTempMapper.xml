@@ -146,12 +146,9 @@
       #{vehicletec,jdbcType=VARCHAR}, #{vehiclesafe,jdbcType=VARCHAR}, #{memo,jdbcType=LONGVARCHAR}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp" >
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp" useGeneratedKeys="true" keyProperty="carId">
     insert into car_biz_car_info_temp
     <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="carId != null" >
-        car_id,
-      </if>
       <if test="cityId != null" >
         city_id,
       </if>
@@ -340,9 +337,6 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="carId != null" >
-        #{carId,jdbcType=INTEGER},
-      </if>
       <if test="cityId != null" >
         #{cityId,jdbcType=INTEGER},
       </if>
@@ -721,137 +715,6 @@
         memo = #{memo,jdbcType=LONGVARCHAR},
       </if>
     </set>
-    where car_id = #{carId,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp" >
-    update car_biz_car_info_temp
-    set city_id = #{cityId,jdbcType=INTEGER},
-      driver_id = #{driverId,jdbcType=INTEGER},
-      supplier_id = #{supplierId,jdbcType=INTEGER},
-      license_plates = #{licensePlates,jdbcType=VARCHAR},
-      brand = #{brand,jdbcType=VARCHAR},
-      car_model_id = #{carModelId,jdbcType=INTEGER},
-      car_purchase_date = #{carPurchaseDate,jdbcType=TIMESTAMP},
-      model_detail = #{modelDetail,jdbcType=VARCHAR},
-      color = #{color,jdbcType=VARCHAR},
-      car_photograph_name = #{carPhotographName,jdbcType=VARCHAR},
-      car_photograph = #{carPhotograph,jdbcType=VARCHAR},
-      engine_no = #{engineNo,jdbcType=VARCHAR},
-      frame_no = #{frameNo,jdbcType=VARCHAR},
-      next_inspect_date = #{nextInspectDate,jdbcType=TIMESTAMP},
-      next_maintenance_date = #{nextMaintenanceDate,jdbcType=TIMESTAMP},
-      rental_expire_date = #{rentalExpireDate,jdbcType=TIMESTAMP},
-      next_operation_date = #{nextOperationDate,jdbcType=TIMESTAMP},
-      next_security_date = #{nextSecurityDate,jdbcType=TIMESTAMP},
-      next_class_date = #{nextClassDate,jdbcType=TIMESTAMP},
-      two_level_maintenance_date = #{twoLevelMaintenanceDate,jdbcType=TIMESTAMP},
-      status = #{status,jdbcType=INTEGER},
-      create_by = #{createBy,jdbcType=INTEGER},
-      update_by = #{updateBy,jdbcType=INTEGER},
-      create_date = #{createDate,jdbcType=TIMESTAMP},
-      update_date = #{updateDate,jdbcType=TIMESTAMP},
-      clicensePlatesColor = #{clicenseplatescolor,jdbcType=VARCHAR},
-      fuelType = #{fueltype,jdbcType=VARCHAR},
-      carryPassengers = #{carrypassengers,jdbcType=VARCHAR},
-      auditingStatus = #{auditingstatus,jdbcType=INTEGER},
-      insuranceCompany = #{insurancecompany,jdbcType=VARCHAR},
-      insuranceNumber = #{insurancenumber,jdbcType=VARCHAR},
-      insuranceType = #{insurancetype,jdbcType=VARCHAR},
-      insuranceMoney = #{insurancemoney,jdbcType=VARCHAR},
-      insuranceDateStart = #{insurancedatestart,jdbcType=VARCHAR},
-      insuranceDateEnd = #{insurancedateend,jdbcType=VARCHAR},
-      freightType = #{freighttype,jdbcType=VARCHAR},
-      vehicleEngineDisplacement = #{vehicleenginedisplacement,jdbcType=VARCHAR},
-      totalMileage = #{totalmileage,jdbcType=VARCHAR},
-      overhaulStatus = #{overhaulstatus,jdbcType=INTEGER},
-      transportNumber = #{transportnumber,jdbcType=VARCHAR},
-      certificationAuthority = #{certificationauthority,jdbcType=VARCHAR},
-      operatingRegion = #{operatingregion,jdbcType=VARCHAR},
-      firstDate = #{firstdate,jdbcType=VARCHAR},
-      transportNumberDateStart = #{transportnumberdatestart,jdbcType=VARCHAR},
-      transportNumberDateEnd = #{transportnumberdateend,jdbcType=VARCHAR},
-      equipmentNumber = #{equipmentnumber,jdbcType=VARCHAR},
-      gpsBrand = #{gpsbrand,jdbcType=VARCHAR},
-      gpsType = #{gpstype,jdbcType=VARCHAR},
-      gpsDate = #{gpsdate,jdbcType=VARCHAR},
-      auditing_date = #{auditingDate,jdbcType=VARCHAR},
-      vehicle_engine_power = #{vehicleEnginePower,jdbcType=VARCHAR},
-      vehicle_engine_wheelbase = #{vehicleEngineWheelbase,jdbcType=VARCHAR},
-      vehicle_registration_date = #{vehicleRegistrationDate,jdbcType=VARCHAR},
-      vehicle_VIN_code = #{vehicleVinCode,jdbcType=VARCHAR},
-      vehicle_brand = #{vehicleBrand,jdbcType=VARCHAR},
-      gps_imei = #{gpsImei,jdbcType=VARCHAR},
-      vehicle_owner = #{vehicleOwner,jdbcType=VARCHAR},
-      vehicle_type = #{vehicleType,jdbcType=VARCHAR},
-      vehicle_driving_license = #{vehicleDrivingLicense,jdbcType=VARCHAR},
-      vehicleTec = #{vehicletec,jdbcType=VARCHAR},
-      vehicleSafe = #{vehiclesafe,jdbcType=VARCHAR},
-      memo = #{memo,jdbcType=LONGVARCHAR}
-    where car_id = #{carId,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp" >
-    update car_biz_car_info_temp
-    set city_id = #{cityId,jdbcType=INTEGER},
-      driver_id = #{driverId,jdbcType=INTEGER},
-      supplier_id = #{supplierId,jdbcType=INTEGER},
-      license_plates = #{licensePlates,jdbcType=VARCHAR},
-      brand = #{brand,jdbcType=VARCHAR},
-      car_model_id = #{carModelId,jdbcType=INTEGER},
-      car_purchase_date = #{carPurchaseDate,jdbcType=TIMESTAMP},
-      model_detail = #{modelDetail,jdbcType=VARCHAR},
-      color = #{color,jdbcType=VARCHAR},
-      car_photograph_name = #{carPhotographName,jdbcType=VARCHAR},
-      car_photograph = #{carPhotograph,jdbcType=VARCHAR},
-      engine_no = #{engineNo,jdbcType=VARCHAR},
-      frame_no = #{frameNo,jdbcType=VARCHAR},
-      next_inspect_date = #{nextInspectDate,jdbcType=TIMESTAMP},
-      next_maintenance_date = #{nextMaintenanceDate,jdbcType=TIMESTAMP},
-      rental_expire_date = #{rentalExpireDate,jdbcType=TIMESTAMP},
-      next_operation_date = #{nextOperationDate,jdbcType=TIMESTAMP},
-      next_security_date = #{nextSecurityDate,jdbcType=TIMESTAMP},
-      next_class_date = #{nextClassDate,jdbcType=TIMESTAMP},
-      two_level_maintenance_date = #{twoLevelMaintenanceDate,jdbcType=TIMESTAMP},
-      status = #{status,jdbcType=INTEGER},
-      create_by = #{createBy,jdbcType=INTEGER},
-      update_by = #{updateBy,jdbcType=INTEGER},
-      create_date = #{createDate,jdbcType=TIMESTAMP},
-      update_date = #{updateDate,jdbcType=TIMESTAMP},
-      clicensePlatesColor = #{clicenseplatescolor,jdbcType=VARCHAR},
-      fuelType = #{fueltype,jdbcType=VARCHAR},
-      carryPassengers = #{carrypassengers,jdbcType=VARCHAR},
-      auditingStatus = #{auditingstatus,jdbcType=INTEGER},
-      insuranceCompany = #{insurancecompany,jdbcType=VARCHAR},
-      insuranceNumber = #{insurancenumber,jdbcType=VARCHAR},
-      insuranceType = #{insurancetype,jdbcType=VARCHAR},
-      insuranceMoney = #{insurancemoney,jdbcType=VARCHAR},
-      insuranceDateStart = #{insurancedatestart,jdbcType=VARCHAR},
-      insuranceDateEnd = #{insurancedateend,jdbcType=VARCHAR},
-      freightType = #{freighttype,jdbcType=VARCHAR},
-      vehicleEngineDisplacement = #{vehicleenginedisplacement,jdbcType=VARCHAR},
-      totalMileage = #{totalmileage,jdbcType=VARCHAR},
-      overhaulStatus = #{overhaulstatus,jdbcType=INTEGER},
-      transportNumber = #{transportnumber,jdbcType=VARCHAR},
-      certificationAuthority = #{certificationauthority,jdbcType=VARCHAR},
-      operatingRegion = #{operatingregion,jdbcType=VARCHAR},
-      firstDate = #{firstdate,jdbcType=VARCHAR},
-      transportNumberDateStart = #{transportnumberdatestart,jdbcType=VARCHAR},
-      transportNumberDateEnd = #{transportnumberdateend,jdbcType=VARCHAR},
-      equipmentNumber = #{equipmentnumber,jdbcType=VARCHAR},
-      gpsBrand = #{gpsbrand,jdbcType=VARCHAR},
-      gpsType = #{gpstype,jdbcType=VARCHAR},
-      gpsDate = #{gpsdate,jdbcType=VARCHAR},
-      auditing_date = #{auditingDate,jdbcType=VARCHAR},
-      vehicle_engine_power = #{vehicleEnginePower,jdbcType=VARCHAR},
-      vehicle_engine_wheelbase = #{vehicleEngineWheelbase,jdbcType=VARCHAR},
-      vehicle_registration_date = #{vehicleRegistrationDate,jdbcType=VARCHAR},
-      vehicle_VIN_code = #{vehicleVinCode,jdbcType=VARCHAR},
-      vehicle_brand = #{vehicleBrand,jdbcType=VARCHAR},
-      gps_imei = #{gpsImei,jdbcType=VARCHAR},
-      vehicle_owner = #{vehicleOwner,jdbcType=VARCHAR},
-      vehicle_type = #{vehicleType,jdbcType=VARCHAR},
-      vehicle_driving_license = #{vehicleDrivingLicense,jdbcType=VARCHAR},
-      vehicleTec = #{vehicletec,jdbcType=VARCHAR},
-      vehicleSafe = #{vehiclesafe,jdbcType=VARCHAR}
     where car_id = #{carId,jdbcType=INTEGER}
   </update>
 </mapper>
