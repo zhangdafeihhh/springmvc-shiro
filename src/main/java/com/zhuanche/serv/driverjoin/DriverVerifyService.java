@@ -14,8 +14,9 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.dto.driver.DriverVerifyDto;
-import com.zhuanche.entity.driver.DriverCert;
 import com.zhuanche.entity.driver.DriverVerify;
+import com.zhuanche.entity.rentcar.CarBizCarGroup;
+import com.zhuanche.entity.rentcar.CarBizModel;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
@@ -23,6 +24,8 @@ import com.zhuanche.util.IdCard;
 
 import mapper.driver.ex.DriverCertExMapper;
 import mapper.driver.ex.DriverVerifyExMapper;
+import mapper.rentcar.CarBizCarGroupMapper;
+import mapper.rentcar.CarBizModelMapper;
 
 /**
  * 司机加盟审核服务层 ClassName: DriverVerifyService.java Date: 2018年8月29日
@@ -42,6 +45,12 @@ public class DriverVerifyService {
 	@Autowired
 	DriverCertExMapper driverCertExMapper;
 
+	@Autowired
+	CarBizCarGroupMapper carBizCarGroupMapper;
+	
+	@Autowired
+	CarBizModelMapper carBizModelMapper;
+	
 	/** 查询司机加盟注册信息 **/
 	public PageDTO queryDriverVerifyList(int page, int pageSize, Long cityId, String supplier, String mobile,
 			Integer verifyStatus, String createDateBegin, String createDateEnd) {
@@ -140,8 +149,22 @@ public class DriverVerifyService {
 				}
 			}
 			dto = BeanUtil.copyObject(driverVerify, DriverVerifyDto.class);
-			// 查询服务类型名称通过serviceType car_biz_car_group TODO
-			// 查询车型名称通过车型modelId car_biz_model TODO
+			// 查询服务类型名称通过serviceType car_biz_car_group 
+			String serviceType = driverVerify.getServiceType();
+			if(StringUtils.isNotBlank(serviceType)){
+				CarBizCarGroup group = carBizCarGroupMapper.selectByPrimaryKey(Integer.valueOf(serviceType));
+				if(null != group){
+					dto.setServiceTypeName(group.getGroupName());
+				}
+			}
+			// 查询车型名称通过车型modelId car_biz_model 
+			Integer modelId = driverVerify.getModelId();
+			if(null != modelId){
+				CarBizModel modle = carBizModelMapper.selectByPrimaryKey(modelId);
+				if(null != modle){
+					dto.setModelIdName(modle.getModelName());
+				}
+			}
 		} catch (Exception e) {
 			logger.error("查询司机加盟注册信息通过司机ID异常,driverId=" + driverId, e);
 		}

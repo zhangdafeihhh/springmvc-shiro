@@ -140,8 +140,28 @@ public class DriverVerifyDto implements Serializable{
     private String notJoinReason;
 
     private String source;
+    
+    private String serviceTypeName;// 服务类型名称
+    
+    private String modelIdName;// 车型名称（rentcar:car_biz_model）
+    
+    public String getServiceTypeName() {
+		return serviceTypeName;
+	}
 
-    public Long getId() {
+	public void setServiceTypeName(String serviceTypeName) {
+		this.serviceTypeName = serviceTypeName;
+	}
+
+	public String getModelIdName() {
+		return modelIdName;
+	}
+
+	public void setModelIdName(String modelIdName) {
+		this.modelIdName = modelIdName;
+	}
+
+	public Long getId() {
         return id;
     }
 
