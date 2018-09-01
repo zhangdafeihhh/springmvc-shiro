@@ -20,7 +20,7 @@ import java.util.Set;
   *
 */
 
-public class SchCommonRequest implements Serializable{
+public class CommonRequest implements Serializable{
 
     private static final long serialVersionUID = -3621783801383952963L;
 

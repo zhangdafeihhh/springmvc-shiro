@@ -18,7 +18,7 @@ import java.util.Set;
   *
 */
 
-public class DutyRequest extends PageRequest{
+public class DriverTeamRequest extends PageRequest{
 
     private static final long serialVersionUID = -6293630291498667107L;
 

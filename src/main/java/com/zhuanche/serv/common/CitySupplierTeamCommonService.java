@@ -3,9 +3,10 @@ package com.zhuanche.serv.common;
 import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
-import com.zhuanche.request.DutyRequest;
-import com.zhuanche.request.SchCommonRequest;
+import com.zhuanche.request.DriverTeamRequest;
+import com.zhuanche.request.CommonRequest;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.Check;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
@@ -52,6 +53,7 @@ public class CitySupplierTeamCommonService {
     @Autowired
     private CarDriverTeamExMapper carDriverTeamExMapper;
 
+
     /** 
     * @Desc: 处理包含数据权限和查询条件参数整合处理 
     * @param:
@@ -59,7 +61,7 @@ public class CitySupplierTeamCommonService {
     * @Author: lunan
     * @Date: 2018/8/30 
     */ 
-    public synchronized SchCommonRequest paramDeal(SchCommonRequest paramRequest){
+    public synchronized CommonRequest paramDeal(CommonRequest paramRequest){
         if(paramRequest == null){
             return null;
         }
@@ -193,6 +195,17 @@ public class CitySupplierTeamCommonService {
             }
             return carDriverTeamExMapper.queryDriverTeam(cityIds, supplierIds, permOfteamIds);
         }
+    }
+
+    /** 根据车队id查询小组*/
+    public List<CarDriverTeam> queryTeamsById(Integer teamId){
+        if(Check.NuNObj(teamId)){
+            return new ArrayList<>();
+        }
+        DriverTeamRequest driverTeamRequest = new DriverTeamRequest();
+        driverTeamRequest.setpId(teamId);
+        List<CarDriverTeam> carDriverTeams = carDriverTeamExMapper.queryForListByPid(driverTeamRequest);
+        return carDriverTeams;
     }
 
 }
