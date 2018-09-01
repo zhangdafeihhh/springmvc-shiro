@@ -12,25 +12,23 @@
 		</commentGenerator>
 
 		<!-- 数据库连接信息 -->
-		<jdbcConnection driverClass="com.mysql.jdbc.Driver"
-						connectionURL="jdbc:mysql://10.35.0.39:3306/rentcar?useUnicode=true&amp;characterEncoding=UTF-8"
-						userId="dev_sqhc_rentcar" password="dev_BzkmQM%O^U7Dy8X3">
+		<jdbcConnection driverClass="com.mysql.jdbc.Driver"	connectionURL="jdbc:mysql://10.20.10.100:3306/rentcar?useUnicode=true&amp;characterEncoding=UTF-8" userId="sqhc_rentcar" password="BzkmQM%O^U7Dy8X3">
 		</jdbcConnection>
 		<javaTypeResolver>
 			<property name="forceBigDecimals" value="true"/>
 		</javaTypeResolver>
 
 		<!-- po实体类代码位置 -->
-		<javaModelGenerator targetPackage="com.zhuanche.entity.rentcar"	targetProject="D:\\git\\mp\\mp-manage\\src\main\\java">
+		<javaModelGenerator targetPackage="com.zhuanche.entity.rentcar"	targetProject="C:\\Users\\admin\\git\\mp-manage\\src\main\\java">
 			<property name="enableSubPackages" value="true" />
 			<property name="trimStrings" value="true" />
 		</javaModelGenerator>
 		<!-- sql代码的xml映射文件位置 -->
-		<sqlMapGenerator targetPackage="mapper.rentcar" targetProject="D:\\git\\mp\\mp-manage\\src\main\\resources">
+		<sqlMapGenerator targetPackage="mapper.rentcar" targetProject="C:\\Users\\admin\\git\\mp-manage\\src\main\\resources">
 			<property name="enableSubPackages" value="true" />
 		</sqlMapGenerator>
 		<!-- mapper接口位置 -->
-		<javaClientGenerator type="XMLMAPPER" targetPackage="mapper.rentcar" targetProject="D:\\git\\mp\\mp-manage\\src\main\\java">
+		<javaClientGenerator type="XMLMAPPER" targetPackage="mapper.rentcar" targetProject="C:\\Users\\admin\\git\\mp-manage\\src\main\\java">
 			<property name="enableSubPackages" value="true" />
 		</javaClientGenerator>
 
@@ -41,74 +39,12 @@
 			<property name="useActualColumnNames" value="false" />
 			<generatedKey column="id" sqlStatement="MySql" identity="true" />
 		</table> -->
-		<!--<table tableName="car_biz_supplier" domainObjectName="CarBizSupplier"-->
-			<!--enableSelectByExample="false" enableDeleteByExample="false"-->
-			<!--enableCountByExample="false" enableUpdateByExample="false">-->
-			<!--<property name="useActualColumnNames" value="false" />-->
-			<!--<generatedKey column="supplier_id" sqlStatement="MySql" identity="true" />-->
-		<!--</table>-->
-		<!--车辆表-->
-		<!--<table tableName="car_biz_car_info" domainObjectName="CarBizCarInfo"
-			   enableSelectByExample="false" enableDeleteByExample="false"
-			   enableCountByExample="false" enableUpdateByExample="false">
+		<table tableName="car_biz_supplier" domainObjectName="CarBizSupplier"
+			enableSelectByExample="false" enableDeleteByExample="false"
+			enableCountByExample="false" enableUpdateByExample="false">
 			<property name="useActualColumnNames" value="false" />
-			<generatedKey column="car_id" sqlStatement="MySql" identity="true" />
-		</table>-->
-		<!--司机表-->
-		<!--<table tableName="car_biz_driver_info" domainObjectName="CarBizDriverInfo"
-			   enableSelectByExample="false" enableDeleteByExample="false"
-			   enableCountByExample="false" enableUpdateByExample="false">
-			<property name="useActualColumnNames" value="false" />
-			<generatedKey column="driver_id" sqlStatement="MySql" identity="true" />
-		</table>-->
-		<!--司机扩展表-->
-		<!--<table tableName="car_biz_driver_info_detail" domainObjectName="CarBizDriverInfoDetail"
-			   enableSelectByExample="false" enableDeleteByExample="false"
-			   enableCountByExample="false" enableUpdateByExample="false">
-			<property name="useActualColumnNames" value="false" />
-			<generatedKey column="id" sqlStatement="MySql" identity="true" />
-		</table>-->
-		<!--司机帐户表-->
-		<!--<table tableName="car_biz_driver_account" domainObjectName="CarBizDriverAccount"
-			   enableSelectByExample="false" enableDeleteByExample="false"
-			   enableCountByExample="false" enableUpdateByExample="false">
-			<property name="useActualColumnNames" value="false" />
-			<generatedKey column="account_id" sqlStatement="MySql" identity="true" />
-		</table>-->
-		<!--用户关系表-->
-		<!--<table tableName="car_biz_chat_user" domainObjectName="CarBizChatUser"
-			   enableSelectByExample="false" enableDeleteByExample="false"
-			   enableCountByExample="false" enableUpdateByExample="false">
-			<property name="useActualColumnNames" value="false" />
-			<generatedKey column="chat_user_id" sqlStatement="MySql" identity="true" />
-		</table>-->
-		<!--用户动作表-->
-		<table tableName="car_biz_user_action" domainObjectName="CarBizUserAction"
-			   enableSelectByExample="false" enableDeleteByExample="false"
-			   enableCountByExample="false" enableUpdateByExample="false">
-			<property name="useActualColumnNames" value="false" />
-			<generatedKey column="chat_user_id" sqlStatement="MySql" identity="true" />
+			<generatedKey column="supplier_id" sqlStatement="MySql" identity="true" />
 		</table>
-		<!--服务类型表-->
-		<!--<table tableName="car_biz_car_group" domainObjectName="CarBizCarGroup"
-			   enableSelectByExample="false" enableDeleteByExample="false"
-			   enableCountByExample="false" enableUpdateByExample="false">
-			<property name="useActualColumnNames" value="false" />
-			<generatedKey column="group_id" sqlStatement="MySql" identity="true" />
-		</table>-->
-		<!--加盟类型表-->
-		<!--<table tableName="car_biz_cooperation_type" domainObjectName="CarBizCooperationType"
-			   enableSelectByExample="false" enableDeleteByExample="false"
-			   enableCountByExample="false" enableUpdateByExample="false">
-			<property name="useActualColumnNames" value="false" />
-			<generatedKey column="id" sqlStatement="MySql" identity="true" />
-		</table>-->
-		<!--车型表-->
-		<!--<table tableName="car_biz_model" domainObjectName="CarBizModel"
-			   enableSelectByExample="false" enableDeleteByExample="false"
-			   enableCountByExample="false" enableUpdateByExample="false">
-			<property name="useActualColumnNames" value="false" />
-			<generatedKey column="model_id" sqlStatement="MySql" identity="true" />
-		</table>-->
+
 	</context>
 </generatorConfiguration>
