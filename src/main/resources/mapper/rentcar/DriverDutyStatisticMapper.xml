@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.DriverDutyStatisticMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.DriverDutyStatistic" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="driverId" property="driverid" jdbcType="INTEGER" />
+    <result column="licensePlates" property="licenseplates" jdbcType="VARCHAR" />
+    <result column="time" property="time" jdbcType="DATE" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="cityId" property="cityid" jdbcType="INTEGER" />
+    <result column="allTime" property="alltime" jdbcType="DOUBLE" />
+    <result column="zgfTime" property="zgftime" jdbcType="DOUBLE" />
+    <result column="wgfTime" property="wgftime" jdbcType="DOUBLE" />
+    <result column="dutyTime" property="dutytime" jdbcType="DOUBLE" />
+    <result column="forcedTime" property="forcedtime" jdbcType="DOUBLE" />
+    <result column="overTime" property="overtime" jdbcType="DOUBLE" />
+    <result column="supplierId" property="supplierid" jdbcType="INTEGER" />
+    <result column="forcedTime1" property="forcedtime1" jdbcType="DOUBLE" />
+    <result column="forcedTime2" property="forcedtime2" jdbcType="DOUBLE" />
+    <result column="forcedTime3" property="forcedtime3" jdbcType="DOUBLE" />
+    <result column="forcedTime4" property="forcedtime4" jdbcType="DOUBLE" />
+    <result column="carGroupId" property="cargroupid" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, driverId, licensePlates, time, name, phone, cityId, allTime, zgfTime, wgfTime, 
+    dutyTime, forcedTime, overTime, supplierId, forcedTime1, forcedTime2, forcedTime3, 
+    forcedTime4, carGroupId
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from statistic_duty_2018_04
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from statistic_duty_2018_04
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.rentcar.DriverDutyStatistic" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into statistic_duty_2018_04 (driverId, licensePlates, time, 
+      name, phone, cityId, 
+      allTime, zgfTime, wgfTime, 
+      dutyTime, forcedTime, overTime, 
+      supplierId, forcedTime1, forcedTime2, 
+      forcedTime3, forcedTime4, carGroupId
+      )
+    values (#{driverid,jdbcType=INTEGER}, #{licenseplates,jdbcType=VARCHAR}, #{time,jdbcType=DATE}, 
+      #{name,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{cityid,jdbcType=INTEGER}, 
+      #{alltime,jdbcType=DOUBLE}, #{zgftime,jdbcType=DOUBLE}, #{wgftime,jdbcType=DOUBLE}, 
+      #{dutytime,jdbcType=DOUBLE}, #{forcedtime,jdbcType=DOUBLE}, #{overtime,jdbcType=DOUBLE}, 
+      #{supplierid,jdbcType=INTEGER}, #{forcedtime1,jdbcType=DOUBLE}, #{forcedtime2,jdbcType=DOUBLE}, 
+      #{forcedtime3,jdbcType=DOUBLE}, #{forcedtime4,jdbcType=DOUBLE}, #{cargroupid,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.rentcar.DriverDutyStatistic" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into statistic_duty_2018_04
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="driverid != null" >
+        driverId,
+      </if>
+      <if test="licenseplates != null" >
+        licensePlates,
+      </if>
+      <if test="time != null" >
+        time,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="cityid != null" >
+        cityId,
+      </if>
+      <if test="alltime != null" >
+        allTime,
+      </if>
+      <if test="zgftime != null" >
+        zgfTime,
+      </if>
+      <if test="wgftime != null" >
+        wgfTime,
+      </if>
+      <if test="dutytime != null" >
+        dutyTime,
+      </if>
+      <if test="forcedtime != null" >
+        forcedTime,
+      </if>
+      <if test="overtime != null" >
+        overTime,
+      </if>
+      <if test="supplierid != null" >
+        supplierId,
+      </if>
+      <if test="forcedtime1 != null" >
+        forcedTime1,
+      </if>
+      <if test="forcedtime2 != null" >
+        forcedTime2,
+      </if>
+      <if test="forcedtime3 != null" >
+        forcedTime3,
+      </if>
+      <if test="forcedtime4 != null" >
+        forcedTime4,
+      </if>
+      <if test="cargroupid != null" >
+        carGroupId,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="driverid != null" >
+        #{driverid,jdbcType=INTEGER},
+      </if>
+      <if test="licenseplates != null" >
+        #{licenseplates,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null" >
+        #{time,jdbcType=DATE},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="cityid != null" >
+        #{cityid,jdbcType=INTEGER},
+      </if>
+      <if test="alltime != null" >
+        #{alltime,jdbcType=DOUBLE},
+      </if>
+      <if test="zgftime != null" >
+        #{zgftime,jdbcType=DOUBLE},
+      </if>
+      <if test="wgftime != null" >
+        #{wgftime,jdbcType=DOUBLE},
+      </if>
+      <if test="dutytime != null" >
+        #{dutytime,jdbcType=DOUBLE},
+      </if>
+      <if test="forcedtime != null" >
+        #{forcedtime,jdbcType=DOUBLE},
+      </if>
+      <if test="overtime != null" >
+        #{overtime,jdbcType=DOUBLE},
+      </if>
+      <if test="supplierid != null" >
+        #{supplierid,jdbcType=INTEGER},
+      </if>
+      <if test="forcedtime1 != null" >
+        #{forcedtime1,jdbcType=DOUBLE},
+      </if>
+      <if test="forcedtime2 != null" >
+        #{forcedtime2,jdbcType=DOUBLE},
+      </if>
+      <if test="forcedtime3 != null" >
+        #{forcedtime3,jdbcType=DOUBLE},
+      </if>
+      <if test="forcedtime4 != null" >
+        #{forcedtime4,jdbcType=DOUBLE},
+      </if>
+      <if test="cargroupid != null" >
+        #{cargroupid,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.rentcar.DriverDutyStatistic" >
+    update statistic_duty_2018_04
+    <set >
+      <if test="driverid != null" >
+        driverId = #{driverid,jdbcType=INTEGER},
+      </if>
+      <if test="licenseplates != null" >
+        licensePlates = #{licenseplates,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null" >
+        time = #{time,jdbcType=DATE},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="cityid != null" >
+        cityId = #{cityid,jdbcType=INTEGER},
+      </if>
+      <if test="alltime != null" >
+        allTime = #{alltime,jdbcType=DOUBLE},
+      </if>
+      <if test="zgftime != null" >
+        zgfTime = #{zgftime,jdbcType=DOUBLE},
+      </if>
+      <if test="wgftime != null" >
+        wgfTime = #{wgftime,jdbcType=DOUBLE},
+      </if>
+      <if test="dutytime != null" >
+        dutyTime = #{dutytime,jdbcType=DOUBLE},
+      </if>
+      <if test="forcedtime != null" >
+        forcedTime = #{forcedtime,jdbcType=DOUBLE},
+      </if>
+      <if test="overtime != null" >
+        overTime = #{overtime,jdbcType=DOUBLE},
+      </if>
+      <if test="supplierid != null" >
+        supplierId = #{supplierid,jdbcType=INTEGER},
+      </if>
+      <if test="forcedtime1 != null" >
+        forcedTime1 = #{forcedtime1,jdbcType=DOUBLE},
+      </if>
+      <if test="forcedtime2 != null" >
+        forcedTime2 = #{forcedtime2,jdbcType=DOUBLE},
+      </if>
+      <if test="forcedtime3 != null" >
+        forcedTime3 = #{forcedtime3,jdbcType=DOUBLE},
+      </if>
+      <if test="forcedtime4 != null" >
+        forcedTime4 = #{forcedtime4,jdbcType=DOUBLE},
+      </if>
+      <if test="cargroupid != null" >
+        carGroupId = #{cargroupid,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.rentcar.DriverDutyStatistic" >
+    update statistic_duty_2018_04
+    set driverId = #{driverid,jdbcType=INTEGER},
+      licensePlates = #{licenseplates,jdbcType=VARCHAR},
+      time = #{time,jdbcType=DATE},
+      name = #{name,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      cityId = #{cityid,jdbcType=INTEGER},
+      allTime = #{alltime,jdbcType=DOUBLE},
+      zgfTime = #{zgftime,jdbcType=DOUBLE},
+      wgfTime = #{wgftime,jdbcType=DOUBLE},
+      dutyTime = #{dutytime,jdbcType=DOUBLE},
+      forcedTime = #{forcedtime,jdbcType=DOUBLE},
+      overTime = #{overtime,jdbcType=DOUBLE},
+      supplierId = #{supplierid,jdbcType=INTEGER},
+      forcedTime1 = #{forcedtime1,jdbcType=DOUBLE},
+      forcedTime2 = #{forcedtime2,jdbcType=DOUBLE},
+      forcedTime3 = #{forcedtime3,jdbcType=DOUBLE},
+      forcedTime4 = #{forcedtime4,jdbcType=DOUBLE},
+      carGroupId = #{cargroupid,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

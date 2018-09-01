@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.CarRelateGroupExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.CarRelateGroup" >
+    <id column="relation_id" property="relationId" jdbcType="INTEGER" />
+    <result column="group_id" property="groupId" jdbcType="INTEGER" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    relation_id, group_id, driver_id
+  </sql>
+ 	
+ 	<select id="queryByParams" parameterType="com.zhuanche.entity.mdbcarmanage.CarRelateGroup" resultType="com.zhuanche.entity.mdbcarmanage.CarRelateGroup">
+		SELECT 
+		<include refid="Base_Column_List" />
+		FROM car_relate_group 
+		WHERE 1=1
+			<if test="relationId!=null and relationId!=''">
+				AND relation_id = #{relationId}
+			</if>
+			<if test="groupId!=null and groupId!=''">
+				AND group_id in (${groupId})
+			</if>
+			<if test="driverId!=null and driverId!=''">
+				AND driver_id = #{driverId}
+			</if>
+	</select>
+ 	
+ 	<select id="queryDriversByParams" parameterType="com.zhuanche.entity.mdbcarmanage.CarRelateGroup" resultType="java.lang.Integer">
+		SELECT driver_id
+		FROM car_relate_group 
+		WHERE 1=1
+			<if test="relationId!=null and relationId!=''">
+				AND relation_id = #{relationId}
+			</if>
+			<if test="groupId!=null and groupId!=''">
+				AND group_id in (${groupId})
+			</if>
+			<if test="driverId!=null and driverId!=''">
+				AND driver_id = #{driverId}
+			</if>
+	</select>
+ 	
+</mapper>

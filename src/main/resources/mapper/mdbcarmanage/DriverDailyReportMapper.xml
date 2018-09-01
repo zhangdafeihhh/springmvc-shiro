@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.DriverDailyReportMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.DriverDailyReport" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="stat_date" property="statDate" jdbcType="DATE" />
+    <result column="license_plates" property="licensePlates" jdbcType="VARCHAR" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="operation_num" property="operationNum" jdbcType="INTEGER" />
+    <result column="up_online_time" property="upOnlineTime" jdbcType="TIMESTAMP" />
+    <result column="order_time" property="orderTime" jdbcType="DECIMAL" />
+    <result column="service_time" property="serviceTime" jdbcType="DECIMAL" />
+    <result column="online_time" property="onlineTime" jdbcType="DECIMAL" />
+    <result column="actual_pay" property="actualPay" jdbcType="DECIMAL" />
+    <result column="driver_get_pay" property="driverGetPay" jdbcType="DECIMAL" />
+    <result column="driver_out_pay" property="driverOutPay" jdbcType="DECIMAL" />
+    <result column="order_mileage" property="orderMileage" jdbcType="DECIMAL" />
+    <result column="service_mileage" property="serviceMileage" jdbcType="DECIMAL" />
+    <result column="assign_order_num" property="assignOrderNum" jdbcType="INTEGER" />
+    <result column="contend_order_num" property="contendOrderNum" jdbcType="INTEGER" />
+    <result column="platform_order_num" property="platformOrderNum" jdbcType="INTEGER" />
+    <result column="get_plane_num" property="getPlaneNum" jdbcType="INTEGER" />
+    <result column="out_plane_num" property="outPlaneNum" jdbcType="INTEGER" />
+    <result column="car_team_id" property="carTeamId" jdbcType="INTEGER" />
+    <result column="travel_time" property="travelTime" jdbcType="INTEGER" />
+    <result column="travel_mileage" property="travelMileage" jdbcType="DECIMAL" />
+    <result column="travel_time_start" property="travelTimeStart" jdbcType="INTEGER" />
+    <result column="travel_mileage_start" property="travelMileageStart" jdbcType="DECIMAL" />
+    <result column="travel_time_end" property="travelTimeEnd" jdbcType="INTEGER" />
+    <result column="travel_mileage_end" property="travelMileageEnd" jdbcType="DECIMAL" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="forced_time" property="forcedTime" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, stat_date, license_plates, driver_id, driver_name, operation_num, up_online_time, 
+    order_time, service_time, online_time, actual_pay, driver_get_pay, driver_out_pay, 
+    order_mileage, service_mileage, assign_order_num, contend_order_num, platform_order_num, 
+    get_plane_num, out_plane_num, car_team_id, travel_time, travel_mileage, travel_time_start, 
+    travel_mileage_start, travel_time_end, travel_mileage_end, supplier_id, city_id, 
+    forced_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from driver_daily_report
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from driver_daily_report
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDailyReport" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into driver_daily_report (stat_date, license_plates, driver_id, 
+      driver_name, operation_num, up_online_time, 
+      order_time, service_time, online_time, 
+      actual_pay, driver_get_pay, driver_out_pay, 
+      order_mileage, service_mileage, assign_order_num, 
+      contend_order_num, platform_order_num, get_plane_num, 
+      out_plane_num, car_team_id, travel_time, 
+      travel_mileage, travel_time_start, travel_mileage_start, 
+      travel_time_end, travel_mileage_end, supplier_id, 
+      city_id, forced_time)
+    values (#{statDate,jdbcType=DATE}, #{licensePlates,jdbcType=VARCHAR}, #{driverId,jdbcType=INTEGER}, 
+      #{driverName,jdbcType=VARCHAR}, #{operationNum,jdbcType=INTEGER}, #{upOnlineTime,jdbcType=TIMESTAMP}, 
+      #{orderTime,jdbcType=DECIMAL}, #{serviceTime,jdbcType=DECIMAL}, #{onlineTime,jdbcType=DECIMAL}, 
+      #{actualPay,jdbcType=DECIMAL}, #{driverGetPay,jdbcType=DECIMAL}, #{driverOutPay,jdbcType=DECIMAL}, 
+      #{orderMileage,jdbcType=DECIMAL}, #{serviceMileage,jdbcType=DECIMAL}, #{assignOrderNum,jdbcType=INTEGER}, 
+      #{contendOrderNum,jdbcType=INTEGER}, #{platformOrderNum,jdbcType=INTEGER}, #{getPlaneNum,jdbcType=INTEGER}, 
+      #{outPlaneNum,jdbcType=INTEGER}, #{carTeamId,jdbcType=INTEGER}, #{travelTime,jdbcType=INTEGER}, 
+      #{travelMileage,jdbcType=DECIMAL}, #{travelTimeStart,jdbcType=INTEGER}, #{travelMileageStart,jdbcType=DECIMAL}, 
+      #{travelTimeEnd,jdbcType=INTEGER}, #{travelMileageEnd,jdbcType=DECIMAL}, #{supplierId,jdbcType=INTEGER}, 
+      #{cityId,jdbcType=INTEGER}, #{forcedTime,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDailyReport" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into driver_daily_report
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="statDate != null" >
+        stat_date,
+      </if>
+      <if test="licensePlates != null" >
+        license_plates,
+      </if>
+      <if test="driverId != null" >
+        driver_id,
+      </if>
+      <if test="driverName != null" >
+        driver_name,
+      </if>
+      <if test="operationNum != null" >
+        operation_num,
+      </if>
+      <if test="upOnlineTime != null" >
+        up_online_time,
+      </if>
+      <if test="orderTime != null" >
+        order_time,
+      </if>
+      <if test="serviceTime != null" >
+        service_time,
+      </if>
+      <if test="onlineTime != null" >
+        online_time,
+      </if>
+      <if test="actualPay != null" >
+        actual_pay,
+      </if>
+      <if test="driverGetPay != null" >
+        driver_get_pay,
+      </if>
+      <if test="driverOutPay != null" >
+        driver_out_pay,
+      </if>
+      <if test="orderMileage != null" >
+        order_mileage,
+      </if>
+      <if test="serviceMileage != null" >
+        service_mileage,
+      </if>
+      <if test="assignOrderNum != null" >
+        assign_order_num,
+      </if>
+      <if test="contendOrderNum != null" >
+        contend_order_num,
+      </if>
+      <if test="platformOrderNum != null" >
+        platform_order_num,
+      </if>
+      <if test="getPlaneNum != null" >
+        get_plane_num,
+      </if>
+      <if test="outPlaneNum != null" >
+        out_plane_num,
+      </if>
+      <if test="carTeamId != null" >
+        car_team_id,
+      </if>
+      <if test="travelTime != null" >
+        travel_time,
+      </if>
+      <if test="travelMileage != null" >
+        travel_mileage,
+      </if>
+      <if test="travelTimeStart != null" >
+        travel_time_start,
+      </if>
+      <if test="travelMileageStart != null" >
+        travel_mileage_start,
+      </if>
+      <if test="travelTimeEnd != null" >
+        travel_time_end,
+      </if>
+      <if test="travelMileageEnd != null" >
+        travel_mileage_end,
+      </if>
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="cityId != null" >
+        city_id,
+      </if>
+      <if test="forcedTime != null" >
+        forced_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="statDate != null" >
+        #{statDate,jdbcType=DATE},
+      </if>
+      <if test="licensePlates != null" >
+        #{licensePlates,jdbcType=VARCHAR},
+      </if>
+      <if test="driverId != null" >
+        #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="driverName != null" >
+        #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="operationNum != null" >
+        #{operationNum,jdbcType=INTEGER},
+      </if>
+      <if test="upOnlineTime != null" >
+        #{upOnlineTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderTime != null" >
+        #{orderTime,jdbcType=DECIMAL},
+      </if>
+      <if test="serviceTime != null" >
+        #{serviceTime,jdbcType=DECIMAL},
+      </if>
+      <if test="onlineTime != null" >
+        #{onlineTime,jdbcType=DECIMAL},
+      </if>
+      <if test="actualPay != null" >
+        #{actualPay,jdbcType=DECIMAL},
+      </if>
+      <if test="driverGetPay != null" >
+        #{driverGetPay,jdbcType=DECIMAL},
+      </if>
+      <if test="driverOutPay != null" >
+        #{driverOutPay,jdbcType=DECIMAL},
+      </if>
+      <if test="orderMileage != null" >
+        #{orderMileage,jdbcType=DECIMAL},
+      </if>
+      <if test="serviceMileage != null" >
+        #{serviceMileage,jdbcType=DECIMAL},
+      </if>
+      <if test="assignOrderNum != null" >
+        #{assignOrderNum,jdbcType=INTEGER},
+      </if>
+      <if test="contendOrderNum != null" >
+        #{contendOrderNum,jdbcType=INTEGER},
+      </if>
+      <if test="platformOrderNum != null" >
+        #{platformOrderNum,jdbcType=INTEGER},
+      </if>
+      <if test="getPlaneNum != null" >
+        #{getPlaneNum,jdbcType=INTEGER},
+      </if>
+      <if test="outPlaneNum != null" >
+        #{outPlaneNum,jdbcType=INTEGER},
+      </if>
+      <if test="carTeamId != null" >
+        #{carTeamId,jdbcType=INTEGER},
+      </if>
+      <if test="travelTime != null" >
+        #{travelTime,jdbcType=INTEGER},
+      </if>
+      <if test="travelMileage != null" >
+        #{travelMileage,jdbcType=DECIMAL},
+      </if>
+      <if test="travelTimeStart != null" >
+        #{travelTimeStart,jdbcType=INTEGER},
+      </if>
+      <if test="travelMileageStart != null" >
+        #{travelMileageStart,jdbcType=DECIMAL},
+      </if>
+      <if test="travelTimeEnd != null" >
+        #{travelTimeEnd,jdbcType=INTEGER},
+      </if>
+      <if test="travelMileageEnd != null" >
+        #{travelMileageEnd,jdbcType=DECIMAL},
+      </if>
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="cityId != null" >
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="forcedTime != null" >
+        #{forcedTime,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDailyReport" >
+    update driver_daily_report
+    <set >
+      <if test="statDate != null" >
+        stat_date = #{statDate,jdbcType=DATE},
+      </if>
+      <if test="licensePlates != null" >
+        license_plates = #{licensePlates,jdbcType=VARCHAR},
+      </if>
+      <if test="driverId != null" >
+        driver_id = #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="driverName != null" >
+        driver_name = #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="operationNum != null" >
+        operation_num = #{operationNum,jdbcType=INTEGER},
+      </if>
+      <if test="upOnlineTime != null" >
+        up_online_time = #{upOnlineTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderTime != null" >
+        order_time = #{orderTime,jdbcType=DECIMAL},
+      </if>
+      <if test="serviceTime != null" >
+        service_time = #{serviceTime,jdbcType=DECIMAL},
+      </if>
+      <if test="onlineTime != null" >
+        online_time = #{onlineTime,jdbcType=DECIMAL},
+      </if>
+      <if test="actualPay != null" >
+        actual_pay = #{actualPay,jdbcType=DECIMAL},
+      </if>
+      <if test="driverGetPay != null" >
+        driver_get_pay = #{driverGetPay,jdbcType=DECIMAL},
+      </if>
+      <if test="driverOutPay != null" >
+        driver_out_pay = #{driverOutPay,jdbcType=DECIMAL},
+      </if>
+      <if test="orderMileage != null" >
+        order_mileage = #{orderMileage,jdbcType=DECIMAL},
+      </if>
+      <if test="serviceMileage != null" >
+        service_mileage = #{serviceMileage,jdbcType=DECIMAL},
+      </if>
+      <if test="assignOrderNum != null" >
+        assign_order_num = #{assignOrderNum,jdbcType=INTEGER},
+      </if>
+      <if test="contendOrderNum != null" >
+        contend_order_num = #{contendOrderNum,jdbcType=INTEGER},
+      </if>
+      <if test="platformOrderNum != null" >
+        platform_order_num = #{platformOrderNum,jdbcType=INTEGER},
+      </if>
+      <if test="getPlaneNum != null" >
+        get_plane_num = #{getPlaneNum,jdbcType=INTEGER},
+      </if>
+      <if test="outPlaneNum != null" >
+        out_plane_num = #{outPlaneNum,jdbcType=INTEGER},
+      </if>
+      <if test="carTeamId != null" >
+        car_team_id = #{carTeamId,jdbcType=INTEGER},
+      </if>
+      <if test="travelTime != null" >
+        travel_time = #{travelTime,jdbcType=INTEGER},
+      </if>
+      <if test="travelMileage != null" >
+        travel_mileage = #{travelMileage,jdbcType=DECIMAL},
+      </if>
+      <if test="travelTimeStart != null" >
+        travel_time_start = #{travelTimeStart,jdbcType=INTEGER},
+      </if>
+      <if test="travelMileageStart != null" >
+        travel_mileage_start = #{travelMileageStart,jdbcType=DECIMAL},
+      </if>
+      <if test="travelTimeEnd != null" >
+        travel_time_end = #{travelTimeEnd,jdbcType=INTEGER},
+      </if>
+      <if test="travelMileageEnd != null" >
+        travel_mileage_end = #{travelMileageEnd,jdbcType=DECIMAL},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="cityId != null" >
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="forcedTime != null" >
+        forced_time = #{forcedTime,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDailyReport" >
+    update driver_daily_report
+    set stat_date = #{statDate,jdbcType=DATE},
+      license_plates = #{licensePlates,jdbcType=VARCHAR},
+      driver_id = #{driverId,jdbcType=INTEGER},
+      driver_name = #{driverName,jdbcType=VARCHAR},
+      operation_num = #{operationNum,jdbcType=INTEGER},
+      up_online_time = #{upOnlineTime,jdbcType=TIMESTAMP},
+      order_time = #{orderTime,jdbcType=DECIMAL},
+      service_time = #{serviceTime,jdbcType=DECIMAL},
+      online_time = #{onlineTime,jdbcType=DECIMAL},
+      actual_pay = #{actualPay,jdbcType=DECIMAL},
+      driver_get_pay = #{driverGetPay,jdbcType=DECIMAL},
+      driver_out_pay = #{driverOutPay,jdbcType=DECIMAL},
+      order_mileage = #{orderMileage,jdbcType=DECIMAL},
+      service_mileage = #{serviceMileage,jdbcType=DECIMAL},
+      assign_order_num = #{assignOrderNum,jdbcType=INTEGER},
+      contend_order_num = #{contendOrderNum,jdbcType=INTEGER},
+      platform_order_num = #{platformOrderNum,jdbcType=INTEGER},
+      get_plane_num = #{getPlaneNum,jdbcType=INTEGER},
+      out_plane_num = #{outPlaneNum,jdbcType=INTEGER},
+      car_team_id = #{carTeamId,jdbcType=INTEGER},
+      travel_time = #{travelTime,jdbcType=INTEGER},
+      travel_mileage = #{travelMileage,jdbcType=DECIMAL},
+      travel_time_start = #{travelTimeStart,jdbcType=INTEGER},
+      travel_mileage_start = #{travelMileageStart,jdbcType=DECIMAL},
+      travel_time_end = #{travelTimeEnd,jdbcType=INTEGER},
+      travel_mileage_end = #{travelMileageEnd,jdbcType=DECIMAL},
+      supplier_id = #{supplierId,jdbcType=INTEGER},
+      city_id = #{cityId,jdbcType=INTEGER},
+      forced_time = #{forcedTime,jdbcType=DECIMAL}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
