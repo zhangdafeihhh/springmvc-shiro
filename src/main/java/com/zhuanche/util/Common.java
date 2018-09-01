@@ -68,6 +68,12 @@ public class Common {
 	public static String REGULAR_IDCARDNO = "(^[A-Z]{1}[0-9]{6}[\\(]{1}[a-zA-Z0-9]{1}[\\)]{1}$)";
 	public static String REGULAR_IDCARDNO2 = "(^[A-Z]{1}[0-9]{10}$)";
 
+	public static Pattern COMPILE = Pattern.compile("[0-9]*");
+
+    public static Pattern COMPILE1 = Pattern.compile("\\s*|\t|\r|\n");
+
+    public static Pattern COMPILE2 = Pattern.compile("\\s*|\t|\r|\n");
+
 	public static String getPath(HttpServletRequest request) {
 		String uploadDir =request.getSession().getServletContext().getRealPath("/");  
 		File f1 = new File(uploadDir);
@@ -153,32 +159,28 @@ public class Common {
 	   } 
 	   return true; 
 	}
-	
-	//数字
-	public static boolean isNumeric(String str){ 
-	   Pattern pattern = Pattern.compile("[0-9]*"); 
-	   Matcher isNum = pattern.matcher(str);
+
+	public static boolean isNumeric(String str){
+	   Matcher isNum = COMPILE.matcher(str);
 	   if( !isNum.matches() ){
 	       return false; 
 	   } 
 	   return true; 
 	}
-	
+
 	public static String replaceBlank(String str) {
 		String dest = "";
 		if (str!=null) {
-			Pattern p = Pattern.compile("\\s*|\t|\r|\n");
-			Matcher m = p.matcher(str);
+			Matcher m = COMPILE1.matcher(str);
 			dest = m.replaceAll("").toUpperCase();
 		}
 		return dest.replaceAll("\\s*", "");
 	}
-	
+
 	public static String replaceBlankNoUpper(String str) {
 		String dest = "";
 		if (str!=null) {
-			Pattern p = Pattern.compile("\\s*|\t|\r|\n");
-			Matcher m = p.matcher(str);
+			Matcher m = COMPILE2.matcher(str);
 			dest = m.replaceAll("");
 		}
 		return dest.replaceAll("\\s*", "");
@@ -250,8 +252,9 @@ public class Common {
 	 * @return 返回结果 如："2016-09-05 16:06:42";
 	 */
 	public static String timeStamp2Date(String timestampString, String formats) {
-		if (TextUtils.isEmpty(formats))
-			formats = "yyyy-MM-dd HH:mm:ss";
+		if (TextUtils.isEmpty(formats)){
+            formats = "yyyy-MM-dd HH:mm:ss";
+        }
 		Long timestamp = Long.parseLong(timestampString);
 		String date = new SimpleDateFormat(formats, Locale.CHINA).format(new Date(timestamp));
 		return date;
