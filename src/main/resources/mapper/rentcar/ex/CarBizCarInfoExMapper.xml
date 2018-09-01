@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper  
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="mapper.rentcar.ex.CarBizCarInfoExMapper">
+
+    <resultMap id="BasicCarBizCarInfoMap" type="com.zhuanche.entity.rentcar.CarBizCarInfo">
+        <result property="carId" column="car_id" />
+        <result property="supplierId" column="supplier_id" />
+        <result property="licensePlates" column="license_plates" />
+        <result property="brand" column="brand" />
+        <result property="carModelId" column="car_model_id" />
+        <result property="modelDetail" column="model_detail" />
+        <result property="color" column="color" />
+        <result property="engineNo" column="engine_no" />
+        <result property="frameNo" column="frame_no" />
+        <result property="nextInspectDate" column="next_inspect_date" />
+        <result property="nextMaintenanceDate" column="next_maintenance_date" />
+        <result property="rentalExpireDate" column="rental_expire_date" />
+        <result property="memo" column="memo" />
+        <result property="status" column="status" />
+        <result property="createBy" column="create_by" />
+        <result property="updateBy" column="update_by" />
+        <result property="createDate" column="create_date" />
+        <result property="updateDate" column="update_date" />
+        <result property="imageUrl" column="car_photograph"/>
+        <result property="driverid" column="driver_id"/>
+        <result property="nextOperationDate" column="next_operation_date"/>
+        <result property="nextSecurityDate" column="next_security_date"/>
+        <result property="nextClassDate" column="next_class_date"/>
+        <result property="twoLevelMaintenanceDate" column="two_level_maintenance_date"/>
+    </resultMap>
+	<resultMap id="BasicCarBizCarInfoVOMap" type="com.zhuanche.entity.rentcar.CarBizCarInfo" extends="BasicCarBizCarInfoMap">
+		  <result property="cityName" column="cityName" />
+          <result property="cityId" column="city_id" />
+          <result property="createName" column="createName"/>
+          <result property="updateName" column="updateName"/>
+          <result property="modeName" column="modeName" />
+          <result property="supplierName" column="supplierName" />
+          <result property="purchaseDate" column="car_purchase_date" />
+     	  <result property="carPhotographName" column="car_photograph_name" />
+     	  <result property="driverName" column="driverName"/>
+     	  <result property="carryPassengers" column="carryPassengers" />
+		  <result property="vehicleBrand" column="vehicle_brand" />
+		  <result property="clicensePlatesColor" column="clicensePlatesColor" />
+		  <result property="vehicleVINCode" column="vehicle_VIN_code" />
+		  <result property="vehicleRegistrationDate" column="vehicle_registration_date" />
+		  <result property="fuelType" column="fuelType" />
+		  <result property="vehicleEngineDisplacement" column="vehicleEngineDisplacement" />
+		  <result property="vehicleEnginePower" column="vehicle_engine_power" />
+		  <result property="vehicleEngineWheelbase" column="vehicle_engine_wheelbase" />
+		  <result property="transportNumber" column="transportNumber" />
+		  <result property="certificationAuthority" column="certificationAuthority" />
+		  <result property="operatingRegion" column="operatingRegion" />
+		  <result property="transportNumberDateStart" column="transportNumberDateStart" />
+		  <result property="transportNumberDateEnd" column="transportNumberDateEnd" />
+		  <result property="firstDate" column="firstDate" />
+		  <result property="overHaulStatus" column="overhaulStatus" />
+		  <result property="auditingStatus" column="auditingStatus" />
+		  <result property="auditingDate" column="auditing_date" />
+		  <result property="equipmentNumber" column="equipmentNumber" />
+		  <result property="gpsBrand" column="gpsBrand" />
+		  <result property="gpsType" column="gpsType" />
+		  <result property="gpsImei" column="gps_imei" />
+		  <result property="gpsDate" column="gpsDate" />
+		  <result property="vehicleOwner" column="vehicle_owner" />
+		  <result property="vehicleType" column="vehicle_type" />
+		  <result property="vehicleDrivingLicense" column="vehicle_driving_license" />
+		  <result property="cooperationType" column="cooperation_type" />
+	</resultMap>
+
+    <!-- 根据车牌号查询 -->
+    <select id="checkLicensePlates" resultType="java.lang.Integer" parameterType="java.lang.String">
+		SELECT count(*)
+		FROM
+			car_biz_car_info car
+		WHERE 1 = 1 and license_plates = #{licensePlates} and status!=2
+    </select>
+</mapper>
+

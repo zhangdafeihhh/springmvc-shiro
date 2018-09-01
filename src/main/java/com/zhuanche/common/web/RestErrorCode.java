@@ -33,14 +33,30 @@ public final class RestErrorCode{
 	public static final int UNKNOWN_ERROR                   = 999;
 	
 	
-	
+	//-----------------------------------------------用户
+	@ResultMessage("获取验证码太频繁")
+	public static final int GET_MSGCODE_EXCEED           = 1000;
+	@ResultMessage("用户不存在")
+	public static final int USER_NOT_EXIST                      = 1001;
+	@ResultMessage("用户密码不正确")
+	public static final int USER_PASSWORD_WRONG      = 1002;
+	@ResultMessage("用户已被禁用")
+	public static final int USER_INVALID                          = 1003;
+	@ResultMessage("登录失败")
+	public static final int USER_LOGIN_FAILED                = 1004;
+	@ResultMessage("短信验证码已经失效")
+	public static final int MSG_CODE_INVALID                = 1005;
+	@ResultMessage("短信验证码不正确")
+	public static final int MSG_CODE_WRONG                = 1006;
 	
 	
 	
 	
 	//-----------------------------------------------业务参数：司机
-//	@ResultMessage("司机信息不存在")
-//	public static final int DRIVER_NOT_EXIST                                         = 1000;
+	@ResultMessage("没有该手机号的司机，请仔细核对！")
+	public static final int DRIVER_NOT_EXIST = 2000;
+	@ResultMessage("该司机已存在启用的永久停运！")
+	public static final int DRIVER_OUTAGEALL_EXIST = 2001;
 //	@ResultMessage("司机状态不是正常启用状态")
 //	public static final int DRIVER_STATUS_NOT_ENABLED                     = 1001;
 //	@ResultMessage("司机手机号码与身份证号码不符合")
@@ -58,8 +74,8 @@ public final class RestErrorCode{
 	
 	
 	//-----------------------------------------------业务参数：车辆
-//	@ResultMessage("车辆信息不存在")
-//	public static final int BUS_NOT_EXIST                                               = 1100;
+	@ResultMessage("车辆信息不存在")
+	public static final int BUS_NOT_EXIST                                               = 1100;
 //	@ResultMessage("车辆状态不是正常启用状态，被停止运营")
 //	public static final int BUS_STATUS_NOT_ENABLED                           = 1101;
 //	@ResultMessage("此车辆已被其他司机选取，请选择其它车辆")

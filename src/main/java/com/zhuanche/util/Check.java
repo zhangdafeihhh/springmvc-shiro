@@ -4,6 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 检测工具.
@@ -167,6 +169,16 @@ public class Check {
 			return encodeUrl(params, "UTF-8");//如果你再错, 就是混蛋王八蛋了.
 		}
 	}
+
+    public static String replaceBlank(String str) {
+        String dest = "";
+        if (str!=null) {
+            Pattern p = Pattern.compile("\\s*|\t|\r|\n");
+            Matcher m = p.matcher(str);
+            dest = m.replaceAll("").toUpperCase();
+        }
+        return dest.replaceAll("\\s*", "");
+    }
 
 	private Check() {
 		throw new AssertionError("Uninstantiable class");

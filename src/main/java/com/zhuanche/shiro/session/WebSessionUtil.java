@@ -24,6 +24,13 @@ public final class WebSessionUtil {
 			subject.getSession().setAttribute(key, value);
 		}
 	}
+	/**移除会话属性**/
+	public static void removeAttribute(String key) {
+		Subject subject = SecurityUtils.getSubject();
+		if(subject!=null) {
+			subject.getSession().removeAttribute(key);
+		}
+	}
 	/**查询会话属性**/
 	public static Object getAttribute(String key) {
 		Subject subject = SecurityUtils.getSubject();
