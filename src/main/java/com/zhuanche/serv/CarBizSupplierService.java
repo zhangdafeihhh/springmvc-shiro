@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.zhuanche.entity.rentcar.CarBizCity;
+import mapper.rentcar.CarBizCityMapper;
+import mapper.rentcar.CarBizSupplierMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +19,9 @@ import mapper.rentcar.ex.CarBizSupplierExMapper;
 public class CarBizSupplierService{
 	@Autowired
 	private CarBizSupplierExMapper carBizSupplierExMapper;
+
+	@Autowired
+	private CarBizSupplierMapper carBizSupplierMapper;
 
 	/**查询供应商信息**/
 	public Map<Integer, CarBizSupplier> querySupplier( Integer cityId,  Set<Integer> supplierids ){
@@ -33,5 +39,13 @@ public class CarBizSupplierService{
     public CarBizSupplier queryForObject(CarBizSupplier carBizSupplier){
 	    return carBizSupplierExMapper.queryForObject(carBizSupplier);
     }
-	
+
+	/**
+	 * 根据供应商ID查询供应商信息
+	 * @param supplierId
+	 * @return
+	 */
+	public CarBizSupplier selectByPrimaryKey(Integer supplierId){
+		return carBizSupplierMapper.selectByPrimaryKey(supplierId);
+	}
 }

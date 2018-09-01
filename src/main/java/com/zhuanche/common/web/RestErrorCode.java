@@ -53,7 +53,7 @@ public final class RestErrorCode{
 	
 	
 	//-----------------------------------------------业务参数：司机
-	@ResultMessage("没有该手机号的司机，请仔细核对！")
+	@ResultMessage("司机不存在，请仔细核对！")
 	public static final int DRIVER_NOT_EXIST = 2000;
 	@ResultMessage("该司机已存在启用的永久停运！")
 	public static final int DRIVER_OUTAGEALL_EXIST = 2001;
@@ -71,8 +71,27 @@ public final class RestErrorCode{
 //	public static final int DRIVER_CAN_NOT_UNBIND_BUS                    = 1006;
 //	@ResultMessage("无法选取车辆（您目前有服务中的任务）")
 //	public static final int DRIVER_CAN_NOT_BIND_BUS                         = 1007;
-	
-	
+
+	@ResultMessage("司机手机号已存在")
+	public static final int DRIVER_PHONE_EXIST                     = 3001;
+	@ResultMessage("司机身份证已存在")
+	public static final int DRIVER_IDCARNO_EXIST                     = 3002;
+	@ResultMessage("司机手机号不合法")
+	public static final int DRIVER_PHONE_NOT_LEGAL                     = 3003;
+	@ResultMessage("司机身份证不合法")
+	public static final int DRIVER_IDCARNO_NOT_LEGAL                     = 3004;
+	@ResultMessage("银行卡号不合法")
+	public static final int DRIVER_BANK_CARD_NUMBER_NOT_LEGAL                     = 3005;
+	@ResultMessage("银行卡号和银行开户行不能只填写一个")
+	public static final int DRIVER_BANK_CARD_NUMBER_NOT_COMPLETE                     = 3006;
+	@ResultMessage("银行卡号和银行开户行不能只填写一个")
+	public static final int DRIVER_BANK_CARD_NUMBER_EXIST                    = 3007;
+
+	//-----------------------------------------------业务参数：导入文件
+	@ResultMessage("文件异常")
+	public static final int FILE_ERROR                    = 4001;
+	@ResultMessage("导入模板格式错误")
+	public static final int FILE_TRMPLATE_ERROR                    = 4002;
 	//-----------------------------------------------业务参数：车辆
 	@ResultMessage("车辆信息不存在")
 	public static final int BUS_NOT_EXIST                                               = 1100;

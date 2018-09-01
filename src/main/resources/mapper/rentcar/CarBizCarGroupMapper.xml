@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.CarBizCarGroupMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarBizCarGroup" >
+    <id column="group_id" property="groupId" jdbcType="INTEGER" />
+    <result column="group_name" property="groupName" jdbcType="VARCHAR" />
+    <result column="seat_num" property="seatNum" jdbcType="INTEGER" />
+    <result column="rank" property="rank" jdbcType="INTEGER" />
+    <result column="sort" property="sort" jdbcType="INTEGER" />
+    <result column="chartered_status" property="charteredStatus" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="selected_img_url" property="selectedImgUrl" jdbcType="VARCHAR" />
+    <result column="selected_url_new" property="selectedUrlNew" jdbcType="VARCHAR" />
+    <result column="unselected_url_new" property="unselectedUrlNew" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizCarGroup" extends="BaseResultMap" >
+    <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
+    <result column="img_url" property="imgUrl" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    group_id, group_name, seat_num, rank, sort, chartered_status, type, status, create_by, 
+    update_by, create_date, update_date, selected_img_url, selected_url_new, unselected_url_new
+  </sql>
+  <sql id="Blob_Column_List" >
+    memo, img_url
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from car_biz_car_group
+    where group_id = #{groupId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from car_biz_car_group
+    where group_id = #{groupId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.rentcar.CarBizCarGroup" >
+    <selectKey resultType="java.lang.Integer" keyProperty="groupId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_biz_car_group (group_name, seat_num, rank, 
+      sort, chartered_status, type, 
+      status, create_by, update_by, 
+      create_date, update_date, selected_img_url, 
+      selected_url_new, unselected_url_new, memo, 
+      img_url)
+    values (#{groupName,jdbcType=VARCHAR}, #{seatNum,jdbcType=INTEGER}, #{rank,jdbcType=INTEGER}, 
+      #{sort,jdbcType=INTEGER}, #{charteredStatus,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, 
+      #{status,jdbcType=INTEGER}, #{createBy,jdbcType=INTEGER}, #{updateBy,jdbcType=INTEGER}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{selectedImgUrl,jdbcType=VARCHAR}, 
+      #{selectedUrlNew,jdbcType=VARCHAR}, #{unselectedUrlNew,jdbcType=VARCHAR}, #{memo,jdbcType=LONGVARCHAR}, 
+      #{imgUrl,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.rentcar.CarBizCarGroup" >
+    <selectKey resultType="java.lang.Integer" keyProperty="groupId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_biz_car_group
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="groupName != null" >
+        group_name,
+      </if>
+      <if test="seatNum != null" >
+        seat_num,
+      </if>
+      <if test="rank != null" >
+        rank,
+      </if>
+      <if test="sort != null" >
+        sort,
+      </if>
+      <if test="charteredStatus != null" >
+        chartered_status,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="selectedImgUrl != null" >
+        selected_img_url,
+      </if>
+      <if test="selectedUrlNew != null" >
+        selected_url_new,
+      </if>
+      <if test="unselectedUrlNew != null" >
+        unselected_url_new,
+      </if>
+      <if test="memo != null" >
+        memo,
+      </if>
+      <if test="imgUrl != null" >
+        img_url,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="groupName != null" >
+        #{groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="seatNum != null" >
+        #{seatNum,jdbcType=INTEGER},
+      </if>
+      <if test="rank != null" >
+        #{rank,jdbcType=INTEGER},
+      </if>
+      <if test="sort != null" >
+        #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="charteredStatus != null" >
+        #{charteredStatus,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="selectedImgUrl != null" >
+        #{selectedImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="selectedUrlNew != null" >
+        #{selectedUrlNew,jdbcType=VARCHAR},
+      </if>
+      <if test="unselectedUrlNew != null" >
+        #{unselectedUrlNew,jdbcType=VARCHAR},
+      </if>
+      <if test="memo != null" >
+        #{memo,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="imgUrl != null" >
+        #{imgUrl,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.rentcar.CarBizCarGroup" >
+    update car_biz_car_group
+    <set >
+      <if test="groupName != null" >
+        group_name = #{groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="seatNum != null" >
+        seat_num = #{seatNum,jdbcType=INTEGER},
+      </if>
+      <if test="rank != null" >
+        rank = #{rank,jdbcType=INTEGER},
+      </if>
+      <if test="sort != null" >
+        sort = #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="charteredStatus != null" >
+        chartered_status = #{charteredStatus,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="selectedImgUrl != null" >
+        selected_img_url = #{selectedImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="selectedUrlNew != null" >
+        selected_url_new = #{selectedUrlNew,jdbcType=VARCHAR},
+      </if>
+      <if test="unselectedUrlNew != null" >
+        unselected_url_new = #{unselectedUrlNew,jdbcType=VARCHAR},
+      </if>
+      <if test="memo != null" >
+        memo = #{memo,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="imgUrl != null" >
+        img_url = #{imgUrl,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where group_id = #{groupId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zhuanche.entity.rentcar.CarBizCarGroup" >
+    update car_biz_car_group
+    set group_name = #{groupName,jdbcType=VARCHAR},
+      seat_num = #{seatNum,jdbcType=INTEGER},
+      rank = #{rank,jdbcType=INTEGER},
+      sort = #{sort,jdbcType=INTEGER},
+      chartered_status = #{charteredStatus,jdbcType=INTEGER},
+      type = #{type,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      create_by = #{createBy,jdbcType=INTEGER},
+      update_by = #{updateBy,jdbcType=INTEGER},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      selected_img_url = #{selectedImgUrl,jdbcType=VARCHAR},
+      selected_url_new = #{selectedUrlNew,jdbcType=VARCHAR},
+      unselected_url_new = #{unselectedUrlNew,jdbcType=VARCHAR},
+      memo = #{memo,jdbcType=LONGVARCHAR},
+      img_url = #{imgUrl,jdbcType=LONGVARCHAR}
+    where group_id = #{groupId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.rentcar.CarBizCarGroup" >
+    update car_biz_car_group
+    set group_name = #{groupName,jdbcType=VARCHAR},
+      seat_num = #{seatNum,jdbcType=INTEGER},
+      rank = #{rank,jdbcType=INTEGER},
+      sort = #{sort,jdbcType=INTEGER},
+      chartered_status = #{charteredStatus,jdbcType=INTEGER},
+      type = #{type,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      create_by = #{createBy,jdbcType=INTEGER},
+      update_by = #{updateBy,jdbcType=INTEGER},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      selected_img_url = #{selectedImgUrl,jdbcType=VARCHAR},
+      selected_url_new = #{selectedUrlNew,jdbcType=VARCHAR},
+      unselected_url_new = #{unselectedUrlNew,jdbcType=VARCHAR}
+    where group_id = #{groupId,jdbcType=INTEGER}
+  </update>
+</mapper>
