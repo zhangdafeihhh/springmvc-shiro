@@ -15,4 +15,3 @@ src/main/resources/sms.properties
 logs
 mp-manage.properties
 mp-manage.properties.lock
-src/test/java/generatorConfig-rentcar.xml
