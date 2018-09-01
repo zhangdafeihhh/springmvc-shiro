@@ -4,8 +4,8 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="mapper.mdbcarmanage.ex.CarBizDriverInfoTempExMapper">
 
-	<select id="queryForPageObject" parameterType="com.zhuanche.entity.mdbcarmanage.DriverVoEntity"
-		resultType="com.zhuanche.entity.mdbcarmanage.DriverVoEntity">
+	<select id="queryForPageObject" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp"
+		resultType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp">
 		SELECT
 		i.driver_id as driverId,
 		i.account_bank as accountBank,
@@ -171,10 +171,9 @@
 			<![CDATA[ and i.create_date <= #{createDateEnd} ]]> 
  		</if>
 		order by i.update_date desc
-		LIMIT ${offSet},${pagesize}
 	</select>
 
-	<select id="queryForInt" parameterType="com.zhuanche.entity.mdbcarmanage.DriverVoEntity"
+	<select id="queryForInt" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp"
 		resultType="java.lang.Integer">
 		SELECT
 		count(*)
@@ -228,8 +227,8 @@
  		</if>
 	</select>
 
-	<select id="queryForListObject" parameterType="com.zhuanche.entity.mdbcarmanage.DriverVoEntity"
-		resultType="com.zhuanche.entity.mdbcarmanage.DriverVoEntity">
+	<select id="queryForListObject" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp"
+		resultType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp">
 		SELECT
 		i.driver_id as driverId,
 		i.account_bank as accountBank,
@@ -397,8 +396,8 @@
 		order by i.update_date desc
 	</select>
 
-	<select id="queryForObject" parameterType="com.zhuanche.entity.mdbcarmanage.DriverVoEntity"
-		resultType="com.zhuanche.entity.mdbcarmanage.DriverVoEntity">
+	<select id="queryForObject" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp"
+		resultType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp">
 		SELECT
 		i.driver_id as driverId,
 		i.account_bank as
@@ -534,7 +533,7 @@
 	</select>
 	
 	<select id="getDriverByLincesePlates" parameterType="String"
-		resultType="com.zhuanche.entity.mdbcarmanage.DriverVoEntity">
+		resultType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp">
 		SELECT
 		i.driver_id as driverId,
 		i.account_bank as
@@ -667,7 +666,7 @@
 	</select>
 	
 	<select id="getDriverByPhone" parameterType="String"
-		resultType="com.zhuanche.entity.mdbcarmanage.DriverVoEntity">
+		resultType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp">
 		SELECT
 		i.driver_id as driverId,
 		i.account_bank as
@@ -803,13 +802,13 @@
 		LIMIT 1
 	</select>
 
-	<delete id="delete" parameterType="com.zhuanche.entity.mdbcarmanage.DriverVoEntity">
+	<delete id="delete" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp">
 		delete from
 		car_biz_driver_info_temp
 		where driver_id = #{driverId ,jdbcType=BIGINT}
 	</delete>
 
-	<insert id="save" parameterType="com.zhuanche.entity.mdbcarmanage.DriverVoEntity"
+	<insert id="save" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp"
 		useGeneratedKeys="true" keyProperty="driverId">
 		INSERT INTO
 		car_biz_driver_info_temp (
@@ -976,7 +975,7 @@
 		)
 	</insert>
 
-	<update id="update" parameterType="com.zhuanche.entity.mdbcarmanage.DriverVoEntity">
+	<update id="update" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp">
 		UPDATE car_biz_driver_info_temp
 		<set>
 			update_date=now()
@@ -1231,12 +1230,12 @@
 		WHERE driver_id = #{driverId}
 	</update>
 	
-	<select id="selectCountForPhone" resultType="java.lang.Integer" parameterType="com.zhuanche.entity.mdbcarmanage.DriverVoEntity">
+	<select id="selectCountForPhone" resultType="java.lang.Integer" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp">
       SELECT count(1) FROM car_biz_driver_info_temp where phone= #{phone}
 	</select>
 	
 	<!-- 验证车牌号 -->
-	<select id="validateLicensePlates" parameterType="com.zhuanche.entity.mdbcarmanage.DriverVoEntity"
+	<select id="validateLicensePlates" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp"
 		resultType="int">
 		SELECT
 		COUNT(1)
@@ -1248,7 +1247,7 @@
 	</select>
 	
 	<!-- 查询车牌号所在城市，厂商=============（验证车牌号之后）-->
-	<select id="validateCityAndSupplier" parameterType="com.zhuanche.entity.mdbcarmanage.DriverVoEntity"
+	<select id="validateCityAndSupplier" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp"
 		resultType="java.lang.Integer">
 		SELECT
 		COUNT(1)
@@ -1267,7 +1266,7 @@
     </update>
     
     <!-- 验证银行卡卡号 -->
-    <select id="validateBankCardNumber" parameterType="com.zhuanche.entity.mdbcarmanage.DriverVoEntity" 
+    <select id="validateBankCardNumber" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp"
     	resultType="int">
 		select count(1) from car_biz_driver_info_temp  
 		where bank_card_number = #{bankCardNumber}
@@ -1276,7 +1275,7 @@
 		    </if>
 	</select>
 	<!-- 根据身份证号检查司机是否存在 -->
-	<select id="checkIdCardNo"  parameterType="com.zhuanche.entity.mdbcarmanage.DriverVoEntity" resultType="java.lang.Integer">
+	<select id="checkIdCardNo" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp" resultType="java.lang.Integer">
 		select
 		count(*)
 		from car_biz_driver_info_temp

@@ -1,11 +1,11 @@
 package com.zhuanche.serv.mdbcarmanage;
 
-import com.zhuanche.entity.mdbcarmanage.DriverVoEntity;
-import com.zhuanche.entity.rentcar.CarBizModel;
+import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
 import mapper.mdbcarmanage.ex.CarBizDriverInfoTempExMapper;
-import mapper.rentcar.CarBizModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 /**
@@ -22,7 +22,7 @@ public class CarBizDriverInfoTempService {
      * @param licensePlates
      * @return
      */
-    public DriverVoEntity getDriverByLincesePlates(String licensePlates){
+    public CarBizDriverInfoTemp getDriverByLincesePlates(String licensePlates){
         return carBizDriverInfoTempExMapper.getDriverByLincesePlates(licensePlates);
     }
 
@@ -31,7 +31,16 @@ public class CarBizDriverInfoTempService {
      * @param driverVoEntity
      * @return
      */
-    public int update(DriverVoEntity driverVoEntity){
+    public int update(CarBizDriverInfoTemp driverVoEntity){
         return carBizDriverInfoTempExMapper.update(driverVoEntity);
+    }
+
+    /**
+     * 根据条件分页查询
+     * @param driverVoEntity
+     * @return
+     */
+    public List<CarBizDriverInfoTemp> queryForPageObject(CarBizDriverInfoTemp driverVoEntity){
+        return carBizDriverInfoTempExMapper.queryForPageObject(driverVoEntity);
     }
 }

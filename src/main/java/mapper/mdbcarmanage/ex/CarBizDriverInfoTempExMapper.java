@@ -1,10 +1,8 @@
 package mapper.mdbcarmanage.ex;
 
-import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
-import com.zhuanche.entity.mdbcarmanage.DriverVoEntity;
+import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author wzq
@@ -16,14 +14,14 @@ public interface CarBizDriverInfoTempExMapper {
      * @param licensePlates
      * @return
      */
-    DriverVoEntity getDriverByLincesePlates(String licensePlates);
+    CarBizDriverInfoTemp getDriverByLincesePlates(String licensePlates);
 
     /**
      * 更新
      * @param driverVoEntity
      * @return
      */
-    int update(DriverVoEntity driverVoEntity);
+    int update(CarBizDriverInfoTemp driverVoEntity);
 
     /**
      * 根据车牌号查询
@@ -31,4 +29,11 @@ public interface CarBizDriverInfoTempExMapper {
      * @return
      */
     int checkLicensePlates(String params);
+
+    /**
+     * 根据条件分页查询
+     * @param driverVoEntity
+     * @return
+     */
+    List<CarBizDriverInfoTemp> queryForPageObject(CarBizDriverInfoTemp driverVoEntity);
 }

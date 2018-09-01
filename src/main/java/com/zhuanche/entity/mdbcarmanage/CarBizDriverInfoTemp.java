@@ -2,7 +2,7 @@ package com.zhuanche.entity.mdbcarmanage;
 
 
 
-public class DriverVoEntity extends DriverEntity {
+public class CarBizDriverInfoTemp extends BaseDriverInfoTemp {
 
 	private static final long serialVersionUID = 1L;
 
@@ -641,7 +641,7 @@ public class DriverVoEntity extends DriverEntity {
 	
 	@Override  
     public boolean equals(Object obj) {  
-		DriverVoEntity s=(DriverVoEntity)obj;   
+		CarBizDriverInfoTemp s=(CarBizDriverInfoTemp)obj;
 	    return super.getPhone().equals(s.getPhone());   
     }   
     @Override

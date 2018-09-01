@@ -3,7 +3,7 @@ package com.zhuanche.serv.deiver;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
-import com.zhuanche.entity.mdbcarmanage.DriverVoEntity;
+import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.entity.rentcar.CarImportExceptionEntity;
 import com.zhuanche.shiro.constants.BusConstant;
@@ -116,7 +116,7 @@ public class CarBizCarInfoTempService {
     public AjaxResponse update(CarBizCarInfoTemp entity) {
         try{
             carBizCarInfoTempMapper.updateByPrimaryKeySelective(entity);
-            DriverVoEntity carDriver = carBizDriverInfoTempExMapper.getDriverByLincesePlates(entity.getLicensePlates1());
+            CarBizDriverInfoTemp carDriver = carBizDriverInfoTempExMapper.getDriverByLincesePlates(entity.getLicensePlates1());
             if (carDriver != null) {
                 int had = 0;
                 // 车辆是否更改城市，更改，则修改司机

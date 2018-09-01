@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper  
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="mapper.rentcar.ex.CarBizCarGroupExMapper">
+<resultMap type="com.zhuanche.entity.rentcar.CarBizCarGroup" id="CarBizGroupMap">
+	<result property="groupId" column="group_id"/>
+	<result property="groupName" column="group_name"/>
+	<result property="seatNum" column="seat_num"/>
+	<result property="rank" column="rank"/>
+	<result property="sort" column="sort"/>
+	<result property="status" column="status"/>
+	<result property="createBy" column="create_by"/>
+	<result property="updateBy" column="update_by"/>
+	<result property="createDate" column="create_date"/>
+	<result property="updateDate" column="update_date"/>
+	<result property="imgUrl" column="img_url"/>
+	<result property="memo" column="memo"/>
+	<result property="cityname" column="cityname"/>
+	<result property="type" column="type"/>
+</resultMap>
+<resultMap type="com.zhuanche.entity.rentcar.CarBizCity" id="city">
+	 <result property="cityId" column="city_id"/>
+     <result property="cityName" column="city_name"/>
+</resultMap>
+
+	<select id="queryForListObject" resultType="com.zhuanche.entity.rentcar.CarBizCarGroup" parameterType="com.zhuanche.entity.rentcar.CarBizCarGroup">
+		select 
+		group_id as groupId,
+		group_name as groupName,
+		img_url as imgUrl,
+		selected_img_url as selectedImgUrl
+		from car_biz_car_group
+		where status = 1
+			<if test="groupName!=null and groupName!=''">
+				and  group_name like '%${groupName}%'
+			</if>
+			<if test="type!=null and type!=''">
+				and  type = #{type}
+			</if>
+		order by sort
+	</select>
+	<select id="queryForObject" resultType="com.zhuanche.entity.rentcar.CarBizCarGroup" parameterType="com.zhuanche.entity.rentcar.CarBizCarGroup">
+		SELECT
+		g.group_id groupId,
+		g.group_name groupName,
+		g.seat_num seatNum,
+		g.`status` status,
+		g.rank rank,
+		g.sort sort ,
+		g.chartered_status charteredStatus,
+		GROUP_CONCAT(cgc.city_id) AS cityId,
+		GROUP_CONCAT(c.city_name) AS cityname,
+		g.memo,
+		g.create_date createDate,
+		g.update_date updateDate
+	FROM
+		car_biz_car_group g
+	LEFT JOIN car_biz_car_group_city cgc ON g.group_id = cgc.group_id
+	LEFT JOIN car_biz_city c on cgc.city_id = c.city_id
+	GROUP BY g.sort, g.update_date DESC   
+	HAVING 1=1 and  g.group_id  = #{groupId}
+	</select>
+	<!-- 车型类别分页 -->
+  <select id="queryForListObjectHasPage" resultType="com.zhuanche.entity.rentcar.CarBizCarGroup" parameterType="com.zhuanche.entity.rentcar.CarBizCarGroup">
+	SELECT
+		g.group_id groupId,
+		g.group_name groupName,
+		g.seat_num seatNum,
+		g.`status` status,
+		g.rank rank,
+		g.sort sort ,
+		g.chartered_status charteredStatus,
+		GROUP_CONCAT(c.city_id) AS cityId,
+		GROUP_CONCAT(c.city_name) AS cityname
+		
+	FROM
+		car_biz_car_group g
+	LEFT JOIN car_biz_car_group_city cgc ON g.group_id = cgc.group_id
+	LEFT JOIN car_biz_city c on cgc.city_id = c.city_id
+	GROUP BY g.sort, g.update_date DESC   
+	HAVING 1=1
+			<if test="groupName!=null and groupName!=''">
+				and  g.group_name like '%${groupName}%'
+			</if>
+			order by sort desc
+			LIMIT ${offSet},${pagesize} 
+	</select>
+    <select id="queryCount" resultType="java.lang.Integer" parameterType="com.zhuanche.entity.rentcar.CarBizCarGroup">
+	 	select 
+	 		count(1) 
+	 	FROM
+		car_biz_car_group
+	where 
+		    1=1
+			<if test="groupName!=null and groupName!=''">
+				and  group_name like '%${groupName}%'
+			</if>
+	</select>
+	<select id="checkGroupName" resultType="java.lang.Integer" parameterType="com.zhuanche.entity.rentcar.CarBizCarGroup">
+    	SELECT
+			COUNT(1)
+		FROM
+			car_biz_car_group a
+		WHERE
+			a.group_name = #{groupName} and <![CDATA[  t.group_id <>#{groupId}  ]]>
+    </select>
+	<select id="selectCarGroupById" parameterType="java.lang.Integer" resultType="com.zhuanche.entity.rentcar.CarBizCarGroup">
+		SELECT
+			group_id as groupId,
+			car_biz_car_group.create_date as createDate,
+			car_biz_car_group.update_date as updateDate,
+		  	group_name as groupName,
+			seat_num as seatNum,
+			chartered_status as charteredStatus,
+			rank,
+			car_biz_car_group.sort,
+			car_biz_car_group.status,
+			car_biz_car_group.create_by as createBy,
+			car_biz_car_group.update_by as updateBy,
+			car_biz_car_group.memo as memo,
+			u1.name as createName,
+			u2.name as updateName
+		FROM
+			car_biz_car_group
+		LEFT JOIN
+			car_sys_user u1
+		ON
+			car_biz_car_group.create_by=u1.user_id
+		LEFT JOIN
+			car_sys_user u2
+		ON
+			car_biz_car_group.update_by=u2.user_id
+		where 
+			group_id=#{groupId} 
+	</select>
+	<select id="queryForObjectByGroupName" resultType="com.zhuanche.entity.rentcar.CarBizCarGroup" parameterType="com.zhuanche.entity.rentcar.CarBizCarGroup">
+		SELECT
+		g.group_id groupId,
+		g.group_name groupName,
+		g.seat_num seatNum,
+		g.`status` status,
+		g.rank rank,
+		g.sort sort ,
+		g.chartered_status charteredStatus,
+		GROUP_CONCAT(cgc.city_id) AS cityId,
+		GROUP_CONCAT(c.city_name) AS cityname,
+		g.memo,
+		g.create_date createDate,
+		g.update_date updateDate,
+		u1.user_id createBy,
+		u2.user_id updateBy
+	FROM
+		car_biz_car_group g
+	LEFT JOIN car_biz_car_group_city cgc ON g.group_id = cgc.group_id
+	LEFT JOIN car_biz_city c on cgc.city_id = c.city_id
+	LEFT JOIN car_sys_user u1 on u1.user_id = g.create_by
+	LEFT JOIN car_sys_user u2 on u2.user_id = g.update_by
+	where 1=1 and  g.group_name  = #{groupName}
+		<if test="cityId !=null and cityId !=''">
+			and cgc.city_id = #{cityId}
+		</if>
+	GROUP BY g.sort, g.update_date DESC   
+	</select>
+	<select id="queryGroupByCityId" resultType="com.zhuanche.entity.rentcar.CarBizCarGroup" parameterType="com.zhuanche.entity.rentcar.CarBizCarGroup">
+		SELECT
+		g.group_id groupId,
+		g.group_name groupName,
+		g.seat_num seatNum,
+		g.`status` status,
+		g.rank rank,
+		g.sort sort ,
+		g.chartered_status charteredStatus,
+		GROUP_CONCAT(cgc.city_id) AS cityId,
+		GROUP_CONCAT(c.city_name) AS cityname,
+		g.memo,
+		g.create_date createDate,
+		g.update_date updateDate,
+		u1.user_id createBy,
+		u2.user_id updateBy
+	FROM
+		car_biz_car_group g
+	LEFT JOIN car_biz_car_group_city cgc ON g.group_id = cgc.group_id
+	LEFT JOIN car_biz_city c on cgc.city_id = c.city_id
+	LEFT JOIN car_sys_user u1 on u1.user_id = g.create_by
+	LEFT JOIN car_sys_user u2 on u2.user_id = g.update_by
+	where 1=1 and  cgc.city_id  = #{cityId}
+	GROUP BY g.sort, g.update_date DESC   
+	</select>
+	
+	<select id="queryById" resultType="com.zhuanche.entity.rentcar.CarBizCarGroup" parameterType="com.zhuanche.entity.rentcar.CarBizCarGroup">
+		select 
+			g.group_id groupId,
+			g.group_name groupName,
+			g.seat_num seatNum,
+			g.`status` status,
+			g.rank rank,
+			g.sort sort ,
+			g.chartered_status charteredStatus
+		from car_biz_car_group g
+		where 1=1
+		<if test="groupId!=null and groupId!=''">
+			and  g.group_Id = #{groupId}
+		</if>
+	</select>
+
+	<select id="queryGroupNameByGroupId" parameterType="java.lang.Integer" resultType="java.lang.String">
+		SELECT
+			group_name as groupName
+		FROM car_biz_car_group
+		where group_id=#{groupId}
+	</select>
+	
+</mapper>

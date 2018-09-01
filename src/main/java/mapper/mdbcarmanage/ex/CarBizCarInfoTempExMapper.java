@@ -7,14 +7,14 @@ import java.util.Map;
 
 public interface CarBizCarInfoTempExMapper {
     /**
-     * 分页查询
+     * 供应商车辆分页查询
      * @param params 查询条件
      * @return
      */
     List<CarBizCarInfoTemp> queryForPageObject(Map<String,Object> params);
 
     /**
-     *查询详情
+     *供应商车辆查询详情
      * @param params
      * @return
      */
