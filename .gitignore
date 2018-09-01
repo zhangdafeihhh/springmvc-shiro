@@ -15,3 +15,5 @@ src/main/resources/sms.properties
 logs
 mp-manage.properties
 mp-manage.properties.lock
+src/main/resources/application-allenv.properties
+src/test/
