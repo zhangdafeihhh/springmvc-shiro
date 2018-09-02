@@ -1,6 +1,5 @@
 package com.zhuanche.controller.homekanban;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -232,9 +231,9 @@ public class HomeKanBanController {
 		// 数据权限设置
 		SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
 		Set<Integer> supplierIds = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-		visibleAllianceIds = supplierIds.toArray(visibleAllianceIds);
+		visibleAllianceIds = setToArray(supplierIds);
 		Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-		visibleMotocadeIds = teamIds.toArray(visibleMotocadeIds);
+		visibleMotocadeIds = setToArray(teamIds);
 		if(null == visibleAllianceIds || null == visibleMotocadeIds){
 			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 		}
