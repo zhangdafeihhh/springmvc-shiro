@@ -1,6 +1,7 @@
 package com.zhuanche.entity.rentcar;
 
 import com.zhuanche.util.DateUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -128,7 +129,7 @@ public class DriverDutyStatisticParams {
     }
 
     public Integer getPage() {
-        return page;
+        return page == null ? 1 : page ;
     }
 
     public void setPage(Integer page) {
@@ -136,7 +137,7 @@ public class DriverDutyStatisticParams {
     }
 
     public Integer getPageSize() {
-        return pageSize;
+        return pageSize  == null ? 30 : pageSize;
     }
 
     public void setPageSize(Integer pageSize) {
@@ -239,13 +240,13 @@ public class DriverDutyStatisticParams {
         this.cities = cities;
     }
 
-    public DriverDutyStatisticParams(String cityId, String supplierId, String teamId, String groupIds, String name, String driverId, String phone, String licensePlates, String startDate, String endDate, String startTime, String endTime, Integer page, Integer pageSize) {
+    public DriverDutyStatisticParams(String cityId, String supplierId, String teamId, String groupIds, String name, String driverId, String phone, String licensePlates, String startTime, String endTime, Integer page, Integer pageSize) {
         this.cityId = cityId;
         this.supplierId = supplierId;
         this.teamId = teamId;
         this.groupIds = groupIds;
         this.name = name;
-        this.driverIds = "'"+ driverId + "'";
+        this.driverIds = StringUtils.isNotEmpty(driverId) ? "'"+ driverId + "'" : null;
         this.driverId = driverId;
         this.phone = phone;
         this.licensePlates = licensePlates;
@@ -266,7 +267,7 @@ public class DriverDutyStatisticParams {
         this.yyyyMMdd = sdf2.format(tableDate);
     }
 
-    public DriverDutyStatisticParams(String cityId) {
+    public DriverDutyStatisticParams() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd");
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy_MM_dd");
         SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");

@@ -14,4 +14,17 @@ public interface DriverDutyStatisticExMapper {
      */
     List<DriverDutyStatistic> queryForListObject(DriverDutyStatisticParams params);
 
+    /**
+     * 按月度统计
+     * @param params
+     * @return
+     */
+    List<DriverDutyStatistic> queryDriverMonthDutyList(DriverDutyStatisticParams params);
+
+    /**
+     * 司机详情查询
+     * @param params
+     * @return
+     */
+    List<DriverDutyStatistic> queryDriverDutyHalfByDriverId(DriverDutyStatisticParams params);
 }

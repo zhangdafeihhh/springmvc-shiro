@@ -88,7 +88,7 @@ public class DriverDailyReportController extends DriverQueryController {
 		int total = 0;
 		//判断权限   如果司机id为空为查询列表页
 		if(StringUtils.isEmpty(driverDailyReportBean.getDriverIds())){
-			String driverList = null;
+			String driverList = "";
 			//如果页面输入了小组id
 			if(StringUtils.isNotEmpty(driverDailyReportBean.getGroupIds())){
 				//通过小组id查询司机id, 如果用户
@@ -254,40 +254,44 @@ public class DriverDailyReportController extends DriverQueryController {
 			
 			Map<String, Object> resultMap = JSONObject.parseObject(result, HashMap.class);
 			if (null == resultMap || !String.valueOf(resultMap.get("code")).equals("0")) {
-				log.info("查询接口【/driverIncome/getDriverIncome】返回异常.");
+				log.info("查询接口【/driverIncome/getDriverIncome】返回异常,code:"+String.valueOf(resultMap.get("code")));
+				return;
 			}
 			
 			String reData = String.valueOf(resultMap.get("data"));
 			if (StringUtils.isBlank(reData)) {
 				log.info("查询接口【/driverIncome/getDriverIncome】返回data为空.");
+				return;
 			}
 			
 			Map dataMap = JSONObject.parseObject(String.valueOf(resultMap.get("data")), Map.class);
-			String driverIncome = String.valueOf(dataMap.get("driverIncome"));
-			if (StringUtils.isBlank(driverIncome)) {
-				log.info("查询接口【/driverIncome/getDriverIncome】返回driverIncome为空.");
+			if (dataMap!=null){
+				String driverIncome = String.valueOf(dataMap.get("driverIncome"));
+				if (StringUtils.isBlank(driverIncome)) {
+					log.info("查询接口【/driverIncome/getDriverIncome】返回driverIncome为空.");
+				}
+
+				JSONObject jsonObject = JSONObject.parseObject(driverIncome);
+
+				// 当日完成订单量
+				Integer orderCounts= Integer.valueOf(String.valueOf(jsonObject.get("orderCounts")));
+				ddre.setOperationNum(orderCounts);
+				// 当日营业额
+				BigDecimal todayIncomeAmount = new BigDecimal(String.valueOf(jsonObject.get("todayIncomeAmount")));
+				ddre.setActualPay(todayIncomeAmount.doubleValue());
+				// 当日载客里程
+				BigDecimal todayTravelMileage = new BigDecimal(String.valueOf(jsonObject.get("todayTravelMileage")));
+				ddre.setServiceMileage(todayTravelMileage.doubleValue());
+				// 当日司机代付价外费
+				BigDecimal todayOtherFee = new BigDecimal(String.valueOf(jsonObject.get("todayOtherFee")));
+				ddre.setDriverOutPay(todayOtherFee.doubleValue());
+				// 当日司机代收
+				BigDecimal todayDriverPay = new BigDecimal(String.valueOf(jsonObject.get("todayDriverPay")));
 			}
-			
-			JSONObject jsonObject = JSONObject.parseObject(driverIncome);
-			
-			// 当日完成订单量
-			Integer orderCounts= Integer.valueOf(String.valueOf(jsonObject.get("orderCounts")));
-			ddre.setOperationNum(orderCounts);
-			// 当日营业额
-			BigDecimal todayIncomeAmount = new BigDecimal(String.valueOf(jsonObject.get("todayIncomeAmount")));
-			ddre.setActualPay(todayIncomeAmount.doubleValue());
-			// 当日载客里程
-			BigDecimal todayTravelMileage = new BigDecimal(String.valueOf(jsonObject.get("todayTravelMileage")));
-			ddre.setServiceMileage(todayTravelMileage.doubleValue());
-			// 当日司机代付价外费
-			BigDecimal todayOtherFee = new BigDecimal(String.valueOf(jsonObject.get("todayOtherFee")));
-			ddre.setDriverOutPay(todayOtherFee.doubleValue());
-			// 当日司机代收
-			BigDecimal todayDriverPay = new BigDecimal(String.valueOf(jsonObject.get("todayDriverPay")));
 		} catch (RestClientException e) {
-			log.info("查询接口【/driverIncome/getDriverIncome】返回异常.");
+			log.error("查询接口【/driverIncome/getDriverIncome】返回异常.",e);
 		} catch (NumberFormatException e) {
-			log.info("查询接口【/driverIncome/getDriverIncome】返回异常.");
+			log.error("查询接口【/driverIncome/getDriverIncome】返回异常.",e);
 		}
 	}
 
