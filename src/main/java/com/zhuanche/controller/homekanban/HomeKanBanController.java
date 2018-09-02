@@ -284,7 +284,23 @@ public class HomeKanBanController {
 		paramMap.put("motorcadeId", motorcadeId);
 		paramMap.put("visibleAllianceIds", visibleAllianceIds);
 		paramMap.put("visibleMotocadeIds", visibleMotocadeIds);
-		return parseResult(coreIndicatorsUrl, paramMap);
+		try {
+			String jsonString = JSON.toJSONString(paramMap);
+			String result = HttpClientUtil.buildPostRequest(coreIndicatorsUrl).setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
+			JSONObject job = JSON.parseObject(result);
+			if (job == null) {
+				logger.error("调用大数据" + coreIndicatorsUrl + "返回结果为null");
+				return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+			}
+			if (!job.getString("code").equals("0")) {
+				return AjaxResponse.fail(Integer.parseInt(job.getString("code")), job.getString("message"));
+			}
+			JSONObject resultArray = JSON.parseObject(job.getString("result"));
+			return AjaxResponse.success(resultArray);
+		} catch (HttpException e) {
+			logger.error("调用大数据" + coreIndicatorsUrl + "异常", e);
+			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		}
 	}
 
 	/** 调用大数据接口获取数据  **/
