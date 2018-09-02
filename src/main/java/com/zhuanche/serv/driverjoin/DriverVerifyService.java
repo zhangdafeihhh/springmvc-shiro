@@ -61,8 +61,10 @@ public class DriverVerifyService {
 		if (!WebSessionUtil.isSupperAdmin()) {// 非超级管理员
 			// 获取当前登录用户信息
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
-			cityIdsForAuth = currentLoginUser.getCityIds();
-			supplierIdsForAuth = currentLoginUser.getSupplierIds();
+			if(null != currentLoginUser){
+				cityIdsForAuth = currentLoginUser.getCityIds();
+				supplierIdsForAuth = currentLoginUser.getSupplierIds();
+			}
 			if (cityIdsForAuth.size() == 0 || cityId != null && !cityIdsForAuth.contains(cityId)) {
 				return null;
 			}

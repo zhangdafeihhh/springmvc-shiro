@@ -115,7 +115,7 @@
 		</if>
 	</trim>
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" >
+  <select id="queryDriverVerifyList" resultMap="BaseResultMap" >
     select 
     <include refid="queryDriverVerifyListColumn" />
     from driver_verify
