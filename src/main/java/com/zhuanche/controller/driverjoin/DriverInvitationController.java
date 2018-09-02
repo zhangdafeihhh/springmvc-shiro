@@ -43,7 +43,7 @@ public class DriverInvitationController {
 		String shortUrl  = null;
 		try {
 			shortUrl = HttpClientUtil.buildGetRequest(SINA_API + url).setLimitResult(1).execute();
-			logger.info("供应商短链接生成,supplierId={},shortUrl={}",supplierId,shortUrl);
+			logger.info("供应商短链接生成,supplierId={},result={}",supplierId,shortUrl);
 		} catch (HttpException e) {
 			logger.error("供应商短链接生成异常",e);
 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
