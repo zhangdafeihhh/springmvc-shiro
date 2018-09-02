@@ -119,7 +119,6 @@
     select 
     <include refid="queryDriverVerifyListColumn" />
     from driver_verify
-    where 1=1
     <include refid="queryDriverVerifyListWhereColumn" />
     order by UPDATE_AT desc
   </select>

@@ -295,8 +295,8 @@ public class HomeKanBanController {
 			if (!job.getString("code").equals("0")) {
 				return AjaxResponse.fail(Integer.parseInt(job.getString("code")), job.getString("message"));
 			}
-			JSONObject resultArray = JSON.parseObject(job.getString("result"));
-			return AjaxResponse.success(resultArray);
+			JSONObject jobj = JSON.parseObject(job.getString("result"));
+			return AjaxResponse.success(jobj);
 		} catch (HttpException e) {
 			logger.error("调用大数据" + coreIndicatorsUrl + "异常", e);
 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);

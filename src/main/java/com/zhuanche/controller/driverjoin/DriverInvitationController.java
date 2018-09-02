@@ -7,6 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -46,6 +48,7 @@ public class DriverInvitationController {
 			logger.error("供应商短链接生成异常",e);
 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 		}
-		return AjaxResponse.success(shortUrl);
+		JSONArray parseArray = JSON.parseArray((shortUrl));
+		return AjaxResponse.success(parseArray);
 	}
 }
