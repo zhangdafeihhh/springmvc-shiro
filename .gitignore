@@ -20,4 +20,4 @@ src/test/java/GeneratorMySql.java
 src/test/java/generatorConfig-rentcar.xml
 src/test/java/generatorConfig-mdbcarmanage.xml
 src/test/java/generatorConfig-driver.xml
-src/test/java/com/zhuanche/BaseFunctionalTestCase.java
+src/test/java/com/zhuanche/dao/BaseFunctionalTestCase.java
