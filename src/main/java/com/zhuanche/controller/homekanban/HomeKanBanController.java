@@ -1,10 +1,12 @@
 package com.zhuanche.controller.homekanban;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
+import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.web.AjaxResponse;
@@ -35,22 +38,22 @@ public class HomeKanBanController {
 
 	private static final Logger logger = LoggerFactory.getLogger(HomeKanBanController.class);
 
-	@Value("statistics.operating.vehicle.url")
+	@Value("${statistics.operating.vehicle.url}")
 	String operatingVehicleUrl;
 
-	@Value("statistics.order.url")
+	@Value("${statistics.order.url}")
 	String statisticsOrderUrl;
 
-	@Value("statistics.evaluation.url")
+	@Value("${statistics.evaluation.url}")
 	String statisticsEvaluationUrl;
 
-	@Value("statistics.online.time.url")
+	@Value("${statistics.online.time.url}")
 	String onlineTimeUrl;
 
-	@Value("statistics.vehicle.top.url")
+	@Value("${statistics.vehicle.top.url}")
 	String vehicleTopUrl;
 
-	@Value("statistics.core.indicators.url")
+	@Value("${statistics.core.indicators.url}")
 	String coreIndicatorsUrl;
 
 	/** 日均运营车辆统计查询接口 **/
@@ -76,6 +79,7 @@ public class HomeKanBanController {
 		Set<Integer> supplierIds = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
 		visibleAllianceIds = setToArray(supplierIds);
 		Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
+		visibleAllianceIds = setToArray(supplierIds);
 		visibleMotocadeIds = setToArray(teamIds);
 		if(null == visibleAllianceIds || null == visibleMotocadeIds){
 			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
@@ -287,16 +291,18 @@ public class HomeKanBanController {
 	/** 调用大数据接口获取数据  **/
 	private AjaxResponse parseResult(String url, Map<String, Object> paramMap) {
 		try {
-			String result = HttpClientUtil.buildPostRequest(url).addParams(paramMap).execute();
+			String jsonString = JSON.toJSONString(paramMap);
+			String result = HttpClientUtil.buildPostRequest(url).setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
 			JSONObject job = JSON.parseObject(result);
 			if (job == null) {
 				logger.error("调用大数据" + url + "返回结果为null");
 				return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 			}
-			if (!job.getString("code").equals(0)) {
+			if (!job.getString("code").equals("0")) {
 				return AjaxResponse.fail(Integer.parseInt(job.getString("code")), job.getString("message"));
 			}
-			return AjaxResponse.success(job.getString("result"));
+			JSONArray resultArray = JSON.parseArray(job.getString("result"));
+			return AjaxResponse.success(resultArray);
 		} catch (HttpException e) {
 			logger.error("调用大数据" + url + "异常", e);
 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
@@ -315,5 +321,21 @@ public class HomeKanBanController {
 		}
 		return stra;
 	}
-	
+	public static void main(String[] args) {
+		Map<String, Object> paramMap = Maps.newHashMap();
+		paramMap.put("startDate", "2018-08-21");
+		paramMap.put("endDate", "2018-08-28");
+		paramMap.put("allianceId", "");
+		paramMap.put("motorcadeId", "");
+		paramMap.put("visibleAllianceIds", new String[]{"1", "3", "5"});
+		paramMap.put("visibleMotocadeIds", new String[]{"1", "3", "5"});
+		String jsonString = JSON.toJSONString(paramMap);
+		System.out.println(jsonString);
+		try {
+			String result = HttpClientUtil.buildPostRequest("http://test-inside-bigdata-saas-data.01zhuanche.com/dayMotionCar/statistic").setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
+			System.out.println(result);
+		} catch (HttpException e) {
+			e.printStackTrace();
+		}
+	}
 }
