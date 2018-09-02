@@ -25,8 +25,9 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 
 /**
- * 首页看板数据提供 ClassName: IndexController.java Date: 2018年8月31日
- * 
+ * 首页看板数据提供 
+ * ClassName: HomeKanBanController.java 
+ * Date: 2018年8月31日
  * @author xinchun
  * @version 1.0
  * @since JDK 1.8.0_161

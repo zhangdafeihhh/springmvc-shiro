@@ -17,8 +17,9 @@ import com.zhuanche.dto.driver.DriverVerifyDto;
 import com.zhuanche.serv.driverjoin.DriverVerifyService;
 
 /**
- * 司机加盟注册 ClassName: DriverVerifyController.java Date: 2018年8月29日
- * 
+ * 司机加盟注册 
+ * ClassName: DriverVerifyController.java 
+ * Date: 2018年8月29日
  * @author xinchun
  * @version 1.0
  * @since JDK 1.8.0_161
