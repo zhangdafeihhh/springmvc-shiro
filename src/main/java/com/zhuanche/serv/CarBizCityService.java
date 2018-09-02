@@ -37,8 +37,12 @@ public class CarBizCityService{
 		return result;
 	}
 
-    public CarBizCity selectByPrimaryKey(Integer cityId){
-	    return carBizCityMapper.selectByPrimaryKey(cityId);
-    }
-	
+	/**
+	 * 根据城市ID，查询城市名称
+	 * @param cityId
+	 * @return
+	 */
+	public CarBizCity selectByPrimaryKey(Integer cityId){
+		return carBizCityMapper.selectByPrimaryKey(cityId);
+	}
 }
