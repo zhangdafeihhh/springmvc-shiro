@@ -939,7 +939,7 @@
   </select>
 
 
-  <select id="selectcarnum" resultType="com.zhuanche.web.entity.car.CarInfoVo" parameterType="map">
+  <select id="selectcarnum" resultType="com.zhuanche.entity.rentcar.CarInfoVo" parameterType="map">
     SELECT
     car_id carId,
     license_plates licensePlates

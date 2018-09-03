@@ -1,8 +1,7 @@
 package com.zhuanche.serv.rentcar.impl;
 
-import com.zhuanche.entity.rentcar.CarImportExceptionEntity;
-import com.zhuanche.entity.rentcar.CarInfo;
-import com.zhuanche.entity.rentcar.CarInfoVo;
+import com.google.common.collect.Sets;
+import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.serv.rentcar.CarInfoService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -21,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 
 import javax.annotation.Resource;
@@ -35,6 +35,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Service
 public class CarInfoServiceImpl implements CarInfoService {
     private static Logger log = LoggerFactory.getLogger(CarInfoServiceImpl.class);
 
@@ -59,14 +60,14 @@ public class CarInfoServiceImpl implements CarInfoService {
     @Autowired
     private CarBizCityExMapper cityDao;
 
-    @Resource(name="carBizModelDao")
-    private CarBizModelDao carBizModelDao;
-
-    @Autowired
-    private IOrderDictionaryService <OrderDictionaryEntity> orderDictionaryService;
-
-    @Autowired
-    private UserService userService;
+//    @Resource(name="carBizModelDao")
+//    private CarBizModelDao carBizModelDao;
+//
+//    @Autowired
+//    private IOrderDictionaryService <OrderDictionaryEntity> orderDictionaryService;
+//
+//    @Autowired
+//    private UserService userService;
 
 
 
@@ -167,10 +168,7 @@ public class CarInfoServiceImpl implements CarInfoService {
         String fileName = params.getFileName();
         String path  = Common.getPath(request);
         String dirPath = path+params.getFileName();
-//		String dirPath = request.getSession().getServletContext()
-//				.getRealPath("/upload/" + params.getFileName());
         File DRIVERINFO = new File(dirPath);
-        // String resStr = "";
         try {
             InputStream is = new FileInputStream(DRIVERINFO);
             Workbook workbook = null;
@@ -550,32 +548,32 @@ public class CarInfoServiceImpl implements CarInfoService {
                             } else {
                                 String license = cellValue.getStringValue();
                                 license = Common.replaceBlank(license);
-                                // 判断车牌号 是否存在
+                                // TODO 判断车牌号 是否存在
                                 if (license.length() == 7||license.length() == 8) {
-                                    OrderDictionaryEntity orderDictionaryEntity = new OrderDictionaryEntity();
-                                    orderDictionaryEntity.setDicId(17);
-                                    OrderDictionaryEntity orderDictionaryEntity1 = orderDictionaryService.queryOrderDictionary(orderDictionaryEntity);
-                                    String strValue = orderDictionaryEntity1.getDicValue();
-                                    Integer intValue = Integer.valueOf(strValue.replace(".00", ""));
-                                    log.info("通过车管后台的参数--17--判断是否执行更新已有车牌号信息--1 更新 2不更新==车牌号=="+license);
-                                    if(intValue!=null&&intValue.equals(2)){
-                                        int n = carInfoExMapper.checkLicensePlates(license);
-                                        if (n > 0) {
-                                            CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                            returnVO.setLicensePlates(licensePlates);
-                                            returnVO.setReson("第" + (rowIx + 1)
-                                                    + "行数据，第" + (colIx + 1)
-                                                    + "列 【车牌号】已存在");
-                                            listException.add(returnVO);
-                                            isTrue = false;
-                                        } else {
-                                            carBizCarInfo.setLicensePlates(license);
-                                            carBizCarInfo.setLicensePlates1(license);
-                                        }
-                                    }else{
-                                        carBizCarInfo.setLicensePlates(license);
-                                        carBizCarInfo.setLicensePlates1(license);
-                                    }
+//                                    OrderDictionaryEntity orderDictionaryEntity = new OrderDictionaryEntity();
+//                                    orderDictionaryEntity.setDicId(17);
+//                                    OrderDictionaryEntity orderDictionaryEntity1 = orderDictionaryService.queryOrderDictionary(orderDictionaryEntity);
+//                                    String strValue = orderDictionaryEntity1.getDicValue();
+//                                    Integer intValue = Integer.valueOf(strValue.replace(".00", ""));
+//                                    log.info("通过车管后台的参数--17--判断是否执行更新已有车牌号信息--1 更新 2不更新==车牌号=="+license);
+//                                    if(intValue!=null&&intValue.equals(2)){
+//                                        int n = carInfoExMapper.checkLicensePlates(license);
+//                                        if (n > 0) {
+//                                            CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                            returnVO.setLicensePlates(licensePlates);
+//                                            returnVO.setReson("第" + (rowIx + 1)
+//                                                    + "行数据，第" + (colIx + 1)
+//                                                    + "列 【车牌号】已存在");
+//                                            listException.add(returnVO);
+//                                            isTrue = false;
+//                                        } else {
+//                                            carBizCarInfo.setLicensePlates(license);
+//                                            carBizCarInfo.setLicensePlates1(license);
+//                                        }
+//                                    }else{
+//                                        carBizCarInfo.setLicensePlates(license);
+//                                        carBizCarInfo.setLicensePlates1(license);
+//                                    }
                                 } else {
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                                     returnVO.setLicensePlates(licensePlates);
@@ -668,9 +666,9 @@ public class CarInfoServiceImpl implements CarInfoService {
                                         listException.add(returnVO);
                                         isTrue = false;
                                     } else {
-                                        SupplierEntity supplierEntity = new SupplierEntity();
-                                        supplierEntity.setCities(String.valueOf(cityId));
-                                        List<SupplierEntity> supplierList = carBizSupplierExMapper.queryForListObject(supplierEntity);
+                                        Set<Integer> cityIds = Sets.newHashSet();
+                                        cityIds.add(cityId);
+                                        List<CarBizSupplier> supplierList = carBizSupplierExMapper.querySuppliers(cityId, null);
                                         Boolean fal = false;
                                         if(supplierList!=null&&supplierList.size()>0){
                                             for(int i=0;i<supplierList.size();i++){
@@ -706,19 +704,19 @@ public class CarInfoServiceImpl implements CarInfoService {
                                 listException.add(returnVO);
                                 isTrue = false;
                             } else {
-                                // 判断车型是否存在
-                                Integer carModelId = carBizModelDao.queryCarModelByCarModelName(cellValue.getStringValue());
-                                if (carModelId == null) {
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setLicensePlates(licensePlates);
-                                    returnVO.setReson("第" + (rowIx + 1)
-                                            + "行数据，第" + (colIx + 1)
-                                            + "列 【车型】无效");
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                } else {
-                                    carBizCarInfo.setCarModelId(carModelId);
-                                }
+                                // TODO 判断车型是否存在
+//                                Integer carModelId = carBizModelDao.queryCarModelByCarModelName(cellValue.getStringValue());
+//                                if (carModelId == null) {
+//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                    returnVO.setLicensePlates(licensePlates);
+//                                    returnVO.setReson("第" + (rowIx + 1)
+//                                            + "行数据，第" + (colIx + 1)
+//                                            + "列 【车型】无效");
+//                                    listException.add(returnVO);
+//                                    isTrue = false;
+//                                } else {
+//                                    carBizCarInfo.setCarModelId(carModelId);
+//                                }
                             }
                             break;
                         // 具体车型
@@ -956,7 +954,7 @@ public class CarInfoServiceImpl implements CarInfoService {
                                             isTrue = false;
                                         } else {
                                             d = dateFormat.format(dateFormat.parse(d));
-                                            carBizCarInfo.setNextClassDate(d);
+                                            carBizCarInfo.setNextClassDate(dateFormat.parse(d));
                                         }
                                     } else {
                                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -1014,7 +1012,7 @@ public class CarInfoServiceImpl implements CarInfoService {
                                             isTrue = false;
                                         } else {
                                             d = dateFormat.format(dateFormat.parse(d));
-                                            carBizCarInfo.setNextOperationDate(d);
+                                            carBizCarInfo.setNextOperationDate(dateFormat.parse(d));
                                         }
                                     } else {
                                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -1072,7 +1070,7 @@ public class CarInfoServiceImpl implements CarInfoService {
                                             isTrue = false;
                                         } else {
                                             d = dateFormat.format(dateFormat.parse(d));
-                                            carBizCarInfo.setNextSecurityDate(d);
+                                            carBizCarInfo.setNextSecurityDate(dateFormat.parse(d));
                                         }
                                     } else {
                                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -1129,7 +1127,7 @@ public class CarInfoServiceImpl implements CarInfoService {
                                             isTrue = false;
                                         } else {
                                             d = dateFormat.format(dateFormat.parse(d));
-                                            carBizCarInfo.setTwoLevelMaintenanceDate(d);
+                                            carBizCarInfo.setTwoLevelMaintenanceDate(dateFormat.parse(d));
                                         }
                                     } else {
                                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -2198,8 +2196,7 @@ public class CarInfoServiceImpl implements CarInfoService {
         Workbook wb = new XSSFWorkbook(io);
         String cities = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getCityIds(), ",");
         String suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds(), ",");
-//        String teamId = ToolUtils.getSecurityUser().getTeamId();
-        String teamId = WebSessionUtil.getCurrentLoginUser().getTeaids;
+        String teamIds = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getTeamIds(), ",");
         String carModelIds = "";
         if(!"".equals(params.getCities())&&params.getCities()!=null&&!"null".equals(params.getCities())){
             cities = params.getCities().replace(";", ",");
@@ -2213,7 +2210,7 @@ public class CarInfoServiceImpl implements CarInfoService {
         params.setCarModelIds(carModelIds);
         params.setSupplierIds(suppliers);
         params.setCities(cities);
-        params.setTeamIds(teamId);
+        params.setTeamIds(teamIds);
         List<CarInfo> list = carInfoExMapper.selectListNoPage(params);
 
         if(list != null && list.size()>0){
@@ -2221,22 +2218,23 @@ public class CarInfoServiceImpl implements CarInfoService {
             Cell cell = null;
             int i=0;
             for(CarInfo s:list){
-                if(s.getCreateBy()!=null && !s.getCreateBy().equals("")){
-                    User user = new User();
-                    user.setUserId(params.getCreateBy());
-                    User us = userService.getUserInfo(user);
-                    if(us!=null){
-                        s.setCreateName(us.getUserName());
-                    }
-                }
-                if(s.getUpdateBy()!=null && !s.getUpdateBy().equals("")){
-                    User user = new User();
-                    user.setUserId(params.getUpdateBy());
-                    User us = userService.getUserInfo(user);
-                    if(us!=null){
-                        s.setUpdateName(us.getUserName());
-                    }
-                }
+                // TODO 用户查询
+//                if(s.getCreateBy()!=null && !s.getCreateBy().equals("")){
+//                    User user = new User();
+//                    user.setUserId(params.getCreateBy());
+//                    User us = userService.getUserInfo(user);
+//                    if(us!=null){
+//                        s.setCreateName(us.getUserName());
+//                    }
+//                }
+//                if(s.getUpdateBy()!=null && !s.getUpdateBy().equals("")){
+//                    User user = new User();
+//                    user.setUserId(params.getUpdateBy());
+//                    User us = userService.getUserInfo(user);
+//                    if(us!=null){
+//                        s.setUpdateName(us.getUserName());
+//                    }
+//                }
                 Row row = sheet.createRow(i + 1);
                 cell = row.createCell(0);
                 cell.setCellValue(s.getLicensePlates());
@@ -2532,7 +2530,7 @@ public class CarInfoServiceImpl implements CarInfoService {
             }
             int minRowIx = 1;// 过滤掉标题，从第一行开始导入数据
             int maxRowIx = sheet.getLastRowNum(); // 要导入数据的总条数
-            CustomUserDetails user = ToolUtils.getSecurityUser();
+            SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
             for (int rowIx = minRowIx; rowIx <= maxRowIx; rowIx++) {
                 Row row = sheet.getRow(rowIx); // 获取行对象
                 if (row == null) {
@@ -2571,7 +2569,7 @@ public class CarInfoServiceImpl implements CarInfoService {
                                 }else{
                                     carInfoEntity.setStatus(2);
                                     carInfoEntity.setLicensePlates1(licensePlates);
-                                    params.setUpdateBy(user.getUserId());
+                                    params.setUpdateBy(currentLoginUser.getId());
                                     result = this.saveCarInfo(carInfoEntity);
                                 }
                             }
