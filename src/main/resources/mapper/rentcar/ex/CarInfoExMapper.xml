@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="mapper.rentcar.ex.CarInfoExMapper" >
   <resultMap id="BasicCarBizCarInfoMap" type="com.zhuanche.entity.rentcar.CarInfo">
-    <result property="carId" column="car_id" />
- 
+    <result property="carId" column="car_id" javaType="int" jdbcType="INTEGER" />
+
     <result property="supplierId" column="supplier_id" />
     <result property="licensePlates" column="license_plates" />
     <result property="brand" column="brand" />
@@ -28,13 +28,17 @@
     <result property="nextClassDate" column="next_class_date"/>
     <result property="twoLevelMaintenanceDate" column="two_level_maintenance_date"/>
   </resultMap>
-  
+
   <resultMap id="BasicCarBizCarInfoVOMap" type="com.zhuanche.entity.rentcar.CarInfo" extends="BasicCarBizCarInfoMap">
+    <result property="carId" column="car_id" javaType="int" jdbcType="INTEGER" />
+
     <result property="cityName" column="cityName" />
     <result property="cityId" column="city_id" />
     <result property="createName" column="createName"/>
     <result property="updateName" column="updateName"/>
     <result property="modeName" column="modeName" />
+    <result property="modelDetail" column="model_detail" />
+
     <result property="supplierName" column="supplierName" />
     <result property="purchaseDate" column="car_purchase_date" />
     <result property="carPhotographName" column="car_photograph_name" />
@@ -74,11 +78,11 @@
 			car.city_id cityId,
 			car.car_photograph imageUrl,
 			car.driver_id driverid,
-			DATE_FORMAT(car.car_purchase_date, '%Y-%m-%d ') AS purchaseDate,
-			DATE_FORMAT(car.next_operation_date, '%Y-%m-%d ') AS nextOperationDate,
-			DATE_FORMAT(car.next_security_date, '%Y-%m-%d ') AS nextSecurityDate,
-			DATE_FORMAT(car.next_class_date, '%Y-%m-%d ') AS nextClassDate,
-			DATE_FORMAT(car.two_level_maintenance_date, '%Y-%m-%d ') AS twoLevelMaintenanceDate,
+			DATE_FORMAT(car.car_purchase_date, '%Y-%m-%d') AS purchaseDate,
+			DATE_FORMAT(car.next_operation_date, '%Y-%m-%d') AS nextOperationDate,
+			DATE_FORMAT(car.next_security_date, '%Y-%m-%d') AS nextSecurityDate,
+			DATE_FORMAT(car.next_class_date, '%Y-%m-%d') AS nextClassDate,
+			DATE_FORMAT(car.two_level_maintenance_date, '%Y-%m-%d') AS twoLevelMaintenanceDate,
 			city.city_name AS cityName,
 			model.model_name AS modeName,
 			car.supplier_id supplierId,
@@ -90,9 +94,9 @@
 			color,
 			engine_no engineNo,
 			frame_no frameNo,
-			DATE_FORMAT(car.next_inspect_date, '%Y-%m-%d ') nextInspectDate,
-			DATE_FORMAT(car.next_maintenance_date, '%Y-%m-%d ') nextMaintenanceDate,
-			DATE_FORMAT(car.rental_expire_date, '%Y-%m-%d ') rentalExpireDate,
+			DATE_FORMAT(car.next_inspect_date, '%Y-%m-%d') nextInspectDate,
+			DATE_FORMAT(car.next_maintenance_date, '%Y-%m-%d') nextMaintenanceDate,
+			DATE_FORMAT(car.rental_expire_date, '%Y-%m-%d') rentalExpireDate,
 			car.memo,
 			car. STATUS,
 			(case when car.driver_id =0 then 0 else 1 end)isFree,
@@ -115,9 +119,9 @@
 
   <select id="selectCarInfoByCarId" resultMap="BasicCarBizCarInfoVOMap" parameterType="com.zhuanche.entity.rentcar.CarInfo">
     SELECT
-    car_id carId,
-    car.city_id cityId,
-    car.car_photograph imageUrl,
+    car_id,
+    car.city_id,
+    car.car_photograph,
     car.fuelType,
     car.carryPassengers,
     car.auditingStatus,
@@ -152,27 +156,27 @@
     car.vehicle_owner,
     car.vehicle_type,
     car.vehicle_driving_license,
-    DATE_FORMAT(car.car_purchase_date, '%Y-%m-%d ') AS purchaseDate,
-    DATE_FORMAT(car.next_operation_date, '%Y-%m-%d ') AS nextOperationDate,
-    DATE_FORMAT(car.next_security_date, '%Y-%m-%d ') AS nextSecurityDate,
-    DATE_FORMAT(car.next_class_date, '%Y-%m-%d ') AS nextClassDate,
-    DATE_FORMAT(car.two_level_maintenance_date, '%Y-%m-%d ') AS twoLevelMaintenanceDate,
+    DATE_FORMAT(car.car_purchase_date, '%Y-%m-%d') AS car_purchase_date,
+    DATE_FORMAT(car.next_operation_date, '%Y-%m-%d') AS next_operation_date,
+    DATE_FORMAT(car.next_security_date, '%Y-%m-%d') AS next_security_date,
+    DATE_FORMAT(car.next_class_date, '%Y-%m-%d') AS next_class_date,
+    DATE_FORMAT(car.two_level_maintenance_date, '%Y-%m-%d') AS two_level_maintenance_date,
     city.city_name AS cityName,
-    model.model_name AS modeName,
-    car.supplier_id supplierId,
+    model.model_name AS modelName,
+    car.supplier_id,
     supplier.supplier_full_name AS supplierName,
-    license_plates licensePlates ,
+    license_plates,
     brand,
-    car_model_id carModelId,
-    model_detail modelDetail,
+    car_model_id,
+    model_detail,
     color,
-    engine_no engineNo,
-    frame_no frameNo,
-    DATE_FORMAT(car.next_inspect_date, '%Y-%m-%d ') nextInspectDate,
-    DATE_FORMAT(car.next_maintenance_date, '%Y-%m-%d ') nextMaintenanceDate,
-    DATE_FORMAT(car.rental_expire_date, '%Y-%m-%d ') rentalExpireDate,
-    car.memo,
-    car. STATUS,
+    engine_no,
+    frame_no,
+    DATE_FORMAT(car.next_inspect_date, '%Y-%m-%d') AS next_inspect_date,
+    DATE_FORMAT(car.next_maintenance_date, '%Y-%m-%d') next_maintenance_date,
+    DATE_FORMAT(car.rental_expire_date, '%Y-%m-%d') rental_expire_date,
+    car.memo AS "",
+    car.STATUS,
     (case when car.driver_id =0 then 0 else 1 end)isFree,
     car.create_by createBy,
     car.update_by updateBy,
@@ -197,32 +201,32 @@
     </if>
   </select>
 
-  <select id="selectList" resultMap="BasicCarBizCarInfoVOMap" parameterType="com.zhuanche.entity.rentcar.CarInfo">
+  <select id="selectList" resultType="com.zhuanche.entity.rentcar.CarInfo" parameterType="com.zhuanche.entity.rentcar.CarInfo">
     SELECT
-    car_id carId,
+    car_id AS "carId",
     car.city_id cityId,
     car.car_photograph imageUrl,
-    DATE_FORMAT(car.car_purchase_date, '%Y-%m-%d ') AS purchaseDate,
-    DATE_FORMAT(car.next_operation_date, '%Y-%m-%d ') AS nextOperationDate,
-    DATE_FORMAT(car.next_security_date, '%Y-%m-%d ') AS nextSecurityDate,
-    DATE_FORMAT(car.next_class_date, '%Y-%m-%d ') AS nextClassDate,
-    DATE_FORMAT(car.two_level_maintenance_date, '%Y-%m-%d ') AS twoLevelMaintenanceDate,
+     car.car_purchase_date   AS purchaseDate,
+     car.next_operation_date   AS nextOperationDate,
+     car.next_security_date   AS nextSecurityDate,
+     car.next_class_date   AS nextClassDate,
+     car.two_level_maintenance_date   AS twoLevelMaintenanceDate,
     city.city_name AS cityName,
     model.model_name AS modeName,
     car.supplier_id supplierId,
     supplier.supplier_full_name AS supplierName,
-    license_plates licensePlates ,
+    license_plates AS 'licensePlates' ,
     brand,
     car_model_id carModelId,
     model_detail modelDetail,
     color,
     engine_no engineNo,
     frame_no frameNo,
-    DATE_FORMAT(car.next_inspect_date, '%Y-%m-%d ') nextInspectDate,
-    DATE_FORMAT(car.next_maintenance_date, '%Y-%m-%d ') nextMaintenanceDate,
-    DATE_FORMAT(car.rental_expire_date, '%Y-%m-%d ') rentalExpireDate,
+     car.next_inspect_date   nextInspectDate,
+     car.next_maintenance_date   nextMaintenanceDate,
+     car.rental_expire_date   rentalExpireDate,
     car.memo,
-    car. STATUS,
+    car.STATUS status,
     (case when car.driver_id =0 then 0 else 1 end)isFree,
     car.create_by createBy,
     car.update_by updateBy,
@@ -388,10 +392,10 @@
     car_id,
     car.city_id,
     car.car_photograph imageUrl,
-    DATE_FORMAT(car.next_operation_date, '%Y-%m-%d ') AS next_operation_date,
-    DATE_FORMAT(car.next_security_date, '%Y-%m-%d ') AS next_security_date,
-    DATE_FORMAT(car.next_class_date, '%Y-%m-%d ') AS next_class_date,
-    DATE_FORMAT(car.two_level_maintenance_date, '%Y-%m-%d ') AS two_level_maintenance_date,
+    DATE_FORMAT(car.next_operation_date, '%Y-%m-%d') AS next_operation_date,
+    DATE_FORMAT(car.next_security_date, '%Y-%m-%d') AS next_security_date,
+    DATE_FORMAT(car.next_class_date, '%Y-%m-%d') AS next_class_date,
+    DATE_FORMAT(car.two_level_maintenance_date, '%Y-%m-%d') AS two_level_maintenance_date,
     city.city_name AS cityName,
     model.model_name AS modeName,
     car.supplier_id,
@@ -404,9 +408,9 @@
     color,
     engine_no engineNo,
     frame_no frameNo,
-    DATE_FORMAT(car.next_inspect_date, '%Y-%m-%d ') nextInspectDate,
-    DATE_FORMAT(car.next_maintenance_date, '%Y-%m-%d ') nextMaintenanceDate,
-    DATE_FORMAT(car.rental_expire_date, '%Y-%m-%d ') rentalExpireDate,
+    DATE_FORMAT(car.next_inspect_date, '%Y-%m-%d') nextInspectDate,
+    DATE_FORMAT(car.next_maintenance_date, '%Y-%m-%d') nextMaintenanceDate,
+    DATE_FORMAT(car.rental_expire_date, '%Y-%m-%d') rentalExpireDate,
     car.fuelType,
     car.carryPassengers,
     car.auditingStatus,
@@ -535,10 +539,10 @@
 			driver_id,
 			car.city_id,
 			car.car_photograph imageUrl,
-			DATE_FORMAT(car.next_operation_date, '%Y-%m-%d ') AS next_operation_date,
-			DATE_FORMAT(car.next_security_date, '%Y-%m-%d ') AS next_security_date,
-			DATE_FORMAT(car.next_class_date, '%Y-%m-%d ') AS next_class_date,
-			DATE_FORMAT(car.two_level_maintenance_date, '%Y-%m-%d ') AS two_level_maintenance_date,
+			DATE_FORMAT(car.next_operation_date, '%Y-%m-%d') AS next_operation_date,
+			DATE_FORMAT(car.next_security_date, '%Y-%m-%d') AS next_security_date,
+			DATE_FORMAT(car.next_class_date, '%Y-%m-%d') AS next_class_date,
+			DATE_FORMAT(car.two_level_maintenance_date, '%Y-%m-%d') AS two_level_maintenance_date,
 			car.car_photograph_name,
 			car.car_photograph,
 			city.city_name AS cityName,

@@ -2,8 +2,11 @@ package com.zhuanche.controller.rentcar;
 
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.rentcar.CarInfoDTO;
+import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 import com.zhuanche.entity.rentcar.CarInfo;
+import com.zhuanche.serv.authc.UserManagementService;
 import com.zhuanche.serv.rentcar.CarInfoService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
@@ -28,13 +31,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RestController
+@RestController("CarInfoController")
 @RequestMapping("carInfo")
 public class CarInfoController {
     private static Logger logger = LoggerFactory.getLogger(CarInfoController.class);
 
     @Autowired
     private CarInfoService carService;
+
+    @Autowired
+    private UserManagementService userManagementService;
 
     //TODO 登录用户暂无
 //    @Autowired
@@ -50,27 +56,62 @@ public class CarInfoController {
 //        return "car/carList";
 //    }
 
+    /**
+     *
+     * @param cities    城市id，多个逗号分割
+     * @param supplierIds   供应商id，多个逗号分割
+     * @param carModelIds   车型id，多个逗号分割
+     * @param licensePlates 车牌号
+     * @param createDateBegin   创建时间
+     * @param createDateEnd     截止时间
+     * @param status        是否有效
+     * @param isFree        车辆状态
+     * @return
+     */
     @RequestMapping(value = "/queryCarData.json", method = { RequestMethod.POST })
-    public Object queryCarData(CarInfo params) {
+    public Object queryCarData(String cities,
+                               String supplierIds,
+                               String carModelIds,
+                               String licensePlates,
+                               String createDateBegin,
+                               String createDateEnd,
+                               Integer status,
+                               Integer isFree,
+                               Integer page,
+                               Integer pageSize) {
         logger.info("车辆列表数据:queryCarData");
 
-        String cities = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getCityIds(), ",");
-        String suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds(), ",");
-        String teamId = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getTeamIds(), ",");
-        String carModelIds = "";
-        if(!"".equals(params.getCities())&&params.getCities()!=null){
-            cities = params.getCities().replace(";", ",");
+        CarInfo params = new CarInfo();
+        params.setCities(cities);
+        params.setSupplierIds(supplierIds);
+        params.setCarModelIds(carModelIds);
+        params.setLicensePlates(licensePlates);
+        params.setCreateDateBegin(createDateBegin);
+        params.setCreateDateEnd(createDateEnd);
+        params.setStatus(status);
+        params.setIsFree(isFree);
+        if(null != page && page > 0)
+            params.setPage(page);
+        if(null != pageSize && pageSize > 0)
+            params.setPagesize(pageSize);
+
+        String _cities = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getCityIds(), ",");
+        String _suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds(), ",");
+        String _teamId = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getTeamIds(), ",");
+        String _carModelIds = "";
+        if(params.getCities()!=null && !"".equals(params.getCities()) ){
+            _cities = params.getCities().replace(";", ",");
         }
         if(!"".equals(params.getSupplierIds())&&params.getSupplierIds()!=null){
-            suppliers = params.getSupplierIds().replace(";", ",");
+            _suppliers = params.getSupplierIds().replace(";", ",");
         }
         if(!"".equals(params.getCarModelIds())&&params.getCarModelIds()!=null){
-            carModelIds = params.getCarModelIds().replace(";", ",");
+            _carModelIds = params.getCarModelIds().replace(";", ",");
         }
-        params.setCarModelIds(carModelIds);
-        params.setSupplierIds(suppliers);
-        params.setCities(cities);
-        params.setTeamIds(teamId);
+        params.setCarModelIds(_carModelIds);
+        params.setSupplierIds(_suppliers);
+        params.setCities(_cities);
+        params.setTeamIds(_teamId);
         List<CarInfo> rows = new ArrayList<CarInfo>();
         rows = carService.selectList(params);
         int total = carService.selectListCount(params);
@@ -89,58 +130,44 @@ public class CarInfoController {
 //        return "car/carListNew";
 //    }
 
-//    @RequestMapping(value = "/queryCarInfo", method = { RequestMethod.GET })
-//    public String queryCarInfo(ModelMap model, CarInfo params) {
-//        logger.info("queryCar:查看车辆详情列表");
-//        params = this.carService.selectCarInfoByCarId(params);
-//        if(params!=null){
-//            if(params.getCreateBy()!=null && !params.getCreateBy().equals("")){
-//                User user = new User();
-//                user.setUserId(params.getCreateBy());
-//                User us = userService.getUserInfo(user);
-//                if(us!=null){
-//                    params.setCreateName(us.getUserName());
-//                }
-//            }
-//            if(params.getUpdateBy()!=null && !params.getUpdateBy().equals("")){
-//                User user = new User();
-//                user.setUserId(params.getUpdateBy());
-//                User us = userService.getUserInfo(user);
-//                if(us!=null){
-//                    params.setUpdateName(us.getUserName());
-//                }
-//            }
-//        }
-//        model.put("carInfoEntity", params);
-//        return "car/carInfo";
-//    }
+    @RequestMapping(value = "/queryCarInfo.json", method = { RequestMethod.GET })
+    public AjaxResponse queryCarInfo(@Verify(param = "carId",rule = "required") Integer carId) {
+        logger.info("queryCar:查看车辆详情列表");
+        CarInfo params = new CarInfo();
+        params.setCarId(carId);
+        params = this.carService.selectCarInfoByCarId(params);
+        if(params!=null){
+            if(params.getCreateBy()!=null && !params.getCreateBy().equals("")){
+                CarAdmUser user = new CarAdmUser();
+                user.setUserId(params.getCreateBy());
+                CarAdmUser us = userManagementService.getUserById(params.getCreateBy());
+                if(us!=null){
+                    params.setCreateName(us.getUserName());
+                }
+            }
+            if(params.getUpdateBy()!=null && !params.getUpdateBy().equals("")){
+                CarAdmUser user = new CarAdmUser();
+                user.setUserId(params.getUpdateBy());
+                CarAdmUser us = userManagementService.getUserById(params.getUpdateBy());
+                if(us!=null){
+                    params.setUpdateName(us.getUserName());
+                }
+            }
+        }
+        return AjaxResponse.success( BeanUtil.copyObject(params, CarInfoDTO.class) );
+    }
 
-//    @AuthPassport
-//    @RequestMapping(value = "/changeCarInfo", method = { RequestMethod.GET }, produces="text/html;charset=UTF-8")
-//    public String changeCarInfo(ModelMap model, CarInfo params) {
-//        try {
-//            logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"新增车辆页");
-//        } catch (Exception e) {
-//        }
-//        if (params != null && params.getCarId() != null) {
-//            params = this.carService.selectCarInfoByCarId(params);
-//            model.put("carInfoEntity", params);
-//            if(params.getCooperationType()!=0 && params.getCooperationType()!=5){
-//                //加盟车辆页面，部分字段不限制
-//                return "car/addCarJoin";
-//            }
-//        }
-//        return "car/addCar";
-//    }
 
     /**
      * 根据车牌号查询是否已存在
-     * @param params
+     * @param licensePlates
      * @return
      */
-    @RequestMapping(value = "/checkLicensePlates", method = { RequestMethod.POST })
-    public Object checkLicensePlates(CarInfo params) {
+    @RequestMapping(value = "/checkLicensePlates.json", method = { RequestMethod.POST })
+    public Object checkLicensePlates(@Verify(param = "licensePlates", rule = "required") String licensePlates) {
         logger.info("根据车牌号查询是否已存在:checkLicensePlates");
+        CarInfo params = new CarInfo();
+        params.setLicensePlates(licensePlates);
         return carService.checkLicensePlates(params);
     }
 
@@ -150,7 +177,7 @@ public class CarInfoController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/saveCarInfo", method = { RequestMethod.POST })
+    @RequestMapping(value = "/saveCarInfo.json", method = { RequestMethod.POST })
     public Object saveCarInfo(CarInfo params, HttpServletRequest request) {
         logger.info("车辆保存/修改:saveCarInfo");
         Map<String, Object> result = new HashMap<String, Object>();
@@ -175,7 +202,7 @@ public class CarInfoController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/deleteCarInfo", method = { RequestMethod.POST })
+    @RequestMapping(value = "/deleteCarInfo.json", method = { RequestMethod.POST })
     public Object deleteCarInfo(CarInfo params, HttpServletRequest request) {
         logger.info("车辆删除:deleteCarInfo");
         Map<String, Object> result = new HashMap<String, Object>();

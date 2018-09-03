@@ -39,7 +39,11 @@ public class UserManagementService{
 	private CarAdmUserMapper      carAdmUserMapper;
 	@Autowired
 	private CarAdmUserExMapper  carAdmUserExMapper;
-	
+
+	public CarAdmUser getUserById(Integer userId){
+		return carAdmUserMapper.selectByPrimaryKey(userId);
+	}
+
 	/**一、增加一个用户**/
 	public AjaxResponse addUser( CarAdmUser user ) {
 		user.setUserId(null);

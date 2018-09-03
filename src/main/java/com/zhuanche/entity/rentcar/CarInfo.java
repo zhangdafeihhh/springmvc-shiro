@@ -48,6 +48,9 @@ public class CarInfo extends BaseEntity {
 
     private Integer supplierId;
 
+    /**
+     * 车牌号
+     */
     private String licensePlates;
 
     private String brand;
@@ -242,9 +245,9 @@ public class CarInfo extends BaseEntity {
     // 下次运营证开始时间
     private String nextOperationDateBegin;
     // 下次运营证结束时间
-    private String nextOperationDateEnd;
+//    private String nextOperationDateEnd;
     // 下次等级鉴定开始时间
-    private String nextClassDateBegin;
+//    private String nextClassDateBegin;
     // 下次等级鉴定结束时间
     private String nextClassDateEnd;
 
@@ -312,6 +315,17 @@ public class CarInfo extends BaseEntity {
 
     //车辆状态
     private java.lang.Integer isFree;
+
+    /** 车辆图片 **/
+    private String imageUrl;
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
     public Integer getIsFree() {
         return isFree;
@@ -1002,22 +1016,6 @@ public class CarInfo extends BaseEntity {
 
     public void setNextOperationDateBegin(String nextOperationDateBegin) {
         this.nextOperationDateBegin = nextOperationDateBegin;
-    }
-
-    public String getNextOperationDateEnd() {
-        return nextOperationDateEnd;
-    }
-
-    public void setNextOperationDateEnd(String nextOperationDateEnd) {
-        this.nextOperationDateEnd = nextOperationDateEnd;
-    }
-
-    public String getNextClassDateBegin() {
-        return nextClassDateBegin;
-    }
-
-    public void setNextClassDateBegin(String nextClassDateBegin) {
-        this.nextClassDateBegin = nextClassDateBegin;
     }
 
     public String getNextClassDateEnd() {
