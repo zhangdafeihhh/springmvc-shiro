@@ -13,10 +13,11 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
-import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
+import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.serv.*;
+import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.io.InputStream;
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @Controller
@@ -178,14 +178,16 @@ public class DriverInfoController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
     })
-    public AjaxResponse findDriverInfoByDriverId(@Verify(param = "driverId", rule = "requird") Integer driverId) {
+    public AjaxResponse findDriverInfoByDriverId(@Verify(param = "driverId", rule = "required") Integer driverId) {
 
         CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(driverId);
-        CarBizDriverInfoDetail carBizDriverInfoDetail = carBizDriverInfoDetailService.selectByPrimaryKey(driverId);
         CarBizDriverInfoDTO carBizDriverInfoDTO = BeanUtil.copyObject(carBizDriverInfo, CarBizDriverInfoDTO.class);
-        carBizDriverInfoDTO.setBankCardNumber(carBizDriverInfoDetail.getBankCardNumber());
-        carBizDriverInfoDTO.setBankCardBank(carBizDriverInfoDetail.getBankCardBank());
-
+        //查询司机银行卡信息
+        CarBizDriverInfoDetailDTO carBizDriverInfoDetailDTO = carBizDriverInfoDetailService.selectByDriverId(driverId);
+        if(carBizDriverInfoDetailDTO!=null){
+            carBizDriverInfoDTO.setBankCardNumber(carBizDriverInfoDetailDTO.getBankCardNumber());
+            carBizDriverInfoDTO.setBankCardBank(carBizDriverInfoDetailDTO.getBankCardBank());
+        }
         // 查询城市名称，供应商名称，服务类型，加盟类型
         carBizDriverInfoDTO = carBizDriverInfoService.getBaseStatis(carBizDriverInfoDTO);
         return AjaxResponse.success(carBizDriverInfoDTO);
@@ -214,15 +216,7 @@ public class DriverInfoController {
         if(ajaxResponse.getCode()!=0){
             return ajaxResponse;
         }
-
         Map<String, Object> resultMap = Maps.newHashMap();
-
-        // 查询城市名称，供应商名称，服务类型，加盟类型
-        carBizDriverInfo = carBizDriverInfoService.getBaseStatis(carBizDriverInfo);
-
-        //TODO 获取当前用户Id
-        carBizDriverInfo.setUpdateBy(1);
-        carBizDriverInfo.setUpdateDate(new Date());
         if (driverId == null) {
             logger.info(LOGTAG + "操作方式：编辑");
             // TODO 司机获取派单的接口，是否可以修改
@@ -231,9 +225,6 @@ public class DriverInfoController {
             resultMap = carBizDriverInfoService.updateDriver(carBizDriverInfo);
         }else{
             logger.info(LOGTAG + "操作方式：新建");
-            //TODO 获取当前用户Id
-            carBizDriverInfo.setCreateBy(1);
-            carBizDriverInfo.setCreateDate(new Date());
             resultMap = carBizDriverInfoService.saveDriver(carBizDriverInfo);
         }
         return AjaxResponse.success(resultMap);
@@ -261,8 +252,8 @@ public class DriverInfoController {
         // TODO 调用接口清除，key
 
         //允许修改
-        //TODO 获取当前用户Id
-        carBizDriverInfo.setUpdateBy(1);
+        // 获取当前用户Id
+        carBizDriverInfo.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
         carBizDriverInfo.setStatus(0);
         CarBizDriverInfoDTO carBizDriverInfoDTO = BeanUtil.copyObject(carBizDriverInfo, CarBizDriverInfoDTO.class);
         int rtn = 0;
@@ -310,7 +301,11 @@ public class DriverInfoController {
     @MasterSlaveConfigs(configs={
             @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
     } )
-    public AjaxResponse batchInputDriverInfo(@Verify(param = "file", rule = "required") MultipartFile file) {
+    public AjaxResponse batchInputDriverInfo(@Verify(param = "cityId", rule = "required") Integer cityId,
+                                             @Verify(param = "supplierId", rule = "required") Integer supplierId,
+                                             Integer teamId, Integer teamGroupId,
+                                             @Verify(param = "file", rule = "required") MultipartFile file,
+                                             HttpServletRequest request) {
 
         if (file.isEmpty()) {
             logger.info("file is empty!");
@@ -318,8 +313,7 @@ public class DriverInfoController {
         }
 
         Map<String, Object> resultMap = Maps.newHashMap();
-//        resultMap = carBizDriverInfoService.batchInputDriverInfo(file);
-
+        resultMap = carBizDriverInfoService.batchInputDriverInfo(cityId, supplierId, teamId, teamGroupId, file, request);
         //模板错误
         if(resultMap!=null && "-1".equals(resultMap.get("result").toString())){
             return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);

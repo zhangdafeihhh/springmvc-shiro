@@ -1,5 +1,6 @@
 package com.zhuanche.serv;
 
+import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
 import com.zhuanche.entity.rentcar.CarBizDriverInfoDetail;
 import mapper.rentcar.CarBizDriverInfoDetailMapper;
 import mapper.rentcar.ex.CarBizDriverInfoDetailExMapper;
@@ -48,12 +49,21 @@ public class CarBizDriverInfoDetailService {
     }
 
     /**
+     * 根据主键ID查询司机扩展表
+     * @param id
+     * @return
+     */
+    public CarBizDriverInfoDetail selectByPrimaryKey(Integer id){
+        return carBizDriverInfoDetailMapper.selectByPrimaryKey(id);
+    }
+
+    /**
      * 根据司机ID查询司机扩展表
      * @param driverId
      * @return
      */
-    public CarBizDriverInfoDetail selectByPrimaryKey(Integer driverId){
-        return carBizDriverInfoDetailMapper.selectByPrimaryKey(driverId);
+    public CarBizDriverInfoDetailDTO selectByDriverId(Integer driverId){
+        return carBizDriverInfoDetailExMapper.selectByDriverId(driverId);
     }
 
 }

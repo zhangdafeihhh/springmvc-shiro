@@ -165,8 +165,8 @@
       <if test="isTwoShifts != null" >
         and is_two_shifts = #{isTwoShifts,jdbcType=INTEGER}
       </if>
-      <if test="cityId != null and cityId != ''" >
-        and service_city = #{cityId,jdbcType=VARCHAR}
+      <if test="serviceCity != null and serviceCity != ''" >
+        and service_city = #{serviceCity,jdbcType=VARCHAR}
       </if>
       <if test="supplierId != null and supplierId != ''" >
         and supplier_id = #{supplierId,jdbcType=VARCHAR}
@@ -200,7 +200,6 @@
     from car_biz_driver_info
     <include refid="allBaseColumnWhereList"/>
     order by create_date desc
-    limit #{offSet},#{pagesize}
   </select>
   <select id="queryDriverListNoLimit" resultMap="ResultMapWithBLOBs" >
     select
@@ -1175,4 +1174,9 @@
 		SET imei = null
 		WHERE driver_id = #{driverId}
 	</update>
+  <select id="checkLicensePlates" resultType="java.lang.Integer" >
+    select count(*)
+    from car_biz_driver_info
+    where license_plates= #{licensePlates}
+  </select>
 </mapper>
