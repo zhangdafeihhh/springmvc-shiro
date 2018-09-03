@@ -1,0 +1,828 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.DriverVerifyMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.DriverVerify" >
+    <id column="ID" property="id" jdbcType="BIGINT" />
+    <result column="DRIVER_ID" property="driverId" jdbcType="BIGINT" />
+    <result column="MOBILE" property="mobile" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="ID_CARD" property="idCard" jdbcType="VARCHAR" />
+    <result column="CITY_ID" property="cityId" jdbcType="BIGINT" />
+    <result column="CITY_NAME" property="cityName" jdbcType="VARCHAR" />
+    <result column="BRAND_ID" property="brandId" jdbcType="BIGINT" />
+    <result column="BRAND_NAME" property="brandName" jdbcType="VARCHAR" />
+    <result column="VEHICLE_ID" property="vehicleId" jdbcType="BIGINT" />
+    <result column="VEHICLE_NAME" property="vehicleName" jdbcType="VARCHAR" />
+    <result column="VERIFY_STATUS" property="verifyStatus" jdbcType="INTEGER" />
+    <result column="LICENSE_NUM" property="licenseNum" jdbcType="VARCHAR" />
+    <result column="PLATE_NUM" property="plateNum" jdbcType="VARCHAR" />
+    <result column="VEHICLE_TYPE" property="vehicleType" jdbcType="VARCHAR" />
+    <result column="CRIMINAL_RECORD" property="criminalRecord" jdbcType="INTEGER" />
+    <result column="IDCARD_SEX" property="idcardSex" jdbcType="VARCHAR" />
+    <result column="RACE" property="race" jdbcType="VARCHAR" />
+    <result column="IDCARD_BIRTHDAY" property="idcardBirthday" jdbcType="VARCHAR" />
+    <result column="IDCARD_ADDRESS" property="idcardAddress" jdbcType="VARCHAR" />
+    <result column="DRIVER_LICENSE_NAME" property="driverLicenseName" jdbcType="VARCHAR" />
+    <result column="DRIVER_LICENSE_SEX" property="driverLicenseSex" jdbcType="VARCHAR" />
+    <result column="DRIVER_LICENSE_BIRTHDAY" property="driverLicenseBirthday" jdbcType="VARCHAR" />
+    <result column="NATIONALITY" property="nationality" jdbcType="VARCHAR" />
+    <result column="DRIVER_LICENSE_NUM" property="driverLicenseNum" jdbcType="VARCHAR" />
+    <result column="DRIVER_LICENSE_ADDRESS" property="driverLicenseAddress" jdbcType="VARCHAR" />
+    <result column="DRIVER_LICENSE_ISSUE_DATE" property="driverLicenseIssueDate" jdbcType="VARCHAR" />
+    <result column="DRIVER_LICENSE_FROM_DATE" property="driverLicenseFromDate" jdbcType="VARCHAR" />
+    <result column="DRIVER_LICENSE_VALID_FOR" property="driverLicenseValidFor" jdbcType="VARCHAR" />
+    <result column="OWNER" property="owner" jdbcType="VARCHAR" />
+    <result column="USE_CHARACTER" property="useCharacter" jdbcType="VARCHAR" />
+    <result column="VEHICLE_LICENSE_ADDRESS" property="vehicleLicenseAddress" jdbcType="VARCHAR" />
+    <result column="VEHICLE_LICENSE_ISSUE_DATE" property="vehicleLicenseIssueDate" jdbcType="VARCHAR" />
+    <result column="DRIVER_CLASS" property="driverClass" jdbcType="VARCHAR" />
+    <result column="VEHICLE_LICENSE_ARCHIVES_NUM" property="vehicleLicenseArchivesNum" jdbcType="VARCHAR" />
+    <result column="ENGINE_NUM" property="engineNum" jdbcType="VARCHAR" />
+    <result column="TOTAL_MASS" property="totalMass" jdbcType="VARCHAR" />
+    <result column="INSPECTION_RECORD" property="inspectionRecord" jdbcType="VARCHAR" />
+    <result column="PASSENGERS_NUM" property="passengersNum" jdbcType="VARCHAR" />
+    <result column="EXTERNAL_DIMENSION" property="externalDimension" jdbcType="VARCHAR" />
+    <result column="MODEL" property="model" jdbcType="VARCHAR" />
+    <result column="VIN" property="vin" jdbcType="VARCHAR" />
+    <result column="CAR_WEIGHT" property="carWeight" jdbcType="VARCHAR" />
+    <result column="VEHICLE_LICENSE_REGISTER_DATE" property="vehicleLicenseRegisterDate" jdbcType="VARCHAR" />
+    <result column="SUPPLIER" property="supplier" jdbcType="VARCHAR" />
+    <result column="SUPPLIER_NAME" property="supplierName" jdbcType="VARCHAR" />
+    <result column="SERVICE_TYPE" property="serviceType" jdbcType="VARCHAR" />
+    <result column="PRESENT_ADDRESS" property="presentAddress" jdbcType="VARCHAR" />
+    <result column="COLOUR" property="colour" jdbcType="VARCHAR" />
+    <result column="EMERGENCY_CONTACT" property="emergencyContact" jdbcType="VARCHAR" />
+    <result column="EMERGENCY_INFORMATION" property="emergencyInformation" jdbcType="VARCHAR" />
+    <result column="FRAME_NUM" property="frameNum" jdbcType="VARCHAR" />
+    <result column="WHEELBASE" property="wheelbase" jdbcType="VARCHAR" />
+    <result column="FUEL_TYPE" property="fuelType" jdbcType="VARCHAR" />
+    <result column="MODEL_ID" property="modelId" jdbcType="INTEGER" />
+    <result column="DISPLACEMENT" property="displacement" jdbcType="VARCHAR" />
+    <result column="CREATE_AT" property="createAt" jdbcType="TIMESTAMP" />
+    <result column="DATA_AUDIT_TIME" property="dataAuditTime" jdbcType="TIMESTAMP" />
+    <result column="TRAIN_TIME" property="trainTime" jdbcType="TIMESTAMP" />
+    <result column="AUDIT_TIME" property="auditTime" jdbcType="TIMESTAMP" />
+    <result column="UPDATE_AT" property="updateAt" jdbcType="TIMESTAMP" />
+    <result column="DRIVER_AGREEMENT_COMPANY" property="driverAgreementCompany" jdbcType="VARCHAR" />
+    <result column="DOMICILE_ADDR" property="domicileAddr" jdbcType="VARCHAR" />
+    <result column="CAR_FLAG" property="carFlag" jdbcType="TINYINT" />
+    <result column="INFORM_STATUS" property="informStatus" jdbcType="TINYINT" />
+    <result column="NOT_JOIN_REASON" property="notJoinReason" jdbcType="VARCHAR" />
+    <result column="SOURCE" property="source" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, DRIVER_ID, MOBILE, NAME, ID_CARD, CITY_ID, CITY_NAME, BRAND_ID, BRAND_NAME, VEHICLE_ID, 
+    VEHICLE_NAME, VERIFY_STATUS, LICENSE_NUM, PLATE_NUM, VEHICLE_TYPE, CRIMINAL_RECORD, 
+    IDCARD_SEX, RACE, IDCARD_BIRTHDAY, IDCARD_ADDRESS, DRIVER_LICENSE_NAME, DRIVER_LICENSE_SEX, 
+    DRIVER_LICENSE_BIRTHDAY, NATIONALITY, DRIVER_LICENSE_NUM, DRIVER_LICENSE_ADDRESS, 
+    DRIVER_LICENSE_ISSUE_DATE, DRIVER_LICENSE_FROM_DATE, DRIVER_LICENSE_VALID_FOR, OWNER, 
+    USE_CHARACTER, VEHICLE_LICENSE_ADDRESS, VEHICLE_LICENSE_ISSUE_DATE, DRIVER_CLASS, 
+    VEHICLE_LICENSE_ARCHIVES_NUM, ENGINE_NUM, TOTAL_MASS, INSPECTION_RECORD, PASSENGERS_NUM, 
+    EXTERNAL_DIMENSION, MODEL, VIN, CAR_WEIGHT, VEHICLE_LICENSE_REGISTER_DATE, SUPPLIER, 
+    SUPPLIER_NAME, SERVICE_TYPE, PRESENT_ADDRESS, COLOUR, EMERGENCY_CONTACT, EMERGENCY_INFORMATION, 
+    FRAME_NUM, WHEELBASE, FUEL_TYPE, MODEL_ID, DISPLACEMENT, CREATE_AT, DATA_AUDIT_TIME, 
+    TRAIN_TIME, AUDIT_TIME, UPDATE_AT, DRIVER_AGREEMENT_COMPANY, DOMICILE_ADDR, CAR_FLAG, 
+    INFORM_STATUS, NOT_JOIN_REASON, SOURCE
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from driver_verify
+    where ID = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from driver_verify
+    where ID = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.driver.DriverVerify" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into driver_verify (DRIVER_ID, MOBILE, NAME, 
+      ID_CARD, CITY_ID, CITY_NAME, 
+      BRAND_ID, BRAND_NAME, VEHICLE_ID, 
+      VEHICLE_NAME, VERIFY_STATUS, LICENSE_NUM, 
+      PLATE_NUM, VEHICLE_TYPE, CRIMINAL_RECORD, 
+      IDCARD_SEX, RACE, IDCARD_BIRTHDAY, 
+      IDCARD_ADDRESS, DRIVER_LICENSE_NAME, DRIVER_LICENSE_SEX, 
+      DRIVER_LICENSE_BIRTHDAY, NATIONALITY, DRIVER_LICENSE_NUM, 
+      DRIVER_LICENSE_ADDRESS, DRIVER_LICENSE_ISSUE_DATE, 
+      DRIVER_LICENSE_FROM_DATE, DRIVER_LICENSE_VALID_FOR, 
+      OWNER, USE_CHARACTER, VEHICLE_LICENSE_ADDRESS, 
+      VEHICLE_LICENSE_ISSUE_DATE, DRIVER_CLASS, VEHICLE_LICENSE_ARCHIVES_NUM, 
+      ENGINE_NUM, TOTAL_MASS, INSPECTION_RECORD, 
+      PASSENGERS_NUM, EXTERNAL_DIMENSION, MODEL, 
+      VIN, CAR_WEIGHT, VEHICLE_LICENSE_REGISTER_DATE, 
+      SUPPLIER, SUPPLIER_NAME, SERVICE_TYPE, 
+      PRESENT_ADDRESS, COLOUR, EMERGENCY_CONTACT, 
+      EMERGENCY_INFORMATION, FRAME_NUM, WHEELBASE, 
+      FUEL_TYPE, MODEL_ID, DISPLACEMENT, 
+      CREATE_AT, DATA_AUDIT_TIME, TRAIN_TIME, 
+      AUDIT_TIME, UPDATE_AT, DRIVER_AGREEMENT_COMPANY, 
+      DOMICILE_ADDR, CAR_FLAG, INFORM_STATUS, 
+      NOT_JOIN_REASON, SOURCE)
+    values (#{driverId,jdbcType=BIGINT}, #{mobile,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{idCard,jdbcType=VARCHAR}, #{cityId,jdbcType=BIGINT}, #{cityName,jdbcType=VARCHAR}, 
+      #{brandId,jdbcType=BIGINT}, #{brandName,jdbcType=VARCHAR}, #{vehicleId,jdbcType=BIGINT}, 
+      #{vehicleName,jdbcType=VARCHAR}, #{verifyStatus,jdbcType=INTEGER}, #{licenseNum,jdbcType=VARCHAR}, 
+      #{plateNum,jdbcType=VARCHAR}, #{vehicleType,jdbcType=VARCHAR}, #{criminalRecord,jdbcType=INTEGER}, 
+      #{idcardSex,jdbcType=VARCHAR}, #{race,jdbcType=VARCHAR}, #{idcardBirthday,jdbcType=VARCHAR}, 
+      #{idcardAddress,jdbcType=VARCHAR}, #{driverLicenseName,jdbcType=VARCHAR}, #{driverLicenseSex,jdbcType=VARCHAR}, 
+      #{driverLicenseBirthday,jdbcType=VARCHAR}, #{nationality,jdbcType=VARCHAR}, #{driverLicenseNum,jdbcType=VARCHAR}, 
+      #{driverLicenseAddress,jdbcType=VARCHAR}, #{driverLicenseIssueDate,jdbcType=VARCHAR}, 
+      #{driverLicenseFromDate,jdbcType=VARCHAR}, #{driverLicenseValidFor,jdbcType=VARCHAR}, 
+      #{owner,jdbcType=VARCHAR}, #{useCharacter,jdbcType=VARCHAR}, #{vehicleLicenseAddress,jdbcType=VARCHAR}, 
+      #{vehicleLicenseIssueDate,jdbcType=VARCHAR}, #{driverClass,jdbcType=VARCHAR}, #{vehicleLicenseArchivesNum,jdbcType=VARCHAR}, 
+      #{engineNum,jdbcType=VARCHAR}, #{totalMass,jdbcType=VARCHAR}, #{inspectionRecord,jdbcType=VARCHAR}, 
+      #{passengersNum,jdbcType=VARCHAR}, #{externalDimension,jdbcType=VARCHAR}, #{model,jdbcType=VARCHAR}, 
+      #{vin,jdbcType=VARCHAR}, #{carWeight,jdbcType=VARCHAR}, #{vehicleLicenseRegisterDate,jdbcType=VARCHAR}, 
+      #{supplier,jdbcType=VARCHAR}, #{supplierName,jdbcType=VARCHAR}, #{serviceType,jdbcType=VARCHAR}, 
+      #{presentAddress,jdbcType=VARCHAR}, #{colour,jdbcType=VARCHAR}, #{emergencyContact,jdbcType=VARCHAR}, 
+      #{emergencyInformation,jdbcType=VARCHAR}, #{frameNum,jdbcType=VARCHAR}, #{wheelbase,jdbcType=VARCHAR}, 
+      #{fuelType,jdbcType=VARCHAR}, #{modelId,jdbcType=INTEGER}, #{displacement,jdbcType=VARCHAR}, 
+      #{createAt,jdbcType=TIMESTAMP}, #{dataAuditTime,jdbcType=TIMESTAMP}, #{trainTime,jdbcType=TIMESTAMP}, 
+      #{auditTime,jdbcType=TIMESTAMP}, #{updateAt,jdbcType=TIMESTAMP}, #{driverAgreementCompany,jdbcType=VARCHAR}, 
+      #{domicileAddr,jdbcType=VARCHAR}, #{carFlag,jdbcType=TINYINT}, #{informStatus,jdbcType=TINYINT}, 
+      #{notJoinReason,jdbcType=VARCHAR}, #{source,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.DriverVerify" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into driver_verify
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="driverId != null" >
+        DRIVER_ID,
+      </if>
+      <if test="mobile != null" >
+        MOBILE,
+      </if>
+      <if test="name != null" >
+        NAME,
+      </if>
+      <if test="idCard != null" >
+        ID_CARD,
+      </if>
+      <if test="cityId != null" >
+        CITY_ID,
+      </if>
+      <if test="cityName != null" >
+        CITY_NAME,
+      </if>
+      <if test="brandId != null" >
+        BRAND_ID,
+      </if>
+      <if test="brandName != null" >
+        BRAND_NAME,
+      </if>
+      <if test="vehicleId != null" >
+        VEHICLE_ID,
+      </if>
+      <if test="vehicleName != null" >
+        VEHICLE_NAME,
+      </if>
+      <if test="verifyStatus != null" >
+        VERIFY_STATUS,
+      </if>
+      <if test="licenseNum != null" >
+        LICENSE_NUM,
+      </if>
+      <if test="plateNum != null" >
+        PLATE_NUM,
+      </if>
+      <if test="vehicleType != null" >
+        VEHICLE_TYPE,
+      </if>
+      <if test="criminalRecord != null" >
+        CRIMINAL_RECORD,
+      </if>
+      <if test="idcardSex != null" >
+        IDCARD_SEX,
+      </if>
+      <if test="race != null" >
+        RACE,
+      </if>
+      <if test="idcardBirthday != null" >
+        IDCARD_BIRTHDAY,
+      </if>
+      <if test="idcardAddress != null" >
+        IDCARD_ADDRESS,
+      </if>
+      <if test="driverLicenseName != null" >
+        DRIVER_LICENSE_NAME,
+      </if>
+      <if test="driverLicenseSex != null" >
+        DRIVER_LICENSE_SEX,
+      </if>
+      <if test="driverLicenseBirthday != null" >
+        DRIVER_LICENSE_BIRTHDAY,
+      </if>
+      <if test="nationality != null" >
+        NATIONALITY,
+      </if>
+      <if test="driverLicenseNum != null" >
+        DRIVER_LICENSE_NUM,
+      </if>
+      <if test="driverLicenseAddress != null" >
+        DRIVER_LICENSE_ADDRESS,
+      </if>
+      <if test="driverLicenseIssueDate != null" >
+        DRIVER_LICENSE_ISSUE_DATE,
+      </if>
+      <if test="driverLicenseFromDate != null" >
+        DRIVER_LICENSE_FROM_DATE,
+      </if>
+      <if test="driverLicenseValidFor != null" >
+        DRIVER_LICENSE_VALID_FOR,
+      </if>
+      <if test="owner != null" >
+        OWNER,
+      </if>
+      <if test="useCharacter != null" >
+        USE_CHARACTER,
+      </if>
+      <if test="vehicleLicenseAddress != null" >
+        VEHICLE_LICENSE_ADDRESS,
+      </if>
+      <if test="vehicleLicenseIssueDate != null" >
+        VEHICLE_LICENSE_ISSUE_DATE,
+      </if>
+      <if test="driverClass != null" >
+        DRIVER_CLASS,
+      </if>
+      <if test="vehicleLicenseArchivesNum != null" >
+        VEHICLE_LICENSE_ARCHIVES_NUM,
+      </if>
+      <if test="engineNum != null" >
+        ENGINE_NUM,
+      </if>
+      <if test="totalMass != null" >
+        TOTAL_MASS,
+      </if>
+      <if test="inspectionRecord != null" >
+        INSPECTION_RECORD,
+      </if>
+      <if test="passengersNum != null" >
+        PASSENGERS_NUM,
+      </if>
+      <if test="externalDimension != null" >
+        EXTERNAL_DIMENSION,
+      </if>
+      <if test="model != null" >
+        MODEL,
+      </if>
+      <if test="vin != null" >
+        VIN,
+      </if>
+      <if test="carWeight != null" >
+        CAR_WEIGHT,
+      </if>
+      <if test="vehicleLicenseRegisterDate != null" >
+        VEHICLE_LICENSE_REGISTER_DATE,
+      </if>
+      <if test="supplier != null" >
+        SUPPLIER,
+      </if>
+      <if test="supplierName != null" >
+        SUPPLIER_NAME,
+      </if>
+      <if test="serviceType != null" >
+        SERVICE_TYPE,
+      </if>
+      <if test="presentAddress != null" >
+        PRESENT_ADDRESS,
+      </if>
+      <if test="colour != null" >
+        COLOUR,
+      </if>
+      <if test="emergencyContact != null" >
+        EMERGENCY_CONTACT,
+      </if>
+      <if test="emergencyInformation != null" >
+        EMERGENCY_INFORMATION,
+      </if>
+      <if test="frameNum != null" >
+        FRAME_NUM,
+      </if>
+      <if test="wheelbase != null" >
+        WHEELBASE,
+      </if>
+      <if test="fuelType != null" >
+        FUEL_TYPE,
+      </if>
+      <if test="modelId != null" >
+        MODEL_ID,
+      </if>
+      <if test="displacement != null" >
+        DISPLACEMENT,
+      </if>
+      <if test="createAt != null" >
+        CREATE_AT,
+      </if>
+      <if test="dataAuditTime != null" >
+        DATA_AUDIT_TIME,
+      </if>
+      <if test="trainTime != null" >
+        TRAIN_TIME,
+      </if>
+      <if test="auditTime != null" >
+        AUDIT_TIME,
+      </if>
+      <if test="updateAt != null" >
+        UPDATE_AT,
+      </if>
+      <if test="driverAgreementCompany != null" >
+        DRIVER_AGREEMENT_COMPANY,
+      </if>
+      <if test="domicileAddr != null" >
+        DOMICILE_ADDR,
+      </if>
+      <if test="carFlag != null" >
+        CAR_FLAG,
+      </if>
+      <if test="informStatus != null" >
+        INFORM_STATUS,
+      </if>
+      <if test="notJoinReason != null" >
+        NOT_JOIN_REASON,
+      </if>
+      <if test="source != null" >
+        SOURCE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="driverId != null" >
+        #{driverId,jdbcType=BIGINT},
+      </if>
+      <if test="mobile != null" >
+        #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="idCard != null" >
+        #{idCard,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        #{cityId,jdbcType=BIGINT},
+      </if>
+      <if test="cityName != null" >
+        #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="brandId != null" >
+        #{brandId,jdbcType=BIGINT},
+      </if>
+      <if test="brandName != null" >
+        #{brandName,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleId != null" >
+        #{vehicleId,jdbcType=BIGINT},
+      </if>
+      <if test="vehicleName != null" >
+        #{vehicleName,jdbcType=VARCHAR},
+      </if>
+      <if test="verifyStatus != null" >
+        #{verifyStatus,jdbcType=INTEGER},
+      </if>
+      <if test="licenseNum != null" >
+        #{licenseNum,jdbcType=VARCHAR},
+      </if>
+      <if test="plateNum != null" >
+        #{plateNum,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleType != null" >
+        #{vehicleType,jdbcType=VARCHAR},
+      </if>
+      <if test="criminalRecord != null" >
+        #{criminalRecord,jdbcType=INTEGER},
+      </if>
+      <if test="idcardSex != null" >
+        #{idcardSex,jdbcType=VARCHAR},
+      </if>
+      <if test="race != null" >
+        #{race,jdbcType=VARCHAR},
+      </if>
+      <if test="idcardBirthday != null" >
+        #{idcardBirthday,jdbcType=VARCHAR},
+      </if>
+      <if test="idcardAddress != null" >
+        #{idcardAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="driverLicenseName != null" >
+        #{driverLicenseName,jdbcType=VARCHAR},
+      </if>
+      <if test="driverLicenseSex != null" >
+        #{driverLicenseSex,jdbcType=VARCHAR},
+      </if>
+      <if test="driverLicenseBirthday != null" >
+        #{driverLicenseBirthday,jdbcType=VARCHAR},
+      </if>
+      <if test="nationality != null" >
+        #{nationality,jdbcType=VARCHAR},
+      </if>
+      <if test="driverLicenseNum != null" >
+        #{driverLicenseNum,jdbcType=VARCHAR},
+      </if>
+      <if test="driverLicenseAddress != null" >
+        #{driverLicenseAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="driverLicenseIssueDate != null" >
+        #{driverLicenseIssueDate,jdbcType=VARCHAR},
+      </if>
+      <if test="driverLicenseFromDate != null" >
+        #{driverLicenseFromDate,jdbcType=VARCHAR},
+      </if>
+      <if test="driverLicenseValidFor != null" >
+        #{driverLicenseValidFor,jdbcType=VARCHAR},
+      </if>
+      <if test="owner != null" >
+        #{owner,jdbcType=VARCHAR},
+      </if>
+      <if test="useCharacter != null" >
+        #{useCharacter,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleLicenseAddress != null" >
+        #{vehicleLicenseAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleLicenseIssueDate != null" >
+        #{vehicleLicenseIssueDate,jdbcType=VARCHAR},
+      </if>
+      <if test="driverClass != null" >
+        #{driverClass,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleLicenseArchivesNum != null" >
+        #{vehicleLicenseArchivesNum,jdbcType=VARCHAR},
+      </if>
+      <if test="engineNum != null" >
+        #{engineNum,jdbcType=VARCHAR},
+      </if>
+      <if test="totalMass != null" >
+        #{totalMass,jdbcType=VARCHAR},
+      </if>
+      <if test="inspectionRecord != null" >
+        #{inspectionRecord,jdbcType=VARCHAR},
+      </if>
+      <if test="passengersNum != null" >
+        #{passengersNum,jdbcType=VARCHAR},
+      </if>
+      <if test="externalDimension != null" >
+        #{externalDimension,jdbcType=VARCHAR},
+      </if>
+      <if test="model != null" >
+        #{model,jdbcType=VARCHAR},
+      </if>
+      <if test="vin != null" >
+        #{vin,jdbcType=VARCHAR},
+      </if>
+      <if test="carWeight != null" >
+        #{carWeight,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleLicenseRegisterDate != null" >
+        #{vehicleLicenseRegisterDate,jdbcType=VARCHAR},
+      </if>
+      <if test="supplier != null" >
+        #{supplier,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierName != null" >
+        #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="serviceType != null" >
+        #{serviceType,jdbcType=VARCHAR},
+      </if>
+      <if test="presentAddress != null" >
+        #{presentAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="colour != null" >
+        #{colour,jdbcType=VARCHAR},
+      </if>
+      <if test="emergencyContact != null" >
+        #{emergencyContact,jdbcType=VARCHAR},
+      </if>
+      <if test="emergencyInformation != null" >
+        #{emergencyInformation,jdbcType=VARCHAR},
+      </if>
+      <if test="frameNum != null" >
+        #{frameNum,jdbcType=VARCHAR},
+      </if>
+      <if test="wheelbase != null" >
+        #{wheelbase,jdbcType=VARCHAR},
+      </if>
+      <if test="fuelType != null" >
+        #{fuelType,jdbcType=VARCHAR},
+      </if>
+      <if test="modelId != null" >
+        #{modelId,jdbcType=INTEGER},
+      </if>
+      <if test="displacement != null" >
+        #{displacement,jdbcType=VARCHAR},
+      </if>
+      <if test="createAt != null" >
+        #{createAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dataAuditTime != null" >
+        #{dataAuditTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="trainTime != null" >
+        #{trainTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="auditTime != null" >
+        #{auditTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateAt != null" >
+        #{updateAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="driverAgreementCompany != null" >
+        #{driverAgreementCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="domicileAddr != null" >
+        #{domicileAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="carFlag != null" >
+        #{carFlag,jdbcType=TINYINT},
+      </if>
+      <if test="informStatus != null" >
+        #{informStatus,jdbcType=TINYINT},
+      </if>
+      <if test="notJoinReason != null" >
+        #{notJoinReason,jdbcType=VARCHAR},
+      </if>
+      <if test="source != null" >
+        #{source,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.driver.DriverVerify" >
+    update driver_verify
+    <set >
+      <if test="driverId != null" >
+        DRIVER_ID = #{driverId,jdbcType=BIGINT},
+      </if>
+      <if test="mobile != null" >
+        MOBILE = #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="idCard != null" >
+        ID_CARD = #{idCard,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        CITY_ID = #{cityId,jdbcType=BIGINT},
+      </if>
+      <if test="cityName != null" >
+        CITY_NAME = #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="brandId != null" >
+        BRAND_ID = #{brandId,jdbcType=BIGINT},
+      </if>
+      <if test="brandName != null" >
+        BRAND_NAME = #{brandName,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleId != null" >
+        VEHICLE_ID = #{vehicleId,jdbcType=BIGINT},
+      </if>
+      <if test="vehicleName != null" >
+        VEHICLE_NAME = #{vehicleName,jdbcType=VARCHAR},
+      </if>
+      <if test="verifyStatus != null" >
+        VERIFY_STATUS = #{verifyStatus,jdbcType=INTEGER},
+      </if>
+      <if test="licenseNum != null" >
+        LICENSE_NUM = #{licenseNum,jdbcType=VARCHAR},
+      </if>
+      <if test="plateNum != null" >
+        PLATE_NUM = #{plateNum,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleType != null" >
+        VEHICLE_TYPE = #{vehicleType,jdbcType=VARCHAR},
+      </if>
+      <if test="criminalRecord != null" >
+        CRIMINAL_RECORD = #{criminalRecord,jdbcType=INTEGER},
+      </if>
+      <if test="idcardSex != null" >
+        IDCARD_SEX = #{idcardSex,jdbcType=VARCHAR},
+      </if>
+      <if test="race != null" >
+        RACE = #{race,jdbcType=VARCHAR},
+      </if>
+      <if test="idcardBirthday != null" >
+        IDCARD_BIRTHDAY = #{idcardBirthday,jdbcType=VARCHAR},
+      </if>
+      <if test="idcardAddress != null" >
+        IDCARD_ADDRESS = #{idcardAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="driverLicenseName != null" >
+        DRIVER_LICENSE_NAME = #{driverLicenseName,jdbcType=VARCHAR},
+      </if>
+      <if test="driverLicenseSex != null" >
+        DRIVER_LICENSE_SEX = #{driverLicenseSex,jdbcType=VARCHAR},
+      </if>
+      <if test="driverLicenseBirthday != null" >
+        DRIVER_LICENSE_BIRTHDAY = #{driverLicenseBirthday,jdbcType=VARCHAR},
+      </if>
+      <if test="nationality != null" >
+        NATIONALITY = #{nationality,jdbcType=VARCHAR},
+      </if>
+      <if test="driverLicenseNum != null" >
+        DRIVER_LICENSE_NUM = #{driverLicenseNum,jdbcType=VARCHAR},
+      </if>
+      <if test="driverLicenseAddress != null" >
+        DRIVER_LICENSE_ADDRESS = #{driverLicenseAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="driverLicenseIssueDate != null" >
+        DRIVER_LICENSE_ISSUE_DATE = #{driverLicenseIssueDate,jdbcType=VARCHAR},
+      </if>
+      <if test="driverLicenseFromDate != null" >
+        DRIVER_LICENSE_FROM_DATE = #{driverLicenseFromDate,jdbcType=VARCHAR},
+      </if>
+      <if test="driverLicenseValidFor != null" >
+        DRIVER_LICENSE_VALID_FOR = #{driverLicenseValidFor,jdbcType=VARCHAR},
+      </if>
+      <if test="owner != null" >
+        OWNER = #{owner,jdbcType=VARCHAR},
+      </if>
+      <if test="useCharacter != null" >
+        USE_CHARACTER = #{useCharacter,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleLicenseAddress != null" >
+        VEHICLE_LICENSE_ADDRESS = #{vehicleLicenseAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleLicenseIssueDate != null" >
+        VEHICLE_LICENSE_ISSUE_DATE = #{vehicleLicenseIssueDate,jdbcType=VARCHAR},
+      </if>
+      <if test="driverClass != null" >
+        DRIVER_CLASS = #{driverClass,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleLicenseArchivesNum != null" >
+        VEHICLE_LICENSE_ARCHIVES_NUM = #{vehicleLicenseArchivesNum,jdbcType=VARCHAR},
+      </if>
+      <if test="engineNum != null" >
+        ENGINE_NUM = #{engineNum,jdbcType=VARCHAR},
+      </if>
+      <if test="totalMass != null" >
+        TOTAL_MASS = #{totalMass,jdbcType=VARCHAR},
+      </if>
+      <if test="inspectionRecord != null" >
+        INSPECTION_RECORD = #{inspectionRecord,jdbcType=VARCHAR},
+      </if>
+      <if test="passengersNum != null" >
+        PASSENGERS_NUM = #{passengersNum,jdbcType=VARCHAR},
+      </if>
+      <if test="externalDimension != null" >
+        EXTERNAL_DIMENSION = #{externalDimension,jdbcType=VARCHAR},
+      </if>
+      <if test="model != null" >
+        MODEL = #{model,jdbcType=VARCHAR},
+      </if>
+      <if test="vin != null" >
+        VIN = #{vin,jdbcType=VARCHAR},
+      </if>
+      <if test="carWeight != null" >
+        CAR_WEIGHT = #{carWeight,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleLicenseRegisterDate != null" >
+        VEHICLE_LICENSE_REGISTER_DATE = #{vehicleLicenseRegisterDate,jdbcType=VARCHAR},
+      </if>
+      <if test="supplier != null" >
+        SUPPLIER = #{supplier,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierName != null" >
+        SUPPLIER_NAME = #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="serviceType != null" >
+        SERVICE_TYPE = #{serviceType,jdbcType=VARCHAR},
+      </if>
+      <if test="presentAddress != null" >
+        PRESENT_ADDRESS = #{presentAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="colour != null" >
+        COLOUR = #{colour,jdbcType=VARCHAR},
+      </if>
+      <if test="emergencyContact != null" >
+        EMERGENCY_CONTACT = #{emergencyContact,jdbcType=VARCHAR},
+      </if>
+      <if test="emergencyInformation != null" >
+        EMERGENCY_INFORMATION = #{emergencyInformation,jdbcType=VARCHAR},
+      </if>
+      <if test="frameNum != null" >
+        FRAME_NUM = #{frameNum,jdbcType=VARCHAR},
+      </if>
+      <if test="wheelbase != null" >
+        WHEELBASE = #{wheelbase,jdbcType=VARCHAR},
+      </if>
+      <if test="fuelType != null" >
+        FUEL_TYPE = #{fuelType,jdbcType=VARCHAR},
+      </if>
+      <if test="modelId != null" >
+        MODEL_ID = #{modelId,jdbcType=INTEGER},
+      </if>
+      <if test="displacement != null" >
+        DISPLACEMENT = #{displacement,jdbcType=VARCHAR},
+      </if>
+      <if test="createAt != null" >
+        CREATE_AT = #{createAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dataAuditTime != null" >
+        DATA_AUDIT_TIME = #{dataAuditTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="trainTime != null" >
+        TRAIN_TIME = #{trainTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="auditTime != null" >
+        AUDIT_TIME = #{auditTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateAt != null" >
+        UPDATE_AT = #{updateAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="driverAgreementCompany != null" >
+        DRIVER_AGREEMENT_COMPANY = #{driverAgreementCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="domicileAddr != null" >
+        DOMICILE_ADDR = #{domicileAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="carFlag != null" >
+        CAR_FLAG = #{carFlag,jdbcType=TINYINT},
+      </if>
+      <if test="informStatus != null" >
+        INFORM_STATUS = #{informStatus,jdbcType=TINYINT},
+      </if>
+      <if test="notJoinReason != null" >
+        NOT_JOIN_REASON = #{notJoinReason,jdbcType=VARCHAR},
+      </if>
+      <if test="source != null" >
+        SOURCE = #{source,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.DriverVerify" >
+    update driver_verify
+    set DRIVER_ID = #{driverId,jdbcType=BIGINT},
+      MOBILE = #{mobile,jdbcType=VARCHAR},
+      NAME = #{name,jdbcType=VARCHAR},
+      ID_CARD = #{idCard,jdbcType=VARCHAR},
+      CITY_ID = #{cityId,jdbcType=BIGINT},
+      CITY_NAME = #{cityName,jdbcType=VARCHAR},
+      BRAND_ID = #{brandId,jdbcType=BIGINT},
+      BRAND_NAME = #{brandName,jdbcType=VARCHAR},
+      VEHICLE_ID = #{vehicleId,jdbcType=BIGINT},
+      VEHICLE_NAME = #{vehicleName,jdbcType=VARCHAR},
+      VERIFY_STATUS = #{verifyStatus,jdbcType=INTEGER},
+      LICENSE_NUM = #{licenseNum,jdbcType=VARCHAR},
+      PLATE_NUM = #{plateNum,jdbcType=VARCHAR},
+      VEHICLE_TYPE = #{vehicleType,jdbcType=VARCHAR},
+      CRIMINAL_RECORD = #{criminalRecord,jdbcType=INTEGER},
+      IDCARD_SEX = #{idcardSex,jdbcType=VARCHAR},
+      RACE = #{race,jdbcType=VARCHAR},
+      IDCARD_BIRTHDAY = #{idcardBirthday,jdbcType=VARCHAR},
+      IDCARD_ADDRESS = #{idcardAddress,jdbcType=VARCHAR},
+      DRIVER_LICENSE_NAME = #{driverLicenseName,jdbcType=VARCHAR},
+      DRIVER_LICENSE_SEX = #{driverLicenseSex,jdbcType=VARCHAR},
+      DRIVER_LICENSE_BIRTHDAY = #{driverLicenseBirthday,jdbcType=VARCHAR},
+      NATIONALITY = #{nationality,jdbcType=VARCHAR},
+      DRIVER_LICENSE_NUM = #{driverLicenseNum,jdbcType=VARCHAR},
+      DRIVER_LICENSE_ADDRESS = #{driverLicenseAddress,jdbcType=VARCHAR},
+      DRIVER_LICENSE_ISSUE_DATE = #{driverLicenseIssueDate,jdbcType=VARCHAR},
+      DRIVER_LICENSE_FROM_DATE = #{driverLicenseFromDate,jdbcType=VARCHAR},
+      DRIVER_LICENSE_VALID_FOR = #{driverLicenseValidFor,jdbcType=VARCHAR},
+      OWNER = #{owner,jdbcType=VARCHAR},
+      USE_CHARACTER = #{useCharacter,jdbcType=VARCHAR},
+      VEHICLE_LICENSE_ADDRESS = #{vehicleLicenseAddress,jdbcType=VARCHAR},
+      VEHICLE_LICENSE_ISSUE_DATE = #{vehicleLicenseIssueDate,jdbcType=VARCHAR},
+      DRIVER_CLASS = #{driverClass,jdbcType=VARCHAR},
+      VEHICLE_LICENSE_ARCHIVES_NUM = #{vehicleLicenseArchivesNum,jdbcType=VARCHAR},
+      ENGINE_NUM = #{engineNum,jdbcType=VARCHAR},
+      TOTAL_MASS = #{totalMass,jdbcType=VARCHAR},
+      INSPECTION_RECORD = #{inspectionRecord,jdbcType=VARCHAR},
+      PASSENGERS_NUM = #{passengersNum,jdbcType=VARCHAR},
+      EXTERNAL_DIMENSION = #{externalDimension,jdbcType=VARCHAR},
+      MODEL = #{model,jdbcType=VARCHAR},
+      VIN = #{vin,jdbcType=VARCHAR},
+      CAR_WEIGHT = #{carWeight,jdbcType=VARCHAR},
+      VEHICLE_LICENSE_REGISTER_DATE = #{vehicleLicenseRegisterDate,jdbcType=VARCHAR},
+      SUPPLIER = #{supplier,jdbcType=VARCHAR},
+      SUPPLIER_NAME = #{supplierName,jdbcType=VARCHAR},
+      SERVICE_TYPE = #{serviceType,jdbcType=VARCHAR},
+      PRESENT_ADDRESS = #{presentAddress,jdbcType=VARCHAR},
+      COLOUR = #{colour,jdbcType=VARCHAR},
+      EMERGENCY_CONTACT = #{emergencyContact,jdbcType=VARCHAR},
+      EMERGENCY_INFORMATION = #{emergencyInformation,jdbcType=VARCHAR},
+      FRAME_NUM = #{frameNum,jdbcType=VARCHAR},
+      WHEELBASE = #{wheelbase,jdbcType=VARCHAR},
+      FUEL_TYPE = #{fuelType,jdbcType=VARCHAR},
+      MODEL_ID = #{modelId,jdbcType=INTEGER},
+      DISPLACEMENT = #{displacement,jdbcType=VARCHAR},
+      CREATE_AT = #{createAt,jdbcType=TIMESTAMP},
+      DATA_AUDIT_TIME = #{dataAuditTime,jdbcType=TIMESTAMP},
+      TRAIN_TIME = #{trainTime,jdbcType=TIMESTAMP},
+      AUDIT_TIME = #{auditTime,jdbcType=TIMESTAMP},
+      UPDATE_AT = #{updateAt,jdbcType=TIMESTAMP},
+      DRIVER_AGREEMENT_COMPANY = #{driverAgreementCompany,jdbcType=VARCHAR},
+      DOMICILE_ADDR = #{domicileAddr,jdbcType=VARCHAR},
+      CAR_FLAG = #{carFlag,jdbcType=TINYINT},
+      INFORM_STATUS = #{informStatus,jdbcType=TINYINT},
+      NOT_JOIN_REASON = #{notJoinReason,jdbcType=VARCHAR},
+      SOURCE = #{source,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

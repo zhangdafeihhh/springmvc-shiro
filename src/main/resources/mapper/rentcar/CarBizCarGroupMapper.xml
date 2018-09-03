@@ -42,28 +42,25 @@
     where group_id = #{groupId,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.zhuanche.entity.rentcar.CarBizCarGroup" >
-    <selectKey resultType="java.lang.Integer" keyProperty="groupId" order="AFTER" >
-      SELECT LAST_INSERT_ID()
-    </selectKey>
-    insert into car_biz_car_group (group_name, seat_num, rank, 
-      sort, chartered_status, type, 
-      status, create_by, update_by, 
-      create_date, update_date, selected_img_url, 
-      selected_url_new, unselected_url_new, memo, 
-      img_url)
-    values (#{groupName,jdbcType=VARCHAR}, #{seatNum,jdbcType=INTEGER}, #{rank,jdbcType=INTEGER}, 
-      #{sort,jdbcType=INTEGER}, #{charteredStatus,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, 
-      #{status,jdbcType=INTEGER}, #{createBy,jdbcType=INTEGER}, #{updateBy,jdbcType=INTEGER}, 
-      #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{selectedImgUrl,jdbcType=VARCHAR}, 
-      #{selectedUrlNew,jdbcType=VARCHAR}, #{unselectedUrlNew,jdbcType=VARCHAR}, #{memo,jdbcType=LONGVARCHAR}, 
-      #{imgUrl,jdbcType=LONGVARCHAR})
+    insert into car_biz_car_group (group_id, group_name, seat_num, 
+      rank, sort, chartered_status, 
+      type, status, create_by, 
+      update_by, create_date, update_date, 
+      selected_img_url, selected_url_new, unselected_url_new, 
+      memo, img_url)
+    values (#{groupId,jdbcType=INTEGER}, #{groupName,jdbcType=VARCHAR}, #{seatNum,jdbcType=INTEGER}, 
+      #{rank,jdbcType=INTEGER}, #{sort,jdbcType=INTEGER}, #{charteredStatus,jdbcType=INTEGER}, 
+      #{type,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{createBy,jdbcType=INTEGER}, 
+      #{updateBy,jdbcType=INTEGER}, #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{selectedImgUrl,jdbcType=VARCHAR}, #{selectedUrlNew,jdbcType=VARCHAR}, #{unselectedUrlNew,jdbcType=VARCHAR}, 
+      #{memo,jdbcType=LONGVARCHAR}, #{imgUrl,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.rentcar.CarBizCarGroup" >
-    <selectKey resultType="java.lang.Integer" keyProperty="groupId" order="AFTER" >
-      SELECT LAST_INSERT_ID()
-    </selectKey>
     insert into car_biz_car_group
     <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="groupId != null" >
+        group_id,
+      </if>
       <if test="groupName != null" >
         group_name,
       </if>
@@ -114,6 +111,9 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="groupId != null" >
+        #{groupId,jdbcType=INTEGER},
+      </if>
       <if test="groupName != null" >
         #{groupName,jdbcType=VARCHAR},
       </if>

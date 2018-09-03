@@ -1,4 +1,4 @@
-package com.zhuanche.serv;
+package com.zhuanche.serv.driverteam;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -6,7 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.github.pagehelper.PageInfo;
+import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.serv.CarBizCityService;
+import com.zhuanche.serv.CarBizSupplierService;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,94 +31,47 @@ import com.zhuanche.util.BeanUtil;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
-/**车队管理**/
+/**
+ * @description: 车队设置
+ *
+ * <PRE>
+ * <BR>	修改记录
+ * <BR>-----------------------------------------------
+ * <BR>	修改日期			修改人			修改内容
+ * </PRE>
+ *
+ * @author lunan
+ * @version 1.0
+ * @since 1.0
+ * @create: 2018-08-29 16:54
+ *
+ */
 @Service
 public class CarDriverTeamService{
+
+	private static final Logger logger = LoggerFactory.getLogger(CarDriverTeamService.class);
+
 	@Autowired
 	private DataPermissionHelper dataPermissionHelper;
+
 	@Autowired
-	private CarBizCityService         carBizCityService;
+	private CarBizCityService carBizCityService;
+
 	@Autowired
-	private CarBizSupplierService  carBizSupplierService;
+	private CarBizSupplierService carBizSupplierService;
+
 	@Autowired
 	private CarDriverTeamExMapper carDriverTeamExMapper;
-	@Autowired
-	private CarBizCityExMapper        carBizCityExMapper;
-	@Autowired
-	private CarBizSupplierExMapper carBizSupplierExMapper;
-	
-	/**查询城市列表（超级管理员可以查询出所有城市、普通管理员只能查询自己数据权限内的城市）**/
-	public List<CarBizCity> queryCityList(){
-		if(WebSessionUtil.isSupperAdmin()) {
-			return carBizCityExMapper.queryByIds(null);
-		}else {
-			Set<Integer> permOfcityids = dataPermissionHelper.havePermOfCityIds("");
-			if(permOfcityids.size()==0) {
-				return new ArrayList<CarBizCity>();
-			}
-			return carBizCityExMapper.queryByIds(permOfcityids);
-		}
-	}
-	
-	/**根据一个城市ID，查询供应商列表（超级管理员可以查询出所有供应商、普通管理员只能查询自己数据权限内的供应商）**/
-	public List<CarBizSupplier> querySupplierList( Integer cityId ){
-		if(cityId==null || cityId.intValue()<=0) {
-			return new ArrayList<CarBizSupplier>();
-		}
-		//对城市ID进行校验数据权限
-		if(WebSessionUtil.isSupperAdmin()==false ) {
-			Set<Integer> permOfcityids = dataPermissionHelper.havePermOfCityIds("");
-			if( permOfcityids.size()==0 || permOfcityids.contains(cityId)==false  ) {
-				return new ArrayList<CarBizSupplier>();
-			}
-		}
-		//进行查询 (区分 超级管理员 、普通管理员 )
-		if( WebSessionUtil.isSupperAdmin() ) {
-			return carBizSupplierExMapper.querySuppliers(cityId, null);
-		}else {
-			Set<Integer> permOfsupplierIds = dataPermissionHelper.havePermOfSupplierIds("");
-			if(permOfsupplierIds.size()==0 ) {
-				return new ArrayList<CarBizSupplier>();
-			}
-			return carBizSupplierExMapper.querySuppliers(cityId, permOfsupplierIds);
-		}
-	}
-	
-	/**根据一个城市ID、一个供应商ID，查询车队列表（超级管理员可以查询出所有车队、普通管理员只能查询自己数据权限内的车队）**/   
-	public List<CarDriverTeam> queryDriverTeamList( Integer cityId, Integer supplierId){
-		if(cityId==null || cityId.intValue()<=0 || supplierId==null || supplierId.intValue()<=0) {
-			return new ArrayList<CarDriverTeam>();
-		}
-		//对城市ID、供应商ID 进行校验数据权限
-		if(WebSessionUtil.isSupperAdmin()==false ) {
-			Set<Integer> permOfcityids = dataPermissionHelper.havePermOfCityIds("");
-			if( permOfcityids.size()==0 || permOfcityids.contains(cityId)==false  ) {
-				return new ArrayList<CarDriverTeam>();
-			}
-			Set<Integer> permOfsupplierIds = dataPermissionHelper.havePermOfSupplierIds("");
-			if( permOfsupplierIds.size()==0 || permOfsupplierIds.contains(supplierId)==false  ) {
-				return new ArrayList<CarDriverTeam>();
-			}
-		}
-		//进行查询 (区分 超级管理员 、普通管理员 )
-		Set<String> cityIds = new HashSet<String>(2);
-		cityIds.add(String.valueOf(cityId));
-		Set<String> supplierIds = new HashSet<String>(2);
-		supplierIds.add(String.valueOf(supplierId));
-		if( WebSessionUtil.isSupperAdmin() ) {
-			return carDriverTeamExMapper.queryDriverTeam(cityIds, supplierIds, null);
-		}else {
-			Set<Integer> permOfteamIds = dataPermissionHelper.havePermOfDriverTeamIds("");
-			if(permOfteamIds.size()==0 ) {
-				return new ArrayList<CarDriverTeam>();
-			}
-			return carDriverTeamExMapper.queryDriverTeam(cityIds, supplierIds, permOfteamIds);
-		}
-	}
-	
-	/**查询车队列表信息**/
+
+	/**
+	* @Desc: 查询车队列表 
+	* @param:  
+	* @return:  
+	* @Author: lunan
+	* @Date: 2018/8/29 
+	*/ 
 	@SuppressWarnings("rawtypes")
-	public LayUIPage queryDriverTeamPage( int page, int pageSize, String cityId, String supplierId, Integer teamId ) {
+	public PageDTO queryDriverTeamPage(int page, int pageSize, String cityId, String supplierId, Integer teamId ) {
 		//----------------------------------------------------------------------------------首先，如果是普通管理员，校验数据权限（cityId、supplierId、teamId）
 		Set<Integer> permOfCity        = new HashSet<Integer>();//普通管理员可以管理的所有城市ID
 		Set<Integer> permOfSupplier = new HashSet<Integer>();//普通管理员可以管理的所有供应商ID
@@ -122,16 +81,17 @@ public class CarDriverTeamService{
 			permOfSupplier = dataPermissionHelper.havePermOfSupplierIds("");
 			permOfTeam     = dataPermissionHelper.havePermOfDriverTeamIds("");
 			if( permOfCity.size()==0 || (StringUtils.isNotEmpty(cityId) && permOfCity.contains(Integer.valueOf(cityId))==false)  ) {
-				return LayUIPage.build("您没有查询此城市的权限！", 0, null);
+				return null;
 			}
 			if( permOfSupplier.size()==0 || (StringUtils.isNotEmpty(supplierId) && permOfSupplier.contains(Integer.valueOf(supplierId))==false)   ) {
-				return LayUIPage.build("您没有查询此供应商的权限！", 0, null);
+				return null;
 			}
 			if( permOfTeam.size()==0 || (teamId!=null && permOfTeam.contains(Integer.valueOf(teamId))==false )   ) {
-				return LayUIPage.build("您没有查询此车队的权限！", 0, null);
+//				return LayUIPage.build("您没有查询此车队的权限！", 0, null);
+				return null;
 			}
 		}
-		
+
 		//A--------------------------------------------------------------------------------设置SQL查询参数
 		Set<String> cityIds        = new HashSet<String>();
 		Set<String> supplierIds = new HashSet<String>();
@@ -172,17 +132,21 @@ public class CarDriverTeamService{
 		}
 		
 		//B----------------------------------------------------------------------------------进行分页查询
-		Page pager = PageHelper.startPage(page, pageSize, true);
+		PageDTO pageDTO = new PageDTO();
 		int total = 0;
 		List<CarDriverTeam> driverTeams = null;
+		PageInfo<CarDriverTeam> pageInfo =null;
 		try{
-			driverTeams = carDriverTeamExMapper.queryDriverTeam(cityIds, supplierIds, teamIds);
-			total = (int) pager.getTotal();
+			pageInfo =
+					PageHelper.startPage(page, pageSize, true).doSelectPageInfo(() -> carDriverTeamExMapper.queryDriverTeam(cityIds, supplierIds, teamIds));
+//			driverTeams = carDriverTeamExMapper.queryDriverTeam(cityIds, supplierIds, teamIds);
+			driverTeams = pageInfo.getList();
+			total = (int)pageInfo.getTotal();
 		}finally {
 			PageHelper.clearPage();
 		}
 		if(driverTeams==null || driverTeams.size()==0) {
-			return LayUIPage.build(null, 0, null);
+			return new PageDTO();
 		}
 		
 		//C----------------------------------------------------------------------------------将分页结果转换为DTO，并填全城市名称、供应商名称
@@ -215,6 +179,8 @@ public class CarDriverTeamService{
 				}
 			}
 		}
-		return LayUIPage.build(null, total, dtos);
+		pageDTO.setResult(dtos);
+		pageDTO.setTotal(total);
+		return pageDTO;
 	}
 }
