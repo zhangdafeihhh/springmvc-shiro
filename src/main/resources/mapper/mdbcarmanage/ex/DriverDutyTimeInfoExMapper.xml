@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.DriverDutyTimeInfoExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.DriverDutyTimeInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="time" property="time" jdbcType="DATE" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="must_duty_time" property="mustDutyTime" jdbcType="VARCHAR" />
+    <result column="duty_time" property="dutyTime" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, time, driver_id, must_duty_time, duty_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from driver_duty_time_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectOne" resultType="com.zhuanche.entity.mdbcarmanage.DriverDutyTimeInfo"
+          parameterType="com.zhuanche.entity.mdbcarmanage.DriverDutyTimeInfo">
+    select
+    d.id,
+    d.driver_id driverId,
+    d.time,
+    d.must_duty_time mustDutyTime,
+    d.duty_time dutyTime
+    from
+    driver_duty_time_info d
+    where 1=1
+    <if test="driverId!=null and driverId!=''">
+      and d.driver_id = #{driverId}
+    </if>
+    <if test="time!=null and time!=''">
+      and d.time = #{time}
+    </if>
+  </select>
+  <insert id="insertDriverDutyTimeInfoList" parameterType="java.util.Map">
+    insert into driver_duty_time_info (driver_id,time,must_duty_time,duty_time)
+    values
+    <foreach collection="list" item="item" index="index" separator="," >
+      (#{item.driverId},#{item.time},#{item.mustDutyTime},#{item.dutyTime})
+    </foreach>
+
+  </insert>
+
+  <update id="updateDriverDutyTimeInfoList" parameterType="java.util.Map">
+    <foreach collection="list" item="item" index="index" separator=";" >
+      UPDATE driver_duty_time_info
+      <set>
+        must_duty_time = #{item.mustDutyTime},
+        duty_time = #{item.dutyTime}
+      </set>
+      WHERE
+      id = #{item.id}
+    </foreach>
+  </update>
+
+</mapper>

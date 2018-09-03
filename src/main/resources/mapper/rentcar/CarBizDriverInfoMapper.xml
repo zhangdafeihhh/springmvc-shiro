@@ -125,8 +125,8 @@
     assessment, driverLicenseIssuingDateStart, driverLicenseIssuingDateEnd, driverLicenseIssuingCorp, 
     driverLicenseIssuingNumber, xy_driver_number, driver_license_issuing_register_date, 
     driver_license_issuing_first_date, driver_license_issuing_grant_date, birth_day, 
-    house_hold_register_permanent, is_upload_card, is_must_confirmation, english_name, 
-    contract_type, contract_no, contract_file, cooperation_type, account_type, group_id, 
+    house_hold_register_permanent, is_upload_card, is_must_confirmation, english_name,
+    contract_type, contract_no, contract_file, cooperation_type, account_type, group_id,
     is_two_shifts, is_image
   </sql>
   <sql id="Blob_Column_List" >
@@ -148,9 +148,9 @@
     <selectKey resultType="java.lang.Integer" keyProperty="driverId" order="AFTER" >
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into car_biz_driver_info (password, phone, gender, 
-      name, supplier_id, age, 
-      current_address, emergency_contact_person, 
+    insert into car_biz_driver_info (password, phone, gender,
+      name, supplier_id, age,
+      current_address, emergency_contact_person,
       emergency_contact_number, id_card_no, superintend_no, 
       superintend_url, driving_license_type, driving_years, 
       archives_no, issue_date, expire_date, 
@@ -181,12 +181,12 @@
       xy_driver_number, driver_license_issuing_register_date, 
       driver_license_issuing_first_date, driver_license_issuing_grant_date, 
       birth_day, house_hold_register_permanent, is_upload_card, 
-      is_must_confirmation, english_name, contract_type, 
-      contract_no, contract_file, cooperation_type, 
-      account_type, group_id, is_two_shifts, 
+      is_must_confirmation, english_name, contract_type,
+      contract_no, contract_file, cooperation_type,
+      account_type, group_id, is_two_shifts,
       is_image, memo)
-    values (#{password,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{gender,jdbcType=INTEGER}, 
-      #{name,jdbcType=VARCHAR}, #{supplierId,jdbcType=INTEGER}, #{age,jdbcType=INTEGER}, 
+    values (#{password,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{gender,jdbcType=INTEGER},
+      #{name,jdbcType=VARCHAR}, #{supplierId,jdbcType=INTEGER}, #{age,jdbcType=INTEGER},
       #{currentAddress,jdbcType=VARCHAR}, #{emergencyContactPerson,jdbcType=VARCHAR}, 
       #{emergencyContactNumber,jdbcType=VARCHAR}, #{idCardNo,jdbcType=VARCHAR}, #{superintendNo,jdbcType=VARCHAR}, 
       #{superintendUrl,jdbcType=VARCHAR}, #{drivingLicenseType,jdbcType=VARCHAR}, #{drivingYears,jdbcType=INTEGER}, 
@@ -218,9 +218,9 @@
       #{xyDriverNumber,jdbcType=VARCHAR}, #{driverLicenseIssuingRegisterDate,jdbcType=VARCHAR}, 
       #{driverLicenseIssuingFirstDate,jdbcType=VARCHAR}, #{driverLicenseIssuingGrantDate,jdbcType=VARCHAR}, 
       #{birthDay,jdbcType=VARCHAR}, #{houseHoldRegisterPermanent,jdbcType=VARCHAR}, #{isUploadCard,jdbcType=INTEGER}, 
-      #{isMustConfirmation,jdbcType=INTEGER}, #{englishName,jdbcType=VARCHAR}, #{contractType,jdbcType=VARCHAR}, 
-      #{contractNo,jdbcType=VARCHAR}, #{contractFile,jdbcType=VARCHAR}, #{cooperationType,jdbcType=TINYINT}, 
-      #{accountType,jdbcType=INTEGER}, #{groupId,jdbcType=INTEGER}, #{isTwoShifts,jdbcType=INTEGER}, 
+      #{isMustConfirmation,jdbcType=INTEGER}, #{englishName,jdbcType=VARCHAR}, #{contractType,jdbcType=VARCHAR},
+      #{contractNo,jdbcType=VARCHAR}, #{contractFile,jdbcType=VARCHAR}, #{cooperationType,jdbcType=TINYINT},
+      #{accountType,jdbcType=INTEGER}, #{groupId,jdbcType=INTEGER}, #{isTwoShifts,jdbcType=INTEGER},
       #{isImage,jdbcType=TINYINT}, #{memo,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.rentcar.CarBizDriverInfo" >
@@ -229,6 +229,9 @@
     </selectKey>
     insert into car_biz_driver_info
     <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="driverId != null" >
+        driver_id,
+      </if>
       <if test="password != null" >
         password,
       </if>
@@ -537,6 +540,9 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="driverId != null" >
+        #{driverId,jdbcType=INTEGER},
+      </if>
       <if test="password != null" >
         #{password,jdbcType=VARCHAR},
       </if>
@@ -812,9 +818,6 @@
       </if>
       <if test="isMustConfirmation != null" >
         #{isMustConfirmation,jdbcType=INTEGER},
-      </if>
-      <if test="englishName != null" >
-        #{englishName,jdbcType=VARCHAR},
       </if>
       <if test="contractType != null" >
         #{contractType,jdbcType=VARCHAR},
@@ -1123,9 +1126,6 @@
       </if>
       <if test="isMustConfirmation != null" >
         is_must_confirmation = #{isMustConfirmation,jdbcType=INTEGER},
-      </if>
-      <if test="englishName != null" >
-        english_name = #{englishName,jdbcType=VARCHAR},
       </if>
       <if test="contractType != null" >
         contract_type = #{contractType,jdbcType=VARCHAR},

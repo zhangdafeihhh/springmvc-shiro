@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
  * <BR>	修改日期			修改人			修改内容
  * </PRE>
  * 
- * @author afi
+ * @author lunan
  * @since 1.0
  * @version 1.0
  */
