@@ -119,12 +119,7 @@ public class LoginController{
 		Subject currentLoginUser = SecurityUtils.getSubject();
 		//A:是否已经登录
 		if(currentLoginUser.isAuthenticated()) {
-			if(isAjax) {
-				return AjaxResponse.success( null );
-			}else {
-				response.sendRedirect(homepageUrl);
-				return null;
-			}
+			return AjaxResponse.success( null );
 		}
 		//B:查询用户信息
 		CarAdmUser user = carAdmUserExMapper.queryByAccount(username);
@@ -153,6 +148,9 @@ public class LoginController{
 			UsernamePasswordToken token = new UsernamePasswordToken( username, password.toCharArray() );
 			currentLoginUser.login(token);
 			
+			//username ,  currentLoginUser.getSession().getId();
+			
+			
 			//TODO 记录登录用户的所有会话ID
 			//TODO 记录登录用户的所有会话ID
 			//TODO 记录登录用户的所有会话ID
@@ -163,12 +161,7 @@ public class LoginController{
 			return AjaxResponse.fail(RestErrorCode.USER_LOGIN_FAILED) ;
 		}
 		//返回登录成功
-		if(isAjax) {
-			return AjaxResponse.success( null );
-		}else {
-			response.sendRedirect(homepageUrl);
-			return null;
-		}
+		return AjaxResponse.success( null );
     }
 	
 	/**执行登出**/
