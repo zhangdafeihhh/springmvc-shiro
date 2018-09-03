@@ -52,14 +52,30 @@
     order by supplier_id
   </select>
 
-  <select id="querySupplierBySupplierName" resultType="int">
-    select
-      supplier_id
-    from
-      car_biz_supplier
-    where
-      status = 1
-      and supplier_name = #{supplierName}
-  </select>
+    <select id="queryForObject" parameterType="com.zhuanche.entity.rentcar.CarBizSupplier"  resultType="com.zhuanche.entity.rentcar.CarBizSupplier">
+	 select
+		t.supplier_id supplierId,t.supplier_num supplierNum,t.supplier_full_name supplierFullName,t.supplier_city supplierCity,t.type,
+		t.contacts,t.contacts_phone contactsPhone,t.memo,t.status,t.create_by createBy,t.update_by updateBy,t.create_date createDate,
+		t.update_date updateDate,c.city_name supplierCityName,u1.name createName,u2.name updateName,
+		t.isCommission,t.posPayFlag,t.enterprise_type enterpriseType,t.cooperation_type cooperationType,
+		ct.cooperation_name cooperationName,t.address,t.dispatcher_phone dispatcherPhone
+		from car_biz_supplier t
+		left join car_biz_city c on c.city_id = t.supplier_city
+		left join car_sys_user u1 on u1.user_id = t.create_by
+		left join car_sys_user u2 on u2.user_id = t.update_by
+		left join car_biz_cooperation_type ct on ct.id = t.cooperation_type
+		where 1=1
+		and t.supplier_id = #{supplierId}
+	 </select>
+
+    <select id="querySupplierBySupplierName" resultType="int">
+        select
+        supplier_id
+        from
+        car_biz_supplier
+        where
+        status = 1
+        and supplier_name = #{supplierName}
+    </select>
   
 </mapper>

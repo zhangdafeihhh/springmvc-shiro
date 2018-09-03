@@ -31,4 +31,25 @@
     limit 1
   </select>
   
+  <!-- 查询用户列表 -->
+  <select id="queryUsers" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from car_adm_user
+    where 1=1 
+    <if test="account!=null">
+ 		and account = #{account} 
+    </if>
+    <if test="userName!=null">
+    	and user_name like #{userName}
+    </if>
+    <if test="phone!=null">
+    	and phone = #{phone}
+    </if>
+    <if test="status!=null">
+    	and status = #{status}
+    </if>
+    order by user_id
+  </select>
+
 </mapper>

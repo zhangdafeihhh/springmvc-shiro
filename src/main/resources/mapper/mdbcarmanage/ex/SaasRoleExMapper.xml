@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.SaasRoleExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.SaasRole" >
+    <id column="role_id" property="roleId" jdbcType="INTEGER" />
+    <result column="role_code" property="roleCode" jdbcType="VARCHAR" />
+    <result column="role_name" property="roleName" jdbcType="VARCHAR" />
+    <result column="valid" property="valid" jdbcType="BIT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    role_id, role_code, role_name, valid
+  </sql>
+  
+  <!-- 查询角色列表 -->
+  <select id="queryRoles" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from saas_role
+    where 1=1
+    <if test="roleIds!=null and roleIds.size()>0">
+	    and role_id in 
+	    <foreach collection="roleIds" open="(" close=")" separator="," item="id">
+	    	#{id}
+	    </foreach>
+    </if>
+    <if test="roleCode!=null">
+    	and role_code = #{roleCode}
+    </if>
+    <if test="roleName!=null">
+    	and  role_name like #{roleName}
+    </if>
+    <if test="valid!=null">
+    	and valid = #{valid}
+    </if>
+    order by role_id
+  </select>
+ 
+   <!-- 根据用户ID，查询其拥有的所有有效的角色ID -->
+  <select id="queryRoleIdsOfUser" resultType="java.lang.Integer">
+		select DISTINCT r.role_id 
+		from saas_role r, saas_user_role_ralation ur 
+		where r.role_id=ur.role_id
+		and r.valid=1 and ur.user_id=#{userId}
+  </select>
+  <!-- 根据用户ID，查询其拥有的所有有效的角色代码 -->
+  <select id="queryRoleCodesOfUser" resultType="java.lang.String">
+		select DISTINCT r.role_code 
+		from saas_role r, saas_user_role_ralation ur 
+		where r.role_id=ur.role_id
+		and r.valid=1 and ur.user_id=#{userId}
+  </select>
+ 
+</mapper>

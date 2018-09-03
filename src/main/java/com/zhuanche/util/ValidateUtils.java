@@ -2,6 +2,7 @@ package com.zhuanche.util;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -41,7 +42,7 @@ public class ValidateUtils {
      * @param IDStr
      *            身份证号
      * @return 有效：返回"" 无效：返回String信息
-     * @throws ParseException
+     * @throws
      */
     public static String IDCardValidate(String IDStr) throws Exception {
         String errorInfo = "";// 记录错误信息
@@ -260,5 +261,53 @@ public class ValidateUtils {
     }
     
     /*********************************** 身份证验证结束 ****************************************/
+
+
+    public static String REGULAR_IDCARDNO = "(^[A-Z]{1}[0-9]{6}[\\(]{1}[a-zA-Z0-9]{1}[\\)]{1}$)";
+    public static String REGULAR_IDCARDNO2 = "(^[A-Z]{1}[0-9]{10}$)";
+    public static String BANK_CARD_NUMBER = "(^[0-9]{16,19}$)";
+    public static String NUMBER_PATTERN = "(^[0-9]*$)";
+    /**
+     * 验证港澳身份证以及港澳内陆通行证
+     * 一般身份证验证方法 ValidateUtils.IDCardValidate(idCardNo);
+     * @param idCardNo
+     * @return
+     */
+    public static Boolean validateIdCarNo(String idCardNo) {
+        String mess = "";
+        try{
+            mess = IDCardValidate(idCardNo);
+            if(StringUtils.isNotEmpty(mess)){
+                if(!isRegular(idCardNo,REGULAR_IDCARDNO)&&!isRegular(idCardNo,REGULAR_IDCARDNO2)){
+                    return false;
+                }else{
+                    return true;
+                }
+            }
+        }catch (Exception e) {
+        }
+        return true;
+    }
+
+    public static Boolean isRegular(String str,String regular){
+        Pattern pattern = Pattern.compile(regular);
+        Matcher isNum = pattern.matcher(str);
+        if( !isNum.matches() ){
+            return false;
+        }
+        return true;
+    }
+
+    public static Boolean isValidDate(String str) {
+        boolean convertSuccess = true;
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            format.setLenient(false);
+            format.parse(str);
+        } catch (ParseException e) {
+            convertSuccess = false;
+        }
+        return convertSuccess;
+    }
 
 }

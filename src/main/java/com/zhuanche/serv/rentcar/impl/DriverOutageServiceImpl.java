@@ -1,7 +1,5 @@
 package com.zhuanche.serv.rentcar.impl;
 
-import com.zhuanche.common.database.DynamicRoutingDataSource;
-import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.entity.rentcar.CarImportExceptionEntity;
 import com.zhuanche.entity.rentcar.DriverOutage;
 import com.zhuanche.entity.rentcar.DriverOutageVo;
@@ -31,11 +29,10 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 
 @Service
 public class DriverOutageServiceImpl implements DriverOutageService {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(DriverOutageServiceImpl.class);
 
     @Autowired

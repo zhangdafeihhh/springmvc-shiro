@@ -1,6 +1,7 @@
 package com.zhuanche.shiro.realm;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -20,12 +21,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
+import mapper.mdbcarmanage.ex.SaasPermissionExMapper;
+import mapper.mdbcarmanage.ex.SaasRoleExMapper;
 
 /**认证  与  权限  **/
 public class UsernamePasswordRealm extends AuthorizingRealm {
     private static final Logger logger = LoggerFactory.getLogger(UsernamePasswordRealm.class);
 	@Autowired
 	private CarAdmUserExMapper carAdmUserExMapper;
+	@Autowired
+	private SaasPermissionExMapper  saasPermissionExMapper;
+	@Autowired
+	private SaasRoleExMapper           saasRoleExMapper;
     
     /**重写：获取用户的身份认证信息**/
 	@Override
@@ -85,21 +92,17 @@ public class UsernamePasswordRealm extends AuthorizingRealm {
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
 		SSOLoginUser loginUser = (SSOLoginUser) principals.getPrimaryPrincipal();
 		String account = loginUser.getLoginName(); //登录名
-    	//TODO
-    	//TODO
+    	//TODO  只读库
+    	//TODO  只读库
+		List<String> perms_string = saasPermissionExMapper.queryPermissionCodesOfUser(  loginUser.getId() );
+		List<String> roles_string   = saasRoleExMapper.queryRoleCodesOfUser( loginUser.getId() );
     	
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
-        Set<String> roles = new HashSet<String>();
-        roles.add("r1");
-        roles.add("r2");
+        Set<String> roles = new HashSet<String>( roles_string );
         authorizationInfo.setRoles( roles );
 		logger.info( "[获取用户授权信息(角色)] "+account+"="+roles);
         
-        Set<String> perms = new HashSet<String>();
-        perms.add("p1");
-        perms.add("p2");
-        perms.add("p3");
-        perms.add("p4");
+        Set<String> perms = new HashSet<String>( perms_string );
         authorizationInfo.setStringPermissions(perms);
 		logger.info( "[获取用户授权信息(权限)] "+account+"="+perms);
         return authorizationInfo;

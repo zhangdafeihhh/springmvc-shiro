@@ -57,14 +57,14 @@
 
   <select id="queryCityByCityName" resultType="int">
     select
-      city_id
+    city_id
     from
-      car_biz_city
+    car_biz_city
     where
-      status = 1
-      <if test="cityName != null and cityName != ''">
-        and city_name = #{cityName}
-      </if>
+    status = 1
+    <if test="cityName != null and cityName != ''">
+      and city_name = #{cityName}
+    </if>
   </select>
-  
+
   </mapper>
