@@ -178,6 +178,22 @@ public class LoginController{
 		}
 		return AjaxResponse.success( null );
 	}
+	
+	/**修改密码**/
+	@RequestMapping("/changePassword")
+	@ResponseBody
+    public AjaxResponse changePassword( String oldPassword, String newPassword ){
+		//TODO
+		//TODO
+		//TODO
+		//TODO
+		//TODO
+		//TODO
+		return null;
+	}
+	
+	
+	
  
 	//-------------------------------------------------------------------------------------------------------------------------------------当前登录用户信息BEGIN
 	@RequestMapping("/currentLoginUserInfo")

@@ -24,7 +24,36 @@
     id, team_name, sort, create_by, create_date, update_by, update_date, city, supplier, 
     remark, status, p_id, duty_start_date, duty_end_date, charge1, charge2, charge3
   </sql>
-  
+
+    <select id="selectByCondition" resultMap="BaseResultMap" parameterType="com.zhuanche.request.DriverTeamRequest" >
+        select
+        <include refid="Base_Column_List" />
+        from car_driver_team
+        where team_name like CONCAT('%',#{teamName,jdbcType=VARCHAR},'%')
+        limit 1
+    </select>
+
+    <select id="queryForListByPid" parameterType="com.zhuanche.request.DriverTeamRequest" resultType="com.zhuanche.entity.mdbcarmanage.CarDriverTeam">
+        SELECT
+        id AS teamId,
+        team_name AS teamName,
+        create_by AS createBy,
+        create_date AS createDate,
+        update_by AS updateBy,
+        update_date AS updateDate ,
+        city AS cities,
+        supplier AS suppliers,
+        remark,
+        status,
+        p_id pId
+        FROM
+        car_driver_team
+        WHERE 1=1  and status!=2
+        <if test="pId!=null and pId!=''">
+            AND p_id = #{pId}
+        </if>
+    </select>
+
   <!-- 查询车队列表(根据城市ID，供应商ID、车队ID  ) -->
   <select id="queryDriverTeam" resultMap="BaseResultMap" >
     select 
