@@ -66,6 +66,12 @@ public final class RestErrorCode{
 	@ResultMessage("父权限已经被禁用，请先启用父权限")
 	public static final int PERMISSION_ENABLE_CANT                     = 10006;
 	
+
+	
+
+
+	
+	//---------------------------------------------------------------------------------------------------------------------------------------------
 	//----------------------------------------------角色管理
 	@ResultMessage("角色不存在")
 	public static final int ROLE_NOT_EXIST                                      = 10100;
@@ -73,25 +79,12 @@ public final class RestErrorCode{
 	public static final int ROLE_CODE_EXIST                                    = 10101;
 	   
 	//-----------------------------------------------业务参数：司机
-	@ResultMessage("司机不存在，请仔细核对！")
+	@ResultMessage("没有该手机号的司机，请仔细核对！")
 	public static final int DRIVER_NOT_EXIST = 2000;
 	@ResultMessage("该司机已存在启用的永久停运！")
 	public static final int DRIVER_OUTAGEALL_EXIST = 2001;
-//	@ResultMessage("司机状态不是正常启用状态")
-//	public static final int DRIVER_STATUS_NOT_ENABLED                     = 1001;
-//	@ResultMessage("司机手机号码与身份证号码不符合")
-//	public static final int DRIVER_PHONE_IDCARD_NOT_MATCHED      = 1002;
-//	@ResultMessage("司机手机号码或司机ID两者必须传入一个")
-//	public static final int DRIVER_PHONE_ID_MUST_HAVE_ONE            = 1003;
-//	@ResultMessage("登录密码不正确")
-//	public static final int DRIVER_LOGIN_PASSWORD_WRONG             = 1004;
-//	@ResultMessage("超过每天换车最大次数（{0}次）")
-//	public static final int DRIVER_EXCEED_BINDBUS_LIMIT_PERDAY     = 1005;
-//	@ResultMessage("无法退出并解绑车辆（您目前有待服务、服务中的任务）")
-//	public static final int DRIVER_CAN_NOT_UNBIND_BUS                    = 1006;
-//	@ResultMessage("无法选取车辆（您目前有服务中的任务）")
-//	public static final int DRIVER_CAN_NOT_BIND_BUS                         = 1007;
-
+	@ResultMessage("该司机已存在启用的临时停运！")
+	public static final int DRIVER_OUTAGE_EXIST = 2002;
 	@ResultMessage("司机手机号已存在")
 	public static final int DRIVER_PHONE_EXIST                     = 3001;
 	@ResultMessage("司机身份证已存在")
