@@ -30,6 +30,7 @@ import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.constants.SaasConst;
 import com.zhuanche.dto.AjaxLoginUserDTO;
 import com.zhuanche.dto.SaasPermissionDTO;
@@ -42,12 +43,13 @@ import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.NumberUtil;
 import com.zhuanche.util.PasswordUtil;
 
+import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import mapper.mdbcarmanage.ex.SaasPermissionExMapper;
 /**用户登录相关的功能**/
 @Controller
 public class LoginController{
-	private static final Logger log =  LoggerFactory.getLogger(LoginController.class);
+	private static final Logger log                                                      =  LoggerFactory.getLogger(LoginController.class);
 	private static final String CACHE_PREFIX_MSGCODE_CONTROL = "mp_login_cache_msgcode_control_";
 	private static final String CACHE_PREFIX_MSGCODE                   = "mp_login_cache_msgcode_";
 	
@@ -57,18 +59,18 @@ public class LoginController{
 	private int msgcodeTimeoutMinutes = 1;
 	
 	@Autowired
+	private CarAdmUserMapper carAdmUserMapper;
+	@Autowired
 	private CarAdmUserExMapper carAdmUserExMapper;
 	@Autowired
 	private SaasPermissionExMapper saasPermissionExMapper;
-	
-	
 	@Autowired
 	private UsernamePasswordRealm usernamePasswordRealm;
 	
 	/**通过用户名、密码，获取短信验证码**/
 	@RequestMapping("/getMsgCode")
 	@ResponseBody
-    public AjaxResponse getMsgCode(String username, String password ){
+    public AjaxResponse getMsgCode( @Verify(param="username",rule="required") String username, @Verify(param="password",rule="required") String password ){
 		//A: 频率检查
 		String flag = RedisCacheUtil.get(CACHE_PREFIX_MSGCODE_CONTROL+username, String.class);
 		if(flag!=null ) {
@@ -105,7 +107,8 @@ public class LoginController{
 	/**执行登录**/
 	@RequestMapping("/dologin")
 	@ResponseBody
-    public AjaxResponse dologin(HttpServletRequest request , HttpServletResponse response, String username, String password, String msgcode ) throws IOException{
+    public AjaxResponse dologin(HttpServletRequest request , HttpServletResponse response, 
+    	@Verify(param="username",rule="required") String username, @Verify(param="password",rule="required") String password, @Verify(param="msgcode",rule="required") String msgcode ) throws IOException{
 		//1.判断是否为AJAX请求
 		boolean isAjax = false;
 		String XMLHttpRequest = request.getHeader("X-Requested-With");
@@ -182,17 +185,26 @@ public class LoginController{
 	/**修改密码**/
 	@RequestMapping("/changePassword")
 	@ResponseBody
-    public AjaxResponse changePassword( String oldPassword, String newPassword ){
-		//TODO
-		//TODO
-		//TODO
-		//TODO
-		//TODO
-		//TODO
-		return null;
+    public AjaxResponse changePassword( @Verify(param="oldPassword",rule="required") String oldPassword, @Verify(param="newPassword",rule="required") String newPassword ){
+		SSOLoginUser ssoLoginUser  =  WebSessionUtil.getCurrentLoginUser();
+		CarAdmUser   carAdmUser    =  carAdmUserMapper.selectByPrimaryKey( ssoLoginUser.getId()  );
+		//A:用户不存在
+		if(carAdmUser==null){
+			return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST) ;
+		}
+		//B:密码不正确
+		String enc_pwd = PasswordUtil.md5(oldPassword, carAdmUser.getAccount());
+		if(!enc_pwd.equalsIgnoreCase(carAdmUser.getPassword())) {
+			return AjaxResponse.fail(RestErrorCode.USER_PASSWORD_WRONG) ;
+		}
+		//C:执行
+		String new_enc_pwd = PasswordUtil.md5(newPassword, carAdmUser.getAccount());
+		CarAdmUser   carAdmUserForUpdate = new  CarAdmUser();
+		carAdmUserForUpdate.setUserId(carAdmUser.getUserId());
+		carAdmUserForUpdate.setPassword(new_enc_pwd);
+		carAdmUserMapper.updateByPrimaryKeySelective(carAdmUserForUpdate);
+		return AjaxResponse.success( null );
 	}
-	
-	
 	
  
 	//-------------------------------------------------------------------------------------------------------------------------------------当前登录用户信息BEGIN

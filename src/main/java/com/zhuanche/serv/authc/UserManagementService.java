@@ -139,20 +139,19 @@ public class UserManagementService{
 	
 	/**七、保存一个用户中的角色ID**/
 	public AjaxResponse saveRoleIds( Integer userId, List<Integer> roleIds) {
-		if( roleIds==null || roleIds.size()==0 ) {
-			return AjaxResponse.success( null );
-		}
 		//先删除
 		saasUserRoleRalationExMapper.deleteRoleIdsOfUser(userId);
 		//再插入
-		List<SaasUserRoleRalation> records = new ArrayList<SaasUserRoleRalation>(  roleIds.size() );
-		for(Integer roleId : roleIds ) {
-			SaasUserRoleRalation ralation = new SaasUserRoleRalation();
-			ralation.setUserId(userId);	
-			ralation.setRoleId(roleId);
-			records.add(ralation);
+		if( roleIds!=null && roleIds.size()>0 ) {
+			List<SaasUserRoleRalation> records = new ArrayList<SaasUserRoleRalation>(  roleIds.size() );
+			for(Integer roleId : roleIds ) {
+				SaasUserRoleRalation ralation = new SaasUserRoleRalation();
+				ralation.setUserId(userId);	
+				ralation.setRoleId(roleId);
+				records.add(ralation);
+			}
+			saasUserRoleRalationExMapper.insertBatch(records);
 		}
-		saasUserRoleRalationExMapper.insertBatch(records);
 		return AjaxResponse.success( null );
 	}
 	

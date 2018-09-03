@@ -57,6 +57,10 @@ public class PermissionManagementService{
 		if(thisPermission == null ) {
 			return AjaxResponse.fail(RestErrorCode.PERMISSION_NOT_EXIST );
 		}
+		//系统预置权限，不能禁用、修改
+		if( SaasConst.SYSTEM_PERMISSIONS.contains( thisPermission.getPermissionCode() ) ) {
+			return AjaxResponse.fail(RestErrorCode.SYSTEM_PERMISSION_CANOT_CHANGE , thisPermission.getPermissionCode() );
+		}
 		//存在已经生效的子权限，请先禁用子权限
 		List<SaasPermission> validChildren = saasPermissionExMapper.queryPermissions(null, permissionId, null, null, null, (byte)1 );
 		if( validChildren!=null && validChildren.size()>0) {
@@ -99,6 +103,10 @@ public class PermissionManagementService{
 		SaasPermission thisPermission = saasPermissionMapper.selectByPrimaryKey( pemission.getPermissionId() );
 		if(thisPermission == null ) {
 			return AjaxResponse.fail(RestErrorCode.PERMISSION_NOT_EXIST );
+		}
+		//系统预置权限，不能禁用、修改
+		if( SaasConst.SYSTEM_PERMISSIONS.contains( thisPermission.getPermissionCode() ) ) {
+			return AjaxResponse.fail(RestErrorCode.SYSTEM_PERMISSION_CANOT_CHANGE , thisPermission.getPermissionCode() );
 		}
 		//权限代码已经存在   (如果发生变化时 )
 		if( pemission.getPermissionCode()!=null && pemission.getPermissionCode().length()>0  && !pemission.getPermissionCode().equalsIgnoreCase(thisPermission.getPermissionCode()) ) {

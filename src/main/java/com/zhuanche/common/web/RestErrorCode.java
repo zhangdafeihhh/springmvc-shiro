@@ -65,6 +65,8 @@ public final class RestErrorCode{
 	public static final int PERMISSION_DISABLE_CANT                    = 10005;
 	@ResultMessage("父权限已经被禁用，请先启用父权限")
 	public static final int PERMISSION_ENABLE_CANT                     = 10006;
+	@ResultMessage("{0}为系统预置权限，不能禁用、修改")
+	public static final int SYSTEM_PERMISSION_CANOT_CHANGE  = 10007;
 	
 
 	
@@ -77,6 +79,8 @@ public final class RestErrorCode{
 	public static final int ROLE_NOT_EXIST                                      = 10100;
 	@ResultMessage("角色代码已经存在")
 	public static final int ROLE_CODE_EXIST                                    = 10101;
+	@ResultMessage("{0}为系统预置角色，不能禁用、修改")
+	public static final int SYSTEM_ROLE_CANOT_CHANGE              = 10102;
 	   
 	//-----------------------------------------------业务参数：司机
 	@ResultMessage("没有该手机号的司机，请仔细核对！")
