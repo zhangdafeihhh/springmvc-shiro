@@ -1,33 +1,40 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="mapper.rentcar.CarBizModelMapper">
-  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarBizModel">
-    <id column="model_id" jdbcType="INTEGER" property="modelId" />
-    <result column="model_name" jdbcType="VARCHAR" property="modelName" />
-    <result column="group_id" jdbcType="INTEGER" property="groupId" />
-    <result column="sort" jdbcType="INTEGER" property="sort" />
-    <result column="status" jdbcType="INTEGER" property="status" />
-    <result column="create_by" jdbcType="INTEGER" property="createBy" />
-    <result column="update_by" jdbcType="INTEGER" property="updateBy" />
-    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
-    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
-      <result column="memo" jdbcType="VARCHAR" property="memo" />
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.CarBizModelMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarBizModel" >
+    <id column="model_id" property="modelId" jdbcType="INTEGER" />
+    <result column="model_name" property="modelName" jdbcType="VARCHAR" />
+    <result column="group_id" property="groupId" jdbcType="INTEGER" />
+    <result column="sort" property="sort" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
   </resultMap>
-  <sql id="Base_Column_List">
+  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizModel" extends="BaseResultMap" >
+    <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
     model_id, model_name, group_id, sort, status, create_by, update_by, create_date, 
-    update_date,memo
+    update_date
   </sql>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  <sql id="Blob_Column_List" >
+    memo
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
     from car_biz_model
     where model_id = #{modelId,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from car_biz_model
     where model_id = #{modelId,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.zhuanche.entity.rentcar.CarBizModel">
+  <insert id="insert" parameterType="com.zhuanche.entity.rentcar.CarBizModel" >
     insert into car_biz_model (model_id, model_name, group_id, 
       sort, status, create_by, 
       update_by, create_date, update_date, 
@@ -37,104 +44,129 @@
       #{updateBy,jdbcType=INTEGER}, #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
       #{memo,jdbcType=LONGVARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.zhuanche.entity.rentcar.CarBizModel">
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.rentcar.CarBizModel" >
     insert into car_biz_model
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="modelId != null">
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="modelId != null" >
         model_id,
       </if>
-      <if test="modelName != null">
+      <if test="modelName != null" >
         model_name,
       </if>
-      <if test="groupId != null">
+      <if test="groupId != null" >
         group_id,
       </if>
-      <if test="sort != null">
+      <if test="sort != null" >
         sort,
       </if>
-      <if test="status != null">
+      <if test="status != null" >
         status,
       </if>
-      <if test="createBy != null">
+      <if test="createBy != null" >
         create_by,
       </if>
-      <if test="updateBy != null">
+      <if test="updateBy != null" >
         update_by,
       </if>
-      <if test="createDate != null">
+      <if test="createDate != null" >
         create_date,
       </if>
-      <if test="updateDate != null">
+      <if test="updateDate != null" >
         update_date,
       </if>
-      <if test="memo != null">
+      <if test="memo != null" >
         memo,
       </if>
     </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="modelId != null">
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="modelId != null" >
         #{modelId,jdbcType=INTEGER},
       </if>
-      <if test="modelName != null">
+      <if test="modelName != null" >
         #{modelName,jdbcType=VARCHAR},
       </if>
-      <if test="groupId != null">
+      <if test="groupId != null" >
         #{groupId,jdbcType=INTEGER},
       </if>
-      <if test="sort != null">
+      <if test="sort != null" >
         #{sort,jdbcType=INTEGER},
       </if>
-      <if test="status != null">
+      <if test="status != null" >
         #{status,jdbcType=INTEGER},
       </if>
-      <if test="createBy != null">
+      <if test="createBy != null" >
         #{createBy,jdbcType=INTEGER},
       </if>
-      <if test="updateBy != null">
+      <if test="updateBy != null" >
         #{updateBy,jdbcType=INTEGER},
       </if>
-      <if test="createDate != null">
+      <if test="createDate != null" >
         #{createDate,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateDate != null">
+      <if test="updateDate != null" >
         #{updateDate,jdbcType=TIMESTAMP},
       </if>
-      <if test="memo != null">
+      <if test="memo != null" >
         #{memo,jdbcType=LONGVARCHAR},
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.rentcar.CarBizModel">
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.rentcar.CarBizModel" >
     update car_biz_model
-    <set>
-      <if test="modelName != null">
+    <set >
+      <if test="modelName != null" >
         model_name = #{modelName,jdbcType=VARCHAR},
       </if>
-      <if test="groupId != null">
+      <if test="groupId != null" >
         group_id = #{groupId,jdbcType=INTEGER},
       </if>
-      <if test="sort != null">
+      <if test="sort != null" >
         sort = #{sort,jdbcType=INTEGER},
       </if>
-      <if test="status != null">
+      <if test="status != null" >
         status = #{status,jdbcType=INTEGER},
       </if>
-      <if test="createBy != null">
+      <if test="createBy != null" >
         create_by = #{createBy,jdbcType=INTEGER},
       </if>
-      <if test="updateBy != null">
+      <if test="updateBy != null" >
         update_by = #{updateBy,jdbcType=INTEGER},
       </if>
-      <if test="createDate != null">
+      <if test="createDate != null" >
         create_date = #{createDate,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateDate != null">
+      <if test="updateDate != null" >
         update_date = #{updateDate,jdbcType=TIMESTAMP},
       </if>
-      <if test="memo != null">
+      <if test="memo != null" >
         memo = #{memo,jdbcType=LONGVARCHAR},
       </if>
     </set>
+    where model_id = #{modelId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zhuanche.entity.rentcar.CarBizModel" >
+    update car_biz_model
+    set model_name = #{modelName,jdbcType=VARCHAR},
+      group_id = #{groupId,jdbcType=INTEGER},
+      sort = #{sort,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      create_by = #{createBy,jdbcType=INTEGER},
+      update_by = #{updateBy,jdbcType=INTEGER},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      memo = #{memo,jdbcType=LONGVARCHAR}
+    where model_id = #{modelId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.rentcar.CarBizModel" >
+    update car_biz_model
+    set model_name = #{modelName,jdbcType=VARCHAR},
+      group_id = #{groupId,jdbcType=INTEGER},
+      sort = #{sort,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      create_by = #{createBy,jdbcType=INTEGER},
+      update_by = #{updateBy,jdbcType=INTEGER},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP}
     where model_id = #{modelId,jdbcType=INTEGER}
   </update>
 </mapper>

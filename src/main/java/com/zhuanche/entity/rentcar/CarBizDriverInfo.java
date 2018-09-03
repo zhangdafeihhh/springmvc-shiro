@@ -203,6 +203,10 @@ public class CarBizDriverInfo {
 
     private Integer groupId;
 
+    private Integer isTwoShifts;
+
+    private Byte isImage;
+
     private String memo;
 
     public Integer getDriverId() {
@@ -1003,6 +1007,22 @@ public class CarBizDriverInfo {
 
     public void setGroupId(Integer groupId) {
         this.groupId = groupId;
+    }
+
+    public Integer getIsTwoShifts() {
+        return isTwoShifts;
+    }
+
+    public void setIsTwoShifts(Integer isTwoShifts) {
+        this.isTwoShifts = isTwoShifts;
+    }
+
+    public Byte getIsImage() {
+        return isImage;
+    }
+
+    public void setIsImage(Byte isImage) {
+        this.isImage = isImage;
     }
 
     public String getMemo() {

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.CarBizDriverAccountMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarBizDriverAccount" >
+    <id column="account_id" property="accountId" jdbcType="INTEGER" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="credit_balance" property="creditBalance" jdbcType="DECIMAL" />
+    <result column="credit_balance_hisall" property="creditBalanceHisall" jdbcType="DECIMAL" />
+    <result column="account_amount" property="accountAmount" jdbcType="DECIMAL" />
+    <result column="frozen_amount" property="frozenAmount" jdbcType="DECIMAL" />
+    <result column="withdraw_deposit" property="withdrawDeposit" jdbcType="DECIMAL" />
+    <result column="settle_account" property="settleAccount" jdbcType="DECIMAL" />
+    <result column="curr_account" property="currAccount" jdbcType="DECIMAL" />
+    <result column="hisall_account" property="hisallAccount" jdbcType="DECIMAL" />
+    <result column="out_curr_account" property="outCurrAccount" jdbcType="DECIMAL" />
+    <result column="out_hisall_account" property="outHisallAccount" jdbcType="DECIMAL" />
+    <result column="version" property="version" jdbcType="INTEGER" />
+    <result column="settle_OTM_fee" property="settleOtmFee" jdbcType="DECIMAL" />
+    <result column="curr_OTM_fee" property="currOtmFee" jdbcType="DECIMAL" />
+    <result column="hisall_OTM_fee" property="hisallOtmFee" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    account_id, driver_id, credit_balance, credit_balance_hisall, account_amount, frozen_amount, 
+    withdraw_deposit, settle_account, curr_account, hisall_account, out_curr_account, 
+    out_hisall_account, version, settle_OTM_fee, curr_OTM_fee, hisall_OTM_fee
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from car_biz_driver_account
+    where account_id = #{accountId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from car_biz_driver_account
+    where account_id = #{accountId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.rentcar.CarBizDriverAccount" >
+    <selectKey resultType="java.lang.Integer" keyProperty="accountId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_biz_driver_account (driver_id, credit_balance, credit_balance_hisall, 
+      account_amount, frozen_amount, withdraw_deposit, 
+      settle_account, curr_account, hisall_account, 
+      out_curr_account, out_hisall_account, version, 
+      settle_OTM_fee, curr_OTM_fee, hisall_OTM_fee
+      )
+    values (#{driverId,jdbcType=INTEGER}, #{creditBalance,jdbcType=DECIMAL}, #{creditBalanceHisall,jdbcType=DECIMAL}, 
+      #{accountAmount,jdbcType=DECIMAL}, #{frozenAmount,jdbcType=DECIMAL}, #{withdrawDeposit,jdbcType=DECIMAL}, 
+      #{settleAccount,jdbcType=DECIMAL}, #{currAccount,jdbcType=DECIMAL}, #{hisallAccount,jdbcType=DECIMAL}, 
+      #{outCurrAccount,jdbcType=DECIMAL}, #{outHisallAccount,jdbcType=DECIMAL}, #{version,jdbcType=INTEGER}, 
+      #{settleOtmFee,jdbcType=DECIMAL}, #{currOtmFee,jdbcType=DECIMAL}, #{hisallOtmFee,jdbcType=DECIMAL}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.rentcar.CarBizDriverAccount" >
+    <selectKey resultType="java.lang.Integer" keyProperty="accountId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_biz_driver_account
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="driverId != null" >
+        driver_id,
+      </if>
+      <if test="creditBalance != null" >
+        credit_balance,
+      </if>
+      <if test="creditBalanceHisall != null" >
+        credit_balance_hisall,
+      </if>
+      <if test="accountAmount != null" >
+        account_amount,
+      </if>
+      <if test="frozenAmount != null" >
+        frozen_amount,
+      </if>
+      <if test="withdrawDeposit != null" >
+        withdraw_deposit,
+      </if>
+      <if test="settleAccount != null" >
+        settle_account,
+      </if>
+      <if test="currAccount != null" >
+        curr_account,
+      </if>
+      <if test="hisallAccount != null" >
+        hisall_account,
+      </if>
+      <if test="outCurrAccount != null" >
+        out_curr_account,
+      </if>
+      <if test="outHisallAccount != null" >
+        out_hisall_account,
+      </if>
+      <if test="version != null" >
+        version,
+      </if>
+      <if test="settleOtmFee != null" >
+        settle_OTM_fee,
+      </if>
+      <if test="currOtmFee != null" >
+        curr_OTM_fee,
+      </if>
+      <if test="hisallOtmFee != null" >
+        hisall_OTM_fee,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="driverId != null" >
+        #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="creditBalance != null" >
+        #{creditBalance,jdbcType=DECIMAL},
+      </if>
+      <if test="creditBalanceHisall != null" >
+        #{creditBalanceHisall,jdbcType=DECIMAL},
+      </if>
+      <if test="accountAmount != null" >
+        #{accountAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="frozenAmount != null" >
+        #{frozenAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="withdrawDeposit != null" >
+        #{withdrawDeposit,jdbcType=DECIMAL},
+      </if>
+      <if test="settleAccount != null" >
+        #{settleAccount,jdbcType=DECIMAL},
+      </if>
+      <if test="currAccount != null" >
+        #{currAccount,jdbcType=DECIMAL},
+      </if>
+      <if test="hisallAccount != null" >
+        #{hisallAccount,jdbcType=DECIMAL},
+      </if>
+      <if test="outCurrAccount != null" >
+        #{outCurrAccount,jdbcType=DECIMAL},
+      </if>
+      <if test="outHisallAccount != null" >
+        #{outHisallAccount,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null" >
+        #{version,jdbcType=INTEGER},
+      </if>
+      <if test="settleOtmFee != null" >
+        #{settleOtmFee,jdbcType=DECIMAL},
+      </if>
+      <if test="currOtmFee != null" >
+        #{currOtmFee,jdbcType=DECIMAL},
+      </if>
+      <if test="hisallOtmFee != null" >
+        #{hisallOtmFee,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.rentcar.CarBizDriverAccount" >
+    update car_biz_driver_account
+    <set >
+      <if test="driverId != null" >
+        driver_id = #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="creditBalance != null" >
+        credit_balance = #{creditBalance,jdbcType=DECIMAL},
+      </if>
+      <if test="creditBalanceHisall != null" >
+        credit_balance_hisall = #{creditBalanceHisall,jdbcType=DECIMAL},
+      </if>
+      <if test="accountAmount != null" >
+        account_amount = #{accountAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="frozenAmount != null" >
+        frozen_amount = #{frozenAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="withdrawDeposit != null" >
+        withdraw_deposit = #{withdrawDeposit,jdbcType=DECIMAL},
+      </if>
+      <if test="settleAccount != null" >
+        settle_account = #{settleAccount,jdbcType=DECIMAL},
+      </if>
+      <if test="currAccount != null" >
+        curr_account = #{currAccount,jdbcType=DECIMAL},
+      </if>
+      <if test="hisallAccount != null" >
+        hisall_account = #{hisallAccount,jdbcType=DECIMAL},
+      </if>
+      <if test="outCurrAccount != null" >
+        out_curr_account = #{outCurrAccount,jdbcType=DECIMAL},
+      </if>
+      <if test="outHisallAccount != null" >
+        out_hisall_account = #{outHisallAccount,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null" >
+        version = #{version,jdbcType=INTEGER},
+      </if>
+      <if test="settleOtmFee != null" >
+        settle_OTM_fee = #{settleOtmFee,jdbcType=DECIMAL},
+      </if>
+      <if test="currOtmFee != null" >
+        curr_OTM_fee = #{currOtmFee,jdbcType=DECIMAL},
+      </if>
+      <if test="hisallOtmFee != null" >
+        hisall_OTM_fee = #{hisallOtmFee,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where account_id = #{accountId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.rentcar.CarBizDriverAccount" >
+    update car_biz_driver_account
+    set driver_id = #{driverId,jdbcType=INTEGER},
+      credit_balance = #{creditBalance,jdbcType=DECIMAL},
+      credit_balance_hisall = #{creditBalanceHisall,jdbcType=DECIMAL},
+      account_amount = #{accountAmount,jdbcType=DECIMAL},
+      frozen_amount = #{frozenAmount,jdbcType=DECIMAL},
+      withdraw_deposit = #{withdrawDeposit,jdbcType=DECIMAL},
+      settle_account = #{settleAccount,jdbcType=DECIMAL},
+      curr_account = #{currAccount,jdbcType=DECIMAL},
+      hisall_account = #{hisallAccount,jdbcType=DECIMAL},
+      out_curr_account = #{outCurrAccount,jdbcType=DECIMAL},
+      out_hisall_account = #{outHisallAccount,jdbcType=DECIMAL},
+      version = #{version,jdbcType=INTEGER},
+      settle_OTM_fee = #{settleOtmFee,jdbcType=DECIMAL},
+      curr_OTM_fee = #{currOtmFee,jdbcType=DECIMAL},
+      hisall_OTM_fee = #{hisallOtmFee,jdbcType=DECIMAL}
+    where account_id = #{accountId,jdbcType=INTEGER}
+  </update>
+</mapper>

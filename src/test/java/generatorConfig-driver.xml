@@ -12,34 +12,46 @@
 		</commentGenerator>
 
 		<!-- 数据库连接信息 -->
-		<jdbcConnection driverClass="com.mysql.jdbc.Driver"	connectionURL="jdbc:mysql://10.20.10.100:3306/mp_driver?useUnicode=true&amp;characterEncoding=UTF-8" userId="mp_driver" password="mp_driver@01zhuanche.com">
+		<jdbcConnection driverClass="com.mysql.jdbc.Driver"	connectionURL="jdbc:mysql://mysql-m-wr-car-all-test-db.01zhuanche.com:3306/mp_driver?useUnicode=true&amp;characterEncoding=UTF-8" userId="sqhc_rentcar" password="BzkmQM%O^U7Dy8X3">
 		</jdbcConnection>
 		<javaTypeResolver>
 			<property name="forceBigDecimals" value="true"/>
 		</javaTypeResolver>
 
 		<!-- po实体类代码位置 -->
-		<javaModelGenerator targetPackage="com.zhuanche.entity.driver"  targetProject="C:\\Users\\admin\\git\\mp-manage\\src\main\\java">
+		<javaModelGenerator targetPackage="com.zhuanche.entity.driver"  targetProject="C:\\mp-manage\\src\main\\java">
 			<property name="enableSubPackages" value="true" />
 			<property name="trimStrings" value="true" />
 		</javaModelGenerator>
 		<!-- sql代码的xml映射文件位置 -->
-		<sqlMapGenerator targetPackage="mapper.driver" targetProject="C:\\Users\\admin\\git\\mp-manage\\src\main\\resources">
+		<sqlMapGenerator targetPackage="mapper.driver" targetProject="C:\\mp-manage\\src\main\\resources">
 			<property name="enableSubPackages" value="true" />
 		</sqlMapGenerator>
 		<!-- mapper接口位置 -->
-		<javaClientGenerator type="XMLMAPPER" targetPackage="mapper.driver"  targetProject="C:\\Users\\admin\\git\\mp-manage\\src\main\\java">
+		<javaClientGenerator type="XMLMAPPER" targetPackage="mapper.driver"  targetProject="C:\\mp-manage\\src\main\\java">
 			<property name="enableSubPackages" value="true" />
 		</javaClientGenerator>
 
 		<!-- 需要自动生成的表 -->
-		<table tableName="driver_bigdata_district" domainObjectName="DriverBigdataDistrict"
+		<!-- <table tableName="driver_bigdata_district" domainObjectName="DriverBigdataDistrict"
 			enableSelectByExample="false" enableDeleteByExample="false"
 			enableCountByExample="false" enableUpdateByExample="false">
 			<property name="useActualColumnNames" value="false" />
 			<generatedKey column="id" sqlStatement="MySql" identity="true" />
 		</table>
 		<table tableName="driver_city_white_list" domainObjectName="DriverCityWhite"
+			enableSelectByExample="false" enableDeleteByExample="false"
+			enableCountByExample="false" enableUpdateByExample="false">
+			<property name="useActualColumnNames" value="false" />
+			<generatedKey column="id" sqlStatement="MySql" identity="true" />
+		</table>
+		<table tableName="driver_verify" domainObjectName="DriverVerify"
+			enableSelectByExample="false" enableDeleteByExample="false"
+			enableCountByExample="false" enableUpdateByExample="false">
+			<property name="useActualColumnNames" value="false" />
+			<generatedKey column="id" sqlStatement="MySql" identity="true" />
+		</table> -->
+		<table tableName="driver_cert" domainObjectName="DriverCert"
 			enableSelectByExample="false" enableDeleteByExample="false"
 			enableCountByExample="false" enableUpdateByExample="false">
 			<property name="useActualColumnNames" value="false" />

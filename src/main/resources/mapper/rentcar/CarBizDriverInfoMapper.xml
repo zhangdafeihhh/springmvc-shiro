@@ -95,12 +95,15 @@
     <result column="house_hold_register_permanent" property="houseHoldRegisterPermanent" jdbcType="VARCHAR" />
     <result column="is_upload_card" property="isUploadCard" jdbcType="INTEGER" />
     <result column="is_must_confirmation" property="isMustConfirmation" jdbcType="INTEGER" />
+    <result column="english_name" property="englishName" jdbcType="VARCHAR" />
     <result column="contract_type" property="contractType" jdbcType="VARCHAR" />
     <result column="contract_no" property="contractNo" jdbcType="VARCHAR" />
     <result column="contract_file" property="contractFile" jdbcType="VARCHAR" />
     <result column="cooperation_type" property="cooperationType" jdbcType="TINYINT" />
     <result column="account_type" property="accountType" jdbcType="INTEGER" />
     <result column="group_id" property="groupId" jdbcType="INTEGER" />
+    <result column="is_two_shifts" property="isTwoShifts" jdbcType="INTEGER" />
+    <result column="is_image" property="isImage" jdbcType="TINYINT" />
   </resultMap>
   <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizDriverInfo" extends="BaseResultMap" >
     <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
@@ -122,8 +125,9 @@
     assessment, driverLicenseIssuingDateStart, driverLicenseIssuingDateEnd, driverLicenseIssuingCorp, 
     driverLicenseIssuingNumber, xy_driver_number, driver_license_issuing_register_date, 
     driver_license_issuing_first_date, driver_license_issuing_grant_date, birth_day, 
-    house_hold_register_permanent, is_upload_card, is_must_confirmation,
-    contract_type, contract_no, contract_file, cooperation_type, account_type, group_id
+    house_hold_register_permanent, is_upload_card, is_must_confirmation, english_name,
+    contract_type, contract_no, contract_file, cooperation_type, account_type, group_id,
+    is_two_shifts, is_image
   </sql>
   <sql id="Blob_Column_List" >
     memo
@@ -141,12 +145,12 @@
     where driver_id = #{driverId,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.zhuanche.entity.rentcar.CarBizDriverInfo" >
-    <selectKey resultType="java.lang.Integer" keyProperty="supplierId" order="AFTER" >
+    <selectKey resultType="java.lang.Integer" keyProperty="driverId" order="AFTER" >
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into car_biz_driver_info (driver_id, password, phone, 
-      gender, name, age, 
-      current_address, emergency_contact_person, 
+    insert into car_biz_driver_info (password, phone, gender,
+      name, supplier_id, age,
+      current_address, emergency_contact_person,
       emergency_contact_number, id_card_no, superintend_no, 
       superintend_url, driving_license_type, driving_years, 
       archives_no, issue_date, expire_date, 
@@ -177,12 +181,12 @@
       xy_driver_number, driver_license_issuing_register_date, 
       driver_license_issuing_first_date, driver_license_issuing_grant_date, 
       birth_day, house_hold_register_permanent, is_upload_card, 
-      is_must_confirmation, contract_type,
-      contract_no, contract_file, cooperation_type, 
-      account_type, group_id, memo
-      )
-    values (#{driverId,jdbcType=INTEGER}, #{password,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
-      #{gender,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{age,jdbcType=INTEGER}, 
+      is_must_confirmation, english_name, contract_type,
+      contract_no, contract_file, cooperation_type,
+      account_type, group_id, is_two_shifts,
+      is_image, memo)
+    values (#{password,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{gender,jdbcType=INTEGER},
+      #{name,jdbcType=VARCHAR}, #{supplierId,jdbcType=INTEGER}, #{age,jdbcType=INTEGER},
       #{currentAddress,jdbcType=VARCHAR}, #{emergencyContactPerson,jdbcType=VARCHAR}, 
       #{emergencyContactNumber,jdbcType=VARCHAR}, #{idCardNo,jdbcType=VARCHAR}, #{superintendNo,jdbcType=VARCHAR}, 
       #{superintendUrl,jdbcType=VARCHAR}, #{drivingLicenseType,jdbcType=VARCHAR}, #{drivingYears,jdbcType=INTEGER}, 
@@ -214,13 +218,13 @@
       #{xyDriverNumber,jdbcType=VARCHAR}, #{driverLicenseIssuingRegisterDate,jdbcType=VARCHAR}, 
       #{driverLicenseIssuingFirstDate,jdbcType=VARCHAR}, #{driverLicenseIssuingGrantDate,jdbcType=VARCHAR}, 
       #{birthDay,jdbcType=VARCHAR}, #{houseHoldRegisterPermanent,jdbcType=VARCHAR}, #{isUploadCard,jdbcType=INTEGER}, 
-      #{isMustConfirmation,jdbcType=INTEGER},  #{contractType,jdbcType=VARCHAR},
-      #{contractNo,jdbcType=VARCHAR}, #{contractFile,jdbcType=VARCHAR}, #{cooperationType,jdbcType=TINYINT}, 
-      #{accountType,jdbcType=INTEGER}, #{groupId,jdbcType=INTEGER}, #{memo,jdbcType=LONGVARCHAR}
-      )
+      #{isMustConfirmation,jdbcType=INTEGER}, #{englishName,jdbcType=VARCHAR}, #{contractType,jdbcType=VARCHAR},
+      #{contractNo,jdbcType=VARCHAR}, #{contractFile,jdbcType=VARCHAR}, #{cooperationType,jdbcType=TINYINT},
+      #{accountType,jdbcType=INTEGER}, #{groupId,jdbcType=INTEGER}, #{isTwoShifts,jdbcType=INTEGER},
+      #{isImage,jdbcType=TINYINT}, #{memo,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.rentcar.CarBizDriverInfo" >
-    <selectKey resultType="java.lang.Integer" keyProperty="supplierId" order="AFTER" >
+    <selectKey resultType="java.lang.Integer" keyProperty="driverId" order="AFTER" >
       SELECT LAST_INSERT_ID()
     </selectKey>
     insert into car_biz_driver_info
@@ -239,6 +243,9 @@
       </if>
       <if test="name != null" >
         name,
+      </if>
+      <if test="supplierId != null" >
+        supplier_id,
       </if>
       <if test="age != null" >
         age,
@@ -501,6 +508,9 @@
       <if test="isMustConfirmation != null" >
         is_must_confirmation,
       </if>
+      <if test="englishName != null" >
+        english_name,
+      </if>
       <if test="contractType != null" >
         contract_type,
       </if>
@@ -518,6 +528,12 @@
       </if>
       <if test="groupId != null" >
         group_id,
+      </if>
+      <if test="isTwoShifts != null" >
+        is_two_shifts,
+      </if>
+      <if test="isImage != null" >
+        is_image,
       </if>
       <if test="memo != null" >
         memo,
@@ -538,6 +554,9 @@
       </if>
       <if test="name != null" >
         #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
       </if>
       <if test="age != null" >
         #{age,jdbcType=INTEGER},
@@ -817,6 +836,12 @@
       </if>
       <if test="groupId != null" >
         #{groupId,jdbcType=INTEGER},
+      </if>
+      <if test="isTwoShifts != null" >
+        #{isTwoShifts,jdbcType=INTEGER},
+      </if>
+      <if test="isImage != null" >
+        #{isImage,jdbcType=TINYINT},
       </if>
       <if test="memo != null" >
         #{memo,jdbcType=LONGVARCHAR},
@@ -1120,6 +1145,12 @@
       <if test="groupId != null" >
         group_id = #{groupId,jdbcType=INTEGER},
       </if>
+      <if test="isTwoShifts != null" >
+        is_two_shifts = #{isTwoShifts,jdbcType=INTEGER},
+      </if>
+      <if test="isImage != null" >
+        is_image = #{isImage,jdbcType=TINYINT},
+      </if>
       <if test="memo != null" >
         memo = #{memo,jdbcType=LONGVARCHAR},
       </if>
@@ -1220,12 +1251,15 @@
       house_hold_register_permanent = #{houseHoldRegisterPermanent,jdbcType=VARCHAR},
       is_upload_card = #{isUploadCard,jdbcType=INTEGER},
       is_must_confirmation = #{isMustConfirmation,jdbcType=INTEGER},
+      english_name = #{englishName,jdbcType=VARCHAR},
       contract_type = #{contractType,jdbcType=VARCHAR},
       contract_no = #{contractNo,jdbcType=VARCHAR},
       contract_file = #{contractFile,jdbcType=VARCHAR},
       cooperation_type = #{cooperationType,jdbcType=TINYINT},
       account_type = #{accountType,jdbcType=INTEGER},
       group_id = #{groupId,jdbcType=INTEGER},
+      is_two_shifts = #{isTwoShifts,jdbcType=INTEGER},
+      is_image = #{isImage,jdbcType=TINYINT},
       memo = #{memo,jdbcType=LONGVARCHAR}
     where driver_id = #{driverId,jdbcType=INTEGER}
   </update>
@@ -1323,12 +1357,15 @@
       house_hold_register_permanent = #{houseHoldRegisterPermanent,jdbcType=VARCHAR},
       is_upload_card = #{isUploadCard,jdbcType=INTEGER},
       is_must_confirmation = #{isMustConfirmation,jdbcType=INTEGER},
+      english_name = #{englishName,jdbcType=VARCHAR},
       contract_type = #{contractType,jdbcType=VARCHAR},
       contract_no = #{contractNo,jdbcType=VARCHAR},
       contract_file = #{contractFile,jdbcType=VARCHAR},
       cooperation_type = #{cooperationType,jdbcType=TINYINT},
       account_type = #{accountType,jdbcType=INTEGER},
-      group_id = #{groupId,jdbcType=INTEGER}
+      group_id = #{groupId,jdbcType=INTEGER},
+      is_two_shifts = #{isTwoShifts,jdbcType=INTEGER},
+      is_image = #{isImage,jdbcType=TINYINT}
     where driver_id = #{driverId,jdbcType=INTEGER}
   </update>
 </mapper>

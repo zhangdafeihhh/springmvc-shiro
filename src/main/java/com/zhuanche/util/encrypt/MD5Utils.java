@@ -135,5 +135,8 @@ public final class MD5Utils {
 	}
 	
 	public static void main(String[] args) throws Exception {
+		String str = "111111";
+		System.out.print(MD5Utils.getMD5DigestBase64(str));
+		System.out.print(MD5Utils.getMD5DigestHex(str));
 	}
 }

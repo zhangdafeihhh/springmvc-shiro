@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.CarBizCustomerAppraisalMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarBizCustomerAppraisal" >
+    <id column="appraisal_id" property="appraisalId" jdbcType="INTEGER" />
+    <result column="order_id" property="orderId" jdbcType="INTEGER" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="booking_customer_id" property="bookingCustomerId" jdbcType="INTEGER" />
+    <result column="booking_customer_phone" property="bookingCustomerPhone" jdbcType="VARCHAR" />
+    <result column="rider_phone" property="riderPhone" jdbcType="VARCHAR" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="car_id" property="carId" jdbcType="INTEGER" />
+    <result column="instrument_and_service" property="instrumentAndService" jdbcType="VARCHAR" />
+    <result column="environment_and_equipped" property="environmentAndEquipped" jdbcType="VARCHAR" />
+    <result column="efficiency_and_safety" property="efficiencyAndSafety" jdbcType="VARCHAR" />
+    <result column="memo" property="memo" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="evaluate_score" property="evaluateScore" jdbcType="VARCHAR" />
+    <result column="evaluate" property="evaluate" jdbcType="VARCHAR" />
+    <result column="platform_evaluate" property="platformEvaluate" jdbcType="VARCHAR" />
+    <result column="platform_evaluate_score" property="platformEvaluateScore" jdbcType="VARCHAR" />
+    <result column="platform_memo" property="platformMemo" jdbcType="VARCHAR" />
+    <result column="customer_ip" property="customerIp" jdbcType="VARCHAR" />
+    <result column="point" property="point" jdbcType="VARCHAR" />
+    <result column="pointBD" property="pointbd" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    appraisal_id, order_id, order_no, booking_customer_id, booking_customer_phone, rider_phone, 
+    driver_id, car_id, instrument_and_service, environment_and_equipped, efficiency_and_safety, 
+    memo, create_by, create_date, update_by, update_date, evaluate_score, evaluate, platform_evaluate, 
+    platform_evaluate_score, platform_memo, customer_ip, point, pointBD
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from car_biz_customer_appraisal
+    where appraisal_id = #{appraisalId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from car_biz_customer_appraisal
+    where appraisal_id = #{appraisalId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.rentcar.CarBizCustomerAppraisal" >
+    <selectKey resultType="java.lang.Integer" keyProperty="appraisalId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_biz_customer_appraisal (order_id, order_no, booking_customer_id, 
+      booking_customer_phone, rider_phone, driver_id, 
+      car_id, instrument_and_service, environment_and_equipped, 
+      efficiency_and_safety, memo, create_by, 
+      create_date, update_by, update_date, 
+      evaluate_score, evaluate, platform_evaluate, 
+      platform_evaluate_score, platform_memo, customer_ip, 
+      point, pointBD)
+    values (#{orderId,jdbcType=INTEGER}, #{orderNo,jdbcType=VARCHAR}, #{bookingCustomerId,jdbcType=INTEGER}, 
+      #{bookingCustomerPhone,jdbcType=VARCHAR}, #{riderPhone,jdbcType=VARCHAR}, #{driverId,jdbcType=INTEGER}, 
+      #{carId,jdbcType=INTEGER}, #{instrumentAndService,jdbcType=VARCHAR}, #{environmentAndEquipped,jdbcType=VARCHAR}, 
+      #{efficiencyAndSafety,jdbcType=VARCHAR}, #{memo,jdbcType=VARCHAR}, #{createBy,jdbcType=INTEGER}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=INTEGER}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{evaluateScore,jdbcType=VARCHAR}, #{evaluate,jdbcType=VARCHAR}, #{platformEvaluate,jdbcType=VARCHAR}, 
+      #{platformEvaluateScore,jdbcType=VARCHAR}, #{platformMemo,jdbcType=VARCHAR}, #{customerIp,jdbcType=VARCHAR}, 
+      #{point,jdbcType=VARCHAR}, #{pointbd,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.rentcar.CarBizCustomerAppraisal" >
+    <selectKey resultType="java.lang.Integer" keyProperty="appraisalId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_biz_customer_appraisal
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        order_id,
+      </if>
+      <if test="orderNo != null" >
+        order_no,
+      </if>
+      <if test="bookingCustomerId != null" >
+        booking_customer_id,
+      </if>
+      <if test="bookingCustomerPhone != null" >
+        booking_customer_phone,
+      </if>
+      <if test="riderPhone != null" >
+        rider_phone,
+      </if>
+      <if test="driverId != null" >
+        driver_id,
+      </if>
+      <if test="carId != null" >
+        car_id,
+      </if>
+      <if test="instrumentAndService != null" >
+        instrument_and_service,
+      </if>
+      <if test="environmentAndEquipped != null" >
+        environment_and_equipped,
+      </if>
+      <if test="efficiencyAndSafety != null" >
+        efficiency_and_safety,
+      </if>
+      <if test="memo != null" >
+        memo,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="evaluateScore != null" >
+        evaluate_score,
+      </if>
+      <if test="evaluate != null" >
+        evaluate,
+      </if>
+      <if test="platformEvaluate != null" >
+        platform_evaluate,
+      </if>
+      <if test="platformEvaluateScore != null" >
+        platform_evaluate_score,
+      </if>
+      <if test="platformMemo != null" >
+        platform_memo,
+      </if>
+      <if test="customerIp != null" >
+        customer_ip,
+      </if>
+      <if test="point != null" >
+        point,
+      </if>
+      <if test="pointbd != null" >
+        pointBD,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        #{orderId,jdbcType=INTEGER},
+      </if>
+      <if test="orderNo != null" >
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="bookingCustomerId != null" >
+        #{bookingCustomerId,jdbcType=INTEGER},
+      </if>
+      <if test="bookingCustomerPhone != null" >
+        #{bookingCustomerPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="riderPhone != null" >
+        #{riderPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="driverId != null" >
+        #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="carId != null" >
+        #{carId,jdbcType=INTEGER},
+      </if>
+      <if test="instrumentAndService != null" >
+        #{instrumentAndService,jdbcType=VARCHAR},
+      </if>
+      <if test="environmentAndEquipped != null" >
+        #{environmentAndEquipped,jdbcType=VARCHAR},
+      </if>
+      <if test="efficiencyAndSafety != null" >
+        #{efficiencyAndSafety,jdbcType=VARCHAR},
+      </if>
+      <if test="memo != null" >
+        #{memo,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="evaluateScore != null" >
+        #{evaluateScore,jdbcType=VARCHAR},
+      </if>
+      <if test="evaluate != null" >
+        #{evaluate,jdbcType=VARCHAR},
+      </if>
+      <if test="platformEvaluate != null" >
+        #{platformEvaluate,jdbcType=VARCHAR},
+      </if>
+      <if test="platformEvaluateScore != null" >
+        #{platformEvaluateScore,jdbcType=VARCHAR},
+      </if>
+      <if test="platformMemo != null" >
+        #{platformMemo,jdbcType=VARCHAR},
+      </if>
+      <if test="customerIp != null" >
+        #{customerIp,jdbcType=VARCHAR},
+      </if>
+      <if test="point != null" >
+        #{point,jdbcType=VARCHAR},
+      </if>
+      <if test="pointbd != null" >
+        #{pointbd,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.rentcar.CarBizCustomerAppraisal" >
+    update car_biz_customer_appraisal
+    <set >
+      <if test="orderId != null" >
+        order_id = #{orderId,jdbcType=INTEGER},
+      </if>
+      <if test="orderNo != null" >
+        order_no = #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="bookingCustomerId != null" >
+        booking_customer_id = #{bookingCustomerId,jdbcType=INTEGER},
+      </if>
+      <if test="bookingCustomerPhone != null" >
+        booking_customer_phone = #{bookingCustomerPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="riderPhone != null" >
+        rider_phone = #{riderPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="driverId != null" >
+        driver_id = #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="carId != null" >
+        car_id = #{carId,jdbcType=INTEGER},
+      </if>
+      <if test="instrumentAndService != null" >
+        instrument_and_service = #{instrumentAndService,jdbcType=VARCHAR},
+      </if>
+      <if test="environmentAndEquipped != null" >
+        environment_and_equipped = #{environmentAndEquipped,jdbcType=VARCHAR},
+      </if>
+      <if test="efficiencyAndSafety != null" >
+        efficiency_and_safety = #{efficiencyAndSafety,jdbcType=VARCHAR},
+      </if>
+      <if test="memo != null" >
+        memo = #{memo,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="evaluateScore != null" >
+        evaluate_score = #{evaluateScore,jdbcType=VARCHAR},
+      </if>
+      <if test="evaluate != null" >
+        evaluate = #{evaluate,jdbcType=VARCHAR},
+      </if>
+      <if test="platformEvaluate != null" >
+        platform_evaluate = #{platformEvaluate,jdbcType=VARCHAR},
+      </if>
+      <if test="platformEvaluateScore != null" >
+        platform_evaluate_score = #{platformEvaluateScore,jdbcType=VARCHAR},
+      </if>
+      <if test="platformMemo != null" >
+        platform_memo = #{platformMemo,jdbcType=VARCHAR},
+      </if>
+      <if test="customerIp != null" >
+        customer_ip = #{customerIp,jdbcType=VARCHAR},
+      </if>
+      <if test="point != null" >
+        point = #{point,jdbcType=VARCHAR},
+      </if>
+      <if test="pointbd != null" >
+        pointBD = #{pointbd,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where appraisal_id = #{appraisalId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.rentcar.CarBizCustomerAppraisal" >
+    update car_biz_customer_appraisal
+    set order_id = #{orderId,jdbcType=INTEGER},
+      order_no = #{orderNo,jdbcType=VARCHAR},
+      booking_customer_id = #{bookingCustomerId,jdbcType=INTEGER},
+      booking_customer_phone = #{bookingCustomerPhone,jdbcType=VARCHAR},
+      rider_phone = #{riderPhone,jdbcType=VARCHAR},
+      driver_id = #{driverId,jdbcType=INTEGER},
+      car_id = #{carId,jdbcType=INTEGER},
+      instrument_and_service = #{instrumentAndService,jdbcType=VARCHAR},
+      environment_and_equipped = #{environmentAndEquipped,jdbcType=VARCHAR},
+      efficiency_and_safety = #{efficiencyAndSafety,jdbcType=VARCHAR},
+      memo = #{memo,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=INTEGER},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=INTEGER},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      evaluate_score = #{evaluateScore,jdbcType=VARCHAR},
+      evaluate = #{evaluate,jdbcType=VARCHAR},
+      platform_evaluate = #{platformEvaluate,jdbcType=VARCHAR},
+      platform_evaluate_score = #{platformEvaluateScore,jdbcType=VARCHAR},
+      platform_memo = #{platformMemo,jdbcType=VARCHAR},
+      customer_ip = #{customerIp,jdbcType=VARCHAR},
+      point = #{point,jdbcType=VARCHAR},
+      pointBD = #{pointbd,jdbcType=VARCHAR}
+    where appraisal_id = #{appraisalId,jdbcType=INTEGER}
+  </update>
+</mapper>

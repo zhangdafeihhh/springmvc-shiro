@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.ex.CarBizUserActionExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarBizUserAction" >
+    <id column="chat_user_id" property="chatUserId" jdbcType="INTEGER" />
+    <result column="active_position_X" property="activePositionX" jdbcType="VARCHAR" />
+    <result column="active_position_Y" property="activePositionY" jdbcType="VARCHAR" />
+    <result column="active_date" property="activeDate" jdbcType="TIMESTAMP" />
+    <result column="login_date" property="loginDate" jdbcType="TIMESTAMP" />
+    <result column="register_date" property="registerDate" jdbcType="TIMESTAMP" />
+    <result column="register_position_X" property="registerPositionX" jdbcType="VARCHAR" />
+    <result column="register_position_Y" property="registerPositionY" jdbcType="VARCHAR" />
+    <result column="first_date" property="firstDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    chat_user_id, active_position_X, active_position_Y, active_date, login_date, register_date, 
+    register_position_X, register_position_Y, first_date
+  </sql>
+  <insert id="insertCarBizUserAction" parameterType="com.zhuanche.entity.rentcar.CarBizUserAction" >
+    insert into car_biz_user_action (chat_user_id, active_position_X, active_position_Y,
+      active_date, login_date, register_date, 
+      register_position_X, register_position_Y, first_date
+      )
+    values (#{chatUserId,jdbcType=INTEGER},#{activePositionX,jdbcType=VARCHAR}, #{activePositionY,jdbcType=VARCHAR},
+      #{activeDate,jdbcType=TIMESTAMP}, #{loginDate,jdbcType=TIMESTAMP}, #{registerDate,jdbcType=TIMESTAMP}, 
+      #{registerPositionX,jdbcType=VARCHAR}, #{registerPositionY,jdbcType=VARCHAR}, #{firstDate,jdbcType=TIMESTAMP}
+      )
+  </insert>
+</mapper>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.SaasRolePermissionRalationExMapper" >
+
+  <!-- 查询一个角色的所有权限ID -->
+  <select id="queryPermissionIdsOfRole" resultType="java.lang.Integer">
+  		select DISTINCT permission_id from saas_role_permission_ralation where role_id = #{roleId}
+  </select>
+  <!-- 删除一个角色的所有权限ID -->
+  <delete id="deletePermissionIdsOfRole">
+  		delete from saas_role_permission_ralation where role_id = #{roleId}
+  </delete>
+  <!-- 保存一个角色的所有权限ID(批量插入) -->
+  <insert id="insertBatch">
+    insert into saas_role_permission_ralation (role_id, permission_id)
+    values
+    <foreach collection="records" open="" close="" separator=","  item="record">
+     (#{record.roleId,jdbcType=INTEGER}, #{record.permissionId,jdbcType=INTEGER})
+    </foreach>
+  </insert>
+
+</mapper>
