@@ -74,7 +74,7 @@
 		SELECT count(*)
 		FROM
 			car_biz_car_info car
-		WHERE 1 = 1 and license_plates = #{licensePlates} and status!=2
+		WHERE status!=2 and license_plates = #{licensePlates}
     </select>
 	<select id="selectModelByLicensePlates" resultType="com.zhuanche.dto.rentcar.CarBizCarInfoDTO" parameterType="java.lang.String" >
     SELECT

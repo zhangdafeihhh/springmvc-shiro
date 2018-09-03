@@ -53,5 +53,12 @@ public interface CarBizDriverInfoExMapper {
      * @param driverId
      * @return
      */
-    public int resetIMEI(Integer driverId);
+    int resetIMEI(@Param("driverId") Integer driverId);
+
+    /**
+     * 根据车牌号查询
+     * @param licensePlates
+     * @return
+     */
+    Integer checkLicensePlates(@Param("licensePlates") String licensePlates);
 }

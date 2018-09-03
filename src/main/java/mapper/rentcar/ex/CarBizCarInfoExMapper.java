@@ -44,4 +44,13 @@ public interface CarBizCarInfoExMapper {
      * @return
      */
     List<CarBizCarInfoDTO> licensePlatesNotDriverIdList(Map<String, Object> map);
+
+    /**
+     * 根据城市ID，供应商Id,车牌号 查询是否存在
+     * @param cityId
+     * @param supplierId
+     * @param licensePlates
+     * @return
+     */
+    Integer validateCityAndSupplier(@Param("cityId") Integer cityId, @Param("supplierId") Integer supplierId, @Param("licensePlates") String licensePlates);
 }
