@@ -1,0 +1,1970 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.ex.CarBizDriverInfoExMapper">
+	 <!--根据身份证号返回司机ID  -->
+	 <select id="queryDriverIdByIdDardNo" parameterType="java.lang.String" resultType="java.lang.Integer">
+		select 	driver_id
+		from car_biz_driver_info
+		where id_card_no=#{idCardNo}
+	 </select>
+	 <!-- 根据身份证号检查司机是否存在 -->
+	 <select id="checkIdCardNo"  parameterType="java.lang.String" resultType="java.lang.Integer">
+	 select
+	  count(*) 
+	  from car_biz_driver_info
+	 where id_card_no=#{idCardNo}
+	 </select>
+	 
+	 <!-- 司机查询 -->
+	 <select id="queryForListObject" parameterType="com.zhuanche.entity.driver.CarBizDriverInfo" resultType="com.zhuanche.entity.driver.CarBizDriverInfo">
+	 	SELECT
+		i.driver_id AS driverId,
+		i.phone AS phone,
+		i.gender gender,
+		i.NAME,
+		g.group_name AS carGroupName,
+		c.city_name AS serviceCity,
+		i.license_plates AS licensePlates,
+		i.supplier_id supplieId,
+		p.supplier_full_name AS supplierName,
+		i.STATUS AS status,
+		d.`name` createByName,
+	    e.`name` updateByName,
+	    i.id_card_no as idCardNo,
+		i.age as age,
+		i.superintend_no AS superintendNo,
+		i.superintend_url AS superintendUrl,
+		i.current_address as currentAddress,
+		i.emergency_contact_number as emergencyContactNumber,
+		i.emergency_contact_person as emergencyContactPerson,
+		i.driving_license_type as drivingLicenseType,
+		i.memo as memo,
+		DATE_FORMAT(i.issue_date,'%Y-%m-%d %T')as issueDate,
+		i.driving_years as drivingYears,
+		DATE_FORMAT(i.expire_date,'%Y-%m-%d %T')as expireDate,
+		i.archives_no as archivesNo,
+	    DATE_FORMAT(i.create_date,'%Y-%m-%d %H:%i:%s') createDateStr,
+    	DATE_FORMAT(i.update_date,'%Y-%m-%d %H:%i:%s') updateDateStr  
+		FROM
+			car_biz_driver_info i
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_car_info a ON a.license_plates = i.license_plates
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_model m ON a.car_model_id = m.model_id
+		LEFT JOIN car_biz_car_group g ON m.group_id = g.group_id
+		left join car_sys_user d on d.user_id=i.create_by
+		left join car_sys_user e on e.user_id=i.update_by
+		where 1=1
+		<if test="status!=null">
+   	 	  and i.status= #{status}
+   	 	</if>
+		<if test="name!=null and name!=''">
+			and i.name LIKE CONCAT(#{name},'%')
+		</if>
+		<if test="licensePlates!=null and licensePlates!=''">
+			and i.license_plates LIKE '%${licensePlates}%'
+		</if>
+		<if test="serviceCityId!=null and serviceCityId!=''">
+			and i.service_city = #{serviceCityId}
+		</if> 
+		<if test="phone!=null and phone!=''">
+			and i.phone LIKE '%${phone}%'
+		</if>
+		<if test="cities !=null and cities !=''">
+			and i.service_city in (${cities})
+		</if>
+		<if test="suppliers !=null and suppliers !=''">
+			and p.supplier_id in (${suppliers})
+		</if>
+		<if test="supplierId !=null and supplierId !=''">
+			and p.supplier_id = #{supplierId}
+		</if>
+		ORDER BY
+			i.update_date DESC
+		LIMIT ${offSet},${pagesize}
+	 </select>
+	 <select id="queryForObject" parameterType="com.zhuanche.entity.driver.CarBizDriverInfo" resultType="com.zhuanche.entity.driver.CarBizDriverInfo">
+		SELECT
+		i.driver_id AS driverId,
+		i.phone AS phone,
+		i.gender gender,
+		i.NAME,
+		g.group_name AS carGroupName,
+		c.city_name AS serviceCity,
+		i.license_plates AS licensePlates,
+		p.supplier_full_name AS supplierName,
+		i.STATUS AS status,	
+		i.service_city cityId,
+        p.supplier_id supplierId,
+		d.`name` createByName,
+	    e.`name` updateByName,
+	    i.memo as memo,
+	    DATE_FORMAT(i.create_date,'%Y-%m-%d %H:%i:%s') createDateStr,
+    	DATE_FORMAT(i.update_date,'%Y-%m-%d %H:%i:%s') updateDateStr  
+		FROM
+		car_biz_driver_info i
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_car_info a ON a.license_plates = i.license_plates
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_model m ON a.car_model_id = m.model_id
+		LEFT JOIN car_biz_car_group g ON m.group_id = g.group_id
+		left join car_sys_user d on d.user_id=i.create_by
+		left join car_sys_user e on e.user_id=i.update_by 
+   	 	where 1=1
+   	 	<if test="status!=null">
+   	 	  and i.status= #{status}
+   	 	</if>
+   	 	<if test="licensePlates!=null and licensePlates!=''">
+   	 	  and i.license_plates LIKE '%${licensePlates}%'
+   	 	</if>
+   	 	<if test="driverId!=null and driverId !=''">
+   	 	  and i.driver_id = #{driverId}
+   	 	</if>
+   	 	<if test="name!=null and name!=''">
+   	 	 <!-- and i.name like '%name%' --> 
+   	 	  and i.name LIKE CONCAT(#{name},'%')
+   	 	</if>
+   	 	<if test="supplierId!=null and supplierId!=''">
+   	 	  and i.supplier_Id = #{supplierId}
+   	 	</if>
+   	 	<if test="phone!=null and phone!=''"> 
+   	 	  and i.phone LIKE '%${phone}%'
+   	 	</if> 
+   	 	<if test="serviceCityId!=null and serviceCityId!=''">
+			and i.service_city = #{serviceCityId}
+		</if> 
+		<if test="cities !=null and cities !=''">
+			and i.service_city in (${cities})
+		</if>
+		<if test="suppliers !=null and suppliers !=''">
+			and i.supplier_id in (${suppliers})
+		</if>
+	limit 1 
+	 </select>	
+	 
+	<select id="selectDriverByPrimaryKey" parameterType="string" resultType="com.zhuanche.entity.driver.CarBizDriverInfo">
+ 	SELECT 
+		i.driver_id as driverId,
+		i.account_bank as accountBank,
+		i.age as age,
+		i.archives_no as archivesNo,
+		i.attachment_addr as attachmentAddr,
+		i.attachment_name as attachmentName,
+		i.bank_account_no as bankAccountNo,
+		i.create_by as createBy,
+		i.create_date as createDate,
+		i.credit_card_no as creditCardNo,
+		i.update_by as updateBy,
+		i.update_date as updateDate,
+		i.credit_card_period_of_validity as creditCardPeriodOfValidity,
+		i.credit_CVN2 as CVN2,
+		i.credit_open_account_bank as creditOpenAccountBank,
+		i.current_address as currentAddress,
+		i.driving_license_type as drivingLicenseType,
+		i.driving_years as drivingYears,
+		i.emergency_contact_number as emergencyContactNumber,
+		i.emergency_contact_person as emergencyContactPerson,
+		DATE_FORMAT(i.expire_date,'%Y-%m-%d %T')as expireDate,
+		i.gender as gender,
+		i.id_card_no as idCardNo,
+		DATE_FORMAT(i.issue_date,'%Y-%m-%d %T')as issueDate,
+		i.is_binding_credit_card as isBindingCreditCard,
+		i.license_plates as licensePlates,
+		ci.car_id as licensePlatesId,
+		i.memo as memo,
+		i.`name` as name,
+		i.`password` as password,
+		i.phone as phone,
+		i.photoSrct as photoSrc,
+		i.push_id as pushId,
+		i.service_city as serviceCityId,
+		i.`status` as status,
+		i.storable_card_no as shortCardNo,
+		i.supplier_id as supplierId,
+		i.superintend_no AS superintendNo,
+  		i.superintend_url AS superintendUrl,
+		IFNULL(t.curr_account,0) as currAccount, 
+		IFNULL(t.hisall_account,0) as hisallAccount,
+		IFNULL(t.credit_balance,0) as creditBalance, 
+		IFNULL(t.credit_balance_hisall,0) as creditBalanceHisall, 
+		IFNULL(t.out_curr_account,0) as outCurrAccount, 
+		IFNULL(t.out_hisall_account,0) as outHisallAccount, 
+		IFNULL(t.account_amount,0) as accountAmount, 
+		IFNULL(t.settle_account,0) as settleAccount, 
+		IFNULL(t.withdraw_deposit,0) as withdrawDeposit, 
+		IFNULL(t.frozen_amount,0) as frozenAmount,
+		c.city_name as serviceCity,
+		c.city_id as cityId,
+		d.name createByName,
+		e.name updateByName,
+		f.supplier_full_name supplierName,
+		i.group_id as groupId
+		from car_biz_driver_info i 
+		LEFT JOIN car_biz_driver_account t on i.driver_id = t.driver_id 
+		LEFT JOIN car_biz_city c on c.city_id = i.service_city 
+		left join car_sys_user d on d.user_id=i.create_by
+		left join car_sys_user e on e.user_id=i.update_by
+		left join car_biz_supplier f on f.supplier_id=i.supplier_id
+		left join car_biz_car_info ci on ci.license_plates=i.license_plates
+		where i.driver_id = #{id}
+  </select>
+	 
+<select id="selectDriverByKey" resultType="com.zhuanche.entity.driver.CarBizDriverInfo"  parameterType="com.zhuanche.entity.driver.CarBizDriverInfo">
+ 	SELECT 
+		i.driver_id AS driverId,
+		i.phone AS phone,
+		i.gender gender,
+		i.NAME,
+		g.group_name AS carGroupName,
+		c.city_name AS serviceCity,
+		i.license_plates AS licensePlates,
+		i.supplier_id supplieId,
+		p.supplier_full_name AS supplierName,
+		i.STATUS AS status,
+		d.`name` createByName,
+	    e.`name` updateByName,
+	    i.id_card_no as idCardNo,
+		i.age as age,
+		i.memo as memo,
+		i.superintend_no AS superintendNo,
+		i.superintend_url AS superintendUrl,
+		i.current_address as currentAddress,
+		i.emergency_contact_number as emergencyContactNumber,
+		i.emergency_contact_person as emergencyContactPerson,
+		i.driving_license_type as drivingLicenseType,
+		DATE_FORMAT(i.issue_date,'%Y-%m-%d %T')as issueDate,
+		i.driving_years as drivingYears,
+		DATE_FORMAT(i.expire_date,'%Y-%m-%d %T')as expireDate,
+		i.archives_no as archivesNo,
+	    DATE_FORMAT(i.create_date,'%Y-%m-%d %H:%i:%s') createDateStr,
+    	DATE_FORMAT(i.update_date,'%Y-%m-%d %H:%i:%s') updateDateStr  
+		FROM
+			car_biz_driver_info i
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_car_info a ON a.license_plates = i.license_plates
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_model m ON a.car_model_id = m.model_id
+		LEFT JOIN car_biz_car_group g ON m.group_id = g.group_id
+		left join car_sys_user d on d.user_id=i.create_by
+		left join car_sys_user e on e.user_id=i.update_by
+		where 1=1 
+		<if test="status!=null">
+   	 	  and i.status= #{status}
+   	 	</if>
+		<if test="licensePlates!=null and licensePlates!=''">
+   	 	  and i.license_plates LIKE '%${licensePlates}%'
+   	 	</if>
+   	 	<if test="driverId!=null and driverId !=''">
+   	 	  and i.driver_id in (${driverId})
+   	 	</if>
+   	 	<if test="name!=null and name!=''">
+   	 	 <!-- and i.name like '%name%' --> 
+   	 	  and i.name LIKE CONCAT(#{name},'%')
+   	 	</if>
+   	 	<if test="supplierId!=null and supplierId!=''">
+   	 	  and i.supplier_Id = #{supplierId}
+   	 	</if>
+   	 	<if test="phone!=null and phone!=''"> 
+   	 	  and i.phone LIKE '%${phone}%'
+   	 	</if> 
+   	 	<if test="serviceCityId!=null and serviceCityId!=''">
+			and i.service_city = #{serviceCityId}
+		</if> 
+		<if test="cities !=null and cities !=''">
+			and i.service_city in (${cities})
+		</if>
+		<if test="suppliers !=null and suppliers !=''">
+			and i.supplier_id in (${suppliers})
+		</if>
+			order by i.update_date desc
+			LIMIT ${offSet},${pagesize}
+  </select>
+  <select id="selectDriverByKeyLimit" resultType="com.zhuanche.entity.driver.CarBizDriverInfo"  parameterType="com.zhuanche.entity.driver.CarBizDriverInfo">
+ 	SELECT 
+		i.driver_id AS driverId,
+		i.phone AS phone,
+		i.gender gender,
+		i.NAME,
+		g.group_name AS carGroupName,
+		c.city_name AS serviceCity,
+		i.license_plates AS licensePlates,
+		i.supplier_id supplieId,
+		p.supplier_full_name AS supplierName,
+		i.STATUS AS status,
+		d.`name` createByName,
+	    e.`name` updateByName,
+	    i.id_card_no as idCardNo,
+		i.age as age,
+		i.memo as memo,
+		i.superintend_no AS superintendNo,
+		i.superintend_url AS superintendUrl,
+		i.current_address as currentAddress,
+		i.emergency_contact_number as emergencyContactNumber,
+		i.emergency_contact_person as emergencyContactPerson,
+		i.driving_license_type as drivingLicenseType,
+		DATE_FORMAT(i.issue_date,'%Y-%m-%d %T')as issueDate,
+		i.driving_years as drivingYears,
+		DATE_FORMAT(i.expire_date,'%Y-%m-%d %T')as expireDate,
+		i.archives_no as archivesNo,
+	    DATE_FORMAT(i.create_date,'%Y-%m-%d %H:%i:%s') createDateStr,
+    	DATE_FORMAT(i.update_date,'%Y-%m-%d %H:%i:%s') updateDateStr  
+		FROM
+			car_biz_driver_info i
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_car_info a ON a.license_plates = i.license_plates
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_model m ON a.car_model_id = m.model_id
+		LEFT JOIN car_biz_car_group g ON m.group_id = g.group_id
+		left join car_sys_user d on d.user_id=i.create_by
+		left join car_sys_user e on e.user_id=i.update_by
+		where 1=1 and i.status=1 and i.license_plates is not null
+		<if test="status!=null">
+   	 	  and i.status= #{status}
+   	 	</if>
+		<if test="licensePlates!=null and licensePlates!=''">
+   	 	  and i.license_plates LIKE '%${licensePlates}%'
+   	 	</if>
+   	 	<if test="driverId!=null and driverId !=''">
+   	 	  and i.driver_id in (${driverId})
+   	 	</if>
+   	 	<if test="name!=null and name!=''">
+   	 	 <!-- and i.name like '%name%' --> 
+   	 	  and i.name LIKE CONCAT(#{name},'%')
+   	 	</if>
+   	 	<if test="supplierId!=null and supplierId!=''">
+   	 	  and i.supplier_Id = #{supplierId}
+   	 	</if>
+   	 	<if test="phone!=null and phone!=''"> 
+   	 	  and i.phone LIKE '%${phone}%'
+   	 	</if> 
+   	 	<if test="serviceCityId!=null and serviceCityId!=''">
+			and i.service_city = #{serviceCityId}
+		</if> 
+		<if test="cities !=null and cities !=''">
+			and i.service_city in (${cities})
+		</if>
+		<if test="suppliers !=null and suppliers !=''">
+			and i.supplier_id in (${suppliers})
+		</if>
+		LIMIT ${offSet},${pagesize}
+  </select>
+  <select id="countDriverByKey" resultType="java.lang.Integer"  parameterType="com.zhuanche.entity.driver.CarBizDriverInfo">
+ 	SELECT count(*) 
+		FROM
+			car_biz_driver_info i
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_car_info a ON a.license_plates = i.license_plates
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_model m ON a.car_model_id = m.model_id
+		LEFT JOIN car_biz_car_group g ON m.group_id = g.group_id
+		left join car_sys_user d on d.user_id=i.create_by
+		left join car_sys_user e on e.user_id=i.update_by
+		where 1=1 and i.status=1 and i.license_plates is not null
+		<if test="licensePlates!=null and licensePlates!=''">
+   	 	  and i.license_plates LIKE '%${licensePlates}%'
+   	 	</if>
+   	 	<if test="driverId!=null and driverId !=''">
+   	 	  and i.driver_id in (${driverId})
+   	 	</if>
+   	 	<if test="name!=null and name!=''">
+   	 	 <!-- and i.name like '%name%' --> 
+   	 	  and i.name LIKE CONCAT(#{name},'%')
+   	 	</if>
+   	 	<if test="supplierId!=null and supplierId!=''">
+   	 	  and i.supplier_Id = #{supplierId}
+   	 	</if>
+   	 	<if test="phone!=null and phone!=''"> 
+   	 	  and i.phone LIKE '%${phone}%'
+   	 	</if> 
+   	 	<if test="serviceCityId!=null and serviceCityId!=''">
+			and i.service_city = #{serviceCityId}
+		</if> 
+		<if test="cities !=null and cities !=''">
+			and i.service_city in (${cities})
+		</if>
+		<if test="suppliers !=null and suppliers !=''">
+			and i.supplier_id in (${suppliers})
+		</if>
+  </select>
+	 <!-- 查询司机信息 -->
+	 <select id="queryDriverListInfo" resultType="com.zhuanche.entity.driver.CarBizDriverInfo" parameterType="com.zhuanche.entity.driver.CarBizDriverInfo">
+	 	select t.driver_id driverId,t.license_plates licensePlates,t.service_city serviceCityId  
+	 	from car_biz_driver_info t where t.license_plates is not NULL
+	 	<if test="licensePlates!=null and licensePlates!=''">
+   	 	  and t.license_plates LIKE '%${licensePlates}%'
+   	 	</if>
+   	 	<if test="driverId!=null and licensePlates!=''">
+   	 	  and t.driver_id = #{driverId}
+   	 	</if>
+   	 	<if test="name!=null and name!=''">
+   	 	 <!-- and i.name like '%name%' --> 
+   	 	  and t.name LIKE CONCAT(#{name},'%')
+   	 	</if>
+   	 	<if test="supplierId!=null and supplierId!=''">
+   	 	  and t.supplier_Id = #{supplierId}
+   	 	</if>
+   	 	<if test="phone!=null and phone!=''"> 
+   	 	  and t.phone LIKE '%${phone}%'
+   	 	</if> 
+   	 	<if test="cities !=null and cities !=''">
+			and t.service_city in (${cities})
+		</if>
+		<if test="suppliers !=null and suppliers !=''">
+			and t.supplier_id in (${suppliers})
+		</if>
+		and t.`status` = 1 
+	 </select>
+	 <!-- 查询司机总数 -->
+	 <select id="queryForInt" resultType="int">
+	 	select count(1)
+		FROM
+			car_biz_driver_info i
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_car_info a ON a.license_plates = i.license_plates
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_model m ON a.car_model_id = m.model_id
+		LEFT JOIN car_biz_car_group g ON m.group_id = g.group_id
+		where 1=1
+		<if test="status!=null">
+   	 	  and i.status= #{status}
+   	 	</if>
+		<if test="name!=null and name!=''">
+			and i.name LIKE CONCAT(#{name},'%')
+		</if>
+		<if test="licensePlates!=null and licensePlates!=''">
+			and i.license_plates LIKE '%${licensePlates}%'
+		</if>
+		<if test="serviceCityId!=null and serviceCityId!=''">
+			and i.service_city = #{serviceCityId}
+		</if>
+		<if test="phone!=null and phone!=''">
+			and i.phone LIKE '%${phone}%'
+		</if>
+		<if test="cities !=null and cities !=''">
+			and i.service_city in (${cities})
+		</if>
+		<if test="suppliers !=null and suppliers !=''">
+			and p.supplier_id in (${suppliers})
+		</if>
+		<if test="supplierId !=null and supplierId !=''">
+			and p.supplier_id = #{supplierId}
+		</if>
+	 </select>
+	
+	
+	<select id="queryList" parameterType="com.zhuanche.entity.driver.CarBizDriverInfo" resultType="com.zhuanche.entity.driver.CarBizDriverInfo">
+	 	SELECT
+		i.driver_id AS driverId 
+		FROM
+			car_biz_driver_info i
+		where 1=1
+		<if test="cities !=null and cities !=''">
+			and i.service_city in (${cities})
+		</if>
+		<if test="suppliers !=null and suppliers !=''">
+			and i.supplier_id in (${suppliers})
+		</if>
+	 </select>
+	
+	 <select id="queryForListDaochu" parameterType="com.zhuanche.entity.driver.CarBizDriverInfo" resultType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp">
+	 	SELECT
+		i.driver_id AS driverId,
+		i.phone AS phone,
+		i.gender gender,
+		i.NAME,
+		g.group_name AS carGroupName,
+		c.city_name AS serviceCity,
+		i.license_plates AS licensePlates,
+		i.supplier_id supplieId,
+		p.supplier_full_name AS supplierName,
+		i.STATUS AS status,
+		d.`name` createByName,
+	    e.`name` updateByName,
+	    i.id_card_no as idCardNo,
+		i.age as age,
+		i.memo as memo,
+		i.superintend_no AS superintendNo,
+		i.superintend_url AS superintendUrl,
+		i.current_address as currentAddress,
+		i.emergency_contact_number as emergencyContactNumber,
+		i.emergency_contact_person as emergencyContactPerson,
+		i.driving_license_type as drivingLicenseType,
+		DATE_FORMAT(i.issue_date,'%Y-%m-%d %T')as issueDate,
+		i.driving_years as drivingYears,
+		DATE_FORMAT(i.expire_date,'%Y-%m-%d %T')as expireDate,
+		i.archives_no as archivesNo,
+	    DATE_FORMAT(i.create_date,'%Y-%m-%d %H:%i:%s') createDateStr,
+    	DATE_FORMAT(i.update_date,'%Y-%m-%d %H:%i:%s') updateDateStr,
+		i.driverLicenseNumber  driverLicenseNumber,
+		i.drivingLicenseImg  drivingLicenseImg,
+		i.firstDrivingLicenseDate  firstDrivingLicenseDate,
+		i.firstMeshworkDrivingLicenseDate  firstMeshworkDrivingLicenseDate,
+		i.nationality  nationAlity,
+		i.householdRegister  houseHoldRegister,
+		i.nation  nation,
+		i.marriage  marriage,
+		i.foreignLanguage  foreignLanguage,
+		i.education  education,
+		i.courseName  courseName,
+		i.courseDate  courseDate,
+		i.courseDateStart  courseDateStart,
+		i.courseDateEnd  courseDateEnd,
+		i.courseTime  courseTime,
+		i.corpType  corpType,
+		i.trafficViolations  trafficViolations,
+		i.signDate  signDate,
+		i.signDateEnd  signDateEnd,
+		i.contractDate  contractDate,
+		i.isXyDriver  isXyDriver,
+		i.xy_driver_number xyDriverNumber,
+		i.partTimeJobDri  partTimeJobDri,
+		i.phoneType  phoneType,
+		i.phoneCorp  phoneCorp,
+		i.appVersion,
+		i.mapType  mapType,
+		i.emergencyContactAddr  emergencyContactAddr,
+		i.assessment  assessment,
+		i.driverLicenseIssuingDateStart  driverLicenseIssuingDateStart,
+		i.driverLicenseIssuingDateEnd  driverLicenseIssuingDateEnd,
+		i.driverLicenseIssuingCorp  driverLicenseIssuingCorp,
+		i.driverLicenseIssuingNumber  driverLicenseIssuingNumber,
+		i.driver_license_issuing_register_date driverLicenseIssuingRegisterDate, 
+		i.driver_license_issuing_first_date driverLicenseIssuingFirstDate, 
+    	i.driver_license_issuing_grant_date driverLicenseIssuingGrantDate,
+		i.birth_day  birthDay,
+		REPLACE(i.house_hold_register_permanent, CHAR(10),'') AS houseHoldRegisterPermanent
+		FROM
+			car_biz_driver_info i
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_car_info a ON a.license_plates = i.license_plates
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_model m ON a.car_model_id = m.model_id
+		LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+		left join car_sys_user d on d.user_id=i.create_by
+		left join car_sys_user e on e.user_id=i.update_by
+		where 1=1
+		<if test="status!=null">
+   	 	  and i.status= #{status}
+   	 	</if>
+		<if test="driverId!=null and driverId !=''">
+   	 	  and i.driver_id in (${driverId})
+   	 	</if>
+		<if test="name!=null and name!=''">
+			and i.name LIKE CONCAT(#{name},'%')
+		</if>
+		<if test="licensePlates!=null and licensePlates!=''">
+			and i.license_plates LIKE '%${licensePlates}%'
+		</if>
+		<if test="serviceCityId!=null and serviceCityId!=''">
+			and i.service_city = #{serviceCityId}
+		</if> 
+		<if test="phone!=null and phone!=''">
+			and i.phone LIKE '%${phone}%'
+		</if>
+		<if test="cities !=null and cities !=''">
+			and i.service_city in (${cities})
+		</if>
+		<if test="suppliers !=null and suppliers !=''">
+			and p.supplier_id in (${suppliers})
+		</if>
+		<if test="supplierId !=null and supplierId !=''">
+			and p.supplier_id = #{supplierId}
+		</if>
+		<if test="groupid !=null and groupid !=''">
+			and i.group_id = #{groupid}
+		</if>
+		ORDER BY
+			i.update_date DESC
+	 </select>
+	 
+	 <!-- 需要进行司机考勤统计的司机列表  -->
+	 <select id="queryDriverListForDuty"  parameterType="com.zhuanche.entity.driver.CarBizDriverInfo" resultType="com.zhuanche.entity.driver.CarBizDriverInfo">
+	 	select driver_id driverId,name,phone,t.service_city serviceCityId,
+		t.license_plates licensePlates  
+		from car_biz_driver_info t where  
+		t.status = 1 and t.license_plates is not null and t.license_plates!= '' 
+		and t.name is not null and t.name != ''
+		and t.phone is not null and t.phone != ''
+	 </select>
+	  <select id="queryNot" parameterType="com.zhuanche.entity.driver.CarBizDriverInfo" resultType="com.zhuanche.entity.driver.CarBizDriverInfo">
+	 	SELECT
+		i.driver_id AS driverId,
+		i.phone AS phone,
+		i.gender gender,
+		i.NAME,
+		g.group_name AS carGroupName,
+		c.city_name AS serviceCity,
+		i.license_plates AS licensePlates,
+		p.supplier_full_name AS supplierName,
+		i.STATUS AS status,
+		d.`name` createByName,
+	    e.`name` updateByName,
+	    i.id_card_no as idCardNo,
+		i.age as age,
+		i.memo as memo,
+		i.superintend_no AS superintendNo,
+		i.superintend_url AS superintendUrl,
+		i.current_address as currentAddress,
+		i.emergency_contact_number as emergencyContactNumber,
+		i.emergency_contact_person as emergencyContactPerson,
+		i.driving_license_type as drivingLicenseType,
+		DATE_FORMAT(i.issue_date,'%Y-%m-%d %T')as issueDate,
+		i.driving_years as drivingYears,
+		DATE_FORMAT(i.expire_date,'%Y-%m-%d %T')as expireDate,
+		i.archives_no as archivesNo,
+	    DATE_FORMAT(i.create_date,'%Y-%m-%d %H:%i:%s') createDateStr,
+    	DATE_FORMAT(i.update_date,'%Y-%m-%d %H:%i:%s') updateDateStr  
+		FROM
+			car_biz_driver_info i
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_car_info a ON a.license_plates = i.license_plates
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_model m ON a.car_model_id = m.model_id
+		LEFT JOIN car_biz_car_group g ON m.group_id = g.group_id
+		left join car_sys_user d on d.user_id=i.create_by
+		left join car_sys_user e on e.user_id=i.update_by
+		where 1=1
+		AND i.STATUS=1
+		<if test="driverId!=null and driverId !=''">
+   	 	  and i.driver_id not in (${driverId})
+   	 	</if>
+		<if test="cities !=null and cities !=''">
+			and i.service_city in (${cities})
+		</if>
+		<if test="suppliers !=null and suppliers !=''">
+			and p.supplier_id in (${suppliers})
+		</if>
+		<if test="supplierId !=null and supplierId !=''">
+			and p.supplier_id = #{supplierId}
+		</if>
+		ORDER BY
+			i.update_date DESC
+		LIMIT ${offSet},${pagesize}
+	 </select>
+	 <select id="queryNotCount" parameterType="com.zhuanche.entity.driver.CarBizDriverInfo" resultType="java.lang.Integer">
+	 	SELECT
+			count(*) 
+		FROM
+			car_biz_driver_info i
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_car_info a ON a.license_plates = i.license_plates
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_model m ON a.car_model_id = m.model_id
+		LEFT JOIN car_biz_car_group g ON m.group_id = g.group_id
+		left join car_sys_user d on d.user_id=i.create_by
+		left join car_sys_user e on e.user_id=i.update_by
+		where 1=1
+		AND i.STATUS=1
+		<if test="driverId!=null and driverId !=''">
+   	 	  and i.driver_id not in (${driverId})
+   	 	</if>
+		<if test="cities !=null and cities !=''">
+			and i.service_city in (${cities})
+		</if>
+		<if test="suppliers !=null and suppliers !=''">
+			and p.supplier_id in (${suppliers})
+		</if>
+		<if test="supplierId !=null and supplierId !=''">
+			and p.supplier_id = #{supplierId}
+		</if>
+	 </select>
+	 
+	 <select id="queryListNoLimit" parameterType="com.zhuanche.entity.driver.CarBizDriverInfo" resultType="com.zhuanche.entity.driver.CarBizDriverInfo">
+	 	select t.driver_id as driverId,t.name,t.phone,t.supplier_id supplierId,
+		t.service_city serviceCity,t.license_plates licensePlates 
+		from car_biz_driver_info t
+		where 1=1
+		<if test="name!=null and name != ''">
+			and t.name like CONCAT(#{name},'%')
+		</if>
+		<if test="phone!=null and phone !=''">
+			and t.phone = #{phone}
+		</if>
+		<if test="supplierId!=null and supplierId!=''">
+			and t.supplier_id = #{supplierId}
+		</if>
+		<if test="driverIds!=null and driverIds!=''">
+			and t.driver_id in (${driverIds})
+		</if>
+		<if test="licensePlates!=null and licensePlates!=''">
+			and t.license_plates like '%${licensePlates}' 
+		</if>
+		<if test="serviceCityId!=null and serviceCityId!=''">
+			and t.service_city = #{serviceCityId}
+		</if> 
+		<if test="cities !=null and cities !=''">
+			and t.service_city in (${cities})
+		</if>
+		<if test="suppliers !=null and suppliers !=''">
+			and t.supplier_id in (${suppliers})
+		</if>
+	 </select>
+	 <select id="selectDriverByKeyNoLimit" resultType="com.zhuanche.entity.driver.CarBizDriverInfo"  parameterType="com.zhuanche.entity.driver.CarBizDriverInfo">
+ 	SELECT 
+		i.driver_id AS driverId,
+		i.phone AS phone,
+		i.gender gender,
+		i.NAME,
+		g.group_name AS carGroupName,
+		c.city_name AS serviceCity,
+		i.service_city AS cityId,
+		i.service_city as serviceCityId,
+		i.supplier_id AS supplierId,
+		i.license_plates AS licensePlates,
+		p.supplier_full_name AS supplierName,
+		i.STATUS AS status,
+		d.`name` createByName,
+	    e.`name` updateByName,
+	    i.id_card_no as idCardNo,
+		i.age as age,
+		i.memo as memo,
+		i.superintend_no AS superintendNo,
+		i.superintend_url AS superintendUrl,
+		i.current_address as currentAddress,
+		i.emergency_contact_number as emergencyContactNumber,
+		i.emergency_contact_person as emergencyContactPerson,
+		i.driving_license_type as drivingLicenseType,
+		DATE_FORMAT(i.issue_date,'%Y-%m-%d %T')as issueDate,
+		i.driving_years as drivingYears,
+		DATE_FORMAT(i.expire_date,'%Y-%m-%d %T')as expireDate,
+		i.archives_no as archivesNo,
+	    DATE_FORMAT(i.create_date,'%Y-%m-%d %H:%i:%s') createDateStr,
+    	DATE_FORMAT(i.update_date,'%Y-%m-%d %H:%i:%s') updateDateStr  
+		FROM
+			car_biz_driver_info i
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_car_info a ON a.license_plates = i.license_plates
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_model m ON a.car_model_id = m.model_id
+		LEFT JOIN car_biz_car_group g ON m.group_id = g.group_id
+		left join car_sys_user d on d.user_id=i.create_by
+		left join car_sys_user e on e.user_id=i.update_by
+		where 1=1
+		<if test="status!=null">
+   	 	  and i.status= #{status}
+   	 	</if>
+		<if test="licensePlates!=null and licensePlates!=''">
+   	 	  and i.license_plates LIKE '%${licensePlates}%'
+   	 	</if>
+   	 	<if test="driverId!=null and driverId !=''">
+   	 	  and i.driver_id in (${driverId})
+   	 	</if>
+   	 	<if test="name!=null and name!=''">
+   	 	  and i.name LIKE CONCAT(#{name},'%')
+   	 	</if>
+   	 	<if test="supplierId!=null and supplierId!=''">
+   	 	  and i.supplier_Id = #{supplierId}
+   	 	</if>
+   	 	<if test="phone!=null and phone!=''"> 
+   	 	  and i.phone LIKE '%${phone}%'
+   	 	</if> 
+   	 	<if test="serviceCityId!=null and serviceCityId!=''">
+			and i.service_city = #{serviceCityId}
+		</if> 
+		<if test="cities !=null and cities !=''">
+			and i.service_city in (${cities})
+		</if>
+		<if test="suppliers !=null and suppliers !=''">
+			and i.supplier_id in (${suppliers})
+		</if>
+  </select>
+ <select id="selectDriverByPhone" resultType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp"  parameterType="com.zhuanche.entity.driver.CarBizDriverInfo">
+ 	SELECT 
+		i.driver_id AS driverId,
+		i.cooperation_type AS cooperationType,
+		i.phone AS phone,
+		i.gender gender,
+		i.NAME,
+		g.group_id groupid,
+		g.group_name AS carGroupName,
+		c.city_name AS serviceCity,
+		i.service_city AS cityId,
+		i.service_city as serviceCityId,
+		i.supplier_id AS supplierId,
+		i.license_plates AS licensePlates,
+		p.supplier_full_name AS supplierName,
+		i.STATUS AS status,
+		d.`name` createByName,
+	    e.`name` updateByName,
+	    i.id_card_no as idCardNo,
+		i.age as age,
+		i.memo as memo,
+		i.superintend_no AS superintendNo,
+		i.superintend_url AS superintendUrl,
+		i.current_address as currentAddress,
+		i.emergency_contact_number as emergencyContactNumber,
+		i.emergency_contact_person as emergencyContactPerson,
+		i.driving_license_type as drivingLicenseType,
+		DATE_FORMAT(i.issue_date,'%Y-%m-%d %T')as issueDate,
+		i.driving_years as drivingYears,
+		DATE_FORMAT(i.expire_date,'%Y-%m-%d %T')as expireDate,
+		i.archives_no as archivesNo,
+	    DATE_FORMAT(i.create_date,'%Y-%m-%d %H:%i:%s') createDateStr,
+    	DATE_FORMAT(i.update_date,'%Y-%m-%d %H:%i:%s') updateDateStr  
+		FROM
+			car_biz_driver_info i
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_car_info a ON a.license_plates = i.license_plates
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_model m ON a.car_model_id = m.model_id
+		LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+		left join car_sys_user d on d.user_id=i.create_by
+		left join car_sys_user e on e.user_id=i.update_by
+		where 1=1
+   	 	  and i.phone = #{phone}
+   	 	  limit 1
+  </select>
+ <select id="selectDriverVoByPhone" resultType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp"  parameterType="com.zhuanche.entity.driver.CarBizDriverInfo">
+ 	SELECT
+		i.driver_id AS driverId,
+		i.cooperation_type AS cooperationType,
+		i.phone AS phone,
+		i.gender gender,
+		i.NAME,
+		i.service_city AS cityId,
+		i.service_city as serviceCityId,
+		i.supplier_id AS supplierId,
+		i.license_plates AS licensePlates,
+		i.STATUS AS status,
+	    i.id_card_no as idCardNo,
+		i.age as age,
+		i.memo as memo,
+		i.superintend_no AS superintendNo,
+		i.superintend_url AS superintendUrl,
+		i.current_address as currentAddress,
+		i.emergency_contact_number as emergencyContactNumber,
+		i.emergency_contact_person as emergencyContactPerson,
+		i.driving_license_type as drivingLicenseType,
+		DATE_FORMAT(i.issue_date,'%Y-%m-%d %T')as issueDate,
+		i.driving_years as drivingYears,
+		DATE_FORMAT(i.expire_date,'%Y-%m-%d %T')as expireDate,
+		i.archives_no as archivesNo,
+	    DATE_FORMAT(i.create_date,'%Y-%m-%d %H:%i:%s') createDateStr,
+    	DATE_FORMAT(i.update_date,'%Y-%m-%d %H:%i:%s') updateDateStr
+		FROM
+			car_biz_driver_info i
+		where i.phone = #{phone}
+   	 	  limit 1
+  </select>
+  <select id="queryForListObjectNoLimit" parameterType="com.zhuanche.entity.driver.CarBizDriverInfo" resultType="com.zhuanche.entity.driver.CarBizDriverInfo">
+	 	SELECT
+		i.driver_id AS driverId,
+		i.phone AS phone,
+		i.gender gender,
+		i.NAME,
+		g.group_name AS carGroupName,
+		c.city_name AS serviceCity,
+		i.service_city AS cityId,
+		i.supplier_id AS supplierId,
+		i.license_plates AS licensePlates,
+		p.supplier_full_name AS supplierName,
+		i.STATUS AS status,
+		d.`name` createByName,
+	    e.`name` updateByName,
+	    i.id_card_no as idCardNo,
+		i.age as age,
+		i.memo as memo,
+		i.superintend_no AS superintendNo,
+		i.superintend_url AS superintendUrl,
+		i.current_address as currentAddress,
+		i.emergency_contact_number as emergencyContactNumber,
+		i.emergency_contact_person as emergencyContactPerson,
+		i.driving_license_type as drivingLicenseType,
+		DATE_FORMAT(i.issue_date,'%Y-%m-%d %T')as issueDate,
+		i.driving_years as drivingYears,
+		DATE_FORMAT(i.expire_date,'%Y-%m-%d %T')as expireDate,
+		i.archives_no as archivesNo,
+	    DATE_FORMAT(i.create_date,'%Y-%m-%d %H:%i:%s') createDateStr,
+    	DATE_FORMAT(i.update_date,'%Y-%m-%d %H:%i:%s') updateDateStr  
+		FROM
+			car_biz_driver_info i
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_car_info a ON a.license_plates = i.license_plates
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_model m ON a.car_model_id = m.model_id
+		LEFT JOIN car_biz_car_group g ON m.group_id = g.group_id
+		left join car_sys_user d on d.user_id=i.create_by
+		left join car_sys_user e on e.user_id=i.update_by
+		where 1=1
+		<if test="status!=null">
+   	 	  and i.status= #{status}
+   	 	</if>
+		<if test="name!=null and name!=''">
+			and i.name LIKE CONCAT(#{name},'%')
+		</if>
+		<if test="licensePlates!=null and licensePlates!=''">
+			and i.license_plates LIKE '%${licensePlates}%'
+		</if>
+		<if test="serviceCityId!=null and serviceCityId!=''">
+			and i.service_city = #{serviceCityId}
+		</if> 
+		<if test="phone!=null and phone!=''">
+			and i.phone LIKE '%${phone}%'
+		</if>
+		<if test="cities !=null and cities !=''">
+			and i.service_city in (${cities})
+		</if>
+		<if test="suppliers !=null and suppliers !=''">
+			and p.supplier_id in (${suppliers})
+		</if>
+		<if test="supplierId !=null and supplierId !=''">
+			and p.supplier_id = #{supplierId}
+		</if>
+		ORDER BY
+			i.update_date DESC
+	 </select>
+	 <!-- 检测司机手机号是否存在 -->
+	 <select id="selectCountForPhone" resultType="java.lang.Integer" parameterType="com.zhuanche.entity.driver.CarBizDriverInfo">
+      SELECT
+		count(1)
+		FROM
+			car_biz_driver_info
+        where phone= #{phone}
+		       
+	</select>
+	<!-- 通过车牌号车型车辆信息 -->
+	<select id="getGroupIdWithLis" resultType="com.zhuanche.entity.driver.CarBizDriverInfo"
+		parameterType="com.zhuanche.entity.driver.CarBizDriverInfo">
+		SELECT
+		g.group_id AS groupId,
+		g.group_name AS groupName,
+		m.model_id AS modelId,
+		m.model_name AS modelName
+		FROM
+		car_biz_car_info c
+		LEFT JOIN
+		car_biz_model m
+		ON
+		c.car_model_id = m.model_id
+		LEFT JOIN
+		car_biz_car_group g
+		ON
+		m.group_id = g.group_id
+		WHERE
+		c.license_plates =
+		#{licensePlates} and c.status !=2
+	</select>
+	<!-- 验证车牌号 -->
+	<select id="validateLicensePlates" parameterType="com.zhuanche.entity.driver.CarBizDriverInfo"
+		resultType="int">
+		SELECT
+		COUNT(1)
+		FROM
+		car_biz_driver_info
+		WHERE
+		license_plates =
+		#{licensePlates}
+	</select>
+	
+	<!-- 查询车牌号所在城市，厂商=============（验证车牌号之后）-->
+	<select id="validateCityAndSupplier" parameterType="com.zhuanche.entity.driver.CarBizDriverInfo"
+		resultType="java.lang.Integer">
+		SELECT
+		COUNT(1)
+		FROM
+		car_biz_car_info
+		WHERE
+		license_plates = #{licensePlates}
+		and city_id = #{serviceCityId}
+		and supplier_id = #{supplierId}
+	</select>
+	
+	<!-- 查询司机信用卡相关的信息 -->
+	<select id="queryCreditByDriverId" parameterType="string" resultType="com.zhuanche.entity.driver.CarBizDriverInfo">
+ 	SELECT 
+		i.driver_id as driverId,
+		i.phone as phone,
+		i.id_card_no as idCardNo,
+		i.credit_open_account_bank as creditOpenAccountBank,
+		i.quickpay_customerid as quickpayCustomerid,
+		i.storable_card_no as shortCardNo,
+		i.is_binding_credit_card as isBindingCreditCard,
+		i.credit_card_no as creditCardNo,
+		i.credit_CVN2 as CVN2,
+		i.credit_card_period_of_validity as creditCardPeriodOfValidity,
+		b.bankid as bankid
+		from 
+			car_biz_driver_info i
+		left join car_sys_bank_info b on i.credit_open_account_bank = b.bankname
+		where 1=1 
+			and i.driver_id = #{id}
+		limit 1
+  </select>
+  
+	<select id="selectDriverByKeyCount" resultType="java.lang.Integer"  parameterType="com.zhuanche.entity.driver.CarBizDriverInfo">
+ 	SELECT 
+		count(*) 
+		FROM
+			car_biz_driver_info i
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_car_info a ON a.license_plates = i.license_plates
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_model m ON a.car_model_id = m.model_id
+		LEFT JOIN car_biz_car_group g ON m.group_id = g.group_id
+		left join car_sys_user d on d.user_id=i.create_by
+		left join car_sys_user e on e.user_id=i.update_by
+		where 1=1 
+		<if test="status!=null">
+   	 	  and i.status= #{status}
+   	 	</if>
+		<if test="licensePlates!=null and licensePlates!=''">
+   	 	  and i.license_plates LIKE '%${licensePlates}%'
+   	 	</if>
+   	 	<if test="driverId!=null and driverId !=''">
+   	 	  and i.driver_id in (${driverId})
+   	 	</if>
+   	 	<if test="name!=null and name!=''">
+   	 	 <!-- and i.name like '%name%' --> 
+   	 	  and i.name LIKE CONCAT(#{name},'%')
+   	 	</if>
+   	 	<if test="supplierId!=null and supplierId!=''">
+   	 	  and i.supplier_Id = #{supplierId}
+   	 	</if>
+   	 	<if test="phone!=null and phone!=''"> 
+   	 	  and i.phone LIKE '%${phone}%'
+   	 	</if> 
+   	 	<if test="serviceCityId!=null and serviceCityId!=''">
+			and i.service_city = #{serviceCityId}
+		</if> 
+		<if test="cities !=null and cities !=''">
+			and i.service_city in (${cities})
+		</if>
+		<if test="suppliers !=null and suppliers !=''">
+			and i.supplier_id in (${suppliers})
+		</if>
+  </select>
+  
+  <!-- 司机查询 -->
+	 <select id="queryDriverListInfoForMonthDuty" parameterType="com.zhuanche.entity.driver.CarBizDriverInfo" resultType="com.zhuanche.entity.driver.CarBizDriverInfo">
+	 	SELECT
+		i.driver_id AS driverId,
+		i.name,
+		i.license_plates AS licensePlates,
+		i.status
+		FROM
+			car_biz_driver_info i
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		where 1=1
+		and i.status = 1
+		<if test="cities !=null and cities !=''">
+			and i.service_city in (${cities})
+		</if>
+		<if test="cityId !=null and cityId !=''">
+			and i.service_city = (${cityId})
+		</if>
+		<if test="suppliers !=null and suppliers !=''">
+			and p.supplier_id in (${suppliers})
+		</if>
+		ORDER BY
+			i.driver_id asc
+	 </select>
+	 
+	 <select id="queryDriverForAction" parameterType="com.zhuanche.entity.driver.CarBizDriverInfo" resultType="com.zhuanche.entity.driver.CarBizDriverInfo">
+	 	SELECT
+		i.driver_id driverId,
+		i.name,
+		i.license_plates licensePlates,
+		i.phone phone
+		FROM
+			car_biz_driver_info i
+		where 1=1
+		<if test="driverId !=null and driverId !=''">
+			and i.driver_id = #{driverId}
+		</if>
+		<if test="name !=null and name !=''">
+			and i.name = #{name}
+		</if>
+		<if test="licensePlates !=null and licensePlates !=''">
+			and i.license_plates = #{licensePlates}
+		</if>
+		<if test="phone !=null and phone !=''">
+			and i.phone = #{phone}
+		</if>
+	 </select>
+	<select id="queryDriverHomePointList" parameterType="com.zhuanche.entity.driver.CarBizDriverInfo" resultType="com.zhuanche.entity.driver.CarBizDriverInfo">
+	 	SELECT
+		i.driver_id AS driverId,
+		i.phone AS phone,
+		i.NAME,
+		i.license_plates AS licensePlates,
+		i.go_home_address goHomeAddress,
+		i.go_home_point_la goHomePointLa,
+		i.go_home_point_lo goHomePointLo
+		FROM
+			car_biz_driver_info i
+		where 1=1 and i.status= 1
+		<if test="driverId!=null and driverId !=''">
+   	 	  and i.driver_id in (${driverId})
+   	 	</if>
+		<if test="name!=null and name!=''">
+			and i.name LIKE CONCAT(#{name},'%')
+		</if>
+		<if test="licensePlates!=null and licensePlates!=''">
+			and i.license_plates LIKE '%${licensePlates}%'
+		</if>
+		<if test="serviceCityId!=null and serviceCityId!=''">
+			and i.service_city = #{serviceCityId}
+		</if> 
+		<if test="phone!=null and phone!=''">
+			and i.phone LIKE '%${phone}%'
+		</if>
+		<if test="cities !=null and cities !=''">
+			and i.service_city in (${cities})
+		</if>
+		<if test="suppliers !=null and suppliers !=''">
+			and i.supplier_id in (${suppliers})
+		</if>
+		<if test="supplierId !=null and supplierId !=''">
+			and i.supplier_id = #{supplierId}
+		</if>
+		ORDER BY
+			i.update_date DESC
+	 </select>
+	 
+	 <select id="queryDriverVoEntityByDriverId" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp" resultType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp">
+ 	SELECT 
+		i.driver_id as driverId,
+		REPLACE(i.account_bank, CHAR(10),'') as accountBank,
+		i.age as age,
+		REPLACE(i.archives_no, CHAR(10),'') as archivesNo,
+		REPLACE(i.attachment_addr, CHAR(10),'') as attachmentAddr,
+		REPLACE(i.attachment_name, CHAR(10),'') as attachmentName,
+		REPLACE(i.bank_account_no, CHAR(10),'') as bankAccountNo,
+		i.create_by as createBy,
+		i.create_date as createDate,
+		i.credit_card_no as creditCardNo,
+		i.cooperation_type as cooperationType,
+		i.update_by as updateBy,
+		i.update_date as updateDate,
+		REPLACE(i.credit_card_period_of_validity, CHAR(10),'') as creditCardPeriodOfValidity,
+		REPLACE(i.credit_CVN2, CHAR(10),'') as CVN2,
+		REPLACE(i.credit_open_account_bank, CHAR(10),'') as creditOpenAccountBank,
+		REPLACE(i.current_address, CHAR(10),'') AS currentAddress,
+		REPLACE(i.driving_license_type, CHAR(10),'') as drivingLicenseType,
+		REPLACE(i.driving_years, CHAR(10),'') as drivingYears,
+		REPLACE(i.emergency_contact_number, CHAR(10),'') as emergencyContactNumber,
+		REPLACE(i.emergency_contact_person, CHAR(10),'') AS emergencyContactPerson,
+		DATE_FORMAT(i.expire_date,'%Y-%m-%d %T')as expireDate,
+		i.gender as gender,
+		i.id_card_no as idCardNo,
+		DATE_FORMAT(i.issue_date,'%Y-%m-%d %T')as issueDate,
+		i.is_binding_credit_card as isBindingCreditCard,
+		REPLACE(i.license_plates, CHAR(10),'') AS licensePlates,
+		ci.car_id as licensePlatesId,
+		REPLACE(i.memo, CHAR(10),'') AS memo,
+		REPLACE(i.`name`, CHAR(10),'') AS name,
+		i.`password` as password,
+		REPLACE(i.phone, CHAR(10),'') as phone,
+		REPLACE(i.photoSrct, CHAR(10),'') as photoSrc,
+		i.push_id as pushId,
+		i.service_city as serviceCityId,
+		i.`status` as status,
+		REPLACE(i.storable_card_no, CHAR(10),'') as shortCardNo,
+		i.supplier_id as supplierId,
+		REPLACE(i.superintend_no, CHAR(10),'') AS superintendNo,
+  		REPLACE(i.superintend_url, CHAR(10),'') AS superintendUrl,
+		IFNULL(t.curr_account,0) as currAccount, 
+		IFNULL(t.hisall_account,0) as hisallAccount,
+		IFNULL(t.credit_balance,0) as creditBalance, 
+		IFNULL(t.credit_balance_hisall,0) as creditBalanceHisall, 
+		IFNULL(t.out_curr_account,0) as outCurrAccount, 
+		IFNULL(t.out_hisall_account,0) as outHisallAccount, 
+		IFNULL(t.account_amount,0) as accountAmount, 
+		IFNULL(t.settle_account,0) as settleAccount, 
+		IFNULL(t.withdraw_deposit,0) as withdrawDeposit, 
+		IFNULL(t.frozen_amount,0) as frozenAmount,
+		c.city_name as serviceCity,
+		c.city_id as cityId,
+		d.name createByName,
+		e.name updateByName,
+		f.supplier_full_name supplierName,
+		i.driverLicenseNumber  driverLicenseNumber,
+		i.drivingLicenseImg  drivingLicenseImg,
+		i.firstDrivingLicenseDate  firstDrivingLicenseDate,
+		i.firstMeshworkDrivingLicenseDate  firstMeshworkDrivingLicenseDate,
+		REPLACE(i.nationality, CHAR(10),'') AS nationAlity,
+		REPLACE(i.householdRegister, CHAR(10),'') AS houseHoldRegister,
+		REPLACE(i.nation, CHAR(10),'') AS nation,
+		REPLACE(i.marriage, CHAR(10),'') AS marriage,
+		REPLACE(i.foreignLanguage, CHAR(10),'') AS foreignLanguage,
+		REPLACE(i.education, CHAR(10),'') AS education,
+		REPLACE(i.courseName, CHAR(10),'')  courseName,
+		i.courseDate  courseDate,
+		i.courseDateStart  courseDateStart,
+		i.courseDateEnd  courseDateEnd,
+		i.courseTime  courseTime,
+		REPLACE(i.corpType, CHAR(10),'') AS corpType,
+		REPLACE(i.trafficViolations, CHAR(10),'')  trafficViolations,
+		i.signDate  signDate,
+		i.signDateEnd  signDateEnd,
+		i.contractDate  contractDate,
+		REPLACE(i.isXyDriver, CHAR(10),'')  isXyDriver,
+		REPLACE(i.xy_driver_number, CHAR(10),'') xyDriverNumber,
+		REPLACE(i.partTimeJobDri, CHAR(10),'')  partTimeJobDri,
+		REPLACE(i.phoneType, CHAR(10),'')  phoneType,
+		REPLACE(i.phoneCorp, CHAR(10),'')  phoneCorp,
+		REPLACE(i.appVersion, CHAR(10),'') appVersion,
+		REPLACE(i.mapType, CHAR(10),'') mapType,
+		REPLACE(i.emergencyContactAddr, CHAR(10),'') AS emergencyContactAddr,
+		REPLACE(i.assessment, CHAR(10),'')  assessment,
+		i.driverLicenseIssuingDateStart  driverLicenseIssuingDateStart,
+		i.driverLicenseIssuingDateEnd  driverLicenseIssuingDateEnd,
+		i.driverLicenseIssuingCorp  driverLicenseIssuingCorp,
+		i.driverLicenseIssuingNumber  driverLicenseIssuingNumber,
+		i.driver_license_issuing_register_date driverLicenseIssuingRegisterDate,
+		i.driver_license_issuing_first_date driverLicenseIssuingFirstDate,
+    	i.driver_license_issuing_grant_date driverLicenseIssuingGrantDate,
+		i.birth_day  birthDay,
+		REPLACE(i.house_hold_register_permanent, CHAR(10),'') AS houseHoldRegisterPermanent,
+		i.group_id as groupId,
+		g.group_name groupName,
+		REPLACE(did.bank_card_bank, CHAR(10),'') AS bankCardBank,
+		REPLACE(did.bank_card_number, CHAR(10),'') AS bankCardNumber,
+		did.ext6 ext6
+		from car_biz_driver_info i 
+		LEFT JOIN car_biz_driver_account t on i.driver_id = t.driver_id 
+		LEFT JOIN car_biz_city c on c.city_id = i.service_city 
+		left join car_sys_user d on d.user_id=i.create_by
+		left join car_sys_user e on e.user_id=i.update_by
+		left join car_biz_supplier f on f.supplier_id=i.supplier_id
+		left join car_biz_car_info ci on ci.license_plates=i.license_plates
+		LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+		LEFT JOIN car_biz_driver_info_detail did ON i.driver_id = did.driver_id
+		where i.driver_id = #{driverId}
+		limit 1
+  </select>
+
+	<select id="selectDriverToTrainList" resultType="com.zhuanche.entity.driver.CarBizDriverInfo"
+		parameterType="com.zhuanche.entity.driver.CarBizDriverInfo">
+		SELECT
+		i.driver_id AS driverId,
+		i.phone AS phone,
+		i.gender gender,
+		i.NAME,
+		g.group_name AS
+		carGroupName,
+		c.city_name AS serviceCity,
+		i.service_city AS cityId,
+		i.supplier_id AS supplierId,
+		i.license_plates AS licensePlates,
+		p.supplier_full_name AS supplierName,
+		i.STATUS AS status,
+		d.`name`
+		createByName,
+		e.`name` updateByName,
+		i.id_card_no as idCardNo,
+		i.age as age,
+		i.memo as memo,
+		i.superintend_no AS
+		superintendNo,
+		i.superintend_url AS superintendUrl,
+		i.current_address as
+		currentAddress,
+		i.emergency_contact_number as emergencyContactNumber,
+		i.emergency_contact_person as emergencyContactPerson,
+		i.driving_license_type as drivingLicenseType,
+		DATE_FORMAT(i.issue_date,'%Y-%m-%d %T')as issueDate,
+		i.driving_years as
+		drivingYears,
+		DATE_FORMAT(i.expire_date,'%Y-%m-%d %T')as expireDate,
+		i.archives_no as archivesNo,
+		DATE_FORMAT(i.create_date,'%Y-%m-%d %H:%i:%s') createDateStr,
+		DATE_FORMAT(i.update_date,'%Y-%m-%d %H:%i:%s') updateDateStr
+		FROM
+		car_biz_driver_info i
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN
+		car_biz_car_info a ON a.license_plates = i.license_plates
+		LEFT JOIN
+		car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN
+		car_biz_model m ON a.car_model_id = m.model_id
+		LEFT JOIN
+		car_biz_car_group g ON m.group_id = g.group_id
+		left join car_sys_user d
+		on d.user_id=i.create_by
+		left join car_sys_user e on
+		e.user_id=i.update_by
+		where 1=1
+		<if test="status!=null">
+			and i.status= #{status}
+		</if>
+		<if test="licensePlates!=null and licensePlates!=''">
+			and i.license_plates LIKE '%${licensePlates}%'
+		</if>
+		<if test="driverId!=null and driverId !=''">
+			and i.driver_id not in (${driverId})
+		</if>
+		<if test="name!=null and name!=''">
+			and i.name LIKE CONCAT(#{name},'%')
+		</if>
+		<if test="phone!=null and phone!=''">
+			and i.phone LIKE '%${phone}%'
+		</if>
+		<if test="serviceCityId!=null and serviceCityId!=''">
+			and i.service_city = #{serviceCityId}
+		</if>
+		<if test="cities !=null and cities !=''">
+			and i.service_city in (${cities})
+		</if>
+		<if test="supplierId!=null and supplierId!=''">
+			and i.supplier_Id = #{supplierId}
+		</if>
+		<if test="suppliers !=null and suppliers !=''">
+			and i.supplier_id in (${suppliers})
+		</if>
+		ORDER BY
+		i.update_date DESC
+		LIMIT ${offSet},${pagesize}
+	</select>
+
+	<select id="selectDriverToTrainCount" resultType="java.lang.Integer"
+		parameterType="com.zhuanche.entity.driver.CarBizDriverInfo">
+		SELECT
+		count(*)
+		FROM
+		car_biz_driver_info i
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN
+		car_biz_car_info a ON a.license_plates = i.license_plates
+		LEFT JOIN
+		car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN
+		car_biz_model m ON a.car_model_id = m.model_id
+		LEFT JOIN
+		car_biz_car_group g ON m.group_id = g.group_id
+		left join car_sys_user d
+		on d.user_id=i.create_by
+		left join car_sys_user e on
+		e.user_id=i.update_by
+		where 1=1
+		<if test="status!=null">
+			and i.status= #{status}
+		</if>
+		<if test="licensePlates!=null and licensePlates!=''">
+			and i.license_plates LIKE '%${licensePlates}%'
+		</if>
+		<if test="driverId!=null and driverId !=''">
+			and i.driver_id not in (${driverId})
+		</if>
+		<if test="name!=null and name!=''">
+			and i.name LIKE CONCAT(#{name},'%')
+		</if>
+		<if test="phone!=null and phone!=''">
+			and i.phone LIKE '%${phone}%'
+		</if>
+		<if test="serviceCityId!=null and serviceCityId!=''">
+			and i.service_city = #{serviceCityId}
+		</if>
+		<if test="cities !=null and cities !=''">
+			and i.service_city in (${cities})
+		</if>
+		<if test="supplierId!=null and supplierId!=''">
+			and i.supplier_Id = #{supplierId}
+		</if>
+		<if test="suppliers !=null and suppliers !=''">
+			and i.supplier_id in (${suppliers})
+		</if>
+	</select>
+	<select id="selectDriverByKeyAddCooperation" resultType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp"  parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp">
+ 	SELECT 
+		i.driver_id AS driverId,
+		i.phone AS phone,
+		i.gender gender,
+		i.NAME,
+		g.group_id AS groupid,
+		g.group_name AS carGroupName,
+		c.city_name AS serviceCity,
+		i.license_plates AS licensePlates,
+		i.supplier_id supplieId,
+		p.supplier_full_name AS supplierName,
+		i.STATUS AS status,
+		d.`name` createByName,
+	    e.`name` updateByName,
+	    i.id_card_no as idCardNo,
+		i.age as age,
+		i.memo as memo,
+		i.imei as imei,
+		i.superintend_no AS superintendNo,
+		i.superintend_url AS superintendUrl,
+		i.current_address as currentAddress,
+		i.emergency_contact_number as emergencyContactNumber,
+		i.emergency_contact_person as emergencyContactPerson,
+		i.driving_license_type as drivingLicenseType,
+		DATE_FORMAT(i.issue_date,'%Y-%m-%d %T')as issueDate,
+		i.driving_years as drivingYears,
+		DATE_FORMAT(i.expire_date,'%Y-%m-%d %T')as expireDate,
+		i.archives_no as archivesNo,
+	    DATE_FORMAT(i.create_date,'%Y-%m-%d %H:%i:%s') createDateStr,
+    	DATE_FORMAT(i.update_date,'%Y-%m-%d %H:%i:%s') updateDateStr,
+    	i.cooperation_type cooperationType,
+    	t.cooperation_name cooperationName
+		FROM
+			car_biz_driver_info i
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_car_info a ON a.license_plates = i.license_plates
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_model m ON a.car_model_id = m.model_id
+		LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+		left join car_sys_user d on d.user_id=i.create_by
+		left join car_sys_user e on e.user_id=i.update_by
+		left join car_biz_cooperation_type t on t.id=i.cooperation_type
+		where 1=1 
+		<if test="status!=null">
+   	 	  and i.status= #{status}
+   	 	</if>
+		<if test="licensePlates!=null and licensePlates!=''">
+   	 	  and i.license_plates LIKE '%${licensePlates}%'
+   	 	</if>
+   	 	<if test="driverId!=null and driverId !=''">
+   	 	  and i.driver_id in (${driverId})
+   	 	</if>
+   	 	<if test="name!=null and name!=''">
+   	 	  and i.name LIKE CONCAT(#{name},'%')
+   	 	</if>
+   	 	<if test="supplierId!=null and supplierId!=''">
+   	 	  and i.supplier_Id = #{supplierId}
+   	 	</if>
+   	 	<if test="phone!=null and phone!=''"> 
+   	 	  and i.phone LIKE '%${phone}%'
+   	 	</if> 
+   	 	<if test="serviceCityId!=null and serviceCityId!=''">
+			and i.service_city = #{serviceCityId}
+		</if> 
+		<if test="cities !=null and cities !=''">
+			and i.service_city in (${cities})
+		</if>
+		<if test="suppliers !=null and suppliers !=''">
+			and i.supplier_id in (${suppliers})
+		</if>
+		<if test="cooperationType !=null and cooperationType !=''">
+   	 	  and t.id= #{cooperationType}
+   	 	</if>
+   	 	<if test="groupid !=null and groupid !=''">
+			and i.group_id = #{groupid}
+		</if>
+		<if test="imei!=null and imei!=''">
+   	 	  and i.imei LIKE '%${imei}%'
+   	 	</if>
+		<if test="idCardNo!=null and idCardNo!=''">
+			and i.id_card_no = #{idCardNo}
+		</if>
+			order by i.update_date desc
+			LIMIT ${offSet},${pagesize}
+  </select>
+  
+  <select id="selectDriverByKeyCountAddCooperation" resultType="java.lang.Integer"  parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp">
+ 	SELECT 
+		count(*)
+	FROM
+		car_biz_driver_info i
+	LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+	LEFT JOIN car_biz_car_info a ON a.license_plates = i.license_plates
+	LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+	LEFT JOIN car_biz_model m ON a.car_model_id = m.model_id
+	LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+	left join car_sys_user d on d.user_id=i.create_by
+	left join car_sys_user e on e.user_id=i.update_by
+	left join car_biz_cooperation_type t on t.id=i.cooperation_type
+	where 1=1 
+		<if test="status!=null">
+   	 	  and i.status= #{status}
+   	 	</if>
+		<if test="licensePlates!=null and licensePlates!=''">
+   	 	  and i.license_plates LIKE '%${licensePlates}%'
+   	 	</if>
+   	 	<if test="driverId!=null and driverId !=''">
+   	 	  and i.driver_id in (${driverId})
+   	 	</if>
+   	 	<if test="name!=null and name!=''">
+   	 	 <!-- and i.name like '%name%' --> 
+   	 	  and i.name LIKE CONCAT(#{name},'%')
+   	 	</if>
+   	 	<if test="supplierId!=null and supplierId!=''">
+   	 	  and i.supplier_Id = #{supplierId}
+   	 	</if>
+   	 	<if test="phone!=null and phone!=''"> 
+   	 	  and i.phone LIKE '%${phone}%'
+   	 	</if> 
+   	 	<if test="serviceCityId!=null and serviceCityId!=''">
+			and i.service_city = #{serviceCityId}
+		</if> 
+		<if test="cities !=null and cities !=''">
+			and i.service_city in (${cities})
+		</if>
+		<if test="suppliers !=null and suppliers !=''">
+			and i.supplier_id in (${suppliers})
+		</if>
+		<if test="cooperationType !=null and cooperationType !=''">
+   	 	  and t.id= #{cooperationType}
+   	 	</if>
+   	 	<if test="groupid !=null and groupid !=''">
+			and i.group_id = #{groupid}
+		</if>
+		<if test="imei!=null and imei!=''">
+   	 	  and i.imei LIKE '%${imei}%'
+   	 	</if>
+	  	<if test="idCardNo!=null and idCardNo!=''">
+		  and i.id_card_no = #{idCardNo}
+	  	</if>
+  </select>
+  
+  <select id="selectDriverByKeyAddCooperationNoLimit" resultType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp"  parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp">
+ 	SELECT 
+		i.driver_id AS driverId,
+		i.phone AS phone,
+		i.gender gender,
+		i.NAME,
+		g.group_id AS groupid,
+		g.group_name AS carGroupName,
+		c.city_name AS serviceCity,
+		i.license_plates AS licensePlates,
+		i.supplier_id supplieId,
+		p.supplier_full_name AS supplierName,
+		i.STATUS AS status,
+		d.`name` createByName,
+	    e.`name` updateByName,
+	    i.id_card_no as idCardNo,
+		i.age as age,
+		i.memo as memo,
+		i.imei as imei,
+		i.superintend_no AS superintendNo,
+		i.superintend_url AS superintendUrl,
+		i.current_address as currentAddress,
+		i.emergency_contact_number as emergencyContactNumber,
+		i.emergency_contact_person as emergencyContactPerson,
+		i.driving_license_type as drivingLicenseType,
+		DATE_FORMAT(i.issue_date,'%Y-%m-%d %T')as issueDate,
+		i.driving_years as drivingYears,
+		DATE_FORMAT(i.expire_date,'%Y-%m-%d %T')as expireDate,
+		i.archives_no as archivesNo,
+	    DATE_FORMAT(i.create_date,'%Y-%m-%d %H:%i:%s') createDateStr,
+    	DATE_FORMAT(i.update_date,'%Y-%m-%d %H:%i:%s') updateDateStr,
+    	i.driverLicenseNumber  driverLicenseNumber,
+		i.drivingLicenseImg  drivingLicenseImg,
+		i.firstDrivingLicenseDate  firstDrivingLicenseDate,
+		i.firstMeshworkDrivingLicenseDate  firstMeshworkDrivingLicenseDate,
+		i.nationality  nationAlity,
+		i.householdRegister  houseHoldRegister,
+		i.nation  nation,
+		i.marriage  marriage,
+		i.foreignLanguage  foreignLanguage,
+		i.education  education,
+		i.courseName  courseName,
+		i.courseDate  courseDate,
+		i.courseDateStart  courseDateStart,
+		i.courseDateEnd  courseDateEnd,
+		i.courseTime  courseTime,
+		i.corpType  corpType,
+		i.trafficViolations  trafficViolations,
+		i.signDate  signDate,
+		i.signDateEnd  signDateEnd,
+		i.contractDate  contractDate,
+		i.isXyDriver  isXyDriver,
+		i.xy_driver_number xyDriverNumber,
+		i.partTimeJobDri  partTimeJobDri,
+		i.phoneType  phoneType,
+		i.phoneCorp  phoneCorp,
+		i.appVersion,
+		i.mapType  mapType,
+		i.emergencyContactAddr  emergencyContactAddr,
+		i.assessment  assessment,
+		i.driverLicenseIssuingDateStart  driverLicenseIssuingDateStart,
+		i.driverLicenseIssuingDateEnd  driverLicenseIssuingDateEnd,
+		i.driverLicenseIssuingCorp  driverLicenseIssuingCorp,
+		i.driverLicenseIssuingNumber  driverLicenseIssuingNumber,
+		i.driver_license_issuing_register_date driverLicenseIssuingRegisterDate, 
+		i.driver_license_issuing_first_date driverLicenseIssuingFirstDate, 
+    	i.driver_license_issuing_grant_date driverLicenseIssuingGrantDate,
+		i.birth_day  birthDay,
+		REPLACE(i.house_hold_register_permanent, CHAR(10),'') AS houseHoldRegisterPermanent,
+    	i.cooperation_type cooperationType,
+    	t.cooperation_name cooperationName
+		FROM
+			car_biz_driver_info i
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_car_info a ON a.license_plates = i.license_plates
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_model m ON a.car_model_id = m.model_id
+		LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+		left join car_sys_user d on d.user_id=i.create_by
+		left join car_sys_user e on e.user_id=i.update_by
+		left join car_biz_cooperation_type t on t.id=i.cooperation_type
+		where 1=1 
+		<if test="status!=null">
+   	 	  and i.status= #{status}
+   	 	</if>
+		<if test="licensePlates!=null and licensePlates!=''">
+   	 	  and i.license_plates LIKE '%${licensePlates}%'
+   	 	</if>
+   	 	<if test="driverId!=null and driverId !=''">
+   	 	  and i.driver_id in (${driverId})
+   	 	</if>
+   	 	<if test="name!=null and name!=''">
+   	 	  and i.name LIKE CONCAT(#{name},'%')
+   	 	</if>
+   	 	<if test="supplierId!=null and supplierId!=''">
+   	 	  and i.supplier_Id = #{supplierId}
+   	 	</if>
+   	 	<if test="phone!=null and phone!=''"> 
+   	 	  and i.phone LIKE '%${phone}%'
+   	 	</if> 
+   	 	<if test="serviceCityId!=null and serviceCityId!=''">
+			and i.service_city = #{serviceCityId}
+		</if> 
+		<if test="cities !=null and cities !=''">
+			and i.service_city in (${cities})
+		</if>
+		<if test="suppliers !=null and suppliers !=''">
+			and i.supplier_id in (${suppliers})
+		</if>
+		<if test="cooperationType !=null and cooperationType !=''">
+   	 	  and t.id= #{cooperationType}
+   	 	</if>
+   	 	<if test="groupid !=null and groupid !=''">
+			and i.group_id = #{groupid}
+		</if>
+		<if test="imei!=null and imei!=''">
+   	 	  and i.imei LIKE '%${imei}%'
+   	 	</if>
+	  	<if test="idCardNo!=null and idCardNo!=''">
+		  and i.id_card_no = #{idCardNo}
+	  	</if>
+			order by i.update_date desc
+  </select>
+  
+  <select id="queryBusCarList"  parameterType="com.zhuanche.entity.rentcar.DriverEntityBusVo"  resultType="com.zhuanche.entity.rentcar.DriverEntityBusVo">
+		SELECT
+			c.car_id AS licensePlatesId,
+			c.color AS color,
+			c.license_plates AS licensePlates,
+			p.supplier_id AS supplierId,
+			p.supplier_full_name AS supplierName,
+			g.group_name AS groupName
+		FROM
+			car_biz_car_info c
+		LEFT JOIN car_biz_supplier p ON c.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_model m ON m.model_id = c.car_model_id
+		LEFT JOIN car_biz_car_group g ON m.group_id = g.group_id
+		WHERE 
+		c.STATUS = 1 AND g.type = 2
+		<if test="licensePlatesList !=null">
+			and c.license_plates not in  
+			<foreach item="item" index="index" collection="licensePlatesList" open="(" separator="," close=")">  
+		  		#{item}  
+		 	</foreach> 
+		 </if>
+   	 	<if test="groupid!=null and groupid!=''"> 
+   	 	  and g.group_id =  #{groupid}
+   	 	</if>
+		<if test="cityId!=null and cityId!=''">
+		  and c.city_id =  #{cityId}
+		</if>
+		<if test="supplierIds!=null and supplierIds!=''">
+			and c.supplier_id in (${supplierIds})
+		</if>
+		<if test="supplierId!=null and supplierId!=''">
+			and c.supplier_id = #{supplierId}
+		</if>
+		<if test="licensePlates != null and licensePlates != ''">
+			and c.license_plates = #{licensePlates}
+		</if>
+		order by c.update_date  desc
+	 	limit #{offSet},#{pagesize}
+	 </select>
+  	<select id="countBusCarList" resultType="java.lang.Integer">
+	 	SELECT count(*)
+		FROM
+			car_biz_car_info c
+		LEFT JOIN car_biz_supplier p ON c.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_model m ON m.model_id = c.car_model_id
+		LEFT JOIN car_biz_car_group g ON m.group_id = g.group_id
+		LEFT JOIN car_biz_driver_info i ON i.license_plates = c.license_plates
+		WHERE 
+		c.STATUS = 1 AND g.type = 2
+		<if test="licensePlatesList !=null">
+			and c.license_plates not in  
+			<foreach item="item" index="index" collection="licensePlatesList" open="(" separator="," close=")">  
+		  		#{item}  
+		 	</foreach> 
+		 </if>
+   	 	<if test="groupid!=null and groupid!=''"> 
+   	 	  and g.group_id =  #{groupid}
+   	 	</if>
+		<if test="cityId!=null and cityId!=''">
+		  and c.city_id =  #{cityId}
+		</if>
+		<if test="supplierIds!=null and supplierIds!=''">
+			and c.supplier_id in (${supplierIds})
+		</if>
+		<if test="supplierId!=null and supplierId!=''">
+			and c.supplier_id = #{supplierId}
+		</if>
+		<if test="licensePlates != null and licensePlates != ''">
+			and c.license_plates = #{licensePlates}
+		</if>
+	 </select>
+	 
+  	<select id="queryBusDriverList"  parameterType="com.zhuanche.entity.rentcar.DriverEntityBusVo"  resultType="com.zhuanche.entity.rentcar.DriverEntityBusVo">
+	 	SELECT i.driver_id AS driverId ,i.name as name,i.phone as phone,i.license_plates as licensePlates,p.supplier_full_name AS supplierName,g.group_name as groupName
+		FROM car_biz_driver_info i 
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id 
+		LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+		where 1=1 and g.type=2 and i.status=1
+		<if test="ids !=null">
+			and i.driver_id not in  
+			<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">  
+		  		#{item}  
+		 	</foreach> 
+		 </if>
+	 	<if test="driverId!=null and driverId !=''">
+   	 	  and i.driver_id in (${driverId})
+   	 	</if>
+   	 	<if test="name!=null and name!=''">
+   	 	  and i.name LIKE CONCAT(#{name},'%')
+   	 	</if>
+   	 	<if test="phone!=null and phone!=''"> 
+   	 	  and i.phone LIKE '%${phone}%'
+   	 	</if> 
+   	 	<if test="groupid!=null and groupid!=''"> 
+   	 	  and i.group_id =  #{groupid}
+   	 	</if>
+		<if test="cityId!=null and cityId!=''">
+		  and i.service_city =  #{cityId}
+		</if>
+		<if test="supplierId!=null and supplierId!=''">
+			and i.supplier_Id = #{supplierId}
+		</if>
+		<if test="supplierIds!=null and supplierIds!=''">
+			and i.supplier_Id in (${supplierIds})
+		</if>
+		order by i.update_date  desc
+	 	limit #{offSet},#{pagesize}
+	 </select>
+  	<select id="countBusDriverList" resultType="java.lang.Integer">
+	 	SELECT count(*)
+		FROM car_biz_driver_info i 
+		LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+		where 1=1 and g.type=2 and i.status=1
+		<if test="ids !=null">
+			and i.driver_id not in  
+			<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">  
+		  		#{item}  
+		 	</foreach> 
+		 </if>
+		<if test="driverId!=null and driverId !=''">
+   	 	  and i.driver_id in (${driverId})
+   	 	</if>
+   	 	<if test="name!=null and name!=''">
+   	 	 <!-- and i.name like '%name%' --> 
+   	 	  and i.name LIKE CONCAT(#{name},'%')
+   	 	</if>
+   	 	<if test="phone!=null and phone!=''"> 
+   	 	  and i.phone LIKE '%${phone}%'
+   	 	</if> 
+   	 	<if test="groupid!=null and groupid!=''"> 
+   	 	  and i.group_id =  #{groupid}
+   	 	</if>
+		<if test="cityId!=null and cityId!=''">
+		  and i.service_city =  #{cityId}
+		</if>
+		<if test="supplierId!=null and supplierId!=''">
+			and i.supplier_Id = #{supplierId}
+		</if>
+		<if test="supplierIds!=null and supplierIds!=''">
+			and i.supplier_Id in (${supplierIds})
+		</if>
+	 </select>
+	 
+	 <select id="selectDriverByPrimaryKeyBus" parameterType="Integer" resultType="com.zhuanche.entity.driver.CarBizDriverInfo">
+	 	SELECT 
+			i.driver_id as driverId,
+			i.license_plates as licensePlates,
+			i.`name` as name,
+			i.phone as phone,
+			i.service_city as serviceCityId,
+			c.city_name as serviceCity,
+			i.supplier_id supplierId,
+			f.supplier_full_name supplierName,
+			i.group_id as groupId,
+			g.group_name carGroupName,
+			 <!-- 借用一下 --> 
+			model.model_name AS teamName
+			from car_biz_driver_info i 
+			LEFT JOIN car_biz_car_info a ON a.license_plates = i.license_plates
+			LEFT JOIN car_biz_model model ON model.model_id = a.car_model_id
+			LEFT JOIN car_biz_city c on c.city_id = i.service_city 
+			left join car_biz_supplier f on f.supplier_id=i.supplier_id
+			LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+			where i.driver_id = #{driverId}
+  </select>
+  <select id="selectCustomerNameById" parameterType="Integer" resultType="String">
+	 	SELECT 
+			`name` as name
+		from car_biz_customer 
+		where customer_id = #{customerId}
+  </select>
+  <select id="selectDriverByDriverId" parameterType="string" resultType="com.zhuanche.entity.driver.CarBizDriverInfo">
+ 	SELECT 
+		i.driver_id as driverId,
+		i.license_plates as licensePlates,
+		i.`name` as name,
+		i.phone as phone,
+		i.supplier_id AS supplierId,
+		i.group_id as groupid,
+		c.city_name as cityName,
+		c.city_id as cityId
+		from car_biz_driver_info i 
+		LEFT JOIN car_biz_city c on c.city_id = i.service_city 
+		where i.driver_id = #{id}
+  </select>
+  <!-- 验证银行卡卡号 -->
+   <select id="validateBankCardNumber" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp"  resultType="int">
+	select count(1) from car_biz_driver_info_detail  
+	where bank_card_number = #{bankCardNumber}
+		<if test="driverId !=null and driverId !='' ">
+	            <![CDATA[ and driver_id <> #{driverId}  ]]>
+	    </if>
+	</select>
+	<!-- 根据身份证号检查司机是否存在 -->
+	<select id="checkIdCardNoNew"  parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp" resultType="java.lang.Integer">
+		select
+		count(*)
+		from car_biz_driver_info
+		where status!=0 and id_card_no=#{idCardNo}
+		<if test="driverId !=null and driverId !='' ">
+			<![CDATA[ and driver_id <> #{driverId}  ]]>
+		</if>
+	</select>
+
+	<!-- 根据供应商ID，修改司机的加盟类型 -->
+	<update id="updateDriverCooperationTypeBySupplierId" parameterType="java.util.HashMap">
+		UPDATE car_biz_driver_info
+		set cooperation_type = #{cooperationType}
+		WHERE supplier_id = #{supplierId}
+	</update>
+	
+	<!-- 根据driverID，修改司机头像 -->
+	<update id="updateDriverPhoto" parameterType="java.util.HashMap">
+		UPDATE car_biz_driver_info
+		set photoSrct = #{photoUrlt}
+		WHERE driver_id = #{driverId}
+	</update>
+
+	<!-- 解绑司机信用卡，更新 -->
+	<update id="updateDriverCardInfo" parameterType="map">
+		UPDATE
+		car_biz_driver_info
+		SET
+		name=name
+		,update_date = now()
+		<if test="quickpayCustomerid!=null">
+			,quickpay_customerid = #{quickpayCustomerid}
+		</if>
+		<if test="creditOpenAccountBank!=null">
+			,credit_open_account_bank = #{creditOpenAccountBank}
+		</if>
+		<if test="shortCardNo!=null">
+			,storable_card_no = #{shortCardNo}
+		</if>
+		<if test="isBindingCreditCard!=null">
+			,is_binding_credit_card = #{isBindingCreditCard}
+		</if>
+		<if test="creditCardNo!=null">
+			,credit_card_no = #{creditCardNo}
+		</if>
+		<if test="CVN2!=null">
+			,credit_CVN2 = #{CVN2}
+		</if>
+		<if test="updateBy!=null and updateBy!=''">
+			,update_by = #{updateBy}
+		</if>
+		<if test="expireDate!=null">
+			,credit_card_period_of_validity = #{expireDate}
+		</if>
+		<if test="bindTime!=null">
+			,credit_bind_date = #{bindTime}
+		</if>
+		WHERE driver_id = #{driverId}
+	</update>
+
+	<update id="updateDriverIMEI" parameterType="java.lang.Integer">
+		UPDATE car_biz_driver_info
+		set imei = null
+		WHERE driver_id = #{driverId}
+	</update>
+
+	<update id="updateDriverStatus" parameterType="com.zhuanche.entity.driver.CarBizDriverInfo">
+		UPDATE car_biz_driver_info
+		SET
+		update_date = now(),
+		status = #{status},
+		license_plates = NULL,
+		phone = NULL
+		WHERE driver_id = #{driverId}
+	</update>
+
+	<update id="updateDriverGroupIdByDriverId" parameterType="map">
+		UPDATE car_biz_driver_info
+		SET group_id = #{groupId}
+		WHERE driver_id = #{driverId}
+	</update>
+
+	<!-- 根据司机ID，把car_biz_driver_info_detail的银行卡号和开户行清空 -->
+	<update id="updateDriverBankCardBankIsNull" parameterType="java.lang.Integer">
+		UPDATE car_biz_driver_info_detail
+		SET bank_card_bank = NULL, bank_card_number = NULL
+		WHERE driver_id = #{driverId}
+	</update>
+
+	<!--查询司机部分信息（只供更改车队是调用）-->
+	<select id="selectDriverVoByDriverId" parameterType="java.lang.Integer" resultType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp">
+		SELECT
+		i.driver_id AS driverId,
+		i.phone AS phone,
+		i.NAME AS name,
+		i.license_plates AS licensePlates,
+		i.cooperation_type AS cooperationType,
+		i.group_id AS groupid,
+		g.group_name AS carGroupName,
+		i.service_city as serviceCityId,
+		c.city_name AS cityName,
+		i.supplier_id AS supplierId,
+		p.supplier_full_name AS supplierName,
+		i.STATUS AS status,
+		i.update_by AS updateBy,
+		DATE_FORMAT(i.create_date,'%Y-%m-%d %H:%i:%s') AS createDate
+		FROM car_biz_driver_info i
+		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+		where i.driver_id= #{driverId}
+	</select>
+
+	<select id="queryDriverIdBySupplierId" parameterType="com.zhuanche.entity.driver.CarBizDriverInfo" resultType="com.zhuanche.entity.driver.CarBizDriverInfo">
+		SELECT
+		driver_id AS driverId
+		FROM
+		car_biz_driver_info
+		where status= 1
+		<if test="phone!=null and phone!=''">
+			and phone = #{phone}
+		</if>
+		<if test="supplierId!=null and supplierId!=''">
+			and supplier_id = #{supplierId}
+		</if>
+		<if test="suppliers!=null and suppliers!=''">
+			and supplier_id in (${suppliers})
+		</if>
+	</select>
+
+    <select id="querySupplierIdAndNameByDriverId" parameterType="java.lang.Integer" resultType="com.zhuanche.entity.driver.CarBizDriverInfo">
+		SELECT
+		name ,
+		phone,
+		supplier_id AS supplierId
+		FROM
+		car_biz_driver_info
+		where driver_id = #{driverId}
+	</select>
+</mapper>

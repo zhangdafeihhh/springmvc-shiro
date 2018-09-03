@@ -1778,12 +1778,11 @@ public class CarBizCarInfoTempService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (!"".equals(download) && download != null) {
-            result.put("download", download);
-        } else {
-            result.put("download", "");
+        if(!"".equals(download)&&download!=null){
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,download);
+        }else{
+            return AjaxResponse.success(RestErrorCode.SUCCESS);
         }
-        return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,download);
     }
 
     /**
@@ -2184,11 +2183,10 @@ public class CarBizCarInfoTempService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (!"".equals(download) && download != null) {
-            result.put("download", download);
-        } else {
-            result.put("download", "");
+        if(!"".equals(download)&&download!=null){
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,download);
+        }else{
+            return AjaxResponse.success(RestErrorCode.SUCCESS);
         }
-        return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,download);
     }
 }

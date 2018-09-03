@@ -48,8 +48,8 @@ public final class RestErrorCode{
 	public static final int MSG_CODE_INVALID                = 1005;
 	@ResultMessage("短信验证码不正确")
 	public static final int MSG_CODE_WRONG                = 1006;
-	
-	
+
+
 	
 	
 	//-----------------------------------------------业务参数：司机
@@ -93,6 +93,9 @@ public final class RestErrorCode{
 //	public static final int CUSTOMER_PHONE_NOT_MATCH_ORDER           = 2001;
 //	@ResultMessage("订单已经评价")
 //	public static final int ORDER_HAD_APPRAISAL                                        = 2002;
+
+    @ResultMessage("没有查询到结果")
+    public static final int NOT_FOUND_RESULT                = 2003;
 	
 
 	

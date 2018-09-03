@@ -13,4 +13,6 @@ public interface CarBizCarGroupExMapper {
      * @return
      */
     CarBizCarGroup queryForObject(CarBizCarGroup carBizCarGroup);
+
+    CarBizCarGroup queryForObjectByGroupName(CarBizCarGroup carBizCarGroup);
 }

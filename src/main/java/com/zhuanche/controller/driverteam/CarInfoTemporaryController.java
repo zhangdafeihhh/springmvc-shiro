@@ -1,6 +1,5 @@
 package com.zhuanche.controller.driverteam;
 
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
@@ -48,10 +47,10 @@ import java.util.Map;
  * @author wzq
  */
 @Controller
-@RequestMapping(value = "/temporary")
-public class TemporaryController extends BaseController {
+@RequestMapping(value = "/carInfoTemporary")
+public class CarInfoTemporaryController extends BaseController {
 
-    private static Log log =  LogFactory.getLog(TemporaryController.class);
+    private static Log log =  LogFactory.getLog(CarInfoTemporaryController.class);
 
 	@Autowired
 	private CarBizCarInfoTempService carBizCarInfoTempService;
@@ -59,17 +58,8 @@ public class TemporaryController extends BaseController {
 	@Autowired
     private CarBizModelService carBizModelService;
 
-    @Autowired
-    private CarBizDriverInfoTempService carBizDriverInfoTempService;
-
-    @Autowired
-    private CarBizCarGroupService carBizCarGroupService;
-
-    @Autowired
-    private CarBizCooperationTypeService carBizCooperationTypeService;
-
     /**
-     * 加盟商司机录入查询
+     * 加盟商车辆查询
      * @param page 页数
      * @param pageSize 条数
      * @param licensePlates 车牌号
@@ -528,119 +518,5 @@ public class TemporaryController extends BaseController {
         return carBizCarInfoTempService.importCarInfo4Bus(params, request);
     }
 
-    /**
-     * 供应商司机查询
-     * @param page 页数
-     * @param pageSize 条数
-     * @param name 司机姓名
-     * @param phone 手机号
-     * @param licensePlates 车牌号
-     * @param groupid 车型类型Id
-     * @param serviceCityId 城市Id
-     * @param supplierId 供应商Id
-     * @param teamIds 车队Id
-     * @param groupIds 小组Id
-     * @param createDateBegin 开始时间
-     * @param createDateEnd 结束时间
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping(value = "/driverListData", method =  RequestMethod.GET )
-    public AjaxResponse driverListData(@RequestParam(value = "page",defaultValue="1") Integer page,
-                                       @RequestParam(value = "pageNum",defaultValue="10") Integer pageSize,
-                                       @RequestParam(value = "name",required = false) String name,
-                                       @RequestParam(value = "phone",required = false) String phone,
-                                       @RequestParam(value = "licensePlates",required = false) String licensePlates,
-                                       @RequestParam(value = "groupid",required = false) Integer groupid,
-                                       @RequestParam(value = "serviceCityId",required = false) Integer serviceCityId,
-                                       @RequestParam(value = "supplierId",required = false) Integer supplierId,
-                                       @RequestParam(value = "teamIds",required = false) Integer teamIds,
-                                       @RequestParam(value = "groupIds",required = false) String groupIds,
-                                       @RequestParam(value = "createDateBegin",required = false) String createDateBegin,
-                                       @RequestParam(value = "createDateEnd",required = false) String createDateEnd) {
-        log.info("查询司机信息列表");
-        CarBizDriverInfoTemp driverEntity = new CarBizDriverInfoTemp();
-        //权限  当前用户的权限
-        SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
-        String sessionCityIds = StringUtils.join(user.getCityIds().toArray(), ",");
-        String sessionSuppliers = StringUtils.join(user.getSupplierIds().toArray(), ",");
-        String sessionTeamIds = StringUtils.join(user.getTeamIds().toArray(), ",");
-        //TODO 缺少登陆人 小组 参数 groupIds
-        if(StringUtils.isNotBlank(name)){
-            driverEntity.setName(name);
-        }
-        if(StringUtils.isNotBlank(phone)){
-            driverEntity.setPhone(phone);
-        }
-        if(StringUtils.isNotBlank(licensePlates)){
-            driverEntity.setLicensePlates(licensePlates);
-        }
-        if(groupid != null){
-            driverEntity.setGroupid(groupid);
-        }
-        if(serviceCityId != null){
-            driverEntity.setCities(serviceCityId.toString());
-        }else{
-            driverEntity.setCities(sessionCityIds);
-        }
-        if(supplierId != null){
-            driverEntity.setSuppliers(supplierId.toString());
-        }else{
-            driverEntity.setSuppliers(sessionSuppliers);
-        }
-        if(teamIds != null){
-            driverEntity.setTeamIds(teamIds.toString());
-        }else{
-            driverEntity.setTeamIds(sessionTeamIds);
-        }
-        if(groupIds != null){
-            driverEntity.setGroupId(groupIds);
-        }
-        if(StringUtils.isNotBlank(createDateBegin)){
-            driverEntity.setCreateDateBegin(createDateBegin);
-        }
-        if(StringUtils.isNotBlank(createDateEnd)){
-            driverEntity.setCreateDateEnd(createDateEnd);
-        }
-        long total=0;
-        PageHelper.startPage(page, pageSize,true);
-        List<CarBizDriverInfoTemp> carBizDriverInfoTemps = null;
-        try{
-            carBizDriverInfoTemps = carBizDriverInfoTempService.queryForPageObject(driverEntity);
-            PageInfo<CarBizDriverInfoTemp> pageInfo = new PageInfo<>(carBizDriverInfoTemps);
-            total = pageInfo.getTotal();
-        }finally {
-            PageHelper.clearPage();
-        }
-        if(carBizDriverInfoTemps == null || carBizDriverInfoTemps.size() == 0){
-            PageDTO pageDto = new PageDTO(page,pageSize,0,new ArrayList());
-            return AjaxResponse.success(pageDto);
-        }else{
-            for (CarBizDriverInfoTemp driverInfoTemp:carBizDriverInfoTemps) {
-                Map<String, Object> result = super.querySupplierName(driverInfoTemp.getCityId(), driverInfoTemp.getSupplierId());
-                driverInfoTemp.setCityName((String)result.get("cityName"));
-                driverInfoTemp.setSupplierName((String)result.get("supplierName"));
-                //车型，加盟类型
-                if(driverInfoTemp.getGroupid()!=null&&!"".equals(driverInfoTemp.getGroupid())){
-                    CarBizCarGroup groupEntity = new CarBizCarGroup();
-                    groupEntity.setGroupId(driverInfoTemp.getGroupid());
-                    CarBizCarGroup queryForObject = carBizCarGroupService.queryForObject(groupEntity);
-                    if(queryForObject!=null){
-                        driverInfoTemp.setCarGroupName(queryForObject.getGroupName());
-                    }
-                }
-                if(driverInfoTemp.getCooperationType()!=0){
-                    CarBizCooperationType cooperationType = new CarBizCooperationType();
-                    cooperationType.setId(driverInfoTemp.getCooperationType());
-                    CarBizCooperationType queryForObject = carBizCooperationTypeService.queryForObject(cooperationType);
-                    if(queryForObject!=null){
-                        driverInfoTemp.setCooperationName(queryForObject.getCooperationName());
-                    }
-                }
-            }
-        }
-        List<CarBizDriverInfoTempDTO> carBizDriverInfoTempDTOList = BeanUtil.copyList(carBizDriverInfoTemps,CarBizDriverInfoTempDTO.class);
-        PageDTO pageDto = new PageDTO(page,pageSize,(int)total,carBizDriverInfoTempDTOList);
-        return AjaxResponse.success(pageDto);
-    }
+
 }

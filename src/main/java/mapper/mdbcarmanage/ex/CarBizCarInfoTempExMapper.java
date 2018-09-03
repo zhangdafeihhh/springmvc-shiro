@@ -19,4 +19,25 @@ public interface CarBizCarInfoTempExMapper {
      * @return
      */
     CarBizCarInfoTemp queryForObject(Map<String,Object> params);
+
+    /**
+     * 根据车牌查询车辆
+     * @param licensePlates
+     * @return
+     */
+    int checkLicensePlates(String licensePlates);
+
+    /**
+     *根据车牌号更新司机Id
+     * @param car
+     * @return
+     */
+    int updateByLicensePlates(CarBizCarInfoTemp car);
+
+    /**
+     * 根据车牌号查询
+     * @param params
+     * @return
+     */
+    CarBizCarInfoTemp selectBylicensePlates(Map<String,Object> params);
 }
