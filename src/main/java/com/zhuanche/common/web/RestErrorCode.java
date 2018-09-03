@@ -32,7 +32,6 @@ public final class RestErrorCode{
 	@ResultMessage("未知错误")
 	public static final int UNKNOWN_ERROR                   = 999;
 	
-	
 	//-----------------------------------------------用户
 	@ResultMessage("获取验证码太频繁")
 	public static final int GET_MSGCODE_EXCEED           = 1000;
@@ -48,10 +47,35 @@ public final class RestErrorCode{
 	public static final int MSG_CODE_INVALID                = 1005;
 	@ResultMessage("短信验证码不正确")
 	public static final int MSG_CODE_WRONG                = 1006;
+	@ResultMessage("账号已经存在")
+	public static final int ACCOUNT_EXIST                      = 1007;
 	
+	//----------------------------------------------权限管理
+	@ResultMessage("父权限不存在")
+	public static final int PARENT_PERMISSION_NOT_EXIST           = 10001;
+	@ResultMessage("权限代码已经存在")
+	public static final int PERMISSION_CODE_EXIST                        = 10002;
+	@ResultMessage("权限类型不合法")
+	public static final int PERMISSION_TYPE_WRONG                     = 10003;
+	@ResultMessage("权限不存在")
+	public static final int PERMISSION_NOT_EXIST                          = 10004;
+	@ResultMessage("存在已经生效的子权限，请先禁用子权限")
+	public static final int PERMISSION_DISABLE_CANT                    = 10005;
+	@ResultMessage("父权限已经被禁用，请先启用父权限")
+	public static final int PERMISSION_ENABLE_CANT                     = 10006;
 	
+
 	
+
+
 	
+	//---------------------------------------------------------------------------------------------------------------------------------------------
+	//----------------------------------------------角色管理
+	@ResultMessage("角色不存在")
+	public static final int ROLE_NOT_EXIST                                      = 10100;
+	@ResultMessage("角色代码已经存在")
+	public static final int ROLE_CODE_EXIST                                    = 10101;
+	   
 	//-----------------------------------------------业务参数：司机
 	@ResultMessage("没有该手机号的司机，请仔细核对！")
 	public static final int DRIVER_NOT_EXIST = 2000;
@@ -59,43 +83,29 @@ public final class RestErrorCode{
 	public static final int DRIVER_OUTAGEALL_EXIST = 2001;
 	@ResultMessage("该司机已存在启用的临时停运！")
 	public static final int DRIVER_OUTAGE_EXIST = 2002;
-//	@ResultMessage("司机状态不是正常启用状态")
-//	public static final int DRIVER_STATUS_NOT_ENABLED                     = 1001;
-//	@ResultMessage("司机手机号码与身份证号码不符合")
-//	public static final int DRIVER_PHONE_IDCARD_NOT_MATCHED      = 1002;
-//	@ResultMessage("司机手机号码或司机ID两者必须传入一个")
-//	public static final int DRIVER_PHONE_ID_MUST_HAVE_ONE            = 1003;
-//	@ResultMessage("登录密码不正确")
-//	public static final int DRIVER_LOGIN_PASSWORD_WRONG             = 1004;
-//	@ResultMessage("超过每天换车最大次数（{0}次）")
-//	public static final int DRIVER_EXCEED_BINDBUS_LIMIT_PERDAY     = 1005;
-//	@ResultMessage("无法退出并解绑车辆（您目前有待服务、服务中的任务）")
-//	public static final int DRIVER_CAN_NOT_UNBIND_BUS                    = 1006;
-//	@ResultMessage("无法选取车辆（您目前有服务中的任务）")
-//	public static final int DRIVER_CAN_NOT_BIND_BUS                         = 1007;
-	
-	
+	@ResultMessage("司机手机号已存在")
+	public static final int DRIVER_PHONE_EXIST                     = 3001;
+	@ResultMessage("司机身份证已存在")
+	public static final int DRIVER_IDCARNO_EXIST                     = 3002;
+	@ResultMessage("司机手机号不合法")
+	public static final int DRIVER_PHONE_NOT_LEGAL                     = 3003;
+	@ResultMessage("司机身份证不合法")
+	public static final int DRIVER_IDCARNO_NOT_LEGAL                     = 3004;
+	@ResultMessage("银行卡号不合法")
+	public static final int DRIVER_BANK_CARD_NUMBER_NOT_LEGAL                     = 3005;
+	@ResultMessage("银行卡号和银行开户行不能只填写一个")
+	public static final int DRIVER_BANK_CARD_NUMBER_NOT_COMPLETE                     = 3006;
+	@ResultMessage("银行卡号和银行开户行不能只填写一个")
+	public static final int DRIVER_BANK_CARD_NUMBER_EXIST                    = 3007;
+
+	//-----------------------------------------------业务参数：导入文件
+	@ResultMessage("文件异常")
+	public static final int FILE_ERROR                    = 4001;
+	@ResultMessage("导入模板格式错误")
+	public static final int FILE_TRMPLATE_ERROR                    = 4002;
 	//-----------------------------------------------业务参数：车辆
-//	@ResultMessage("车辆信息不存在")
-//	public static final int BUS_NOT_EXIST                                               = 1100;
-//	@ResultMessage("车辆状态不是正常启用状态，被停止运营")
-//	public static final int BUS_STATUS_NOT_ENABLED                           = 1101;
-//	@ResultMessage("此车辆已被其他司机选取，请选择其它车辆")
-//	public static final int BUS_HAVE_BINDED_DRIVER                             = 1102;
-	
-	
-	//-----------------------------------------------业务参数：公共基础服务
-//	@ResultMessage("城市不存在")
-//	public static final int CITY_INFO_NOT_EXIST                                      = 1400;
-	
-	//-----------------------------------------------业务参数：订单
-//	@ResultMessage("订单不存在")
-//	public static final int ORDER_INFO_NOT_EXIST                                      = 2000;
-//	@ResultMessage("预定人手机号或乘客手机号与此订单不相符合")
-//	public static final int CUSTOMER_PHONE_NOT_MATCH_ORDER           = 2001;
-//	@ResultMessage("订单已经评价")
-//	public static final int ORDER_HAD_APPRAISAL                                        = 2002;
-	
+	@ResultMessage("车辆信息不存在")
+	public static final int BUS_NOT_EXIST                                               = 1100;
 
 	
 	//---------------------------------------------------------------------------------------------------------------------------------------------

@@ -20,7 +20,7 @@ public class RedisSessionDAO extends CachingSessionDAO{
 
     @Override
     protected void doUpdate(Session session) {
-        redisTemplate.opsForValue().set(SESSION_KEY+session.getId(), session,1,TimeUnit.HOURS);
+        redisTemplate.opsForValue().set(SESSION_KEY+session.getId(), session,30,TimeUnit.MINUTES);
 //        RedisCacheUtil.set(SESSION_KEY+session.getId(), session, 1*60*60 );
     }
 
@@ -37,7 +37,7 @@ public class RedisSessionDAO extends CachingSessionDAO{
     protected Serializable doCreate(Session session) {
         Serializable sessionId = generateSessionId(session);
         assignSessionId(session, sessionId);
-        redisTemplate.opsForValue().set(SESSION_KEY+sessionId, session,1,TimeUnit.HOURS);
+        redisTemplate.opsForValue().set(SESSION_KEY+sessionId, session,30,TimeUnit.MINUTES);
 //        RedisCacheUtil.set(SESSION_KEY+session.getId(), session, 1*60*60 );
         return sessionId;
     }

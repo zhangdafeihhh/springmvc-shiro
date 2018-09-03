@@ -1,7 +1,11 @@
 package com.zhuanche.controller.user;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,6 +14,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.cache.Cache;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,11 +30,20 @@ import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.constants.SaasConst;
+import com.zhuanche.dto.AjaxLoginUserDTO;
+import com.zhuanche.dto.SaasPermissionDTO;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
+import com.zhuanche.entity.mdbcarmanage.SaasPermission;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.realm.UsernamePasswordRealm;
+import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.NumberUtil;
 import com.zhuanche.util.PasswordUtil;
 
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
+import mapper.mdbcarmanage.ex.SaasPermissionExMapper;
 /**用户登录相关的功能**/
 @Controller
 public class LoginController{
@@ -42,6 +58,12 @@ public class LoginController{
 	
 	@Autowired
 	private CarAdmUserExMapper carAdmUserExMapper;
+	@Autowired
+	private SaasPermissionExMapper saasPermissionExMapper;
+	
+	
+	@Autowired
+	private UsernamePasswordRealm usernamePasswordRealm;
 	
 	/**通过用户名、密码，获取短信验证码**/
 	@RequestMapping("/getMsgCode")
@@ -80,8 +102,7 @@ public class LoginController{
 		return AjaxResponse.success( result );
 	}
 	
-	/**执行登录
-	 * @throws IOException **/
+	/**执行登录**/
 	@RequestMapping("/dologin")
 	@ResponseBody
     public AjaxResponse dologin(HttpServletRequest request , HttpServletResponse response, String username, String password, String msgcode ) throws IOException{
@@ -128,6 +149,13 @@ public class LoginController{
 		try {
 			UsernamePasswordToken token = new UsernamePasswordToken( username, password.toCharArray() );
 			currentLoginUser.login(token);
+			
+			//TODO 记录登录用户的所有会话ID
+			//TODO 记录登录用户的所有会话ID
+			//TODO 记录登录用户的所有会话ID
+			//TODO 记录登录用户的所有会话ID
+			
+			
 		}catch(AuthenticationException aex) {
 			return AjaxResponse.fail(RestErrorCode.USER_LOGIN_FAILED) ;
 		}
@@ -150,5 +178,101 @@ public class LoginController{
 		}
 		return AjaxResponse.success( null );
 	}
-  
+ 
+	//-------------------------------------------------------------------------------------------------------------------------------------当前登录用户信息BEGIN
+	@RequestMapping("/currentLoginUserInfo")
+	@ResponseBody
+	@SuppressWarnings("unchecked")
+    public AjaxResponse currentLoginUserInfo( String menuDataFormat ){
+		SSOLoginUser ssoLoginUser = WebSessionUtil.getCurrentLoginUser();
+		
+		AjaxLoginUserDTO ajaxLoginUserDTO = new AjaxLoginUserDTO();
+		//一、用户基本信息
+		ajaxLoginUserDTO.setId(ssoLoginUser.getId());
+		ajaxLoginUserDTO.setLoginName(ssoLoginUser.getLoginName());
+		ajaxLoginUserDTO.setMobile(ssoLoginUser.getMobile());
+		ajaxLoginUserDTO.setName(ssoLoginUser.getName());
+		ajaxLoginUserDTO.setEmail(ssoLoginUser.getEmail());
+		ajaxLoginUserDTO.setStatus(ssoLoginUser.getStatus());
+		//二、用户的菜单信息      (  具有Session缓存机制 ，以提升性能   )
+		if( !SaasConst.PermissionDataFormat.TREE.equalsIgnoreCase(menuDataFormat) && !SaasConst.PermissionDataFormat.LIST.equalsIgnoreCase(menuDataFormat) ) {
+			menuDataFormat = SaasConst.PermissionDataFormat.TREE;//默认为树形
+		}
+		List<SaasPermissionDTO>  menuPerms = (List<SaasPermissionDTO>)WebSessionUtil.getAttribute("xxx_menu_"+menuDataFormat);
+		if( menuPerms ==null ) {
+			List<Byte> permissionTypes =  Arrays.asList( new Byte[] { SaasConst.PermissionType.MENU });
+			menuPerms = this.getAllPermissions( ssoLoginUser.getId()  , permissionTypes, menuDataFormat);
+			if(menuPerms!=null && menuPerms.size()>0) {
+				WebSessionUtil.setAttribute("xxx_menu_"+menuDataFormat, menuPerms);
+			}
+		}
+		ajaxLoginUserDTO.setMenus( menuPerms );
+		
+		//三、用户的权限信息 ( 参照shiro原码中的逻辑 )
+		Subject subject = SecurityUtils.getSubject();
+		subject.isPermitted("XXXX-XXXXXXXXX-XXXXXXXX-123456");//这里随意调用一下，确保shiro授权缓存已经被加载！！！
+		PrincipalCollection principalCollection =subject.getPrincipals();
+		if(principalCollection!=null) {
+			Cache<Object, AuthorizationInfo> cache = usernamePasswordRealm.getAuthorizationCache();
+			if(cache!=null) {
+				AuthorizationInfo info = cache.get(principalCollection);
+				if(info!=null) {
+					Collection<String> pemissionStrings = info.getStringPermissions();
+					if(pemissionStrings!=null && pemissionStrings.size()>0 ) {
+						ajaxLoginUserDTO.setHoldPerms( new  HashSet<String>( pemissionStrings )  );
+					}
+				}
+			}
+		}
+		//四、用户的数据权限
+		ajaxLoginUserDTO.setCityIds( ssoLoginUser.getCityIds()  );
+		ajaxLoginUserDTO.setSupplierIds( ssoLoginUser.getSupplierIds() );
+		ajaxLoginUserDTO.setTeamIds( ssoLoginUser.getTeamIds() );
+		
+		//五、配置信息
+		Map<String, Object > configs = new HashMap<String,Object>();
+		configs.put("mobileRegex", SaasConst.MOBILE_REGEX);       //手机号码正则式
+		configs.put("accountRegex", SaasConst.ACCOUNT_REGEX);  //账号的正则表达式
+		ajaxLoginUserDTO.setConfigs(configs);
+		return AjaxResponse.success( ajaxLoginUserDTO );
+	}
+	
+	/**五、查询一个用户的菜单（返回的数据格式：列表、树形）**/
+	private List<SaasPermissionDTO> getAllPermissions( Integer userId,  List<Byte> permissionTypes,  String dataFormat ){
+		List<Integer> validPermissionIdsOfCurrentLoginUser =  saasPermissionExMapper.queryPermissionIdsOfUser( userId ); //查询用户所拥有的所有有效的权限ID
+		if(validPermissionIdsOfCurrentLoginUser==null || validPermissionIdsOfCurrentLoginUser.size()==0) {
+			return null;
+		}
+		if(  SaasConst.PermissionDataFormat.LIST.equalsIgnoreCase(dataFormat) ) {
+			return this.getAllPermissions_list( validPermissionIdsOfCurrentLoginUser, permissionTypes );
+		}else if( SaasConst.PermissionDataFormat.TREE.equalsIgnoreCase(dataFormat) ) {
+			return this.getAllPermissions_tree( validPermissionIdsOfCurrentLoginUser, permissionTypes );
+		}
+		return null;
+	}
+	/**返回的数据格式：列表**/
+	private List<SaasPermissionDTO> getAllPermissions_list( List<Integer> permissionIds,  List<Byte> permissionTypes ){
+		List<SaasPermission> allPos = saasPermissionExMapper.queryPermissions(permissionIds, null, null, permissionTypes, null, null);
+		List<SaasPermissionDTO> allDtos = BeanUtil.copyList(allPos, SaasPermissionDTO.class);
+		return allDtos;
+	}
+	/**返回的数据格式：树形**/
+	private List<SaasPermissionDTO> getAllPermissions_tree( List<Integer> permissionIds,  List<Byte> permissionTypes ){
+		return this.getChildren(permissionIds,  0 , permissionTypes);
+	}
+	private List<SaasPermissionDTO> getChildren( List<Integer> permissionIds,  Integer parentPermissionId,  List<Byte> permissionTypes ){
+		List<SaasPermission> childrenPos = saasPermissionExMapper.queryPermissions(permissionIds, parentPermissionId, null, permissionTypes, null, null);
+		if(childrenPos==null || childrenPos.size()==0) {
+			return null;
+		}
+		//递归
+		List<SaasPermissionDTO> childrenDtos = BeanUtil.copyList(childrenPos, SaasPermissionDTO.class);
+		for( SaasPermissionDTO childrenDto : childrenDtos ) {
+			List<SaasPermissionDTO> childs = this.getChildren( permissionIds, childrenDto.getPermissionId() ,  permissionTypes );
+ 			childrenDto.setChildPermissions(childs);
+		}
+		return childrenDtos;
+	}
+	//-------------------------------------------------------------------------------------------------------------------------------------当前登录用户信息END
+	
 }
