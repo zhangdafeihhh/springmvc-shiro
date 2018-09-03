@@ -1,18 +1,24 @@
 package com.zhuanche.serv.common;
 
+import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
+import com.zhuanche.entity.mdbcarmanage.CarRelateGroup;
+import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.request.DriverTeamRequest;
 import com.zhuanche.request.CommonRequest;
+import com.zhuanche.request.TeamGroupRequest;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
+import mapper.mdbcarmanage.ex.CarRelateTeamExMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -53,6 +59,83 @@ public class CitySupplierTeamCommonService {
 
     @Autowired
     private CarDriverTeamExMapper carDriverTeamExMapper;
+
+    /**
+     * @Desc: 处理车队关联司机中间表操作
+     * @param:
+     * @return:
+     * @Author: lunan
+     * @Date: 2018/8/31
+     */
+    public  <T> Set<String> dealDriverids(List srcList, Class<T> destClass){
+        if(srcList==null){
+            return null;
+        }
+        try{
+            Set<String> driverIds = new HashSet<>();
+            T param = destClass.newInstance();
+            if(param instanceof CarRelateGroup){
+                for(int i=0;i<srcList.size();i++ ){
+                    Object srcObj = srcList.get(i);
+                    CarRelateGroup data = new CarRelateGroup();
+                    BeanUtils.copyProperties(srcObj,data);
+                    driverIds.add(String.valueOf(data.getDriverId()));
+                }
+                return driverIds;
+            }else if(param instanceof CarRelateTeam){
+                for(int i=0;i<srcList.size();i++ ){
+                    Object srcObj = srcList.get(i);
+                    CarRelateTeam data = new CarRelateTeam();
+                    BeanUtils.copyProperties(srcObj,data);
+                    driverIds.add(String.valueOf(data.getDriverId()));
+                }
+                return driverIds;
+            }else if(param instanceof CarDriverTeam){
+                for(int i=0;i<srcList.size();i++ ){
+                    Object srcObj = srcList.get(i);
+                    CarDriverTeam data = new CarDriverTeam();
+                    BeanUtils.copyProperties(srcObj,data);
+                    driverIds.add(String.valueOf(data.getId()));
+                }
+                return driverIds;
+            }else if(param instanceof CarDriverInfoDTO){
+                for(int i=0;i<srcList.size();i++ ){
+                    Object srcObj = srcList.get(i);
+                    CarDriverInfoDTO data = new CarDriverInfoDTO();
+                    BeanUtils.copyProperties(srcObj,data);
+                    driverIds.add(String.valueOf(data.getDriverId()));
+                }
+                return driverIds;
+            }else{
+                return null;
+            }
+        }catch(Exception e){
+            logger.error("关联表分离driverid异常:{}",e);
+            return null;
+        }
+    }
+
+    /** 
+    * @Desc: pid查询车队下小组 
+    * @param:
+    * @return:  
+    * @Author: lunan
+    * @Date: 2018/9/3 
+    */ 
+    public List<CarDriverTeam> getTeamsByPid(Integer teamId){
+        if(Check.NuNObj(teamId)) {
+            return null;
+        }
+        try{
+            DriverTeamRequest driverTeamRequest = new DriverTeamRequest();
+            driverTeamRequest.setpId(teamId);
+            List<CarDriverTeam> carDriverTeams = carDriverTeamExMapper.queryForListByPid(driverTeamRequest);
+            return carDriverTeams;
+        }catch (Exception e){
+            logger.error("查询车队下小组异常:{}",e);
+            return null;
+        }
+    }
 
 
     /** 

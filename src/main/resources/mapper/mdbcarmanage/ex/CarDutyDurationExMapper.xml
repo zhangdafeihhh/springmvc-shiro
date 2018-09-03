@@ -19,6 +19,40 @@
     <result column="status" property="status" jdbcType="BIT" />
   </resultMap>
 
+  <select id="queryDutyDurationListByField" parameterType="com.zhuanche.request.DutyParamRequest" resultType="com.zhuanche.dto.driverDuty.CarDriverDurationDTO">
+    select
+    d.id,
+    d.city,
+    d.city_name cityName,
+    d.supplier,
+    d.supplier_name supplierName,
+    d.duty_name dutyName,
+    d.startDate,
+    d.endDate,
+    d.create_by createBy,
+    d.create_date createDate,
+    d.update_by updateBy,
+    d.update_date updateDate,
+    d.remark,
+    d.status,
+    CONCAT(startDate,'-',endDate) as times
+    from car_duty_duration d
+    where 1=1
+    <if test="cityId !=null ">
+      and d.city = #{cityId}
+    </if>
+    <if test="supplierId !=null">
+      and d.supplier = #{supplierId}
+    </if>
+    <if test="teamId != null">
+      and d.team_id = #{teamId}
+    </if>
+    <if test="status !=null and status !='' ">
+      and d.status = #{status}
+    </if>
+    order by d.update_date desc
+  </select>
+
   <select id="selectOne" resultType="com.zhuanche.dto.driverDuty.CarDriverDurationDTO" parameterType="java.lang.Integer" >
         select
     d.id,
@@ -71,6 +105,9 @@
     left join car_adm_user u2 on d.update_by=u2.user_id
     left JOIN car_driver_team t3 on d.team_id = t3.id
     where 1=1
+    <if test="dutyIds !=null and dutyIds !='' ">
+      and d.id in (${dutyIds})
+    </if>
     <if test="cityIds!=null and cityIds.size()>0">
       and d.city_id IN
       <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >

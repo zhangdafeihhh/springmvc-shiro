@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @description: 车队设置
+ * @description: 排班时长
  *
  * <PRE>
  * <BR>	修改记录

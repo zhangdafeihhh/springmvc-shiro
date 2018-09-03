@@ -11,6 +11,15 @@ public class CarDriverMustDutyDTO extends CarDriverMustDuty {
     private String  createName;
     private String  updateName;
     private String  teamName;
+    private String times;
+
+    public String getTimes() {
+        return times;
+    }
+
+    public void setTimes(String times) {
+        this.times = times;
+    }
 
     public String getCreateName() {
         return createName;

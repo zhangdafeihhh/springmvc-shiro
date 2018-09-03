@@ -3,7 +3,7 @@
 <mapper namespace="mapper.mdbcarmanage.DriverDutyTimeInfoMapper" >
   <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.DriverDutyTimeInfo" >
     <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="time" property="time" jdbcType="DATE" />
+    <result column="time" property="time" jdbcType="VARCHAR" />
     <result column="driver_id" property="driverId" jdbcType="INTEGER" />
     <result column="must_duty_time" property="mustDutyTime" jdbcType="VARCHAR" />
     <result column="duty_time" property="dutyTime" jdbcType="VARCHAR" />
@@ -24,7 +24,7 @@
   <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDutyTimeInfo" >
     insert into driver_duty_time_info (id, time, driver_id, 
       must_duty_time, duty_time)
-    values (#{id,jdbcType=INTEGER}, #{time,jdbcType=DATE}, #{driverId,jdbcType=INTEGER}, 
+    values (#{id,jdbcType=INTEGER}, #{time}, #{driverId,jdbcType=INTEGER},
       #{mustDutyTime,jdbcType=VARCHAR}, #{dutyTime,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDutyTimeInfo" >
@@ -51,7 +51,7 @@
         #{id,jdbcType=INTEGER},
       </if>
       <if test="time != null" >
-        #{time,jdbcType=DATE},
+        #{time},
       </if>
       <if test="driverId != null" >
         #{driverId,jdbcType=INTEGER},
@@ -68,7 +68,7 @@
     update driver_duty_time_info
     <set >
       <if test="time != null" >
-        time = #{time,jdbcType=DATE},
+        time = #{time},
       </if>
       <if test="driverId != null" >
         driver_id = #{driverId,jdbcType=INTEGER},
@@ -84,7 +84,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDutyTimeInfo" >
     update driver_duty_time_info
-    set time = #{time,jdbcType=DATE},
+    set time = #{time},
       driver_id = #{driverId,jdbcType=INTEGER},
       must_duty_time = #{mustDutyTime,jdbcType=VARCHAR},
       duty_time = #{dutyTime,jdbcType=VARCHAR}

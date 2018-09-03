@@ -29,7 +29,13 @@
         select
         <include refid="Base_Column_List" />
         from car_driver_team
-        where team_name like CONCAT('%',#{teamName,jdbcType=VARCHAR},'%')
+        where
+        <if test="teamId!=null">
+            id = #{teamId} AND
+        </if>
+        <if test="teamName!=null">
+            team_name like CONCAT('%',#{teamName,jdbcType=VARCHAR},'%')
+        </if>
         limit 1
     </select>
 

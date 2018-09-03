@@ -42,6 +42,11 @@ public class DutyParamRequest extends PageRequest{
     private String supplierName;
     private String teamName;
 
+    /** 保存排班信息参数*/
+    // 批量处理字段
+    private String times; // 要设置的日期集， 用 ,分隔
+    private String driverIds; // 要设置的司机id集， 用 ,分隔
+
     /** 高峰时间*/
     private String peakTimes;
 
@@ -58,6 +63,22 @@ public class DutyParamRequest extends PageRequest{
     // 查询
     private String startTime;
     private String endTime;
+
+    public String getTimes() {
+        return times;
+    }
+
+    public void setTimes(String times) {
+        this.times = times;
+    }
+
+    public String getDriverIds() {
+        return driverIds;
+    }
+
+    public void setDriverIds(String driverIds) {
+        this.driverIds = driverIds;
+    }
 
     public String getPeakTimes() {
         return peakTimes;

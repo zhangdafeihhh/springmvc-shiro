@@ -18,6 +18,28 @@
     <result column="status" property="status" jdbcType="BIT" />
     <result column="team_id" property="teamId" jdbcType="INTEGER" />
   </resultMap>
+
+  <!-- 查询供应商下强制上班时间信息 -->
+  <select id="selectDriverMustDutyListByField" parameterType="com.zhuanche.web.entity.driverDuty.DriverMustDutyEntity" resultType="com.zhuanche.dto.driverDuty.CarDriverMustDutyDTO" >
+    select
+    id,
+    startDate,
+    endDate,
+    peak_times peakTimes,
+    CONCAT( startDate, '-', endDate, CASE WHEN peak_times = 1 THEN '(早高峰)' WHEN peak_times = 2 THEN '(晚高峰)' WHEN peak_times = 3 THEN '(其他时段1)' WHEN peak_times = 4 THEN '(其他时段2)' END ) AS times
+    from car_driver_must_duty where 1=1
+    <if test="cityId!=null">
+      and city = #{cityId}
+    </if>
+    <if test="teamId!=null">
+      and team_id = #{teamId}
+    </if>
+    <if test="supplierId!=null">
+      and supplier = #{supplierId}
+    </if>
+    and status = 1
+  </select>
+
   <select id="selectDriverMustDutyList" parameterType="com.zhuanche.request.DutyParamRequest" resultType="com.zhuanche.dto.driverDuty.CarDriverMustDutyDTO">
     select
     d.id driverMustDutyId,
@@ -43,6 +65,9 @@
     left join car_adm_user u2 on d.update_by=u2.user_id
     left JOIN car_driver_team t3 on d.team_id = t3.id
     where 1=1
+    <if test="forcedIds !=null and forcedIds !='' ">
+      and d.id in (#{forcedIds})
+    </if>
     <if test="cityIds!=null and cityIds.size()>0">
       and d.city_id IN
       <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >

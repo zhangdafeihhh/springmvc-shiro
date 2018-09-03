@@ -172,14 +172,14 @@ public class CarDriverTeamService{
 					logger.info("该车队/小组"+ driverTeamRequest.getTeamId()+"下没有司机");
 					return null;
 				}
-				Set<String> driverIdsAll = dealDriverids(carRelateTeams, CarRelateTeam.class);
+				Set<String> driverIdsAll = citySupplierTeamCommonService.dealDriverids(carRelateTeams, CarRelateTeam.class);
 				//2.查询小组所属车队下其他小组以及绑定的司机关联
 				List<CarDriverTeam> carDriverTeams = carDriverTeamExMapper.queryForListByPid(driverTeamRequest);
 				//2.1 车队有几个小组，查询小组下绑定的司机
-				Set<String> teamIds = dealDriverids(carDriverTeams,CarDriverTeam.class);
+				Set<String> teamIds = citySupplierTeamCommonService.dealDriverids(carDriverTeams,CarDriverTeam.class);
 				teamGroupRequest.setGroupIds(teamIds);
 				List<CarRelateGroup> carRelateGroups = carRelateGroupExMapper.queryDriverGroupRelationList(teamGroupRequest);
-				Set<String> existsGroups = dealDriverids(carRelateGroups, CarRelateGroup.class);
+				Set<String> existsGroups = citySupplierTeamCommonService.dealDriverids(carRelateGroups, CarRelateGroup.class);
 				//去掉其他小组绑定的司机
 				driverIdsAll.removeAll(existsGroups);
 				if(Check.NuNCollection(driverIdsAll)){
@@ -205,13 +205,13 @@ public class CarDriverTeamService{
 					logger.info("该车队/小组"+ driverTeamRequest.getTeamId()+"下没有司机");
 					return null;
 				}
-				Set<String> driverIdsAll = dealDriverids(limitsDrivers, CarDriverInfoDTO.class);
+				Set<String> driverIdsAll = citySupplierTeamCommonService.dealDriverids(limitsDrivers, CarDriverInfoDTO.class);
 				//查询同级车队绑定了多少司机
 				List<CarDriverTeam> carDriverTeams = carDriverTeamExMapper.queryDriverTeam(null, null, null);
-				Set<String> teamIds = dealDriverids(carDriverTeams,CarDriverTeam.class);
+				Set<String> teamIds = citySupplierTeamCommonService.dealDriverids(carDriverTeams,CarDriverTeam.class);
 				teamGroupRequest.setTeamIds(teamIds);
 				List<CarRelateTeam> carRelateTeams = carRelateTeamExMapper.queryDriverTeamRelationList(teamGroupRequest);
-				Set<String> teamDrivers = dealDriverids(carRelateTeams, CarRelateTeam.class);
+				Set<String> teamDrivers = citySupplierTeamCommonService.dealDriverids(carRelateTeams, CarRelateTeam.class);
 				//去掉其他车队绑定的司机
 				driverIdsAll.removeAll(teamDrivers);
 				driverTeamRequest.setDriverIds(driverIdsAll);
@@ -265,9 +265,9 @@ public class CarDriverTeamService{
 				logger.info("该车队/小组"+ driverTeamRequest.getTeamId()+"下没有司机");
 				return null;
 			}else if(Check.NuNCollection(groups)){
-				driverIds = dealDriverids(teams,CarRelateTeam.class);
+				driverIds = citySupplierTeamCommonService.dealDriverids(teams,CarRelateTeam.class);
 			}else if(Check.NuNCollection(teams)){
-				driverIds = dealDriverids(groups,CarRelateGroup.class);
+				driverIds = citySupplierTeamCommonService.dealDriverids(groups,CarRelateGroup.class);
 			}else{
 				logger.info("该车队/小组"+ driverTeamRequest.getTeamId()+"司机信息异常");
 				return null;
@@ -300,60 +300,7 @@ public class CarDriverTeamService{
 		}
 	}
 	
-	/** 
-	* @Desc: 处理车队关联司机中间表操作 
-	* @param:
-	* @return:  
-	* @Author: lunan
-	* @Date: 2018/8/31 
-	*/ 
-	public  <T> Set<String> dealDriverids(List srcList, Class<T> destClass){
-		if(srcList==null){
-			return null;
-		}
-		try{
-			Set<String> driverIds = new HashSet<>();
-			T param = destClass.newInstance();
-			if(param instanceof CarRelateGroup){
-				for(int i=0;i<srcList.size();i++ ){
-					Object srcObj = srcList.get(i);
-					CarRelateGroup data = new CarRelateGroup();
-					BeanUtils.copyProperties(srcObj,data);
-					driverIds.add(String.valueOf(data.getDriverId()));
-				}
-				return driverIds;
-			}else if(param instanceof CarRelateTeam){
-				for(int i=0;i<srcList.size();i++ ){
-					Object srcObj = srcList.get(i);
-					CarRelateTeam data = new CarRelateTeam();
-					BeanUtils.copyProperties(srcObj,data);
-					driverIds.add(String.valueOf(data.getDriverId()));
-				}
-				return driverIds;
-			}else if(param instanceof CarDriverTeam){
-				for(int i=0;i<srcList.size();i++ ){
-					Object srcObj = srcList.get(i);
-					CarDriverTeam data = new CarDriverTeam();
-					BeanUtils.copyProperties(srcObj,data);
-					driverIds.add(String.valueOf(data.getId()));
-				}
-				return driverIds;
-			}else if(param instanceof CarDriverInfoDTO){
-				for(int i=0;i<srcList.size();i++ ){
-					Object srcObj = srcList.get(i);
-					CarDriverInfoDTO data = new CarDriverInfoDTO();
-					BeanUtils.copyProperties(srcObj,data);
-					driverIds.add(String.valueOf(data.getDriverId()));
-				}
-				return driverIds;
-			}else{
-				return null;
-			}
-		}catch(Exception e){
-			logger.error("关联表分离driverid异常:{}",e);
-			return null;
-		}
-	}
+
 
 	/**
 	* @Desc: 查询车队详情

@@ -14,6 +14,8 @@ public class CarDriverInfoDTO implements Serializable{
 
     private String carGroupName;
 
+    private Integer groupId;
+
     private String name;
 
     private String serviceCity;
@@ -59,6 +61,14 @@ public class CarDriverInfoDTO implements Serializable{
     private String pid;
 
     private String teamId;
+
+    public Integer getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(Integer groupId) {
+        this.groupId = groupId;
+    }
 
     public String getTeamName() {
         return teamName;
