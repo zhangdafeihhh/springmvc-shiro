@@ -113,9 +113,6 @@
     <result column="is_two_shifts" property="isTwoShifts" jdbcType="INTEGER" />
     <result column="is_image" property="isImage" jdbcType="INTEGER" />
   </resultMap>
-  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.dto.rentcar.CarBizDriverInfoDTO" extends="BaseResultMap" >
-    <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
-  </resultMap>
   <sql id="Base_Column_List" >
     driver_id, password, phone, gender, name, supplier_id, age, current_address, emergency_contact_person, 
     emergency_contact_number, id_card_no, superintend_no, superintend_url, driving_license_type, 

@@ -19,10 +19,6 @@
     <result column="type" property="type" jdbcType="INTEGER" />
     <result column="status" property="status" jdbcType="INTEGER" />
   </resultMap>
-  <sql id="Base_Column_List" >
-    id, driver_id, driver_name, city_id, city_name, supplier_id, supplier_name, team_id, 
-    team_name, time, forced_ids, duty_ids, forced_times, duty_times, type, status
-  </sql>
 
   <select id="getUnIssueCount" resultType="java.lang.Integer"
           parameterType="com.zhuanche.request.DutyParamRequest">
@@ -166,7 +162,7 @@
     d.team_name, d.time, d.forced_ids, d.duty_ids, d.forced_times, d.duty_times, d.type, d.status
   </sql>
   <!-- 查询司机排班列表-->
-  <select id="selectForList" resultMap="BaseResultMap" parameterType="TODO" >
+  <select id="selectForList" resultMap="BaseResultMap" parameterType="com.zhuanche.request.DutyParamRequest" >
     select
     <include refid="Base_Column_List" />
     from car_driver_day_duty d

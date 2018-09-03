@@ -6,6 +6,8 @@ import java.util.Date;
 
 public class CarBizCustomerAppraisalDTO extends Base {
 
+    private static final long serialVersionUID = 1296427662939958799L;
+
     private Integer appraisalId;
 
     private Integer orderId;

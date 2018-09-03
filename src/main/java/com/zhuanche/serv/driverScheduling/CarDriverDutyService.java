@@ -96,7 +96,7 @@ public class CarDriverDutyService {
 			}
 
 			PageInfo<CarDriverDayDutyDTO> pageInfo = PageHelper.startPage(dutyParamRequest.getPageNo(), dutyParamRequest.getPageSize(), true).doSelectPageInfo(()
-					-> carDriverDayDutyExMapper.queryForList(dutyParamRequest));
+					-> carDriverDayDutyExMapper.selectForList(dutyParamRequest));
 			List<CarDriverDayDutyDTO> list = pageInfo.getList();
 
 			for (CarDriverDayDutyDTO carDriverDayDuty : list) {
@@ -169,7 +169,7 @@ public class CarDriverDutyService {
 	public void affirmDriverDayDuty(DutyParamRequest dutyParamRequest) {
 		logger.info("开始执行排班入参:{}"+JSON.toJSONString(dutyParamRequest));
 		try{
-			List<CarDriverDayDutyDTO> list = carDriverDayDutyExMapper.queryForList(dutyParamRequest);
+			List<CarDriverDayDutyDTO> list = carDriverDayDutyExMapper.selectForList(dutyParamRequest);
 			if(Check.NuNCollection(list)){
 				logger.info("没有发现需要发布的数据，入参:{}"+ JSON.toJSONString(dutyParamRequest));
 				return;

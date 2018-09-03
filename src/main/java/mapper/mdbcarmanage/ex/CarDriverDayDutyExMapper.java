@@ -9,7 +9,7 @@ import java.util.Map;
 
 public interface CarDriverDayDutyExMapper {
 
-    List<CarDriverDayDutyDTO> queryForList(DutyParamRequest dutyParamRequest);
+    List<CarDriverDayDutyDTO> selectForList(DutyParamRequest dutyParamRequest);
 
     Integer getUnIssueCount(DutyParamRequest dutyParamRequest);
 
