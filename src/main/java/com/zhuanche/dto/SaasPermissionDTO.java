@@ -1,9 +1,12 @@
 package com.zhuanche.dto;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class SaasPermissionDTO {
-    private Integer permissionId;
+public class SaasPermissionDTO implements Serializable{
+	private static final long serialVersionUID = 1000000000000000110L;
+
+	private Integer permissionId;
 
     private Integer parentPermissionId;
 

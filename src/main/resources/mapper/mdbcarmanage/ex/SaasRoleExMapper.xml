@@ -35,4 +35,19 @@
     order by role_id
   </select>
  
+   <!-- 根据用户ID，查询其拥有的所有有效的角色ID -->
+  <select id="queryRoleIdsOfUser" resultType="java.lang.Integer">
+		select DISTINCT r.role_id 
+		from saas_role r, saas_user_role_ralation ur 
+		where r.role_id=ur.role_id
+		and r.valid=1 and ur.user_id=#{userId}
+  </select>
+  <!-- 根据用户ID，查询其拥有的所有有效的角色代码 -->
+  <select id="queryRoleCodesOfUser" resultType="java.lang.String">
+		select DISTINCT r.role_code 
+		from saas_role r, saas_user_role_ralation ur 
+		where r.role_id=ur.role_id
+		and r.valid=1 and ur.user_id=#{userId}
+  </select>
+ 
 </mapper>

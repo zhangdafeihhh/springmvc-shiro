@@ -1,6 +1,5 @@
 package com.zhuanche.serv.authc;
 
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,7 +19,6 @@ import mapper.mdbcarmanage.ex.SaasPermissionExMapper;
 /**权限管理功能**/
 @Service
 public class PermissionManagementService{
-	private static final SimpleDateFormat yyyyMMddHHmmss_sdf  =  new SimpleDateFormat("yyyyMMddHHmmss");
 	@Autowired
 	private SaasPermissionMapper     saasPermissionMapper;
 	@Autowired

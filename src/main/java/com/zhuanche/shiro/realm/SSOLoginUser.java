@@ -5,7 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**当前的登录用户信息**/
-public final class SSOLoginUser {
+public final class SSOLoginUser implements Serializable{
+	private static final long serialVersionUID = 1198761461846111111L;
 	//eg:   {"loginName":"wangjiaqi","mobile":"17600606250","name":"王佳琪","id":287,"type":2,"email":"wangjiaqi@01zhuanche.com","status":1}
 	/**用户ID**/
 	private Integer id;

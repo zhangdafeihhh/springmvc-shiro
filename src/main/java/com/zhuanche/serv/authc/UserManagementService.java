@@ -13,6 +13,7 @@ import com.github.pagehelper.PageHelper;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.constants.SaasConst;
 import com.zhuanche.dto.CarAdmUserDTO;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 import com.zhuanche.entity.mdbcarmanage.SaasUserRoleRalation;
@@ -50,7 +51,7 @@ public class UserManagementService{
 		if( StringUtils.isEmpty(user.getUserName()) ) {
 			user.setUserName(null);
 		}
-		user.setPassword( PasswordUtil.md5("12345678", user.getAccount())  );
+		user.setPassword( PasswordUtil.md5(SaasConst.INITIAL_PASSWORD, user.getAccount())  );
 		user.setAccountType(100);
 		user.setStatus(200);
 		SSOLoginUser ssoLoginUser = WebSessionUtil.getCurrentLoginUser();
@@ -197,22 +198,17 @@ public class UserManagementService{
 	}
 
 	/**九、重置密码**/
-//	public AjaxResponse saveRoleIds( Integer userId, List<Integer> roleIds) {
-//		if( roleIds==null || roleIds.size()==0 ) {
-//			return AjaxResponse.success( null );
-//		}
-//		//先删除
-//		saasUserRoleRalationExMapper.deleteRoleIdsOfUser(userId);
-//		//再插入
-//		List<SaasUserRoleRalation> records = new ArrayList<SaasUserRoleRalation>(  roleIds.size() );
-//		for(Integer roleId : roleIds ) {
-//			SaasUserRoleRalation ralation = new SaasUserRoleRalation();
-//			ralation.setUserId(userId);	
-//			ralation.setRoleId(roleId);
-//			records.add(ralation);
-//		}
-//		saasUserRoleRalationExMapper.insertBatch(records);
-//		return AjaxResponse.success( null );
-//	}
+	public AjaxResponse resetPassword( Integer userId ) {
+		//用户不存在
+		CarAdmUser rawuser = carAdmUserMapper.selectByPrimaryKey( userId );
+		if( rawuser==null ) {
+			return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST );
+		}
+		//执行
+		CarAdmUser userForupdate = new CarAdmUser();
+		userForupdate.setUserId(userId);
+		userForupdate.setPassword(  PasswordUtil.md5(SaasConst.INITIAL_PASSWORD, rawuser.getAccount()) );
+		return AjaxResponse.success( null );
+	}
 	
 }

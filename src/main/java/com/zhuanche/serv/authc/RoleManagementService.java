@@ -45,6 +45,7 @@ public class RoleManagementService{
 			return AjaxResponse.fail(RestErrorCode.ROLE_CODE_EXIST );
 		}
 		//保存
+		role.setValid(true);
 		saasRoleMapper.insertSelective(role);
 		return AjaxResponse.success( null );
 	}
