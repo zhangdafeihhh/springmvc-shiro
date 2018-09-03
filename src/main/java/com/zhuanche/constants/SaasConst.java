@@ -1,5 +1,8 @@
 package com.zhuanche.constants;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**常量定义**/
 public final class SaasConst {
 	/**默认的初始密码**/
@@ -33,6 +36,24 @@ public final class SaasConst {
 		/**返回的权限数据格式：树形**/
 		public static final String TREE  = "tree";
 	}
+
+	/**系统预置角色**/
+	public static String           SYSTEM_ROLE             = "mp_manage_super_admin";
+	/**系统预置权限**/
+	public static Set<String> SYSTEM_PERMISSIONS  = new HashSet<String>( 128 );
+	static{
+		//----------------------------------------------------用户管理
+		SYSTEM_PERMISSIONS.add("XXX");//
+		//----------------------------------------------------角色管理
+		SYSTEM_PERMISSIONS.add("XXX");//
+		//----------------------------------------------------权限管理
+		SYSTEM_PERMISSIONS.add("XXX");//
+	}
+	
+	
+
+	
+	
 	
 	public static void main( String[] args ) {
 		boolean res = "5,66,465,0,46".matches("^([0-9]+,)*[0-9]+$");

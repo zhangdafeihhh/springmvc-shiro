@@ -37,6 +37,15 @@ public class InitRequestCommonDataFilter extends OncePerRequestFilter {
 	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)throws ServletException, IOException {
+		/***************支持跨域请求BEGIN***********************/
+		response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+        response.setHeader("Access-Control-Max-Age", "3600");
+        response.setHeader("Access-Control-Allow-Headers", "content-type, x-requested-with");
+        response.setHeader("Access-Control-Allow-Credentials", "true");		
+		/***************支持跨域请求END***********************/
+		
+		
 		//一、请求流水号(用于日志,实现对请求进行统一编号，方便于进行排查业务日志)
 		String reqId = request.getParameter("x_requestId");
 		if(reqId==null || "".equals(reqId.trim())  ) {
