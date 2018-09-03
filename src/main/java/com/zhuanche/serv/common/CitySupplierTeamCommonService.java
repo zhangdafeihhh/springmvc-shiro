@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -121,11 +122,12 @@ public class CitySupplierTeamCommonService {
         if(WebSessionUtil.isSupperAdmin()) {
             return carBizCityExMapper.queryByIds(null);
         }else {
-            Set<Integer> permOfcityids = dataPermissionHelper.havePermOfCityIds("");
-            if(permOfcityids.size()==0) {
+//            Set<Integer> permOfcityids = dataPermissionHelper.havePermOfCityIds("");
+            Set<Integer> cityIds = WebSessionUtil.getCurrentLoginUser().getCityIds();
+            if(cityIds.size()==0) {
                 return new ArrayList<CarBizCity>();
             }
-            return carBizCityExMapper.queryByIds(permOfcityids);
+            return carBizCityExMapper.queryByIds(cityIds);
         }
     }
 
@@ -142,8 +144,9 @@ public class CitySupplierTeamCommonService {
         }
         //对城市ID进行校验数据权限
         if(WebSessionUtil.isSupperAdmin()==false ) {
-            Set<Integer> permOfcityids = dataPermissionHelper.havePermOfCityIds("");
-            if( permOfcityids.size()==0 || permOfcityids.contains(cityId)==false  ) {
+//            Set<Integer> permOfcityids = dataPermissionHelper.havePermOfCityIds("");
+            Set<Integer> cityIds = WebSessionUtil.getCurrentLoginUser().getCityIds();
+            if( cityIds.size()==0 || cityIds.contains(cityId)==false  ) {
                 return new ArrayList<CarBizSupplier>();
             }
         }
@@ -151,11 +154,12 @@ public class CitySupplierTeamCommonService {
         if( WebSessionUtil.isSupperAdmin() ) {
             return carBizSupplierExMapper.querySuppliers(cityId, null);
         }else {
-            Set<Integer> permOfsupplierIds = dataPermissionHelper.havePermOfSupplierIds("");
-            if(permOfsupplierIds.size()==0 ) {
+//            Set<Integer> permOfsupplierIds = dataPermissionHelper.havePermOfSupplierIds("");
+            Set<Integer> supplierIds = WebSessionUtil.getCurrentLoginUser().getSupplierIds();
+            if(supplierIds.size()==0 ) {
                 return new ArrayList<CarBizSupplier>();
             }
-            return carBizSupplierExMapper.querySuppliers(cityId, permOfsupplierIds);
+            return carBizSupplierExMapper.querySuppliers(cityId, supplierIds);
         }
     }
 
@@ -172,12 +176,13 @@ public class CitySupplierTeamCommonService {
         }
         //对城市ID、供应商ID 进行校验数据权限
         if(WebSessionUtil.isSupperAdmin()==false ) {
-            Set<Integer> permOfcityids = dataPermissionHelper.havePermOfCityIds("");
-            if( permOfcityids.size()==0 || permOfcityids.contains(cityId)==false  ) {
+            Set<Integer> cityIds = WebSessionUtil.getCurrentLoginUser().getCityIds();
+            if( cityIds.size()==0 || cityIds.contains(cityId)==false  ) {
                 return new ArrayList<CarDriverTeam>();
             }
-            Set<Integer> permOfsupplierIds = dataPermissionHelper.havePermOfSupplierIds("");
-            if( permOfsupplierIds.size()==0 || permOfsupplierIds.contains(supplierId)==false  ) {
+//            Set<Integer> permOfsupplierIds = dataPermissionHelper.havePermOfSupplierIds("");
+            Set<Integer> supplierIds = WebSessionUtil.getCurrentLoginUser().getSupplierIds();
+            if( supplierIds.size()==0 || supplierIds.contains(supplierId)==false  ) {
                 return new ArrayList<CarDriverTeam>();
             }
         }
@@ -189,11 +194,12 @@ public class CitySupplierTeamCommonService {
         if( WebSessionUtil.isSupperAdmin() ) {
             return carDriverTeamExMapper.queryDriverTeam(cityIds, supplierIds, null);
         }else {
-            Set<Integer> permOfteamIds = dataPermissionHelper.havePermOfDriverTeamIds("");
-            if(permOfteamIds.size()==0 ) {
+//            Set<Integer> permOfteamIds = dataPermissionHelper.havePermOfDriverTeamIds("");
+            Set<Integer> teamIds = WebSessionUtil.getCurrentLoginUser().getTeamIds();
+            if(teamIds.size()==0 ) {
                 return new ArrayList<CarDriverTeam>();
             }
-            return carDriverTeamExMapper.queryDriverTeam(cityIds, supplierIds, permOfteamIds);
+            return carDriverTeamExMapper.queryDriverTeam(cityIds, supplierIds, teamIds);
         }
     }
 

@@ -19,6 +19,8 @@ public final class RestErrorCode{
 	public static final int SUCCESS                                   = 0;
 	@ResultMessage("获得互斥锁超时")
 	public static final int GET_LOCK_TIMEOUT                = 1;
+	@ResultMessage("参数错误")
+	public static final int PARAMS_ERROR                 =400;
 	@ResultMessage("缺少授权")
 	public static final int HTTP_UNAUTHORIZED             = 401;
 	@ResultMessage("禁止访问")
