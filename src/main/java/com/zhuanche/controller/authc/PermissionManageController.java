@@ -52,7 +52,8 @@ public class PermissionManageController {
 	}
 
 	/**五、查询所有的权限信息（返回的数据格式：列表、树形）**/
-	public AjaxResponse getAllPermissions( String dataFormat ){
+	@RequestMapping("getAllSaasPermissionsInfo")
+	public AjaxResponse getAllSaasPermissionsInfo( String dataFormat ){
 		List<SaasPermissionDTO> allDtos = permissionManagementService.getAllPermissions(dataFormat);
 		return AjaxResponse.success(allDtos);
 	}

@@ -41,7 +41,16 @@ public class CarDriverTeamDTO {
     //---------------------------------扩充字段
     private String cityName;
     private String supplierName;
-    
+    /** 0没有操作 1打开 2关闭*/
+    private Integer openCloseFlag;
+
+    public Integer getOpenCloseFlag() {
+        return openCloseFlag;
+    }
+
+    public void setOpenCloseFlag(Integer openCloseFlag) {
+        this.openCloseFlag = openCloseFlag;
+    }
 
     public String getCityName() {
 		return cityName;

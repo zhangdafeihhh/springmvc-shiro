@@ -5,6 +5,8 @@ import java.util.Set;
 
 public class Base implements Serializable {
 
+    private static final long serialVersionUID = 4959453183678167556L;
+
     //数据权限控制字段
     private Set<Integer> cityIds;//可以管理的所有城市ID
     private Set<Integer> supplierIds;//可以管理的所有供应商ID
