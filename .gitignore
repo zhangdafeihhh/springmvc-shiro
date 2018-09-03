@@ -7,8 +7,17 @@ src/main/resources/application.properties
 src/main/resources/db.properties
 src/main/resources/dubbo.properties
 src/main/resources/redis.properties
+src/main/resources/logback.xml
+src/main/resources/rocketmq.properties
+src/main/resources/sms.properties
 .idea
 *.iml
 logs
 mp-manage.properties
 mp-manage.properties.lock
+src/main/resources/application-allenv.properties
+src/test/java/GeneratorMySql.java
+src/test/java/generatorConfig-rentcar.xml
+src/test/java/generatorConfig-mdbcarmanage.xml
+src/test/java/generatorConfig-driver.xml
+src/test/java/com/zhuanche/dao/BaseFunctionalTestCase.java

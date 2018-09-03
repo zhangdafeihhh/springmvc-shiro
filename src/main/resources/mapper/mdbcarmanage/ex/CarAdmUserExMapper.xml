@@ -51,5 +51,5 @@
     </if>
     order by user_id
   </select>
-  
+
 </mapper>

@@ -17,11 +17,12 @@ public final class IdNumberUtil {
 	      return random[total % 11] == no.charAt(17);
 	}
 	
-//	public static void main( String[] a ) {
-//		 // 正确
-//	      System.out.println(IdNumberUtil.check("432831196411150810"));
-//	      System.out.println(IdNumberUtil.check("130229198408081414"));
-//	      // 错误
-//	      System.out.println(IdNumberUtil.check("432831196411150813"));
-//	}
+	public static void main( String[] a ) {
+		 // 正确
+	      System.out.println(IdNumberUtil.check("432831196411150810"));
+	      System.out.println(IdNumberUtil.check("130229198408081414"));
+		System.out.println(IdNumberUtil.check("32020219810706451x"));
+	      // 错误
+	      System.out.println(IdNumberUtil.check("432831196411150813"));
+	}
 }

@@ -66,15 +66,15 @@ public final class RestErrorCode{
 	
 	//----------------------------------------------角色管理
 	@ResultMessage("角色不存在")
-	public static final int ROLE_NOT_EXIST                          = 10100;
+	public static final int ROLE_NOT_EXIST                                      = 10100;
 	@ResultMessage("角色代码已经存在")
-	public static final int ROLE_CODE_EXIST                        = 10101;
-
-	
-	
-	
-	
+	public static final int ROLE_CODE_EXIST                                    = 10101;
+	   
 	//-----------------------------------------------业务参数：司机
+	@ResultMessage("司机不存在，请仔细核对！")
+	public static final int DRIVER_NOT_EXIST = 2000;
+	@ResultMessage("该司机已存在启用的永久停运！")
+	public static final int DRIVER_OUTAGEALL_EXIST = 2001;
 //	@ResultMessage("司机状态不是正常启用状态")
 //	public static final int DRIVER_STATUS_NOT_ENABLED                     = 1001;
 //	@ResultMessage("司机手机号码与身份证号码不符合")
@@ -89,29 +89,30 @@ public final class RestErrorCode{
 //	public static final int DRIVER_CAN_NOT_UNBIND_BUS                    = 1006;
 //	@ResultMessage("无法选取车辆（您目前有服务中的任务）")
 //	public static final int DRIVER_CAN_NOT_BIND_BUS                         = 1007;
-	
-	
+
+	@ResultMessage("司机手机号已存在")
+	public static final int DRIVER_PHONE_EXIST                     = 3001;
+	@ResultMessage("司机身份证已存在")
+	public static final int DRIVER_IDCARNO_EXIST                     = 3002;
+	@ResultMessage("司机手机号不合法")
+	public static final int DRIVER_PHONE_NOT_LEGAL                     = 3003;
+	@ResultMessage("司机身份证不合法")
+	public static final int DRIVER_IDCARNO_NOT_LEGAL                     = 3004;
+	@ResultMessage("银行卡号不合法")
+	public static final int DRIVER_BANK_CARD_NUMBER_NOT_LEGAL                     = 3005;
+	@ResultMessage("银行卡号和银行开户行不能只填写一个")
+	public static final int DRIVER_BANK_CARD_NUMBER_NOT_COMPLETE                     = 3006;
+	@ResultMessage("银行卡号和银行开户行不能只填写一个")
+	public static final int DRIVER_BANK_CARD_NUMBER_EXIST                    = 3007;
+
+	//-----------------------------------------------业务参数：导入文件
+	@ResultMessage("文件异常")
+	public static final int FILE_ERROR                    = 4001;
+	@ResultMessage("导入模板格式错误")
+	public static final int FILE_TRMPLATE_ERROR                    = 4002;
 	//-----------------------------------------------业务参数：车辆
-//	@ResultMessage("车辆信息不存在")
-//	public static final int BUS_NOT_EXIST                                               = 1100;
-//	@ResultMessage("车辆状态不是正常启用状态，被停止运营")
-//	public static final int BUS_STATUS_NOT_ENABLED                           = 1101;
-//	@ResultMessage("此车辆已被其他司机选取，请选择其它车辆")
-//	public static final int BUS_HAVE_BINDED_DRIVER                             = 1102;
-	
-	
-	//-----------------------------------------------业务参数：公共基础服务
-//	@ResultMessage("城市不存在")
-//	public static final int CITY_INFO_NOT_EXIST                                      = 1400;
-	
-	//-----------------------------------------------业务参数：订单
-//	@ResultMessage("订单不存在")
-//	public static final int ORDER_INFO_NOT_EXIST                                      = 2000;
-//	@ResultMessage("预定人手机号或乘客手机号与此订单不相符合")
-//	public static final int CUSTOMER_PHONE_NOT_MATCH_ORDER           = 2001;
-//	@ResultMessage("订单已经评价")
-//	public static final int ORDER_HAD_APPRAISAL                                        = 2002;
-	
+	@ResultMessage("车辆信息不存在")
+	public static final int BUS_NOT_EXIST                                               = 1100;
 
 	
 	//---------------------------------------------------------------------------------------------------------------------------------------------
