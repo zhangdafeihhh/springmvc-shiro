@@ -196,7 +196,9 @@ public class CarDriverTeamService{
 			}else{
 				//当前车队信息
 				CarDriverTeam carDriverTeam = carDriverTeamMapper.selectByPrimaryKey(driverTeamRequest.getTeamId());
-				//TODO 数据权限
+				//设置登录用户城市和供应商数据权限
+				driverTeamRequest.setCityIds(BeanUtil.copySet(WebSessionUtil.getCurrentLoginUser().getCityIds(),String.class));
+				driverTeamRequest.setSupplierIds(BeanUtil.copySet(WebSessionUtil.getCurrentLoginUser().getSupplierIds(),String.class));
 				//查询车队上级供应商级别下司机列表
 				List<CarDriverInfoDTO> limitsDrivers = carBizDriverInfoExMapper.queryListByLimits(driverTeamRequest);
 				if(Check.NuNCollection(limitsDrivers)){
@@ -226,6 +228,8 @@ public class CarDriverTeamService{
 		}
 	}
 
+
+
 	/** 
 	* @Desc: 查询车队/小组已存在司机列表
 	* @param:  
@@ -239,7 +243,6 @@ public class CarDriverTeamService{
 			if(Check.NuNObj(driverTeamRequest)){
 				return null;
 			}
-			//TODO 数据权限
 			CarDriverTeam carDriverTeam = carDriverTeamMapper.selectByPrimaryKey(driverTeamRequest.getId());
 			//判断是小组还是车队
 			if(Check.NuNObj(carDriverTeam)){
@@ -448,10 +451,9 @@ public class CarDriverTeamService{
 			if(!Check.NuNObj(carDriverTeamDTO)){
 				return ServiceReturnCodeEnum.RECODE_EXISTS.getCode();
 			}
-			//TODO 获取登录用户id
 			CarDriverTeam record = new CarDriverTeam();
 			BeanUtils.copyProperties(record,paramDto);
-			//TODO 设置创建者
+			record.setCreateBy(String.valueOf(WebSessionUtil.getCurrentLoginUser().getId()));
 			return carDriverTeamMapper.insertSelective(record);
 		}catch (Exception e){
 			logger.error("新增车队失败:{}",e);
@@ -477,34 +479,10 @@ public class CarDriverTeamService{
 			return null;
 		}
 		logger.info("查询车队入参:{}"+ JSON.toJSONString(driverTeamRequest));
-		//----------------------------------------------------------------------------------首先，如果是普通管理员，校验数据权限（cityId、supplierId、teamId）
-		//TODO 数据权限
-		Set<Integer> permOfCity        = new HashSet<Integer>();//普通管理员可以管理的所有城市ID
-		Set<Integer> permOfSupplier = new HashSet<Integer>();//普通管理员可以管理的所有供应商ID
-		Set<Integer> permOfTeam     = new HashSet<Integer>();//普通管理员可以管理的所有车队ID
-		if(WebSessionUtil.isSupperAdmin() == false) {//如果是普通管理员
-			permOfCity        = dataPermissionHelper.havePermOfCityIds("");
-			permOfSupplier = dataPermissionHelper.havePermOfSupplierIds("");
-			permOfTeam     = dataPermissionHelper.havePermOfDriverTeamIds("");
-			if( permOfCity.size()==0 || (StringUtils.isNotEmpty(driverTeamRequest.getCityId())
-					&& permOfCity.contains(Integer.valueOf(driverTeamRequest.getCityId()))==false)  ) {
-				return null;
-			}
-			if( permOfSupplier.size()==0 || (StringUtils.isNotEmpty(driverTeamRequest.getSupplierId())
-					&& permOfSupplier.contains(Integer.valueOf(driverTeamRequest.getSupplierId()))==false)   ) {
-				return null;
-			}
-			if( permOfTeam.size()==0 || (driverTeamRequest.getTeamId() != null
-					&& permOfTeam.contains(Integer.valueOf(driverTeamRequest.getTeamId())) == false )   ) {
-//				return LayUIPage.build("您没有查询此车队的权限！", 0, null);
-				return null;
-			}
-		}
+
 		CommonRequest paramRequest = new CommonRequest();
 		BeanUtils.copyProperties(driverTeamRequest,paramRequest);
-		paramRequest.setPermOfCity(permOfCity);
-		paramRequest.setPermOfSupplier(permOfSupplier);
-		paramRequest.setPermOfTeam(permOfTeam);
+
 		final CommonRequest commonRequest = citySupplierTeamCommonService.paramDeal(paramRequest);
 		//B----------------------------------------------------------------------------------进行分页查询
 		PageDTO pageDTO = new PageDTO();

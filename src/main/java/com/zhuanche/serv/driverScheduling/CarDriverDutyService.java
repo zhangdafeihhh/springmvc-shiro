@@ -10,8 +10,12 @@ import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.dto.driver.CarDriverDayDutyDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverDayDuty;
 import com.zhuanche.entity.mdbcarmanage.DriverDutyTimeInfo;
+import com.zhuanche.request.CommonRequest;
 import com.zhuanche.request.DutyParamRequest;
+import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.serv.common.DataPermissionHelper;
+import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.Check;
 import com.zhuanche.util.Common;
 import mapper.mdbcarmanage.ex.CarDriverDayDutyExMapper;
@@ -63,6 +67,9 @@ public class CarDriverDutyService {
 	@Autowired
 	private DriverDutyTimeInfoExMapper driverDutyTimeInfoExMapper;
 
+	@Autowired
+	private CitySupplierTeamCommonService citySupplierTeamCommonService;
+
 	private static final ExecutorService es = Executors.newCachedThreadPool();
 
 	/** 
@@ -74,7 +81,7 @@ public class CarDriverDutyService {
 	*/ 
 	public PageDTO queryDriverDayDutyList(DutyParamRequest dutyParamRequest){
 
-		//TODO 数据权限
+
 		if(Check.NuNObj(dutyParamRequest)){
 			return null;
 		}
@@ -83,6 +90,17 @@ public class CarDriverDutyService {
 			dutyParamRequest.setStatus(1);
 		}
 		try{
+			/** 数据权限处理开始 */
+			CommonRequest commonRequest = new CommonRequest();
+			commonRequest.setCityId(String.valueOf(dutyParamRequest.getCityId()));
+			commonRequest.setSupplierId(String.valueOf(dutyParamRequest.getSupplierId()));
+			commonRequest.setTeamId(dutyParamRequest.getTeamId());
+			CommonRequest resultParmam = citySupplierTeamCommonService.paramDeal(commonRequest);
+			dutyParamRequest.setCityIds(BeanUtil.copySet(resultParmam.getCityIds(),Integer.class));
+			dutyParamRequest.setSuppliers(BeanUtil.copySet(resultParmam.getSupplierIds(),Integer.class));
+			dutyParamRequest.setSuppliers(resultParmam.getTeamIds());
+			/** 数据权限处理结束 */
+
 			DutyParamRequest request = new DutyParamRequest();
 			//手机号转换driverId进行查询
 			if(!Check.NuNStr(dutyParamRequest.getPhone())){

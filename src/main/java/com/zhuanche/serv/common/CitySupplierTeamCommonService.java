@@ -66,6 +66,29 @@ public class CitySupplierTeamCommonService {
         if(paramRequest == null){
             return null;
         }
+        //----------------------------------------------------------------------------------首先，如果是普通管理员，校验数据权限（cityId、supplierId、teamId）
+        //TODO 数据权限
+        Set<Integer> permOfCity        = new HashSet<Integer>();//普通管理员可以管理的所有城市ID
+        Set<Integer> permOfSupplier = new HashSet<Integer>();//普通管理员可以管理的所有供应商ID
+        Set<Integer> permOfTeam     = new HashSet<Integer>();//普通管理员可以管理的所有车队ID
+        if(WebSessionUtil.isSupperAdmin() == false) {//如果是普通管理员
+            permOfCity        = WebSessionUtil.getCurrentLoginUser().getCityIds();
+            permOfSupplier = WebSessionUtil.getCurrentLoginUser().getSupplierIds();
+            permOfTeam     = WebSessionUtil.getCurrentLoginUser().getTeamIds();
+            if( permOfCity.size()==0 || (StringUtils.isNotEmpty(paramRequest.getCityId())
+                    && permOfCity.contains(Integer.valueOf(paramRequest.getCityId()))==false)  ) {
+                return null;
+            }
+            if( permOfSupplier.size()==0 || (StringUtils.isNotEmpty(paramRequest.getSupplierId())
+                    && permOfSupplier.contains(Integer.valueOf(paramRequest.getSupplierId()))==false)   ) {
+                return null;
+            }
+            if( permOfTeam.size()==0 || (paramRequest.getTeamId() != null
+                    && permOfTeam.contains(Integer.valueOf(paramRequest.getTeamId())) == false )   ) {
+//				return LayUIPage.build("您没有查询此车队的权限！", 0, null);
+                return null;
+            }
+        }
         //A--------------------------------------------------------------------------------设置SQL查询参数
         Set<String> cityIds        = new HashSet<String>();
         Set<String> supplierIds = new HashSet<String>();
@@ -77,7 +100,7 @@ public class CitySupplierTeamCommonService {
             if( WebSessionUtil.isSupperAdmin() ) {
                 cityIds.clear();
             }else {
-                for(Integer cityid : paramRequest.getPermOfCity()) {
+                for(Integer cityid : permOfCity ) {
                     cityIds.add( String.valueOf(cityid)  );
                 }
             }
@@ -89,7 +112,7 @@ public class CitySupplierTeamCommonService {
             if( WebSessionUtil.isSupperAdmin() ) {
                 supplierIds.clear();
             }else {
-                for(Integer sid : paramRequest.getPermOfSupplier()) {
+                for(Integer sid : permOfSupplier) {
                     supplierIds.add( String.valueOf(sid)  );
                 }
             }
@@ -101,7 +124,7 @@ public class CitySupplierTeamCommonService {
             if( WebSessionUtil.isSupperAdmin() ) {
                 teamIds.clear();
             }else {
-                teamIds.addAll( paramRequest.getTeamIds() );
+                teamIds.addAll( permOfTeam );
             }
         }
         paramRequest.setCityIds(cityIds);
