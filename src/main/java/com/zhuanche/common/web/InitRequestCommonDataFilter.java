@@ -12,6 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -38,10 +39,15 @@ public class InitRequestCommonDataFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)throws ServletException, IOException {
 		/***************支持跨域请求BEGIN***********************/
-		response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
-        response.setHeader("Access-Control-Max-Age", "3600");
-        response.setHeader("Access-Control-Allow-Headers", "content-type, x-requested-with");
+		String Origin = request.getHeader("Origin");
+		if(StringUtils.isNotEmpty(Origin)) {
+			response.setHeader("Access-Control-Allow-Origin", Origin);
+		}else {
+			response.setHeader("Access-Control-Allow-Origin", "*");
+		}
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
+        response.setHeader("Access-Control-Max-Age", "1800");
+        response.setHeader("Access-Control-Allow-Headers", "*");
         response.setHeader("Access-Control-Allow-Credentials", "true");		
 		/***************支持跨域请求END***********************/
 		
