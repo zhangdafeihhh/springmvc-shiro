@@ -51,7 +51,7 @@
 			</if>
 	</select>
 	
-	<select id="queryListByTeamId" resultType="com.zhuanche.entity.mdbcarmanage.CarRelateTeam">
+	<select id="queryListByTeamIds" resultType="com.zhuanche.entity.mdbcarmanage.CarRelateTeam">
 		SELECT 
 			relation_id AS relationId,
 			team_id AS teamId,
@@ -62,7 +62,7 @@
 				AND team_id in (#{teamIds})
 	</select>
 	
-	<select id="queryListByGroupId" resultType="com.zhuanche.entity.mdbcarmanage.CarRelateTeam">
+	<select id="queryListByGroupIds" resultType="com.zhuanche.entity.mdbcarmanage.CarRelateTeam">
 		SELECT 
 			relation_id AS relationId,
 			group_id AS groupId,

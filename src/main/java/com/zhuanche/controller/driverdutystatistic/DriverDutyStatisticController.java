@@ -162,21 +162,6 @@ public class DriverDutyStatisticController extends DriverQueryController{
 		return AjaxResponse.success(pageDTO);
 	}
 	
-//	@RequestMapping(value = "/driverDutyStatisticInfoData")
-//	@ResponseBody
-//	public Object driverDutyStatisticInfoData(DriverDutyStatistic DriverDutyStatistic,HttpServletRequest request) {
-//		try {
-//			logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"司机考勤记录列表按车牌号查询数据");
-//		} catch (Exception e) {
-//		}
-//		logger.info("司机考勤记录列表按车牌号查询数据:driverDutyStatisticInfoData,参数"+DriverDutyStatistic.toString());
-//		String licensePlates = request.getParameter("licensePlates");
-//		DriverDutyStatistic.setLicensePlates(licensePlates);
-//		List<DriverDutyStatistic> rows = driverDutyStatisticService.queryDriverDutyInfo(DriverDutyStatistic);
-//		int count = this.driverDutyStatisticService.queryDriverDutyInfoCount(DriverDutyStatistic);
-//		return this.gridJsonFormate(rows, count);
-//	}
-
 	/**
 	 * 司机个人考勤列表  司机考勤记录列表按司机id查询数据
 	 * @param driverId 司机id
@@ -309,57 +294,6 @@ public class DriverDutyStatisticController extends DriverQueryController{
 		}
 	}
 
-//	/**
-//	  *
-//	 *导出司机考勤操作月报
-//	 * @param request
-//	 * @param response
-//	 * @return
-//	 */
-//	@AuthPassport
-//	@RequestMapping("/exportDriverMonthDutyStatistic")
-//	public void exportDriverMonthDuty(DriverDutyStatistic DriverDutyStatistic, DriverTeamRelationEntity driverTeamRelationEntity, HttpServletRequest request, HttpServletResponse response){
-//		try {
-//			logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"导出司机考勤月报");
-//		} catch (Exception e) {
-//		}
-//		logger.info("导出司机考勤操作");
-//		List<DriverDutyStatistic> rows = new ArrayList<DriverDutyStatistic>();
-//		String driverList = "";
-//		if(DriverDutyStatistic.getGroupIds()!=null&&!"".equals(DriverDutyStatistic.getGroupIds())
-//				||DriverDutyStatistic.getTeamId()!=null&&!"".equals(DriverDutyStatistic.getTeamId())){
-//			driverList = super.queryAuthorityDriverIdsByTeamAndGroup(DriverDutyStatistic.getTeamId(), String.valueOf(DriverDutyStatistic.getGroupIds()));
-//			if(driverList==null || "".equals(driverList)){
-//				logger.info("司机考勤3.0列表-有选择小组查询条件-该小组下没有司机groupId=="+DriverDutyStatistic.getGroupIds());
-//				logger.info("或者司机考勤3.0列表-有选择车队查询条件-该车队下没有司机teamId=="+DriverDutyStatistic.getTeamId());
-//			}
-//		}
-//		if((DriverDutyStatistic.getGroupIds()!=null&&!"".equals(DriverDutyStatistic.getGroupIds())
-//				||DriverDutyStatistic.getTeamId()!=null&&!"".equals(DriverDutyStatistic.getTeamId()))
-//				&&(driverList==null || "".equals(driverList))){
-//		}else{
-//			DriverDutyStatistic.setDriverIds(driverList);
-//			if(DriverDutyStatistic.getStartTime()!=null && DriverDutyStatistic.getStartTime()!=""){
-//				String time = DriverDutyStatistic.getStartTime();
-//				int value= setDriverDutyStatisticValue(time);
-//				DriverDutyStatistic.setValue(value);
-//				DriverDutyStatistic.setTable("statistic_duty_"+time.substring(0,7).replaceAll("-", "_"));
-//			}
-//			rows = driverDutyStatisticService.queryMonthDutyList(DriverDutyStatistic);
-//			rows = selectSuppierNameAndCityName(rows);
-//		}
-//		try {
-//			@SuppressWarnings("deprecation")
-//			Workbook wb = driverDutyStatisticService.exportExcelTongyong(rows,request.getRealPath("/")+File.separator+"template"+File.separator+"driverDuty2_info.xlsx");
-////			Workbook wb = driverDutyStatisticService.exportExcel(DriverDutyStatistic,request.getRealPath("/")+File.separator+"template"+File.separator+"driverDuty2_info.xlsx");
-//			super.exportExcelFromTemplet(request, response, wb, new String("司机考勤2列表".getBytes("utf-8"), "iso8859-1"));
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
-
 	/**
 	 * <p>Title: chuliDriverDutyStatisticParams</p>
 	 * <p>Description: 根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限 </p>
@@ -369,9 +303,9 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	 */
 	public DriverDutyStatisticParams chuliDriverDutyStatisticParams(DriverDutyStatisticParams params){
 		//整理排序字段
-		if(!"".equals(params.getSortname())&&params.getSortname()!=null){
-			String sortName = pingSortName(params.getSortname());
-			params.setSortname(sortName);
+		if(!"".equals(params.getSortName())&&params.getSortName()!=null){
+			String sortName = pingSortName(params.getSortName());
+			params.setSortName(sortName);
 		}
 		//获取当前 用户
 		SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
@@ -545,39 +479,4 @@ public class DriverDutyStatisticController extends DriverQueryController{
 		}
 		return wb;
 	}
-//
-//	@AuthPassport
-//	@RequestMapping(value = "/toDelete")
-//	public String toDelete(){
-//		return "driverDutyStatistic/delete";
-//	}
-//
-//	@AuthPassport
-//	@RequestMapping(value = "/delete")
-//	@ResponseBody
-//	public Object delete(String ids, String dateStr){
-//		try {
-//			logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"删除考勤ids="+ids+",dateStr="+ dateStr);
-//		} catch (Exception e) {
-//		}
-//		logger.info("删除考勤ids="+ids+",dateStr="+ dateStr);
-//		Map<String,Object> result = new HashMap<String,Object>();
-//		if(StringUtils.isEmpty(ids)||StringUtils.isEmpty(dateStr)){
-//			result.put("result", 0);
-//			result.put("msg", "请求参数不可为空");
-//			return result;
-//		}
-//		String table = "statistic_duty_"+dateStr.substring(0,7).replaceAll("-", "_");
-//
-////		Map<String,Object> map = new HashMap<String,Object>();
-////		map.put("ids", ids);
-////		map.put("table", table);
-//		logger.info("删除考勤ids="+ids+",table="+ table);
-//		DriverDutyStatistic params = new DriverDutyStatistic();
-//		params.setDriverIds(ids);//借用一下driverIds代表的意义ids
-//		params.setTable(table);
-//		this.driverDutyStatisticService.delete(params);
-//		result.put("result", 1);
-//		return result;
-//	}
 }

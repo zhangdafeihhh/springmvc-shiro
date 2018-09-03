@@ -96,18 +96,18 @@ public class StatisticDutyHalfParams implements Serializable{
     }
 
     public Integer getPage() {
-        return page;
+        return page == null ? 1 : page;
     }
 
     public void setPage(Integer page) {
-        this.page = page == null ? 1 : page;
+        this.page = page;
     }
 
     public Integer getPageSize() {
-        return pageSize;
+        return pageSize == null ? 30 : pageSize;
     }
 
     public void setPageSize(Integer pageSize) {
-        this.pageSize = pageSize == null ? 30 : pageSize;
+        this.pageSize = pageSize;
     }
 }

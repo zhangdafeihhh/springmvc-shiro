@@ -20,7 +20,7 @@ public class RedisSessionDAO extends CachingSessionDAO{
 
     @Override
     protected void doUpdate(Session session) {
-        redisTemplate.opsForValue().set(SESSION_KEY+session.getId(), session,1,TimeUnit.HOURS);
+//        redisTemplate.opsForValue().set(SESSION_KEY+session.getId(), session,1,TimeUnit.HOURS);
 //        RedisCacheUtil.set(SESSION_KEY+session.getId(), session, 1*60*60 );
     }
 
@@ -29,7 +29,7 @@ public class RedisSessionDAO extends CachingSessionDAO{
         if (session == null || session.getId() == null) {
             return;
         }
-        redisTemplate.delete(SESSION_KEY+session.getId());
+//        redisTemplate.delete(SESSION_KEY+session.getId());
 //        RedisCacheUtil.delete(SESSION_KEY+session.getId());
     }
 
@@ -37,18 +37,19 @@ public class RedisSessionDAO extends CachingSessionDAO{
     protected Serializable doCreate(Session session) {
         Serializable sessionId = generateSessionId(session);
         assignSessionId(session, sessionId);
-        redisTemplate.opsForValue().set(SESSION_KEY+sessionId, session,1,TimeUnit.HOURS);
+//        redisTemplate.opsForValue().set(SESSION_KEY+sessionId, session,1,TimeUnit.HOURS);
 //        RedisCacheUtil.set(SESSION_KEY+session.getId(), session, 1*60*60 );
         return sessionId;
     }
 
     @Override
     protected Session doReadSession(Serializable sessionId) {
-        return redisTemplate.opsForValue().get(SESSION_KEY+sessionId);
+//        return redisTemplate.opsForValue().get(SESSION_KEY+sessionId);
+        return null;
 //    	return (Session) RedisCacheUtil.get(SESSION_KEY+sessionId, SimpleSession.class );
     }
 
     public void setRedisTemplate(RedisTemplate<Serializable, Session> redisTemplate) {
-        this.redisTemplate = redisTemplate;
+//        this.redisTemplate = redisTemplate;
     }
 }

@@ -33,12 +33,12 @@ public class DriverDutyStatisticParams {
     private Integer pageSize;
     private String table;
     private String time;
-    private String gpstable;
+    private String gpsTable;
     private String yyyyMMdd;
     private Integer value;
 
-    private String sortname;
-    private String sortorder = " desc";
+    private String sortName;
+    private String sortOrder = " desc";
 
     public String getCityId() {
         return cityId;
@@ -160,12 +160,12 @@ public class DriverDutyStatisticParams {
         this.time = time;
     }
 
-    public String getGpstable() {
-        return gpstable;
+    public String getGpsTable() {
+        return gpsTable;
     }
 
-    public void setGpstable(String gpstable) {
-        this.gpstable = gpstable;
+    public void setGpsTable(String gpsTable) {
+        this.gpsTable = gpsTable;
     }
 
     public String getYyyyMMdd() {
@@ -200,20 +200,20 @@ public class DriverDutyStatisticParams {
         this.value = value;
     }
 
-    public String getSortname() {
-        return sortname;
+    public String getSortName() {
+        return sortName;
     }
 
-    public void setSortname(String sortname) {
-        this.sortname = sortname;
+    public void setSortName(String sortName) {
+        this.sortName = sortName;
     }
 
-    public String getSortorder() {
-        return sortorder;
+    public String getSortOrder() {
+        return sortOrder;
     }
 
-    public void setSortorder(String sortorder) {
-        this.sortorder = sortorder;
+    public void setSortOrder(String sortOrder) {
+        this.sortOrder = sortOrder;
     }
 
     public String getTeamIds() {
@@ -263,7 +263,7 @@ public class DriverDutyStatisticParams {
         Date tableDate = DateUtil.beforeNDayDate(new Date(), 1);
         this.time = sdf.format(tableDate);
         this.table = "statistic_duty_"+sdf4.format(tableDate);
-        this.gpstable = "car_gps_log_"+sdf1.format(tableDate);
+        this.gpsTable = "car_gps_log_"+sdf1.format(tableDate);
         this.yyyyMMdd = sdf2.format(tableDate);
     }
 
@@ -275,7 +275,7 @@ public class DriverDutyStatisticParams {
         Date tableDate = DateUtil.beforeNDayDate(new Date(), 1);
         this.time = sdf.format(tableDate);
         this.table = "statistic_duty_"+sdf4.format(tableDate);
-        this.gpstable = "car_gps_log_"+sdf1.format(tableDate);
+        this.gpsTable = "car_gps_log_"+sdf1.format(tableDate);
         this.yyyyMMdd = sdf2.format(tableDate);
     }
 
@@ -299,7 +299,7 @@ public class DriverDutyStatisticParams {
                 ", pageSize=" + pageSize +
                 ", table='" + table + '\'' +
                 ", time='" + time + '\'' +
-                ", gpstable='" + gpstable + '\'' +
+                ", gpstable='" + gpsTable + '\'' +
                 ", yyyyMMdd='" + yyyyMMdd + '\'' +
                 '}';
     }

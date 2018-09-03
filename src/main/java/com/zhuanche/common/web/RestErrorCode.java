@@ -112,7 +112,12 @@ public final class RestErrorCode{
 //	public static final int CUSTOMER_PHONE_NOT_MATCH_ORDER           = 2001;
 //	@ResultMessage("订单已经评价")
 //	public static final int ORDER_HAD_APPRAISAL                                        = 2002;
-	
+
+	//-----------------------------------------------业务参数：投诉评分
+	@ResultMessage("请选择一个车队或输入司机手机号")
+	public static final int TEAMID_OR_DRIVERID_ISNULL = 5201;
+	@ResultMessage("文件导出失败")
+	public static final int FILE_EXPORT_FAIL = 5202;
 
 	
 	//---------------------------------------------------------------------------------------------------------------------------------------------

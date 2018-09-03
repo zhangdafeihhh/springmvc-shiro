@@ -217,9 +217,9 @@ public class DriverDailyReportController extends DriverQueryController {
 	 */
 	public DriverDailyReportBean  chuliDriverDailyReportEntity(DriverDailyReportBean driverDailyReportBean){
 		//整理排序字段
-		if(!"".equals(driverDailyReportBean.getSortname())&&driverDailyReportBean.getSortname()!=null){
-			String sortName = pingSortName(driverDailyReportBean.getSortname());
-			driverDailyReportBean.setSortname(sortName);
+		if(!"".equals(driverDailyReportBean.getSortName())&&driverDailyReportBean.getSortName()!=null){
+			String sortName = pingSortName(driverDailyReportBean.getSortName());
+			driverDailyReportBean.setSortName(sortName);
 		}
 		//获取当前 用户
 		SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();

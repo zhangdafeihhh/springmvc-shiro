@@ -83,12 +83,12 @@
 	  <if test="statDateEnd !=null and statDateEnd !=''">
 		  <![CDATA[ and DATE_FORMAT(stat_date, '%Y-%m-%d') <= DATE_FORMAT(#{statDateEnd}, '%Y-%m-%d') ]]>
 	  </if> 
-	   <if test="sortname ==null or sortname ==''">
+	   <if test="sortName ==null or sortName ==''">
 		  ORDER BY stat_date, driver_id desc
 	  </if> 
-	   <if test="sortname !=null and sortname !=''">
+	   <if test="sortName !=null and sortName !=''">
 		  ORDER BY
-			${sortname},driver_id ${sortorder}
+			${sortName},driver_id ${sortOrder}
 	  </if> 
   </select>
   
