@@ -175,6 +175,7 @@ public class UserManagementService{
 			userName = null;
 		}
 		if( StringUtils.isNotEmpty(userName) ) {
+			userName = userName.replace("/", "//").replace("%", "/%").replace("_", "/_");
 			userName = "%"+userName+"%";
 		}
 		if( StringUtils.isEmpty(phone) ) {

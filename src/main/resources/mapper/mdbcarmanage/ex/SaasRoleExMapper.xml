@@ -27,7 +27,7 @@
     	and role_code = #{roleCode}
     </if>
     <if test="roleName!=null">
-    	and  role_name like #{roleName}
+    	and  role_name like #{roleName} ESCAPE '/' 
     </if>
     <if test="valid!=null">
     	and valid = #{valid}
