@@ -208,7 +208,7 @@ public class DriverInfoTemporaryController extends BaseController {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = "/importDriverInfo")
+    @RequestMapping(value = "/importDriverInfo",method =  RequestMethod.POST)
     public AjaxResponse importDriverInfo(CarBizDriverInfoTemp driverEntity,HttpServletRequest request){
         log.info("司机导入");
         return carBizDriverInfoTempService.importDriverInfo(driverEntity, request);
@@ -225,8 +225,14 @@ public class DriverInfoTemporaryController extends BaseController {
         super.fileDownload(request,response,path);
     }
 
+    /**
+     * 司机导入(巴士司机)
+     * @param driverEntity
+     * @param request
+     * @return
+     */
     @ResponseBody
-    @RequestMapping(value = "/importDriverInfo4Bus")
+    @RequestMapping(value = "/importDriverInfo4Bus",method =  RequestMethod.POST)
     public AjaxResponse importDriverInfo4Bus(CarBizDriverInfoTemp driverEntity,HttpServletRequest request){
         log.info("导入巴士司机");
         return carBizDriverInfoTempService.importDriverInfo4Bus(driverEntity, request);
@@ -238,7 +244,7 @@ public class DriverInfoTemporaryController extends BaseController {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = "/driverInfo",method =  RequestMethod.POST)
+    @RequestMapping(value = "/driverInfo",method =  RequestMethod.GET)
     public AjaxResponse driverInfo(@Verify(param = "driverId",rule="required") String driverId) {
         log.info("查询司机个人信息:driverInfo,司机Id:"+driverId);
         CarBizDriverInfoTemp entity = new CarBizDriverInfoTemp();

@@ -499,7 +499,7 @@ public class CarInfoTemporaryController extends BaseController {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = "/importCarInfo")
+    @RequestMapping(value = "/importCarInfo",method = RequestMethod.POST)
     public AjaxResponse importCarInfo(CarBizCarInfoTemp params, HttpServletRequest request) {
         log.info("车辆信息导入保存:importCarInfo,参数" + params.toString());
         return carBizCarInfoTempService.importCarInfo(params, request);
@@ -512,9 +512,9 @@ public class CarInfoTemporaryController extends BaseController {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = "/importCarInfo4Bus")
+    @RequestMapping(value = "/importCarInfo4Bus",method = RequestMethod.POST)
     public AjaxResponse importCarInfo4Bus(CarBizCarInfoTemp params, HttpServletRequest request) {
-        log.info("车辆信息（巴士）导入保存:importCarInfo,参数" + params.toString());
+        log.info("车辆信息（巴士）导入保存:importCarInfo4Bus,参数" + params.toString());
         return carBizCarInfoTempService.importCarInfo4Bus(params, request);
     }
 
