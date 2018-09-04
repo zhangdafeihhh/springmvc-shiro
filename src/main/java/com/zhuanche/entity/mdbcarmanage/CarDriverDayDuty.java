@@ -21,7 +21,7 @@ public class CarDriverDayDuty {
 
     private String teamName;
 
-    private Date time;
+    private String time;
 
     private String forcedIds;
 
@@ -107,11 +107,11 @@ public class CarDriverDayDuty {
         this.teamName = teamName == null ? null : teamName.trim();
     }
 
-    public Date getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(Date time) {
+    public void setTime(String time) {
         this.time = time;
     }
 

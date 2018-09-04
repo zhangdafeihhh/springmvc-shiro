@@ -3,9 +3,9 @@ package com.zhuanche.entity.mdbcarmanage;
 import java.io.Serializable;
 import java.util.Date;
 
-public class CarDriverMustDuty implements Serializable{
+public class CarDutyDuration implements Serializable{
 
-    private static final long serialVersionUID = 1428191786861793376L;
+    private static final long serialVersionUID = -4757242891562016128L;
 
     private Integer id;
 
@@ -15,13 +15,15 @@ public class CarDriverMustDuty implements Serializable{
 
     private Integer supplier;
 
+    private Integer teamId;
+
     private String supplierName;
+
+    private String dutyName;
 
     private String startDate;
 
     private String endDate;
-
-    private Integer peakTimes;
 
     private Integer createBy;
 
@@ -34,8 +36,6 @@ public class CarDriverMustDuty implements Serializable{
     private String remark;
 
     private Boolean status;
-
-    private Integer teamId;
 
     public Integer getId() {
         return id;
@@ -69,12 +69,28 @@ public class CarDriverMustDuty implements Serializable{
         this.supplier = supplier;
     }
 
+    public Integer getTeamId() {
+        return teamId;
+    }
+
+    public void setTeamId(Integer teamId) {
+        this.teamId = teamId;
+    }
+
     public String getSupplierName() {
         return supplierName;
     }
 
     public void setSupplierName(String supplierName) {
         this.supplierName = supplierName == null ? null : supplierName.trim();
+    }
+
+    public String getDutyName() {
+        return dutyName;
+    }
+
+    public void setDutyName(String dutyName) {
+        this.dutyName = dutyName == null ? null : dutyName.trim();
     }
 
     public String getStartDate() {
@@ -91,14 +107,6 @@ public class CarDriverMustDuty implements Serializable{
 
     public void setEndDate(String endDate) {
         this.endDate = endDate;
-    }
-
-    public Integer getPeakTimes() {
-        return peakTimes;
-    }
-
-    public void setPeakTimes(Integer peakTimes) {
-        this.peakTimes = peakTimes;
     }
 
     public Integer getCreateBy() {
@@ -147,13 +155,5 @@ public class CarDriverMustDuty implements Serializable{
 
     public void setStatus(Boolean status) {
         this.status = status;
-    }
-
-    public Integer getTeamId() {
-        return teamId;
-    }
-
-    public void setTeamId(Integer teamId) {
-        this.teamId = teamId;
     }
 }

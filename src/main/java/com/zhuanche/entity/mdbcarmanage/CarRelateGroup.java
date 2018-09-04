@@ -7,6 +7,16 @@ public class CarRelateGroup {
 
     private Integer driverId;
 
+    private String teamName;
+
+    public String getTeamName() {
+        return teamName;
+    }
+
+    public void setTeamName(String teamName) {
+        this.teamName = teamName;
+    }
+
     public Integer getRelationId() {
         return relationId;
     }

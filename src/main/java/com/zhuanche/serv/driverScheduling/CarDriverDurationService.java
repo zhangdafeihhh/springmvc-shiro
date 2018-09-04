@@ -1,12 +1,13 @@
 package com.zhuanche.serv.driverScheduling;
 
 
-import com.alibaba.fastjson.parser.deserializer.AbstractDateDeserializer;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.dto.driverDuty.CarDriverDurationDTO;
 import com.zhuanche.dto.driverDuty.CarDriverMustDutyDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverMustDuty;
+import com.zhuanche.entity.mdbcarmanage.CarDutyDuration;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.request.CommonRequest;
@@ -16,7 +17,9 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.Check;
 import mapper.mdbcarmanage.CarDriverMustDutyMapper;
+import mapper.mdbcarmanage.CarDutyDurationMapper;
 import mapper.mdbcarmanage.ex.CarDriverMustDutyExMapper;
+import mapper.mdbcarmanage.ex.CarDutyDurationExMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.slf4j.Logger;
@@ -25,13 +28,12 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.mail.search.SearchTerm;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 /**
- * @description: 强制排班
+ * @description: 排班时长
  *
  * <PRE>
  * <BR>	修改记录
@@ -46,12 +48,9 @@ import java.util.Set;
  *
  */
 @Service
-public class CarDriverMustDutyService {
+public class CarDriverDurationService {
 
-	private static final Logger logger = LoggerFactory.getLogger(CarDriverMustDutyService.class);
-
-	@Autowired
-	private CarDriverMustDutyExMapper carDriverMustDutyExMapper;
+	private static final Logger logger = LoggerFactory.getLogger(CarDriverDurationService.class);
 
 	@Autowired
 	private CitySupplierTeamCommonService citySupplierTeamCommonService;
@@ -60,19 +59,22 @@ public class CarDriverMustDutyService {
 	private CarBizCityExMapper carBizCityExMapper;
 
 	@Autowired
-	private CarDriverMustDutyMapper carDriverMustDutyMapper;
+	private CarDutyDurationExMapper carDutyDurationExMapper;
+
+	@Autowired
+	private CarDutyDurationMapper carDutyDurationMapper;
 
 	@Autowired
 	private CarBizSupplierExMapper carBizSupplierExMapper;
 
-	/** 
-	* @Desc: 查询强制上班配置列表 
-	* @param:
-	* @return:  
-	* @Author: lunan
-	* @Date: 2018/9/3 
-	*/ 
-	public PageDTO getDriverMustDutyList(DutyParamRequest dutyParamRequest){
+	/**
+	 * @Desc: 查询排班时长列表
+	 * @param:
+	 * @return:
+	 * @Author: lunan
+	 * @Date: 2018/9/3
+	 */
+	public PageDTO getDriverDurationList(DutyParamRequest dutyParamRequest){
 		if(Check.NuNObj(dutyParamRequest)){
 			return new PageDTO();
 		}
@@ -86,45 +88,42 @@ public class CarDriverMustDutyService {
 			dutyParamRequest.setCityIds(BeanUtil.copySet(resultParmam.getCityIds(),Integer.class));
 			dutyParamRequest.setSuppliers(BeanUtil.copySet(resultParmam.getSupplierIds(),Integer.class));
 			dutyParamRequest.setSuppliers(resultParmam.getTeamIds());
-			PageInfo<CarDriverMustDutyDTO> pageInfo = PageHelper.startPage(dutyParamRequest.getPageNo(), dutyParamRequest.getPageSize(), true).doSelectPageInfo(()
-					-> carDriverMustDutyExMapper.selectDriverMustDutyList(dutyParamRequest));
+			PageInfo<CarDriverDurationDTO> pageInfo = PageHelper.startPage(dutyParamRequest.getPageNo(), dutyParamRequest.getPageSize(), true).doSelectPageInfo(()
+					-> carDutyDurationExMapper.selectDutyDurationList(dutyParamRequest));
 			PageDTO pageDTO = new PageDTO();
 			pageDTO.setResult(pageInfo.getList());
 			pageDTO.setTotal((int)pageInfo.getTotal());
 			return pageDTO;
 		}catch (Exception e){
-			logger.error("查询强制上班列表异常:{}",e);
+			logger.error("查询排班时长列表异常:{}",e);
 			return null;
 		}finally {
 			PageHelper.clearPage();
 		}
-
 	}
 
 	/** 
-	* @Desc: 新增或者修改强制排班信息 
+	* @Desc: 保存/修改排班时长 
 	* @param:
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/3 
 	*/ 
-	public int saveOrUpdateDriverMust(CarDriverMustDuty carDriverMustDuty){
-
-		if(Check.NuNObj(carDriverMustDuty)
-				|| Check.NuNObj(carDriverMustDuty.getCity())
-				|| Check.NuNObj(carDriverMustDuty.getPeakTimes())
-				|| Check.NuNObj(carDriverMustDuty.getSupplier())
-				|| Check.NuNObj(carDriverMustDuty.getSupplier())
-		){
+	public int saveOrUpdateCarDriverDuration(CarDutyDuration carDutyDuration){
+		if(Check.NuNObj(carDutyDuration)
+				|| Check.NuNObj(carDutyDuration.getCity())
+				|| Check.NuNObj(carDutyDuration.getTeamId())
+				|| Check.NuNObj(carDutyDuration.getSupplier())
+				){
 			return 0;
 		}
-		if(carDriverMustDuty.getStartDate().length() != 5 || carDriverMustDuty.getEndDate().length() != 5){
+		if(carDutyDuration.getStartDate().length() != 5 || carDutyDuration.getEndDate().length() != 5){
 			return 0;
 		}
-		String start = carDriverMustDuty.getStartDate().substring(0,2);
-		String end = carDriverMustDuty.getEndDate().substring(0,2);
-		String start1 = carDriverMustDuty.getStartDate().substring(3,5);
-		String end1 = carDriverMustDuty.getEndDate().substring(3,5);
+		String start = carDutyDuration.getStartDate().substring(0,2);
+		String end = carDutyDuration.getEndDate().substring(0,2);
+		String start1 = carDutyDuration.getStartDate().substring(3,5);
+		String end1 = carDutyDuration.getEndDate().substring(3,5);
 		if(!"".equals(start)&&start!=null&&!"".equals(end)&&end!=null){
 			if(Integer.parseInt(start)>Integer.parseInt(end)){
 				return 0;
@@ -137,52 +136,53 @@ public class CarDriverMustDutyService {
 			}
 		}
 		try{
-			if(!Check.NuNObj(carDriverMustDuty.getId())){
+			if(!Check.NuNObj(carDutyDuration.getId())){
 				/** 修改逻辑*/
-				CarDriverMustDuty upRecord = new CarDriverMustDuty();
-				upRecord.setId(carDriverMustDuty.getId());
-				upRecord.setStartDate(carDriverMustDuty.getStartDate());
-				upRecord.setEndDate(carDriverMustDuty.getEndDate());
-				upRecord.setRemark(carDriverMustDuty.getRemark());
+				CarDutyDuration upRecord = new CarDutyDuration();
+				upRecord.setId(carDutyDuration.getId());
+				upRecord.setStartDate(carDutyDuration.getStartDate());
+				upRecord.setEndDate(carDutyDuration.getEndDate());
+				upRecord.setRemark(carDutyDuration.getRemark());
 				upRecord.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
-				return carDriverMustDutyMapper.updateByPrimaryKeySelective(upRecord);
+				return carDutyDurationMapper.updateByPrimaryKeySelective(upRecord);
 			}else{
 				Set<Integer> cityId = new HashSet<>();
-				cityId.add(carDriverMustDuty.getCity());
+				cityId.add(carDutyDuration.getCity());
 				List<CarBizCity> carBizCities = carBizCityExMapper.queryByIds(cityId);
 				if(Check.NuNCollection(carBizCities)){
 					return 0;
 				}
-				carDriverMustDuty.setCityName(carBizCities.get(0).getCityName());
+				carDutyDuration.setCityName(carBizCities.get(0).getCityName());
 				CarBizSupplier supplier = new CarBizSupplier();
-				supplier.setSupplierId(carDriverMustDuty.getSupplier());
+				supplier.setSupplierId(carDutyDuration.getSupplier());
 				CarBizSupplier supplierDetail = carBizSupplierExMapper.queryForObject(supplier);
 				if(Check.NuNObj(supplierDetail)){
 					return 0;
 				}
-				carDriverMustDuty.setSupplierName(supplierDetail.getSupplierFullName());
-				carDriverMustDuty.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
-				return carDriverMustDutyMapper.insertSelective(carDriverMustDuty);
+				carDutyDuration.setSupplierName(supplierDetail.getSupplierFullName());
+				carDutyDuration.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
+				return carDutyDurationMapper.insertSelective(carDutyDuration);
 			}
 		}catch (Exception e){
-			logger.error("保存/修改强制上班时间异常:{}",e);
+			logger.error("保存/修改排班时长异常:{}",e);
 			return 0;
 		}
+
 	}
 
-	/** 
-	* @Desc: 获取强制排班详情 
-	* @param:
-	* @return:  
-	* @Author: lunan
-	* @Date: 2018/9/3 
-	*/ 
-	public CarDriverMustDuty getCarDriverMustDetail(Integer paramId){
+	/**
+	 * @Desc: 获取排班时长详情
+	 * @param:
+	 * @return:
+	 * @Author: lunan
+	 * @Date: 2018/9/3
+	 */
+	public CarDriverDurationDTO getCarDriverDurationDetail(Integer paramId){
 		if(Check.NuNObj(paramId)){
 			return null;
 		}
-		CarDriverMustDuty carDriverMustDuty = carDriverMustDutyMapper.selectByPrimaryKey(paramId);
-		return carDriverMustDuty;
+		CarDriverDurationDTO carDutyDuration = carDutyDurationExMapper.selectOne(paramId);
+		return carDutyDuration;
 	}
 
 

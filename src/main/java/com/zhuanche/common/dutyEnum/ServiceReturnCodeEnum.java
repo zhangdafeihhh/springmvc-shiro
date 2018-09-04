@@ -1,5 +1,7 @@
 package com.zhuanche.common.dutyEnum;
 
+import com.zhuanche.util.Check;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +27,25 @@ public enum ServiceReturnCodeEnum {
     ServiceReturnCodeEnum(String name, int code) {
         this.name = name;
         this.code = code;
+    }
+
+    /**
+     * 获取当前的类型
+     * @author afi
+     * @param code
+     * @return
+     */
+    public static ServiceReturnCodeEnum getTypeByCode(Integer code) {
+        if (Check.NuNObj(code)){
+            return null;
+        }
+        ServiceReturnCodeEnum[] enums = ServiceReturnCodeEnum.values();
+        for(ServiceReturnCodeEnum enumtype:enums) {
+            if(enumtype.getCode() == code) {
+                return enumtype;
+            }
+        }
+        return null;
     }
 
     public String getName() {

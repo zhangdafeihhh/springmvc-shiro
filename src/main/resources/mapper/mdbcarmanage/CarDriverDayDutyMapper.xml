@@ -11,7 +11,7 @@
     <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
     <result column="team_id" property="teamId" jdbcType="INTEGER" />
     <result column="team_name" property="teamName" jdbcType="VARCHAR" />
-    <result column="time" property="time" jdbcType="DATE" />
+    <result column="time" property="time" jdbcType="VARCHAR" />
     <result column="forced_ids" property="forcedIds" jdbcType="VARCHAR" />
     <result column="duty_ids" property="dutyIds" jdbcType="VARCHAR" />
     <result column="forced_times" property="forcedTimes" jdbcType="VARCHAR" />
@@ -43,7 +43,7 @@
     values (#{id,jdbcType=INTEGER}, #{driverId,jdbcType=INTEGER}, #{driverName,jdbcType=VARCHAR}, 
       #{cityId,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR}, #{supplierId,jdbcType=INTEGER}, 
       #{supplierName,jdbcType=VARCHAR}, #{teamId,jdbcType=INTEGER}, #{teamName,jdbcType=VARCHAR}, 
-      #{time,jdbcType=DATE}, #{forcedIds,jdbcType=VARCHAR}, #{dutyIds,jdbcType=VARCHAR}, 
+      #{time,jdbcType=VARCHAR}, #{forcedIds,jdbcType=VARCHAR}, #{dutyIds,jdbcType=VARCHAR},
       #{forcedTimes,jdbcType=VARCHAR}, #{dutyTimes,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, 
       #{status,jdbcType=INTEGER})
   </insert>
@@ -128,7 +128,7 @@
         #{teamName,jdbcType=VARCHAR},
       </if>
       <if test="time != null" >
-        #{time,jdbcType=DATE},
+        #{time,jdbcType=VARCHAR},
       </if>
       <if test="forcedIds != null" >
         #{forcedIds,jdbcType=VARCHAR},
@@ -178,7 +178,7 @@
         team_name = #{teamName,jdbcType=VARCHAR},
       </if>
       <if test="time != null" >
-        time = #{time,jdbcType=DATE},
+        time = #{time,jdbcType=VARCHAR},
       </if>
       <if test="forcedIds != null" >
         forced_ids = #{forcedIds,jdbcType=VARCHAR},
@@ -211,7 +211,7 @@
       supplier_name = #{supplierName,jdbcType=VARCHAR},
       team_id = #{teamId,jdbcType=INTEGER},
       team_name = #{teamName,jdbcType=VARCHAR},
-      time = #{time,jdbcType=DATE},
+      time = #{time,jdbcType=VARCHAR},
       forced_ids = #{forcedIds,jdbcType=VARCHAR},
       duty_ids = #{dutyIds,jdbcType=VARCHAR},
       forced_times = #{forcedTimes,jdbcType=VARCHAR},

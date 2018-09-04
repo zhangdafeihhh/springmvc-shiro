@@ -17,12 +17,19 @@
     where relation_id = #{relationId,jdbcType=INTEGER}
   </select>
 
-  <select id="selectOneGroup" resultMap="BaseResultMap" parameterType="com.zhuanche.request.TeamGroupRequest" >
+  <select id="selectOneGroup" resultType="com.zhuanche.entity.mdbcarmanage.CarRelateGroup" parameterType="com.zhuanche.request.TeamGroupRequest" >
     select
-    <include refid="Base_Column_List" />
+    rt.relation_id AS relationId,
+    rt.group_id AS groupId,
+    rt.driver_id AS driverId,
+    t.team_name groupName
     from car_relate_group
-    where group_id = #{groupId,jdbcType=INTEGER}
-    AND driver_id = #{driverId,jdbcType=INTEGER}
+    LEFT JOIN car_driver_team t ON t.id = rt.group_id
+    where
+    driver_id = #{driverId,jdbcType=INTEGER}
+    <if test="groupId!=null">
+      AND group_id = #{groupId}
+    </if>
     limit 1
   </select>
 
