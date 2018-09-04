@@ -274,11 +274,12 @@ public class AsyncDutyService {
 		if(Check.NuNCollection(list)){
 			return null;
 		}
+		String resultStr = "";
 		StringBuffer dutyTimesBuffer = new StringBuffer();
 		for (CarDriverDurationDTO insideDuration : list) {
-			if(!Check.NuNObj(insideDuration)){
-				dutyTimesBuffer.append(",");
-			}
+			//拼接,号，首个多余，最后处理去掉
+			dutyTimesBuffer.append(",");
+
 			if (null != insideDuration.getDutyName() && !"".equals(insideDuration.getDutyName())) {
 				dutyTimesBuffer.append(insideDuration.getDutyName()).append(":");
 			}
@@ -290,7 +291,11 @@ public class AsyncDutyService {
 				dutyTimesBuffer.append(insideDuration.getEndDate());
 			}
 		}
-		return dutyTimesBuffer.toString();
+		resultStr = dutyTimesBuffer.toString();
+		if(!Check.NuNStr(resultStr)){
+			resultStr = resultStr.substring(1,resultStr.length());
+		}
+		return resultStr;
 	}
 
 	//发布数据

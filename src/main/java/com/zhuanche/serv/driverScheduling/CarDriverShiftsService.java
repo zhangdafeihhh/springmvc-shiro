@@ -254,6 +254,7 @@ public class CarDriverShiftsService {
 			return null;
 		}
 		try{
+			String resultStr = "";
 			DutyParamRequest searchParam = new DutyParamRequest();
 			searchParam.setForcedIds(forceIds);
 			List<CarDriverMustDutyDTO> mustList = carDriverMustDutyExMapper.selectDriverMustDutyList(searchParam);
@@ -269,9 +270,8 @@ public class CarDriverShiftsService {
 						return "repeatTime";
 					}
 				}
-				if(!Check.NuNObj(mustDuty)){
-					forcedTimesBuffer.append(",");
-				}
+				//拼接,号，首个多余，最后处理去掉
+				forcedTimesBuffer.append(",");
 				if (null != mustDuty.getPeakTimes()) {
 					String peakTimes = EnumDriverDutyPeakTimes.getKey(mustDuty.getPeakTimes().intValue());
 					if (null != peakTimes) {
@@ -286,8 +286,11 @@ public class CarDriverShiftsService {
 					forcedTimesBuffer.append(mustDuty.getEndDate());
 				}
 			}
-			return forcedTimesBuffer.toString();
-
+			resultStr = forcedTimesBuffer.toString();
+			if(!Check.NuNStr(resultStr)){
+				resultStr = resultStr.substring(1,resultStr.length());
+			}
+			return resultStr;
 		}catch (Exception e){
 			logger.error("处理强制上班时间异常:{}",e);
 			return null;

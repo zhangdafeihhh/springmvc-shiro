@@ -12,7 +12,7 @@
     <result column="city" property="city" jdbcType="VARCHAR" />
     <result column="supplier" property="supplier" jdbcType="VARCHAR" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
-    <result column="status" property="status" jdbcType="BIT" />
+    <result column="status" property="status" jdbcType="INTEGER" />
     <result column="p_id" property="pId" jdbcType="INTEGER" />
     <result column="duty_start_date" property="dutyStartDate" jdbcType="VARCHAR" />
     <result column="duty_end_date" property="dutyEndDate" jdbcType="VARCHAR" />
