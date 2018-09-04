@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.CarDriverMonthDutyExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.CarDriverMonthDuty" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="time" property="time" jdbcType="DATE" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="driver_phone" property="driverPhone" jdbcType="VARCHAR" />
+    <result column="license_plates" property="licensePlates" jdbcType="VARCHAR" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="data" property="data" jdbcType="VARCHAR" />
+    <result column="memo" property="memo" jdbcType="VARCHAR" />
+    <result column="team_id" property="teamId" jdbcType="INTEGER" />
+    <result column="group_id" property="groupId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, time, driver_id, driver_name, driver_phone, license_plates, supplier_id, city_id, 
+    data, memo, team_id, group_id
+  </sql>
+
+  <insert id="saveDriverMonthDutyList" parameterType="java.util.Map">
+    insert into car_driver_month_duty (time,driver_id,driver_name,driver_phone,
+    license_plates,supplier_id,city_id,data,team_id,group_id)
+    values
+    <foreach collection="driverList" item="item" index="index" separator="," >
+      (
+      str_to_date(#{item.monitorDate},'%Y-%m'),#{item.driverId},#{item.driverName},#{item.driverPhone},
+      #{item.licensePlates},#{item.supplierId},#{item.cityId},#{item.data},
+      #{item.teamId},#{item.groupId})
+    </foreach>
+
+  </insert>
+
+  <update id="updateDriverMonthDutyList" parameterType="java.util.Map">
+    <foreach collection="updateDriverList" item="item" index="index" separator=";" >
+      UPDATE car_driver_month_duty
+      <set>
+        driver_name=#{item.driverName},
+        driver_phone=#{item.driverPhone},
+        license_plates=#{item.licensePlates},
+        supplier_id=#{item.supplierId},
+        city_id=#{item.cityId},
+        data=#{item.data},
+        team_id=#{item.teamId},
+        group_id=#{item.groupId},
+      </set>
+      WHERE
+      id = #{item.id}
+    </foreach>
+  </update>
+
+  <update id="updateDriverMonthDutyData"
+          parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverMonthDuty">
+    UPDATE car_driver_month_duty
+    <set >
+      data = #{data}
+    </set>
+    WHERE
+    id = #{id}
+  </update>
+
+  <select id="queryDriverDutyList" parameterType="com.zhuanche.request.DriverMonthDutyRequest" resultType="com.zhuanche.dto.driverDuty.CarDriverMonthDTO">
+    SELECT
+    i.id,
+    i.driver_id driverId,
+    i.driver_name driverName,
+    i.driver_phone driverPhone,
+    i.license_plates licensePlates,
+    i.city_id cityId,
+    i.supplier_id supplierId,
+    r.team_id teamId,
+    t.team_name teamName,
+    i.group_id groupId,
+    g.team_name groupName,
+    date_format(i.time,'%Y-%m') monitorDate,
+    i.data
+    FROM
+    car_driver_month_duty i
+    Left Join car_relate_team r on r.driver_id = i.driver_id
+    Left Join car_driver_team t on r.team_id = t.id
+    Left Join car_driver_team g on g.id = i.group_id
+    where 1=1
+    <if test="monitorDate !=null and monitorDate !=''">
+      <![CDATA[ and i.time = str_to_date(#{monitorDate},'%Y-%m') ]]>
+    </if>
+    <if test="driverId !=null">
+      and i.driver_id = #{driverId}
+    </if>
+    <if test="cityIds!=null and cityIds.size()>0">
+      and i.city_id IN
+      <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
+        #{cid}
+      </foreach>
+    </if>
+    <if test="supplierIds!=null and supplierIds.size()>0">
+      and i.supplier_id IN
+      <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
+        #{sid}
+      </foreach>
+    </if>
+    <if test="teamIds!=null and teamIds.size()>0">
+      and r.team_id IN
+      <foreach collection="teamIds" open="(" close=")" separator="," item="tid" >
+        #{tid}
+      </foreach>
+    </if>
+    <if test="driverName!=null and driverName!=''">
+      AND i.driver_name LIKE CONCAT('%', #{driverName}, '%')
+    </if>
+    <if test="driverPhone!=null and driverPhone!=''">
+      AND i.driver_phone LIKE CONCAT('%', #{driverPhone}, '%')
+    </if>
+    <if test="licensePlates!=null and licensePlates!=''">
+      AND i.license_plates LIKE CONCAT('%', #{licensePlates}, '%')
+    </if>
+    <if test="sortname != null and sortname !=''">
+      ORDER BY
+      convert(${sortname} using gbk) ${sortorder}
+    </if>
+    <if test="sortname == null or sortname ==''">
+      ORDER BY
+      i.driver_id DESC
+    </if>
+  </select>
+</mapper>

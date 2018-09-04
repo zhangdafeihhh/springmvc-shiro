@@ -24,6 +24,17 @@
     id, team_name, sort, create_by, create_date, update_by, update_date, city, supplier, 
     remark, status, p_id, duty_start_date, duty_end_date, charge1, charge2, charge3
   </sql>
+    <select id="queryTeamIdByDriverId" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+        SELECT
+        r.team_id teamId, t.team_name teamName
+        FROM
+        car_relate_team r
+        left join car_driver_team t on r.team_id = t.id
+        WHERE 1=1
+        <if test="driverId !=null and driverId !=''">
+            and r.driver_id in (${driverId})
+        </if>
+    </select>
 
     <select id="selectByCondition" resultMap="BaseResultMap" parameterType="com.zhuanche.request.DriverTeamRequest" >
         select

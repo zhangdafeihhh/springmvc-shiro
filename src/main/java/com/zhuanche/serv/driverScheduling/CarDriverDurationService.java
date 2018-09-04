@@ -177,7 +177,7 @@ public class CarDriverDurationService {
 	 * @Author: lunan
 	 * @Date: 2018/9/3
 	 */
-	public CarDriverDurationDTO getCarDriverMustDetail(Integer paramId){
+	public CarDriverDurationDTO getCarDriverDurationDetail(Integer paramId){
 		if(Check.NuNObj(paramId)){
 			return null;
 		}

@@ -62,6 +62,99 @@ public class CarDriverInfoDTO implements Serializable{
 
     private String teamId;
 
+    private String licensePlatesId;
+
+    private Double currAccount;
+    private Double hisallAccount;
+    private Double withdrawDeposit;
+    private Double frozenAmount;
+    private String genderString;
+    private String statusString;
+    private String photoSrc;
+    private Integer cityId;
+
+    private Integer supplierId;
+
+    public Integer getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(Integer supplierId) {
+        this.supplierId = supplierId;
+    }
+
+    public String getLicensePlatesId() {
+        return licensePlatesId;
+    }
+
+    public void setLicensePlatesId(String licensePlatesId) {
+        this.licensePlatesId = licensePlatesId;
+    }
+
+    public Double getCurrAccount() {
+        return currAccount;
+    }
+
+    public void setCurrAccount(Double currAccount) {
+        this.currAccount = currAccount;
+    }
+
+    public Double getHisallAccount() {
+        return hisallAccount;
+    }
+
+    public void setHisallAccount(Double hisallAccount) {
+        this.hisallAccount = hisallAccount;
+    }
+
+    public Double getWithdrawDeposit() {
+        return withdrawDeposit;
+    }
+
+    public void setWithdrawDeposit(Double withdrawDeposit) {
+        this.withdrawDeposit = withdrawDeposit;
+    }
+
+    public Double getFrozenAmount() {
+        return frozenAmount;
+    }
+
+    public void setFrozenAmount(Double frozenAmount) {
+        this.frozenAmount = frozenAmount;
+    }
+
+    public String getGenderString() {
+        return genderString;
+    }
+
+    public void setGenderString(String genderString) {
+        this.genderString = genderString;
+    }
+
+    public String getStatusString() {
+        return statusString;
+    }
+
+    public void setStatusString(String statusString) {
+        this.statusString = statusString;
+    }
+
+    public String getPhotoSrc() {
+        return photoSrc;
+    }
+
+    public void setPhotoSrc(String photoSrc) {
+        this.photoSrc = photoSrc;
+    }
+
+    public Integer getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(Integer cityId) {
+        this.cityId = cityId;
+    }
+
     public Integer getGroupId() {
         return groupId;
     }

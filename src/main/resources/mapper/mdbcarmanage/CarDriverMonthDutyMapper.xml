@@ -30,23 +30,24 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverMonthDuty" >
-    insert into car_driver_month_duty (id, time, driver_id, 
-      driver_name, driver_phone, license_plates, 
-      supplier_id, city_id, data, 
-      memo, team_id, group_id
-      )
-    values (#{id,jdbcType=INTEGER}, #{time,jdbcType=DATE}, #{driverId,jdbcType=INTEGER}, 
-      #{driverName,jdbcType=VARCHAR}, #{driverPhone,jdbcType=VARCHAR}, #{licensePlates,jdbcType=VARCHAR}, 
-      #{supplierId,jdbcType=INTEGER}, #{cityId,jdbcType=INTEGER}, #{data,jdbcType=VARCHAR}, 
-      #{memo,jdbcType=VARCHAR}, #{teamId,jdbcType=INTEGER}, #{groupId,jdbcType=INTEGER}
-      )
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_driver_month_duty (time, driver_id, driver_name, 
+      driver_phone, license_plates, supplier_id, 
+      city_id, data, memo, 
+      team_id, group_id)
+    values (#{time,jdbcType=DATE}, #{driverId,jdbcType=INTEGER}, #{driverName,jdbcType=VARCHAR}, 
+      #{driverPhone,jdbcType=VARCHAR}, #{licensePlates,jdbcType=VARCHAR}, #{supplierId,jdbcType=INTEGER}, 
+      #{cityId,jdbcType=INTEGER}, #{data,jdbcType=VARCHAR}, #{memo,jdbcType=VARCHAR}, 
+      #{teamId,jdbcType=INTEGER}, #{groupId,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverMonthDuty" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
     insert into car_driver_month_duty
     <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        id,
-      </if>
       <if test="time != null" >
         time,
       </if>
@@ -82,9 +83,6 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        #{id,jdbcType=INTEGER},
-      </if>
       <if test="time != null" >
         #{time,jdbcType=DATE},
       </if>

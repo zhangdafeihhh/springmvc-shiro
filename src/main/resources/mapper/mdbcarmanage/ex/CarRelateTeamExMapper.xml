@@ -32,6 +32,21 @@
     limit 1
   </select>
 
+  <select id="queryDriverIdsByTeamIds"  resultType="java.util.HashMap">
+    SELECT
+    r.driver_id driverId, t.team_name teamName
+    FROM
+    car_relate_team r
+    left join car_driver_team t on r.team_id = t.id
+    WHERE 1=1
+    <if test="teamIds!=null and teamIds.size()>0">
+      and r.team_id IN
+      <foreach collection="teamIds" open="(" close=")" separator="," item="tid" >
+        #{tid}
+      </foreach>
+    </if>
+  </select>
+
   <select id="queryDriverTeamRelationList" parameterType="com.zhuanche.request.TeamGroupRequest" resultMap="BaseResultMap">
     SELECT
     <include refid="Base_Column_List" />
