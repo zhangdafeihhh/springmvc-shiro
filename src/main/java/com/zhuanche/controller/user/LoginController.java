@@ -53,9 +53,10 @@ public class LoginController{
 	private static final Logger log                                                      =  LoggerFactory.getLogger(LoginController.class);
 	private static final String CACHE_PREFIX_MSGCODE_CONTROL = "mp_login_cache_msgcode_control_";
 	private static final String CACHE_PREFIX_MSGCODE                   = "mp_login_cache_msgcode_";
-	
+    @Value(value="${loginpage.url}")
+    private String loginpageUrl;  //前端UI登录页面
 	@Value("${homepage.url}")
-	private String homepageUrl;
+	private String homepageUrl; //前端UI首页页面
 	
 	private int msgcodeTimeoutMinutes = 1;
 	
@@ -111,18 +112,20 @@ public class LoginController{
 	@RequestMapping("/dologin")
 	@ResponseBody
     public AjaxResponse dologin(HttpServletRequest request , HttpServletResponse response, 
-    	@Verify(param="username",rule="required") String username, @Verify(param="password",rule="required") String password, @Verify(param="msgcode",rule="required") String msgcode ) throws IOException{
-		//1.判断是否为AJAX请求
-		boolean isAjax = false;
-		String XMLHttpRequest = request.getHeader("X-Requested-With");
-		if(XMLHttpRequest!=null && XMLHttpRequest.trim().length()>0){
-			isAjax = true;
-		}
+    	@Verify(param="username",rule="required") String username, 
+    	@Verify(param="password",rule="required") String password, 
+    	@Verify(param="msgcode",rule="required") String msgcode ) throws IOException{
 		
 		Subject currentLoginUser = SecurityUtils.getSubject();
 		//A:是否已经登录
 		if(currentLoginUser.isAuthenticated()) {
-			return AjaxResponse.success( null );
+			Boolean isAjax = (Boolean) request.getAttribute("X_IS_AJAX");
+			if(  isAjax  ) {
+				return AjaxResponse.success( null );
+			}else {
+				response.sendRedirect(homepageUrl);
+				return null;
+			}
 		}
 		//B:查询用户信息
 		CarAdmUser user = carAdmUserExMapper.queryByAccount(username);
@@ -146,30 +149,42 @@ public class LoginController{
 		if(user.getStatus()!=null && user.getStatus().intValue()==100 ){
 			return AjaxResponse.fail(RestErrorCode.USER_INVALID) ;
 		}
-		//F: shiro登录
+		//F: 执行登录
 		try {
+			//shiro登录
 			UsernamePasswordToken token = new UsernamePasswordToken( username, password.toCharArray() );
 			currentLoginUser.login(token);
-			
-			//TODO 记录登录用户的所有会话ID，以便支持自动会话清理
-			//redisSessionDAO.saveSessionIdOfLoginUser(username,  (String)currentLoginUser.getSession().getId() );
-			
+			//记录登录用户的所有会话ID，以支持“系统管理”功能中的自动会话清理
+			String sessionId =  (String)currentLoginUser.getSession().getId() ;
+			redisSessionDAO.saveSessionIdOfLoginUser(username, sessionId);
 		}catch(AuthenticationException aex) {
 			return AjaxResponse.fail(RestErrorCode.USER_LOGIN_FAILED) ;
 		}
 		//返回登录成功
-		return AjaxResponse.success( null );
+		Boolean isAjax = (Boolean) request.getAttribute("X_IS_AJAX");
+		if(  isAjax  ) {
+			return AjaxResponse.success( null );
+		}else {
+			response.sendRedirect(homepageUrl);
+			return null;
+		}
     }
 	
-	/**执行登出**/
+	/**执行登出 **/
 	@RequestMapping("/dologout")
 	@ResponseBody
-    public AjaxResponse dologout( ){
+    public AjaxResponse dologout( HttpServletRequest request , HttpServletResponse response ) throws Exception{
 		Subject subject = SecurityUtils.getSubject();
 		if(subject.isAuthenticated()) {
 			subject.logout();
 		}
-		return AjaxResponse.success( null );
+		Boolean isAjax = (Boolean) request.getAttribute("X_IS_AJAX");
+		if(  isAjax  ) {
+			return AjaxResponse.success( null );
+		}else {
+			response.sendRedirect(loginpageUrl);
+			return null;
+		}
 	}
 	
 	/**修改密码**/

@@ -78,7 +78,7 @@ public class RedisSessionDAO extends CachingSessionDAO{
     		allSessionIds =  new HashSet<String>(4);
     	}
     	allSessionIds.add(sessionId);
-    	redisTemplate.opsForValue().set(KEY_PREFIX_OF_SESSIONID+loginAccount, (Serializable)allSessionIds, 1, TimeUnit.HOURS);
+    	redisTemplate.opsForValue().set(KEY_PREFIX_OF_SESSIONID+loginAccount, (Serializable)allSessionIds, 24, TimeUnit.HOURS);
     }
     /**二、当权限信息、角色信息、用户信息发生变化时，同时清理与之相关联的会话**/
     public void clearRelativeSession( final Integer permissionId, final  Integer roleId, final  Integer userId ) {
