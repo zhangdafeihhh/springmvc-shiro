@@ -27,6 +27,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.zhuanche.common.cache.RedisCacheUtil;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -74,6 +77,9 @@ public class LoginController{
 	/**通过用户名、密码，获取短信验证码**/
 	@RequestMapping("/getMsgCode")
 	@ResponseBody
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode=DataSourceMode.SLAVE )
+	} )
     public AjaxResponse getMsgCode( @Verify(param="username",rule="required") String username, @Verify(param="password",rule="required") String password ){
 		//A: 频率检查
 		String flag = RedisCacheUtil.get(CACHE_PREFIX_MSGCODE_CONTROL+username, String.class);
@@ -111,6 +117,9 @@ public class LoginController{
 	/**执行登录**/
 	@RequestMapping("/dologin")
 	@ResponseBody
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode=DataSourceMode.SLAVE )
+	} )
     public AjaxResponse dologin(HttpServletRequest request , HttpServletResponse response, 
     	@Verify(param="username",rule="required") String username, 
     	@Verify(param="password",rule="required") String password, 
@@ -216,6 +225,9 @@ public class LoginController{
 	@RequestMapping("/currentLoginUserInfo")
 	@ResponseBody
 	@SuppressWarnings("unchecked")
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode=DataSourceMode.SLAVE )
+	} )
     public AjaxResponse currentLoginUserInfo( String menuDataFormat ){
 		SSOLoginUser ssoLoginUser = WebSessionUtil.getCurrentLoginUser();
 		
