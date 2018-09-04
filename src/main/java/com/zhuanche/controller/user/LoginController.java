@@ -38,6 +38,7 @@ import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 import com.zhuanche.entity.mdbcarmanage.SaasPermission;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.realm.UsernamePasswordRealm;
+import com.zhuanche.shiro.session.RedisSessionDAO;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.NumberUtil;
@@ -66,6 +67,8 @@ public class LoginController{
 	private SaasPermissionExMapper saasPermissionExMapper;
 	@Autowired
 	private UsernamePasswordRealm usernamePasswordRealm;
+	@Autowired
+	private RedisSessionDAO redisSessionDAO;
 	
 	/**通过用户名、密码，获取短信验证码**/
 	@RequestMapping("/getMsgCode")
@@ -148,14 +151,8 @@ public class LoginController{
 			UsernamePasswordToken token = new UsernamePasswordToken( username, password.toCharArray() );
 			currentLoginUser.login(token);
 			
-			//username ,  currentLoginUser.getSession().getId();
-			
-			
-			//TODO 记录登录用户的所有会话ID
-			//TODO 记录登录用户的所有会话ID
-			//TODO 记录登录用户的所有会话ID
-			//TODO 记录登录用户的所有会话ID
-			
+			//TODO 记录登录用户的所有会话ID，以便支持自动会话清理
+			//redisSessionDAO.saveSessionIdOfLoginUser(username,  (String)currentLoginUser.getSession().getId() );
 			
 		}catch(AuthenticationException aex) {
 			return AjaxResponse.fail(RestErrorCode.USER_LOGIN_FAILED) ;

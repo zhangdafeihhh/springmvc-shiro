@@ -29,8 +29,8 @@ public class UserManagementController {
 			@Verify(param="supplierIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String supplierIds, 
 			@Verify(param="teamIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String teamIds ) {
 		CarAdmUser user  = new CarAdmUser();
-		user.setAccount(account);
-		user.setUserName(userName);
+		user.setAccount(account.trim());
+		user.setUserName(userName.trim());
 		user.setCities( cityIds );
 		user.setSuppliers( supplierIds );
 		user.setTeamId( teamIds );
@@ -62,7 +62,7 @@ public class UserManagementController {
 			@Verify(param="teamIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String teamIds ) {
 		CarAdmUser newUser = new CarAdmUser();
 		newUser.setUserId(userId);
-		newUser.setUserName(userName);
+		newUser.setUserName(userName.trim());
 		newUser.setCities( cityIds );
 		newUser.setSuppliers( supplierIds );
 		newUser.setTeamId( teamIds );

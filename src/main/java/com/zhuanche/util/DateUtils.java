@@ -1,5 +1,6 @@
 package com.zhuanche.util;
-import org.apache.commons.lang.StringUtils;
+
+import org.springframework.util.StringUtils;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -451,7 +452,7 @@ public class DateUtils {
 	}
 
 	 public static Date getDate(String dateStr) {
-		  DateFormat   df=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		  DateFormat df=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		  Date d = null;
 		try {
 			d = df.parse(dateStr);
@@ -621,4 +622,6 @@ public class DateUtils {
 				throw new RuntimeException("add days is error.");
 			}
 		}
+
+
 }
