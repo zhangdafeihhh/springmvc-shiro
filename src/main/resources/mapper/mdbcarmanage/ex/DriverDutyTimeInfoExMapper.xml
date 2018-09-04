@@ -3,7 +3,7 @@
 <mapper namespace="mapper.mdbcarmanage.ex.DriverDutyTimeInfoExMapper" >
   <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.DriverDutyTimeInfo" >
     <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="time" property="time" jdbcType="DATE" />
+    <result column="time" property="time" jdbcType="VARCHAR" />
     <result column="driver_id" property="driverId" jdbcType="INTEGER" />
     <result column="must_duty_time" property="mustDutyTime" jdbcType="VARCHAR" />
     <result column="duty_time" property="dutyTime" jdbcType="VARCHAR" />

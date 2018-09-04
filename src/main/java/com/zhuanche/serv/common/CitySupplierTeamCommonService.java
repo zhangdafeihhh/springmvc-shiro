@@ -1,18 +1,24 @@
 package com.zhuanche.serv.common;
 
+import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
+import com.zhuanche.entity.mdbcarmanage.CarRelateGroup;
+import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.request.DriverTeamRequest;
 import com.zhuanche.request.CommonRequest;
+import com.zhuanche.request.TeamGroupRequest;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
+import mapper.mdbcarmanage.ex.CarRelateTeamExMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -54,6 +60,83 @@ public class CitySupplierTeamCommonService {
     @Autowired
     private CarDriverTeamExMapper carDriverTeamExMapper;
 
+    /**
+     * @Desc: 处理车队关联司机中间表操作
+     * @param:
+     * @return:
+     * @Author: lunan
+     * @Date: 2018/8/31
+     */
+    public  <T> Set<String> dealDriverids(List srcList, Class<T> destClass){
+        if(srcList==null){
+            return null;
+        }
+        try{
+            Set<String> driverIds = new HashSet<>();
+            T param = destClass.newInstance();
+            if(param instanceof CarRelateGroup){
+                for(int i=0;i<srcList.size();i++ ){
+                    Object srcObj = srcList.get(i);
+                    CarRelateGroup data = new CarRelateGroup();
+                    BeanUtils.copyProperties(srcObj,data);
+                    driverIds.add(String.valueOf(data.getDriverId()));
+                }
+                return driverIds;
+            }else if(param instanceof CarRelateTeam){
+                for(int i=0;i<srcList.size();i++ ){
+                    Object srcObj = srcList.get(i);
+                    CarRelateTeam data = new CarRelateTeam();
+                    BeanUtils.copyProperties(srcObj,data);
+                    driverIds.add(String.valueOf(data.getDriverId()));
+                }
+                return driverIds;
+            }else if(param instanceof CarDriverTeam){
+                for(int i=0;i<srcList.size();i++ ){
+                    Object srcObj = srcList.get(i);
+                    CarDriverTeam data = new CarDriverTeam();
+                    BeanUtils.copyProperties(srcObj,data);
+                    driverIds.add(String.valueOf(data.getId()));
+                }
+                return driverIds;
+            }else if(param instanceof CarDriverInfoDTO){
+                for(int i=0;i<srcList.size();i++ ){
+                    Object srcObj = srcList.get(i);
+                    CarDriverInfoDTO data = new CarDriverInfoDTO();
+                    BeanUtils.copyProperties(srcObj,data);
+                    driverIds.add(String.valueOf(data.getDriverId()));
+                }
+                return driverIds;
+            }else{
+                return null;
+            }
+        }catch(Exception e){
+            logger.error("关联表分离driverid异常:{}",e);
+            return null;
+        }
+    }
+
+    /** 
+    * @Desc: pid查询车队下小组 
+    * @param:
+    * @return:  
+    * @Author: lunan
+    * @Date: 2018/9/3 
+    */ 
+    public List<CarDriverTeam> getTeamsByPid(Integer teamId){
+        if(Check.NuNObj(teamId)) {
+            return null;
+        }
+        try{
+            DriverTeamRequest driverTeamRequest = new DriverTeamRequest();
+            driverTeamRequest.setpId(teamId);
+            List<CarDriverTeam> carDriverTeams = carDriverTeamExMapper.queryForListByPid(driverTeamRequest);
+            return carDriverTeams;
+        }catch (Exception e){
+            logger.error("查询车队下小组异常:{}",e);
+            return null;
+        }
+    }
+
 
     /** 
     * @Desc: 处理包含数据权限和查询条件参数整合处理 
@@ -66,6 +149,29 @@ public class CitySupplierTeamCommonService {
         if(paramRequest == null){
             return null;
         }
+        //----------------------------------------------------------------------------------首先，如果是普通管理员，校验数据权限（cityId、supplierId、teamId）
+        //TODO 数据权限
+        Set<Integer> permOfCity        = new HashSet<Integer>();//普通管理员可以管理的所有城市ID
+        Set<Integer> permOfSupplier = new HashSet<Integer>();//普通管理员可以管理的所有供应商ID
+        Set<Integer> permOfTeam     = new HashSet<Integer>();//普通管理员可以管理的所有车队ID
+        if(WebSessionUtil.isSupperAdmin() == false) {//如果是普通管理员
+            permOfCity        = WebSessionUtil.getCurrentLoginUser().getCityIds();
+            permOfSupplier = WebSessionUtil.getCurrentLoginUser().getSupplierIds();
+            permOfTeam     = WebSessionUtil.getCurrentLoginUser().getTeamIds();
+            if( permOfCity.size()==0 || (StringUtils.isNotEmpty(paramRequest.getCityId())
+                    && permOfCity.contains(Integer.valueOf(paramRequest.getCityId()))==false)  ) {
+                return null;
+            }
+            if( permOfSupplier.size()==0 || (StringUtils.isNotEmpty(paramRequest.getSupplierId())
+                    && permOfSupplier.contains(Integer.valueOf(paramRequest.getSupplierId()))==false)   ) {
+                return null;
+            }
+            if( permOfTeam.size()==0 || (paramRequest.getTeamId() != null
+                    && permOfTeam.contains(Integer.valueOf(paramRequest.getTeamId())) == false )   ) {
+//				return LayUIPage.build("您没有查询此车队的权限！", 0, null);
+                return null;
+            }
+        }
         //A--------------------------------------------------------------------------------设置SQL查询参数
         Set<String> cityIds        = new HashSet<String>();
         Set<String> supplierIds = new HashSet<String>();
@@ -77,7 +183,7 @@ public class CitySupplierTeamCommonService {
             if( WebSessionUtil.isSupperAdmin() ) {
                 cityIds.clear();
             }else {
-                for(Integer cityid : paramRequest.getPermOfCity()) {
+                for(Integer cityid : permOfCity ) {
                     cityIds.add( String.valueOf(cityid)  );
                 }
             }
@@ -89,7 +195,7 @@ public class CitySupplierTeamCommonService {
             if( WebSessionUtil.isSupperAdmin() ) {
                 supplierIds.clear();
             }else {
-                for(Integer sid : paramRequest.getPermOfSupplier()) {
+                for(Integer sid : permOfSupplier) {
                     supplierIds.add( String.valueOf(sid)  );
                 }
             }
@@ -101,7 +207,7 @@ public class CitySupplierTeamCommonService {
             if( WebSessionUtil.isSupperAdmin() ) {
                 teamIds.clear();
             }else {
-                teamIds.addAll( paramRequest.getTeamIds() );
+                teamIds.addAll( permOfTeam );
             }
         }
         paramRequest.setCityIds(cityIds);

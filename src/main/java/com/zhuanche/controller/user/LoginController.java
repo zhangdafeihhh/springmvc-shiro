@@ -27,6 +27,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.zhuanche.common.cache.RedisCacheUtil;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -57,6 +60,8 @@ public class LoginController{
     private String loginpageUrl;  //前端UI登录页面
 	@Value("${homepage.url}")
 	private String homepageUrl; //前端UI首页页面
+	@Value("${login.checkMsgCode.switch}")
+	private String loginCheckMsgCodeSwitch = "ON";//登录时是否进行短信验证的开关
 	
 	private int msgcodeTimeoutMinutes = 1;
 	
@@ -74,6 +79,9 @@ public class LoginController{
 	/**通过用户名、密码，获取短信验证码**/
 	@RequestMapping("/getMsgCode")
 	@ResponseBody
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode=DataSourceMode.SLAVE )
+	} )
     public AjaxResponse getMsgCode( @Verify(param="username",rule="required") String username, @Verify(param="password",rule="required") String password ){
 		//A: 频率检查
 		String flag = RedisCacheUtil.get(CACHE_PREFIX_MSGCODE_CONTROL+username, String.class);
@@ -111,6 +119,9 @@ public class LoginController{
 	/**执行登录**/
 	@RequestMapping("/dologin")
 	@ResponseBody
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode=DataSourceMode.SLAVE )
+	} )
     public AjaxResponse dologin(HttpServletRequest request , HttpServletResponse response, 
     	@Verify(param="username",rule="required") String username, 
     	@Verify(param="password",rule="required") String password, 
@@ -138,13 +149,15 @@ public class LoginController{
 			return AjaxResponse.fail(RestErrorCode.USER_PASSWORD_WRONG) ;
 		}
 		//D: 查询验证码，并判断是否正确
-//		String  msgcodeInCache = RedisCacheUtil.get(CACHE_PREFIX_MSGCODE+username, String.class);
-//		if(msgcodeInCache==null) {
-//			return AjaxResponse.fail(RestErrorCode.MSG_CODE_INVALID) ;
-//		}
-//		if(!msgcodeInCache.equals(msgcode)) {
-//			return AjaxResponse.fail(RestErrorCode.MSG_CODE_WRONG) ;
-//		}
+		if("ON".equalsIgnoreCase(loginCheckMsgCodeSwitch)) {
+			String  msgcodeInCache = RedisCacheUtil.get(CACHE_PREFIX_MSGCODE+username, String.class);
+			if(msgcodeInCache==null) {
+				return AjaxResponse.fail(RestErrorCode.MSG_CODE_INVALID) ;
+			}
+			if(!msgcodeInCache.equals(msgcode)) {
+				return AjaxResponse.fail(RestErrorCode.MSG_CODE_WRONG) ;
+			}
+		}
 		//E: 用户状态
 		if(user.getStatus()!=null && user.getStatus().intValue()==100 ){
 			return AjaxResponse.fail(RestErrorCode.USER_INVALID) ;
@@ -216,6 +229,9 @@ public class LoginController{
 	@RequestMapping("/currentLoginUserInfo")
 	@ResponseBody
 	@SuppressWarnings("unchecked")
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode=DataSourceMode.SLAVE )
+	} )
     public AjaxResponse currentLoginUserInfo( String menuDataFormat ){
 		SSOLoginUser ssoLoginUser = WebSessionUtil.getCurrentLoginUser();
 		
@@ -264,8 +280,9 @@ public class LoginController{
 		
 		//五、配置信息
 		Map<String, Object > configs = new HashMap<String,Object>();
-		configs.put("mobileRegex", SaasConst.MOBILE_REGEX);       //手机号码正则式
+		configs.put("mobileRegex",  SaasConst.MOBILE_REGEX);       //手机号码正则式
 		configs.put("accountRegex", SaasConst.ACCOUNT_REGEX);  //账号的正则表达式
+		configs.put("emailRegex",    SaasConst.EMAIL_REGEX);         //电子邮箱的正则表达式
 		ajaxLoginUserDTO.setConfigs(configs);
 		return AjaxResponse.success( ajaxLoginUserDTO );
 	}

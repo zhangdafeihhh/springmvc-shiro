@@ -3,6 +3,7 @@ package com.zhuanche.shiro.session;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 
+import com.zhuanche.constants.SaasConst;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 /**当前登录用户 工具类**/
 public final class WebSessionUtil {
@@ -14,7 +15,8 @@ public final class WebSessionUtil {
 	/**是否为：车管后台-超级管理员**/
 	public static boolean isSupperAdmin() {
 		Subject subject = SecurityUtils.getSubject();
-		return subject.hasRole("car_manage_admin");
+		return subject.hasRole(SaasConst.SYSTEM_ROLE);
+//		return subject.hasRole("car_manage_admin");
 	}
 	
 	/**设置会话属性**/

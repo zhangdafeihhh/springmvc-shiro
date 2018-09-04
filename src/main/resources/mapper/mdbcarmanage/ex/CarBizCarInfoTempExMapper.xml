@@ -119,8 +119,7 @@
 		SELECT
 		car_id carId,
 		car.city_id cityId,
-		car.supplier_id
-		supplierId,
+		car.supplier_id supplierId,
 		car.driver_id driverid,
 		car.car_photograph imageUrl,
 		car.fuelType,

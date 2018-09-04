@@ -23,7 +23,7 @@ public class CarDriverTeam {
 
     private String remark;
 
-    private Boolean status;
+    private Integer status;//状态   0关闭 1启用
 
     private Integer pId;
 
@@ -117,11 +117,11 @@ public class CarDriverTeam {
         this.remark = remark == null ? null : remark.trim();
     }
 
-    public Boolean getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(Boolean status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

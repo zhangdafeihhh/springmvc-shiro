@@ -41,7 +41,7 @@
  		and account = #{account} 
     </if>
     <if test="userName!=null">
-    	and user_name like #{userName}
+    	and user_name like #{userName} ESCAPE '/' 
     </if>
     <if test="phone!=null">
     	and phone = #{phone}
