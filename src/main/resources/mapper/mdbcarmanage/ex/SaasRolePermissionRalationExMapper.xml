@@ -18,5 +18,9 @@
      (#{record.roleId,jdbcType=INTEGER}, #{record.permissionId,jdbcType=INTEGER})
     </foreach>
   </insert>
-
+  
+  <!-- 查询一个权限的所有角色ID -->
+  <select id="queryRoleIdsOfPermission" resultType="java.lang.Integer">
+  		select DISTINCT role_id from saas_role_permission_ralation where permission_id = #{permissionId}
+  </select>
 </mapper>

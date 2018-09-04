@@ -18,6 +18,7 @@ import com.zhuanche.dto.SaasRoleDTO;
 import com.zhuanche.entity.mdbcarmanage.SaasPermission;
 import com.zhuanche.entity.mdbcarmanage.SaasRole;
 import com.zhuanche.entity.mdbcarmanage.SaasRolePermissionRalation;
+import com.zhuanche.shiro.session.RedisSessionDAO;
 import com.zhuanche.util.BeanUtil;
 
 import mapper.mdbcarmanage.SaasRoleMapper;
@@ -36,6 +37,8 @@ public class RoleManagementService{
 	private SaasRolePermissionRalationExMapper saasRolePermissionRalationExMapper;
 	@Autowired
 	private SaasPermissionExMapper  saasPermissionExMapper;
+	@Autowired
+	private RedisSessionDAO              redisSessionDAO;
 	
 	/**一、增加一个角色**/
 	public AjaxResponse addSaasRole( SaasRole role ) {
@@ -66,6 +69,7 @@ public class RoleManagementService{
 		roleForUpdate.setRoleId(roleId);
 		roleForUpdate.setValid(false);
 		saasRoleMapper.updateByPrimaryKeySelective(roleForUpdate);
+		redisSessionDAO.clearRelativeSession(null, roleId, null);//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
 	
@@ -81,6 +85,7 @@ public class RoleManagementService{
 		roleForUpdate.setRoleId(roleId);
 		roleForUpdate.setValid(true);
 		saasRoleMapper.updateByPrimaryKeySelective(roleForUpdate);
+		redisSessionDAO.clearRelativeSession(null, roleId, null);//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
 
@@ -104,6 +109,7 @@ public class RoleManagementService{
 		}
 		//执行
 		saasRoleMapper.updateByPrimaryKeySelective(newrole);
+		redisSessionDAO.clearRelativeSession(null, newrole.getRoleId(), null);//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
 	
@@ -186,6 +192,7 @@ public class RoleManagementService{
 			}
 			saasRolePermissionRalationExMapper.insertBatch(records);
 		}
+		redisSessionDAO.clearRelativeSession(null, roleId , null);//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
 	

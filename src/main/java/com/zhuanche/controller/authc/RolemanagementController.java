@@ -24,8 +24,8 @@ public class RolemanagementController{
 //	@RequiresPermissions(value = { "ADD_SAAS_ROLE" } )
 	public AjaxResponse addSaasRole( @Verify(param="roleCode",rule="required") String roleCode,  @Verify(param="roleName",rule="required") String roleName) {
 		SaasRole role = new SaasRole();
-		role.setRoleCode(roleCode);
-		role.setRoleName(roleName);
+		role.setRoleCode(roleCode.trim());
+		role.setRoleName(roleName.trim());
 		role.setValid(true);
 		return roleManagementService.addSaasRole(role);
 	}
@@ -50,8 +50,8 @@ public class RolemanagementController{
 	public 	AjaxResponse changeRole( @Verify(param="roleId",rule="required|min(1)") Integer roleId , @Verify(param="roleCode",rule="required")  String roleCode,  @Verify(param="roleName",rule="required") String roleName ) {
 		SaasRole roleForupdate = new SaasRole();
 		roleForupdate.setRoleId(roleId);
-		roleForupdate.setRoleCode(roleCode);
-		roleForupdate.setRoleName(roleName);
+		roleForupdate.setRoleCode(roleCode.trim());
+		roleForupdate.setRoleName(roleName.trim());
 		return roleManagementService.changeRole(roleForupdate);
 	}
 

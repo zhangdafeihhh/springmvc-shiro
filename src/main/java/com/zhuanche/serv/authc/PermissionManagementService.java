@@ -11,6 +11,7 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constants.SaasConst;
 import com.zhuanche.dto.SaasPermissionDTO;
 import com.zhuanche.entity.mdbcarmanage.SaasPermission;
+import com.zhuanche.shiro.session.RedisSessionDAO;
 import com.zhuanche.util.BeanUtil;
 
 import mapper.mdbcarmanage.SaasPermissionMapper;
@@ -23,6 +24,8 @@ public class PermissionManagementService{
 	private SaasPermissionMapper     saasPermissionMapper;
 	@Autowired
 	private SaasPermissionExMapper  saasPermissionExMapper;
+	@Autowired
+	private RedisSessionDAO              redisSessionDAO;
 	
 	/**一、增加一个权限**/
 	public AjaxResponse addSaasPermission( SaasPermission pemission ) {
@@ -71,6 +74,7 @@ public class PermissionManagementService{
 		pemissionForUpdate.setPermissionId(permissionId);
 		pemissionForUpdate.setValid(false);
 		saasPermissionMapper.updateByPrimaryKeySelective(pemissionForUpdate);
+		redisSessionDAO.clearRelativeSession(permissionId, null, null);//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
 	
@@ -94,6 +98,7 @@ public class PermissionManagementService{
 		pemissionForUpdate.setPermissionId(permissionId);
 		pemissionForUpdate.setValid( true );
 		saasPermissionMapper.updateByPrimaryKeySelective(pemissionForUpdate);
+		redisSessionDAO.clearRelativeSession(permissionId, null, null);//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
 
@@ -124,6 +129,7 @@ public class PermissionManagementService{
 		}
 		pemission.setParentPermissionId( null );
 	    saasPermissionMapper.updateByPrimaryKeySelective( pemission );
+		redisSessionDAO.clearRelativeSession(pemission.getPermissionId(), null, null);//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
 	

@@ -18,6 +18,7 @@ import com.zhuanche.dto.CarAdmUserDTO;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 import com.zhuanche.entity.mdbcarmanage.SaasUserRoleRalation;
 import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.session.RedisSessionDAO;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.PasswordUtil;
@@ -39,6 +40,8 @@ public class UserManagementService{
 	private CarAdmUserMapper      carAdmUserMapper;
 	@Autowired
 	private CarAdmUserExMapper  carAdmUserExMapper;
+	@Autowired
+	private RedisSessionDAO          redisSessionDAO;
 	
 	/**一、增加一个用户**/
 	public AjaxResponse addUser( CarAdmUser user ) {
@@ -84,6 +87,7 @@ public class UserManagementService{
 		userForUpdate.setUserId(userId);
 		userForUpdate.setStatus(100);
 		carAdmUserMapper.updateByPrimaryKeySelective(userForUpdate);
+		redisSessionDAO.clearRelativeSession(null, null , userId);//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
 	
@@ -99,6 +103,7 @@ public class UserManagementService{
 		userForUpdate.setUserId(userId);
 		userForUpdate.setStatus(200);
 		carAdmUserMapper.updateByPrimaryKeySelective(userForUpdate);
+		redisSessionDAO.clearRelativeSession(null, null , userId);//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
 
@@ -124,6 +129,7 @@ public class UserManagementService{
 		}
 		//执行
 		carAdmUserMapper.updateByPrimaryKeySelective(newUser);
+		redisSessionDAO.clearRelativeSession(null, null , newUser.getUserId() );//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
 	
@@ -148,6 +154,7 @@ public class UserManagementService{
 			}
 			saasUserRoleRalationExMapper.insertBatch(records);
 		}
+		redisSessionDAO.clearRelativeSession(null, null , userId );//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
 	
@@ -207,6 +214,7 @@ public class UserManagementService{
 		CarAdmUser userForupdate = new CarAdmUser();
 		userForupdate.setUserId(userId);
 		userForupdate.setPassword(  PasswordUtil.md5(SaasConst.INITIAL_PASSWORD, rawuser.getAccount()) );
+		redisSessionDAO.clearRelativeSession(null, null , userId );//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
 	

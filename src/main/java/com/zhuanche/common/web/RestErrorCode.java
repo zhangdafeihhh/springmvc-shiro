@@ -29,10 +29,10 @@ public final class RestErrorCode{
 	public static final int HTTP_NOT_FOUND                   = 404;
 	@ResultMessage("系统内部发生错误")
 	public static final int HTTP_SYSTEM_ERROR              = 500;
+    @ResultMessage("会话已失效，请重新登录")
+    public static final int HTTP_INVALID_SESSION           = 997;
 	@ResultMessage("请求参数校验不通过")
 	public static final int HTTP_PARAM_INVALID              = 998;
-    @ResultMessage("没有查询到结果")
-    public static final int NOT_FOUND_RESULT                = 997;
 	@ResultMessage("未知错误")
 	public static final int UNKNOWN_ERROR                   = 999;
 
@@ -116,6 +116,9 @@ public final class RestErrorCode{
 	@ResultMessage("车辆信息不存在")
 	public static final int BUS_NOT_EXIST                                               = 1100;
 
+	
+	@ResultMessage("结果不存在")
+	public static final int NOT_FOUND_RESULT                                               = 1101;
 	
 	//---------------------------------------------------------------------------------------------------------------------------------------------
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);

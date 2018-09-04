@@ -18,4 +18,12 @@
     </foreach>
   </insert>
 
+
+  <!-- 查询多个角色所对应的用户ID -->
+  <select id="queryUserIdsOfRole" resultType="java.lang.Integer">
+  		select DISTINCT user_id from saas_user_role_ralation where role_id in 
+  		<foreach collection="roleIds" open="(" close=")" separator="," item="rid">
+  			#{rid}
+  		</foreach>
+  </select>
 </mapper>
