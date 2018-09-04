@@ -25,47 +25,41 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Maps;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
-import com.zhuanche.dto.rentcar.CancelOrderDTO;
+import com.zhuanche.dto.rentcar.DriverEvaluateDTO;
 import com.zhuanche.http.HttpClientUtil;
-import com.zhuanche.http.PostRequest;
-import com.zhuanche.serv.statisticalAnalysis.CancelOrderService;
+import com.zhuanche.serv.statisticalAnalysis.DriverEvaluateService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 
-
 /**
  * 
- * ClassName: 取消订单分析 
+ * ClassName: 对司机评级详情分析 
  * date: 2018年9月01日 下午7:19:45 
  * @author jiadongdong
- * allianceAssessment
+ *
  */
 @Controller
-@RequestMapping("/cancelOrder")
-public class CancelOrderController{
-	 private static final Logger logger = LoggerFactory.getLogger(CancelOrderController.class);
+@RequestMapping("/driverEvaluate")
+public class DriverEvaluateController{
+	private static final Logger logger = LoggerFactory.getLogger(DriverEvaluateController.class);
 	 
 	 @Value("${saas.bigdata.api.url}")
 	 String  saasBigdataApiUrl;
 	 
 	 @Autowired
-	 private CancelOrderService cancelOrderService;
+	 private DriverEvaluateService driverEvaluateService;
 		 /**
-		    * 查询取消订单列表
-		 	* @param 查询日期	queryDate
+		    * 查询对司机评级详情分析 列表
 		    * @param queryDate	查询日期
-			* @param driverCityId	司机所属城市ID
-			* @param allianceId	加盟商ID
-			* @param motorcadeId	车队ID
-			* @param driverTypeId	司机类型ID
-			* @param channelId	下单渠道ID
-			* @param orderVehicleTypeId	预约车型ID
-			* @param productTypeId	产品类型ID
-			* @param cancelDurationTypeId	取消时长分类ID
+			* @param orderCityId 订单城市ID	
+			* @param driverTypeId 司机类型ID	
+			* @param allianceId 加盟商ID	
+			* @param motorcadeId 车队ID	
+			* @param driverScore 司机评价分数	
+			* @param appScore APP评价分数	
 			* @param pageNo	页号
 			* @param pageSize	每页记录数
 			* @param visibleCityIds	可见城市ID
@@ -73,31 +67,27 @@ public class CancelOrderController{
 			* @param visibleMotorcadeIds	可见车队ID
 		    * @return
 		  */
-	    @RequestMapping(value = "/queryCancelOrderData", method = { RequestMethod.POST,RequestMethod.GET })
-	    public AjaxResponse queryCancelOrderData(
-	    										  String driverCityId,
-	    										  String allianceId,
+	    @RequestMapping(value = "/queryDriverEvaluateData", method = { RequestMethod.POST,RequestMethod.GET })
+	    public AjaxResponse queryDriverEvaluateData(
+	    										  String orderCityId,
+	    										  String driverTypeId,
+	                                              String allianceId,
 	                                              String motorcadeId,
-	                                              String driverTypeId,
-	                                              String channelId,
-	                                              String orderVehicleTypeId,
-	                                              String productTypeId,
-	                                              String cancelDurationTypeId,
+	                                              String driverScore,
+	                                              String appScore,
 	                                              @Verify(param = "queryDate",rule = "required") String queryDate,
 	                                              @Verify(param = "pageNo",rule = "required") Integer pageNo,
 	                                              @Verify(param = "pageSize",rule = "required") Integer pageSize
 	                                              ){
-	        logger.info("【运营管理-统计分析】取消订单列表数据:queryCancelOrderData");
+	        logger.info("【运营管理-统计分析】对司机评级详情分析 列表数据:queryDriverEvaluateData");
 	        Map<String, Object> paramMap = new HashMap<String, Object>();
-	        paramMap.put("driverCityId", driverCityId);//司机所属城市ID
+	        paramMap.put("orderCityId", orderCityId);//订单城市ID	
 	        paramMap.put("allianceId", allianceId);//加盟商ID
 	        paramMap.put("motorcadeId", motorcadeId);//车队ID
 	        paramMap.put("driverTypeId", driverTypeId);//司机类型ID
-	        paramMap.put("channelId", channelId);//下单渠道ID
-	        paramMap.put("orderVehicleTypeId", orderVehicleTypeId);//预约车型ID
-	        paramMap.put("productTypeId", productTypeId);//产品类型ID
-	        paramMap.put("cancelDurationTypeId", cancelDurationTypeId);//取消时长分类ID
-	        paramMap.put("queryDate", queryDate);//查询日期
+	        paramMap.put("driverScore", driverScore);//司机评价分数	
+	        paramMap.put("appScore", appScore);//APP评价分数	
+			paramMap.put("queryDate", queryDate);//查询日期
 	        // 数据权限设置
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
 	        Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
@@ -120,53 +110,46 @@ public class CancelOrderController{
 	        if(null != pageSize && pageSize > 0)
 	        	paramMap.put("pageSize", pageSize);//每页记录数
 	        
-	        AjaxResponse result = parseResult(saasBigdataApiUrl+"/cancelOrderDetail/queryList",paramMap);
+	        AjaxResponse result = parseResult(saasBigdataApiUrl+"/driverEvaluateDetail/queryList",paramMap);
 	    	// 从大数据仓库获取统计数据
 	        return result;
 	    }
 	    
 	    /**
-		    * 导出取消订单列表
-		 	* @param 查询日期	queryDate
+		    * 导出对司机评级详情分析 
 		    * @param queryDate	查询日期
-			* @param driverCityId	司机所属城市ID
-			* @param allianceId	加盟商ID
-			* @param motorcadeId	车队ID
-			* @param driverTypeId	司机类型ID
-			* @param channelId	下单渠道ID
-			* @param orderVehicleTypeId	预约车型ID
-			* @param productTypeId	产品类型ID
-			* @param cancelDurationTypeId	取消时长分类ID
+			* @param orderCityId 订单城市ID	
+			* @param driverTypeId 司机类型ID	
+			* @param allianceId 加盟商ID	
+			* @param motorcadeId 车队ID	
+			* @param driverScore 司机评价分数	
+			* @param appScore APP评价分数	
 			* @param visibleCityIds	可见城市ID
 			* @param visibleAllianceIds	可见加盟商ID
 			* @param visibleMotorcadeIds	可见车队ID
 		    * @return
 		  */
-   	@RequestMapping(value = "/exportCancelOrderData", method = { RequestMethod.POST,RequestMethod.GET })
-	public void exportCancelOrderData( 
-											String driverCityId,
-											String allianceId,
-								            String motorcadeId,
-								            String driverTypeId,
-								            String channelId,
-								            String orderVehicleTypeId,
-								            String productTypeId,
-								            String cancelDurationTypeId,
-								            @Verify(param = "queryDate",rule = "required") String queryDate,
-                                            HttpServletRequest request,
-                                            HttpServletResponse response){
-	        logger.info("【运营管理-统计分析】导出,导出取消订单列表数据:exportCancelOrderData");
-       try {
-    	    Map<String, Object> paramMap = new HashMap<String, Object>();
-	        paramMap.put("driverCityId", driverCityId);//司机所属城市ID
+  	@RequestMapping(value = "/exportDriverEvaluateData", method = { RequestMethod.POST,RequestMethod.GET })
+	public void exportDriverEvaluateData( 
+										String orderCityId,
+										String driverTypeId,
+							            String allianceId,
+							            String motorcadeId,
+							            String driverScore,
+							            String appScore,
+							            @Verify(param = "queryDate",rule = "required") String queryDate,
+	                                    HttpServletRequest request,
+	                                    HttpServletResponse response){
+	        logger.info("【运营管理-统计分析】导出,导出对司机评级详情列表数据:exportCancelOrderData");
+      try {
+    	  Map<String, Object> paramMap = new HashMap<String, Object>();
+	        paramMap.put("orderCityId", orderCityId);//订单城市ID	
 	        paramMap.put("allianceId", allianceId);//加盟商ID
 	        paramMap.put("motorcadeId", motorcadeId);//车队ID
 	        paramMap.put("driverTypeId", driverTypeId);//司机类型ID
-	        paramMap.put("channelId", channelId);//下单渠道ID
-	        paramMap.put("orderVehicleTypeId", orderVehicleTypeId);//预约车型ID
-	        paramMap.put("productTypeId", productTypeId);//产品类型ID
-	        paramMap.put("cancelDurationTypeId", cancelDurationTypeId);//取消时长分类ID
-	        paramMap.put("queryDate", queryDate);//查询日期
+	        paramMap.put("driverScore", driverScore);//司机评价分数	
+	        paramMap.put("appScore", appScore);//APP评价分数	
+			paramMap.put("queryDate", queryDate);//查询日期
 	        // 数据权限设置
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
 	        Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
@@ -179,37 +162,96 @@ public class CancelOrderController{
 			// 可见城市
 			String[] visibleCityIds = setToArray(cityIds);
 			if(null == visibleAllianceIds || null == visibleMotocadeIds || visibleCityIds == null ){
-				//return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+				 // return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 			}
 	        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
 	        paramMap.put("visibleMotorcardIds", visibleMotocadeIds); // 可见车队ID
 	        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
-	        String resultStr = parseResultStr(saasBigdataApiUrl+"/cancelOrderDetail/queryList",paramMap);
-	    	
+	        String resultStr = parseResultStr(saasBigdataApiUrl+"/driverEvaluateDetail/download",paramMap);
 	        //调用接口
-	        List<CancelOrderDTO> list = JSONObject.parseArray(resultStr, CancelOrderDTO.class);
+	        List<DriverEvaluateDTO> list = JSONObject.parseArray(resultStr, DriverEvaluateDTO.class);
 	        
-           @SuppressWarnings("deprecation")
-           Workbook wb = cancelOrderService.exportExcelCancelOrder(list,request.getRealPath("/")+File.separator+"template"+File.separator+"cancelOrder_info.xlsx");
-           exportExcelFromTemplet(request, response, wb, new String("完成订单详情".getBytes("gb2312"), "iso8859-1"));
-       } catch (IOException e) {
-           e.printStackTrace();
-       } catch (Exception e) {
-           e.printStackTrace();
-       }
-   }
+          @SuppressWarnings("deprecation")
+          Workbook wb = driverEvaluateService.exportExcelDriverEvaluate(list,request.getRealPath("/")+File.separator+"template"+File.separator+"driverEvaluate_info.xlsx");
+          exportExcelFromTemplet(request, response, wb, new String("司机评级详情分析".getBytes("gb2312"), "iso8859-1"));
+      } catch (IOException e) {
+          e.printStackTrace();
+      } catch (Exception e) {
+          e.printStackTrace();
+      }
+  }
 
-   	
-    public void exportExcelFromTemplet(HttpServletRequest request, HttpServletResponse response, Workbook wb, String fileName) throws IOException {
-        if(StringUtils.isEmpty(fileName)) {
-            fileName = "exportExcel";
-        }
-        response.setHeader("Content-Disposition","attachment;filename="+fileName+".xlsx");//指定下载的文件名
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        ServletOutputStream os =  response.getOutputStream();
-        wb.write(os);
-        os.close();
-    }
+  
+	 /**
+	    * 查询对司机评级详情分析 明细
+	    * @param queryDate	查询日期
+		* @param orderCityId 订单城市ID	
+		* @param driverTypeId 司机类型ID	
+		* @param allianceId 加盟商ID	
+		* @param motorcadeId 车队ID	
+		* @param driverScore 司机评价分数	
+		* @param appScore APP评价分数	
+		* @param visibleCityIds	可见城市ID
+		* @param visibleAllianceIds	可见加盟商ID
+		* @param visibleMotorcadeIds	可见车队ID
+	    * @return
+	  */
+ @RequestMapping(value = "/queryDriverEvaluateDetailData", method = { RequestMethod.POST,RequestMethod.GET })
+ public AjaxResponse queryDriverEvaluateDetailData(
+ 										   String orderCityId,
+ 										   String driverTypeId,
+                                           String allianceId,
+                                           String motorcadeId,
+                                           String driverScore,
+                                           String appScore,
+                                           @Verify(param = "queryDate",rule = "required") String queryDate){
+     logger.info("【运营管理-统计分析】对司机评级详情分析 明细数据:queryDriverEvaluateDetailData");
+     Map<String, Object> paramMap = new HashMap<String, Object>();
+     paramMap.put("orderCityId", orderCityId);//订单城市ID	
+     paramMap.put("allianceId", allianceId);//加盟商ID
+     paramMap.put("motorcadeId", motorcadeId);//车队ID
+     paramMap.put("driverTypeId", driverTypeId);//司机类型ID
+     paramMap.put("driverScore", driverScore);//司机评价分数	
+     paramMap.put("appScore", appScore);//APP评价分数	
+	 paramMap.put("queryDate", queryDate);//查询日期
+     // 数据权限设置
+	 SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
+     Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
+     Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
+     Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
+     // 供应商信息
+		String[] visibleAllianceIds = setToArray(suppliers);
+		// 车队信息
+		String[] visibleMotocadeIds = setToArray(teamIds);
+		// 可见城市
+		String[] visibleCityIds = setToArray(cityIds);
+		if(null == visibleAllianceIds || null == visibleMotocadeIds || visibleCityIds == null ){
+			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+		}
+     paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
+     paramMap.put("visibleMotorcardIds", visibleMotocadeIds); // 可见车队ID
+     paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
+ 	 paramMap.put("pageNo", "1");//页号
+ 	 paramMap.put("pageSize", "1");//每页记录数
+     
+     AjaxResponse result = parseResult(saasBigdataApiUrl+"/driverEvaluateDetail/queryList",paramMap);
+ 	// 从大数据仓库获取统计数据
+     return result;
+ }
+ 
+
+  	
+  	
+   public void exportExcelFromTemplet(HttpServletRequest request, HttpServletResponse response, Workbook wb, String fileName) throws IOException {
+       if(StringUtils.isEmpty(fileName)) {
+           fileName = "exportExcel";
+       }
+       response.setHeader("Content-Disposition","attachment;filename="+fileName+".xlsx");//指定下载的文件名
+       response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+       ServletOutputStream os =  response.getOutputStream();
+       wb.write(os);
+       os.close();
+   }
 	 
 	/** 将Set<Integer>集合转成String[] **/
 	private String[] setToArray(Set<Integer> set){
@@ -238,7 +280,6 @@ public class CancelOrderController{
 				return AjaxResponse.fail(Integer.parseInt(job.getString("code")), job.getString("message"));
 			}
 			JSONObject jsonResult = JSON.parseObject(job.getString("result"));
-			logger.info("excel--" + job.getString("result"));
 			//JSONArray resultArray = JSON.parseArray(jsonResult.getString("recordList"));
 			return AjaxResponse.success(jsonResult);
 		} catch (HttpException e) {
@@ -268,42 +309,5 @@ public class CancelOrderController{
 			return null;
 		}
 	}
-	
-	public static void main(String[] args) {
-		Map<String, Object> paramMap = Maps.newHashMap();
-		paramMap.put("queryDate", "2018-08-28");
-		paramMap.put("endDate", "2018-08-28");
-		paramMap.put("allianceId", "1");
-		paramMap.put("motorcadeId", "2");
-		paramMap.put("driverTypeId", "3");
-		paramMap.put("channelId", "2");
-		paramMap.put("orderVehicleTypeId", "1");
-		paramMap.put("productTypeId", "2");
-		paramMap.put("cancelDurationTypeId", "1");
-		paramMap.put("visibleCityIds", new String[]{"1", "3", "5"}); //可见城市ID
-		paramMap.put("visibleAllianceIds", new String[]{"1", "3", "4"});
-		paramMap.put("visibleMotorcadeIds", new String[]{"2", "4"});
-        
-        
-		String jsonString = JSON.toJSONString(paramMap);
-		System.out.println(jsonString);
-		try {
-			// AjaxResponse result = parseResult("http://test-inside-bigdata-saas-data.01zhuanche.com/cancelOrderDetail/download",paramMap);
-			
-			//String result = HttpClientUtil.buildPostRequest("http://test-inside-bigdata-saas-data.01zhuanche.com/cancelOrderDetail/download").execute();
-			String result =  HttpClientUtil.buildPostRequest("http://test-inside-bigdata-saas-data.01zhuanche.com/cancelOrderDetail/download")
-					.setBody(jsonString).addHeader("encoding", "UTF-8").addHeader("content-type", ContentType.APPLICATION_JSON).execute();
-			//JSONObject job = JSON.parseObject(result);
-			
-			String[] a  = result.split(",");
-			System.out.println("---"+a.length);
-			//AjaxResponse result = parseResult("http://test-inside-bigdata-saas-data.01zhuanche.com/cancelOrderDetail/queryList",paramMap);
-			//.setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute()
-			System.out.println("---"+result);
-			//System.out.println("---"+result.getData());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	 
+
 }

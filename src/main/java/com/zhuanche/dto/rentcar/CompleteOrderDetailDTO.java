@@ -7,7 +7,7 @@ import java.io.Serializable;
  * @author jiadongdong
  *
  */
-public class CompleteOrderDetailsDTO implements Serializable{
+public class CompleteOrderDetailDTO implements Serializable{
 	
 	private static final long serialVersionUID = -1373760761780841082L;
     

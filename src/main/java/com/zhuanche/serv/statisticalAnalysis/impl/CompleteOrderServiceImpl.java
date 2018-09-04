@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.HttpException;
+import org.apache.http.entity.ContentType;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -15,82 +17,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.util.StringUtil;
+import com.google.common.collect.Maps;
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.dto.rentcar.CompleteOrderDTO;
+import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.serv.statisticalAnalysis.CompleteOrderService;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.JsonUtil;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-
+@Service
 public class CompleteOrderServiceImpl implements CompleteOrderService {
 	private static final Logger logger = LoggerFactory.getLogger(CompleteOrderServiceImpl.class);
 	 
-	/**
-	 * 待修改 大数据URL
-	 */
-    @Autowired
-    @Qualifier("saasBigdataApiTemplate")
-    private MyRestTemplate saasBigdataApiTemplate;
-    
-	@Override
-	public Map<String,Object> queryForPageObject(Map<String, Object> paramMap) {
-		Map<String,Object> resutlMap = new HashMap<String,Object>();
-		List<CompleteOrderDTO> list = new ArrayList<CompleteOrderDTO>();
-		paramMap.put("removeBy", WebSessionUtil.getCurrentLoginUser().getId());
-		paramMap.put("removeName", WebSessionUtil.getCurrentLoginUser().getLoginName());
-        String url = "/CompleteOrderDTODetail/queryList";
-        //String reqUrl = crowdDataUrl+API_CROWD_COUPON + "?mobile=" + mobile + "&crowdIds=" + crowdIds;
-        // 调接口大数据接口
-        String jsonResultStr = executeMassDataSystemService(url,paramMap);
-    	if(!StringUtil.isEmpty(jsonResultStr)){
-    		Map map = JsonUtil.jsonToMap(jsonResultStr);
-			JSONArray jsonRecordList = JSONArray.fromObject(map.get("recordList"));  
-        	list = (List<CompleteOrderDTO>)JSONArray.toCollection(jsonRecordList, CompleteOrderDTO.class);  
-        	Integer total = (Integer)map.get("total");
-        	resutlMap.put("list", list);
-        	resutlMap.put("total", total);
-        	return resutlMap;
-    	}
-        return resutlMap;
-	}
-
-	/**
-	 * 调用大数据API
-	 * 
-	 * @param url
-	 *            请求地址
-	 * @param paramMap
-	 *            请求参数
-	 * @return
-	 */
-	private String executeMassDataSystemService(String url, Map<String, Object> paramMap) {
-		Map<String, Object> result = new HashMap<String, Object>();
-		try {
-			result = saasBigdataApiTemplate.postForObject(url,JSONObject.class, paramMap);
-			if (result!=null) {
-				Integer code = (Integer)result.get("code");
-				if(code == 0){
-					return String.valueOf(result.get("result"));
-				}else if(code == -1){
-					String message  = String.valueOf(result.get("message"));
-					logger.error("请求大数据接口异常，url:{" + url + "},message:{"+message+"},paramMap:{" + paramMap
-							+ "}");
-				}else{
-					logger.error("请求大数据接口异常,url:{" + url+ "},paramMap:{" + paramMap + "}");
-				}
-			}
-			return null;
-		} catch (Exception e) {
-			logger.error("请求大数据接口异常，e:{" + e.getMessage() + "},url:{" + url
-					+ "},paramMap:{" + paramMap + "}");
-			e.printStackTrace();
-		}
-		return null;
-	}
+     
 	
-	
+	 
 	
 	@Override
 	public Workbook exportExcelCompleteOrder(List<CompleteOrderDTO> list, String path) throws Exception {
