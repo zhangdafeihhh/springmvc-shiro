@@ -31,8 +31,11 @@ public final class RestErrorCode{
 	public static final int HTTP_SYSTEM_ERROR              = 500;
 	@ResultMessage("请求参数校验不通过")
 	public static final int HTTP_PARAM_INVALID              = 998;
+    @ResultMessage("没有查询到结果")
+    public static final int NOT_FOUND_RESULT                = 997;
 	@ResultMessage("未知错误")
 	public static final int UNKNOWN_ERROR                   = 999;
+
 	
 	//-----------------------------------------------用户
 	@ResultMessage("获取验证码太频繁")
@@ -67,9 +70,9 @@ public final class RestErrorCode{
 	public static final int PERMISSION_ENABLE_CANT                     = 10006;
 	@ResultMessage("{0}为系统预置权限，不能禁用、修改")
 	public static final int SYSTEM_PERMISSION_CANOT_CHANGE  = 10007;
-	
 
-	
+
+
 
 
 	
