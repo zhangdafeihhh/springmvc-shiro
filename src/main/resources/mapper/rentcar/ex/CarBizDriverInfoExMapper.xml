@@ -95,23 +95,18 @@
     <result column="house_hold_register_permanent" property="houseHoldRegisterPermanent" jdbcType="VARCHAR" />
     <result column="is_upload_card" property="isUploadCard" jdbcType="INTEGER" />
     <result column="is_must_confirmation" property="isMustConfirmation" jdbcType="INTEGER" />
+    <result column="english_name" property="englishName" jdbcType="VARCHAR" />
     <result column="contract_type" property="contractType" jdbcType="VARCHAR" />
     <result column="contract_no" property="contractNo" jdbcType="VARCHAR" />
     <result column="contract_file" property="contractFile" jdbcType="VARCHAR" />
     <result column="cooperation_type" property="cooperationType" jdbcType="TINYINT" />
     <result column="account_type" property="accountType" jdbcType="INTEGER" />
     <result column="group_id" property="groupId" jdbcType="INTEGER" />
-  </resultMap>
-  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizDriverInfo" extends="BaseResultMap" >
-    <result column="english_name" property="englishName" jdbcType="VARCHAR" />
-    <result column="contract_type" property="contractType" jdbcType="VARCHAR" />
-    <result column="contract_no" property="contractNo" jdbcType="VARCHAR" />
-    <result column="contract_file" property="contractFile" jdbcType="VARCHAR" />
-    <result column="cooperation_type" property="cooperationType" jdbcType="INTEGER" />
-    <result column="account_type" property="accountType" jdbcType="INTEGER" />
-    <result column="group_id" property="groupId" jdbcType="INTEGER" />
     <result column="is_two_shifts" property="isTwoShifts" jdbcType="INTEGER" />
-    <result column="is_image" property="isImage" jdbcType="INTEGER" />
+    <result column="is_image" property="isImage" jdbcType="TINYINT" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.dto.rentcar.CarBizDriverInfoDTO" extends="BaseResultMap" >
+    <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     driver_id, password, phone, gender, name, supplier_id, age, current_address, emergency_contact_person, 
@@ -324,17 +319,7 @@
       </if>
     </trim>
   </sql>
-
   <select id="queryDriverList" resultMap="ResultMapWithBLOBs" >
-    select
-    <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
-    from car_biz_driver_info
-    <include refid="allBaseColumnWhereList"/>
-    order by create_date desc
-  </select>
-  <select id="queryDriverListNoLimit" resultMap="ResultMapWithBLOBs" >
     select
     <include refid="Base_Column_List" />
     ,
@@ -1312,4 +1297,42 @@
     from car_biz_driver_info
     where license_plates= #{licensePlates}
   </select>
+  <!-- 解绑司机信用卡，更新 -->
+  <update id="updateDriverCardInfo" parameterType="java.util.Map">
+    UPDATE car_biz_driver_info
+    SET name=name, update_date = now()
+    <if test="quickpayCustomerid!=null">
+      ,quickpay_customerid = #{quickpayCustomerid}
+    </if>
+    <if test="creditOpenAccountBank!=null">
+      ,credit_open_account_bank = #{creditOpenAccountBank}
+    </if>
+    <if test="shortCardNo!=null">
+      ,storable_card_no = #{shortCardNo}
+    </if>
+    <if test="isBindingCreditCard!=null">
+      ,is_binding_credit_card = #{isBindingCreditCard}
+    </if>
+    <if test="creditCardNo!=null">
+      ,credit_card_no = #{creditCardNo}
+    </if>
+    <if test="CVN2!=null">
+      ,credit_CVN2 = #{CVN2}
+    </if>
+    <if test="updateBy!=null and updateBy!=''">
+      ,update_by = #{updateBy}
+    </if>
+    <if test="expireDate!=null">
+      ,credit_card_period_of_validity = #{expireDate}
+    </if>
+    <if test="bindTime!=null">
+      ,credit_bind_date = #{bindTime}
+    </if>
+    WHERE driver_id = #{driverId}
+  </update>
+  <update id="updateDriverCustomerId" parameterType="java.util.Map">
+    UPDATE car_biz_driver_info
+    SET uickpay_customerid = #{quickpayCustomerID}
+    WHERE driver_id = #{driverID}
+  </update>
 </mapper>

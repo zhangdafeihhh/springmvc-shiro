@@ -80,7 +80,19 @@
     </if>
 	order by CITY, id
   </select>
-  
-  
+
+    <select id="queryTeamNameAndGroupNameByDriverId" parameterType="java.lang.Integer" resultType="java.util.Map">
+        SELECT
+			rt.driver_id driverId,
+			rt.team_id teamId,
+			dt.team_name teamName,
+			rg.group_id teamGroupId,
+			dtm.team_name teamGroupName
+		FROM car_relate_team rt
+		LEFT JOIN car_relate_group rg ON rg.driver_id=rt.driver_id
+		LEFT JOIN car_driver_team dt  ON rt.team_id=dt.id
+		LEFT JOIN car_driver_team dtm ON rg.group_id=dtm.id
+		WHERE rt.driver_id = #{driverId}
+    </select>
   
 </mapper>

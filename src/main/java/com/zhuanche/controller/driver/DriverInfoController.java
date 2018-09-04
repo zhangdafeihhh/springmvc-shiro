@@ -65,9 +65,10 @@ public class DriverInfoController {
      * @param pageSize 取N条，默认20
      * @return
      */
+    @ResponseBody
     @RequestMapping(value = "/findDriverList")
     @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
     public AjaxResponse findDriverList(String name, String phone, String licensePlates, Integer status, Integer cityId, Integer supplierId,
             Integer teamId, Integer teamGroupId, Integer groupId, Integer cooperationType, String imei, String idCardNo, Integer isImage,
@@ -131,9 +132,10 @@ public class DriverInfoController {
      * @param isImage 是否维护形象
      * @return
      */
+    @ResponseBody
     @RequestMapping(value = "/findDriverAllList")
     @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
     public AjaxResponse findDriverAllList(String name, String phone, String licensePlates, Integer status, Integer cityId, Integer supplierId,
          Integer teamId, Integer teamGroupId, Integer groupId, Integer cooperationType, String imei, String idCardNo, Integer isImage) {
@@ -171,7 +173,7 @@ public class DriverInfoController {
     }
 
     /**
-     * 司机信息列表查询（无分页）
+     * 司机信息列表查询导出
      * @param name 司机姓名
      * @param phone 司机手机号
      * @param licensePlates 车牌号
@@ -187,9 +189,10 @@ public class DriverInfoController {
      * @param isImage 是否维护形象
      * @return
      */
+    @ResponseBody
     @RequestMapping(value = "/exportDriverList")
     @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
     public AjaxResponse exportDriverList(String name, String phone, String licensePlates, Integer status, Integer cityId, Integer supplierId,
                                          Integer teamId, Integer teamGroupId, Integer groupId, Integer cooperationType,
@@ -241,9 +244,10 @@ public class DriverInfoController {
      * @param driverId
      * @return
      */
+    @ResponseBody
     @RequestMapping(value = "/findDriverInfoByDriverId")
     @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
     public AjaxResponse findDriverInfoByDriverId(@Verify(param = "driverId", rule = "required") Integer driverId) {
 
@@ -296,6 +300,9 @@ public class DriverInfoController {
         }else{
             logger.info(LOGTAG + "操作方式：新建");
             resultMap = carBizDriverInfoService.saveDriver(carBizDriverInfo);
+        }
+        if(resultMap!=null && "1".equals(resultMap.get("result").toString())){
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, resultMap.get("msg").toString());
         }
         return AjaxResponse.success(resultMap);
     }
@@ -369,6 +376,16 @@ public class DriverInfoController {
         return AjaxResponse.success(true);
     }
 
+    /**
+     * 导入司机信息
+     * @param cityId
+     * @param supplierId
+     * @param teamId
+     * @param teamGroupId
+     * @param file
+     * @param request
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value = "/batchInputDriverInfo")
     @MasterSlaveConfigs(configs={

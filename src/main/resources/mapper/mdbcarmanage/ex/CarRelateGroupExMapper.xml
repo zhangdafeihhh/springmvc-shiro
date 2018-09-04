@@ -48,4 +48,8 @@
       </foreach>
     </if>
   </select>
+  <delete id="deleteByDriverId" parameterType="java.lang.Integer" >
+    delete from car_relate_group
+    where driver_id = #{driverId,jdbcType=INTEGER}
+  </delete>
 </mapper>

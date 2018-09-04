@@ -1,5 +1,8 @@
 package mapper.rentcar.ex;
 
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.request.DriverTeamRequest;
 import com.zhuanche.request.DutyParamRequest;
@@ -7,6 +10,7 @@ import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CarBizDriverInfoExMapper {
 
@@ -21,13 +25,6 @@ public interface CarBizDriverInfoExMapper {
      * @return
      */
     List<CarBizDriverInfoDTO> queryDriverList(CarBizDriverInfoDTO params);
-
-    /**
-     * 查询司机信息列表展示(无分页)
-     * @param params
-     * @return
-     */
-    List<CarBizDriverInfoDTO> queryDriverListNoLimit(CarBizDriverInfoDTO params);
 
     /**
      * 查询手机号是否存在
@@ -69,4 +66,19 @@ public interface CarBizDriverInfoExMapper {
      * @return
      */
     Integer checkLicensePlates(@Param("licensePlates") String licensePlates);
+
+    /**
+     * 解绑司机信用卡，更新
+     * @param map
+     */
+    int updateDriverCardInfo(Map<String, Object> map);
+
+    /**
+     * 更新uickpay_customerid
+     * @param map
+     */
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER)
+    })
+    void updateDriverCustomerId(Map<String, Object> map);
 }

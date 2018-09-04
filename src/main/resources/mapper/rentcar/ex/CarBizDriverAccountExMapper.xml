@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.ex.CarBizDriverAccountExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.dto.rentcar.CarBizDriverAccountDTO" >
+    <id column="account_id" property="accountId" jdbcType="INTEGER" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="credit_balance" property="creditBalance" jdbcType="DECIMAL" />
+    <result column="account_amount" property="accountAmount" jdbcType="DECIMAL" />
+    <result column="frozen_amount" property="frozenAmount" jdbcType="DECIMAL" />
+    <result column="withdraw_deposit" property="withdrawDeposit" jdbcType="DECIMAL" />
+    <result column="settle_account" property="settleAccount" jdbcType="DECIMAL" />
+    <result column="out_curr_account" property="outCurrAccount" jdbcType="DECIMAL" />
+    <result column="version" property="version" jdbcType="INTEGER" />
+  </resultMap>
+  <select id="selectDriverAcctount" resultType="com.zhuanche.dto.rentcar.CarBizDriverAccountDTO" parameterType="java.lang.Integer" >
+    	SELECT
+			acc.curr_account as currAmount,
+			acc.hisall_account as historyAmount,
+			acc.credit_balance as creditBalance,
+			acc.credit_balance_hisall as creditBalanceHis,
+			acc.out_curr_account as outCurrAmount,
+			acc.out_hisall_account as outHisallAmount
+		FROM
+			car_biz_driver_account acc
+		WHERE
+			acc.driver_id = #{driverId}
+  </select>
+
+  <update id="updateDrivetAccount" parameterType="com.zhuanche.dto.rentcar.CarBizDriverAccountDTO">
+    UPDATE
+    car_biz_driver_account
+    SET
+    driver_id = #{driverId}
+    <if test="currAmount!=null and currAmount!=''">
+      ,curr_account = #{currAmount}
+    </if>
+    <if test="creditBalance!=null and creditBalance!=''">
+      ,credit_balance = #{creditBalance}
+    </if>
+    <if test="outCurrAmount!=null and outCurrAmount!=''">
+      ,out_curr_account = #{outCurrAmount}
+    </if>
+    WHERE
+    driver_id = #{driverId}
+  </update>
+
+  <insert id="insertDriverAccountDetil"  parameterType="com.zhuanche.dto.rentcar.CarBizDriverAccountDTO">
+    	INSERT INTO
+			car_biz_driver_account_detail(
+			deal_no,
+			driver_id,
+			settle_account,
+			credit_balance,
+			operation,
+			settle_account_hisall,
+			credit_balance_hisall,
+			out_account_curr,
+			out_account_hisall,
+			amount,
+			create_date)
+		VALUES(
+			#{dealNo},
+			#{driverId},
+			#{settleAccount},
+			#{creditBalance},
+			#{operation},
+			#{settleAccountHis},
+			#{creditBalanceHis},
+			#{outCurrAccount},
+			#{outHisAccount},
+			#{amount},
+			now())
+    </insert>
+</mapper>

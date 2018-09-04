@@ -35,4 +35,8 @@
     <import resource="applicationContext-springmvc.xml"/>
     <!--mongo的服务-->
     <import resource="applicationContext-mongodb-driver.xml"/>
+    <!--redis-driver的服务-->
+    <import resource="applicationContext-redis-driver.xml"/>
+    <!--块钱的服务-->
+    <import resource="applicationContext-kuaiqian.xml"/>
 </beans>

@@ -3,6 +3,7 @@ package com.zhuanche.serv;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.zhuanche.common.cache.RedisCacheDriverUtil;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -11,16 +12,25 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
+import com.zhuanche.entity.mdbcarmanage.*;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.mongo.DriverMongo;
-import com.zhuanche.serv.mdbcaranage.CarBizDriverUpdateService;
+import com.zhuanche.serv.mdbcarmanage.CarBizDriverUpdateService;
 import com.zhuanche.serv.mongo.DriverMongoService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.Common;
 import com.zhuanche.util.ValidateUtils;
 import com.zhuanche.util.encrypt.MD5Utils;
+import mapper.mdbcarmanage.CarAdmUserMapper;
+import mapper.mdbcarmanage.CarDriverTeamMapper;
+import mapper.mdbcarmanage.CarRelateGroupMapper;
+import mapper.mdbcarmanage.CarRelateTeamMapper;
+import mapper.mdbcarmanage.ex.CarBizAgreementCompanyExMapper;
+import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
+import mapper.mdbcarmanage.ex.CarRelateGroupExMapper;
+import mapper.mdbcarmanage.ex.CarRelateTeamExMapper;
 import mapper.rentcar.CarBizDriverAccountMapper;
 import mapper.rentcar.CarBizDriverInfoMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
@@ -104,6 +114,30 @@ public class CarBizDriverInfoService {
 
     @Autowired
     private CarBizCooperationTypeService carBizCooperationTypeService;
+
+    @Autowired
+    private CarDriverTeamMapper carDriverTeamMapper;
+
+    @Autowired
+    private CarDriverTeamExMapper carDriverTeamExMapper;
+
+    @Autowired
+    private CarRelateTeamMapper carRelateTeamMapper;
+
+    @Autowired
+    private CarRelateTeamExMapper carRelateTeamExMapper;
+
+    @Autowired
+    private CarRelateGroupMapper carRelateGroupMapper;
+
+    @Autowired
+    private CarRelateGroupExMapper carRelateGroupExMapper;
+
+    @Autowired
+    private CarAdmUserMapper carAdmUserMapper;
+
+    @Autowired
+    private CarBizAgreementCompanyExMapper carBizAgreementCompanyExMapper;
 
     @Autowired
     private DriverMongoService driverMongoService;
@@ -191,15 +225,15 @@ public class CarBizDriverInfoService {
             }
             // 查询城市名称，供应商名称，服务类型，加盟类型
             carBizDriverInfo = this.getBaseStatis(carBizDriverInfo);
-            //TODO 驾驶员合同（或协议）签署公司在协议公司 验证
-//            if(cooperationType!=null&&cooperationType==5){
-//                int count = this.queryAgreementCompanyByName(driver.getCorpType());
-//                if(count==0){
-//                    result.put("result", 1);
-//                    result.put("msg", " 驾驶员合同（或协议）签署公司在协议公司中不存在");
-//                    return result;
-//                }
-//            }
+            // 驾驶员合同（或协议）签署公司在协议公司 验证
+            if(carBizDriverInfo.getCooperationType()!=null && carBizDriverInfo.getCooperationType()==5){
+                CarBizAgreementCompany company = carBizAgreementCompanyExMapper.selectByName(carBizDriverInfo.getCorptype());
+                if(company==null){
+                    resultMap.put("result", 1);
+                    resultMap.put("msg", " 驾驶员合同（或协议）签署公司在协议公司中不存在");
+                    return resultMap;
+                }
+            }
 
             // 获取当前用户Id
             carBizDriverInfo.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
@@ -233,7 +267,6 @@ public class CarBizDriverInfoService {
                 ex.printStackTrace();
             }
 
-            carBizDriverInfo.setUpdateDate(new Date());
             //更新司机信息
             int n = this.updateDriverInfo(carBizDriverInfo);
 
@@ -264,10 +297,9 @@ public class CarBizDriverInfoService {
             if ((carBizDriverInfo.getOldCity() != null && !carBizDriverInfo.getOldCity().equals(carBizDriverInfo.getServiceCity()))
                     || (carBizDriverInfo.getOldSupplier() != null && !carBizDriverInfo.getOldSupplier().equals(carBizDriverInfo.getSupplierId()))) {
                 logger.info("修改司机driverId=" + carBizDriverInfo.getDriverId() + "的城市或者供应商，需将司机移除车队小组");
-                //TODO 移除司机车队小组信息
-//                DriverTeamRelationEntity relation = new DriverTeamRelationEntity();
-//                relation.setDriverId(carBizDriverInfoDTO.getDriverId());
-//                driverTeamRelationService.deleteTeamAndGroupByDriverId(relation);
+                // 移除司机车队小组信息
+                carRelateTeamExMapper.deleteByDriverId(carBizDriverInfo.getDriverId());
+                carRelateGroupExMapper.deleteByDriverId(carBizDriverInfo.getDriverId());
                 carBizDriverInfo.setTeamId(null);
                 carBizDriverInfo.setTeamName("");
                 carBizDriverInfo.setTeamGroupId(null);
@@ -316,15 +348,15 @@ public class CarBizDriverInfoService {
         try {
             // 查询城市名称，供应商名称，服务类型，加盟类型
             carBizDriverInfo = this.getBaseStatis(carBizDriverInfo);
-            //TODO 驾驶员合同（或协议）签署公司在协议公司 验证
-//            if(cooperationType!=null&&cooperationType==5){
-//                int count = this.queryAgreementCompanyByName(driver.getCorpType());
-//                if(count==0){
-//                    result.put("result", 1);
-//                    result.put("msg", " 驾驶员合同（或协议）签署公司在协议公司中不存在");
-//                    return result;
-//                }
-//            }
+            // 驾驶员合同（或协议）签署公司在协议公司 验证
+            if(carBizDriverInfo.getCooperationType()!=null && carBizDriverInfo.getCooperationType()==5){
+                CarBizAgreementCompany company = carBizAgreementCompanyExMapper.selectByName(carBizDriverInfo.getCorptype());
+                if(company==null){
+                    resultMap.put("result", 1);
+                    resultMap.put("msg", " 驾驶员合同（或协议）签署公司在协议公司中不存在");
+                    return resultMap;
+                }
+            }
 
             // 获取当前用户Id
             carBizDriverInfo.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
@@ -353,8 +385,19 @@ public class CarBizDriverInfoService {
             }
             carBizChatUserService.insertChat(carBizDriverInfo.getDriverId());
 
-            //TODO teamId teamGroupId 存在，则新增车队与司机的关联表
-
+            // teamId teamGroupId 存在，则新增车队与司机的关联表
+            if(carBizDriverInfo.getTeamId()!=null){//新增车队
+                CarRelateTeam record = new CarRelateTeam();
+                record.setTeamId(carBizDriverInfo.getTeamId());
+                record.setDriverId(carBizDriverInfo.getDriverId());
+                carRelateTeamMapper.insertSelective(record);
+            }
+            if(carBizDriverInfo.getTeamGroupId()!=null){//新增小组
+                CarRelateGroup record = new CarRelateGroup();
+                record.setGroupId(carBizDriverInfo.getTeamGroupId());
+                record.setDriverId(carBizDriverInfo.getDriverId());
+                carRelateGroupMapper.insertSelective(record);
+            }
 
             //发送MQ
             sendDriverToMq(carBizDriverInfo, "INSERT");
@@ -687,19 +730,32 @@ public class CarBizDriverInfoService {
             carBizDriverInfo.setCarGroupName(carBizCarGroup.getGroupName());
         }
         if (carBizDriverInfo.getDriverId() != null) {
-            //TODO 根据司机ID查询车队小组信息
-            Integer teamId = 0;
-            String teamName = "";
-            Integer teamGroupId = 0;
-            String teamGroupName = "";
-            carBizDriverInfo.setTeamId(teamId);
-            carBizDriverInfo.setTeamName(teamName);
-            carBizDriverInfo.setTeamGroupId(teamGroupId);
-            carBizDriverInfo.setTeamGroupName(teamGroupName);
+            // 根据司机ID查询车队小组信息
+            Map<String, Object> stringObjectMap = carDriverTeamExMapper.queryTeamNameAndGroupNameByDriverId(carBizDriverInfo.getDriverId());
+            if(stringObjectMap!=null){
+                if(StringUtils.isNotEmpty(stringObjectMap.get("teamId").toString())){
+                    carBizDriverInfo.setTeamId(Integer.parseInt(stringObjectMap.get("teamId").toString()));
+                    carBizDriverInfo.setTeamName(stringObjectMap.get("teamName").toString());
+                }
+                if(StringUtils.isNotEmpty(stringObjectMap.get("teamGroupId").toString())){
+                    carBizDriverInfo.setTeamId(Integer.parseInt(stringObjectMap.get("teamGroupId").toString()));
+                    carBizDriverInfo.setTeamName(stringObjectMap.get("teamGroupName").toString());
+                }
+            }
 
-            //TODO 查询用户的名称
-            carBizDriverInfo.setCreateName("");
-            carBizDriverInfo.setUpdateName("");
+            // 查询用户的名称
+            if(carBizDriverInfo.getCreateBy()!=null){
+                CarAdmUser carAdmUser = carAdmUserMapper.selectByPrimaryKey(carBizDriverInfo.getCreateBy());
+                if(carAdmUser!=null){
+                    carBizDriverInfo.setCreateName(carAdmUser.getUserName());
+                }
+            }
+            if(carBizDriverInfo.getUpdateBy()!=null){
+                CarAdmUser carAdmUser = carAdmUserMapper.selectByPrimaryKey(carBizDriverInfo.getUpdateBy());
+                if(carAdmUser!=null){
+                    carBizDriverInfo.setUpdateName(carAdmUser.getUserName());
+                }
+            }
         }
         return carBizDriverInfo;
     }
@@ -1110,12 +1166,6 @@ public class CarBizDriverInfoService {
                     continue;
                 }
                 CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();
-//                //TODO 获取当前用户Id
-//                carBizDriverInfoDTO.setCreateBy(1);
-//                carBizDriverInfoDTO.setCreateDate(new Date());
-//                carBizDriverInfoDTO.setUpdateBy(1);
-//                carBizDriverInfoDTO.setUpdateDate(new Date());
-//                carBizDriverInfoDTO.setStatus(1);
 
                 // 根据供应商ID查询供应商名称以及加盟类型
                 CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(supplierId);
@@ -2345,9 +2395,19 @@ public class CarBizDriverInfoService {
                     carBizDriverInfoDTO.setSupplierId(supplierId);
                     carBizDriverInfoDTO.setTeamId(teamId);
                     carBizDriverInfoDTO.setTeamGroupId(teamGroupId);
-                    //TODO 车队名称
-                    carBizDriverInfoDTO.setTeamName("");
-                    carBizDriverInfoDTO.setTeamGroupName("");
+
+                    if(teamId!=null){//车队名称
+                        CarDriverTeam carDriverTeam = carDriverTeamMapper.selectByPrimaryKey(teamId);
+                        if(carDriverTeam!=null){
+                            carBizDriverInfoDTO.setTeamName(carDriverTeam.getTeamName());
+                        }
+                    }
+                    if(teamGroupId!=null){//小组名称
+                        CarDriverTeam carDriverTeam = carDriverTeamMapper.selectByPrimaryKey(teamGroupId);
+                        if(carDriverTeam!=null){
+                            carBizDriverInfoDTO.setTeamGroupName(carDriverTeam.getTeamName());
+                        }
+                    }
 
                     //TODO 保存司机信息
                     Map<String, Object> stringObjectMap = this.saveDriver(carBizDriverInfoDTO);
@@ -2393,20 +2453,6 @@ public class CarBizDriverInfoService {
         FileInputStream io = new FileInputStream(path);
         // 创建 excel
         Workbook wb = new XSSFWorkbook(io);
-//            for(int i=0;i<list.size();i++){
-//                DriverTeamRelationEntity params2 = new DriverTeamRelationEntity();
-//                params2.setDriverId(list.get(i).getDriverId());
-//                DriverTeamRelationEntity driverTeamRelationEntity = this.driverTeamRelationService.selectDriverInfo(params2);
-//                if(!"".equals(driverTeamRelationEntity)&&driverTeamRelationEntity!=null){
-//                    list.get(i).setTeamid(driverTeamRelationEntity.getTeamId());
-//                    list.get(i).setTeamName(driverTeamRelationEntity.getTeamName());
-//                }
-//                DriverTeamRelationEntity driverTeamRelationEntity2 = this.driverTeamRelationService.queryForObjectGroup(params2);
-//                if(!"".equals(driverTeamRelationEntity2)&&driverTeamRelationEntity2!=null){
-//                    list.get(i).setGroupId(driverTeamRelationEntity2.getGroupId());
-//                    list.get(i).setGroupName(driverTeamRelationEntity2.getGroupName());
-//                }
-//            }
         if(list != null && list.size()>0){
             Sheet sheet = null;
             try {
@@ -2633,26 +2679,27 @@ public class CarBizDriverInfoService {
 
     // 派单司机锁-派单组提供
     private Boolean getLock(String phone){
-//        boolean lock = false;
-//        int expireTime = 20;
-//        String key = "D" + phone + "_lock";
-//        String value = jedisTemplate.get(key);
-//        if(StringUtils.isBlank(value)){
+        boolean lock = false;
+        int expireTime = 20;
+        String key = "D" + phone + "_lock";
+        String value = RedisCacheDriverUtil.get(key, String.class);
+        if(StringUtils.isBlank(value)){
 //            long expire = System.currentTimeMillis() + expireTime * 1000 + 1;
-//            String result = jedisTemplate.set(key, String.valueOf(expire),expireTime);
-//            logger.info(LOGTAG + "派单锁-缓存KEY[" + key + "] " + result);
-//            if(result != null){
-//                lock = true;
-//            }
-//        }
-        return true;
+            long expire = System.currentTimeMillis() + expireTime * 1000 + 1;
+            String result = RedisCacheDriverUtil.getSet(key, String.valueOf(expire), String.class);
+            logger.info(LOGTAG + "派单锁-缓存KEY[" + key + "] " + result);
+            if(result != null){
+                lock = true;
+            }
+        }
+        return lock;
     }
 
     // 派单司机锁释放
     private void unLock(String phone){
-//        String key = "D" + phone + "_lock";
-//        Long result = jedisTemplate.del(key);
-//        logger.info(LOGTAG + "派单锁-删除KEY[" + key + "] " + result);
+        String key = "D" + phone + "_lock";
+        RedisCacheDriverUtil.delete(key);
+        logger.info(LOGTAG + "派单锁-删除KEY[={}]", key);
     }
 
     /**
@@ -2747,4 +2794,26 @@ public class CarBizDriverInfoService {
         }
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    /**
+     * 解绑司机信用卡，更新
+     * @param map
+     */
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER)
+    })
+    public void updateDriverCardInfo(Map<String, Object> map) {
+        Map<String,Object> result = new HashMap<String,Object>();
+        try {
+            // 信用卡短卡号绑定至司机信息
+            int rtn = carBizDriverInfoExMapper.updateDriverCardInfo(map);
+            driverMongoService.updateDriverCardInfo(map);
+            if (rtn > 0) {
+                result.put("result", 1);
+            } else {
+                result.put("result", 0);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

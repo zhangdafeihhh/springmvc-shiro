@@ -41,4 +41,8 @@
       AND driver_id = #{driverId}
     </if>
   </select>
+  <delete id="deleteByDriverId" parameterType="java.lang.Integer" >
+    delete from car_relate_team
+    where driver_id = #{driverId,jdbcType=INTEGER}
+  </delete>
 </mapper>
