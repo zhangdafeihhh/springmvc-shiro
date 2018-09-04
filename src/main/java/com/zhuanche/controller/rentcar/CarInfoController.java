@@ -10,22 +10,18 @@ import com.zhuanche.serv.authc.UserManagementService;
 import com.zhuanche.serv.rentcar.CarInfoService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
-import com.zhuanche.util.Common;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +31,8 @@ import java.util.Map;
 @RequestMapping("carInfo")
 public class CarInfoController {
     private static Logger logger = LoggerFactory.getLogger(CarInfoController.class);
+
+    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     @Autowired
     private CarInfoService carService;
@@ -147,14 +145,166 @@ public class CarInfoController {
     }
 
     /**
-     * 保存或修改车辆 TODO 待完成
-     * @param params
-     * @param request
+     * 修改
+     * @param carId 主键
+     * @param licensePlates 车牌号
+     * @param status 是否有效
+     * @param cityId 城市
+     * @param supplierId 供应商
+     * @param carModelId 车型
+     * @param imageUrl 车辆图片上传
+     * @param vehicleDrivingLicense 行驶证扫描件
+     * @param modelDetail 具体车型
+     * @param color 颜色
+     * @param clicensePlatesColor 车牌颜色
+     * @param engineNo 发动机号
+     * @param vehicleEngineDisplacement 车辆发动机排量
+     * @param vehicleEnginePower 发动机功率
+     * @param carryPassengers 核定载客位
+     * @param frameNo 车架号
+     * @param vehicleBrand 车辆厂牌
+     * @param vehicleEngineWheelbase 车辆轴距
+     * @param vehicleOwner 所属车主
+     * @param vehicleType 车辆类型（以机动车行驶证为主）
+     * @param fuelType 车辆燃料类型
+     * @param nextInspectDate 下次车检时间 (格式:yyyy-MM-dd)
+     * @param nextMaintenanceDate 下次维保时间 (格式:yyyy-MM-dd)
+     * @param nextOperationDate 下次运营证检验时间 (格式:yyyy-MM-dd)
+     * @param nextSecurityDate 下次治安证检测时间 (格式:yyyy-MM-dd)
+     * @param nextClassDate 下次等级验证时间 (格式:yyyy-MM-dd)
+     * @param twoLevelMaintenanceDate 二级维护时间 (格式:yyyy-MM-dd)
+     * @param rentalExpireDate 租赁到期时间 (格式:yyyy-MM-dd)
+     * @param purchaseDate 购买时间 (格式:yyyy-MM-dd)
+     * @param vehicleRegistrationDate 车辆注册日期 (格式:yyyy-MM-dd)
+     * @param transportNumber 运输证字号
+     * @param certificationAuthority 车辆运输证发证机构
+     * @param operatingRegion 车辆经营区域
+     * @param transportNumberDateStart 车辆运输证有效期起 (格式:yyyy-MM-dd)
+     * @param transportNumberDateEnd 车辆运输证有效期止 (格式:yyyy-MM-dd)
+     * @param firstDate 车辆初次登记日期 (格式:yyyy-MM-dd)
+     * @param overHaulStatus 车辆检修状态
+     * @param auditingStatus 车辆年度审验状态
+     * @param auditingDate 车辆年度审验日期 (格式:yyyy-MM-dd)
+     * @param equipmentNumber 发票打印设备序列号
+     * @param gpsBrand 卫星定位装置品牌
+     * @param gpsType 卫星定位装置型号
+     * @param gpsImei 卫星定位装置IMEI号
+     * @param gpsDate 卫星定位设备安装日期(格式:yyyy-MM-dd)
+     * @param licensePlates1 旧的车牌号
+     * @param oldCity 旧城市Id
+     * @param oldSupplierId 旧的供应商Ids
+     * @param memo 备注
      * @return
      */
     @RequestMapping(value = "/saveCarInfo.json", method = { RequestMethod.POST })
-    public Object saveCarInfo(CarInfo params, HttpServletRequest request) {
+    public Object saveCarInfo(@Verify(param = "carId",rule="") Integer carId,
+                              @Verify(param = "licensePlates",rule="required") String licensePlates,
+                              @Verify(param = "status",rule="required") Integer status,
+                              @Verify(param = "cityId",rule="required") Integer cityId,
+                              @Verify(param = "supplierId",rule="required") Integer supplierId,
+                              @Verify(param = "carModelId",rule="required") Integer carModelId,
+                              @Verify(param = "imageUrl",rule="") String imageUrl,
+                              @Verify(param = "vehicleDrivingLicense",rule="") String vehicleDrivingLicense,
+                              @Verify(param = "modelDetail",rule="required") String modelDetail,
+                              @Verify(param = "color",rule="required") String color,
+                              @Verify(param = "clicensePlatesColor",rule="required") String clicensePlatesColor,
+                              @Verify(param = "engineNo",rule="required") String engineNo,
+                              @Verify(param = "vehicleEngineDisplacement",rule="required") String vehicleEngineDisplacement,
+                              @Verify(param = "vehicleEnginePower",rule="required") String vehicleEnginePower,
+                              @Verify(param = "carryPassengers",rule="required") String carryPassengers,
+                              @Verify(param = "vehicleBrand",rule="required") String vehicleBrand,
+                              @Verify(param = "vehicleEngineWheelbase",rule="required") String vehicleEngineWheelbase,
+                              @Verify(param = "vehicleOwner",rule="required") String vehicleOwner,
+                              @Verify(param = "frameNo",rule="required") String frameNo,
+                              @Verify(param = "vehicleType",rule="required") String vehicleType,
+                              @Verify(param = "fuelType",rule="required") Integer fuelType,
+                              @RequestParam(value = "nextInspectDate",required = false) String nextInspectDate,
+                              @RequestParam(value = "nextMaintenanceDate",required = false) String nextMaintenanceDate,
+                              @RequestParam(value = "nextOperationDate",required = false) String nextOperationDate,
+                              @RequestParam(value = "nextSecurityDate",required = false) String nextSecurityDate,
+                              @RequestParam(value = "nextClassDate",required = false) String nextClassDate,
+                              @RequestParam(value = "twoLevelMaintenanceDate",required = false) String twoLevelMaintenanceDate,
+                              @RequestParam(value = "rentalExpireDate",required = false) String rentalExpireDate,
+                              @RequestParam(value = "purchaseDate",required = false) String purchaseDate,
+                              @Verify(param = "vehicleRegistrationDate",rule="required") String vehicleRegistrationDate,
+                              @Verify(param = "transportNumber",rule="required") String transportNumber,
+                              @Verify(param = "certificationAuthority",rule="required") String certificationAuthority,
+                              @Verify(param = "operatingRegion",rule="required") String operatingRegion,
+                              @Verify(param = "transportNumberDateStart",rule="required") String transportNumberDateStart,
+                              @Verify(param = "transportNumberDateEnd",rule="required") String transportNumberDateEnd,
+                              @Verify(param = "firstDate",rule="required") String firstDate,
+                              @Verify(param = "overHaulStatus",rule="required") Integer overHaulStatus,
+                              @Verify(param = "auditingStatus",rule="required") Integer auditingStatus,
+                              @Verify(param = "auditingDate",rule="required") String auditingDate,
+                              @Verify(param = "equipmentNumber",rule="required") String equipmentNumber,
+                              @Verify(param = "gpsBrand",rule="required") String gpsBrand,
+                              @Verify(param = "gpsType",rule="required") String gpsType,
+                              @Verify(param = "gpsImei",rule="required") String gpsImei,
+                              @Verify(param = "gpsDate",rule="required") String gpsDate,
+                              @RequestParam(value = "purchaseDate",required = false) String memo,
+                              @Verify(param = "licensePlates1",rule="required") String licensePlates1,
+                              @Verify(param = "oldCity",rule="required") Integer oldCity,
+                              @Verify(param = "oldSupplierId",rule="required") Integer oldSupplierId) {
         logger.info("车辆保存/修改:saveCarInfo");
+
+
+
+        CarInfo params = new CarInfo();
+        params.setCarId(carId);
+        params.setLicensePlates(licensePlates);
+        params.setStatus(status);
+        params.setCityId(cityId);
+        params.setSupplierId(supplierId);
+        params.setCarModelId(carModelId);
+        params.setImageUrl(imageUrl);
+        params.setVehicleDrivingLicense(vehicleDrivingLicense);
+
+        params.setModelDetail(modelDetail);
+        params.setColor(color);
+        params.setClicensePlatesColor(clicensePlatesColor);
+        params.setEngineNo(engineNo);
+        params.setVehicleEngineDisplacement(vehicleEngineDisplacement);
+        params.setVehicleEnginePower(vehicleEnginePower);
+        params.setCarryPassengers(carryPassengers);
+        params.setVehicleBrand(vehicleBrand);
+        params.setVehicleEngineWheelbase(vehicleEngineWheelbase);
+        params.setVehicleOwner(vehicleOwner);
+        params.setFrameNo(frameNo);
+        params.setVehicleType(vehicleType);
+        params.setFuelType(fuelType);
+        params.setNextInspectDate(nextInspectDate);
+        params.setNextMaintenanceDate(nextMaintenanceDate);
+
+        params.setRentalExpireDate(rentalExpireDate);
+        params.setPurchaseDate(purchaseDate);
+        params.setVehicleRegistrationDate(vehicleRegistrationDate);
+        params.setTransportNumber(transportNumber);
+        params.setCertificationAuthority(certificationAuthority);
+        params.setOperatingRegion(operatingRegion);
+        params.setTransportNumberDateStart(transportNumberDateStart);
+        params.setTransportNumberDateEnd(transportNumberDateEnd);
+        params.setFirstDate(firstDate);
+        params.setOverHaulStatus(overHaulStatus);
+        params.setAuditingStatus(auditingStatus);
+        params.setAuditingDate(auditingDate);
+        params.setEquipmentNumber(equipmentNumber);
+        params.setGpsBrand(gpsBrand);
+        params.setGpsType(gpsType);
+        params.setGpsImei(gpsImei);
+        params.setGpsDate(gpsDate);
+        params.setMemo(memo);
+        params.setLicensePlates1(licensePlates1);
+        params.setOldCity(oldCity);
+        params.setOldSupplierId(oldSupplierId);
+        try{
+            params.setNextOperationDate( sdf.parse(nextOperationDate) );
+            params.setNextSecurityDate( sdf.parse(nextSecurityDate));
+            params.setNextClassDate( sdf.parse(nextClassDate));
+            params.setTwoLevelMaintenanceDate( sdf.parse(twoLevelMaintenanceDate));
+        } catch (Exception e){
+            logger.error("日期类型格式错误，e={}" + e);
+        }
+
         Map<String, Object> result = new HashMap<String, Object>();
         try {
             Integer userId = WebSessionUtil.getCurrentLoginUser().getId();
@@ -162,6 +312,8 @@ public class CarInfoController {
             if (params.getCarId() == null) {
                 logger.info("*********操作类型：新建");
                 params.setCreateBy(userId);
+            }else {
+                logger.info("*********操作类型：修改");
             }
             result = this.carService.saveCarInfo(params);
         } catch (Exception e) {
@@ -238,7 +390,7 @@ public class CarInfoController {
     }
 
     /**
-     * 车辆信息导入 TODO 待完成
+     * 车辆信息导入
      */
     @RequestMapping(value = "/importCarInfo")
     public Object importCarInfo(CarInfo params, HttpServletRequest request) {
