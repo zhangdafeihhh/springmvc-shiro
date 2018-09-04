@@ -29,7 +29,7 @@ public interface CarInfoService {
     /*
      * 车辆导入
      */
-    Map<String,Object> importCarInfo(CarInfo params,HttpServletRequest request);
+    Map<String,Object> importCarInfo(String fileName, HttpServletRequest request);
 
     //根据车牌号查询是否已存在
     Map<String, Object> checkLicensePlates(CarInfo params);

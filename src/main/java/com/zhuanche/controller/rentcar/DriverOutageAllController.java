@@ -69,7 +69,7 @@ public class DriverOutageAllController {
         //查数量
         total = driverOutageService.queryAllForInt(params);
         if(total==0){
-            PageDTO result = new PageDTO(params.getPage(), params.getPagerSize(), 0, rows);
+            PageDTO result = new PageDTO(params.getPage(), params.getPagesize(), 0, rows);
             return AjaxResponse.success(result);
         }
         //查数据

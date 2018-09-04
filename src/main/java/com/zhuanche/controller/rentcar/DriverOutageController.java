@@ -8,7 +8,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.common.collect.Lists;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -18,6 +17,8 @@ import com.zhuanche.entity.rentcar.DriverOutage;
 import com.zhuanche.serv.rentcar.DriverOutageService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
+import com.zhuanche.util.DateUtils;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
@@ -95,7 +96,7 @@ public class DriverOutageController {
         //查数量
         total = driverOutageService.queryForInt(params);
         if(total==0){
-            PageDTO result = new PageDTO(params.getPage(), params.getPagerSize(), 0, rows);
+            PageDTO result = new PageDTO(params.getPage(), params.getPagesize(), 0, rows);
             return AjaxResponse.success(result);
         }
         //查数据
@@ -198,12 +199,12 @@ public class DriverOutageController {
     @RequestMapping(value="/saveDriverOutage")
     public AjaxResponse saveDriverOutage(
                                     @Verify(param = "outStopLongTime",rule = "required|max(10000)")Double outStopLongTime,
-                                   String driverName,
-                                   @Verify(param = "driverPhone",rule = "mobile")String driverPhone,
-                                   @Verify(param = "outStartDate",rule = "required")Date outStartDate,
-                                   @Verify(param = "outageReason",rule = "required")String outageReason,
+                                    @Verify(param = "driverName",rule = "required")String driverName,
+                                    @Verify(param = "driverPhone",rule = "mobile")String driverPhone,
+                                    @Verify(param = "outStartDate",rule = "required")String outStartDate,
+                                    @Verify(param = "outageReason",rule = "required")String outageReason,
                                     @Verify(param = "driverId",rule = "required")Integer driverId){
-        if(outStopLongTime%1.5 != 0){
+        if(outStopLongTime%0.5 != 0){
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID,"请设定停运时长为0.5的倍数");
         }
         if(outageReason.length() > 50)
@@ -211,7 +212,7 @@ public class DriverOutageController {
         DriverOutage params = new DriverOutage();
         params.setDriverPhone(driverPhone);
         params.setDriverName(driverName);
-        params.setOutStartDate(outStartDate);
+        params.setOutStartDate(DateUtils.parse(outStartDate, "yyyy-MM-dd HH:mm:ss", Date.class));
         params.setOutageReason(outageReason);
         params.setOutStopLongTime(outStopLongTime);
         params.setDriverId(driverId);
@@ -221,48 +222,52 @@ public class DriverOutageController {
         if(params.getDriverId()==null){
             return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
         }
-        DriverOutage outage = this.driverOutageService.queryDriverOutageAllByDriverId(params);
+        DriverOutage outage = driverOutageService.queryDriverOutageAllByDriverId(params);
         if(outage!=null){
             return AjaxResponse.fail(RestErrorCode.DRIVER_OUTAGEALL_EXIST);
         }else{
             result = this.driverOutageService.saveDriverOutage(params);
         }
-        return AjaxResponse.success(result);
+        return getResponse(result);
     }
 
     /**
      *
      * @param outageId  停运id
-     * @param removeStatus  停运状态
      * @param removeReason  解除原因
      * @return
      */
     @RequestMapping(value="/updateDriverOutage")
     public AjaxResponse updateDriverOutage(@Verify(param = "outageId",rule = "required")Integer outageId,
-                                     @Verify(param = "removeStatus",rule = "required")Integer removeStatus,
                                      @Verify(param = "removeReason",rule = "required")String removeReason){
         DriverOutage params = new DriverOutage();
         params.setOutageId(outageId);
-        params.setRemoveStatus(removeStatus);
+        params.setRemoveStatus(4);//解除状态 1：已执行 2：执行中 3：待执行 4：撤销(未执行解除)',
         params.setRemoveReason(removeReason);
 
         logger.info("【司机停运】临时停运解除数据=="+params.toString());
         Map<String,Object> result = new HashMap<String,Object>();
         result = this.driverOutageService.updateDriverOutage(params);
-        return AjaxResponse.success(result);
+        logger.info("" + result);
+        return getResponse(result);
     }
 
-    @RequestMapping(value="/updateDriverOutages")
-    //outageIds:checkDriver,removeReason:value
-    public AjaxResponse updateDriverOutages(@Verify(param = "outageIds",rule = "required")String outageIds,
-                                      @Verify(param = "removeReason",rule = "required")String removeReason){
-        DriverOutage params = new DriverOutage();
-        params.setOutageIds(outageIds);
-        params.setRemoveReason(removeReason);
-        logger.info("【司机停运】临时停运批量解除数据=="+params.toString());
-        Map<String,Object> result = new HashMap<String,Object>();
-        result = this.driverOutageService.updateDriverOutages(params);
-        return AjaxResponse.success(result);
+    public AjaxResponse getResponse(Map<String,Object> result){
+        try{
+//            JSONObject jsonStr = (JSONObject)result.get("jsonStr");
+
+            Integer result1 = Integer.valueOf( result.get("result").toString() );
+
+            if( 0 == result1 ){
+                String exception = result.get("exception").toString();
+                return AjaxResponse.fail(996, exception);
+            } else if(1 == result1){
+                return AjaxResponse.success(null);
+            }
+            return AjaxResponse.fail(999);
+        } catch (Exception e){
+            return AjaxResponse.fail(999);
+        }
     }
 
 }

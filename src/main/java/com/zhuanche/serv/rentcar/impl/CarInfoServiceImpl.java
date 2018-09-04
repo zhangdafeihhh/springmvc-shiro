@@ -161,7 +161,7 @@ public class CarInfoServiceImpl implements CarInfoService {
     }
 
     @Override
-    public Map<String, Object> importCarInfo(CarInfo params,
+    public Map<String, Object> importCarInfo(String fileName,
                                              HttpServletRequest request) {
         String resultError1 = "-1";// 模板错误
         String resultErrorMag1 = "导入模板格式错误!";
@@ -171,9 +171,8 @@ public class CarInfoServiceImpl implements CarInfoService {
         List<CarImportExceptionEntity> listException = new ArrayList<CarImportExceptionEntity>();
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         List<CarInfo> carList = new ArrayList<CarInfo>();
-        String fileName = params.getFileName();
         String path  = Common.getPath(request);
-        String dirPath = path+params.getFileName();
+        String dirPath = path + fileName;
         File DRIVERINFO = new File(dirPath);
         try {
             InputStream is = new FileInputStream(DRIVERINFO);

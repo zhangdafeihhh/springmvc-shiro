@@ -394,21 +394,47 @@ public class CarInfoController {
      * 车辆信息导入
      */
     @RequestMapping(value = "/importCarInfo")
-    public Object importCarInfo(CarInfo params, HttpServletRequest request) {
-        logger.info("车辆信息导入保存:importCarInfo,参数" + params.toString());
+    public Object importCarInfo(String fileName, HttpServletRequest request) {
+        logger.info("车辆信息导入保存:importCarInfo,参数" + fileName);
         Map<String, Object> result = new HashMap<String, Object>();
-        result = this.carService.importCarInfo(params, request);
+        result = this.carService.importCarInfo(fileName, request);
         return result;
     }
 
     /**
-     *
-     *车辆信息导出
+     * 车辆信息导出
+     * @param cities    城市id，多个逗号分割
+     * @param supplierIds   供应商id，多个逗号分割
+     * @param carModelIds   车型id，多个逗号分割
+     * @param licensePlates 车牌号
+     * @param createDateBegin   创建时间
+     * @param createDateEnd     截止时间
+     * @param status        是否有效
+     * @param isFree        车辆状态
+     * @return
      */
     @RequestMapping("/exportCarInfo")
-    public void exportCarInfo(CarInfo params, HttpServletRequest request, HttpServletResponse response){
+    public void exportCarInfo(String cities,
+                              String supplierIds,
+                              String carModelIds,
+                              String licensePlates,
+                              String createDateBegin,
+                              String createDateEnd,
+                              Integer status,
+                              Integer isFree,
+                              HttpServletRequest request, HttpServletResponse response){
         logger.info("exportCarInfo:车辆信息导出");
         try {
+            CarInfo params = new CarInfo();
+            params.setCities(cities);
+            params.setSupplierIds(supplierIds);
+            params.setCarModelIds(carModelIds);
+            params.setLicensePlates(licensePlates);
+            params.setCreateDateBegin(createDateBegin);
+            params.setCreateDateEnd(createDateEnd);
+            params.setStatus(status);
+            params.setIsFree(isFree);
+
             @SuppressWarnings("deprecation")
             Workbook wb = this.carService.exportExcel(params,request.getRealPath("/")+File.separator+"template"+File.separator+"car_info.xlsx");
             exportExcelFromTemplet(request, response, wb, new String("车辆信息列表".getBytes("gb2312"), "iso8859-1"));
@@ -470,6 +496,10 @@ public class CarInfoController {
         ServletOutputStream os =  response.getOutputStream();
         wb.write(os);
         os.close();
+    }
+
+    public AjaxResponse getResponse(){
+        return null;
     }
 
 }
