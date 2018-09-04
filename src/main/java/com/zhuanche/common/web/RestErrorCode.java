@@ -71,11 +71,6 @@ public final class RestErrorCode{
 	@ResultMessage("{0}为系统预置权限，不能禁用、修改")
 	public static final int SYSTEM_PERMISSION_CANOT_CHANGE  = 10007;
 
-
-
-
-
-
 	//---------------------------------------------------------------------------------------------------------------------------------------------
 	//----------------------------------------------角色管理
 	@ResultMessage("角色不存在")
@@ -119,7 +114,6 @@ public final class RestErrorCode{
 
 	@ResultMessage("结果不存在")
 	public static final int NOT_FOUND_RESULT                                               = 1101;
-
 	@ResultMessage("请求风控资源失败")
 	public static final int RISK_ORDER_DATA_FAIL                                        = 5002;
 	@ResultMessage("上传风控文件失败")
@@ -127,6 +121,8 @@ public final class RestErrorCode{
 	@ResultMessage("提交申诉失败")
 	public static final int RISK_SUBMITCOMPLAIN_FAIL                                        = 5004;
 
+	@ResultMessage("查询GPS数据失败")
+	public static final int MONITOR_GPS_FAIL                                        = 6004;
 	//---------------------------------------------------------------------------------------------------------------------------------------------
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系
