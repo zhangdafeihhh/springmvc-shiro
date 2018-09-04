@@ -20,7 +20,7 @@
   </resultMap>
 
   <!-- 查询供应商下强制上班时间信息 -->
-  <select id="selectDriverMustDutyListByField" parameterType="com.zhuanche.web.entity.driverDuty.DriverMustDutyEntity" resultType="com.zhuanche.dto.driverDuty.CarDriverMustDutyDTO" >
+  <select id="selectDriverMustDutyListByField" parameterType="com.zhuanche.request.DutyParamRequest" resultType="com.zhuanche.dto.driverDuty.CarDriverMustDutyDTO" >
     select
     id,
     startDate,
