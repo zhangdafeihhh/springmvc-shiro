@@ -46,7 +46,8 @@ public class PermissionManagementService{
 		if(!permTypes.contains(pemission.getPermissionType())) {
 			return AjaxResponse.fail(RestErrorCode.PERMISSION_TYPE_WRONG );
 		}
-		Integer sortSeq = 0 ; //自动生成排序的序号//TODO
+		
+		int sortSeq = saasPermissionExMapper.selectMaxSortSeq(pemission.getParentPermissionId()).intValue()+1;//自动生成排序的序号
 		pemission.setValid(true);
 		pemission.setSortSeq(sortSeq);
 	    saasPermissionMapper.insertSelective(pemission);
