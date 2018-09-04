@@ -340,12 +340,14 @@ public class DateUtil {
 		long between_days = (time2 - time1) / (1000 * 3600 * 24);
 		return Integer.parseInt(String.valueOf(between_days));
 	}
-	
-	/**
-	 * @param 某日期距离现在多少年
-	 * @return
-	 * @throws Exception
-	 */
+
+
+    /**
+     *
+     * @param date
+     * @return
+     * @throws Exception
+     */
 	public static int yearsBetween(Date date) throws Exception {
 		return yearsBetween(date, new Date());
 	}

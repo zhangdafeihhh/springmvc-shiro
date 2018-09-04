@@ -1,26 +1,19 @@
 package com.zhuanche.entity.mdbcarmanage;
 
-import java.io.Serializable;
-
-public class CarRelateTeam implements Serializable{
-	
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -9139698423714410729L;
-
-	private Integer relationId;
+public class CarRelateTeam {
+    private Integer relationId;
 
     private Integer teamId;
 
     private Integer driverId;
-    
+
+
     private String teamName;
-    
+
 	private String groupId;
-	
+
 	private String groupName;
-    
+
     public Integer getRelationId() {
         return relationId;
     }
@@ -68,5 +61,5 @@ public class CarRelateTeam implements Serializable{
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
 	}
-    
+
 }

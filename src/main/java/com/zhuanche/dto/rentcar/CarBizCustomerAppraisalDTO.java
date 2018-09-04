@@ -1,11 +1,11 @@
 package com.zhuanche.dto.rentcar;
 
-import java.io.Serializable;
+import com.zhuanche.entity.common.Base;
 import java.util.Date;
 
-public class CarBizCustomerAppraisalDTO implements Serializable{
+public class CarBizCustomerAppraisalDTO extends Base {
 
-    private static final long serialVersionUID = -3381629489093335823L;
+    private static final long serialVersionUID = 1296427662939958799L;
 
     private Integer appraisalId;
 
@@ -252,29 +252,5 @@ public class CarBizCustomerAppraisalDTO implements Serializable{
 
     public void setPointbd(String pointbd) {
         this.pointbd = pointbd == null ? null : pointbd.trim();
-    }
-
-    public String getDriverName() {
-        return driverName;
-    }
-
-    public void setDriverName(String driverName) {
-        this.driverName = driverName;
-    }
-
-    public String getDriverPhone() {
-        return DriverPhone;
-    }
-
-    public void setDriverPhone(String driverPhone) {
-        DriverPhone = driverPhone;
-    }
-
-    public String getLicensePlates() {
-        return licensePlates;
-    }
-
-    public void setLicensePlates(String licensePlates) {
-        this.licensePlates = licensePlates;
     }
 }

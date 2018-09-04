@@ -30,7 +30,7 @@
     <logger name="java.sql.ResultSet" level="INFO" />
 
     <root level="INFO">
-        <appender-ref ref="STDOUT"/>
+        <!-- <appender-ref ref="STDOUT"/> --><!-- 在本地开发时，需要打开注释 -->
         <appender-ref ref="FILE"/>
     </root>
 </configuration>

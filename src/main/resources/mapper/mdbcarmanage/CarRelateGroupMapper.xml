@@ -20,18 +20,17 @@
     where relation_id = #{relationId,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.CarRelateGroup" >
-    <selectKey resultType="java.lang.Integer" keyProperty="relationId" order="AFTER" >
-      SELECT LAST_INSERT_ID()
-    </selectKey>
-    insert into car_relate_group (group_id, driver_id)
-    values (#{groupId,jdbcType=INTEGER}, #{driverId,jdbcType=INTEGER})
+    insert into car_relate_group (relation_id, group_id, driver_id
+      )
+    values (#{relationId,jdbcType=INTEGER}, #{groupId,jdbcType=INTEGER}, #{driverId,jdbcType=INTEGER}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarRelateGroup" >
-    <selectKey resultType="java.lang.Integer" keyProperty="relationId" order="AFTER" >
-      SELECT LAST_INSERT_ID()
-    </selectKey>
     insert into car_relate_group
     <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="relationId != null" >
+        relation_id,
+      </if>
       <if test="groupId != null" >
         group_id,
       </if>
@@ -40,6 +39,9 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="relationId != null" >
+        #{relationId,jdbcType=INTEGER},
+      </if>
       <if test="groupId != null" >
         #{groupId,jdbcType=INTEGER},
       </if>

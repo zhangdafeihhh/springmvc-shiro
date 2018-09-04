@@ -9,14 +9,46 @@
   <sql id="Base_Column_List" >
     relation_id, team_id, driver_id
   </sql>
-  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from car_relate_team
+    where relation_id = #{relationId,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectOneTeam" resultMap="BaseResultMap" parameterType="com.zhuanche.entity.mdbcarmanage.CarRelateTeam" >
+    select
+    <include refid="Base_Column_List" />
+    from car_relate_team
+    where team_id = #{teamId,jdbcType=INTEGER}
+    AND driver_id = #{driverId,jdbcType=INTEGER}
+    limit 1
+  </select>
+
+  <select id="queryDriverTeamRelationList" parameterType="com.zhuanche.request.TeamGroupRequest" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM
+    car_relate_team
+    WHERE 1=1
+    <if test="relationId!=null and relationId!=''">
+      AND relation_id = #{relationId}
+    </if>
+    <if test="teamId!=null and teamId!=''">
+      AND team_id = #{teamId}
+    </if>
+    <if test="driverId!=null and driverId!=''">
+      AND driver_id = #{driverId}
+    </if>
+  </select>
+
   <select id="queryForListObjectGroupNoLimit" parameterType="java.lang.String" resultType="com.zhuanche.entity.mdbcarmanage.CarRelateGroup">
-		SELECT 
+		SELECT
 			relation_id AS relationId,
 			group_id AS groupId,
 			driver_id AS driverId
 		FROM
-			car_relate_group 
+			car_relate_group
 		WHERE 1=1
 			<if test="relationId!=null and relationId!=''">
 				AND relation_id = #{relationId}
@@ -28,49 +60,49 @@
 				AND driver_id = #{driverId}
 			</if>
 	</select>
-	
+
 	<select id="queryForListObject" resultType="com.zhuanche.entity.mdbcarmanage.CarRelateTeam">
-		SELECT 
+		SELECT
 			relation_id AS relationId,
 			team_id AS teamId,
 			driver_id AS driverId
 		FROM
-			car_relate_team 
+			car_relate_team
 		WHERE 1=1
 			<if test="relationId!=null and relationId!=''">
 				AND relation_id = #{relationId}
 			</if>
 			<if test="teamIds != null">
 				AND team_id in
-		       <foreach item="teamId" index="index" collection="teamIds" open="(" separator="," close=")">  
-			　　　　#{teamId}  
-			　　</foreach> 
+		       <foreach item="teamId" index="index" collection="teamIds" open="(" separator="," close=")">
+			　　　　#{teamId}
+			　　</foreach>
 			</if>
 			<if test="driverId!=null and driverId!=''">
 				AND driver_id = #{driverId}
 			</if>
 	</select>
-	
+
 	<select id="queryListByTeamIds" resultType="com.zhuanche.entity.mdbcarmanage.CarRelateTeam">
-		SELECT 
+		SELECT
 			relation_id AS relationId,
 			team_id AS teamId,
 			driver_id AS driverId
 		FROM
-			car_relate_team 
+			car_relate_team
 		WHERE 1=1
 				AND team_id in (#{teamIds})
 	</select>
-	
+
 	<select id="queryListByGroupIds" resultType="com.zhuanche.entity.mdbcarmanage.CarRelateTeam">
-		SELECT 
+		SELECT
 			relation_id AS relationId,
 			group_id AS groupId,
 			driver_id AS driverId
 		FROM
-			car_relate_group  
+			car_relate_group
 		WHERE 1=1
 				AND group_id in (#{groupIds})
 	</select>
-	
+
 </mapper>

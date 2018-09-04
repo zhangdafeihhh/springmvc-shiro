@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.ex.CarBizCarGroupExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarBizCarGroup" >
+    <id column="group_id" property="groupId" jdbcType="INTEGER" />
+    <result column="group_name" property="groupName" jdbcType="VARCHAR" />
+    <result column="seat_num" property="seatNum" jdbcType="INTEGER" />
+    <result column="rank" property="rank" jdbcType="INTEGER" />
+    <result column="sort" property="sort" jdbcType="INTEGER" />
+    <result column="chartered_status" property="charteredStatus" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="selected_img_url" property="selectedImgUrl" jdbcType="VARCHAR" />
+    <result column="selected_url_new" property="selectedUrlNew" jdbcType="VARCHAR" />
+    <result column="unselected_url_new" property="unselectedUrlNew" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizCarGroup" extends="BaseResultMap" >
+    <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
+    <result column="img_url" property="imgUrl" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <resultMap type="com.zhuanche.entity.rentcar.CarBizCity" id="city">
+      <result property="cityId" column="city_id"/>
+      <result property="cityName" column="city_name"/>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    group_id, group_name, seat_num, rank, sort, chartered_status, type, status, create_by, 
+    update_by, create_date, update_date, selected_img_url, selected_url_new, unselected_url_new
+  </sql>
+  <sql id="Blob_Column_List" >
+    memo, img_url
+  </sql>
+  <select id="queryGroupByGroupName" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from car_biz_car_group
+    where group_name = #{groupName,jdbcType=VARCHAR}
+  </select>
+  <select id="queryForObjectByGroupName" resultType="com.zhuanche.entity.rentcar.CarBizCarGroup" parameterType="com.zhuanche.entity.rentcar.CarBizCarGroup">
+      SELECT
+      g.group_id groupId,
+      g.group_name groupName,
+      g.seat_num seatNum,
+      g.`status` status,
+      g.rank rank,
+      g.sort sort ,
+      g.chartered_status charteredStatus,
+      GROUP_CONCAT(cgc.city_id) AS cityId,
+      GROUP_CONCAT(c.city_name) AS cityname,
+      g.memo,
+      g.create_date createDate,
+      g.update_date updateDate,
+      u1.user_id createBy,
+      u2.user_id updateBy
+      FROM
+      car_biz_car_group g
+      LEFT JOIN car_biz_car_group_city cgc ON g.group_id = cgc.group_id
+      LEFT JOIN car_biz_city c on cgc.city_id = c.city_id
+      LEFT JOIN car_sys_user u1 on u1.user_id = g.create_by
+      LEFT JOIN car_sys_user u2 on u2.user_id = g.update_by
+      where 1=1 and  g.group_name  = #{groupName}
+      <if test="cityId !=null and cityId !=''">
+          and cgc.city_id = #{cityId}
+      </if>
+      GROUP BY g.sort, g.update_date DESC
+  </select>
+  <select id="queryForObject" resultType="com.zhuanche.entity.rentcar.CarBizCarGroup" parameterType="com.zhuanche.entity.rentcar.CarBizCarGroup">
+      SELECT
+      g.group_id groupId,
+      g.group_name groupName,
+      g.seat_num seatNum,
+      g.`status` status,
+      g.rank rank,
+      g.sort sort ,
+      g.chartered_status charteredStatus,
+      GROUP_CONCAT(cgc.city_id) AS cityId,
+      GROUP_CONCAT(c.city_name) AS cityname,
+      g.memo,
+      g.create_date createDate,
+      g.update_date updateDate
+      FROM
+      car_biz_car_group g
+      LEFT JOIN car_biz_car_group_city cgc ON g.group_id = cgc.group_id
+      LEFT JOIN car_biz_city c on cgc.city_id = c.city_id
+      GROUP BY g.sort, g.update_date DESC
+      HAVING 1=1 and  g.group_id  = #{groupId}
+  </select>
+</mapper>

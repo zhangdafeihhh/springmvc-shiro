@@ -1,5 +1,7 @@
 package com.zhuanche.util;
 
+import org.springframework.util.StringUtils;
+
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -7,7 +9,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import com.alibaba.druid.util.StringUtils;
 /**
  * 日期处理类
  * @author will
@@ -196,7 +197,7 @@ public class DateUtils {
 	public static int getYear(long t) {
 		Calendar cld = Calendar.getInstance();
 		if (t > 0) {
-			cld.setTime(new java.util.Date(t));
+			cld.setTime(new Date(t));
 		}
 		return cld.get(Calendar.YEAR);
 	}
@@ -206,13 +207,13 @@ public class DateUtils {
 	*
 	* @author hansel.
 	* @param t 给定的以毫秒为单位的日期
-	* @return int  给定日期的月份. 
-	* @exception 
+	* @return int  给定日期的月份.
+	* @exception
 	*/
 	public static int getMonth(long t) {
 		Calendar cld = Calendar.getInstance();
 		if (t > 0) {
-			cld.setTime(new java.util.Date(t));
+			cld.setTime(new Date(t));
 		}
 		return cld.get(Calendar.MONTH) + 1;
 	}
@@ -222,13 +223,13 @@ public class DateUtils {
 	*
 	* @author hansel.
 	* @param t 给定的以毫秒为单位的日期
-	* @return int  给定日期的天. 
-	* @exception 
+	* @return int  给定日期的天.
+	* @exception
 	*/
 	public static int getDay(long t) {
 		Calendar cld = Calendar.getInstance();
 		if (t > 0) {
-			cld.setTime(new java.util.Date(t));
+			cld.setTime(new Date(t));
 		}
 		return cld.get(Calendar.DAY_OF_MONTH);
 	}
@@ -238,29 +239,29 @@ public class DateUtils {
 	*
 	* @author hansel.
 	* @param t 给定的以毫秒为单位的日期
-	* @return int  给定日期的小时. 
-	* @exception 
+	* @return int  给定日期的小时.
+	* @exception
 	*/
 	public static int getHour(long t) {
 		Calendar cld = Calendar.getInstance();
 		if (t > 0) {
-			cld.setTime(new java.util.Date(t));
+			cld.setTime(new Date(t));
 		}
 		return cld.get(Calendar.HOUR_OF_DAY);
 	}
-	
+
 	/**
 	* 获得给定日期的分钟.
 	*
 	* @author hansel.
 	* @param t 给定的以毫秒为单位的日期
-	* @return int  给定日期的分钟. 
-	* @exception 
+	* @return int  给定日期的分钟.
+	* @exception
 	*/
 	public static int getMinute(long t) {
 		Calendar cld = Calendar.getInstance();
 		if (t > 0) {
-			cld.setTime(new java.util.Date(t));
+			cld.setTime(new Date(t));
 		}
 		return cld.get(Calendar.MINUTE);
 	}
@@ -270,13 +271,13 @@ public class DateUtils {
 	*
 	* @author hansel.
 	* @param t 给定的以毫秒为单位的日期
-	* @return int  给定日期的秒. 
-	* @exception 
+	* @return int  给定日期的秒.
+	* @exception
 	*/
 	public static int getSecond(long t) {
 		Calendar cld = Calendar.getInstance();
 		if (t > 0) {
-			cld.setTime(new java.util.Date(t));
+			cld.setTime(new Date(t));
 		}
 		return cld.get(Calendar.SECOND);
 	}
@@ -286,8 +287,8 @@ public class DateUtils {
 	*
 	* @author hansel.
 	* @param date 给定的日期
-	* @return int  给定日期的年份. 
-	* @exception 
+	* @return int  给定日期的年份.
+	* @exception
 	*/
 	public static int getYear(Date date) {
 		Calendar cld = Calendar.getInstance();
@@ -300,8 +301,8 @@ public class DateUtils {
 	*
 	* @author hansel.
 	* @param date 给定的日期
-	* @return int  给定日期的月份. 
-	* @exception 
+	* @return int  给定日期的月份.
+	* @exception
 	*/
 	public static int getMonth(Date date) {
 		Calendar cld = Calendar.getInstance();
@@ -314,8 +315,8 @@ public class DateUtils {
 	*
 	* @author hansel.
 	* @param date 给定的日期
-	* @return int  给定日期的天. 
-	* @exception 
+	* @return int  给定日期的天.
+	* @exception
 	*/
 	public static int getDay(Date date) {
 		Calendar cld = Calendar.getInstance();
@@ -328,22 +329,22 @@ public class DateUtils {
 	*
 	* @author hansel.
 	* @param date 给定的日期
-	* @return int  给定日期的小时. 
-	* @exception 
+	* @return int  给定日期的小时.
+	* @exception
 	*/
 	public static int getHour(Date date) {
 		Calendar cld = Calendar.getInstance();
 		cld.setTime(date);
 		return cld.get(Calendar.HOUR_OF_DAY);
 	}
-	
+
 	/**
 	* 获得给定日期的分钟.
 	*
 	* @author hansel.
 	* @param date 给定的日期
-	* @return int  给定日期的分钟. 
-	* @exception 
+	* @return int  给定日期的分钟.
+	* @exception
 	*/
 	public static int getMinute(Date date) {
 		Calendar cld = Calendar.getInstance();
@@ -356,8 +357,8 @@ public class DateUtils {
 	*
 	* @author hansel.
 	* @param date 给定的日期
-	* @return int  给定日期的秒. 
-	* @exception 
+	* @return int  给定日期的秒.
+	* @exception
 	*/
 	public static int getSecond(Date date) {
 		Calendar cld = Calendar.getInstance();
@@ -370,12 +371,12 @@ public class DateUtils {
 	*
 	* @author hansel.
 	* @param  age 年龄
-	* @return String YYYYMMDD格式. 
-	* @exception 
+	* @return String YYYYMMDD格式.
+	* @exception
 	*/
 	public static String formatdate7(int age) {
 		Calendar cld = Calendar.getInstance();
-		cld.setTime(new java.util.Date());
+		cld.setTime(new Date());
 		return (cld.get(Calendar.YEAR)-age)+"0101";
 	}
 
@@ -383,13 +384,13 @@ public class DateUtils {
 	* 获得当前日期的月.
 	*
 	* @author hansel.
-	* @param 
-	* @return int  当前日期的月. 
-	* @exception 
+	* @param
+	* @return int  当前日期的月.
+	* @exception
 	*/
 	public static int getMonth() {
 		Calendar cld = Calendar.getInstance();
-		cld.setTime(new java.util.Date());
+		cld.setTime(new Date());
 		return cld.get(Calendar.MONTH) + 1;
 	}
 
@@ -397,13 +398,13 @@ public class DateUtils {
 	* 获得当前日期的天.
 	*
 	* @author hansel.
-	* @param 
-	* @return int  当前日期的天. 
-	* @exception 
+	* @param
+	* @return int  当前日期的天.
+	* @exception
 	*/
 	public static int getDay() {
 		Calendar cld = Calendar.getInstance();
-		cld.setTime(new java.util.Date());
+		cld.setTime(new Date());
 		return cld.get(Calendar.DAY_OF_MONTH);
 	}
 
@@ -411,68 +412,68 @@ public class DateUtils {
 	* 获得当前日期的年.
 	*
 	* @author hansel.
-	* @param 
-	* @return int  当前日期的年. 
-	* @exception 
+	* @param
+	* @return int  当前日期的年.
+	* @exception
 	*/
 	public static int  getYear() {
 		Calendar cld = Calendar.getInstance();
-		cld.setTime(new java.util.Date());
+		cld.setTime(new Date());
 		return cld.get(Calendar.YEAR);
 	}
 	/**
 	* 根据输入的年月日，获得DATE类型.
 	*
 	* @author hansel.
-	* @param 
-	* @return Date  Date类型数据. 
-	 * @throws ParseException 
-	* @exception 
+	* @param
+	* @return Date  Date类型数据.
+	 * @throws ParseException
+	* @exception
 	*/
 	public static Date getDate(int year,int month,int day) throws ParseException {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-		java.util.Date date= formatter.parse(year+"-"+month+"-"+day);
+		Date date= formatter.parse(year+"-"+month+"-"+day);
 		return date;
 	}
-	
+
 	/**
 	* 根据输入的年月日，获得DATE类型.
 	*
 	* @author hansel.
-	* @param 
-	* @return Date  Date类型数据. 
-	 * @throws ParseException 
-	* @exception 
+	* @param
+	* @return Date  Date类型数据.
+	 * @throws ParseException
+	* @exception
 	*/
 	public static Date getDate1(String birthday) throws ParseException {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-		java.util.Date date= formatter.parse(birthday);
+		Date date= formatter.parse(birthday);
 		return date;
 	}
 
 	 public static Date getDate(String dateStr) {
-		  DateFormat   df=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");   
-		  java.util.Date d = null;
+		  DateFormat df=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		  Date d = null;
 		try {
 			d = df.parse(dateStr);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
 		  return d;
-	 } 
-	
-	
+	 }
+
+
 	 public static Date getDate(String dateStr, String dateFormat) {
-		  DateFormat   df=new SimpleDateFormat(dateFormat);   
-		  java.util.Date d = null;
+		  DateFormat   df=new SimpleDateFormat(dateFormat);
+		  Date d = null;
 		try {
 			d = df.parse(dateStr);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
 		  return d;
-	 } 
-	 
+	 }
+
 		/** 计算两个日期相差多少天 */
 		public static int getIntervalDays(Date begin,Date end){
 			long in = end.getTime() - begin.getTime();
@@ -480,23 +481,23 @@ public class DateUtils {
 			return days;
 		}
 
-	
-		public static String dateOpt(String dateStr,int skip){		   
+
+		public static String dateOpt(String dateStr,int skip){
 				String result = "";
-		        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");   
-		        try {   
+		        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		        try {
 		            Date d1 = df.parse(dateStr);
-		            Calendar  g = Calendar.getInstance();   
+		            Calendar  g = Calendar.getInstance();
 		            g.setTime(d1);
-		            g.add(Calendar.SECOND,skip);              
+		            g.add(Calendar.SECOND,skip);
 		            Date d2 = g.getTime();
 		            result = df.format(d2);
-		       } catch (ParseException e) {               
-		            e.printStackTrace();   
-		       }  
+		       } catch (ParseException e) {
+		            e.printStackTrace();
+		       }
 		       return result;
 		}
-		
+
 		/**
 		 * 是否为当天
 		 * @param date
@@ -529,19 +530,19 @@ public class DateUtils {
 			return String.valueOf(time.getTime());
 		}
 
-		
+
 		public static Timestamp getCurrentTime() {
 			return new Timestamp(new Date().getTime());
 		}
-		
+
 		@SuppressWarnings("unchecked")
-		public static <T extends java.util.Date> T parse(String dateString,String dateFormat,Class<T> targetResultType) {
+		public static <T extends Date> T parse(String dateString,String dateFormat,Class<T> targetResultType) {
 			if(StringUtils.isEmpty(dateString))
 				return null;
 			DateFormat df = new SimpleDateFormat(dateFormat);
 			try {
 				long time = df.parse(dateString).getTime();
-				java.util.Date t = targetResultType.getConstructor(long.class).newInstance(time);
+				Date t = targetResultType.getConstructor(long.class).newInstance(time);
 				return (T)t;
 			} catch (ParseException e) {
 				String errorInfo = "cannot use dateformat:"+dateFormat+" parse datestring:"+dateString;
@@ -621,4 +622,6 @@ public class DateUtils {
 				throw new RuntimeException("add days is error.");
 			}
 		}
+
+
 }

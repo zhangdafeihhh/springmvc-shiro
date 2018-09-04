@@ -9,11 +9,50 @@
   <sql id="Base_Column_List" >
     relation_id, group_id, driver_id
   </sql>
- 	
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from car_relate_group
+    where relation_id = #{relationId,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectOneGroup" resultMap="BaseResultMap" parameterType="com.zhuanche.request.TeamGroupRequest" >
+    select
+    <include refid="Base_Column_List" />
+    from car_relate_group
+    where group_id = #{groupId,jdbcType=INTEGER}
+    AND driver_id = #{driverId,jdbcType=INTEGER}
+    limit 1
+  </select>
+
+  <select id="queryDriverGroupRelationList" parameterType="com.zhuanche.request.TeamGroupRequest" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM
+    car_relate_group
+    WHERE 1=1
+    <if test="relationId!=null and relationId!=''">
+      AND relation_id = #{relationId}
+    </if>
+    <if test="groupId!=null and groupId!=''">
+      AND group_id = #{groupId}
+    </if>
+    <if test="driverId!=null and driverId!=''">
+      AND driver_id = #{driverId}
+    </if>
+    <if test="groupIds!=null and groupIds.size()>0">
+      and group_id IN
+      <foreach collection="groupIds" open="(" close=")" separator="," item="gid" >
+        #{gid}
+      </foreach>
+    </if>
+  </select>
+
  	<select id="queryByParams" parameterType="com.zhuanche.entity.mdbcarmanage.CarRelateGroup" resultType="com.zhuanche.entity.mdbcarmanage.CarRelateGroup">
-		SELECT 
+		SELECT
 		<include refid="Base_Column_List" />
-		FROM car_relate_group 
+		FROM car_relate_group
 		WHERE 1=1
 			<if test="relationId!=null and relationId!=''">
 				AND relation_id = #{relationId}
@@ -25,10 +64,10 @@
 				AND driver_id = #{driverId}
 			</if>
 	</select>
- 	
+
  	<select id="queryDriversByParams" parameterType="com.zhuanche.entity.mdbcarmanage.CarRelateGroup" resultType="java.lang.Integer">
 		SELECT driver_id
-		FROM car_relate_group 
+		FROM car_relate_group
 		WHERE 1=1
 			<if test="relationId!=null and relationId!=''">
 				AND relation_id = #{relationId}
@@ -40,5 +79,5 @@
 				AND driver_id = #{driverId}
 			</if>
 	</select>
- 	
+
 </mapper>

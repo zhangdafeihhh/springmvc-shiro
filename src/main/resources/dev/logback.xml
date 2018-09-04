@@ -7,6 +7,16 @@
             <level>INFO</level>
         </filter>
     </appender>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/u01/tomcat_docker_8080/logs/mp-manage.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/u01/tomcat_docker_8080/logs/mp-manage.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] %X{reqId} - %logger{36} -%X{loginUser} %msg%n</pattern>
+        </encoder>
+    </appender>
 
     <logger name="com.alibaba" level="INFO"/>
     <logger name="jdbc.sqltiming" level="INFO"/>
@@ -20,6 +30,7 @@
     <logger name="java.sql.ResultSet" level="INFO" />
 
     <root level="INFO">
-        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="STDOUT"/><!-- 在本地开发时，需要打开注释 -->
+        <appender-ref ref="FILE"/>
     </root>
 </configuration>

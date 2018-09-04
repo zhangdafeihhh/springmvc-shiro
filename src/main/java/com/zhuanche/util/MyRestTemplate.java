@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 public class MyRestTemplate extends RestTemplate {
-	
+
 	public MyRestTemplate() {
 		super();
 	}
@@ -45,7 +45,7 @@ public class MyRestTemplate extends RestTemplate {
 	public void setFailover(String failover) {
 		this.failover = failover;
 	}
-	
+
 	public String getHost(){
 		String [] hosts = failover.split(",");
 		Integer random = (int) (hosts.length * Math.random());
@@ -87,10 +87,10 @@ public class MyRestTemplate extends RestTemplate {
 	public <T> T postForObject(String  url, Object request, Class<T> responseType, Object... uriVariables) throws RestClientException {
 		return super.postForObject(getHost() + url, request, responseType, uriVariables);
 	}
-	
-	
+
+
 	private static HttpClient httpClient = HttpClients.createDefault();
-	
+
 	@SuppressWarnings({ "unchecked"})
 	public <T> T postForObject(String url, Object responseType, Map<String, Object> uriVariables) {
 		List<NameValuePair> pairs = null;
@@ -114,9 +114,9 @@ public class MyRestTemplate extends RestTemplate {
 			if (pairs != null && pairs.size() > 0) {
 				method.setEntity(new UrlEncodedFormEntity(pairs, "UTF-8"));
 			}
-			long begin = System.nanoTime();  
+			long begin = System.nanoTime();
 			HttpResponse response = httpClient.execute(method);
-			long end = System.nanoTime();  
+			long end = System.nanoTime();
 			logger.info("MyRestTemplate:"+((end-begin)/1000000)+" url:"+this.getHost() + url);
 			HttpEntity entity = response.getEntity();
 			String body = EntityUtils.toString(entity);
@@ -140,7 +140,7 @@ public class MyRestTemplate extends RestTemplate {
 				return (T)JSONObject.fromObject(r);
 			}finally{
 				if(method!=null){
-					method.abort(); 
+					method.abort();
 				}
 				if(in!=null){
 					in.close();
@@ -156,7 +156,7 @@ public class MyRestTemplate extends RestTemplate {
 			return (T)JSONObject.fromObject(r);
 		}finally{
 			if(method!=null){
-				method.abort(); 
+				method.abort();
 			}
 			if(in!=null){
 				try {
@@ -167,7 +167,7 @@ public class MyRestTemplate extends RestTemplate {
 			}
 		}
 	}
-	
+
 	/**
 	 * @param url
 	 * @param params
@@ -185,7 +185,7 @@ public class MyRestTemplate extends RestTemplate {
 				Object value = entry.getValue();
 				if (value != null) {
 					if(value instanceof ContentBody){
-						
+
 						meb.addPart(entry.getKey(), (ContentBody)value);// uploadFile对应服务端类的同名属性<File类型>
 					}else{
 						meb.addTextBody(entry.getKey(), value.toString(),ContentType.APPLICATION_FORM_URLENCODED);

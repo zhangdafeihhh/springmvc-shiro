@@ -2,9 +2,6 @@ package mapper.rentcar;
 
 import com.zhuanche.entity.rentcar.CarBizModel;
 
-/**
- * @author wzq
- */
 public interface CarBizModelMapper {
     int deleteByPrimaryKey(Integer modelId);
 
@@ -15,4 +12,8 @@ public interface CarBizModelMapper {
     CarBizModel selectByPrimaryKey(Integer modelId);
 
     int updateByPrimaryKeySelective(CarBizModel record);
+
+    int updateByPrimaryKeyWithBLOBs(CarBizModel record);
+
+    int updateByPrimaryKey(CarBizModel record);
 }

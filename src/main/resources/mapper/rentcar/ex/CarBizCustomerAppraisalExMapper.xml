@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="mapper.rentcar.ex.CarBizCustomerAppraisalExMapper" >
-  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarBizCustomerAppraisal" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.dto.rentcar.CarBizCustomerAppraisalDTO" >
     <id column="appraisal_id" property="appraisalId" jdbcType="INTEGER" />
     <result column="order_id" property="orderId" jdbcType="INTEGER" />
     <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
@@ -27,6 +27,18 @@
     <result column="point" property="point" jdbcType="VARCHAR" />
     <result column="pointBD" property="pointbd" jdbcType="VARCHAR" />
   </resultMap>
+  <sql id="Base_Column_List" >
+    appraisal_id, order_id, order_no, booking_customer_id, booking_customer_phone, rider_phone,
+    driver_id, car_id, instrument_and_service, environment_and_equipped, efficiency_and_safety,
+    memo, create_by, create_date, update_by, update_date, evaluate_score, evaluate, platform_evaluate,
+    platform_evaluate_score, platform_memo, customer_ip, point, pointBD
+  </sql>
+  <select id="queryCustomerAppraisalList" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from car_biz_customer_appraisal
+    where appraisal_id = #{appraisalId,jdbcType=INTEGER}
+  </select>
 
 
   <select id="queryForListObject" parameterType="com.zhuanche.entity.rentcar.CarBizCustomerAppraisalParams" resultType="com.zhuanche.entity.rentcar.CarBizCustomerAppraisal">

@@ -1,5 +1,10 @@
 package mapper.rentcar.ex;
 
+import com.zhuanche.dto.CarDriverInfoDTO;
+import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
+import com.zhuanche.entity.rentcar.CarBizDriverInfo;
+import com.zhuanche.request.DriverTeamRequest;
+import com.zhuanche.request.DutyParamRequest;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import org.apache.ibatis.annotations.Param;
 
@@ -7,6 +12,11 @@ import java.util.List;
 
 public interface CarBizDriverInfoExMapper {
 
+    List<CarDriverInfoDTO> selectDriverList(DriverTeamRequest driverTeamRequest);
+
+    List<CarDriverInfoDTO> queryListByLimits(DriverTeamRequest driverTeamRequest);
+
+    CarDriverInfoDTO queryOneDriver(DutyParamRequest dutyParamRequest);
     /**
      * 查询司机信息列表展示(有分页)
      * @param params
@@ -53,5 +63,33 @@ public interface CarBizDriverInfoExMapper {
      * @param driverId
      * @return
      */
-    public int resetIMEI(Integer driverId);
+    int resetIMEI(@Param("driverId") Integer driverId);
+
+    /**
+     * 根据车牌号查询
+     * @param licensePlates
+     * @return
+     */
+    Integer checkLicensePlates(@Param("licensePlates") String licensePlates);
+
+    /**
+     * 根据身份证号检查司机是否存在
+     * @param carBizDriverInfoTemp
+     * @return
+     */
+    Integer checkIdCardNoNew(CarBizDriverInfoTemp carBizDriverInfoTemp);
+
+    /**
+     * 检测司机手机号是否存在
+     * @param carBizDriverInfo
+     * @return
+     */
+    Integer selectCountForPhone(CarBizDriverInfo carBizDriverInfo);
+
+    /**
+     * 验证银行卡卡号
+     * @param carBizDriverInfoTemp
+     * @return
+     */
+    Integer validateBankCardNumber(CarBizDriverInfoTemp carBizDriverInfoTemp);
 }

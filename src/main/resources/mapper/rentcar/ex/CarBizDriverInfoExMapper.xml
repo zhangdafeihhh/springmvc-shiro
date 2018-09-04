@@ -95,6 +95,14 @@
     <result column="house_hold_register_permanent" property="houseHoldRegisterPermanent" jdbcType="VARCHAR" />
     <result column="is_upload_card" property="isUploadCard" jdbcType="INTEGER" />
     <result column="is_must_confirmation" property="isMustConfirmation" jdbcType="INTEGER" />
+    <result column="contract_type" property="contractType" jdbcType="VARCHAR" />
+    <result column="contract_no" property="contractNo" jdbcType="VARCHAR" />
+    <result column="contract_file" property="contractFile" jdbcType="VARCHAR" />
+    <result column="cooperation_type" property="cooperationType" jdbcType="TINYINT" />
+    <result column="account_type" property="accountType" jdbcType="INTEGER" />
+    <result column="group_id" property="groupId" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizDriverInfo" extends="BaseResultMap" >
     <result column="english_name" property="englishName" jdbcType="VARCHAR" />
     <result column="contract_type" property="contractType" jdbcType="VARCHAR" />
     <result column="contract_no" property="contractNo" jdbcType="VARCHAR" />
@@ -104,9 +112,6 @@
     <result column="group_id" property="groupId" jdbcType="INTEGER" />
     <result column="is_two_shifts" property="isTwoShifts" jdbcType="INTEGER" />
     <result column="is_image" property="isImage" jdbcType="INTEGER" />
-  </resultMap>
-  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.dto.rentcar.CarBizDriverInfoDTO" extends="BaseResultMap" >
-    <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     driver_id, password, phone, gender, name, supplier_id, age, current_address, emergency_contact_person, 
@@ -125,13 +130,141 @@
     assessment, driverLicenseIssuingDateStart, driverLicenseIssuingDateEnd, driverLicenseIssuingCorp, 
     driverLicenseIssuingNumber, xy_driver_number, driver_license_issuing_register_date, 
     driver_license_issuing_first_date, driver_license_issuing_grant_date, birth_day, 
-    house_hold_register_permanent, is_upload_card, is_must_confirmation, english_name, 
-    contract_type, contract_no, contract_file, cooperation_type, account_type, group_id, 
-    is_two_shifts, is_image
+    house_hold_register_permanent, is_upload_card, is_must_confirmation, english_name,
+    contract_type, contract_no, contract_file, cooperation_type, account_type, group_id,
+    is_two_shifts, is_image,
+    house_hold_register_permanent, is_upload_card, is_must_confirmation,
+    contract_type, contract_no, contract_file, cooperation_type, account_type, group_id
   </sql>
   <sql id="Blob_Column_List" >
     memo
   </sql>
+
+  <select id="queryOneDriver" parameterType="com.zhuanche.request.DutyParamRequest" resultType="com.zhuanche.dto.CarDriverInfoDTO">
+    SELECT
+    i.driver_id AS driverId,
+    i.phone AS phone,
+    i.gender gender,
+    i.NAME,
+    i.license_plates AS licensePlates,
+    i.supplier_id supplieId,
+    i.STATUS AS status
+    FROM
+    car_biz_driver_info i
+    where 1=1
+    <if test="licensePlates!=null and licensePlates!=''">
+      and i.license_plates LIKE '%${licensePlates}%'
+    </if>
+    <if test="driverId!=null and driverId!=''">
+      and i.driver_id = #{driverId}
+    </if>
+    <if test="phone!=null and phone!=''">
+      and i.phone = #{phone}
+    </if>
+    limit 1
+  </select>
+
+  <select id="queryListByLimits" parameterType="com.zhuanche.request.DriverTeamRequest" resultType="com.zhuanche.dto.CarDriverInfoDTO">
+    SELECT
+    i.driver_id AS driverId
+    FROM
+    car_biz_driver_info i
+    where 1=1
+    <if test="licensePlates!=null and licensePlates!=''">
+      and i.license_plates LIKE '%${licensePlates}%'
+    </if>
+    <if test="cityIds!=null and cityIds.size()>0">
+      and city IN
+      <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
+        #{cid}
+      </foreach>
+    </if>
+    <if test="supplierIds!=null and supplierIds.size()>0">
+      and supplier IN
+      <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
+        #{sid}
+      </foreach>
+    </if>
+
+  </select>
+
+  <select id="selectDriverList" resultType="com.zhuanche.dto.CarDriverInfoDTO"  parameterType="com.zhuanche.request.DriverTeamRequest">
+    SELECT
+    i.driver_id AS driverId,
+    i.phone AS phone,
+    i.gender gender,
+    i.NAME,
+    g.group_name AS carGroupName,
+    i.license_plates AS licensePlates,
+    i.supplier_id supplieId,
+    p.supplier_full_name AS supplierName,
+    i.STATUS AS status,
+    d.`name` createByName,
+    e.`name` updateByName,
+    i.id_card_no as idCardNo,
+    i.age as age,
+    i.superintend_no AS superintendNo,
+    i.current_address as currentAddress,
+    i.emergency_contact_number as emergencyContactNumber,
+    i.emergency_contact_person as emergencyContactPerson,
+    i.driving_license_type as drivingLicenseType,
+    DATE_FORMAT(i.issue_date,'%Y-%m-%d %T')as issueDate,
+    DATE_FORMAT(i.expire_date,'%Y-%m-%d %T')as expireDate,
+    DATE_FORMAT(i.create_date,'%Y-%m-%d %H:%i:%s') createDateStr,
+    DATE_FORMAT(i.update_date,'%Y-%m-%d %H:%i:%s') updateDateStr
+    FROM
+    car_biz_driver_info i
+    LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+    LEFT JOIN car_biz_car_info a ON a.license_plates = i.license_plates
+    LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+    LEFT JOIN car_biz_model m ON a.car_model_id = m.model_id
+    LEFT JOIN car_biz_car_group g ON m.group_id = g.group_id
+    left join car_sys_user d on d.user_id=i.create_by
+    left join car_sys_user e on e.user_id=i.update_by
+    where 1=1
+    <if test="driverIds!=null and driverIds.size()>0">
+      and i.driver_id IN
+      <foreach collection="driverIds" open="(" close=")" separator="," item="did" >
+        #{did}
+      </foreach>
+    </if>
+    <if test="status!=null">
+      and i.status= #{status}
+    </if>
+    <if test="licensePlates!=null and licensePlates!=''">
+      and i.license_plates LIKE '%${licensePlates}%'
+    </if>
+    <if test="driverId!=null and driverId !=''">
+      and i.driver_id in (${driverId})
+    </if>
+    <if test="name!=null and name!=''">
+      <!-- and i.name like '%name%' -->
+      and i.name LIKE CONCAT(#{name},'%')
+    </if>
+    <if test="supplierId!=null and supplierId!=''">
+      and i.supplier_Id = #{supplierId}
+    </if>
+    <if test="phone!=null and phone!=''">
+      and i.phone LIKE '%${phone}%'
+    </if>
+    <if test="serviceCityId!=null and serviceCityId!=''">
+      and i.service_city = #{serviceCityId}
+    </if>
+    <if test="cityIds!=null and cityIds.size()>0">
+      and c.city_id IN
+      <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
+        #{cid}
+      </foreach>
+    </if>
+    <if test="supplierIds!=null and supplierIds.size()>0">
+      and supplier IN
+      <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
+        #{sid}
+      </foreach>
+    </if>
+    order by i.update_date desc
+  </select>
+
   <!-- mapper基础标准: 当前表所有字段查询条件集 -->
   <sql id="allBaseColumnWhereList" >
     <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR" >
@@ -165,8 +298,8 @@
       <if test="isTwoShifts != null" >
         and is_two_shifts = #{isTwoShifts,jdbcType=INTEGER}
       </if>
-      <if test="cityId != null and cityId != ''" >
-        and service_city = #{cityId,jdbcType=VARCHAR}
+      <if test="serviceCity != null and serviceCity != ''" >
+        and service_city = #{serviceCity,jdbcType=VARCHAR}
       </if>
       <if test="supplierId != null and supplierId != ''" >
         and supplier_id = #{supplierId,jdbcType=VARCHAR}
@@ -193,14 +326,13 @@
   </sql>
 
   <select id="queryDriverList" resultMap="ResultMapWithBLOBs" >
-    select 
+    select
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
     from car_biz_driver_info
     <include refid="allBaseColumnWhereList"/>
     order by create_date desc
-    limit #{offSet},#{pagesize}
   </select>
   <select id="queryDriverListNoLimit" resultMap="ResultMapWithBLOBs" >
     select
@@ -1175,4 +1307,37 @@
 		SET imei = null
 		WHERE driver_id = #{driverId}
 	</update>
+  <select id="checkLicensePlates" resultType="java.lang.Integer" >
+    select count(*)
+    from car_biz_driver_info
+    where license_plates= #{licensePlates}
+  </select>
+
+    <!-- 检测司机手机号是否存在 -->
+    <select id="selectCountForPhone" resultType="java.lang.Integer" parameterType="com.zhuanche.entity.rentcar.CarBizDriverInfo">
+      SELECT
+		count(1)
+		FROM
+			car_biz_driver_info
+        where phone= #{phone}
+
+	</select>
+    <!-- 验证银行卡卡号 -->
+    <select id="validateBankCardNumber" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp"  resultType="int">
+        select count(1) from car_biz_driver_info_detail
+        where bank_card_number = #{bankCardNumber}
+        <if test="driverId !=null and driverId !='' ">
+            <![CDATA[ and driver_id <> #{driverId}  ]]>
+        </if>
+    </select>
+    <!-- 根据身份证号检查司机是否存在 -->
+    <select id="checkIdCardNoNew"  parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp" resultType="java.lang.Integer">
+        select
+        count(*)
+        from car_biz_driver_info
+        where status!=0 and id_card_no=#{idCardNo}
+        <if test="driverId !=null and driverId !='' ">
+            <![CDATA[ and driver_id <> #{driverId}  ]]>
+        </if>
+    </select>
 </mapper>

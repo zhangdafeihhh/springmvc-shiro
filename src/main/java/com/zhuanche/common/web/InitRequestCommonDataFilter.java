@@ -12,6 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -37,6 +38,20 @@ public class InitRequestCommonDataFilter extends OncePerRequestFilter {
 	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)throws ServletException, IOException {
+		/***************支持跨域请求BEGIN***********************/
+		String Origin = request.getHeader("Origin");
+		if(StringUtils.isNotEmpty(Origin)) {
+			response.setHeader("Access-Control-Allow-Origin", Origin);
+		}else {
+			response.setHeader("Access-Control-Allow-Origin", "*");
+		}
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
+        response.setHeader("Access-Control-Max-Age", "1800");
+        response.setHeader("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Accept,XRequestedWith,LastModified");
+        response.setHeader("Access-Control-Allow-Credentials", "true");		
+		/***************支持跨域请求END***********************/
+		
+		
 		//一、请求流水号(用于日志,实现对请求进行统一编号，方便于进行排查业务日志)
 		String reqId = request.getParameter("x_requestId");
 		if(reqId==null || "".equals(reqId.trim())  ) {

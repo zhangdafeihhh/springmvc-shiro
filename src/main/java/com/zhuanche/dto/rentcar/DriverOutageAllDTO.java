@@ -33,6 +33,89 @@ public class DriverOutageAllDTO {
 
     private Date updateDate;
 
+    /** 页面显示用 **/
+    private String driverName;
+    private String driverPhone;
+    private String licensePlates;
+    private Integer cityId;
+    private String cityName;
+    private Integer supplierId;
+    private String supplierName;
+    private Integer carGroupId;//车组
+    private String carGroupName;
+
+    public String getDriverName() {
+        return driverName;
+    }
+
+    public void setDriverName(String driverName) {
+        this.driverName = driverName;
+    }
+
+    public String getDriverPhone() {
+        return driverPhone;
+    }
+
+    public void setDriverPhone(String driverPhone) {
+        this.driverPhone = driverPhone;
+    }
+
+    public String getLicensePlates() {
+        return licensePlates;
+    }
+
+    public void setLicensePlates(String licensePlates) {
+        this.licensePlates = licensePlates;
+    }
+
+    public Integer getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(Integer cityId) {
+        this.cityId = cityId;
+    }
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
+
+    public Integer getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(Integer supplierId) {
+        this.supplierId = supplierId;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    public Integer getCarGroupId() {
+        return carGroupId;
+    }
+
+    public void setCarGroupId(Integer carGroupId) {
+        this.carGroupId = carGroupId;
+    }
+
+    public String getCarGroupName() {
+        return carGroupName;
+    }
+
+    public void setCarGroupName(String carGroupName) {
+        this.carGroupName = carGroupName;
+    }
+
     public Integer getId() {
         return id;
     }

@@ -1,19 +1,12 @@
 package com.zhuanche.entity.rentcar;
 
-import java.io.Serializable;
 import java.util.Date;
 
-/**
- * @author wzq
- */
-public class CarBizModel implements Serializable {
+public class CarBizModel {
     private Integer modelId;
 
     private String modelName;
 
-    /**
-     * 关联车组ID
-     */
     private Integer groupId;
 
     private Integer sort;
@@ -30,8 +23,6 @@ public class CarBizModel implements Serializable {
 
     private String memo;
 
-    private static final long serialVersionUID = 1L;
-
     public Integer getModelId() {
         return modelId;
     }
@@ -45,7 +36,7 @@ public class CarBizModel implements Serializable {
     }
 
     public void setModelName(String modelName) {
-        this.modelName = modelName;
+        this.modelName = modelName == null ? null : modelName.trim();
     }
 
     public Integer getGroupId() {
@@ -109,6 +100,6 @@ public class CarBizModel implements Serializable {
     }
 
     public void setMemo(String memo) {
-        this.memo = memo;
+        this.memo = memo == null ? null : memo.trim();
     }
 }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.ex.DriverCertExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.DriverCert" >
+    <id column="ID" property="id" jdbcType="BIGINT" />
+    <result column="TYPE" property="type" jdbcType="TINYINT" />
+    <result column="IMAGE_INFO" property="imageInfo" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="TINYINT" />
+    <result column="DRIVER_ID" property="driverId" jdbcType="BIGINT" />
+    <result column="CREATE_AT" property="createAt" jdbcType="TIMESTAMP" />
+    <result column="UPDATE_AT" property="updateAt" jdbcType="TIMESTAMP" />
+    <result column="IS_VALID" property="isValid" jdbcType="TINYINT" />
+    <result column="AUDIT_RESULT" property="auditResult" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.driver.DriverCert" extends="BaseResultMap" >
+    <result column="IMAGE" property="image" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, TYPE, IMAGE_INFO, STATUS, DRIVER_ID, CREATE_AT, UPDATE_AT, IS_VALID, AUDIT_RESULT
+  </sql>
+  <sql id="Blob_Column_List" >
+    IMAGE
+  </sql>
+  <select id="queryImageByDriverIdAndType" resultType="String" >
+		SELECT IMAGE
+		FROM driver_cert
+		WHERE DRIVER_ID = #{driverId} AND IS_VALID = 1 AND TYPE = #{type}
+  </select>
+</mapper>
