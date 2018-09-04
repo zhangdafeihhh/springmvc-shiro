@@ -276,8 +276,9 @@ public class LoginController{
 		
 		//五、配置信息
 		Map<String, Object > configs = new HashMap<String,Object>();
-		configs.put("mobileRegex", SaasConst.MOBILE_REGEX);       //手机号码正则式
+		configs.put("mobileRegex",  SaasConst.MOBILE_REGEX);       //手机号码正则式
 		configs.put("accountRegex", SaasConst.ACCOUNT_REGEX);  //账号的正则表达式
+		configs.put("emailRegex",    SaasConst.EMAIL_REGEX);         //电子邮箱的正则表达式
 		ajaxLoginUserDTO.setConfigs(configs);
 		return AjaxResponse.success( ajaxLoginUserDTO );
 	}
