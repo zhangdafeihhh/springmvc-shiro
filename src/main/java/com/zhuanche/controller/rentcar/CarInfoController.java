@@ -22,10 +22,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,20 +41,6 @@ public class CarInfoController {
 
     @Autowired
     private UserManagementService userManagementService;
-
-    //TODO 登录用户暂无
-//    @Autowired
-//    private UserService userService;
-
-//    @RequestMapping(value = "/queryCar", method = { RequestMethod.GET })
-//    public String queryCar() {
-//        try {
-//            logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"车辆列表");
-//        } catch (Exception e) {
-//        }
-//        logger.info("queryCar:车辆列表");
-//        return "car/carList";
-//    }
 
     /**
      *
@@ -119,17 +105,6 @@ public class CarInfoController {
         return AjaxResponse.success(new PageDTO(params.getPage(), params.getPagesize(), total, BeanUtil.copyList(rows, CarInfoDTO.class)));
     }
 
-//    @AuthPassport
-//    @RequestMapping(value = "/queryCarNew", method = { RequestMethod.GET })
-//    public String queryCarNew() {
-//        try {
-//            logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"车辆列表");
-//        } catch (Exception e) {
-//        }
-//        logger.info("queryCarNew:车辆列表");
-//        return "car/carListNew";
-//    }
-
     @RequestMapping(value = "/queryCarInfo.json", method = { RequestMethod.GET })
     public AjaxResponse queryCarInfo(@Verify(param = "carId",rule = "required") Integer carId) {
         logger.info("queryCar:查看车辆详情列表");
@@ -172,7 +147,7 @@ public class CarInfoController {
     }
 
     /**
-     * 保存或修改车辆
+     * 保存或修改车辆 TODO 待完成
      * @param params
      * @param request
      * @return
@@ -196,69 +171,60 @@ public class CarInfoController {
     }
 
 
-    /**
-     * 车辆信息删除
-     * @param params
-     * @param request
-     * @return
-     */
-    @RequestMapping(value = "/deleteCarInfo.json", method = { RequestMethod.POST })
-    public Object deleteCarInfo(CarInfo params, HttpServletRequest request) {
-        logger.info("车辆删除:deleteCarInfo");
-        Map<String, Object> result = new HashMap<String, Object>();
-        String message = "";
-        try {
-            String carIds = params.getCarIds();
-            if(StringUtils.isEmpty(carIds)){
-                result.put(Common.RESULT_RESULT, 0);
-                result.put(Common.RESULT_ERRORMSG, "参数不全");
-                return result;
-            }
-            String[] carIdStr = carIds.split(",");
-            for (int i = 0; i < carIdStr.length; i++) {
-                String carId = carIdStr[i];
-                if(StringUtils.isEmpty(carId)){
-                    continue;
-                }
-                String licensePlates = this.carService.selectCarByCarId(Integer.parseInt(carId));
-                if(StringUtils.isEmpty(licensePlates)){
-                    continue;
-                }
-                CarInfo carInfoEntity = new CarInfo();
-                carInfoEntity.setCarId(Integer.parseInt(carId));
-                carInfoEntity.setLicensePlates(licensePlates);
-                carInfoEntity = this.carService.selectCarInfoByCarId(carInfoEntity);
-                if(carInfoEntity.getIsFree()==1){
-                    message += licensePlates + "该车正在运营中，不可删除;";
-                    continue;
-                }
-                carInfoEntity.setStatus(2);
-                carInfoEntity.setLicensePlates1(licensePlates);
-                params.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
-                result = this.carService.saveCarInfo(carInfoEntity);
-            }
-        } catch (Exception e) {
-            logger.error("delete CarInfo error. ", e);
-        }
-        if(StringUtils.isNotEmpty(message)){
-            result.put(Common.RESULT_RESULT, 0);
-            result.put(Common.RESULT_ERRORMSG, message);
-            return result;
-        }
-        result.put(Common.RESULT_RESULT, 1);
-        result.put(Common.RESULT_ERRORMSG, "成功");
-        return result;
-    }
-
-//    @AuthPassport
-//    @RequestMapping(value = "/importDeleteCarInfoView", method = { RequestMethod.GET }, produces="text/html;charset=UTF-8")
-//    public String importDeleteCarInfoView() {
+//    /**
+//     * 车辆信息删除
+//     * @param params
+//     * @param request
+//     * @return
+//     */
+//    @RequestMapping(value = "/deleteCarInfo.json", method = { RequestMethod.POST })
+//    public Object deleteCarInfo(CarInfo params, HttpServletRequest request) {
+//        logger.info("车辆删除:deleteCarInfo");
+//        Map<String, Object> result = new HashMap<String, Object>();
+//        String message = "";
 //        try {
-//            logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"车辆信息导入删除页");
+//            String carIds = params.getCarIds();
+//            if(StringUtils.isEmpty(carIds)){
+//                result.put(Common.RESULT_RESULT, 0);
+//                result.put(Common.RESULT_ERRORMSG, "参数不全");
+//                return result;
+//            }
+//            String[] carIdStr = carIds.split(",");
+//            for (int i = 0; i < carIdStr.length; i++) {
+//                String carId = carIdStr[i];
+//                if(StringUtils.isEmpty(carId)){
+//                    continue;
+//                }
+//                String licensePlates = this.carService.selectCarByCarId(Integer.parseInt(carId));
+//                if(StringUtils.isEmpty(licensePlates)){
+//                    continue;
+//                }
+//                CarInfo carInfoEntity = new CarInfo();
+//                carInfoEntity.setCarId(Integer.parseInt(carId));
+//                carInfoEntity.setLicensePlates(licensePlates);
+//                carInfoEntity = this.carService.selectCarInfoByCarId(carInfoEntity);
+//                if(carInfoEntity.getIsFree()==1){
+//                    message += licensePlates + "该车正在运营中，不可删除;";
+//                    continue;
+//                }
+//                carInfoEntity.setStatus(2);
+//                carInfoEntity.setLicensePlates1(licensePlates);
+//                params.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
+//                result = this.carService.saveCarInfo(carInfoEntity);
+//            }
 //        } catch (Exception e) {
+//            logger.error("delete CarInfo error. ", e);
 //        }
-//        return "car/importDeleteCarInfo";
+//        if(StringUtils.isNotEmpty(message)){
+//            result.put(Common.RESULT_RESULT, 0);
+//            result.put(Common.RESULT_ERRORMSG, message);
+//            return result;
+//        }
+//        result.put(Common.RESULT_RESULT, 1);
+//        result.put(Common.RESULT_ERRORMSG, "成功");
+//        return result;
 //    }
+
 
     /**
      * 车辆信息导入删除
@@ -272,7 +238,7 @@ public class CarInfoController {
     }
 
     /**
-     * 车辆信息导入
+     * 车辆信息导入 TODO 待完成
      */
     @RequestMapping(value = "/importCarInfo")
     public Object importCarInfo(CarInfo params, HttpServletRequest request) {
@@ -282,33 +248,75 @@ public class CarInfoController {
         return result;
     }
 
-//    /**
-//     *
-//     *车辆信息导出
-//     */
-//    @RequestMapping("/exportCarInfo")
-//    public void exportCarInfo(CarInfo params, HttpServletRequest request, HttpServletResponse response){
-//        logger.info("exportCarInfo:车辆信息导出");
-//        try {
-//            @SuppressWarnings("deprecation")
-//            Workbook wb = this.carService.exportExcel(params,request.getRealPath("/")+File.separator+"template"+File.separator+"car_info.xlsx");
-//            super.exportExcelFromTemplet(request, response, wb, new String("车辆信息列表".getBytes("gb2312"), "iso8859-1"));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    /**
-//     * 下载车辆导入模板
-//     */
-//    @RequestMapping(value = "/fileDownloadCarInfo")
-//    public void fileDownloadCarInfo(HttpServletRequest request,
-//                                    HttpServletResponse response) {
-//
-//        String path = request.getRealPath("/") + File.separator + "upload"
-//                + File.separator + "IMPORTCARINFO.xlsx";
-//        super.fileDownload(request,response,path);
-//    }
+    /**
+     *
+     *车辆信息导出
+     */
+    @RequestMapping("/exportCarInfo.json")
+    public void exportCarInfo(CarInfo params, HttpServletRequest request, HttpServletResponse response){
+        logger.info("exportCarInfo:车辆信息导出");
+        try {
+            @SuppressWarnings("deprecation")
+            Workbook wb = this.carService.exportExcel(params,request.getRealPath("/")+File.separator+"template"+File.separator+"car_info.xlsx");
+            exportExcelFromTemplet(request, response, wb, new String("车辆信息列表".getBytes("gb2312"), "iso8859-1"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 下载车辆导入模板
+     */
+    @RequestMapping(value = "/fileDownloadCarInfo.json")
+    public void fileDownloadCarInfo(HttpServletRequest request,
+                                    HttpServletResponse response) {
+
+        String path = request.getRealPath("/") + File.separator + "upload"
+                + File.separator + "IMPORTCARINFO.xlsx";
+        fileDownload(request,response,path);
+    }
+
+    /*
+     * 下载
+     */
+    public void fileDownload(HttpServletRequest request, HttpServletResponse response,String path) {
+
+        File file = new File(path);// path是根据日志路径和文件名拼接出来的
+        String filename = file.getName();// 获取日志文件名称
+        try {
+            InputStream fis = new BufferedInputStream(new FileInputStream(path));
+            byte[] buffer = new byte[fis.available()];
+            fis.read(buffer);
+            fis.close();
+            response.reset();
+            // 先去掉文件名称中的空格,然后转换编码格式为utf-8,保证不出现乱码,这个文件名称用于浏览器的下载框中自动显示的文件名
+            response.addHeader("Content-Disposition", "attachment;filename=" + new String(filename.replaceAll(" ", "").getBytes("utf-8"),"iso8859-1"));
+            response.addHeader("Content-Length", "" + file.length());
+            OutputStream os = new BufferedOutputStream(response.getOutputStream());
+            response.setContentType("application/octet-stream");
+            os.write(buffer);// 输出文件
+            os.flush();
+            os.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void exportExcelFromTemplet(HttpServletRequest request, HttpServletResponse response, Workbook wb, String fileName) throws IOException {
+        if(StringUtils.isEmpty(fileName)) {
+            fileName = "exportExcel";
+        }
+        response.setHeader("Content-Disposition","attachment;filename="+fileName+".xlsx");//指定下载的文件名
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        ServletOutputStream os =  response.getOutputStream();
+        wb.write(os);
+        os.close();
+    }
+
 }

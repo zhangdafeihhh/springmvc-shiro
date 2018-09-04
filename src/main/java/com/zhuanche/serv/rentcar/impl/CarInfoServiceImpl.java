@@ -1,13 +1,17 @@
 package com.zhuanche.serv.rentcar.impl;
 
 import com.google.common.collect.Sets;
+import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 import com.zhuanche.entity.rentcar.*;
+import com.zhuanche.serv.authc.UserManagementService;
 import com.zhuanche.serv.rentcar.CarInfoService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Common;
 import com.zhuanche.util.MyRestTemplate;
+import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
+import mapper.rentcar.ex.CarBizModelExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import mapper.rentcar.ex.CarInfoExMapper;
 import net.sf.json.JSONArray;
@@ -60,14 +64,14 @@ public class CarInfoServiceImpl implements CarInfoService {
     @Autowired
     private CarBizCityExMapper cityDao;
 
-//    @Resource(name="carBizModelDao")
-//    private CarBizModelDao carBizModelDao;
-//
+    @Autowired
+    private CarBizModelExMapper carBizModelExMapper;
+        //car_sys_dictionary
 //    @Autowired
 //    private IOrderDictionaryService <OrderDictionaryEntity> orderDictionaryService;
-//
-//    @Autowired
-//    private UserService userService;
+
+    @Autowired
+    private UserManagementService userManagementService;
 
 
 
@@ -504,7 +508,7 @@ public class CarInfoServiceImpl implements CarInfoService {
 
             int minRowIx = 1;// 过滤掉标题，从第一行开始导入数据
             int maxRowIx = sheet.getLastRowNum(); // 要导入数据的总条数
-            // int successCount = 0;// 成功导入条数
+             int successCount = 0;// 成功导入条数
 
             for (int rowIx = minRowIx; rowIx <= maxRowIx; rowIx++) {
                 Row row = sheet.getRow(rowIx); // 获取行对象
@@ -704,19 +708,18 @@ public class CarInfoServiceImpl implements CarInfoService {
                                 listException.add(returnVO);
                                 isTrue = false;
                             } else {
-                                // TODO 判断车型是否存在
-//                                Integer carModelId = carBizModelDao.queryCarModelByCarModelName(cellValue.getStringValue());
-//                                if (carModelId == null) {
-//                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-//                                    returnVO.setLicensePlates(licensePlates);
-//                                    returnVO.setReson("第" + (rowIx + 1)
-//                                            + "行数据，第" + (colIx + 1)
-//                                            + "列 【车型】无效");
-//                                    listException.add(returnVO);
-//                                    isTrue = false;
-//                                } else {
-//                                    carBizCarInfo.setCarModelId(carModelId);
-//                                }
+                                Integer carModelId = carBizModelExMapper.queryCarModelByCarModelName(cellValue.getStringValue());
+                                if (carModelId == null) {
+                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+                                    returnVO.setLicensePlates(licensePlates);
+                                    returnVO.setReson("第" + (rowIx + 1)
+                                            + "行数据，第" + (colIx + 1)
+                                            + "列 【车型】无效");
+                                    listException.add(returnVO);
+                                    isTrue = false;
+                                } else {
+                                    carBizCarInfo.setCarModelId(carModelId);
+                                }
                             }
                             break;
                         // 具体车型
@@ -2218,23 +2221,18 @@ public class CarInfoServiceImpl implements CarInfoService {
             Cell cell = null;
             int i=0;
             for(CarInfo s:list){
-                // TODO 用户查询
-//                if(s.getCreateBy()!=null && !s.getCreateBy().equals("")){
-//                    User user = new User();
-//                    user.setUserId(params.getCreateBy());
-//                    User us = userService.getUserInfo(user);
-//                    if(us!=null){
-//                        s.setCreateName(us.getUserName());
-//                    }
-//                }
-//                if(s.getUpdateBy()!=null && !s.getUpdateBy().equals("")){
-//                    User user = new User();
-//                    user.setUserId(params.getUpdateBy());
-//                    User us = userService.getUserInfo(user);
-//                    if(us!=null){
-//                        s.setUpdateName(us.getUserName());
-//                    }
-//                }
+                if(s.getCreateBy()!=null && !s.getCreateBy().equals("")){
+                    CarAdmUser us = userManagementService.getUserById(params.getCreateBy());
+                    if(us!=null){
+                        s.setCreateName(us.getUserName());
+                    }
+                }
+                if(s.getUpdateBy()!=null && !s.getUpdateBy().equals("")){
+                    CarAdmUser us = userManagementService.getUserById(params.getUpdateBy());
+                    if(us!=null){
+                        s.setUpdateName(us.getUserName());
+                    }
+                }
                 Row row = sheet.createRow(i + 1);
                 cell = row.createCell(0);
                 cell.setCellValue(s.getLicensePlates());
@@ -2466,18 +2464,6 @@ public class CarInfoServiceImpl implements CarInfoService {
             return false;
         }
         return true;
-    }
-
-    @SuppressWarnings("unused")
-    public static void main(String[] args) {
-
-        String reg = "[\u4e00-\u9fa5]*交运管[\u4e00-\u9fa5]{1,2}字\\d{6}\\s\\d{6}号$";
-        String str = "滇交运管渡字530111 000645号";
-        Boolean flag = str.matches("[\u4e00-\u9fa5]*交运管[\u4e00-\u9fa5]{1,2}字\\d{6}\\s\\d{6}号$");
-
-        String a = "2GR-0649472";
-        String b = "(^[a-zA-Z0-9\\-]{11}$)|(^[a-zA-Z0-9\\-]{17}$)";
-        flag = isRegular(a,b);
     }
 
     @Override
