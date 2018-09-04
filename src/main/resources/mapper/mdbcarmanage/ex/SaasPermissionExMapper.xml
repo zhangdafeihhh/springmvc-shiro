@@ -17,6 +17,11 @@
     menu_url, menu_open_mode, valid, sort_seq
   </sql>
   
+  <!-- 查询父权限下所有子权限的最大排序序号 -->
+  <select id="selectMaxSortSeq" resultType="java.lang.Integer">
+	  select IFNULL(MAX(sort_seq),0) from saas_permission where parent_permission_id = #{parentId}
+  </select>
+  
   <!-- 根据权限ID、父权限ID、权限代码、权限类型、权限名称、状态进行查询 -->
   <select id="queryPermissions" resultMap="BaseResultMap" >
     select 
