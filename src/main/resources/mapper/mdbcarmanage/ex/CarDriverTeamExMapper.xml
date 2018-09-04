@@ -12,7 +12,7 @@
     <result column="city" property="city" jdbcType="VARCHAR" />
     <result column="supplier" property="supplier" jdbcType="VARCHAR" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
-    <result column="status" property="status" jdbcType="BIT" />
+    <result column="status" property="status" jdbcType="INTEGER" />
     <result column="p_id" property="pId" jdbcType="INTEGER" />
     <result column="duty_start_date" property="dutyStartDate" jdbcType="VARCHAR" />
     <result column="duty_end_date" property="dutyEndDate" jdbcType="VARCHAR" />
@@ -24,12 +24,29 @@
     id, team_name, sort, create_by, create_date, update_by, update_date, city, supplier, 
     remark, status, p_id, duty_start_date, duty_end_date, charge1, charge2, charge3
   </sql>
+    <select id="queryTeamIdByDriverId" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+        SELECT
+        r.team_id teamId, t.team_name teamName
+        FROM
+        car_relate_team r
+        left join car_driver_team t on r.team_id = t.id
+        WHERE 1=1
+        <if test="driverId !=null and driverId !=''">
+            and r.driver_id in (${driverId})
+        </if>
+    </select>
 
     <select id="selectByCondition" resultMap="BaseResultMap" parameterType="com.zhuanche.request.DriverTeamRequest" >
         select
         <include refid="Base_Column_List" />
         from car_driver_team
-        where team_name like CONCAT('%',#{teamName,jdbcType=VARCHAR},'%')
+        where
+        <if test="teamId!=null">
+            id = #{teamId} AND
+        </if>
+        <if test="teamName!=null">
+            team_name like CONCAT('%',#{teamName,jdbcType=VARCHAR},'%')
+        </if>
         limit 1
     </select>
 

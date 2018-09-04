@@ -77,7 +77,7 @@
 	</bean>
 
 	<!-- ********************************配置Shiro的Web过滤器 -->
-	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+	<bean id="shiroFilter" class="com.zhuanche.shiro.PlatformShiroFilterFactoryBean">
 		<property name="securityManager" ref="securityManager" />
 		<property name="loginUrl" value="/login.json" />
 		<property name="successUrl" value="${homepage.url}" />

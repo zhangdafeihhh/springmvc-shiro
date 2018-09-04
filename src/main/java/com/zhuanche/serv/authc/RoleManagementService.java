@@ -213,6 +213,7 @@ public class RoleManagementService{
 			roleName = null;
 		}
 		if( StringUtils.isNotEmpty(roleName) ) {
+			roleName = roleName.replace("/", "//").replace("%", "/%").replace("_", "/_");
 			roleName = "%"+roleName+"%";
 		}
 		if( valid!=null && valid.byteValue()!=0 && valid.byteValue()!=1 ) {

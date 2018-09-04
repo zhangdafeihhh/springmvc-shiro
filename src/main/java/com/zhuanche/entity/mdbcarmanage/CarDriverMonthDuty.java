@@ -1,8 +1,12 @@
 package com.zhuanche.entity.mdbcarmanage;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class CarDriverMonthDuty {
+public class CarDriverMonthDuty implements Serializable{
+
+    private static final long serialVersionUID = 7971916990041701145L;
+
     private Integer id;
 
     private Date time;
