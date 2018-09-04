@@ -40,7 +40,7 @@ public class MyRestTemplate extends RestTemplate {
 	public MyRestTemplate(ClientHttpRequestFactory requestFactory) {
 		super(requestFactory);
 	}
-	private String failover = "http://localhost/";
+	private String failover = "http://192.168.2.145/";
 
 	public void setFailover(String failover) {
 		this.failover = failover;

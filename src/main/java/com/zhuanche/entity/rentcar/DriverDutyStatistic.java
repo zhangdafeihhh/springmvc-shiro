@@ -45,6 +45,10 @@ public class DriverDutyStatistic {
 
     private String forcedTimeAll;
 
+    private String cityName;
+
+    private String supplierName;
+
     public String getDutyTimeAll() {
         return dutyTimeAll;
     }
@@ -211,5 +215,21 @@ public class DriverDutyStatistic {
 
     public void setCargroupid(Integer cargroupid) {
         this.cargroupid = cargroupid;
+    }
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
     }
 }

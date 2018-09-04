@@ -96,22 +96,6 @@ public class DriverDutyStatisticParams {
         this.licensePlates = licensePlates;
     }
 
-//    public String getStartDate() {
-//        return startDate;
-//    }
-//
-//    public void setStartDate(String startDate) {
-//        this.startDate = startDate;
-//    }
-//
-//    public String getEndDate() {
-//        return endDate;
-//    }
-//
-//    public void setEndDate(String endDate) {
-//        this.endDate = endDate;
-//    }
-
     public String getStartTime() {
         return startTime;
     }
@@ -240,7 +224,7 @@ public class DriverDutyStatisticParams {
         this.cities = cities;
     }
 
-    public DriverDutyStatisticParams(String cityId, String supplierId, String teamId, String groupIds, String name, String driverId, String phone, String licensePlates, String startTime, String endTime, Integer page, Integer pageSize) {
+    public DriverDutyStatisticParams(String cityId, String supplierId, String teamId, String groupIds, String name, String driverId, String phone, String licensePlates, String startTime, String endTime, String sortName, String sortOrder, Integer page, Integer pageSize) {
         this.cityId = cityId;
         this.supplierId = supplierId;
         this.teamId = teamId;
@@ -250,10 +234,10 @@ public class DriverDutyStatisticParams {
         this.driverId = driverId;
         this.phone = phone;
         this.licensePlates = licensePlates;
-//        this.startDate = startDate;
-//        this.endDate = endDate;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.sortName = sortName;
+        this.sortOrder = sortOrder;
         this.page = page;
         this.pageSize = pageSize;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd");
@@ -289,8 +273,6 @@ public class DriverDutyStatisticParams {
                 ", name='" + name + '\'' +
                 ", phone='" + phone + '\'' +
                 ", licensePlates='" + licensePlates + '\'' +
-//                ", startDate='" + startDate + '\'' +
-//                ", endDate='" + endDate + '\'' +
                 ", startTime='" + startTime + '\'' +
                 ", endTime='" + endTime + '\'' +
                 ", driverId='" + driverId + '\'' +

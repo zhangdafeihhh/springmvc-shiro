@@ -107,6 +107,17 @@ public final class RestErrorCode{
 	@ResultMessage("银行卡号和银行开户行不能只填写一个")
 	public static final int DRIVER_BANK_CARD_NUMBER_EXIST                    = 3007;
 
+	@ResultMessage("周报查询时间段只能查询一个星期的时间")
+	public static final int ONLY_QUERY_WEEK                    = 3101;
+	@ResultMessage("月报查询时间段只能查询一个月份的时间")
+	public static final int ONLY_QUERY_ONE_MONTH                    = 3102;
+	@ResultMessage("文件导出失败")
+	public static final int FILE_EXCEL_REPORT_FAIL                    = 3103;
+	@ResultMessage("查询时间范围结束时间不能为空")
+	public static final int ENDTIME_IS_NULL                    = 3104;
+	@ResultMessage("查询时间范围开始时间不能大于结束时间")
+	public static final int STARTTIME_GREATE_ENDTIME                    = 3105;
+
 	//-----------------------------------------------业务参数：导入文件
 	@ResultMessage("文件异常")
 	public static final int FILE_ERROR                    = 4001;

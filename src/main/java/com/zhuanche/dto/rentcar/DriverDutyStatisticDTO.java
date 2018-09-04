@@ -15,21 +15,11 @@ public class DriverDutyStatisticDTO {
 
     private String phone;
 
-    private Integer cityid;
-
-    private Double alltime;
-
-    private Double zgftime;
-
-    private Double wgftime;
-
     private Double dutytime;
 
     private Double forcedtime;
 
     private Double overtime;
-
-    private Integer supplierid;
 
     private Double forcedtime1;
 
@@ -39,10 +29,7 @@ public class DriverDutyStatisticDTO {
 
     private Double forcedtime4;
 
-    private Integer cargroupid;
-
     private String cityName;
-    private String SupplierName;
 
     private String dutyTimeAll;
 
@@ -70,14 +57,6 @@ public class DriverDutyStatisticDTO {
 
     public void setCityName(String cityName) {
         this.cityName = cityName;
-    }
-
-    public String getSupplierName() {
-        return SupplierName;
-    }
-
-    public void setSupplierName(String supplierName) {
-        SupplierName = supplierName;
     }
 
     public Integer getId() {
@@ -128,38 +107,6 @@ public class DriverDutyStatisticDTO {
         this.phone = phone == null ? null : phone.trim();
     }
 
-    public Integer getCityid() {
-        return cityid;
-    }
-
-    public void setCityid(Integer cityid) {
-        this.cityid = cityid;
-    }
-
-    public Double getAlltime() {
-        return alltime;
-    }
-
-    public void setAlltime(Double alltime) {
-        this.alltime = alltime;
-    }
-
-    public Double getZgftime() {
-        return zgftime;
-    }
-
-    public void setZgftime(Double zgftime) {
-        this.zgftime = zgftime;
-    }
-
-    public Double getWgftime() {
-        return wgftime;
-    }
-
-    public void setWgftime(Double wgftime) {
-        this.wgftime = wgftime;
-    }
-
     public Double getDutytime() {
         return dutytime;
     }
@@ -182,14 +129,6 @@ public class DriverDutyStatisticDTO {
 
     public void setOvertime(Double overtime) {
         this.overtime = overtime;
-    }
-
-    public Integer getSupplierid() {
-        return supplierid;
-    }
-
-    public void setSupplierid(Integer supplierid) {
-        this.supplierid = supplierid;
     }
 
     public Double getForcedtime1() {
@@ -224,11 +163,4 @@ public class DriverDutyStatisticDTO {
         this.forcedtime4 = forcedtime4;
     }
 
-    public Integer getCargroupid() {
-        return cargroupid;
-    }
-
-    public void setCargroupid(Integer cargroupid) {
-        this.cargroupid = cargroupid;
-    }
 }

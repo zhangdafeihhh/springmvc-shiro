@@ -425,4 +425,33 @@ public class DateUtil {
 		return maxDate;
 	}
 
+	/**
+	 * 判断两个时间是否在同一周
+	 * @param date1
+	 * @param date2
+	 * @return
+	 */
+	public static boolean isWeekSame(String date1, String date2){
+		Date d1 = null;
+		Date d2 = null;
+		try{
+			d1 = DATE_SIMPLE_FORMAT.parse(date1);
+			d2 = DATE_SIMPLE_FORMAT.parse(date2);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		Calendar cal1 = Calendar.getInstance();
+		Calendar cal2 = Calendar.getInstance();
+		cal1.setFirstDayOfWeek(Calendar.MONDAY);//西方周日为一周的第一天，咱得将周一设为一周第一天
+		cal2.setFirstDayOfWeek(Calendar.MONDAY);
+		cal1.setTime(d1);
+		cal2.setTime(d2);
+		int subYear = cal1.get(Calendar.YEAR) - cal2.get(Calendar.YEAR);// subYear==0,说明是同一年
+		if (subYear == 0){
+			if (cal1.get(Calendar.WEEK_OF_YEAR) == cal2.get(Calendar.WEEK_OF_YEAR))
+				return true;
+		}
+		return false;
+	}
+
 }

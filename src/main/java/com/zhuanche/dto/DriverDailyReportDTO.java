@@ -13,7 +13,7 @@ public class DriverDailyReportDTO{
 
 	private Integer id;
 
-    private String statDate;
+    private String statDate;//统计日期
 
     private String licensePlates;
 

@@ -1,4 +1,4 @@
-package com.zhuanche.entity.common;
+package com.zhuanche.entity.mdbcarmanage;
 
 import java.io.Serializable;
 
@@ -7,7 +7,7 @@ import java.io.Serializable;
  * @author admin
  *
  */
-public class DriverDailyReportBean implements Serializable{
+public class DriverDailyReportParams implements Serializable{
 	
 	/**
 	 * 
@@ -27,6 +27,26 @@ public class DriverDailyReportBean implements Serializable{
 	private String groupIds;//小组
 	private Integer page;
 	private Integer pageSize;
+
+	public DriverDailyReportParams(String licensePlates, String driverName, String driverIds, String teamIds, String suppliers, String cities, String statDateStart,
+		   String statDateEnd, String sortName, String sortOrder, String groupIds, Integer page, Integer pageSize) {
+		this.licensePlates = licensePlates;
+		this.driverName = driverName;
+		this.driverIds = driverIds;
+		this.teamIds = teamIds;
+		this.suppliers = suppliers;
+		this.cities = cities;
+		this.statDateStart = statDateStart;
+		this.statDateEnd = statDateEnd;
+		this.sortName = sortName;
+		this.sortOrder = sortOrder;
+		this.groupIds = groupIds;
+		this.page = page;
+		this.pageSize = pageSize;
+	}
+
+	public DriverDailyReportParams() {
+	}
 
 	public String getLicensePlates() {
 		return licensePlates;

@@ -50,11 +50,12 @@
     travel_time, travel_mileage, travel_time_end, travel_mileage_end,forced_time
   </sql>
   
-  <select id="queryForListObject" resultMap="BaseResultMap" parameterType="com.zhuanche.entity.common.DriverDailyReportBean" >
+  <select id="queryForListObject" resultMap="BaseResultMap" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDailyReportParams" >
     select 
     r.id id,
     <include refid="Base_Column_List" />,
     t.team_name teamName,
+    r.driver_id,
     (select team_name from car_driver_team tt,car_relate_group gg where tt.id = gg.group_id and gg.driver_id = r.driver_id limit 1) as groupName
     from driver_daily_report r force index(idx_stat_date)
     left join car_driver_team t on t.id = r.car_team_id
@@ -91,9 +92,9 @@
 			${sortName},driver_id ${sortOrder}
 	  </if> 
   </select>
-  
+
   <!-- 周报sql -->
-  <select id="queryWeekForListObject" resultMap="BaseResultMap" parameterType="com.zhuanche.entity.common.DriverDailyReportBean" >
+  <select id="queryWeekForListObject" resultMap="BaseResultMap" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDailyReportParams" >
     select
     r.id id,
     license_plates,

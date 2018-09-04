@@ -5,14 +5,17 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.controller.DriverQueryController;
 import com.zhuanche.dto.DriverDailyReportDTO;
-import com.zhuanche.entity.common.DriverDailyReportBean;
+import com.zhuanche.entity.mdbcarmanage.DriverDailyReportParams;
 import com.zhuanche.entity.mdbcarmanage.DriverDailyReport;
 import com.zhuanche.serv.common.DataPermissionHelper;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
+import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.MyRestTemplate;
 import mapper.mdbcarmanage.ex.CarRelateGroupExMapper;
 import mapper.mdbcarmanage.ex.DriverDailyReportExMapper;
@@ -36,6 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,51 +73,78 @@ public class DriverDailyReportController extends DriverQueryController {
 	public String list(){
 		return "driverdailyreport/driverlist";
 	}
-	
+
 	/**
-	 * <p>Title: queryDriverWeekReportDataNew</p>  
-	 * <p>Description: </p>  
-	 * @param driverDailyReportBean 查询参数
+	 * 日报查询
+	 * @param licensePlates 车牌号
+	 * @param driverName 司机姓名
+	 * @param driverIds 司机id
+	 * @param teamIds 车队id
+	 * @param suppliers 供应商id
+	 * @param cities 城市id
+	 * @param statDateStart 开始时间
+	 * @param statDateEnd 结束时间
+	 * @param sortName 排序名称
+	 * @param sortOrder 排序顺序
+	 * @param groupIds 组id
 	 * @param page  当前页
 	 * @param pageSize  页面展示数量
 	 * @param reportType  报表类型  0 日报 1周报 2 月报  默认为0，查询日报
-	 * @return  
-	 * return: AjaxResponse
+	 * @return
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/queryDriverReportData")
-	public AjaxResponse queryDriverWeekReportDataNew(DriverDailyReportBean driverDailyReportBean, Integer page, Integer pageSize, Integer reportType){
-		log.info("司机周报列表数据:queryDriverDailyReportData");
+	public AjaxResponse queryDriverWeekReportDataNew(String licensePlates, String driverName, String driverIds, String teamIds,
+		    @Verify(rule = "required",param = "suppliers") String suppliers,
+    		@Verify(rule = "required",param = "cities") String cities,
+		    @Verify(rule = "required",param = "statDateStart") String statDateStart,
+			@Verify(rule = "required",param = "statDateEnd") String statDateEnd, String sortName, String sortOrder, String groupIds, Integer page, Integer pageSize, Integer reportType){
+		//默认报告类型为日报
 		reportType = reportType == null ? 0 : reportType;
+		if (reportType.equals(0)){
+			statDateEnd = statDateStart;
+		}else if(reportType.equals(1)){
+			//如果是周报，但是开始时间和结束时间不再同一周，不可以
+			if (!DateUtil.isWeekSame(statDateStart,statDateEnd)){
+				return AjaxResponse.fail(RestErrorCode.ONLY_QUERY_WEEK);
+			}
+		}else if (reportType.equals(2)){
+			//如果是月报，但是开始时间和结束时间不再同一月，不可以
+			if (!statDateStart.substring(0,7).equals(statDateEnd.substring(0,7))){
+				return AjaxResponse.fail(RestErrorCode.ONLY_QUERY_ONE_MONTH);
+			}
+		}
+		//初始化查询参数
+		DriverDailyReportParams params = new DriverDailyReportParams(licensePlates,driverName,driverIds,teamIds,suppliers,cities,statDateStart,statDateEnd,sortName,sortOrder,groupIds,page,pageSize);
+
+		log.info("司机周报列表数据:queryDriverDailyReportData，参数："+params.toString());
 		int total = 0;
 		//判断权限   如果司机id为空为查询列表页
-		if(StringUtils.isEmpty(driverDailyReportBean.getDriverIds())){
+		if(StringUtils.isEmpty(params.getDriverIds())){
 			String driverList = "";
 			//如果页面输入了小组id
-			if(StringUtils.isNotEmpty(driverDailyReportBean.getGroupIds())){
+			if(StringUtils.isNotEmpty(params.getGroupIds())){
 				//通过小组id查询司机id, 如果用户
-				driverList = super.queryAuthorityDriverIdsByTeamAndGroup(null, String.valueOf(driverDailyReportBean.getGroupIds()));
+				driverList = super.queryAuthorityDriverIdsByTeamAndGroup(null, String.valueOf(params.getGroupIds()));
 				//如果该小组下无司机，返回空
 				if(StringUtils.isEmpty(driverList)){
-					log.info("司机日报列表-有选择小组查询条件-该小组下没有司机groupId=="+driverDailyReportBean.getGroupIds());
-					PageDTO pageDTO = new PageDTO(page, pageSize, total, null);
+					log.info("司机日报列表-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds());
+					PageDTO pageDTO = new PageDTO(params.getPage(), params.getPageSize(), total, null);
 					return AjaxResponse.success(pageDTO);
 				}
 			}
-			driverDailyReportBean.setDriverIds(driverList);
+			params.setDriverIds(driverList);
 		}
 		//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限 
-		driverDailyReportBean = this.chuliDriverDailyReportEntity(driverDailyReportBean);
+		params = this.chuliDriverDailyReportEntity(params);
 		List<DriverDailyReport> list = null;
 		//开始查询
-		Page<DriverDailyReport> p = PageHelper.startPage(page, pageSize);
+		Page<DriverDailyReport> p = PageHelper.startPage(params.getPage(), params.getPageSize());
 		try {
 			if ( reportType==0 ) {
-				list = this.driverDailyReportExMapper.queryForListObject(driverDailyReportBean);
-			}else if ( reportType==1 ) {
-				list = this.driverDailyReportExMapper.queryWeekForListObject(driverDailyReportBean);
-			} else if ( reportType==2 ) {
-				list = this.driverDailyReportExMapper.queryForListObject(driverDailyReportBean);
+				list = this.driverDailyReportExMapper.queryForListObject(params);
+			}else{
+				list = this.driverDailyReportExMapper.queryWeekForListObject(params);
 			}
 			total = (int) p.getTotal();
 		} finally {
@@ -121,21 +152,58 @@ public class DriverDailyReportController extends DriverQueryController {
 		}
 		//如果不为空，进行查询供应商名称
 		List<DriverDailyReportDTO> dtoList = this.selectSuppierNameAndCityNameDays(list);
-		PageDTO pageDTO = new PageDTO(page, pageSize, total, dtoList);
+		PageDTO pageDTO = new PageDTO(params.getPage(), params.getPageSize(), total, dtoList);
 		return AjaxResponse.success(pageDTO);
 	}
 
 
 	/**
-	 * <p>Title: queryDriverWeekReportDataNew</p>
-	 * <p>Description: </p>
-	 * @param driverDailyReportBean 查询参数
+	 * excel导出
+	 * @param licensePlates 车牌号
+	 * @param driverName 司机姓名
+	 * @param driverIds 司机id
+	 * @param teamIds 车队id
+	 * @param suppliers 供应商id
+	 * @param cities 城市id
+	 * @param statDateStart 开始时间
+	 * @param statDateEnd 结束时间
+	 * @param sortName 排序名称
+	 * @param sortOrder 排序顺序
+	 * @param groupIds 组id
 	 * @param reportType  报表类型  0 日报 1周报 2 月报  默认为0，查询日报
 	 * @return
-	 * return: AjaxResponse
 	 */
+	@ResponseBody
 	@RequestMapping(value = "/exportDriverReportData")
-	public void exportDriverReportData(DriverDailyReportBean driverDailyReportBean, Integer reportType, HttpServletRequest request,HttpServletResponse response) {
+	public AjaxResponse exportDriverReportData(String licensePlates, String driverName, String driverIds, String teamIds,
+		   @Verify(rule = "required",param = "suppliers") String suppliers,
+		   @Verify(rule = "required",param = "cities") String cities,
+		   @Verify(rule = "required",param = "statDateStart") String statDateStart, String statDateEnd, String sortName, String sortOrder, String groupIds, Integer reportType, HttpServletRequest request, HttpServletResponse response) {
+
+		//默认报告类型为日报
+		reportType = reportType == null ? 0 : reportType;
+		if (reportType.equals(0)){
+			statDateEnd = statDateStart;
+		}else if(reportType.equals(1)){
+			//如果是周报，但是开始时间和结束时间不再同一周，不可以
+			if (statDateStart.compareTo(statDateEnd) > 0 ){
+				return AjaxResponse.fail(RestErrorCode.STARTTIME_GREATE_ENDTIME);
+			}
+			if (!DateUtil.isWeekSame(statDateStart,statDateEnd)){
+				return AjaxResponse.fail(RestErrorCode.ONLY_QUERY_WEEK);
+			}
+		}else if (reportType.equals(2)){
+			if (statDateStart.compareTo(statDateEnd) > 0 ){
+				return AjaxResponse.fail(RestErrorCode.STARTTIME_GREATE_ENDTIME);
+			}
+			//如果是月报，但是开始时间和结束时间不再同一月，不可以
+			if (!statDateStart.substring(7).equals(statDateEnd.substring(7))){
+				return AjaxResponse.fail(RestErrorCode.ONLY_QUERY_ONE_MONTH);
+			}
+		}
+
+		DriverDailyReportParams params = new DriverDailyReportParams(licensePlates,driverName,driverIds,teamIds,suppliers,cities,statDateStart,statDateEnd,sortName,sortOrder,groupIds,null,null);
+
 		try {
 			log.info("司机周报列表数据:queryDriverDailyReportData");
 			reportType = reportType == null ? 0 : reportType;
@@ -147,29 +215,27 @@ public class DriverDailyReportController extends DriverQueryController {
 			//判断权限   如果司机id为空为查询列表页
 			String driverList = null;
 			//如果页面输入了小组id
-			if(StringUtils.isNotEmpty(driverDailyReportBean.getGroupIds())){
+			if(StringUtils.isNotEmpty(params.getGroupIds())){
 				//通过小组id查询司机id, 如果用户
-				driverList = super.queryAuthorityDriverIdsByTeamAndGroup(null, String.valueOf(driverDailyReportBean.getGroupIds()));
+				driverList = super.queryAuthorityDriverIdsByTeamAndGroup(null, String.valueOf(params.getGroupIds()));
 				//如果该小组下无司机，返回空
 				if(StringUtils.isEmpty(driverList)){
-					log.info("司机日报列表-有选择小组查询条件-该小组下没有司机groupId=="+driverDailyReportBean.getGroupIds());
+					log.info("司机日报列表-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds());
 					list = new ArrayList<DriverDailyReport>();
 				}
 			}
-			if(StringUtils.isNotEmpty(driverDailyReportBean.getGroupIds()) && (StringUtils.isEmpty(driverList))){
+			if(StringUtils.isNotEmpty(params.getGroupIds()) && (StringUtils.isEmpty(driverList))){
 			}else{
-				driverDailyReportBean.setDriverIds(driverList);
+				params.setDriverIds(driverList);
 				//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
-				driverDailyReportBean = this.chuliDriverDailyReportEntity(driverDailyReportBean);
+				params = this.chuliDriverDailyReportEntity(params);
 				//开始查询
 				Page<DriverDailyReport> p = PageHelper.startPage(1, 500);
 				try {
 					if ( reportType==0 ) {
-						list = this.driverDailyReportExMapper.queryForListObject(driverDailyReportBean);
-					}else if ( reportType==1 ) {
-						list = this.driverDailyReportExMapper.queryWeekForListObject(driverDailyReportBean);
-					} else if ( reportType==2 ) {
-						list = this.driverDailyReportExMapper.queryForListObject(driverDailyReportBean);
+						list = this.driverDailyReportExMapper.queryForListObject(params);
+					}else {
+						list = this.driverDailyReportExMapper.queryWeekForListObject(params);
 					}
 					total = (int) p.getTotal();
 				} finally {
@@ -179,8 +245,10 @@ public class DriverDailyReportController extends DriverQueryController {
 			}
 			Workbook wb = this.exportExcel(rows,request.getRealPath("/")+ File.separator+"template"+File.separator+"driverDailyReport_info.xlsx");
 			this.exportExcelFromTemplet(request, response, wb, new String("司机周/月报列表".getBytes("gb2312"), "iso8859-1"));
+			return AjaxResponse.success("文件导出成功");
 		} catch (Exception e) {
 			log.error("导出失败哦！");
+			return AjaxResponse.fail(RestErrorCode.FILE_EXCEL_REPORT_FAIL);
 		}
 	}
 
@@ -215,7 +283,7 @@ public class DriverDailyReportController extends DriverQueryController {
 	 * @return
 	 * return: DriverDailyReportDTO
 	 */
-	public DriverDailyReportBean  chuliDriverDailyReportEntity(DriverDailyReportBean driverDailyReportBean){
+	public DriverDailyReportParams chuliDriverDailyReportEntity(DriverDailyReportParams driverDailyReportBean){
 		//整理排序字段
 		if(!"".equals(driverDailyReportBean.getSortName())&&driverDailyReportBean.getSortName()!=null){
 			String sortName = pingSortName(driverDailyReportBean.getSortName());

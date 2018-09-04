@@ -4,6 +4,8 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.controller.DriverQueryController;
 import com.zhuanche.dto.rentcar.DriverDutyStatisticDTO;
 import com.zhuanche.entity.mdbcarmanage.DriverDailyReport;
@@ -57,27 +59,44 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	private StatisticDutyHalfExMapper statisticDutyHalfExMapper;
 	/**
 	 * 司机考勤查询
-	 * @param cityId
-	 * @param supplierId
-	 * @param teamId
-	 * @param groupIds
-	 * @param name
-	 * @param phone
-	 * @param licensePlates
-	 * @param startDate
-	 * @param endDate
-	 * @param startTime
-	 * @param endTime
-	 * @param page
-	 * @param pageSize
+	 * @param cityId 城市ID
+	 * @param supplierId 供应商ID
+	 * @param teamId 车队ID
+	 * @param groupIds 小组ID
+	 * @param name 司机名称
+	 * @param phone 司机电话
+	 * @param licensePlates 车牌号
+	 * @param startTime  开始时间，格式YYYY-MM-DD
+	 * @param endTime 结束时间，格式YYYY-MM-DD
+	 * @param sortName 排序字段名称
+	 * @param sortOrder 正序（ASC）、倒序（DESC）
+	 * @param page 当前页
+	 * @param pageSize 页面展示数量
+	 * @param reportType 查询类型，0：日统计，1：月统计
 	 * @return
 	 */
 	@RequestMapping(value = "/driverDutyStatisticDailData")
 	@ResponseBody
-	public AjaxResponse driverDutyStatisticDailData(String cityId, String supplierId, String teamId, String groupIds, String name,String driverId,
-		String  phone, String licensePlates, String startDate, String endDate, String startTime, String endTime, Integer page, Integer pageSize) {
+	public AjaxResponse driverDutyStatisticDailData(@Verify(param = "cityId",rule = "required") String cityId, @Verify(param = "supplierId",rule = "required")String supplierId, String teamId,
+			String groupIds, String name, String driverId, String  phone, String licensePlates,
+			@Verify(param = "startTime",rule = "required") String startTime, String endTime, String sortName, String sortOrder, Integer page, Integer pageSize, Integer reportType) {
+		//默认日统计
+		reportType = reportType == null ? 0 : reportType;
+		//如果是日统计，开始时间和结束时间不能为空并且开始时间和结束时间在一个月内
+		if (reportType.equals(0)){
+			if(StringUtils.isEmpty(endTime)){
+				return AjaxResponse.fail(RestErrorCode.ENDTIME_IS_NULL);
+			}
+			if (startTime.compareTo(endTime) > 0 ){
+				return AjaxResponse.fail(RestErrorCode.STARTTIME_GREATE_ENDTIME);
+			}
+			if(!startTime.substring(0,7).equals(endTime.substring(0,7))){
+				return AjaxResponse.fail(RestErrorCode.ONLY_QUERY_ONE_MONTH);
+			}
+		}
+
 		//初始化参数
-		DriverDutyStatisticParams params = new DriverDutyStatisticParams(cityId, supplierId, teamId, groupIds, name,driverId,phone, licensePlates, startTime, endTime, page, pageSize);
+		DriverDutyStatisticParams params = new DriverDutyStatisticParams(cityId, supplierId, teamId, groupIds, name,driverId,phone, licensePlates, startTime, endTime, sortName, sortOrder, page, pageSize);
 		log.info("司机考勤记录列表数据:driverDutyStatisticDailData,参数"+ params.toString());
 		int total = 0;
 		//判断权限  如果司机id为空为查询列表页
@@ -107,61 +126,24 @@ public class DriverDutyStatisticController extends DriverQueryController{
 		//处理参数
 		params = chuliDriverDutyStatisticParams(params);
 		//开始查询
-		Page<DriverDailyReport> p = PageHelper.startPage(params.getPage(), params.getPageSize());
-		List<DriverDutyStatistic> list = this.driverDutyStatisticExMapper.queryForListObject(params);
-		total = (int) p.getTotal();
-		//数据转换
-		List<DriverDutyStatisticDTO> dtoList = selectSuppierNameAndCityName(list);
-		PageDTO pageDTO = new PageDTO(params.getPage(), params.getPageSize(), total, dtoList);
-		return AjaxResponse.success(pageDTO);
-	}
-
-
-	@RequestMapping(value = "/driverDutyStatisticMonthData")
-	@ResponseBody
-	public Object driverDutyStatisticMonthData(String cityId, String supplierId, String teamId, String groupIds, String name,
-											   String  phone, String licensePlates, String startTime, String endTime, Integer page, Integer pageSize) {
-		//初始化参数
-		DriverDutyStatisticParams params = new DriverDutyStatisticParams(cityId,supplierId,teamId,groupIds,name,
-				null,phone,licensePlates,startTime,endTime,page,pageSize);
-		log.info("司机考勤记录列表数据:driverDutyStatisticMonthData,参数"+params.toString());
-		int total = 0;
-		String driverList = "";
-
-		//如果页面输入了小组id或者车队id
-		if(StringUtils.isNotEmpty(params.getGroupIds()) ||  StringUtils.isNotEmpty(params.getTeamId())){
-			//通过小组id查询司机id, 如果用户
-			driverList = super.queryAuthorityDriverIdsByTeamAndGroup(params.getTeamId(), String.valueOf(params.getGroupIds()));
-			//如果该小组下无司机，返回空
-			if(StringUtils.isEmpty(driverList)){
-				log.info("司机考勤3.0列表-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds());
-				log.info("或者司机考勤3.0列表-有选择车队查询条件-该车队下没有司机teamId=="+params.getTeamId());
-				PageDTO pageDTO = new PageDTO(params.getPage(), params.getPageSize(), total, null);
-				return AjaxResponse.success(pageDTO);
+		Page<DriverDutyStatistic> p = PageHelper.startPage(params.getPage(), params.getPageSize());
+		List<DriverDutyStatistic> list = null;
+		try{
+			if (reportType.equals(0)){
+				list = this.driverDutyStatisticExMapper.queryForListObject(params);
+			}else{
+				list = this.driverDutyStatisticExMapper.queryDriverMonthDutyList(params);
 			}
+			total = (int) p.getTotal();
+		}finally {
+			PageHelper.clearPage();
 		}
-		params.setDriverIds(driverList);
-
-		//如果输入开始时间重置查询表名称
-		if(StringUtils.isNotEmpty(params.getStartTime())){
-			String time = params.getStartTime();
-			int value = setDriverDutyStatisticValue(time);
-			params.setValue(value);
-			params.setTable("statistic_duty_"+time.substring(0,7).replaceAll("-", "_"));
-		}
-		//处理参数
-		params = chuliDriverDutyStatisticParams(params);
-
-		//开始查询
-		Page<DriverDailyReport> p = PageHelper.startPage(params.getPage(), params.getPageSize());
-		List<DriverDutyStatistic> list = this.driverDutyStatisticExMapper.queryDriverMonthDutyList(params);
-		total = (int) p.getTotal();
 		//数据转换
 		List<DriverDutyStatisticDTO> dtoList = selectSuppierNameAndCityName(list);
 		PageDTO pageDTO = new PageDTO(params.getPage(), params.getPageSize(), total, dtoList);
 		return AjaxResponse.success(pageDTO);
 	}
-	
+
 	/**
 	 * 司机个人考勤列表  司机考勤记录列表按司机id查询数据
 	 * @param driverId 司机id
@@ -172,7 +154,7 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	 */
 	@RequestMapping(value = "/driverDutyStatisticHalfData")
 	@ResponseBody
-	public AjaxResponse driverDutyStatisticHalfData(String driverId,String time, Integer page, Integer pageSize) {
+	public AjaxResponse driverDutyStatisticHalfData(@Verify(param = "driverId",rule = "required") String driverId,@Verify(param = "time",rule = "required") String time, Integer page, Integer pageSize) {
 
 		StatisticDutyHalfParams params = new StatisticDutyHalfParams(driverId, time, page, pageSize);
 		log.info("司机考勤记录列表按司机id查询数据:driverDutyStatisticHalfData,参数"+params.toString());
@@ -207,11 +189,29 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	 * @param response
 	 * @return
 	 */
+	@ResponseBody
 	@RequestMapping("/exportDriverDutyStatistic")
-	public void exportDriverDuty(String cityId, String supplierId, String teamId, String groupIds, String name, String  phone, String licensePlates, String startTime,
-		 String endTime, Integer page, Integer pageSize, HttpServletRequest request, HttpServletResponse response){
+	public AjaxResponse exportDriverDuty(@Verify(param = "cityId",rule = "required") String cityId, @Verify(param = "supplierId",rule = "required") String supplierId, String teamId, String groupIds, String name,
+		 String  phone, String licensePlates,@Verify(param = "startTime",rule = "required")  String startTime,
+		 String endTime, Integer reportType, HttpServletRequest request, HttpServletResponse response){
+
+		//默认日统计
+		reportType = reportType == null ? 0 : reportType;
+		//如果是日统计，开始时间和结束时间不能为空并且开始时间和结束时间在一个月内
+		if (reportType.equals(0)){
+			if(StringUtils.isEmpty(endTime)){
+				return AjaxResponse.fail(RestErrorCode.ENDTIME_IS_NULL);
+			}
+			if (startTime.compareTo(endTime) > 0 ){
+				return AjaxResponse.fail(RestErrorCode.STARTTIME_GREATE_ENDTIME);
+			}
+			if(!startTime.substring(0,7).equals(endTime.substring(0,7))){
+				return AjaxResponse.fail(RestErrorCode.ONLY_QUERY_ONE_MONTH);
+			}
+		}
 		//初始化参数
-		DriverDutyStatisticParams params = new DriverDutyStatisticParams(cityId, supplierId, teamId, groupIds, name, null,phone, licensePlates, startTime, endTime, page, pageSize);
+		DriverDutyStatisticParams params = new DriverDutyStatisticParams(cityId,supplierId,teamId,groupIds,name,
+				null,phone,licensePlates,startTime,endTime,null, null,null,null);
 		log.info("导出司机考勤操作，入参：" + params.toString());
 		String driverList = "";
 		List<DriverDutyStatisticDTO> rows = new ArrayList<>();
@@ -234,63 +234,27 @@ public class DriverDutyStatisticController extends DriverQueryController{
 				params.setValue(value);
 				params.setTable("statistic_duty_"+time.substring(0,7).replaceAll("-", "_"));
 			}
-			List<DriverDutyStatistic> list = driverDutyStatisticExMapper.queryDriverMonthDutyList(params);
+			List<DriverDutyStatistic> list = null;
+			if (reportType.equals(0)){
+				list = this.driverDutyStatisticExMapper.queryForListObject(params);
+			}else{
+				list = this.driverDutyStatisticExMapper.queryDriverMonthDutyList(params);
+			}
+			//设置供应商名称和城市名称
 			rows = selectSuppierNameAndCityName(list);
 		}
 		try {
-			@SuppressWarnings("deprecation")
-			Workbook wb = this.exportExcelTongyong(rows,request.getRealPath("/")+ File.separator+"template"+File.separator+"driverDuty2_info.xlsx");
+			Workbook wb = null;
+			if (reportType==0){
+				wb = this.exportExcelTongyong(rows,request.getRealPath("/")+ File.separator+"template"+File.separator+"driverDuty2_info.xlsx");
+			}else{
+				wb = this.exportMonthExcelTongyong(rows,request.getRealPath("/")+ File.separator+"template"+File.separator+"driverDuty2_info_month.xlsx");
+			}
 			super.exportExcelFromTemplet(request, response, wb, new String("司机考勤2列表".getBytes("utf-8"), "iso8859-1"));
+			return AjaxResponse.success("文件导出成功");
 		} catch (Exception e) {
 			log.error("导出司机考勤操作失败",e);
-		}
-	}
-
-
-	/**
-	 * 导出司机月度考勤操作
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	@RequestMapping("/exportDriverMonthDutyStatistic")
-	public void exportDriverMonthDuty(String cityId, String supplierId, String teamId, String groupIds, String name, String  phone, String licensePlates, String startTime,
-								 String endTime, Integer page, Integer pageSize, HttpServletRequest request, HttpServletResponse response){
-		//初始化参数
-		DriverDutyStatisticParams params = new DriverDutyStatisticParams(cityId,supplierId,teamId,groupIds,name,
-				null,phone,licensePlates,startTime,endTime,page,pageSize);
-		log.info("导出司机月度考勤操作，入参：" + params.toString());
-		String driverList = "";
-		List<DriverDutyStatisticDTO> rows = new ArrayList<>();
-		//如果页面输入了小组id或者车队id
-		if(StringUtils.isNotEmpty(params.getGroupIds()) ||  StringUtils.isNotEmpty(params.getTeamId())){
-			//通过小组id查询司机id, 如果用户
-			driverList = super.queryAuthorityDriverIdsByTeamAndGroup(params.getTeamId(), String.valueOf(params.getGroupIds()));
-			//如果该小组下无司机，返回空
-			if(StringUtils.isEmpty(driverList)){
-				log.info("司机考勤3.0列表-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds());
-				log.info("或者司机考勤3.0列表-有选择车队查询条件-该车队下没有司机teamId=="+params.getTeamId());
-			}
-		}
-		if ((StringUtils.isEmpty(params.getGroupIds()) && StringUtils.isEmpty(params.getTeamId()) && StringUtils.isEmpty(driverList)) || StringUtils.isNotEmpty(driverList)){
-			params.setDriverIds(driverList);
-			params = chuliDriverDutyStatisticParams(params);
-			if(StringUtils.isNotEmpty(params.getStartTime())){
-				String time = params.getStartTime();
-				int value = setDriverDutyStatisticValue(time);
-				params.setValue(value);
-				params.setTable("statistic_duty_"+time.substring(0,7).replaceAll("-", "_"));
-			}
-			List<DriverDutyStatistic> list = driverDutyStatisticExMapper.queryDriverMonthDutyList(params);
-			rows = selectSuppierNameAndCityName(list);
-		}
-
-		try {
-			@SuppressWarnings("deprecation")
-			Workbook wb = this.exportMonthExcelTongyong(rows,request.getRealPath("/")+ File.separator+"template"+File.separator+"driverDuty2_info_month.xlsx");
-			super.exportExcelFromTemplet(request, response, wb, new String("司机考勤2列表".getBytes("utf-8"), "iso8859-1"));
-		} catch (Exception e) {
-			log.error("导出司机考勤操作失败",e);
+			return AjaxResponse.fail(RestErrorCode.FILE_EXCEL_REPORT_FAIL);
 		}
 	}
 
@@ -336,13 +300,13 @@ public class DriverDutyStatisticController extends DriverQueryController{
 		List<DriverDutyStatisticDTO> list = null;
 		//不为空进行转换并查询城市名称和供应商名称
 		if(rows!=null&&rows.size()>0){
-			list = BeanUtil.copyList(rows, DriverDutyStatisticDTO.class);
-			for(DriverDutyStatisticDTO driverDutyStatisticDTO : list){
+			for(DriverDutyStatistic driverDutyStatistic : rows){
 				//查询城市名称和供应商名称
-				Map<String, Object> result = super.querySupplierName(driverDutyStatisticDTO.getCityid(), driverDutyStatisticDTO.getSupplierid());
-				driverDutyStatisticDTO.setCityName((String)result.get("cityName"));
-				driverDutyStatisticDTO.setSupplierName((String)result.get("supplierName"));
+				Map<String, Object> result = super.querySupplierName(driverDutyStatistic.getCityid(), driverDutyStatistic.getSupplierid());
+				driverDutyStatistic.setCityName((String)result.get("cityName"));
+				driverDutyStatistic.setSupplierName((String)result.get("supplierName"));
 			}
+			list = BeanUtil.copyList(rows, DriverDutyStatisticDTO.class);
 		}
 		return list;
 	}
