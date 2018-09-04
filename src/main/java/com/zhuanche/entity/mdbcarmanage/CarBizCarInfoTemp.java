@@ -243,8 +243,6 @@ public class CarBizCarInfoTemp {
 
     private String clicenseplatescolor;
 
-    private String fueltype;
-
     private String carrypassengers;
 
     private Integer auditingstatus;
@@ -1079,13 +1077,6 @@ public class CarBizCarInfoTemp {
         this.clicenseplatescolor = clicenseplatescolor;
     }
 
-    public String getFueltype() {
-        return fueltype;
-    }
-
-    public void setFueltype(String fueltype) {
-        this.fueltype = fueltype;
-    }
 
     public String getCarrypassengers() {
         return carrypassengers;
