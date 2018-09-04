@@ -60,6 +60,8 @@ public class LoginController{
     private String loginpageUrl;  //前端UI登录页面
 	@Value("${homepage.url}")
 	private String homepageUrl; //前端UI首页页面
+	@Value("${login.checkMsgCode.switch}")
+	private String loginCheckMsgCodeSwitch = "ON";//登录时是否进行短信验证的开关
 	
 	private int msgcodeTimeoutMinutes = 1;
 	
@@ -147,13 +149,15 @@ public class LoginController{
 			return AjaxResponse.fail(RestErrorCode.USER_PASSWORD_WRONG) ;
 		}
 		//D: 查询验证码，并判断是否正确
-//		String  msgcodeInCache = RedisCacheUtil.get(CACHE_PREFIX_MSGCODE+username, String.class);
-//		if(msgcodeInCache==null) {
-//			return AjaxResponse.fail(RestErrorCode.MSG_CODE_INVALID) ;
-//		}
-//		if(!msgcodeInCache.equals(msgcode)) {
-//			return AjaxResponse.fail(RestErrorCode.MSG_CODE_WRONG) ;
-//		}
+		if("ON".equalsIgnoreCase(loginCheckMsgCodeSwitch)) {
+			String  msgcodeInCache = RedisCacheUtil.get(CACHE_PREFIX_MSGCODE+username, String.class);
+			if(msgcodeInCache==null) {
+				return AjaxResponse.fail(RestErrorCode.MSG_CODE_INVALID) ;
+			}
+			if(!msgcodeInCache.equals(msgcode)) {
+				return AjaxResponse.fail(RestErrorCode.MSG_CODE_WRONG) ;
+			}
+		}
 		//E: 用户状态
 		if(user.getStatus()!=null && user.getStatus().intValue()==100 ){
 			return AjaxResponse.fail(RestErrorCode.USER_INVALID) ;
