@@ -10,6 +10,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Common;
 import com.zhuanche.util.MyRestTemplate;
 import mapper.mdbcarmanage.CarAdmUserMapper;
+import mapper.rentcar.CarSysDictionaryMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizModelExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
@@ -67,8 +68,9 @@ public class CarInfoServiceImpl implements CarInfoService {
     @Autowired
     private CarBizModelExMapper carBizModelExMapper;
         //car_sys_dictionary
-//    @Autowired
-//    private IOrderDictionaryService <OrderDictionaryEntity> orderDictionaryService;
+
+    @Autowired
+    private CarSysDictionaryMapper carSysDictionaryMapper;
 
     @Autowired
     private UserManagementService userManagementService;
@@ -554,30 +556,28 @@ public class CarInfoServiceImpl implements CarInfoService {
                                 license = Common.replaceBlank(license);
                                 // TODO 判断车牌号 是否存在
                                 if (license.length() == 7||license.length() == 8) {
-//                                    OrderDictionaryEntity orderDictionaryEntity = new OrderDictionaryEntity();
-//                                    orderDictionaryEntity.setDicId(17);
-//                                    OrderDictionaryEntity orderDictionaryEntity1 = orderDictionaryService.queryOrderDictionary(orderDictionaryEntity);
-//                                    String strValue = orderDictionaryEntity1.getDicValue();
-//                                    Integer intValue = Integer.valueOf(strValue.replace(".00", ""));
-//                                    log.info("通过车管后台的参数--17--判断是否执行更新已有车牌号信息--1 更新 2不更新==车牌号=="+license);
-//                                    if(intValue!=null&&intValue.equals(2)){
-//                                        int n = carInfoExMapper.checkLicensePlates(license);
-//                                        if (n > 0) {
-//                                            CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-//                                            returnVO.setLicensePlates(licensePlates);
-//                                            returnVO.setReson("第" + (rowIx + 1)
-//                                                    + "行数据，第" + (colIx + 1)
-//                                                    + "列 【车牌号】已存在");
-//                                            listException.add(returnVO);
-//                                            isTrue = false;
-//                                        } else {
-//                                            carBizCarInfo.setLicensePlates(license);
-//                                            carBizCarInfo.setLicensePlates1(license);
-//                                        }
-//                                    }else{
-//                                        carBizCarInfo.setLicensePlates(license);
-//                                        carBizCarInfo.setLicensePlates1(license);
-//                                    }
+                                    CarSysDictionary orderDictionaryEntity1 = carSysDictionaryMapper.selectByPrimaryKey(17);
+                                    String strValue = orderDictionaryEntity1.getDicValue();
+                                    Integer intValue = Integer.valueOf(strValue.replace(".00", ""));
+                                    log.info("通过车管后台的参数--17--判断是否执行更新已有车牌号信息--1 更新 2不更新==车牌号=="+license);
+                                    if(intValue!=null&&intValue.equals(2)){
+                                        int n = carInfoExMapper.checkLicensePlates(license);
+                                        if (n > 0) {
+                                            CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+                                            returnVO.setLicensePlates(licensePlates);
+                                            returnVO.setReson("第" + (rowIx + 1)
+                                                    + "行数据，第" + (colIx + 1)
+                                                    + "列 【车牌号】已存在");
+                                            listException.add(returnVO);
+                                            isTrue = false;
+                                        } else {
+                                            carBizCarInfo.setLicensePlates(license);
+                                            carBizCarInfo.setLicensePlates1(license);
+                                        }
+                                    }else{
+                                        carBizCarInfo.setLicensePlates(license);
+                                        carBizCarInfo.setLicensePlates1(license);
+                                    }
                                 } else {
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                                     returnVO.setLicensePlates(licensePlates);
