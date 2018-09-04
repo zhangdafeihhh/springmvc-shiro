@@ -10,6 +10,7 @@ import com.zhuanche.serv.authc.UserManagementService;
 import com.zhuanche.serv.rentcar.CarInfoService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
+import com.zhuanche.util.Common;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
@@ -52,7 +53,7 @@ public class CarInfoController {
      * @param isFree        车辆状态
      * @return
      */
-    @RequestMapping(value = "/queryCarData.json", method = { RequestMethod.POST })
+    @RequestMapping(value = "/queryCarData")
     public Object queryCarData(String cities,
                                String supplierIds,
                                String carModelIds,
@@ -103,7 +104,7 @@ public class CarInfoController {
         return AjaxResponse.success(new PageDTO(params.getPage(), params.getPagesize(), total, BeanUtil.copyList(rows, CarInfoDTO.class)));
     }
 
-    @RequestMapping(value = "/queryCarInfo.json", method = { RequestMethod.GET })
+    @RequestMapping(value = "/queryCarInfo")
     public AjaxResponse queryCarInfo(@Verify(param = "carId",rule = "required") Integer carId) {
         logger.info("queryCar:查看车辆详情列表");
         CarInfo params = new CarInfo();
@@ -136,7 +137,7 @@ public class CarInfoController {
      * @param licensePlates
      * @return
      */
-    @RequestMapping(value = "/checkLicensePlates.json", method = { RequestMethod.POST })
+    @RequestMapping(value = "/checkLicensePlates")
     public Object checkLicensePlates(@Verify(param = "licensePlates", rule = "required") String licensePlates) {
         logger.info("根据车牌号查询是否已存在:checkLicensePlates");
         CarInfo params = new CarInfo();
@@ -196,7 +197,7 @@ public class CarInfoController {
      * @param memo 备注
      * @return
      */
-    @RequestMapping(value = "/saveCarInfo.json", method = { RequestMethod.POST })
+    @RequestMapping(value = "/saveCarInfo")
     public Object saveCarInfo(@Verify(param = "carId",rule="") Integer carId,
                               @Verify(param = "licensePlates",rule="required") String licensePlates,
                               @Verify(param = "status",rule="required") Integer status,
@@ -329,7 +330,7 @@ public class CarInfoController {
 //     * @param request
 //     * @return
 //     */
-//    @RequestMapping(value = "/deleteCarInfo.json", method = { RequestMethod.POST })
+//    @RequestMapping(value = "/deleteCarInfo")
 //    public Object deleteCarInfo(CarInfo params, HttpServletRequest request) {
 //        logger.info("车辆删除:deleteCarInfo");
 //        Map<String, Object> result = new HashMap<String, Object>();
@@ -404,7 +405,7 @@ public class CarInfoController {
      *
      *车辆信息导出
      */
-    @RequestMapping("/exportCarInfo.json")
+    @RequestMapping("/exportCarInfo")
     public void exportCarInfo(CarInfo params, HttpServletRequest request, HttpServletResponse response){
         logger.info("exportCarInfo:车辆信息导出");
         try {
@@ -421,7 +422,7 @@ public class CarInfoController {
     /**
      * 下载车辆导入模板
      */
-    @RequestMapping(value = "/fileDownloadCarInfo.json")
+    @RequestMapping(value = "/fileDownloadCarInfo")
     public void fileDownloadCarInfo(HttpServletRequest request,
                                     HttpServletResponse response) {
 

@@ -57,7 +57,7 @@ public class DriverOutageController {
      * @param removeStatus      解除状态
      * @return
      */
-    @GetMapping(value = "/queryDriverOutageData.json")
+    @RequestMapping(value = "/queryDriverOutageData")
     public AjaxResponse queryDriverOutageData(@Verify(param = "cityId",rule = "") Integer cityId,
                                               Integer supplierId,
                                               Integer carGroupId,
@@ -109,7 +109,7 @@ public class DriverOutageController {
      * @return
      */
 
-    @RequestMapping("/exportDriverOutage.json")
+    @RequestMapping("/exportDriverOutage")
     public void exportDriverOutage(@Verify(param = "cityId",rule = "") Integer cityId,
                                    Integer supplierId,
                                    Integer carGroupId,
@@ -166,7 +166,7 @@ public class DriverOutageController {
      * @param driverPhone
      * @return
      */
-    @RequestMapping(value = "/queryDriverNameByPhone.json", method = { RequestMethod.GET })
+    @RequestMapping(value = "/queryDriverNameByPhone")
     public AjaxResponse queryDriverNameByPhone(@Verify(param = "driverPhone", rule = "mobile") String driverPhone){
         logger.info("【司机停运】查询手机号"+driverPhone+"所对应的司机姓名");
         Map<String,Object> result = new HashMap<String,Object>();
@@ -195,7 +195,7 @@ public class DriverOutageController {
      * @param driverId  司机id
      * @return
      */
-    @RequestMapping(value="/saveDriverOutage", method = { RequestMethod.POST })
+    @RequestMapping(value="/saveDriverOutage")
     public AjaxResponse saveDriverOutage(
                                     @Verify(param = "outStopLongTime",rule = "required|max(10000)")Double outStopLongTime,
                                    String driverName,
@@ -237,7 +237,7 @@ public class DriverOutageController {
      * @param removeReason  解除原因
      * @return
      */
-    @RequestMapping(value="/updateDriverOutage", method = { RequestMethod.POST })
+    @RequestMapping(value="/updateDriverOutage")
     public AjaxResponse updateDriverOutage(@Verify(param = "outageId",rule = "required")Integer outageId,
                                      @Verify(param = "removeStatus",rule = "required")Integer removeStatus,
                                      @Verify(param = "removeReason",rule = "required")String removeReason){
@@ -252,7 +252,7 @@ public class DriverOutageController {
         return AjaxResponse.success(result);
     }
 
-    @RequestMapping(value="/updateDriverOutages", method = { RequestMethod.POST })
+    @RequestMapping(value="/updateDriverOutages")
     //outageIds:checkDriver,removeReason:value
     public AjaxResponse updateDriverOutages(@Verify(param = "outageIds",rule = "required")String outageIds,
                                       @Verify(param = "removeReason",rule = "required")String removeReason){
