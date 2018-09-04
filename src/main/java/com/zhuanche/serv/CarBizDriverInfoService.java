@@ -11,8 +11,6 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
-import com.zhuanche.entity.mdbcarmanage.DriverEntity;
-import com.zhuanche.entity.mdbcarmanage.DriverVoEntity;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.mongo.DriverMongo;
 import com.zhuanche.serv.mdbcaranage.CarBizDriverUpdateService;

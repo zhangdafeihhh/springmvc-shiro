@@ -27,9 +27,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.zhuanche.common.cache.RedisCacheUtil;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.constants.SaasConst;
 import com.zhuanche.dto.AjaxLoginUserDTO;
 import com.zhuanche.dto.SaasPermissionDTO;
@@ -37,38 +41,48 @@ import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 import com.zhuanche.entity.mdbcarmanage.SaasPermission;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.realm.UsernamePasswordRealm;
+import com.zhuanche.shiro.session.RedisSessionDAO;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.NumberUtil;
 import com.zhuanche.util.PasswordUtil;
 
+import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import mapper.mdbcarmanage.ex.SaasPermissionExMapper;
 /**用户登录相关的功能**/
 @Controller
 public class LoginController{
-	private static final Logger log =  LoggerFactory.getLogger(LoginController.class);
+	private static final Logger log                                                      =  LoggerFactory.getLogger(LoginController.class);
 	private static final String CACHE_PREFIX_MSGCODE_CONTROL = "mp_login_cache_msgcode_control_";
 	private static final String CACHE_PREFIX_MSGCODE                   = "mp_login_cache_msgcode_";
-	
+    @Value(value="${loginpage.url}")
+    private String loginpageUrl;  //前端UI登录页面
 	@Value("${homepage.url}")
-	private String homepageUrl;
+	private String homepageUrl; //前端UI首页页面
+	@Value("${login.checkMsgCode.switch}")
+	private String loginCheckMsgCodeSwitch = "ON";//登录时是否进行短信验证的开关
 	
 	private int msgcodeTimeoutMinutes = 1;
 	
 	@Autowired
+	private CarAdmUserMapper carAdmUserMapper;
+	@Autowired
 	private CarAdmUserExMapper carAdmUserExMapper;
 	@Autowired
 	private SaasPermissionExMapper saasPermissionExMapper;
-	
-	
 	@Autowired
 	private UsernamePasswordRealm usernamePasswordRealm;
+	@Autowired
+	private RedisSessionDAO redisSessionDAO;
 	
 	/**通过用户名、密码，获取短信验证码**/
 	@RequestMapping("/getMsgCode")
 	@ResponseBody
-    public AjaxResponse getMsgCode(String username, String password ){
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode=DataSourceMode.SLAVE )
+	} )
+    public AjaxResponse getMsgCode( @Verify(param="username",rule="required") String username, @Verify(param="password",rule="required") String password ){
 		//A: 频率检查
 		String flag = RedisCacheUtil.get(CACHE_PREFIX_MSGCODE_CONTROL+username, String.class);
 		if(flag!=null ) {
@@ -105,18 +119,19 @@ public class LoginController{
 	/**执行登录**/
 	@RequestMapping("/dologin")
 	@ResponseBody
-    public AjaxResponse dologin(HttpServletRequest request , HttpServletResponse response, String username, String password, String msgcode ) throws IOException{
-		//1.判断是否为AJAX请求
-		boolean isAjax = false;
-		String XMLHttpRequest = request.getHeader("X-Requested-With");
-		if(XMLHttpRequest!=null && XMLHttpRequest.trim().length()>0){
-			isAjax = true;
-		}
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode=DataSourceMode.SLAVE )
+	} )
+    public AjaxResponse dologin(HttpServletRequest request , HttpServletResponse response, 
+    	@Verify(param="username",rule="required") String username, 
+    	@Verify(param="password",rule="required") String password, 
+    	@Verify(param="msgcode",rule="required") String msgcode ) throws IOException{
 		
 		Subject currentLoginUser = SecurityUtils.getSubject();
 		//A:是否已经登录
 		if(currentLoginUser.isAuthenticated()) {
-			if(isAjax) {
+			Boolean isAjax = (Boolean) request.getAttribute("X_IS_AJAX");
+			if(  isAjax  ) {
 				return AjaxResponse.success( null );
 			}else {
 				response.sendRedirect(homepageUrl);
@@ -134,33 +149,33 @@ public class LoginController{
 			return AjaxResponse.fail(RestErrorCode.USER_PASSWORD_WRONG) ;
 		}
 		//D: 查询验证码，并判断是否正确
-//		String  msgcodeInCache = RedisCacheUtil.get(CACHE_PREFIX_MSGCODE+username, String.class);
-//		if(msgcodeInCache==null) {
-//			return AjaxResponse.fail(RestErrorCode.MSG_CODE_INVALID) ;
-//		}
-//		if(!msgcodeInCache.equals(msgcode)) {
-//			return AjaxResponse.fail(RestErrorCode.MSG_CODE_WRONG) ;
-//		}
+		if("ON".equalsIgnoreCase(loginCheckMsgCodeSwitch)) {
+			String  msgcodeInCache = RedisCacheUtil.get(CACHE_PREFIX_MSGCODE+username, String.class);
+			if(msgcodeInCache==null) {
+				return AjaxResponse.fail(RestErrorCode.MSG_CODE_INVALID) ;
+			}
+			if(!msgcodeInCache.equals(msgcode)) {
+				return AjaxResponse.fail(RestErrorCode.MSG_CODE_WRONG) ;
+			}
+		}
 		//E: 用户状态
 		if(user.getStatus()!=null && user.getStatus().intValue()==100 ){
 			return AjaxResponse.fail(RestErrorCode.USER_INVALID) ;
 		}
-		//F: shiro登录
+		//F: 执行登录
 		try {
+			//shiro登录
 			UsernamePasswordToken token = new UsernamePasswordToken( username, password.toCharArray() );
 			currentLoginUser.login(token);
-			
-			//TODO 记录登录用户的所有会话ID
-			//TODO 记录登录用户的所有会话ID
-			//TODO 记录登录用户的所有会话ID
-			//TODO 记录登录用户的所有会话ID
-			
-			
+			//记录登录用户的所有会话ID，以支持“系统管理”功能中的自动会话清理
+			String sessionId =  (String)currentLoginUser.getSession().getId() ;
+			redisSessionDAO.saveSessionIdOfLoginUser(username, sessionId);
 		}catch(AuthenticationException aex) {
 			return AjaxResponse.fail(RestErrorCode.USER_LOGIN_FAILED) ;
 		}
 		//返回登录成功
-		if(isAjax) {
+		Boolean isAjax = (Boolean) request.getAttribute("X_IS_AJAX");
+		if(  isAjax  ) {
 			return AjaxResponse.success( null );
 		}else {
 			response.sendRedirect(homepageUrl);
@@ -168,21 +183,55 @@ public class LoginController{
 		}
     }
 	
-	/**执行登出**/
+	/**执行登出 **/
 	@RequestMapping("/dologout")
 	@ResponseBody
-    public AjaxResponse dologout( ){
+    public AjaxResponse dologout( HttpServletRequest request , HttpServletResponse response ) throws Exception{
 		Subject subject = SecurityUtils.getSubject();
 		if(subject.isAuthenticated()) {
 			subject.logout();
 		}
+		Boolean isAjax = (Boolean) request.getAttribute("X_IS_AJAX");
+		if(  isAjax  ) {
+			return AjaxResponse.success( null );
+		}else {
+			response.sendRedirect(loginpageUrl);
+			return null;
+		}
+	}
+	
+	/**修改密码**/
+	@RequestMapping("/changePassword")
+	@ResponseBody
+    public AjaxResponse changePassword( @Verify(param="oldPassword",rule="required") String oldPassword, @Verify(param="newPassword",rule="required") String newPassword ){
+		SSOLoginUser ssoLoginUser  =  WebSessionUtil.getCurrentLoginUser();
+		CarAdmUser   carAdmUser    =  carAdmUserMapper.selectByPrimaryKey( ssoLoginUser.getId()  );
+		//A:用户不存在
+		if(carAdmUser==null){
+			return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST) ;
+		}
+		//B:密码不正确
+		String enc_pwd = PasswordUtil.md5(oldPassword, carAdmUser.getAccount());
+		if(!enc_pwd.equalsIgnoreCase(carAdmUser.getPassword())) {
+			return AjaxResponse.fail(RestErrorCode.USER_PASSWORD_WRONG) ;
+		}
+		//C:执行
+		String new_enc_pwd = PasswordUtil.md5(newPassword, carAdmUser.getAccount());
+		CarAdmUser   carAdmUserForUpdate = new  CarAdmUser();
+		carAdmUserForUpdate.setUserId(carAdmUser.getUserId());
+		carAdmUserForUpdate.setPassword(new_enc_pwd);
+		carAdmUserMapper.updateByPrimaryKeySelective(carAdmUserForUpdate);
 		return AjaxResponse.success( null );
 	}
+	
  
 	//-------------------------------------------------------------------------------------------------------------------------------------当前登录用户信息BEGIN
 	@RequestMapping("/currentLoginUserInfo")
 	@ResponseBody
 	@SuppressWarnings("unchecked")
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode=DataSourceMode.SLAVE )
+	} )
     public AjaxResponse currentLoginUserInfo( String menuDataFormat ){
 		SSOLoginUser ssoLoginUser = WebSessionUtil.getCurrentLoginUser();
 		
@@ -231,8 +280,9 @@ public class LoginController{
 		
 		//五、配置信息
 		Map<String, Object > configs = new HashMap<String,Object>();
-		configs.put("mobileRegex", SaasConst.MOBILE_REGEX);       //手机号码正则式
+		configs.put("mobileRegex",  SaasConst.MOBILE_REGEX);       //手机号码正则式
 		configs.put("accountRegex", SaasConst.ACCOUNT_REGEX);  //账号的正则表达式
+		configs.put("emailRegex",    SaasConst.EMAIL_REGEX);         //电子邮箱的正则表达式
 		ajaxLoginUserDTO.setConfigs(configs);
 		return AjaxResponse.success( ajaxLoginUserDTO );
 	}

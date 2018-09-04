@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.AgreementCompanyMapper" >
+  <!-- mapper基础标准: 当前表所有字段映射结果集 -->
+  <resultMap id="baseResultMap" type="com.zhuanche.entity.mdbcarmanage.AgreementCompany" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="BIT" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="create_name" property="createName" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_name" property="updateName" jdbcType="VARCHAR" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <!-- mapper基础标准: 当前表所有字段结果集 -->
+  <sql id="allBaseColumnList" >
+    id, name, status, remark, create_name, create_date, update_name, update_date
+  </sql>
+
+  <!-- mapper基础标准: 当前表所有字段查询条件集 -->
+  <sql id="allBaseColumnWhereList" >
+    <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR" >
+      <if test="name != null and name != ''" >
+        and name like '%${name}%'
+      </if>
+      <if test="status != null and status !='' " >
+        and status = #{status}
+      </if>
+    </trim>
+  </sql>
+  
+  <!-- mapper基础标准: 通用单表全字段查询 -->
+  <select id="queryForInt" resultType="int" parameterType="com.zhuanche.entity.mdbcarmanage.AgreementCompany" >
+    select 
+    count(*)
+    from car_biz_agreement_company
+    <include refid="allBaseColumnWhereList" />
+  </select>
+  
+  <!-- mapper基础标准: 通用单表全字段查询 -->
+  <select id="queryForPageObject" resultType="com.zhuanche.entity.mdbcarmanage.AgreementCompany" parameterType="com.zhuanche.entity.mdbcarmanage.AgreementCompany" >
+    select 
+    id, name, status, remark, create_name createName, create_date createdate, update_name updateName, update_date updateDate,
+    DATE_FORMAT(create_date,'%Y-%m-%d %H:%i:%s') AS createdateStr,
+	DATE_FORMAT(update_date,'%Y-%m-%d %H:%i:%s') AS updateDateStr
+    from car_biz_agreement_company
+    <include refid="allBaseColumnWhereList" />
+    LIMIT #{offSet}, #{pagesize}
+  </select>
+  
+  <!-- mapper基础标准: 通用单表全字段查询 -->
+  <select id="queryForListObject" resultType="com.zhuanche.entity.mdbcarmanage.AgreementCompany" parameterType="com.zhuanche.entity.mdbcarmanage.AgreementCompany" >
+    select 
+   id, name, status, remark, create_name createName, create_date createdate, update_name updateName, update_date updateDate,
+    DATE_FORMAT(create_date,'%Y-%m-%d %H:%i:%s') AS createdateStr,
+	DATE_FORMAT(update_date,'%Y-%m-%d %H:%i:%s') AS updateDateStr
+    from car_biz_agreement_company
+    <include refid="allBaseColumnWhereList" />
+  </select>
+  
+  <!-- mapper基础标准: 通用单表主键查询 -->
+  <select id="queryForObject" resultMap="baseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="allBaseColumnList" />
+    from car_biz_agreement_company
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="checkName" parameterType="com.zhuanche.entity.mdbcarmanage.AgreementCompany" resultType="int">
+	select count(1) from car_biz_agreement_company  
+	where name = #{name}
+		<if test="id !=null and id !='' ">
+	            <![CDATA[ and id <> #{id}  ]]>
+	    </if>
+	    <if test="status !=null and status !='' ">
+	             and status = #{status}
+	    </if>
+  </select>
+
+  <!-- mapper基础标准: 通用单表保存 -->
+  <insert id="save" parameterType="com.zhuanche.entity.mdbcarmanage.AgreementCompany" >
+    insert into car_biz_agreement_company
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null and id != ''" >
+        id,
+      </if>
+      <if test="name != null and name != ''" >
+        name,
+      </if>
+      <if test="status != null and status !='' " >
+        status,
+      </if>
+      <if test="remark != null and remark != ''" >
+        remark,
+      </if>
+      	create_name,
+	    create_date,
+      	update_name,
+        update_date
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null and id != ''" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null and name != ''" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null and status !='' " >
+        #{status},
+      </if>
+      <if test="remark != null and remark != ''" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+	    #{createName,jdbcType=VARCHAR},
+	    now(),
+	    #{updateName,jdbcType=VARCHAR},
+	    now()
+    </trim>
+  </insert>
+
+  <!-- mapper基础标准: 通用主键更新 -->
+  <update id="update" parameterType="com.zhuanche.entity.mdbcarmanage.AgreementCompany" >
+    update car_biz_agreement_company
+    <trim prefix="SET" suffixOverrides="," >
+      <if test="name != null and name != ''" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null and status !='' " >
+        status = #{status},
+      </if>
+      <if test="remark != null and remark != ''" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+        update_name = #{updateName,jdbcType=VARCHAR},
+        update_date = now()
+    </trim>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

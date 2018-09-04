@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
@@ -50,6 +51,7 @@ public class CommonController {
     * @Date: 2018/9/3
     */
     @RequestMapping("/citys")
+    @ResponseBody
     public AjaxResponse getCities(){
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         if(Check.NuNObj(currentLoginUser)){
@@ -72,6 +74,7 @@ public class CommonController {
     * @Date: 2018/9/3
     */
     @RequestMapping("/suppliers")
+    @ResponseBody
     public AjaxResponse getSuppliers(@Verify(param = "cityId", rule = "required") Integer cityId){
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         if(Check.NuNObj(currentLoginUser)){
@@ -94,6 +97,7 @@ public class CommonController {
      * @Date: 2018/9/3
      */
     @RequestMapping("/teams")
+    @ResponseBody
     public AjaxResponse getTeams(@Verify(param = "cityId", rule = "required") Integer cityId
                 ,@Verify(param = "supplierId", rule = "required") Integer supplierId){
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
@@ -117,6 +121,7 @@ public class CommonController {
      * @Date: 2018/9/3
      */
     @RequestMapping("/groups")
+    @ResponseBody
     public AjaxResponse getGroups(@Verify(param = "cityId", rule = "required") String cityId
             ,@Verify(param = "supplierId", rule = "required") String supplierId
             ,@Verify(param = "teamId", rule = "required") Integer teamId){

@@ -1406,4 +1406,32 @@
     from car_biz_driver_info
     where license_plates= #{licensePlates}
   </select>
+
+    <!-- 检测司机手机号是否存在 -->
+    <select id="selectCountForPhone" resultType="java.lang.Integer" parameterType="com.zhuanche.entity.rentcar.CarBizDriverInfo">
+      SELECT
+		count(1)
+		FROM
+			car_biz_driver_info
+        where phone= #{phone}
+
+	</select>
+    <!-- 验证银行卡卡号 -->
+    <select id="validateBankCardNumber" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp"  resultType="int">
+        select count(1) from car_biz_driver_info_detail
+        where bank_card_number = #{bankCardNumber}
+        <if test="driverId !=null and driverId !='' ">
+            <![CDATA[ and driver_id <> #{driverId}  ]]>
+        </if>
+    </select>
+    <!-- 根据身份证号检查司机是否存在 -->
+    <select id="checkIdCardNoNew"  parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp" resultType="java.lang.Integer">
+        select
+        count(*)
+        from car_biz_driver_info
+        where status!=0 and id_card_no=#{idCardNo}
+        <if test="driverId !=null and driverId !='' ">
+            <![CDATA[ and driver_id <> #{driverId}  ]]>
+        </if>
+    </select>
 </mapper>

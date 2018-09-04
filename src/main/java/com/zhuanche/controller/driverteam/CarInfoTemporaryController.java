@@ -1,6 +1,5 @@
 package com.zhuanche.controller.driverteam;
 
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
@@ -9,11 +8,14 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.BaseController;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
-import com.zhuanche.dto.driver.CarBizCarInfoTempDTO;
+import com.zhuanche.dto.mdbcarmanage.CarBizCarInfoTempDTO;
+import com.zhuanche.dto.mdbcarmanage.CarBizDriverInfoTempDTO;
 import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
+import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
+import com.zhuanche.entity.rentcar.CarBizCarGroup;
+import com.zhuanche.entity.rentcar.CarBizCooperationType;
 import com.zhuanche.entity.rentcar.CarBizModel;
 import com.zhuanche.serv.deiver.CarBizCarInfoTempService;
-import com.zhuanche.serv.mdbcarmanage.CarBizDriverInfoTempService;
 import com.zhuanche.serv.rentcar.CarBizModelService;
 import com.zhuanche.shiro.constants.BusConstant;
 import com.zhuanche.shiro.realm.SSOLoginUser;
@@ -35,7 +37,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,10 +44,10 @@ import java.util.Map;
  * @author wzq
  */
 @Controller
-@RequestMapping(value = "/temporary")
-public class TemporaryController extends BaseController {
+@RequestMapping(value = "/carInfoTemporary")
+public class CarInfoTemporaryController extends BaseController {
 
-    private static Log log =  LogFactory.getLog(TemporaryController.class);
+    private static Log log =  LogFactory.getLog(CarInfoTemporaryController.class);
 
 	@Autowired
 	private CarBizCarInfoTempService carBizCarInfoTempService;
@@ -54,9 +55,8 @@ public class TemporaryController extends BaseController {
 	@Autowired
     private CarBizModelService carBizModelService;
 
-
     /**
-     * 加盟商司机录入查询
+     * 加盟商车辆查询
      * @param page 页数
      * @param pageSize 条数
      * @param licensePlates 车牌号
@@ -82,26 +82,23 @@ public class TemporaryController extends BaseController {
         Map<String,Object> params = Maps.newHashMap();
         String sessionCities = StringUtils.join(currentLoginUser.getCityIds().toArray(), ",");
         String sessionSupplierIds = StringUtils.join(currentLoginUser.getSupplierIds().toArray(), ",");
-        String sessionCarModelIds = StringUtils.join(currentLoginUser.getTeamIds().toArray(), ",");
         params.put("licensePlates",licensePlates);
         params.put("createDateBegin",createDateBegin);
         params.put("createDateEnd",createDateEnd);
         if(StringUtils.isNotBlank(carModelIds)){
             params.put("carModelIds",carModelIds);
-        }else{
-            params.put("carModelIds",sessionCities);
         }
         if(StringUtils.isNotBlank(cities)){
             params.put("cities",cities);
         }else{
-            params.put("cities",sessionSupplierIds);
+            params.put("cities",sessionCities);
         }
         if(StringUtils.isNotBlank(supplierIds)){
             params.put("supplierIds",supplierIds);
         }else{
-            params.put("supplierIds",sessionCarModelIds);
+            params.put("supplierIds",sessionSupplierIds);
         }
-        Page p = PageHelper.startPage(page, pageSize,true);
+        PageHelper.startPage(page, pageSize,true);
         List<CarBizCarInfoTemp> carBizCarInfoTempList = null;
         try{
             carBizCarInfoTempList = carBizCarInfoTempService.queryForPageObject(params);
@@ -499,7 +496,7 @@ public class TemporaryController extends BaseController {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = "/importCarInfo")
+    @RequestMapping(value = "/importCarInfo",method = RequestMethod.POST)
     public AjaxResponse importCarInfo(CarBizCarInfoTemp params, HttpServletRequest request) {
         log.info("车辆信息导入保存:importCarInfo,参数" + params.toString());
         return carBizCarInfoTempService.importCarInfo(params, request);
@@ -512,9 +509,11 @@ public class TemporaryController extends BaseController {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = "/importCarInfo4Bus")
+    @RequestMapping(value = "/importCarInfo4Bus",method = RequestMethod.POST)
     public AjaxResponse importCarInfo4Bus(CarBizCarInfoTemp params, HttpServletRequest request) {
-        log.info("车辆信息（巴士）导入保存:importCarInfo,参数" + params.toString());
+        log.info("车辆信息（巴士）导入保存:importCarInfo4Bus,参数" + params.toString());
         return carBizCarInfoTempService.importCarInfo4Bus(params, request);
     }
+
+
 }

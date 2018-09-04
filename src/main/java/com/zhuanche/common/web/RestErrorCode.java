@@ -29,11 +29,14 @@ public final class RestErrorCode{
 	public static final int HTTP_NOT_FOUND                   = 404;
 	@ResultMessage("系统内部发生错误")
 	public static final int HTTP_SYSTEM_ERROR              = 500;
+	@ResultMessage("会话已失效，请重新登录")
+	public static final int HTTP_INVALID_SESSION           = 997;
 	@ResultMessage("请求参数校验不通过")
 	public static final int HTTP_PARAM_INVALID              = 998;
 	@ResultMessage("未知错误")
 	public static final int UNKNOWN_ERROR                   = 999;
-	
+
+
 	//-----------------------------------------------用户
 	@ResultMessage("获取验证码太频繁")
 	public static final int GET_MSGCODE_EXCEED           = 1000;
@@ -51,7 +54,7 @@ public final class RestErrorCode{
 	public static final int MSG_CODE_WRONG                = 1006;
 	@ResultMessage("账号已经存在")
 	public static final int ACCOUNT_EXIST                      = 1007;
-	
+
 	//----------------------------------------------权限管理
 	@ResultMessage("父权限不存在")
 	public static final int PARENT_PERMISSION_NOT_EXIST           = 10001;
@@ -65,33 +68,30 @@ public final class RestErrorCode{
 	public static final int PERMISSION_DISABLE_CANT                    = 10005;
 	@ResultMessage("父权限已经被禁用，请先启用父权限")
 	public static final int PERMISSION_ENABLE_CANT                     = 10006;
-	
+	@ResultMessage("{0}为系统预置权限，不能禁用、修改")
+	public static final int SYSTEM_PERMISSION_CANOT_CHANGE  = 10007;
+
+
+
+
+
+
+	//---------------------------------------------------------------------------------------------------------------------------------------------
 	//----------------------------------------------角色管理
 	@ResultMessage("角色不存在")
 	public static final int ROLE_NOT_EXIST                                      = 10100;
 	@ResultMessage("角色代码已经存在")
 	public static final int ROLE_CODE_EXIST                                    = 10101;
-	   
+	@ResultMessage("{0}为系统预置角色，不能禁用、修改")
+	public static final int SYSTEM_ROLE_CANOT_CHANGE              = 10102;
+
 	//-----------------------------------------------业务参数：司机
-	@ResultMessage("司机不存在，请仔细核对！")
+	@ResultMessage("没有该手机号的司机，请仔细核对！")
 	public static final int DRIVER_NOT_EXIST = 2000;
 	@ResultMessage("该司机已存在启用的永久停运！")
 	public static final int DRIVER_OUTAGEALL_EXIST = 2001;
-//	@ResultMessage("司机状态不是正常启用状态")
-//	public static final int DRIVER_STATUS_NOT_ENABLED                     = 1001;
-//	@ResultMessage("司机手机号码与身份证号码不符合")
-//	public static final int DRIVER_PHONE_IDCARD_NOT_MATCHED      = 1002;
-//	@ResultMessage("司机手机号码或司机ID两者必须传入一个")
-//	public static final int DRIVER_PHONE_ID_MUST_HAVE_ONE            = 1003;
-//	@ResultMessage("登录密码不正确")
-//	public static final int DRIVER_LOGIN_PASSWORD_WRONG             = 1004;
-//	@ResultMessage("超过每天换车最大次数（{0}次）")
-//	public static final int DRIVER_EXCEED_BINDBUS_LIMIT_PERDAY     = 1005;
-//	@ResultMessage("无法退出并解绑车辆（您目前有待服务、服务中的任务）")
-//	public static final int DRIVER_CAN_NOT_UNBIND_BUS                    = 1006;
-//	@ResultMessage("无法选取车辆（您目前有服务中的任务）")
-//	public static final int DRIVER_CAN_NOT_BIND_BUS                         = 1007;
-
+	@ResultMessage("该司机已存在启用的临时停运！")
+	public static final int DRIVER_OUTAGE_EXIST = 2002;
 	@ResultMessage("司机手机号已存在")
 	public static final int DRIVER_PHONE_EXIST                     = 3001;
 	@ResultMessage("司机身份证已存在")
@@ -116,7 +116,17 @@ public final class RestErrorCode{
 	@ResultMessage("车辆信息不存在")
 	public static final int BUS_NOT_EXIST                                               = 1100;
 
-	
+
+	@ResultMessage("结果不存在")
+	public static final int NOT_FOUND_RESULT                                               = 1101;
+
+	@ResultMessage("请求风控资源失败")
+	public static final int RISK_ORDER_DATA_FAIL                                        = 5002;
+	@ResultMessage("上传风控文件失败")
+	public static final int RISK_UPLOAD_FILE_FAIL                                        = 5003;
+	@ResultMessage("提交申诉失败")
+	public static final int RISK_SUBMITCOMPLAIN_FAIL                                        = 5004;
+
 	//---------------------------------------------------------------------------------------------------------------------------------------------
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系
@@ -152,7 +162,7 @@ public final class RestErrorCode{
 		}
 		return MessageFormat.format(rawErrorMsg, args);
 	}
-	
+
 	/**生成一个HTML文件，方便生成技术文档**/
 	public static void main(String[] args) throws Exception{
 		//1.生成表格
@@ -173,7 +183,7 @@ public final class RestErrorCode{
 		html.append("</table>");
 		FileUtils.writeStringToFile(new File(path), html.toString(),"GBK");
 		System.out.println("Write html file to ["+path+"] successfully.");
-		
+
 		//2.生成国际化属性文件
 		String propPath   = "D:/globalMessages.properties";
 		StringBuffer text = new StringBuffer("#Error Codes\r\n");

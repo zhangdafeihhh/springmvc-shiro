@@ -41,7 +41,7 @@
  		and account = #{account} 
     </if>
     <if test="userName!=null">
-    	and user_name like #{userName}
+    	and user_name like #{userName} ESCAPE '/' 
     </if>
     <if test="phone!=null">
     	and phone = #{phone}
@@ -51,5 +51,13 @@
     </if>
     order by user_id
   </select>
-
+  
+  <!-- 查询所有的登录账号名称 -->
+  <select id="queryAccountsOfUsers" resultType="java.lang.String">
+    select account from car_adm_user where account is not null 
+    and user_id in 
+	<foreach collection="userIds" open="(" close=")" separator="," item="uid">
+		#{uid}
+	</foreach>
+  </select>
 </mapper>

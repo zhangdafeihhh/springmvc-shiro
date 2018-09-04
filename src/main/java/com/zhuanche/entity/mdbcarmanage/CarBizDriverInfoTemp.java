@@ -2,7 +2,7 @@ package com.zhuanche.entity.mdbcarmanage;
 
 
 
-public class DriverVoEntity extends DriverEntity {
+public class CarBizDriverInfoTemp extends BaseDriverInfoTemp {
 
 	private static final long serialVersionUID = 1L;
 
@@ -111,9 +111,9 @@ public class DriverVoEntity extends DriverEntity {
     private String bankCardNumber;
 
     /**
-     * 可扩展1
+     * 司机头像
      */
-    private Integer ext1;
+    private String photoSrct;
 
     /**
      * 可扩展2
@@ -176,15 +176,15 @@ public class DriverVoEntity extends DriverEntity {
 		this.bankCardNumber = bankCardNumber;
 	}
 
-	public Integer getExt1() {
-		return ext1;
-	}
+    public String getPhotoSrct() {
+        return photoSrct;
+    }
 
-	public void setExt1(Integer ext1) {
-		this.ext1 = ext1;
-	}
+    public void setPhotoSrct(String photoSrct) {
+        this.photoSrct = photoSrct;
+    }
 
-	public Integer getExt2() {
+    public Integer getExt2() {
 		return ext2;
 	}
 
@@ -641,7 +641,7 @@ public class DriverVoEntity extends DriverEntity {
 	
 	@Override  
     public boolean equals(Object obj) {  
-		DriverVoEntity s=(DriverVoEntity)obj;   
+		CarBizDriverInfoTemp s=(CarBizDriverInfoTemp)obj;
 	    return super.getPhone().equals(s.getPhone());   
     }   
     @Override
