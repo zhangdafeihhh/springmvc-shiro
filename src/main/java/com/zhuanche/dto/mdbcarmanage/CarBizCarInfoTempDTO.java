@@ -1,4 +1,4 @@
-package com.zhuanche.dto.driver;
+package com.zhuanche.dto.mdbcarmanage;
 
 import java.util.Date;
 

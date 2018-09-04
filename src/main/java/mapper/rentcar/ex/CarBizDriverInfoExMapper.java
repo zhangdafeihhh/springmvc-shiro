@@ -1,6 +1,8 @@
 package mapper.rentcar.ex;
 
 import com.zhuanche.dto.CarDriverInfoDTO;
+import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
+import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.request.DriverTeamRequest;
 import com.zhuanche.request.DutyParamRequest;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
@@ -69,4 +71,25 @@ public interface CarBizDriverInfoExMapper {
      * @return
      */
     Integer checkLicensePlates(@Param("licensePlates") String licensePlates);
+
+    /**
+     * 根据身份证号检查司机是否存在
+     * @param carBizDriverInfoTemp
+     * @return
+     */
+    Integer checkIdCardNoNew(CarBizDriverInfoTemp carBizDriverInfoTemp);
+
+    /**
+     * 检测司机手机号是否存在
+     * @param carBizDriverInfo
+     * @return
+     */
+    Integer selectCountForPhone(CarBizDriverInfo carBizDriverInfo);
+
+    /**
+     * 验证银行卡卡号
+     * @param carBizDriverInfoTemp
+     * @return
+     */
+    Integer validateBankCardNumber(CarBizDriverInfoTemp carBizDriverInfoTemp);
 }

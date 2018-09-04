@@ -1,7 +1,7 @@
 package com.zhuanche.entity.mdbcarmanage;
 
 
-public class DriverEntity{
+public class BaseDriverInfoTemp {
 
 	private static final long serialVersionUID = 7868838087731509604L;
 	
@@ -673,60 +673,6 @@ public class DriverEntity{
 	}
 	public void setCreateDateStr(String createDateStr) {
 		this.createDateStr = createDateStr;
-	}
-	@Override
-	public String toString() {
-		return "DriverEntity [driverId=" + driverId + ", password=" + password
-				+ ", phone=" + phone + ", gender=" + gender + ", name=" + name
-				+ ", supplierId=" + supplierId + ", superintendNo="
-				+ superintendNo + ", superintendUrl=" + superintendUrl
-				+ ", age=" + age + ", idCardNo=" + idCardNo
-				+ ", drivingLicenseType=" + drivingLicenseType
-				+ ", drivingYears=" + drivingYears + ", archivesNo="
-				+ archivesNo + ", issueDate=" + issueDate + ", expireDate="
-				+ expireDate + ", serviceCityId=" + serviceCityId
-				+ ", serviceCity=" + serviceCity + ", attachmentName="
-				+ attachmentName + ", attachmentAddr=" + attachmentAddr
-				+ ", accountBank=" + accountBank + ", bankAccountNo="
-				+ bankAccountNo + ", licensePlates=" + licensePlates
-				+ ", licensePlatesId=" + licensePlatesId + ", updateDate="
-				+ updateDate + ", createDate=" + createDate
-				+ ", updateDateStr=" + updateDateStr + ", createDateStr="
-				+ createDateStr + ", updateBy=" + updateBy + ", createBy="
-				+ createBy + ", status=" + status + ", memo=" + memo + ", mac="
-				+ mac + ", workStatus=" + workStatus + ", serviceStatus="
-				+ serviceStatus + ", onlineStatus=" + onlineStatus
-				+ ", loginStatus=" + loginStatus + ", createByName="
-				+ createByName + ", updateByName=" + updateByName
-				+ ", supplierName=" + supplierName + ", currentAddress="
-				+ currentAddress + ", emergencyContactPerson="
-				+ emergencyContactPerson + ", emergencyContactNumber="
-				+ emergencyContactNumber + ", isBindingCreditCard="
-				+ isBindingCreditCard + ", creditCardNo=" + creditCardNo
-				+ ", creditOpenAccountBank=" + creditOpenAccountBank
-				+ ", creditCardPeriodOfValidity=" + creditCardPeriodOfValidity
-				+ ", CVN2=" + CVN2 + ", shortCardNo=" + shortCardNo
-				+ ", createDateBegin=" + createDateBegin + ", createDateEnd="
-				+ createDateEnd + ", groupid=" + groupid + ", groupId="
-				+ groupId + ", carGroupName=" + carGroupName
-				+ ", licensePlatesOld=" + licensePlatesOld + ", orderNo="
-				+ orderNo + ", actionId=" + actionId + ", grabNotice="
-				+ grabNotice + ", creditBalance=" + creditBalance
-				+ ", creditBalanceHisall=" + creditBalanceHisall
-				+ ", outCurrAccount=" + outCurrAccount + ", outHisallAccount="
-				+ outHisallAccount + ", accountAmount=" + accountAmount
-				+ ", settleAccount=" + settleAccount + ", currAccount="
-				+ currAccount + ", hisallAccount=" + hisallAccount
-				+ ", withdrawDeposit=" + withdrawDeposit + ", frozenAmount="
-				+ frozenAmount + ", genderString=" + genderString
-				+ ", statusString=" + statusString + ", photoSrc=" + photoSrc
-				+ ", drivingTypeString=" + drivingTypeString + ", appVersion="
-				+ appVersion + ", pushId=" + pushId + ", isLimit=" + isLimit
-				+ ", cityId=" + cityId + ", cities=" + cities + ", suppliers="
-				+ suppliers + ", teamid=" + teamid + ", teamName=" + teamName
-				+ ", teamIds=" + teamIds + ", groupIds=" + groupIds
-				+ ", groupName=" + groupName + ", driverIds=" + driverIds
-				+ ", fileName=" + fileName + ", cityName=" + cityName + "]";
 	}
 	
 }
