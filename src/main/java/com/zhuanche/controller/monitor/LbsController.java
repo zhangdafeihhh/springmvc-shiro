@@ -36,6 +36,15 @@ public class LbsController {
     @Qualifier("lbsDriverGpsRestTemplate")
     private MyRestTemplate lbsDriverGpsRestTemplate;
 
+    /**
+     * lbs wiki :
+     *          http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=3213570
+     * @param driverId
+     * @param startTime
+     * @param endTime
+     * @param model
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value = "/getGpsByDriver", method = { RequestMethod.POST,RequestMethod.GET })
     public AjaxResponse getGpsByDriver(
