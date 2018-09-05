@@ -956,7 +956,7 @@ public class CarInfoServiceImpl implements CarInfoService {
                                             isTrue = false;
                                         } else {
                                             d = dateFormat.format(dateFormat.parse(d));
-                                            carBizCarInfo.setNextClassDate(dateFormat.parse(d));
+                                            carBizCarInfo.setNextClassDate(d);
                                         }
                                     } else {
                                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -1014,7 +1014,7 @@ public class CarInfoServiceImpl implements CarInfoService {
                                             isTrue = false;
                                         } else {
                                             d = dateFormat.format(dateFormat.parse(d));
-                                            carBizCarInfo.setNextOperationDate(dateFormat.parse(d));
+                                            carBizCarInfo.setNextOperationDate(d);
                                         }
                                     } else {
                                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -1072,7 +1072,7 @@ public class CarInfoServiceImpl implements CarInfoService {
                                             isTrue = false;
                                         } else {
                                             d = dateFormat.format(dateFormat.parse(d));
-                                            carBizCarInfo.setNextSecurityDate(dateFormat.parse(d));
+                                            carBizCarInfo.setNextSecurityDate(d);
                                         }
                                     } else {
                                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -1129,7 +1129,7 @@ public class CarInfoServiceImpl implements CarInfoService {
                                             isTrue = false;
                                         } else {
                                             d = dateFormat.format(dateFormat.parse(d));
-                                            carBizCarInfo.setTwoLevelMaintenanceDate(dateFormat.parse(d));
+                                            carBizCarInfo.setTwoLevelMaintenanceDate(d);
                                         }
                                     } else {
                                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();

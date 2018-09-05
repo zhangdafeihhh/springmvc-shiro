@@ -337,7 +337,7 @@ public class DriverOutageServiceImpl implements DriverOutageService {
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         List<DriverOutage> outList = new ArrayList<DriverOutage>();
 //        String fileName = params.getFileName();
-        String path  = Common.getPath(request);
+//        String path  = Common.getPath(request);
 //        String dirPath = path+params.getFileName();
 //        File DRIVERINFO = new File(dirPath);
         try {

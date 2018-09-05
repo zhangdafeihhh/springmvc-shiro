@@ -41,13 +41,13 @@ public class CarInfoDTO{
 
     private String rentalExpireDate;
 
-    private Date nextOperationDate;
+    private String nextOperationDate;
 
-    private Date nextSecurityDate;
+    private String  nextSecurityDate;
 
-    private Date nextClassDate;
+    private String nextClassDate;
 
-    private Date twoLevelMaintenanceDate;
+    private String twoLevelMaintenanceDate;
 
     private Integer status;
 
@@ -345,35 +345,35 @@ public class CarInfoDTO{
         this.rentalExpireDate = rentalExpireDate;
     }
 
-    public Date getNextOperationDate() {
+    public String getNextOperationDate() {
         return nextOperationDate;
     }
 
-    public void setNextOperationDate(Date nextOperationDate) {
+    public void setNextOperationDate(String nextOperationDate) {
         this.nextOperationDate = nextOperationDate;
     }
 
-    public Date getNextSecurityDate() {
+    public String getNextSecurityDate() {
         return nextSecurityDate;
     }
 
-    public void setNextSecurityDate(Date nextSecurityDate) {
+    public void setNextSecurityDate(String nextSecurityDate) {
         this.nextSecurityDate = nextSecurityDate;
     }
 
-    public Date getNextClassDate() {
+    public String getNextClassDate() {
         return nextClassDate;
     }
 
-    public void setNextClassDate(Date nextClassDate) {
+    public void setNextClassDate(String nextClassDate) {
         this.nextClassDate = nextClassDate;
     }
 
-    public Date getTwoLevelMaintenanceDate() {
+    public String getTwoLevelMaintenanceDate() {
         return twoLevelMaintenanceDate;
     }
 
-    public void setTwoLevelMaintenanceDate(Date twoLevelMaintenanceDate) {
+    public void setTwoLevelMaintenanceDate(String twoLevelMaintenanceDate) {
         this.twoLevelMaintenanceDate = twoLevelMaintenanceDate;
     }
 

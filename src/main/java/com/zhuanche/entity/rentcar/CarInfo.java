@@ -2,12 +2,16 @@ package com.zhuanche.entity.rentcar;
 
 import com.zhuanche.entity.common.BaseEntity;
 import com.zhuanche.util.DateUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class CarInfo extends BaseEntity {
+
+    private static final long serialVersionUID = 5454155825314635342L;
 
     // alias
     public static final String TABLE_ALIAS = "CarBizCarInfo";
@@ -40,168 +44,62 @@ public class CarInfo extends BaseEntity {
     // update
     public static final String FORMAT_CAR_PURCHASE_DATE = "yyyy-MM-dd";
 
-    private Integer carId;
+    // 可以直接使用: @Length(max=50,message="用户名长度不能大于50")显示错误消息
+    // columns START
+    //
+    private java.lang.Integer carId;
+
+    //
+    private java.lang.Integer supplierId;
+    // @Length(max=10)
+    private java.lang.String licensePlates;
+    // @Length(max=40)
+    private java.lang.String brand;
+    //
+    private java.lang.Integer carModelId;
+    private java.lang.String carModelIds;
+    // @Length(max=50)
+    private java.lang.String modelDetail;
+    // @Length(max=10)
+    private java.lang.String color;
+    // @Length(max=40)
+    private java.lang.String engineNo;
+    // @Length(max=40)
+    private java.lang.String frameNo;
+    //
+    private String nextInspectDate;
+    //
+    private String nextMaintenanceDate;
+    //
+    private String rentalExpireDate;
+    // @Length(max=65535)
+    private java.lang.String memo;
+    //
+    private java.lang.Integer status;
+    //车辆状态
+    private java.lang.Integer isFree;
+    //
+    private java.lang.Integer createBy;
+    //
+    private java.lang.Integer updateBy;
+    // @NotNull
+    private String createDate;
+    // @NotNull
+    private String updateDate;
+    // columns END
+    private String imageUrl;// 车辆图片
+    // 关联 司机的id
+    private Integer driverid;
+    // 下次运营证检验时间
+    private String nextOperationDate;
+    // 下次治安证检测时间
+    private String nextSecurityDate;
+    // 下次等级验证时间
+    private String nextClassDate;
+    // 二级维护时间
+    private String twoLevelMaintenanceDate;
 
     private Integer cityId;
-
-    private Integer driverId;
-
-    private Integer supplierId;
-
-    /**
-     * 车牌号
-     */
-    private String licensePlates;
-
-    private String brand;
-
-    private Integer carModelId;
-
-    private Date carPurchaseDate;
-
-    private String modelDetail;
-
-    private String color;
-
-    private String carPhotographName;
-
-    private String carPhotograph;
-
-    private String engineNo;
-
-    private String frameNo;
-
-    private String nextInspectDate;
-
-    private String nextMaintenanceDate;
-
-    private String rentalExpireDate;
-
-    private Date nextOperationDate;
-
-    private Date nextSecurityDate;
-
-    private Date nextClassDate;
-
-    private Date twoLevelMaintenanceDate;
-
-    private Integer status;
-
-    private Integer createBy;
-
-    private Integer updateBy;
-
-    private Date createDate;
-
-    private Date updateDate;
-
-    private String gpsdate;
-
-    private String clicenseplatescolor;
-
-    private String fueltype;
-
-    private String carrypassengers;
-
-    private Integer auditingstatus;
-
-    private String insurancecompany;
-
-    private String insurancenumber;
-
-    private String insurancetype;
-
-    private String insurancemoney;
-
-    private String insurancedatestart;
-
-    private String insurancedateend;
-
-    private String freighttype;
-
-    private String vehicleenginedisplacement;
-
-    private String totalmileage;
-
-    private Integer overhaulstatus;
-
-    private String transportnumber;
-
-    private String certificationauthority;
-
-    private String operatingregion;
-
-    private String firstdate;
-
-    private String transportnumberdatestart;
-
-    private String transportnumberdateend;
-
-    private String equipmentnumber;
-
-    private String gpsbrand;
-
-    private String gpstype;
-
-    /**
-     * 车辆年度审验日期
-     */
-    private String auditingDate;
-
-    /**
-     * 发动机功率
-     */
-    private String vehicleEnginePower;
-
-    /**
-     * 车辆轴距
-     */
-    private String vehicleEngineWheelbase;
-
-    /**
-     * 车辆注册日期
-     */
-    private String vehicleRegistrationDate;
-
-    private String vehicleVinCode;
-
-    /**
-     * 车辆厂牌
-     */
-    private String vehicleBrand;
-
-    /**
-     * 卫星定位装置IMEI号
-     */
-    private String gpsImei;
-
-    /**
-     * 所属车主
-     */
-    private String vehicleOwner;
-
-    /**
-     * 车辆类型（以机动车行驶证为主）
-     */
-    private String vehicleType;
-
-    /**
-     * 车辆行驶证扫描件
-     */
-    private String vehicleDrivingLicense;
-
-    private String vehicletec;
-
-    private String vehiclesafe;
-
-    private Integer lzbStatus;
-
-    private String memo;
-
-
-
-
-    /** 附加字段 **/
     private String cityName;
     private String modeName;
     private String supplierName;
@@ -210,12 +108,12 @@ public class CarInfo extends BaseEntity {
     private String timeOfnextInspect;
     private String timeOfnextMaintenance;
     private String driverName;
+    private String carPhotographName;
     private String createName;
     private String updateName;
     private String groupName; // 车型名称
     private Integer groupId; // 车型Id
-    //
-    private java.lang.String carModelIds;
+
 
     @SuppressWarnings("unused")
     private String purchaseDateString;//购车时间的String
@@ -268,14 +166,22 @@ public class CarInfo extends BaseEntity {
 
     //核定载客位
     private String carryPassengers;
+    //车辆厂牌
+    private String vehicleBrand;
     //车牌颜色
     private String clicensePlatesColor;
     //车辆VIN码
     private String vehicleVINCode;
+    //车辆注册日期
+    private String vehicleRegistrationDate;
     //车辆燃料类型
     private Integer fuelType;
     //车辆发动机排量
     private String vehicleEngineDisplacement;
+    //发动机功率
+    private String vehicleEnginePower;
+    //车辆轴距
+    private String vehicleEngineWheelbase;
     //网络预约出租汽车运输证号
     private String transportNumber;
     //网络预约出租汽车运输证发证机构
@@ -292,14 +198,24 @@ public class CarInfo extends BaseEntity {
     private Integer overHaulStatus;
     //年度审验状态
     private Integer auditingStatus;
+    //车辆年度审验日期
+    private String auditingDate;
     //发票打印设备序列号
     private String equipmentNumber;
     //卫星定位装置品牌
     private String gpsBrand;
     //卫星定位装置型号
     private String gpsType;
+    //卫星定位装置IMEI号
+    private String gpsImei;
     //卫星定位装置安装日期
     private String gpsDate;
+    //所属车主
+    private String vehicleOwner;
+    //车辆类型（以机动车行驶证为主）
+    private String vehicleType;
+    //车辆行驶证扫描件
+    private String vehicleDrivingLicense;
 
     //update 2017-05-22  车辆更改供应商，需要把关联司机从原有供应商更改
     private Integer oldSupplierId;//
@@ -313,58 +229,148 @@ public class CarInfo extends BaseEntity {
 
     private String cooperationName;//加盟类型
 
-    //车辆状态
-    private java.lang.Integer isFree;
-
-    /** 车辆图片 **/
-    private String imageUrl;
-
-    public String getNextOperationDateEnd() {
-        return nextOperationDateEnd;
+    public int getCooperationType() {
+        return cooperationType;
     }
 
-    public void setNextOperationDateEnd(String nextOperationDateEnd) {
-        this.nextOperationDateEnd = nextOperationDateEnd;
+    public void setCooperationType(int cooperationType) {
+        this.cooperationType = cooperationType;
     }
 
-    public String getNextClassDateBegin() {
-        return nextClassDateBegin;
+    public String getCooperationName() {
+        return cooperationName;
     }
 
-    public void setNextClassDateBegin(String nextClassDateBegin) {
-        this.nextClassDateBegin = nextClassDateBegin;
+    public void setCooperationName(String cooperationName) {
+        this.cooperationName = cooperationName;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getCarIds() {
+        return carIds;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setCarIds(String carIds) {
+        this.carIds = carIds;
     }
 
-    public Integer getIsFree() {
-        return isFree;
+    public Integer getOldCity() {
+        return oldCity;
     }
 
-    public void setIsFree(Integer isFree) {
-        this.isFree = isFree;
+    public void setOldCity(Integer oldCity) {
+        this.oldCity = oldCity;
     }
 
-    public String getCarModelIds() {
+    public Integer getOldSupplierId() {
+        return oldSupplierId;
+    }
+
+    public void setOldSupplierId(Integer oldSupplierId) {
+        this.oldSupplierId = oldSupplierId;
+    }
+
+    public String getVehicleDrivingLicense() {
+        return vehicleDrivingLicense;
+    }
+
+    public void setVehicleDrivingLicense(String vehicleDrivingLicense) {
+        this.vehicleDrivingLicense = vehicleDrivingLicense;
+    }
+
+    public String getVehicleOwner() {
+        return vehicleOwner;
+    }
+
+    public void setVehicleOwner(String vehicleOwner) {
+        this.vehicleOwner = vehicleOwner;
+    }
+
+    public String getVehicleType() {
+        return vehicleType;
+    }
+
+    public void setVehicleType(String vehicleType) {
+        this.vehicleType = vehicleType;
+    }
+
+    public String getCreateDateBegin() {
+        return createDateBegin;
+    }
+
+    public void setCreateDateBegin(String createDateBegin) {
+        this.createDateBegin = createDateBegin;
+    }
+
+    public String getCreateDateEnd() {
+        return createDateEnd;
+    }
+
+    public void setCreateDateEnd(String createDateEnd) {
+        this.createDateEnd = createDateEnd;
+    }
+
+    public java.lang.String getCarModelIds() {
         return carModelIds;
     }
 
-    public void setCarModelIds(String carModelIds) {
+    public void setCarModelIds(java.lang.String carModelIds) {
         this.carModelIds = carModelIds;
     }
 
-    public Integer getCarId() {
-        return carId;
+    public int getInspectFlag() {
+        return inspectFlag;
     }
 
-    public void setCarId(Integer carId) {
-        this.carId = carId;
+    public void setInspectFlag(int inspectFlag) {
+        this.inspectFlag = inspectFlag;
+    }
+
+    public int getMaintenanceFlag() {
+        return MaintenanceFlag;
+    }
+
+    public void setMaintenanceFlag(int maintenanceFlag) {
+        MaintenanceFlag = maintenanceFlag;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getSupplierIds() {
+        return supplierIds;
+    }
+
+    public void setSupplierIds(String supplierIds) {
+        this.supplierIds = supplierIds;
+    }
+
+    public String getCities() {
+        return cities;
+    }
+
+    public void setCities(String cities) {
+        this.cities = cities;
+    }
+
+    public String getTeamIds() {
+        return teamIds;
+    }
+
+    public void setTeamIds(String teamIds) {
+        this.teamIds = teamIds;
+    }
+
+    public java.lang.Integer getIsFree() {
+        return isFree;
+    }
+
+    public void setIsFree(java.lang.Integer isFree) {
+        this.isFree = isFree;
     }
 
     public Integer getCityId() {
@@ -375,504 +381,6 @@ public class CarInfo extends BaseEntity {
         this.cityId = cityId;
     }
 
-    public Integer getDriverId() {
-        return driverId;
-    }
-
-    public void setDriverId(Integer driverId) {
-        this.driverId = driverId;
-    }
-
-    public Integer getSupplierId() {
-        return supplierId;
-    }
-
-    public void setSupplierId(Integer supplierId) {
-        this.supplierId = supplierId;
-    }
-
-    public String getLicensePlates() {
-        return licensePlates;
-    }
-
-    public void setLicensePlates(String licensePlates) {
-        this.licensePlates = licensePlates == null ? null : licensePlates.trim();
-    }
-
-    public String getBrand() {
-        return brand;
-    }
-
-    public void setBrand(String brand) {
-        this.brand = brand == null ? null : brand.trim();
-    }
-
-    public Integer getCarModelId() {
-        return carModelId;
-    }
-
-    public void setCarModelId(Integer carModelId) {
-        this.carModelId = carModelId;
-    }
-
-    public Date getCarPurchaseDate() {
-        return carPurchaseDate;
-    }
-
-    public void setCarPurchaseDate(Date carPurchaseDate) {
-        this.carPurchaseDate = carPurchaseDate;
-    }
-
-    public String getModelDetail() {
-        return modelDetail;
-    }
-
-    public void setModelDetail(String modelDetail) {
-        this.modelDetail = modelDetail == null ? null : modelDetail.trim();
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color == null ? null : color.trim();
-    }
-
-    public String getCarPhotographName() {
-        return carPhotographName;
-    }
-
-    public void setCarPhotographName(String carPhotographName) {
-        this.carPhotographName = carPhotographName == null ? null : carPhotographName.trim();
-    }
-
-    public String getCarPhotograph() {
-        return carPhotograph;
-    }
-
-    public void setCarPhotograph(String carPhotograph) {
-        this.carPhotograph = carPhotograph == null ? null : carPhotograph.trim();
-    }
-
-    public String getEngineNo() {
-        return engineNo;
-    }
-
-    public void setEngineNo(String engineNo) {
-        this.engineNo = engineNo == null ? null : engineNo.trim();
-    }
-
-    public String getFrameNo() {
-        return frameNo;
-    }
-
-    public void setFrameNo(String frameNo) {
-        this.frameNo = frameNo == null ? null : frameNo.trim();
-    }
-
-    public String getNextInspectDate() {
-        return nextInspectDate;
-    }
-
-    public void setNextInspectDate(String nextInspectDate) {
-        this.nextInspectDate = nextInspectDate;
-    }
-
-    public String getNextMaintenanceDate() {
-        return nextMaintenanceDate;
-    }
-
-    public void setNextMaintenanceDate(String nextMaintenanceDate) {
-        this.nextMaintenanceDate = nextMaintenanceDate;
-    }
-
-    public String getRentalExpireDate() {
-        return rentalExpireDate;
-    }
-
-    public void setRentalExpireDate(String rentalExpireDate) {
-        this.rentalExpireDate = rentalExpireDate;
-    }
-
-    public Date getNextOperationDate() {
-        return nextOperationDate;
-    }
-
-    public void setNextOperationDate(Date nextOperationDate) {
-        this.nextOperationDate = nextOperationDate;
-    }
-
-    public Date getNextSecurityDate() {
-        return nextSecurityDate;
-    }
-
-    public void setNextSecurityDate(Date nextSecurityDate) {
-        this.nextSecurityDate = nextSecurityDate;
-    }
-
-    public Date getNextClassDate() {
-        return nextClassDate;
-    }
-
-    public void setNextClassDate(Date nextClassDate) {
-        this.nextClassDate = nextClassDate;
-    }
-
-    public Date getTwoLevelMaintenanceDate() {
-        return twoLevelMaintenanceDate;
-    }
-
-    public void setTwoLevelMaintenanceDate(Date twoLevelMaintenanceDate) {
-        this.twoLevelMaintenanceDate = twoLevelMaintenanceDate;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public Integer getCreateBy() {
-        return createBy;
-    }
-
-    public void setCreateBy(Integer createBy) {
-        this.createBy = createBy;
-    }
-
-    public Integer getUpdateBy() {
-        return updateBy;
-    }
-
-    public void setUpdateBy(Integer updateBy) {
-        this.updateBy = updateBy;
-    }
-
-    public Date getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-
-    public Date getUpdateDate() {
-        return updateDate;
-    }
-
-    public void setUpdateDate(Date updateDate) {
-        this.updateDate = updateDate;
-    }
-
-    public String getGpsdate() {
-        return gpsdate;
-    }
-
-    public void setGpsdate(String gpsdate) {
-        this.gpsdate = gpsdate == null ? null : gpsdate.trim();
-    }
-
-    public String getClicenseplatescolor() {
-        return clicenseplatescolor;
-    }
-
-    public void setClicenseplatescolor(String clicenseplatescolor) {
-        this.clicenseplatescolor = clicenseplatescolor == null ? null : clicenseplatescolor.trim();
-    }
-
-    public String getFueltype() {
-        return fueltype;
-    }
-
-    public void setFueltype(String fueltype) {
-        this.fueltype = fueltype == null ? null : fueltype.trim();
-    }
-
-    public String getCarrypassengers() {
-        return carrypassengers;
-    }
-
-    public void setCarrypassengers(String carrypassengers) {
-        this.carrypassengers = carrypassengers == null ? null : carrypassengers.trim();
-    }
-
-    public Integer getAuditingstatus() {
-        return auditingstatus;
-    }
-
-    public void setAuditingstatus(Integer auditingstatus) {
-        this.auditingstatus = auditingstatus;
-    }
-
-    public String getInsurancecompany() {
-        return insurancecompany;
-    }
-
-    public void setInsurancecompany(String insurancecompany) {
-        this.insurancecompany = insurancecompany == null ? null : insurancecompany.trim();
-    }
-
-    public String getInsurancenumber() {
-        return insurancenumber;
-    }
-
-    public void setInsurancenumber(String insurancenumber) {
-        this.insurancenumber = insurancenumber == null ? null : insurancenumber.trim();
-    }
-
-    public String getInsurancetype() {
-        return insurancetype;
-    }
-
-    public void setInsurancetype(String insurancetype) {
-        this.insurancetype = insurancetype == null ? null : insurancetype.trim();
-    }
-
-    public String getInsurancemoney() {
-        return insurancemoney;
-    }
-
-    public void setInsurancemoney(String insurancemoney) {
-        this.insurancemoney = insurancemoney == null ? null : insurancemoney.trim();
-    }
-
-    public String getInsurancedatestart() {
-        return insurancedatestart;
-    }
-
-    public void setInsurancedatestart(String insurancedatestart) {
-        this.insurancedatestart = insurancedatestart == null ? null : insurancedatestart.trim();
-    }
-
-    public String getInsurancedateend() {
-        return insurancedateend;
-    }
-
-    public void setInsurancedateend(String insurancedateend) {
-        this.insurancedateend = insurancedateend == null ? null : insurancedateend.trim();
-    }
-
-    public String getFreighttype() {
-        return freighttype;
-    }
-
-    public void setFreighttype(String freighttype) {
-        this.freighttype = freighttype == null ? null : freighttype.trim();
-    }
-
-    public String getVehicleenginedisplacement() {
-        return vehicleenginedisplacement;
-    }
-
-    public void setVehicleenginedisplacement(String vehicleenginedisplacement) {
-        this.vehicleenginedisplacement = vehicleenginedisplacement == null ? null : vehicleenginedisplacement.trim();
-    }
-
-    public String getTotalmileage() {
-        return totalmileage;
-    }
-
-    public void setTotalmileage(String totalmileage) {
-        this.totalmileage = totalmileage == null ? null : totalmileage.trim();
-    }
-
-    public Integer getOverhaulstatus() {
-        return overhaulstatus;
-    }
-
-    public void setOverhaulstatus(Integer overhaulstatus) {
-        this.overhaulstatus = overhaulstatus;
-    }
-
-    public String getTransportnumber() {
-        return transportnumber;
-    }
-
-    public void setTransportnumber(String transportnumber) {
-        this.transportnumber = transportnumber == null ? null : transportnumber.trim();
-    }
-
-    public String getCertificationauthority() {
-        return certificationauthority;
-    }
-
-    public void setCertificationauthority(String certificationauthority) {
-        this.certificationauthority = certificationauthority == null ? null : certificationauthority.trim();
-    }
-
-    public String getOperatingregion() {
-        return operatingregion;
-    }
-
-    public void setOperatingregion(String operatingregion) {
-        this.operatingregion = operatingregion == null ? null : operatingregion.trim();
-    }
-
-    public String getFirstdate() {
-        return firstdate;
-    }
-
-    public void setFirstdate(String firstdate) {
-        this.firstdate = firstdate == null ? null : firstdate.trim();
-    }
-
-    public String getTransportnumberdatestart() {
-        return transportnumberdatestart;
-    }
-
-    public void setTransportnumberdatestart(String transportnumberdatestart) {
-        this.transportnumberdatestart = transportnumberdatestart == null ? null : transportnumberdatestart.trim();
-    }
-
-    public String getTransportnumberdateend() {
-        return transportnumberdateend;
-    }
-
-    public void setTransportnumberdateend(String transportnumberdateend) {
-        this.transportnumberdateend = transportnumberdateend == null ? null : transportnumberdateend.trim();
-    }
-
-    public String getEquipmentnumber() {
-        return equipmentnumber;
-    }
-
-    public void setEquipmentnumber(String equipmentnumber) {
-        this.equipmentnumber = equipmentnumber == null ? null : equipmentnumber.trim();
-    }
-
-    public String getGpsbrand() {
-        return gpsbrand;
-    }
-
-    public void setGpsbrand(String gpsbrand) {
-        this.gpsbrand = gpsbrand == null ? null : gpsbrand.trim();
-    }
-
-    public String getGpstype() {
-        return gpstype;
-    }
-
-    public void setGpstype(String gpstype) {
-        this.gpstype = gpstype == null ? null : gpstype.trim();
-    }
-
-    public String getAuditingDate() {
-        return auditingDate;
-    }
-
-    public void setAuditingDate(String auditingDate) {
-        this.auditingDate = auditingDate == null ? null : auditingDate.trim();
-    }
-
-    public String getVehicleEnginePower() {
-        return vehicleEnginePower;
-    }
-
-    public void setVehicleEnginePower(String vehicleEnginePower) {
-        this.vehicleEnginePower = vehicleEnginePower == null ? null : vehicleEnginePower.trim();
-    }
-
-    public String getVehicleEngineWheelbase() {
-        return vehicleEngineWheelbase;
-    }
-
-    public void setVehicleEngineWheelbase(String vehicleEngineWheelbase) {
-        this.vehicleEngineWheelbase = vehicleEngineWheelbase == null ? null : vehicleEngineWheelbase.trim();
-    }
-
-    public String getVehicleRegistrationDate() {
-        return vehicleRegistrationDate;
-    }
-
-    public void setVehicleRegistrationDate(String vehicleRegistrationDate) {
-        this.vehicleRegistrationDate = vehicleRegistrationDate == null ? null : vehicleRegistrationDate.trim();
-    }
-
-    public String getVehicleVinCode() {
-        return vehicleVinCode;
-    }
-
-    public void setVehicleVinCode(String vehicleVinCode) {
-        this.vehicleVinCode = vehicleVinCode == null ? null : vehicleVinCode.trim();
-    }
-
-    public String getVehicleBrand() {
-        return vehicleBrand;
-    }
-
-    public void setVehicleBrand(String vehicleBrand) {
-        this.vehicleBrand = vehicleBrand == null ? null : vehicleBrand.trim();
-    }
-
-    public String getGpsImei() {
-        return gpsImei;
-    }
-
-    public void setGpsImei(String gpsImei) {
-        this.gpsImei = gpsImei == null ? null : gpsImei.trim();
-    }
-
-    public String getVehicleOwner() {
-        return vehicleOwner;
-    }
-
-    public void setVehicleOwner(String vehicleOwner) {
-        this.vehicleOwner = vehicleOwner == null ? null : vehicleOwner.trim();
-    }
-
-    public String getVehicleType() {
-        return vehicleType;
-    }
-
-    public void setVehicleType(String vehicleType) {
-        this.vehicleType = vehicleType == null ? null : vehicleType.trim();
-    }
-
-    public String getVehicleDrivingLicense() {
-        return vehicleDrivingLicense;
-    }
-
-    public void setVehicleDrivingLicense(String vehicleDrivingLicense) {
-        this.vehicleDrivingLicense = vehicleDrivingLicense == null ? null : vehicleDrivingLicense.trim();
-    }
-
-    public String getVehicletec() {
-        return vehicletec;
-    }
-
-    public void setVehicletec(String vehicletec) {
-        this.vehicletec = vehicletec == null ? null : vehicletec.trim();
-    }
-
-    public String getVehiclesafe() {
-        return vehiclesafe;
-    }
-
-    public void setVehiclesafe(String vehiclesafe) {
-        this.vehiclesafe = vehiclesafe == null ? null : vehiclesafe.trim();
-    }
-
-    public Integer getLzbStatus() {
-        return lzbStatus;
-    }
-
-    public void setLzbStatus(Integer lzbStatus) {
-        this.lzbStatus = lzbStatus;
-    }
-
-    public String getMemo() {
-        return memo;
-    }
-
-    public void setMemo(String memo) {
-        this.memo = memo == null ? null : memo.trim();
-    }
-
-
-    /**-------------------------------------------------------------------扩展字段---------------------------------------------------------------**/
     public String getCityName() {
         return cityName;
     }
@@ -897,16 +405,17 @@ public class CarInfo extends BaseEntity {
         this.supplierName = supplierName;
     }
 
+
+    public String getCarAge() {
+        return carAge;
+    }
+
     public String getPurchaseDate() {
         return purchaseDate;
     }
 
     public void setPurchaseDate(String purchaseDate) {
         this.purchaseDate = purchaseDate;
-    }
-
-    public String getCarAge() {
-        return carAge;
     }
 
     public void setCarAge(String carAge) {
@@ -937,6 +446,14 @@ public class CarInfo extends BaseEntity {
         this.driverName = driverName;
     }
 
+    public String getCarPhotographName() {
+        return carPhotographName;
+    }
+
+    public void setCarPhotographName(String carPhotographName) {
+        this.carPhotographName = carPhotographName;
+    }
+
     public String getCreateName() {
         return createName;
     }
@@ -951,22 +468,6 @@ public class CarInfo extends BaseEntity {
 
     public void setUpdateName(String updateName) {
         this.updateName = updateName;
-    }
-
-    public String getGroupName() {
-        return groupName;
-    }
-
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
-    }
-
-    public Integer getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(Integer groupId) {
-        this.groupId = groupId;
     }
 
 
@@ -1034,6 +535,22 @@ public class CarInfo extends BaseEntity {
         this.nextOperationDateBegin = nextOperationDateBegin;
     }
 
+    public String getNextOperationDateEnd() {
+        return nextOperationDateEnd;
+    }
+
+    public void setNextOperationDateEnd(String nextOperationDateEnd) {
+        this.nextOperationDateEnd = nextOperationDateEnd;
+    }
+
+    public String getNextClassDateBegin() {
+        return nextClassDateBegin;
+    }
+
+    public void setNextClassDateBegin(String nextClassDateBegin) {
+        this.nextClassDateBegin = nextClassDateBegin;
+    }
+
     public String getNextClassDateEnd() {
         return nextClassDateEnd;
     }
@@ -1042,75 +559,236 @@ public class CarInfo extends BaseEntity {
         this.nextClassDateEnd = nextClassDateEnd;
     }
 
-    @Override
-    public String getSupplierIds() {
-        return supplierIds;
+    public String getGroupName() {
+        return groupName;
     }
 
-    @Override
-    public void setSupplierIds(String supplierIds) {
-        this.supplierIds = supplierIds;
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
-    @Override
-    public String getCities() {
-        return cities;
+    public Integer getGroupId() {
+        return groupId;
     }
 
-    @Override
-    public void setCities(String cities) {
-        this.cities = cities;
+    public void setGroupId(Integer groupId) {
+        this.groupId = groupId;
     }
 
-    @Override
-    public String getTeamIds() {
-        return teamIds;
+
+    public String getNextOperationDate() {
+        return nextOperationDate;
     }
 
-    @Override
-    public void setTeamIds(String teamIds) {
-        this.teamIds = teamIds;
+    public void setNextOperationDate(String nextOperationDate) {
+        this.nextOperationDate = nextOperationDate;
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getNextSecurityDate() {
+        return nextSecurityDate;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setNextSecurityDate(String nextSecurityDate) {
+        this.nextSecurityDate = nextSecurityDate;
     }
 
-    public int getInspectFlag() {
-        return inspectFlag;
+    public String getNextClassDate() {
+        return nextClassDate;
     }
 
-    public void setInspectFlag(int inspectFlag) {
-        this.inspectFlag = inspectFlag;
+    public void setNextClassDate(String nextClassDate) {
+        this.nextClassDate = nextClassDate;
     }
 
-    public int getMaintenanceFlag() {
-        return MaintenanceFlag;
+    public String getTwoLevelMaintenanceDate() {
+        return twoLevelMaintenanceDate;
     }
 
-    public void setMaintenanceFlag(int maintenanceFlag) {
-        MaintenanceFlag = maintenanceFlag;
+    public void setTwoLevelMaintenanceDate(String twoLevelMaintenanceDate) {
+        this.twoLevelMaintenanceDate = twoLevelMaintenanceDate;
     }
 
-    public String getCreateDateBegin() {
-        return createDateBegin;
+    public Integer getDriverid() {
+        return driverid;
     }
 
-    public void setCreateDateBegin(String createDateBegin) {
-        this.createDateBegin = createDateBegin;
+    public void setDriverid(Integer driverid) {
+        this.driverid = driverid;
     }
 
-    public String getCreateDateEnd() {
-        return createDateEnd;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setCreateDateEnd(String createDateEnd) {
-        this.createDateEnd = createDateEnd;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
+
+    public CarInfo() {
+    }
+
+    public CarInfo(java.lang.Integer carId) {
+        this.carId = carId;
+    }
+
+    public void setCarId(java.lang.Integer value) {
+        this.carId = value;
+    }
+
+    public java.lang.Integer getCarId() {
+        return this.carId;
+    }
+
+    public void setSupplierId(java.lang.Integer value) {
+        this.supplierId = value;
+    }
+
+    public java.lang.Integer getSupplierId() {
+        return this.supplierId;
+    }
+
+    public void setLicensePlates(java.lang.String value) {
+        this.licensePlates = value;
+    }
+
+    public java.lang.String getLicensePlates() {
+        return this.licensePlates;
+    }
+
+    public void setBrand(java.lang.String value) {
+        this.brand = value;
+    }
+
+    public java.lang.String getBrand() {
+        return this.brand;
+    }
+
+    public void setCarModelId(java.lang.Integer value) {
+        this.carModelId = value;
+    }
+
+    public java.lang.Integer getCarModelId() {
+        return this.carModelId;
+    }
+
+    public void setModelDetail(java.lang.String value) {
+        this.modelDetail = value;
+    }
+
+    public java.lang.String getModelDetail() {
+        return this.modelDetail;
+    }
+
+    public void setColor(java.lang.String value) {
+        this.color = value;
+    }
+
+    public java.lang.String getColor() {
+        return this.color;
+    }
+
+    public void setEngineNo(java.lang.String value) {
+        this.engineNo = value;
+    }
+
+    public java.lang.String getEngineNo() {
+        return this.engineNo;
+    }
+
+    public void setFrameNo(java.lang.String value) {
+        this.frameNo = value;
+    }
+
+    public java.lang.String getFrameNo() {
+        return this.frameNo;
+    }
+
+    public void setMemo(java.lang.String value) {
+        this.memo = value;
+    }
+
+    public java.lang.String getMemo() {
+        return this.memo;
+    }
+
+    public void setStatus(java.lang.Integer value) {
+        this.status = value;
+    }
+
+    public java.lang.Integer getStatus() {
+        return this.status;
+    }
+
+    public void setCreateBy(java.lang.Integer value) {
+        this.createBy = value;
+    }
+
+    public java.lang.Integer getCreateBy() {
+        return this.createBy;
+    }
+
+    public void setUpdateBy(java.lang.Integer value) {
+        this.updateBy = value;
+    }
+
+    public java.lang.Integer getUpdateBy() {
+        return this.updateBy;
+    }
+
+    public int hashCode() {
+        return new HashCodeBuilder().append(getCarId()).toHashCode();
+    }
+
+    public boolean equals(Object obj) {
+        if (obj instanceof CarInfo == false)
+            return false;
+        if (this == obj)
+            return true;
+        CarInfo other = (CarInfo) obj;
+        return new EqualsBuilder().append(getCarId(), other.getCarId())
+                .isEquals();
+    }
+
+    public String getNextInspectDate() {
+        return nextInspectDate;
+    }
+
+    public void setNextInspectDate(String nextInspectDate) {
+        this.nextInspectDate = nextInspectDate;
+    }
+
+    public String getNextMaintenanceDate() {
+        return nextMaintenanceDate;
+    }
+
+    public void setNextMaintenanceDate(String nextMaintenanceDate) {
+        this.nextMaintenanceDate = nextMaintenanceDate;
+    }
+
+    public String getRentalExpireDate() {
+        return rentalExpireDate;
+    }
+
+    public void setRentalExpireDate(String rentalExpireDate) {
+        this.rentalExpireDate = rentalExpireDate;
+    }
+
+    public String getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(String createDate) {
+        this.createDate = createDate;
+    }
+
+    public String getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(String updateDate) {
+        this.updateDate = updateDate;
+    }
+
 
     public String getCarryPassengers() {
         return carryPassengers;
@@ -1119,6 +797,16 @@ public class CarInfo extends BaseEntity {
     public void setCarryPassengers(String carryPassengers) {
         this.carryPassengers = carryPassengers;
     }
+
+    public String getVehicleBrand() {
+        return vehicleBrand;
+    }
+
+    public void setVehicleBrand(String vehicleBrand) {
+        this.vehicleBrand = vehicleBrand;
+    }
+
+
 
     public String getClicensePlatesColor() {
         return clicensePlatesColor;
@@ -1136,6 +824,14 @@ public class CarInfo extends BaseEntity {
         this.vehicleVINCode = vehicleVINCode;
     }
 
+    public String getVehicleRegistrationDate() {
+        return vehicleRegistrationDate;
+    }
+
+    public void setVehicleRegistrationDate(String vehicleRegistrationDate) {
+        this.vehicleRegistrationDate = vehicleRegistrationDate;
+    }
+
     public Integer getFuelType() {
         return fuelType;
     }
@@ -1150,6 +846,22 @@ public class CarInfo extends BaseEntity {
 
     public void setVehicleEngineDisplacement(String vehicleEngineDisplacement) {
         this.vehicleEngineDisplacement = vehicleEngineDisplacement;
+    }
+
+    public String getVehicleEnginePower() {
+        return vehicleEnginePower;
+    }
+
+    public void setVehicleEnginePower(String vehicleEnginePower) {
+        this.vehicleEnginePower = vehicleEnginePower;
+    }
+
+    public String getVehicleEngineWheelbase() {
+        return vehicleEngineWheelbase;
+    }
+
+    public void setVehicleEngineWheelbase(String vehicleEngineWheelbase) {
+        this.vehicleEngineWheelbase = vehicleEngineWheelbase;
     }
 
     public String getTransportNumber() {
@@ -1200,6 +912,8 @@ public class CarInfo extends BaseEntity {
         this.firstDate = firstDate;
     }
 
+
+
     public Integer getOverHaulStatus() {
         return overHaulStatus;
     }
@@ -1214,6 +928,14 @@ public class CarInfo extends BaseEntity {
 
     public void setAuditingStatus(Integer auditingStatus) {
         this.auditingStatus = auditingStatus;
+    }
+
+    public String getAuditingDate() {
+        return auditingDate;
+    }
+
+    public void setAuditingDate(String auditingDate) {
+        this.auditingDate = auditingDate;
     }
 
     public String getEquipmentNumber() {
@@ -1240,52 +962,20 @@ public class CarInfo extends BaseEntity {
         this.gpsType = gpsType;
     }
 
+    public String getGpsImei() {
+        return gpsImei;
+    }
+
+    public void setGpsImei(String gpsImei) {
+        this.gpsImei = gpsImei;
+    }
+
     public String getGpsDate() {
         return gpsDate;
     }
 
     public void setGpsDate(String gpsDate) {
         this.gpsDate = gpsDate;
-    }
-
-    public Integer getOldSupplierId() {
-        return oldSupplierId;
-    }
-
-    public void setOldSupplierId(Integer oldSupplierId) {
-        this.oldSupplierId = oldSupplierId;
-    }
-
-    public Integer getOldCity() {
-        return oldCity;
-    }
-
-    public void setOldCity(Integer oldCity) {
-        this.oldCity = oldCity;
-    }
-
-    public String getCarIds() {
-        return carIds;
-    }
-
-    public void setCarIds(String carIds) {
-        this.carIds = carIds;
-    }
-
-    public int getCooperationType() {
-        return cooperationType;
-    }
-
-    public void setCooperationType(int cooperationType) {
-        this.cooperationType = cooperationType;
-    }
-
-    public String getCooperationName() {
-        return cooperationName;
-    }
-
-    public void setCooperationName(String cooperationName) {
-        this.cooperationName = cooperationName;
     }
 
     public String getPurchaseDateString() {
@@ -1302,14 +992,12 @@ public class CarInfo extends BaseEntity {
         }
         return str;
     }
-
     public void setPurchaseDateString(String value) {
         SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd");
         setPurchaseDate(sdf.format(DateUtils.parse(value, FORMAT_CAR_PURCHASE_DATE,
                 java.util.Date.class)));
         this.purchaseDateString = value;
     }
-
     public String getRentalExpireDateString() {
         String str = "";
         if(getRentalExpireDate()!=null&&!"".equals(getRentalExpireDate())){
