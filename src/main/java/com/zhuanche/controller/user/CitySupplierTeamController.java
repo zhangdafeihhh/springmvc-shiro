@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.serv.common.CitySupplierTeamService;
@@ -48,6 +49,23 @@ public class CitySupplierTeamController {
             return AjaxResponse.success(carBizSuppliers);
         }catch (Exception e){
             logger.error("查询城市供应商列表异常:{}",e);
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+    }
+	
+	/** 查询供应商下可见的车队信息 **/
+	@RequestMapping("/teamsForSupplier")
+    @ResponseBody
+    public AjaxResponse getTeamsForSupplier(@Verify(param = "supplierId", rule = "required") Integer supplierId){
+        SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+        if(Check.NuNObj(currentLoginUser)){
+            return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST);
+        }
+        try{
+            List<CarDriverTeam> carDriverTeams = citySupplierTeamService.queryDriverTeamListForSupplier(supplierId);
+            return AjaxResponse.success(carDriverTeams);
+        }catch (Exception e){
+            logger.error("查询城市供应商车队列表异常:{}",e);
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
     }
