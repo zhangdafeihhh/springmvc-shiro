@@ -14,10 +14,12 @@ import com.zhuanche.entity.mdbcarmanage.CarRelateGroup;
 import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.request.DriverTeamRequest;
 import com.zhuanche.request.CommonRequest;
+import com.zhuanche.request.DutyParamRequest;
 import com.zhuanche.request.TeamGroupRequest;
 import com.zhuanche.serv.CarBizCityService;
 import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.common.CitySupplierTeamCommonService;
+import com.zhuanche.serv.driverScheduling.AsyncDutyService;
 import com.zhuanche.util.Check;
 import mapper.mdbcarmanage.CarDriverTeamMapper;
 import mapper.mdbcarmanage.CarRelateGroupMapper;
@@ -96,6 +98,9 @@ public class CarDriverTeamService{
 	@Autowired
 	private CarBizDriverInfoExMapper carBizDriverInfoExMapper;
 
+	@Autowired
+	private AsyncDutyService asyncDutyService;
+
 	/**
 	* @Desc: 添加司机到车队/小组
 	* @param:
@@ -121,7 +126,9 @@ public class CarDriverTeamService{
 		CarRelateTeam team = new CarRelateTeam();
 		for(int i= 0; i < licenses.length; i++) {
 			driverTeamRequest.setLicense(licenses[i]);
-			String driverId = carBizDriverInfoExMapper.queryListByLimits(driverTeamRequest).get(0).getDriverId();
+			DutyParamRequest param = new DutyParamRequest();
+			param.setLicensePlates(licenses[i]);
+			String driverId = carBizDriverInfoExMapper.queryOneDriver(param).getDriverId();
 			if(!Check.NuNObj(driverTeamRequest.getpId())){
 				//小组
 				group.setGroupId(driverTeamRequest.getpId());
@@ -138,9 +145,10 @@ public class CarDriverTeamService{
 					result += carRelateTeamMapper.insertSelective(team);
 				}
 			}
+			//TODO 处理司机ID，发动司机变更MQ 从车队新增司机 driverId; driverTeam.getTeamId();driverTeam.getTeamName()
+			this.asyncDutyService.processingData(Integer.parseInt(driverId), String.valueOf(carDriverTeam.getId()), carDriverTeam.getTeamName(), 2);
 		}
-		//TODO 处理司机ID，发动司机变更MQ 从车队新增司机 driverId; driverTeam.getTeamId();driverTeam.getTeamName()
-		//driverService.processingData(Integer.parseInt(driverId), driverTeam.getTeamId(), driverTeam.getTeamName(), 2);
+
 		return result;
 	}
 
@@ -193,8 +201,8 @@ public class CarDriverTeamService{
 				//当前车队信息
 				CarDriverTeam carDriverTeam = carDriverTeamMapper.selectByPrimaryKey(driverTeamRequest.getTeamId());
 				//设置登录用户城市和供应商数据权限
-				driverTeamRequest.setCityIds(BeanUtil.copySet(WebSessionUtil.getCurrentLoginUser().getCityIds(),String.class));
-				driverTeamRequest.setSupplierIds(BeanUtil.copySet(WebSessionUtil.getCurrentLoginUser().getSupplierIds(),String.class));
+				driverTeamRequest.setCityIds(citySupplierTeamCommonService.setIntegerShiftString(WebSessionUtil.getCurrentLoginUser().getCityIds()));
+				driverTeamRequest.setSupplierIds(citySupplierTeamCommonService.setIntegerShiftString(WebSessionUtil.getCurrentLoginUser().getSupplierIds()));
 				//查询车队上级供应商级别下司机列表
 				List<CarDriverInfoDTO> limitsDrivers = carBizDriverInfoExMapper.queryListByLimits(driverTeamRequest);
 				if(Check.NuNCollection(limitsDrivers)){

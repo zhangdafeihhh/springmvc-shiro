@@ -99,9 +99,9 @@ public class CarDriverDutyService {
 			commonRequest.setSupplierId(String.valueOf(dutyParamRequest.getSupplierId()));
 			commonRequest.setTeamId(dutyParamRequest.getTeamId());
 			CommonRequest resultParmam = citySupplierTeamCommonService.paramDeal(commonRequest);
-			dutyParamRequest.setCityIds(BeanUtil.copySet(resultParmam.getCityIds(),Integer.class));
-			dutyParamRequest.setSuppliers(BeanUtil.copySet(resultParmam.getSupplierIds(),Integer.class));
-			dutyParamRequest.setSuppliers(resultParmam.getTeamIds());
+			dutyParamRequest.setCityIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getCityIds()));
+			dutyParamRequest.setSupplierIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getSupplierIds()));
+			dutyParamRequest.setSupplierIds(resultParmam.getTeamIds());
 			/** 数据权限处理结束 */
 
 			DutyParamRequest request = new DutyParamRequest();
