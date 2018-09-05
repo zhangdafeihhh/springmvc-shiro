@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.http.HttpException;
-import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,13 +11,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
-import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -55,14 +51,16 @@ public class CarAnalysisIndexController{
 		* @param 	endDate	结束日期
 		* @param 	groupByColumnCode	汇总维度代码
 		* @param 	visibleAllianceIds	可见加盟商ID
-		* @param 	visibleMotocadeIds	可见车队ID
+		* @param 	visibleVehicleTypeIds	可见车辆类型ID
 	    * @return
 	  */
+	  @ResponseBody
 	  @RequestMapping(value = "/queryCarAnalysisIndexDetailData", method = { RequestMethod.POST,RequestMethod.GET })
 	  public AjaxResponse queryCarAnalysisIndexDetailData(
 			  @Verify(param = "startDate",rule = "required") String startDate,
 			  @Verify(param = "endDate",rule = "required") String endDate, 
-			  @Verify(param = "groupByColumnCode",rule = "required") String groupByColumnCode){
+			  @Verify(param = "groupByColumnCode",rule = "required") String groupByColumnCode,
+              @Verify(param = "visibleVehicleTypeIds",rule = "required") String visibleVehicleTypeIds){
 	      logger.info("【运营管理-统计分析】车辆分析指标明细 数据:queryCarAnalysisIndexDetailData");
 	      Map<String, Object> paramMap = new HashMap<String, Object>();
 	      paramMap.put("startDate", startDate);//订单城市ID	
@@ -71,16 +69,14 @@ public class CarAnalysisIndexController{
 	      // 数据权限设置
 		  SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
 	      Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-	      Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
+	      //Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
 	      // 供应商信息
 		  String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-		  // 车队信息
-		  String[] visibleMotocadeIds = statisticalAnalysisService.setToArray(teamIds);
-		  if(null == visibleAllianceIds || null == visibleMotocadeIds){
+		  if(null == visibleAllianceIds || null == visibleVehicleTypeIds){
 			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 		  }
 	      paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-	      paramMap.put("visibleMotocadeIds", visibleMotocadeIds); // 可见车队ID
+	      paramMap.put("visibleVehicleTypeIds", visibleVehicleTypeIds); // 可见车辆类型ID
 	      AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/carAnalysisDetail/carDetail",paramMap);
 	  	// 从大数据仓库获取统计数据
 	      return result;
@@ -95,18 +91,17 @@ public class CarAnalysisIndexController{
 			* @param 	allianceId	加盟商ID
 			* @param 	vehicleTypeId	车辆类型ID
 			* @param 	visibleAllianceIds	可见加盟商ID
-			* @param 	allVehicleTypeIds	全部车辆类型ID
+			* @param 	visibleVehicleTypeIds	可见车辆类型ID
 		    * @return
 		  */
+		@ResponseBody
 	    @RequestMapping(value = "/queryCarAnalysisIndexWayData", method = { RequestMethod.POST,RequestMethod.GET })
 	    public AjaxResponse queryCarAnalysisIndexWayData(
 	    			@Verify(param = "startDate",rule = "required") String startDate,
 	    			@Verify(param = "endDate",rule = "required") String endDate, 
 	                                              String allianceId,
 	                                              String vehicleTypeId,
-	                                              String allVehicleTypeIds
-	                                              //String visibleAllianceIds,
-	                                              //String allVehicleTypeIds
+	                @Verify(param = "visibleVehicleTypeIds",rule = "required") String visibleVehicleTypeIds
 	                                              ){
 	        logger.info("【运营管理-统计分析】车辆分析指标趋势 数据:queryCarAnalysisIndexWayData");
 	        Map<String, Object> paramMap = new HashMap<String, Object>();
@@ -116,16 +111,16 @@ public class CarAnalysisIndexController{
 	        // 数据权限设置
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
 	        Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-	        Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
+	        // Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
 	        // 供应商信息
 			String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
 			// 全部车辆类型  ??
-			String[] allVehicleTypeIdsArray = statisticalAnalysisService.setToArray(teamIds);
-			if(null == visibleAllianceIds || null == allVehicleTypeIdsArray){
+			//String[] allVehicleTypeIdsArray = statisticalAnalysisService.setToArray(teamIds);
+			if(null == visibleAllianceIds || null == visibleVehicleTypeIds){
 				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 			}
 	        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-	        paramMap.put("allVehicleTypeIds", allVehicleTypeIds); // 全部车辆类型
+	        paramMap.put("visibleVehicleTypeIds", visibleVehicleTypeIds); // 可见车辆类型ID
 	        AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/carAnalysisIndex/carIndex",paramMap);
 	    	// 从大数据仓库获取统计数据
 	        return result;

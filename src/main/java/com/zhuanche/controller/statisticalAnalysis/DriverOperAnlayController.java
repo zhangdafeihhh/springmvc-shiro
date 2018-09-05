@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -51,6 +52,7 @@ public class DriverOperAnlayController{
 		* @param 	visibleAllianceIds	可见加盟商ID
 	    * @return
 	  */
+	  @ResponseBody
 	  @RequestMapping(value = "/queryDriverOperAnlayData", method = { RequestMethod.POST,RequestMethod.GET })
 	  public AjaxResponse queryCarAnalysisIndexDetailData(
 			  @Verify(param = "startDate",rule = "required") String startDate,
@@ -85,6 +87,7 @@ public class DriverOperAnlayController{
 		* @param 	visibleAllianceIds	可见加盟商ID
 	    * @return
 	  */
+	@ResponseBody
     @RequestMapping(value = "/queryDriverOperAnlayTrendData", method = { RequestMethod.POST,RequestMethod.GET })
     public AjaxResponse queryCarAnalysisIndexWayData(
     		  @Verify(param = "startDate",rule = "required") String startDate,

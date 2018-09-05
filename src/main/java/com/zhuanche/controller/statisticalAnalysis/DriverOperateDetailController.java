@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -64,6 +65,7 @@ public class DriverOperateDetailController{
 		* @param 	visibleMotorcadeIds	可见车队ID
 	    * @return
 	  */
+	@ResponseBody
     @RequestMapping(value = "/queryDriverOperateDetailData", method = { RequestMethod.POST,RequestMethod.GET })
     public AjaxResponse queryDriverOperateDetailData(
     										  String driverCityId,
