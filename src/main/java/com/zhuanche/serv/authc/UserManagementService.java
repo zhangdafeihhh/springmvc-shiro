@@ -219,18 +219,25 @@ public class UserManagementService{
     		return new PageDTO( page, pageSize, total , new ArrayList()  );
     	}
     	List<CarAdmUserDTO> roledtos = BeanUtil.copyList(users, CarAdmUserDTO.class);
-    	//3.1补充上角色名称
+    	//3.1补充上角色ID，角色名称
     	Map<Integer,String> roleIdNameMappings = this.searchRoleIdNameMappings();
     	for( CarAdmUserDTO admUserDto : roledtos ) {
     		List<Integer> roleIdsOfthisUser = saasRoleExMapper.queryRoleIdsOfUser(admUserDto.getUserId());//根据用户ID，查询其拥有的所有有效的角色ID
-    		//拼接角色名称
+    		//拼接角色ID，角色名称
+    		StringBuffer sbRoleIds       =  new StringBuffer("");
     		StringBuffer sbRoleNames =  new StringBuffer("");
 			for( Integer rid : roleIdsOfthisUser) {
+				sbRoleIds.append(rid.intValue()).append(",");
 				String rname = roleIdNameMappings.get(rid);
 				if( StringUtils.isNotEmpty(rname) ) {
 					sbRoleNames.append(rname).append(",");
 				}
 			}
+			String roleIds = sbRoleIds.toString();
+			if(roleIds.endsWith(",")) {
+				roleIds = roleIds.substring(0, roleIds.length()-1);
+			}
+			admUserDto.setRoleIds(roleIds);//设置角色ID
 			String roleNames = sbRoleNames.toString();
 			if(roleNames.endsWith(",")) {
 				roleNames = roleNames.substring(0, roleNames.length()-1);
