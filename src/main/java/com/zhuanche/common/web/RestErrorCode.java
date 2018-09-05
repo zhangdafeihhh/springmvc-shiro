@@ -29,14 +29,16 @@ public final class RestErrorCode{
 	public static final int HTTP_NOT_FOUND                   = 404;
 	@ResultMessage("系统内部发生错误")
 	public static final int HTTP_SYSTEM_ERROR              = 500;
+	@ResultMessage("服务错误：{0}")
+	public static final int CAR_API_ERROR           = 996;
+	@ResultMessage("会话已失效，请重新登录")
+	public static final int HTTP_INVALID_SESSION           = 997;
 	@ResultMessage("请求参数校验不通过")
 	public static final int HTTP_PARAM_INVALID              = 998;
-    @ResultMessage("没有查询到结果")
-    public static final int NOT_FOUND_RESULT                = 997;
 	@ResultMessage("未知错误")
 	public static final int UNKNOWN_ERROR                   = 999;
 
-	
+
 	//-----------------------------------------------用户
 	@ResultMessage("获取验证码太频繁")
 	public static final int GET_MSGCODE_EXCEED           = 1000;
@@ -54,7 +56,7 @@ public final class RestErrorCode{
 	public static final int MSG_CODE_WRONG                = 1006;
 	@ResultMessage("账号已经存在")
 	public static final int ACCOUNT_EXIST                      = 1007;
-	
+
 	//----------------------------------------------权限管理
 	@ResultMessage("父权限不存在")
 	public static final int PARENT_PERMISSION_NOT_EXIST           = 10001;
@@ -71,11 +73,6 @@ public final class RestErrorCode{
 	@ResultMessage("{0}为系统预置权限，不能禁用、修改")
 	public static final int SYSTEM_PERMISSION_CANOT_CHANGE  = 10007;
 
-
-
-
-
-	
 	//---------------------------------------------------------------------------------------------------------------------------------------------
 	//----------------------------------------------角色管理
 	@ResultMessage("角色不存在")
@@ -84,7 +81,7 @@ public final class RestErrorCode{
 	public static final int ROLE_CODE_EXIST                                    = 10101;
 	@ResultMessage("{0}为系统预置角色，不能禁用、修改")
 	public static final int SYSTEM_ROLE_CANOT_CHANGE              = 10102;
-	   
+
 	//-----------------------------------------------业务参数：司机
 	@ResultMessage("没有该手机号的司机，请仔细核对！")
 	public static final int DRIVER_NOT_EXIST = 2000;
@@ -116,7 +113,20 @@ public final class RestErrorCode{
 	@ResultMessage("车辆信息不存在")
 	public static final int BUS_NOT_EXIST                                               = 1100;
 
-	
+
+	@ResultMessage("结果不存在")
+	public static final int NOT_FOUND_RESULT                                               = 1101;
+	@ResultMessage("请求风控资源失败")
+	public static final int RISK_ORDER_DATA_FAIL                                        = 5002;
+	@ResultMessage("上传风控文件失败")
+	public static final int RISK_UPLOAD_FILE_FAIL                                        = 5003;
+	@ResultMessage("提交申诉失败")
+	public static final int RISK_SUBMITCOMPLAIN_FAIL                                        = 5004;
+
+	@ResultMessage("查询GPS数据失败")
+	public static final int MONITOR_GPS_FAIL                                        = 6001;
+	@ResultMessage("查询大数据司机订单信息失败")
+	public static final int MONITOR_DRIVERO_ORDER_FAIL                                        = 7001;
 	//---------------------------------------------------------------------------------------------------------------------------------------------
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系
@@ -152,7 +162,7 @@ public final class RestErrorCode{
 		}
 		return MessageFormat.format(rawErrorMsg, args);
 	}
-	
+
 	/**生成一个HTML文件，方便生成技术文档**/
 	public static void main(String[] args) throws Exception{
 		//1.生成表格
@@ -173,7 +183,7 @@ public final class RestErrorCode{
 		html.append("</table>");
 		FileUtils.writeStringToFile(new File(path), html.toString(),"GBK");
 		System.out.println("Write html file to ["+path+"] successfully.");
-		
+
 		//2.生成国际化属性文件
 		String propPath   = "D:/globalMessages.properties";
 		StringBuffer text = new StringBuffer("#Error Codes\r\n");

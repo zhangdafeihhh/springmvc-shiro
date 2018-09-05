@@ -44,7 +44,7 @@ import java.util.Map;
  * @author wzq
  */
 @Controller
-@RequestMapping(value = "/carInfoTemporary")
+@RequestMapping(value = "/ç")
 public class CarInfoTemporaryController extends BaseController {
 
     private static Log log =  LogFactory.getLog(CarInfoTemporaryController.class);

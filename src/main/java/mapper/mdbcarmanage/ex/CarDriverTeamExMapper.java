@@ -1,6 +1,7 @@
 package mapper.mdbcarmanage.ex;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.zhuanche.request.DriverTeamRequest;
@@ -15,4 +16,13 @@ public interface CarDriverTeamExMapper{
 	CarDriverTeam selectByCondition(DriverTeamRequest driverTeamRequest);
 
 	List<CarDriverTeam> queryForListByPid(DriverTeamRequest driverTeamRequest);
+
+	public Map<String, Object> queryTeamIdByDriverId(@Param("driverId") Integer driverId);
+
+	/**
+	 * 根据司机ID查询司机的车队小组信息
+	 * @param driverId
+	 * @return
+	 */
+	Map<String, Object> queryTeamNameAndGroupNameByDriverId(@Param("driverId") Integer driverId);
 }

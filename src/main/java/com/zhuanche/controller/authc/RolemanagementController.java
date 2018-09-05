@@ -3,6 +3,7 @@ package com.zhuanche.controller.authc;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,6 +18,7 @@ import com.zhuanche.serv.authc.RoleManagementService;
 /**角色管理**/
 @RestController
 public class RolemanagementController{
+	@Autowired
 	private RoleManagementService roleManagementService;
 	
 	/**一、增加一个角色**/
@@ -24,8 +26,8 @@ public class RolemanagementController{
 //	@RequiresPermissions(value = { "ADD_SAAS_ROLE" } )
 	public AjaxResponse addSaasRole( @Verify(param="roleCode",rule="required") String roleCode,  @Verify(param="roleName",rule="required") String roleName) {
 		SaasRole role = new SaasRole();
-		role.setRoleCode(roleCode);
-		role.setRoleName(roleName);
+		role.setRoleCode(roleCode.trim());
+		role.setRoleName(roleName.trim());
 		role.setValid(true);
 		return roleManagementService.addSaasRole(role);
 	}
@@ -50,8 +52,8 @@ public class RolemanagementController{
 	public 	AjaxResponse changeRole( @Verify(param="roleId",rule="required|min(1)") Integer roleId , @Verify(param="roleCode",rule="required")  String roleCode,  @Verify(param="roleName",rule="required") String roleName ) {
 		SaasRole roleForupdate = new SaasRole();
 		roleForupdate.setRoleId(roleId);
-		roleForupdate.setRoleCode(roleCode);
-		roleForupdate.setRoleName(roleName);
+		roleForupdate.setRoleCode(roleCode.trim());
+		roleForupdate.setRoleName(roleName.trim());
 		return roleManagementService.changeRole(roleForupdate);
 	}
 

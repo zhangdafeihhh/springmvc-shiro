@@ -7,10 +7,6 @@ import java.util.Date;
 
 /**
  *
- * @Description:
- * @see: 此处填写需要参考的类
- * @version 2017年05月04日 下午 18:47:40ce
- * @autor
  */
 public class DriverOutage extends BaseEntity {
 

@@ -33,10 +33,95 @@
     memo, create_by, create_date, update_by, update_date, evaluate_score, evaluate, platform_evaluate, 
     platform_evaluate_score, platform_memo, customer_ip, point, pointBD
   </sql>
-  <select id="queryCustomerAppraisalList" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select 
-    <include refid="Base_Column_List" />
-    from car_biz_customer_appraisal
-    where appraisal_id = #{appraisalId,jdbcType=INTEGER}
+
+  <!-- mapper基础标准: 当前表所有字段查询条件集 -->
+  <sql id="allBaseColumnWhereList" >
+    <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR" >
+      <if test="evaluateScore !=null and evaluateScore !=''">
+        AND ca.evaluate_score in (${evaluateScore})
+      </if>
+      <if test="orderNo !=null and orderNo !=''">
+        AND ca.order_no = #{orderNo}
+      </if>
+      <if test="name !=null and name !=''">
+        AND di.name = #{name}
+      </if>
+      <if test="phone !=null and phone !=''">
+        AND di.phone LIKE CONCAT('%', #{phone}, '%')
+      </if>
+      <if test="licensePlates !=null and licensePlates !=''">
+        AND di.license_plates = #{licensePlates}
+      </if>
+      <if test="driverId !=null and driverId !='' ">
+        and di.driver_id = #{driverId}
+      </if>
+      <if test="cityId !=null and cityId !=''">
+        AND di.service_city = #{cityId}
+      </if>
+      <if test="supplierId !=null and supplierId !=''">
+        AND di.supplier_id = #{supplierId}
+      </if>
+      <if test="createDateBegin !=null and createDateBegin !=''">
+        <![CDATA[ AND ca.create_date >=  concat(#{createDateBegin},' 00:00:00') ]]>
+      </if>
+      <if test="createDateEnd !=null and createDateEnd !=''">
+        <![CDATA[ AND ca.create_date <=  concat(#{createDateEnd},' 23:59:59') ]]>
+      </if>
+      <if test="cityIds !=null and cityIds.size()>0">
+        and di.service_city IN
+        <foreach collection="cityIds" open="(" close=")" separator="," item="cid">
+          #{cid}
+        </foreach>
+      </if>
+      <if test="supplierIds !=null and supplierIds.size()>0">
+        and di.supplier_id IN
+        <foreach collection="supplierIds" open="(" close=")" separator="," item="sid">
+          #{sid}
+        </foreach>
+      </if>
+      <if test="driverIds !=null and driverIds.size()>0">
+        and di.driver_id IN
+        <foreach collection="driverIds" open="(" close=")" separator="," item="did">
+          #{did}
+        </foreach>
+      </if>
+    </trim>
+  </sql>
+
+  <select id="queryCustomerAppraisalList" resultMap="BaseResultMap" parameterType="com.zhuanche.dto.rentcar.CarBizCustomerAppraisalDTO" >
+    SELECT
+    DISTINCT(ca.order_no) AS orderNo,
+    DATE_FORMAT(ca.create_date,'%Y-%m-%d %T') AS createDate,
+    ca.instrument_and_service AS instrumentAndService,
+    ca.environment_and_equipped AS environmentAndEquipped,
+    ca.efficiency_and_safety AS efficiencyAndSafety,
+    ca.evaluate_score AS evaluateScore,
+    ca.evaluate AS evaluate,
+    ca.memo,
+    di.driver_id AS driverId,
+    di.name AS driverName,
+    di.phone AS driverPhone,
+    di.license_plates AS licensePlates
+    FROM
+    car_biz_customer_appraisal ca
+    LEFT JOIN car_biz_driver_info di ON di.driver_id = ca.driver_id
+    <include refid="allBaseColumnWhereList"/>
+    ORDER BY ca.create_date DESC
+  </select>
+
+  <select id="queryDriverAppraisalDetail" resultType="com.zhuanche.dto.rentcar.CarBizCustomerAppraisalDTO" parameterType="com.zhuanche.dto.rentcar.CarBizCustomerAppraisalDTO" >
+    SELECT
+    DISTINCT(ca.order_no) AS orderNo,
+    DATE_FORMAT(ca.create_date,'%Y-%m-%d') AS createDate,
+    ca.memo,
+    (case when ca.evaluate_score then ca.evaluate_score
+    else ROUND((ca.instrument_and_service+ca.environment_and_equipped+ca.efficiency_and_safety)/3,2) end ) AS evaluateScore
+    FROM car_biz_customer_appraisal ca
+    WHERE ca.driver_id = #{driverId}
+    and DATE_FORMAT(ca.create_date,'%Y-%m')= #{createDateBegin}
+    <if test="orderNo!=null and orderNo!=''">
+      AND ca.order_no LIKE CONCAT('%', #{orderNo}, '%')
+    </if>
+    ORDER BY ca.create_date DESC
   </select>
 </mapper>

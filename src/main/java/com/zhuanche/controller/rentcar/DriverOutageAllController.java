@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,27 +32,7 @@ public class DriverOutageAllController {
     DriverOutageService driverOutageService;
 
 
-//    @RequestMapping(value = "/queryDriverOutage", method = { RequestMethod.GET })
-//    public String queryDriverOutage(ModelMap model, DriverOutageEntity params){
-//        try {
-//            logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"【司机永久停运】司机永久停运列表");
-//        } catch (Exception e) {
-//        }
-//        logger.info("【司机永久停运】queryDriverOutage:司机永久停运列表");
-//        return "driverOutage/driverOutageAllList";
-//    }
-//
-//    @RequestMapping(value = "/queryDriverOutageNo", method = { RequestMethod.GET })
-//    public String queryDriverOutageNo(ModelMap model, DriverOutageEntity params){
-//        try {
-//            logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"【司机永久停运】司机永久停运列表");
-//        } catch (Exception e) {
-//        }
-//        logger.info("【司机永久停运】queryDriverOutageNo:司机永久停运列表");
-//        return "driverOutage/driverOutageAllListNo";
-//    }
-
-    @GetMapping(value = "/queryDriverOutageData.json")
+    @RequestMapping(value = "/queryDriverOutageData")
     public AjaxResponse queryDriverOutageData(@Verify(param = "cityId",rule = "") Integer cityId,
                                               Integer supplierId,
                                               Integer carGroupId,
@@ -89,7 +70,7 @@ public class DriverOutageAllController {
         //查数量
         total = driverOutageService.queryAllForInt(params);
         if(total==0){
-            PageDTO result = new PageDTO(params.getPage(), params.getPagerSize(), 0, rows);
+            PageDTO result = new PageDTO(params.getPage(), params.getPagesize(), 0, rows);
             return AjaxResponse.success(result);
         }
         //查数据
@@ -97,20 +78,9 @@ public class DriverOutageAllController {
         return AjaxResponse.success(new PageDTO(params.getPage(), params.getPagesize(), total, BeanUtil.copyList(rows, DriverOutageAllDTO.class)));
     }
 
-//    @AuthPassport
-//    @RequestMapping(value = "/driverOutageAddView")
-//    public String driverOutageAddView() {
-//        try {
-//            logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"【司机永久停运】永久停运页面");
-//        } catch (Exception e) {
-//        }
-//        logger.info("【司机永久停运】永久停运页面");
-//        return "driverOutage/driverOutageAllAdd";
-//    }
-
-    @RequestMapping(value="/saveDriverOutage", method = { RequestMethod.POST })
+    @RequestMapping(value="/saveDriverOutage")
     public AjaxResponse saveDriverOutage(
-                                         String driverName,
+                                        @Verify(param = "driverName",rule = "required")String driverName,
                                          @Verify(param = "driverPhone",rule = "mobile")String driverPhone,
                                          @Verify(param = "outageReason",rule = "required")String outageReason,
                                          @Verify(param = "driverId",rule = "required")Integer driverId){
@@ -137,11 +107,11 @@ public class DriverOutageAllController {
             return AjaxResponse.fail(RestErrorCode.DRIVER_OUTAGEALL_EXIST);
         }else{
             result = this.driverOutageService.saveDriverOutageAll(params);
-            return AjaxResponse.success(result);
+            return getResponse(result);
         }
     }
 
-    @RequestMapping(value="/updateDriverOutages", method = { RequestMethod.POST })
+    @RequestMapping(value="/updateDriverOutages")
     public AjaxResponse updateDriverOutages(@Verify(param = "outageIds",rule = "required")String outageIds,
                                             @Verify(param = "removeReason",rule = "required")String removeReason){
         DriverOutage params = new DriverOutage();
@@ -151,21 +121,44 @@ public class DriverOutageAllController {
         logger.info("【司机永久停运】永久停运批量解除数据=="+params.toString());
         Map<String,Object> result = new HashMap<String,Object>();
         result = this.driverOutageService.updateDriverOutagesAll(params);
-        return AjaxResponse.success(result);
+        return getResponse(result);
     }
+
+//    /**
+//     * 永久停运导入
+//     */
+//    @RequestMapping(value = "/importDriverOutageInfo")
+//    public AjaxResponse importDriverOutageInfo(DriverOutageVo params, HttpServletRequest request) {
+//        logger.info("永久停运导入保存importDriverOutageInfo,参数" + params.toString());
+//        Map<String, Object> result = new HashMap<String, Object>();
+//        result = this.driverOutageService.importDriverOutageInfo(params, request);
+//        return getResponse(result);
+//    }
 
     /**
      * 永久停运导入
      */
     @RequestMapping(value = "/importDriverOutageInfo")
-    public AjaxResponse importDriverOutageInfo(DriverOutageVo params, HttpServletRequest request) {
-        logger.info("永久停运导入保存importDriverOutageInfo,参数" + params.toString());
+    public AjaxResponse importDriverOutageInfo(@RequestParam(value="filename") MultipartFile file,
+                                               HttpServletRequest request,HttpServletResponse response) {
+
+        if(file == null){
+            return AjaxResponse.fail(400);
+        }
+        //获取文件名
+        String name=file.getOriginalFilename();
+        //进一步判断文件是否为空（即判断其大小是否为0或其名称是否为null）
+        long size=file.getSize();
+        if(name==null || ("").equals(name) && size==0)
+            return AjaxResponse.fail(400);
+
+        logger.info("永久停运导入保存importDriverOutageInfo,参数" + file.getName());
         Map<String, Object> result = new HashMap<String, Object>();
-        result = this.driverOutageService.importDriverOutageInfo(params, request);
-        return AjaxResponse.success(request);
+        result = this.driverOutageService.importDriverOutageInfo(name, file, request);
+        return AjaxResponse.success(result);
     }
 
-    /*
+    /**
      * 下载永久停运导入模板
      */
     @RequestMapping(value = "/fileDownloadInfo")
@@ -200,6 +193,24 @@ public class DriverOutageAllController {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public AjaxResponse getResponse(Map<String,Object> result){
+        try{
+//            JSONObject jsonStr = (JSONObject)result.get("jsonStr");
+
+            Integer result1 = Integer.valueOf( result.get("result").toString() );
+
+            if( 0 == result1 ){
+                String exception = result.get("exception").toString();
+                return AjaxResponse.fail(996, exception);
+            } else if(1 == result1){
+                return AjaxResponse.success(null);
+            }
+            return AjaxResponse.fail(999);
+        } catch (Exception e){
+            return AjaxResponse.fail(999);
         }
     }
 

@@ -50,6 +50,15 @@ public class InitRequestCommonDataFilter extends OncePerRequestFilter {
         response.setHeader("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Accept,XRequestedWith,LastModified");
         response.setHeader("Access-Control-Allow-Credentials", "true");		
 		/***************支持跨域请求END***********************/
+        
+		/***************是否为AJAX请求BEGIN******************/
+		String XMLHttpRequest = request.getHeader("X-Requested-With");
+		if( (XMLHttpRequest!=null && XMLHttpRequest.trim().length()>0) || request.getRequestURI().endsWith(".json") ){
+			request.setAttribute("X_IS_AJAX", true);
+		}else {
+			request.setAttribute("X_IS_AJAX", false);
+		}
+		/***************是否为AJAX请求END*******************/
 		
 		
 		//一、请求流水号(用于日志,实现对请求进行统一编号，方便于进行排查业务日志)

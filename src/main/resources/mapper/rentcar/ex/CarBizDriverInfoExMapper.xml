@@ -102,7 +102,7 @@
     <result column="account_type" property="accountType" jdbcType="INTEGER" />
     <result column="group_id" property="groupId" jdbcType="INTEGER" />
   </resultMap>
-  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizDriverInfo" extends="BaseResultMap" >
+  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.dto.rentcar.CarBizDriverInfoDTO" extends="BaseResultMap" >
     <result column="english_name" property="englishName" jdbcType="VARCHAR" />
     <result column="contract_type" property="contractType" jdbcType="VARCHAR" />
     <result column="contract_no" property="contractNo" jdbcType="VARCHAR" />
@@ -139,6 +139,124 @@
   <sql id="Blob_Column_List" >
     memo
   </sql>
+
+  <!--查询司机部分信息（只供更改车队是调用）-->
+  <select id="selectDriverInfoByDriverId" parameterType="java.lang.Integer" resultType="com.zhuanche.dto.CarDriverInfoDTO">
+    SELECT
+    i.driver_id AS driverId,
+    i.phone AS phone,
+    i.NAME AS name,
+    i.license_plates AS licensePlates,
+    i.cooperation_type AS cooperationType,
+    i.group_id AS groupId,
+    g.group_name AS carGroupName,
+    i.service_city as serviceCityId,
+    c.city_name AS cityName,
+    i.supplier_id AS supplierId,
+    p.supplier_full_name AS supplierName,
+    i.STATUS AS status,
+    i.update_by AS updateBy,
+    DATE_FORMAT(i.create_date,'%Y-%m-%d %H:%i:%s') AS createDate
+    FROM car_biz_driver_info i
+    LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+    LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+    LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+    where i.driver_id= #{driverId}
+  </select>
+
+  <select id="queryDriverListForMonthDuty" parameterType="com.zhuanche.request.DriverMonthDutyRequest" resultType="com.zhuanche.dto.CarDriverInfoDTO">
+    SELECT
+    i.driver_id AS driverId,
+    i.name,
+    i.license_plates AS licensePlates,
+    i.status
+    FROM
+    car_biz_driver_info i
+    LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+    where 1=1
+    and i.status = 1
+    <if test="cityIds!=null and cityIds.size()>0">
+      and city IN
+      <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
+        #{cid}
+      </foreach>
+    </if>
+    <if test="supplierIds!=null and supplierIds.size()>0">
+      and supplier IN
+      <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
+        #{sid}
+      </foreach>
+    </if>
+    ORDER BY
+    i.driver_id asc
+  </select>
+
+  <select id="selectDriverDetail" parameterType="string" resultType="com.zhuanche.dto.CarDriverInfoDTO">
+    SELECT
+    i.driver_id as driverId,
+    i.account_bank as accountBank,
+    i.age as age,
+    i.archives_no as archivesNo,
+    i.attachment_addr as attachmentAddr,
+    i.attachment_name as attachmentName,
+    i.bank_account_no as bankAccountNo,
+    i.create_by as createBy,
+    i.create_date as createDate,
+    i.credit_card_no as creditCardNo,
+    i.update_by as updateBy,
+    i.update_date as updateDate,
+    i.credit_card_period_of_validity as creditCardPeriodOfValidity,
+    i.credit_CVN2 as CVN2,
+    i.credit_open_account_bank as creditOpenAccountBank,
+    i.current_address as currentAddress,
+    i.driving_license_type as drivingLicenseType,
+    i.driving_years as drivingYears,
+    i.emergency_contact_number as emergencyContactNumber,
+    i.emergency_contact_person as emergencyContactPerson,
+    DATE_FORMAT(i.expire_date,'%Y-%m-%d %T')as expireDate,
+    i.gender as gender,
+    i.id_card_no as idCardNo,
+    DATE_FORMAT(i.issue_date,'%Y-%m-%d %T')as issueDate,
+    i.is_binding_credit_card as isBindingCreditCard,
+    i.license_plates as licensePlates,
+    ci.car_id as licensePlatesId,
+    i.memo as memo,
+    i.`name` as name,
+    i.`password` as password,
+    i.phone as phone,
+    i.photoSrct as photoSrc,
+    i.push_id as pushId,
+    i.service_city as serviceCityId,
+    i.`status` as status,
+    i.storable_card_no as shortCardNo,
+    i.supplier_id as supplierId,
+    i.superintend_no AS superintendNo,
+    i.superintend_url AS superintendUrl,
+    IFNULL(t.curr_account,0) as currAccount,
+    IFNULL(t.hisall_account,0) as hisallAccount,
+    IFNULL(t.credit_balance,0) as creditBalance,
+    IFNULL(t.credit_balance_hisall,0) as creditBalanceHisall,
+    IFNULL(t.out_curr_account,0) as outCurrAccount,
+    IFNULL(t.out_hisall_account,0) as outHisallAccount,
+    IFNULL(t.account_amount,0) as accountAmount,
+    IFNULL(t.settle_account,0) as settleAccount,
+    IFNULL(t.withdraw_deposit,0) as withdrawDeposit,
+    IFNULL(t.frozen_amount,0) as frozenAmount,
+    c.city_name as serviceCity,
+    c.city_id as cityId,
+    d.name createByName,
+    e.name updateByName,
+    f.supplier_full_name supplierName,
+    i.group_id as groupId
+    from car_biz_driver_info i
+    LEFT JOIN car_biz_driver_account t on i.driver_id = t.driver_id
+    LEFT JOIN car_biz_city c on c.city_id = i.service_city
+    left join car_sys_user d on d.user_id=i.create_by
+    left join car_sys_user e on e.user_id=i.update_by
+    left join car_biz_supplier f on f.supplier_id=i.supplier_id
+    left join car_biz_car_info ci on ci.license_plates=i.license_plates
+    where i.driver_id = #{driverId}
+  </select>
 
   <select id="queryOneDriver" parameterType="com.zhuanche.request.DutyParamRequest" resultType="com.zhuanche.dto.CarDriverInfoDTO">
     SELECT
@@ -324,17 +442,7 @@
       </if>
     </trim>
   </sql>
-
   <select id="queryDriverList" resultMap="ResultMapWithBLOBs" >
-    select
-    <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
-    from car_biz_driver_info
-    <include refid="allBaseColumnWhereList"/>
-    order by create_date desc
-  </select>
-  <select id="queryDriverListNoLimit" resultMap="ResultMapWithBLOBs" >
     select
     <include refid="Base_Column_List" />
     ,
@@ -1340,4 +1448,42 @@
             <![CDATA[ and driver_id <> #{driverId}  ]]>
         </if>
     </select>
+  <!-- 解绑司机信用卡，更新 -->
+  <update id="updateDriverCardInfo" parameterType="java.util.Map">
+    UPDATE car_biz_driver_info
+    SET name=name, update_date = now()
+    <if test="quickpayCustomerid!=null">
+      ,quickpay_customerid = #{quickpayCustomerid}
+    </if>
+    <if test="creditOpenAccountBank!=null">
+      ,credit_open_account_bank = #{creditOpenAccountBank}
+    </if>
+    <if test="shortCardNo!=null">
+      ,storable_card_no = #{shortCardNo}
+    </if>
+    <if test="isBindingCreditCard!=null">
+      ,is_binding_credit_card = #{isBindingCreditCard}
+    </if>
+    <if test="creditCardNo!=null">
+      ,credit_card_no = #{creditCardNo}
+    </if>
+    <if test="CVN2!=null">
+      ,credit_CVN2 = #{CVN2}
+    </if>
+    <if test="updateBy!=null and updateBy!=''">
+      ,update_by = #{updateBy}
+    </if>
+    <if test="expireDate!=null">
+      ,credit_card_period_of_validity = #{expireDate}
+    </if>
+    <if test="bindTime!=null">
+      ,credit_bind_date = #{bindTime}
+    </if>
+    WHERE driver_id = #{driverId}
+  </update>
+  <update id="updateDriverCustomerId" parameterType="java.util.Map">
+    UPDATE car_biz_driver_info
+    SET uickpay_customerid = #{quickpayCustomerID}
+    WHERE driver_id = #{driverID}
+  </update>
 </mapper>

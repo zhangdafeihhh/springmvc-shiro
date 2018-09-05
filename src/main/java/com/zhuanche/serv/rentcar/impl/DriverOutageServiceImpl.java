@@ -9,6 +9,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Common;
 import com.zhuanche.util.MyRestTemplate;
 import com.zhuanche.util.ValidateUtils;
+import mapper.rentcar.DriverOutageMapper;
 import mapper.rentcar.ex.DriverOutageExMapper;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -21,12 +22,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -36,7 +37,10 @@ public class DriverOutageServiceImpl implements DriverOutageService {
     private static final Logger logger = LoggerFactory.getLogger(DriverOutageServiceImpl.class);
 
     @Autowired
-    private DriverOutageExMapper DriverOutageExMapper;
+    private DriverOutageExMapper driverOutageExMapper;
+
+    @Autowired
+    private DriverOutageMapper driverOutageMapper;
 
     @Autowired
     @Qualifier("carApiTemplate")
@@ -45,23 +49,23 @@ public class DriverOutageServiceImpl implements DriverOutageService {
     @Override
 //    @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     public List<DriverOutage> queryForListObject(DriverOutage params) {
-        return DriverOutageExMapper.queryForListObject(params);
+        return driverOutageExMapper.queryForListObject(params);
     }
 
     @Override
     public int queryForInt(DriverOutage params) {
-        return DriverOutageExMapper.queryForInt(params);
+        return driverOutageExMapper.queryForInt(params);
     }
 
     @Override
     public DriverOutage queryForObject(DriverOutage params) {
-        return DriverOutageExMapper.queryForObject(params);
+        return driverOutageExMapper.queryForObject(params);
     }
 
     @Override
     public List<DriverOutage> queryForListObjectNoLimit(
             DriverOutage params) {
-        return DriverOutageExMapper.queryForListObjectNoLimit(params);
+        return driverOutageExMapper.queryForListObjectNoLimit(params);
     }
 
     @Override
@@ -179,17 +183,14 @@ public class DriverOutageServiceImpl implements DriverOutageService {
         Map<String, Object> result = new HashMap<String, Object>();
         // 调接口，保存
         Map<String, Object> paramMap = new HashMap<String, Object>();
-        try {
-            params.setOutageSource(2);//人工停运
-            params.setRemoveStatus(3);//待执行
-            params.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
-            params.setCreateName(WebSessionUtil.getCurrentLoginUser().getLoginName());
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            params.setOutStartDate(sdf.parse(params.getOutStartDateStr()));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
 
+        params.setOutageSource(2);//人工停运
+        params.setRemoveStatus(3);//待执行
+        params.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
+        params.setCreateName(WebSessionUtil.getCurrentLoginUser().getLoginName());
+
+        JSONObject json = JSONObject.fromObject(params);
+        paramMap.put("driverOutageInfo", json);
         String url = "/webservice/outage/saveDriverOutage";
         result = carApiTemplate.postForObject(url, JSONObject.class, paramMap);
 
@@ -207,8 +208,11 @@ public class DriverOutageServiceImpl implements DriverOutageService {
         paramMap.put("DriverOutageInfo", json);
         String url = "/webservice/outage/updateDriverOutage";
         result = carApiTemplate.postForObject(url, JSONObject.class, paramMap);
+
         return result;
     }
+
+
 
     @Override
     public Map<String,Object> updateDriverOutages(DriverOutage params){
@@ -234,7 +238,7 @@ public class DriverOutageServiceImpl implements DriverOutageService {
 
     @Override
     public DriverOutage queryDriverNameByPhone(DriverOutage params){
-        return DriverOutageExMapper.queryDriverNameByPhone(params);
+        return driverOutageExMapper.queryDriverNameByPhone(params);
     }
 
     public static String addDate(String day, int x) {
@@ -260,7 +264,7 @@ public class DriverOutageServiceImpl implements DriverOutageService {
      */
     @Override
     public List<DriverOutage> queryAllForListObject(DriverOutage params){
-        return DriverOutageExMapper.queryAllForListObject(params);
+        return driverOutageExMapper.queryAllForListObject(params);
     }
 
     /*
@@ -268,19 +272,19 @@ public class DriverOutageServiceImpl implements DriverOutageService {
      */
     @Override
     public int queryAllForInt(DriverOutage params){
-        return DriverOutageExMapper.queryAllForInt(params);
+        return driverOutageExMapper.queryAllForInt(params);
     }
 
     //根据司机id，查询司机临时停运，正在执行或者待执行的数据
     @Override
     public List<DriverOutage> queryDriverOutageByDriverId(DriverOutage params){
-        return DriverOutageExMapper.queryDriverOutageByDriverId(params);
+        return driverOutageExMapper.queryDriverOutageByDriverId(params);
     }
 
     //根据司机id，查询司机永久停运，启用的数据
     @Override
     public DriverOutage queryDriverOutageAllByDriverId(DriverOutage params){
-        return DriverOutageExMapper.queryDriverOutageAllByDriverId(params);
+        return driverOutageExMapper.queryDriverOutageAllByDriverId(params);
     }
 
     /*
@@ -322,26 +326,28 @@ public class DriverOutageServiceImpl implements DriverOutageService {
     }
 
     @Override
-    public Map<String,Object> importDriverOutageInfo(DriverOutageVo params, HttpServletRequest request){
+    public Map<String,Object> importDriverOutageInfo(String fileName, MultipartFile file, HttpServletRequest request){
         String resultError1 = "-1";// 模板错误
         String resultErrorMag1 = "导入模板格式错误!";
+
+
 
         Map<String, Object> result = new HashMap<String, Object>();
         List<CarImportExceptionEntity> listException = new ArrayList<CarImportExceptionEntity>();
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         List<DriverOutage> outList = new ArrayList<DriverOutage>();
-        String fileName = params.getFileName();
+//        String fileName = params.getFileName();
         String path  = Common.getPath(request);
-        String dirPath = path+params.getFileName();
-        File DRIVERINFO = new File(dirPath);
+//        String dirPath = path+params.getFileName();
+//        File DRIVERINFO = new File(dirPath);
         try {
-            InputStream is = new FileInputStream(DRIVERINFO);
+//            InputStream is = new FileInputStream(DRIVERINFO);
             Workbook workbook = null;
             String fileType = fileName.split("\\.")[1];
             if (fileType.equals("xls")) {
-                workbook = new HSSFWorkbook(is);
+                workbook = new HSSFWorkbook(file.getInputStream());
             } else if (fileType.equals("xlsx")) {
-                workbook = new XSSFWorkbook(is);
+                workbook = new XSSFWorkbook(file.getInputStream());
             }
             Sheet sheet = workbook.getSheetAt(0);
             FormulaEvaluator evaluator = workbook.getCreationHelper()

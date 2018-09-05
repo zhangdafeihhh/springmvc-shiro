@@ -92,8 +92,7 @@ public class UsernamePasswordRealm extends AuthorizingRealm {
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
 		SSOLoginUser loginUser = (SSOLoginUser) principals.getPrimaryPrincipal();
 		String account = loginUser.getLoginName(); //登录名
-    	//TODO  只读库
-    	//TODO  只读库
+		
 		List<String> perms_string = saasPermissionExMapper.queryPermissionCodesOfUser(  loginUser.getId() );
 		List<String> roles_string   = saasRoleExMapper.queryRoleCodesOfUser( loginUser.getId() );
     	

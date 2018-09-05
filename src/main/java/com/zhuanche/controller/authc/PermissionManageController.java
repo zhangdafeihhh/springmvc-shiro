@@ -2,6 +2,7 @@ package com.zhuanche.controller.authc;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,6 +16,7 @@ import com.zhuanche.serv.authc.PermissionManagementService;
 /**权限管理**/
 @RestController
 public class PermissionManageController {
+	@Autowired
 	private PermissionManagementService permissionManagementService;
 	
 	/**一、增加一个权限**/
@@ -28,9 +30,9 @@ public class PermissionManageController {
 			Byte menuOpenMode ) {
 		SaasPermission pemission =  new SaasPermission();
 		pemission.setParentPermissionId(parentPermissionId);
-		pemission.setPermissionCode(permissionCode);
+		pemission.setPermissionCode(permissionCode.trim());
 		pemission.setPermissionType(permissionType);
-		pemission.setMenuUrl(menuUrl);
+		pemission.setMenuUrl(menuUrl==null? "": menuUrl.trim());
 		pemission.setMenuOpenMode(menuOpenMode);
 		return permissionManagementService.addSaasPermission(pemission);
 	}
@@ -60,9 +62,9 @@ public class PermissionManageController {
 			Byte menuOpenMode ) {
 		SaasPermission pemissionForupdate = new SaasPermission();
 		pemissionForupdate.setPermissionId(permissionId);
-		pemissionForupdate.setPermissionCode(permissionCode);
+		pemissionForupdate.setPermissionCode(permissionCode.trim());
 		pemissionForupdate.setPermissionType(permissionType);
-		pemissionForupdate.setMenuUrl(menuUrl);
+		pemissionForupdate.setMenuUrl(menuUrl==null? "": menuUrl.trim());
 		pemissionForupdate.setMenuOpenMode(menuOpenMode);
 		return permissionManagementService.changeSaasPermission(pemissionForupdate);
 	}

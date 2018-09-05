@@ -10,8 +10,12 @@ import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.dto.driver.CarDriverDayDutyDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverDayDuty;
 import com.zhuanche.entity.mdbcarmanage.DriverDutyTimeInfo;
+import com.zhuanche.request.CommonRequest;
 import com.zhuanche.request.DutyParamRequest;
+import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.serv.common.DataPermissionHelper;
+import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.Check;
 import com.zhuanche.util.Common;
 import mapper.mdbcarmanage.ex.CarDriverDayDutyExMapper;
@@ -32,7 +36,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * @description: 车队设置
+ * @description: 查看排班
  *
  * <PRE>
  * <BR>	修改记录
@@ -63,6 +67,12 @@ public class CarDriverDutyService {
 	@Autowired
 	private DriverDutyTimeInfoExMapper driverDutyTimeInfoExMapper;
 
+	@Autowired
+	private CitySupplierTeamCommonService citySupplierTeamCommonService;
+
+	@Autowired
+	private AsyncDutyService asyncDutyService;
+
 	private static final ExecutorService es = Executors.newCachedThreadPool();
 
 	/** 
@@ -74,7 +84,7 @@ public class CarDriverDutyService {
 	*/ 
 	public PageDTO queryDriverDayDutyList(DutyParamRequest dutyParamRequest){
 
-		//TODO 数据权限
+
 		if(Check.NuNObj(dutyParamRequest)){
 			return null;
 		}
@@ -83,6 +93,17 @@ public class CarDriverDutyService {
 			dutyParamRequest.setStatus(1);
 		}
 		try{
+			/** 数据权限处理开始 */
+			CommonRequest commonRequest = new CommonRequest();
+			commonRequest.setCityId(String.valueOf(dutyParamRequest.getCityId()));
+			commonRequest.setSupplierId(String.valueOf(dutyParamRequest.getSupplierId()));
+			commonRequest.setTeamId(dutyParamRequest.getTeamId());
+			CommonRequest resultParmam = citySupplierTeamCommonService.paramDeal(commonRequest);
+			dutyParamRequest.setCityIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getCityIds()));
+			dutyParamRequest.setSupplierIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getSupplierIds()));
+			dutyParamRequest.setSupplierIds(resultParmam.getTeamIds());
+			/** 数据权限处理结束 */
+
 			DutyParamRequest request = new DutyParamRequest();
 			//手机号转换driverId进行查询
 			if(!Check.NuNStr(dutyParamRequest.getPhone())){
@@ -164,143 +185,10 @@ public class CarDriverDutyService {
 
 	}
 
-	//发布数据
-	@SuppressWarnings("unchecked")
-	public void affirmDriverDayDuty(DutyParamRequest dutyParamRequest) {
-		logger.info("开始执行排班入参:{}"+JSON.toJSONString(dutyParamRequest));
-		try{
-			List<CarDriverDayDutyDTO> list = carDriverDayDutyExMapper.selectForList(dutyParamRequest);
-			if(Check.NuNCollection(list)){
-				logger.info("没有发现需要发布的数据，入参:{}"+ JSON.toJSONString(dutyParamRequest));
-				return;
-			}
-			Map<String, Object> data = this.getAffirmDriverDayDutyData(list);
-			List<DriverDutyTimeInfo> insertList = (List<DriverDutyTimeInfo>) data.get("insertList");
-			List<DriverDutyTimeInfo> updateList = (List<DriverDutyTimeInfo>) data.get("updateList");
-			Map<String, Object> paramMap = new HashMap<String, Object>();
-			if (!CollectionUtils.isEmpty(insertList)) {
-				paramMap.put("list", insertList);
-				// 批量插入
-				Integer result = driverDutyTimeInfoExMapper.insertDriverDutyTimeInfoList(paramMap);
-				logger.info("批量插入排班：入参{}"+JSON.toJSONString(dutyParamRequest)+"结果:"+result);
-			}
-			if (!CollectionUtils.isEmpty(updateList)) {
-				paramMap.put("list", updateList);
-				// 批量修改
-				Integer result = driverDutyTimeInfoExMapper.updateDriverDutyTimeInfoList(paramMap);
-				logger.info("批量更新排班：入参{}"+JSON.toJSONString(dutyParamRequest)+"结果:"+result);
-			}
-			// 将排班数据设置为已发布
-			Map<String, Object> dayDutyParams = new HashMap<String, Object>();
-			dayDutyParams.put("list", list);
-			Integer result = carDriverDayDutyExMapper.updateDriverDayDutyList(dayDutyParams);
-			logger.info("更新排版数据状态：入参{}"+JSON.toJSONString(dutyParamRequest)+"结果:"+result);
-			return;
-		}catch (Exception e){
-			logger.error("排班异常:{}",e);
-			logger.error("排班异常入参:{}"+JSON.toJSONString(dutyParamRequest));
-		}
-	}
-
-	/**
-	 * 获取发布信息中 新增的数据，修改的数据，错误的数据
-	 * @param
-	 * @return
-	 */
-	private Map<String, Object> getAffirmDriverDayDutyData(List<CarDriverDayDutyDTO> list) {
-		Map<String, Object> data = new HashMap<String, Object>();
-		List<DriverDutyTimeInfo> insertList = new ArrayList<DriverDutyTimeInfo>();
-		List<DriverDutyTimeInfo> updateList = new ArrayList<DriverDutyTimeInfo>();
-		if (null != list) {
-			for(CarDriverDayDutyDTO driverDayDuty : list) {
-				DriverDutyTimeInfo newRecord = new DriverDutyTimeInfo();
-				newRecord.setDriverId(driverDayDuty.getDriverId());
-				newRecord.setTime(driverDayDuty.getTime());
-				String mustDutyTime = this.getMustBDutyTimeByForcedTimes(driverDayDuty.getForcedTimes());
-				String dutyTime = this.getDutyTimeByDutyTimes(driverDayDuty.getDutyTimes());;
-				newRecord.setMustDutyTime(mustDutyTime);
-				newRecord.setDutyTime(dutyTime);
-				DriverDutyTimeInfo params = new DriverDutyTimeInfo();
-				params.setDriverId(driverDayDuty.getDriverId());
-				params.setTime(driverDayDuty.getTime());
-				//是否存在排班记录
-				DriverDutyTimeInfo existsDutyTimeInfo = driverDutyTimeInfoExMapper.selectOne(params);
-				if (Check.NuNObj(existsDutyTimeInfo)) {
-					insertList.add(newRecord);
-				} else {
-					newRecord.setId(existsDutyTimeInfo.getId());
-					updateList.add(newRecord);
-				}
-				driverDayDuty.setStatus(2);
-			}
-		}
-		data.put("insertList", insertList);
-		data.put("updateList", updateList);
-		return data;
-	}
-
-	/**
-	 * 解析排班时长设置
-	 * @param dutyTimes
-	 * @return
-	 */
-	private String getDutyTimeByDutyTimes(String dutyTimes) {
-		String dutyTime = null;
-		if (!StringUtils.isEmpty(dutyTimes)) {
-			StringBuffer dutyTimeBuffer = new StringBuffer();
-			dutyTimes = dutyTimes.replace("—", "-");
-			String[] dutyTimeArray = dutyTimes.split(",");
-			int num = 0;
-			for (String dutyTimeStr : dutyTimeArray) {
-				if (!StringUtils.isEmpty(dutyTimeStr)) {
-					String value = null;
-					if (dutyTimeStr.length() > 18) {
-						value = dutyTimeStr.substring(dutyTimeStr.length() - 17);
-					} else {
-						value = dutyTimeStr;
-					}
-					if (0 != num++) {
-						dutyTimeBuffer.append(",");
-					}
-					dutyTimeBuffer.append(value);
-				}
-			}
-			dutyTime = dutyTimeBuffer.toString();
-		}
-		return dutyTime;
-	}
-
-	/**
-	 * 解析强制排班设置
-	 * @param forcedTimes
-	 * @return
-	 */
-	private String getMustBDutyTimeByForcedTimes(String forcedTimes) {
-		String mustBDutyTime = null;
-		if (!StringUtils.isEmpty(forcedTimes)) {
-			Map<String,String> map = new HashMap<String,String>();
-			forcedTimes = forcedTimes.replace("—", "-");
-			String[] forcedTimeArray = forcedTimes.split(",");
-			for (String forcedTime : forcedTimeArray) {
-				if (!StringUtils.isEmpty(forcedTime) && forcedTime.length() > 18) {
-					String key = forcedTime.substring(0, forcedTime.length() - 18);
-					String value = forcedTime.substring(forcedTime.length() - 17);
-					key = EnumDriverDutyTimeFlag.getKey(key);
-					map.put(key, value);
-				}
-			}
-			JSONObject newObj = JSONObject.fromObject(map);
-			mustBDutyTime = newObj.toString();
-		}
-		return mustBDutyTime;
-	}
-
 	class AffirmDriverDayDuty implements Runnable{
 
 		private DutyParamRequest dutyParamRequest;
 
-		@Autowired
-		private CarDriverDutyService carDriverDutyService;
 		public AffirmDriverDayDuty(DutyParamRequest dutyParamRequest){
 			this.dutyParamRequest = dutyParamRequest;
 		}
@@ -308,7 +196,7 @@ public class CarDriverDutyService {
 		public void run() {
 			try {
 				// 发布数据
-				carDriverDutyService.affirmDriverDayDuty(dutyParamRequest);
+				asyncDutyService.affirmDriverDayDuty(dutyParamRequest);
 			} catch (Exception e) {
 				logger.error("AffirmDriverDayDuty",e);
 			}

@@ -93,8 +93,8 @@
 	</update>
 	<select id="licensePlatesNotDriverIdList" resultType="com.zhuanche.dto.rentcar.CarBizCarInfoDTO" parameterType="java.util.Map" >
 		SELECT
-		car_id carId,
-		license_plates licensePlates
+			car_id carId,
+			license_plates licensePlates
 		FROM
 		car_biz_car_info
 		WHERE driver_id = '0' and status=1
@@ -111,5 +111,14 @@
 			or driver_id = #{driverId}
 		</if>
 	</select>
+	<!-- 根据车牌号查询 -->
+	<select id="validateCityAndSupplier" resultType="java.lang.Integer" >
+		SELECT count(*)
+		FROM
+			car_biz_car_info
+		WHERE license_plates = #{licensePlates}
+		and city_id = #{cityId}
+		and supplier_id = #{supplierId}
+    </select>
 </mapper>
 
