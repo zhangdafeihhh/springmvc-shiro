@@ -12,4 +12,7 @@ public interface CarBizSupplierExMapper{
 	List<CarBizSupplier> querySuppliers( @Param("cityId") Integer cityId, @Param("supplierIds") Set<Integer> supplierIds);
 
     CarBizSupplier queryForObject(CarBizSupplier carBizSupplier);
+
+	/** 根据供应商名称查询供应商id **/
+	Integer querySupplierBySupplierName( @Param("supplierName") String supplierName);
 }

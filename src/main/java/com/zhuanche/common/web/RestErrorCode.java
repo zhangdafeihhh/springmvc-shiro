@@ -29,6 +29,8 @@ public final class RestErrorCode{
 	public static final int HTTP_NOT_FOUND                   = 404;
 	@ResultMessage("系统内部发生错误")
 	public static final int HTTP_SYSTEM_ERROR              = 500;
+	@ResultMessage("服务错误：{0}")
+	public static final int CAR_API_ERROR           = 996;
 	@ResultMessage("会话已失效，请重新登录")
 	public static final int HTTP_INVALID_SESSION           = 997;
 	@ResultMessage("请求参数校验不通过")

@@ -1,6 +1,7 @@
 package com.zhuanche.serv.common;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -63,5 +64,31 @@ public class CitySupplierTeamService {
 			}
 			return carDriverTeamExMapper.queryDriverTeam(null, null, teamIds);
 		}
+	}
+
+	/** 查询供应商下可见的车队信息 **/
+	public List<CarDriverTeam> queryDriverTeamListForSupplier(Integer supplierId) {
+		if(supplierId==null || supplierId.intValue()<=0) {
+            return new ArrayList<CarDriverTeam>();
+        }
+        //供应商ID 进行校验数据权限
+        if(WebSessionUtil.isSupperAdmin()==false ) {
+            Set<Integer> supplierIds = WebSessionUtil.getCurrentLoginUser().getSupplierIds();
+            if( supplierIds.size()==0 || supplierIds.contains(supplierId)==false  ) {
+                return new ArrayList<CarDriverTeam>();
+            }
+        }
+        //进行查询 (区分 超级管理员 、普通管理员 )
+        Set<String> supplierIds = new HashSet<String>(1);
+        supplierIds.add(String.valueOf(supplierId));
+        if( WebSessionUtil.isSupperAdmin() ) {
+            return carDriverTeamExMapper.queryDriverTeam(null, supplierIds, null);
+        }else {
+            Set<Integer> teamIds = WebSessionUtil.getCurrentLoginUser().getTeamIds();
+            if(teamIds.size()==0 ) {
+                return new ArrayList<CarDriverTeam>();
+            }
+            return carDriverTeamExMapper.queryDriverTeam(null, supplierIds, teamIds);
+        }
 	}
 }
