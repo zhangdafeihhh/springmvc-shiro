@@ -239,11 +239,13 @@ public class DriverOutageController {
      */
     @RequestMapping(value="/updateDriverOutage")
     public AjaxResponse updateDriverOutage(@Verify(param = "outageId",rule = "required")Integer outageId,
-                                     @Verify(param = "removeReason",rule = "required")String removeReason){
+                                     @Verify(param = "removeReason",rule = "required")String removeReason,
+                                           @Verify(param = "removeStatus",rule = "required|min(1)|max(4)")Integer removeStatus){
         DriverOutage params = new DriverOutage();
         params.setOutageId(outageId);
-        params.setRemoveStatus(4);//解除状态 1：已执行 2：执行中 3：待执行 4：撤销(未执行解除)',
+        params.setRemoveStatus(removeStatus);//解除状态 1：已执行 2：执行中 3：待执行 4：撤销(未执行解除)',
         params.setRemoveReason(removeReason);
+
 
         logger.info("【司机停运】临时停运解除数据=="+params.toString());
         Map<String,Object> result = new HashMap<String,Object>();
