@@ -3,7 +3,6 @@ package com.zhuanche.controller.statisticalAnalysis;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,22 +21,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Lists;
-import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
-import com.zhuanche.dto.rentcar.CompleteOrderDTO;
-import com.zhuanche.dto.rentcar.CompleteOrderDetailDTO;
 import com.zhuanche.http.HttpClientUtil;
-import com.zhuanche.serv.statisticalAnalysis.CompleteOrderService;
+import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.BeanUtil;
 
 /**
  * 
@@ -51,11 +44,17 @@ import com.zhuanche.util.BeanUtil;
 public class CompleteOrderController{
 	 private static final Logger logger = LoggerFactory.getLogger(CompleteOrderController.class);
 	 
+	/* @Value("${statistics.completeorderdetail.queryList.url}")
+	 String  completeorderdetailQueryListApiUrl;
+	 
+	 @Value("${statistics.completeorderdetail.download.url}")
+	 String  completeorderdetailDownloadApiUrl;*/
+	 
 	 @Value("${saas.bigdata.api.url}")
 	 String  saasBigdataApiUrl;
 	 
 	 @Autowired
-	 private CompleteOrderService completeOrderService;
+	 private StatisticalAnalysisService statisticalAnalysisService;
 	 
 	 	/**
 	     * 查询完成订单列表
@@ -101,11 +100,11 @@ public class CompleteOrderController{
 		    Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
 		    Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
 		    // 供应商信息
-		    String[] visibleAllianceIds = setToArray(suppliers);
+		    String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
 			// 车队信息
-			String[] visibleMotocadeIds = setToArray(teamIds);
+			String[] visibleMotocadeIds = statisticalAnalysisService.setToArray(teamIds);
 			// 可见城市
-			String[] visibleCityIds = setToArray(cityIds);
+			String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
 			if(null == visibleAllianceIds || null == visibleMotocadeIds || visibleCityIds == null ){
 				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 			}
@@ -117,7 +116,7 @@ public class CompleteOrderController{
 	        if(null != pageSize && pageSize > 0)
 	        	params.put("pageSize", pageSize);//每页记录数
 		     //从大数据仓库获取统计数据
-		     AjaxResponse result = parseResult(saasBigdataApiUrl+"/cancelOrderDetail/queryList",paramMap);
+		     AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/completeOrderDetail/queryList",paramMap);
 		     return result;
 	  }
 	 
@@ -167,99 +166,30 @@ public class CompleteOrderController{
 	        Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
 	        Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
 	        // 供应商信息
-			String[] visibleAllianceIds = setToArray(suppliers);
+			String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
 			// 车队信息
-			String[] visibleMotocadeIds = setToArray(teamIds);
+			String[] visibleMotocadeIds = statisticalAnalysisService.setToArray(teamIds);
 			// 可见城市
-			String[] visibleCityIds = setToArray(cityIds);
+			String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
 			if(null == visibleAllianceIds || null == visibleMotocadeIds || visibleCityIds == null ){
 				//return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 			}
 	        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
 	        paramMap.put("visibleMotorcardIds", visibleMotocadeIds); // 可见车队ID
 	        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
- 	        
- 	       //调用接口
-	       // Map<String,Object>  pageMap = completeOrderService.queryForPageObject(paramMap);
-	      //  List<CompleteOrderDTO> rows = (List<CompleteOrderDTO>)pageMap.get("list");
 	        
-            @SuppressWarnings("deprecation")
-            Workbook wb =  null ; //completeOrderService.exportExcelCompleteOrder(rows,request.getRealPath("/")+File.separator+"template"+File.separator+"completeOrder_info.xlsx");
-            exportExcelFromTemplet(request, response, wb, new String("完成订单详情".getBytes("gb2312"), "iso8859-1"));
+	        statisticalAnalysisService.downloadCsvFromTemplet(paramMap,
+	        		saasBigdataApiUrl+"/completeOrderDetail/download" ,
+					request.getRealPath("/")+File.separator+"template"+File.separator+"completeorder_info.csv");
+			statisticalAnalysisService.exportCsvFromTemplet(response,
+					new String("完成订单详情".getBytes("gb2312"), "iso8859-1"),
+					request.getRealPath("/")+File.separator+"template"+File.separator+"completeorder_info.csv");
+       
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-	    
-    
-    public void exportExcelFromTemplet(HttpServletRequest request, HttpServletResponse response, Workbook wb, String fileName) throws IOException {
-        if(StringUtils.isEmpty(fileName)) {
-            fileName = "exportExcel";
-        }
-        response.setHeader("Content-Disposition","attachment;filename="+fileName+".xlsx");//指定下载的文件名
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        ServletOutputStream os =  response.getOutputStream();
-        wb.write(os);
-        os.close();
-    }
-	 
-	/** 将Set<Integer>集合转成String[] **/
-	private String[] setToArray(Set<Integer> set){
-		if(null == set || set.size() == 0){
-			return null;
-		}
-		Object[] array = set.toArray();
-		String[] stra = new String[array.length];
-		for (int i = 0; i < array.length; i++) {
-			stra[i] = array[i].toString();
-		}
-		return stra;
-	}   
-	
-	/** 调用大数据接口获取数据  **/
-	private static AjaxResponse parseResult(String url,Map<String, Object> paramMap) {
-		try {
-			String jsonString = JSON.toJSONString(paramMap);
-			String result = HttpClientUtil.buildPostRequest(url).setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
-			JSONObject job = JSON.parseObject(result);
-			if (job == null) {
-				logger.error("调用大数据" + url + "返回结果为null");
-				return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-			}
-			if (!job.getString("code").equals("0")) {
-				return AjaxResponse.fail(Integer.parseInt(job.getString("code")), job.getString("message"));
-			}
-			JSONObject jsonResult = JSON.parseObject(job.getString("result"));
-			//JSONArray resultArray = JSON.parseArray(jsonResult.getString("recordList"));
-			return AjaxResponse.success(jsonResult);
-		} catch (HttpException e) {
-			logger.error("调用大数据" + url + "异常", e);
-			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-		}
-	}
-	
-	/** 调用大数据接口获取数据  **/
-	private static String parseResultStr(String url, Map<String, Object> paramMap) {
-		try {
-			String jsonString = JSON.toJSONString(paramMap);
-			String result = HttpClientUtil.buildPostRequest(url).setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
-			JSONObject job = JSON.parseObject(result);
-			if (job == null) {
-				logger.error("调用大数据" + url + "返回结果为null");
-				return "";
-			}
-			if (!job.getString("code").equals("0")) {
-				logger.error("调用大数据" + url + "返回结果code:"+job.getString("code")+",message:"+job.getString("message"));
-				return  "-1";
-			}
-			JSONObject jsonResult = JSON.parseObject(job.getString("result"));
-			return jsonResult.getString("recordList");
-		} catch (HttpException e) {
-			logger.error("调用大数据" + url + "异常", e);
-			return null;
-		}
-	}
 	    
 }

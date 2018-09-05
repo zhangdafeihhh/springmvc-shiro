@@ -4,21 +4,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.http.HttpException;
-import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
-import com.zhuanche.http.HttpClientUtil;
+import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 
@@ -33,10 +30,19 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 @RequestMapping("/driverOperAnlay")
 public class DriverOperAnlayController{
 	private static final Logger logger = LoggerFactory.getLogger(DriverOperAnlayController.class);
+	/* //指标趋势
+	 @Value("${statistics.driveroperanlayTrend.trend.url}")
+	 String  driveroperanlayTrendApiUrl;
+	 
+	 //指标查询
+	 @Value("${statistics.driveroperanaly.query.url}")
+	 String  driveroperanalyQueryApiUrl;*/
 	 
 	 @Value("${saas.bigdata.api.url}")
 	 String  saasBigdataApiUrl;
 	 
+	 @Autowired
+	 private StatisticalAnalysisService statisticalAnalysisService;
 	 /**
 	    * 司机运营分析指标查询
 		* @param 	startDate	起始日期
@@ -59,13 +65,13 @@ public class DriverOperAnlayController{
 		  SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
 	      Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
 	      // 供应商信息
-		  String[] visibleAllianceIds = setToArray(suppliers);
+		  String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
 		  if(null == visibleAllianceIds){
 			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 		  }
 	      paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-	      AjaxResponse result = parseResult(saasBigdataApiUrl+"/driverEvaluateDetail/queryList",paramMap);
-	  	// 从大数据仓库获取统计数据
+	      // 从大数据仓库获取统计数据
+	      AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/driverOperAnaly/query",paramMap);
 	      return result;
 	  }
 	  
@@ -93,72 +99,13 @@ public class DriverOperAnlayController{
 			  SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
 		      Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
 		      // 供应商信息
-			  String[] visibleAllianceIds = setToArray(suppliers);
+			  String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
 			  if(null == visibleAllianceIds){
 				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 			  }
 		      paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
 		      // 从大数据仓库获取统计数据
-	          AjaxResponse result = parseResult(saasBigdataApiUrl+"/driverEvaluateDetail/queryList",paramMap);
+	          AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/driverOperAnlayTrend/trend",paramMap);
 	          return result;
     }
-	    
-	 
-	/** 将Set<Integer>集合转成String[] **/
-	private String[] setToArray(Set<Integer> set){
-		if(null == set || set.size() == 0){
-			return null;
-		}
-		Object[] array = set.toArray();
-		String[] stra = new String[array.length];
-		for (int i = 0; i < array.length; i++) {
-			stra[i] = array[i].toString();
-		}
-		return stra;
-	}   
-	
-	/** 调用大数据接口获取数据  **/
-	private static AjaxResponse parseResult(String url,Map<String, Object> paramMap) {
-		try {
-			String jsonString = JSON.toJSONString(paramMap);
-			String result = HttpClientUtil.buildPostRequest(url).setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
-			JSONObject job = JSON.parseObject(result);
-			if (job == null) {
-				logger.error("调用大数据" + url + "返回结果为null");
-				return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-			}
-			if (!job.getString("code").equals("0")) {
-				return AjaxResponse.fail(Integer.parseInt(job.getString("code")), job.getString("message"));
-			}
-			JSONObject jsonResult = JSON.parseObject(job.getString("result"));
-			//JSONArray resultArray = JSON.parseArray(jsonResult.getString("recordList"));
-			return AjaxResponse.success(jsonResult);
-		} catch (HttpException e) {
-			logger.error("调用大数据" + url + "异常", e);
-			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-		}
-	}
-	
-	/** 调用大数据接口获取数据  **/
-	private static String parseResultStr(String url, Map<String, Object> paramMap) {
-		try {
-			String jsonString = JSON.toJSONString(paramMap);
-			String result = HttpClientUtil.buildPostRequest(url).setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
-			JSONObject job = JSON.parseObject(result);
-			if (job == null) {
-				logger.error("调用大数据" + url + "返回结果为null");
-				return "";
-			}
-			if (!job.getString("code").equals("0")) {
-				logger.error("调用大数据" + url + "返回结果code:"+job.getString("code")+",message:"+job.getString("message"));
-				return  "-1";
-			}
-			JSONObject jsonResult = JSON.parseObject(job.getString("result"));
-			return jsonResult.getString("recordList");
-		} catch (HttpException e) {
-			logger.error("调用大数据" + url + "异常", e);
-			return null;
-		}
-	}
-
 }
