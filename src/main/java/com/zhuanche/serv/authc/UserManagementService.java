@@ -270,6 +270,7 @@ public class UserManagementService{
 		CarAdmUser userForupdate = new CarAdmUser();
 		userForupdate.setUserId(userId);
 		userForupdate.setPassword(  PasswordUtil.md5(SaasConst.INITIAL_PASSWORD, rawuser.getAccount()) );
+		carAdmUserMapper.updateByPrimaryKeySelective(userForupdate);
 		redisSessionDAO.clearRelativeSession(null, null , userId );//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
