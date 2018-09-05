@@ -7,8 +7,10 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.CarDriverInfoDTO;
+import com.zhuanche.dto.driver.CarDriverDayDutyDTO;
 import com.zhuanche.dto.driverDuty.CarDriverDurationDTO;
 import com.zhuanche.dto.driverDuty.CarDriverMustDutyDTO;
+import com.zhuanche.dto.driverDuty.DutyExcelDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverMustDuty;
 import com.zhuanche.entity.mdbcarmanage.CarDutyDuration;
 import com.zhuanche.request.DutyParamRequest;
@@ -17,8 +19,12 @@ import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.serv.driverScheduling.*;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.Check;
+import com.zhuanche.util.dateUtil.DateUtil;
+import com.zhuanche.util.excel.ExportExcelUtil;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +32,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @description: 司机排班
@@ -71,24 +77,65 @@ public class DriverSchController {
     /**
      * 设置文件下载 response格式
      */
-    private HttpServletResponse setResponse(HttpServletResponse response, String filename) throws IOException {
+    private HttpServletResponse setResponse(HttpServletResponse response, String fileName) throws IOException {
         response.setContentType("application/octet-stream;charset=ISO8859-1");
-        response.setHeader("Content-Disposition", "attachment;filename=" + new String(filename.getBytes("GB2312"), "ISO8859-1") + ".xls");
+        response.setHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes("GB2312"), "ISO8859-1") + ".xls");
         response.addHeader("Pargam", "no-cache");
         response.addHeader("Cache-Control", "no-cache");
         return response;
     }
 
+    /** 
+    * @Desc: 导出排班信息 
+    * @param:
+    * @return:  
+    * @Author: lunan
+    * @Date: 2018/9/5 
+    */ 
     @RequestMapping("exportDutyToExcel")
     @ResponseBody
-    public AjaxResponse exportDutyToExcel(HttpServletResponse response, HttpServletRequest request){
-
+    public AjaxResponse exportDutyToExcel(HttpServletResponse response, HttpServletRequest request,DutyParamRequest param){
+        String[] title = {"司机姓名","手机号","城市","供应商","车队",
+                "排班日期","强制上班时间","排班时长","状态"};
         try{
+            if(Check.NuNObj(param)){
+                param = new DutyParamRequest();
+            }
+            //设置导出单文件阈值 3000
+            param.setPageSize(3000);
+            PageDTO pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
+            Integer total = pageDTO.getTotal();
+            List<CarDriverDayDutyDTO> result = pageDTO.getResult();
+            List<DutyExcelDTO> firstList = BeanUtil.copyList(result, DutyExcelDTO.class);
+            if(Check.NuNCollection(result)){
+                return AjaxResponse.success(result);
+            }
+            String fileName = DateUtil.dateFormat(new Date(),DateUtil.intTimestampPattern);
+            HttpServletResponse reponseOut = this.setResponse(response, fileName);
+            // 声明一个工作薄
+            ExportExcelUtil excelUtil = new ExportExcelUtil();
+            HSSFWorkbook workbook = new HSSFWorkbook();
+            workbook = excelUtil.exportExcelSheet(workbook, "排班信息"+param.getPageNo(), title, firstList);
+            for(int pageNumber = 2; ((pageNumber-1)*param.getPageSize()) < total; pageNumber++){
+                param.setPageNo(pageNumber);
+                PageDTO page = carDriverDutyService.queryDriverDayDutyList(param);
+                List<CarDriverDayDutyDTO> sourceList = page.getResult();
+                List<DutyExcelDTO> targetList = BeanUtil.copyList(sourceList, DutyExcelDTO.class);
+                if(!Check.NuNCollection(targetList)){
+                    workbook = excelUtil.exportExcelSheet(workbook, "排班信息" + pageNumber, title, targetList);
+                }
+            }
+            ServletOutputStream out = reponseOut.getOutputStream();
+            workbook.write(out);
+            out.flush();
+            if(total <= 3000){
+                return AjaxResponse.success(result);
+            }
 
         }catch (Exception e){
-
+            logger.error("导出排班信息 异常:{}",e);
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
-
         return AjaxResponse.success(null);
     }
 

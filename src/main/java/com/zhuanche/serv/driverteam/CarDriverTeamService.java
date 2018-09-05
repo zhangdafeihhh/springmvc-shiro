@@ -100,6 +100,17 @@ public class CarDriverTeamService{
 
 	@Autowired
 	private AsyncDutyService asyncDutyService;
+	
+	/** 
+	* @Desc: 更新车队班制排班信息 
+	* @param:
+	* @return:  
+	* @Author: lunan
+	* @Date: 2018/9/5 
+	*/ 
+	public int updateTeamDuty(CarDriverTeam record){
+		return carDriverTeamExMapper.updateTeamDuty(record);
+	}
 
 	/**
 	* @Desc: 添加司机到车队/小组
