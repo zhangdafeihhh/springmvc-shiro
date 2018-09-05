@@ -46,12 +46,12 @@ public class PlatFormShiroHttpServletResponse extends ShiroHttpServletResponse {
             path = path.substring(0, pound);
         }
         StringBuilder sb = new StringBuilder(path);
-        if (sb.length() > 0) { // session id param can't be first.
-            sb.append("?");
-            sb.append(DEFAULT_SESSION_ID_PARAMETER_NAME);
-            sb.append("=");
-            sb.append(sessionId);
-        }
+//        if (sb.length() > 0) { // session id param can't be first.
+//            sb.append("?");
+//            sb.append(DEFAULT_SESSION_ID_PARAMETER_NAME);
+//            sb.append("=");
+//            sb.append(sessionId);
+//        }
         sb.append(anchor);
         sb.append(query);
         return (sb.toString());

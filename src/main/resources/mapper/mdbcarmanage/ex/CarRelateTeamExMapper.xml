@@ -16,13 +16,35 @@
     where relation_id = #{relationId,jdbcType=INTEGER}
   </select>
 
-  <select id="selectOneTeam" resultMap="BaseResultMap" parameterType="com.zhuanche.entity.mdbcarmanage.CarRelateTeam" >
+  <select id="selectOneTeam" resultType="com.zhuanche.entity.mdbcarmanage.CarRelateTeam" parameterType="com.zhuanche.entity.mdbcarmanage.CarRelateTeam" >
     select
-    <include refid="Base_Column_List" />
-    from car_relate_team
-    where team_id = #{teamId,jdbcType=INTEGER}
-    AND driver_id = #{driverId,jdbcType=INTEGER}
+    rt.relation_id AS relationId,
+    t.team_name teamName,
+    rt.driver_id driverId,
+    rt.team_id teamId
+    from car_relate_team rt
+    LEFT JOIN car_driver_team t ON rt.team_id = t.id
+    where
+    rt.driver_id = #{driverId,jdbcType=INTEGER}
+    <if test="teamId!=null">
+      AND rt.team_id = #{teamId}
+    </if>
     limit 1
+  </select>
+
+  <select id="queryDriverIdsByTeamIds"  resultType="java.util.HashMap">
+    SELECT
+    r.driver_id driverId, t.team_name teamName
+    FROM
+    car_relate_team r
+    left join car_driver_team t on r.team_id = t.id
+    WHERE 1=1
+    <if test="teamIds!=null and teamIds.size()>0">
+      and r.team_id IN
+      <foreach collection="teamIds" open="(" close=")" separator="," item="tid" >
+        #{tid}
+      </foreach>
+    </if>
   </select>
 
   <select id="queryDriverTeamRelationList" parameterType="com.zhuanche.request.TeamGroupRequest" resultMap="BaseResultMap">

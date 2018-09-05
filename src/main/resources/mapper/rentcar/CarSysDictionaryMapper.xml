@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.CarSysDictionaryMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarSysDictionary" >
+    <id column="data_id" property="dataId" jdbcType="INTEGER" />
+    <result column="dic_type" property="dicType" jdbcType="INTEGER" />
+    <result column="dic_name" property="dicName" jdbcType="VARCHAR" />
+    <result column="dic_value" property="dicValue" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarSysDictionary" extends="BaseResultMap" >
+    <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    data_id, dic_type, dic_name, dic_value, status
+  </sql>
+  <sql id="Blob_Column_List" >
+    memo
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from car_sys_dictionary
+    where data_id = #{dataId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from car_sys_dictionary
+    where data_id = #{dataId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.rentcar.CarSysDictionary" >
+    <selectKey resultType="java.lang.Integer" keyProperty="dataId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_sys_dictionary (dic_type, dic_name, dic_value, 
+      status, memo)
+    values (#{dicType,jdbcType=INTEGER}, #{dicName,jdbcType=VARCHAR}, #{dicValue,jdbcType=VARCHAR}, 
+      #{status,jdbcType=INTEGER}, #{memo,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.rentcar.CarSysDictionary" >
+    <selectKey resultType="java.lang.Integer" keyProperty="dataId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_sys_dictionary
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="dicType != null" >
+        dic_type,
+      </if>
+      <if test="dicName != null" >
+        dic_name,
+      </if>
+      <if test="dicValue != null" >
+        dic_value,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="memo != null" >
+        memo,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="dicType != null" >
+        #{dicType,jdbcType=INTEGER},
+      </if>
+      <if test="dicName != null" >
+        #{dicName,jdbcType=VARCHAR},
+      </if>
+      <if test="dicValue != null" >
+        #{dicValue,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="memo != null" >
+        #{memo,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.rentcar.CarSysDictionary" >
+    update car_sys_dictionary
+    <set >
+      <if test="dicType != null" >
+        dic_type = #{dicType,jdbcType=INTEGER},
+      </if>
+      <if test="dicName != null" >
+        dic_name = #{dicName,jdbcType=VARCHAR},
+      </if>
+      <if test="dicValue != null" >
+        dic_value = #{dicValue,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="memo != null" >
+        memo = #{memo,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where data_id = #{dataId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zhuanche.entity.rentcar.CarSysDictionary" >
+    update car_sys_dictionary
+    set dic_type = #{dicType,jdbcType=INTEGER},
+      dic_name = #{dicName,jdbcType=VARCHAR},
+      dic_value = #{dicValue,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      memo = #{memo,jdbcType=LONGVARCHAR}
+    where data_id = #{dataId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.rentcar.CarSysDictionary" >
+    update car_sys_dictionary
+    set dic_type = #{dicType,jdbcType=INTEGER},
+      dic_name = #{dicName,jdbcType=VARCHAR},
+      dic_value = #{dicValue,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER}
+    where data_id = #{dataId,jdbcType=INTEGER}
+  </update>
+</mapper>

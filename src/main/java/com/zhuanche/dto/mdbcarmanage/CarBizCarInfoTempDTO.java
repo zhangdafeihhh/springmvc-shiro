@@ -1,4 +1,4 @@
-package com.zhuanche.dto.driver;
+package com.zhuanche.dto.mdbcarmanage;
 
 import java.util.Date;
 
@@ -242,8 +242,6 @@ public class CarBizCarInfoTempDTO {
     private String carPhotograph;
 
     private String clicenseplatescolor;
-
-    private String fueltype;
 
     private String carrypassengers;
 
@@ -1077,14 +1075,6 @@ public class CarBizCarInfoTempDTO {
 
     public void setClicenseplatescolor(String clicenseplatescolor) {
         this.clicenseplatescolor = clicenseplatescolor;
-    }
-
-    public String getFueltype() {
-        return fueltype;
-    }
-
-    public void setFueltype(String fueltype) {
-        this.fueltype = fueltype;
     }
 
     public String getCarrypassengers() {

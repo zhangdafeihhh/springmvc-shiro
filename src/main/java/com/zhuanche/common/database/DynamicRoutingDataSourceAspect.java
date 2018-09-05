@@ -1,7 +1,5 @@
 package com.zhuanche.common.database;
 
-import java.util.Arrays;
-
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
@@ -28,23 +26,8 @@ public class DynamicRoutingDataSourceAspect {
 			}
 			DynamicRoutingDataSource.setMasterSlave(databaseTag, master_slave );
 			
-			//--------------------------------------数据库标识：driver
-//			if("driver".equalsIgnoreCase(databaseTag) && "master".equalsIgnoreCase(master_slave)) {
-//				DynamicRoutingDataSource.setDriver2Master();
-//			}
-//			if("driver".equalsIgnoreCase(databaseTag) && "slave".equalsIgnoreCase(master_slave)) {
-//				DynamicRoutingDataSource.setDriver2Slave();
-//			}
-//			//--------------------------------------数据库标识：rentcar
-//			if("rentcar".equalsIgnoreCase(databaseTag) && "master".equalsIgnoreCase(master_slave)) {
-//				DynamicRoutingDataSource.setRentcar2Master();
-//			}
-//			if("rentcar".equalsIgnoreCase(databaseTag) && "slave".equalsIgnoreCase(master_slave)) {
-//				DynamicRoutingDataSource.setRentcar2Slave();
-//			}
-			//TODO 在此处未来增加新的数据库切换
 		}
-        System.out.println("【AOP数据源主从切换BEGIN】before method 【" +jp.getSignature().toString()+ "】：" + Arrays.asList(msc.configs()) );
+        //System.out.println("【AOP数据源主从切换BEGIN】before method 【" +jp.getSignature().toString()+ "】：" + Arrays.asList(msc.configs()) );
     }
 	@After("@annotation(msc)")
     public void afterMethod(JoinPoint jp , MasterSlaveConfigs msc){
@@ -58,6 +41,6 @@ public class DynamicRoutingDataSourceAspect {
 			}
 			DynamicRoutingDataSource.setDefault(databaseTag);
 		}
-        System.out.println("【AOP数据源主从切换END】after method 【" +jp.getSignature().toString()+ "】：" + Arrays.asList(msc.configs()) );
+        //System.out.println("【AOP数据源主从切换END】after method 【" +jp.getSignature().toString()+ "】：" + Arrays.asList(msc.configs()) );
     }
 }

@@ -54,5 +54,17 @@
     </if>
     order by city_id
   </select>
-  
+
+  <select id="queryCityByCityName" resultType="int">
+    select
+    city_id
+    from
+    car_biz_city
+    where
+    status = 1
+    <if test="cityName != null and cityName != ''">
+      and city_name = #{cityName}
+    </if>
+  </select>
+
   </mapper>

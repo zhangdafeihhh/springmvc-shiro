@@ -17,6 +17,8 @@ public interface CarDriverTeamExMapper{
 
 	List<CarDriverTeam> queryForListByPid(DriverTeamRequest driverTeamRequest);
 
+	public Map<String, Object> queryTeamIdByDriverId(Integer params);
+
 	/**
 	 * 根据司机ID查询司机的车队小组信息
 	 * @param driverId

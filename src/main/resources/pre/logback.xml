@@ -32,4 +32,25 @@
     <root level="INFO">
         <appender-ref ref="FILE"/>
     </root>
+    
+    <!-- Rest接口性能监测BEGIN -->
+    <appender name="Perf4JStatisticsFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/u01/tomcat_docker_8080/logs/mp-manage-perf.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/u01/tomcat_docker_8080/logs/mp-manage-perf.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="coalescingStatisticsAppender" class="org.perf4j.logback.AsyncCoalescingStatisticsAppender">
+        <timeSlice>3600000</timeSlice><!-- 每小时汇总一次 -->
+        <appender-ref ref="Perf4JStatisticsFile"/>
+    </appender>
+	<logger name="org.perf4j.TimingLogger" level="info" additivity="false">
+        <appender-ref ref="coalescingStatisticsAppender" />
+    </logger>
+    <!-- Rest接口性能监测END -->
+    
 </configuration>
