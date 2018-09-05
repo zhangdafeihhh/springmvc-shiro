@@ -3,6 +3,7 @@ package com.zhuanche.controller.authc;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,6 +18,7 @@ import com.zhuanche.serv.authc.RoleManagementService;
 /**角色管理**/
 @RestController
 public class RolemanagementController{
+	@Autowired
 	private RoleManagementService roleManagementService;
 	
 	/**一、增加一个角色**/

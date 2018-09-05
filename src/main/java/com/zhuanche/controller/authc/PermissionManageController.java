@@ -2,6 +2,7 @@ package com.zhuanche.controller.authc;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,6 +16,7 @@ import com.zhuanche.serv.authc.PermissionManagementService;
 /**权限管理**/
 @RestController
 public class PermissionManageController {
+	@Autowired
 	private PermissionManagementService permissionManagementService;
 	
 	/**一、增加一个权限**/

@@ -1,8 +1,11 @@
 package com.zhuanche.serv.authc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,7 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constants.SaasConst;
 import com.zhuanche.dto.CarAdmUserDTO;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
+import com.zhuanche.entity.mdbcarmanage.SaasRole;
 import com.zhuanche.entity.mdbcarmanage.SaasUserRoleRalation;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.RedisSessionDAO;
@@ -25,6 +29,7 @@ import com.zhuanche.util.PasswordUtil;
 
 import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
+import mapper.mdbcarmanage.ex.SaasRoleExMapper;
 import mapper.mdbcarmanage.ex.SaasUserRoleRalationExMapper;
 
 /**用户管理功能**/
@@ -32,8 +37,8 @@ import mapper.mdbcarmanage.ex.SaasUserRoleRalationExMapper;
 public class UserManagementService{
 //	@Autowired
 //	private SaasRoleMapper     saasRoleMapper;
-//	@Autowired
-//	private SaasRoleExMapper saasRoleExMapper;
+	@Autowired
+	private SaasRoleExMapper saasRoleExMapper;
 	@Autowired
 	private SaasUserRoleRalationExMapper saasUserRoleRalationExMapper;
 	@Autowired
@@ -160,7 +165,7 @@ public class UserManagementService{
 	
 	/**八、查询用户列表**/
 	@SuppressWarnings("rawtypes")
-	public PageDTO queryUserList( Integer page, Integer pageSize,  String account , String userName, String phone , Integer status ) {
+	public PageDTO queryUserList( Integer page, Integer pageSize,  Integer roleId , String account , String userName, String phone , Integer status ) {
     	//一、参数修正
 		if(page==null || page.intValue()<=0) {
 			page = new Integer(1);
@@ -185,24 +190,62 @@ public class UserManagementService{
 			status = null;
 		}
     	//二、开始查询DB
+		//2.1 查询出角色相关联的用户ID
+		List<Integer> userIds = new ArrayList<Integer>();
+		if(roleId!=null && roleId.intValue()>0) {
+			userIds = saasUserRoleRalationExMapper.queryUserIdsOfRole(  Arrays.asList(new Integer[] { roleId})   );
+			if( userIds!=null && userIds.size()==0 ) {
+				return new PageDTO( page, pageSize, 0 , new ArrayList()  );//肯定查询不到，直接返回
+			}
+		}
+		//2.2 执行SQL 查询
     	int total = 0;
     	List<CarAdmUser> users = null;
     	Page p = PageHelper.startPage( page, pageSize, true );
     	try{
-    		users = carAdmUserExMapper.queryUsers(account, userName, phone, status);
+    		users = carAdmUserExMapper.queryUsers( userIds ,  account, userName, phone, status );
         	total    = (int)p.getTotal();
     	}finally {
         	PageHelper.clearPage();
     	}
+    	
     	//三、判断返回结果
     	if(users==null|| users.size()==0) {
-        	PageDTO pageDto = new PageDTO( page, pageSize, total , new ArrayList()  );
-        	return pageDto;
+    		return new PageDTO( page, pageSize, total , new ArrayList()  );
     	}
     	List<CarAdmUserDTO> roledtos = BeanUtil.copyList(users, CarAdmUserDTO.class);
-    	PageDTO pageDto = new PageDTO( page, pageSize, total , roledtos);
-    	return pageDto;
+    	//3.1补充上角色名称
+    	Map<Integer,String> roleIdNameMappings = this.searchRoleIdNameMappings();
+    	for( CarAdmUserDTO admUserDto : roledtos ) {
+    		List<Integer> roleIdsOfthisUser = saasRoleExMapper.queryRoleIdsOfUser(admUserDto.getUserId());//根据用户ID，查询其拥有的所有有效的角色ID
+    		//拼接角色名称
+    		StringBuffer sbRoleNames =  new StringBuffer("");
+			for( Integer rid : roleIdsOfthisUser) {
+				String rname = roleIdNameMappings.get(rid);
+				if( StringUtils.isNotEmpty(rname) ) {
+					sbRoleNames.append(rname).append(",");
+				}
+			}
+			String roleNames = sbRoleNames.toString();
+			if(roleNames.endsWith(",")) {
+				roleNames = roleNames.substring(0, roleNames.length()-1);
+			}
+			if(StringUtils.isNotEmpty(roleNames)) {
+				admUserDto.setRoleNames(roleNames);//设置角色名称
+			}
+    	}
+    	//返回
+    	return new PageDTO( page, pageSize, total , roledtos);
 	}
+	private Map<Integer,String> searchRoleIdNameMappings(){//获得角色ID与角色名称的映射MAP
+		List<SaasRole> allRoles =   saasRoleExMapper.queryRoles(null, null, null, null);
+		Map<Integer,String> result = new HashMap<Integer,String>( allRoles.size() * 2 );
+		for( SaasRole role : allRoles ) {
+			result.put(role.getRoleId(), role.getRoleName());
+		}
+		return result;
+	}
+	
 
 	/**九、重置密码**/
 	public AjaxResponse resetPassword( Integer userId ) {
