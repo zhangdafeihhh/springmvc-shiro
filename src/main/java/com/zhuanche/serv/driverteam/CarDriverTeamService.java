@@ -431,7 +431,7 @@ public class CarDriverTeamService{
 	} )
 	public PageDTO queryDriverTeamPage(DriverTeamRequest driverTeamRequest) {
 		if(Check.NuNObj(driverTeamRequest)){
-			return null;
+			return new PageDTO();
 		}
 		logger.info("查询车队入参:{}"+ JSON.toJSONString(driverTeamRequest));
 
@@ -439,6 +439,9 @@ public class CarDriverTeamService{
 		BeanUtils.copyProperties(driverTeamRequest,paramRequest);
 
 		final CommonRequest commonRequest = citySupplierTeamCommonService.paramDeal(paramRequest);
+		if(Check.NuNObj(commonRequest)){
+			return new PageDTO();
+		}
 		//B----------------------------------------------------------------------------------进行分页查询
 		PageDTO pageDTO = new PageDTO();
 		int total = 0;

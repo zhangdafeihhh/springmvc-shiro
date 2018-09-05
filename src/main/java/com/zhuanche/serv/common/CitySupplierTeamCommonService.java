@@ -186,6 +186,9 @@ public class CitySupplierTeamCommonService {
         Set<Integer> permOfCity        = new HashSet<Integer>();//普通管理员可以管理的所有城市ID
         Set<Integer> permOfSupplier = new HashSet<Integer>();//普通管理员可以管理的所有供应商ID
         Set<Integer> permOfTeam     = new HashSet<Integer>();//普通管理员可以管理的所有车队ID
+        if(Check.NuNObj(WebSessionUtil.getCurrentLoginUser())){
+            return null;
+        }
         if(WebSessionUtil.isSupperAdmin() == false) {//如果是普通管理员
             permOfCity        = WebSessionUtil.getCurrentLoginUser().getCityIds();
             permOfSupplier = WebSessionUtil.getCurrentLoginUser().getSupplierIds();
@@ -263,7 +266,7 @@ public class CitySupplierTeamCommonService {
 //            Set<Integer> permOfcityids = dataPermissionHelper.havePermOfCityIds("");
             Set<Integer> cityIds = WebSessionUtil.getCurrentLoginUser().getCityIds();
             if(cityIds.size()==0) {
-                return new ArrayList<CarBizCity>();
+                carBizCityExMapper.queryByIds(null);
             }
             return carBizCityExMapper.queryByIds(cityIds);
         }
@@ -295,7 +298,7 @@ public class CitySupplierTeamCommonService {
 //            Set<Integer> permOfsupplierIds = dataPermissionHelper.havePermOfSupplierIds("");
             Set<Integer> supplierIds = WebSessionUtil.getCurrentLoginUser().getSupplierIds();
             if(supplierIds.size()==0 ) {
-                return new ArrayList<CarBizSupplier>();
+                carBizSupplierExMapper.querySuppliers(cityId, null);
             }
             return carBizSupplierExMapper.querySuppliers(cityId, supplierIds);
         }
@@ -335,7 +338,7 @@ public class CitySupplierTeamCommonService {
 //            Set<Integer> permOfteamIds = dataPermissionHelper.havePermOfDriverTeamIds("");
             Set<Integer> teamIds = WebSessionUtil.getCurrentLoginUser().getTeamIds();
             if(teamIds.size()==0 ) {
-                return new ArrayList<CarDriverTeam>();
+                return carDriverTeamExMapper.queryDriverTeam(cityIds, supplierIds, null);
             }
             return carDriverTeamExMapper.queryDriverTeam(cityIds, supplierIds, teamIds);
         }
