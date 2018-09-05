@@ -9,17 +9,17 @@ public class CarAdmUserDTO{
 
     private String userName;
 
-    private String password;
+    //private String password;
 
-    private Integer roleId;
+    //private Integer roleId;
 
     private Integer accountType;
 
     private Integer status;
 
-    private String remark;
+    //private String remark;
 
-    private String createUser;
+   // private String createUser;
 
     private Date createDate;
 
@@ -30,8 +30,19 @@ public class CarAdmUserDTO{
     private String teamId;
 
     private String phone;
+    
+    //-----扩展: 角色名称（多个以逗号分隔）
+    private String roleNames = "";
 
-    public Integer getUserId() {
+    public String getRoleNames() {
+		return roleNames;
+	}
+
+	public void setRoleNames(String roleNames) {
+		this.roleNames = roleNames;
+	}
+
+	public Integer getUserId() {
         return userId;
     }
 
@@ -55,22 +66,6 @@ public class CarAdmUserDTO{
         this.userName = userName == null ? null : userName.trim();
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password == null ? null : password.trim();
-    }
-
-    public Integer getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(Integer roleId) {
-        this.roleId = roleId;
-    }
-
     public Integer getAccountType() {
         return accountType;
     }
@@ -85,22 +80,6 @@ public class CarAdmUserDTO{
 
     public void setStatus(Integer status) {
         this.status = status;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark == null ? null : remark.trim();
-    }
-
-    public String getCreateUser() {
-        return createUser;
-    }
-
-    public void setCreateUser(String createUser) {
-        this.createUser = createUser == null ? null : createUser.trim();
     }
 
     public Date getCreateDate() {
