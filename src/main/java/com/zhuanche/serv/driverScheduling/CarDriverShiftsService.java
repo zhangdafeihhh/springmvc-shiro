@@ -140,7 +140,7 @@ public class CarDriverShiftsService {
 			if(Check.NuNCollection(carRelateTeams)){
 				return null;
 			}
-			Set<String> driverids = citySupplierTeamCommonService.dealDriverids(carRelateTeams, CarRelateTeam.class);
+			Set<String> driverids = citySupplierTeamCommonService.dealDriverids(carRelateTeams, CarRelateTeam.class,"driverId");
 			DriverTeamRequest driverTeamRequest = new DriverTeamRequest();
 			driverTeamRequest.setDriverIds(driverids);
 			driverTeamRequest.setStatus(1);

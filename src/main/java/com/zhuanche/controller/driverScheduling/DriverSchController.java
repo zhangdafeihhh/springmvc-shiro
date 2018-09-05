@@ -25,6 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -63,6 +67,30 @@ public class DriverSchController {
 
     @Autowired
     private CarDriverShiftsService carDriverShiftsService;
+
+    /**
+     * 设置文件下载 response格式
+     */
+    private HttpServletResponse setResponse(HttpServletResponse response, String filename) throws IOException {
+        response.setContentType("application/octet-stream;charset=ISO8859-1");
+        response.setHeader("Content-Disposition", "attachment;filename=" + new String(filename.getBytes("GB2312"), "ISO8859-1") + ".xls");
+        response.addHeader("Pargam", "no-cache");
+        response.addHeader("Cache-Control", "no-cache");
+        return response;
+    }
+
+    @RequestMapping("exportDutyToExcel")
+    @ResponseBody
+    public AjaxResponse exportDutyToExcel(HttpServletResponse response, HttpServletRequest request){
+
+        try{
+
+        }catch (Exception e){
+
+        }
+
+        return AjaxResponse.success(null);
+    }
 
     /**
      * @Desc: 保存司机日排班信息

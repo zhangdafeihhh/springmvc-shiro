@@ -1,6 +1,7 @@
 package com.zhuanche.serv.common;
 
 import com.zhuanche.dto.CarDriverInfoDTO;
+import com.zhuanche.dto.mdbcarmanage.ShiftParamDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
 import com.zhuanche.entity.mdbcarmanage.CarRelateGroup;
 import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -99,48 +101,29 @@ public class CitySupplierTeamCommonService {
      * @Author: lunan
      * @Date: 2018/8/31
      */
-    public  <T> Set<String> dealDriverids(List srcList, Class<T> destClass){
+    public  <T> Set<String> dealDriverids(List srcList, Class<T> destClass,String field){
         if(srcList==null){
             return null;
         }
         try{
-            Set<String> driverIds = new HashSet<>();
-            T param = destClass.newInstance();
-            if(param instanceof CarRelateGroup){
-                for(int i=0;i<srcList.size();i++ ){
-                    Object srcObj = srcList.get(i);
-                    CarRelateGroup data = new CarRelateGroup();
-                    BeanUtils.copyProperties(srcObj,data);
-                    driverIds.add(String.valueOf(data.getDriverId()));
-                }
-                return driverIds;
-            }else if(param instanceof CarRelateTeam){
-                for(int i=0;i<srcList.size();i++ ){
-                    Object srcObj = srcList.get(i);
-                    CarRelateTeam data = new CarRelateTeam();
-                    BeanUtils.copyProperties(srcObj,data);
-                    driverIds.add(String.valueOf(data.getDriverId()));
-                }
-                return driverIds;
-            }else if(param instanceof CarDriverTeam){
-                for(int i=0;i<srcList.size();i++ ){
-                    Object srcObj = srcList.get(i);
-                    CarDriverTeam data = new CarDriverTeam();
-                    BeanUtils.copyProperties(srcObj,data);
-                    driverIds.add(String.valueOf(data.getId()));
-                }
-                return driverIds;
-            }else if(param instanceof CarDriverInfoDTO){
-                for(int i=0;i<srcList.size();i++ ){
-                    Object srcObj = srcList.get(i);
-                    CarDriverInfoDTO data = new CarDriverInfoDTO();
-                    BeanUtils.copyProperties(srcObj,data);
-                    driverIds.add(String.valueOf(data.getDriverId()));
-                }
-                return driverIds;
-            }else{
+            Set<String> result = new HashSet<>();
+            Field existsField = destClass.getDeclaredField(field);
+            if(Check.NuNObj(existsField)){
                 return null;
             }
+            for(int i=0;i<srcList.size();i++ ){
+                Object srcObj = srcList.get(i);
+                ShiftParamDTO data = new ShiftParamDTO();
+                BeanUtils.copyProperties(srcObj,data);
+                if(existsField.getName().equals("driverId")){
+                    result.add(String.valueOf(data.getDriverId()));
+                }else if(existsField.getName().equals("id")){
+                    result.add(String.valueOf(data.getId()));
+                }else{
+                    continue;
+                }
+            }
+            return result;
         }catch(Exception e){
             logger.error("关联表分离driverid异常:{}",e);
             return null;
