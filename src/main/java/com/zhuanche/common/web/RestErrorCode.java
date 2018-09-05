@@ -122,7 +122,9 @@ public final class RestErrorCode{
 	public static final int RISK_SUBMITCOMPLAIN_FAIL                                        = 5004;
 
 	@ResultMessage("查询GPS数据失败")
-	public static final int MONITOR_GPS_FAIL                                        = 6004;
+	public static final int MONITOR_GPS_FAIL                                        = 6001;
+	@ResultMessage("查询大数据司机订单信息失败")
+	public static final int MONITOR_DRIVERO_ORDER_FAIL                                        = 7001;
 	//---------------------------------------------------------------------------------------------------------------------------------------------
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系

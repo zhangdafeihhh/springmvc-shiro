@@ -52,21 +52,16 @@ public class LbsController {
             @RequestParam(value = "startTime", required = true)String startTime,
             @RequestParam(value = "endTime", required = true)String endTime,
               ModelMap model) {
-        JSONObject param = new JSONObject();
-        param.put("driverId",driverId);
-        param.put("startTime",startTime);
-        param.put("endTime",endTime);
-        logger.info("监控-查看车辆GPS轨迹-请求参数" + JSON.toJSONString(param));
+        Map<String, Object> paramMap = new HashMap<String, Object>();
+        paramMap.put("driverId",driverId);
+        paramMap.put("startTime",startTime);
+        paramMap.put("endTime",endTime);
+        paramMap.put("platform", 20);
+        logger.info("监控-查看车辆GPS轨迹-请求参数" + JSON.toJSONString(paramMap));
         try {
-            Map<String, Object> paramMap = new HashMap<String, Object>();
-            paramMap.put("driverId", driverId);
-            paramMap.put("startTime", startTime);
-            paramMap.put("endTime", endTime);
-            paramMap.put("platform", 20);
 
-
-            ResponseEntity<String> responseEntity = lbsDriverGpsRestTemplate.getForEntity("/hbase/queryGpsByDriver",
-                    String.class, paramMap);
+            ResponseEntity<String> responseEntity = lbsDriverGpsRestTemplate.getForEntity("/hbase/queryGpsByDriver?driverId="+driverId+"&startTime="+startTime+"&endTime="+endTime+"&platform=20",
+                    String.class, new HashMap<>());
             if(HttpStatus.OK .equals(responseEntity.getStatusCode() )){
                 String result =  responseEntity.getBody();
                 if (StringUtils.isNotEmpty(result)) {
@@ -78,15 +73,15 @@ public class LbsController {
                         JSONObject gpgData = responseObject.getJSONObject("data");
                         return AjaxResponse.success(gpgData);
                     }else {
-                        logger.error("监控-查看车辆GPS轨迹-返回状态码为："+responseEntity.getStatusCode().toString()+";请求参数" + JSON.toJSONString(param)+",返回结果为："+responseObject.toJSONString());
+                        logger.error("监控-查看车辆GPS轨迹-返回状态码为："+responseEntity.getStatusCode().toString()+";请求参数" + JSON.toJSONString(paramMap)+",返回结果为："+responseObject.toJSONString());
                     }
                 }
             }else{
-                logger.error("监控-查看车辆GPS轨迹-返回状态码为："+responseEntity.getStatusCode().toString()+";请求参数" + JSON.toJSONString(param));
+                logger.error("监控-查看车辆GPS轨迹-返回状态码为："+responseEntity.getStatusCode().toString()+";请求参数" + JSON.toJSONString(paramMap));
             }
-            return AjaxResponse.success(null);
+            return AjaxResponse.fail(RestErrorCode.MONITOR_GPS_FAIL,"nodata");
         } catch (Exception e) {
-            logger.error("监控-查看车辆GPS轨迹-请求参数" + JSON.toJSONString(param),e);
+            logger.error("监控-查看车辆GPS轨迹-请求参数" + JSON.toJSONString(paramMap),e);
             return AjaxResponse.fail(RestErrorCode.MONITOR_GPS_FAIL,null);
 
         }
