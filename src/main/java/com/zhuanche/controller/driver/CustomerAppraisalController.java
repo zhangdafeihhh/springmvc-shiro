@@ -13,6 +13,7 @@ import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalDTO;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.serv.CustomerAppraisalService;
+import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,9 @@ public class CustomerAppraisalController {
 
     @Autowired
     private CustomerAppraisalService customerAppraisalService;
+
+    @Autowired
+    private CarDriverTeamService carDriverTeamService;
 
     /**
      * 订单评分
@@ -60,11 +64,24 @@ public class CustomerAppraisalController {
                                        @RequestParam(value="page", defaultValue="0")Integer page,
                                        @RequestParam(value="pageSize", defaultValue="20")Integer pageSize) {
 
-        //TODO 数据权限控制SSOLoginUser
+        // 数据权限控制SSOLoginUser
         Set<Integer> permOfCity        = WebSessionUtil.getCurrentLoginUser().getCityIds(); //普通管理员可以管理的所有城市ID
         Set<Integer> permOfSupplier    = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); //普通管理员可以管理的所有供应商ID
         Set<Integer> permOfTeam        = WebSessionUtil.getCurrentLoginUser().getTeamIds(); //普通管理员可以管理的所有车队ID
 
+        int total = 0;
+        List<CarBizCustomerAppraisalDTO> list =  Lists.newArrayList();
+        Set<Integer> driverIds = null;
+        Boolean had = false;
+        if(teamGroupId!=null || teamId!=null || (permOfTeam!=null && permOfTeam.size()>0)){
+            had = true;
+            driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
+        }
+        if(had && (driverIds==null || driverIds.size()==0)){
+            logger.info(LOGTAG + "查询teamId={},groupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
+            PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
+            return AjaxResponse.success(pageDTO);
+        }
 
         CarBizCustomerAppraisalDTO carBizCustomerAppraisalDTO = new CarBizCustomerAppraisalDTO();
         carBizCustomerAppraisalDTO.setName(name);
@@ -76,9 +93,12 @@ public class CustomerAppraisalController {
         carBizCustomerAppraisalDTO.setTeamGroupId(teamGroupId);
         carBizCustomerAppraisalDTO.setCreateDateBegin(createDateBegin);
         carBizCustomerAppraisalDTO.setCreateDateEnd(createDateEnd);
+        //数据权限
+        carBizCustomerAppraisalDTO.setCityIds(permOfCity);
+        carBizCustomerAppraisalDTO.setSupplierIds(permOfSupplier);
+        carBizCustomerAppraisalDTO.setTeamIds(permOfTeam);
+        carBizCustomerAppraisalDTO.setDriverIds(driverIds);
 
-        int total = 0;
-        List<CarBizCustomerAppraisalDTO> list =  Lists.newArrayList();
         Page p = PageHelper.startPage(page, pageSize, true);
         try {
             list = customerAppraisalService.queryCustomerAppraisalList(carBizCustomerAppraisalDTO);
@@ -94,6 +114,10 @@ public class CustomerAppraisalController {
      * 司机评分
      * @param name 司机姓名
      * @param phone 司机手机号
+     * @param cityId 城市ID
+     * @param supplierId 供应商ID
+     * @param teamId 车队ID
+     * @param teamGroupId 车队下小组ID
      * @param month 月份 yyyy-M
      * @param page 起始页，默认0
      * @param pageSize 取N条，默认20
@@ -104,24 +128,41 @@ public class CustomerAppraisalController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
-    public AjaxResponse queryCustomerAppraisalStatisticsList(String name, String phone,
-                                                             @Verify(param = "month", rule = "required") String month,
+    public AjaxResponse queryCustomerAppraisalStatisticsList(String name, String phone,Integer cityId, Integer supplierId,
+                                                   Integer teamId, Integer teamGroupId,
+                                                   @Verify(param = "month", rule = "required") String month,
                                                    @RequestParam(value="page", defaultValue="0")Integer page,
                                                    @RequestParam(value="pageSize", defaultValue="20")Integer pageSize) {
 
-        //TODO 数据权限控制SSOLoginUser
+        // 数据权限控制SSOLoginUser
         Set<Integer> permOfCity        = WebSessionUtil.getCurrentLoginUser().getCityIds(); //普通管理员可以管理的所有城市ID
         Set<Integer> permOfSupplier    = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); //普通管理员可以管理的所有供应商ID
         Set<Integer> permOfTeam        = WebSessionUtil.getCurrentLoginUser().getTeamIds(); //普通管理员可以管理的所有车队ID
 
+        int total = 0;
+        List<CarBizCustomerAppraisalStatisticsDTO> list =  Lists.newArrayList();
+        Set<Integer> driverIds = null;
+        Boolean had = false;
+        if(teamGroupId!=null || teamId!=null || (permOfTeam!=null && permOfTeam.size()>0)){
+            had = true;
+            driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
+        }
+        if(had && (driverIds==null || driverIds.size()==0)){
+            logger.info(LOGTAG + "查询teamId={},groupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
+            PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
+            return AjaxResponse.success(pageDTO);
+        }
 
         CarBizCustomerAppraisalStatisticsDTO carBizCustomerAppraisalStatisticsDTO = new CarBizCustomerAppraisalStatisticsDTO();
         carBizCustomerAppraisalStatisticsDTO.setDriverName(name);
         carBizCustomerAppraisalStatisticsDTO.setDriverPhone(phone);
         carBizCustomerAppraisalStatisticsDTO.setCreateDate(month);
+        //数据权限
+        carBizCustomerAppraisalStatisticsDTO.setCityIds(permOfCity);
+        carBizCustomerAppraisalStatisticsDTO.setSupplierIds(permOfSupplier);
+        carBizCustomerAppraisalStatisticsDTO.setTeamIds(permOfTeam);
+        carBizCustomerAppraisalStatisticsDTO.setDriverIds(driverIds);
 
-        int total = 0;
-        List<CarBizCustomerAppraisalStatisticsDTO> list =  Lists.newArrayList();
         Page p = PageHelper.startPage(page, pageSize, true);
         try {
             list = customerAppraisalService.queryCustomerAppraisalStatisticsList(carBizCustomerAppraisalStatisticsDTO);

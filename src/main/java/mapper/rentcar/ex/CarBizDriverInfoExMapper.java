@@ -29,7 +29,7 @@ public interface CarBizDriverInfoExMapper {
     /** 司机月排班查询司机信息列表*/
     List<CarDriverInfoDTO> queryDriverListForMonthDuty(DriverMonthDutyRequest param);
     /**
-     * 查询司机信息列表展示(有分页)
+     * 查询司机信息列表展示
      * @param params
      * @return
      */

@@ -1,10 +1,6 @@
 package com.zhuanche.serv.driverteam;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
@@ -487,5 +483,34 @@ public class CarDriverTeamService{
 		pageDTO.setResult(dtos);
 		pageDTO.setTotal(total);
 		return pageDTO;
+	}
+
+	/**
+	 * 查询所给小组ID下的所有司机ID,
+	 * 查询所给车队ID下的所有司机ID
+	 * @param groupId
+	 * @param teamId
+	 * @param teamIds
+	 * @return
+	 */
+	public Set<Integer> selectDriverIdsByTeamIdAndGroupId(Integer groupId, Integer teamId, Set<Integer> teamIds){
+		Set<Integer> set = new HashSet<Integer>();
+		if(groupId!=null){//有车队下小组ID传入，故以此ID为主
+			List<Integer> integers = carRelateGroupExMapper.queryDriverIdsByGroupId(groupId);
+			if(integers!=null && integers.size()>0){
+				set = new HashSet<Integer>(integers);
+				return set;
+			}else {//不存在司机ID，即返回
+				return set;
+			}
+		}else {//没有车队下小组ID传入，以传入车队ID以及当前用户的数据权限下车队ID查询sijiID
+			List<Integer> integers = carRelateTeamExMapper.queryDriverIdsByTeamId(teamId, teamIds);
+			if(integers!=null && integers.size()>0){
+				set = new HashSet<Integer>(integers);
+				return set;
+			}else {//不存在司机ID，即返回
+				return set;
+			}
+		}
 	}
 }

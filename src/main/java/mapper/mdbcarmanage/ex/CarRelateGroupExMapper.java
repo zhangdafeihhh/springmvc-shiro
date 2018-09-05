@@ -19,4 +19,11 @@ public interface CarRelateGroupExMapper {
      */
     int deleteByDriverId(@Param("driverId") Integer driverId);
 
+    /**
+     * 查询所给小组ID下的所有司机ID
+     * @param groupId
+     * @return
+     */
+    List<Integer> queryDriverIdsByGroupId(@Param("groupId") Integer groupId);
+
 }

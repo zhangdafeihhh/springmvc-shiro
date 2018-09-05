@@ -59,4 +59,12 @@
     delete from car_relate_group
     where driver_id = #{driverId,jdbcType=INTEGER}
   </delete>
+
+  <!--查询所给小组ID下的所有司机ID-->
+  <select id="queryDriverIdsByGroupId" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+    SELECT
+    driver_id
+    FROM car_relate_group
+    WHERE  group_id = #{groupId}
+  </select>
 </mapper>

@@ -17,6 +17,7 @@ import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.serv.*;
+import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -45,6 +46,9 @@ public class DriverInfoController {
 
     @Autowired
     private CarBizDriverInfoDetailService carBizDriverInfoDetailService;
+
+    @Autowired
+    private CarDriverTeamService carDriverTeamService;
 
     /**
      * 司机信息列表（有分页）
@@ -75,10 +79,24 @@ public class DriverInfoController {
             @RequestParam(value="page", defaultValue="0")Integer page,
             @RequestParam(value="pageSize", defaultValue="20")Integer pageSize) {
 
-        //TODO 数据权限控制SSOLoginUser
+        // 数据权限控制SSOLoginUser
         Set<Integer> permOfCity        = WebSessionUtil.getCurrentLoginUser().getCityIds(); //普通管理员可以管理的所有城市ID
         Set<Integer> permOfSupplier    = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); //普通管理员可以管理的所有供应商ID
         Set<Integer> permOfTeam        = WebSessionUtil.getCurrentLoginUser().getTeamIds(); //普通管理员可以管理的所有车队ID
+
+        int total = 0;
+        List<CarBizDriverInfoDTO> list =  Lists.newArrayList();
+        Set<Integer> driverIds = null;
+        Boolean had = false;
+        if(teamGroupId!=null || teamId!=null || (permOfTeam!=null && permOfTeam.size()>0)){
+            had = true;
+            driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
+        }
+        if(had && (driverIds==null || driverIds.size()==0)){
+            logger.info(LOGTAG + "查询teamId={},groupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
+            PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
+            return AjaxResponse.success(pageDTO);
+        }
 
         CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();
         carBizDriverInfoDTO.setName(name);
@@ -94,12 +112,12 @@ public class DriverInfoController {
         carBizDriverInfoDTO.setImei(imei);
         carBizDriverInfoDTO.setIdCardNo(idCardNo);
         carBizDriverInfoDTO.setIsImage(isImage);
+        //数据权限
         carBizDriverInfoDTO.setCityIds(permOfCity);
         carBizDriverInfoDTO.setSupplierIds(permOfSupplier);
         carBizDriverInfoDTO.setTeamIds(permOfTeam);
+        carBizDriverInfoDTO.setDriverIds(driverIds);
 
-        int total = 0;
-        List<CarBizDriverInfoDTO> list =  Lists.newArrayList();
         Page p = PageHelper.startPage(page, pageSize, true);
         try {
             list = carBizDriverInfoService.queryDriverList(carBizDriverInfoDTO);
@@ -140,11 +158,22 @@ public class DriverInfoController {
     public AjaxResponse findDriverAllList(String name, String phone, String licensePlates, Integer status, Integer cityId, Integer supplierId,
          Integer teamId, Integer teamGroupId, Integer groupId, Integer cooperationType, String imei, String idCardNo, Integer isImage) {
 
-        //TODO 数据权限控制SSOLoginUser
+        // 数据权限控制SSOLoginUser
         Set<Integer> permOfCity        = WebSessionUtil.getCurrentLoginUser().getCityIds(); //普通管理员可以管理的所有城市ID
         Set<Integer> permOfSupplier    = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); //普通管理员可以管理的所有供应商ID
         Set<Integer> permOfTeam        = WebSessionUtil.getCurrentLoginUser().getTeamIds(); //普通管理员可以管理的所有车队ID
 
+        List<CarBizDriverInfoDTO> list =  Lists.newArrayList();
+        Set<Integer> driverIds = null;
+        Boolean had = false;
+        if(teamGroupId!=null || teamId!=null || (permOfTeam!=null && permOfTeam.size()>0)){
+            had = true;
+            driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
+        }
+        if(had && (driverIds==null || driverIds.size()==0)){
+            logger.info(LOGTAG + "查询teamId={},groupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
+            return AjaxResponse.success(list);
+        }
         CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();
         carBizDriverInfoDTO.setName(name);
         carBizDriverInfoDTO.setPhone(phone);
@@ -159,11 +188,12 @@ public class DriverInfoController {
         carBizDriverInfoDTO.setImei(imei);
         carBizDriverInfoDTO.setIdCardNo(idCardNo);
         carBizDriverInfoDTO.setIsImage(isImage);
+        //数据权限
         carBizDriverInfoDTO.setCityIds(permOfCity);
         carBizDriverInfoDTO.setSupplierIds(permOfSupplier);
         carBizDriverInfoDTO.setTeamIds(permOfTeam);
+        carBizDriverInfoDTO.setDriverIds(driverIds);
 
-        List<CarBizDriverInfoDTO> list =  Lists.newArrayList();
         list = carBizDriverInfoService.queryDriverList(carBizDriverInfoDTO);
         // 查询城市名称，供应商名称，服务类型，加盟类型
         for (CarBizDriverInfoDTO driver : list) {
@@ -199,35 +229,48 @@ public class DriverInfoController {
                                          String imei, String idCardNo, Integer isImage,
                                          HttpServletRequest request) {
 
-        //TODO 数据权限控制SSOLoginUser
+        // 数据权限控制SSOLoginUser
         Set<Integer> permOfCity        = WebSessionUtil.getCurrentLoginUser().getCityIds(); //普通管理员可以管理的所有城市ID
         Set<Integer> permOfSupplier    = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); //普通管理员可以管理的所有供应商ID
         Set<Integer> permOfTeam        = WebSessionUtil.getCurrentLoginUser().getTeamIds(); //普通管理员可以管理的所有车队ID
 
-        CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();
-        carBizDriverInfoDTO.setName(name);
-        carBizDriverInfoDTO.setPhone(phone);
-        carBizDriverInfoDTO.setLicensePlates(licensePlates);
-        carBizDriverInfoDTO.setStatus(status);
-        carBizDriverInfoDTO.setServiceCity(cityId);
-        carBizDriverInfoDTO.setSupplierId(supplierId);
-        carBizDriverInfoDTO.setTeamId(teamId);
-        carBizDriverInfoDTO.setTeamGroupId(teamGroupId);
-        carBizDriverInfoDTO.setGroupId(groupId);
-        carBizDriverInfoDTO.setCooperationType(cooperationType);
-        carBizDriverInfoDTO.setImei(imei);
-        carBizDriverInfoDTO.setIdCardNo(idCardNo);
-        carBizDriverInfoDTO.setIsImage(isImage);
-        carBizDriverInfoDTO.setCityIds(permOfCity);
-        carBizDriverInfoDTO.setSupplierIds(permOfSupplier);
-        carBizDriverInfoDTO.setTeamIds(permOfTeam);
-
-        List<CarBizDriverInfoDTO> list = carBizDriverInfoService.queryDriverList(carBizDriverInfoDTO);
-        // 查询城市名称，供应商名称，服务类型，加盟类型
-        for (CarBizDriverInfoDTO driver : list) {
-            driver = carBizDriverInfoService.getBaseStatis(driver);
+        List<CarBizDriverInfoDTO> list =  Lists.newArrayList();
+        Set<Integer> driverIds = null;
+        Boolean had = false;
+        if(teamGroupId!=null || teamId!=null || (permOfTeam!=null && permOfTeam.size()>0)){
+            had = true;
+            driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
         }
+        if(had && (driverIds==null || driverIds.size()==0)){
+            logger.info(LOGTAG + "查询teamId={},groupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
+            list =  Lists.newArrayList();
+        }else{
+            CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();
+            carBizDriverInfoDTO.setName(name);
+            carBizDriverInfoDTO.setPhone(phone);
+            carBizDriverInfoDTO.setLicensePlates(licensePlates);
+            carBizDriverInfoDTO.setStatus(status);
+            carBizDriverInfoDTO.setServiceCity(cityId);
+            carBizDriverInfoDTO.setSupplierId(supplierId);
+            carBizDriverInfoDTO.setTeamId(teamId);
+            carBizDriverInfoDTO.setTeamGroupId(teamGroupId);
+            carBizDriverInfoDTO.setGroupId(groupId);
+            carBizDriverInfoDTO.setCooperationType(cooperationType);
+            carBizDriverInfoDTO.setImei(imei);
+            carBizDriverInfoDTO.setIdCardNo(idCardNo);
+            carBizDriverInfoDTO.setIsImage(isImage);
+            //数据权限
+            carBizDriverInfoDTO.setCityIds(permOfCity);
+            carBizDriverInfoDTO.setSupplierIds(permOfSupplier);
+            carBizDriverInfoDTO.setTeamIds(permOfTeam);
+            carBizDriverInfoDTO.setDriverIds(driverIds);
 
+            list = carBizDriverInfoService.queryDriverList(carBizDriverInfoDTO);
+            // 查询城市名称，供应商名称，服务类型，加盟类型
+            for (CarBizDriverInfoDTO driver : list) {
+                driver = carBizDriverInfoService.getBaseStatis(driver);
+            }
+        }
         try {
             //TODO 待完善
             Workbook wb = carBizDriverInfoService.exportExcel(list,request.getRealPath("/")+File.separator+"template"+File.separator+"driver_info.xlsx");
