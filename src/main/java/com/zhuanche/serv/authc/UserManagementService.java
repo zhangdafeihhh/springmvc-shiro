@@ -9,11 +9,13 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constants.SaasConst;
@@ -25,6 +27,7 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.RedisSessionDAO;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
+import com.zhuanche.util.NumberUtil;
 import com.zhuanche.util.PasswordUtil;
 
 import mapper.mdbcarmanage.CarAdmUserMapper;
@@ -45,6 +48,9 @@ public class UserManagementService{
 	private CarAdmUserMapper      carAdmUserMapper;
 	@Autowired
 	private CarAdmUserExMapper  carAdmUserExMapper;
+	
+	@Value("${resetpassword.msgnotify.switch}")
+	private String resetpasswordMsgotifySwitch = "OFF";//重置密码时是否短信通知用户
 
 	public CarAdmUser getUserById(Integer userId){
 		return carAdmUserMapper.selectByPrimaryKey(userId);
@@ -267,10 +273,21 @@ public class UserManagementService{
 			return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST );
 		}
 		//执行
-		CarAdmUser userForupdate = new CarAdmUser();
-		userForupdate.setUserId(userId);
-		userForupdate.setPassword(  PasswordUtil.md5(SaasConst.INITIAL_PASSWORD, rawuser.getAccount()) );
-		carAdmUserMapper.updateByPrimaryKeySelective(userForupdate);
+		if( "ON".equalsIgnoreCase(resetpasswordMsgotifySwitch) && StringUtils.isNotEmpty(rawuser.getPhone())  ) {//短信通知开关打开的情况下，密码随机生成，并短信通知用户
+			CarAdmUser userForupdate = new CarAdmUser();
+			userForupdate.setUserId(userId);
+			String newpass = NumberUtil.genRandomCode(8);//密码随机生成
+			userForupdate.setPassword(  PasswordUtil.md5(newpass , rawuser.getAccount()) );
+			carAdmUserMapper.updateByPrimaryKeySelective(userForupdate);
+			//短信通知用户
+			String msg = "您账号"+ rawuser.getAccount() +"的登录密码已被管理员重置，新密码为："+newpass+"（为保障账户安全，请您登录后进行密码修改）";
+			SmsSendUtil.send(rawuser.getPhone(), msg);
+		}else{//短信通知开关关闭的情况下，密码为初始密码
+			CarAdmUser userForupdate = new CarAdmUser();
+			userForupdate.setUserId(userId);
+			userForupdate.setPassword(  PasswordUtil.md5(SaasConst.INITIAL_PASSWORD, rawuser.getAccount()) );
+			carAdmUserMapper.updateByPrimaryKeySelective(userForupdate);
+		}
 		redisSessionDAO.clearRelativeSession(null, null , userId );//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
