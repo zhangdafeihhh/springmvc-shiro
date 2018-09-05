@@ -24,6 +24,11 @@
     id, team_name, sort, create_by, create_date, update_by, update_date, city, supplier, 
     remark, status, p_id, duty_start_date, duty_end_date, charge1, charge2, charge3
   </sql>
+
+    <update id="updateTeamDuty" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverTeam">
+        update car_driver_team set duty_start_date = #{dutyStartDate} ,duty_end_date = #{dutyEndDate} where id = #{id}
+    </update>
+
     <select id="queryTeamIdByDriverId" parameterType="Integer" resultType="java.util.HashMap">
         SELECT
         r.team_id teamId, t.team_name teamName

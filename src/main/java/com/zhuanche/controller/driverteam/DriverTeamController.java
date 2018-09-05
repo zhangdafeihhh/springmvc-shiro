@@ -5,7 +5,9 @@ import com.zhuanche.common.dutyEnum.ServiceReturnCodeEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.CarDriverTeamDTO;
+import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
 import com.zhuanche.request.DriverTeamRequest;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
@@ -219,6 +221,36 @@ public class DriverTeamController{
 			return AjaxResponse.success(pageDTO);
 		}catch (Exception e){
 			logger.error("查询可添加司机列表异常:{}",e);
+			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		}
+	}
+
+	/** 
+	* @Desc: 车队设置车队班制排班 
+	* @param:
+	* @return:  
+	* @Author: lunan
+	* @Date: 2018/9/5 
+	*/ 
+	@RequestMapping("/saveTeamDuty")
+	@ResponseBody
+	public AjaxResponse saveTeamDuty(@Verify(param = "dutyStartDate   ", rule = "required") String dutyStartDate   ,
+									 @Verify(param = "dutyEndDate", rule = "required") String dutyEndDate,
+									 @Verify(param = "paramId", rule = "required") Integer paramId) {
+		logger.info("车队设置车队班制排班入参:"+dutyStartDate+"--"+dutyEndDate+"--"+paramId);
+		try{
+			CarDriverTeam record = new CarDriverTeam();
+			record.setId(paramId);
+			record.setDutyStartDate(dutyStartDate);
+			record.setDutyEndDate(dutyEndDate);
+			int result = carDriverTeamService.updateTeamDuty(record);
+			if(result > 0 ){
+				return AjaxResponse.success(result);
+			}else{
+				return AjaxResponse.fail(RestErrorCode.RECORD_DEAL_FAILURE);
+			}
+		}catch (Exception e){
+			logger.error("车队设置车队班制排班异常:{}",e);
 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 		}
 	}

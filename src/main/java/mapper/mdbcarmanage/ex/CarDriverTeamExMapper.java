@@ -18,4 +18,7 @@ public interface CarDriverTeamExMapper{
 	List<CarDriverTeam> queryForListByPid(DriverTeamRequest driverTeamRequest);
 
 	public Map<String, Object> queryTeamIdByDriverId(@Param("driverId") Integer driverId);
+
+	/** 车队设置中给车队排班制*/
+	int updateTeamDuty(CarDriverTeam record);
 }

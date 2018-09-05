@@ -36,6 +36,9 @@ public final class RestErrorCode{
 	@ResultMessage("未知错误")
 	public static final int UNKNOWN_ERROR                   = 999;
 
+	@ResultMessage("记录操作失败")
+	public static final int RECORD_DEAL_FAILURE                   = 501;
+
 
 	//-----------------------------------------------用户
 	@ResultMessage("获取验证码太频繁")
