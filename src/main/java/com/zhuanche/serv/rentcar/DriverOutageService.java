@@ -3,6 +3,7 @@ package com.zhuanche.serv.rentcar;
 import com.zhuanche.entity.rentcar.DriverOutage;
 import com.zhuanche.entity.rentcar.DriverOutageVo;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -73,5 +74,5 @@ public interface DriverOutageService {
     /*
      * 导入
      */
-     Map<String,Object> importDriverOutageInfo(DriverOutageVo params, HttpServletRequest request);
+     Map<String,Object> importDriverOutageInfo(String fileName, MultipartFile file, HttpServletRequest request);
 }

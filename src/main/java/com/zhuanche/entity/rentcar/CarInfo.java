@@ -245,9 +245,9 @@ public class CarInfo extends BaseEntity {
     // 下次运营证开始时间
     private String nextOperationDateBegin;
     // 下次运营证结束时间
-//    private String nextOperationDateEnd;
+    private String nextOperationDateEnd;
     // 下次等级鉴定开始时间
-//    private String nextClassDateBegin;
+    private String nextClassDateBegin;
     // 下次等级鉴定结束时间
     private String nextClassDateEnd;
 
@@ -318,6 +318,22 @@ public class CarInfo extends BaseEntity {
 
     /** 车辆图片 **/
     private String imageUrl;
+
+    public String getNextOperationDateEnd() {
+        return nextOperationDateEnd;
+    }
+
+    public void setNextOperationDateEnd(String nextOperationDateEnd) {
+        this.nextOperationDateEnd = nextOperationDateEnd;
+    }
+
+    public String getNextClassDateBegin() {
+        return nextClassDateBegin;
+    }
+
+    public void setNextClassDateBegin(String nextClassDateBegin) {
+        this.nextClassDateBegin = nextClassDateBegin;
+    }
 
     public String getImageUrl() {
         return imageUrl;
