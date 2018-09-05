@@ -204,8 +204,8 @@ public class DriverMonthDutyController {
                 logger.error("没有权限操作,用户："+JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));
                 return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
             }
-            param.setCityIds(BeanUtil.copySet(data.getCityIds(),Integer.class));
-            param.setSupplierIds(BeanUtil.copySet(data.getSupplierIds(),Integer.class));
+            param.setCityIds(commonService.setStringShiftInteger(data.getCityIds()));
+            param.setSupplierIds(commonService.setStringShiftInteger(data.getSupplierIds()));
             param.setTeamIds(data.getTeamIds());
             PageDTO pageDTO = driverMonthDutyService.queryDriverDutyList(param);
             return AjaxResponse.success(pageDTO);
@@ -215,6 +215,13 @@ public class DriverMonthDutyController {
         }
     }
 
+    /** 
+    * @Desc: 下载模板 
+    * @param:
+    * @return:  
+    * @Author: lunan
+    * @Date: 2018/9/5 
+    */ 
     @SuppressWarnings({ "deprecation", "unchecked" })
     @RequestMapping(value = "/downloadTemplateMonthDuty")
     @ResponseBody
@@ -241,8 +248,8 @@ public class DriverMonthDutyController {
                 logger.error("没有权限操作,用户："+JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));
                 return;
             }
-            param.setCityIds(BeanUtil.copySet(data.getCityIds(),Integer.class));
-            param.setSupplierIds(BeanUtil.copySet(data.getSupplierIds(),Integer.class));
+            param.setCityIds(commonService.setStringShiftInteger(data.getCityIds()));
+            param.setSupplierIds(commonService.setStringShiftInteger(data.getSupplierIds()));
             param.setTeamIds(data.getTeamIds());
 
             List<CarDriverInfoDTO> driverInfoList = new ArrayList<CarDriverInfoDTO>();

@@ -60,6 +60,38 @@ public class CitySupplierTeamCommonService {
     @Autowired
     private CarDriverTeamExMapper carDriverTeamExMapper;
 
+
+    public Set<Integer> setStringShiftInteger(Set<String> srcList){
+        if(Check.NuNCollection(srcList)){
+            return null;
+        }
+        try{
+            Set<Integer> resultSet = new HashSet<>();
+            for (String str : srcList) {
+                resultSet.add(Integer.parseInt(str));
+            }
+            return resultSet;
+        }catch (Exception e){
+            logger.error("set集合转换异常:{}",e);
+            return null;
+        }
+    }
+
+    public  Set<String> setIntegerShiftString(Set<Integer> srcList){
+        if(Check.NuNCollection(srcList)){
+            return null;
+        }
+        try{
+            Set<String> resultSet = new HashSet<>();
+            for (Integer parmam : srcList) {
+                resultSet.add(String.valueOf(parmam));
+            }
+            return resultSet;
+        }catch (Exception e){
+            logger.error("set集合转换异常:{}",e);
+            return null;
+        }
+    }
     /**
      * @Desc: 处理车队关联司机中间表操作
      * @param:

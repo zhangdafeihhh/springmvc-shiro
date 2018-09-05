@@ -23,6 +23,9 @@ public interface CarBizDriverInfoExMapper {
 
     CarDriverInfoDTO queryOneDriver(DutyParamRequest dutyParamRequest);
 
+    /** 更改车队信息查询司机信息*/
+    CarDriverInfoDTO selectDriverInfoByDriverId(Integer driverId);
+
     /** 月排班查询司机详情*/
     CarDriverInfoDTO selectDriverDetail(String driverId);
 

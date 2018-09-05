@@ -1,11 +1,8 @@
 package com.zhuanche.serv.driverScheduling;
 
 import com.alibaba.fastjson.JSON;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.dutyEnum.EnumDriverDutyTimeFlag;
-import com.zhuanche.common.dutyEnum.ServiceReturnCodeEnum;
-import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.common.rocketmq.CommonRocketProducer;
 import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.dto.driver.CarDriverDayDutyDTO;
 import com.zhuanche.dto.driverDuty.CarDriverDurationDTO;
@@ -14,12 +11,8 @@ import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
 import com.zhuanche.entity.mdbcarmanage.DriverDutyTimeInfo;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
-import com.zhuanche.request.CommonRequest;
 import com.zhuanche.request.DriverTeamRequest;
 import com.zhuanche.request.DutyParamRequest;
-import com.zhuanche.serv.common.CitySupplierTeamCommonService;
-import com.zhuanche.serv.common.DataPermissionHelper;
-import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.Check;
 import mapper.mdbcarmanage.ex.CarDriverDayDutyExMapper;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
@@ -35,12 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
 
 /**
  * @description: 查看排班
@@ -429,6 +418,49 @@ public class AsyncDutyService {
 		return dutyTime;
 	}
 
+	public void processingData(Integer driverId, String teamId, String teamName, Integer value) {
+		CarDriverInfoDTO driverInfo = carBizDriverInfoExMapper.selectDriverInfoByDriverId(driverId);
+		if(Check.NuNObj(driverInfo)){
+			return ;
+		}
+		//车队信息
+		driverInfo.setTeamId(teamId);
+		driverInfo.setTeamName(teamName);
+		driverInfo.setGroupId(null);
+		driverInfo.setCarGroupName("");
+		sendDriverToMq(driverInfo, "UPDATE");
+	}
+
+	public void sendDriverToMq(CarDriverInfoDTO driver, String method){
+		//MQ消息写入
+		try {
+			Map<String, Object> messageMap = new HashMap<String, Object>();
+			messageMap.put("carNumber", driver.getLicensePlates());
+			messageMap.put("city", driver.getServiceCity());
+			messageMap.put("cityId",driver.getCityId());
+			messageMap.put("createBy", driver.getUpdateBy()==null?"1":driver.getUpdateBy());
+			messageMap.put("driverId", driver.getDriverId());
+			messageMap.put("driverName",driver.getName());
+			messageMap.put("driverPhone", driver.getPhone()==null?"":driver.getPhone());
+			messageMap.put("status",driver.getStatus());
+			messageMap.put("supplierFullName", driver.getSupplierName());
+			messageMap.put("supplierId", driver.getSupplierId());
+			messageMap.put("cooperationType", driver.getCooperationType());
+			messageMap.put("groupId",driver.getGroupId());
+			messageMap.put("create_date",driver.getCreateDate());
+			messageMap.put("carType",driver.getCarGroupName()==null?"":driver.getCarGroupName());
+			messageMap.put("teamId", driver.getTeamId()==null?"":driver.getTeamId());
+			messageMap.put("teamName", driver.getTeamName()==null?"":driver.getTeamName());
+			messageMap.put("teamGroupId", driver.getGroupId()==null?"":driver.getGroupId());
+			messageMap.put("teamGroupName", driver.getCarGroupName()==null?"":driver.getCarGroupName());
+
+			String messageStr = JSONObject.fromObject(messageMap).toString();
+			logger.info("专车司机，同步发送数据：" + messageStr);
+			CommonRocketProducer.publishMessage("driver_info", method,String.valueOf(driver.getDriverId()),messageMap);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 
 

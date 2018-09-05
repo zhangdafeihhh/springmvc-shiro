@@ -83,9 +83,9 @@ public class CarDriverMustDutyService {
 			if(Check.NuNObj(resultParmam)){
 				return new PageDTO();
 			}
-			dutyParamRequest.setCityIds(BeanUtil.copySet(resultParmam.getCityIds(),Integer.class));
-			dutyParamRequest.setSuppliers(BeanUtil.copySet(resultParmam.getSupplierIds(),Integer.class));
-			dutyParamRequest.setSuppliers(resultParmam.getTeamIds());
+			dutyParamRequest.setCityIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getCityIds()));
+			dutyParamRequest.setSupplierIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getSupplierIds()));
+			dutyParamRequest.setSupplierIds(resultParmam.getTeamIds());
 			PageInfo<CarDriverMustDutyDTO> pageInfo = PageHelper.startPage(dutyParamRequest.getPageNo(), dutyParamRequest.getPageSize(), true).doSelectPageInfo(()
 					-> carDriverMustDutyExMapper.selectDriverMustDutyList(dutyParamRequest));
 			PageDTO pageDTO = new PageDTO();

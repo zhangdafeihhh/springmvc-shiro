@@ -109,13 +109,13 @@
       and d.id in (${dutyIds})
     </if>
     <if test="cityIds!=null and cityIds.size()>0">
-      and d.city_id IN
+      and d.city IN
       <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
         #{cid}
       </foreach>
     </if>
     <if test="supplierIds!=null and supplierIds.size()>0">
-      and d.supplier_id IN
+      and d.supplier IN
       <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
         #{sid}
       </foreach>
