@@ -38,7 +38,7 @@
   <select id="getUnIssueCount" resultType="java.lang.Integer"
           parameterType="com.zhuanche.request.DutyParamRequest">
     select
-    COUNT (1)
+    COUNT(1)
     from
     car_driver_day_duty d
     where 1=1
@@ -48,32 +48,23 @@
     <if test="time!=null and time!=''">
       and d.time = #{time}
     </if>
-    <if test="cityId!=null and cityId!=''">
-      and d.city_id = #{cityId}
-    </if>
-    <if test="supplierId !=null and supplierId !=''">
-      and d.supplier_id = #{supplierId}
-    </if>
-    <if test="teamId !=null and teamId !=''">
-      AND d.team_id = #{teamId}
-    </if>
     <if test="status!=null and status!=''">
       and d.status = #{status}
     </if>
     <if test="cityIds!=null and cityIds.size()>0">
-      and city IN
+      and d.city_id IN
       <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
         #{cid}
       </foreach>
     </if>
     <if test="supplierIds!=null and supplierIds.size()>0">
-      and supplier IN
+      and d.supplier_id IN
       <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
         #{sid}
       </foreach>
     </if>
     <if test="teamIds!=null and teamIds.size()>0">
-      and id IN
+      and d.team_id IN
       <foreach collection="teamIds" open="(" close=")" separator="," item="tid" >
         #{tid}
       </foreach>

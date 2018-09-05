@@ -11,27 +11,20 @@ import com.zhuanche.dto.driverDuty.CarDriverDurationDTO;
 import com.zhuanche.dto.driverDuty.CarDriverMustDutyDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverMustDuty;
 import com.zhuanche.entity.mdbcarmanage.CarDutyDuration;
-import com.zhuanche.request.CommonRequest;
-import com.zhuanche.request.DriverMonthDutyRequest;
 import com.zhuanche.request.DutyParamRequest;
 import com.zhuanche.request.TeamGroupRequest;
 import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.serv.driverScheduling.*;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.Check;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 

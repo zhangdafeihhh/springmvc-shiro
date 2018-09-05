@@ -17,5 +17,5 @@ public interface CarDriverTeamExMapper{
 
 	List<CarDriverTeam> queryForListByPid(DriverTeamRequest driverTeamRequest);
 
-	public Map<String, Object> queryTeamIdByDriverId(Integer params);
+	public Map<String, Object> queryTeamIdByDriverId(@Param("driverId") Integer driverId);
 }

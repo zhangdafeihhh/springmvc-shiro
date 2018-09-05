@@ -140,6 +140,30 @@
     memo
   </sql>
 
+  <!--查询司机部分信息（只供更改车队是调用）-->
+  <select id="selectDriverInfoByDriverId" parameterType="java.lang.Integer" resultType="com.zhuanche.dto.CarDriverInfoDTO">
+    SELECT
+    i.driver_id AS driverId,
+    i.phone AS phone,
+    i.NAME AS name,
+    i.license_plates AS licensePlates,
+    i.cooperation_type AS cooperationType,
+    i.group_id AS groupId,
+    g.group_name AS carGroupName,
+    i.service_city as serviceCityId,
+    c.city_name AS cityName,
+    i.supplier_id AS supplierId,
+    p.supplier_full_name AS supplierName,
+    i.STATUS AS status,
+    i.update_by AS updateBy,
+    DATE_FORMAT(i.create_date,'%Y-%m-%d %H:%i:%s') AS createDate
+    FROM car_biz_driver_info i
+    LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+    LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+    LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+    where i.driver_id= #{driverId}
+  </select>
+
   <select id="queryDriverListForMonthDuty" parameterType="com.zhuanche.request.DriverMonthDutyRequest" resultType="com.zhuanche.dto.CarDriverInfoDTO">
     SELECT
     i.driver_id AS driverId,
