@@ -33,7 +33,8 @@
 
   <select id="queryMobileClientPublishInfo" resultMap="BaseResultMap" parameterType="string" >
     select
-    <include refid="Base_Column_List" />
+    version_id,version_name, version_no, platform, download_url, forced_update,
+    forced_update_down, publisher, publish_date, memo
     from car_sys_mobile_client_publish
     where type = 0 and status = 1
     <if test="value != null and value !='' " >

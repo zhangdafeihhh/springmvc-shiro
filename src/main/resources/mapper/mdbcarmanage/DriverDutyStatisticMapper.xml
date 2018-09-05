@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="mapper.rentcar.DriverDutyStatisticMapper" >
-  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.DriverDutyStatistic" >
+<mapper namespace="mapper.mdbcarmanage.DriverDutyStatisticMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.DriverDutyStatistic" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="driverId" property="driverid" jdbcType="INTEGER" />
     <result column="licensePlates" property="licenseplates" jdbcType="VARCHAR" />
@@ -37,7 +37,7 @@
     delete from statistic_duty_2018_04
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.zhuanche.entity.rentcar.DriverDutyStatistic" >
+  <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDutyStatistic" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
       SELECT LAST_INSERT_ID()
     </selectKey>
@@ -56,7 +56,7 @@
       #{forcedtime3,jdbcType=DOUBLE}, #{forcedtime4,jdbcType=DOUBLE}, #{cargroupid,jdbcType=INTEGER}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.zhuanche.entity.rentcar.DriverDutyStatistic" >
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDutyStatistic" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
       SELECT LAST_INSERT_ID()
     </selectKey>
@@ -174,7 +174,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.rentcar.DriverDutyStatistic" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDutyStatistic" >
     update statistic_duty_2018_04
     <set >
       <if test="driverid != null" >
@@ -234,7 +234,7 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.rentcar.DriverDutyStatistic" >
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDutyStatistic" >
     update statistic_duty_2018_04
     set driverId = #{driverid,jdbcType=INTEGER},
       licensePlates = #{licenseplates,jdbcType=VARCHAR},

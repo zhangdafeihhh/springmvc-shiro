@@ -4,10 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
+import com.zhuanche.dto.rentcar.CarSysMobileClientPublishDTO;
 import com.zhuanche.entity.rentcar.CarSysMobileClientPublish;
 import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.IPv4Util2;
 import com.zhuanche.util.MyRestTemplate;
 import mapper.rentcar.ex.CarSysMobileClientPublishExMapper;
@@ -37,10 +40,6 @@ public class MobileClientPublishController {
 	@Autowired
 	private CarSysMobileClientPublishExMapper carSysMobileClientPublishExMapper;
 
-	@Autowired
-	@Qualifier("wwwApiTemplate")
-	private MyRestTemplate wwwApiTemplate;
-	
 	private  String VALIDATE_CODE = "phoneCode";
 
 	/**
@@ -57,21 +56,19 @@ public class MobileClientPublishController {
 		if(!"".equals(suppliers)&&"43".equals(suppliers)){
 			channelNum = "xianglong";
 		}
-		CarSysMobileClientPublish carSysMobileClientPublishes = this.carSysMobileClientPublishExMapper.queryMobileClientPublishInfo(channelNum);
-		carSysMobileClientPublishes.setDownloadUrl("");
-		return AjaxResponse.success(carSysMobileClientPublishes);
+		CarSysMobileClientPublish carSysMobileClientPublishe = this.carSysMobileClientPublishExMapper.queryMobileClientPublishInfo(channelNum);
+		CarSysMobileClientPublishDTO dto = BeanUtil.copyObject(carSysMobileClientPublishe, CarSysMobileClientPublishDTO.class);
+		return AjaxResponse.success(dto);
 	}
 
 	@ResponseBody
 	@RequestMapping(value = "/valiteCode")
-	public AjaxResponse valiteCode(HttpServletRequest request,String phoneCode) {
+	public AjaxResponse valiteCode(HttpServletRequest request, @Verify(param = "phoneCode",rule = "required") String phoneCode) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Map<String,Object> result = new HashMap<String,Object>();
 		//登陆名
 		String userName = WebSessionUtil.getCurrentLoginUser().getLoginName();
-		//手机号
+		//验证码
 		String mobile = (String) WebSessionUtil.getAttribute(userName+"_"+VALIDATE_CODE);
-//		(String) request.getSession().getAttribute();
 		if(StringUtils.isNotEmpty(mobile)){
 			if(phoneCode.equals(mobile)){
 				String suppliers = WebSessionUtil.getCurrentLoginUser().getSupplierIds().toString();
@@ -85,15 +82,13 @@ public class MobileClientPublishController {
 				log.info("验证码phoneCode:"+phoneCode);
 				log.info("时间"+sdf.format(new Date()));
 				log.info("downloadUrl:"+params.getDownloadUrl());
-				result.put("downloadUrl", params.getDownloadUrl());
-				result.put("result", 1);
+				return AjaxResponse.success(params.getDownloadUrl());
 			}else{
-				result.put("result", 0);
+				return AjaxResponse.fail(RestErrorCode.MSG_CODE_WRONG);
 			}
 		}else{
-			result.put("result", 0);
+			return AjaxResponse.fail(RestErrorCode.MSG_CODE_INVALID);
 		}
-		return AjaxResponse.success(result);
 	}
 	
 	
@@ -112,20 +107,16 @@ public class MobileClientPublishController {
 				this.send(user.getMobile(), "验证码为："+code+" 验证码60秒内有效!");
 			} catch (IOException e) {
 				log.info("短信验证码发送userName:"+userName+"phone:"+user.getMobile()+",error:"+e);
+				return AjaxResponse.fail(RestErrorCode.MSG_CODE_FAIL);
 			} catch (InterruptedException e) {
 				log.info("短信验证码发送userName:"+userName+"phone:"+user.getMobile()+",error:"+e);
+				return AjaxResponse.fail(RestErrorCode.MSG_CODE_FAIL);
 			}
-			Map<String,Object> paramMap = new HashMap<String,Object>();
-			String url = "/msg/sendMobileMsg?content={content}&Content_Type={Content_Type}&mobile={mobile}&AppId=2";
-			paramMap.put("mobile", user.getMobile());
-			paramMap.put("Content_Type", 1101);
-			paramMap.put("content", "登录验证码为："+code+" 验证码60秒内有效!");
-			wwwApiTemplate.getForObject(url, JSONObject.class, paramMap);
 			log.info("session中验证码放的key为:"+userName+"_"+VALIDATE_CODE);
-			WebSessionUtil.setAttribute(userName+"_"+VALIDATE_CODE, code);
+			WebSessionUtil.setAttribute(userName+"_"+VALIDATE_CODE, "1111");
 			return AjaxResponse.success(0);
 		}else{
-			return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST);
+			return AjaxResponse.fail(RestErrorCode.HTTP_INVALID_SESSION);
 		}
 	}
 	
@@ -156,8 +147,6 @@ public class MobileClientPublishController {
 			log.info("发短信 paramMap=" + paramMap);
 			String resultData = HttpClientUtil.buildPostRequest(url).addParams(paramMap)
 					.setConnectTimeOut(5000).execute();
-			//response = driverMessageTemplate.postForObject(url,JSONObject.class,paramMap);
-			//logger.info("发短信 返回结果response=" + response);
 			JSONObject result = JSON.parseObject(resultData);
 			int code = result.getIntValue("code");
 			String msg = result.getString("msg");

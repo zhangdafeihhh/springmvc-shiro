@@ -29,6 +29,8 @@ public final class RestErrorCode{
 	public static final int HTTP_NOT_FOUND                   = 404;
 	@ResultMessage("系统内部发生错误")
 	public static final int HTTP_SYSTEM_ERROR              = 500;
+	@ResultMessage("服务错误：{0}")
+	public static final int CAR_API_ERROR           = 996;
 	@ResultMessage("会话已失效，请重新登录")
 	public static final int HTTP_INVALID_SESSION           = 997;
 	@ResultMessage("请求参数校验不通过")
@@ -54,6 +56,8 @@ public final class RestErrorCode{
 	public static final int MSG_CODE_WRONG                = 1006;
 	@ResultMessage("账号已经存在")
 	public static final int ACCOUNT_EXIST                      = 1007;
+	@ResultMessage("短信验证码发送失败")
+	public static final int MSG_CODE_FAIL                      = 1011;
 
 	//----------------------------------------------权限管理
 	@ResultMessage("父权限不存在")

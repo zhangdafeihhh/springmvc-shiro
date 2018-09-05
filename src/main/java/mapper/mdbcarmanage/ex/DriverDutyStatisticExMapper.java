@@ -1,7 +1,7 @@
-package mapper.rentcar.ex;
+package mapper.mdbcarmanage.ex;
 
-import com.zhuanche.entity.rentcar.DriverDutyStatistic;
-import com.zhuanche.entity.rentcar.DriverDutyStatisticParams;
+import com.zhuanche.entity.mdbcarmanage.DriverDutyStatistic;
+import com.zhuanche.entity.mdbcarmanage.DriverDutyStatisticParams;
 
 import java.util.List;
 

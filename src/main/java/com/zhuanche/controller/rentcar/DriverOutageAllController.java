@@ -31,27 +31,7 @@ public class DriverOutageAllController {
     DriverOutageService driverOutageService;
 
 
-//    @RequestMapping(value = "/queryDriverOutage", method = { RequestMethod.GET })
-//    public String queryDriverOutage(ModelMap model, DriverOutageEntity params){
-//        try {
-//            logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"【司机永久停运】司机永久停运列表");
-//        } catch (Exception e) {
-//        }
-//        logger.info("【司机永久停运】queryDriverOutage:司机永久停运列表");
-//        return "driverOutage/driverOutageAllList";
-//    }
-//
-//    @RequestMapping(value = "/queryDriverOutageNo", method = { RequestMethod.GET })
-//    public String queryDriverOutageNo(ModelMap model, DriverOutageEntity params){
-//        try {
-//            logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"【司机永久停运】司机永久停运列表");
-//        } catch (Exception e) {
-//        }
-//        logger.info("【司机永久停运】queryDriverOutageNo:司机永久停运列表");
-//        return "driverOutage/driverOutageAllListNo";
-//    }
-
-    @GetMapping(value = "/queryDriverOutageData.json")
+    @RequestMapping(value = "/queryDriverOutageData")
     public AjaxResponse queryDriverOutageData(@Verify(param = "cityId",rule = "") Integer cityId,
                                               Integer supplierId,
                                               Integer carGroupId,
@@ -89,7 +69,7 @@ public class DriverOutageAllController {
         //查数量
         total = driverOutageService.queryAllForInt(params);
         if(total==0){
-            PageDTO result = new PageDTO(params.getPage(), params.getPagerSize(), 0, rows);
+            PageDTO result = new PageDTO(params.getPage(), params.getPagesize(), 0, rows);
             return AjaxResponse.success(result);
         }
         //查数据
@@ -97,18 +77,7 @@ public class DriverOutageAllController {
         return AjaxResponse.success(new PageDTO(params.getPage(), params.getPagesize(), total, BeanUtil.copyList(rows, DriverOutageAllDTO.class)));
     }
 
-//    @AuthPassport
-//    @RequestMapping(value = "/driverOutageAddView")
-//    public String driverOutageAddView() {
-//        try {
-//            logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"【司机永久停运】永久停运页面");
-//        } catch (Exception e) {
-//        }
-//        logger.info("【司机永久停运】永久停运页面");
-//        return "driverOutage/driverOutageAllAdd";
-//    }
-
-    @RequestMapping(value="/saveDriverOutage", method = { RequestMethod.POST })
+    @RequestMapping(value="/saveDriverOutage")
     public AjaxResponse saveDriverOutage(
                                          String driverName,
                                          @Verify(param = "driverPhone",rule = "mobile")String driverPhone,
@@ -141,7 +110,7 @@ public class DriverOutageAllController {
         }
     }
 
-    @RequestMapping(value="/updateDriverOutages", method = { RequestMethod.POST })
+    @RequestMapping(value="/updateDriverOutages")
     public AjaxResponse updateDriverOutages(@Verify(param = "outageIds",rule = "required")String outageIds,
                                             @Verify(param = "removeReason",rule = "required")String removeReason){
         DriverOutage params = new DriverOutage();

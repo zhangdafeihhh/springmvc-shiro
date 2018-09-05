@@ -34,6 +34,26 @@ public class PageRequest implements Serializable {
     private  int pageSize = 10;
     //分页查询的开始位置
 
+    /** 车管业务字段 */
+    private String sortname;
+    private String sortorder=" desc";
+
+    public String getSortname() {
+        return sortname;
+    }
+
+    public void setSortname(String sortname) {
+        this.sortname = sortname;
+    }
+
+    public String getSortorder() {
+        return sortorder;
+    }
+
+    public void setSortorder(String sortorder) {
+        this.sortorder = sortorder;
+    }
+
     public int getPage() {
         return page;
     }

@@ -8,16 +8,15 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.controller.DriverQueryController;
 import com.zhuanche.dto.rentcar.DriverDutyStatisticDTO;
-import com.zhuanche.entity.mdbcarmanage.DriverDailyReport;
 import com.zhuanche.entity.mdblog.StatisticDutyHalf;
 import com.zhuanche.entity.mdblog.StatisticDutyHalfParams;
-import com.zhuanche.entity.rentcar.DriverDutyStatistic;
-import com.zhuanche.entity.rentcar.DriverDutyStatisticParams;
+import com.zhuanche.entity.mdbcarmanage.DriverDutyStatistic;
+import com.zhuanche.entity.mdbcarmanage.DriverDutyStatisticParams;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import mapper.mdblog.ex.StatisticDutyHalfExMapper;
-import mapper.rentcar.ex.DriverDutyStatisticExMapper;
+import mapper.mdbcarmanage.ex.DriverDutyStatisticExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,7 +34,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -277,13 +275,13 @@ public class DriverDutyStatisticController extends DriverQueryController{
 		String cities = currentLoginUser.getCityIds().toString();
 		String suppliers = currentLoginUser.getSupplierIds().toString();
 		String teamIds = currentLoginUser.getTeamIds().toString();
-		if("".equals(params.getCities())||params.getCities()==null){
+		if("".equals(params.getCityId())||params.getCityId()==null){
 			params.setCities(cities.substring(1, cities.length()-1));
 		}
-		if("".equals(params.getSuppliers())||params.getSuppliers()==null){
+		if("".equals(params.getSupplierId())||params.getSupplierId()==null){
 			params.setSuppliers(suppliers.substring(1, suppliers.length()-1));
 		}
-		if("".equals(params.getTeamIds())||params.getTeamIds()==null){
+		if("".equals(params.getTeamId())||params.getTeamId()==null){
 			params.setTeamIds(teamIds.substring(1, teamIds.length()-1));
 		}
 		return params;

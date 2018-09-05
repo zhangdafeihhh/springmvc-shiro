@@ -3,6 +3,7 @@ package com.zhuanche.controller.driverPreparate;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.entity.DriverPreparate.DriverPreparate;
 import com.zhuanche.serv.driverPreparate.DriverPreparateService;
 import org.apache.commons.lang.StringUtils;
@@ -12,7 +13,6 @@ import org.apache.http.util.TextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,7 +51,9 @@ public class DriverPreparateController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/queryDriverPreparateData")
-	public AjaxResponse queryDriverPreparateData(String orderNo, String driverPhone, String licensePlates,Integer page, Integer pageSize) {
+	public AjaxResponse queryDriverPreparateData(String orderNo, String driverPhone, String licensePlates,
+												 @Verify(param = "page",rule = "required|min(1)") Integer page,
+												 @Verify(param = "pageSize",rule = "required|min(5)") Integer pageSize) {
 
 		if (StringUtils.isEmpty(orderNo) && StringUtils.isEmpty(driverPhone) && StringUtils.isEmpty(licensePlates)){
 			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
@@ -59,6 +61,11 @@ public class DriverPreparateController {
 		Map<String,Object> map =  driverPreparateService.selectList(orderNo, driverPhone, licensePlates, page, pageSize);
 		Integer total = map.get("total") !=null ? Integer.valueOf(map.get("total").toString()) : 0;
 		List<DriverPreparate> list = (List) map.get("list");
+		if (list!=null && list.size() > 0 ){
+			for (DriverPreparate driverPreparate:list) {
+				driverPreparate.setCreateDateStr(TimeStamp2Date(driverPreparate.getCreateDate(), "yyyy-MM-dd HH:mm:ss"));
+			}
+		}
 		PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
 		return AjaxResponse.success(pageDTO);
 	}
@@ -70,10 +77,7 @@ public class DriverPreparateController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/queryDriverPreparateDetails")
-	public AjaxResponse queryOrderDetails(String orderNo) {
-		if (StringUtils.isBlank(orderNo)) {
-			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
-		}
+	public AjaxResponse queryOrderDetails(@Verify(param = "orderNo",rule = "required") String orderNo) {
 		DriverPreparate entity = driverPreparateService.selectDriverPreparateDetail(orderNo);
 		if(entity!=null){
 			entity.setCreateDateStr(TimeStamp2Date(entity.getCreateDate(), "yyyy-MM-dd HH:mm:ss"));
@@ -81,20 +85,21 @@ public class DriverPreparateController {
 		return AjaxResponse.success(entity);
 	}
 
+	@ResponseBody
 	@RequestMapping("/exportException")
-	public void exportException(String fileName, HttpServletRequest request, HttpServletResponse response) {
+	public AjaxResponse exportException(@Verify(param = "fileName",rule = "required") String fileName, HttpServletRequest request, HttpServletResponse response) {
 		log.info("下载司机报备图片");
-		if (StringUtils.isNotEmpty(fileName)) {
-			String[] files = fileName.split(",");
-			if (files != null && files.length > 0) {
-				try {
-					download(request, response, files);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+		String[] files = fileName.split(",");
+		if (files != null && files.length > 0) {
+			try {
+				download(request, response, files);
+				return AjaxResponse.success("下载成功");
+			} catch (Exception e) {
+				e.printStackTrace();
+				return AjaxResponse.fail(RestErrorCode.FILE_EXCEL_REPORT_FAIL);
 			}
 		}
-
+		return AjaxResponse.fail(RestErrorCode.FILE_EXCEL_REPORT_FAIL);
 	}
 
 	public void download(HttpServletRequest request, HttpServletResponse response, String[] files){

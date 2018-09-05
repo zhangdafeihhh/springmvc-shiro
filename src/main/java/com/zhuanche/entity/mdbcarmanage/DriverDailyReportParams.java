@@ -45,6 +45,18 @@ public class DriverDailyReportParams implements Serializable{
 		this.pageSize = pageSize;
 	}
 
+	public DriverDailyReportParams(String driverIds, String statDateStart,
+								   String statDateEnd, String sortName, String sortOrder, Integer page, Integer pageSize) {
+		this.driverIds = driverIds;
+		this.statDateStart = statDateStart;
+		this.statDateEnd = statDateEnd;
+		this.sortName = sortName;
+		this.sortOrder = sortOrder;
+		this.page = page;
+		this.pageSize = pageSize;
+	}
+
+
 	public DriverDailyReportParams() {
 	}
 

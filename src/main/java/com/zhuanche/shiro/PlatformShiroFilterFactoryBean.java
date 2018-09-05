@@ -59,19 +59,18 @@ public class PlatformShiroFilterFactoryBean extends ShiroFilterFactoryBean {
 
 //    @Override
 //    public void setLoginUrl(String loginUrl) {
-//
 //        super.setLoginUrl(loginUrl);
 //    }
-
-    @Override
-    public String getLoginUrl() {
-        if (StringUtils.isNotBlank(desSecret)) {
-            try {
-                return super.getLoginUrl() + "?service=" + DESUtil.encodeHex(localLoginUrl,desSecret);
-            } catch (Exception e) {
-
-            }
-        }
-        return super.getLoginUrl();
-    }
+//
+//    @Override
+//    public String getLoginUrl() {
+//        if (StringUtils.isNotBlank(desSecret)) {
+//            try {
+//                return super.getLoginUrl() + "?service=" + DESUtil.encodeHex(localLoginUrl,desSecret);
+//            } catch (Exception e) {
+//
+//            }
+//        }
+//        return super.getLoginUrl();
+//    }
 }

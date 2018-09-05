@@ -10,5 +10,7 @@ public interface DriverDailyReportExMapper {
 	public List<DriverDailyReport> queryForListObject(DriverDailyReportParams params);
 	
 	public List<DriverDailyReport> queryWeekForListObject(DriverDailyReportParams params);
-	
+
+	public List<DriverDailyReport> queryDriverReportData(DriverDailyReportParams params);
+
 }

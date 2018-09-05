@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.zhuanche.constants.SaasConst;
 import com.zhuanche.util.IdNumberUtil;
 
 public class HttpParamVerifyValidator {
@@ -33,7 +34,8 @@ public class HttpParamVerifyValidator {
 		if(StringUtils.isEmpty(value) ){
 			return null;
 		}
-		String regexp = "^[A-Za-z0-9]+([-_\\.][A-Za-z0-9]+)*@([-A-Za-z0-9]+[\\.])+[A-Za-z0-9]+$";
+//		String regexp = "^[A-Za-z0-9]+([-_\\.][A-Za-z0-9]+)*@([-A-Za-z0-9]+[\\.])+[A-Za-z0-9]+$";
+		String regexp = SaasConst.EMAIL_REGEX;
 		if( ! value.matches(regexp) ) {
 			return "传入值"+value+"，电子邮箱格式错误";
 		}
@@ -44,7 +46,8 @@ public class HttpParamVerifyValidator {
 		if(StringUtils.isEmpty(value) ){
 			return null;
 		}
-		String regexp = "^1(3|4|5|6|7|8|9)[0-9]{9}$";
+//		String regexp = "^1(3|4|5|6|7|8|9)[0-9]{9}$";
+		String regexp = SaasConst.MOBILE_REGEX;
 		if( ! value.matches(regexp) ) {
 			return "传入值"+value+"，手机号码格式错误";
 		}

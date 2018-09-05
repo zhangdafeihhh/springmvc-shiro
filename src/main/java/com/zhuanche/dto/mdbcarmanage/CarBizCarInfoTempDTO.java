@@ -243,8 +243,6 @@ public class CarBizCarInfoTempDTO {
 
     private String clicenseplatescolor;
 
-    private String fueltype;
-
     private String carrypassengers;
 
     private Integer auditingstatus;
@@ -1077,14 +1075,6 @@ public class CarBizCarInfoTempDTO {
 
     public void setClicenseplatescolor(String clicenseplatescolor) {
         this.clicenseplatescolor = clicenseplatescolor;
-    }
-
-    public String getFueltype() {
-        return fueltype;
-    }
-
-    public void setFueltype(String fueltype) {
-        this.fueltype = fueltype;
     }
 
     public String getCarrypassengers() {

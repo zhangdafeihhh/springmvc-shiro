@@ -34,11 +34,7 @@ public final class CustomExceptionResolver implements HandlerExceptionResolver{
 		String exceptionDetail = sw.toString();
 		
 		//1.判断是否为AJAX请求
-		boolean isAjax = false;
-		String XMLHttpRequest = request.getHeader("X-Requested-With");
-		if(XMLHttpRequest!=null && XMLHttpRequest.trim().length()>0){
-			isAjax = true;
-		}
+		Boolean isAjax = (Boolean) request.getAttribute("X_IS_AJAX");
 		//2.根据不同的请求类型，分别返回不同的结果
 		if(isAjax){
 			AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);

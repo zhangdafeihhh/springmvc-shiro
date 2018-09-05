@@ -1,4 +1,4 @@
-package com.zhuanche.entity.rentcar;
+package com.zhuanche.entity.mdbcarmanage;
 
 import com.zhuanche.util.DateUtil;
 import org.apache.commons.lang3.StringUtils;

@@ -67,5 +67,15 @@
 		where 1=1
 		and t.supplier_id = #{supplierId}
 	 </select>
+
+    <select id="querySupplierBySupplierName" resultType="int">
+        select
+        supplier_id
+        from
+        car_biz_supplier
+        where
+        status = 1
+        and supplier_name = #{supplierName}
+    </select>
   
 </mapper>

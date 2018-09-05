@@ -102,8 +102,10 @@ public class UserManagementController {
 			String account , 
 			String userName, 
 			@Verify(param="phone",rule="mobile") String phone , 
-			Integer status ) {
-		PageDTO pageDto = userManagementService.queryUserList(page, pageSize, account, userName, phone, status);
+			Integer status ,
+			Integer roleId 
+			) {
+		PageDTO pageDto = userManagementService.queryUserList(page, pageSize, roleId, account, userName, phone, status);
     	return AjaxResponse.success(pageDto);
 	}
 

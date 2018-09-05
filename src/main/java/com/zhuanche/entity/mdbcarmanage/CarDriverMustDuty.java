@@ -1,8 +1,12 @@
 package com.zhuanche.entity.mdbcarmanage;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class CarDriverMustDuty {
+public class CarDriverMustDuty implements Serializable{
+
+    private static final long serialVersionUID = 1428191786861793376L;
+
     private Integer id;
 
     private Integer city;
@@ -13,9 +17,9 @@ public class CarDriverMustDuty {
 
     private String supplierName;
 
-    private String startdate;
+    private String startDate;
 
-    private String enddate;
+    private String endDate;
 
     private Integer peakTimes;
 
@@ -73,20 +77,20 @@ public class CarDriverMustDuty {
         this.supplierName = supplierName == null ? null : supplierName.trim();
     }
 
-    public String getStartdate() {
-        return startdate;
+    public String getStartDate() {
+        return startDate;
     }
 
-    public void setStartdate(String startdate) {
-        this.startdate = startdate == null ? null : startdate.trim();
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
     }
 
-    public String getEnddate() {
-        return enddate;
+    public String getEndDate() {
+        return endDate;
     }
 
-    public void setEnddate(String enddate) {
-        this.enddate = enddate == null ? null : enddate.trim();
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
 
     public Integer getPeakTimes() {

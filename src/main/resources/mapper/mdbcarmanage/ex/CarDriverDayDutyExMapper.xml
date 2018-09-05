@@ -11,7 +11,7 @@
     <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
     <result column="team_id" property="teamId" jdbcType="INTEGER" />
     <result column="team_name" property="teamName" jdbcType="VARCHAR" />
-    <result column="time" property="time" jdbcType="DATE" />
+    <result column="time" property="time" jdbcType="VARCHAR" />
     <result column="forced_ids" property="forcedIds" jdbcType="VARCHAR" />
     <result column="duty_ids" property="dutyIds" jdbcType="VARCHAR" />
     <result column="forced_times" property="forcedTimes" jdbcType="VARCHAR" />
@@ -19,6 +19,21 @@
     <result column="type" property="type" jdbcType="INTEGER" />
     <result column="status" property="status" jdbcType="INTEGER" />
   </resultMap>
+
+  <insert id="insertDriverDayDutyList" parameterType="java.util.Map">
+    insert into car_driver_day_duty (driver_id,driver_name,
+    city_id,city_name,supplier_id,supplier_name,team_id,team_name,
+    time,forced_ids,duty_ids,
+    forced_times,duty_times,type,status)
+    values
+    <foreach collection="list" item="item" index="index" separator="," >
+      (#{item.driverId},#{item.driverName},#{item.cityId},#{item.cityName},
+      #{item.supplierId},#{item.supplierName},#{item.teamId},
+      #{item.teamName},#{item.time},#{item.forcedIds},#{item.dutyIds},
+      #{item.forcedTimes},#{item.dutyTimes},#{item.type},#{item.status})
+    </foreach>
+
+  </insert>
 
   <select id="getUnIssueCount" resultType="java.lang.Integer"
           parameterType="com.zhuanche.request.DutyParamRequest">
@@ -167,6 +182,9 @@
     <include refid="Base_Column_List" />
     from car_driver_day_duty d
     where 1=1
+    <if test="driverId!=null and driverId!=''">
+      and d.driver_id = #{driverId}
+    </if>
     <if test="driverName!=null and driverName!=''">
       and d.driver_name = #{driverName}
     </if>
@@ -181,7 +199,7 @@
 		]]>
     </if>
     <if test="time!=null and time!=''">
-      and d.time = #{time, jdbcType=TIMESTAMP}
+      and d.time = #{time}
     </if>
     <if test="cityIds!=null and cityIds.size()>0">
       and d.city_id IN

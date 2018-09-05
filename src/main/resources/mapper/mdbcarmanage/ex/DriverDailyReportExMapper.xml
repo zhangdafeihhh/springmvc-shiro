@@ -84,7 +84,7 @@
 	  <if test="statDateEnd !=null and statDateEnd !=''">
 		  <![CDATA[ and DATE_FORMAT(stat_date, '%Y-%m-%d') <= DATE_FORMAT(#{statDateEnd}, '%Y-%m-%d') ]]>
 	  </if> 
-	   <if test="sortName ==null or sortName ==''">
+      <if test="sortName ==null or sortName ==''">
 		  ORDER BY stat_date, driver_id desc
 	  </if> 
 	   <if test="sortName !=null and sortName !=''">
@@ -157,6 +157,34 @@
     <if test="statDateEnd !=null and statDateEnd !=''">
       <![CDATA[ and stat_date <=  #{statDateEnd} ]]>
     </if>
-          group by driver_id
+    group by driver_id
+    <if test="sortName ==null or sortName ==''">
+      ORDER BY stat_date, driver_id desc
+    </if>
+    <if test="sortName !=null and sortName !=''">
+      ORDER BY
+      ${sortName},driver_id ${sortOrder}
+    </if>
+  </select>
+
+  <select id="queryDriverReportData" resultMap="BaseResultMap" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDailyReportParams" >
+    select
+    r.id driverDailyReportId,
+    <include refid="Base_Column_List" />,
+    t.team_name teamName,
+    r.driver_id,
+    (select team_name from car_driver_team tt,car_relate_group gg where tt.id = gg.group_id and gg.driver_id = r.driver_id limit 1) as groupName
+    from driver_daily_report r
+    left join car_driver_team t on t.id = r.car_team_id
+    where r.driver_id = #{driverIds}
+    <![CDATA[ and stat_date >=  #{statDateStart} ]]>
+    <![CDATA[ and stat_date <=  #{statDateEnd} ]]>
+    <if test="sortName ==null or sortName ==''">
+      ORDER BY stat_date, driver_id desc
+    </if>
+    <if test="sortName !=null and sortName !=''">
+      ORDER BY
+      ${sortName},driver_id ${sortOrder}
+    </if>
   </select>
 </mapper>

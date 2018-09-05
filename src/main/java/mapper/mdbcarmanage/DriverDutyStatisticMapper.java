@@ -1,6 +1,6 @@
-package mapper.rentcar;
+package mapper.mdbcarmanage;
 
-import com.zhuanche.entity.rentcar.DriverDutyStatistic;
+import com.zhuanche.entity.mdbcarmanage.DriverDutyStatistic;
 
 public interface DriverDutyStatisticMapper {
     int deleteByPrimaryKey(Integer id);

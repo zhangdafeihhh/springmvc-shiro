@@ -3,6 +3,7 @@ package mapper.rentcar.ex;
 import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
+import com.zhuanche.request.DriverMonthDutyRequest;
 import com.zhuanche.request.DriverTeamRequest;
 import com.zhuanche.request.DutyParamRequest;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
@@ -17,6 +18,12 @@ public interface CarBizDriverInfoExMapper {
     List<CarDriverInfoDTO> queryListByLimits(DriverTeamRequest driverTeamRequest);
 
     CarDriverInfoDTO queryOneDriver(DutyParamRequest dutyParamRequest);
+
+    /** 月排班查询司机详情*/
+    CarDriverInfoDTO selectDriverDetail(String driverId);
+
+    /** 司机月排班查询司机信息列表*/
+    List<CarDriverInfoDTO> queryDriverListForMonthDuty(DriverMonthDutyRequest param);
     /**
      * 查询司机信息列表展示(有分页)
      * @param params

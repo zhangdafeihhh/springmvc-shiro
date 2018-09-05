@@ -105,11 +105,17 @@ public class DriverDailyReportController extends DriverQueryController {
 			statDateEnd = statDateStart;
 		}else if(reportType.equals(1)){
 			//如果是周报，但是开始时间和结束时间不再同一周，不可以
+			if (statDateStart.compareTo(statDateEnd) > 0 ){
+				return AjaxResponse.fail(RestErrorCode.STARTTIME_GREATE_ENDTIME);
+			}
 			if (!DateUtil.isWeekSame(statDateStart,statDateEnd)){
 				return AjaxResponse.fail(RestErrorCode.ONLY_QUERY_WEEK);
 			}
 		}else if (reportType.equals(2)){
 			//如果是月报，但是开始时间和结束时间不再同一月，不可以
+			if (statDateStart.compareTo(statDateEnd) > 0 ){
+				return AjaxResponse.fail(RestErrorCode.STARTTIME_GREATE_ENDTIME);
+			}
 			if (!statDateStart.substring(0,7).equals(statDateEnd.substring(0,7))){
 				return AjaxResponse.fail(RestErrorCode.ONLY_QUERY_ONE_MONTH);
 			}
@@ -146,6 +152,47 @@ public class DriverDailyReportController extends DriverQueryController {
 			}else{
 				list = this.driverDailyReportExMapper.queryWeekForListObject(params);
 			}
+			total = (int) p.getTotal();
+		} finally {
+			PageHelper.clearPage();
+		}
+		//如果不为空，进行查询供应商名称
+		List<DriverDailyReportDTO> dtoList = this.selectSuppierNameAndCityNameDays(list);
+		PageDTO pageDTO = new PageDTO(params.getPage(), params.getPageSize(), total, dtoList);
+		return AjaxResponse.success(pageDTO);
+	}
+
+
+
+	/**
+	 * 周报、月报详情
+	 * @param driverIds 司机id
+	 * @param statDateStart 开始时间
+	 * @param statDateEnd 结束时间
+	 * @param sortName 排序名称
+	 * @param sortOrder 排序顺序
+	 * @param page  当前页
+	 * @param pageSize  页面展示数量
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/queryDriverReportDataDetail")
+	public AjaxResponse queryDriverWeekReportDataNew(@Verify(rule = "required",param = "statDateStart") String driverIds,
+													 @Verify(rule = "required",param = "statDateStart") String statDateStart,
+													 @Verify(rule = "required",param = "statDateEnd") String statDateEnd, String sortName, String sortOrder, Integer page, Integer pageSize){
+		if (statDateStart.compareTo(statDateEnd) > 0 ){
+			return AjaxResponse.fail(RestErrorCode.STARTTIME_GREATE_ENDTIME);
+		}
+		//初始化查询参数
+		DriverDailyReportParams params = new DriverDailyReportParams(driverIds,statDateStart,statDateEnd,sortName,sortOrder,page,pageSize);
+		log.info("司机周报、月报详情列表数据:queryDriverReportDataDetail，参数："+params.toString());
+		int total = 0;
+		//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
+		List<DriverDailyReport> list = null;
+		//开始查询
+		Page<DriverDailyReport> p = PageHelper.startPage(params.getPage(), params.getPageSize());
+		try {
+			list = this.driverDailyReportExMapper.queryDriverReportData(params);
 			total = (int) p.getTotal();
 		} finally {
 			PageHelper.clearPage();
@@ -197,7 +244,7 @@ public class DriverDailyReportController extends DriverQueryController {
 				return AjaxResponse.fail(RestErrorCode.STARTTIME_GREATE_ENDTIME);
 			}
 			//如果是月报，但是开始时间和结束时间不再同一月，不可以
-			if (!statDateStart.substring(7).equals(statDateEnd.substring(7))){
+			if (!statDateStart.substring(0,7).equals(statDateEnd.substring(0,7))){
 				return AjaxResponse.fail(RestErrorCode.ONLY_QUERY_ONE_MONTH);
 			}
 		}

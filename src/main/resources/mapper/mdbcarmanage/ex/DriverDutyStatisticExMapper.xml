@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="mapper.rentcar.ex.DriverDutyStatisticExMapper" >
-  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.DriverDutyStatistic" >
+<mapper namespace="mapper.mdbcarmanage.ex.DriverDutyStatisticExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.DriverDutyStatistic" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="driverId" property="driverid" jdbcType="INTEGER" />
     <result column="licensePlates" property="licenseplates" jdbcType="VARCHAR" />
@@ -29,13 +29,13 @@
   </sql>
 
 
-  <select id="queryForListObject" parameterType="com.zhuanche.entity.rentcar.DriverDutyStatisticParams" resultType="com.zhuanche.entity.rentcar.DriverDutyStatistic">
+  <select id="queryForListObject" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDutyStatisticParams" resultType="com.zhuanche.entity.mdbcarmanage.DriverDutyStatistic">
     select
     <include refid="Base_Column_List" />
-    <!--<if test="value !=null and value !='' and value==1 ">-->
-      <!--,t.dutyTimeAll-->
-      <!--,t.forcedTimeAll-->
-    <!--</if>-->
+    <if test="value !=null and value !='' and value==1 ">
+      ,t.dutyTimeAll
+      ,t.forcedTimeAll
+    </if>
     from ${table} t where 1 =1
     <if test="startTime!=null and startTime!=''">
       and t.time >= #{startTime}
@@ -83,7 +83,7 @@
   </select>
 
 
-  <select id="queryDriverMonthDutyList" parameterType="com.zhuanche.entity.rentcar.DriverDutyStatisticParams" resultType="com.zhuanche.entity.rentcar.DriverDutyStatistic">
+  <select id="queryDriverMonthDutyList" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDutyStatisticParams" resultType="com.zhuanche.entity.mdbcarmanage.DriverDutyStatistic">
     SELECT
     t.id,
     t.driverId,
@@ -103,10 +103,10 @@
     sum(IFNULL(t.forcedTime3, 0)) forcedTime3,
     sum(IFNULL(t.forcedTime4, 0)) forcedTime4,
     t.supplierId
-    <!--<if test="value !=null and value !='' and value==1 ">-->
-      <!--,sum(IFNULL(t.dutyTimeAll, 0)) dutyTimeAll-->
-      <!--,sum(IFNULL(t.forcedTimeAll, 0)) forcedTimeAll-->
-    <!--</if>-->
+    <if test="value !=null and value !='' and value==1 ">
+      ,sum(IFNULL(t.dutyTimeAll, 0)) dutyTimeAll
+      ,sum(IFNULL(t.forcedTimeAll, 0)) forcedTimeAll
+    </if>
     FROM
     ${table} t where 1=1
     <if test="name!=null and name!=''">
