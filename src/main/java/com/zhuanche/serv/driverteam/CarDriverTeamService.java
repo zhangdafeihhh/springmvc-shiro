@@ -176,14 +176,14 @@ public class CarDriverTeamService{
 					logger.info("该车队/小组"+ driverTeamRequest.getTeamId()+"下没有司机");
 					return null;
 				}
-				Set<String> driverIdsAll = citySupplierTeamCommonService.dealDriverids(carRelateTeams, CarRelateTeam.class);
+				Set<String> driverIdsAll = citySupplierTeamCommonService.dealDriverids(carRelateTeams, CarRelateTeam.class,"driverId");
 				//2.查询小组所属车队下其他小组以及绑定的司机关联
 				List<CarDriverTeam> carDriverTeams = carDriverTeamExMapper.queryForListByPid(driverTeamRequest);
 				//2.1 车队有几个小组，查询小组下绑定的司机
-				Set<String> teamIds = citySupplierTeamCommonService.dealDriverids(carDriverTeams,CarDriverTeam.class);
+				Set<String> teamIds = citySupplierTeamCommonService.dealDriverids(carDriverTeams,CarDriverTeam.class,"driverId");
 				teamGroupRequest.setGroupIds(teamIds);
 				List<CarRelateGroup> carRelateGroups = carRelateGroupExMapper.queryDriverGroupRelationList(teamGroupRequest);
-				Set<String> existsGroups = citySupplierTeamCommonService.dealDriverids(carRelateGroups, CarRelateGroup.class);
+				Set<String> existsGroups = citySupplierTeamCommonService.dealDriverids(carRelateGroups, CarRelateGroup.class,"driverId");
 				//去掉其他小组绑定的司机
 				driverIdsAll.removeAll(existsGroups);
 				if(Check.NuNCollection(driverIdsAll)){
@@ -209,13 +209,13 @@ public class CarDriverTeamService{
 					logger.info("该车队/小组"+ driverTeamRequest.getTeamId()+"下没有司机");
 					return null;
 				}
-				Set<String> driverIdsAll = citySupplierTeamCommonService.dealDriverids(limitsDrivers, CarDriverInfoDTO.class);
+				Set<String> driverIdsAll = citySupplierTeamCommonService.dealDriverids(limitsDrivers, CarDriverInfoDTO.class,"driverId");
 				//查询同级车队绑定了多少司机
 				List<CarDriverTeam> carDriverTeams = carDriverTeamExMapper.queryDriverTeam(null, null, null);
-				Set<String> teamIds = citySupplierTeamCommonService.dealDriverids(carDriverTeams,CarDriverTeam.class);
+				Set<String> teamIds = citySupplierTeamCommonService.dealDriverids(carDriverTeams,CarDriverTeam.class,"id");
 				teamGroupRequest.setTeamIds(teamIds);
 				List<CarRelateTeam> carRelateTeams = carRelateTeamExMapper.queryDriverTeamRelationList(teamGroupRequest);
-				Set<String> teamDrivers = citySupplierTeamCommonService.dealDriverids(carRelateTeams, CarRelateTeam.class);
+				Set<String> teamDrivers = citySupplierTeamCommonService.dealDriverids(carRelateTeams, CarRelateTeam.class,"driverId");
 				//去掉其他车队绑定的司机
 				driverIdsAll.removeAll(teamDrivers);
 				driverTeamRequest.setDriverIds(driverIdsAll);
@@ -269,9 +269,9 @@ public class CarDriverTeamService{
 				logger.info("该车队/小组"+ driverTeamRequest.getTeamId()+"下没有司机");
 				return null;
 			}else if(Check.NuNCollection(groups)){
-				driverIds = citySupplierTeamCommonService.dealDriverids(teams,CarRelateTeam.class);
+				driverIds = citySupplierTeamCommonService.dealDriverids(teams,CarRelateTeam.class,"driverId");
 			}else if(Check.NuNCollection(teams)){
-				driverIds = citySupplierTeamCommonService.dealDriverids(groups,CarRelateGroup.class);
+				driverIds = citySupplierTeamCommonService.dealDriverids(groups,CarRelateGroup.class,"driverId");
 			}else{
 				logger.info("该车队/小组"+ driverTeamRequest.getTeamId()+"司机信息异常");
 				return null;
@@ -427,7 +427,7 @@ public class CarDriverTeamService{
 	} )
 	public PageDTO queryDriverTeamPage(DriverTeamRequest driverTeamRequest) {
 		if(Check.NuNObj(driverTeamRequest)){
-			return null;
+			return new PageDTO();
 		}
 		logger.info("查询车队入参:{}"+ JSON.toJSONString(driverTeamRequest));
 
@@ -435,6 +435,9 @@ public class CarDriverTeamService{
 		BeanUtils.copyProperties(driverTeamRequest,paramRequest);
 
 		final CommonRequest commonRequest = citySupplierTeamCommonService.paramDeal(paramRequest);
+		if(Check.NuNObj(commonRequest)){
+			return new PageDTO();
+		}
 		//B----------------------------------------------------------------------------------进行分页查询
 		PageDTO pageDTO = new PageDTO();
 		int total = 0;
