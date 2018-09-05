@@ -297,14 +297,11 @@ public class CarInfoController {
         params.setLicensePlates1(licensePlates1);
         params.setOldCity(oldCity);
         params.setOldSupplierId(oldSupplierId);
-        try{
-            params.setNextOperationDate( sdf.parse(nextOperationDate) );
-            params.setNextSecurityDate( sdf.parse(nextSecurityDate));
-            params.setNextClassDate( sdf.parse(nextClassDate));
-            params.setTwoLevelMaintenanceDate( sdf.parse(twoLevelMaintenanceDate));
-        } catch (Exception e){
-            logger.error("日期类型格式错误，e={}" + e);
-        }
+
+        params.setNextOperationDate( nextOperationDate );
+        params.setNextSecurityDate( nextSecurityDate);
+        params.setNextClassDate( nextClassDate);
+        params.setTwoLevelMaintenanceDate( twoLevelMaintenanceDate);
 
         Map<String, Object> result = new HashMap<String, Object>();
         try {
