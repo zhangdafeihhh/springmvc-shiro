@@ -228,7 +228,7 @@
       <if test="mac != null">
         mac,
       </if>
-      <if test="photosrct != null">
+      <if test="photoSrct != null">
         photoSrct,
       </if>
       <if test="pushId != null">
@@ -539,8 +539,8 @@
       <if test="mac != null">
         #{mac,jdbcType=VARCHAR},
       </if>
-      <if test="photosrct != null">
-        #{photosrct,jdbcType=VARCHAR},
+      <if test="photoSrct != null">
+        #{photoSrct,jdbcType=VARCHAR},
       </if>
       <if test="pushId != null">
         #{pushId,jdbcType=VARCHAR},
@@ -853,8 +853,8 @@
       <if test="mac != null">
         mac = #{mac,jdbcType=VARCHAR},
       </if>
-      <if test="photosrct != null">
-        photoSrct = #{photosrct,jdbcType=VARCHAR},
+      <if test="photoSrct != null">
+        photoSrct = #{photoSrct,jdbcType=VARCHAR},
       </if>
       <if test="pushId != null">
         push_id = #{pushId,jdbcType=VARCHAR},

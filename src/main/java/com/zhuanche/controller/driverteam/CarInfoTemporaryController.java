@@ -384,7 +384,7 @@ public class CarInfoTemporaryController extends BaseController {
      * @param gpsType 卫星定位装置型号
      * @param gpsImei 卫星定位装置IMEI号
      * @param gpsDate 卫星定位设备安装日期(格式:yyyy-MM-dd)
-     * @param licensePlates1 旧的车牌号
+     * @param oldLicensePlates 旧的车牌号
      * @param oldCity 旧城市Id
      * @param oldSupplierId 旧的供应商Id
      * @return
@@ -432,8 +432,8 @@ public class CarInfoTemporaryController extends BaseController {
                                     @Verify(param = "gpsType",rule="required") String gpsType,
                                     @Verify(param = "gpsImei",rule="required") String gpsImei,
                                     @Verify(param = "gpsDate",rule="required") String gpsDate,
-                                    @RequestParam(value = "purchaseDate",required = false) String memo,
-                                    @Verify(param = "licensePlates1",rule="required") String licensePlates1,
+                                    @RequestParam(value = "memo",required = false) String memo,
+                                    @Verify(param = "oldLicensePlates",rule="required") String oldLicensePlates,
                                     @Verify(param = "oldCity",rule="required") Integer oldCity,
                                     @Verify(param = "oldSupplierId",rule="required") Integer oldSupplierId) {
         log.error("修改Id:"+carId);
@@ -480,7 +480,7 @@ public class CarInfoTemporaryController extends BaseController {
         carBizCarInfoTemp.setGpsImei(gpsImei);
         carBizCarInfoTemp.setGpsDate(gpsDate);
         carBizCarInfoTemp.setMemo(memo);
-        carBizCarInfoTemp.setLicensePlates1(licensePlates1);
+        carBizCarInfoTemp.setOldLicensePlates(oldLicensePlates);
         carBizCarInfoTemp.setOldCity(oldCity);
         carBizCarInfoTemp.setOldSupplierId(oldSupplierId);
         SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
