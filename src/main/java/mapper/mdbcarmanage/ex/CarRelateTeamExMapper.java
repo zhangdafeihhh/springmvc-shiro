@@ -17,6 +17,20 @@ public interface CarRelateTeamExMapper {
     CarRelateTeam selectOneTeam(CarRelateTeam carRelateTeam);
 
     /**
+     * 根据司机ID删除
+     * @param driverId
+     * @return
+     */
+    int deleteByDriverId(@Param("driverId") Integer driverId);
+
+    /**
+     * 查询所给车队ID下的所有司机ID
+     * @param teamId
+     * @param teamIds
+     * @return
+     */
+    List<Integer> queryDriverIdsByTeamId(@Param("teamId") Integer teamId, @Param("teamIds") Set<Integer> teamIds);
+    /**
      * <p>Title: queryListByTeamId</p>
      * <p>Description: 通过车队id查询关联关系，参数格式要求('','','')</p>
      * @param teamIds

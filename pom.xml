@@ -273,8 +273,6 @@
 			<artifactId>spring-data-mongodb</artifactId>
 			<version>1.8.2.RELEASE</version>
 		</dependency>
-
-
 		<dependency>
 			<groupId>com.baidu.lbsyun</groupId>
 			<artifactId>lbsyun</artifactId>
@@ -282,6 +280,18 @@
 		</dependency>
 		<!--springdata-mongo~~~~~~~~END~~~~~~~~~-->
 
+		<!--调用块钱 ~~~~~~START~~~~~~~-->
+		<dependency>
+			<groupId>com.bill99</groupId>
+			<artifactId>quick-pay</artifactId>
+			<version>test</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.25</version>
+		</dependency>
+		<!--调用块钱~~~~~~~~END~~~~~~~~~-->
 	</dependencies>
 
 	<!-- 多环境配置BEGIN -->

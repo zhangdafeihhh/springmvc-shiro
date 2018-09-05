@@ -14,6 +14,8 @@ public class CarDriverInfoDTO implements Serializable{
 
     private String carGroupName;
 
+    private Integer cooperationType;
+
     private Integer groupId;
 
     private String name;
@@ -31,6 +33,8 @@ public class CarDriverInfoDTO implements Serializable{
     private String createByName;
 
     private String updateByName;
+
+    private String updateBy;
 
     private String idCardNo;
 
@@ -55,6 +59,8 @@ public class CarDriverInfoDTO implements Serializable{
 
     private String updateDateStr;
 
+    private String createDate;
+
     /** 扩展字段*/
     private String teamName;
 
@@ -74,6 +80,30 @@ public class CarDriverInfoDTO implements Serializable{
     private Integer cityId;
 
     private Integer supplierId;
+
+    public String getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(String createDate) {
+        this.createDate = createDate;
+    }
+
+    public Integer getCooperationType() {
+        return cooperationType;
+    }
+
+    public void setCooperationType(Integer cooperationType) {
+        this.cooperationType = cooperationType;
+    }
+
+    public String getUpdateBy() {
+        return updateBy;
+    }
+
+    public void setUpdateBy(String updateBy) {
+        this.updateBy = updateBy;
+    }
 
     public Integer getSupplierId() {
         return supplierId;

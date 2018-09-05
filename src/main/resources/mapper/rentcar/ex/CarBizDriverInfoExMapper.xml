@@ -102,7 +102,7 @@
     <result column="account_type" property="accountType" jdbcType="INTEGER" />
     <result column="group_id" property="groupId" jdbcType="INTEGER" />
   </resultMap>
-  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizDriverInfo" extends="BaseResultMap" >
+  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.dto.rentcar.CarBizDriverInfoDTO" extends="BaseResultMap" >
     <result column="english_name" property="englishName" jdbcType="VARCHAR" />
     <result column="contract_type" property="contractType" jdbcType="VARCHAR" />
     <result column="contract_no" property="contractNo" jdbcType="VARCHAR" />
@@ -139,6 +139,30 @@
   <sql id="Blob_Column_List" >
     memo
   </sql>
+
+  <!--查询司机部分信息（只供更改车队是调用）-->
+  <select id="selectDriverInfoByDriverId" parameterType="java.lang.Integer" resultType="com.zhuanche.dto.CarDriverInfoDTO">
+    SELECT
+    i.driver_id AS driverId,
+    i.phone AS phone,
+    i.NAME AS name,
+    i.license_plates AS licensePlates,
+    i.cooperation_type AS cooperationType,
+    i.group_id AS groupId,
+    g.group_name AS carGroupName,
+    i.service_city as serviceCityId,
+    c.city_name AS cityName,
+    i.supplier_id AS supplierId,
+    p.supplier_full_name AS supplierName,
+    i.STATUS AS status,
+    i.update_by AS updateBy,
+    DATE_FORMAT(i.create_date,'%Y-%m-%d %H:%i:%s') AS createDate
+    FROM car_biz_driver_info i
+    LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+    LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+    LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+    where i.driver_id= #{driverId}
+  </select>
 
   <select id="queryDriverListForMonthDuty" parameterType="com.zhuanche.request.DriverMonthDutyRequest" resultType="com.zhuanche.dto.CarDriverInfoDTO">
     SELECT
@@ -418,17 +442,7 @@
       </if>
     </trim>
   </sql>
-
   <select id="queryDriverList" resultMap="ResultMapWithBLOBs" >
-    select
-    <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
-    from car_biz_driver_info
-    <include refid="allBaseColumnWhereList"/>
-    order by create_date desc
-  </select>
-  <select id="queryDriverListNoLimit" resultMap="ResultMapWithBLOBs" >
     select
     <include refid="Base_Column_List" />
     ,
@@ -1434,4 +1448,42 @@
             <![CDATA[ and driver_id <> #{driverId}  ]]>
         </if>
     </select>
+  <!-- 解绑司机信用卡，更新 -->
+  <update id="updateDriverCardInfo" parameterType="java.util.Map">
+    UPDATE car_biz_driver_info
+    SET name=name, update_date = now()
+    <if test="quickpayCustomerid!=null">
+      ,quickpay_customerid = #{quickpayCustomerid}
+    </if>
+    <if test="creditOpenAccountBank!=null">
+      ,credit_open_account_bank = #{creditOpenAccountBank}
+    </if>
+    <if test="shortCardNo!=null">
+      ,storable_card_no = #{shortCardNo}
+    </if>
+    <if test="isBindingCreditCard!=null">
+      ,is_binding_credit_card = #{isBindingCreditCard}
+    </if>
+    <if test="creditCardNo!=null">
+      ,credit_card_no = #{creditCardNo}
+    </if>
+    <if test="CVN2!=null">
+      ,credit_CVN2 = #{CVN2}
+    </if>
+    <if test="updateBy!=null and updateBy!=''">
+      ,update_by = #{updateBy}
+    </if>
+    <if test="expireDate!=null">
+      ,credit_card_period_of_validity = #{expireDate}
+    </if>
+    <if test="bindTime!=null">
+      ,credit_bind_date = #{bindTime}
+    </if>
+    WHERE driver_id = #{driverId}
+  </update>
+  <update id="updateDriverCustomerId" parameterType="java.util.Map">
+    UPDATE car_biz_driver_info
+    SET uickpay_customerid = #{quickpayCustomerID}
+    WHERE driver_id = #{driverID}
+  </update>
 </mapper>

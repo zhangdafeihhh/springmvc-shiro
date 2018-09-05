@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.shiro.cache.Cache;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.session.mgt.eis.CachingSessionDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -66,7 +68,8 @@ public class RedisSessionDAO extends CachingSessionDAO{
 
     @Override
     protected Session doReadSession(Serializable sessionId) {
-        return (Session)redisTemplate.opsForValue().get(KEY_PREFIX_OF_SESSION+sessionId);
+        Session session = (Session)redisTemplate.opsForValue().get(KEY_PREFIX_OF_SESSION+sessionId);
+        return session;
 //    	return (Session) RedisCacheUtil.get(SESSION_KEY+sessionId, SimpleSession.class );
     }
     
@@ -83,6 +86,7 @@ public class RedisSessionDAO extends CachingSessionDAO{
     }
     /**二、当权限信息、角色信息、用户信息发生变化时，同时清理与之相关联的会话**/
     public void clearRelativeSession( final Integer permissionId, final  Integer roleId, final  Integer userId ) {
+    	final Cache<Serializable, Session> cache = super.getActiveSessionsCache();
     	new Thread(new Runnable() {
 			@SuppressWarnings("unchecked")
 			@Override
@@ -110,21 +114,32 @@ public class RedisSessionDAO extends CachingSessionDAO{
 			    	if(userIds.size()>0) {
 			    		accounts = carAdmUserExMapper.queryAccountsOfUsers(userIds);
 			    	}
-			    	//最后，汇总需要清理的REDIS KEY
+			    	//D：汇总需要清理的REDIS KEY 和 sessionId
 			    	if(accounts.size() ==0) {
 			    		return;
 			    	}
 			    	Set<String> redisKeysNeedDelete = new HashSet<String>();//这是需要清除的所有REDIS KEY
+			    	Set<String> allSessionIds              = new HashSet<String>();//这是需要清除的所有的sessionId
 			    	for( String account : accounts) {
 			    		redisKeysNeedDelete.add( KEY_PREFIX_OF_SESSIONID + account );
-			        	Set<String> allSessionIds =  (Set<String>) redisTemplate.opsForValue().get(KEY_PREFIX_OF_SESSIONID+account);
-			        	if(allSessionIds!=null && allSessionIds.size()>0) {
-			        		for(String sessionId : allSessionIds ){
-			            		redisKeysNeedDelete.add( KEY_PREFIX_OF_SESSION + sessionId );
-			        		}
+			        	Set<String> sessionIds  =  (Set<String>) redisTemplate.opsForValue().get(KEY_PREFIX_OF_SESSIONID+account);
+			        	if(sessionIds!=null && sessionIds.size()>0) {
+			        		allSessionIds.addAll(sessionIds);
 			        	}
 			    	}
+			    	//E1：执行清除Redis key
+			    	for( String sessionId : allSessionIds) {
+	            		redisKeysNeedDelete.add( KEY_PREFIX_OF_SESSION + sessionId );
+			    	}
 			    	redisTemplate.delete(redisKeysNeedDelete);
+			    	//E2：执行清理EHCACHE的内存缓存
+	        		for(String sessionId : allSessionIds ){
+	        			SimpleSession session = (SimpleSession)cache.get(sessionId);
+	        			if(session!=null) {
+		        			session.setExpired(true);
+	        			}
+	        			cache.remove(sessionId);
+	        		}
 				}catch(Exception ex) {
 				}finally {
 					DynamicRoutingDataSource.setDefault("mdbcarmanage-DataSource");

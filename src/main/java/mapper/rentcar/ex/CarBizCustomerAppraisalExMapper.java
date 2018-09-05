@@ -8,7 +8,9 @@ import java.util.List;
 
 public interface CarBizCustomerAppraisalExMapper {
 
-    List<CarBizCustomerAppraisalDTO> queryCustomerAppraisalList(Integer appraisalId);
+    List<CarBizCustomerAppraisalDTO> queryCustomerAppraisalList(CarBizCustomerAppraisalDTO carBizCustomerAppraisalDTO);
+
+    List<CarBizCustomerAppraisalDTO> queryDriverAppraisalDetail(CarBizCustomerAppraisalDTO carBizCustomerAppraisalDTO);
 
     public List<CarBizCustomerAppraisal> queryForListObject(CarBizCustomerAppraisalParams params);
 

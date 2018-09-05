@@ -8,6 +8,9 @@ import java.util.Date;
  * car_biz_driver_info
  */
 public class CarBizDriverInfoDTO extends Base {
+
+    private static final long serialVersionUID = 4959453183678167556L;
+
     private Integer driverId;
 
     private String password;

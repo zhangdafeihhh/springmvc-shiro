@@ -10,7 +10,7 @@
     relation_id, team_id, driver_id
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select
+    select 
     <include refid="Base_Column_List" />
     from car_relate_team
     where relation_id = #{relationId,jdbcType=INTEGER}
@@ -61,6 +61,23 @@
     </if>
     <if test="driverId!=null and driverId!=''">
       AND driver_id = #{driverId}
+    </if>
+  </select>
+  <delete id="deleteByDriverId" parameterType="java.lang.Integer" >
+    delete from car_relate_team
+    where driver_id = #{driverId,jdbcType=INTEGER}
+  </delete>
+
+  <!--查询所给车队ID下的所有司机ID-->
+  <select id="queryDriverIdsByTeamId" resultType="java.lang.Integer" >
+    SELECT driver_id
+    FROM car_relate_team
+    WHERE team_id = #{teamId}
+    <if test="teamIds!=null and teamIds.size()>0">
+      and team_id IN
+      <foreach collection="teamIds" open="(" close=")" separator="," item="tid" >
+        #{tid}
+      </foreach>
     </if>
   </select>
 

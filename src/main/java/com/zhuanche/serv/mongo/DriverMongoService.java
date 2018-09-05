@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * @ClassName: DriverMongoServiceImpl
@@ -156,114 +157,14 @@ public class DriverMongoService {
 		update.set("superintendUrl", carBizDriverInfo.getSuperintendUrl());
 		update.set("cooperationType", carBizDriverInfo.getCooperationType());
 		driverMongoTemplate.updateFirst(query, update, DriverMongo.class);
-//		DriverMongo driverMongo = new DriverMongo();
-//		driverMongo.setGroupId(carBizDriverInfo.getGroupId());
-//		driverMongo.setGroupName(carBizDriverInfo.getCarGroupName());
-//		driverMongo.setModelId(carBizDriverInfo.getModelId());
-//		driverMongo.setModelName(carBizDriverInfo.getModelName());
-//		driverMongo.setDriverId(carBizDriverInfo.getDriverId());
-//		driverMongo.setPhotoSrc(carBizDriverInfo.getPhotosrct());
-//		driverMongo.setAge(carBizDriverInfo.getAge());
-//		driverMongo.setAccountBank(carBizDriverInfo.getAccountBank());
-//		driverMongo.setArchivesNo(carBizDriverInfo.getArchivesNo());
-//		driverMongo.setAttachmentAddr(carBizDriverInfo.getAttachmentAddr());
-//		driverMongo.setAttachmentName(carBizDriverInfo.getAttachmentName());
-//		driverMongo.setBankAccountNo(carBizDriverInfo.getBankAccountNo());
-//		driverMongo.setUpdateBy(carBizDriverInfo.getUpdateBy());
-//		driverMongo.setUpdateDate(carBizDriverInfo.getUpdateDate());
-//		driverMongo.setDrivingLicenseType(carBizDriverInfo.getDrivingLicenseType());
-//		driverMongo.setDrivingYears(carBizDriverInfo.getDrivingYears());
-//		driverMongo.setGender(carBizDriverInfo.getGender());
-//		driverMongo.setIdCardNo(carBizDriverInfo.getIdCardNo());
-//		driverMongo.setLicensePlates(carBizDriverInfo.getLicensePlates());
-//		driverMongo.setName(carBizDriverInfo.getName());
-//		driverMongo.setPhone(carBizDriverInfo.getPhone());
-//		driverMongo.setServiceCityName(carBizDriverInfo.getCityName());
-//		driverMongo.setServiceCityId(carBizDriverInfo.getServiceCity());
-//		driverMongo.setSupplierId(carBizDriverInfo.getSupplierId());
-//		driverMongo.setStatus(carBizDriverInfo.getStatus());
-//		driverMongo.setSuperintendNo(carBizDriverInfo.getSuperintendNo());
-//		driverMongo.setSuperintendUrl(carBizDriverInfo.getSuperintendUrl());
-//		driverMongo.setCooperationType(carBizDriverInfo.getCooperationType());
-//
-//		// 更新mongoDB
-//		Query query = new Query(Criteria.where("driverId").is(carBizDriverInfo.getDriverId()));
-//		Update update = new Update();
-//		if (driverMongo.getGroupName() != null) {
-//			update.set("modelName", driverMongo.getModelName());
-//		}
-//		if (driverMongo.getAge() != null) {
-//			update.set("age", driverMongo.getAge());
-//		}
-//		if (driverMongo.getArchivesNo() != null) {
-//			update.set("archivesNo", driverMongo.getArchivesNo());
-//		}
-//		update.set("superintendNo", driverMongo.getSuperintendNo());
-//		update.set("superintendUrl", driverMongo.getSuperintendUrl());
-//		if (driverMongo.getAttachmentAddr() != null) {
-//			update.set("attachmentAddr", driverMongo.getAttachmentAddr());
-//		}
-//		if (driverMongo.getAttachmentName() != null) {
-//			update.set("attachmentName", driverMongo.getAttachmentName());
-//		}
-//		if (driverMongo.getUpdateBy() != null) {
-//			update.set("updateBy", driverMongo.getUpdateBy());
-//		}
-//		if (driverMongo.getUpdateDate() != null) {
-//			update.set("updateDate", driverMongo.getUpdateDate());
-//		}
-//		if (driverMongo.getDrivingLicenseType() != null) {
-//			update.set("drivingLicenseType", driverMongo.getDrivingLicenseType());
-//		}
-//		if (driverMongo.getDrivingYears() != null) {
-//			update.set("drivingYears", driverMongo.getDrivingYears());
-//		}
-//		if (driverMongo.getExpireDate() != null) {
-//			update.set("expireDate", driverMongo.getExpireDate());
-//		}
-//		if (driverMongo.getGender() != null) {
-//			update.set("gender", driverMongo.getGender());
-//		}
-//		if (driverMongo.getIdCardNo() != null) {
-//			update.set("idCardNo", driverMongo.getIdCardNo());
-//		}
-//		if (driverMongo.getIssueDate() != null) {
-//			update.set("issueDate", driverMongo.getIssueDate());
-//		}
-//		if(driverMongo.getGroupId()!=null&&!"".equals(driverMongo.getGroupId())&&driverMongo.getGroupId()!=0){
-//			update.set("groupId", driverMongo.getGroupId());
-//			update.set("groupName", driverMongo.getGroupName());
-//		}
-//		if (driverMongo.getLicensePlates() != null) {
-//			update.set("licensePlates", driverMongo.getLicensePlates());
-//			update.set("modelId", driverMongo.getModelId());
-//		}
-//		if (driverMongo.getName() != null) {
-//			update.set("name", driverMongo.getName());
-//		}
-//		if (driverMongo.getPhone() != null) {
-//			if(driverMongo.getStatus() != 0){
-//				update.set("phone", driverMongo.getPhone());
-//			}else{
-//				update.set("phone", "");
-//			}
-//		}
-//		if (driverMongo.getStatus() != null) {
-//			update.set("status", driverMongo.getStatus());
-//		}
-//		if (driverMongo.getPhotoSrc() != null) {
-//			update.set("photoSrc", driverMongo.getPhotoSrc());
-//		}
-//		update.set("serviceCityId", driverMongo.getServiceCityId());
-//		update.set("serviceCityName", driverMongo.getServiceCityName());
-//		update.set("superintendNo", driverMongo.getSuperintendNo());
-//		update.set("supplierId", driverMongo.getSupplierId());
-//		update.set("superintendUrl", driverMongo.getSuperintendUrl());
-//		update.set("cooperationType", driverMongo.getCooperationType());
-//		driverMongoTemplate.updateFirst(query, update, DriverMongo.class);
 	}
 
 
+	/**
+	 * 更新司机
+	 * @param driverId
+	 * @param status
+	 */
 	public void updateByDriverId(Integer driverId, Integer status) {
 		Query query = new Query(Criteria.where("driverId").is(driverId));
 		Update update = new Update();
@@ -277,5 +178,25 @@ public class DriverMongoService {
 			update.set("modelName", null);
 		}
 		driverMongoTemplate.updateFirst(query, update, DriverMongo.class);
+	}
+
+	/**
+	 * 更新司机信用卡信息
+	 * @param map
+	 */
+	public void updateDriverCardInfo (Map<String, Object> map) {
+		// 更新mongoDB
+		Query query = new Query(Criteria.where("driverId").is(Integer.parseInt((String)map.get("driverId"))));
+		Update update = new Update();
+		update.set("updateBy", map.get("updateBy"));
+		update.set("creditOpenAccountBank", map.get("creditOpenAccountBank"));
+		update.set("shortCardNo", map.get("shortCardNo"));
+		update.set("isBindingCreditCard", map.get("isBindingCreditCard"));
+		update.set("creditCardNo", map.get("creditCardNo"));
+		update.set("CVN2", map.get("CVN2"));
+		update.set("phone", map.get("phone"));
+		update.set("bindTime", map.get("bindTime"));
+		update.set("expireDate", map.get("expireDate"));
+		driverMongoTemplate.updateFirst(query, update,DriverMongo.class);
 	}
 }

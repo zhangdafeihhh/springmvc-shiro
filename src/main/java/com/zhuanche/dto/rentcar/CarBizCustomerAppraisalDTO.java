@@ -1,6 +1,7 @@
 package com.zhuanche.dto.rentcar;
 
 import com.zhuanche.entity.common.Base;
+
 import java.util.Date;
 
 public class CarBizCustomerAppraisalDTO extends Base {
@@ -55,12 +56,14 @@ public class CarBizCustomerAppraisalDTO extends Base {
 
     private String pointbd;
 
-    private String driverName;
-
-    private String DriverPhone;
-
+    //查询条件
+    private Integer cityId;
+    private Integer supplierId;
+    private String name;
+    private String phone;
     private String licensePlates;
-
+    private String createDateBegin;
+    private String createDateEnd;
 
     public Integer getAppraisalId() {
         return appraisalId;
@@ -252,5 +255,61 @@ public class CarBizCustomerAppraisalDTO extends Base {
 
     public void setPointbd(String pointbd) {
         this.pointbd = pointbd == null ? null : pointbd.trim();
+    }
+
+    public Integer getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(Integer cityId) {
+        this.cityId = cityId;
+    }
+
+    public Integer getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(Integer supplierId) {
+        this.supplierId = supplierId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getLicensePlates() {
+        return licensePlates;
+    }
+
+    public void setLicensePlates(String licensePlates) {
+        this.licensePlates = licensePlates;
+    }
+
+    public String getCreateDateBegin() {
+        return createDateBegin;
+    }
+
+    public void setCreateDateBegin(String createDateBegin) {
+        this.createDateBegin = createDateBegin;
+    }
+
+    public String getCreateDateEnd() {
+        return createDateEnd;
+    }
+
+    public void setCreateDateEnd(String createDateEnd) {
+        this.createDateEnd = createDateEnd;
     }
 }

@@ -23,7 +23,7 @@
     rt.group_id AS groupId,
     rt.driver_id AS driverId,
     t.team_name groupName
-    from car_relate_group
+    from car_relate_group rt
     LEFT JOIN car_driver_team t ON t.id = rt.group_id
     where
     driver_id = #{driverId,jdbcType=INTEGER}
@@ -54,6 +54,18 @@
         #{gid}
       </foreach>
     </if>
+  </select>
+  <delete id="deleteByDriverId" parameterType="java.lang.Integer" >
+    delete from car_relate_group
+    where driver_id = #{driverId,jdbcType=INTEGER}
+  </delete>
+
+  <!--查询所给小组ID下的所有司机ID-->
+  <select id="queryDriverIdsByGroupId" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+    SELECT
+    driver_id
+    FROM car_relate_group
+    WHERE  group_id = #{groupId}
   </select>
 
  	<select id="queryByParams" parameterType="com.zhuanche.entity.mdbcarmanage.CarRelateGroup" resultType="com.zhuanche.entity.mdbcarmanage.CarRelateGroup">

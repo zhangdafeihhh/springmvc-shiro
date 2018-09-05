@@ -17,8 +17,10 @@ import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.serv.*;
+import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.*;
 
 @Controller
@@ -44,8 +47,11 @@ public class DriverInfoController {
     @Autowired
     private CarBizDriverInfoDetailService carBizDriverInfoDetailService;
 
+    @Autowired
+    private CarDriverTeamService carDriverTeamService;
+
     /**
-     * 司机信息列表
+     * 司机信息列表（有分页）
      * @param name 司机姓名
      * @param phone 司机手机号
      * @param licensePlates 车牌号
@@ -63,20 +69,34 @@ public class DriverInfoController {
      * @param pageSize 取N条，默认20
      * @return
      */
+    @ResponseBody
     @RequestMapping(value = "/findDriverList")
     @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
     public AjaxResponse findDriverList(String name, String phone, String licensePlates, Integer status, Integer cityId, Integer supplierId,
             Integer teamId, Integer teamGroupId, Integer groupId, Integer cooperationType, String imei, String idCardNo, Integer isImage,
             @RequestParam(value="page", defaultValue="0")Integer page,
             @RequestParam(value="pageSize", defaultValue="20")Integer pageSize) {
 
-        //TODO 数据权限控制SSOLoginUser
+        // 数据权限控制SSOLoginUser
+        Set<Integer> permOfCity        = WebSessionUtil.getCurrentLoginUser().getCityIds(); //普通管理员可以管理的所有城市ID
+        Set<Integer> permOfSupplier    = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); //普通管理员可以管理的所有供应商ID
+        Set<Integer> permOfTeam        = WebSessionUtil.getCurrentLoginUser().getTeamIds(); //普通管理员可以管理的所有车队ID
 
-        Set<Integer> permOfCity        = new HashSet<Integer>();//普通管理员可以管理的所有城市ID
-        Set<Integer> permOfSupplier = new HashSet<Integer>();//普通管理员可以管理的所有供应商ID
-        Set<Integer> permOfTeam     = new HashSet<Integer>();//普通管理员可以管理的所有车队ID
+        int total = 0;
+        List<CarBizDriverInfoDTO> list =  Lists.newArrayList();
+        Set<Integer> driverIds = null;
+        Boolean had = false;
+        if(teamGroupId!=null || teamId!=null || (permOfTeam!=null && permOfTeam.size()>0)){
+            had = true;
+            driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
+        }
+        if(had && (driverIds==null || driverIds.size()==0)){
+            logger.info(LOGTAG + "查询teamId={},groupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
+            PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
+            return AjaxResponse.success(pageDTO);
+        }
 
         CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();
         carBizDriverInfoDTO.setName(name);
@@ -92,12 +112,12 @@ public class DriverInfoController {
         carBizDriverInfoDTO.setImei(imei);
         carBizDriverInfoDTO.setIdCardNo(idCardNo);
         carBizDriverInfoDTO.setIsImage(isImage);
+        //数据权限
         carBizDriverInfoDTO.setCityIds(permOfCity);
         carBizDriverInfoDTO.setSupplierIds(permOfSupplier);
         carBizDriverInfoDTO.setTeamIds(permOfTeam);
+        carBizDriverInfoDTO.setDriverIds(driverIds);
 
-        int total = 0;
-        List<CarBizDriverInfoDTO> list =  Lists.newArrayList();
         Page p = PageHelper.startPage(page, pageSize, true);
         try {
             list = carBizDriverInfoService.queryDriverList(carBizDriverInfoDTO);
@@ -114,7 +134,7 @@ public class DriverInfoController {
     }
 
     /**
-     * 司机信息列表导出
+     * 司机信息列表查询（无分页）
      * @param name 司机姓名
      * @param phone 司机手机号
      * @param licensePlates 车牌号
@@ -130,18 +150,30 @@ public class DriverInfoController {
      * @param isImage 是否维护形象
      * @return
      */
+    @ResponseBody
     @RequestMapping(value = "/findDriverAllList")
     @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
     public AjaxResponse findDriverAllList(String name, String phone, String licensePlates, Integer status, Integer cityId, Integer supplierId,
          Integer teamId, Integer teamGroupId, Integer groupId, Integer cooperationType, String imei, String idCardNo, Integer isImage) {
 
-        //TODO 数据权限控制SSOLoginUser
-        Set<Integer> permOfCity        = new HashSet<Integer>();//普通管理员可以管理的所有城市ID
-        Set<Integer> permOfSupplier = new HashSet<Integer>();//普通管理员可以管理的所有供应商ID
-        Set<Integer> permOfTeam     = new HashSet<Integer>();//普通管理员可以管理的所有车队ID
+        // 数据权限控制SSOLoginUser
+        Set<Integer> permOfCity        = WebSessionUtil.getCurrentLoginUser().getCityIds(); //普通管理员可以管理的所有城市ID
+        Set<Integer> permOfSupplier    = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); //普通管理员可以管理的所有供应商ID
+        Set<Integer> permOfTeam        = WebSessionUtil.getCurrentLoginUser().getTeamIds(); //普通管理员可以管理的所有车队ID
 
+        List<CarBizDriverInfoDTO> list =  Lists.newArrayList();
+        Set<Integer> driverIds = null;
+        Boolean had = false;
+        if(teamGroupId!=null || teamId!=null || (permOfTeam!=null && permOfTeam.size()>0)){
+            had = true;
+            driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
+        }
+        if(had && (driverIds==null || driverIds.size()==0)){
+            logger.info(LOGTAG + "查询teamId={},groupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
+            return AjaxResponse.success(list);
+        }
         CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();
         carBizDriverInfoDTO.setName(name);
         carBizDriverInfoDTO.setPhone(phone);
@@ -156,12 +188,13 @@ public class DriverInfoController {
         carBizDriverInfoDTO.setImei(imei);
         carBizDriverInfoDTO.setIdCardNo(idCardNo);
         carBizDriverInfoDTO.setIsImage(isImage);
+        //数据权限
         carBizDriverInfoDTO.setCityIds(permOfCity);
         carBizDriverInfoDTO.setSupplierIds(permOfSupplier);
         carBizDriverInfoDTO.setTeamIds(permOfTeam);
+        carBizDriverInfoDTO.setDriverIds(driverIds);
 
-        List<CarBizDriverInfoDTO> list =  Lists.newArrayList();
-        list = carBizDriverInfoService.queryDriverListNoLimit(carBizDriverInfoDTO);
+        list = carBizDriverInfoService.queryDriverList(carBizDriverInfoDTO);
         // 查询城市名称，供应商名称，服务类型，加盟类型
         for (CarBizDriverInfoDTO driver : list) {
             driver = carBizDriverInfoService.getBaseStatis(driver);
@@ -170,13 +203,94 @@ public class DriverInfoController {
     }
 
     /**
+     * 司机信息列表查询导出
+     * @param name 司机姓名
+     * @param phone 司机手机号
+     * @param licensePlates 车牌号
+     * @param status 状态
+     * @param cityId 城市ID
+     * @param supplierId 供应商ID
+     * @param teamId 车队ID
+     * @param teamGroupId 车队下小组ID
+     * @param groupId 服务类型ID
+     * @param cooperationType 加盟类型
+     * @param imei imei
+     * @param idCardNo 身份证号
+     * @param isImage 是否维护形象
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/exportDriverList")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
+    })
+    public AjaxResponse exportDriverList(String name, String phone, String licensePlates, Integer status, Integer cityId, Integer supplierId,
+                                         Integer teamId, Integer teamGroupId, Integer groupId, Integer cooperationType,
+                                         String imei, String idCardNo, Integer isImage,
+                                         HttpServletRequest request) {
+
+        // 数据权限控制SSOLoginUser
+        Set<Integer> permOfCity        = WebSessionUtil.getCurrentLoginUser().getCityIds(); //普通管理员可以管理的所有城市ID
+        Set<Integer> permOfSupplier    = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); //普通管理员可以管理的所有供应商ID
+        Set<Integer> permOfTeam        = WebSessionUtil.getCurrentLoginUser().getTeamIds(); //普通管理员可以管理的所有车队ID
+
+        List<CarBizDriverInfoDTO> list =  Lists.newArrayList();
+        Set<Integer> driverIds = null;
+        Boolean had = false;
+        if(teamGroupId!=null || teamId!=null || (permOfTeam!=null && permOfTeam.size()>0)){
+            had = true;
+            driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
+        }
+        if(had && (driverIds==null || driverIds.size()==0)){
+            logger.info(LOGTAG + "查询teamId={},groupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
+            list =  Lists.newArrayList();
+        }else{
+            CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();
+            carBizDriverInfoDTO.setName(name);
+            carBizDriverInfoDTO.setPhone(phone);
+            carBizDriverInfoDTO.setLicensePlates(licensePlates);
+            carBizDriverInfoDTO.setStatus(status);
+            carBizDriverInfoDTO.setServiceCity(cityId);
+            carBizDriverInfoDTO.setSupplierId(supplierId);
+            carBizDriverInfoDTO.setTeamId(teamId);
+            carBizDriverInfoDTO.setTeamGroupId(teamGroupId);
+            carBizDriverInfoDTO.setGroupId(groupId);
+            carBizDriverInfoDTO.setCooperationType(cooperationType);
+            carBizDriverInfoDTO.setImei(imei);
+            carBizDriverInfoDTO.setIdCardNo(idCardNo);
+            carBizDriverInfoDTO.setIsImage(isImage);
+            //数据权限
+            carBizDriverInfoDTO.setCityIds(permOfCity);
+            carBizDriverInfoDTO.setSupplierIds(permOfSupplier);
+            carBizDriverInfoDTO.setTeamIds(permOfTeam);
+            carBizDriverInfoDTO.setDriverIds(driverIds);
+
+            list = carBizDriverInfoService.queryDriverList(carBizDriverInfoDTO);
+            // 查询城市名称，供应商名称，服务类型，加盟类型
+            for (CarBizDriverInfoDTO driver : list) {
+                driver = carBizDriverInfoService.getBaseStatis(driver);
+            }
+        }
+        try {
+            //TODO 待完善
+            Workbook wb = carBizDriverInfoService.exportExcel(list,request.getRealPath("/")+File.separator+"template"+File.separator+"driver_info.xlsx");
+//        super.exportExcelFromTemplet(request, response, wb, new String("司机信息列表".getBytes("utf-8"), "iso8859-1"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return AjaxResponse.success(list);
+    }
+
+    /**
      * 司机信息
      * @param driverId
      * @return
      */
+    @ResponseBody
     @RequestMapping(value = "/findDriverInfoByDriverId")
     @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
     public AjaxResponse findDriverInfoByDriverId(@Verify(param = "driverId", rule = "required") Integer driverId) {
 
@@ -209,7 +323,6 @@ public class DriverInfoController {
         if(carBizDriverInfo==null){
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
         }
-
         Integer driverId = carBizDriverInfo.getDriverId();
         //判断一些基础信息是否正确
         AjaxResponse ajaxResponse = carBizDriverInfoService.validateCarDriverInfo(carBizDriverInfo);
@@ -219,13 +332,20 @@ public class DriverInfoController {
         Map<String, Object> resultMap = Maps.newHashMap();
         if (driverId == null) {
             logger.info(LOGTAG + "操作方式：编辑");
-            // TODO 司机获取派单的接口，是否可以修改
-
-            // TODO 调用接口清除，key
+            // 司机获取派单的接口，是否可以修改
+            Map<String, Object> updateDriverMap = carBizDriverInfoService.isUpdateDriver(driverId, carBizDriverInfo.getPhone());
+            if(updateDriverMap!=null && "2".equals(updateDriverMap.get("result").toString())){
+                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, updateDriverMap.get("msg").toString());
+            }
+            // 调用接口清除，key
+            carBizDriverInfoService.flashDriverInfo(driverId);
             resultMap = carBizDriverInfoService.updateDriver(carBizDriverInfo);
         }else{
             logger.info(LOGTAG + "操作方式：新建");
             resultMap = carBizDriverInfoService.saveDriver(carBizDriverInfo);
+        }
+        if(resultMap!=null && "1".equals(resultMap.get("result").toString())){
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, resultMap.get("msg").toString());
         }
         return AjaxResponse.success(resultMap);
     }
@@ -247,10 +367,13 @@ public class DriverInfoController {
         if(carBizDriverInfo==null){
             return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
         }
-        // TODO 司机获取派单的接口，是否可以修改
-
-        // TODO 调用接口清除，key
-
+        // 司机获取派单的接口，是否可以修改
+        Map<String, Object> updateDriverMap = carBizDriverInfoService.isUpdateDriver(driverId, carBizDriverInfo.getPhone());
+        if(updateDriverMap!=null && "2".equals(updateDriverMap.get("result").toString())){
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, updateDriverMap.get("msg").toString());
+        }
+        // 调用接口清除，key
+        carBizDriverInfoService.flashDriverInfo(driverId);
         //允许修改
         // 获取当前用户Id
         carBizDriverInfo.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
@@ -296,6 +419,16 @@ public class DriverInfoController {
         return AjaxResponse.success(true);
     }
 
+    /**
+     * 导入司机信息
+     * @param cityId
+     * @param supplierId
+     * @param teamId
+     * @param teamGroupId
+     * @param file
+     * @param request
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value = "/batchInputDriverInfo")
     @MasterSlaveConfigs(configs={

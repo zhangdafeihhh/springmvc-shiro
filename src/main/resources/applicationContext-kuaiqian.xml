@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+     http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.0.xsd
+     http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+    <!--  块钱变量注入 -->
+    <bean class="com.bill99.mgw.common.Common">
+        <property name="GETDYNNUM_URL" value="${quickPay.GETDYNNUM_URL}" />
+        <property name="BILL99_TR1_URL" value="${quickPay.BILL99_TR1_URL}" />
+        <property name="ZHUANCHE_TR3" value="${quickPay.ZHUANCHE_TR3}" />
+        <property name="BILL99_PREAUTH_URL" value="${quickPay.BILL99_PREAUTH_URL}" />
+        <property name="PREAUTH_ZHUANCHE_TR3" value="${quickPay.PREAUTH_ZHUANCHE_TR3}" />
+        <property name="BILL99_PREAUTH_CONFIRM_URL" value="${quickPay.BILL99_PREAUTH_CONFIRM_URL}" />
+        <property name="PRECONFIRM_ZHUANCHE_TR3" value="${quickPay.PRECONFIRM_ZHUANCHE_TR3}" />
+        <property name="BILL99_PREAUTH_CANCEL_URL" value="${quickPay.BILL99_PREAUTH_CANCEL_URL}" />
+        <property name="BILL99_PREAUTH_REFUND_URL" value="${quickPay.BILL99_PREAUTH_REFUND_URL}" />
+        <property name="BILL99_PCI_DEL_URL" value="${quickPay.BILL99_PCI_DEL_URL}" />
+        <property name="MERCHANTID" value="${quickPay.MERCHANTID}" />
+        <property name="TERMINALID" value="${quickPay.TERMINALID}" />
+        <property name="CERTIFICSTENAME" value="${quickPay.CERTIFICSTENAME}" />
+        <property name="AUTH" value="${quickPay.AUTH}" />
+    </bean>
+</beans>

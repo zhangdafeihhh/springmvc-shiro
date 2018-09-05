@@ -55,7 +55,6 @@ public class RiskOrderComplainController {
         pageData.put("Rows",new JSONArray());
         pageData.put("Total",0);
         try {
-
 //            SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
             Map<String, Object> paramMap = new HashMap<String, Object>();
             paramMap.put("orderNo", params.getOrderNo());

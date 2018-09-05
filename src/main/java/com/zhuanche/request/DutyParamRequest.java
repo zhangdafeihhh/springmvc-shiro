@@ -38,6 +38,8 @@ public class DutyParamRequest extends PageRequest{
     private Integer type; // 类型
     private Integer status; // 状态：1 未发布；2 已发布
 
+    private String licensePlates;
+
     private String cityName;
     private String supplierName;
     private String teamName;
@@ -56,13 +58,21 @@ public class DutyParamRequest extends PageRequest{
     /** 权限相关*/
     private Set<Integer> cityIds;//普通管理员可以管理的所有城市ID
 
-    private Set<Integer> suppliers;//普通管理员可以管理的所有供应商ID
+    private Set<Integer> supplierIds;//普通管理员可以管理的所有供应商ID
 
     private Set<Integer> teamIds;//普通管理员可以管理的所有车队ID
 
     // 查询
     private String startTime;
     private String endTime;
+
+    public String getLicensePlates() {
+        return licensePlates;
+    }
+
+    public void setLicensePlates(String licensePlates) {
+        this.licensePlates = licensePlates;
+    }
 
     public String getTimes() {
         return times;
@@ -96,12 +106,12 @@ public class DutyParamRequest extends PageRequest{
         this.cityIds = cityIds;
     }
 
-    public Set<Integer> getSuppliers() {
-        return suppliers;
+    public Set<Integer> getSupplierIds() {
+        return supplierIds;
     }
 
-    public void setSuppliers(Set<Integer> suppliers) {
-        this.suppliers = suppliers;
+    public void setSupplierIds(Set<Integer> supplierIds) {
+        this.supplierIds = supplierIds;
     }
 
     public Set<Integer> getTeamIds() {

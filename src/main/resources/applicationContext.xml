@@ -40,4 +40,8 @@
     <import resource="applicationContext-ctx-restful.xml"/>
 
     <bean class="com.zhuanche.util.FtpUtil"/>
+    <!--redis-driver的服务-->
+    <import resource="applicationContext-redis-driver.xml"/>
+    <!--块钱的服务-->
+    <import resource="applicationContext-kuaiqian.xml"/>
 </beans>
