@@ -102,7 +102,7 @@
     <result column="account_type" property="accountType" jdbcType="INTEGER" />
     <result column="group_id" property="groupId" jdbcType="INTEGER" />
   </resultMap>
-  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizDriverInfo" extends="BaseResultMap" >
+  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.dto.rentcar.CarBizDriverInfoDTO" extends="BaseResultMap" >
     <result column="english_name" property="englishName" jdbcType="VARCHAR" />
     <result column="contract_type" property="contractType" jdbcType="VARCHAR" />
     <result column="contract_no" property="contractNo" jdbcType="VARCHAR" />
