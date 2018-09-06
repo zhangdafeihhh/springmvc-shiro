@@ -1,5 +1,6 @@
 package com.zhuanche.controller.rentcar;
 
+import com.google.common.collect.Maps;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.Verify;
@@ -501,12 +502,18 @@ public class CarInfoController {
 //            JSONObject jsonStr = (JSONObject)result.get("jsonStr");
 
             Integer result1 = Integer.valueOf( result.get("result").toString() );
-
+            Map response = Maps.newHashMap();
             if( 0 == result1 ){
                 String exception = result.get("exception").toString();
                 return AjaxResponse.fail(996, exception);
             } else if(1 == result1){
-                return AjaxResponse.success(null);
+                Object success = result.get("success");
+                Object error = result.get("error");
+                if(success != null)
+                    response.put("success", success);
+                if(error != null)
+                    response.put("error", error);
+                return AjaxResponse.success(response);
             }
             return AjaxResponse.fail(999);
         } catch (Exception e){

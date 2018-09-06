@@ -205,7 +205,7 @@ public class DriverOutageServiceImpl implements DriverOutageService {
         params.setRemoveBy(WebSessionUtil.getCurrentLoginUser().getId());
         params.setRemoveName(WebSessionUtil.getCurrentLoginUser().getLoginName());
         JSONObject json = JSONObject.fromObject(params);
-        paramMap.put("DriverOutageInfo", json);
+        paramMap.put("driverOutageInfo", json);
         String url = "/webservice/outage/updateDriverOutage";
         result = carApiTemplate.postForObject(url, JSONObject.class, paramMap);
 
@@ -222,7 +222,7 @@ public class DriverOutageServiceImpl implements DriverOutageService {
         params.setRemoveBy(WebSessionUtil.getCurrentLoginUser().getId());
         params.setRemoveName(WebSessionUtil.getCurrentLoginUser().getLoginName());
         JSONObject json = JSONObject.fromObject(params);
-        paramMap.put("DriverOutageInfo", json);
+        paramMap.put("driverOutageInfo", json);
         String url = "/webservice/outage/updateDriverOutages";
         result = carApiTemplate.postForObject(url, JSONObject.class, paramMap);
 
@@ -305,7 +305,7 @@ public class DriverOutageServiceImpl implements DriverOutageService {
             logger.info("saveDriverOutageAll error:"+e);
         }
         JSONObject json = JSONObject.fromObject(params);
-        paramMap.put("DriverOutageInfo", json);
+        paramMap.put("driverOutageInfo", json);
         String url = "/webservice/outageAll/saveDriverOutageAll";
         result = carApiTemplate.postForObject(url, JSONObject.class, paramMap);
         return result;
@@ -319,7 +319,7 @@ public class DriverOutageServiceImpl implements DriverOutageService {
         params.setRemoveBy(WebSessionUtil.getCurrentLoginUser().getId());
         params.setRemoveName(WebSessionUtil.getCurrentLoginUser().getLoginName());
         JSONObject json = JSONObject.fromObject(params);
-        paramMap.put("DriverOutageInfo", json);
+        paramMap.put("driverOutageInfo", json);
         String url = "/webservice/outageAll/updateDriverOutagesAll";
         result = carApiTemplate.postForObject(url, JSONObject.class, paramMap);
         return result;
@@ -507,7 +507,7 @@ public class DriverOutageServiceImpl implements DriverOutageService {
             Map<String, Object> paramMap = new HashMap<String, Object>();
             JSONArray jsonarray = JSONArray.fromObject(outList);
             String cars = jsonarray.toString();
-            paramMap.put("DriverOutageList", cars);
+            paramMap.put("driverOutageList", cars);
             String url = "/webservice/outageAll/batchInputDriverOutageInfo";
             JSONObject jsonobject = carApiTemplate.postForObject(url,JSONObject.class, paramMap);
             // 返回为0 ==========不成功
