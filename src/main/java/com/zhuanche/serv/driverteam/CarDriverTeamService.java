@@ -457,8 +457,8 @@ public class CarDriverTeamService{
 		//B----------------------------------------------------------------------------------进行分页查询
 		PageDTO pageDTO = new PageDTO();
 		int total = 0;
-		List<DriverTeamGroupDTO> driverTeams = null;
-		PageInfo<DriverTeamGroupDTO> pageInfo =null;
+		List<CarDriverTeamDTO> driverTeams = null;
+		PageInfo<CarDriverTeamDTO> pageInfo =null;
 		try{
 			pageInfo =
 					PageHelper.startPage(driverTeamRequest.getPageNo(), driverTeamRequest.getPageSize(), true).doSelectPageInfo(()
@@ -478,11 +478,11 @@ public class CarDriverTeamService{
 		}
 
 		//C----------------------------------------------------------------------------------将分页结果转换为DTO，并填全城市名称、供应商名称
-		List<CarDriverTeamDTO> dtos = BeanUtil.copyList(driverTeams, CarDriverTeamDTO.class);
+
 		//查询此结果中的 城市信息和供应商信息
 		Set<Integer> resultOfcityIds        = new HashSet<Integer>();
 		Set<Integer> resultOfsupplierIds = new HashSet<Integer>();
-		for(CarDriverTeamDTO dto : dtos) {
+		for(CarDriverTeamDTO dto : driverTeams) {
 			if( StringUtils.isNotEmpty( dto.getCity() )) {
 				resultOfcityIds.add( Integer.valueOf(dto.getCity()) ) ;
 			}
@@ -493,21 +493,33 @@ public class CarDriverTeamService{
 		Map<Integer, CarBizCity>     cityMapping     = carBizCityService.queryCity( resultOfcityIds );
 		Map<Integer, CarBizSupplier> supplierMapping = carBizSupplierService.querySupplier(null, resultOfsupplierIds);
 		//填充城市名称、供应商名称
-		for(CarDriverTeamDTO dto : dtos ) {
+		for(CarDriverTeamDTO dto : driverTeams ) {
 			if( StringUtils.isNotEmpty( dto.getCity() )) {
 				CarBizCity city = cityMapping.get( Integer.valueOf(dto.getCity()));
 				if(city!=null) {
 					dto.setCityName(  city.getCityName() );
-				}
+                    List<CarDriverTeam> groups = dto.getGroups();
+                    if(!Check.NuNCollection(groups)){
+                        for (CarDriverTeam group : groups) {
+                            group.setCityName(city.getCityName());
+                        }
+                    }
+                }
 			}
 			if( StringUtils.isNotEmpty( dto.getSupplier() )) {
 				CarBizSupplier supplier = supplierMapping.get( Integer.valueOf(dto.getSupplier())  );
 				if( supplier!=null ) {
 					dto.setSupplierName( supplier.getSupplierFullName() );
-				}
+                    List<CarDriverTeam> groups = dto.getGroups();
+                    if(!Check.NuNCollection(groups)){
+                        for (CarDriverTeam group : groups) {
+                            group.setSupplierName(supplier.getSupplierFullName());
+                        }
+                    }
+                }
 			}
 		}
-		pageDTO.setResult(dtos);
+		pageDTO.setResult(driverTeams);
 		pageDTO.setTotal(total);
 		return pageDTO;
 	}

@@ -21,7 +21,7 @@
     <result column="charge3" property="charge3" jdbcType="VARCHAR" />
   </resultMap>
 
-    <resultMap id="BaseExResultMap" type="com.zhuanche.dto.driver.DriverTeamGroupDTO" extends="BaseResultMap">
+    <resultMap id="BaseExResultMap" type="com.zhuanche.dto.CarDriverTeamDTO" extends="BaseResultMap">
         <collection column="{pId=id}" property="groups" javaType="ArrayList"
                     select="queryForListByPid" />
     </resultMap>
