@@ -36,6 +36,7 @@ public class MainController{
 	/**显示首页**/
     @RequestMapping("/index")
     public String index(HttpServletRequest request , HttpServletResponse response,Model model) throws Exception {
+    	logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>log4j桥接至logback测试成功！");
 //		response.sendRedirect(homepageUrl);
 //		return null;
         return "index";
@@ -44,7 +45,6 @@ public class MainController{
     /**显示登录页面 **/
 	@RequestMapping("/login")
     public String login(HttpServletRequest request , HttpServletResponse response) throws Exception{
-    	logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>log4j桥接至logback测试成功！");
 		Boolean isAjax = (Boolean) request.getAttribute("X_IS_AJAX");
 		if(  isAjax  ) {
 			AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_INVALID_SESSION);
