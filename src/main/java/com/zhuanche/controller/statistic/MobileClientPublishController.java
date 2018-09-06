@@ -95,18 +95,6 @@ public class MobileClientPublishController {
 	public AjaxResponse sendPhoneCode(HttpServletRequest request) {
 		SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
 		String userName = WebSessionUtil.getCurrentLoginUser().getLoginName();
-
-		//30秒内不能重复发送
-		Object last = WebSessionUtil.getAttribute(userName+"_"+VALIDATE_CODE_TIME);
-		if (last!=null){
-			long lastTime = (long)last;
-			long currTime = new Date().getTime();
-			long time = (currTime-lastTime)/1000;
-			if ( time < 30){
-				return AjaxResponse.fail(RestErrorCode.MSG_CODE_REPEAT_SEND,time);
-			}
-		}
-
 		if (user!=null && StringUtils.isNotEmpty(userName)){
 			String ip = IPv4Util2.getClientIpAddr(request);
 			log.info("短信验证码发送用户userName:"+userName+"  手机号phone:"+user.getMobile()+"   ip:"+ip);
@@ -115,7 +103,6 @@ public class MobileClientPublishController {
 			SmsSendUtil.send(user.getMobile(), "验证码为："+code+" 验证码60秒内有效!");
 			log.info("session中验证码放的key为:"+userName+"_"+VALIDATE_CODE);
 			WebSessionUtil.setAttribute(userName+"_"+VALIDATE_CODE, "1111");
-			WebSessionUtil.setAttribute(userName+"_"+VALIDATE_CODE_TIME, new Date().getTime());
 			return AjaxResponse.success(0);
 		}else{
 			return AjaxResponse.fail(RestErrorCode.HTTP_INVALID_SESSION);
