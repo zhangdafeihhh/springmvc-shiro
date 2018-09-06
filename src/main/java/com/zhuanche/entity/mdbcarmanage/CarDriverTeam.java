@@ -1,8 +1,12 @@
 package com.zhuanche.entity.mdbcarmanage;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class CarDriverTeam {
+public class CarDriverTeam implements Serializable{
+
+    private static final long serialVersionUID = -8774840927274024855L;
+
     private Integer id;
 
     private String teamName;

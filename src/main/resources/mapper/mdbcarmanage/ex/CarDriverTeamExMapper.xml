@@ -20,6 +20,12 @@
     <result column="charge2" property="charge2" jdbcType="VARCHAR" />
     <result column="charge3" property="charge3" jdbcType="VARCHAR" />
   </resultMap>
+
+    <resultMap id="BaseExResultMap" type="com.zhuanche.dto.driver.CarDriverTeamDTO" extends="BaseResultMap">
+        <collection column="{pId=id}" property="groups" javaType="ArrayList"
+                    select="queryForListByPid" />
+    </resultMap>
+
   <sql id="Base_Column_List" >
     id, team_name, sort, create_by, create_date, update_by, update_date, city, supplier, 
     remark, status, p_id, duty_start_date, duty_end_date, charge1, charge2, charge3
@@ -107,11 +113,11 @@
   </select>
 
     <!-- 查询车队列表(根据城市ID，供应商ID、车队ID  )返回车队和车队下的小组 -->
-    <select id="queryDriverTeamAndGroup" resultMap="BaseResultMap" >
+    <select id="queryDriverTeamAndGroup" resultMap="BaseExResultMap" >
         select
         <include refid="Base_Column_List" />
         from car_driver_team
-        where status!=2
+        where p_id is null AND status!=2
         <if test="cityIds!=null and cityIds.size()>0">
             and city IN
             <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
@@ -126,12 +132,6 @@
         </if>
         <if test="teamIds!=null and teamIds.size()>0">
             and id IN
-            <foreach collection="teamIds" open="(" close=")" separator="," item="tid" >
-                #{tid}
-            </foreach>
-        </if>
-        <if test="teamIds!=null and teamIds.size()>0">
-            and p_id IN
             <foreach collection="teamIds" open="(" close=")" separator="," item="tid" >
                 #{tid}
             </foreach>

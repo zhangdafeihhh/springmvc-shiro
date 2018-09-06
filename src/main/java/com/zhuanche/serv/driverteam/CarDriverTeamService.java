@@ -461,7 +461,7 @@ public class CarDriverTeamService{
 		try{
 			pageInfo =
 					PageHelper.startPage(driverTeamRequest.getPageNo(), driverTeamRequest.getPageSize(), true).doSelectPageInfo(()
-							-> carDriverTeamExMapper.queryDriverTeamAndGroup(commonRequest.getCityIds(), commonRequest.getSupplierIds(), commonRequest.getTeamIds()));
+							-> carDriverTeamExMapper.queryDriverTeam(commonRequest.getCityIds(), commonRequest.getSupplierIds(), commonRequest.getTeamIds()));
 //			driverTeams = carDriverTeamExMapper.queryDriverTeam(cityIds, supplierIds, teamIds);
 			driverTeams = pageInfo.getList();
 			total = (int)pageInfo.getTotal();
