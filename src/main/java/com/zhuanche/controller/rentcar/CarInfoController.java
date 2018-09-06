@@ -56,16 +56,16 @@ public class CarInfoController {
      * @return
      */
     @RequestMapping(value = "/queryCarData")
-    public Object queryCarData(String cities,
-                               String supplierIds,
-                               String carModelIds,
-                               String licensePlates,
-                               String createDateBegin,
-                               String createDateEnd,
-                               Integer status,
-                               Integer isFree,
-                               Integer page,
-                               Integer pageSize) {
+    public Object queryCarData(@Verify(param = "cities",rule="") String cities,
+                               @Verify(param = "supplierIds",rule="") String supplierIds,
+                               @Verify(param = "carModelIds",rule="") String carModelIds,
+                               @Verify(param = "licensePlates",rule="") String licensePlates,
+                               @Verify(param = "createDateBegin",rule="") String createDateBegin,
+                               @Verify(param = "createDateEnd",rule="") String createDateEnd,
+                               @Verify(param = "status",rule="") Integer status,
+                               @Verify(param = "isFree",rule="") Integer isFree,
+                               @Verify(param = "page",rule="") Integer page,
+                               @Verify(param = "pageSize",rule="") Integer pageSize) {
         logger.info("车辆列表数据:queryCarData");
 
         CarInfo params = new CarInfo();
@@ -106,6 +106,11 @@ public class CarInfoController {
         return AjaxResponse.success(new PageDTO(params.getPage(), params.getPagesize(), total, BeanUtil.copyList(rows, CarInfoDTO.class)));
     }
 
+    /**
+     * 查询车辆详情
+     * @param carId
+     * @return
+     */
     @RequestMapping(value = "/queryCarInfo")
     public AjaxResponse queryCarInfo(@Verify(param = "carId",rule = "required") Integer carId) {
         logger.info("queryCar:查看车辆详情列表");
@@ -207,7 +212,7 @@ public class CarInfoController {
                                   @Verify(param = "supplierId",rule="required") Integer supplierId,
                                   @Verify(param = "carModelId",rule="required") Integer carModelId,
                               @Verify(param = "imageUrl",rule="") String imageUrl,
-                                  @Verify(param = "vehicleDrivingLicense",rule="required") String vehicleDrivingLicense,
+                              @Verify(param = "vehicleDrivingLicense",rule="") String vehicleDrivingLicense,
                                   @Verify(param = "modelDetail",rule="required") String modelDetail,
                                   @Verify(param = "color",rule="required") String color,
                               @Verify(param = "clicensePlatesColor",rule="") String clicensePlatesColor,
