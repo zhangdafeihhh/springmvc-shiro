@@ -13,6 +13,8 @@ public interface CarDriverTeamExMapper{
 	/**查询车队列表(根据城市ID，供应商ID、车队ID  )**/
 	List<CarDriverTeam> queryDriverTeam(@Param("cityIds") Set<String> cityIds, @Param("supplierIds") Set<String> supplierIds ,  @Param("teamIds") Set<Integer>  teamIds );
 
+	List<CarDriverTeam> queryDriverTeamAndGroup(@Param("cityIds") Set<String> cityIds, @Param("supplierIds") Set<String> supplierIds ,  @Param("teamIds") Set<Integer>  teamIds );
+
 	CarDriverTeam selectByCondition(DriverTeamRequest driverTeamRequest);
 
 	List<CarDriverTeam> queryForListByPid(DriverTeamRequest driverTeamRequest);
