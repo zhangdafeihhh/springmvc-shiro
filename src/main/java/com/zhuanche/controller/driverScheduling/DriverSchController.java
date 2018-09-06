@@ -92,7 +92,7 @@ public class DriverSchController {
     * @Author: lunan
     * @Date: 2018/9/5 
     */ 
-    @RequestMapping("exportDutyToExcel")
+    @RequestMapping("/exportDutyToExcel")
     @ResponseBody
     public AjaxResponse exportDutyToExcel(HttpServletResponse response, HttpServletRequest request,DutyParamRequest param){
         String[] title = {"司机姓名","手机号","城市","供应商","车队",
@@ -128,6 +128,7 @@ public class DriverSchController {
             ServletOutputStream out = reponseOut.getOutputStream();
             workbook.write(out);
             out.flush();
+            out.close();
             if(total <= 3000){
                 return AjaxResponse.success(result);
             }
