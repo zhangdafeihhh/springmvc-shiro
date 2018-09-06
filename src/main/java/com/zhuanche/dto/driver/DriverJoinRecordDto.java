@@ -1,9 +1,13 @@
 package com.zhuanche.dto.driver;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class DriverJoinRecordDto {
-    private Integer id;
+public class DriverJoinRecordDto implements Serializable{
+    
+	private static final long serialVersionUID = 1L;
+
+	private Integer id;
 
     private Integer driverVerifyId;
 
