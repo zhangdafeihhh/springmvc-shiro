@@ -31,7 +31,7 @@ public class QuickPayService {
 	private String guid = UUID.randomUUID().toString();
 
 	/**
-	 * add by zhou 20151118 注册信用卡服务类 封装各业务模块传递的数据，并调用快钱支付包
+	 * 注册信用卡服务类 封装各业务模块传递的数据，并调用快钱支付包
 	 *
 	 * @paymentType 支付类型 1:乘客绑定信用卡，2:司机绑定信用卡
 	 * @cardNo 信用卡卡号
@@ -123,7 +123,7 @@ public class QuickPayService {
 	}
 
 	/**
-	 * add by zhou 20151211
+	 *
 	 * 注册信用卡,获取动态验证码
 	 * @param customerId 客户号
 	 * @param externalNo 外部流水号
