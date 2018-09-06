@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.DriverJoinRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.DriverJoinRecord" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="driver_verify_id" property="driverVerifyId" jdbcType="INTEGER" />
+    <result column="operation" property="operation" jdbcType="INTEGER" />
+    <result column="operation_name" property="operationName" jdbcType="VARCHAR" />
+    <result column="operation_describe" property="operationDescribe" jdbcType="VARCHAR" />
+    <result column="create_id" property="createId" jdbcType="INTEGER" />
+    <result column="create_name" property="createName" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_id" property="updateId" jdbcType="INTEGER" />
+    <result column="update_name" property="updateName" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, driver_verify_id, operation, operation_name, operation_describe, create_id, create_name, 
+    create_time, update_id, update_name, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from driver_join_record
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from driver_join_record
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.driver.DriverJoinRecord" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into driver_join_record (driver_verify_id, operation, operation_name, 
+      operation_describe, create_id, create_name, 
+      create_time, update_id, update_name, 
+      update_time)
+    values (#{driverVerifyId,jdbcType=INTEGER}, #{operation,jdbcType=INTEGER}, #{operationName,jdbcType=VARCHAR}, 
+      #{operationDescribe,jdbcType=VARCHAR}, #{createId,jdbcType=INTEGER}, #{createName,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateId,jdbcType=INTEGER}, #{updateName,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.DriverJoinRecord" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into driver_join_record
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="driverVerifyId != null" >
+        driver_verify_id,
+      </if>
+      <if test="operation != null" >
+        operation,
+      </if>
+      <if test="operationName != null" >
+        operation_name,
+      </if>
+      <if test="operationDescribe != null" >
+        operation_describe,
+      </if>
+      <if test="createId != null" >
+        create_id,
+      </if>
+      <if test="createName != null" >
+        create_name,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateId != null" >
+        update_id,
+      </if>
+      <if test="updateName != null" >
+        update_name,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="driverVerifyId != null" >
+        #{driverVerifyId,jdbcType=INTEGER},
+      </if>
+      <if test="operation != null" >
+        #{operation,jdbcType=INTEGER},
+      </if>
+      <if test="operationName != null" >
+        #{operationName,jdbcType=VARCHAR},
+      </if>
+      <if test="operationDescribe != null" >
+        #{operationDescribe,jdbcType=VARCHAR},
+      </if>
+      <if test="createId != null" >
+        #{createId,jdbcType=INTEGER},
+      </if>
+      <if test="createName != null" >
+        #{createName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateId != null" >
+        #{updateId,jdbcType=INTEGER},
+      </if>
+      <if test="updateName != null" >
+        #{updateName,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.driver.DriverJoinRecord" >
+    update driver_join_record
+    <set >
+      <if test="driverVerifyId != null" >
+        driver_verify_id = #{driverVerifyId,jdbcType=INTEGER},
+      </if>
+      <if test="operation != null" >
+        operation = #{operation,jdbcType=INTEGER},
+      </if>
+      <if test="operationName != null" >
+        operation_name = #{operationName,jdbcType=VARCHAR},
+      </if>
+      <if test="operationDescribe != null" >
+        operation_describe = #{operationDescribe,jdbcType=VARCHAR},
+      </if>
+      <if test="createId != null" >
+        create_id = #{createId,jdbcType=INTEGER},
+      </if>
+      <if test="createName != null" >
+        create_name = #{createName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateId != null" >
+        update_id = #{updateId,jdbcType=INTEGER},
+      </if>
+      <if test="updateName != null" >
+        update_name = #{updateName,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.DriverJoinRecord" >
+    update driver_join_record
+    set driver_verify_id = #{driverVerifyId,jdbcType=INTEGER},
+      operation = #{operation,jdbcType=INTEGER},
+      operation_name = #{operationName,jdbcType=VARCHAR},
+      operation_describe = #{operationDescribe,jdbcType=VARCHAR},
+      create_id = #{createId,jdbcType=INTEGER},
+      create_name = #{createName,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_id = #{updateId,jdbcType=INTEGER},
+      update_name = #{updateName,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

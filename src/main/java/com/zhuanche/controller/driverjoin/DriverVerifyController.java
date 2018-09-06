@@ -1,5 +1,6 @@
 package com.zhuanche.controller.driverjoin;
 
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -9,12 +10,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.dto.driver.DriverJoinRecordDto;
 import com.zhuanche.dto.driver.DriverVerifyDto;
+import com.zhuanche.entity.driver.DriverJoinRecord;
 import com.zhuanche.serv.driverjoin.DriverVerifyService;
+import com.zhuanche.util.BeanUtil;
+
+import mapper.driver.ex.DriverJoinRecordExMapper;
 
 /**
  * 司机加盟注册 
@@ -34,6 +42,9 @@ public class DriverVerifyController {
 	@Autowired
 	DriverVerifyService driverVerifyService;
 
+	@Autowired
+	DriverJoinRecordExMapper driverJoinRecordExMapper;
+	
 	/**
 	 * 查询加盟司机审核列表数据
 	 * 
@@ -85,6 +96,42 @@ public class DriverVerifyController {
 		Map<String, Object> result = Maps.newHashMap();
 		result.put("image", image);
 		return AjaxResponse.success(result);
+	}
+	
+	/** 查询司机加盟记录列表数据 **/
+	@ResponseBody
+	@RequestMapping(value = "/queryDriverJoinRecordData")
+	public AjaxResponse queryDriverJoinRecordData(Integer page, Integer pageSize, @Verify(param = "driverId", rule = "required") Long driverId){
+		logger.info("查询司机加盟记录列表数据通过司机ID,driverId="+driverId);
+		if (null == page || page.intValue() <= 0) {
+			page = 1;
+		}
+		if (null == pageSize || pageSize.intValue() <= 0) {
+			pageSize = 20;
+		}
+		// 分页查询司机加盟记录信息
+		PageDTO pageDto = new PageDTO();
+		int total = 0;
+		List<DriverJoinRecord> driverJoinRecordList = null;
+		PageInfo<DriverJoinRecord> pageInfo = null;
+		try {
+			pageInfo = PageHelper.startPage(page, pageSize, true).doSelectPageInfo(() -> driverJoinRecordExMapper
+					.queryJoinRecordByDriverId(driverId));
+			total = (int) pageInfo.getTotal();
+			driverJoinRecordList = pageInfo.getList();
+			if (null == driverJoinRecordList || driverJoinRecordList.size() <= 0) {
+				return AjaxResponse.success(pageDto);
+			}
+			// 将分页查询结果转成dto
+			List<DriverJoinRecordDto> dtos = BeanUtil.copyList(driverJoinRecordList, DriverJoinRecordDto.class);
+			pageDto.setResult(dtos);
+			pageDto.setTotal(total);
+		} catch (Exception e) {
+			logger.error("查询司机加盟记录列表数据异常,driverId="+driverId, e);
+		} finally {
+			PageHelper.clearPage();
+		}
+		return AjaxResponse.success(pageDto);
 	}
 
 }
