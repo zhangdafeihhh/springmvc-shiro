@@ -81,7 +81,7 @@ public class DriverMonthDutyController {
     @Autowired
     private CitySupplierTeamCommonService commonService;
 
-    /** 
+    /**
     * @Desc: 导入模板数据 
     * @param:
     * @return:  
@@ -99,8 +99,7 @@ public class DriverMonthDutyController {
             }
             logger.info("每个司机一个月每天的排班导入保存,参数:"+params.toString());
             Map<String, Object> result = this.driverMonthDutyService.importDriverMonthDuty(params, request);
-
-            return AjaxResponse.success(request);
+            return AjaxResponse.success(result);
         }catch (Exception e){
             logger.error("导入月排班模板数据异常：{}",e);
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);

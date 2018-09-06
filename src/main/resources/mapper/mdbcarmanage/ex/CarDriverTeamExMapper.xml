@@ -20,10 +20,21 @@
     <result column="charge2" property="charge2" jdbcType="VARCHAR" />
     <result column="charge3" property="charge3" jdbcType="VARCHAR" />
   </resultMap>
+
+    <resultMap id="BaseExResultMap" type="com.zhuanche.dto.CarDriverTeamDTO" extends="BaseResultMap">
+        <collection column="{pId=id}" property="groups" javaType="ArrayList"
+                    select="queryForListByPid" />
+    </resultMap>
+
   <sql id="Base_Column_List" >
     id, team_name, sort, create_by, create_date, update_by, update_date, city, supplier, 
     remark, status, p_id, duty_start_date, duty_end_date, charge1, charge2, charge3
   </sql>
+
+    <update id="updateTeamDuty" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverTeam">
+        update car_driver_team set duty_start_date = #{dutyStartDate} ,duty_end_date = #{dutyEndDate} where id = #{id}
+    </update>
+
     <select id="queryTeamIdByDriverId" parameterType="Integer" resultType="java.util.HashMap">
         SELECT
         r.team_id teamId, t.team_name teamName
@@ -55,7 +66,7 @@
 
     <select id="queryForListByPid" parameterType="com.zhuanche.request.DriverTeamRequest" resultType="com.zhuanche.entity.mdbcarmanage.CarDriverTeam">
         SELECT
-        id AS teamId,
+        id,
         team_name AS teamName,
         create_by AS createBy,
         create_date AS createDate,
@@ -114,5 +125,33 @@
 		LEFT JOIN car_driver_team dtm ON rg.group_id=dtm.id
 		WHERE rt.driver_id = #{driverId}
     </select>
-  
+
+    <!-- 查询车队列表(根据城市ID，供应商ID、车队ID  )返回车队和车队下的小组 -->
+    <select id="queryDriverTeamAndGroup" resultMap="BaseExResultMap" >
+        select
+        <include refid="Base_Column_List" />
+        from car_driver_team
+        where p_id is null AND status!=2
+        <if test="cityIds!=null and cityIds.size()>0">
+            and city IN
+            <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
+                #{cid}
+            </foreach>
+        </if>
+        <if test="supplierIds!=null and supplierIds.size()>0">
+            and supplier IN
+            <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
+                #{sid}
+            </foreach>
+        </if>
+        <if test="teamIds!=null and teamIds.size()>0">
+            and id IN
+            <foreach collection="teamIds" open="(" close=")" separator="," item="tid" >
+                #{tid}
+            </foreach>
+        </if>
+        order by city, id
+    </select>
+
+
 </mapper>

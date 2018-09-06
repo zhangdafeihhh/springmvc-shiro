@@ -2568,7 +2568,7 @@ public class CarBizDriverInfoTempService {
             }
             entity.setStatus(1);
             entity.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
-            log.info("编辑");
+            log.info("临时司机修改:"+entity.toString());
             try {
                 if((entity.getOldCityId()!=null&&!"".equals(entity.getOldCityId())&&!entity.getServiceCityId().equals(entity.getOldCityId()))
                         ||(entity.getOldSupplierId()!=null&&!"".equals(entity.getOldSupplierId())&&!entity.getSupplierId().equals(entity.getOldSupplierId()))){

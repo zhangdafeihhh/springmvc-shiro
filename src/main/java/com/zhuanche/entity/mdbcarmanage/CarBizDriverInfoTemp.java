@@ -649,5 +649,70 @@ public class CarBizDriverInfoTemp extends BaseDriverInfoTemp {
 	    String in =  super.getPhone();  
 	    return in.hashCode();  
     }
+
+    @Override
+    public String toString() {
+        return "CarBizDriverInfoTemp{" +
+                "driverLicenseNumber='" + driverLicenseNumber + '\'' +
+                ", drivingLicenseImg='" + drivingLicenseImg + '\'' +
+                ", firstDrivingLicenseDate='" + firstDrivingLicenseDate + '\'' +
+                ", firstMeshworkDrivingLicenseDate='" + firstMeshworkDrivingLicenseDate + '\'' +
+                ", nationAlity='" + nationAlity + '\'' +
+                ", houseHoldRegister='" + houseHoldRegister + '\'' +
+                ", nation='" + nation + '\'' +
+                ", marriage='" + marriage + '\'' +
+                ", foreignLanguage='" + foreignLanguage + '\'' +
+                ", education='" + education + '\'' +
+                ", courseName='" + courseName + '\'' +
+                ", courseDate='" + courseDate + '\'' +
+                ", courseDateStart='" + courseDateStart + '\'' +
+                ", courseDateEnd='" + courseDateEnd + '\'' +
+                ", courseTime='" + courseTime + '\'' +
+                ", corpType='" + corpType + '\'' +
+                ", trafficViolations='" + trafficViolations + '\'' +
+                ", signDate='" + signDate + '\'' +
+                ", signDateEnd='" + signDateEnd + '\'' +
+                ", contractDate='" + contractDate + '\'' +
+                ", isXyDriver=" + isXyDriver +
+                ", xyDriverNumber='" + xyDriverNumber + '\'' +
+                ", partTimeJobDri='" + partTimeJobDri + '\'' +
+                ", phoneType='" + phoneType + '\'' +
+                ", phoneCorp='" + phoneCorp + '\'' +
+                ", mapType='" + mapType + '\'' +
+                ", emergencyContactAddr='" + emergencyContactAddr + '\'' +
+                ", assessment='" + assessment + '\'' +
+                ", driverLicenseIssuingDateStart='" + driverLicenseIssuingDateStart + '\'' +
+                ", driverLicenseIssuingDateEnd='" + driverLicenseIssuingDateEnd + '\'' +
+                ", driverLicenseIssuingCorp='" + driverLicenseIssuingCorp + '\'' +
+                ", driverLicenseIssuingNumber='" + driverLicenseIssuingNumber + '\'' +
+                ", driverLicenseIssuingRegisterDate='" + driverLicenseIssuingRegisterDate + '\'' +
+                ", driverLicenseIssuingFirstDate='" + driverLicenseIssuingFirstDate + '\'' +
+                ", driverLicenseIssuingGrantDate='" + driverLicenseIssuingGrantDate + '\'' +
+                ", birthDay='" + birthDay + '\'' +
+                ", houseHoldRegisterPermanent='" + houseHoldRegisterPermanent + '\'' +
+                ", isDriverBlack='" + isDriverBlack + '\'' +
+                ", oldPhone='" + oldPhone + '\'' +
+                ", oldIdCardNo='" + oldIdCardNo + '\'' +
+                ", oldDriverLicenseNumber='" + oldDriverLicenseNumber + '\'' +
+                ", oldDriverLicenseIssuingNumber='" + oldDriverLicenseIssuingNumber + '\'' +
+                ", cooperationType=" + cooperationType +
+                ", cooperationName='" + cooperationName + '\'' +
+                ", oldSupplierId=" + oldSupplierId +
+                ", oldCityId=" + oldCityId +
+                ", imei='" + imei + '\'' +
+                ", bankCardBank='" + bankCardBank + '\'' +
+                ", bankCardNumber='" + bankCardNumber + '\'' +
+                ", photoSrct='" + photoSrct + '\'' +
+                ", ext2=" + ext2 +
+                ", ext3=" + ext3 +
+                ", ext4=" + ext4 +
+                ", ext5=" + ext5 +
+                ", ext6='" + ext6 + '\'' +
+                ", ext7='" + ext7 + '\'' +
+                ", ext8='" + ext8 + '\'' +
+                ", ext9='" + ext9 + '\'' +
+                ", ext10='" + ext10 + '\'' +
+                '}';
+    }
 }
   

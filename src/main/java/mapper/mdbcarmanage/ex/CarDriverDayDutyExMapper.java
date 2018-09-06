@@ -11,6 +11,8 @@ public interface CarDriverDayDutyExMapper {
 
     List<CarDriverDayDutyDTO> selectForList(DutyParamRequest dutyParamRequest);
 
+    List<CarDriverDayDutyDTO> queryForList(DutyParamRequest dutyParamRequest);
+
     Integer getUnIssueCount(DutyParamRequest dutyParamRequest);
 
     Integer updateDriverDayDutyList(Map<String, Object> params);

@@ -116,7 +116,7 @@ public class CarBizCarInfoTempService {
     public AjaxResponse update(CarBizCarInfoTemp entity) {
         try{
             carBizCarInfoTempMapper.updateByPrimaryKeySelective(entity);
-            CarBizDriverInfoTemp carDriver = carBizDriverInfoTempExMapper.getDriverByLincesePlates(entity.getLicensePlates1());
+            CarBizDriverInfoTemp carDriver = carBizDriverInfoTempExMapper.getDriverByLincesePlates(entity.getOldLicensePlates());
             if (carDriver != null) {
                 int had = 0;
                 // 车辆是否更改城市，更改，则修改司机
@@ -134,7 +134,7 @@ public class CarBizCarInfoTempService {
                     carDriver.setTeamid("");
                     carDriver.setGroupIds("");
                 }
-                if (!entity.getLicensePlates().equals(entity.getLicensePlates1())) {
+                if (!entity.getLicensePlates().equals(entity.getOldLicensePlates())) {
                     had = 1;
                     carDriver.setLicensePlates(entity.getLicensePlates());
                 }
@@ -464,7 +464,7 @@ public class CarBizCarInfoTempService {
                                         isTrue = false;
                                     } else {
                                         carBizCarInfo.setLicensePlates(license);
-                                        carBizCarInfo.setLicensePlates1(license);
+                                        carBizCarInfo.setOldLicensePlates(license);
                                     }
                                 } else {
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();

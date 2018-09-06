@@ -1,8 +1,12 @@
 package com.zhuanche.entity.mdbcarmanage;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class CarDriverTeam {
+public class CarDriverTeam implements Serializable{
+
+    private static final long serialVersionUID = -8774840927274024855L;
+
     private Integer id;
 
     private String teamName;
@@ -36,6 +40,25 @@ public class CarDriverTeam {
     private String charge2;
 
     private String charge3;
+
+    private String cityName;
+    private String supplierName;
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
 
     public Integer getId() {
         return id;

@@ -1,6 +1,9 @@
 package com.zhuanche.dto;
 
+import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
+
 import java.util.Date;
+import java.util.List;
 
 public class CarDriverTeamDTO {
     private Integer id;
@@ -36,13 +39,22 @@ public class CarDriverTeamDTO {
     private String charge2;
 
     private String charge3;
-    
+
+    private List<CarDriverTeam> groups;
     
     //---------------------------------扩充字段
     private String cityName;
     private String supplierName;
     /** 0没有操作 1打开 2关闭*/
     private Integer openCloseFlag;
+
+    public List<CarDriverTeam> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<CarDriverTeam> groups) {
+        this.groups = groups;
+    }
 
     public Integer getOpenCloseFlag() {
         return openCloseFlag;
