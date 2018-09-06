@@ -15,6 +15,7 @@ import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.serv.CustomerAppraisalService;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.util.List;
 import java.util.Set;
 
@@ -157,6 +161,8 @@ public class CustomerAppraisalController {
         carBizCustomerAppraisalStatisticsDTO.setDriverName(name);
         carBizCustomerAppraisalStatisticsDTO.setDriverPhone(phone);
         carBizCustomerAppraisalStatisticsDTO.setCreateDate(month);
+        carBizCustomerAppraisalStatisticsDTO.setCityId(cityId);
+        carBizCustomerAppraisalStatisticsDTO.setSupplierId(supplierId);
         //数据权限
         carBizCustomerAppraisalStatisticsDTO.setCityIds(permOfCity);
         carBizCustomerAppraisalStatisticsDTO.setSupplierIds(permOfSupplier);
@@ -175,10 +181,71 @@ public class CustomerAppraisalController {
     }
 
     /**
+     * 司机评分导出
+     * @param name 司机姓名
+     * @param phone 司机手机号
+     * @param cityId 城市ID
+     * @param supplierId 供应商ID
+     * @param teamId 车队ID
+     * @param teamGroupId 车队下小组ID
+     * @param month 月份 yyyy-M
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/exportCustomerAppraisalStatistics")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
+    })
+    public void queryCustomerAppraisalStatisticsList(String name, String phone, Integer cityId, Integer supplierId,
+                                                     Integer teamId, Integer teamGroupId,
+                                                     @Verify(param = "month", rule = "required") String month,
+                                                     HttpServletRequest request, HttpServletResponse response) {
+
+        // 数据权限控制SSOLoginUser
+        Set<Integer> permOfCity        = WebSessionUtil.getCurrentLoginUser().getCityIds(); //普通管理员可以管理的所有城市ID
+        Set<Integer> permOfSupplier    = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); //普通管理员可以管理的所有供应商ID
+        Set<Integer> permOfTeam        = WebSessionUtil.getCurrentLoginUser().getTeamIds(); //普通管理员可以管理的所有车队ID
+
+        int total = 0;
+        List<CarBizCustomerAppraisalStatisticsDTO> list =  Lists.newArrayList();
+        Set<Integer> driverIds = null;
+        Boolean had = false;
+        if(teamGroupId!=null || teamId!=null || (permOfTeam!=null && permOfTeam.size()>0)){
+            had = true;
+            driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
+        }
+        if(had && (driverIds==null || driverIds.size()==0)){
+            logger.info(LOGTAG + "查询teamId={},groupId={},permOfTeam={}没有司机评分信息", teamId, teamGroupId, permOfTeam);
+            list =  Lists.newArrayList();
+        }else {
+            CarBizCustomerAppraisalStatisticsDTO carBizCustomerAppraisalStatisticsDTO = new CarBizCustomerAppraisalStatisticsDTO();
+            carBizCustomerAppraisalStatisticsDTO.setDriverName(name);
+            carBizCustomerAppraisalStatisticsDTO.setDriverPhone(phone);
+            carBizCustomerAppraisalStatisticsDTO.setCreateDate(month);
+            carBizCustomerAppraisalStatisticsDTO.setCityId(cityId);
+            carBizCustomerAppraisalStatisticsDTO.setSupplierId(supplierId);
+            //数据权限
+            carBizCustomerAppraisalStatisticsDTO.setCityIds(permOfCity);
+            carBizCustomerAppraisalStatisticsDTO.setSupplierIds(permOfSupplier);
+            carBizCustomerAppraisalStatisticsDTO.setTeamIds(permOfTeam);
+            carBizCustomerAppraisalStatisticsDTO.setDriverIds(driverIds);
+
+            list = customerAppraisalService.queryCustomerAppraisalStatisticsList(carBizCustomerAppraisalStatisticsDTO);
+        }
+        try {
+            //TODO 待完善
+            Workbook wb = customerAppraisalService.exportExcelDriverAppraisal(list, request.getRealPath("/")+File.separator+"template"+File.separator+"driver_appraisal.xlsx");
+            Componment.fileDownload(response, wb, new String("司机评分".getBytes("utf-8"), "iso8859-1"));
+        } catch (Exception e) {
+            logger.error("司机信息列表查询导出error",e);
+        }
+    }
+
+    /**
      * 司机评分一个月详情
-     * @param driverId
-     * @param month
-     * @param orderNo
+     * @param driverId 司机ID
+     * @param month 月份 yyyy-MM
+     * @param orderNo 订单号
      * @return
      */
     @ResponseBody
@@ -187,8 +254,7 @@ public class CustomerAppraisalController {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
     public AjaxResponse queryCustomerAppraisalStatisticsDetail(@Verify(param = "driverId", rule = "required") Integer driverId,
-                                                             @Verify(param = "month", rule = "required") String month,
-                                                             String orderNo) {
+                                                             @Verify(param = "month", rule = "required") String month, String orderNo) {
 
         CarBizCustomerAppraisalDTO carBizCustomerAppraisalDTO = new CarBizCustomerAppraisalDTO();
         carBizCustomerAppraisalDTO.setDriverId(driverId);

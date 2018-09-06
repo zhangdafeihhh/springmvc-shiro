@@ -88,7 +88,7 @@ public final class RestErrorCode{
 	public static final int SYSTEM_ROLE_CANOT_CHANGE              = 10102;
 
 	//-----------------------------------------------业务参数：司机
-	@ResultMessage("没有该手机号的司机，请仔细核对！")
+	@ResultMessage("司机不存在，请仔细核对！")
 	public static final int DRIVER_NOT_EXIST = 2000;
 	@ResultMessage("该司机已存在启用的永久停运！")
 	public static final int DRIVER_OUTAGEALL_EXIST = 2001;
@@ -106,7 +106,7 @@ public final class RestErrorCode{
 	public static final int DRIVER_BANK_CARD_NUMBER_NOT_LEGAL                     = 3005;
 	@ResultMessage("银行卡号和银行开户行不能只填写一个")
 	public static final int DRIVER_BANK_CARD_NUMBER_NOT_COMPLETE                     = 3006;
-	@ResultMessage("银行卡号和银行开户行不能只填写一个")
+	@ResultMessage("银行卡号已存在")
 	public static final int DRIVER_BANK_CARD_NUMBER_EXIST                    = 3007;
 
 	//-----------------------------------------------业务参数：导入文件

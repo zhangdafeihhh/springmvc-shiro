@@ -6,6 +6,8 @@ import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class CarBizCarGroupService {
 
@@ -35,6 +37,15 @@ public class CarBizCarGroupService {
      */
     public CarBizCarGroup queryForObject(CarBizCarGroup carBizCarGroup){
         return carBizCarGroupExMapper.queryForObject(carBizCarGroup);
+    }
+
+    /**
+     * 查询服务类型
+     * @param type 1:专车、2:大巴车
+     * @return
+     */
+    public List<CarBizCarGroup> queryCarGroupList(Integer type){
+        return carBizCarGroupExMapper.queryCarGroupList(type);
     }
 
 }

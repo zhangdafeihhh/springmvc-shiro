@@ -90,4 +90,17 @@
       GROUP BY g.sort, g.update_date DESC
       HAVING 1=1 and  g.group_id  = #{groupId}
   </select>
+
+    <!--查询服务类型-->
+    <select id="queryCarGroupList" resultType="com.zhuanche.entity.rentcar.CarBizCarGroup" parameterType="java.lang.Integer">
+      SELECT
+        group_id AS groupId,
+        group_name AS groupName
+      FROM
+        car_biz_car_group
+      WHERE status=1
+        <if test="type !=null and type !='' ">
+            and type = #{type}
+        </if>
+  </select>
 </mapper>

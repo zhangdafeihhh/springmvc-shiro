@@ -28,6 +28,25 @@ public class CarBizCustomerAppraisalStatisticsDTO extends Base {
 
     private Date sysDate;
 
+    private Integer cityId;
+    private Integer supplierId;
+
+    public Integer getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(Integer cityId) {
+        this.cityId = cityId;
+    }
+
+    public Integer getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(Integer supplierId) {
+        this.supplierId = supplierId;
+    }
+
     public Integer getAppraisalStatisticsId() {
         return appraisalStatisticsId;
     }
