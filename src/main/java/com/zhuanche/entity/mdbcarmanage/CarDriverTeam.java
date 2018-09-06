@@ -41,6 +41,25 @@ public class CarDriverTeam implements Serializable{
 
     private String charge3;
 
+    private String cityName;
+    private String supplierName;
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
     public Integer getId() {
         return id;
     }
