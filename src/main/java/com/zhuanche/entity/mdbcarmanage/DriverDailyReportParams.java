@@ -163,4 +163,23 @@ public class DriverDailyReportParams implements Serializable{
 	public void setPageSize(Integer pageSize) {
 		this.pageSize = pageSize;
 	}
+
+	@Override
+	public String toString() {
+		return "DriverDailyReportParams{" +
+				"licensePlates='" + licensePlates + '\'' +
+				", driverName='" + driverName + '\'' +
+				", driverIds='" + driverIds + '\'' +
+				", teamIds='" + teamIds + '\'' +
+				", suppliers='" + suppliers + '\'' +
+				", cities='" + cities + '\'' +
+				", statDateStart='" + statDateStart + '\'' +
+				", statDateEnd='" + statDateEnd + '\'' +
+				", sortName='" + sortName + '\'' +
+				", sortOrder='" + sortOrder + '\'' +
+				", groupIds='" + groupIds + '\'' +
+				", page=" + page +
+				", pageSize=" + pageSize +
+				'}';
+	}
 }

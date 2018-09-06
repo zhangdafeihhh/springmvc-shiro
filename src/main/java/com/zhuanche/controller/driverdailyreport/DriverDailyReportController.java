@@ -9,8 +9,8 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.controller.DriverQueryController;
 import com.zhuanche.dto.DriverDailyReportDTO;
-import com.zhuanche.entity.mdbcarmanage.DriverDailyReportParams;
 import com.zhuanche.entity.mdbcarmanage.DriverDailyReport;
+import com.zhuanche.entity.mdbcarmanage.DriverDailyReportParams;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.serv.common.DataPermissionHelper;
 import com.zhuanche.shiro.realm.SSOLoginUser;
@@ -22,14 +22,13 @@ import mapper.mdbcarmanage.ex.CarRelateGroupExMapper;
 import mapper.mdbcarmanage.ex.DriverDailyReportExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.shiro.crypto.hash.Hash;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -39,11 +38,9 @@ import org.springframework.web.client.RestClientException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.crypto.Data;
 import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -54,7 +51,7 @@ import java.util.*;
 @RequestMapping(value = "/driverDailyReport")
 public class DriverDailyReportController extends DriverQueryController {
 
-	private static Log log =  LogFactory.getLog(DriverDailyReportController.class);
+	private static Logger log =  LoggerFactory.getLogger(DriverDailyReportController.class);
 	
 	@Autowired
 	private DriverDailyReportExMapper driverDailyReportExMapper;
@@ -279,12 +276,10 @@ public class DriverDailyReportController extends DriverQueryController {
 
 		try {
 			log.info("司机周报列表数据:queryDriverDailyReportData");
-			reportType = reportType == null ? 0 : reportType;
 
 			List<DriverDailyReportDTO> rows = new ArrayList<>();
 			List<DriverDailyReport> list = new ArrayList<>();
 
-			int total = 0;
 			//判断权限   如果司机id为空为查询列表页
 			String driverList = null;
 			//如果页面输入了小组id
@@ -303,16 +298,10 @@ public class DriverDailyReportController extends DriverQueryController {
 				//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
 				params = this.chuliDriverDailyReportEntity(params);
 				//开始查询
-				Page<DriverDailyReport> p = PageHelper.startPage(1, 500);
-				try {
-					if ( reportType==0 ) {
-						list = this.driverDailyReportExMapper.queryForListObject(params);
-					}else {
-						list = this.driverDailyReportExMapper.queryWeekForListObject(params);
-					}
-					total = (int) p.getTotal();
-				} finally {
-					PageHelper.clearPage();
+				if ( reportType==0 ) {
+					list = this.driverDailyReportExMapper.queryForListObject(params);
+				}else {
+					list = this.driverDailyReportExMapper.queryWeekForListObject(params);
 				}
 				rows = this.selectSuppierNameAndCityNameDays(list);
 			}
@@ -339,7 +328,7 @@ public class DriverDailyReportController extends DriverQueryController {
 			list = BeanUtil.copyList(rows, DriverDailyReportDTO.class);
 			Set<Integer> s = new HashSet();
 			for(DriverDailyReportDTO driverDailyReport : list){
-				s.add(driverDailyReport.getCityId());
+				s.add(driverDailyReport.getSupplierId());
 			}
 			//查询供应商名称，一次查询出来避免多次读库
 			List<CarBizSupplier>  names = this.carBizSupplierExMapper.queryNamesByIds(s);

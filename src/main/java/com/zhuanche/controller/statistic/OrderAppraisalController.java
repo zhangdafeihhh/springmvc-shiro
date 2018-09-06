@@ -8,7 +8,6 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.controller.DriverQueryController;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalBean;
-import com.zhuanche.entity.mdbcarmanage.DriverDailyReport;
 import com.zhuanche.entity.rentcar.CarBizCustomerAppraisal;
 import com.zhuanche.entity.rentcar.CarBizCustomerAppraisalParams;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -16,13 +15,13 @@ import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.DateUtils;
 import mapper.rentcar.ex.CarBizCustomerAppraisalExMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,7 +42,7 @@ import java.util.List;
 @RequestMapping("/orderAppraisal")
 public class OrderAppraisalController extends DriverQueryController{
 
-	private static Log log =  LogFactory.getLog(OrderAppraisalController.class);
+	private static Logger log =  LoggerFactory.getLogger(OrderAppraisalController.class);
 
 	@Autowired
 	private CarBizCustomerAppraisalExMapper carBizCustomerAppraisalExMapper;

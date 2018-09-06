@@ -8,24 +8,23 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.controller.DriverQueryController;
 import com.zhuanche.dto.rentcar.DriverDutyStatisticDTO;
-import com.zhuanche.entity.mdblog.StatisticDutyHalf;
-import com.zhuanche.entity.mdblog.StatisticDutyHalfParams;
 import com.zhuanche.entity.mdbcarmanage.DriverDutyStatistic;
 import com.zhuanche.entity.mdbcarmanage.DriverDutyStatisticParams;
+import com.zhuanche.entity.mdblog.StatisticDutyHalf;
+import com.zhuanche.entity.mdblog.StatisticDutyHalfParams;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
-import com.zhuanche.util.DateUtil;
-import mapper.mdblog.ex.StatisticDutyHalfExMapper;
 import mapper.mdbcarmanage.ex.DriverDutyStatisticExMapper;
+import mapper.mdblog.ex.StatisticDutyHalfExMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,7 +49,7 @@ import java.util.Map;
 @RequestMapping(value = "/driverDutyStatistic")
 public class DriverDutyStatisticController extends DriverQueryController{
 
-	private static Log log =  LogFactory.getLog(DriverDutyStatisticController.class);
+	private static Logger log =  LoggerFactory.getLogger(DriverDutyStatisticController.class);
 
 	@Autowired
 	private DriverDutyStatisticExMapper driverDutyStatisticExMapper;

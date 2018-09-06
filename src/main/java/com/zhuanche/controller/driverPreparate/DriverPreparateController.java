@@ -7,9 +7,9 @@ import com.zhuanche.common.web.Verify;
 import com.zhuanche.entity.DriverPreparate.DriverPreparate;
 import com.zhuanche.serv.driverPreparate.DriverPreparateService;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.util.TextUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +35,7 @@ import java.util.zip.ZipOutputStream;
 @RequestMapping(value = "/driverPreparate")
 public class DriverPreparateController {
 
-	private static Log log =  LogFactory.getLog(DriverPreparateController.class);
+	private static Logger log =  LoggerFactory.getLogger(DriverPreparateController.class);
 
 	@Autowired
 	private DriverPreparateService driverPreparateService;
