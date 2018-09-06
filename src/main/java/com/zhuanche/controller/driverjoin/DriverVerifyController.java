@@ -15,6 +15,7 @@ import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.driver.DriverJoinRecordDto;
 import com.zhuanche.dto.driver.DriverVerifyDto;
@@ -128,6 +129,7 @@ public class DriverVerifyController {
 			pageDto.setTotal(total);
 		} catch (Exception e) {
 			logger.error("查询司机加盟记录列表数据异常,driverId="+driverId, e);
+			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 		} finally {
 			PageHelper.clearPage();
 		}
