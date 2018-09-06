@@ -206,7 +206,6 @@ public class CustomerAppraisalController {
         Set<Integer> permOfSupplier    = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); //普通管理员可以管理的所有供应商ID
         Set<Integer> permOfTeam        = WebSessionUtil.getCurrentLoginUser().getTeamIds(); //普通管理员可以管理的所有车队ID
 
-        int total = 0;
         List<CarBizCustomerAppraisalStatisticsDTO> list =  Lists.newArrayList();
         Set<Integer> driverIds = null;
         Boolean had = false;
