@@ -20,7 +20,7 @@ import java.util.List;
   *
 */
 
-public class CarDriverTeamDTO extends CarDriverTeam {
+public class DriverTeamGroupDTO extends CarDriverTeam {
 
     private static final long serialVersionUID = 5047475786202110125L;
 

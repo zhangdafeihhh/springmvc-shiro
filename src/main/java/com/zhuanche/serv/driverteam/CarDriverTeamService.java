@@ -14,6 +14,7 @@ import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.dutyEnum.ServiceReturnCodeEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.dto.CarDriverInfoDTO;
+import com.zhuanche.dto.driver.DriverTeamGroupDTO;
 import com.zhuanche.entity.mdbcarmanage.CarRelateGroup;
 import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.request.DriverTeamRequest;
@@ -456,8 +457,8 @@ public class CarDriverTeamService{
 		//B----------------------------------------------------------------------------------进行分页查询
 		PageDTO pageDTO = new PageDTO();
 		int total = 0;
-		List<CarDriverTeam> driverTeams = null;
-		PageInfo<CarDriverTeam> pageInfo =null;
+		List<DriverTeamGroupDTO> driverTeams = null;
+		PageInfo<DriverTeamGroupDTO> pageInfo =null;
 		try{
 			pageInfo =
 					PageHelper.startPage(driverTeamRequest.getPageNo(), driverTeamRequest.getPageSize(), true).doSelectPageInfo(()
