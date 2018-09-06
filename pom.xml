@@ -310,9 +310,6 @@
 			<properties>
 				<env.name>dev</env.name>
 			</properties>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
 		</profile>
 		<profile>
 			<id>test</id>
@@ -331,6 +328,9 @@
 			<properties>
 				<env.name>online</env.name>
 			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 		</profile>
 	</profiles>
 	<!-- 多环境配置END -->
@@ -356,12 +356,13 @@
 					<include>${env.name}/*.properties</include>
 				</includes>
 			</resource>
-			<!-- 包含当前环境下的logback.xml (自动复制到CLASSPATH下 ) -->
+			<!-- 包含当前环境下的logback.xml  ,  jks (自动复制到CLASSPATH下 ) -->
 			<resource>
 				<directory>src/main/resources/${env.name}</directory>
-				<filtering>true</filtering>
+				<filtering>false</filtering>
 				<includes>
 					<include>logback.xml</include>
+					<include>*.jks</include>
 				</includes>
 			</resource>
 		</resources>
