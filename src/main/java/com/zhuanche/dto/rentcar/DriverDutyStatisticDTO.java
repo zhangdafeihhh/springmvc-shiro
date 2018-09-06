@@ -9,7 +9,7 @@ public class DriverDutyStatisticDTO {
 
     private String licenseplates;
 
-    private Date time;
+    private String time;
 
     private String name;
 
@@ -83,11 +83,11 @@ public class DriverDutyStatisticDTO {
         this.licenseplates = licenseplates == null ? null : licenseplates.trim();
     }
 
-    public Date getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(Date time) {
+    public void setTime(String time) {
         this.time = time;
     }
 

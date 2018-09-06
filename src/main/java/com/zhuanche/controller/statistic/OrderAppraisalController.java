@@ -7,10 +7,12 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.controller.DriverQueryController;
+import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalBean;
 import com.zhuanche.entity.mdbcarmanage.DriverDailyReport;
 import com.zhuanche.entity.rentcar.CarBizCustomerAppraisal;
 import com.zhuanche.entity.rentcar.CarBizCustomerAppraisalParams;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.DateUtils;
 import mapper.rentcar.ex.CarBizCustomerAppraisalExMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -71,7 +73,7 @@ public class OrderAppraisalController extends DriverQueryController{
 										  String teamId,
 										  String groupIds,
 										  String driverName,
-//										  @Verify(param="createDateBegin",rule="mobile")
+										  @Verify(param="driverPhone",rule="mobile")
 													  String driverPhone,
 										  String orderNo,
 										  @Verify(param="createDateBegin",rule="required")String createDateBegin,
@@ -81,7 +83,7 @@ public class OrderAppraisalController extends DriverQueryController{
 										  Integer pageSize) {
 
 		if (StringUtils.isEmpty(driverPhone) && StringUtils.isEmpty(teamId)){
-			//请选择一个车队或输入司机手机号
+			//请选择一个车队号或输入司机手机
 			return AjaxResponse.fail(RestErrorCode.TEAMID_OR_DRIVERID_ISNULL);
 		}
 		CarBizCustomerAppraisalParams params = new CarBizCustomerAppraisalParams(cityId,supplierId,teamId,groupIds,driverName,driverPhone,orderNo,
@@ -103,10 +105,11 @@ public class OrderAppraisalController extends DriverQueryController{
 		//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
 		params = this.chuliParams(params);
 		//开始查询
-		Page<DriverDailyReport> p = PageHelper.startPage(params.getPage(), params.getPageSize());
-		List<CarBizCustomerAppraisal> list = null;
+		Page<CarBizCustomerAppraisal> p = PageHelper.startPage(params.getPage(), params.getPageSize());
+		List<CarBizCustomerAppraisalBean> list = null;
 		try {
-			list = this.carBizCustomerAppraisalExMapper.queryForListObject(params);
+			List<CarBizCustomerAppraisal> appraisalList = this.carBizCustomerAppraisalExMapper.queryForListObject(params);
+			list = BeanUtil.copyList(appraisalList,CarBizCustomerAppraisalBean.class);
 			total = (int) p.getTotal();
 		} finally {
 			PageHelper.clearPage();
@@ -140,7 +143,7 @@ public class OrderAppraisalController extends DriverQueryController{
 									 String teamId,
 									 String groupIds,
 									 String driverName,
-//									 @Verify(param="createDateBegin",rule="mobile")
+									 @Verify(param="driverPhone",rule="mobile")
 														 String driverPhone,
 									 String orderNo,
 									 @Verify(param="createDateBegin",rule="required")String createDateBegin,
@@ -226,15 +229,6 @@ public class OrderAppraisalController extends DriverQueryController{
 
 				cell = row.createCell(3);
 				cell.setCellValue(s.getOrderNo());
-
-//				cell = row.createCell(4);
-//				cell.setCellValue(s.getInstrumentAndService());
-//
-//				cell = row.createCell(5);
-//				cell.setCellValue(s.getEnvironmentAndEquipped());
-//
-//				cell = row.createCell(6);
-//				cell.setCellValue(s.getEfficiencyAndSafety());
 
 				cell = row.createCell(4);
 				cell.setCellValue(s.getEvaluateScore());

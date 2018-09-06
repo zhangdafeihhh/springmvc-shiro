@@ -16,6 +16,8 @@ public class CarSysMobileClientPublishDTO implements Serializable{
 
     private Integer platform;
 
+    private String channelNum;
+
     private Integer forcedUpdate;
 
     private Integer forcedUpdateDown;
@@ -25,6 +27,8 @@ public class CarSysMobileClientPublishDTO implements Serializable{
     private Date publishDate;
 
     private String memo;
+
+    private Integer type;
 
     public Integer getVersionId() {
         return versionId;
@@ -98,4 +102,19 @@ public class CarSysMobileClientPublishDTO implements Serializable{
         this.memo = memo == null ? null : memo.trim();
     }
 
+    public String getChannelNum() {
+        return channelNum;
+    }
+
+    public void setChannelNum(String channelNum) {
+        this.channelNum = channelNum;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
 }

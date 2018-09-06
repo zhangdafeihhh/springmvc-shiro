@@ -11,6 +11,7 @@ import com.zhuanche.controller.DriverQueryController;
 import com.zhuanche.dto.DriverDailyReportDTO;
 import com.zhuanche.entity.mdbcarmanage.DriverDailyReportParams;
 import com.zhuanche.entity.mdbcarmanage.DriverDailyReport;
+import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.serv.common.DataPermissionHelper;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -19,6 +20,7 @@ import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.MyRestTemplate;
 import mapper.mdbcarmanage.ex.CarRelateGroupExMapper;
 import mapper.mdbcarmanage.ex.DriverDailyReportExMapper;
+import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,6 +29,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.shiro.crypto.hash.Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -36,14 +39,12 @@ import org.springframework.web.client.RestClientException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.crypto.Data;
 import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigDecimal;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *   司机日报、周报、月报查询接口
@@ -63,6 +64,9 @@ public class DriverDailyReportController extends DriverQueryController {
 	
 	@Autowired
 	private CarRelateGroupExMapper carRelateGroupExMapper;
+
+	@Autowired
+	private CarBizSupplierExMapper carBizSupplierExMapper;
 	
 	
 	@Autowired
@@ -100,6 +104,9 @@ public class DriverDailyReportController extends DriverQueryController {
 		    @Verify(rule = "required",param = "statDateStart") String statDateStart,
 			@Verify(rule = "required",param = "statDateEnd") String statDateEnd, String sortName, String sortOrder, String groupIds, Integer page, Integer pageSize, Integer reportType){
 		//默认报告类型为日报
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(new Date());
+		long timeInMillis = cal.getTimeInMillis();
 		reportType = reportType == null ? 0 : reportType;
 		if (reportType.equals(0)){
 			statDateEnd = statDateStart;
@@ -146,6 +153,12 @@ public class DriverDailyReportController extends DriverQueryController {
 		List<DriverDailyReport> list = null;
 		//开始查询
 		Page<DriverDailyReport> p = PageHelper.startPage(params.getPage(), params.getPageSize());
+
+
+		cal.setTime(new Date());
+		long timeInMillis1 = cal.getTimeInMillis();
+		System.out.println("初始化时间：" + (timeInMillis1-timeInMillis) );
+
 		try {
 			if ( reportType==0 ) {
 				list = this.driverDailyReportExMapper.queryForListObject(params);
@@ -156,9 +169,22 @@ public class DriverDailyReportController extends DriverQueryController {
 		} finally {
 			PageHelper.clearPage();
 		}
+
+
+		cal.setTime(new Date());
+		long timeInMillis2 = cal.getTimeInMillis();
+		System.out.println("查询时间：" + (timeInMillis2-timeInMillis1) );
+
 		//如果不为空，进行查询供应商名称
 		List<DriverDailyReportDTO> dtoList = this.selectSuppierNameAndCityNameDays(list);
 		PageDTO pageDTO = new PageDTO(params.getPage(), params.getPageSize(), total, dtoList);
+
+
+		cal.setTime(new Date());
+		long timeInMillis3 = cal.getTimeInMillis();
+		System.out.println("设置名称时间：" + (timeInMillis3-timeInMillis2) );
+
+
 		return AjaxResponse.success(pageDTO);
 	}
 
@@ -311,13 +337,21 @@ public class DriverDailyReportController extends DriverQueryController {
 		//不为空进行转换并查询城市名称和供应商名称
 		if(rows!=null&&rows.size()>0){
 			list = BeanUtil.copyList(rows, DriverDailyReportDTO.class);
+			Set<Integer> s = new HashSet();
 			for(DriverDailyReportDTO driverDailyReport : list){
-				//查询城市名称和供应商名称
-				Map<String, Object> result = this.querySupplierName(driverDailyReport.getCityId(), driverDailyReport.getSupplierId());
-				driverDailyReport.setCityName((String)result.get("cityName"));
-				driverDailyReport.setSupplierName((String)result.get("supplierName"));
+				s.add(driverDailyReport.getCityId());
+			}
+			//查询供应商名称，一次查询出来避免多次读库
+			List<CarBizSupplier>  names = this.carBizSupplierExMapper.queryNamesByIds(s);
+			for (DriverDailyReportDTO dto: list) {
+				for (CarBizSupplier name: names) {
+					if (name.getSupplierId().equals(dto.getSupplierId())){
+						dto.setSupplierName(name.getSupplierFullName());
+						break;
+					}
+				}
 				//司机营业信息查询
-				this.modifyDriverVolume(driverDailyReport, driverDailyReport.getStatDate());
+				this.modifyDriverVolume(dto, dto.getStatDate());
 			}
 		}
 		return list;
@@ -363,50 +397,53 @@ public class DriverDailyReportController extends DriverQueryController {
 	 * return: void
 	 */
 	private void modifyDriverVolume(DriverDailyReportDTO ddre, String statDateStart) {
-		try {
-			String url = "/driverIncome/getDriverIncome?driverId="+ddre.getDriverId()+"&incomeDate=" + statDateStart;
-			String result = busOrderCostTemplate.getForObject(url, String.class);
-			
-			Map<String, Object> resultMap = JSONObject.parseObject(result, HashMap.class);
-			if (null == resultMap || !String.valueOf(resultMap.get("code")).equals("0")) {
-				log.info("查询接口【/driverIncome/getDriverIncome】返回异常,code:"+String.valueOf(resultMap.get("code")));
-				return;
-			}
-			
-			String reData = String.valueOf(resultMap.get("data"));
-			if (StringUtils.isBlank(reData)) {
-				log.info("查询接口【/driverIncome/getDriverIncome】返回data为空.");
-				return;
-			}
-			
-			Map dataMap = JSONObject.parseObject(String.valueOf(resultMap.get("data")), Map.class);
-			if (dataMap!=null){
-				String driverIncome = String.valueOf(dataMap.get("driverIncome"));
-				if (StringUtils.isBlank(driverIncome)) {
-					log.info("查询接口【/driverIncome/getDriverIncome】返回driverIncome为空.");
+		if(StringUtils.isNotEmpty(statDateStart) && statDateStart.compareTo("2018-01-01") >0 ){
+			try {
+				String url = "/driverIncome/getDriverIncome?driverId="+ddre.getDriverId()+"&incomeDate=" + statDateStart;
+				String result = busOrderCostTemplate.getForObject(url, String.class);
+
+				Map<String, Object> resultMap = JSONObject.parseObject(result, HashMap.class);
+				if (null == resultMap || !String.valueOf(resultMap.get("code")).equals("0")) {
+					log.info("查询接口【/driverIncome/getDriverIncome】返回异常,code:"+String.valueOf(resultMap.get("code")));
+					return;
 				}
 
-				JSONObject jsonObject = JSONObject.parseObject(driverIncome);
+				String reData = String.valueOf(resultMap.get("data"));
+				if (StringUtils.isBlank(reData)) {
+					log.info("查询接口【/driverIncome/getDriverIncome】返回data为空.");
+					return;
+				}
 
-				// 当日完成订单量
-				Integer orderCounts= Integer.valueOf(String.valueOf(jsonObject.get("orderCounts")));
-				ddre.setOperationNum(orderCounts);
-				// 当日营业额
-				BigDecimal todayIncomeAmount = new BigDecimal(String.valueOf(jsonObject.get("todayIncomeAmount")));
-				ddre.setActualPay(todayIncomeAmount.doubleValue());
-				// 当日载客里程
-				BigDecimal todayTravelMileage = new BigDecimal(String.valueOf(jsonObject.get("todayTravelMileage")));
-				ddre.setServiceMileage(todayTravelMileage.doubleValue());
-				// 当日司机代付价外费
-				BigDecimal todayOtherFee = new BigDecimal(String.valueOf(jsonObject.get("todayOtherFee")));
-				ddre.setDriverOutPay(todayOtherFee.doubleValue());
-				// 当日司机代收
-				BigDecimal todayDriverPay = new BigDecimal(String.valueOf(jsonObject.get("todayDriverPay")));
+				Map dataMap = JSONObject.parseObject(String.valueOf(resultMap.get("data")), Map.class);
+				if (dataMap!=null){
+					String driverIncome = String.valueOf(dataMap.get("driverIncome"));
+					if (StringUtils.isBlank(driverIncome)) {
+						log.info("查询接口【/driverIncome/getDriverIncome】返回driverIncome为空.");
+						return;
+					}
+
+					JSONObject jsonObject = JSONObject.parseObject(driverIncome);
+					log.info("查询接口【/driverIncome/getDriverIncome】返回jsonObject成功."+jsonObject);
+					// 当日完成订单量
+					Integer orderCounts= Integer.valueOf(String.valueOf(jsonObject.get("orderCounts")));
+					ddre.setOperationNum(orderCounts);
+					// 当日营业额
+					BigDecimal todayIncomeAmount = new BigDecimal(String.valueOf(jsonObject.get("todayIncomeAmount")));
+					ddre.setActualPay(todayIncomeAmount.doubleValue());
+					// 当日载客里程
+					BigDecimal todayTravelMileage = new BigDecimal(String.valueOf(jsonObject.get("todayTravelMileage")));
+					ddre.setServiceMileage(todayTravelMileage.doubleValue());
+					// 当日司机代付价外费
+					BigDecimal todayOtherFee = new BigDecimal(String.valueOf(jsonObject.get("todayOtherFee")));
+					ddre.setDriverOutPay(todayOtherFee.doubleValue());
+					// 当日司机代收
+					BigDecimal todayDriverPay = new BigDecimal(String.valueOf(jsonObject.get("todayDriverPay")));
+				}
+			} catch (RestClientException e) {
+				log.error("查询接口【/driverIncome/getDriverIncome】返回异常.",e);
+			} catch (NumberFormatException e) {
+				log.error("查询接口【/driverIncome/getDriverIncome】返回异常.",e);
 			}
-		} catch (RestClientException e) {
-			log.error("查询接口【/driverIncome/getDriverIncome】返回异常.",e);
-		} catch (NumberFormatException e) {
-			log.error("查询接口【/driverIncome/getDriverIncome】返回异常.",e);
 		}
 	}
 

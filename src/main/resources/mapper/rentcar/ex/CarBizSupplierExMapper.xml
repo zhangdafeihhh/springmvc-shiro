@@ -77,5 +77,17 @@
         status = 1
         and supplier_name = #{supplierName}
     </select>
-  
+
+    <select id="queryNamesByIds" resultMap="BaseResultMap" >
+        select
+        supplier_id,supplier_full_name
+        from car_biz_supplier
+        where status=1
+        <if test="supplierIds!=null and supplierIds.size()>0">
+            and supplier_id IN
+            <foreach collection="supplierIds" open="(" close=")" separator="," item="sid">
+                #{sid}
+            </foreach>
+        </if>
+    </select>
 </mapper>

@@ -15,6 +15,7 @@ import com.zhuanche.entity.mdbcarmanage.DriverDutyStatisticParams;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
+import com.zhuanche.util.DateUtil;
 import mapper.mdblog.ex.StatisticDutyHalfExMapper;
 import mapper.mdbcarmanage.ex.DriverDutyStatisticExMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -243,12 +244,14 @@ public class DriverDutyStatisticController extends DriverQueryController{
 		}
 		try {
 			Workbook wb = null;
+			String  fileName = "司机考勤日列表";
 			if (reportType==0){
 				wb = this.exportExcelTongyong(rows,request.getRealPath("/")+ File.separator+"template"+File.separator+"driverDuty2_info.xlsx");
 			}else{
 				wb = this.exportMonthExcelTongyong(rows,request.getRealPath("/")+ File.separator+"template"+File.separator+"driverDuty2_info_month.xlsx");
+				fileName = "司机考勤月统计列表";
 			}
-			super.exportExcelFromTemplet(request, response, wb, new String("司机考勤2列表".getBytes("utf-8"), "iso8859-1"));
+			super.exportExcelFromTemplet(request, response, wb, new String(fileName.getBytes("utf-8"), "iso8859-1"));
 			return AjaxResponse.success("文件导出成功");
 		} catch (Exception e) {
 			log.error("导出司机考勤操作失败",e);
@@ -300,7 +303,7 @@ public class DriverDutyStatisticController extends DriverQueryController{
 		if(rows!=null&&rows.size()>0){
 			for(DriverDutyStatistic driverDutyStatistic : rows){
 				//查询城市名称和供应商名称
-				Map<String, Object> result = super.querySupplierName(driverDutyStatistic.getCityid(), driverDutyStatistic.getSupplierid());
+				Map<String, Object> result = super.querySupplierNameAndCityName(driverDutyStatistic.getCityid(), driverDutyStatistic.getSupplierid());
 				driverDutyStatistic.setCityName((String)result.get("cityName"));
 				driverDutyStatistic.setSupplierName((String)result.get("supplierName"));
 			}

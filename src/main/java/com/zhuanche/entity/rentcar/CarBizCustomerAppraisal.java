@@ -57,7 +57,7 @@ public class CarBizCustomerAppraisal implements Serializable{
 
     private String driverName;
 
-    private String DriverPhone;
+    private String driverPhone;
 
     private String licensePlates;
 
@@ -263,11 +263,11 @@ public class CarBizCustomerAppraisal implements Serializable{
     }
 
     public String getDriverPhone() {
-        return DriverPhone;
+        return driverPhone;
     }
 
     public void setDriverPhone(String driverPhone) {
-        DriverPhone = driverPhone;
+        this.driverPhone = driverPhone;
     }
 
     public String getLicensePlates() {

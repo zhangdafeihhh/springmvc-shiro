@@ -124,12 +124,22 @@ public class DriverQueryController {
     /**
      * <p>Title: querySupplierName</p>
      * <p>Description: 查询供应商名称和城市名称</p>
-     * @param cityId
      * @param supplierId
      * @return
      * return: Map<String,Object>
      */
-    public Map<String,Object> querySupplierName(int cityId, int supplierId){
+    public Map<String,Object> querySupplierName(int supplierId){
+        Map<String, Object> result = new HashMap<String, Object>();
+        CarBizSupplier supplierEntity = carBizSupplierMapper.selectByPrimaryKey(supplierId);
+        if(supplierEntity!=null){
+            result.put("supplierName", supplierEntity.getSupplierFullName());
+        }else{
+            result.put("supplierName", "");
+        }
+        return result;
+    }
+
+    public Map<String,Object> querySupplierNameAndCityName(int cityId, int supplierId){
         Map<String, Object> result = new HashMap<String, Object>();
         CarBizSupplier supplierEntity = carBizSupplierMapper.selectByPrimaryKey(supplierId);
         if(supplierEntity!=null){

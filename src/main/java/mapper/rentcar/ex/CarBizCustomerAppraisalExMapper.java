@@ -14,4 +14,6 @@ public interface CarBizCustomerAppraisalExMapper {
 
     public List<CarBizCustomerAppraisal> queryForListObject(CarBizCustomerAppraisalParams params);
 
+    CarBizCustomerAppraisalDTO queryCustomerAppraisalListById(Integer appraisalId);
+
 }

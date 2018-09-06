@@ -125,7 +125,7 @@
     ORDER BY ca.create_date DESC
   </select>
 
-  <select id="queryCustomerAppraisalList" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  <select id="queryCustomerAppraisalListById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select
     <include refid="Base_Column_List" />
     from car_biz_customer_appraisal

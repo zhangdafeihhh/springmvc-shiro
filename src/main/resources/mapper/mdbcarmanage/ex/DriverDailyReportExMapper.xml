@@ -79,11 +79,11 @@
         and city_id in (${cities})
 	  </if>
       <if test="statDateStart !=null and statDateStart !=''">
-		  <![CDATA[ and DATE_FORMAT(stat_date, '%Y-%m-%d') >= DATE_FORMAT(#{statDateStart}, '%Y-%m-%d') ]]>
-	  </if>
-	  <if test="statDateEnd !=null and statDateEnd !=''">
-		  <![CDATA[ and DATE_FORMAT(stat_date, '%Y-%m-%d') <= DATE_FORMAT(#{statDateEnd}, '%Y-%m-%d') ]]>
-	  </if> 
+        <![CDATA[ and stat_date >=  #{statDateStart} ]]>
+      </if>
+      <if test="statDateEnd !=null and statDateEnd !=''">
+        <![CDATA[ and stat_date <=  #{statDateEnd} ]]>
+      </if>
       <if test="sortName ==null or sortName ==''">
 		  ORDER BY stat_date, driver_id desc
 	  </if> 
@@ -130,7 +130,7 @@
     sum(travel_mileage_end) travel_mileage_end,
     t.team_name teamName,
     (select team_name from car_driver_team tt,car_relate_group gg where tt.id = gg.group_id and gg.driver_id = r.driver_id limit 1) as groupName
-    from driver_daily_report r
+    from driver_daily_report r force index(idx_stat_date)
     left join car_driver_team t on t.id = r.car_team_id
     where 1=1
     <if test="licensePlates != null and licensePlates != '' " >

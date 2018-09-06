@@ -90,12 +90,15 @@ public class MobileClientPublishController {
 			return AjaxResponse.fail(RestErrorCode.MSG_CODE_INVALID);
 		}
 	}
-	
-	
+
+	/**
+	 * 请求发送验证码
+	 * @param request
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping(value = "/phoneCode")
 	public AjaxResponse sendPhoneCode(HttpServletRequest request) {
-//		String userName = ToolUtils.getSecurityUser().getAccount();
 		SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
 		String userName = WebSessionUtil.getCurrentLoginUser().getLoginName();
 		if (user!=null && StringUtils.isNotEmpty(userName)){
