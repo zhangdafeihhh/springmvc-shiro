@@ -38,7 +38,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 public class CompleteOrderController{
 	 private static final Logger logger = LoggerFactory.getLogger(CompleteOrderController.class);
 	 
-	 @Value("${saas.bigdata.api.url}")
+	 @Value("${bigdata.saas.data.url}")
 	 String  saasBigdataApiUrl;
 	 
 	 @Autowired

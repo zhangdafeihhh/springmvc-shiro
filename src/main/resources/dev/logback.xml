@@ -1,11 +1,21 @@
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] %X{reqId} - %logger{36} -%X{loginUser} %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %X{env} [%-5level] %X{reqId} %logger{36}%X{loginUser} %msg%n</pattern>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>
+    </appender>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/u01/tomcat_docker_8080/logs/mp-manage.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/u01/tomcat_docker_8080/logs/mp-manage.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %X{env} [%-5level] %X{reqId} %logger{36}%X{loginUser} %msg%n</pattern>
+        </encoder>
     </appender>
 
     <logger name="com.alibaba" level="INFO"/>
@@ -20,6 +30,28 @@
     <logger name="java.sql.ResultSet" level="INFO" />
 
     <root level="INFO">
-        <appender-ref ref="STDOUT"/>
+        <!-- <appender-ref ref="STDOUT"/> --><!-- 在本地开发时，需要打开注释 -->
+        <appender-ref ref="FILE"/>
     </root>
+    
+    <!-- Rest接口性能监测BEGIN -->
+    <appender name="Perf4JStatisticsFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/u01/tomcat_docker_8080/logs/mp-manage-perf.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/u01/tomcat_docker_8080/logs/mp-manage-perf.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="coalescingStatisticsAppender" class="org.perf4j.logback.AsyncCoalescingStatisticsAppender">
+        <timeSlice>3600000</timeSlice><!-- 每小时汇总一次 -->
+        <appender-ref ref="Perf4JStatisticsFile"/>
+    </appender>
+	<logger name="org.perf4j.TimingLogger" level="info" additivity="false">
+        <appender-ref ref="coalescingStatisticsAppender" />
+    </logger>
+    <!-- Rest接口性能监测END -->
+    
 </configuration>

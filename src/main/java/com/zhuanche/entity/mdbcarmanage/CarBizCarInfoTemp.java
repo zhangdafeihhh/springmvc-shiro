@@ -97,7 +97,7 @@ public class CarBizCarInfoTemp {
     private String nextMaintenanceDateString;//下次维保时间的
 
     //原有车牌号
-    private String licensePlates1;
+    private String oldLicensePlates;
 
     // 购买日期 开始时间
     private String purchaseDateBegin;
@@ -241,14 +241,6 @@ public class CarBizCarInfoTemp {
 
     private String carPhotograph;
 
-    private String clicenseplatescolor;
-
-    private String fueltype;
-
-    private String carrypassengers;
-
-    private Integer auditingstatus;
-
     private String insurancecompany;
 
     private String insurancenumber;
@@ -263,31 +255,11 @@ public class CarBizCarInfoTemp {
 
     private String freighttype;
 
-    private String vehicleenginedisplacement;
-
     private String totalmileage;
 
     private Integer overhaulstatus;
 
-    private String transportnumber;
-
     private String certificationauthority;
-
-    private String operatingregion;
-
-    private String firstdate;
-
-    private String transportnumberdatestart;
-
-    private String transportnumberdateend;
-
-    private String equipmentnumber;
-
-    private String gpsbrand;
-
-    private String gpstype;
-
-    private String gpsdate;
 
     private String vehicleVinCode;
 
@@ -647,12 +619,12 @@ public class CarBizCarInfoTemp {
         this.nextMaintenanceDateString = nextMaintenanceDateString;
     }
 
-    public String getLicensePlates1() {
-        return licensePlates1;
+    public String getOldLicensePlates() {
+        return oldLicensePlates;
     }
 
-    public void setLicensePlates1(String licensePlates1) {
-        this.licensePlates1 = licensePlates1;
+    public void setOldLicensePlates(String oldLicensePlates) {
+        this.oldLicensePlates = oldLicensePlates;
     }
 
     public String getPurchaseDateBegin() {
@@ -1071,38 +1043,6 @@ public class CarBizCarInfoTemp {
         this.carPhotograph = carPhotograph;
     }
 
-    public String getClicenseplatescolor() {
-        return clicenseplatescolor;
-    }
-
-    public void setClicenseplatescolor(String clicenseplatescolor) {
-        this.clicenseplatescolor = clicenseplatescolor;
-    }
-
-    public String getFueltype() {
-        return fueltype;
-    }
-
-    public void setFueltype(String fueltype) {
-        this.fueltype = fueltype;
-    }
-
-    public String getCarrypassengers() {
-        return carrypassengers;
-    }
-
-    public void setCarrypassengers(String carrypassengers) {
-        this.carrypassengers = carrypassengers;
-    }
-
-    public Integer getAuditingstatus() {
-        return auditingstatus;
-    }
-
-    public void setAuditingstatus(Integer auditingstatus) {
-        this.auditingstatus = auditingstatus;
-    }
-
     public String getInsurancecompany() {
         return insurancecompany;
     }
@@ -1159,14 +1099,6 @@ public class CarBizCarInfoTemp {
         this.freighttype = freighttype;
     }
 
-    public String getVehicleenginedisplacement() {
-        return vehicleenginedisplacement;
-    }
-
-    public void setVehicleenginedisplacement(String vehicleenginedisplacement) {
-        this.vehicleenginedisplacement = vehicleenginedisplacement;
-    }
-
     public String getTotalmileage() {
         return totalmileage;
     }
@@ -1183,84 +1115,12 @@ public class CarBizCarInfoTemp {
         this.overhaulstatus = overhaulstatus;
     }
 
-    public String getTransportnumber() {
-        return transportnumber;
-    }
-
-    public void setTransportnumber(String transportnumber) {
-        this.transportnumber = transportnumber;
-    }
-
     public String getCertificationauthority() {
         return certificationauthority;
     }
 
     public void setCertificationauthority(String certificationauthority) {
         this.certificationauthority = certificationauthority;
-    }
-
-    public String getOperatingregion() {
-        return operatingregion;
-    }
-
-    public void setOperatingregion(String operatingregion) {
-        this.operatingregion = operatingregion;
-    }
-
-    public String getFirstdate() {
-        return firstdate;
-    }
-
-    public void setFirstdate(String firstdate) {
-        this.firstdate = firstdate;
-    }
-
-    public String getTransportnumberdatestart() {
-        return transportnumberdatestart;
-    }
-
-    public void setTransportnumberdatestart(String transportnumberdatestart) {
-        this.transportnumberdatestart = transportnumberdatestart;
-    }
-
-    public String getTransportnumberdateend() {
-        return transportnumberdateend;
-    }
-
-    public void setTransportnumberdateend(String transportnumberdateend) {
-        this.transportnumberdateend = transportnumberdateend;
-    }
-
-    public String getEquipmentnumber() {
-        return equipmentnumber;
-    }
-
-    public void setEquipmentnumber(String equipmentnumber) {
-        this.equipmentnumber = equipmentnumber;
-    }
-
-    public String getGpsbrand() {
-        return gpsbrand;
-    }
-
-    public void setGpsbrand(String gpsbrand) {
-        this.gpsbrand = gpsbrand;
-    }
-
-    public String getGpstype() {
-        return gpstype;
-    }
-
-    public void setGpstype(String gpstype) {
-        this.gpstype = gpstype;
-    }
-
-    public String getGpsdate() {
-        return gpsdate;
-    }
-
-    public void setGpsdate(String gpsdate) {
-        this.gpsdate = gpsdate;
     }
 
     public String getVehicleVinCode() {

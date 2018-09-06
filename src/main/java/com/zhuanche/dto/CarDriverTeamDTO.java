@@ -1,6 +1,9 @@
 package com.zhuanche.dto;
 
+import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
+
 import java.util.Date;
+import java.util.List;
 
 public class CarDriverTeamDTO {
     private Integer id;
@@ -23,7 +26,7 @@ public class CarDriverTeamDTO {
 
     private String remark;
 
-    private Boolean status;
+    private Integer status;//状态   0关闭 1启用
 
     private Integer pId;
 
@@ -36,12 +39,30 @@ public class CarDriverTeamDTO {
     private String charge2;
 
     private String charge3;
-    
+
+    private List<CarDriverTeam> groups;
     
     //---------------------------------扩充字段
     private String cityName;
     private String supplierName;
-    
+    /** 0没有操作 1打开 2关闭*/
+    private Integer openCloseFlag;
+
+    public List<CarDriverTeam> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<CarDriverTeam> groups) {
+        this.groups = groups;
+    }
+
+    public Integer getOpenCloseFlag() {
+        return openCloseFlag;
+    }
+
+    public void setOpenCloseFlag(Integer openCloseFlag) {
+        this.openCloseFlag = openCloseFlag;
+    }
 
     public String getCityName() {
 		return cityName;
@@ -139,11 +160,11 @@ public class CarDriverTeamDTO {
         this.remark = remark == null ? null : remark.trim();
     }
 
-    public Boolean getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(Boolean status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

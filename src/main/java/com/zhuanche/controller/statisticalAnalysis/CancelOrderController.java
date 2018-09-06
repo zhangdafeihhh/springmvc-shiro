@@ -36,7 +36,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 public class CancelOrderController{
 	 private static final Logger logger = LoggerFactory.getLogger(CancelOrderController.class);
 	 
-	 @Value("${saas.bigdata.api.url}")
+	 @Value("${bigdata.saas.data.url}")
 	 String  saasBigdataApiUrl;
 	 
 	 @Autowired

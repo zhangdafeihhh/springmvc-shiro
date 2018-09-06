@@ -15,4 +15,6 @@ public interface SaasRolePermissionRalationExMapper {
 	int insertBatch( @Param("records") List<SaasRolePermissionRalation> records );
 	
 	/**查询一个权限的所有角色ID**/
+	List<Integer> queryRoleIdsOfPermission( @Param("permissionId")  Integer permissionId );
+	
 }

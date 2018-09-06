@@ -1,25 +1,42 @@
 package mapper.rentcar.ex;
 
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.dto.CarDriverInfoDTO;
+import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
+import com.zhuanche.entity.rentcar.CarBizDriverInfo;
+import com.zhuanche.request.DriverMonthDutyRequest;
+import com.zhuanche.request.DriverTeamRequest;
+import com.zhuanche.request.DutyParamRequest;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CarBizDriverInfoExMapper {
 
+    List<CarDriverInfoDTO> selectDriverList(DriverTeamRequest driverTeamRequest);
+
+    List<CarDriverInfoDTO> queryListByLimits(DriverTeamRequest driverTeamRequest);
+
+    CarDriverInfoDTO queryOneDriver(DutyParamRequest dutyParamRequest);
+
+    /** 更改车队信息查询司机信息*/
+    CarDriverInfoDTO selectDriverInfoByDriverId(Integer driverId);
+
+    /** 月排班查询司机详情*/
+    CarDriverInfoDTO selectDriverDetail(String driverId);
+
+    /** 司机月排班查询司机信息列表*/
+    List<CarDriverInfoDTO> queryDriverListForMonthDuty(DriverMonthDutyRequest param);
     /**
-     * 查询司机信息列表展示(有分页)
+     * 查询司机信息列表展示
      * @param params
      * @return
      */
     List<CarBizDriverInfoDTO> queryDriverList(CarBizDriverInfoDTO params);
-
-    /**
-     * 查询司机信息列表展示(无分页)
-     * @param params
-     * @return
-     */
-    List<CarBizDriverInfoDTO> queryDriverListNoLimit(CarBizDriverInfoDTO params);
 
     /**
      * 查询手机号是否存在
@@ -61,4 +78,40 @@ public interface CarBizDriverInfoExMapper {
      * @return
      */
     Integer checkLicensePlates(@Param("licensePlates") String licensePlates);
+
+    /**
+     * 根据身份证号检查司机是否存在
+     * @param carBizDriverInfoTemp
+     * @return
+     */
+    Integer checkIdCardNoNew(CarBizDriverInfoTemp carBizDriverInfoTemp);
+
+    /**
+     * 检测司机手机号是否存在
+     * @param carBizDriverInfo
+     * @return
+     */
+    Integer selectCountForPhone(CarBizDriverInfo carBizDriverInfo);
+
+    /**
+     * 验证银行卡卡号
+     * @param carBizDriverInfoTemp
+     * @return
+     */
+    Integer validateBankCardNumber(CarBizDriverInfoTemp carBizDriverInfoTemp);
+
+    /**
+     * 解绑司机信用卡，更新
+     * @param map
+     */
+    int updateDriverCardInfo(Map<String, Object> map);
+
+    /**
+     * 更新uickpay_customerid
+     * @param map
+     */
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER)
+    })
+    void updateDriverCustomerId(Map<String, Object> map);
 }

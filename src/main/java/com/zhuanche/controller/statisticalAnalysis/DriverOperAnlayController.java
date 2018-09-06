@@ -32,7 +32,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 public class DriverOperAnlayController{
 	private static final Logger logger = LoggerFactory.getLogger(DriverOperAnlayController.class);
 	 
-	 @Value("${saas.bigdata.api.url}")
+	 @Value("${bigdata.saas.data.url}")
 	 String  saasBigdataApiUrl;
 	 
 	 @Autowired

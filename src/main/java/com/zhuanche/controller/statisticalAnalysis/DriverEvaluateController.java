@@ -37,7 +37,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 public class DriverEvaluateController{
 	private static final Logger logger = LoggerFactory.getLogger(DriverEvaluateController.class);
 	 
-	 @Value("${saas.bigdata.api.url}")
+	 @Value("${bigdata.saas.data.url}")
 	 String  saasBigdataApiUrl;
 	 
 	 @Autowired

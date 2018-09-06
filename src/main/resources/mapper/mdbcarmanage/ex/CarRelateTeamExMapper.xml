@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.CarRelateTeamExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.CarRelateTeam" >
+    <id column="relation_id" property="relationId" jdbcType="INTEGER" />
+    <result column="team_id" property="teamId" jdbcType="INTEGER" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    relation_id, team_id, driver_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from car_relate_team
+    where relation_id = #{relationId,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectOneTeam" resultType="com.zhuanche.entity.mdbcarmanage.CarRelateTeam" parameterType="com.zhuanche.entity.mdbcarmanage.CarRelateTeam" >
+    select
+    rt.relation_id AS relationId,
+    t.team_name teamName,
+    rt.driver_id driverId,
+    rt.team_id teamId
+    from car_relate_team rt
+    LEFT JOIN car_driver_team t ON rt.team_id = t.id
+    where
+    rt.driver_id = #{driverId,jdbcType=INTEGER}
+    <if test="teamId!=null">
+      AND rt.team_id = #{teamId}
+    </if>
+    limit 1
+  </select>
+
+  <select id="queryDriverIdsByTeamIds"  resultType="java.util.HashMap">
+    SELECT
+    r.driver_id driverId, t.team_name teamName
+    FROM
+    car_relate_team r
+    left join car_driver_team t on r.team_id = t.id
+    WHERE 1=1
+    <if test="teamIds!=null and teamIds.size()>0">
+      and r.team_id IN
+      <foreach collection="teamIds" open="(" close=")" separator="," item="tid" >
+        #{tid}
+      </foreach>
+    </if>
+  </select>
+
+  <select id="queryDriverTeamRelationList" parameterType="com.zhuanche.request.TeamGroupRequest" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM
+    car_relate_team
+    WHERE 1=1
+    <if test="relationId!=null and relationId!=''">
+      AND relation_id = #{relationId}
+    </if>
+    <if test="teamId!=null and teamId!=''">
+      AND team_id = #{teamId}
+    </if>
+    <if test="driverId!=null and driverId!=''">
+      AND driver_id = #{driverId}
+    </if>
+  </select>
+  <delete id="deleteByDriverId" parameterType="java.lang.Integer" >
+    delete from car_relate_team
+    where driver_id = #{driverId,jdbcType=INTEGER}
+  </delete>
+
+  <!--查询所给车队ID下的所有司机ID-->
+  <select id="queryDriverIdsByTeamId" resultType="java.lang.Integer" >
+    SELECT driver_id
+    FROM car_relate_team
+    WHERE team_id = #{teamId}
+    <if test="teamIds!=null and teamIds.size()>0">
+      and team_id IN
+      <foreach collection="teamIds" open="(" close=")" separator="," item="tid" >
+        #{tid}
+      </foreach>
+    </if>
+  </select>
+</mapper>

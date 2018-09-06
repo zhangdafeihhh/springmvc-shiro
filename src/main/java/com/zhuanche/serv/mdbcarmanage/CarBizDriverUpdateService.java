@@ -1,9 +1,10 @@
-package com.zhuanche.serv.mdbcaranage;
+package com.zhuanche.serv.mdbcarmanage;
 
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.entity.mdbcarmanage.CarBizDriverUpdate;
+import com.zhuanche.shiro.session.WebSessionUtil;
 import mapper.mdbcarmanage.CarBizDriverUpdateMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,8 +25,8 @@ public class CarBizDriverUpdateService {
         try {
             CarBizDriverUpdate driverUpdate = new CarBizDriverUpdate();
             driverUpdate.setDriverid(driverId);
-            //TODO 获取当前操作人的ID
-//            driverUpdate.setCreateby(dealId);
+            // 获取当前操作人的ID
+            driverUpdate.setCreateby(WebSessionUtil.getCurrentLoginUser().getId());
             driverUpdate.setIdentifier(value);
             driverUpdate.setOrigin(origin);
             driverUpdate.setUpdata(updata);

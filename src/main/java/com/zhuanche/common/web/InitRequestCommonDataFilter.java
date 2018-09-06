@@ -3,6 +3,7 @@ package com.zhuanche.common.web;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
 import java.util.Random;
@@ -12,6 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -19,9 +21,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * @author zhaoyali
  **/
 public class InitRequestCommonDataFilter extends OncePerRequestFilter {
-	private static String staticResourceVersion; //静态资源版本号
-	private static String ssoLogoutUrl; //SSO单点登出URL
-	private static String cmsLogoutUrl; //SSO单点登出本地回调URL
+	private static String staticResourceVersion;//静态资源版本号
+	private static String envName;                  //多环境信息
+	private static String ssoLogoutUrl;            //SSO单点登出URL
+	private static String cmsLogoutUrl;           //SSO单点登出本地回调URL
 	
 	private static final String SEED_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	private static final Random rnd = new  SecureRandom();
@@ -37,14 +40,51 @@ public class InitRequestCommonDataFilter extends OncePerRequestFilter {
 	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)throws ServletException, IOException {
+		/***************支持跨域请求BEGIN***********************/
+		String Origin = request.getHeader("Origin");
+		if(StringUtils.isNotEmpty(Origin)) {
+			response.setHeader("Access-Control-Allow-Origin", Origin);
+		}else {
+			response.setHeader("Access-Control-Allow-Origin", "*");
+		}
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
+        response.setHeader("Access-Control-Max-Age", "1800");
+        response.setHeader("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Accept,XRequestedWith,LastModified");
+        response.setHeader("Access-Control-Allow-Credentials", "true");		
+		/***************支持跨域请求END***********************/
+        
+		/***************是否为AJAX请求BEGIN******************/
+		String XMLHttpRequest = request.getHeader("X-Requested-With");
+		if( (XMLHttpRequest!=null && XMLHttpRequest.trim().length()>0) || request.getRequestURI().endsWith(".json") ){
+			request.setAttribute("X_IS_AJAX", true);
+		}else {
+			request.setAttribute("X_IS_AJAX", false);
+		}
+		/***************是否为AJAX请求END*******************/
+	
 		//一、请求流水号(用于日志,实现对请求进行统一编号，方便于进行排查业务日志)
 		String reqId = request.getParameter("x_requestId");
+		if(reqId==null || "".equals(reqId.trim())  ) {
+			reqId = request.getHeader("x_requestId");
+		}
 		if(reqId==null || "".equals(reqId.trim())  ) {
 			reqId = this.genRequestId(6);
 		}
 		MDC.put("reqId", reqId);
 		
-		//二、静态资源版本号(用于页面渲染, 解决客户端浏览器本地缓存不失效问题)
+		//二、多环境信息
+		if(envName==null) {
+			envName = request.getServletContext().getInitParameter("env.name");
+			if(envName==null || Arrays.asList(new String[]{"dev","test","pre","online"}).contains(envName)==false ) {
+				envName = "IDE";
+			}
+			if(envName!=null) {
+				envName = envName.toUpperCase();
+			}
+		}
+		MDC.put("env", envName);
+		
+		//三、静态资源版本号(用于页面渲染, 解决客户端浏览器本地缓存不失效问题)
 		if(staticResourceVersion==null) {
 			try {
 				Properties pop = new Properties();
@@ -58,12 +98,11 @@ public class InitRequestCommonDataFilter extends OncePerRequestFilter {
 		}
 		request.setAttribute("staticResourceVersion", staticResourceVersion);
 		
-		//三、SSO单点登出URL、本地应用登出URL
+		//四、SSO单点登出URL、本地应用登出URL
 		if(ssoLogoutUrl==null || cmsLogoutUrl==null) {
 			try {
 				String env = request.getServletContext().getInitParameter("env.name");
-				
-				if(env.equalsIgnoreCase("${env.name}")) {//有的IDE不能自动替换
+				if( Arrays.asList(new String[]{"dev","test","pre","online"}).contains(env)==false) {//有的IDE不能自动替换
 					env = "dev";
 				}
 				Properties pop = new Properties();
@@ -86,7 +125,7 @@ public class InitRequestCommonDataFilter extends OncePerRequestFilter {
 		request.setAttribute("ssoLogoutUrl", ssoLogoutUrl );
 		request.setAttribute("cmsLogoutUrl", cmsLogoutUrl );
 		
-		//四、常用的页面变量参数(用于页面渲染)
+		//五、常用的页面变量参数(用于页面渲染)
 		request.setAttribute("webctx", request.getContextPath() );
 		
 		//TODO 增加其它共性的逻辑

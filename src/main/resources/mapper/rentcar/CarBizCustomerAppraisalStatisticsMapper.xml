@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.CarBizCustomerAppraisalStatisticsMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarBizCustomerAppraisalStatistics" >
+    <id column="appraisal_statistics_id" property="appraisalStatisticsId" jdbcType="INTEGER" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="driver_phone" property="driverPhone" jdbcType="VARCHAR" />
+    <result column="instrument_and_service" property="instrumentAndService" jdbcType="VARCHAR" />
+    <result column="environment_and_equipped" property="environmentAndEquipped" jdbcType="VARCHAR" />
+    <result column="efficiency_and_safety" property="efficiencyAndSafety" jdbcType="VARCHAR" />
+    <result column="evaluate_score" property="evaluateScore" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="VARCHAR" />
+    <result column="sys_date" property="sysDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    appraisal_statistics_id, driver_id, driver_name, driver_phone, instrument_and_service, 
+    environment_and_equipped, efficiency_and_safety, evaluate_score, create_date, sys_date
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from car_biz_customer_appraisal_statistics
+    where appraisal_statistics_id = #{appraisalStatisticsId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from car_biz_customer_appraisal_statistics
+    where appraisal_statistics_id = #{appraisalStatisticsId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.rentcar.CarBizCustomerAppraisalStatistics" >
+    <selectKey resultType="java.lang.Integer" keyProperty="appraisalStatisticsId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_biz_customer_appraisal_statistics (driver_id, driver_name, driver_phone, 
+      instrument_and_service, environment_and_equipped, 
+      efficiency_and_safety, evaluate_score, create_date, 
+      sys_date)
+    values (#{driverId,jdbcType=INTEGER}, #{driverName,jdbcType=VARCHAR}, #{driverPhone,jdbcType=VARCHAR}, 
+      #{instrumentAndService,jdbcType=VARCHAR}, #{environmentAndEquipped,jdbcType=VARCHAR}, 
+      #{efficiencyAndSafety,jdbcType=VARCHAR}, #{evaluateScore,jdbcType=VARCHAR}, #{createDate,jdbcType=VARCHAR}, 
+      #{sysDate,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.rentcar.CarBizCustomerAppraisalStatistics" >
+    <selectKey resultType="java.lang.Integer" keyProperty="appraisalStatisticsId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_biz_customer_appraisal_statistics
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="driverId != null" >
+        driver_id,
+      </if>
+      <if test="driverName != null" >
+        driver_name,
+      </if>
+      <if test="driverPhone != null" >
+        driver_phone,
+      </if>
+      <if test="instrumentAndService != null" >
+        instrument_and_service,
+      </if>
+      <if test="environmentAndEquipped != null" >
+        environment_and_equipped,
+      </if>
+      <if test="efficiencyAndSafety != null" >
+        efficiency_and_safety,
+      </if>
+      <if test="evaluateScore != null" >
+        evaluate_score,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="sysDate != null" >
+        sys_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="driverId != null" >
+        #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="driverName != null" >
+        #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="driverPhone != null" >
+        #{driverPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="instrumentAndService != null" >
+        #{instrumentAndService,jdbcType=VARCHAR},
+      </if>
+      <if test="environmentAndEquipped != null" >
+        #{environmentAndEquipped,jdbcType=VARCHAR},
+      </if>
+      <if test="efficiencyAndSafety != null" >
+        #{efficiencyAndSafety,jdbcType=VARCHAR},
+      </if>
+      <if test="evaluateScore != null" >
+        #{evaluateScore,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=VARCHAR},
+      </if>
+      <if test="sysDate != null" >
+        #{sysDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.rentcar.CarBizCustomerAppraisalStatistics" >
+    update car_biz_customer_appraisal_statistics
+    <set >
+      <if test="driverId != null" >
+        driver_id = #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="driverName != null" >
+        driver_name = #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="driverPhone != null" >
+        driver_phone = #{driverPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="instrumentAndService != null" >
+        instrument_and_service = #{instrumentAndService,jdbcType=VARCHAR},
+      </if>
+      <if test="environmentAndEquipped != null" >
+        environment_and_equipped = #{environmentAndEquipped,jdbcType=VARCHAR},
+      </if>
+      <if test="efficiencyAndSafety != null" >
+        efficiency_and_safety = #{efficiencyAndSafety,jdbcType=VARCHAR},
+      </if>
+      <if test="evaluateScore != null" >
+        evaluate_score = #{evaluateScore,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=VARCHAR},
+      </if>
+      <if test="sysDate != null" >
+        sys_date = #{sysDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where appraisal_statistics_id = #{appraisalStatisticsId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.rentcar.CarBizCustomerAppraisalStatistics" >
+    update car_biz_customer_appraisal_statistics
+    set driver_id = #{driverId,jdbcType=INTEGER},
+      driver_name = #{driverName,jdbcType=VARCHAR},
+      driver_phone = #{driverPhone,jdbcType=VARCHAR},
+      instrument_and_service = #{instrumentAndService,jdbcType=VARCHAR},
+      environment_and_equipped = #{environmentAndEquipped,jdbcType=VARCHAR},
+      efficiency_and_safety = #{efficiencyAndSafety,jdbcType=VARCHAR},
+      evaluate_score = #{evaluateScore,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=VARCHAR},
+      sys_date = #{sysDate,jdbcType=TIMESTAMP}
+    where appraisal_statistics_id = #{appraisalStatisticsId,jdbcType=INTEGER}
+  </update>
+</mapper>

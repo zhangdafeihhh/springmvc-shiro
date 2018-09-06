@@ -15,5 +15,6 @@ public interface SaasUserRoleRalationExMapper {
 	int insertBatch( @Param("records") List<SaasUserRoleRalation> records );
 	
 	/**查询多个角色所对应的用户ID**/
+	List<Integer> queryUserIdsOfRole( @Param("roleIds")  List<Integer> roleIds );
 	
 }

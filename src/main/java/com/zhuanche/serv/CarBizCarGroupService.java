@@ -28,4 +28,13 @@ public class CarBizCarGroupService {
         return carBizCarGroupExMapper.queryGroupByGroupName(groupName);
     }
 
+    /**
+     * 根据groupId查询
+     * @param carBizCarGroup
+     * @return
+     */
+    public CarBizCarGroup queryForObject(CarBizCarGroup carBizCarGroup){
+        return carBizCarGroupExMapper.queryForObject(carBizCarGroup);
+    }
+
 }

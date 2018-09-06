@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.ex.CarBizCustomerAppraisalStatisticsExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO" >
+    <id column="appraisal_statistics_id" property="appraisalStatisticsId" jdbcType="INTEGER" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="driver_phone" property="driverPhone" jdbcType="VARCHAR" />
+    <result column="instrument_and_service" property="instrumentAndService" jdbcType="VARCHAR" />
+    <result column="environment_and_equipped" property="environmentAndEquipped" jdbcType="VARCHAR" />
+    <result column="efficiency_and_safety" property="efficiencyAndSafety" jdbcType="VARCHAR" />
+    <result column="evaluate_score" property="evaluateScore" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="VARCHAR" />
+    <result column="sys_date" property="sysDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ca.appraisal_statistics_id, ca.driver_id, ca.driver_name, ca.driver_phone, ca.instrument_and_service,
+    ca.environment_and_equipped, ca.efficiency_and_safety, ca.evaluate_score, ca.create_date, ca.sys_date
+  </sql>
+  <!-- mapper基础标准: 当前表所有字段查询条件集 -->
+  <sql id="allBaseColumnWhereList" >
+    <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR" >
+      <if test="driverName !=null and driverName !=''">
+        AND ca.driver_name = #{driverName}
+      </if>
+      <if test="driverPhone !=null and driverPhone !=''">
+        AND ca.driver_phone = #{driverPhone}
+      </if>
+      <if test="createDate !=null and createDate !=''">
+        <![CDATA[ AND ca.create_date =  concat(#{createDate}) ]]>
+      </if>
+      <if test="driverIds !=null and driverIds.size()>0">
+        and ca.driver_id IN
+        <foreach collection="driverIds" open="(" close=")" separator="," item="did">
+          #{did}
+        </foreach>
+      </if>
+      <if test="cityIds !=null and cityIds.size()>0">
+        and di.service_city IN
+        <foreach collection="cityIds" open="(" close=")" separator="," item="cid">
+          #{cid}
+        </foreach>
+      </if>
+      <if test="supplierIds !=null and supplierIds.size()>0">
+        and di.supplier_id IN
+        <foreach collection="supplierIds" open="(" close=")" separator="," item="sid">
+          #{sid}
+        </foreach>
+      </if>
+    </trim>
+  </sql>
+  <select id="queryCustomerAppraisalStatisticsList" resultMap="BaseResultMap" parameterType="com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO" >
+    select 
+    <include refid="Base_Column_List" />
+    from car_biz_customer_appraisal_statistics ca
+    LEFT JOIN car_biz_driver_info di ON di.driver_id = ca.driver_id
+    <include refid="allBaseColumnWhereList"/>
+    ORDER BY ca.sys_date DESC
+  </select>
+</mapper>

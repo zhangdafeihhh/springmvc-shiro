@@ -37,7 +37,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 public class AllianceCheckController{
 	private static final Logger logger = LoggerFactory.getLogger(AllianceCheckController.class);
 	 
-	 @Value("${saas.bigdata.api.url}")
+	 @Value("${bigdata.saas.data.url}")
 	 String  saasBigdataApiUrl;
 	 
 	 @Autowired

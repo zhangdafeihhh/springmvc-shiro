@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.CarDriverDayDutyMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.CarDriverDayDuty" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+    <result column="team_id" property="teamId" jdbcType="INTEGER" />
+    <result column="team_name" property="teamName" jdbcType="VARCHAR" />
+    <result column="time" property="time" jdbcType="VARCHAR" />
+    <result column="forced_ids" property="forcedIds" jdbcType="VARCHAR" />
+    <result column="duty_ids" property="dutyIds" jdbcType="VARCHAR" />
+    <result column="forced_times" property="forcedTimes" jdbcType="VARCHAR" />
+    <result column="duty_times" property="dutyTimes" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, driver_id, driver_name, city_id, city_name, supplier_id, supplier_name, team_id, 
+    team_name, time, forced_ids, duty_ids, forced_times, duty_times, type, status
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from car_driver_day_duty
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from car_driver_day_duty
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverDayDuty" >
+    insert into car_driver_day_duty (id, driver_id, driver_name, 
+      city_id, city_name, supplier_id, 
+      supplier_name, team_id, team_name, 
+      time, forced_ids, duty_ids, 
+      forced_times, duty_times, type, 
+      status)
+    values (#{id,jdbcType=INTEGER}, #{driverId,jdbcType=INTEGER}, #{driverName,jdbcType=VARCHAR}, 
+      #{cityId,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR}, #{supplierId,jdbcType=INTEGER}, 
+      #{supplierName,jdbcType=VARCHAR}, #{teamId,jdbcType=INTEGER}, #{teamName,jdbcType=VARCHAR}, 
+      #{time,jdbcType=VARCHAR}, #{forcedIds,jdbcType=VARCHAR}, #{dutyIds,jdbcType=VARCHAR},
+      #{forcedTimes,jdbcType=VARCHAR}, #{dutyTimes,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, 
+      #{status,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverDayDuty" >
+    insert into car_driver_day_duty
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="driverId != null" >
+        driver_id,
+      </if>
+      <if test="driverName != null" >
+        driver_name,
+      </if>
+      <if test="cityId != null" >
+        city_id,
+      </if>
+      <if test="cityName != null" >
+        city_name,
+      </if>
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="supplierName != null" >
+        supplier_name,
+      </if>
+      <if test="teamId != null" >
+        team_id,
+      </if>
+      <if test="teamName != null" >
+        team_name,
+      </if>
+      <if test="time != null" >
+        time,
+      </if>
+      <if test="forcedIds != null" >
+        forced_ids,
+      </if>
+      <if test="dutyIds != null" >
+        duty_ids,
+      </if>
+      <if test="forcedTimes != null" >
+        forced_times,
+      </if>
+      <if test="dutyTimes != null" >
+        duty_times,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="driverId != null" >
+        #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="driverName != null" >
+        #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null" >
+        #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierName != null" >
+        #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="teamId != null" >
+        #{teamId,jdbcType=INTEGER},
+      </if>
+      <if test="teamName != null" >
+        #{teamName,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null" >
+        #{time,jdbcType=VARCHAR},
+      </if>
+      <if test="forcedIds != null" >
+        #{forcedIds,jdbcType=VARCHAR},
+      </if>
+      <if test="dutyIds != null" >
+        #{dutyIds,jdbcType=VARCHAR},
+      </if>
+      <if test="forcedTimes != null" >
+        #{forcedTimes,jdbcType=VARCHAR},
+      </if>
+      <if test="dutyTimes != null" >
+        #{dutyTimes,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverDayDuty" >
+    update car_driver_day_duty
+    <set >
+      <if test="driverId != null" >
+        driver_id = #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="driverName != null" >
+        driver_name = #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null" >
+        city_name = #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierName != null" >
+        supplier_name = #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="teamId != null" >
+        team_id = #{teamId,jdbcType=INTEGER},
+      </if>
+      <if test="teamName != null" >
+        team_name = #{teamName,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null" >
+        time = #{time,jdbcType=VARCHAR},
+      </if>
+      <if test="forcedIds != null" >
+        forced_ids = #{forcedIds,jdbcType=VARCHAR},
+      </if>
+      <if test="dutyIds != null" >
+        duty_ids = #{dutyIds,jdbcType=VARCHAR},
+      </if>
+      <if test="forcedTimes != null" >
+        forced_times = #{forcedTimes,jdbcType=VARCHAR},
+      </if>
+      <if test="dutyTimes != null" >
+        duty_times = #{dutyTimes,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverDayDuty" >
+    update car_driver_day_duty
+    set driver_id = #{driverId,jdbcType=INTEGER},
+      driver_name = #{driverName,jdbcType=VARCHAR},
+      city_id = #{cityId,jdbcType=INTEGER},
+      city_name = #{cityName,jdbcType=VARCHAR},
+      supplier_id = #{supplierId,jdbcType=INTEGER},
+      supplier_name = #{supplierName,jdbcType=VARCHAR},
+      team_id = #{teamId,jdbcType=INTEGER},
+      team_name = #{teamName,jdbcType=VARCHAR},
+      time = #{time,jdbcType=VARCHAR},
+      forced_ids = #{forcedIds,jdbcType=VARCHAR},
+      duty_ids = #{dutyIds,jdbcType=VARCHAR},
+      forced_times = #{forcedTimes,jdbcType=VARCHAR},
+      duty_times = #{dutyTimes,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

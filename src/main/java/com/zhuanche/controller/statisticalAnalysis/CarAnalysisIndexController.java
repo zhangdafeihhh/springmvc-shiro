@@ -32,7 +32,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 public class CarAnalysisIndexController{
 	private static final Logger logger = LoggerFactory.getLogger(CarAnalysisIndexController.class);
 
-	@Value("${saas.bigdata.api.url}")
+	@Value("${bigdata.saas.data.url}")
 	 String  saasBigdataApiUrl;
 	 
 	 @Autowired
