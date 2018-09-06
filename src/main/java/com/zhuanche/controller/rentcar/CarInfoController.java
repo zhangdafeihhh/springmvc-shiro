@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -317,7 +318,7 @@ public class CarInfoController {
         } catch (Exception e) {
             logger.error("save CarInfo error. ", e);
         }
-        return result;
+        return getResponse(result);
     }
 
 
@@ -391,7 +392,7 @@ public class CarInfoController {
      * 车辆信息导入
      */
     @RequestMapping(value = "/importCarInfo")
-    public Object importCarInfo(String fileName, HttpServletRequest request) {
+    public Object importCarInfo(@RequestParam("fileName") MultipartFile fileName, HttpServletRequest request) {
         logger.info("车辆信息导入保存:importCarInfo,参数" + fileName);
         Map<String, Object> result = new HashMap<String, Object>();
         result = this.carService.importCarInfo(fileName, request);
@@ -495,8 +496,21 @@ public class CarInfoController {
         os.close();
     }
 
-    public AjaxResponse getResponse(){
-        return null;
-    }
+    public AjaxResponse getResponse(Map<String,Object> result){
+        try{
+//            JSONObject jsonStr = (JSONObject)result.get("jsonStr");
 
+            Integer result1 = Integer.valueOf( result.get("result").toString() );
+
+            if( 0 == result1 ){
+                String exception = result.get("exception").toString();
+                return AjaxResponse.fail(996, exception);
+            } else if(1 == result1){
+                return AjaxResponse.success(null);
+            }
+            return AjaxResponse.fail(999);
+        } catch (Exception e){
+            return AjaxResponse.fail(999);
+        }
+    }
 }

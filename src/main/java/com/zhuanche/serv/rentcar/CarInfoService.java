@@ -3,6 +3,7 @@ package com.zhuanche.serv.rentcar;
 import com.zhuanche.entity.rentcar.CarInfo;
 import com.zhuanche.entity.rentcar.CarInfoVo;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -29,7 +30,7 @@ public interface CarInfoService {
     /*
      * 车辆导入
      */
-    Map<String,Object> importCarInfo(String fileName, HttpServletRequest request);
+    Map<String,Object> importCarInfo(MultipartFile fileName, HttpServletRequest request);
 
     //根据车牌号查询是否已存在
     Map<String, Object> checkLicensePlates(CarInfo params);

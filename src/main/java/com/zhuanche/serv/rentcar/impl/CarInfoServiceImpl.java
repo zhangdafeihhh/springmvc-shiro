@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import javax.annotation.Resource;
@@ -161,8 +162,7 @@ public class CarInfoServiceImpl implements CarInfoService {
     }
 
     @Override
-    public Map<String, Object> importCarInfo(String fileName,
-                                             HttpServletRequest request) {
+    public Map<String, Object> importCarInfo(MultipartFile fileName, HttpServletRequest request) {
         String resultError1 = "-1";// 模板错误
         String resultErrorMag1 = "导入模板格式错误!";
 
@@ -171,17 +171,17 @@ public class CarInfoServiceImpl implements CarInfoService {
         List<CarImportExceptionEntity> listException = new ArrayList<CarImportExceptionEntity>();
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         List<CarInfo> carList = new ArrayList<CarInfo>();
-        String path  = Common.getPath(request);
-        String dirPath = path + fileName;
-        File DRIVERINFO = new File(dirPath);
+//        String path  = Common.getPath(request);
+//        String dirPath = path + fileName;
+//        File DRIVERINFO = new File(dirPath);
         try {
-            InputStream is = new FileInputStream(DRIVERINFO);
+//            InputStream is = new FileInputStream(DRIVERINFO);
             Workbook workbook = null;
-            String fileType = fileName.split("\\.")[1];
+            String fileType = fileName.getName().split("\\.")[1];
             if (fileType.equals("xls")) {
-                workbook = new HSSFWorkbook(is);
+                workbook = new HSSFWorkbook(fileName.getInputStream());
             } else if (fileType.equals("xlsx")) {
-                workbook = new XSSFWorkbook(is);
+                workbook = new XSSFWorkbook(fileName.getInputStream());
             }
             Sheet sheet = workbook.getSheetAt(0);
             FormulaEvaluator evaluator = workbook.getCreationHelper()
