@@ -208,6 +208,9 @@ public class CarInfoDTO{
     /** 车辆图片 **/
     private String imageUrl;
 
+//    private int cooperationType;//加盟类型  car_biz_cooperation_type
+
+
     public String getImageUrl() {
         return imageUrl;
     }

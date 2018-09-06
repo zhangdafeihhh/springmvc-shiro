@@ -75,7 +75,7 @@
         car_biz_supplier
         where
         status = 1
-        and supplier_name = #{supplierName}
+        and supplier_full_name = #{supplierName}
     </select>
 
     <select id="queryNamesByIds" resultMap="BaseResultMap" >

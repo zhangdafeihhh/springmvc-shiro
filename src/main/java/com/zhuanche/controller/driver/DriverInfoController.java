@@ -20,6 +20,7 @@ import com.zhuanche.serv.*;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
+import jxl.write.WritableWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +30,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.*;
 
@@ -224,10 +227,10 @@ public class DriverInfoController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
-    public AjaxResponse exportDriverList(String name, String phone, String licensePlates, Integer status, Integer cityId, Integer supplierId,
+    public void exportDriverList(String name, String phone, String licensePlates, Integer status, Integer cityId, Integer supplierId,
                                          Integer teamId, Integer teamGroupId, Integer groupId, Integer cooperationType,
                                          String imei, String idCardNo, Integer isImage,
-                                         HttpServletRequest request) {
+                                         HttpServletRequest request, HttpServletResponse response) {
 
         // 数据权限控制SSOLoginUser
         Set<Integer> permOfCity        = WebSessionUtil.getCurrentLoginUser().getCityIds(); //普通管理员可以管理的所有城市ID
@@ -268,18 +271,15 @@ public class DriverInfoController {
             list = carBizDriverInfoService.queryDriverList(carBizDriverInfoDTO);
             // 查询城市名称，供应商名称，服务类型，加盟类型
             for (CarBizDriverInfoDTO driver : list) {
-                driver = carBizDriverInfoService.getBaseStatis(driver);
+                carBizDriverInfoService.getBaseStatis(driver);
             }
         }
         try {
-            //TODO 待完善
             Workbook wb = carBizDriverInfoService.exportExcel(list,request.getRealPath("/")+File.separator+"template"+File.separator+"driver_info.xlsx");
-//        super.exportExcelFromTemplet(request, response, wb, new String("司机信息列表".getBytes("utf-8"), "iso8859-1"));
+            Componment.fileDownload(response, wb, new String("司机信息".getBytes("utf-8"), "iso8859-1"));
         } catch (Exception e) {
-            e.printStackTrace();
+           logger.error("司机信息列表查询导出error",e);
         }
-
-        return AjaxResponse.success(list);
     }
 
     /**
@@ -395,7 +395,7 @@ public class DriverInfoController {
         } catch (Exception e) {
             logger.info(LOGTAG + "司机driverId={},置为无效error={}", driverId, e.getMessage());
         }
-        return AjaxResponse.success(true);
+        return AjaxResponse.success(null);
     }
 
     /**
@@ -416,7 +416,7 @@ public class DriverInfoController {
             return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
         }
         carBizDriverInfoService.resetIMEI(driverId);
-        return AjaxResponse.success(true);
+        return AjaxResponse.success(null);
     }
 
     /**
@@ -451,7 +451,6 @@ public class DriverInfoController {
         if(resultMap!=null && "-1".equals(resultMap.get("result").toString())){
             return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
         }
-        //
-        return AjaxResponse.success(true);
+        return AjaxResponse.success(request);
     }
 }

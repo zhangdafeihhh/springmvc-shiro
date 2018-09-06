@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.DriverInfoUpdateApplyMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.DriverInfoUpdateApply" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="license_plates" property="licensePlates" jdbcType="VARCHAR" />
+    <result column="id_card_no" property="idCardNo" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+    <result column="team_id" property="teamId" jdbcType="INTEGER" />
+    <result column="team_name" property="teamName" jdbcType="VARCHAR" />
+    <result column="driver_phone" property="driverPhone" jdbcType="VARCHAR" />
+    <result column="car_model_id" property="carModelId" jdbcType="INTEGER" />
+    <result column="car_model_name" property="carModelName" jdbcType="VARCHAR" />
+    <result column="car_purchase_date" property="carPurchaseDate" jdbcType="TIMESTAMP" />
+    <result column="model_detail" property="modelDetail" jdbcType="VARCHAR" />
+    <result column="color" property="color" jdbcType="VARCHAR" />
+    <result column="driver_id_new" property="driverIdNew" jdbcType="INTEGER" />
+    <result column="driver_name_new" property="driverNameNew" jdbcType="VARCHAR" />
+    <result column="driver_phone_new" property="driverPhoneNew" jdbcType="VARCHAR" />
+    <result column="car_model_id_new" property="carModelIdNew" jdbcType="INTEGER" />
+    <result column="car_model_name_new" property="carModelNameNew" jdbcType="VARCHAR" />
+    <result column="car_purchase_date_new" property="carPurchaseDateNew" jdbcType="TIMESTAMP" />
+    <result column="model_detail_new" property="modelDetailNew" jdbcType="VARCHAR" />
+    <result column="color_new" property="colorNew" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="create_id" property="createId" jdbcType="INTEGER" />
+    <result column="create_name" property="createName" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_id" property="updateId" jdbcType="INTEGER" />
+    <result column="update_name" property="updateName" jdbcType="VARCHAR" />
+    <result column="operate_reason" property="operateReason" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, driver_id, driver_name, license_plates, id_card_no, city_id, city_name, supplier_id, 
+    supplier_name, team_id, team_name, driver_phone, car_model_id, car_model_name, car_purchase_date, 
+    model_detail, color, driver_id_new, driver_name_new, driver_phone_new, car_model_id_new, 
+    car_model_name_new, car_purchase_date_new, model_detail_new, color_new, status, type, 
+    create_id, create_name, create_time, update_id, update_name, operate_reason, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from driver_info_update_apply
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from driver_info_update_apply
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.DriverInfoUpdateApply" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into driver_info_update_apply (driver_id, driver_name, license_plates, 
+      id_card_no, city_id, city_name, 
+      supplier_id, supplier_name, team_id, 
+      team_name, driver_phone, car_model_id, 
+      car_model_name, car_purchase_date, model_detail, 
+      color, driver_id_new, driver_name_new, 
+      driver_phone_new, car_model_id_new, car_model_name_new, 
+      car_purchase_date_new, model_detail_new, color_new, 
+      status, type, create_id, 
+      create_name, create_time, update_id, 
+      update_name, operate_reason, update_time
+      )
+    values (#{driverId,jdbcType=INTEGER}, #{driverName,jdbcType=VARCHAR}, #{licensePlates,jdbcType=VARCHAR}, 
+      #{idCardNo,jdbcType=VARCHAR}, #{cityId,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR}, 
+      #{supplierId,jdbcType=INTEGER}, #{supplierName,jdbcType=VARCHAR}, #{teamId,jdbcType=INTEGER}, 
+      #{teamName,jdbcType=VARCHAR}, #{driverPhone,jdbcType=VARCHAR}, #{carModelId,jdbcType=INTEGER}, 
+      #{carModelName,jdbcType=VARCHAR}, #{carPurchaseDate,jdbcType=TIMESTAMP}, #{modelDetail,jdbcType=VARCHAR}, 
+      #{color,jdbcType=VARCHAR}, #{driverIdNew,jdbcType=INTEGER}, #{driverNameNew,jdbcType=VARCHAR}, 
+      #{driverPhoneNew,jdbcType=VARCHAR}, #{carModelIdNew,jdbcType=INTEGER}, #{carModelNameNew,jdbcType=VARCHAR}, 
+      #{carPurchaseDateNew,jdbcType=TIMESTAMP}, #{modelDetailNew,jdbcType=VARCHAR}, #{colorNew,jdbcType=VARCHAR}, 
+      #{status,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{createId,jdbcType=INTEGER}, 
+      #{createName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateId,jdbcType=INTEGER}, 
+      #{updateName,jdbcType=VARCHAR}, #{operateReason,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.DriverInfoUpdateApply" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into driver_info_update_apply
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="driverId != null" >
+        driver_id,
+      </if>
+      <if test="driverName != null" >
+        driver_name,
+      </if>
+      <if test="licensePlates != null" >
+        license_plates,
+      </if>
+      <if test="idCardNo != null" >
+        id_card_no,
+      </if>
+      <if test="cityId != null" >
+        city_id,
+      </if>
+      <if test="cityName != null" >
+        city_name,
+      </if>
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="supplierName != null" >
+        supplier_name,
+      </if>
+      <if test="teamId != null" >
+        team_id,
+      </if>
+      <if test="teamName != null" >
+        team_name,
+      </if>
+      <if test="driverPhone != null" >
+        driver_phone,
+      </if>
+      <if test="carModelId != null" >
+        car_model_id,
+      </if>
+      <if test="carModelName != null" >
+        car_model_name,
+      </if>
+      <if test="carPurchaseDate != null" >
+        car_purchase_date,
+      </if>
+      <if test="modelDetail != null" >
+        model_detail,
+      </if>
+      <if test="color != null" >
+        color,
+      </if>
+      <if test="driverIdNew != null" >
+        driver_id_new,
+      </if>
+      <if test="driverNameNew != null" >
+        driver_name_new,
+      </if>
+      <if test="driverPhoneNew != null" >
+        driver_phone_new,
+      </if>
+      <if test="carModelIdNew != null" >
+        car_model_id_new,
+      </if>
+      <if test="carModelNameNew != null" >
+        car_model_name_new,
+      </if>
+      <if test="carPurchaseDateNew != null" >
+        car_purchase_date_new,
+      </if>
+      <if test="modelDetailNew != null" >
+        model_detail_new,
+      </if>
+      <if test="colorNew != null" >
+        color_new,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="createId != null" >
+        create_id,
+      </if>
+      <if test="createName != null" >
+        create_name,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateId != null" >
+        update_id,
+      </if>
+      <if test="updateName != null" >
+        update_name,
+      </if>
+      <if test="operateReason != null" >
+        operate_reason,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="driverId != null" >
+        #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="driverName != null" >
+        #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="licensePlates != null" >
+        #{licensePlates,jdbcType=VARCHAR},
+      </if>
+      <if test="idCardNo != null" >
+        #{idCardNo,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null" >
+        #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierName != null" >
+        #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="teamId != null" >
+        #{teamId,jdbcType=INTEGER},
+      </if>
+      <if test="teamName != null" >
+        #{teamName,jdbcType=VARCHAR},
+      </if>
+      <if test="driverPhone != null" >
+        #{driverPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="carModelId != null" >
+        #{carModelId,jdbcType=INTEGER},
+      </if>
+      <if test="carModelName != null" >
+        #{carModelName,jdbcType=VARCHAR},
+      </if>
+      <if test="carPurchaseDate != null" >
+        #{carPurchaseDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modelDetail != null" >
+        #{modelDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="color != null" >
+        #{color,jdbcType=VARCHAR},
+      </if>
+      <if test="driverIdNew != null" >
+        #{driverIdNew,jdbcType=INTEGER},
+      </if>
+      <if test="driverNameNew != null" >
+        #{driverNameNew,jdbcType=VARCHAR},
+      </if>
+      <if test="driverPhoneNew != null" >
+        #{driverPhoneNew,jdbcType=VARCHAR},
+      </if>
+      <if test="carModelIdNew != null" >
+        #{carModelIdNew,jdbcType=INTEGER},
+      </if>
+      <if test="carModelNameNew != null" >
+        #{carModelNameNew,jdbcType=VARCHAR},
+      </if>
+      <if test="carPurchaseDateNew != null" >
+        #{carPurchaseDateNew,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modelDetailNew != null" >
+        #{modelDetailNew,jdbcType=VARCHAR},
+      </if>
+      <if test="colorNew != null" >
+        #{colorNew,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="createId != null" >
+        #{createId,jdbcType=INTEGER},
+      </if>
+      <if test="createName != null" >
+        #{createName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateId != null" >
+        #{updateId,jdbcType=INTEGER},
+      </if>
+      <if test="updateName != null" >
+        #{updateName,jdbcType=VARCHAR},
+      </if>
+      <if test="operateReason != null" >
+        #{operateReason,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.mdbcarmanage.DriverInfoUpdateApply" >
+    update driver_info_update_apply
+    <set >
+      <if test="driverId != null" >
+        driver_id = #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="driverName != null" >
+        driver_name = #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="licensePlates != null" >
+        license_plates = #{licensePlates,jdbcType=VARCHAR},
+      </if>
+      <if test="idCardNo != null" >
+        id_card_no = #{idCardNo,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null" >
+        city_name = #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierName != null" >
+        supplier_name = #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="teamId != null" >
+        team_id = #{teamId,jdbcType=INTEGER},
+      </if>
+      <if test="teamName != null" >
+        team_name = #{teamName,jdbcType=VARCHAR},
+      </if>
+      <if test="driverPhone != null" >
+        driver_phone = #{driverPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="carModelId != null" >
+        car_model_id = #{carModelId,jdbcType=INTEGER},
+      </if>
+      <if test="carModelName != null" >
+        car_model_name = #{carModelName,jdbcType=VARCHAR},
+      </if>
+      <if test="carPurchaseDate != null" >
+        car_purchase_date = #{carPurchaseDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modelDetail != null" >
+        model_detail = #{modelDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="color != null" >
+        color = #{color,jdbcType=VARCHAR},
+      </if>
+      <if test="driverIdNew != null" >
+        driver_id_new = #{driverIdNew,jdbcType=INTEGER},
+      </if>
+      <if test="driverNameNew != null" >
+        driver_name_new = #{driverNameNew,jdbcType=VARCHAR},
+      </if>
+      <if test="driverPhoneNew != null" >
+        driver_phone_new = #{driverPhoneNew,jdbcType=VARCHAR},
+      </if>
+      <if test="carModelIdNew != null" >
+        car_model_id_new = #{carModelIdNew,jdbcType=INTEGER},
+      </if>
+      <if test="carModelNameNew != null" >
+        car_model_name_new = #{carModelNameNew,jdbcType=VARCHAR},
+      </if>
+      <if test="carPurchaseDateNew != null" >
+        car_purchase_date_new = #{carPurchaseDateNew,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modelDetailNew != null" >
+        model_detail_new = #{modelDetailNew,jdbcType=VARCHAR},
+      </if>
+      <if test="colorNew != null" >
+        color_new = #{colorNew,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="createId != null" >
+        create_id = #{createId,jdbcType=INTEGER},
+      </if>
+      <if test="createName != null" >
+        create_name = #{createName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateId != null" >
+        update_id = #{updateId,jdbcType=INTEGER},
+      </if>
+      <if test="updateName != null" >
+        update_name = #{updateName,jdbcType=VARCHAR},
+      </if>
+      <if test="operateReason != null" >
+        operate_reason = #{operateReason,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.DriverInfoUpdateApply" >
+    update driver_info_update_apply
+    set driver_id = #{driverId,jdbcType=INTEGER},
+      driver_name = #{driverName,jdbcType=VARCHAR},
+      license_plates = #{licensePlates,jdbcType=VARCHAR},
+      id_card_no = #{idCardNo,jdbcType=VARCHAR},
+      city_id = #{cityId,jdbcType=INTEGER},
+      city_name = #{cityName,jdbcType=VARCHAR},
+      supplier_id = #{supplierId,jdbcType=INTEGER},
+      supplier_name = #{supplierName,jdbcType=VARCHAR},
+      team_id = #{teamId,jdbcType=INTEGER},
+      team_name = #{teamName,jdbcType=VARCHAR},
+      driver_phone = #{driverPhone,jdbcType=VARCHAR},
+      car_model_id = #{carModelId,jdbcType=INTEGER},
+      car_model_name = #{carModelName,jdbcType=VARCHAR},
+      car_purchase_date = #{carPurchaseDate,jdbcType=TIMESTAMP},
+      model_detail = #{modelDetail,jdbcType=VARCHAR},
+      color = #{color,jdbcType=VARCHAR},
+      driver_id_new = #{driverIdNew,jdbcType=INTEGER},
+      driver_name_new = #{driverNameNew,jdbcType=VARCHAR},
+      driver_phone_new = #{driverPhoneNew,jdbcType=VARCHAR},
+      car_model_id_new = #{carModelIdNew,jdbcType=INTEGER},
+      car_model_name_new = #{carModelNameNew,jdbcType=VARCHAR},
+      car_purchase_date_new = #{carPurchaseDateNew,jdbcType=TIMESTAMP},
+      model_detail_new = #{modelDetailNew,jdbcType=VARCHAR},
+      color_new = #{colorNew,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      type = #{type,jdbcType=INTEGER},
+      create_id = #{createId,jdbcType=INTEGER},
+      create_name = #{createName,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_id = #{updateId,jdbcType=INTEGER},
+      update_name = #{updateName,jdbcType=VARCHAR},
+      operate_reason = #{operateReason,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

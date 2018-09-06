@@ -71,7 +71,7 @@
 		            and cooperation_name like '%${cooperationName}%' 
 		    </if>
 		    <if test="status !=null and status !='' ">
-		            and status = #{status} 
+		            and status = #{status}
 		    </if>
     </select>
     <select id="queryForObject" resultType="com.zhuanche.entity.rentcar.CarBizCooperationType" parameterType="com.zhuanche.entity.rentcar.CarBizCooperationType">
@@ -171,5 +171,16 @@
 		update_date=now()
 		where id=#{id}
 	</update>
+
+	<!--查询所有加盟类型-->
+	<select id="queryCarBizCooperationTypeList" resultType="com.zhuanche.entity.rentcar.CarBizCooperationType" >
+		SELECT
+			id,
+			cooperation_name cooperationName,
+			status
+		FROM
+			car_biz_cooperation_type
+		WHERE status = 1
+	</select>
 </mapper>
 

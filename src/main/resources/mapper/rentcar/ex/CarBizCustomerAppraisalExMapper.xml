@@ -99,8 +99,8 @@
     ca.evaluate AS evaluate,
     ca.memo,
     di.driver_id AS driverId,
-    di.name AS driverName,
-    di.phone AS driverPhone,
+    di.name AS name,
+    di.phone AS phone,
     di.license_plates AS licensePlates
     FROM
     car_biz_customer_appraisal ca

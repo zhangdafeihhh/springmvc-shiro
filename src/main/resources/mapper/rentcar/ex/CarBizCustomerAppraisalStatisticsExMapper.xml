@@ -29,6 +29,12 @@
       <if test="createDate !=null and createDate !=''">
         <![CDATA[ AND ca.create_date =  concat(#{createDate}) ]]>
       </if>
+      <if test="cityId !=null and cityId !=''">
+        AND di.service_city = #{cityId}
+      </if>
+      <if test="supplierId !=null and supplierId !=''">
+        AND di.supplier_id = #{supplierId}
+      </if>
       <if test="driverIds !=null and driverIds.size()>0">
         and ca.driver_id IN
         <foreach collection="driverIds" open="(" close=")" separator="," item="did">

@@ -20,7 +20,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +27,7 @@ import java.util.Map;
 @RequestMapping("/creditCard")
 public class CreditCardController {
 
-    private static final Logger logger = LoggerFactory.getLogger(DriverInfoController.class);
+    private static final Logger logger = LoggerFactory.getLogger(Componment.class);
     private static final String LOGTAG = "[司机信用卡]: ";
 
     @Autowired
@@ -70,8 +69,8 @@ public class CreditCardController {
                 return AjaxResponse.success(true);
             }else if(returnMap.get("returnCode").equals("1")){
                 if(!(returnMap.get("errormsg")==null || returnMap.get("errormsg")=="" ||  returnMap.get("errormsg").toString().isEmpty())){
-                    logger.info(LOGTAG + "司机driverId={},司机获取验证码接口处理 处理失败={}", driverId, URLEncoder.encode(returnMap.get("errormsg").toString()));
-                    return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, URLEncoder.encode(returnMap.get("errormsg").toString()));
+                    logger.info(LOGTAG + "司机driverId={},司机获取验证码接口处理 处理失败={}", driverId, returnMap.get("errormsg").toString());
+                    return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, returnMap.get("errormsg").toString());
                 }
             }else {
                 return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, "服务器异常!");
@@ -118,12 +117,12 @@ public class CreditCardController {
                 return AjaxResponse.success(true);
             }else{
                 if(returnMap.get("returnMsg")!=null || returnMap.get("returnMsg")!=""){
-                    return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, URLEncoder.encode(returnMap.get("returnMsg").toString()));
+                    return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, returnMap.get("returnMsg").toString());
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, URLEncoder.encode(e.getMessage()));
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, e.getMessage());
         }
         return AjaxResponse.success(true);
     }
