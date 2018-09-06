@@ -3,7 +3,7 @@ package com.zhuanche.dto.rentcar;
 import java.util.Date;
 
 public class DriverOutageAllDTO {
-    private Integer id;
+    private Integer outageId;
 
     private Integer driverId;
 
@@ -116,12 +116,12 @@ public class DriverOutageAllDTO {
         this.carGroupName = carGroupName;
     }
 
-    public Integer getId() {
-        return id;
+    public Integer getOutageId() {
+        return outageId;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setOutageId(Integer outageId) {
+        this.outageId = outageId;
     }
 
     public Integer getDriverId() {
