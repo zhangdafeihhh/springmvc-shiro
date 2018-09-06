@@ -195,7 +195,7 @@ public class CarDriverTeamService{
 				//2.查询小组所属车队下其他小组以及绑定的司机关联
 				List<CarDriverTeam> carDriverTeams = carDriverTeamExMapper.queryForListByPid(driverTeamRequest);
 				//2.1 车队有几个小组，查询小组下绑定的司机
-				Set<String> teamIds = citySupplierTeamCommonService.dealDriverids(carDriverTeams,CarDriverTeam.class,"driverId");
+				Set<String> teamIds = citySupplierTeamCommonService.dealDriverids(carDriverTeams,CarDriverTeam.class,"id");
 				teamGroupRequest.setGroupIds(teamIds);
 				List<CarRelateGroup> carRelateGroups = carRelateGroupExMapper.queryDriverGroupRelationList(teamGroupRequest);
 				Set<String> existsGroups = citySupplierTeamCommonService.dealDriverids(carRelateGroups, CarRelateGroup.class,"driverId");
@@ -461,7 +461,7 @@ public class CarDriverTeamService{
 		try{
 			pageInfo =
 					PageHelper.startPage(driverTeamRequest.getPageNo(), driverTeamRequest.getPageSize(), true).doSelectPageInfo(()
-							-> carDriverTeamExMapper.queryDriverTeam(commonRequest.getCityIds(), commonRequest.getSupplierIds(), commonRequest.getTeamIds()));
+							-> carDriverTeamExMapper.queryDriverTeamAndGroup(commonRequest.getCityIds(), commonRequest.getSupplierIds(), commonRequest.getTeamIds()));
 //			driverTeams = carDriverTeamExMapper.queryDriverTeam(cityIds, supplierIds, teamIds);
 			driverTeams = pageInfo.getList();
 			total = (int)pageInfo.getTotal();
