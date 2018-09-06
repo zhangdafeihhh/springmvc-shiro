@@ -56,16 +56,16 @@ public class CarInfoController {
      * @return
      */
     @RequestMapping(value = "/queryCarData")
-    public Object queryCarData(String cities,
-                               String supplierIds,
-                               String carModelIds,
-                               String licensePlates,
-                               String createDateBegin,
-                               String createDateEnd,
-                               Integer status,
-                               Integer isFree,
-                               Integer page,
-                               Integer pageSize) {
+    public Object queryCarData(@Verify(param = "cities",rule="") String cities,
+                               @Verify(param = "supplierIds",rule="") String supplierIds,
+                               @Verify(param = "carModelIds",rule="") String carModelIds,
+                               @Verify(param = "licensePlates",rule="") String licensePlates,
+                               @Verify(param = "createDateBegin",rule="") String createDateBegin,
+                               @Verify(param = "createDateEnd",rule="") String createDateEnd,
+                               @Verify(param = "status",rule="") Integer status,
+                               @Verify(param = "isFree",rule="") Integer isFree,
+                               @Verify(param = "page",rule="") Integer page,
+                               @Verify(param = "pageSize",rule="") Integer pageSize) {
         logger.info("车辆列表数据:queryCarData");
 
         CarInfo params = new CarInfo();
@@ -106,6 +106,11 @@ public class CarInfoController {
         return AjaxResponse.success(new PageDTO(params.getPage(), params.getPagesize(), total, BeanUtil.copyList(rows, CarInfoDTO.class)));
     }
 
+    /**
+     * 查询车辆详情
+     * @param carId
+     * @return
+     */
     @RequestMapping(value = "/queryCarInfo")
     public AjaxResponse queryCarInfo(@Verify(param = "carId",rule = "required") Integer carId) {
         logger.info("queryCar:查看车辆详情列表");
@@ -130,6 +135,10 @@ public class CarInfoController {
                 }
             }
         }
+        params.setLicensePlates1(params.getLicensePlates());
+        params.setOldCity(params.getCityId());
+        params.setOldSupplierId(params.getSupplierId());
+
         return AjaxResponse.success( BeanUtil.copyObject(params, CarInfoDTO.class) );
     }
 
@@ -201,26 +210,26 @@ public class CarInfoController {
      */
     @RequestMapping(value = "/saveCarInfo")
     public Object saveCarInfo(@Verify(param = "carId",rule="") Integer carId,
-                              @Verify(param = "licensePlates",rule="required") String licensePlates,
-                              @Verify(param = "status",rule="required") Integer status,
-                              @Verify(param = "cityId",rule="required") Integer cityId,
-                              @Verify(param = "supplierId",rule="required") Integer supplierId,
-                              @Verify(param = "carModelId",rule="required") Integer carModelId,
+                                  @Verify(param = "licensePlates",rule="required") String licensePlates,
+                                  @Verify(param = "status",rule="required") Integer status,
+                                  @Verify(param = "cityId",rule="required") Integer cityId,
+                                  @Verify(param = "supplierId",rule="required") Integer supplierId,
+                                  @Verify(param = "carModelId",rule="required") Integer carModelId,
                               @Verify(param = "imageUrl",rule="") String imageUrl,
                               @Verify(param = "vehicleDrivingLicense",rule="") String vehicleDrivingLicense,
-                              @Verify(param = "modelDetail",rule="required") String modelDetail,
-                              @Verify(param = "color",rule="required") String color,
-                              @Verify(param = "clicensePlatesColor",rule="required") String clicensePlatesColor,
-                              @Verify(param = "engineNo",rule="required") String engineNo,
-                              @Verify(param = "vehicleEngineDisplacement",rule="required") String vehicleEngineDisplacement,
-                              @Verify(param = "vehicleEnginePower",rule="required") String vehicleEnginePower,
-                              @Verify(param = "carryPassengers",rule="required") String carryPassengers,
-                              @Verify(param = "vehicleBrand",rule="required") String vehicleBrand,
-                              @Verify(param = "vehicleEngineWheelbase",rule="required") String vehicleEngineWheelbase,
-                              @Verify(param = "vehicleOwner",rule="required") String vehicleOwner,
-                              @Verify(param = "frameNo",rule="required") String frameNo,
-                              @Verify(param = "vehicleType",rule="required") String vehicleType,
-                              @Verify(param = "fuelType",rule="required") Integer fuelType,
+                                  @Verify(param = "modelDetail",rule="required") String modelDetail,
+                                  @Verify(param = "color",rule="required") String color,
+                              @Verify(param = "clicensePlatesColor",rule="") String clicensePlatesColor,
+                              @Verify(param = "engineNo",rule="") String engineNo,
+                              @Verify(param = "vehicleEngineDisplacement",rule="") String vehicleEngineDisplacement,
+                              @Verify(param = "vehicleEnginePower",rule="") String vehicleEnginePower,
+                              @Verify(param = "carryPassengers",rule="") String carryPassengers,
+                              @Verify(param = "vehicleBrand",rule="") String vehicleBrand,
+                              @Verify(param = "vehicleEngineWheelbase",rule="") String vehicleEngineWheelbase,
+                                    @Verify(param = "vehicleOwner",rule="required") String vehicleOwner,
+                              @Verify(param = "frameNo",rule="") String frameNo,
+                              @Verify(param = "vehicleType",rule="") String vehicleType,
+                              @Verify(param = "fuelType",rule="") Integer fuelType,
                               @RequestParam(value = "nextInspectDate",required = false) String nextInspectDate,
                               @RequestParam(value = "nextMaintenanceDate",required = false) String nextMaintenanceDate,
                               @RequestParam(value = "nextOperationDate",required = false) String nextOperationDate,
@@ -229,25 +238,25 @@ public class CarInfoController {
                               @RequestParam(value = "twoLevelMaintenanceDate",required = false) String twoLevelMaintenanceDate,
                               @RequestParam(value = "rentalExpireDate",required = false) String rentalExpireDate,
                               @RequestParam(value = "purchaseDate",required = false) String purchaseDate,
-                              @Verify(param = "vehicleRegistrationDate",rule="required") String vehicleRegistrationDate,
-                              @Verify(param = "transportNumber",rule="required") String transportNumber,
-                              @Verify(param = "certificationAuthority",rule="required") String certificationAuthority,
-                              @Verify(param = "operatingRegion",rule="required") String operatingRegion,
-                              @Verify(param = "transportNumberDateStart",rule="required") String transportNumberDateStart,
-                              @Verify(param = "transportNumberDateEnd",rule="required") String transportNumberDateEnd,
-                              @Verify(param = "firstDate",rule="required") String firstDate,
-                              @Verify(param = "overHaulStatus",rule="required") Integer overHaulStatus,
-                              @Verify(param = "auditingStatus",rule="required") Integer auditingStatus,
-                              @Verify(param = "auditingDate",rule="required") String auditingDate,
-                              @Verify(param = "equipmentNumber",rule="required") String equipmentNumber,
-                              @Verify(param = "gpsBrand",rule="required") String gpsBrand,
-                              @Verify(param = "gpsType",rule="required") String gpsType,
-                              @Verify(param = "gpsImei",rule="required") String gpsImei,
-                              @Verify(param = "gpsDate",rule="required") String gpsDate,
+                                    @Verify(param = "vehicleRegistrationDate",rule="required") String vehicleRegistrationDate,
+                              @Verify(param = "transportNumber",rule="") String transportNumber,
+                              @Verify(param = "certificationAuthority",rule="") String certificationAuthority,
+                              @Verify(param = "operatingRegion",rule="") String operatingRegion,
+                              @Verify(param = "transportNumberDateStart",rule="") String transportNumberDateStart,
+                              @Verify(param = "transportNumberDateEnd",rule="") String transportNumberDateEnd,
+                              @Verify(param = "firstDate",rule="") String firstDate,
+                              @Verify(param = "overHaulStatus",rule="") Integer overHaulStatus,
+                              @Verify(param = "auditingStatus",rule="") Integer auditingStatus,
+                              @Verify(param = "auditingDate",rule="") String auditingDate,
+                              @Verify(param = "equipmentNumber",rule="") String equipmentNumber,
+                              @Verify(param = "gpsBrand",rule="") String gpsBrand,
+                              @Verify(param = "gpsType",rule="") String gpsType,
+                              @Verify(param = "gpsImei",rule="") String gpsImei,
+                              @Verify(param = "gpsDate",rule="") String gpsDate,
                               @RequestParam(value = "purchaseDate",required = false) String memo,
-                              @Verify(param = "licensePlates1",rule="required") String licensePlates1,
-                              @Verify(param = "oldCity",rule="required") Integer oldCity,
-                              @Verify(param = "oldSupplierId",rule="required") Integer oldSupplierId) {
+                                  @Verify(param = "licensePlates1",rule="required") String licensePlates1,
+                                  @Verify(param = "oldCity",rule="required") Integer oldCity,
+                                  @Verify(param = "oldSupplierId",rule="required") Integer oldSupplierId) {
         logger.info("车辆保存/修改:saveCarInfo");
 
 

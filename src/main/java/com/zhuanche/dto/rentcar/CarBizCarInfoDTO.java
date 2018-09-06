@@ -1,8 +1,10 @@
 package com.zhuanche.dto.rentcar;
 
+import com.zhuanche.entity.common.Base;
+
 import java.util.Date;
 
-public class CarBizCarInfoDTO {
+public class CarBizCarInfoDTO extends Base {
     private Integer carId;
 
     private Integer cityId;
