@@ -135,6 +135,10 @@ public class CarInfoController {
                 }
             }
         }
+        params.setLicensePlates1(params.getLicensePlates());
+        params.setOldCity(params.getCityId());
+        params.setOldSupplierId(params.getSupplierId());
+
         return AjaxResponse.success( BeanUtil.copyObject(params, CarInfoDTO.class) );
     }
 
@@ -250,9 +254,9 @@ public class CarInfoController {
                               @Verify(param = "gpsImei",rule="") String gpsImei,
                               @Verify(param = "gpsDate",rule="") String gpsDate,
                               @RequestParam(value = "purchaseDate",required = false) String memo,
-                              @Verify(param = "licensePlates1",rule="required") String licensePlates1,
-                              @Verify(param = "oldCity",rule="required") Integer oldCity,
-                              @Verify(param = "oldSupplierId",rule="required") Integer oldSupplierId) {
+                                  @Verify(param = "licensePlates1",rule="required") String licensePlates1,
+                                  @Verify(param = "oldCity",rule="required") Integer oldCity,
+                                  @Verify(param = "oldSupplierId",rule="required") Integer oldSupplierId) {
         logger.info("车辆保存/修改:saveCarInfo");
 
 
