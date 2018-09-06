@@ -310,6 +310,9 @@
 			<properties>
 				<env.name>dev</env.name>
 			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 		</profile>
 		<profile>
 			<id>test</id>
@@ -328,9 +331,6 @@
 			<properties>
 				<env.name>online</env.name>
 			</properties>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
 		</profile>
 	</profiles>
 	<!-- 多环境配置END -->
