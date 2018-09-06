@@ -177,7 +177,8 @@ public class CarInfoServiceImpl implements CarInfoService {
         try {
 //            InputStream is = new FileInputStream(DRIVERINFO);
             Workbook workbook = null;
-            String fileType = fileName.getName().split("\\.")[1];
+            String name = fileName.getOriginalFilename();
+            String fileType = fileName.getOriginalFilename().split("\\.")[1];
             if (fileType.equals("xls")) {
                 workbook = new HSSFWorkbook(fileName.getInputStream());
             } else if (fileType.equals("xlsx")) {
