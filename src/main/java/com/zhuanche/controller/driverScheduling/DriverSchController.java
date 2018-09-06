@@ -128,6 +128,7 @@ public class DriverSchController {
             ServletOutputStream out = reponseOut.getOutputStream();
             workbook.write(out);
             out.flush();
+            out.close();
             if(total <= 3000){
                 return AjaxResponse.success(result);
             }
