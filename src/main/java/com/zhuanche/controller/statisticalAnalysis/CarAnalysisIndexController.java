@@ -31,16 +31,8 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 @RequestMapping("/carAnalysisIndex")
 public class CarAnalysisIndexController{
 	private static final Logger logger = LoggerFactory.getLogger(CarAnalysisIndexController.class);
-	
-	/*//指标
-	 @Value("${statistics.caranalysisindex.carDetail.url}")
-	 String  caranalysisindexCarDetailApiUrl;
-	 
-	 //趋势
-	 @Value("${statistics.caranalysisindex.carIndex.url}")
-	 String  caranalysisindexCarIndexApiUrl;*/
-	 
-	 @Value("${saas.bigdata.api.url}")
+
+	@Value("${saas.bigdata.api.url}")
 	 String  saasBigdataApiUrl;
 	 
 	 @Autowired
@@ -69,16 +61,17 @@ public class CarAnalysisIndexController{
 	      // 数据权限设置
 		  SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
 	      Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-	      //Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
 	      // 供应商信息
 		  String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
 		  if(null == visibleAllianceIds || null == visibleVehicleTypeIds){
 			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 		  }
+		  // 全部车辆类型  ??
+		  String[] visibleVehicleTypeIdsStr = visibleVehicleTypeIds.split(",");
 	      paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-	      paramMap.put("visibleVehicleTypeIds", visibleVehicleTypeIds); // 可见车辆类型ID
+	      paramMap.put("visibleVehicleTypeIds", visibleVehicleTypeIdsStr); // 可见车辆类型ID
+	      // 从大数据仓库获取统计数据
 	      AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/carAnalysisDetail/carDetail",paramMap);
-	  	// 从大数据仓库获取统计数据
 	      return result;
 	  }
 	  
@@ -111,18 +104,17 @@ public class CarAnalysisIndexController{
 	        // 数据权限设置
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
 	        Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-	        // Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
 	        // 供应商信息
 			String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-			// 全部车辆类型  ??
-			//String[] allVehicleTypeIdsArray = statisticalAnalysisService.setToArray(teamIds);
 			if(null == visibleAllianceIds || null == visibleVehicleTypeIds){
 				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 			}
-	        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-	        paramMap.put("visibleVehicleTypeIds", visibleVehicleTypeIds); // 可见车辆类型ID
-	        AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/carAnalysisIndex/carIndex",paramMap);
-	    	// 从大数据仓库获取统计数据
+			  // 全部车辆类型  ??
+			  String[] visibleVehicleTypeIdsStr = visibleVehicleTypeIds.split(",");
+		      paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
+		      paramMap.put("visibleVehicleTypeIds", visibleVehicleTypeIdsStr); // 可见车辆类型ID
+		      // 从大数据仓库获取统计数据
+	          AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/carAnalysisIndex/carIndex",paramMap);
 	        return result;
 	    }
 

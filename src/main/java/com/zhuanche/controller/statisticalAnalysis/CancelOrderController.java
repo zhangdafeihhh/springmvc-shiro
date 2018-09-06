@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.fastjson.JSON;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -34,12 +35,6 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 @RequestMapping("/cancelOrder")
 public class CancelOrderController{
 	 private static final Logger logger = LoggerFactory.getLogger(CancelOrderController.class);
-	 
-	 /*@Value("${statistics.cancelorderdetail.queryList.url}")
-	 String  cancelorderdetailQueryListApiUrl;
-	 
-	 @Value("${statistics.cancelorderdetail.download.url}")
-	 String  cancelorderdetailDownloadApiUrl;*/
 	 
 	 @Value("${saas.bigdata.api.url}")
 	 String  saasBigdataApiUrl;
@@ -110,16 +105,15 @@ public class CancelOrderController{
 	        paramMap.put("visibleMotorcardIds", visibleMotocadeIds); // 可见车队ID
 	        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
 	        
-/*			paramMap.put("visibleAllianceIds", new String[]{"1", "3", "4"});
-			paramMap.put("visibleMotorcadeIds", new String[]{"1", "4"});
-			paramMap.put("visibleCityIds", new String[]{"44"}); //可见城市ID
-*/			
-	        if(null != pageNo && pageNo > 0)
+			//paramMap.put("visibleAllianceIds", new String[]{"97", "946", "99", "489", "1307", "65", "1349"});
+			//paramMap.put("visibleMotorcadeIds", new String[]{"2498", "2487", "1809", "2359", "1369"});
+			//paramMap.put("visibleCityIds", new String[]{"88", "67", "111", "123", "85", "91"}); //可见城市ID
+	        
+			if(null != pageNo && pageNo > 0)
 	        	paramMap.put("pageNo", pageNo);//页号
 	        if(null != pageSize && pageSize > 0)
 	        	paramMap.put("pageSize", pageSize);//每页记录数
    
-			
 			// 从大数据仓库获取统计数据
 	        AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/cancelOrderDetail/queryList",paramMap);
 	        return result;
@@ -142,8 +136,9 @@ public class CancelOrderController{
 			* @param visibleMotorcadeIds	可见车队ID
 		    * @return
 		  */
+	@ResponseBody
    	@RequestMapping(value = "/exportCancelOrderData", method = { RequestMethod.POST,RequestMethod.GET })
-	public void exportCancelOrderData( 
+	public AjaxResponse exportCancelOrderData( 
 											String driverCityId,
 											String allianceId,
 								            String motorcadeId,
@@ -181,28 +176,15 @@ public class CancelOrderController{
 			String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
 			if(null == visibleAllianceIds || null == visibleMotocadeIds || visibleCityIds == null ){
 				 logger.info("【运营管理-统计分析】导出取消订单列表数据权限为空");
-				 return;
+				 return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 			}
 	        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
 	        paramMap.put("visibleMotorcardIds", visibleMotocadeIds); // 可见车队ID
 	        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
-
-	/*        paramMap.put("queryDate", "2018-09-04");
-			paramMap.put("driverCityId", "44");
-			paramMap.put("allianceId", "1");
-			paramMap.put("motorcadeId", "1");
-			paramMap.put("driverTypeId", "1");
-			paramMap.put("channelId", "1");
-			paramMap.put("orderVehicleTypeId", "1");
-			paramMap.put("productTypeId", "1");
-			paramMap.put("cancelDurationTypeId", "1");
-			paramMap.put("visibleCityIds", new String[]{"44"}); //可见城市ID
-			paramMap.put("visibleAllianceIds", new String[]{"1", "3", "4"});
-			paramMap.put("visibleMotorcadeIds", new String[]{"1", "4"});
-			paramMap.put("pageNo", "1");
-			paramMap.put("pageSize", "1");
-			*/
-			statisticalAnalysisService.downloadCsvFromTemplet(paramMap,
+	        
+			String jsonString = JSON.toJSONString(paramMap);
+			 
+			statisticalAnalysisService.downloadCsvFromTemplet(jsonString,
 					saasBigdataApiUrl+"/cancelOrderDetail/download" ,
 					request.getRealPath("/")+File.separator+"template"+File.separator+"cancelOrder_info.csv");
 			statisticalAnalysisService.exportCsvFromTemplet(response,
@@ -211,6 +193,9 @@ public class CancelOrderController{
        } catch (Exception e) {
            e.printStackTrace();
        }
+       return AjaxResponse.success("成功");
    }
+	
+	
 	
 }

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.fastjson.JSON;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -35,12 +36,6 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 @RequestMapping("/allianceCheck")
 public class AllianceCheckController{
 	private static final Logger logger = LoggerFactory.getLogger(AllianceCheckController.class);
-	 
-	 /*@Value("${statistics.alliancecheck.queryList.url}")
-	 String  alliancecheckQueryListApiUrl;
-	 
-	 @Value("${statistics.alliancecheck.download.url}")
-	 String  alliancecheckDownloadApiUrl;*/
 	 
 	 @Value("${saas.bigdata.api.url}")
 	 String  saasBigdataApiUrl;
@@ -92,13 +87,15 @@ public class AllianceCheckController{
 			}
 	        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
 	        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
+	        //paramMap.put("visibleAllianceIds", new String[]{"37", "47", "52", "61", "43", "67"}); // 可见加盟商ID
+	        //paramMap.put("visibleCityIds", new String[]{"44", "73", "78", "84"}); //可见城市ID
 	        if(null != pageNo && pageNo > 0)
 	        	paramMap.put("pageNo", pageNo);//页号
 	        if(null != pageSize && pageSize > 0)
 	        	paramMap.put("pageSize", pageSize);//每页记录数
 	        
-	        AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/allianceCheck/queryList",paramMap);
 	    	// 从大数据仓库获取统计数据
+	        AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/allianceCheck/queryList",paramMap);
 	        return result;
 	    }
 	    
@@ -139,11 +136,14 @@ public class AllianceCheckController{
 			// 可见城市
 			String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
 			if(null == visibleAllianceIds ||  visibleCityIds == null ){
+				logger.info("【运营管理-统计分析】导出,导出 加盟商考核授权不足");
 				return;// return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 			}
 	        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
 	        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
-	        statisticalAnalysisService.downloadCsvFromTemplet(paramMap,
+	        String jsonString = JSON.toJSONString(paramMap);
+	        
+	        statisticalAnalysisService.downloadCsvFromTemplet(jsonString,
 	        		saasBigdataApiUrl+"/allianceCheck/download" ,
 					request.getRealPath("/")+File.separator+"template"+File.separator+"alliancecheck_info.csv");
 			statisticalAnalysisService.exportCsvFromTemplet(response,

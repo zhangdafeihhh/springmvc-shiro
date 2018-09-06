@@ -31,13 +31,6 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 @RequestMapping("/driverOperAnlay")
 public class DriverOperAnlayController{
 	private static final Logger logger = LoggerFactory.getLogger(DriverOperAnlayController.class);
-	/* //指标趋势
-	 @Value("${statistics.driveroperanlayTrend.trend.url}")
-	 String  driveroperanlayTrendApiUrl;
-	 
-	 //指标查询
-	 @Value("${statistics.driveroperanaly.query.url}")
-	 String  driveroperanalyQueryApiUrl;*/
 	 
 	 @Value("${saas.bigdata.api.url}")
 	 String  saasBigdataApiUrl;
@@ -57,7 +50,7 @@ public class DriverOperAnlayController{
 	  public AjaxResponse queryCarAnalysisIndexDetailData(
 			  @Verify(param = "startDate",rule = "required") String startDate,
 			  @Verify(param = "endDate",rule = "required") String endDate, 
-			  @Verify(param = "allianceId",rule = "required") String allianceId){
+			  String allianceId){
 	      logger.info("【运营管理-统计分析】司机运营分析指标 数据:queryDriverOperAnlayData");
 	      Map<String, Object> paramMap = new HashMap<String, Object>();
 	      paramMap.put("startDate", startDate);//订单城市ID	
@@ -65,7 +58,10 @@ public class DriverOperAnlayController{
 	      paramMap.put("allianceId", allianceId);//加盟商ID
 	      // 数据权限设置
 		  SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-	      Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
+		  if(currentLoginUser == null){
+				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+			}
+		  Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
 	      // 供应商信息
 		  String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
 		  if(null == visibleAllianceIds){
@@ -92,7 +88,7 @@ public class DriverOperAnlayController{
     public AjaxResponse queryCarAnalysisIndexWayData(
     		  @Verify(param = "startDate",rule = "required") String startDate,
 			  @Verify(param = "endDate",rule = "required") String endDate, 
-			  @Verify(param = "allianceId",rule = "required") String allianceId){
+			  String allianceId){
         	  logger.info("【运营管理-统计分析】司机运营分析指标趋势查询 数据:queryDriverOperAnlayTrendData");
         	  Map<String, Object> paramMap = new HashMap<String, Object>();
 		      paramMap.put("startDate", startDate);//订单城市ID	
@@ -100,10 +96,14 @@ public class DriverOperAnlayController{
 		      paramMap.put("allianceId", allianceId);//加盟商ID
 		      // 数据权限设置
 			  SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-		      Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
+			  if(currentLoginUser == null){
+					return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+				}
+			  Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
 		      // 供应商信息
 			  String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
 			  if(null == visibleAllianceIds){
+				logger.info("【运营管理-统计分析】司机运营分析指标趋势查询 数据:授权不足");
 				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 			  }
 		      paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID

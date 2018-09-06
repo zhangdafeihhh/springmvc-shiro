@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -89,13 +90,13 @@ public class  StatisticalAnalysisService {
    	  * @param uri 远程接口地址
    	  * @param path 保存文件路径+文件名
    	  */
-	 public void downloadCsvFromTemplet(Map<String, Object> paramMap,String uri,String path) {
+	 public void downloadCsvFromTemplet(String jsonString,String uri,String path) {
 	        HttpClient httpClient = null;
 	        logger.info("远程下载文件uri:"+uri+"，path:" +path);
-	        if(StringUtils.isBlank(uri) || StringUtils.isBlank(path)){
+	        logger.info("远程下载文件参数:"+jsonString);
+	        if(StringUtils.isBlank(uri) || StringUtils.isBlank(path) || StringUtils.isBlank(jsonString)){
 	   	    	return;
 	   	    }
-			String jsonString = JSON.toJSONString(paramMap);
 	        OutputStream output = null;
 	        try{
 	            httpClient = new DefaultHttpClient();
@@ -143,6 +144,7 @@ public class  StatisticalAnalysisService {
 		try {
 			logger.info("调用大数据接口，url--" + url);
 			String jsonString = JSON.toJSONString(paramMap);
+			logger.info("调用大数据接口，参数--" + jsonString);
 			String result = HttpClientUtil.buildPostRequest(url).setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
 			logger.info("调用大数据接口，result--" + result);
 			JSONObject job = JSON.parseObject(result);
@@ -153,9 +155,13 @@ public class  StatisticalAnalysisService {
 			if (!job.getString("code").equals("0")) {
 				return AjaxResponse.fail(Integer.parseInt(job.getString("code")), job.getString("message"));
 			}
-			JSONObject jsonResult = JSON.parseObject(job.getString("result"));
-			//JSONArray resultArray = JSON.parseArray(jsonResult.getString("recordList"));
-			return AjaxResponse.success(jsonResult);
+			try {
+				JSONObject jsonResult = JSON.parseObject(job.getString("result"));
+				return AjaxResponse.success(jsonResult);
+			} catch (Exception e) {
+				JSONArray resultArray = JSON.parseArray(job.getString("result"));
+				return AjaxResponse.success(resultArray);
+			}
 		} catch (HttpException e) {
 			logger.error("调用大数据" + url + "异常", e);
 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);

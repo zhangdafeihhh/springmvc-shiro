@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.fastjson.JSON;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -35,15 +36,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 @RequestMapping("/driverOperateDetail")
 public class DriverOperateDetailController{
 	private static final Logger logger = LoggerFactory.getLogger(DriverOperateDetailController.class);
-	 
-	/* //司机运营详情查询
-	 @Value("${statistics.driveroperatedetail.queryList.url}")
-	 String  driveroperatedetailQueryListApiUrl;
-	 
-	 //司机运营详情下载
-	 @Value("${statistics.driveroperatedetail.download.url}")
-	 String  driveroperatedetailDownloadApiUrl;*/
-	 
+
 	 @Value("${saas.bigdata.api.url}")
 	 String  saasBigdataApiUrl;
 	 
@@ -89,7 +82,10 @@ public class DriverOperateDetailController{
 		paramMap.put("queryDate", queryDate);//查询日期
         // 数据权限设置
 		SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-        Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
+		if(currentLoginUser == null){
+			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+		}
+		Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
         Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
         Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
         // 供应商信息
@@ -161,12 +157,16 @@ public class DriverOperateDetailController{
 	  		  // 可见城市
 	  		  String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
 	  		  if(null == visibleAllianceIds || null == visibleMotocadeIds || visibleCityIds == null ){
-	  			 return;
+	  			  logger.info("【运营管理-统计分析】导出,导出司机运营详情数据:授权不足");
+	  			  return;
 	  		  }
 	          paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
 	          paramMap.put("visibleMotorcadeIds", visibleMotocadeIds); // 可见车队ID
 	          paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
-	          statisticalAnalysisService.downloadCsvFromTemplet(paramMap,
+	          
+	          String jsonString = JSON.toJSONString(paramMap);
+	          
+	          statisticalAnalysisService.downloadCsvFromTemplet(jsonString,
 	        		  	saasBigdataApiUrl+"/driverOperateDetail/download" ,
 						request.getRealPath("/")+File.separator+"template"+File.separator+"driveroperatedetail_info.csv");
 			  statisticalAnalysisService.exportCsvFromTemplet(response,
