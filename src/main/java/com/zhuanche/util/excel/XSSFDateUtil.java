@@ -1,10 +1,12 @@
 package com.zhuanche.util.excel;
 
 /**
- * @author zhangzhengguang
- * @create 2017-07-17
- **/
-
+ * @Description:  excel 工具类
+ * @Param:
+ * @return:
+ * @Author: lunan
+ * @Date: 2018/7/9
+ */
 import org.apache.poi.ss.usermodel.DateUtil;
 
 import java.util.Calendar;

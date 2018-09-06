@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,10 +19,12 @@ import com.zhuanche.common.web.RestErrorCode;
 
 @Controller
 public class MainController{
+	private static final Logger logger = Logger.getLogger(MainController.class);	
     @Value(value="${loginpage.url}")
     private String loginpageUrl;  //前端UI登录页面
 	@Value("${homepage.url}")
 	private String homepageUrl; //前端UI首页页面
+	
     
     /**运维监控心跳检测 **/
     @RequestMapping("/nginx")
@@ -33,6 +36,7 @@ public class MainController{
 	/**显示首页**/
     @RequestMapping("/index")
     public String index(HttpServletRequest request , HttpServletResponse response,Model model) throws Exception {
+    	logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>log4j桥接至logback测试成功！");
 //		response.sendRedirect(homepageUrl);
 //		return null;
         return "index";

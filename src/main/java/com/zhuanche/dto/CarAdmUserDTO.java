@@ -33,8 +33,18 @@ public class CarAdmUserDTO{
     
     //-----扩展: 角色名称（多个以逗号分隔）
     private String roleNames = "";
+    //-----扩展: 角色ID    （多个以逗号分隔）
+    private String roleIds       = "";
 
-    public String getRoleNames() {
+    public String getRoleIds() {
+		return roleIds;
+	}
+
+	public void setRoleIds(String roleIds) {
+		this.roleIds = roleIds;
+	}
+
+	public String getRoleNames() {
 		return roleNames;
 	}
 

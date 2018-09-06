@@ -9,11 +9,13 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constants.SaasConst;
@@ -25,6 +27,7 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.RedisSessionDAO;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
+import com.zhuanche.util.NumberUtil;
 import com.zhuanche.util.PasswordUtil;
 
 import mapper.mdbcarmanage.CarAdmUserMapper;
@@ -45,6 +48,9 @@ public class UserManagementService{
 	private CarAdmUserMapper      carAdmUserMapper;
 	@Autowired
 	private CarAdmUserExMapper  carAdmUserExMapper;
+	
+	@Value("${resetpassword.msgnotify.switch}")
+	private String resetpasswordMsgotifySwitch = "OFF";//重置密码时是否短信通知用户
 
 	public CarAdmUser getUserById(Integer userId){
 		return carAdmUserMapper.selectByPrimaryKey(userId);
@@ -219,18 +225,25 @@ public class UserManagementService{
     		return new PageDTO( page, pageSize, total , new ArrayList()  );
     	}
     	List<CarAdmUserDTO> roledtos = BeanUtil.copyList(users, CarAdmUserDTO.class);
-    	//3.1补充上角色名称
+    	//3.1补充上角色ID，角色名称
     	Map<Integer,String> roleIdNameMappings = this.searchRoleIdNameMappings();
     	for( CarAdmUserDTO admUserDto : roledtos ) {
     		List<Integer> roleIdsOfthisUser = saasRoleExMapper.queryRoleIdsOfUser(admUserDto.getUserId());//根据用户ID，查询其拥有的所有有效的角色ID
-    		//拼接角色名称
+    		//拼接角色ID，角色名称
+    		StringBuffer sbRoleIds       =  new StringBuffer("");
     		StringBuffer sbRoleNames =  new StringBuffer("");
 			for( Integer rid : roleIdsOfthisUser) {
+				sbRoleIds.append(rid.intValue()).append(",");
 				String rname = roleIdNameMappings.get(rid);
 				if( StringUtils.isNotEmpty(rname) ) {
 					sbRoleNames.append(rname).append(",");
 				}
 			}
+			String roleIds = sbRoleIds.toString();
+			if(roleIds.endsWith(",")) {
+				roleIds = roleIds.substring(0, roleIds.length()-1);
+			}
+			admUserDto.setRoleIds(roleIds);//设置角色ID
 			String roleNames = sbRoleNames.toString();
 			if(roleNames.endsWith(",")) {
 				roleNames = roleNames.substring(0, roleNames.length()-1);
@@ -260,9 +273,21 @@ public class UserManagementService{
 			return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST );
 		}
 		//执行
-		CarAdmUser userForupdate = new CarAdmUser();
-		userForupdate.setUserId(userId);
-		userForupdate.setPassword(  PasswordUtil.md5(SaasConst.INITIAL_PASSWORD, rawuser.getAccount()) );
+		if( "ON".equalsIgnoreCase(resetpasswordMsgotifySwitch) && StringUtils.isNotEmpty(rawuser.getPhone())  ) {//短信通知开关打开的情况下，密码随机生成，并短信通知用户
+			CarAdmUser userForupdate = new CarAdmUser();
+			userForupdate.setUserId(userId);
+			String newpass = NumberUtil.genRandomCode(8);//密码随机生成
+			userForupdate.setPassword(  PasswordUtil.md5(newpass , rawuser.getAccount()) );
+			carAdmUserMapper.updateByPrimaryKeySelective(userForupdate);
+			//短信通知用户
+			String msg = "您账号"+ rawuser.getAccount() +"的登录密码已被管理员重置，新密码为："+newpass+"（为保障账户安全，请您登录后进行密码修改）";
+			SmsSendUtil.send(rawuser.getPhone(), msg);
+		}else{//短信通知开关关闭的情况下，密码为初始密码
+			CarAdmUser userForupdate = new CarAdmUser();
+			userForupdate.setUserId(userId);
+			userForupdate.setPassword(  PasswordUtil.md5(SaasConst.INITIAL_PASSWORD, rawuser.getAccount()) );
+			carAdmUserMapper.updateByPrimaryKeySelective(userForupdate);
+		}
 		redisSessionDAO.clearRelativeSession(null, null , userId );//自动清理用户会话
 		return AjaxResponse.success( null );
 	}

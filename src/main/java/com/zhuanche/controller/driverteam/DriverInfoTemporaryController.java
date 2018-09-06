@@ -298,7 +298,7 @@ public class DriverInfoTemporaryController extends BaseController {
      * @param age 年龄
      * @param marriage 婚姻状况
      * @param education 学历
-     * @param foreignLanguage 外语能力 Integer
+     * @param foreignLanguage 外语能力
      * @param currentAddress 现住址
      * @param emergencyContactPerson 紧急联系人
      * @param emergencyContactNumber 紧急联系方式
@@ -504,6 +504,8 @@ public class DriverInfoTemporaryController extends BaseController {
      * @param bankCardNumber 银行卡号
      * @param bankCardBank 银行卡开户行
      * @param memo 备注
+     * @param oldCityId 旧的城市Id
+     * @param oldSupplierId 旧的供应商
      * @return
      */
     @ResponseBody
@@ -560,7 +562,9 @@ public class DriverInfoTemporaryController extends BaseController {
                                 @Verify(param = "groupId",rule="required") Integer groupId,
                                 @RequestParam(value = "bankCardNumber",required = false) String bankCardNumber,
                                 @RequestParam(value = "bankCardBank",required = false) String bankCardBank,
-                                @RequestParam(value = "memo",required = false) String memo) {
+                                @RequestParam(value = "memo",required = false) String memo,
+                                @Verify(param = "oldCityId",rule="required") Integer oldCityId,
+                                @Verify(param = "oldSupplierId",rule="required") Integer oldSupplierId) {
         log.info("修改司机信息保存,司机Id:"+driverId);
         CarBizDriverInfoTemp entity = new CarBizDriverInfoTemp();
         entity.setDriverId(driverId);
@@ -616,6 +620,8 @@ public class DriverInfoTemporaryController extends BaseController {
         entity.setBankCardNumber(StringUtils.isNotBlank(bankCardNumber)?superintendUrl:null);
         entity.setBankCardBank(StringUtils.isNotBlank(bankCardBank)?superintendUrl:null);
         entity.setMemo(StringUtils.isNotBlank(memo)?superintendUrl:null);
+        entity.setOldCityId(oldCityId);
+        entity.setOldSupplierId(oldSupplierId);
         return carBizDriverInfoTempService.updateSave(entity);
     }
 }

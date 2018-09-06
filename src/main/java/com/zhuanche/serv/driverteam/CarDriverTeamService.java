@@ -10,6 +10,7 @@ import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.dutyEnum.ServiceReturnCodeEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.dto.CarDriverInfoDTO;
+import com.zhuanche.dto.driver.DriverTeamGroupDTO;
 import com.zhuanche.entity.mdbcarmanage.CarRelateGroup;
 import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.request.DriverTeamRequest;
@@ -100,6 +101,17 @@ public class CarDriverTeamService{
 
 	@Autowired
 	private AsyncDutyService asyncDutyService;
+	
+	/** 
+	* @Desc: 更新车队班制排班信息 
+	* @param:
+	* @return:  
+	* @Author: lunan
+	* @Date: 2018/9/5 
+	*/ 
+	public int updateTeamDuty(CarDriverTeam record){
+		return carDriverTeamExMapper.updateTeamDuty(record);
+	}
 
 	/**
 	* @Desc: 添加司机到车队/小组
@@ -176,14 +188,14 @@ public class CarDriverTeamService{
 					logger.info("该车队/小组"+ driverTeamRequest.getTeamId()+"下没有司机");
 					return null;
 				}
-				Set<String> driverIdsAll = citySupplierTeamCommonService.dealDriverids(carRelateTeams, CarRelateTeam.class);
+				Set<String> driverIdsAll = citySupplierTeamCommonService.dealDriverids(carRelateTeams, CarRelateTeam.class,"driverId");
 				//2.查询小组所属车队下其他小组以及绑定的司机关联
 				List<CarDriverTeam> carDriverTeams = carDriverTeamExMapper.queryForListByPid(driverTeamRequest);
 				//2.1 车队有几个小组，查询小组下绑定的司机
-				Set<String> teamIds = citySupplierTeamCommonService.dealDriverids(carDriverTeams,CarDriverTeam.class);
+				Set<String> teamIds = citySupplierTeamCommonService.dealDriverids(carDriverTeams,CarDriverTeam.class,"id");
 				teamGroupRequest.setGroupIds(teamIds);
 				List<CarRelateGroup> carRelateGroups = carRelateGroupExMapper.queryDriverGroupRelationList(teamGroupRequest);
-				Set<String> existsGroups = citySupplierTeamCommonService.dealDriverids(carRelateGroups, CarRelateGroup.class);
+				Set<String> existsGroups = citySupplierTeamCommonService.dealDriverids(carRelateGroups, CarRelateGroup.class,"driverId");
 				//去掉其他小组绑定的司机
 				driverIdsAll.removeAll(existsGroups);
 				if(Check.NuNCollection(driverIdsAll)){
@@ -209,13 +221,13 @@ public class CarDriverTeamService{
 					logger.info("该车队/小组"+ driverTeamRequest.getTeamId()+"下没有司机");
 					return null;
 				}
-				Set<String> driverIdsAll = citySupplierTeamCommonService.dealDriverids(limitsDrivers, CarDriverInfoDTO.class);
+				Set<String> driverIdsAll = citySupplierTeamCommonService.dealDriverids(limitsDrivers, CarDriverInfoDTO.class,"driverId");
 				//查询同级车队绑定了多少司机
 				List<CarDriverTeam> carDriverTeams = carDriverTeamExMapper.queryDriverTeam(null, null, null);
-				Set<String> teamIds = citySupplierTeamCommonService.dealDriverids(carDriverTeams,CarDriverTeam.class);
+				Set<String> teamIds = citySupplierTeamCommonService.dealDriverids(carDriverTeams,CarDriverTeam.class,"id");
 				teamGroupRequest.setTeamIds(teamIds);
 				List<CarRelateTeam> carRelateTeams = carRelateTeamExMapper.queryDriverTeamRelationList(teamGroupRequest);
-				Set<String> teamDrivers = citySupplierTeamCommonService.dealDriverids(carRelateTeams, CarRelateTeam.class);
+				Set<String> teamDrivers = citySupplierTeamCommonService.dealDriverids(carRelateTeams, CarRelateTeam.class,"driverId");
 				//去掉其他车队绑定的司机
 				driverIdsAll.removeAll(teamDrivers);
 				driverTeamRequest.setDriverIds(driverIdsAll);
@@ -269,9 +281,9 @@ public class CarDriverTeamService{
 				logger.info("该车队/小组"+ driverTeamRequest.getTeamId()+"下没有司机");
 				return null;
 			}else if(Check.NuNCollection(groups)){
-				driverIds = citySupplierTeamCommonService.dealDriverids(teams,CarRelateTeam.class);
+				driverIds = citySupplierTeamCommonService.dealDriverids(teams,CarRelateTeam.class,"driverId");
 			}else if(Check.NuNCollection(teams)){
-				driverIds = citySupplierTeamCommonService.dealDriverids(groups,CarRelateGroup.class);
+				driverIds = citySupplierTeamCommonService.dealDriverids(groups,CarRelateGroup.class,"driverId");
 			}else{
 				logger.info("该车队/小组"+ driverTeamRequest.getTeamId()+"司机信息异常");
 				return null;
@@ -427,7 +439,7 @@ public class CarDriverTeamService{
 	} )
 	public PageDTO queryDriverTeamPage(DriverTeamRequest driverTeamRequest) {
 		if(Check.NuNObj(driverTeamRequest)){
-			return null;
+			return new PageDTO();
 		}
 		logger.info("查询车队入参:{}"+ JSON.toJSONString(driverTeamRequest));
 
@@ -435,15 +447,18 @@ public class CarDriverTeamService{
 		BeanUtils.copyProperties(driverTeamRequest,paramRequest);
 
 		final CommonRequest commonRequest = citySupplierTeamCommonService.paramDeal(paramRequest);
+		if(Check.NuNObj(commonRequest)){
+			return new PageDTO();
+		}
 		//B----------------------------------------------------------------------------------进行分页查询
 		PageDTO pageDTO = new PageDTO();
 		int total = 0;
-		List<CarDriverTeam> driverTeams = null;
-		PageInfo<CarDriverTeam> pageInfo =null;
+		List<CarDriverTeamDTO> driverTeams = null;
+		PageInfo<CarDriverTeamDTO> pageInfo =null;
 		try{
 			pageInfo =
 					PageHelper.startPage(driverTeamRequest.getPageNo(), driverTeamRequest.getPageSize(), true).doSelectPageInfo(()
-							-> carDriverTeamExMapper.queryDriverTeam(commonRequest.getCityIds(), commonRequest.getSupplierIds(), commonRequest.getTeamIds()));
+							-> carDriverTeamExMapper.queryDriverTeamAndGroup(commonRequest.getCityIds(), commonRequest.getSupplierIds(), commonRequest.getTeamIds()));
 //			driverTeams = carDriverTeamExMapper.queryDriverTeam(cityIds, supplierIds, teamIds);
 			driverTeams = pageInfo.getList();
 			total = (int)pageInfo.getTotal();
@@ -459,11 +474,11 @@ public class CarDriverTeamService{
 		}
 
 		//C----------------------------------------------------------------------------------将分页结果转换为DTO，并填全城市名称、供应商名称
-		List<CarDriverTeamDTO> dtos = BeanUtil.copyList(driverTeams, CarDriverTeamDTO.class);
+
 		//查询此结果中的 城市信息和供应商信息
 		Set<Integer> resultOfcityIds        = new HashSet<Integer>();
 		Set<Integer> resultOfsupplierIds = new HashSet<Integer>();
-		for(CarDriverTeamDTO dto : dtos) {
+		for(CarDriverTeamDTO dto : driverTeams) {
 			if( StringUtils.isNotEmpty( dto.getCity() )) {
 				resultOfcityIds.add( Integer.valueOf(dto.getCity()) ) ;
 			}
@@ -474,21 +489,33 @@ public class CarDriverTeamService{
 		Map<Integer, CarBizCity>     cityMapping     = carBizCityService.queryCity( resultOfcityIds );
 		Map<Integer, CarBizSupplier> supplierMapping = carBizSupplierService.querySupplier(null, resultOfsupplierIds);
 		//填充城市名称、供应商名称
-		for(CarDriverTeamDTO dto : dtos ) {
+		for(CarDriverTeamDTO dto : driverTeams ) {
 			if( StringUtils.isNotEmpty( dto.getCity() )) {
 				CarBizCity city = cityMapping.get( Integer.valueOf(dto.getCity()));
 				if(city!=null) {
 					dto.setCityName(  city.getCityName() );
-				}
+                    List<CarDriverTeam> groups = dto.getGroups();
+                    if(!Check.NuNCollection(groups)){
+                        for (CarDriverTeam group : groups) {
+                            group.setCityName(city.getCityName());
+                        }
+                    }
+                }
 			}
 			if( StringUtils.isNotEmpty( dto.getSupplier() )) {
 				CarBizSupplier supplier = supplierMapping.get( Integer.valueOf(dto.getSupplier())  );
 				if( supplier!=null ) {
 					dto.setSupplierName( supplier.getSupplierFullName() );
-				}
+                    List<CarDriverTeam> groups = dto.getGroups();
+                    if(!Check.NuNCollection(groups)){
+                        for (CarDriverTeam group : groups) {
+                            group.setSupplierName(supplier.getSupplierFullName());
+                        }
+                    }
+                }
 			}
 		}
-		pageDTO.setResult(dtos);
+		pageDTO.setResult(driverTeams);
 		pageDTO.setTotal(total);
 		return pageDTO;
 	}

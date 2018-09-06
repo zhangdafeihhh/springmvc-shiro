@@ -8,6 +8,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.common.collect.Maps;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -239,11 +240,13 @@ public class DriverOutageController {
      */
     @RequestMapping(value="/updateDriverOutage")
     public AjaxResponse updateDriverOutage(@Verify(param = "outageId",rule = "required")Integer outageId,
-                                     @Verify(param = "removeReason",rule = "required")String removeReason){
+                                     @Verify(param = "removeReason",rule = "required")String removeReason,
+                                           @Verify(param = "removeStatus",rule = "required|min(1)|max(4)")Integer removeStatus){
         DriverOutage params = new DriverOutage();
         params.setOutageId(outageId);
-        params.setRemoveStatus(4);//解除状态 1：已执行 2：执行中 3：待执行 4：撤销(未执行解除)',
+        params.setRemoveStatus(removeStatus);//解除状态 1：已执行 2：执行中 3：待执行 4：撤销(未执行解除)',
         params.setRemoveReason(removeReason);
+
 
         logger.info("【司机停运】临时停运解除数据=="+params.toString());
         Map<String,Object> result = new HashMap<String,Object>();
@@ -257,12 +260,18 @@ public class DriverOutageController {
 //            JSONObject jsonStr = (JSONObject)result.get("jsonStr");
 
             Integer result1 = Integer.valueOf( result.get("result").toString() );
-
+            Map response = Maps.newHashMap();
             if( 0 == result1 ){
                 String exception = result.get("exception").toString();
                 return AjaxResponse.fail(996, exception);
             } else if(1 == result1){
-                return AjaxResponse.success(null);
+                Object success = result.get("success");
+                Object error = result.get("error");
+                if(success != null)
+                    response.put("success", success);
+                if(error != null)
+                    response.put("error", error);
+                return AjaxResponse.success(response);
             }
             return AjaxResponse.fail(999);
         } catch (Exception e){

@@ -1,5 +1,6 @@
 package com.zhuanche.controller.rentcar;
 
+import com.google.common.collect.Maps;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.Verify;
@@ -17,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -199,26 +201,26 @@ public class CarInfoController {
      */
     @RequestMapping(value = "/saveCarInfo")
     public Object saveCarInfo(@Verify(param = "carId",rule="") Integer carId,
-                              @Verify(param = "licensePlates",rule="required") String licensePlates,
-                              @Verify(param = "status",rule="required") Integer status,
-                              @Verify(param = "cityId",rule="required") Integer cityId,
-                              @Verify(param = "supplierId",rule="required") Integer supplierId,
-                              @Verify(param = "carModelId",rule="required") Integer carModelId,
+                                  @Verify(param = "licensePlates",rule="required") String licensePlates,
+                                  @Verify(param = "status",rule="required") Integer status,
+                                  @Verify(param = "cityId",rule="required") Integer cityId,
+                                  @Verify(param = "supplierId",rule="required") Integer supplierId,
+                                  @Verify(param = "carModelId",rule="required") Integer carModelId,
                               @Verify(param = "imageUrl",rule="") String imageUrl,
-                              @Verify(param = "vehicleDrivingLicense",rule="") String vehicleDrivingLicense,
-                              @Verify(param = "modelDetail",rule="required") String modelDetail,
-                              @Verify(param = "color",rule="required") String color,
-                              @Verify(param = "clicensePlatesColor",rule="required") String clicensePlatesColor,
-                              @Verify(param = "engineNo",rule="required") String engineNo,
-                              @Verify(param = "vehicleEngineDisplacement",rule="required") String vehicleEngineDisplacement,
-                              @Verify(param = "vehicleEnginePower",rule="required") String vehicleEnginePower,
-                              @Verify(param = "carryPassengers",rule="required") String carryPassengers,
-                              @Verify(param = "vehicleBrand",rule="required") String vehicleBrand,
-                              @Verify(param = "vehicleEngineWheelbase",rule="required") String vehicleEngineWheelbase,
-                              @Verify(param = "vehicleOwner",rule="required") String vehicleOwner,
-                              @Verify(param = "frameNo",rule="required") String frameNo,
-                              @Verify(param = "vehicleType",rule="required") String vehicleType,
-                              @Verify(param = "fuelType",rule="required") Integer fuelType,
+                                  @Verify(param = "vehicleDrivingLicense",rule="required") String vehicleDrivingLicense,
+                                  @Verify(param = "modelDetail",rule="required") String modelDetail,
+                                  @Verify(param = "color",rule="required") String color,
+                              @Verify(param = "clicensePlatesColor",rule="") String clicensePlatesColor,
+                              @Verify(param = "engineNo",rule="") String engineNo,
+                              @Verify(param = "vehicleEngineDisplacement",rule="") String vehicleEngineDisplacement,
+                              @Verify(param = "vehicleEnginePower",rule="") String vehicleEnginePower,
+                              @Verify(param = "carryPassengers",rule="") String carryPassengers,
+                              @Verify(param = "vehicleBrand",rule="") String vehicleBrand,
+                              @Verify(param = "vehicleEngineWheelbase",rule="") String vehicleEngineWheelbase,
+                                    @Verify(param = "vehicleOwner",rule="required") String vehicleOwner,
+                              @Verify(param = "frameNo",rule="") String frameNo,
+                              @Verify(param = "vehicleType",rule="") String vehicleType,
+                              @Verify(param = "fuelType",rule="") Integer fuelType,
                               @RequestParam(value = "nextInspectDate",required = false) String nextInspectDate,
                               @RequestParam(value = "nextMaintenanceDate",required = false) String nextMaintenanceDate,
                               @RequestParam(value = "nextOperationDate",required = false) String nextOperationDate,
@@ -227,21 +229,21 @@ public class CarInfoController {
                               @RequestParam(value = "twoLevelMaintenanceDate",required = false) String twoLevelMaintenanceDate,
                               @RequestParam(value = "rentalExpireDate",required = false) String rentalExpireDate,
                               @RequestParam(value = "purchaseDate",required = false) String purchaseDate,
-                              @Verify(param = "vehicleRegistrationDate",rule="required") String vehicleRegistrationDate,
-                              @Verify(param = "transportNumber",rule="required") String transportNumber,
-                              @Verify(param = "certificationAuthority",rule="required") String certificationAuthority,
-                              @Verify(param = "operatingRegion",rule="required") String operatingRegion,
-                              @Verify(param = "transportNumberDateStart",rule="required") String transportNumberDateStart,
-                              @Verify(param = "transportNumberDateEnd",rule="required") String transportNumberDateEnd,
-                              @Verify(param = "firstDate",rule="required") String firstDate,
-                              @Verify(param = "overHaulStatus",rule="required") Integer overHaulStatus,
-                              @Verify(param = "auditingStatus",rule="required") Integer auditingStatus,
-                              @Verify(param = "auditingDate",rule="required") String auditingDate,
-                              @Verify(param = "equipmentNumber",rule="required") String equipmentNumber,
-                              @Verify(param = "gpsBrand",rule="required") String gpsBrand,
-                              @Verify(param = "gpsType",rule="required") String gpsType,
-                              @Verify(param = "gpsImei",rule="required") String gpsImei,
-                              @Verify(param = "gpsDate",rule="required") String gpsDate,
+                                    @Verify(param = "vehicleRegistrationDate",rule="required") String vehicleRegistrationDate,
+                              @Verify(param = "transportNumber",rule="") String transportNumber,
+                              @Verify(param = "certificationAuthority",rule="") String certificationAuthority,
+                              @Verify(param = "operatingRegion",rule="") String operatingRegion,
+                              @Verify(param = "transportNumberDateStart",rule="") String transportNumberDateStart,
+                              @Verify(param = "transportNumberDateEnd",rule="") String transportNumberDateEnd,
+                              @Verify(param = "firstDate",rule="") String firstDate,
+                              @Verify(param = "overHaulStatus",rule="") Integer overHaulStatus,
+                              @Verify(param = "auditingStatus",rule="") Integer auditingStatus,
+                              @Verify(param = "auditingDate",rule="") String auditingDate,
+                              @Verify(param = "equipmentNumber",rule="") String equipmentNumber,
+                              @Verify(param = "gpsBrand",rule="") String gpsBrand,
+                              @Verify(param = "gpsType",rule="") String gpsType,
+                              @Verify(param = "gpsImei",rule="") String gpsImei,
+                              @Verify(param = "gpsDate",rule="") String gpsDate,
                               @RequestParam(value = "purchaseDate",required = false) String memo,
                               @Verify(param = "licensePlates1",rule="required") String licensePlates1,
                               @Verify(param = "oldCity",rule="required") Integer oldCity,
@@ -297,14 +299,11 @@ public class CarInfoController {
         params.setLicensePlates1(licensePlates1);
         params.setOldCity(oldCity);
         params.setOldSupplierId(oldSupplierId);
-        try{
-            params.setNextOperationDate( sdf.parse(nextOperationDate) );
-            params.setNextSecurityDate( sdf.parse(nextSecurityDate));
-            params.setNextClassDate( sdf.parse(nextClassDate));
-            params.setTwoLevelMaintenanceDate( sdf.parse(twoLevelMaintenanceDate));
-        } catch (Exception e){
-            logger.error("日期类型格式错误，e={}" + e);
-        }
+
+        params.setNextOperationDate( nextOperationDate );
+        params.setNextSecurityDate( nextSecurityDate);
+        params.setNextClassDate( nextClassDate);
+        params.setTwoLevelMaintenanceDate( twoLevelMaintenanceDate);
 
         Map<String, Object> result = new HashMap<String, Object>();
         try {
@@ -320,7 +319,7 @@ public class CarInfoController {
         } catch (Exception e) {
             logger.error("save CarInfo error. ", e);
         }
-        return result;
+        return getResponse(result);
     }
 
 
@@ -394,7 +393,7 @@ public class CarInfoController {
      * 车辆信息导入
      */
     @RequestMapping(value = "/importCarInfo")
-    public Object importCarInfo(String fileName, HttpServletRequest request) {
+    public Object importCarInfo(@RequestParam("fileName") MultipartFile fileName, HttpServletRequest request) {
         logger.info("车辆信息导入保存:importCarInfo,参数" + fileName);
         Map<String, Object> result = new HashMap<String, Object>();
         result = this.carService.importCarInfo(fileName, request);
@@ -498,8 +497,27 @@ public class CarInfoController {
         os.close();
     }
 
-    public AjaxResponse getResponse(){
-        return null;
-    }
+    public AjaxResponse getResponse(Map<String,Object> result){
+        try{
+//            JSONObject jsonStr = (JSONObject)result.get("jsonStr");
 
+            Integer result1 = Integer.valueOf( result.get("result").toString() );
+            Map response = Maps.newHashMap();
+            if( 0 == result1 ){
+                String exception = result.get("exception").toString();
+                return AjaxResponse.fail(996, exception);
+            } else if(1 == result1){
+                Object success = result.get("success");
+                Object error = result.get("error");
+                if(success != null)
+                    response.put("success", success);
+                if(error != null)
+                    response.put("error", error);
+                return AjaxResponse.success(response);
+            }
+            return AjaxResponse.fail(999);
+        } catch (Exception e){
+            return AjaxResponse.fail(999);
+        }
+    }
 }
