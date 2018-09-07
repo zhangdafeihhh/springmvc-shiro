@@ -183,9 +183,6 @@ public class HomeKanBanController {
 			visibleAllianceIds = setToArray(supplierIds);
 			Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
 			visibleMotocadeIds = setToArray(teamIds);
-			if(null == visibleAllianceIds || null == visibleMotocadeIds){
-				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-			}
 		}
 		// 从大数据仓库获取统计数据
 		Map<String, Object> paramMap = Maps.newHashMap();
@@ -227,9 +224,6 @@ public class HomeKanBanController {
 			visibleAllianceIds = setToArray(supplierIds);
 			Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
 			visibleMotocadeIds = setToArray(teamIds);
-			if(null == visibleAllianceIds || null == visibleMotocadeIds){
-				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-			}
 			paramMap.put("visibleAllianceIds", visibleAllianceIds);
 			paramMap.put("visibleMotocadeIds", visibleMotocadeIds);
 		}

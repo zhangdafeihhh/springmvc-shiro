@@ -39,31 +39,37 @@ public class CitySupplierTeamService {
 	/** 查询当前登录用户可见的供应商信息 **/
 	public List<CarBizSupplier> querySupplierList() {
 
+		List<CarBizSupplier> suppliers = new ArrayList<CarBizSupplier>();
 		// 进行查询 (区分 超级管理员 、普通管理员 )
 		if (WebSessionUtil.isSupperAdmin()) {
-			return carBizSupplierExMapper.querySuppliers(null, null);
+			suppliers = carBizSupplierExMapper.querySuppliers(null, null);
 		} else {
 			Set<Integer> supplierIds = WebSessionUtil.getCurrentLoginUser().getSupplierIds();
-			if (supplierIds.size() == 0) {
-				return new ArrayList<CarBizSupplier>();
+			if (null != supplierIds && supplierIds.size() > 0) {
+				suppliers = carBizSupplierExMapper.querySuppliers(null, supplierIds);
+			}else{
+				suppliers = carBizSupplierExMapper.querySuppliers(null, null);
 			}
-			return carBizSupplierExMapper.querySuppliers(null, supplierIds);
 		}
+		return suppliers;
 	}
 
 	/** 查询当前登录用户可见的车队信息 **/
 	public List<CarDriverTeam> queryDriverTeamList() {
 		
+		List<CarDriverTeam> teams = new ArrayList<CarDriverTeam>();
 		// 进行查询 (区分 超级管理员 、普通管理员 )
 		if (WebSessionUtil.isSupperAdmin()) {
-			return carDriverTeamExMapper.queryDriverTeam(null, null, null);
+			teams =  carDriverTeamExMapper.queryDriverTeam(null, null, null);
 		} else {
 			Set<Integer> teamIds = WebSessionUtil.getCurrentLoginUser().getTeamIds();
-			if (teamIds.size() == 0) {
-				return new ArrayList<CarDriverTeam>();
+			if (null != teamIds && teamIds.size() > 0) {
+				teams =  carDriverTeamExMapper.queryDriverTeam(null, null, teamIds);
+			}else{
+				teams =  carDriverTeamExMapper.queryDriverTeam(null, null, null);
 			}
-			return carDriverTeamExMapper.queryDriverTeam(null, null, teamIds);
 		}
+		return teams;
 	}
 
 	/** 查询供应商下可见的车队信息 **/
@@ -86,9 +92,10 @@ public class CitySupplierTeamService {
         }else {
             Set<Integer> teamIds = WebSessionUtil.getCurrentLoginUser().getTeamIds();
             if(teamIds.size()==0 ) {
-                return new ArrayList<CarDriverTeam>();
+                return carDriverTeamExMapper.queryDriverTeam(null, supplierIds, null);
+            }else{
+            	return carDriverTeamExMapper.queryDriverTeam(null, supplierIds, teamIds);
             }
-            return carDriverTeamExMapper.queryDriverTeam(null, supplierIds, teamIds);
         }
 	}
 }
