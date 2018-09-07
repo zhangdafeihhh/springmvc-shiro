@@ -374,9 +374,7 @@ public class CarDriverTeamService{
 	* @Date: 2018/8/30 
 	*/ 
 	public int updateOneDriverTeam(CarDriverTeamDTO paramDto){
-		if(Check.NuNObj(paramDto)){
-			return ServiceReturnCodeEnum.DEAL_FAILURE.getCode();
-		}
+
 		try{
 			CarDriverTeam existsTeam = carDriverTeamMapper.selectByPrimaryKey(paramDto.getId());
 			if(Check.NuNObj(existsTeam)){
@@ -384,7 +382,7 @@ public class CarDriverTeamService{
 			}
 			//开启关闭逻辑
 			if(paramDto.getOpenCloseFlag() !=0 && paramDto.getStatus() != existsTeam.getStatus()){
-				existsTeam.setStatus(paramDto.getStatus());
+				existsTeam.setStatus(paramDto.getOpenCloseFlag());
 				return carDriverTeamMapper.updateByPrimaryKeySelective(existsTeam);
 			}else if(paramDto.getOpenCloseFlag() !=0 && paramDto.getStatus() == existsTeam.getStatus()){
 				return ServiceReturnCodeEnum.DEAL_SUCCESS.getCode();

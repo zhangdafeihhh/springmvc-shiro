@@ -109,6 +109,9 @@ public class DriverTeamController{
 	public AjaxResponse updateOneDriverTeam(CarDriverTeamDTO param){
 		logger.info("修改车队入参:"+ JSON.toJSONString(param));
 		try{
+			if(Check.NuNObj(param) || Check.NuNObj(param.getId())){
+				return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
+			}
 			int result = carDriverTeamService.updateOneDriverTeam(param);
 			if(result >0){
 				return AjaxResponse.success(result);
