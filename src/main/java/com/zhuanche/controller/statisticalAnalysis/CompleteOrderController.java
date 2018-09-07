@@ -171,11 +171,20 @@ public class CompleteOrderController{
 				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 			}
 	        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-	        paramMap.put("visibleMotorcardIds", visibleMotocadeIds); // 可见车队ID
+	        paramMap.put("visibleMotorcadeIds", visibleMotocadeIds); // 可见车队ID
 	        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
 		    
 	 		String jsonString = JSON.toJSONString(paramMap);
 		    logger.info("【运营管理-统计分析】导出,完成订单详情请求参数----"+jsonString);
+		    
+			statisticalAnalysisService.exportCsvFromToPage(
+					response,
+					jsonString,
+					saasBigdataApiUrl+"/completeOrderDetail/download",
+					new String("完成订单详情".getBytes("gb2312"), "iso8859-1"),
+					request.getRealPath("/")+File.separator+"template"+File.separator+"completeorder_info.csv");
+			
+		/*	
 		    //下载
 		    statisticalAnalysisService.downloadCsvFromTemplet(jsonString,
 		    		saasBigdataApiUrl+"/completeOrderDetail/download",
@@ -183,7 +192,7 @@ public class CompleteOrderController{
 			//导出 
 	        statisticalAnalysisService.exportCsvFromTemplet(response,
 					new String("完成订单详情".getBytes("gb2312"), "iso8859-1"),
-					request.getRealPath("/")+File.separator+"template"+File.separator+"completeorder_info.csv");
+					request.getRealPath("/")+File.separator+"template"+File.separator+"completeorder_info.csv");*/
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Exception e) {

@@ -166,12 +166,20 @@ public class DriverOperateDetailController{
 	          
 	          String jsonString = JSON.toJSONString(paramMap);
 	          
+			  statisticalAnalysisService.exportCsvFromToPage(
+					response,
+					jsonString,
+					saasBigdataApiUrl+"/driverOperateDetail/download",
+					new String("司机运营详情分析".getBytes("gb2312"), "iso8859-1"),
+					request.getRealPath("/")+File.separator+"template"+File.separator+"driveroperatedetail_info.csv");
+				
+				/*
 	          statisticalAnalysisService.downloadCsvFromTemplet(jsonString,
 	        		  	saasBigdataApiUrl+"/driverOperateDetail/download" ,
 						request.getRealPath("/")+File.separator+"template"+File.separator+"driveroperatedetail_info.csv");
 			  statisticalAnalysisService.exportCsvFromTemplet(response,
 						new String("司机运营详情分析".getBytes("gb2312"), "iso8859-1"),
-						request.getRealPath("/")+File.separator+"template"+File.separator+"driveroperatedetail_info.csv");
+						request.getRealPath("/")+File.separator+"template"+File.separator+"driveroperatedetail_info.csv");*/
       }  catch (Exception e) {
           e.printStackTrace();
       }

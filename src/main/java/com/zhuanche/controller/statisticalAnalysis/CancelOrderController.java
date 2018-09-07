@@ -102,7 +102,7 @@ public class CancelOrderController{
 				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 			}
 	        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-	        paramMap.put("visibleMotorcardIds", visibleMotocadeIds); // 可见车队ID
+	        paramMap.put("visibleMotorcadeIds", visibleMotocadeIds); // 可见车队ID
 	        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
 	        
 			//paramMap.put("visibleAllianceIds", new String[]{"97", "946", "99", "489", "1307", "65", "1349"});
@@ -179,17 +179,24 @@ public class CancelOrderController{
 				 return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 			}
 	        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-	        paramMap.put("visibleMotorcardIds", visibleMotocadeIds); // 可见车队ID
+	        paramMap.put("visibleMotorcadeIds", visibleMotocadeIds); // 可见车队ID
 	        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
 	        
 			String jsonString = JSON.toJSONString(paramMap);
 			 
-			statisticalAnalysisService.downloadCsvFromTemplet(jsonString,
+			statisticalAnalysisService.exportCsvFromToPage(
+					response,
+					jsonString,
+					saasBigdataApiUrl+"/cancelOrderDetail/download",
+					new String("取消订单分析".getBytes("gb2312"), "iso8859-1"),
+					request.getRealPath("/")+File.separator+"template"+File.separator+"cancelOrder_info.csv");
+			
+		/*	statisticalAnalysisService.downloadCsvFromTemplet(jsonString,
 					saasBigdataApiUrl+"/cancelOrderDetail/download" ,
 					request.getRealPath("/")+File.separator+"template"+File.separator+"cancelOrder_info.csv");
 			statisticalAnalysisService.exportCsvFromTemplet(response,
 					new String("取消订单分析".getBytes("gb2312"), "iso8859-1"),
-					request.getRealPath("/")+File.separator+"template"+File.separator+"cancelOrder_info.csv");
+					request.getRealPath("/")+File.separator+"template"+File.separator+"cancelOrder_info.csv");*/
        } catch (Exception e) {
            e.printStackTrace();
        }

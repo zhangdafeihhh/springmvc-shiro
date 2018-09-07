@@ -36,6 +36,57 @@ import com.zhuanche.http.HttpClientUtil;
 public class  StatisticalAnalysisService {
 	
 	private static final Logger logger = LoggerFactory.getLogger(StatisticalAnalysisService.class);
+	
+	/**
+   	 * 导出文件
+   	 * @param response
+   	 * @param fileName 输出文件名称
+   	 * @param path 下载文件地址+文件名
+   	 * @throws Exception
+   	 */
+   	public synchronized void exportCsvFromToPage(HttpServletResponse response,String jsonString,String uri ,String fileName , String path) throws Exception {
+   		//先远程下载
+   		downloadCsvFromTemplet(jsonString,uri,path);
+   	    // 让servlet用UTF-8转码，默认为ISO8859
+   	    response.setCharacterEncoding("UTF-8");
+   	    logger.info("导出文件fileName:"+fileName+"，path:" +path);
+   	    if(StringUtils.isBlank(fileName) || StringUtils.isBlank(path)){
+   	    	return;
+   	    }
+   	    File file = new File(path);
+   	    if (!file.exists()) {
+   	    	logger.info("导出文件不存在");
+   	        // 让浏览器用UTF-8解析数据
+   	        response.setHeader("Content-type", "text/html;charset=UTF-8");
+   	        response.getWriter().write("文件不存在或已过期,请重新生成");
+   	        return;
+   	    }
+   	   // String fileName = URLEncoder.encode(path.substring(path.lastIndexOf("/") + 1), "UTF-8");
+   	    response.setContentType("text/csv");
+   	    response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", fileName+".csv"));
+   	    InputStream is = null;
+   	    OutputStream os = null;
+   	    try {
+   	        is = new FileInputStream(path);
+   	        byte[] buffer = new byte[1024];
+   	        os = response.getOutputStream();
+   	        int len;
+   	        while((len = is.read(buffer)) > 0) {
+   	            os.write(buffer,0, len);
+   	        }
+   	    }catch(Exception e) {
+   	        throw new RuntimeException(e);
+   	    }finally {
+   	        try {
+   	            if (is != null) is.close();
+   	            if (os != null) os.close();
+   	        } catch (Exception e) {
+   	            e.printStackTrace();
+   	        }
+
+   	    }
+   	}
+   	
 	/**
    	 * 导出文件
    	 * @param response
@@ -153,7 +204,7 @@ public class  StatisticalAnalysisService {
 				return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 			}
 			if (!job.getString("code").equals("0")) {
-				return AjaxResponse.fail(Integer.parseInt(job.getString("code")), job.getString("message"));
+				return AjaxResponse.failMsg(Integer.parseInt(job.getString("code")), job.getString("message"));
 			}
 			try {
 				JSONObject jsonResult = JSON.parseObject(job.getString("result"));

@@ -143,12 +143,20 @@ public class AllianceCheckController{
 	        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
 	        String jsonString = JSON.toJSONString(paramMap);
 	        
-	        statisticalAnalysisService.downloadCsvFromTemplet(jsonString,
+		    statisticalAnalysisService.exportCsvFromToPage(
+					response,
+					jsonString,
+					saasBigdataApiUrl+"/allianceCheck/download" ,
+					new String("加盟商考核".getBytes("gb2312"), "iso8859-1"),
+					request.getRealPath("/")+File.separator+"template"+File.separator+"alliancecheck_info.csv");
+						
+			   
+	       /* statisticalAnalysisService.downloadCsvFromTemplet(jsonString,
 	        		saasBigdataApiUrl+"/allianceCheck/download" ,
 					request.getRealPath("/")+File.separator+"template"+File.separator+"alliancecheck_info.csv");
 			statisticalAnalysisService.exportCsvFromTemplet(response,
 					new String("加盟商考核".getBytes("gb2312"), "iso8859-1"),
-					request.getRealPath("/")+File.separator+"template"+File.separator+"alliancecheck_info.csv");
+					request.getRealPath("/")+File.separator+"template"+File.separator+"alliancecheck_info.csv");*/
       } catch (Exception e) {
           e.printStackTrace();
       }

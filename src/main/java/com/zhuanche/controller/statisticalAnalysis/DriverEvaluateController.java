@@ -98,7 +98,7 @@ public class DriverEvaluateController{
 				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 			}
 	        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-	        paramMap.put("visibleMotorcardIds", visibleMotocadeIds); // 可见车队ID
+	        paramMap.put("visibleMotorcadeIds", visibleMotocadeIds); // 可见车队ID
 	        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
 	        if(null != pageNo && pageNo > 0)
 	        	paramMap.put("pageNo", pageNo);//页号
@@ -164,17 +164,25 @@ public class DriverEvaluateController{
 				return; // return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 			}
 	        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-	        paramMap.put("visibleMotorcardIds", visibleMotocadeIds); // 可见车队ID
+	        paramMap.put("visibleMotorcadeIds", visibleMotocadeIds); // 可见车队ID
 	        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
 	       
 	        String jsonString = JSON.toJSONString(paramMap);
 	        
+		   statisticalAnalysisService.exportCsvFromToPage(
+				response,
+				jsonString,
+				saasBigdataApiUrl+"/driverEvaluateDetail/download" ,
+				new String("对司机评级详情分析".getBytes("gb2312"), "iso8859-1"),
+				request.getRealPath("/")+File.separator+"template"+File.separator+"driverEvaluate_info.csv");
+				
+			  /*
 	        statisticalAnalysisService.downloadCsvFromTemplet(jsonString,
 	        		saasBigdataApiUrl+"/driverEvaluateDetail/download" ,
 					request.getRealPath("/")+File.separator+"template"+File.separator+"driverEvaluate_info.csv");
 			statisticalAnalysisService.exportCsvFromTemplet(response,
 					new String("对司机评级详情分析".getBytes("gb2312"), "iso8859-1"),
-					request.getRealPath("/")+File.separator+"template"+File.separator+"driverEvaluate_info.csv");
+					request.getRealPath("/")+File.separator+"template"+File.separator+"driverEvaluate_info.csv");*/
        
       } catch (Exception e) {
           e.printStackTrace();
