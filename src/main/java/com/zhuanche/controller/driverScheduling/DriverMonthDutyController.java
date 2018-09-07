@@ -107,11 +107,11 @@ public class DriverMonthDutyController {
             if (file == null) {
                 return AjaxResponse.fail(RestErrorCode.FILE_ERROR);
             }
-            CommonsMultipartFile commonsmultipartfile = (CommonsMultipartFile) file;
+            /*CommonsMultipartFile commonsmultipartfile = (CommonsMultipartFile) file;
             DiskFileItem diskFileItem = (DiskFileItem) commonsmultipartfile.getFileItem();
             File newFile = diskFileItem.getStoreLocation();
-            logger.info("导入月排班数据文件名:"+newFile.getName());
-            Map<String, Object> result = this.driverMonthDutyService.importDriverMonthDuty(params, request,newFile);
+            logger.info("导入月排班数据文件名:"+newFile.getName());*/
+            Map<String, Object> result = this.driverMonthDutyService.importDriverMonthDuty(params, request,file);
             if(result.get("result").equals("1")){
                 return AjaxResponse.success(result);
             }else{

@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
@@ -95,7 +96,7 @@ public class DriverMonthDutyService {
 	* @Date: 2018/9/4 
 	*/
 	public Map<String, Object> importDriverMonthDuty(
-			DriverMonthDutyRequest params, HttpServletRequest request,File newFile) {
+			DriverMonthDutyRequest params, HttpServletRequest request,MultipartFile file) {
 
 		String resultError1 = "-1";//模板错误
 		String resultErrorMag1 = "导入模板格式错误!";
@@ -108,7 +109,16 @@ public class DriverMonthDutyService {
 //		String path  = Common.getPath(request);
 //		String dirPath = path+params.getFileName();
 //		File DRIVERINFO = new File(dirPath);
-		String fileName = newFile.getName();
+		CommonsMultipartFile commonsmultipartfile = null;
+		try{
+			commonsmultipartfile = (CommonsMultipartFile) file;
+		}catch (Exception e){
+			logger.error("文件流转化失败", e);
+			result.put("result", "0");
+			result.put("msg","导入失败！");
+			return result;
+		}
+		String fileName = commonsmultipartfile.getOriginalFilename();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
 		String time ="";
 		if((!"".equals(params.getMonitorDate())&&params.getMonitorDate()!=null&&!"null".equals(params.getMonitorDate()))){
@@ -137,7 +147,7 @@ public class DriverMonthDutyService {
 			SimpleDateFormat sdf1 = new SimpleDateFormat("MM-dd");
 			String nowDay = sdf1.format(new Date()); // 今天日期
 
-			InputStream is = new FileInputStream(newFile);
+			InputStream is = commonsmultipartfile.getInputStream();
 			Workbook workbook = null;
 			String fileType = fileName.split("\\.")[1];
 			if (fileType.equals("xls")) {
