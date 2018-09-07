@@ -143,6 +143,8 @@ public final class RestErrorCode{
 
 	@ResultMessage("查询GPS数据失败")
 	public static final int MONITOR_GPS_FAIL                                        = 6001;
+	@ResultMessage("查询GPS数据失败,司机信息不存在")
+	public static final int MONITOR_GPS_DRIVER_NOT_EXIST                                        = 6002;
 	@ResultMessage("查询大数据司机订单信息失败")
 	public static final int MONITOR_DRIVERO_ORDER_FAIL                                        = 7001;
 

@@ -2826,4 +2826,9 @@ public class CarBizDriverInfoService {
             e.printStackTrace();
         }
     }
+
+    public CarBizDriverInfo selectByPhone(String phone){
+        CarBizDriverInfo carBizDriverInfo = carBizDriverInfoMapper.selectByPhone(phone);
+        return carBizDriverInfo;
+    }
 }
