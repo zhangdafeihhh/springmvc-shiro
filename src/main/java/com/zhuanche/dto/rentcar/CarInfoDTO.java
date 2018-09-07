@@ -208,8 +208,35 @@ public class CarInfoDTO{
     /** 车辆图片 **/
     private String imageUrl;
 
-//    private int cooperationType;//加盟类型  car_biz_cooperation_type
+    private String licensePlates1;
 
+    private Integer oldCity;
+
+    private Integer oldSupplierId;
+
+    public String getLicensePlates1() {
+        return licensePlates1;
+    }
+
+    public void setLicensePlates1(String licensePlates1) {
+        this.licensePlates1 = licensePlates1;
+    }
+
+    public Integer getOldCity() {
+        return oldCity;
+    }
+
+    public void setOldCity(Integer oldCity) {
+        this.oldCity = oldCity;
+    }
+
+    public Integer getOldSupplierId() {
+        return oldSupplierId;
+    }
+
+    public void setOldSupplierId(Integer oldSupplierId) {
+        this.oldSupplierId = oldSupplierId;
+    }
 
     public String getImageUrl() {
         return imageUrl;
