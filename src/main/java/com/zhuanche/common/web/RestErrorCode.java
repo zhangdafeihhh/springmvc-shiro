@@ -1,13 +1,13 @@
 package com.zhuanche.common.web;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 定义错误码与错误提示
@@ -110,6 +110,13 @@ public final class RestErrorCode{
 	public static final int DRIVER_BANK_CARD_NUMBER_NOT_COMPLETE                     = 3006;
 	@ResultMessage("银行卡号已存在")
 	public static final int DRIVER_BANK_CARD_NUMBER_EXIST                    = 3007;
+	@ResultMessage("车型不存在")
+	public static final int MODEL_NOT_EXIST                    = 3008;
+	@ResultMessage("信息不全，请补全")
+	public static final int INFORMATION_NOT_COMPLETE                    = 3009;
+	@ResultMessage("供应商ID={}的供应商不存在")
+	public static final int SUPPLIER_NOT_EXIST                    = 3010;
+
 
 	@ResultMessage("周报查询时间段只能查询一个星期的时间")
 	public static final int ONLY_QUERY_WEEK                    = 3101;

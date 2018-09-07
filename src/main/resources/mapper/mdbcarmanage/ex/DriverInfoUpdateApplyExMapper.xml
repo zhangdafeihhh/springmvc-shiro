@@ -105,6 +105,6 @@
     <include refid="Base_Column_List" />
     from driver_info_update_apply
     <include refid="allBaseColumnWhereList"/>
-    ORDER BY create_date DESC
+    ORDER BY create_time DESC
   </select>
 </mapper>

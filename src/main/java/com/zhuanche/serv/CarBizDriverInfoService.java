@@ -248,7 +248,7 @@ public class CarBizDriverInfoService {
             carBizDriverInfo.setIdCardNo(idCardNo);
             carBizDriverInfo.setDriverlicensenumber(idCardNo);//机动车驾驶证号
 
-            if (carBizDriverInfo.getPasswordReset() == 1) {//重置密码
+            if (carBizDriverInfo.getPasswordReset()!=null && carBizDriverInfo.getPasswordReset() == 1) {//重置密码
                 carBizDriverInfo.setPassword(getPassword(idCardNo));
             }
 
@@ -585,21 +585,22 @@ public class CarBizDriverInfoService {
 
     /**
      * 判断一些基础信息是否正确
-     *
-     * @param carBizDriverInfo
+     * @param driverId 司机ID
+     * @param phone 手机号
+     * @param idCardNo 身份证号
+     * @param bankCardNumber 银行卡卡号
+     * @param bankCardBank 银行卡开户行
      * @return
      */
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
-    public AjaxResponse validateCarDriverInfo(CarBizDriverInfoDTO carBizDriverInfo) {
+    public AjaxResponse validateCarDriverInfo(Integer driverId, String phone, String idCardNo, String bankCardNumber, String bankCardBank) {
         //手机号是否合法
-        String phone = carBizDriverInfo.getPhone();
         if (StringUtils.isEmpty(phone) || !ValidateUtils.validatePhone(phone)) {
             return AjaxResponse.fail(RestErrorCode.DRIVER_PHONE_NOT_LEGAL);
         }
         //身份证是否合法，大写X一律改为小写的x
-        String idCardNo = carBizDriverInfo.getIdCardNo();
         if ("X".equals(idCardNo.substring(idCardNo.length() - 1, idCardNo.length()))) {
             idCardNo = idCardNo.toLowerCase();
         }
@@ -607,8 +608,6 @@ public class CarBizDriverInfoService {
             return AjaxResponse.fail(RestErrorCode.DRIVER_IDCARNO_NOT_LEGAL);
         }
         //银行卡号位16到18位数字，银行开户行，二者都填，或都不填
-        String bankCardNumber = carBizDriverInfo.getBankCardNumber();
-        String bankCardBank = carBizDriverInfo.getBankCardBank();
         if ((StringUtils.isNotEmpty(bankCardNumber) || StringUtils.isEmpty(bankCardBank)) || (StringUtils.isEmpty(bankCardNumber) || StringUtils.isNotEmpty(bankCardBank))) {
             return AjaxResponse.fail(RestErrorCode.DRIVER_BANK_CARD_NUMBER_NOT_COMPLETE);
         }
@@ -616,7 +615,6 @@ public class CarBizDriverInfoService {
             return AjaxResponse.fail(RestErrorCode.DRIVER_BANK_CARD_NUMBER_NOT_LEGAL);
         }
         //查询手机号是否存在
-        Integer driverId = carBizDriverInfo.getDriverId();
         Boolean had = this.checkPhone(phone, driverId);
         if (had) {
             return AjaxResponse.fail(RestErrorCode.DRIVER_PHONE_EXIST);
