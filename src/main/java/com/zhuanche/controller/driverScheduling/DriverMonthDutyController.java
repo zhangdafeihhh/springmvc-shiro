@@ -33,6 +33,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.POIXMLDocument;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -53,6 +54,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 
 /**
@@ -100,13 +102,30 @@ public class DriverMonthDutyController {
                 return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
             }
             logger.info("每个司机一个月每天的排班导入保存,参数:"+params.toString());
-            Map<String, Object> result = this.driverMonthDutyService.importDriverMonthDuty(params, request);
-            return AjaxResponse.success(result);
+//            Map<String, Object> result = this.driverMonthDutyService.importDriverMonthDuty(params, request);
+
+            if (file == null) {
+                return AjaxResponse.fail(RestErrorCode.FILE_ERROR);
+            }
+            CommonsMultipartFile commonsmultipartfile = (CommonsMultipartFile) file;
+            DiskFileItem diskFileItem = (DiskFileItem) commonsmultipartfile.getFileItem();
+            File newFile = diskFileItem.getStoreLocation();
+            logger.info("导入月排班数据文件名:"+newFile.getName());
+            Map<String, Object> result = this.driverMonthDutyService.importDriverMonthDuty(params, request,newFile);
+            if(result.get("result").equals("1")){
+                return AjaxResponse.success(result);
+            }else{
+                AjaxResponse fail = AjaxResponse.fail(RestErrorCode.RECORD_DEAL_FAILURE);
+                fail.setData(result);
+                return fail;
+            }
         }catch (Exception e){
             logger.error("导入月排班模板数据异常：{}",e);
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
     }
+
+
 
     /** 
     * @Desc: 修改司机上班状态 
