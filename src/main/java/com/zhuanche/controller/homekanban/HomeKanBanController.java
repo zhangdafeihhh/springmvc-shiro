@@ -67,31 +67,12 @@ public class HomeKanBanController {
 			logger.warn("如果加盟商ID为空，不允许传入车队ID");
 			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
 		}
-		// 供应商信息
-		String[] visibleAllianceIds = null;
-		// 车队信息
-		String[] visibleMotocadeIds = null;
-		// 数据权限设置
-		SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-		if(currentLoginUser == null){
-			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-		}
-		Set<Integer> supplierIds = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-		visibleAllianceIds = setToArray(supplierIds);
-		Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-		visibleAllianceIds = setToArray(supplierIds);
-		visibleMotocadeIds = setToArray(teamIds);
-		if(null == visibleAllianceIds || null == visibleMotocadeIds){
-			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-		}
 		// 从大数据仓库获取统计数据
 		Map<String, Object> paramMap = Maps.newHashMap();
 		paramMap.put("startDate", startDate);
 		paramMap.put("endDate", endDate);
 		paramMap.put("allianceId", allianceId);
 		paramMap.put("motorcadeId", motorcadeId);
-		paramMap.put("visibleAllianceIds", visibleAllianceIds);
-		paramMap.put("visibleMotocadeIds", visibleMotocadeIds);
 		return parseResult(operatingVehicleUrl, paramMap);
 	}
 
@@ -106,30 +87,12 @@ public class HomeKanBanController {
 			logger.warn("如果加盟商ID为空，不允许传入车队ID");
 			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
 		}
-		// 供应商信息
-		String[] visibleAllianceIds = null;
-		// 车队信息
-		String[] visibleMotocadeIds = null;
-		// 数据权限设置
-		SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-		if(currentLoginUser == null){
-			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-		}
-		Set<Integer> supplierIds = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-		visibleAllianceIds = setToArray(supplierIds);
-		Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-		visibleMotocadeIds = setToArray(teamIds);
-		if(null == visibleAllianceIds || null == visibleMotocadeIds){
-			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-		}
 		// 从大数据仓库获取统计数据
 		Map<String, Object> paramMap = Maps.newHashMap();
 		paramMap.put("startDate", startDate);
 		paramMap.put("endDate", endDate);
 		paramMap.put("allianceId", allianceId);
 		paramMap.put("motorcadeId", motorcadeId);
-		paramMap.put("visibleAllianceIds", visibleAllianceIds);
-		paramMap.put("visibleMotocadeIds", visibleMotocadeIds);
 		return parseResult(statisticsOrderUrl, paramMap);
 	}
 
@@ -145,30 +108,12 @@ public class HomeKanBanController {
 			logger.warn("如果加盟商ID为空，不允许传入车队ID");
 			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
 		}
-		// 供应商信息
-		String[] visibleAllianceIds = null;
-		// 车队信息
-		String[] visibleMotocadeIds = null;
-		// 数据权限设置
-		SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-		if(currentLoginUser == null){
-			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-		}
-		Set<Integer> supplierIds = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-		visibleAllianceIds = setToArray(supplierIds);
-		Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-		visibleMotocadeIds = setToArray(teamIds);
-		if(null == visibleAllianceIds || null == visibleMotocadeIds){
-			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-		}
 		// 从大数据仓库获取统计数据
 		Map<String, Object> paramMap = Maps.newHashMap();
 		paramMap.put("startDate", startDate);
 		paramMap.put("endDate", endDate);
 		paramMap.put("allianceId", allianceId);
 		paramMap.put("motorcadeId", motorcadeId);
-		paramMap.put("visibleAllianceIds", visibleAllianceIds);
-		paramMap.put("visibleMotocadeIds", visibleMotocadeIds);
 		return parseResult(statisticsEvaluationUrl, paramMap);
 	}
 
@@ -184,31 +129,12 @@ public class HomeKanBanController {
 			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
 		}
 		
-		// 供应商信息
-		String[] visibleAllianceIds = null;
-		// 车队信息
-		String[] visibleMotocadeIds = null;
-		// 数据权限设置
-		SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-		if(currentLoginUser == null){
-			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-		}
-		Set<Integer> supplierIds = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-		visibleAllianceIds = setToArray(supplierIds);
-		Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-		visibleMotocadeIds = setToArray(teamIds);
-		if(null == visibleAllianceIds || null == visibleMotocadeIds){
-			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-		}
-
 		// 从大数据仓库获取统计数据
 		Map<String, Object> paramMap = Maps.newHashMap();
 		paramMap.put("startDate", startDate);
 		paramMap.put("endDate", endDate);
 		paramMap.put("allianceId", allianceId);
 		paramMap.put("motorcadeId", motorcadeId);
-		paramMap.put("visibleAllianceIds", visibleAllianceIds);
-		paramMap.put("visibleMotocadeIds", visibleMotocadeIds);
 		return parseResult(onlineTimeUrl, paramMap);
 	}
 
@@ -225,25 +151,10 @@ public class HomeKanBanController {
 			logger.warn("如果加盟商ID为空，不允许传入车队ID");
 			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
 		}
-		// 供应商信息
-		String[] visibleAllianceIds = null;
-		// 车队信息
-		String[] visibleMotocadeIds = null;
-		// 数据权限设置
-		SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-		Set<Integer> supplierIds = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-		visibleAllianceIds = setToArray(supplierIds);
-		Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-		visibleMotocadeIds = setToArray(teamIds);
-		if(null == visibleAllianceIds || null == visibleMotocadeIds){
-			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-		}
 		// 从大数据仓库获取统计数据
 		Map<String, Object> paramMap = Maps.newHashMap();
 		paramMap.put("allianceId", allianceId);
 		paramMap.put("motorcadeId", motorcadeId);
-		paramMap.put("visibleAllianceIds", visibleAllianceIds);
-		paramMap.put("visibleMotocadeIds", visibleMotocadeIds);
 		paramMap.put("orderByColumnCode", orderByColumnCode);
 		paramMap.put("orderByTypeCode", orderByTypeCode);
 		paramMap.put("topNum", topNum);
@@ -266,16 +177,15 @@ public class HomeKanBanController {
 		// 车队信息
 		String[] visibleMotocadeIds = null;
 		// 数据权限设置
-		SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-		if(currentLoginUser == null){
-			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-		}
-		Set<Integer> supplierIds = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-		visibleAllianceIds = setToArray(supplierIds);
-		Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-		visibleMotocadeIds = setToArray(teamIds);
-		if(null == visibleAllianceIds || null == visibleMotocadeIds){
-			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+		if(WebSessionUtil.isSupperAdmin() == false){// 如果是普通管理员
+			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
+			Set<Integer> supplierIds = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
+			visibleAllianceIds = setToArray(supplierIds);
+			Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
+			visibleMotocadeIds = setToArray(teamIds);
+			if(null == visibleAllianceIds || null == visibleMotocadeIds){
+				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+			}
 		}
 		// 从大数据仓库获取统计数据
 		Map<String, Object> paramMap = Maps.newHashMap();
@@ -306,6 +216,23 @@ public class HomeKanBanController {
 
 	/** 调用大数据接口获取数据  **/
 	private AjaxResponse parseResult(String url, Map<String, Object> paramMap) {
+		// 供应商信息
+		String[] visibleAllianceIds = null;
+		// 车队信息
+		String[] visibleMotocadeIds = null;
+		// 数据权限设置
+		if(WebSessionUtil.isSupperAdmin() == false){// 如果是普通管理员
+			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
+			Set<Integer> supplierIds = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
+			visibleAllianceIds = setToArray(supplierIds);
+			Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
+			visibleMotocadeIds = setToArray(teamIds);
+			if(null == visibleAllianceIds || null == visibleMotocadeIds){
+				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+			}
+			paramMap.put("visibleAllianceIds", visibleAllianceIds);
+			paramMap.put("visibleMotocadeIds", visibleMotocadeIds);
+		}
 		try {
 			String jsonString = JSON.toJSONString(paramMap);
 			String result = HttpClientUtil.buildPostRequest(url).setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
