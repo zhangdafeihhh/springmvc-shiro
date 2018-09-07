@@ -332,59 +332,58 @@ public class CarInfoController {
     }
 
 
-//    /**
-//     * 车辆信息删除
-//     * @param params
-//     * @param request
-//     * @return
-//     */
-//    @RequestMapping(value = "/deleteCarInfo")
-//    public Object deleteCarInfo(CarInfo params, HttpServletRequest request) {
-//        logger.info("车辆删除:deleteCarInfo");
-//        Map<String, Object> result = new HashMap<String, Object>();
-//        String message = "";
-//        try {
-//            String carIds = params.getCarIds();
-//            if(StringUtils.isEmpty(carIds)){
-//                result.put(Common.RESULT_RESULT, 0);
-//                result.put(Common.RESULT_ERRORMSG, "参数不全");
-//                return result;
-//            }
-//            String[] carIdStr = carIds.split(",");
-//            for (int i = 0; i < carIdStr.length; i++) {
-//                String carId = carIdStr[i];
-//                if(StringUtils.isEmpty(carId)){
-//                    continue;
-//                }
-//                String licensePlates = this.carService.selectCarByCarId(Integer.parseInt(carId));
-//                if(StringUtils.isEmpty(licensePlates)){
-//                    continue;
-//                }
-//                CarInfo carInfoEntity = new CarInfo();
-//                carInfoEntity.setCarId(Integer.parseInt(carId));
-//                carInfoEntity.setLicensePlates(licensePlates);
-//                carInfoEntity = this.carService.selectCarInfoByCarId(carInfoEntity);
-//                if(carInfoEntity.getIsFree()==1){
-//                    message += licensePlates + "该车正在运营中，不可删除;";
-//                    continue;
-//                }
-//                carInfoEntity.setStatus(2);
-//                carInfoEntity.setLicensePlates1(licensePlates);
+    /**
+     * 车辆信息删除
+     * @param params
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/deleteCarInfo")
+    public Object deleteCarInfo(@Verify(param = "carIds", rule = "required") String carIds) {
+        logger.info("车辆删除:deleteCarInfo");
+        Map<String, Object> result = new HashMap<String, Object>();
+        String message = "";
+        try {
+            if(StringUtils.isEmpty(carIds)){
+                result.put(Common.RESULT_RESULT, 0);
+                result.put(Common.RESULT_ERRORMSG, "参数不全");
+                return result;
+            }
+            String[] carIdStr = carIds.split(",");
+            for (int i = 0; i < carIdStr.length; i++) {
+                String carId = carIdStr[i];
+                if(StringUtils.isEmpty(carId)){
+                    continue;
+                }
+                String licensePlates = this.carService.selectCarByCarId(Integer.parseInt(carId));
+                if(StringUtils.isEmpty(licensePlates)){
+                    continue;
+                }
+                CarInfo carInfoEntity = new CarInfo();
+                carInfoEntity.setCarId(Integer.parseInt(carId));
+                carInfoEntity.setLicensePlates(licensePlates);
+                carInfoEntity = this.carService.selectCarInfoByCarId(carInfoEntity);
+                if(carInfoEntity.getIsFree()==1){
+                    message += licensePlates + "该车正在运营中，不可删除;";
+                    continue;
+                }
+                carInfoEntity.setStatus(2);
+                carInfoEntity.setLicensePlates1(licensePlates);
 //                params.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
-//                result = this.carService.saveCarInfo(carInfoEntity);
-//            }
-//        } catch (Exception e) {
-//            logger.error("delete CarInfo error. ", e);
-//        }
-//        if(StringUtils.isNotEmpty(message)){
-//            result.put(Common.RESULT_RESULT, 0);
-//            result.put(Common.RESULT_ERRORMSG, message);
-//            return result;
-//        }
-//        result.put(Common.RESULT_RESULT, 1);
-//        result.put(Common.RESULT_ERRORMSG, "成功");
-//        return result;
-//    }
+                result = this.carService.saveCarInfo(carInfoEntity);
+            }
+        } catch (Exception e) {
+            logger.error("delete CarInfo error. ", e);
+        }
+        if(StringUtils.isNotEmpty(message)){
+            result.put(Common.RESULT_RESULT, 0);
+            result.put(Common.RESULT_ERRORMSG, message);
+            return getResponse(result);
+        }
+        result.put(Common.RESULT_RESULT, 1);
+        result.put(Common.RESULT_ERRORMSG, "成功");
+        return getResponse(result);
+    }
 
 
     /**
