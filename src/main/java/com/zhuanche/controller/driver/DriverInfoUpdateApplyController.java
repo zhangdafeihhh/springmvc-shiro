@@ -48,9 +48,6 @@ public class DriverInfoUpdateApplyController {
     private DriverInfoUpdateService driverInfoUpdateService;
 
     @Autowired
-    private CarDriverTeamService carDriverTeamService;
-
-    @Autowired
     private CarBizDriverInfoService carBizDriverInfoService;
 
     @Autowired
