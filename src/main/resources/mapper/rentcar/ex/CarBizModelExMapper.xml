@@ -25,4 +25,11 @@
     where model_name = #{modelName}
     limit 1
   </select>
+
+  <select id="queryCarBizModelNoPage" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from car_biz_model
+        where 1=1 and status=1
+  </select>
 </mapper>

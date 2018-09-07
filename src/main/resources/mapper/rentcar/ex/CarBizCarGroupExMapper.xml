@@ -90,4 +90,20 @@
       GROUP BY g.sort, g.update_date DESC
       HAVING 1=1 and  g.group_id  = #{groupId}
   </select>
+
+    <select id="queryForListObject" resultMap="ResultMapWithBLOBs" parameterType="com.zhuanche.entity.rentcar.CarBizCarGroup">
+        select
+        <include refid="Base_Column_List" />
+        ,
+        <include refid="Blob_Column_List" />
+        from car_biz_car_group
+        where status = 1
+        <if test="groupName!=null and groupName!=''">
+            and  group_name like '%${groupName}%'
+        </if>
+        <if test="type!=null and type!=''">
+            and  type = #{type}
+        </if>
+        order by sort
+    </select>
 </mapper>
