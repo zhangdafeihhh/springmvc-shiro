@@ -42,7 +42,7 @@
   </filter-mapping>
 
   <!-- shiro过滤器 -->
-  <!--<filter>
+  <filter>
     <filter-name>shiroFilter</filter-name>
     <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     <init-param>
@@ -57,7 +57,7 @@
   <filter-mapping>
     <filter-name>shiroFilter</filter-name>
     <url-pattern>*.json</url-pattern>
-  </filter-mapping>-->
+  </filter-mapping>
   
   <!-- 日志中增加登录用户信息 -->
   <filter>
