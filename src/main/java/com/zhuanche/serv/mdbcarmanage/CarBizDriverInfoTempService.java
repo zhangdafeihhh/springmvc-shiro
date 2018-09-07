@@ -17,6 +17,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Common;
 import com.zhuanche.util.ImportTempletUtils;
 import com.zhuanche.util.ValidateUtils;
+import com.zhuanche.util.excel.ExportExcelUtil;
 import mapper.mdbcarmanage.AgreementCompanyMapper;
 import mapper.mdbcarmanage.CarBizDriverInfoTempMapper;
 import mapper.mdbcarmanage.ex.CarBizCarInfoTempExMapper;
@@ -30,10 +31,13 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -48,7 +52,7 @@ import com.zhuanche.util.DateUtil;
 @Service
 public class CarBizDriverInfoTempService {
 
-    private static Log log =  LogFactory.getLog(DriverInfoTemporaryController.class);
+    private static final Logger log =  LoggerFactory.getLogger(CarBizDriverInfoTempService.class);
 
     private final static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -145,26 +149,25 @@ public class CarBizDriverInfoTempService {
 
     /**
      * 导入司机
-     * @param params
+     * @param is
+     * @param prefix 后缀名
      * @param request
+     * @param response
+     * @param cityId 城市Id
+     * @param supplierId 供应商Id
+     * @param teamId 车队Id
+     * @param groupId 小组Id
      * @return
      */
-    public AjaxResponse importDriverInfo(CarBizDriverInfoTemp params, HttpServletRequest request) {
+    public AjaxResponse importDriverInfo(InputStream is, String prefix, HttpServletRequest request, HttpServletResponse response, Integer cityId, Integer supplierId,Integer teamId,Integer groupId) {
         String resultErrorMag1 = "导入模板格式错误!";
-
         Map<String,Object> result = new HashMap<String,Object>();
         List<CarImportExceptionEntity> listException = new ArrayList<CarImportExceptionEntity>();
         SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
         List<CarBizDriverInfoTemp> driverList = new ArrayList<CarBizDriverInfoTemp>();
-        String fileName = params.getFileName();
-        String path  = Common.getPath(request);
-        String dirPath = path+params.getFileName();
-        File DRIVERINFO = new File(dirPath);
-        String resStr = "";
         try {
-            InputStream is = new FileInputStream(DRIVERINFO);
             Workbook workbook = null;
-            String fileType = fileName.split("\\.")[1];
+            String fileType = prefix.split("\\.")[1];
             if (fileType.equals("xls")) {
                 workbook = new HSSFWorkbook(is);
             }
@@ -456,9 +459,8 @@ public class CarBizDriverInfoTempService {
                 driver.setStatus(1);
                 driver.setCreateBy(user.getId());
                 driver.setUpdateBy(user.getId());
-
                 //加入加盟类型
-                Integer cooperationType = queryCooperationTypeBySupplierId(params.getSupplierId());
+                Integer cooperationType = queryCooperationTypeBySupplierId(supplierId);
                 String bankCardNumber = "";
                 // 司机导入模板总共18列
                 for (int colIx = 0; colIx < 50; colIx++) {
@@ -496,8 +498,8 @@ public class CarBizDriverInfoTempService {
                                     listException.add(returnVO);
                                     isTrue = false;
                                 }
-                                driverEntity.setServiceCityId(params.getServiceCityId());
-                                driverEntity.setSupplierId(params.getSupplierId());
+                                driverEntity.setServiceCityId(cityId);
+                                driverEntity.setSupplierId(supplierId);
                                 if(carBizDriverInfoTempExMapper.validateCityAndSupplier(driverEntity) > 0){
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                                     returnVO.setReson("第" +  (rowIx+1) + "行数据，第"
@@ -599,10 +601,9 @@ public class CarBizDriverInfoTempService {
                                         + "列 【驾驶员手机】不合法");
                                 listException.add(returnVO);
                                 isTrue = false;
-                            }
-                            else {
+                            }else {
                                 CarBizDriverInfo entity = new CarBizDriverInfo();
-                                entity.setPhone(params.getPhone());
+                                entity.setPhone(cellValue.getStringValue());
                                 Integer c = carBizDriverInfoExMapper.selectCountForPhone(entity);
                                 if (c != null && c.intValue() > 0) {
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -614,7 +615,9 @@ public class CarBizDriverInfoTempService {
                                     colIx = 100;// 结束本行数据
                                     isTrue = false;
                                 }else {
-                                    c = carBizDriverInfoTempExMapper.selectCountForPhone(params);
+                                    CarBizDriverInfoTemp driverInfoTemp = new CarBizDriverInfoTemp();
+                                    driverInfoTemp.setPhone(cellValue.getStringValue());
+                                    c = carBizDriverInfoTempExMapper.selectCountForPhone(driverInfoTemp);
                                     if (c != null && c.intValue() > 0) {
                                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                                         returnVO.setReson("第" +  (rowIx+1) + "行数据，第"
@@ -1708,19 +1711,17 @@ public class CarBizDriverInfoTempService {
 
                 }// 循环列结束
                 if (isTrue && driver != null) {
-                    driver.setServiceCityId(params.getServiceCityId());
-                    driver.setSupplierId(params.getSupplierId());
-                    driver.setTeamid(params.getTeamid());
-                    driver.setGroupIds(params.getGroupId());
+                    driver.setServiceCityId(cityId);
+                    driver.setSupplierId(supplierId);
+                    driver.setTeamid(String.valueOf(teamId));
+                    driver.setGroupIds(String.valueOf(groupId));
                     driverList.add(driver);
                 }
             }
         }catch (Exception e) {
             e.printStackTrace();
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
-        String download = "";
-        int record = 0;
-        int records = 0;
         if("".equals(driverList)||driverList==null||driverList.size()==0){
             result.put("result", "0");
             result.put("msg","导入失败！");
@@ -1763,7 +1764,6 @@ public class CarBizDriverInfoTempService {
                     }
                 }
             }
-            int had = 0;
             for(CarBizDriverInfoTemp asd: driverList2){
                 try {
                     log.info("导入司机到临时表 导入司机后信息=:"+ JSON.toJSONString(asd));
@@ -1776,44 +1776,43 @@ public class CarBizDriverInfoTempService {
                     carBizCarInfoTempExMapper.updateByLicensePlates(carInfoEntity);
                     log.info("导入司机到临时表 导入司机后司机id="+asd.getDriverId()+",更新车辆信息end="+JSON.toJSONString(carInfoEntity));
                 } catch (Exception e) {
-                    had = 1;
                     log.info("导入司机到临时表 error:"+e);
                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                     returnVO.setReson(asd.getName()+"导入失败！");
                     listException.add(returnVO);
                 }
             }
-            if(had>0){
-                result.put("result", "0");
-                result.put("msg","导入失败！");
-            }else{
-                result.put("result", 1);
-                result.put("msg","");
-            }
         }
         try {
-            // 将错误列表导出
-            if(listException.size() > 0) {
-                Workbook wb = Common.exportExcel(request.getServletContext().getRealPath("/")+ "template" + File.separator + "driver_exception.xlsx", listException);
-                download = Common.exportExcelFromTempletToLoacl(request, wb,new String("ERROR".getBytes("utf-8"), "iso8859-1") );
+            //将错误列表导出
+            if (listException.size() > 0) {
+                /*response.setContentType("application/octet-stream;charset=ISO8859-1");
+                response.setHeader("Content-Disposition", "attachment;filename=" + new String("巴士车辆导入错误列表".getBytes("GB2312"), "ISO8859-1") + ".xls");
+                response.addHeader("Pargam", "no-cache");
+                response.addHeader("Cache-Control", "no-cache");
+                Collection c = listException;
+                new ExportExcelUtil<>().exportExcel("巴士车辆导入错误Excel", new String[]{"车牌号","错误原因"}, c, response.getOutputStream());*/
+                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+            }else{
+                return AjaxResponse.success(RestErrorCode.SUCCESS);
             }
         }catch(Exception e){
             e.printStackTrace();
-        }
-        if(!"".equals(download)&&download!=null){
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,download);
-        }else{
-            return AjaxResponse.success(RestErrorCode.SUCCESS);
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
     }
 
     /**
      * 导入巴士司机
-     * @param params
+     * @param is
+     * @param prefix
      * @param request
+     * @param response
+     * @param cityId
+     * @param supplierId
      * @return
      */
-    public AjaxResponse importDriverInfo4Bus(CarBizDriverInfoTemp params, HttpServletRequest request) {
+    public AjaxResponse importDriverInfo4Bus(InputStream is,String prefix,Integer cityId,Integer supplierId,Integer teamId,Integer groupId,HttpServletRequest request,HttpServletResponse response) {
         // 错误信息
         List<CarImportExceptionEntity> listException = new ArrayList<CarImportExceptionEntity>();
         // 处理结果
@@ -1821,16 +1820,9 @@ public class CarBizDriverInfoTempService {
         String resultErrorMag1 = "导入模板格式错误!";
         // 司机信息集合
         List<CarBizDriverInfoTemp> driverList = new ArrayList<CarBizDriverInfoTemp>();
-
-        // 导入的文件
-        String path  = Common.getPath(request);
-        String dirPath = path+params.getFileName();
-        File driverInfo = new File(dirPath);
         try {
-            InputStream is = new FileInputStream(driverInfo);
             Workbook workbook = null;
-            String fileName = params.getFileName();
-            String fileType = fileName.split("\\.")[1];
+            String fileType = prefix.split("\\.")[1];
             if (fileType.equals("xls")) {
                 workbook = new HSSFWorkbook(is);
             }
@@ -1844,7 +1836,6 @@ public class CarBizDriverInfoTempService {
             if(headRow==null){
                 return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
             }
-
             // 判断模板列是否缺少
             List<String> templetFields = ImportTempletUtils.getTempletFields(ImportTempletUtils.TempletType.BUS_DRIVER);
             for (int colIndex = 0; colIndex < templetFields.size(); colIndex++) {
@@ -1879,9 +1870,9 @@ public class CarBizDriverInfoTempService {
                 driver.setUpdateBy(user.getId());
 
                 // 加入加盟类型
-                Integer cooperationType = queryCooperationTypeBySupplierId(params.getSupplierId());
+                Integer cooperationType = queryCooperationTypeBySupplierId(supplierId);
                 // 供应商名称
-                String supplierFullName = querySupplierNameBySupplierId(params.getSupplierId());
+                String supplierFullName = querySupplierNameBySupplierId(supplierId);
 
 
                 // 司机导入模板总共12列
@@ -2017,7 +2008,9 @@ public class CarBizDriverInfoTempService {
                                     colIndex = 100;// 结束本行数据
                                     isTrue = false;
                                 }else {
-                                    c = carBizDriverInfoTempExMapper.selectCountForPhone(params);
+                                    CarBizDriverInfoTemp driverInfoTemp = new CarBizDriverInfoTemp();
+                                    driverInfoTemp.setPhone(cellValue.getStringValue());
+                                    c = carBizDriverInfoTempExMapper.selectCountForPhone(driverInfoTemp);
                                     if (c != null && c.intValue() > 0) {
                                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                                         returnVO.setReson("第" +  (rowIndex+1) + "行数据，第" + (colIndex + 1) + "列 已存在【手机号为：" + cellValue.getStringValue() + "】的信息");
@@ -2144,8 +2137,8 @@ public class CarBizDriverInfoTempService {
                                     listException.add(returnVO);
                                     isTrue = false;
                                 }
-                                driverEntity.setServiceCityId(params.getServiceCityId());
-                                driverEntity.setSupplierId(params.getSupplierId());
+                                driverEntity.setServiceCityId(cityId);
+                                driverEntity.setSupplierId(supplierId);
                                 if(carBizDriverInfoTempExMapper.validateCityAndSupplier(driverEntity) > 0){
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                                     returnVO.setReson("第" +  (rowIndex+1) + "行数据，第" + (colIndex + 1) + "列 【车牌号】:"+cellValue.getStringValue()+"不在所选的城市或厂商");
@@ -2303,20 +2296,19 @@ public class CarBizDriverInfoTempService {
 
                 //serviceCityId //supplierId //teamid //groupId
                 if (isTrue && driver != null) {
-                    driver.setServiceCityId(params.getServiceCityId());
-                    driver.setSupplierId(params.getSupplierId());
-                    driver.setTeamid(params.getTeamid());
-                    driver.setGroupIds(params.getGroupId());
+                    driver.setServiceCityId(cityId);
+                    driver.setSupplierId(supplierId);
+                    driver.setTeamid(String.valueOf(teamId));
+                    driver.setGroupIds(String.valueOf(groupId));
                     driverList.add(driver);
                 }
             }
         }catch (Exception e) {
             e.printStackTrace();
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
-        String download = "";
         if(driverList.isEmpty()){
-            result.put("result", "0");
-            result.put("msg","导入失败！");
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         } else {
             List<CarBizDriverInfoTemp> validDriverList = new ArrayList<CarBizDriverInfoTemp>();
             StringBuffer phone = new StringBuffer();
@@ -2377,27 +2369,28 @@ public class CarBizDriverInfoTempService {
                 }
             }
             if (failed) {
-                result.put("result", "0");
-                result.put("msg", "导入失败！");
+                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
             } else {
-                result.put("result", 1);
-                result.put("msg", "");
+                return AjaxResponse.success(RestErrorCode.SUCCESS);
             }
         }
-        try {
-            // 将错误列表导出
+        /*try {
+            //将错误列表导出
             if (listException.size() > 0) {
-                Workbook wb = Common.exportExcel(request.getServletContext().getRealPath("/") + "template" + File.separator + "driver_exception.xlsx", listException);
-                download = Common.exportExcelFromTempletToLoacl(request, wb, new String("ERROR".getBytes("utf-8"), "iso8859-1"));
+                response.setContentType("application/octet-stream;charset=ISO8859-1");
+                response.setHeader("Content-Disposition", "attachment;filename=" + new String("巴士车辆导入错误列表".getBytes("GB2312"), "ISO8859-1") + ".xls");
+                response.addHeader("Pargam", "no-cache");
+                response.addHeader("Cache-Control", "no-cache");
+                Collection c = listException;
+                new ExportExcelUtil<>().exportExcel("巴士车辆导入错误Excel", new String[]{"车牌号","错误原因"}, c, response.getOutputStream());
+                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+            }else{
+                return AjaxResponse.success(RestErrorCode.SUCCESS);
             }
         }catch(Exception e){
             e.printStackTrace();
-        }
-        if(StringUtils.isNotBlank(download)){
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,download);
-        }else{
-            return AjaxResponse.success(RestErrorCode.SUCCESS);
-        }
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }*/
     }
 
     private Integer queryCooperationTypeBySupplierId(Integer supplierId){

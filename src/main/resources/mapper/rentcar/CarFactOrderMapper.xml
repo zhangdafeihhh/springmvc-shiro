@@ -1,0 +1,904 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.CarFactOrderMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarFactOrder" >
+    <id column="order_id" property="orderId" jdbcType="INTEGER" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="push_driver_type" property="pushDriverType" jdbcType="INTEGER" />
+    <result column="order_type" property="orderType" jdbcType="INTEGER" />
+    <result column="booking_user_id" property="bookingUserId" jdbcType="INTEGER" />
+    <result column="booking_date" property="bookingDate" jdbcType="TIMESTAMP" />
+    <result column="rider_name" property="riderName" jdbcType="VARCHAR" />
+    <result column="rider_phone" property="riderPhone" jdbcType="VARCHAR" />
+    <result column="booking_start_addr" property="bookingStartAddr" jdbcType="VARCHAR" />
+    <result column="booking_start_point" property="bookingStartPoint" jdbcType="VARCHAR" />
+    <result column="booking_end_addr" property="bookingEndAddr" jdbcType="VARCHAR" />
+    <result column="booking_end_point" property="bookingEndPoint" jdbcType="VARCHAR" />
+    <result column="fact_start_addr" property="factStartAddr" jdbcType="VARCHAR" />
+    <result column="fact_start_point" property="factStartPoint" jdbcType="VARCHAR" />
+    <result column="fact_end_addr" property="factEndAddr" jdbcType="VARCHAR" />
+    <result column="fact_end_point" property="factEndPoint" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="service_type_id" property="serviceTypeId" jdbcType="INTEGER" />
+    <result column="car_group_id" property="carGroupId" jdbcType="INTEGER" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="license_plates" property="licensePlates" jdbcType="VARCHAR" />
+    <result column="airline_no" property="airlineNo" jdbcType="VARCHAR" />
+    <result column="airline_status" property="airlineStatus" jdbcType="VARCHAR" />
+    <result column="airline_plan_date" property="airlinePlanDate" jdbcType="TIMESTAMP" />
+    <result column="airline_arr_date" property="airlineArrDate" jdbcType="TIMESTAMP" />
+    <result column="airline_dep_code" property="airlineDepCode" jdbcType="VARCHAR" />
+    <result column="airline_arr_code" property="airlineArrCode" jdbcType="VARCHAR" />
+    <result column="channels_num" property="channelsNum" jdbcType="VARCHAR" />
+    <result column="receive_SMS" property="receiveSms" jdbcType="INTEGER" />
+    <result column="estimated_Amount" property="estimatedAmount" jdbcType="DECIMAL" />
+    <result column="airport_id" property="airportId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="fact_date" property="factDate" jdbcType="TIMESTAMP" />
+    <result column="booking_groupids" property="bookingGroupids" jdbcType="VARCHAR" />
+    <result column="fact_driver_id" property="factDriverId" jdbcType="INTEGER" />
+    <result column="fact_end_date" property="factEndDate" jdbcType="TIMESTAMP" />
+    <result column="imei" property="imei" jdbcType="VARCHAR" />
+    <result column="version" property="version" jdbcType="VARCHAR" />
+    <result column="mobel_version" property="mobelVersion" jdbcType="VARCHAR" />
+    <result column="sys_version" property="sysVersion" jdbcType="VARCHAR" />
+    <result column="platform" property="platform" jdbcType="VARCHAR" />
+    <result column="pay_flag" property="payFlag" jdbcType="INTEGER" />
+    <result column="cancelorder_penalty" property="cancelorderPenalty" jdbcType="DECIMAL" />
+    <result column="chartered_id" property="charteredId" jdbcType="INTEGER" />
+    <result column="chartered_order_no" property="charteredOrderNo" jdbcType="VARCHAR" />
+    <result column="is_order_others" property="isOrderOthers" jdbcType="INTEGER" />
+    <result column="doorman_pay_method" property="doormanPayMethod" jdbcType="INTEGER" />
+    <result column="selected_pay_flag" property="selectedPayFlag" jdbcType="INTEGER" />
+    <result column="business_id" property="businessId" jdbcType="INTEGER" />
+    <result column="go_home_status" property="goHomeStatus" jdbcType="INTEGER" />
+    <result column="auto_level_up" property="autoLevelUp" jdbcType="INTEGER" />
+    <result column="booking_driver_id" property="bookingDriverId" jdbcType="INTEGER" />
+    <result column="is_other_drivers" property="isOtherDrivers" jdbcType="INTEGER" />
+    <result column="booking_current_addr" property="bookingCurrentAddr" jdbcType="VARCHAR" />
+    <result column="booking_current_point" property="bookingCurrentPoint" jdbcType="VARCHAR" />
+    <result column="booking_user_phone" property="bookingUserPhone" jdbcType="VARCHAR" />
+    <result column="buyout_flag" property="buyoutFlag" jdbcType="INTEGER" />
+    <result column="buyout_price" property="buyoutPrice" jdbcType="DECIMAL" />
+    <result column="booking_id_number" property="bookingIdNumber" jdbcType="VARCHAR" />
+    <result column="estimated_id" property="estimatedId" jdbcType="VARCHAR" />
+    <result column="agent_id" property="agentId" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarFactOrder" extends="BaseResultMap" >
+    <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    order_id, order_no, type, push_driver_type, order_type, booking_user_id, booking_date, 
+    rider_name, rider_phone, booking_start_addr, booking_start_point, booking_end_addr, 
+    booking_end_point, fact_start_addr, fact_start_point, fact_end_addr, fact_end_point, 
+    city_id, service_type_id, car_group_id, driver_id, license_plates, airline_no, airline_status, 
+    airline_plan_date, airline_arr_date, airline_dep_code, airline_arr_code, channels_num, 
+    receive_SMS, estimated_Amount, airport_id, status, create_by, update_by, create_date, 
+    update_date, fact_date, booking_groupids, fact_driver_id, fact_end_date, imei, version, 
+    mobel_version, sys_version, platform, pay_flag, cancelorder_penalty, chartered_id, 
+    chartered_order_no, is_order_others, doorman_pay_method, selected_pay_flag, business_id, 
+    go_home_status, auto_level_up, booking_driver_id, is_other_drivers, booking_current_addr, 
+    booking_current_point, booking_user_phone, buyout_flag, buyout_price, booking_id_number, 
+    estimated_id, agent_id
+  </sql>
+  <sql id="Blob_Column_List" >
+    memo
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from car_fact_order
+    where order_id = #{orderId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from car_fact_order
+    where order_id = #{orderId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.rentcar.CarFactOrder" >
+    <selectKey resultType="java.lang.Integer" keyProperty="orderId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_fact_order (order_no, type, push_driver_type, 
+      order_type, booking_user_id, booking_date, 
+      rider_name, rider_phone, booking_start_addr, 
+      booking_start_point, booking_end_addr, booking_end_point, 
+      fact_start_addr, fact_start_point, fact_end_addr, 
+      fact_end_point, city_id, service_type_id, 
+      car_group_id, driver_id, license_plates, 
+      airline_no, airline_status, airline_plan_date, 
+      airline_arr_date, airline_dep_code, airline_arr_code, 
+      channels_num, receive_SMS, estimated_Amount, 
+      airport_id, status, create_by, 
+      update_by, create_date, update_date, 
+      fact_date, booking_groupids, fact_driver_id, 
+      fact_end_date, imei, version, 
+      mobel_version, sys_version, platform, 
+      pay_flag, cancelorder_penalty, chartered_id, 
+      chartered_order_no, is_order_others, doorman_pay_method, 
+      selected_pay_flag, business_id, go_home_status, 
+      auto_level_up, booking_driver_id, is_other_drivers, 
+      booking_current_addr, booking_current_point, 
+      booking_user_phone, buyout_flag, buyout_price, 
+      booking_id_number, estimated_id, agent_id, 
+      memo)
+    values (#{orderNo,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{pushDriverType,jdbcType=INTEGER}, 
+      #{orderType,jdbcType=INTEGER}, #{bookingUserId,jdbcType=INTEGER}, #{bookingDate,jdbcType=TIMESTAMP}, 
+      #{riderName,jdbcType=VARCHAR}, #{riderPhone,jdbcType=VARCHAR}, #{bookingStartAddr,jdbcType=VARCHAR}, 
+      #{bookingStartPoint,jdbcType=VARCHAR}, #{bookingEndAddr,jdbcType=VARCHAR}, #{bookingEndPoint,jdbcType=VARCHAR}, 
+      #{factStartAddr,jdbcType=VARCHAR}, #{factStartPoint,jdbcType=VARCHAR}, #{factEndAddr,jdbcType=VARCHAR}, 
+      #{factEndPoint,jdbcType=VARCHAR}, #{cityId,jdbcType=INTEGER}, #{serviceTypeId,jdbcType=INTEGER}, 
+      #{carGroupId,jdbcType=INTEGER}, #{driverId,jdbcType=INTEGER}, #{licensePlates,jdbcType=VARCHAR}, 
+      #{airlineNo,jdbcType=VARCHAR}, #{airlineStatus,jdbcType=VARCHAR}, #{airlinePlanDate,jdbcType=TIMESTAMP}, 
+      #{airlineArrDate,jdbcType=TIMESTAMP}, #{airlineDepCode,jdbcType=VARCHAR}, #{airlineArrCode,jdbcType=VARCHAR}, 
+      #{channelsNum,jdbcType=VARCHAR}, #{receiveSms,jdbcType=INTEGER}, #{estimatedAmount,jdbcType=DECIMAL}, 
+      #{airportId,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{createBy,jdbcType=INTEGER}, 
+      #{updateBy,jdbcType=INTEGER}, #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{factDate,jdbcType=TIMESTAMP}, #{bookingGroupids,jdbcType=VARCHAR}, #{factDriverId,jdbcType=INTEGER}, 
+      #{factEndDate,jdbcType=TIMESTAMP}, #{imei,jdbcType=VARCHAR}, #{version,jdbcType=VARCHAR}, 
+      #{mobelVersion,jdbcType=VARCHAR}, #{sysVersion,jdbcType=VARCHAR}, #{platform,jdbcType=VARCHAR}, 
+      #{payFlag,jdbcType=INTEGER}, #{cancelorderPenalty,jdbcType=DECIMAL}, #{charteredId,jdbcType=INTEGER}, 
+      #{charteredOrderNo,jdbcType=VARCHAR}, #{isOrderOthers,jdbcType=INTEGER}, #{doormanPayMethod,jdbcType=INTEGER}, 
+      #{selectedPayFlag,jdbcType=INTEGER}, #{businessId,jdbcType=INTEGER}, #{goHomeStatus,jdbcType=INTEGER}, 
+      #{autoLevelUp,jdbcType=INTEGER}, #{bookingDriverId,jdbcType=INTEGER}, #{isOtherDrivers,jdbcType=INTEGER}, 
+      #{bookingCurrentAddr,jdbcType=VARCHAR}, #{bookingCurrentPoint,jdbcType=VARCHAR}, 
+      #{bookingUserPhone,jdbcType=VARCHAR}, #{buyoutFlag,jdbcType=INTEGER}, #{buyoutPrice,jdbcType=DECIMAL}, 
+      #{bookingIdNumber,jdbcType=VARCHAR}, #{estimatedId,jdbcType=VARCHAR}, #{agentId,jdbcType=INTEGER}, 
+      #{memo,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.rentcar.CarFactOrder" >
+    <selectKey resultType="java.lang.Integer" keyProperty="orderId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_fact_order
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="orderNo != null" >
+        order_no,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="pushDriverType != null" >
+        push_driver_type,
+      </if>
+      <if test="orderType != null" >
+        order_type,
+      </if>
+      <if test="bookingUserId != null" >
+        booking_user_id,
+      </if>
+      <if test="bookingDate != null" >
+        booking_date,
+      </if>
+      <if test="riderName != null" >
+        rider_name,
+      </if>
+      <if test="riderPhone != null" >
+        rider_phone,
+      </if>
+      <if test="bookingStartAddr != null" >
+        booking_start_addr,
+      </if>
+      <if test="bookingStartPoint != null" >
+        booking_start_point,
+      </if>
+      <if test="bookingEndAddr != null" >
+        booking_end_addr,
+      </if>
+      <if test="bookingEndPoint != null" >
+        booking_end_point,
+      </if>
+      <if test="factStartAddr != null" >
+        fact_start_addr,
+      </if>
+      <if test="factStartPoint != null" >
+        fact_start_point,
+      </if>
+      <if test="factEndAddr != null" >
+        fact_end_addr,
+      </if>
+      <if test="factEndPoint != null" >
+        fact_end_point,
+      </if>
+      <if test="cityId != null" >
+        city_id,
+      </if>
+      <if test="serviceTypeId != null" >
+        service_type_id,
+      </if>
+      <if test="carGroupId != null" >
+        car_group_id,
+      </if>
+      <if test="driverId != null" >
+        driver_id,
+      </if>
+      <if test="licensePlates != null" >
+        license_plates,
+      </if>
+      <if test="airlineNo != null" >
+        airline_no,
+      </if>
+      <if test="airlineStatus != null" >
+        airline_status,
+      </if>
+      <if test="airlinePlanDate != null" >
+        airline_plan_date,
+      </if>
+      <if test="airlineArrDate != null" >
+        airline_arr_date,
+      </if>
+      <if test="airlineDepCode != null" >
+        airline_dep_code,
+      </if>
+      <if test="airlineArrCode != null" >
+        airline_arr_code,
+      </if>
+      <if test="channelsNum != null" >
+        channels_num,
+      </if>
+      <if test="receiveSms != null" >
+        receive_SMS,
+      </if>
+      <if test="estimatedAmount != null" >
+        estimated_Amount,
+      </if>
+      <if test="airportId != null" >
+        airport_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="factDate != null" >
+        fact_date,
+      </if>
+      <if test="bookingGroupids != null" >
+        booking_groupids,
+      </if>
+      <if test="factDriverId != null" >
+        fact_driver_id,
+      </if>
+      <if test="factEndDate != null" >
+        fact_end_date,
+      </if>
+      <if test="imei != null" >
+        imei,
+      </if>
+      <if test="version != null" >
+        version,
+      </if>
+      <if test="mobelVersion != null" >
+        mobel_version,
+      </if>
+      <if test="sysVersion != null" >
+        sys_version,
+      </if>
+      <if test="platform != null" >
+        platform,
+      </if>
+      <if test="payFlag != null" >
+        pay_flag,
+      </if>
+      <if test="cancelorderPenalty != null" >
+        cancelorder_penalty,
+      </if>
+      <if test="charteredId != null" >
+        chartered_id,
+      </if>
+      <if test="charteredOrderNo != null" >
+        chartered_order_no,
+      </if>
+      <if test="isOrderOthers != null" >
+        is_order_others,
+      </if>
+      <if test="doormanPayMethod != null" >
+        doorman_pay_method,
+      </if>
+      <if test="selectedPayFlag != null" >
+        selected_pay_flag,
+      </if>
+      <if test="businessId != null" >
+        business_id,
+      </if>
+      <if test="goHomeStatus != null" >
+        go_home_status,
+      </if>
+      <if test="autoLevelUp != null" >
+        auto_level_up,
+      </if>
+      <if test="bookingDriverId != null" >
+        booking_driver_id,
+      </if>
+      <if test="isOtherDrivers != null" >
+        is_other_drivers,
+      </if>
+      <if test="bookingCurrentAddr != null" >
+        booking_current_addr,
+      </if>
+      <if test="bookingCurrentPoint != null" >
+        booking_current_point,
+      </if>
+      <if test="bookingUserPhone != null" >
+        booking_user_phone,
+      </if>
+      <if test="buyoutFlag != null" >
+        buyout_flag,
+      </if>
+      <if test="buyoutPrice != null" >
+        buyout_price,
+      </if>
+      <if test="bookingIdNumber != null" >
+        booking_id_number,
+      </if>
+      <if test="estimatedId != null" >
+        estimated_id,
+      </if>
+      <if test="agentId != null" >
+        agent_id,
+      </if>
+      <if test="memo != null" >
+        memo,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="orderNo != null" >
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="pushDriverType != null" >
+        #{pushDriverType,jdbcType=INTEGER},
+      </if>
+      <if test="orderType != null" >
+        #{orderType,jdbcType=INTEGER},
+      </if>
+      <if test="bookingUserId != null" >
+        #{bookingUserId,jdbcType=INTEGER},
+      </if>
+      <if test="bookingDate != null" >
+        #{bookingDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="riderName != null" >
+        #{riderName,jdbcType=VARCHAR},
+      </if>
+      <if test="riderPhone != null" >
+        #{riderPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="bookingStartAddr != null" >
+        #{bookingStartAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="bookingStartPoint != null" >
+        #{bookingStartPoint,jdbcType=VARCHAR},
+      </if>
+      <if test="bookingEndAddr != null" >
+        #{bookingEndAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="bookingEndPoint != null" >
+        #{bookingEndPoint,jdbcType=VARCHAR},
+      </if>
+      <if test="factStartAddr != null" >
+        #{factStartAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="factStartPoint != null" >
+        #{factStartPoint,jdbcType=VARCHAR},
+      </if>
+      <if test="factEndAddr != null" >
+        #{factEndAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="factEndPoint != null" >
+        #{factEndPoint,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="serviceTypeId != null" >
+        #{serviceTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="carGroupId != null" >
+        #{carGroupId,jdbcType=INTEGER},
+      </if>
+      <if test="driverId != null" >
+        #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="licensePlates != null" >
+        #{licensePlates,jdbcType=VARCHAR},
+      </if>
+      <if test="airlineNo != null" >
+        #{airlineNo,jdbcType=VARCHAR},
+      </if>
+      <if test="airlineStatus != null" >
+        #{airlineStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="airlinePlanDate != null" >
+        #{airlinePlanDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="airlineArrDate != null" >
+        #{airlineArrDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="airlineDepCode != null" >
+        #{airlineDepCode,jdbcType=VARCHAR},
+      </if>
+      <if test="airlineArrCode != null" >
+        #{airlineArrCode,jdbcType=VARCHAR},
+      </if>
+      <if test="channelsNum != null" >
+        #{channelsNum,jdbcType=VARCHAR},
+      </if>
+      <if test="receiveSms != null" >
+        #{receiveSms,jdbcType=INTEGER},
+      </if>
+      <if test="estimatedAmount != null" >
+        #{estimatedAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="airportId != null" >
+        #{airportId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="factDate != null" >
+        #{factDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="bookingGroupids != null" >
+        #{bookingGroupids,jdbcType=VARCHAR},
+      </if>
+      <if test="factDriverId != null" >
+        #{factDriverId,jdbcType=INTEGER},
+      </if>
+      <if test="factEndDate != null" >
+        #{factEndDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="imei != null" >
+        #{imei,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null" >
+        #{version,jdbcType=VARCHAR},
+      </if>
+      <if test="mobelVersion != null" >
+        #{mobelVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="sysVersion != null" >
+        #{sysVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="platform != null" >
+        #{platform,jdbcType=VARCHAR},
+      </if>
+      <if test="payFlag != null" >
+        #{payFlag,jdbcType=INTEGER},
+      </if>
+      <if test="cancelorderPenalty != null" >
+        #{cancelorderPenalty,jdbcType=DECIMAL},
+      </if>
+      <if test="charteredId != null" >
+        #{charteredId,jdbcType=INTEGER},
+      </if>
+      <if test="charteredOrderNo != null" >
+        #{charteredOrderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="isOrderOthers != null" >
+        #{isOrderOthers,jdbcType=INTEGER},
+      </if>
+      <if test="doormanPayMethod != null" >
+        #{doormanPayMethod,jdbcType=INTEGER},
+      </if>
+      <if test="selectedPayFlag != null" >
+        #{selectedPayFlag,jdbcType=INTEGER},
+      </if>
+      <if test="businessId != null" >
+        #{businessId,jdbcType=INTEGER},
+      </if>
+      <if test="goHomeStatus != null" >
+        #{goHomeStatus,jdbcType=INTEGER},
+      </if>
+      <if test="autoLevelUp != null" >
+        #{autoLevelUp,jdbcType=INTEGER},
+      </if>
+      <if test="bookingDriverId != null" >
+        #{bookingDriverId,jdbcType=INTEGER},
+      </if>
+      <if test="isOtherDrivers != null" >
+        #{isOtherDrivers,jdbcType=INTEGER},
+      </if>
+      <if test="bookingCurrentAddr != null" >
+        #{bookingCurrentAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="bookingCurrentPoint != null" >
+        #{bookingCurrentPoint,jdbcType=VARCHAR},
+      </if>
+      <if test="bookingUserPhone != null" >
+        #{bookingUserPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="buyoutFlag != null" >
+        #{buyoutFlag,jdbcType=INTEGER},
+      </if>
+      <if test="buyoutPrice != null" >
+        #{buyoutPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="bookingIdNumber != null" >
+        #{bookingIdNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="estimatedId != null" >
+        #{estimatedId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null" >
+        #{agentId,jdbcType=INTEGER},
+      </if>
+      <if test="memo != null" >
+        #{memo,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.rentcar.CarFactOrder" >
+    update car_fact_order
+    <set >
+      <if test="orderNo != null" >
+        order_no = #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="pushDriverType != null" >
+        push_driver_type = #{pushDriverType,jdbcType=INTEGER},
+      </if>
+      <if test="orderType != null" >
+        order_type = #{orderType,jdbcType=INTEGER},
+      </if>
+      <if test="bookingUserId != null" >
+        booking_user_id = #{bookingUserId,jdbcType=INTEGER},
+      </if>
+      <if test="bookingDate != null" >
+        booking_date = #{bookingDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="riderName != null" >
+        rider_name = #{riderName,jdbcType=VARCHAR},
+      </if>
+      <if test="riderPhone != null" >
+        rider_phone = #{riderPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="bookingStartAddr != null" >
+        booking_start_addr = #{bookingStartAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="bookingStartPoint != null" >
+        booking_start_point = #{bookingStartPoint,jdbcType=VARCHAR},
+      </if>
+      <if test="bookingEndAddr != null" >
+        booking_end_addr = #{bookingEndAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="bookingEndPoint != null" >
+        booking_end_point = #{bookingEndPoint,jdbcType=VARCHAR},
+      </if>
+      <if test="factStartAddr != null" >
+        fact_start_addr = #{factStartAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="factStartPoint != null" >
+        fact_start_point = #{factStartPoint,jdbcType=VARCHAR},
+      </if>
+      <if test="factEndAddr != null" >
+        fact_end_addr = #{factEndAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="factEndPoint != null" >
+        fact_end_point = #{factEndPoint,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="serviceTypeId != null" >
+        service_type_id = #{serviceTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="carGroupId != null" >
+        car_group_id = #{carGroupId,jdbcType=INTEGER},
+      </if>
+      <if test="driverId != null" >
+        driver_id = #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="licensePlates != null" >
+        license_plates = #{licensePlates,jdbcType=VARCHAR},
+      </if>
+      <if test="airlineNo != null" >
+        airline_no = #{airlineNo,jdbcType=VARCHAR},
+      </if>
+      <if test="airlineStatus != null" >
+        airline_status = #{airlineStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="airlinePlanDate != null" >
+        airline_plan_date = #{airlinePlanDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="airlineArrDate != null" >
+        airline_arr_date = #{airlineArrDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="airlineDepCode != null" >
+        airline_dep_code = #{airlineDepCode,jdbcType=VARCHAR},
+      </if>
+      <if test="airlineArrCode != null" >
+        airline_arr_code = #{airlineArrCode,jdbcType=VARCHAR},
+      </if>
+      <if test="channelsNum != null" >
+        channels_num = #{channelsNum,jdbcType=VARCHAR},
+      </if>
+      <if test="receiveSms != null" >
+        receive_SMS = #{receiveSms,jdbcType=INTEGER},
+      </if>
+      <if test="estimatedAmount != null" >
+        estimated_Amount = #{estimatedAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="airportId != null" >
+        airport_id = #{airportId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="factDate != null" >
+        fact_date = #{factDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="bookingGroupids != null" >
+        booking_groupids = #{bookingGroupids,jdbcType=VARCHAR},
+      </if>
+      <if test="factDriverId != null" >
+        fact_driver_id = #{factDriverId,jdbcType=INTEGER},
+      </if>
+      <if test="factEndDate != null" >
+        fact_end_date = #{factEndDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="imei != null" >
+        imei = #{imei,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null" >
+        version = #{version,jdbcType=VARCHAR},
+      </if>
+      <if test="mobelVersion != null" >
+        mobel_version = #{mobelVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="sysVersion != null" >
+        sys_version = #{sysVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="platform != null" >
+        platform = #{platform,jdbcType=VARCHAR},
+      </if>
+      <if test="payFlag != null" >
+        pay_flag = #{payFlag,jdbcType=INTEGER},
+      </if>
+      <if test="cancelorderPenalty != null" >
+        cancelorder_penalty = #{cancelorderPenalty,jdbcType=DECIMAL},
+      </if>
+      <if test="charteredId != null" >
+        chartered_id = #{charteredId,jdbcType=INTEGER},
+      </if>
+      <if test="charteredOrderNo != null" >
+        chartered_order_no = #{charteredOrderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="isOrderOthers != null" >
+        is_order_others = #{isOrderOthers,jdbcType=INTEGER},
+      </if>
+      <if test="doormanPayMethod != null" >
+        doorman_pay_method = #{doormanPayMethod,jdbcType=INTEGER},
+      </if>
+      <if test="selectedPayFlag != null" >
+        selected_pay_flag = #{selectedPayFlag,jdbcType=INTEGER},
+      </if>
+      <if test="businessId != null" >
+        business_id = #{businessId,jdbcType=INTEGER},
+      </if>
+      <if test="goHomeStatus != null" >
+        go_home_status = #{goHomeStatus,jdbcType=INTEGER},
+      </if>
+      <if test="autoLevelUp != null" >
+        auto_level_up = #{autoLevelUp,jdbcType=INTEGER},
+      </if>
+      <if test="bookingDriverId != null" >
+        booking_driver_id = #{bookingDriverId,jdbcType=INTEGER},
+      </if>
+      <if test="isOtherDrivers != null" >
+        is_other_drivers = #{isOtherDrivers,jdbcType=INTEGER},
+      </if>
+      <if test="bookingCurrentAddr != null" >
+        booking_current_addr = #{bookingCurrentAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="bookingCurrentPoint != null" >
+        booking_current_point = #{bookingCurrentPoint,jdbcType=VARCHAR},
+      </if>
+      <if test="bookingUserPhone != null" >
+        booking_user_phone = #{bookingUserPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="buyoutFlag != null" >
+        buyout_flag = #{buyoutFlag,jdbcType=INTEGER},
+      </if>
+      <if test="buyoutPrice != null" >
+        buyout_price = #{buyoutPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="bookingIdNumber != null" >
+        booking_id_number = #{bookingIdNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="estimatedId != null" >
+        estimated_id = #{estimatedId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null" >
+        agent_id = #{agentId,jdbcType=INTEGER},
+      </if>
+      <if test="memo != null" >
+        memo = #{memo,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where order_id = #{orderId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zhuanche.entity.rentcar.CarFactOrder" >
+    update car_fact_order
+    set order_no = #{orderNo,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      push_driver_type = #{pushDriverType,jdbcType=INTEGER},
+      order_type = #{orderType,jdbcType=INTEGER},
+      booking_user_id = #{bookingUserId,jdbcType=INTEGER},
+      booking_date = #{bookingDate,jdbcType=TIMESTAMP},
+      rider_name = #{riderName,jdbcType=VARCHAR},
+      rider_phone = #{riderPhone,jdbcType=VARCHAR},
+      booking_start_addr = #{bookingStartAddr,jdbcType=VARCHAR},
+      booking_start_point = #{bookingStartPoint,jdbcType=VARCHAR},
+      booking_end_addr = #{bookingEndAddr,jdbcType=VARCHAR},
+      booking_end_point = #{bookingEndPoint,jdbcType=VARCHAR},
+      fact_start_addr = #{factStartAddr,jdbcType=VARCHAR},
+      fact_start_point = #{factStartPoint,jdbcType=VARCHAR},
+      fact_end_addr = #{factEndAddr,jdbcType=VARCHAR},
+      fact_end_point = #{factEndPoint,jdbcType=VARCHAR},
+      city_id = #{cityId,jdbcType=INTEGER},
+      service_type_id = #{serviceTypeId,jdbcType=INTEGER},
+      car_group_id = #{carGroupId,jdbcType=INTEGER},
+      driver_id = #{driverId,jdbcType=INTEGER},
+      license_plates = #{licensePlates,jdbcType=VARCHAR},
+      airline_no = #{airlineNo,jdbcType=VARCHAR},
+      airline_status = #{airlineStatus,jdbcType=VARCHAR},
+      airline_plan_date = #{airlinePlanDate,jdbcType=TIMESTAMP},
+      airline_arr_date = #{airlineArrDate,jdbcType=TIMESTAMP},
+      airline_dep_code = #{airlineDepCode,jdbcType=VARCHAR},
+      airline_arr_code = #{airlineArrCode,jdbcType=VARCHAR},
+      channels_num = #{channelsNum,jdbcType=VARCHAR},
+      receive_SMS = #{receiveSms,jdbcType=INTEGER},
+      estimated_Amount = #{estimatedAmount,jdbcType=DECIMAL},
+      airport_id = #{airportId,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      create_by = #{createBy,jdbcType=INTEGER},
+      update_by = #{updateBy,jdbcType=INTEGER},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      fact_date = #{factDate,jdbcType=TIMESTAMP},
+      booking_groupids = #{bookingGroupids,jdbcType=VARCHAR},
+      fact_driver_id = #{factDriverId,jdbcType=INTEGER},
+      fact_end_date = #{factEndDate,jdbcType=TIMESTAMP},
+      imei = #{imei,jdbcType=VARCHAR},
+      version = #{version,jdbcType=VARCHAR},
+      mobel_version = #{mobelVersion,jdbcType=VARCHAR},
+      sys_version = #{sysVersion,jdbcType=VARCHAR},
+      platform = #{platform,jdbcType=VARCHAR},
+      pay_flag = #{payFlag,jdbcType=INTEGER},
+      cancelorder_penalty = #{cancelorderPenalty,jdbcType=DECIMAL},
+      chartered_id = #{charteredId,jdbcType=INTEGER},
+      chartered_order_no = #{charteredOrderNo,jdbcType=VARCHAR},
+      is_order_others = #{isOrderOthers,jdbcType=INTEGER},
+      doorman_pay_method = #{doormanPayMethod,jdbcType=INTEGER},
+      selected_pay_flag = #{selectedPayFlag,jdbcType=INTEGER},
+      business_id = #{businessId,jdbcType=INTEGER},
+      go_home_status = #{goHomeStatus,jdbcType=INTEGER},
+      auto_level_up = #{autoLevelUp,jdbcType=INTEGER},
+      booking_driver_id = #{bookingDriverId,jdbcType=INTEGER},
+      is_other_drivers = #{isOtherDrivers,jdbcType=INTEGER},
+      booking_current_addr = #{bookingCurrentAddr,jdbcType=VARCHAR},
+      booking_current_point = #{bookingCurrentPoint,jdbcType=VARCHAR},
+      booking_user_phone = #{bookingUserPhone,jdbcType=VARCHAR},
+      buyout_flag = #{buyoutFlag,jdbcType=INTEGER},
+      buyout_price = #{buyoutPrice,jdbcType=DECIMAL},
+      booking_id_number = #{bookingIdNumber,jdbcType=VARCHAR},
+      estimated_id = #{estimatedId,jdbcType=VARCHAR},
+      agent_id = #{agentId,jdbcType=INTEGER},
+      memo = #{memo,jdbcType=LONGVARCHAR}
+    where order_id = #{orderId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.rentcar.CarFactOrder" >
+    update car_fact_order
+    set order_no = #{orderNo,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      push_driver_type = #{pushDriverType,jdbcType=INTEGER},
+      order_type = #{orderType,jdbcType=INTEGER},
+      booking_user_id = #{bookingUserId,jdbcType=INTEGER},
+      booking_date = #{bookingDate,jdbcType=TIMESTAMP},
+      rider_name = #{riderName,jdbcType=VARCHAR},
+      rider_phone = #{riderPhone,jdbcType=VARCHAR},
+      booking_start_addr = #{bookingStartAddr,jdbcType=VARCHAR},
+      booking_start_point = #{bookingStartPoint,jdbcType=VARCHAR},
+      booking_end_addr = #{bookingEndAddr,jdbcType=VARCHAR},
+      booking_end_point = #{bookingEndPoint,jdbcType=VARCHAR},
+      fact_start_addr = #{factStartAddr,jdbcType=VARCHAR},
+      fact_start_point = #{factStartPoint,jdbcType=VARCHAR},
+      fact_end_addr = #{factEndAddr,jdbcType=VARCHAR},
+      fact_end_point = #{factEndPoint,jdbcType=VARCHAR},
+      city_id = #{cityId,jdbcType=INTEGER},
+      service_type_id = #{serviceTypeId,jdbcType=INTEGER},
+      car_group_id = #{carGroupId,jdbcType=INTEGER},
+      driver_id = #{driverId,jdbcType=INTEGER},
+      license_plates = #{licensePlates,jdbcType=VARCHAR},
+      airline_no = #{airlineNo,jdbcType=VARCHAR},
+      airline_status = #{airlineStatus,jdbcType=VARCHAR},
+      airline_plan_date = #{airlinePlanDate,jdbcType=TIMESTAMP},
+      airline_arr_date = #{airlineArrDate,jdbcType=TIMESTAMP},
+      airline_dep_code = #{airlineDepCode,jdbcType=VARCHAR},
+      airline_arr_code = #{airlineArrCode,jdbcType=VARCHAR},
+      channels_num = #{channelsNum,jdbcType=VARCHAR},
+      receive_SMS = #{receiveSms,jdbcType=INTEGER},
+      estimated_Amount = #{estimatedAmount,jdbcType=DECIMAL},
+      airport_id = #{airportId,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      create_by = #{createBy,jdbcType=INTEGER},
+      update_by = #{updateBy,jdbcType=INTEGER},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      fact_date = #{factDate,jdbcType=TIMESTAMP},
+      booking_groupids = #{bookingGroupids,jdbcType=VARCHAR},
+      fact_driver_id = #{factDriverId,jdbcType=INTEGER},
+      fact_end_date = #{factEndDate,jdbcType=TIMESTAMP},
+      imei = #{imei,jdbcType=VARCHAR},
+      version = #{version,jdbcType=VARCHAR},
+      mobel_version = #{mobelVersion,jdbcType=VARCHAR},
+      sys_version = #{sysVersion,jdbcType=VARCHAR},
+      platform = #{platform,jdbcType=VARCHAR},
+      pay_flag = #{payFlag,jdbcType=INTEGER},
+      cancelorder_penalty = #{cancelorderPenalty,jdbcType=DECIMAL},
+      chartered_id = #{charteredId,jdbcType=INTEGER},
+      chartered_order_no = #{charteredOrderNo,jdbcType=VARCHAR},
+      is_order_others = #{isOrderOthers,jdbcType=INTEGER},
+      doorman_pay_method = #{doormanPayMethod,jdbcType=INTEGER},
+      selected_pay_flag = #{selectedPayFlag,jdbcType=INTEGER},
+      business_id = #{businessId,jdbcType=INTEGER},
+      go_home_status = #{goHomeStatus,jdbcType=INTEGER},
+      auto_level_up = #{autoLevelUp,jdbcType=INTEGER},
+      booking_driver_id = #{bookingDriverId,jdbcType=INTEGER},
+      is_other_drivers = #{isOtherDrivers,jdbcType=INTEGER},
+      booking_current_addr = #{bookingCurrentAddr,jdbcType=VARCHAR},
+      booking_current_point = #{bookingCurrentPoint,jdbcType=VARCHAR},
+      booking_user_phone = #{bookingUserPhone,jdbcType=VARCHAR},
+      buyout_flag = #{buyoutFlag,jdbcType=INTEGER},
+      buyout_price = #{buyoutPrice,jdbcType=DECIMAL},
+      booking_id_number = #{bookingIdNumber,jdbcType=VARCHAR},
+      estimated_id = #{estimatedId,jdbcType=VARCHAR},
+      agent_id = #{agentId,jdbcType=INTEGER}
+    where order_id = #{orderId,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -12,6 +12,10 @@ public interface CarRelateGroupExMapper {
 
     CarRelateGroup selectOneGroup(CarRelateGroup group);
 
+	List<CarRelateGroup> queryByParams(CarRelateGroup group);
+
+	List<Integer> queryDriversByParams(CarRelateGroup group);
+
     /**
      * 根据司机ID删除
      * @param driverId

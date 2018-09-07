@@ -2,6 +2,7 @@ package com.zhuanche.serv.deiver;
 
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.controller.driverteam.CarInfoTemporaryController;
 import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
 import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
@@ -11,6 +12,7 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
 import com.zhuanche.util.Common;
+import com.zhuanche.util.excel.ExportExcelUtil;
 import mapper.mdbcarmanage.CarBizCarInfoTempMapper;
 import mapper.mdbcarmanage.ex.CarBizCarInfoTempExMapper;
 import mapper.mdbcarmanage.ex.CarBizDriverInfoTempExMapper;
@@ -18,18 +20,17 @@ import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarBizModelExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -40,7 +41,7 @@ import java.util.*;
 @Service
 public class CarBizCarInfoTempService {
 
-    private static Log log =  LogFactory.getLog(CarBizCarInfoTempService.class);
+    private static final Logger log =  LoggerFactory.getLogger(CarBizCarInfoTempService.class);
 
     private final static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -152,21 +153,20 @@ public class CarBizCarInfoTempService {
         }
     }
 
-    public AjaxResponse importCarInfo(CarBizCarInfoTemp params,HttpServletRequest request) {
-        String resultErrorMag1 = "导入模板格式错误!";
-
+    /**
+     * 车辆导入
+     * @param is
+     * @param request
+     * @return
+     */
+    public AjaxResponse importCarInfo(InputStream is,String prefix,HttpServletRequest request,HttpServletResponse response,Integer cityId,Integer supplierId) {
         String licensePlates = "";
-        Map<String, Object> result = new HashMap<String, Object>();
+        String resultErrorMag1 = "导入模板格式错误!";
         List<CarImportExceptionEntity> listException = new ArrayList<CarImportExceptionEntity>();
         SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
-        String fileName = params.getFileName();
-        String path = Common.getPath(request);
-        String dirPath = path + params.getFileName();
-        File DRIVERINFO = new File(dirPath);
         try {
-            InputStream is = new FileInputStream(DRIVERINFO);
             Workbook workbook = null;
-            String fileType = fileName.split("\\.")[1];
+            String fileType = prefix.split("\\.")[1];
             if (fileType.equals("xls")) {
                 workbook = new HSSFWorkbook(is);
             } else if (fileType.equals("xlsx")) {
@@ -421,8 +421,8 @@ public class CarBizCarInfoTempService {
                 carBizCarInfo.setStatus(1);
                 carBizCarInfo.setCreateBy(user.getId());
                 carBizCarInfo.setUpdateBy(user.getId());
-                carBizCarInfo.setCityId(params.getCityId());
-                carBizCarInfo.setSupplierId(params.getSupplierId());
+                carBizCarInfo.setCityId(cityId);
+                carBizCarInfo.setSupplierId(supplierId);
                 // 车辆导入模板总共41 列
                 for (int colIx = 0; colIx < 43; colIx++) {
                     Cell cell = row.getCell(colIx); // 获取列对象
@@ -1769,11 +1769,17 @@ public class CarBizCarInfoTempService {
         }
         String download = "";
         try {
-            // 将错误列表导出
+            //将错误列表导出
             if (listException.size() > 0) {
-                Workbook wb = Common.exportExcel(request.getServletContext().getRealPath("/") + "template" + File.separator + "car_exception.xlsx", listException);
-                download = Common.exportExcelFromTempletToLoacl(request, wb,
-                        new String("ERROR".getBytes("utf-8"), "iso8859-1"));
+                /*response.setContentType("application/octet-stream;charset=ISO8859-1");
+                response.setHeader("Content-Disposition", "attachment;filename=" + new String("车辆导入错误列表".getBytes("GB2312"), "ISO8859-1") + ".xls");
+                response.addHeader("Pargam", "no-cache");
+                response.addHeader("Cache-Control", "no-cache");
+                Collection c = listException;
+                new ExportExcelUtil<>().exportExcel("车辆导入错误Excel", new String[]{"车牌号","错误原因"}, c, response.getOutputStream());*/
+                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+            }else{
+                return AjaxResponse.success(RestErrorCode.SUCCESS);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1809,24 +1815,23 @@ public class CarBizCarInfoTempService {
         return result;
     }
 
-    public AjaxResponse importCarInfo4Bus(CarBizCarInfoTemp params, HttpServletRequest request) {
+    /**
+     * 巴士车辆导入
+     * @param is
+     * @param prefix
+     * @return
+     */
+    public AjaxResponse importCarInfo4Bus(InputStream is,String prefix,HttpServletRequest request,HttpServletResponse response,Integer cityId,Integer supplierId) {
         log.info("车辆（巴士）信息导入");
         String resultErrorMag1 = "导入模板格式错误!";
         String licensePlates = "";
-        Map<String, Object> result = new HashMap<String, Object>();
         List<CarImportExceptionEntity> listException = new ArrayList<CarImportExceptionEntity>();
         SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
-        String fileName = params.getFileName();
-        String path = Common.getPath(request);
-        String dirPath = path + params.getFileName();
-        File DRIVERINFO = new File(dirPath);
         try {
-            InputStream is = new FileInputStream(DRIVERINFO);
             Workbook workbook = null;
-            String fileType = fileName.split("\\.")[1];
-            if (fileType.equals("xls")) {
+            if (prefix.equals("xls")) {
                 workbook = new HSSFWorkbook(is);
-            } else if (fileType.equals("xlsx")) {
+            } else if (prefix.equals("xlsx")) {
                 workbook = new XSSFWorkbook(is);
             }
             Sheet sheet = workbook.getSheetAt(0);
@@ -1870,8 +1875,10 @@ public class CarBizCarInfoTempService {
                 entity.setStatus(1);
                 entity.setCreateBy(user.getId());
                 entity.setUpdateBy(user.getId());
-                entity.setCityId(params.getCityId());
-                entity.setSupplierId(params.getSupplierId());
+                entity.setCreateBy(1);
+                entity.setUpdateBy(1);
+                entity.setCityId(cityId);
+                entity.setSupplierId(supplierId);
                 // 车辆导入模板总共41 列
                 for (int colIx = 0; colIx < row1.getLastCellNum(); colIx++) {
                     Cell cell = row.getCell(colIx); // 获取列对象
@@ -1885,9 +1892,7 @@ public class CarBizCarInfoTempService {
                     switch (colIx) {
                         // 车牌号
                         case 3:
-                            if (cellValue == null
-                                    || StringUtils.isEmpty(cellValue
-                                    .getStringValue())) {
+                            if (cellValue == null|| StringUtils.isEmpty(cellValue.getStringValue())) {
                                 CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                                 returnVO.setLicensePlates(licensePlates);
                                 returnVO.setReson("第" + (rowIx + 1) + "行数据，第"
@@ -2072,7 +2077,6 @@ public class CarBizCarInfoTempService {
                                 isTrue = false;
                             } else {
                                 // 判断车型是否存在
-                                System.out.println(cellValue.getStringValue());
                                 Integer carModelId = carBizModelExMapper.queryCarModelByCarModelName(cellValue.getStringValue().trim());
                                 if (carModelId == null) {
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -2109,7 +2113,9 @@ public class CarBizCarInfoTempService {
                     entity.setVehicleEngineWheelbase("6000");
                     //所属车主(供应商保持一直)
                     CarBizSupplier carBizSupplier = new CarBizSupplier();
-                    carBizSupplier.setSupplierId(params.getSupplierId());
+                    if(!user.getSupplierIds().isEmpty()){
+                        carBizSupplier.setSupplierId(user.getSupplierIds().iterator().next());
+                    }
                     CarBizSupplier resultSupplier = carBizSupplierExMapper.queryForObject(carBizSupplier);
                     if (resultSupplier != null && resultSupplier.getSupplierFullName() != null) {
                         entity.setVehicleOwner(resultSupplier.getSupplierFullName());
@@ -2156,10 +2162,8 @@ public class CarBizCarInfoTempService {
                     entity.setStatus(1);
                     //备注
                     try {
-                        log.error("车辆（巴士）信息导入，保存信息 param=" + entity.toString());
-                        carBizCarInfoTempMapper.insert(entity);
-                        result.put("result", "1");
-                        result.put("msg", "");
+                        log.info("车辆（巴士）信息导入，保存信息 param=" + entity.toString());
+                        carBizCarInfoTempMapper.insertSelective(entity);
                     } catch (Exception e) {
                         log.error("车辆（巴士）信息导入，保存信息  error：" + e);
                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -2170,23 +2174,26 @@ public class CarBizCarInfoTempService {
                 }
             }
         } catch (Exception e) {
+            log.error("导入巴士车辆error:",e);
             e.printStackTrace();
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
-        String download = "";
         try {
-            // 将错误列表导出
+            //将错误列表导出
             if (listException.size() > 0) {
-                Workbook wb = Common.exportExcel(request.getServletContext().getRealPath("/") + "template" + File.separator + "car_exception.xlsx", listException);
-                download = Common.exportExcelFromTempletToLoacl(request, wb,
-                        new String("ERROR".getBytes("utf-8"), "iso8859-1"));
+                /*response.setContentType("application/octet-stream;charset=ISO8859-1");
+                response.setHeader("Content-Disposition", "attachment;filename=" + new String("巴士车辆导入错误列表".getBytes("GB2312"), "ISO8859-1") + ".xls");
+                response.addHeader("Pargam", "no-cache");
+                response.addHeader("Cache-Control", "no-cache");
+                Collection c = listException;
+                new ExportExcelUtil<>().exportExcel("巴士车辆导入错误Excel", new String[]{"车牌号","错误原因"}, c, response.getOutputStream());*/
+                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+            }else{
+                return AjaxResponse.success(RestErrorCode.SUCCESS);
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        if(!"".equals(download)&&download!=null){
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,download);
-        }else{
-            return AjaxResponse.success(RestErrorCode.SUCCESS);
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
     }
 }

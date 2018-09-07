@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.DriverDutyStatisticExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.DriverDutyStatistic" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="driverId" property="driverid" jdbcType="INTEGER" />
+    <result column="licensePlates" property="licenseplates" jdbcType="VARCHAR" />
+    <result column="time" property="time" jdbcType="DATE" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="cityId" property="cityid" jdbcType="INTEGER" />
+    <result column="allTime" property="alltime" jdbcType="DOUBLE" />
+    <result column="zgfTime" property="zgftime" jdbcType="DOUBLE" />
+    <result column="wgfTime" property="wgftime" jdbcType="DOUBLE" />
+    <result column="dutyTime" property="dutytime" jdbcType="DOUBLE" />
+    <result column="forcedTime" property="forcedtime" jdbcType="DOUBLE" />
+    <result column="overTime" property="overtime" jdbcType="DOUBLE" />
+    <result column="supplierId" property="supplierid" jdbcType="INTEGER" />
+    <result column="forcedTime1" property="forcedtime1" jdbcType="DOUBLE" />
+    <result column="forcedTime2" property="forcedtime2" jdbcType="DOUBLE" />
+    <result column="forcedTime3" property="forcedtime3" jdbcType="DOUBLE" />
+    <result column="forcedTime4" property="forcedtime4" jdbcType="DOUBLE" />
+    <result column="carGroupId" property="cargroupid" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, driverId, licensePlates, time, name, phone, cityId, allTime, zgfTime, wgfTime, 
+    dutyTime, forcedTime, overTime, supplierId, forcedTime1, forcedTime2, forcedTime3, 
+    forcedTime4, carGroupId
+  </sql>
+
+
+  <select id="queryForListObject" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDutyStatisticParams" resultType="com.zhuanche.entity.mdbcarmanage.DriverDutyStatistic">
+    select
+    <include refid="Base_Column_List" />
+    <if test="value !=null and value !='' and value==1 ">
+      ,t.dutyTimeAll
+      ,t.forcedTimeAll
+    </if>
+    from ${table} t where 1 =1
+    <if test="startTime!=null and startTime!=''">
+      and t.time >= #{startTime}
+    </if>
+    <if test="endTime!=null and endTime!=''">
+      <![CDATA[ and t.time <= #{endTime} ]]>
+    </if>
+    <if test="(startTime==null or startTime=='') and (endTime==null or endTime=='')">
+      and t.time = #{yyyyMMdd}
+    </if>
+    <if test="name!=null and name!=''">
+      and t.name = #{name}
+    </if>
+    <if test="phone !=null and phone !=''">
+      and t.phone = #{phone}
+    </if>
+    <if test="licensePlates!=null and licensePlates!=''">
+      and t.licensePlates = #{licensePlates}
+    </if>
+    <if test="cityId !=null and cityId !=''">
+      and t.cityId = #{cityId}
+    </if>
+    <if test="supplierId !=null and supplierId !=''">
+      and t.supplierId = #{supplierId}
+    </if>
+    <if test="cities!=null and cities!=''">
+      and t.cityId in (${cities})
+    </if>
+    <if test="suppliers!=null and suppliers!=''">
+      and t.supplierId in (${suppliers})
+    </if>
+    <if test="driverIds!=null and driverIds!=''">
+      and t.driverId in (${driverIds})
+    </if>
+    <if test="driverId!=null and driverId!=''">
+      and t.driverId = #{driverId}
+    </if>
+    <if test="sortName ==null or sortName ==''">
+      ORDER BY time, id desc
+    </if>
+    <if test="sortName !=null and sortName !=''">
+      ORDER BY
+      ${sortName},id ${sortOrder}
+    </if>
+  </select>
+
+
+  <select id="queryDriverMonthDutyList" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDutyStatisticParams" resultType="com.zhuanche.entity.mdbcarmanage.DriverDutyStatistic">
+    SELECT
+    t.id,
+    t.driverId,
+    t.time,
+    t.licensePlates,
+    t.name,
+    t.phone,
+    t.cityId,
+    sum(IFNULL(t.allTime, 0)) allTime,
+    sum(IFNULL(t.zgfTime, 0)) zgfTime,
+    sum(IFNULL(t.wgfTime, 0)) wgfTime,
+    sum(IFNULL(t.dutyTime, 0)) dutyTime,
+    sum(IFNULL(t.forcedTime,0)) forcedTime,
+    sum(IFNULL(t.overTime, 0)) overTime,
+    sum(IFNULL(t.forcedTime1, 0)) forcedTime1,
+    sum(IFNULL(t.forcedTime2, 0)) forcedTime2,
+    sum(IFNULL(t.forcedTime3, 0)) forcedTime3,
+    sum(IFNULL(t.forcedTime4, 0)) forcedTime4,
+    t.supplierId
+    <if test="value !=null and value !='' and value==1 ">
+      ,sum(IFNULL(t.dutyTimeAll, 0)) dutyTimeAll
+      ,sum(IFNULL(t.forcedTimeAll, 0)) forcedTimeAll
+    </if>
+    FROM
+    ${table} t where 1=1
+    <if test="name!=null and name!=''">
+      and t.name = #{name}
+    </if>
+    <if test="licensePlates!=null and licensePlates!=''">
+      and t.licensePlates = #{licensePlates}
+    </if>
+    <if test="cityId !=null and cityId !=''">
+      and t.cityId = #{cityId}
+    </if>
+    <if test="cities!=null and cities!=''">
+      and t.cityId in (${cities})
+    </if>
+    <if test="supplierId !=null and supplierId !=''">
+      and t.supplierId = #{supplierId}
+    </if>
+    <if test="suppliers!=null and suppliers!=''">
+      and t.supplierId in (${suppliers})
+    </if>
+    <if test="driverIds!=null and driverIds!=''">
+      and t.driverId in (${driverIds})
+    </if>
+    GROUP BY licensePlates
+    <if test="sortName ==null or sortName ==''">
+      ORDER BY licensePlates,time, id desc
+    </if>
+    <if test="sortName !=null and sortName !=''">
+      ORDER BY
+      ${sortName},id ${sortOrder}
+    </if>
+  </select>
+</mapper>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.ex.CarSysMobileClientPublishExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarSysMobileClientPublish" >
+    <id column="version_id" property="versionId" jdbcType="INTEGER" />
+    <result column="version_name" property="versionName" jdbcType="VARCHAR" />
+    <result column="version_no" property="versionNo" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="platform" property="platform" jdbcType="INTEGER" />
+    <result column="download_url" property="downloadUrl" jdbcType="VARCHAR" />
+    <result column="forced_update" property="forcedUpdate" jdbcType="INTEGER" />
+    <result column="forced_update_down" property="forcedUpdateDown" jdbcType="INTEGER" />
+    <result column="channel_num" property="channelNum" jdbcType="VARCHAR" />
+    <result column="publisher" property="publisher" jdbcType="INTEGER" />
+    <result column="publish_date" property="publishDate" jdbcType="TIMESTAMP" />
+    <result column="memo" property="memo" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="city_names" property="cityNames" jdbcType="VARCHAR" />
+    <result column="supplier_str" property="supplierStr" jdbcType="VARCHAR" />
+    <result column="effective_date" property="effectiveDate" jdbcType="VARCHAR" />
+    <result column="sorts_num" property="sortsNum" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    version_id, version_name, version_no, type, platform, download_url, forced_update,
+    forced_update_down, channel_num, publisher, publish_date, memo, status, create_by,
+    create_date, update_by, update_date, city_names, supplier_str, effective_date, sorts_num
+  </sql>
+
+  <select id="queryMobileClientPublishInfo" resultMap="BaseResultMap" parameterType="string" >
+    select
+    version_id,version_name, version_no, platform, download_url, forced_update,
+    forced_update_down, publisher, publish_date, memo
+    from car_sys_mobile_client_publish
+    where type = 0 and status = 1
+    <if test="value != null and value !='' " >
+      and channel_num = '${value}'
+    </if>
+    order by create_date desc
+    limit 1
+  </select>
+
+</mapper>

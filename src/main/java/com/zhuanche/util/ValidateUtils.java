@@ -199,7 +199,7 @@ public class ValidateUtils {
     /**
      * 功能：判断字符串是否为日期格式
      * 
-     * @param str
+     * @param strDate
      * @return
      */
     public static boolean isDate(String strDate) {

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdblog.ex.StatisticDutyHalfExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdblog.StatisticDutyHalf" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="time" property="time" jdbcType="VARCHAR" />
+    <result column="driverId" property="driverid" jdbcType="INTEGER" />
+    <result column="licensePlates" property="licenseplates" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="dutyStatus" property="dutystatus" jdbcType="SMALLINT" />
+    <result column="serviceStatus" property="servicestatus" jdbcType="SMALLINT" />
+    <result column="onlineStatus" property="onlinestatus" jdbcType="SMALLINT" />
+    <result column="positionX" property="positionx" jdbcType="VARCHAR" />
+    <result column="positionY" property="positiony" jdbcType="VARCHAR" />
+    <result column="positionBaiduX" property="positionbaidux" jdbcType="VARCHAR" />
+    <result column="positionBaiduY" property="positionbaiduy" jdbcType="VARCHAR" />
+    <result column="allTime" property="alltime" jdbcType="DOUBLE" />
+    <result column="zgfTime" property="zgftime" jdbcType="DOUBLE" />
+    <result column="wgfTime" property="wgftime" jdbcType="DOUBLE" />
+    <result column="dutyTime" property="dutytime" jdbcType="DOUBLE" />
+    <result column="forcedTime" property="forcedtime" jdbcType="DOUBLE" />
+    <result column="overTime" property="overtime" jdbcType="DOUBLE" />
+    <result column="forcedTime1" property="forcedtime1" jdbcType="DOUBLE" />
+    <result column="forcedTime2" property="forcedtime2" jdbcType="DOUBLE" />
+    <result column="forcedTime3" property="forcedtime3" jdbcType="DOUBLE" />
+    <result column="forcedTime4" property="forcedtime4" jdbcType="DOUBLE" />
+    <result column="cityId" property="cityid" jdbcType="INTEGER" />
+    <result column="supplierId" property="supplierid" jdbcType="INTEGER" />
+    <result column="carGroupId" property="cargroupid" jdbcType="INTEGER" />
+    <result column="dutyTimeAll" property="dutytimeall" jdbcType="DOUBLE" />
+    <result column="forcedTimeAll" property="forcedtimeall" jdbcType="DOUBLE" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, time, driverId, licensePlates, name, phone, dutyStatus, serviceStatus, onlineStatus, 
+    positionX, positionY, positionBaiduX, positionBaiduY, allTime, zgfTime, wgfTime, 
+    dutyTime, forcedTime, overTime, forcedTime1, forcedTime2, forcedTime3, forcedTime4, 
+    cityId, supplierId, carGroupId, dutyTimeAll, forcedTimeAll
+  </sql>
+
+
+  <select id="queryDriverDutyHalfByDriverId" parameterType="com.zhuanche.entity.mdblog.StatisticDutyHalfParams" resultType="com.zhuanche.entity.mdblog.StatisticDutyHalf">
+    select
+    t.id,t.driverId,t.licensePlates,t.time,t.name,t.phone,t.cityId,t.allTime,t.zgfTime,t.wgfTime,
+    t.dutyTime,t.forcedTime,t.overTime, t.supplierId,
+    forcedTime1, forcedTime2, forcedTime3, forcedTime4
+    <if test="value !=null and value !='' and value==1 ">
+      ,t.dutyTimeAll
+      ,t.forcedTimeAll
+    </if>
+    from ${table} t where driverId = #{driverId}
+     order by t.time asc
+  </select>
+
+</mapper>

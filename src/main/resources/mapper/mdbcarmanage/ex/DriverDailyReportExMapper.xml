@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.DriverDailyReportExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.DriverDailyReport" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="stat_date" property="statDate" jdbcType="DATE" />
+    <result column="license_plates" property="licensePlates" jdbcType="VARCHAR" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="operation_num" property="operationNum" jdbcType="INTEGER" />
+    <result column="up_online_time" property="upOnlineTime" jdbcType="TIMESTAMP" />
+    <result column="order_time" property="orderTime" jdbcType="DECIMAL" />
+    <result column="service_time" property="serviceTime" jdbcType="DECIMAL" />
+    <result column="online_time" property="onlineTime" jdbcType="DECIMAL" />
+    <result column="actual_pay" property="actualPay" jdbcType="DECIMAL" />
+    <result column="driver_get_pay" property="driverGetPay" jdbcType="DECIMAL" />
+    <result column="driver_out_pay" property="driverOutPay" jdbcType="DECIMAL" />
+    <result column="order_mileage" property="orderMileage" jdbcType="DECIMAL" />
+    <result column="service_mileage" property="serviceMileage" jdbcType="DECIMAL" />
+    <result column="assign_order_num" property="assignOrderNum" jdbcType="INTEGER" />
+    <result column="contend_order_num" property="contendOrderNum" jdbcType="INTEGER" />
+    <result column="platform_order_num" property="platformOrderNum" jdbcType="INTEGER" />
+    <result column="get_plane_num" property="getPlaneNum" jdbcType="INTEGER" />
+    <result column="out_plane_num" property="outPlaneNum" jdbcType="INTEGER" />
+    <result column="car_team_id" property="carTeamId" jdbcType="INTEGER" />
+    <result column="travel_time" property="travelTime" jdbcType="INTEGER" />
+    <result column="travel_mileage" property="travelMileage" jdbcType="DECIMAL" />
+    <result column="travel_time_start" property="travelTimeStart" jdbcType="INTEGER" />
+    <result column="travel_mileage_start" property="travelMileageStart" jdbcType="DECIMAL" />
+    <result column="travel_time_end" property="travelTimeEnd" jdbcType="INTEGER" />
+    <result column="travel_mileage_end" property="travelMileageEnd" jdbcType="DECIMAL" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="forced_time" property="forcedTime" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List1" >
+    id, stat_date, license_plates, driver_id, driver_name, operation_num, up_online_time, 
+    order_time, service_time, online_time, actual_pay, driver_get_pay, driver_out_pay, 
+    order_mileage, service_mileage, assign_order_num, contend_order_num, platform_order_num, 
+    get_plane_num, out_plane_num, car_team_id, travel_time, travel_mileage, travel_time_start, 
+    travel_mileage_start, travel_time_end, travel_mileage_end, supplier_id, city_id, 
+    forced_time
+  </sql>
+  
+  <sql id="Base_Column_List" >
+    license_plates, driver_name, operation_num, up_online_time, order_time, service_time, 
+    online_time, actual_pay, driver_get_pay, driver_out_pay, order_mileage, service_mileage, 
+    assign_order_num, contend_order_num, platform_order_num, get_plane_num, out_plane_num, 
+    car_team_id, supplier_id, city_id, stat_date, travel_time_start, travel_mileage_start, 
+    travel_time, travel_mileage, travel_time_end, travel_mileage_end,forced_time
+  </sql>
+  
+  <select id="queryForListObject" resultMap="BaseResultMap" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDailyReportParams" >
+    select 
+    r.id id,
+    <include refid="Base_Column_List" />,
+    t.team_name teamName,
+    r.driver_id,
+    (select team_name from car_driver_team tt,car_relate_group gg where tt.id = gg.group_id and gg.driver_id = r.driver_id limit 1) as groupName
+    from driver_daily_report r force index(idx_stat_date)
+    left join car_driver_team t on t.id = r.car_team_id
+    where 1=1
+      <if test="licensePlates != null and licensePlates != '' " >
+        and license_plates like '${licensePlates}%'
+      </if>
+      <if test="driverName != null and driverName != '' " >
+        and driver_name like '${driverName}%'
+      </if>
+      <if test="driverIds != null and driverIds != '' ">
+        and r.driver_id in (${driverIds})
+	  </if>
+	  <if test="teamIds != null and teamIds != ''">
+        and car_team_id in (${teamIds})
+	  </if>
+	  <if test="suppliers != null and suppliers != ''">
+        and supplier_id in (${suppliers}) 
+	  </if>
+      <if test="cities != null and cities != ''">
+        and city_id in (${cities})
+	  </if>
+      <if test="statDateStart !=null and statDateStart !=''">
+        <![CDATA[ and stat_date >=  #{statDateStart} ]]>
+      </if>
+      <if test="statDateEnd !=null and statDateEnd !=''">
+        <![CDATA[ and stat_date <=  #{statDateEnd} ]]>
+      </if>
+      <if test="sortName ==null or sortName ==''">
+		  ORDER BY stat_date, driver_id desc
+	  </if> 
+	   <if test="sortName !=null and sortName !=''">
+		  ORDER BY
+			${sortName},driver_id ${sortOrder}
+	  </if> 
+  </select>
+
+  <!-- 周报sql -->
+  <select id="queryWeekForListObject" resultMap="BaseResultMap" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDailyReportParams" >
+    select
+    r.id id,
+    license_plates,
+    r.driver_id,
+    driver_name,
+    sum(operation_num) operation_num,
+    min(up_online_time) up_online_time,
+    sum(forced_time) forcedTime,
+    sum(order_time) order_time,
+    sum(service_time) service_time,
+    sum(online_time) online_time,
+    sum(actual_pay) actual_pay,
+    sum(driver_get_pay) driver_get_pay,
+    sum(driver_out_pay) driver_out_pay,
+    sum(order_mileage) order_mileage,
+    sum(travel_mileage) travel_mileage,
+    sum(service_mileage) service_mileage,
+    sum(assign_order_num) assign_order_num,
+    sum(contend_order_num) contend_order_num,
+    sum(platform_order_num) platform_order_num,
+    sum(get_plane_num) get_plane_num,
+    sum(out_plane_num) out_plane_num,
+    car_team_id,
+    supplier_id,
+    city_id,
+    max(stat_date) stat_date,
+    min(stat_date) statDateStart,
+    max(stat_date) statDateEnd,
+    sum(travel_time_start) travel_time_start,
+    sum(travel_mileage_start) travel_mileage_start,
+    sum(travel_time) travel_time,
+    sum(travel_time_end) travel_time_end,
+    sum(travel_mileage_end) travel_mileage_end,
+    t.team_name teamName,
+    (select team_name from car_driver_team tt,car_relate_group gg where tt.id = gg.group_id and gg.driver_id = r.driver_id limit 1) as groupName
+    from driver_daily_report r force index(idx_stat_date)
+    left join car_driver_team t on t.id = r.car_team_id
+    where 1=1
+    <if test="licensePlates != null and licensePlates != '' " >
+      and license_plates like '${licensePlates}%'
+    </if>
+    <if test="driverName != null and driverName != '' " >
+      and driver_name like '${driverName}%'
+    </if>
+    <if test="driverIds != null and driverIds != '' " >
+      and driver_id in (${driverIds})
+    </if>
+    <if test="teamIds != null and teamIds != '' " >
+      and car_team_id in (${teamIds})
+    </if>
+    <if test="suppliers != null and suppliers != '' " >
+      and supplier_id in (${suppliers})
+    </if>
+    <if test="cities != null and cities != '' " >
+      and city_id in (${cities})
+    </if>
+    <if test="statDateStart !=null and statDateStart !=''">
+      <![CDATA[ and stat_date >=  #{statDateStart} ]]>
+    </if>
+    <if test="statDateEnd !=null and statDateEnd !=''">
+      <![CDATA[ and stat_date <=  #{statDateEnd} ]]>
+    </if>
+    group by driver_id
+    <if test="sortName ==null or sortName ==''">
+      ORDER BY stat_date, driver_id desc
+    </if>
+    <if test="sortName !=null and sortName !=''">
+      ORDER BY
+      ${sortName},driver_id ${sortOrder}
+    </if>
+  </select>
+
+  <select id="queryDriverReportData" resultMap="BaseResultMap" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDailyReportParams" >
+    select
+    r.id driverDailyReportId,
+    <include refid="Base_Column_List" />,
+    t.team_name teamName,
+    r.driver_id,
+    (select team_name from car_driver_team tt,car_relate_group gg where tt.id = gg.group_id and gg.driver_id = r.driver_id limit 1) as groupName
+    from driver_daily_report r
+    left join car_driver_team t on t.id = r.car_team_id
+    where r.driver_id = #{driverIds}
+    <![CDATA[ and stat_date >=  #{statDateStart} ]]>
+    <![CDATA[ and stat_date <=  #{statDateEnd} ]]>
+    <if test="sortName ==null or sortName ==''">
+      ORDER BY stat_date, driver_id desc
+    </if>
+    <if test="sortName !=null and sortName !=''">
+      ORDER BY
+      ${sortName},driver_id ${sortOrder}
+    </if>
+  </select>
+</mapper>

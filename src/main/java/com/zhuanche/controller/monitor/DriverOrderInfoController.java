@@ -40,7 +40,7 @@ public class DriverOrderInfoController {
      *          http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=21044937
      * @param allianceId  加盟商ID
      * @param vehiclePlate  车牌号
-     *  @param driverId  司机ID
+     *  @param driverPhone  司机手机号
      * @param onboardDate   实际上车日期 yyyy-MM-dd 格式字符串
      * @return
      */
@@ -49,13 +49,13 @@ public class DriverOrderInfoController {
     public AjaxResponse driverOrderbBtween(
             @RequestParam(value = "allianceId", required = true,defaultValue = "0")int allianceId,
             @RequestParam(value = "vehiclePlate", required = true)String vehiclePlate,
-            @RequestParam(value = "driverId", required = true,defaultValue = "0")int driverId,
+            @RequestParam(value = "driverPhone", required = true,defaultValue = "")String driverPhone,
             @RequestParam(value = "onboardDate", required = true)String onboardDate) {
         Map<String, Object> param = new HashMap<String, Object>();
         param.put("allianceId",allianceId);
         param.put("vehiclePlate",vehiclePlate);
         param.put("onboardDate",onboardDate);
-        param.put("driverId",driverId);
+        param.put("driverPhone",driverPhone);
 
         logger.info("监控-指标汇总查询接口-请求参数" + JSON.toJSONString(param));
         String url = "/singleVehicleMonitor/statistic";

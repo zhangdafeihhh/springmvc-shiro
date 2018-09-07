@@ -47,6 +47,16 @@ public class DriverTeamRequest extends PageRequest{
 
     private String license;
 
+    private String licensePlates;
+
+    public String getLicensePlates() {
+        return licensePlates;
+    }
+
+    public void setLicensePlates(String licensePlates) {
+        this.licensePlates = licensePlates;
+    }
+
     public Integer getStatus() {
         return status;
     }

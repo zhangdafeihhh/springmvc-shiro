@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.ex.CarFactOrderExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarFactOrder" >
+    <id column="order_id" property="orderId" jdbcType="INTEGER" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="push_driver_type" property="pushDriverType" jdbcType="INTEGER" />
+    <result column="order_type" property="orderType" jdbcType="INTEGER" />
+    <result column="booking_user_id" property="bookingUserId" jdbcType="INTEGER" />
+    <result column="booking_date" property="bookingDate" jdbcType="TIMESTAMP" />
+    <result column="rider_name" property="riderName" jdbcType="VARCHAR" />
+    <result column="rider_phone" property="riderPhone" jdbcType="VARCHAR" />
+    <result column="booking_start_addr" property="bookingStartAddr" jdbcType="VARCHAR" />
+    <result column="booking_start_point" property="bookingStartPoint" jdbcType="VARCHAR" />
+    <result column="booking_end_addr" property="bookingEndAddr" jdbcType="VARCHAR" />
+    <result column="booking_end_point" property="bookingEndPoint" jdbcType="VARCHAR" />
+    <result column="fact_start_addr" property="factStartAddr" jdbcType="VARCHAR" />
+    <result column="fact_start_point" property="factStartPoint" jdbcType="VARCHAR" />
+    <result column="fact_end_addr" property="factEndAddr" jdbcType="VARCHAR" />
+    <result column="fact_end_point" property="factEndPoint" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="service_type_id" property="serviceTypeId" jdbcType="INTEGER" />
+    <result column="car_group_id" property="carGroupId" jdbcType="INTEGER" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="license_plates" property="licensePlates" jdbcType="VARCHAR" />
+    <result column="airline_no" property="airlineNo" jdbcType="VARCHAR" />
+    <result column="airline_status" property="airlineStatus" jdbcType="VARCHAR" />
+    <result column="airline_plan_date" property="airlinePlanDate" jdbcType="TIMESTAMP" />
+    <result column="airline_arr_date" property="airlineArrDate" jdbcType="TIMESTAMP" />
+    <result column="airline_dep_code" property="airlineDepCode" jdbcType="VARCHAR" />
+    <result column="airline_arr_code" property="airlineArrCode" jdbcType="VARCHAR" />
+    <result column="channels_num" property="channelsNum" jdbcType="VARCHAR" />
+    <result column="receive_SMS" property="receiveSms" jdbcType="INTEGER" />
+    <result column="estimated_Amount" property="estimatedAmount" jdbcType="DECIMAL" />
+    <result column="airport_id" property="airportId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="fact_date" property="factDate" jdbcType="TIMESTAMP" />
+    <result column="booking_groupids" property="bookingGroupids" jdbcType="VARCHAR" />
+    <result column="fact_driver_id" property="factDriverId" jdbcType="INTEGER" />
+    <result column="fact_end_date" property="factEndDate" jdbcType="TIMESTAMP" />
+    <result column="imei" property="imei" jdbcType="VARCHAR" />
+    <result column="version" property="version" jdbcType="VARCHAR" />
+    <result column="mobel_version" property="mobelVersion" jdbcType="VARCHAR" />
+    <result column="sys_version" property="sysVersion" jdbcType="VARCHAR" />
+    <result column="platform" property="platform" jdbcType="VARCHAR" />
+    <result column="pay_flag" property="payFlag" jdbcType="INTEGER" />
+    <result column="cancelorder_penalty" property="cancelorderPenalty" jdbcType="DECIMAL" />
+    <result column="chartered_id" property="charteredId" jdbcType="INTEGER" />
+    <result column="chartered_order_no" property="charteredOrderNo" jdbcType="VARCHAR" />
+    <result column="is_order_others" property="isOrderOthers" jdbcType="INTEGER" />
+    <result column="doorman_pay_method" property="doormanPayMethod" jdbcType="INTEGER" />
+    <result column="selected_pay_flag" property="selectedPayFlag" jdbcType="INTEGER" />
+    <result column="business_id" property="businessId" jdbcType="INTEGER" />
+    <result column="go_home_status" property="goHomeStatus" jdbcType="INTEGER" />
+    <result column="auto_level_up" property="autoLevelUp" jdbcType="INTEGER" />
+    <result column="booking_driver_id" property="bookingDriverId" jdbcType="INTEGER" />
+    <result column="is_other_drivers" property="isOtherDrivers" jdbcType="INTEGER" />
+    <result column="booking_current_addr" property="bookingCurrentAddr" jdbcType="VARCHAR" />
+    <result column="booking_current_point" property="bookingCurrentPoint" jdbcType="VARCHAR" />
+    <result column="booking_user_phone" property="bookingUserPhone" jdbcType="VARCHAR" />
+    <result column="buyout_flag" property="buyoutFlag" jdbcType="INTEGER" />
+    <result column="buyout_price" property="buyoutPrice" jdbcType="DECIMAL" />
+    <result column="booking_id_number" property="bookingIdNumber" jdbcType="VARCHAR" />
+    <result column="estimated_id" property="estimatedId" jdbcType="VARCHAR" />
+    <result column="agent_id" property="agentId" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarFactOrder" extends="BaseResultMap" >
+    <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    order_id, order_no, type, push_driver_type, order_type, booking_user_id, booking_date, 
+    rider_name, rider_phone, booking_start_addr, booking_start_point, booking_end_addr, 
+    booking_end_point, fact_start_addr, fact_start_point, fact_end_addr, fact_end_point, 
+    city_id, service_type_id, car_group_id, driver_id, license_plates, airline_no, airline_status, 
+    airline_plan_date, airline_arr_date, airline_dep_code, airline_arr_code, channels_num, 
+    receive_SMS, estimated_Amount, airport_id, status, create_by, update_by, create_date, 
+    update_date, fact_date, booking_groupids, fact_driver_id, fact_end_date, imei, version, 
+    mobel_version, sys_version, platform, pay_flag, cancelorder_penalty, chartered_id, 
+    chartered_order_no, is_order_others, doorman_pay_method, selected_pay_flag, business_id, 
+    go_home_status, auto_level_up, booking_driver_id, is_other_drivers, booking_current_addr, 
+    booking_current_point, booking_user_phone, buyout_flag, buyout_price, booking_id_number, 
+    estimated_id, agent_id
+  </sql>
+
+  <select id="selectorderIdByOrderNo" parameterType="java.lang.String" resultType="java.lang.String">
+    SELECT order_id FROM car_fact_order WHERE order_no = #{orderno}
+  </select>
+
+</mapper>

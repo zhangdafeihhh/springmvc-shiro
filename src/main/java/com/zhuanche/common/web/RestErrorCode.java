@@ -33,7 +33,7 @@ public final class RestErrorCode{
 	public static final int CAR_API_ERROR           = 996;
 	@ResultMessage("会话已失效，请重新登录")
 	public static final int HTTP_INVALID_SESSION           = 997;
-	@ResultMessage("请求参数校验不通过")
+	@ResultMessage("请求参数校验不通过{0}")
 	public static final int HTTP_PARAM_INVALID              = 998;
 	@ResultMessage("未知错误")
 	public static final int UNKNOWN_ERROR                   = 999;
@@ -59,6 +59,10 @@ public final class RestErrorCode{
 	public static final int MSG_CODE_WRONG                = 1006;
 	@ResultMessage("账号已经存在")
 	public static final int ACCOUNT_EXIST                      = 1007;
+	@ResultMessage("短信验证码发送失败")
+	public static final int MSG_CODE_FAIL                      = 1011;
+	@ResultMessage("短信验证码{0}秒内不能重复发送")
+	public static final int MSG_CODE_REPEAT_SEND                      = 1012;
 
 	//----------------------------------------------权限管理
 	@ResultMessage("父权限不存在")
@@ -107,6 +111,17 @@ public final class RestErrorCode{
 	@ResultMessage("银行卡号已存在")
 	public static final int DRIVER_BANK_CARD_NUMBER_EXIST                    = 3007;
 
+	@ResultMessage("周报查询时间段只能查询一个星期的时间")
+	public static final int ONLY_QUERY_WEEK                    = 3101;
+	@ResultMessage("月报查询时间段只能查询一个月份的时间")
+	public static final int ONLY_QUERY_ONE_MONTH                    = 3102;
+	@ResultMessage("文件导出失败")
+	public static final int FILE_EXCEL_REPORT_FAIL                    = 3103;
+	@ResultMessage("查询时间范围结束时间不能为空")
+	public static final int ENDTIME_IS_NULL                    = 3104;
+	@ResultMessage("查询时间范围开始时间不能大于结束时间")
+	public static final int STARTTIME_GREATE_ENDTIME                    = 3105;
+
 	//-----------------------------------------------业务参数：导入文件
 	@ResultMessage("文件异常")
 	public static final int FILE_ERROR                    = 4001;
@@ -130,6 +145,12 @@ public final class RestErrorCode{
 	public static final int MONITOR_GPS_FAIL                                        = 6001;
 	@ResultMessage("查询大数据司机订单信息失败")
 	public static final int MONITOR_DRIVERO_ORDER_FAIL                                        = 7001;
+
+    //-----------------------------------------------业务参数：投诉评分
+    @ResultMessage("请选择一个车队或输入司机手机号")
+    public static final int TEAMID_OR_DRIVERID_ISNULL = 5201;
+    @ResultMessage("文件导出失败")
+    public static final int FILE_EXPORT_FAIL = 5202;
 	//---------------------------------------------------------------------------------------------------------------------------------------------
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系
