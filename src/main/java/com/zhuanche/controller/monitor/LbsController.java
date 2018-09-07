@@ -44,7 +44,9 @@ public class LbsController {
     /**
      * lbs wiki :
      *          http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=3213570
-     * @param driverId
+     * 输出wiki:
+     *          http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=21044880
+     * @param driverPhone
      * @param startTime
      * @param endTime
      * @param model
@@ -58,7 +60,7 @@ public class LbsController {
             @RequestParam(value = "endTime", required = true)String endTime,
               ModelMap model) {
         Map<String, Object> paramMap = new HashMap<String, Object>();
-
+        paramMap.put("driverPhone",driverPhone);
         paramMap.put("startTime",startTime);
         paramMap.put("endTime",endTime);
         paramMap.put("platform", 20);
