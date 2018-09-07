@@ -1,6 +1,7 @@
 package mapper.rentcar;
 
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
+import org.apache.ibatis.annotations.Param;
 
 public interface CarBizDriverInfoMapper {
     int deleteByPrimaryKey(Integer driverId);
@@ -16,4 +17,6 @@ public interface CarBizDriverInfoMapper {
     int updateByPrimaryKeyWithBLOBs(CarBizDriverInfo record);
 
     int updateByPrimaryKey(CarBizDriverInfo record);
+
+    CarBizDriverInfo selectByPhone(@Param("phone") String phone);
 }
