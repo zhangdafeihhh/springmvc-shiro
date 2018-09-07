@@ -1,7 +1,6 @@
 package com.zhuanche.controller.driver;
 
 
-import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
@@ -15,12 +14,14 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
-import com.zhuanche.entity.rentcar.*;
-import com.zhuanche.serv.*;
+import com.zhuanche.entity.rentcar.CarBizDriverInfo;
+import com.zhuanche.entity.rentcar.CarBizSupplier;
+import com.zhuanche.serv.CarBizDriverInfoDetailService;
+import com.zhuanche.serv.CarBizDriverInfoService;
+import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
-import jxl.write.WritableWorkbook;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
@@ -31,12 +32,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/driverInfo")
@@ -408,7 +411,7 @@ public class DriverInfoController {
         // 根据供应商ID查询供应商名称以及加盟类型
         CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(supplierId);
         if (carBizSupplier == null) {
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, "供应商ID=" + supplierId + "的供应商不存在");
+            return AjaxResponse.fail(RestErrorCode.SUPPLIER_NOT_EXIST, supplierId);
         }
         Integer cooperationType = carBizSupplier.getCooperationType();
         if(cooperationType!=null && cooperationType==5){
@@ -425,7 +428,7 @@ public class DriverInfoController {
                     || StringUtils.isEmpty(driverLicenseIssuingRegisterDate) || StringUtils.isEmpty(driverLicenseIssuingFirstDate) || StringUtils.isEmpty(driverLicenseIssuingGrantDate)
                     || StringUtils.isEmpty(birthDay) || StringUtils.isEmpty(houseHoldRegisterPermanent) || groupId == null
                     || StringUtils.isEmpty(memo) || StringUtils.isEmpty(bankCardBank) || StringUtils.isEmpty(bankCardNumber)){
-                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, "信息不全，请补全");
+                return AjaxResponse.fail(RestErrorCode.INFORMATION_NOT_COMPLETE);
             }
 
         }

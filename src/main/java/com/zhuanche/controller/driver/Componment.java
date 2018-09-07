@@ -9,14 +9,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * 注释模板配好了
+ *
  */
 public class Componment {
 
     private static final Logger logger = LoggerFactory.getLogger(Componment.class);
 
     /**
-     *  加注释一定要
+     *  下载
      * @param response
      * @param wb
      * @param fileName

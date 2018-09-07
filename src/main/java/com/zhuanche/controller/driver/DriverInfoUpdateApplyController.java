@@ -19,7 +19,6 @@ import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.entity.rentcar.CarBizModel;
 import com.zhuanche.serv.CarBizCarInfoService;
 import com.zhuanche.serv.CarBizDriverInfoService;
-import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.serv.mdbcarmanage.DriverInfoUpdateService;
 import com.zhuanche.serv.rentcar.CarBizModelService;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -33,9 +32,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/driverInfoUpdateApply")
@@ -219,7 +221,7 @@ public class DriverInfoUpdateApplyController {
         //查询车牌号是否存在
         CarBizCarInfoDTO carBizCarInfoDTO = carBizCarInfoService.selectModelByLicensePlates(licensePlates);
         if(carBizCarInfoDTO==null){
-            return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST, "车牌号查询不存在");
+            return AjaxResponse.fail(RestErrorCode.BUS_NOT_EXIST);
         }
         DriverInfoUpdateApply driverInfoUpdateApply = new DriverInfoUpdateApply();
         driverInfoUpdateApply.setLicensePlates(licensePlates);
@@ -246,7 +248,7 @@ public class DriverInfoUpdateApplyController {
         if(carBizCarInfoDTO.getCarModelId()!=null){
             CarBizModel carBizModel = carBizModelService.selectByPrimaryKey(carBizCarInfoDTO.getCarModelId());
             if(carBizModel==null){
-                return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST, "车型不存在");
+                return AjaxResponse.fail(RestErrorCode.MODEL_NOT_EXIST);
             }
             driverInfoUpdateApply.setCarModelId(carBizCarInfoDTO.getCarModelId());
             driverInfoUpdateApply.setCarModelName(carBizModel.getModelName());
@@ -254,7 +256,7 @@ public class DriverInfoUpdateApplyController {
 
         CarBizModel carBizModel = carBizModelService.selectByPrimaryKey(carModelIdNew);
         if(carBizModel==null){
-            return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST, "车型不存在");
+            return AjaxResponse.fail(RestErrorCode.MODEL_NOT_EXIST);
         }
         //车型相关信息
         driverInfoUpdateApply.setCarModelIdNew(carModelIdNew);
