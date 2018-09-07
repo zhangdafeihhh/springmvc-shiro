@@ -259,7 +259,7 @@ public class CarInfoController {
                                   @Verify(param = "oldSupplierId",rule="") Integer oldSupplierId) {
         logger.info("车辆保存/修改:saveCarInfo");
 
-        if(null == carId){
+        if(null != carId){
             if(StringUtils.isBlank(licensePlates1))
                 return AjaxResponse.fail(998, "licensePlates1");
             if(oldCity == null)
@@ -342,9 +342,7 @@ public class CarInfoController {
 
     /**
      * 车辆信息删除
-     * @param params
-     * @param request
-     * @return
+     * @param carIds
      */
     @RequestMapping(value = "/deleteCarInfo")
     public Object deleteCarInfo(@Verify(param = "carIds", rule = "required") String carIds) {
