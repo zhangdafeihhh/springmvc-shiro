@@ -679,7 +679,7 @@ public class DriverMonthDutyService {
 						}
 					}
 				} catch (NumberFormatException e) {
-					logger.info("changeDay error:" + e);
+					logger.info("changeDay error:" +JSON.toJSONString(e));
 				}
 			}
 		}
