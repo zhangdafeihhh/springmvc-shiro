@@ -254,11 +254,19 @@ public class CarInfoController {
                               @Verify(param = "gpsImei",rule="") String gpsImei,
                               @Verify(param = "gpsDate",rule="") String gpsDate,
                               @RequestParam(value = "purchaseDate",required = false) String memo,
-                                  @Verify(param = "licensePlates1",rule="required") String licensePlates1,
-                                  @Verify(param = "oldCity",rule="required") Integer oldCity,
-                                  @Verify(param = "oldSupplierId",rule="required") Integer oldSupplierId) {
+                                  @Verify(param = "licensePlates1",rule="") String licensePlates1,
+                                  @Verify(param = "oldCity",rule="") Integer oldCity,
+                                  @Verify(param = "oldSupplierId",rule="") Integer oldSupplierId) {
         logger.info("车辆保存/修改:saveCarInfo");
 
+        if(null == carId){
+            if(StringUtils.isBlank(licensePlates1))
+                return AjaxResponse.fail(998, "licensePlates1");
+            if(oldCity == null)
+                return AjaxResponse.fail(998, "oldCity");
+            if(oldSupplierId == null)
+                return AjaxResponse.fail(998, "oldSupplierId");
+        }
 
 
         CarInfo params = new CarInfo();
