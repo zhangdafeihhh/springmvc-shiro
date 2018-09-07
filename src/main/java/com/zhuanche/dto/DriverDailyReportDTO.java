@@ -72,17 +72,11 @@ public class DriverDailyReportDTO{
     private double forcedTime;
     
     private String supplierName;
-    private String cityName;
-    
-    
+
     //权限
-    private String supplier;
     private String teamName;
     private String groupName;
-    //
-    private String upOnlineTimeStart;
-    private String upOnlineTimeEnd;
-    
+
     private String statDateStart;
     private String statDateEnd;
  
@@ -341,24 +335,6 @@ public class DriverDailyReportDTO{
 		this.supplierName = supplierName;
 	}
 
-	public String getCityName() {
-		return cityName;
-	}
-
-	public void setCityName(String cityName) {
-		this.cityName = cityName;
-	}
-
-
-	public String getSupplier() {
-		return supplier;
-	}
-
-	public void setSupplier(String supplier) {
-		this.supplier = supplier;
-	}
-
-
 	public String getTeamName() {
 		return teamName;
 	}
@@ -374,22 +350,6 @@ public class DriverDailyReportDTO{
 
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
-	}
-
-	public String getUpOnlineTimeStart() {
-		return upOnlineTimeStart;
-	}
-
-	public void setUpOnlineTimeStart(String upOnlineTimeStart) {
-		this.upOnlineTimeStart = upOnlineTimeStart;
-	}
-
-	public String getUpOnlineTimeEnd() {
-		return upOnlineTimeEnd;
-	}
-
-	public void setUpOnlineTimeEnd(String upOnlineTimeEnd) {
-		this.upOnlineTimeEnd = upOnlineTimeEnd;
 	}
 
 	public String getStatDateStart() {
