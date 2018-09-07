@@ -25,6 +25,7 @@ import com.zhuanche.common.web.Verify;
 import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.ValidateUtils;
 
 /**
  * 
@@ -87,21 +88,23 @@ public class CompleteOrderController{
 			if(currentLoginUser == null){
 				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 			}
-			Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-		    Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-		    Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
-		    // 供应商信息
-		    String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-			// 车队信息
-			String[] visibleMotorcadeIds = statisticalAnalysisService.setToArray(teamIds);
-			// 可见城市
-			String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
-			if(null == visibleAllianceIds || null == visibleMotorcadeIds || visibleCityIds == null ){
-				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+			if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
+				Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
+			    Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
+			    Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
+			    // 供应商信息
+			    String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
+				// 车队信息
+				String[] visibleMotorcadeIds = statisticalAnalysisService.setToArray(teamIds);
+				// 可见城市
+				String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
+				if(null == visibleAllianceIds || null == visibleMotorcadeIds || visibleCityIds == null ){
+					return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+				}
+			    paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
+			    paramMap.put("visibleMotorcadeIds", visibleMotorcadeIds); // 可见车队ID
+			    paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
 			}
-		    paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-		    paramMap.put("visibleMotorcadeIds", visibleMotorcadeIds); // 可见车队ID
-		    paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
 	        if(null != pageNo && pageNo > 0)
 	        	paramMap.put("pageNo", pageNo);//页号
 	        if(null != pageSize && pageSize > 0)
@@ -156,24 +159,26 @@ public class CompleteOrderController{
  	       // 数据权限设置
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
 			if(currentLoginUser == null){
+				logger.info("【运营管理-统计分析】导出,完成订单详情列表数据  未授权");
 				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 			}
-			Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-	        Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-	        Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
-	        // 供应商信息
-			String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-			// 车队信息
-			String[] visibleMotocadeIds = statisticalAnalysisService.setToArray(teamIds);
-			// 可见城市
-			String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
-			if(null == visibleAllianceIds || null == visibleMotocadeIds || visibleCityIds == null ){
-				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+			if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
+				Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
+		        Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
+		        Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
+		        // 供应商信息
+				String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
+				// 车队信息
+				String[] visibleMotocadeIds = statisticalAnalysisService.setToArray(teamIds);
+				// 可见城市
+				String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
+				if(null == visibleAllianceIds || null == visibleMotocadeIds || visibleCityIds == null ){
+					return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+				}
+		        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
+		        paramMap.put("visibleMotorcadeIds", visibleMotocadeIds); // 可见车队ID
+		        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
 			}
-	        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-	        paramMap.put("visibleMotorcadeIds", visibleMotocadeIds); // 可见车队ID
-	        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
-		    
 	 		String jsonString = JSON.toJSONString(paramMap);
 		    logger.info("【运营管理-统计分析】导出,完成订单详情请求参数----"+jsonString);
 		    

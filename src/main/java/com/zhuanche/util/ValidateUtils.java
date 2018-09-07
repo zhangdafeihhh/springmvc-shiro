@@ -310,4 +310,15 @@ public class ValidateUtils {
         return convertSuccess;
     }
 
+    /**
+     * 是否admin用户
+     * @param accountType
+     * @return
+     */
+    public static boolean isAdmin(Integer accountType) {
+		if (accountType.intValue() == 900)
+			return true;
+		return false;
+	}
+	
 }

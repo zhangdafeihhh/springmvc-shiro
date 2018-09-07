@@ -19,6 +19,7 @@ import com.zhuanche.common.web.Verify;
 import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.ValidateUtils;
 
 /**
  * 
@@ -60,16 +61,24 @@ public class CarAnalysisIndexController{
 	      paramMap.put("groupByColumnCode", groupByColumnCode);//汇总维度代码
 	      // 数据权限设置
 		  SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-	      Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-	      // 供应商信息
-		  String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-		  if(null == visibleAllianceIds || null == visibleVehicleTypeIds){
-			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+		  if(currentLoginUser == null){
+				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+		  }
+		  if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
+			  Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
+		      // 供应商信息
+			  String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
+			  if(null == visibleAllianceIds || null == visibleVehicleTypeIds){
+				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+			  }
+		      paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
+		  }
+		  if(null == visibleVehicleTypeIds){
+				return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID,"可见车辆类型ID参数不能为空");
 		  }
 		  // 全部车辆类型  ??
 		  String[] visibleVehicleTypeIdsStr = visibleVehicleTypeIds.split(",");
-	      paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-	      paramMap.put("visibleVehicleTypeIds", visibleVehicleTypeIdsStr); // 可见车辆类型ID
+		  paramMap.put("visibleVehicleTypeIds", visibleVehicleTypeIdsStr); // 可见车辆类型ID
 	      // 从大数据仓库获取统计数据
 	      AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/carAnalysisDetail/carDetail",paramMap);
 	      return result;
@@ -103,15 +112,21 @@ public class CarAnalysisIndexController{
 	        paramMap.put("allianceId", allianceId);//车队ID
 	        // 数据权限设置
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-	        Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-	        // 供应商信息
-			String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-			if(null == visibleAllianceIds || null == visibleVehicleTypeIds){
+			if(currentLoginUser == null){
+				logger.info("【运营管理-统计分析】车辆分析指标趋势 数据  未授权");
 				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 			}
-			  // 全部车辆类型  ??
+			if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
+				Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
+		        // 供应商信息
+				String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
+				if(null == visibleAllianceIds || null == visibleVehicleTypeIds){
+					return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+				}
+			    paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
+			}
+			  // 车辆类型  ??
 			  String[] visibleVehicleTypeIdsStr = visibleVehicleTypeIds.split(",");
-		      paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
 		      paramMap.put("visibleVehicleTypeIds", visibleVehicleTypeIdsStr); // 可见车辆类型ID
 		      // 从大数据仓库获取统计数据
 	          AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/carAnalysisIndex/carIndex",paramMap);

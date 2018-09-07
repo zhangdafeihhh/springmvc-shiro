@@ -24,6 +24,7 @@ import com.zhuanche.common.web.Verify;
 import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.ValidateUtils;
 
 
 /**
@@ -89,22 +90,26 @@ public class CancelOrderController{
 			
 	        // 数据权限设置
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-	        Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-	        Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-	        Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
-	        // 供应商信息
-			String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-			// 车队信息
-			String[] visibleMotocadeIds = statisticalAnalysisService.setToArray(teamIds);
-			// 可见城市
-			String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
-			if(null == visibleAllianceIds || null == visibleMotocadeIds || visibleCityIds == null ){
+			if(currentLoginUser == null ){
 				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 			}
-	        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-	        paramMap.put("visibleMotorcadeIds", visibleMotocadeIds); // 可见车队ID
-	        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
-	        
+			if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
+				Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
+		        Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
+		        Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
+		        // 供应商信息
+				String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
+				// 车队信息
+				String[] visibleMotocadeIds = statisticalAnalysisService.setToArray(teamIds);
+				// 可见城市
+				String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
+				if(null == visibleAllianceIds || null == visibleMotocadeIds || visibleCityIds == null ){
+					return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+				}
+		        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
+		        paramMap.put("visibleMotorcadeIds", visibleMotocadeIds); // 可见车队ID
+		        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
+			}
 			//paramMap.put("visibleAllianceIds", new String[]{"97", "946", "99", "489", "1307", "65", "1349"});
 			//paramMap.put("visibleMotorcadeIds", new String[]{"2498", "2487", "1809", "2359", "1369"});
 			//paramMap.put("visibleCityIds", new String[]{"88", "67", "111", "123", "85", "91"}); //可见城市ID
@@ -165,23 +170,28 @@ public class CancelOrderController{
 	        
 	       // 数据权限设置
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-	        Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-	        Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-	        Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
-	        // 供应商信息
-			String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-			// 车队信息
-			String[] visibleMotocadeIds = statisticalAnalysisService.setToArray(teamIds);
-			// 可见城市
-			String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
-			if(null == visibleAllianceIds || null == visibleMotocadeIds || visibleCityIds == null ){
-				 logger.info("【运营管理-统计分析】导出取消订单列表数据权限为空");
-				 return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+			if(currentLoginUser == null){
+				logger.info("【运营管理-统计分析】导出,导出取消订单列表数据  未授权");
+				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 			}
-	        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-	        paramMap.put("visibleMotorcadeIds", visibleMotocadeIds); // 可见车队ID
-	        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
-	        
+			if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
+				Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
+		        Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
+		        Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
+		        // 供应商信息
+				String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
+				// 车队信息
+				String[] visibleMotocadeIds = statisticalAnalysisService.setToArray(teamIds);
+				// 可见城市
+				String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
+				if(null == visibleAllianceIds || null == visibleMotocadeIds || visibleCityIds == null ){
+					 logger.info("【运营管理-统计分析】导出取消订单列表数据权限为空");
+					 return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+				}
+		        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
+		        paramMap.put("visibleMotorcadeIds", visibleMotocadeIds); // 可见车队ID
+		        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
+			}
 			String jsonString = JSON.toJSONString(paramMap);
 			 
 			statisticalAnalysisService.exportCsvFromToPage(
