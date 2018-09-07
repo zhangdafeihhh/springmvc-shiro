@@ -20,12 +20,12 @@ public class CarBizModelService {
 	@Autowired
 	private CarBizModelExMapper carBizModelExMapper;
 
+
     public CarBizModel selectByPrimaryKey(Integer modelId){
 	    return carBizModelMapper.selectByPrimaryKey(modelId);
     }
 
     public List<CarBizModel> queryAllList(){
-
     	return carBizModelExMapper.queryAllList();
 	}
 }

@@ -4,9 +4,13 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
+import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.entity.rentcar.CarBizCity;
+import com.zhuanche.entity.rentcar.CarBizModel;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
+import com.zhuanche.serv.CarBizCarGroupService;
 import com.zhuanche.serv.common.CitySupplierTeamCommonService;
+import com.zhuanche.serv.rentcar.CarBizModelService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
@@ -15,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
@@ -42,6 +47,12 @@ public class CommonController {
 
     @Autowired
     private CitySupplierTeamCommonService citySupplierTeamCommonService;
+
+    @Autowired
+    private CarBizModelService carBizModelService;
+
+    @Autowired
+    private CarBizCarGroupService carBizCarGroupService;
 
     /**
     * @Desc:  获取城市列表
@@ -141,7 +152,31 @@ public class CommonController {
         }
     }
 
+    /**
+     * 查询有效车型列表
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/carBizModelList", method = RequestMethod.GET)
+    public AjaxResponse carBizModelList(){
+        SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+        if(Check.NuNObj(currentLoginUser)){
+            return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST);
+        }
+        List<CarBizModel> carBizModels = carBizModelService.queryAllList();
+        return AjaxResponse.success(carBizModels);
+    }
 
-
+    /**
+     *查询用车型类型列表
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value="/queryGroup",method = RequestMethod.GET)
+    public AjaxResponse queryGroup() {
+        logger.info("queryGroup:查询用车型类型");
+        List<CarBizCarGroup> list = carBizCarGroupService.queryCarGroupList(1);
+        return AjaxResponse.success(list);
+    }
 }
 
