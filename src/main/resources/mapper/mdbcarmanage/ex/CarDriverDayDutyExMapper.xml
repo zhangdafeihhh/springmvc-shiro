@@ -184,12 +184,12 @@
     </if>
     <if test = "startTime !=null and startTime !=''" >
       <![CDATA[
-			and d.startTime >= #{startTime, jdbcType=TIMESTAMP}
+			and d.time >= #{startTime, jdbcType=TIMESTAMP}
 		]]>
     </if>
     <if test = "endTime !=null and endTime !=''" >
       <![CDATA[
-			and d.endTime <= #{endTime, jdbcType=TIMESTAMP}
+			and d.time <= #{endTime, jdbcType=TIMESTAMP}
 		]]>
     </if>
     <if test="time!=null and time!=''">
