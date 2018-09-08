@@ -134,7 +134,7 @@ public class DriverSchController {
             }
 
         }catch (Exception e){
-            logger.error("导出排班信息 异常:{}",e);
+            logger.error("导出排班信息 异常:{}"+JSON.toJSONString(e));
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
         return AjaxResponse.success(null);
@@ -151,24 +151,19 @@ public class DriverSchController {
     @RequestMapping(value = "/saveDriverDayDuty")
     public AjaxResponse saveDriverDayDuty(DutyParamRequest param){
         logger.info("保存司机日排班信息入参:"+ JSON.toJSONString(param));
-        try{
-            String result = carDriverShiftsService.saveDriverDayDuty(param);
-            if("已接收请求，正在处理，稍后可在发布司机排版菜单查看".equals(result)){
-                AjaxResponse success = AjaxResponse.success(result);
-                Map<String,String> map = new HashedMap();
-                map.put("successMsg",result);
-                success.setData(map);
-                return success;
-            }else {
-                AjaxResponse fail = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
-                Map<String,String> map = new HashedMap();
-                map.put("errorMsg",result);
-                fail.setData(map);
-                return fail;
-            }
-        }catch (Exception e){
-            logger.error("保存司机日排班信息异常:{}",e);
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        String result = carDriverShiftsService.saveDriverDayDuty(param);
+        if("已接收请求，正在处理，稍后可在发布司机排版菜单查看".equals(result)){
+            AjaxResponse success = AjaxResponse.success(result);
+            Map<String,String> map = new HashedMap();
+            map.put("successMsg",result);
+            success.setData(map);
+            return success;
+        }else {
+            AjaxResponse fail = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
+            Map<String,String> map = new HashedMap();
+            map.put("errorMsg",result);
+            fail.setData(map);
+            return fail;
         }
     }
 
@@ -183,13 +178,8 @@ public class DriverSchController {
     @RequestMapping(value = "/queryDriverTeamReList")
     public AjaxResponse queryDriverTeamReList(TeamGroupRequest teamGroupRequest){
         logger.info("获取班制设置司机列表入参:"+ JSON.toJSONString(teamGroupRequest));
-        try{
-            List<CarDriverInfoDTO> list = carDriverShiftsService.queryDriverTeamReList(teamGroupRequest);
-            return AjaxResponse.success(list);
-        }catch (Exception e){
-            logger.error("获取班制设置司机列表异常:{}",e);
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-        }
+        List<CarDriverInfoDTO> list = carDriverShiftsService.queryDriverTeamReList(teamGroupRequest);
+        return AjaxResponse.success(list);
     }
 
     /**
@@ -205,13 +195,8 @@ public class DriverSchController {
                                                  @Verify(param = "cityId", rule = "required") Integer cityId,
                                                  @Verify(param = "supplierId", rule = "required") Integer supplierId){
         logger.info("获取排班时长时间段入参:"+ JSON.toJSONString(teamId));
-        try{
-            List<CarDriverDurationDTO> list = carDriverShiftsService.queryDurationListByField(cityId, supplierId, teamId);
-            return AjaxResponse.success(list);
-        }catch (Exception e){
-            logger.error("获取排班时长时间段异常:{}",e);
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-        }
+        List<CarDriverDurationDTO> list = carDriverShiftsService.queryDurationListByField(cityId, supplierId, teamId);
+        return AjaxResponse.success(list);
     }
 
     /**
@@ -225,13 +210,8 @@ public class DriverSchController {
     @RequestMapping(value = "/queryMustListByField")
     public AjaxResponse queryMustListByField(@Verify(param = "teamId", rule = "required") Integer teamId){
         logger.info("查询司机强制排班时间段入参:"+ JSON.toJSONString(teamId));
-        try{
-            List<CarDriverMustDutyDTO> list = carDriverShiftsService.queryMustListByField(teamId);
-            return AjaxResponse.success(list);
-        }catch (Exception e){
-            logger.error("查询司机强制排班时间段异常:{}",e);
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-        }
+        List<CarDriverMustDutyDTO> list = carDriverShiftsService.queryMustListByField(teamId);
+        return AjaxResponse.success(list);
     }
 
     /**
@@ -245,13 +225,8 @@ public class DriverSchController {
     @RequestMapping(value = "/getCarDriverMustDetail")
     public AjaxResponse getCarDriverMustDetail(@Verify(param = "paramId", rule = "required") String paramId){
         logger.info("获取强制排班详情入参:"+ JSON.toJSONString(paramId));
-        try{
-            CarDriverMustDuty detail = carDriverMustDutyService.getCarDriverMustDetail(Integer.parseInt(paramId));
-            return AjaxResponse.success(detail);
-        }catch (Exception e){
-            logger.error("获取强制排班详情异常:{}",e);
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-        }
+        CarDriverMustDuty detail = carDriverMustDutyService.getCarDriverMustDetail(Integer.parseInt(paramId));
+        return AjaxResponse.success(detail);
     }
 
     /**
@@ -265,16 +240,11 @@ public class DriverSchController {
     @RequestMapping(value = "/saveOrUpdateDriverMust")
     public AjaxResponse saveOrUpdateDriverMust(CarDriverMustDuty param){
         logger.info("新增或者修改强制排班信息入参:"+ JSON.toJSONString(param));
-        try{
-            int result = carDriverMustDutyService.saveOrUpdateDriverMust(param);
-            if(result >0){
-                return AjaxResponse.success(result);
-            }else{
-                return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
-            }
-        }catch (Exception e){
-            logger.error("新增或者修改强制排班信息异常:{}",e);
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        int result = carDriverMustDutyService.saveOrUpdateDriverMust(param);
+        if(result >0){
+            return AjaxResponse.success(result);
+        }else{
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
     }
 
@@ -289,17 +259,12 @@ public class DriverSchController {
     @RequestMapping(value = "/getDriverMustDutyList")
     public AjaxResponse getDriverMustDutyList(DutyParamRequest param){
         logger.info("查询强制上班配置列表 入参:"+ JSON.toJSONString(param));
-        try{
-            SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-            if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
-                return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
-            }
-            PageDTO pageDTO = carDriverMustDutyService.getDriverMustDutyList(param);
-            return AjaxResponse.success(pageDTO);
-        }catch (Exception e){
-            logger.error("查询强制上班配置列表异常:{}",e);
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+        if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
+            return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
         }
+        PageDTO pageDTO = carDriverMustDutyService.getDriverMustDutyList(param);
+        return AjaxResponse.success(pageDTO);
     }
 
     /**
@@ -313,13 +278,8 @@ public class DriverSchController {
     @RequestMapping(value = "/getCarDriverDurationDetail")
     public AjaxResponse getCarDriverDurationDetail(@Verify(param = "paramId", rule = "required") String paramId){
         logger.info("获取排班时长详情入参:"+ JSON.toJSONString(paramId));
-        try{
-            CarDriverDurationDTO detail = carDriverDurationService.getCarDriverDurationDetail(Integer.parseInt(paramId));
-            return AjaxResponse.success(detail);
-        }catch (Exception e){
-            logger.error("获取排班时长详情异常:{}",e);
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-        }
+        CarDriverDurationDTO detail = carDriverDurationService.getCarDriverDurationDetail(Integer.parseInt(paramId));
+        return AjaxResponse.success(detail);
     }
 
     /**
@@ -333,16 +293,11 @@ public class DriverSchController {
     @RequestMapping(value = "/saveOrUpdateCarDriverDuration")
     public AjaxResponse saveOrUpdateCarDriverDuration(CarDutyDuration param){
         logger.info("保存/修改排班时长入参:"+ JSON.toJSONString(param));
-        try{
-            int result = carDriverDurationService.saveOrUpdateCarDriverDuration(param);
-            if(result >0){
-                return AjaxResponse.success(result);
-            }else{
-                return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
-            }
-        }catch (Exception e){
-            logger.error("保存/修改排班时长异常:{}",e);
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        int result = carDriverDurationService.saveOrUpdateCarDriverDuration(param);
+        if(result >0){
+            return AjaxResponse.success(result);
+        }else{
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
     }
 
@@ -357,17 +312,12 @@ public class DriverSchController {
     @RequestMapping(value = "/getDriverDurationList")
     public AjaxResponse getDriverDurationList(DutyParamRequest param){
         logger.info("查询排班时长列表入参:"+ JSON.toJSONString(param));
-        try{
-            SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-            if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
-                return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
-            }
-            PageDTO pageDTO = carDriverDurationService.getDriverDurationList(param);
-            return AjaxResponse.success(pageDTO);
-        }catch (Exception e){
-            logger.error("查询排班时长异常:{}",e);
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+        if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
+            return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
         }
+        PageDTO pageDTO = carDriverDurationService.getDriverDurationList(param);
+        return AjaxResponse.success(pageDTO);
     }
 
     /** 
@@ -381,29 +331,24 @@ public class DriverSchController {
     @RequestMapping(value = "/issueDriverDuty")
     public AjaxResponse issueDriverDuty(DutyParamRequest param){
         logger.info("发布排班入参:"+ JSON.toJSONString(param));
-        try{
-            int result = carDriverDutyService.issueDriverDuty(param);
-            ServiceReturnCodeEnum typeByCode = ServiceReturnCodeEnum.getTypeByCode(result);
-            if(result < 0 ){
-                AjaxResponse fail = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
-                Map<String,String> map = new HashedMap();
-                map.put("errorMsg",typeByCode.getName());
-                fail.setData(map);
-                return fail;
-            }else if(result == 1){
-                return AjaxResponse.success(result);
-            }else if(result == 2){
-                AjaxResponse success = AjaxResponse.success(result);
-                Map<String,String> map = new HashedMap();
-                map.put("successMsg",typeByCode.getName());
-                success.setData(map);
-                return success;
-            }
+        int result = carDriverDutyService.issueDriverDuty(param);
+        ServiceReturnCodeEnum typeByCode = ServiceReturnCodeEnum.getTypeByCode(result);
+        if(result < 0 ){
+            AjaxResponse fail = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
+            Map<String,String> map = new HashedMap();
+            map.put("errorMsg",typeByCode.getName());
+            fail.setData(map);
+            return fail;
+        }else if(result == 1){
             return AjaxResponse.success(result);
-        }catch (Exception e){
-            logger.error("发布排班异常:{}",e);
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }else if(result == 2){
+            AjaxResponse success = AjaxResponse.success(result);
+            Map<String,String> map = new HashedMap();
+            map.put("successMsg",typeByCode.getName());
+            success.setData(map);
+            return success;
         }
+        return AjaxResponse.success(result);
     }
 
     /** 
@@ -417,21 +362,12 @@ public class DriverSchController {
     @RequestMapping(value = "/queryDriverMonthDutyData")
     public AjaxResponse queryDriverMonthDutyData(DutyParamRequest param) {
         logger.info("查询月排班列表数据入参:"+ JSON.toJSONString(param));
-        try{
-            SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-            if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
-                return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
-            }
-            PageDTO pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
-            return AjaxResponse.success(pageDTO);
-        }catch (Exception e){
-            logger.error("查询排班列表异常:{}",e);
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+        if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
+            return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
         }
+        PageDTO pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
+        return AjaxResponse.success(pageDTO);
     }
-
-
-
-
 
 }

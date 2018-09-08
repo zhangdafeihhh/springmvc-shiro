@@ -130,7 +130,7 @@ public class CarDriverDutyService {
 			pageDTO.setResult(list);
 			return pageDTO;
 		}catch (Exception e){
-			logger.error("查询排班司机列表异常:{}",e);
+			logger.error("查询排班司机列表异常:{}"+JSON.toJSONString(e));
 			return null;
 		}
 	}
@@ -179,7 +179,7 @@ public class CarDriverDutyService {
 			es.submit(new AffirmDriverDayDuty(dutyParamRequest));
 			return ServiceReturnCodeEnum.DEAL_SUCCESS_MSG.getCode();
 		}catch (Exception e){
-			logger.error("发布数据异常:{}",e);
+			logger.error("发布数据异常:{}"+JSON.toJSONString(e));
 			return 0;
 		}
 
@@ -198,7 +198,7 @@ public class CarDriverDutyService {
 				// 发布数据
 				asyncDutyService.affirmDriverDayDuty(dutyParamRequest);
 			} catch (Exception e) {
-				logger.error("AffirmDriverDayDuty",e);
+				logger.error("AffirmDriverDayDuty"+JSON.toJSONString(e));
 			}
 		}
 	}
@@ -223,7 +223,7 @@ public class CarDriverDutyService {
 				}
 			}
 		} catch (ParseException e) {
-			logger.error("时间参数错误", e);
+			logger.error("时间参数错误"+JSON.toJSONString(e));
 		}
 
 		return startTime;
