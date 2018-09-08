@@ -19,7 +19,6 @@
     <result column="car_purchase_date" property="carPurchaseDate" jdbcType="TIMESTAMP" />
     <result column="model_detail" property="modelDetail" jdbcType="VARCHAR" />
     <result column="color" property="color" jdbcType="VARCHAR" />
-    <result column="driver_id_new" property="driverIdNew" jdbcType="INTEGER" />
     <result column="driver_name_new" property="driverNameNew" jdbcType="VARCHAR" />
     <result column="driver_phone_new" property="driverPhoneNew" jdbcType="VARCHAR" />
     <result column="car_model_id_new" property="carModelIdNew" jdbcType="INTEGER" />
@@ -40,7 +39,7 @@
   <sql id="Base_Column_List" >
     id, driver_id, driver_name, license_plates, id_card_no, city_id, city_name, supplier_id, 
     supplier_name, team_id, team_name, driver_phone, car_model_id, car_model_name, car_purchase_date, 
-    model_detail, color, driver_id_new, driver_name_new, driver_phone_new, car_model_id_new, 
+    model_detail, color, driver_name_new, driver_phone_new, car_model_id_new,
     car_model_name_new, car_purchase_date_new, model_detail_new, color_new, status, type, 
     create_id, create_name, create_time, update_id, update_name, operate_reason, update_time
   </sql>

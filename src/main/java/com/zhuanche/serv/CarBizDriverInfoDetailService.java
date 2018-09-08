@@ -25,9 +25,9 @@ public class CarBizDriverInfoDetailService {
     public Boolean checkBankCardBank(String bankCardBank, Integer driverId){
         int count = carBizDriverInfoDetailExMapper.checkBankCardBank(bankCardBank, driverId);
         if(count>0){
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**

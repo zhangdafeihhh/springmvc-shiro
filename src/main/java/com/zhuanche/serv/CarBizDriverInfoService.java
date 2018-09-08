@@ -164,9 +164,9 @@ public class CarBizDriverInfoService {
     public Boolean checkPhone(String phone, Integer driverId) {
         int count = carBizDriverInfoExMapper.checkPhone(phone, driverId);
         if (count > 0) {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**
@@ -179,9 +179,9 @@ public class CarBizDriverInfoService {
     public Boolean checkIdCardNo(String idCardNo, Integer driverId) {
         int count = carBizDriverInfoExMapper.checkIdCardNo(idCardNo, driverId);
         if (count > 0) {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**
@@ -608,7 +608,7 @@ public class CarBizDriverInfoService {
             return AjaxResponse.fail(RestErrorCode.DRIVER_IDCARNO_NOT_LEGAL);
         }
         //银行卡号位16到18位数字，银行开户行，二者都填，或都不填
-        if ((StringUtils.isNotEmpty(bankCardNumber) || StringUtils.isEmpty(bankCardBank)) || (StringUtils.isEmpty(bankCardNumber) || StringUtils.isNotEmpty(bankCardBank))) {
+        if (((StringUtils.isNotEmpty(bankCardNumber) && StringUtils.isEmpty(bankCardBank))) || ((StringUtils.isEmpty(bankCardNumber) && StringUtils.isNotEmpty(bankCardBank)))) {
             return AjaxResponse.fail(RestErrorCode.DRIVER_BANK_CARD_NUMBER_NOT_COMPLETE);
         }
         if (StringUtils.isNotEmpty(bankCardNumber) && StringUtils.isNotEmpty(bankCardBank) && !ValidateUtils.isRegular(bankCardNumber, ValidateUtils.BANK_CARD_NUMBER)) {
