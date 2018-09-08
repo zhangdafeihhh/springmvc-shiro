@@ -36,6 +36,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -332,8 +334,8 @@ public class DriverInfoController {
      * @param drivingLicenseType //驾照类型,例：A1,B1,C1
      * @param drivingYears //驾龄
      * @param archivesNo //档案编号
-     * @param issueDate //领证日期 yyyy-MM-dd
-     * @param expireDate //驾照到期时间 yyyy-MM-dd
+     * @param issueDateStr //领证日期 yyyy-MM-dd
+     * @param expireDateStr //驾照到期时间 yyyy-MM-dd
      * @param serviceCity //服务城市ID
      * @param licensePlates //车牌号
      * @param status //司机状态
@@ -392,7 +394,7 @@ public class DriverInfoController {
                                    @Verify(param = "status",rule="required") Integer status,
                                    Integer age, String currentAddress, String emergencyContactPerson, String emergencyContactNumber,
                                    String superintendNo, String superintendUrl, String drivingLicenseType, Integer drivingYears,
-                                   String archivesNo, Date issueDate, Date expireDate, String photosrct, String driverlicensenumber,
+                                   String archivesNo, String issueDateStr, String expireDateStr, String photosrct, String driverlicensenumber,
                                    String drivinglicenseimg, String nationality, String householdregister, String nation, String marriage,
                                    String foreignlanguage, String address, String education, String firstdrivinglicensedate,
                                    String firstmeshworkdrivinglicensedate, String corptype,  String signdate, String signdateend,
@@ -418,7 +420,7 @@ public class DriverInfoController {
             if(age==null || StringUtils.isEmpty(currentAddress) || StringUtils.isEmpty(emergencyContactPerson)
                     || StringUtils.isEmpty(emergencyContactNumber) || StringUtils.isEmpty(superintendNo)
                     || StringUtils.isEmpty(drivingLicenseType) || drivingYears==null || StringUtils.isEmpty(archivesNo)
-                    || issueDate == null || expireDate == null || StringUtils.isEmpty(driverlicensenumber) || StringUtils.isEmpty(nationality)
+                    || StringUtils.isEmpty(issueDateStr) || StringUtils.isEmpty(expireDateStr) || StringUtils.isEmpty(driverlicensenumber) || StringUtils.isEmpty(nationality)
                     || StringUtils.isEmpty(householdregister) || StringUtils.isEmpty(nation) || StringUtils.isEmpty(marriage) || StringUtils.isEmpty(foreignlanguage)
                     || StringUtils.isEmpty(address) || StringUtils.isEmpty(education) || StringUtils.isEmpty(firstdrivinglicensedate) || StringUtils.isEmpty(firstmeshworkdrivinglicensedate)
                     || StringUtils.isEmpty(corptype) || StringUtils.isEmpty(signdate) || StringUtils.isEmpty(signdateend) || StringUtils.isEmpty(contractdate)
@@ -452,8 +454,18 @@ public class DriverInfoController {
         carBizDriverInfoDTO.setDrivingLicenseType(drivingLicenseType);
         carBizDriverInfoDTO.setDrivingYears(drivingYears);
         carBizDriverInfoDTO.setArchivesNo(archivesNo);
-        carBizDriverInfoDTO.setIssueDate(issueDate);
-        carBizDriverInfoDTO.setExpireDate(expireDate);
+        try {
+            if(StringUtils.isNotEmpty(issueDateStr)){
+                carBizDriverInfoDTO.setIssueDate(new SimpleDateFormat("yyyy-MM-dd").parse(issueDateStr));
+            }
+            if(StringUtils.isNotEmpty(expireDateStr)){
+                carBizDriverInfoDTO.setExpireDate(new SimpleDateFormat("yyyy-MM-dd").parse(expireDateStr));
+            }
+        } catch (ParseException e) {
+            logger.info(LOGTAG + "司机driverId={},修改,时间转换异常={}", driverId, e.getMessage());
+        }
+//        carBizDriverInfoDTO.setIssueDate(issueDate);
+//        carBizDriverInfoDTO.setExpireDate(expireDate);
         carBizDriverInfoDTO.setPhotosrct(photosrct);
         carBizDriverInfoDTO.setDriverlicensenumber(driverlicensenumber);
         carBizDriverInfoDTO.setDrivinglicenseimg(drivinglicenseimg);

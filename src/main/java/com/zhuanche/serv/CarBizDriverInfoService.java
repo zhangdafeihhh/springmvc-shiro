@@ -2798,7 +2798,7 @@ public class CarBizDriverInfoService {
             String result = HttpClientUtil.buildGetRequest(url).execute();
             logger.info(LOGTAG + "删除司机信息缓存,删除失败不影响业务,调用结果返回={}", result);
         } catch (HttpException e) {
-            e.printStackTrace();
+            logger.info(LOGTAG + "司机driverId={},修改,调用清除接口异常={}", driverId, e.getMessage());
         }
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
