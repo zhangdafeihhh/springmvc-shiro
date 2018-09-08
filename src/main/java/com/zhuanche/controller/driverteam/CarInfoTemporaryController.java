@@ -67,7 +67,7 @@ public class CarInfoTemporaryController extends BaseController {
 	@ResponseBody
 	@RequestMapping(value = "/queryCarData", method =  RequestMethod.GET )
 	public AjaxResponse queryCarData(@RequestParam(value = "page",defaultValue="1") Integer page,
-                                     @RequestParam(value = "pageNum",defaultValue="10") Integer pageSize,
+                                     @RequestParam(value = "pageSize",defaultValue="10") Integer pageSize,
                                      @RequestParam(value = "licensePlates",required = false,defaultValue = "") String licensePlates,
                                      @RequestParam(value = "carModelIds",required = false,defaultValue = "") String carModelIds,
                                      @RequestParam(value = "cities",required = false,defaultValue = "") String cities,

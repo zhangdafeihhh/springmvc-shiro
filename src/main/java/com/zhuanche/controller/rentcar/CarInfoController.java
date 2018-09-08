@@ -333,6 +333,7 @@ public class CarInfoController {
                 logger.info("*********操作类型：修改");
             }
             result = this.carService.saveCarInfo(params);
+            logger.info("saveCar-result-result={}" + result);
         } catch (Exception e) {
             logger.error("save CarInfo error. ", e);
         }
@@ -383,7 +384,7 @@ public class CarInfoController {
         }
         if(StringUtils.isNotEmpty(message)){
             result.put(Common.RESULT_RESULT, 0);
-            result.put(Common.RESULT_ERRORMSG, message);
+            result.put("exception", message);
             return getResponse(result);
         }
         result.put(Common.RESULT_RESULT, 1);
