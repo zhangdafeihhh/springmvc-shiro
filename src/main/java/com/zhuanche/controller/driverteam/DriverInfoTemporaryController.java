@@ -194,24 +194,29 @@ public class DriverInfoTemporaryController extends BaseController {
     /**
      * 司机导入
      * @param file
-     * @param cityId 城市Id
-     * @param supplierId 供应商Id
-     * @param teamId 车队Id
-     * @param groupId 小组Id
-     * @param request
      * @param response
      * @return
      */
     @ResponseBody
     @RequestMapping(value = "/importDriverInfo",method =  RequestMethod.POST)
     public AjaxResponse importDriverInfo(@RequestParam(value="fineName") MultipartFile file,
-                                         @Verify(param = "cityId",rule="required") Integer cityId,
-                                         @Verify(param = "supplierId",rule="required") Integer supplierId,
-                                         @Verify(param = "teamId",rule="required") Integer teamId,
-                                         @Verify(param = "groupId",rule="required") Integer groupId,
                                          HttpServletRequest request,
                                          HttpServletResponse response){
         try {
+            /*
+            * @param cityId 城市Id
+     * @param supplierId 供应商Id
+     * @param teamId 车队Id
+     * @param groupId 小组Id
+     * @param request
+            @Verify(param = "cityId",rule="required") Integer cityId,
+            @Verify(param = "supplierId",rule="required") Integer supplierId,
+            @Verify(param = "teamId",rule="required") Integer teamId,
+            @Verify(param = "groupId",rule="required") Integer groupId,*/
+            Integer cityId = 44;
+            Integer supplierId = 37;
+            Integer teamId = 61;
+            Integer groupId = 191;
             log.info("司机导入");
             // 获取上传的文件的名称
             String filename = file.getOriginalFilename();
