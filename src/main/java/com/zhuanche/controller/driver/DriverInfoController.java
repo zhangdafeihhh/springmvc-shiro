@@ -14,12 +14,10 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
+import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
-import com.zhuanche.serv.CarBizCarInfoService;
-import com.zhuanche.serv.CarBizDriverInfoDetailService;
-import com.zhuanche.serv.CarBizDriverInfoService;
-import com.zhuanche.serv.CarBizSupplierService;
+import com.zhuanche.serv.*;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
@@ -64,6 +62,10 @@ public class DriverInfoController {
 
     @Autowired
     private CarBizCarInfoService carBizCarInfoService;
+
+    @Autowired
+    private CarBizCarGroupService carBizCarGroupService;
+
 
     /**
      * 司机信息列表（有分页）
@@ -395,6 +397,7 @@ public class DriverInfoController {
                                    @Verify(param = "supplierId",rule="required") Integer supplierId,
                                    @Verify(param = "licensePlates",rule="required") String licensePlates,
                                    @Verify(param = "status",rule="required") Integer status,
+                                   @Verify(param = "groupId",rule="required") Integer groupId,
                                    Integer age, String currentAddress, String emergencyContactPerson, String emergencyContactNumber,
                                    String superintendNo, String superintendUrl, String drivingLicenseType, Integer drivingYears,
                                    String archivesNo, String issueDateStr, String expireDateStr, String photosrct, String driverlicensenumber,
@@ -405,7 +408,7 @@ public class DriverInfoController {
                                    String phonecorp, String maptype, String emergencycontactaddr, String assessment,
                                    String driverlicenseissuingdatestart, String driverlicenseissuingdateend, String driverlicenseissuingcorp,
                                    String driverlicenseissuingnumber, String driverLicenseIssuingRegisterDate, String driverLicenseIssuingFirstDate,
-                                   String driverLicenseIssuingGrantDate, String birthDay, String houseHoldRegisterPermanent, Integer groupId,
+                                   String driverLicenseIssuingGrantDate, String birthDay, String houseHoldRegisterPermanent,
                                    String memo, String bankCardBank,String bankCardNumber) {
 
         //判断一些基础信息是否正确
@@ -433,6 +436,11 @@ public class DriverInfoController {
         had = carBizCarInfoService.validateCityAndSupplier(serviceCity, supplierId, licensePlates);
         if (!had) {
             return AjaxResponse.fail(RestErrorCode.CITY_SUPPLIER_CAR_DIFFER);
+        }
+        // 根据服务类型查找服务类型名称
+        CarBizCarGroup carBizCarGroup = carBizCarGroupService.selectByPrimaryKey(groupId);
+        if (carBizCarGroup == null) {
+            return AjaxResponse.fail(RestErrorCode.GROUP_NOT_EXIST);
         }
         Integer cooperationType = carBizSupplier.getCooperationType();
         if(cooperationType!=null && cooperationType==5){
