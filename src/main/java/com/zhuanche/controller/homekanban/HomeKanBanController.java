@@ -55,6 +55,11 @@ public class HomeKanBanController {
 
 	@Value("${statistics.core.indicators.url}")
 	String coreIndicatorsUrl;
+	
+	/**链接超时时间**/
+	private static final Integer CONNECT_TIMEOUT = 3000;
+	/**读取超时时间**/
+	private static final Integer READ_TIMEOUT = 3000;
 
 	/** 日均运营车辆统计查询接口 **/
 	@RequestMapping("/operatingVehicleStatistics")
@@ -183,9 +188,6 @@ public class HomeKanBanController {
 			visibleAllianceIds = setToArray(supplierIds);
 			Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
 			visibleMotocadeIds = setToArray(teamIds);
-			if(null == visibleAllianceIds || null == visibleMotocadeIds){
-				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-			}
 		}
 		// 从大数据仓库获取统计数据
 		Map<String, Object> paramMap = Maps.newHashMap();
@@ -197,7 +199,12 @@ public class HomeKanBanController {
 		paramMap.put("visibleMotocadeIds", visibleMotocadeIds);
 		try {
 			String jsonString = JSON.toJSONString(paramMap);
-			String result = HttpClientUtil.buildPostRequest(coreIndicatorsUrl).setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
+			String result = HttpClientUtil.buildPostRequest(coreIndicatorsUrl)
+					.setConnectTimeOut(CONNECT_TIMEOUT)
+					.setReadTimeOut(READ_TIMEOUT)
+					.setBody(jsonString)
+					.addHeader("Content-Type", ContentType.APPLICATION_JSON)
+					.execute();
 			JSONObject job = JSON.parseObject(result);
 			if (job == null) {
 				logger.error("调用大数据" + coreIndicatorsUrl + "返回结果为null");
@@ -227,15 +234,17 @@ public class HomeKanBanController {
 			visibleAllianceIds = setToArray(supplierIds);
 			Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
 			visibleMotocadeIds = setToArray(teamIds);
-			if(null == visibleAllianceIds || null == visibleMotocadeIds){
-				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-			}
 			paramMap.put("visibleAllianceIds", visibleAllianceIds);
 			paramMap.put("visibleMotocadeIds", visibleMotocadeIds);
 		}
 		try {
 			String jsonString = JSON.toJSONString(paramMap);
-			String result = HttpClientUtil.buildPostRequest(url).setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
+			String result = HttpClientUtil.buildPostRequest(url)
+					.setConnectTimeOut(CONNECT_TIMEOUT)
+					.setReadTimeOut(READ_TIMEOUT)
+					.setBody(jsonString)
+					.addHeader("Content-Type", ContentType.APPLICATION_JSON)
+					.execute();
 			JSONObject job = JSON.parseObject(result);
 			if (job == null) {
 				logger.error("调用大数据" + url + "返回结果为null");

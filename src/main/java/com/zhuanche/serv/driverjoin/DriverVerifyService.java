@@ -65,11 +65,11 @@ public class DriverVerifyService {
 				cityIdsForAuth = currentLoginUser.getCityIds();
 				supplierIdsForAuth = currentLoginUser.getSupplierIds();
 			}
-			if (cityIdsForAuth.size() == 0 || cityId != null && !cityIdsForAuth.contains(cityId)) {
+			if (cityIdsForAuth.size() > 0 && cityId != null && !cityIdsForAuth.contains(cityId)) {
 				return null;
 			}
-			if (supplierIdsForAuth.size() == 0
-					|| StringUtils.isNotBlank(supplier) && !supplierIdsForAuth.contains(supplier)) {
+			if (supplierIdsForAuth.size() > 0
+					&& StringUtils.isNotBlank(supplier) && !supplierIdsForAuth.contains(supplier)) {
 				return null;
 			}
 		}
@@ -80,16 +80,20 @@ public class DriverVerifyService {
 		if (null != cityId) {
 			cityIds.add(cityId);
 		} else {
-			for (Integer cityid : cityIdsForAuth) {
-				cityIds.add(cityid.longValue());
+			if(cityIdsForAuth != null && cityIdsForAuth.size() >0){
+				for (Integer cityid : cityIdsForAuth) {
+					cityIds.add(cityid.longValue());
+				}
 			}
 		}
 		// 供应商权限
 		if (StringUtils.isNotBlank(supplier)) {
 			supplierIds.add(supplier);
 		} else {
-			for (Integer supplierId : supplierIdsForAuth) {
-				supplierIds.add(String.valueOf(supplierId));
+			if(supplierIdsForAuth != null && supplierIdsForAuth.size() >0 ){
+				for (Integer supplierId : supplierIdsForAuth) {
+					supplierIds.add(String.valueOf(supplierId));
+				}
 			}
 		}
 		// 分页查询司机加盟信息

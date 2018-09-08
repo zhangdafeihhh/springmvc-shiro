@@ -77,7 +77,7 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	@ResponseBody
 	public AjaxResponse driverDutyStatisticDailData(@Verify(param = "cityId",rule = "required") String cityId, @Verify(param = "supplierId",rule = "required")String supplierId, String teamId,
 			String groupIds, String name, String driverId, String  phone, String licensePlates,
-			@Verify(param = "startTime",rule = "required") String startTime, String endTime, String sortName, String sortOrder, Integer page, Integer pageSize, Integer reportType) {
+			@Verify(param = "startTime",rule = "required") String startTime, String endTime, String sortName, String sortOrder, Integer page, Integer pageSize, Integer reportType) throws ParseException {
 		//默认日统计
 		reportType = reportType == null ? 0 : reportType;
 		//如果是日统计，开始时间和结束时间不能为空并且开始时间和结束时间在一个月内
@@ -152,23 +152,19 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	 */
 	@RequestMapping(value = "/driverDutyStatisticHalfData")
 	@ResponseBody
-	public AjaxResponse driverDutyStatisticHalfData(@Verify(param = "driverId",rule = "required") String driverId,@Verify(param = "time",rule = "required") String time, Integer page, Integer pageSize) {
+	public AjaxResponse driverDutyStatisticHalfData(@Verify(param = "driverId",rule = "required") String driverId,@Verify(param = "time",rule = "required") String time, Integer page, Integer pageSize) throws ParseException {
 
 		StatisticDutyHalfParams params = new StatisticDutyHalfParams(driverId, time, page, pageSize);
 		log.info("司机考勤记录列表按司机id查询数据:driverDutyStatisticHalfData,参数"+params.toString());
 		if(time !=null && !"".equals(time)){
 			int value=0;
-			try {
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-				Date dateBegin=sdf.parse("2017-09-14");
-				Date dateEnd=sdf.parse(time);
-				if(dateBegin.getTime()>dateEnd.getTime()){
-					value = 0;
-				}else{
-					value = 1;
-				}
-			} catch (ParseException e) {
-				e.printStackTrace();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			Date dateBegin=sdf.parse("2017-09-14");
+			Date dateEnd=sdf.parse(time);
+			if(dateBegin.getTime()>dateEnd.getTime()){
+				value = 0;
+			}else{
+				value = 1;
 			}
 			params.setValue(value);
 			params.setTable("statistic_duty_half_"+time.substring(0,10).replaceAll("-", "_"));
@@ -191,7 +187,7 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	@RequestMapping("/exportDriverDutyStatistic")
 	public AjaxResponse exportDriverDuty(@Verify(param = "cityId",rule = "required") String cityId, @Verify(param = "supplierId",rule = "required") String supplierId, String teamId, String groupIds, String name,
 		 String  phone, String licensePlates,@Verify(param = "startTime",rule = "required")  String startTime,
-		 String endTime, Integer reportType, HttpServletRequest request, HttpServletResponse response){
+		 String endTime, Integer reportType, HttpServletRequest request, HttpServletResponse response) throws ParseException {
 
 		//默认日统计
 		reportType = reportType == null ? 0 : reportType;
@@ -316,19 +312,15 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	 * @param time
 	 * @return
 	 */
-	public int setDriverDutyStatisticValue(String time){
+	public int setDriverDutyStatisticValue(String time) throws ParseException {
 		int value=0;
-		try {
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
-			Date dateBegin = sdf.parse("2017-09");
-			Date dateEnd = sdf.parse(time);
-			if(dateBegin.getTime() > dateEnd.getTime()){
-				value = 0;
-			}else{
-				value = 1;
-			}
-		} catch (ParseException e) {
-			e.printStackTrace();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+		Date dateBegin = sdf.parse("2017-09");
+		Date dateEnd = sdf.parse(time);
+		if(dateBegin.getTime() > dateEnd.getTime()){
+			value = 0;
+		}else{
+			value = 1;
 		}
 		return value;
 	}

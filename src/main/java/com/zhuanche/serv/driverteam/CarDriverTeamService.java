@@ -239,7 +239,7 @@ public class CarDriverTeamService{
 				return pageDTO;
 			}
 		}catch (Exception e){
-			logger.error("查询可添加司机列表异常:{}",e);
+			logger.error("查询可添加司机列表异常:{}"+JSON.toJSONString(e));
 			return null;
 		}
 	}
@@ -311,7 +311,7 @@ public class CarDriverTeamService{
 			pageDTO.setTotal((int)pageInfo.getTotal());
 			return pageDTO;
 		}catch (Exception e){
-			logger.error("查询车队/小组司机已有司机异常:{}",e);
+			logger.error("查询车队/小组司机已有司机异常:{}"+JSON.toJSONString(e));
 			return null;
 		}
 	}
@@ -357,7 +357,7 @@ public class CarDriverTeamService{
 			dto.setCityName(supplierMapping.get(Integer.valueOf(carDriverTeam.getSupplier())).getSupplierFullName());
 			return dto;
 		}catch (Exception e){
-			logger.error("查询车队详情失败:{}",e);
+			logger.error("查询车队详情失败:{}"+JSON.toJSONString(e));
 			return null;
 		}
 	}
@@ -389,7 +389,7 @@ public class CarDriverTeamService{
 			existsTeam.setRemark(paramDto.getRemark());
 			return carDriverTeamMapper.updateByPrimaryKeySelective(existsTeam);
 		}catch (Exception e){
-			logger.error("更新车队失败:{}",e);
+			logger.error("更新车队失败:{}"+JSON.toJSONString(e));
 			return ServiceReturnCodeEnum.DEAL_FAILURE.getCode();
 		}
 	}
@@ -417,7 +417,7 @@ public class CarDriverTeamService{
 			record.setCreateBy(String.valueOf(WebSessionUtil.getCurrentLoginUser().getId()));
 			return carDriverTeamMapper.insertSelective(record);
 		}catch (Exception e){
-			logger.error("新增车队失败:{}",e);
+			logger.error("新增车队失败:{}"+JSON.toJSONString(e));
 			return ServiceReturnCodeEnum.DEAL_FAILURE.getCode();
 		}
 	}
@@ -461,7 +461,7 @@ public class CarDriverTeamService{
 			driverTeams = pageInfo.getList();
 			total = (int)pageInfo.getTotal();
 		}catch (Exception e){
-			logger.error("查询车队异常:{}",e);
+			logger.error("查询车队异常:{}"+JSON.toJSONString(e));
 			return new PageDTO();
 		}finally {
 			PageHelper.clearPage();
