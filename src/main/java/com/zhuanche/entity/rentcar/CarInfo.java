@@ -229,6 +229,16 @@ public class CarInfo extends BaseEntity {
 
     private String cooperationName;//加盟类型
 
+    private String idCardNo;//司机身份证号
+
+    public String getIdCardNo() {
+        return idCardNo;
+    }
+
+    public void setIdCardNo(String idCardNo) {
+        this.idCardNo = idCardNo;
+    }
+
     public int getCooperationType() {
         return cooperationType;
     }

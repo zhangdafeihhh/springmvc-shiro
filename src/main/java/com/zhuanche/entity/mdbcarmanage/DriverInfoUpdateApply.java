@@ -37,7 +37,7 @@ public class DriverInfoUpdateApply {
 
     private String color;
 
-    private Integer driverIdNew;
+    private String idCardNoNew;
 
     private String driverNameNew;
 
@@ -207,12 +207,12 @@ public class DriverInfoUpdateApply {
         this.color = color == null ? null : color.trim();
     }
 
-    public Integer getDriverIdNew() {
-        return driverIdNew;
+    public String getIdCardNoNew() {
+        return idCardNoNew;
     }
 
-    public void setDriverIdNew(Integer driverIdNew) {
-        this.driverIdNew = driverIdNew;
+    public void setIdCardNoNew(String idCardNoNew) {
+        this.idCardNoNew = idCardNoNew == null ? null : idCardNoNew.trim();
     }
 
     public String getDriverNameNew() {

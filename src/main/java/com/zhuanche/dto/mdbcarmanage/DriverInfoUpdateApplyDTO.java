@@ -95,9 +95,9 @@ public class DriverInfoUpdateApplyDTO extends Base {
     private String color;
 
     /**
-     * 司机ID(新,车辆修改申请所需)
+     * 司机身份证号(新,车辆修改申请所需)
      */
-    private Integer driverIdNew;
+    private String idCardNoNew;
 
     /**
      * 司机名称(新,车辆修改申请所需)
@@ -302,12 +302,12 @@ public class DriverInfoUpdateApplyDTO extends Base {
         this.color = color;
     }
 
-    public Integer getDriverIdNew() {
-        return driverIdNew;
+    public String getIdCardNoNew() {
+        return idCardNoNew;
     }
 
-    public void setDriverIdNew(Integer driverIdNew) {
-        this.driverIdNew = driverIdNew;
+    public void setIdCardNoNew(String idCardNoNew) {
+        this.idCardNoNew = idCardNoNew;
     }
 
     public String getDriverNameNew() {
@@ -451,7 +451,7 @@ public class DriverInfoUpdateApplyDTO extends Base {
                 && (this.getCarPurchaseDate() == null ? other.getCarPurchaseDate() == null : this.getCarPurchaseDate().equals(other.getCarPurchaseDate()))
                 && (this.getModelDetail() == null ? other.getModelDetail() == null : this.getModelDetail().equals(other.getModelDetail()))
                 && (this.getColor() == null ? other.getColor() == null : this.getColor().equals(other.getColor()))
-                && (this.getDriverIdNew() == null ? other.getDriverIdNew() == null : this.getDriverIdNew().equals(other.getDriverIdNew()))
+                && (this.getIdCardNoNew() == null ? other.getIdCardNoNew() == null : this.getIdCardNoNew().equals(other.getIdCardNoNew()))
                 && (this.getDriverNameNew() == null ? other.getDriverNameNew() == null : this.getDriverNameNew().equals(other.getDriverNameNew()))
                 && (this.getDriverPhoneNew() == null ? other.getDriverPhoneNew() == null : this.getDriverPhoneNew().equals(other.getDriverPhoneNew()))
                 && (this.getCarModelIdNew() == null ? other.getCarModelIdNew() == null : this.getCarModelIdNew().equals(other.getCarModelIdNew()))
@@ -491,7 +491,7 @@ public class DriverInfoUpdateApplyDTO extends Base {
         result = prime * result + ((getCarPurchaseDate() == null) ? 0 : getCarPurchaseDate().hashCode());
         result = prime * result + ((getModelDetail() == null) ? 0 : getModelDetail().hashCode());
         result = prime * result + ((getColor() == null) ? 0 : getColor().hashCode());
-        result = prime * result + ((getDriverIdNew() == null) ? 0 : getDriverIdNew().hashCode());
+        result = prime * result + ((getIdCardNoNew() == null) ? 0 : getIdCardNoNew().hashCode());
         result = prime * result + ((getDriverNameNew() == null) ? 0 : getDriverNameNew().hashCode());
         result = prime * result + ((getDriverPhoneNew() == null) ? 0 : getDriverPhoneNew().hashCode());
         result = prime * result + ((getCarModelIdNew() == null) ? 0 : getCarModelIdNew().hashCode());
@@ -534,7 +534,7 @@ public class DriverInfoUpdateApplyDTO extends Base {
         sb.append(", carPurchaseDate=").append(carPurchaseDate);
         sb.append(", modelDetail=").append(modelDetail);
         sb.append(", color=").append(color);
-        sb.append(", driverIdNew=").append(driverIdNew);
+        sb.append(", idCardNoNew=").append(idCardNoNew);
         sb.append(", driverNameNew=").append(driverNameNew);
         sb.append(", driverPhoneNew=").append(driverPhoneNew);
         sb.append(", carModelIdNew=").append(carModelIdNew);

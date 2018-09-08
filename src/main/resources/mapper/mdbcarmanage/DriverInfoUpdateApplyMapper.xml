@@ -19,7 +19,7 @@
     <result column="car_purchase_date" property="carPurchaseDate" jdbcType="TIMESTAMP" />
     <result column="model_detail" property="modelDetail" jdbcType="VARCHAR" />
     <result column="color" property="color" jdbcType="VARCHAR" />
-    <result column="driver_id_new" property="driverIdNew" jdbcType="INTEGER" />
+    <result column="id_card_no_new" property="idCardNoNew" jdbcType="VARCHAR" />
     <result column="driver_name_new" property="driverNameNew" jdbcType="VARCHAR" />
     <result column="driver_phone_new" property="driverPhoneNew" jdbcType="VARCHAR" />
     <result column="car_model_id_new" property="carModelIdNew" jdbcType="INTEGER" />
@@ -40,7 +40,7 @@
   <sql id="Base_Column_List" >
     id, driver_id, driver_name, license_plates, id_card_no, city_id, city_name, supplier_id, 
     supplier_name, team_id, team_name, driver_phone, car_model_id, car_model_name, car_purchase_date, 
-    model_detail, color, driver_id_new, driver_name_new, driver_phone_new, car_model_id_new, 
+    model_detail, color, id_card_no_new, driver_name_new, driver_phone_new, car_model_id_new, 
     car_model_name_new, car_purchase_date_new, model_detail_new, color_new, status, type, 
     create_id, create_name, create_time, update_id, update_name, operate_reason, update_time
   </sql>
@@ -63,7 +63,7 @@
       supplier_id, supplier_name, team_id, 
       team_name, driver_phone, car_model_id, 
       car_model_name, car_purchase_date, model_detail, 
-      color, driver_id_new, driver_name_new, 
+      color, id_card_no_new, driver_name_new, 
       driver_phone_new, car_model_id_new, car_model_name_new, 
       car_purchase_date_new, model_detail_new, color_new, 
       status, type, create_id, 
@@ -75,7 +75,7 @@
       #{supplierId,jdbcType=INTEGER}, #{supplierName,jdbcType=VARCHAR}, #{teamId,jdbcType=INTEGER}, 
       #{teamName,jdbcType=VARCHAR}, #{driverPhone,jdbcType=VARCHAR}, #{carModelId,jdbcType=INTEGER}, 
       #{carModelName,jdbcType=VARCHAR}, #{carPurchaseDate,jdbcType=TIMESTAMP}, #{modelDetail,jdbcType=VARCHAR}, 
-      #{color,jdbcType=VARCHAR}, #{driverIdNew,jdbcType=INTEGER}, #{driverNameNew,jdbcType=VARCHAR}, 
+      #{color,jdbcType=VARCHAR}, #{idCardNoNew,jdbcType=VARCHAR}, #{driverNameNew,jdbcType=VARCHAR}, 
       #{driverPhoneNew,jdbcType=VARCHAR}, #{carModelIdNew,jdbcType=INTEGER}, #{carModelNameNew,jdbcType=VARCHAR}, 
       #{carPurchaseDateNew,jdbcType=TIMESTAMP}, #{modelDetailNew,jdbcType=VARCHAR}, #{colorNew,jdbcType=VARCHAR}, 
       #{status,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{createId,jdbcType=INTEGER}, 
@@ -137,8 +137,8 @@
       <if test="color != null" >
         color,
       </if>
-      <if test="driverIdNew != null" >
-        driver_id_new,
+      <if test="idCardNoNew != null" >
+        id_card_no_new,
       </if>
       <if test="driverNameNew != null" >
         driver_name_new,
@@ -238,8 +238,8 @@
       <if test="color != null" >
         #{color,jdbcType=VARCHAR},
       </if>
-      <if test="driverIdNew != null" >
-        #{driverIdNew,jdbcType=INTEGER},
+      <if test="idCardNoNew != null" >
+        #{idCardNoNew,jdbcType=VARCHAR},
       </if>
       <if test="driverNameNew != null" >
         #{driverNameNew,jdbcType=VARCHAR},
@@ -342,8 +342,8 @@
       <if test="color != null" >
         color = #{color,jdbcType=VARCHAR},
       </if>
-      <if test="driverIdNew != null" >
-        driver_id_new = #{driverIdNew,jdbcType=INTEGER},
+      <if test="idCardNoNew != null" >
+        id_card_no_new = #{idCardNoNew,jdbcType=VARCHAR},
       </if>
       <if test="driverNameNew != null" >
         driver_name_new = #{driverNameNew,jdbcType=VARCHAR},
@@ -414,7 +414,7 @@
       car_purchase_date = #{carPurchaseDate,jdbcType=TIMESTAMP},
       model_detail = #{modelDetail,jdbcType=VARCHAR},
       color = #{color,jdbcType=VARCHAR},
-      driver_id_new = #{driverIdNew,jdbcType=INTEGER},
+      id_card_no_new = #{idCardNoNew,jdbcType=VARCHAR},
       driver_name_new = #{driverNameNew,jdbcType=VARCHAR},
       driver_phone_new = #{driverPhoneNew,jdbcType=VARCHAR},
       car_model_id_new = #{carModelIdNew,jdbcType=INTEGER},

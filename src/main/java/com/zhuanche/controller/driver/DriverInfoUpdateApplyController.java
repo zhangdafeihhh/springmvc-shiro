@@ -203,7 +203,8 @@ public class DriverInfoUpdateApplyController {
      * @param modelDetailNew 新的具体车型
      * @param carPurchaseDateNewStr 购买时间(String yyyy-MM-dd)
      * @param colorNew 新的颜色
-     * @param driverIdNew 新的绑定司机
+     * @param idCarNoNew 新的绑定司机身份证号
+     * @param driverNameNew 新的绑定司机名称
      * @return
      */
     @ResponseBody
@@ -216,8 +217,12 @@ public class DriverInfoUpdateApplyController {
                                                @Verify(param = "modelDetailNew", rule = "required") String modelDetailNew,
                                                @Verify(param = "carPurchaseDateNewStr", rule = "required") String carPurchaseDateNewStr,
                                                @Verify(param = "colorNew", rule = "required") String colorNew,
-                                               Integer driverIdNew) {
+                                               String idCarNoNew, String driverNameNew) {
 
+        if((StringUtils.isNotEmpty(idCarNoNew) && StringUtils.isEmpty(driverNameNew))
+                || (StringUtils.isEmpty(idCarNoNew) && StringUtils.isNotEmpty(driverNameNew))){
+            return AjaxResponse.fail(RestErrorCode.INFORMATION_NOT_COMPLETE);
+        }
         //查询车牌号是否存在
         CarBizCarInfoDTO carBizCarInfoDTO = carBizCarInfoService.selectModelByLicensePlates(licensePlates);
         if(carBizCarInfoDTO==null){
@@ -240,7 +245,7 @@ public class DriverInfoUpdateApplyController {
                 return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
             }
             //存在，加入
-            driverInfoUpdateApply.setDriverId(driverIdNew);
+            driverInfoUpdateApply.setDriverId(carBizDriverInfo.getDriverId());
             driverInfoUpdateApply.setDriverName(carBizDriverInfo.getName());
             driverInfoUpdateApply.setDriverPhone(carBizDriverInfo.getPhone());
             driverInfoUpdateApply.setIdCardNo(carBizDriverInfo.getIdCardNo());
@@ -265,17 +270,11 @@ public class DriverInfoUpdateApplyController {
         driverInfoUpdateApply.setColorNew(colorNew);
 
         //新司机信息
-        if(driverIdNew!=null){
-            CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(driverIdNew);
-            if(carBizDriverInfo==null){
-                return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
-            }else {//存在，加入
-                driverInfoUpdateApply.setDriverIdNew(driverIdNew);
-                driverInfoUpdateApply.setDriverNameNew(carBizDriverInfo.getName());
-                driverInfoUpdateApply.setDriverPhoneNew(carBizDriverInfo.getPhone());
-            }
+        if(StringUtils.isNotEmpty(idCarNoNew) && StringUtils.isNotEmpty(driverNameNew)){
+                driverInfoUpdateApply.setIdCardNoNew(idCarNoNew);
+                driverInfoUpdateApply.setDriverNameNew(driverNameNew);
         }else {//不存在，删除
-            driverInfoUpdateApply.setDriverIdNew(null);
+            driverInfoUpdateApply.setIdCardNoNew("");
             driverInfoUpdateApply.setDriverNameNew("");
             driverInfoUpdateApply.setDriverPhoneNew("");
         }

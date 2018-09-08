@@ -229,6 +229,7 @@
     car.STATUS status,
     (case when car.driver_id =0 then 0 else 1 end)isFree,
     driver.name AS driverName,
+    driver.id_card_no AS idCardNo,
     car.create_by createBy,
     car.update_by updateBy,
     car.create_date createDate,

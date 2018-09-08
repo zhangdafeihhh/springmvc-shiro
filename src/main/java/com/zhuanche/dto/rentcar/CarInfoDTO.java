@@ -214,6 +214,25 @@ public class CarInfoDTO{
 
     private Integer oldSupplierId;
 
+    private String driverName;
+    private String idCardNo;//司机身份证号
+
+    public String getDriverName() {
+        return driverName;
+    }
+
+    public void setDriverName(String driverName) {
+        this.driverName = driverName;
+    }
+
+    public String getIdCardNo() {
+        return idCardNo;
+    }
+
+    public void setIdCardNo(String idCardNo) {
+        this.idCardNo = idCardNo;
+    }
+
     public String getLicensePlates1() {
         return licensePlates1;
     }
