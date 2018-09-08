@@ -80,7 +80,7 @@ public class CitySupplierTeamService {
         //供应商ID 进行校验数据权限
         if(WebSessionUtil.isSupperAdmin()==false ) {
             Set<Integer> supplierIds = WebSessionUtil.getCurrentLoginUser().getSupplierIds();
-            if( supplierIds.size()==0 || supplierIds.contains(supplierId)==false  ) {
+            if(null !=supplierIds && supplierIds.size()>0 && supplierIds.contains(supplierId)==false  ) {
                 return new ArrayList<CarDriverTeam>();
             }
         }
@@ -91,7 +91,7 @@ public class CitySupplierTeamService {
             return carDriverTeamExMapper.queryDriverTeam(null, supplierIds, null);
         }else {
             Set<Integer> teamIds = WebSessionUtil.getCurrentLoginUser().getTeamIds();
-            if(teamIds.size()==0 ) {
+            if(null == teamIds || teamIds.size()==0 ) {
                 return carDriverTeamExMapper.queryDriverTeam(null, supplierIds, null);
             }else{
             	return carDriverTeamExMapper.queryDriverTeam(null, supplierIds, teamIds);
