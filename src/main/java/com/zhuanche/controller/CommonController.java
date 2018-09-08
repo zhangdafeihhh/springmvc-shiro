@@ -153,21 +153,6 @@ public class CommonController {
     }
 
     /**
-     * 查询有效车型列表
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping(value = "/carBizModelList", method = RequestMethod.GET)
-    public AjaxResponse carBizModelList(){
-        SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
-        if(Check.NuNObj(currentLoginUser)){
-            return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST);
-        }
-        List<CarBizModel> carBizModels = carBizModelService.queryAllList();
-        return AjaxResponse.success(carBizModels);
-    }
-
-    /**
      *查询用车型类型列表
      * @return
      */
