@@ -20,7 +20,7 @@ import com.zhuanche.entity.rentcar.CarBizModel;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
-import com.zhuanche.util.IdCard;
+import com.zhuanche.util.IdcardUtil;
 
 import mapper.driver.ex.DriverCertExMapper;
 import mapper.driver.ex.DriverVerifyExMapper;
@@ -137,21 +137,20 @@ public class DriverVerifyService {
 				driverVerify.setPlateNum(plateNum.toUpperCase());
 			}
 			// 获取司机的出生日期 性别
-			if (driverVerify.getIdCard() != null && !"".equals(driverVerify.getIdCard())) {
-				if (driverVerify.getIdCard() != null && !"".equals(driverVerify.getIdCard())) {
-					String gender = IdCard.getGenderByIdCard(driverVerify.getIdCard());
-					if (Integer.valueOf(gender) == 1) {
-						driverVerify.setIdcardSex("男");
-					} else {
-						driverVerify.setIdcardSex("女");
-					}
-					String d = IdCard.getBirthByIdCard(driverVerify.getIdCard());
-					if (d != null && d.length() == 8) {
-						driverVerify.setIdcardBirthday(
-								d.substring(0, 4) + "-" + d.substring(4, 6) + "-" + d.substring(6, 8));
-					} else {
-						driverVerify.setIdcardBirthday(d);
-					}
+			String idCard = driverVerify.getIdCard();
+			if (StringUtils.isNotBlank(idCard)) {
+				int gender = IdcardUtil.getGenderByIdCard(idCard);
+				if (gender == 1) {
+					driverVerify.setIdcardSex("男");
+				} else if(gender == 0){
+					driverVerify.setIdcardSex("女");
+				}
+				String d = IdcardUtil.getBirthByIdCard(idCard);
+				if (d != null && d.length() == 8) {
+					driverVerify.setIdcardBirthday(
+							d.substring(0, 4) + "-" + d.substring(4, 6) + "-" + d.substring(6, 8));
+				} else {
+					driverVerify.setIdcardBirthday(d);
 				}
 			}
 			dto = BeanUtil.copyObject(driverVerify, DriverVerifyDto.class);
