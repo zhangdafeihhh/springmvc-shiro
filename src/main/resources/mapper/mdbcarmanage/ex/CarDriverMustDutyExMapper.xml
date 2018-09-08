@@ -42,7 +42,7 @@
 
   <select id="selectDriverMustDutyList" parameterType="com.zhuanche.request.DutyParamRequest" resultType="com.zhuanche.dto.driverDuty.CarDriverMustDutyDTO">
     select
-    d.id driverMustDutyId,
+    d.id,
     d.city,
     d.city_name cityName,
     d.supplier,
