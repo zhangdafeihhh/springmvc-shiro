@@ -203,7 +203,7 @@ public class DriverInfoUpdateApplyController {
      * @param modelDetailNew 新的具体车型
      * @param carPurchaseDateNewStr 购买时间(String yyyy-MM-dd)
      * @param colorNew 新的颜色
-     * @param idCarNoNew 新的绑定司机身份证号
+     * @param idCardNoNew 新的绑定司机身份证号
      * @param driverNameNew 新的绑定司机名称
      * @return
      */
@@ -217,10 +217,10 @@ public class DriverInfoUpdateApplyController {
                                                @Verify(param = "modelDetailNew", rule = "required") String modelDetailNew,
                                                @Verify(param = "carPurchaseDateNewStr", rule = "required") String carPurchaseDateNewStr,
                                                @Verify(param = "colorNew", rule = "required") String colorNew,
-                                               String idCarNoNew, String driverNameNew) {
+                                               String idCardNoNew, String driverNameNew) {
 
-        if((StringUtils.isNotEmpty(idCarNoNew) && StringUtils.isEmpty(driverNameNew))
-                || (StringUtils.isEmpty(idCarNoNew) && StringUtils.isNotEmpty(driverNameNew))){
+        if((StringUtils.isNotEmpty(idCardNoNew) && StringUtils.isEmpty(driverNameNew))
+                || (StringUtils.isEmpty(idCardNoNew) && StringUtils.isNotEmpty(driverNameNew))){
             return AjaxResponse.fail(RestErrorCode.INFORMATION_NOT_COMPLETE);
         }
         //查询车牌号是否存在
@@ -270,8 +270,8 @@ public class DriverInfoUpdateApplyController {
         driverInfoUpdateApply.setColorNew(colorNew);
 
         //新司机信息
-        if(StringUtils.isNotEmpty(idCarNoNew) && StringUtils.isNotEmpty(driverNameNew)){
-                driverInfoUpdateApply.setIdCardNoNew(idCarNoNew);
+        if(StringUtils.isNotEmpty(idCardNoNew) && StringUtils.isNotEmpty(driverNameNew)){
+                driverInfoUpdateApply.setIdCardNoNew(idCardNoNew);
                 driverInfoUpdateApply.setDriverNameNew(driverNameNew);
         }else {//不存在，删除
             driverInfoUpdateApply.setIdCardNoNew("");
