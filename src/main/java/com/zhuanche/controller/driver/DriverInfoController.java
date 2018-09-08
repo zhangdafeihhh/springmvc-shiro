@@ -16,6 +16,7 @@ import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
+import com.zhuanche.serv.CarBizCarInfoService;
 import com.zhuanche.serv.CarBizDriverInfoDetailService;
 import com.zhuanche.serv.CarBizDriverInfoService;
 import com.zhuanche.serv.CarBizSupplierService;
@@ -38,7 +39,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -61,6 +61,9 @@ public class DriverInfoController {
 
     @Autowired
     private CarBizSupplierService carBizSupplierService;
+
+    @Autowired
+    private CarBizCarInfoService carBizCarInfoService;
 
     /**
      * 司机信息列表（有分页）
@@ -414,6 +417,22 @@ public class DriverInfoController {
         CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(supplierId);
         if (carBizSupplier == null) {
             return AjaxResponse.fail(RestErrorCode.SUPPLIER_NOT_EXIST, supplierId);
+        }
+        if(serviceCity!=carBizSupplier.getSupplierCity()){
+            return AjaxResponse.fail(RestErrorCode.CITY_SUPPLIER_DIFFER);
+        }
+        Boolean had = carBizCarInfoService.checkLicensePlates(licensePlates);
+        if (!had) {
+            return AjaxResponse.fail(RestErrorCode.BUS_NOT_EXIST);
+        } else {
+            had = carBizDriverInfoService.checkLicensePlates(licensePlates);
+            if (had) {
+                return AjaxResponse.fail(RestErrorCode.CAR_HAS_BIND);
+            }
+        }
+        had = carBizCarInfoService.validateCityAndSupplier(serviceCity, supplierId, licensePlates);
+        if (!had) {
+            return AjaxResponse.fail(RestErrorCode.CITY_SUPPLIER_CAR_DIFFER);
         }
         Integer cooperationType = carBizSupplier.getCooperationType();
         if(cooperationType!=null && cooperationType==5){

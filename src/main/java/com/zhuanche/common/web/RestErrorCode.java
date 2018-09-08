@@ -116,7 +116,12 @@ public final class RestErrorCode{
 	public static final int INFORMATION_NOT_COMPLETE                    = 3009;
 	@ResultMessage("供应商ID={}的供应商不存在")
 	public static final int SUPPLIER_NOT_EXIST                    = 3010;
-
+	@ResultMessage("所选城市和供应商城市不一致")
+	public static final int CITY_SUPPLIER_DIFFER                    = 3011;
+	@ResultMessage("车辆已经被绑定")
+	public static final int CAR_HAS_BIND                    = 3011;
+	@ResultMessage("所选城市和供应商、车辆信息不一致")
+	public static final int CITY_SUPPLIER_CAR_DIFFER                    = 3012;
 
 	@ResultMessage("周报查询时间段只能查询一个星期的时间")
 	public static final int ONLY_QUERY_WEEK                    = 3101;

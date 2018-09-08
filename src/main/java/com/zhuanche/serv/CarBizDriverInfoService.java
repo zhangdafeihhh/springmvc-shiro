@@ -1223,7 +1223,7 @@ public class CarBizDriverInfoService {
                                         }
                                     }
                                     Integer cityCount = carBizCarInfoExMapper.validateCityAndSupplier(cityId, supplierId, licensePlates);
-                                    if (cityCount == null || cityCount > 0) {
+                                    if (cityCount == null || cityCount == 0) {
                                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                                         returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
                                                 + (colIx + 1) + "列 【车牌号】:" + licensePlates + "不在所选的城市或厂商");
@@ -2828,5 +2828,18 @@ public class CarBizDriverInfoService {
     public CarBizDriverInfo selectByPhone(String phone){
         CarBizDriverInfo carBizDriverInfo = carBizDriverInfoMapper.selectByPhone(phone);
         return carBizDriverInfo;
+    }
+
+    /**
+     * 查询车辆是否已存在司机表
+     * @param licensePlates
+     * @return
+     */
+    public Boolean checkLicensePlates(String licensePlates){
+        int count = carBizDriverInfoExMapper.checkLicensePlates(licensePlates);
+        if(count>0){
+            return true;
+        }
+        return false;
     }
 }
