@@ -366,6 +366,9 @@ public class DriverSchController {
         if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
             return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
         }
+        if(Check.NuNObj(param) || Check.NuNObj(param.getUnpublishedFlag()) ){
+            return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
+        }
         PageDTO pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
         return AjaxResponse.success(pageDTO);
     }

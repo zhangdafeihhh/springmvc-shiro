@@ -16,7 +16,7 @@
     <result column="update_by" property="updateBy" jdbcType="INTEGER" />
     <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
-    <result column="status" property="status" jdbcType="BIT" />
+    <result column="status" property="status" jdbcType="INTEGER" />
   </resultMap>
 
   <select id="queryDutyDurationListByField" parameterType="com.zhuanche.request.DutyParamRequest" resultType="com.zhuanche.dto.driverDuty.CarDriverDurationDTO">

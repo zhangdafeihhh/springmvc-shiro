@@ -84,10 +84,6 @@ public class CarDriverDutyService {
 	*/ 
 	public PageDTO queryDriverDayDutyList(DutyParamRequest dutyParamRequest){
 
-
-		if(Check.NuNObj(dutyParamRequest)){
-			return null;
-		}
 		//发布司机排班的查询功能 上层返回提示语
 		if(dutyParamRequest.getUnpublishedFlag() == 1){
 			dutyParamRequest.setStatus(1);
