@@ -263,13 +263,16 @@ public class CitySupplierTeamCommonService {
             return new ArrayList<CarBizSupplier>();
         }
         //对城市ID进行校验数据权限
-        if(WebSessionUtil.isSupperAdmin()==false ) {
+        /*if(WebSessionUtil.isSupperAdmin()==false ) {
 //            Set<Integer> permOfcityids = dataPermissionHelper.havePermOfCityIds("");
             Set<Integer> cityIds = WebSessionUtil.getCurrentLoginUser().getCityIds();
-            if( cityIds.size()==0 || cityIds.contains(cityId)==false  ) {
-                return new ArrayList<CarBizSupplier>();
+            if( cityIds.size()==0  ) {
+                if(cityIds.contains(cityId)==false ){
+                    return new ArrayList<>();
+                }
+                return carBizSupplierExMapper.querySuppliers(cityId, null);
             }
-        }
+        }*/
         //进行查询 (区分 超级管理员 、普通管理员 )
         if( WebSessionUtil.isSupperAdmin() ) {
             return carBizSupplierExMapper.querySuppliers(cityId, null);
@@ -295,17 +298,20 @@ public class CitySupplierTeamCommonService {
             return new ArrayList<CarDriverTeam>();
         }
         //对城市ID、供应商ID 进行校验数据权限
-        if(WebSessionUtil.isSupperAdmin()==false ) {
+        /*if(WebSessionUtil.isSupperAdmin()==false ) {
             Set<Integer> cityIds = WebSessionUtil.getCurrentLoginUser().getCityIds();
-            if( cityIds.size()==0 || cityIds.contains(cityId)==false  ) {
-                return new ArrayList<CarDriverTeam>();
-            }
-//            Set<Integer> permOfsupplierIds = dataPermissionHelper.havePermOfSupplierIds("");
             Set<Integer> supplierIds = WebSessionUtil.getCurrentLoginUser().getSupplierIds();
-            if( supplierIds.size()==0 || supplierIds.contains(supplierId)==false  ) {
-                return new ArrayList<CarDriverTeam>();
+            if( cityIds.size()==0  || Check.NuNCollection(supplierIds) ) {
+                if(cityIds.contains(cityId)==false){
+                    return new ArrayList<CarDriverTeam>();
+                }
+                Set<String> cities = new HashSet<String>();
+                cities.add(String.valueOf(cityId));
+                Set<String> suppliers = new HashSet<String>();
+                suppliers.add(String.valueOf(supplierId));
+                return carDriverTeamExMapper.queryDriverTeam(cities, suppliers, null);
             }
-        }
+        }*/
         //进行查询 (区分 超级管理员 、普通管理员 )
         Set<String> cityIds = new HashSet<String>(2);
         cityIds.add(String.valueOf(cityId));
