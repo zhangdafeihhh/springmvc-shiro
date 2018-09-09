@@ -132,15 +132,30 @@ public class CarDriverShiftsService {
 	*/ 
 	public List<CarDriverInfoDTO> queryDriverTeamReList(TeamGroupRequest teamGroupRequest){
 		logger.info("获取班制设置司机列表入参:{}"+ JSON.toJSONString(teamGroupRequest));
-		if(Check.NuNObj(teamGroupRequest) || Check.NuNObj(teamGroupRequest.getTeamId())){
+		if(Check.NuNObj(teamGroupRequest) || (Check.NuNObj(teamGroupRequest.getTeamId()) && Check.NuNStr(teamGroupRequest.getGroupId()))){
 			return null;
 		}
 		try{
-			List<CarRelateTeam> carRelateTeams = carRelateTeamExMapper.queryDriverTeamRelationList(teamGroupRequest);
-			if(Check.NuNCollection(carRelateTeams)){
+			Set<String> driverids = new HashSet<>();
+			if(!Check.NuNStr(teamGroupRequest.getGroupId())){
+				//小组
+				teamGroupRequest.setTeamId(null);
+				List<CarRelateGroup> carRelateGroups = carRelateGroupExMapper.queryDriverGroupRelationList(teamGroupRequest);
+				if(Check.NuNCollection(carRelateGroups)){
+					return null;
+				}
+				driverids = citySupplierTeamCommonService.dealDriverids(carRelateGroups,CarRelateGroup.class,"driverId");
+			}else{
+				//车队
+				List<CarRelateTeam> carRelateTeams = carRelateTeamExMapper.queryDriverTeamRelationList(teamGroupRequest);
+				if(Check.NuNCollection(carRelateTeams)){
+					return null;
+				}
+				driverids = citySupplierTeamCommonService.dealDriverids(carRelateTeams, CarRelateTeam.class,"driverId");
+			}
+			if(Check.NuNCollection(driverids)){
 				return null;
 			}
-			Set<String> driverids = citySupplierTeamCommonService.dealDriverids(carRelateTeams, CarRelateTeam.class,"driverId");
 			DriverTeamRequest driverTeamRequest = new DriverTeamRequest();
 			driverTeamRequest.setDriverIds(driverids);
 			driverTeamRequest.setStatus(1);

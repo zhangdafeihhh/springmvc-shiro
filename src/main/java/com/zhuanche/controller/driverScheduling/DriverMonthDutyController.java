@@ -405,8 +405,8 @@ public class DriverMonthDutyController {
     */ 
     @ResponseBody
     @RequestMapping(value = "/queryDriverMonthDutyStatus", method = { RequestMethod.POST })
-    public Object queryDriverMonthDutyStatus(HttpServletRequest request){
-        return EnumDriverMonthDutyStatus.getStatusMap();
+    public AjaxResponse queryDriverMonthDutyStatus(HttpServletRequest request){
+        return AjaxResponse.success(EnumDriverMonthDutyStatus.getStatusMap());
     }
 
 }
