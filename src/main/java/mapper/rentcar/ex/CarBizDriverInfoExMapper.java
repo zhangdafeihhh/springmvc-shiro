@@ -56,6 +56,9 @@ public interface CarBizDriverInfoExMapper {
 
     int insertCarBizDriverInfoDTO(CarBizDriverInfoDTO record);
 
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER)
+    })
     int updateCarBizDriverInfoDTO(CarBizDriverInfoDTO record);
 
     /**

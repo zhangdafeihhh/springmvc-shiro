@@ -625,9 +625,11 @@ public class CarBizDriverInfoService {
             return AjaxResponse.fail(RestErrorCode.DRIVER_IDCARNO_EXIST);
         }
         //查询银行卡号是否存在
-        had = carBizDriverInfoDetailService.checkBankCardBank(bankCardNumber, driverId);
-        if (had) {
-            return AjaxResponse.fail(RestErrorCode.DRIVER_BANK_CARD_NUMBER_EXIST);
+        if (StringUtils.isNotEmpty(bankCardNumber) && StringUtils.isNotEmpty(bankCardBank)){
+            had = carBizDriverInfoDetailService.checkBankCardBank(bankCardNumber, driverId);
+            if (had) {
+                return AjaxResponse.fail(RestErrorCode.DRIVER_BANK_CARD_NUMBER_EXIST);
+            }
         }
         return AjaxResponse.success(true);
     }
@@ -733,11 +735,11 @@ public class CarBizDriverInfoService {
             // 根据司机ID查询车队小组信息
             Map<String, Object> stringObjectMap = carDriverTeamExMapper.queryTeamNameAndGroupNameByDriverId(carBizDriverInfo.getDriverId());
             if(stringObjectMap!=null){
-                if(StringUtils.isNotEmpty(stringObjectMap.get("teamId").toString())){
+                if(stringObjectMap.containsKey("teamId") && stringObjectMap.get("teamId")!=null ){
                     carBizDriverInfo.setTeamId(Integer.parseInt(stringObjectMap.get("teamId").toString()));
                     carBizDriverInfo.setTeamName(stringObjectMap.get("teamName").toString());
                 }
-                if(StringUtils.isNotEmpty(stringObjectMap.get("teamGroupId").toString())){
+                if(stringObjectMap.containsKey("teamGroupId") && stringObjectMap.get("teamGroupId")!=null ){
                     carBizDriverInfo.setTeamId(Integer.parseInt(stringObjectMap.get("teamGroupId").toString()));
                     carBizDriverInfo.setTeamName(stringObjectMap.get("teamGroupName").toString());
                 }

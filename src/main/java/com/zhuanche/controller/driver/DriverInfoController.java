@@ -352,7 +352,6 @@ public class DriverInfoController {
      * @param nation //驾驶员民族
      * @param marriage //驾驶员婚姻状况  [填写:已婚、未婚、离异]
      * @param foreignlanguage //外语能力 [0无（默认） 1 英语 2 德语  3 法语 4 其他]
-     * @param address //驾驶员通信地址
      * @param education //驾驶员学历 [填写:研究生、本科、大专、中专、高中、 初中、 中学、其他]
      * @param firstdrivinglicensedate //初次领取驾驶证日期 yyyy-MM-dd
      * @param firstmeshworkdrivinglicensedate //网络预约出租汽车驾驶员证初领日期 yyyy-MM-dd
@@ -402,7 +401,7 @@ public class DriverInfoController {
                                    String superintendNo, String superintendUrl, String drivingLicenseType, Integer drivingYears,
                                    String archivesNo, String issueDateStr, String expireDateStr, String photosrct, String driverlicensenumber,
                                    String drivinglicenseimg, String nationality, String householdregister, String nation, String marriage,
-                                   String foreignlanguage, String address, String education, String firstdrivinglicensedate,
+                                   String foreignlanguage, String education, String firstdrivinglicensedate,
                                    String firstmeshworkdrivinglicensedate, String corptype,  String signdate, String signdateend,
                                    String contractdate, Integer isxydriver, String xyDriverNumber, String parttimejobdri, String phonetype,
                                    String phonecorp, String maptype, String emergencycontactaddr, String assessment,
@@ -425,12 +424,14 @@ public class DriverInfoController {
             return AjaxResponse.fail(RestErrorCode.CITY_SUPPLIER_DIFFER);
         }
         Boolean had = carBizCarInfoService.checkLicensePlates(licensePlates);
-        if (!had) {
+        if (!had) {//查看车牌号是否在车辆表存在
             return AjaxResponse.fail(RestErrorCode.BUS_NOT_EXIST);
         } else {
-            had = carBizDriverInfoService.checkLicensePlates(licensePlates);
-            if (had) {
-                return AjaxResponse.fail(RestErrorCode.CAR_HAS_BIND);
+            if(driverId == null){
+                had = carBizDriverInfoService.checkLicensePlates(licensePlates);
+                if (had) {//查看车辆是否已被绑定
+                    return AjaxResponse.fail(RestErrorCode.CAR_HAS_BIND);
+                }
             }
         }
         had = carBizCarInfoService.validateCityAndSupplier(serviceCity, supplierId, licensePlates);
@@ -449,7 +450,7 @@ public class DriverInfoController {
                     || StringUtils.isEmpty(drivingLicenseType) || drivingYears==null || StringUtils.isEmpty(archivesNo)
                     || StringUtils.isEmpty(issueDateStr) || StringUtils.isEmpty(expireDateStr) || StringUtils.isEmpty(driverlicensenumber) || StringUtils.isEmpty(nationality)
                     || StringUtils.isEmpty(householdregister) || StringUtils.isEmpty(nation) || StringUtils.isEmpty(marriage) || StringUtils.isEmpty(foreignlanguage)
-                    || StringUtils.isEmpty(address) || StringUtils.isEmpty(education) || StringUtils.isEmpty(firstdrivinglicensedate) || StringUtils.isEmpty(firstmeshworkdrivinglicensedate)
+                    || StringUtils.isEmpty(education) || StringUtils.isEmpty(firstdrivinglicensedate) || StringUtils.isEmpty(firstmeshworkdrivinglicensedate)
                     || StringUtils.isEmpty(corptype) || StringUtils.isEmpty(signdate) || StringUtils.isEmpty(signdateend) || StringUtils.isEmpty(contractdate)
                     || isxydriver==null || StringUtils.isEmpty(xyDriverNumber) || StringUtils.isEmpty(parttimejobdri) || StringUtils.isEmpty(phonetype)
                     || StringUtils.isEmpty(phonecorp) || StringUtils.isEmpty(maptype) || StringUtils.isEmpty(emergencycontactaddr) || StringUtils.isEmpty(driverlicenseissuingdatestart)
@@ -501,7 +502,6 @@ public class DriverInfoController {
         carBizDriverInfoDTO.setNation(nation);
         carBizDriverInfoDTO.setMarriage(marriage);
         carBizDriverInfoDTO.setForeignlanguage(foreignlanguage);
-        carBizDriverInfoDTO.setAddress(address);
         carBizDriverInfoDTO.setEducation(education);
         carBizDriverInfoDTO.setFirstdrivinglicensedate(firstdrivinglicensedate);
         carBizDriverInfoDTO.setFirstmeshworkdrivinglicensedate(firstmeshworkdrivinglicensedate);
@@ -538,10 +538,10 @@ public class DriverInfoController {
         if (driverId != null) {
             logger.info(LOGTAG + "操作方式：编辑");
             // 司机获取派单的接口，是否可以修改
-            Map<String, Object> updateDriverMap = carBizDriverInfoService.isUpdateDriver(driverId, phone);
-            if(updateDriverMap!=null && "2".equals(updateDriverMap.get("result").toString())){
-                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, updateDriverMap.get("msg").toString());
-            }
+//            Map<String, Object> updateDriverMap = carBizDriverInfoService.isUpdateDriver(driverId, phone);
+//            if(updateDriverMap!=null && "2".equals(updateDriverMap.get("result").toString())){
+//                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, updateDriverMap.get("msg").toString());
+//            }
             try {
                 // 调用接口清除，key
                 carBizDriverInfoService.flashDriverInfo(driverId);
@@ -577,10 +577,10 @@ public class DriverInfoController {
             return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
         }
         // 司机获取派单的接口，是否可以修改
-        Map<String, Object> updateDriverMap = carBizDriverInfoService.isUpdateDriver(driverId, carBizDriverInfo.getPhone());
-        if(updateDriverMap!=null && "2".equals(updateDriverMap.get("result").toString())){
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, updateDriverMap.get("msg").toString());
-        }
+//        Map<String, Object> updateDriverMap = carBizDriverInfoService.isUpdateDriver(driverId, carBizDriverInfo.getPhone());
+//        if(updateDriverMap!=null && (int)updateDriverMap.get("result")==2){
+//            return AjaxResponse.fail(RestErrorCode.CAR_API_ERROR, updateDriverMap.get("msg").toString());
+//        }
         try {
             // 调用接口清除，key
             carBizDriverInfoService.flashDriverInfo(driverId);
