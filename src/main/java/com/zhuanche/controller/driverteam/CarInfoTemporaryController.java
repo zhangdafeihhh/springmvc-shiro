@@ -491,17 +491,13 @@ public class CarInfoTemporaryController extends BaseController {
      * @param file 上传文件
      * @param cityId 城市Id
      * @param supplierId 供应商Id
-     * @param request
-     * @param response
      * @return
      */
     @ResponseBody
     @RequestMapping(value = "/importCarInfo",method = RequestMethod.POST)
-    public AjaxResponse importCarInfo(@RequestParam(value="fineName") MultipartFile file,
+    public AjaxResponse importCarInfo(@RequestParam(value="fileName") MultipartFile file,
                                       @Verify(param = "cityId",rule="required") Integer cityId,
-                                      @Verify(param = "supplierId",rule="required") Integer supplierId,
-                                      HttpServletRequest request,
-                                      HttpServletResponse response) {
+                                      @Verify(param = "supplierId",rule="required") Integer supplierId) {
         log.info("车辆信息导入保存:importCarInfo");
         try {
             // 获取上传的文件的名称
@@ -511,7 +507,7 @@ public class CarInfoTemporaryController extends BaseController {
             if (!"xls".equals(prefix) && !"xlsx".equals(prefix)) {
                 return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
             }
-            return carBizCarInfoTempService.importCarInfo(file.getInputStream(), prefix,request,response,cityId,supplierId);
+            return carBizCarInfoTempService.importCarInfo(file.getInputStream(), prefix,cityId,supplierId);
         } catch (IOException e) {
             e.printStackTrace();
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
@@ -523,17 +519,13 @@ public class CarInfoTemporaryController extends BaseController {
      * @param file 上传文件
      * @param cityId 城市Id
      * @param supplierId 供应商Id
-     * @param request
-     * @param response
      * @return
      */
     @ResponseBody
     @RequestMapping(value = "/importCarInfo4Bus",method = RequestMethod.POST)
-    public AjaxResponse importCarInfo4Bus(@RequestParam(value="fineName") MultipartFile file,
+    public AjaxResponse importCarInfo4Bus(@RequestParam(value="fileName") MultipartFile file,
                                           @Verify(param = "cityId",rule="required") Integer cityId,
-                                          @Verify(param = "supplierId",rule="required") Integer supplierId,
-                                          HttpServletRequest request,
-                                          HttpServletResponse response) {
+                                          @Verify(param = "supplierId",rule="required") Integer supplierId) {
         log.info("车辆信息（巴士）导入保存:importCarInfo4Bus");
         try {
             // 获取上传的文件的名称
@@ -543,7 +535,7 @@ public class CarInfoTemporaryController extends BaseController {
             if (!"xls".equals(prefix) && !"xlsx".equals(prefix)) {
                 return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
             }
-            return carBizCarInfoTempService.importCarInfo4Bus(file.getInputStream(),prefix,request,response,cityId,supplierId);
+            return carBizCarInfoTempService.importCarInfo4Bus(file.getInputStream(),prefix,cityId,supplierId);
         } catch (IOException e) {
             e.printStackTrace();
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
