@@ -194,29 +194,20 @@ public class DriverInfoTemporaryController extends BaseController {
     /**
      * 司机导入
      * @param file
-     * @param response
+     * @param cityId 城市Id
+     * @param supplierId 供应商Id
+     * @param teamId 车队Id
+     * @param groupId 小组Id
      * @return
      */
     @ResponseBody
     @RequestMapping(value = "/importDriverInfo",method =  RequestMethod.POST)
-    public AjaxResponse importDriverInfo(@RequestParam(value="fineName") MultipartFile file,
-                                         HttpServletRequest request,
-                                         HttpServletResponse response){
+    public AjaxResponse importDriverInfo(@RequestParam(value="fileName") MultipartFile file,
+                                         @Verify(param = "cityId",rule="required") Integer cityId,
+                                         @Verify(param = "supplierId",rule="required") Integer supplierId,
+                                         @Verify(param = "teamId",rule="required") Integer teamId,
+                                         @Verify(param = "groupId",rule="required") Integer groupId){
         try {
-            /*
-            * @param cityId 城市Id
-     * @param supplierId 供应商Id
-     * @param teamId 车队Id
-     * @param groupId 小组Id
-     * @param request
-            @Verify(param = "cityId",rule="required") Integer cityId,
-            @Verify(param = "supplierId",rule="required") Integer supplierId,
-            @Verify(param = "teamId",rule="required") Integer teamId,
-            @Verify(param = "groupId",rule="required") Integer groupId,*/
-            Integer cityId = 44;
-            Integer supplierId = 37;
-            Integer teamId = 61;
-            Integer groupId = 191;
             log.info("司机导入");
             // 获取上传的文件的名称
             String filename = file.getOriginalFilename();
@@ -225,7 +216,7 @@ public class DriverInfoTemporaryController extends BaseController {
             if (!"xls".equals(prefix) && !"xlsx".equals(prefix)) {
                 return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
             }
-            return carBizDriverInfoTempService.importDriverInfo(file.getInputStream(),prefix,request,response,cityId,supplierId,teamId,groupId);
+            return carBizDriverInfoTempService.importDriverInfo(file.getInputStream(),prefix,cityId,supplierId,teamId,groupId);
         } catch (IOException e) {
             e.printStackTrace();
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
@@ -250,19 +241,15 @@ public class DriverInfoTemporaryController extends BaseController {
      * @param supplierId 供应商Id
      * @param teamId 车队Id
      * @param groupId 小组Id
-     * @param request
-     * @param response
      * @return
      */
     @ResponseBody
     @RequestMapping(value = "/importDriverInfo4Bus",method =  RequestMethod.POST)
-    public AjaxResponse importDriverInfo4Bus(@RequestParam(value="fineName") MultipartFile file,
+    public AjaxResponse importDriverInfo4Bus(@RequestParam(value="fileName") MultipartFile file,
                                              @Verify(param = "cityId",rule="required") Integer cityId,
                                              @Verify(param = "supplierId",rule="required") Integer supplierId,
                                              @Verify(param = "teamId",rule="required") Integer teamId,
-                                             @Verify(param = "groupId",rule="required") Integer groupId,
-                                             HttpServletRequest request,
-                                             HttpServletResponse response){
+                                             @Verify(param = "groupId",rule="required") Integer groupId){
         try {
             log.info("导入巴士司机");
             // 获取上传的文件的名称
@@ -272,7 +259,7 @@ public class DriverInfoTemporaryController extends BaseController {
             if (!"xls".equals(prefix) && !"xlsx".equals(prefix)) {
                 return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
             }
-            return carBizDriverInfoTempService.importDriverInfo4Bus(file.getInputStream(),prefix,cityId,supplierId,teamId,groupId,request,response);
+            return carBizDriverInfoTempService.importDriverInfo4Bus(file.getInputStream(),prefix,cityId,supplierId,teamId,groupId);
         } catch (IOException e) {
             e.printStackTrace();
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
