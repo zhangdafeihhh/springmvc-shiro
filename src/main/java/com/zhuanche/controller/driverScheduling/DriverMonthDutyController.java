@@ -37,6 +37,7 @@ import com.zhuanche.util.excel.ExportExcelUtil;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.POIXMLDocument;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -208,6 +209,7 @@ public class DriverMonthDutyController {
         }
         CommonRequest commonRequest = new CommonRequest();
         BeanUtils.copyProperties(param,commonRequest);
+        commonRequest.setTeamId(Integer.parseInt(param.getTeamId()));
         CommonRequest data = commonService.paramDeal(commonRequest);
         if(Check.NuNObj(data)){
             logger.error("没有权限操作,用户："+JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));
@@ -238,7 +240,7 @@ public class DriverMonthDutyController {
             logger.error("downloadTemplateMonthDuty:下载 司机月排行 导入模板-失败[统计月不能为空]");
             return;
         }
-        String path = request.getRealPath(File.separator)+"template"+File.separator+"driverMonthDutyInfo.xlsx";
+        String path = request.getRealPath("/")+File.separator+"template"+File.separator+"driverMonthDutyInfo.xlsx";
         InputStream inputStream = null;
         try{
             // 获取表头
@@ -248,6 +250,7 @@ public class DriverMonthDutyController {
             tabelHeader = (Map<String, Object>)result.get("Rows");
             CommonRequest commonRequest = new CommonRequest();
             BeanUtils.copyProperties(param,commonRequest);
+            commonRequest.setTeamId(Integer.parseInt(param.getTeamId()));
             CommonRequest data = commonService.paramDeal(commonRequest);
             if(Check.NuNObj(data)){
                 logger.error("没有权限操作,用户："+JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));
@@ -274,10 +277,8 @@ public class DriverMonthDutyController {
             }
             driverInfoList = driverMonthDutyService.queryDriverListInfoForMonthDuty(param, driverTeamMap, param.getTeamIds());
             // 打开导入模板文件
-//            ExportExcelUtil excelUtil = new ExportExcelUtil();
+            // 打开导入模板文件
             Workbook workbook = null;
-//            HSSFWorkbook workbook = new HSSFWorkbook();
-//            workbook = excelUtil.exportExcelSheet(workbook, "排班信息" + param.getPageNo(), null, firstList);
             inputStream = new FileInputStream(path);
             workbook = create(inputStream);
             // 更新表头
@@ -381,6 +382,7 @@ public class DriverMonthDutyController {
         response.setContentType("application/octet-stream");
         ServletOutputStream os =  response.getOutputStream();
         wb.write(os);
+        os.flush();
         os.close();
     }
 

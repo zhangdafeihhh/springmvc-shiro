@@ -97,7 +97,7 @@ public class CarDriverDutyService {
 			CommonRequest resultParmam = citySupplierTeamCommonService.paramDeal(commonRequest);
 			dutyParamRequest.setCityIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getCityIds()));
 			dutyParamRequest.setSupplierIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getSupplierIds()));
-			dutyParamRequest.setSupplierIds(resultParmam.getTeamIds());
+			dutyParamRequest.setTeamIds(resultParmam.getTeamIds());
 			/** 数据权限处理结束 */
 
 			DutyParamRequest request = new DutyParamRequest();
@@ -119,7 +119,9 @@ public class CarDriverDutyService {
 			for (CarDriverDayDutyDTO carDriverDayDuty : list) {
 				request.setDriverId(carDriverDayDuty.getDriverId());
 				CarDriverInfoDTO info = carBizDriverInfoExMapper.queryOneDriver(request);
-				carDriverDayDuty.setPhone(info.getPhone());
+				if(!Check.NuNObj(info)){
+					carDriverDayDuty.setPhone(info.getPhone());
+				}
 			}
 			PageDTO pageDTO = new PageDTO();
 			pageDTO.setTotal((int)pageInfo.getTotal());
