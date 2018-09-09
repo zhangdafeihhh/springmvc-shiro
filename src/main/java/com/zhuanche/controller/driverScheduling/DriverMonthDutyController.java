@@ -33,6 +33,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.zhuanche.util.excel.ExportExcelUtil;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.POIXMLDocument;
@@ -237,8 +238,8 @@ public class DriverMonthDutyController {
             logger.error("downloadTemplateMonthDuty:下载 司机月排行 导入模板-失败[统计月不能为空]");
             return;
         }
-        String path = request.getRealPath(File.separator)+"template"+File.separator+"driverMonthDutyInfo.xlsx";
-        InputStream inputStream = null;
+//        String path = request.getRealPath(File.separator)+"template"+File.separator+"driverMonthDutyInfo.xlsx";
+//        InputStream inputStream = null;
         try{
             // 获取表头
             Map<String, Object> result = new LinkedHashMap<String,Object>();
@@ -273,9 +274,12 @@ public class DriverMonthDutyController {
             }
             driverInfoList = driverMonthDutyService.queryDriverListInfoForMonthDuty(param, driverTeamMap, param.getTeamIds());
             // 打开导入模板文件
-            Workbook workbook = null;
-            inputStream = new FileInputStream(path);
-            workbook = create(inputStream);
+            ExportExcelUtil excelUtil = new ExportExcelUtil();
+//            Workbook workbook = null;
+            HSSFWorkbook workbook = new HSSFWorkbook();
+//            workbook = excelUtil.exportExcelSheet(workbook, "排班信息" + param.getPageNo(), null, firstList);
+//            inputStream = new FileInputStream(path);
+//            workbook = create(inputStream);
             // 更新表头
             Sheet sheet = workbook.getSheetAt(0);
             int coloumNum=sheet.getRow(1).getPhysicalNumberOfCells();//获得总列数
@@ -326,11 +330,16 @@ public class DriverMonthDutyController {
                 }
 
             }
+            HttpServletResponse excelResponse = this.setResponse(response, param.getMonitorDate()+"司机月排班");
+            ServletOutputStream out = excelResponse.getOutputStream();
+            workbook.write(out);
+            out.flush();
+            out.close();
             // 先去掉文件名称中的空格,然后转换编码格式为utf-8,保证不出现乱码,这个文件名称用于浏览器的下载框中自动显示的文件名
             //response.addHeader("Content-Disposition", "attachment;filename=" + new String((driverMonthDutyEntity.getMonitorDate() + "司机月排班").getBytes("gbk"),"iso8859-1"));
             //response.addHeader("Content-Length", "" + file.length());
             //response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            this.exportExcelFromTemplet(request, response, workbook, new String((param.getMonitorDate() + "司机月排班").getBytes("utf-8"), "iso8859-1"));
+//            this.exportExcelFromTemplet(request, response, workbook, new String((param.getMonitorDate() + "司机月排班").getBytes("utf-8"), "iso8859-1"));
         }catch (FileNotFoundException e) {
             logger.error("fileDownloadDriverMonthDutyInfo:下载 司机月排行 导入模板-失败", e);
         } catch (UnsupportedEncodingException e) {
@@ -342,7 +351,7 @@ public class DriverMonthDutyController {
         } catch (Exception e) {
             logger.error("fileDownloadDriverMonthDutyInfo:下载 司机月排行 导入模板-失败", e);
             e.printStackTrace();
-        } finally {
+        } /*finally {
             try {
                 if (inputStream != null) {
                     inputStream.close();
@@ -350,7 +359,18 @@ public class DriverMonthDutyController {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
+    }
+
+    /**
+     * 设置文件下载 response格式
+     */
+    private HttpServletResponse setResponse(HttpServletResponse response, String filename) throws IOException {
+        response.setContentType("application/octet-stream;charset=ISO8859-1");
+        response.setHeader("Content-Disposition", "attachment;filename=" + new String(filename.getBytes("GB2312"), "ISO8859-1") + ".xls");
+        response.addHeader("Pargam", "no-cache");
+        response.addHeader("Cache-Control", "no-cache");
+        return response;
     }
 
     public void exportExcelFromTemplet(HttpServletRequest request, HttpServletResponse response, Workbook wb, String fileName) throws IOException {
