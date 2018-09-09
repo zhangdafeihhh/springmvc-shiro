@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.cache.RedisCacheDriverUtil;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -12,6 +13,7 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
+import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
 import com.zhuanche.entity.mdbcarmanage.*;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.HttpClientUtil;
@@ -270,6 +272,7 @@ public class CarBizDriverInfoService {
             }
 
             //更新司机信息
+            DynamicRoutingDataSource.setMasterSlave("rentcar-DataSource", DataSourceMode.MASTER);
             int n = this.updateDriverInfo(carBizDriverInfo);
 
             // 更新车辆信息 根据 车牌号更新车辆 信息（更换车辆所属人）
@@ -474,7 +477,7 @@ public class CarBizDriverInfoService {
         int id = carBizDriverInfoDTO.getDriverId();
 
         //司机信息扩展表，司机银行卡号
-        CarBizDriverInfoDetail infoDetail = carBizDriverInfoDetailService.selectByPrimaryKey(carBizDriverInfoDTO.getDriverId());
+        CarBizDriverInfoDetailDTO infoDetail = carBizDriverInfoDetailService.selectByDriverId(carBizDriverInfoDTO.getDriverId());
         CarBizDriverInfoDetail carBizDriverInfoDetail = new CarBizDriverInfoDetail();
         carBizDriverInfoDetail.setBankCardBank(carBizDriverInfoDTO.getBankCardBank());
         carBizDriverInfoDetail.setBankCardNumber(carBizDriverInfoDTO.getBankCardNumber());
@@ -2696,11 +2699,12 @@ public class CarBizDriverInfoService {
         if(StringUtils.isBlank(value)){
 //            long expire = System.currentTimeMillis() + expireTime * 1000 + 1;
             long expire = System.currentTimeMillis() + expireTime * 1000 + 1;
-            String result = RedisCacheDriverUtil.getSet(key, String.valueOf(expire), String.class);
-            logger.info(LOGTAG + "派单锁-缓存KEY[" + key + "] " + result);
-            if(result != null){
-                lock = true;
-            }
+//            String result = RedisCacheDriverUtil.getSet(key, String.valueOf(expire), String.class);
+            RedisCacheDriverUtil.set(key, String.valueOf(expire), expireTime);
+//            logger.info(LOGTAG + "派单锁-缓存KEY[" + key + "] " + result);
+//            if(result != null){
+//                lock = true;
+//            }
         }
         return lock;
     }

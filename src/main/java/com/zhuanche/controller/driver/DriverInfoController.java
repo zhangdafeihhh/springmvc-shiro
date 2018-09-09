@@ -538,7 +538,7 @@ public class DriverInfoController {
         if (driverId != null) {
             logger.info(LOGTAG + "操作方式：编辑");
             // 司机获取派单的接口，是否可以修改
-//            Map<String, Object> updateDriverMap = carBizDriverInfoService.isUpdateDriver(driverId, phone);
+            Map<String, Object> updateDriverMap = carBizDriverInfoService.isUpdateDriver(driverId, phone);
 //            if(updateDriverMap!=null && "2".equals(updateDriverMap.get("result").toString())){
 //                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, updateDriverMap.get("msg").toString());
 //            }
@@ -577,7 +577,7 @@ public class DriverInfoController {
             return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
         }
         // 司机获取派单的接口，是否可以修改
-//        Map<String, Object> updateDriverMap = carBizDriverInfoService.isUpdateDriver(driverId, carBizDriverInfo.getPhone());
+        Map<String, Object> updateDriverMap = carBizDriverInfoService.isUpdateDriver(driverId, carBizDriverInfo.getPhone());
 //        if(updateDriverMap!=null && (int)updateDriverMap.get("result")==2){
 //            return AjaxResponse.fail(RestErrorCode.CAR_API_ERROR, updateDriverMap.get("msg").toString());
 //        }
