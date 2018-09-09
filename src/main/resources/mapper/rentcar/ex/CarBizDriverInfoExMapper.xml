@@ -176,13 +176,13 @@
     where 1=1
     and i.status = 1
     <if test="cityIds!=null and cityIds.size()>0">
-      and city IN
+      and i.service_city IN
       <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
         #{cid}
       </foreach>
     </if>
     <if test="supplierIds!=null and supplierIds.size()>0">
-      and supplier IN
+      and p.supplier_id IN
       <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
         #{sid}
       </foreach>
@@ -292,13 +292,13 @@
       and i.license_plates LIKE '%${licensePlates}%'
     </if>
     <if test="cityIds!=null and cityIds.size()>0">
-      and city IN
+      and i.service_city IN
       <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
         #{cid}
       </foreach>
     </if>
     <if test="supplierIds!=null and supplierIds.size()>0">
-      and supplier IN
+      and i.supplier_id IN
       <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
         #{sid}
       </foreach>
@@ -372,7 +372,7 @@
       </foreach>
     </if>
     <if test="supplierIds!=null and supplierIds.size()>0">
-      and supplier IN
+      and p.supplier_id IN
       <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
         #{sid}
       </foreach>

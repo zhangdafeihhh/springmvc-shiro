@@ -94,7 +94,7 @@ public class DriverSchController {
     */ 
     @RequestMapping("/exportDutyToExcel")
     @ResponseBody
-    public AjaxResponse exportDutyToExcel(HttpServletResponse response, HttpServletRequest request,DutyParamRequest param){
+    public void exportDutyToExcel(HttpServletResponse response, HttpServletRequest request,DutyParamRequest param){
         String[] title = {"司机姓名","手机号","城市","供应商","车队",
                 "排班日期","强制上班时间","排班时长","状态"};
         try{
@@ -104,11 +104,14 @@ public class DriverSchController {
             //设置导出单文件阈值 3000
             param.setPageSize(3000);
             PageDTO pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
+            if(Check.NuNObj(pageDTO)){
+                return ;
+            }
             Integer total = pageDTO.getTotal();
             List<CarDriverDayDutyDTO> result = pageDTO.getResult();
             List<DutyExcelDTO> firstList = BeanUtil.copyList(result, DutyExcelDTO.class);
             if(Check.NuNCollection(result)){
-                return AjaxResponse.success(result);
+                return ;
             }
             String fileName = DateUtil.dateFormat(new Date(),DateUtil.intTimestampPattern);
             HttpServletResponse reponseOut = this.setResponse(response, fileName);
@@ -130,14 +133,14 @@ public class DriverSchController {
             out.flush();
             out.close();
             if(total <= 3000){
-                return AjaxResponse.success(result);
+                return ;
             }
 
         }catch (Exception e){
             logger.error("导出排班信息 异常:{}"+JSON.toJSONString(e));
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+            return ;
         }
-        return AjaxResponse.success(null);
+        return ;
     }
 
     /**
