@@ -640,7 +640,7 @@ public class DriverInfoController {
      * @param supplierId
      * @param teamId
      * @param teamGroupId
-     * @param file
+     * @param fileName
      * @param request
      * @return
      */
@@ -661,7 +661,7 @@ public class DriverInfoController {
         }
 
         Map<String, Object> resultMap = Maps.newHashMap();
-        resultMap = carBizDriverInfoService.batchInputDriverInfo(cityId, supplierId, teamId, teamGroupId, file, request);
+        resultMap = carBizDriverInfoService.batchInputDriverInfo(cityId, supplierId, teamId, teamGroupId, fileName, request);
         //模板错误
         if(resultMap!=null && "-1".equals(resultMap.get("result").toString())){
             return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
