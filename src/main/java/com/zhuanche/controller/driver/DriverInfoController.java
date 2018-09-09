@@ -397,7 +397,9 @@ public class DriverInfoController {
                                    @Verify(param = "licensePlates",rule="required") String licensePlates,
                                    @Verify(param = "status",rule="required") Integer status,
                                    @Verify(param = "groupId",rule="required") Integer groupId,
-                                   Integer age, String currentAddress, String emergencyContactPerson, String emergencyContactNumber,
+                                   @Verify(param = "age",rule="required|min(18)") Integer age,
+                                   @Verify(param = "emergencyContactNumber",rule="max(11)") String emergencyContactNumber,
+                                   String currentAddress, String emergencyContactPerson,
                                    String superintendNo, String superintendUrl, String drivingLicenseType, Integer drivingYears,
                                    String archivesNo, String issueDateStr, String expireDateStr, String photosrct, String driverlicensenumber,
                                    String drivinglicenseimg, String nationality, String householdregister, String nation, String marriage,
@@ -650,10 +652,10 @@ public class DriverInfoController {
     public AjaxResponse batchInputDriverInfo(@Verify(param = "cityId", rule = "required") Integer cityId,
                                              @Verify(param = "supplierId", rule = "required") Integer supplierId,
                                              Integer teamId, Integer teamGroupId,
-                                             @Verify(param = "file", rule = "required") MultipartFile file,
+                                             @Verify(param = "fileName", rule = "required") MultipartFile fileName,
                                              HttpServletRequest request) {
 
-        if (file.isEmpty()) {
+        if (fileName.isEmpty()) {
             logger.info("file is empty!");
             return AjaxResponse.fail(RestErrorCode.FILE_ERROR);
         }
