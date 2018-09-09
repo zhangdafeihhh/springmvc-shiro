@@ -361,7 +361,7 @@ public class DriverSchController {
     @ResponseBody
     @RequestMapping(value = "/queryDriverMonthDutyData")
     public AjaxResponse queryDriverMonthDutyData(DutyParamRequest param) {
-        logger.info("查询月排班列表数据入参:"+ JSON.toJSONString(param));
+        logger.info("查看符合条件排班列表入参:"+ JSON.toJSONString(param));
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
         if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
             return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
