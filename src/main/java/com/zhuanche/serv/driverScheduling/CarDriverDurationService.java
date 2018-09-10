@@ -114,7 +114,12 @@ public class CarDriverDurationService {
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/3 
-	*/ 
+	*/
+	@SuppressWarnings("unchecked")
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE ),
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public int saveOrUpdateCarDriverDuration(CarDutyDuration carDutyDuration){
 		if(Check.NuNObj(carDutyDuration)
 				|| Check.NuNObj(carDutyDuration.getCity())
@@ -150,6 +155,7 @@ public class CarDriverDurationService {
 				upRecord.setEndDate(carDutyDuration.getEndDate());
 				upRecord.setRemark(carDutyDuration.getRemark());
 				upRecord.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
+				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
 				return carDutyDurationMapper.updateByPrimaryKeySelective(upRecord);
 			}else{
 				Set<Integer> cityId = new HashSet<>();
@@ -167,6 +173,7 @@ public class CarDriverDurationService {
 				}
 				carDutyDuration.setSupplierName(supplierDetail.getSupplierFullName());
 				carDutyDuration.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
+				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
 				return carDutyDurationMapper.insertSelective(carDutyDuration);
 			}
 		}catch (Exception e){
