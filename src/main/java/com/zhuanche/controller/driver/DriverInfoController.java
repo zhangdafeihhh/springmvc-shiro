@@ -667,7 +667,7 @@ public class DriverInfoController {
             return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
         }
         if(resultMap!=null && "0".equals(resultMap.get("result").toString())){
-            return AjaxResponse.fail(RestErrorCode.FILE_UPLOAD_ERROR, resultMap.get("download").toString());
+            return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR, resultMap.get("download").toString());
         }
         return AjaxResponse.success(resultMap);
     }

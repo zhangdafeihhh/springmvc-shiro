@@ -55,7 +55,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -2443,12 +2442,16 @@ public class CarBizDriverInfoService {
         try {
             // 将错误列表导出
             if(listException.size() > 0) {
-                Workbook wb = Common.exportExcel(request.getServletContext().getRealPath("/")+ "template" + File.separator + "car_exception.xlsx", listException);
-                download = Common.exportExcelFromTempletToLoacl(request, wb,new String("ERROR".getBytes("utf-8"), "iso8859-1") );
+//                Workbook wb = Common.exportExcel(request.getServletContext().getRealPath("/")+ "template" + File.separator + "car_exception.xlsx", listException);
+//                download = Common.exportExcelFromTempletToLoacl(request, wb,new String("ERROR".getBytes("utf-8"), "iso8859-1") );
 //                Componment.fileDownload(response, wb, new String("司机导入错误信息".getBytes("utf-8"), "iso8859-1"));
+                StringBuilder errorMsg = new StringBuilder();
+                for (CarImportExceptionEntity entity:listException){
+                    errorMsg.append(entity.getReson()).append(";");
+                }
                 resultMap.put("result", "0");
                 resultMap.put("msg", "有错误信息");
-                resultMap.put("download", download);
+                resultMap.put("download", errorMsg);
                 return resultMap;
             }
         }catch(Exception e){
@@ -2465,7 +2468,6 @@ public class CarBizDriverInfoService {
 //        }
         resultMap.put("result", "1");
         resultMap.put("msg", "成功");
-        resultMap.put("download", "");
         return resultMap;
     }
 

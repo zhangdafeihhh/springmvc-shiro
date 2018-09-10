@@ -114,7 +114,7 @@ public final class RestErrorCode{
 	public static final int MODEL_NOT_EXIST                    = 3008;
 	@ResultMessage("信息不全，请补全")
 	public static final int INFORMATION_NOT_COMPLETE                    = 3009;
-	@ResultMessage("供应商ID={}的供应商不存在")
+	@ResultMessage("供应商ID={0}的供应商不存在")
 	public static final int SUPPLIER_NOT_EXIST                    = 3010;
 	@ResultMessage("所选城市和供应商城市不一致")
 	public static final int CITY_SUPPLIER_DIFFER                    = 3011;
