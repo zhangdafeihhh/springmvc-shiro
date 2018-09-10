@@ -141,6 +141,8 @@ public final class RestErrorCode{
 	public static final int FILE_ERROR                    = 4001;
 	@ResultMessage("导入模板格式错误")
 	public static final int FILE_TRMPLATE_ERROR                    = 4002;
+	@ResultMessage("导入有错误信息,文件名称={}")
+	public static final int FILE_UPLOAD_ERROR                    = 4003;
 	//-----------------------------------------------业务参数：车辆
 	@ResultMessage("车辆信息不存在")
 	public static final int BUS_NOT_EXIST                                               = 1100;
