@@ -10,6 +10,8 @@ import com.zhuanche.controller.DriverQueryController;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalBean;
 import com.zhuanche.entity.rentcar.CarBizCustomerAppraisal;
 import com.zhuanche.entity.rentcar.CarBizCustomerAppraisalParams;
+import com.zhuanche.entity.rentcar.DriverOutage;
+import com.zhuanche.serv.rentcar.DriverOutageService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.DateUtils;
@@ -46,6 +48,9 @@ public class OrderAppraisalController extends DriverQueryController{
 
 	@Autowired
 	private CarBizCustomerAppraisalExMapper carBizCustomerAppraisalExMapper;
+
+	@Autowired
+	private DriverOutageService driverOutageService;
 
 	/**
 	 * 订单评分查询
@@ -245,6 +250,50 @@ public class OrderAppraisalController extends DriverQueryController{
 			}
 		}
 		return wb;
+	}
+
+
+	@ResponseBody
+	@RequestMapping("/orderAppraisalListFromDriverOutageData")
+	public Object orderAppraisalListFromDriverOutageData(@Verify(param = "outageId", rule = "required") Integer outageId,
+														 Integer page,
+														 Integer pageSize) {
+		log.info("/orderAppraisal/orderAppraisalListFromDriverOutageData:司机评分数据列表数据----来自司机停运");
+
+		if(null == page || page == 0)
+			page = 1;
+		if(null == pageSize || pageSize == 0)
+			pageSize = 30;
+
+
+		int total = 0;
+		DriverOutage params = new DriverOutage();
+		params.setOutageId(outageId);
+		DriverOutage paramss = driverOutageService.queryForObject(params);
+
+		if(paramss!=null&&paramss.getOrderNos()!=null&&!"".equals(paramss.getOrderNos())){
+			CarBizCustomerAppraisalParams customerAppraisalEntity = new CarBizCustomerAppraisalParams();
+			String orderNos = paramss.getOrderNos().replaceAll(",", "\",\"");
+			orderNos = "\""+orderNos +"\"";
+			customerAppraisalEntity.setOrderNos(orderNos);
+
+
+			Page<CarBizCustomerAppraisal> p = PageHelper.startPage(page, pageSize);
+			List<CarBizCustomerAppraisalBean> list = null;
+			try {
+				List<CarBizCustomerAppraisal> appraisalList = this.carBizCustomerAppraisalExMapper.queryForListObject(customerAppraisalEntity);
+				list = BeanUtil.copyList(appraisalList,CarBizCustomerAppraisalBean.class);
+				total = (int) p.getTotal();
+			} finally {
+				PageHelper.clearPage();
+			}
+
+			PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
+			return AjaxResponse.success(pageDTO);
+		}else{
+			return new PageDTO(page, pageSize, 0, null);
+		}
+
 	}
 
 }
