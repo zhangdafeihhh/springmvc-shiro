@@ -652,7 +652,7 @@ public class DriverInfoController {
     public AjaxResponse batchInputDriverInfo(@Verify(param = "cityId", rule = "required") Integer cityId,
                                              @Verify(param = "supplierId", rule = "required") Integer supplierId,
                                              Integer teamId, Integer teamGroupId,
-                                             @Verify(param = "fileName", rule = "required") MultipartFile fileName,
+                                             MultipartFile fileName,
                                              HttpServletRequest request) {
 
         if (fileName.isEmpty()) {
