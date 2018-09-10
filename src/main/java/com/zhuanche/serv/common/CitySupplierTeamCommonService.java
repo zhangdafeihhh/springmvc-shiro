@@ -114,7 +114,13 @@ public class CitySupplierTeamCommonService {
             for(int i=0;i<srcList.size();i++ ){
                 Object srcObj = srcList.get(i);
                 ShiftParamDTO data = new ShiftParamDTO();
-                BeanUtils.copyProperties(srcObj,data);
+                if("driverId".equals(field) && existsField.getType().toString().contains("String")){
+                    Field special = srcObj.getClass().getDeclaredField(field);
+                    special.setAccessible(true);
+                    data.setDriverId(Integer.parseInt(String.valueOf(special.get(srcObj))));
+                }else{
+                    BeanUtils.copyProperties(srcObj,data);
+                }
                 Field shiftField = data.getClass().getDeclaredField(field);
                 shiftField.setAccessible(true);
                 result.add(String.valueOf(shiftField.get(data)));

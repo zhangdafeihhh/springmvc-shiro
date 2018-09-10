@@ -8,8 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
-import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
-
 /** 动态路由数据源：目的是支持主从切换、读写分离的场景
  *  特别说明：对于本项目，主要是达到对某一个相同结构的数据库进行主从切换（此时Mybatis Mapper 是支持主从复用的：即同一个Mapper，既可以针对主库，也可以针对从库）。
  **/
@@ -58,7 +56,9 @@ public class DynamicRoutingDataSource extends AbstractRoutingDataSource implemen
 		if(holder==null) {
 			return;
 		}
-		holder.set( mode.getValue()  );
+		if(mode!=null) {
+			holder.set( mode.getValue()  );
+		}
 	}
 	/***************************************切换为默认数据源*********************************/
     public static void setDefault(  String databaseTag ) {
