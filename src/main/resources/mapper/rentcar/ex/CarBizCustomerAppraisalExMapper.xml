@@ -99,8 +99,8 @@
     ca.evaluate AS evaluate,
     ca.memo,
     di.driver_id AS driverId,
-    di.name AS driverName,
-    di.phone AS driverPhone,
+    di.name AS name,
+    di.phone AS phone,
     di.license_plates AS licensePlates
     FROM
     car_biz_customer_appraisal ca
@@ -124,4 +124,81 @@
     </if>
     ORDER BY ca.create_date DESC
   </select>
+
+  <select id="queryCustomerAppraisalListById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from car_biz_customer_appraisal
+    where appraisal_id = #{appraisalId,jdbcType=INTEGER}
+  </select>
+
+
+  <select id="queryForListObject" parameterType="com.zhuanche.entity.rentcar.CarBizCustomerAppraisalParams" resultType="com.zhuanche.entity.rentcar.CarBizCustomerAppraisal">
+    SELECT
+    DISTINCT(ca.order_no) AS orderNo,
+    DATE_FORMAT(ca.create_date,'%Y-%m-%d %T') AS createDate,
+    ca.instrument_and_service AS instrumentAndService,
+    ca.environment_and_equipped AS environmentAndEquipped,
+    ca.efficiency_and_safety AS efficiencyAndSafety,
+    ca.evaluate_score AS evaluateScore,
+    ca.evaluate AS evaluate,
+    ca.memo,
+    di.driver_id AS driverId,
+    di.name AS driverName,
+    di.phone AS driverPhone,
+    di.license_plates AS licensePlates
+    FROM
+    car_biz_customer_appraisal ca
+    LEFT JOIN car_biz_driver_info di ON di.driver_id = ca.driver_id
+    WHERE
+    1 = 1
+    <if test="evaluateScore !=null and evaluateScore !=''">
+      AND ca.evaluate_score in (${evaluateScore})
+    </if>
+    <if test="createDateBegin !=null and createDateBegin !=''">
+      <![CDATA[ AND ca.create_date >=  concat(#{createDateBegin},' 00:00:00') ]]>
+    </if>
+    <if test="createDateEnd !=null and createDateEnd !=''">
+      <![CDATA[ AND ca.create_date <=  concat(#{createDateEnd},' 23:59:59') ]]>
+    </if>
+    <if test="orderNo!=null and orderNo!=''">
+      AND ca.order_no LIKE CONCAT('%', #{orderNo}, '%')
+    </if>
+    <if test="orderNos!=null and orderNos!=''">
+      AND ca.order_no in (${orderNos})
+    </if>
+    <if test="driverName!=null and driverName!=''">
+      AND di.name LIKE CONCAT('%', #{driverName}, '%')
+    </if>
+    <if test="driverPhone!=null and driverPhone!=''">
+      AND di.phone LIKE CONCAT('%', #{driverPhone}, '%')
+    </if>
+    <if test="driverIds!=null and driverIds!=''">
+      AND ca.driver_id in (${driverIds})
+    </if>
+    <if test="licensePlates!=null and licensePlates!=''">
+      AND di.license_plates LIKE CONCAT('%', #{licensePlates}, '%')
+    </if>
+    <if test="cityId!=null and cityId!=''">
+      and di.service_city = #{cityId}
+    </if>
+    <if test="cities !=null and cities !=''">
+      and di.service_city in (${cities})
+    </if>
+    <if test="supplierId !=null and supplierId !=''">
+      and di.supplier_id = #{supplierId}
+    </if>
+    <if test="suppliers !=null and suppliers !=''">
+      and di.supplier_id in (${suppliers})
+    </if>
+    <if test="sortName ==null or sortName ==''">
+      ORDER BY
+      ca.create_date,ca.appraisal_id DESC
+    </if>
+    <if test="sortName !=null and sortName !=''">
+      ORDER BY
+      ${sortName},ca.appraisal_id ${sortOrder}
+    </if>
+  </select>
+
 </mapper>

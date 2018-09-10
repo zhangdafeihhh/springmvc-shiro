@@ -1,6 +1,7 @@
 package com.zhuanche.serv.driverScheduling;
 
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.parser.deserializer.AbstractDateDeserializer;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -93,7 +94,7 @@ public class CarDriverMustDutyService {
 			pageDTO.setTotal((int)pageInfo.getTotal());
 			return pageDTO;
 		}catch (Exception e){
-			logger.error("查询强制上班列表异常:{}",e);
+			logger.error("查询强制上班列表异常:{}"+ JSON.toJSONString(e));
 			return null;
 		}finally {
 			PageHelper.clearPage();
@@ -114,7 +115,7 @@ public class CarDriverMustDutyService {
 				|| Check.NuNObj(carDriverMustDuty.getCity())
 				|| Check.NuNObj(carDriverMustDuty.getPeakTimes())
 				|| Check.NuNObj(carDriverMustDuty.getSupplier())
-				|| Check.NuNObj(carDriverMustDuty.getSupplier())
+				|| Check.NuNObj(carDriverMustDuty.getTeamId())
 		){
 			return 0;
 		}
@@ -165,7 +166,7 @@ public class CarDriverMustDutyService {
 				return carDriverMustDutyMapper.insertSelective(carDriverMustDuty);
 			}
 		}catch (Exception e){
-			logger.error("保存/修改强制上班时间异常:{}",e);
+			logger.error("保存/修改强制上班时间异常:{}"+ JSON.toJSONString(e));
 			return 0;
 		}
 	}

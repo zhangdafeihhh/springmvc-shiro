@@ -1,13 +1,13 @@
 package com.zhuanche.common.web;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 定义错误码与错误提示
@@ -33,7 +33,7 @@ public final class RestErrorCode{
 	public static final int CAR_API_ERROR           = 996;
 	@ResultMessage("会话已失效，请重新登录")
 	public static final int HTTP_INVALID_SESSION           = 997;
-	@ResultMessage("请求参数校验不通过")
+	@ResultMessage("请求参数校验不通过{0}")
 	public static final int HTTP_PARAM_INVALID              = 998;
 	@ResultMessage("未知错误")
 	public static final int UNKNOWN_ERROR                   = 999;
@@ -59,6 +59,10 @@ public final class RestErrorCode{
 	public static final int MSG_CODE_WRONG                = 1006;
 	@ResultMessage("账号已经存在")
 	public static final int ACCOUNT_EXIST                      = 1007;
+	@ResultMessage("短信验证码发送失败")
+	public static final int MSG_CODE_FAIL                      = 1011;
+	@ResultMessage("短信验证码{0}秒内不能重复发送")
+	public static final int MSG_CODE_REPEAT_SEND                      = 1012;
 
 	//----------------------------------------------权限管理
 	@ResultMessage("父权限不存在")
@@ -86,7 +90,7 @@ public final class RestErrorCode{
 	public static final int SYSTEM_ROLE_CANOT_CHANGE              = 10102;
 
 	//-----------------------------------------------业务参数：司机
-	@ResultMessage("没有该手机号的司机，请仔细核对！")
+	@ResultMessage("司机不存在，请仔细核对！")
 	public static final int DRIVER_NOT_EXIST = 2000;
 	@ResultMessage("该司机已存在启用的永久停运！")
 	public static final int DRIVER_OUTAGEALL_EXIST = 2001;
@@ -104,8 +108,33 @@ public final class RestErrorCode{
 	public static final int DRIVER_BANK_CARD_NUMBER_NOT_LEGAL                     = 3005;
 	@ResultMessage("银行卡号和银行开户行不能只填写一个")
 	public static final int DRIVER_BANK_CARD_NUMBER_NOT_COMPLETE                     = 3006;
-	@ResultMessage("银行卡号和银行开户行不能只填写一个")
+	@ResultMessage("银行卡号已存在")
 	public static final int DRIVER_BANK_CARD_NUMBER_EXIST                    = 3007;
+	@ResultMessage("车型不存在")
+	public static final int MODEL_NOT_EXIST                    = 3008;
+	@ResultMessage("信息不全，请补全")
+	public static final int INFORMATION_NOT_COMPLETE                    = 3009;
+	@ResultMessage("供应商ID={}的供应商不存在")
+	public static final int SUPPLIER_NOT_EXIST                    = 3010;
+	@ResultMessage("所选城市和供应商城市不一致")
+	public static final int CITY_SUPPLIER_DIFFER                    = 3011;
+	@ResultMessage("车辆已经被绑定")
+	public static final int CAR_HAS_BIND                    = 3012;
+	@ResultMessage("所选城市和供应商、车辆信息不一致")
+	public static final int CITY_SUPPLIER_CAR_DIFFER                    = 3013;
+	@ResultMessage("服务类型不存在")
+	public static final int GROUP_NOT_EXIST                    = 3014;
+
+	@ResultMessage("周报查询时间段只能查询一个星期的时间")
+	public static final int ONLY_QUERY_WEEK                    = 3101;
+	@ResultMessage("月报查询时间段只能查询一个月份的时间")
+	public static final int ONLY_QUERY_ONE_MONTH                    = 3102;
+	@ResultMessage("文件导出失败")
+	public static final int FILE_EXCEL_REPORT_FAIL                    = 3103;
+	@ResultMessage("查询时间范围结束时间不能为空")
+	public static final int ENDTIME_IS_NULL                    = 3104;
+	@ResultMessage("查询时间范围开始时间不能大于结束时间")
+	public static final int STARTTIME_GREATE_ENDTIME                    = 3105;
 
 	//-----------------------------------------------业务参数：导入文件
 	@ResultMessage("文件异常")
@@ -128,8 +157,16 @@ public final class RestErrorCode{
 
 	@ResultMessage("查询GPS数据失败")
 	public static final int MONITOR_GPS_FAIL                                        = 6001;
+	@ResultMessage("查询GPS数据失败,司机信息不存在")
+	public static final int MONITOR_GPS_DRIVER_NOT_EXIST                                        = 6002;
 	@ResultMessage("查询大数据司机订单信息失败")
 	public static final int MONITOR_DRIVERO_ORDER_FAIL                                        = 7001;
+
+    //-----------------------------------------------业务参数：投诉评分
+    @ResultMessage("请选择一个车队或输入司机手机号")
+    public static final int TEAMID_OR_DRIVERID_ISNULL = 5201;
+    @ResultMessage("文件导出失败")
+    public static final int FILE_EXPORT_FAIL = 5202;
 	//---------------------------------------------------------------------------------------------------------------------------------------------
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系

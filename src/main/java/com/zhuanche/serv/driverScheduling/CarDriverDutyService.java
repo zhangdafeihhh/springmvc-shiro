@@ -84,12 +84,8 @@ public class CarDriverDutyService {
 	*/ 
 	public PageDTO queryDriverDayDutyList(DutyParamRequest dutyParamRequest){
 
-
-		if(Check.NuNObj(dutyParamRequest)){
-			return null;
-		}
 		//发布司机排班的查询功能 上层返回提示语
-		if(dutyParamRequest.getUnpublishedFlag() == 1){
+		if(!Check.NuNObj(dutyParamRequest) && dutyParamRequest.getUnpublishedFlag() == 1){
 			dutyParamRequest.setStatus(1);
 		}
 		try{
@@ -101,7 +97,7 @@ public class CarDriverDutyService {
 			CommonRequest resultParmam = citySupplierTeamCommonService.paramDeal(commonRequest);
 			dutyParamRequest.setCityIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getCityIds()));
 			dutyParamRequest.setSupplierIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getSupplierIds()));
-			dutyParamRequest.setSupplierIds(resultParmam.getTeamIds());
+			dutyParamRequest.setTeamIds(resultParmam.getTeamIds());
 			/** 数据权限处理结束 */
 
 			DutyParamRequest request = new DutyParamRequest();
@@ -123,14 +119,16 @@ public class CarDriverDutyService {
 			for (CarDriverDayDutyDTO carDriverDayDuty : list) {
 				request.setDriverId(carDriverDayDuty.getDriverId());
 				CarDriverInfoDTO info = carBizDriverInfoExMapper.queryOneDriver(request);
-				carDriverDayDuty.setPhone(info.getPhone());
+				if(!Check.NuNObj(info)){
+					carDriverDayDuty.setPhone(info.getPhone());
+				}
 			}
 			PageDTO pageDTO = new PageDTO();
 			pageDTO.setTotal((int)pageInfo.getTotal());
 			pageDTO.setResult(list);
 			return pageDTO;
 		}catch (Exception e){
-			logger.error("查询排班司机列表异常:{}",e);
+			logger.error("查询排班司机列表异常:{}"+JSON.toJSONString(e));
 			return null;
 		}
 	}
@@ -179,7 +177,7 @@ public class CarDriverDutyService {
 			es.submit(new AffirmDriverDayDuty(dutyParamRequest));
 			return ServiceReturnCodeEnum.DEAL_SUCCESS_MSG.getCode();
 		}catch (Exception e){
-			logger.error("发布数据异常:{}",e);
+			logger.error("发布数据异常:{}"+JSON.toJSONString(e));
 			return 0;
 		}
 
@@ -198,7 +196,7 @@ public class CarDriverDutyService {
 				// 发布数据
 				asyncDutyService.affirmDriverDayDuty(dutyParamRequest);
 			} catch (Exception e) {
-				logger.error("AffirmDriverDayDuty",e);
+				logger.error("AffirmDriverDayDuty"+JSON.toJSONString(e));
 			}
 		}
 	}
@@ -223,7 +221,7 @@ public class CarDriverDutyService {
 				}
 			}
 		} catch (ParseException e) {
-			logger.error("时间参数错误", e);
+			logger.error("时间参数错误"+JSON.toJSONString(e));
 		}
 
 		return startTime;

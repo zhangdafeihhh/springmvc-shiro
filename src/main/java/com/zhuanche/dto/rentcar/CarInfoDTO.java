@@ -208,6 +208,55 @@ public class CarInfoDTO{
     /** 车辆图片 **/
     private String imageUrl;
 
+    private String licensePlates1;
+
+    private Integer oldCity;
+
+    private Integer oldSupplierId;
+
+    private String driverName;
+    private String idCardNo;//司机身份证号
+
+    public String getDriverName() {
+        return driverName;
+    }
+
+    public void setDriverName(String driverName) {
+        this.driverName = driverName;
+    }
+
+    public String getIdCardNo() {
+        return idCardNo;
+    }
+
+    public void setIdCardNo(String idCardNo) {
+        this.idCardNo = idCardNo;
+    }
+
+    public String getLicensePlates1() {
+        return licensePlates1;
+    }
+
+    public void setLicensePlates1(String licensePlates1) {
+        this.licensePlates1 = licensePlates1;
+    }
+
+    public Integer getOldCity() {
+        return oldCity;
+    }
+
+    public void setOldCity(Integer oldCity) {
+        this.oldCity = oldCity;
+    }
+
+    public Integer getOldSupplierId() {
+        return oldSupplierId;
+    }
+
+    public void setOldSupplierId(Integer oldSupplierId) {
+        this.oldSupplierId = oldSupplierId;
+    }
+
     public String getImageUrl() {
         return imageUrl;
     }

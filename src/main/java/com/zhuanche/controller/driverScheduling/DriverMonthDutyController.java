@@ -33,8 +33,11 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.zhuanche.util.excel.ExportExcelUtil;
+import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.POIXMLDocument;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -52,6 +55,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 
 /**
@@ -90,21 +95,34 @@ public class DriverMonthDutyController {
     */ 
     @ResponseBody
     @RequestMapping(value = "/importDriverMonthDutyInfo")
-    public AjaxResponse importDriverMonthDutyInfo(DriverMonthDutyRequest params,HttpServletRequest request){
+    public AjaxResponse importDriverMonthDutyInfo(DriverMonthDutyRequest params,HttpServletRequest request,MultipartFile file){
+        //TODO
         logger.info("导入月排班模板数据入参："+JSON.toJSONString(params));
-        try{
-            if("".equals(params.getMonitorDate())||params.getMonitorDate()==null||"null".equals(params.getMonitorDate())){
-                logger.error("importDriverMonthDutyInfo:导入 司机月排行 数据-失败[统计月不能为空]");
-                return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
-            }
-            logger.info("每个司机一个月每天的排班导入保存,参数:"+params.toString());
-            Map<String, Object> result = this.driverMonthDutyService.importDriverMonthDuty(params, request);
+        if("".equals(params.getMonitorDate())||params.getMonitorDate()==null||"null".equals(params.getMonitorDate())){
+            logger.error("importDriverMonthDutyInfo:导入 司机月排行 数据-失败[统计月不能为空]");
+            return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
+        }
+        logger.info("每个司机一个月每天的排班导入保存,参数:"+params.toString());
+//            Map<String, Object> result = this.driverMonthDutyService.importDriverMonthDuty(params, request);
+
+        if (file == null) {
+            return AjaxResponse.fail(RestErrorCode.FILE_ERROR);
+        }
+        /*CommonsMultipartFile commonsmultipartfile = (CommonsMultipartFile) file;
+        DiskFileItem diskFileItem = (DiskFileItem) commonsmultipartfile.getFileItem();
+        File newFile = diskFileItem.getStoreLocation();
+        logger.info("导入月排班数据文件名:"+newFile.getName());*/
+        Map<String, Object> result = this.driverMonthDutyService.importDriverMonthDuty(params, request,file);
+        if(result.get("result").equals("1")){
             return AjaxResponse.success(result);
-        }catch (Exception e){
-            logger.error("导入月排班模板数据异常：{}",e);
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }else{
+            AjaxResponse fail = AjaxResponse.fail(RestErrorCode.RECORD_DEAL_FAILURE);
+            fail.setData(result);
+            return fail;
         }
     }
+
+
 
     /** 
     * @Desc: 修改司机上班状态 
@@ -116,39 +134,33 @@ public class DriverMonthDutyController {
     @ResponseBody
     @RequestMapping(value = "/updateDriverMonthDutyData", method = { RequestMethod.POST })
     public AjaxResponse updateDriverMonthDutyData(DriverMonthDutyRequest param){
-
         logger.info("修改司机上班状态入参:{}",JSON.toJSONString(param));
-        try{
-            CarDriverMonthDuty exists = this.driverMonthDutyService.selectByPrimaryKey(param.getId());
-            if (Check.NuNObj(exists)) {
-                return AjaxResponse.fail(RestErrorCode.HTTP_NOT_FOUND);
-            } else {
-                // 只能修改当天及之后的排班
-                SimpleDateFormat sdf = new SimpleDateFormat("MM-dd");
-                String nowDay = sdf.format(new Date()); // 今天日期
-                String newData = param.getData();
-                String oldData = exists.getData();
-                int index = newData.indexOf(nowDay);
-                boolean hasError = false;
-                if (index >= 0) {
-                    int oldIndex = oldData.indexOf(nowDay);
-                    if (oldIndex >= 0) {
-                        String data = oldData.substring(0, oldIndex) + newData.substring(index);
-                        exists.setData(data);
-                    } else { // 旧排班数据没有当天的排班
-                        hasError = true;
-                    }
-                } else { // 新排班数据没有当天的排班
-                    exists.setData(newData);
+        CarDriverMonthDuty exists = this.driverMonthDutyService.selectByPrimaryKey(param.getId());
+        if (Check.NuNObj(exists)) {
+            return AjaxResponse.fail(RestErrorCode.HTTP_NOT_FOUND);
+        } else {
+            // 只能修改当天及之后的排班
+            SimpleDateFormat sdf = new SimpleDateFormat("MM-dd");
+            String nowDay = sdf.format(new Date()); // 今天日期
+            String newData = param.getData();
+            String oldData = exists.getData();
+            int index = newData.indexOf(nowDay);
+            boolean hasError = false;
+            if (index >= 0) {
+                int oldIndex = oldData.indexOf(nowDay);
+                if (oldIndex >= 0) {
+                    String data = oldData.substring(0, oldIndex) + newData.substring(index);
+                    exists.setData(data);
+                } else { // 旧排班数据没有当天的排班
+                    hasError = true;
                 }
-                if (hasError) {
-                    return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
-                }
-                return AjaxResponse.success(this.driverMonthDutyService.updateDriverMonthDutyData(exists));
+            } else { // 新排班数据没有当天的排班
+                exists.setData(newData);
             }
-        }catch (Exception e){
-            logger.error("修改司机上班信息异常:{}",e);
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+            if (hasError) {
+                return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
+            }
+            return AjaxResponse.success(this.driverMonthDutyService.updateDriverMonthDutyData(exists));
         }
     }
 
@@ -191,27 +203,23 @@ public class DriverMonthDutyController {
     @RequestMapping(value = "/queryDriverMonthDutyData")
     public AjaxResponse queryDriverMonthDutyData(DriverMonthDutyRequest param) {
         logger.info("查询月排班列表数据入参:"+JSON.toJSONString(param));
-        try{
-            if(Check.NuNStr(param.getMonitorDate())){
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
-                param.setMonitorDate(sdf.format(new Date()));
-            }
-            CommonRequest commonRequest = new CommonRequest();
-            BeanUtils.copyProperties(param,commonRequest);
-            CommonRequest data = commonService.paramDeal(commonRequest);
-            if(Check.NuNObj(data)){
-                logger.error("没有权限操作,用户："+JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));
-                return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
-            }
-            param.setCityIds(commonService.setStringShiftInteger(data.getCityIds()));
-            param.setSupplierIds(commonService.setStringShiftInteger(data.getSupplierIds()));
-            param.setTeamIds(data.getTeamIds());
-            PageDTO pageDTO = driverMonthDutyService.queryDriverDutyList(param);
-            return AjaxResponse.success(pageDTO);
-        }catch (Exception e){
-            logger.error("查询排班列表异常:{}",e);
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        if(Check.NuNStr(param.getMonitorDate())){
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+            param.setMonitorDate(sdf.format(new Date()));
         }
+        CommonRequest commonRequest = new CommonRequest();
+        BeanUtils.copyProperties(param,commonRequest);
+        commonRequest.setTeamId(Integer.parseInt(param.getTeamId()));
+        CommonRequest data = commonService.paramDeal(commonRequest);
+        if(Check.NuNObj(data)){
+            logger.error("没有权限操作,用户："+JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));
+            return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
+        }
+        param.setCityIds(commonService.setStringShiftInteger(data.getCityIds()));
+        param.setSupplierIds(commonService.setStringShiftInteger(data.getSupplierIds()));
+        param.setTeamIds(data.getTeamIds());
+        PageDTO pageDTO = driverMonthDutyService.queryDriverDutyList(param);
+        return AjaxResponse.success(pageDTO);
     }
 
     /** 
@@ -232,7 +240,7 @@ public class DriverMonthDutyController {
             logger.error("downloadTemplateMonthDuty:下载 司机月排行 导入模板-失败[统计月不能为空]");
             return;
         }
-        String path = request.getRealPath(File.separator)+"template"+File.separator+"driverMonthDutyInfo.xlsx";
+        String path = request.getRealPath("/")+File.separator+"template"+File.separator+"driverMonthDutyInfo.xlsx";
         InputStream inputStream = null;
         try{
             // 获取表头
@@ -242,6 +250,7 @@ public class DriverMonthDutyController {
             tabelHeader = (Map<String, Object>)result.get("Rows");
             CommonRequest commonRequest = new CommonRequest();
             BeanUtils.copyProperties(param,commonRequest);
+            commonRequest.setTeamId(Integer.parseInt(param.getTeamId()));
             CommonRequest data = commonService.paramDeal(commonRequest);
             if(Check.NuNObj(data)){
                 logger.error("没有权限操作,用户："+JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));
@@ -267,6 +276,7 @@ public class DriverMonthDutyController {
                 }
             }
             driverInfoList = driverMonthDutyService.queryDriverListInfoForMonthDuty(param, driverTeamMap, param.getTeamIds());
+            // 打开导入模板文件
             // 打开导入模板文件
             Workbook workbook = null;
             inputStream = new FileInputStream(path);
@@ -321,6 +331,11 @@ public class DriverMonthDutyController {
                 }
 
             }
+            /*HttpServletResponse excelResponse = this.setResponse(response, param.getMonitorDate()+"司机月排班");
+            ServletOutputStream out = excelResponse.getOutputStream();
+            workbook.write(out);
+            out.flush();
+            out.close();*/
             // 先去掉文件名称中的空格,然后转换编码格式为utf-8,保证不出现乱码,这个文件名称用于浏览器的下载框中自动显示的文件名
             //response.addHeader("Content-Disposition", "attachment;filename=" + new String((driverMonthDutyEntity.getMonitorDate() + "司机月排班").getBytes("gbk"),"iso8859-1"));
             //response.addHeader("Content-Length", "" + file.length());
@@ -348,14 +363,26 @@ public class DriverMonthDutyController {
         }
     }
 
+    /**
+     * 设置文件下载 response格式
+     */
+    private HttpServletResponse setResponse(HttpServletResponse response, String filename) throws IOException {
+        response.setContentType("application/octet-stream;charset=ISO8859-1");
+        response.setHeader("Content-Disposition", "attachment;filename=" + new String(filename.getBytes("GB2312"), "ISO8859-1") + ".xls");
+        response.addHeader("Pargam", "no-cache");
+        response.addHeader("Cache-Control", "no-cache");
+        return response;
+    }
+
     public void exportExcelFromTemplet(HttpServletRequest request, HttpServletResponse response, Workbook wb, String fileName) throws IOException {
         if(StringUtils.isEmpty(fileName)) {
             fileName = "exportExcel";
         }
         response.setHeader("Content-Disposition","attachment;filename="+fileName+".xlsx");//指定下载的文件名
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setContentType("application/octet-stream");
         ServletOutputStream os =  response.getOutputStream();
         wb.write(os);
+        os.flush();
         os.close();
     }
 
@@ -383,16 +410,11 @@ public class DriverMonthDutyController {
     @RequestMapping(value = "/queryDriverDutyTable")
     public AjaxResponse queryDriverDutyTable(DriverMonthDutyRequest driverMonthDutyRequest){
         Map<String,Object> result = new LinkedHashMap<String,Object>();
-        try{
-            logger.info("queryDriverDutyTable begin: 司机月排班表表头");
-            result = this.driverMonthDutyService.queryDriverDutyTable(driverMonthDutyRequest);
-            logger.info("queryDriverDutyTable end: 司机月排班表表头:" + result);
-            SimpleDateFormat sdf = new SimpleDateFormat("MM-dd");
-            result.put("nowDay", sdf.format(new Date()));
-        }catch (Exception e){
-            logger.error("司机月排班表头返回异常:{}",e);
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-        }
+        logger.info("queryDriverDutyTable begin: 司机月排班表表头");
+        result = this.driverMonthDutyService.queryDriverDutyTable(driverMonthDutyRequest);
+        logger.info("queryDriverDutyTable end: 司机月排班表表头:" + result);
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd");
+        result.put("nowDay", sdf.format(new Date()));
         return AjaxResponse.success(result);
     }
 
@@ -405,8 +427,8 @@ public class DriverMonthDutyController {
     */ 
     @ResponseBody
     @RequestMapping(value = "/queryDriverMonthDutyStatus", method = { RequestMethod.POST })
-    public Object queryDriverMonthDutyStatus(HttpServletRequest request){
-        return EnumDriverMonthDutyStatus.getStatusMap();
+    public AjaxResponse queryDriverMonthDutyStatus(HttpServletRequest request){
+        return AjaxResponse.success(EnumDriverMonthDutyStatus.getStatusMap());
     }
 
 }

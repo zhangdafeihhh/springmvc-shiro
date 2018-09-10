@@ -18,18 +18,20 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +44,7 @@ import java.util.Map;
 @RequestMapping(value = "/driverInfoTemporary")
 public class DriverInfoTemporaryController extends BaseController {
 
-    private static Log log =  LogFactory.getLog(DriverInfoTemporaryController.class);
+    private static final Logger log =  LoggerFactory.getLogger(DriverInfoTemporaryController.class);
 
     @Autowired
     private CarBizDriverInfoTempService carBizDriverInfoTempService;
@@ -71,7 +73,7 @@ public class DriverInfoTemporaryController extends BaseController {
     @ResponseBody
     @RequestMapping(value = "/driverListData", method =  RequestMethod.GET )
     public AjaxResponse driverListData(@RequestParam(value = "page",defaultValue="1") Integer page,
-                                       @RequestParam(value = "pageNum",defaultValue="10") Integer pageSize,
+                                       @RequestParam(value = "pageSize",defaultValue="10") Integer pageSize,
                                        @RequestParam(value = "name",required = false) String name,
                                        @RequestParam(value = "phone",required = false) String phone,
                                        @RequestParam(value = "licensePlates",required = false) String licensePlates,
@@ -191,15 +193,34 @@ public class DriverInfoTemporaryController extends BaseController {
 
     /**
      * 司机导入
-     * @param driverEntity
-     * @param request
+     * @param file
+     * @param cityId 城市Id
+     * @param supplierId 供应商Id
+     * @param teamId 车队Id
+     * @param groupId 小组Id
      * @return
      */
     @ResponseBody
     @RequestMapping(value = "/importDriverInfo",method =  RequestMethod.POST)
-    public AjaxResponse importDriverInfo(CarBizDriverInfoTemp driverEntity,HttpServletRequest request){
-        log.info("司机导入");
-        return carBizDriverInfoTempService.importDriverInfo(driverEntity, request);
+    public AjaxResponse importDriverInfo(@RequestParam(value="fileName") MultipartFile file,
+                                         @Verify(param = "cityId",rule="required") Integer cityId,
+                                         @Verify(param = "supplierId",rule="required") Integer supplierId,
+                                         @Verify(param = "teamId",rule="required") Integer teamId,
+                                         @Verify(param = "groupId",rule="required") Integer groupId){
+        try {
+            log.info("司机导入");
+            // 获取上传的文件的名称
+            String filename = file.getOriginalFilename();
+            //获取后缀
+            String prefix=filename.substring(filename.lastIndexOf(".")+1);
+            if (!"xls".equals(prefix) && !"xlsx".equals(prefix)) {
+                return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
+            }
+            return carBizDriverInfoTempService.importDriverInfo(file.getInputStream(),prefix,cityId,supplierId,teamId,groupId);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
     }
 
     /**
@@ -215,15 +236,35 @@ public class DriverInfoTemporaryController extends BaseController {
 
     /**
      * 司机导入(巴士司机)
-     * @param driverEntity
-     * @param request
+     * @param file
+     * @param cityId 城市Id
+     * @param supplierId 供应商Id
+     * @param teamId 车队Id
+     * @param groupId 小组Id
      * @return
      */
     @ResponseBody
     @RequestMapping(value = "/importDriverInfo4Bus",method =  RequestMethod.POST)
-    public AjaxResponse importDriverInfo4Bus(CarBizDriverInfoTemp driverEntity,HttpServletRequest request){
-        log.info("导入巴士司机");
-        return carBizDriverInfoTempService.importDriverInfo4Bus(driverEntity, request);
+    public AjaxResponse importDriverInfo4Bus(@RequestParam(value="fileName") MultipartFile file,
+                                             @Verify(param = "cityId",rule="required") Integer cityId,
+                                             @Verify(param = "supplierId",rule="required") Integer supplierId,
+                                             @Verify(param = "teamId",rule="required") Integer teamId,
+                                             @Verify(param = "groupId",rule="required") Integer groupId){
+        try {
+            log.info("导入巴士司机");
+            // 获取上传的文件的名称
+            String filename = file.getOriginalFilename();
+            //获取后缀
+            String prefix=filename.substring(filename.lastIndexOf(".")+1);
+            if (!"xls".equals(prefix) && !"xlsx".equals(prefix)) {
+                return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
+            }
+            return carBizDriverInfoTempService.importDriverInfo4Bus(file.getInputStream(),prefix,cityId,supplierId,teamId,groupId);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+
     }
 
     /**

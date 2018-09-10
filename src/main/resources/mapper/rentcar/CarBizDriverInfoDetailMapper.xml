@@ -57,10 +57,10 @@
       <if test="driverId != null" >
         driver_id,
       </if>
-      <if test="bankCardBank != null" >
+      <if test="bankCardBank != null and bankCardBank != ''" >
         bank_card_bank,
       </if>
-      <if test="bankCardNumber != null" >
+      <if test="bankCardNumber != null and bankCardNumber != ''" >
         bank_card_number,
       </if>
       <if test="ext1 != null" >
@@ -104,10 +104,10 @@
       <if test="driverId != null" >
         #{driverId,jdbcType=INTEGER},
       </if>
-      <if test="bankCardBank != null" >
+      <if test="bankCardBank != null  and bankCardBank != ''" >
         #{bankCardBank,jdbcType=VARCHAR},
       </if>
-      <if test="bankCardNumber != null" >
+      <if test="bankCardNumber != null  and bankCardNumber != ''" >
         #{bankCardNumber,jdbcType=VARCHAR},
       </if>
       <if test="ext1 != null" >

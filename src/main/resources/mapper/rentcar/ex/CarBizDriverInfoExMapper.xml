@@ -176,13 +176,13 @@
     where 1=1
     and i.status = 1
     <if test="cityIds!=null and cityIds.size()>0">
-      and city IN
+      and i.service_city IN
       <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
         #{cid}
       </foreach>
     </if>
     <if test="supplierIds!=null and supplierIds.size()>0">
-      and supplier IN
+      and p.supplier_id IN
       <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
         #{sid}
       </foreach>
@@ -292,13 +292,13 @@
       and i.license_plates LIKE '%${licensePlates}%'
     </if>
     <if test="cityIds!=null and cityIds.size()>0">
-      and city IN
+      and i.service_city IN
       <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
         #{cid}
       </foreach>
     </if>
     <if test="supplierIds!=null and supplierIds.size()>0">
-      and supplier IN
+      and i.supplier_id IN
       <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
         #{sid}
       </foreach>
@@ -352,9 +352,6 @@
     <if test="licensePlates!=null and licensePlates!=''">
       and i.license_plates LIKE '%${licensePlates}%'
     </if>
-    <if test="driverId!=null and driverId !=''">
-      and i.driver_id in (${driverId})
-    </if>
     <if test="name!=null and name!=''">
       <!-- and i.name like '%name%' -->
       and i.name LIKE CONCAT(#{name},'%')
@@ -375,7 +372,7 @@
       </foreach>
     </if>
     <if test="supplierIds!=null and supplierIds.size()>0">
-      and supplier IN
+      and p.supplier_id IN
       <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
         #{sid}
       </foreach>
@@ -653,7 +650,7 @@
       <if test="foreignlanguage != null" >
         foreignLanguage,
       </if>
-      <if test="address != null" >
+      <if test="currentAddress != null" >
         address,
       </if>
       <if test="education != null" >
@@ -961,8 +958,8 @@
       <if test="foreignlanguage != null" >
         #{foreignlanguage,jdbcType=VARCHAR},
       </if>
-      <if test="address != null" >
-        #{address,jdbcType=VARCHAR},
+      <if test="currentAddress != null" >
+        #{currentAddress,jdbcType=VARCHAR},
       </if>
       <if test="education != null" >
         #{education,jdbcType=VARCHAR},

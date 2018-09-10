@@ -1,5 +1,8 @@
 package mapper.mdbcarmanage.ex;
 
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.dto.driverDuty.CarDriverMonthDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverMonthDuty;
 import com.zhuanche.request.DriverMonthDutyRequest;
@@ -9,6 +12,10 @@ import java.util.Map;
 
 public interface CarDriverMonthDutyExMapper {
 
+    @SuppressWarnings("rawtypes")
+    @MasterSlaveConfigs(configs={
+            @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+    } )
     /** 查询月排班列表*/
     List<CarDriverMonthDTO> queryDriverDutyList(DriverMonthDutyRequest param);
 

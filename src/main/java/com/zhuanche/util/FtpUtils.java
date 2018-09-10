@@ -129,7 +129,7 @@ public class FtpUtils {
 	/**
 	 * 下载
 	 * 
-	 * @param remortPath
+	 * @param path
 	 *            远程目录
 	 * @param webPath
 	 *            本地web目录
@@ -171,7 +171,7 @@ public class FtpUtils {
 	/**
 	 * 下载
 	 * 
-	 * @param remortPath
+	 * @param path
 	 *            远程目录
 	 * @param fileName
 	 *            文件名
@@ -203,7 +203,7 @@ public class FtpUtils {
 	/**
 	 * 创建目录(有则切换目录，没有则创建目录)
 	 * 
-	 * @param dir
+	 * @param path
 	 * @return
 	 */
 	public boolean createDir(String path) {

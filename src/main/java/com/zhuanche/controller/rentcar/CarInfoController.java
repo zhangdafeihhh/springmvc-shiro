@@ -56,16 +56,16 @@ public class CarInfoController {
      * @return
      */
     @RequestMapping(value = "/queryCarData")
-    public Object queryCarData(String cities,
-                               String supplierIds,
-                               String carModelIds,
-                               String licensePlates,
-                               String createDateBegin,
-                               String createDateEnd,
-                               Integer status,
-                               Integer isFree,
-                               Integer page,
-                               Integer pageSize) {
+    public Object queryCarData(@Verify(param = "cities",rule="") String cities,
+                               @Verify(param = "supplierIds",rule="") String supplierIds,
+                               @Verify(param = "carModelIds",rule="") String carModelIds,
+                               @Verify(param = "licensePlates",rule="") String licensePlates,
+                               @Verify(param = "createDateBegin",rule="") String createDateBegin,
+                               @Verify(param = "createDateEnd",rule="") String createDateEnd,
+                               @Verify(param = "status",rule="") Integer status,
+                               @Verify(param = "isFree",rule="") Integer isFree,
+                               @Verify(param = "page",rule="") Integer page,
+                               @Verify(param = "pageSize",rule="") Integer pageSize) {
         logger.info("车辆列表数据:queryCarData");
 
         CarInfo params = new CarInfo();
@@ -106,6 +106,11 @@ public class CarInfoController {
         return AjaxResponse.success(new PageDTO(params.getPage(), params.getPagesize(), total, BeanUtil.copyList(rows, CarInfoDTO.class)));
     }
 
+    /**
+     * 查询车辆详情
+     * @param carId
+     * @return
+     */
     @RequestMapping(value = "/queryCarInfo")
     public AjaxResponse queryCarInfo(@Verify(param = "carId",rule = "required") Integer carId) {
         logger.info("queryCar:查看车辆详情列表");
@@ -130,6 +135,10 @@ public class CarInfoController {
                 }
             }
         }
+        params.setLicensePlates1(params.getLicensePlates());
+        params.setOldCity(params.getCityId());
+        params.setOldSupplierId(params.getSupplierId());
+
         return AjaxResponse.success( BeanUtil.copyObject(params, CarInfoDTO.class) );
     }
 
@@ -207,7 +216,7 @@ public class CarInfoController {
                                   @Verify(param = "supplierId",rule="required") Integer supplierId,
                                   @Verify(param = "carModelId",rule="required") Integer carModelId,
                               @Verify(param = "imageUrl",rule="") String imageUrl,
-                                  @Verify(param = "vehicleDrivingLicense",rule="required") String vehicleDrivingLicense,
+                              @Verify(param = "vehicleDrivingLicense",rule="") String vehicleDrivingLicense,
                                   @Verify(param = "modelDetail",rule="required") String modelDetail,
                                   @Verify(param = "color",rule="required") String color,
                               @Verify(param = "clicensePlatesColor",rule="") String clicensePlatesColor,
@@ -245,11 +254,19 @@ public class CarInfoController {
                               @Verify(param = "gpsImei",rule="") String gpsImei,
                               @Verify(param = "gpsDate",rule="") String gpsDate,
                               @RequestParam(value = "purchaseDate",required = false) String memo,
-                              @Verify(param = "licensePlates1",rule="required") String licensePlates1,
-                              @Verify(param = "oldCity",rule="required") Integer oldCity,
-                              @Verify(param = "oldSupplierId",rule="required") Integer oldSupplierId) {
+                                  @Verify(param = "licensePlates1",rule="") String licensePlates1,
+                                  @Verify(param = "oldCity",rule="") Integer oldCity,
+                                  @Verify(param = "oldSupplierId",rule="") Integer oldSupplierId) {
         logger.info("车辆保存/修改:saveCarInfo");
 
+        if(null != carId){
+            if(StringUtils.isBlank(licensePlates1))
+                return AjaxResponse.fail(998, "licensePlates1");
+            if(oldCity == null)
+                return AjaxResponse.fail(998, "oldCity");
+            if(oldSupplierId == null)
+                return AjaxResponse.fail(998, "oldSupplierId");
+        }
 
 
         CarInfo params = new CarInfo();
@@ -316,6 +333,7 @@ public class CarInfoController {
                 logger.info("*********操作类型：修改");
             }
             result = this.carService.saveCarInfo(params);
+            logger.info("saveCar-result-result={}" + result);
         } catch (Exception e) {
             logger.error("save CarInfo error. ", e);
         }
@@ -323,59 +341,56 @@ public class CarInfoController {
     }
 
 
-//    /**
-//     * 车辆信息删除
-//     * @param params
-//     * @param request
-//     * @return
-//     */
-//    @RequestMapping(value = "/deleteCarInfo")
-//    public Object deleteCarInfo(CarInfo params, HttpServletRequest request) {
-//        logger.info("车辆删除:deleteCarInfo");
-//        Map<String, Object> result = new HashMap<String, Object>();
-//        String message = "";
-//        try {
-//            String carIds = params.getCarIds();
-//            if(StringUtils.isEmpty(carIds)){
-//                result.put(Common.RESULT_RESULT, 0);
-//                result.put(Common.RESULT_ERRORMSG, "参数不全");
-//                return result;
-//            }
-//            String[] carIdStr = carIds.split(",");
-//            for (int i = 0; i < carIdStr.length; i++) {
-//                String carId = carIdStr[i];
-//                if(StringUtils.isEmpty(carId)){
-//                    continue;
-//                }
-//                String licensePlates = this.carService.selectCarByCarId(Integer.parseInt(carId));
-//                if(StringUtils.isEmpty(licensePlates)){
-//                    continue;
-//                }
-//                CarInfo carInfoEntity = new CarInfo();
-//                carInfoEntity.setCarId(Integer.parseInt(carId));
-//                carInfoEntity.setLicensePlates(licensePlates);
-//                carInfoEntity = this.carService.selectCarInfoByCarId(carInfoEntity);
-//                if(carInfoEntity.getIsFree()==1){
-//                    message += licensePlates + "该车正在运营中，不可删除;";
-//                    continue;
-//                }
-//                carInfoEntity.setStatus(2);
-//                carInfoEntity.setLicensePlates1(licensePlates);
+    /**
+     * 车辆信息删除
+     * @param carIds
+     */
+    @RequestMapping(value = "/deleteCarInfo")
+    public Object deleteCarInfo(@Verify(param = "carIds", rule = "required") String carIds) {
+        logger.info("车辆删除:deleteCarInfo");
+        Map<String, Object> result = new HashMap<String, Object>();
+        String message = "";
+        try {
+            if(StringUtils.isEmpty(carIds)){
+                result.put(Common.RESULT_RESULT, 0);
+                result.put(Common.RESULT_ERRORMSG, "参数不全");
+                return result;
+            }
+            String[] carIdStr = carIds.split(",");
+            for (int i = 0; i < carIdStr.length; i++) {
+                String carId = carIdStr[i];
+                if(StringUtils.isEmpty(carId)){
+                    continue;
+                }
+                String licensePlates = this.carService.selectCarByCarId(Integer.parseInt(carId));
+                if(StringUtils.isEmpty(licensePlates)){
+                    continue;
+                }
+                CarInfo carInfoEntity = new CarInfo();
+                carInfoEntity.setCarId(Integer.parseInt(carId));
+                carInfoEntity.setLicensePlates(licensePlates);
+                carInfoEntity = this.carService.selectCarInfoByCarId(carInfoEntity);
+                if(carInfoEntity.getIsFree()==1){
+                    message += licensePlates + "该车正在运营中，不可删除;";
+                    continue;
+                }
+                carInfoEntity.setStatus(2);
+                carInfoEntity.setLicensePlates1(licensePlates);
 //                params.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
-//                result = this.carService.saveCarInfo(carInfoEntity);
-//            }
-//        } catch (Exception e) {
-//            logger.error("delete CarInfo error. ", e);
-//        }
-//        if(StringUtils.isNotEmpty(message)){
-//            result.put(Common.RESULT_RESULT, 0);
-//            result.put(Common.RESULT_ERRORMSG, message);
-//            return result;
-//        }
-//        result.put(Common.RESULT_RESULT, 1);
-//        result.put(Common.RESULT_ERRORMSG, "成功");
-//        return result;
-//    }
+                result = this.carService.saveCarInfo(carInfoEntity);
+            }
+        } catch (Exception e) {
+            logger.error("delete CarInfo error. ", e);
+        }
+        if(StringUtils.isNotEmpty(message)){
+            result.put(Common.RESULT_RESULT, 0);
+            result.put("exception", message);
+            return getResponse(result);
+        }
+        result.put(Common.RESULT_RESULT, 1);
+        result.put(Common.RESULT_ERRORMSG, "成功");
+        return getResponse(result);
+    }
 
 
     /**

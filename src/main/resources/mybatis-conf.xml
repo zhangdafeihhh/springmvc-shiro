@@ -11,6 +11,7 @@
 		<setting name="autoMappingBehavior" value="FULL" />
 		<setting name="defaultExecutorType" value="SIMPLE" />
 		<setting name="defaultStatementTimeout" value="300" />
+		<setting name="logImpl" value="STDOUT_LOGGING" />
 	</settings>
 	<!-- <plugins>
 		<plugin interceptor="com.jrd.framework.mybatis.PagePlugin">

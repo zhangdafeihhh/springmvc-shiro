@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.cache.RedisCacheDriverUtil;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -12,6 +13,7 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
+import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
 import com.zhuanche.entity.mdbcarmanage.*;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.HttpClientUtil;
@@ -21,6 +23,7 @@ import com.zhuanche.serv.mongo.DriverMongoService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.Common;
+import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.ValidateUtils;
 import com.zhuanche.util.encrypt.MD5Utils;
 import mapper.mdbcarmanage.CarAdmUserMapper;
@@ -53,6 +56,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
@@ -65,7 +69,7 @@ public class CarBizDriverInfoService {
     private static final Logger logger = LoggerFactory.getLogger(CarBizDriverInfoService.class);
     private static final String LOGTAG = "[司机信息]: ";
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     //司机端待服务列表
     private static final String DRIVER_SERVICE_TRIPLIST_URL="/trip/driverHasServiceOrderOrNot";
@@ -162,9 +166,9 @@ public class CarBizDriverInfoService {
     public Boolean checkPhone(String phone, Integer driverId) {
         int count = carBizDriverInfoExMapper.checkPhone(phone, driverId);
         if (count > 0) {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**
@@ -177,9 +181,9 @@ public class CarBizDriverInfoService {
     public Boolean checkIdCardNo(String idCardNo, Integer driverId) {
         int count = carBizDriverInfoExMapper.checkIdCardNo(idCardNo, driverId);
         if (count > 0) {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**
@@ -246,7 +250,7 @@ public class CarBizDriverInfoService {
             carBizDriverInfo.setIdCardNo(idCardNo);
             carBizDriverInfo.setDriverlicensenumber(idCardNo);//机动车驾驶证号
 
-            if (carBizDriverInfo.getPasswordReset() == 1) {//重置密码
+            if (carBizDriverInfo.getPasswordReset()!=null && carBizDriverInfo.getPasswordReset() == 1) {//重置密码
                 carBizDriverInfo.setPassword(getPassword(idCardNo));
             }
 
@@ -268,6 +272,7 @@ public class CarBizDriverInfoService {
             }
 
             //更新司机信息
+            DynamicRoutingDataSource.setMasterSlave("rentcar-DataSource", DataSourceMode.MASTER);
             int n = this.updateDriverInfo(carBizDriverInfo);
 
             // 更新车辆信息 根据 车牌号更新车辆 信息（更换车辆所属人）
@@ -472,7 +477,7 @@ public class CarBizDriverInfoService {
         int id = carBizDriverInfoDTO.getDriverId();
 
         //司机信息扩展表，司机银行卡号
-        CarBizDriverInfoDetail infoDetail = carBizDriverInfoDetailService.selectByPrimaryKey(carBizDriverInfoDTO.getDriverId());
+        CarBizDriverInfoDetailDTO infoDetail = carBizDriverInfoDetailService.selectByDriverId(carBizDriverInfoDTO.getDriverId());
         CarBizDriverInfoDetail carBizDriverInfoDetail = new CarBizDriverInfoDetail();
         carBizDriverInfoDetail.setBankCardBank(carBizDriverInfoDTO.getBankCardBank());
         carBizDriverInfoDetail.setBankCardNumber(carBizDriverInfoDTO.getBankCardNumber());
@@ -583,21 +588,22 @@ public class CarBizDriverInfoService {
 
     /**
      * 判断一些基础信息是否正确
-     *
-     * @param carBizDriverInfo
+     * @param driverId 司机ID
+     * @param phone 手机号
+     * @param idCardNo 身份证号
+     * @param bankCardNumber 银行卡卡号
+     * @param bankCardBank 银行卡开户行
      * @return
      */
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
-    public AjaxResponse validateCarDriverInfo(CarBizDriverInfoDTO carBizDriverInfo) {
+    public AjaxResponse validateCarDriverInfo(Integer driverId, String phone, String idCardNo, String bankCardNumber, String bankCardBank) {
         //手机号是否合法
-        String phone = carBizDriverInfo.getPhone();
         if (StringUtils.isEmpty(phone) || !ValidateUtils.validatePhone(phone)) {
             return AjaxResponse.fail(RestErrorCode.DRIVER_PHONE_NOT_LEGAL);
         }
         //身份证是否合法，大写X一律改为小写的x
-        String idCardNo = carBizDriverInfo.getIdCardNo();
         if ("X".equals(idCardNo.substring(idCardNo.length() - 1, idCardNo.length()))) {
             idCardNo = idCardNo.toLowerCase();
         }
@@ -605,16 +611,13 @@ public class CarBizDriverInfoService {
             return AjaxResponse.fail(RestErrorCode.DRIVER_IDCARNO_NOT_LEGAL);
         }
         //银行卡号位16到18位数字，银行开户行，二者都填，或都不填
-        String bankCardNumber = carBizDriverInfo.getBankCardNumber();
-        String bankCardBank = carBizDriverInfo.getBankCardBank();
-        if ((StringUtils.isNotEmpty(bankCardNumber) || StringUtils.isEmpty(bankCardBank)) || (StringUtils.isEmpty(bankCardNumber) || StringUtils.isNotEmpty(bankCardBank))) {
+        if (((StringUtils.isNotEmpty(bankCardNumber) && StringUtils.isEmpty(bankCardBank))) || ((StringUtils.isEmpty(bankCardNumber) && StringUtils.isNotEmpty(bankCardBank)))) {
             return AjaxResponse.fail(RestErrorCode.DRIVER_BANK_CARD_NUMBER_NOT_COMPLETE);
         }
         if (StringUtils.isNotEmpty(bankCardNumber) && StringUtils.isNotEmpty(bankCardBank) && !ValidateUtils.isRegular(bankCardNumber, ValidateUtils.BANK_CARD_NUMBER)) {
             return AjaxResponse.fail(RestErrorCode.DRIVER_BANK_CARD_NUMBER_NOT_LEGAL);
         }
         //查询手机号是否存在
-        Integer driverId = carBizDriverInfo.getDriverId();
         Boolean had = this.checkPhone(phone, driverId);
         if (had) {
             return AjaxResponse.fail(RestErrorCode.DRIVER_PHONE_EXIST);
@@ -625,9 +628,11 @@ public class CarBizDriverInfoService {
             return AjaxResponse.fail(RestErrorCode.DRIVER_IDCARNO_EXIST);
         }
         //查询银行卡号是否存在
-        had = carBizDriverInfoDetailService.checkBankCardBank(bankCardNumber, driverId);
-        if (had) {
-            return AjaxResponse.fail(RestErrorCode.DRIVER_BANK_CARD_NUMBER_EXIST);
+        if (StringUtils.isNotEmpty(bankCardNumber) && StringUtils.isNotEmpty(bankCardBank)){
+            had = carBizDriverInfoDetailService.checkBankCardBank(bankCardNumber, driverId);
+            if (had) {
+                return AjaxResponse.fail(RestErrorCode.DRIVER_BANK_CARD_NUMBER_EXIST);
+            }
         }
         return AjaxResponse.success(true);
     }
@@ -733,11 +738,11 @@ public class CarBizDriverInfoService {
             // 根据司机ID查询车队小组信息
             Map<String, Object> stringObjectMap = carDriverTeamExMapper.queryTeamNameAndGroupNameByDriverId(carBizDriverInfo.getDriverId());
             if(stringObjectMap!=null){
-                if(StringUtils.isNotEmpty(stringObjectMap.get("teamId").toString())){
+                if(stringObjectMap.containsKey("teamId") && stringObjectMap.get("teamId")!=null ){
                     carBizDriverInfo.setTeamId(Integer.parseInt(stringObjectMap.get("teamId").toString()));
                     carBizDriverInfo.setTeamName(stringObjectMap.get("teamName").toString());
                 }
-                if(StringUtils.isNotEmpty(stringObjectMap.get("teamGroupId").toString())){
+                if(stringObjectMap.containsKey("teamGroupId") && stringObjectMap.get("teamGroupId")!=null ){
                     carBizDriverInfo.setTeamId(Integer.parseInt(stringObjectMap.get("teamGroupId").toString()));
                     carBizDriverInfo.setTeamName(stringObjectMap.get("teamGroupName").toString());
                 }
@@ -772,7 +777,7 @@ public class CarBizDriverInfoService {
         String fileName = file.getOriginalFilename();
         String suffixName = fileName.substring(fileName.lastIndexOf("."));
         logger.info("上传的文件名为:{},上传的后缀名为:{}", fileName, suffixName);
-        InputStream is;
+        InputStream is = null;
         try {
             is = file.getInputStream();
 
@@ -1223,7 +1228,7 @@ public class CarBizDriverInfoService {
                                         }
                                     }
                                     Integer cityCount = carBizCarInfoExMapper.validateCityAndSupplier(cityId, supplierId, licensePlates);
-                                    if (cityCount == null || cityCount > 0) {
+                                    if (cityCount == null || cityCount == 0) {
                                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                                         returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
                                                 + (colIx + 1) + "列 【车牌号】:" + licensePlates + "不在所选的城市或厂商");
@@ -1412,7 +1417,7 @@ public class CarBizDriverInfoService {
                                     }
                                 }
                                 if (ValidateUtils.isValidDate(d)) {
-                                    d = dateFormat.format(dateFormat.parse(d));
+                                    d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
                                     carBizDriverInfoDTO.setBirthDay(d);
                                 } else {
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -1533,7 +1538,7 @@ public class CarBizDriverInfoService {
                                     }
                                 }
                                 if (ValidateUtils.isValidDate(d)) {
-                                    Date issueDate = dateFormat.parse(d);
+                                    Date issueDate = DATE_FORMAT.parse(d);
                                     carBizDriverInfoDTO.setIssueDate(issueDate);
                                 } else {
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -1588,15 +1593,15 @@ public class CarBizDriverInfoService {
                                     }
                                 }
                                 if (ValidateUtils.isValidDate(d)) {
-                                    String datetime = dateFormat.format(new Date());
-                                    if (dateFormat.parse(d).getTime() < dateFormat.parse(datetime).getTime()) {
+                                    String datetime = DATE_FORMAT.format(new Date());
+                                    if (DATE_FORMAT.parse(d).getTime() < DATE_FORMAT.parse(datetime).getTime()) {
                                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                                         returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
                                                 + (colIx + 1) + "列 【驾照到期时间】应该大于当前时间");
                                         listException.add(returnVO);
                                         isTrue = false;
                                     } else {
-                                        Date expireDate = dateFormat.parse(d);
+                                        Date expireDate = DATE_FORMAT.parse(d);
                                         carBizDriverInfoDTO.setExpireDate(expireDate);
                                     }
                                 } else {
@@ -1813,15 +1818,15 @@ public class CarBizDriverInfoService {
                                     }
                                 }
                                 if (ValidateUtils.isValidDate(d)) {
-                                    String datetime = dateFormat.format(new Date());
-                                    if (dateFormat.parse(d).getTime() > dateFormat.parse(datetime).getTime()) {
+                                    String datetime = DATE_FORMAT.format(new Date());
+                                    if (DATE_FORMAT.parse(d).getTime() > DATE_FORMAT.parse(datetime).getTime()) {
                                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                                         returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
                                                 + (colIx + 1) + "列 【初次领取驾驶证日期】应该小于当前时间");
                                         listException.add(returnVO);
                                         isTrue = false;
                                     } else {
-                                        d = dateFormat.format(dateFormat.parse(d));
+                                        d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
                                         carBizDriverInfoDTO.setFirstmeshworkdrivinglicensedate(d);
                                     }
                                 } else {
@@ -1893,15 +1898,15 @@ public class CarBizDriverInfoService {
                                     }
                                 }
                                 if (ValidateUtils.isValidDate(d)) {
-                                    String datetime = dateFormat.format(new Date());
-                                    if (dateFormat.parse(d).getTime() > dateFormat.parse(datetime).getTime()) {
+                                    String datetime = DATE_FORMAT.format(new Date());
+                                    if (DATE_FORMAT.parse(d).getTime() > DATE_FORMAT.parse(datetime).getTime()) {
                                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                                         returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
                                                 + (colIx + 1) + "列 【网络预约出租汽车驾驶员证初领日期】应该小于当前时间");
                                         listException.add(returnVO);
                                         isTrue = false;
                                     } else {
-                                        d = dateFormat.format(dateFormat.parse(d));
+                                        d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
                                         carBizDriverInfoDTO.setFirstmeshworkdrivinglicensedate(d);
                                     }
                                 } else {
@@ -1962,7 +1967,7 @@ public class CarBizDriverInfoService {
                                     }
                                 }
                                 if (ValidateUtils.isValidDate(d)) {
-                                    d = dateFormat.format(dateFormat.parse(d));
+                                    d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
                                     carBizDriverInfoDTO.setDriverLicenseIssuingGrantDate(d);
                                 } else {
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -1996,7 +2001,7 @@ public class CarBizDriverInfoService {
                                     }
                                 }
                                 if (ValidateUtils.isValidDate(d)) {
-                                    d = dateFormat.format(dateFormat.parse(d));
+                                    d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
                                     carBizDriverInfoDTO.setDriverLicenseIssuingFirstDate(d);
                                 } else {
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -2030,7 +2035,7 @@ public class CarBizDriverInfoService {
                                     }
                                 }
                                 if (ValidateUtils.isValidDate(d)) {
-                                    d = dateFormat.format(dateFormat.parse(d));
+                                    d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
                                     carBizDriverInfoDTO.setDriverlicenseissuingdatestart(d);
                                 } else {
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -2064,7 +2069,7 @@ public class CarBizDriverInfoService {
                                     }
                                 }
                                 if (ValidateUtils.isValidDate(d)) {
-                                    d = dateFormat.format(dateFormat.parse(d));
+                                    d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
                                     carBizDriverInfoDTO.setDriverlicenseissuingdateend(d);
                                 } else {
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -2098,15 +2103,15 @@ public class CarBizDriverInfoService {
                                     }
                                 }
                                 if (ValidateUtils.isValidDate(d)) {
-                                    String datetime = dateFormat.format(new Date());
-                                    if (dateFormat.parse(d).getTime() > dateFormat.parse(datetime).getTime()) {
+                                    String datetime = DATE_FORMAT.format(new Date());
+                                    if (DATE_FORMAT.parse(d).getTime() > DATE_FORMAT.parse(datetime).getTime()) {
                                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                                         returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
                                                 + (colIx + 1) + "列 【注册日期】应该小于当前时间");
                                         listException.add(returnVO);
                                         isTrue = false;
                                     } else {
-                                        d = dateFormat.format(dateFormat.parse(d));
+                                        d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
                                         carBizDriverInfoDTO.setDriverLicenseIssuingRegisterDate(d);
                                     }
                                 } else {
@@ -2199,15 +2204,15 @@ public class CarBizDriverInfoService {
                                     }
                                 }
                                 if (ValidateUtils.isValidDate(d)) {
-                                    String datetime = dateFormat.format(new Date());
-                                    if (dateFormat.parse(d).getTime() < dateFormat.parse(datetime).getTime()) {
+                                    String datetime = DATE_FORMAT.format(new Date());
+                                    if (DATE_FORMAT.parse(d).getTime() < DATE_FORMAT.parse(datetime).getTime()) {
                                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                                         returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
                                                 + (colIx + 1) + "列 【有效合同时间】应该大于当前时间");
                                         listException.add(returnVO);
                                         isTrue = false;
                                     } else {
-                                        d = dateFormat.format(dateFormat.parse(d));
+                                        d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
                                         carBizDriverInfoDTO.setContractdate(d);
                                     }
                                 } else {
@@ -2242,8 +2247,8 @@ public class CarBizDriverInfoService {
                                     }
                                 }
                                 if (ValidateUtils.isValidDate(d)) {
-                                    String datetime = dateFormat.format(new Date());
-                                    d = dateFormat.format(dateFormat.parse(d));
+                                    String datetime = DATE_FORMAT.format(new Date());
+                                    d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
                                     carBizDriverInfoDTO.setSigndate(d);
                                 } else {
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -2277,7 +2282,7 @@ public class CarBizDriverInfoService {
                                     }
                                 }
                                 if (ValidateUtils.isValidDate(d)) {
-                                    d = dateFormat.format(dateFormat.parse(d));
+                                    d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
                                     carBizDriverInfoDTO.setSigndateend(d);
                                 } else {
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -2421,6 +2426,14 @@ public class CarBizDriverInfoService {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         String download = "";
@@ -2434,7 +2447,7 @@ public class CarBizDriverInfoService {
             e.printStackTrace();
         }
         if (!"".equals(download) && download != null) {
-            resultMap.put("result", 1);
+            resultMap.put("result", 0);
             resultMap.put("msg", "有错误信息");
             resultMap.put("download", download);
         } else {
@@ -2622,7 +2635,7 @@ public class CarBizDriverInfoService {
                 cell.setCellValue(s.getDriverId()!=null?""+s.getDriverId()+"":"");
                 //创建时间
                 cell = row.createCell(52);
-                cell.setCellValue(s.getCreateDate()!=null?""+s.getCreateDate()+"":"");
+                cell.setCellValue(DateUtil.getTimeString(s.getCreateDate()));
 
                 i++;
             }
@@ -2686,11 +2699,12 @@ public class CarBizDriverInfoService {
         if(StringUtils.isBlank(value)){
 //            long expire = System.currentTimeMillis() + expireTime * 1000 + 1;
             long expire = System.currentTimeMillis() + expireTime * 1000 + 1;
-            String result = RedisCacheDriverUtil.getSet(key, String.valueOf(expire), String.class);
-            logger.info(LOGTAG + "派单锁-缓存KEY[" + key + "] " + result);
-            if(result != null){
-                lock = true;
-            }
+//            String result = RedisCacheDriverUtil.getSet(key, String.valueOf(expire), String.class);
+            RedisCacheDriverUtil.set(key, String.valueOf(expire), expireTime);
+//            logger.info(LOGTAG + "派单锁-缓存KEY[" + key + "] " + result);
+//            if(result != null){
+//                lock = true;
+//            }
         }
         return lock;
     }
@@ -2790,7 +2804,7 @@ public class CarBizDriverInfoService {
             String result = HttpClientUtil.buildGetRequest(url).execute();
             logger.info(LOGTAG + "删除司机信息缓存,删除失败不影响业务,调用结果返回={}", result);
         } catch (HttpException e) {
-            e.printStackTrace();
+            logger.info(LOGTAG + "司机driverId={},修改,调用清除接口异常={}", driverId, e.getMessage());
         }
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2815,5 +2829,23 @@ public class CarBizDriverInfoService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public CarBizDriverInfo selectByPhone(String phone){
+        CarBizDriverInfo carBizDriverInfo = carBizDriverInfoMapper.selectByPhone(phone);
+        return carBizDriverInfo;
+    }
+
+    /**
+     * 查询车辆是否已存在司机表
+     * @param licensePlates
+     * @return
+     */
+    public Boolean checkLicensePlates(String licensePlates){
+        int count = carBizDriverInfoExMapper.checkLicensePlates(licensePlates);
+        if(count>0){
+            return true;
+        }
+        return false;
     }
 }

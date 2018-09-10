@@ -9,11 +9,7 @@ import com.zhuanche.common.web.BaseController;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.mdbcarmanage.CarBizCarInfoTempDTO;
-import com.zhuanche.dto.mdbcarmanage.CarBizDriverInfoTempDTO;
 import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
-import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
-import com.zhuanche.entity.rentcar.CarBizCarGroup;
-import com.zhuanche.entity.rentcar.CarBizCooperationType;
 import com.zhuanche.entity.rentcar.CarBizModel;
 import com.zhuanche.serv.deiver.CarBizCarInfoTempService;
 import com.zhuanche.serv.rentcar.CarBizModelService;
@@ -23,14 +19,15 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.excel.ExportExcelUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,10 +41,10 @@ import java.util.Map;
  * @author wzq
  */
 @Controller
-@RequestMapping(value = "/ç")
+@RequestMapping(value = "/carInfoTemporary")
 public class CarInfoTemporaryController extends BaseController {
 
-    private static Log log =  LogFactory.getLog(CarInfoTemporaryController.class);
+    private static final Logger log =  LoggerFactory.getLogger(CarInfoTemporaryController.class);
 
 	@Autowired
 	private CarBizCarInfoTempService carBizCarInfoTempService;
@@ -70,7 +67,7 @@ public class CarInfoTemporaryController extends BaseController {
 	@ResponseBody
 	@RequestMapping(value = "/queryCarData", method =  RequestMethod.GET )
 	public AjaxResponse queryCarData(@RequestParam(value = "page",defaultValue="1") Integer page,
-                                     @RequestParam(value = "pageNum",defaultValue="10") Integer pageSize,
+                                     @RequestParam(value = "pageSize",defaultValue="10") Integer pageSize,
                                      @RequestParam(value = "licensePlates",required = false,defaultValue = "") String licensePlates,
                                      @RequestParam(value = "carModelIds",required = false,defaultValue = "") String carModelIds,
                                      @RequestParam(value = "cities",required = false,defaultValue = "") String cities,
@@ -491,28 +488,58 @@ public class CarInfoTemporaryController extends BaseController {
 
     /**
      * 车辆信息导入
-     * @param params
-     * @param request
+     * @param file 上传文件
+     * @param cityId 城市Id
+     * @param supplierId 供应商Id
      * @return
      */
     @ResponseBody
     @RequestMapping(value = "/importCarInfo",method = RequestMethod.POST)
-    public AjaxResponse importCarInfo(CarBizCarInfoTemp params, HttpServletRequest request) {
-        log.info("车辆信息导入保存:importCarInfo,参数" + params.toString());
-        return carBizCarInfoTempService.importCarInfo(params, request);
+    public AjaxResponse importCarInfo(@RequestParam(value="fileName") MultipartFile file,
+                                      @Verify(param = "cityId",rule="required") Integer cityId,
+                                      @Verify(param = "supplierId",rule="required") Integer supplierId) {
+        log.info("车辆信息导入保存:importCarInfo");
+        try {
+            // 获取上传的文件的名称
+            String filename = file.getOriginalFilename();
+            //获取后缀
+            String prefix=filename.substring(filename.lastIndexOf(".")+1);
+            if (!"xls".equals(prefix) && !"xlsx".equals(prefix)) {
+                return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
+            }
+            return carBizCarInfoTempService.importCarInfo(file.getInputStream(), prefix,cityId,supplierId);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
     }
 
     /**
      * 巴士导入
-     * @param params
-     * @param request
+     * @param file 上传文件
+     * @param cityId 城市Id
+     * @param supplierId 供应商Id
      * @return
      */
     @ResponseBody
     @RequestMapping(value = "/importCarInfo4Bus",method = RequestMethod.POST)
-    public AjaxResponse importCarInfo4Bus(CarBizCarInfoTemp params, HttpServletRequest request) {
-        log.info("车辆信息（巴士）导入保存:importCarInfo4Bus,参数" + params.toString());
-        return carBizCarInfoTempService.importCarInfo4Bus(params, request);
+    public AjaxResponse importCarInfo4Bus(@RequestParam(value="fileName") MultipartFile file,
+                                          @Verify(param = "cityId",rule="required") Integer cityId,
+                                          @Verify(param = "supplierId",rule="required") Integer supplierId) {
+        log.info("车辆信息（巴士）导入保存:importCarInfo4Bus");
+        try {
+            // 获取上传的文件的名称
+            String filename = file.getOriginalFilename();
+            //获取后缀
+            String prefix=filename.substring(filename.lastIndexOf(".")+1);
+            if (!"xls".equals(prefix) && !"xlsx".equals(prefix)) {
+                return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
+            }
+            return carBizCarInfoTempService.importCarInfo4Bus(file.getInputStream(),prefix,cityId,supplierId);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
     }
 
 

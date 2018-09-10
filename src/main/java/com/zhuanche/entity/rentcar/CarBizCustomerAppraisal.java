@@ -1,8 +1,12 @@
 package com.zhuanche.entity.rentcar;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class CarBizCustomerAppraisal {
+public class CarBizCustomerAppraisal implements Serializable{
+
+    private static final long serialVersionUID = 3607995917594876584L;
+
     private Integer appraisalId;
 
     private Integer orderId;
@@ -50,6 +54,13 @@ public class CarBizCustomerAppraisal {
     private String point;
 
     private String pointbd;
+
+    private String driverName;
+
+    private String driverPhone;
+
+    private String licensePlates;
+
 
     public Integer getAppraisalId() {
         return appraisalId;
@@ -241,5 +252,29 @@ public class CarBizCustomerAppraisal {
 
     public void setPointbd(String pointbd) {
         this.pointbd = pointbd == null ? null : pointbd.trim();
+    }
+
+    public String getDriverName() {
+        return driverName;
+    }
+
+    public void setDriverName(String driverName) {
+        this.driverName = driverName;
+    }
+
+    public String getDriverPhone() {
+        return driverPhone;
+    }
+
+    public void setDriverPhone(String driverPhone) {
+        this.driverPhone = driverPhone;
+    }
+
+    public String getLicensePlates() {
+        return licensePlates;
+    }
+
+    public void setLicensePlates(String licensePlates) {
+        this.licensePlates = licensePlates;
     }
 }

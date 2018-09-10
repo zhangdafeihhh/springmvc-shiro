@@ -34,6 +34,8 @@ public class DriverTeamRequest extends PageRequest{
 
     private String teamName;
 
+    private String name;
+
     private Integer status;
 
     private Set<String> driverIds;
@@ -46,6 +48,24 @@ public class DriverTeamRequest extends PageRequest{
     private String plates;
 
     private String license;
+
+    private String licensePlates;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getLicensePlates() {
+        return licensePlates;
+    }
+
+    public void setLicensePlates(String licensePlates) {
+        this.licensePlates = licensePlates;
+    }
 
     public Integer getStatus() {
         return status;

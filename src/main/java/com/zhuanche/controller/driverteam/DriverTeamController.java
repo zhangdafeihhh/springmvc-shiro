@@ -60,17 +60,12 @@ public class DriverTeamController{
 	@RequestMapping(value = "/queryDriverTeamList")
 	public AjaxResponse queryDriverTeamList(DriverTeamRequest param){
 		logger.info("查询车队列表入参:"+ JSON.toJSONString(param));
-		try{
-			SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-			if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
-				return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
-			}
-			PageDTO pageDTO = carDriverTeamService.queryDriverTeamPage(param);
-			return AjaxResponse.success(pageDTO);
-		}catch (Exception e){
-			logger.error("查询车队列表异常:{}",e);
-			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+		if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
+			return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
 		}
+		PageDTO pageDTO = carDriverTeamService.queryDriverTeamPage(param);
+		return AjaxResponse.success(pageDTO);
 	}
 
 	/**
@@ -84,16 +79,11 @@ public class DriverTeamController{
 	@RequestMapping(value = "/saveOneDriverTeam")
 	public AjaxResponse saveOneDriverTeam(CarDriverTeamDTO param){
 		logger.info("新增车队入参:"+ JSON.toJSONString(param));
-		try{
-			int result = carDriverTeamService.saveOneDriverTeam(param);
-			if(result >0){
-				return AjaxResponse.success(result);
-			}else{
-				return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
-			}
-		}catch (Exception e){
-			logger.error("新增车队异常:{}",e);
-			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		int result = carDriverTeamService.saveOneDriverTeam(param);
+		if(result >0){
+			return AjaxResponse.success(result);
+		}else{
+			return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
 		}
 	}
 
@@ -108,16 +98,14 @@ public class DriverTeamController{
 	@RequestMapping(value = "/updateOneDriverTeam")
 	public AjaxResponse updateOneDriverTeam(CarDriverTeamDTO param){
 		logger.info("修改车队入参:"+ JSON.toJSONString(param));
-		try{
-			int result = carDriverTeamService.updateOneDriverTeam(param);
-			if(result >0){
-				return AjaxResponse.success(result);
-			}else{
-				return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
-			}
-		}catch (Exception e){
-			logger.error("修改车队异常:{}",e);
-			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		if(Check.NuNObj(param) || Check.NuNObj(param.getId())){
+			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
+		}
+		int result = carDriverTeamService.updateOneDriverTeam(param);
+		if(result >0){
+			return AjaxResponse.success(result);
+		}else{
+			return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
 		}
 	}
 
@@ -132,13 +120,8 @@ public class DriverTeamController{
 	@RequestMapping(value = "/driverTeamDetail")
 	public AjaxResponse driverTeamDetail(DriverTeamRequest param){
 		logger.info("查询车队详情入参:"+ JSON.toJSONString(param));
-		try{
-			CarDriverTeamDTO detail = carDriverTeamService.selectOneDriverTeam(param);
-			return AjaxResponse.success(detail);
-		}catch (Exception e){
-			logger.error("查询车队详情异常:{}",e);
-			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-		}
+		CarDriverTeamDTO detail = carDriverTeamService.selectOneDriverTeam(param);
+		return AjaxResponse.success(detail);
 	}
 
 	/**
@@ -152,17 +135,12 @@ public class DriverTeamController{
 	@RequestMapping(value = "/queryTeamExistsDriverList")
 	public AjaxResponse queryTeamExistsDriverList(DriverTeamRequest param){
 		logger.info("查询车队/小组已存在司机列表入参:"+ JSON.toJSONString(param));
-		try{
-			SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-			if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
-				return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
-			}
-			PageDTO pageDTO = carDriverTeamService.selectTeamExistsDriverList(param);
-			return AjaxResponse.success(pageDTO);
-		}catch (Exception e){
-			logger.error("查询车队/小组已存在司机列表异常:{}",e);
-			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+		if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
+			return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
 		}
+		PageDTO pageDTO = carDriverTeamService.selectTeamExistsDriverList(param);
+		return AjaxResponse.success(pageDTO);
 	}
 
 	/**
@@ -176,29 +154,24 @@ public class DriverTeamController{
 	@RequestMapping(value = "/addDriverToTeam")
 	public AjaxResponse addDriverToTeam(DriverTeamRequest param){
 		logger.info("添加司机到车队/小组入参:"+ JSON.toJSONString(param));
-		try{
-			int result = carDriverTeamService.addDriverToTeam(param);
-			ServiceReturnCodeEnum typeByCode = ServiceReturnCodeEnum.getTypeByCode(result);
-			if(result < 0 ){
-				AjaxResponse fail = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
-				Map<String,String> map = new HashedMap();
-				map.put("errorMsg",typeByCode.getName());
-				fail.setData(map);
-				return fail;
-			}else if(result == 1){
-				return AjaxResponse.success(result);
-			}else if(result == 2){
-				AjaxResponse success = AjaxResponse.success(result);
-				Map<String,String> map = new HashedMap();
-				map.put("successMsg",typeByCode.getName());
-				success.setData(map);
-				return success;
-			}
+		int result = carDriverTeamService.addDriverToTeam(param);
+		ServiceReturnCodeEnum typeByCode = ServiceReturnCodeEnum.getTypeByCode(result);
+		if(result < 0 ){
+			AjaxResponse fail = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
+			Map<String,String> map = new HashedMap();
+			map.put("errorMsg",typeByCode.getName());
+			fail.setData(map);
+			return fail;
+		}else if(result == 1){
 			return AjaxResponse.success(result);
-		}catch (Exception e){
-			logger.error("添加司机到车队/小组异常:{}",e);
-			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		}else if(result == 2){
+			AjaxResponse success = AjaxResponse.success(result);
+			Map<String,String> map = new HashedMap();
+			map.put("successMsg",typeByCode.getName());
+			success.setData(map);
+			return success;
 		}
+		return AjaxResponse.success(result);
 	}
 
 	/**
@@ -212,17 +185,12 @@ public class DriverTeamController{
 	@RequestMapping(value = "/queryAddDriverList")
 	public AjaxResponse queryAddDriverList(DriverTeamRequest param){
 		logger.info("查询可添加司机列表入参:"+ JSON.toJSONString(param));
-		try{
-			SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-			if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
-				return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
-			}
-			PageDTO pageDTO = carDriverTeamService.selectAddDriverList(param);
-			return AjaxResponse.success(pageDTO);
-		}catch (Exception e){
-			logger.error("查询可添加司机列表异常:{}",e);
-			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+		if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
+			return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
 		}
+		PageDTO pageDTO = carDriverTeamService.selectAddDriverList(param);
+		return AjaxResponse.success(pageDTO);
 	}
 
 	/** 
@@ -238,20 +206,15 @@ public class DriverTeamController{
 									 @Verify(param = "dutyEndDate", rule = "required") String dutyEndDate,
 									 @Verify(param = "paramId", rule = "required") Integer paramId) {
 		logger.info("车队设置车队班制排班入参:"+dutyStartDate+"--"+dutyEndDate+"--"+paramId);
-		try{
-			CarDriverTeam record = new CarDriverTeam();
-			record.setId(paramId);
-			record.setDutyStartDate(dutyStartDate);
-			record.setDutyEndDate(dutyEndDate);
-			int result = carDriverTeamService.updateTeamDuty(record);
-			if(result > 0 ){
-				return AjaxResponse.success(result);
-			}else{
-				return AjaxResponse.fail(RestErrorCode.RECORD_DEAL_FAILURE);
-			}
-		}catch (Exception e){
-			logger.error("车队设置车队班制排班异常:{}",e);
-			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		CarDriverTeam record = new CarDriverTeam();
+		record.setId(paramId);
+		record.setDutyStartDate(dutyStartDate);
+		record.setDutyEndDate(dutyEndDate);
+		int result = carDriverTeamService.updateTeamDuty(record);
+		if(result > 0 ){
+			return AjaxResponse.success(result);
+		}else{
+			return AjaxResponse.fail(RestErrorCode.RECORD_DEAL_FAILURE);
 		}
 	}
 

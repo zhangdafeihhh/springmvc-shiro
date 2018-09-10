@@ -215,7 +215,7 @@
     model.model_name AS modeName,
     car.supplier_id supplierId,
     supplier.supplier_full_name AS supplierName,
-    license_plates AS 'licensePlates' ,
+    car.license_plates AS 'licensePlates' ,
     brand,
     car_model_id carModelId,
     model_detail modelDetail,
@@ -228,6 +228,8 @@
     car.memo,
     car.STATUS status,
     (case when car.driver_id =0 then 0 else 1 end)isFree,
+    driver.name AS driverName,
+    driver.id_card_no AS idCardNo,
     car.create_by createBy,
     car.update_by updateBy,
     car.create_date createDate,
@@ -235,6 +237,7 @@
     supplier.cooperation_type cooperationType
     FROM
     car_biz_car_info car
+    LEFT JOIN car_biz_driver_info driver ON driver.driver_id = car.driver_id
     LEFT JOIN car_biz_city city ON car.city_id = city.city_id
     LEFT JOIN car_biz_model model ON model.model_id = car.car_model_id
     LEFT JOIN car_biz_supplier supplier ON supplier.supplier_id = car.supplier_id
@@ -314,6 +317,7 @@
     SELECT count(*)
     FROM
     car_biz_car_info car
+    LEFT JOIN car_biz_driver_info driver ON driver.driver_id = car.driver_id
     LEFT JOIN car_biz_city city ON car.city_id = city.city_id
     LEFT JOIN car_biz_model model ON model.model_id = car.car_model_id
     LEFT JOIN car_biz_supplier supplier ON supplier.supplier_id = car.supplier_id

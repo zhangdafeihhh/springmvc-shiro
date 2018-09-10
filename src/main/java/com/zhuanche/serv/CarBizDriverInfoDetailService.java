@@ -18,16 +18,16 @@ public class CarBizDriverInfoDetailService {
 
     /**
      * 检查银行卡号是否存在
-     * @param bankCardBank
+     * @param bankCardNumber
      * @param driverId
      * @return
      */
-    public Boolean checkBankCardBank(String bankCardBank, Integer driverId){
-        int count = carBizDriverInfoDetailExMapper.checkBankCardBank(bankCardBank, driverId);
+    public Boolean checkBankCardBank(String bankCardNumber, Integer driverId){
+        int count = carBizDriverInfoDetailExMapper.checkBankCardBank(bankCardNumber, driverId);
         if(count>0){
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**

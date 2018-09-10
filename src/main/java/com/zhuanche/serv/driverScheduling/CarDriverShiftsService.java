@@ -91,7 +91,7 @@ public class CarDriverShiftsService {
 			List<CarDriverMustDutyDTO> list = carDriverMustDutyExMapper.selectDriverMustDutyListByField(dutyParamRequest);
 			return list;
 		}catch (Exception e){
-			logger.error("查询司机强制排班时间段异常:{}",e);
+			logger.error("查询司机强制排班时间段异常:{}"+JSON.toJSONString(e));
 			return null;
 		}
 	}
@@ -116,7 +116,7 @@ public class CarDriverShiftsService {
 			List<CarDriverDurationDTO> list = carDutyDurationExMapper.queryDutyDurationListByField(dutyParamRequest);
 			return list;
 		}catch (Exception e){
-			logger.error("查询排班时长时间段异常:{}",e);
+			logger.error("查询排班时长时间段异常:{}"+JSON.toJSONString(e));
 			return null;
 		}
 
@@ -132,15 +132,30 @@ public class CarDriverShiftsService {
 	*/ 
 	public List<CarDriverInfoDTO> queryDriverTeamReList(TeamGroupRequest teamGroupRequest){
 		logger.info("获取班制设置司机列表入参:{}"+ JSON.toJSONString(teamGroupRequest));
-		if(Check.NuNObj(teamGroupRequest) || Check.NuNObj(teamGroupRequest.getTeamId())){
+		if(Check.NuNObj(teamGroupRequest) || (Check.NuNObj(teamGroupRequest.getTeamId()) && Check.NuNStr(teamGroupRequest.getGroupId()))){
 			return null;
 		}
 		try{
-			List<CarRelateTeam> carRelateTeams = carRelateTeamExMapper.queryDriverTeamRelationList(teamGroupRequest);
-			if(Check.NuNCollection(carRelateTeams)){
+			Set<String> driverids = new HashSet<>();
+			if(!Check.NuNStr(teamGroupRequest.getGroupId())){
+				//小组
+				teamGroupRequest.setTeamId(null);
+				List<CarRelateGroup> carRelateGroups = carRelateGroupExMapper.queryDriverGroupRelationList(teamGroupRequest);
+				if(Check.NuNCollection(carRelateGroups)){
+					return null;
+				}
+				driverids = citySupplierTeamCommonService.dealDriverids(carRelateGroups,CarRelateGroup.class,"driverId");
+			}else{
+				//车队
+				List<CarRelateTeam> carRelateTeams = carRelateTeamExMapper.queryDriverTeamRelationList(teamGroupRequest);
+				if(Check.NuNCollection(carRelateTeams)){
+					return null;
+				}
+				driverids = citySupplierTeamCommonService.dealDriverids(carRelateTeams, CarRelateTeam.class,"driverId");
+			}
+			if(Check.NuNCollection(driverids)){
 				return null;
 			}
-			Set<String> driverids = citySupplierTeamCommonService.dealDriverids(carRelateTeams, CarRelateTeam.class,"driverId");
 			DriverTeamRequest driverTeamRequest = new DriverTeamRequest();
 			driverTeamRequest.setDriverIds(driverids);
 			driverTeamRequest.setStatus(1);
@@ -166,7 +181,7 @@ public class CarDriverShiftsService {
 			}
 			return driverInfoList;
 		}catch (Exception e){
-			logger.error("获取班制设置司机列表异常:{}",e);
+			logger.error("获取班制设置司机列表异常:{}"+JSON.toJSONString(e));
 			return null;
 		}
 	}
@@ -218,7 +233,7 @@ public class CarDriverShiftsService {
 			es.submit(new DayDutyTasker(dutyParamRequest));
 
 		}catch (Exception e){
-			logger.error("保存排班信息异常:{}",e);
+			logger.error("保存排班信息异常:{}"+JSON.toJSONString(e));
 		}
 		return "已接收请求，正在处理，稍后可在发布司机排版菜单查看";
 	}
@@ -237,7 +252,7 @@ public class CarDriverShiftsService {
 				Map<String,Object> result = new HashMap<String,Object>();
 				asyncDutyService.saveDriverDayDutyList(dutyParamRequest);
 			} catch (Exception e) {
-				logger.error("DayDutyTasker",e);
+				logger.error("DayDutyTasker"+JSON.toJSONString(e));
 			}
 		}
 	}
@@ -292,7 +307,7 @@ public class CarDriverShiftsService {
 			}
 			return resultStr;
 		}catch (Exception e){
-			logger.error("处理强制上班时间异常:{}",e);
+			logger.error("处理强制上班时间异常:{}"+JSON.toJSONString(e));
 			return null;
 		}
 	}

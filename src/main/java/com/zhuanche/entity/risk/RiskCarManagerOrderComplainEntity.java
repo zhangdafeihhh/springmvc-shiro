@@ -105,5 +105,195 @@ public class RiskCarManagerOrderComplainEntity   implements Serializable{
 	private String ruleName;
 
 
+    public String getRiskOrderId() {
+        return riskOrderId;
+    }
 
+    public void setRiskOrderId(String riskOrderId) {
+        this.riskOrderId = riskOrderId;
+    }
+
+    public String getOrderNo() {
+        return orderNo;
+    }
+
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
+    public String getDriverId() {
+        return driverId;
+    }
+
+    public void setDriverId(String driverId) {
+        this.driverId = driverId;
+    }
+
+    public String getDriverName() {
+        return driverName;
+    }
+
+    public void setDriverName(String driverName) {
+        this.driverName = driverName;
+    }
+
+    public String getDriverPhone() {
+        return driverPhone;
+    }
+
+    public void setDriverPhone(String driverPhone) {
+        this.driverPhone = driverPhone;
+    }
+
+    public String getOrderRiskStatus() {
+        return orderRiskStatus;
+    }
+
+    public void setOrderRiskStatus(String orderRiskStatus) {
+        this.orderRiskStatus = orderRiskStatus;
+    }
+
+    public Integer getAppealStatus() {
+        return appealStatus;
+    }
+
+    public void setAppealStatus(Integer appealStatus) {
+        this.appealStatus = appealStatus;
+    }
+
+    public String getAppealProcessAt() {
+        return appealProcessAt;
+    }
+
+    public void setAppealProcessAt(String appealProcessAt) {
+        this.appealProcessAt = appealProcessAt;
+    }
+
+    public String getAppealProcessBy() {
+        return appealProcessBy;
+    }
+
+    public void setAppealProcessBy(String appealProcessBy) {
+        this.appealProcessBy = appealProcessBy;
+    }
+
+    public String getCreateAt() {
+        return createAt;
+    }
+
+    public void setCreateAt(String createAt) {
+        this.createAt = createAt;
+    }
+
+    public String getCreateAtStart() {
+        return createAtStart;
+    }
+
+    public void setCreateAtStart(String createAtStart) {
+        this.createAtStart = createAtStart;
+    }
+
+    public String getCreateAtEnd() {
+        return createAtEnd;
+    }
+
+    public void setCreateAtEnd(String createAtEnd) {
+        this.createAtEnd = createAtEnd;
+    }
+
+    public String getOrderEndDate() {
+        return orderEndDate;
+    }
+
+    public void setOrderEndDate(String orderEndDate) {
+        this.orderEndDate = orderEndDate;
+    }
+
+    public String getOrderEndDateStart() {
+        return orderEndDateStart;
+    }
+
+    public void setOrderEndDateStart(String orderEndDateStart) {
+        this.orderEndDateStart = orderEndDateStart;
+    }
+
+    public String getOrderEndDateEnd() {
+        return orderEndDateEnd;
+    }
+
+    public void setOrderEndDateEnd(String orderEndDateEnd) {
+        this.orderEndDateEnd = orderEndDateEnd;
+    }
+
+    public BigDecimal getTotalCost() {
+        return totalCost;
+    }
+
+    public void setTotalCost(BigDecimal totalCost) {
+        this.totalCost = totalCost;
+    }
+
+    public String getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(String supplierId) {
+        this.supplierId = supplierId;
+    }
+
+    public String getLeasingCompany() {
+        return leasingCompany;
+    }
+
+    public void setLeasingCompany(String leasingCompany) {
+        this.leasingCompany = leasingCompany;
+    }
+
+    public String getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(String cityId) {
+        this.cityId = cityId;
+    }
+
+    public String getDriverCityName() {
+        return driverCityName;
+    }
+
+    public void setDriverCityName(String driverCityName) {
+        this.driverCityName = driverCityName;
+    }
+
+    public String getSupplierIds() {
+        return supplierIds;
+    }
+
+    public void setSupplierIds(String supplierIds) {
+        this.supplierIds = supplierIds;
+    }
+
+    public String getDriverCityIds() {
+        return driverCityIds;
+    }
+
+    public void setDriverCityIds(String driverCityIds) {
+        this.driverCityIds = driverCityIds;
+    }
+
+    public String getRuleName() {
+        return ruleName;
+    }
+
+    public void setRuleName(String ruleName) {
+        this.ruleName = ruleName;
+    }
 }
