@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,11 +32,37 @@ import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.http.HttpClientUtil;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.util.ValidateUtils;
 
 @Service
 public class  StatisticalAnalysisService {
 	
 	private static final Logger logger = LoggerFactory.getLogger(StatisticalAnalysisService.class);
+	
+	public Map<String, Object> currentLoginUserVisibleParam(Map<String, Object> paramMap,SSOLoginUser currentLoginUser){
+		if(currentLoginUser == null || paramMap==null){
+			return paramMap;
+		}
+		if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
+			Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
+		    Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
+		    Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
+		    // 供应商信息
+		    String[] visibleAllianceIds = setToArray(suppliers);
+			// 车队信息
+			String[] visibleMotorcadeIds = setToArray(teamIds);
+			// 可见城市
+			String[] visibleCityIds = setToArray(cityIds);
+			if(null == visibleAllianceIds || null == visibleMotorcadeIds || visibleCityIds == null ){
+				return paramMap;
+			}
+		    paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
+		    paramMap.put("visibleMotorcadeIds", visibleMotorcadeIds); // 可见车队ID
+		    paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
+		}
+		return paramMap;
+	}
 	
 	/**
    	 * 导出文件
