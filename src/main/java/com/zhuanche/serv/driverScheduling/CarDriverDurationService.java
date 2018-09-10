@@ -3,6 +3,9 @@ package com.zhuanche.serv.driverScheduling;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.dto.driverDuty.CarDriverDurationDTO;
 import com.zhuanche.dto.driverDuty.CarDriverMustDutyDTO;
@@ -74,6 +77,9 @@ public class CarDriverDurationService {
 	 * @Author: lunan
 	 * @Date: 2018/9/3
 	 */
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public PageDTO getDriverDurationList(DutyParamRequest dutyParamRequest){
 		if(Check.NuNObj(dutyParamRequest)){
 			return new PageDTO();
@@ -177,6 +183,9 @@ public class CarDriverDurationService {
 	 * @Author: lunan
 	 * @Date: 2018/9/3
 	 */
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public CarDriverDurationDTO getCarDriverDurationDetail(Integer paramId){
 		if(Check.NuNObj(paramId)){
 			return null;

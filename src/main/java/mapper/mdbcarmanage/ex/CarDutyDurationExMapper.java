@@ -11,23 +11,12 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface CarDutyDurationExMapper {
-    @SuppressWarnings("rawtypes")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-    } )
+
     /** 获取排班时长设置列表*/
     List<CarDriverDurationDTO> selectDutyDurationList(DutyParamRequest dutyParamRequest);
 
-    @SuppressWarnings("rawtypes")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-    } )
     /** 获取排班时长时间段*/
     List<CarDriverDurationDTO> queryDutyDurationListByField(DutyParamRequest dutyParamRequest);
 
-    @SuppressWarnings("rawtypes")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-    } )
     CarDriverDurationDTO selectOne(@Param("paramId") Integer paramId);
 }
