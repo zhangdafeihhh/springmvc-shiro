@@ -206,7 +206,8 @@ public class DriverInfoTemporaryController extends BaseController {
                                          @Verify(param = "cityId",rule="required") Integer cityId,
                                          @Verify(param = "supplierId",rule="required") Integer supplierId,
                                          @Verify(param = "teamId",rule="required") Integer teamId,
-                                         @Verify(param = "groupId",rule="required") Integer groupId){
+                                         @Verify(param = "groupId",rule="required") Integer groupId,
+                                         HttpServletResponse response){
         try {
             log.info("司机导入");
             // 获取上传的文件的名称
@@ -216,7 +217,7 @@ public class DriverInfoTemporaryController extends BaseController {
             if (!"xls".equals(prefix) && !"xlsx".equals(prefix)) {
                 return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
             }
-            return carBizDriverInfoTempService.importDriverInfo(file.getInputStream(),prefix,cityId,supplierId,teamId,groupId);
+            return carBizDriverInfoTempService.importDriverInfo(file.getInputStream(),prefix,cityId,supplierId,teamId,groupId,response);
         } catch (IOException e) {
             e.printStackTrace();
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
