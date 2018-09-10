@@ -116,9 +116,9 @@ public class CarBizDriverInfoTemp extends BaseDriverInfoTemp {
     private String photoSrct;
 
     /**
-     * 可扩展2
+     * 信用卡短卡号（块钱接口返回）
      */
-    private Integer ext2;
+    private String storableCardNo;
 
     /**
      * 可扩展3
@@ -184,15 +184,15 @@ public class CarBizDriverInfoTemp extends BaseDriverInfoTemp {
         this.photoSrct = photoSrct;
     }
 
-    public Integer getExt2() {
-		return ext2;
-	}
+    public String getStorableCardNo() {
+        return storableCardNo;
+    }
 
-	public void setExt2(Integer ext2) {
-		this.ext2 = ext2;
-	}
+    public void setStorableCardNo(String storableCardNo) {
+        this.storableCardNo = storableCardNo;
+    }
 
-	public Integer getExt3() {
+    public Integer getExt3() {
 		return ext3;
 	}
 
@@ -703,7 +703,7 @@ public class CarBizDriverInfoTemp extends BaseDriverInfoTemp {
                 ", bankCardBank='" + bankCardBank + '\'' +
                 ", bankCardNumber='" + bankCardNumber + '\'' +
                 ", photoSrct='" + photoSrct + '\'' +
-                ", ext2=" + ext2 +
+                ", storableCardNo=" + storableCardNo +
                 ", ext3=" + ext3 +
                 ", ext4=" + ext4 +
                 ", ext5=" + ext5 +
