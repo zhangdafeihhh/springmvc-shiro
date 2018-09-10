@@ -362,9 +362,6 @@
     <if test="phone!=null and phone!=''">
       and i.phone LIKE '%${phone}%'
     </if>
-    <if test="serviceCityId!=null and serviceCityId!=''">
-      and i.service_city = #{serviceCityId}
-    </if>
     <if test="cityIds!=null and cityIds.size()>0">
       and c.city_id IN
       <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >

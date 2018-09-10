@@ -12,10 +12,6 @@ import java.util.Map;
 
 public interface CarDriverMonthDutyExMapper {
 
-    @SuppressWarnings("rawtypes")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-    } )
     /** 查询月排班列表*/
     List<CarDriverMonthDTO> queryDriverDutyList(DriverMonthDutyRequest param);
 

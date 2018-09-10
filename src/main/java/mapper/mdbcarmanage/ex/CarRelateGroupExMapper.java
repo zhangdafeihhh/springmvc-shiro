@@ -11,16 +11,8 @@ import java.util.List;
 
 public interface CarRelateGroupExMapper {
 
-    @SuppressWarnings("rawtypes")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-    } )
     List<CarRelateGroup> queryDriverGroupRelationList(TeamGroupRequest teamGroupRequest);
 
-    @SuppressWarnings("rawtypes")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-    } )
     CarRelateGroup selectOneGroup(CarRelateGroup group);
 
 	List<CarRelateGroup> queryByParams(CarRelateGroup group);
