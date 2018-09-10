@@ -2480,8 +2480,8 @@ public class CarBizDriverInfoTempService {
                 }
             }
             entity.setStatus(1);
-            entity.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
-            entity.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
+            entity.setUpdateBy(1);
+            entity.setCreateBy(1);
             log.info("新建");
             try {
                 carBizDriverInfoTempMapper.insertSelective(entity);
@@ -2493,11 +2493,13 @@ public class CarBizDriverInfoTempService {
                 carBizCarInfoTempExMapper.updateByLicensePlates(car);
                 return AjaxResponse.success(RestErrorCode.SUCCESS);
             } catch (Exception e) {
-                log.info("保存司机信息error:" + e);
+                e.printStackTrace();
+                log.error("保存司机信息error:" + e);
                 return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
             }
         } catch (Exception e) {
-            log.info("保存司机信息error:" + e);
+            e.printStackTrace();
+            log.error("保存司机信息error:" + e);
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
     }

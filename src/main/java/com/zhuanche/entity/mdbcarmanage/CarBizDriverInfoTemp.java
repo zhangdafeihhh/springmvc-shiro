@@ -1,6 +1,7 @@
 package com.zhuanche.entity.mdbcarmanage;
 
 
+import java.util.Date;
 
 public class CarBizDriverInfoTemp extends BaseDriverInfoTemp {
 
@@ -120,45 +121,74 @@ public class CarBizDriverInfoTemp extends BaseDriverInfoTemp {
      */
     private String storableCardNo;
 
-    /**
-     * 可扩展3
-     */
-    private Integer ext3;
+    private String creditCvn2;
+
+    private Date creditBindDate;
 
     /**
-     * 可扩展4
+     * 是否有未读信息 0没有;1有
      */
-    private Integer ext4;
+    private Integer isRead;
 
     /**
-     * 可扩展5
+     * 回家模式地址百度经度
      */
-    private Integer ext5;
+    private String goHomePointLobd;
 
     /**
-     * 可扩展6
+     * 回家模式地址百度纬度
      */
-    private String ext6;
+    private String goHomePointLabd;
 
     /**
-     * 可扩展7
+     * 回家模式状态开启 1开启;0关闭
      */
-    private String ext7;
+    private String goHomeStatus;
 
     /**
-     * 可扩展8
+     * 司机端修改回家模式时间 格式 2015-11-01
      */
-    private String ext8;
+    private String updateGoHomeDate;
 
     /**
-     * 可扩展9
+     * 驾驶员通信地址
      */
-    private String ext9;
+    private String address;
 
     /**
-     * 可扩展10
+     * 是否上传身份证照片;1：上传，非1：未上传
      */
-    private String ext10;
+    private String isUploadCard;
+
+    /**
+     * 是否必须进行人脸识别验证。1：必须验证；非1：不是必须验证
+     */
+    private String isMustConfirmation;
+
+    /**
+     * 司机类型：1=普通账号、2=内部测试账号
+     */
+    private Integer accountType;
+
+    /**
+     * 合同类型： HT:合同、XY:协议
+     */
+    private String contractType;
+
+    /**
+     * 合同编号
+     */
+    private String contractNo;
+
+    /**
+     * 车队id
+     */
+    private Integer teamId;
+
+    /**
+     * 小组id
+     */
+    private Integer teamGroupId;
     
     public String getBankCardBank() {
 		return bankCardBank;
@@ -192,71 +222,71 @@ public class CarBizDriverInfoTemp extends BaseDriverInfoTemp {
         this.storableCardNo = storableCardNo;
     }
 
-    public Integer getExt3() {
-		return ext3;
-	}
+    public String getCreditCvn2() {
+        return creditCvn2;
+    }
 
-	public void setExt3(Integer ext3) {
-		this.ext3 = ext3;
-	}
+    public void setCreditCvn2(String creditCvn2) {
+        this.creditCvn2 = creditCvn2;
+    }
 
-	public Integer getExt4() {
-		return ext4;
-	}
+    public Date getCreditBindDate() {
+        return creditBindDate;
+    }
 
-	public void setExt4(Integer ext4) {
-		this.ext4 = ext4;
-	}
+    public void setCreditBindDate(Date creditBindDate) {
+        this.creditBindDate = creditBindDate;
+    }
 
-	public Integer getExt5() {
-		return ext5;
-	}
+    public Integer getIsRead() {
+        return isRead;
+    }
 
-	public void setExt5(Integer ext5) {
-		this.ext5 = ext5;
-	}
+    public void setIsRead(Integer isRead) {
+        this.isRead = isRead;
+    }
 
-	public String getExt6() {
-		return ext6;
-	}
+    public String getGoHomePointLobd() {
+        return goHomePointLobd;
+    }
 
-	public void setExt6(String ext6) {
-		this.ext6 = ext6;
-	}
+    public void setGoHomePointLobd(String goHomePointLobd) {
+        this.goHomePointLobd = goHomePointLobd;
+    }
 
-	public String getExt7() {
-		return ext7;
-	}
+    public String getGoHomePointLabd() {
+        return goHomePointLabd;
+    }
 
-	public void setExt7(String ext7) {
-		this.ext7 = ext7;
-	}
+    public void setGoHomePointLabd(String goHomePointLabd) {
+        this.goHomePointLabd = goHomePointLabd;
+    }
 
-	public String getExt8() {
-		return ext8;
-	}
+    public String getGoHomeStatus() {
+        return goHomeStatus;
+    }
 
-	public void setExt8(String ext8) {
-		this.ext8 = ext8;
-	}
+    public void setGoHomeStatus(String goHomeStatus) {
+        this.goHomeStatus = goHomeStatus;
+    }
 
-	public String getExt9() {
-		return ext9;
-	}
+    public String getUpdateGoHomeDate() {
+        return updateGoHomeDate;
+    }
 
-	public void setExt9(String ext9) {
-		this.ext9 = ext9;
-	}
+    public void setUpdateGoHomeDate(String updateGoHomeDate) {
+        this.updateGoHomeDate = updateGoHomeDate;
+    }
 
-	public String getExt10() {
-		return ext10;
-	}
+    public String getAddress() {
+        return address;
+    }
 
-	public void setExt10(String ext10) {
-		this.ext10 = ext10;
-	}
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
-	public String getImei() {
+    public String getImei() {
 		return imei;
 	}
 
@@ -638,8 +668,16 @@ public class CarBizDriverInfoTemp extends BaseDriverInfoTemp {
 	public void setHouseHoldRegisterPermanent(String houseHoldRegisterPermanent) {
 		this.houseHoldRegisterPermanent = houseHoldRegisterPermanent;
 	}
-	
-	@Override  
+
+    public String getIsUploadCard() {
+        return isUploadCard;
+    }
+
+    public void setIsUploadCard(String isUploadCard) {
+        this.isUploadCard = isUploadCard;
+    }
+
+    @Override
     public boolean equals(Object obj) {  
 		CarBizDriverInfoTemp s=(CarBizDriverInfoTemp)obj;
 	    return super.getPhone().equals(s.getPhone());   
@@ -648,6 +686,54 @@ public class CarBizDriverInfoTemp extends BaseDriverInfoTemp {
     public int hashCode() {  
 	    String in =  super.getPhone();  
 	    return in.hashCode();  
+    }
+
+    public String getIsMustConfirmation() {
+        return isMustConfirmation;
+    }
+
+    public void setIsMustConfirmation(String isMustConfirmation) {
+        this.isMustConfirmation = isMustConfirmation;
+    }
+
+    public Integer getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(Integer accountType) {
+        this.accountType = accountType;
+    }
+
+    public String getContractType() {
+        return contractType;
+    }
+
+    public void setContractType(String contractType) {
+        this.contractType = contractType;
+    }
+
+    public String getContractNo() {
+        return contractNo;
+    }
+
+    public void setContractNo(String contractNo) {
+        this.contractNo = contractNo;
+    }
+
+    public Integer getTeamId() {
+        return teamId;
+    }
+
+    public void setTeamId(Integer teamId) {
+        this.teamId = teamId;
+    }
+
+    public Integer getTeamGroupId() {
+        return teamGroupId;
+    }
+
+    public void setTeamGroupId(Integer teamGroupId) {
+        this.teamGroupId = teamGroupId;
     }
 
     @Override
@@ -703,15 +789,22 @@ public class CarBizDriverInfoTemp extends BaseDriverInfoTemp {
                 ", bankCardBank='" + bankCardBank + '\'' +
                 ", bankCardNumber='" + bankCardNumber + '\'' +
                 ", photoSrct='" + photoSrct + '\'' +
-                ", storableCardNo=" + storableCardNo +
-                ", ext3=" + ext3 +
-                ", ext4=" + ext4 +
-                ", ext5=" + ext5 +
-                ", ext6='" + ext6 + '\'' +
-                ", ext7='" + ext7 + '\'' +
-                ", ext8='" + ext8 + '\'' +
-                ", ext9='" + ext9 + '\'' +
-                ", ext10='" + ext10 + '\'' +
+                ", storableCardNo='" + storableCardNo + '\'' +
+                ", creditCvn2='" + creditCvn2 + '\'' +
+                ", creditBindDate=" + creditBindDate +
+                ", isRead=" + isRead +
+                ", goHomePointLobd='" + goHomePointLobd + '\'' +
+                ", goHomePointLabd='" + goHomePointLabd + '\'' +
+                ", goHomeStatus='" + goHomeStatus + '\'' +
+                ", updateGoHomeDate='" + updateGoHomeDate + '\'' +
+                ", address='" + address + '\'' +
+                ", isUploadCard='" + isUploadCard + '\'' +
+                ", isMustConfirmation='" + isMustConfirmation + '\'' +
+                ", accountType=" + accountType +
+                ", contractType='" + contractType + '\'' +
+                ", contractNo='" + contractNo + '\'' +
+                ", teamId=" + teamId +
+                ", teamGroupId=" + teamGroupId +
                 '}';
     }
 }
