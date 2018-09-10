@@ -2,6 +2,7 @@ package com.zhuanche.controller.rentcar;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.*;
 
 import javax.servlet.ServletOutputStream;
@@ -18,6 +19,7 @@ import com.zhuanche.entity.rentcar.DriverOutage;
 import com.zhuanche.serv.rentcar.DriverOutageService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
+import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.DateUtils;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -210,10 +212,16 @@ public class DriverOutageController {
         }
         if(outageReason.length() > 50)
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID,"请输入50字以内的停运说明");
+//        DateUtil.beforeNDayDate()
         DriverOutage params = new DriverOutage();
         params.setDriverPhone(driverPhone);
         params.setDriverName(driverName);
-        params.setOutStartDate(DateUtils.parse(outStartDate, "yyyy-MM-dd HH:mm:ss", Date.class));
+        try {
+            params.setOutStartDate(DateUtils.parse(outStartDate, "yyyy-MM-dd HH:mm:ss", Date.class));
+        } catch (Exception e){
+            logger.error("保存临时停运开始时间格式错误,e={}" + e);
+            return AjaxResponse.fail(998, "始时间格式错误,yyyy-MM-dd HH:mm:ss");
+        }
         params.setOutageReason(outageReason);
         params.setOutStopLongTime(outStopLongTime);
         params.setDriverId(driverId);
