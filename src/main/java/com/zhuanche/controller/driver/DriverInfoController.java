@@ -715,4 +715,22 @@ public class DriverInfoController {
             e.printStackTrace();
         }
     }
+    @ResponseBody
+    @RequestMapping(value = "/selectByPhone")
+    @MasterSlaveConfigs(configs={
+            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
+    } )
+    public AjaxResponse selectByPhone(  @Verify(param = "phone",rule="required") String phone) {
+        logger.info(LOGTAG + "根据手机号查询司机信息phone={}", phone);
+        try{
+            CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPhone(phone);
+            if(carBizDriverInfo==null){
+                return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
+            }
+            return AjaxResponse.success(carBizDriverInfo);
+        }catch (Exception e){
+            logger.error(LOGTAG + "根据手机号查询司机信息phone="+phone,e );
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+        }
+    }
 }
