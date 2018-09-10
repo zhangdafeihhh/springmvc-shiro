@@ -1,6 +1,7 @@
 package mapper.mdbcarmanage.ex;
 
 import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
+import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
 
 import java.util.List;
 import java.util.Map;
@@ -40,4 +41,11 @@ public interface CarBizCarInfoTempExMapper {
      * @return
      */
     CarBizCarInfoTemp selectBylicensePlates(Map<String,Object> params);
+
+    /**
+     * 查询未绑定车牌号
+     * @param map
+     * @return
+     */
+    List<CarBizCarInfoTemp> licensePlatesNotDriverIdList(Map<String,Object> map);
 }

@@ -8,6 +8,7 @@ import com.zhuanche.common.web.BaseController;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.mdbcarmanage.CarBizDriverInfoTempDTO;
+import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
 import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.entity.rentcar.CarBizCooperationType;
@@ -665,5 +666,23 @@ public class DriverInfoTemporaryController extends BaseController {
         entity.setOldCityId(oldCityId);
         entity.setOldSupplierId(oldSupplierId);
         return carBizDriverInfoTempService.updateSave(entity);
+    }
+
+
+    /**
+     * 查询未绑定车牌号
+     * @param cityId 城市Id
+     * @param supplierId 供应商Id
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/licensePlatesTempList")
+    public Object licensePlatesList(@Verify(param = "cityId", rule = "required") Integer cityId,
+                                    @Verify(param = "supplierId", rule = "required") Integer supplierId) {
+        Map<String, Object> map=new HashMap<String, Object>();
+        map.put("cityId",cityId);
+        map.put("supplierId",supplierId);
+        List<CarBizCarInfoTemp> carList = carBizDriverInfoTempService.licensePlatesNotDriverIdList(map);
+        return AjaxResponse.success(carList);
     }
 }

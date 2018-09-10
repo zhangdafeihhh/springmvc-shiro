@@ -303,5 +303,20 @@
 		FROM car_biz_car_info_temp car
 		WHERE license_plates = #{licensePlates}
     </select>
+
+    <select id="licensePlatesNotDriverIdList" resultType="com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp" parameterType="java.util.Map">
+        SELECT
+        car_id carId,
+        license_plates licensePlates
+        FROM
+        car_biz_car_info_temp
+        WHERE driver_id = '0' and status=1
+        <if test="cityId !=null and cityId != ''">
+            and city_id = #{cityId}
+        </if>
+        <if test="supplierId !=null and supplierId != ''">
+            and supplier_id = #{supplierId}
+        </if>
+    </select>
 </mapper>
 

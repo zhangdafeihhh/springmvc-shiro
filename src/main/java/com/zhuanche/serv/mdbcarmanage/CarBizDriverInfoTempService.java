@@ -2589,4 +2589,13 @@ public class CarBizDriverInfoTempService {
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
     }
+
+    /**
+     *查询未绑定车牌号
+     * @param map
+     * @return
+     */
+    public List<CarBizCarInfoTemp> licensePlatesNotDriverIdList(Map<String,Object> map) {
+        return carBizCarInfoTempExMapper.licensePlatesNotDriverIdList(map);
+    }
 }
