@@ -24,7 +24,7 @@
     insert into car_driver_month_duty (time,driver_id,driver_name,driver_phone,
     license_plates,supplier_id,city_id,data,team_id,group_id)
     values
-    <foreach collection="driverList" item="item" index="index" separator="," >
+    <foreach collection="params" item="item" index="index" separator="," >
       (
       str_to_date(#{item.monitorDate},'%Y-%m'),#{item.driverId},#{item.driverName},#{item.driverPhone},
       #{item.licensePlates},#{item.supplierId},#{item.cityId},#{item.data},
@@ -34,7 +34,7 @@
   </insert>
 
   <update id="updateDriverMonthDutyList" parameterType="java.util.Map">
-    <foreach collection="updateDriverList" item="item" index="index" separator=";" >
+    <foreach collection="params" item="item" index="index" separator=";" >
       UPDATE car_driver_month_duty
       <set>
         driver_name=#{item.driverName},

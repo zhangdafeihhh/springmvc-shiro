@@ -132,8 +132,11 @@ public class DriverMonthDutyController {
     * @Date: 2018/9/4 
     */ 
     @ResponseBody
-    @RequestMapping(value = "/updateDriverMonthDutyData", method = { RequestMethod.POST })
+    @RequestMapping(value = "/updateDriverMonthDutyData")
     public AjaxResponse updateDriverMonthDutyData(DriverMonthDutyRequest param){
+        if(Check.NuNObj(param) || Check.NuNObj(param.getId()) || Check.NuNStr(param.getData())){
+            return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
+        }
         logger.info("修改司机上班状态入参:{}",JSON.toJSONString(param));
         CarDriverMonthDuty exists = this.driverMonthDutyService.selectByPrimaryKey(param.getId());
         if (Check.NuNObj(exists)) {
