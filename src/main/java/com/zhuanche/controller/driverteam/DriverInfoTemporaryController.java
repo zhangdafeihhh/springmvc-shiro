@@ -474,7 +474,7 @@ public class DriverInfoTemporaryController extends BaseController {
         entity.setXyDriverNumber(xyDriverNumber);
         entity.setPartTimeJobDri(partTimeJobDri);
         entity.setMapType(mapType);
-        entity.setAssessment(StringUtils.isNotBlank(assessment)?superintendUrl:null);
+        entity.setAssessment(StringUtils.isNotBlank(assessment)?assessment:null);
         entity.setDriverLicenseIssuingDateStart(driverLicenseIssuingDateStart);
         entity.setDriverLicenseIssuingDateEnd(driverLicenseIssuingDateEnd);
         entity.setDriverLicenseIssuingCorp(driverLicenseIssuingCorp);
@@ -486,9 +486,9 @@ public class DriverInfoTemporaryController extends BaseController {
         entity.setSupplierId(supplierId);
         entity.setLicensePlates(licensePlates);
         entity.setGroupid(groupId);
-        entity.setBankCardNumber(StringUtils.isNotBlank(bankCardNumber)?superintendUrl:null);
-        entity.setBankCardBank(StringUtils.isNotBlank(bankCardBank)?superintendUrl:null);
-        entity.setMemo(StringUtils.isNotBlank(memo)?superintendUrl:null);
+        entity.setBankCardNumber(StringUtils.isNotBlank(bankCardNumber)?bankCardNumber:null);
+        entity.setBankCardBank(StringUtils.isNotBlank(bankCardBank)?bankCardBank:null);
+        entity.setMemo(StringUtils.isNotBlank(memo)?memo:null);
         return carBizDriverInfoTempService.addSave(entity);
     }
 
@@ -648,7 +648,7 @@ public class DriverInfoTemporaryController extends BaseController {
         entity.setXyDriverNumber(xyDriverNumber);
         entity.setPartTimeJobDri(partTimeJobDri);
         entity.setMapType(mapType);
-        entity.setAssessment(StringUtils.isNotBlank(assessment)?superintendUrl:null);
+        entity.setAssessment(StringUtils.isNotBlank(assessment)?assessment:null);
         entity.setDriverLicenseIssuingDateStart(driverLicenseIssuingDateStart);
         entity.setDriverLicenseIssuingDateEnd(driverLicenseIssuingDateEnd);
         entity.setDriverLicenseIssuingCorp(driverLicenseIssuingCorp);
@@ -660,9 +660,9 @@ public class DriverInfoTemporaryController extends BaseController {
         entity.setSupplierId(supplierId);
         entity.setLicensePlates(licensePlates);
         entity.setGroupid(groupId);
-        entity.setBankCardNumber(StringUtils.isNotBlank(bankCardNumber)?superintendUrl:null);
-        entity.setBankCardBank(StringUtils.isNotBlank(bankCardBank)?superintendUrl:null);
-        entity.setMemo(StringUtils.isNotBlank(memo)?superintendUrl:null);
+        entity.setBankCardNumber(StringUtils.isNotBlank(bankCardNumber)?bankCardNumber:null);
+        entity.setBankCardBank(StringUtils.isNotBlank(bankCardBank)?bankCardBank:null);
+        entity.setMemo(StringUtils.isNotBlank(memo)?memo:null);
         entity.setOldCityId(oldCityId);
         entity.setOldSupplierId(oldSupplierId);
         return carBizDriverInfoTempService.updateSave(entity);
