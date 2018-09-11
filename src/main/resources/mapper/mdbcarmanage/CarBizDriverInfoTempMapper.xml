@@ -137,7 +137,7 @@
     delete from car_biz_driver_info_temp
     where driver_id = #{driverId,jdbcType=INTEGER}
   </delete>
-  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp" useGeneratedKeys="true" keyProperty="carId">
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp" useGeneratedKeys="true" keyProperty="driverId">
     insert into car_biz_driver_info_temp
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="password != null">

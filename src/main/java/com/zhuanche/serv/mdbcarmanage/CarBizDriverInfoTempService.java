@@ -2479,9 +2479,21 @@ public class CarBizDriverInfoTempService {
                     return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID,"【驾驶员合同（或协议）签署公司】在协议公司中不存在");
                 }
             }
+            CarBizDriverInfo carBizDriverInfo = new CarBizDriverInfo();
+            carBizDriverInfo.setPhone(entity.getPhone());
+            Integer integer = carBizDriverInfoExMapper.selectCountForPhone(carBizDriverInfo);
+            if(integer > 0){
+                return AjaxResponse.fail(RestErrorCode.DRIVER_PHONE_EXIST);
+            }
+            CarBizDriverInfoTemp driverInfoTemp = new CarBizDriverInfoTemp();
+            driverInfoTemp.setPhone(entity.getPhone());
+            Integer integer1 = carBizDriverInfoTempExMapper.selectCountForPhone(driverInfoTemp);
+            if(integer1 > 0){
+                return AjaxResponse.fail(RestErrorCode.DRIVER_PHONE_EXIST);
+            }
             entity.setStatus(1);
-            entity.setUpdateBy(1);
-            entity.setCreateBy(1);
+            entity.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
+            entity.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
             log.info("新建");
             try {
                 carBizDriverInfoTempMapper.insertSelective(entity);
