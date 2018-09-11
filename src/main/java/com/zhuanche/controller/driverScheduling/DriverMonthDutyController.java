@@ -33,9 +33,11 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.zhuanche.util.excel.ExportExcelUtil;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.POIXMLDocument;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -207,6 +209,7 @@ public class DriverMonthDutyController {
         }
         CommonRequest commonRequest = new CommonRequest();
         BeanUtils.copyProperties(param,commonRequest);
+        commonRequest.setTeamId(Integer.parseInt(param.getTeamId()));
         CommonRequest data = commonService.paramDeal(commonRequest);
         if(Check.NuNObj(data)){
             logger.error("没有权限操作,用户："+JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));
@@ -237,7 +240,7 @@ public class DriverMonthDutyController {
             logger.error("downloadTemplateMonthDuty:下载 司机月排行 导入模板-失败[统计月不能为空]");
             return;
         }
-        String path = request.getRealPath(File.separator)+"template"+File.separator+"driverMonthDutyInfo.xlsx";
+        String path = request.getRealPath("/")+File.separator+"template"+File.separator+"driverMonthDutyInfo.xlsx";
         InputStream inputStream = null;
         try{
             // 获取表头
@@ -247,6 +250,7 @@ public class DriverMonthDutyController {
             tabelHeader = (Map<String, Object>)result.get("Rows");
             CommonRequest commonRequest = new CommonRequest();
             BeanUtils.copyProperties(param,commonRequest);
+            commonRequest.setTeamId(Integer.parseInt(param.getTeamId()));
             CommonRequest data = commonService.paramDeal(commonRequest);
             if(Check.NuNObj(data)){
                 logger.error("没有权限操作,用户："+JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));
@@ -272,6 +276,7 @@ public class DriverMonthDutyController {
                 }
             }
             driverInfoList = driverMonthDutyService.queryDriverListInfoForMonthDuty(param, driverTeamMap, param.getTeamIds());
+            // 打开导入模板文件
             // 打开导入模板文件
             Workbook workbook = null;
             inputStream = new FileInputStream(path);
@@ -326,6 +331,11 @@ public class DriverMonthDutyController {
                 }
 
             }
+            /*HttpServletResponse excelResponse = this.setResponse(response, param.getMonitorDate()+"司机月排班");
+            ServletOutputStream out = excelResponse.getOutputStream();
+            workbook.write(out);
+            out.flush();
+            out.close();*/
             // 先去掉文件名称中的空格,然后转换编码格式为utf-8,保证不出现乱码,这个文件名称用于浏览器的下载框中自动显示的文件名
             //response.addHeader("Content-Disposition", "attachment;filename=" + new String((driverMonthDutyEntity.getMonitorDate() + "司机月排班").getBytes("gbk"),"iso8859-1"));
             //response.addHeader("Content-Length", "" + file.length());
@@ -353,14 +363,26 @@ public class DriverMonthDutyController {
         }
     }
 
+    /**
+     * 设置文件下载 response格式
+     */
+    private HttpServletResponse setResponse(HttpServletResponse response, String filename) throws IOException {
+        response.setContentType("application/octet-stream;charset=ISO8859-1");
+        response.setHeader("Content-Disposition", "attachment;filename=" + new String(filename.getBytes("GB2312"), "ISO8859-1") + ".xls");
+        response.addHeader("Pargam", "no-cache");
+        response.addHeader("Cache-Control", "no-cache");
+        return response;
+    }
+
     public void exportExcelFromTemplet(HttpServletRequest request, HttpServletResponse response, Workbook wb, String fileName) throws IOException {
         if(StringUtils.isEmpty(fileName)) {
             fileName = "exportExcel";
         }
         response.setHeader("Content-Disposition","attachment;filename="+fileName+".xlsx");//指定下载的文件名
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setContentType("application/octet-stream");
         ServletOutputStream os =  response.getOutputStream();
         wb.write(os);
+        os.flush();
         os.close();
     }
 
@@ -405,8 +427,8 @@ public class DriverMonthDutyController {
     */ 
     @ResponseBody
     @RequestMapping(value = "/queryDriverMonthDutyStatus", method = { RequestMethod.POST })
-    public Object queryDriverMonthDutyStatus(HttpServletRequest request){
-        return EnumDriverMonthDutyStatus.getStatusMap();
+    public AjaxResponse queryDriverMonthDutyStatus(HttpServletRequest request){
+        return AjaxResponse.success(EnumDriverMonthDutyStatus.getStatusMap());
     }
 
 }

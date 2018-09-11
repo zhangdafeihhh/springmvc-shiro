@@ -14,11 +14,10 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
+import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
-import com.zhuanche.serv.CarBizDriverInfoDetailService;
-import com.zhuanche.serv.CarBizDriverInfoService;
-import com.zhuanche.serv.CarBizSupplierService;
+import com.zhuanche.serv.*;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
@@ -35,10 +34,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
+import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -61,6 +59,13 @@ public class DriverInfoController {
 
     @Autowired
     private CarBizSupplierService carBizSupplierService;
+
+    @Autowired
+    private CarBizCarInfoService carBizCarInfoService;
+
+    @Autowired
+    private CarBizCarGroupService carBizCarGroupService;
+
 
     /**
      * 司机信息列表（有分页）
@@ -347,7 +352,6 @@ public class DriverInfoController {
      * @param nation //驾驶员民族
      * @param marriage //驾驶员婚姻状况  [填写:已婚、未婚、离异]
      * @param foreignlanguage //外语能力 [0无（默认） 1 英语 2 德语  3 法语 4 其他]
-     * @param address //驾驶员通信地址
      * @param education //驾驶员学历 [填写:研究生、本科、大专、中专、高中、 初中、 中学、其他]
      * @param firstdrivinglicensedate //初次领取驾驶证日期 yyyy-MM-dd
      * @param firstmeshworkdrivinglicensedate //网络预约出租汽车驾驶员证初领日期 yyyy-MM-dd
@@ -392,17 +396,20 @@ public class DriverInfoController {
                                    @Verify(param = "supplierId",rule="required") Integer supplierId,
                                    @Verify(param = "licensePlates",rule="required") String licensePlates,
                                    @Verify(param = "status",rule="required") Integer status,
-                                   Integer age, String currentAddress, String emergencyContactPerson, String emergencyContactNumber,
+                                   @Verify(param = "groupId",rule="required") Integer groupId,
+                                   @Verify(param = "age",rule="required|min(18)") Integer age,
+                                   @Verify(param = "emergencyContactNumber",rule="max(11)") String emergencyContactNumber,
+                                   String currentAddress, String emergencyContactPerson,
                                    String superintendNo, String superintendUrl, String drivingLicenseType, Integer drivingYears,
                                    String archivesNo, String issueDateStr, String expireDateStr, String photosrct, String driverlicensenumber,
                                    String drivinglicenseimg, String nationality, String householdregister, String nation, String marriage,
-                                   String foreignlanguage, String address, String education, String firstdrivinglicensedate,
+                                   String foreignlanguage, String education, String firstdrivinglicensedate,
                                    String firstmeshworkdrivinglicensedate, String corptype,  String signdate, String signdateend,
                                    String contractdate, Integer isxydriver, String xyDriverNumber, String parttimejobdri, String phonetype,
                                    String phonecorp, String maptype, String emergencycontactaddr, String assessment,
                                    String driverlicenseissuingdatestart, String driverlicenseissuingdateend, String driverlicenseissuingcorp,
                                    String driverlicenseissuingnumber, String driverLicenseIssuingRegisterDate, String driverLicenseIssuingFirstDate,
-                                   String driverLicenseIssuingGrantDate, String birthDay, String houseHoldRegisterPermanent, Integer groupId,
+                                   String driverLicenseIssuingGrantDate, String birthDay, String houseHoldRegisterPermanent,
                                    String memo, String bankCardBank,String bankCardNumber) {
 
         //判断一些基础信息是否正确
@@ -415,6 +422,29 @@ public class DriverInfoController {
         if (carBizSupplier == null) {
             return AjaxResponse.fail(RestErrorCode.SUPPLIER_NOT_EXIST, supplierId);
         }
+        if(serviceCity!=carBizSupplier.getSupplierCity()){
+            return AjaxResponse.fail(RestErrorCode.CITY_SUPPLIER_DIFFER);
+        }
+        Boolean had = carBizCarInfoService.checkLicensePlates(licensePlates);
+        if (!had) {//查看车牌号是否在车辆表存在
+            return AjaxResponse.fail(RestErrorCode.BUS_NOT_EXIST);
+        } else {
+            if(driverId == null){
+                had = carBizDriverInfoService.checkLicensePlates(licensePlates);
+                if (had) {//查看车辆是否已被绑定
+                    return AjaxResponse.fail(RestErrorCode.CAR_HAS_BIND);
+                }
+            }
+        }
+        had = carBizCarInfoService.validateCityAndSupplier(serviceCity, supplierId, licensePlates);
+        if (!had) {
+            return AjaxResponse.fail(RestErrorCode.CITY_SUPPLIER_CAR_DIFFER);
+        }
+        // 根据服务类型查找服务类型名称
+        CarBizCarGroup carBizCarGroup = carBizCarGroupService.selectByPrimaryKey(groupId);
+        if (carBizCarGroup == null) {
+            return AjaxResponse.fail(RestErrorCode.GROUP_NOT_EXIST);
+        }
         Integer cooperationType = carBizSupplier.getCooperationType();
         if(cooperationType!=null && cooperationType==5){
             if(age==null || StringUtils.isEmpty(currentAddress) || StringUtils.isEmpty(emergencyContactPerson)
@@ -422,7 +452,7 @@ public class DriverInfoController {
                     || StringUtils.isEmpty(drivingLicenseType) || drivingYears==null || StringUtils.isEmpty(archivesNo)
                     || StringUtils.isEmpty(issueDateStr) || StringUtils.isEmpty(expireDateStr) || StringUtils.isEmpty(driverlicensenumber) || StringUtils.isEmpty(nationality)
                     || StringUtils.isEmpty(householdregister) || StringUtils.isEmpty(nation) || StringUtils.isEmpty(marriage) || StringUtils.isEmpty(foreignlanguage)
-                    || StringUtils.isEmpty(address) || StringUtils.isEmpty(education) || StringUtils.isEmpty(firstdrivinglicensedate) || StringUtils.isEmpty(firstmeshworkdrivinglicensedate)
+                    || StringUtils.isEmpty(education) || StringUtils.isEmpty(firstdrivinglicensedate) || StringUtils.isEmpty(firstmeshworkdrivinglicensedate)
                     || StringUtils.isEmpty(corptype) || StringUtils.isEmpty(signdate) || StringUtils.isEmpty(signdateend) || StringUtils.isEmpty(contractdate)
                     || isxydriver==null || StringUtils.isEmpty(xyDriverNumber) || StringUtils.isEmpty(parttimejobdri) || StringUtils.isEmpty(phonetype)
                     || StringUtils.isEmpty(phonecorp) || StringUtils.isEmpty(maptype) || StringUtils.isEmpty(emergencycontactaddr) || StringUtils.isEmpty(driverlicenseissuingdatestart)
@@ -474,7 +504,6 @@ public class DriverInfoController {
         carBizDriverInfoDTO.setNation(nation);
         carBizDriverInfoDTO.setMarriage(marriage);
         carBizDriverInfoDTO.setForeignlanguage(foreignlanguage);
-        carBizDriverInfoDTO.setAddress(address);
         carBizDriverInfoDTO.setEducation(education);
         carBizDriverInfoDTO.setFirstdrivinglicensedate(firstdrivinglicensedate);
         carBizDriverInfoDTO.setFirstmeshworkdrivinglicensedate(firstmeshworkdrivinglicensedate);
@@ -512,9 +541,9 @@ public class DriverInfoController {
             logger.info(LOGTAG + "操作方式：编辑");
             // 司机获取派单的接口，是否可以修改
             Map<String, Object> updateDriverMap = carBizDriverInfoService.isUpdateDriver(driverId, phone);
-            if(updateDriverMap!=null && "2".equals(updateDriverMap.get("result").toString())){
-                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, updateDriverMap.get("msg").toString());
-            }
+//            if(updateDriverMap!=null && "2".equals(updateDriverMap.get("result").toString())){
+//                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, updateDriverMap.get("msg").toString());
+//            }
             try {
                 // 调用接口清除，key
                 carBizDriverInfoService.flashDriverInfo(driverId);
@@ -551,9 +580,9 @@ public class DriverInfoController {
         }
         // 司机获取派单的接口，是否可以修改
         Map<String, Object> updateDriverMap = carBizDriverInfoService.isUpdateDriver(driverId, carBizDriverInfo.getPhone());
-        if(updateDriverMap!=null && "2".equals(updateDriverMap.get("result").toString())){
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, updateDriverMap.get("msg").toString());
-        }
+//        if(updateDriverMap!=null && (int)updateDriverMap.get("result")==2){
+//            return AjaxResponse.fail(RestErrorCode.CAR_API_ERROR, updateDriverMap.get("msg").toString());
+//        }
         try {
             // 调用接口清除，key
             carBizDriverInfoService.flashDriverInfo(driverId);
@@ -611,7 +640,7 @@ public class DriverInfoController {
      * @param supplierId
      * @param teamId
      * @param teamGroupId
-     * @param file
+     * @param fileName
      * @param request
      * @return
      */
@@ -623,20 +652,85 @@ public class DriverInfoController {
     public AjaxResponse batchInputDriverInfo(@Verify(param = "cityId", rule = "required") Integer cityId,
                                              @Verify(param = "supplierId", rule = "required") Integer supplierId,
                                              Integer teamId, Integer teamGroupId,
-                                             @Verify(param = "file", rule = "required") MultipartFile file,
-                                             HttpServletRequest request) {
+                                             MultipartFile fileName,
+                                             HttpServletRequest request, HttpServletResponse response) {
 
-        if (file.isEmpty()) {
+        if (fileName.isEmpty()) {
             logger.info("file is empty!");
             return AjaxResponse.fail(RestErrorCode.FILE_ERROR);
         }
 
         Map<String, Object> resultMap = Maps.newHashMap();
-        resultMap = carBizDriverInfoService.batchInputDriverInfo(cityId, supplierId, teamId, teamGroupId, file, request);
+        resultMap = carBizDriverInfoService.batchInputDriverInfo(cityId, supplierId, teamId, teamGroupId, fileName, request, response);
         //模板错误
         if(resultMap!=null && "-1".equals(resultMap.get("result").toString())){
             return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
         }
-        return AjaxResponse.success(request);
+        if(resultMap!=null && "0".equals(resultMap.get("result").toString())){
+            return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR, resultMap.get("download").toString());
+        }
+        return AjaxResponse.success(resultMap);
+    }
+
+    /**
+     * 下载司机导入错误的信息
+     * @param fileName
+     * @param request
+     * @param response
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/exportException")
+    public AjaxResponse exportException(@Verify(param = "fileName", rule = "required") String fileName,
+                                        HttpServletRequest request,HttpServletResponse response) {
+
+        String path = request.getServletContext().getRealPath("/") + fileName;
+        this.fileDownload(response,path);
+        return AjaxResponse.success(null);
+    }
+
+    public void fileDownload(HttpServletResponse response,String path) {
+
+        File file = new File(path);// path是根据日志路径和文件名拼接出来的
+        String filename = file.getName();// 获取日志文件名称
+        try {
+            InputStream fis = new BufferedInputStream(new FileInputStream(path));
+            byte[] buffer = new byte[fis.available()];
+            fis.read(buffer);
+            fis.close();
+            response.reset();
+            // 先去掉文件名称中的空格,然后转换编码格式为utf-8,保证不出现乱码,这个文件名称用于浏览器的下载框中自动显示的文件名
+            response.addHeader("Content-Disposition", "attachment;filename=" + new String(filename.replaceAll(" ", "").getBytes("utf-8"),"iso8859-1"));
+            response.addHeader("Content-Length", "" + file.length());
+            OutputStream os = new BufferedOutputStream(response.getOutputStream());
+            response.setContentType("application/octet-stream");
+            os.write(buffer);// 输出文件
+            os.flush();
+            os.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    @ResponseBody
+    @RequestMapping(value = "/selectByPhone")
+    @MasterSlaveConfigs(configs={
+            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
+    } )
+    public AjaxResponse selectByPhone(  @Verify(param = "phone",rule="required") String phone) {
+        logger.info(LOGTAG + "根据手机号查询司机信息phone={}", phone);
+        try{
+            CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPhone(phone);
+            if(carBizDriverInfo==null){
+                return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
+            }
+            return AjaxResponse.success(carBizDriverInfo);
+        }catch (Exception e){
+            logger.error(LOGTAG + "根据手机号查询司机信息phone="+phone,e );
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+        }
     }
 }

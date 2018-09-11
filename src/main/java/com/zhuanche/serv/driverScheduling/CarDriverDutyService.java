@@ -3,6 +3,9 @@ package com.zhuanche.serv.driverScheduling;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.dutyEnum.EnumDriverDutyTimeFlag;
 import com.zhuanche.common.dutyEnum.ServiceReturnCodeEnum;
 import com.zhuanche.common.paging.PageDTO;
@@ -81,15 +84,14 @@ public class CarDriverDutyService {
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/1 
-	*/ 
+	*/
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public PageDTO queryDriverDayDutyList(DutyParamRequest dutyParamRequest){
 
-
-		if(Check.NuNObj(dutyParamRequest)){
-			return null;
-		}
 		//发布司机排班的查询功能 上层返回提示语
-		if(dutyParamRequest.getUnpublishedFlag() == 1){
+		if(!Check.NuNObj(dutyParamRequest) && dutyParamRequest.getUnpublishedFlag() == 1){
 			dutyParamRequest.setStatus(1);
 		}
 		try{
@@ -101,7 +103,7 @@ public class CarDriverDutyService {
 			CommonRequest resultParmam = citySupplierTeamCommonService.paramDeal(commonRequest);
 			dutyParamRequest.setCityIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getCityIds()));
 			dutyParamRequest.setSupplierIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getSupplierIds()));
-			dutyParamRequest.setSupplierIds(resultParmam.getTeamIds());
+			dutyParamRequest.setTeamIds(resultParmam.getTeamIds());
 			/** 数据权限处理结束 */
 
 			DutyParamRequest request = new DutyParamRequest();
@@ -123,7 +125,9 @@ public class CarDriverDutyService {
 			for (CarDriverDayDutyDTO carDriverDayDuty : list) {
 				request.setDriverId(carDriverDayDuty.getDriverId());
 				CarDriverInfoDTO info = carBizDriverInfoExMapper.queryOneDriver(request);
-				carDriverDayDuty.setPhone(info.getPhone());
+				if(!Check.NuNObj(info)){
+					carDriverDayDuty.setPhone(info.getPhone());
+				}
 			}
 			PageDTO pageDTO = new PageDTO();
 			pageDTO.setTotal((int)pageInfo.getTotal());
@@ -141,7 +145,12 @@ public class CarDriverDutyService {
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/3
-	*/ 
+	*/
+	@SuppressWarnings("unchecked")
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE ),
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public int issueDriverDuty(DutyParamRequest dutyParamRequest){
 		if(Check.NuNObj(dutyParamRequest)){
 			return 0;

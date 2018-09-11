@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.cache.RedisCacheDriverUtil;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -12,6 +13,7 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
+import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
 import com.zhuanche.entity.mdbcarmanage.*;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.HttpClientUtil;
@@ -52,7 +54,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
+import javax.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -270,6 +272,7 @@ public class CarBizDriverInfoService {
             }
 
             //更新司机信息
+            DynamicRoutingDataSource.setMasterSlave("rentcar-DataSource", DataSourceMode.MASTER);
             int n = this.updateDriverInfo(carBizDriverInfo);
 
             // 更新车辆信息 根据 车牌号更新车辆 信息（更换车辆所属人）
@@ -474,7 +477,7 @@ public class CarBizDriverInfoService {
         int id = carBizDriverInfoDTO.getDriverId();
 
         //司机信息扩展表，司机银行卡号
-        CarBizDriverInfoDetail infoDetail = carBizDriverInfoDetailService.selectByPrimaryKey(carBizDriverInfoDTO.getDriverId());
+        CarBizDriverInfoDetailDTO infoDetail = carBizDriverInfoDetailService.selectByDriverId(carBizDriverInfoDTO.getDriverId());
         CarBizDriverInfoDetail carBizDriverInfoDetail = new CarBizDriverInfoDetail();
         carBizDriverInfoDetail.setBankCardBank(carBizDriverInfoDTO.getBankCardBank());
         carBizDriverInfoDetail.setBankCardNumber(carBizDriverInfoDTO.getBankCardNumber());
@@ -625,9 +628,11 @@ public class CarBizDriverInfoService {
             return AjaxResponse.fail(RestErrorCode.DRIVER_IDCARNO_EXIST);
         }
         //查询银行卡号是否存在
-        had = carBizDriverInfoDetailService.checkBankCardBank(bankCardNumber, driverId);
-        if (had) {
-            return AjaxResponse.fail(RestErrorCode.DRIVER_BANK_CARD_NUMBER_EXIST);
+        if (StringUtils.isNotEmpty(bankCardNumber) && StringUtils.isNotEmpty(bankCardBank)){
+            had = carBizDriverInfoDetailService.checkBankCardBank(bankCardNumber, driverId);
+            if (had) {
+                return AjaxResponse.fail(RestErrorCode.DRIVER_BANK_CARD_NUMBER_EXIST);
+            }
         }
         return AjaxResponse.success(true);
     }
@@ -733,11 +738,11 @@ public class CarBizDriverInfoService {
             // 根据司机ID查询车队小组信息
             Map<String, Object> stringObjectMap = carDriverTeamExMapper.queryTeamNameAndGroupNameByDriverId(carBizDriverInfo.getDriverId());
             if(stringObjectMap!=null){
-                if(StringUtils.isNotEmpty(stringObjectMap.get("teamId").toString())){
+                if(stringObjectMap.containsKey("teamId") && stringObjectMap.get("teamId")!=null ){
                     carBizDriverInfo.setTeamId(Integer.parseInt(stringObjectMap.get("teamId").toString()));
                     carBizDriverInfo.setTeamName(stringObjectMap.get("teamName").toString());
                 }
-                if(StringUtils.isNotEmpty(stringObjectMap.get("teamGroupId").toString())){
+                if(stringObjectMap.containsKey("teamGroupId") && stringObjectMap.get("teamGroupId")!=null ){
                     carBizDriverInfo.setTeamId(Integer.parseInt(stringObjectMap.get("teamGroupId").toString()));
                     carBizDriverInfo.setTeamName(stringObjectMap.get("teamGroupName").toString());
                 }
@@ -761,7 +766,9 @@ public class CarBizDriverInfoService {
     }
 
     public Map<String, Object> batchInputDriverInfo(Integer cityId, Integer supplierId, Integer teamId,
-                                                    Integer teamGroupId, MultipartFile file, HttpServletRequest request) {
+                                                    Integer teamGroupId, MultipartFile file,
+                                                    HttpServletRequest request,
+                                                    HttpServletResponse response) {
 
         Map<String, Object> resultMap = Maps.newHashMap();
 
@@ -1223,7 +1230,7 @@ public class CarBizDriverInfoService {
                                         }
                                     }
                                     Integer cityCount = carBizCarInfoExMapper.validateCityAndSupplier(cityId, supplierId, licensePlates);
-                                    if (cityCount == null || cityCount > 0) {
+                                    if (cityCount == null || cityCount == 0) {
                                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                                         returnVO.setReson( "第" + (rowIx + 1) + "行数据，第"
                                                 + (colIx + 1) + "列 【车牌号】:" + licensePlates + "不在所选的城市或厂商");
@@ -2411,7 +2418,7 @@ public class CarBizDriverInfoService {
 
                     //TODO 保存司机信息
                     Map<String, Object> stringObjectMap = this.saveDriver(carBizDriverInfoDTO);
-                    if (stringObjectMap != null && "1".equals(stringObjectMap.get("result").toString())) {
+                    if (stringObjectMap != null && stringObjectMap.containsKey("result") && (int)stringObjectMap.get("result")==1) {
                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                         returnVO.setReson( "手机号=" + carBizDriverInfoDTO.getPhone() + "保存出错，错误=" + stringObjectMap.get("msg").toString());
                         logger.info(LOGTAG + returnVO.getReson());
@@ -2435,21 +2442,32 @@ public class CarBizDriverInfoService {
         try {
             // 将错误列表导出
             if(listException.size() > 0) {
-                Workbook wb = Common.exportExcel(request.getServletContext().getRealPath("/")+ "template" + File.separator + "car_exception.xlsx", listException);
-                download = Common.exportExcelFromTempletToLoacl(request, wb,new String("ERROR".getBytes("utf-8"), "iso8859-1") );
+//                Workbook wb = Common.exportExcel(request.getServletContext().getRealPath("/")+ "template" + File.separator + "car_exception.xlsx", listException);
+//                download = Common.exportExcelFromTempletToLoacl(request, wb,new String("ERROR".getBytes("utf-8"), "iso8859-1") );
+//                Componment.fileDownload(response, wb, new String("司机导入错误信息".getBytes("utf-8"), "iso8859-1"));
+                StringBuilder errorMsg = new StringBuilder();
+                for (CarImportExceptionEntity entity:listException){
+                    errorMsg.append(entity.getReson()).append(";");
+                }
+                resultMap.put("result", "0");
+                resultMap.put("msg", "有错误信息");
+                resultMap.put("download", errorMsg);
+                return resultMap;
             }
         }catch(Exception e){
             e.printStackTrace();
         }
-        if (!"".equals(download) && download != null) {
-            resultMap.put("result", 0);
-            resultMap.put("msg", "有错误信息");
-            resultMap.put("download", download);
-        } else {
-            resultMap.put("result", 1);
-            resultMap.put("msg", "成功");
-            resultMap.put("download", "");
-        }
+//        if (!"".equals(download) && download != null) {
+//            resultMap.put("result", 0);
+//            resultMap.put("msg", "有错误信息");
+//            resultMap.put("download", download);
+//        } else {
+//            resultMap.put("result", 1);
+//            resultMap.put("msg", "成功");
+//            resultMap.put("download", "");
+//        }
+        resultMap.put("result", "1");
+        resultMap.put("msg", "成功");
         return resultMap;
     }
 
@@ -2694,11 +2712,12 @@ public class CarBizDriverInfoService {
         if(StringUtils.isBlank(value)){
 //            long expire = System.currentTimeMillis() + expireTime * 1000 + 1;
             long expire = System.currentTimeMillis() + expireTime * 1000 + 1;
-            String result = RedisCacheDriverUtil.getSet(key, String.valueOf(expire), String.class);
-            logger.info(LOGTAG + "派单锁-缓存KEY[" + key + "] " + result);
-            if(result != null){
-                lock = true;
-            }
+//            String result = RedisCacheDriverUtil.getSet(key, String.valueOf(expire), String.class);
+            RedisCacheDriverUtil.set(key, String.valueOf(expire), expireTime);
+//            logger.info(LOGTAG + "派单锁-缓存KEY[" + key + "] " + result);
+//            if(result != null){
+//                lock = true;
+//            }
         }
         return lock;
     }
@@ -2828,5 +2847,18 @@ public class CarBizDriverInfoService {
     public CarBizDriverInfo selectByPhone(String phone){
         CarBizDriverInfo carBizDriverInfo = carBizDriverInfoMapper.selectByPhone(phone);
         return carBizDriverInfo;
+    }
+
+    /**
+     * 查询车辆是否已存在司机表
+     * @param licensePlates
+     * @return
+     */
+    public Boolean checkLicensePlates(String licensePlates){
+        int count = carBizDriverInfoExMapper.checkLicensePlates(licensePlates);
+        if(count>0){
+            return true;
+        }
+        return false;
     }
 }

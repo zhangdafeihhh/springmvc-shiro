@@ -179,17 +179,20 @@
     <if test="driverId!=null and driverId!=''">
       and d.driver_id = #{driverId}
     </if>
+    <if test="status!=null and status!=''">
+      and d.status = #{status}
+    </if>
     <if test="driverName!=null and driverName!=''">
       and d.driver_name = #{driverName}
     </if>
     <if test = "startTime !=null and startTime !=''" >
       <![CDATA[
-			and d.startTime >= #{startTime, jdbcType=TIMESTAMP}
+			and d.time >= #{startTime, jdbcType=TIMESTAMP}
 		]]>
     </if>
     <if test = "endTime !=null and endTime !=''" >
       <![CDATA[
-			and d.endTime <= #{endTime, jdbcType=TIMESTAMP}
+			and d.time <= #{endTime, jdbcType=TIMESTAMP}
 		]]>
     </if>
     <if test="time!=null and time!=''">

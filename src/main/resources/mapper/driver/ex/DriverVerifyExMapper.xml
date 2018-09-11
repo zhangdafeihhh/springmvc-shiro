@@ -85,7 +85,7 @@
     INFORM_STATUS, NOT_JOIN_REASON, SOURCE
   </sql>
   <sql id="queryDriverVerifyListColumn" >
-    ID, MOBILE, NAME, CITY_ID, CITY_NAME, DRIVER_LICENSE_NUM, CREATE_AT, VERIFY_STATUS, SUPPLIER, SUPPLIER_NAME
+    ID, MOBILE, NAME, CITY_ID, CITY_NAME, PLATE_NUM, CREATE_AT, VERIFY_STATUS, SUPPLIER, SUPPLIER_NAME
   </sql>
   <sql id="queryDriverVerifyListWhereColumn">
 	<trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR">

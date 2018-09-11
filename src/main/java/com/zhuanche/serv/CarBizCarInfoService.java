@@ -2,7 +2,6 @@ package com.zhuanche.serv;
 
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +40,32 @@ public class CarBizCarInfoService {
      */
     public int updateCarLicensePlates(String licensePlates, Integer driverId){
         return carBizCarInfoExMapper.updateCarLicensePlates(licensePlates, driverId);
+    }
+
+    /**
+     * 查询车牌号是否存在
+     * @param licensePlates
+     * @return
+     */
+    public Boolean checkLicensePlates(String licensePlates){
+        int count = carBizCarInfoExMapper.checkLicensePlates(licensePlates);
+        if(count>0){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 查询城市，供应商，车牌号是否一致
+     * @param licensePlates
+     * @return
+     */
+    public Boolean validateCityAndSupplier(Integer cityId, Integer supplierId, String licensePlates){
+        int count = carBizCarInfoExMapper.validateCityAndSupplier(cityId, supplierId, licensePlates);
+        if(count>0){
+            return true;
+        }
+        return false;
     }
 
 }

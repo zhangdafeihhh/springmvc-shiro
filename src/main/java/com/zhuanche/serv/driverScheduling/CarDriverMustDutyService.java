@@ -5,6 +5,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.parser.deserializer.AbstractDateDeserializer;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.dto.driverDuty.CarDriverMustDutyDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverMustDuty;
@@ -72,7 +75,10 @@ public class CarDriverMustDutyService {
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/3 
-	*/ 
+	*/
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public PageDTO getDriverMustDutyList(DutyParamRequest dutyParamRequest){
 		if(Check.NuNObj(dutyParamRequest)){
 			return new PageDTO();
@@ -108,7 +114,12 @@ public class CarDriverMustDutyService {
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/3 
-	*/ 
+	*/
+	@SuppressWarnings("unchecked")
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE ),
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public int saveOrUpdateDriverMust(CarDriverMustDuty carDriverMustDuty){
 
 		if(Check.NuNObj(carDriverMustDuty)
@@ -146,6 +157,7 @@ public class CarDriverMustDutyService {
 				upRecord.setEndDate(carDriverMustDuty.getEndDate());
 				upRecord.setRemark(carDriverMustDuty.getRemark());
 				upRecord.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
+				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
 				return carDriverMustDutyMapper.updateByPrimaryKeySelective(upRecord);
 			}else{
 				Set<Integer> cityId = new HashSet<>();
@@ -163,6 +175,7 @@ public class CarDriverMustDutyService {
 				}
 				carDriverMustDuty.setSupplierName(supplierDetail.getSupplierFullName());
 				carDriverMustDuty.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
+				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
 				return carDriverMustDutyMapper.insertSelective(carDriverMustDuty);
 			}
 		}catch (Exception e){
@@ -177,7 +190,10 @@ public class CarDriverMustDutyService {
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/3 
-	*/ 
+	*/
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public CarDriverMustDuty getCarDriverMustDetail(Integer paramId){
 		if(Check.NuNObj(paramId)){
 			return null;
