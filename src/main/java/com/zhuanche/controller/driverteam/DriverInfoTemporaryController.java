@@ -8,6 +8,7 @@ import com.zhuanche.common.web.BaseController;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.mdbcarmanage.CarBizDriverInfoTempDTO;
+import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
 import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.entity.rentcar.CarBizCooperationType;
@@ -206,7 +207,8 @@ public class DriverInfoTemporaryController extends BaseController {
                                          @Verify(param = "cityId",rule="required") Integer cityId,
                                          @Verify(param = "supplierId",rule="required") Integer supplierId,
                                          @Verify(param = "teamId",rule="required") Integer teamId,
-                                         @Verify(param = "groupId",rule="required") Integer groupId){
+                                         @Verify(param = "groupId",rule="required") Integer groupId,
+                                         HttpServletResponse response){
         try {
             log.info("司机导入");
             // 获取上传的文件的名称
@@ -216,7 +218,7 @@ public class DriverInfoTemporaryController extends BaseController {
             if (!"xls".equals(prefix) && !"xlsx".equals(prefix)) {
                 return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
             }
-            return carBizDriverInfoTempService.importDriverInfo(file.getInputStream(),prefix,cityId,supplierId,teamId,groupId);
+            return carBizDriverInfoTempService.importDriverInfo(file.getInputStream(),prefix,cityId,supplierId,teamId,groupId,response);
         } catch (IOException e) {
             e.printStackTrace();
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
@@ -472,7 +474,7 @@ public class DriverInfoTemporaryController extends BaseController {
         entity.setXyDriverNumber(xyDriverNumber);
         entity.setPartTimeJobDri(partTimeJobDri);
         entity.setMapType(mapType);
-        entity.setAssessment(StringUtils.isNotBlank(assessment)?superintendUrl:null);
+        entity.setAssessment(StringUtils.isNotBlank(assessment)?assessment:null);
         entity.setDriverLicenseIssuingDateStart(driverLicenseIssuingDateStart);
         entity.setDriverLicenseIssuingDateEnd(driverLicenseIssuingDateEnd);
         entity.setDriverLicenseIssuingCorp(driverLicenseIssuingCorp);
@@ -484,9 +486,9 @@ public class DriverInfoTemporaryController extends BaseController {
         entity.setSupplierId(supplierId);
         entity.setLicensePlates(licensePlates);
         entity.setGroupid(groupId);
-        entity.setBankCardNumber(StringUtils.isNotBlank(bankCardNumber)?superintendUrl:null);
-        entity.setBankCardBank(StringUtils.isNotBlank(bankCardBank)?superintendUrl:null);
-        entity.setMemo(StringUtils.isNotBlank(memo)?superintendUrl:null);
+        entity.setBankCardNumber(StringUtils.isNotBlank(bankCardNumber)?bankCardNumber:null);
+        entity.setBankCardBank(StringUtils.isNotBlank(bankCardBank)?bankCardBank:null);
+        entity.setMemo(StringUtils.isNotBlank(memo)?memo:null);
         return carBizDriverInfoTempService.addSave(entity);
     }
 
@@ -646,7 +648,7 @@ public class DriverInfoTemporaryController extends BaseController {
         entity.setXyDriverNumber(xyDriverNumber);
         entity.setPartTimeJobDri(partTimeJobDri);
         entity.setMapType(mapType);
-        entity.setAssessment(StringUtils.isNotBlank(assessment)?superintendUrl:null);
+        entity.setAssessment(StringUtils.isNotBlank(assessment)?assessment:null);
         entity.setDriverLicenseIssuingDateStart(driverLicenseIssuingDateStart);
         entity.setDriverLicenseIssuingDateEnd(driverLicenseIssuingDateEnd);
         entity.setDriverLicenseIssuingCorp(driverLicenseIssuingCorp);
@@ -658,11 +660,29 @@ public class DriverInfoTemporaryController extends BaseController {
         entity.setSupplierId(supplierId);
         entity.setLicensePlates(licensePlates);
         entity.setGroupid(groupId);
-        entity.setBankCardNumber(StringUtils.isNotBlank(bankCardNumber)?superintendUrl:null);
-        entity.setBankCardBank(StringUtils.isNotBlank(bankCardBank)?superintendUrl:null);
-        entity.setMemo(StringUtils.isNotBlank(memo)?superintendUrl:null);
+        entity.setBankCardNumber(StringUtils.isNotBlank(bankCardNumber)?bankCardNumber:null);
+        entity.setBankCardBank(StringUtils.isNotBlank(bankCardBank)?bankCardBank:null);
+        entity.setMemo(StringUtils.isNotBlank(memo)?memo:null);
         entity.setOldCityId(oldCityId);
         entity.setOldSupplierId(oldSupplierId);
         return carBizDriverInfoTempService.updateSave(entity);
+    }
+
+
+    /**
+     * 查询未绑定车牌号
+     * @param cityId 城市Id
+     * @param supplierId 供应商Id
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/licensePlatesTempList")
+    public Object licensePlatesList(@Verify(param = "cityId", rule = "required") Integer cityId,
+                                    @Verify(param = "supplierId", rule = "required") Integer supplierId) {
+        Map<String, Object> map=new HashMap<String, Object>();
+        map.put("cityId",cityId);
+        map.put("supplierId",supplierId);
+        List<CarBizCarInfoTemp> carList = carBizDriverInfoTempService.licensePlatesNotDriverIdList(map);
+        return AjaxResponse.success(carList);
     }
 }

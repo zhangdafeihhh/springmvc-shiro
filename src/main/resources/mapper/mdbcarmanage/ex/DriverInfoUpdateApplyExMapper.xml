@@ -74,10 +74,10 @@
         AND team_id = #{teamId}
       </if>
       <if test="createDateBegin !=null and createDateBegin !=''">
-        <![CDATA[ AND create_date >=  concat(#{createDateBegin},' 00:00:00') ]]>
+        <![CDATA[ AND create_time >=  concat(#{createDateBegin},' 00:00:00') ]]>
       </if>
       <if test="createDateEnd !=null and createDateEnd !=''">
-        <![CDATA[ AND create_date <=  concat(#{createDateEnd},' 23:59:59') ]]>
+        <![CDATA[ AND create_time <=  concat(#{createDateEnd},' 23:59:59') ]]>
       </if>
       <if test="cityIds !=null and cityIds.size()>0">
         and city_id IN

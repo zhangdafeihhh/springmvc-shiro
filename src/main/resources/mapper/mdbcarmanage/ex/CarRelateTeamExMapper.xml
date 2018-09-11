@@ -16,6 +16,13 @@
     where relation_id = #{relationId,jdbcType=INTEGER}
   </select>
 
+    <delete id="deleteDriverFromTeam">
+        delete from car_relate_team
+        WHERE
+         team_id = #{paramId}
+          AND driver_id = #{driverId}
+    </delete>
+
   <select id="selectOneTeam" resultType="com.zhuanche.entity.mdbcarmanage.CarRelateTeam" parameterType="com.zhuanche.entity.mdbcarmanage.CarRelateTeam" >
     select
     rt.relation_id AS relationId,

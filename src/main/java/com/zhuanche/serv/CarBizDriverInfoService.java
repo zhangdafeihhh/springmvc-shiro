@@ -54,7 +54,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
+import javax.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -766,7 +766,9 @@ public class CarBizDriverInfoService {
     }
 
     public Map<String, Object> batchInputDriverInfo(Integer cityId, Integer supplierId, Integer teamId,
-                                                    Integer teamGroupId, MultipartFile file, HttpServletRequest request) {
+                                                    Integer teamGroupId, MultipartFile file,
+                                                    HttpServletRequest request,
+                                                    HttpServletResponse response) {
 
         Map<String, Object> resultMap = Maps.newHashMap();
 
@@ -2416,7 +2418,7 @@ public class CarBizDriverInfoService {
 
                     //TODO 保存司机信息
                     Map<String, Object> stringObjectMap = this.saveDriver(carBizDriverInfoDTO);
-                    if (stringObjectMap != null && "1".equals(stringObjectMap.get("result").toString())) {
+                    if (stringObjectMap != null && stringObjectMap.containsKey("result") && (int)stringObjectMap.get("result")==1) {
                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                         returnVO.setReson( "手机号=" + carBizDriverInfoDTO.getPhone() + "保存出错，错误=" + stringObjectMap.get("msg").toString());
                         logger.info(LOGTAG + returnVO.getReson());
@@ -2440,21 +2442,32 @@ public class CarBizDriverInfoService {
         try {
             // 将错误列表导出
             if(listException.size() > 0) {
-                Workbook wb = Common.exportExcel(request.getServletContext().getRealPath("/")+ "template" + File.separator + "car_exception.xlsx", listException);
-                download = Common.exportExcelFromTempletToLoacl(request, wb,new String("ERROR".getBytes("utf-8"), "iso8859-1") );
+//                Workbook wb = Common.exportExcel(request.getServletContext().getRealPath("/")+ "template" + File.separator + "car_exception.xlsx", listException);
+//                download = Common.exportExcelFromTempletToLoacl(request, wb,new String("ERROR".getBytes("utf-8"), "iso8859-1") );
+//                Componment.fileDownload(response, wb, new String("司机导入错误信息".getBytes("utf-8"), "iso8859-1"));
+                StringBuilder errorMsg = new StringBuilder();
+                for (CarImportExceptionEntity entity:listException){
+                    errorMsg.append(entity.getReson()).append(";");
+                }
+                resultMap.put("result", "0");
+                resultMap.put("msg", "有错误信息");
+                resultMap.put("download", errorMsg);
+                return resultMap;
             }
         }catch(Exception e){
             e.printStackTrace();
         }
-        if (!"".equals(download) && download != null) {
-            resultMap.put("result", 0);
-            resultMap.put("msg", "有错误信息");
-            resultMap.put("download", download);
-        } else {
-            resultMap.put("result", 1);
-            resultMap.put("msg", "成功");
-            resultMap.put("download", "");
-        }
+//        if (!"".equals(download) && download != null) {
+//            resultMap.put("result", 0);
+//            resultMap.put("msg", "有错误信息");
+//            resultMap.put("download", download);
+//        } else {
+//            resultMap.put("result", 1);
+//            resultMap.put("msg", "成功");
+//            resultMap.put("download", "");
+//        }
+        resultMap.put("result", "1");
+        resultMap.put("msg", "成功");
         return resultMap;
     }
 

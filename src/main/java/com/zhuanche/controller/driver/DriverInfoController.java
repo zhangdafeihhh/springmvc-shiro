@@ -34,7 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
+import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -652,8 +652,8 @@ public class DriverInfoController {
     public AjaxResponse batchInputDriverInfo(@Verify(param = "cityId", rule = "required") Integer cityId,
                                              @Verify(param = "supplierId", rule = "required") Integer supplierId,
                                              Integer teamId, Integer teamGroupId,
-                                             @Verify(param = "fileName", rule = "required") MultipartFile fileName,
-                                             HttpServletRequest request) {
+                                             MultipartFile fileName,
+                                             HttpServletRequest request, HttpServletResponse response) {
 
         if (fileName.isEmpty()) {
             logger.info("file is empty!");
@@ -661,11 +661,76 @@ public class DriverInfoController {
         }
 
         Map<String, Object> resultMap = Maps.newHashMap();
-        resultMap = carBizDriverInfoService.batchInputDriverInfo(cityId, supplierId, teamId, teamGroupId, fileName, request);
+        resultMap = carBizDriverInfoService.batchInputDriverInfo(cityId, supplierId, teamId, teamGroupId, fileName, request, response);
         //模板错误
         if(resultMap!=null && "-1".equals(resultMap.get("result").toString())){
             return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
         }
-        return AjaxResponse.success(request);
+        if(resultMap!=null && "0".equals(resultMap.get("result").toString())){
+            return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR, resultMap.get("download").toString());
+        }
+        return AjaxResponse.success(resultMap);
+    }
+
+    /**
+     * 下载司机导入错误的信息
+     * @param fileName
+     * @param request
+     * @param response
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/exportException")
+    public AjaxResponse exportException(@Verify(param = "fileName", rule = "required") String fileName,
+                                        HttpServletRequest request,HttpServletResponse response) {
+
+        String path = request.getServletContext().getRealPath("/") + fileName;
+        this.fileDownload(response,path);
+        return AjaxResponse.success(null);
+    }
+
+    public void fileDownload(HttpServletResponse response,String path) {
+
+        File file = new File(path);// path是根据日志路径和文件名拼接出来的
+        String filename = file.getName();// 获取日志文件名称
+        try {
+            InputStream fis = new BufferedInputStream(new FileInputStream(path));
+            byte[] buffer = new byte[fis.available()];
+            fis.read(buffer);
+            fis.close();
+            response.reset();
+            // 先去掉文件名称中的空格,然后转换编码格式为utf-8,保证不出现乱码,这个文件名称用于浏览器的下载框中自动显示的文件名
+            response.addHeader("Content-Disposition", "attachment;filename=" + new String(filename.replaceAll(" ", "").getBytes("utf-8"),"iso8859-1"));
+            response.addHeader("Content-Length", "" + file.length());
+            OutputStream os = new BufferedOutputStream(response.getOutputStream());
+            response.setContentType("application/octet-stream");
+            os.write(buffer);// 输出文件
+            os.flush();
+            os.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    @ResponseBody
+    @RequestMapping(value = "/selectByPhone")
+    @MasterSlaveConfigs(configs={
+            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
+    } )
+    public AjaxResponse selectByPhone(  @Verify(param = "phone",rule="required") String phone) {
+        logger.info(LOGTAG + "根据手机号查询司机信息phone={}", phone);
+        try{
+            CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPhone(phone);
+            if(carBizDriverInfo==null){
+                return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
+            }
+            return AjaxResponse.success(carBizDriverInfo);
+        }catch (Exception e){
+            logger.error(LOGTAG + "根据手机号查询司机信息phone="+phone,e );
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+        }
     }
 }

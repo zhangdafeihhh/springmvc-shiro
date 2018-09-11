@@ -1,6 +1,7 @@
 package com.zhuanche.controller.driverteam;
 
 import com.alibaba.fastjson.JSON;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.dutyEnum.ServiceReturnCodeEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
@@ -143,6 +144,34 @@ public class DriverTeamController{
 		return AjaxResponse.success(pageDTO);
 	}
 
+	/** 
+	* @Desc: 车队/小组移除司机 
+	* @param:
+	* @return:  
+	* @Author: lunan
+	* @Date: 2018/9/10 
+	*/ 
+	@ResponseBody
+	@RequestMapping(value = "/removeDriverToTeam")
+	public AjaxResponse removeDriverToTeam(@Verify(param = "id", rule = "required") Integer id,@Verify(param = "driverId", rule = "required") Integer driverId){
+		logger.info("车队/小组移除司机 入参:"+ "车队/小组id："+id+"要移除的司机id："+driverId);
+		if(Check.NuNObj(id) || Check.NuNObj(driverId)){
+			return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
+		}
+		int result = carDriverTeamService.removeDriverToTeam(id, driverId);
+		ServiceReturnCodeEnum typeByCode = ServiceReturnCodeEnum.getTypeByCode(result);
+		if(result < 0 ){
+			AjaxResponse fail = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
+			Map<String,String> map = new HashedMap();
+			map.put("errorMsg",typeByCode.getName());
+			fail.setData(map);
+			return fail;
+		}else if(result == 1){
+			return AjaxResponse.success(result);
+		}
+		return AjaxResponse.success(result);
+	}
+
 	/**
 	 * @Desc: 添加司机到车队/小组
 	 * @param:
@@ -210,6 +239,7 @@ public class DriverTeamController{
 		record.setId(paramId);
 		record.setDutyStartDate(dutyStartDate);
 		record.setDutyEndDate(dutyEndDate);
+		DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
 		int result = carDriverTeamService.updateTeamDuty(record);
 		if(result > 0 ){
 			return AjaxResponse.success(result);

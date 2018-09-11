@@ -11,21 +11,15 @@ import java.util.List;
 
 public interface CarRelateGroupExMapper {
 
-    @SuppressWarnings("rawtypes")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-    } )
     List<CarRelateGroup> queryDriverGroupRelationList(TeamGroupRequest teamGroupRequest);
 
-    @SuppressWarnings("rawtypes")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-    } )
     CarRelateGroup selectOneGroup(CarRelateGroup group);
 
 	List<CarRelateGroup> queryByParams(CarRelateGroup group);
 
 	List<Integer> queryDriversByParams(CarRelateGroup group);
+
+	int deleteDriverFromGroup(@Param("paramId") Integer paramId,@Param("driverId") Integer driverId);
 
     /**
      * 根据司机ID删除
