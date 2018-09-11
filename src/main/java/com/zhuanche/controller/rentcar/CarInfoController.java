@@ -189,13 +189,13 @@ public class CarInfoController {
      * @param purchaseDate 购买时间 (格式:yyyy-MM-dd)
      * @param vehicleRegistrationDate 车辆注册日期 (格式:yyyy-MM-dd)
      * @param transportNumber 运输证字号
-     * @param certificationAuthority 车辆运输证发证机构
+         * @param certificationAuthority 车辆运输证发证机构
      * @param operatingRegion 车辆经营区域
      * @param transportNumberDateStart 车辆运输证有效期起 (格式:yyyy-MM-dd)
      * @param transportNumberDateEnd 车辆运输证有效期止 (格式:yyyy-MM-dd)
      * @param firstDate 车辆初次登记日期 (格式:yyyy-MM-dd)
      * @param overHaulStatus 车辆检修状态
-     * @param auditingStatus 车辆年度审验状态
+        * @param auditingStatus 车辆年度审验状态
      * @param auditingDate 车辆年度审验日期 (格式:yyyy-MM-dd)
      * @param equipmentNumber 发票打印设备序列号
      * @param gpsBrand 卫星定位装置品牌
@@ -253,7 +253,7 @@ public class CarInfoController {
                               @Verify(param = "gpsType",rule="") String gpsType,
                               @Verify(param = "gpsImei",rule="") String gpsImei,
                               @Verify(param = "gpsDate",rule="") String gpsDate,
-                              @RequestParam(value = "purchaseDate",required = false) String memo,
+                              @RequestParam(value = "memo",required = false) String memo,
                                   @Verify(param = "licensePlates1",rule="") String licensePlates1,
                                   @Verify(param = "oldCity",rule="") Integer oldCity,
                                   @Verify(param = "oldSupplierId",rule="") Integer oldSupplierId) {
