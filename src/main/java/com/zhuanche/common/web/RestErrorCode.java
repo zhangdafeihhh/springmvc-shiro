@@ -150,6 +150,8 @@ public final class RestErrorCode{
 
 	@ResultMessage("结果不存在")
 	public static final int NOT_FOUND_RESULT                                               = 1101;
+    @ResultMessage("车牌号已存在")
+    public static final int LICENSE_PLATES_EXIST                                               = 1102;
 	@ResultMessage("请求风控资源失败")
 	public static final int RISK_ORDER_DATA_FAIL                                        = 5002;
 	@ResultMessage("上传风控文件失败")
