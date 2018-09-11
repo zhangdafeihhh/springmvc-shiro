@@ -2522,7 +2522,6 @@ public class CarBizDriverInfoTempService {
      * @return
      */
     public AjaxResponse updateSave(CarBizDriverInfoTemp entity) {
-        Map<String, Object> result = new HashMap<String, Object>();
         try {
             if(entity.getIdCardNo()!=null&&!"".equals(entity.getIdCardNo())&&entity.getIdCardNo().length()==8){
                 entity.setIdCardNo(entity.getIdCardNo().substring(0, 7)+"("+entity.getIdCardNo().substring(7, 8)+")");
@@ -2566,14 +2565,27 @@ public class CarBizDriverInfoTempService {
                 int count = this.queryAgreementCompanyByName(entity.getCorpType());
                 if(count==0){
                     return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID,"【驾驶员合同（或协议）签署公司】在协议公司中不存在");
-
+                }
+            }
+            if(!entity.getPhone().equals(entity.getOldPhone())){
+                CarBizDriverInfo carBizDriverInfo = new CarBizDriverInfo();
+                carBizDriverInfo.setPhone(entity.getPhone());
+                Integer integer = carBizDriverInfoExMapper.selectCountForPhone(carBizDriverInfo);
+                if(integer > 0){
+                    return AjaxResponse.fail(RestErrorCode.DRIVER_PHONE_EXIST);
+                }
+                CarBizDriverInfoTemp driverInfoTemp = new CarBizDriverInfoTemp();
+                driverInfoTemp.setPhone(entity.getPhone());
+                Integer integer1 = carBizDriverInfoTempExMapper.selectCountForPhone(driverInfoTemp);
+                if(integer1 > 0){
+                    return AjaxResponse.fail(RestErrorCode.DRIVER_PHONE_EXIST);
                 }
             }
             entity.setStatus(1);
             entity.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
             log.info("临时司机修改:"+entity.toString());
             try {
-                if((entity.getOldCityId()!=null&&!"".equals(entity.getOldCityId())&&!entity.getServiceCityId().equals(entity.getOldCityId()))
+                if((entity.getOldCityId()!=null&&!"".equals(entity.getOldCityId())&&!String.valueOf(entity.getCityId()).equals(entity.getOldCityId()))
                         ||(entity.getOldSupplierId()!=null&&!"".equals(entity.getOldSupplierId())&&!entity.getSupplierId().equals(entity.getOldSupplierId()))){
                     entity.setTeamid("");
                     entity.setGroupIds("");
@@ -2595,10 +2607,12 @@ public class CarBizDriverInfoTempService {
                 carBizCarInfoTempExMapper.updateByLicensePlates(car);
                 return AjaxResponse.success(RestErrorCode.SUCCESS);
             } catch (Exception e) {
+                e.printStackTrace();
                 log.error("修改司机信息error:" + e);
                 return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("修改司机信息 error:" + e);
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }

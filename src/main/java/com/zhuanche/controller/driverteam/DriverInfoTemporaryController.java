@@ -549,6 +549,7 @@ public class DriverInfoTemporaryController extends BaseController {
      * @param memo 备注
      * @param oldCityId 旧的城市Id
      * @param oldSupplierId 旧的供应商
+     * @param oldPhone 旧的手机号
      * @return
      */
     @ResponseBody
@@ -607,7 +608,8 @@ public class DriverInfoTemporaryController extends BaseController {
                                 @RequestParam(value = "bankCardBank",required = false) String bankCardBank,
                                 @RequestParam(value = "memo",required = false) String memo,
                                 @Verify(param = "oldCityId",rule="required") Integer oldCityId,
-                                @Verify(param = "oldSupplierId",rule="required") Integer oldSupplierId) {
+                                @Verify(param = "oldSupplierId",rule="required") Integer oldSupplierId,
+                                @Verify(param = "oldPhone",rule="required") String oldPhone) {
         log.info("修改司机信息保存,司机Id:"+driverId);
         CarBizDriverInfoTemp entity = new CarBizDriverInfoTemp();
         entity.setDriverId(driverId);
@@ -665,6 +667,7 @@ public class DriverInfoTemporaryController extends BaseController {
         entity.setMemo(StringUtils.isNotBlank(memo)?memo:null);
         entity.setOldCityId(oldCityId);
         entity.setOldSupplierId(oldSupplierId);
+        entity.setOldPhone(oldPhone);
         return carBizDriverInfoTempService.updateSave(entity);
     }
 
