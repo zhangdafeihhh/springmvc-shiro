@@ -2166,17 +2166,14 @@ public class CarInfoServiceImpl implements CarInfoService {
     }
 
     @Override
-    public Map<String, Object> checkLicensePlates(CarInfo params) {
+    public boolean checkLicensePlates(CarInfo params) {
         Map<String, Object> result = new HashMap<String, Object>();
         int n = carInfoExMapper.checkLicensePlates(params.getLicensePlates());
         if (n > 0) {
-            result.put("result", "0");
-            result.put("msg", "车牌号已存在");
+            return false;
         }else{
-            result.put("result", "1");
-            result.put("msg", "车牌号可以使用");
+            return true;
         }
-        return result;
     }
 
     @Override
