@@ -24,6 +24,9 @@ public interface CarDriverMonthDutyExMapper {
     /** 批量修改*/
     int updateDriverMonthDutyList(Map<String, Object> params);
 
+    int updateDriverMonthDutyOne(DriverMonthDutyRequest params);
+
+
 
 
 }

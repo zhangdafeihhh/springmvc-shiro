@@ -48,6 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * @description: 司机月排班
@@ -411,8 +412,10 @@ public class DriverMonthDutyService {
 				count = carDriverMonthDutyExMapper.saveDriverMonthDutyList(paramMap);
 			}
 			if (!("".equals(updateDriverMonthDutyList)||updateDriverMonthDutyList==null||updateDriverMonthDutyList.size()==0)) {
-				paramMap.put("updateDriverList", updateDriverMonthDutyList);
-				count += carDriverMonthDutyExMapper.updateDriverMonthDutyList(paramMap);
+				for(DriverMonthDutyRequest param : updateDriverMonthDutyList){
+					count += carDriverMonthDutyExMapper.updateDriverMonthDutyOne(param);
+				}
+//				count += carDriverMonthDutyExMapper.updateDriverMonthDutyList(paramMap);
 			}
 
 			if (count > 0) {

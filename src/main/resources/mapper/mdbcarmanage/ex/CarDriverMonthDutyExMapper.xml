@@ -33,6 +33,22 @@
 
   </insert>
 
+  <update id="updateDriverMonthDutyOne" parameterType="com.zhuanche.request.DriverMonthDutyRequest">
+      UPDATE car_driver_month_duty d
+      <set>
+        d.driver_name=#{driverName},
+        d.driver_phone=#{driverPhone},
+        d.license_plates=#{licensePlates},
+        d.supplier_id=#{supplierId},
+        d.city_id=#{cityId},
+        d.data=#{data},
+        d.team_id=#{teamId},
+        d.group_id=#{groupId},
+      </set>
+      WHERE
+      d.id = #{id}
+  </update>
+
   <update id="updateDriverMonthDutyList" parameterType="java.util.Map">
     <foreach collection="updateDriverList" item="item" index="index" separator=";" >
       UPDATE car_driver_month_duty d
