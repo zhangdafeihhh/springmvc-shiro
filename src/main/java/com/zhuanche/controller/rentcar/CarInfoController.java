@@ -148,13 +148,13 @@ public class CarInfoController {
      * @param licensePlates
      * @return
      */
-    @RequestMapping(value = "/checkLicensePlates")
-    public Object checkLicensePlates(@Verify(param = "licensePlates", rule = "required") String licensePlates) {
-        logger.info("根据车牌号查询是否已存在:checkLicensePlates");
-        CarInfo params = new CarInfo();
-        params.setLicensePlates(licensePlates);
-        return carService.checkLicensePlates(params);
-    }
+//    @RequestMapping(value = "/checkLicensePlates")
+//    public Object checkLicensePlates(@Verify(param = "licensePlates", rule = "required") String licensePlates) {
+//        logger.info("根据车牌号查询是否已存在:checkLicensePlates");
+//        CarInfo params = new CarInfo();
+//        params.setLicensePlates(licensePlates);
+//        return getResponse(carService.checkLicensePlates(params) );
+//    }
 
     /**
      * 修改
@@ -258,6 +258,8 @@ public class CarInfoController {
                                   @Verify(param = "oldCity",rule="") Integer oldCity,
                                   @Verify(param = "oldSupplierId",rule="") Integer oldSupplierId) {
         logger.info("车辆保存/修改:saveCarInfo");
+        CarInfo params = new CarInfo();
+        params.setLicensePlates(licensePlates);
 
         if(null != carId){
             if(StringUtils.isBlank(licensePlates1))
@@ -266,12 +268,20 @@ public class CarInfoController {
                 return AjaxResponse.fail(998, "oldCity");
             if(oldSupplierId == null)
                 return AjaxResponse.fail(998, "oldSupplierId");
+            if(licensePlates.equals(licensePlates1)){
+                if(!carService.checkLicensePlates(params))
+                    return AjaxResponse.fail(1102);
+            }
+
+        } else {
+            if(!carService.checkLicensePlates(params))
+                return AjaxResponse.fail(1102);
         }
 
 
-        CarInfo params = new CarInfo();
+
         params.setCarId(carId);
-        params.setLicensePlates(licensePlates);
+
         params.setStatus(status);
         params.setCityId(cityId);
         params.setSupplierId(supplierId);

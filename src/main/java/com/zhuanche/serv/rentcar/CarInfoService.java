@@ -33,7 +33,7 @@ public interface CarInfoService {
     Map<String,Object> importCarInfo(MultipartFile fileName, HttpServletRequest request);
 
     //根据车牌号查询是否已存在
-    Map<String, Object> checkLicensePlates(CarInfo params);
+    boolean checkLicensePlates(CarInfo params);
 
     /*
      * 车辆新增/修改
