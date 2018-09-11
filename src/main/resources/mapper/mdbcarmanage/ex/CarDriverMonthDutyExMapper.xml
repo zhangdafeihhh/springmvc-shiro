@@ -24,7 +24,7 @@
     insert into car_driver_month_duty (time,driver_id,driver_name,driver_phone,
     license_plates,supplier_id,city_id,data,team_id,group_id)
     values
-    <foreach collection="params" item="item" index="index" separator="," >
+    <foreach collection="driverList" item="item" index="index" separator="," >
       (
       str_to_date(#{item.monitorDate},'%Y-%m'),#{item.driverId},#{item.driverName},#{item.driverPhone},
       #{item.licensePlates},#{item.supplierId},#{item.cityId},#{item.data},
@@ -34,20 +34,20 @@
   </insert>
 
   <update id="updateDriverMonthDutyList" parameterType="java.util.Map">
-    <foreach collection="params" item="item" index="index" separator=";" >
-      UPDATE car_driver_month_duty
+    <foreach collection="updateDriverList" item="item" index="index" separator=";" >
+      UPDATE car_driver_month_duty d
       <set>
-        driver_name=#{item.driverName},
-        driver_phone=#{item.driverPhone},
-        license_plates=#{item.licensePlates},
-        supplier_id=#{item.supplierId},
-        city_id=#{item.cityId},
-        data=#{item.data},
-        team_id=#{item.teamId},
-        group_id=#{item.groupId},
+        d.driver_name=#{item.driverName},
+        d.driver_phone=#{item.driverPhone},
+        d.license_plates=#{item.licensePlates},
+        d.supplier_id=#{item.supplierId},
+        d.city_id=#{item.cityId},
+        d.data=#{item.data},
+        d.team_id=#{item.teamId},
+        d.group_id=#{item.groupId},
       </set>
       WHERE
-      id = #{item.id}
+      d.id = #{item.id}
     </foreach>
   </update>
 
