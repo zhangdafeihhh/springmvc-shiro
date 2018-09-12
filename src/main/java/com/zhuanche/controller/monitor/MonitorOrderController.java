@@ -7,6 +7,8 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.serv.CarBizDriverInfoService;
+import com.zhuanche.util.DateUtil;
+import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.MyRestTemplate;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -28,6 +30,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -64,8 +67,8 @@ public class MonitorOrderController {
             @RequestParam(value = "supplierId", required = true)String supplierId,
             @RequestParam(value = "licensePlates", required = true)String licensePlates,
             @RequestParam(value = "driverPhone", required = true)String driverPhone,
-            @RequestParam(value = "beginCreateDate", required = true)String beginCreateDate,
-            @RequestParam(value = "endCreateDate", required = true)String endCreateDate,
+            @RequestParam(value = "beginCreateDate", required = true)long beginCreateDate,
+            @RequestParam(value = "endCreateDate", required = true)long endCreateDate,
             HttpServletRequest request,
               ModelMap model) {
         Map<String, Object> param = new HashMap<String, Object>();
@@ -81,14 +84,19 @@ public class MonitorOrderController {
         logger.info("监控-查询司机订单列表-请求参数" + JSON.toJSONString(param));
         try {
 
+            Date begign = new Date(beginCreateDate);
+            Date end = new Date(endCreateDate);
+            String beginString = DateUtils.formatDate(begign,"yyyy-MM-dd HH:mm:ss");
+            String endString = DateUtils.formatDate(end,"yyyy-MM-dd HH:mm:ss");
+
             MultiValueMap<String, Object> postParameters = new LinkedMultiValueMap<>();
             postParameters.add("pageNo", pageNo+"");
             postParameters.add("pageSize", pageSize+"");
             postParameters.add("supplierId", supplierId+"");
             postParameters.add("licensePlates", licensePlates);
             postParameters.add("driverPhone", driverPhone);
-            postParameters.add("beginCreateDate", beginCreateDate);
-            postParameters.add("endCreateDate", endCreateDate);
+            postParameters.add("beginCreateDate", beginString);
+            postParameters.add("endCreateDate", endString);
             postParameters.add("transId", param.get("transId"));
 
             HttpHeaders headers = new HttpHeaders();
