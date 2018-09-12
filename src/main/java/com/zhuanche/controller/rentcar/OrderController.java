@@ -42,9 +42,6 @@ import com.zhuanche.util.CopyBeanUtil;
 @RequestMapping(value = "/order")
 public class OrderController{
 	private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
-	
-	@Value("${bigdata.saas.data.url}")
-	String  saasBigdataApiUrl;
 	 
 	@Autowired
 	private CarFactOrderInfoService carFactOrderInfoService;

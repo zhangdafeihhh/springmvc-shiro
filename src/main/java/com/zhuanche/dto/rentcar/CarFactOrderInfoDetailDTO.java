@@ -6,7 +6,7 @@ import java.util.List;
 import com.zhuanche.entity.rentcar.CarBizOrderWaitingPeriod;
 
 public class CarFactOrderInfoDetailDTO{
-	//司机出发 
+	//司机出发时间
 	private String driverBeginTime;
 	//司机到达上车地点 
 	private String driverArriveTime;
