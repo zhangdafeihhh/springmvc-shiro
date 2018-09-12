@@ -398,7 +398,7 @@ public class DriverInfoController {
                                    @Verify(param = "status",rule="required") Integer status,
                                    @Verify(param = "groupId",rule="required") Integer groupId,
                                    @Verify(param = "age",rule="required|min(18)") Integer age,
-                                   @Verify(param = "emergencyContactNumber",rule="max(11)") String emergencyContactNumber,
+                                   @Verify(param = "emergencyContactNumber",rule="maxlength(11)") String emergencyContactNumber,
                                    String currentAddress, String emergencyContactPerson,
                                    String superintendNo, String superintendUrl, String drivingLicenseType, Integer drivingYears,
                                    String archivesNo, String issueDateStr, String expireDateStr, String photosrct, String driverlicensenumber,

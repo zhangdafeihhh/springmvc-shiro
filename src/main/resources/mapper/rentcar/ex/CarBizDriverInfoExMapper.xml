@@ -381,13 +381,13 @@
   <sql id="allBaseColumnWhereList" >
     <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR" >
       <if test="phone != null and phone != ''" >
-        and phone = #{phone,jdbcType=VARCHAR}
+        and phone LIKE '%${phone}%'
       </if>
       <if test="name != null and name != ''" >
-        and name = #{name,jdbcType=VARCHAR}
+        and name LIKE CONCAT(#{name},'%')
       </if>
       <if test="licensePlates != null and licensePlates != ''" >
-        and license_plates = #{licensePlates,jdbcType=VARCHAR}
+        and license_plates LIKE '%${licensePlates}%'
       </if>
       <if test="status != null" >
         and status = #{status,jdbcType=INTEGER}
