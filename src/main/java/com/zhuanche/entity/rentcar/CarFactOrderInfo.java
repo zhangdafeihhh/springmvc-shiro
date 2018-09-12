@@ -130,7 +130,6 @@ public class CarFactOrderInfo extends BaseEntity {
 	// 司机信用卡代收
 	private Double paymentDriver;
 	// 优惠券 实际抵扣面值
-
 	private Double couponsAmount;
 	// 充值账户支付
 	private Double changeAmount;

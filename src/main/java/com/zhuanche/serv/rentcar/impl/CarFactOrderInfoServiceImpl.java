@@ -1,28 +1,13 @@
 package com.zhuanche.serv.rentcar.impl;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +17,6 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.sun.tools.extcheck.Main;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.dto.rentcar.CarFactOrderInfoDTO;
@@ -91,8 +75,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 	@Override
 	public String getMainOrderBySubOrderNo(String orderNo){
 		String mainOrderNo = "";
-		String url02 = "http://test-inside-order.01zhuanche.com/"+Common.GET_MAIN_ORDER_BY_ORDERNO + 
-				"?businessId=" + Common.BUSSINESSID + "&orderNo=P1521107110815579";
+		//String url02 = "http://test-inside-order.01zhuanche.com/"+Common.GET_MAIN_ORDER_BY_ORDERNO + "?businessId=" + Common.BUSSINESSID + "&orderNo=P1521107110815579";
 		String url = carRestUrl+Common.GET_MAIN_ORDER_BY_ORDERNO + 
 					"?businessId=" + Common.BUSSINESSID + "&orderNo="+orderNo;
 		 try {
@@ -104,7 +87,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 			String sign = java.net.URLEncoder.encode(
 					Base64.encodeBase64String(DigestUtils.md5(param.toString())), "UTF-8");
 			url += "&sign="+sign;
-			System.out.println(url);
+			//System.out.println(url);
 			String result = HttpClientUtil.buildGetRequest(url).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
 			JSONObject job = JSON.parseObject(result);
 			if (job == null) {

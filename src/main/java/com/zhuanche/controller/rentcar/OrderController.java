@@ -1,11 +1,13 @@
 package com.zhuanche.controller.rentcar;
 
+import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +22,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.Verify;
-import com.zhuanche.dto.rentcar.CarFactOrderInfoDTO;
+import com.zhuanche.dto.rentcar.CarFactOrderInfoDetailDTO;
 import com.zhuanche.entity.DriverOrderRecord.OrderTimeEntity;
 import com.zhuanche.entity.rentcar.CarBizOrderSettleEntity;
 import com.zhuanche.entity.rentcar.CarBizOrderWaitingPeriod;
 import com.zhuanche.entity.rentcar.CarFactOrderInfo;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
-import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
+import com.zhuanche.util.CopyBeanUtil;
 
 
 /**
@@ -115,8 +117,9 @@ public class OrderController{
      */
 	@ResponseBody
 	@RequestMapping(value = "/orderView", method = { RequestMethod.POST,RequestMethod.GET })
-	public CarFactOrderInfo selectUser(@Verify(param = "orderId",rule = "required") Long orderId){
+	public CarFactOrderInfoDetailDTO selectUser(@Verify(param = "orderId",rule = "required") Long orderId){
 		logger.info("*****************查询订单详情 订单id+"+orderId);
+		CarFactOrderInfoDetailDTO orderDTO = new CarFactOrderInfoDetailDTO();
 		long startTime=System.currentTimeMillis();
 		//根据orderId获取订单明细
 		CarFactOrderInfo order = getOrderInfo(orderId);
@@ -144,9 +147,10 @@ public class OrderController{
 		List<CarBizOrderWaitingPeriod>  carBizOrderWaitingPeriodList = this.carFactOrderInfoService.selectWaitingPeriodListSlave(order.getOrderno());
 		order.setCarBizOrderWaitingPeriodList(carBizOrderWaitingPeriodList);
 		
+		CopyBeanUtil.copyByIgnoreCase(orderDTO,order,true);
 		float excTime=(float)(endTime-startTime)/1000;
 		logger.info("*****************查询订单详情 耗时+"+excTime);
-		return order;
+		return orderDTO;
 	}
 	
 	 /**
@@ -361,7 +365,4 @@ public class OrderController{
 			}
 			return order;
 		}
-		
-		
-	
-}
+	}
