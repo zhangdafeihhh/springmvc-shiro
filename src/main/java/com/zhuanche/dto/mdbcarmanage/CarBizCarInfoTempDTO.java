@@ -265,11 +265,7 @@ public class CarBizCarInfoTempDTO {
 
     private String totalmileage;
 
-    private Integer overhaulstatus;
-
     private String transportnumber;
-
-    private String certificationauthority;
 
     private String operatingregion;
 
@@ -1165,28 +1161,12 @@ public class CarBizCarInfoTempDTO {
         this.totalmileage = totalmileage;
     }
 
-    public Integer getOverhaulstatus() {
-        return overhaulstatus;
-    }
-
-    public void setOverhaulstatus(Integer overhaulstatus) {
-        this.overhaulstatus = overhaulstatus;
-    }
-
     public String getTransportnumber() {
         return transportnumber;
     }
 
     public void setTransportnumber(String transportnumber) {
         this.transportnumber = transportnumber;
-    }
-
-    public String getCertificationauthority() {
-        return certificationauthority;
-    }
-
-    public void setCertificationauthority(String certificationauthority) {
-        this.certificationauthority = certificationauthority;
     }
 
     public String getOperatingregion() {

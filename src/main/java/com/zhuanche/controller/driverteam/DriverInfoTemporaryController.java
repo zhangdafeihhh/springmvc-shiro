@@ -388,7 +388,7 @@ public class DriverInfoTemporaryController extends BaseController {
                                     @Verify(param = "nation",rule="required") String nation,
                                     @Verify(param = "houseHoldRegisterPermanent",rule="required") String houseHoldRegisterPermanent,
                                     @Verify(param = "houseHoldRegister",rule="required") String houseHoldRegister,
-                                    @Verify(param = "idCardNo",rule="required|idcard") String idCardNo,
+                                    @Verify(param = "idCardNo",rule="required") String idCardNo,
                                     @Verify(param = "birthDay",rule="required") String birthDay,
                                     @Verify(param = "gender",rule="required") Integer gender,
                                     @Verify(param = "phone",rule="required|mobile") String phone,
@@ -550,6 +550,7 @@ public class DriverInfoTemporaryController extends BaseController {
      * @param oldCityId 旧的城市Id
      * @param oldSupplierId 旧的供应商
      * @param oldPhone 旧的手机号
+     * @param oldLicensePlates 旧的车牌号
      * @return
      */
     @ResponseBody
@@ -560,7 +561,7 @@ public class DriverInfoTemporaryController extends BaseController {
                                 @Verify(param = "nation",rule="required") String nation,
                                 @Verify(param = "houseHoldRegisterPermanent",rule="required") String houseHoldRegisterPermanent,
                                 @Verify(param = "houseHoldRegister",rule="required") String houseHoldRegister,
-                                @Verify(param = "idCardNo",rule="required|idcard") String idCardNo,
+                                @Verify(param = "idCardNo",rule="required") String idCardNo,
                                 @Verify(param = "birthDay",rule="required") String birthDay,
                                 @Verify(param = "gender",rule="required") Integer gender,
                                 @Verify(param = "phone",rule="required|mobile") String phone,
@@ -609,7 +610,8 @@ public class DriverInfoTemporaryController extends BaseController {
                                 @RequestParam(value = "memo",required = false) String memo,
                                 @Verify(param = "oldCityId",rule="required") Integer oldCityId,
                                 @Verify(param = "oldSupplierId",rule="required") Integer oldSupplierId,
-                                @Verify(param = "oldPhone",rule="required") String oldPhone) {
+                                @Verify(param = "oldPhone",rule="required") String oldPhone,
+                                @Verify(param = "oldLicensePlates",rule="required") String oldLicensePlates) {
         log.info("修改司机信息保存,司机Id:"+driverId);
         CarBizDriverInfoTemp entity = new CarBizDriverInfoTemp();
         entity.setDriverId(driverId);
@@ -668,6 +670,7 @@ public class DriverInfoTemporaryController extends BaseController {
         entity.setOldCityId(oldCityId);
         entity.setOldSupplierId(oldSupplierId);
         entity.setOldPhone(oldPhone);
+        entity.setOldLicensePlates(oldLicensePlates);
         return carBizDriverInfoTempService.updateSave(entity);
     }
 
