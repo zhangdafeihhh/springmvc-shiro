@@ -59,7 +59,7 @@ public class MonitorOrderController {
     @ResponseBody
     @RequestMapping(value = "/page", method = { RequestMethod.POST })
     public AjaxResponse getGpsByDriver(
-            @RequestParam(value = "pageNo", required = false,defaultValue = "0")Integer pageNo,
+            @RequestParam(value = "pageNo", required = false,defaultValue = "1")Integer pageNo,
             @RequestParam(value = "pageSize", required = false,defaultValue = "20")Integer pageSize,
             @RequestParam(value = "supplierId", required = true)String supplierId,
             @RequestParam(value = "licensePlates", required = true)String licensePlates,
