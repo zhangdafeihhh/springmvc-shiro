@@ -59,7 +59,7 @@ public class CarInfoDTO{
 
     private Date updateDate;
 
-    private Integer auditingstatus;
+    private Integer auditingStatus;
 
     private String freighttype;
 
@@ -467,14 +467,13 @@ public class CarInfoDTO{
     }
 
 
-    public Integer getAuditingstatus() {
-        return auditingstatus;
+    public Integer getAuditingStatus() {
+        return auditingStatus;
     }
 
-    public void setAuditingstatus(Integer auditingstatus) {
-        this.auditingstatus = auditingstatus;
+    public void setAuditingStatus(Integer auditingStatus) {
+        this.auditingStatus = auditingStatus;
     }
-
 
     public String getFreighttype() {
         return freighttype;

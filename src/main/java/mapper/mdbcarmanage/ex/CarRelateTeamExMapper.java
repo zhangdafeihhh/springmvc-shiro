@@ -19,6 +19,8 @@ public interface CarRelateTeamExMapper {
 
     CarRelateTeam selectOneTeam(CarRelateTeam carRelateTeam);
 
+    int deleteDriverFromTeam(@Param("paramId") Integer paramId,@Param("driverId") Integer driverId);
+
     /**
      * 根据司机ID删除
      * @param driverId

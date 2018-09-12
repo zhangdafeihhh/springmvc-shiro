@@ -2479,6 +2479,30 @@ public class CarBizDriverInfoTempService {
                     return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID,"【驾驶员合同（或协议）签署公司】在协议公司中不存在");
                 }
             }
+            //判断司机手机号
+            CarBizDriverInfo carBizDriverInfo = new CarBizDriverInfo();
+            carBizDriverInfo.setPhone(entity.getPhone());
+            Integer integer = carBizDriverInfoExMapper.selectCountForPhone(carBizDriverInfo);
+            if(integer > 0){
+                return AjaxResponse.fail(RestErrorCode.DRIVER_PHONE_EXIST);
+            }
+            CarBizDriverInfoTemp driverInfoTemp = new CarBizDriverInfoTemp();
+            driverInfoTemp.setPhone(entity.getPhone());
+            Integer integer1 = carBizDriverInfoTempExMapper.selectCountForPhone(driverInfoTemp);
+            if(integer1 > 0){
+                return AjaxResponse.fail(RestErrorCode.DRIVER_PHONE_EXIST);
+            }
+            //判断车牌是否被绑定
+            if(carBizDriverInfoTempExMapper.validateLicensePlates(driverEntity) > 0){
+                return AjaxResponse.fail(RestErrorCode.CAR_HAS_BIND);
+            }
+            //无效的车牌号
+            Map<String,Object> carSd = Maps.newHashMap();
+            carSd.put("licensePlates",driverEntity.getLicensePlates());
+            CarBizCarInfoTemp carBizCarInfo = carBizCarInfoTempExMapper.selectBylicensePlates(carSd);
+            if (carBizCarInfo == null) {
+                return AjaxResponse.fail(RestErrorCode.LICENSE_PLATES_NOT_EXIST);
+            }
             entity.setStatus(1);
             entity.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
             entity.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
@@ -2493,11 +2517,13 @@ public class CarBizDriverInfoTempService {
                 carBizCarInfoTempExMapper.updateByLicensePlates(car);
                 return AjaxResponse.success(RestErrorCode.SUCCESS);
             } catch (Exception e) {
-                log.info("保存司机信息error:" + e);
+                e.printStackTrace();
+                log.error("保存司机信息error:" + e);
                 return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
             }
         } catch (Exception e) {
-            log.info("保存司机信息error:" + e);
+            e.printStackTrace();
+            log.error("保存司机信息error:" + e);
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
     }
@@ -2508,7 +2534,6 @@ public class CarBizDriverInfoTempService {
      * @return
      */
     public AjaxResponse updateSave(CarBizDriverInfoTemp entity) {
-        Map<String, Object> result = new HashMap<String, Object>();
         try {
             if(entity.getIdCardNo()!=null&&!"".equals(entity.getIdCardNo())&&entity.getIdCardNo().length()==8){
                 entity.setIdCardNo(entity.getIdCardNo().substring(0, 7)+"("+entity.getIdCardNo().substring(7, 8)+")");
@@ -2552,26 +2577,56 @@ public class CarBizDriverInfoTempService {
                 int count = this.queryAgreementCompanyByName(entity.getCorpType());
                 if(count==0){
                     return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID,"【驾驶员合同（或协议）签署公司】在协议公司中不存在");
+                }
+            }
+            //判断手机号
+            if(!entity.getPhone().equals(entity.getOldPhone())){
+                CarBizDriverInfo carBizDriverInfo = new CarBizDriverInfo();
+                carBizDriverInfo.setPhone(entity.getPhone());
+                Integer integer = carBizDriverInfoExMapper.selectCountForPhone(carBizDriverInfo);
+                if(integer > 0){
+                    return AjaxResponse.fail(RestErrorCode.DRIVER_PHONE_EXIST);
+                }
+                CarBizDriverInfoTemp driverInfoTemp = new CarBizDriverInfoTemp();
+                driverInfoTemp.setPhone(entity.getPhone());
+                Integer integer1 = carBizDriverInfoTempExMapper.selectCountForPhone(driverInfoTemp);
+                if(integer1 > 0){
+                    return AjaxResponse.fail(RestErrorCode.DRIVER_PHONE_EXIST);
+                }
+            }
 
+            if(!entity.getLicensePlates().equals(entity.getOldLicensePlates())){
+                //判断车牌是否被绑定
+                if(carBizDriverInfoTempExMapper.validateLicensePlates(driverEntity) > 0){
+                    return AjaxResponse.fail(RestErrorCode.CAR_HAS_BIND);
+                }
+                //无效的车牌号
+                Map<String,Object> carSd = Maps.newHashMap();
+                carSd.put("licensePlates",driverEntity.getLicensePlates());
+                CarBizCarInfoTemp carBizCarInfo = carBizCarInfoTempExMapper.selectBylicensePlates(carSd);
+                if (carBizCarInfo == null) {
+                    return AjaxResponse.fail(RestErrorCode.LICENSE_PLATES_NOT_EXIST);
                 }
             }
             entity.setStatus(1);
-            entity.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
+            //WebSessionUtil.getCurrentLoginUser().getId()
+            entity.setUpdateBy(1);
             log.info("临时司机修改:"+entity.toString());
             try {
-                if((entity.getOldCityId()!=null&&!"".equals(entity.getOldCityId())&&!entity.getServiceCityId().equals(entity.getOldCityId()))
+                if((entity.getOldCityId()!=null&&!"".equals(entity.getOldCityId())&&!String.valueOf(entity.getCityId()).equals(entity.getOldCityId()))
                         ||(entity.getOldSupplierId()!=null&&!"".equals(entity.getOldSupplierId())&&!entity.getSupplierId().equals(entity.getOldSupplierId()))){
                     entity.setTeamid("");
                     entity.setGroupIds("");
                 }
                 carBizDriverInfoTempMapper.updateByPrimaryKeySelective(entity);
                 CarBizCarInfoTemp car = new CarBizCarInfoTemp();
-                car.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
+                //WebSessionUtil.getCurrentLoginUser().getId()
+                car.setUpdateBy(1);
                 //判断 车牌号是否修改 如果修改 释放 车牌号
-                if(entity.getLicensePlatesOld()!= null && entity.getLicensePlatesOld().length()>=1 && !entity.getLicensePlatesOld().equals(entity.getLicensePlates())){
+                if(entity.getOldLicensePlates()!= null && entity.getOldLicensePlates().length()>=1 && !entity.getOldLicensePlates().equals(entity.getLicensePlates())){
                     log.info("****************修改车牌号 释放以前的车牌号");
                     //释放旧车
-                    car.setLicensePlates(entity.getLicensePlatesOld());
+                    car.setLicensePlates(entity.getOldLicensePlates());
                     car.setDriverid(0);
                     carBizCarInfoTempExMapper.updateByLicensePlates(car);
                 }
@@ -2581,12 +2636,23 @@ public class CarBizDriverInfoTempService {
                 carBizCarInfoTempExMapper.updateByLicensePlates(car);
                 return AjaxResponse.success(RestErrorCode.SUCCESS);
             } catch (Exception e) {
+                e.printStackTrace();
                 log.error("修改司机信息error:" + e);
                 return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("修改司机信息 error:" + e);
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
+    }
+
+    /**
+     *查询未绑定车牌号
+     * @param map
+     * @return
+     */
+    public List<CarBizCarInfoTemp> licensePlatesNotDriverIdList(Map<String,Object> map) {
+        return carBizCarInfoTempExMapper.licensePlatesNotDriverIdList(map);
     }
 }

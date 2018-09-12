@@ -330,12 +330,7 @@ public class CarInfoTemporaryController extends BaseController {
         Integer userId = user.getId();
         carBizCarInfoTemp.setUpdateBy(userId);
         carBizCarInfoTemp.setCreateBy(userId);
-        int code  = carBizCarInfoTempService.add(carBizCarInfoTemp);
-        if(code > 0 ){
-            return AjaxResponse.success(RestErrorCode.SUCCESS);
-        }else{
-            return AjaxResponse.success(RestErrorCode.HTTP_SYSTEM_ERROR);
-        }
+        return carBizCarInfoTempService.add(carBizCarInfoTemp);
     }
 
     /**

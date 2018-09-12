@@ -48,6 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * @description: 司机月排班
@@ -411,8 +412,10 @@ public class DriverMonthDutyService {
 				count = carDriverMonthDutyExMapper.saveDriverMonthDutyList(paramMap);
 			}
 			if (!("".equals(updateDriverMonthDutyList)||updateDriverMonthDutyList==null||updateDriverMonthDutyList.size()==0)) {
-				paramMap.put("updateDriverList", updateDriverMonthDutyList);
-				count += carDriverMonthDutyExMapper.updateDriverMonthDutyList(paramMap);
+				for(DriverMonthDutyRequest param : updateDriverMonthDutyList){
+					count += carDriverMonthDutyExMapper.updateDriverMonthDutyOne(param);
+				}
+//				count += carDriverMonthDutyExMapper.updateDriverMonthDutyList(paramMap);
 			}
 
 			if (count > 0) {
@@ -472,7 +475,10 @@ public class DriverMonthDutyService {
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/4 
-	*/ 
+	*/
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.MASTER )
+	} )
 	public int updateDriverMonthDutyData(CarDriverMonthDuty record){
 		if(Check.NuNObj(record)){
 			return 0;
@@ -562,6 +568,11 @@ public class DriverMonthDutyService {
 		throw new IllegalArgumentException("你的excel版本目前poi解析不了");
 	}
 
+	@SuppressWarnings("unchecked")
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE ),
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public Workbook exportExcel(DriverMonthDutyRequest params, String path, Map<String, Object> tabelHeader)
 			throws Exception {
 		FileInputStream io = new FileInputStream(path);

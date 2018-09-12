@@ -102,11 +102,20 @@ public class CarBizCarInfoTempService {
      * @param carBizCarInfoTemp
      * @return
      */
-    public int add(CarBizCarInfoTemp carBizCarInfoTemp) {
+    public AjaxResponse add(CarBizCarInfoTemp carBizCarInfoTemp) {
         String license = carBizCarInfoTemp.getLicensePlates();
         license = Check.replaceBlank(license);
         carBizCarInfoTemp.setLicensePlates(license);
-        return carBizCarInfoTempMapper.insertSelective(carBizCarInfoTemp);
+        Map<String, Object> resultCar = this.checkLicensePlates(license);
+        if ((int) resultCar.get("result") == 0) {
+            return AjaxResponse.fail(RestErrorCode.LICENSE_PLATES_EXIST);
+        }
+        int code =  carBizCarInfoTempMapper.insertSelective(carBizCarInfoTemp);
+        if(code > 0 ){
+            return AjaxResponse.success(RestErrorCode.SUCCESS);
+        }else{
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
     }
 
     /**
@@ -116,6 +125,12 @@ public class CarBizCarInfoTempService {
      */
     public AjaxResponse update(CarBizCarInfoTemp entity) {
         try{
+            if (!entity.getLicensePlates().equals(entity.getOldLicensePlates())) {
+                Map<String, Object> resultCar = this.checkLicensePlates(entity.getLicensePlates());
+                if ((int) resultCar.get("result") == 0) {
+                    return AjaxResponse.fail(RestErrorCode.LICENSE_PLATES_EXIST);
+                }
+            }
             carBizCarInfoTempMapper.updateByPrimaryKeySelective(entity);
             CarBizDriverInfoTemp carDriver = carBizDriverInfoTempExMapper.getDriverByLincesePlates(entity.getOldLicensePlates());
             if (carDriver != null) {
@@ -156,7 +171,6 @@ public class CarBizCarInfoTempService {
     /**
      * 车辆导入
      * @param is
-     * @param request
      * @return
      */
     public AjaxResponse importCarInfo(InputStream is,String prefix,Integer cityId,Integer supplierId) {
