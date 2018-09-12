@@ -291,7 +291,7 @@ public class OrderAppraisalController extends DriverQueryController{
 			PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
 			return AjaxResponse.success(pageDTO);
 		}else{
-			return new PageDTO(page, pageSize, 0, null);
+			return AjaxResponse.success(new PageDTO(page, pageSize, 0, null));
 		}
 
 	}
