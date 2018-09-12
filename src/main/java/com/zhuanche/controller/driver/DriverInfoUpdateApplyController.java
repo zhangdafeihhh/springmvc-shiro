@@ -172,6 +172,7 @@ public class DriverInfoUpdateApplyController {
         driverInfoUpdateApply.setDriverId(driverId);
         driverInfoUpdateApply.setDriverName(carBizDriverInfoDTO.getName());
         driverInfoUpdateApply.setDriverPhone(driverPhone);
+        driverInfoUpdateApply.setDriverPhoneNew(driverPhoneNew);
         driverInfoUpdateApply.setIdCardNo(carBizDriverInfoDTO.getIdCardNo());
         driverInfoUpdateApply.setLicensePlates(carBizDriverInfoDTO.getLicensePlates());
         driverInfoUpdateApply.setCityId(carBizDriverInfoDTO.getServiceCity());
