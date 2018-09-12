@@ -55,9 +55,9 @@ public class CarInfoDTO{
 
     private Integer updateBy;
 
-    private Date createDate;
+    private String createDate;
 
-    private Date updateDate;
+    private String updateDate;
 
     private Integer auditingStatus;
 
@@ -450,22 +450,21 @@ public class CarInfoDTO{
         this.updateBy = updateBy;
     }
 
-    public Date getCreateDate() {
+    public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(String createDate) {
         this.createDate = createDate;
     }
 
-    public Date getUpdateDate() {
+    public String getUpdateDate() {
         return updateDate;
     }
 
-    public void setUpdateDate(Date updateDate) {
+    public void setUpdateDate(String updateDate) {
         this.updateDate = updateDate;
     }
-
 
     public Integer getAuditingStatus() {
         return auditingStatus;

@@ -138,20 +138,24 @@ public class DriverVerifyService {
 			}
 			// 获取司机的出生日期 性别
 			String idCard = driverVerify.getIdCard();
-			if (StringUtils.isNotBlank(idCard)) {
-				int gender = IdcardUtil.getGenderByIdCard(idCard);
-				if (gender == 1) {
-					driverVerify.setIdcardSex("男");
-				} else if(gender == 0){
-					driverVerify.setIdcardSex("女");
+			try {
+				if (StringUtils.isNotBlank(idCard)) {
+					int gender = IdcardUtil.getGenderByIdCard(idCard);
+					if (gender == 1) {
+						driverVerify.setIdcardSex("男");
+					} else if(gender == 0){
+						driverVerify.setIdcardSex("女");
+					}
+					String d = IdcardUtil.getBirthByIdCard(idCard);
+					if (d != null && d.length() == 8) {
+						driverVerify.setIdcardBirthday(
+								d.substring(0, 4) + "-" + d.substring(4, 6) + "-" + d.substring(6, 8));
+					} else {
+						driverVerify.setIdcardBirthday(d);
+					}
 				}
-				String d = IdcardUtil.getBirthByIdCard(idCard);
-				if (d != null && d.length() == 8) {
-					driverVerify.setIdcardBirthday(
-							d.substring(0, 4) + "-" + d.substring(4, 6) + "-" + d.substring(6, 8));
-				} else {
-					driverVerify.setIdcardBirthday(d);
-				}
+			} catch (Exception e) {
+				logger.error("查询司机加盟注册信息通过司机ID-身份证号码处理异常,idCard="+idCard,e);
 			}
 			dto = BeanUtil.copyObject(driverVerify, DriverVerifyDto.class);
 			// 查询服务类型名称通过serviceType car_biz_car_group 

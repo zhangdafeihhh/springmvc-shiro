@@ -49,7 +49,15 @@ public final class AjaxResponse{
 		int code = errorCode==RestErrorCode.SUCCESS? RestErrorCode.UNKNOWN_ERROR : errorCode;
 		resp.setCode( code );
 		resp.setSuccess(false);
-		resp.setMsg(  RestErrorCode.renderMsg(code, errArgs) );
+		resp.setMsg(RestErrorCode.renderMsg(code, errArgs) );
+		return resp;
+	}
+	public static AjaxResponse failMsg(int errorCode, String msg) {
+		AjaxResponse resp = new AjaxResponse();
+		int code = errorCode==RestErrorCode.SUCCESS? RestErrorCode.UNKNOWN_ERROR : errorCode;
+		resp.setCode( code );
+		resp.setSuccess(false);
+		resp.setMsg(msg);
 		return resp;
 	}
 }

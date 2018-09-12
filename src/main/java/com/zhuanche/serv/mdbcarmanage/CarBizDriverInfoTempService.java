@@ -2498,7 +2498,7 @@ public class CarBizDriverInfoTempService {
             }
             //无效的车牌号
             Map<String,Object> carSd = Maps.newHashMap();
-            carSd.put("licensePlates",driverEntity.getLicensePlates());
+            carSd.put("licensePlates",entity.getLicensePlates());
             CarBizCarInfoTemp carBizCarInfo = carBizCarInfoTempExMapper.selectBylicensePlates(carSd);
             if (carBizCarInfo == null) {
                 return AjaxResponse.fail(RestErrorCode.LICENSE_PLATES_NOT_EXIST);
@@ -2602,15 +2602,14 @@ public class CarBizDriverInfoTempService {
                 }
                 //无效的车牌号
                 Map<String,Object> carSd = Maps.newHashMap();
-                carSd.put("licensePlates",driverEntity.getLicensePlates());
+                carSd.put("licensePlates",entity.getLicensePlates());
                 CarBizCarInfoTemp carBizCarInfo = carBizCarInfoTempExMapper.selectBylicensePlates(carSd);
                 if (carBizCarInfo == null) {
                     return AjaxResponse.fail(RestErrorCode.LICENSE_PLATES_NOT_EXIST);
                 }
             }
             entity.setStatus(1);
-            //WebSessionUtil.getCurrentLoginUser().getId()
-            entity.setUpdateBy(1);
+            entity.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
             log.info("临时司机修改:"+entity.toString());
             try {
                 if((entity.getOldCityId()!=null&&!"".equals(entity.getOldCityId())&&!String.valueOf(entity.getCityId()).equals(entity.getOldCityId()))
@@ -2620,8 +2619,7 @@ public class CarBizDriverInfoTempService {
                 }
                 carBizDriverInfoTempMapper.updateByPrimaryKeySelective(entity);
                 CarBizCarInfoTemp car = new CarBizCarInfoTemp();
-                //WebSessionUtil.getCurrentLoginUser().getId()
-                car.setUpdateBy(1);
+                car.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
                 //判断 车牌号是否修改 如果修改 释放 车牌号
                 if(entity.getOldLicensePlates()!= null && entity.getOldLicensePlates().length()>=1 && !entity.getOldLicensePlates().equals(entity.getLicensePlates())){
                     log.info("****************修改车牌号 释放以前的车牌号");
