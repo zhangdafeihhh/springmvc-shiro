@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driverOrderRecord.DriverOrderRecordMapper" >
+   	<select id="queryDriverOrderRecord" parameterType="map" resultType="com.zhuanche.entity.DriverOrderRecord.OrderTimeEntity">
+		select
+		case when a.action=4 then a.action_time else '' END driverBeginTime,
+		case when a.action=5 then a.action_time else '' END driverArriveTime,
+		case when a.action=6 then a.action_time else '' END
+		driverStartServiceTime,
+		case when a.action=7 then a.action_time else '' END driverOrderEndTime,
+		case when a.action=14 then a.action_time else '' END
+		driverOrderCoformTime,
+		case when (a.action=18 or a.action=19 or a.action=20) then a.action_time
+		else '' END orderCancleTime
+		from ${tableName} a where order_no
+		=#{orderNo} and (a.action=4 or a.action=5 or
+		a.action=6 or a.action=7 or a.action=14 or a.action=18 or a.action=19 or
+		a.action=20)
+	</select>
+</mapper>
