@@ -398,8 +398,7 @@ public class DriverInfoController {
                                    @Verify(param = "status",rule="required") Integer status,
                                    @Verify(param = "groupId",rule="required") Integer groupId,
                                    @Verify(param = "age",rule="required|min(18)") Integer age,
-                                   @Verify(param = "emergencyContactNumber",rule="maxlength(11)") String emergencyContactNumber,
-                                   String currentAddress, String emergencyContactPerson,
+                                   String emergencyContactNumber, String currentAddress, String emergencyContactPerson,
                                    String superintendNo, String superintendUrl, String drivingLicenseType, Integer drivingYears,
                                    String archivesNo, String issueDateStr, String expireDateStr, String photosrct, String driverlicensenumber,
                                    String drivinglicenseimg, String nationality, String householdregister, String nation, String marriage,
@@ -411,6 +410,10 @@ public class DriverInfoController {
                                    String driverlicenseissuingnumber, String driverLicenseIssuingRegisterDate, String driverLicenseIssuingFirstDate,
                                    String driverLicenseIssuingGrantDate, String birthDay, String houseHoldRegisterPermanent,
                                    String memo, String bankCardBank,String bankCardNumber) {
+
+        if(StringUtils.isNotEmpty(emergencyContactNumber) && emergencyContactNumber.length()>11){
+            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID,"紧急联系方式不可超过11位");
+        }
 
         //判断一些基础信息是否正确
         AjaxResponse ajaxResponse = carBizDriverInfoService.validateCarDriverInfo(driverId, phone, idCardNo, bankCardNumber, bankCardBank);
