@@ -189,6 +189,11 @@ public class CarBizDriverInfoTemp extends BaseDriverInfoTemp {
      * 小组id
      */
     private Integer teamGroupId;
+
+    /**
+     * 旧的车牌号
+     */
+    private String oldLicensePlates;
     
     public String getBankCardBank() {
 		return bankCardBank;
@@ -736,6 +741,14 @@ public class CarBizDriverInfoTemp extends BaseDriverInfoTemp {
         this.teamGroupId = teamGroupId;
     }
 
+    public String getOldLicensePlates() {
+        return oldLicensePlates;
+    }
+
+    public void setOldLicensePlates(String oldLicensePlates) {
+        this.oldLicensePlates = oldLicensePlates;
+    }
+
     @Override
     public String toString() {
         return "CarBizDriverInfoTemp{" +
@@ -805,6 +818,7 @@ public class CarBizDriverInfoTemp extends BaseDriverInfoTemp {
                 ", contractNo='" + contractNo + '\'' +
                 ", teamId=" + teamId +
                 ", teamGroupId=" + teamGroupId +
+                ", oldLicensePlates='" + oldLicensePlates + '\'' +
                 '}';
     }
 }

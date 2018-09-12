@@ -257,10 +257,6 @@ public class CarBizCarInfoTemp {
 
     private String totalmileage;
 
-    private Integer overhaulstatus;
-
-    private String certificationauthority;
-
     private String vehicleVinCode;
 
     private String vehicletec;
@@ -1105,22 +1101,6 @@ public class CarBizCarInfoTemp {
 
     public void setTotalmileage(String totalmileage) {
         this.totalmileage = totalmileage;
-    }
-
-    public Integer getOverhaulstatus() {
-        return overhaulstatus;
-    }
-
-    public void setOverhaulstatus(Integer overhaulstatus) {
-        this.overhaulstatus = overhaulstatus;
-    }
-
-    public String getCertificationauthority() {
-        return certificationauthority;
-    }
-
-    public void setCertificationauthority(String certificationauthority) {
-        this.certificationauthority = certificationauthority;
     }
 
     public String getVehicleVinCode() {

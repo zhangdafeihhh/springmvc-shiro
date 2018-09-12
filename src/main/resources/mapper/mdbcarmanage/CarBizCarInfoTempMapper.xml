@@ -41,9 +41,9 @@
     <result column="freightType" property="freighttype" jdbcType="VARCHAR" />
     <result column="vehicleEngineDisplacement" property="vehicleEngineDisplacement" jdbcType="VARCHAR" />
     <result column="totalMileage" property="totalmileage" jdbcType="VARCHAR" />
-    <result column="overhaulStatus" property="overhaulstatus" jdbcType="INTEGER" />
+    <result column="overhaulStatus" property="overHaulStatus" jdbcType="INTEGER" />
     <result column="transportNumber" property="transportNumber" jdbcType="VARCHAR" />
-    <result column="certificationAuthority" property="certificationauthority" jdbcType="VARCHAR" />
+    <result column="certificationAuthority" property="certificationAuthority" jdbcType="VARCHAR" />
     <result column="operatingRegion" property="operatingRegion" jdbcType="VARCHAR" />
     <result column="firstDate" property="firstDate" jdbcType="VARCHAR" />
     <result column="transportNumberDateStart" property="transportNumberDateStart" jdbcType="VARCHAR" />
@@ -135,8 +135,8 @@
       #{insurancecompany,jdbcType=VARCHAR}, #{insurancenumber,jdbcType=VARCHAR}, #{insurancetype,jdbcType=VARCHAR}, 
       #{insurancemoney,jdbcType=VARCHAR}, #{insurancedatestart,jdbcType=VARCHAR}, #{insurancedateend,jdbcType=VARCHAR}, 
       #{freighttype,jdbcType=VARCHAR}, #{vehicleEngineDisplacement,jdbcType=VARCHAR}, 
-      #{totalmileage,jdbcType=VARCHAR}, #{overhaulstatus,jdbcType=INTEGER}, #{transportNumber,jdbcType=VARCHAR}, 
-      #{certificationauthority,jdbcType=VARCHAR}, #{operatingRegion,jdbcType=VARCHAR}, 
+      #{totalmileage,jdbcType=VARCHAR}, #{overHaulStatus,jdbcType=INTEGER}, #{transportNumber,jdbcType=VARCHAR},
+      #{certificationAuthority,jdbcType=VARCHAR}, #{operatingRegion,jdbcType=VARCHAR},
       #{firstDate,jdbcType=VARCHAR}, #{transportNumberDateStart,jdbcType=VARCHAR}, #{transportNumberDateEnd,jdbcType=VARCHAR}, 
       #{equipmentNumber,jdbcType=VARCHAR}, #{gpsBrand,jdbcType=VARCHAR}, #{gpsType,jdbcType=VARCHAR}, 
       #{gpsDate,jdbcType=VARCHAR}, #{auditingDate,jdbcType=VARCHAR}, #{vehicleEnginePower,jdbcType=VARCHAR}, 
@@ -167,7 +167,7 @@
       <if test="carModelId != null" >
         car_model_id,
       </if>
-      <if test="carPurchaseDate != null" >
+      <if test="purchaseDate != null" >
         car_purchase_date,
       </if>
       <if test="modelDetail != null" >
@@ -263,13 +263,13 @@
       <if test="totalmileage != null" >
         totalMileage,
       </if>
-      <if test="overhaulstatus != null" >
-        overhaulStatus,
+      <if test="overHaulStatus != null" >
+          overHaulStatus,
       </if>
       <if test="transportNumber != null" >
         transportNumber,
       </if>
-      <if test="certificationauthority != null" >
+      <if test="certificationAuthority != null" >
         certificationAuthority,
       </if>
       <if test="operatingRegion != null" >
@@ -355,8 +355,8 @@
       <if test="carModelId != null" >
         #{carModelId,jdbcType=INTEGER},
       </if>
-      <if test="carPurchaseDate != null" >
-        #{carPurchaseDate,jdbcType=TIMESTAMP},
+      <if test="purchaseDate != null" >
+        #{purchaseDate},
       </if>
       <if test="modelDetail != null" >
         #{modelDetail,jdbcType=VARCHAR},
@@ -451,14 +451,14 @@
       <if test="totalmileage != null" >
         #{totalmileage,jdbcType=VARCHAR},
       </if>
-      <if test="overhaulstatus != null" >
-        #{overhaulstatus,jdbcType=INTEGER},
+      <if test="overHaulStatus != null" >
+        #{overHaulStatus,jdbcType=INTEGER},
       </if>
       <if test="transportNumber != null" >
         #{transportNumber,jdbcType=VARCHAR},
       </if>
-      <if test="certificationauthority != null" >
-        #{certificationauthority,jdbcType=VARCHAR},
+      <if test="certificationAuthority != null" >
+        #{certificationAuthority,jdbcType=VARCHAR},
       </if>
       <if test="operatingRegion != null" >
         #{operatingRegion,jdbcType=VARCHAR},
@@ -546,8 +546,8 @@
       <if test="carModelId != null" >
         car_model_id = #{carModelId,jdbcType=INTEGER},
       </if>
-      <if test="carPurchaseDate != null" >
-        car_purchase_date = #{carPurchaseDate,jdbcType=TIMESTAMP},
+      <if test="purchaseDate != null" >
+        car_purchase_date = #{purchaseDate},
       </if>
       <if test="modelDetail != null" >
         model_detail = #{modelDetail,jdbcType=VARCHAR},
@@ -642,14 +642,14 @@
       <if test="totalmileage != null" >
         totalMileage = #{totalmileage,jdbcType=VARCHAR},
       </if>
-      <if test="overhaulstatus != null" >
-        overhaulStatus = #{overhaulstatus,jdbcType=INTEGER},
+      <if test="overHaulStatus != null" >
+        overhaulStatus = #{overHaulStatus,jdbcType=INTEGER},
       </if>
       <if test="transportNumber != null" >
         transportNumber = #{transportNumber,jdbcType=VARCHAR},
       </if>
-      <if test="certificationauthority != null" >
-        certificationAuthority = #{certificationauthority,jdbcType=VARCHAR},
+      <if test="certificationAuthority != null" >
+        certificationAuthority = #{certificationAuthority,jdbcType=VARCHAR},
       </if>
       <if test="operatingRegion != null" >
         operatingRegion = #{operatingRegion,jdbcType=VARCHAR},
