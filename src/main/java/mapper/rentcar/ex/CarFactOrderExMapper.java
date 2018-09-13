@@ -3,12 +3,13 @@ package mapper.rentcar.ex;
 import java.util.List;
 import java.util.Map;
 
-import com.zhuanche.entity.DriverOrderRecord.OrderTimeEntity;
+import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
 import com.zhuanche.entity.rentcar.CarBizOrderSettleEntity;
 import com.zhuanche.entity.rentcar.CarBizOrderWaitingPeriod;
 import com.zhuanche.entity.rentcar.CarBizPlanEntity;
 import com.zhuanche.entity.rentcar.CarFactOrderInfo;
 import com.zhuanche.entity.rentcar.CarGroupEntity;
+import com.zhuanche.entity.rentcar.ServiceEntity;
 
 public interface CarFactOrderExMapper {
 
@@ -48,4 +49,16 @@ public interface CarFactOrderExMapper {
      * 
      */
     public List<CarBizOrderWaitingPeriod> selectWaitingPeriodListSlave(String orderNo);
+    /**
+     * 
+     */
+    public CarPoolMainOrderDTO queryCarpoolMainForObject(CarPoolMainOrderDTO params);
+    /**
+     * 查询车行类别
+     */
+    public ServiceEntity selectServiceEntityById(Integer serviceId);
+    /**
+     * 查询车型
+     */
+    public String selectModelNameByLicensePlates(String licensePlates);
 }

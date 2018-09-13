@@ -1,17 +1,14 @@
 package com.zhuanche.controller.rentcar;
 
-import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,13 +20,16 @@ import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.rentcar.CarFactOrderInfoDetailDTO;
+import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
 import com.zhuanche.entity.DriverOrderRecord.OrderTimeEntity;
+import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizOrderSettleEntity;
 import com.zhuanche.entity.rentcar.CarBizOrderWaitingPeriod;
+import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.entity.rentcar.CarFactOrderInfo;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.util.CopyBeanUtil;
-
+import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 
 /**
  * ClassName: OrderController 
@@ -114,7 +114,7 @@ public class OrderController{
      */
 	@ResponseBody
 	@RequestMapping(value = "/orderView", method = { RequestMethod.POST,RequestMethod.GET })
-	public CarFactOrderInfoDetailDTO selectUser(@Verify(param = "orderId",rule = "required") Long orderId){
+	public AjaxResponse selectUser(@Verify(param = "orderId",rule = "required") Long orderId){
 		logger.info("*****************查询订单详情 订单id+"+orderId);
 		CarFactOrderInfoDetailDTO orderDTO = new CarFactOrderInfoDetailDTO();
 		long startTime=System.currentTimeMillis();
@@ -147,8 +147,65 @@ public class OrderController{
 		CopyBeanUtil.copyByIgnoreCase(orderDTO,order,true);
 		float excTime=(float)(endTime-startTime)/1000;
 		logger.info("*****************查询订单详情 耗时+"+excTime);
-		return orderDTO;
+		if(orderDTO!=null){
+			return AjaxResponse.success(orderDTO);
+		}else{
+			return AjaxResponse.failMsg(500,"内部错误");
+		}
 	}
+	
+	
+	/**
+     * 查询主订单详情
+     * @param orderId
+     * @return CarFactOrderInfo
+     * @createdate 2018-09-11
+     * Jdd
+     */
+	@ResponseBody
+	@RequestMapping(value = "/poolMainOrderview", method = { RequestMethod.POST,RequestMethod.GET })
+	public CarPoolMainOrderDTO driverOutageAddView(@Verify(param = "mainOrderNo",rule = "required")  String mainOrderNo) {
+		logger.info("主订单页面");
+		CarPoolMainOrderDTO params = new CarPoolMainOrderDTO();
+		params.setMainOrderNo(mainOrderNo);
+		params = carFactOrderInfoService.queryCarpoolMainForObject(params);
+        params = complementingInformation(params);
+		
+        List<CarFactOrderInfo> carFactOrderInfoList = carFactOrderInfoService.getMainOrderByMainOrderNo(params.getMainOrderNo());
+		params.setCarFactOrderInfoList(carFactOrderInfoList);
+		return params;
+	}
+	
+	public CarPoolMainOrderDTO complementingInformation(CarPoolMainOrderDTO params){
+		//查询供应商
+		if(params.getDriverId()!=null){
+			CarBizDriverInfoDTO driverEntity = carFactOrderInfoService.querySupplierIdAndNameByDriverId(params.getDriverId());
+			if(driverEntity!=null){
+				params.setDriverName(driverEntity.getName());
+				params.setDriverPhone(driverEntity.getPhone());
+				CarBizSupplier supplierEntityParams = new CarBizSupplier();
+				supplierEntityParams.setSupplierId(driverEntity.getSupplierId());
+				CarBizSupplier supplierEntity = carFactOrderInfoService.queryCarBizSupplier(supplierEntityParams);
+				if(supplierEntity!=null){
+					params.setSupplierName(supplierEntity.getSupplierFullName());
+				}
+			}
+		}
+		//查询城市
+		CarBizCity cityParams = new CarBizCity();
+		cityParams.setCityId(params.getCityId());
+		CarBizCity cityEntity = this.carFactOrderInfoService.queryCarBizCityById(cityParams);
+		if(cityEntity!=null){
+			params.setCityName(cityEntity.getCityName());
+		}
+		//查询服务类型
+        params.setServiceTypeName(carFactOrderInfoService.serviceTypeName(params.getServiceTypeId()));
+        //查询车行类别
+		params.setGroupName(carFactOrderInfoService.getGroupNameByGroupId(params.getGroupId()));
+		//查询车型
+		params.setModeldetail(carFactOrderInfoService.selectModelNameByLicensePlates(params.getLicensePlates()));
+        return params;
+    }
 	
 	 /**
 	    * 查询LBS提供的轨迹坐标
@@ -202,9 +259,11 @@ public class OrderController{
 					order.setPayperson("乘车人付现金");
 				}
 			}
+			
 			//调订单接口，查询拼车子订单号查主单号
 			String mainOrderNo = carFactOrderInfoService.getMainOrderBySubOrderNo(order.getOrderno());
 			order.setMainOrderNo(mainOrderNo);
+			
 			//调用计费接口
 			String costDetailParamStr = "orderId="+orderId+"&serviceId=1";
 			String result = carFactOrderInfoService.queryCostDetailData(costDetailParamStr);
