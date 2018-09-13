@@ -110,7 +110,7 @@ public class DriverInfoController {
             driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
         }
         if(had && (driverIds==null || driverIds.size()==0)){
-            logger.info(LOGTAG + "查询teamId={},groupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
+            logger.info(LOGTAG + "查询teamId={},teamGroupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
             PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
             return AjaxResponse.success(pageDTO);
         }
@@ -188,7 +188,7 @@ public class DriverInfoController {
             driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
         }
         if(had && (driverIds==null || driverIds.size()==0)){
-            logger.info(LOGTAG + "查询teamId={},groupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
+            logger.info(LOGTAG + "查询teamId={},teamGroupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
             return AjaxResponse.success(list);
         }
         CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();
@@ -259,7 +259,7 @@ public class DriverInfoController {
             driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
         }
         if(had && (driverIds==null || driverIds.size()==0)){
-            logger.info(LOGTAG + "查询teamId={},groupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
+            logger.info(LOGTAG + "查询teamId={},teamGroupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
             list =  Lists.newArrayList();
         }else{
             CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();

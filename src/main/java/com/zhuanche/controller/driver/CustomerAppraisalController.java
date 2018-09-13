@@ -81,7 +81,7 @@ public class CustomerAppraisalController {
             driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
         }
         if(had && (driverIds==null || driverIds.size()==0)){
-            logger.info(LOGTAG + "查询teamId={},groupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
+            logger.info(LOGTAG + "查询teamId={},teamGroupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
             PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
             return AjaxResponse.success(pageDTO);
         }
@@ -151,7 +151,7 @@ public class CustomerAppraisalController {
             driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
         }
         if(had && (driverIds==null || driverIds.size()==0)){
-            logger.info(LOGTAG + "查询teamId={},groupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
+            logger.info(LOGTAG + "查询teamId={},teamGroupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
             PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
             return AjaxResponse.success(pageDTO);
         }
@@ -213,7 +213,7 @@ public class CustomerAppraisalController {
             driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
         }
         if(had && (driverIds==null || driverIds.size()==0)){
-            logger.info(LOGTAG + "查询teamId={},groupId={},permOfTeam={}没有司机评分信息", teamId, teamGroupId, permOfTeam);
+            logger.info(LOGTAG + "查询teamId={},teamGroupId={},permOfTeam={}没有司机评分信息", teamId, teamGroupId, permOfTeam);
             list =  Lists.newArrayList();
         }else {
             CarBizCustomerAppraisalStatisticsDTO carBizCustomerAppraisalStatisticsDTO = new CarBizCustomerAppraisalStatisticsDTO();

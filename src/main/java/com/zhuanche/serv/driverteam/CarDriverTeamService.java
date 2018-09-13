@@ -604,8 +604,16 @@ public class CarDriverTeamService{
 			}else {//不存在司机ID，即返回
 				return set;
 			}
-		}else {//没有车队下小组ID传入，以传入车队ID以及当前用户的数据权限下车队ID查询sijiID
-			List<Integer> integers = carRelateTeamExMapper.queryDriverIdsByTeamId(teamId, teamIds);
+		}else if(teamId!=null) {//没有车队下小组ID传入，以传入车队ID以及当前用户的数据权限下车队ID查询sijiID
+			List<Integer> integers = carRelateTeamExMapper.queryDriverIdsByTeamId(teamId);
+			if(integers!=null && integers.size()>0){
+				set = new HashSet<Integer>(integers);
+				return set;
+			}else {//不存在司机ID，即返回
+				return set;
+			}
+		}else if(teamIds !=null && teamIds.size()>0){
+			List<Integer> integers = carRelateTeamExMapper.queryDriverIdsByTeamIdss(teamIds);
 			if(integers!=null && integers.size()>0){
 				set = new HashSet<Integer>(integers);
 				return set;
@@ -613,5 +621,6 @@ public class CarDriverTeamService{
 				return set;
 			}
 		}
+		return set;
 	}
 }
