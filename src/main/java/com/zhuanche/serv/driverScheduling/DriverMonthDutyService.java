@@ -3,6 +3,9 @@ package com.zhuanche.serv.driverScheduling;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.dutyEnum.EnumDriverMonthDutyStatus;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.dto.CarDriverInfoDTO;
@@ -45,6 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * @description: 司机月排班
@@ -408,8 +412,10 @@ public class DriverMonthDutyService {
 				count = carDriverMonthDutyExMapper.saveDriverMonthDutyList(paramMap);
 			}
 			if (!("".equals(updateDriverMonthDutyList)||updateDriverMonthDutyList==null||updateDriverMonthDutyList.size()==0)) {
-				paramMap.put("updateDriverList", updateDriverMonthDutyList);
-				count += carDriverMonthDutyExMapper.updateDriverMonthDutyList(paramMap);
+				for(DriverMonthDutyRequest param : updateDriverMonthDutyList){
+					count += carDriverMonthDutyExMapper.updateDriverMonthDutyOne(param);
+				}
+//				count += carDriverMonthDutyExMapper.updateDriverMonthDutyList(paramMap);
 			}
 
 			if (count > 0) {
@@ -469,7 +475,10 @@ public class DriverMonthDutyService {
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/4 
-	*/ 
+	*/
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.MASTER )
+	} )
 	public int updateDriverMonthDutyData(CarDriverMonthDuty record){
 		if(Check.NuNObj(record)){
 			return 0;
@@ -483,7 +492,10 @@ public class DriverMonthDutyService {
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/4 
-	*/ 
+	*/
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public CarDriverMonthDuty selectByPrimaryKey(Integer id){
 		CarDriverMonthDuty month = carDriverMonthDutyMapper.selectByPrimaryKey(id);
 		return month;
@@ -496,7 +508,10 @@ public class DriverMonthDutyService {
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/4 
-	*/ 
+	*/
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public List<Map<String,Object>> queryDriverIdsByTeamIds(Set<Integer>  teamIds){
 		return carRelateTeamExMapper.queryDriverIdsByTeamIds(teamIds);
 	}
@@ -507,7 +522,10 @@ public class DriverMonthDutyService {
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/4 
-	*/ 
+	*/
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public PageDTO queryDriverDutyList(DriverMonthDutyRequest param){
 		try{
 			logger.info("查询排班列表service入参："+ JSON.toJSONString(param));
@@ -550,6 +568,11 @@ public class DriverMonthDutyService {
 		throw new IllegalArgumentException("你的excel版本目前poi解析不了");
 	}
 
+	@SuppressWarnings("unchecked")
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE ),
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public Workbook exportExcel(DriverMonthDutyRequest params, String path, Map<String, Object> tabelHeader)
 			throws Exception {
 		FileInputStream io = new FileInputStream(path);
@@ -692,7 +715,10 @@ public class DriverMonthDutyService {
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/4 
-	*/ 
+	*/
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public List<CarDriverInfoDTO> queryDriverListForMonthDuty(DriverMonthDutyRequest param){
 		return carBizDriverInfoExMapper.queryDriverListForMonthDuty(param);
 	}
@@ -703,7 +729,10 @@ public class DriverMonthDutyService {
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/4 
-	*/ 
+	*/
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public List<CarDriverInfoDTO> queryDriverListInfoForMonthDuty(DriverMonthDutyRequest param, Map<String, Object> driverTeamMap, Set<Integer> teamIds) {
 		List<CarDriverInfoDTO> driverEntityList = this.carBizDriverInfoExMapper.queryDriverListForMonthDuty(param);
 		if (null != driverEntityList && !driverEntityList.isEmpty()) {

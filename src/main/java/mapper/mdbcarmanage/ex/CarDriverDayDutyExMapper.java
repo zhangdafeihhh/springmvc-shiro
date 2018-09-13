@@ -12,22 +12,10 @@ import java.util.Map;
 
 public interface CarDriverDayDutyExMapper {
 
-    @SuppressWarnings("rawtypes")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-    } )
     List<CarDriverDayDutyDTO> selectForList(DutyParamRequest dutyParamRequest);
 
-    @SuppressWarnings("rawtypes")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-    } )
     List<CarDriverDayDutyDTO> queryForList(DutyParamRequest dutyParamRequest);
 
-    @SuppressWarnings("rawtypes")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-    } )
     Integer getUnIssueCount(DutyParamRequest dutyParamRequest);
 
 

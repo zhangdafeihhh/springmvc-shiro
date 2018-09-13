@@ -345,7 +345,7 @@
       and car.car_model_id in (${carModelIds})
     </if>
     <if test=" licensePlates !=null and licensePlates !=''">
-      and license_plates like '%${licensePlates}%'
+      and car.license_plates like '%${licensePlates}%'
     </if>
     <if test="purchaseDateBegin !=null and purchaseDateBegin !=''">
       <![CDATA[ and car.car_purchase_date >=  concat(#{purchaseDateBegin},' 00:00:00') ]]>

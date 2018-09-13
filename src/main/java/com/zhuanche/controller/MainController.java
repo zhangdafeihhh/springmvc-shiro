@@ -36,10 +36,10 @@ public class MainController{
 	/**显示首页**/
     @RequestMapping("/index")
     public String index(HttpServletRequest request , HttpServletResponse response,Model model) throws Exception {
-    	logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>log4j桥接至logback测试成功！");
-//		response.sendRedirect(homepageUrl);
-//		return null;
-        return "index";
+    	logger.info(">>>>>>>>>>>>>>>>>跳转至首页（log4j桥接至logback成功！）");
+//        return "index";
+		response.sendRedirect(homepageUrl);
+		return null;
     }
     
     /**显示登录页面 **/

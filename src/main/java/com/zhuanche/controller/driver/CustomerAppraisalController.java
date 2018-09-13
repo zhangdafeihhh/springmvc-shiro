@@ -11,7 +11,6 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalDTO;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
-import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.serv.CustomerAppraisalService;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -232,7 +231,6 @@ public class CustomerAppraisalController {
             list = customerAppraisalService.queryCustomerAppraisalStatisticsList(carBizCustomerAppraisalStatisticsDTO);
         }
         try {
-            //TODO 待完善
             Workbook wb = customerAppraisalService.exportExcelDriverAppraisal(list, request.getRealPath("/")+File.separator+"template"+File.separator+"driver_appraisal.xlsx");
             Componment.fileDownload(response, wb, new String("司机评分".getBytes("utf-8"), "iso8859-1"));
         } catch (Exception e) {
@@ -245,6 +243,8 @@ public class CustomerAppraisalController {
      * @param driverId 司机ID
      * @param month 月份 yyyy-MM
      * @param orderNo 订单号
+     * @param page 起始页，默认0
+     * @param pageSize 取N条，默认20
      * @return
      */
     @ResponseBody
@@ -253,14 +253,27 @@ public class CustomerAppraisalController {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
     public AjaxResponse queryCustomerAppraisalStatisticsDetail(@Verify(param = "driverId", rule = "required") Integer driverId,
-                                                             @Verify(param = "month", rule = "required") String month, String orderNo) {
+                                                               @Verify(param = "month", rule = "required") String month,
+                                                               String orderNo,
+                                                               @RequestParam(value="page", defaultValue="0")Integer page,
+                                                               @RequestParam(value="pageSize", defaultValue="20")Integer pageSize) {
 
         CarBizCustomerAppraisalDTO carBizCustomerAppraisalDTO = new CarBizCustomerAppraisalDTO();
         carBizCustomerAppraisalDTO.setDriverId(driverId);
         carBizCustomerAppraisalDTO.setOrderNo(orderNo);
         carBizCustomerAppraisalDTO.setCreateDateBegin(month);
 
-        List<CarBizCustomerAppraisalDTO> list = customerAppraisalService.queryDriverAppraisalDetail(carBizCustomerAppraisalDTO);
-        return AjaxResponse.success(list);
+        List<CarBizCustomerAppraisalDTO> list = Lists.newArrayList();
+        int total = 0;
+
+        Page p = PageHelper.startPage(page, pageSize, true);
+        try {
+            list = customerAppraisalService.queryDriverAppraisalDetail(carBizCustomerAppraisalDTO);
+            total = (int)p.getTotal();
+        } finally {
+            PageHelper.clearPage();
+        }
+        PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
+        return AjaxResponse.success(pageDTO);
     }
 }

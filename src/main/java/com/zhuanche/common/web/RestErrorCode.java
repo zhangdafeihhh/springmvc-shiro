@@ -114,7 +114,7 @@ public final class RestErrorCode{
 	public static final int MODEL_NOT_EXIST                    = 3008;
 	@ResultMessage("信息不全，请补全")
 	public static final int INFORMATION_NOT_COMPLETE                    = 3009;
-	@ResultMessage("供应商ID={}的供应商不存在")
+	@ResultMessage("供应商ID={0}的供应商不存在")
 	public static final int SUPPLIER_NOT_EXIST                    = 3010;
 	@ResultMessage("所选城市和供应商城市不一致")
 	public static final int CITY_SUPPLIER_DIFFER                    = 3011;
@@ -141,6 +141,8 @@ public final class RestErrorCode{
 	public static final int FILE_ERROR                    = 4001;
 	@ResultMessage("导入模板格式错误")
 	public static final int FILE_TRMPLATE_ERROR                    = 4002;
+    @ResultMessage("导入错误:{0}")
+    public static final int FILE_IMPORT_ERROR                    = 4003;
 	//-----------------------------------------------业务参数：车辆
 	@ResultMessage("车辆信息不存在")
 	public static final int BUS_NOT_EXIST                                               = 1100;
@@ -148,6 +150,10 @@ public final class RestErrorCode{
 
 	@ResultMessage("结果不存在")
 	public static final int NOT_FOUND_RESULT                                               = 1101;
+    @ResultMessage("车牌号已存在")
+    public static final int LICENSE_PLATES_EXIST                                               = 1102;
+    @ResultMessage("车牌号不存在")
+    public static final int LICENSE_PLATES_NOT_EXIST                                                = 1103;
 	@ResultMessage("请求风控资源失败")
 	public static final int RISK_ORDER_DATA_FAIL                                        = 5002;
 	@ResultMessage("上传风控文件失败")

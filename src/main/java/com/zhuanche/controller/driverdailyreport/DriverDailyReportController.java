@@ -272,6 +272,7 @@ public class DriverDailyReportController extends DriverQueryController {
 				list = new ArrayList<DriverDailyReport>();
 			}
 		}
+		String filename = "司机周/月报列表";
 		if(!(StringUtils.isNotEmpty(params.getGroupIds()) && (StringUtils.isEmpty(driverList)))){
 			params.setDriverIds(driverList);
 			//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
@@ -279,14 +280,15 @@ public class DriverDailyReportController extends DriverQueryController {
 			//开始查询
 			if ( reportType==0 ) {
 				list = this.driverDailyReportExMapper.queryForListObject(params);
+				filename = "司机日报列表";
 			}else {
 				list = this.driverDailyReportExMapper.queryWeekForListObject(params);
 			}
 			rows = this.selectSuppierNameAndCityNameDays(list,reportType);
 		}
 		try {
-			Workbook wb = this.exportExcel(rows,request.getRealPath("/")+ File.separator+"template"+File.separator+"driverDailyReport_info.xlsx");
-			this.exportExcelFromTemplet(request, response, wb, new String("司机周/月报列表".getBytes("gb2312"), "iso8859-1"));
+			Workbook wb = this.exportExcel(rows,request.getRealPath("/")+ File.separator+"template"+File.separator+"driverDailyReport_info.xlsx",reportType);
+			this.exportExcelFromTemplet(request, response, wb, new String(filename.getBytes("gb2312"), "iso8859-1"));
 			return AjaxResponse.success("文件导出成功");
 		} catch (Exception e) {
 			log.error("导出失败哦！");
@@ -468,7 +470,7 @@ public class DriverDailyReportController extends DriverQueryController {
 	 * @return
 	 * @throws Exception
 	 */
-	public Workbook exportExcel(List<DriverDailyReportDTO> list, String path)
+	public Workbook exportExcel(List<DriverDailyReportDTO> list, String path, Integer reportType)
 			throws Exception {
 		FileInputStream io = new FileInputStream(path);
 		Workbook wb = new XSSFWorkbook(io);
@@ -556,7 +558,11 @@ public class DriverDailyReportController extends DriverQueryController {
 				cell.setCellValue(s.getOperationNum());
 
 				cell = row.createCell(24);
-				cell.setCellValue(s.getStatDate());
+				if (reportType==0){
+					cell.setCellValue(s.getStatDate());
+				}else{
+					cell.setCellValue("("+s.getStatDateStart()+")-("+s.getStatDateEnd()+")");
+				}
 
 				i++;
 			}

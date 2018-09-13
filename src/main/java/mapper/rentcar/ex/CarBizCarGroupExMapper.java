@@ -23,4 +23,8 @@ public interface CarBizCarGroupExMapper {
      * @return
      */
     List<CarBizCarGroup> queryCarGroupList(@Param("type") Integer type);
+    /**
+     * 
+     */
+    public String getGroupNameByGroupId(Integer groupId);
 }

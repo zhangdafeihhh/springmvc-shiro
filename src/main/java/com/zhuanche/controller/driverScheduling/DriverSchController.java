@@ -181,8 +181,8 @@ public class DriverSchController {
     @RequestMapping(value = "/queryDriverTeamReList")
     public AjaxResponse queryDriverTeamReList(TeamGroupRequest teamGroupRequest){
         logger.info("获取班制设置司机列表入参:"+ JSON.toJSONString(teamGroupRequest));
-        List<CarDriverInfoDTO> list = carDriverShiftsService.queryDriverTeamReList(teamGroupRequest);
-        return AjaxResponse.success(list);
+        PageDTO pageDTO = carDriverShiftsService.queryDriverTeamReList(teamGroupRequest);
+        return AjaxResponse.success(pageDTO);
     }
 
     /**

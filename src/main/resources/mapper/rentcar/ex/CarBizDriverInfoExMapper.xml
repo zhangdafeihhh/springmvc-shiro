@@ -362,9 +362,6 @@
     <if test="phone!=null and phone!=''">
       and i.phone LIKE '%${phone}%'
     </if>
-    <if test="serviceCityId!=null and serviceCityId!=''">
-      and i.service_city = #{serviceCityId}
-    </if>
     <if test="cityIds!=null and cityIds.size()>0">
       and c.city_id IN
       <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
@@ -384,13 +381,13 @@
   <sql id="allBaseColumnWhereList" >
     <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR" >
       <if test="phone != null and phone != ''" >
-        and phone = #{phone,jdbcType=VARCHAR}
+        and phone LIKE '%${phone}%'
       </if>
       <if test="name != null and name != ''" >
-        and name = #{name,jdbcType=VARCHAR}
+        and name LIKE CONCAT(#{name},'%')
       </if>
       <if test="licensePlates != null and licensePlates != ''" >
-        and license_plates = #{licensePlates,jdbcType=VARCHAR}
+        and license_plates LIKE '%${licensePlates}%'
       </if>
       <if test="status != null" >
         and status = #{status,jdbcType=INTEGER}
@@ -1483,4 +1480,16 @@
     SET uickpay_customerid = #{quickpayCustomerID}
     WHERE driver_id = #{driverID}
   </update>
+  
+  
+  <select id="querySupplierIdAndNameByDriverId" parameterType="java.lang.Integer" resultType="com.zhuanche.dto.rentcar.CarBizDriverInfoDTO">
+		SELECT
+		name ,
+		phone,
+		supplier_id AS supplierId
+		FROM
+		car_biz_driver_info
+		where driver_id = #{driverId}
+   </select>
+  
 </mapper>

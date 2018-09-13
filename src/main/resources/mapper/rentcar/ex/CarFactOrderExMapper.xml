@@ -91,4 +91,410 @@
     SELECT order_id FROM car_fact_order WHERE order_no = #{orderno}
   </select>
 
+
+
+
+	<!--  老车管拷贝 ， 订单详情 -->
+	<resultMap type="com.zhuanche.entity.rentcar.CarFactOrderInfo" id="CarFactOrderInfoMap">
+		<result column="push_driver_type" property="pushDriverType" jdbcType="INTEGER" />
+		<result property="riderName" column="rider_name" />
+		<result property="riderPhone" column="rider_phone" />
+		<result property="serviceName" column="service_name" />
+		<result property="cityId" column="city_id"/>
+		<result property="cityName" column="city_name" />
+		<result property="bookingStartAddr" column="booking_start_addr" />
+		<result property="bookingEndAddr" column="booking_end_addr" />
+		<result property="bookingStartPoint" column="booking_start_point" />
+		<result property="bookingEndPoint" column="booking_end_point" />
+		<result property="factStartAddr" column="fact_start_addr" />
+		<result property="factEndAddr" column="fact_end_addr" />
+		<result property="factDate" column="fact_date" />
+		<result property="factEndDate" column="fact_end_date" />
+		<result property="bookinkGroupids" column="booking_groupids" />
+		<result property="bookingDateStr" column="bookingDateStr" />
+		<result property="factDateStr" column="factDateStr" />
+		<result property="driverName" column="name" />
+		<result property="licensePlates" column="license_plates" />
+		<result property="bookingGroupName" column="bookingGroupName" />
+		<result property="factGroupName" column="factGroupName" />
+		<result property="travelTime" column="travel_time" />
+		<result property="travelMileage" column="travel_mileage" />
+		<result property="memo" column="memo" />
+		<result property="basePrice" column="base_price" />
+		<result property="amount" column="amount" />
+		<result property="totalAmount" column="total_amount" />
+		<result property="overMileagePrice" column="over_mileage_price" />
+		<result property="overTimePrice" column="over_time_price" />
+		<result property="longDistancePrice" column="long_distance_price" />
+		<result property="status" column="status" />
+		<result property="bookingUserId" column="booking_user_id" />
+		<result property="serviceTypeId" column="service_type_id" />
+		<result property="airlineNo" column="airline_no" />
+		<result property="driverId" column="driver_id" />
+        <result property="orderno" column="order_no"/>
+		<result property="basePrice" column="base_price" />
+		<result property="factDriver" column="fact_driver" />
+		<result property="overMileageNum" column="over_mileage_num" />
+		<result property="overTimeNum" column="over_time_num" />
+		<result property="longDistanceNum" column="long_distance_num" />
+		<result property="longdistanceprice" column="long_distance_price"/>
+		<result property="outServiceMileage" column="out_service_mileage" />
+		<result property="outServicePrice" column="out_service_price" />
+		<result property="nightServiceMileage" column="night_service_mileage" />
+		<result property="nightServicePrice" column="night_service_price" />
+		<result property="nightdistancenum" column="night_distance_num"/>
+		<result property="nightdistanceprice" column="night_distance_price"/>
+		<result property="forecastAmount" column="forecast_amount" />
+		<result property="createdate" column="createdate"/>
+		<result property="bookingname" column="bookingname"/>
+		<result property="bookingphone" column="bookingphone"/>
+		<result property="driverphone" column="driverphone"/>
+		<result property="modeldetail" column="model_detail"/>
+		<result property="drivername" column="drivername"/>
+		<result property="driverphone" column="driverphone"/>
+		<result property="yyperson" column="yyperson"/>
+		<result property="yydate" column="yydate"/>
+		<result property="yymemo" column="yymemo"/>
+		<result property="qxmemo" column="qxmemo"/>
+		<result property="qxperson" column="qxperson"/>
+		<result property="qxdate" column="qxdate"/>
+		<result property="qxreasonname" column="qxreasonname"/>
+		<result property="jmname" column="jmname"/>
+		<result property="jmdate" column="jmdate"/>
+		<result property="jmprice" column="jmprice"/>
+		<result property="jmreason" column="jmreason"/>
+		<result property="reductiontotalprice" column="reduction_totalprice"/>
+		<result property="detailId" column="detail_id"/>
+		<result property="customeramount" column="customeramount"/>
+		<result property="yystatus" column="yystatus"/>
+		<result property="weixin" column="weixin"/>
+		<result property="zfb" column="zfb"/>
+		<result property="qxcancelstatus" column="qxcancelstatus"/>
+		<result property="actualPayAmount" column="actualPayAmount"/>
+		<result property="paydriver" column="paydriver"/>
+		<result property="decimalsFees" column="decimalsFees"/>
+		<result property="paymentCustomer" column="paymentCustomer"/>
+		<result property="paymentDriver" column="paymentDriver"/>
+		<result property="customerRejectPay" column="customer_reject_pay"/>
+		<result property="payFlag" column="pay_flag"/>
+		<result property="couponId" column="coupon_id"/>
+		<result property="designatedDriverFee" column="designatedDriverFee"/>
+		<result property="baiDuOrCtripPrice" column="baiDuOrCtripPrice"/>
+		<result property="channelsNum" column="channelsNum"/>
+		<result property="languageServiceFee" column="languageServiceFee"/>
+		<result property="distantDetail" column="distantDetail"/>
+		<result property="channelDiscountDriver" column="channelDiscountDriver"/>
+		<result property="airportId" column="airport_id"/>
+	</resultMap>
+	
+	<select id="selectByPrimaryKey" resultMap="CarFactOrderInfoMap" parameterType="java.lang.Long">
+		SELECT
+			a.order_no,
+			IFNULL(a.channels_num,0)as channelsNum,
+			a.pay_flag ,			
+			a.rider_name ,
+			a.rider_phone ,
+			c.service_name,
+			a.city_id,
+			d.city_name ,
+			a.booking_start_addr ,
+			a.push_driver_type,
+			a.booking_end_addr ,
+			 a.booking_start_point,
+  			a.booking_end_point,
+			a.fact_start_addr ,
+			a.fact_end_addr,
+			a.fact_date,
+  			a.fact_end_date,
+  			a.booking_groupids,
+			n.`name` AS bookingname,
+       	    n.phone AS bookingphone,
+      	    e.`name` AS drivername,
+        	e.phone AS driverphone,
+        	k.model_detail,
+			DATE_FORMAT(a.create_date,'%Y-%m-%d %T') AS createdate, 
+			DATE_FORMAT(a.booking_date,'%Y-%m-%d %T')as bookingDateStr,
+			DATE_FORMAT(a.fact_date,'%Y-%m-%d %T')as factDateStr,
+			e.name ,
+			a.license_plates ,
+			f.group_name bookingGroupName,
+			m.group_name
+			factGroupName,
+			b.travel_time ,
+			b.travel_mileage ,
+			b.night_distance_num,
+			b.night_distance_price,
+			b.long_distance_price,
+			b.reduction_totalprice,
+		 	b.detail_id,
+		 	IFNULL(b.actual_pay_amount,0) as actualPayAmount,
+		 	IFNULL(b.hot_duration_fees,0) as hotDurationFees,
+		 	IFNULL(b.hot_duration,0) as hotDuration,
+		 	IFNULL(b.hot_mileage,0) as hotMileage,
+		 	IFNULL(b.hot_mileage_fees,0) as hotMileageFees,
+		 	IFNULL(b.nighit_duration,0) as nighitDuration,
+		 	IFNULL(b.nighit_duration_fees,0) as nighitDurationFees,
+		 	IFNULL(b.driver_pay,0) as paydriver,
+		 	IFNULL(b.decimals_fees,0) as decimalsFees,
+		 	IFNULL(paymentcustomer.amount,0) AS paymentCustomer,
+	 		IFNULL(paymentdriver.amount,0) AS paymentDriver,
+			a.memo ,
+			h.base_price ,
+			b.total_amount ,
+			b.over_mileage_price ,
+			b.over_time_price ,
+			a.status,
+			a.booking_user_id,
+			a.service_type_id,
+			a.airline_no,
+			a.driver_id,
+			e1.`name` fact_driver,
+			e1.phone driverphone,
+			b.over_mileage_num ,
+			b.over_time_num,
+			b.long_distance_num,
+			b.out_service_mileage,
+			b.out_service_price,
+			b.night_service_mileage,
+			b.night_service_price,
+			b.forecast_amount,
+			x.`NAME` AS yyperson,
+			SUM(cbca.amount) AS customeramount,
+  			DATE_FORMAT(x.create_date,'%Y-%m-%d %T')as yydate,
+ 			x.memo as yymemo,
+ 			x.`status` AS yystatus,
+        	y.memo AS qxmemo,
+  			y.`NAME` AS qxperson,
+			DATE_FORMAT(y.create_date, '%Y-%m-%d %T') AS qxdate,
+			y.cancel_type AS qxreasonname,
+		 	y.cancel_status as qxcancelstatus,
+			z.`name` AS jmname,
+			DATE_FORMAT(z.reduction_date,'%Y-%m-%d %T')as jmdate,
+  			z.reduction_price as jmprice,
+  			z.reduction_reason AS jmreason,
+  			IFNULL(de.wx_settle_amount, 0) AS weixin,
+			IFNULL(de.zfb_settle_amount, 0) AS zfb,
+			IFNULL(de.passenger_pending_pay, 0) AS passengerPendingPay,
+			de.settle_date settleDate,
+			de.pay_type payType,
+  			<!-- z.amount AS amount, -->
+  			det.customer_reject_pay,
+  			<!--addBy zsc 2016-03-08 新增指定司机费用 -->
+			 IFNULL(b.designated_driver_fee, 0) as designatedDriverFee,
+			 <!--addBy lwl 2016-04-15 新增等候时长 -->
+			 IFNULL(b.waiting_minutes, 0) as waitingTime,
+			 <!--addBy lwl 2016-04-15 新增等候费用 -->
+			 IFNULL(b.waiting_fee, 0) as waitingPrice,
+			 <!-- add by lwl 2016-05-10 新增 百度 携程支付 -->
+			 partner.pay_amount as baiDuOrCtripPrice,
+			 IFNULL(deo.language_service_fee, 0) as languageServiceFee,
+			 deo.distant_detail distantDetail,
+			 deo.channel_discount_driver channelDiscountDriver,
+			 a.airport_id
+		from car_fact_order a
+		LEFT JOIN car_biz_order_cost_detail_extension deo ON deo.order_id = a.order_id
+		LEFT JOIN car_biz_order_cost_detail b on a.order_id=b.order_id
+		LEFT JOIN car_biz_service c on a.service_type_id=c.service_id
+		LEFT JOIN car_biz_city d on a.city_id=d.city_id
+		LEFT JOIN car_biz_driver_info e on a.driver_id=e.driver_id
+		LEFT JOIN car_biz_car_group f on a.car_group_id=f.group_id
+		LEFT JOIN car_biz_pricing h on h.price_id=b.price_plan_id and b.price_plan_version=h.version
+		<!-- left join car_biz_coupons i on i.coupons_id=b.coupon_id -->
+		LEFT JOIN car_biz_car_info k ON e.license_plates=k.license_plates
+		LEFT JOIN car_biz_driver_info e1 on a.fact_driver_id=e1.driver_id
+		LEFT JOIN car_biz_car_group m on e1.group_id=m.group_id
+		LEFT JOIN car_biz_customer n ON n.customer_id=a.booking_user_id
+		LEFT JOIN car_biz_partner_pay_detail partner ON partner.order_no=a.order_no
+		LEFT JOIN (
+	SELECT
+		c.memo,
+		c.create_by,
+		c.create_date,
+        c.order_id,
+        c.status,
+		a.`name` AS NAME
+	FROM
+		car_biz_order_dissent AS c
+	LEFT JOIN car_sys_user AS a ON a.user_id = c.create_by where c.order_id=#{orderId , jdbcType=BIGINT}
+    ) x ON x.order_id = a.order_id
+	LEFT JOIN (
+	SELECT
+		c.memo,
+		c.create_by,
+		c.create_date,
+    	c.order_id,
+		a.`name` AS NAME,
+    	c.cancel_type,
+    	c.cancel_status
+	FROM
+		car_biz_order_cancel_reason AS c
+	LEFT JOIN car_sys_user AS a ON a.user_id = c.create_by where c.order_id=#{orderId , jdbcType=BIGINT}
+		) y ON y.order_id=a.order_id
+	LEFT JOIN (
+	SELECT
+   	 	a.`name`AS name,
+    	c.reduction_date,
+    	c.reduction_price,
+    	c.reduction_reason,
+    	c.order_id
+	FROM
+		car_biz_order_cost_detail AS c
+	LEFT JOIN car_sys_user AS a ON a.user_id =c.reduction_person 
+	where c.order_id=#{orderId , jdbcType=BIGINT}
+			) z ON z.order_id=a.order_id
+	LEFT JOIN car_biz_wxpay_payrecord wi on a.order_no=wi.order_no  AND wi.pay_order_flag=1
+	LEFT JOIN car_biz_ailipay_payrecord al ON a.order_no=al.order_no AND al.pay_order_flag=1
+	LEFT JOIN car_biz_customer_account_detail cbca ON a.order_no=cbca.order_no AND cbca.operation=3 
+	LEFT JOIN car_biz_payment_detail paymentcustomer ON paymentcustomer.relative_no=a.order_no
+	AND paymentcustomer.payment_type=2 and paymentcustomer.status='00'
+	LEFT JOIN car_biz_payment_detail paymentdriver ON paymentdriver.relative_no=a.order_no
+	AND paymentdriver.payment_type=4
+	LEFT JOIN car_biz_order_settle_detail det on a.order_id=det.order_id
+	LEFT JOIN car_biz_order_settle_detail_extension de on det.order_no=de.order_no
+	where a.order_id = #{orderId , jdbcType=BIGINT}
+	</select>
+	
+	<select id="selectDriverSettleByOrderId" parameterType="java.lang.Long" resultType="com.zhuanche.entity.rentcar.CarBizOrderSettleEntity">
+		SELECT
+				detail.coupon_amount AS couponAmount,
+				detail.coupon_settle_amount AS couponSettleAmount,
+				detail.customer_creditcard_amount AS customerCreditcardAmount,
+				detail.gift_settle_amount AS giftSettleAmount,
+				detail.charge_settle_amount AS chargeSettleAmount,
+				detail.deiver_creditcard_amount AS driverCreditcardAmount,
+				detail.order_original_amount AS orderAmount,
+				detail.deiver_cash_amount AS driverCashAmount,
+				detail.driver_actual_pay AS driverActualPay,
+				detail.driver_pay AS driverPay,
+				detail.pos_pay AS posPay
+		FROM
+			car_biz_order_settle_detail detail
+		WHERE detail.order_id=#{orderId}
+	</select>
+	
+	<select id="selectCarGroupById" parameterType="java.lang.Integer" resultType="com.zhuanche.entity.rentcar.CarGroupEntity">
+		SELECT
+			group_id as groupId,
+			car_biz_car_group.create_date as createDate,
+			car_biz_car_group.update_date as updateDate,
+		  	group_name as groupName,
+			seat_num as seatNum,
+			chartered_status as charteredStatus,
+			rank,
+			car_biz_car_group.sort,
+			car_biz_car_group.status,
+			car_biz_car_group.create_by as createBy,
+			car_biz_car_group.update_by as updateBy,
+			car_biz_car_group.memo as memo,
+			u1.name as createName,
+			u2.name as updateName
+		FROM
+			car_biz_car_group
+		LEFT JOIN
+			car_sys_user u1
+		ON
+			car_biz_car_group.create_by=u1.user_id
+		LEFT JOIN
+			car_sys_user u2
+		ON
+			car_biz_car_group.update_by=u2.user_id
+		where 
+			group_id=#{id} 
+	</select>
+	
+	<select id="selectByListPrimaryKey" resultType="com.zhuanche.entity.rentcar.CarFactOrderInfo"  parameterType="java.lang.Long">
+		SELECT
+			 b.cost,
+			 c.cost_type_name costTypeName
+		from 
+			car_fact_order a
+		JOIN car_biz_other_service_cost b on a.order_id=b.order_id
+		JOIN car_biz_cost_type c on b.cost_type_id=c.cost_type_id
+		where
+		a.order_id =
+		#{orderId , jdbcType=BIGINT}
+	</select>
+	
+	<!-- 查询价格计划快照的价格计划 -->
+	<select id="selectByOrderNo" parameterType="map" resultType="com.zhuanche.entity.rentcar.CarBizPlanEntity">
+		SELECT
+			c.plan_id AS planId,
+			c.version as planVer,
+			c.price_id as priceId, 
+			c.service_id as serviceId,
+			c.mileage_price as mileagePrice,
+			c.minute_price as minutePrice,
+			c.over_time_price as overTimePrice,
+			c.over_mileage_price as overMileagePrice,
+			c.base_price as basePrice,
+			c.peak_price as peakPrice,
+			c.peak_price_time as peakPriceTime,
+			c.include_long_distance as includeLongDistance,
+			c.include_mileage as includeMileage,
+			c.include_minute as includeMinute,
+			c.long_distance_price as longDistancePriceRate,
+			c.night_service_price as nightServicePrice,
+			c.night_service_price_time as nightServicePriceTime
+			FROM
+				car_biz_pricing_snapshoot c
+			WHERE
+				c.order_no = #{orderNo}
+			AND c.`status` = 1
+		</select>
+	
+	
+	<select id="selectWaitingPeriodListSlave"  parameterType="String" resultType="com.zhuanche.entity.rentcar.CarBizOrderWaitingPeriod">
+		SELECT
+			order_no as orderNo ,
+			DATE_FORMAT(start_waiting_time, '%Y-%m-%d %T') AS startWaitingTime,
+			DATE_FORMAT(end_waiting_time, '%Y-%m-%d %T') AS endWaitingTime
+		FROM car_biz_order_waiting_period 
+		where  order_no=#{orderNo}
+	</select>
+	
+	
+	<!-- mapper基础标准: 当前表所有字段结果集 -->
+	<sql id="Base_Carpool_MainColumn_List">
+		main_order_id, main_order_no, service_type_id, city_id, status, order_total_num,
+		finish_order_num, first_order_id, last_order_id, driver_start_long_addr, driver_start_short_addr,
+		driver_start_point, driver_start_date, driver_end_long_addr, driver_end_short_addr,
+		driver_end_point, driver_end_date, driver_id, group_id, license_plates, driver_total_mileage,
+		driver_total_time, driver_total_fee, create_date, create_by, update_date, update_by
+  	</sql>
+  	
+	<select id="queryCarpoolMainForObject" resultMap="BaseResultMap" parameterType="com.zhuanche.dto.rentcar.CarPoolMainOrderDTO">
+		select
+		<include refid="Base_Carpool_MainColumn_List"/>
+		,DATE_FORMAT(driver_start_date,'%Y-%m-%d %H:%i:%s') driverStartDateStr
+		,DATE_FORMAT(driver_end_date,'%Y-%m-%d %H:%i:%s') driverEndDateStr
+		,DATE_FORMAT(create_date,'%Y-%m-%d %H:%i:%s') createDateStr
+		,DATE_FORMAT(update_date,'%Y-%m-%d %H:%i:%s') updateDateStr
+		from carpool_main_order
+		where main_order_no = #{mainOrderNo,jdbcType=VARCHAR}
+	</select>
+	
+	 <select id="selectServiceEntityById" parameterType="java.lang.Integer" resultType="com.zhuanche.entity.rentcar.ServiceEntity">
+		 SELECT
+			service_id as serviceId,
+			service.service_name as serviceName,
+			service.service_no as serviceNo,
+			service.sort as sort,
+			service.update_date as updateDate,
+			service.create_date as createDate,
+			service.status as status,
+			service.memo as memo
+		FROM
+			car_biz_service service
+		WHERE
+		 service_id = #{serviceId,jdbcType=BIGINT}
+   </select>
+   
+	<select id="selectModelNameByLicensePlates" resultType="java.lang.String" parameterType="java.lang.String">
+    	SELECT model.model_name AS modeName
+		FROM car_biz_car_info car
+		LEFT JOIN car_biz_model model ON model.model_id = car.car_model_id
+		WHERE car.license_plates = #{licensePlates}
+    </select>
+    
+    
 </mapper>

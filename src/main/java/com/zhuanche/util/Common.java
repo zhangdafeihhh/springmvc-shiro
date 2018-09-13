@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -49,6 +50,15 @@ public class Common {
 	public static final String MAIN_ORDER_KEY = "5a49cc61e15f40c98e2dbd6d56581830";
 	//拼车订单查询end
 	
+	//查询LBS提供的轨迹坐标URL
+	public static final String LBS_DRIVING_ROUTE = "/driving/route";
+	
+	//查询订单明细中计费明细相关数据
+	public static final String COST_ORDER_DETAIL = "/orderCostdetail/getCostDetail";
+	
+	//订单接口提供，查询 订单列表
+    public static final String ORDER_ORDER_LIST_DATE = "/order/v1/search";
+		
 	// redis key prefix~~~~~~~~~~~~~~~~~~~~~~start~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	public static final String V2_D_G_I = "mp_rest_driver_";
 	// 清理司机redis缓存
