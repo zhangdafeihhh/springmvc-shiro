@@ -446,6 +446,8 @@
       <if test="memo != null">
         memo,
       </if>
+       create_date,
+       update_date
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="password != null">
@@ -754,6 +756,8 @@
       <if test="memo != null">
         #{memo,jdbcType=LONGVARCHAR},
       </if>
+      now(),
+      now()
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp">
@@ -1065,6 +1069,7 @@
       <if test="memo != null">
         memo = #{memo,jdbcType=LONGVARCHAR},
       </if>
+       update_date = now()
     </set>
     where driver_id = #{driverId,jdbcType=INTEGER}
   </update>
