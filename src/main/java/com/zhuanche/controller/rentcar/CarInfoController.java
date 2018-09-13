@@ -418,11 +418,10 @@ public class CarInfoController {
      * 车辆信息导入
      */
     @RequestMapping(value = "/importCarInfo")
-    public Object importCarInfo(@RequestParam("fileName") MultipartFile fileName, HttpServletRequest request) {
+    public AjaxResponse importCarInfo(@RequestParam("fileName") MultipartFile fileName, HttpServletRequest request) {
         logger.info("车辆信息导入保存:importCarInfo,参数" + fileName);
         Map<String, Object> result = new HashMap<String, Object>();
-        result = this.carService.importCarInfo(fileName, request);
-        return result;
+        return carService.importCarInfo(fileName, request);
     }
 
     /**
