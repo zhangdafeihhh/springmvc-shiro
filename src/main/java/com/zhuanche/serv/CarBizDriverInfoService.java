@@ -775,6 +775,7 @@ public class CarBizDriverInfoService {
         String resultError1 = "-1";//模板错误
         String resultErrorMag1 = "导入模板格式错误!";
         List<CarImportExceptionEntity> listException = Lists.newArrayList(); // 数据错误原因
+        int count = 0;
 
         String fileName = file.getOriginalFilename();
         String suffixName = fileName.substring(fileName.lastIndexOf("."));
@@ -1165,9 +1166,9 @@ public class CarBizDriverInfoService {
 
             int minRowIx = 1;// 过滤掉标题，从第一行开始导入数据
             int maxRowIx = sheet.getLastRowNum(); // 要导入数据的总条数
-            int successCount = 0;// 成功导入条数
 
             for (int rowIx = minRowIx; rowIx <= maxRowIx; rowIx++) {
+                count ++;
                 Row row = sheet.getRow(rowIx); // 获取行对象
                 if (row == null) {
                     continue;
@@ -2416,7 +2417,7 @@ public class CarBizDriverInfoService {
                         }
                     }
 
-                    //TODO 保存司机信息
+                    //保存司机信息
                     Map<String, Object> stringObjectMap = this.saveDriver(carBizDriverInfoDTO);
                     if (stringObjectMap != null && stringObjectMap.containsKey("result") && (int)stringObjectMap.get("result")==1) {
                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -2437,37 +2438,27 @@ public class CarBizDriverInfoService {
                 }
             }
         }
-
-        String download = "";
         try {
             // 将错误列表导出
             if(listException.size() > 0) {
-//                Workbook wb = Common.exportExcel(request.getServletContext().getRealPath("/")+ "template" + File.separator + "car_exception.xlsx", listException);
-//                download = Common.exportExcelFromTempletToLoacl(request, wb,new String("ERROR".getBytes("utf-8"), "iso8859-1") );
-//                Componment.fileDownload(response, wb, new String("司机导入错误信息".getBytes("utf-8"), "iso8859-1"));
                 StringBuilder errorMsg = new StringBuilder();
                 for (CarImportExceptionEntity entity:listException){
                     errorMsg.append(entity.getReson()).append(";");
                 }
                 resultMap.put("result", "0");
-                resultMap.put("msg", "有错误信息");
-                resultMap.put("download", errorMsg);
+                resultMap.put("msg", errorMsg);
                 return resultMap;
             }
         }catch(Exception e){
             e.printStackTrace();
         }
-//        if (!"".equals(download) && download != null) {
-//            resultMap.put("result", 0);
-//            resultMap.put("msg", "有错误信息");
-//            resultMap.put("download", download);
-//        } else {
-//            resultMap.put("result", 1);
-//            resultMap.put("msg", "成功");
-//            resultMap.put("download", "");
-//        }
-        resultMap.put("result", "1");
-        resultMap.put("msg", "成功");
+        if(count==0){
+            resultMap.put("result", "0");
+            resultMap.put("msg", "表中没有数据，请检查");
+        }else {
+            resultMap.put("result", "1");
+            resultMap.put("msg", "成功");
+        }
         return resultMap;
     }
 

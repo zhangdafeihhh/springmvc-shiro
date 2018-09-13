@@ -670,54 +670,11 @@ public class DriverInfoController {
             return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
         }
         if(resultMap!=null && "0".equals(resultMap.get("result").toString())){
-            return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR, resultMap.get("download").toString());
+            return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR, resultMap.get("msg").toString());
         }
         return AjaxResponse.success(resultMap);
     }
 
-    /**
-     * 下载司机导入错误的信息
-     * @param fileName
-     * @param request
-     * @param response
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping(value = "/exportException")
-    public AjaxResponse exportException(@Verify(param = "fileName", rule = "required") String fileName,
-                                        HttpServletRequest request,HttpServletResponse response) {
-
-        String path = request.getServletContext().getRealPath("/") + fileName;
-        this.fileDownload(response,path);
-        return AjaxResponse.success(null);
-    }
-
-    public void fileDownload(HttpServletResponse response,String path) {
-
-        File file = new File(path);// path是根据日志路径和文件名拼接出来的
-        String filename = file.getName();// 获取日志文件名称
-        try {
-            InputStream fis = new BufferedInputStream(new FileInputStream(path));
-            byte[] buffer = new byte[fis.available()];
-            fis.read(buffer);
-            fis.close();
-            response.reset();
-            // 先去掉文件名称中的空格,然后转换编码格式为utf-8,保证不出现乱码,这个文件名称用于浏览器的下载框中自动显示的文件名
-            response.addHeader("Content-Disposition", "attachment;filename=" + new String(filename.replaceAll(" ", "").getBytes("utf-8"),"iso8859-1"));
-            response.addHeader("Content-Length", "" + file.length());
-            OutputStream os = new BufferedOutputStream(response.getOutputStream());
-            response.setContentType("application/octet-stream");
-            os.write(buffer);// 输出文件
-            os.flush();
-            os.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
     @ResponseBody
     @RequestMapping(value = "/selectByPhone")
     @MasterSlaveConfigs(configs={
