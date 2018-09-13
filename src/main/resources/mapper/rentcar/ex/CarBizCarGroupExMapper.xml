@@ -64,9 +64,6 @@
       LEFT JOIN car_sys_user u1 on u1.user_id = g.create_by
       LEFT JOIN car_sys_user u2 on u2.user_id = g.update_by
       where 1=1 and  g.group_name  = #{groupName}
-      <if test="cityId !=null and cityId !=''">
-          and cgc.city_id = #{cityId}
-      </if>
       GROUP BY g.sort, g.update_date DESC
   </select>
   <select id="queryForObject" resultType="com.zhuanche.entity.rentcar.CarBizCarGroup" parameterType="com.zhuanche.entity.rentcar.CarBizCarGroup">

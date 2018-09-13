@@ -2,6 +2,8 @@ package com.zhuanche.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -183,4 +185,14 @@ public class Check {
 	private Check() {
 		throw new AssertionError("Uninstantiable class");
 	};
+
+    public static void main(String[] args) {
+        Long n1 = 6553699777L;
+        DecimalFormat df1 = new DecimalFormat("##,###.##");
+        System.out.println(df1.format(n1));//1,234.527
+
+        DecimalFormat a = new DecimalFormat(".##");
+        String s= a.format(33333);
+        System.err.println(s);
+    }
 }
