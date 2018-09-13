@@ -6,6 +6,8 @@ import java.util.List;
 import com.zhuanche.entity.rentcar.CarBizOrderWaitingPeriod;
 
 public class CarFactOrderInfoDetailDTO{
+	//是否主订单 y / n 
+	private String isMainOrder;
 	//司机出发时间
 	private String driverBeginTime;
 	//司机到达上车地点 
@@ -957,6 +959,14 @@ public class CarFactOrderInfoDetailDTO{
 
 	public void setCarBizOrderWaitingPeriodList(List<CarBizOrderWaitingPeriod> carBizOrderWaitingPeriodList) {
 		this.carBizOrderWaitingPeriodList = carBizOrderWaitingPeriodList;
+	}
+
+	public String getIsMainOrder() {
+		return isMainOrder;
+	}
+
+	public void setIsMainOrder(String isMainOrder) {
+		this.isMainOrder = isMainOrder;
 	}
 	
 	

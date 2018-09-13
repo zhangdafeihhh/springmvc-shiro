@@ -453,4 +453,48 @@
 	</select>
 	
 	
+	<!-- mapper基础标准: 当前表所有字段结果集 -->
+	<sql id="Base_Carpool_MainColumn_List">
+		main_order_id, main_order_no, service_type_id, city_id, status, order_total_num,
+		finish_order_num, first_order_id, last_order_id, driver_start_long_addr, driver_start_short_addr,
+		driver_start_point, driver_start_date, driver_end_long_addr, driver_end_short_addr,
+		driver_end_point, driver_end_date, driver_id, group_id, license_plates, driver_total_mileage,
+		driver_total_time, driver_total_fee, create_date, create_by, update_date, update_by
+  	</sql>
+  	
+	<select id="queryCarpoolMainForObject" resultMap="BaseResultMap" parameterType="com.zhuanche.dto.rentcar.CarPoolMainOrderDTO">
+		select
+		<include refid="Base_Carpool_MainColumn_List"/>
+		,DATE_FORMAT(driver_start_date,'%Y-%m-%d %H:%i:%s') driverStartDateStr
+		,DATE_FORMAT(driver_end_date,'%Y-%m-%d %H:%i:%s') driverEndDateStr
+		,DATE_FORMAT(create_date,'%Y-%m-%d %H:%i:%s') createDateStr
+		,DATE_FORMAT(update_date,'%Y-%m-%d %H:%i:%s') updateDateStr
+		from carpool_main_order
+		where main_order_no = #{mainOrderNo,jdbcType=VARCHAR}
+	</select>
+	
+	 <select id="selectServiceEntityById" parameterType="java.lang.Integer" resultType="com.zhuanche.entity.rentcar.ServiceEntity">
+		 SELECT
+			service_id as serviceId,
+			service.service_name as serviceName,
+			service.service_no as serviceNo,
+			service.sort as sort,
+			service.update_date as updateDate,
+			service.create_date as createDate,
+			service.status as status,
+			service.memo as memo
+		FROM
+			car_biz_service service
+		WHERE
+		 service_id = #{serviceId,jdbcType=BIGINT}
+   </select>
+   
+	<select id="selectModelNameByLicensePlates" resultType="java.lang.String" parameterType="java.lang.String">
+    	SELECT model.model_name AS modeName
+		FROM car_biz_car_info car
+		LEFT JOIN car_biz_model model ON model.model_id = car.car_model_id
+		WHERE car.license_plates = #{licensePlates}
+    </select>
+    
+    
 </mapper>

@@ -1480,4 +1480,16 @@
     SET uickpay_customerid = #{quickpayCustomerID}
     WHERE driver_id = #{driverID}
   </update>
+  
+  
+  <select id="querySupplierIdAndNameByDriverId" parameterType="java.lang.Integer" resultType="com.zhuanche.dto.rentcar.CarBizDriverInfoDTO">
+		SELECT
+		name ,
+		phone,
+		supplier_id AS supplierId
+		FROM
+		car_biz_driver_info
+		where driver_id = #{driverId}
+   </select>
+  
 </mapper>

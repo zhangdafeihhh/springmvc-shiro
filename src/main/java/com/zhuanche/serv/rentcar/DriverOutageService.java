@@ -1,5 +1,6 @@
 package com.zhuanche.serv.rentcar;
 
+import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.entity.rentcar.DriverOutage;
 import com.zhuanche.entity.rentcar.DriverOutageVo;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -74,5 +75,5 @@ public interface DriverOutageService {
     /*
      * 导入
      */
-     Map<String,Object> importDriverOutageInfo(String fileName, MultipartFile file, HttpServletRequest request);
+    AjaxResponse importDriverOutageInfo(String fileName, MultipartFile file, HttpServletRequest request);
 }
