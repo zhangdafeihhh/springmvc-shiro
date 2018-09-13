@@ -232,7 +232,7 @@
     driver.id_card_no AS idCardNo,
     car.create_by createBy,
     car.update_by updateBy,
-    DATE_FORMAT(car.create_date, '%Y-%m-%d') createDate,
+    DATE_FORMAT(car.create_date, '%Y-%m- %d') createDate,
     DATE_FORMAT(car.update_date, '%Y-%m-%d') updateDate,
     supplier.cooperation_type cooperationType
     FROM

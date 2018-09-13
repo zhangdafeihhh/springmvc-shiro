@@ -156,7 +156,7 @@ public class DriverOutageAllController {
         logger.info("永久停运导入保存importDriverOutageInfo,参数" + file.getName());
         Map<String, Object> result = new HashMap<String, Object>();
         result = this.driverOutageService.importDriverOutageInfo(name, file, request);
-        return AjaxResponse.success(result);
+        return getResponse(result);
     }
 
     /**
@@ -209,10 +209,16 @@ public class DriverOutageAllController {
             } else if(1 == result1){
                 Object success = result.get("success");
                 Object error = result.get("error");
+                Object msg = result.get("msg");
+                Object errorList = result.get("errorList");
                 if(success != null)
                     response.put("success", success);
                 if(error != null)
                     response.put("error", error);
+                if(msg != null)
+                    response.put("msg", msg);
+                if(errorList != null)
+                    response.put("errorList", msg);
                 return AjaxResponse.success(response);
             }
             return AjaxResponse.fail(999);

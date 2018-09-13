@@ -546,7 +546,7 @@ public class DriverOutageServiceImpl implements DriverOutageService {
         } else {
             result.put("download", "");
         }
-
+        result.put("errorList", listException);
         return result;
     }
 }
