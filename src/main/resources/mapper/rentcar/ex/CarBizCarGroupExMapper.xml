@@ -103,4 +103,12 @@
             and type = #{type}
         </if>
   </select>
+  
+  <select id="queryGroupNameByGroupId" parameterType="java.lang.Integer" resultType="java.lang.String">
+		SELECT
+			group_name as groupName
+		FROM car_biz_car_group
+		where group_id=#{groupId}
+	</select>
+	
 </mapper>
