@@ -117,4 +117,10 @@ public interface CarBizDriverInfoExMapper {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER)
     })
     void updateDriverCustomerId(Map<String, Object> map);
+	/**
+	 * 
+	 * @param params
+	 * @return
+	 */
+	public CarBizDriverInfoDTO querySupplierIdAndNameByDriverId(Integer params);
 }

@@ -1,6 +1,7 @@
 package com.zhuanche.serv.rentcar.impl;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,18 +20,27 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarFactOrderInfoDTO;
+import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
 import com.zhuanche.entity.DriverOrderRecord.OrderTimeEntity;
+import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizOrderSettleEntity;
 import com.zhuanche.entity.rentcar.CarBizOrderWaitingPeriod;
 import com.zhuanche.entity.rentcar.CarBizPlanEntity;
+import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.entity.rentcar.CarFactOrderInfo;
 import com.zhuanche.entity.rentcar.CarGroupEntity;
+import com.zhuanche.entity.rentcar.ServiceEntity;
 import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.util.Common;
 
 import mapper.driverOrderRecord.DriverOrderRecordMapper;
+import mapper.rentcar.ex.CarBizCarGroupExMapper;
+import mapper.rentcar.ex.CarBizCityExMapper;
+import mapper.rentcar.ex.CarBizDriverInfoExMapper;
+import mapper.rentcar.ex.CarBizSupplierExMapper;
 import mapper.rentcar.ex.CarFactOrderExMapper;
 
 @Service
@@ -62,6 +72,17 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
     @Autowired
     private DriverOrderRecordMapper driverOrderRecordMapper;
 
+    @Autowired
+    private CarBizDriverInfoExMapper carBizDriverInfoExMapper;
+    
+    @Autowired
+    private CarBizSupplierExMapper carBizSupplierExMapper;
+    
+    @Autowired
+    private CarBizCityExMapper carBizCityExMapper;
+    
+    @Autowired
+    private  CarBizCarGroupExMapper carBizCarGroupExMapper;
     @Override
 	public CarFactOrderInfo selectByPrimaryKey(Long orderId) {
 		return carFactOrderExMapper.selectByPrimaryKey(orderId);
@@ -108,6 +129,50 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 			e.printStackTrace();
 		} 
 		return mainOrderNo;
+	}
+	
+	
+	/**
+	 * 根据主订单查询子订单信息
+	 * @param mainOrderNo
+	 * @return
+	 */
+	@Override
+	public List<CarFactOrderInfo> getMainOrderByMainOrderNo(String mainOrderNo){
+		List<CarFactOrderInfo> rows = new ArrayList<CarFactOrderInfo>();
+	 try {
+			String url = carRestUrl+Common.GET_MAIN_ORDER_BY_ORDERNO + 
+					"?isShowSubOrderList=0&mainOrderNo=" + mainOrderNo;
+			// 参数：订单号 、业务线id
+			StringBuffer param = new StringBuffer("");
+			param.append("businessId=" + Common.BUSSINESSID + "&isShowSubOrderList=0&");
+			param.append("mainOrderNo=" + mainOrderNo  + '&');
+			param.append("key=" + Common.MAIN_ORDER_KEY);
+			String sign = java.net.URLEncoder.encode(
+					Base64.encodeBase64String(DigestUtils.md5(param.toString())), "UTF-8");;
+			url += "&sign="+sign;
+			 
+			System.out.println(url);
+			
+			String result = HttpClientUtil.buildGetRequest(url).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
+			JSONObject job = JSON.parseObject(result);
+			if (job == null) {
+				logger.error("调用订单接口，根据子订单号查询主订单" + url + "返回结果为null");
+				return null;
+			}
+			if (!job.getString("code").equals("0")) {
+				logger.error("根据主订单号查询子订单出错,错误码:" + url + "返回结果为code"+job.getString("code").equals("0"));
+				return null;
+			}
+			JSONObject jsonResult = JSON.parseObject(job.getString("data"));
+			if (jsonResult!=null) {
+				String subOrderList = String.valueOf(jsonResult.getString("subOrderList"));
+				rows =  JSONArray.parseArray(subOrderList, CarFactOrderInfo.class);   
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return rows;
 	}
 	
 	/**
@@ -188,7 +253,9 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 					JSONObject jobres = JSON.parseObject(job.get("data").toString());
 					if(jobres!=null){
 						list =  JSONArray.parseArray(jobres.get("data").toString(), CarFactOrderInfoDTO.class);   
-						return AjaxResponse.success(list);
+						jobres.remove("data");
+						jobres.put("data", list);
+						return AjaxResponse.success(jobres);
 					}
 				}
 			}
@@ -228,5 +295,45 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 	@Override
 	public List<CarBizOrderWaitingPeriod> selectWaitingPeriodListSlave(String orderNo) {
 		return carFactOrderExMapper.selectWaitingPeriodListSlave(orderNo);
+	}
+
+	@Override
+	public CarPoolMainOrderDTO queryCarpoolMainForObject(CarPoolMainOrderDTO params) {
+		return carFactOrderExMapper.queryCarpoolMainForObject(params);
+	}
+
+	@Override
+	public CarBizDriverInfoDTO querySupplierIdAndNameByDriverId(Integer params) {
+		return carBizDriverInfoExMapper.querySupplierIdAndNameByDriverId(params);
+	}
+
+	@Override
+	public CarBizSupplier queryCarBizSupplier(CarBizSupplier carBizSupplier) {
+		return carBizSupplierExMapper.queryForObject(carBizSupplier);
+	}
+
+	@Override
+	public CarBizCity queryCarBizCityById(CarBizCity params) {
+		return carBizCityExMapper.queryCarBizCityById(params);
+	}
+
+	@Override
+	public String serviceTypeName(Integer serviceId) {
+		ServiceEntity serviceEntity = carFactOrderExMapper.selectServiceEntityById(serviceId);
+		String serviceTypeName = "";
+		if(serviceEntity!=null){
+			serviceTypeName = serviceEntity.getServiceName();
+		}
+		return serviceTypeName;
+	}
+
+	@Override
+	public String getGroupNameByGroupId(Integer groupId) {
+		return carBizCarGroupExMapper.getGroupNameByGroupId(groupId);
+	}
+
+	@Override
+	public String selectModelNameByLicensePlates(String licensePlates) {
+		return carFactOrderExMapper.selectModelNameByLicensePlates(licensePlates);
 	}
 }

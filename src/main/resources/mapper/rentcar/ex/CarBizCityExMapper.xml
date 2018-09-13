@@ -67,4 +67,27 @@
     </if>
   </select>
 
+
+ <select id="queryCarBizCityById" parameterType="com.zhuanche.entity.rentcar.CarBizCity" resultType="com.zhuanche.entity.rentcar.CarBizCity">
+	 	select 
+		t.city_id cityId,
+		t.city_name cityName,
+		t.code,
+		t.citySpell,
+		t.sort,
+		t.status,
+		t.test_status testStatus,
+		t.create_by createBy,
+		t.update_by updateBy,
+		t.create_date createDate,
+		t.update_date updateDate,
+		t.memo,
+		t.centreLo,
+		t.centreLa
+		from car_biz_city t
+	 	where t.city_id = #{cityId} limit 1;
+	 </select>
+	 
+	 
+	 
   </mapper>
