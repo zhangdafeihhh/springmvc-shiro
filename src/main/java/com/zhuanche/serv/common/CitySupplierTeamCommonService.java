@@ -70,6 +70,9 @@ public class CitySupplierTeamCommonService {
         try{
             Set<Integer> resultSet = new HashSet<>();
             for (String str : srcList) {
+                if(Check.NuNStr(str)){
+                    continue;
+                }
                 resultSet.add(Integer.parseInt(str));
             }
             return resultSet;
@@ -86,6 +89,9 @@ public class CitySupplierTeamCommonService {
         try{
             Set<String> resultSet = new HashSet<>();
             for (Integer parmam : srcList) {
+                if(Check.NuNObj(parmam)){
+                    continue;
+                }
                 resultSet.add(String.valueOf(parmam));
             }
             return resultSet;
@@ -178,13 +184,15 @@ public class CitySupplierTeamCommonService {
             permOfSupplier = WebSessionUtil.getCurrentLoginUser().getSupplierIds();
             permOfTeam     = WebSessionUtil.getCurrentLoginUser().getTeamIds();
             if( permOfCity.size()!=0
-                    && permOfCity.contains(Integer.valueOf(paramRequest.getCityId()))==false ) {
+                    && (!Check.NuNObj(paramRequest.getCityId()) && permOfCity.contains(Integer.valueOf(paramRequest.getCityId()))==false )) {
                 return null;
             }
-            if( permOfSupplier.size()!=0 && permOfSupplier.contains(Integer.valueOf(paramRequest.getSupplierId()))==false  ) {
+            if( permOfSupplier.size()!=0 &&
+                    (!Check.NuNObj(paramRequest.getSupplierId()) && permOfSupplier.contains(Integer.valueOf(paramRequest.getSupplierId()))==false ) ) {
                 return null;
             }
-            if( permOfTeam.size()!=0 && permOfTeam.contains(Integer.valueOf(paramRequest.getTeamId())) == false ) {
+            if( permOfTeam.size()!=0
+                    && (!Check.NuNObj(paramRequest.getTeamId()) &&permOfTeam.contains(Integer.valueOf(paramRequest.getTeamId())) == false )) {
 //				return LayUIPage.build("您没有查询此车队的权限！", 0, null);
                 return null;
             }
