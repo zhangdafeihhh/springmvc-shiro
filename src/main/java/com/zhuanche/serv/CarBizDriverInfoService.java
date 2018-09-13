@@ -1830,7 +1830,7 @@ public class CarBizDriverInfoService {
                                         isTrue = false;
                                     } else {
                                         d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
-                                        carBizDriverInfoDTO.setFirstmeshworkdrivinglicensedate(d);
+                                        carBizDriverInfoDTO.setFirstdrivinglicensedate(d);
                                     }
                                 } else {
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
