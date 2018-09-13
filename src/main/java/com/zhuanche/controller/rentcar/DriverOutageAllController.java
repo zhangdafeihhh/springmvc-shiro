@@ -155,8 +155,7 @@ public class DriverOutageAllController {
 
         logger.info("永久停运导入保存importDriverOutageInfo,参数" + file.getName());
         Map<String, Object> result = new HashMap<String, Object>();
-        result = this.driverOutageService.importDriverOutageInfo(name, file, request);
-        return getResponse(result);
+        return driverOutageService.importDriverOutageInfo(name, file, request);
     }
 
     /**

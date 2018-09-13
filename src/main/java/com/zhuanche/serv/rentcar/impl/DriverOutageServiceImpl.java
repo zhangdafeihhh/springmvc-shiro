@@ -1,5 +1,7 @@
 package com.zhuanche.serv.rentcar.impl;
 
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.entity.rentcar.CarImportExceptionEntity;
 import com.zhuanche.entity.rentcar.DriverOutage;
 import com.zhuanche.entity.rentcar.DriverOutageVo;
@@ -198,7 +200,7 @@ public class DriverOutageServiceImpl implements DriverOutageService {
     }
 
     @Override
-    public Map<String,Object> updateDriverOutage(DriverOutage params){
+    public Map<String, Object> updateDriverOutage(DriverOutage params) {
         Map<String, Object> result = new HashMap<String, Object>();
         // 调接口，保存
         Map<String, Object> paramMap = new HashMap<String, Object>();
@@ -213,9 +215,8 @@ public class DriverOutageServiceImpl implements DriverOutageService {
     }
 
 
-
     @Override
-    public Map<String,Object> updateDriverOutages(DriverOutage params){
+    public Map<String, Object> updateDriverOutages(DriverOutage params) {
         Map<String, Object> result = new HashMap<String, Object>();
         // 调接口，保存
         Map<String, Object> paramMap = new HashMap<String, Object>();
@@ -237,7 +238,7 @@ public class DriverOutageServiceImpl implements DriverOutageService {
     }
 
     @Override
-    public DriverOutage queryDriverNameByPhone(DriverOutage params){
+    public DriverOutage queryDriverNameByPhone(DriverOutage params) {
         return driverOutageExMapper.queryDriverNameByPhone(params);
     }
 
@@ -263,7 +264,7 @@ public class DriverOutageServiceImpl implements DriverOutageService {
      * 查询列表，有分页
      */
     @Override
-    public List<DriverOutage> queryAllForListObject(DriverOutage params){
+    public List<DriverOutage> queryAllForListObject(DriverOutage params) {
         return driverOutageExMapper.queryAllForListObject(params);
     }
 
@@ -271,19 +272,19 @@ public class DriverOutageServiceImpl implements DriverOutageService {
      * 查询数量
      */
     @Override
-    public int queryAllForInt(DriverOutage params){
+    public int queryAllForInt(DriverOutage params) {
         return driverOutageExMapper.queryAllForInt(params);
     }
 
     //根据司机id，查询司机临时停运，正在执行或者待执行的数据
     @Override
-    public List<DriverOutage> queryDriverOutageByDriverId(DriverOutage params){
+    public List<DriverOutage> queryDriverOutageByDriverId(DriverOutage params) {
         return driverOutageExMapper.queryDriverOutageByDriverId(params);
     }
 
     //根据司机id，查询司机永久停运，启用的数据
     @Override
-    public DriverOutage queryDriverOutageAllByDriverId(DriverOutage params){
+    public DriverOutage queryDriverOutageAllByDriverId(DriverOutage params) {
         return driverOutageExMapper.queryDriverOutageAllByDriverId(params);
     }
 
@@ -291,7 +292,7 @@ public class DriverOutageServiceImpl implements DriverOutageService {
      * 保存
      */
     @Override
-    public Map<String,Object> saveDriverOutageAll(DriverOutage params){
+    public Map<String, Object> saveDriverOutageAll(DriverOutage params) {
         Map<String, Object> result = new HashMap<String, Object>();
         // 调接口，保存
         Map<String, Object> paramMap = new HashMap<String, Object>();
@@ -302,7 +303,7 @@ public class DriverOutageServiceImpl implements DriverOutageService {
             params.setCreateName(WebSessionUtil.getCurrentLoginUser().getLoginName());
             params.setOutStartDate(new Date());
         } catch (Exception e) {
-            logger.info("saveDriverOutageAll error:"+e);
+            logger.info("saveDriverOutageAll error:" + e);
         }
         JSONObject json = JSONObject.fromObject(params);
         paramMap.put("driverOutageInfo", json);
@@ -312,7 +313,7 @@ public class DriverOutageServiceImpl implements DriverOutageService {
     }
 
     @Override
-    public Map<String,Object> updateDriverOutagesAll(DriverOutage params){
+    public Map<String, Object> updateDriverOutagesAll(DriverOutage params) {
         Map<String, Object> result = new HashMap<String, Object>();
         // 调接口，保存
         Map<String, Object> paramMap = new HashMap<String, Object>();
@@ -326,13 +327,12 @@ public class DriverOutageServiceImpl implements DriverOutageService {
     }
 
     @Override
-    public Map<String,Object> importDriverOutageInfo(String fileName, MultipartFile file, HttpServletRequest request){
+    public AjaxResponse importDriverOutageInfo(String fileName, MultipartFile file, HttpServletRequest request) {
         String resultError1 = "-1";// 模板错误
         String resultErrorMag1 = "导入模板格式错误!";
 
 
-
-        Map<String, Object> result = new HashMap<String, Object>();
+//        Map<String, Object> result = new HashMap<String, Object>();
         List<CarImportExceptionEntity> listException = new ArrayList<CarImportExceptionEntity>();
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         List<DriverOutage> outList = new ArrayList<DriverOutage>();
@@ -358,37 +358,27 @@ public class DriverOutageServiceImpl implements DriverOutageService {
                 Cell cell = row1.getCell(colIx); // 获取列对象
                 CellValue cellValue = evaluator.evaluate(cell); // 获取列属性
                 if (cell == null || cellValue == null) {
-                    result.put("result", resultError1);
-                    result.put("msg", resultErrorMag1);
-                    return result;
+                    return AjaxResponse.fail(5000, resultErrorMag1);
                 } else {
                     switch ((colIx + 1)) {
                         case 1:
                             if (!cellValue.getStringValue().contains("序号")) {
-                                result.put("result", resultError1);
-                                result.put("msg", resultErrorMag1);
-                                return result;
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR, "序号列不正确");
                             }
                             break;
                         case 2:
                             if (!cellValue.getStringValue().contains("司机姓名")) {
-                                result.put("result", resultError1);
-                                result.put("msg", resultErrorMag1);
-                                return result;
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR, "司机姓名列不正确");
                             }
                             break;
                         case 3:
                             if (!cellValue.getStringValue().contains("司机手机号")) {
-                                result.put("result", resultError1);
-                                result.put("msg", resultErrorMag1);
-                                return result;
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR, "序号列不正确");
                             }
                             break;
                         case 4:
                             if (!cellValue.getStringValue().contains("停运原因")) {
-                                result.put("result", resultError1);
-                                result.put("msg", resultErrorMag1);
-                                return result;
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR, "停运原因列不正确");
                             }
                             break;
                     }
@@ -419,7 +409,7 @@ public class DriverOutageServiceImpl implements DriverOutageService {
                             break;
                         // 司机姓名
                         case 2:
-                            if (cellValue == null|| StringUtils.isEmpty(cellValue.getStringValue())) {
+                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
                                 CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                                 returnVO.setReson("第" + (rowIx + 1) + "行数据，第"
                                         + (colIx + 1) + "列 【司机姓名】不能为空且单元格格式必须为文本");
@@ -431,7 +421,7 @@ public class DriverOutageServiceImpl implements DriverOutageService {
                             break;
                         // 司机手机号
                         case 3:
-                            if (cellValue == null|| StringUtils.isEmpty(cellValue.getStringValue())) {
+                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
                                 CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                                 returnVO.setReson("第" + (rowIx + 1) + "行数据，第"
                                         + (colIx + 1) + "列 【司机手机号】不能为空且单元格格式必须为文本");
@@ -441,35 +431,35 @@ public class DriverOutageServiceImpl implements DriverOutageService {
                             // 判断手机号码合法性
                             else if (!ValidateUtils.validatePhone(cellValue.getStringValue())) {
                                 CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setReson("第" +  (rowIx+1) + "行数据，第" + (colIx + 1)
+                                returnVO.setReson("第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
                                         + "列 【驾驶员手机】不合法");
                                 listException.add(returnVO);
                                 isTrue = false;
-                            }else {
+                            } else {
                                 String phone = cellValue.getStringValue();
                                 DriverOutage driverout = new DriverOutage();
                                 driverout.setDriverPhone(phone);
                                 //查数据
                                 DriverOutage hasout = this.queryDriverNameByPhone(driverout);
-                                if(hasout!=null){
-                                    if(hasout.getDriverName()!=null&&!"".equals(hasout.getDriverName())
-                                            &&outage.getDriverName()!=null&&!"".equals(outage.getDriverName())
-                                            &&!hasout.getDriverName().equals(outage.getDriverName())){
+                                if (hasout != null) {
+                                    if (hasout.getDriverName() != null && !"".equals(hasout.getDriverName())
+                                            && outage.getDriverName() != null && !"".equals(outage.getDriverName())
+                                            && !hasout.getDriverName().equals(outage.getDriverName())) {
                                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                        returnVO.setReson("第" +  (rowIx+1) + "行数据，第" + (colIx + 1)
+                                        returnVO.setReson("第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
                                                 + "列 【驾驶员手机】司机手机号和姓名匹配不上");
                                         listException.add(returnVO);
                                         isTrue = false;
-                                    }else{
+                                    } else {
                                         outage.setDriverPhone(phone);
                                         outage.setDriverId(hasout.getDriverId());
                                         outage.setOutStartDate(new Date());
                                         outage.setRemoveStatus(1);
                                         outage.setOutageSource(2);
                                     }
-                                }else{
+                                } else {
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson("第" +  (rowIx+1) + "行数据，第" + (colIx + 1)
+                                    returnVO.setReson("第" + (rowIx + 1) + "行数据，第" + (colIx + 1)
                                             + "列 【驾驶员手机】司机手机号不存在");
                                     listException.add(returnVO);
                                     isTrue = false;
@@ -478,7 +468,7 @@ public class DriverOutageServiceImpl implements DriverOutageService {
                             break;
                         // 停运原因
                         case 4:
-                            if (cellValue == null|| StringUtils.isEmpty(cellValue.getStringValue())) {
+                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
                                 CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                                 returnVO.setReson("第" + (rowIx + 1) + "行数据，第"
                                         + (colIx + 1) + "列 【停运原因】不能为空且单元格格式必须为文本");
@@ -499,9 +489,9 @@ public class DriverOutageServiceImpl implements DriverOutageService {
             e.printStackTrace();
         }
         String download = "";
+        boolean flag = false;
         if ("".equals(outList) || outList == null || outList.size() == 0) {
-            result.put("result", "0");
-            result.put("msg", "导入失败！");
+
         } else {
             // 调接口，保存
             Map<String, Object> paramMap = new HashMap<String, Object>();
@@ -509,15 +499,13 @@ public class DriverOutageServiceImpl implements DriverOutageService {
             String cars = jsonarray.toString();
             paramMap.put("driverOutageList", cars);
             String url = "/webservice/outageAll/batchInputDriverOutageInfo";
-            JSONObject jsonobject = carApiTemplate.postForObject(url,JSONObject.class, paramMap);
+            JSONObject jsonobject = carApiTemplate.postForObject(url, JSONObject.class, paramMap);
             // 返回为0 ==========不成功
             if ((int) jsonobject.get("result") == 0) {
                 logger.info("接口返回为0 ==========导入不成功");
                 CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                 returnVO.setReson((String) jsonobject.get("exception"));
                 listException.add(returnVO);
-                result.put("result", "0");
-                result.put("msg", "导入失败！");
             } else {
                 // 返回为1 ==========成功
                 JSONObject json = (JSONObject) jsonobject.get("jsonStr");
@@ -527,26 +515,22 @@ public class DriverOutageServiceImpl implements DriverOutageService {
                     returnVO.setReson(arrayDriverName + "导入失败！");
                     listException.add(returnVO);
                 }
-                result.put("result", "1");
-                result.put("msg","");
+                flag = true;
             }
         }
-        try {
-            // 将错误列表导出
-            if (listException.size() > 0) {
-                Workbook wb = Common.exportExcel(request.getServletContext().getRealPath("/")+ "template" + File.separator + "car_exception.xlsx", listException);
-                download = Common.exportExcelFromTempletToLoacl(request, wb,
-                        new String("ERROR".getBytes("utf-8"), "iso8859-1"));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (!"".equals(download) && download != null) {
-            result.put("download", download);
+
+        if(flag){
+            return AjaxResponse.success(listException);
         } else {
-            result.put("download", "");
+            StringBuilder errorMsg = new StringBuilder();
+            if (listException.size() > 0) {
+
+                for (CarImportExceptionEntity entity : listException) {
+                    errorMsg.append(entity.getReson()).append(";");
+                }
+            }
+            return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR, errorMsg);
         }
-        result.put("errorList", listException);
-        return result;
     }
+
 }
