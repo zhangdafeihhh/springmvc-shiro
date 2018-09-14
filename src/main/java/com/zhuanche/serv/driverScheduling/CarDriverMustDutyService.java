@@ -100,7 +100,7 @@ public class CarDriverMustDutyService {
 			}
 			dutyParamRequest.setCityIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getCityIds()));
 			dutyParamRequest.setSupplierIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getSupplierIds()));
-			dutyParamRequest.setSupplierIds(resultParmam.getTeamIds());
+			dutyParamRequest.setTeamIds(resultParmam.getTeamIds());
 			PageInfo<CarDriverMustDutyDTO> pageInfo = PageHelper.startPage(dutyParamRequest.getPageNo(), dutyParamRequest.getPageSize(), true).doSelectPageInfo(()
 					-> carDriverMustDutyExMapper.selectDriverMustDutyList(dutyParamRequest));
 			PageDTO pageDTO = new PageDTO();
