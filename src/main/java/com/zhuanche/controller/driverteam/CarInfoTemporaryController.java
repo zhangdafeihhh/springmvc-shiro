@@ -282,7 +282,7 @@ public class CarInfoTemporaryController extends BaseController {
                                     @Verify(param = "gpsType",rule="required") String gpsType,
                                     @Verify(param = "gpsImei",rule="required") String gpsImei,
                                     @Verify(param = "gpsDate",rule="required") String gpsDate,
-                                    @RequestParam(value = "purchaseDate",required = false) String memo
+                                    @RequestParam(value = "memo",required = false) String memo
                                     ) {
         CarBizCarInfoTemp carBizCarInfoTemp = new CarBizCarInfoTemp();
         carBizCarInfoTemp.setLicensePlates(licensePlates);
@@ -309,7 +309,7 @@ public class CarInfoTemporaryController extends BaseController {
         carBizCarInfoTemp.setNextClassDate(nextClassDate);
         carBizCarInfoTemp.setTwoLevelMaintenanceDate(twoLevelMaintenanceDate);
         carBizCarInfoTemp.setRentalExpireDate(rentalExpireDate);
-        carBizCarInfoTemp.setPurchaseDate(purchaseDate);
+        carBizCarInfoTemp.setPurchaseDate(StringUtils.isBlank(purchaseDate)?null:purchaseDate);
         carBizCarInfoTemp.setVehicleRegistrationDate(vehicleRegistrationDate);
         carBizCarInfoTemp.setTransportNumber(transportNumber);
         carBizCarInfoTemp.setCertificationAuthority(certificationAuthority);
@@ -455,7 +455,7 @@ public class CarInfoTemporaryController extends BaseController {
         carBizCarInfoTemp.setNextClassDate(nextClassDate);
         carBizCarInfoTemp.setTwoLevelMaintenanceDate(twoLevelMaintenanceDate);
         carBizCarInfoTemp.setRentalExpireDate(rentalExpireDate);
-        carBizCarInfoTemp.setPurchaseDate(purchaseDate);
+        carBizCarInfoTemp.setPurchaseDate(StringUtils.isBlank(purchaseDate)?null:purchaseDate);
         carBizCarInfoTemp.setVehicleRegistrationDate(vehicleRegistrationDate);
         carBizCarInfoTemp.setTransportNumber(transportNumber);
         carBizCarInfoTemp.setCertificationAuthority(certificationAuthority);
