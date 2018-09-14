@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -76,14 +77,25 @@ public class DriverOperateDetailController{
                                               ){
         logger.info("【运营管理-统计分析】司机运营详情分析  列表数据:queryDriverOperateDetailData");
         Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("driverCityId", cityId);//司机所属城市ID
-        paramMap.put("genderId", genderId);//性别ID
-        paramMap.put("driverTypeId", driverTypeId);//司机类型ID
-        paramMap.put("allianceId", supplier);//加盟商ID
-        paramMap.put("motorcadeId", teamId);//车队ID
-        paramMap.put("driverName", driverName);//司机姓名
+        if(null!=cityId){
+        	paramMap.put("driverCityId", cityId);//司机所属城市ID
+	    }
+	    if(StringUtil.isNotEmpty(genderId)){
+	    	   paramMap.put("genderId", genderId);//性别ID
+	    }
+	    if(StringUtil.isNotEmpty(driverTypeId)){
+	    	 paramMap.put("driverTypeId", driverTypeId);//司机类型ID
+	    }
+	    if(StringUtil.isNotEmpty(supplier)){
+	    	paramMap.put("allianceId", supplier);//加盟商ID
+	    }
+	    if(StringUtil.isNotEmpty(teamId)){
+	    	paramMap.put("motorcadeId", teamId);//车队ID
+	    }
+	    if(StringUtil.isNotEmpty(driverName)){
+	    	paramMap.put("driverName", driverName);//司机姓名
+	    }
 		paramMap.put("queryDate", queryDate);//查询日期
-		
 		paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,supplier,teamId);
 		if(paramMap==null){
 			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
@@ -118,6 +130,8 @@ public class DriverOperateDetailController{
 										String genderId,
 										String driverTypeId,
 							            String allianceId,
+							            String supplier,
+                                        String teamId,
 							            String motorcadeId,
 							            String driverName,
 							            @Verify(param = "queryDate",rule = "required") String queryDate,
@@ -125,13 +139,25 @@ public class DriverOperateDetailController{
 	                                    HttpServletResponse response){
 	        logger.info("【运营管理-统计分析】导出,导出司机运营详情数据:DriverOperateDetail");
 	      try {
-	    	  Map<String, Object> paramMap = new HashMap<String, Object>();
-	          paramMap.put("driverCityId", driverCityId);//司机所属城市ID
-	          paramMap.put("genderId", genderId);//性别ID
-	          paramMap.put("driverTypeId", driverTypeId);//司机类型ID
-	          paramMap.put("allianceId", allianceId);//加盟商ID
-	          paramMap.put("motorcadeId", motorcadeId);//车队ID
-	          paramMap.put("driverName", driverName);//司机姓名
+    	    Map<String, Object> paramMap = new HashMap<String, Object>();
+    	    if(null!=driverCityId){
+          	 	paramMap.put("driverCityId", driverCityId);//司机所属城市ID
+	  	    }
+	  	    if(StringUtil.isNotEmpty(genderId)){
+	  	    	   paramMap.put("genderId", genderId);//性别ID
+	  	    }
+	  	    if(StringUtil.isNotEmpty(driverTypeId)){
+	  	    	 paramMap.put("driverTypeId", driverTypeId);//司机类型ID
+	  	    }
+	  	    if(StringUtil.isNotEmpty(supplier)){
+	  	    	paramMap.put("allianceId", supplier);//加盟商ID
+	  	    }
+	  	    if(StringUtil.isNotEmpty(teamId)){
+	  	    	paramMap.put("motorcadeId", teamId);//车队ID
+	  	    }
+	  	    if(StringUtil.isNotEmpty(driverName)){
+	  	    	paramMap.put("driverName", driverName);//司机姓名
+	  	    }
 	  		  paramMap.put("queryDate", queryDate);//查询日期
 		  		paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,driverCityId,allianceId,motorcadeId);
 				if(paramMap==null){

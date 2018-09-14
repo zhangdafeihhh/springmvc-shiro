@@ -21,7 +21,7 @@ public class CarFactOrderInfoDetailDTO{
 	//取消订单 
 	private String orderCancleTime;
 	//订单号 
-	private String orderno;
+	private String orderNo;
 	//下单时间 
 	private String createdate;
 	//服务类型 
@@ -253,12 +253,12 @@ public class CarFactOrderInfoDetailDTO{
 		this.orderCancleTime = orderCancleTime;
 	}
 
-	public String getOrderno() {
-		return orderno;
+	public String getOrderNo() {
+		return orderNo;
 	}
 
-	public void setOrderno(String orderno) {
-		this.orderno = orderno;
+	public void setOrderNo(String orderNo) {
+		this.orderNo = orderNo;
 	}
 
 	public String getCreatedate() {

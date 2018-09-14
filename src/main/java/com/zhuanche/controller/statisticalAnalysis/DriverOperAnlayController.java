@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -56,7 +57,9 @@ public class DriverOperAnlayController{
 	      Map<String, Object> paramMap = new HashMap<String, Object>();
 	      paramMap.put("startDate", startDate);//订单城市ID	
 	      paramMap.put("endDate", endDate);//加盟商ID
-	      paramMap.put("allianceId", allianceId);//加盟商ID
+          if(StringUtil.isNotEmpty(allianceId)){
+        	 paramMap.put("allianceId", allianceId);//加盟商ID
+          }
 	      paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,null,allianceId,null);
 		  if(paramMap==null){
 			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
@@ -86,7 +89,9 @@ public class DriverOperAnlayController{
         	  Map<String, Object> paramMap = new HashMap<String, Object>();
 		      paramMap.put("startDate", startDate);//订单城市ID	
 		      paramMap.put("endDate", endDate);//加盟商ID
-		      paramMap.put("allianceId", allianceId);//加盟商ID
+		      if(StringUtil.isNotEmpty(allianceId)){
+	        	 paramMap.put("allianceId", allianceId);//加盟商ID
+		       }
 		      paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,null,allianceId,null);
 		      if(paramMap==null){
 					return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);

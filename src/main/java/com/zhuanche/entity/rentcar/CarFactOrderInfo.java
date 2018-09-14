@@ -40,10 +40,8 @@ public class CarFactOrderInfo extends BaseEntity {
 	private Double travelTime;
 	private Double travelMileage;
 	private String memo;
-	// 订单号
-	private String orderno;
 	// 订单id
-	private int orderId;
+	private long orderId;
 	// 下单时间
 	private String createdate;
 	// 预订人姓名
@@ -264,9 +262,8 @@ public class CarFactOrderInfo extends BaseEntity {
 	private String airlineDate;
 	// 预定人手机号
 	private String bookingUserPhone;
-	// 订单ID
 	// 订单号
-	private java.lang.String orderNo;
+	private String orderNo;
 	// 预定上车时间
 	private Date bookingDate;
 	// 订单创建时间
@@ -1295,13 +1292,6 @@ public class CarFactOrderInfo extends BaseEntity {
 		this.cutomerId = cutomerId;
 	}
 
-	public int getOrderId() {
-		return orderId;
-	}
-
-	public void setOrderId(int orderId) {
-		this.orderId = orderId;
-	}
 
 	public Double getDecimalsFees() {
 		return decimalsFees;
@@ -1613,14 +1603,6 @@ public class CarFactOrderInfo extends BaseEntity {
 
 	public void setCreatedate(String createdate) {
 		this.createdate = createdate;
-	}
-
-	public String getOrderno() {
-		return orderno;
-	}
-
-	public void setOrderno(String orderno) {
-		this.orderno = orderno;
 	}
 
 	public String getCostTypeNameJc() {
@@ -2130,6 +2112,14 @@ public class CarFactOrderInfo extends BaseEntity {
 
 	public void setOrderCancleTime(String orderCancleTime) {
 		this.orderCancleTime = orderCancleTime;
+	}
+
+	public long getOrderId() {
+		return orderId;
+	}
+
+	public void setOrderId(long orderId) {
+		this.orderId = orderId;
 	}
 	
 }

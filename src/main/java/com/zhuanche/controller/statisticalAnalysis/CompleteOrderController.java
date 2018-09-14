@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -71,18 +72,42 @@ public class CompleteOrderController{
 	        
 	        Map<String, Object> paramMap = new HashMap<String, Object>();
 	        paramMap.put("queryDate", queryDate);//查询日期
-	        paramMap.put("cityId", cityId);//下单城市ID
-	        paramMap.put("productId", productId);//产品类型ID
-	        paramMap.put("bindVehicleTypeId", bindVehicleTypeId);//绑定车型ID
-	        paramMap.put("serviceVehicleTypeId", serviceVehicleTypeId);//服务车型ID
-	        paramMap.put("orderTypeId", orderTypeId);//订单类别ID
-	        paramMap.put("orgnizationId", orgnizationId);//机构ID
-	        paramMap.put("channelId", channelId);//渠道ID
-	        paramMap.put("driverTypeId", driverTypeId);//司机类型ID
-	        paramMap.put("allianceId", allianceId);//加盟商ID
-	        paramMap.put("motorcardId", motorcardId);//车队ID
-	        paramMap.put("hotelId", hotelId);//酒店ID
-	        paramMap.put("driverId", driverId);//司机ID
+	        if(null!=cityId){
+	        	 paramMap.put("cityId", cityId);//下单城市ID
+	        }
+	        if(StringUtil.isNotEmpty(productId)){
+	        	paramMap.put("productId", productId);//产品类型ID
+	        }
+	        if(StringUtil.isNotEmpty(bindVehicleTypeId)){
+	        	 paramMap.put("bindVehicleTypeId", bindVehicleTypeId);//绑定车型ID
+	        }
+	        if(StringUtil.isNotEmpty(serviceVehicleTypeId)){
+	        	 paramMap.put("serviceVehicleTypeId", serviceVehicleTypeId);//服务车型ID
+	        }
+	        if(StringUtil.isNotEmpty(orderTypeId)){
+	        	paramMap.put("orderTypeId", orderTypeId);//订单类别ID
+	        }
+	        if(StringUtil.isNotEmpty(orgnizationId)){
+	        	paramMap.put("orgnizationId", orgnizationId);//机构ID
+	        }
+	        if(StringUtil.isNotEmpty(channelId)){
+	        	paramMap.put("channelId", channelId);//渠道ID
+	        }
+	        if(StringUtil.isNotEmpty(driverTypeId)){
+	        	paramMap.put("driverTypeId", driverTypeId);//司机类型ID
+	        }
+	        if(StringUtil.isNotEmpty(allianceId)){
+	        	 paramMap.put("allianceId", allianceId);//加盟商ID
+	        }
+	        if(StringUtil.isNotEmpty(motorcardId)){
+	        	paramMap.put("motorcardId", motorcardId);//车队ID
+	        }
+	        if(StringUtil.isNotEmpty(hotelId)){
+	        	paramMap.put("hotelId", hotelId);//酒店ID
+	        }
+	        if(StringUtil.isNotEmpty(driverId)){
+	        	paramMap.put("driverId", driverId);//司机ID
+	        }
 	        // 数据权限设置
 	        paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,allianceId,motorcardId);
 			if(paramMap==null){
@@ -127,18 +152,42 @@ public class CompleteOrderController{
         try {
         	 Map<String, Object> paramMap = new HashMap<String, Object>();
         	 paramMap.put("queryDate", queryDate);//查询日期
-        	 paramMap.put("cityId", cityId);//下单城市ID
-        	 paramMap.put("productId", productId);//产品类型ID
-        	 paramMap.put("bindVehicleTypeId", bindVehicleTypeId);//绑定车型ID
-        	 paramMap.put("serviceVehicleTypeId", serviceVehicleTypeId);//服务车型ID
-        	 paramMap.put("orderTypeId", orderTypeId);//订单类别ID
-        	 paramMap.put("orgnizationId", orgnizationId);//机构ID
-        	 paramMap.put("channelId", channelId);//渠道ID
-        	 paramMap.put("driverTypeId", driverTypeId);//司机类型ID
-        	 paramMap.put("allianceId", allianceId);//加盟商ID
-        	 paramMap.put("motorcardId", motorcardId);//车队ID
-        	 paramMap.put("hotelId", hotelId);//酒店ID
-        	 paramMap.put("driverId", driverId);//司机ID
+ 	        if(null!=cityId){
+	        	 paramMap.put("cityId", cityId);//下单城市ID
+	        }
+	        if(StringUtil.isNotEmpty(productId)){
+	        	paramMap.put("productId", productId);//产品类型ID
+	        }
+	        if(StringUtil.isNotEmpty(bindVehicleTypeId)){
+	        	 paramMap.put("bindVehicleTypeId", bindVehicleTypeId);//绑定车型ID
+	        }
+	        if(StringUtil.isNotEmpty(serviceVehicleTypeId)){
+	        	 paramMap.put("serviceVehicleTypeId", serviceVehicleTypeId);//服务车型ID
+	        }
+	        if(StringUtil.isNotEmpty(orderTypeId)){
+	        	paramMap.put("orderTypeId", orderTypeId);//订单类别ID
+	        }
+	        if(StringUtil.isNotEmpty(orgnizationId)){
+	        	paramMap.put("orgnizationId", orgnizationId);//机构ID
+	        }
+	        if(StringUtil.isNotEmpty(channelId)){
+	        	paramMap.put("channelId", channelId);//渠道ID
+	        }
+	        if(StringUtil.isNotEmpty(driverTypeId)){
+	        	paramMap.put("driverTypeId", driverTypeId);//司机类型ID
+	        }
+	        if(StringUtil.isNotEmpty(allianceId)){
+	        	 paramMap.put("allianceId", allianceId);//加盟商ID
+	        }
+	        if(StringUtil.isNotEmpty(motorcardId)){
+	        	paramMap.put("motorcardId", motorcardId);//车队ID
+	        }
+	        if(StringUtil.isNotEmpty(hotelId)){
+	        	paramMap.put("hotelId", hotelId);//酒店ID
+	        }
+	        if(StringUtil.isNotEmpty(driverId)){
+	        	paramMap.put("driverId", driverId);//司机ID
+	        }
         	 // 数据权限设置
  	        paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,allianceId,motorcardId);
  			if(paramMap==null){
