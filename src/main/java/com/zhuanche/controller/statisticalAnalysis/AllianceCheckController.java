@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -70,8 +71,12 @@ public class AllianceCheckController{
 	                                              ){
 	        logger.info("【运营管理-统计分析】加盟商考核  列表数据:queryAllianceCheckData");
 	        Map<String, Object> paramMap = new HashMap<String, Object>();
-	        paramMap.put("allianceId", allianceId);//加盟商ID
-	        paramMap.put("cityId", cityId);//城市ID
+	        if(StringUtil.isNotEmpty(allianceId)){
+	        	paramMap.put("allianceId", allianceId);//加盟商ID
+	        }
+	        if(null!=cityId){
+	        	paramMap.put("cityId", cityId);//城市ID
+	        }
 	        paramMap.put("orderByColumnCode", orderByColumnCode);//排序字段代码 
 	        paramMap.put("orderTypeCode", orderTypeCode);//排序方式代码
 			paramMap.put("queryDate", queryDate);//查询日期
@@ -113,8 +118,12 @@ public class AllianceCheckController{
 	        logger.info("【运营管理-统计分析】导出,导出 加盟商考核  列表数据:exportAllianceCheckData");
       try {
     	    Map<String, Object> paramMap = new HashMap<String, Object>();
-	        paramMap.put("allianceId", allianceId);//加盟商ID
-	        paramMap.put("cityId", cityId);//城市ID
+    	    if(StringUtil.isNotEmpty(allianceId)){
+	        	paramMap.put("allianceId", allianceId);//加盟商ID
+	        }
+	        if(null!=cityId){
+	        	paramMap.put("cityId", cityId);//城市ID
+	        }
 	        paramMap.put("orderByColumnCode", orderByColumnCode);//排序字段代码 
 	        paramMap.put("orderTypeCode", orderTypeCode);//排序方式代码
 			paramMap.put("queryDate", queryDate);//查询日期

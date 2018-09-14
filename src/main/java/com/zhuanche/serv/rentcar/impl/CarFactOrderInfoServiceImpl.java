@@ -92,8 +92,8 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
     @Autowired
     private  CarBizCarGroupExMapper carBizCarGroupExMapper;
     @Override
-	public CarFactOrderInfo selectByPrimaryKey(Long orderId) {
-		return carFactOrderExMapper.selectByPrimaryKey(orderId);
+	public CarFactOrderInfo selectByPrimaryKey(CarFactOrderInfo carFactOrderInfo) {
+		return carFactOrderExMapper.selectByPrimaryKey(carFactOrderInfo);
 	}
    
 	/**
@@ -221,7 +221,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 			}
 			if (!job.getString("code").equals("0")) {
 				logger.info("调用计费接口" + url + "返回结果为result"+result);
-				return job.getString("code");
+				return "";
 			}
 			if (job != null) {
 				if("0".equals(job.get("code").toString())){

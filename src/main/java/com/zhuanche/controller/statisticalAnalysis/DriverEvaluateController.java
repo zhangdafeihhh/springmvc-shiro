@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -74,12 +75,24 @@ public class DriverEvaluateController{
 	                                              ){
 	        logger.info("【运营管理-统计分析】对司机评级详情分析 列表数据:queryDriverEvaluateData");
 	        Map<String, Object> paramMap = new HashMap<String, Object>();
-	        paramMap.put("orderCityId", orderCityId);//订单城市ID	
-	        paramMap.put("allianceId", allianceId);//加盟商ID
-	        paramMap.put("motorcadeId", motorcadeId);//车队ID
-	        paramMap.put("driverTypeId", driverTypeId);//司机类型ID
-	        paramMap.put("driverScore", driverScore);//司机评价分数	
-	        paramMap.put("appScore", appScore);//APP评价分数	
+	        if(null!=orderCityId){
+	        	 paramMap.put("orderCityId", orderCityId);//订单城市ID	
+	        }
+	        if(StringUtil.isNotEmpty(allianceId)){
+	        	 paramMap.put("allianceId", allianceId);//加盟商ID
+	        }
+	        if(StringUtil.isNotEmpty(motorcadeId)){
+	        	 paramMap.put("motorcadeId", motorcadeId);//车队ID
+	        }
+	        if(StringUtil.isNotEmpty(driverTypeId)){
+	        	paramMap.put("driverTypeId", driverTypeId);//司机类型ID
+	        }
+	        if(StringUtil.isNotEmpty(driverScore)){
+	        	paramMap.put("driverScore", driverScore);//司机评价分数	
+	        }
+	        if(StringUtil.isNotEmpty(appScore)){
+	        	 paramMap.put("appScore", appScore);//APP评价分数	
+	        }
 			paramMap.put("queryDate", queryDate);//查询日期
 			paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,orderCityId,allianceId,motorcadeId);
 			if(paramMap==null){
@@ -122,12 +135,24 @@ public class DriverEvaluateController{
 	        logger.info("【运营管理-统计分析】导出,导出对司机评级详情列表数据:exportCancelOrderData");
       try {
     	  Map<String, Object> paramMap = new HashMap<String, Object>();
-	        paramMap.put("orderCityId", orderCityId);//订单城市ID	
-	        paramMap.put("allianceId", allianceId);//加盟商ID
-	        paramMap.put("motorcadeId", motorcadeId);//车队ID
-	        paramMap.put("driverTypeId", driverTypeId);//司机类型ID
-	        paramMap.put("driverScore", driverScore);//司机评价分数	
-	        paramMap.put("appScore", appScore);//APP评价分数	
+	        if(null!=orderCityId){
+	        	 paramMap.put("orderCityId", orderCityId);//订单城市ID	
+	        }
+	        if(StringUtil.isNotEmpty(allianceId)){
+	        	 paramMap.put("allianceId", allianceId);//加盟商ID
+	        }
+	        if(StringUtil.isNotEmpty(motorcadeId)){
+	        	 paramMap.put("motorcadeId", motorcadeId);//车队ID
+	        }
+	        if(StringUtil.isNotEmpty(driverTypeId)){
+	        	paramMap.put("driverTypeId", driverTypeId);//司机类型ID
+	        }
+	        if(StringUtil.isNotEmpty(driverScore)){
+	        	paramMap.put("driverScore", driverScore);//司机评价分数	
+	        }
+	        if(StringUtil.isNotEmpty(appScore)){
+	        	 paramMap.put("appScore", appScore);//APP评价分数	
+	        }
 			paramMap.put("queryDate", queryDate);//查询日期
 	        // 数据权限设置
 			paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,orderCityId,allianceId,motorcadeId);

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -100,7 +101,12 @@ public class CarAnalysisIndexController{
 	        Map<String, Object> paramMap = new HashMap<String, Object>();
 	        paramMap.put("startDate", startDate);//
 	        paramMap.put("endDate", endDate);//
-	        paramMap.put("allianceId", allianceId);//车队ID
+	        if(StringUtil.isNotEmpty(allianceId)){
+	        	paramMap.put("allianceId", allianceId);//加盟商ID
+	        }
+	        if(StringUtil.isNotEmpty(vehicleTypeId)){
+	        	paramMap.put("vehicleTypeId", vehicleTypeId);//车辆类型ID
+	        }
 	        // 数据权限设置
 		      paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,null,null,allianceId);
 		      if(paramMap==null){

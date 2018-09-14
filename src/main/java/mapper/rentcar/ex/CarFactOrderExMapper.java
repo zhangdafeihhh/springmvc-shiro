@@ -27,7 +27,7 @@ public interface CarFactOrderExMapper {
      * @param orderNo 订单号
      * @return java.lang.String
      */
-    public CarFactOrderInfo selectByPrimaryKey(Long orderId);
+    public CarFactOrderInfo selectByPrimaryKey(CarFactOrderInfo carFactOrderInfo);
     /**
      * 
      * @param orderId

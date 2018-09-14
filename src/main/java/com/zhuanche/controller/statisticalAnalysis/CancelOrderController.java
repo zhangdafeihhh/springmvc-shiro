@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -78,14 +79,31 @@ public class CancelOrderController{
 	                                              ){
 	        logger.info("【运营管理-统计分析】取消订单列表数据:queryCancelOrderData");
 	        Map<String, Object> paramMap = new HashMap<String, Object>();
-	        paramMap.put("driverCityId", driverCityId);//司机所属城市ID
-	        paramMap.put("allianceId", allianceId);//加盟商ID
-	        paramMap.put("motorcadeId", motorcadeId);//车队ID
-	        paramMap.put("driverTypeId", driverTypeId);//司机类型ID
-	        paramMap.put("channelId", channelId);//下单渠道ID
-	        paramMap.put("orderVehicleTypeId", orderVehicleTypeId);//预约车型ID
-	        paramMap.put("productTypeId", productTypeId);//产品类型ID
-	        paramMap.put("cancelDurationTypeId", cancelDurationTypeId);//取消时长分类ID
+	        if(null!=driverCityId){
+	        	 paramMap.put("driverCityId", driverCityId);//司机所属城市ID
+	        }
+	        if(StringUtil.isNotEmpty(allianceId)){
+	        	paramMap.put("allianceId", allianceId);//加盟商ID
+	        }
+	        if(StringUtil.isNotEmpty(motorcadeId)){
+	        	paramMap.put("motorcadeId", motorcadeId);//车队ID
+	        }
+	        if(StringUtil.isNotEmpty(driverTypeId)){
+	        	paramMap.put("driverTypeId", driverTypeId);//司机类型ID
+	        }
+	        if(StringUtil.isNotEmpty(channelId)){
+	        	paramMap.put("channelId", channelId);//下单渠道ID
+	        }
+	        if(StringUtil.isNotEmpty(orderVehicleTypeId)){
+	        	paramMap.put("orderVehicleTypeId", orderVehicleTypeId);//预约车型ID
+	        }
+	        if(StringUtil.isNotEmpty(productTypeId)){
+	        	paramMap.put("productTypeId", productTypeId);//产品类型ID
+	        }
+	        if(StringUtil.isNotEmpty(cancelDurationTypeId)){
+	        	paramMap.put("cancelDurationTypeId", cancelDurationTypeId);//取消时长分类ID
+	        }
+	        
 	        paramMap.put("queryDate", queryDate);//查询日期
 			
 	        // 数据权限设置
@@ -141,14 +159,30 @@ public class CancelOrderController{
 	        logger.info("【运营管理-统计分析】导出,导出取消订单列表数据:exportCancelOrderData");
        try {
     	    Map<String, Object> paramMap = new HashMap<String, Object>();
-	        paramMap.put("driverCityId", driverCityId);//司机所属城市ID
-	        paramMap.put("allianceId", allianceId);//加盟商ID
-	        paramMap.put("motorcadeId", motorcadeId);//车队ID
-	        paramMap.put("driverTypeId", driverTypeId);//司机类型ID
-	        paramMap.put("channelId", channelId);//下单渠道ID
-	        paramMap.put("orderVehicleTypeId", orderVehicleTypeId);//预约车型ID
-	        paramMap.put("productTypeId", productTypeId);//产品类型ID
-	        paramMap.put("cancelDurationTypeId", cancelDurationTypeId);//取消时长分类ID
+	        if(null!=driverCityId){
+	        	 paramMap.put("driverCityId", driverCityId);//司机所属城市ID
+	        }
+	        if(StringUtil.isNotEmpty(allianceId)){
+	        	paramMap.put("allianceId", allianceId);//加盟商ID
+	        }
+	        if(StringUtil.isNotEmpty(motorcadeId)){
+	        	paramMap.put("motorcadeId", motorcadeId);//车队ID
+	        }
+	        if(StringUtil.isNotEmpty(driverTypeId)){
+	        	paramMap.put("driverTypeId", driverTypeId);//司机类型ID
+	        }
+	        if(StringUtil.isNotEmpty(channelId)){
+	        	paramMap.put("channelId", channelId);//下单渠道ID
+	        }
+	        if(StringUtil.isNotEmpty(orderVehicleTypeId)){
+	        	paramMap.put("orderVehicleTypeId", orderVehicleTypeId);//预约车型ID
+	        }
+	        if(StringUtil.isNotEmpty(productTypeId)){
+	        	paramMap.put("productTypeId", productTypeId);//产品类型ID
+	        }
+	        if(StringUtil.isNotEmpty(cancelDurationTypeId)){
+	        	paramMap.put("cancelDurationTypeId", cancelDurationTypeId);//取消时长分类ID
+	        }
 	        paramMap.put("queryDate", queryDate);//查询日期
 	        
 	       // 数据权限设置

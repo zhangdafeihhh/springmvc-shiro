@@ -173,7 +173,7 @@ public class OrderController{
 		@SuppressWarnings("deprecation")
 		Workbook wb;
 		try {
-			wb = carFactOrderInfoService.exportExceleOrderList(dtoList,request.getServletContext().getRealPath("/")+ "template" + File.separator +"orderList_info.xlsx");
+			wb = carFactOrderInfoService.exportExceleOrderList(dtoList,request.getServletContext().getRealPath("/")+ "template" + File.separator +"order_info.xlsx");
 			Componment.fileDownload(response, wb, new String("订单列表".getBytes("utf-8"), "iso8859-1"));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -199,12 +199,15 @@ public class OrderController{
      */
 	@ResponseBody
 	@RequestMapping(value = "/orderView", method = { RequestMethod.POST,RequestMethod.GET })
-	public AjaxResponse selectUser(@Verify(param = "orderId",rule = "required") Long orderId){
+	public AjaxResponse selectUser(String orderId,String orderNo){
 		logger.info("*****************查询订单详情 订单id+"+orderId);
 		CarFactOrderInfoDetailDTO orderDTO = new CarFactOrderInfoDetailDTO();
 		long startTime=System.currentTimeMillis();
+		if(StringUtil.isEmpty(orderId) && StringUtil.isEmpty(orderNo)){
+			return AjaxResponse.failMsg(100,"参数不能是空");
+		}
 		//根据orderId获取订单明细
-		CarFactOrderInfo order = getOrderInfo(orderId);
+		CarFactOrderInfo order = getOrderInfo(orderId,orderNo);
 		long endTime=System.currentTimeMillis();
 		if(order.getQxcancelstatus()>=10){
 			order.setQxcancelstatus(10);
@@ -226,7 +229,7 @@ public class OrderController{
 			order.setSettleDate("");
 		}
 		// 等待时间明细
-		List<CarBizOrderWaitingPeriod>  carBizOrderWaitingPeriodList = this.carFactOrderInfoService.selectWaitingPeriodListSlave(order.getOrderno());
+		List<CarBizOrderWaitingPeriod>  carBizOrderWaitingPeriodList = this.carFactOrderInfoService.selectWaitingPeriodListSlave(order.getOrderNo());
 		order.setCarBizOrderWaitingPeriodList(carBizOrderWaitingPeriodList);
 		
 		CopyBeanUtil.copyByIgnoreCase(orderDTO,order,true);
@@ -344,9 +347,16 @@ public class OrderController{
 		 * @param orderId
 		 * @return
 		 */
-		public CarFactOrderInfo getOrderInfo(long orderId){
-			CarFactOrderInfo order = this.carFactOrderInfoService.selectByPrimaryKey(orderId);
-			order.setOrderId((int)orderId);
+		public CarFactOrderInfo getOrderInfo(String orderId,String orderNo){
+			CarFactOrderInfo carFactOrderInfo = new CarFactOrderInfo();
+			if(StringUtil.isNotEmpty(orderId)){
+				carFactOrderInfo.setOrderId(Long.valueOf(orderId));
+			}
+			if(StringUtil.isNotEmpty(orderNo)){
+				carFactOrderInfo.setOrderNo(orderNo);
+			}
+			CarFactOrderInfo order = this.carFactOrderInfoService.selectByPrimaryKey(carFactOrderInfo);
+			order.setOrderId(order.getOrderId());
 			Integer flag = order.getPayFlag();
 			if(flag!=null){
 				if (flag == 1) {
@@ -359,11 +369,11 @@ public class OrderController{
 			}
 			
 			//调订单接口，查询拼车子订单号查主单号
-			String mainOrderNo = carFactOrderInfoService.getMainOrderBySubOrderNo(order.getOrderno());
+			String mainOrderNo = carFactOrderInfoService.getMainOrderBySubOrderNo(order.getOrderNo());
 			order.setMainOrderNo(mainOrderNo);
 			
 			//调用计费接口
-			String costDetailParamStr = "orderId="+orderId+"&serviceId=1";
+			String costDetailParamStr = "orderId="+order.getOrderId()+"&serviceId=1";
 			String result = carFactOrderInfoService.queryCostDetailData(costDetailParamStr);
 			if(!"".equals(result)){
 				JSONObject costDetailJson = JSON.parseObject(result);
@@ -392,7 +402,7 @@ public class OrderController{
 				
 			}
 			 //end
-			List<CarFactOrderInfo> pojoList = this.carFactOrderInfoService.selectByListPrimaryKey(orderId);
+			List<CarFactOrderInfo> pojoList = this.carFactOrderInfoService.selectByListPrimaryKey(order.getOrderId());
 			if (pojoList != null) {
 				for (int i = 0; i < pojoList.size(); i++) {
 					CarFactOrderInfo info = pojoList.get(i);
@@ -411,7 +421,7 @@ public class OrderController{
 					}
 				}
 			}
-			CarBizOrderSettleEntity carBizOrderSettle= carFactOrderInfoService.selectDriverSettleByOrderId(orderId);
+			CarBizOrderSettleEntity carBizOrderSettle= carFactOrderInfoService.selectDriverSettleByOrderId(order.getOrderId());
 			if(carBizOrderSettle!=null){
 				//优惠券面值
 				//优惠券类型
@@ -452,7 +462,7 @@ public class OrderController{
 				date =sdf1.parse(order.getCreatedate()); 
 				String tableName="car_biz_driver_record_"+sdf.format(date);
 				Map<String,String>paraMap=new HashMap<String, String>();
-				paraMap.put("orderNo", order.getOrderno());
+				paraMap.put("orderNo", order.getOrderNo());
 				paraMap.put("tableName", tableName.replace("-", "_") ); //driver_order_record  tableName.replace("-", "_")
 				List<OrderTimeEntity> p1 = carFactOrderInfoService.queryDriverOrderRecord(paraMap);
 				if(p1!=null){

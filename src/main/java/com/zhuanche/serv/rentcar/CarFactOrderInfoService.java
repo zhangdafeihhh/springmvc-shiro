@@ -27,7 +27,7 @@ public interface CarFactOrderInfoService {
      * @param orderNo 订单号
      * @return java.lang.String
      */
-    public CarFactOrderInfo selectByPrimaryKey(Long orderId);
+    public CarFactOrderInfo selectByPrimaryKey(CarFactOrderInfo carFactOrderInfo);
     /**
      *  （老车管）根据子订单号查询主订单
      * @param orderNo 订单号
