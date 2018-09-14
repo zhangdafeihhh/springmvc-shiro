@@ -3,6 +3,8 @@ package com.zhuanche.dto.rentcar;
 public class CarFactOrderInfoDTO{
 	//订单号 
 	private String orderNo;
+	//订单ID
+	private String orderId;
 	//订单指派方式 
 	private String pushDriverType;
 	//城市 
@@ -208,6 +210,12 @@ public class CarFactOrderInfoDTO{
 	}
 	public void setMainOrderNo(String mainOrderNo) {
 		this.mainOrderNo = mainOrderNo;
+	}
+	public String getOrderId() {
+		return orderId;
+	}
+	public void setOrderId(String orderId) {
+		this.orderId = orderId;
 	}
 	
 	

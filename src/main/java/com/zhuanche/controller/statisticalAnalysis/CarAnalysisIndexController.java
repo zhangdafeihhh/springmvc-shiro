@@ -60,19 +60,10 @@ public class CarAnalysisIndexController{
 	      paramMap.put("endDate", endDate);//加盟商ID
 	      paramMap.put("groupByColumnCode", groupByColumnCode);//汇总维度代码
 	      // 数据权限设置
-		  SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-		  if(currentLoginUser == null){
-				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-		  }
-		  if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
-			  Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-		      // 供应商信息
-			  String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-			  if(null == visibleAllianceIds || null == visibleVehicleTypeIds){
-				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-			  }
-		      paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-		  }
+	      paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,null,null,null);
+	      if(paramMap==null){
+	    	  return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+	      }
 		  if(null == visibleVehicleTypeIds){
 				return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID,"可见车辆类型ID参数不能为空");
 		  }
@@ -107,24 +98,14 @@ public class CarAnalysisIndexController{
 	                                              ){
 	        logger.info("【运营管理-统计分析】车辆分析指标趋势 数据:queryCarAnalysisIndexWayData");
 	        Map<String, Object> paramMap = new HashMap<String, Object>();
-	        paramMap.put("startDate", startDate);//订单城市ID	
-	        paramMap.put("endDate", endDate);//加盟商ID
+	        paramMap.put("startDate", startDate);//
+	        paramMap.put("endDate", endDate);//
 	        paramMap.put("allianceId", allianceId);//车队ID
 	        // 数据权限设置
-			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-			if(currentLoginUser == null){
-				logger.info("【运营管理-统计分析】车辆分析指标趋势 数据  未授权");
-				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-			}
-			if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
-				Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-		        // 供应商信息
-				String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-				if(null == visibleAllianceIds || null == visibleVehicleTypeIds){
-					return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-				}
-			    paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-			}
+		      paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,null,null,allianceId);
+		      if(paramMap==null){
+		    	  return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+		      }
 			  // 车辆类型  ??
 			  String[] visibleVehicleTypeIdsStr = visibleVehicleTypeIds.split(",");
 		      paramMap.put("visibleVehicleTypeIds", visibleVehicleTypeIdsStr); // 可见车辆类型ID

@@ -2,12 +2,14 @@ package com.zhuanche.controller.statisticalAnalysis;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,11 +64,11 @@ public class DriverOperateDetailController{
 	@ResponseBody
     @RequestMapping(value = "/queryDriverOperateDetailData", method = { RequestMethod.POST,RequestMethod.GET })
     public AjaxResponse queryDriverOperateDetailData(
-    										  String driverCityId,
+    										  Long cityId,
     										  String genderId,
     										  String driverTypeId,
-                                              String allianceId,
-                                              String motorcadeId,
+                                              String supplier,
+                                              String teamId,
                                               String driverName,
                                               @Verify(param = "queryDate",rule = "required") String queryDate,
                                               @Verify(param = "pageNo",rule = "required") Integer pageNo,
@@ -74,34 +76,17 @@ public class DriverOperateDetailController{
                                               ){
         logger.info("【运营管理-统计分析】司机运营详情分析  列表数据:queryDriverOperateDetailData");
         Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("driverCityId", driverCityId);//司机所属城市ID
+        paramMap.put("driverCityId", cityId);//司机所属城市ID
         paramMap.put("genderId", genderId);//性别ID
         paramMap.put("driverTypeId", driverTypeId);//司机类型ID
-        paramMap.put("allianceId", allianceId);//加盟商ID
-        paramMap.put("motorcadeId", motorcadeId);//车队ID
+        paramMap.put("allianceId", supplier);//加盟商ID
+        paramMap.put("motorcadeId", teamId);//车队ID
         paramMap.put("driverName", driverName);//司机姓名
 		paramMap.put("queryDate", queryDate);//查询日期
-        // 数据权限设置
-		SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-		if(currentLoginUser == null){
+		
+		paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,supplier,teamId);
+		if(paramMap==null){
 			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-		}
-		if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
-			Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-	        Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-	        Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
-	        // 供应商信息
-			String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-			// 车队信息
-			String[] visibleMotocadeIds = statisticalAnalysisService.setToArray(teamIds);
-			// 可见城市
-			String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
-			if(null == visibleAllianceIds || null == visibleMotocadeIds || visibleCityIds == null ){
-				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-			}
-	        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-	        paramMap.put("visibleMotorcadeIds", visibleMotocadeIds); // 可见车队ID
-	        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
 		}
         if(null != pageNo && pageNo > 0)
         	paramMap.put("pageNo", pageNo);//页号
@@ -129,7 +114,7 @@ public class DriverOperateDetailController{
 	  */
   	@RequestMapping(value = "/exportDriverOperateDetailData", method = { RequestMethod.POST,RequestMethod.GET })
 	public void exportDriverOperateDetailData( 
-										String driverCityId,
+										Long driverCityId,
 										String genderId,
 										String driverTypeId,
 							            String allianceId,
@@ -148,30 +133,11 @@ public class DriverOperateDetailController{
 	          paramMap.put("motorcadeId", motorcadeId);//车队ID
 	          paramMap.put("driverName", driverName);//司机姓名
 	  		  paramMap.put("queryDate", queryDate);//查询日期
-	          // 数据权限设置
-	  		  SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-	  		  if(currentLoginUser == null){
-	  			  logger.info("【运营管理-统计分析】导出,导出司机运营详情数据:未授权");
-	  			  return;
-	  			}
-	  		  if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
-		  		  Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-		          Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-		          Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
-		          // 供应商信息
-		  		  String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-		  		  // 车队信息
-		  		  String[] visibleMotocadeIds = statisticalAnalysisService.setToArray(teamIds);
-		  		  // 可见城市
-		  		  String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
-		  		  if(null == visibleAllianceIds || null == visibleMotocadeIds || visibleCityIds == null ){
-		  			  logger.info("【运营管理-统计分析】导出,导出司机运营详情数据:授权不足");
-		  			  return;
-		  		  }
-		          paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-		          paramMap.put("visibleMotorcadeIds", visibleMotocadeIds); // 可见车队ID
-		          paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
-	  		  }
+		  		paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,driverCityId,allianceId,motorcadeId);
+				if(paramMap==null){
+					return;
+				}
+			
 	          String jsonString = JSON.toJSONString(paramMap);
 	          
 			  statisticalAnalysisService.exportCsvFromToPage(

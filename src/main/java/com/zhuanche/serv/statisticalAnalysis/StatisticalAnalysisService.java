@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,6 +34,7 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.ValidateUtils;
 
 @Service
@@ -244,5 +246,80 @@ public class  StatisticalAnalysisService {
 			logger.error("调用大数据" + url + "异常", e);
 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 		}
+	}
+	
+	public Map<String, Object> getCurrentLoginUserParamMap(Map<String, Object> paramMap,Long cityId,String supplier,String teamId){
+		// 数据权限设置
+		Set<Integer> cityIdsForAuth = new HashSet<Integer>();// 非超级管理员可以管理的所有城市ID
+		Set<Integer> supplierIdsForAuth = new HashSet<Integer>();// 非超级管理员可以管理的所有供应商ID
+		Set<Integer> teamIdsForAuth = new HashSet<Integer>();// 非超级管理员可以管理的可见的车队信息
+		if (!WebSessionUtil.isSupperAdmin()) {// 非超级管理员
+			// 获取当前登录用户信息
+			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+			if(null != currentLoginUser){
+				cityIdsForAuth = currentLoginUser.getCityIds();// 获取用户可见的城市ID
+				supplierIdsForAuth = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
+				teamIdsForAuth = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
+			}else{
+				return null;
+			}
+			if (cityIdsForAuth.size() > 0 && cityId != null && !cityIdsForAuth.contains(cityId)) {
+				return null;
+			}
+			if (supplierIdsForAuth.size() > 0 && StringUtils.isNotBlank(supplier) && !supplierIdsForAuth.contains(supplier)) {
+				return null;
+			}
+			if (teamIdsForAuth.size() > 0 && StringUtils.isNotBlank(teamId) && !teamIdsForAuth.contains(teamId)) {
+				return null;
+			}
+		}
+		// 查询参数设置
+		Set<Long> cityIds = new HashSet<Long>();
+		Set<String> supplierIds = new HashSet<String>();
+		Set<String> teamIds = new HashSet<String>();
+		// 城市权限
+		if (null != cityId) {
+			cityIds.add(cityId);
+		} else {
+			if(cityIdsForAuth != null && cityIdsForAuth.size() >0){
+				for (Integer cityid : cityIdsForAuth) {
+					cityIds.add(cityid.longValue());
+				}
+			}
+		}
+		// 供应商权限
+		if (StringUtils.isNotBlank(supplier)) {
+			supplierIds.add(supplier);
+		} else {
+			if(supplierIdsForAuth != null && supplierIdsForAuth.size() >0 ){
+				for (Integer supplierId : supplierIdsForAuth) {
+					supplierIds.add(String.valueOf(supplierId));
+				}
+			}
+		}
+		// 车队权限
+		if (StringUtils.isNotBlank(teamId)) {
+			teamIds.add(teamId);
+		} else {
+			if(teamIdsForAuth != null && teamIdsForAuth.size() >0 ){
+				for (Integer tId : teamIdsForAuth) {
+					teamIds.add(String.valueOf(tId));
+				}
+			}
+		}
+		if(!supplierIds.isEmpty()){
+			 paramMap.put("visibleAllianceIds", supplierIds); // 可见加盟商ID
+		}
+		if(!teamIds.isEmpty()){
+			paramMap.put("visibleMotorcadeIds", teamIds); // 可见车队ID
+		}
+		if(!cityIds.isEmpty()){
+			paramMap.put("visibleCityIds", cityIds); //可见城市ID
+		}
+		//非管理员  没有任何可见权限返回null
+		if(cityIds.isEmpty() && teamIds.isEmpty() && supplierIds.isEmpty() && !WebSessionUtil.isSupperAdmin()){
+			return null;
+		}
+		return paramMap;
 	}
 }
