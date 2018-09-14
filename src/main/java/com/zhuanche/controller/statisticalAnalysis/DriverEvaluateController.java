@@ -62,7 +62,7 @@ public class DriverEvaluateController{
 		@ResponseBody
 	    @RequestMapping(value = "/queryDriverEvaluateData", method = { RequestMethod.POST,RequestMethod.GET })
 	    public AjaxResponse queryDriverEvaluateData(
-	    										  String orderCityId,
+	    										  Long orderCityId,
 	    										  String driverTypeId,
 	                                              String allianceId,
 	                                              String motorcadeId,
@@ -81,27 +81,9 @@ public class DriverEvaluateController{
 	        paramMap.put("driverScore", driverScore);//司机评价分数	
 	        paramMap.put("appScore", appScore);//APP评价分数	
 			paramMap.put("queryDate", queryDate);//查询日期
-	        // 数据权限设置
-			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-			if(currentLoginUser == null){
+			paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,orderCityId,allianceId,motorcadeId);
+			if(paramMap==null){
 				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-			}
-			if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
-				Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-		        Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-		        Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
-		        // 供应商信息
-				String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-				// 车队信息
-				String[] visibleMotocadeIds = statisticalAnalysisService.setToArray(teamIds);
-				// 可见城市
-				String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
-				if(null == visibleAllianceIds || null == visibleMotocadeIds || visibleCityIds == null ){
-					return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-				}
-		        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-		        paramMap.put("visibleMotorcadeIds", visibleMotocadeIds); // 可见车队ID
-		        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
 			}
 		   if(null != pageNo && pageNo > 0)
 	        	paramMap.put("pageNo", pageNo);//页号
@@ -128,7 +110,7 @@ public class DriverEvaluateController{
 		  */
   	@RequestMapping(value = "/exportDriverEvaluateData", method = { RequestMethod.POST,RequestMethod.GET })
 	public void exportDriverEvaluateData( 
-										String orderCityId,
+										Long orderCityId,
 										String driverTypeId,
 							            String allianceId,
 							            String motorcadeId,
@@ -148,28 +130,9 @@ public class DriverEvaluateController{
 	        paramMap.put("appScore", appScore);//APP评价分数	
 			paramMap.put("queryDate", queryDate);//查询日期
 	        // 数据权限设置
-			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-			if(currentLoginUser == null){
-				logger.info("【运营管理-统计分析】导出,导出对司机评级详情列表数据:授权不足");
+			paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,orderCityId,allianceId,motorcadeId);
+			if(paramMap==null){
 				return;
-			}
-			if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
-				Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-		        Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-		        Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
-		        // 供应商信息
-				String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-				// 车队信息
-				String[] visibleMotocadeIds = statisticalAnalysisService.setToArray(teamIds);
-				// 可见城市
-				String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
-				if(null == visibleAllianceIds || null == visibleMotocadeIds || visibleCityIds == null ){
-					logger.info("【运营管理-统计分析】导出,导出对司机评级详情:授权不足");
-					return; // return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-				}
-		        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-		        paramMap.put("visibleMotorcadeIds", visibleMotocadeIds); // 可见车队ID
-		        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
 			}
 	        String jsonString = JSON.toJSONString(paramMap);
 	        

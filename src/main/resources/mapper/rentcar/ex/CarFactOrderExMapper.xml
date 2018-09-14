@@ -496,5 +496,16 @@
 		WHERE car.license_plates = #{licensePlates}
     </select>
     
+    <select id="selectServiceEntityList" parameterType="com.zhuanche.entity.rentcar.ServiceEntity" resultType="com.zhuanche.dto.rentcar.ServiceTypeDTO">
+		 SELECT
+			service_id as serviceId,
+			service.service_name as serviceName,
+			service.service_no as serviceNo,
+			service.sort as sort
+		FROM
+			car_biz_service service
+		WHERE service.`status` = '1'
+   </select>
+   
     
 </mapper>

@@ -53,7 +53,7 @@ public class CompleteOrderController{
 	    @RequestMapping(value = "/queryCompleteOrdeData", method = { RequestMethod.POST,RequestMethod.GET })
 	    public AjaxResponse queryCompleteOrderData(
 	    										  @Verify(param = "queryDate",rule = "required") String queryDate,
-	    										  String cityId,
+	    										  Long cityId,
 	    										  String productId,
 	                                              String bindVehicleTypeId,
 	                                              String serviceVehicleTypeId,
@@ -84,26 +84,9 @@ public class CompleteOrderController{
 	        paramMap.put("hotelId", hotelId);//酒店ID
 	        paramMap.put("driverId", driverId);//司机ID
 	        // 数据权限设置
-			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-			if(currentLoginUser == null){
+	        paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,allianceId,motorcardId);
+			if(paramMap==null){
 				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-			}
-			if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
-				Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-			    Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-			    Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
-			    // 供应商信息
-			    String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-				// 车队信息
-				String[] visibleMotorcadeIds = statisticalAnalysisService.setToArray(teamIds);
-				// 可见城市
-				String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
-				if(null == visibleAllianceIds || null == visibleMotorcadeIds || visibleCityIds == null ){
-					return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-				}
-			    paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-			    paramMap.put("visibleMotorcadeIds", visibleMotorcadeIds); // 可见车队ID
-			    paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
 			}
 	        if(null != pageNo && pageNo > 0)
 	        	paramMap.put("pageNo", pageNo);//页号
@@ -126,7 +109,7 @@ public class CompleteOrderController{
     	@RequestMapping(value = "/exportCompleteOrderData", method = { RequestMethod.POST,RequestMethod.GET })
  	    public AjaxResponse exportCompleteOrderData(
  	    										  @Verify(param = "queryDate",rule = "required") String queryDate,
- 	    										  String cityId,
+ 	    										  Long cityId,
  	    										  String productId,
  	                                              String bindVehicleTypeId,
  	                                              String serviceVehicleTypeId,
@@ -156,29 +139,11 @@ public class CompleteOrderController{
         	 paramMap.put("motorcardId", motorcardId);//车队ID
         	 paramMap.put("hotelId", hotelId);//酒店ID
         	 paramMap.put("driverId", driverId);//司机ID
- 	       // 数据权限设置
-			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-			if(currentLoginUser == null){
-				logger.info("【运营管理-统计分析】导出,完成订单详情列表数据  未授权");
-				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-			}
-			if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
-				Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-		        Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-		        Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
-		        // 供应商信息
-				String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-				// 车队信息
-				String[] visibleMotocadeIds = statisticalAnalysisService.setToArray(teamIds);
-				// 可见城市
-				String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
-				if(null == visibleAllianceIds || null == visibleMotocadeIds || visibleCityIds == null ){
-					return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-				}
-		        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-		        paramMap.put("visibleMotorcadeIds", visibleMotocadeIds); // 可见车队ID
-		        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
-			}
+        	 // 数据权限设置
+ 	        paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,allianceId,motorcardId);
+ 			if(paramMap==null){
+ 				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+ 			}
 	 		String jsonString = JSON.toJSONString(paramMap);
 		    logger.info("【运营管理-统计分析】导出,完成订单详情请求参数----"+jsonString);
 		    

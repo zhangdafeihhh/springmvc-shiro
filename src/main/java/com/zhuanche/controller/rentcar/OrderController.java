@@ -1,11 +1,19 @@
 package com.zhuanche.controller.rentcar;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,17 +27,21 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.controller.driver.Componment;
+import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
+import com.zhuanche.dto.rentcar.CarFactOrderInfoDTO;
 import com.zhuanche.dto.rentcar.CarFactOrderInfoDetailDTO;
 import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
+import com.zhuanche.dto.rentcar.ServiceTypeDTO;
 import com.zhuanche.entity.DriverOrderRecord.OrderTimeEntity;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizOrderSettleEntity;
 import com.zhuanche.entity.rentcar.CarBizOrderWaitingPeriod;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.entity.rentcar.CarFactOrderInfo;
+import com.zhuanche.entity.rentcar.ServiceEntity;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.util.CopyBeanUtil;
-import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 
 /**
  * ClassName: OrderController 
@@ -104,6 +116,79 @@ public class OrderController{
 	     AjaxResponse result = carFactOrderInfoService.queryOrderDataList(paramMap);
 	     return result;
 	 }
+	 
+	 
+		/**
+	    * 订单 列表导出
+	    * @param queryDate	查询日期
+	    * @return
+	  */
+	 @ResponseBody
+	 @RequestMapping(value = "/exportOrderList", method = { RequestMethod.POST,RequestMethod.GET })
+	 public void exportOrderList(
+	 										   String carGroupId,
+	 										   String status,
+	 										   String cityId,
+	 										   String supplierId,
+	                                           String teamId,
+	                                           String teamClassId,
+	                                           String bookingUserName, 
+	                                           String bookingUserPhone,
+	                                           String driverPhone,
+	                                           String licensePlates, 
+	                                           String orderNo, 
+	                                           String orderType,
+	                                           @Verify(param = "beginCreateDate",rule = "required") String beginCreateDate,
+	                                           @Verify(param = "endCreateDate",rule = "required") String endCreateDate,
+	                                           @Verify(param = "beginCostEndDate",rule = "required") String beginCostEndDate,
+	                                           @Verify(param = "endCostEndDate",rule = "required") String endCostEndDate,
+	                                           HttpServletRequest request,HttpServletResponse response
+	                                           ){
+	     logger.info("【运营管理-统计分析】查询订单 列表:queryOrderList");
+	     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmssSS");
+	     String  transId =sdf.format(new Date());
+	     
+	     Map<String, Object> paramMap = new HashMap<String, Object>();
+	     paramMap.put("carGroupId", carGroupId);// 
+	     paramMap.put("status", status);//
+	     paramMap.put("cityId", cityId);//
+	     paramMap.put("supplierId", supplierId);//
+	     paramMap.put("teamId", teamId);// 
+	     paramMap.put("teamClassId", teamClassId);//
+	     paramMap.put("bookingUserName", bookingUserName);//
+	     paramMap.put("bookingUserPhone", bookingUserPhone);//
+	     paramMap.put("driverPhone", driverPhone);//
+	     paramMap.put("licensePlates", licensePlates);// 
+	     paramMap.put("orderNo", orderNo);//
+	     paramMap.put("orderType", orderType);//
+	     paramMap.put("beginCreateDate", beginCreateDate+" 00:00:00");//
+	     paramMap.put("endCreateDate", endCreateDate+" 23:59:59");//
+	     paramMap.put("beginCostEndDate", beginCostEndDate+" 00:00:00");//
+	     paramMap.put("endCostEndDate", endCostEndDate+" 23:59:59");//
+	     paramMap.put("transId", transId );//
+	     paramMap.put("pageNo", "1");//页号
+	     paramMap.put("pageSize", "10000");//每页记录数
+		 // 从订单组取统计数据
+	     List<CarFactOrderInfoDTO> dtoList = carFactOrderInfoService.queryAllOrderDataList(paramMap);
+		@SuppressWarnings("deprecation")
+		Workbook wb;
+		try {
+			wb = carFactOrderInfoService.exportExceleOrderList(dtoList,request.getServletContext().getRealPath("/")+ "template" + File.separator +"orderList_info.xlsx");
+			Componment.fileDownload(response, wb, new String("订单列表".getBytes("utf-8"), "iso8859-1"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	 }
+	public void exportExcelFromTemplet(HttpServletRequest request, HttpServletResponse response, Workbook wb, String fileName) throws IOException {
+		if(StringUtils.isEmpty(fileName)) {
+			fileName = "exportExcel";
+		}
+		response.setHeader("Content-Disposition","attachment;filename="+fileName+".xlsx");//指定下载的文件名
+		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); 
+		ServletOutputStream os =  response.getOutputStream();
+		wb.write(os);
+		os.close();
+	}
 	 
 	/**
      * 查询订单详情
@@ -220,27 +305,40 @@ public class OrderController{
 	 @ResponseBody
 	 @RequestMapping(value = "/queryDrivingRouteData", method = { RequestMethod.POST,RequestMethod.GET })
 	 public String queryDrivingRouteData(
-	 										   @Verify(param = "orderNo",rule = "required") String orderNo,
-	                                           String batchNo,
-	                                           @Verify(param = "startDate",rule = "required") String startDate,
+	 										   @Verify(param = "startDate",rule = "required") String startDate,
 	                                           @Verify(param = "endDate",rule = "required")   String endDate,
 	                                           @Verify(param = "driverId",rule = "required")  String driverId,
+	                                           String output,
 	                                           @Verify(param = "platform",rule = "required")  String platform
 	                                           ){
 	     logger.info("【运营管理-统计分析】查询LBS提供的轨迹坐标 :queryDrivingRouteData");
-	     StringBuffer param = new StringBuffer("");
-		 param.append("orderNo=" + orderNo + '&');
-		 if(StringUtil.isNotEmpty(batchNo)){
-			 param.append("batchNo=" + batchNo+ '&');
-		 }
-		 param.append("startDate=" + startDate + '&');
-		 param.append("endDate=" + endDate+ '&');
-		 param.append("driverId=" + driverId+ '&');
-		 param.append("platform=" + platform);
-		 String result = carFactOrderInfoService.queryDrivingRouteData(param.toString());
+	     Map<String, Object> paramMap = new HashMap<String, Object>();
+	     paramMap.put("startDate", startDate+" 00:00:00");// 
+	     paramMap.put("endDate", endDate+" 23:59:59");//
+	     paramMap.put("driverId", driverId);//
+	     if(StringUtil.isEmpty(output)){
+	    	 paramMap.put("output", "1");//
+	     }else{
+	    	 paramMap.put("output", output);//
+	     }
+	     paramMap.put("platform", platform);// 
+		 String result = carFactOrderInfoService.queryDrivingRouteData(paramMap);
 	     return result;
 	 }
 	
+	 /**
+	    * 查询订单服务类型字典
+	    * @return
+	  */
+	 @ResponseBody
+	 @RequestMapping(value = "/queryServiceEntityData", method = { RequestMethod.POST,RequestMethod.GET })
+	 public List<ServiceTypeDTO> queryServiceEntityData( ){
+	     logger.info("订单服务类型字典 :ServiceEntityData");
+	     List<ServiceTypeDTO> list = carFactOrderInfoService.selectServiceEntityList(new ServiceEntity());
+	     return list;
+	 }
+	
+	 
 	 /**
 		 * 根据orderId获取订单明细
 		 * @param orderId

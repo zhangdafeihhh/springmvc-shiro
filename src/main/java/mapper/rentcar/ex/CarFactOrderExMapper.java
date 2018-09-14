@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
+import com.zhuanche.dto.rentcar.ServiceTypeDTO;
 import com.zhuanche.entity.rentcar.CarBizOrderSettleEntity;
 import com.zhuanche.entity.rentcar.CarBizOrderWaitingPeriod;
 import com.zhuanche.entity.rentcar.CarBizPlanEntity;
@@ -61,4 +62,9 @@ public interface CarFactOrderExMapper {
      * 查询车型
      */
     public String selectModelNameByLicensePlates(String licensePlates);
+    /**
+     * 订单服务类型
+     */
+    public List<ServiceTypeDTO> selectServiceEntityList(ServiceEntity serviceEntity);
+    
 }

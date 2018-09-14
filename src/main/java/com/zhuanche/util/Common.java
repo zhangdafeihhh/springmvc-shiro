@@ -51,7 +51,7 @@ public class Common {
 	//拼车订单查询end
 	
 	//查询LBS提供的轨迹坐标URL
-	public static final String LBS_DRIVING_ROUTE = "/driving/route";
+	public static final String LBS_DRIVING_ROUTE = "/grapsRoad";
 	
 	//查询订单明细中计费明细相关数据
 	public static final String COST_ORDER_DETAIL = "/orderCostdetail/getCostDetail";
