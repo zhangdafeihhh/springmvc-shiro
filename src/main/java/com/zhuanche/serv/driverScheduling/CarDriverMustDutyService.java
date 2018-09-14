@@ -85,14 +85,22 @@ public class CarDriverMustDutyService {
 		}
 		try{
 			CommonRequest commonRequest = new CommonRequest();
-			BeanUtils.copyProperties(dutyParamRequest,commonRequest);
+			if(!Check.NuNObj(dutyParamRequest.getCityId())){
+				commonRequest.setCityId(String.valueOf(dutyParamRequest.getCityId()));
+			}
+			if(!Check.NuNObj(dutyParamRequest.getSupplierId())){
+				commonRequest.setSupplierId(String.valueOf(dutyParamRequest.getSupplierId()));
+			}
+			if(!Check.NuNObj(dutyParamRequest.getTeamId())){
+				commonRequest.setTeamId(dutyParamRequest.getTeamId());
+			}
 			CommonRequest resultParmam = citySupplierTeamCommonService.paramDeal(commonRequest);
 			if(Check.NuNObj(resultParmam)){
 				return new PageDTO();
 			}
 			dutyParamRequest.setCityIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getCityIds()));
 			dutyParamRequest.setSupplierIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getSupplierIds()));
-			dutyParamRequest.setSupplierIds(resultParmam.getTeamIds());
+			dutyParamRequest.setTeamIds(resultParmam.getTeamIds());
 			PageInfo<CarDriverMustDutyDTO> pageInfo = PageHelper.startPage(dutyParamRequest.getPageNo(), dutyParamRequest.getPageSize(), true).doSelectPageInfo(()
 					-> carDriverMustDutyExMapper.selectDriverMustDutyList(dutyParamRequest));
 			PageDTO pageDTO = new PageDTO();
