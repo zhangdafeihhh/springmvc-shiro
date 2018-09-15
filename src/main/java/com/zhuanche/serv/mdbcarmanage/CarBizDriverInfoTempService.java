@@ -498,7 +498,7 @@ public class CarBizDriverInfoTempService {
                                 }
                                 driverEntity.setServiceCityId(cityId);
                                 driverEntity.setSupplierId(supplierId);
-                                if(carBizDriverInfoTempExMapper.validateCityAndSupplier(driverEntity) > 0){
+                                if(carBizDriverInfoTempExMapper.validateCityAndSupplier(driverEntity) == 0){
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                                     returnVO.setReson("第" +  (rowIx+1) + "行数据，第"
                                             + (colIx + 1) + "列 【车牌号】:"+cellValue.getStringValue()+"不在所选的城市或厂商");
