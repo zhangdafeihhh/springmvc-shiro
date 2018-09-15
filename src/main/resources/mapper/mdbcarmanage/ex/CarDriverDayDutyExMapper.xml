@@ -216,7 +216,7 @@
         #{tid}
       </foreach>
     </if>
-    order by d.city_id, d.id
+    order by d.time DESC
   </select>
 
   <update id="updateDriverDayDutyList" parameterType="java.util.Map">

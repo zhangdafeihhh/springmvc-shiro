@@ -212,7 +212,9 @@ public class DriverMonthDutyController {
         }
         CommonRequest commonRequest = new CommonRequest();
         BeanUtils.copyProperties(param,commonRequest);
-        commonRequest.setTeamId(Integer.parseInt(param.getTeamId()));
+        if(!Check.NuNStr(param.getTeamId())){
+            commonRequest.setTeamId(Integer.parseInt(param.getTeamId()));
+        }
         CommonRequest data = commonService.paramDeal(commonRequest);
         if(Check.NuNObj(data)){
             logger.error("没有权限操作,用户："+JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));
@@ -253,7 +255,9 @@ public class DriverMonthDutyController {
             tabelHeader = (Map<String, Object>)result.get("Rows");
             CommonRequest commonRequest = new CommonRequest();
             BeanUtils.copyProperties(param,commonRequest);
-            commonRequest.setTeamId(Integer.parseInt(param.getTeamId()));
+            if(!Check.NuNStr(param.getTeamId())){
+                commonRequest.setTeamId(Integer.parseInt(param.getTeamId()));
+            }
             CommonRequest data = commonService.paramDeal(commonRequest);
             if(Check.NuNObj(data)){
                 logger.error("没有权限操作,用户："+JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));

@@ -5,9 +5,6 @@ import java.io.Serializable;
 
 public class DutyExcelDTO implements Serializable{
 
-    String[] title = {"司机姓名","手机号","城市","供应商","车队",
-            "排班日期","强制上班时间","排班时长","状态"};
-
     private String driverName;
     private String phone; // 司机手机号
     private String cityName;
@@ -17,14 +14,6 @@ public class DutyExcelDTO implements Serializable{
     private String forcedTimes;
     private String dutyIds;
     private Integer status;
-
-    public String[] getTitle() {
-        return title;
-    }
-
-    public void setTitle(String[] title) {
-        this.title = title;
-    }
 
     public String getDriverName() {
         return driverName;

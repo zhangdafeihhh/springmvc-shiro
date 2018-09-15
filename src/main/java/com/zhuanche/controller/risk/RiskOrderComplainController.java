@@ -196,12 +196,11 @@ public class RiskOrderComplainController {
             paramMap.put("complainReason", reason);
             SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
             paramMap.put("appealCommitBy", currentLoginUser.getName());
-
-//            paramMap.put("fileNameList", fileNameList);
+             paramMap.put("fileNameList", new ArrayList<>());//必须保留的参数
             String result =riskOrderCompalinTemplate.postForObject("/car/manager/order/submitComplain.do",
                     String.class, paramMap);
 
-            return AjaxResponse.success(null);
+            return AjaxResponse.success(result);
         } catch (Exception e) {
             logger.error("风控-风控订单管理-执行提交申诉,orderNo:{" + orderNo + "}",e);
             return AjaxResponse.fail(RestErrorCode.RISK_SUBMITCOMPLAIN_FAIL,"ERROR");

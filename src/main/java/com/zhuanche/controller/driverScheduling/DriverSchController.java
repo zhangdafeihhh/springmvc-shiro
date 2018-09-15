@@ -336,15 +336,7 @@ public class DriverSchController {
         logger.info("发布排班入参:"+ JSON.toJSONString(param));
         int result = carDriverDutyService.issueDriverDuty(param);
         ServiceReturnCodeEnum typeByCode = ServiceReturnCodeEnum.getTypeByCode(result);
-        if(result < 0 ){
-            AjaxResponse fail = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
-            Map<String,String> map = new HashedMap();
-            map.put("errorMsg",typeByCode.getName());
-            fail.setData(map);
-            return fail;
-        }else if(result == 1){
-            return AjaxResponse.success(result);
-        }else if(result == 2){
+        if(result == 2){
             AjaxResponse success = AjaxResponse.success(result);
             Map<String,String> map = new HashedMap();
             map.put("successMsg",typeByCode.getName());
