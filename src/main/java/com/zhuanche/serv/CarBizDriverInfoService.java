@@ -740,10 +740,14 @@ public class CarBizDriverInfoService {
             if(stringObjectMap!=null){
                 if(stringObjectMap.containsKey("teamId") && stringObjectMap.get("teamId")!=null ){
                     carBizDriverInfo.setTeamId(Integer.parseInt(stringObjectMap.get("teamId").toString()));
+                }
+                if(stringObjectMap.containsKey("teamName") && stringObjectMap.get("teamName")!=null ){
                     carBizDriverInfo.setTeamName(stringObjectMap.get("teamName").toString());
                 }
                 if(stringObjectMap.containsKey("teamGroupId") && stringObjectMap.get("teamGroupId")!=null ){
                     carBizDriverInfo.setTeamId(Integer.parseInt(stringObjectMap.get("teamGroupId").toString()));
+                }
+                if(stringObjectMap.containsKey("teamGroupName") && stringObjectMap.get("teamGroupName")!=null ){
                     carBizDriverInfo.setTeamName(stringObjectMap.get("teamGroupName").toString());
                 }
             }

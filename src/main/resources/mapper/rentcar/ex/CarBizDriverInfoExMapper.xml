@@ -443,7 +443,7 @@
     <include refid="Blob_Column_List" />
     from car_biz_driver_info
     <include refid="allBaseColumnWhereList"/>
-    order by create_date desc
+    order by update_date desc
   </select>
   <select id="checkPhone" resultType="java.lang.Integer" >
     select count(*)

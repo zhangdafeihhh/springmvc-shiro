@@ -124,6 +124,8 @@ public final class RestErrorCode{
 	public static final int CITY_SUPPLIER_CAR_DIFFER                    = 3013;
 	@ResultMessage("服务类型不存在")
 	public static final int GROUP_NOT_EXIST                    = 3014;
+	@ResultMessage("修改手机号与原手机号不可以相同")
+	public static final int PHONE_NEW_SAME                    = 3015;
 
 	@ResultMessage("周报查询时间段只能查询一个星期的时间")
 	public static final int ONLY_QUERY_WEEK                    = 3101;
