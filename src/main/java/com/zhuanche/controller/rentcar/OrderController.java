@@ -39,6 +39,7 @@ import com.zhuanche.entity.rentcar.CarBizOrderSettleEntity;
 import com.zhuanche.entity.rentcar.CarBizOrderWaitingPeriod;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.entity.rentcar.CarFactOrderInfo;
+import com.zhuanche.entity.rentcar.CarGroupEntity;
 import com.zhuanche.entity.rentcar.ServiceEntity;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.util.CopyBeanUtil;
@@ -423,6 +424,25 @@ public class OrderController{
 					}
 				}
 			}
+			//根据预约的车型id 查找车型的名字
+			String bookinggroupids=order.getBookinkGroupids();
+			if(!StringUtils.isEmpty(bookinggroupids)){
+				String[] ids = bookinggroupids.split(",");
+				String groupStr = "";
+				for (int i = 0; i < ids.length; i++) {
+					CarGroupEntity carBizGroup = carFactOrderInfoService.selectCarGroupById(Integer.parseInt(ids[i]));
+					if (carBizGroup != null) {
+						if (!groupStr.contains(carBizGroup.getGroupName())) {
+							groupStr += carBizGroup.getGroupName()+ ",";
+								}
+							}
+						}
+				if (groupStr.length() > 0) {
+						groupStr = groupStr.substring(0,groupStr.length() - 1);
+					}
+					order.setBookingGroupnames(groupStr);
+			}
+			
 			CarBizOrderSettleEntity carBizOrderSettle= carFactOrderInfoService.selectDriverSettleByOrderId(order.getOrderId());
 			if(carBizOrderSettle!=null){
 				//优惠券面值
