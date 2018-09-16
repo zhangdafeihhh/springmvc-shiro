@@ -316,9 +316,10 @@ public class OrderController{
 	                                           ){
 	     logger.info("【运营管理-统计分析】查询LBS提供的轨迹坐标 :queryDrivingRouteData");
 	     Map<String, Object> paramMap = new HashMap<String, Object>();
-	     paramMap.put("startDate", startDate+" 00:00:00");// 
-	     paramMap.put("endDate", endDate+" 23:59:59");//
+	     paramMap.put("startDate", startDate);// 
+	     paramMap.put("endDate", endDate);//
 	     paramMap.put("driverId", driverId);//
+	     
 	     if(StringUtil.isEmpty(output)){
 	    	 paramMap.put("output", "1");//
 	     }else{

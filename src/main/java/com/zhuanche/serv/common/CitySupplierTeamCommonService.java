@@ -338,6 +338,34 @@ public class CitySupplierTeamCommonService {
         }
     }
 
+    
+
+    /**
+     * @Desc: 根据一个城市ID ，查询车队列表（超级管理员可以查询出所有车队、普通管理员只能查询自己数据权限内的车队）
+     * @param:
+     * @return:
+     * @Author: lunan
+     * @Date: 2018/8/29
+     */
+    public List<CarDriverTeam> queryDriverTeamList(Integer cityId){
+        if(cityId==null || cityId.intValue()<=00) {
+            return new ArrayList<CarDriverTeam>();
+        }
+        //进行查询 (区分 超级管理员 、普通管理员 )
+        Set<String> cityIds = new HashSet<String>(2);
+        cityIds.add(String.valueOf(cityId));
+        if( WebSessionUtil.isSupperAdmin() ) {
+            return carDriverTeamExMapper.queryDriverTeam(cityIds,  null , null);
+        }else {
+            Set<Integer> teamIds = WebSessionUtil.getCurrentLoginUser().getTeamIds();
+            if(teamIds.size()==0 ) {
+                return carDriverTeamExMapper.queryDriverTeam(cityIds, null, null);
+            }
+            return carDriverTeamExMapper.queryDriverTeam(cityIds, null, teamIds);
+        }
+    }
+    
+    
     /** 根据车队id查询小组*/
     public List<CarDriverTeam> queryTeamsById(Integer teamId){
         if(Check.NuNObj(teamId)){

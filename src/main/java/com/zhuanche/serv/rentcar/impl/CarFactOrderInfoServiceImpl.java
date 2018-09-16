@@ -192,7 +192,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 	public String queryDrivingRouteData(Map<String, Object> paramMap) {
 		String result = "";
 		String url = baseLbsRestApiUrl+Common.LBS_DRIVING_ROUTE;
-		//String url01 =  "http://test-inside-trace-source-lbs.01zhuanche.com/grapsRoad?startDate=2018-06-20 17:39:46&endDate=2018-06-20 17:57:18&driverId=199824&output=0&platform=3";
+		// String url01 =  "http://test-inside-trace-source-lbs.01zhuanche.com/grapsRoad?startDate=2018-06-20&endDate=2018-06-20&driverId=199824&output=0&platform=3";
 		try {
 			result = HttpClientUtil.buildPostRequest(url).addParams(paramMap).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
 		} catch (Exception e) {
@@ -387,11 +387,11 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 		return carFactOrderExMapper.selectServiceEntityList(serviceEntity);
 	}
 	
-	/*public static void main(String[] args) {
+	 public static void main(String[] args) {
 		List<CarFactOrderInfoDTO> list = null;
 		String url = "http://test-inside-trace-source-lbs.01zhuanche.com/grapsRoad";
 		 Map<String, Object> paramMap = new HashMap<String, Object>();
-	     paramMap.put("startDate", "2018-06-20 17:39:4");// 
+	     paramMap.put("startDate", "2018-06-20 17:39:40");// 
 	     paramMap.put("endDate", "2018-06-20 17:57:10");//
 	     paramMap.put("driverId", "199824");//
 	     paramMap.put("output", "0");//
@@ -420,7 +420,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 			e.printStackTrace();
 		}
 	}
-	*/
+	 
 	@Override
 	public Workbook exportExceleOrderList(List<CarFactOrderInfoDTO> list,String path) throws Exception {
 		FileInputStream io = new FileInputStream(path);
