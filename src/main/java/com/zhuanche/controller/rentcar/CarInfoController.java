@@ -268,7 +268,7 @@ public class CarInfoController {
                 return AjaxResponse.fail(998, "oldCity");
             if(oldSupplierId == null)
                 return AjaxResponse.fail(998, "oldSupplierId");
-            if(licensePlates.equals(licensePlates1)){
+            if(!licensePlates.equals(licensePlates1)){
                 if(!carService.checkLicensePlates(params))
                     return AjaxResponse.fail(1102);
             }

@@ -125,6 +125,29 @@ public class CommonController {
     }
 
     /**
+     * @Desc: 查询车队列表
+     * @param:
+     * @return:
+     * @Author: jd
+     * @Date: 2018/9/16
+     */
+    @RequestMapping("/teamsByCityId")
+    @ResponseBody
+    public AjaxResponse getTeamsByCityId(@Verify(param = "cityId", rule = "required") Integer cityId){
+        SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+        if(Check.NuNObj(currentLoginUser)){
+            return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST);
+        }
+        try{
+            List<CarDriverTeam> carDriverTeams = citySupplierTeamCommonService.queryDriverTeamList(cityId);
+            return AjaxResponse.success(carDriverTeams);
+        }catch (Exception e){
+            logger.error("查询城市供应商车队列表异常:{}",e);
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+    }
+    
+    /**
      * @Desc: 查询车队小组列表
      * @param:
      * @return:

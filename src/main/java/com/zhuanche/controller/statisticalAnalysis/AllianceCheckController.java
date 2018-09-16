@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -62,7 +63,7 @@ public class AllianceCheckController{
 	    public AjaxResponse queryAllianceCheckData(
 	    										  @Verify(param = "queryDate",rule = "required") String queryDate,
 	                                              String allianceId,
-	                                              String cityId,
+	                                              Long cityId,
 	                                              @Verify(param = "pageNo",rule = "required") Integer pageNo,
 	                                              @Verify(param = "pageSize",rule = "required") Integer pageSize,
 	                                              @Verify(param = "orderByColumnCode",rule = "required") String orderByColumnCode,
@@ -70,32 +71,20 @@ public class AllianceCheckController{
 	                                              ){
 	        logger.info("【运营管理-统计分析】加盟商考核  列表数据:queryAllianceCheckData");
 	        Map<String, Object> paramMap = new HashMap<String, Object>();
-	        paramMap.put("allianceId", allianceId);//加盟商ID
-	        paramMap.put("cityId", cityId);//城市ID
+	        if(StringUtil.isNotEmpty(allianceId)){
+	        	paramMap.put("allianceId", allianceId);//加盟商ID
+	        }
+	        if(null!=cityId){
+	        	paramMap.put("cityId", cityId);//城市ID
+	        }
 	        paramMap.put("orderByColumnCode", orderByColumnCode);//排序字段代码 
 	        paramMap.put("orderTypeCode", orderTypeCode);//排序方式代码
 			paramMap.put("queryDate", queryDate);//查询日期
-	        // 数据权限设置
-			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-			if(currentLoginUser == null ){
-				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-			}
-			
-			if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
-				Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-		        Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
-		        // 供应商信息
-				String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-				// 可见城市
-				String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
-				if(null == visibleAllianceIds ||  visibleCityIds == null ){
-					return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-				}
-		        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-		        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
-			}
-	        //paramMap.put("visibleAllianceIds", new String[]{"37", "47", "52", "61", "43", "67"}); // 可见加盟商ID
-	        //paramMap.put("visibleCityIds", new String[]{"44", "73", "78", "84"}); //可见城市ID
+			 // 数据权限设置
+	        paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,allianceId,null);
+		      if(paramMap==null){
+		    	  return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+		      }
 	        if(null != pageNo && pageNo > 0)
 	        	paramMap.put("pageNo", pageNo);//页号
 	        if(null != pageSize && pageSize > 0)
@@ -121,7 +110,7 @@ public class AllianceCheckController{
 	public void exportAllianceCheckData( 
 										 @Verify(param = "queryDate",rule = "required") String queryDate,
 							             String allianceId,
-							             String cityId,
+							             Long cityId,
 							             @Verify(param = "orderByColumnCode",rule = "required") String orderByColumnCode,
 							             @Verify(param = "orderTypeCode",rule = "required") String orderTypeCode,
 	                                     HttpServletRequest request,
@@ -129,31 +118,20 @@ public class AllianceCheckController{
 	        logger.info("【运营管理-统计分析】导出,导出 加盟商考核  列表数据:exportAllianceCheckData");
       try {
     	    Map<String, Object> paramMap = new HashMap<String, Object>();
-	        paramMap.put("allianceId", allianceId);//加盟商ID
-	        paramMap.put("cityId", cityId);//城市ID
+    	    if(StringUtil.isNotEmpty(allianceId)){
+	        	paramMap.put("allianceId", allianceId);//加盟商ID
+	        }
+	        if(null!=cityId){
+	        	paramMap.put("cityId", cityId);//城市ID
+	        }
 	        paramMap.put("orderByColumnCode", orderByColumnCode);//排序字段代码 
 	        paramMap.put("orderTypeCode", orderTypeCode);//排序方式代码
 			paramMap.put("queryDate", queryDate);//查询日期
 	        // 数据权限设置
-			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-			if(currentLoginUser == null ){
-				logger.info("【运营管理-统计分析】导出,导出 加盟商考核  列表数据 未授权");
-				return;
-			}
-			if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
-				Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-		        Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
-		        // 供应商信息
-				String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-				// 可见城市
-				String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
-				if(null == visibleAllianceIds ||  visibleCityIds == null ){
-					logger.info("【运营管理-统计分析】导出,导出 加盟商考核授权不足");
-					return;// return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-				}
-		        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-		        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
-			}
+	        paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,allianceId,null);
+		      if(paramMap==null){
+		    	  return;
+		      }
 	        String jsonString = JSON.toJSONString(paramMap);
 	        
 		    statisticalAnalysisService.exportCsvFromToPage(

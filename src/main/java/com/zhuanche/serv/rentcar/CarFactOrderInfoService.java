@@ -3,9 +3,13 @@ package com.zhuanche.serv.rentcar;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.poi.ss.usermodel.Workbook;
+
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
+import com.zhuanche.dto.rentcar.CarFactOrderInfoDTO;
 import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
+import com.zhuanche.dto.rentcar.ServiceTypeDTO;
 import com.zhuanche.entity.DriverOrderRecord.OrderTimeEntity;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizOrderSettleEntity;
@@ -23,7 +27,7 @@ public interface CarFactOrderInfoService {
      * @param orderNo 订单号
      * @return java.lang.String
      */
-    public CarFactOrderInfo selectByPrimaryKey(Long orderId);
+    public CarFactOrderInfo selectByPrimaryKey(CarFactOrderInfo carFactOrderInfo);
     /**
      *  （老车管）根据子订单号查询主订单
      * @param orderNo 订单号
@@ -37,11 +41,17 @@ public interface CarFactOrderInfoService {
      */
     public List<CarFactOrderInfo> getMainOrderByMainOrderNo(String mainOrderNo);
     /**
+     *  （老车管）all订单信息
+     * @param orderNo 订单号
+     * @return java.lang.String
+     */
+    public List<CarFactOrderInfoDTO>  queryAllOrderDataList(Map<String, Object> paramMap);
+    /**
 	 * 查询LBS提供的轨迹坐标
 	 * @param paramsStr
 	 * @return
 	 */
-	public String queryDrivingRouteData(String paramsStr);
+	public String queryDrivingRouteData(Map<String, Object> paramMap);
 	/**
 	 * 查询计费提供的计费明细
 	 * @param paramsStr
@@ -115,4 +125,10 @@ public interface CarFactOrderInfoService {
      * 
      */
     public String selectModelNameByLicensePlates(String licensePlates);
+    /**
+     * 订单服务类型
+     */
+    public List<ServiceTypeDTO> selectServiceEntityList(ServiceEntity serviceEntity);
+    
+    public Workbook exportExceleOrderList(List<CarFactOrderInfoDTO> list,String path) throws Exception;
 }
