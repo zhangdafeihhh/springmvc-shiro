@@ -748,7 +748,7 @@ public class CarBizDriverInfoService {
                     carBizDriverInfo.setTeamId(Integer.parseInt(stringObjectMap.get("teamGroupId").toString()));
                 }
                 if(stringObjectMap.containsKey("teamGroupName") && stringObjectMap.get("teamGroupName")!=null ){
-                    carBizDriverInfo.setTeamName(stringObjectMap.get("teamGroupName").toString());
+                    carBizDriverInfo.setTeamGroupName(stringObjectMap.get("teamGroupName").toString());
                 }
             }
 
@@ -2526,13 +2526,13 @@ public class CarBizDriverInfoService {
                 cell.setCellValue(s.getDrivingLicenseType()!=null?""+s.getDrivingLicenseType()+"":"");
                 // 驾照领证日期
                 cell = row.createCell(13);
-                cell.setCellValue(s.getIssueDate()!=null?""+s.getIssueDate()+"":"");
+                cell.setCellValue(DateUtil.getTimeString(s.getIssueDate()));
                 // 驾龄
                 cell = row.createCell(14);
                 cell.setCellValue(s.getDrivingYears()!=null?""+s.getDrivingYears()+"":"");
                 // 驾照到期时间
                 cell = row.createCell(15);
-                cell.setCellValue(s.getExpireDate()!=null?""+s.getExpireDate()+"":"");
+                cell.setCellValue(DateUtil.getTimeString(s.getExpireDate()));
                 // 档案编号
                 cell = row.createCell(16);
                 cell.setCellValue(s.getArchivesNo()!=null?""+s.getArchivesNo()+"":"");

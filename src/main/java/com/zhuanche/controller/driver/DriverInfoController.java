@@ -144,7 +144,7 @@ public class DriverInfoController {
         }
         // 查询城市名称，供应商名称，服务类型，加盟类型
         for (CarBizDriverInfoDTO driver : list) {
-            driver = carBizDriverInfoService.getBaseStatis(driver);
+            carBizDriverInfoService.getBaseStatis(driver);
         }
         PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
         return AjaxResponse.success(pageDTO);
@@ -214,7 +214,7 @@ public class DriverInfoController {
         list = carBizDriverInfoService.queryDriverList(carBizDriverInfoDTO);
         // 查询城市名称，供应商名称，服务类型，加盟类型
         for (CarBizDriverInfoDTO driver : list) {
-            driver = carBizDriverInfoService.getBaseStatis(driver);
+            carBizDriverInfoService.getBaseStatis(driver);
         }
         return AjaxResponse.success(list);
     }
