@@ -173,8 +173,9 @@ public class OrderController{
 		@SuppressWarnings("deprecation")
 		Workbook wb;
 		try {
-			wb = carFactOrderInfoService.exportExceleOrderList(dtoList,request.getServletContext().getRealPath("/")+ "template" + File.separator +"order_info.xlsx");
-			Componment.fileDownload(response, wb, new String("订单列表".getBytes("utf-8"), "iso8859-1"));
+			wb = carFactOrderInfoService.exportExceleOrderList(dtoList,request.getServletContext().getRealPath("/")+ "template" + File.separator +"orderList_info.xlsx");
+			Componment.fileDownload(response, wb, new String("订单列表".getBytes("gb2312"), "iso8859-1"));
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

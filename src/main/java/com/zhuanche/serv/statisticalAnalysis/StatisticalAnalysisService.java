@@ -30,6 +30,8 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.Feature;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.http.HttpClientUtil;
@@ -227,6 +229,8 @@ public class  StatisticalAnalysisService {
 			logger.info("调用大数据接口，参数--" + jsonString);
 			String result = HttpClientUtil.buildPostRequest(url).setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
 			logger.info("调用大数据接口，result--" + result);
+			result = result.replaceAll("null", "\"\"");
+			result = result.replaceAll("NULL", "\"\"");
 			JSONObject job = JSON.parseObject(result);
 			if (job == null) {
 				logger.error("调用大数据" + url + "返回结果为null");
