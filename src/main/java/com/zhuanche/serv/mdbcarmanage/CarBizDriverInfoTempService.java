@@ -1711,8 +1711,12 @@ public class CarBizDriverInfoTempService {
                 if (isTrue && driver != null) {
                     driver.setServiceCityId(cityId);
                     driver.setSupplierId(supplierId);
-                    driver.setTeamid(String.valueOf(teamId));
-                    driver.setGroupIds(String.valueOf(groupId));
+                    if(teamId != null){
+                        driver.setTeamid(String.valueOf(teamId));
+                    }
+                    if(groupId != null){
+                        driver.setGroupIds(String.valueOf(groupId));
+                    }
                     driverList.add(driver);
                 }
             }

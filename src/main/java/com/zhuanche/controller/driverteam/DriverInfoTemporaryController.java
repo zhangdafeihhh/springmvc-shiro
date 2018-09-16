@@ -206,8 +206,8 @@ public class DriverInfoTemporaryController extends BaseController {
     public AjaxResponse importDriverInfo(@RequestParam(value="fileName") MultipartFile file,
                                          @Verify(param = "cityId",rule="required") Integer cityId,
                                          @Verify(param = "supplierId",rule="required") Integer supplierId,
-                                         @Verify(param = "teamId",rule="required") Integer teamId,
-                                         @Verify(param = "groupId",rule="required") Integer groupId,
+                                         @RequestParam(value = "teamId",required = false) Integer teamId,
+                                         @RequestParam(value = "groupId",required = false) Integer groupId,
                                          HttpServletResponse response){
         try {
             log.info("司机导入");
