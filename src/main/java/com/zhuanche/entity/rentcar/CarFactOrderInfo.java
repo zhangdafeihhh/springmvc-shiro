@@ -200,7 +200,7 @@ public class CarFactOrderInfo extends BaseEntity {
 	private int serviceTypeId;
 	private String airlineNo;
 	private int bookingUserId;
-	private int driverId;
+	private String driverId;
 	// 基础价格
 	private Double basePrice = 0.0;
 	// 分钟数（含）
@@ -1733,11 +1733,12 @@ public class CarFactOrderInfo extends BaseEntity {
 		this.longdistanceprice = longdistanceprice;
 	}
 
-	public int getDriverId() {
+	
+	public String getDriverId() {
 		return driverId;
 	}
 
-	public void setDriverId(int driverId) {
+	public void setDriverId(String driverId) {
 		this.driverId = driverId;
 	}
 
