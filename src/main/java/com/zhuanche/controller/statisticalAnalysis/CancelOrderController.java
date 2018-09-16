@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -64,7 +65,7 @@ public class CancelOrderController{
 	    @ResponseBody
 	    @RequestMapping(value = "/queryCancelOrderData", method = { RequestMethod.POST,RequestMethod.GET })
 	    public AjaxResponse queryCancelOrderData(
-	    										  String driverCityId,
+	    										  Long driverCityId,
 	    										  String allianceId,
 	                                              String motorcadeId,
 	                                              String driverTypeId,
@@ -78,38 +79,38 @@ public class CancelOrderController{
 	                                              ){
 	        logger.info("【运营管理-统计分析】取消订单列表数据:queryCancelOrderData");
 	        Map<String, Object> paramMap = new HashMap<String, Object>();
-	        paramMap.put("driverCityId", driverCityId);//司机所属城市ID
-	        paramMap.put("allianceId", allianceId);//加盟商ID
-	        paramMap.put("motorcadeId", motorcadeId);//车队ID
-	        paramMap.put("driverTypeId", driverTypeId);//司机类型ID
-	        paramMap.put("channelId", channelId);//下单渠道ID
-	        paramMap.put("orderVehicleTypeId", orderVehicleTypeId);//预约车型ID
-	        paramMap.put("productTypeId", productTypeId);//产品类型ID
-	        paramMap.put("cancelDurationTypeId", cancelDurationTypeId);//取消时长分类ID
+	        if(null!=driverCityId){
+	        	 paramMap.put("driverCityId", driverCityId);//司机所属城市ID
+	        }
+	        if(StringUtil.isNotEmpty(allianceId)){
+	        	paramMap.put("allianceId", allianceId);//加盟商ID
+	        }
+	        if(StringUtil.isNotEmpty(motorcadeId)){
+	        	paramMap.put("motorcadeId", motorcadeId);//车队ID
+	        }
+	        if(StringUtil.isNotEmpty(driverTypeId)){
+	        	paramMap.put("driverTypeId", driverTypeId);//司机类型ID
+	        }
+	        if(StringUtil.isNotEmpty(channelId)){
+	        	paramMap.put("channelId", channelId);//下单渠道ID
+	        }
+	        if(StringUtil.isNotEmpty(orderVehicleTypeId)){
+	        	paramMap.put("orderVehicleTypeId", orderVehicleTypeId);//预约车型ID
+	        }
+	        if(StringUtil.isNotEmpty(productTypeId)){
+	        	paramMap.put("productTypeId", productTypeId);//产品类型ID
+	        }
+	        if(StringUtil.isNotEmpty(cancelDurationTypeId)){
+	        	paramMap.put("cancelDurationTypeId", cancelDurationTypeId);//取消时长分类ID
+	        }
+	        
 	        paramMap.put("queryDate", queryDate);//查询日期
 			
 	        // 数据权限设置
-			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-			if(currentLoginUser == null ){
-				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-			}
-			if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
-				Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-		        Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-		        Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
-		        // 供应商信息
-				String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-				// 车队信息
-				String[] visibleMotocadeIds = statisticalAnalysisService.setToArray(teamIds);
-				// 可见城市
-				String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
-				if(null == visibleAllianceIds || null == visibleMotocadeIds || visibleCityIds == null ){
-					return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-				}
-		        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-		        paramMap.put("visibleMotorcadeIds", visibleMotocadeIds); // 可见车队ID
-		        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
-			}
+	        paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,driverCityId,allianceId,motorcadeId);
+		      if(paramMap==null){
+		    	  return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+		      }
 			//paramMap.put("visibleAllianceIds", new String[]{"97", "946", "99", "489", "1307", "65", "1349"});
 			//paramMap.put("visibleMotorcadeIds", new String[]{"2498", "2487", "1809", "2359", "1369"});
 			//paramMap.put("visibleCityIds", new String[]{"88", "67", "111", "123", "85", "91"}); //可见城市ID
@@ -144,7 +145,7 @@ public class CancelOrderController{
 	@ResponseBody
    	@RequestMapping(value = "/exportCancelOrderData", method = { RequestMethod.POST,RequestMethod.GET })
 	public AjaxResponse exportCancelOrderData( 
-											String driverCityId,
+											Long driverCityId,
 											String allianceId,
 								            String motorcadeId,
 								            String driverTypeId,
@@ -158,40 +159,37 @@ public class CancelOrderController{
 	        logger.info("【运营管理-统计分析】导出,导出取消订单列表数据:exportCancelOrderData");
        try {
     	    Map<String, Object> paramMap = new HashMap<String, Object>();
-	        paramMap.put("driverCityId", driverCityId);//司机所属城市ID
-	        paramMap.put("allianceId", allianceId);//加盟商ID
-	        paramMap.put("motorcadeId", motorcadeId);//车队ID
-	        paramMap.put("driverTypeId", driverTypeId);//司机类型ID
-	        paramMap.put("channelId", channelId);//下单渠道ID
-	        paramMap.put("orderVehicleTypeId", orderVehicleTypeId);//预约车型ID
-	        paramMap.put("productTypeId", productTypeId);//产品类型ID
-	        paramMap.put("cancelDurationTypeId", cancelDurationTypeId);//取消时长分类ID
+	        if(null!=driverCityId){
+	        	 paramMap.put("driverCityId", driverCityId);//司机所属城市ID
+	        }
+	        if(StringUtil.isNotEmpty(allianceId)){
+	        	paramMap.put("allianceId", allianceId);//加盟商ID
+	        }
+	        if(StringUtil.isNotEmpty(motorcadeId)){
+	        	paramMap.put("motorcadeId", motorcadeId);//车队ID
+	        }
+	        if(StringUtil.isNotEmpty(driverTypeId)){
+	        	paramMap.put("driverTypeId", driverTypeId);//司机类型ID
+	        }
+	        if(StringUtil.isNotEmpty(channelId)){
+	        	paramMap.put("channelId", channelId);//下单渠道ID
+	        }
+	        if(StringUtil.isNotEmpty(orderVehicleTypeId)){
+	        	paramMap.put("orderVehicleTypeId", orderVehicleTypeId);//预约车型ID
+	        }
+	        if(StringUtil.isNotEmpty(productTypeId)){
+	        	paramMap.put("productTypeId", productTypeId);//产品类型ID
+	        }
+	        if(StringUtil.isNotEmpty(cancelDurationTypeId)){
+	        	paramMap.put("cancelDurationTypeId", cancelDurationTypeId);//取消时长分类ID
+	        }
 	        paramMap.put("queryDate", queryDate);//查询日期
 	        
 	       // 数据权限设置
-			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-			if(currentLoginUser == null){
-				logger.info("【运营管理-统计分析】导出,导出取消订单列表数据  未授权");
-				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-			}
-			if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
-				Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-		        Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-		        Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
-		        // 供应商信息
-				String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-				// 车队信息
-				String[] visibleMotocadeIds = statisticalAnalysisService.setToArray(teamIds);
-				// 可见城市
-				String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
-				if(null == visibleAllianceIds || null == visibleMotocadeIds || visibleCityIds == null ){
-					 logger.info("【运营管理-统计分析】导出取消订单列表数据权限为空");
-					 return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-				}
-		        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-		        paramMap.put("visibleMotorcadeIds", visibleMotocadeIds); // 可见车队ID
-		        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
-			}
+	        paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,driverCityId,allianceId,motorcadeId);
+		      if(paramMap==null){
+		    	  return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+		      }
 			String jsonString = JSON.toJSONString(paramMap);
 			 
 			statisticalAnalysisService.exportCsvFromToPage(

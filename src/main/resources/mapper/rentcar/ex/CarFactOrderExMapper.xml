@@ -131,7 +131,7 @@
 		<result property="serviceTypeId" column="service_type_id" />
 		<result property="airlineNo" column="airline_no" />
 		<result property="driverId" column="driver_id" />
-        <result property="orderno" column="order_no"/>
+        <result property="orderNo" column="order_no"/>
 		<result property="basePrice" column="base_price" />
 		<result property="factDriver" column="fact_driver" />
 		<result property="overMileageNum" column="over_mileage_num" />
@@ -187,7 +187,7 @@
 		<result property="airportId" column="airport_id"/>
 	</resultMap>
 	
-	<select id="selectByPrimaryKey" resultMap="CarFactOrderInfoMap" parameterType="java.lang.Long">
+	<select id="selectByPrimaryKey" resultMap="CarFactOrderInfoMap" parameterType="com.zhuanche.entity.rentcar.CarFactOrderInfo">
 		SELECT
 			a.order_no,
 			IFNULL(a.channels_num,0)as channelsNum,
@@ -351,7 +351,13 @@
 	AND paymentdriver.payment_type=4
 	LEFT JOIN car_biz_order_settle_detail det on a.order_id=det.order_id
 	LEFT JOIN car_biz_order_settle_detail_extension de on det.order_no=de.order_no
-	where a.order_id = #{orderId , jdbcType=BIGINT}
+	where 1=1
+	 	<if test="orderId !=null and orderId !='' ">
+           	and a.order_id = #{orderId}
+        </if>
+         <if test="orderNo !=null and orderNo !='' ">
+           and  a.order_no = #{orderNo}
+        </if>
 	</select>
 	
 	<select id="selectDriverSettleByOrderId" parameterType="java.lang.Long" resultType="com.zhuanche.entity.rentcar.CarBizOrderSettleEntity">
@@ -496,5 +502,16 @@
 		WHERE car.license_plates = #{licensePlates}
     </select>
     
+    <select id="selectServiceEntityList" parameterType="com.zhuanche.entity.rentcar.ServiceEntity" resultType="com.zhuanche.dto.rentcar.ServiceTypeDTO">
+		 SELECT
+			service_id as serviceId,
+			service.service_name as serviceName,
+			service.service_no as serviceNo,
+			service.sort as sort
+		FROM
+			car_biz_service service
+		WHERE service.`status` = '1'
+   </select>
+   
     
 </mapper>

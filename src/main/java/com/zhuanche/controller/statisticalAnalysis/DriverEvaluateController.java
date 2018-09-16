@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -62,7 +63,7 @@ public class DriverEvaluateController{
 		@ResponseBody
 	    @RequestMapping(value = "/queryDriverEvaluateData", method = { RequestMethod.POST,RequestMethod.GET })
 	    public AjaxResponse queryDriverEvaluateData(
-	    										  String orderCityId,
+	    										  Long orderCityId,
 	    										  String driverTypeId,
 	                                              String allianceId,
 	                                              String motorcadeId,
@@ -74,34 +75,28 @@ public class DriverEvaluateController{
 	                                              ){
 	        logger.info("【运营管理-统计分析】对司机评级详情分析 列表数据:queryDriverEvaluateData");
 	        Map<String, Object> paramMap = new HashMap<String, Object>();
-	        paramMap.put("orderCityId", orderCityId);//订单城市ID	
-	        paramMap.put("allianceId", allianceId);//加盟商ID
-	        paramMap.put("motorcadeId", motorcadeId);//车队ID
-	        paramMap.put("driverTypeId", driverTypeId);//司机类型ID
-	        paramMap.put("driverScore", driverScore);//司机评价分数	
-	        paramMap.put("appScore", appScore);//APP评价分数	
+	        if(null!=orderCityId){
+	        	 paramMap.put("orderCityId", orderCityId);//订单城市ID	
+	        }
+	        if(StringUtil.isNotEmpty(allianceId)){
+	        	 paramMap.put("allianceId", allianceId);//加盟商ID
+	        }
+	        if(StringUtil.isNotEmpty(motorcadeId)){
+	        	 paramMap.put("motorcadeId", motorcadeId);//车队ID
+	        }
+	        if(StringUtil.isNotEmpty(driverTypeId)){
+	        	paramMap.put("driverTypeId", driverTypeId);//司机类型ID
+	        }
+	        if(StringUtil.isNotEmpty(driverScore)){
+	        	paramMap.put("driverScore", driverScore);//司机评价分数	
+	        }
+	        if(StringUtil.isNotEmpty(appScore)){
+	        	 paramMap.put("appScore", appScore);//APP评价分数	
+	        }
 			paramMap.put("queryDate", queryDate);//查询日期
-	        // 数据权限设置
-			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-			if(currentLoginUser == null){
+			paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,orderCityId,allianceId,motorcadeId);
+			if(paramMap==null){
 				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-			}
-			if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
-				Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-		        Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-		        Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
-		        // 供应商信息
-				String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-				// 车队信息
-				String[] visibleMotocadeIds = statisticalAnalysisService.setToArray(teamIds);
-				// 可见城市
-				String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
-				if(null == visibleAllianceIds || null == visibleMotocadeIds || visibleCityIds == null ){
-					return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-				}
-		        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-		        paramMap.put("visibleMotorcadeIds", visibleMotocadeIds); // 可见车队ID
-		        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
 			}
 		   if(null != pageNo && pageNo > 0)
 	        	paramMap.put("pageNo", pageNo);//页号
@@ -128,7 +123,7 @@ public class DriverEvaluateController{
 		  */
   	@RequestMapping(value = "/exportDriverEvaluateData", method = { RequestMethod.POST,RequestMethod.GET })
 	public void exportDriverEvaluateData( 
-										String orderCityId,
+										Long orderCityId,
 										String driverTypeId,
 							            String allianceId,
 							            String motorcadeId,
@@ -140,36 +135,29 @@ public class DriverEvaluateController{
 	        logger.info("【运营管理-统计分析】导出,导出对司机评级详情列表数据:exportCancelOrderData");
       try {
     	  Map<String, Object> paramMap = new HashMap<String, Object>();
-	        paramMap.put("orderCityId", orderCityId);//订单城市ID	
-	        paramMap.put("allianceId", allianceId);//加盟商ID
-	        paramMap.put("motorcadeId", motorcadeId);//车队ID
-	        paramMap.put("driverTypeId", driverTypeId);//司机类型ID
-	        paramMap.put("driverScore", driverScore);//司机评价分数	
-	        paramMap.put("appScore", appScore);//APP评价分数	
+	        if(null!=orderCityId){
+	        	 paramMap.put("orderCityId", orderCityId);//订单城市ID	
+	        }
+	        if(StringUtil.isNotEmpty(allianceId)){
+	        	 paramMap.put("allianceId", allianceId);//加盟商ID
+	        }
+	        if(StringUtil.isNotEmpty(motorcadeId)){
+	        	 paramMap.put("motorcadeId", motorcadeId);//车队ID
+	        }
+	        if(StringUtil.isNotEmpty(driverTypeId)){
+	        	paramMap.put("driverTypeId", driverTypeId);//司机类型ID
+	        }
+	        if(StringUtil.isNotEmpty(driverScore)){
+	        	paramMap.put("driverScore", driverScore);//司机评价分数	
+	        }
+	        if(StringUtil.isNotEmpty(appScore)){
+	        	 paramMap.put("appScore", appScore);//APP评价分数	
+	        }
 			paramMap.put("queryDate", queryDate);//查询日期
 	        // 数据权限设置
-			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-			if(currentLoginUser == null){
-				logger.info("【运营管理-统计分析】导出,导出对司机评级详情列表数据:授权不足");
+			paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,orderCityId,allianceId,motorcadeId);
+			if(paramMap==null){
 				return;
-			}
-			if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
-				Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-		        Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-		        Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
-		        // 供应商信息
-				String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-				// 车队信息
-				String[] visibleMotocadeIds = statisticalAnalysisService.setToArray(teamIds);
-				// 可见城市
-				String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
-				if(null == visibleAllianceIds || null == visibleMotocadeIds || visibleCityIds == null ){
-					logger.info("【运营管理-统计分析】导出,导出对司机评级详情:授权不足");
-					return; // return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-				}
-		        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-		        paramMap.put("visibleMotorcadeIds", visibleMotocadeIds); // 可见车队ID
-		        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
 			}
 	        String jsonString = JSON.toJSONString(paramMap);
 	        

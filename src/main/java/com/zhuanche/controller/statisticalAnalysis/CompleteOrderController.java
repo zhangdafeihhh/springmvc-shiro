@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -53,7 +54,7 @@ public class CompleteOrderController{
 	    @RequestMapping(value = "/queryCompleteOrdeData", method = { RequestMethod.POST,RequestMethod.GET })
 	    public AjaxResponse queryCompleteOrderData(
 	    										  @Verify(param = "queryDate",rule = "required") String queryDate,
-	    										  String cityId,
+	    										  Long cityId,
 	    										  String productId,
 	                                              String bindVehicleTypeId,
 	                                              String serviceVehicleTypeId,
@@ -71,39 +72,46 @@ public class CompleteOrderController{
 	        
 	        Map<String, Object> paramMap = new HashMap<String, Object>();
 	        paramMap.put("queryDate", queryDate);//查询日期
-	        paramMap.put("cityId", cityId);//下单城市ID
-	        paramMap.put("productId", productId);//产品类型ID
-	        paramMap.put("bindVehicleTypeId", bindVehicleTypeId);//绑定车型ID
-	        paramMap.put("serviceVehicleTypeId", serviceVehicleTypeId);//服务车型ID
-	        paramMap.put("orderTypeId", orderTypeId);//订单类别ID
-	        paramMap.put("orgnizationId", orgnizationId);//机构ID
-	        paramMap.put("channelId", channelId);//渠道ID
-	        paramMap.put("driverTypeId", driverTypeId);//司机类型ID
-	        paramMap.put("allianceId", allianceId);//加盟商ID
-	        paramMap.put("motorcardId", motorcardId);//车队ID
-	        paramMap.put("hotelId", hotelId);//酒店ID
-	        paramMap.put("driverId", driverId);//司机ID
+	        if(null!=cityId){
+	        	 paramMap.put("cityId", cityId);//下单城市ID
+	        }
+	        if(StringUtil.isNotEmpty(productId)){
+	        	paramMap.put("productId", productId);//产品类型ID
+	        }
+	        if(StringUtil.isNotEmpty(bindVehicleTypeId)){
+	        	 paramMap.put("bindVehicleTypeId", bindVehicleTypeId);//绑定车型ID
+	        }
+	        if(StringUtil.isNotEmpty(serviceVehicleTypeId)){
+	        	 paramMap.put("serviceVehicleTypeId", serviceVehicleTypeId);//服务车型ID
+	        }
+	        if(StringUtil.isNotEmpty(orderTypeId)){
+	        	paramMap.put("orderTypeId", orderTypeId);//订单类别ID
+	        }
+	        if(StringUtil.isNotEmpty(orgnizationId)){
+	        	paramMap.put("orgnizationId", orgnizationId);//机构ID
+	        }
+	        if(StringUtil.isNotEmpty(channelId)){
+	        	paramMap.put("channelId", channelId);//渠道ID
+	        }
+	        if(StringUtil.isNotEmpty(driverTypeId)){
+	        	paramMap.put("driverTypeId", driverTypeId);//司机类型ID
+	        }
+	        if(StringUtil.isNotEmpty(allianceId)){
+	        	 paramMap.put("allianceId", allianceId);//加盟商ID
+	        }
+	        if(StringUtil.isNotEmpty(motorcardId)){
+	        	paramMap.put("motorcardId", motorcardId);//车队ID
+	        }
+	        if(StringUtil.isNotEmpty(hotelId)){
+	        	paramMap.put("hotelId", hotelId);//酒店ID
+	        }
+	        if(StringUtil.isNotEmpty(driverId)){
+	        	paramMap.put("driverId", driverId);//司机ID
+	        }
 	        // 数据权限设置
-			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-			if(currentLoginUser == null){
+	        paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,allianceId,motorcardId);
+			if(paramMap==null){
 				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-			}
-			if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
-				Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-			    Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-			    Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
-			    // 供应商信息
-			    String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-				// 车队信息
-				String[] visibleMotorcadeIds = statisticalAnalysisService.setToArray(teamIds);
-				// 可见城市
-				String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
-				if(null == visibleAllianceIds || null == visibleMotorcadeIds || visibleCityIds == null ){
-					return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-				}
-			    paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-			    paramMap.put("visibleMotorcadeIds", visibleMotorcadeIds); // 可见车队ID
-			    paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
 			}
 	        if(null != pageNo && pageNo > 0)
 	        	paramMap.put("pageNo", pageNo);//页号
@@ -126,7 +134,7 @@ public class CompleteOrderController{
     	@RequestMapping(value = "/exportCompleteOrderData", method = { RequestMethod.POST,RequestMethod.GET })
  	    public AjaxResponse exportCompleteOrderData(
  	    										  @Verify(param = "queryDate",rule = "required") String queryDate,
- 	    										  String cityId,
+ 	    										  Long cityId,
  	    										  String productId,
  	                                              String bindVehicleTypeId,
  	                                              String serviceVehicleTypeId,
@@ -144,41 +152,47 @@ public class CompleteOrderController{
         try {
         	 Map<String, Object> paramMap = new HashMap<String, Object>();
         	 paramMap.put("queryDate", queryDate);//查询日期
-        	 paramMap.put("cityId", cityId);//下单城市ID
-        	 paramMap.put("productId", productId);//产品类型ID
-        	 paramMap.put("bindVehicleTypeId", bindVehicleTypeId);//绑定车型ID
-        	 paramMap.put("serviceVehicleTypeId", serviceVehicleTypeId);//服务车型ID
-        	 paramMap.put("orderTypeId", orderTypeId);//订单类别ID
-        	 paramMap.put("orgnizationId", orgnizationId);//机构ID
-        	 paramMap.put("channelId", channelId);//渠道ID
-        	 paramMap.put("driverTypeId", driverTypeId);//司机类型ID
-        	 paramMap.put("allianceId", allianceId);//加盟商ID
-        	 paramMap.put("motorcardId", motorcardId);//车队ID
-        	 paramMap.put("hotelId", hotelId);//酒店ID
-        	 paramMap.put("driverId", driverId);//司机ID
- 	       // 数据权限设置
-			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-			if(currentLoginUser == null){
-				logger.info("【运营管理-统计分析】导出,完成订单详情列表数据  未授权");
-				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-			}
-			if(!ValidateUtils.isAdmin(currentLoginUser.getAccountType())){
-				Set<Integer> suppliers = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-		        Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-		        Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取用户可见的城市ID
-		        // 供应商信息
-				String[] visibleAllianceIds = statisticalAnalysisService.setToArray(suppliers);
-				// 车队信息
-				String[] visibleMotocadeIds = statisticalAnalysisService.setToArray(teamIds);
-				// 可见城市
-				String[] visibleCityIds = statisticalAnalysisService.setToArray(cityIds);
-				if(null == visibleAllianceIds || null == visibleMotocadeIds || visibleCityIds == null ){
-					return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-				}
-		        paramMap.put("visibleAllianceIds", visibleAllianceIds); // 可见加盟商ID
-		        paramMap.put("visibleMotorcadeIds", visibleMotocadeIds); // 可见车队ID
-		        paramMap.put("visibleCityIds", visibleCityIds); //可见城市ID
-			}
+ 	        if(null!=cityId){
+	        	 paramMap.put("cityId", cityId);//下单城市ID
+	        }
+	        if(StringUtil.isNotEmpty(productId)){
+	        	paramMap.put("productId", productId);//产品类型ID
+	        }
+	        if(StringUtil.isNotEmpty(bindVehicleTypeId)){
+	        	 paramMap.put("bindVehicleTypeId", bindVehicleTypeId);//绑定车型ID
+	        }
+	        if(StringUtil.isNotEmpty(serviceVehicleTypeId)){
+	        	 paramMap.put("serviceVehicleTypeId", serviceVehicleTypeId);//服务车型ID
+	        }
+	        if(StringUtil.isNotEmpty(orderTypeId)){
+	        	paramMap.put("orderTypeId", orderTypeId);//订单类别ID
+	        }
+	        if(StringUtil.isNotEmpty(orgnizationId)){
+	        	paramMap.put("orgnizationId", orgnizationId);//机构ID
+	        }
+	        if(StringUtil.isNotEmpty(channelId)){
+	        	paramMap.put("channelId", channelId);//渠道ID
+	        }
+	        if(StringUtil.isNotEmpty(driverTypeId)){
+	        	paramMap.put("driverTypeId", driverTypeId);//司机类型ID
+	        }
+	        if(StringUtil.isNotEmpty(allianceId)){
+	        	 paramMap.put("allianceId", allianceId);//加盟商ID
+	        }
+	        if(StringUtil.isNotEmpty(motorcardId)){
+	        	paramMap.put("motorcardId", motorcardId);//车队ID
+	        }
+	        if(StringUtil.isNotEmpty(hotelId)){
+	        	paramMap.put("hotelId", hotelId);//酒店ID
+	        }
+	        if(StringUtil.isNotEmpty(driverId)){
+	        	paramMap.put("driverId", driverId);//司机ID
+	        }
+        	 // 数据权限设置
+ 	        paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,allianceId,motorcardId);
+ 			if(paramMap==null){
+ 				return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+ 			}
 	 		String jsonString = JSON.toJSONString(paramMap);
 		    logger.info("【运营管理-统计分析】导出,完成订单详情请求参数----"+jsonString);
 		    
