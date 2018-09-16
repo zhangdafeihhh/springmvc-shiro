@@ -497,41 +497,49 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 				cell = row.createCell(14);
 				cell.setCellValue(s.getTravelTime() != null ? ""
 						+ s.getTravelTime() + "" : "");
-				//  
+			//  
 				cell = row.createCell(15);
+				cell.setCellValue(s.getTravelMileage() != null ? ""
+						+ s.getTravelMileage() + "" : "");
+				//  
+				cell = row.createCell(16);
 				cell.setCellValue(s.getActualPayAmount() != null ? ""
 						+ s.getActualPayAmount() + "" : "");
 				//  
-				cell = row.createCell(16);
+				cell = row.createCell(17);
 				cell.setCellValue(s.getCouponId() != null ? ""
 						+ s.getCouponId() + "" : "");
+				//  
+				cell = row.createCell(18);
+				cell.setCellValue(s.getCouponAmount() != null ? ""
+						+ s.getCouponAmount() + "" : "");
 				 //
-				cell = row.createCell(17);
+				cell = row.createCell(19);
 				cell.setCellValue(s.getCreateDate() != null ? ""
 						+ s.getCreateDate() + "" : "");
 				//  
-				cell = row.createCell(18);
+				cell = row.createCell(20);
 				cell.setCellValue(s.getCostEndDate() != null ? ""
 						+ s.getCostEndDate() + "" : "");
 
 				//  
-				cell = row.createCell(19);
+				cell = row.createCell(21);
 				cell.setCellValue(s.getFactStartAddr() != null ? ""
 						+ s.getFactStartAddr() + "" : "");
 				//  
-				cell = row.createCell(20);
+				cell = row.createCell(22);
 				cell.setCellValue(s.getFactEndAddr() != null ? ""
 						+ s.getFactEndAddr() + "" : "");
 				//  
-				cell = row.createCell(21);
+				cell = row.createCell(23);
 				cell.setCellValue(s.getStatus() != null ? ""
 						+ s.getStatus() + "" : "");
 				//  
-				cell = row.createCell(22);
+				cell = row.createCell(24);
 				cell.setCellValue(s.getAirportId() != null ? ""
 						+ s.getAirportId() + "" : "");
 				//  
-				cell = row.createCell(23);
+				cell = row.createCell(25);
 				cell.setCellValue(s.getMainOrderNo() != null ? ""
 						+ s.getMainOrderNo() + "" : "");
 				i++;

@@ -1,5 +1,8 @@
 package com.zhuanche.dto.rentcar;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class CarFactOrderInfoDTO{
 	//订单号 
 	private String orderNo;
@@ -19,7 +22,7 @@ public class CarFactOrderInfoDTO{
 	private String bookingUserName;
 	//预订人手机号 
 	private String bookingUserPhone;
-	//乘车人 
+	//乘车人  --1
 	private String riderName;
 	//乘车人手机号 
 	private String riderPhone;
@@ -62,7 +65,13 @@ public class CarFactOrderInfoDTO{
 		this.orderNo = orderNo;
 	}
 	public String getPushDriverType() {
-		return pushDriverType;
+		if("2".equals(pushDriverType)){
+    		return "抢单";
+    	} else if("1".equals(pushDriverType) || "3".equals(pushDriverType)){
+    		return "绑单";
+    	}else{
+    		return "";
+    	}
 	}
 	public void setPushDriverType(String pushDriverType) {
 		this.pushDriverType = pushDriverType;
@@ -86,7 +95,13 @@ public class CarFactOrderInfoDTO{
 		this.groupName = groupName;
 	}
 	public String getType() {
-		return type;
+		if("1".equals(type)){
+    		return "普通订单";
+    	}else if("2".equals(type)){
+    		return "机构订单";
+    	}else{
+    		return "";
+    	}	
 	}
 	public void setType(String type) {
 		this.type = type;
@@ -158,7 +173,11 @@ public class CarFactOrderInfoDTO{
 		this.actualPayAmount = actualPayAmount;
 	}
 	public String getCouponId() {
-		return couponId;
+		if(couponId!=null && "-1".equals(couponId) && couponAmount!=null && Double.valueOf(couponAmount)>0){
+    		return "使用";
+    	}else{
+    		return "未使用";
+    	}
 	}
 	public void setCouponId(String couponId) {
 		this.couponId = couponId;
@@ -194,13 +213,27 @@ public class CarFactOrderInfoDTO{
 		this.factEndAddr = factEndAddr;
 	}
 	public String getStatus() {
-		return status;
+		List<String> dfw = Arrays.asList("10,15,13".split(","));
+		List<String> fwz = Arrays.asList("20,25,30,35,40".split(","));
+		List<String> ywc = Arrays.asList("45,50,55,42,43".split(","));
+		List<String> yqx = Arrays.asList("60".split(","));
+		 if(dfw.contains(status)){
+			return "待服务";
+		 }  else if(fwz.contains(status)){
+			return "服务中";
+		 } else if(ywc.contains(status)){
+			return "已完成";
+		 } else if(yqx.contains(status)){
+			return "已取消";
+		 }else {
+			 return status;
+		 }
 	}
 	public void setStatus(String status) {
 		this.status = status;
 	}
 	public String getAirportId() {
-		return airportId;
+		 return "1".equals(airportId) ? "是" : "否";
 	}
 	public void setAirportId(String airportId) {
 		this.airportId = airportId;
