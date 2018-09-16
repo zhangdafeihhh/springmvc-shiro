@@ -326,6 +326,7 @@ public class DriverDailyReportController extends DriverQueryController {
 					this.modifyDriverVolume(dto, dto.getStatDate());
 				}else{
 					this.modifyMonthDriverVolume(dto,dto.getStatDateStart(),dto.getStatDateEnd());
+					dto.setStatDate("("+dto.getStatDateStart()+")-("+dto.getStatDateEnd()+")");
 				}
 			}
 		}
