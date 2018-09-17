@@ -219,11 +219,6 @@ public class CarDriverShiftsService {
 	* @Author: lunan
 	* @Date: 2018/9/3 
 	*/
-    @SuppressWarnings("unchecked")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE ),
-            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-    } )
 	public String saveDriverDayDuty(DutyParamRequest dutyParamRequest){
 		if(Check.NuNObj(dutyParamRequest)){
 			return null;
@@ -262,7 +257,8 @@ public class CarDriverShiftsService {
 			//设置强制上班结果
 			dutyParamRequest.setForcedTimes(forceIdsResult);
 			es.submit(new DayDutyTasker(dutyParamRequest));
-
+			/*Map<String,Object> result = new HashMap<String,Object>();
+			result = asyncDutyService.saveDriverDayDutyList(dutyParamRequest);*/
 		}catch (Exception e){
 			logger.error("保存排班信息异常:{}"+JSON.toJSONString(e));
 		}
@@ -281,7 +277,8 @@ public class CarDriverShiftsService {
 			try {
 				logger.info("保存司机日排班信息 driverIds"+dutyParamRequest.getDutyIds()+",times"+dutyParamRequest.getTimes());
 				Map<String,Object> result = new HashMap<String,Object>();
-				asyncDutyService.saveDriverDayDutyList(dutyParamRequest);
+				result = asyncDutyService.saveDriverDayDutyList(dutyParamRequest);
+				logger.info("保存司机日排班信息 driverIds"+dutyParamRequest.getDutyIds()+",times"+dutyParamRequest.getTimes()+"保存班制排班结果："+JSON.toJSONString(result));
 			} catch (Exception e) {
 				logger.error("DayDutyTasker"+JSON.toJSONString(e));
 			}

@@ -123,11 +123,6 @@ public class CarDriverDurationService {
 	* @Author: lunan
 	* @Date: 2018/9/3 
 	*/
-	@SuppressWarnings("unchecked")
-	@MasterSlaveConfigs(configs={
-			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE ),
-			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-	} )
 	public int saveOrUpdateCarDriverDuration(CarDutyDuration carDutyDuration){
 		if(Check.NuNObj(carDutyDuration)
 				|| Check.NuNObj(carDutyDuration.getCity())

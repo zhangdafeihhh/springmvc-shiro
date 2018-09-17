@@ -135,7 +135,7 @@ public class RiskOrderComplainController {
             Map<String, Object> param = new HashMap<String, Object>();
             param.put("orderNo", orderNo);
             String resultDetail =riskOrderCompalinTemplate.postForObject("/risk/in/running/getDetailByOrderNo.do",
-                    String.class, paramMap);
+                    String.class, param);
 
             if (StringUtils.isNotEmpty(resultDetail)) {
                 JSONObject responseObject = JSONObject.parseObject(resultDetail);
