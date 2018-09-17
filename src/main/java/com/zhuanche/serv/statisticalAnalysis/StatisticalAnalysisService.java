@@ -224,7 +224,7 @@ public class  StatisticalAnalysisService {
 			logger.info("调用大数据接口，url--" + url);
 			String jsonString = JSON.toJSONString(paramMap);
 			logger.info("调用大数据接口，参数--" + jsonString);
-			String result = HttpClientUtil.buildPostRequest(url).setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
+			String result = HttpClientUtil.buildPostRequest(url).setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON).setConnectTimeOut(3000).setReadTimeOut(3000).execute();
 			logger.info("调用大数据接口，result--" + result);
 			result = result.replaceAll("null", "\"\"");
 			result = result.replaceAll("NULL", "\"\"");
