@@ -138,7 +138,7 @@
 			and i.license_plates LIKE '%${licensePlates}%'
 		</if>
 		<if test="name!=null and name!=''">
-			and i.name LIKE '%${name}%'
+			and i.name = #{name}
 		</if>
 		<if test="phone!=null and phone!=''">
 			and i.phone LIKE '%${phone}%'
