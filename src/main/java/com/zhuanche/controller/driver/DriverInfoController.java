@@ -241,7 +241,9 @@ public class DriverInfoController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
-    public void exportDriverList(String name, String phone, String licensePlates, Integer status, Integer cityId, Integer supplierId,
+    public void exportDriverList(String name, String phone, String licensePlates, Integer status,
+                                         @Verify(param = "cityId",rule="required") Integer cityId,
+                                         @Verify(param = "supplierId",rule="required") Integer supplierId,
                                          Integer teamId, Integer teamGroupId, Integer groupId, Integer cooperationType,
                                          String imei, String idCardNo, Integer isImage,
                                          HttpServletRequest request, HttpServletResponse response) {

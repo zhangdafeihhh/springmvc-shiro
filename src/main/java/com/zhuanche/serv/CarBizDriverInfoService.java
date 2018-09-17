@@ -379,6 +379,7 @@ public class CarBizDriverInfoService {
             carBizDriverInfo.setPassword(getPassword(carBizDriverInfo.getIdCardNo()));
 
             // 插入司机信息到mysql，mongo
+            DynamicRoutingDataSource.setMasterSlave("rentcar-DataSource", DataSourceMode.MASTER);
             int n = this.saveDriverInfo(carBizDriverInfo);
             driverMongoService.saveDriverMongo(carBizDriverInfo);
 
@@ -2631,7 +2632,7 @@ public class CarBizDriverInfoService {
                 cell.setCellValue(s.getSupplierName()!=null?""+s.getSupplierName()+"":"");
                 //服务城市
                 cell = row.createCell(48);
-                cell.setCellValue(s.getServiceCity()!=null?""+s.getServiceCity()+"":"");
+                cell.setCellValue(s.getCityName()!=null?""+s.getCityName()+"":"");
                 //车队
                 cell = row.createCell(49);
                 cell.setCellValue(s.getTeamName()!=null?""+s.getTeamName()+"":"");
