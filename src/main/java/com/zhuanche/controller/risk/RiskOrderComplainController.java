@@ -199,8 +199,15 @@ public class RiskOrderComplainController {
              paramMap.put("fileNameList", new ArrayList<>());//必须保留的参数
             String result =riskOrderCompalinTemplate.postForObject("/car/manager/order/submitComplain.do",
                     String.class, paramMap);
+            JSONObject resultJson = JSON.parseObject(result);
+           Integer code = resultJson.getInteger("code");
+           if(code != null && code.intValue() == 0){
+               return AjaxResponse.success(null);
+           }else{
+               return AjaxResponse.fail(RestErrorCode.RISK_SUBMITCOMPLAIN_FAIL,result);
+           }
 
-            return AjaxResponse.success(result);
+
         } catch (Exception e) {
             logger.error("风控-风控订单管理-执行提交申诉,orderNo:{" + orderNo + "}",e);
             return AjaxResponse.fail(RestErrorCode.RISK_SUBMITCOMPLAIN_FAIL,"ERROR");
