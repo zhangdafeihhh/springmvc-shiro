@@ -154,6 +154,12 @@ public class DriverDailyReportController extends DriverQueryController {
 				list = this.driverDailyReportExMapper.queryForListObject(params);
 			}else{
 				list = this.driverDailyReportExMapper.queryWeekForListObject(params);
+				if(list!=null && list.size()>0){
+					for (DriverDailyReport report: list) {
+						report.setStatDateStart(statDateStart);
+						report.setStatDateEnd(statDateEnd);
+					}
+				}
 			}
 			total = (int) p.getTotal();
 		} finally {
@@ -283,6 +289,12 @@ public class DriverDailyReportController extends DriverQueryController {
 				filename = "司机日报列表";
 			}else {
 				list = this.driverDailyReportExMapper.queryWeekForListObject(params);
+				if(list!=null && list.size()>0){
+					for (DriverDailyReport report: list) {
+						report.setStatDateStart(statDateStart);
+						report.setStatDateEnd(statDateEnd);
+					}
+				}
 			}
 			rows = this.selectSuppierNameAndCityNameDays(list,reportType);
 		}
