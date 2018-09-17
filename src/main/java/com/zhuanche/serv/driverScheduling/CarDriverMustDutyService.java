@@ -162,6 +162,7 @@ public class CarDriverMustDutyService {
 				upRecord.setRemark(carDriverMustDuty.getRemark());
 				upRecord.setPeakTimes(carDriverMustDuty.getPeakTimes());
 				upRecord.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
+				upRecord.setStatus(carDriverMustDuty.getStatus());
 				return carDriverMustDutyMapper.updateByPrimaryKeySelective(upRecord);
 			}else{
 				Set<Integer> cityId = new HashSet<>();
