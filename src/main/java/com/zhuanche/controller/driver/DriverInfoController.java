@@ -472,7 +472,7 @@ public class DriverInfoController {
                     || StringUtils.isEmpty(phonecorp) || StringUtils.isEmpty(maptype) || StringUtils.isEmpty(emergencycontactaddr) || StringUtils.isEmpty(driverlicenseissuingdatestart)
                     || StringUtils.isEmpty(driverlicenseissuingdateend) || StringUtils.isEmpty(driverlicenseissuingcorp) || StringUtils.isEmpty(driverlicenseissuingnumber)
                     || StringUtils.isEmpty(driverLicenseIssuingRegisterDate) || StringUtils.isEmpty(driverLicenseIssuingFirstDate) || StringUtils.isEmpty(driverLicenseIssuingGrantDate)
-                    || StringUtils.isEmpty(birthDay) || StringUtils.isEmpty(houseHoldRegisterPermanent) || groupId == null)){
+                    || StringUtils.isEmpty(birthDay) || StringUtils.isEmpty(houseHoldRegisterPermanent) || groupId == null){
                 return AjaxResponse.fail(RestErrorCode.INFORMATION_NOT_COMPLETE);
             }
 
