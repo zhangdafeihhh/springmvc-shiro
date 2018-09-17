@@ -148,6 +148,9 @@ public class RiskOrderComplainController {
                     Integer appealStatus = repDetailData.getInteger("appealStatus");
                     String remark = repDetailData.getString("remark");
                     String appealProcessAt = repDetailData.getString("appealProcessAt");
+                    if(StringUtils.isNotEmpty(appealProcessAt)){
+                        appealProcessAt = appealProcessAt.substring(0,appealProcessAt.indexOf("."));
+                    }
 
                     if (appealStatus == 1){
                         repData.put("appealStatus","未申诉");
