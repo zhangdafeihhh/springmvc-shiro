@@ -283,12 +283,7 @@ public class DriverInfoController {
             carBizDriverInfoDTO.setSupplierIds(permOfSupplier);
             carBizDriverInfoDTO.setTeamIds(permOfTeam);
             carBizDriverInfoDTO.setDriverIds(driverIds);
-
             list = carBizDriverInfoService.queryDriverList(carBizDriverInfoDTO);
-            // 查询城市名称，供应商名称，服务类型，加盟类型
-            for (CarBizDriverInfoDTO driver : list) {
-                carBizDriverInfoService.getBaseStatis(driver);
-            }
         }
         try {
             Workbook wb = carBizDriverInfoService.exportExcel(list,request.getRealPath("/")+File.separator+"template"+File.separator+"driver_info.xlsx");

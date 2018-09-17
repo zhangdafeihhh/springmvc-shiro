@@ -2485,6 +2485,10 @@ public class CarBizDriverInfoService {
             Cell cell = null;
             int i=0;
             for(CarBizDriverInfoDTO s:list){
+
+                // 查询城市名称，供应商名称，服务类型，加盟类型
+                this.getBaseStatis(s);
+
                 Row row = sheet.createRow(i + 1);
                 // 车牌号
                 cell = row.createCell(0);
