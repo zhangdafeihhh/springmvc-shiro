@@ -77,6 +77,7 @@ public class AsyncDutyService {
 
 
 	public Map<String, Object> saveDriverDayDutyList(DutyParamRequest dutyParamRequest) {
+		logger.info("保存班制排班逻辑最后一个方法入参："+JSON.toJSONString(dutyParamRequest));
 		Map<String, Object> result = new HashMap<String, Object>();
 		if (null == dutyParamRequest) {
 			result.put("result", "0");

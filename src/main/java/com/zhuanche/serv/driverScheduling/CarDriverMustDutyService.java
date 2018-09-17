@@ -123,11 +123,6 @@ public class CarDriverMustDutyService {
 	* @Author: lunan
 	* @Date: 2018/9/3 
 	*/
-	@SuppressWarnings("unchecked")
-	@MasterSlaveConfigs(configs={
-			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE ),
-			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-	} )
 	public int saveOrUpdateDriverMust(CarDriverMustDuty carDriverMustDuty){
 
 		if(Check.NuNObj(carDriverMustDuty)
