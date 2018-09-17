@@ -31,6 +31,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -159,6 +160,7 @@ public class CarDriverDurationService {
 				upRecord.setRemark(carDutyDuration.getRemark());
 				upRecord.setStatus(carDutyDuration.getStatus());
 				upRecord.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
+				upRecord.setUpdateDate(new Date());
 				return carDutyDurationMapper.updateByPrimaryKeySelective(upRecord);
 			}else{
 				Set<Integer> cityId = new HashSet<>();
@@ -176,6 +178,7 @@ public class CarDriverDurationService {
 				}
 				carDutyDuration.setSupplierName(supplierDetail.getSupplierFullName());
 				carDutyDuration.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
+				carDutyDuration.setCreateDate(new Date());
 				return carDutyDurationMapper.insertSelective(carDutyDuration);
 			}
 		}catch (Exception e){
