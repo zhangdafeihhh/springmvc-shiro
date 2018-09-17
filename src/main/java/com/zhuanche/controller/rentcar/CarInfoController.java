@@ -216,7 +216,7 @@ public class CarInfoController {
                                   @Verify(param = "cityId",rule="required") Integer cityId,
                                   @Verify(param = "supplierId",rule="required") Integer supplierId,
                                   @Verify(param = "carModelId",rule="required") Integer carModelId,
-                              @Verify(param = "carPhotograph",rule="") String imageUrl,
+                              @RequestParam(value = "carPhotograph", required = false) String imageUrl,
                               @Verify(param = "vehicleDrivingLicense",rule="") String vehicleDrivingLicense,
                                   @Verify(param = "modelDetail",rule="required") String modelDetail,
                                   @Verify(param = "color",rule="required") String color,
