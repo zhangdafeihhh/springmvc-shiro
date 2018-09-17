@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -287,10 +288,23 @@ public class DriverInfoController {
         }
         try {
             Workbook wb = carBizDriverInfoService.exportExcel(list,request.getRealPath("/")+File.separator+"template"+File.separator+"driver_info.xlsx");
-            Componment.fileDownload(response, wb, new String("司机信息".getBytes("utf-8"), "iso8859-1"));
+//            Componment.fileDownload(response, wb, new String("司机信息".getBytes("utf-8"), "iso8859-1"));
+            this.exportExcelFromTemplet(response, wb, new String("司机信息".getBytes("utf-8"), "iso8859-1"));
         } catch (Exception e) {
            logger.error("司机信息列表查询导出error",e);
         }
+    }
+
+    public void exportExcelFromTemplet(HttpServletResponse response, Workbook wb, String fileName) throws IOException {
+        if(StringUtils.isEmpty(fileName)) {
+            fileName = "exportExcel";
+        }
+        response.setHeader("Content-Disposition","attachment;filename="+fileName+".xlsx");//指定下载的文件名
+        response.setContentType("application/octet-stream");
+        ServletOutputStream os =  response.getOutputStream();
+        wb.write(os);
+        os.flush();
+        os.close();
     }
 
     /**
