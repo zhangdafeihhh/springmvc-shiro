@@ -313,6 +313,7 @@
     i.gender gender,
     i.NAME,
     g.group_name AS carGroupName,
+    c.city_name AS serviceCity,
     i.license_plates AS licensePlates,
     i.supplier_id supplieId,
     p.supplier_full_name AS supplierName,
@@ -363,13 +364,13 @@
       and i.phone LIKE '%${phone}%'
     </if>
     <if test="cityIds!=null and cityIds.size()>0">
-      and c.city_id IN
+      and i.service_city IN
       <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
         #{cid}
       </foreach>
     </if>
     <if test="supplierIds!=null and supplierIds.size()>0">
-      and p.supplier_id IN
+      and i.supplier_id IN
       <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
         #{sid}
       </foreach>

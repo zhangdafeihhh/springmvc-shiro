@@ -27,6 +27,7 @@ import org.apache.commons.collections.map.HashedMap;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -108,8 +109,21 @@ public class DriverSchController {
                 return ;
             }
             Integer total = pageDTO.getTotal();
+            List<DutyExcelDTO> firstList = new ArrayList<>();
             List<CarDriverDayDutyDTO> result = pageDTO.getResult();
-            List<DutyExcelDTO> firstList = BeanUtil.copyList(result, DutyExcelDTO.class);
+            for (CarDriverDayDutyDTO carDriverDayDutyDTO : result) {
+                DutyExcelDTO excel = new DutyExcelDTO();
+                BeanUtils.copyProperties(carDriverDayDutyDTO,excel);
+                if(carDriverDayDutyDTO.getStatus() == 2){
+                    excel.setStatus("已发布");
+                }else if(carDriverDayDutyDTO.getStatus() == 1){
+                    excel.setStatus("未发布");
+                }else{
+                    excel.setStatus("未发布");
+                }
+                firstList.add(excel);
+            }
+//            List<DutyExcelDTO> firstList = BeanUtil.copyList(result, DutyExcelDTO.class);
             if(Check.NuNCollection(result)){
                 return ;
             }
@@ -228,7 +242,7 @@ public class DriverSchController {
     @RequestMapping(value = "/getCarDriverMustDetail")
     public AjaxResponse getCarDriverMustDetail(@Verify(param = "paramId", rule = "required") String paramId){
         logger.info("获取强制排班详情入参:"+ JSON.toJSONString(paramId));
-        CarDriverMustDuty detail = carDriverMustDutyService.getCarDriverMustDetail(Integer.parseInt(paramId));
+        CarDriverMustDutyDTO detail = carDriverMustDutyService.getCarDriverMustDetail(Integer.parseInt(paramId));
         return AjaxResponse.success(detail);
     }
 

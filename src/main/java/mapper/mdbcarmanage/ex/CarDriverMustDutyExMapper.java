@@ -15,4 +15,8 @@ public interface CarDriverMustDutyExMapper {
 
     /** 查询司机强制排班时间段信息*/
     List<CarDriverMustDutyDTO> selectDriverMustDutyListByField(DutyParamRequest dutyParamRequest);
+
+
+    CarDriverMustDutyDTO selectDriverMustDutyDetail(DutyParamRequest dutyParamRequest);
+
 }

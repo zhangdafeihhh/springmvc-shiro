@@ -123,7 +123,6 @@ public class CarDriverTeamService{
 	public int removeDriverToTeam(Integer id, Integer driverId){
 		logger.info("车队/小组移除司机service入参:"+ "车队/小组id："+id+"要移除的司机id："+driverId);
 		try{
-            DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.SLAVE);
 			CarDriverTeam carDriverTeam = carDriverTeamMapper.selectByPrimaryKey(id);
 			if(Check.NuNObj(carDriverTeam)){
 				logger.info("移除--车队/小组不存在" + id + driverId);
@@ -134,15 +133,12 @@ public class CarDriverTeamService{
 			carRelateTeam.setDriverId(driverId);
 			if(Check.NuNObj(carDriverTeam.getpId())){
 				//车队操作移除司机,包含移除司机绑定在小组的关系
-                DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
 				int result = carRelateTeamExMapper.deleteDriverFromTeam(id, driverId);
 				logger.info("车队:"+id + "移除司机"+driverId+"结果:"+result);
 				CarRelateGroup group = new CarRelateGroup();
 				group.setDriverId(driverId);
-                DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.SLAVE);
 				CarRelateGroup existsGroup = carRelateGroupExMapper.selectOneGroup(group);
 				if(!Check.NuNObj(existsGroup)){
-                    DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
 					result = carRelateGroupExMapper.deleteDriverFromGroup(existsGroup.getGroupId(),driverId);
 				}
 				//TODO 处理司机ID，发动司机变更MQ 从车队移除司机
@@ -173,7 +169,6 @@ public class CarDriverTeamService{
 			logger.info("添加司机到车队/小组参数无效");
 			return ServiceReturnCodeEnum.DEAL_FAILURE.getCode();
 		}
-		DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.SLAVE);
 		CarDriverTeam carDriverTeam = carDriverTeamMapper.selectByPrimaryKey(driverTeamRequest.getTeamId());
 		if(Check.NuNObj(carDriverTeam)){
 			logger.info("车队/小组不存在");
@@ -194,7 +189,6 @@ public class CarDriverTeamService{
 				group.setDriverId(Integer.valueOf(driverId));
 				CarRelateGroup existsGroup = carRelateGroupExMapper.selectOneGroup(group);
 				if(Check.NuNObj(existsGroup)){
-					DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
 					result += carRelateGroupMapper.insertSelective(group);
 				}
 			}else{
@@ -202,7 +196,6 @@ public class CarDriverTeamService{
 				team.setDriverId(Integer.valueOf(driverId));
 				CarRelateTeam existsTeam = carRelateTeamExMapper.selectOneTeam(team);
 				if(Check.NuNObj(existsTeam)){
-					DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
 					result += carRelateTeamMapper.insertSelective(team);
 				}
 			}
@@ -436,7 +429,6 @@ public class CarDriverTeamService{
 	public int updateOneDriverTeam(CarDriverTeamDTO paramDto){
 
 		try{
-			DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.SLAVE);
 			CarDriverTeam existsTeam = carDriverTeamMapper.selectByPrimaryKey(paramDto.getId());
 			if(Check.NuNObj(existsTeam)){
 				return ServiceReturnCodeEnum.NONE_RECODE_EXISTS.getCode();
@@ -444,7 +436,6 @@ public class CarDriverTeamService{
 			//开启关闭逻辑
 			if(paramDto.getOpenCloseFlag() !=0 && paramDto.getStatus() != existsTeam.getStatus()){
 				existsTeam.setStatus(paramDto.getOpenCloseFlag());
-				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
 				return carDriverTeamMapper.updateByPrimaryKeySelective(existsTeam);
 			}else if(paramDto.getOpenCloseFlag() !=0 && paramDto.getStatus() == existsTeam.getStatus()){
 				return ServiceReturnCodeEnum.DEAL_SUCCESS.getCode();
@@ -453,7 +444,6 @@ public class CarDriverTeamService{
 			existsTeam.setCharge2(paramDto.getCharge2());
 			existsTeam.setCharge3(paramDto.getCharge3());
 			existsTeam.setRemark(paramDto.getRemark());
-			DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
 			return carDriverTeamMapper.updateByPrimaryKeySelective(existsTeam);
 		}catch (Exception e){
 			logger.error("更新车队失败:{}"+JSON.toJSONString(e));
@@ -482,7 +472,6 @@ public class CarDriverTeamService{
 			CarDriverTeam record = new CarDriverTeam();
 			BeanUtils.copyProperties(record,paramDto);
 			record.setCreateBy(String.valueOf(WebSessionUtil.getCurrentLoginUser().getId()));
-			DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
 			return carDriverTeamMapper.insertSelective(record);
 		}catch (Exception e){
 			logger.error("新增车队失败:{}"+JSON.toJSONString(e));

@@ -239,7 +239,6 @@ public class DriverTeamController{
 		record.setId(paramId);
 		record.setDutyStartDate(dutyStartDate);
 		record.setDutyEndDate(dutyEndDate);
-		DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
 		int result = carDriverTeamService.updateTeamDuty(record);
 		if(result > 0 ){
 			return AjaxResponse.success(result);
