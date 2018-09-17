@@ -1,6 +1,8 @@
 package com.zhuanche.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -24,6 +27,7 @@ import com.zhuanche.serv.CarBizCarGroupService;
 import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.serv.rentcar.CarBizModelService;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
+import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
@@ -51,7 +55,10 @@ public class CommonController {
 
 	@Value("${bigdata.saas.data.url}")
 	String  saasBigdataApiUrl;
-	 
+	
+	@Autowired
+	private StatisticalAnalysisService statisticalAnalysisService;
+	
     @Autowired
     private CitySupplierTeamCommonService citySupplierTeamCommonService;
 
@@ -221,17 +228,24 @@ public class CommonController {
      * @Author: jdd
      * @Date: 2018/9/17
      */
-   /* @RequestMapping("/queryListBigDataDropdown")
+    @RequestMapping("/queryListBigDataDropdown")
     @ResponseBody
-    public AjaxResponse queryListBigDataDropdown(@Verify(param = "typeName", rule = "required") String typeName){
+    public AjaxResponse queryListBigDataDropdown(@Verify(param = "typeName", rule = "required") String typeName,
+    		String cityId){
         try{
-        	
-          return AjaxResponse.success(carDriverTeams);
+        	Map<String, Object> paramMap = new HashMap<String, Object>();
+        	paramMap.put("typeName", typeName);//
+        	 if(StringUtil.isNotEmpty(cityId)){
+ 	        	paramMap.put("city_id", cityId);//
+ 	        }
+          // 从大数据仓库获取统计数据
+ 	      AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/dropdown/queryList",paramMap);
+          return result;
         }catch (Exception e){
-            logger.error("查询城市供应商车队列表异常:{}",e);
+            logger.error("查询统计分析 - 完成订单下拉列表查询接口异常",e);
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
-    }*/
+    }
     
     
 }
