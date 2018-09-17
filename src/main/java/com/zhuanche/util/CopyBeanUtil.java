@@ -340,14 +340,15 @@ public class CopyBeanUtil {
         }
         return null;
     }
-/*    public static void main(String[] args) {
+   public static void main(String[] args) {
     	CarFactOrderInfoDetailDTO orderDTO = new CarFactOrderInfoDetailDTO();
     	CarFactOrderInfo ci = new CarFactOrderInfo();
     	ci.setCreatedate("2019-09-10");
     	ci.setAmount(132.1);
+    	ci.setDriverId("1");
     	copyByIgnoreCase(orderDTO,ci,true);
     	System.out.println(orderDTO.getCreatedate());
-    	System.out.println(orderDTO.getAmount());
-    }*/
+    	System.out.println(orderDTO.getDriverId());
+    }
 
 }

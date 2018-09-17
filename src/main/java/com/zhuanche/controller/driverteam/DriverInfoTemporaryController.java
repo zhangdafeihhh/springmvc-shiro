@@ -206,8 +206,8 @@ public class DriverInfoTemporaryController extends BaseController {
     public AjaxResponse importDriverInfo(@RequestParam(value="fileName") MultipartFile file,
                                          @Verify(param = "cityId",rule="required") Integer cityId,
                                          @Verify(param = "supplierId",rule="required") Integer supplierId,
-                                         @Verify(param = "teamId",rule="required") Integer teamId,
-                                         @Verify(param = "groupId",rule="required") Integer groupId,
+                                         @RequestParam(value = "teamId",required = false) Integer teamId,
+                                         @RequestParam(value = "groupId",required = false) Integer groupId,
                                          HttpServletResponse response){
         try {
             log.info("司机导入");
@@ -379,6 +379,8 @@ public class DriverInfoTemporaryController extends BaseController {
      * @param bankCardNumber 银行卡号
      * @param bankCardBank 银行卡开户行
      * @param memo 备注
+     * @param photoSrct 司机头像
+     * @param drivingLicenseImg 驾驶证扫描件
      * @return
      */
     @ResponseBody
@@ -434,7 +436,9 @@ public class DriverInfoTemporaryController extends BaseController {
                                     @Verify(param = "groupId",rule="required") Integer groupId,
                                     @RequestParam(value = "bankCardNumber",required = false) String bankCardNumber,
                                     @RequestParam(value = "bankCardBank",required = false) String bankCardBank,
-                                    @RequestParam(value = "memo",required = false) String memo) {
+                                    @RequestParam(value = "memo",required = false) String memo,
+                                    @RequestParam(value = "photoSrct",required = false) String photoSrct,
+                                    @RequestParam(value = "drivingLicenseImg",required = false) String drivingLicenseImg) {
         log.info("新建司机信息保存");
         CarBizDriverInfoTemp entity = new CarBizDriverInfoTemp();
         entity.setName(name);
@@ -490,6 +494,8 @@ public class DriverInfoTemporaryController extends BaseController {
         entity.setBankCardBank(StringUtils.isNotBlank(bankCardBank)?bankCardBank:null);
         entity.setMemo(StringUtils.isNotBlank(memo)?memo:null);
         entity.setAddress(currentAddress);
+        entity.setPhotoSrct(StringUtils.isNotBlank(photoSrct)?photoSrct:null);
+        entity.setDrivingLicenseImg(StringUtils.isNotBlank(drivingLicenseImg)?drivingLicenseImg:null);
         return carBizDriverInfoTempService.addSave(entity);
     }
 
@@ -552,6 +558,8 @@ public class DriverInfoTemporaryController extends BaseController {
      * @param oldSupplierId 旧的供应商
      * @param oldPhone 旧的手机号
      * @param oldLicensePlates 旧的车牌号
+     * @param photoSrct 司机头像
+     * @param drivingLicenseImg 驾驶证扫描件
      * @return
      */
     @ResponseBody
@@ -612,7 +620,9 @@ public class DriverInfoTemporaryController extends BaseController {
                                 @Verify(param = "oldCityId",rule="required") Integer oldCityId,
                                 @Verify(param = "oldSupplierId",rule="required") Integer oldSupplierId,
                                 @Verify(param = "oldPhone",rule="required") String oldPhone,
-                                @Verify(param = "oldLicensePlates",rule="required") String oldLicensePlates) {
+                                @Verify(param = "oldLicensePlates",rule="required") String oldLicensePlates,
+                                @RequestParam(value = "photoSrct",required = false) String photoSrct,
+                                @RequestParam(value = "drivingLicenseImg",required = false) String drivingLicenseImg) {
         log.info("修改司机信息保存,司机Id:"+driverId);
         CarBizDriverInfoTemp entity = new CarBizDriverInfoTemp();
         entity.setDriverId(driverId);
@@ -673,6 +683,8 @@ public class DriverInfoTemporaryController extends BaseController {
         entity.setOldPhone(oldPhone);
         entity.setOldLicensePlates(oldLicensePlates);
         entity.setAddress(currentAddress);
+        entity.setPhotoSrct(StringUtils.isNotBlank(photoSrct)?photoSrct:null);
+        entity.setDrivingLicenseImg(StringUtils.isNotBlank(drivingLicenseImg)?drivingLicenseImg:null);
         return carBizDriverInfoTempService.updateSave(entity);
     }
 

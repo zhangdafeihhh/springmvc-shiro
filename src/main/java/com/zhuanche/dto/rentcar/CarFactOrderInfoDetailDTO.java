@@ -6,8 +6,8 @@ import java.util.List;
 import com.zhuanche.entity.rentcar.CarBizOrderWaitingPeriod;
 
 public class CarFactOrderInfoDetailDTO{
-	//是否主订单 y / n 
-	private String isMainOrder;
+	//司机Id
+	private String driverId;
 	//司机出发时间
 	private String driverBeginTime;
 	//司机到达上车地点 
@@ -42,7 +42,7 @@ public class CarFactOrderInfoDetailDTO{
 	private String bookingStartAddr;
 	//预约下车地点 
 	private String bookingEndAddr;
-	//预定车型类别 
+	//预定车型类别   --1
 	private String bookingGroupnames;
 	//实际上车时间 
 	private String factDate;
@@ -60,17 +60,19 @@ public class CarFactOrderInfoDetailDTO{
 	private String airlineNo;
 	//指派司机类型 
 	private Integer pushDriverType;
+	//指派司机类型name
+	private String pushDriverTypeName;
 	//预定人身份证号码 
 	private String bookingIdNumber;
 	//是否拼车单 
-	private Integer airportId;
+	private String airportId;
 	//主订单编号 
 	private String mainOrderNo;
 	//司机姓名 
 	private String drivername;
 	//司机手机 
 	private String driverphone;
-	//车型 
+	//车型    --1 
 	private String modeldetail;
 	//车牌号 
 	private String licensePlates;
@@ -408,6 +410,23 @@ public class CarFactOrderInfoDetailDTO{
 	public Integer getPushDriverType() {
 		return pushDriverType;
 	}
+	
+	public String getPushDriverTypeName() {
+		if(this.pushDriverType==1){
+			pushDriverTypeName= "自动派单";
+		}else if(this.pushDriverType==2){
+			pushDriverTypeName= "司机抢单";
+		}else if(this.pushDriverType==3){
+			pushDriverTypeName= "人工绑单";
+		}else{
+			pushDriverTypeName = "无";
+		}
+		return pushDriverTypeName;
+	}
+
+	public void setPushDriverTypeName(String pushDriverTypeName) {
+		this.pushDriverTypeName = pushDriverTypeName;
+	}
 
 	public void setPushDriverType(Integer pushDriverType) {
 		this.pushDriverType = pushDriverType;
@@ -421,11 +440,11 @@ public class CarFactOrderInfoDetailDTO{
 		this.bookingIdNumber = bookingIdNumber;
 	}
 
-	public Integer getAirportId() {
-		return airportId;
+	public String getAirportId() {
+		return "1".equals(airportId) ? "是" : "否";
 	}
 
-	public void setAirportId(Integer airportId) {
+	public void setAirportId(String airportId) {
 		this.airportId = airportId;
 	}
 
@@ -961,12 +980,13 @@ public class CarFactOrderInfoDetailDTO{
 		this.carBizOrderWaitingPeriodList = carBizOrderWaitingPeriodList;
 	}
 
-	public String getIsMainOrder() {
-		return isMainOrder;
+
+	public String getDriverId() {
+		return driverId;
 	}
 
-	public void setIsMainOrder(String isMainOrder) {
-		this.isMainOrder = isMainOrder;
+	public void setDriverId(String driverId) {
+		this.driverId = driverId;
 	}
 	
 	

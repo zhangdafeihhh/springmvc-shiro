@@ -101,7 +101,7 @@ public class CarDriverDurationService {
 			}
 			dutyParamRequest.setCityIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getCityIds()));
 			dutyParamRequest.setSupplierIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getSupplierIds()));
-			dutyParamRequest.setSupplierIds(resultParmam.getTeamIds());
+			dutyParamRequest.setTeamIds(resultParmam.getTeamIds());
 			PageInfo<CarDriverDurationDTO> pageInfo = PageHelper.startPage(dutyParamRequest.getPageNo(), dutyParamRequest.getPageSize(), true).doSelectPageInfo(()
 					-> carDutyDurationExMapper.selectDutyDurationList(dutyParamRequest));
 			PageDTO pageDTO = new PageDTO();
@@ -163,7 +163,6 @@ public class CarDriverDurationService {
 				upRecord.setEndDate(carDutyDuration.getEndDate());
 				upRecord.setRemark(carDutyDuration.getRemark());
 				upRecord.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
-				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
 				return carDutyDurationMapper.updateByPrimaryKeySelective(upRecord);
 			}else{
 				Set<Integer> cityId = new HashSet<>();
@@ -181,7 +180,6 @@ public class CarDriverDurationService {
 				}
 				carDutyDuration.setSupplierName(supplierDetail.getSupplierFullName());
 				carDutyDuration.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
-				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
 				return carDutyDurationMapper.insertSelective(carDutyDuration);
 			}
 		}catch (Exception e){

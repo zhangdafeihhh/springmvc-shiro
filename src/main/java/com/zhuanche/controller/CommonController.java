@@ -3,14 +3,17 @@ package com.zhuanche.controller;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.dto.rentcar.ServiceTypeDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizModel;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
+import com.zhuanche.entity.rentcar.ServiceEntity;
 import com.zhuanche.serv.CarBizCarGroupService;
 import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.serv.rentcar.CarBizModelService;
+import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
@@ -54,6 +57,8 @@ public class CommonController {
     @Autowired
     private CarBizCarGroupService carBizCarGroupService;
 
+	@Autowired
+	private CarFactOrderInfoService carFactOrderInfoService;
     /**
     * @Desc:  获取城市列表
     * @param:
@@ -146,6 +151,24 @@ public class CommonController {
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
     }
+    
+    /**
+	    * 查询订单服务类型字典
+	    * @return
+	  */
+    @RequestMapping(value = "/queryServiceEntityData", method = { RequestMethod.POST,RequestMethod.GET })
+    @ResponseBody
+    public AjaxResponse queryServiceEntityData(){
+        try{
+         	logger.info("查询订单服务类型字典 :queryServiceEntityData");
+         	List<ServiceTypeDTO> list = carFactOrderInfoService.selectServiceEntityList(new ServiceEntity());
+            return AjaxResponse.success(list);
+        }catch (Exception e){
+            logger.error("查询订单服务类型字典异常:{}",e);
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+    }
+    
     
     /**
      * @Desc: 查询车队小组列表

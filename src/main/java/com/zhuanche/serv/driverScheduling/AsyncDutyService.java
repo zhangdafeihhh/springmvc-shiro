@@ -161,13 +161,11 @@ public class AsyncDutyService {
 		Map<String, Object> params = new HashMap<String, Object>();
 		if (null != insertList && !insertList.isEmpty()) {
 			params.put("list", insertList);
-			DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
 			carDriverDayDutyExMapper.insertDriverDayDutyList(params);
 		}
 		if (null != updateList && !updateList.isEmpty()) {
 			params.remove("list");
 			params.put("list", updateList);
-			DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
 			carDriverDayDutyExMapper.updateDriverDayDutyList(params);
 		}
 		String errorMsg = null;
@@ -313,21 +311,18 @@ public class AsyncDutyService {
 			if (!CollectionUtils.isEmpty(insertList)) {
 				paramMap.put("list", insertList);
 				// 批量插入
-				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
 				Integer result = driverDutyTimeInfoExMapper.insertDriverDutyTimeInfoList(paramMap);
 				logger.info("批量插入排班：入参{}"+JSON.toJSONString(dutyParamRequest)+"结果:"+result);
 			}
 			if (!CollectionUtils.isEmpty(updateList)) {
 				paramMap.put("list", updateList);
 				// 批量修改
-				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
 				Integer result = driverDutyTimeInfoExMapper.updateDriverDutyTimeInfoList(paramMap);
 				logger.info("批量更新排班：入参{}"+JSON.toJSONString(dutyParamRequest)+"结果:"+result);
 			}
 			// 将排班数据设置为已发布
 			Map<String, Object> dayDutyParams = new HashMap<String, Object>();
 			dayDutyParams.put("list", list);
-			DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
 			Integer result = carDriverDayDutyExMapper.updateDriverDayDutyList(dayDutyParams);
 			logger.info("更新排版数据状态：入参{}"+JSON.toJSONString(dutyParamRequest)+"结果:"+result);
 			return;
