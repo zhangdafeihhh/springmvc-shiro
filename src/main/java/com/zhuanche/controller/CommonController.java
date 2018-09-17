@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,16 +14,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.dto.rentcar.CarFactOrderInfoDTO;
 import com.zhuanche.dto.rentcar.ServiceTypeDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.entity.rentcar.ServiceEntity;
+import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.serv.CarBizCarGroupService;
 import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.serv.rentcar.CarBizModelService;
@@ -31,6 +37,7 @@ import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
+import com.zhuanche.util.Common;
 
 /**
   * @description: 多级联动查询
@@ -230,23 +237,42 @@ public class CommonController {
      */
     @RequestMapping("/queryListBigDataDropdown")
     @ResponseBody
-    public AjaxResponse queryListBigDataDropdown(@Verify(param = "typeName", rule = "required") String typeName,
+    public AjaxResponse queryListBigDataDropdown(
+    		@Verify(param = "typeName", rule = "required") String typeName,
     		String cityId){
         try{
         	Map<String, Object> paramMap = new HashMap<String, Object>();
         	paramMap.put("typeName", typeName);//
         	 if(StringUtil.isNotEmpty(cityId)){
- 	        	paramMap.put("city_id", cityId);//
+ 	        	paramMap.put("cityId", cityId);//
  	        }
-          // 从大数据仓库获取统计数据
- 	      AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/dropdown/queryList",paramMap);
-          return result;
+            String url =saasBigdataApiUrl+"/dropdown/queryList";
+            // 从大数据仓库获取统计数据
+ 	        String resultStr = HttpClientUtil.buildPostRequest(url).addParams(paramMap)
+ 	        			.addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
+			JSONObject job = JSON.parseObject(resultStr);
+			if (job == null) {
+				logger.error("调用订单接口" + url + "返回结果为null");
+				return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+			}
+			if (!job.getString("code").equals("0")) {
+				logger.info("调用订单接口" + url + "返回结果为result"+resultStr);
+				return AjaxResponse.failMsg(Integer.parseInt(job.getString("code")), job.getString("message"));
+			}
+			if (job != null) {
+				if("0".equals(job.get("code").toString())){
+					List<Map> list =  JSONArray.parseArray(job.get("result").toString(), Map.class);   
+					return AjaxResponse.success(list);
+				}
+			}
         }catch (Exception e){
             logger.error("查询统计分析 - 完成订单下拉列表查询接口异常",e);
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
+        return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
     }
     
+	
     
 }
 
