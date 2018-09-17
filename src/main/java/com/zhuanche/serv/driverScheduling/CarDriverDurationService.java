@@ -157,6 +157,7 @@ public class CarDriverDurationService {
 				upRecord.setStartDate(carDutyDuration.getStartDate());
 				upRecord.setEndDate(carDutyDuration.getEndDate());
 				upRecord.setRemark(carDutyDuration.getRemark());
+				upRecord.setStatus(carDutyDuration.getStatus());
 				upRecord.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
 				return carDutyDurationMapper.updateByPrimaryKeySelective(upRecord);
 			}else{
