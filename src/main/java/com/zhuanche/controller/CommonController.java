@@ -1,5 +1,16 @@
 package com.zhuanche.controller;
 
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -7,7 +18,6 @@ import com.zhuanche.dto.rentcar.ServiceTypeDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.entity.rentcar.CarBizCity;
-import com.zhuanche.entity.rentcar.CarBizModel;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.entity.rentcar.ServiceEntity;
 import com.zhuanche.serv.CarBizCarGroupService;
@@ -17,15 +27,6 @@ import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.util.List;
 
 /**
   * @description: 多级联动查询
@@ -48,6 +49,9 @@ public class CommonController {
 
     private static final Logger logger = LoggerFactory.getLogger(CommonController.class);
 
+	@Value("${bigdata.saas.data.url}")
+	String  saasBigdataApiUrl;
+	 
     @Autowired
     private CitySupplierTeamCommonService citySupplierTeamCommonService;
 
@@ -209,5 +213,26 @@ public class CommonController {
         List<CarBizCarGroup> list = carBizCarGroupService.queryCarGroupList(1);
         return AjaxResponse.success(list);
     }
+    
+    /**
+     * @Desc: 查询统计分析 - 完成订单下拉列表查询接口  
+     * @param:
+     * @return:
+     * @Author: jdd
+     * @Date: 2018/9/17
+     */
+   /* @RequestMapping("/queryListBigDataDropdown")
+    @ResponseBody
+    public AjaxResponse queryListBigDataDropdown(@Verify(param = "typeName", rule = "required") String typeName){
+        try{
+        	
+          return AjaxResponse.success(carDriverTeams);
+        }catch (Exception e){
+            logger.error("查询城市供应商车队列表异常:{}",e);
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+    }*/
+    
+    
 }
 

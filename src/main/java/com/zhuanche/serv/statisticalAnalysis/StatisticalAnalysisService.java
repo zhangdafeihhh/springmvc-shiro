@@ -257,9 +257,11 @@ public class  StatisticalAnalysisService {
 		Set<Integer> cityIdsForAuth = new HashSet<Integer>();// 非超级管理员可以管理的所有城市ID
 		Set<Integer> supplierIdsForAuth = new HashSet<Integer>();// 非超级管理员可以管理的所有供应商ID
 		Set<Integer> teamIdsForAuth = new HashSet<Integer>();// 非超级管理员可以管理的可见的车队信息
+		logger.info("非超级管理员:"+WebSessionUtil.isSupperAdmin());
 		if (!WebSessionUtil.isSupperAdmin()) {// 非超级管理员
 			// 获取当前登录用户信息
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+	   	    logger.info("获取当前登录用户信息:"+currentLoginUser);
 			if(null != currentLoginUser){
 				cityIdsForAuth = currentLoginUser.getCityIds();// 获取用户可见的城市ID
 				supplierIdsForAuth = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
@@ -321,9 +323,9 @@ public class  StatisticalAnalysisService {
 			paramMap.put("visibleCityIds", cityIds); //可见城市ID
 		}
 		//非管理员  没有任何可见权限返回null
-		if(cityIds.isEmpty() && teamIds.isEmpty() && supplierIds.isEmpty() && !WebSessionUtil.isSupperAdmin()){
+		/*if(cityIds.isEmpty() && teamIds.isEmpty() && supplierIds.isEmpty() && !WebSessionUtil.isSupperAdmin()){
 			return null;
-		}
+		}*/
 		return paramMap;
 	}
 }
