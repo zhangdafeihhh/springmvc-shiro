@@ -2551,8 +2551,21 @@ public class CarBizDriverInfoService {
                 cell = row.createCell(19);
                 cell.setCellValue(s.getMarriage()!=null?""+s.getMarriage()+"":"");
                 // 驾驶员外语能力
+                String foreignlanguageName= "无";
+                String foreignLanguage = s.getForeignlanguage();
+                if(StringUtils.isNotEmpty(foreignLanguage)){
+                    if("1".equals(foreignLanguage)){
+                        foreignlanguageName = "英语";
+                    }else if("2".equals(foreignLanguage)){
+                        foreignlanguageName = "德语";
+                    }else if("3".equals(foreignLanguage)){
+                        foreignlanguageName = "法语";
+                    }else if("4".equals(foreignLanguage)){
+                        foreignlanguageName = "其他";
+                    }
+                }
                 cell = row.createCell(20);
-                cell.setCellValue(s.getForeignlanguage()!=null?""+s.getForeignlanguage()+"":"");
+                cell.setCellValue(foreignlanguageName);
                 // 驾驶员学历
                 cell = row.createCell(21);
                 cell.setCellValue(s.getEducation()!=null?""+s.getEducation()+"":"");
