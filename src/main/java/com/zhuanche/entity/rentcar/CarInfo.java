@@ -231,6 +231,17 @@ public class CarInfo extends BaseEntity {
 
     private String idCardNo;//司机身份证号
 
+    /** 车辆图片 **/
+    private String carPhotograph;
+
+    public String getCarPhotograph() {
+        return carPhotograph;
+    }
+
+    public void setCarPhotograph(String carPhotograph) {
+        this.carPhotograph = carPhotograph;
+    }
+
     public String getIdCardNo() {
         return idCardNo;
     }

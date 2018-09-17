@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.mail.search.SearchTerm;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -162,6 +163,8 @@ public class CarDriverMustDutyService {
 				upRecord.setRemark(carDriverMustDuty.getRemark());
 				upRecord.setPeakTimes(carDriverMustDuty.getPeakTimes());
 				upRecord.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
+				upRecord.setStatus(carDriverMustDuty.getStatus());
+				upRecord.setUpdateDate(new Date());
 				return carDriverMustDutyMapper.updateByPrimaryKeySelective(upRecord);
 			}else{
 				Set<Integer> cityId = new HashSet<>();
@@ -179,6 +182,7 @@ public class CarDriverMustDutyService {
 				}
 				carDriverMustDuty.setSupplierName(supplierDetail.getSupplierFullName());
 				carDriverMustDuty.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
+				carDriverMustDuty.setCreateDate(new Date());
 				return carDriverMustDutyMapper.insertSelective(carDriverMustDuty);
 			}
 		}catch (Exception e){
