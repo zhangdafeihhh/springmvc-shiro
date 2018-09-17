@@ -51,15 +51,12 @@
         select
         <include refid="Base_Column_List" />
         from car_driver_team
-        where
+        where 1=1
         <if test="teamId!=null">
-            id = #{teamId}
-        </if>
-        <if test="teamId !=null and teamName !=''">
-            AND
+            AND id = #{teamId}
         </if>
         <if test="teamName!=null">
-            team_name like CONCAT('%',#{teamName,jdbcType=VARCHAR},'%')
+            AND team_name like CONCAT('%',#{teamName,jdbcType=VARCHAR},'%')
         </if>
         limit 1
     </select>
