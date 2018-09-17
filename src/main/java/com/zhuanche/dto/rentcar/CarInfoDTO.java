@@ -208,6 +208,9 @@ public class CarInfoDTO{
     /** 车辆图片 **/
     private String imageUrl;
 
+    /** 车辆图片 **/
+    private String carPhotograph;
+
     private String licensePlates1;
 
     private Integer oldCity;
@@ -216,6 +219,14 @@ public class CarInfoDTO{
 
     private String driverName;
     private String idCardNo;//司机身份证号
+
+    public String getCarPhotograph() {
+        return carPhotograph;
+    }
+
+    public void setCarPhotograph(String carPhotograph) {
+        this.carPhotograph = carPhotograph;
+    }
 
     public String getDriverName() {
         return driverName;

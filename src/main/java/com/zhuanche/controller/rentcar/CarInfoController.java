@@ -118,6 +118,7 @@ public class CarInfoController {
         params.setCarId(carId);
         params = this.carService.selectCarInfoByCarId(params);
         if(params!=null){
+            params.setCarPhotograph(params.getImageUrl());
             if(params.getCreateBy()!=null && !params.getCreateBy().equals("")){
                 CarAdmUser user = new CarAdmUser();
                 user.setUserId(params.getCreateBy());
@@ -215,7 +216,7 @@ public class CarInfoController {
                                   @Verify(param = "cityId",rule="required") Integer cityId,
                                   @Verify(param = "supplierId",rule="required") Integer supplierId,
                                   @Verify(param = "carModelId",rule="required") Integer carModelId,
-                              @Verify(param = "imageUrl",rule="") String imageUrl,
+                              @Verify(param = "carPhotograph",rule="") String imageUrl,
                               @Verify(param = "vehicleDrivingLicense",rule="") String vehicleDrivingLicense,
                                   @Verify(param = "modelDetail",rule="required") String modelDetail,
                                   @Verify(param = "color",rule="required") String color,
