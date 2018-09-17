@@ -63,7 +63,7 @@ public class LoginController{
 	@Value("${login.checkMsgCode.switch}")
 	private String loginCheckMsgCodeSwitch = "ON";//登录时是否进行短信验证的开关
 	
-	private int msgcodeTimeoutMinutes = 1;
+	private int msgcodeTimeoutMinutes = 2;
 	
 	@Autowired
 	private CarAdmUserMapper carAdmUserMapper;
@@ -111,7 +111,7 @@ public class LoginController{
 		RedisCacheUtil.set(CACHE_PREFIX_MSGCODE+username, msgcode,  msgcodeTimeoutMinutes * 60 );
 		//返回结果
 		Map<String,Object> result = new HashMap<String,Object>();
-		result.put("timeout", msgcodeTimeoutMinutes * 60 );//验证码有效的秒数
+		result.put("timeout",  60 );//验证码有效的秒数
 		result.put("tipText", "短信验证码已成功发送至尾号为"+mobile.substring(7)+"的手机上。" );//成功信息
 		return AjaxResponse.success( result );
 	}
