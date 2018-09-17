@@ -184,12 +184,16 @@ public class CarFactOrderInfoDetailDTO{
 	private String settleDate;
 	//发起人 y.cancel_status as qxcancelstatus, (qxcancelstatus: 1 pc端 ,  2 乘客端APP , 3 乘客端APP(超时)  ,  4 系统自动取消(日租/半日租乘客15分钟内未付定金) ， 5 系统自动取消 , 10 乘客端APP )
 	private int qxcancelstatus;
+	//发起人
+	private String startPerson;
 	//操作人 qxperson
 	//操作时间 qxdate
 	//取消原因 
 	private String qxmemo;
 	//操作人  (yystatus: 1 pc端 ,  2 乘客端APP )
 	private int yystatus;
+	//操作人 
+	private String operatePerson;
 	//操作时间 
 	private String yydate;
 	//异议原因  
@@ -987,6 +991,44 @@ public class CarFactOrderInfoDetailDTO{
 
 	public void setDriverId(String driverId) {
 		this.driverId = driverId;
+	}
+
+	public String getStartPerson() {
+		if(qxcancelstatus==1){
+			startPerson="pc端";
+		}else if(qxcancelstatus==2){
+			startPerson="乘客端APP";
+		}else if(qxcancelstatus==2){
+			startPerson="pc端";
+		}else if(qxcancelstatus==3){
+			startPerson="乘客端APP(超时)";
+		}else if(qxcancelstatus==4){
+			startPerson="系统自动取消";
+		}else if(qxcancelstatus==5){
+			startPerson="系统自动取消";
+		}else if(qxcancelstatus==10){
+			startPerson="乘客端APP";
+		}else{
+			startPerson="";
+		}
+		return startPerson;
+	}
+
+	public void setStartPerson(String startPerson) {
+		this.startPerson = startPerson;
+	}
+
+	public String getOperatePerson() {
+		 if(yystatus==1){
+			 operatePerson="pc端";
+		 }else if(yystatus==1){
+			 operatePerson="乘客端APP";
+		 }
+		return operatePerson;
+	}
+
+	public void setOperatePerson(String operatePerson) {
+		this.operatePerson = operatePerson;
 	}
 	
 	

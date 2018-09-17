@@ -210,6 +210,9 @@ public class OrderController{
 		}
 		//根据orderId获取订单明细
 		CarFactOrderInfo order = getOrderInfo(orderId,orderNo);
+		if(order==null){
+			return AjaxResponse.failMsg(101,"根据条件没有返回结果");
+		}
 		long endTime=System.currentTimeMillis();
 		if(order.getQxcancelstatus()>=10){
 			order.setQxcancelstatus(10);
@@ -359,6 +362,9 @@ public class OrderController{
 				carFactOrderInfo.setOrderNo(orderNo);
 			}
 			CarFactOrderInfo order = this.carFactOrderInfoService.selectByPrimaryKey(carFactOrderInfo);
+			if(order==null){
+				return null;
+			}
 			order.setOrderId(order.getOrderId());
 			Integer flag = order.getPayFlag();
 			if(flag!=null){
