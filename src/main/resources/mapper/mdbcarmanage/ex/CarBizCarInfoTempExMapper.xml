@@ -121,7 +121,7 @@
 		car.city_id cityId,
 		car.supplier_id supplierId,
 		car.driver_id driverid,
-		car.car_photograph imageUrl,
+		car.car_photograph carPhotograph,
 		car.fuelType,
 		car.carryPassengers,
 		car.auditingStatus,
