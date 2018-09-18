@@ -41,6 +41,11 @@ public class  StatisticalAnalysisService {
 	
 	private static final Logger logger = LoggerFactory.getLogger(StatisticalAnalysisService.class);
 	
+	/**链接超时时间**/
+	private static final Integer CONNECT_TIMEOUT = 6000;
+	/**读取超时时间**/
+	private static final Integer READ_TIMEOUT = 6000;
+	
 	public Map<String, Object> currentLoginUserVisibleParam(Map<String, Object> paramMap,SSOLoginUser currentLoginUser){
 		if(currentLoginUser == null || paramMap==null){
 			return paramMap;
@@ -224,7 +229,8 @@ public class  StatisticalAnalysisService {
 			logger.info("调用大数据接口，url--" + url);
 			String jsonString = JSON.toJSONString(paramMap);
 			logger.info("调用大数据接口，参数--" + jsonString);
-			String result = HttpClientUtil.buildPostRequest(url).setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON).setConnectTimeOut(3000).setReadTimeOut(3000).execute();
+			String result = HttpClientUtil.buildPostRequest(url).setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON).setConnectTimeOut(CONNECT_TIMEOUT)
+					.setReadTimeOut(READ_TIMEOUT).execute();
 			logger.info("调用大数据接口，result--" + result);
 			result = result.replaceAll("null", "\"\"");
 			result = result.replaceAll("NULL", "\"\"");
