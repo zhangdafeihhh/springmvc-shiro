@@ -73,7 +73,8 @@
         supplier AS suppliers,
         remark,
         status,
-        p_id pId
+        p_id pId,
+        charge1, charge2, charge3
         FROM
         car_driver_team
         WHERE 1=1
