@@ -18,6 +18,7 @@ import com.zhuanche.entity.mdbcarmanage.*;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.mongo.DriverMongo;
+import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.serv.mdbcarmanage.CarBizDriverUpdateService;
 import com.zhuanche.serv.mongo.DriverMongoService;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -26,6 +27,7 @@ import com.zhuanche.util.Common;
 import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.ValidateUtils;
 import com.zhuanche.util.encrypt.MD5Utils;
+import lombok.AllArgsConstructor;
 import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.mdbcarmanage.CarDriverTeamMapper;
 import mapper.mdbcarmanage.CarRelateGroupMapper;
@@ -145,6 +147,10 @@ public class CarBizDriverInfoService {
 
     @Autowired
     private DriverMongoService driverMongoService;
+
+    @Autowired
+    private CarDriverTeamService carDriverTeamService;
+
 
     /**
      * 查询司机信息列表展示
@@ -2470,7 +2476,9 @@ public class CarBizDriverInfoService {
     /*
      * 导出司机信息操作
      */
-    public Workbook exportExcel(List<CarBizDriverInfoDTO> list , String path) throws Exception{
+    public Workbook exportExcel(List<CarBizDriverInfoDTO> list, Integer cityId,Integer supplierId, String path) throws Exception{
+
+        long start=System.currentTimeMillis(); //获取开始时间
 
         FileInputStream io = new FileInputStream(path);
         // 创建 excel
@@ -2484,10 +2492,32 @@ public class CarBizDriverInfoService {
             }
             Cell cell = null;
             int i=0;
+
+            // 根据供应商ID查询供应商名称以及加盟类型
+            CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(supplierId);
+            String supplierName = "";
+            String cityName = "";
+            if (carBizSupplier != null) {
+                supplierName = carBizSupplier.getSupplierFullName();
+            }
+            // 根据城市ID查找城市名称
+            CarBizCity carBizCity = carBizCityService.selectByPrimaryKey(cityId);
+            if (carBizCity != null) {
+                cityName = carBizCity.getCityName();
+            }
+            Map<Integer, String> teamMap = null;
+            Map<Integer, String> groupMap = null;
+            try {
+                teamMap = carDriverTeamService.queryDriverTeamList(cityId, supplierId);
+                groupMap = carBizCarGroupService.queryGroupNameMap();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             for(CarBizDriverInfoDTO s:list){
 
                 // 查询城市名称，供应商名称，服务类型，加盟类型
-                this.getBaseStatis(s);
+//                this.getBaseStatis(s);
 
                 Row row = sheet.createRow(i + 1);
                 // 车牌号
@@ -2524,8 +2554,12 @@ public class CarBizDriverInfoService {
                 cell = row.createCell(10);
                 cell.setCellValue(s.getSuperintendUrl()!=null?""+s.getSuperintendUrl()+"":"");
                 // 车型类别
+                String groupName = "";
+                if(groupMap!=null){
+                    groupName = groupMap.get(s.getGroupId());
+                }
                 cell = row.createCell(11);
-                cell.setCellValue(s.getCarGroupName()!=null?""+s.getCarGroupName()+"":"");
+                cell.setCellValue(groupName);
                 // 驾照类型
                 cell = row.createCell(12);
                 cell.setCellValue(s.getDrivingLicenseType()!=null?""+s.getDrivingLicenseType()+"":"");
@@ -2646,16 +2680,24 @@ public class CarBizDriverInfoService {
                 cell.setCellValue(s.getEmergencycontactaddr()!=null?""+s.getEmergencycontactaddr()+"":"");
                 //供应商
                 cell = row.createCell(47);
-                cell.setCellValue(s.getSupplierName()!=null?""+s.getSupplierName()+"":"");
+                cell.setCellValue(supplierName);
                 //服务城市
                 cell = row.createCell(48);
-                cell.setCellValue(s.getCityName()!=null?""+s.getCityName()+"":"");
+                cell.setCellValue(cityName);
                 //车队
+                String teamName = "";
+                if(teamMap!=null){
+                    teamName = teamMap.get(s.getTeamId());
+                }
                 cell = row.createCell(49);
-                cell.setCellValue(s.getTeamName()!=null?""+s.getTeamName()+"":"");
+                cell.setCellValue(teamName);
                 //小组
+                String teamGroupName = "";
+                if(teamMap!=null){
+                    teamGroupName = teamMap.get(s.getTeamGroupId());
+                }
                 cell = row.createCell(50);
-                cell.setCellValue(s.getTeamGroupName()!=null?""+s.getTeamGroupName()+"":"");
+                cell.setCellValue(teamGroupName);
                 //司机id
                 cell = row.createCell(51);
                 cell.setCellValue(s.getDriverId()!=null?""+s.getDriverId()+"":"");
@@ -2666,6 +2708,8 @@ public class CarBizDriverInfoService {
                 i++;
             }
         }
+        long end=System.currentTimeMillis(); //获取结束时间
+        logger.info(LOGTAG + "司机导出cityId={},supplierId={}的写数据时间为={}ms", cityId, supplierId, (end-start));
         return wb;
     }
 

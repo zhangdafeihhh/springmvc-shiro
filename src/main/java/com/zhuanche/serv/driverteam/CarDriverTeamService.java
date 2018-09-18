@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Maps;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -611,5 +612,23 @@ public class CarDriverTeamService{
 			}
 		}
 		return set;
+	}
+
+	/**
+	 * 查询车队，返回Map
+	 * @param cityId
+	 * @param supplierid
+	 * @return
+	 */
+	public Map<Integer, String> queryDriverTeamList( Integer cityId, Integer supplierid ){
+		List<CarDriverTeam> list = carDriverTeamExMapper.queryDriverTeamList(cityId, supplierid);
+		if(list==null||list.size()==0) {
+			return new HashMap<Integer, String>(4);
+		}
+		Map<Integer, String> result = Maps.newHashMap();
+		for(CarDriverTeam c : list) {
+			result.put(c.getId(),  c.getTeamName());
+		}
+		return result;
 	}
 }

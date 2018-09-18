@@ -254,6 +254,8 @@ public class DriverInfoController {
         Set<Integer> permOfSupplier    = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); //普通管理员可以管理的所有供应商ID
         Set<Integer> permOfTeam        = WebSessionUtil.getCurrentLoginUser().getTeamIds(); //普通管理员可以管理的所有车队ID
 
+        long start=System.currentTimeMillis(); //获取开始时间
+
         List<CarBizDriverInfoDTO> list =  Lists.newArrayList();
         Set<Integer> driverIds = null;
         Boolean had = false;
@@ -287,11 +289,16 @@ public class DriverInfoController {
             list = carBizDriverInfoService.queryDriverList(carBizDriverInfoDTO);
         }
         try {
-            Workbook wb = carBizDriverInfoService.exportExcel(list,request.getRealPath("/")+File.separator+"template"+File.separator+"driver_info.xlsx");
+            Workbook wb = carBizDriverInfoService.exportExcel(list, cityId, supplierId, request.getRealPath("/")+File.separator+"template"+File.separator+"driver_info.xlsx");
 //            Componment.fileDownload(response, wb, new String("司机信息".getBytes("utf-8"), "iso8859-1"));
+            long end=System.currentTimeMillis(); //获取结束时间
+            logger.info(LOGTAG + "司机导出cityId={},supplierId={}的查询写入数据时间为={}ms", cityId, supplierId, (end-start));
             this.exportExcelFromTemplet(response, wb, new String("司机信息".getBytes("utf-8"), "iso8859-1"));
         } catch (Exception e) {
            logger.error("司机信息列表查询导出error",e);
+        }finally {
+            long end=System.currentTimeMillis(); //获取结束时间
+            logger.info(LOGTAG + "司机导出cityId={},supplierId={}的时间为={}ms", cityId, supplierId, (end-start));
         }
     }
 

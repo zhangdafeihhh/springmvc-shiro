@@ -1,12 +1,16 @@
 package com.zhuanche.serv;
 
+import com.google.common.collect.Maps;
+import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import mapper.rentcar.CarBizCarGroupMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CarBizCarGroupService {
@@ -46,6 +50,22 @@ public class CarBizCarGroupService {
      */
     public List<CarBizCarGroup> queryCarGroupList(Integer type){
         return carBizCarGroupExMapper.queryCarGroupList(type);
+    }
+
+    /**
+     * 查询所有服务类型
+     * @return
+     */
+    public Map<Integer, String> queryGroupNameMap() {
+        List<CarBizCarGroup> list = carBizCarGroupExMapper.queryGroupNameList();
+        if(list==null||list.size()==0) {
+            return new HashMap<Integer, String>(4);
+        }
+        Map<Integer, String> result = Maps.newHashMap();
+        for(CarBizCarGroup c : list) {
+            result.put(c.getGroupId(),  c.getGroupName());
+        }
+        return result;
     }
 
 }

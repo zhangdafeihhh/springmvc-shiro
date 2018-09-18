@@ -36,4 +36,6 @@ public interface CarDriverTeamExMapper{
 	 * @return
 	 */
 	Map<String, Object> queryTeamNameAndGroupNameByDriverId(@Param("driverId") Integer driverId);
+
+	List<CarDriverTeam> queryDriverTeamList(@Param("cityId") Integer cityId, @Param("supplierId") Integer supplierId);
 }

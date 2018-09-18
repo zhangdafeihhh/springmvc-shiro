@@ -170,6 +170,12 @@
         </if>
         order by city, id
     </select>
-
+    <select id="queryDriverTeamList" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List" />
+        from car_driver_team
+        where status!=2 and city = #{cityId} and supplier = #{supplierId}
+        order by CITY, id
+    </select>
 
 </mapper>

@@ -61,6 +61,6 @@
     from car_biz_customer_appraisal_statistics ca
     LEFT JOIN car_biz_driver_info di ON di.driver_id = ca.driver_id
     <include refid="allBaseColumnWhereList"/>
-    ORDER BY ca.sys_date DESC
+    ORDER BY ca.driver_id DESC
   </select>
 </mapper>
