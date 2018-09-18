@@ -418,11 +418,11 @@ public class CarFactOrderInfoDetailDTO{
 	}
 	
 	public String getPushDriverTypeName() {
-		if(this.pushDriverType==1){
+		if(pushDriverType!=null && this.pushDriverType==1){
 			pushDriverTypeName= "自动派单";
-		}else if(this.pushDriverType==2){
+		}else if(pushDriverType!=null && this.pushDriverType==2){
 			pushDriverTypeName= "司机抢单";
-		}else if(this.pushDriverType==3){
+		}else if(pushDriverType!=null && this.pushDriverType==3){
 			pushDriverTypeName= "人工绑单";
 		}else{
 			pushDriverTypeName = "无";
@@ -1023,7 +1023,7 @@ public class CarFactOrderInfoDetailDTO{
 	public String getOperatePerson() {
 		 if(yystatus==1){
 			 operatePerson="pc端";
-		 }else if(yystatus==1){
+		 }else if(yystatus==2){
 			 operatePerson="乘客端APP";
 		 }
 		return operatePerson;
