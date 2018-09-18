@@ -184,10 +184,12 @@ public class CarFactOrderInfoDetailDTO{
 	private String settleDate;
 	//发起人 y.cancel_status as qxcancelstatus, (qxcancelstatus: 1 pc端 ,  2 乘客端APP , 3 乘客端APP(超时)  ,  4 系统自动取消(日租/半日租乘客15分钟内未付定金) ， 5 系统自动取消 , 10 乘客端APP )
 	private int qxcancelstatus;
-	//发起人
+	//取消 发起人
 	private String startPerson;
-	//操作人 qxperson
-	//操作时间 qxdate
+	//取消 操作人
+	private String qxperson;
+	//取消 操作时间 
+	private String qxdate;
 	//取消原因 
 	private String qxmemo;
 	//操作人  (yystatus: 1 pc端 ,  2 乘客端APP )
@@ -1029,6 +1031,22 @@ public class CarFactOrderInfoDetailDTO{
 
 	public void setOperatePerson(String operatePerson) {
 		this.operatePerson = operatePerson;
+	}
+
+	public String getQxperson() {
+		return qxperson;
+	}
+
+	public void setQxperson(String qxperson) {
+		this.qxperson = qxperson;
+	}
+
+	public String getQxdate() {
+		return qxdate;
+	}
+
+	public void setQxdate(String qxdate) {
+		this.qxdate = qxdate;
 	}
 	
 	
