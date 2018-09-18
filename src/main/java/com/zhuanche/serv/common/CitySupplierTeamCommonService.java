@@ -317,6 +317,13 @@ public class CitySupplierTeamCommonService {
      * @Date: 2018/8/29
      */
     public List<CarDriverTeam> queryDriverTeamList(Integer cityId, Integer supplierId){
+
+        if(Check.NuNObj(cityId) && !Check.NuNObj(supplierId)){
+            Set<String> supplierIds = new HashSet<String>(2);
+            supplierIds.add(String.valueOf(supplierId));
+            return carDriverTeamExMapper.queryDriverTeam(null, supplierIds, null);
+        }
+
         if(cityId==null || cityId.intValue()<=0 || supplierId==null || supplierId.intValue()<=0) {
             return new ArrayList<CarDriverTeam>();
         }
