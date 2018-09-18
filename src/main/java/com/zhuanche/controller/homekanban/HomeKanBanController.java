@@ -57,9 +57,9 @@ public class HomeKanBanController {
 	String coreIndicatorsUrl;
 	
 	/**链接超时时间**/
-	private static final Integer CONNECT_TIMEOUT = 3000;
+	private static final Integer CONNECT_TIMEOUT = 6000;
 	/**读取超时时间**/
-	private static final Integer READ_TIMEOUT = 3000;
+	private static final Integer READ_TIMEOUT = 6000;
 
 	/** 日均运营车辆统计查询接口 **/
 	@RequestMapping("/operatingVehicleStatistics")
