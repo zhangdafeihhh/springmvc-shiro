@@ -103,7 +103,6 @@
     <result column="group_id" property="groupId" jdbcType="INTEGER" />
   </resultMap>
   <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.dto.rentcar.CarBizDriverInfoDTO" extends="BaseResultMap" >
-    <result column="english_name" property="englishName" jdbcType="VARCHAR" />
     <result column="contract_type" property="contractType" jdbcType="VARCHAR" />
     <result column="contract_no" property="contractNo" jdbcType="VARCHAR" />
     <result column="contract_file" property="contractFile" jdbcType="VARCHAR" />
@@ -130,7 +129,7 @@
     assessment, driverLicenseIssuingDateStart, driverLicenseIssuingDateEnd, driverLicenseIssuingCorp, 
     driverLicenseIssuingNumber, xy_driver_number, driver_license_issuing_register_date, 
     driver_license_issuing_first_date, driver_license_issuing_grant_date, birth_day, 
-    house_hold_register_permanent, is_upload_card, is_must_confirmation, english_name,
+    house_hold_register_permanent, is_upload_card, is_must_confirmation,
     contract_type, contract_no, contract_file, cooperation_type, account_type, group_id,
     is_two_shifts, is_image,
     house_hold_register_permanent, is_upload_card, is_must_confirmation,
@@ -744,9 +743,6 @@
       <if test="isMustConfirmation != null" >
         is_must_confirmation,
       </if>
-      <if test="englishName != null" >
-        english_name,
-      </if>
       <if test="contractType != null" >
         contract_type,
       </if>
@@ -1051,9 +1047,6 @@
       </if>
       <if test="isMustConfirmation != null" >
         #{isMustConfirmation,jdbcType=INTEGER},
-      </if>
-      <if test="englishName != null" >
-        #{englishName,jdbcType=VARCHAR},
       </if>
       <if test="contractType != null" >
         #{contractType,jdbcType=VARCHAR},
@@ -1362,9 +1355,6 @@
       </if>
       <if test="isMustConfirmation != null" >
         is_must_confirmation = #{isMustConfirmation,jdbcType=INTEGER},
-      </if>
-      <if test="englishName != null" >
-        english_name = #{englishName,jdbcType=VARCHAR},
       </if>
       <if test="contractType != null" >
         contract_type = #{contractType,jdbcType=VARCHAR},
