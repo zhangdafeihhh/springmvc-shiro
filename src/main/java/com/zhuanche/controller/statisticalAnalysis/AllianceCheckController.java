@@ -82,6 +82,7 @@ public class AllianceCheckController{
 			paramMap.put("queryDate", queryDate);//查询日期
 			 // 数据权限设置
 	        paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,allianceId,null);
+	        logger.info("【运营管理-统计分析】加盟商考核  列表数据:paramMap"+paramMap);
 		      if(paramMap==null){
 		    	  return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 		      }

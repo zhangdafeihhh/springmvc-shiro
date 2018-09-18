@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -30,8 +29,6 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.parser.Feature;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.http.HttpClientUtil;
@@ -227,7 +224,7 @@ public class  StatisticalAnalysisService {
 			logger.info("调用大数据接口，url--" + url);
 			String jsonString = JSON.toJSONString(paramMap);
 			logger.info("调用大数据接口，参数--" + jsonString);
-			String result = HttpClientUtil.buildPostRequest(url).setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
+			String result = HttpClientUtil.buildPostRequest(url).setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON).setConnectTimeOut(3000).setReadTimeOut(3000).execute();
 			logger.info("调用大数据接口，result--" + result);
 			result = result.replaceAll("null", "\"\"");
 			result = result.replaceAll("NULL", "\"\"");
@@ -257,9 +254,11 @@ public class  StatisticalAnalysisService {
 		Set<Integer> cityIdsForAuth = new HashSet<Integer>();// 非超级管理员可以管理的所有城市ID
 		Set<Integer> supplierIdsForAuth = new HashSet<Integer>();// 非超级管理员可以管理的所有供应商ID
 		Set<Integer> teamIdsForAuth = new HashSet<Integer>();// 非超级管理员可以管理的可见的车队信息
+		logger.info("非超级管理员:"+WebSessionUtil.isSupperAdmin());
 		if (!WebSessionUtil.isSupperAdmin()) {// 非超级管理员
 			// 获取当前登录用户信息
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+	   	    logger.info("获取当前登录用户信息:"+currentLoginUser);
 			if(null != currentLoginUser){
 				cityIdsForAuth = currentLoginUser.getCityIds();// 获取用户可见的城市ID
 				supplierIdsForAuth = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
@@ -321,9 +320,9 @@ public class  StatisticalAnalysisService {
 			paramMap.put("visibleCityIds", cityIds); //可见城市ID
 		}
 		//非管理员  没有任何可见权限返回null
-		if(cityIds.isEmpty() && teamIds.isEmpty() && supplierIds.isEmpty() && !WebSessionUtil.isSupperAdmin()){
+		/*if(cityIds.isEmpty() && teamIds.isEmpty() && supplierIds.isEmpty() && !WebSessionUtil.isSupperAdmin()){
 			return null;
-		}
+		}*/
 		return paramMap;
 	}
 }

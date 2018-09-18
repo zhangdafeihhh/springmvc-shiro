@@ -1,5 +1,7 @@
 package com.zhuanche.controller.statisticalAnalysis;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -120,4 +122,9 @@ public class CarAnalysisIndexController{
 	        return result;
 	    }
 
+		public static void main(String[] args) throws ParseException {
+			 String string = "2016-10-24 21:59:06";
+		        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		        System.out.println(sdf.parse(string).getTime());
+		}
 }

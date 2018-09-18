@@ -73,6 +73,7 @@ public class CancelOrderController{
 	                                              String orderVehicleTypeId,
 	                                              String productTypeId,
 	                                              String cancelDurationTypeId,
+	                                              String cancelTypeId,
 	                                              @Verify(param = "queryDate",rule = "required") String queryDate,
 	                                              @Verify(param = "pageNo",rule = "required") Integer pageNo,
 	                                              @Verify(param = "pageSize",rule = "required") Integer pageSize
@@ -103,7 +104,9 @@ public class CancelOrderController{
 	        if(StringUtil.isNotEmpty(cancelDurationTypeId)){
 	        	paramMap.put("cancelDurationTypeId", cancelDurationTypeId);//取消时长分类ID
 	        }
-	        
+	        if(StringUtil.isNotEmpty(cancelTypeId)){
+	        	paramMap.put("cancelTypeId", cancelTypeId);//取消类型
+	        }
 	        paramMap.put("queryDate", queryDate);//查询日期
 			
 	        // 数据权限设置
@@ -153,6 +156,7 @@ public class CancelOrderController{
 								            String orderVehicleTypeId,
 								            String productTypeId,
 								            String cancelDurationTypeId,
+								            String cancelTypeId,
 								            @Verify(param = "queryDate",rule = "required") String queryDate,
                                             HttpServletRequest request,
                                             HttpServletResponse response){
@@ -183,6 +187,9 @@ public class CancelOrderController{
 	        if(StringUtil.isNotEmpty(cancelDurationTypeId)){
 	        	paramMap.put("cancelDurationTypeId", cancelDurationTypeId);//取消时长分类ID
 	        }
+	        if(StringUtil.isNotEmpty(cancelTypeId)){
+	        	paramMap.put("cancelTypeId", cancelTypeId);//取消类型
+	        }
 	        paramMap.put("queryDate", queryDate);//查询日期
 	        
 	       // 数据权限设置
@@ -210,6 +217,9 @@ public class CancelOrderController{
        }
        return AjaxResponse.success("成功");
    }
+	
+	
+	
 	
 	
 	
