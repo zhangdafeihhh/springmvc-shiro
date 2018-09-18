@@ -68,6 +68,8 @@ public class OrderController{
 	 @ResponseBody
 	 @RequestMapping(value = "/queryOrderList", method = { RequestMethod.POST,RequestMethod.GET })
 	 public AjaxResponse queryOrderList(
+			 								   String serviceId,
+			 								   String airportId,
 	 										   String carGroupId,
 	 										   String status,
 	 										   String cityId,
@@ -92,6 +94,8 @@ public class OrderController{
 	     String  transId =sdf.format(new Date());
 	     
 	     Map<String, Object> paramMap = new HashMap<String, Object>();
+		 paramMap.put("serviceId", serviceId);// 
+		 paramMap.put("airportId", airportId);//
 	     paramMap.put("carGroupId", carGroupId);// 
 	     paramMap.put("status", status);//
 	     paramMap.put("cityId", cityId);//
