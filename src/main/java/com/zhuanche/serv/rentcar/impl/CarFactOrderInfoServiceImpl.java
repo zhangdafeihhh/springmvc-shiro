@@ -56,6 +56,11 @@ import mapper.rentcar.ex.CarFactOrderExMapper;
 public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
     private static Logger logger = LoggerFactory.getLogger(CarFactOrderInfoServiceImpl.class);
 
+	/**链接超时时间**/
+	private static final Integer CONNECT_TIMEOUT = 6000;
+	/**读取超时时间**/
+	private static final Integer READ_TIMEOUT = 6000;
+	
     //LBS轨迹URL
     @Value("${lbs.driver.gps.rest.url}")
 	String  baseLbsRestApiUrl;
@@ -122,7 +127,8 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 					Base64.encodeBase64String(DigestUtils.md5(param.toString())), "UTF-8");
 			url += "&sign="+sign;
 			//System.out.println(url);
-			String result = HttpClientUtil.buildGetRequest(url).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
+			String result = HttpClientUtil.buildGetRequest(url).addHeader("Content-Type", ContentType.APPLICATION_JSON).setConnectTimeOut(CONNECT_TIMEOUT)
+					.setReadTimeOut(READ_TIMEOUT).execute();
 			JSONObject job = JSON.parseObject(result);
 			if (job == null) {
 				logger.error("调用订单接口，根据子订单号查询主订单" + url + "返回结果为null");
@@ -290,7 +296,8 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 		List<CarFactOrderInfoDTO> list = null;
 		String url = orderSearchUrl+Common.ORDER_ORDER_LIST_DATE;
 		try {
-			String result = HttpClientUtil.buildPostRequest(url).addParams(paramMap).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
+			String result = HttpClientUtil.buildPostRequest(url).addParams(paramMap).setConnectTimeOut(CONNECT_TIMEOUT)
+					.setReadTimeOut(READ_TIMEOUT).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
 			JSONObject job = JSON.parseObject(result);
 			if (job == null) {
 				logger.error("调用订单接口" + url + "返回结果为null");
