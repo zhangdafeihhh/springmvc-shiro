@@ -97,6 +97,7 @@
 	<!--  老车管拷贝 ， 订单详情 -->
 	<resultMap type="com.zhuanche.entity.rentcar.CarFactOrderInfo" id="CarFactOrderInfoMap">
 		<result column="push_driver_type" property="pushDriverType" jdbcType="INTEGER" />
+		<result property="orderId" column="order_id"  jdbcType="INTEGER" />
 		<result property="riderName" column="rider_name" />
 		<result property="riderPhone" column="rider_phone" />
 		<result property="serviceName" column="service_name" />
@@ -189,6 +190,7 @@
 	
 	<select id="selectByPrimaryKey" resultMap="CarFactOrderInfoMap" parameterType="com.zhuanche.entity.rentcar.CarFactOrderInfo">
 		SELECT
+			a.order_id,
 			a.order_no,
 			IFNULL(a.channels_num,0)as channelsNum,
 			a.pay_flag ,			
