@@ -390,14 +390,14 @@ public class CarDriverTeamService{
 		try{
 			CarDriverTeamDTO dto = new CarDriverTeamDTO();
 			//根据名称查询是否存在，新增使用判断
-			if(StringUtils.isNotEmpty(driverTeamRequest.getTeamName())){
+			/*if(StringUtils.isNotEmpty(driverTeamRequest.getTeamName())){
 				CarDriverTeam carDriverTeam = carDriverTeamExMapper.selectByCondition(driverTeamRequest);
 				if(Check.NuNObj(carDriverTeam)){
 					return null;
 				}
 				BeanUtils.copyProperties(dto,carDriverTeam);
 				return dto;
-			}
+			}*/
 			//正常查询详情业务逻辑
 			CarDriverTeam carDriverTeam = carDriverTeamMapper.selectByPrimaryKey(driverTeamRequest.getId());
 			if(Check.NuNObj(carDriverTeam)){
@@ -460,18 +460,31 @@ public class CarDriverTeamService{
 	* @Date: 2018/8/30
 	*/
 	public int saveOneDriverTeam(CarDriverTeamDTO paramDto){
-		if(Check.NuNObj(paramDto)){
+		if(Check.NuNObj(paramDto) || Check.NuNStr(paramDto.getCity()) || Check.NuNStr(paramDto.getSupplier())){
 			return ServiceReturnCodeEnum.DEAL_FAILURE.getCode();
 		}
 		try{
 			DriverTeamRequest driverTeamRequest = new DriverTeamRequest();
 			driverTeamRequest.setTeamName(paramDto.getTeamName());
-			CarDriverTeamDTO carDriverTeamDTO = this.selectOneDriverTeam(driverTeamRequest);
-			if(!Check.NuNObj(carDriverTeamDTO)){
+			CarDriverTeam carDriverTeam = carDriverTeamExMapper.selectByCondition(driverTeamRequest);
+//			CarDriverTeamDTO carDriverTeamDTO = this.selectOneDriverTeam(driverTeamRequest);
+			if(!Check.NuNObj(carDriverTeam)){
 				return ServiceReturnCodeEnum.RECODE_EXISTS.getCode();
 			}
 			CarDriverTeam record = new CarDriverTeam();
-			BeanUtils.copyProperties(record,paramDto);
+			record.setSupplier(paramDto.getSupplier());
+			record.setCity(paramDto.getCity());
+			if(!Check.NuNObj(paramDto.getpId())){
+				record.setpId(paramDto.getpId());
+			}
+			record.setTeamName(paramDto.getTeamName());
+			if(Check.NuNObj(paramDto.getStatus())){
+				record.setStatus(2);
+			}
+			record.setCharge1(paramDto.getCharge1());
+			record.setCharge2(paramDto.getCharge2());
+			record.setCharge3(paramDto.getCharge3());
+//			BeanUtils.copyProperties(record,paramDto);
 			record.setCreateBy(String.valueOf(WebSessionUtil.getCurrentLoginUser().getId()));
 			return carDriverTeamMapper.insertSelective(record);
 		}catch (Exception e){

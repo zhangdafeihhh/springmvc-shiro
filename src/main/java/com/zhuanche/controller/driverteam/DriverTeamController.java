@@ -84,7 +84,7 @@ public class DriverTeamController{
 		if(result >0){
 			return AjaxResponse.success(result);
 		}else{
-			return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+			return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
 		}
 	}
 
