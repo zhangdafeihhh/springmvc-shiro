@@ -87,7 +87,7 @@ public class  StatisticalAnalysisService {
    	    	return;
    	    }
    	    File file = new File(path);
-   	    if (!file.exists()) {
+   	    if (!file.exists()  ||  file.length() <=3 ) {
    	    	logger.info("导出文件不存在");
    	        // 让浏览器用UTF-8解析数据
    	        response.setHeader("Content-type", "text/html;charset=UTF-8");
