@@ -30,28 +30,28 @@ public class DriverDailyReportParams implements Serializable{
 
 	public DriverDailyReportParams(String licensePlates, String driverName, String driverIds, String teamIds, String suppliers, String cities, String statDateStart,
 		   String statDateEnd, String sortName, String sortOrder, String groupIds, Integer page, Integer pageSize) {
-		this.licensePlates = licensePlates.equals("null") ? "" : licensePlates;
-		this.driverName = driverName.equals("null") ? "" : driverName;
-		this.driverIds = driverIds.equals("null") ? "" : driverIds;
-		this.teamIds = teamIds.equals("null") ? "" : teamIds;
-		this.suppliers = suppliers.equals("null") ? "" : suppliers;
-		this.cities = cities.equals("null") ? "" : cities;
-		this.statDateStart = statDateStart.equals("null") ? "" : statDateStart;
-		this.statDateEnd = statDateEnd.equals("null") ? "" : statDateEnd;
-		this.sortName = sortName.equals("null") ? "" : sortName;
-		this.sortOrder = sortOrder.equals("null") ? "" : sortOrder;
-		this.groupIds = groupIds.equals("null") ? "" : groupIds;
+		this.licensePlates = licensePlates;
+		this.driverName = driverName;
+		this.driverIds = driverIds;
+		this.teamIds = teamIds;
+		this.suppliers = suppliers;
+		this.cities = cities;
+		this.statDateStart = statDateStart;
+		this.statDateEnd = statDateEnd;
+		this.sortName = sortName;
+		this.sortOrder = sortOrder;
+		this.groupIds = groupIds;
 		this.page = page;
 		this.pageSize = pageSize;
 	}
 
 	public DriverDailyReportParams(String driverIds, String statDateStart,
 								   String statDateEnd, String sortName, String sortOrder, Integer page, Integer pageSize) {
-		this.driverIds = driverIds.equals("null") ? "" : driverIds;
-		this.statDateStart = statDateStart.equals("null") ? "" : statDateStart;
-		this.statDateEnd = statDateEnd.equals("null") ? "" : statDateEnd;
-		this.sortName = sortName.equals("null") ? "" : sortName;
-		this.sortOrder = sortOrder.equals("null") ? "" : sortOrder;
+		this.driverIds = driverIds;
+		this.statDateStart = statDateStart;
+		this.statDateEnd = statDateEnd;
+		this.sortName = sortName;
+		this.sortOrder = sortOrder;
 		this.page = page;
 		this.pageSize = pageSize;
 	}

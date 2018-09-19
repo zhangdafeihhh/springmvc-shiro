@@ -29,20 +29,20 @@ public class CarBizCustomerAppraisalParams implements Serializable{
 
     public CarBizCustomerAppraisalParams(String cityId, String supplierId, String teamId, String groupIds, String driverName, String driverPhone, String orderNo,
             String createDateBegin, String createDateEnd, String evaluateScore, String sortName, String sortorder, Integer page, Integer pageSize) {
-        this.cityId = cityId.equals("null") ? "" : cityId;
-        this.supplierId = supplierId.equals("null") ? "" : supplierId;
-        this.teamId = teamId.equals("null") ? "" : teamId;
-        this.groupIds = groupIds.equals("null") ? "" : groupIds;
-        this.driverName = driverName.equals("null") ? "" : driverName;
-        this.driverPhone = driverPhone.equals("null") ? "" : driverPhone;
-        this.orderNo = orderNo.equals("null") ? "" : orderNo;
-        this.createDateBegin = createDateBegin.equals("null") ? "" : createDateBegin;
-        this.createDateEnd = createDateEnd.equals("null") ? "" : createDateEnd;
-        this.evaluateScore = evaluateScore.equals("null") ? "" : evaluateScore;
+        this.cityId = cityId;
+        this.supplierId = supplierId;
+        this.teamId = teamId;
+        this.groupIds = groupIds;
+        this.driverName = driverName;
+        this.driverPhone = driverPhone;
+        this.orderNo = orderNo;
+        this.createDateBegin = createDateBegin;
+        this.createDateEnd = createDateEnd;
+        this.evaluateScore = evaluateScore;
         this.page = page;
         this.pageSize = pageSize;
-        this.sortName = sortName.equals("null") ? "" : sortName;
-        this.sortorder = sortorder.equals("null") ? "" : sortorder;
+        this.sortName = sortName;
+        this.sortorder = sortorder;
     }
 
     public CarBizCustomerAppraisalParams(){};
