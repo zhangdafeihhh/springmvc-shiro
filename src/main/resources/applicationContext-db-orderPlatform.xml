@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+     http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.0.xsd
+     http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+	<!-- 配置datasource数据源(主库)  -->
+    <bean id="orderPlatform-master-DataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close" parent="commonsAbstractDataSource">
+        <property name="url" value="${orderPlatform.master.jdbc.url}"/>
+        <property name="username" value="${orderPlatform.master.jdbc.username}"/>
+        <property name="password" value="${orderPlatform.master.jdbc.password}"/>
+    </bean>
+	<!-- 配置datasource数据源(从库)  -->
+    <bean id="orderPlatform-slave-DataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close" parent="commonsAbstractDataSource">
+        <property name="url" value="${orderPlatform.slave.jdbc.url}"/>
+        <property name="username" value="${orderPlatform.slave.jdbc.username}"/>
+        <property name="password" value="${orderPlatform.slave.jdbc.password}"/>
+    </bean>
+	<!-- 配置datasource数据源(支持动态主从库切换，ID属性即为动态路由数据源标识名)  -->
+    <bean id="orderPlatform-DataSource" class="com.zhuanche.common.database.DynamicRoutingDataSource">
+       <!-- 默认目标数据源为主库 -->
+       <property name="defaultTargetDataSource" ref="orderPlatform-master-DataSource"/>
+       <!-- 所有目标数据源 -->
+       <property name="targetDataSources">
+           <map key-type="java.lang.String">
+               <entry key="master" value-ref="orderPlatform-master-DataSource"/>
+               <entry key="slave" value-ref="orderPlatform-slave-DataSource"/>
+           </map>
+       </property>
+    </bean>    
+
+	<!-- 配置SqlSessionFactory -->
+	<bean id="orderPlatform-sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="orderPlatform-DataSource" />
+		<!-- 请修改此处：修改为实际的数据对象包路径 -->
+		<property name="typeAliasesPackage" value="com.zhuanche.entity.DriverOrderRecord" />
+		<!-- 请修改此处： 请修改为实际的mybatis环境配置文件位置 -->
+		<property name="configLocation" value="classpath:mybatis-conf.xml" />
+        <!-- 分页插件 -->
+        <property name="plugins">
+            <array>
+                <bean class="com.github.pagehelper.PageInterceptor">
+                    <!-- 这里的几个配置主要演示如何使用，如果不理解，一定要去掉下面的配置 -->
+                    <property name="properties">
+                        <value>
+                            helperDialect=mysql
+                            reasonable=true
+                            supportMethodsArguments=true
+                            params=count=countSql
+                            autoRuntimeDialect=true
+                        </value>
+                    </property>
+                </bean>
+            </array>
+        </property>
+	</bean>
+
+	<!-- 配置mapper扫描 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+	   <property name="sqlSessionFactoryBeanName" value="orderPlatform-sqlSessionFactory"></property>
+		<!-- 请修改此处： 请修改为实际的mapper接口包路径 -->
+		<property name="basePackage" value="mapper.orderPlatform" />
+	</bean>
+
+</beans>
