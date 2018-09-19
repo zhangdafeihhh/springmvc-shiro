@@ -601,7 +601,7 @@ public class DriverInfoTemporaryController extends BaseController {
                                 @Verify(param = "isXyDriver",rule="required") Integer isXyDriver,
                                 @Verify(param = "xyDriverNumber",rule="required") String xyDriverNumber,
                                 @Verify(param = "partTimeJobDri",rule="required") String partTimeJobDri,
-                                @Verify(param = "mapType",rule="required") String mapType,
+                                @RequestParam(value = "mapType",required = false) String mapType,
                                 @RequestParam(value = "assessment",required = false) String assessment,
                                 @Verify(param = "driverLicenseIssuingDateStart",rule="required") String driverLicenseIssuingDateStart,
                                 @Verify(param = "driverLicenseIssuingDateEnd",rule="required") String driverLicenseIssuingDateEnd,
