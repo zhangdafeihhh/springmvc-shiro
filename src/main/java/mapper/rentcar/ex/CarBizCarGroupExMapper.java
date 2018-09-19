@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface CarBizCarGroupExMapper {
-
     CarBizCarGroup queryGroupByGroupName (@Param("groupName") String groupName);
     /**
      * 根据groupId查询
@@ -24,7 +23,6 @@ public interface CarBizCarGroupExMapper {
      */
     List<CarBizCarGroup> queryCarGroupList(@Param("type") Integer type);
     /**
-     * 
      */
     public String getGroupNameByGroupId(Integer groupId);
 }
