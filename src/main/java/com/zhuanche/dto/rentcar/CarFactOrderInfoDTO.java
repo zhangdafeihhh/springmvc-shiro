@@ -172,8 +172,8 @@ public class CarFactOrderInfoDTO{
 	public void setActualPayAmount(String actualPayAmount) {
 		this.actualPayAmount = actualPayAmount;
 	}
-	public String getCouponId() {
-		if(couponId!=null && "-1".equals(couponId) && couponAmount!=null && Double.valueOf(couponAmount)>0){
+	public String getCouponId() { // couponId!=null && "-1".equals(couponId) && 
+		if(couponAmount!=null && Double.valueOf(couponAmount)>0){
     		return "使用";
     	}else{
     		return "未使用";
