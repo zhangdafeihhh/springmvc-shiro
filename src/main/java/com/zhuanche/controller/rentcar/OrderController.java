@@ -269,7 +269,7 @@ public class OrderController{
      */
 	@ResponseBody
 	@RequestMapping(value = "/poolMainOrderview", method = { RequestMethod.POST,RequestMethod.GET })
-	public CarPoolMainOrderDTO driverOutageAddView(@Verify(param = "mainOrderNo",rule = "required")  String mainOrderNo) {
+	public AjaxResponse driverOutageAddView(@Verify(param = "mainOrderNo",rule = "required")  String mainOrderNo) {
 		logger.info("主订单页面");
 		CarPoolMainOrderDTO params = new CarPoolMainOrderDTO();
 		params.setMainOrderNo(mainOrderNo);
@@ -278,7 +278,11 @@ public class OrderController{
 		
         List<CarFactOrderInfo> carFactOrderInfoList = carFactOrderInfoService.getMainOrderByMainOrderNo(params.getMainOrderNo());
 		params.setCarFactOrderInfoList(carFactOrderInfoList);
-		return params;
+		if(params!=null){
+			return AjaxResponse.success(params);
+		}else{
+			return AjaxResponse.failMsg(500,"内部错误");
+		}
 	}
 	
 	public CarPoolMainOrderDTO complementingInformation(CarPoolMainOrderDTO params){
