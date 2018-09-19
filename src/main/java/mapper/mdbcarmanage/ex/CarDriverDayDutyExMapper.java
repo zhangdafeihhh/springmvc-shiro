@@ -21,6 +21,8 @@ public interface CarDriverDayDutyExMapper {
 
     Integer updateDriverDayDutyList(Map<String, Object> params);
 
+    Integer updateDriverDayDutyOne(CarDriverDayDutyDTO dayDutyDTO);
+
     /** 保存司机排班信息--LN*/
     Integer insertDriverDayDutyList(Map<String, Object> params);
 

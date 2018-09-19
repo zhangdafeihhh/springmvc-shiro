@@ -242,4 +242,25 @@
     </foreach>
   </update>
 
+  <update id="updateDriverDayDutyOne" parameterType="com.zhuanche.dto.driver.CarDriverDayDutyDTO">
+      UPDATE car_driver_day_duty
+      <set>
+        driver_name = #{driverName},
+        city_id = #{cityId},
+        city_name = #{cityName},
+        supplier_id = #{supplierId},
+        supplier_name = #{supplierName},
+        team_id = #{teamId},
+        team_name = #{teamName},
+        forced_ids = #{forcedIds},
+        duty_ids = #{dutyIds},
+        forced_times = #{forcedTimes},
+        duty_times = #{dutyTimes},
+        type = #{type},
+        status = #{status}
+      </set>
+      WHERE
+      id = #{id}
+  </update>
+
 </mapper>

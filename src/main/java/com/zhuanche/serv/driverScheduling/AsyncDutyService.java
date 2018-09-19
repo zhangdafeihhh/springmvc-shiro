@@ -14,8 +14,10 @@ import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
 import com.zhuanche.entity.mdbcarmanage.DriverDutyTimeInfo;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
+import com.zhuanche.request.CommonRequest;
 import com.zhuanche.request.DriverTeamRequest;
 import com.zhuanche.request.DutyParamRequest;
+import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.util.Check;
 import mapper.mdbcarmanage.ex.CarDriverDayDutyExMapper;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
@@ -74,6 +76,9 @@ public class AsyncDutyService {
 
 	@Autowired
 	private CarBizDriverInfoExMapper carBizDriverInfoExMapper;
+
+	@Autowired
+	private CitySupplierTeamCommonService citySupplierTeamCommonService;
 
 
 	public Map<String, Object> saveDriverDayDutyList(DutyParamRequest dutyParamRequest) {
@@ -295,6 +300,21 @@ public class AsyncDutyService {
 	public void affirmDriverDayDuty(DutyParamRequest dutyParamRequest) {
 		logger.info("开始执行排班入参:{}"+JSON.toJSONString(dutyParamRequest));
 		try{
+			CommonRequest commonRequest = new CommonRequest();
+			if(!Check.NuNObj(dutyParamRequest.getCityId())){
+				commonRequest.setCityId(String.valueOf(dutyParamRequest.getCityId()));
+			}
+			if(!Check.NuNObj(dutyParamRequest.getSupplierId())){
+				commonRequest.setSupplierId(String.valueOf(dutyParamRequest.getSupplierId()));
+			}
+			if(!Check.NuNObj(dutyParamRequest.getTeamId())){
+				commonRequest.setTeamId(dutyParamRequest.getTeamId());
+			}
+			CommonRequest resultParmam = citySupplierTeamCommonService.paramDeal(commonRequest);
+			dutyParamRequest.setCityIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getCityIds()));
+			dutyParamRequest.setSupplierIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getSupplierIds()));
+			dutyParamRequest.setTeamIds(resultParmam.getTeamIds());
+
 			List<CarDriverDayDutyDTO> list = carDriverDayDutyExMapper.selectForList(dutyParamRequest);
 			if(Check.NuNCollection(list)){
 				logger.info("没有发现需要发布的数据，入参:{}"+ JSON.toJSONString(dutyParamRequest));
@@ -313,14 +333,22 @@ public class AsyncDutyService {
 			if (!CollectionUtils.isEmpty(updateList)) {
 				paramMap.put("list", updateList);
 				// 批量修改
-				Integer result = driverDutyTimeInfoExMapper.updateDriverDutyTimeInfoList(paramMap);
-				logger.info("批量更新排班：入参{}"+JSON.toJSONString(dutyParamRequest)+"结果:"+result);
+				Integer timeInfoLines = 0;
+				for (DriverDutyTimeInfo timeInfo : updateList){
+					timeInfoLines += driverDutyTimeInfoExMapper.updateDriverDutyTimeInfoOne(timeInfo);
+				}
+//				Integer result = driverDutyTimeInfoExMapper.updateDriverDutyTimeInfoList(paramMap);
+				logger.info("批量更新排班：入参{}"+JSON.toJSONString(dutyParamRequest)+"结果:"+timeInfoLines);
 			}
 			// 将排班数据设置为已发布
 			Map<String, Object> dayDutyParams = new HashMap<String, Object>();
 			dayDutyParams.put("list", list);
-			Integer result = carDriverDayDutyExMapper.updateDriverDayDutyList(dayDutyParams);
-			logger.info("更新排版数据状态：入参{}"+JSON.toJSONString(dutyParamRequest)+"结果:"+result);
+			Integer dayDutyLines = 0;
+			for(CarDriverDayDutyDTO dayDuty : list){
+				dayDutyLines +=carDriverDayDutyExMapper.updateDriverDayDutyOne(dayDuty);
+			}
+//			Integer result = carDriverDayDutyExMapper.updateDriverDayDutyList(dayDutyParams);
+			logger.info("更新排版数据状态：入参{}"+JSON.toJSONString(dutyParamRequest)+"结果:"+dayDutyLines);
 			return;
 		}catch (Exception e){
 			logger.error("排班异常:{}",e);
