@@ -82,6 +82,7 @@ public class MonitorOrderController {
         param.put("transId", UUID.randomUUID().toString().replace("-", "").toLowerCase());
 
         logger.info("监控-查询司机订单列表-请求参数" + JSON.toJSONString(param));
+        String url = esOrderDataSaasUrl+"/order/v1/search";
         try {
 
             Date begign = new Date(beginCreateDate);
@@ -103,7 +104,7 @@ public class MonitorOrderController {
             headers.add("Content-Type", "application/x-www-form-urlencoded");
             HttpEntity<MultiValueMap<String, Object>> r = new HttpEntity<>(postParameters, headers);
             RestTemplate restTemplate = new RestTemplate();
-            JSONObject responseObject= restTemplate.postForObject(esOrderDataSaasUrl+"/order/v1/search", r, JSONObject.class);
+            JSONObject responseObject= restTemplate.postForObject(url, r, JSONObject.class);
 
             if (responseObject != null) {
                 Integer code = responseObject.getInteger("code");
@@ -129,12 +130,12 @@ public class MonitorOrderController {
                     pageData.put("data",newPageList);
                     return AjaxResponse.success(pageData);
                 }else {
-                    logger.error("监控-查询司机订单列表-请求参数" + JSON.toJSONString(param)+",返回结果为："+responseObject.toJSONString());
+                    logger.error("监控-查询司机订单列表-请求参数" + JSON.toJSONString(param)+",返回结果为："+responseObject.toJSONString() +",url="+url);
                 }
             }
             return AjaxResponse.success(null);
         } catch (Exception e) {
-            logger.error("监控-查询司机订单列表-请求参数" + JSON.toJSONString(param),e);
+            logger.error("监控-查询司机订单列表-url="+url+";请求参数" + JSON.toJSONString(param),e);
             return AjaxResponse.fail(RestErrorCode.MONITOR_DRIVERO_ORDER_FAIL,null);
 
         }
