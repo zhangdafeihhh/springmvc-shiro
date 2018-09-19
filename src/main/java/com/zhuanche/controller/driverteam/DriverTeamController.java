@@ -215,8 +215,8 @@ public class DriverTeamController{
 	public AjaxResponse queryAddDriverList(DriverTeamRequest param){
 		logger.info("查询可添加司机列表入参:"+ JSON.toJSONString(param));
 		SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-		if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
-			return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
+		if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId()) ||Check.NuNStr(param.getCityId()) || Check.NuNStr(param.getSupplierId())){
+			return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
 		}
 		PageDTO pageDTO = carDriverTeamService.selectAddDriverList(param);
 		return AjaxResponse.success(pageDTO);
