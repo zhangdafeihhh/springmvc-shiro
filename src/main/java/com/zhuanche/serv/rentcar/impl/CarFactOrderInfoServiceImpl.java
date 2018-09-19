@@ -57,9 +57,9 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
     private static Logger logger = LoggerFactory.getLogger(CarFactOrderInfoServiceImpl.class);
 
 	/**链接超时时间**/
-	private static final Integer CONNECT_TIMEOUT = 6000;
+	private static final Integer CONNECT_TIMEOUT = 30000;
 	/**读取超时时间**/
-	private static final Integer READ_TIMEOUT = 6000;
+	private static final Integer READ_TIMEOUT = 30000;
 	
     //LBS轨迹URL
     @Value("${lbs.driver.gps.rest.url}")
