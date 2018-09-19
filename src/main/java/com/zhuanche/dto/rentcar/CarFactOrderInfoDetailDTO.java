@@ -184,10 +184,12 @@ public class CarFactOrderInfoDetailDTO{
 	private String settleDate;
 	//发起人 y.cancel_status as qxcancelstatus, (qxcancelstatus: 1 pc端 ,  2 乘客端APP , 3 乘客端APP(超时)  ,  4 系统自动取消(日租/半日租乘客15分钟内未付定金) ， 5 系统自动取消 , 10 乘客端APP )
 	private int qxcancelstatus;
-	//发起人
+	//取消 发起人
 	private String startPerson;
-	//操作人 qxperson
-	//操作时间 qxdate
+	//取消 操作人
+	private String qxperson;
+	//取消 操作时间 
+	private String qxdate;
 	//取消原因 
 	private String qxmemo;
 	//操作人  (yystatus: 1 pc端 ,  2 乘客端APP )
@@ -416,11 +418,11 @@ public class CarFactOrderInfoDetailDTO{
 	}
 	
 	public String getPushDriverTypeName() {
-		if(this.pushDriverType==1){
+		if(pushDriverType!=null && this.pushDriverType==1){
 			pushDriverTypeName= "自动派单";
-		}else if(this.pushDriverType==2){
+		}else if(pushDriverType!=null && this.pushDriverType==2){
 			pushDriverTypeName= "司机抢单";
-		}else if(this.pushDriverType==3){
+		}else if(pushDriverType!=null && this.pushDriverType==3){
 			pushDriverTypeName= "人工绑单";
 		}else{
 			pushDriverTypeName = "无";
@@ -1021,7 +1023,7 @@ public class CarFactOrderInfoDetailDTO{
 	public String getOperatePerson() {
 		 if(yystatus==1){
 			 operatePerson="pc端";
-		 }else if(yystatus==1){
+		 }else if(yystatus==2){
 			 operatePerson="乘客端APP";
 		 }
 		return operatePerson;
@@ -1029,6 +1031,22 @@ public class CarFactOrderInfoDetailDTO{
 
 	public void setOperatePerson(String operatePerson) {
 		this.operatePerson = operatePerson;
+	}
+
+	public String getQxperson() {
+		return qxperson;
+	}
+
+	public void setQxperson(String qxperson) {
+		this.qxperson = qxperson;
+	}
+
+	public String getQxdate() {
+		return qxdate;
+	}
+
+	public void setQxdate(String qxdate) {
+		this.qxdate = qxdate;
 	}
 	
 	
