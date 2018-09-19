@@ -123,7 +123,7 @@ public class MonitorOrderController {
                             newItem.put("orderId",item.getString("orderId"));
                             newItem.put("orderNo",item.getString("orderNo"));
                             newItem.put("createDate",item.getString("createDate"));
-                            newItem.put("status",item.getString("status"));
+                            newItem.put("status",transStatus(item.getString("status")));
 
                             newPageList.add(newItem);
                         }
@@ -138,8 +138,44 @@ public class MonitorOrderController {
         } catch (Exception e) {
             logger.error("监控-查询司机订单列表-url="+url+";请求参数" + JSON.toJSONString(param),e);
             return AjaxResponse.fail(RestErrorCode.MONITOR_DRIVERO_ORDER_FAIL,null);
-
         }
+    }
+    private String transStatus(String status){
+        if(StringUtils.isEmpty(status)){
+            return status;
+            //状态 10预定中 ；13订单池； 14待支付 ；15待服务； 20司机已出发；25司机已到达；30服务中；40待结算；42支付中；43扣款中；44后付；45已结算；50已完成；55订单异议；60已取消',
+        }else if("10".equals(status)){
+            status = "预定中";
+        }else if("13".equals(status)){
+            status = "订单池";
+        }else if("14".equals(status)){
+            status = "待支付";
+        }else if("15".equals(status)){
+            status = "待服务";
+        }else if("20".equals(status)){
+            status = "司机已出发";
+        }else if("25".equals(status)){
+            status = "司机已到达";
+        }else if("30".equals(status)){
+            status = "服务中";
+        }else if("40".equals(status)){
+            status = "待结算";
+        }else if("42".equals(status)){
+            status = "支付中";
+        }else if("43".equals(status)){
+            status = "扣款中";
+        }else if("44".equals(status)){
+            status = "后付";
+        }else if("45".equals(status)){
+            status = "已结算";
+        }else if("50".equals(status)){
+            status = "已完成";
+        }else if("55".equals(status)){
+            status = "订单异议";
+        }else if("60".equals(status)){
+            status = "已取消";
+        }
+        return status;
     }
 
 }
