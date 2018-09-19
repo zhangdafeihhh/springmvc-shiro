@@ -51,10 +51,6 @@ public interface CarFactOrderExMapper {
      */
     public List<CarBizOrderWaitingPeriod> selectWaitingPeriodListSlave(String orderNo);
     /**
-     * 
-     */
-    public CarPoolMainOrderDTO queryCarpoolMainForObject(CarPoolMainOrderDTO params);
-    /**
      * 查询车行类别
      */
     public ServiceEntity selectServiceEntityById(Integer serviceId);
