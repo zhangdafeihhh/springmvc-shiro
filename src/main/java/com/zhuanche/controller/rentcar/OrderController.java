@@ -270,14 +270,19 @@ public class OrderController{
 	@ResponseBody
 	@RequestMapping(value = "/poolMainOrderview", method = { RequestMethod.POST,RequestMethod.GET })
 	public AjaxResponse driverOutageAddView(@Verify(param = "mainOrderNo",rule = "required")  String mainOrderNo) {
-		logger.info("主订单页面");
+		logger.info("主订单页面mainOrderNo:"+mainOrderNo);
 		CarPoolMainOrderDTO params = new CarPoolMainOrderDTO();
 		params.setMainOrderNo(mainOrderNo);
 		params = carFactOrderInfoService.queryCarpoolMainForObject(params);
-        params = complementingInformation(params);
-		
+		logger.info("主订单CarPoolMainOrderDTO:"+params);
+		if(params==null){
+			return AjaxResponse.failMsg(101,"没有此主订单号数据");
+		}
+		params = complementingInformation(params);
+		logger.info("查询供应商,城市，车型:"+params);
         List<CarFactOrderInfo> carFactOrderInfoList = carFactOrderInfoService.getMainOrderByMainOrderNo(params.getMainOrderNo());
 		params.setCarFactOrderInfoList(carFactOrderInfoList);
+		logger.info("查询子订单list:"+carFactOrderInfoList);
 		if(params!=null){
 			return AjaxResponse.success(params);
 		}else{
