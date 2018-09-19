@@ -100,12 +100,13 @@ public class MonitorOrderController {
             postParameters.add("endCreateDate", endString);
             postParameters.add("transId", param.get("transId"));
 
+            logger.info("监控-查询司机订单列表-请求参数postParameters=" + JSON.toJSONString(postParameters));
             HttpHeaders headers = new HttpHeaders();
             headers.add("Content-Type", "application/x-www-form-urlencoded");
             HttpEntity<MultiValueMap<String, Object>> r = new HttpEntity<>(postParameters, headers);
             RestTemplate restTemplate = new RestTemplate();
             JSONObject responseObject= restTemplate.postForObject(url, r, JSONObject.class);
-
+            logger.info("监控-查询司机订单列表-返回结果为=" + (responseObject == null?"null":responseObject.toJSONString()));
             if (responseObject != null) {
                 Integer code = responseObject.getInteger("code");
                 if (code == 0) {
