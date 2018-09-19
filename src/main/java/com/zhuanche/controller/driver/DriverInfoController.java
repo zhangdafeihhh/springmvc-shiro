@@ -476,7 +476,7 @@ public class DriverInfoController {
                     || StringUtils.isEmpty(education) || StringUtils.isEmpty(firstdrivinglicensedate) || StringUtils.isEmpty(firstmeshworkdrivinglicensedate)
                     || StringUtils.isEmpty(corptype) || StringUtils.isEmpty(signdate) || StringUtils.isEmpty(signdateend) || StringUtils.isEmpty(contractdate)
                     || isxydriver==null || StringUtils.isEmpty(xyDriverNumber) || StringUtils.isEmpty(parttimejobdri) || StringUtils.isEmpty(phonetype)
-                    || StringUtils.isEmpty(phonecorp) || StringUtils.isEmpty(maptype) || StringUtils.isEmpty(emergencycontactaddr) || StringUtils.isEmpty(driverlicenseissuingdatestart)
+                    || StringUtils.isEmpty(phonecorp) || StringUtils.isEmpty(emergencycontactaddr) || StringUtils.isEmpty(driverlicenseissuingdatestart)
                     || StringUtils.isEmpty(driverlicenseissuingdateend) || StringUtils.isEmpty(driverlicenseissuingcorp) || StringUtils.isEmpty(driverlicenseissuingnumber)
                     || StringUtils.isEmpty(driverLicenseIssuingRegisterDate) || StringUtils.isEmpty(driverLicenseIssuingFirstDate) || StringUtils.isEmpty(driverLicenseIssuingGrantDate)
                     || StringUtils.isEmpty(birthDay) || StringUtils.isEmpty(houseHoldRegisterPermanent) || groupId == null){
