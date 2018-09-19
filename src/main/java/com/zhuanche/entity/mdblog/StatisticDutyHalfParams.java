@@ -31,8 +31,8 @@ public class StatisticDutyHalfParams implements Serializable{
         this.table = "statistic_"+sdf.format(tableDate);
         this.gpstable = "car_gps_log_"+sdf1.format(tableDate);
         this.yyyyMMdd = sdf2.format(tableDate);
-        this.driverId = driverId;
-        this.time = time;
+        this.driverId = driverId.equals("null") ? "" : driverId;
+        this.time = time.equals("null") ? "" : time;
         this.page = page;
         this.pageSize = pageSize;
     }

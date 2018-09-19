@@ -225,19 +225,19 @@ public class DriverDutyStatisticParams {
     }
 
     public DriverDutyStatisticParams(String cityId, String supplierId, String teamId, String groupIds, String name, String driverId, String phone, String licensePlates, String startTime, String endTime, String sortName, String sortOrder, Integer page, Integer pageSize) {
-        this.cityId = cityId;
-        this.supplierId = supplierId;
-        this.teamId = teamId;
-        this.groupIds = groupIds;
-        this.name = name;
+        this.cityId = cityId.equals("null") ? "" : cityId;
+        this.supplierId = supplierId.equals("null") ? "" : supplierId;
+        this.teamId = teamId.equals("null") ? "" : teamId;
+        this.groupIds = groupIds.equals("null") ? "" : groupIds;
+        this.name = name.equals("null") ? "" : name;
         this.driverIds = StringUtils.isNotEmpty(driverId) ? "'"+ driverId + "'" : null;
-        this.driverId = driverId;
-        this.phone = phone;
-        this.licensePlates = licensePlates;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.sortName = sortName;
-        this.sortOrder = sortOrder;
+        this.driverId = driverId.equals("null") ? "" : driverId;
+        this.phone = phone.equals("null") ? "" : phone;
+        this.licensePlates = licensePlates.equals("null") ? "" : licensePlates;
+        this.startTime = startTime.equals("null") ? "" : startTime;
+        this.endTime = endTime.equals("null") ? "" : endTime;
+        this.sortName = sortName.equals("null") ? "" : sortName;
+        this.sortOrder = sortOrder.equals("null") ? "" : sortOrder;
         this.page = page;
         this.pageSize = pageSize;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd");
