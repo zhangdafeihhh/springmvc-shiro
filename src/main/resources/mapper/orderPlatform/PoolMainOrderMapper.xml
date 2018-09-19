@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.orderPlatform.PoolMainOrderMapper" >
+	<!-- mapper基础标准: 当前表所有字段映射结果集 -->
+	<resultMap id="BaseResultMap" type="com.zhuanche.dto.rentcar.CarPoolMainOrderDTO">
+		<id column="main_order_id" jdbcType="INTEGER" property="mainOrderId" />
+		<result column="main_order_no" jdbcType="VARCHAR" property="mainOrderNo" />
+		<result column="service_type_id" jdbcType="INTEGER" property="serviceTypeId" />
+		<result column="city_id" jdbcType="INTEGER" property="cityId" />
+		<result column="status" jdbcType="INTEGER" property="status" />
+		<result column="order_total_num" jdbcType="INTEGER" property="orderTotalNum" />
+		<result column="finish_order_num" jdbcType="INTEGER" property="finishOrderNum" />
+		<result column="first_order_id" jdbcType="INTEGER" property="firstOrderId" />
+		<result column="last_order_id" jdbcType="INTEGER" property="lastOrderId" />
+		<result column="driver_start_long_addr" jdbcType="VARCHAR" property="driverStartLongAddr" />
+		<result column="driver_start_short_addr" jdbcType="VARCHAR" property="driverStartShortAddr" />
+		<result column="driver_start_point" jdbcType="VARCHAR" property="driverStartPoint" />
+		<result column="driver_start_date" jdbcType="TIMESTAMP" property="driverStartDate" />
+		<result column="driver_end_long_addr" jdbcType="VARCHAR" property="driverEndLongAddr" />
+		<result column="driver_end_short_addr" jdbcType="VARCHAR" property="driverEndShortAddr" />
+		<result column="driver_end_point" jdbcType="VARCHAR" property="driverEndPoint" />
+		<result column="driver_end_date" jdbcType="TIMESTAMP" property="driverEndDate" />
+		<result column="driver_id" jdbcType="INTEGER" property="driverId" />
+		<result column="group_id" jdbcType="INTEGER" property="groupId" />
+		<result column="license_plates" jdbcType="VARCHAR" property="licensePlates" />
+		<result column="driver_total_mileage" jdbcType="DECIMAL" property="driverTotalMileage" />
+		<result column="driver_total_time" jdbcType="INTEGER" property="driverTotalTime" />
+		<result column="driver_total_fee" jdbcType="DECIMAL" property="driverTotalFee" />
+		<result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+		<result column="create_by" jdbcType="INTEGER" property="createBy" />
+		<result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+		<result column="update_by" jdbcType="INTEGER" property="updateBy" />
+	</resultMap>
+	<!-- mapper基础标准: 当前表所有字段结果集 -->
+	<sql id="Base_Column_List">
+		main_order_id, main_order_no, service_type_id, city_id, status, order_total_num,
+		finish_order_num, first_order_id, last_order_id, driver_start_long_addr, driver_start_short_addr,
+		driver_start_point, driver_start_date, driver_end_long_addr, driver_end_short_addr,
+		driver_end_point, driver_end_date, driver_id, group_id, license_plates, driver_total_mileage,
+		driver_total_time, driver_total_fee, create_date, create_by, update_date, update_by
+  	</sql>
+	<!-- mapper基础标准: 当前表所有字段查询条件集 -->
+	<sql id="allBaseColumnWhereList" >
+		<trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR" >
+			<if test="mainOrderId != null and mainOrderId != ''" >
+				and main_order_id = #{mainOrderId,jdbcType=INTEGER}
+			</if>
+			<if test="mainOrderNo != null and mainOrderNo != ''" >
+				and main_order_no = #{mainOrderNo,jdbcType=VARCHAR}
+			</if>
+			<if test="serviceTypeId != null and serviceTypeId != ''" >
+				and service_type_id = #{serviceTypeId,jdbcType=INTEGER}
+			</if>
+			<if test="cityId != null and cityId != ''" >
+				and city_id = #{cityId,jdbcType=INTEGER}
+			</if>
+			<if test="status != null and status != ''" >
+				and status = #{status,jdbcType=INTEGER}
+			</if>
+			<if test="driverId != null and driverId != ''" >
+				and driver_id = #{driverId,jdbcType=INTEGER}
+			</if>
+			<if test="groupId != null and groupId != ''" >
+				and group_id = #{groupId,jdbcType=INTEGER}
+			</if>
+			<if test="licensePlates != null and licensePlates != ''" >
+				and license_plates = #{licensePlates,jdbcType=VARCHAR}
+			</if>
+			<if test="cities != null and cities != ''">
+				and city_id in (${cities})
+			</if>
+			<if test="driverIds != null and driverIds != ''">
+				and driver_id in (${driverIds})
+			</if>
+			<if test="createDateBegin !=null and createDateBegin !=''">
+				<![CDATA[ and driver_start_date >= '${createDateBegin} 00:00:00' ]]>
+			</if>
+			<if test="createDateEnd !=null and createDateEnd !=''">
+				<![CDATA[ and driver_start_date <= '${createDateEnd} 23:59:59' ]]>
+			</if>
+			<if test="endDateBegin !=null and endDateBegin !=''">
+				<![CDATA[ and driver_end_date >= '${endDateBegin} 00:00:00' ]]>
+			</if>
+			<if test="endDateEnd !=null and endDateEnd !=''">
+				<![CDATA[ and driver_end_date <= '${endDateEnd} 23:59:59' ]]>
+			</if>
+		</trim>
+	</sql>
+
+
+	<select id="queryCarpoolMainForObject" resultMap="BaseResultMap" parameterType="com.zhuanche.dto.rentcar.CarPoolMainOrderDTO">
+		select
+		<include refid="Base_Column_List"/>
+		,DATE_FORMAT(driver_start_date,'%Y-%m-%d %H:%i:%s') driverStartDateStr
+		,DATE_FORMAT(driver_end_date,'%Y-%m-%d %H:%i:%s') driverEndDateStr
+		,DATE_FORMAT(create_date,'%Y-%m-%d %H:%i:%s') createDateStr
+		,DATE_FORMAT(update_date,'%Y-%m-%d %H:%i:%s') updateDateStr
+		from carpool_main_order
+		where main_order_no = #{mainOrderNo,jdbcType=VARCHAR}
+	</select>
+	
+</mapper>
