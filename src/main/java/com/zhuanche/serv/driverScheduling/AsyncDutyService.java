@@ -298,7 +298,7 @@ public class AsyncDutyService {
 	//发布数据
 	@SuppressWarnings("unchecked")
 	public void affirmDriverDayDuty(DutyParamRequest dutyParamRequest) {
-		logger.info("开始执行排班入参:{}"+JSON.toJSONString(dutyParamRequest));
+		logger.info("开始执行排班原始入参:{}"+JSON.toJSONString(dutyParamRequest));
 		try{
 			CommonRequest commonRequest = new CommonRequest();
 			if(!Check.NuNObj(dutyParamRequest.getCityId())){
@@ -315,6 +315,7 @@ public class AsyncDutyService {
 			dutyParamRequest.setSupplierIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getSupplierIds()));
 			dutyParamRequest.setTeamIds(resultParmam.getTeamIds());
 
+			logger.info("开始执行排班入参:{}"+JSON.toJSONString(dutyParamRequest));
 			List<CarDriverDayDutyDTO> list = carDriverDayDutyExMapper.selectForList(dutyParamRequest);
 			if(Check.NuNCollection(list)){
 				logger.info("没有发现需要发布的数据，入参:{}"+ JSON.toJSONString(dutyParamRequest));
