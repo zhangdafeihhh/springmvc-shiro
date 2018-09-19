@@ -167,15 +167,6 @@ public class DriverEvaluateController{
 				saasBigdataApiUrl+"/driverEvaluateDetail/download" ,
 				new String("对司机评级详情分析".getBytes("gb2312"), "iso8859-1"),
 				request.getRealPath("/")+File.separator+"template"+File.separator+"driverEvaluate_info.csv");
-				
-			  /*
-	        statisticalAnalysisService.downloadCsvFromTemplet(jsonString,
-	        		saasBigdataApiUrl+"/driverEvaluateDetail/download" ,
-					request.getRealPath("/")+File.separator+"template"+File.separator+"driverEvaluate_info.csv");
-			statisticalAnalysisService.exportCsvFromTemplet(response,
-					new String("对司机评级详情分析".getBytes("gb2312"), "iso8859-1"),
-					request.getRealPath("/")+File.separator+"template"+File.separator+"driverEvaluate_info.csv");*/
-       
       } catch (Exception e) {
           e.printStackTrace();
       }

@@ -95,9 +95,9 @@ public class CarAnalysisIndexController{
 	    public AjaxResponse queryCarAnalysisIndexWayData(
 	    			@Verify(param = "startDate",rule = "required") String startDate,
 	    			@Verify(param = "endDate",rule = "required") String endDate, 
-	                                              String allianceId,
-	                                              String vehicleTypeId,
-	                @Verify(param = "visibleVehicleTypeIds",rule = "required") String visibleVehicleTypeIds
+	                                              String allianceId,  // 加盟商ID
+	                                              String carGroupId,// 车辆类型ID
+	                                              String motorcadeId // 车队ID
 	                                              ){
 	        logger.info("【运营管理-统计分析】车辆分析指标趋势 数据:queryCarAnalysisIndexWayData");
 	        Map<String, Object> paramMap = new HashMap<String, Object>();
@@ -106,18 +106,20 @@ public class CarAnalysisIndexController{
 	        if(StringUtil.isNotEmpty(allianceId)){
 	        	paramMap.put("allianceId", allianceId);//加盟商ID
 	        }
-	        if(StringUtil.isNotEmpty(vehicleTypeId)){
-	        	paramMap.put("vehicleTypeId", vehicleTypeId);//车辆类型ID
+	        if(StringUtil.isNotEmpty(motorcadeId)){
+	        	paramMap.put("motorcadeId", motorcadeId);//车辆类型ID
 	        }
 	        // 数据权限设置
 		      paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,null,null,allianceId);
 		      if(paramMap==null){
 		    	  return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 		      }
-			  // 车辆类型  ??
-			  String[] visibleVehicleTypeIdsStr = visibleVehicleTypeIds.split(",");
-		      paramMap.put("visibleVehicleTypeIds", visibleVehicleTypeIdsStr); // 可见车辆类型ID
-		      // 从大数据仓库获取统计数据
+		      if(StringUtil.isNotEmpty(carGroupId)){
+		    	  // 车辆类型  ??
+				  String[] visibleVehicleTypeIdsStr = carGroupId.split(",");
+			      paramMap.put("visibleVehicleTypeIds", visibleVehicleTypeIdsStr); // 可见车辆类型ID
+		      }
+			  // 从大数据仓库获取统计数据
 	          AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/carAnalysisIndex/carIndex",paramMap);
 	        return result;
 	    }

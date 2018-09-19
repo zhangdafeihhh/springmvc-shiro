@@ -34,7 +34,7 @@ import com.zhuanche.util.ValidateUtils;
  * ClassName: 司机运营详情分析
  * date: 2018年9月01日 下午7:19:45 
  * @author jiadongdong
- *
+ *  /driverOperateDetail/exportDriverOperateDetailData.json
  */
 @Controller
 @RequestMapping("/driverOperateDetail")
@@ -65,11 +65,11 @@ public class DriverOperateDetailController{
 	@ResponseBody
     @RequestMapping(value = "/queryDriverOperateDetailData", method = { RequestMethod.POST,RequestMethod.GET })
     public AjaxResponse queryDriverOperateDetailData(
-    										  Long cityId,
+    										  Long driverCityId,
     										  String genderId,
     										  String driverTypeId,
-                                              String supplier,
-                                              String teamId,
+                                              String allianceId,
+                                              String motorcadeId,
                                               String driverName,
                                               @Verify(param = "queryDate",rule = "required") String queryDate,
                                               @Verify(param = "pageNo",rule = "required") Integer pageNo,
@@ -77,8 +77,8 @@ public class DriverOperateDetailController{
                                               ){
         logger.info("【运营管理-统计分析】司机运营详情分析  列表数据:queryDriverOperateDetailData");
         Map<String, Object> paramMap = new HashMap<String, Object>();
-        if(null!=cityId){
-        	paramMap.put("driverCityId", cityId);//司机所属城市ID
+        if(null!=driverCityId){
+        	paramMap.put("driverCityId", driverCityId);//司机所属城市ID
 	    }
 	    if(StringUtil.isNotEmpty(genderId)){
 	    	   paramMap.put("genderId", genderId);//性别ID
@@ -86,17 +86,17 @@ public class DriverOperateDetailController{
 	    if(StringUtil.isNotEmpty(driverTypeId)){
 	    	 paramMap.put("driverTypeId", driverTypeId);//司机类型ID
 	    }
-	    if(StringUtil.isNotEmpty(supplier)){
-	    	paramMap.put("allianceId", supplier);//加盟商ID
+	    if(StringUtil.isNotEmpty(allianceId)){
+	    	paramMap.put("allianceId", allianceId);//加盟商ID
 	    }
-	    if(StringUtil.isNotEmpty(teamId)){
-	    	paramMap.put("motorcadeId", teamId);//车队ID
+	    if(StringUtil.isNotEmpty(motorcadeId)){
+	    	paramMap.put("motorcadeId", motorcadeId);//车队ID
 	    }
 	    if(StringUtil.isNotEmpty(driverName)){
 	    	paramMap.put("driverName", driverName);//司机姓名
 	    }
 		paramMap.put("queryDate", queryDate);//查询日期
-		paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,supplier,teamId);
+		paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,driverCityId,allianceId,motorcadeId);
 		if(paramMap==null){
 			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 		}
