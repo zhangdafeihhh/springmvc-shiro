@@ -69,6 +69,7 @@ public class OrderController{
 	 @RequestMapping(value = "/queryOrderList", method = { RequestMethod.POST,RequestMethod.GET })
 	 public AjaxResponse queryOrderList(
 			 								   String serviceId,
+			 								   String airportIdnot,
 			 								   String airportId,
 	 										   String carGroupId,
 	 										   String status,
@@ -96,6 +97,7 @@ public class OrderController{
 	     Map<String, Object> paramMap = new HashMap<String, Object>();
 		 paramMap.put("serviceId", serviceId);// 
 		 paramMap.put("airportId", airportId);//
+		 paramMap.put("airportIdnot", airportIdnot);//
 	     paramMap.put("carGroupId", carGroupId);// 
 	     paramMap.put("status", status);//
 	     paramMap.put("cityId", cityId);//
@@ -131,6 +133,9 @@ public class OrderController{
 	 @ResponseBody
 	 @RequestMapping(value = "/exportOrderList", method = { RequestMethod.POST,RequestMethod.GET })
 	 public void exportOrderList(
+											   String serviceId,
+											   String airportIdnot,
+											   String airportId,
 	 										   String carGroupId,
 	 										   String status,
 	 										   String cityId,
@@ -154,6 +159,9 @@ public class OrderController{
 	     String  transId =sdf.format(new Date());
 	     
 	     Map<String, Object> paramMap = new HashMap<String, Object>();
+	     paramMap.put("serviceId", serviceId);// 
+		 paramMap.put("airportId", airportId);//
+		 paramMap.put("airportIdnot", airportIdnot);//
 	     paramMap.put("carGroupId", carGroupId);// 
 	     paramMap.put("status", status);//
 	     paramMap.put("cityId", cityId);//
