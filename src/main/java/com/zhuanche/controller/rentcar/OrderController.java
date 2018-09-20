@@ -128,23 +128,20 @@ public class OrderController{
          */
 	     paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,supplierId,teamId);
 	     if(paramMap.get("visibleAllianceIds")!=null){
-	    	 logger.info("visibleAllianceIds"+paramMap.get("visibleAllianceIds"));
-	    	 logger.info("visibleAllianceIdstoString"+paramMap.get("visibleAllianceIds").toString());
-			 paramMap.put("supplierIdBatch", paramMap.get("visibleAllianceIds").toString().replaceAll("/[/]", "")); // 可见加盟商ID
+	    	 logger.info("visibleAllianceIdstoString"+paramMap.get("visibleAllianceIds").toString().replaceAll("\\[", "").replaceAll("\\]", ""));
+			 paramMap.put("supplierIdBatch", paramMap.get("visibleAllianceIds").toString().replaceAll("\\[", "").replaceAll("\\]", "")); // 可见加盟商ID
 		}
 		if(paramMap.get("visibleMotorcadeIds")!=null){
-			logger.info("visibleMotorcadeIds"+paramMap.get("visibleMotorcadeIds"));
-	    	 logger.info("visibleMotorcadeIdstoString"+paramMap.get("visibleMotorcadeIds").toString());
-			paramMap.put("teamIdBatch", paramMap.get("visibleMotorcadeIds").toString().replaceAll("/[/]", "")); // 可见车队ID
+	    	 logger.info("visibleMotorcadeIdstoString"+paramMap.get("visibleMotorcadeIds").toString().replaceAll("\\[", "").replaceAll("\\]", ""));
+			paramMap.put("teamIdBatch", paramMap.get("visibleMotorcadeIds").toString().replaceAll("\\[", "").replaceAll("\\]", "")); // 可见车队ID
 		}
 		if(paramMap.get("visibleCityIds")!=null){
-			paramMap.put("cityIdBatch", paramMap.get("visibleCityIds").toString().replaceAll("/[/]", "")); //可见城市ID
+			paramMap.put("cityIdBatch", paramMap.get("visibleCityIds").toString().replaceAll("\\[", "").replaceAll("\\]", "")); //可见城市ID
 		}
 		 // 从订单组取统计数据
 	     AjaxResponse result = carFactOrderInfoService.queryOrderDataList(paramMap);
 	     return result;
 	 }
-	 
 	 
 	 public String arrayToStr(String v[]){
 		 String temp = "";
