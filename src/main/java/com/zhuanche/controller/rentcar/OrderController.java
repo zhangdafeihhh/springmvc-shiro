@@ -26,6 +26,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.controller.driver.Componment;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
@@ -42,6 +43,7 @@ import com.zhuanche.entity.rentcar.CarFactOrderInfo;
 import com.zhuanche.entity.rentcar.CarGroupEntity;
 import com.zhuanche.entity.rentcar.ServiceEntity;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
+import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import com.zhuanche.util.CopyBeanUtil;
 
 /**
@@ -59,7 +61,8 @@ public class OrderController{
 	@Autowired
 	private CarFactOrderInfoService carFactOrderInfoService;
 	 
-	 
+	@Autowired
+	private StatisticalAnalysisService statisticalAnalysisService;
 	/**
 	    * 查询订单 列表
 	    * @param queryDate	查询日期
@@ -73,7 +76,7 @@ public class OrderController{
 			 								   String airportId,
 	 										   String carGroupId,
 	 										   String status,
-	 										   String cityId,
+	 										   Long cityId,
 	 										   String supplierId,
 	                                           String teamId,
 	                                           String teamClassId,
@@ -119,6 +122,20 @@ public class OrderController{
 	     paramMap.put("pageNo", pageNo);//页号
 	     if(null != pageSize && pageSize > 0)
 	     paramMap.put("pageSize", pageSize);//每页记录数
+        /* String cityIdBatch,//下单城市id批量 多个用逗号分割
+         String supplierIdBatch,//供应商id 多个用逗号
+         String teamIdBatch,//车队ID多个用逗号分割 类似or操作
+         */
+	     paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,supplierId,teamId);
+	     if(paramMap.get("visibleAllianceIds")!=null){
+			 paramMap.put("supplierIdBatch", paramMap.get("visibleAllianceIds")); // 可见加盟商ID
+		}
+		if(paramMap.get("visibleMotorcadeIds")!=null){
+			paramMap.put("teamIdBatch", paramMap.get("visibleMotorcadeIds")); // 可见车队ID
+		}
+		if(paramMap.get("visibleCityIds")!=null){
+			paramMap.put("cityIdBatch", paramMap.get("visibleCityIds")); //可见城市ID
+		}
 		 // 从订单组取统计数据
 	     AjaxResponse result = carFactOrderInfoService.queryOrderDataList(paramMap);
 	     return result;
@@ -521,9 +538,11 @@ public class OrderController{
 						}
 						if(item.getDriverArriveTime()!=null && item.getDriverArriveTime().length()>0){
 							order.setDriverArriveTime(item.getDriverArriveTime());
+							logger.info("可能订单为不跨天订单，DriverArriveTime"+item.getDriverArriveTime());
 						}
 						if(item.getDriverStartServiceTime()!=null && item.getDriverStartServiceTime().length()>0){
 							order.setDriverStartServiceTime(item.getDriverStartServiceTime());
+							logger.info("可能订单为不跨天订单，DriverStartServiceTime"+item.getDriverStartServiceTime());
 						}
 						if(item.getDriverOrderEndTime()!=null && item.getDriverOrderEndTime().length()>0){
 							order.setDriverOrderEndTime(item.getDriverOrderEndTime());
@@ -537,6 +556,7 @@ public class OrderController{
 					}
 				}
 				//2、可能订单为跨天订单，需根据订单结束时间再次查询********如果中间状态也跨天怎么办？？？
+				logger.info("可能订单为跨天订单，需根据订单结束时间再次查FactDate："+order.getFactDate());
 				if(order.getFactDate()!=null){
 					date =sdf1.parse(order.getFactDate()); 
 					tableName="car_biz_driver_record_"+sdf.format(date);
@@ -551,11 +571,13 @@ public class OrderController{
 							//司机到达
 							if(orderTime.getDriverArriveTime()==null  && item.getDriverArriveTime()!=null && item.getDriverArriveTime().length()>0){
 								order.setDriverArriveTime(item.getDriverArriveTime());
+								logger.info("可能订单为跨天订单，DriverArriveTime"+item.getDriverArriveTime());
 							}
 							
 							//开始服务
 							if(orderTime.getDriverStartServiceTime()==null  && item.getDriverStartServiceTime()!=null && item.getDriverStartServiceTime().length()>0){
 								order.setDriverStartServiceTime(item.getDriverStartServiceTime());
+								logger.info("可能订单为跨天订单，DriverStartServiceTime"+item.getDriverStartServiceTime());
 							}
 							
 							//服务完成
