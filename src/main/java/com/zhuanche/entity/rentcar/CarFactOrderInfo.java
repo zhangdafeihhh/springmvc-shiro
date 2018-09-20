@@ -2174,6 +2174,8 @@ public class CarFactOrderInfo extends BaseEntity {
 			 operatePerson="pc端";
 		 }else if(yystatus==2){
 			 operatePerson="乘客端APP";
+		 }else{
+			 operatePerson="";
 		 }
 		return operatePerson;
 	}

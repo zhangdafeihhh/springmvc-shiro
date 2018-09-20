@@ -443,11 +443,11 @@ public class OrderController{
 				//基础资费（套餐费用）
 				order.setBasePrice(Double.valueOf(String.valueOf(costDetailJson.get("basePrice")==null?"0.00":costDetailJson.get("basePrice"))));
 				//基础价包含公里(单位,公里) 
-				order.setIncludemileage(Integer.valueOf(String.valueOf(costDetailJson.get("includemileage")==null?"0":costDetailJson.get("includemileage"))));
-				logger.info("基础价包含公里(单位,公里)  :includemileage"+costDetailJson.get("includemileage"));
+				order.setIncludemileage(Integer.valueOf(String.valueOf(costDetailJson.get("includeMileage")==null?"0":costDetailJson.get("includeMileage"))));
+				logger.info("基础价包含公里(单位,公里)  :includemileage"+costDetailJson.get("includeMileage"));
 				//基础价包含时长(单位,分钟)
-				order.setIncludeminute(Integer.valueOf(String.valueOf(costDetailJson.get("includeminute")==null?"0":costDetailJson.get("includeminute"))));
-				logger.info("基础价包含时长(单位,分钟) :includeminute"+costDetailJson.get("includeminute"));
+				order.setIncludeminute(Integer.valueOf(String.valueOf(costDetailJson.get("includeMinute")==null?"0":costDetailJson.get("includeMinute"))));
+				logger.info("基础价包含时长(单位,分钟) :includeminute"+costDetailJson.get("includeMinute"));
 				//查找车型的名字
 				order.setBookingGroupnames(String.valueOf(costDetailJson.get("carGroupName")==null?"":costDetailJson.get("carGroupName")));
 				//String orderStatus = String.valueOf(costDetailJson.get("orderStatus"));

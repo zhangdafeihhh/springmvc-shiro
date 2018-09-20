@@ -279,15 +279,10 @@
 			IFNULL(de.passenger_pending_pay, 0) AS passengerPendingPay,
 			de.settle_date settleDate,
 			de.pay_type payType,
-  			<!-- z.amount AS amount, -->
   			det.customer_reject_pay,
-  			<!--addBy zsc 2016-03-08 新增指定司机费用 -->
 			 IFNULL(b.designated_driver_fee, 0) as designatedDriverFee,
-			 <!--addBy lwl 2016-04-15 新增等候时长 -->
 			 IFNULL(b.waiting_minutes, 0) as waitingTime,
-			 <!--addBy lwl 2016-04-15 新增等候费用 -->
 			 IFNULL(b.waiting_fee, 0) as waitingPrice,
-			 <!-- add by lwl 2016-05-10 新增 百度 携程支付 -->
 			 partner.pay_amount as baiDuOrCtripPrice,
 			 IFNULL(deo.language_service_fee, 0) as languageServiceFee,
 			 deo.distant_detail distantDetail,
@@ -301,7 +296,6 @@
 		LEFT JOIN car_biz_driver_info e on a.driver_id=e.driver_id
 		LEFT JOIN car_biz_car_group f on a.car_group_id=f.group_id
 		LEFT JOIN car_biz_pricing h on h.price_id=b.price_plan_id and b.price_plan_version=h.version
-		<!-- left join car_biz_coupons i on i.coupons_id=b.coupon_id -->
 		LEFT JOIN car_biz_car_info k ON e.license_plates=k.license_plates
 		LEFT JOIN car_biz_driver_info e1 on a.fact_driver_id=e1.driver_id
 		LEFT JOIN car_biz_car_group m on e1.group_id=m.group_id
