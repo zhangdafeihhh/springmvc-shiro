@@ -167,7 +167,7 @@ public class OrderController{
 											   String airportId,
 	 										   String carGroupId,
 	 										   String status,
-	 										   String cityId,
+	 										   Long cityId,
 	 										   String supplierId,
 	                                           String teamId,
 	                                           String teamClassId,
@@ -209,7 +209,20 @@ public class OrderController{
 	     paramMap.put("endCostEndDate", endCostEndDate+" 23:59:59");//
 	     paramMap.put("transId", transId );//
 	     paramMap.put("pageNo", "1");//页号
-	     paramMap.put("pageSize", "10000");//每页记录数
+	     paramMap.put("pageSize", "20000");//每页记录数
+	    paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,supplierId,teamId);
+	     if(paramMap.get("visibleAllianceIds")!=null){
+	    	 logger.info("visibleAllianceIdstoString"+paramMap.get("visibleAllianceIds").toString().replaceAll("\\[", "").replaceAll("\\]", ""));
+			 paramMap.put("supplierIdBatch", paramMap.get("visibleAllianceIds").toString().replaceAll("\\[", "").replaceAll("\\]", "")); // 可见加盟商ID
+		}
+		if(paramMap.get("visibleMotorcadeIds")!=null){
+	    	 logger.info("visibleMotorcadeIdstoString"+paramMap.get("visibleMotorcadeIds").toString().replaceAll("\\[", "").replaceAll("\\]", ""));
+			paramMap.put("teamIdBatch", paramMap.get("visibleMotorcadeIds").toString().replaceAll("\\[", "").replaceAll("\\]", "")); // 可见车队ID
+		}
+		if(paramMap.get("visibleCityIds")!=null){
+			paramMap.put("cityIdBatch", paramMap.get("visibleCityIds").toString().replaceAll("\\[", "").replaceAll("\\]", "")); //可见城市ID
+		}
+			
 		 // 从订单组取统计数据
 	    List<CarFactOrderInfoDTO> dtoList = carFactOrderInfoService.queryAllOrderDataList(paramMap);
 		@SuppressWarnings("deprecation")
