@@ -169,7 +169,8 @@ public final class RestErrorCode{
 	public static final int MONITOR_GPS_DRIVER_NOT_EXIST                                        = 6002;
 	@ResultMessage("查询大数据司机订单信息失败")
 	public static final int MONITOR_DRIVERO_ORDER_FAIL                                        = 7001;
-
+	@ResultMessage("查询大数据车辆分析指标趋势信息失败")
+	public static final int MONITOR_CARINDEX_FAIL                                        = 7002;
     //-----------------------------------------------业务参数：投诉评分
     @ResultMessage("请选择一个车队或输入司机手机号")
     public static final int TEAMID_OR_DRIVERID_ISNULL = 5201;
