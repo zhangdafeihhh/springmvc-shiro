@@ -274,18 +274,18 @@ public class  StatisticalAnalysisService {
 				logger.info("获取当前登录用户信息null");
 				return null;
 			}
-			if (cityIdsForAuth.size() > 0 && cityId != null && !cityIdsForAuth.contains(cityId)) {
+			if (cityIdsForAuth.size() > 0 && cityId != null && !cityIdsForAuth.contains(Integer.valueOf(String.valueOf(cityId)))) {
 				logger.info("cityIdsForAuth="+(cityIdsForAuth==null?"null":JSON.toJSONString(cityIdsForAuth))
 						+";cityId="+cityId);
 				return null;
 			} 
-			if (supplierIdsForAuth.size() > 0 && StringUtils.isNotBlank(supplier) && !supplierIdsForAuth.contains(supplier)) {
+			if (supplierIdsForAuth.size() > 0 && StringUtils.isNotBlank(supplier) && !supplierIdsForAuth.contains(Integer.valueOf(supplier))) {
 				logger.info("supplierIdsForAuth="+(supplierIdsForAuth==null?"null":JSON.toJSONString(supplierIdsForAuth))
 						+";supplier="+supplier);
 				return null;
 			}
 			 
-			if (teamIdsForAuth.size() > 0 && StringUtils.isNotBlank(teamId) && !teamIdsForAuth.contains(teamId)) {
+			if (teamIdsForAuth.size() > 0 && StringUtils.isNotBlank(teamId) && !teamIdsForAuth.contains(Integer.valueOf(teamId))) {
 				logger.info("teamIdsForAuth="+(teamIdsForAuth==null?"null":JSON.toJSONString(teamIdsForAuth))
 						+";teamId="+teamId);
 				return null;
