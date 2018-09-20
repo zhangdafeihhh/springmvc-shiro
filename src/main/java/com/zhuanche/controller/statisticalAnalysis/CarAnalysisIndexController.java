@@ -136,6 +136,8 @@ public class CarAnalysisIndexController{
 				HttpEntity<String> formEntity = new HttpEntity<String>(JSON.toJSONString(paramMap), headers);
 				RestTemplate restTemplate = new RestTemplate();
 				responseObject = restTemplate.postForObject(httpUrl, formEntity, JSONObject.class);
+				logger.info("【运营管理-统计分析】车辆分析指标趋势-请求参数" + JSON.toJSONString(paramMap)+",请求url："+httpUrl+",返回结果为："+(responseObject == null?"null":responseObject.toJSONString()));
+
 				if (responseObject != null) {
 					Integer code = responseObject.getInteger("code");
 					if (code == 0) {
