@@ -112,8 +112,11 @@ public class CarAnalysisIndexController{
 	        	paramMap.put("allianceId", allianceId);//加盟商ID
 	        }
 	        if(StringUtil.isNotEmpty(motorcadeId)){
-	        	paramMap.put("motorcadeId", motorcadeId);//车辆类型ID
+	        	paramMap.put("motorcadeId", motorcadeId);//车队ID
 	        }
+			if(StringUtil.isNotEmpty(carGroupId)){
+				paramMap.put("carGroupId", carGroupId); // 车辆类型  ??
+			}
 	        String httpUrl = saasBigdataApiUrl+"/carAnalysisIndex/carIndex";
 			logger.info("【运营管理-统计分析】车辆分析指标趋势 数据:"+JSON.toJSONString(paramMap));
 			JSONObject responseObject = null;
@@ -122,11 +125,6 @@ public class CarAnalysisIndexController{
 				paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,null,null,allianceId);
 				if(paramMap==null){
 					return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
-				}
-				if(StringUtil.isNotEmpty(carGroupId)){
-					// 车辆类型  ??
-					String[] carGroupIdArray = carGroupId.split(",");
-					paramMap.put("carGroupId", carGroupIdArray); // 可见车辆类型ID
 				}
 				// 从大数据仓库获取统计数据
 				HttpHeaders headers = new HttpHeaders();
