@@ -261,6 +261,12 @@ public class  StatisticalAnalysisService {
 		Set<Integer> cityIdsForAuth = new HashSet<Integer>();// 非超级管理员可以管理的所有城市ID
 		Set<Integer> supplierIdsForAuth = new HashSet<Integer>();// 非超级管理员可以管理的所有供应商ID
 		Set<Integer> teamIdsForAuth = new HashSet<Integer>();// 非超级管理员可以管理的可见的车队信息
+
+		// 查询参数设置
+		Set<Long> cityIds = new HashSet<Long>();
+		Set<String> supplierIds = new HashSet<String>();
+		Set<String> teamIds = new HashSet<String>();
+
 		logger.info("非超级管理员:"+WebSessionUtil.isSupperAdmin()+"cityId:"+cityId+",supplier:"+supplier+",teamId:"+teamId);
 		if (!WebSessionUtil.isSupperAdmin()) {// 非超级管理员
 			// 获取当前登录用户信息
@@ -290,43 +296,38 @@ public class  StatisticalAnalysisService {
 						+";teamId="+teamId);
 				return null;
 			}
-		}
-		// 查询参数设置
-		Set<Long> cityIds = new HashSet<Long>();
-		Set<String> supplierIds = new HashSet<String>();
-		Set<String> teamIds = new HashSet<String>();
-		// 城市权限
-		if (null != cityId) {
-			cityIds.add(cityId);
-		} else {
+			// 城市权限
 			if(cityIdsForAuth != null && cityIdsForAuth.size() >0){
 				for (Integer cityid : cityIdsForAuth) {
 					cityIds.add(cityid.longValue());
 				}
 			}
-		}
-		// 供应商权限
-		if (StringUtils.isNotBlank(supplier)) {
-			supplierIds.add(supplier);
-		} else {
+			// 供应商权限
 			if(supplierIdsForAuth != null && supplierIdsForAuth.size() >0 ){
 				for (Integer supplierId : supplierIdsForAuth) {
 					supplierIds.add(String.valueOf(supplierId));
 				}
 			}
-		}
-		// 车队权限
-		if (StringUtils.isNotBlank(teamId)) {
-			teamIds.add(teamId);
-		} else {
+			// 车队权限
 			if(teamIdsForAuth != null && teamIdsForAuth.size() >0 ){
 				for (Integer tId : teamIdsForAuth) {
 					teamIds.add(String.valueOf(tId));
 				}
 			}
+
+		}else{
+			if(StringUtils.isNotEmpty(supplier)){
+				supplierIds.add(supplier);
+			}
+			if(StringUtils.isNotEmpty(teamId)){
+				teamIds.add(teamId);
+			}
+			if(cityId != null && cityId >= 1){
+				cityIds.add(cityId);
+			}
 		}
 		if(!supplierIds.isEmpty()){
-			 paramMap.put("visibleAllianceIds", supplierIds); // 可见加盟商ID
+			paramMap.put("visibleAllianceIds", supplierIds); // 可见加盟商ID
 		}
 		if(!teamIds.isEmpty()){
 			paramMap.put("visibleMotorcadeIds", teamIds); // 可见车队ID
@@ -334,6 +335,7 @@ public class  StatisticalAnalysisService {
 		if(!cityIds.isEmpty()){
 			paramMap.put("visibleCityIds", cityIds); //可见城市ID
 		}
+
 		//非管理员  没有任何可见权限返回null
 		/*if(cityIds.isEmpty() && teamIds.isEmpty() && supplierIds.isEmpty() && !WebSessionUtil.isSupperAdmin()){
 			return null;
