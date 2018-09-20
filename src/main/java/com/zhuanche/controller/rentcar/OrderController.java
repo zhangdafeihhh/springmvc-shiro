@@ -444,8 +444,10 @@ public class OrderController{
 				order.setBasePrice(Double.valueOf(String.valueOf(costDetailJson.get("basePrice")==null?"0.00":costDetailJson.get("basePrice"))));
 				//基础价包含公里(单位,公里) 
 				order.setIncludemileage(Integer.valueOf(String.valueOf(costDetailJson.get("includemileage")==null?"0":costDetailJson.get("includemileage"))));
+				logger.info("基础价包含公里(单位,公里)  :includemileage"+costDetailJson.get("includemileage"));
 				//基础价包含时长(单位,分钟)
 				order.setIncludeminute(Integer.valueOf(String.valueOf(costDetailJson.get("includeminute")==null?"0":costDetailJson.get("includeminute"))));
+				logger.info("基础价包含时长(单位,分钟) :includeminute"+costDetailJson.get("includeminute"));
 				//查找车型的名字
 				order.setBookingGroupnames(String.valueOf(costDetailJson.get("carGroupName")==null?"":costDetailJson.get("carGroupName")));
 				//String orderStatus = String.valueOf(costDetailJson.get("orderStatus"));
@@ -458,7 +460,8 @@ public class OrderController{
 				order.setDistantFee(longDistancePrice);
 				order.setLongDistanceNum(longDistanceNum);
 				order.setLongdistanceprice(longDistancePrice);
-				
+				logger.info("order:Includemileage"+order.getIncludemileage());
+				logger.info("order:Includeminute"+order.getIncludeminute());
 			}
 			 //end
 			List<CarFactOrderInfo> pojoList = this.carFactOrderInfoService.selectByListPrimaryKey(order.getOrderId());
@@ -542,7 +545,9 @@ public class OrderController{
 				Map<String,String>paraMap=new HashMap<String, String>();
 				paraMap.put("orderNo", order.getOrderNo());
 				paraMap.put("tableName", tableName.replace("-", "_") ); //driver_order_record  tableName.replace("-", "_")
+				logger.info("**************根据订单创建时间确定表名:"+paraMap.toString());
 				List<OrderTimeEntity> p1 = carFactOrderInfoService.queryDriverOrderRecord(paraMap);
+				logger.info("*************p1+"+JSON.toJSONString(p1));
 				if(p1!=null){
 					for (OrderTimeEntity item : p1) {
 						if(item.getDriverBeginTime()!=null && item.getDriverBeginTime().length()>0){
@@ -576,10 +581,12 @@ public class OrderController{
 					List<OrderTimeEntity> orderTimeCamcel= carFactOrderInfoService.queryDriverOrderRecord(paraMap);
 					if(orderTimeCamcel!=null){
 						for (OrderTimeEntity item : orderTimeCamcel) {
+							logger.info("可能订单为跨天订单，需根据订单结束时间再次查DriverBeginTime："+item.getDriverBeginTime());
 							//司机出发	
 							if(orderTime.getDriverBeginTime()==null && item.getDriverBeginTime()!=null && item.getDriverBeginTime().length()>0){
 								order.setDriverBeginTime(item.getDriverBeginTime());
 							}
+							logger.info("可能订单为跨天订单，需根据订单结束时间再次查DriverArriveTime："+item.getDriverArriveTime());
 							//司机到达
 							if(orderTime.getDriverArriveTime()==null  && item.getDriverArriveTime()!=null && item.getDriverArriveTime().length()>0){
 								order.setDriverArriveTime(item.getDriverArriveTime());
