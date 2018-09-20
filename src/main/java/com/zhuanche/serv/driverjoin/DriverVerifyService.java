@@ -65,11 +65,11 @@ public class DriverVerifyService {
 				cityIdsForAuth = currentLoginUser.getCityIds();
 				supplierIdsForAuth = currentLoginUser.getSupplierIds();
 			}
-			if (cityIdsForAuth.size() > 0 && cityId != null && !cityIdsForAuth.contains(cityId)) {
+			if (cityIdsForAuth.size() > 0 && cityId != null && !cityIdsForAuth.contains(cityId.intValue())) {
 				return null;
 			}
 			if (supplierIdsForAuth.size() > 0
-					&& StringUtils.isNotBlank(supplier) && !supplierIdsForAuth.contains(supplier)) {
+					&& StringUtils.isNotBlank(supplier) && !supplierIdsForAuth.contains(Integer.parseInt(supplier))) {
 				return null;
 			}
 		}
