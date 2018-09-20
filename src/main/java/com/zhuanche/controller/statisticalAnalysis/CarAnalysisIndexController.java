@@ -122,7 +122,7 @@ public class CarAnalysisIndexController{
 			JSONObject responseObject = null;
 			try {
 				// 数据权限设置
-				paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,null,null,allianceId);
+				paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,null,allianceId,null);
 				if(paramMap==null){
 					return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 				}
