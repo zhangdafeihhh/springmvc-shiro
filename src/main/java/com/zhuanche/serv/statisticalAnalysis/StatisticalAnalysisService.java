@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.sun.tools.extcheck.Main;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.http.HttpClientUtil;
@@ -270,24 +271,23 @@ public class  StatisticalAnalysisService {
 				supplierIdsForAuth = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
 				teamIdsForAuth = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
 			}else{
+				logger.info("获取当前登录用户信息null");
 				return null;
-			}
-			for(Integer cId : cityIdsForAuth){
-				logger.info("获取当前登录用户信息cId:"+cId);
 			}
 			if (cityIdsForAuth.size() > 0 && cityId != null && !cityIdsForAuth.contains(cityId)) {
+				logger.info("cityIdsForAuth="+(cityIdsForAuth==null?"null":JSON.toJSONString(cityIdsForAuth))
+						+";cityId="+cityId);
 				return null;
-			}
-			for(Integer sId : supplierIdsForAuth){
-				logger.info("获取当前登录用户信息sId:"+sId);
-			}
+			} 
 			if (supplierIdsForAuth.size() > 0 && StringUtils.isNotBlank(supplier) && !supplierIdsForAuth.contains(supplier)) {
+				logger.info("supplierIdsForAuth="+(supplierIdsForAuth==null?"null":JSON.toJSONString(supplierIdsForAuth))
+						+";supplier="+supplier);
 				return null;
 			}
-			for(Integer tId : teamIdsForAuth){
-				logger.info("获取当前登录用户信息tId:"+tId);
-			}
+			 
 			if (teamIdsForAuth.size() > 0 && StringUtils.isNotBlank(teamId) && !teamIdsForAuth.contains(teamId)) {
+				logger.info("teamIdsForAuth="+(teamIdsForAuth==null?"null":JSON.toJSONString(teamIdsForAuth))
+						+";teamId="+teamId);
 				return null;
 			}
 		}
@@ -340,4 +340,5 @@ public class  StatisticalAnalysisService {
 		}*/
 		return paramMap;
 	}
+	
 }
