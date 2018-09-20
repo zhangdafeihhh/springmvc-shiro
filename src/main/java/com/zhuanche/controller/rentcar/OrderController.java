@@ -278,11 +278,11 @@ public class OrderController{
 		List<CarBizOrderWaitingPeriod>  carBizOrderWaitingPeriodList = this.carFactOrderInfoService.selectWaitingPeriodListSlave(order.getOrderNo());
 		order.setCarBizOrderWaitingPeriodList(carBizOrderWaitingPeriodList);
 		
-		CopyBeanUtil.copyByIgnoreCase(orderDTO,order,true);
+		//CopyBeanUtil.copyByIgnoreCase(orderDTO,order,true);
 		float excTime=(float)(endTime-startTime)/1000;
 		logger.info("*****************查询订单详情 耗时+"+excTime);
-		if(orderDTO!=null){
-			return AjaxResponse.success(orderDTO);
+		if(order!=null){
+			return AjaxResponse.success(order);
 		}else{
 			return AjaxResponse.failMsg(500,"内部错误");
 		}
