@@ -125,8 +125,8 @@ public class CarAnalysisIndexController{
 				}
 				if(StringUtil.isNotEmpty(carGroupId)){
 					// 车辆类型  ??
-					String[] visibleVehicleTypeIdsStr = carGroupId.split(",");
-					paramMap.put("visibleVehicleTypeIds", visibleVehicleTypeIdsStr); // 可见车辆类型ID
+					String[] carGroupIdArray = carGroupId.split(",");
+					paramMap.put("carGroupId", carGroupIdArray); // 可见车辆类型ID
 				}
 				// 从大数据仓库获取统计数据
 				HttpHeaders headers = new HttpHeaders();
