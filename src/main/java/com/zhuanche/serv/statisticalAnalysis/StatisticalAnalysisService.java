@@ -260,7 +260,7 @@ public class  StatisticalAnalysisService {
 		Set<Integer> cityIdsForAuth = new HashSet<Integer>();// 非超级管理员可以管理的所有城市ID
 		Set<Integer> supplierIdsForAuth = new HashSet<Integer>();// 非超级管理员可以管理的所有供应商ID
 		Set<Integer> teamIdsForAuth = new HashSet<Integer>();// 非超级管理员可以管理的可见的车队信息
-		logger.info("非超级管理员:"+WebSessionUtil.isSupperAdmin());
+		logger.info("非超级管理员:"+WebSessionUtil.isSupperAdmin()+"cityId:"+cityId+",supplier:"+supplier+",teamId:"+teamId);
 		if (!WebSessionUtil.isSupperAdmin()) {// 非超级管理员
 			// 获取当前登录用户信息
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
@@ -272,11 +272,20 @@ public class  StatisticalAnalysisService {
 			}else{
 				return null;
 			}
+			for(Integer cId : cityIdsForAuth){
+				logger.info("获取当前登录用户信息cId:"+cId);
+			}
 			if (cityIdsForAuth.size() > 0 && cityId != null && !cityIdsForAuth.contains(cityId)) {
 				return null;
 			}
+			for(Integer sId : supplierIdsForAuth){
+				logger.info("获取当前登录用户信息sId:"+sId);
+			}
 			if (supplierIdsForAuth.size() > 0 && StringUtils.isNotBlank(supplier) && !supplierIdsForAuth.contains(supplier)) {
 				return null;
+			}
+			for(Integer tId : teamIdsForAuth){
+				logger.info("获取当前登录用户信息tId:"+tId);
 			}
 			if (teamIdsForAuth.size() > 0 && StringUtils.isNotBlank(teamId) && !teamIdsForAuth.contains(teamId)) {
 				return null;
