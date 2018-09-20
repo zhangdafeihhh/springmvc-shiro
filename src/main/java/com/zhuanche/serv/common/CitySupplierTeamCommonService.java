@@ -240,11 +240,7 @@ public class CitySupplierTeamCommonService {
             if( WebSessionUtil.isSupperAdmin() ) {
                 teamIds.clear();
             }else {
-                if(Check.NuNCollection(teamIds)){
-                    teamIds.clear();
-                }else{
-                    teamIds.addAll( permOfTeam );
-                }
+                teamIds.addAll( permOfTeam );
             }
         }
         paramRequest.setCityIds(cityIds);
