@@ -128,9 +128,13 @@ public class OrderController{
          */
 	     paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,supplierId,teamId);
 	     if(paramMap.get("visibleAllianceIds")!=null){
+	    	 logger.info("visibleAllianceIds"+paramMap.get("visibleAllianceIds"));
+	    	 logger.info("visibleAllianceIdstoString"+paramMap.get("visibleAllianceIds").toString());
 			 paramMap.put("supplierIdBatch", paramMap.get("visibleAllianceIds").toString().replaceAll("/[/]", "")); // 可见加盟商ID
 		}
 		if(paramMap.get("visibleMotorcadeIds")!=null){
+			logger.info("visibleMotorcadeIds"+paramMap.get("visibleMotorcadeIds"));
+	    	 logger.info("visibleMotorcadeIdstoString"+paramMap.get("visibleMotorcadeIds").toString());
 			paramMap.put("teamIdBatch", paramMap.get("visibleMotorcadeIds").toString().replaceAll("/[/]", "")); // 可见车队ID
 		}
 		if(paramMap.get("visibleCityIds")!=null){
@@ -141,6 +145,17 @@ public class OrderController{
 	     return result;
 	 }
 	 
+	 
+	 public String arrayToStr(String v[]){
+		 String temp = "";
+		 for(String str : v){
+			 temp+=str+",";
+		 }
+		 if(!"".equals(temp)){
+			 temp=temp.substring(0, temp.length()-1);
+		 }
+		 return temp;
+	 }
 	 
 		/**
 	    * 订单 列表导出
