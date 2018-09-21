@@ -56,4 +56,15 @@
     </foreach>
   </update>
 
+  <update id="updateDriverDutyTimeInfoOne" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDutyTimeInfo">
+      UPDATE driver_duty_time_info
+      <set>
+        must_duty_time = #{mustDutyTime},
+        duty_time = #{dutyTime}
+      </set>
+      WHERE
+      id = #{id}
+
+  </update>
+
 </mapper>

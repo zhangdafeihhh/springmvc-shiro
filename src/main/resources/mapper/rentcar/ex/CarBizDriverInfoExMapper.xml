@@ -103,7 +103,6 @@
     <result column="group_id" property="groupId" jdbcType="INTEGER" />
   </resultMap>
   <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.dto.rentcar.CarBizDriverInfoDTO" extends="BaseResultMap" >
-    <result column="english_name" property="englishName" jdbcType="VARCHAR" />
     <result column="contract_type" property="contractType" jdbcType="VARCHAR" />
     <result column="contract_no" property="contractNo" jdbcType="VARCHAR" />
     <result column="contract_file" property="contractFile" jdbcType="VARCHAR" />
@@ -130,7 +129,7 @@
     assessment, driverLicenseIssuingDateStart, driverLicenseIssuingDateEnd, driverLicenseIssuingCorp, 
     driverLicenseIssuingNumber, xy_driver_number, driver_license_issuing_register_date, 
     driver_license_issuing_first_date, driver_license_issuing_grant_date, birth_day, 
-    house_hold_register_permanent, is_upload_card, is_must_confirmation, english_name,
+    house_hold_register_permanent, is_upload_card, is_must_confirmation,
     contract_type, contract_no, contract_file, cooperation_type, account_type, group_id,
     is_two_shifts, is_image,
     house_hold_register_permanent, is_upload_card, is_must_confirmation,
@@ -313,6 +312,7 @@
     i.gender gender,
     i.NAME,
     g.group_name AS carGroupName,
+    c.city_name AS serviceCity,
     i.license_plates AS licensePlates,
     i.supplier_id supplieId,
     p.supplier_full_name AS supplierName,
@@ -363,13 +363,13 @@
       and i.phone LIKE '%${phone}%'
     </if>
     <if test="cityIds!=null and cityIds.size()>0">
-      and c.city_id IN
+      and i.service_city IN
       <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
         #{cid}
       </foreach>
     </if>
     <if test="supplierIds!=null and supplierIds.size()>0">
-      and p.supplier_id IN
+      and i.supplier_id IN
       <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
         #{sid}
       </foreach>
@@ -381,13 +381,13 @@
   <sql id="allBaseColumnWhereList" >
     <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR" >
       <if test="phone != null and phone != ''" >
-        and phone = #{phone,jdbcType=VARCHAR}
+        and phone LIKE '%${phone}%'
       </if>
       <if test="name != null and name != ''" >
-        and name = #{name,jdbcType=VARCHAR}
+        and name LIKE CONCAT(#{name},'%')
       </if>
       <if test="licensePlates != null and licensePlates != ''" >
-        and license_plates = #{licensePlates,jdbcType=VARCHAR}
+        and license_plates LIKE '%${licensePlates}%'
       </if>
       <if test="status != null" >
         and status = #{status,jdbcType=INTEGER}
@@ -443,7 +443,7 @@
     <include refid="Blob_Column_List" />
     from car_biz_driver_info
     <include refid="allBaseColumnWhereList"/>
-    order by create_date desc
+    order by update_date desc
   </select>
   <select id="checkPhone" resultType="java.lang.Integer" >
     select count(*)
@@ -742,9 +742,6 @@
       </if>
       <if test="isMustConfirmation != null" >
         is_must_confirmation,
-      </if>
-      <if test="englishName != null" >
-        english_name,
       </if>
       <if test="contractType != null" >
         contract_type,
@@ -1051,9 +1048,6 @@
       <if test="isMustConfirmation != null" >
         #{isMustConfirmation,jdbcType=INTEGER},
       </if>
-      <if test="englishName != null" >
-        #{englishName,jdbcType=VARCHAR},
-      </if>
       <if test="contractType != null" >
         #{contractType,jdbcType=VARCHAR},
       </if>
@@ -1266,8 +1260,8 @@
       <if test="foreignlanguage != null" >
         foreignLanguage = #{foreignlanguage,jdbcType=VARCHAR},
       </if>
-      <if test="address != null" >
-        address = #{address,jdbcType=VARCHAR},
+      <if test="currentAddress != null" >
+        address = #{currentAddress,jdbcType=VARCHAR},
       </if>
       <if test="education != null" >
         education = #{education,jdbcType=VARCHAR},
@@ -1361,9 +1355,6 @@
       </if>
       <if test="isMustConfirmation != null" >
         is_must_confirmation = #{isMustConfirmation,jdbcType=INTEGER},
-      </if>
-      <if test="englishName != null" >
-        english_name = #{englishName,jdbcType=VARCHAR},
       </if>
       <if test="contractType != null" >
         contract_type = #{contractType,jdbcType=VARCHAR},
@@ -1480,4 +1471,16 @@
     SET uickpay_customerid = #{quickpayCustomerID}
     WHERE driver_id = #{driverID}
   </update>
+  
+  
+  <select id="querySupplierIdAndNameByDriverId" parameterType="java.lang.Integer" resultType="com.zhuanche.dto.rentcar.CarBizDriverInfoDTO">
+		SELECT
+		name ,
+		phone,
+		supplier_id AS supplierId
+		FROM
+		car_biz_driver_info
+		where driver_id = #{driverId}
+   </select>
+  
 </mapper>

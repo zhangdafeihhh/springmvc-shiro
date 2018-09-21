@@ -35,7 +35,15 @@ public class CarDutyDuration implements Serializable{
 
     private String remark;
 
-    private Boolean status;
+    private Integer status;
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
 
     public Integer getId() {
         return id;
@@ -149,11 +157,4 @@ public class CarDutyDuration implements Serializable{
         this.remark = remark == null ? null : remark.trim();
     }
 
-    public Boolean getStatus() {
-        return status;
-    }
-
-    public void setStatus(Boolean status) {
-        this.status = status;
-    }
 }

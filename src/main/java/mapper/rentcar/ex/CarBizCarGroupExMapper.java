@@ -4,9 +4,9 @@ import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CarBizCarGroupExMapper {
-
     CarBizCarGroup queryGroupByGroupName (@Param("groupName") String groupName);
     /**
      * 根据groupId查询
@@ -23,4 +23,9 @@ public interface CarBizCarGroupExMapper {
      * @return
      */
     List<CarBizCarGroup> queryCarGroupList(@Param("type") Integer type);
+    /**
+     */
+    public String getGroupNameByGroupId(Integer groupId);
+
+    List<CarBizCarGroup> queryGroupNameList();
 }

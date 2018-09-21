@@ -84,7 +84,7 @@ public class DriverTeamController{
 		if(result >0){
 			return AjaxResponse.success(result);
 		}else{
-			return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+			return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
 		}
 	}
 
@@ -215,8 +215,8 @@ public class DriverTeamController{
 	public AjaxResponse queryAddDriverList(DriverTeamRequest param){
 		logger.info("查询可添加司机列表入参:"+ JSON.toJSONString(param));
 		SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-		if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
-			return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
+		if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId()) ||Check.NuNStr(param.getCityId()) || Check.NuNStr(param.getSupplierId())){
+			return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
 		}
 		PageDTO pageDTO = carDriverTeamService.selectAddDriverList(param);
 		return AjaxResponse.success(pageDTO);
@@ -239,7 +239,6 @@ public class DriverTeamController{
 		record.setId(paramId);
 		record.setDutyStartDate(dutyStartDate);
 		record.setDutyEndDate(dutyEndDate);
-		DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
 		int result = carDriverTeamService.updateTeamDuty(record);
 		if(result > 0 ){
 			return AjaxResponse.success(result);

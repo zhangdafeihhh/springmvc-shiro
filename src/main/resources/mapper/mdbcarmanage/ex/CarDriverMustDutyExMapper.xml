@@ -15,9 +15,37 @@
     <result column="update_by" property="updateBy" jdbcType="INTEGER" />
     <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
-    <result column="status" property="status" jdbcType="BIT" />
+    <result column="status" property="status" jdbcType="INTEGER" />
     <result column="team_id" property="teamId" jdbcType="INTEGER" />
   </resultMap>
+
+  <select id="selectDriverMustDutyDetail" parameterType="com.zhuanche.request.DutyParamRequest" resultType="com.zhuanche.dto.driverDuty.CarDriverMustDutyDTO">
+    select
+    d.id,
+    d.city,
+    d.city_name cityName,
+    d.supplier,
+    d.supplier_name supplierName,
+    d.startDate,
+    d.endDate,
+    d.create_by createBy,
+    d.create_date createDate,
+    d.update_by updateBy,
+    d.update_date updateDate,
+    d.remark,
+    d.status,
+    d.peak_times peakTimes,
+    u1.user_name createName,
+    u2.user_name updateName,
+    t3.team_name teamName,
+    d.team_id teamId
+    from car_driver_must_duty d
+    left join car_adm_user u1 on d.create_by=u1.user_id
+    left join car_adm_user u2 on d.update_by=u2.user_id
+    left JOIN car_driver_team t3 on d.team_id = t3.id
+    where 1=1
+    and d.id = #{id}
+  </select>
 
   <!-- 查询供应商下强制上班时间信息 -->
   <select id="selectDriverMustDutyListByField" parameterType="com.zhuanche.request.DutyParamRequest" resultType="com.zhuanche.dto.driverDuty.CarDriverMustDutyDTO" >
@@ -64,7 +92,7 @@
     left join car_adm_user u1 on d.create_by=u1.user_id
     left join car_adm_user u2 on d.update_by=u2.user_id
     left JOIN car_driver_team t3 on d.team_id = t3.id
-    where 1=1
+    where 1=1 and t3.status!=2
     <if test="forcedIds !=null and forcedIds !='' ">
       and d.id in (#{forcedIds})
     </if>

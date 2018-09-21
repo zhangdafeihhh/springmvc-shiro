@@ -31,6 +31,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -86,14 +87,22 @@ public class CarDriverDurationService {
 		}
 		try{
 			CommonRequest commonRequest = new CommonRequest();
-			BeanUtils.copyProperties(dutyParamRequest,commonRequest);
+			if(!Check.NuNObj(dutyParamRequest.getCityId())){
+				commonRequest.setCityId(String.valueOf(dutyParamRequest.getCityId()));
+			}
+			if(!Check.NuNObj(dutyParamRequest.getSupplierId())){
+				commonRequest.setSupplierId(String.valueOf(dutyParamRequest.getSupplierId()));
+			}
+			if(!Check.NuNObj(dutyParamRequest.getTeamId())){
+				commonRequest.setTeamId(dutyParamRequest.getTeamId());
+			}
 			CommonRequest resultParmam = citySupplierTeamCommonService.paramDeal(commonRequest);
 			if(Check.NuNObj(resultParmam)){
 				return new PageDTO();
 			}
 			dutyParamRequest.setCityIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getCityIds()));
 			dutyParamRequest.setSupplierIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getSupplierIds()));
-			dutyParamRequest.setSupplierIds(resultParmam.getTeamIds());
+			dutyParamRequest.setTeamIds(resultParmam.getTeamIds());
 			PageInfo<CarDriverDurationDTO> pageInfo = PageHelper.startPage(dutyParamRequest.getPageNo(), dutyParamRequest.getPageSize(), true).doSelectPageInfo(()
 					-> carDutyDurationExMapper.selectDutyDurationList(dutyParamRequest));
 			PageDTO pageDTO = new PageDTO();
@@ -115,11 +124,6 @@ public class CarDriverDurationService {
 	* @Author: lunan
 	* @Date: 2018/9/3 
 	*/
-	@SuppressWarnings("unchecked")
-	@MasterSlaveConfigs(configs={
-			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE ),
-			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-	} )
 	public int saveOrUpdateCarDriverDuration(CarDutyDuration carDutyDuration){
 		if(Check.NuNObj(carDutyDuration)
 				|| Check.NuNObj(carDutyDuration.getCity())
@@ -154,8 +158,9 @@ public class CarDriverDurationService {
 				upRecord.setStartDate(carDutyDuration.getStartDate());
 				upRecord.setEndDate(carDutyDuration.getEndDate());
 				upRecord.setRemark(carDutyDuration.getRemark());
+				upRecord.setStatus(carDutyDuration.getStatus());
 				upRecord.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
-				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
+				upRecord.setUpdateDate(new Date());
 				return carDutyDurationMapper.updateByPrimaryKeySelective(upRecord);
 			}else{
 				Set<Integer> cityId = new HashSet<>();
@@ -173,7 +178,7 @@ public class CarDriverDurationService {
 				}
 				carDutyDuration.setSupplierName(supplierDetail.getSupplierFullName());
 				carDutyDuration.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
-				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",DynamicRoutingDataSource.DataSourceMode.MASTER);
+				carDutyDuration.setCreateDate(new Date());
 				return carDutyDurationMapper.insertSelective(carDutyDuration);
 			}
 		}catch (Exception e){

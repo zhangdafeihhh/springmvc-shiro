@@ -66,6 +66,7 @@ public class DriverOrderInfoController {
             HttpEntity<String> formEntity = new HttpEntity<String>(JSON.toJSONString(param), headers);
             RestTemplate restTemplate = new RestTemplate();
             JSONObject responseObject = restTemplate.postForObject(bigDataSaasUrl+url, formEntity, JSONObject.class);
+            logger.info("监控-指标汇总查询接口-httpUrl:"+bigDataSaasUrl+url+";返回结果为=" + (responseObject == null?"null":responseObject.toJSONString()));
             if (responseObject != null) {
                 Integer code = responseObject.getInteger("code");
                 if (code == 0) {

@@ -80,13 +80,16 @@
     SELECT driver_id
     FROM car_relate_team
     WHERE team_id = #{teamId}
-    <if test="teamIds!=null and teamIds.size()>0">
-      and team_id IN
-      <foreach collection="teamIds" open="(" close=")" separator="," item="tid" >
-        #{tid}
-      </foreach>
-    </if>
   </select>
+    <!--查询所给车队ID下的所有司机ID-->
+    <select id="queryDriverIdsByTeamIdss" resultType="java.lang.Integer" >
+        SELECT driver_id
+        FROM car_relate_team
+        WHERE team_id IN
+            <foreach collection="teamIds" open="(" close=")" separator="," item="tid" >
+                #{tid}
+            </foreach>
+    </select>
 
   <select id="queryForListObjectGroupNoLimit" parameterType="java.lang.String" resultType="com.zhuanche.entity.mdbcarmanage.CarRelateGroup">
 		SELECT

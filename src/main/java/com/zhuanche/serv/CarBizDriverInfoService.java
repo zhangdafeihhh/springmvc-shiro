@@ -18,6 +18,7 @@ import com.zhuanche.entity.mdbcarmanage.*;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.mongo.DriverMongo;
+import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.serv.mdbcarmanage.CarBizDriverUpdateService;
 import com.zhuanche.serv.mongo.DriverMongoService;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -26,6 +27,7 @@ import com.zhuanche.util.Common;
 import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.ValidateUtils;
 import com.zhuanche.util.encrypt.MD5Utils;
+import lombok.AllArgsConstructor;
 import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.mdbcarmanage.CarDriverTeamMapper;
 import mapper.mdbcarmanage.CarRelateGroupMapper;
@@ -145,6 +147,10 @@ public class CarBizDriverInfoService {
 
     @Autowired
     private DriverMongoService driverMongoService;
+
+    @Autowired
+    private CarDriverTeamService carDriverTeamService;
+
 
     /**
      * 查询司机信息列表展示
@@ -379,6 +385,7 @@ public class CarBizDriverInfoService {
             carBizDriverInfo.setPassword(getPassword(carBizDriverInfo.getIdCardNo()));
 
             // 插入司机信息到mysql，mongo
+            DynamicRoutingDataSource.setMasterSlave("rentcar-DataSource", DataSourceMode.MASTER);
             int n = this.saveDriverInfo(carBizDriverInfo);
             driverMongoService.saveDriverMongo(carBizDriverInfo);
 
@@ -740,11 +747,15 @@ public class CarBizDriverInfoService {
             if(stringObjectMap!=null){
                 if(stringObjectMap.containsKey("teamId") && stringObjectMap.get("teamId")!=null ){
                     carBizDriverInfo.setTeamId(Integer.parseInt(stringObjectMap.get("teamId").toString()));
+                }
+                if(stringObjectMap.containsKey("teamName") && stringObjectMap.get("teamName")!=null ){
                     carBizDriverInfo.setTeamName(stringObjectMap.get("teamName").toString());
                 }
                 if(stringObjectMap.containsKey("teamGroupId") && stringObjectMap.get("teamGroupId")!=null ){
                     carBizDriverInfo.setTeamId(Integer.parseInt(stringObjectMap.get("teamGroupId").toString()));
-                    carBizDriverInfo.setTeamName(stringObjectMap.get("teamGroupName").toString());
+                }
+                if(stringObjectMap.containsKey("teamGroupName") && stringObjectMap.get("teamGroupName")!=null ){
+                    carBizDriverInfo.setTeamGroupName(stringObjectMap.get("teamGroupName").toString());
                 }
             }
 
@@ -775,6 +786,7 @@ public class CarBizDriverInfoService {
         String resultError1 = "-1";//模板错误
         String resultErrorMag1 = "导入模板格式错误!";
         List<CarImportExceptionEntity> listException = Lists.newArrayList(); // 数据错误原因
+        int count = 0;
 
         String fileName = file.getOriginalFilename();
         String suffixName = fileName.substring(fileName.lastIndexOf("."));
@@ -1165,9 +1177,9 @@ public class CarBizDriverInfoService {
 
             int minRowIx = 1;// 过滤掉标题，从第一行开始导入数据
             int maxRowIx = sheet.getLastRowNum(); // 要导入数据的总条数
-            int successCount = 0;// 成功导入条数
 
             for (int rowIx = minRowIx; rowIx <= maxRowIx; rowIx++) {
+                count ++;
                 Row row = sheet.getRow(rowIx); // 获取行对象
                 if (row == null) {
                     continue;
@@ -1829,7 +1841,7 @@ public class CarBizDriverInfoService {
                                         isTrue = false;
                                     } else {
                                         d = DATE_FORMAT.format(DATE_FORMAT.parse(d));
-                                        carBizDriverInfoDTO.setFirstmeshworkdrivinglicensedate(d);
+                                        carBizDriverInfoDTO.setFirstdrivinglicensedate(d);
                                     }
                                 } else {
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -2416,7 +2428,7 @@ public class CarBizDriverInfoService {
                         }
                     }
 
-                    //TODO 保存司机信息
+                    //保存司机信息
                     Map<String, Object> stringObjectMap = this.saveDriver(carBizDriverInfoDTO);
                     if (stringObjectMap != null && stringObjectMap.containsKey("result") && (int)stringObjectMap.get("result")==1) {
                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -2437,44 +2449,36 @@ public class CarBizDriverInfoService {
                 }
             }
         }
-
-        String download = "";
         try {
             // 将错误列表导出
             if(listException.size() > 0) {
-//                Workbook wb = Common.exportExcel(request.getServletContext().getRealPath("/")+ "template" + File.separator + "car_exception.xlsx", listException);
-//                download = Common.exportExcelFromTempletToLoacl(request, wb,new String("ERROR".getBytes("utf-8"), "iso8859-1") );
-//                Componment.fileDownload(response, wb, new String("司机导入错误信息".getBytes("utf-8"), "iso8859-1"));
                 StringBuilder errorMsg = new StringBuilder();
                 for (CarImportExceptionEntity entity:listException){
                     errorMsg.append(entity.getReson()).append(";");
                 }
                 resultMap.put("result", "0");
-                resultMap.put("msg", "有错误信息");
-                resultMap.put("download", errorMsg);
+                resultMap.put("msg", errorMsg);
                 return resultMap;
             }
         }catch(Exception e){
             e.printStackTrace();
         }
-//        if (!"".equals(download) && download != null) {
-//            resultMap.put("result", 0);
-//            resultMap.put("msg", "有错误信息");
-//            resultMap.put("download", download);
-//        } else {
-//            resultMap.put("result", 1);
-//            resultMap.put("msg", "成功");
-//            resultMap.put("download", "");
-//        }
-        resultMap.put("result", "1");
-        resultMap.put("msg", "成功");
+        if(count==0){
+            resultMap.put("result", "0");
+            resultMap.put("msg", "表中没有数据，请检查");
+        }else {
+            resultMap.put("result", "1");
+            resultMap.put("msg", "成功");
+        }
         return resultMap;
     }
 
     /*
      * 导出司机信息操作
      */
-    public Workbook exportExcel(List<CarBizDriverInfoDTO> list , String path) throws Exception{
+    public Workbook exportExcel(List<CarBizDriverInfoDTO> list, Integer cityId,Integer supplierId, String path) throws Exception{
+
+        long start=System.currentTimeMillis(); //获取开始时间
 
         FileInputStream io = new FileInputStream(path);
         // 创建 excel
@@ -2488,7 +2492,33 @@ public class CarBizDriverInfoService {
             }
             Cell cell = null;
             int i=0;
+
+            // 根据供应商ID查询供应商名称以及加盟类型
+            CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(supplierId);
+            String supplierName = "";
+            String cityName = "";
+            if (carBizSupplier != null) {
+                supplierName = carBizSupplier.getSupplierFullName();
+            }
+            // 根据城市ID查找城市名称
+            CarBizCity carBizCity = carBizCityService.selectByPrimaryKey(cityId);
+            if (carBizCity != null) {
+                cityName = carBizCity.getCityName();
+            }
+            Map<Integer, String> teamMap = null;
+            Map<Integer, String> groupMap = null;
+            try {
+                teamMap = carDriverTeamService.queryDriverTeamList(cityId, supplierId);
+                groupMap = carBizCarGroupService.queryGroupNameMap();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             for(CarBizDriverInfoDTO s:list){
+
+                // 查询城市名称，供应商名称，服务类型，加盟类型
+//                this.getBaseStatis(s);
+
                 Row row = sheet.createRow(i + 1);
                 // 车牌号
                 cell = row.createCell(0);
@@ -2524,20 +2554,24 @@ public class CarBizDriverInfoService {
                 cell = row.createCell(10);
                 cell.setCellValue(s.getSuperintendUrl()!=null?""+s.getSuperintendUrl()+"":"");
                 // 车型类别
+                String groupName = "";
+                if(groupMap!=null){
+                    groupName = groupMap.get(s.getGroupId());
+                }
                 cell = row.createCell(11);
-                cell.setCellValue(s.getCarGroupName()!=null?""+s.getCarGroupName()+"":"");
+                cell.setCellValue(groupName);
                 // 驾照类型
                 cell = row.createCell(12);
                 cell.setCellValue(s.getDrivingLicenseType()!=null?""+s.getDrivingLicenseType()+"":"");
                 // 驾照领证日期
                 cell = row.createCell(13);
-                cell.setCellValue(s.getIssueDate()!=null?""+s.getIssueDate()+"":"");
+                cell.setCellValue(DateUtil.getTimeString(s.getIssueDate()));
                 // 驾龄
                 cell = row.createCell(14);
                 cell.setCellValue(s.getDrivingYears()!=null?""+s.getDrivingYears()+"":"");
                 // 驾照到期时间
                 cell = row.createCell(15);
-                cell.setCellValue(s.getExpireDate()!=null?""+s.getExpireDate()+"":"");
+                cell.setCellValue(DateUtil.getTimeString(s.getExpireDate()));
                 // 档案编号
                 cell = row.createCell(16);
                 cell.setCellValue(s.getArchivesNo()!=null?""+s.getArchivesNo()+"":"");
@@ -2551,8 +2585,21 @@ public class CarBizDriverInfoService {
                 cell = row.createCell(19);
                 cell.setCellValue(s.getMarriage()!=null?""+s.getMarriage()+"":"");
                 // 驾驶员外语能力
+                String foreignlanguageName= "无";
+                String foreignLanguage = s.getForeignlanguage();
+                if(StringUtils.isNotEmpty(foreignLanguage)){
+                    if("1".equals(foreignLanguage)){
+                        foreignlanguageName = "英语";
+                    }else if("2".equals(foreignLanguage)){
+                        foreignlanguageName = "德语";
+                    }else if("3".equals(foreignLanguage)){
+                        foreignlanguageName = "法语";
+                    }else if("4".equals(foreignLanguage)){
+                        foreignlanguageName = "其他";
+                    }
+                }
                 cell = row.createCell(20);
-                cell.setCellValue(s.getForeignlanguage()!=null?""+s.getForeignlanguage()+"":"");
+                cell.setCellValue(foreignlanguageName);
                 // 驾驶员学历
                 cell = row.createCell(21);
                 cell.setCellValue(s.getEducation()!=null?""+s.getEducation()+"":"");
@@ -2633,16 +2680,24 @@ public class CarBizDriverInfoService {
                 cell.setCellValue(s.getEmergencycontactaddr()!=null?""+s.getEmergencycontactaddr()+"":"");
                 //供应商
                 cell = row.createCell(47);
-                cell.setCellValue(s.getSupplierName()!=null?""+s.getSupplierName()+"":"");
+                cell.setCellValue(supplierName);
                 //服务城市
                 cell = row.createCell(48);
-                cell.setCellValue(s.getServiceCity()!=null?""+s.getServiceCity()+"":"");
+                cell.setCellValue(cityName);
                 //车队
+                String teamName = "";
+                if(teamMap!=null){
+                    teamName = teamMap.get(s.getTeamId());
+                }
                 cell = row.createCell(49);
-                cell.setCellValue(s.getTeamName()!=null?""+s.getTeamName()+"":"");
+                cell.setCellValue(teamName);
                 //小组
+                String teamGroupName = "";
+                if(teamMap!=null){
+                    teamGroupName = teamMap.get(s.getTeamGroupId());
+                }
                 cell = row.createCell(50);
-                cell.setCellValue(s.getTeamGroupName()!=null?""+s.getTeamGroupName()+"":"");
+                cell.setCellValue(teamGroupName);
                 //司机id
                 cell = row.createCell(51);
                 cell.setCellValue(s.getDriverId()!=null?""+s.getDriverId()+"":"");
@@ -2653,6 +2708,8 @@ public class CarBizDriverInfoService {
                 i++;
             }
         }
+        long end=System.currentTimeMillis(); //获取结束时间
+        logger.info(LOGTAG + "司机导出cityId={},supplierId={}的写数据时间为={}ms", cityId, supplierId, (end-start));
         return wb;
     }
 

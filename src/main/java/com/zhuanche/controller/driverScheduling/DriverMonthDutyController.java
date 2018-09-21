@@ -132,8 +132,11 @@ public class DriverMonthDutyController {
     * @Date: 2018/9/4 
     */ 
     @ResponseBody
-    @RequestMapping(value = "/updateDriverMonthDutyData", method = { RequestMethod.POST })
+    @RequestMapping(value = "/updateDriverMonthDutyData")
     public AjaxResponse updateDriverMonthDutyData(DriverMonthDutyRequest param){
+        if(Check.NuNObj(param) || Check.NuNObj(param.getId()) || Check.NuNStr(param.getData())){
+            return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
+        }
         logger.info("修改司机上班状态入参:{}",JSON.toJSONString(param));
         CarDriverMonthDuty exists = this.driverMonthDutyService.selectByPrimaryKey(param.getId());
         if (Check.NuNObj(exists)) {
@@ -209,7 +212,9 @@ public class DriverMonthDutyController {
         }
         CommonRequest commonRequest = new CommonRequest();
         BeanUtils.copyProperties(param,commonRequest);
-        commonRequest.setTeamId(Integer.parseInt(param.getTeamId()));
+        if(!Check.NuNStr(param.getTeamId())){
+            commonRequest.setTeamId(Integer.parseInt(param.getTeamId()));
+        }
         CommonRequest data = commonService.paramDeal(commonRequest);
         if(Check.NuNObj(data)){
             logger.error("没有权限操作,用户："+JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));
@@ -250,7 +255,9 @@ public class DriverMonthDutyController {
             tabelHeader = (Map<String, Object>)result.get("Rows");
             CommonRequest commonRequest = new CommonRequest();
             BeanUtils.copyProperties(param,commonRequest);
-            commonRequest.setTeamId(Integer.parseInt(param.getTeamId()));
+            if(!Check.NuNStr(param.getTeamId())){
+                commonRequest.setTeamId(Integer.parseInt(param.getTeamId()));
+            }
             CommonRequest data = commonService.paramDeal(commonRequest);
             if(Check.NuNObj(data)){
                 logger.error("没有权限操作,用户："+JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));

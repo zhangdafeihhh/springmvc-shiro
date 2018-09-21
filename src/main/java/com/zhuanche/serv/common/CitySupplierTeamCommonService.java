@@ -70,6 +70,9 @@ public class CitySupplierTeamCommonService {
         try{
             Set<Integer> resultSet = new HashSet<>();
             for (String str : srcList) {
+                if(Check.NuNStr(str)){
+                    continue;
+                }
                 resultSet.add(Integer.parseInt(str));
             }
             return resultSet;
@@ -86,6 +89,9 @@ public class CitySupplierTeamCommonService {
         try{
             Set<String> resultSet = new HashSet<>();
             for (Integer parmam : srcList) {
+                if(Check.NuNObj(parmam)){
+                    continue;
+                }
                 resultSet.add(String.valueOf(parmam));
             }
             return resultSet;
@@ -178,13 +184,15 @@ public class CitySupplierTeamCommonService {
             permOfSupplier = WebSessionUtil.getCurrentLoginUser().getSupplierIds();
             permOfTeam     = WebSessionUtil.getCurrentLoginUser().getTeamIds();
             if( permOfCity.size()!=0
-                    && permOfCity.contains(Integer.valueOf(paramRequest.getCityId()))==false ) {
+                    && (!Check.NuNObj(paramRequest.getCityId()) && permOfCity.contains(Integer.valueOf(paramRequest.getCityId()))==false )) {
                 return null;
             }
-            if( permOfSupplier.size()!=0 && permOfSupplier.contains(Integer.valueOf(paramRequest.getSupplierId()))==false  ) {
+            if( permOfSupplier.size()!=0 &&
+                    (!Check.NuNObj(paramRequest.getSupplierId()) && permOfSupplier.contains(Integer.valueOf(paramRequest.getSupplierId()))==false ) ) {
                 return null;
             }
-            if( permOfTeam.size()!=0 && permOfTeam.contains(Integer.valueOf(paramRequest.getTeamId())) == false ) {
+            if( permOfTeam.size()!=0
+                    && (!Check.NuNObj(paramRequest.getTeamId()) &&permOfTeam.contains(Integer.valueOf(paramRequest.getTeamId())) == false )) {
 //				return LayUIPage.build("您没有查询此车队的权限！", 0, null);
                 return null;
             }
@@ -232,11 +240,7 @@ public class CitySupplierTeamCommonService {
             if( WebSessionUtil.isSupperAdmin() ) {
                 teamIds.clear();
             }else {
-                if(Check.NuNCollection(teamIds)){
-                    teamIds.clear();
-                }else{
-                    teamIds.addAll( permOfTeam );
-                }
+                teamIds.addAll( permOfTeam );
             }
         }
         paramRequest.setCityIds(cityIds);
@@ -309,6 +313,13 @@ public class CitySupplierTeamCommonService {
      * @Date: 2018/8/29
      */
     public List<CarDriverTeam> queryDriverTeamList(Integer cityId, Integer supplierId){
+
+        if(Check.NuNObj(cityId) && !Check.NuNObj(supplierId)){
+            Set<String> supplierIds = new HashSet<String>(2);
+            supplierIds.add(String.valueOf(supplierId));
+            return carDriverTeamExMapper.queryDriverTeam(null, supplierIds, null);
+        }
+
         if(cityId==null || cityId.intValue()<=0 || supplierId==null || supplierId.intValue()<=0) {
             return new ArrayList<CarDriverTeam>();
         }
@@ -344,6 +355,34 @@ public class CitySupplierTeamCommonService {
         }
     }
 
+    
+
+    /**
+     * @Desc: 根据一个城市ID ，查询车队列表（超级管理员可以查询出所有车队、普通管理员只能查询自己数据权限内的车队）
+     * @param:
+     * @return:
+     * @Author: lunan
+     * @Date: 2018/8/29
+     */
+    public List<CarDriverTeam> queryDriverTeamList(Integer cityId){
+        if(cityId==null || cityId.intValue()<=00) {
+            return new ArrayList<CarDriverTeam>();
+        }
+        //进行查询 (区分 超级管理员 、普通管理员 )
+        Set<String> cityIds = new HashSet<String>(2);
+        cityIds.add(String.valueOf(cityId));
+        if( WebSessionUtil.isSupperAdmin() ) {
+            return carDriverTeamExMapper.queryDriverTeam(cityIds,  null , null);
+        }else {
+            Set<Integer> teamIds = WebSessionUtil.getCurrentLoginUser().getTeamIds();
+            if(teamIds.size()==0 ) {
+                return carDriverTeamExMapper.queryDriverTeam(cityIds, null, null);
+            }
+            return carDriverTeamExMapper.queryDriverTeam(cityIds, null, teamIds);
+        }
+    }
+    
+    
     /** 根据车队id查询小组*/
     public List<CarDriverTeam> queryTeamsById(Integer teamId){
         if(Check.NuNObj(teamId)){

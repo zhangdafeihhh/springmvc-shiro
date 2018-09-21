@@ -174,8 +174,8 @@
   <select id="selectForList" resultMap="BaseExResultMap" parameterType="com.zhuanche.request.DutyParamRequest" >
     select
     <include refid="Base_Column_List" />
-    from car_driver_day_duty d
-    where 1=1
+    from car_driver_day_duty d LEFT JOIN car_driver_team t3 on d.team_id = t3.id
+    where 1=1 and t3.status!=2
     <if test="driverId!=null and driverId!=''">
       and d.driver_id = #{driverId}
     </if>
@@ -216,7 +216,7 @@
         #{tid}
       </foreach>
     </if>
-    order by d.city_id, d.id
+    order by d.time DESC
   </select>
 
   <update id="updateDriverDayDutyList" parameterType="java.util.Map">
@@ -240,6 +240,27 @@
       WHERE
       id = #{item.id}
     </foreach>
+  </update>
+
+  <update id="updateDriverDayDutyOne" parameterType="com.zhuanche.dto.driver.CarDriverDayDutyDTO">
+      UPDATE car_driver_day_duty
+      <set>
+        driver_name = #{driverName},
+        city_id = #{cityId},
+        city_name = #{cityName},
+        supplier_id = #{supplierId},
+        supplier_name = #{supplierName},
+        team_id = #{teamId},
+        team_name = #{teamName},
+        forced_ids = #{forcedIds},
+        duty_ids = #{dutyIds},
+        forced_times = #{forcedTimes},
+        duty_times = #{dutyTimes},
+        type = #{type},
+        status = #{status}
+      </set>
+      WHERE
+      id = #{id}
   </update>
 
 </mapper>

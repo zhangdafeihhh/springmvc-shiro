@@ -156,6 +156,9 @@ public class DriverInfoUpdateApplyController {
         if (StringUtils.isEmpty(driverPhoneNew) || !ValidateUtils.validatePhone(driverPhoneNew)) {
             return AjaxResponse.fail(RestErrorCode.DRIVER_PHONE_NOT_LEGAL);
         }
+        if(driverPhoneNew.equals(driverPhone)){
+            return AjaxResponse.fail(RestErrorCode.PHONE_NEW_SAME);
+        }
         //查询手机号是否存在
         Boolean had = carBizDriverInfoService.checkPhone(driverPhoneNew, null);
         if (had) {
@@ -172,6 +175,7 @@ public class DriverInfoUpdateApplyController {
         driverInfoUpdateApply.setDriverId(driverId);
         driverInfoUpdateApply.setDriverName(carBizDriverInfoDTO.getName());
         driverInfoUpdateApply.setDriverPhone(driverPhone);
+        driverInfoUpdateApply.setDriverPhoneNew(driverPhoneNew);
         driverInfoUpdateApply.setIdCardNo(carBizDriverInfoDTO.getIdCardNo());
         driverInfoUpdateApply.setLicensePlates(carBizDriverInfoDTO.getLicensePlates());
         driverInfoUpdateApply.setCityId(carBizDriverInfoDTO.getServiceCity());

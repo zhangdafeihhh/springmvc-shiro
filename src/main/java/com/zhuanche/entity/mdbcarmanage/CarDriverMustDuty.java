@@ -33,7 +33,7 @@ public class CarDriverMustDuty implements Serializable{
 
     private String remark;
 
-    private Boolean status;
+    private Integer status;
 
     private Integer teamId;
 
@@ -141,11 +141,11 @@ public class CarDriverMustDuty implements Serializable{
         this.remark = remark == null ? null : remark.trim();
     }
 
-    public Boolean getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(Boolean status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

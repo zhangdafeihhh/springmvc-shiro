@@ -15,7 +15,7 @@
     <result column="update_by" property="updateBy" jdbcType="INTEGER" />
     <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
-    <result column="status" property="status" jdbcType="BIT" />
+    <result column="status" property="status" jdbcType="INTEGER" />
     <result column="team_id" property="teamId" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
@@ -45,7 +45,7 @@
       #{supplierName,jdbcType=VARCHAR}, #{startDate,jdbcType=VARCHAR}, #{endDate,jdbcType=VARCHAR},
       #{peakTimes,jdbcType=INTEGER}, #{createBy,jdbcType=INTEGER}, #{createDate,jdbcType=TIMESTAMP}, 
       #{updateBy,jdbcType=INTEGER}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, 
-      #{status,jdbcType=BIT}, #{teamId,jdbcType=INTEGER})
+      #{status,jdbcType=INTEGER}, #{teamId,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverMustDuty" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
@@ -134,7 +134,7 @@
         #{remark,jdbcType=VARCHAR},
       </if>
       <if test="status != null" >
-        #{status,jdbcType=BIT},
+        #{status,jdbcType=INTEGER},
       </if>
       <if test="teamId != null" >
         #{teamId,jdbcType=INTEGER},
@@ -181,7 +181,7 @@
         remark = #{remark,jdbcType=VARCHAR},
       </if>
       <if test="status != null" >
-        status = #{status,jdbcType=BIT},
+        status = #{status,jdbcType=INTEGER},
       </if>
       <if test="teamId != null" >
         team_id = #{teamId,jdbcType=INTEGER},
@@ -203,7 +203,7 @@
       update_by = #{updateBy,jdbcType=INTEGER},
       update_date = #{updateDate,jdbcType=TIMESTAMP},
       remark = #{remark,jdbcType=VARCHAR},
-      status = #{status,jdbcType=BIT},
+      status = #{status,jdbcType=INTEGER},
       team_id = #{teamId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>

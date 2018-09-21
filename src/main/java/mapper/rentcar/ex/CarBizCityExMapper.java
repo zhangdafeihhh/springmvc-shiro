@@ -13,4 +13,6 @@ public interface CarBizCityExMapper{
 
     /** 根据城市名称查询城市id **/
     Integer queryCityByCityName(@Param("cityName") String cityName);
+    
+    CarBizCity queryCarBizCityById(CarBizCity params);
 }

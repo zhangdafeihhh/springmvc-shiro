@@ -97,9 +97,15 @@ public class CarDriverDutyService {
 		try{
 			/** 数据权限处理开始 */
 			CommonRequest commonRequest = new CommonRequest();
-			commonRequest.setCityId(String.valueOf(dutyParamRequest.getCityId()));
-			commonRequest.setSupplierId(String.valueOf(dutyParamRequest.getSupplierId()));
-			commonRequest.setTeamId(dutyParamRequest.getTeamId());
+			if(!Check.NuNObj(dutyParamRequest.getCityId())){
+				commonRequest.setCityId(String.valueOf(dutyParamRequest.getCityId()));
+			}
+			if(!Check.NuNObj(dutyParamRequest.getSupplierId())){
+				commonRequest.setSupplierId(String.valueOf(dutyParamRequest.getSupplierId()));
+			}
+			if(!Check.NuNObj(dutyParamRequest.getTeamId())){
+				commonRequest.setTeamId(dutyParamRequest.getTeamId());
+			}
 			CommonRequest resultParmam = citySupplierTeamCommonService.paramDeal(commonRequest);
 			dutyParamRequest.setCityIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getCityIds()));
 			dutyParamRequest.setSupplierIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getSupplierIds()));
@@ -146,11 +152,6 @@ public class CarDriverDutyService {
 	* @Author: lunan
 	* @Date: 2018/9/3
 	*/
-	@SuppressWarnings("unchecked")
-	@MasterSlaveConfigs(configs={
-			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE ),
-			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-	} )
 	public int issueDriverDuty(DutyParamRequest dutyParamRequest){
 		if(Check.NuNObj(dutyParamRequest)){
 			return 0;

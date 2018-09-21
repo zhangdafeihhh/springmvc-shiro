@@ -18,4 +18,6 @@ public interface DriverDutyTimeInfoExMapper {
 
     Integer updateDriverDutyTimeInfoList(Map<String, Object> params);
 
+    Integer updateDriverDutyTimeInfoOne(DriverDutyTimeInfo timeInfo);
+
 }
