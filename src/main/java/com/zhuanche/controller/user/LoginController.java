@@ -106,6 +106,7 @@ public class LoginController{
 		long count = redisTemplate.opsForZSet().count(redis_login_key, min, max);
 
 		int countLimit = 5;
+		log.info("用户"+username+"在"+statistics+"分钟内第"+count+"次进行获取验证码操作");
 		if(count  > countLimit) {
 			log.info("用户"+username+"在"+statistics+"分钟内进行获取验证码"+count+"次,超过限制"+countLimit+",需要等待"+statistics+"分钟");
 			return AjaxResponse.fail(RestErrorCode.GET_MSGCODE_EXCEED);
@@ -144,7 +145,7 @@ public class LoginController{
 	}
 	
 	/**执行登录**/
-	@RequestMapping("/dologin")
+	@RequestMapping(value = "/dologin",method = {RequestMethod.POST})
 	@ResponseBody
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode=DataSourceMode.SLAVE )
@@ -192,6 +193,7 @@ public class LoginController{
 			long count = redisTemplate.opsForZSet().count(redis_msgcode_key, min, max);
 
 			int countLimit = 5;
+			log.info("用户"+username+"在"+statistics+"分钟内第"+count+"次登录");
 			if(count  > countLimit) {
 				log.info("用户"+username+"在"+statistics+"分钟内登录"+count+"次,超过限制"+countLimit+",需要等待"+statistics+"分钟");
 				return AjaxResponse.fail(RestErrorCode.DO_LOGIN_FREQUENTLY);
