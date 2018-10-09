@@ -84,7 +84,7 @@ public class LoginController{
 	private RedisTemplate<String, Serializable> redisTemplate;
 	
 	/**通过用户名、密码，获取短信验证码**/
-	@RequestMapping(value = "/getMsgCode",method = {RequestMethod.POST})
+	@RequestMapping(value = "/getMsgCode" )
 	@ResponseBody
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode=DataSourceMode.SLAVE )
@@ -145,7 +145,7 @@ public class LoginController{
 	}
 	
 	/**执行登录**/
-	@RequestMapping(value = "/dologin",method = {RequestMethod.POST})
+	@RequestMapping(value = "/dologin" )
 	@ResponseBody
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode=DataSourceMode.SLAVE )
