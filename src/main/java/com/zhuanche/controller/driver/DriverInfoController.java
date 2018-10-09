@@ -710,4 +710,20 @@ public class DriverInfoController {
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/selectByLicensePlates")
+    @MasterSlaveConfigs(configs={
+            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
+    } )
+    public AjaxResponse queryDriverByLicensePlates(  @Verify(param = "license_plates",rule="required") String license_plates) {
+        logger.info(LOGTAG + "根据车牌号查询司机信息license_plates={}", license_plates);
+        try{
+            List<CarBizDriverInfoDTO> driverList = carBizDriverInfoService.queryDriverByLicensePlates(license_plates);
+            return AjaxResponse.success(driverList);
+        }catch (Exception e){
+            logger.error(LOGTAG + "根据车牌号查询司机信息异常license_plates="+license_plates,e );
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+        }
+    }
 }

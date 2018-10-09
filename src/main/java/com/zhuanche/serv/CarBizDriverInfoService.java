@@ -2918,4 +2918,13 @@ public class CarBizDriverInfoService {
         }
         return false;
     }
+
+    /**
+     * 根据车牌号查询司机信息
+     * @param license_plates
+     * @return
+     */
+    public List<CarBizDriverInfoDTO> queryDriverByLicensePlates(String license_plates) {
+        return carBizDriverInfoExMapper.queryDriverByLicensePlates(license_plates);
+    }
 }
