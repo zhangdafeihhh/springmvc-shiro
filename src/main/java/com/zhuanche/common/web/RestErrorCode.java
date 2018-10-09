@@ -63,6 +63,8 @@ public final class RestErrorCode{
 	public static final int MSG_CODE_FAIL                      = 1011;
 	@ResultMessage("短信验证码{0}秒内不能重复发送")
 	public static final int MSG_CODE_REPEAT_SEND                      = 1012;
+	@ResultMessage("登录太频繁")
+	public static final int DO_LOGIN_FREQUENTLY           = 1013;
 
 	//----------------------------------------------权限管理
 	@ResultMessage("父权限不存在")

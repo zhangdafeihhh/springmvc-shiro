@@ -1,12 +1,14 @@
 package com.zhuanche.controller.user;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,8 +24,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.zhuanche.common.cache.RedisCacheUtil;
@@ -53,7 +57,7 @@ import mapper.mdbcarmanage.ex.SaasPermissionExMapper;
 /**用户登录相关的功能**/
 @Controller
 public class LoginController{
-	private static final Logger log                                                      =  LoggerFactory.getLogger(LoginController.class);
+	private static final Logger log        =  LoggerFactory.getLogger(LoginController.class);
 	private static final String CACHE_PREFIX_MSGCODE_CONTROL = "mp_login_cache_msgcode_control_";
 	private static final String CACHE_PREFIX_MSGCODE                   = "mp_login_cache_msgcode_";
     @Value(value="${loginpage.url}")
@@ -75,19 +79,42 @@ public class LoginController{
 	private UsernamePasswordRealm usernamePasswordRealm;
 	@Autowired
 	private RedisSessionDAO redisSessionDAO;
+
+	@Autowired
+	private RedisTemplate<String, Serializable> redisTemplate;
 	
 	/**通过用户名、密码，获取短信验证码**/
-	@RequestMapping("/getMsgCode")
+	@RequestMapping(value = "/getMsgCode",method = {RequestMethod.POST})
 	@ResponseBody
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode=DataSourceMode.SLAVE )
 	} )
-    public AjaxResponse getMsgCode( @Verify(param="username",rule="required") String username, @Verify(param="password",rule="required") String password ){
+    public AjaxResponse getMsgCode( @Verify(param="username",rule="required") String username,
+									@Verify(param="password",rule="required") String password ){
 		//A: 频率检查
-		String flag = RedisCacheUtil.get(CACHE_PREFIX_MSGCODE_CONTROL+username, String.class);
-		if(flag!=null ) {
+		String redis_login_key = "mp_manager_login_key_"+username;
+		long score = System.currentTimeMillis();
+		//zset内部是按分数来排序的，这里用当前时间做分数
+		redisTemplate.opsForZSet().add(redis_login_key, String.valueOf(score), score);
+		//统计30分钟内获取验证码次数
+		int statistics = 30;
+		redisTemplate.expire(redis_login_key, statistics, TimeUnit.MINUTES);
+
+		//统计用户30分钟内获取验证码次数
+		long max = score;
+		long min = max - (statistics * 60 * 1000);
+		long count = redisTemplate.opsForZSet().count(redis_login_key, min, max);
+
+		int countLimit = 5;
+		if(count  > countLimit) {
+			log.info("用户"+username+"在"+statistics+"分钟内进行获取验证码"+count+"次,超过限制"+countLimit+",需要等待"+statistics+"分钟");
 			return AjaxResponse.fail(RestErrorCode.GET_MSGCODE_EXCEED);
 		}
+
+//		String flag = RedisCacheUtil.get(CACHE_PREFIX_MSGCODE_CONTROL+username, String.class);
+//		if(flag!=null ) {
+//			return AjaxResponse.fail(RestErrorCode.GET_MSGCODE_EXCEED);
+//		}
 		//B:查询用户信息
 		CarAdmUser user = carAdmUserExMapper.queryByAccount(username);
 		if(user==null){
@@ -107,7 +134,7 @@ public class LoginController{
 		String content  = "登录验证码为："+msgcode+"，请在"+msgcodeTimeoutMinutes+"分钟内进行登录。";
 		SmsSendUtil.send(mobile, content);
 		//E: 写入缓存
-		RedisCacheUtil.set(CACHE_PREFIX_MSGCODE_CONTROL+username, "Y",  60 );
+//		RedisCacheUtil.set(CACHE_PREFIX_MSGCODE_CONTROL+username, "Y",  60 );
 		RedisCacheUtil.set(CACHE_PREFIX_MSGCODE+username, msgcode,  msgcodeTimeoutMinutes * 60 );
 		//返回结果
 		Map<String,Object> result = new HashMap<String,Object>();
@@ -150,6 +177,25 @@ public class LoginController{
 		}
 		//D: 查询验证码，并判断是否正确
 		if("ON".equalsIgnoreCase(loginCheckMsgCodeSwitch)) {
+
+			String redis_msgcode_key = "mp_manager_msgcode_key_"+user.getUserId();
+			long score = System.currentTimeMillis();
+			//zset内部是按分数来排序的，这里用当前时间做分数
+			redisTemplate.opsForZSet().add(redis_msgcode_key, String.valueOf(score), score);
+			//统计30分钟内用户登录次数
+			int statistics = 30;
+			redisTemplate.expire(redis_msgcode_key, statistics, TimeUnit.MINUTES);
+
+			//统计用户30分钟内登录的次数
+			long max = score;
+			long min = max - (statistics * 60 * 1000);
+			long count = redisTemplate.opsForZSet().count(redis_msgcode_key, min, max);
+
+			int countLimit = 5;
+			if(count  > countLimit) {
+				log.info("用户"+username+"在"+statistics+"分钟内登录"+count+"次,超过限制"+countLimit+",需要等待"+statistics+"分钟");
+				return AjaxResponse.fail(RestErrorCode.DO_LOGIN_FREQUENTLY);
+			}
 			String  msgcodeInCache = RedisCacheUtil.get(CACHE_PREFIX_MSGCODE+username, String.class);
 			if(msgcodeInCache==null) {
 				return AjaxResponse.fail(RestErrorCode.MSG_CODE_INVALID) ;
@@ -157,6 +203,7 @@ public class LoginController{
 			if(!msgcodeInCache.equals(msgcode)) {
 				return AjaxResponse.fail(RestErrorCode.MSG_CODE_WRONG) ;
 			}
+
 		}
 		//E: 用户状态
 		if(user.getStatus()!=null && user.getStatus().intValue()==100 ){
