@@ -11,6 +11,7 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constants.SaasConst;
 import com.zhuanche.dto.SaasPermissionDTO;
 import com.zhuanche.entity.mdbcarmanage.SaasPermission;
+import com.zhuanche.shiro.session.RedisSessionDAO;
 import com.zhuanche.util.BeanUtil;
 
 import mapper.mdbcarmanage.SaasPermissionMapper;
@@ -23,6 +24,8 @@ public class PermissionManagementService{
 	private SaasPermissionMapper     saasPermissionMapper;
 	@Autowired
 	private SaasPermissionExMapper  saasPermissionExMapper;
+	@Autowired
+	private RedisSessionDAO              redisSessionDAO;
 	
 	/**一、增加一个权限**/
 	public AjaxResponse addSaasPermission( SaasPermission pemission ) {
@@ -43,7 +46,8 @@ public class PermissionManagementService{
 		if(!permTypes.contains(pemission.getPermissionType())) {
 			return AjaxResponse.fail(RestErrorCode.PERMISSION_TYPE_WRONG );
 		}
-		Integer sortSeq = 0 ; //自动生成排序的序号//TODO
+		
+		int sortSeq = saasPermissionExMapper.selectMaxSortSeq(pemission.getParentPermissionId()).intValue()+1;//自动生成排序的序号
 		pemission.setValid(true);
 		pemission.setSortSeq(sortSeq);
 	    saasPermissionMapper.insertSelective(pemission);
@@ -57,6 +61,10 @@ public class PermissionManagementService{
 		if(thisPermission == null ) {
 			return AjaxResponse.fail(RestErrorCode.PERMISSION_NOT_EXIST );
 		}
+		//系统预置权限，不能禁用、修改
+		if( SaasConst.SYSTEM_PERMISSIONS.contains( thisPermission.getPermissionCode() ) ) {
+			return AjaxResponse.fail(RestErrorCode.SYSTEM_PERMISSION_CANOT_CHANGE , thisPermission.getPermissionCode() );
+		}
 		//存在已经生效的子权限，请先禁用子权限
 		List<SaasPermission> validChildren = saasPermissionExMapper.queryPermissions(null, permissionId, null, null, null, (byte)1 );
 		if( validChildren!=null && validChildren.size()>0) {
@@ -67,6 +75,7 @@ public class PermissionManagementService{
 		pemissionForUpdate.setPermissionId(permissionId);
 		pemissionForUpdate.setValid(false);
 		saasPermissionMapper.updateByPrimaryKeySelective(pemissionForUpdate);
+		redisSessionDAO.clearRelativeSession(permissionId, null, null);//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
 	
@@ -90,6 +99,7 @@ public class PermissionManagementService{
 		pemissionForUpdate.setPermissionId(permissionId);
 		pemissionForUpdate.setValid( true );
 		saasPermissionMapper.updateByPrimaryKeySelective(pemissionForUpdate);
+		redisSessionDAO.clearRelativeSession(permissionId, null, null);//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
 
@@ -99,6 +109,10 @@ public class PermissionManagementService{
 		SaasPermission thisPermission = saasPermissionMapper.selectByPrimaryKey( pemission.getPermissionId() );
 		if(thisPermission == null ) {
 			return AjaxResponse.fail(RestErrorCode.PERMISSION_NOT_EXIST );
+		}
+		//系统预置权限，不能禁用、修改
+		if( SaasConst.SYSTEM_PERMISSIONS.contains( thisPermission.getPermissionCode() ) ) {
+			return AjaxResponse.fail(RestErrorCode.SYSTEM_PERMISSION_CANOT_CHANGE , thisPermission.getPermissionCode() );
 		}
 		//权限代码已经存在   (如果发生变化时 )
 		if( pemission.getPermissionCode()!=null && pemission.getPermissionCode().length()>0  && !pemission.getPermissionCode().equalsIgnoreCase(thisPermission.getPermissionCode()) ) {
@@ -116,6 +130,7 @@ public class PermissionManagementService{
 		}
 		pemission.setParentPermissionId( null );
 	    saasPermissionMapper.updateByPrimaryKeySelective( pemission );
+		redisSessionDAO.clearRelativeSession(pemission.getPermissionId(), null, null);//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
 	

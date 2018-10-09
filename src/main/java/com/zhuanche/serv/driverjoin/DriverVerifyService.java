@@ -20,7 +20,7 @@ import com.zhuanche.entity.rentcar.CarBizModel;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
-import com.zhuanche.util.IdCard;
+import com.zhuanche.util.IdcardUtil;
 
 import mapper.driver.ex.DriverCertExMapper;
 import mapper.driver.ex.DriverVerifyExMapper;
@@ -65,11 +65,11 @@ public class DriverVerifyService {
 				cityIdsForAuth = currentLoginUser.getCityIds();
 				supplierIdsForAuth = currentLoginUser.getSupplierIds();
 			}
-			if (cityIdsForAuth.size() == 0 || cityId != null && !cityIdsForAuth.contains(cityId)) {
+			if (cityIdsForAuth.size() > 0 && cityId != null && !cityIdsForAuth.contains(cityId.intValue())) {
 				return null;
 			}
-			if (supplierIdsForAuth.size() == 0
-					|| StringUtils.isNotBlank(supplier) && !supplierIdsForAuth.contains(supplier)) {
+			if (supplierIdsForAuth.size() > 0
+					&& StringUtils.isNotBlank(supplier) && !supplierIdsForAuth.contains(Integer.parseInt(supplier))) {
 				return null;
 			}
 		}
@@ -80,16 +80,20 @@ public class DriverVerifyService {
 		if (null != cityId) {
 			cityIds.add(cityId);
 		} else {
-			for (Integer cityid : cityIdsForAuth) {
-				cityIds.add(cityid.longValue());
+			if(cityIdsForAuth != null && cityIdsForAuth.size() >0){
+				for (Integer cityid : cityIdsForAuth) {
+					cityIds.add(cityid.longValue());
+				}
 			}
 		}
 		// 供应商权限
 		if (StringUtils.isNotBlank(supplier)) {
 			supplierIds.add(supplier);
 		} else {
-			for (Integer supplierId : supplierIdsForAuth) {
-				supplierIds.add(String.valueOf(supplierId));
+			if(supplierIdsForAuth != null && supplierIdsForAuth.size() >0 ){
+				for (Integer supplierId : supplierIdsForAuth) {
+					supplierIds.add(String.valueOf(supplierId));
+				}
 			}
 		}
 		// 分页查询司机加盟信息
@@ -133,15 +137,16 @@ public class DriverVerifyService {
 				driverVerify.setPlateNum(plateNum.toUpperCase());
 			}
 			// 获取司机的出生日期 性别
-			if (driverVerify.getIdCard() != null && !"".equals(driverVerify.getIdCard())) {
-				if (driverVerify.getIdCard() != null && !"".equals(driverVerify.getIdCard())) {
-					String gender = IdCard.getGenderByIdCard(driverVerify.getIdCard());
-					if (Integer.valueOf(gender) == 1) {
+			String idCard = driverVerify.getIdCard();
+			try {
+				if (StringUtils.isNotBlank(idCard)) {
+					int gender = IdcardUtil.getGenderByIdCard(idCard);
+					if (gender == 1) {
 						driverVerify.setIdcardSex("男");
-					} else {
+					} else if(gender == 0){
 						driverVerify.setIdcardSex("女");
 					}
-					String d = IdCard.getBirthByIdCard(driverVerify.getIdCard());
+					String d = IdcardUtil.getBirthByIdCard(idCard);
 					if (d != null && d.length() == 8) {
 						driverVerify.setIdcardBirthday(
 								d.substring(0, 4) + "-" + d.substring(4, 6) + "-" + d.substring(6, 8));
@@ -149,6 +154,8 @@ public class DriverVerifyService {
 						driverVerify.setIdcardBirthday(d);
 					}
 				}
+			} catch (Exception e) {
+				logger.error("查询司机加盟注册信息通过司机ID-身份证号码处理异常,idCard="+idCard,e);
 			}
 			dto = BeanUtil.copyObject(driverVerify, DriverVerifyDto.class);
 			// 查询服务类型名称通过serviceType car_biz_car_group 

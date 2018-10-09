@@ -95,7 +95,6 @@
     <result column="house_hold_register_permanent" property="houseHoldRegisterPermanent" jdbcType="VARCHAR" />
     <result column="is_upload_card" property="isUploadCard" jdbcType="INTEGER" />
     <result column="is_must_confirmation" property="isMustConfirmation" jdbcType="INTEGER" />
-    <result column="english_name" property="englishName" jdbcType="VARCHAR" />
     <result column="contract_type" property="contractType" jdbcType="VARCHAR" />
     <result column="contract_no" property="contractNo" jdbcType="VARCHAR" />
     <result column="contract_file" property="contractFile" jdbcType="VARCHAR" />
@@ -125,7 +124,7 @@
     assessment, driverLicenseIssuingDateStart, driverLicenseIssuingDateEnd, driverLicenseIssuingCorp, 
     driverLicenseIssuingNumber, xy_driver_number, driver_license_issuing_register_date, 
     driver_license_issuing_first_date, driver_license_issuing_grant_date, birth_day, 
-    house_hold_register_permanent, is_upload_card, is_must_confirmation, english_name,
+    house_hold_register_permanent, is_upload_card, is_must_confirmation,
     contract_type, contract_no, contract_file, cooperation_type, account_type, group_id,
     is_two_shifts, is_image
   </sql>
@@ -181,7 +180,7 @@
       xy_driver_number, driver_license_issuing_register_date, 
       driver_license_issuing_first_date, driver_license_issuing_grant_date, 
       birth_day, house_hold_register_permanent, is_upload_card, 
-      is_must_confirmation, english_name, contract_type,
+      is_must_confirmation, contract_type,
       contract_no, contract_file, cooperation_type,
       account_type, group_id, is_two_shifts,
       is_image, memo)
@@ -218,7 +217,7 @@
       #{xyDriverNumber,jdbcType=VARCHAR}, #{driverLicenseIssuingRegisterDate,jdbcType=VARCHAR}, 
       #{driverLicenseIssuingFirstDate,jdbcType=VARCHAR}, #{driverLicenseIssuingGrantDate,jdbcType=VARCHAR}, 
       #{birthDay,jdbcType=VARCHAR}, #{houseHoldRegisterPermanent,jdbcType=VARCHAR}, #{isUploadCard,jdbcType=INTEGER}, 
-      #{isMustConfirmation,jdbcType=INTEGER}, #{englishName,jdbcType=VARCHAR}, #{contractType,jdbcType=VARCHAR},
+      #{isMustConfirmation,jdbcType=INTEGER}, #{contractType,jdbcType=VARCHAR},
       #{contractNo,jdbcType=VARCHAR}, #{contractFile,jdbcType=VARCHAR}, #{cooperationType,jdbcType=TINYINT},
       #{accountType,jdbcType=INTEGER}, #{groupId,jdbcType=INTEGER}, #{isTwoShifts,jdbcType=INTEGER},
       #{isImage,jdbcType=TINYINT}, #{memo,jdbcType=LONGVARCHAR})
@@ -507,9 +506,6 @@
       </if>
       <if test="isMustConfirmation != null" >
         is_must_confirmation,
-      </if>
-      <if test="englishName != null" >
-        english_name,
       </if>
       <if test="contractType != null" >
         contract_type,
@@ -1251,7 +1247,6 @@
       house_hold_register_permanent = #{houseHoldRegisterPermanent,jdbcType=VARCHAR},
       is_upload_card = #{isUploadCard,jdbcType=INTEGER},
       is_must_confirmation = #{isMustConfirmation,jdbcType=INTEGER},
-      english_name = #{englishName,jdbcType=VARCHAR},
       contract_type = #{contractType,jdbcType=VARCHAR},
       contract_no = #{contractNo,jdbcType=VARCHAR},
       contract_file = #{contractFile,jdbcType=VARCHAR},
@@ -1357,7 +1352,6 @@
       house_hold_register_permanent = #{houseHoldRegisterPermanent,jdbcType=VARCHAR},
       is_upload_card = #{isUploadCard,jdbcType=INTEGER},
       is_must_confirmation = #{isMustConfirmation,jdbcType=INTEGER},
-      english_name = #{englishName,jdbcType=VARCHAR},
       contract_type = #{contractType,jdbcType=VARCHAR},
       contract_no = #{contractNo,jdbcType=VARCHAR},
       contract_file = #{contractFile,jdbcType=VARCHAR},
@@ -1368,4 +1362,13 @@
       is_image = #{isImage,jdbcType=TINYINT}
     where driver_id = #{driverId,jdbcType=INTEGER}
   </update>
+
+  <select id="selectByPhone" resultMap="ResultMapWithBLOBs" parameterType="java.util.Map" >
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from car_biz_driver_info
+    where phone = #{phone,jdbcType=INTEGER}
+  </select>
 </mapper>

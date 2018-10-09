@@ -199,7 +199,7 @@ public class ValidateUtils {
     /**
      * 功能：判断字符串是否为日期格式
      * 
-     * @param str
+     * @param strDate
      * @return
      */
     public static boolean isDate(String strDate) {
@@ -264,7 +264,7 @@ public class ValidateUtils {
 
 
     public static String REGULAR_IDCARDNO = "(^[A-Z]{1}[0-9]{6}[\\(]{1}[a-zA-Z0-9]{1}[\\)]{1}$)";
-    public static String REGULAR_IDCARDNO2 = "(^[A-Z]{1}[0-9]{10}$)";
+    public static String REGULAR_IDCARDNO2 = "(^[A-Z]{1}[0-9]{8,10}$)";
     public static String BANK_CARD_NUMBER = "(^[0-9]{16,19}$)";
     public static String NUMBER_PATTERN = "(^[0-9]*$)";
     /**
@@ -310,4 +310,15 @@ public class ValidateUtils {
         return convertSuccess;
     }
 
+    /**
+     * 是否admin用户
+     * @param accountType
+     * @return
+     */
+    public static boolean isAdmin(Integer accountType) {
+		if (accountType.intValue() == 900)
+			return true;
+		return false;
+	}
+	
 }

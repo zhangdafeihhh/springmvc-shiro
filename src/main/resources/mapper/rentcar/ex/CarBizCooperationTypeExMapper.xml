@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper  
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="mapper.rentcar.ex.CarBizCooperationTypeExMapper">
+ 	<select id="queryForListObject" resultType="com.zhuanche.entity.rentcar.CarBizCooperationType" parameterType="com.zhuanche.entity.rentcar.CarBizCooperationType">
+    	SELECT
+			id,
+			cooperation_name cooperationName,
+			status,
+			create_by createBy,
+			update_by updateBy,
+			create_name createName,
+			update_name updateName,
+			create_date createDate,
+			update_date updateDate,
+			DATE_FORMAT(create_date, '%Y-%m-%d %H:%i:%s') createDateStr,
+			DATE_FORMAT(update_date, '%Y-%m-%d %H:%i:%s') updateDateStr
+		FROM
+			car_biz_cooperation_type 
+		WHERE 1=1 
+			<if test="id !=null and id !='' ">
+		            and id = #{id} 
+		    </if>
+			<if test="cooperationName !=null and cooperationName !='' ">
+		            and cooperation_name like '%${cooperationName}%' 
+		    </if>
+		    <if test="status !=null and status !='' ">
+		            and status = #{status} 
+		    </if>
+    </select>
+    <select id="queryForListObjectHasPage" resultType="com.zhuanche.entity.rentcar.CarBizCooperationType" parameterType="com.zhuanche.entity.rentcar.CarBizCooperationType">
+    	SELECT
+			id,
+			cooperation_name cooperationName,
+			status,
+			create_by createBy,
+			update_by updateBy,
+			create_name createName,
+			update_name updateName,
+			create_date createDate,
+			update_date updateDate,
+			DATE_FORMAT(create_date, '%Y-%m-%d %H:%i:%s') createDateStr,
+			DATE_FORMAT(update_date, '%Y-%m-%d %H:%i:%s') updateDateStr
+		FROM
+			car_biz_cooperation_type 
+		WHERE 1=1 
+			<if test="id !=null and id !='' ">
+		            and id = #{id} 
+		    </if>
+			<if test="cooperationName !=null and cooperationName !='' ">
+		            and cooperation_name like '%${cooperationName}%' 
+		    </if>
+		    <if test="status !=null and status !='' ">
+		            and status = #{status} 
+		    </if>
+		order by update_date desc 
+	 	limit #{offSet},#{pagesize}
+    </select>
+    
+    <select id="queryForInt" resultType="java.lang.Integer" parameterType="com.zhuanche.entity.rentcar.CarBizCooperationType">
+    	SELECT
+			count(*)
+		FROM
+			car_biz_cooperation_type 
+		WHERE 1=1 
+			<if test="id !=null and id !='' ">
+		            and id = #{id} 
+		    </if>
+			<if test="cooperationName !=null and cooperationName !='' ">
+		            and cooperation_name like '%${cooperationName}%' 
+		    </if>
+		    <if test="status !=null and status !='' ">
+		            and status = #{status}
+		    </if>
+    </select>
+    <select id="queryForObject" resultType="com.zhuanche.entity.rentcar.CarBizCooperationType" parameterType="com.zhuanche.entity.rentcar.CarBizCooperationType">
+    	SELECT
+			id,
+			cooperation_name cooperationName,
+			status,
+			create_by createBy,
+			update_by updateBy,
+			create_name createName,
+			update_name updateName,
+			create_date createDate,
+			update_date updateDate,
+			DATE_FORMAT(create_date, '%Y-%m-%d %H:%i:%s') createDateStr,
+			DATE_FORMAT(update_date, '%Y-%m-%d %H:%i:%s') updateDateStr
+		FROM
+			car_biz_cooperation_type 
+		WHERE id = #{id} 
+    </select>
+    <select id="checkCooperationName" parameterType="com.zhuanche.entity.rentcar.CarBizCooperationType" resultType="int">
+		select count(1) from car_biz_cooperation_type  
+		where cooperation_name = #{cooperationName}
+			<if test="id !=null and id !='' ">
+		            <![CDATA[ and id <> #{id}  ]]>
+		    </if>
+	</select>
+	<select id="querySupplierByCooperationId" parameterType="com.zhuanche.entity.rentcar.CarBizCooperationType" resultType="int">
+		select count(1) from car_biz_supplier 
+		where cooperation_type = #{id}
+	</select>
+
+	<insert id="save" parameterType="com.zhuanche.entity.rentcar.CarBizCooperationType" useGeneratedKeys="true" keyProperty="id">
+		insert into
+		car_biz_cooperation_type
+		(
+		<if test="cooperationName !=null and cooperationName !=''">
+			cooperation_name,
+		</if>
+		<if test="status !=null and status !=''">
+			status,
+		</if>
+		<if test="createBy !=null and createBy !=''">
+			create_by,
+		</if>
+		<if test="updateBy !=null and updateBy !=''">
+			update_by,
+		</if>
+		<if test="createName !=null and createName !=''">
+			create_name,
+		</if>
+		<if test="updateName !=null and updateName !=''">
+			update_name,
+		</if>
+		create_date,
+		update_date
+		)
+		values
+		(
+		<if test="cooperationName !=null and cooperationName !=''">
+			#{cooperationName},
+		</if>
+		<if test="status !=null and status !=''">
+			#{status},
+		</if>
+		<if test="createBy !=null and createBy !=''">
+			#{createBy},
+		</if>
+		<if test="updateBy !=null and updateBy !=''">
+			#{updateBy},
+		</if>
+		<if test="createName !=null and createName !=''">
+			#{createName},
+		</if>
+		<if test="updateName !=null and updateName !=''">
+			#{updateName},
+		</if>
+		now(),
+		now()
+		)
+	</insert>
+
+	<update id="update" parameterType="com.zhuanche.entity.rentcar.CarBizCooperationType" >
+		update car_biz_cooperation_type
+		set
+		<if test="cooperationName !=null and cooperationName !=''">
+			cooperation_name = #{cooperationName},
+		</if>
+		<if test="status !=null and status !=''">
+			status = #{status},
+		</if>
+		<if test="updateBy !=null and updateBy !=''">
+			update_by = #{updateBy},
+		</if>
+		<if test="updateName !=null and updateName !=''">
+			update_name = #{updateName},
+		</if>
+		update_date=now()
+		where id=#{id}
+	</update>
+
+	<!--查询所有加盟类型-->
+	<select id="queryCarBizCooperationTypeList" resultType="com.zhuanche.entity.rentcar.CarBizCooperationType" >
+		SELECT
+			id,
+			cooperation_name cooperationName,
+			status
+		FROM
+			car_biz_cooperation_type
+		WHERE status = 1
+	</select>
+</mapper>
+

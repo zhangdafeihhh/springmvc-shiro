@@ -2,8 +2,9 @@ package com.zhuanche.serv.deiver;
 
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.controller.driverteam.CarInfoTemporaryController;
 import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
-import com.zhuanche.entity.mdbcarmanage.DriverVoEntity;
+import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.entity.rentcar.CarImportExceptionEntity;
 import com.zhuanche.shiro.constants.BusConstant;
@@ -11,6 +12,7 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
 import com.zhuanche.util.Common;
+import com.zhuanche.util.excel.ExportExcelUtil;
 import mapper.mdbcarmanage.CarBizCarInfoTempMapper;
 import mapper.mdbcarmanage.ex.CarBizCarInfoTempExMapper;
 import mapper.mdbcarmanage.ex.CarBizDriverInfoTempExMapper;
@@ -18,18 +20,17 @@ import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarBizModelExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -40,7 +41,7 @@ import java.util.*;
 @Service
 public class CarBizCarInfoTempService {
 
-    private static Log log =  LogFactory.getLog(CarBizCarInfoTempService.class);
+    private static final Logger log =  LoggerFactory.getLogger(CarBizCarInfoTempService.class);
 
     private final static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -101,11 +102,20 @@ public class CarBizCarInfoTempService {
      * @param carBizCarInfoTemp
      * @return
      */
-    public int add(CarBizCarInfoTemp carBizCarInfoTemp) {
+    public AjaxResponse add(CarBizCarInfoTemp carBizCarInfoTemp) {
         String license = carBizCarInfoTemp.getLicensePlates();
         license = Check.replaceBlank(license);
         carBizCarInfoTemp.setLicensePlates(license);
-        return carBizCarInfoTempMapper.insertSelective(carBizCarInfoTemp);
+        Map<String, Object> resultCar = this.checkLicensePlates(license);
+        if ((int) resultCar.get("result") == 0) {
+            return AjaxResponse.fail(RestErrorCode.LICENSE_PLATES_EXIST);
+        }
+        int code =  carBizCarInfoTempMapper.insertSelective(carBizCarInfoTemp);
+        if(code > 0 ){
+            return AjaxResponse.success(RestErrorCode.SUCCESS);
+        }else{
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
     }
 
     /**
@@ -115,8 +125,14 @@ public class CarBizCarInfoTempService {
      */
     public AjaxResponse update(CarBizCarInfoTemp entity) {
         try{
+            if (!entity.getLicensePlates().equals(entity.getOldLicensePlates())) {
+                Map<String, Object> resultCar = this.checkLicensePlates(entity.getLicensePlates());
+                if ((int) resultCar.get("result") == 0) {
+                    return AjaxResponse.fail(RestErrorCode.LICENSE_PLATES_EXIST);
+                }
+            }
             carBizCarInfoTempMapper.updateByPrimaryKeySelective(entity);
-            DriverVoEntity carDriver = carBizDriverInfoTempExMapper.getDriverByLincesePlates(entity.getLicensePlates1());
+            CarBizDriverInfoTemp carDriver = carBizDriverInfoTempExMapper.getDriverByLincesePlates(entity.getOldLicensePlates());
             if (carDriver != null) {
                 int had = 0;
                 // 车辆是否更改城市，更改，则修改司机
@@ -134,7 +150,7 @@ public class CarBizCarInfoTempService {
                     carDriver.setTeamid("");
                     carDriver.setGroupIds("");
                 }
-                if (!entity.getLicensePlates().equals(entity.getLicensePlates1())) {
+                if (!entity.getLicensePlates().equals(entity.getOldLicensePlates())) {
                     had = 1;
                     carDriver.setLicensePlates(entity.getLicensePlates());
                 }
@@ -152,24 +168,21 @@ public class CarBizCarInfoTempService {
         }
     }
 
-    public AjaxResponse importCarInfo(CarBizCarInfoTemp params,HttpServletRequest request) {
-        String resultErrorMag1 = "导入模板格式错误!";
-
+    /**
+     * 车辆导入
+     * @param is
+     * @return
+     */
+    public AjaxResponse importCarInfo(InputStream is,String prefix,Integer cityId,Integer supplierId) {
         String licensePlates = "";
-        Map<String, Object> result = new HashMap<String, Object>();
+        String resultErrorMag1 = "导入模板格式错误!";
         List<CarImportExceptionEntity> listException = new ArrayList<CarImportExceptionEntity>();
         SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
-        String fileName = params.getFileName();
-        String path = Common.getPath(request);
-        String dirPath = path + params.getFileName();
-        File DRIVERINFO = new File(dirPath);
         try {
-            InputStream is = new FileInputStream(DRIVERINFO);
             Workbook workbook = null;
-            String fileType = fileName.split("\\.")[1];
-            if (fileType.equals("xls")) {
+            if (prefix.equals("xls")) {
                 workbook = new HSSFWorkbook(is);
-            } else if (fileType.equals("xlsx")) {
+            } else if (prefix.equals("xlsx")) {
                 workbook = new XSSFWorkbook(is);
             }
             Sheet sheet = workbook.getSheetAt(0);
@@ -189,217 +202,217 @@ public class CarBizCarInfoTempService {
                     switch ((colIx + 1)) {
                         case 1:
                             if (!cellValue.getStringValue().contains("序号")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"序号不正确");
                             }
                             break;
                         case 2:
                             if (!cellValue.getStringValue().contains("车牌号")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"车牌号不正确");
                             }
                             break;
                         case 3:
                             if (!cellValue.getStringValue().contains("城市")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"城市不正确");
                             }
                             break;
                         case 4:
                             if (!cellValue.getStringValue().contains("状态")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"状态不正确");
                             }
                             break;
                         case 5:
                             if (!cellValue.getStringValue().contains("供应商")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"供应商不正确");
                             }
                             break;
                         case 6:
                             if (!cellValue.getStringValue().contains("车型")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"车型不正确");
                             }
                             break;
                         case 7:
                             if (!cellValue.getStringValue().contains("具体车型")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"具体车型不正确");
                             }
                             break;
                         case 8:
                             if (!cellValue.getStringValue().contains("购买日期")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"购买日期不正确");
                             }
                             break;
                         case 9:
                             if (!cellValue.getStringValue().contains("颜色")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"颜色不正确");
                             }
                             break;
                         case 10:
                             if (!cellValue.getStringValue().contains("发动机号")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"发动机号不正确");
                             }
                             break;
                         case 11:
                             if (!cellValue.getStringValue().contains("车架号")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"发动机号不正确");
                             }
                             break;
                         case 12:
                             if (!cellValue.getStringValue().contains("下次维保时间")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"下次维保时间不正确");
                             }
                             break;
                         case 13:
                             if (!cellValue.getStringValue().contains("下次等级鉴定时间")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"下次等级鉴定时间不正确");
                             }
                             break;
                         case 14:
                             if (!cellValue.getStringValue().contains("下次检营运证时间")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"下次检营运证时间不正确");
                             }
                             break;
                         case 15:
                             if (!cellValue.getStringValue().contains("下次检治安证时间")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"下次检治安证时间不正确");
                             }
                             break;
                         case 16:
                             if (!cellValue.getStringValue().contains("二次维护时间")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"二次维护时间不正确");
                             }
                             break;
                         case 17:
                             if (!cellValue.getStringValue().contains("租赁到期时间")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"租赁到期时间不正确");
                             }
                             break;
                         case 18:
                             if (!cellValue.getStringValue().contains("下次车检时间")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"下次车检时间不正确");
                             }
                             break;
                         case 19:
                             if (!cellValue.getStringValue().contains("核定载客位")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"核定载客位不正确");
                             }
                             break;
                         case 20:
                             if (!cellValue.getStringValue().contains("车辆厂牌")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"车辆厂牌不正确");
                             }
                             break;
                         case 21:
                             if (!cellValue.getStringValue().contains("车牌颜色")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"车牌颜色不正确");
                             }
                             break;
                         case 22:
                             if (!cellValue.getStringValue().contains("车辆VIN码")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"车辆VIN码不正确");
                             }
                             break;
                         case 23:
                             if (!cellValue.getStringValue().contains("车辆注册日期")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"车辆注册日期不正确");
                             }
                             break;
                         case 24:
                             if (!cellValue.getStringValue().contains("车辆燃料类型")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"车辆燃料类型不正确");
                             }
                             break;
                         case 25:
                             if (!cellValue.getStringValue().contains("发动机排量（毫升）")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"发动机排量（毫升）不正确");
                             }
                             break;
                         case 26:
                             if (!cellValue.getStringValue().contains("发动机功率（千瓦）")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"发动机功率（千瓦）不正确");
                             }
                             break;
                         case 27:
                             if (!cellValue.getStringValue().contains("车辆轴距（毫米）")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"车辆轴距（毫米）不正确");
                             }
                             break;
                         case 28:
                             if (!cellValue.getStringValue().contains("运输证字号")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"运输证字号不正确");
                             }
                             break;
                         case 29:
                             if (!cellValue.getStringValue().contains("车辆运输证发证机构")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"车辆运输证发证机构不正确");
                             }
                             break;
                         case 30:
                             if (!cellValue.getStringValue().contains("车辆经营区域")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"车辆经营区域不正确");
                             }
                             break;
                         case 31:
                             if (!cellValue.getStringValue().contains("车辆运输证有效期起")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"车辆运输证有效期起不正确");
                             }
                             break;
                         case 32:
                             if (!cellValue.getStringValue().contains("车辆运输证有效期止")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"车辆运输证有效期止不正确");
                             }
                             break;
                         case 33:
                             if (!cellValue.getStringValue().contains("车辆初次登记日期")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"车辆初次登记日期不正确");
                             }
                             break;
                         case 34:
                             if (!cellValue.getStringValue().contains("车辆检修状态")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"车辆检修状态不正确");
                             }
                             break;
                         case 35:
                             if (!cellValue.getStringValue().contains("车辆年度审验状态")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"车辆年度审验状态不正确");
                             }
                             break;
                         case 36:
                             if (!cellValue.getStringValue().contains("车辆年度审验日期")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"车辆年度审验日期不正确");
                             }
                             break;
                         case 37:
                             if (!cellValue.getStringValue().contains("发票打印设备序列号")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"发票打印设备序列号不正确");
                             }
                             break;
                         case 38:
                             if (!cellValue.getStringValue().contains("卫星定位装置品牌")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"卫星定位装置品牌不正确");
                             }
                             break;
                         case 39:
                             if (!cellValue.getStringValue().contains("卫星定位装置型号")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"卫星定位装置型号不正确");
                             }
                             break;
                         case 40:
                             if (!cellValue.getStringValue().contains("卫星定位装置IMEI号")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"卫星定位装置IMEI号不正确");
                             }
                             break;
                         case 41:
                             if (!cellValue.getStringValue().contains("卫星定位设备安装日期")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"卫星定位设备安装日期不正确");
                             }
                             break;
                         case 42:
                             if (!cellValue.getStringValue().contains("所属车主")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"所属车主不正确");
                             }
                             break;
                         case 43:
                             if (!cellValue.getStringValue().contains("车辆类型(以机动车行驶证为主)")) {
-                                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"车辆类型(以机动车行驶证为主)不正确");
                             }
                             break;
                     }
@@ -421,8 +434,8 @@ public class CarBizCarInfoTempService {
                 carBizCarInfo.setStatus(1);
                 carBizCarInfo.setCreateBy(user.getId());
                 carBizCarInfo.setUpdateBy(user.getId());
-                carBizCarInfo.setCityId(params.getCityId());
-                carBizCarInfo.setSupplierId(params.getSupplierId());
+                carBizCarInfo.setCityId(cityId);
+                carBizCarInfo.setSupplierId(supplierId);
                 // 车辆导入模板总共41 列
                 for (int colIx = 0; colIx < 43; colIx++) {
                     Cell cell = row.getCell(colIx); // 获取列对象
@@ -464,7 +477,7 @@ public class CarBizCarInfoTempService {
                                         isTrue = false;
                                     } else {
                                         carBizCarInfo.setLicensePlates(license);
-                                        carBizCarInfo.setLicensePlates1(license);
+                                        carBizCarInfo.setOldLicensePlates(license);
                                     }
                                 } else {
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -1767,23 +1780,21 @@ public class CarBizCarInfoTempService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String download = "";
         try {
-            // 将错误列表导出
+            //将错误列表导出
             if (listException.size() > 0) {
-                Workbook wb = Common.exportExcel(request.getServletContext().getRealPath("/") + "template" + File.separator + "car_exception.xlsx", listException);
-                download = Common.exportExcelFromTempletToLoacl(request, wb,
-                        new String("ERROR".getBytes("utf-8"), "iso8859-1"));
+                StringBuilder errorMsg = new StringBuilder();
+                for (CarImportExceptionEntity entity:listException){
+                    errorMsg.append(entity.getReson()).append(";");
+                }
+                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,errorMsg);
+            }else{
+                return AjaxResponse.success(RestErrorCode.SUCCESS);
             }
         } catch (Exception e) {
             e.printStackTrace();
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
-        if (!"".equals(download) && download != null) {
-            result.put("download", download);
-        } else {
-            result.put("download", "");
-        }
-        return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,download);
     }
 
     /**
@@ -1810,24 +1821,23 @@ public class CarBizCarInfoTempService {
         return result;
     }
 
-    public AjaxResponse importCarInfo4Bus(CarBizCarInfoTemp params, HttpServletRequest request) {
+    /**
+     * 巴士车辆导入
+     * @param is
+     * @param prefix
+     * @return
+     */
+    public AjaxResponse importCarInfo4Bus(InputStream is,String prefix,Integer cityId,Integer supplierId) {
         log.info("车辆（巴士）信息导入");
         String resultErrorMag1 = "导入模板格式错误!";
         String licensePlates = "";
-        Map<String, Object> result = new HashMap<String, Object>();
         List<CarImportExceptionEntity> listException = new ArrayList<CarImportExceptionEntity>();
         SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
-        String fileName = params.getFileName();
-        String path = Common.getPath(request);
-        String dirPath = path + params.getFileName();
-        File DRIVERINFO = new File(dirPath);
         try {
-            InputStream is = new FileInputStream(DRIVERINFO);
             Workbook workbook = null;
-            String fileType = fileName.split("\\.")[1];
-            if (fileType.equals("xls")) {
+            if (prefix.equals("xls")) {
                 workbook = new HSSFWorkbook(is);
-            } else if (fileType.equals("xlsx")) {
+            } else if (prefix.equals("xlsx")) {
                 workbook = new XSSFWorkbook(is);
             }
             Sheet sheet = workbook.getSheetAt(0);
@@ -1871,8 +1881,10 @@ public class CarBizCarInfoTempService {
                 entity.setStatus(1);
                 entity.setCreateBy(user.getId());
                 entity.setUpdateBy(user.getId());
-                entity.setCityId(params.getCityId());
-                entity.setSupplierId(params.getSupplierId());
+                entity.setCreateBy(1);
+                entity.setUpdateBy(1);
+                entity.setCityId(cityId);
+                entity.setSupplierId(supplierId);
                 // 车辆导入模板总共41 列
                 for (int colIx = 0; colIx < row1.getLastCellNum(); colIx++) {
                     Cell cell = row.getCell(colIx); // 获取列对象
@@ -1886,9 +1898,7 @@ public class CarBizCarInfoTempService {
                     switch (colIx) {
                         // 车牌号
                         case 3:
-                            if (cellValue == null
-                                    || StringUtils.isEmpty(cellValue
-                                    .getStringValue())) {
+                            if (cellValue == null|| StringUtils.isEmpty(cellValue.getStringValue())) {
                                 CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                                 returnVO.setLicensePlates(licensePlates);
                                 returnVO.setReson("第" + (rowIx + 1) + "行数据，第"
@@ -2073,7 +2083,6 @@ public class CarBizCarInfoTempService {
                                 isTrue = false;
                             } else {
                                 // 判断车型是否存在
-                                System.out.println(cellValue.getStringValue());
                                 Integer carModelId = carBizModelExMapper.queryCarModelByCarModelName(cellValue.getStringValue().trim());
                                 if (carModelId == null) {
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -2110,7 +2119,9 @@ public class CarBizCarInfoTempService {
                     entity.setVehicleEngineWheelbase("6000");
                     //所属车主(供应商保持一直)
                     CarBizSupplier carBizSupplier = new CarBizSupplier();
-                    carBizSupplier.setSupplierId(params.getSupplierId());
+                    if(!user.getSupplierIds().isEmpty()){
+                        carBizSupplier.setSupplierId(user.getSupplierIds().iterator().next());
+                    }
                     CarBizSupplier resultSupplier = carBizSupplierExMapper.queryForObject(carBizSupplier);
                     if (resultSupplier != null && resultSupplier.getSupplierFullName() != null) {
                         entity.setVehicleOwner(resultSupplier.getSupplierFullName());
@@ -2157,10 +2168,8 @@ public class CarBizCarInfoTempService {
                     entity.setStatus(1);
                     //备注
                     try {
-                        log.error("车辆（巴士）信息导入，保存信息 param=" + entity.toString());
-                        carBizCarInfoTempMapper.insert(entity);
-                        result.put("result", "1");
-                        result.put("msg", "");
+                        log.info("车辆（巴士）信息导入，保存信息 param=" + entity.toString());
+                        carBizCarInfoTempMapper.insertSelective(entity);
                     } catch (Exception e) {
                         log.error("车辆（巴士）信息导入，保存信息  error：" + e);
                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -2171,24 +2180,26 @@ public class CarBizCarInfoTempService {
                 }
             }
         } catch (Exception e) {
+            log.error("导入巴士车辆error:",e);
             e.printStackTrace();
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
-        String download = "";
         try {
-            // 将错误列表导出
+            //将错误列表导出
             if (listException.size() > 0) {
-                Workbook wb = Common.exportExcel(request.getServletContext().getRealPath("/") + "template" + File.separator + "car_exception.xlsx", listException);
-                download = Common.exportExcelFromTempletToLoacl(request, wb,
-                        new String("ERROR".getBytes("utf-8"), "iso8859-1"));
+                /*response.setContentType("application/octet-stream;charset=ISO8859-1");
+                response.setHeader("Content-Disposition", "attachment;filename=" + new String("巴士车辆导入错误列表".getBytes("GB2312"), "ISO8859-1") + ".xls");
+                response.addHeader("Pargam", "no-cache");
+                response.addHeader("Cache-Control", "no-cache");
+                Collection c = listException;
+                new ExportExcelUtil<>().exportExcel("巴士车辆导入错误Excel", new String[]{"车牌号","错误原因"}, c, response.getOutputStream());*/
+                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+            }else{
+                return AjaxResponse.success(RestErrorCode.SUCCESS);
             }
         } catch (Exception e) {
             e.printStackTrace();
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
-        if (!"".equals(download) && download != null) {
-            result.put("download", download);
-        } else {
-            result.put("download", "");
-        }
-        return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,download);
     }
 }

@@ -54,5 +54,40 @@
     </if>
     order by city_id
   </select>
-  
+
+  <select id="queryCityByCityName" resultType="int">
+    select
+    city_id
+    from
+    car_biz_city
+    where
+    status = 1
+    <if test="cityName != null and cityName != ''">
+      and city_name = #{cityName}
+    </if>
+  </select>
+
+
+ <select id="queryCarBizCityById" parameterType="com.zhuanche.entity.rentcar.CarBizCity" resultType="com.zhuanche.entity.rentcar.CarBizCity">
+	 	select 
+		t.city_id cityId,
+		t.city_name cityName,
+		t.code,
+		t.citySpell,
+		t.sort,
+		t.status,
+		t.test_status testStatus,
+		t.create_by createBy,
+		t.update_by updateBy,
+		t.create_date createDate,
+		t.update_date updateDate,
+		t.memo,
+		t.centreLo,
+		t.centreLa
+		from car_biz_city t
+	 	where t.city_id = #{cityId} limit 1;
+	 </select>
+	 
+	 
+	 
   </mapper>

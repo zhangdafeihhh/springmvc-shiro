@@ -38,23 +38,89 @@ public class DutyParamRequest extends PageRequest{
     private Integer type; // 类型
     private Integer status; // 状态：1 未发布；2 已发布
 
+    private String licensePlates;
+
     private String cityName;
     private String supplierName;
     private String teamName;
+
+    /** 保存排班信息参数*/
+    // 批量处理字段
+    private String times; // 要设置的日期集， 用 ,分隔
+    private String driverIds; // 要设置的司机id集， 用 ,分隔
+
+    /** 高峰时间*/
+    private String peakTimes;
 
     /** 是否查看发布排班列表 0查看所有 1查看未发布 */
     private Integer unpublishedFlag;
 
     /** 权限相关*/
-    private Set<Integer> permOfCity;//普通管理员可以管理的所有城市ID
+    private Set<Integer> cityIds;//普通管理员可以管理的所有城市ID
 
-    private Set<Integer> permOfSupplier;//普通管理员可以管理的所有供应商ID
+    private Set<Integer> supplierIds;//普通管理员可以管理的所有供应商ID
 
-    private Set<Integer> permOfTeam;//普通管理员可以管理的所有车队ID
+    private Set<Integer> teamIds;//普通管理员可以管理的所有车队ID
 
     // 查询
     private String startTime;
     private String endTime;
+
+    public String getLicensePlates() {
+        return licensePlates;
+    }
+
+    public void setLicensePlates(String licensePlates) {
+        this.licensePlates = licensePlates;
+    }
+
+    public String getTimes() {
+        return times;
+    }
+
+    public void setTimes(String times) {
+        this.times = times;
+    }
+
+    public String getDriverIds() {
+        return driverIds;
+    }
+
+    public void setDriverIds(String driverIds) {
+        this.driverIds = driverIds;
+    }
+
+    public String getPeakTimes() {
+        return peakTimes;
+    }
+
+    public void setPeakTimes(String peakTimes) {
+        this.peakTimes = peakTimes;
+    }
+
+    public Set<Integer> getCityIds() {
+        return cityIds;
+    }
+
+    public void setCityIds(Set<Integer> cityIds) {
+        this.cityIds = cityIds;
+    }
+
+    public Set<Integer> getSupplierIds() {
+        return supplierIds;
+    }
+
+    public void setSupplierIds(Set<Integer> supplierIds) {
+        this.supplierIds = supplierIds;
+    }
+
+    public Set<Integer> getTeamIds() {
+        return teamIds;
+    }
+
+    public void setTeamIds(Set<Integer> teamIds) {
+        this.teamIds = teamIds;
+    }
 
     public Integer getUnpublishedFlag() {
         return unpublishedFlag;
@@ -198,30 +264,6 @@ public class DutyParamRequest extends PageRequest{
 
     public void setTeamName(String teamName) {
         this.teamName = teamName;
-    }
-
-    public Set<Integer> getPermOfCity() {
-        return permOfCity;
-    }
-
-    public void setPermOfCity(Set<Integer> permOfCity) {
-        this.permOfCity = permOfCity;
-    }
-
-    public Set<Integer> getPermOfSupplier() {
-        return permOfSupplier;
-    }
-
-    public void setPermOfSupplier(Set<Integer> permOfSupplier) {
-        this.permOfSupplier = permOfSupplier;
-    }
-
-    public Set<Integer> getPermOfTeam() {
-        return permOfTeam;
-    }
-
-    public void setPermOfTeam(Set<Integer> permOfTeam) {
-        this.permOfTeam = permOfTeam;
     }
 
     public String getStartTime() {

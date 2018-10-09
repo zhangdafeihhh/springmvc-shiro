@@ -19,6 +19,9 @@
     <import resource="applicationContext-db-driver.xml"/>
     <import resource="applicationContext-db-rentcar.xml"/>
     <import resource="applicationContext-db-carmanage.xml"/>
+    <import resource="applicationContext-db-mdblog.xml"/>
+    <import resource="applicationContext-db-orderRecord.xml"/>
+    <import resource="applicationContext-db-orderPlatform.xml"/>
 	<!-- 配置AOP以便支持基于注解的DB数据源自动主从切换 -->
     <aop:aspectj-autoproxy></aop:aspectj-autoproxy>
     <!-- 配置缓存 -->
@@ -35,4 +38,12 @@
     <import resource="applicationContext-springmvc.xml"/>
     <!--mongo的服务-->
     <import resource="applicationContext-mongodb-driver.xml"/>
+    <!--接口服务-->
+    <import resource="applicationContext-ctx-restful.xml"/>
+
+    <bean class="com.zhuanche.util.FtpUtil"/>
+    <!--redis-driver的服务-->
+    <import resource="applicationContext-redis-driver.xml"/>
+    <!--块钱的服务-->
+    <import resource="applicationContext-kuaiqian.xml"/>
 </beans>

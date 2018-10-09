@@ -7,15 +7,15 @@
     <result column="city_name" property="cityName" jdbcType="VARCHAR" />
     <result column="supplier" property="supplier" jdbcType="INTEGER" />
     <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
-    <result column="startDate" property="startdate" jdbcType="VARCHAR" />
-    <result column="endDate" property="enddate" jdbcType="VARCHAR" />
+    <result column="startDate" property="startDate" jdbcType="VARCHAR" />
+    <result column="endDate" property="endDate" jdbcType="VARCHAR" />
     <result column="peak_times" property="peakTimes" jdbcType="INTEGER" />
     <result column="create_by" property="createBy" jdbcType="INTEGER" />
     <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
     <result column="update_by" property="updateBy" jdbcType="INTEGER" />
     <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
-    <result column="status" property="status" jdbcType="BIT" />
+    <result column="status" property="status" jdbcType="INTEGER" />
     <result column="team_id" property="teamId" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
@@ -33,23 +33,26 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverMustDuty" >
-    insert into car_driver_must_duty (id, city, city_name, 
-      supplier, supplier_name, startDate, 
-      endDate, peak_times, create_by, 
-      create_date, update_by, update_date, 
-      remark, status, team_id)
-    values (#{id,jdbcType=INTEGER}, #{city,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR}, 
-      #{supplier,jdbcType=INTEGER}, #{supplierName,jdbcType=VARCHAR}, #{startdate,jdbcType=VARCHAR}, 
-      #{enddate,jdbcType=VARCHAR}, #{peakTimes,jdbcType=INTEGER}, #{createBy,jdbcType=INTEGER}, 
-      #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=INTEGER}, #{updateDate,jdbcType=TIMESTAMP}, 
-      #{remark,jdbcType=VARCHAR}, #{status,jdbcType=BIT}, #{teamId,jdbcType=INTEGER})
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_driver_must_duty (city, city_name, supplier, 
+      supplier_name, startDate, endDate, 
+      peak_times, create_by, create_date, 
+      update_by, update_date, remark, 
+      status, team_id)
+    values (#{city,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR}, #{supplier,jdbcType=INTEGER}, 
+      #{supplierName,jdbcType=VARCHAR}, #{startDate,jdbcType=VARCHAR}, #{endDate,jdbcType=VARCHAR},
+      #{peakTimes,jdbcType=INTEGER}, #{createBy,jdbcType=INTEGER}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateBy,jdbcType=INTEGER}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, 
+      #{status,jdbcType=INTEGER}, #{teamId,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverMustDuty" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
     insert into car_driver_must_duty
     <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        id,
-      </if>
       <if test="city != null" >
         city,
       </if>
@@ -62,10 +65,10 @@
       <if test="supplierName != null" >
         supplier_name,
       </if>
-      <if test="startdate != null" >
+      <if test="startDate != null" >
         startDate,
       </if>
-      <if test="enddate != null" >
+      <if test="endDate != null" >
         endDate,
       </if>
       <if test="peakTimes != null" >
@@ -94,9 +97,6 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        #{id,jdbcType=INTEGER},
-      </if>
       <if test="city != null" >
         #{city,jdbcType=INTEGER},
       </if>
@@ -109,11 +109,11 @@
       <if test="supplierName != null" >
         #{supplierName,jdbcType=VARCHAR},
       </if>
-      <if test="startdate != null" >
-        #{startdate,jdbcType=VARCHAR},
+      <if test="startDate != null" >
+        #{startDate,jdbcType=VARCHAR},
       </if>
-      <if test="enddate != null" >
-        #{enddate,jdbcType=VARCHAR},
+      <if test="endDate != null" >
+        #{endDate,jdbcType=VARCHAR},
       </if>
       <if test="peakTimes != null" >
         #{peakTimes,jdbcType=INTEGER},
@@ -134,7 +134,7 @@
         #{remark,jdbcType=VARCHAR},
       </if>
       <if test="status != null" >
-        #{status,jdbcType=BIT},
+        #{status,jdbcType=INTEGER},
       </if>
       <if test="teamId != null" >
         #{teamId,jdbcType=INTEGER},
@@ -156,11 +156,11 @@
       <if test="supplierName != null" >
         supplier_name = #{supplierName,jdbcType=VARCHAR},
       </if>
-      <if test="startdate != null" >
-        startDate = #{startdate,jdbcType=VARCHAR},
+      <if test="startDate != null" >
+        startDate = #{startDate,jdbcType=VARCHAR},
       </if>
-      <if test="enddate != null" >
-        endDate = #{enddate,jdbcType=VARCHAR},
+      <if test="endDate != null" >
+        endDate = #{endDate,jdbcType=VARCHAR},
       </if>
       <if test="peakTimes != null" >
         peak_times = #{peakTimes,jdbcType=INTEGER},
@@ -181,7 +181,7 @@
         remark = #{remark,jdbcType=VARCHAR},
       </if>
       <if test="status != null" >
-        status = #{status,jdbcType=BIT},
+        status = #{status,jdbcType=INTEGER},
       </if>
       <if test="teamId != null" >
         team_id = #{teamId,jdbcType=INTEGER},
@@ -195,15 +195,15 @@
       city_name = #{cityName,jdbcType=VARCHAR},
       supplier = #{supplier,jdbcType=INTEGER},
       supplier_name = #{supplierName,jdbcType=VARCHAR},
-      startDate = #{startdate,jdbcType=VARCHAR},
-      endDate = #{enddate,jdbcType=VARCHAR},
+      startDate = #{startDate,jdbcType=VARCHAR},
+      endDate = #{endDate,jdbcType=VARCHAR},
       peak_times = #{peakTimes,jdbcType=INTEGER},
       create_by = #{createBy,jdbcType=INTEGER},
       create_date = #{createDate,jdbcType=TIMESTAMP},
       update_by = #{updateBy,jdbcType=INTEGER},
       update_date = #{updateDate,jdbcType=TIMESTAMP},
       remark = #{remark,jdbcType=VARCHAR},
-      status = #{status,jdbcType=BIT},
+      status = #{status,jdbcType=INTEGER},
       team_id = #{teamId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>

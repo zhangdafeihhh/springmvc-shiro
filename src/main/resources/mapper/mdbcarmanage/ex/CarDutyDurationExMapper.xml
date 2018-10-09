@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.CarDutyDurationExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.CarDutyDuration" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="city" property="city" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="supplier" property="supplier" jdbcType="INTEGER" />
+    <result column="team_id" property="teamId" jdbcType="INTEGER" />
+    <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+    <result column="duty_name" property="dutyName" jdbcType="VARCHAR" />
+    <result column="startDate" property="startDate" jdbcType="VARCHAR" />
+    <result column="endDate" property="endDate" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+  </resultMap>
+
+  <select id="queryDutyDurationListByField" parameterType="com.zhuanche.request.DutyParamRequest" resultType="com.zhuanche.dto.driverDuty.CarDriverDurationDTO">
+    select
+    d.id,
+    d.city,
+    d.city_name cityName,
+    d.supplier,
+    d.supplier_name supplierName,
+    d.duty_name dutyName,
+    d.startDate,
+    d.endDate,
+    d.create_by createBy,
+    d.create_date createDate,
+    d.update_by updateBy,
+    d.update_date updateDate,
+    d.remark,
+    d.status,
+    CONCAT(startDate,'-',endDate) as times
+    from car_duty_duration d
+    where 1=1
+    <if test="cityId !=null ">
+      and d.city = #{cityId}
+    </if>
+    <if test="supplierId !=null">
+      and d.supplier = #{supplierId}
+    </if>
+    <if test="teamId != null">
+      and d.team_id = #{teamId}
+    </if>
+    <if test="status !=null and status !='' ">
+      and d.status = #{status}
+    </if>
+    order by d.update_date desc
+  </select>
+
+  <select id="selectOne" resultType="com.zhuanche.dto.driverDuty.CarDriverDurationDTO" parameterType="java.lang.Integer" >
+        select
+    d.id,
+    d.city,
+    d.city_name cityName,
+    d.supplier,
+    d.supplier_name supplierName,
+    d.duty_name dutyName,
+    d.startDate,
+    d.endDate,
+    d.create_by createBy,
+    d.create_date createDate,
+    d.update_by updateBy,
+    d.update_date updateDate,
+    d.remark,
+    d.status,
+    u1.user_name createName,
+    u2.user_name updateName,
+    t3.team_name teamName,
+    d.team_id teamId
+    from car_duty_duration d
+    left join car_adm_user u1 on d.create_by=u1.user_id
+    left join car_adm_user u2 on d.update_by=u2.user_id
+    left JOIN car_driver_team t3 on d.team_id = t3.id
+    where d.id = #{paramId,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectDutyDurationList" parameterType="com.zhuanche.request.DutyParamRequest" resultType="com.zhuanche.dto.driverDuty.CarDriverDurationDTO">
+    select
+    d.id,
+    d.city,
+    d.city_name cityName,
+    d.supplier,
+    d.supplier_name supplierName,
+    d.duty_name dutyName,
+    d.startDate,
+    d.endDate,
+    d.create_by createBy,
+    d.create_date createDate,
+    d.update_by updateBy,
+    d.update_date updateDate,
+    d.remark,
+    d.status,
+    u1.user_name createName,
+    u2.user_name updateName,
+    t3.team_name teamName,
+    d.team_id teamId
+    from car_duty_duration d
+    left join car_adm_user u1 on d.create_by=u1.user_id
+    left join car_adm_user u2 on d.update_by=u2.user_id
+    left JOIN car_driver_team t3 on d.team_id = t3.id
+    where 1=1 and t3.status!=2
+    <if test="dutyIds !=null and dutyIds !='' ">
+      and d.id in (${dutyIds})
+    </if>
+    <if test="cityIds!=null and cityIds.size()>0">
+      and d.city IN
+      <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
+        #{cid}
+      </foreach>
+    </if>
+    <if test="supplierIds!=null and supplierIds.size()>0">
+      and d.supplier IN
+      <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
+        #{sid}
+      </foreach>
+    </if>
+    <if test="teamIds!=null and teamIds.size()>0">
+      and d.team_id IN
+      <foreach collection="teamIds" open="(" close=")" separator="," item="tid" >
+        #{tid}
+      </foreach>
+    </if>
+    <if test="status !=null and status !='' ">
+      and d.status = #{status}
+    </if>
+    order by d.update_date desc
+  </select>
+</mapper>

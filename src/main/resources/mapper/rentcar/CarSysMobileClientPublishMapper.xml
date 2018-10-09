@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.CarSysMobileClientPublishMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarSysMobileClientPublish" >
+    <id column="version_id" property="versionId" jdbcType="INTEGER" />
+    <result column="version_name" property="versionName" jdbcType="VARCHAR" />
+    <result column="version_no" property="versionNo" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="platform" property="platform" jdbcType="INTEGER" />
+    <result column="download_url" property="downloadUrl" jdbcType="VARCHAR" />
+    <result column="forced_update" property="forcedUpdate" jdbcType="INTEGER" />
+    <result column="forced_update_down" property="forcedUpdateDown" jdbcType="INTEGER" />
+    <result column="channel_num" property="channelNum" jdbcType="VARCHAR" />
+    <result column="publisher" property="publisher" jdbcType="INTEGER" />
+    <result column="publish_date" property="publishDate" jdbcType="TIMESTAMP" />
+    <result column="memo" property="memo" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="city_names" property="cityNames" jdbcType="VARCHAR" />
+    <result column="supplier_str" property="supplierStr" jdbcType="VARCHAR" />
+    <result column="effective_date" property="effectiveDate" jdbcType="VARCHAR" />
+    <result column="sorts_num" property="sortsNum" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    version_id, version_name, version_no, type, platform, download_url, forced_update, 
+    forced_update_down, channel_num, publisher, publish_date, memo, status, create_by, 
+    create_date, update_by, update_date, city_names, supplier_str, effective_date, sorts_num
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from car_sys_mobile_client_publish
+    where version_id = #{versionId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from car_sys_mobile_client_publish
+    where version_id = #{versionId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.rentcar.CarSysMobileClientPublish" >
+    <selectKey resultType="java.lang.Integer" keyProperty="versionId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_sys_mobile_client_publish (version_name, version_no, type, 
+      platform, download_url, forced_update, 
+      forced_update_down, channel_num, publisher, 
+      publish_date, memo, status, 
+      create_by, create_date, update_by, 
+      update_date, city_names, supplier_str, 
+      effective_date, sorts_num)
+    values (#{versionName,jdbcType=VARCHAR}, #{versionNo,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, 
+      #{platform,jdbcType=INTEGER}, #{downloadUrl,jdbcType=VARCHAR}, #{forcedUpdate,jdbcType=INTEGER}, 
+      #{forcedUpdateDown,jdbcType=INTEGER}, #{channelNum,jdbcType=VARCHAR}, #{publisher,jdbcType=INTEGER}, 
+      #{publishDate,jdbcType=TIMESTAMP}, #{memo,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      #{createBy,jdbcType=INTEGER}, #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=INTEGER}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{cityNames,jdbcType=VARCHAR}, #{supplierStr,jdbcType=VARCHAR}, 
+      #{effectiveDate,jdbcType=VARCHAR}, #{sortsNum,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.rentcar.CarSysMobileClientPublish" >
+    <selectKey resultType="java.lang.Integer" keyProperty="versionId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_sys_mobile_client_publish
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="versionName != null" >
+        version_name,
+      </if>
+      <if test="versionNo != null" >
+        version_no,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="platform != null" >
+        platform,
+      </if>
+      <if test="downloadUrl != null" >
+        download_url,
+      </if>
+      <if test="forcedUpdate != null" >
+        forced_update,
+      </if>
+      <if test="forcedUpdateDown != null" >
+        forced_update_down,
+      </if>
+      <if test="channelNum != null" >
+        channel_num,
+      </if>
+      <if test="publisher != null" >
+        publisher,
+      </if>
+      <if test="publishDate != null" >
+        publish_date,
+      </if>
+      <if test="memo != null" >
+        memo,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="cityNames != null" >
+        city_names,
+      </if>
+      <if test="supplierStr != null" >
+        supplier_str,
+      </if>
+      <if test="effectiveDate != null" >
+        effective_date,
+      </if>
+      <if test="sortsNum != null" >
+        sorts_num,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="versionName != null" >
+        #{versionName,jdbcType=VARCHAR},
+      </if>
+      <if test="versionNo != null" >
+        #{versionNo,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="platform != null" >
+        #{platform,jdbcType=INTEGER},
+      </if>
+      <if test="downloadUrl != null" >
+        #{downloadUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="forcedUpdate != null" >
+        #{forcedUpdate,jdbcType=INTEGER},
+      </if>
+      <if test="forcedUpdateDown != null" >
+        #{forcedUpdateDown,jdbcType=INTEGER},
+      </if>
+      <if test="channelNum != null" >
+        #{channelNum,jdbcType=VARCHAR},
+      </if>
+      <if test="publisher != null" >
+        #{publisher,jdbcType=INTEGER},
+      </if>
+      <if test="publishDate != null" >
+        #{publishDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="memo != null" >
+        #{memo,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cityNames != null" >
+        #{cityNames,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierStr != null" >
+        #{supplierStr,jdbcType=VARCHAR},
+      </if>
+      <if test="effectiveDate != null" >
+        #{effectiveDate,jdbcType=VARCHAR},
+      </if>
+      <if test="sortsNum != null" >
+        #{sortsNum,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.rentcar.CarSysMobileClientPublish" >
+    update car_sys_mobile_client_publish
+    <set >
+      <if test="versionName != null" >
+        version_name = #{versionName,jdbcType=VARCHAR},
+      </if>
+      <if test="versionNo != null" >
+        version_no = #{versionNo,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="platform != null" >
+        platform = #{platform,jdbcType=INTEGER},
+      </if>
+      <if test="downloadUrl != null" >
+        download_url = #{downloadUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="forcedUpdate != null" >
+        forced_update = #{forcedUpdate,jdbcType=INTEGER},
+      </if>
+      <if test="forcedUpdateDown != null" >
+        forced_update_down = #{forcedUpdateDown,jdbcType=INTEGER},
+      </if>
+      <if test="channelNum != null" >
+        channel_num = #{channelNum,jdbcType=VARCHAR},
+      </if>
+      <if test="publisher != null" >
+        publisher = #{publisher,jdbcType=INTEGER},
+      </if>
+      <if test="publishDate != null" >
+        publish_date = #{publishDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="memo != null" >
+        memo = #{memo,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cityNames != null" >
+        city_names = #{cityNames,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierStr != null" >
+        supplier_str = #{supplierStr,jdbcType=VARCHAR},
+      </if>
+      <if test="effectiveDate != null" >
+        effective_date = #{effectiveDate,jdbcType=VARCHAR},
+      </if>
+      <if test="sortsNum != null" >
+        sorts_num = #{sortsNum,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where version_id = #{versionId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.rentcar.CarSysMobileClientPublish" >
+    update car_sys_mobile_client_publish
+    set version_name = #{versionName,jdbcType=VARCHAR},
+      version_no = #{versionNo,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      platform = #{platform,jdbcType=INTEGER},
+      download_url = #{downloadUrl,jdbcType=VARCHAR},
+      forced_update = #{forcedUpdate,jdbcType=INTEGER},
+      forced_update_down = #{forcedUpdateDown,jdbcType=INTEGER},
+      channel_num = #{channelNum,jdbcType=VARCHAR},
+      publisher = #{publisher,jdbcType=INTEGER},
+      publish_date = #{publishDate,jdbcType=TIMESTAMP},
+      memo = #{memo,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      create_by = #{createBy,jdbcType=INTEGER},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=INTEGER},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      city_names = #{cityNames,jdbcType=VARCHAR},
+      supplier_str = #{supplierStr,jdbcType=VARCHAR},
+      effective_date = #{effectiveDate,jdbcType=VARCHAR},
+      sorts_num = #{sortsNum,jdbcType=VARCHAR}
+    where version_id = #{versionId,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -11,7 +11,7 @@
     <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
     <result column="team_id" property="teamId" jdbcType="INTEGER" />
     <result column="team_name" property="teamName" jdbcType="VARCHAR" />
-    <result column="time" property="time" jdbcType="DATE" />
+    <result column="time" property="time" jdbcType="VARCHAR" />
     <result column="forced_ids" property="forcedIds" jdbcType="VARCHAR" />
     <result column="duty_ids" property="dutyIds" jdbcType="VARCHAR" />
     <result column="forced_times" property="forcedTimes" jdbcType="VARCHAR" />
@@ -19,11 +19,29 @@
     <result column="type" property="type" jdbcType="INTEGER" />
     <result column="status" property="status" jdbcType="INTEGER" />
   </resultMap>
+  <resultMap id="BaseExResultMap" type="com.zhuanche.dto.driver.CarDriverDayDutyDTO" extends="BaseResultMap">
+
+  </resultMap>
+
+  <insert id="insertDriverDayDutyList" parameterType="java.util.Map">
+    insert into car_driver_day_duty (driver_id,driver_name,
+    city_id,city_name,supplier_id,supplier_name,team_id,team_name,
+    time,forced_ids,duty_ids,
+    forced_times,duty_times,type,status)
+    values
+    <foreach collection="list" item="item" index="index" separator="," >
+      (#{item.driverId},#{item.driverName},#{item.cityId},#{item.cityName},
+      #{item.supplierId},#{item.supplierName},#{item.teamId},
+      #{item.teamName},#{item.time},#{item.forcedIds},#{item.dutyIds},
+      #{item.forcedTimes},#{item.dutyTimes},#{item.type},#{item.status})
+    </foreach>
+
+  </insert>
 
   <select id="getUnIssueCount" resultType="java.lang.Integer"
           parameterType="com.zhuanche.request.DutyParamRequest">
     select
-    COUNT (1)
+    COUNT(1)
     from
     car_driver_day_duty d
     where 1=1
@@ -33,32 +51,23 @@
     <if test="time!=null and time!=''">
       and d.time = #{time}
     </if>
-    <if test="cityId!=null and cityId!=''">
-      and d.city_id = #{cityId}
-    </if>
-    <if test="supplierId !=null and supplierId !=''">
-      and d.supplier_id = #{supplierId}
-    </if>
-    <if test="teamId !=null and teamId !=''">
-      AND d.team_id = #{teamId}
-    </if>
     <if test="status!=null and status!=''">
       and d.status = #{status}
     </if>
     <if test="cityIds!=null and cityIds.size()>0">
-      and city IN
+      and d.city_id IN
       <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
         #{cid}
       </foreach>
     </if>
     <if test="supplierIds!=null and supplierIds.size()>0">
-      and supplier IN
+      and d.supplier_id IN
       <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
         #{sid}
       </foreach>
     </if>
     <if test="teamIds!=null and teamIds.size()>0">
-      and id IN
+      and d.team_id IN
       <foreach collection="teamIds" open="(" close=")" separator="," item="tid" >
         #{tid}
       </foreach>
@@ -162,26 +171,32 @@
     d.team_name, d.time, d.forced_ids, d.duty_ids, d.forced_times, d.duty_times, d.type, d.status
   </sql>
   <!-- 查询司机排班列表-->
-  <select id="selectForList" resultMap="BaseResultMap" parameterType="com.zhuanche.request.DutyParamRequest" >
+  <select id="selectForList" resultMap="BaseExResultMap" parameterType="com.zhuanche.request.DutyParamRequest" >
     select
     <include refid="Base_Column_List" />
-    from car_driver_day_duty d
-    where 1=1
+    from car_driver_day_duty d LEFT JOIN car_driver_team t3 on d.team_id = t3.id
+    where 1=1 and t3.status!=2
+    <if test="driverId!=null and driverId!=''">
+      and d.driver_id = #{driverId}
+    </if>
+    <if test="status!=null and status!=''">
+      and d.status = #{status}
+    </if>
     <if test="driverName!=null and driverName!=''">
       and d.driver_name = #{driverName}
     </if>
     <if test = "startTime !=null and startTime !=''" >
       <![CDATA[
-			and d.startTime >= #{startTime, jdbcType=TIMESTAMP}
+			and d.time >= #{startTime, jdbcType=TIMESTAMP}
 		]]>
     </if>
     <if test = "endTime !=null and endTime !=''" >
       <![CDATA[
-			and d.endTime <= #{endTime, jdbcType=TIMESTAMP}
+			and d.time <= #{endTime, jdbcType=TIMESTAMP}
 		]]>
     </if>
     <if test="time!=null and time!=''">
-      and d.time = #{time, jdbcType=TIMESTAMP}
+      and d.time = #{time}
     </if>
     <if test="cityIds!=null and cityIds.size()>0">
       and d.city_id IN
@@ -201,7 +216,7 @@
         #{tid}
       </foreach>
     </if>
-    order by d.city_id, d.id
+    order by d.time DESC
   </select>
 
   <update id="updateDriverDayDutyList" parameterType="java.util.Map">
@@ -225,6 +240,27 @@
       WHERE
       id = #{item.id}
     </foreach>
+  </update>
+
+  <update id="updateDriverDayDutyOne" parameterType="com.zhuanche.dto.driver.CarDriverDayDutyDTO">
+      UPDATE car_driver_day_duty
+      <set>
+        driver_name = #{driverName},
+        city_id = #{cityId},
+        city_name = #{cityName},
+        supplier_id = #{supplierId},
+        supplier_name = #{supplierName},
+        team_id = #{teamId},
+        team_name = #{teamName},
+        forced_ids = #{forcedIds},
+        duty_ids = #{dutyIds},
+        forced_times = #{forcedTimes},
+        duty_times = #{dutyTimes},
+        type = #{type},
+        status = #{status}
+      </set>
+      WHERE
+      id = #{id}
   </update>
 
 </mapper>

@@ -18,6 +18,7 @@ import com.zhuanche.dto.SaasRoleDTO;
 import com.zhuanche.entity.mdbcarmanage.SaasPermission;
 import com.zhuanche.entity.mdbcarmanage.SaasRole;
 import com.zhuanche.entity.mdbcarmanage.SaasRolePermissionRalation;
+import com.zhuanche.shiro.session.RedisSessionDAO;
 import com.zhuanche.util.BeanUtil;
 
 import mapper.mdbcarmanage.SaasRoleMapper;
@@ -36,6 +37,8 @@ public class RoleManagementService{
 	private SaasRolePermissionRalationExMapper saasRolePermissionRalationExMapper;
 	@Autowired
 	private SaasPermissionExMapper  saasPermissionExMapper;
+	@Autowired
+	private RedisSessionDAO              redisSessionDAO;
 	
 	/**一、增加一个角色**/
 	public AjaxResponse addSaasRole( SaasRole role ) {
@@ -57,11 +60,16 @@ public class RoleManagementService{
 		if( role==null ) {
 			return AjaxResponse.fail(RestErrorCode.ROLE_NOT_EXIST );
 		}
+		//系统预置角色，不能被禁用
+		if( SaasConst.SYSTEM_ROLE.equalsIgnoreCase(role.getRoleCode()) ) {
+			return AjaxResponse.fail(RestErrorCode.SYSTEM_ROLE_CANOT_CHANGE , role.getRoleCode() );
+		}
 		//执行
 		SaasRole roleForUpdate = new SaasRole();
 		roleForUpdate.setRoleId(roleId);
 		roleForUpdate.setValid(false);
 		saasRoleMapper.updateByPrimaryKeySelective(roleForUpdate);
+		redisSessionDAO.clearRelativeSession(null, roleId, null);//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
 	
@@ -77,6 +85,7 @@ public class RoleManagementService{
 		roleForUpdate.setRoleId(roleId);
 		roleForUpdate.setValid(true);
 		saasRoleMapper.updateByPrimaryKeySelective(roleForUpdate);
+		redisSessionDAO.clearRelativeSession(null, roleId, null);//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
 
@@ -87,6 +96,10 @@ public class RoleManagementService{
 		if( rawrole==null ) {
 			return AjaxResponse.fail(RestErrorCode.ROLE_NOT_EXIST );
 		}
+		//系统预置角色，不能被禁用
+		if( SaasConst.SYSTEM_ROLE.equalsIgnoreCase(rawrole.getRoleCode()) ) {
+			return AjaxResponse.fail(RestErrorCode.SYSTEM_ROLE_CANOT_CHANGE , rawrole.getRoleCode() );
+		}
 		//角色代码已经存在   (如果发生变化时 )
 		if( newrole.getRoleCode()!=null && newrole.getRoleCode().length()>0 && !newrole.getRoleCode().equalsIgnoreCase(rawrole.getRoleCode())   ) {
 			List<SaasRole> roles = saasRoleExMapper.queryRoles(null, newrole.getRoleCode(), null, null);
@@ -96,6 +109,7 @@ public class RoleManagementService{
 		}
 		//执行
 		saasRoleMapper.updateByPrimaryKeySelective(newrole);
+		redisSessionDAO.clearRelativeSession(null, newrole.getRoleId(), null);//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
 	
@@ -155,20 +169,30 @@ public class RoleManagementService{
 	
 	/**七、保存一个角色中的权限ID**/
 	public AjaxResponse savePermissionIds( Integer roleId, List<Integer> permissionIds) {
-		if( permissionIds==null || permissionIds.size()==0 ) {
-			return AjaxResponse.success( null );
+		//角色不存在
+		SaasRole rawrole = saasRoleMapper.selectByPrimaryKey( roleId );
+		if( rawrole==null ) {
+			return AjaxResponse.fail(RestErrorCode.ROLE_NOT_EXIST );
 		}
+		//系统预置角色，不能被禁用
+		if( SaasConst.SYSTEM_ROLE.equalsIgnoreCase(rawrole.getRoleCode()) ) {
+			return AjaxResponse.fail(RestErrorCode.SYSTEM_ROLE_CANOT_CHANGE , rawrole.getRoleCode() );
+		}
+		
 		//先删除
 		saasRolePermissionRalationExMapper.deletePermissionIdsOfRole(roleId);
 		//再插入
-		List<SaasRolePermissionRalation> records = new ArrayList<SaasRolePermissionRalation>(  permissionIds.size() );
-		for(Integer permissionId : permissionIds ) {
-			SaasRolePermissionRalation ralation = new SaasRolePermissionRalation();
-			ralation.setRoleId(roleId);
-			ralation.setPermissionId(permissionId);
-			records.add(ralation);
+		if(permissionIds!=null && permissionIds.size()>0) {
+			List<SaasRolePermissionRalation> records = new ArrayList<SaasRolePermissionRalation>(  permissionIds.size() );
+			for(Integer permissionId : permissionIds ) {
+				SaasRolePermissionRalation ralation = new SaasRolePermissionRalation();
+				ralation.setRoleId(roleId);
+				ralation.setPermissionId(permissionId);
+				records.add(ralation);
+			}
+			saasRolePermissionRalationExMapper.insertBatch(records);
 		}
-		saasRolePermissionRalationExMapper.insertBatch(records);
+		redisSessionDAO.clearRelativeSession(null, roleId , null);//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
 	
@@ -189,6 +213,7 @@ public class RoleManagementService{
 			roleName = null;
 		}
 		if( StringUtils.isNotEmpty(roleName) ) {
+			roleName = roleName.replace("/", "//").replace("%", "/%").replace("_", "/_");
 			roleName = "%"+roleName+"%";
 		}
 		if( valid!=null && valid.byteValue()!=0 && valid.byteValue()!=1 ) {

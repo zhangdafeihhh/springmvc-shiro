@@ -1,5 +1,8 @@
 package mapper.mdbcarmanage.ex;
 
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.dto.driver.CarDriverDayDutyDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverDayDuty;
 import com.zhuanche.request.DutyParamRequest;
@@ -11,8 +14,16 @@ public interface CarDriverDayDutyExMapper {
 
     List<CarDriverDayDutyDTO> selectForList(DutyParamRequest dutyParamRequest);
 
+    List<CarDriverDayDutyDTO> queryForList(DutyParamRequest dutyParamRequest);
+
     Integer getUnIssueCount(DutyParamRequest dutyParamRequest);
 
+
     Integer updateDriverDayDutyList(Map<String, Object> params);
+
+    Integer updateDriverDayDutyOne(CarDriverDayDutyDTO dayDutyDTO);
+
+    /** 保存司机排班信息--LN*/
+    Integer insertDriverDayDutyList(Map<String, Object> params);
 
 }

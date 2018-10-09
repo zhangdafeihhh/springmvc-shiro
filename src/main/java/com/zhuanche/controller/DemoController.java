@@ -2,22 +2,35 @@ package com.zhuanche.controller;
 
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.serv.DemoService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 
 @Controller
 @RequestMapping("/demo")
 public class DemoController{
+	@Autowired
+	private DemoService demoService;
+	
 	//---------------------------------------------------------------------请求页面时
 	/**有权限**/
     //@RequiresRoles(value= {"strategy_manage","dispatcher"},logical=Logical.OR )
     @RequestMapping("/hasPerm")
+    @MasterSlaveConfigs(configs={ 
+  		  @MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.MASTER ),
+  		  @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
+      } )
     public String hasPerm(){
+    	demoService.sayhello();
         return "demo";
     }
 	/**无权限**/

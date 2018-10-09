@@ -34,6 +34,10 @@ public class DriverTeamRequest extends PageRequest{
 
     private String teamName;
 
+    private String name;
+
+    private Integer status;
+
     private Set<String> driverIds;
 
     private Set<String> cityIds;
@@ -44,6 +48,42 @@ public class DriverTeamRequest extends PageRequest{
     private String plates;
 
     private String license;
+
+    private String licensePlates;
+
+    private String phone;
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getLicensePlates() {
+        return licensePlates;
+    }
+
+    public void setLicensePlates(String licensePlates) {
+        this.licensePlates = licensePlates;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
 
     public String getLicense() {
         return license;

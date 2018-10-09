@@ -77,11 +77,11 @@
 	</bean>
 
 	<!-- ********************************配置Shiro的Web过滤器 -->
-	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+	<bean id="shiroFilter" class="com.zhuanche.shiro.PlatformShiroFilterFactoryBean">
 		<property name="securityManager" ref="securityManager" />
-		<property name="loginUrl" value="${loginpage.url}" />
+		<property name="loginUrl" value="/login.json" />
 		<property name="successUrl" value="${homepage.url}" />
-		<property name="unauthorizedUrl" value="/unauthorized.html" /><!-- 因为和CAS集成了，因框架存在BUG不起作用无法注入，只能是默认的unauthorized.jsp -->
+		<property name="unauthorizedUrl" value="/unauthorized.json" /><!-- 因为和CAS集成了，因框架存在BUG不起作用无法注入，只能是默认的unauthorized.jsp -->
 		<property name="filters">
 			<util:map>
 				<!-- 添加casFilter到shiroFilter -->
@@ -90,11 +90,12 @@
 		</property>
 		<property name="filterChainDefinitions">
 			<value>
+				/nginx.html = anon
+				/login.json = anon
+				/unauthorized.json=anon
 				/getMsgCode.json = anon
 				/dologin.json = anon
 				/logout.html = logout
-				/nginx.html = anon
-				/unauthorized.html=anon
 				/** = user
 			</value>
 		</property>

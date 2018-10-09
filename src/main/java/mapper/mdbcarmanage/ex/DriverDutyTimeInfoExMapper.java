@@ -1,5 +1,8 @@
 package mapper.mdbcarmanage.ex;
 
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.entity.mdbcarmanage.DriverDutyTimeInfo;
 
 import java.util.List;
@@ -14,5 +17,7 @@ public interface DriverDutyTimeInfoExMapper {
     Integer insertDriverDutyTimeInfoList(Map<String, Object> params);
 
     Integer updateDriverDutyTimeInfoList(Map<String, Object> params);
+
+    Integer updateDriverDutyTimeInfoOne(DriverDutyTimeInfo timeInfo);
 
 }

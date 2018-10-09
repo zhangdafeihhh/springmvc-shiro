@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.ex.DriverJoinRecordExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.DriverJoinRecord" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="driver_verify_id" property="driverVerifyId" jdbcType="INTEGER" />
+    <result column="operation" property="operation" jdbcType="INTEGER" />
+    <result column="operation_name" property="operationName" jdbcType="VARCHAR" />
+    <result column="operation_describe" property="operationDescribe" jdbcType="VARCHAR" />
+    <result column="create_id" property="createId" jdbcType="INTEGER" />
+    <result column="create_name" property="createName" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_id" property="updateId" jdbcType="INTEGER" />
+    <result column="update_name" property="updateName" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, driver_verify_id, operation, operation_name, operation_describe, create_id, create_name, 
+    create_time, update_id, update_name, update_time
+  </sql>
+  <select id="queryJoinRecordByDriverId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from driver_join_record
+    where driver_verify_id = #{driverId,jdbcType=INTEGER}
+    order by update_time desc
+  </select>
+</mapper>

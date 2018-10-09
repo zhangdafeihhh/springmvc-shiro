@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.CarBizPaymentDetailMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarBizPaymentDetail" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="relative_no" property="relativeNo" jdbcType="VARCHAR" />
+    <result column="payment_type" property="paymentType" jdbcType="INTEGER" />
+    <result column="payment_no" property="paymentNo" jdbcType="VARCHAR" />
+    <result column="payment_usertype" property="paymentUsertype" jdbcType="INTEGER" />
+    <result column="payment_user" property="paymentUser" jdbcType="VARCHAR" />
+    <result column="payment_customerid" property="paymentCustomerid" jdbcType="VARCHAR" />
+    <result column="amount" property="amount" jdbcType="DECIMAL" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="preauth_date" property="preauthDate" jdbcType="VARCHAR" />
+    <result column="preauth_status" property="preauthStatus" jdbcType="INTEGER" />
+    <result column="preauth_sure_date" property="preauthSureDate" jdbcType="VARCHAR" />
+    <result column="preauth_sure_status" property="preauthSureStatus" jdbcType="INTEGER" />
+    <result column="external_no" property="externalNo" jdbcType="VARCHAR" />
+    <result column="createdate" property="createdate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="errorMsg" property="errormsg" jdbcType="VARCHAR" />
+    <result column="authorizationCode" property="authorizationcode" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, relative_no, payment_type, payment_no, payment_usertype, payment_user, payment_customerid, 
+    amount, status, preauth_date, preauth_status, preauth_sure_date, preauth_sure_status, 
+    external_no, createdate, update_date, errorMsg, authorizationCode
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from car_biz_payment_detail
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from car_biz_payment_detail
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.rentcar.CarBizPaymentDetail" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_biz_payment_detail (relative_no, payment_type, payment_no, 
+      payment_usertype, payment_user, payment_customerid, 
+      amount, status, preauth_date, 
+      preauth_status, preauth_sure_date, preauth_sure_status, 
+      external_no, createdate, update_date, 
+      errorMsg, authorizationCode)
+    values (#{relativeNo,jdbcType=VARCHAR}, #{paymentType,jdbcType=INTEGER}, #{paymentNo,jdbcType=VARCHAR}, 
+      #{paymentUsertype,jdbcType=INTEGER}, #{paymentUser,jdbcType=VARCHAR}, #{paymentCustomerid,jdbcType=VARCHAR}, 
+      #{amount,jdbcType=DECIMAL}, #{status,jdbcType=VARCHAR}, #{preauthDate,jdbcType=VARCHAR}, 
+      #{preauthStatus,jdbcType=INTEGER}, #{preauthSureDate,jdbcType=VARCHAR}, #{preauthSureStatus,jdbcType=INTEGER}, 
+      #{externalNo,jdbcType=VARCHAR}, #{createdate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{errormsg,jdbcType=VARCHAR}, #{authorizationcode,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.rentcar.CarBizPaymentDetail" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_biz_payment_detail
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="relativeNo != null" >
+        relative_no,
+      </if>
+      <if test="paymentType != null" >
+        payment_type,
+      </if>
+      <if test="paymentNo != null" >
+        payment_no,
+      </if>
+      <if test="paymentUsertype != null" >
+        payment_usertype,
+      </if>
+      <if test="paymentUser != null" >
+        payment_user,
+      </if>
+      <if test="paymentCustomerid != null" >
+        payment_customerid,
+      </if>
+      <if test="amount != null" >
+        amount,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="preauthDate != null" >
+        preauth_date,
+      </if>
+      <if test="preauthStatus != null" >
+        preauth_status,
+      </if>
+      <if test="preauthSureDate != null" >
+        preauth_sure_date,
+      </if>
+      <if test="preauthSureStatus != null" >
+        preauth_sure_status,
+      </if>
+      <if test="externalNo != null" >
+        external_no,
+      </if>
+      <if test="createdate != null" >
+        createdate,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="errormsg != null" >
+        errorMsg,
+      </if>
+      <if test="authorizationcode != null" >
+        authorizationCode,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="relativeNo != null" >
+        #{relativeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="paymentType != null" >
+        #{paymentType,jdbcType=INTEGER},
+      </if>
+      <if test="paymentNo != null" >
+        #{paymentNo,jdbcType=VARCHAR},
+      </if>
+      <if test="paymentUsertype != null" >
+        #{paymentUsertype,jdbcType=INTEGER},
+      </if>
+      <if test="paymentUser != null" >
+        #{paymentUser,jdbcType=VARCHAR},
+      </if>
+      <if test="paymentCustomerid != null" >
+        #{paymentCustomerid,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null" >
+        #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="preauthDate != null" >
+        #{preauthDate,jdbcType=VARCHAR},
+      </if>
+      <if test="preauthStatus != null" >
+        #{preauthStatus,jdbcType=INTEGER},
+      </if>
+      <if test="preauthSureDate != null" >
+        #{preauthSureDate,jdbcType=VARCHAR},
+      </if>
+      <if test="preauthSureStatus != null" >
+        #{preauthSureStatus,jdbcType=INTEGER},
+      </if>
+      <if test="externalNo != null" >
+        #{externalNo,jdbcType=VARCHAR},
+      </if>
+      <if test="createdate != null" >
+        #{createdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="errormsg != null" >
+        #{errormsg,jdbcType=VARCHAR},
+      </if>
+      <if test="authorizationcode != null" >
+        #{authorizationcode,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.rentcar.CarBizPaymentDetail" >
+    update car_biz_payment_detail
+    <set >
+      <if test="relativeNo != null" >
+        relative_no = #{relativeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="paymentType != null" >
+        payment_type = #{paymentType,jdbcType=INTEGER},
+      </if>
+      <if test="paymentNo != null" >
+        payment_no = #{paymentNo,jdbcType=VARCHAR},
+      </if>
+      <if test="paymentUsertype != null" >
+        payment_usertype = #{paymentUsertype,jdbcType=INTEGER},
+      </if>
+      <if test="paymentUser != null" >
+        payment_user = #{paymentUser,jdbcType=VARCHAR},
+      </if>
+      <if test="paymentCustomerid != null" >
+        payment_customerid = #{paymentCustomerid,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null" >
+        amount = #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="preauthDate != null" >
+        preauth_date = #{preauthDate,jdbcType=VARCHAR},
+      </if>
+      <if test="preauthStatus != null" >
+        preauth_status = #{preauthStatus,jdbcType=INTEGER},
+      </if>
+      <if test="preauthSureDate != null" >
+        preauth_sure_date = #{preauthSureDate,jdbcType=VARCHAR},
+      </if>
+      <if test="preauthSureStatus != null" >
+        preauth_sure_status = #{preauthSureStatus,jdbcType=INTEGER},
+      </if>
+      <if test="externalNo != null" >
+        external_no = #{externalNo,jdbcType=VARCHAR},
+      </if>
+      <if test="createdate != null" >
+        createdate = #{createdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="errormsg != null" >
+        errorMsg = #{errormsg,jdbcType=VARCHAR},
+      </if>
+      <if test="authorizationcode != null" >
+        authorizationCode = #{authorizationcode,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.rentcar.CarBizPaymentDetail" >
+    update car_biz_payment_detail
+    set relative_no = #{relativeNo,jdbcType=VARCHAR},
+      payment_type = #{paymentType,jdbcType=INTEGER},
+      payment_no = #{paymentNo,jdbcType=VARCHAR},
+      payment_usertype = #{paymentUsertype,jdbcType=INTEGER},
+      payment_user = #{paymentUser,jdbcType=VARCHAR},
+      payment_customerid = #{paymentCustomerid,jdbcType=VARCHAR},
+      amount = #{amount,jdbcType=DECIMAL},
+      status = #{status,jdbcType=VARCHAR},
+      preauth_date = #{preauthDate,jdbcType=VARCHAR},
+      preauth_status = #{preauthStatus,jdbcType=INTEGER},
+      preauth_sure_date = #{preauthSureDate,jdbcType=VARCHAR},
+      preauth_sure_status = #{preauthSureStatus,jdbcType=INTEGER},
+      external_no = #{externalNo,jdbcType=VARCHAR},
+      createdate = #{createdate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      errorMsg = #{errormsg,jdbcType=VARCHAR},
+      authorizationCode = #{authorizationcode,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

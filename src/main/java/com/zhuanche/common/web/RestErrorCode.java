@@ -1,13 +1,13 @@
 package com.zhuanche.common.web;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 定义错误码与错误提示
@@ -29,13 +29,21 @@ public final class RestErrorCode{
 	public static final int HTTP_NOT_FOUND                   = 404;
 	@ResultMessage("系统内部发生错误")
 	public static final int HTTP_SYSTEM_ERROR              = 500;
-	@ResultMessage("请求参数校验不通过")
+	@ResultMessage("服务错误：{0}")
+	public static final int CAR_API_ERROR           = 996;
+	@ResultMessage("会话已失效，请重新登录")
+	public static final int HTTP_INVALID_SESSION           = 997;
+	@ResultMessage("请求参数校验不通过{0}")
 	public static final int HTTP_PARAM_INVALID              = 998;
 	@ResultMessage("未知错误")
 	public static final int UNKNOWN_ERROR                   = 999;
-	
+
+	@ResultMessage("记录操作失败")
+	public static final int RECORD_DEAL_FAILURE                   = 501;
+
+
 	//-----------------------------------------------用户
-	@ResultMessage("获取验证码太频繁")
+	@ResultMessage("获取验证码太频繁,请{0}分钟后重试")
 	public static final int GET_MSGCODE_EXCEED           = 1000;
 	@ResultMessage("用户不存在")
 	public static final int USER_NOT_EXIST                      = 1001;
@@ -51,7 +59,13 @@ public final class RestErrorCode{
 	public static final int MSG_CODE_WRONG                = 1006;
 	@ResultMessage("账号已经存在")
 	public static final int ACCOUNT_EXIST                      = 1007;
-	
+	@ResultMessage("短信验证码发送失败")
+	public static final int MSG_CODE_FAIL                      = 1011;
+	@ResultMessage("短信验证码{0}秒内不能重复发送")
+	public static final int MSG_CODE_REPEAT_SEND                      = 1012;
+	@ResultMessage("登录太频繁，请{0}分钟后重新登录")
+	public static final int DO_LOGIN_FREQUENTLY           = 1013;
+
 	//----------------------------------------------权限管理
 	@ResultMessage("父权限不存在")
 	public static final int PARENT_PERMISSION_NOT_EXIST           = 10001;
@@ -65,33 +79,25 @@ public final class RestErrorCode{
 	public static final int PERMISSION_DISABLE_CANT                    = 10005;
 	@ResultMessage("父权限已经被禁用，请先启用父权限")
 	public static final int PERMISSION_ENABLE_CANT                     = 10006;
-	
+	@ResultMessage("{0}为系统预置权限，不能禁用、修改")
+	public static final int SYSTEM_PERMISSION_CANOT_CHANGE  = 10007;
+
+	//---------------------------------------------------------------------------------------------------------------------------------------------
 	//----------------------------------------------角色管理
 	@ResultMessage("角色不存在")
 	public static final int ROLE_NOT_EXIST                                      = 10100;
 	@ResultMessage("角色代码已经存在")
 	public static final int ROLE_CODE_EXIST                                    = 10101;
-	   
+	@ResultMessage("{0}为系统预置角色，不能禁用、修改")
+	public static final int SYSTEM_ROLE_CANOT_CHANGE              = 10102;
+
 	//-----------------------------------------------业务参数：司机
 	@ResultMessage("司机不存在，请仔细核对！")
 	public static final int DRIVER_NOT_EXIST = 2000;
 	@ResultMessage("该司机已存在启用的永久停运！")
 	public static final int DRIVER_OUTAGEALL_EXIST = 2001;
-//	@ResultMessage("司机状态不是正常启用状态")
-//	public static final int DRIVER_STATUS_NOT_ENABLED                     = 1001;
-//	@ResultMessage("司机手机号码与身份证号码不符合")
-//	public static final int DRIVER_PHONE_IDCARD_NOT_MATCHED      = 1002;
-//	@ResultMessage("司机手机号码或司机ID两者必须传入一个")
-//	public static final int DRIVER_PHONE_ID_MUST_HAVE_ONE            = 1003;
-//	@ResultMessage("登录密码不正确")
-//	public static final int DRIVER_LOGIN_PASSWORD_WRONG             = 1004;
-//	@ResultMessage("超过每天换车最大次数（{0}次）")
-//	public static final int DRIVER_EXCEED_BINDBUS_LIMIT_PERDAY     = 1005;
-//	@ResultMessage("无法退出并解绑车辆（您目前有待服务、服务中的任务）")
-//	public static final int DRIVER_CAN_NOT_UNBIND_BUS                    = 1006;
-//	@ResultMessage("无法选取车辆（您目前有服务中的任务）")
-//	public static final int DRIVER_CAN_NOT_BIND_BUS                         = 1007;
-
+	@ResultMessage("该司机已存在启用的临时停运！")
+	public static final int DRIVER_OUTAGE_EXIST = 2002;
 	@ResultMessage("司机手机号已存在")
 	public static final int DRIVER_PHONE_EXIST                     = 3001;
 	@ResultMessage("司机身份证已存在")
@@ -104,19 +110,74 @@ public final class RestErrorCode{
 	public static final int DRIVER_BANK_CARD_NUMBER_NOT_LEGAL                     = 3005;
 	@ResultMessage("银行卡号和银行开户行不能只填写一个")
 	public static final int DRIVER_BANK_CARD_NUMBER_NOT_COMPLETE                     = 3006;
-	@ResultMessage("银行卡号和银行开户行不能只填写一个")
+	@ResultMessage("银行卡号已存在")
 	public static final int DRIVER_BANK_CARD_NUMBER_EXIST                    = 3007;
+	@ResultMessage("车型不存在")
+	public static final int MODEL_NOT_EXIST                    = 3008;
+	@ResultMessage("信息不全，请补全")
+	public static final int INFORMATION_NOT_COMPLETE                    = 3009;
+	@ResultMessage("供应商ID={0}的供应商不存在")
+	public static final int SUPPLIER_NOT_EXIST                    = 3010;
+	@ResultMessage("所选城市和供应商城市不一致")
+	public static final int CITY_SUPPLIER_DIFFER                    = 3011;
+	@ResultMessage("车辆已经被绑定")
+	public static final int CAR_HAS_BIND                    = 3012;
+	@ResultMessage("所选城市和供应商、车辆信息不一致")
+	public static final int CITY_SUPPLIER_CAR_DIFFER                    = 3013;
+	@ResultMessage("服务类型不存在")
+	public static final int GROUP_NOT_EXIST                    = 3014;
+	@ResultMessage("修改手机号与原手机号不可以相同")
+	public static final int PHONE_NEW_SAME                    = 3015;
+
+	@ResultMessage("周报查询时间段只能查询一个星期的时间")
+	public static final int ONLY_QUERY_WEEK                    = 3101;
+	@ResultMessage("月报查询时间段只能查询一个月份的时间")
+	public static final int ONLY_QUERY_ONE_MONTH                    = 3102;
+	@ResultMessage("文件导出失败")
+	public static final int FILE_EXCEL_REPORT_FAIL                    = 3103;
+	@ResultMessage("查询时间范围结束时间不能为空")
+	public static final int ENDTIME_IS_NULL                    = 3104;
+	@ResultMessage("查询时间范围开始时间不能大于结束时间")
+	public static final int STARTTIME_GREATE_ENDTIME                    = 3105;
 
 	//-----------------------------------------------业务参数：导入文件
 	@ResultMessage("文件异常")
 	public static final int FILE_ERROR                    = 4001;
 	@ResultMessage("导入模板格式错误")
 	public static final int FILE_TRMPLATE_ERROR                    = 4002;
+    @ResultMessage("导入错误:{0}")
+    public static final int FILE_IMPORT_ERROR                    = 4003;
 	//-----------------------------------------------业务参数：车辆
 	@ResultMessage("车辆信息不存在")
 	public static final int BUS_NOT_EXIST                                               = 1100;
 
-	
+
+	@ResultMessage("结果不存在")
+	public static final int NOT_FOUND_RESULT                                               = 1101;
+    @ResultMessage("车牌号已存在")
+    public static final int LICENSE_PLATES_EXIST                                               = 1102;
+    @ResultMessage("车牌号不存在")
+    public static final int LICENSE_PLATES_NOT_EXIST                                                = 1103;
+	@ResultMessage("请求风控资源失败")
+	public static final int RISK_ORDER_DATA_FAIL                                        = 5002;
+	@ResultMessage("上传风控文件失败")
+	public static final int RISK_UPLOAD_FILE_FAIL                                        = 5003;
+	@ResultMessage("提交申诉失败")
+	public static final int RISK_SUBMITCOMPLAIN_FAIL                                        = 5004;
+
+	@ResultMessage("查询GPS数据失败")
+	public static final int MONITOR_GPS_FAIL                                        = 6001;
+	@ResultMessage("查询GPS数据失败,司机信息不存在")
+	public static final int MONITOR_GPS_DRIVER_NOT_EXIST                                        = 6002;
+	@ResultMessage("查询大数据司机订单信息失败")
+	public static final int MONITOR_DRIVERO_ORDER_FAIL                                        = 7001;
+	@ResultMessage("查询大数据车辆分析指标趋势信息失败")
+	public static final int MONITOR_CARINDEX_FAIL                                        = 7002;
+    //-----------------------------------------------业务参数：投诉评分
+    @ResultMessage("请选择一个车队或输入司机手机号")
+    public static final int TEAMID_OR_DRIVERID_ISNULL = 5201;
+    @ResultMessage("文件导出失败")
+    public static final int FILE_EXPORT_FAIL = 5202;
 	//---------------------------------------------------------------------------------------------------------------------------------------------
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系
@@ -152,7 +213,7 @@ public final class RestErrorCode{
 		}
 		return MessageFormat.format(rawErrorMsg, args);
 	}
-	
+
 	/**生成一个HTML文件，方便生成技术文档**/
 	public static void main(String[] args) throws Exception{
 		//1.生成表格
@@ -173,7 +234,7 @@ public final class RestErrorCode{
 		html.append("</table>");
 		FileUtils.writeStringToFile(new File(path), html.toString(),"GBK");
 		System.out.println("Write html file to ["+path+"] successfully.");
-		
+
 		//2.生成国际化属性文件
 		String propPath   = "D:/globalMessages.properties";
 		StringBuffer text = new StringBuffer("#Error Codes\r\n");
