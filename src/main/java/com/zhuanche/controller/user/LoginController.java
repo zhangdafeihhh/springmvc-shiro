@@ -106,10 +106,10 @@ public class LoginController{
 		long count = redisTemplate.opsForZSet().count(redis_login_key, min, max);
 
 		int countLimit = 5;
-		log.info("用户"+username+"在"+statistics+"分钟内第"+count+"次进行获取验证码操作");
+		log.info("获取验证码-用户"+username+"在"+statistics+"分钟内第"+count+"次进行获取验证码操作");
 		if(count  > countLimit) {
-			log.info("用户"+username+"在"+statistics+"分钟内进行获取验证码"+count+"次,超过限制"+countLimit+",需要等待"+statistics+"分钟");
-			return AjaxResponse.fail(RestErrorCode.GET_MSGCODE_EXCEED);
+			log.info("获取验证码-用户"+username+"在"+statistics+"分钟内进行获取验证码"+count+"次,超过限制"+countLimit+",需要等待"+statistics+"分钟");
+			return AjaxResponse.fail(RestErrorCode.GET_MSGCODE_EXCEED,statistics);
 		}
 
 //		String flag = RedisCacheUtil.get(CACHE_PREFIX_MSGCODE_CONTROL+username, String.class);
@@ -193,10 +193,10 @@ public class LoginController{
 			long count = redisTemplate.opsForZSet().count(redis_msgcode_key, min, max);
 
 			int countLimit = 5;
-			log.info("用户"+username+"在"+statistics+"分钟内第"+count+"次登录");
+			log.info("登录-用户"+username+"在"+statistics+"分钟内第"+count+"次登录");
 			if(count  > countLimit) {
-				log.info("用户"+username+"在"+statistics+"分钟内登录"+count+"次,超过限制"+countLimit+",需要等待"+statistics+"分钟");
-				return AjaxResponse.fail(RestErrorCode.DO_LOGIN_FREQUENTLY);
+				log.info("登录-用户"+username+"在"+statistics+"分钟内登录"+count+"次,超过限制"+countLimit+",需要等待"+statistics+"分钟");
+				return AjaxResponse.fail(RestErrorCode.DO_LOGIN_FREQUENTLY,statistics);
 			}
 			//验证验证码是否正确
 			String  msgcodeInCache = RedisCacheUtil.get(CACHE_PREFIX_MSGCODE+username, String.class);

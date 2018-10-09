@@ -43,7 +43,7 @@ public final class RestErrorCode{
 
 
 	//-----------------------------------------------用户
-	@ResultMessage("获取验证码太频繁")
+	@ResultMessage("获取验证码太频繁,请{0}分钟后重试")
 	public static final int GET_MSGCODE_EXCEED           = 1000;
 	@ResultMessage("用户不存在")
 	public static final int USER_NOT_EXIST                      = 1001;
@@ -63,7 +63,7 @@ public final class RestErrorCode{
 	public static final int MSG_CODE_FAIL                      = 1011;
 	@ResultMessage("短信验证码{0}秒内不能重复发送")
 	public static final int MSG_CODE_REPEAT_SEND                      = 1012;
-	@ResultMessage("登录太频繁")
+	@ResultMessage("登录太频繁，请{0}分钟后重新登录")
 	public static final int DO_LOGIN_FREQUENTLY           = 1013;
 
 	//----------------------------------------------权限管理
