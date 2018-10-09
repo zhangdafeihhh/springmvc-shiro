@@ -95,7 +95,7 @@ public class DriverInfoController {
     public AjaxResponse findDriverList(String name, String phone, String licensePlates, Integer status, Integer cityId, Integer supplierId,
             Integer teamId, Integer teamGroupId, Integer groupId, Integer cooperationType, String imei, String idCardNo, Integer isImage,
             @RequestParam(value="page", defaultValue="0")Integer page,
-            @RequestParam(value="pageSize", defaultValue="20")Integer pageSize) {
+            @Verify(param = "pageSize",rule = "max(50)")@RequestParam(value="pageSize", defaultValue="20")Integer pageSize) {
 
         // 数据权限控制SSOLoginUser
         Set<Integer> permOfCity        = WebSessionUtil.getCurrentLoginUser().getCityIds(); //普通管理员可以管理的所有城市ID

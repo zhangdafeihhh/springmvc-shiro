@@ -196,6 +196,7 @@ public class LoginController{
 				log.info("用户"+username+"在"+statistics+"分钟内登录"+count+"次,超过限制"+countLimit+",需要等待"+statistics+"分钟");
 				return AjaxResponse.fail(RestErrorCode.DO_LOGIN_FREQUENTLY);
 			}
+			//验证验证码是否正确
 			String  msgcodeInCache = RedisCacheUtil.get(CACHE_PREFIX_MSGCODE+username, String.class);
 			if(msgcodeInCache==null) {
 				return AjaxResponse.fail(RestErrorCode.MSG_CODE_INVALID) ;
