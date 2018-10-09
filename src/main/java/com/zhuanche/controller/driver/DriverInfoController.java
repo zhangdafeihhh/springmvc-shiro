@@ -21,23 +21,29 @@ import com.zhuanche.serv.*;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -712,15 +718,28 @@ public class DriverInfoController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/selectByLicensePlates")
+    @RequestMapping(value = "/selectByLicensePlates",method = {RequestMethod.POST})
     @MasterSlaveConfigs(configs={
             @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
     } )
-    public AjaxResponse queryDriverByLicensePlates(  @Verify(param = "license_plates",rule="required") String license_plates) {
+    public AjaxResponse queryDriverByLicensePlates(HttpServletRequest request, @Verify(param = "license_plates",rule="required") String license_plates) {
+
         logger.info(LOGTAG + "根据车牌号查询司机信息license_plates={}", license_plates);
         try{
             List<CarBizDriverInfoDTO> driverList = carBizDriverInfoService.queryDriverByLicensePlates(license_plates);
-            return AjaxResponse.success(driverList);
+            List<JSONObject> retList = new ArrayList<>();
+            if(!CollectionUtils.isEmpty(driverList)){
+                for(CarBizDriverInfoDTO item : driverList){
+                    JSONObject itemJson = new JSONObject();
+                    itemJson.put("phone",item.getPhone());
+                    itemJson.put("name",item.getPhone());
+                    itemJson.put("supplierId",item.getSupplierId());
+                    itemJson.put("licensePlates",item.getLicensePlates());
+                    itemJson.put("serviceCity",item.getServiceCity());
+                    retList.add(itemJson);
+                }
+            }
+            return AjaxResponse.success(retList);
         }catch (Exception e){
             logger.error(LOGTAG + "根据车牌号查询司机信息异常license_plates="+license_plates,e );
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
