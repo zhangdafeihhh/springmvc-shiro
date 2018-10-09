@@ -46,7 +46,7 @@ public class LbsController {
      *          http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=3213570
      * 输出wiki:
      *          http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=21044880
-     * @param driverPhone
+
      * @param startTime
      * @param endTime
      * @param model
@@ -55,25 +55,17 @@ public class LbsController {
     @ResponseBody
     @RequestMapping(value = "/getGpsByDriver", method = { RequestMethod.POST,RequestMethod.GET })
     public AjaxResponse getGpsByDriver(
-            @RequestParam(value = "driverPhone", required = true,defaultValue = "")String driverPhone,
+            @RequestParam(value = "driverId", required = true,defaultValue = "")String driverId,
             @RequestParam(value = "startTime", required = true)String startTime,
             @RequestParam(value = "endTime", required = true)String endTime,
               ModelMap model) {
         Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("driverPhone",driverPhone);
+        paramMap.put("driverId",driverId);
         paramMap.put("startTime",startTime);
         paramMap.put("endTime",endTime);
         paramMap.put("platform", 20);
         logger.info("监控-查看车辆GPS轨迹-请求参数" + JSON.toJSONString(paramMap));
         try {
-            CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPhone(driverPhone);
-            Integer driverId = null;
-            if(carBizDriverInfo == null){
-                return AjaxResponse.fail(RestErrorCode.MONITOR_GPS_DRIVER_NOT_EXIST,null);
-            }else{
-                driverId = carBizDriverInfo.getDriverId();
-            }
-            paramMap.put("driverId",driverId);
 
             ResponseEntity<String> responseEntity = lbsDriverGpsRestTemplate.getForEntity("/hbase/queryGpsByDriver?driverId="+driverId+"&startTime="+startTime+"&endTime="+endTime+"&platform=20",
                     String.class, new HashMap<>());

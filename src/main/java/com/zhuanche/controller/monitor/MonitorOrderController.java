@@ -52,9 +52,7 @@ public class MonitorOrderController {
      *          http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=21048019
      * @param pageNo
      * @param pageSize
-     * @param supplierId        加盟商id
      * @param licensePlates     车牌号
-     * @param driverPhone     司机手机号
      * @param beginCreateDate     订单创建时间，开始时间
      * @param endCreateDate     订单创建时间，结束时间
      * @param model
@@ -65,9 +63,8 @@ public class MonitorOrderController {
     public AjaxResponse getGpsByDriver(
             @RequestParam(value = "pageNo", required = false,defaultValue = "1")Integer pageNo,
             @Verify(param = "pageSize",rule = "max(50)")@RequestParam(value = "pageSize", required = false,defaultValue = "20")Integer pageSize,
-            @RequestParam(value = "supplierId", required = true)String supplierId,
+
             @RequestParam(value = "licensePlates", required = true)String licensePlates,
-            @RequestParam(value = "driverPhone", required = true)String driverPhone,
             @RequestParam(value = "beginCreateDate", required = true)long beginCreateDate,
             @RequestParam(value = "endCreateDate", required = true)long endCreateDate,
             HttpServletRequest request,
@@ -75,9 +72,9 @@ public class MonitorOrderController {
         Map<String, Object> param = new HashMap<String, Object>();
         param.put("pageNo",pageNo);
         param.put("pageSize",pageSize);
-        param.put("supplierId",supplierId);
+
         param.put("licensePlates", licensePlates);
-        param.put("driverPhone", driverPhone);
+
         param.put("beginCreateDate", beginCreateDate);
         param.put("endCreateDate", endCreateDate);
         param.put("transId", UUID.randomUUID().toString().replace("-", "").toLowerCase());
@@ -94,9 +91,9 @@ public class MonitorOrderController {
             MultiValueMap<String, Object> postParameters = new LinkedMultiValueMap<>();
             postParameters.add("pageNo", pageNo+"");
             postParameters.add("pageSize", pageSize+"");
-            postParameters.add("supplierId", supplierId+"");
+
             postParameters.add("licensePlates", licensePlates);
-            postParameters.add("driverPhone", driverPhone);
+
             postParameters.add("beginCreateDate", beginString);
             postParameters.add("endCreateDate", endString);
             postParameters.add("transId", param.get("transId"));
