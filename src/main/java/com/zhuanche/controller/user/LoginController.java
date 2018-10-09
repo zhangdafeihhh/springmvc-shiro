@@ -179,7 +179,7 @@ public class LoginController{
 		//D: 查询验证码，并判断是否正确
 		if("ON".equalsIgnoreCase(loginCheckMsgCodeSwitch)) {
 
-			String redis_msgcode_key = "mp_manager_msgcode_key_"+user.getUserId();
+			String redis_msgcode_key = "mp_manager_msgcode_key_"+username;
 			long score = System.currentTimeMillis();
 			//zset内部是按分数来排序的，这里用当前时间做分数
 			redisTemplate.opsForZSet().add(redis_msgcode_key, String.valueOf(score), score);
