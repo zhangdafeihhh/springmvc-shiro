@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.serv.CarBizDriverInfoService;
 import com.zhuanche.util.DateUtil;
@@ -63,7 +64,7 @@ public class MonitorOrderController {
     @RequestMapping(value = "/page", method = { RequestMethod.POST })
     public AjaxResponse getGpsByDriver(
             @RequestParam(value = "pageNo", required = false,defaultValue = "1")Integer pageNo,
-            @RequestParam(value = "pageSize", required = false,defaultValue = "20")Integer pageSize,
+            @Verify(param = "pageSize",rule = "max(50)")@RequestParam(value = "pageSize", required = false,defaultValue = "20")Integer pageSize,
             @RequestParam(value = "supplierId", required = true)String supplierId,
             @RequestParam(value = "licensePlates", required = true)String licensePlates,
             @RequestParam(value = "driverPhone", required = true)String driverPhone,
