@@ -8,6 +8,8 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.serv.CarBizDriverInfoService;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.MyRestTemplate;
@@ -31,10 +33,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Controller()
 @RequestMapping(value = "/monitor/order")
@@ -45,6 +44,10 @@ public class MonitorOrderController {
     @Value("${order.saas.es.url}")
     private String  esOrderDataSaasUrl;
 
+    @Autowired
+    private CarBizDriverInfoService carBizDriverInfoService;
+
+
     /**
      * 定单组 wiki :
      *         http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=21047769
@@ -52,9 +55,7 @@ public class MonitorOrderController {
      *          http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=21048019
      * @param pageNo
      * @param pageSize
-     * @param supplierId        加盟商id
      * @param licensePlates     车牌号
-     * @param driverPhone     司机手机号
      * @param beginCreateDate     订单创建时间，开始时间
      * @param endCreateDate     订单创建时间，结束时间
      * @param model
@@ -65,9 +66,8 @@ public class MonitorOrderController {
     public AjaxResponse getGpsByDriver(
             @RequestParam(value = "pageNo", required = false,defaultValue = "1")Integer pageNo,
             @Verify(param = "pageSize",rule = "max(50)")@RequestParam(value = "pageSize", required = false,defaultValue = "20")Integer pageSize,
-            @RequestParam(value = "supplierId", required = true)String supplierId,
+            @RequestParam(value = "driverId", required = true,defaultValue = "")String driverId,
             @RequestParam(value = "licensePlates", required = true)String licensePlates,
-            @RequestParam(value = "driverPhone", required = true)String driverPhone,
             @RequestParam(value = "beginCreateDate", required = true)long beginCreateDate,
             @RequestParam(value = "endCreateDate", required = true)long endCreateDate,
             HttpServletRequest request,
@@ -75,9 +75,9 @@ public class MonitorOrderController {
         Map<String, Object> param = new HashMap<String, Object>();
         param.put("pageNo",pageNo);
         param.put("pageSize",pageSize);
-        param.put("supplierId",supplierId);
+
         param.put("licensePlates", licensePlates);
-        param.put("driverPhone", driverPhone);
+
         param.put("beginCreateDate", beginCreateDate);
         param.put("endCreateDate", endCreateDate);
         param.put("transId", UUID.randomUUID().toString().replace("-", "").toLowerCase());
@@ -85,6 +85,27 @@ public class MonitorOrderController {
         logger.info("监控-查询司机订单列表-请求参数" + JSON.toJSONString(param));
         String url = esOrderDataSaasUrl+"/order/v1/search";
         try {
+
+            if(WebSessionUtil.isSupperAdmin() == false){// 如果是普通管理员
+                SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
+                Set<Integer> supplierIds = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
+                Set<Integer> cityIds  = currentLoginUser.getCityIds();
+                Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
+
+                CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(Integer.parseInt(driverId));
+                if(carBizDriverInfo != null){
+                    if(cityIds != null && !cityIds.contains(carBizDriverInfo.getServiceCity())){
+                        //缺少授权
+                        logger.info("监控-指标汇总查询接口-缺少城市授权-请求参数" + JSON.toJSONString(param)+",已授权城市为："+(cityIds==null?"null":JSON.toJSONString(cityIds))+",司机所属城市为："+carBizDriverInfo.getServiceCity());
+                        return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED,null);
+                    }
+                    if(supplierIds != null && !supplierIds.contains(carBizDriverInfo.getSupplierId())){
+                        //缺少授权
+                        logger.info("监控-指标汇总查询接口-缺少供应商授权-请求参数" + JSON.toJSONString(param)+",已授权供应商id为："+(supplierIds==null?"null":JSON.toJSONString(supplierIds))+",司机所属供应商id为："+carBizDriverInfo.getSupplierId());
+                        return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED,null);
+                    }
+                }
+            }
 
             Date begign = new Date(beginCreateDate);
             Date end = new Date(endCreateDate);
@@ -94,9 +115,9 @@ public class MonitorOrderController {
             MultiValueMap<String, Object> postParameters = new LinkedMultiValueMap<>();
             postParameters.add("pageNo", pageNo+"");
             postParameters.add("pageSize", pageSize+"");
-            postParameters.add("supplierId", supplierId+"");
+
             postParameters.add("licensePlates", licensePlates);
-            postParameters.add("driverPhone", driverPhone);
+            postParameters.add("driverId", driverId);
             postParameters.add("beginCreateDate", beginString);
             postParameters.add("endCreateDate", endString);
             postParameters.add("transId", param.get("transId"));

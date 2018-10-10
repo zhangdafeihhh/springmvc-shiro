@@ -1482,5 +1482,13 @@
 		car_biz_driver_info
 		where driver_id = #{driverId}
    </select>
+
+  <select id="queryDriverByLicensePlates" parameterType="java.lang.String" resultMap="BaseResultMap">
+    SELECT
+      driver_id,phone,name,supplier_id,license_plates,service_city
+    FROM
+      car_biz_driver_info
+    where license_plates = #{license_plates}
+  </select>
   
 </mapper>
