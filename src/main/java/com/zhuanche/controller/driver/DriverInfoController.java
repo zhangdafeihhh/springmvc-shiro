@@ -731,6 +731,7 @@ public class DriverInfoController {
             if(!CollectionUtils.isEmpty(driverList)){
                 for(CarBizDriverInfoDTO item : driverList){
                     JSONObject itemJson = new JSONObject();
+                    itemJson.put("driverId",item.getDriverId());
                     itemJson.put("phone",item.getPhone());
                     itemJson.put("name",item.getPhone());
                     itemJson.put("supplierId",item.getSupplierId());
