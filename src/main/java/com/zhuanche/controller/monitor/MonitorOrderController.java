@@ -94,12 +94,12 @@ public class MonitorOrderController {
 
                 CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(Integer.parseInt(driverId));
                 if(carBizDriverInfo != null){
-                    if(cityIds != null && !cityIds.contains(carBizDriverInfo.getServiceCity())){
+                    if(cityIds != null && cityIds.size()>=1 && !cityIds.contains(carBizDriverInfo.getServiceCity())){
                         //缺少授权
                         logger.info("监控-指标汇总查询接口-缺少城市授权-请求参数" + JSON.toJSONString(param)+",已授权城市为："+(cityIds==null?"null":JSON.toJSONString(cityIds))+",司机所属城市为："+carBizDriverInfo.getServiceCity());
                         return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED,null);
                     }
-                    if(supplierIds != null && !supplierIds.contains(carBizDriverInfo.getSupplierId())){
+                    if(supplierIds != null && supplierIds.size()>=1  && !supplierIds.contains(carBizDriverInfo.getSupplierId())){
                         //缺少授权
                         logger.info("监控-指标汇总查询接口-缺少供应商授权-请求参数" + JSON.toJSONString(param)+",已授权供应商id为："+(supplierIds==null?"null":JSON.toJSONString(supplierIds))+",司机所属供应商id为："+carBizDriverInfo.getSupplierId());
                         return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED,null);
