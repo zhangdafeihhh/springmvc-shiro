@@ -55,11 +55,11 @@ public class CarInfoDTO{
 
     private Integer updateBy;
 
-    private Date createDate;
+    private String createDate;
 
-    private Date updateDate;
+    private String updateDate;
 
-    private Integer auditingstatus;
+    private Integer auditingStatus;
 
     private String freighttype;
 
@@ -208,6 +208,9 @@ public class CarInfoDTO{
     /** 车辆图片 **/
     private String imageUrl;
 
+    /** 车辆图片 **/
+    private String carPhotograph;
+
     private String licensePlates1;
 
     private Integer oldCity;
@@ -216,6 +219,14 @@ public class CarInfoDTO{
 
     private String driverName;
     private String idCardNo;//司机身份证号
+
+    public String getCarPhotograph() {
+        return carPhotograph;
+    }
+
+    public void setCarPhotograph(String carPhotograph) {
+        this.carPhotograph = carPhotograph;
+    }
 
     public String getDriverName() {
         return driverName;
@@ -450,31 +461,29 @@ public class CarInfoDTO{
         this.updateBy = updateBy;
     }
 
-    public Date getCreateDate() {
+    public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(String createDate) {
         this.createDate = createDate;
     }
 
-    public Date getUpdateDate() {
+    public String getUpdateDate() {
         return updateDate;
     }
 
-    public void setUpdateDate(Date updateDate) {
+    public void setUpdateDate(String updateDate) {
         this.updateDate = updateDate;
     }
 
-
-    public Integer getAuditingstatus() {
-        return auditingstatus;
+    public Integer getAuditingStatus() {
+        return auditingStatus;
     }
 
-    public void setAuditingstatus(Integer auditingstatus) {
-        this.auditingstatus = auditingstatus;
+    public void setAuditingStatus(Integer auditingStatus) {
+        this.auditingStatus = auditingStatus;
     }
-
 
     public String getFreighttype() {
         return freighttype;

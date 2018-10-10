@@ -26,6 +26,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.controller.driver.Componment;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
@@ -42,6 +43,7 @@ import com.zhuanche.entity.rentcar.CarFactOrderInfo;
 import com.zhuanche.entity.rentcar.CarGroupEntity;
 import com.zhuanche.entity.rentcar.ServiceEntity;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
+import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import com.zhuanche.util.CopyBeanUtil;
 
 /**
@@ -59,7 +61,8 @@ public class OrderController{
 	@Autowired
 	private CarFactOrderInfoService carFactOrderInfoService;
 	 
-	 
+	@Autowired
+	private StatisticalAnalysisService statisticalAnalysisService;
 	/**
 	    * 查询订单 列表
 	    * @param queryDate	查询日期
@@ -72,8 +75,8 @@ public class OrderController{
 			 								   String airportIdnot,
 			 								   String airportId,
 	 										   String carGroupId,
-	 										   String status,
-	 										   String cityId,
+	 										   String statusStr,
+	 										   Long cityId,
 	 										   String supplierId,
 	                                           String teamId,
 	                                           String teamClassId,
@@ -99,7 +102,7 @@ public class OrderController{
 		 paramMap.put("airportId", airportId);//
 		 paramMap.put("airportIdnot", airportIdnot);//
 	     paramMap.put("carGroupId", carGroupId);// 
-	     paramMap.put("status", status);//
+	     paramMap.put("statusBatch", statusStr);//
 	     paramMap.put("cityId", cityId);//
 	     paramMap.put("supplierId", supplierId);//
 	     paramMap.put("teamId", teamId);// 
@@ -119,11 +122,37 @@ public class OrderController{
 	     paramMap.put("pageNo", pageNo);//页号
 	     if(null != pageSize && pageSize > 0)
 	     paramMap.put("pageSize", pageSize);//每页记录数
+        /* String cityIdBatch,//下单城市id批量 多个用逗号分割
+         String supplierIdBatch,//供应商id 多个用逗号
+         String teamIdBatch,//车队ID多个用逗号分割 类似or操作
+         */
+	     paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,supplierId,teamId);
+	     if(paramMap.get("visibleAllianceIds")!=null){
+	    	 logger.info("visibleAllianceIdstoString"+paramMap.get("visibleAllianceIds").toString().replaceAll("\\[", "").replaceAll("\\]", ""));
+			 paramMap.put("supplierIdBatch", paramMap.get("visibleAllianceIds").toString().replaceAll("\\[", "").replaceAll("\\]", "")); // 可见加盟商ID
+		}
+		if(paramMap.get("visibleMotorcadeIds")!=null){
+	    	 logger.info("visibleMotorcadeIdstoString"+paramMap.get("visibleMotorcadeIds").toString().replaceAll("\\[", "").replaceAll("\\]", ""));
+			paramMap.put("teamIdBatch", paramMap.get("visibleMotorcadeIds").toString().replaceAll("\\[", "").replaceAll("\\]", "")); // 可见车队ID
+		}
+		if(paramMap.get("visibleCityIds")!=null){
+			paramMap.put("cityIdBatch", paramMap.get("visibleCityIds").toString().replaceAll("\\[", "").replaceAll("\\]", "")); //可见城市ID
+		}
 		 // 从订单组取统计数据
 	     AjaxResponse result = carFactOrderInfoService.queryOrderDataList(paramMap);
 	     return result;
 	 }
 	 
+	 public String arrayToStr(String v[]){
+		 String temp = "";
+		 for(String str : v){
+			 temp+=str+",";
+		 }
+		 if(!"".equals(temp)){
+			 temp=temp.substring(0, temp.length()-1);
+		 }
+		 return temp;
+	 }
 	 
 		/**
 	    * 订单 列表导出
@@ -137,8 +166,8 @@ public class OrderController{
 											   String airportIdnot,
 											   String airportId,
 	 										   String carGroupId,
-	 										   String status,
-	 										   String cityId,
+	 										   String statusStr,
+	 										   Long cityId,
 	 										   String supplierId,
 	                                           String teamId,
 	                                           String teamClassId,
@@ -163,7 +192,7 @@ public class OrderController{
 		 paramMap.put("airportId", airportId);//
 		 paramMap.put("airportIdnot", airportIdnot);//
 	     paramMap.put("carGroupId", carGroupId);// 
-	     paramMap.put("status", status);//
+	     paramMap.put("statusBatch", statusStr);//
 	     paramMap.put("cityId", cityId);//
 	     paramMap.put("supplierId", supplierId);//
 	     paramMap.put("teamId", teamId);// 
@@ -180,9 +209,22 @@ public class OrderController{
 	     paramMap.put("endCostEndDate", endCostEndDate+" 23:59:59");//
 	     paramMap.put("transId", transId );//
 	     paramMap.put("pageNo", "1");//页号
-	     paramMap.put("pageSize", "10000");//每页记录数
+	     paramMap.put("pageSize", "20000");//每页记录数
+	    paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,supplierId,teamId);
+	     if(paramMap.get("visibleAllianceIds")!=null){
+	    	 logger.info("visibleAllianceIdstoString"+paramMap.get("visibleAllianceIds").toString().replaceAll("\\[", "").replaceAll("\\]", ""));
+			 paramMap.put("supplierIdBatch", paramMap.get("visibleAllianceIds").toString().replaceAll("\\[", "").replaceAll("\\]", "")); // 可见加盟商ID
+		}
+		if(paramMap.get("visibleMotorcadeIds")!=null){
+	    	 logger.info("visibleMotorcadeIdstoString"+paramMap.get("visibleMotorcadeIds").toString().replaceAll("\\[", "").replaceAll("\\]", ""));
+			paramMap.put("teamIdBatch", paramMap.get("visibleMotorcadeIds").toString().replaceAll("\\[", "").replaceAll("\\]", "")); // 可见车队ID
+		}
+		if(paramMap.get("visibleCityIds")!=null){
+			paramMap.put("cityIdBatch", paramMap.get("visibleCityIds").toString().replaceAll("\\[", "").replaceAll("\\]", "")); //可见城市ID
+		}
+			
 		 // 从订单组取统计数据
-	     List<CarFactOrderInfoDTO> dtoList = carFactOrderInfoService.queryAllOrderDataList(paramMap);
+	    List<CarFactOrderInfoDTO> dtoList = carFactOrderInfoService.queryAllOrderDataList(paramMap);
 		@SuppressWarnings("deprecation")
 		Workbook wb;
 		try {
@@ -249,11 +291,11 @@ public class OrderController{
 		List<CarBizOrderWaitingPeriod>  carBizOrderWaitingPeriodList = this.carFactOrderInfoService.selectWaitingPeriodListSlave(order.getOrderNo());
 		order.setCarBizOrderWaitingPeriodList(carBizOrderWaitingPeriodList);
 		
-		CopyBeanUtil.copyByIgnoreCase(orderDTO,order,true);
+		//CopyBeanUtil.copyByIgnoreCase(orderDTO,order,true);
 		float excTime=(float)(endTime-startTime)/1000;
 		logger.info("*****************查询订单详情 耗时+"+excTime);
-		if(orderDTO!=null){
-			return AjaxResponse.success(orderDTO);
+		if(order!=null){
+			return AjaxResponse.success(order);
 		}else{
 			return AjaxResponse.failMsg(500,"内部错误");
 		}
@@ -414,9 +456,11 @@ public class OrderController{
 				//基础资费（套餐费用）
 				order.setBasePrice(Double.valueOf(String.valueOf(costDetailJson.get("basePrice")==null?"0.00":costDetailJson.get("basePrice"))));
 				//基础价包含公里(单位,公里) 
-				order.setIncludemileage(Integer.valueOf(String.valueOf(costDetailJson.get("includemileage")==null?"0":costDetailJson.get("includemileage"))));
+				order.setIncludemileage(Integer.valueOf(String.valueOf(costDetailJson.get("includeMileage")==null?"0":costDetailJson.get("includeMileage"))));
+				logger.info("基础价包含公里(单位,公里)  :includemileage"+costDetailJson.get("includeMileage"));
 				//基础价包含时长(单位,分钟)
-				order.setIncludeminute(Integer.valueOf(String.valueOf(costDetailJson.get("includeminute")==null?"0":costDetailJson.get("includeminute"))));
+				order.setIncludeminute(Integer.valueOf(String.valueOf(costDetailJson.get("includeMinute")==null?"0":costDetailJson.get("includeMinute"))));
+				logger.info("基础价包含时长(单位,分钟) :includeminute"+costDetailJson.get("includeMinute"));
 				//查找车型的名字
 				order.setBookingGroupnames(String.valueOf(costDetailJson.get("carGroupName")==null?"":costDetailJson.get("carGroupName")));
 				//String orderStatus = String.valueOf(costDetailJson.get("orderStatus"));
@@ -429,7 +473,8 @@ public class OrderController{
 				order.setDistantFee(longDistancePrice);
 				order.setLongDistanceNum(longDistanceNum);
 				order.setLongdistanceprice(longDistancePrice);
-				
+				logger.info("order:Includemileage"+order.getIncludemileage());
+				logger.info("order:Includeminute"+order.getIncludeminute());
 			}
 			 //end
 			List<CarFactOrderInfo> pojoList = this.carFactOrderInfoService.selectByListPrimaryKey(order.getOrderId());
@@ -513,7 +558,9 @@ public class OrderController{
 				Map<String,String>paraMap=new HashMap<String, String>();
 				paraMap.put("orderNo", order.getOrderNo());
 				paraMap.put("tableName", tableName.replace("-", "_") ); //driver_order_record  tableName.replace("-", "_")
+				logger.info("**************根据订单创建时间确定表名:"+paraMap.toString());
 				List<OrderTimeEntity> p1 = carFactOrderInfoService.queryDriverOrderRecord(paraMap);
+				logger.info("*************p1+"+JSON.toJSONString(p1));
 				if(p1!=null){
 					for (OrderTimeEntity item : p1) {
 						if(item.getDriverBeginTime()!=null && item.getDriverBeginTime().length()>0){
@@ -521,9 +568,11 @@ public class OrderController{
 						}
 						if(item.getDriverArriveTime()!=null && item.getDriverArriveTime().length()>0){
 							order.setDriverArriveTime(item.getDriverArriveTime());
+							logger.info("可能订单为不跨天订单，DriverArriveTime"+item.getDriverArriveTime());
 						}
 						if(item.getDriverStartServiceTime()!=null && item.getDriverStartServiceTime().length()>0){
 							order.setDriverStartServiceTime(item.getDriverStartServiceTime());
+							logger.info("可能订单为不跨天订单，DriverStartServiceTime"+item.getDriverStartServiceTime());
 						}
 						if(item.getDriverOrderEndTime()!=null && item.getDriverOrderEndTime().length()>0){
 							order.setDriverOrderEndTime(item.getDriverOrderEndTime());
@@ -537,6 +586,7 @@ public class OrderController{
 					}
 				}
 				//2、可能订单为跨天订单，需根据订单结束时间再次查询********如果中间状态也跨天怎么办？？？
+				logger.info("可能订单为跨天订单，需根据订单结束时间再次查FactDate："+order.getFactDate());
 				if(order.getFactDate()!=null){
 					date =sdf1.parse(order.getFactDate()); 
 					tableName="car_biz_driver_record_"+sdf.format(date);
@@ -544,18 +594,22 @@ public class OrderController{
 					List<OrderTimeEntity> orderTimeCamcel= carFactOrderInfoService.queryDriverOrderRecord(paraMap);
 					if(orderTimeCamcel!=null){
 						for (OrderTimeEntity item : orderTimeCamcel) {
+							logger.info("可能订单为跨天订单，需根据订单结束时间再次查DriverBeginTime："+item.getDriverBeginTime());
 							//司机出发	
 							if(orderTime.getDriverBeginTime()==null && item.getDriverBeginTime()!=null && item.getDriverBeginTime().length()>0){
 								order.setDriverBeginTime(item.getDriverBeginTime());
 							}
+							logger.info("可能订单为跨天订单，需根据订单结束时间再次查DriverArriveTime："+item.getDriverArriveTime());
 							//司机到达
 							if(orderTime.getDriverArriveTime()==null  && item.getDriverArriveTime()!=null && item.getDriverArriveTime().length()>0){
 								order.setDriverArriveTime(item.getDriverArriveTime());
+								logger.info("可能订单为跨天订单，DriverArriveTime"+item.getDriverArriveTime());
 							}
 							
 							//开始服务
 							if(orderTime.getDriverStartServiceTime()==null  && item.getDriverStartServiceTime()!=null && item.getDriverStartServiceTime().length()>0){
 								order.setDriverStartServiceTime(item.getDriverStartServiceTime());
+								logger.info("可能订单为跨天订单，DriverStartServiceTime"+item.getDriverStartServiceTime());
 							}
 							
 							//服务完成

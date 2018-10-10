@@ -12,14 +12,12 @@ public interface DriverDutyTimeInfoExMapper {
 
 //    List<DriverDutyTimeInfo> queryList(DriverDutyTimeInfo param);
 
-    @SuppressWarnings("rawtypes")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-    } )
     DriverDutyTimeInfo selectOne(DriverDutyTimeInfo param);
 
     Integer insertDriverDutyTimeInfoList(Map<String, Object> params);
 
     Integer updateDriverDutyTimeInfoList(Map<String, Object> params);
+
+    Integer updateDriverDutyTimeInfoOne(DriverDutyTimeInfo timeInfo);
 
 }

@@ -2,7 +2,13 @@ package com.zhuanche.serv.driverScheduling;
 
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.dutyEnum.EnumDriverDutyPeakTimes;
+import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.dto.driverDuty.CarDriverDurationDTO;
 import com.zhuanche.dto.driverDuty.CarDriverMustDutyDTO;
@@ -79,7 +85,11 @@ public class CarDriverShiftsService {
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/3 
-	*/ 
+	*/
+    @SuppressWarnings("unchecked")
+    @MasterSlaveConfigs(configs={
+            @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+    } )
 	public List<CarDriverMustDutyDTO> queryMustListByField(Integer teamId){
 		logger.info("查询司机强制排班时间段入参:{}"+"--teamId:"+teamId);
 		if(Check.NuNObj(teamId)){
@@ -102,7 +112,11 @@ public class CarDriverShiftsService {
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/3 
-	*/ 
+	*/
+    @SuppressWarnings("unchecked")
+    @MasterSlaveConfigs(configs={
+            @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+    } )
 	public List<CarDriverDurationDTO> queryDurationListByField(Integer cityId,Integer supplierId,Integer teamId){
 		logger.info("获取排班时长时间段入参:{}"+"cityId:"+cityId+"--supplierId:"+supplierId+"--teamId:"+teamId);
 		if(Check.NuNObjs(cityId,supplierId,teamId)){
@@ -129,11 +143,15 @@ public class CarDriverShiftsService {
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/3 
-	*/ 
-	public List<CarDriverInfoDTO> queryDriverTeamReList(TeamGroupRequest teamGroupRequest){
+	*/
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE ),
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
+	public PageDTO queryDriverTeamReList(TeamGroupRequest teamGroupRequest){
 		logger.info("获取班制设置司机列表入参:{}"+ JSON.toJSONString(teamGroupRequest));
 		if(Check.NuNObj(teamGroupRequest) || (Check.NuNObj(teamGroupRequest.getTeamId()) && Check.NuNStr(teamGroupRequest.getGroupId()))){
-			return null;
+			return new PageDTO();
 		}
 		try{
 			Set<String> driverids = new HashSet<>();
@@ -142,26 +160,31 @@ public class CarDriverShiftsService {
 				teamGroupRequest.setTeamId(null);
 				List<CarRelateGroup> carRelateGroups = carRelateGroupExMapper.queryDriverGroupRelationList(teamGroupRequest);
 				if(Check.NuNCollection(carRelateGroups)){
-					return null;
+					return new PageDTO();
 				}
 				driverids = citySupplierTeamCommonService.dealDriverids(carRelateGroups,CarRelateGroup.class,"driverId");
 			}else{
 				//车队
 				List<CarRelateTeam> carRelateTeams = carRelateTeamExMapper.queryDriverTeamRelationList(teamGroupRequest);
 				if(Check.NuNCollection(carRelateTeams)){
-					return null;
+					return new PageDTO();
 				}
 				driverids = citySupplierTeamCommonService.dealDriverids(carRelateTeams, CarRelateTeam.class,"driverId");
 			}
 			if(Check.NuNCollection(driverids)){
-				return null;
+				return new PageDTO();
 			}
 			DriverTeamRequest driverTeamRequest = new DriverTeamRequest();
 			driverTeamRequest.setDriverIds(driverids);
 			driverTeamRequest.setStatus(1);
-			List<CarDriverInfoDTO> driverInfoList = carBizDriverInfoExMapper.selectDriverList(driverTeamRequest);
+			PageInfo<CarDriverInfoDTO> pageInfo = PageHelper.startPage(driverTeamRequest.getPageNo(),driverTeamRequest.getPageSize(),true).doSelectPageInfo(
+					()->carBizDriverInfoExMapper.selectDriverList(driverTeamRequest));
+			if(Check.NuNObj(pageInfo)){
+				return new PageDTO();
+			}
+			List<CarDriverInfoDTO> driverInfoList = pageInfo.getList();
 			if(Check.NuNCollection(driverInfoList)){
-				return null;
+				return new PageDTO();
 			}
 			for (CarDriverInfoDTO carDriverInfoDTO : driverInfoList) {
 				CarRelateTeam carRelateTeam = new CarRelateTeam();
@@ -179,10 +202,13 @@ public class CarDriverShiftsService {
 					carDriverInfoDTO.setGroupId(group.getGroupId());
 				}
 			}
-			return driverInfoList;
+			PageDTO pageDTO = new PageDTO();
+			pageDTO.setResult(driverInfoList);
+			pageDTO.setTotal((int)pageInfo.getTotal());
+			return pageDTO;
 		}catch (Exception e){
 			logger.error("获取班制设置司机列表异常:{}"+JSON.toJSONString(e));
-			return null;
+			return new PageDTO();
 		}
 	}
 
@@ -231,7 +257,8 @@ public class CarDriverShiftsService {
 			//设置强制上班结果
 			dutyParamRequest.setForcedTimes(forceIdsResult);
 			es.submit(new DayDutyTasker(dutyParamRequest));
-
+			/*Map<String,Object> result = new HashMap<String,Object>();
+			result = asyncDutyService.saveDriverDayDutyList(dutyParamRequest);*/
 		}catch (Exception e){
 			logger.error("保存排班信息异常:{}"+JSON.toJSONString(e));
 		}
@@ -250,7 +277,8 @@ public class CarDriverShiftsService {
 			try {
 				logger.info("保存司机日排班信息 driverIds"+dutyParamRequest.getDutyIds()+",times"+dutyParamRequest.getTimes());
 				Map<String,Object> result = new HashMap<String,Object>();
-				asyncDutyService.saveDriverDayDutyList(dutyParamRequest);
+				result = asyncDutyService.saveDriverDayDutyList(dutyParamRequest);
+				logger.info("保存司机日排班信息 driverIds"+dutyParamRequest.getDutyIds()+",times"+dutyParamRequest.getTimes()+"保存班制排班结果："+JSON.toJSONString(result));
 			} catch (Exception e) {
 				logger.error("DayDutyTasker"+JSON.toJSONString(e));
 			}
@@ -274,7 +302,38 @@ public class CarDriverShiftsService {
 			searchParam.setForcedIds(forceIds);
 			List<CarDriverMustDutyDTO> mustList = carDriverMustDutyExMapper.selectDriverMustDutyList(searchParam);
 			StringBuffer forcedTimesBuffer = new StringBuffer();
-			for (CarDriverMustDutyDTO mustDuty : mustList) {
+			for(int i = 0; i < mustList.size(); i++) {
+				CarDriverMustDutyDTO driverMustDuty = mustList.get(i);
+
+				for (int j = i+1; j < mustList.size(); j ++) {
+					CarDriverMustDutyDTO driverMustDuty2 = mustList.get(j);
+					if (driverMustDuty.getPeakTimes().intValue()
+							== driverMustDuty2.getPeakTimes().intValue()) {  // 高峰时段不能重复
+						return "repeat";
+					}
+					if (checkRepeatTime(driverMustDuty, driverMustDuty2)) { // 检查强制上班时间段是否有重叠
+						return "repeatTime";
+					}
+				}
+
+				if (i != 0) {
+					forcedTimesBuffer.append(",");
+				}
+				if (null != driverMustDuty.getPeakTimes()) {
+					String peakTimes = EnumDriverDutyPeakTimes.getKey(driverMustDuty.getPeakTimes().intValue());
+					if (null != peakTimes) {
+						forcedTimesBuffer.append(peakTimes + ":");
+					}
+				}
+				if (null != driverMustDuty.getStartDate()) {
+					forcedTimesBuffer.append(driverMustDuty.getStartDate());
+				}
+				forcedTimesBuffer.append("—");
+				if (null != driverMustDuty.getEndDate()) {
+					forcedTimesBuffer.append(driverMustDuty.getEndDate());
+				}
+			}
+			/*for (CarDriverMustDutyDTO mustDuty : mustList) {
 
 				for (CarDriverMustDutyDTO repeatDto : mustList) {
 					if (mustDuty.getPeakTimes().intValue()
@@ -300,11 +359,11 @@ public class CarDriverShiftsService {
 				if (null != mustDuty.getEndDate()) {
 					forcedTimesBuffer.append(mustDuty.getEndDate());
 				}
-			}
+			}*/
 			resultStr = forcedTimesBuffer.toString();
-			if(!Check.NuNStr(resultStr)){
+			/*if(!Check.NuNStr(resultStr)){
 				resultStr = resultStr.substring(1,resultStr.length());
-			}
+			}*/
 			return resultStr;
 		}catch (Exception e){
 			logger.error("处理强制上班时间异常:{}"+JSON.toJSONString(e));

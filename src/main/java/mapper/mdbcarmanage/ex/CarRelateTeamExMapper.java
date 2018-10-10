@@ -13,23 +13,13 @@ import java.util.Set;
 
 public interface CarRelateTeamExMapper {
 
-    @SuppressWarnings("rawtypes")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-    } )
     List<CarRelateTeam> queryDriverTeamRelationList(TeamGroupRequest teamGroupRequest);
 
-    @SuppressWarnings("rawtypes")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-    } )
     List<Map<String,Object>> queryDriverIdsByTeamIds(@Param("teamIds") Set<Integer> teamIds);
 
-    @SuppressWarnings("rawtypes")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-    } )
     CarRelateTeam selectOneTeam(CarRelateTeam carRelateTeam);
+
+    int deleteDriverFromTeam(@Param("paramId") Integer paramId,@Param("driverId") Integer driverId);
 
     /**
      * 根据司机ID删除
@@ -41,10 +31,11 @@ public interface CarRelateTeamExMapper {
     /**
      * 查询所给车队ID下的所有司机ID
      * @param teamId
-     * @param teamIds
      * @return
      */
-    List<Integer> queryDriverIdsByTeamId(@Param("teamId") Integer teamId, @Param("teamIds") Set<Integer> teamIds);
+    List<Integer> queryDriverIdsByTeamId(@Param("teamId") Integer teamId);
+
+    List<Integer> queryDriverIdsByTeamIdss(@Param("teamIds") Set<Integer> teamIds);
     /**
      * <p>Title: queryListByTeamId</p>
      * <p>Description: 通过车队id查询关联关系，参数格式要求('','','')</p>

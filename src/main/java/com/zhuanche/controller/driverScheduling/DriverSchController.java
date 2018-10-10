@@ -27,6 +27,7 @@ import org.apache.commons.collections.map.HashedMap;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -102,14 +103,27 @@ public class DriverSchController {
                 param = new DutyParamRequest();
             }
             //设置导出单文件阈值 3000
-            param.setPageSize(3000);
+            param.setPageSize(1000);
             PageDTO pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
             if(Check.NuNObj(pageDTO)){
                 return ;
             }
             Integer total = pageDTO.getTotal();
+            List<DutyExcelDTO> firstList = new ArrayList<>();
             List<CarDriverDayDutyDTO> result = pageDTO.getResult();
-            List<DutyExcelDTO> firstList = BeanUtil.copyList(result, DutyExcelDTO.class);
+            for (CarDriverDayDutyDTO carDriverDayDutyDTO : result) {
+                DutyExcelDTO excel = new DutyExcelDTO();
+                BeanUtils.copyProperties(carDriverDayDutyDTO,excel);
+                if(carDriverDayDutyDTO.getStatus() == 2){
+                    excel.setStatus("已发布");
+                }else if(carDriverDayDutyDTO.getStatus() == 1){
+                    excel.setStatus("未发布");
+                }else{
+                    excel.setStatus("未发布");
+                }
+                firstList.add(excel);
+            }
+//            List<DutyExcelDTO> firstList = BeanUtil.copyList(result, DutyExcelDTO.class);
             if(Check.NuNCollection(result)){
                 return ;
             }
@@ -122,8 +136,21 @@ public class DriverSchController {
             for(int pageNumber = 2; ((pageNumber-1)*param.getPageSize()) < total; pageNumber++){
                 param.setPageNo(pageNumber);
                 PageDTO page = carDriverDutyService.queryDriverDayDutyList(param);
+                List<DutyExcelDTO> targetList = new ArrayList<>();
                 List<CarDriverDayDutyDTO> sourceList = page.getResult();
-                List<DutyExcelDTO> targetList = BeanUtil.copyList(sourceList, DutyExcelDTO.class);
+                for (CarDriverDayDutyDTO carDriverDayDutyDTO : sourceList) {
+                    DutyExcelDTO excel = new DutyExcelDTO();
+                    BeanUtils.copyProperties(carDriverDayDutyDTO,excel);
+                    if(carDriverDayDutyDTO.getStatus() == 2){
+                        excel.setStatus("已发布");
+                    }else if(carDriverDayDutyDTO.getStatus() == 1){
+                        excel.setStatus("未发布");
+                    }else{
+                        excel.setStatus("未发布");
+                    }
+                    targetList.add(excel);
+                }
+//                List<DutyExcelDTO> targetList = BeanUtil.copyList(sourceList, DutyExcelDTO.class);
                 if(!Check.NuNCollection(targetList)){
                     workbook = excelUtil.exportExcelSheet(workbook, "排班信息" + pageNumber, title, targetList);
                 }
@@ -132,7 +159,7 @@ public class DriverSchController {
             workbook.write(out);
             out.flush();
             out.close();
-            if(total <= 3000){
+            if(total <= 1000){
                 return ;
             }
 
@@ -181,8 +208,8 @@ public class DriverSchController {
     @RequestMapping(value = "/queryDriverTeamReList")
     public AjaxResponse queryDriverTeamReList(TeamGroupRequest teamGroupRequest){
         logger.info("获取班制设置司机列表入参:"+ JSON.toJSONString(teamGroupRequest));
-        List<CarDriverInfoDTO> list = carDriverShiftsService.queryDriverTeamReList(teamGroupRequest);
-        return AjaxResponse.success(list);
+        PageDTO pageDTO = carDriverShiftsService.queryDriverTeamReList(teamGroupRequest);
+        return AjaxResponse.success(pageDTO);
     }
 
     /**
@@ -228,7 +255,7 @@ public class DriverSchController {
     @RequestMapping(value = "/getCarDriverMustDetail")
     public AjaxResponse getCarDriverMustDetail(@Verify(param = "paramId", rule = "required") String paramId){
         logger.info("获取强制排班详情入参:"+ JSON.toJSONString(paramId));
-        CarDriverMustDuty detail = carDriverMustDutyService.getCarDriverMustDetail(Integer.parseInt(paramId));
+        CarDriverMustDutyDTO detail = carDriverMustDutyService.getCarDriverMustDetail(Integer.parseInt(paramId));
         return AjaxResponse.success(detail);
     }
 
@@ -247,7 +274,7 @@ public class DriverSchController {
         if(result >0){
             return AjaxResponse.success(result);
         }else{
-            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+            return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
         }
     }
 
@@ -336,15 +363,7 @@ public class DriverSchController {
         logger.info("发布排班入参:"+ JSON.toJSONString(param));
         int result = carDriverDutyService.issueDriverDuty(param);
         ServiceReturnCodeEnum typeByCode = ServiceReturnCodeEnum.getTypeByCode(result);
-        if(result < 0 ){
-            AjaxResponse fail = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
-            Map<String,String> map = new HashedMap();
-            map.put("errorMsg",typeByCode.getName());
-            fail.setData(map);
-            return fail;
-        }else if(result == 1){
-            return AjaxResponse.success(result);
-        }else if(result == 2){
+        if(result == 2){
             AjaxResponse success = AjaxResponse.success(result);
             Map<String,String> map = new HashedMap();
             map.put("successMsg",typeByCode.getName());

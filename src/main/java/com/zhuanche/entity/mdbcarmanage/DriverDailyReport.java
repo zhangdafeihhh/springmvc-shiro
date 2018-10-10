@@ -1,6 +1,5 @@
 package com.zhuanche.entity.mdbcarmanage;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 public class DriverDailyReport {
@@ -16,23 +15,23 @@ public class DriverDailyReport {
 
     private Integer operationNum;
 
-    private Date upOnlineTime;
+    private String upOnlineTime;
 
-    private BigDecimal orderTime;
+    private double orderTime;
 
-    private BigDecimal serviceTime;
+    private double serviceTime;
 
-    private BigDecimal onlineTime;
+    private double onlineTime;
 
-    private BigDecimal actualPay;
+    private double actualPay;
 
-    private BigDecimal driverGetPay;
+    private double driverGetPay;
 
-    private BigDecimal driverOutPay;
+    private double driverOutPay;
 
-    private BigDecimal orderMileage;
+    private double orderMileage;
 
-    private BigDecimal serviceMileage;
+    private double serviceMileage;
 
     private Integer assignOrderNum;
 
@@ -48,21 +47,21 @@ public class DriverDailyReport {
 
     private Integer travelTime;
 
-    private BigDecimal travelMileage;
+    private double travelMileage;
 
     private Integer travelTimeStart;
 
-    private BigDecimal travelMileageStart;
+    private double travelMileageStart;
 
     private Integer travelTimeEnd;
 
-    private BigDecimal travelMileageEnd;
+    private double travelMileageEnd;
 
     private Integer supplierId;
 
     private Integer cityId;
 
-    private BigDecimal forcedTime;
+    private double forcedTime;
     
     private String teamName;
     private String groupName;
@@ -121,75 +120,75 @@ public class DriverDailyReport {
         this.operationNum = operationNum;
     }
 
-    public Date getUpOnlineTime() {
+    public String getUpOnlineTime() {
         return upOnlineTime;
     }
 
-    public void setUpOnlineTime(Date upOnlineTime) {
+    public void setUpOnlineTime(String upOnlineTime) {
         this.upOnlineTime = upOnlineTime;
     }
 
-    public BigDecimal getOrderTime() {
+    public double getOrderTime() {
         return orderTime;
     }
 
-    public void setOrderTime(BigDecimal orderTime) {
+    public void setOrderTime(double orderTime) {
         this.orderTime = orderTime;
     }
 
-    public BigDecimal getServiceTime() {
+    public double getServiceTime() {
         return serviceTime;
     }
 
-    public void setServiceTime(BigDecimal serviceTime) {
+    public void setServiceTime(double serviceTime) {
         this.serviceTime = serviceTime;
     }
 
-    public BigDecimal getOnlineTime() {
+    public double getOnlineTime() {
         return onlineTime;
     }
 
-    public void setOnlineTime(BigDecimal onlineTime) {
+    public void setOnlineTime(double onlineTime) {
         this.onlineTime = onlineTime;
     }
 
-    public BigDecimal getActualPay() {
+    public double getActualPay() {
         return actualPay;
     }
 
-    public void setActualPay(BigDecimal actualPay) {
+    public void setActualPay(double actualPay) {
         this.actualPay = actualPay;
     }
 
-    public BigDecimal getDriverGetPay() {
+    public double getDriverGetPay() {
         return driverGetPay;
     }
 
-    public void setDriverGetPay(BigDecimal driverGetPay) {
+    public void setDriverGetPay(double driverGetPay) {
         this.driverGetPay = driverGetPay;
     }
 
-    public BigDecimal getDriverOutPay() {
+    public double getDriverOutPay() {
         return driverOutPay;
     }
 
-    public void setDriverOutPay(BigDecimal driverOutPay) {
+    public void setDriverOutPay(double driverOutPay) {
         this.driverOutPay = driverOutPay;
     }
 
-    public BigDecimal getOrderMileage() {
+    public double getOrderMileage() {
         return orderMileage;
     }
 
-    public void setOrderMileage(BigDecimal orderMileage) {
+    public void setOrderMileage(double orderMileage) {
         this.orderMileage = orderMileage;
     }
 
-    public BigDecimal getServiceMileage() {
+    public double getServiceMileage() {
         return serviceMileage;
     }
 
-    public void setServiceMileage(BigDecimal serviceMileage) {
+    public void setServiceMileage(double serviceMileage) {
         this.serviceMileage = serviceMileage;
     }
 
@@ -249,11 +248,11 @@ public class DriverDailyReport {
         this.travelTime = travelTime;
     }
 
-    public BigDecimal getTravelMileage() {
+    public double getTravelMileage() {
         return travelMileage;
     }
 
-    public void setTravelMileage(BigDecimal travelMileage) {
+    public void setTravelMileage(double travelMileage) {
         this.travelMileage = travelMileage;
     }
 
@@ -265,11 +264,11 @@ public class DriverDailyReport {
         this.travelTimeStart = travelTimeStart;
     }
 
-    public BigDecimal getTravelMileageStart() {
+    public double getTravelMileageStart() {
         return travelMileageStart;
     }
 
-    public void setTravelMileageStart(BigDecimal travelMileageStart) {
+    public void setTravelMileageStart(double travelMileageStart) {
         this.travelMileageStart = travelMileageStart;
     }
 
@@ -281,11 +280,11 @@ public class DriverDailyReport {
         this.travelTimeEnd = travelTimeEnd;
     }
 
-    public BigDecimal getTravelMileageEnd() {
+    public double getTravelMileageEnd() {
         return travelMileageEnd;
     }
 
-    public void setTravelMileageEnd(BigDecimal travelMileageEnd) {
+    public void setTravelMileageEnd(double travelMileageEnd) {
         this.travelMileageEnd = travelMileageEnd;
     }
 
@@ -305,11 +304,11 @@ public class DriverDailyReport {
         this.cityId = cityId;
     }
 
-    public BigDecimal getForcedTime() {
+    public double getForcedTime() {
         return forcedTime;
     }
 
-    public void setForcedTime(BigDecimal forcedTime) {
+    public void setForcedTime(double forcedTime) {
         this.forcedTime = forcedTime;
     }
 

@@ -94,7 +94,6 @@ public class CarFactOrderInfo extends BaseEntity {
 	private Double paydriver;
 	// 预定车型id
 	private String bookinggroupids;
-
 	// 信用卡支付
 	private Double creditPay;
 	// 提出异议的端口 0:pc端口 1：手机端口
@@ -2122,5 +2121,69 @@ public class CarFactOrderInfo extends BaseEntity {
 	public void setOrderId(long orderId) {
 		this.orderId = orderId;
 	}
+	
+	//指派司机类型name
+	private String pushDriverTypeName;
+	public String getPushDriverTypeName() {
+		if(pushDriverType!=null && this.pushDriverType==1){
+			pushDriverTypeName= "自动派单";
+		}else if(pushDriverType!=null && this.pushDriverType==2){
+			pushDriverTypeName= "司机抢单";
+		}else if(pushDriverType!=null && this.pushDriverType==3){
+			pushDriverTypeName= "人工绑单";
+		}else{
+			pushDriverTypeName = "无";
+		}
+		return pushDriverTypeName;
+	}
+
+	public void setPushDriverTypeName(String pushDriverTypeName) {
+		this.pushDriverTypeName = pushDriverTypeName;
+	}
+	//取消 发起人
+	private String startPerson;
+	public String getStartPerson() {
+		if(qxcancelstatus==1){
+			startPerson="pc端";
+		}else if(qxcancelstatus==2){
+			startPerson="乘客端APP";
+		}else if(qxcancelstatus==2){
+			startPerson="pc端";
+		}else if(qxcancelstatus==3){
+			startPerson="乘客端APP(超时)";
+		}else if(qxcancelstatus==4){
+			startPerson="系统自动取消";
+		}else if(qxcancelstatus==5){
+			startPerson="系统自动取消";
+		}else if(qxcancelstatus==10){
+			startPerson="乘客端APP";
+		}else{
+			startPerson="";
+		}
+		return startPerson;
+	}
+
+	public void setStartPerson(String startPerson) {
+		this.startPerson = startPerson;
+	}
+	
+	//操作人 
+	private String operatePerson;
+	public String getOperatePerson() {
+		 if(yystatus==1){
+			 operatePerson="pc端";
+		 }else if(yystatus==2){
+			 operatePerson="乘客端APP";
+		 }else{
+			 operatePerson="";
+		 }
+		return operatePerson;
+	}
+
+	public void setOperatePerson(String operatePerson) {
+		this.operatePerson = operatePerson;
+	}
+	
+	
 	
 }

@@ -102,7 +102,7 @@ public class MobileClientPublishController {
 			log.info("短信验证码发送用户userName:"+userName+"  手机号phone:"+user.getMobile()+"   验证码code:"+code);
 			SmsSendUtil.send(user.getMobile(), "验证码为："+code+" 验证码60秒内有效!");
 			log.info("session中验证码放的key为:"+userName+"_"+VALIDATE_CODE);
-			WebSessionUtil.setAttribute(userName+"_"+VALIDATE_CODE, "1111");
+			WebSessionUtil.setAttribute(userName+"_"+VALIDATE_CODE, code);
 			return AjaxResponse.success(0);
 		}else{
 			return AjaxResponse.fail(RestErrorCode.HTTP_INVALID_SESSION);

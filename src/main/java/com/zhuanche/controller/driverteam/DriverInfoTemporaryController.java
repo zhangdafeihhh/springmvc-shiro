@@ -8,6 +8,7 @@ import com.zhuanche.common.web.BaseController;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.mdbcarmanage.CarBizDriverInfoTempDTO;
+import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
 import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.entity.rentcar.CarBizCooperationType;
@@ -73,6 +74,7 @@ public class DriverInfoTemporaryController extends BaseController {
     @ResponseBody
     @RequestMapping(value = "/driverListData", method =  RequestMethod.GET )
     public AjaxResponse driverListData(@RequestParam(value = "page",defaultValue="1") Integer page,
+                                       @Verify(param = "pageSize",rule = "max(50)")
                                        @RequestParam(value = "pageSize",defaultValue="10") Integer pageSize,
                                        @RequestParam(value = "name",required = false) String name,
                                        @RequestParam(value = "phone",required = false) String phone,
@@ -205,8 +207,9 @@ public class DriverInfoTemporaryController extends BaseController {
     public AjaxResponse importDriverInfo(@RequestParam(value="fileName") MultipartFile file,
                                          @Verify(param = "cityId",rule="required") Integer cityId,
                                          @Verify(param = "supplierId",rule="required") Integer supplierId,
-                                         @Verify(param = "teamId",rule="required") Integer teamId,
-                                         @Verify(param = "groupId",rule="required") Integer groupId){
+                                         @RequestParam(value = "teamId",required = false) Integer teamId,
+                                         @RequestParam(value = "groupId",required = false) Integer groupId,
+                                         HttpServletResponse response){
         try {
             log.info("司机导入");
             // 获取上传的文件的名称
@@ -216,7 +219,7 @@ public class DriverInfoTemporaryController extends BaseController {
             if (!"xls".equals(prefix) && !"xlsx".equals(prefix)) {
                 return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
             }
-            return carBizDriverInfoTempService.importDriverInfo(file.getInputStream(),prefix,cityId,supplierId,teamId,groupId);
+            return carBizDriverInfoTempService.importDriverInfo(file.getInputStream(),prefix,cityId,supplierId,teamId,groupId,response);
         } catch (IOException e) {
             e.printStackTrace();
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
@@ -377,6 +380,8 @@ public class DriverInfoTemporaryController extends BaseController {
      * @param bankCardNumber 银行卡号
      * @param bankCardBank 银行卡开户行
      * @param memo 备注
+     * @param photoSrct 司机头像
+     * @param drivingLicenseImg 驾驶证扫描件
      * @return
      */
     @ResponseBody
@@ -386,7 +391,7 @@ public class DriverInfoTemporaryController extends BaseController {
                                     @Verify(param = "nation",rule="required") String nation,
                                     @Verify(param = "houseHoldRegisterPermanent",rule="required") String houseHoldRegisterPermanent,
                                     @Verify(param = "houseHoldRegister",rule="required") String houseHoldRegister,
-                                    @Verify(param = "idCardNo",rule="required|idcard") String idCardNo,
+                                    @Verify(param = "idCardNo",rule="required") String idCardNo,
                                     @Verify(param = "birthDay",rule="required") String birthDay,
                                     @Verify(param = "gender",rule="required") Integer gender,
                                     @Verify(param = "phone",rule="required|mobile") String phone,
@@ -432,7 +437,9 @@ public class DriverInfoTemporaryController extends BaseController {
                                     @Verify(param = "groupId",rule="required") Integer groupId,
                                     @RequestParam(value = "bankCardNumber",required = false) String bankCardNumber,
                                     @RequestParam(value = "bankCardBank",required = false) String bankCardBank,
-                                    @RequestParam(value = "memo",required = false) String memo) {
+                                    @RequestParam(value = "memo",required = false) String memo,
+                                    @RequestParam(value = "photoSrct",required = false) String photoSrct,
+                                    @RequestParam(value = "drivingLicenseImg",required = false) String drivingLicenseImg) {
         log.info("新建司机信息保存");
         CarBizDriverInfoTemp entity = new CarBizDriverInfoTemp();
         entity.setName(name);
@@ -454,7 +461,7 @@ public class DriverInfoTemporaryController extends BaseController {
         entity.setEmergencyContactPerson(emergencyContactPerson);
         entity.setEmergencyContactNumber(emergencyContactNumber);
         entity.setEmergencyContactAddr(emergencyContactAddr);
-        entity.setDrivingTypeString(drivingTypeString);
+        entity.setDrivingLicenseType(drivingTypeString);
         entity.setIssueDate(issueDate);
         entity.setExpireDate(expireDate);
         entity.setSuperintendNo(superintendNo);
@@ -472,7 +479,7 @@ public class DriverInfoTemporaryController extends BaseController {
         entity.setXyDriverNumber(xyDriverNumber);
         entity.setPartTimeJobDri(partTimeJobDri);
         entity.setMapType(mapType);
-        entity.setAssessment(StringUtils.isNotBlank(assessment)?superintendUrl:null);
+        entity.setAssessment(StringUtils.isNotBlank(assessment)?assessment:null);
         entity.setDriverLicenseIssuingDateStart(driverLicenseIssuingDateStart);
         entity.setDriverLicenseIssuingDateEnd(driverLicenseIssuingDateEnd);
         entity.setDriverLicenseIssuingCorp(driverLicenseIssuingCorp);
@@ -480,13 +487,16 @@ public class DriverInfoTemporaryController extends BaseController {
         entity.setDriverLicenseIssuingRegisterDate(driverLicenseIssuingRegisterDate);
         entity.setDriverLicenseIssuingFirstDate(driverLicenseIssuingFirstDate);
         entity.setDriverLicenseIssuingGrantDate(driverLicenseIssuingGrantDate);
-        entity.setCityId(cityId);
+        entity.setServiceCity(String.valueOf(cityId));
         entity.setSupplierId(supplierId);
         entity.setLicensePlates(licensePlates);
-        entity.setGroupid(groupId);
-        entity.setBankCardNumber(StringUtils.isNotBlank(bankCardNumber)?superintendUrl:null);
-        entity.setBankCardBank(StringUtils.isNotBlank(bankCardBank)?superintendUrl:null);
-        entity.setMemo(StringUtils.isNotBlank(memo)?superintendUrl:null);
+        entity.setGroupId(String.valueOf(groupId));
+        entity.setBankCardNumber(StringUtils.isNotBlank(bankCardNumber)?bankCardNumber:null);
+        entity.setBankCardBank(StringUtils.isNotBlank(bankCardBank)?bankCardBank:null);
+        entity.setMemo(StringUtils.isNotBlank(memo)?memo:null);
+        entity.setAddress(currentAddress);
+        entity.setPhotoSrct(StringUtils.isNotBlank(photoSrct)?photoSrct:null);
+        entity.setDrivingLicenseImg(StringUtils.isNotBlank(drivingLicenseImg)?drivingLicenseImg:null);
         return carBizDriverInfoTempService.addSave(entity);
     }
 
@@ -547,6 +557,10 @@ public class DriverInfoTemporaryController extends BaseController {
      * @param memo 备注
      * @param oldCityId 旧的城市Id
      * @param oldSupplierId 旧的供应商
+     * @param oldPhone 旧的手机号
+     * @param oldLicensePlates 旧的车牌号
+     * @param photoSrct 司机头像
+     * @param drivingLicenseImg 驾驶证扫描件
      * @return
      */
     @ResponseBody
@@ -557,7 +571,7 @@ public class DriverInfoTemporaryController extends BaseController {
                                 @Verify(param = "nation",rule="required") String nation,
                                 @Verify(param = "houseHoldRegisterPermanent",rule="required") String houseHoldRegisterPermanent,
                                 @Verify(param = "houseHoldRegister",rule="required") String houseHoldRegister,
-                                @Verify(param = "idCardNo",rule="required|idcard") String idCardNo,
+                                @Verify(param = "idCardNo",rule="required") String idCardNo,
                                 @Verify(param = "birthDay",rule="required") String birthDay,
                                 @Verify(param = "gender",rule="required") Integer gender,
                                 @Verify(param = "phone",rule="required|mobile") String phone,
@@ -588,7 +602,7 @@ public class DriverInfoTemporaryController extends BaseController {
                                 @Verify(param = "isXyDriver",rule="required") Integer isXyDriver,
                                 @Verify(param = "xyDriverNumber",rule="required") String xyDriverNumber,
                                 @Verify(param = "partTimeJobDri",rule="required") String partTimeJobDri,
-                                @Verify(param = "mapType",rule="required") String mapType,
+                                @RequestParam(value = "mapType",required = false) String mapType,
                                 @RequestParam(value = "assessment",required = false) String assessment,
                                 @Verify(param = "driverLicenseIssuingDateStart",rule="required") String driverLicenseIssuingDateStart,
                                 @Verify(param = "driverLicenseIssuingDateEnd",rule="required") String driverLicenseIssuingDateEnd,
@@ -605,7 +619,11 @@ public class DriverInfoTemporaryController extends BaseController {
                                 @RequestParam(value = "bankCardBank",required = false) String bankCardBank,
                                 @RequestParam(value = "memo",required = false) String memo,
                                 @Verify(param = "oldCityId",rule="required") Integer oldCityId,
-                                @Verify(param = "oldSupplierId",rule="required") Integer oldSupplierId) {
+                                @Verify(param = "oldSupplierId",rule="required") Integer oldSupplierId,
+                                @Verify(param = "oldPhone",rule="required") String oldPhone,
+                                @Verify(param = "oldLicensePlates",rule="required") String oldLicensePlates,
+                                @RequestParam(value = "photoSrct",required = false) String photoSrct,
+                                @RequestParam(value = "drivingLicenseImg",required = false) String drivingLicenseImg) {
         log.info("修改司机信息保存,司机Id:"+driverId);
         CarBizDriverInfoTemp entity = new CarBizDriverInfoTemp();
         entity.setDriverId(driverId);
@@ -628,7 +646,7 @@ public class DriverInfoTemporaryController extends BaseController {
         entity.setEmergencyContactPerson(emergencyContactPerson);
         entity.setEmergencyContactNumber(emergencyContactNumber);
         entity.setEmergencyContactAddr(emergencyContactAddr);
-        entity.setDrivingTypeString(drivingTypeString);
+        entity.setDrivingLicenseType(drivingTypeString);
         entity.setIssueDate(issueDate);
         entity.setExpireDate(expireDate);
         entity.setSuperintendNo(superintendNo);
@@ -646,7 +664,7 @@ public class DriverInfoTemporaryController extends BaseController {
         entity.setXyDriverNumber(xyDriverNumber);
         entity.setPartTimeJobDri(partTimeJobDri);
         entity.setMapType(mapType);
-        entity.setAssessment(StringUtils.isNotBlank(assessment)?superintendUrl:null);
+        entity.setAssessment(StringUtils.isNotBlank(assessment)?assessment:null);
         entity.setDriverLicenseIssuingDateStart(driverLicenseIssuingDateStart);
         entity.setDriverLicenseIssuingDateEnd(driverLicenseIssuingDateEnd);
         entity.setDriverLicenseIssuingCorp(driverLicenseIssuingCorp);
@@ -654,15 +672,38 @@ public class DriverInfoTemporaryController extends BaseController {
         entity.setDriverLicenseIssuingRegisterDate(driverLicenseIssuingRegisterDate);
         entity.setDriverLicenseIssuingFirstDate(driverLicenseIssuingFirstDate);
         entity.setDriverLicenseIssuingGrantDate(driverLicenseIssuingGrantDate);
-        entity.setCityId(cityId);
+        entity.setServiceCity(String.valueOf(cityId));
         entity.setSupplierId(supplierId);
         entity.setLicensePlates(licensePlates);
-        entity.setGroupid(groupId);
-        entity.setBankCardNumber(StringUtils.isNotBlank(bankCardNumber)?superintendUrl:null);
-        entity.setBankCardBank(StringUtils.isNotBlank(bankCardBank)?superintendUrl:null);
-        entity.setMemo(StringUtils.isNotBlank(memo)?superintendUrl:null);
+        entity.setGroupId(String.valueOf(groupId));
+        entity.setBankCardNumber(StringUtils.isNotBlank(bankCardNumber)?bankCardNumber:null);
+        entity.setBankCardBank(StringUtils.isNotBlank(bankCardBank)?bankCardBank:null);
+        entity.setMemo(StringUtils.isNotBlank(memo)?memo:null);
         entity.setOldCityId(oldCityId);
         entity.setOldSupplierId(oldSupplierId);
+        entity.setOldPhone(oldPhone);
+        entity.setOldLicensePlates(oldLicensePlates);
+        entity.setAddress(currentAddress);
+        entity.setPhotoSrct(StringUtils.isNotBlank(photoSrct)?photoSrct:null);
+        entity.setDrivingLicenseImg(StringUtils.isNotBlank(drivingLicenseImg)?drivingLicenseImg:null);
         return carBizDriverInfoTempService.updateSave(entity);
+    }
+
+
+    /**
+     * 查询未绑定车牌号
+     * @param cityId 城市Id
+     * @param supplierId 供应商Id
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/licensePlatesTempList")
+    public Object licensePlatesList(@Verify(param = "cityId", rule = "required") Integer cityId,
+                                    @Verify(param = "supplierId", rule = "required") Integer supplierId) {
+        Map<String, Object> map=new HashMap<String, Object>();
+        map.put("cityId",cityId);
+        map.put("supplierId",supplierId);
+        List<CarBizCarInfoTemp> carList = carBizDriverInfoTempService.licensePlatesNotDriverIdList(map);
+        return AjaxResponse.success(carList);
     }
 }

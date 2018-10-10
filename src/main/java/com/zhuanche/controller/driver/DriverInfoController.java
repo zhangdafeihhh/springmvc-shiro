@@ -21,22 +21,29 @@ import com.zhuanche.serv.*;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
+import java.io.*;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -94,7 +101,7 @@ public class DriverInfoController {
     public AjaxResponse findDriverList(String name, String phone, String licensePlates, Integer status, Integer cityId, Integer supplierId,
             Integer teamId, Integer teamGroupId, Integer groupId, Integer cooperationType, String imei, String idCardNo, Integer isImage,
             @RequestParam(value="page", defaultValue="0")Integer page,
-            @RequestParam(value="pageSize", defaultValue="20")Integer pageSize) {
+            @Verify(param = "pageSize",rule = "max(50)")@RequestParam(value="pageSize", defaultValue="20")Integer pageSize) {
 
         // 数据权限控制SSOLoginUser
         Set<Integer> permOfCity        = WebSessionUtil.getCurrentLoginUser().getCityIds(); //普通管理员可以管理的所有城市ID
@@ -110,7 +117,7 @@ public class DriverInfoController {
             driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
         }
         if(had && (driverIds==null || driverIds.size()==0)){
-            logger.info(LOGTAG + "查询teamId={},groupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
+            logger.info(LOGTAG + "查询teamId={},teamGroupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
             PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
             return AjaxResponse.success(pageDTO);
         }
@@ -144,7 +151,7 @@ public class DriverInfoController {
         }
         // 查询城市名称，供应商名称，服务类型，加盟类型
         for (CarBizDriverInfoDTO driver : list) {
-            driver = carBizDriverInfoService.getBaseStatis(driver);
+            carBizDriverInfoService.getBaseStatis(driver);
         }
         PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
         return AjaxResponse.success(pageDTO);
@@ -188,7 +195,7 @@ public class DriverInfoController {
             driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
         }
         if(had && (driverIds==null || driverIds.size()==0)){
-            logger.info(LOGTAG + "查询teamId={},groupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
+            logger.info(LOGTAG + "查询teamId={},teamGroupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
             return AjaxResponse.success(list);
         }
         CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();
@@ -214,7 +221,7 @@ public class DriverInfoController {
         list = carBizDriverInfoService.queryDriverList(carBizDriverInfoDTO);
         // 查询城市名称，供应商名称，服务类型，加盟类型
         for (CarBizDriverInfoDTO driver : list) {
-            driver = carBizDriverInfoService.getBaseStatis(driver);
+            carBizDriverInfoService.getBaseStatis(driver);
         }
         return AjaxResponse.success(list);
     }
@@ -241,7 +248,9 @@ public class DriverInfoController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
-    public void exportDriverList(String name, String phone, String licensePlates, Integer status, Integer cityId, Integer supplierId,
+    public void exportDriverList(String name, String phone, String licensePlates, Integer status,
+                                         @Verify(param = "cityId",rule="required") Integer cityId,
+                                         @Verify(param = "supplierId",rule="required") Integer supplierId,
                                          Integer teamId, Integer teamGroupId, Integer groupId, Integer cooperationType,
                                          String imei, String idCardNo, Integer isImage,
                                          HttpServletRequest request, HttpServletResponse response) {
@@ -251,6 +260,8 @@ public class DriverInfoController {
         Set<Integer> permOfSupplier    = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); //普通管理员可以管理的所有供应商ID
         Set<Integer> permOfTeam        = WebSessionUtil.getCurrentLoginUser().getTeamIds(); //普通管理员可以管理的所有车队ID
 
+        long start=System.currentTimeMillis(); //获取开始时间
+
         List<CarBizDriverInfoDTO> list =  Lists.newArrayList();
         Set<Integer> driverIds = null;
         Boolean had = false;
@@ -259,7 +270,7 @@ public class DriverInfoController {
             driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
         }
         if(had && (driverIds==null || driverIds.size()==0)){
-            logger.info(LOGTAG + "查询teamId={},groupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
+            logger.info(LOGTAG + "查询teamId={},teamGroupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
             list =  Lists.newArrayList();
         }else{
             CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();
@@ -281,19 +292,32 @@ public class DriverInfoController {
             carBizDriverInfoDTO.setSupplierIds(permOfSupplier);
             carBizDriverInfoDTO.setTeamIds(permOfTeam);
             carBizDriverInfoDTO.setDriverIds(driverIds);
-
             list = carBizDriverInfoService.queryDriverList(carBizDriverInfoDTO);
-            // 查询城市名称，供应商名称，服务类型，加盟类型
-            for (CarBizDriverInfoDTO driver : list) {
-                carBizDriverInfoService.getBaseStatis(driver);
-            }
         }
         try {
-            Workbook wb = carBizDriverInfoService.exportExcel(list,request.getRealPath("/")+File.separator+"template"+File.separator+"driver_info.xlsx");
-            Componment.fileDownload(response, wb, new String("司机信息".getBytes("utf-8"), "iso8859-1"));
+            Workbook wb = carBizDriverInfoService.exportExcel(list, cityId, supplierId, request.getRealPath("/")+File.separator+"template"+File.separator+"driver_info.xlsx");
+//            Componment.fileDownload(response, wb, new String("司机信息".getBytes("utf-8"), "iso8859-1"));
+            long end=System.currentTimeMillis(); //获取结束时间
+            logger.info(LOGTAG + "司机导出cityId={},supplierId={}的查询写入数据时间为={}ms", cityId, supplierId, (end-start));
+            this.exportExcelFromTemplet(response, wb, new String("司机信息".getBytes("utf-8"), "iso8859-1"));
         } catch (Exception e) {
            logger.error("司机信息列表查询导出error",e);
+        }finally {
+            long end=System.currentTimeMillis(); //获取结束时间
+            logger.info(LOGTAG + "司机导出cityId={},supplierId={}的时间为={}ms", cityId, supplierId, (end-start));
         }
+    }
+
+    public void exportExcelFromTemplet(HttpServletResponse response, Workbook wb, String fileName) throws IOException {
+        if(StringUtils.isEmpty(fileName)) {
+            fileName = "exportExcel";
+        }
+        response.setHeader("Content-Disposition","attachment;filename="+fileName+".xlsx");//指定下载的文件名
+        response.setContentType("application/octet-stream");
+        ServletOutputStream os =  response.getOutputStream();
+        wb.write(os);
+        os.flush();
+        os.close();
     }
 
     /**
@@ -398,8 +422,7 @@ public class DriverInfoController {
                                    @Verify(param = "status",rule="required") Integer status,
                                    @Verify(param = "groupId",rule="required") Integer groupId,
                                    @Verify(param = "age",rule="required|min(18)") Integer age,
-                                   @Verify(param = "emergencyContactNumber",rule="max(11)") String emergencyContactNumber,
-                                   String currentAddress, String emergencyContactPerson,
+                                   String emergencyContactNumber, String currentAddress, String emergencyContactPerson,
                                    String superintendNo, String superintendUrl, String drivingLicenseType, Integer drivingYears,
                                    String archivesNo, String issueDateStr, String expireDateStr, String photosrct, String driverlicensenumber,
                                    String drivinglicenseimg, String nationality, String householdregister, String nation, String marriage,
@@ -411,6 +434,10 @@ public class DriverInfoController {
                                    String driverlicenseissuingnumber, String driverLicenseIssuingRegisterDate, String driverLicenseIssuingFirstDate,
                                    String driverLicenseIssuingGrantDate, String birthDay, String houseHoldRegisterPermanent,
                                    String memo, String bankCardBank,String bankCardNumber) {
+
+        if(StringUtils.isNotEmpty(emergencyContactNumber) && emergencyContactNumber.length()>11){
+            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID,"紧急联系方式不可超过11位");
+        }
 
         //判断一些基础信息是否正确
         AjaxResponse ajaxResponse = carBizDriverInfoService.validateCarDriverInfo(driverId, phone, idCardNo, bankCardNumber, bankCardBank);
@@ -455,11 +482,10 @@ public class DriverInfoController {
                     || StringUtils.isEmpty(education) || StringUtils.isEmpty(firstdrivinglicensedate) || StringUtils.isEmpty(firstmeshworkdrivinglicensedate)
                     || StringUtils.isEmpty(corptype) || StringUtils.isEmpty(signdate) || StringUtils.isEmpty(signdateend) || StringUtils.isEmpty(contractdate)
                     || isxydriver==null || StringUtils.isEmpty(xyDriverNumber) || StringUtils.isEmpty(parttimejobdri) || StringUtils.isEmpty(phonetype)
-                    || StringUtils.isEmpty(phonecorp) || StringUtils.isEmpty(maptype) || StringUtils.isEmpty(emergencycontactaddr) || StringUtils.isEmpty(driverlicenseissuingdatestart)
+                    || StringUtils.isEmpty(phonecorp) || StringUtils.isEmpty(emergencycontactaddr) || StringUtils.isEmpty(driverlicenseissuingdatestart)
                     || StringUtils.isEmpty(driverlicenseissuingdateend) || StringUtils.isEmpty(driverlicenseissuingcorp) || StringUtils.isEmpty(driverlicenseissuingnumber)
                     || StringUtils.isEmpty(driverLicenseIssuingRegisterDate) || StringUtils.isEmpty(driverLicenseIssuingFirstDate) || StringUtils.isEmpty(driverLicenseIssuingGrantDate)
-                    || StringUtils.isEmpty(birthDay) || StringUtils.isEmpty(houseHoldRegisterPermanent) || groupId == null
-                    || StringUtils.isEmpty(memo) || StringUtils.isEmpty(bankCardBank) || StringUtils.isEmpty(bankCardNumber)){
+                    || StringUtils.isEmpty(birthDay) || StringUtils.isEmpty(houseHoldRegisterPermanent) || groupId == null){
                 return AjaxResponse.fail(RestErrorCode.INFORMATION_NOT_COMPLETE);
             }
 
@@ -653,7 +679,7 @@ public class DriverInfoController {
                                              @Verify(param = "supplierId", rule = "required") Integer supplierId,
                                              Integer teamId, Integer teamGroupId,
                                              MultipartFile fileName,
-                                             HttpServletRequest request) {
+                                             HttpServletRequest request, HttpServletResponse response) {
 
         if (fileName.isEmpty()) {
             logger.info("file is empty!");
@@ -661,11 +687,62 @@ public class DriverInfoController {
         }
 
         Map<String, Object> resultMap = Maps.newHashMap();
-        resultMap = carBizDriverInfoService.batchInputDriverInfo(cityId, supplierId, teamId, teamGroupId, fileName, request);
+        resultMap = carBizDriverInfoService.batchInputDriverInfo(cityId, supplierId, teamId, teamGroupId, fileName, request, response);
         //模板错误
         if(resultMap!=null && "-1".equals(resultMap.get("result").toString())){
             return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
         }
-        return AjaxResponse.success(request);
+        if(resultMap!=null && "0".equals(resultMap.get("result").toString())){
+            return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR, resultMap.get("msg").toString());
+        }
+        return AjaxResponse.success(resultMap);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/selectByPhone")
+    @MasterSlaveConfigs(configs={
+            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
+    } )
+    public AjaxResponse selectByPhone(  @Verify(param = "phone",rule="required") String phone) {
+        logger.info(LOGTAG + "根据手机号查询司机信息phone={}", phone);
+        try{
+            CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPhone(phone);
+            if(carBizDriverInfo==null){
+                return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
+            }
+            return AjaxResponse.success(carBizDriverInfo);
+        }catch (Exception e){
+            logger.error(LOGTAG + "根据手机号查询司机信息phone="+phone,e );
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/selectByLicensePlates",method = {RequestMethod.POST})
+    @MasterSlaveConfigs(configs={
+            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
+    } )
+    public AjaxResponse queryDriverByLicensePlates(HttpServletRequest request, @Verify(param = "license_plates",rule="required") String license_plates) {
+
+        logger.info(LOGTAG + "根据车牌号查询司机信息license_plates={}", license_plates);
+        try{
+            List<CarBizDriverInfoDTO> driverList = carBizDriverInfoService.queryDriverByLicensePlates(license_plates);
+            List<JSONObject> retList = new ArrayList<>();
+            if(!CollectionUtils.isEmpty(driverList)){
+                for(CarBizDriverInfoDTO item : driverList){
+                    JSONObject itemJson = new JSONObject();
+                    itemJson.put("phone",item.getPhone());
+                    itemJson.put("name",item.getPhone());
+                    itemJson.put("supplierId",item.getSupplierId());
+                    itemJson.put("licensePlates",item.getLicensePlates());
+                    itemJson.put("serviceCity",item.getServiceCity());
+                    retList.add(itemJson);
+                }
+            }
+            return AjaxResponse.success(retList);
+        }catch (Exception e){
+            logger.error(LOGTAG + "根据车牌号查询司机信息异常license_plates="+license_plates,e );
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+        }
     }
 }

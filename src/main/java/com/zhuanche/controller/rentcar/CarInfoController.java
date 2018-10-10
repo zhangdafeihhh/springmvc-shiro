@@ -65,7 +65,7 @@ public class CarInfoController {
                                @Verify(param = "status",rule="") Integer status,
                                @Verify(param = "isFree",rule="") Integer isFree,
                                @Verify(param = "page",rule="") Integer page,
-                               @Verify(param = "pageSize",rule="") Integer pageSize) {
+                               @Verify(param = "pageSize",rule = "max(50)") Integer pageSize) {
         logger.info("车辆列表数据:queryCarData");
 
         CarInfo params = new CarInfo();
@@ -118,6 +118,7 @@ public class CarInfoController {
         params.setCarId(carId);
         params = this.carService.selectCarInfoByCarId(params);
         if(params!=null){
+            params.setCarPhotograph(params.getImageUrl());
             if(params.getCreateBy()!=null && !params.getCreateBy().equals("")){
                 CarAdmUser user = new CarAdmUser();
                 user.setUserId(params.getCreateBy());
@@ -189,13 +190,13 @@ public class CarInfoController {
      * @param purchaseDate 购买时间 (格式:yyyy-MM-dd)
      * @param vehicleRegistrationDate 车辆注册日期 (格式:yyyy-MM-dd)
      * @param transportNumber 运输证字号
-     * @param certificationAuthority 车辆运输证发证机构
+         * @param certificationAuthority 车辆运输证发证机构
      * @param operatingRegion 车辆经营区域
      * @param transportNumberDateStart 车辆运输证有效期起 (格式:yyyy-MM-dd)
      * @param transportNumberDateEnd 车辆运输证有效期止 (格式:yyyy-MM-dd)
      * @param firstDate 车辆初次登记日期 (格式:yyyy-MM-dd)
      * @param overHaulStatus 车辆检修状态
-     * @param auditingStatus 车辆年度审验状态
+        * @param auditingStatus 车辆年度审验状态
      * @param auditingDate 车辆年度审验日期 (格式:yyyy-MM-dd)
      * @param equipmentNumber 发票打印设备序列号
      * @param gpsBrand 卫星定位装置品牌
@@ -215,7 +216,7 @@ public class CarInfoController {
                                   @Verify(param = "cityId",rule="required") Integer cityId,
                                   @Verify(param = "supplierId",rule="required") Integer supplierId,
                                   @Verify(param = "carModelId",rule="required") Integer carModelId,
-                              @Verify(param = "imageUrl",rule="") String imageUrl,
+                              @RequestParam(value = "carPhotograph", required = false) String imageUrl,
                               @Verify(param = "vehicleDrivingLicense",rule="") String vehicleDrivingLicense,
                                   @Verify(param = "modelDetail",rule="required") String modelDetail,
                                   @Verify(param = "color",rule="required") String color,
@@ -253,7 +254,7 @@ public class CarInfoController {
                               @Verify(param = "gpsType",rule="") String gpsType,
                               @Verify(param = "gpsImei",rule="") String gpsImei,
                               @Verify(param = "gpsDate",rule="") String gpsDate,
-                              @RequestParam(value = "purchaseDate",required = false) String memo,
+                              @RequestParam(value = "memo",required = false) String memo,
                                   @Verify(param = "licensePlates1",rule="") String licensePlates1,
                                   @Verify(param = "oldCity",rule="") Integer oldCity,
                                   @Verify(param = "oldSupplierId",rule="") Integer oldSupplierId) {
@@ -268,7 +269,7 @@ public class CarInfoController {
                 return AjaxResponse.fail(998, "oldCity");
             if(oldSupplierId == null)
                 return AjaxResponse.fail(998, "oldSupplierId");
-            if(licensePlates.equals(licensePlates1)){
+            if(!licensePlates.equals(licensePlates1)){
                 if(!carService.checkLicensePlates(params))
                     return AjaxResponse.fail(1102);
             }
@@ -418,11 +419,10 @@ public class CarInfoController {
      * 车辆信息导入
      */
     @RequestMapping(value = "/importCarInfo")
-    public Object importCarInfo(@RequestParam("fileName") MultipartFile fileName, HttpServletRequest request) {
+    public AjaxResponse importCarInfo(@RequestParam("fileName") MultipartFile fileName, HttpServletRequest request) {
         logger.info("车辆信息导入保存:importCarInfo,参数" + fileName);
         Map<String, Object> result = new HashMap<String, Object>();
-        result = this.carService.importCarInfo(fileName, request);
-        return result;
+        return carService.importCarInfo(fileName, request);
     }
 
     /**

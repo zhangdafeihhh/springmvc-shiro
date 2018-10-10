@@ -237,7 +237,8 @@ public class CarInfoTemporaryController extends BaseController {
      * @param gpsType 卫星定位装置型号
      * @param gpsImei 卫星定位装置IMEI号
      * @param gpsDate 卫星定位设备安装日期(格式:yyyy-MM-dd)
-     * @param memo 备注
+     * @param vehicleDrivingLicense 车辆图片
+     * @param carPhotograph 行驶证扫描件
      * @return
      */
     @ResponseBody
@@ -282,8 +283,9 @@ public class CarInfoTemporaryController extends BaseController {
                                     @Verify(param = "gpsType",rule="required") String gpsType,
                                     @Verify(param = "gpsImei",rule="required") String gpsImei,
                                     @Verify(param = "gpsDate",rule="required") String gpsDate,
-                                    @RequestParam(value = "purchaseDate",required = false) String memo
-                                    ) {
+                                    @RequestParam(value = "memo",required = false) String memo,
+                                    @RequestParam(value = "vehicleDrivingLicense",required = false) String vehicleDrivingLicense,
+                                    @RequestParam(value = "carPhotograph",required = false) String carPhotograph) {
         CarBizCarInfoTemp carBizCarInfoTemp = new CarBizCarInfoTemp();
         carBizCarInfoTemp.setLicensePlates(licensePlates);
         carBizCarInfoTemp.setCityId(cityId);
@@ -302,14 +304,14 @@ public class CarInfoTemporaryController extends BaseController {
         carBizCarInfoTemp.setFrameNo(frameNo);
         carBizCarInfoTemp.setVehicleType(vehicleType);
         carBizCarInfoTemp.setFuelType(fuelType);
-        carBizCarInfoTemp.setNextInspectDate(nextInspectDate);
-        carBizCarInfoTemp.setNextMaintenanceDate(nextMaintenanceDate);
-        carBizCarInfoTemp.setNextOperationDate(nextOperationDate);
-        carBizCarInfoTemp.setNextSecurityDate(nextSecurityDate);
-        carBizCarInfoTemp.setNextClassDate(nextClassDate);
-        carBizCarInfoTemp.setTwoLevelMaintenanceDate(twoLevelMaintenanceDate);
-        carBizCarInfoTemp.setRentalExpireDate(rentalExpireDate);
-        carBizCarInfoTemp.setPurchaseDate(purchaseDate);
+        carBizCarInfoTemp.setNextInspectDate(StringUtils.isBlank(nextInspectDate)?null:nextInspectDate);
+        carBizCarInfoTemp.setNextMaintenanceDate(StringUtils.isBlank(nextMaintenanceDate)?null:nextMaintenanceDate);
+        carBizCarInfoTemp.setNextOperationDate(StringUtils.isBlank(nextOperationDate)?null:nextOperationDate);
+        carBizCarInfoTemp.setNextSecurityDate(StringUtils.isBlank(nextSecurityDate)?null:nextSecurityDate);
+        carBizCarInfoTemp.setNextClassDate(StringUtils.isBlank(nextClassDate)?null:nextClassDate);
+        carBizCarInfoTemp.setTwoLevelMaintenanceDate(StringUtils.isBlank(twoLevelMaintenanceDate)?null:twoLevelMaintenanceDate);
+        carBizCarInfoTemp.setRentalExpireDate(StringUtils.isBlank(rentalExpireDate)?null:rentalExpireDate);
+        carBizCarInfoTemp.setPurchaseDate(StringUtils.isBlank(purchaseDate)?null:purchaseDate);
         carBizCarInfoTemp.setVehicleRegistrationDate(vehicleRegistrationDate);
         carBizCarInfoTemp.setTransportNumber(transportNumber);
         carBizCarInfoTemp.setCertificationAuthority(certificationAuthority);
@@ -325,17 +327,14 @@ public class CarInfoTemporaryController extends BaseController {
         carBizCarInfoTemp.setGpsType(gpsType);
         carBizCarInfoTemp.setGpsImei(gpsImei);
         carBizCarInfoTemp.setGpsDate(gpsDate);
-        carBizCarInfoTemp.setMemo(memo);
+        carBizCarInfoTemp.setMemo(StringUtils.isBlank(memo)?null:memo);
         SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
         Integer userId = user.getId();
         carBizCarInfoTemp.setUpdateBy(userId);
         carBizCarInfoTemp.setCreateBy(userId);
-        int code  = carBizCarInfoTempService.add(carBizCarInfoTemp);
-        if(code > 0 ){
-            return AjaxResponse.success(RestErrorCode.SUCCESS);
-        }else{
-            return AjaxResponse.success(RestErrorCode.HTTP_SYSTEM_ERROR);
-        }
+        carBizCarInfoTemp.setVehicleDrivingLicense(StringUtils.isBlank(vehicleDrivingLicense)?null:vehicleDrivingLicense);
+        carBizCarInfoTemp.setCarPhotograph(StringUtils.isBlank(carPhotograph)?null:carPhotograph);
+        return carBizCarInfoTempService.add(carBizCarInfoTemp);
     }
 
     /**
@@ -384,6 +383,8 @@ public class CarInfoTemporaryController extends BaseController {
      * @param oldLicensePlates 旧的车牌号
      * @param oldCity 旧城市Id
      * @param oldSupplierId 旧的供应商Id
+     * @param vehicleDrivingLicense 车辆图片
+     * @param carPhotograph 行驶证扫描件
      * @return
      */
     @ResponseBody
@@ -432,7 +433,9 @@ public class CarInfoTemporaryController extends BaseController {
                                     @RequestParam(value = "memo",required = false) String memo,
                                     @Verify(param = "oldLicensePlates",rule="required") String oldLicensePlates,
                                     @Verify(param = "oldCity",rule="required") Integer oldCity,
-                                    @Verify(param = "oldSupplierId",rule="required") Integer oldSupplierId) {
+                                    @Verify(param = "oldSupplierId",rule="required") Integer oldSupplierId,
+                                    @RequestParam(value = "vehicleDrivingLicense",required = false) String vehicleDrivingLicense,
+                                    @RequestParam(value = "carPhotograph",required = false) String carPhotograph) {
         log.error("修改Id:"+carId);
         CarBizCarInfoTemp carBizCarInfoTemp = new CarBizCarInfoTemp();
         carBizCarInfoTemp.setCarId(carId);
@@ -453,14 +456,14 @@ public class CarInfoTemporaryController extends BaseController {
         carBizCarInfoTemp.setFrameNo(frameNo);
         carBizCarInfoTemp.setVehicleType(vehicleType);
         carBizCarInfoTemp.setFuelType(fuelType);
-        carBizCarInfoTemp.setNextInspectDate(nextInspectDate);
-        carBizCarInfoTemp.setNextMaintenanceDate(nextMaintenanceDate);
-        carBizCarInfoTemp.setNextOperationDate(nextOperationDate);
-        carBizCarInfoTemp.setNextSecurityDate(nextSecurityDate);
-        carBizCarInfoTemp.setNextClassDate(nextClassDate);
-        carBizCarInfoTemp.setTwoLevelMaintenanceDate(twoLevelMaintenanceDate);
-        carBizCarInfoTemp.setRentalExpireDate(rentalExpireDate);
-        carBizCarInfoTemp.setPurchaseDate(purchaseDate);
+        carBizCarInfoTemp.setNextInspectDate(StringUtils.isBlank(nextInspectDate)?null:nextInspectDate);
+        carBizCarInfoTemp.setNextMaintenanceDate(StringUtils.isBlank(nextMaintenanceDate)?null:nextMaintenanceDate);
+        carBizCarInfoTemp.setNextOperationDate(StringUtils.isBlank(nextOperationDate)?null:nextOperationDate);
+        carBizCarInfoTemp.setNextSecurityDate(StringUtils.isBlank(nextSecurityDate)?null:nextSecurityDate);
+        carBizCarInfoTemp.setNextClassDate(StringUtils.isBlank(nextClassDate)?null:nextClassDate);
+        carBizCarInfoTemp.setTwoLevelMaintenanceDate(StringUtils.isBlank(twoLevelMaintenanceDate)?null:twoLevelMaintenanceDate);
+        carBizCarInfoTemp.setRentalExpireDate(StringUtils.isBlank(rentalExpireDate)?null:rentalExpireDate);
+        carBizCarInfoTemp.setPurchaseDate(StringUtils.isBlank(purchaseDate)?null:purchaseDate);
         carBizCarInfoTemp.setVehicleRegistrationDate(vehicleRegistrationDate);
         carBizCarInfoTemp.setTransportNumber(transportNumber);
         carBizCarInfoTemp.setCertificationAuthority(certificationAuthority);
@@ -476,13 +479,15 @@ public class CarInfoTemporaryController extends BaseController {
         carBizCarInfoTemp.setGpsType(gpsType);
         carBizCarInfoTemp.setGpsImei(gpsImei);
         carBizCarInfoTemp.setGpsDate(gpsDate);
-        carBizCarInfoTemp.setMemo(memo);
+        carBizCarInfoTemp.setMemo(StringUtils.isBlank(memo)?null:memo);
         carBizCarInfoTemp.setOldLicensePlates(oldLicensePlates);
         carBizCarInfoTemp.setOldCity(oldCity);
         carBizCarInfoTemp.setOldSupplierId(oldSupplierId);
         SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
         Integer userId = user.getId();
         carBizCarInfoTemp.setUpdateBy(userId);
+        carBizCarInfoTemp.setVehicleDrivingLicense(StringUtils.isBlank(vehicleDrivingLicense)?null:vehicleDrivingLicense);
+        carBizCarInfoTemp.setCarPhotograph(StringUtils.isBlank(carPhotograph)?null:carPhotograph);
         return carBizCarInfoTempService.update(carBizCarInfoTemp);
     }
 

@@ -1,29 +1,28 @@
 package com.zhuanche.dto.driverDuty;
 
 
+import com.zhuanche.util.Check;
+
 import java.io.Serializable;
 
 public class DutyExcelDTO implements Serializable{
-
-    String[] title = {"司机姓名","手机号","城市","供应商","车队",
-            "排班日期","强制上班时间","排班时长","状态"};
 
     private String driverName;
     private String phone; // 司机手机号
     private String cityName;
     private String supplierName;
     private String teamName;
-    private String dutyTimes;
+    private String time;
     private String forcedTimes;
-    private String dutyIds;
-    private Integer status;
+    private String dutyTimes;
+    private String status;
 
-    public String[] getTitle() {
-        return title;
+    public String getStatus() {
+        return status;
     }
 
-    public void setTitle(String[] title) {
-        this.title = title;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getDriverName() {
@@ -82,20 +81,13 @@ public class DutyExcelDTO implements Serializable{
         this.forcedTimes = forcedTimes;
     }
 
-    public String getDutyIds() {
-        return dutyIds;
+
+    public String getTime() {
+        return time;
     }
 
-    public void setDutyIds(String dutyIds) {
-        this.dutyIds = dutyIds;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
+    public void setTime(String time) {
+        this.time = time;
     }
 
     private static final long serialVersionUID = 4705761636123728898L;

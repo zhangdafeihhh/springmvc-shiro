@@ -4,6 +4,7 @@ import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CarBizCarGroupExMapper {
     CarBizCarGroup queryGroupByGroupName (@Param("groupName") String groupName);
@@ -25,4 +26,6 @@ public interface CarBizCarGroupExMapper {
     /**
      */
     public String getGroupNameByGroupId(Integer groupId);
+
+    List<CarBizCarGroup> queryGroupNameList();
 }

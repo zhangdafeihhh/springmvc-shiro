@@ -3,6 +3,9 @@ package com.zhuanche.serv.driverScheduling;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.dutyEnum.EnumDriverDutyTimeFlag;
 import com.zhuanche.common.dutyEnum.ServiceReturnCodeEnum;
 import com.zhuanche.common.paging.PageDTO;
@@ -81,7 +84,10 @@ public class CarDriverDutyService {
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/1 
-	*/ 
+	*/
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public PageDTO queryDriverDayDutyList(DutyParamRequest dutyParamRequest){
 
 		//发布司机排班的查询功能 上层返回提示语
@@ -91,9 +97,15 @@ public class CarDriverDutyService {
 		try{
 			/** 数据权限处理开始 */
 			CommonRequest commonRequest = new CommonRequest();
-			commonRequest.setCityId(String.valueOf(dutyParamRequest.getCityId()));
-			commonRequest.setSupplierId(String.valueOf(dutyParamRequest.getSupplierId()));
-			commonRequest.setTeamId(dutyParamRequest.getTeamId());
+			if(!Check.NuNObj(dutyParamRequest.getCityId())){
+				commonRequest.setCityId(String.valueOf(dutyParamRequest.getCityId()));
+			}
+			if(!Check.NuNObj(dutyParamRequest.getSupplierId())){
+				commonRequest.setSupplierId(String.valueOf(dutyParamRequest.getSupplierId()));
+			}
+			if(!Check.NuNObj(dutyParamRequest.getTeamId())){
+				commonRequest.setTeamId(dutyParamRequest.getTeamId());
+			}
 			CommonRequest resultParmam = citySupplierTeamCommonService.paramDeal(commonRequest);
 			dutyParamRequest.setCityIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getCityIds()));
 			dutyParamRequest.setSupplierIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getSupplierIds()));
@@ -139,7 +151,7 @@ public class CarDriverDutyService {
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/3
-	*/ 
+	*/
 	public int issueDriverDuty(DutyParamRequest dutyParamRequest){
 		if(Check.NuNObj(dutyParamRequest)){
 			return 0;

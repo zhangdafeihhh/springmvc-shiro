@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.entity.risk.RiskCarManagerOrderComplainEntity;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -47,7 +48,7 @@ public class RiskOrderComplainController {
     @RequestMapping(value = "/dopage", method = { RequestMethod.POST,RequestMethod.GET })
     public AjaxResponse incontrolorderDopage(
             @RequestParam(value = "pageNum", required = false,defaultValue = "0")int pageNo,
-            @RequestParam(value = "pageSize", required = false,defaultValue = "20")int pageSize,
+            @Verify(param = "pageSize",rule = "max(50)")@RequestParam(value = "pageSize", required = false,defaultValue = "20")int pageSize,
             HttpServletRequest request, RiskCarManagerOrderComplainEntity params, ModelMap model) {
         logger.info("风控-运行中订单-执行分页查询-请求参数  RiskCarManagerOrderComplainEntity："
                 + params);
@@ -74,6 +75,42 @@ public class RiskOrderComplainController {
 
             paramMap.put("pageNum", pageNo);
             paramMap.put("pageSize", pageSize);
+
+            // 数据权限设置
+            Set<Integer> cityIdsForAuth = new HashSet<Integer>();// 非超级管理员可以管理的所有城市ID
+            Set<Integer> supplierIdsForAuth = new HashSet<Integer>();// 非超级管理员可以管理的所有供应商ID
+            if (!WebSessionUtil.isSupperAdmin()) {// 非超级管理员
+                // 获取当前登录用户信息
+                SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+                if(null != currentLoginUser){
+                    cityIdsForAuth = currentLoginUser.getCityIds();
+                    supplierIdsForAuth = currentLoginUser.getSupplierIds();
+                }
+            }
+            // 查询参数设置
+            String citys = "";
+            for(Integer cityId : cityIdsForAuth){
+                if(StringUtils.isEmpty(citys)){
+                    citys += cityId;
+                }else {
+                    citys += (","+cityId);
+                }
+            }
+            String supplierIds = "";
+            for(Integer supplierId : supplierIdsForAuth){
+                if(StringUtils.isEmpty(supplierIds)){
+                    supplierIds += supplierId;
+                }else {
+                    supplierIds += (","+supplierId);
+                }
+            }
+            if(StringUtils.isNotEmpty(citys)){
+                paramMap.put("citys", citys);
+            }
+            if(StringUtils.isNotEmpty(supplierIds)){
+                paramMap.put("supplierIds", supplierIds);
+            }
+
 
             String result = riskOrderCompalinTemplate.postForObject("/car/manager/order/page.do",
                     String.class, paramMap);
@@ -135,7 +172,7 @@ public class RiskOrderComplainController {
             Map<String, Object> param = new HashMap<String, Object>();
             param.put("orderNo", orderNo);
             String resultDetail =riskOrderCompalinTemplate.postForObject("/risk/in/running/getDetailByOrderNo.do",
-                    String.class, paramMap);
+                    String.class, param);
 
             if (StringUtils.isNotEmpty(resultDetail)) {
                 JSONObject responseObject = JSONObject.parseObject(resultDetail);
@@ -148,6 +185,9 @@ public class RiskOrderComplainController {
                     Integer appealStatus = repDetailData.getInteger("appealStatus");
                     String remark = repDetailData.getString("remark");
                     String appealProcessAt = repDetailData.getString("appealProcessAt");
+                    if(StringUtils.isNotEmpty(appealProcessAt)){
+                        appealProcessAt = appealProcessAt.substring(0,appealProcessAt.indexOf("."));
+                    }
 
                     if (appealStatus == 1){
                         repData.put("appealStatus","未申诉");
@@ -196,12 +236,18 @@ public class RiskOrderComplainController {
             paramMap.put("complainReason", reason);
             SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
             paramMap.put("appealCommitBy", currentLoginUser.getName());
-
-//            paramMap.put("fileNameList", fileNameList);
+             paramMap.put("fileNameList", new ArrayList<>());//必须保留的参数
             String result =riskOrderCompalinTemplate.postForObject("/car/manager/order/submitComplain.do",
                     String.class, paramMap);
+            JSONObject resultJson = JSON.parseObject(result);
+           Integer code = resultJson.getInteger("code");
+           if(code != null && code.intValue() == 0){
+               return AjaxResponse.success(null);
+           }else{
+               return AjaxResponse.fail(RestErrorCode.RISK_SUBMITCOMPLAIN_FAIL,result);
+           }
 
-            return AjaxResponse.success(null);
+
         } catch (Exception e) {
             logger.error("风控-风控订单管理-执行提交申诉,orderNo:{" + orderNo + "}",e);
             return AjaxResponse.fail(RestErrorCode.RISK_SUBMITCOMPLAIN_FAIL,"ERROR");

@@ -33,15 +33,7 @@
     <result column="city_id" property="cityId" jdbcType="INTEGER" />
     <result column="forced_time" property="forcedTime" jdbcType="DECIMAL" />
   </resultMap>
-  <sql id="Base_Column_List1" >
-    id, stat_date, license_plates, driver_id, driver_name, operation_num, up_online_time, 
-    order_time, service_time, online_time, actual_pay, driver_get_pay, driver_out_pay, 
-    order_mileage, service_mileage, assign_order_num, contend_order_num, platform_order_num, 
-    get_plane_num, out_plane_num, car_team_id, travel_time, travel_mileage, travel_time_start, 
-    travel_mileage_start, travel_time_end, travel_mileage_end, supplier_id, city_id, 
-    forced_time
-  </sql>
-  
+
   <sql id="Base_Column_List" >
     license_plates, driver_name, operation_num, up_online_time, order_time, service_time, 
     online_time, actual_pay, driver_get_pay, driver_out_pay, order_mileage, service_mileage, 

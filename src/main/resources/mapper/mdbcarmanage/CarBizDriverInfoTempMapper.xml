@@ -59,7 +59,7 @@
     <result column="firstDrivingLicenseDate" jdbcType="VARCHAR" property="firstDrivingLicenseDate" />
     <result column="firstMeshworkDrivingLicenseDate" jdbcType="VARCHAR" property="firstMeshworkDrivingLicenseDate" />
     <result column="nationality" jdbcType="VARCHAR" property="nationAlity" />
-    <result column="householdRegister" jdbcType="VARCHAR" property="householdRegister" />
+    <result column="householdRegister" jdbcType="VARCHAR" property="houseHoldRegister" />
     <result column="nation" jdbcType="VARCHAR" property="nation" />
     <result column="marriage" jdbcType="VARCHAR" property="marriage" />
     <result column="foreignLanguage" jdbcType="VARCHAR" property="foreignLanguage" />
@@ -100,7 +100,6 @@
     <result column="group_id" jdbcType="INTEGER" property="groupId" />
     <result column="contract_type" jdbcType="VARCHAR" property="contractType" />
     <result column="contract_no" jdbcType="VARCHAR" property="contractNo" />
-    <result column="contract_file" jdbcType="VARCHAR" property="contractFile" />
     <result column="team_id" jdbcType="INTEGER" property="teamId" />
     <result column="team_group_id" jdbcType="INTEGER" property="teamGroupId" />
     <result column="bank_card_bank" jdbcType="VARCHAR" property="bankCardBank" />
@@ -125,7 +124,7 @@
     driverLicenseIssuingNumber, xy_driver_number, driver_license_issuing_register_date, 
     driver_license_issuing_first_date, driver_license_issuing_grant_date, birth_day, 
     house_hold_register_permanent, is_upload_card, is_must_confirmation, account_type, 
-    cooperation_type, group_id, contract_type, contract_no, contract_file, team_id, team_group_id, 
+    cooperation_type, group_id, contract_type, contract_no, team_id, team_group_id,
     bank_card_bank, bank_card_number,memo
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
@@ -138,7 +137,7 @@
     delete from car_biz_driver_info_temp
     where driver_id = #{driverId,jdbcType=INTEGER}
   </delete>
-  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp" useGeneratedKeys="true" keyProperty="carId">
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp" useGeneratedKeys="true" keyProperty="driverId">
     insert into car_biz_driver_info_temp
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="password != null">
@@ -309,7 +308,7 @@
       <if test="nationAlity != null">
           nationAlity,
       </if>
-      <if test="householdRegister != null">
+      <if test="houseHoldRegister != null">
         householdRegister,
       </if>
       <if test="nation != null">
@@ -432,9 +431,6 @@
       <if test="contractNo != null">
         contract_no,
       </if>
-      <if test="contractFile != null">
-        contract_file,
-      </if>
       <if test="teamId != null">
         team_id,
       </if>
@@ -450,6 +446,8 @@
       <if test="memo != null">
         memo,
       </if>
+       create_date,
+       update_date
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="password != null">
@@ -620,8 +618,8 @@
       <if test="nationAlity != null">
         #{nationAlity,jdbcType=VARCHAR},
       </if>
-      <if test="householdRegister != null">
-        #{householdRegister,jdbcType=VARCHAR},
+      <if test="houseHoldRegister != null">
+        #{houseHoldRegister,jdbcType=VARCHAR},
       </if>
       <if test="nation != null">
         #{nation,jdbcType=VARCHAR},
@@ -743,9 +741,6 @@
       <if test="contractNo != null">
         #{contractNo,jdbcType=VARCHAR},
       </if>
-      <if test="contractFile != null">
-        #{contractFile,jdbcType=VARCHAR},
-      </if>
       <if test="teamId != null">
         #{teamId,jdbcType=INTEGER},
       </if>
@@ -761,6 +756,8 @@
       <if test="memo != null">
         #{memo,jdbcType=LONGVARCHAR},
       </if>
+      now(),
+      now()
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp">
@@ -934,8 +931,8 @@
       <if test="nationAlity != null">
           nationAlity = #{nationAlity,jdbcType=VARCHAR},
       </if>
-      <if test="householdRegister != null">
-        householdRegister = #{householdRegister,jdbcType=VARCHAR},
+      <if test="houseHoldRegister != null">
+        householdRegister = #{houseHoldRegister,jdbcType=VARCHAR},
       </if>
       <if test="nation != null">
         nation = #{nation,jdbcType=VARCHAR},
@@ -1057,9 +1054,6 @@
       <if test="contractNo != null">
         contract_no = #{contractNo,jdbcType=VARCHAR},
       </if>
-      <if test="contractFile != null">
-        contract_file = #{contractFile,jdbcType=VARCHAR},
-      </if>
       <if test="teamId != null">
         team_id = #{teamId,jdbcType=INTEGER},
       </if>
@@ -1075,6 +1069,7 @@
       <if test="memo != null">
         memo = #{memo,jdbcType=LONGVARCHAR},
       </if>
+       update_date = now()
     </set>
     where driver_id = #{driverId,jdbcType=INTEGER}
   </update>

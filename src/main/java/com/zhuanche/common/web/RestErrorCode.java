@@ -43,7 +43,7 @@ public final class RestErrorCode{
 
 
 	//-----------------------------------------------用户
-	@ResultMessage("获取验证码太频繁")
+	@ResultMessage("获取验证码太频繁,请{0}分钟后重试")
 	public static final int GET_MSGCODE_EXCEED           = 1000;
 	@ResultMessage("用户不存在")
 	public static final int USER_NOT_EXIST                      = 1001;
@@ -63,6 +63,8 @@ public final class RestErrorCode{
 	public static final int MSG_CODE_FAIL                      = 1011;
 	@ResultMessage("短信验证码{0}秒内不能重复发送")
 	public static final int MSG_CODE_REPEAT_SEND                      = 1012;
+	@ResultMessage("登录太频繁，请{0}分钟后重新登录")
+	public static final int DO_LOGIN_FREQUENTLY           = 1013;
 
 	//----------------------------------------------权限管理
 	@ResultMessage("父权限不存在")
@@ -114,7 +116,7 @@ public final class RestErrorCode{
 	public static final int MODEL_NOT_EXIST                    = 3008;
 	@ResultMessage("信息不全，请补全")
 	public static final int INFORMATION_NOT_COMPLETE                    = 3009;
-	@ResultMessage("供应商ID={}的供应商不存在")
+	@ResultMessage("供应商ID={0}的供应商不存在")
 	public static final int SUPPLIER_NOT_EXIST                    = 3010;
 	@ResultMessage("所选城市和供应商城市不一致")
 	public static final int CITY_SUPPLIER_DIFFER                    = 3011;
@@ -124,6 +126,8 @@ public final class RestErrorCode{
 	public static final int CITY_SUPPLIER_CAR_DIFFER                    = 3013;
 	@ResultMessage("服务类型不存在")
 	public static final int GROUP_NOT_EXIST                    = 3014;
+	@ResultMessage("修改手机号与原手机号不可以相同")
+	public static final int PHONE_NEW_SAME                    = 3015;
 
 	@ResultMessage("周报查询时间段只能查询一个星期的时间")
 	public static final int ONLY_QUERY_WEEK                    = 3101;
@@ -141,6 +145,8 @@ public final class RestErrorCode{
 	public static final int FILE_ERROR                    = 4001;
 	@ResultMessage("导入模板格式错误")
 	public static final int FILE_TRMPLATE_ERROR                    = 4002;
+    @ResultMessage("导入错误:{0}")
+    public static final int FILE_IMPORT_ERROR                    = 4003;
 	//-----------------------------------------------业务参数：车辆
 	@ResultMessage("车辆信息不存在")
 	public static final int BUS_NOT_EXIST                                               = 1100;
@@ -148,6 +154,10 @@ public final class RestErrorCode{
 
 	@ResultMessage("结果不存在")
 	public static final int NOT_FOUND_RESULT                                               = 1101;
+    @ResultMessage("车牌号已存在")
+    public static final int LICENSE_PLATES_EXIST                                               = 1102;
+    @ResultMessage("车牌号不存在")
+    public static final int LICENSE_PLATES_NOT_EXIST                                                = 1103;
 	@ResultMessage("请求风控资源失败")
 	public static final int RISK_ORDER_DATA_FAIL                                        = 5002;
 	@ResultMessage("上传风控文件失败")
@@ -161,7 +171,8 @@ public final class RestErrorCode{
 	public static final int MONITOR_GPS_DRIVER_NOT_EXIST                                        = 6002;
 	@ResultMessage("查询大数据司机订单信息失败")
 	public static final int MONITOR_DRIVERO_ORDER_FAIL                                        = 7001;
-
+	@ResultMessage("查询大数据车辆分析指标趋势信息失败")
+	public static final int MONITOR_CARINDEX_FAIL                                        = 7002;
     //-----------------------------------------------业务参数：投诉评分
     @ResultMessage("请选择一个车队或输入司机手机号")
     public static final int TEAMID_OR_DRIVERID_ISNULL = 5201;

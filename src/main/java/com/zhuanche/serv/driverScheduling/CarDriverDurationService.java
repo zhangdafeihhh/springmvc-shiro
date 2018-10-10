@@ -3,6 +3,9 @@ package com.zhuanche.serv.driverScheduling;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.dto.driverDuty.CarDriverDurationDTO;
 import com.zhuanche.dto.driverDuty.CarDriverMustDutyDTO;
@@ -28,6 +31,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -74,20 +78,31 @@ public class CarDriverDurationService {
 	 * @Author: lunan
 	 * @Date: 2018/9/3
 	 */
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public PageDTO getDriverDurationList(DutyParamRequest dutyParamRequest){
 		if(Check.NuNObj(dutyParamRequest)){
 			return new PageDTO();
 		}
 		try{
 			CommonRequest commonRequest = new CommonRequest();
-			BeanUtils.copyProperties(dutyParamRequest,commonRequest);
+			if(!Check.NuNObj(dutyParamRequest.getCityId())){
+				commonRequest.setCityId(String.valueOf(dutyParamRequest.getCityId()));
+			}
+			if(!Check.NuNObj(dutyParamRequest.getSupplierId())){
+				commonRequest.setSupplierId(String.valueOf(dutyParamRequest.getSupplierId()));
+			}
+			if(!Check.NuNObj(dutyParamRequest.getTeamId())){
+				commonRequest.setTeamId(dutyParamRequest.getTeamId());
+			}
 			CommonRequest resultParmam = citySupplierTeamCommonService.paramDeal(commonRequest);
 			if(Check.NuNObj(resultParmam)){
 				return new PageDTO();
 			}
 			dutyParamRequest.setCityIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getCityIds()));
 			dutyParamRequest.setSupplierIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getSupplierIds()));
-			dutyParamRequest.setSupplierIds(resultParmam.getTeamIds());
+			dutyParamRequest.setTeamIds(resultParmam.getTeamIds());
 			PageInfo<CarDriverDurationDTO> pageInfo = PageHelper.startPage(dutyParamRequest.getPageNo(), dutyParamRequest.getPageSize(), true).doSelectPageInfo(()
 					-> carDutyDurationExMapper.selectDutyDurationList(dutyParamRequest));
 			PageDTO pageDTO = new PageDTO();
@@ -108,7 +123,7 @@ public class CarDriverDurationService {
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/3 
-	*/ 
+	*/
 	public int saveOrUpdateCarDriverDuration(CarDutyDuration carDutyDuration){
 		if(Check.NuNObj(carDutyDuration)
 				|| Check.NuNObj(carDutyDuration.getCity())
@@ -143,7 +158,9 @@ public class CarDriverDurationService {
 				upRecord.setStartDate(carDutyDuration.getStartDate());
 				upRecord.setEndDate(carDutyDuration.getEndDate());
 				upRecord.setRemark(carDutyDuration.getRemark());
+				upRecord.setStatus(carDutyDuration.getStatus());
 				upRecord.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
+				upRecord.setUpdateDate(new Date());
 				return carDutyDurationMapper.updateByPrimaryKeySelective(upRecord);
 			}else{
 				Set<Integer> cityId = new HashSet<>();
@@ -161,6 +178,7 @@ public class CarDriverDurationService {
 				}
 				carDutyDuration.setSupplierName(supplierDetail.getSupplierFullName());
 				carDutyDuration.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
+				carDutyDuration.setCreateDate(new Date());
 				return carDutyDurationMapper.insertSelective(carDutyDuration);
 			}
 		}catch (Exception e){
@@ -177,6 +195,9 @@ public class CarDriverDurationService {
 	 * @Author: lunan
 	 * @Date: 2018/9/3
 	 */
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public CarDriverDurationDTO getCarDriverDurationDetail(Integer paramId){
 		if(Check.NuNObj(paramId)){
 			return null;

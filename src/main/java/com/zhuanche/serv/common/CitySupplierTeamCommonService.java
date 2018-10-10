@@ -70,6 +70,9 @@ public class CitySupplierTeamCommonService {
         try{
             Set<Integer> resultSet = new HashSet<>();
             for (String str : srcList) {
+                if(Check.NuNStr(str)){
+                    continue;
+                }
                 resultSet.add(Integer.parseInt(str));
             }
             return resultSet;
@@ -86,6 +89,9 @@ public class CitySupplierTeamCommonService {
         try{
             Set<String> resultSet = new HashSet<>();
             for (Integer parmam : srcList) {
+                if(Check.NuNObj(parmam)){
+                    continue;
+                }
                 resultSet.add(String.valueOf(parmam));
             }
             return resultSet;
@@ -114,7 +120,13 @@ public class CitySupplierTeamCommonService {
             for(int i=0;i<srcList.size();i++ ){
                 Object srcObj = srcList.get(i);
                 ShiftParamDTO data = new ShiftParamDTO();
-                BeanUtils.copyProperties(srcObj,data);
+                if("driverId".equals(field) && existsField.getType().toString().contains("String")){
+                    Field special = srcObj.getClass().getDeclaredField(field);
+                    special.setAccessible(true);
+                    data.setDriverId(Integer.parseInt(String.valueOf(special.get(srcObj))));
+                }else{
+                    BeanUtils.copyProperties(srcObj,data);
+                }
                 Field shiftField = data.getClass().getDeclaredField(field);
                 shiftField.setAccessible(true);
                 result.add(String.valueOf(shiftField.get(data)));
@@ -172,13 +184,15 @@ public class CitySupplierTeamCommonService {
             permOfSupplier = WebSessionUtil.getCurrentLoginUser().getSupplierIds();
             permOfTeam     = WebSessionUtil.getCurrentLoginUser().getTeamIds();
             if( permOfCity.size()!=0
-                    && permOfCity.contains(Integer.valueOf(paramRequest.getCityId()))==false ) {
+                    && (!Check.NuNObj(paramRequest.getCityId()) && permOfCity.contains(Integer.valueOf(paramRequest.getCityId()))==false )) {
                 return null;
             }
-            if( permOfSupplier.size()!=0 && permOfSupplier.contains(Integer.valueOf(paramRequest.getSupplierId()))==false  ) {
+            if( permOfSupplier.size()!=0 &&
+                    (!Check.NuNObj(paramRequest.getSupplierId()) && permOfSupplier.contains(Integer.valueOf(paramRequest.getSupplierId()))==false ) ) {
                 return null;
             }
-            if( permOfTeam.size()!=0 && permOfTeam.contains(Integer.valueOf(paramRequest.getTeamId())) == false ) {
+            if( permOfTeam.size()!=0
+                    && (!Check.NuNObj(paramRequest.getTeamId()) &&permOfTeam.contains(Integer.valueOf(paramRequest.getTeamId())) == false )) {
 //				return LayUIPage.build("您没有查询此车队的权限！", 0, null);
                 return null;
             }
@@ -226,11 +240,7 @@ public class CitySupplierTeamCommonService {
             if( WebSessionUtil.isSupperAdmin() ) {
                 teamIds.clear();
             }else {
-                if(Check.NuNCollection(teamIds)){
-                    teamIds.clear();
-                }else{
-                    teamIds.addAll( permOfTeam );
-                }
+                teamIds.addAll( permOfTeam );
             }
         }
         paramRequest.setCityIds(cityIds);
@@ -303,6 +313,13 @@ public class CitySupplierTeamCommonService {
      * @Date: 2018/8/29
      */
     public List<CarDriverTeam> queryDriverTeamList(Integer cityId, Integer supplierId){
+
+        if(Check.NuNObj(cityId) && !Check.NuNObj(supplierId)){
+            Set<String> supplierIds = new HashSet<String>(2);
+            supplierIds.add(String.valueOf(supplierId));
+            return carDriverTeamExMapper.queryDriverTeam(null, supplierIds, null);
+        }
+
         if(cityId==null || cityId.intValue()<=0 || supplierId==null || supplierId.intValue()<=0) {
             return new ArrayList<CarDriverTeam>();
         }

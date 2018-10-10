@@ -11,7 +11,6 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalDTO;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
-import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.serv.CustomerAppraisalService;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -66,7 +65,7 @@ public class CustomerAppraisalController {
     public AjaxResponse queryCustomerAppraisalList(String name, String phone, String orderNo, Integer cityId, Integer supplierId,
                                        Integer teamId, Integer teamGroupId, String createDateBegin, String createDateEnd,
                                        @RequestParam(value="page", defaultValue="0")Integer page,
-                                       @RequestParam(value="pageSize", defaultValue="20")Integer pageSize) {
+                                                   @Verify(param = "pageSize",rule = "max(50)")@RequestParam(value="pageSize", defaultValue="20")Integer pageSize) {
 
         // 数据权限控制SSOLoginUser
         Set<Integer> permOfCity        = WebSessionUtil.getCurrentLoginUser().getCityIds(); //普通管理员可以管理的所有城市ID
@@ -82,7 +81,7 @@ public class CustomerAppraisalController {
             driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
         }
         if(had && (driverIds==null || driverIds.size()==0)){
-            logger.info(LOGTAG + "查询teamId={},groupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
+            logger.info(LOGTAG + "查询teamId={},teamGroupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
             PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
             return AjaxResponse.success(pageDTO);
         }
@@ -152,7 +151,7 @@ public class CustomerAppraisalController {
             driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
         }
         if(had && (driverIds==null || driverIds.size()==0)){
-            logger.info(LOGTAG + "查询teamId={},groupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
+            logger.info(LOGTAG + "查询teamId={},teamGroupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
             PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
             return AjaxResponse.success(pageDTO);
         }
@@ -214,7 +213,7 @@ public class CustomerAppraisalController {
             driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
         }
         if(had && (driverIds==null || driverIds.size()==0)){
-            logger.info(LOGTAG + "查询teamId={},groupId={},permOfTeam={}没有司机评分信息", teamId, teamGroupId, permOfTeam);
+            logger.info(LOGTAG + "查询teamId={},teamGroupId={},permOfTeam={}没有司机评分信息", teamId, teamGroupId, permOfTeam);
             list =  Lists.newArrayList();
         }else {
             CarBizCustomerAppraisalStatisticsDTO carBizCustomerAppraisalStatisticsDTO = new CarBizCustomerAppraisalStatisticsDTO();
@@ -232,7 +231,6 @@ public class CustomerAppraisalController {
             list = customerAppraisalService.queryCustomerAppraisalStatisticsList(carBizCustomerAppraisalStatisticsDTO);
         }
         try {
-            //TODO 待完善
             Workbook wb = customerAppraisalService.exportExcelDriverAppraisal(list, request.getRealPath("/")+File.separator+"template"+File.separator+"driver_appraisal.xlsx");
             Componment.fileDownload(response, wb, new String("司机评分".getBytes("utf-8"), "iso8859-1"));
         } catch (Exception e) {
@@ -245,6 +243,8 @@ public class CustomerAppraisalController {
      * @param driverId 司机ID
      * @param month 月份 yyyy-MM
      * @param orderNo 订单号
+     * @param page 起始页，默认0
+     * @param pageSize 取N条，默认20
      * @return
      */
     @ResponseBody
@@ -253,14 +253,27 @@ public class CustomerAppraisalController {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
     public AjaxResponse queryCustomerAppraisalStatisticsDetail(@Verify(param = "driverId", rule = "required") Integer driverId,
-                                                             @Verify(param = "month", rule = "required") String month, String orderNo) {
+                                                               @Verify(param = "month", rule = "required") String month,
+                                                               String orderNo,
+                                                               @RequestParam(value="page", defaultValue="0")Integer page,
+                                                               @RequestParam(value="pageSize", defaultValue="20")Integer pageSize) {
 
         CarBizCustomerAppraisalDTO carBizCustomerAppraisalDTO = new CarBizCustomerAppraisalDTO();
         carBizCustomerAppraisalDTO.setDriverId(driverId);
         carBizCustomerAppraisalDTO.setOrderNo(orderNo);
         carBizCustomerAppraisalDTO.setCreateDateBegin(month);
 
-        List<CarBizCustomerAppraisalDTO> list = customerAppraisalService.queryDriverAppraisalDetail(carBizCustomerAppraisalDTO);
-        return AjaxResponse.success(list);
+        List<CarBizCustomerAppraisalDTO> list = Lists.newArrayList();
+        int total = 0;
+
+        Page p = PageHelper.startPage(page, pageSize, true);
+        try {
+            list = customerAppraisalService.queryDriverAppraisalDetail(carBizCustomerAppraisalDTO);
+            total = (int)p.getTotal();
+        } finally {
+            PageHelper.clearPage();
+        }
+        PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
+        return AjaxResponse.success(pageDTO);
     }
 }

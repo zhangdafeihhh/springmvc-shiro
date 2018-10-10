@@ -132,7 +132,7 @@ public class CommonController {
      */
     @RequestMapping("/teams")
     @ResponseBody
-    public AjaxResponse getTeams(@Verify(param = "cityId", rule = "required") Integer cityId
+    public AjaxResponse getTeams(Integer cityId
                 ,@Verify(param = "supplierId", rule = "required") Integer supplierId){
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         if(Check.NuNObj(currentLoginUser)){

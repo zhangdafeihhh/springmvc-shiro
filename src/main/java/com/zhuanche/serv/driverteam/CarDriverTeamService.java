@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Maps;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -113,6 +114,48 @@ public class CarDriverTeamService{
 		return carDriverTeamExMapper.updateTeamDuty(record);
 	}
 
+	/** 
+	* @Desc: 移除司机 
+	* @param:
+	* @return:  
+	* @Author: lunan
+	* @Date: 2018/9/10 
+	*/ 
+	public int removeDriverToTeam(Integer id, Integer driverId){
+		logger.info("车队/小组移除司机service入参:"+ "车队/小组id："+id+"要移除的司机id："+driverId);
+		try{
+			CarDriverTeam carDriverTeam = carDriverTeamMapper.selectByPrimaryKey(id);
+			if(Check.NuNObj(carDriverTeam)){
+				logger.info("移除--车队/小组不存在" + id + driverId);
+				return ServiceReturnCodeEnum.NONE_RECODE_EXISTS.getCode();
+			}
+			CarRelateTeam carRelateTeam = new CarRelateTeam();
+			carRelateTeam.setTeamId(id);
+			carRelateTeam.setDriverId(driverId);
+			if(Check.NuNObj(carDriverTeam.getpId())){
+				//车队操作移除司机,包含移除司机绑定在小组的关系
+				int result = carRelateTeamExMapper.deleteDriverFromTeam(id, driverId);
+				logger.info("车队:"+id + "移除司机"+driverId+"结果:"+result);
+				CarRelateGroup group = new CarRelateGroup();
+				group.setDriverId(driverId);
+				CarRelateGroup existsGroup = carRelateGroupExMapper.selectOneGroup(group);
+				if(!Check.NuNObj(existsGroup)){
+					result = carRelateGroupExMapper.deleteDriverFromGroup(existsGroup.getGroupId(),driverId);
+				}
+				//TODO 处理司机ID，发动司机变更MQ 从车队移除司机
+				this.asyncDutyService.processingData(driverId, String.valueOf(id), carDriverTeam.getTeamName(), 1);
+				return result;
+			}else{
+				//小组操作移除司机
+				return carRelateGroupExMapper.deleteDriverFromGroup(id,driverId);
+			}
+		}catch (Exception e){
+			logger.error("车队:"+id + "移除司机"+driverId+"结果:"+JSON.toJSONString(e));
+			return 0;
+		}
+
+	}
+
 	/**
 	* @Desc: 添加司机到车队/小组
 	* @param:
@@ -170,7 +213,12 @@ public class CarDriverTeamService{
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/8/31 
-	*/ 
+	*/
+	@SuppressWarnings("rawtypes")
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE ),
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public PageDTO selectAddDriverList(DriverTeamRequest driverTeamRequest){
 		logger.info("请求可添加司机列表入参:{}"+JSON.toJSONString(driverTeamRequest));
 		if(Check.NuNObj(driverTeamRequest) || Check.NuNObj(driverTeamRequest.getTeamId())){
@@ -252,7 +300,12 @@ public class CarDriverTeamService{
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/8/30 
-	*/ 
+	*/
+	@SuppressWarnings("rawtypes")
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE ),
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public PageDTO selectTeamExistsDriverList(DriverTeamRequest driverTeamRequest){
 		logger.info("请求车队司机列表入参:{}"+JSON.toJSONString(driverTeamRequest));
 		try{
@@ -325,6 +378,11 @@ public class CarDriverTeamService{
 	* @Author: lunan
 	* @Date: 2018/8/30
 	*/
+	@SuppressWarnings("rawtypes")
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE ),
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public CarDriverTeamDTO selectOneDriverTeam(DriverTeamRequest driverTeamRequest){
 		if(Check.NuNObj(driverTeamRequest) || Check.NuNObj(driverTeamRequest.getId())){
 			return null;
@@ -332,14 +390,14 @@ public class CarDriverTeamService{
 		try{
 			CarDriverTeamDTO dto = new CarDriverTeamDTO();
 			//根据名称查询是否存在，新增使用判断
-			if(StringUtils.isNotEmpty(driverTeamRequest.getTeamName())){
+			/*if(StringUtils.isNotEmpty(driverTeamRequest.getTeamName())){
 				CarDriverTeam carDriverTeam = carDriverTeamExMapper.selectByCondition(driverTeamRequest);
 				if(Check.NuNObj(carDriverTeam)){
 					return null;
 				}
 				BeanUtils.copyProperties(dto,carDriverTeam);
 				return dto;
-			}
+			}*/
 			//正常查询详情业务逻辑
 			CarDriverTeam carDriverTeam = carDriverTeamMapper.selectByPrimaryKey(driverTeamRequest.getId());
 			if(Check.NuNObj(carDriverTeam)){
@@ -402,18 +460,31 @@ public class CarDriverTeamService{
 	* @Date: 2018/8/30
 	*/
 	public int saveOneDriverTeam(CarDriverTeamDTO paramDto){
-		if(Check.NuNObj(paramDto)){
+		if(Check.NuNObj(paramDto) || Check.NuNStr(paramDto.getCity()) || Check.NuNStr(paramDto.getSupplier())){
 			return ServiceReturnCodeEnum.DEAL_FAILURE.getCode();
 		}
 		try{
 			DriverTeamRequest driverTeamRequest = new DriverTeamRequest();
 			driverTeamRequest.setTeamName(paramDto.getTeamName());
-			CarDriverTeamDTO carDriverTeamDTO = this.selectOneDriverTeam(driverTeamRequest);
-			if(!Check.NuNObj(carDriverTeamDTO)){
+			CarDriverTeam carDriverTeam = carDriverTeamExMapper.selectByCondition(driverTeamRequest);
+//			CarDriverTeamDTO carDriverTeamDTO = this.selectOneDriverTeam(driverTeamRequest);
+			if(!Check.NuNObj(carDriverTeam)){
 				return ServiceReturnCodeEnum.RECODE_EXISTS.getCode();
 			}
 			CarDriverTeam record = new CarDriverTeam();
-			BeanUtils.copyProperties(record,paramDto);
+			record.setSupplier(paramDto.getSupplier());
+			record.setCity(paramDto.getCity());
+			if(!Check.NuNObj(paramDto.getpId())){
+				record.setpId(paramDto.getpId());
+			}
+			record.setTeamName(paramDto.getTeamName());
+			if(Check.NuNObj(paramDto.getStatus())){
+				record.setStatus(2);
+			}
+			record.setCharge1(paramDto.getCharge1());
+			record.setCharge2(paramDto.getCharge2());
+			record.setCharge3(paramDto.getCharge3());
+//			BeanUtils.copyProperties(record,paramDto);
 			record.setCreateBy(String.valueOf(WebSessionUtil.getCurrentLoginUser().getId()));
 			return carDriverTeamMapper.insertSelective(record);
 		}catch (Exception e){
@@ -536,8 +607,16 @@ public class CarDriverTeamService{
 			}else {//不存在司机ID，即返回
 				return set;
 			}
-		}else {//没有车队下小组ID传入，以传入车队ID以及当前用户的数据权限下车队ID查询sijiID
-			List<Integer> integers = carRelateTeamExMapper.queryDriverIdsByTeamId(teamId, teamIds);
+		}else if(teamId!=null) {//没有车队下小组ID传入，以传入车队ID以及当前用户的数据权限下车队ID查询sijiID
+			List<Integer> integers = carRelateTeamExMapper.queryDriverIdsByTeamId(teamId);
+			if(integers!=null && integers.size()>0){
+				set = new HashSet<Integer>(integers);
+				return set;
+			}else {//不存在司机ID，即返回
+				return set;
+			}
+		}else if(teamIds !=null && teamIds.size()>0){
+			List<Integer> integers = carRelateTeamExMapper.queryDriverIdsByTeamIdss(teamIds);
 			if(integers!=null && integers.size()>0){
 				set = new HashSet<Integer>(integers);
 				return set;
@@ -545,5 +624,24 @@ public class CarDriverTeamService{
 				return set;
 			}
 		}
+		return set;
+	}
+
+	/**
+	 * 查询车队，返回Map
+	 * @param cityId
+	 * @param supplierid
+	 * @return
+	 */
+	public Map<Integer, String> queryDriverTeamList( Integer cityId, Integer supplierid ){
+		List<CarDriverTeam> list = carDriverTeamExMapper.queryDriverTeamList(cityId, supplierid);
+		if(list==null||list.size()==0) {
+			return new HashMap<Integer, String>(4);
+		}
+		Map<Integer, String> result = Maps.newHashMap();
+		for(CarDriverTeam c : list) {
+			result.put(c.getId(),  c.getTeamName());
+		}
+		return result;
 	}
 }

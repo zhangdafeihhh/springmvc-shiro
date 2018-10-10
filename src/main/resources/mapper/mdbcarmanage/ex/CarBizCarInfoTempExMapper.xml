@@ -121,7 +121,7 @@
 		car.city_id cityId,
 		car.supplier_id supplierId,
 		car.driver_id driverid,
-		car.car_photograph imageUrl,
+		car.car_photograph carPhotograph,
 		car.fuelType,
 		car.carryPassengers,
 		car.auditingStatus,
@@ -156,8 +156,7 @@
 		car.clicensePlatesColor,
 		car.vehicle_owner vehicleOwner,
 		car.vehicle_type vehicleType,
-		car.vehicle_driving_license
-		vehicleDrivingLicense,
+		car.vehicle_driving_license vehicleDrivingLicense,
 		DATE_FORMAT(car.car_purchase_date, '%Y-%m-%d')
 		AS purchaseDate,
 		DATE_FORMAT(car.next_operation_date, '%Y-%m-%d') AS
@@ -192,7 +191,8 @@
 		car.update_date updateDate,
 		u1.user_name AS
 		createName,
-		u2.user_name AS updateName
+		u2.user_name AS updateName,
+		car.overhaulStatus as overHaulStatus
 		FROM
 		car_biz_car_info_temp car
 		LEFT JOIN car_adm_user u1 ON u1.user_id = car.create_by
@@ -302,6 +302,21 @@
 		SELECT count(*)
 		FROM car_biz_car_info_temp car
 		WHERE license_plates = #{licensePlates}
+    </select>
+
+    <select id="licensePlatesNotDriverIdList" resultType="com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp" parameterType="java.util.Map">
+        SELECT
+        car_id carId,
+        license_plates licensePlates
+        FROM
+        car_biz_car_info_temp
+        WHERE driver_id = '0' and status=1
+        <if test="cityId !=null and cityId != ''">
+            and city_id = #{cityId}
+        </if>
+        <if test="supplierId !=null and supplierId != ''">
+            and supplier_id = #{supplierId}
+        </if>
     </select>
 </mapper>
 

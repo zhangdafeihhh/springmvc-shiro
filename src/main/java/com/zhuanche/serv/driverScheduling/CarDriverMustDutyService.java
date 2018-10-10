@@ -5,6 +5,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.parser.deserializer.AbstractDateDeserializer;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.dto.driverDuty.CarDriverMustDutyDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverMustDuty;
@@ -27,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.mail.search.SearchTerm;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -72,21 +76,32 @@ public class CarDriverMustDutyService {
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/3 
-	*/ 
+	*/
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public PageDTO getDriverMustDutyList(DutyParamRequest dutyParamRequest){
 		if(Check.NuNObj(dutyParamRequest)){
 			return new PageDTO();
 		}
 		try{
 			CommonRequest commonRequest = new CommonRequest();
-			BeanUtils.copyProperties(dutyParamRequest,commonRequest);
+			if(!Check.NuNObj(dutyParamRequest.getCityId())){
+				commonRequest.setCityId(String.valueOf(dutyParamRequest.getCityId()));
+			}
+			if(!Check.NuNObj(dutyParamRequest.getSupplierId())){
+				commonRequest.setSupplierId(String.valueOf(dutyParamRequest.getSupplierId()));
+			}
+			if(!Check.NuNObj(dutyParamRequest.getTeamId())){
+				commonRequest.setTeamId(dutyParamRequest.getTeamId());
+			}
 			CommonRequest resultParmam = citySupplierTeamCommonService.paramDeal(commonRequest);
 			if(Check.NuNObj(resultParmam)){
 				return new PageDTO();
 			}
 			dutyParamRequest.setCityIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getCityIds()));
 			dutyParamRequest.setSupplierIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getSupplierIds()));
-			dutyParamRequest.setSupplierIds(resultParmam.getTeamIds());
+			dutyParamRequest.setTeamIds(resultParmam.getTeamIds());
 			PageInfo<CarDriverMustDutyDTO> pageInfo = PageHelper.startPage(dutyParamRequest.getPageNo(), dutyParamRequest.getPageSize(), true).doSelectPageInfo(()
 					-> carDriverMustDutyExMapper.selectDriverMustDutyList(dutyParamRequest));
 			PageDTO pageDTO = new PageDTO();
@@ -108,7 +123,7 @@ public class CarDriverMustDutyService {
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/3 
-	*/ 
+	*/
 	public int saveOrUpdateDriverMust(CarDriverMustDuty carDriverMustDuty){
 
 		if(Check.NuNObj(carDriverMustDuty)
@@ -137,6 +152,7 @@ public class CarDriverMustDutyService {
 				}
 			}
 		}
+
 		try{
 			if(!Check.NuNObj(carDriverMustDuty.getId())){
 				/** 修改逻辑*/
@@ -145,7 +161,10 @@ public class CarDriverMustDutyService {
 				upRecord.setStartDate(carDriverMustDuty.getStartDate());
 				upRecord.setEndDate(carDriverMustDuty.getEndDate());
 				upRecord.setRemark(carDriverMustDuty.getRemark());
+				upRecord.setPeakTimes(carDriverMustDuty.getPeakTimes());
 				upRecord.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
+				upRecord.setStatus(carDriverMustDuty.getStatus());
+				upRecord.setUpdateDate(new Date());
 				return carDriverMustDutyMapper.updateByPrimaryKeySelective(upRecord);
 			}else{
 				Set<Integer> cityId = new HashSet<>();
@@ -163,6 +182,7 @@ public class CarDriverMustDutyService {
 				}
 				carDriverMustDuty.setSupplierName(supplierDetail.getSupplierFullName());
 				carDriverMustDuty.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
+				carDriverMustDuty.setCreateDate(new Date());
 				return carDriverMustDutyMapper.insertSelective(carDriverMustDuty);
 			}
 		}catch (Exception e){
@@ -177,13 +197,18 @@ public class CarDriverMustDutyService {
 	* @return:  
 	* @Author: lunan
 	* @Date: 2018/9/3 
-	*/ 
-	public CarDriverMustDuty getCarDriverMustDetail(Integer paramId){
+	*/
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
+	public CarDriverMustDutyDTO getCarDriverMustDetail(Integer paramId){
 		if(Check.NuNObj(paramId)){
 			return null;
 		}
-		CarDriverMustDuty carDriverMustDuty = carDriverMustDutyMapper.selectByPrimaryKey(paramId);
-		return carDriverMustDuty;
+		DutyParamRequest param = new DutyParamRequest();
+		param.setId(paramId);
+		CarDriverMustDutyDTO detail = carDriverMustDutyExMapper.selectDriverMustDutyDetail(param);
+		return detail;
 	}
 
 

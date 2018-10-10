@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -83,7 +84,7 @@ public class DriverInfoUpdateApplyController {
                                                  Integer supplierId,Integer teamId, Integer teamGroupId, String createDateBegin, String createDateEnd,
                                                  @Verify(param = "type", rule = "required") Integer type,
                                                  @RequestParam(value="page", defaultValue="0")Integer page,
-                                                 @RequestParam(value="pageSize", defaultValue="20")Integer pageSize) {
+                                                 @Verify(param = "pageSize",rule = "max(50)")@RequestParam(value="pageSize", defaultValue="20")Integer pageSize) {
 
         // 数据权限控制SSOLoginUser
         Set<Integer> permOfCity        = WebSessionUtil.getCurrentLoginUser().getCityIds(); //普通管理员可以管理的所有城市ID
@@ -145,7 +146,7 @@ public class DriverInfoUpdateApplyController {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = "/saveDriverInfoUpdateApply")
+    @RequestMapping(value = "/saveDriverInfoUpdateApply",method = RequestMethod.POST)
     @MasterSlaveConfigs(configs={
             @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
     } )
@@ -155,6 +156,9 @@ public class DriverInfoUpdateApplyController {
 
         if (StringUtils.isEmpty(driverPhoneNew) || !ValidateUtils.validatePhone(driverPhoneNew)) {
             return AjaxResponse.fail(RestErrorCode.DRIVER_PHONE_NOT_LEGAL);
+        }
+        if(driverPhoneNew.equals(driverPhone)){
+            return AjaxResponse.fail(RestErrorCode.PHONE_NEW_SAME);
         }
         //查询手机号是否存在
         Boolean had = carBizDriverInfoService.checkPhone(driverPhoneNew, null);
@@ -172,6 +176,7 @@ public class DriverInfoUpdateApplyController {
         driverInfoUpdateApply.setDriverId(driverId);
         driverInfoUpdateApply.setDriverName(carBizDriverInfoDTO.getName());
         driverInfoUpdateApply.setDriverPhone(driverPhone);
+        driverInfoUpdateApply.setDriverPhoneNew(driverPhoneNew);
         driverInfoUpdateApply.setIdCardNo(carBizDriverInfoDTO.getIdCardNo());
         driverInfoUpdateApply.setLicensePlates(carBizDriverInfoDTO.getLicensePlates());
         driverInfoUpdateApply.setCityId(carBizDriverInfoDTO.getServiceCity());
