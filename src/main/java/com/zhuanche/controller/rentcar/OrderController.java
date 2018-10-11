@@ -75,7 +75,7 @@ public class OrderController{
 			 								   String airportIdnot,
 			 								   String airportId,
 	 										   String carGroupId,
-	 										   String status,
+	 										   String statusStr,
 	 										   Long cityId,
 	 										   String supplierId,
 	                                           String teamId,
@@ -102,7 +102,7 @@ public class OrderController{
 		 paramMap.put("airportId", airportId);//
 		 paramMap.put("airportIdnot", airportIdnot);//
 	     paramMap.put("carGroupId", carGroupId);// 
-	     paramMap.put("status", status);//
+	     paramMap.put("statusBatch", statusStr);//
 	     paramMap.put("cityId", cityId);//
 	     paramMap.put("supplierId", supplierId);//
 	     paramMap.put("teamId", teamId);// 
@@ -166,7 +166,7 @@ public class OrderController{
 											   String airportIdnot,
 											   String airportId,
 	 										   String carGroupId,
-	 										   String status,
+	 										   String statusStr,
 	 										   Long cityId,
 	 										   String supplierId,
 	                                           String teamId,
@@ -192,7 +192,7 @@ public class OrderController{
 		 paramMap.put("airportId", airportId);//
 		 paramMap.put("airportIdnot", airportIdnot);//
 	     paramMap.put("carGroupId", carGroupId);// 
-	     paramMap.put("status", status);//
+	     paramMap.put("statusBatch", statusStr);//
 	     paramMap.put("cityId", cityId);//
 	     paramMap.put("supplierId", supplierId);//
 	     paramMap.put("teamId", teamId);// 

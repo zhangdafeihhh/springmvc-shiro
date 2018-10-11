@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.entity.risk.RiskCarManagerOrderComplainEntity;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -47,7 +48,7 @@ public class RiskOrderComplainController {
     @RequestMapping(value = "/dopage", method = { RequestMethod.POST,RequestMethod.GET })
     public AjaxResponse incontrolorderDopage(
             @RequestParam(value = "pageNum", required = false,defaultValue = "0")int pageNo,
-            @RequestParam(value = "pageSize", required = false,defaultValue = "20")int pageSize,
+            @Verify(param = "pageSize",rule = "max(50)")@RequestParam(value = "pageSize", required = false,defaultValue = "20")int pageSize,
             HttpServletRequest request, RiskCarManagerOrderComplainEntity params, ModelMap model) {
         logger.info("风控-运行中订单-执行分页查询-请求参数  RiskCarManagerOrderComplainEntity："
                 + params);

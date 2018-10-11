@@ -65,7 +65,7 @@ public class CarInfoController {
                                @Verify(param = "status",rule="") Integer status,
                                @Verify(param = "isFree",rule="") Integer isFree,
                                @Verify(param = "page",rule="") Integer page,
-                               @Verify(param = "pageSize",rule="") Integer pageSize) {
+                               @Verify(param = "pageSize",rule = "max(50)") Integer pageSize) {
         logger.info("车辆列表数据:queryCarData");
 
         CarInfo params = new CarInfo();

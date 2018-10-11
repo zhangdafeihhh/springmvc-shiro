@@ -84,7 +84,7 @@ public class OrderAppraisalController extends DriverQueryController{
 										  @Verify(param="createDateEnd",rule="required")String createDateEnd,
 										  String evaluateScore,String sortName, String sortOrder,
 										  Integer page,
-										  Integer pageSize) {
+										  @Verify(param = "pageSize",rule = "max(50)")Integer pageSize) {
 
 		if (StringUtils.isEmpty(driverPhone) && StringUtils.isEmpty(teamId)){
 			//请选择一个车队号或输入司机手机

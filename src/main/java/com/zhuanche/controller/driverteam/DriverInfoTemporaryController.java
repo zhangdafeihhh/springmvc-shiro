@@ -74,6 +74,7 @@ public class DriverInfoTemporaryController extends BaseController {
     @ResponseBody
     @RequestMapping(value = "/driverListData", method =  RequestMethod.GET )
     public AjaxResponse driverListData(@RequestParam(value = "page",defaultValue="1") Integer page,
+                                       @Verify(param = "pageSize",rule = "max(50)")
                                        @RequestParam(value = "pageSize",defaultValue="10") Integer pageSize,
                                        @RequestParam(value = "name",required = false) String name,
                                        @RequestParam(value = "phone",required = false) String phone,
