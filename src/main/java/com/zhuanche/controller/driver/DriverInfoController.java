@@ -733,7 +733,7 @@ public class DriverInfoController {
                     JSONObject itemJson = new JSONObject();
                     itemJson.put("driverId",item.getDriverId());
                     itemJson.put("phone",item.getPhone());
-                    itemJson.put("name",item.getPhone());
+                    itemJson.put("name",item.getName());
                     itemJson.put("supplierId",item.getSupplierId());
                     itemJson.put("licensePlates",item.getLicensePlates());
                     itemJson.put("serviceCity",item.getServiceCity());
