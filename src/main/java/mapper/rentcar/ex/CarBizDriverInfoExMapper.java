@@ -123,4 +123,11 @@ public interface CarBizDriverInfoExMapper {
 	 * @return
 	 */
 	public CarBizDriverInfoDTO querySupplierIdAndNameByDriverId(Integer params);
+
+    /**
+     * 根据车牌号查询司机信息
+     * @param license_plates
+     * @return
+     */
+    public List<CarBizDriverInfoDTO> queryDriverByLicensePlates(String license_plates);
 }
