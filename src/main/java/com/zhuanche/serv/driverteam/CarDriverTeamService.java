@@ -4,11 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
+import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.dutyEnum.ServiceReturnCodeEnum;
 import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.dto.CarDriverTeamDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
@@ -107,7 +109,21 @@ public class CarDriverTeamService{
 	* @Date: 2018/9/5 
 	*/ 
 	public int updateTeamDuty(CarDriverTeam record){
-		return carDriverTeamExMapper.updateTeamDuty(record);
+		int result = carDriverTeamExMapper.updateTeamDuty(record);
+		if(result >0){
+			List<Integer> teamDrivers = carRelateTeamExMapper.queryDriverIdsByTeamId(record.getId());
+			if(Check.NuNCollection(teamDrivers)){
+				List<Integer> groupDrivers = carRelateGroupExMapper.queryDriverIdsByGroupId(record.getId());
+				for (Integer driverId : groupDrivers) {
+					RedisCacheUtil.delete(Constants.REDISKEYPREFIX_ISDUTYTIME+"_"+driverId);
+				}
+			}else{
+				for(Integer driverId : teamDrivers){
+					RedisCacheUtil.delete(Constants.REDISKEYPREFIX_ISDUTYTIME+"_"+driverId);
+				}
+			}
+		}
+		return result;
 	}
 
 	/** 
@@ -120,6 +136,9 @@ public class CarDriverTeamService{
 	public int removeDriverToTeam(Integer id, Integer driverId){
 		logger.info("车队/小组移除司机service入参:"+ "车队/小组id："+id+"要移除的司机id："+driverId);
 		try{
+			//删除司机的车队信息
+			RedisCacheUtil.delete(Constants.REDISKEYPREFIX_ISDUTYTIME+"_"+driverId);
+
 			CarDriverTeam carDriverTeam = carDriverTeamMapper.selectByPrimaryKey(id);
 			if(Check.NuNObj(carDriverTeam)){
 				logger.info("移除--车队/小组不存在" + id + driverId);

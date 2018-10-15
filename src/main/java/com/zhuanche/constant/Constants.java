@@ -23,6 +23,11 @@ public final class Constants {
 	public static final int ARRANGE_DUTY = 4;//司机排班
 	public static final int IMPORT_DRIVER_INFO = 5;//司机信息导入
 	public static final int DRIVER_SALARY_PERFORMANCE = 10;//司机薪酬绩效
+
+	/** 司机排班相关redis key前缀*/
+	public static final String REDISKEYPREFIX_ISINDUTY = "redis_duty_is_induty";
+	public static final String REDISKEYPREFIX_ISDUTYTIME = "redis_duty_is_duty_time";
+	public static final String REDISKEYPREFIX_DRIVERDUTYINFO = "redis_duty_driver_duty_info";
 	
 	
 
