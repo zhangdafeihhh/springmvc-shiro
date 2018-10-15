@@ -74,7 +74,7 @@ public class CustomerAppraisalService {
             Map<Integer, String> teamMap = null;
             try {
                 String driverIds = this.pingDriverIds(list);
-                teamMap = carDriverTeamService.queryDriverTeamListByTeamName(driverIds);
+                teamMap = carDriverTeamService.queryDriverTeamListByDriverId(driverIds);
             } catch (Exception e) {
                 e.printStackTrace();
             }
