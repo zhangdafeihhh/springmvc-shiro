@@ -1,8 +1,7 @@
 package com.zhuanche.serv.driverteam;
 
-import java.util.*;
-
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
@@ -11,21 +10,27 @@ import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.dutyEnum.ServiceReturnCodeEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.dto.CarDriverInfoDTO;
-import com.zhuanche.dto.driver.DriverTeamGroupDTO;
+import com.zhuanche.dto.CarDriverTeamDTO;
+import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
 import com.zhuanche.entity.mdbcarmanage.CarRelateGroup;
 import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
-import com.zhuanche.request.DriverTeamRequest;
+import com.zhuanche.entity.rentcar.CarBizCity;
+import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.request.CommonRequest;
+import com.zhuanche.request.DriverTeamRequest;
 import com.zhuanche.request.DutyParamRequest;
 import com.zhuanche.request.TeamGroupRequest;
 import com.zhuanche.serv.CarBizCityService;
 import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.common.CitySupplierTeamCommonService;
+import com.zhuanche.serv.common.DataPermissionHelper;
 import com.zhuanche.serv.driverScheduling.AsyncDutyService;
+import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
 import mapper.mdbcarmanage.CarDriverTeamMapper;
 import mapper.mdbcarmanage.CarRelateGroupMapper;
 import mapper.mdbcarmanage.CarRelateTeamMapper;
+import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.mdbcarmanage.ex.CarRelateGroupExMapper;
 import mapper.mdbcarmanage.ex.CarRelateTeamExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
@@ -36,16 +41,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.github.pagehelper.PageHelper;
-import com.zhuanche.dto.CarDriverTeamDTO;
-import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
-import com.zhuanche.entity.rentcar.CarBizCity;
-import com.zhuanche.entity.rentcar.CarBizSupplier;
-import com.zhuanche.serv.common.DataPermissionHelper;
-import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.BeanUtil;
-
-import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
+import java.util.*;
 
 /**
  * @description: 车队设置
@@ -641,6 +637,40 @@ public class CarDriverTeamService{
 		Map<Integer, String> result = Maps.newHashMap();
 		for(CarDriverTeam c : list) {
 			result.put(c.getId(),  c.getTeamName());
+		}
+		return result;
+	}
+
+	/**
+	 * 根据司机ID，查询车队名称
+	 * @param driverIds
+	 * @return
+	 */
+	public Map<Integer, String> queryDriverTeamListByDriverId(String driverIds){
+		List<CarRelateTeam> list = carDriverTeamExMapper.queryDriverTeamListByDriverId(driverIds);
+		if(list==null||list.size()==0) {
+			return new HashMap<Integer, String>(4);
+		}
+		Map<Integer, String> result = Maps.newHashMap();
+		for(CarRelateTeam c : list) {
+			result.put(c.getDriverId(),  c.getTeamName());
+		}
+		return result;
+	}
+
+	/**
+	 * 根据司机ID，查询小组名称
+	 * @param driverIds
+	 * @return
+	 */
+	public Map<Integer, String> queryDriverTeamGroupListByDriverId(String driverIds){
+		List<CarRelateTeam> list = carDriverTeamExMapper.queryDriverTeamListByDriverId(driverIds);
+		if(list==null||list.size()==0) {
+			return new HashMap<Integer, String>(4);
+		}
+		Map<Integer, String> result = Maps.newHashMap();
+		for(CarRelateTeam c : list) {
+			result.put(c.getDriverId(),  c.getGroupName());
 		}
 		return result;
 	}
