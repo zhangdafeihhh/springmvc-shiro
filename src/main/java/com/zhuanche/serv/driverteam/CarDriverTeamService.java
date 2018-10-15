@@ -115,7 +115,9 @@ public class CarDriverTeamService{
 			if(Check.NuNCollection(teamDrivers)){
 				List<Integer> groupDrivers = carRelateGroupExMapper.queryDriverIdsByGroupId(record.getId());
 				for (Integer driverId : groupDrivers) {
+				    logger.info("清除key开始teamid="+record.getId()+"driverId="+driverId);
 					RedisCacheUtil.delete(Constants.REDISKEYPREFIX_ISDUTYTIME+"_"+driverId);
+                    logger.info("清除key开始teamid="+record.getId()+"driverId="+driverId+"结果=："+RedisCacheUtil.get(Constants.REDISKEYPREFIX_ISDUTYTIME+"_"+driverId,String.class));
 				}
 			}else{
 				for(Integer driverId : teamDrivers){
