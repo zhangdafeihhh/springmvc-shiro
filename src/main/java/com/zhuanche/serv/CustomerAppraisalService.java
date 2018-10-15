@@ -2,6 +2,7 @@ package com.zhuanche.serv;
 
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalDTO;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
+import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import mapper.rentcar.ex.CarBizCustomerAppraisalExMapper;
 import mapper.rentcar.ex.CarBizCustomerAppraisalStatisticsExMapper;
 import org.apache.poi.ss.usermodel.Cell;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CustomerAppraisalService {
@@ -23,6 +25,9 @@ public class CustomerAppraisalService {
 
     @Autowired
     private CarBizCustomerAppraisalStatisticsExMapper carBizCustomerAppraisalStatisticsExMapper;
+
+    @Autowired
+    private CarDriverTeamService carDriverTeamService;
 
     /**
      * 查询订单评分信息
@@ -65,6 +70,15 @@ public class CustomerAppraisalService {
             Sheet sheet = wb.getSheetAt(0);
             Cell cell = null;
             int i=0;
+
+            Map<Integer, String> teamMap = null;
+            try {
+                String driverIds = this.pingDriverIds(list);
+                teamMap = carDriverTeamService.queryDriverTeamListByTeamName(driverIds);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             for(CarBizCustomerAppraisalStatisticsDTO s:list){
                 Row row = sheet.createRow(i + 1);
                 cell = row.createCell(0);
@@ -79,9 +93,37 @@ public class CustomerAppraisalService {
                 cell = row.createCell(3);
                 cell.setCellValue(s.getEvaluateScore());
 
+                cell = row.createCell(4);
+                cell.setCellValue(s.getIdCardNo());
+
+                cell = row.createCell(5);
+                String teamName = "";
+                if(teamMap!=null){
+                    teamName = teamMap.get(s.getDriverId());
+                }
+                cell.setCellValue(teamName);
+
                 i++;
             }
         }
         return wb;
+    }
+
+    public static String pingDriverIds(List<CarBizCustomerAppraisalStatisticsDTO> list) {
+        String driverId = "";
+        if(list!=null&&list.size()>0){
+            int j=0;
+            for(int i=0;i<list.size();i++){
+                if(!"".equals(list.get(i))&&list.get(i)!=null&&!"".equals(list.get(i).getDriverId())&&list.get(i).getDriverId()!=null){
+                    if(j==0){
+                        driverId = "'"+list.get(i).getDriverId()+"'";
+                    }else{
+                        driverId +=",'"+list.get(i).getDriverId()+"'";
+                    }
+                    j++	;
+                }
+            }
+        }
+        return driverId;
     }
 }

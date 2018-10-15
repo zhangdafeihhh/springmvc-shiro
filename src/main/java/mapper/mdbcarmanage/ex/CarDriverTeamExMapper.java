@@ -1,18 +1,14 @@
 package mapper.mdbcarmanage.ex;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import com.zhuanche.common.database.DynamicRoutingDataSource;
-import com.zhuanche.common.database.MasterSlaveConfig;
-import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.dto.CarDriverTeamDTO;
-import com.zhuanche.dto.driver.DriverTeamGroupDTO;
+import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
+import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.request.DriverTeamRequest;
 import org.apache.ibatis.annotations.Param;
 
-import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface CarDriverTeamExMapper{
 
@@ -38,4 +34,6 @@ public interface CarDriverTeamExMapper{
 	Map<String, Object> queryTeamNameAndGroupNameByDriverId(@Param("driverId") Integer driverId);
 
 	List<CarDriverTeam> queryDriverTeamList(@Param("cityId") Integer cityId, @Param("supplierId") Integer supplierId);
+
+	List<CarRelateTeam> queryDriverTeamListByDriverId(@Param("driverIds") String driverIds);
 }
