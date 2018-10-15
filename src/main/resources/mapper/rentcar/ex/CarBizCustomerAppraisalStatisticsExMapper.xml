@@ -15,7 +15,8 @@
   </resultMap>
   <sql id="Base_Column_List" >
     ca.appraisal_statistics_id, ca.driver_id, ca.driver_name, ca.driver_phone, ca.instrument_and_service,
-    ca.environment_and_equipped, ca.efficiency_and_safety, ca.evaluate_score, ca.create_date, ca.sys_date
+    ca.environment_and_equipped, ca.efficiency_and_safety, ca.evaluate_score, ca.create_date, ca.sys_date,
+    di.service_city cityId, di.id_card_no idCardNo
   </sql>
   <!-- mapper基础标准: 当前表所有字段查询条件集 -->
   <sql id="allBaseColumnWhereList" >
