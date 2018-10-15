@@ -30,6 +30,15 @@ public class CarBizCustomerAppraisalStatisticsDTO extends Base {
 
     private Integer cityId;
     private Integer supplierId;
+    private String idCardNo;
+
+    public String getIdCardNo() {
+        return idCardNo;
+    }
+
+    public void setIdCardNo(String idCardNo) {
+        this.idCardNo = idCardNo;
+    }
 
     public Integer getCityId() {
         return cityId;

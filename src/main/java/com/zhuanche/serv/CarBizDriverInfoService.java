@@ -27,7 +27,6 @@ import com.zhuanche.util.Common;
 import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.ValidateUtils;
 import com.zhuanche.util.encrypt.MD5Utils;
-import lombok.AllArgsConstructor;
 import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.mdbcarmanage.CarDriverTeamMapper;
 import mapper.mdbcarmanage.CarRelateGroupMapper;
@@ -2505,11 +2504,20 @@ public class CarBizDriverInfoService {
             if (carBizCity != null) {
                 cityName = carBizCity.getCityName();
             }
-            Map<Integer, String> teamMap = null;
             Map<Integer, String> groupMap = null;
             try {
-                teamMap = carDriverTeamService.queryDriverTeamList(cityId, supplierId);
                 groupMap = carBizCarGroupService.queryGroupNameMap();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            Map<Integer, String> teamMap = null;
+            Map<Integer, String> teamGroupMap = null;
+            try {
+//                teamMap = carDriverTeamService.queryDriverTeamList(cityId, supplierId);
+                String driverIds = this.pingDriverIds(list);
+                teamMap = carDriverTeamService.queryDriverTeamListByDriverId(driverIds);
+                teamGroupMap = carDriverTeamService.queryDriverTeamGroupListByDriverId(driverIds);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -2687,14 +2695,14 @@ public class CarBizDriverInfoService {
                 //车队
                 String teamName = "";
                 if(teamMap!=null){
-                    teamName = teamMap.get(s.getTeamId());
+                    teamName = teamMap.get(s.getDriverId());
                 }
                 cell = row.createCell(49);
                 cell.setCellValue(teamName);
                 //小组
                 String teamGroupName = "";
-                if(teamMap!=null){
-                    teamGroupName = teamMap.get(s.getTeamGroupId());
+                if(teamGroupMap!=null){
+                    teamGroupName = teamGroupMap.get(s.getDriverId());
                 }
                 cell = row.createCell(50);
                 cell.setCellValue(teamGroupName);
@@ -2917,5 +2925,23 @@ public class CarBizDriverInfoService {
             return true;
         }
         return false;
+    }
+
+    public String pingDriverIds(List<CarBizDriverInfoDTO> list) {
+        String driverId = "";
+        if(list!=null&&list.size()>0){
+            int j=0;
+            for(int i=0;i<list.size();i++){
+                if(!"".equals(list.get(i))&&list.get(i)!=null&&!"".equals(list.get(i).getDriverId())&&list.get(i).getDriverId()!=null){
+                    if(j==0){
+                        driverId = "'"+list.get(i).getDriverId()+"'";
+                    }else{
+                        driverId +=",'"+list.get(i).getDriverId()+"'";
+                    }
+                    j++	;
+                }
+            }
+        }
+        return driverId;
     }
 }
