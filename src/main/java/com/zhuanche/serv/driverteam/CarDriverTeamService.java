@@ -121,7 +121,9 @@ public class CarDriverTeamService{
 				}
 			}else{
 				for(Integer driverId : teamDrivers){
+					logger.info("清除key开始teamid="+record.getId()+"driverId="+driverId);
 					RedisCacheUtil.delete(Constants.REDISKEYPREFIX_ISDUTYTIME+"_"+driverId);
+					logger.info("清除key开始teamid="+record.getId()+"driverId="+driverId+"结果=："+RedisCacheUtil.get(Constants.REDISKEYPREFIX_ISDUTYTIME+"_"+driverId,String.class));
 				}
 			}
 		}
