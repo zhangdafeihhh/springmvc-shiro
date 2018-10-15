@@ -146,8 +146,8 @@ public class CancelOrderController{
 		    * @return
 		  */
 	@ResponseBody
-   	@RequestMapping(value = "/exportCancelOrderData", method = { RequestMethod.POST,RequestMethod.GET })
-	public AjaxResponse exportCancelOrderData( 
+   	@RequestMapping(value = "/exportCancelOrderDataBak", method = { RequestMethod.POST,RequestMethod.GET })
+	public AjaxResponse exportCancelOrderDataBak(
 											Long driverCityId,
 											String allianceId,
 								            String motorcadeId,
@@ -204,7 +204,7 @@ public class CancelOrderController{
            paramMap.put("pageSize", Integer.MAX_VALUE);
 
            String jsonString = JSON.toJSONString(paramMap);
-           logger.info("【订单管理-统计分析】导出,完成订单详情请求参数----{}",jsonString);
+           logger.info("【运营管理-取消订单】导出,取消订单详情请求参数----{}",jsonString);
 
            List<CancelOrderDTO> completeOrderDTOList =  statisticalAnalysisService.queryCancelOrderDataList(saasBigdataApiUrl+"/cancelOrderDetail/queryList",paramMap, CancelOrderDTO.class);
            String[] headers = new String[]{"下单城市", "创建时间", "预计乘车时间", "司机出发时间", "取消时间",
@@ -233,8 +233,8 @@ public class CancelOrderController{
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = "/exportCancelOrderDataBak", method = { RequestMethod.POST,RequestMethod.GET })
-    public AjaxResponse exportCancelOrderDataBak(
+    @RequestMapping(value = "/exportCancelOrderData", method = { RequestMethod.POST,RequestMethod.GET })
+    public AjaxResponse exportCancelOrderData(
             Long driverCityId,
             String allianceId,
             String motorcadeId,

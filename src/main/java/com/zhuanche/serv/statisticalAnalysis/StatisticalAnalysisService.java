@@ -354,8 +354,8 @@ public class  StatisticalAnalysisService {
             String jsonString = JSON.toJSONString(paramMap);
             logger.info("调用大数据接口，参数--" + jsonString);
             String result = HttpClientUtil.buildPostRequest(url).setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON)
-                    .setConnectTimeOut(100000)
-                    .setReadTimeOut(100000).setIgnoreResult(true).execute();
+                    .setConnectTimeOut(1000000)
+                    .setReadTimeOut(1000000).setIgnoreResult(true).execute();
             result = result.replaceAll("null", "\"\"");
             result = result.replaceAll("NULL", "\"\"");
             JSONObject obj = JSON.parseObject(result);
@@ -403,11 +403,11 @@ public class  StatisticalAnalysisService {
 			result = result.replaceAll("NULL", "\"\"");
 			JSONObject obj = JSON.parseObject(result);
 			if (obj == null) {
-				logger.info("调用大数据完成订单详情接口:{}返回结果为null",url);
+				logger.info("调用大数据取消订单详情接口:{}返回结果为null",url);
 				return list;
 			}
 			if (!obj.getString("code").equals("0")) {
-				logger.info("调用大数据完成订单接口:{}返回结果为:{}",url,result);
+				logger.info("调用大数据取消订单接口:{}返回结果为:{}",url,result);
 				return list;
 			}
 			if (obj != null) {
@@ -421,7 +421,7 @@ public class  StatisticalAnalysisService {
 				}
 			}
 		} catch (Exception e) {
-			logger.error("调用大数据完成订单接口:{}异常:{}",url,e);
+			logger.error("调用大数据取消订单接口:{}异常:{}",url,e);
 			return null;
 		}
 		return list;
