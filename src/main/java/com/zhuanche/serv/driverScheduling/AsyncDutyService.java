@@ -337,7 +337,7 @@ public class AsyncDutyService {
 				paramMap.put("list", updateList);
 				// 批量修改
 				Integer timeInfoLines = 0;
-				String yearMonthStr = updateList.get(0).getTime().substring(0, 7);
+				String yearMonthStr = updateList.get(0).getTime();
 				for (DriverDutyTimeInfo timeInfo : updateList){
 					timeInfoLines += driverDutyTimeInfoExMapper.updateDriverDutyTimeInfoOne(timeInfo);
 					RedisCacheUtil.delete(Constants.REDISKEYPREFIX_DRIVERDUTYINFO+"_"+yearMonthStr+"_"+timeInfo.getDriverId());
