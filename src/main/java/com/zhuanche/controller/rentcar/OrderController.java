@@ -112,7 +112,7 @@ public class OrderController{
 	     paramMap.put("driverPhone", driverPhone);//
 	     paramMap.put("licensePlates", licensePlates);// 
 	     paramMap.put("orderNo", orderNo);//
-	     paramMap.put("orderType", orderType);//
+	     paramMap.put("type", orderType);//
 	     paramMap.put("beginCreateDate", beginCreateDate+" 00:00:00");//
 	     paramMap.put("endCreateDate", endCreateDate+" 23:59:59");//
 	     paramMap.put("beginCostEndDate", beginCostEndDate+" 00:00:00");//
@@ -202,7 +202,7 @@ public class OrderController{
 	     paramMap.put("driverPhone", driverPhone);//
 	     paramMap.put("licensePlates", licensePlates);// 
 	     paramMap.put("orderNo", orderNo);//
-	     paramMap.put("orderType", orderType);//
+	     paramMap.put("type", orderType);//
 	     paramMap.put("beginCreateDate", beginCreateDate+" 00:00:00");//
 	     paramMap.put("endCreateDate", endCreateDate+" 23:59:59");//
 	     paramMap.put("beginCostEndDate", beginCostEndDate+" 00:00:00");//
@@ -461,18 +461,18 @@ public class OrderController{
 				//基础价包含时长(单位,分钟)
 				order.setIncludeminute(Integer.valueOf(String.valueOf(costDetailJson.get("includeMinute")==null?"0":costDetailJson.get("includeMinute"))));
 				logger.info("基础价包含时长(单位,分钟) :includeminute"+costDetailJson.get("includeMinute"));
-				//查找车型的名字
-				order.setBookingGroupnames(String.valueOf(costDetailJson.get("carGroupName")==null?"":costDetailJson.get("carGroupName")));
 				//String orderStatus = String.valueOf(costDetailJson.get("orderStatus"));
 				//String payType = String.valueOf(costDetailJson.get("payType"));
 				//长途里程(公里）  ，  空驶里程(公里)
 				Double longDistanceNum = Double.valueOf(String.valueOf(costDetailJson.get("longDistanceNum")==null?"0.00":costDetailJson.get("longDistanceNum")));
 				//长途费(元) ， 空驶费(元)
 				Double longDistancePrice = Double.valueOf(String.valueOf(costDetailJson.get("longDistancePrice")==null?"0.00":costDetailJson.get("longDistancePrice")));
+				Double actualPayAmount = Double.valueOf(String.valueOf(costDetailJson.get("actualPayAmount")==null?"0.00":costDetailJson.get("actualPayAmount")));
 				order.setDistantNum(longDistanceNum);
 				order.setDistantFee(longDistancePrice);
 				order.setLongDistanceNum(longDistanceNum);
 				order.setLongdistanceprice(longDistancePrice);
+				order.setActualPayAmount(actualPayAmount);
 				logger.info("order:Includemileage"+order.getIncludemileage());
 				logger.info("order:Includeminute"+order.getIncludeminute());
 			}
