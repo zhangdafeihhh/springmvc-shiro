@@ -1,11 +1,13 @@
 package com.zhuanche.serv.driverScheduling;
 
 import com.alibaba.fastjson.JSON;
+import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.dutyEnum.EnumDriverDutyTimeFlag;
 import com.zhuanche.common.rocketmq.CommonRocketProducer;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.dto.driver.CarDriverDayDutyDTO;
 import com.zhuanche.dto.driverDuty.CarDriverDurationDTO;
@@ -335,8 +337,10 @@ public class AsyncDutyService {
 				paramMap.put("list", updateList);
 				// 批量修改
 				Integer timeInfoLines = 0;
+				String yearMonthStr = updateList.get(0).getTime();
 				for (DriverDutyTimeInfo timeInfo : updateList){
 					timeInfoLines += driverDutyTimeInfoExMapper.updateDriverDutyTimeInfoOne(timeInfo);
+					RedisCacheUtil.delete(Constants.REDISKEYPREFIX_DRIVERDUTYINFO+"_"+yearMonthStr+"_"+timeInfo.getDriverId());
 				}
 //				Integer result = driverDutyTimeInfoExMapper.updateDriverDutyTimeInfoList(paramMap);
 				logger.info("批量更新排班：入参{}"+JSON.toJSONString(dutyParamRequest)+"结果:"+timeInfoLines);

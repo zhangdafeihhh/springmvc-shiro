@@ -3,11 +3,13 @@ package com.zhuanche.serv.driverScheduling;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.dutyEnum.EnumDriverMonthDutyStatus;
 import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.dto.driverDuty.CarDriverMonthDTO;
 import com.zhuanche.dto.driverDuty.ColumnEntity;
@@ -20,6 +22,7 @@ import com.zhuanche.request.DriverMonthDutyRequest;
 import com.zhuanche.request.DutyParamRequest;
 import com.zhuanche.util.Check;
 import com.zhuanche.util.Common;
+import com.zhuanche.util.DateUtils;
 import mapper.mdbcarmanage.CarDriverMonthDutyMapper;
 import mapper.mdbcarmanage.ex.CarDriverMonthDutyExMapper;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
@@ -412,8 +415,10 @@ public class DriverMonthDutyService {
 				count = carDriverMonthDutyExMapper.saveDriverMonthDutyList(paramMap);
 			}
 			if (!("".equals(updateDriverMonthDutyList)||updateDriverMonthDutyList==null||updateDriverMonthDutyList.size()==0)) {
+				String yearMonthStr = time.substring(0, 7);
 				for(DriverMonthDutyRequest param : updateDriverMonthDutyList){
 					count += carDriverMonthDutyExMapper.updateDriverMonthDutyOne(param);
+					RedisCacheUtil.delete(Constants.REDISKEYPREFIX_ISINDUTY+"_"+yearMonthStr+"_"+param.getDriverId());
 				}
 //				count += carDriverMonthDutyExMapper.updateDriverMonthDutyList(paramMap);
 			}
@@ -483,7 +488,12 @@ public class DriverMonthDutyService {
 		if(Check.NuNObj(record)){
 			return 0;
 		}
-		return carDriverMonthDutyExMapper.updateDriverMonthDutyData(record);
+		int result = carDriverMonthDutyExMapper.updateDriverMonthDutyData(record);
+		if(result > 0){
+			String yearMonthStr = DateUtils.formatDate(record.getTime(), "yyyy-mm");
+			RedisCacheUtil.delete(Constants.REDISKEYPREFIX_ISINDUTY+"_"+yearMonthStr+"_"+record.getDriverId());
+		}
+		return result;
 	}
 
 	/** 
