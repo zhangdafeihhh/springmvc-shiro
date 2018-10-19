@@ -3,6 +3,7 @@ package com.zhuanche.controller.authc;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -81,11 +82,17 @@ public class RolemanagementController{
 //	@RequiresPermissions(value = { "SAVE_ROLE_PERMISSIONIDS" } )
 	public AjaxResponse savePermissionIds(@Verify(param="roleId",rule="required|min(1)") Integer roleId, @Verify(param="permissionIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String permissionIds) {
 		List<Integer> newPermissionIds = new ArrayList<Integer>();
-		if(permissionIds!=null) {
+		if(StringUtils.isNotEmpty(permissionIds) ) {
 			String[]  ids = permissionIds.split(",");
 			if(ids.length>0) {
 				for(String id : ids ) {
-					newPermissionIds.add(Integer.valueOf(id));
+					if(StringUtils.isNotEmpty(id)) {
+						try {
+							newPermissionIds.add(Integer.valueOf(id));
+						}catch(Exception ex) {
+							ex.printStackTrace();
+						}
+					}
 				}
 			}
 		}
