@@ -53,24 +53,24 @@ import java.util.*;
 public class DriverDailyReportController extends DriverQueryController {
 
 	private static Logger log =  LoggerFactory.getLogger(DriverDailyReportController.class);
-	
+
 	@Autowired
 	private DriverDailyReportExMapper driverDailyReportExMapper;
-	
+
 	@Autowired
 	private DataPermissionHelper dataPermissionHelper;
-	
+
 	@Autowired
 	private CarRelateGroupExMapper carRelateGroupExMapper;
 
 	@Autowired
 	private CarBizSupplierExMapper carBizSupplierExMapper;
-	
-	
+
+
 	@Autowired
 	@Qualifier("busOrderCostTemplate")
 	private MyRestTemplate busOrderCostTemplate;
-	
+
 	@RequestMapping("/list")
 	public String list(){
 		return "driverdailyreport/driverlist";
@@ -97,10 +97,10 @@ public class DriverDailyReportController extends DriverQueryController {
 	@ResponseBody
 	@RequestMapping(value = "/queryDriverReportData")
 	public AjaxResponse queryDriverWeekReportDataNew(String licensePlates, String driverName, String driverIds, String teamIds,
-		    @Verify(rule = "required",param = "suppliers") String suppliers,
-    		@Verify(rule = "required",param = "cities") String cities,
-		    @Verify(rule = "required",param = "statDateStart") String statDateStart,
-			@Verify(rule = "required",param = "statDateEnd") String statDateEnd, String sortName, String sortOrder, String groupIds, Integer page, Integer pageSize, Integer reportType) throws ParseException {
+													 @Verify(rule = "required",param = "suppliers") String suppliers,
+													 @Verify(rule = "required",param = "cities") String cities,
+													 @Verify(rule = "required",param = "statDateStart") String statDateStart,
+													 @Verify(rule = "required",param = "statDateEnd") String statDateEnd, String sortName, String sortOrder, String groupIds, Integer page, Integer pageSize, Integer reportType) throws ParseException {
 		//默认报告类型为日报
 		reportType = reportType == null ? 0 : reportType;
 		if (reportType.equals(0)){
@@ -234,9 +234,9 @@ public class DriverDailyReportController extends DriverQueryController {
 	@ResponseBody
 	@RequestMapping(value = "/exportDriverReportData")
 	public AjaxResponse exportDriverReportData(String licensePlates, String driverName, String driverIds, String teamIds,
-		   @Verify(rule = "required",param = "suppliers") String suppliers,
-		   @Verify(rule = "required",param = "cities") String cities,
-		   @Verify(rule = "required",param = "statDateStart") String statDateStart, String statDateEnd, String sortName, String sortOrder, String groupIds, Integer reportType, HttpServletRequest request, HttpServletResponse response) throws ParseException {
+											   @Verify(rule = "required",param = "suppliers") String suppliers,
+											   @Verify(rule = "required",param = "cities") String cities,
+											   @Verify(rule = "required",param = "statDateStart") String statDateStart, String statDateEnd, String sortName, String sortOrder, String groupIds, Integer reportType, HttpServletRequest request, HttpServletResponse response) throws ParseException {
 
 		//默认报告类型为日报
 		reportType = reportType == null ? 0 : reportType;
@@ -284,7 +284,7 @@ public class DriverDailyReportController extends DriverQueryController {
 		}
 
 		long time = new Date().getTime();
-
+		long time2 = 1;
 		String filename = "司机周/月报列表";
 		if(!(StringUtils.isNotEmpty(params.getGroupIds()) && (StringUtils.isEmpty(driverList)))){
 			params.setDriverIds(driverList);
@@ -305,15 +305,17 @@ public class DriverDailyReportController extends DriverQueryController {
 			}
 
 			long time1 = new Date().getTime();
-			System.out.println("month report queryDataBase time :"+ (time1-time));
+			log.info("month report queryDataBase time :"+ (time1-time));
 
 			rows = this.selectSuppierNameAndCityNameDays(list,reportType);
 
-			long time2 = new Date().getTime();
-			System.out.println("month report queryService time :"+ (time2-time1));
+			time2 = new Date().getTime();
+			log.info("month report queryService time :"+ (time2-time1));
 		}
 		try {
 			Workbook wb = this.exportExcel(rows,request.getRealPath("/")+ File.separator+"template"+File.separator+"driverDailyReport_info.xlsx",reportType);
+			long time3 = new Date().getTime();
+			log.info("month report exportExcel time :"+ (time3-time2));
 			this.exportExcelFromTemplet(request, response, wb, new String(filename.getBytes("gb2312"), "iso8859-1"));
 			return AjaxResponse.success("文件导出成功");
 		} catch (Exception e) {
@@ -391,11 +393,11 @@ public class DriverDailyReportController extends DriverQueryController {
 	}
 
 	/**
-	 * 
-	 * <p>Title: modifyDriverVolume</p>  
-	 * <p>Description: 司机营业信息查询</p>  
+	 *
+	 * <p>Title: modifyDriverVolume</p>
+	 * <p>Description: 司机营业信息查询</p>
 	 * @param ddre
-	 * @param statDateStart  
+	 * @param statDateStart
 	 * return: void
 	 */
 	private void modifyDriverVolume(DriverDailyReportDTO ddre, String statDateStart) {
@@ -423,7 +425,7 @@ public class DriverDailyReportController extends DriverQueryController {
 					return;
 				}
 				JSONObject jsonObject = JSONObject.parseObject(driverIncome);
-				log.info("modifyDriverVolume查询接口【/driverIncome/getDriverIncome】返回jsonObject成功."+jsonObject);
+//				log.info("modifyDriverVolume查询接口【/driverIncome/getDriverIncome】返回jsonObject成功."+jsonObject);
 				// 当日完成订单量
 				Integer orderCounts= Integer.valueOf(String.valueOf(jsonObject.get("orderCounts")));
 				ddre.setOperationNum(orderCounts);
@@ -470,7 +472,7 @@ public class DriverDailyReportController extends DriverQueryController {
 				}
 
 				JSONObject jsonObject = JSONObject.parseObject(driverIncome);
-				log.info("modifyMonthDriverVolume查询接口【/driverIncome/getDriverIncome】返回jsonObject成功."+jsonObject);
+//				log.info("modifyMonthDriverVolume查询接口【/driverIncome/getDriverIncome】返回jsonObject成功."+jsonObject);
 				// 当段日期完成订单量
 				Integer orderCounts= Integer.valueOf(String.valueOf(jsonObject.get("orderCounts")));
 				ddre.setOperationNum(orderCounts);
