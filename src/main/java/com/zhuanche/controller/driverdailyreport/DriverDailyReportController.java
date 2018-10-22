@@ -266,18 +266,25 @@ public class DriverDailyReportController extends DriverQueryController {
 		List<DriverDailyReportDTO> rows = new ArrayList<>();
 		List<DriverDailyReport> list = new ArrayList<>();
 
-		//判断权限   如果司机id为空为查询列表页
 		String driverList = null;
-		//如果页面输入了小组id
-		if(StringUtils.isNotEmpty(params.getGroupIds())){
-			//通过小组id查询司机id, 如果用户
-			driverList = super.queryAuthorityDriverIdsByTeamAndGroup(null, String.valueOf(params.getGroupIds()));
-			//如果该小组下无司机，返回空
-			if(StringUtils.isEmpty(driverList)){
-				log.info("司机日报列表-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds());
-				list = new ArrayList<DriverDailyReport>();
+		if (StringUtils.isEmpty(params.getDriverIds())){
+			//判断权限   如果司机id为空为查询列表页
+			//如果页面输入了小组id
+			if(StringUtils.isNotEmpty(params.getGroupIds()) || StringUtils.isNotEmpty(params.getTeamIds())){
+				//通过小组id查询司机id, 如果用户
+				driverList = super.queryAuthorityDriverIdsByTeamAndGroup(params.getTeamIds(), String.valueOf(params.getGroupIds()));
+				//如果该小组下无司机，返回空
+				if(StringUtils.isEmpty(driverList)){
+					log.info("司机日报列表-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds());
+					list = new ArrayList<DriverDailyReport>();
+				}
 			}
+		}else{
+			driverList = params.getDriverIds();
 		}
+
+		long time = new Date().getTime();
+
 		String filename = "司机周/月报列表";
 		if(!(StringUtils.isNotEmpty(params.getGroupIds()) && (StringUtils.isEmpty(driverList)))){
 			params.setDriverIds(driverList);
@@ -296,7 +303,14 @@ public class DriverDailyReportController extends DriverQueryController {
 					}
 				}
 			}
+
+			long time1 = new Date().getTime();
+			System.out.println("month report queryDataBase time :"+ (time1-time));
+
 			rows = this.selectSuppierNameAndCityNameDays(list,reportType);
+
+			long time2 = new Date().getTime();
+			System.out.println("month report queryService time :"+ (time2-time1));
 		}
 		try {
 			Workbook wb = this.exportExcel(rows,request.getRealPath("/")+ File.separator+"template"+File.separator+"driverDailyReport_info.xlsx",reportType);
