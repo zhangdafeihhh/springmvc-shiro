@@ -24,12 +24,14 @@ public class PermissionManageController {
 //	@RequiresPermissions(value = { "ADD_SAAS_PERMISSION" } )
 	public AjaxResponse addSaasPermission( 
 			@Verify(param="parentPermissionId",rule="required|min(0)")  Integer parentPermissionId, 
+			@Verify(param="permissionName",rule="required") String permissionName, 
 			@Verify(param="permissionCode",rule="required") String permissionCode, 
 			@Verify(param="permissionType",rule="required") Byte permissionType, 
 			String menuUrl, 
 			Byte menuOpenMode ) {
 		SaasPermission pemission =  new SaasPermission();
 		pemission.setParentPermissionId(parentPermissionId);
+		pemission.setPermissionName(permissionName);
 		pemission.setPermissionCode(permissionCode.trim());
 		pemission.setPermissionType(permissionType);
 		pemission.setMenuUrl(menuUrl==null? "": menuUrl.trim());
@@ -56,12 +58,14 @@ public class PermissionManageController {
 //	@RequiresPermissions(value = { "CHANGE_SAAS_PERMISSION" } )
 	public 	AjaxResponse changeSaasPermission(  
 			@Verify(param="permissionId",rule="required|min(1)")  Integer permissionId, 
+			@Verify(param="permissionName",rule="required") String permissionName, 
 			@Verify(param="permissionCode",rule="required") String permissionCode, 
 			@Verify(param="permissionType",rule="required") Byte permissionType, 
 			String menuUrl, 
 			Byte menuOpenMode ) {
 		SaasPermission pemissionForupdate = new SaasPermission();
 		pemissionForupdate.setPermissionId(permissionId);
+		pemissionForupdate.setPermissionName(permissionName);
 		pemissionForupdate.setPermissionCode(permissionCode.trim());
 		pemissionForupdate.setPermissionType(permissionType);
 		pemissionForupdate.setMenuUrl(menuUrl==null? "": menuUrl.trim());
