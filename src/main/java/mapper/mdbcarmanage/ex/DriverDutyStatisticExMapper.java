@@ -1,5 +1,8 @@
 package mapper.mdbcarmanage.ex;
 
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.entity.mdbcarmanage.DriverDutyStatistic;
 import com.zhuanche.entity.mdbcarmanage.DriverDutyStatisticParams;
 
@@ -12,6 +15,9 @@ public interface DriverDutyStatisticExMapper {
      * @param params
      * @return
      */
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     List<DriverDutyStatistic> queryForListObject(DriverDutyStatisticParams params);
 
     /**
@@ -19,6 +25,9 @@ public interface DriverDutyStatisticExMapper {
      * @param params
      * @return
      */
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     List<DriverDutyStatistic> queryDriverMonthDutyList(DriverDutyStatisticParams params);
 
     /**
@@ -26,5 +35,8 @@ public interface DriverDutyStatisticExMapper {
      * @param params
      * @return
      */
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     List<DriverDutyStatistic> queryDriverDutyHalfByDriverId(DriverDutyStatisticParams params);
 }
