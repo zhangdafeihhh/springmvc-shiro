@@ -270,9 +270,9 @@ public class DriverDailyReportController extends DriverQueryController {
 		if (StringUtils.isEmpty(params.getDriverIds())){
 			//判断权限   如果司机id为空为查询列表页
 			//如果页面输入了小组id
-			if(StringUtils.isNotEmpty(params.getGroupIds()) || StringUtils.isNotEmpty(params.getTeamIds())){
+			if(StringUtils.isNotEmpty(params.getGroupIds())){
 				//通过小组id查询司机id, 如果用户
-				driverList = super.queryAuthorityDriverIdsByTeamAndGroup(params.getTeamIds(), String.valueOf(params.getGroupIds()));
+				driverList = super.queryAuthorityDriverIdsByTeamAndGroup(null, String.valueOf(params.getGroupIds()));
 				//如果该小组下无司机，返回空
 				if(StringUtils.isEmpty(driverList)){
 					log.info("司机日报列表-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds());

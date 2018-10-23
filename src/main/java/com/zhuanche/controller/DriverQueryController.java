@@ -102,7 +102,7 @@ public class DriverQueryController {
         if(list !=null && list.size()>0){
             for (CarRelateTeam team : list) {
                 if (team!=null && team.getDriverId()!=null ) {
-                    driverIds += team.getDriverId() + ",";
+                    driverIds += "'" + team.getDriverId() + "',";
                 }
             }
             driverIds = driverIds.substring(0, driverIds.length()-1);

@@ -59,7 +59,7 @@
         and driver_name like CONCAT(#{driverName},'%')
       </if>
       <if test="driverIds != null and driverIds != '' ">
-        and r.driver_id in (#{driverIds})
+        and r.driver_id in (${driverIds})
 	  </if>
 	  <if test="teamIds != null and teamIds != ''">
         and car_team_id in (#{teamIds})
@@ -132,7 +132,7 @@
       and driver_name like CONCAT(#{driverName},'%')
     </if>
     <if test="driverIds != null and driverIds != '' " >
-      and driver_id in (#{driverIds})
+      and driver_id in (${driverIds})
     </if>
     <if test="teamIds != null and teamIds != '' " >
       and car_team_id in (#{teamIds})
