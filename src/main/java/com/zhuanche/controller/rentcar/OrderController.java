@@ -3,6 +3,7 @@ package com.zhuanche.controller.rentcar;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -223,12 +224,23 @@ public class OrderController{
 			paramMap.put("cityIdBatch", paramMap.get("visibleCityIds").toString().replaceAll("\\[", "").replaceAll("\\]", "")); //可见城市ID
 		}
 			
-		 // 从订单组取统计数据
-	    List<CarFactOrderInfoDTO> dtoList = carFactOrderInfoService.queryAllOrderDataList(paramMap);
+		// 查询ES（性能优化：采用分页的方式进行检索并获取数据）
+		List<CarFactOrderInfoDTO> result = new ArrayList<CarFactOrderInfoDTO>(10000);
+		for(int pageNo=1; ; pageNo++  ) {
+			paramMap.put("pageNo",pageNo);//页号
+		    paramMap.put("pageSize",5000);//每页记录数
+			 // 从订单组取统计数据
+		    List<CarFactOrderInfoDTO> dtoList = carFactOrderInfoService.queryAllOrderDataList(paramMap);
+			if(dtoList==null || dtoList.size()==0) {
+				break;
+			}
+			result.addAll( dtoList );
+		}
+		
 		@SuppressWarnings("deprecation")
 		Workbook wb;
 		try {
-			wb = carFactOrderInfoService.exportExceleOrderList(dtoList,request.getServletContext().getRealPath("/")+ "template" + File.separator +"orderList_info.xlsx");
+			wb = carFactOrderInfoService.exportExceleOrderList(result,request.getServletContext().getRealPath("/")+ "template" + File.separator +"orderList_info.xlsx");
 			Componment.fileDownload(response, wb, new String("订单列表".getBytes("gb2312"), "iso8859-1"));
 			
 		} catch (Exception e) {
