@@ -54,6 +54,8 @@ public class CarFactOrderInfoDTO{
 	private String factEndAddr; 
 	//订单状态  
 	private String status; 
+	//订单状态  名称
+	private String dicName; 
 	//是否拼车单  
 	private String airportId; 
 	//主订单号  
@@ -213,7 +215,8 @@ public class CarFactOrderInfoDTO{
 		this.factEndAddr = factEndAddr;
 	}
 	public String getStatus() {
-		List<String> dfw = Arrays.asList("10,15,13".split(","));
+		 return status;
+		/*List<String> dfw = Arrays.asList("10,15,13".split(","));
 		List<String> fwz = Arrays.asList("20,25,30,35,40".split(","));
 		List<String> ywc = Arrays.asList("45,50,55,42,43".split(","));
 		List<String> yqx = Arrays.asList("60".split(","));
@@ -227,7 +230,7 @@ public class CarFactOrderInfoDTO{
 			return "已取消";
 		 }else {
 			 return status;
-		 }
+		 }*/
 	}
 	public void setStatus(String status) {
 		this.status = status;
@@ -249,6 +252,12 @@ public class CarFactOrderInfoDTO{
 	}
 	public void setOrderId(String orderId) {
 		this.orderId = orderId;
+	}
+	public String getDicName() {
+		return dicName;
+	}
+	public void setDicName(String dicName) {
+		this.dicName = dicName;
 	}
 	
 	
