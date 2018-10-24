@@ -47,7 +47,7 @@
         AND di.name = #{name}
       </if>
       <if test="phone !=null and phone !=''">
-        AND di.phone LIKE CONCAT('%', #{phone}, '%')
+        AND di.phone LIKE CONCAT(#{phone}, '%')
       </if>
       <if test="licensePlates !=null and licensePlates !=''">
         AND di.license_plates = #{licensePlates}
@@ -120,7 +120,7 @@
     WHERE ca.driver_id = #{driverId}
     and DATE_FORMAT(ca.create_date,'%Y-%m')= #{createDateBegin}
     <if test="orderNo!=null and orderNo!=''">
-      AND ca.order_no LIKE CONCAT('%', #{orderNo}, '%')
+      AND ca.order_no LIKE CONCAT(#{orderNo}, '%')
     </if>
     ORDER BY ca.create_date DESC
   </select>
@@ -162,22 +162,22 @@
       <![CDATA[ AND ca.create_date <=  concat(#{createDateEnd},' 23:59:59') ]]>
     </if>
     <if test="orderNo!=null and orderNo!=''">
-      AND ca.order_no LIKE CONCAT('%', #{orderNo}, '%')
+      AND ca.order_no LIKE CONCAT(#{orderNo}, '%')
     </if>
     <if test="orderNos!=null and orderNos!=''">
       AND ca.order_no in (${orderNos})
     </if>
     <if test="driverName!=null and driverName!=''">
-      AND di.name LIKE CONCAT('%', #{driverName}, '%')
+      AND di.name LIKE CONCAT(#{driverName}, '%')
     </if>
     <if test="driverPhone!=null and driverPhone!=''">
-      AND di.phone LIKE CONCAT('%', #{driverPhone}, '%')
+      AND di.phone LIKE CONCAT(#{driverPhone}, '%')
     </if>
     <if test="driverIds!=null and driverIds!=''">
       AND ca.driver_id in (${driverIds})
     </if>
     <if test="licensePlates!=null and licensePlates!=''">
-      AND di.license_plates LIKE CONCAT('%', #{licensePlates}, '%')
+      AND di.license_plates LIKE CONCAT(#{licensePlates}, '%')
     </if>
     <if test="cityId!=null and cityId!=''">
       and di.service_city = #{cityId}
