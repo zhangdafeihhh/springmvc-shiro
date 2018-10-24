@@ -74,11 +74,11 @@
       and t.driverId = #{driverId}
     </if>
     <if test="sortName ==null or sortName ==''">
-      ORDER BY time, id desc
+      ORDER BY time desc
     </if>
     <if test="sortName !=null and sortName !=''">
       ORDER BY
-      ${sortName},id ${sortOrder}
+      ${sortName} ${sortOrder}
     </if>
   </select>
 
@@ -130,9 +130,15 @@
     <if test="driverIds!=null and driverIds!=''">
       and t.driverId in (${driverIds})
     </if>
+    <if test="driverId!=null and driverId!=''">
+      and t.driverId = #{driverId}
+    </if>
+    <if test="phone !=null and phone !=''">
+      and t.phone LIKE CONCAT(#{phone}, '%')
+    </if>
     GROUP BY licensePlates
     <if test="sortName ==null or sortName ==''">
-      ORDER BY licensePlates,time, id desc
+      ORDER BY time desc
     </if>
     <if test="sortName !=null and sortName !=''">
       ORDER BY
