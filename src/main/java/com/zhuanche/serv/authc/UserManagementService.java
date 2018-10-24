@@ -68,9 +68,10 @@ public class UserManagementService{
 			return AjaxResponse.fail(RestErrorCode.ACCOUNT_EXIST );
 		}
 		if( StringUtils.isEmpty(user.getUserName()) ) {
-			user.setUserName(null);
+			user.setUserName("");
 		}
 		user.setPassword( PasswordUtil.md5(SaasConst.INITIAL_PASSWORD, user.getAccount())  );
+		user.setRoleId(0);
 		user.setAccountType(100);
 		user.setStatus(200);
 		SSOLoginUser ssoLoginUser = WebSessionUtil.getCurrentLoginUser();
@@ -132,7 +133,7 @@ public class UserManagementService{
 		}
 		//可以修改的字段
 		if( StringUtils.isEmpty(newUser.getUserName()) ) {
-			newUser.setUserName(null);
+			newUser.setUserName("");
 		}
 		if( StringUtils.isEmpty(newUser.getCities()) ) {
 			newUser.setCities("");
