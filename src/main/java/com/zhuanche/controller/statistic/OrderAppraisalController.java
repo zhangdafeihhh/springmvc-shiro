@@ -2,6 +2,9 @@ package com.zhuanche.controller.statistic;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -72,6 +75,9 @@ public class OrderAppraisalController extends DriverQueryController{
 	 */
 	@ResponseBody
 	@RequestMapping("/orderAppraisalListData")
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
 	public AjaxResponse appraisalDataList(String cityId,
 										  String supplierId,
 										  String teamId,
@@ -142,6 +148,9 @@ public class OrderAppraisalController extends DriverQueryController{
 	 */
 	@RequestMapping("/exportOrderAppraisal")
 	@ResponseBody
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
 	public AjaxResponse exportOrderAppraisal(String cityId,
 									 String supplierId,
 									 String teamId,
@@ -255,6 +264,9 @@ public class OrderAppraisalController extends DriverQueryController{
 
 	@ResponseBody
 	@RequestMapping("/orderAppraisalListFromDriverOutageData")
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
 	public Object orderAppraisalListFromDriverOutageData(@Verify(param = "outageId", rule = "required") Integer outageId,
 														 Integer page,
 														 Integer pageSize) {
