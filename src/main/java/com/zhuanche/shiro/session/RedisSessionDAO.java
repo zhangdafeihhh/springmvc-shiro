@@ -8,14 +8,18 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.shiro.cache.Cache;
+import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.session.mgt.eis.CachingSessionDAO;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.realm.UsernamePasswordRealm;
 
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import mapper.mdbcarmanage.ex.SaasRolePermissionRalationExMapper;
@@ -41,8 +45,12 @@ public class RedisSessionDAO extends CachingSessionDAO{
     public void setRedisTemplate(RedisTemplate<String, Serializable> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
+    private AuthorizingRealm authorizingRealm;
+    public void setAuthorizingRealm(AuthorizingRealm authorizingRealm) {
+		this.authorizingRealm = authorizingRealm;
+	}
 
-    @Override
+	@Override
     protected void doUpdate(Session session) {
         redisTemplate.opsForValue().set(KEY_PREFIX_OF_SESSION+session.getId(), (Serializable)session,30,TimeUnit.MINUTES);
 //        RedisCacheUtil.set(SESSION_KEY+session.getId(), session, 1*60*60 );
@@ -127,19 +135,30 @@ public class RedisSessionDAO extends CachingSessionDAO{
 			        		allSessionIds.addAll(sessionIds);
 			        	}
 			    	}
-			    	//E1：执行清除Redis key
+			    	
+			    	//E1：执行清除执久化的会话(这里是保存在REDIS中的)
 			    	for( String sessionId : allSessionIds) {
 	            		redisKeysNeedDelete.add( KEY_PREFIX_OF_SESSION + sessionId );
 			    	}
 			    	redisTemplate.delete(redisKeysNeedDelete);
-			    	//E2：执行清理EHCACHE的内存缓存
-	        		for(String sessionId : allSessionIds ){
-	        			SimpleSession session = (SimpleSession)cache.get(sessionId);
-	        			if(session!=null) {
-		        			session.setExpired(true);
-	        			}
-	        			cache.remove(sessionId);
-	        		}
+			    	//E2：执行清理shiro会话缓存
+			    	if(cache!=null) {
+		        		for(String sessionId : allSessionIds ){
+		        			SimpleSession session = (SimpleSession)cache.get(sessionId);
+		        			if(session!=null) {
+			        			session.setExpired(true);
+		        			}
+		        			cache.remove(sessionId);
+		        		}
+			    	}
+	        		//E3：执行清理shiro 认证与授权缓存
+			    	for( String account : accounts) {
+		        		SSOLoginUser principal  = new SSOLoginUser();
+		        		principal.setLoginName(  account );
+		        		SimplePrincipalCollection simplePrincipalCollection = new SimplePrincipalCollection( );
+		        		simplePrincipalCollection.add(principal, authorizingRealm.getName() );
+		        		((UsernamePasswordRealm)authorizingRealm).clearCache( simplePrincipalCollection );
+			    	}
 				}catch(Exception ex) {
 				}finally {
 					DynamicRoutingDataSource.setDefault("mdbcarmanage-DataSource");

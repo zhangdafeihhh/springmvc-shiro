@@ -33,6 +33,7 @@
 		<property name="activeSessionsCacheName" value="shiro-activeSessionCache" />
 		<property name="sessionIdGenerator" ref="sessionIdGenerator" />
 		<property name="redisTemplate" ref="redisTemplate" />
+		<property name="authorizingRealm" ref="shiroRealm" />
 	</bean>
 	<!-- 会话管理器 -->
 	<bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
