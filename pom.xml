@@ -94,7 +94,7 @@
 		<dependency>
 			<groupId>com.zhuanche</groupId>
 			<artifactId>mp-util</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mybatis</groupId>
