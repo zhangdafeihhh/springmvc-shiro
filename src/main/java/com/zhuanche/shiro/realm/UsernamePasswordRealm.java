@@ -33,7 +33,7 @@ public class UsernamePasswordRealm extends AuthorizingRealm {
 	private SaasPermissionExMapper  saasPermissionExMapper;
 	@Autowired
 	private SaasRoleExMapper           saasRoleExMapper;
-    
+	
     /**重写：获取用户的身份认证信息**/
 	@Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException{
@@ -106,6 +106,13 @@ public class UsernamePasswordRealm extends AuthorizingRealm {
 		logger.info( "[获取用户授权信息(权限)] "+account+"="+perms);
         return authorizationInfo;
     }
+	@Override
+    public Object getAuthorizationCacheKey(PrincipalCollection principals) {
+		SSOLoginUser loginUser = (SSOLoginUser) principals.getPrimaryPrincipal();
+		String account = loginUser.getLoginName(); //登录名
+        return "-AuthInfo-"+account;
+    }
+	
 
     @Override
     public void clearCachedAuthorizationInfo(PrincipalCollection principals) {
