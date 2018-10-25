@@ -117,37 +117,13 @@ public class UsernamePasswordRealm extends AuthorizingRealm {
     @Override
     public void clearCachedAuthorizationInfo(PrincipalCollection principals) {
         super.clearCachedAuthorizationInfo(principals);
-        clearAllCache();
     }
-
     @Override
     public void clearCachedAuthenticationInfo(PrincipalCollection principals) {
         super.clearCachedAuthenticationInfo(principals);
-        clearAllCache();
     }
-
     @Override
     public void clearCache(PrincipalCollection principals) {
         super.clearCache(principals);
-        clearAllCache();
     }
-
-    public void clearAllCachedAuthorizationInfo() {
-        if (getAuthorizationCache() != null) {
-            getAuthorizationCache().clear();
-        }
-    }
-
-    public void clearAllCachedAuthenticationInfo() {
-        if (getAuthenticationCache() != null) {
-            getAuthenticationCache().clear();
-        }
-
-    }
-
-    public void clearAllCache() {
-        clearAllCachedAuthenticationInfo();
-        clearAllCachedAuthorizationInfo();
-    }
-
 }
