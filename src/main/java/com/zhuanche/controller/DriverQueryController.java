@@ -151,6 +151,20 @@ public class DriverQueryController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
+    public Map<String,Object> queryCityName(int cityId){
+        Map<String, Object> result = new HashMap<String, Object>();
+        CarBizCity cityEntity = carBizCityMapper.selectByPrimaryKey(cityId);
+        if(cityEntity!=null){
+            result.put("cityName", cityEntity.getCityName());
+        }else{
+            result.put("cityName", "");
+        }
+        return result;
+    }
+
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     public Map<String,Object> querySupplierNameAndCityName(int cityId, int supplierId){
         Map<String, Object> result = new HashMap<String, Object>();
         CarBizSupplier supplierEntity = carBizSupplierMapper.selectByPrimaryKey(supplierId);

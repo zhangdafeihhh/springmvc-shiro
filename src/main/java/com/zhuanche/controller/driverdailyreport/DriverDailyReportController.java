@@ -344,7 +344,7 @@ public class DriverDailyReportController extends DriverQueryController {
 	 * return: List<DriverDailyReportDTO>
 	 */
 	@MasterSlaveConfigs(configs = {
-			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})
 	public List<DriverDailyReportDTO> selectSuppierNameAndCityNameDays(List<DriverDailyReport> rows,Integer reportType) throws ParseException {
 		List<DriverDailyReportDTO> list = null;

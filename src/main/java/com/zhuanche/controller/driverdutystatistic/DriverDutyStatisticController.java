@@ -15,11 +15,13 @@ import com.zhuanche.entity.mdbcarmanage.DriverDutyStatistic;
 import com.zhuanche.entity.mdbcarmanage.DriverDutyStatisticParams;
 import com.zhuanche.entity.mdblog.StatisticDutyHalf;
 import com.zhuanche.entity.mdblog.StatisticDutyHalfParams;
+import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import mapper.mdbcarmanage.ex.DriverDutyStatisticExMapper;
 import mapper.mdblog.ex.StatisticDutyHalfExMapper;
+import mapper.rentcar.ex.CarBizCityExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -39,10 +41,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 司机考勤查询
@@ -58,6 +57,9 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	private DriverDutyStatisticExMapper driverDutyStatisticExMapper;
 	@Autowired
 	private StatisticDutyHalfExMapper statisticDutyHalfExMapper;
+	@Autowired
+	private CarBizCityExMapper carBizCityExMapper;
+
 	/**
 	 * 司机考勤查询
 	 * @param cityId 城市ID
@@ -304,15 +306,26 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	 * @return
 	 * return: List<DriverDailyReportDTO>
 	 */
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
 	public List<DriverDutyStatisticDTO> selectSuppierNameAndCityName(List<DriverDutyStatistic> rows){
 		List<DriverDutyStatisticDTO> list = null;
 		//不为空进行转换并查询城市名称和供应商名称
 		if(rows!=null&&rows.size()>0){
+			Set<Integer> s = new HashSet();
 			for(DriverDutyStatistic driverDutyStatistic : rows){
-				//查询城市名称和供应商名称
-				Map<String, Object> result = super.querySupplierNameAndCityName(driverDutyStatistic.getCityid(), driverDutyStatistic.getSupplierid());
-				driverDutyStatistic.setCityName((String)result.get("cityName"));
-				driverDutyStatistic.setSupplierName((String)result.get("supplierName"));
+				s.add(driverDutyStatistic.getCityid());
+			}
+			//查询供应商名称，一次查询出来避免多次读库
+			List<CarBizCity> names = carBizCityExMapper.queryNameByIds(s);
+			for (DriverDutyStatistic entity: rows) {
+				for (CarBizCity name: names) {
+					if (name.getCityId().equals(entity.getCityid())){
+						entity.setCityName(name.getCityName());
+						break;
+					}
+				}
 			}
 			list = BeanUtil.copyList(rows, DriverDutyStatisticDTO.class);
 		}
