@@ -314,7 +314,7 @@ public class LoginController{
 		if(principalCollection!=null) {
 			Cache<Object, AuthorizationInfo> cache = usernamePasswordRealm.getAuthorizationCache();
 			if(cache!=null) {
-				AuthorizationInfo info = cache.get(principalCollection);
+				AuthorizationInfo info = cache.get(  usernamePasswordRealm.getAuthorizationCacheKey(principalCollection)  );
 				if(info!=null) {
 					Collection<String> pemissionStrings = info.getStringPermissions();
 					if(pemissionStrings!=null && pemissionStrings.size()>0 ) {
