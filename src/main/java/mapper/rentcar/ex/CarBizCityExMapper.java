@@ -1,11 +1,10 @@
 package mapper.rentcar.ex;
 
-import java.util.List;
-import java.util.Set;
-
+import com.zhuanche.entity.rentcar.CarBizCity;
 import org.apache.ibatis.annotations.Param;
 
-import com.zhuanche.entity.rentcar.CarBizCity;
+import java.util.List;
+import java.util.Set;
 
 public interface CarBizCityExMapper{
 	/**根据城市ID，查询城市信息**/
@@ -15,4 +14,9 @@ public interface CarBizCityExMapper{
     Integer queryCityByCityName(@Param("cityName") String cityName);
     
     CarBizCity queryCarBizCityById(CarBizCity params);
+
+    /**
+     * 根据城市ID，查询城市名称**/
+    List<CarBizCity> queryNameByIds( @Param("cityIds")  Set<Integer> cityIds );
+
 }
