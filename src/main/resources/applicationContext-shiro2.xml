@@ -6,12 +6,18 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-	<!-- ********************************配置cacheManager（用于shiro安全管理器，用来缓存用户会话、认证信息、授权信息）-->
-	<bean id="ehCacheManager"	class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+	<!-- ********************************配置基于EhCache的cacheManager（用于shiro安全管理器，用来缓存用户会话、认证信息、授权信息）-->
+	<!-- <bean id="ehCacheManager"	class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
 		<property name="configLocation" value="classpath:ehcache.xml" />
 	</bean>
 	<bean id="shiroCacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
 		<property name="cacheManager" ref="ehCacheManager" />
+	</bean> -->
+
+	<!-- ********************************配置基于Redis的cacheManager（用于shiro安全管理器，用来缓存用户会话、认证信息、授权信息）-->
+	<bean id="shiroCacheManager" class="com.zhuanche.shiro.cache.RedisCacheManager">
+		<property name="redisTemplate" ref="redisTemplate" />
+		<property name="expireSeconds" value="3600" />
 	</bean>
 	
 	<!-- ********************************配置会话Session Cookie -->
@@ -58,6 +64,8 @@
 	
 	<!-- ********************************配置Realm实现 -->
 	<bean id="shiroRealm" class="com.zhuanche.shiro.realm.UsernamePasswordRealm">
+		<property name="name" value="SAASUsernamePasswordRealm" />
+		<property name="authorizationCachingEnabled" value="true" /><!-- 是否启用授权缓存（生产环境可调节此参数进行调优） -->
 	</bean>
 	
 	<!-- ********************************配置SecurityManager安全管理器 -->
