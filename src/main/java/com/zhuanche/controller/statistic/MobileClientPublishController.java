@@ -1,5 +1,8 @@
 package com.zhuanche.controller.statistic;
 
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -42,6 +45,9 @@ public class MobileClientPublishController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/queryMobileClientPublish")
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
 	public AjaxResponse queryMobileClientPublish() {
 		log.info("手机端管理版本：queryMobileClientPublish");
 		String suppliers = WebSessionUtil.getCurrentLoginUser().getSupplierIds().toString();
@@ -55,8 +61,17 @@ public class MobileClientPublishController {
 		return AjaxResponse.success(dto);
 	}
 
+	/**
+	 * 通过验证码获取下载地址
+	 * @param request
+	 * @param phoneCode
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping(value = "/valiteCode")
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
 	public AjaxResponse valiteCode(HttpServletRequest request, @Verify(param = "phoneCode",rule = "required") String phoneCode) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		//登陆名
@@ -102,6 +117,7 @@ public class MobileClientPublishController {
 			log.info("短信验证码发送用户userName:"+userName+"  手机号phone:"+user.getMobile()+"   验证码code:"+code);
 			SmsSendUtil.send(user.getMobile(), "验证码为："+code+" 验证码60秒内有效!");
 			log.info("session中验证码放的key为:"+userName+"_"+VALIDATE_CODE);
+			WebSessionUtil.removeAttribute(userName+"_"+VALIDATE_CODE);
 			WebSessionUtil.setAttribute(userName+"_"+VALIDATE_CODE, code);
 			return AjaxResponse.success(0);
 		}else{

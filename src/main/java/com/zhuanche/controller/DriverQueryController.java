@@ -1,5 +1,8 @@
 package com.zhuanche.controller;
 
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
@@ -42,6 +45,9 @@ public class DriverQueryController {
      * @return
      * return: String
      */
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     public String queryAuthorityDriverIdsByTeamAndGroup(String teamIds,String groupIds){
         //车队id如果 为空，将用户的车队id赋值
         if(StringUtils.isEmpty(teamIds)){
@@ -128,6 +134,9 @@ public class DriverQueryController {
      * @return
      * return: Map<String,Object>
      */
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     public Map<String,Object> querySupplierName(int supplierId){
         Map<String, Object> result = new HashMap<String, Object>();
         CarBizSupplier supplierEntity = carBizSupplierMapper.selectByPrimaryKey(supplierId);
@@ -139,6 +148,9 @@ public class DriverQueryController {
         return result;
     }
 
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     public Map<String,Object> querySupplierNameAndCityName(int cityId, int supplierId){
         Map<String, Object> result = new HashMap<String, Object>();
         CarBizSupplier supplierEntity = carBizSupplierMapper.selectByPrimaryKey(supplierId);

@@ -2,6 +2,9 @@ package com.zhuanche.controller.driverdutystatistic;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -75,6 +78,9 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	 */
 	@RequestMapping(value = "/driverDutyStatisticDailData")
 	@ResponseBody
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
 	public AjaxResponse driverDutyStatisticDailData(@Verify(param = "cityId",rule = "required") String cityId, @Verify(param = "supplierId",rule = "required")String supplierId, String teamId,
 			String groupIds, String name, String driverId, String  phone, String licensePlates,
 			@Verify(param = "startTime",rule = "required") String startTime, String endTime, String sortName, String sortOrder, Integer page, Integer pageSize, Integer reportType) throws ParseException {
@@ -152,6 +158,9 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	 */
 	@RequestMapping(value = "/driverDutyStatisticHalfData")
 	@ResponseBody
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
 	public AjaxResponse driverDutyStatisticHalfData(@Verify(param = "driverId",rule = "required") String driverId,@Verify(param = "time",rule = "required") String time, Integer page, Integer pageSize) throws ParseException {
 
 		StatisticDutyHalfParams params = new StatisticDutyHalfParams(driverId, time, page, pageSize);
@@ -185,6 +194,9 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	 */
 	@ResponseBody
 	@RequestMapping("/exportDriverDutyStatistic")
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
 	public AjaxResponse exportDriverDuty(@Verify(param = "cityId",rule = "required") String cityId, @Verify(param = "supplierId",rule = "required") String supplierId, String teamId, String groupIds, String name,
 		 String  phone, String licensePlates,@Verify(param = "startTime",rule = "required")  String startTime,
 		 String endTime, Integer reportType, HttpServletRequest request, HttpServletResponse response) throws ParseException {
