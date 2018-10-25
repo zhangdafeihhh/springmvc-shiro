@@ -87,7 +87,17 @@
 		from car_biz_city t
 	 	where t.city_id = #{cityId} limit 1;
 	 </select>
-	 
-	 
+
+    <!-- 根据城市ID，查询城市信息 -->
+    <select id="queryNameByIds" resultType="com.zhuanche.entity.rentcar.CarBizCity" >
+        select t.city_id cityId, t.city_name cityName from car_biz_city t
+        where status=1
+        <if test="cityIds!=null and cityIds.size()>0">
+            and city_id IN
+            <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
+                #{cid}
+            </foreach>
+        </if>
+    </select>
 	 
   </mapper>
