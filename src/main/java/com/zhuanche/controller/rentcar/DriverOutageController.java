@@ -1,14 +1,5 @@
 package com.zhuanche.controller.rentcar;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.*;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.google.common.collect.Maps;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
@@ -19,15 +10,21 @@ import com.zhuanche.entity.rentcar.DriverOutage;
 import com.zhuanche.serv.rentcar.DriverOutageService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
-import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.DateUtils;
-import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 
 /**
@@ -216,6 +213,7 @@ public class DriverOutageController {
         DriverOutage params = new DriverOutage();
         params.setDriverPhone(driverPhone);
         params.setDriverName(driverName);
+        params.setOutStartDateStr(outStartDate);
         try {
             params.setOutStartDate(DateUtils.parse(outStartDate, "yyyy-MM-dd HH:mm:ss", Date.class));
         } catch (Exception e){

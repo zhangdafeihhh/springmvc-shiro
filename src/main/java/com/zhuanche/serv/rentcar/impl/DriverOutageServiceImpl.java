@@ -1,35 +1,36 @@
 package com.zhuanche.serv.rentcar.impl;
 
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Maps;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.entity.rentcar.CarImportExceptionEntity;
 import com.zhuanche.entity.rentcar.DriverOutage;
-import com.zhuanche.entity.rentcar.DriverOutageVo;
+import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.serv.rentcar.DriverOutageService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Common;
-import com.zhuanche.util.MyRestTemplate;
 import com.zhuanche.util.ValidateUtils;
-import mapper.rentcar.DriverOutageMapper;
 import mapper.rentcar.ex.DriverOutageExMapper;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpException;
+import org.apache.http.entity.ContentType;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -41,12 +42,16 @@ public class DriverOutageServiceImpl implements DriverOutageService {
     @Autowired
     private DriverOutageExMapper driverOutageExMapper;
 
-    @Autowired
-    private DriverOutageMapper driverOutageMapper;
+//    @Autowired
+//    private DriverOutageMapper driverOutageMapper;
 
-    @Autowired
-    @Qualifier("carApiTemplate")
-    private MyRestTemplate carApiTemplate;
+//    @Autowired
+//    @Qualifier("carApiTemplate")
+//    private MyRestTemplate carApiTemplate;
+
+    //mp-restapi service
+    @Value("${mp.restapi.url}")
+    private String mpReatApiUrl;
 
     @Override
 //    @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
@@ -182,51 +187,146 @@ public class DriverOutageServiceImpl implements DriverOutageService {
 
     @Override
     public Map<String, Object> saveDriverOutage(DriverOutage params) {
-        Map<String, Object> result = new HashMap<String, Object>();
-        // 调接口，保存
+//        Map<String, Object> result = new HashMap<String, Object>();
+//        // 调接口，保存
+//        Map<String, Object> paramMap = new HashMap<String, Object>();
+//
+//        params.setOutageSource(2);//人工停运
+//        params.setRemoveStatus(3);//待执行
+//        params.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
+//        params.setCreateName(WebSessionUtil.getCurrentLoginUser().getLoginName());
+//
+//        JSONObject json = JSONObject.fromObject(params);
+//        paramMap.put("driverOutageInfo", json);
+//        String url = "/webservice/outage/saveDriverOutage";
+//        result = carApiTemplate.postForObject(url, JSONObject.class, paramMap);
+//
+//        return result;
+
+        Map<String, Object> result = Maps.newHashMap();
         Map<String, Object> paramMap = new HashMap<String, Object>();
+        paramMap.put("driverId", params.getDriverId());
+        paramMap.put("outStartDate", params.getOutStartDateStr());
+        paramMap.put("outStopLongTime", params.getOutStopLongTime());
+        paramMap.put("outageSource", 2);//人工停运
+        paramMap.put("outageReason", params.getOutageReason());
+        paramMap.put("createBy", WebSessionUtil.getCurrentLoginUser().getId());
+        paramMap.put("createName", WebSessionUtil.getCurrentLoginUser().getName());
 
-        params.setOutageSource(2);//人工停运
-        params.setRemoveStatus(3);//待执行
-        params.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
-        params.setCreateName(WebSessionUtil.getCurrentLoginUser().getLoginName());
+        String url = mpReatApiUrl + Common.SAVE_DRIVER_OUTAGE;
+        String jsonObjectStr = null;
+        try {
+            jsonObjectStr = HttpClientUtil.buildPostRequest(url).addParams(paramMap).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
+        } catch (HttpException e) {
+            logger.info("临时停运调用接口 paramMap={},error={}", paramMap, e);
+        }
+        logger.info("临时停运调用新增接口 paramMap={}, result={}", paramMap, jsonObjectStr);
+        JSONObject jsonObject = JSON.parseObject(jsonObjectStr);
 
-        JSONObject json = JSONObject.fromObject(params);
-        paramMap.put("driverOutageInfo", json);
-        String url = "/webservice/outage/saveDriverOutage";
-        result = carApiTemplate.postForObject(url, JSONObject.class, paramMap);
-
+        if(jsonObject!=null && jsonObject.containsKey("code")){
+            if(jsonObject.getIntValue("code")==0) {
+                result.put("result", 1);
+                result.put("exception", "成功！");
+            }else{
+                result.put("result", 0);
+                result.put("exception", jsonObject.get("msg"));
+            }
+        }else{
+            result.put("result", 0);
+            result.put("exception", "调用接口停运失败！");
+        }
         return result;
     }
 
     @Override
     public Map<String, Object> updateDriverOutage(DriverOutage params) {
-        Map<String, Object> result = new HashMap<String, Object>();
-        // 调接口，保存
-        Map<String, Object> paramMap = new HashMap<String, Object>();
-        params.setRemoveBy(WebSessionUtil.getCurrentLoginUser().getId());
-        params.setRemoveName(WebSessionUtil.getCurrentLoginUser().getLoginName());
-        JSONObject json = JSONObject.fromObject(params);
-        paramMap.put("driverOutageInfo", json);
-        String url = "/webservice/outage/updateDriverOutage";
-        result = carApiTemplate.postForObject(url, JSONObject.class, paramMap);
+//        Map<String, Object> result = new HashMap<String, Object>();
+//        // 调接口，保存
+//        Map<String, Object> paramMap = new HashMap<String, Object>();
+//        params.setRemoveBy(WebSessionUtil.getCurrentLoginUser().getId());
+//        params.setRemoveName(WebSessionUtil.getCurrentLoginUser().getLoginName());
+//        JSONObject json = JSONObject.fromObject(params);
+//        paramMap.put("driverOutageInfo", json);
+//        String url = "/webservice/outage/updateDriverOutage";
+//        result = carApiTemplate.postForObject(url, JSONObject.class, paramMap);
+//
+//        return result;
+        Map<String, Object> result = Maps.newHashMap();
+        Map<String, Object> paramMap = Maps.newHashMap();
+        paramMap.put("outageId", params.getOutageId());
+        paramMap.put("removeReason", params.getRemoveReason());
+        paramMap.put("removeBy", WebSessionUtil.getCurrentLoginUser().getId());
+        paramMap.put("removeName", WebSessionUtil.getCurrentLoginUser().getName());
 
+        String url = mpReatApiUrl + Common.UPDATE_DRIVER_OUTAGE;
+        String jsonObjectStr = null;
+        try {
+            jsonObjectStr = HttpClientUtil.buildPostRequest(url).addParams(paramMap).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
+        } catch (HttpException e) {
+            logger.info("临时停运调用接口 paramMap={},error={}", paramMap, e);
+        }
+        logger.info("临时停运调用解除接口 paramMap={}, result={}", paramMap, jsonObjectStr);
+        JSONObject jsonObject = JSON.parseObject(jsonObjectStr);
+
+        if(jsonObject!=null && jsonObject.containsKey("code")){
+            if(jsonObject.getIntValue("code")==0) {
+                result.put("result", 1);
+                result.put("exception", "成功！");
+            }else{
+                result.put("result", 0);
+                result.put("exception", jsonObject.get("msg"));
+            }
+        }else{
+            result.put("result", 0);
+            result.put("exception", "调用接口解除停运失败！");
+        }
         return result;
     }
 
 
     @Override
     public Map<String, Object> updateDriverOutages(DriverOutage params) {
-        Map<String, Object> result = new HashMap<String, Object>();
-        // 调接口，保存
-        Map<String, Object> paramMap = new HashMap<String, Object>();
-        params.setRemoveBy(WebSessionUtil.getCurrentLoginUser().getId());
-        params.setRemoveName(WebSessionUtil.getCurrentLoginUser().getLoginName());
-        JSONObject json = JSONObject.fromObject(params);
-        paramMap.put("driverOutageInfo", json);
-        String url = "/webservice/outage/updateDriverOutages";
-        result = carApiTemplate.postForObject(url, JSONObject.class, paramMap);
+//        Map<String, Object> result = new HashMap<String, Object>();
+//        // 调接口，保存
+//        Map<String, Object> paramMap = new HashMap<String, Object>();
+//        params.setRemoveBy(WebSessionUtil.getCurrentLoginUser().getId());
+//        params.setRemoveName(WebSessionUtil.getCurrentLoginUser().getLoginName());
+//        JSONObject json = JSONObject.fromObject(params);
+//        paramMap.put("driverOutageInfo", json);
+//        String url = "/webservice/outage/updateDriverOutages";
+//        result = carApiTemplate.postForObject(url, JSONObject.class, paramMap);
+//
+//        return result;
 
+        Map<String, Object> result = Maps.newHashMap();
+        Map<String, Object> paramMap = Maps.newHashMap();
+        paramMap.put("outageIds", params.getOutageIds());
+        paramMap.put("removeReason", params.getRemoveReason());
+        paramMap.put("removeBy", WebSessionUtil.getCurrentLoginUser().getId());
+        paramMap.put("removeName", WebSessionUtil.getCurrentLoginUser().getName());
+
+        String url = mpReatApiUrl + Common.UPDATE_DRIVER_OUTAGES;
+        String jsonObjectStr = null;
+        try {
+            jsonObjectStr = HttpClientUtil.buildPostRequest(url).addParams(paramMap).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
+        } catch (HttpException e) {
+            logger.info("临时停运调用接口 paramMap={},error={}", paramMap, e);
+        }
+        logger.info("临时停运调用解除接口 paramMap={}, result={}", paramMap, jsonObjectStr);
+        JSONObject jsonObject = JSON.parseObject(jsonObjectStr);
+
+        if(jsonObject!=null && jsonObject.containsKey("code")){
+            if(jsonObject.getIntValue("code")==0) {
+                result.put("result", 1);
+                result.put("exception", "成功！");
+            }else{
+                result.put("result", 0);
+                result.put("exception", jsonObject.get("msg"));
+            }
+        }else{
+            result.put("result", 0);
+            result.put("exception", "调用接口解除停运失败！");
+        }
         return result;
     }
 
@@ -293,36 +393,99 @@ public class DriverOutageServiceImpl implements DriverOutageService {
      */
     @Override
     public Map<String, Object> saveDriverOutageAll(DriverOutage params) {
-        Map<String, Object> result = new HashMap<String, Object>();
-        // 调接口，保存
-        Map<String, Object> paramMap = new HashMap<String, Object>();
+//        Map<String, Object> result = new HashMap<String, Object>();
+//        // 调接口，保存
+//        Map<String, Object> paramMap = new HashMap<String, Object>();
+//        try {
+//            params.setOutageSource(2);//人工停运
+//            params.setRemoveStatus(1);//待执行
+//            params.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
+//            params.setCreateName(WebSessionUtil.getCurrentLoginUser().getLoginName());
+//            params.setOutStartDate(new Date());
+//        } catch (Exception e) {
+//            logger.info("saveDriverOutageAll error:" + e);
+//        }
+//        JSONObject json = JSONObject.fromObject(params);
+//        paramMap.put("driverOutageInfo", json);
+//        String url = "/webservice/outageAll/saveDriverOutageAll";
+//        result = carApiTemplate.postForObject(url, JSONObject.class, paramMap);
+//        return result;
+        Map<String, Object> result = Maps.newHashMap();
+        Map<String, Object> paramMap = Maps.newHashMap();
+        paramMap.put("driverId", params.getDriverId());
+        paramMap.put("outageSource", 2);//人工停运
+        paramMap.put("outageReason", params.getOutageReason());
+        paramMap.put("createBy", WebSessionUtil.getCurrentLoginUser().getId());
+        paramMap.put("createName", WebSessionUtil.getCurrentLoginUser().getName());
+
+        String url = mpReatApiUrl + Common.SAVE_DRIVER_OUTAGE_ALL;
+        String jsonObjectStr = null;
         try {
-            params.setOutageSource(2);//人工停运
-            params.setRemoveStatus(1);//待执行
-            params.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
-            params.setCreateName(WebSessionUtil.getCurrentLoginUser().getLoginName());
-            params.setOutStartDate(new Date());
-        } catch (Exception e) {
-            logger.info("saveDriverOutageAll error:" + e);
+            jsonObjectStr = HttpClientUtil.buildPostRequest(url).addParams(paramMap).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
+        } catch (HttpException e) {
+            logger.info("永久停运调用接口 paramMap={},error={}", paramMap, e);
         }
-        JSONObject json = JSONObject.fromObject(params);
-        paramMap.put("driverOutageInfo", json);
-        String url = "/webservice/outageAll/saveDriverOutageAll";
-        result = carApiTemplate.postForObject(url, JSONObject.class, paramMap);
+        logger.info("永久停运调用新增接口 paramMap={}, result={}", paramMap, jsonObjectStr);
+        JSONObject jsonObject = JSON.parseObject(jsonObjectStr);
+
+        if(jsonObject!=null && jsonObject.containsKey("code")){
+            if(jsonObject.getIntValue("code")==0) {
+                result.put("result", 1);
+                result.put("exception", "成功！");
+            }else{
+                result.put("result", 0);
+                result.put("exception", jsonObject.get("msg"));
+            }
+        }else{
+            result.put("result", 0);
+            result.put("exception", "调用接口解除停运失败！");
+        }
         return result;
+
     }
 
     @Override
     public Map<String, Object> updateDriverOutagesAll(DriverOutage params) {
-        Map<String, Object> result = new HashMap<String, Object>();
-        // 调接口，保存
-        Map<String, Object> paramMap = new HashMap<String, Object>();
-        params.setRemoveBy(WebSessionUtil.getCurrentLoginUser().getId());
-        params.setRemoveName(WebSessionUtil.getCurrentLoginUser().getLoginName());
-        JSONObject json = JSONObject.fromObject(params);
-        paramMap.put("driverOutageInfo", json);
-        String url = "/webservice/outageAll/updateDriverOutagesAll";
-        result = carApiTemplate.postForObject(url, JSONObject.class, paramMap);
+//        Map<String, Object> result = new HashMap<String, Object>();
+//        // 调接口，保存
+//        Map<String, Object> paramMap = new HashMap<String, Object>();
+//        params.setRemoveBy(WebSessionUtil.getCurrentLoginUser().getId());
+//        params.setRemoveName(WebSessionUtil.getCurrentLoginUser().getLoginName());
+//        JSONObject json = JSONObject.fromObject(params);
+//        paramMap.put("driverOutageInfo", json);
+//        String url = "/webservice/outageAll/updateDriverOutagesAll";
+//        result = carApiTemplate.postForObject(url, JSONObject.class, paramMap);
+//        return result;
+
+        Map<String, Object> result = Maps.newHashMap();
+        Map<String, Object> paramMap = Maps.newHashMap();
+        paramMap.put("outageIds", params.getOutageIds());
+        paramMap.put("removeReason", params.getRemoveReason());
+        paramMap.put("removeBy", WebSessionUtil.getCurrentLoginUser().getId());
+        paramMap.put("removeName", WebSessionUtil.getCurrentLoginUser().getName());
+
+        String url = mpReatApiUrl + Common.UPDATE_DRIVER_OUTAGE_ALL;
+        String jsonObjectStr = null;
+        try {
+            jsonObjectStr = HttpClientUtil.buildPostRequest(url).addParams(paramMap).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
+        } catch (HttpException e) {
+            logger.info("永久停运调用接口 paramMap={},error={}", paramMap, e);
+        }
+        logger.info("永久停运调用解除接口 paramMap={}, result={}", paramMap, jsonObjectStr);
+        JSONObject jsonObject = JSON.parseObject(jsonObjectStr);
+
+        if(jsonObject!=null && jsonObject.containsKey("code")){
+            if(jsonObject.getIntValue("code")==0) {
+                result.put("result", 1);
+                result.put("exception", "成功！");
+            }else{
+                result.put("result", 0);
+                result.put("exception", jsonObject.get("msg"));
+            }
+        }else{
+            result.put("result", 0);
+            result.put("exception", "调用接口解除停运失败！");
+        }
         return result;
     }
 
@@ -336,6 +499,7 @@ public class DriverOutageServiceImpl implements DriverOutageService {
         List<CarImportExceptionEntity> listException = new ArrayList<CarImportExceptionEntity>();
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         List<DriverOutage> outList = new ArrayList<DriverOutage>();
+        List<Map<String, Object>> outageMapList = new ArrayList<Map<String, Object>>();
 //        String fileName = params.getFileName();
 //        String path  = Common.getPath(request);
 //        String dirPath = path+params.getFileName();
@@ -387,6 +551,7 @@ public class DriverOutageServiceImpl implements DriverOutageService {
 
             int minRowIx = 1;// 过滤掉标题，从第一行开始导入数据
             int maxRowIx = sheet.getLastRowNum(); // 要导入数据的总条数
+            Map<String, Object> outageMap = Maps.newHashMap();
 
             for (int rowIx = minRowIx; rowIx <= maxRowIx; rowIx++) {
                 Row row = sheet.getRow(rowIx); // 获取行对象
@@ -456,6 +621,7 @@ public class DriverOutageServiceImpl implements DriverOutageService {
                                         outage.setOutStartDate(new Date());
                                         outage.setRemoveStatus(1);
                                         outage.setOutageSource(2);
+                                        outageMap.put("driverId", hasout.getDriverId());
                                     }
                                 } else {
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -475,7 +641,9 @@ public class DriverOutageServiceImpl implements DriverOutageService {
                                 listException.add(returnVO);
                                 isTrue = false;
                             } else {
-                                outage.setOutageReason(cellValue.getStringValue());
+                                String outageReason = Common.replaceBlank(cellValue.getStringValue());
+                                outage.setOutageReason(outageReason);
+                                outageMap.put("outageReason", outageReason);
                             }
                             break;
                     }// switch end
@@ -483,39 +651,79 @@ public class DriverOutageServiceImpl implements DriverOutageService {
                 }// 循环列结束
                 if (isTrue && outage != null) {
                     outList.add(outage);
+                    outageMapList.add(outageMap);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String download = "";
+//        String download = "";
         boolean flag = false;
         if ("".equals(outList) || outList == null || outList.size() == 0) {
 
         } else {
             // 调接口，保存
-            Map<String, Object> paramMap = new HashMap<String, Object>();
-            JSONArray jsonarray = JSONArray.fromObject(outList);
-            String cars = jsonarray.toString();
-            paramMap.put("driverOutageList", cars);
-            String url = "/webservice/outageAll/batchInputDriverOutageInfo";
-            JSONObject jsonobject = carApiTemplate.postForObject(url, JSONObject.class, paramMap);
-            // 返回为0 ==========不成功
-            if ((int) jsonobject.get("result") == 0) {
-                logger.info("接口返回为0 ==========导入不成功");
-                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                returnVO.setReson((String) jsonobject.get("exception"));
-                listException.add(returnVO);
-            } else {
-                // 返回为1 ==========成功
-                JSONObject json = (JSONObject) jsonobject.get("jsonStr");
-                String arrayDriverName = (String) json.get("error");
-                if (!"".equals(arrayDriverName) && arrayDriverName != null) {
+//            Map<String, Object> paramMap = new HashMap<String, Object>();
+//            JSONArray jsonarray = JSONArray.fromObject(outList);
+//            String cars = jsonarray.toString();
+//            paramMap.put("driverOutageList", cars);
+//            String url = "/webservice/outageAll/batchInputDriverOutageInfo";
+//            JSONObject jsonobject = carApiTemplate.postForObject(url, JSONObject.class, paramMap);
+//            // 返回为0 ==========不成功
+//            if ((int) jsonobject.get("result") == 0) {
+//                logger.info("接口返回为0 ==========导入不成功");
+//                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                returnVO.setReson((String) jsonobject.get("exception"));
+//                listException.add(returnVO);
+//            } else {
+//                // 返回为1 ==========成功
+//                JSONObject json = (JSONObject) jsonobject.get("jsonStr");
+//                String arrayDriverName = (String) json.get("error");
+//                if (!"".equals(arrayDriverName) && arrayDriverName != null) {
+//                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                    returnVO.setReson(arrayDriverName + "导入失败！");
+//                    listException.add(returnVO);
+//                }
+//                flag = true;
+//            }
+
+            Map<String, Object> paramMap = Maps.newHashMap();
+            JSONArray jsonarray = JSONArray.parseArray(outageMapList.toString());
+            String driverOutage = jsonarray.toString();
+            paramMap.put("driverOutage", driverOutage);
+            paramMap.put("outageSource", 2);//人工停运
+            paramMap.put("createBy", WebSessionUtil.getCurrentLoginUser().getId());
+            paramMap.put("createName", WebSessionUtil.getCurrentLoginUser().getName());
+
+            String url = mpReatApiUrl + Common.BATH_INPUT_DRIVER_OUTAGE_ALL;
+            String jsonObjectStr = null;
+            try {
+                jsonObjectStr = HttpClientUtil.buildPostRequest(url).addParams(paramMap).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
+            } catch (HttpException e) {
+                logger.info("永久停运调用接口 paramMap={},error={}", paramMap, e);
+            }
+            logger.info("永久停运调用新增接口 paramMap={}, result={}", paramMap, jsonObjectStr);
+            JSONObject jsonObject = JSON.parseObject(jsonObjectStr);
+
+            if(jsonObject!=null && jsonObject.containsKey("code")){
+                if(jsonObject.getIntValue("code")==0) {// 返回为0 ==========成功
+                    JSONObject json = (JSONObject) jsonObject.get("data");
+                    String arrayDriverName = (String) json.get("error");
+                    if (!"".equals(arrayDriverName) && arrayDriverName != null) {
+                        CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+                        returnVO.setReson(arrayDriverName + "导入失败！");
+                        listException.add(returnVO);
+                    }
+                    flag = true;
+                }else{
                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                    returnVO.setReson(arrayDriverName + "导入失败！");
+                    returnVO.setReson(jsonObject.get("msg") + "导入失败！");
                     listException.add(returnVO);
                 }
-                flag = true;
+            }else{
+                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+                returnVO.setReson("调用接口解除停运失败");
+                listException.add(returnVO);
             }
         }
 
@@ -532,5 +740,4 @@ public class DriverOutageServiceImpl implements DriverOutageService {
             return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR, errorMsg);
         }
     }
-
 }
