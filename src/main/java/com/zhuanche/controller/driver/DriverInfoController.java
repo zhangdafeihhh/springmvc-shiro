@@ -303,6 +303,7 @@ public class DriverInfoController {
         } catch (Exception e) {
            logger.error("司机信息列表查询导出error",e);
         }finally {
+        	list.clear();// 帮助GC回收内存
             long end=System.currentTimeMillis(); //获取结束时间
             logger.info(LOGTAG + "司机导出cityId={},supplierId={}的时间为={}ms", cityId, supplierId, (end-start));
         }
