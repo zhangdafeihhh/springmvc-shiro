@@ -25,6 +25,8 @@ import com.zhuanche.util.dateUtil.DateUtil;
 import com.zhuanche.util.excel.ExportExcelUtil;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -131,8 +133,12 @@ public class DriverSchController {
             HttpServletResponse reponseOut = this.setResponse(response, fileName);
             // 声明一个工作薄
             ExportExcelUtil excelUtil = new ExportExcelUtil();
-            HSSFWorkbook workbook = new HSSFWorkbook();
-            workbook = excelUtil.exportExcelSheet(workbook, "排班信息"+param.getPageNo(), title, firstList);
+
+//            HSSFWorkbook workbook = new HSSFWorkbook();
+            int rowMaxCache = 100;
+            // 使用SXSSFWorkbook解决OOM问题
+            SXSSFWorkbook workbook = new SXSSFWorkbook(rowMaxCache);
+            workbook = excelUtil.exportExcelSheetV2(workbook, "排班信息"+param.getPageNo(), title, firstList);
             for(int pageNumber = 2; ((pageNumber-1)*param.getPageSize()) < total; pageNumber++){
                 param.setPageNo(pageNumber);
                 PageDTO page = carDriverDutyService.queryDriverDayDutyList(param);
@@ -152,7 +158,7 @@ public class DriverSchController {
                 }
 //                List<DutyExcelDTO> targetList = BeanUtil.copyList(sourceList, DutyExcelDTO.class);
                 if(!Check.NuNCollection(targetList)){
-                    workbook = excelUtil.exportExcelSheet(workbook, "排班信息" + pageNumber, title, targetList);
+                    workbook = excelUtil.exportExcelSheetV2(workbook, "排班信息" + pageNumber, title, targetList);
                 }
             }
             ServletOutputStream out = reponseOut.getOutputStream();

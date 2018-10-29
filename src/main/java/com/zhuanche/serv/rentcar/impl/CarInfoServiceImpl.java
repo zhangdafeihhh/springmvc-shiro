@@ -22,6 +22,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -2100,7 +2101,10 @@ public class CarInfoServiceImpl implements CarInfoService {
             throws Exception {
         FileInputStream io = new FileInputStream(path);
         // 创建 excel
-        Workbook wb = new XSSFWorkbook(io);
+        // 内存缓存最大行数
+        int rowMaxCache = 100;
+        // 使用SXSSFWorkbook解决OOM问题
+        SXSSFWorkbook wb = new SXSSFWorkbook(new XSSFWorkbook(io),rowMaxCache);
         String cities = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getCityIds(), ",");
         String suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds(), ",");
         String teamIds = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getTeamIds(), ",");

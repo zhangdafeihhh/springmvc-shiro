@@ -24,6 +24,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -171,8 +172,9 @@ public class OrderAppraisalController extends DriverQueryController{
 				createDateBegin,createDateEnd,evaluateScore,sortName,sortOrder,null,null);
 
 		log.info("订单评分导出--/orderAppraisal/exportOrderAppraisal---参数："+params.toString());
+		List<CarBizCustomerAppraisal> rows = new ArrayList<>();
 		try {
-			List<CarBizCustomerAppraisal> rows = new ArrayList<>();
+
 			String driverList = "";
 			if(StringUtils.isNotEmpty(params.getGroupIds()) || StringUtils.isNotEmpty(params.getTeamId())){
 				driverList = super.queryAuthorityDriverIdsByTeamAndGroup(params.getTeamId(), params.getGroupIds());
@@ -194,6 +196,9 @@ public class OrderAppraisalController extends DriverQueryController{
 			return AjaxResponse.success("文件导出成功！");
 		} catch (Exception e) {
 			log.error("订单评分导出--导出失败");
+			if(rows != null){
+				rows.clear();
+			}
 			return AjaxResponse.fail(RestErrorCode.FILE_EXPORT_FAIL);
 		}
 	}
@@ -222,7 +227,10 @@ public class OrderAppraisalController extends DriverQueryController{
 
 	public Workbook exportExcel(List<CarBizCustomerAppraisal> list, String path) throws Exception{
 		FileInputStream io = new FileInputStream(path);
-		Workbook wb = new XSSFWorkbook(io);
+		// 内存缓存最大行数
+		int rowMaxCache = 100;
+		// 使用SXSSFWorkbook解决OOM问题
+		SXSSFWorkbook wb = new SXSSFWorkbook(new XSSFWorkbook(io),rowMaxCache);
 
 		if(list != null && list.size()>0){
 			Sheet sheet = wb.getSheetAt(0);

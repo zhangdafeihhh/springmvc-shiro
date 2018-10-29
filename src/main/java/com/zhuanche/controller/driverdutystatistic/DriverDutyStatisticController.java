@@ -27,6 +27,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -263,6 +264,9 @@ public class DriverDutyStatisticController extends DriverQueryController{
 			super.exportExcelFromTemplet(request, response, wb, new String(fileName.getBytes("utf-8"), "iso8859-1"));
 			return AjaxResponse.success("文件导出成功");
 		} catch (Exception e) {
+			if(rows!=null){
+				rows.clear();
+			}
 			log.error("导出司机考勤操作失败",e);
 			return AjaxResponse.fail(RestErrorCode.FILE_EXCEL_REPORT_FAIL);
 		}
@@ -358,7 +362,10 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	 */
 	public Workbook exportExcelTongyong(List<DriverDutyStatisticDTO> list, String path) throws Exception{
 		FileInputStream io = new FileInputStream(path);
-		Workbook wb = new XSSFWorkbook(io);
+		// 内存缓存最大行数
+		int rowMaxCache = 100;
+		// 使用SXSSFWorkbook解决OOM问题
+		SXSSFWorkbook wb = new SXSSFWorkbook(new XSSFWorkbook(io),rowMaxCache);
 		if(list != null && list.size()>0){
 			Sheet sheet = wb.getSheetAt(0);
 			Cell cell = null;
@@ -409,7 +416,10 @@ public class DriverDutyStatisticController extends DriverQueryController{
 
 	public Workbook exportMonthExcelTongyong(List<DriverDutyStatisticDTO> list, String path) throws Exception{
 		FileInputStream io = new FileInputStream(path);
-		Workbook wb = new XSSFWorkbook(io);
+		// 内存缓存最大行数
+		int rowMaxCache = 100;
+		// 使用SXSSFWorkbook解决OOM问题
+		SXSSFWorkbook wb = new SXSSFWorkbook(new XSSFWorkbook(io),rowMaxCache);
 		if(list != null && list.size()>0){
 			Sheet sheet = wb.getSheetAt(0);
 			Cell cell = null;
