@@ -172,8 +172,9 @@ public class OrderAppraisalController extends DriverQueryController{
 				createDateBegin,createDateEnd,evaluateScore,sortName,sortOrder,null,null);
 
 		log.info("订单评分导出--/orderAppraisal/exportOrderAppraisal---参数："+params.toString());
+		List<CarBizCustomerAppraisal> rows = new ArrayList<>();
 		try {
-			List<CarBizCustomerAppraisal> rows = new ArrayList<>();
+
 			String driverList = "";
 			if(StringUtils.isNotEmpty(params.getGroupIds()) || StringUtils.isNotEmpty(params.getTeamId())){
 				driverList = super.queryAuthorityDriverIdsByTeamAndGroup(params.getTeamId(), params.getGroupIds());
@@ -195,6 +196,9 @@ public class OrderAppraisalController extends DriverQueryController{
 			return AjaxResponse.success("文件导出成功！");
 		} catch (Exception e) {
 			log.error("订单评分导出--导出失败");
+			if(rows != null){
+				rows.clear();
+			}
 			return AjaxResponse.fail(RestErrorCode.FILE_EXPORT_FAIL);
 		}
 	}
