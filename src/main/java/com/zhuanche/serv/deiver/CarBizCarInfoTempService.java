@@ -2,7 +2,6 @@ package com.zhuanche.serv.deiver;
 
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.controller.driverteam.CarInfoTemporaryController;
 import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
 import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
@@ -12,7 +11,6 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
 import com.zhuanche.util.Common;
-import com.zhuanche.util.excel.ExportExcelUtil;
 import mapper.mdbcarmanage.CarBizCarInfoTempMapper;
 import mapper.mdbcarmanage.ex.CarBizCarInfoTempExMapper;
 import mapper.mdbcarmanage.ex.CarBizDriverInfoTempExMapper;
@@ -28,9 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
+
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;

@@ -3,6 +3,9 @@ package com.zhuanche.controller.driverdailyreport;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -26,6 +29,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,6 +100,9 @@ public class DriverDailyReportController extends DriverQueryController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/queryDriverReportData")
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
 	public AjaxResponse queryDriverWeekReportDataNew(String licensePlates, String driverName, String driverIds, String teamIds,
 													 @Verify(rule = "required",param = "suppliers") String suppliers,
 													 @Verify(rule = "required",param = "cities") String cities,
@@ -188,6 +195,9 @@ public class DriverDailyReportController extends DriverQueryController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/queryDriverReportDataDetail")
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
 	public AjaxResponse queryDriverWeekReportDataNew(@Verify(rule = "required",param = "statDateStart") String driverIds,
 													 @Verify(rule = "required",param = "statDateStart") String statDateStart,
 													 @Verify(rule = "required",param = "statDateEnd") String statDateEnd, String sortName, String sortOrder, Integer page, Integer pageSize) throws ParseException {
@@ -233,6 +243,9 @@ public class DriverDailyReportController extends DriverQueryController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/exportDriverReportData")
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
 	public AjaxResponse exportDriverReportData(String licensePlates, String driverName, String driverIds, String teamIds,
 											   @Verify(rule = "required",param = "suppliers") String suppliers,
 											   @Verify(rule = "required",param = "cities") String cities,
@@ -319,6 +332,9 @@ public class DriverDailyReportController extends DriverQueryController {
 			this.exportExcelFromTemplet(request, response, wb, new String(filename.getBytes("gb2312"), "iso8859-1"));
 			return AjaxResponse.success("文件导出成功");
 		} catch (Exception e) {
+			if(rows != null){
+				rows.clear();
+			}
 			log.error("导出失败哦！");
 			return AjaxResponse.fail(RestErrorCode.FILE_EXCEL_REPORT_FAIL);
 		}
@@ -331,6 +347,9 @@ public class DriverDailyReportController extends DriverQueryController {
 	 * @return
 	 * return: List<DriverDailyReportDTO>
 	 */
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
 	public List<DriverDailyReportDTO> selectSuppierNameAndCityNameDays(List<DriverDailyReport> rows,Integer reportType) throws ParseException {
 		List<DriverDailyReportDTO> list = null;
 		//不为空进行转换并查询城市名称和供应商名称
@@ -502,7 +521,10 @@ public class DriverDailyReportController extends DriverQueryController {
 	public Workbook exportExcel(List<DriverDailyReportDTO> list, String path, Integer reportType)
 			throws Exception {
 		FileInputStream io = new FileInputStream(path);
-		Workbook wb = new XSSFWorkbook(io);
+		// 内存缓存最大行数
+		int rowMaxCache = 100;
+		// 使用SXSSFWorkbook解决OOM问题
+		SXSSFWorkbook wb = new SXSSFWorkbook(new XSSFWorkbook(io),rowMaxCache);
 		if (list != null && list.size() > 0) {
 			Sheet sheet = wb.getSheetAt(0);
 			Cell cell = null;

@@ -2,6 +2,9 @@ package com.zhuanche.controller.statistic;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -21,6 +24,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +76,9 @@ public class OrderAppraisalController extends DriverQueryController{
 	 */
 	@ResponseBody
 	@RequestMapping("/orderAppraisalListData")
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
 	public AjaxResponse appraisalDataList(String cityId,
 										  String supplierId,
 										  String teamId,
@@ -142,6 +149,9 @@ public class OrderAppraisalController extends DriverQueryController{
 	 */
 	@RequestMapping("/exportOrderAppraisal")
 	@ResponseBody
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
 	public AjaxResponse exportOrderAppraisal(String cityId,
 									 String supplierId,
 									 String teamId,
@@ -162,8 +172,9 @@ public class OrderAppraisalController extends DriverQueryController{
 				createDateBegin,createDateEnd,evaluateScore,sortName,sortOrder,null,null);
 
 		log.info("订单评分导出--/orderAppraisal/exportOrderAppraisal---参数："+params.toString());
+		List<CarBizCustomerAppraisal> rows = new ArrayList<>();
 		try {
-			List<CarBizCustomerAppraisal> rows = new ArrayList<>();
+
 			String driverList = "";
 			if(StringUtils.isNotEmpty(params.getGroupIds()) || StringUtils.isNotEmpty(params.getTeamId())){
 				driverList = super.queryAuthorityDriverIdsByTeamAndGroup(params.getTeamId(), params.getGroupIds());
@@ -185,6 +196,9 @@ public class OrderAppraisalController extends DriverQueryController{
 			return AjaxResponse.success("文件导出成功！");
 		} catch (Exception e) {
 			log.error("订单评分导出--导出失败");
+			if(rows != null){
+				rows.clear();
+			}
 			return AjaxResponse.fail(RestErrorCode.FILE_EXPORT_FAIL);
 		}
 	}
@@ -213,7 +227,10 @@ public class OrderAppraisalController extends DriverQueryController{
 
 	public Workbook exportExcel(List<CarBizCustomerAppraisal> list, String path) throws Exception{
 		FileInputStream io = new FileInputStream(path);
-		Workbook wb = new XSSFWorkbook(io);
+		// 内存缓存最大行数
+		int rowMaxCache = 100;
+		// 使用SXSSFWorkbook解决OOM问题
+		SXSSFWorkbook wb = new SXSSFWorkbook(new XSSFWorkbook(io),rowMaxCache);
 
 		if(list != null && list.size()>0){
 			Sheet sheet = wb.getSheetAt(0);
@@ -255,6 +272,9 @@ public class OrderAppraisalController extends DriverQueryController{
 
 	@ResponseBody
 	@RequestMapping("/orderAppraisalListFromDriverOutageData")
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
 	public Object orderAppraisalListFromDriverOutageData(@Verify(param = "outageId", rule = "required") Integer outageId,
 														 Integer page,
 														 Integer pageSize) {

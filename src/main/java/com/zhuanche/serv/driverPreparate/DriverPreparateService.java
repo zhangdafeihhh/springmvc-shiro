@@ -2,6 +2,9 @@ package com.zhuanche.serv.driverPreparate;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.entity.DriverPreparate.DriverPreparate;
 import com.zhuanche.util.MyRestTemplate;
 import mapper.rentcar.ex.CarFactOrderExMapper;
@@ -41,6 +44,9 @@ public class DriverPreparateService {
      * @param pagesize
      * @return
      */
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
 	public Map selectList(String orderNo, String driverPhone, String licensePlates,Integer page, Integer pagesize) {
 		Map<String, Object> map = new HashMap<>();
 		try {

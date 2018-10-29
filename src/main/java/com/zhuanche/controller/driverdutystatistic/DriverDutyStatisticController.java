@@ -2,6 +2,9 @@ package com.zhuanche.controller.driverdutystatistic;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -12,16 +15,19 @@ import com.zhuanche.entity.mdbcarmanage.DriverDutyStatistic;
 import com.zhuanche.entity.mdbcarmanage.DriverDutyStatisticParams;
 import com.zhuanche.entity.mdblog.StatisticDutyHalf;
 import com.zhuanche.entity.mdblog.StatisticDutyHalfParams;
+import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import mapper.mdbcarmanage.ex.DriverDutyStatisticExMapper;
 import mapper.mdblog.ex.StatisticDutyHalfExMapper;
+import mapper.rentcar.ex.CarBizCityExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +42,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 司机考勤查询
@@ -55,6 +58,9 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	private DriverDutyStatisticExMapper driverDutyStatisticExMapper;
 	@Autowired
 	private StatisticDutyHalfExMapper statisticDutyHalfExMapper;
+	@Autowired
+	private CarBizCityExMapper carBizCityExMapper;
+
 	/**
 	 * 司机考勤查询
 	 * @param cityId 城市ID
@@ -75,6 +81,9 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	 */
 	@RequestMapping(value = "/driverDutyStatisticDailData")
 	@ResponseBody
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
 	public AjaxResponse driverDutyStatisticDailData(@Verify(param = "cityId",rule = "required") String cityId, @Verify(param = "supplierId",rule = "required")String supplierId, String teamId,
 			String groupIds, String name, String driverId, String  phone, String licensePlates,
 			@Verify(param = "startTime",rule = "required") String startTime, String endTime, String sortName, String sortOrder, Integer page, Integer pageSize, Integer reportType) throws ParseException {
@@ -152,6 +161,9 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	 */
 	@RequestMapping(value = "/driverDutyStatisticHalfData")
 	@ResponseBody
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
 	public AjaxResponse driverDutyStatisticHalfData(@Verify(param = "driverId",rule = "required") String driverId,@Verify(param = "time",rule = "required") String time, Integer page, Integer pageSize) throws ParseException {
 
 		StatisticDutyHalfParams params = new StatisticDutyHalfParams(driverId, time, page, pageSize);
@@ -185,6 +197,9 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	 */
 	@ResponseBody
 	@RequestMapping("/exportDriverDutyStatistic")
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
 	public AjaxResponse exportDriverDuty(@Verify(param = "cityId",rule = "required") String cityId, @Verify(param = "supplierId",rule = "required") String supplierId, String teamId, String groupIds, String name,
 		 String  phone, String licensePlates,@Verify(param = "startTime",rule = "required")  String startTime,
 		 String endTime, Integer reportType, HttpServletRequest request, HttpServletResponse response) throws ParseException {
@@ -249,6 +264,9 @@ public class DriverDutyStatisticController extends DriverQueryController{
 			super.exportExcelFromTemplet(request, response, wb, new String(fileName.getBytes("utf-8"), "iso8859-1"));
 			return AjaxResponse.success("文件导出成功");
 		} catch (Exception e) {
+			if(rows!=null){
+				rows.clear();
+			}
 			log.error("导出司机考勤操作失败",e);
 			return AjaxResponse.fail(RestErrorCode.FILE_EXCEL_REPORT_FAIL);
 		}
@@ -292,15 +310,26 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	 * @return
 	 * return: List<DriverDailyReportDTO>
 	 */
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
 	public List<DriverDutyStatisticDTO> selectSuppierNameAndCityName(List<DriverDutyStatistic> rows){
 		List<DriverDutyStatisticDTO> list = null;
 		//不为空进行转换并查询城市名称和供应商名称
 		if(rows!=null&&rows.size()>0){
+			Set<Integer> s = new HashSet();
 			for(DriverDutyStatistic driverDutyStatistic : rows){
-				//查询城市名称和供应商名称
-				Map<String, Object> result = super.querySupplierNameAndCityName(driverDutyStatistic.getCityid(), driverDutyStatistic.getSupplierid());
-				driverDutyStatistic.setCityName((String)result.get("cityName"));
-				driverDutyStatistic.setSupplierName((String)result.get("supplierName"));
+				s.add(driverDutyStatistic.getCityid());
+			}
+			//查询供应商名称，一次查询出来避免多次读库
+			List<CarBizCity> names = carBizCityExMapper.queryNameByIds(s);
+			for (DriverDutyStatistic entity: rows) {
+				for (CarBizCity name: names) {
+					if (name.getCityId().equals(entity.getCityid())){
+						entity.setCityName(name.getCityName());
+						break;
+					}
+				}
 			}
 			list = BeanUtil.copyList(rows, DriverDutyStatisticDTO.class);
 		}
@@ -333,7 +362,10 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	 */
 	public Workbook exportExcelTongyong(List<DriverDutyStatisticDTO> list, String path) throws Exception{
 		FileInputStream io = new FileInputStream(path);
-		Workbook wb = new XSSFWorkbook(io);
+		// 内存缓存最大行数
+		int rowMaxCache = 100;
+		// 使用SXSSFWorkbook解决OOM问题
+		SXSSFWorkbook wb = new SXSSFWorkbook(new XSSFWorkbook(io),rowMaxCache);
 		if(list != null && list.size()>0){
 			Sheet sheet = wb.getSheetAt(0);
 			Cell cell = null;
@@ -384,7 +416,10 @@ public class DriverDutyStatisticController extends DriverQueryController{
 
 	public Workbook exportMonthExcelTongyong(List<DriverDutyStatisticDTO> list, String path) throws Exception{
 		FileInputStream io = new FileInputStream(path);
-		Workbook wb = new XSSFWorkbook(io);
+		// 内存缓存最大行数
+		int rowMaxCache = 100;
+		// 使用SXSSFWorkbook解决OOM问题
+		SXSSFWorkbook wb = new SXSSFWorkbook(new XSSFWorkbook(io),rowMaxCache);
 		if(list != null && list.size()>0){
 			Sheet sheet = wb.getSheetAt(0);
 			Cell cell = null;

@@ -39,6 +39,7 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -588,7 +589,11 @@ public class DriverMonthDutyService {
 		FileInputStream io = new FileInputStream(path);
 		// 创建 excel
 		//Workbook wb = new XSSFWorkbook(io);
-		Workbook wb = create(io);
+		// 内存缓存最大行数
+		int rowMaxCache = 100;
+		// 使用SXSSFWorkbook解决OOM问题
+		SXSSFWorkbook wb = new SXSSFWorkbook(new XSSFWorkbook(io),rowMaxCache);
+
 		List<CarDriverMonthDTO> rows = new ArrayList<CarDriverMonthDTO>();
 		rows = carDriverMonthDutyExMapper.queryDriverDutyList(params);
 		if (null != rows && !rows.isEmpty()) {
@@ -669,6 +674,9 @@ public class DriverMonthDutyService {
 
 				i++;
 			}
+		}
+		if(rows != null){
+			rows.clear();
 		}
 		return wb;
 	}

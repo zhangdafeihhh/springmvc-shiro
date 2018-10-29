@@ -15,9 +15,6 @@ public interface DriverDutyStatisticExMapper {
      * @param params
      * @return
      */
-    @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
-    })
     List<DriverDutyStatistic> queryForListObject(DriverDutyStatisticParams params);
 
     /**
@@ -25,9 +22,6 @@ public interface DriverDutyStatisticExMapper {
      * @param params
      * @return
      */
-    @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
-    })
     List<DriverDutyStatistic> queryDriverMonthDutyList(DriverDutyStatisticParams params);
 
     /**
@@ -35,8 +29,5 @@ public interface DriverDutyStatisticExMapper {
      * @param params
      * @return
      */
-    @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
-    })
     List<DriverDutyStatistic> queryDriverDutyHalfByDriverId(DriverDutyStatisticParams params);
 }

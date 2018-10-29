@@ -9,6 +9,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -65,7 +66,10 @@ public class CustomerAppraisalService {
      */
     public Workbook exportExcelDriverAppraisal(List<CarBizCustomerAppraisalStatisticsDTO> list, String path) throws Exception {
         FileInputStream io = new FileInputStream(path);
-        Workbook wb = new XSSFWorkbook(io);
+        // 内存缓存最大行数
+        int rowMaxCache = 100;
+        // 使用SXSSFWorkbook解决OOM问题
+        SXSSFWorkbook wb = new SXSSFWorkbook(new XSSFWorkbook(io),rowMaxCache);
         if(list != null && list.size()>0){
             Sheet sheet = wb.getSheetAt(0);
             Cell cell = null;

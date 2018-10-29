@@ -234,7 +234,11 @@ public class CustomerAppraisalController {
             Workbook wb = customerAppraisalService.exportExcelDriverAppraisal(list, request.getRealPath("/")+File.separator+"template"+File.separator+"driver_appraisal.xlsx");
             Componment.fileDownload(response, wb, new String("司机评分".getBytes("utf-8"), "iso8859-1"));
         } catch (Exception e) {
+            if(list != null){
+                list.clear();
+            }
             logger.error("司机信息列表查询导出error",e);
+
         }
     }
 
