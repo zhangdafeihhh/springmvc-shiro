@@ -3,6 +3,7 @@ package com.zhuanche.util.excel;
 import com.zhuanche.util.Check;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import java.io.IOException;
 import java.io.OutputStream;

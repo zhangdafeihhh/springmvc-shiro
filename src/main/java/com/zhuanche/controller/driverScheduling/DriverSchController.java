@@ -131,7 +131,9 @@ public class DriverSchController {
             HttpServletResponse reponseOut = this.setResponse(response, fileName);
             // 声明一个工作薄
             ExportExcelUtil excelUtil = new ExportExcelUtil();
+
             HSSFWorkbook workbook = new HSSFWorkbook();
+
             workbook = excelUtil.exportExcelSheet(workbook, "排班信息"+param.getPageNo(), title, firstList);
             for(int pageNumber = 2; ((pageNumber-1)*param.getPageSize()) < total; pageNumber++){
                 param.setPageNo(pageNumber);
