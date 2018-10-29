@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -73,6 +72,15 @@ public class Common {
     public static Pattern COMPILE1 = Pattern.compile("\\s*|\t|\r|\n");
 
     public static Pattern COMPILE2 = Pattern.compile("\\s*|\t|\r|\n");
+
+	//停运begin
+	public static final String SAVE_DRIVER_OUTAGE = "/driverOutage/saveDriverOutage";
+	public static final String UPDATE_DRIVER_OUTAGE = "/driverOutage/updateDriverOutage";
+	public static final String UPDATE_DRIVER_OUTAGES = "/driverOutage/updateDriverOutages";
+	public static final String SAVE_DRIVER_OUTAGE_ALL = "/driverOutageAll/saveDriverOutageAll";
+	public static final String UPDATE_DRIVER_OUTAGE_ALL = "/driverOutageAll/updateDriverOutagesAll";
+	public static final String BATH_INPUT_DRIVER_OUTAGE_ALL = "/driverOutageAll/batchInputDriverOutageAllInfo";
+	//停运end
 
 	public static String getPath(HttpServletRequest request) {
 		String uploadDir =request.getSession().getServletContext().getRealPath("/");  
