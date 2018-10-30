@@ -164,10 +164,28 @@ public class DriverMonthDutyController {
 
         logger.info("导出data:"+data);
         try {
+            if(Check.NuNStr(param.getMonitorDate())){
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+                param.setMonitorDate(sdf.format(new Date()));
+            }
+            CommonRequest commonRequest = new CommonRequest();
+            BeanUtils.copyProperties(param,commonRequest);
+            if(!Check.NuNStr(param.getTeamId())){
+                commonRequest.setTeamId(Integer.parseInt(param.getTeamId()));
+            }
+            CommonRequest dealData = commonService.paramDeal(commonRequest);
+            if(Check.NuNObj(dealData)){
+                logger.error("没有权限操作,用户："+JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));
+                return ;
+            }
+            param.setCityIds(commonService.setStringShiftInteger(dealData.getCityIds()));
+            param.setSupplierIds(commonService.setStringShiftInteger(dealData.getSupplierIds()));
+            param.setTeamIds(dealData.getTeamIds());
             // 获取表头
             Map<String, Object> result = new LinkedHashMap<String,Object>();
             Map<String, Object> tabelHeader = new LinkedHashMap<String,Object>();
             result = this.driverMonthDutyService.queryDriverDutyTable(param);
+
             tabelHeader = (Map<String, Object>)result.get("Rows");
             @SuppressWarnings("deprecation")
             Workbook wb = driverMonthDutyService.exportExcel(param,request.getRealPath("/")+File.separator+"template"+File.separator+"driverMonthDutyInfo.xlsx",
