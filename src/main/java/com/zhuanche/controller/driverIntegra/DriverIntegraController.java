@@ -186,11 +186,11 @@ public class DriverIntegraController {
             }
             return this.gridJsonFormate(rows, total);
         }catch (Exception e){
-            logger.error("司机积分数据列表异常",e);
+            logger.error("司机积分数据列表异常,参数为："+(driverEntity==null?"null": JSON.toJSONString(driverEntity)),e);
             JSONObject ret = new JSONObject();
             ret.put("code",1);
             ret.put("msg","失败");
-            throw  e;
+            return  ret;
         }
     }
 
