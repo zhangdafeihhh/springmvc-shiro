@@ -1,10 +1,9 @@
-package com.zhuanche.web.entity.driverVo;  
+package com.zhuanche.dto.driver;
 
-import java.math.BigDecimal;
 
-import com.zhuanche.web.entity.driver.DriverEntity;
+import com.zhuanche.entity.rentcar.DriverEntity;
 
-/** 
+/**
  * ClassName: DriverVoEntity 
  * date: 2016年11月7日 上午11:58:42 
  * 

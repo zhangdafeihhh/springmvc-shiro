@@ -1,7 +1,7 @@
-package com.zhuanche.web.entity.driver;
+package com.zhuanche.dto.driver;
 
-import com.zhuanche.web.entity.common.BaseEntity;
 
+import com.zhuanche.entity.common.BaseEntity;
 
 public class DriverTeamEntity extends BaseEntity {
 

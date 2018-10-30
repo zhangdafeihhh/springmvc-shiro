@@ -1,6 +1,7 @@
-package com.zhuanche.web.entity.driver;
-import com.zhuanche.web.entity.common.BaseEntity;
+package com.zhuanche.dto.driver;
 
+
+import com.zhuanche.entity.common.BaseEntity;
 
 /***
  * dirverInfoDetail
@@ -26,12 +27,12 @@ public class DriverInfoDetailEntity extends BaseEntity {
 	private String createDate;
 	private String updateDate;
 
-	@Override
+
 	public Integer getId() {
 		return id;
 	}
 
-	@Override
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
