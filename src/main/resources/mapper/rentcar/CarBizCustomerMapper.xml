@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.CarBizCustomerMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarBizCustomer" >
+    <id column="customer_id" property="customerId" jdbcType="INTEGER" />
+    <result column="is_binding_credit_card" property="isBindingCreditCard" jdbcType="INTEGER" />
+    <result column="credit_card_no" property="creditCardNo" jdbcType="VARCHAR" />
+    <result column="storable_card_no" property="storableCardNo" jdbcType="VARCHAR" />
+    <result column="open_account_bank" property="openAccountBank" jdbcType="VARCHAR" />
+    <result column="credit_card_period_of_validity" property="creditCardPeriodOfValidity" jdbcType="VARCHAR" />
+    <result column="user_from" property="userFrom" jdbcType="VARCHAR" />
+    <result column="CVN2" property="cvn2" jdbcType="VARCHAR" />
+    <result column="user_lv" property="userLv" jdbcType="INTEGER" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="gender" property="gender" jdbcType="INTEGER" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="user_type" property="userType" jdbcType="INTEGER" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="user_photo_url" property="userPhotoUrl" jdbcType="VARCHAR" />
+    <result column="push_id" property="pushId" jdbcType="VARCHAR" />
+    <result column="IMEI" property="imei" jdbcType="VARCHAR" />
+    <result column="os_platform" property="osPlatform" jdbcType="VARCHAR" />
+    <result column="app_version" property="appVersion" jdbcType="VARCHAR" />
+    <result column="mobile_brand" property="mobileBrand" jdbcType="VARCHAR" />
+    <result column="os_version" property="osVersion" jdbcType="VARCHAR" />
+    <result column="channel_num" property="channelNum" jdbcType="VARCHAR" />
+    <result column="binding_card_date" property="bindingCardDate" jdbcType="TIMESTAMP" />
+    <result column="bankid" property="bankid" jdbcType="VARCHAR" />
+    <result column="is_used_account" property="isUsedAccount" jdbcType="TINYINT" />
+    <result column="register_source" property="registerSource" jdbcType="TINYINT" />
+    <result column="freeze_account" property="freezeAccount" jdbcType="INTEGER" />
+    <result column="id_number" property="idNumber" jdbcType="VARCHAR" />
+    <result column="is_member" property="isMember" jdbcType="INTEGER" />
+    <result column="account_type" property="accountType" jdbcType="INTEGER" />
+    <result column="birth_day" property="birthDay" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizCustomer" extends="BaseResultMap" >
+    <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    customer_id, is_binding_credit_card, credit_card_no, storable_card_no, open_account_bank, 
+    credit_card_period_of_validity, user_from, CVN2, user_lv, update_date, create_date, 
+    update_by, create_by, status, name, gender, phone, password, user_type, city_id, 
+    user_photo_url, push_id, IMEI, os_platform, app_version, mobile_brand, os_version, 
+    channel_num, binding_card_date, bankid, is_used_account, register_source, freeze_account, 
+    id_number, is_member, account_type, birth_day
+  </sql>
+  <sql id="Blob_Column_List" >
+    memo
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from car_biz_customer
+    where customer_id = #{customerId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from car_biz_customer
+    where customer_id = #{customerId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.rentcar.CarBizCustomer" >
+    <selectKey resultType="java.lang.Integer" keyProperty="customerId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_biz_customer (is_binding_credit_card, credit_card_no, 
+      storable_card_no, open_account_bank, credit_card_period_of_validity, 
+      user_from, CVN2, user_lv, 
+      update_date, create_date, update_by, 
+      create_by, status, name, 
+      gender, phone, password, 
+      user_type, city_id, user_photo_url, 
+      push_id, IMEI, os_platform, 
+      app_version, mobile_brand, os_version, 
+      channel_num, binding_card_date, bankid, 
+      is_used_account, register_source, freeze_account, 
+      id_number, is_member, account_type, 
+      birth_day, memo)
+    values (#{isBindingCreditCard,jdbcType=INTEGER}, #{creditCardNo,jdbcType=VARCHAR}, 
+      #{storableCardNo,jdbcType=VARCHAR}, #{openAccountBank,jdbcType=VARCHAR}, #{creditCardPeriodOfValidity,jdbcType=VARCHAR}, 
+      #{userFrom,jdbcType=VARCHAR}, #{cvn2,jdbcType=VARCHAR}, #{userLv,jdbcType=INTEGER}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=INTEGER}, 
+      #{createBy,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, 
+      #{gender,jdbcType=INTEGER}, #{phone,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{userType,jdbcType=INTEGER}, #{cityId,jdbcType=INTEGER}, #{userPhotoUrl,jdbcType=VARCHAR}, 
+      #{pushId,jdbcType=VARCHAR}, #{imei,jdbcType=VARCHAR}, #{osPlatform,jdbcType=VARCHAR}, 
+      #{appVersion,jdbcType=VARCHAR}, #{mobileBrand,jdbcType=VARCHAR}, #{osVersion,jdbcType=VARCHAR}, 
+      #{channelNum,jdbcType=VARCHAR}, #{bindingCardDate,jdbcType=TIMESTAMP}, #{bankid,jdbcType=VARCHAR}, 
+      #{isUsedAccount,jdbcType=TINYINT}, #{registerSource,jdbcType=TINYINT}, #{freezeAccount,jdbcType=INTEGER}, 
+      #{idNumber,jdbcType=VARCHAR}, #{isMember,jdbcType=INTEGER}, #{accountType,jdbcType=INTEGER}, 
+      #{birthDay,jdbcType=VARCHAR}, #{memo,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.rentcar.CarBizCustomer" >
+    <selectKey resultType="java.lang.Integer" keyProperty="customerId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_biz_customer
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="isBindingCreditCard != null" >
+        is_binding_credit_card,
+      </if>
+      <if test="creditCardNo != null" >
+        credit_card_no,
+      </if>
+      <if test="storableCardNo != null" >
+        storable_card_no,
+      </if>
+      <if test="openAccountBank != null" >
+        open_account_bank,
+      </if>
+      <if test="creditCardPeriodOfValidity != null" >
+        credit_card_period_of_validity,
+      </if>
+      <if test="userFrom != null" >
+        user_from,
+      </if>
+      <if test="cvn2 != null" >
+        CVN2,
+      </if>
+      <if test="userLv != null" >
+        user_lv,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="gender != null" >
+        gender,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="password != null" >
+        password,
+      </if>
+      <if test="userType != null" >
+        user_type,
+      </if>
+      <if test="cityId != null" >
+        city_id,
+      </if>
+      <if test="userPhotoUrl != null" >
+        user_photo_url,
+      </if>
+      <if test="pushId != null" >
+        push_id,
+      </if>
+      <if test="imei != null" >
+        IMEI,
+      </if>
+      <if test="osPlatform != null" >
+        os_platform,
+      </if>
+      <if test="appVersion != null" >
+        app_version,
+      </if>
+      <if test="mobileBrand != null" >
+        mobile_brand,
+      </if>
+      <if test="osVersion != null" >
+        os_version,
+      </if>
+      <if test="channelNum != null" >
+        channel_num,
+      </if>
+      <if test="bindingCardDate != null" >
+        binding_card_date,
+      </if>
+      <if test="bankid != null" >
+        bankid,
+      </if>
+      <if test="isUsedAccount != null" >
+        is_used_account,
+      </if>
+      <if test="registerSource != null" >
+        register_source,
+      </if>
+      <if test="freezeAccount != null" >
+        freeze_account,
+      </if>
+      <if test="idNumber != null" >
+        id_number,
+      </if>
+      <if test="isMember != null" >
+        is_member,
+      </if>
+      <if test="accountType != null" >
+        account_type,
+      </if>
+      <if test="birthDay != null" >
+        birth_day,
+      </if>
+      <if test="memo != null" >
+        memo,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="isBindingCreditCard != null" >
+        #{isBindingCreditCard,jdbcType=INTEGER},
+      </if>
+      <if test="creditCardNo != null" >
+        #{creditCardNo,jdbcType=VARCHAR},
+      </if>
+      <if test="storableCardNo != null" >
+        #{storableCardNo,jdbcType=VARCHAR},
+      </if>
+      <if test="openAccountBank != null" >
+        #{openAccountBank,jdbcType=VARCHAR},
+      </if>
+      <if test="creditCardPeriodOfValidity != null" >
+        #{creditCardPeriodOfValidity,jdbcType=VARCHAR},
+      </if>
+      <if test="userFrom != null" >
+        #{userFrom,jdbcType=VARCHAR},
+      </if>
+      <if test="cvn2 != null" >
+        #{cvn2,jdbcType=VARCHAR},
+      </if>
+      <if test="userLv != null" >
+        #{userLv,jdbcType=INTEGER},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="gender != null" >
+        #{gender,jdbcType=INTEGER},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="userType != null" >
+        #{userType,jdbcType=INTEGER},
+      </if>
+      <if test="cityId != null" >
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="userPhotoUrl != null" >
+        #{userPhotoUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="pushId != null" >
+        #{pushId,jdbcType=VARCHAR},
+      </if>
+      <if test="imei != null" >
+        #{imei,jdbcType=VARCHAR},
+      </if>
+      <if test="osPlatform != null" >
+        #{osPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="appVersion != null" >
+        #{appVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="mobileBrand != null" >
+        #{mobileBrand,jdbcType=VARCHAR},
+      </if>
+      <if test="osVersion != null" >
+        #{osVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="channelNum != null" >
+        #{channelNum,jdbcType=VARCHAR},
+      </if>
+      <if test="bindingCardDate != null" >
+        #{bindingCardDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="bankid != null" >
+        #{bankid,jdbcType=VARCHAR},
+      </if>
+      <if test="isUsedAccount != null" >
+        #{isUsedAccount,jdbcType=TINYINT},
+      </if>
+      <if test="registerSource != null" >
+        #{registerSource,jdbcType=TINYINT},
+      </if>
+      <if test="freezeAccount != null" >
+        #{freezeAccount,jdbcType=INTEGER},
+      </if>
+      <if test="idNumber != null" >
+        #{idNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="isMember != null" >
+        #{isMember,jdbcType=INTEGER},
+      </if>
+      <if test="accountType != null" >
+        #{accountType,jdbcType=INTEGER},
+      </if>
+      <if test="birthDay != null" >
+        #{birthDay,jdbcType=VARCHAR},
+      </if>
+      <if test="memo != null" >
+        #{memo,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.rentcar.CarBizCustomer" >
+    update car_biz_customer
+    <set >
+      <if test="isBindingCreditCard != null" >
+        is_binding_credit_card = #{isBindingCreditCard,jdbcType=INTEGER},
+      </if>
+      <if test="creditCardNo != null" >
+        credit_card_no = #{creditCardNo,jdbcType=VARCHAR},
+      </if>
+      <if test="storableCardNo != null" >
+        storable_card_no = #{storableCardNo,jdbcType=VARCHAR},
+      </if>
+      <if test="openAccountBank != null" >
+        open_account_bank = #{openAccountBank,jdbcType=VARCHAR},
+      </if>
+      <if test="creditCardPeriodOfValidity != null" >
+        credit_card_period_of_validity = #{creditCardPeriodOfValidity,jdbcType=VARCHAR},
+      </if>
+      <if test="userFrom != null" >
+        user_from = #{userFrom,jdbcType=VARCHAR},
+      </if>
+      <if test="cvn2 != null" >
+        CVN2 = #{cvn2,jdbcType=VARCHAR},
+      </if>
+      <if test="userLv != null" >
+        user_lv = #{userLv,jdbcType=INTEGER},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="gender != null" >
+        gender = #{gender,jdbcType=INTEGER},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="userType != null" >
+        user_type = #{userType,jdbcType=INTEGER},
+      </if>
+      <if test="cityId != null" >
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="userPhotoUrl != null" >
+        user_photo_url = #{userPhotoUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="pushId != null" >
+        push_id = #{pushId,jdbcType=VARCHAR},
+      </if>
+      <if test="imei != null" >
+        IMEI = #{imei,jdbcType=VARCHAR},
+      </if>
+      <if test="osPlatform != null" >
+        os_platform = #{osPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="appVersion != null" >
+        app_version = #{appVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="mobileBrand != null" >
+        mobile_brand = #{mobileBrand,jdbcType=VARCHAR},
+      </if>
+      <if test="osVersion != null" >
+        os_version = #{osVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="channelNum != null" >
+        channel_num = #{channelNum,jdbcType=VARCHAR},
+      </if>
+      <if test="bindingCardDate != null" >
+        binding_card_date = #{bindingCardDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="bankid != null" >
+        bankid = #{bankid,jdbcType=VARCHAR},
+      </if>
+      <if test="isUsedAccount != null" >
+        is_used_account = #{isUsedAccount,jdbcType=TINYINT},
+      </if>
+      <if test="registerSource != null" >
+        register_source = #{registerSource,jdbcType=TINYINT},
+      </if>
+      <if test="freezeAccount != null" >
+        freeze_account = #{freezeAccount,jdbcType=INTEGER},
+      </if>
+      <if test="idNumber != null" >
+        id_number = #{idNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="isMember != null" >
+        is_member = #{isMember,jdbcType=INTEGER},
+      </if>
+      <if test="accountType != null" >
+        account_type = #{accountType,jdbcType=INTEGER},
+      </if>
+      <if test="birthDay != null" >
+        birth_day = #{birthDay,jdbcType=VARCHAR},
+      </if>
+      <if test="memo != null" >
+        memo = #{memo,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where customer_id = #{customerId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zhuanche.entity.rentcar.CarBizCustomer" >
+    update car_biz_customer
+    set is_binding_credit_card = #{isBindingCreditCard,jdbcType=INTEGER},
+      credit_card_no = #{creditCardNo,jdbcType=VARCHAR},
+      storable_card_no = #{storableCardNo,jdbcType=VARCHAR},
+      open_account_bank = #{openAccountBank,jdbcType=VARCHAR},
+      credit_card_period_of_validity = #{creditCardPeriodOfValidity,jdbcType=VARCHAR},
+      user_from = #{userFrom,jdbcType=VARCHAR},
+      CVN2 = #{cvn2,jdbcType=VARCHAR},
+      user_lv = #{userLv,jdbcType=INTEGER},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=INTEGER},
+      create_by = #{createBy,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
+      gender = #{gender,jdbcType=INTEGER},
+      phone = #{phone,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      user_type = #{userType,jdbcType=INTEGER},
+      city_id = #{cityId,jdbcType=INTEGER},
+      user_photo_url = #{userPhotoUrl,jdbcType=VARCHAR},
+      push_id = #{pushId,jdbcType=VARCHAR},
+      IMEI = #{imei,jdbcType=VARCHAR},
+      os_platform = #{osPlatform,jdbcType=VARCHAR},
+      app_version = #{appVersion,jdbcType=VARCHAR},
+      mobile_brand = #{mobileBrand,jdbcType=VARCHAR},
+      os_version = #{osVersion,jdbcType=VARCHAR},
+      channel_num = #{channelNum,jdbcType=VARCHAR},
+      binding_card_date = #{bindingCardDate,jdbcType=TIMESTAMP},
+      bankid = #{bankid,jdbcType=VARCHAR},
+      is_used_account = #{isUsedAccount,jdbcType=TINYINT},
+      register_source = #{registerSource,jdbcType=TINYINT},
+      freeze_account = #{freezeAccount,jdbcType=INTEGER},
+      id_number = #{idNumber,jdbcType=VARCHAR},
+      is_member = #{isMember,jdbcType=INTEGER},
+      account_type = #{accountType,jdbcType=INTEGER},
+      birth_day = #{birthDay,jdbcType=VARCHAR},
+      memo = #{memo,jdbcType=LONGVARCHAR}
+    where customer_id = #{customerId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.rentcar.CarBizCustomer" >
+    update car_biz_customer
+    set is_binding_credit_card = #{isBindingCreditCard,jdbcType=INTEGER},
+      credit_card_no = #{creditCardNo,jdbcType=VARCHAR},
+      storable_card_no = #{storableCardNo,jdbcType=VARCHAR},
+      open_account_bank = #{openAccountBank,jdbcType=VARCHAR},
+      credit_card_period_of_validity = #{creditCardPeriodOfValidity,jdbcType=VARCHAR},
+      user_from = #{userFrom,jdbcType=VARCHAR},
+      CVN2 = #{cvn2,jdbcType=VARCHAR},
+      user_lv = #{userLv,jdbcType=INTEGER},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=INTEGER},
+      create_by = #{createBy,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
+      gender = #{gender,jdbcType=INTEGER},
+      phone = #{phone,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      user_type = #{userType,jdbcType=INTEGER},
+      city_id = #{cityId,jdbcType=INTEGER},
+      user_photo_url = #{userPhotoUrl,jdbcType=VARCHAR},
+      push_id = #{pushId,jdbcType=VARCHAR},
+      IMEI = #{imei,jdbcType=VARCHAR},
+      os_platform = #{osPlatform,jdbcType=VARCHAR},
+      app_version = #{appVersion,jdbcType=VARCHAR},
+      mobile_brand = #{mobileBrand,jdbcType=VARCHAR},
+      os_version = #{osVersion,jdbcType=VARCHAR},
+      channel_num = #{channelNum,jdbcType=VARCHAR},
+      binding_card_date = #{bindingCardDate,jdbcType=TIMESTAMP},
+      bankid = #{bankid,jdbcType=VARCHAR},
+      is_used_account = #{isUsedAccount,jdbcType=TINYINT},
+      register_source = #{registerSource,jdbcType=TINYINT},
+      freeze_account = #{freezeAccount,jdbcType=INTEGER},
+      id_number = #{idNumber,jdbcType=VARCHAR},
+      is_member = #{isMember,jdbcType=INTEGER},
+      account_type = #{accountType,jdbcType=INTEGER},
+      birth_day = #{birthDay,jdbcType=VARCHAR}
+    where customer_id = #{customerId,jdbcType=INTEGER}
+  </update>
+</mapper>

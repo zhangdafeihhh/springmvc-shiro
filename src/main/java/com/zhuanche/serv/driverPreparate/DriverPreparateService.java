@@ -1,13 +1,12 @@
 package com.zhuanche.serv.driverPreparate;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.zhuanche.common.database.DynamicRoutingDataSource;
-import com.zhuanche.common.database.MasterSlaveConfig;
-import com.zhuanche.common.database.MasterSlaveConfigs;
-import com.zhuanche.entity.DriverPreparate.DriverPreparate;
-import com.zhuanche.util.MyRestTemplate;
-import mapper.rentcar.ex.CarFactOrderExMapper;
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -15,8 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import java.security.MessageDigest;
-import java.util.*;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.entity.DriverPreparate.DriverPreparate;
+import com.zhuanche.serv.order.OrderService;
+import com.zhuanche.util.MyRestTemplate;
 
 @Component("driverPreparateService")
 public class DriverPreparateService {
@@ -32,9 +37,8 @@ public class DriverPreparateService {
 	@Autowired
 	@Qualifier("driverPreparateTemplate")
 	private MyRestTemplate driverPreparateTemplate;
-
 	@Autowired
-	private CarFactOrderExMapper carFactOrderExMapper;
+	private OrderService orderService;
 
 	/**
      * @param orderNo
@@ -96,11 +100,12 @@ public class DriverPreparateService {
 					JSONObject jsonObject = (JSONObject) object;
 					DriverPreparate t = JSONObject.toJavaObject(jsonObject, DriverPreparate.class);
 					if(t!=null&&StringUtils.isNotEmpty(t.getOrderNo())) {
-						String orderId = carFactOrderExMapper.selectorderIdByOrderNo(t.getOrderNo());
-						if(StringUtils.isNotEmpty(orderId)){
+						JSONObject orderInfoJson = orderService.getOrderInfo(null, t.getOrderNo() );
+						if(orderInfoJson!=null) {
+							String orderId = ""+orderInfoJson.getIntValue("orderId");
 							t.setOrderId(orderId);
-							list.add(t);
 						}
+						list.add(t);
 					}
 				}
 				map.put("list",list);
