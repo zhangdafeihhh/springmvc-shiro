@@ -23,7 +23,5 @@ public interface CarBizDriverInfoMapper {
 
     CarBizDriverInfo selectByPhone(@Param("phone") String phone);
 
-    int selectDriverByKeyCountAddCooperation(DriverVoEntity params);
 
-    public List<DriverVoEntity> selectDriverByKeyAddCooperation(DriverVoEntity params);
 }

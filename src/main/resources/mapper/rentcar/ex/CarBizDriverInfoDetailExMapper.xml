@@ -37,4 +37,6 @@
     from car_biz_driver_info_detail
     where driver_id = #{driverId,jdbcType=INTEGER}
   </select>
+
+
 </mapper>

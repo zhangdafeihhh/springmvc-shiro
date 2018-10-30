@@ -2,7 +2,7 @@ package com.zhuanche.serv.rentcar.impl;
 
 import com.zhuanche.dto.driver.DriverTeamRelationEntity;
 import com.zhuanche.serv.rentcar.IDriverTeamRelationService;
-import mapper.rentcar.DriverTeamRelationMapper;
+import mapper.mdbcarmanage.ex.CarRelateTeamExMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,13 +12,11 @@ import java.util.List;
 public class DriverTeamRelationServiceImpl implements IDriverTeamRelationService<DriverTeamRelationEntity> {
 
     @Autowired
-    private DriverTeamRelationMapper driverTeamRelationMapper;
-
-
+    private CarRelateTeamExMapper carRelateTeamExMapper;
 
     @Override
     public List<DriverTeamRelationEntity> selectDriverIdsNoLimit(DriverTeamRelationEntity params) {
-        return driverTeamRelationMapper.queryForListObjectNoLimit(params);
+        return carRelateTeamExMapper.queryForListObjectNoLimit(params);
     }
 
     @Override
@@ -42,12 +40,12 @@ public class DriverTeamRelationServiceImpl implements IDriverTeamRelationService
 
     @Override
     public DriverTeamRelationEntity selectDriverInfo(DriverTeamRelationEntity params) {
-        return this.driverTeamRelationMapper.queryForObject(params);
+        return this.carRelateTeamExMapper.queryForObject(params);
     }
 
     @Override
     public DriverTeamRelationEntity queryForObjectGroup(DriverTeamRelationEntity params) {
-        return this.driverTeamRelationMapper.queryForObjectGroup(params);
+        return this.carRelateTeamExMapper.queryForObjectGroup(params);
     }
 
 }
