@@ -1649,7 +1649,7 @@
   </select>
 
 
-  <select id="selectByPhone" resultMap="ResultMapWithBLOBs" parameterType="java.util.Map" >
+  <select id="selectByPhone" resultMap="BaseResultMap" parameterType="java.util.Map" >
     select
     <include refid="Base_Column_List" />
     ,
