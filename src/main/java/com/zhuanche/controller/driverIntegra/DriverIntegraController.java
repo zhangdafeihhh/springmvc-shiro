@@ -3,6 +3,9 @@ package com.zhuanche.controller.driverIntegra;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.dto.driver.DriverTeamEntity;
 import com.zhuanche.dto.driver.DriverTeamRelationEntity;
 import com.zhuanche.dto.driver.DriverVoEntity;
@@ -58,6 +61,9 @@ public class DriverIntegraController {
     }
     @ResponseBody
     @RequestMapping("/queryDriverIntegralListData")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     public Object queryDriverIntegralListData(DriverVoEntity driverEntity) {
 
         try{
@@ -213,6 +219,9 @@ public class DriverIntegraController {
 
     @ResponseBody
     @RequestMapping("/queryDriverIntegralListDataDown")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     public String queryDriverIntegralListDataDown(DriverVoEntity driverEntity, HttpServletResponse response) {
         driverEntity.setPage(1);
         driverEntity.setPagesize(Integer.MAX_VALUE);
