@@ -26,26 +26,35 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.util.StringUtil;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.controller.driver.Componment;
+import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarFactOrderInfoDTO;
-import com.zhuanche.dto.rentcar.CarFactOrderInfoDetailDTO;
 import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
 import com.zhuanche.dto.rentcar.ServiceTypeDTO;
 import com.zhuanche.entity.DriverOrderRecord.OrderTimeEntity;
 import com.zhuanche.entity.rentcar.CarBizCity;
+import com.zhuanche.entity.rentcar.CarBizCustomer;
+import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.entity.rentcar.CarBizOrderSettleEntity;
 import com.zhuanche.entity.rentcar.CarBizOrderWaitingPeriod;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.entity.rentcar.CarFactOrderInfo;
 import com.zhuanche.entity.rentcar.CarGroupEntity;
 import com.zhuanche.entity.rentcar.ServiceEntity;
+import com.zhuanche.serv.order.OrderService;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
-import com.zhuanche.util.CopyBeanUtil;
+
+import mapper.rentcar.CarBizCustomerMapper;
+import mapper.rentcar.CarBizDriverInfoMapper;
+import mapper.rentcar.ex.CarBizCarInfoExMapper;
+import mapper.rentcar.ex.CarFactOrderExMapper;
 
 /**
  * ClassName: OrderController 
@@ -64,6 +73,16 @@ public class OrderController{
 	 
 	@Autowired
 	private StatisticalAnalysisService statisticalAnalysisService;
+	@Autowired
+	private OrderService orderService;
+	@Autowired
+	private CarFactOrderExMapper carFactOrderExMapper;
+	@Autowired
+	private CarBizDriverInfoMapper carBizDriverInfoMapper;
+	@Autowired
+	private CarBizCustomerMapper carBizCustomerMapper;
+	@Autowired
+	private CarBizCarInfoExMapper carBizCarInfoExMapper;
 	/**
 	    * 查询订单 列表
 	    * @param queryDate	查询日期
@@ -267,10 +286,12 @@ public class OrderController{
      */
 	@ResponseBody
 	@RequestMapping(value = "/orderView", method = { RequestMethod.POST,RequestMethod.GET })
+    @MasterSlaveConfigs(configs={ 
+		  @MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE ),
+		  @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
+	} )
 	public AjaxResponse selectUser(String orderId,String orderNo){
 		logger.info("*****************查询订单详情 订单id+"+orderId);
-		CarFactOrderInfoDetailDTO orderDTO = new CarFactOrderInfoDetailDTO();
-		long startTime=System.currentTimeMillis();
 		if(StringUtil.isEmpty(orderId) && StringUtil.isEmpty(orderNo)){
 			return AjaxResponse.failMsg(100,"参数不能是空");
 		}
@@ -279,7 +300,6 @@ public class OrderController{
 		if(order==null){
 			return AjaxResponse.failMsg(101,"根据条件没有返回结果");
 		}
-		long endTime=System.currentTimeMillis();
 		if(order.getQxcancelstatus()>=10){
 			order.setQxcancelstatus(10);
 		}
@@ -302,15 +322,7 @@ public class OrderController{
 		// 等待时间明细
 		List<CarBizOrderWaitingPeriod>  carBizOrderWaitingPeriodList = this.carFactOrderInfoService.selectWaitingPeriodListSlave(order.getOrderNo());
 		order.setCarBizOrderWaitingPeriodList(carBizOrderWaitingPeriodList);
-		
-		//CopyBeanUtil.copyByIgnoreCase(orderDTO,order,true);
-		float excTime=(float)(endTime-startTime)/1000;
-		logger.info("*****************查询订单详情 耗时+"+excTime);
-		if(order!=null){
-			return AjaxResponse.success(order);
-		}else{
-			return AjaxResponse.failMsg(500,"内部错误");
-		}
+		return AjaxResponse.success(order);
 	}
 	
 	
@@ -423,135 +435,311 @@ public class OrderController{
 	 }
 	
 	 
-	 /**
-		 * 根据orderId获取订单明细
-		 * @param orderId
-		 * @return
-		 */
-		public CarFactOrderInfo getOrderInfo(String orderId,String orderNo){
-			CarFactOrderInfo carFactOrderInfo = new CarFactOrderInfo();
-			if(StringUtil.isNotEmpty(orderId)){
-				carFactOrderInfo.setOrderId(Long.valueOf(orderId));
+	/**查询订单详情( 首先调用订单接口，然后再补全数据)**/
+	private CarFactOrderInfo getOrderInfo(String orderId, String orderNo) {
+		//-------------------------------------------------------------------------------------------------------------------------car_fact_order拆表开始BEGIN
+		SimpleDateFormat yyyyMMddHHmmssSDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		JSONObject orderInfoJson = orderService.getOrderInfo(orderId, orderNo );
+		if(orderInfoJson==null) {
+			return null;
+		}
+		orderId = ""+orderInfoJson.getIntValue("orderId");//重新赋下值
+		
+		//System.out.println( ">>>>>>" + orderInfoJson );
+		//>>>>>>{"channelsNum":"partner-homeinns","factStartLongAddr":"安徽省 合肥市 包河区 徽州大道 靠近合肥南站 ","cityId":93,"factStartAddr":"安徽省 合肥市 包河区 徽州大道 靠近合肥南站 ","bookingEndAddr":"CBC拓基广场","cityName":"合肥","carGroupName":"畅享型","bookingEndLongAddr":"CBC拓基广场","buyoutPrice":53.0,"type":2,"bookingEndPoint":"117.171879,31.856586;117.178469,31.862267","laterMinute":0,"bookingGroupName":"畅享型","estimatedId":"1000","factStartPoint":"117.28889973958333,31.799595811631946;117.295479,31.805302","factDate":1538325568000,"factEndShortAddr":"安徽天正司法鉴定中心","businessId":20010453,"riderPhone":"15555331059","orderType":4,"status":50,"imei":"f4f6e38d-dd0e-49f4-8c72-706a9dea560d","goHomeStatus":0,"airportId":-1,"bookingDriverId":0,"factEndLongAddr":"安徽省 合肥市 蜀山区 井岗路 靠近CBC拓基广场 ","bookingStartShortAddr":"","pushDriverType":2,"bookingStartPoint":"117.290288,31.798983;117.29687,31.804675","bookingCurrentPoint":"null,","factEndPoint":"117.17165418836805,31.857140028211806;117.178244,31.862822","bookingStartLongAddr":"合肥南站","isOtherDrivers":1,"buyoutFlag":1,"memo":"{}","serviceTypeId":2,"licensePlates":"皖A6X984","bookingUserId":100047277,"receiveSMS":1,"riderName":"首旅如家乘车人","factEndDate":1538327131000,"bookingStartAddr":"合肥南站","payFlag":0,"version":"5.0","airlineStatus":"0","serviceTypeName":"预约用车","estimatedAmount":83.0,"bookingDateStr":"2018-10-01 00:30:00","driverId":321721,"carGroupId":43,"bookingUserPhone":"13228973156","createDate":1538320625000,"orderTypeName":"首旅如家","orderId":388510487,"bookingDate":1538325000000,"bookingGroupids":"43","agentId":"0","updateDate":1538334604000,"factEndAddr":"安徽省 合肥市 蜀山区 井岗路 靠近CBC拓基广场 ","factStartShortAddr":"肯德基(合肥南站)","bookingEndShortAddr":"","orderNo":"B5538320625920973","isOrderOthers":1}
+		//一、获取订单的基本信息
+		CarFactOrderInfo result = new CarFactOrderInfo();
+		result.setOrderId( orderInfoJson.getIntValue("orderId") );
+		result.setOrderNo(  orderInfoJson.getString("orderNo") );
+		result.setChannelsNum(  orderInfoJson.getString("channelsNum")  );
+		if(StringUtils.isEmpty( result.getChannelsNum()  ) ) {
+			result.setChannelsNum(  "0"  );
+		}
+		result.setPayFlag(  orderInfoJson.getIntValue("payFlag")  );
+		result.setPushDriverType( orderInfoJson.getIntValue("pushDriverType") );
+		result.setRiderName( orderInfoJson.getString("riderName") );
+		result.setRiderPhone( orderInfoJson.getString("riderPhone") );
+		result.setCityId( orderInfoJson.getIntValue("cityId")  );
+		result.setCityName(  orderInfoJson.getString("cityName") );
+		result.setBookingStartAddr( orderInfoJson.getString("bookingStartAddr") );
+		result.setBookingEndAddr(  orderInfoJson.getString("bookingEndAddr") );
+		result.setBookingStartPoint(  orderInfoJson.getString("bookingStartPoint") );
+		result.setBookingEndPoint(  orderInfoJson.getString("bookingEndPoint") );
+		result.setFactStartAddr( orderInfoJson.getString("factStartAddr") );
+		result.setFactEndAddr(  orderInfoJson.getString("factEndAddr") );
+		if(orderInfoJson.containsKey("factDate") && orderInfoJson.getLongValue("factDate")>0 ) {//实际上车时间
+			Date   factDate = new Date( orderInfoJson.getLongValue("factDate") );
+			String factDatestr = yyyyMMddHHmmssSDF.format(factDate);
+			result.setFactDate( factDatestr );
+			result.setFactDateStr( factDatestr );
+		}
+		if(orderInfoJson.containsKey("factEndDate") && orderInfoJson.getLongValue("factEndDate")>0 ) {//实际下车时间
+			Date   factEndDate = new Date( orderInfoJson.getLongValue("factEndDate") );
+			String factEndDatestr = yyyyMMddHHmmssSDF.format(factEndDate);
+			result.setFactEndDate(  factEndDatestr );
+		}
+		result.setBookinkGroupids( orderInfoJson.getString("bookingGroupids")  );
+		result.setBookinggroupids( orderInfoJson.getString("bookingGroupids") );
+		result.setBookingGroupIds( orderInfoJson.getString("bookingGroupids") );
+		
+		result.setBookingGroupName( orderInfoJson.getString("bookingGroupName") );
+		result.setBookingGroupnames( orderInfoJson.getString("bookingGroupName") );
+		if(orderInfoJson.containsKey("createDate") && orderInfoJson.getLongValue("createDate")>0 ) {//创建时间
+			Date   createDate = new Date( orderInfoJson.getLongValue("createDate") );
+			String createDatestr = yyyyMMddHHmmssSDF.format(createDate);
+			result.setCreatedate(  createDatestr );
+		}
+		result.setBookingDateStr( orderInfoJson.getString("bookingDateStr") );
+		result.setLicensePlates(  orderInfoJson.getString("licensePlates") );
+		result.setMemo(  orderInfoJson.getString("memo") );
+		result.setStatus(  orderInfoJson.getIntValue("status") );
+		result.setBookingUserId( orderInfoJson.getIntValue("bookingUserId")  );
+		result.setServiceTypeId(  orderInfoJson.getIntValue("serviceTypeId") );
+		result.setServiceName( orderInfoJson.getString("serviceTypeName") );
+		if( orderInfoJson.containsKey("driverId") && orderInfoJson.getLongValue("driverId")>0) {
+			result.setDriverId( ""+orderInfoJson.getIntValue("driverId")   );
+		}
+		result.setAirportId( orderInfoJson.getIntValue("airportId") );
+		result.setAirlineNo( orderInfoJson.getString("airlineNo")  );
+		result.setAirlineDepCode( orderInfoJson.getString("airlineDepCode") );
+		if( StringUtils.isNotEmpty(orderInfoJson.getString("airlineStatus"))) {
+			result.setAirlineStatus(  Integer.valueOf( orderInfoJson.getString("airlineStatus")  )  ) ;
+		}
+		result.setAirlineArrCode( orderInfoJson.getString("airlineArrCode") );
+		if(orderInfoJson.containsKey("airlineArrDate") && orderInfoJson.getLongValue("airlineArrDate")>0 ) {
+			Date   airlineArrDate = new Date( orderInfoJson.getLongValue("airlineArrDate") );
+			String airlineArrDatestr = yyyyMMddHHmmssSDF.format(airlineArrDate);
+			result.setAirlineArrDate(airlineArrDatestr);
+		}
+		if(orderInfoJson.containsKey("airlinePlanDate") && orderInfoJson.getLongValue("airlinePlanDate")>0 ) {
+			Date   airlinePlanDate = new Date( orderInfoJson.getLongValue("airlinePlanDate") );
+			result.setAirlinePlanDate(airlinePlanDate);
+		}
+		//二、补全此订单的order_cost_detail
+		CarFactOrderInfo  orderCostDetailData =  carFactOrderExMapper.selectOrderCostDetailByOrderId( Long.valueOf(orderId) );
+		if(orderCostDetailData!=null) {
+			result.setTravelTime(orderCostDetailData.getTravelTime());
+			result.setTravelMileage(orderCostDetailData.getTravelMileage());
+			result.setNightdistancenum(orderCostDetailData.getNightdistancenum());
+			result.setNightdistanceprice(orderCostDetailData.getNightdistanceprice());
+			result.setLongDistancePrice(orderCostDetailData.getLongDistancePrice());
+			result.setReductiontotalprice(orderCostDetailData.getReductiontotalprice());
+			result.setDetailId(orderCostDetailData.getDetailId());
+			result.setActualPayAmount(orderCostDetailData.getActualPayAmount());
+			result.setHotDurationFees(orderCostDetailData.getHotDurationFees());
+			result.setHotDuration(orderCostDetailData.getHotDuration());
+			result.setHotMileage(orderCostDetailData.getHotMileage());
+			result.setHotMileageFees(orderCostDetailData.getHotMileageFees());
+			result.setNighitDuration(orderCostDetailData.getNighitDuration());
+			result.setNighitDurationFees(orderCostDetailData.getNighitDurationFees());
+			result.setPaydriver(orderCostDetailData.getPaydriver());
+			result.setDecimalsFees(orderCostDetailData.getDecimalsFees());
+			result.setTotalAmount(orderCostDetailData.getTotalAmount());
+			result.setOverMileagePrice(orderCostDetailData.getOverMileagePrice());
+			result.setOverTimePrice(orderCostDetailData.getOverTimePrice());
+			result.setOverMileageNum(orderCostDetailData.getOverMileageNum());
+			result.setOverTimeNum(orderCostDetailData.getOverTimeNum());
+			result.setLongDistanceNum(orderCostDetailData.getLongDistanceNum());
+			result.setOutServiceMileage(orderCostDetailData.getOutServiceMileage());
+			result.setOutServicePrice(orderCostDetailData.getOutServicePrice());
+			result.setNightServiceMileage(orderCostDetailData.getNightServiceMileage());
+			result.setNightServicePrice(orderCostDetailData.getNightServicePrice());
+			result.setForecastAmount(orderCostDetailData.getForecastAmount());
+			result.setDesignatedDriverFee(orderCostDetailData.getDesignatedDriverFee());
+			result.setWaitingTime(orderCostDetailData.getWaitingTime());
+			result.setWaitingPrice(orderCostDetailData.getWaitingPrice());
+			result.setBasePrice(orderCostDetailData.getBasePrice());   
+			result.setJmname(orderCostDetailData.getJmname());
+			result.setJmdate(orderCostDetailData.getJmdate());
+			result.setJmprice(orderCostDetailData.getJmprice());
+			result.setJmreason(orderCostDetailData.getJmreason());
+		}
+		//三、补全此订单的car_biz_order_cost_detail_extension
+		CarFactOrderInfo orderCostExtension = carFactOrderExMapper.selectOrderCostExtension( Long.valueOf(orderId) );
+		if(orderCostExtension!=null) {
+			result.setLanguageServiceFee(orderCostExtension.getLanguageServiceFee());
+			result.setDistantDetail(orderCostExtension.getDistantDetail());
+			result.setChannelDiscountDriver(orderCostExtension.getChannelDiscountDriver());
+		}
+		//四、补全此订单的司机信息
+		if( result.getDriverId()!=null && result.getDriverId().length()>0 ) {
+			CarBizDriverInfo carBizDriverInfo = carBizDriverInfoMapper.selectByPrimaryKey(Integer.valueOf(result.getDriverId()));
+			if(carBizDriverInfo!=null) {
+				result.setDrivername(carBizDriverInfo.getName());
+				result.setDriverName(carBizDriverInfo.getName());
+				result.setDriverphone(carBizDriverInfo.getPhone());
+				result.setDriverPhone(carBizDriverInfo.getPhone());
 			}
-			if(StringUtil.isNotEmpty(orderNo)){
-				carFactOrderInfo.setOrderNo(orderNo);
+		}
+		//五、补全此订单的预订人信息
+		if( result.getBookingUserId()>0 ) {
+			CarBizCustomer carBizCustomer = carBizCustomerMapper.selectByPrimaryKey(result.getBookingUserId());
+			if(carBizCustomer!=null) {
+				result.setBookingname(carBizCustomer.getName());
+				result.setBookingphone(carBizCustomer.getPhone());
+				result.setBookingUserPhone(carBizCustomer.getPhone());
 			}
-			CarFactOrderInfo order = this.carFactOrderInfoService.selectByPrimaryKey(carFactOrderInfo);
-			if(order==null){
-				return null;
+		}
+		//六、补全此订单的车辆详情信息
+		if( StringUtils.isNotEmpty(result.getLicensePlates()) ) {
+			CarBizCarInfoDTO carBizCarInfoDTO = carBizCarInfoExMapper.selectModelByLicensePlates( result.getLicensePlates() );
+			if(carBizCarInfoDTO!=null) {
+				result.setModeldetail(  carBizCarInfoDTO.getModelDetail() );
 			}
-			order.setOrderId(order.getOrderId());
-			Integer flag = order.getPayFlag();
-			if(flag!=null){
-				if (flag == 1) {
-					order.setPayperson("乘车人");
-				} else if(flag == 0) {
-					order.setPayperson("预订人");
-				}else if(flag == 2){
-					order.setPayperson("乘车人付现金");
+		}
+		//七、补全此订单的payment信息
+		Double paymentCustomer = carFactOrderExMapper.selectPaymentCustomer(result.getOrderNo());
+		if(paymentCustomer!=null) {
+			result.setPaymentCustomer( paymentCustomer );
+		}
+		Double paymentDriver = carFactOrderExMapper.selectPaymentDriver(result.getOrderNo());
+		if(paymentDriver!=null) {
+			result.setPaymentDriver(paymentDriver);
+		}
+		//八、补全此订单的dissent
+		CarFactOrderInfo orderDissent = carFactOrderExMapper.selectDissent( Long.valueOf(orderId) );
+		if( orderDissent !=null ) {
+			result.setYymemo(orderDissent.getYymemo());
+			result.setYydate(orderDissent.getYydate());
+			result.setYystatus(orderDissent.getYystatus());
+			result.setYyperson(orderDissent.getYyperson());
+		}
+		//九、补全此订单的cancel_reason
+		CarFactOrderInfo orderCancelReason = carFactOrderExMapper.selectCancelReason( Long.valueOf(orderId) );
+		if(orderCancelReason!=null) {
+			result.setQxmemo(orderCancelReason.getQxmemo());
+			result.setQxdate(orderCancelReason.getQxdate());
+			result.setQxperson(orderCancelReason.getQxperson());
+			result.setQxreasonname(orderCancelReason.getQxreasonname());
+			result.setQxcancelstatus(orderCancelReason.getQxcancelstatus());
+		}
+		//十、补全此订单的car_biz_partner_pay_detail
+		Double baiDuOrCtripPrice = carFactOrderExMapper.selectPartnerPayAmount(result.getOrderNo());
+		if(baiDuOrCtripPrice!=null) {
+			result.setBaiDuOrCtripPrice(baiDuOrCtripPrice);
+		}
+		//十一、补全此订单的car_biz_order_settle_detail_extension
+		CarFactOrderInfo orderSettleDetail = carFactOrderExMapper.selectOrderSettleDetail(Long.valueOf(orderId));
+		if( orderSettleDetail!=null ) {
+			result.setWeixin(orderSettleDetail.getWeixin());
+			result.setZfb(orderSettleDetail.getZfb());
+			result.setPassengerPendingPay(orderSettleDetail.getPassengerPendingPay());
+			result.setSettleDate(orderSettleDetail.getSettleDate());
+			result.setPayType(orderSettleDetail.getPayType());
+			result.setCustomerRejectPay(orderSettleDetail.getCustomerRejectPay());
+		}
+		//-------------------------------------------------------------------------------------------------------------------------car_fact_order拆表完成END
+		
+		//B 设置Payperson
+		Integer flag = result.getPayFlag();
+		if (flag == 1) {
+			result.setPayperson("乘车人");
+		} else if(flag == 0) {
+			result.setPayperson("预订人");
+		}else if(flag == 2){
+			result.setPayperson("乘车人付现金");
+		}
+		//C 设置 MainOrderNo
+		//2018-08-13日添加拼车单业务，调接口查询主单号
+		String mainOrderNo = carFactOrderInfoService.getMainOrderBySubOrderNo(result.getOrderNo());
+		result.setMainOrderNo(mainOrderNo);
+		//D 计算 超时长费和时间 add by jdd
+		//调用计费接口
+		String costDetailParamStr = "orderId="+result.getOrderId()+"&serviceId=1";
+		String costDetailResult = carFactOrderInfoService.queryCostDetailData(costDetailParamStr);
+		if(!"".equals(costDetailResult)){
+			JSONObject costDetailJson = JSON.parseObject(costDetailResult);
+			 //超时长数（单位：分钟）
+			result.setOverTimeNum(Double.valueOf(String.valueOf(costDetailJson.get("overTimeNum")==null?"0.00":costDetailJson.get("overTimeNum"))));
+			//超时长费（超时长数*超时长单价）
+			result.setOverTimePrice(Double.valueOf(String.valueOf(costDetailJson.get("overTimePrice")==null?"0.00":costDetailJson.get("overTimePrice"))));
+			//基础资费（套餐费用）
+			result.setBasePrice(Double.valueOf(String.valueOf(costDetailJson.get("basePrice")==null?"0.00":costDetailJson.get("basePrice"))));
+			//基础价包含公里(单位,公里) 
+			result.setIncludemileage(Integer.valueOf(String.valueOf(costDetailJson.get("includeMileage")==null?"0":costDetailJson.get("includeMileage"))));
+			logger.info("基础价包含公里(单位,公里)  :includemileage"+costDetailJson.get("includeMileage"));
+			//基础价包含时长(单位,分钟)
+			result.setIncludeminute(Integer.valueOf(String.valueOf(costDetailJson.get("includeMinute")==null?"0":costDetailJson.get("includeMinute"))));
+			logger.info("基础价包含时长(单位,分钟) :includeminute"+costDetailJson.get("includeMinute"));
+			//String orderStatus = String.valueOf(costDetailJson.get("orderStatus"));
+			//String payType = String.valueOf(costDetailJson.get("payType"));
+			//长途里程(公里）  ，  空驶里程(公里)
+			Double longDistanceNum = Double.valueOf(String.valueOf(costDetailJson.get("longDistanceNum")==null?"0.00":costDetailJson.get("longDistanceNum")));
+			//长途费(元) ， 空驶费(元)
+			Double longDistancePrice = Double.valueOf(String.valueOf(costDetailJson.get("longDistancePrice")==null?"0.00":costDetailJson.get("longDistancePrice")));
+			Double actualPayAmount = Double.valueOf(String.valueOf(costDetailJson.get("actualPayAmount")==null?"0.00":costDetailJson.get("actualPayAmount")));
+			result.setDistantNum(longDistanceNum);
+			result.setDistantFee(longDistancePrice);
+			result.setLongDistanceNum(longDistanceNum);
+			result.setLongdistanceprice(longDistancePrice);
+			result.setActualPayAmount(actualPayAmount);
+			logger.info("order:Includemileage"+result.getIncludemileage());
+			logger.info("order:Includeminute"+result.getIncludeminute());
+		}
+		//E 设置
+		List<CarFactOrderInfo> pojoList = this.carFactOrderInfoService.selectByListPrimaryKey(Long.valueOf(orderId));
+		if (pojoList != null) {
+			for (int i = 0; i < pojoList.size(); i++) {
+				CarFactOrderInfo info = pojoList.get(i);
+				if (info.getCostTypeName().contains("停车")) {
+					result.setCostTypeNameTc(info.getCostTypeName());
+					result.setCostTypeNameTcPrice(info.getCost());
+				} else if (info.getCostTypeName().contains("高速")) {
+					result.setCostTypeNameGs(info.getCostTypeName());
+					result.setCostTypeNameGsPrice(info.getCost());
+				} else if (info.getCostTypeName().contains("机场")) {
+					result.setCostTypeNameJc(info.getCostTypeName());
+					result.setCostTypeNameJcPrice(info.getCost());
+				} else if (info.getCostTypeName().contains("食宿")) {
+					result.setCostTypeNameYj(info.getCostTypeName());
+					result.setCostTypeNameYjPrice(info.getCost());
 				}
 			}
-			
-			//调订单接口，查询拼车子订单号查主单号
-			String mainOrderNo = carFactOrderInfoService.getMainOrderBySubOrderNo(order.getOrderNo());
-			order.setMainOrderNo(mainOrderNo);
-			
-			//调用计费接口
-			String costDetailParamStr = "orderId="+order.getOrderId()+"&serviceId=1";
-			String result = carFactOrderInfoService.queryCostDetailData(costDetailParamStr);
-			if(!"".equals(result)){
-				JSONObject costDetailJson = JSON.parseObject(result);
-				 //超时长数（单位：分钟）
-				order.setOverTimeNum(Double.valueOf(String.valueOf(costDetailJson.get("overTimeNum")==null?"0.00":costDetailJson.get("overTimeNum"))));
-				//超时长费（超时长数*超时长单价）
-				order.setOverTimePrice(Double.valueOf(String.valueOf(costDetailJson.get("overTimePrice")==null?"0.00":costDetailJson.get("overTimePrice"))));
-				//基础资费（套餐费用）
-				order.setBasePrice(Double.valueOf(String.valueOf(costDetailJson.get("basePrice")==null?"0.00":costDetailJson.get("basePrice"))));
-				//基础价包含公里(单位,公里) 
-				order.setIncludemileage(Integer.valueOf(String.valueOf(costDetailJson.get("includeMileage")==null?"0":costDetailJson.get("includeMileage"))));
-				logger.info("基础价包含公里(单位,公里)  :includemileage"+costDetailJson.get("includeMileage"));
-				//基础价包含时长(单位,分钟)
-				order.setIncludeminute(Integer.valueOf(String.valueOf(costDetailJson.get("includeMinute")==null?"0":costDetailJson.get("includeMinute"))));
-				logger.info("基础价包含时长(单位,分钟) :includeminute"+costDetailJson.get("includeMinute"));
-				//String orderStatus = String.valueOf(costDetailJson.get("orderStatus"));
-				//String payType = String.valueOf(costDetailJson.get("payType"));
-				//长途里程(公里）  ，  空驶里程(公里)
-				Double longDistanceNum = Double.valueOf(String.valueOf(costDetailJson.get("longDistanceNum")==null?"0.00":costDetailJson.get("longDistanceNum")));
-				//长途费(元) ， 空驶费(元)
-				Double longDistancePrice = Double.valueOf(String.valueOf(costDetailJson.get("longDistancePrice")==null?"0.00":costDetailJson.get("longDistancePrice")));
-				Double actualPayAmount = Double.valueOf(String.valueOf(costDetailJson.get("actualPayAmount")==null?"0.00":costDetailJson.get("actualPayAmount")));
-				order.setDistantNum(longDistanceNum);
-				order.setDistantFee(longDistancePrice);
-				order.setLongDistanceNum(longDistanceNum);
-				order.setLongdistanceprice(longDistancePrice);
-				order.setActualPayAmount(actualPayAmount);
-				logger.info("order:Includemileage"+order.getIncludemileage());
-				logger.info("order:Includeminute"+order.getIncludeminute());
-			}
-			 //end
-			List<CarFactOrderInfo> pojoList = this.carFactOrderInfoService.selectByListPrimaryKey(order.getOrderId());
-			if (pojoList != null) {
-				for (int i = 0; i < pojoList.size(); i++) {
-					CarFactOrderInfo info = pojoList.get(i);
-					if (info.getCostTypeName().contains("停车")) {
-						order.setCostTypeNameTc(info.getCostTypeName());
-						order.setCostTypeNameTcPrice(info.getCost());
-					} else if (info.getCostTypeName().contains("高速")) {
-						order.setCostTypeNameGs(info.getCostTypeName());
-						order.setCostTypeNameGsPrice(info.getCost());
-					} else if (info.getCostTypeName().contains("机场")) {
-						order.setCostTypeNameJc(info.getCostTypeName());
-						order.setCostTypeNameJcPrice(info.getCost());
-					} else if (info.getCostTypeName().contains("食宿")) {
-						order.setCostTypeNameYj(info.getCostTypeName());
-						order.setCostTypeNameYjPrice(info.getCost());
-					}
-				}
-			}
-			//根据预约的车型id 查找车型的名字
-			String bookinggroupids=order.getBookinkGroupids();
-			if(!StringUtils.isEmpty(bookinggroupids)){
-				String[] ids = bookinggroupids.split(",");
-				String groupStr = "";
-				for (int i = 0; i < ids.length; i++) {
-					CarGroupEntity carBizGroup = carFactOrderInfoService.selectCarGroupById(Integer.parseInt(ids[i]));
-					if (carBizGroup != null) {
-						if (!groupStr.contains(carBizGroup.getGroupName())) {
-							groupStr += carBizGroup.getGroupName()+ ",";
-								}
+		}
+		//F: 根据预约的车型id 设置车型的名字
+		String bookinggroupids=result.getBookinkGroupids();
+		if(!StringUtils.isEmpty(bookinggroupids)){
+			String[] ids = bookinggroupids.split(",");
+			String groupStr = "";
+			for (int i = 0; i < ids.length; i++) {
+				CarGroupEntity carBizGroup = carFactOrderInfoService.selectCarGroupById(Integer.parseInt(ids[i]));
+				if (carBizGroup != null) {
+					if (!groupStr.contains(carBizGroup.getGroupName())) {
+						groupStr += carBizGroup.getGroupName()+ ",";
 							}
 						}
-				if (groupStr.length() > 0) {
-						groupStr = groupStr.substring(0,groupStr.length() - 1);
 					}
-					order.setBookingGroupnames(groupStr);
-			}
-			
-			CarBizOrderSettleEntity carBizOrderSettle= carFactOrderInfoService.selectDriverSettleByOrderId(order.getOrderId());
-			if(carBizOrderSettle!=null){
-				//优惠券面值
-				//优惠券类型
-				order.setCouponsType(carBizOrderSettle.getCouponsType());
-				order.setAmount(carBizOrderSettle.getCouponAmount());
-				//优惠券抵扣
-				order.setCouponsAmount(carBizOrderSettle.getCouponSettleAmount());
-				//乘客信用卡支付
-				order.setPaymentCustomer(carBizOrderSettle.getCustomerCreditcardAmount());
-				//司机代收
-				order.setPaydriver(carBizOrderSettle.getDriverPay());
-				//司机代收现金
-				order.setDriverCashAmount(carBizOrderSettle.getDriverCashAmount());
-				//支付账户
-				order.setChangeAmount(carBizOrderSettle.getChargeSettleAmount());
-				//赠送账户
-				order.setGiftAmount(carBizOrderSettle.getGiftSettleAmount());
-				//司机信用卡支付
-				order.setDriverCreditcardAmount(carBizOrderSettle.getDriverCreditcardAmount());
-				//pos机支付
-				order.setPosPay(carBizOrderSettle.getPosPay());
-			}
-			return order;
+			if (groupStr.length() > 0) {
+					groupStr = groupStr.substring(0,groupStr.length() - 1);
+				}
+			result.setBookingGroupnames(groupStr);
 		}
+		//G: 设置优惠券
+		CarBizOrderSettleEntity carBizOrderSettle= carFactOrderInfoService.selectDriverSettleByOrderId( Long.valueOf(orderId) );
+		if(carBizOrderSettle!=null){
+			//优惠券类型
+			result.setCouponsType(carBizOrderSettle.getCouponsType());
+			//优惠券面值
+			result.setAmount(carBizOrderSettle.getCouponAmount());
+			//优惠券抵扣
+			result.setCouponsAmount(carBizOrderSettle.getCouponSettleAmount());
+			//乘客信用卡支付
+			result.setPaymentCustomer(carBizOrderSettle.getCustomerCreditcardAmount());
+			//司机代收
+			result.setPaydriver(carBizOrderSettle.getDriverPay());
+			//司机代收现金
+			result.setDriverCashAmount(carBizOrderSettle.getDriverCashAmount());
+			//支付账户
+			result.setChangeAmount(carBizOrderSettle.getChargeSettleAmount());
+			//赠送账户
+			result.setGiftAmount(carBizOrderSettle.getGiftSettleAmount());
+			//司机信用卡支付
+			result.setDriverCreditcardAmount(carBizOrderSettle.getDriverCreditcardAmount());
+			//pos机支付
+			result.setPosPay(carBizOrderSettle.getPosPay());
+		}
+		return result;
+	}
 		
 		//订单时间流程赋值
 		public CarFactOrderInfo giveOrderTime(CarFactOrderInfo order){

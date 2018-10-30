@@ -3,7 +3,6 @@ package mapper.rentcar.ex;
 import java.util.List;
 import java.util.Map;
 
-import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
 import com.zhuanche.dto.rentcar.ServiceTypeDTO;
 import com.zhuanche.entity.rentcar.CarBizOrderSettleEntity;
 import com.zhuanche.entity.rentcar.CarBizOrderWaitingPeriod;
@@ -13,21 +12,6 @@ import com.zhuanche.entity.rentcar.CarGroupEntity;
 import com.zhuanche.entity.rentcar.ServiceEntity;
 
 public interface CarFactOrderExMapper {
-
-    /**
-     *  输入订单号返回订单ID
-     * @param orderNo 订单号
-     * @return java.lang.String
-     */
-    public String selectorderIdByOrderNo(String orderNo);
-    
-    
-    /**
-     *  （老车管）输入订单号返回订单明细
-     * @param orderNo 订单号
-     * @return java.lang.String
-     */
-    public CarFactOrderInfo selectByPrimaryKey(CarFactOrderInfo carFactOrderInfo);
     /**
      * 
      * @param orderId
@@ -62,5 +46,21 @@ public interface CarFactOrderExMapper {
      * 订单服务类型
      */
     public List<ServiceTypeDTO> selectServiceEntityList(ServiceEntity serviceEntity);
-    
+
+	//查询order_cost_detail
+	public CarFactOrderInfo selectOrderCostDetailByOrderId(Long orderId);
+	//查询car_biz_order_cost_detail_extension
+	public CarFactOrderInfo selectOrderCostExtension(Long orderId);
+	//查询PaymentCustomer
+	public Double selectPaymentCustomer( String orderNo);
+	//查询PaymentDriver
+	public Double selectPaymentDriver( String orderNo);
+	//查询car_biz_partner_pay_detail
+	public Double selectPartnerPayAmount( String orderNo);
+	//查询dissent
+	public CarFactOrderInfo selectDissent(Long orderId);
+	//查询cancel_reason
+	public CarFactOrderInfo selectCancelReason(Long orderId);
+	//查询car_biz_order_settle_detail_extension
+	public CarFactOrderInfo selectOrderSettleDetail(Long orderId);
 }

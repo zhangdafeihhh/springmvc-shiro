@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
@@ -102,14 +101,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
     
     @Autowired
     private  CarBizCarGroupExMapper carBizCarGroupExMapper;
-    @Override
-	public CarFactOrderInfo selectByPrimaryKey(CarFactOrderInfo carFactOrderInfo) {
-    	CarFactOrderInfo cfo =  carFactOrderExMapper.selectByPrimaryKey(carFactOrderInfo);
-    	if(StringUtil.isEmpty(cfo.getOrderNo()) && cfo.getOrderId()==0){
-    		return null;
-		}
-    	return cfo;
-	}
+
    
 	/**
 	 * 调用订单接口，根据子订单号查询主订单

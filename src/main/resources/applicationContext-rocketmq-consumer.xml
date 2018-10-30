@@ -14,7 +14,7 @@
 		<property name="namesrvAddr" value="${rocketmq.namesrvAddr}"/><!-- RocketMQ命名服务地址 -->
 		<property name="consumeFromWhere" value="CONSUME_FROM_LAST_OFFSET"/><!-- 消费起点 -->
 		<property name="messageModel" value="CLUSTERING"/><!-- 消费模式 -->
-		<property name="topic" value="car_fact_order_canal_new"/><!-- RocketMQ TOPIC -->
+		<property name="topic" value="car_XXXXXXXXXXXX_canal_new"/><!-- RocketMQ TOPIC -->
 		<property name="tags" value="1_40 || 1_43 || 1_44 || 1_45 || 1_50 || 2_40 || 2_43 || 2_44 || 2_45 || 2_50"/><!-- RocketMQ TAG -->
 		<property name="messageBatchMaxSize" value="10"/><!-- 每次消费消息的最大数量 -->
 		<property name="threads" value="2"/><!-- 并发消费线程数 -->
