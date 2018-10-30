@@ -217,4 +217,20 @@
         limit 1;
     </select>
 
+
+    <select id="selectByDriverIdSet"
+            resultType="com.zhuanche.dto.driver.DriverTeamRelationEntity">
+        SELECT
+        t.relation_id AS relationId,
+        t.team_id AS teamId,
+        t.driver_id AS driverId,
+        t1.team_name teamName
+        FROM
+        car_relate_team t,car_driver_team t1
+        WHERE t.team_id = t1.id  and t.driver_id IN
+        <foreach collection="driverIdSet" open="(" close=")" separator="," item="tid" >
+            #{tid}
+        </foreach>
+    </select>
+
 </mapper>

@@ -2,6 +2,7 @@ package com.zhuanche.serv.rentcar;
 
 
 import java.util.List;
+import java.util.Set;
 
 @SuppressWarnings("hiding")
 public interface IDriverTeamRelationService<DriverTeamRelationEntity> {
@@ -17,5 +18,7 @@ public interface IDriverTeamRelationService<DriverTeamRelationEntity> {
 	public DriverTeamRelationEntity selectDriverInfo(DriverTeamRelationEntity params);
 
 	public DriverTeamRelationEntity queryForObjectGroup(DriverTeamRelationEntity params);
+
+	public List<DriverTeamRelationEntity> selectByDriverIdSet(Set<String> driverIdSet);
 
 }

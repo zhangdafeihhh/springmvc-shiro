@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 public class DriverServiceImpl implements IDriverService<DriverEntity> {
@@ -42,15 +42,41 @@ public class DriverServiceImpl implements IDriverService<DriverEntity> {
     public List<DriverVoEntity> selectDriverByKeyAddCooperation(DriverVoEntity params) {
         //查询司机信息
         List<DriverVoEntity> driverEntity = carBizDriverInfoExMapper.selectDriverByKeyAddCooperation(params);
-        //
-        for(int i=0;i<driverEntity.size();i++){
-            DriverTeamRelationEntity params2 = new DriverTeamRelationEntity();
-            params2.setDriverId(driverEntity.get(i).getDriverId());
-            DriverTeamRelationEntity driverTeamRelationEntity = (DriverTeamRelationEntity) driverTeamRelationService.selectDriverInfo(params2);
-            if(driverTeamRelationEntity != null){
-                driverEntity.get(i).setTeamid(driverTeamRelationEntity.getTeamId());
-                driverEntity.get(i).setTeamName(driverTeamRelationEntity.getTeamName());
+        if(driverEntity != null){
+            Set<String> driverIdSet = new HashSet<>();
+            for(DriverVoEntity item : driverEntity){
+                driverIdSet.add(item.getDriverId());
             }
+            //批量查询司机与车队的关系对象
+            List<DriverTeamRelationEntity> driverTeamRelationEntityList = driverTeamRelationService.selectByDriverIdSet(driverIdSet);
+            //本地遍历，缓存
+            Map<String,DriverTeamRelationEntity> cacheDriverTeamRelationEntity = new HashMap<>();
+            if(driverTeamRelationEntityList != null){
+                for(DriverTeamRelationEntity item :driverTeamRelationEntityList){
+                    cacheDriverTeamRelationEntity.put(item.getDriverId(),item);
+                }
+            }
+            //遍历赋值
+            DriverTeamRelationEntity tempDriverTeamRelationEntity = null;
+            for(DriverVoEntity item : driverEntity){
+                tempDriverTeamRelationEntity = cacheDriverTeamRelationEntity.get(item.getDriverId());
+                if(tempDriverTeamRelationEntity != null){
+                    item.setTeamid(tempDriverTeamRelationEntity.getTeamId());
+                    item.setTeamName(tempDriverTeamRelationEntity.getTeamName());
+                }
+            }
+        }
+
+
+        //
+//        for(int i=0;i<driverEntity.size();i++){
+//            DriverTeamRelationEntity params2 = new DriverTeamRelationEntity();
+//            params2.setDriverId(driverEntity.get(i).getDriverId());
+//            DriverTeamRelationEntity driverTeamRelationEntity = (DriverTeamRelationEntity) driverTeamRelationService.selectDriverInfo(params2);
+//            if(driverTeamRelationEntity != null){
+//                driverEntity.get(i).setTeamid(driverTeamRelationEntity.getTeamId());
+//                driverEntity.get(i).setTeamName(driverTeamRelationEntity.getTeamName());
+//            }
 //            DriverTeamRelationEntity driverTeamRelationEntity2 = (DriverTeamRelationEntity) this.driverTeamRelationService.queryForObjectGroup(params2);
 //            if(!"".equals(driverTeamRelationEntity2)&&driverTeamRelationEntity2!=null){
 //                driverEntity.get(i).setGroupId(driverTeamRelationEntity2.getGroupId());
@@ -63,7 +89,7 @@ public class DriverServiceImpl implements IDriverService<DriverEntity> {
 //            }else{
 //                driverEntity.get(i).setExt1(2);
 //            }
-        }
+//        }
         return driverEntity;
     }
 

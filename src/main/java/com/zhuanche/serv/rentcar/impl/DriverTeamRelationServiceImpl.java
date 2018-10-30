@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class DriverTeamRelationServiceImpl implements IDriverTeamRelationService<DriverTeamRelationEntity> {
@@ -46,6 +47,11 @@ public class DriverTeamRelationServiceImpl implements IDriverTeamRelationService
     @Override
     public DriverTeamRelationEntity queryForObjectGroup(DriverTeamRelationEntity params) {
         return this.carRelateTeamExMapper.queryForObjectGroup(params);
+    }
+
+    @Override
+    public List<DriverTeamRelationEntity> selectByDriverIdSet(Set<String> driverIdSet) {
+        return carRelateTeamExMapper.selectByDriverIdSet(driverIdSet);
     }
 
 }

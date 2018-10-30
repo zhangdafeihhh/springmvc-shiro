@@ -62,4 +62,5 @@ public interface CarRelateTeamExMapper {
 
     public DriverTeamRelationEntity queryForObjectGroup(DriverTeamRelationEntity params);
 
+    List<DriverTeamRelationEntity> selectByDriverIdSet(@Param("driverIdSet")Set<String> driverIdSet);
 }
