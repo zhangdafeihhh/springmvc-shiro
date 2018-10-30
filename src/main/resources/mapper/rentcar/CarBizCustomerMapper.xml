@@ -38,7 +38,6 @@
     <result column="id_number" property="idNumber" jdbcType="VARCHAR" />
     <result column="is_member" property="isMember" jdbcType="INTEGER" />
     <result column="account_type" property="accountType" jdbcType="INTEGER" />
-    <result column="attribution" property="attribution" jdbcType="VARCHAR" />
     <result column="birth_day" property="birthDay" jdbcType="VARCHAR" />
   </resultMap>
   <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizCustomer" extends="BaseResultMap" >
@@ -50,7 +49,7 @@
     update_by, create_by, status, name, gender, phone, password, user_type, city_id, 
     user_photo_url, push_id, IMEI, os_platform, app_version, mobile_brand, os_version, 
     channel_num, binding_card_date, bankid, is_used_account, register_source, freeze_account, 
-    id_number, is_member, account_type, attribution, birth_day
+    id_number, is_member, account_type, birth_day
   </sql>
   <sql id="Blob_Column_List" >
     memo
@@ -83,8 +82,7 @@
       channel_num, binding_card_date, bankid, 
       is_used_account, register_source, freeze_account, 
       id_number, is_member, account_type, 
-      attribution, birth_day, memo
-      )
+      birth_day, memo)
     values (#{isBindingCreditCard,jdbcType=INTEGER}, #{creditCardNo,jdbcType=VARCHAR}, 
       #{storableCardNo,jdbcType=VARCHAR}, #{openAccountBank,jdbcType=VARCHAR}, #{creditCardPeriodOfValidity,jdbcType=VARCHAR}, 
       #{userFrom,jdbcType=VARCHAR}, #{cvn2,jdbcType=VARCHAR}, #{userLv,jdbcType=INTEGER}, 
@@ -97,8 +95,7 @@
       #{channelNum,jdbcType=VARCHAR}, #{bindingCardDate,jdbcType=TIMESTAMP}, #{bankid,jdbcType=VARCHAR}, 
       #{isUsedAccount,jdbcType=TINYINT}, #{registerSource,jdbcType=TINYINT}, #{freezeAccount,jdbcType=INTEGER}, 
       #{idNumber,jdbcType=VARCHAR}, #{isMember,jdbcType=INTEGER}, #{accountType,jdbcType=INTEGER}, 
-      #{attribution,jdbcType=VARCHAR}, #{birthDay,jdbcType=VARCHAR}, #{memo,jdbcType=LONGVARCHAR}
-      )
+      #{birthDay,jdbcType=VARCHAR}, #{memo,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.rentcar.CarBizCustomer" >
     <selectKey resultType="java.lang.Integer" keyProperty="customerId" order="AFTER" >
@@ -210,9 +207,6 @@
       </if>
       <if test="accountType != null" >
         account_type,
-      </if>
-      <if test="attribution != null" >
-        attribution,
       </if>
       <if test="birthDay != null" >
         birth_day,
@@ -326,9 +320,6 @@
       </if>
       <if test="accountType != null" >
         #{accountType,jdbcType=INTEGER},
-      </if>
-      <if test="attribution != null" >
-        #{attribution,jdbcType=VARCHAR},
       </if>
       <if test="birthDay != null" >
         #{birthDay,jdbcType=VARCHAR},
@@ -446,9 +437,6 @@
       <if test="accountType != null" >
         account_type = #{accountType,jdbcType=INTEGER},
       </if>
-      <if test="attribution != null" >
-        attribution = #{attribution,jdbcType=VARCHAR},
-      </if>
       <if test="birthDay != null" >
         birth_day = #{birthDay,jdbcType=VARCHAR},
       </if>
@@ -495,7 +483,6 @@
       id_number = #{idNumber,jdbcType=VARCHAR},
       is_member = #{isMember,jdbcType=INTEGER},
       account_type = #{accountType,jdbcType=INTEGER},
-      attribution = #{attribution,jdbcType=VARCHAR},
       birth_day = #{birthDay,jdbcType=VARCHAR},
       memo = #{memo,jdbcType=LONGVARCHAR}
     where customer_id = #{customerId,jdbcType=INTEGER}
@@ -537,7 +524,6 @@
       id_number = #{idNumber,jdbcType=VARCHAR},
       is_member = #{isMember,jdbcType=INTEGER},
       account_type = #{accountType,jdbcType=INTEGER},
-      attribution = #{attribution,jdbcType=VARCHAR},
       birth_day = #{birthDay,jdbcType=VARCHAR}
     where customer_id = #{customerId,jdbcType=INTEGER}
   </update>

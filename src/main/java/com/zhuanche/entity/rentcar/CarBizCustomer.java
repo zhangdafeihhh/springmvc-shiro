@@ -75,8 +75,6 @@ public class CarBizCustomer {
 
     private Integer accountType;
 
-    private String attribution;
-
     private String birthDay;
 
     private String memo;
@@ -367,14 +365,6 @@ public class CarBizCustomer {
 
     public void setAccountType(Integer accountType) {
         this.accountType = accountType;
-    }
-
-    public String getAttribution() {
-        return attribution;
-    }
-
-    public void setAttribution(String attribution) {
-        this.attribution = attribution == null ? null : attribution.trim();
     }
 
     public String getBirthDay() {
