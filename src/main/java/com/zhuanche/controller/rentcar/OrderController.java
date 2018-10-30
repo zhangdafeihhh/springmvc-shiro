@@ -228,7 +228,7 @@ public class OrderController{
 		List<CarFactOrderInfoDTO> result = new ArrayList<CarFactOrderInfoDTO>(10000);
 		for(int pageNo=1; ; pageNo++  ) {
 			paramMap.put("pageNo",pageNo);//页号
-		    paramMap.put("pageSize",5000);//每页记录数
+		    paramMap.put("pageSize",500);//每页记录数
 			 // 从订单组取统计数据
 		    List<CarFactOrderInfoDTO> dtoList = carFactOrderInfoService.queryAllOrderDataList(paramMap);
 			if(dtoList==null || dtoList.size()==0) {
