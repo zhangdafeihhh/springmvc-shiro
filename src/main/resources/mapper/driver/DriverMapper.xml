@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.DriverTeamRelationMapper" >
+
+  <!--<resultMap id="BaseResultMap" type="com.zhuanche.dto.driver.DriverTeamRelationEntity" >-->
+    <!--<id column="id" property="id" jdbcType="INTEGER" />-->
+    <!--<result column="driver_verify_id" property="driverVerifyId" jdbcType="INTEGER" />-->
+    <!--<result column="operation" property="operation" jdbcType="INTEGER" />-->
+    <!--<result column="operation_name" property="operationName" jdbcType="VARCHAR" />-->
+    <!--<result column="operation_describe" property="operationDescribe" jdbcType="VARCHAR" />-->
+    <!--<result column="create_id" property="createId" jdbcType="INTEGER" />-->
+    <!--<result column="create_name" property="createName" jdbcType="VARCHAR" />-->
+    <!--<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />-->
+    <!--<result column="update_id" property="updateId" jdbcType="INTEGER" />-->
+    <!--<result column="update_name" property="updateName" jdbcType="VARCHAR" />-->
+    <!--<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />-->
+  <!--</resultMap>-->
+
+
+  <select id="queryForListObjectNoLimit" parameterType="com.zhuanche.dto.driver.DriverTeamRelationEntity"
+          resultType="com.zhuanche.dto.driver.DriverTeamRelationEntity">
+    SELECT
+    relation_id AS relationId,
+    team_id AS teamId,
+    driver_id AS driverId
+    FROM
+    car_relate_team
+    WHERE 1=1
+    <if test="relationId!=null and relationId!=''">
+      AND relation_id = #{relationId}
+    </if>
+    <if test="teamId!=null and teamId!=''">
+      AND team_id in (${teamId})
+    </if>
+    <if test="driverId!=null and driverId!=''">
+      AND driver_id = #{driverId}
+    </if>
+  </select>
+
+  <select id="queryForObject" parameterType="com.zhuanche.dto.driver.DriverTeamRelationEntity"
+          resultType="com.zhuanche.dto.driver.DriverTeamRelationEntity">
+    SELECT
+    t.relation_id AS relationId,
+    t.team_id AS teamId,
+    t.driver_id AS driverId,
+    t1.team_name teamName
+    FROM
+    car_relate_team t,car_driver_team t1
+    WHERE t.team_id = t1.id
+    <if test="relationId!=null and relationId!=''">
+      AND relation_id = #{relationId}
+    </if>
+    <if test="teamId!=null and teamId!=''">
+      AND team_id in (${teamId})
+    </if>
+    <if test="driverId!=null and driverId!=''">
+      AND driver_id = #{driverId}
+    </if>
+    limit 1;
+  </select>
+
+  <select id="queryForObjectGroup" parameterType="com.zhuanche.dto.driver.DriverTeamRelationEntity"
+          resultType="com.zhuanche.dto.driver.DriverTeamRelationEntity">
+    SELECT
+    t.relation_id AS relationId,
+    t.group_id AS groupId,
+    t.driver_id AS driverId,
+    t1.team_name groupName
+    FROM
+    car_relate_group t,car_driver_team t1
+    WHERE t.group_id = t1.id
+    <if test="relationId!=null and relationId!=''">
+      AND t.relation_id = #{relationId}
+    </if>
+    <if test="groupId!=null and groupId!=''">
+      AND t.group_id in (${groupId})
+    </if>
+    AND t.driver_id = #{driverId}
+    limit 1;
+  </select>
+
+</mapper>
