@@ -52,12 +52,18 @@ public class DriverIntegraController {
     private MyRestTemplate driverIntegralApiTemplate;
 
 
-    protected Map<String, Object> gridJsonFormate(List<?> rows, int total) {
+    protected JSONObject gridJsonFormate(List<?> rows, int total) {
         rows = null == rows ? new ArrayList<>() : rows;
         Map<String, Object> result = new HashMap<String, Object>();
         result.put(Common.RESULT_ROWS, rows);
         result.put(Common.RESULT_TOTAL, total);
-        return result;
+
+        JSONObject ret = new JSONObject();
+        ret.put("code",0);
+        ret.put("msg","成功");
+        ret.put("data",result);
+
+        return ret;
     }
     @ResponseBody
     @RequestMapping("/queryDriverIntegralListData")
@@ -181,6 +187,9 @@ public class DriverIntegraController {
             return this.gridJsonFormate(rows, total);
         }catch (Exception e){
             logger.error("司机积分数据列表异常",e);
+            JSONObject ret = new JSONObject();
+            ret.put("code",1);
+            ret.put("msg","失败");
             throw  e;
         }
     }
@@ -227,6 +236,7 @@ public class DriverIntegraController {
         driverEntity.setPagesize(Integer.MAX_VALUE);
 
         logger.info("queryDriverIntegralListDataDown:下载司机积分数据列表,参数为："+(driverEntity==null?"null": JSON.toJSONString(driverEntity)));
+
 
         try {
             // 权限
