@@ -46,7 +46,6 @@ import org.apache.http.HttpException;
 import org.apache.http.entity.ContentType;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -2482,11 +2481,7 @@ public class CarBizDriverInfoService {
 
         FileInputStream io = new FileInputStream(path);
         // 创建 excel
-//        Workbook wb = new XSSFWorkbook(io);
-		// 内存缓存最大行数
-		int rowMaxCache = 100;
-        // 使用SXSSFWorkbook解决OOM问题
-        SXSSFWorkbook wb = new SXSSFWorkbook(new XSSFWorkbook(io),rowMaxCache);
+        Workbook wb = new XSSFWorkbook(io);
         if(list != null && list.size()>0){
             Sheet sheet = null;
             try {
