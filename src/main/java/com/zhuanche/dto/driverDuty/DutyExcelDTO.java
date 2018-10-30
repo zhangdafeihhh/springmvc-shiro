@@ -1,8 +1,6 @@
 package com.zhuanche.dto.driverDuty;
 
 
-import com.zhuanche.util.Check;
-
 import java.io.Serializable;
 
 public class DutyExcelDTO implements Serializable{

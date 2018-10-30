@@ -429,6 +429,9 @@ public class ExportExcelUtil<T> {
             Font font3 = workbook.createFont();
             font3.setColor(HSSFColor.BLUE.index);
 
+            CellStyle style3 = workbook.createCellStyle();
+            style3.setFont(font3);
+
             CellStyle styleDate = workbook.createCellStyle();
             styleDate.setFillForegroundColor(HSSFColor.LIGHT_YELLOW.index);
             styleDate.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
@@ -449,6 +452,9 @@ public class ExportExcelUtil<T> {
                     String getMethodName = "get"
                             + fieldName.substring(0, 1).toUpperCase()
                             + fieldName.substring(1);
+                    if("getSerialVersionUID".equals(getMethodName)){
+                        continue;
+                    }
                     try {
                         Class tCls = t.getClass();
                         Method getMethod = tCls.getMethod(getMethodName,
@@ -489,8 +495,8 @@ public class ExportExcelUtil<T> {
                                 cell.setCellValue(Double.parseDouble(textValue));
                             } else {
                                 HSSFRichTextString richString = new HSSFRichTextString(textValue);
-
-                                richString.applyFont(font3);
+                                cell.setCellStyle(style3);
+//                                richString.applyFont(font3);
                                 cell.setCellValue(richString);
                             }
                         }
