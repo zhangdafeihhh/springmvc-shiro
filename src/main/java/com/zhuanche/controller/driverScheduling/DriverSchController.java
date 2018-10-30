@@ -6,7 +6,6 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
-import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.dto.driver.CarDriverDayDutyDTO;
 import com.zhuanche.dto.driverDuty.CarDriverDurationDTO;
 import com.zhuanche.dto.driverDuty.CarDriverMustDutyDTO;
@@ -16,17 +15,17 @@ import com.zhuanche.entity.mdbcarmanage.CarDutyDuration;
 import com.zhuanche.request.DutyParamRequest;
 import com.zhuanche.request.TeamGroupRequest;
 import com.zhuanche.serv.common.CitySupplierTeamCommonService;
-import com.zhuanche.serv.driverScheduling.*;
+import com.zhuanche.serv.driverScheduling.CarDriverDurationService;
+import com.zhuanche.serv.driverScheduling.CarDriverDutyService;
+import com.zhuanche.serv.driverScheduling.CarDriverMustDutyService;
+import com.zhuanche.serv.driverScheduling.CarDriverShiftsService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.Check;
 import com.zhuanche.util.dateUtil.DateUtil;
 import com.zhuanche.util.excel.ExportExcelUtil;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -39,7 +38,10 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @description: 司机排班
@@ -134,11 +136,9 @@ public class DriverSchController {
             // 声明一个工作薄
             ExportExcelUtil excelUtil = new ExportExcelUtil();
 
-//            HSSFWorkbook workbook = new HSSFWorkbook();
-            int rowMaxCache = 100;
-            // 使用SXSSFWorkbook解决OOM问题
-            SXSSFWorkbook workbook = new SXSSFWorkbook(rowMaxCache);
-            workbook = excelUtil.exportExcelSheetV2(workbook, "排班信息"+param.getPageNo(), title, firstList);
+            HSSFWorkbook workbook = new HSSFWorkbook();
+
+            workbook = excelUtil.exportExcelSheet(workbook, "排班信息"+param.getPageNo(), title, firstList);
             for(int pageNumber = 2; ((pageNumber-1)*param.getPageSize()) < total; pageNumber++){
                 param.setPageNo(pageNumber);
                 PageDTO page = carDriverDutyService.queryDriverDayDutyList(param);
@@ -158,7 +158,7 @@ public class DriverSchController {
                 }
 //                List<DutyExcelDTO> targetList = BeanUtil.copyList(sourceList, DutyExcelDTO.class);
                 if(!Check.NuNCollection(targetList)){
-                    workbook = excelUtil.exportExcelSheetV2(workbook, "排班信息" + pageNumber, title, targetList);
+                    workbook = excelUtil.exportExcelSheet(workbook, "排班信息" + pageNumber, title, targetList);
                 }
             }
             ServletOutputStream out = reponseOut.getOutputStream();
@@ -170,7 +170,7 @@ public class DriverSchController {
             }
 
         }catch (Exception e){
-            logger.error("导出排班信息 异常:{}"+JSON.toJSONString(e));
+            logger.error("导出排班信息 异常:{}",e);
             return ;
         }
         return ;

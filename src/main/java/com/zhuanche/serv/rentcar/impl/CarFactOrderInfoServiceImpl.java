@@ -1,28 +1,5 @@
 package com.zhuanche.serv.rentcar.impl;
 
-import java.io.FileInputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.http.HttpException;
-import org.apache.http.entity.ContentType;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -34,25 +11,34 @@ import com.zhuanche.dto.rentcar.CarFactOrderInfoDTO;
 import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
 import com.zhuanche.dto.rentcar.ServiceTypeDTO;
 import com.zhuanche.entity.DriverOrderRecord.OrderTimeEntity;
-import com.zhuanche.entity.rentcar.CarBizCity;
-import com.zhuanche.entity.rentcar.CarBizOrderSettleEntity;
-import com.zhuanche.entity.rentcar.CarBizOrderWaitingPeriod;
-import com.zhuanche.entity.rentcar.CarBizPlanEntity;
-import com.zhuanche.entity.rentcar.CarBizSupplier;
-import com.zhuanche.entity.rentcar.CarFactOrderInfo;
-import com.zhuanche.entity.rentcar.CarGroupEntity;
-import com.zhuanche.entity.rentcar.ServiceEntity;
+import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.util.Common;
-
 import mapper.driverOrderRecord.DriverOrderRecordMapper;
 import mapper.orderPlatform.PoolMainOrderMapper;
-import mapper.rentcar.ex.CarBizCarGroupExMapper;
-import mapper.rentcar.ex.CarBizCityExMapper;
-import mapper.rentcar.ex.CarBizDriverInfoExMapper;
-import mapper.rentcar.ex.CarBizSupplierExMapper;
-import mapper.rentcar.ex.CarFactOrderExMapper;
+import mapper.rentcar.ex.*;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.http.HttpException;
+import org.apache.http.entity.ContentType;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.io.FileInputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
@@ -444,13 +430,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 	public Workbook exportExceleOrderList(List<CarFactOrderInfoDTO> list,String path) throws Exception {
 		FileInputStream io = new FileInputStream(path);
 		// 创建 excel
-//		Workbook wb = new XSSFWorkbook(io);
-		// 内存缓存最大行数
-		int rowMaxCache = 100;
-		// 使用SXSSFWorkbook解决OOM问题
-		SXSSFWorkbook wb = new SXSSFWorkbook(new XSSFWorkbook(io),rowMaxCache);
-
-
+ 		Workbook wb = new XSSFWorkbook(io);
 		if (list != null && list.size() > 0) {
 			Sheet sheet = null;
 			try {
