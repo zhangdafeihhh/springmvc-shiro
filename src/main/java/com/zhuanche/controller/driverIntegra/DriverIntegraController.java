@@ -12,10 +12,12 @@ import com.zhuanche.serv.IDriverTeamRelationService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Common;
+import com.zhuanche.util.MyRestTemplate;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -35,6 +37,9 @@ public class DriverIntegraController {
     @Autowired
     private IDriverService driverService;
 
+    @Autowired
+    @Qualifier("driverIntegralApiTemplate")
+    private MyRestTemplate driverIntegralApiTemplate;
 
 
     protected Map<String, Object> gridJsonFormate(List<?> rows, int total) {
@@ -168,6 +173,34 @@ public class DriverIntegraController {
     }
 
     private JSONArray getDriverIntegralInfoList(List<JSONObject> driverInfoList){
-        return null;
+
+        JSONObject jsonObj = null;
+        JSONArray  retArray = null;
+        long start = System.currentTimeMillis();
+        try{
+            String url = "/integral/batchGetDriverInfo";
+            Map<String,Object> paramMap = new HashMap<>();
+            paramMap.put("driverInfo", driverInfoList);
+
+            jsonObj = driverIntegralApiTemplate.postForObject(url,driverInfoList,JSONObject.class);
+            logger.info("调用策略平台批量查询积分正常,耗时+"+(System.currentTimeMillis() - start)+";参数为"+(driverInfoList==null?"": driverInfoList.toString())
+                    +";返回结果为："+ (jsonObj == null ?"null":JSON.toJSONString(jsonObj)));
+            if (jsonObj != null) {
+                int code = jsonObj.getInteger("code");
+                if(code == 0) {
+                    JSONObject dataJSON = jsonObj.getJSONObject("data");
+                    if(dataJSON != null){
+                        retArray = dataJSON.getJSONArray("data");
+                    }
+
+                }
+            }
+        }catch (Exception e) {
+            logger.error("调用策略平台批量查询积分异常,耗时"+(System.currentTimeMillis() - start)+";参数为"+(driverInfoList==null?"": driverInfoList.toString())
+                    +";返回结果为："+ (jsonObj == null ?"null":jsonObj.toJSONString()),e);
+        }
+//		logger.info("调用策略平台批量查询积分-返回结果："+(retArray==null?"nul":retArray.toJSONString()));
+        return retArray;
+
     }
 }

@@ -1,6 +1,89 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="mapper.driver.DriverInfoDetailMapper" >
+<mapper namespace="mapper.driver.DriverTeamRelationMapper">
+
+    <resultMap id="baseResultMap" type="com.zhuanche.dto.driver.DriverInfoDetailEntity">
+        <result column="id" property="id" />
+        <result column="driver_id" property="driverId" />
+        <result column="bank_card_bank" property="bankCardBank" />
+        <result column="bank_card_number" property="bankCardNumber" />
+        <result column="ext1" property="ext1" />
+        <result column="ext2" property="ext2" />
+        <result column="ext3" property="ext3" />
+        <result column="ext4" property="ext4" />
+        <result column="ext5" property="ext5" />
+        <result column="ext6" property="ext6" />
+        <result column="ext7" property="ext7" />
+        <result column="ext8" property="ext8" />
+        <result column="ext9" property="ext9" />
+        <result column="ext10" property="ext10" />
+        <result column="create_date" property="createDate" />
+        <result column="update_date" property="updateDate" />
+    </resultMap>
+
+    <sql id="columns">
+        id, driver_id, bank_card_bank, bank_card_number, ext1, ext2, ext3, ext4, ext5, ext6, ext7, ext8, ext9, ext10, create_date, update_date
+    </sql>
+
+    <sql id="wheres">
+        where 1 = 1
+        <if test="id != null">
+            and id = #{id}
+        </if>
+        <if test="driverId != null">
+            and driver_id = #{driverId}
+        </if>
+        <if test="bankCardBank != null and bankCardBank != ''">
+            and bank_card_bank = #{bankCardBank}
+        </if>
+        <if test="bankCardNumber != null and bankCardNumber != ''">
+            and bank_card_number = #{bankCardNumber}
+        </if>
+        <if test="ext1 != null">
+            and ext1 = #{ext1}
+        </if>
+        <if test="ext2 != null">
+            and ext2 = #{ext2}
+        </if>
+        <if test="ext3 != null">
+            and ext3 = #{ext3}
+        </if>
+        <if test="ext4 != null">
+            and ext4 = #{ext4}
+        </if>
+        <if test="ext5 != null">
+            and ext5 = #{ext5}
+        </if>
+        <if test="ext6 != null and ext6 != ''">
+            and ext6 = #{ext6}
+        </if>
+        <if test="ext7 != null and ext7 != ''">
+            and ext7 = #{ext7}
+        </if>
+        <if test="ext8 != null and ext8 != ''">
+            and ext8 = #{ext8}
+        </if>
+        <if test="ext9 != null and ext9 != ''">
+            and ext9 = #{ext9}
+        </if>
+        <if test="ext10 != null and ext10 != ''">
+            and ext10 = #{ext10}
+        </if>
+        <if test="createDate != null and createDate != ''">
+            and create_date = #{createDate}
+        </if>
+        <if test="updateDate != null and updateDate != ''">
+            and update_date = #{updateDate}
+        </if>
+    </sql>
+
+    <select id="getByDriverId" parameterType="java.lang.Integer" resultMap="baseResultMap">
+        select
+        ext1
+        from car_biz_driver_info_detail
+        where driver_id = #{driverId}
+        limit 1
+    </select>
 
 
 
