@@ -22,12 +22,6 @@ import com.zhuanche.entity.rentcar.ServiceEntity;
 
 
 public interface CarFactOrderInfoService {
-	/**
-     *  （老车管）输入订单号返回订单明细
-     * @param orderNo 订单号
-     * @return java.lang.String
-     */
-    public CarFactOrderInfo selectByPrimaryKey(CarFactOrderInfo carFactOrderInfo);
     /**
      *  （老车管）根据子订单号查询主订单
      * @param orderNo 订单号
