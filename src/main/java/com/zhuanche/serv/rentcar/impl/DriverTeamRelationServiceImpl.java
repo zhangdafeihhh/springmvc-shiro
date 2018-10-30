@@ -1,14 +1,15 @@
-package com.zhuanche.serv;
+package com.zhuanche.serv.rentcar.impl;
 
 import com.zhuanche.dto.driver.DriverTeamRelationEntity;
-import mapper.driver.DriverTeamRelationMapper;
+import com.zhuanche.serv.rentcar.IDriverTeamRelationService;
+import mapper.rentcar.DriverTeamRelationMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class DriverTeamRelationServiceImpl implements IDriverTeamRelationService<DriverTeamRelationEntity>{
+public class DriverTeamRelationServiceImpl implements IDriverTeamRelationService<DriverTeamRelationEntity> {
 
     @Autowired
     private DriverTeamRelationMapper driverTeamRelationMapper;

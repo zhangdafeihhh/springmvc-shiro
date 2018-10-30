@@ -1,11 +1,13 @@
-package com.zhuanche.serv;
+package com.zhuanche.serv.rentcar.impl;
 
 import com.zhuanche.dto.driver.DriverInfoDetailEntity;
 import com.zhuanche.dto.driver.DriverTeamRelationEntity;
 import com.zhuanche.dto.driver.DriverVoEntity;
 import com.zhuanche.entity.rentcar.DriverEntity;
+import com.zhuanche.serv.rentcar.IDriverTeamRelationService;
+import com.zhuanche.serv.rentcar.IDriverService;
 import mapper.driver.DriverInfoDetailMapper;
-import mapper.driver.DriverMapper;
+import mapper.rentcar.CarBizDriverInfoMapper;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +20,7 @@ public class DriverServiceImpl implements IDriverService<DriverEntity> {
 
 
     @Autowired
-    private DriverMapper driverDao;
+    private CarBizDriverInfoMapper carBizDriverInfoMapper;
 
     @Autowired
     private IDriverTeamRelationService driverTeamRelationService;
@@ -29,12 +31,12 @@ public class DriverServiceImpl implements IDriverService<DriverEntity> {
 
     @Override
     public int selectDriverByKeyCountAddCooperation(DriverVoEntity params) {
-        return driverDao.selectDriverByKeyCountAddCooperation(params);
+        return carBizDriverInfoMapper.selectDriverByKeyCountAddCooperation(params);
     }
 
     @Override
     public List<DriverVoEntity> selectDriverByKeyAddCooperation(DriverVoEntity params) {
-        List<DriverVoEntity> driverEntity = driverDao.selectDriverByKeyAddCooperation(params);
+        List<DriverVoEntity> driverEntity = carBizDriverInfoMapper.selectDriverByKeyAddCooperation(params);
         for(int i=0;i<driverEntity.size();i++){
             DriverTeamRelationEntity params2 = new DriverTeamRelationEntity();
             params2.setDriverId(driverEntity.get(i).getDriverId());

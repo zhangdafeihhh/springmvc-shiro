@@ -1,4 +1,4 @@
-package com.zhuanche.serv;
+package com.zhuanche.serv.rentcar;
 
 
 import java.util.List;

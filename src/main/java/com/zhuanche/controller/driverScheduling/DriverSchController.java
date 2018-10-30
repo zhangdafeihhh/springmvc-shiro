@@ -170,7 +170,7 @@ public class DriverSchController {
             }
 
         }catch (Exception e){
-            logger.error("导出排班信息 异常:{}"+JSON.toJSONString(e));
+            logger.error("导出排班信息 异常:{}",e);
             return ;
         }
         return ;

@@ -1,4 +1,4 @@
-package mapper.driver;
+package mapper.rentcar;
 
 import com.zhuanche.dto.driver.DriverTeamRelationEntity;
 
