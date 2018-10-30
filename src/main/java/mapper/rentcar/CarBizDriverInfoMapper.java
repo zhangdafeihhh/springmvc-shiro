@@ -21,7 +21,7 @@ public interface CarBizDriverInfoMapper {
 
     int updateByPrimaryKey(CarBizDriverInfo record);
 
-    CarBizDriverInfo selectByPhone(@Param("phone") String phone);
+
 
 
 }

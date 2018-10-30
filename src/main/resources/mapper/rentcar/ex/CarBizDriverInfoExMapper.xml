@@ -1647,5 +1647,15 @@
     order by i.update_date desc
     LIMIT ${offSet},${pagesize}
   </select>
+
+
+  <select id="selectByPhone" resultMap="ResultMapWithBLOBs" parameterType="java.util.Map" >
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from car_biz_driver_info
+    where phone = #{phone,jdbcType=INTEGER}
+  </select>
   
 </mapper>

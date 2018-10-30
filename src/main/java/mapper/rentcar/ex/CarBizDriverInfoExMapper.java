@@ -135,4 +135,7 @@ public interface CarBizDriverInfoExMapper {
     int selectDriverByKeyCountAddCooperation(DriverVoEntity params);
 
     public List<DriverVoEntity> selectDriverByKeyAddCooperation(DriverVoEntity params);
+
+
+    CarBizDriverInfo selectByPhone(@Param("phone") String phone);
 }
