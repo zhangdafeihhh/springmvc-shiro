@@ -29,7 +29,6 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +37,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.client.RestClientException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -521,10 +519,7 @@ public class DriverDailyReportController extends DriverQueryController {
 	public Workbook exportExcel(List<DriverDailyReportDTO> list, String path, Integer reportType)
 			throws Exception {
 		FileInputStream io = new FileInputStream(path);
-		// 内存缓存最大行数
-		int rowMaxCache = 100;
-		// 使用SXSSFWorkbook解决OOM问题
-		SXSSFWorkbook wb = new SXSSFWorkbook(new XSSFWorkbook(io),rowMaxCache);
+		Workbook wb = new XSSFWorkbook(io);
 		if (list != null && list.size() > 0) {
 			Sheet sheet = wb.getSheetAt(0);
 			Cell cell = null;

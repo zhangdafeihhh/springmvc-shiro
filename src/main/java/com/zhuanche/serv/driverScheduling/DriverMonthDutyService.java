@@ -13,15 +13,12 @@ import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.dto.driverDuty.CarDriverMonthDTO;
 import com.zhuanche.dto.driverDuty.ColumnEntity;
-import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverMonthDuty;
-import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.request.DriverMonthDutyRequest;
 import com.zhuanche.request.DutyParamRequest;
 import com.zhuanche.util.Check;
-import com.zhuanche.util.Common;
 import com.zhuanche.util.DateUtils;
 import mapper.mdbcarmanage.CarDriverMonthDutyMapper;
 import mapper.mdbcarmanage.ex.CarDriverMonthDutyExMapper;
@@ -32,14 +29,12 @@ import mapper.rentcar.ex.CarBizDriverInfoExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
 import org.apache.poi.POIXMLDocument;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,10 +44,12 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * @description: 司机月排班
@@ -588,12 +585,7 @@ public class DriverMonthDutyService {
 			throws Exception {
 		FileInputStream io = new FileInputStream(path);
 		// 创建 excel
-		//Workbook wb = new XSSFWorkbook(io);
-		// 内存缓存最大行数
-		int rowMaxCache = 100;
-		// 使用SXSSFWorkbook解决OOM问题
-		SXSSFWorkbook wb = new SXSSFWorkbook(new XSSFWorkbook(io),rowMaxCache);
-
+		Workbook wb = new XSSFWorkbook(io);
 		List<CarDriverMonthDTO> rows = new ArrayList<CarDriverMonthDTO>();
 		rows = carDriverMonthDutyExMapper.queryDriverDutyList(params);
 		if (null != rows && !rows.isEmpty()) {

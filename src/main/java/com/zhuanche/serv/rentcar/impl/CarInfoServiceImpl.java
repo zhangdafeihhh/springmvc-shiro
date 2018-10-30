@@ -11,7 +11,6 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Common;
 import com.zhuanche.util.MyRestTemplate;
-import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.rentcar.CarSysDictionaryMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizModelExMapper;
@@ -22,7 +21,6 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +29,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
@@ -2100,11 +2096,7 @@ public class CarInfoServiceImpl implements CarInfoService {
     public Workbook exportExcel(CarInfo params, String path)
             throws Exception {
         FileInputStream io = new FileInputStream(path);
-        // 创建 excel
-        // 内存缓存最大行数
-        int rowMaxCache = 100;
-        // 使用SXSSFWorkbook解决OOM问题
-        SXSSFWorkbook wb = new SXSSFWorkbook(new XSSFWorkbook(io),rowMaxCache);
+        Workbook wb = new XSSFWorkbook(io);
         String cities = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getCityIds(), ",");
         String suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds(), ",");
         String teamIds = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getTeamIds(), ",");

@@ -24,7 +24,6 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -227,11 +226,7 @@ public class OrderAppraisalController extends DriverQueryController{
 
 	public Workbook exportExcel(List<CarBizCustomerAppraisal> list, String path) throws Exception{
 		FileInputStream io = new FileInputStream(path);
-		// 内存缓存最大行数
-		int rowMaxCache = 100;
-		// 使用SXSSFWorkbook解决OOM问题
-		SXSSFWorkbook wb = new SXSSFWorkbook(new XSSFWorkbook(io),rowMaxCache);
-
+		Workbook wb = new XSSFWorkbook(io);
 		if(list != null && list.size()>0){
 			Sheet sheet = wb.getSheetAt(0);
 			Cell cell = null;
