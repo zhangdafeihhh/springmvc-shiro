@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.BusOrderOperationTimeExMapper">
+	<resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.BusOrderOperationTime">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="order_id" property="orderId" jdbcType="INTEGER" />
+		<result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+		<result column="time" property="time" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+		<result column="type" property="type" jdbcType="INTEGER" />
+		<result column="driver_id" property="driverId" jdbcType="INTEGER" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+		<result column="dirver_phone" property="dirverPhone" jdbcType="VARCHAR" />
+		<result column="description" property="description" jdbcType="VARCHAR" />
+	</resultMap>
+	<resultMap id="ResultMapType1" type="java.util.HashMap">
+		<result column="order_id" property="orderId" jdbcType="INTEGER" />
+		<result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+		<result column="time" property="time" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+		<result column="type" property="type" jdbcType="INTEGER" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="driver_id" property="driverId" jdbcType="INTEGER" />
+		<result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+		<result column="dirver_phone" property="dirverPhone" jdbcType="VARCHAR" />
+		<result column="description" property="description" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, order_id, order_no, time, type, driver_id, status, driver_name, dirver_phone, description
+	</sql>
+	<sql id="Column_List_Type1">
+		order_id, order_no, time, type, driver_id, status, driver_name, dirver_phone, description
+	</sql>
+
+	<select id="queryOperationByOrderId" resultMap="ResultMapType1">
+        select
+        <include refid="Column_List_Type1"/>
+        from bus_order_operation_time
+        where order_id = #{orderId}
+    </select>
+
+</mapper>

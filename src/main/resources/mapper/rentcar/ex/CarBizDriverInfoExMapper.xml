@@ -1491,4 +1491,51 @@
     where license_plates = #{license_plates}
   </select>
   
+  <!-- 查询巴士订单指派/改派可用司机 -->
+	<select id="queryBusDriverList" parameterType="com.zhuanche.dto.busManage.BusDriverRicherDTO" resultType="java.util.HashMap">
+		SELECT 
+			i.driver_id AS driverId ,
+			i.name as name,
+			i.phone as phone,
+			p.supplier_full_name AS supplierName,
+			g.group_name as groupName
+		FROM 
+			car_biz_driver_info i 
+			LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+			LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+		where 
+			g.type=2 and i.status=1
+		<if test="driverId != null">
+			and i.driver_id = #{driverId}
+		</if>
+		<if test="driverIds != null and !driverIds.isEmpty()">
+			and i.driver_id not in
+			<foreach item="item" index="index" collection="driverIds" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="name != null and name != ''">
+			and i.name LIKE CONCAT(#{name},'%')
+		</if>
+		<if test="phone != null and phone != ''">
+			and i.phone LIKE CONCAT(#{phone},'%')
+		</if>
+		<if test="groupId != null">
+			and i.group_id = #{groupId}
+		</if>
+		<if test="cityId != null">
+			and i.service_city = #{cityId}
+		</if>
+		<if test="supplierId != null">
+			and i.supplier_Id = #{supplierId}
+		</if>
+		<if test="supplierIds != null and !supplierIds.isEmpty()">
+			and i.supplier_Id in 
+			<foreach item="item" index="index" collection="supplierIds" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		order by i.update_date desc
+	</select>
+	
 </mapper>

@@ -1,984 +1,645 @@
 package com.zhuanche.entity.rentcar;
 
+import java.util.Date;
 
-public class CarBizCarInfo{
-	private static final long serialVersionUID = 5454155825314635342L;
+public class CarBizCarInfo {
+    private Integer carId;
 
-	public static final String FORMAT_CAR_PURCHASE_DATE = "yyyy-MM-dd";
-	private Integer carId;
+    private Integer cityId;
 
-	private Integer supplierId;
+    private Integer driverId;
 
-	private String licensePlates;
+    private Integer supplierId;
 
-	private String brand;
+    private String licensePlates;
 
-	private Integer carModelId;
+    private String brand;
 
-	private String carModelIds;
+    private Integer carModelId;
 
-	private String modelDetail;
+    private Date carPurchaseDate;
 
-	private String color;
+    private String modelDetail;
 
-	private String engineNo;
+    private String color;
 
-	private String frameNo;
+    private String carPhotographName;
 
-	private String nextInspectDate;
+    private String carPhotograph;
 
-	private String nextMaintenanceDate;
+    private String engineNo;
 
-	private String rentalExpireDate;
+    private String frameNo;
 
-	private String memo;
+    private Date nextInspectDate;
 
-	private Integer status;
+    private Date nextMaintenanceDate;
 
-	private Integer isFree;
+    private Date rentalExpireDate;
 
-	private Integer createBy;
+    private Date nextOperationDate;
 
-	private Integer updateBy;
+    private Date nextSecurityDate;
 
-	private String createDate;
+    private Date nextClassDate;
 
-	private String updateDate;
+    private Date twoLevelMaintenanceDate;
 
-	//车辆图片
-	private String imageUrl;
+    private Integer status;
 
-	// 关联 司机的id
-	private Integer driverid;
+    private Integer createBy;
 
-	// 下次运营证检验时间
-	private String nextOperationDate;
+    private Integer updateBy;
 
-	// 下次治安证检测时间
-	private String nextSecurityDate;
+    private Date createDate;
 
-	// 下次等级验证时间
-	private String nextClassDate;
+    private Date updateDate;
 
-	// 二级维护时间
-	private String twoLevelMaintenanceDate;
+    private String gpsdate;
 
-	private Integer cityId;
+    private String clicenseplatescolor;
 
-	private String cityName;
+    private String fueltype;
 
-	private String modeName;
+    private String carrypassengers;
 
-	private String supplierName;
+    private Integer auditingstatus;
 
-	private String purchaseDate;
+    private String insurancecompany;
 
-	private String carAge;
+    private String insurancenumber;
 
-	private String timeOfnextInspect;
+    private String insurancetype;
 
-	private String timeOfnextMaintenance;
+    private String insurancemoney;
 
-	private String driverName;
+    private String insurancedatestart;
 
-	private String carPhotographName;
+    private String insurancedateend;
 
-	private String createName;
+    private String freighttype;
 
-	private String updateName;
+    private String vehicleenginedisplacement;
 
-    //车型名称
-	private String groupName;
+    private String totalmileage;
 
-    //车型Id
-	private Integer groupId;
+    private Integer overhaulstatus;
 
-	//购车时间的String
-	private String purchaseDateString;
+    private String transportnumber;
 
-    ////租赁时间
-	private String rentalExpireDateString;
+    private String certificationauthority;
 
-    //下次车检时间的
-	private String nextInspectDateString;
+    private String operatingregion;
 
-    //下次维保时间的
-	private String nextMaintenanceDateString;
+    private String firstdate;
 
-	//原有车牌号
-	private String licensePlates1;
+    private String transportnumberdatestart;
 
-	// 购买日期 开始时间
-	private String purchaseDateBegin;
+    private String transportnumberdateend;
 
-	// 购买日期 结束时间
-	private String purchaseDateEnd;
+    private String equipmentnumber;
 
-	// 下次维保开始时间
-	private String nextMaintenanceDateBegin;
+    private String gpsbrand;
 
-	// 下次维保结束时间
-	private String nextMaintenanceDateEnd;
+    private String gpstype;
 
-	// 下次治安证开始时间
-	private String nextSecurityDateBegin;
+    private String auditingDate;
 
-	// 下次治安证结束时间
-	private String nextSecurityDateEnd;
+    private String vehicleEnginePower;
 
-	// 下次运营证开始时间
-	private String nextOperationDateBegin;
+    private String vehicleEngineWheelbase;
 
-	// 下次运营证结束时间
-	private String nextOperationDateEnd;
+    private String vehicleRegistrationDate;
 
-	// 下次等级鉴定开始时间
-	private String nextClassDateBegin;
+    private String vehicleVinCode;
 
-	// 下次等级鉴定结束时间
-	private String nextClassDateEnd;
+    private String vehicleBrand;
 
-	// 权限
-	private String supplierIds;
-	private String cities;
+    private String gpsImei;
 
-	private String teamIds;
+    private String vehicleOwner;
 
-	private String fileName;//批量导入上传文件名称
+    private String vehicleType;
 
-	private int inspectFlag;
+    private String vehicleDrivingLicense;
 
-	private int MaintenanceFlag;
+    private String vehicletec;
 
-	private String createDateBegin;
+    private String vehiclesafe;
 
-	private String createDateEnd;
+    private Integer lzbStatus;
 
-	//核定载客位
-	private String carryPassengers;
+    private String memo;
 
-	//车辆厂牌
-	private String vehicleBrand;
+    public Integer getCarId() {
+        return carId;
+    }
 
-	//车牌颜色
-	private String clicensePlatesColor;
+    public void setCarId(Integer carId) {
+        this.carId = carId;
+    }
 
-	//车辆VIN码
-	private String vehicleVINCode;
+    public Integer getCityId() {
+        return cityId;
+    }
 
-	//车辆注册日期
-	private String vehicleRegistrationDate;
+    public void setCityId(Integer cityId) {
+        this.cityId = cityId;
+    }
 
-	//车辆燃料类型
-	private Integer fuelType;
+    public Integer getDriverId() {
+        return driverId;
+    }
 
-	//车辆发动机排量
-	private String vehicleEngineDisplacement;
+    public void setDriverId(Integer driverId) {
+        this.driverId = driverId;
+    }
 
-	//发动机功率
-	private String vehicleEnginePower;
+    public Integer getSupplierId() {
+        return supplierId;
+    }
 
-	//车辆轴距
-	private String vehicleEngineWheelbase;
+    public void setSupplierId(Integer supplierId) {
+        this.supplierId = supplierId;
+    }
 
-	//网络预约出租汽车运输证号
-	private String transportNumber;
+    public String getLicensePlates() {
+        return licensePlates;
+    }
 
-	//网络预约出租汽车运输证发证机构
-	private String certificationAuthority;
+    public void setLicensePlates(String licensePlates) {
+        this.licensePlates = licensePlates == null ? null : licensePlates.trim();
+    }
 
-	//经营区域
-	private String operatingRegion;
+    public String getBrand() {
+        return brand;
+    }
 
-	//网络预约出租汽车运输证有效期起
-	private String transportNumberDateStart;
+    public void setBrand(String brand) {
+        this.brand = brand == null ? null : brand.trim();
+    }
 
-	//网络预约出租汽车运输证有效期止
-	private String transportNumberDateEnd;
+    public Integer getCarModelId() {
+        return carModelId;
+    }
 
-	//网约车初次登记日期
-	private String firstDate;
+    public void setCarModelId(Integer carModelId) {
+        this.carModelId = carModelId;
+    }
 
-	//车辆检修状态
-	private Integer overHaulStatus;
+    public Date getCarPurchaseDate() {
+        return carPurchaseDate;
+    }
 
-	//年度审验状态
-	private Integer auditingStatus;
+    public void setCarPurchaseDate(Date carPurchaseDate) {
+        this.carPurchaseDate = carPurchaseDate;
+    }
 
-	//车辆年度审验日期
-	private String auditingDate;
+    public String getModelDetail() {
+        return modelDetail;
+    }
 
-	//发票打印设备序列号
-	private String equipmentNumber;
+    public void setModelDetail(String modelDetail) {
+        this.modelDetail = modelDetail == null ? null : modelDetail.trim();
+    }
 
-	//卫星定位装置品牌
-	private String gpsBrand;
+    public String getColor() {
+        return color;
+    }
 
-	//卫星定位装置型号
-	private String gpsType;
+    public void setColor(String color) {
+        this.color = color == null ? null : color.trim();
+    }
 
-	//卫星定位装置IMEI号
-	private String gpsImei;
+    public String getCarPhotographName() {
+        return carPhotographName;
+    }
 
-	//卫星定位装置安装日期
-	private String gpsDate;
+    public void setCarPhotographName(String carPhotographName) {
+        this.carPhotographName = carPhotographName == null ? null : carPhotographName.trim();
+    }
 
-	//所属车主
-	private String vehicleOwner;
+    public String getCarPhotograph() {
+        return carPhotograph;
+    }
 
-	//车辆类型（以机动车行驶证为主）
-	private String vehicleType;
+    public void setCarPhotograph(String carPhotograph) {
+        this.carPhotograph = carPhotograph == null ? null : carPhotograph.trim();
+    }
 
-	//车辆行驶证扫描件
-	private String vehicleDrivingLicense;
+    public String getEngineNo() {
+        return engineNo;
+    }
 
-	//车辆更改供应商，需要把关联司机从原有供应商更改
-    private Integer oldSupplierId;
+    public void setEngineNo(String engineNo) {
+        this.engineNo = engineNo == null ? null : engineNo.trim();
+    }
 
-    private Integer oldCity;
+    public String getFrameNo() {
+        return frameNo;
+    }
 
-    private String carIds;
+    public void setFrameNo(String frameNo) {
+        this.frameNo = frameNo == null ? null : frameNo.trim();
+    }
 
-    //加盟类型  car_biz_cooperation_type
-	private int cooperationType;
+    public Date getNextInspectDate() {
+        return nextInspectDate;
+    }
 
-	//加盟类型
-	private String cooperationName;
+    public void setNextInspectDate(Date nextInspectDate) {
+        this.nextInspectDate = nextInspectDate;
+    }
 
-	public int getCooperationType() {
-		return cooperationType;
-	}
+    public Date getNextMaintenanceDate() {
+        return nextMaintenanceDate;
+    }
 
-	public void setCooperationType(int cooperationType) {
-		this.cooperationType = cooperationType;
-	}
+    public void setNextMaintenanceDate(Date nextMaintenanceDate) {
+        this.nextMaintenanceDate = nextMaintenanceDate;
+    }
 
-	public String getCooperationName() {
-		return cooperationName;
-	}
+    public Date getRentalExpireDate() {
+        return rentalExpireDate;
+    }
 
-	public void setCooperationName(String cooperationName) {
-		this.cooperationName = cooperationName;
-	}
+    public void setRentalExpireDate(Date rentalExpireDate) {
+        this.rentalExpireDate = rentalExpireDate;
+    }
 
-	public String getCarIds() {
-		return carIds;
-	}
+    public Date getNextOperationDate() {
+        return nextOperationDate;
+    }
 
-	public void setCarIds(String carIds) {
-		this.carIds = carIds;
-	}
+    public void setNextOperationDate(Date nextOperationDate) {
+        this.nextOperationDate = nextOperationDate;
+    }
 
-	public Integer getOldCity() {
-		return oldCity;
-	}
+    public Date getNextSecurityDate() {
+        return nextSecurityDate;
+    }
 
-	public void setOldCity(Integer oldCity) {
-		this.oldCity = oldCity;
-	}
+    public void setNextSecurityDate(Date nextSecurityDate) {
+        this.nextSecurityDate = nextSecurityDate;
+    }
 
-	public Integer getOldSupplierId() {
-		return oldSupplierId;
-	}
+    public Date getNextClassDate() {
+        return nextClassDate;
+    }
 
-	public void setOldSupplierId(Integer oldSupplierId) {
-		this.oldSupplierId = oldSupplierId;
-	}
+    public void setNextClassDate(Date nextClassDate) {
+        this.nextClassDate = nextClassDate;
+    }
 
-	public String getVehicleDrivingLicense() {
-		return vehicleDrivingLicense;
-	}
+    public Date getTwoLevelMaintenanceDate() {
+        return twoLevelMaintenanceDate;
+    }
 
-	public void setVehicleDrivingLicense(String vehicleDrivingLicense) {
-		this.vehicleDrivingLicense = vehicleDrivingLicense;
-	}
+    public void setTwoLevelMaintenanceDate(Date twoLevelMaintenanceDate) {
+        this.twoLevelMaintenanceDate = twoLevelMaintenanceDate;
+    }
 
-	public String getVehicleOwner() {
-		return vehicleOwner;
-	}
+    public Integer getStatus() {
+        return status;
+    }
 
-	public void setVehicleOwner(String vehicleOwner) {
-		this.vehicleOwner = vehicleOwner;
-	}
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
 
-	public String getVehicleType() {
-		return vehicleType;
-	}
+    public Integer getCreateBy() {
+        return createBy;
+    }
 
-	public void setVehicleType(String vehicleType) {
-		this.vehicleType = vehicleType;
-	}
+    public void setCreateBy(Integer createBy) {
+        this.createBy = createBy;
+    }
 
-	public String getCreateDateBegin() {
-		return createDateBegin;
-	}
+    public Integer getUpdateBy() {
+        return updateBy;
+    }
 
-	public void setCreateDateBegin(String createDateBegin) {
-		this.createDateBegin = createDateBegin;
-	}
+    public void setUpdateBy(Integer updateBy) {
+        this.updateBy = updateBy;
+    }
 
-	public String getCreateDateEnd() {
-		return createDateEnd;
-	}
+    public Date getCreateDate() {
+        return createDate;
+    }
 
-	public void setCreateDateEnd(String createDateEnd) {
-		this.createDateEnd = createDateEnd;
-	}
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
 
-	public String getCarModelIds() {
-		return carModelIds;
-	}
+    public Date getUpdateDate() {
+        return updateDate;
+    }
 
-	public void setCarModelIds(String carModelIds) {
-		this.carModelIds = carModelIds;
-	}
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
 
-	public int getInspectFlag() {
-		return inspectFlag;
-	}
+    public String getGpsdate() {
+        return gpsdate;
+    }
 
-	public void setInspectFlag(int inspectFlag) {
-		this.inspectFlag = inspectFlag;
-	}
+    public void setGpsdate(String gpsdate) {
+        this.gpsdate = gpsdate == null ? null : gpsdate.trim();
+    }
 
-	public int getMaintenanceFlag() {
-		return MaintenanceFlag;
-	}
+    public String getClicenseplatescolor() {
+        return clicenseplatescolor;
+    }
 
-	public void setMaintenanceFlag(int maintenanceFlag) {
-		MaintenanceFlag = maintenanceFlag;
-	}
+    public void setClicenseplatescolor(String clicenseplatescolor) {
+        this.clicenseplatescolor = clicenseplatescolor == null ? null : clicenseplatescolor.trim();
+    }
 
-	public String getFileName() {
-		return fileName;
-	}
+    public String getFueltype() {
+        return fueltype;
+    }
 
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
+    public void setFueltype(String fueltype) {
+        this.fueltype = fueltype == null ? null : fueltype.trim();
+    }
 
-	public String getSupplierIds() {
-		return supplierIds;
-	}
+    public String getCarrypassengers() {
+        return carrypassengers;
+    }
 
-	public void setSupplierIds(String supplierIds) {
-		this.supplierIds = supplierIds;
-	}
+    public void setCarrypassengers(String carrypassengers) {
+        this.carrypassengers = carrypassengers == null ? null : carrypassengers.trim();
+    }
 
-	public String getCities() {
-		return cities;
-	}
+    public Integer getAuditingstatus() {
+        return auditingstatus;
+    }
 
-	public void setCities(String cities) {
-		this.cities = cities;
-	}
+    public void setAuditingstatus(Integer auditingstatus) {
+        this.auditingstatus = auditingstatus;
+    }
 
-	public String getTeamIds() {
-		return teamIds;
-	}
+    public String getInsurancecompany() {
+        return insurancecompany;
+    }
 
-	public void setTeamIds(String teamIds) {
-		this.teamIds = teamIds;
-	}
+    public void setInsurancecompany(String insurancecompany) {
+        this.insurancecompany = insurancecompany == null ? null : insurancecompany.trim();
+    }
 
-	public Integer getIsFree() {
-		return isFree;
-	}
+    public String getInsurancenumber() {
+        return insurancenumber;
+    }
 
-	public void setIsFree(Integer isFree) {
-		this.isFree = isFree;
-	}
+    public void setInsurancenumber(String insurancenumber) {
+        this.insurancenumber = insurancenumber == null ? null : insurancenumber.trim();
+    }
 
-	public Integer getCityId() {
-		return cityId;
-	}
+    public String getInsurancetype() {
+        return insurancetype;
+    }
 
-	public void setCityId(Integer cityId) {
-		this.cityId = cityId;
-	}
+    public void setInsurancetype(String insurancetype) {
+        this.insurancetype = insurancetype == null ? null : insurancetype.trim();
+    }
 
-	public String getCityName() {
-		return cityName;
-	}
+    public String getInsurancemoney() {
+        return insurancemoney;
+    }
 
-	public void setCityName(String cityName) {
-		this.cityName = cityName;
-	}
+    public void setInsurancemoney(String insurancemoney) {
+        this.insurancemoney = insurancemoney == null ? null : insurancemoney.trim();
+    }
 
-	public String getModeName() {
-		return modeName;
-	}
+    public String getInsurancedatestart() {
+        return insurancedatestart;
+    }
 
-	public void setModeName(String modeName) {
-		this.modeName = modeName;
-	}
+    public void setInsurancedatestart(String insurancedatestart) {
+        this.insurancedatestart = insurancedatestart == null ? null : insurancedatestart.trim();
+    }
 
-	public String getSupplierName() {
-		return supplierName;
-	}
+    public String getInsurancedateend() {
+        return insurancedateend;
+    }
 
-	public void setSupplierName(String supplierName) {
-		this.supplierName = supplierName;
-	}
+    public void setInsurancedateend(String insurancedateend) {
+        this.insurancedateend = insurancedateend == null ? null : insurancedateend.trim();
+    }
 
+    public String getFreighttype() {
+        return freighttype;
+    }
 
-	public String getCarAge() {
-		return carAge;
-	}
+    public void setFreighttype(String freighttype) {
+        this.freighttype = freighttype == null ? null : freighttype.trim();
+    }
 
-	public String getPurchaseDate() {
-		return purchaseDate;
-	}
+    public String getVehicleenginedisplacement() {
+        return vehicleenginedisplacement;
+    }
 
-	public void setPurchaseDate(String purchaseDate) {
-		this.purchaseDate = purchaseDate;
-	}
+    public void setVehicleenginedisplacement(String vehicleenginedisplacement) {
+        this.vehicleenginedisplacement = vehicleenginedisplacement == null ? null : vehicleenginedisplacement.trim();
+    }
 
-	public void setCarAge(String carAge) {
-		this.carAge = carAge;
-	}
+    public String getTotalmileage() {
+        return totalmileage;
+    }
 
-	public String getTimeOfnextInspect() {
-		return timeOfnextInspect;
-	}
+    public void setTotalmileage(String totalmileage) {
+        this.totalmileage = totalmileage == null ? null : totalmileage.trim();
+    }
 
-	public void setTimeOfnextInspect(String timeOfnextInspect) {
-		this.timeOfnextInspect = timeOfnextInspect;
-	}
+    public Integer getOverhaulstatus() {
+        return overhaulstatus;
+    }
 
-	public String getTimeOfnextMaintenance() {
-		return timeOfnextMaintenance;
-	}
+    public void setOverhaulstatus(Integer overhaulstatus) {
+        this.overhaulstatus = overhaulstatus;
+    }
 
-	public void setTimeOfnextMaintenance(String timeOfnextMaintenance) {
-		this.timeOfnextMaintenance = timeOfnextMaintenance;
-	}
+    public String getTransportnumber() {
+        return transportnumber;
+    }
 
-	public String getDriverName() {
-		return driverName;
-	}
+    public void setTransportnumber(String transportnumber) {
+        this.transportnumber = transportnumber == null ? null : transportnumber.trim();
+    }
 
-	public void setDriverName(String driverName) {
-		this.driverName = driverName;
-	}
+    public String getCertificationauthority() {
+        return certificationauthority;
+    }
 
-	public String getCarPhotographName() {
-		return carPhotographName;
-	}
+    public void setCertificationauthority(String certificationauthority) {
+        this.certificationauthority = certificationauthority == null ? null : certificationauthority.trim();
+    }
 
-	public void setCarPhotographName(String carPhotographName) {
-		this.carPhotographName = carPhotographName;
-	}
+    public String getOperatingregion() {
+        return operatingregion;
+    }
 
-	public String getCreateName() {
-		return createName;
-	}
+    public void setOperatingregion(String operatingregion) {
+        this.operatingregion = operatingregion == null ? null : operatingregion.trim();
+    }
 
-	public void setCreateName(String createName) {
-		this.createName = createName;
-	}
+    public String getFirstdate() {
+        return firstdate;
+    }
 
-	public String getUpdateName() {
-		return updateName;
-	}
+    public void setFirstdate(String firstdate) {
+        this.firstdate = firstdate == null ? null : firstdate.trim();
+    }
 
-	public void setUpdateName(String updateName) {
-		this.updateName = updateName;
-	}
+    public String getTransportnumberdatestart() {
+        return transportnumberdatestart;
+    }
 
+    public void setTransportnumberdatestart(String transportnumberdatestart) {
+        this.transportnumberdatestart = transportnumberdatestart == null ? null : transportnumberdatestart.trim();
+    }
 
-	public String getLicensePlates1() {
-		return licensePlates1;
-	}
+    public String getTransportnumberdateend() {
+        return transportnumberdateend;
+    }
 
-	public void setLicensePlates1(String licensePlates1) {
-		this.licensePlates1 = licensePlates1;
-	}
+    public void setTransportnumberdateend(String transportnumberdateend) {
+        this.transportnumberdateend = transportnumberdateend == null ? null : transportnumberdateend.trim();
+    }
 
-	public String getPurchaseDateBegin() {
-		return purchaseDateBegin;
-	}
+    public String getEquipmentnumber() {
+        return equipmentnumber;
+    }
 
-	public void setPurchaseDateBegin(String purchaseDateBegin) {
-		this.purchaseDateBegin = purchaseDateBegin;
-	}
+    public void setEquipmentnumber(String equipmentnumber) {
+        this.equipmentnumber = equipmentnumber == null ? null : equipmentnumber.trim();
+    }
 
-	public String getPurchaseDateEnd() {
-		return purchaseDateEnd;
-	}
+    public String getGpsbrand() {
+        return gpsbrand;
+    }
 
-	public void setPurchaseDateEnd(String purchaseDateEnd) {
-		this.purchaseDateEnd = purchaseDateEnd;
-	}
+    public void setGpsbrand(String gpsbrand) {
+        this.gpsbrand = gpsbrand == null ? null : gpsbrand.trim();
+    }
 
-	public String getNextMaintenanceDateBegin() {
-		return nextMaintenanceDateBegin;
-	}
+    public String getGpstype() {
+        return gpstype;
+    }
 
-	public void setNextMaintenanceDateBegin(String nextMaintenanceDateBegin) {
-		this.nextMaintenanceDateBegin = nextMaintenanceDateBegin;
-	}
+    public void setGpstype(String gpstype) {
+        this.gpstype = gpstype == null ? null : gpstype.trim();
+    }
 
-	public String getNextMaintenanceDateEnd() {
-		return nextMaintenanceDateEnd;
-	}
+    public String getAuditingDate() {
+        return auditingDate;
+    }
 
-	public void setNextMaintenanceDateEnd(String nextMaintenanceDateEnd) {
-		this.nextMaintenanceDateEnd = nextMaintenanceDateEnd;
-	}
+    public void setAuditingDate(String auditingDate) {
+        this.auditingDate = auditingDate == null ? null : auditingDate.trim();
+    }
 
-	public String getNextSecurityDateBegin() {
-		return nextSecurityDateBegin;
-	}
+    public String getVehicleEnginePower() {
+        return vehicleEnginePower;
+    }
 
-	public void setNextSecurityDateBegin(String nextSecurityDateBegin) {
-		this.nextSecurityDateBegin = nextSecurityDateBegin;
-	}
+    public void setVehicleEnginePower(String vehicleEnginePower) {
+        this.vehicleEnginePower = vehicleEnginePower == null ? null : vehicleEnginePower.trim();
+    }
 
-	public String getNextSecurityDateEnd() {
-		return nextSecurityDateEnd;
-	}
+    public String getVehicleEngineWheelbase() {
+        return vehicleEngineWheelbase;
+    }
 
-	public void setNextSecurityDateEnd(String nextSecurityDateEnd) {
-		this.nextSecurityDateEnd = nextSecurityDateEnd;
-	}
+    public void setVehicleEngineWheelbase(String vehicleEngineWheelbase) {
+        this.vehicleEngineWheelbase = vehicleEngineWheelbase == null ? null : vehicleEngineWheelbase.trim();
+    }
 
-	public String getNextOperationDateBegin() {
-		return nextOperationDateBegin;
-	}
+    public String getVehicleRegistrationDate() {
+        return vehicleRegistrationDate;
+    }
 
-	public void setNextOperationDateBegin(String nextOperationDateBegin) {
-		this.nextOperationDateBegin = nextOperationDateBegin;
-	}
+    public void setVehicleRegistrationDate(String vehicleRegistrationDate) {
+        this.vehicleRegistrationDate = vehicleRegistrationDate == null ? null : vehicleRegistrationDate.trim();
+    }
 
-	public String getNextOperationDateEnd() {
-		return nextOperationDateEnd;
-	}
+    public String getVehicleVinCode() {
+        return vehicleVinCode;
+    }
 
-	public void setNextOperationDateEnd(String nextOperationDateEnd) {
-		this.nextOperationDateEnd = nextOperationDateEnd;
-	}
+    public void setVehicleVinCode(String vehicleVinCode) {
+        this.vehicleVinCode = vehicleVinCode == null ? null : vehicleVinCode.trim();
+    }
 
-	public String getNextClassDateBegin() {
-		return nextClassDateBegin;
-	}
+    public String getVehicleBrand() {
+        return vehicleBrand;
+    }
 
-	public void setNextClassDateBegin(String nextClassDateBegin) {
-		this.nextClassDateBegin = nextClassDateBegin;
-	}
+    public void setVehicleBrand(String vehicleBrand) {
+        this.vehicleBrand = vehicleBrand == null ? null : vehicleBrand.trim();
+    }
 
-	public String getNextClassDateEnd() {
-		return nextClassDateEnd;
-	}
+    public String getGpsImei() {
+        return gpsImei;
+    }
 
-	public void setNextClassDateEnd(String nextClassDateEnd) {
-		this.nextClassDateEnd = nextClassDateEnd;
-	}
+    public void setGpsImei(String gpsImei) {
+        this.gpsImei = gpsImei == null ? null : gpsImei.trim();
+    }
 
-	public String getGroupName() {
-		return groupName;
-	}
+    public String getVehicleOwner() {
+        return vehicleOwner;
+    }
 
-	public void setGroupName(String groupName) {
-		this.groupName = groupName;
-	}
+    public void setVehicleOwner(String vehicleOwner) {
+        this.vehicleOwner = vehicleOwner == null ? null : vehicleOwner.trim();
+    }
 
-	public Integer getGroupId() {
-		return groupId;
-	}
+    public String getVehicleType() {
+        return vehicleType;
+    }
 
-	public void setGroupId(Integer groupId) {
-		this.groupId = groupId;
-	}
+    public void setVehicleType(String vehicleType) {
+        this.vehicleType = vehicleType == null ? null : vehicleType.trim();
+    }
 
+    public String getVehicleDrivingLicense() {
+        return vehicleDrivingLicense;
+    }
 
-	public String getNextOperationDate() {
-		return nextOperationDate;
-	}
+    public void setVehicleDrivingLicense(String vehicleDrivingLicense) {
+        this.vehicleDrivingLicense = vehicleDrivingLicense == null ? null : vehicleDrivingLicense.trim();
+    }
 
-	public void setNextOperationDate(String nextOperationDate) {
-		this.nextOperationDate = nextOperationDate;
-	}
+    public String getVehicletec() {
+        return vehicletec;
+    }
 
-	public String getNextSecurityDate() {
-		return nextSecurityDate;
-	}
+    public void setVehicletec(String vehicletec) {
+        this.vehicletec = vehicletec == null ? null : vehicletec.trim();
+    }
 
-	public void setNextSecurityDate(String nextSecurityDate) {
-		this.nextSecurityDate = nextSecurityDate;
-	}
+    public String getVehiclesafe() {
+        return vehiclesafe;
+    }
 
-	public String getNextClassDate() {
-		return nextClassDate;
-	}
+    public void setVehiclesafe(String vehiclesafe) {
+        this.vehiclesafe = vehiclesafe == null ? null : vehiclesafe.trim();
+    }
 
-	public void setNextClassDate(String nextClassDate) {
-		this.nextClassDate = nextClassDate;
-	}
+    public Integer getLzbStatus() {
+        return lzbStatus;
+    }
 
-	public String getTwoLevelMaintenanceDate() {
-		return twoLevelMaintenanceDate;
-	}
+    public void setLzbStatus(Integer lzbStatus) {
+        this.lzbStatus = lzbStatus;
+    }
 
-	public void setTwoLevelMaintenanceDate(String twoLevelMaintenanceDate) {
-		this.twoLevelMaintenanceDate = twoLevelMaintenanceDate;
-	}
+    public String getMemo() {
+        return memo;
+    }
 
-	public Integer getDriverid() {
-		return driverid;
-	}
-
-	public void setDriverid(Integer driverid) {
-		this.driverid = driverid;
-	}
-
-	public String getImageUrl() {
-		return imageUrl;
-	}
-
-	public void setImageUrl(String imageUrl) {
-		this.imageUrl = imageUrl;
-	}
-
-	public CarBizCarInfo() {
-	}
-
-	public CarBizCarInfo(Integer carId) {
-		this.carId = carId;
-	}
-
-	public void setCarId(Integer value) {
-		this.carId = value;
-	}
-
-	public Integer getCarId() {
-		return this.carId;
-	}
-
-	public void setSupplierId(Integer value) {
-		this.supplierId = value;
-	}
-
-	public Integer getSupplierId() {
-		return this.supplierId;
-	}
-
-	public void setLicensePlates(String value) {
-		this.licensePlates = value;
-	}
-
-	public String getLicensePlates() {
-		return this.licensePlates;
-	}
-
-	public void setBrand(String value) {
-		this.brand = value;
-	}
-
-	public String getBrand() {
-		return this.brand;
-	}
-
-	public void setCarModelId(Integer value) {
-		this.carModelId = value;
-	}
-
-	public Integer getCarModelId() {
-		return this.carModelId;
-	}
-
-	public void setModelDetail(String value) {
-		this.modelDetail = value;
-	}
-
-	public String getModelDetail() {
-		return this.modelDetail;
-	}
-
-	public void setColor(String value) {
-		this.color = value;
-	}
-
-	public String getColor() {
-		return this.color;
-	}
-
-	public void setEngineNo(String value) {
-		this.engineNo = value;
-	}
-
-	public String getEngineNo() {
-		return this.engineNo;
-	}
-
-	public void setFrameNo(String value) {
-		this.frameNo = value;
-	}
-
-	public String getFrameNo() {
-		return this.frameNo;
-	}
-
-	public void setMemo(String value) {
-		this.memo = value;
-	}
-
-	public String getMemo() {
-		return this.memo;
-	}
-
-	public void setStatus(Integer value) {
-		this.status = value;
-	}
-
-	public Integer getStatus() {
-		return this.status;
-	}
-
-	public void setCreateBy(Integer value) {
-		this.createBy = value;
-	}
-
-	public Integer getCreateBy() {
-		return this.createBy;
-	}
-
-	public void setUpdateBy(Integer value) {
-		this.updateBy = value;
-	}
-
-	public Integer getUpdateBy() {
-		return this.updateBy;
-	}
-
-
-	public String getNextInspectDate() {
-		return nextInspectDate;
-	}
-
-	public void setNextInspectDate(String nextInspectDate) {
-		this.nextInspectDate = nextInspectDate;
-	}
-
-	public String getNextMaintenanceDate() {
-		return nextMaintenanceDate;
-	}
-
-	public void setNextMaintenanceDate(String nextMaintenanceDate) {
-		this.nextMaintenanceDate = nextMaintenanceDate;
-	}
-
-	public String getRentalExpireDate() {
-		return rentalExpireDate;
-	}
-
-	public void setRentalExpireDate(String rentalExpireDate) {
-		this.rentalExpireDate = rentalExpireDate;
-	}
-
-	public String getCreateDate() {
-		return createDate;
-	}
-
-	public void setCreateDate(String createDate) {
-		this.createDate = createDate;
-	}
-
-	public String getUpdateDate() {
-		return updateDate;
-	}
-
-	public void setUpdateDate(String updateDate) {
-		this.updateDate = updateDate;
-	}
-
-
-	public String getCarryPassengers() {
-		return carryPassengers;
-	}
-
-	public void setCarryPassengers(String carryPassengers) {
-		this.carryPassengers = carryPassengers;
-	}
-
-	public String getVehicleBrand() {
-		return vehicleBrand;
-	}
-
-	public void setVehicleBrand(String vehicleBrand) {
-		this.vehicleBrand = vehicleBrand;
-	}
-
-
-
-	public String getClicensePlatesColor() {
-		return clicensePlatesColor;
-	}
-
-	public void setClicensePlatesColor(String clicensePlatesColor) {
-		this.clicensePlatesColor = clicensePlatesColor;
-	}
-
-	public String getVehicleVINCode() {
-		return vehicleVINCode;
-	}
-
-	public void setVehicleVINCode(String vehicleVINCode) {
-		this.vehicleVINCode = vehicleVINCode;
-	}
-
-	public String getVehicleRegistrationDate() {
-		return vehicleRegistrationDate;
-	}
-
-	public void setVehicleRegistrationDate(String vehicleRegistrationDate) {
-		this.vehicleRegistrationDate = vehicleRegistrationDate;
-	}
-
-	public Integer getFuelType() {
-		return fuelType;
-	}
-
-	public void setFuelType(Integer fuelType) {
-		this.fuelType = fuelType;
-	}
-
-	public String getVehicleEngineDisplacement() {
-		return vehicleEngineDisplacement;
-	}
-
-	public void setVehicleEngineDisplacement(String vehicleEngineDisplacement) {
-		this.vehicleEngineDisplacement = vehicleEngineDisplacement;
-	}
-
-	public String getVehicleEnginePower() {
-		return vehicleEnginePower;
-	}
-
-	public void setVehicleEnginePower(String vehicleEnginePower) {
-		this.vehicleEnginePower = vehicleEnginePower;
-	}
-
-	public String getVehicleEngineWheelbase() {
-		return vehicleEngineWheelbase;
-	}
-
-	public void setVehicleEngineWheelbase(String vehicleEngineWheelbase) {
-		this.vehicleEngineWheelbase = vehicleEngineWheelbase;
-	}
-
-	public String getTransportNumber() {
-		return transportNumber;
-	}
-
-	public void setTransportNumber(String transportNumber) {
-		this.transportNumber = transportNumber;
-	}
-
-	public String getCertificationAuthority() {
-		return certificationAuthority;
-	}
-
-	public void setCertificationAuthority(String certificationAuthority) {
-		this.certificationAuthority = certificationAuthority;
-	}
-
-	public String getOperatingRegion() {
-		return operatingRegion;
-	}
-
-	public void setOperatingRegion(String operatingRegion) {
-		this.operatingRegion = operatingRegion;
-	}
-
-	public String getTransportNumberDateStart() {
-		return transportNumberDateStart;
-	}
-
-	public void setTransportNumberDateStart(String transportNumberDateStart) {
-		this.transportNumberDateStart = transportNumberDateStart;
-	}
-
-	public String getTransportNumberDateEnd() {
-		return transportNumberDateEnd;
-	}
-
-	public void setTransportNumberDateEnd(String transportNumberDateEnd) {
-		this.transportNumberDateEnd = transportNumberDateEnd;
-	}
-
-	public String getFirstDate() {
-		return firstDate;
-	}
-
-	public void setFirstDate(String firstDate) {
-		this.firstDate = firstDate;
-	}
-
-
-
-	public Integer getOverHaulStatus() {
-		return overHaulStatus;
-	}
-
-	public void setOverHaulStatus(Integer overHaulStatus) {
-		this.overHaulStatus = overHaulStatus;
-	}
-
-	public Integer getAuditingStatus() {
-		return auditingStatus;
-	}
-
-	public void setAuditingStatus(Integer auditingStatus) {
-		this.auditingStatus = auditingStatus;
-	}
-
-	public String getAuditingDate() {
-		return auditingDate;
-	}
-
-	public void setAuditingDate(String auditingDate) {
-		this.auditingDate = auditingDate;
-	}
-
-	public String getEquipmentNumber() {
-		return equipmentNumber;
-	}
-
-	public void setEquipmentNumber(String equipmentNumber) {
-		this.equipmentNumber = equipmentNumber;
-	}
-
-	public String getGpsBrand() {
-		return gpsBrand;
-	}
-
-	public void setGpsBrand(String gpsBrand) {
-		this.gpsBrand = gpsBrand;
-	}
-
-	public String getGpsType() {
-		return gpsType;
-	}
-
-	public void setGpsType(String gpsType) {
-		this.gpsType = gpsType;
-	}
-
-	public String getGpsImei() {
-		return gpsImei;
-	}
-
-	public void setGpsImei(String gpsImei) {
-		this.gpsImei = gpsImei;
-	}
-
-	public String getGpsDate() {
-		return gpsDate;
-	}
-
-	public void setGpsDate(String gpsDate) {
-		this.gpsDate = gpsDate;
-	}
+    public void setMemo(String memo) {
+        this.memo = memo == null ? null : memo.trim();
+    }
 }
-

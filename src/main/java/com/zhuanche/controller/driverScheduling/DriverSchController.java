@@ -110,7 +110,7 @@ public class DriverSchController {
             if(Check.NuNObj(pageDTO)){
                 return ;
             }
-            Integer total = pageDTO.getTotal();
+            long total = pageDTO.getTotal();
             List<DutyExcelDTO> firstList = new ArrayList<>();
             List<CarDriverDayDutyDTO> result = pageDTO.getResult();
             for (CarDriverDayDutyDTO carDriverDayDutyDTO : result) {

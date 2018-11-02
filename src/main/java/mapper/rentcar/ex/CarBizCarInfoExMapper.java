@@ -4,6 +4,7 @@ package mapper.rentcar.ex;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.dto.busManage.BusCarRicherDTO;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import org.apache.ibatis.annotations.Param;
 
@@ -53,4 +54,22 @@ public interface CarBizCarInfoExMapper {
      * @return
      */
     Integer validateCityAndSupplier(@Param("cityId") Integer cityId, @Param("supplierId") Integer supplierId, @Param("licensePlates") String licensePlates);
+
+	/**
+	 * @Title: queryBusCarList
+	 * @Description: 查询巴士订单指派/改派可用车辆
+	 * @param richerDTO
+	 * @return List<Map<String,Object>>
+	 * @throws
+	 */
+	List<Map<String, Object>> queryBusCarList(BusCarRicherDTO richerDTO);
+
+	/**
+	 * @Title: selectCarCitySupplierInfoByCarId
+	 * @Description: 根据车辆ID查询其车辆及关联的城市、供应商信息
+	 * @param carId
+	 * @return CarBizCarInfoDTO
+	 * @throws
+	 */
+	CarBizCarInfoDTO selectCarCitySupplierInfoByCarId(Integer carId);
 }
