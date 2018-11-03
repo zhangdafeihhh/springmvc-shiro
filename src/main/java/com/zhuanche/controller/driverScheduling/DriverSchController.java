@@ -415,6 +415,7 @@ public class DriverSchController {
             return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
         }
         PageDTO pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
+        logger.info("分页查询符合条件排班列表入参:"+ JSON.toJSONString(param)+"，pageNumber="+0+";总条数为："+pageDTO.getTotal()+"；查询结果为："+(pageDTO.getResult()==null?"null":JSON.toJSONString(pageDTO.getResult())));
         return AjaxResponse.success(pageDTO);
     }
 
