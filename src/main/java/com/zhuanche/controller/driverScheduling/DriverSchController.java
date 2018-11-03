@@ -119,37 +119,7 @@ public class DriverSchController {
             PageDTO pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
             List<CarDriverDayDutyDTO> result = pageDTO.getResult();
             List<String> dbDataList = new ArrayList<>();
-            if(result != null){
-                for (CarDriverDayDutyDTO carDriverDayDutyDTO : result) {
-                    StringBuffer stringBuffer = new StringBuffer();
-                    stringBuffer.append(carDriverDayDutyDTO.getDriverName());
-                    stringBuffer.append(",");
-                    stringBuffer.append(carDriverDayDutyDTO.getPhone());
-                    stringBuffer.append(",");
-                    stringBuffer.append(carDriverDayDutyDTO.getCityName());
-                    stringBuffer.append(",");
-                    stringBuffer.append(carDriverDayDutyDTO.getSupplierName());
-                    stringBuffer.append(",");
-                    stringBuffer.append(carDriverDayDutyDTO.getTeamName());
-                    stringBuffer.append(",");
-                    stringBuffer.append(carDriverDayDutyDTO.getDutyTimes());
-                    stringBuffer.append(",");
-                    stringBuffer.append(carDriverDayDutyDTO.getForcedTimes());
-                    stringBuffer.append(",");
-                    stringBuffer.append(carDriverDayDutyDTO.getTime());
-
-                    stringBuffer.append(",");
-
-                    if(carDriverDayDutyDTO.getStatus() == 2){
-                        stringBuffer.append("已发布");
-                    }else if(carDriverDayDutyDTO.getStatus() == 1){
-                        stringBuffer.append("未发布");
-                    }else{
-                        stringBuffer.append("未发布");
-                    }
-                    dbDataList.add(stringBuffer.toString());
-                }
-            }
+            dataTrans( result,  dbDataList);
 
             String fileName = "司机排班信息"+DateUtil.dateFormat(new Date(),DateUtil.intTimestampPattern)+".csv";
             String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
@@ -165,37 +135,9 @@ public class DriverSchController {
             for(int pageNumber = 2; pageNumber <= totalPage; pageNumber++){
                 param.setPageNo(pageNumber);
                 PageDTO page = carDriverDutyService.queryDriverDayDutyList(param);
-                List<CarDriverDayDutyDTO> sourceList = page.getResult();
-                for (CarDriverDayDutyDTO carDriverDayDutyDTO : sourceList) {
-                    StringBuffer stringBuffer = new StringBuffer();
-                    stringBuffer.append(carDriverDayDutyDTO.getDriverName());
-                    stringBuffer.append(",");
-                    stringBuffer.append(carDriverDayDutyDTO.getPhone());
-                    stringBuffer.append(",");
-                    stringBuffer.append(carDriverDayDutyDTO.getCityName());
-                    stringBuffer.append(",");
-                    stringBuffer.append(carDriverDayDutyDTO.getSupplierName());
-                    stringBuffer.append(",");
-                    stringBuffer.append(carDriverDayDutyDTO.getTeamName());
-                    stringBuffer.append(",");
-                    stringBuffer.append(carDriverDayDutyDTO.getDutyTimes());
-                    stringBuffer.append(",");
-                    stringBuffer.append(carDriverDayDutyDTO.getForcedTimes());
-                    stringBuffer.append(",");
-                    stringBuffer.append(carDriverDayDutyDTO.getTime());
+                result = page.getResult();
+                dataTrans( result,  dbDataList);
 
-                    stringBuffer.append(",");
-
-                    if(carDriverDayDutyDTO.getStatus() == 2){
-                        stringBuffer.append("已发布");
-                    }else if(carDriverDayDutyDTO.getStatus() == 1){
-                        stringBuffer.append("未发布");
-                    }else{
-
-                        stringBuffer.append("未发布");
-                    }
-                    dbDataList.add(stringBuffer.toString());
-                }
             }
             CsvUtils.exportCsv(response,dbDataList,headerList,fileName);
 
@@ -204,6 +146,40 @@ public class DriverSchController {
             return ;
         }
         return ;
+    }
+    private  void dataTrans(List<CarDriverDayDutyDTO> result,List<String> dbDataList){
+        if(result != null){
+            return;
+        }
+        for (CarDriverDayDutyDTO carDriverDayDutyDTO : result) {
+            StringBuffer stringBuffer = new StringBuffer();
+            stringBuffer.append(carDriverDayDutyDTO.getDriverName());
+            stringBuffer.append(",");
+            stringBuffer.append(carDriverDayDutyDTO.getPhone());
+            stringBuffer.append(",");
+            stringBuffer.append(carDriverDayDutyDTO.getCityName());
+            stringBuffer.append(",");
+            stringBuffer.append(carDriverDayDutyDTO.getSupplierName());
+            stringBuffer.append(",");
+            stringBuffer.append(carDriverDayDutyDTO.getTeamName());
+            stringBuffer.append(",");
+            stringBuffer.append(carDriverDayDutyDTO.getDutyTimes());
+            stringBuffer.append(",");
+            stringBuffer.append(carDriverDayDutyDTO.getForcedTimes());
+            stringBuffer.append(",");
+            stringBuffer.append(carDriverDayDutyDTO.getTime());
+
+            stringBuffer.append(",");
+
+            if(carDriverDayDutyDTO.getStatus() == 2){
+                stringBuffer.append("已发布");
+            }else if(carDriverDayDutyDTO.getStatus() == 1){
+                stringBuffer.append("未发布");
+            }else{
+                stringBuffer.append("未发布");
+            }
+            dbDataList.add(stringBuffer.toString());
+        }
     }
 
 
