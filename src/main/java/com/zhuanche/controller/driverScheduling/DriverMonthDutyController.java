@@ -234,7 +234,7 @@ public class DriverMonthDutyController {
         }
     }
     private  void dataTrans(List<CarDriverMonthDTO> result, List<String> csvDataList,List<JSONObject>  headerList) {
-        if (result != null) {
+        if (null == result) {
             return;
         }
         for(CarDriverMonthDTO s:result){

@@ -160,7 +160,7 @@ public class DriverSchController {
         return ;
     }
     private  void dataTrans(List<CarDriverDayDutyDTO> result,List<String> csvDataList){
-        if(result != null){
+        if(null == result){
             return;
         }
         for (CarDriverDayDutyDTO carDriverDayDutyDTO : result) {
