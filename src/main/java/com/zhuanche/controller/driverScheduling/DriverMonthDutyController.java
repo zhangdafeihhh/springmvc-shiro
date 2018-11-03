@@ -194,7 +194,7 @@ public class DriverMonthDutyController {
 
             PageDTO pageDTO = driverMonthDutyService.queryDriverDutyList(param);
             List<CarDriverMonthDTO> pageList = pageDTO.getResult();
-            Integer total = pageDTO.getTotal();
+            long total = pageDTO.getTotal();
 
             List<JSONObject>  headerList=  driverMonthDutyService.generateTableHeader(param.getMonitorDate());
             dataTrans(pageList, csvDataList,headerList);

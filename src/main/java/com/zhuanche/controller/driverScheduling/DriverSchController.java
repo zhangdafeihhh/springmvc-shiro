@@ -133,7 +133,7 @@ public class DriverSchController {
             } else {  //其他浏览器
                 fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
             }
-            Integer total = pageDTO.getTotal();
+            long total = pageDTO.getTotal();
             //计算总页数
             Integer totalPage = PageUtils.getTotalPage(total,pageDTO.getPageSize());
 

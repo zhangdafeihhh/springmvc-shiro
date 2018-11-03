@@ -2,11 +2,11 @@ package com.zhuanche.util;
 
 public class PageUtils {
 
-    public static int getTotalPage(int totalCount,int pageSize) {
-        int p = totalCount / pageSize;
+    public static int getTotalPage(long totalCount,int pageSize) {
+        long p = totalCount / pageSize;
         if (totalCount % pageSize == 0)
-            return p;
+            return Integer.parseInt(p+"");
         else
-            return p + 1;
+            return Integer.parseInt(p+"") + 1;
     }
 }
