@@ -39,6 +39,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -116,8 +117,6 @@ public class DriverSchController {
             //设置导出单文件阈值 3000
             param.setPageSize(1000);
             PageDTO pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
-
-
             List<CarDriverDayDutyDTO> result = pageDTO.getResult();
             List<String> dbDataList = new ArrayList<>();
             if(result != null){
@@ -153,6 +152,12 @@ public class DriverSchController {
             }
 
             String fileName = "司机排班信息"+DateUtil.dateFormat(new Date(),DateUtil.intTimestampPattern)+".csv";
+            String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
+            if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
+                 fileName = URLEncoder.encode(fileName, "UTF-8");
+            } else {  //其他浏览器
+                fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+            }
             Integer total = pageDTO.getTotal();
             //计算总页数
             Integer totalPage = getTotalPage(total,pageDTO.getPageSize());
