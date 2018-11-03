@@ -2,6 +2,8 @@ package mapper.mdbcarmanage;
 
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 
+import java.util.List;
+
 public interface CarAdmUserMapper {
     int deleteByPrimaryKey(Integer userId);
 
@@ -14,4 +16,6 @@ public interface CarAdmUserMapper {
     int updateByPrimaryKeySelective(CarAdmUser record);
 
     int updateByPrimaryKey(CarAdmUser record);
+
+    List<CarAdmUser> selectUsersByIdList(List<Integer> ids);
 }

@@ -2120,17 +2120,42 @@ public class CarInfoServiceImpl implements CarInfoService {
             Sheet sheet = wb.getSheetAt(0);
             Cell cell = null;
             int i=0;
+            List<Integer> createIds = new ArrayList<>();
+            List<Integer> updateIds = new ArrayList<>();
             for(CarInfo s:list){
-                if(s.getCreateBy()!=null && !s.getCreateBy().equals("")){
-                    CarAdmUser us = userManagementService.getUserById(params.getCreateBy());
-                    if(us!=null){
-                        s.setCreateName(us.getUserName());
-                    }
+                //待优化
+                if(s.getCreateBy()!=null && StringUtils.isBlank(s.getCreateName())){
+//                    CarAdmUser us = userManagementService.getUserById(params.getCreateBy());
+//                    if(us!=null){
+//                        s.setCreateName(us.getUserName());
+//                    }
+                    createIds.add(s.getCreateBy());
                 }
-                if(s.getUpdateBy()!=null && !s.getUpdateBy().equals("")){
-                    CarAdmUser us = userManagementService.getUserById(params.getUpdateBy());
+                if(s.getUpdateBy()!=null && StringUtils.isBlank(s.getUpdateName())){
+        /*            CarAdmUser us = userManagementService.getUserById(params.getUpdateBy());
                     if(us!=null){
                         s.setUpdateName(us.getUserName());
+                    }*/
+                    updateIds.add(s.getUpdateBy());
+                }
+            }
+            List<CarAdmUser>  creator = userManagementService.getUsersByIdList(createIds);
+            List<CarAdmUser>  updator = userManagementService.getUsersByIdList(updateIds);
+            for (CarInfo s : list){
+                if (s.getCreateBy()!=null && StringUtils.isBlank(s.getCreateName())){
+                    for (CarAdmUser user : creator){
+                        if ((s.getCreateBy()).equals(user.getUserId())){
+                            s.setCreateName(user.getUserName());
+                            break;
+                        }
+                    }
+                }
+                if (s.getUpdateBy()!=null && StringUtils.isBlank(s.getUpdateName())){
+                    for (CarAdmUser user : updator){
+                        if ((s.getUpdateBy()).equals(user.getUserId())){
+                            s.setUpdateName(user.getUserName());
+                            break;
+                        }
                     }
                 }
                 Row row = sheet.createRow(i + 1);
