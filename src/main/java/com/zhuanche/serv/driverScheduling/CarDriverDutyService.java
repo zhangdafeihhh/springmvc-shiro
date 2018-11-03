@@ -106,6 +106,7 @@ public class CarDriverDutyService {
 					pageDTO.setResult(null);
 					return pageDTO;
 				}
+				dutyParamRequest.setDriverId(Integer.parseInt(driverInfo.getDriverId()));
 			}
 			//组装权限参数
 			generateDutyParamRequestByUser(dutyParamRequest);
