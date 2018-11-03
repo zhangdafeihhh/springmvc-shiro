@@ -115,6 +115,7 @@ public class DriverSchController {
             if(Check.NuNObj(param) || Check.NuNObj(param.getUnpublishedFlag()) ){
                 return  ;
             }
+            long start = System.currentTimeMillis();
             param.setPage(1);
             //设置导出单文件阈值 3000
             param.setPageSize(20);
@@ -149,7 +150,8 @@ public class DriverSchController {
             headerList.add("司机姓名,手机号,城市,供应商,车队,排班日期,强制上班时间,排班时长,状态");
 
             CsvUtils.exportCsv(response,csvDataList,headerList,fileName);
-
+            long end = System.currentTimeMillis();
+            logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，耗时："+(end-start)+"毫秒;总条数："+total);
 
         }catch (Exception e){
             logger.error("导出排班信息 异常:{}",e);
@@ -414,8 +416,10 @@ public class DriverSchController {
         if(Check.NuNObj(param) || Check.NuNObj(param.getUnpublishedFlag()) ){
             return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
         }
+        long start = System.currentTimeMillis();
         PageDTO pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
-        logger.info("分页查询符合条件排班列表入参:"+ JSON.toJSONString(param)+"，pageNumber="+0+";总条数为："+pageDTO.getTotal()+"；查询结果为："+(pageDTO.getResult()==null?"null":JSON.toJSONString(pageDTO.getResult())));
+        long end = System.currentTimeMillis();
+        logger.info("分页查询符合条件排班列表入参:"+ JSON.toJSONString(param)+"，耗时："+(end-start)+"毫秒，pageNumber="+0+";总条数为："+pageDTO.getTotal()+"；查询结果为："+(pageDTO.getResult()==null?"null":JSON.toJSONString(pageDTO.getResult())));
         return AjaxResponse.success(pageDTO);
     }
 
