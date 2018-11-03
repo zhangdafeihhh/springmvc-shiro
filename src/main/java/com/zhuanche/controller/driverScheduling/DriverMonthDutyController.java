@@ -191,7 +191,7 @@ public class DriverMonthDutyController {
             param.setTeamIds(data.getTeamIds());
 
             List<String> csvDataList = new ArrayList<>();
-
+            long start = System.currentTimeMillis();
             PageDTO pageDTO = driverMonthDutyService.queryDriverDutyList(param);
             List<CarDriverMonthDTO> pageList = pageDTO.getResult();
             long total = pageDTO.getTotal();
@@ -226,7 +226,8 @@ public class DriverMonthDutyController {
             }
 
             CsvUtils.exportCsv(response,csvDataList,csvheaderList,fileName);
-
+            long end = System.currentTimeMillis();
+            logger.error("司机月排班成功,参数param："+(param==null?"null":JSON.toJSONString(param))+",耗时："+(end-start)+"毫秒");
         } catch (Exception e) {
             logger.error("司机月排班异常,参数param："+(param==null?"null":JSON.toJSONString(param)),e);
         }
