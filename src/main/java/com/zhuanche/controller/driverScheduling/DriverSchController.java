@@ -121,6 +121,7 @@ public class DriverSchController {
             PageDTO pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
 
             List<CarDriverDayDutyDTO> result = pageDTO.getResult();
+            logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，pageNumber="+0+";总条数为："+pageDTO.getTotal()+"；查询结果为："+(result==null?"null":JSON.toJSONString(result)));
             List<String> csvDataList = new ArrayList<>();
             dataTrans( result,  csvDataList);
 
@@ -138,6 +139,8 @@ public class DriverSchController {
             for(int pageNumber = 2; pageNumber <= totalPage; pageNumber++){
                 param.setPageNo(pageNumber);
                 PageDTO page = carDriverDutyService.queryDriverDayDutyList(param);
+                logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，pageNumber="+pageNumber+";总条数为："+pageDTO.getTotal()+"；查询结果为："+(result==null?"null":JSON.toJSONString(result)));
+
                 result = page.getResult();
                 dataTrans( result,  csvDataList);
 
