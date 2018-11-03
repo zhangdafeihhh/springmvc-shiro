@@ -46,7 +46,7 @@ public class CsvUtils {
 
     public static boolean exportCsv(HttpServletResponse response,
                                     List<String> dataList,
-                                    String headdataList,
+                                    List<String> headdataList,
                                     String  fileName) throws IOException {
         OutputStreamWriter osw = null;
         boolean isSucess=false;
@@ -58,8 +58,11 @@ public class CsvUtils {
             response.setHeader("content-disposition", "attachment; filename="+fileName);
             osw.write(new String(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF })); 
             bw =new BufferedWriter(osw);
-            if(StringUtils.isNotEmpty(headdataList)){
-                bw.write(headdataList+"\r");
+
+            if(headdataList!=null && !headdataList.isEmpty()){
+                for(String data : headdataList){
+                    bw.write(data+"\r");
+                }
             }
             if(dataList!=null && !dataList.isEmpty()){
                 for(String data : dataList){

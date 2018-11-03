@@ -22,6 +22,7 @@ import com.zhuanche.serv.driverScheduling.CarDriverShiftsService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
+import com.zhuanche.util.PageUtils;
 import com.zhuanche.util.dateUtil.DateUtil;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.excel.ExportExcelUtil;
@@ -92,13 +93,7 @@ public class DriverSchController {
         return response;
     }
 
-    public int getTotalPage(int totalCount,int pageSize) {
-        int p = totalCount / pageSize;
-        if (totalCount % pageSize == 0)
-            return p;
-        else
-            return p + 1;
-    }
+
     /** 
     * @Desc: 导出排班信息 
     * @param:
@@ -109,17 +104,21 @@ public class DriverSchController {
     @RequestMapping("/exportDutyToExcel")
     @ResponseBody
     public void exportDutyToExcel(HttpServletResponse response, HttpServletRequest request,DutyParamRequest param){
-        String headerList = "司机姓名,手机号,城市,供应商,车队,排班日期,强制上班时间,排班时长,状态";
+
         try{
+
             if(Check.NuNObj(param)){
                 param = new DutyParamRequest();
             }
+            List<String> headerList = new ArrayList<>();
+            headerList.add("司机姓名,手机号,城市,供应商,车队,排班日期,强制上班时间,排班时长,状态");
+
             //设置导出单文件阈值 3000
             param.setPageSize(1000);
             PageDTO pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
             List<CarDriverDayDutyDTO> result = pageDTO.getResult();
-            List<String> dbDataList = new ArrayList<>();
-            dataTrans( result,  dbDataList);
+            List<String> csvDataList = new ArrayList<>();
+            dataTrans( result,  csvDataList);
 
             String fileName = "司机排班信息"+DateUtil.dateFormat(new Date(),DateUtil.intTimestampPattern)+".csv";
             String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
@@ -130,16 +129,16 @@ public class DriverSchController {
             }
             Integer total = pageDTO.getTotal();
             //计算总页数
-            Integer totalPage = getTotalPage(total,pageDTO.getPageSize());
+            Integer totalPage = PageUtils.getTotalPage(total,pageDTO.getPageSize());
 
             for(int pageNumber = 2; pageNumber <= totalPage; pageNumber++){
                 param.setPageNo(pageNumber);
                 PageDTO page = carDriverDutyService.queryDriverDayDutyList(param);
                 result = page.getResult();
-                dataTrans( result,  dbDataList);
+                dataTrans( result,  csvDataList);
 
             }
-            CsvUtils.exportCsv(response,dbDataList,headerList,fileName);
+            CsvUtils.exportCsv(response,csvDataList,headerList,fileName);
 
         }catch (Exception e){
             logger.error("导出排班信息 异常:{}",e);
@@ -147,7 +146,7 @@ public class DriverSchController {
         }
         return ;
     }
-    private  void dataTrans(List<CarDriverDayDutyDTO> result,List<String> dbDataList){
+    private  void dataTrans(List<CarDriverDayDutyDTO> result,List<String> csvDataList){
         if(result != null){
             return;
         }
@@ -178,7 +177,7 @@ public class DriverSchController {
             }else{
                 stringBuffer.append("未发布");
             }
-            dbDataList.add(stringBuffer.toString());
+            csvDataList.add(stringBuffer.toString());
         }
     }
 

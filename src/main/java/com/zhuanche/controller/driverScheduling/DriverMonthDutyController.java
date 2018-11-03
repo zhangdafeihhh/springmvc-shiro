@@ -1,11 +1,14 @@
 package com.zhuanche.controller.driverScheduling;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.dutyEnum.EnumDriverMonthDutyStatus;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.dto.CarDriverInfoDTO;
+import com.zhuanche.dto.driver.CarDriverDayDutyDTO;
+import com.zhuanche.dto.driverDuty.CarDriverMonthDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverMonthDuty;
 import com.zhuanche.request.CommonRequest;
 import com.zhuanche.request.DriverMonthDutyRequest;
@@ -13,6 +16,9 @@ import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.serv.driverScheduling.DriverMonthDutyService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
+import com.zhuanche.util.PageUtils;
+import com.zhuanche.util.dateUtil.DateUtil;
+import com.zhuanche.util.excel.CsvUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.POIXMLDocument;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -38,6 +44,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.lang.reflect.Field;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -160,9 +168,9 @@ public class DriverMonthDutyController {
     @SuppressWarnings("unchecked")
     @ResponseBody
     @RequestMapping("/exportDriverMonthDuty")
-    public void exportDriverMonthDuty(String data,DriverMonthDutyRequest param, HttpServletRequest request,HttpServletResponse response){
+    public void exportDriverMonthDuty(DriverMonthDutyRequest param, HttpServletRequest request,HttpServletResponse response){
 
-        logger.info("导出data:"+data);
+
         try {
             if(Check.NuNStr(param.getMonitorDate())){
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
@@ -173,28 +181,108 @@ public class DriverMonthDutyController {
             if(!Check.NuNStr(param.getTeamId())){
                 commonRequest.setTeamId(Integer.parseInt(param.getTeamId()));
             }
-            CommonRequest dealData = commonService.paramDeal(commonRequest);
-            if(Check.NuNObj(dealData)){
+            CommonRequest data = commonService.paramDeal(commonRequest);
+            if(Check.NuNObj(data)){
                 logger.error("没有权限操作,用户："+JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));
                 return ;
             }
-            param.setCityIds(commonService.setStringShiftInteger(dealData.getCityIds()));
-            param.setSupplierIds(commonService.setStringShiftInteger(dealData.getSupplierIds()));
-            param.setTeamIds(dealData.getTeamIds());
-            // 获取表头
-            Map<String, Object> result = new LinkedHashMap<String,Object>();
-            Map<String, Object> tabelHeader = new LinkedHashMap<String,Object>();
-            result = this.driverMonthDutyService.queryDriverDutyTable(param);
+            param.setCityIds(commonService.setStringShiftInteger(data.getCityIds()));
+            param.setSupplierIds(commonService.setStringShiftInteger(data.getSupplierIds()));
+            param.setTeamIds(data.getTeamIds());
 
-            tabelHeader = (Map<String, Object>)result.get("Rows");
-            @SuppressWarnings("deprecation")
-            Workbook wb = driverMonthDutyService.exportExcel(param,request.getRealPath("/")+File.separator+"template"+File.separator+"driverMonthDutyInfo.xlsx",
-                    tabelHeader);
-            this.exportExcelFromTemplet(request, response, wb, new String("司机月排班".getBytes("utf-8"), "iso8859-1"));
+            List<String> csvDataList = new ArrayList<>();
+
+            PageDTO pageDTO = driverMonthDutyService.queryDriverDutyList(param);
+            List<CarDriverMonthDTO> pageList = pageDTO.getResult();
+            Integer total = pageDTO.getTotal();
+
+            List<JSONObject>  headerList=  driverMonthDutyService.generateTableHeader(param.getMonitorDate());
+            dataTrans(pageList, csvDataList,headerList);
+            //计算总页数
+            Integer totalPage = PageUtils.getTotalPage(total,pageDTO.getPageSize());
+            for(int pageNumber = 2; pageNumber <= totalPage; pageNumber++){
+                param.setPageNo(pageNumber);
+                pageDTO = driverMonthDutyService.queryDriverDutyList(param);
+                dataTrans( pageDTO.getResult(),  csvDataList,headerList);
+            }
+            List<String> csvheaderList = new ArrayList<>();
+
+//            String header1 = "说明：司机编码,车队,司机名称,是否在职,车牌号 这几列不需要修改；排班可选状态：上班,休息,调休,替班,换班,早班,晚班,事假,病假；当状态不填时默认为上班";
+            StringBuffer stringBuffer = new StringBuffer();
+            for(JSONObject item : headerList){
+                stringBuffer.append(item.get("showName"));
+                stringBuffer.append(",");
+            }
+            String header2 = stringBuffer.toString();
+            header2 = header2.substring(0,header2.lastIndexOf(","));
+
+//            csvheaderList.add(header1);
+            csvheaderList.add(header2);
+
+            String fileName = "司机月排班"+ DateUtil.dateFormat(new Date(),"yyyy-MM")+".csv";
+            String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
+            if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
+                fileName = URLEncoder.encode(fileName, "UTF-8");
+            } else {  //其他浏览器
+                fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+            }
+
+            CsvUtils.exportCsv(response,csvDataList,csvheaderList,fileName);
+
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("司机月排班异常,参数param："+(param==null?"null":JSON.toJSONString(param)),e);
         }
     }
+    private  void dataTrans(List<CarDriverMonthDTO> result, List<String> csvDataList,List<JSONObject>  headerList) {
+        if (result != null) {
+            return;
+        }
+        for(CarDriverMonthDTO s:result){
+           StringBuffer rowBuffer = new StringBuffer();
+            rowBuffer.append(s.getDriverId()!=null?""+s.getDriverId()+"":"");
+            rowBuffer.append(",");
+
+            rowBuffer.append(s.getTeamName()!=null?""+s.getTeamName()+"":"");
+            rowBuffer.append(",");
+
+
+            rowBuffer.append(s.getDriverName()!=null?""+s.getDriverName()+"":"");
+            rowBuffer.append(",");
+
+            rowBuffer.append(s.getStatus()==1?"在职":"离职");
+            rowBuffer.append(",");
+
+
+            rowBuffer.append(s.getLicensePlates()!=null?""+s.getLicensePlates()+"":"");
+            rowBuffer.append(",");
+
+            for(int j = 5; j < headerList.size(); j++) {
+                JSONObject header = headerList.get(j);
+
+                String statusKey = header.getString("proName");
+                String statusValue = null;
+                if (null != s.getMap() && !s.getMap().isEmpty()) {
+                    String status = s.getMap().get(statusKey);
+                    if (null != status && !"".equals(status.trim())&&!"null".equals(status.trim())) {
+                        try {
+                            statusValue = EnumDriverMonthDutyStatus.getStatus(Integer.parseInt(status));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                if (null == statusValue) {
+                    statusValue = "--";
+                }
+                rowBuffer.append(statusValue);
+
+                if(j <= (headerList.size() -1) ){
+                    rowBuffer.append(",");
+                }
+            }
+        }
+    }
+
 
     /** 
     * @Desc: 查询符合条件月排班列表 
