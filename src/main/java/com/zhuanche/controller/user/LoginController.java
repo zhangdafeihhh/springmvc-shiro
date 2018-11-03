@@ -91,19 +91,19 @@ public class LoginController{
 	} )
     public AjaxResponse getMsgCode( @Verify(param="username",rule="required") String username,
 									@Verify(param="password",rule="required") String password ){
-		//A: 频率检查
-		String redis_login_key = "mp_manager_login_key_"+username;
+		//A: 频率检查 ,
+		String redis_getmsgcode_key = "mp_manager_getmsgcode_key_"+username;
 		long score = System.currentTimeMillis();
 		//zset内部是按分数来排序的，这里用当前时间做分数
-		redisTemplate.opsForZSet().add(redis_login_key, String.valueOf(score), score);
+		redisTemplate.opsForZSet().add(redis_getmsgcode_key, String.valueOf(score), score);
 		//统计30分钟内获取验证码次数
 		int statistics = 30;
-		redisTemplate.expire(redis_login_key, statistics, TimeUnit.MINUTES);
+		redisTemplate.expire(redis_getmsgcode_key, statistics, TimeUnit.MINUTES);
 
 		//统计用户30分钟内获取验证码次数
 		long max = score;
 		long min = max - (statistics * 60 * 1000);
-		long count = redisTemplate.opsForZSet().count(redis_login_key, min, max);
+		long count = redisTemplate.opsForZSet().count(redis_getmsgcode_key, min, max);
 
 		int countLimit = 5;
 		log.info("获取验证码-用户"+username+"在"+statistics+"分钟内第"+count+"次进行获取验证码操作");
@@ -154,7 +154,10 @@ public class LoginController{
     	@Verify(param="username",rule="required") String username, 
     	@Verify(param="password",rule="required") String password, 
     	@Verify(param="msgcode",rule="required") String msgcode ) throws IOException{
-		
+
+		String redis_login_key = "mp_manager_login_key_"+username;
+		String redis_getmsgcode_key = "mp_manager_getmsgcode_key_"+username;
+
 		Subject currentLoginUser = SecurityUtils.getSubject();
 		//A:是否已经登录
 		if(currentLoginUser.isAuthenticated()) {
@@ -179,18 +182,18 @@ public class LoginController{
 		//D: 查询验证码，并判断是否正确
 		if("ON".equalsIgnoreCase(loginCheckMsgCodeSwitch)) {
 
-			String redis_msgcode_key = "mp_manager_msgcode_key_"+username;
+
 			long score = System.currentTimeMillis();
 			//zset内部是按分数来排序的，这里用当前时间做分数
-			redisTemplate.opsForZSet().add(redis_msgcode_key, String.valueOf(score), score);
+			redisTemplate.opsForZSet().add(redis_login_key, String.valueOf(score), score);
 			//统计30分钟内用户登录次数
 			int statistics = 30;
-			redisTemplate.expire(redis_msgcode_key, statistics, TimeUnit.MINUTES);
+			redisTemplate.expire(redis_login_key, statistics, TimeUnit.MINUTES);
 
 			//统计用户30分钟内登录的次数
 			long max = score;
 			long min = max - (statistics * 60 * 1000);
-			long count = redisTemplate.opsForZSet().count(redis_msgcode_key, min, max);
+			long count = redisTemplate.opsForZSet().count(redis_login_key, min, max);
 
 			int countLimit = 5;
 			log.info("登录-用户"+username+"在"+statistics+"分钟内第"+count+"次登录");
@@ -220,6 +223,10 @@ public class LoginController{
 			//记录登录用户的所有会话ID，以支持“系统管理”功能中的自动会话清理
 			String sessionId =  (String)currentLoginUser.getSession().getId() ;
 			redisSessionDAO.saveSessionIdOfLoginUser(username, sessionId);
+
+			redisTemplate.delete(redis_login_key);
+			redisTemplate.delete(redis_getmsgcode_key);
+
 		}catch(AuthenticationException aex) {
 			return AjaxResponse.fail(RestErrorCode.USER_LOGIN_FAILED) ;
 		}
