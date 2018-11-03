@@ -541,6 +541,7 @@ public class DriverMonthDutyService {
 					()->carDriverMonthDutyExMapper.queryDriverDutyList(param));
 			List<CarDriverMonthDTO> list = pageInfo.getList();
 			if(Check.NuNCollection(list)){
+				logger.info("查询排班列表service入参："+ JSON.toJSONString(param)+",返回值为：null");
 				return null;
 			}
 			for (CarDriverMonthDTO month : list) {
