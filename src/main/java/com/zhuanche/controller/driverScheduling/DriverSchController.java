@@ -118,7 +118,7 @@ public class DriverSchController {
             long start = System.currentTimeMillis();
             param.setPage(1);
             //设置导出单文件阈值 3000
-            param.setPageSize(20);
+            param.setPageSize(1000);
             PageDTO pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
 
             List<CarDriverDayDutyDTO> result = pageDTO.getResult();
