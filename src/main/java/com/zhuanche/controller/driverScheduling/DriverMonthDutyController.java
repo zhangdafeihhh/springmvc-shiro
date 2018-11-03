@@ -240,21 +240,21 @@ public class DriverMonthDutyController {
         for(CarDriverMonthDTO s:result){
            StringBuffer rowBuffer = new StringBuffer();
             rowBuffer.append(s.getDriverId()!=null?""+s.getDriverId()+"":"");
-            rowBuffer.append(",");
+            rowBuffer.append("\t");
 
             rowBuffer.append(s.getTeamName()!=null?""+s.getTeamName()+"":"");
-            rowBuffer.append(",");
+            rowBuffer.append("\t");
 
 
             rowBuffer.append(s.getDriverName()!=null?""+s.getDriverName()+"":"");
-            rowBuffer.append(",");
+            rowBuffer.append("\t");
 
             rowBuffer.append(s.getStatus()==1?"在职":"离职");
-            rowBuffer.append(",");
+            rowBuffer.append("\t");
 
 
             rowBuffer.append(StringUtils.isEmpty(s.getLicensePlates())?"":s.getLicensePlates());
-            rowBuffer.append(",");
+            rowBuffer.append("\t");
  
 
             for(int j = 5; j < headerList.size(); j++) {
@@ -278,9 +278,10 @@ public class DriverMonthDutyController {
                 rowBuffer.append(statusValue);
 
                 if(j <= (headerList.size() -1) ){
-                    rowBuffer.append(",");
+                    rowBuffer.append("\t");
                 }
             }
+            csvDataList.add(rowBuffer.toString());
         }
     }
 

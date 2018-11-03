@@ -166,22 +166,22 @@ public class DriverSchController {
         for (CarDriverDayDutyDTO carDriverDayDutyDTO : result) {
             StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append(carDriverDayDutyDTO.getDriverName());
-            stringBuffer.append(",");
+            stringBuffer.append("\t");
             stringBuffer.append(carDriverDayDutyDTO.getPhone());
-            stringBuffer.append(",");
+            stringBuffer.append("\t");
             stringBuffer.append(carDriverDayDutyDTO.getCityName());
-            stringBuffer.append(",");
+            stringBuffer.append("\t");
             stringBuffer.append(carDriverDayDutyDTO.getSupplierName());
-            stringBuffer.append(",");
+            stringBuffer.append("\t");
             stringBuffer.append(carDriverDayDutyDTO.getTeamName());
-            stringBuffer.append(",");
-            stringBuffer.append(carDriverDayDutyDTO.getDutyTimes());
-            stringBuffer.append(",");
-            stringBuffer.append(carDriverDayDutyDTO.getForcedTimes());
-            stringBuffer.append(",");
-            stringBuffer.append(carDriverDayDutyDTO.getTime());
+            stringBuffer.append("\t");
+            stringBuffer.append(carDriverDayDutyDTO.getTime());//排班日期
+            stringBuffer.append("\t");
+            stringBuffer.append(carDriverDayDutyDTO.getForcedTimes());//强制上班时间
+            stringBuffer.append("\t");
+            stringBuffer.append(carDriverDayDutyDTO.getDutyTimes());//排班时长
 
-            stringBuffer.append(",");
+            stringBuffer.append("\t");
 
             if(carDriverDayDutyDTO.getStatus() == 2){
                 stringBuffer.append("已发布");
