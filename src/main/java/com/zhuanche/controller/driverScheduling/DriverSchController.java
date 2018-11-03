@@ -147,7 +147,7 @@ public class DriverSchController {
 
             }
             List<String> headerList = new ArrayList<>();
-            headerList.add("司机姓名,手机号,城市,供应商,车队,排班日期,强制上班时间,排班时长,状态");
+            headerList.add("司机姓名\t手机号\t城市\t供应商\t车队\t排班日期\t强制上班时间\t排班时长\t状态");
 
             CsvUtils.exportCsv(response,csvDataList,headerList,fileName);
             long end = System.currentTimeMillis();

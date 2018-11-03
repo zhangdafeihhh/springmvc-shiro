@@ -207,16 +207,14 @@ public class DriverMonthDutyController {
             }
             List<String> csvheaderList = new ArrayList<>();
 
-//            String header1 = "说明：司机编码,车队,司机名称,是否在职,车牌号 这几列不需要修改；排班可选状态：上班,休息,调休,替班,换班,早班,晚班,事假,病假；当状态不填时默认为上班";
             StringBuffer stringBuffer = new StringBuffer();
             for(JSONObject item : headerList){
                 stringBuffer.append(item.get("showName"));
-                stringBuffer.append(",");
+                stringBuffer.append("\t");
             }
             String header2 = stringBuffer.toString();
             header2 = header2.substring(0,header2.lastIndexOf(","));
 
-//            csvheaderList.add(header1);
             csvheaderList.add(header2);
 
             String fileName = "司机月排班"+ DateUtil.dateFormat(new Date(),"yyyy-MM")+".csv";
