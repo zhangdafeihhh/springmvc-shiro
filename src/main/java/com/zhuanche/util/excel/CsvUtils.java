@@ -61,12 +61,12 @@ public class CsvUtils {
 
             if(headdataList!=null && !headdataList.isEmpty()){
                 for(String data : headdataList){
-                    bw.write(data+"\r");
+                    bw.write(data+"\r\n");
                 }
             }
             if(dataList!=null && !dataList.isEmpty()){
                 for(String data : dataList){
-                    bw.write(data+"\r");
+                    bw.write(data+"\r\n");
                 }
             }
             isSucess=true;
@@ -87,6 +87,70 @@ public class CsvUtils {
                     osw=null;
                 } catch (IOException e) {
                     e.printStackTrace();
+                }
+            }
+        }
+        return isSucess;
+    }
+
+    public static boolean exportCsvV2(HttpServletResponse response,
+                                    List<List<String>> dataList,
+                                    List<List<String>> headdataList,
+                                    String  fileName) throws IOException {
+        OutputStreamWriter osw = null;
+        boolean isSucess=false;
+        BufferedWriter bw=null;
+        CsvWriter csvWriter =null;
+        try {
+
+            response.reset();
+            response.setContentType("multipart/form-data");
+            response.setHeader("content-disposition", "attachment; filename="+fileName);
+              csvWriter = new CsvWriter(response.getOutputStream(), ',', Charset.forName("UTF-8"));
+
+            if(headdataList!=null && !headdataList.isEmpty()){
+
+                for(List<String> data : headdataList){
+                    String[] array = new String[data.size()];
+                    for(int i = 0;i<data.size();i++){
+                        array[i] = data.get(i);
+                    }
+                    csvWriter.writeRecord(array);
+                }
+            }
+            if(dataList!=null && !dataList.isEmpty()){
+                for(List<String> data : dataList){
+                    String[] array = new String[data.size()];
+                    for(int i = 0;i<data.size();i++){
+                        array[i] = data.get(i);
+                    }
+                    csvWriter.writeRecord(array);
+                }
+            }
+            isSucess=true;
+        } catch (Exception e) {
+            isSucess=false;
+        }finally{
+            if(bw!=null){
+                try {
+                    bw.close();
+                    bw=null;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(osw!=null){
+                try {
+                    osw.close();
+                    osw=null;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(csvWriter != null){
+                try {
+                csvWriter.close();
+                } catch (Exception e) {
                 }
             }
         }

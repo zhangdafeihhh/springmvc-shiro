@@ -27,6 +27,7 @@ import com.zhuanche.util.dateUtil.DateUtil;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.excel.ExportExcelUtil;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,7 +148,7 @@ public class DriverSchController {
 
             }
             List<String> headerList = new ArrayList<>();
-            headerList.add("司机姓名\t手机号\t城市\t供应商\t车队\t排班日期\t强制上班时间\t排班时长\t状态");
+            headerList.add("司机姓名,手机号,城市,供应商,车队,排班日期,强制上班时间,排班时长,状态");
 
             CsvUtils.exportCsv(response,csvDataList,headerList,fileName);
             long end = System.currentTimeMillis();
@@ -166,22 +167,22 @@ public class DriverSchController {
         for (CarDriverDayDutyDTO carDriverDayDutyDTO : result) {
             StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append(carDriverDayDutyDTO.getDriverName());
-            stringBuffer.append("\t");
+            stringBuffer.append(",");
             stringBuffer.append(carDriverDayDutyDTO.getPhone());
-            stringBuffer.append("\t");
+            stringBuffer.append(",");
             stringBuffer.append(carDriverDayDutyDTO.getCityName());
-            stringBuffer.append("\t");
+            stringBuffer.append(",");
             stringBuffer.append(carDriverDayDutyDTO.getSupplierName());
-            stringBuffer.append("\t");
+            stringBuffer.append(",");
             stringBuffer.append(carDriverDayDutyDTO.getTeamName());
-            stringBuffer.append("\t");
+            stringBuffer.append(",");
             stringBuffer.append(carDriverDayDutyDTO.getTime());//排班日期
-            stringBuffer.append("\t");
-            stringBuffer.append(carDriverDayDutyDTO.getForcedTimes());//强制上班时间
-            stringBuffer.append("\t");
+            stringBuffer.append(",");
+            stringBuffer.append(StringUtils.isNoneEmpty(carDriverDayDutyDTO.getForcedTimes())?carDriverDayDutyDTO.getForcedTimes().replace(",","  "):carDriverDayDutyDTO.getForcedTimes());//强制上班时间
+            stringBuffer.append(",");
             stringBuffer.append(carDriverDayDutyDTO.getDutyTimes());//排班时长
 
-            stringBuffer.append("\t");
+            stringBuffer.append(",");
 
             if(carDriverDayDutyDTO.getStatus() == 2){
                 stringBuffer.append("已发布");
