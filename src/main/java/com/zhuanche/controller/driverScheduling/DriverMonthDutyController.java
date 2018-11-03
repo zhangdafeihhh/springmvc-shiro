@@ -253,8 +253,9 @@ public class DriverMonthDutyController {
             rowBuffer.append(",");
 
 
-            rowBuffer.append(s.getLicensePlates()!=null?""+s.getLicensePlates()+"":"");
+            rowBuffer.append(StringUtils.isEmpty(s.getLicensePlates())?"":s.getLicensePlates());
             rowBuffer.append(",");
+ 
 
             for(int j = 5; j < headerList.size(); j++) {
                 JSONObject header = headerList.get(j);
