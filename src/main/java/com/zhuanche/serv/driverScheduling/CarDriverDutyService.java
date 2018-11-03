@@ -95,6 +95,68 @@ public class CarDriverDutyService {
 			dutyParamRequest.setStatus(1);
 		}
 		try{
+			//手机号转换driverId进行查询
+			if(!Check.NuNStr(dutyParamRequest.getPhone())) {
+				DutyParamRequest request = new DutyParamRequest();
+				request.setPhone(dutyParamRequest.getPhone());
+				CarDriverInfoDTO driverInfo = carBizDriverInfoExMapper.queryOneDriver(request);
+				if(driverInfo == null){
+					PageDTO pageDTO = new PageDTO();
+					pageDTO.setTotal(0);
+					pageDTO.setResult(null);
+					return pageDTO;
+				}
+			}
+			//组装权限参数
+			generateDutyParamRequestByUser(dutyParamRequest);
+
+			PageInfo<CarDriverDayDutyDTO> pageInfo = PageHelper.startPage(dutyParamRequest.getPageNo(), dutyParamRequest.getPageSize(), true).doSelectPageInfo(()
+					-> carDriverDayDutyExMapper.selectForList(dutyParamRequest));
+			List<CarDriverDayDutyDTO> list = pageInfo.getList();
+			if(list != null){
+				Set<Integer> driverSet = new HashSet<>();
+				for (CarDriverDayDutyDTO carDriverDayDuty : list) {
+					driverSet.add(carDriverDayDuty.getDriverId());
+				}
+
+				List<CarDriverInfoDTO> driverList = new ArrayList<>();
+				if(!driverSet.isEmpty()){
+					driverList =carBizDriverInfoExMapper.queryListDriverByDriverIds(driverSet);
+				}
+				Map<String,CarDriverInfoDTO> driverCache = new HashMap<>();
+				for(CarDriverInfoDTO item : driverList){
+					driverCache.put("d_"+item.getDriverId(),item);
+				}
+				CarDriverInfoDTO info = null;
+				for (CarDriverDayDutyDTO carDriverDayDuty : list) {
+					info = driverCache.get("d_"+carDriverDayDuty.getDriverId());
+					if(!Check.NuNObj(info)){
+						carDriverDayDuty.setPhone(info.getPhone());
+					}
+				}
+			}
+
+			PageDTO pageDTO = new PageDTO();
+			pageDTO.setTotal((int)pageInfo.getTotal());
+			pageDTO.setResult(list);
+			return pageDTO;
+		}catch (Exception e){
+			logger.error("查询排班司机列表异常，参数dutyParamRequest="+(dutyParamRequest==null?"null":JSON.toJSONString(dutyParamRequest)),e);
+			return null;
+		}
+	}
+
+	/**
+	 * 重新组装请求参数，并返回 DutyParamRequest参数
+	 * @param dutyParamRequest
+	 * @return
+	 */
+	private DutyParamRequest generateDutyParamRequestByUser(DutyParamRequest dutyParamRequest){
+		//发布司机排班的查询功能 上层返回提示语
+		if(!Check.NuNObj(dutyParamRequest) && dutyParamRequest.getUnpublishedFlag() == 1){
+			dutyParamRequest.setStatus(1);
+		}
+		try{
 			/** 数据权限处理开始 */
 			CommonRequest commonRequest = new CommonRequest();
 			if(!Check.NuNObj(dutyParamRequest.getCityId())){
@@ -112,36 +174,11 @@ public class CarDriverDutyService {
 			dutyParamRequest.setTeamIds(resultParmam.getTeamIds());
 			/** 数据权限处理结束 */
 
-			DutyParamRequest request = new DutyParamRequest();
-			//手机号转换driverId进行查询
-			if(!Check.NuNStr(dutyParamRequest.getPhone())){
-				request.setPhone(dutyParamRequest.getPhone());
-				CarDriverInfoDTO driverInfo = carBizDriverInfoExMapper.queryOneDriver(request);
-				request.setPhone(null);
-				if(Check.NuNObj(driverInfo)){
-					return null;
-				}
-				dutyParamRequest.setDriverId(Integer.valueOf(driverInfo.getDriverId()));
-			}
 
-			PageInfo<CarDriverDayDutyDTO> pageInfo = PageHelper.startPage(dutyParamRequest.getPageNo(), dutyParamRequest.getPageSize(), true).doSelectPageInfo(()
-					-> carDriverDayDutyExMapper.selectForList(dutyParamRequest));
-			List<CarDriverDayDutyDTO> list = pageInfo.getList();
-
-			for (CarDriverDayDutyDTO carDriverDayDuty : list) {
-				request.setDriverId(carDriverDayDuty.getDriverId());
-				CarDriverInfoDTO info = carBizDriverInfoExMapper.queryOneDriver(request);
-				if(!Check.NuNObj(info)){
-					carDriverDayDuty.setPhone(info.getPhone());
-				}
-			}
-			PageDTO pageDTO = new PageDTO();
-			pageDTO.setTotal((int)pageInfo.getTotal());
-			pageDTO.setResult(list);
-			return pageDTO;
+			 return dutyParamRequest;
 		}catch (Exception e){
-			logger.error("查询排班司机列表异常:{}"+JSON.toJSONString(e));
-			return null;
+			logger.error("组装权限异常:dutyParamRequest="+(dutyParamRequest==null?"null":JSON.toJSONString(dutyParamRequest))+";"+JSON.toJSONString(e));
+			return dutyParamRequest;
 		}
 	}
 

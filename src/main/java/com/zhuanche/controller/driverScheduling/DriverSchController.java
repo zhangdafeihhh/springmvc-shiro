@@ -23,6 +23,7 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
 import com.zhuanche.util.dateUtil.DateUtil;
+import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.excel.ExportExcelUtil;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -90,6 +91,13 @@ public class DriverSchController {
         return response;
     }
 
+    public int getTotalPage(int totalCount,int pageSize) {
+        int p = totalCount / pageSize;
+        if (totalCount % pageSize == 0)
+            return p;
+        else
+            return p + 1;
+    }
     /** 
     * @Desc: 导出排班信息 
     * @param:
@@ -100,8 +108,7 @@ public class DriverSchController {
     @RequestMapping("/exportDutyToExcel")
     @ResponseBody
     public void exportDutyToExcel(HttpServletResponse response, HttpServletRequest request,DutyParamRequest param){
-        String[] title = {"司机姓名","手机号","城市","供应商","车队",
-                "排班日期","强制上班时间","排班时长","状态"};
+        String headerList = "司机姓名,手机号,城市,供应商,车队,排班日期,强制上班时间,排班时长,状态";
         try{
             if(Check.NuNObj(param)){
                 param = new DutyParamRequest();
@@ -109,65 +116,83 @@ public class DriverSchController {
             //设置导出单文件阈值 3000
             param.setPageSize(1000);
             PageDTO pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
-            if(Check.NuNObj(pageDTO)){
-                return ;
-            }
-            Integer total = pageDTO.getTotal();
-            List<DutyExcelDTO> firstList = new ArrayList<>();
+
+
             List<CarDriverDayDutyDTO> result = pageDTO.getResult();
-            for (CarDriverDayDutyDTO carDriverDayDutyDTO : result) {
-                DutyExcelDTO excel = new DutyExcelDTO();
-                BeanUtils.copyProperties(carDriverDayDutyDTO,excel);
-                if(carDriverDayDutyDTO.getStatus() == 2){
-                    excel.setStatus("已发布");
-                }else if(carDriverDayDutyDTO.getStatus() == 1){
-                    excel.setStatus("未发布");
-                }else{
-                    excel.setStatus("未发布");
+            List<String> dbDataList = new ArrayList<>();
+            if(result != null){
+                for (CarDriverDayDutyDTO carDriverDayDutyDTO : result) {
+                    StringBuffer stringBuffer = new StringBuffer();
+                    stringBuffer.append(carDriverDayDutyDTO.getDriverName());
+                    stringBuffer.append(",");
+                    stringBuffer.append(carDriverDayDutyDTO.getPhone());
+                    stringBuffer.append(",");
+                    stringBuffer.append(carDriverDayDutyDTO.getCityName());
+                    stringBuffer.append(",");
+                    stringBuffer.append(carDriverDayDutyDTO.getSupplierName());
+                    stringBuffer.append(",");
+                    stringBuffer.append(carDriverDayDutyDTO.getTeamName());
+                    stringBuffer.append(",");
+                    stringBuffer.append(carDriverDayDutyDTO.getDutyTimes());
+                    stringBuffer.append(",");
+                    stringBuffer.append(carDriverDayDutyDTO.getForcedTimes());
+                    stringBuffer.append(",");
+                    stringBuffer.append(carDriverDayDutyDTO.getTime());
+
+                    stringBuffer.append(",");
+
+                    if(carDriverDayDutyDTO.getStatus() == 2){
+                        stringBuffer.append("已发布");
+                    }else if(carDriverDayDutyDTO.getStatus() == 1){
+                        stringBuffer.append("未发布");
+                    }else{
+                        stringBuffer.append("未发布");
+                    }
+                    dbDataList.add(stringBuffer.toString());
                 }
-                firstList.add(excel);
             }
-//            List<DutyExcelDTO> firstList = BeanUtil.copyList(result, DutyExcelDTO.class);
-            if(Check.NuNCollection(result)){
-                return ;
-            }
-            String fileName = DateUtil.dateFormat(new Date(),DateUtil.intTimestampPattern);
-            HttpServletResponse reponseOut = this.setResponse(response, fileName);
-            // 声明一个工作薄
-            ExportExcelUtil excelUtil = new ExportExcelUtil();
 
-            HSSFWorkbook workbook = new HSSFWorkbook();
+            String fileName = "司机排班信息"+DateUtil.dateFormat(new Date(),DateUtil.intTimestampPattern)+".csv";
+            Integer total = pageDTO.getTotal();
+            //计算总页数
+            Integer totalPage = getTotalPage(total,pageDTO.getPageSize());
 
-            workbook = excelUtil.exportExcelSheet(workbook, "排班信息"+param.getPageNo(), title, firstList);
-            for(int pageNumber = 2; ((pageNumber-1)*param.getPageSize()) < total; pageNumber++){
+            for(int pageNumber = 2; pageNumber <= totalPage; pageNumber++){
                 param.setPageNo(pageNumber);
                 PageDTO page = carDriverDutyService.queryDriverDayDutyList(param);
-                List<DutyExcelDTO> targetList = new ArrayList<>();
                 List<CarDriverDayDutyDTO> sourceList = page.getResult();
                 for (CarDriverDayDutyDTO carDriverDayDutyDTO : sourceList) {
-                    DutyExcelDTO excel = new DutyExcelDTO();
-                    BeanUtils.copyProperties(carDriverDayDutyDTO,excel);
+                    StringBuffer stringBuffer = new StringBuffer();
+                    stringBuffer.append(carDriverDayDutyDTO.getDriverName());
+                    stringBuffer.append(",");
+                    stringBuffer.append(carDriverDayDutyDTO.getPhone());
+                    stringBuffer.append(",");
+                    stringBuffer.append(carDriverDayDutyDTO.getCityName());
+                    stringBuffer.append(",");
+                    stringBuffer.append(carDriverDayDutyDTO.getSupplierName());
+                    stringBuffer.append(",");
+                    stringBuffer.append(carDriverDayDutyDTO.getTeamName());
+                    stringBuffer.append(",");
+                    stringBuffer.append(carDriverDayDutyDTO.getDutyTimes());
+                    stringBuffer.append(",");
+                    stringBuffer.append(carDriverDayDutyDTO.getForcedTimes());
+                    stringBuffer.append(",");
+                    stringBuffer.append(carDriverDayDutyDTO.getTime());
+
+                    stringBuffer.append(",");
+
                     if(carDriverDayDutyDTO.getStatus() == 2){
-                        excel.setStatus("已发布");
+                        stringBuffer.append("已发布");
                     }else if(carDriverDayDutyDTO.getStatus() == 1){
-                        excel.setStatus("未发布");
+                        stringBuffer.append("未发布");
                     }else{
-                        excel.setStatus("未发布");
+
+                        stringBuffer.append("未发布");
                     }
-                    targetList.add(excel);
-                }
-//                List<DutyExcelDTO> targetList = BeanUtil.copyList(sourceList, DutyExcelDTO.class);
-                if(!Check.NuNCollection(targetList)){
-                    workbook = excelUtil.exportExcelSheet(workbook, "排班信息" + pageNumber, title, targetList);
+                    dbDataList.add(stringBuffer.toString());
                 }
             }
-            ServletOutputStream out = reponseOut.getOutputStream();
-            workbook.write(out);
-            out.flush();
-            out.close();
-            if(total <= 1000){
-                return ;
-            }
+            CsvUtils.exportCsv(response,dbDataList,headerList,fileName);
 
         }catch (Exception e){
             logger.error("导出排班信息 异常:{}",e);
@@ -175,6 +200,7 @@ public class DriverSchController {
         }
         return ;
     }
+
 
     /**
      * @Desc: 保存司机日排班信息
