@@ -541,35 +541,6 @@ public class DriverMonthDutyService {
 					()->carDriverMonthDutyExMapper.queryDriverDutyList(param));
 			List<CarDriverMonthDTO> list = pageInfo.getList();
 			if(Check.NuNCollection(list)){
-				logger.info("查询排班列表service入参："+ JSON.toJSONString(param)+",返回值为：null");
-				return null;
-			}
-			for (CarDriverMonthDTO month : list) {
-				DutyParamRequest dutyParamRequest = new DutyParamRequest();
-				dutyParamRequest.setDriverId(month.getDriverId());
-				CarDriverInfoDTO info = carBizDriverInfoExMapper.queryOneDriver(dutyParamRequest);
-				if(!Check.NuNObj(info)){
-					month.setStatus(info.getStatus());
-				}
-			}
-			PageDTO pageDTO = new PageDTO();
-			pageDTO.setResult(list);
-			pageDTO.setTotal((int)pageInfo.getTotal());
-			return pageDTO;
-		}catch (Exception e){
-			logger.error("查询排班列表service异常:{}",e);
-			return null;
-		}finally {
-			PageHelper.clearPage();
-		}
-	}
-	public PageDTO queryDriverDutyListV2(DriverMonthDutyRequest param){
-		try{
-			logger.info("查询排班列表service入参："+ JSON.toJSONString(param));
-			PageInfo<CarDriverMonthDTO> pageInfo = PageHelper.startPage(param.getPageNo(),param.getPageSize(),true).doSelectPageInfo(
-					()->carDriverMonthDutyExMapper.queryDriverDutyList(param));
-			List<CarDriverMonthDTO> list = pageInfo.getList();
-			if(Check.NuNCollection(list)){
 				//返回空
 				PageDTO pageDTO = new PageDTO();
 				pageDTO.setResult(list);

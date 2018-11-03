@@ -210,7 +210,7 @@ public class DriverMonthDutyController {
             StringBuffer stringBuffer = new StringBuffer();
             for(JSONObject item : headerList){
                 stringBuffer.append(item.get("showName"));
-                stringBuffer.append("\t");
+                stringBuffer.append(",");
             }
             String header2 = stringBuffer.toString();
             header2 = header2.substring(0,header2.lastIndexOf(","));
@@ -238,21 +238,21 @@ public class DriverMonthDutyController {
         for(CarDriverMonthDTO s:result){
            StringBuffer rowBuffer = new StringBuffer();
             rowBuffer.append(s.getDriverId()!=null?""+s.getDriverId()+"":"");
-            rowBuffer.append("\t");
+            rowBuffer.append(",");
 
             rowBuffer.append(s.getTeamName()!=null?""+s.getTeamName()+"":"");
-            rowBuffer.append("\t");
+            rowBuffer.append(",");
 
 
             rowBuffer.append(s.getDriverName()!=null?""+s.getDriverName()+"":"");
-            rowBuffer.append("\t");
+            rowBuffer.append(",");
 
             rowBuffer.append(s.getStatus()==1?"在职":"离职");
-            rowBuffer.append("\t");
+            rowBuffer.append(",");
 
 
             rowBuffer.append(StringUtils.isEmpty(s.getLicensePlates())?"":s.getLicensePlates());
-            rowBuffer.append("\t");
+            rowBuffer.append(",");
  
 
             for(int j = 5; j < headerList.size(); j++) {
@@ -273,10 +273,10 @@ public class DriverMonthDutyController {
                 if (null == statusValue) {
                     statusValue = "--";
                 }
-                rowBuffer.append(statusValue);
+                rowBuffer.append(PageUtils.replaceComma(statusValue));
 
                 if(j <= (headerList.size() -1) ){
-                    rowBuffer.append("\t");
+                    rowBuffer.append(",");
                 }
             }
             csvDataList.add(rowBuffer.toString());
