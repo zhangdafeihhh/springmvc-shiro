@@ -107,15 +107,19 @@ public class DriverSchController {
 
         try{
 
-            if(Check.NuNObj(param)){
-                param = new DutyParamRequest();
+            logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param));
+            SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+            if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
+                return  ;
             }
-            List<String> headerList = new ArrayList<>();
-            headerList.add("司机姓名,手机号,城市,供应商,车队,排班日期,强制上班时间,排班时长,状态");
-
+            if(Check.NuNObj(param) || Check.NuNObj(param.getUnpublishedFlag()) ){
+                return  ;
+            }
+            param.setPage(1);
             //设置导出单文件阈值 3000
-            param.setPageSize(1000);
+            param.setPageSize(20);
             PageDTO pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
+
             List<CarDriverDayDutyDTO> result = pageDTO.getResult();
             List<String> csvDataList = new ArrayList<>();
             dataTrans( result,  csvDataList);
@@ -123,7 +127,7 @@ public class DriverSchController {
             String fileName = "司机排班信息"+DateUtil.dateFormat(new Date(),DateUtil.intTimestampPattern)+".csv";
             String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
             if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
-                 fileName = URLEncoder.encode(fileName, "UTF-8");
+                fileName = URLEncoder.encode(fileName, "UTF-8");
             } else {  //其他浏览器
                 fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
             }
@@ -138,7 +142,11 @@ public class DriverSchController {
                 dataTrans( result,  csvDataList);
 
             }
+            List<String> headerList = new ArrayList<>();
+            headerList.add("司机姓名,手机号,城市,供应商,车队,排班日期,强制上班时间,排班时长,状态");
+
             CsvUtils.exportCsv(response,csvDataList,headerList,fileName);
+
 
         }catch (Exception e){
             logger.error("导出排班信息 异常:{}",e);
