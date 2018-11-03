@@ -408,19 +408,24 @@ public class DriverSchController {
     @ResponseBody
     @RequestMapping(value = "/queryDriverMonthDutyData")
     public AjaxResponse queryDriverMonthDutyData(DutyParamRequest param) {
-        logger.info("查看符合条件排班列表入参:"+ JSON.toJSONString(param));
-        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-        if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
-            return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
+        logger.info("查看符合条件排班列表，入参:"+ (param== null?"null":JSON.toJSONString(param)));
+      try{
+            SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+            if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
+                return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
+            }
+            if(Check.NuNObj(param) || Check.NuNObj(param.getUnpublishedFlag()) ){
+                return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
+            }
+            long start = System.currentTimeMillis();
+            PageDTO pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
+            long end = System.currentTimeMillis();
+            logger.info("分页查询符合条件排班列表入参:"+ JSON.toJSONString(param)+"，耗时："+(end-start)+"毫秒，pageNumber="+0+";总条数为："+pageDTO.getTotal()+"；查询结果为："+(pageDTO.getResult()==null?"null":JSON.toJSONString(pageDTO.getResult())));
+            return AjaxResponse.success(pageDTO);
+        }catch (Exception e){
+            logger.error("查看符合条件排班列表异常，入参:"+ (param== null?"null":JSON.toJSONString(param)),e);
+              return AjaxResponse.success(null);
         }
-        if(Check.NuNObj(param) || Check.NuNObj(param.getUnpublishedFlag()) ){
-            return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
-        }
-        long start = System.currentTimeMillis();
-        PageDTO pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
-        long end = System.currentTimeMillis();
-        logger.info("分页查询符合条件排班列表入参:"+ JSON.toJSONString(param)+"，耗时："+(end-start)+"毫秒，pageNumber="+0+";总条数为："+pageDTO.getTotal()+"；查询结果为："+(pageDTO.getResult()==null?"null":JSON.toJSONString(pageDTO.getResult())));
-        return AjaxResponse.success(pageDTO);
     }
 
 }
