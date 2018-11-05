@@ -136,16 +136,16 @@ public class DriverSchController {
             }
 
             //计算总页数
-            Integer totalPage = pageDTO.getPages();
+            int pages = pageDTO.getPages();
 
-            for(int pageNumber = 2; pageNumber <= totalPage; pageNumber++){
+            for(int pageNumber = 2; pageNumber <= pages; pageNumber++){
                 param.setPageNo(pageNumber);
-                PageDTO page = carDriverDutyService.queryDriverDayDutyList(param);
-                logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，pageNumber="+pageNumber+";总条数为："+pageDTO.getTotal()+"；总页数totalPage = "+totalPage
+                pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
+                logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，pageNumber="+pageNumber+";总条数为："+pageDTO.getTotal()+"；总页数totalPage = "+pageDTO.getPages()
                         //+";查询结果为："+(result==null?"null":JSON.toJSONString(result))
                 );
 
-                result = page.getResult();
+                result = pageDTO.getResult();
                 dataTrans( result,  csvDataList);
 
             }
