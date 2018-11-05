@@ -334,13 +334,16 @@ public class DriverDailyReportController extends DriverQueryController {
 		try {
 
 			List<String> headerList = new ArrayList<>();
-			headerList.add("车牌号,姓名,供应商,车队,小组,上线时间,总在线时长（小时）,班在线时长（min）,计价前时间(min),计价前里程(km)");
+			headerList.add("车牌号,姓名,供应商,车队,小组,上线时间,总在线时长（小时）,班在线时长（min）,计价前时间(min),计价前里程(km),载客中时间(min),载客里程(km)," +
+					"总服务时间(min),总服务里程(km),计算异动时间(min),结算异动里程（km）,订单流水(元),价外流水（元）,价外费用,绑单完成数,抢单完成数," +
+							"后台派单,接机,送机,完成单数,日期"
+						);
 
 			if(rows == null){
 				rows = new ArrayList<>();
 			}
 			List<String> csvDataList  = new ArrayList<>(rows.size());
-			dataTrans(rows,csvDataList);
+			dataTrans(rows,csvDataList,reportType);
 
 			String fileName = "司机工作报告"+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
 			String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
@@ -361,33 +364,104 @@ public class DriverDailyReportController extends DriverQueryController {
 		}
 	}
 
-	private  void dataTrans(List<DriverDailyReportDTO> result, List<String> csvDataList){
+	private  void dataTrans(List<DriverDailyReportDTO> result, List<String> csvDataList ,int reportType){
 		if(null == result){
 			return;
 		}
-		//headerList.add("车牌号,姓名,供应商,车队,小组,上线时间,总在线时长（小时）,总在线时长（min）,计价前时间(min),计价前里程(km)");
-		for (DriverDailyReportDTO carDriverDayDutyDTO : result) {
+//			"车牌号,姓名,供应商,车队,小组,上线时间,总在线时长（小时）,班在线时长（min）,计价前时间(min),计价前里程(km),载客中时间(min),载客里程(km)," +
+//					"总服务时间(min),总服务里程(km),计算异动时间(min),结算异动里程（km）,订单流水(元),价外流水（元）,价外费用,绑单完成数,抢单完成数," +
+//					"后台派单,接机,送机,完成单数,日期"
+
+		for (DriverDailyReportDTO s : result) {
 			StringBuffer stringBuffer = new StringBuffer();
-			stringBuffer.append(carDriverDayDutyDTO.getLicensePlates()==null?"":carDriverDayDutyDTO.getLicensePlates());
+			stringBuffer.append(s.getLicensePlates() != null ? ""
+					+ s.getLicensePlates() + "" : "");
 			stringBuffer.append(",");
-			stringBuffer.append(StringUtils.isEmpty(carDriverDayDutyDTO.getDriverName())?"":carDriverDayDutyDTO.getDriverName());//姓名
+
+
+			stringBuffer.append(s.getDriverName() != null ? ""
+					+ s.getDriverName() + "" : "");
 			stringBuffer.append(",");
-			stringBuffer.append(StringUtils.isEmpty(carDriverDayDutyDTO.getSupplierName())?"":carDriverDayDutyDTO.getSupplierName());//供应商
+
+
+			stringBuffer.append(s.getSupplierName() != null ? ""
+					+ s.getSupplierName() + "" : "");
 			stringBuffer.append(",");
-			stringBuffer.append(StringUtils.isEmpty(carDriverDayDutyDTO.getTeamName())?"":carDriverDayDutyDTO.getTeamName());//车队
+
+
+			stringBuffer.append(s.getTeamName()!= null ? ""
+					+ s.getTeamName() + "" : "");
 			stringBuffer.append(",");
-			stringBuffer.append(StringUtils.isEmpty(carDriverDayDutyDTO.getGroupName())?"":carDriverDayDutyDTO.getGroupName());//小组
+
+
+			stringBuffer.append(s.getGroupName()!= null ? ""
+					+ s.getGroupName() + "" : "");
 			stringBuffer.append(",");
-			stringBuffer.append(StringUtils.isEmpty(carDriverDayDutyDTO.getUpOnlineTime())?"":carDriverDayDutyDTO.getUpOnlineTime());//上线时间
+
+
+			stringBuffer.append(s.getUpOnlineTime());
 			stringBuffer.append(",");
-			stringBuffer.append(carDriverDayDutyDTO.getOnlineTime());//总在线时长（min）
+
+			 
+			stringBuffer.append(s.getOnlineTime());
 			stringBuffer.append(",");
-			stringBuffer.append(carDriverDayDutyDTO.getForcedTime());//班在线时长（min）
+
+			stringBuffer.append(s.getForcedTime());
 			stringBuffer.append(",");
-			stringBuffer.append(carDriverDayDutyDTO.getTravelTimeStart());//计价前时长（min）
+
+			stringBuffer.append(s.getTravelTimeStart());
 			stringBuffer.append(",");
-			stringBuffer.append(carDriverDayDutyDTO.getTravelMileageStart());//计价前里程
+
+			stringBuffer.append(s.getTravelMileageStart());
 			stringBuffer.append(",");
+
+			stringBuffer.append(s.getTravelTime());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getTravelMileage());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getServiceTime());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getServiceMileage());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getTravelTimeEnd());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getTravelMileageEnd());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getActualPay());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getDriverOutPay());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getAssignOrderNum());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getContendOrderNum());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getPlatformOrderNum());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getGetPlaneNum());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getOutPlaneNum());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getOperationNum());
+			stringBuffer.append(",");
+
+			if (reportType == 0){
+				stringBuffer.append(s.getStatDate());
+			}else{
+				stringBuffer.append("("+s.getStatDateStart()+")-("+s.getStatDateEnd()+")");
+			}
 
 			csvDataList.add(stringBuffer.toString());
 		}
@@ -444,87 +518,87 @@ public class DriverDailyReportController extends DriverQueryController {
 			for (DriverDailyReportDTO s : list) {
 				Row row = sheet.createRow(i + 1);
 				cell = row.createCell(0);
-				cell.setCellValue(s.getLicensePlates() != null ? ""
+				stringBuffer.append(s.getLicensePlates() != null ? ""
 						+ s.getLicensePlates() + "" : "");
 
 				cell = row.createCell(1);
-				cell.setCellValue(s.getDriverName() != null ? ""
+				stringBuffer.append(s.getDriverName() != null ? ""
 						+ s.getDriverName() + "" : "");
 
 				cell = row.createCell(2);
-				cell.setCellValue(s.getSupplierName() != null ? ""
+				stringBuffer.append(s.getSupplierName() != null ? ""
 						+ s.getSupplierName() + "" : "");
 
 				cell = row.createCell(3);
-				cell.setCellValue(s.getTeamName()!= null ? ""
+				stringBuffer.append(s.getTeamName()!= null ? ""
 						+ s.getTeamName() + "" : "");
 
 				cell = row.createCell(4);
-				cell.setCellValue(s.getGroupName()!= null ? ""
+				stringBuffer.append(s.getGroupName()!= null ? ""
 						+ s.getGroupName() + "" : "");
 
 				cell = row.createCell(5);
-				cell.setCellValue(s.getUpOnlineTime());
+				stringBuffer.append(s.getUpOnlineTime());
 
 				cell = row.createCell(6);
-				cell.setCellValue(s.getOnlineTime());
+				stringBuffer.append(s.getOnlineTime());
 
 				cell = row.createCell(7);
-				cell.setCellValue(s.getForcedTime());
+				stringBuffer.append(s.getForcedTime());
 
 				cell = row.createCell(8);
-				cell.setCellValue(s.getTravelTimeStart());
+				stringBuffer.append(s.getTravelTimeStart());
 
 				cell = row.createCell(9);
-				cell.setCellValue(s.getTravelMileageStart());
+				stringBuffer.append(s.getTravelMileageStart());
 
 				cell = row.createCell(10);
-				cell.setCellValue(s.getTravelTime());
+				stringBuffer.append(s.getTravelTime());
 
 				cell = row.createCell(11);
-				cell.setCellValue(s.getTravelMileage());
+				stringBuffer.append(s.getTravelMileage());
 
 				cell = row.createCell(12);
-				cell.setCellValue(s.getServiceTime());
+				stringBuffer.append(s.getServiceTime());
 
 				cell = row.createCell(13);
-				cell.setCellValue(s.getServiceMileage());
+				stringBuffer.append(s.getServiceMileage());
 
 				cell = row.createCell(14);
-				cell.setCellValue(s.getTravelTimeEnd());
+				stringBuffer.append(s.getTravelTimeEnd());
 
 				cell = row.createCell(15);
-				cell.setCellValue(s.getTravelMileageEnd());
+				stringBuffer.append(s.getTravelMileageEnd());
 
 				cell = row.createCell(16);
-				cell.setCellValue(s.getActualPay());
+				stringBuffer.append(s.getActualPay());
 
 				cell = row.createCell(17);
-				cell.setCellValue(s.getDriverOutPay());
+				stringBuffer.append(s.getDriverOutPay());
 
 				cell = row.createCell(18);
-				cell.setCellValue(s.getAssignOrderNum());
+				stringBuffer.append(s.getAssignOrderNum());
 
 				cell = row.createCell(19);
-				cell.setCellValue(s.getContendOrderNum());
+				stringBuffer.append(s.getContendOrderNum());
 
 				cell = row.createCell(20);
-				cell.setCellValue(s.getPlatformOrderNum());
+				stringBuffer.append(s.getPlatformOrderNum());
 
 				cell = row.createCell(21);
-				cell.setCellValue(s.getGetPlaneNum());
+				stringBuffer.append(s.getGetPlaneNum());
 
 				cell = row.createCell(22);
-				cell.setCellValue(s.getOutPlaneNum());
+				stringBuffer.append(s.getOutPlaneNum());
 
 				cell = row.createCell(23);
-				cell.setCellValue(s.getOperationNum());
+				stringBuffer.append(s.getOperationNum());
 
 				cell = row.createCell(24);
 				if (reportType==0){
-					cell.setCellValue(s.getStatDate());
+					stringBuffer.append(s.getStatDate());
 				}else{
-					cell.setCellValue("("+s.getStatDateStart()+")-("+s.getStatDateEnd()+")");
+					stringBuffer.append("("+s.getStatDateStart()+")-("+s.getStatDateEnd()+")");
 				}
 
 				i++;
