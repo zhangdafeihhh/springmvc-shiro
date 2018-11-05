@@ -187,6 +187,7 @@ public class DriverMonthDutyController {
                 logger.error("没有权限操作,用户："+JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));
                 return ;
             }
+            param.setPageSize(10000);
             param.setCityIds(commonService.setStringShiftInteger(data.getCityIds()));
             param.setSupplierIds(commonService.setStringShiftInteger(data.getSupplierIds()));
             param.setTeamIds(data.getTeamIds());
