@@ -318,7 +318,7 @@ public class DriverMonthDutyController {
 
         PageDTO pageDTO = new PageDTO();
         pageDTO.setResult(pageInfo.getList());
-        pageDTO.setTotal(new Integer(""+pageInfo.getTotal())); 
+        pageDTO.setTotal(new Integer(""+pageInfo.getTotal()));
         return AjaxResponse.success(pageDTO);
     }
 
