@@ -11,6 +11,7 @@ import com.zhuanche.common.dutyEnum.EnumDriverMonthDutyStatus;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.CarDriverInfoDTO;
+import com.zhuanche.dto.driver.CarDriverDayDutyDTO;
 import com.zhuanche.dto.driverDuty.CarDriverMonthDTO;
 import com.zhuanche.dto.driverDuty.ColumnEntity;
 import com.zhuanche.entity.mdbcarmanage.CarDriverMonthDuty;
@@ -534,7 +535,7 @@ public class DriverMonthDutyService {
 	@MasterSlaveConfigs(configs={
 			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
 	} )
-	public PageDTO queryDriverDutyList(DriverMonthDutyRequest param){
+	public PageInfo<CarDriverMonthDTO> queryDriverDutyList(DriverMonthDutyRequest param){
 		try{
 			logger.info("查询排班列表service入参："+ JSON.toJSONString(param));
 			PageInfo<CarDriverMonthDTO> pageInfo = PageHelper.startPage(param.getPageNo(),param.getPageSize(),true).doSelectPageInfo(
@@ -542,10 +543,7 @@ public class DriverMonthDutyService {
 			List<CarDriverMonthDTO> list = pageInfo.getList();
 			if(Check.NuNCollection(list)){
 				//返回空
-				PageDTO pageDTO = new PageDTO();
-				pageDTO.setResult(list);
-				pageDTO.setTotal(0);
-				return pageDTO;
+				return pageInfo;
 			}
 			Set<Integer> driverIdSet = new HashSet<>();
 			for (CarDriverMonthDTO month : list) {
@@ -567,10 +565,8 @@ public class DriverMonthDutyService {
 					month.setStatus(info.getStatus());
 				}
 			}
-			PageDTO pageDTO = new PageDTO();
-			pageDTO.setResult(list);
-			pageDTO.setTotal((int)pageInfo.getTotal());
-			return pageDTO;
+
+			return pageInfo;
 		}catch (Exception e){
 			logger.error("查询排班列表service异常:{}",e);
 			return null;

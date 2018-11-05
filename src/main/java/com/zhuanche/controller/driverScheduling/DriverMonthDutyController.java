@@ -2,6 +2,7 @@ package com.zhuanche.controller.driverScheduling;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.dutyEnum.EnumDriverMonthDutyStatus;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
@@ -192,18 +193,18 @@ public class DriverMonthDutyController {
 
             List<String> csvDataList = new ArrayList<>();
             long start = System.currentTimeMillis();
-            PageDTO pageDTO = driverMonthDutyService.queryDriverDutyList(param);
-            List<CarDriverMonthDTO> pageList = pageDTO.getResult();
+            PageInfo<CarDriverMonthDTO> pageInfo= driverMonthDutyService.queryDriverDutyList(param);
+            List<CarDriverMonthDTO> pageList = pageInfo.getList();
 
 
             List<JSONObject>  headerList=  driverMonthDutyService.generateTableHeader(param.getMonitorDate());
             dataTrans(pageList, csvDataList,headerList);
             //计算总页数
-            Integer totalPage = pageDTO.getPages();
+            Integer totalPage = pageInfo.getPages();
             for(int pageNumber = 2; pageNumber <= totalPage; pageNumber++){
                 param.setPageNo(pageNumber);
-                pageDTO = driverMonthDutyService.queryDriverDutyList(param);
-                dataTrans( pageDTO.getResult(),  csvDataList,headerList);
+                pageInfo = driverMonthDutyService.queryDriverDutyList(param);
+                dataTrans( pageInfo.getList(),  csvDataList,headerList);
             }
             List<String> csvheaderList = new ArrayList<>();
 
@@ -313,7 +314,11 @@ public class DriverMonthDutyController {
         param.setCityIds(commonService.setStringShiftInteger(data.getCityIds()));
         param.setSupplierIds(commonService.setStringShiftInteger(data.getSupplierIds()));
         param.setTeamIds(data.getTeamIds());
-        PageDTO pageDTO = driverMonthDutyService.queryDriverDutyList(param);
+        PageInfo<CarDriverMonthDTO> pageInfo = driverMonthDutyService.queryDriverDutyList(param);
+
+        PageDTO pageDTO = new PageDTO();
+        pageDTO.setResult(pageInfo.getList());
+        pageDTO.setTotal(new Integer(""+pageInfo.getTotal())); 
         return AjaxResponse.success(pageDTO);
     }
 
