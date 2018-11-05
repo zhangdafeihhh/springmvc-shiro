@@ -113,12 +113,10 @@ public class CarDriverDutyService {
 			dutyParamRequest = generateDutyParamRequestByUser(dutyParamRequest);
 
 			PageHelper.startPage(dutyParamRequest.getPageNo(), dutyParamRequest.getPageSize());
+			logger.info("查询司机排班的参数为："+JSON.toJSONString(dutyParamRequest));
 			List<CarDriverDayDutyDTO> listData = carDriverDayDutyExMapper.selectForList(dutyParamRequest);
 			PageInfo<CarDriverDayDutyDTO> pageInfo = new PageInfo<>(listData);
 			List<CarDriverDayDutyDTO> list = pageInfo.getList();
-
-
-			logger.info("查询司机排班的参数为："+JSON.toJSONString(dutyParamRequest)+",：pages:"+pageInfo.getPages()+",total="+pageInfo.getTotal());
 			if(list != null){
 				Set<Integer> driverSet = new HashSet<>();
 				for (CarDriverDayDutyDTO carDriverDayDuty : list) {
@@ -150,7 +148,7 @@ public class CarDriverDutyService {
 			return pageInfo;
 		}catch (Exception e){
 			logger.error("查询排班司机列表异常，参数dutyParamRequest="+(dutyParamRequest==null?"null":JSON.toJSONString(dutyParamRequest)),e);
-			return null;
+			return new PageInfo<>();
 		}
 	}
 
