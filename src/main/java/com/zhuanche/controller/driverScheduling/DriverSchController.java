@@ -1,6 +1,7 @@
 package com.zhuanche.controller.driverScheduling;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.dutyEnum.ServiceReturnCodeEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
@@ -120,10 +121,10 @@ public class DriverSchController {
             param.setPage(1);
             //设置导出单文件阈值 3000
             param.setPageSize(1000);
-            PageDTO pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
+            PageInfo<CarDriverDayDutyDTO> pageInfos = carDriverDutyService.queryDriverDayDutyList(param);
 
-            List<CarDriverDayDutyDTO> result = pageDTO.getResult();
-            logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，pageNumber="+0+";总条数为："+pageDTO.getTotal()+"；查询结果为："+(result==null?"null":JSON.toJSONString(result)));
+            List<CarDriverDayDutyDTO> result = pageInfos.getList();
+            logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，pageNumber="+0+";总条数为："+pageInfos.getTotal()+"；查询结果为："+(result==null?"null":JSON.toJSONString(result)));
             List<String> csvDataList = new ArrayList<>();
             dataTrans( result,  csvDataList);
 
@@ -136,16 +137,16 @@ public class DriverSchController {
             }
 
             //计算总页数
-            int pages = pageDTO.getPages();
+            int pages = pageInfos.getPages();//临时计算总页数
 
             for(int pageNumber = 2; pageNumber <= pages; pageNumber++){
                 param.setPageNo(pageNumber);
-                pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
-                logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，pageNumber="+pageNumber+";总条数为："+pageDTO.getTotal()+"；总页数totalPage = "+pageDTO.getPages()
+                pageInfos = carDriverDutyService.queryDriverDayDutyList(param);
+                logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，pageNumber="+pageNumber+";总条数为："+pageInfos.getTotal()+"；总页数totalPage = "+pageInfos.getPages()
                         //+";查询结果为："+(result==null?"null":JSON.toJSONString(result))
                 );
 
-                result = pageDTO.getResult();
+                result = pageInfos.getList();
                 dataTrans( result,  csvDataList);
 
             }
@@ -154,7 +155,7 @@ public class DriverSchController {
 
             CsvUtils.exportCsv(response,csvDataList,headerList,fileName);
             long end = System.currentTimeMillis();
-            logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，耗时："+(end-start)+"毫秒;总条数："+pageDTO.getTotal());
+            logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，耗时："+(end-start)+"毫秒;总条数："+pageInfos.getTotal());
 
         }catch (Exception e){
             logger.error("导出排班信息 异常:{}",e);
@@ -421,7 +422,12 @@ public class DriverSchController {
                 return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
             }
             long start = System.currentTimeMillis();
-            PageDTO pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
+          PageInfo<CarDriverDayDutyDTO> pageInfos = carDriverDutyService.queryDriverDayDutyList(param);
+
+            PageDTO pageDTO = new PageDTO();
+			pageDTO.setTotal((int)pageInfos.getTotal());
+			pageDTO.setResult(pageInfos.getList());
+
             long end = System.currentTimeMillis();
             logger.info("分页查询符合条件排班列表入参:"+ JSON.toJSONString(param)+"，耗时："+(end-start)+"毫秒，pageNumber="+0+";总条数为："+pageDTO.getTotal()
 //                    +"；查询结果为："+(pageDTO.getResult()==null?"null":JSON.toJSONString(pageDTO.getResult()))

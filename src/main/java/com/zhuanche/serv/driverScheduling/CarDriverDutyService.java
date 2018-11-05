@@ -88,7 +88,7 @@ public class CarDriverDutyService {
 	@MasterSlaveConfigs(configs={
 			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
 	} )
-	public PageDTO queryDriverDayDutyList(DutyParamRequest dutyParamRequest){
+	public PageInfo<CarDriverDayDutyDTO> queryDriverDayDutyList(DutyParamRequest dutyParamRequest){
 
 		//发布司机排班的查询功能 上层返回提示语
 		if(!Check.NuNObj(dutyParamRequest) && dutyParamRequest.getUnpublishedFlag() == 1){
@@ -101,10 +101,11 @@ public class CarDriverDutyService {
 				request.setPhone(dutyParamRequest.getPhone());
 				CarDriverInfoDTO driverInfo = carBizDriverInfoExMapper.queryOneDriver(request);
 				if(driverInfo == null){
-					PageDTO pageDTO = new PageDTO();
-					pageDTO.setTotal(0);
-					pageDTO.setResult(null);
-					return pageDTO;
+					PageInfo<CarDriverDayDutyDTO> pageInfo = new PageInfo<>();
+					pageInfo.setTotal(0);
+					pageInfo.setPages(1);
+					pageInfo.setList(null);
+					return pageInfo;
 				}
 				dutyParamRequest.setDriverId(Integer.parseInt(driverInfo.getDriverId()));
 			}
@@ -114,9 +115,6 @@ public class CarDriverDutyService {
 			PageHelper.startPage(dutyParamRequest.getPageNo(), dutyParamRequest.getPageSize());
 			List<CarDriverDayDutyDTO> listData = carDriverDayDutyExMapper.selectForList(dutyParamRequest);
 			PageInfo<CarDriverDayDutyDTO> pageInfo = new PageInfo<>(listData);
-//			PageInfo<CarDriverDayDutyDTO> pageInfo = PageHelper.startPage(dutyParamRequest.getPageNo(), dutyParamRequest.getPageSize(), true).
-//					doSelectPageInfo(()
-//					-> carDriverDayDutyExMapper.selectForList(dutyParamRequest));
 			List<CarDriverDayDutyDTO> list = pageInfo.getList();
 
 
@@ -144,10 +142,12 @@ public class CarDriverDutyService {
 				}
 			}
 
-			PageDTO pageDTO = new PageDTO();
-			pageDTO.setTotal((int)pageInfo.getTotal());
-			pageDTO.setResult(list);
-			return pageDTO;
+//			PageDTO pageDTO = new PageDTO();
+//			pageDTO.setTotal((int)pageInfo.getTotal());
+//			pageDTO.setResult(list);
+//			pageDTO.setPageSize(pageInfo.getPages());
+
+			return pageInfo;
 		}catch (Exception e){
 			logger.error("查询排班司机列表异常，参数dutyParamRequest="+(dutyParamRequest==null?"null":JSON.toJSONString(dutyParamRequest)),e);
 			return null;
