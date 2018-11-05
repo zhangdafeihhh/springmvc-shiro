@@ -120,7 +120,7 @@ public class DriverSchController {
             long start = System.currentTimeMillis();
             param.setPage(1);
             //设置导出单文件阈值 3000
-            param.setPageSize(1000);
+            param.setPageSize(10000);
             PageInfo<CarDriverDayDutyDTO> pageInfos = carDriverDutyService.queryDriverDayDutyList(param);
 
             List<CarDriverDayDutyDTO> result = pageInfos.getList();
@@ -142,7 +142,10 @@ public class DriverSchController {
             for(int pageNumber = 2; pageNumber <= pages; pageNumber++){
                 param.setPageNo(pageNumber);
                 pageInfos = carDriverDutyService.queryDriverDayDutyList(param);
-                logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，pageNumber="+pageNumber+";总条数为："+pageInfos.getTotal()+"；总页数totalPage = "+pageInfos.getPages()
+                logger.info("下载符合条件排班列表入参:"+
+                                JSON.toJSONString(param)
+                                +"，pageNumber="+pageNumber+";总条数为："+pageInfos.getTotal()
+                                +"；总页数totalPage = "+pageInfos.getPages()
                         //+";查询结果为："+(result==null?"null":JSON.toJSONString(result))
                 );
 
