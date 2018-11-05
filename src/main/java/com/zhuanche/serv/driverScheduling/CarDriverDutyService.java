@@ -109,10 +109,14 @@ public class CarDriverDutyService {
 				dutyParamRequest.setDriverId(Integer.parseInt(driverInfo.getDriverId()));
 			}
 			//组装权限参数
-			generateDutyParamRequestByUser(dutyParamRequest);
-
-			PageInfo<CarDriverDayDutyDTO> pageInfo = PageHelper.startPage(dutyParamRequest.getPageNo(), dutyParamRequest.getPageSize(), true).doSelectPageInfo(()
-					-> carDriverDayDutyExMapper.selectForList(dutyParamRequest));
+			dutyParamRequest = generateDutyParamRequestByUser(dutyParamRequest);
+			logger.info("查询参数为："+JSON.toJSONString(dutyParamRequest));
+			PageHelper.startPage(dutyParamRequest.getPageNo(), dutyParamRequest.getPageSize());
+			List<CarDriverDayDutyDTO> listData = carDriverDayDutyExMapper.selectForList(dutyParamRequest);
+			PageInfo<CarDriverDayDutyDTO> pageInfo = new PageInfo<>(listData);
+//			PageInfo<CarDriverDayDutyDTO> pageInfo = PageHelper.startPage(dutyParamRequest.getPageNo(), dutyParamRequest.getPageSize(), true).
+//					doSelectPageInfo(()
+//					-> carDriverDayDutyExMapper.selectForList(dutyParamRequest));
 			List<CarDriverDayDutyDTO> list = pageInfo.getList();
 			if(list != null){
 				Set<Integer> driverSet = new HashSet<>();
