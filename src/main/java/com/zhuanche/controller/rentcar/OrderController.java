@@ -230,6 +230,7 @@ public class OrderController{
 	     paramMap.put("transId", transId );//
 	     paramMap.put("pageNo", "1");//页号
 	     paramMap.put("pageSize", "20000");//每页记录数
+		 long start = System.currentTimeMillis();
 	    paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,supplierId,teamId);
 	     if(paramMap.get("visibleAllianceIds")!=null){
 	    	 logger.info("visibleAllianceIdstoString"+paramMap.get("visibleAllianceIds").toString().replaceAll("\\[", "").replaceAll("\\]", ""));
@@ -256,8 +257,8 @@ public class OrderController{
 			result.addAll( dtoList );
 		}
 		
-		@SuppressWarnings("deprecation")
-		Workbook wb;
+
+
 		try {
 
 			List<String> csvDataList = new ArrayList<>();
@@ -275,9 +276,10 @@ public class OrderController{
 				fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
 			}
 			CsvUtils.exportCsv(response,csvDataList,headerList,fileName);
-			
+			long end = System.currentTimeMillis();
+			logger.info("订单导出成功，参数为"+JSON.toJSONString(paramMap)+";耗时："+(end -start)+"毫秒");
 		} catch (Exception e) {
-			e.printStackTrace();
+		 	logger.error("订单导出异常，参数为"+JSON.toJSONString(paramMap),e);
 		}
 	 }
 
