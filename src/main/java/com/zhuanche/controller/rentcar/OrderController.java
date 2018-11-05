@@ -274,7 +274,7 @@ public class OrderController{
 			} else {  //其他浏览器
 				fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
 			}
-			CsvUtils.exportCsv(response,csvDataList,headerList,fileName); 
+			CsvUtils.exportCsv(response,csvDataList,headerList,fileName);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -399,6 +399,8 @@ public class OrderController{
 
 			stringBuffer.append(s.getMainOrderNo() != null ? ""
 					+ s.getMainOrderNo() + "" : "");
+
+			csvDataList.add(stringBuffer.toString());
 		}
 
 	}
