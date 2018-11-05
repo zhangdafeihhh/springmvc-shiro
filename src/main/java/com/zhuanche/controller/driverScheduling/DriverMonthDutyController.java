@@ -199,7 +199,7 @@ public class DriverMonthDutyController {
             List<JSONObject>  headerList=  driverMonthDutyService.generateTableHeader(param.getMonitorDate());
             dataTrans(pageList, csvDataList,headerList);
             //计算总页数
-            Integer totalPage = PageUtils.getTotalPage(total,pageDTO.getPageSize());
+            Integer totalPage = pageDTO.getPages();
             for(int pageNumber = 2; pageNumber <= totalPage; pageNumber++){
                 param.setPageNo(pageNumber);
                 pageDTO = driverMonthDutyService.queryDriverDutyList(param);

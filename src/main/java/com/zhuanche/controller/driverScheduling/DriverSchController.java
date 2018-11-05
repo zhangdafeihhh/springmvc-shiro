@@ -134,9 +134,9 @@ public class DriverSchController {
             } else {  //其他浏览器
                 fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
             }
-            long total = pageDTO.getTotal();
+
             //计算总页数
-            Integer totalPage = PageUtils.getTotalPage(total,pageDTO.getPageSize());
+            Integer totalPage = pageDTO.getPages();
 
             for(int pageNumber = 2; pageNumber <= totalPage; pageNumber++){
                 param.setPageNo(pageNumber);
@@ -152,7 +152,7 @@ public class DriverSchController {
 
             CsvUtils.exportCsv(response,csvDataList,headerList,fileName);
             long end = System.currentTimeMillis();
-            logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，耗时："+(end-start)+"毫秒;总条数："+total);
+            logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，耗时："+(end-start)+"毫秒;总条数："+pageDTO.getTotal());
 
         }catch (Exception e){
             logger.error("导出排班信息 异常:{}",e);
