@@ -82,13 +82,13 @@ public interface CarFactOrderInfoService {
     public List<CarBizOrderWaitingPeriod> selectWaitingPeriodListSlave(String orderNo);
     /**
      * 
-     * @param paramsStr
+     * @param paramMap
      * @return
      */
     public AjaxResponse  queryOrderDataList(Map<String, Object> paramMap);
     /**
      * 根据拼车订单号，查询主订单信息
-     * @param paramsStr
+     * @param params
      * @return
      */
 	public CarPoolMainOrderDTO queryCarpoolMainForObject(CarPoolMainOrderDTO params);
