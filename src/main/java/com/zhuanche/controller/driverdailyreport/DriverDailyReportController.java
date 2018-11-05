@@ -159,7 +159,7 @@ public class DriverDailyReportController extends DriverQueryController {
 		}
 		//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限 
 		params = this.chuliDriverDailyReportEntity(params);
-		List<DriverDailyReport> list = null;
+		List<DriverDailyReport> x = null;
 		//开始查询
 		PageInfo<DriverDailyReport> pages = null;
 		if ( reportType==0 ) {
@@ -167,8 +167,9 @@ public class DriverDailyReportController extends DriverQueryController {
 		}else{
 			pages = driverDailyReportExService.findWeekDriverDailyReportByparam(params,  statDateStart,    statDateEnd);
 		}
+
 		//如果不为空，进行查询供应商名称
-		List<DriverDailyReportDTO> dtoList = driverDailyReportExService.selectSuppierNameAndCityNameDays(list,reportType);
+		List<DriverDailyReportDTO> dtoList = driverDailyReportExService.selectSuppierNameAndCityNameDays(pages.getList(),reportType);
 		PageDTO pageDTO =  new PageDTO();
 		pageDTO.setPage(params.getPage());
 		pageDTO.setPageSize(params.getPageSize());
@@ -400,11 +401,11 @@ public class DriverDailyReportController extends DriverQueryController {
 			stringBuffer.append(",");
 
 
-			stringBuffer.append(s.getUpOnlineTime());
+			stringBuffer.append(s.getUpOnlineTime()==null?"":s.getUpOnlineTime());
 			stringBuffer.append(",");
 
 			 
-			stringBuffer.append(s.getOnlineTime());
+			stringBuffer.append(s.getOnlineTime() );
 			stringBuffer.append(",");
 
 			stringBuffer.append(s.getForcedTime());
@@ -452,10 +453,10 @@ public class DriverDailyReportController extends DriverQueryController {
 			stringBuffer.append(s.getGetPlaneNum());
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getOutPlaneNum());
+			stringBuffer.append(s.getOutPlaneNum()); //送机数
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getOperationNum());
+			stringBuffer.append(s.getOperationNum());//完成单数
 			stringBuffer.append(",");
 
 			if (reportType == 0){
