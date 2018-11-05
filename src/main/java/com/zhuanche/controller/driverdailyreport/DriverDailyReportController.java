@@ -337,7 +337,7 @@ public class DriverDailyReportController extends DriverQueryController {
 
 			List<String> headerList = new ArrayList<>();
 			headerList.add("车牌号,姓名,供应商,车队,小组,上线时间,总在线时长（小时）,班在线时长（min）,计价前时间(min),计价前里程(km),载客中时间(min),载客里程(km)," +
-					"总服务时间(min),总服务里程(km),计算异动时间(min),结算异动里程（km）,订单流水(元),价外流水（元）,价外费用,绑单完成数,抢单完成数," +
+					"总服务时间(min),总服务里程(km),计算异动时间(min),结算异动里程（km）,订单流水(元),价外费用（元）,绑单完成数,抢单完成数," +
 							"后台派单,接机,送机,完成单数,日期"
 						);
 
@@ -456,7 +456,7 @@ public class DriverDailyReportController extends DriverQueryController {
 			stringBuffer.append(s.getOutPlaneNum()); //送机数
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getOperationNum());//完成单数
+			stringBuffer.append(s.getOperationNum()==null?"":s.getOperationNum());//完成单数
 			stringBuffer.append(",");
 
 			if (reportType == 0){
