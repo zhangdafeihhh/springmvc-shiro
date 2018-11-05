@@ -274,6 +274,7 @@ public class DriverMonthDutyController {
             }else {
                 jsonObject = new JSONObject();
             }
+            logger.info("jsonObject="+jsonObject);
 
             for(int j = 5; j < headerList.size(); j++) {
                 JSONObject header = headerList.get(j);
