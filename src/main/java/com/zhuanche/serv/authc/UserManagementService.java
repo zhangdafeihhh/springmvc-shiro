@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +53,9 @@ public class UserManagementService{
 	
 	@Value("${resetpassword.msgnotify.switch}")
 	private String resetpasswordMsgotifySwitch = "OFF";//重置密码时是否短信通知用户
-
+	@Value("${user.password.indexOfPhone}")
+	private String indexOfPhone; //用户初始密码取自手机号第多少位
+	
 	public CarAdmUser getUserById(Integer userId){
 		return carAdmUserMapper.selectByPrimaryKey(userId);
 	}
@@ -70,7 +74,19 @@ public class UserManagementService{
 		if( StringUtils.isEmpty(user.getUserName()) ) {
 			user.setUserName("");
 		}
-		user.setPassword( PasswordUtil.md5(SaasConst.INITIAL_PASSWORD, user.getAccount())  );
+		//用户初始密码
+		String initPassword = null;
+		if(indexOfPhone!=null && indexOfPhone.length()>0) {
+			List<Integer> indexes = Stream.of(indexOfPhone.split(",")).mapToInt( s -> Integer.parseInt(s) ).boxed().collect(Collectors.toList());
+			StringBuffer password = new StringBuffer();
+			for( Integer index : indexes ) {
+				password.append(user.getPhone().charAt((index)));
+			}
+			initPassword = password.toString();
+		}else {
+			initPassword = SaasConst.INITIAL_PASSWORD;
+		}
+		user.setPassword( PasswordUtil.md5( initPassword, user.getAccount())  );
 		user.setRoleId(0);
 		user.setAccountType(100);
 		user.setStatus(200);
@@ -89,6 +105,11 @@ public class UserManagementService{
 		}
 		//保存
 		carAdmUserMapper.insertSelective(user);
+		
+		//短信通知
+		String text = user.getUserName() + "，您好！已为您成功开通“首约加盟商服务平台”管理员账号。登录账号为："+user.getAccount()+"，初始密码为："+initPassword+"（为保障账户安全，请您登录后进行密码修改）";
+    	SmsSendUtil.send( user.getPhone() , text);
+		
 		return AjaxResponse.success( null );
 	}
 
