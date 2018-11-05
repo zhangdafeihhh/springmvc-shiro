@@ -11,6 +11,7 @@ import com.zhuanche.common.dutyEnum.EnumDriverMonthDutyStatus;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.CarDriverInfoDTO;
+import com.zhuanche.dto.driver.CarDriverDayDutyDTO;
 import com.zhuanche.dto.driverDuty.CarDriverMonthDTO;
 import com.zhuanche.dto.driverDuty.ColumnEntity;
 import com.zhuanche.entity.mdbcarmanage.CarDriverMonthDuty;
@@ -534,27 +535,38 @@ public class DriverMonthDutyService {
 	@MasterSlaveConfigs(configs={
 			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
 	} )
-	public PageDTO queryDriverDutyList(DriverMonthDutyRequest param){
+	public PageInfo<CarDriverMonthDTO> queryDriverDutyList(DriverMonthDutyRequest param){
 		try{
 			logger.info("查询排班列表service入参："+ JSON.toJSONString(param));
 			PageInfo<CarDriverMonthDTO> pageInfo = PageHelper.startPage(param.getPageNo(),param.getPageSize(),true).doSelectPageInfo(
 					()->carDriverMonthDutyExMapper.queryDriverDutyList(param));
 			List<CarDriverMonthDTO> list = pageInfo.getList();
 			if(Check.NuNCollection(list)){
-				return null;
+				//返回空
+				return pageInfo;
+			}
+			Set<Integer> driverIdSet = new HashSet<>();
+			for (CarDriverMonthDTO month : list) {
+				driverIdSet.add(month.getDriverId());
+			}
+			Map<String,CarDriverInfoDTO> cache = new HashMap<>();
+			if(!driverIdSet.isEmpty()){
+				List<CarDriverInfoDTO> driverInfoDTOS = carBizDriverInfoExMapper.queryListDriverByDriverIds(driverIdSet);
+				if(driverInfoDTOS != null){
+					for(CarDriverInfoDTO item : driverInfoDTOS){
+						cache.put("d_"+item.getDriverId(),item);
+					}
+				}
 			}
 			for (CarDriverMonthDTO month : list) {
-				DutyParamRequest dutyParamRequest = new DutyParamRequest();
-				dutyParamRequest.setDriverId(month.getDriverId());
-				CarDriverInfoDTO info = carBizDriverInfoExMapper.queryOneDriver(dutyParamRequest);
+
+				CarDriverInfoDTO info = cache.get("d_"+month.getDriverId());
 				if(!Check.NuNObj(info)){
 					month.setStatus(info.getStatus());
 				}
 			}
-			PageDTO pageDTO = new PageDTO();
-			pageDTO.setResult(list);
-			pageDTO.setTotal((int)pageInfo.getTotal());
-			return pageDTO;
+
+			return pageInfo;
 		}catch (Exception e){
 			logger.error("查询排班列表service异常:{}",e);
 			return null;
@@ -576,102 +588,102 @@ public class DriverMonthDutyService {
 		throw new IllegalArgumentException("你的excel版本目前poi解析不了");
 	}
 
-	@SuppressWarnings("unchecked")
-	@MasterSlaveConfigs(configs={
-			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE ),
-			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-	} )
-	public Workbook exportExcel(DriverMonthDutyRequest params, String path, Map<String, Object> tabelHeader)
-			throws Exception {
-		FileInputStream io = new FileInputStream(path);
-		// 创建 excel
-		Workbook wb = new XSSFWorkbook(io);
-		List<CarDriverMonthDTO> rows = new ArrayList<CarDriverMonthDTO>();
-		rows = carDriverMonthDutyExMapper.queryDriverDutyList(params);
-		if (null != rows && !rows.isEmpty()) {
-			for (CarDriverMonthDTO driverMonthDuty : rows) {
-				DutyParamRequest dutyParamRequest = new DutyParamRequest();
-				dutyParamRequest.setDriverId(driverMonthDuty.getDriverId());
-				CarDriverInfoDTO info = carBizDriverInfoExMapper.queryOneDriver(dutyParamRequest);
-				if(!Check.NuNObj(info)){
-					driverMonthDuty.setStatus(info.getStatus());
-				}
-			}
-		}
-		rows = changeDay(rows);
-		Sheet sheet = wb.getSheetAt(0);
-		// 设置表头
-		Row row1 = null;
-		int coloumNum=sheet.getRow(1).getPhysicalNumberOfCells();//获得总列数
-		int rowNum=sheet.getLastRowNum();//获得总行数
-		if (null != tabelHeader && !tabelHeader.isEmpty()) {
-			Iterator<String> keyIterator =  tabelHeader.keySet().iterator();
-			int cellIndex = 0;
-			row1 = sheet.getRow(1);
-			while(keyIterator.hasNext()){
-				String key = keyIterator.next();
-				String title = tabelHeader.get(key).toString();
-				Cell cell = row1.getCell(cellIndex++);
-				cell.setCellValue(title);
-			}
-			for(; cellIndex <= coloumNum - 1; cellIndex++) {
-				Cell cell = row1.getCell(cellIndex);
-				cell.setCellValue("——");
-			}
-		}
-		// 清空原有数据
-		for(int i = rowNum - 1; i > 0; i--) {
-			Row row = sheet.getRow(i);
-			sheet.removeRow(row);
-		}
-
-		if(rows != null && rows.size()>0){
-			Cell cell = null;
-			int i=0;
-			for(CarDriverMonthDTO s:rows){
-				Row row = sheet.createRow(i + 2);
-				cell = row.createCell(0);
-				cell.setCellValue(s.getDriverId()!=null?""+s.getDriverId()+"":"");
-
-				cell = row.createCell(1);
-				cell.setCellValue(s.getTeamName()!=null?""+s.getTeamName()+"":"");
-
-				cell = row.createCell(2);
-				cell.setCellValue(s.getDriverName()!=null?""+s.getDriverName()+"":"");
-
-				cell = row.createCell(3);
-				cell.setCellValue(s.getStatus()==1?"在职":"离职");
-
-				cell = row.createCell(4);
-				cell.setCellValue(s.getLicensePlates()!=null?""+s.getLicensePlates()+"":"");
-				for(int j = 5; j < tabelHeader.size(); j++) {
-					cell = row.createCell(j);
-					String statusKey = row1.getCell(j).getStringCellValue();
-					String statusValue = null;
-					if (null != s.getMap() && !s.getMap().isEmpty()) {
-						String status = s.getMap().get(statusKey);
-						if (null != status && !"".equals(status.trim())&&!"null".equals(status.trim())) {
-							try {
-								statusValue = EnumDriverMonthDutyStatus.getStatus(Integer.parseInt(status));
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-						}
-					}
-					if (null == statusValue) {
-						statusValue = "--";
-					}
-					cell.setCellValue(statusValue);
-				}
-
-				i++;
-			}
-		}
-		if(rows != null){
-			rows.clear();
-		}
-		return wb;
-	}
+//	@SuppressWarnings("unchecked")
+//	@MasterSlaveConfigs(configs={
+//			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE ),
+//			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+//	} )
+//	public Workbook exportExcel(DriverMonthDutyRequest params, String path, Map<String, Object> tabelHeader)
+//			throws Exception {
+//		FileInputStream io = new FileInputStream(path);
+//		// 创建 excel
+//		Workbook wb = new XSSFWorkbook(io);
+//		List<CarDriverMonthDTO> rows = new ArrayList<CarDriverMonthDTO>();
+//		rows = carDriverMonthDutyExMapper.queryDriverDutyList(params);
+//		if (null != rows && !rows.isEmpty()) {
+//			for (CarDriverMonthDTO driverMonthDuty : rows) {
+//				DutyParamRequest dutyParamRequest = new DutyParamRequest();
+//				dutyParamRequest.setDriverId(driverMonthDuty.getDriverId());
+//				CarDriverInfoDTO info = carBizDriverInfoExMapper.queryOneDriver(dutyParamRequest);
+//				if(!Check.NuNObj(info)){
+//					driverMonthDuty.setStatus(info.getStatus());
+//				}
+//			}
+//		}
+//		rows = changeDay(rows);
+//		Sheet sheet = wb.getSheetAt(0);
+//		// 设置表头
+//		Row row1 = null;
+//		int coloumNum=sheet.getRow(1).getPhysicalNumberOfCells();//获得总列数
+//		int rowNum=sheet.getLastRowNum();//获得总行数
+//		if (null != tabelHeader && !tabelHeader.isEmpty()) {
+//			Iterator<String> keyIterator =  tabelHeader.keySet().iterator();
+//			int cellIndex = 0;
+//			row1 = sheet.getRow(1);
+//			while(keyIterator.hasNext()){
+//				String key = keyIterator.next();
+//				String title = tabelHeader.get(key).toString();
+//				Cell cell = row1.getCell(cellIndex++);
+//				cell.setCellValue(title);
+//			}
+//			for(; cellIndex <= coloumNum - 1; cellIndex++) {
+//				Cell cell = row1.getCell(cellIndex);
+//				cell.setCellValue("——");
+//			}
+//		}
+//		// 清空原有数据
+//		for(int i = rowNum - 1; i > 0; i--) {
+//			Row row = sheet.getRow(i);
+//			sheet.removeRow(row);
+//		}
+//
+//		if(rows != null && rows.size()>0){
+//			Cell cell = null;
+//			int i=0;
+//			for(CarDriverMonthDTO s:rows){
+//				Row row = sheet.createRow(i + 2);
+//				cell = row.createCell(0);
+//				cell.setCellValue(s.getDriverId()!=null?""+s.getDriverId()+"":"");
+//
+//				cell = row.createCell(1);
+//				cell.setCellValue(s.getTeamName()!=null?""+s.getTeamName()+"":"");
+//
+//				cell = row.createCell(2);
+//				cell.setCellValue(s.getDriverName()!=null?""+s.getDriverName()+"":"");
+//
+//				cell = row.createCell(3);
+//				cell.setCellValue(s.getStatus()==1?"在职":"离职");
+//
+//				cell = row.createCell(4);
+//				cell.setCellValue(s.getLicensePlates()!=null?""+s.getLicensePlates()+"":"");
+//				for(int j = 5; j < tabelHeader.size(); j++) {
+//					cell = row.createCell(j);
+//					String statusKey = row1.getCell(j).getStringCellValue();
+//					String statusValue = null;
+//					if (null != s.getMap() && !s.getMap().isEmpty()) {
+//						String status = s.getMap().get(statusKey);
+//						if (null != status && !"".equals(status.trim())&&!"null".equals(status.trim())) {
+//							try {
+//								statusValue = EnumDriverMonthDutyStatus.getStatus(Integer.parseInt(status));
+//							} catch (Exception e) {
+//								e.printStackTrace();
+//							}
+//						}
+//					}
+//					if (null == statusValue) {
+//						statusValue = "--";
+//					}
+//					cell.setCellValue(statusValue);
+//				}
+//
+//				i++;
+//			}
+//		}
+//		if(rows != null){
+//			rows.clear();
+//		}
+//		return wb;
+//	}
 
 	public List<CarDriverMonthDTO> changeDay(List<CarDriverMonthDTO> rows){
 		if(!"".equals(rows)&&rows!=null){
@@ -775,6 +787,7 @@ public class DriverMonthDutyService {
 	* @Date: 2018/9/4 
 	*/ 
 	public Map<String,Object> queryDriverDutyTable(DriverMonthDutyRequest params) {
+
 		Map<String,Object> result = new LinkedHashMap<String,Object>();
 		Map<String,Object> map = new LinkedHashMap<String,Object>();
 		map.put("driverId", "司机编码");
@@ -809,6 +822,77 @@ public class DriverMonthDutyService {
 		}
 		result.put("Rows", map);
 		return result;
+	}
+
+	/**
+	 *
+	 * @param monitorDate  考勤月份
+	 * @return
+	 */
+	public List<com.alibaba.fastjson.JSONObject> generateTableHeader(String monitorDate){
+
+		List<com.alibaba.fastjson.JSONObject> columnList = new ArrayList<>();
+
+		com.alibaba.fastjson.JSONObject columen1 = new com.alibaba.fastjson.JSONObject();
+		columen1.put("proName","driverId");
+		columen1.put("showName","司机编码");
+		columnList.add(columen1);
+
+		com.alibaba.fastjson.JSONObject columen2 = new com.alibaba.fastjson.JSONObject();
+		columen2.put("proName","teamName");
+		columen2.put("showName","车队");
+		columnList.add(columen2);
+
+
+		com.alibaba.fastjson.JSONObject columen3 = new com.alibaba.fastjson.JSONObject();
+		columen3.put("proName","driverName");
+		columen3.put("showName","司机姓名");
+		columnList.add(columen3);
+
+
+		com.alibaba.fastjson.JSONObject columen4 = new com.alibaba.fastjson.JSONObject();
+		columen4.put("proName","status");
+		columen4.put("showName","是否在职");
+		columnList.add(columen4);
+
+		com.alibaba.fastjson.JSONObject columen5 = new com.alibaba.fastjson.JSONObject();
+		columen5.put("proName","licensePlates");
+		columen5.put("showName","车牌号");
+		columnList.add(columen5);
+
+
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String time ="";
+		if((StringUtils.isNotEmpty(monitorDate) && !"null".equals( monitorDate))){
+			time = monitorDate;
+		}else{
+			time = sdf.format(new Date());
+		}
+		int year = Integer.parseInt(time.substring(0, 4));
+		int month = Integer.parseInt(time.substring(5, 7));
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.YEAR, year);
+		calendar.set(Calendar.MONTH, month - 1);
+		calendar.set(Calendar.DATE, 1);
+		calendar.roll(Calendar.DATE, -1);
+		int maxDate = calendar.get(Calendar.DATE);
+		String monthStr = time.substring(5, 7);
+
+		for(int i=1;i<=maxDate;i++){
+			com.alibaba.fastjson.JSONObject columen = new com.alibaba.fastjson.JSONObject();
+			columen.put("proName","day"+i);
+			if(i<10){
+
+				columen.put("showName", monthStr+"-0"+i+"");
+			}else{
+				columen.put("showName", monthStr+"-"+i+"");
+			}
+
+			columnList.add(columen);
+		}
+
+		return columnList;
+
 	}
 
 
