@@ -124,7 +124,8 @@ public class DriverSchController {
             PageInfo<CarDriverDayDutyDTO> pageInfos = carDriverDutyService.queryDriverDayDutyList(param);
 
             List<CarDriverDayDutyDTO> result = pageInfos.getList();
-            logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，pageNumber="+0+";总条数为："+pageInfos.getTotal()+"；查询结果为："+(result==null?"null":JSON.toJSONString(result)));
+            logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，pageNumber="+0+";总条数为："+pageInfos.getTotal()
+                    +"；总页数为："+pageInfos.getPages());
             List<String> csvDataList = new ArrayList<>();
             dataTrans( result,  csvDataList);
 
@@ -146,7 +147,6 @@ public class DriverSchController {
                                 JSON.toJSONString(param)
                                 +"，pageNumber="+pageNumber+";总条数为："+pageInfos.getTotal()
                                 +"；总页数totalPage = "+pageInfos.getPages()
-                        //+";查询结果为："+(result==null?"null":JSON.toJSONString(result))
                 );
 
                 result = pageInfos.getList();
@@ -432,8 +432,9 @@ public class DriverSchController {
 			pageDTO.setResult(pageInfos.getList());
 
             long end = System.currentTimeMillis();
-            logger.info("分页查询符合条件排班列表入参:"+ JSON.toJSONString(param)+"，耗时："+(end-start)+"毫秒，pageNumber="+0+";总条数为："+pageDTO.getTotal()
-//                    +"；查询结果为："+(pageDTO.getResult()==null?"null":JSON.toJSONString(pageDTO.getResult()))
+            logger.info("分页查询符合条件排班列表入参:"+ JSON.toJSONString(param)+"，耗时："+(end-start)+"毫秒，pageNumber="+param.getPageNo()
+                            +";总条数为："+pageDTO.getTotal()
+                    +"；总页数totalPage = "+pageInfos.getPages()
             );
             return AjaxResponse.success(pageDTO);
         }catch (Exception e){
