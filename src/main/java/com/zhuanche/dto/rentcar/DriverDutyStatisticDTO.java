@@ -1,7 +1,5 @@
 package com.zhuanche.dto.rentcar;
 
-import java.util.Date;
-
 public class DriverDutyStatisticDTO {
     private Integer id;
 
