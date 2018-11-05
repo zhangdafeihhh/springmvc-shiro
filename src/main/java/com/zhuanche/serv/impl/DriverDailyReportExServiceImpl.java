@@ -89,12 +89,16 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
             }
             //查询供应商名称，一次查询出来避免多次读库
             List<CarBizSupplier>  names = this.carBizSupplierExMapper.queryNamesByIds(s);
+            Map<String,CarBizSupplier> cacheCarBizSupplier = new HashMap<>();
+
+            for (CarBizSupplier item: names) {
+                cacheCarBizSupplier.put("c_"+item.getSupplierId(),item);
+            }
+            CarBizSupplier tempCarBizSupplier = null;
             for (DriverDailyReportDTO dto: list) {
-                for (CarBizSupplier name: names) {
-                    if (name.getSupplierId().equals(dto.getSupplierId())){
-                        dto.setSupplierName(name.getSupplierFullName());
-                        break;
-                    }
+                tempCarBizSupplier = cacheCarBizSupplier.get("c_"+dto.getSupplierId());
+                if(tempCarBizSupplier != null){
+                    dto.setSupplierName(tempCarBizSupplier.getSupplierFullName());
                 }
                 //司机营业信息查询
                 if (reportType==0){
