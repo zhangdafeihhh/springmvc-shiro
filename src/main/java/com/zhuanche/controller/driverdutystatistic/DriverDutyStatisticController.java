@@ -283,14 +283,19 @@ public class DriverDutyStatisticController extends DriverQueryController{
 
 		try {
 			List<String> headerList = new ArrayList<>();
-			headerList.add("司机姓名,手机号,车牌号,班制之内上班上线时_有效,强制上班内上班上线时长_有效,加班时长,班制内上班上线时长,强制上班内上班上线时长,城市,早高峰在线时长,晚高峰在线时长,其他时段1在线时长,其他时段2在线时长"
-			);
+			if (reportType  == 0){
+				headerList.add("司机姓名,日期,手机号,车牌号,班制之内上班上线时_有效,强制上班内上班上线时长_有效,加班时长,班制内上班上线时长,强制上班内上班上线时长,城市,早高峰在线时长,晚高峰在线时长,其他时段1在线时长,其他时段2在线时长");
+			}else{
+				headerList.add("司机姓名,手机号,车牌号,班制之内上班上线时_有效,强制上班内上班上线时长_有效,加班时长,班制内上班上线时长,强制上班内上班上线时长,城市,早高峰在线时长,晚高峰在线时长,其他时段1在线时长,其他时段2在线时长");
+			}
+
+
 
 			if(rows == null){
 				rows = new ArrayList<>();
 			}
 			List<String> csvDataList  = new ArrayList<>(rows.size());
-			dataTrans(rows,csvDataList);
+			dataTrans(rows,csvDataList,reportType);
 
 			String fileName = "司机考勤报告"+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
 			String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
@@ -310,7 +315,7 @@ public class DriverDutyStatisticController extends DriverQueryController{
 			return AjaxResponse.fail(RestErrorCode.FILE_EXCEL_REPORT_FAIL);
 		}
 	}
-	private void dataTrans(List<DriverDutyStatisticDTO> result,List<String>  csvDataList){
+	private void dataTrans(List<DriverDutyStatisticDTO> result,List<String>  csvDataList,int reportType){
 		if(null == result){
 			return;
 		}
@@ -319,6 +324,10 @@ public class DriverDutyStatisticController extends DriverQueryController{
 
 			stringBuffer.append(s.getName());
 			stringBuffer.append(",");
+			if (reportType  == 0){
+				stringBuffer.append(s.getTime());
+				stringBuffer.append(",");
+			}
 
 			stringBuffer.append(s.getPhone());
 			stringBuffer.append(",");
