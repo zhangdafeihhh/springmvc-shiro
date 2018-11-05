@@ -141,7 +141,9 @@ public class DriverSchController {
             for(int pageNumber = 2; pageNumber <= totalPage; pageNumber++){
                 param.setPageNo(pageNumber);
                 PageDTO page = carDriverDutyService.queryDriverDayDutyList(param);
-                logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，pageNumber="+pageNumber+";总条数为："+pageDTO.getTotal()+"；查询结果为："+(result==null?"null":JSON.toJSONString(result)));
+                logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，pageNumber="+pageNumber+";总条数为："+pageDTO.getTotal()+"；总页数totalPage = "+totalPage
+                        //+";查询结果为："+(result==null?"null":JSON.toJSONString(result))
+                );
 
                 result = page.getResult();
                 dataTrans( result,  csvDataList);
