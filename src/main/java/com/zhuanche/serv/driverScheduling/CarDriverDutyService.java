@@ -110,7 +110,7 @@ public class CarDriverDutyService {
 			}
 			//组装权限参数
 			dutyParamRequest = generateDutyParamRequestByUser(dutyParamRequest);
-			logger.info("查询参数为："+JSON.toJSONString(dutyParamRequest));
+			logger.info("查询司机排班的参数为："+JSON.toJSONString(dutyParamRequest));
 			PageHelper.startPage(dutyParamRequest.getPageNo(), dutyParamRequest.getPageSize());
 			List<CarDriverDayDutyDTO> listData = carDriverDayDutyExMapper.selectForList(dutyParamRequest);
 			PageInfo<CarDriverDayDutyDTO> pageInfo = new PageInfo<>(listData);

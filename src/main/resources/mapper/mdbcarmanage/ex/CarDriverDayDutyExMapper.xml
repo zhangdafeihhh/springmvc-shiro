@@ -175,7 +175,7 @@
     select
     <include refid="Base_Column_List" />
     from car_driver_day_duty d LEFT JOIN car_driver_team t3 on d.team_id = t3.id
-    where 1=1 and t3.status!=2
+    where   t3.status!=2
     <if test="driverId!=null and driverId!=''">
       and d.driver_id = #{driverId}
     </if>
