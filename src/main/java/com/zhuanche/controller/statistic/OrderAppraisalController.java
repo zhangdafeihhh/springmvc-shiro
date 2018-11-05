@@ -368,12 +368,14 @@ public class OrderAppraisalController extends DriverQueryController{
 			customerAppraisalEntity.setOrderNos(orderNos);
 
 
-			Page<CarBizCustomerAppraisal> p = PageHelper.startPage(page, pageSize);
 			List<CarBizCustomerAppraisalBean> list = null;
 			try {
-				List<CarBizCustomerAppraisal> appraisalList = this.carBizCustomerAppraisalExMapper.queryForListObject(customerAppraisalEntity);
+				PageInfo<CarBizCustomerAppraisal> pageInfo = carBizCustomerAppraisalExService.findPageByparam(customerAppraisalEntity);
+				List<CarBizCustomerAppraisal> appraisalList = pageInfo.getList();
 				list = BeanUtil.copyList(appraisalList,CarBizCustomerAppraisalBean.class);
-				total = (int) p.getTotal();
+				total = (int) pageInfo.getTotal();
+			}catch (Exception e){
+				log.error("异常，参数为："+JSON.toJSONString(customerAppraisalEntity),e);
 			} finally {
 				PageHelper.clearPage();
 			}
