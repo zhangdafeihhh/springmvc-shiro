@@ -54,7 +54,8 @@ public class CsvUtils {
         try {
             osw = new OutputStreamWriter(response.getOutputStream(), "UTF-8");
             response.reset();
-            response.setContentType("multipart/form-data");
+            //设置response 
+            response.setContentType("application/octet-stream;charset=UTF-8");
             response.setHeader("content-disposition", "attachment; filename="+fileName);
             osw.write(new String(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF })); 
             bw =new BufferedWriter(osw);
