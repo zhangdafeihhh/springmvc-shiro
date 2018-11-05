@@ -256,15 +256,22 @@ public class DriverMonthDutyController {
 
             rowBuffer.append(StringUtils.isEmpty(s.getLicensePlates())?"":s.getLicensePlates());
             rowBuffer.append(",");
- 
+
+            String data = s.getData();
+            JSONObject jsonObject = null;
+            if(StringUtils.isNotEmpty(data)){
+                jsonObject = JSON.parseObject(data);
+            }else {
+                jsonObject = new JSONObject();
+            }
 
             for(int j = 5; j < headerList.size(); j++) {
                 JSONObject header = headerList.get(j);
 
                 String statusKey = header.getString("proName");
                 String statusValue = null;
-                if (null != s.getMap() && !s.getMap().isEmpty()) {
-                    String status = s.getMap().get(statusKey);
+                if (null != jsonObject && !jsonObject.isEmpty()) {
+                    String status = jsonObject.getString(statusKey);
                     if (null != status && !"".equals(status.trim())&&!"null".equals(status.trim())) {
                         try {
                             statusValue = EnumDriverMonthDutyStatus.getStatus(Integer.parseInt(status));
