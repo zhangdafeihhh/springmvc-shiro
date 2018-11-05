@@ -281,6 +281,23 @@
     limit 1
   </select>
 
+  <select id="queryListDriverByDriverIds" parameterType="java.util.Map" resultType="com.zhuanche.dto.CarDriverInfoDTO">
+    SELECT
+    i.driver_id AS driverId,
+    i.phone AS phone,
+    i.gender gender,
+    i.NAME,
+    i.license_plates AS licensePlates,
+    i.supplier_id supplieId,
+    i.STATUS AS status
+    FROM
+    car_biz_driver_info i
+    where driver_id in
+    <foreach collection="set" index="index" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </select>
+
   <select id="queryListByLimits" parameterType="com.zhuanche.request.DriverTeamRequest" resultType="com.zhuanche.dto.CarDriverInfoDTO">
     SELECT
     i.driver_id AS driverId
