@@ -540,6 +540,9 @@ public class DriverMonthDutyService {
 			logger.info("查询排班列表service入参："+ JSON.toJSONString(param));
 			PageInfo<CarDriverMonthDTO> pageInfo = PageHelper.startPage(param.getPageNo(),param.getPageSize(),true).doSelectPageInfo(
 					()->carDriverMonthDutyExMapper.queryDriverDutyList(param));
+			logger.info("查询排班列表service入参"+ (param==null?"null":JSON.toJSONString(param))
+				+",总条数："+pageInfo.getTotal()+";总页数："+pageInfo.getPages()
+			);
 			List<CarDriverMonthDTO> list = pageInfo.getList();
 			if(Check.NuNCollection(list)){
 				//返回空
@@ -559,7 +562,6 @@ public class DriverMonthDutyService {
 				}
 			}
 			for (CarDriverMonthDTO month : list) {
-
 				CarDriverInfoDTO info = cache.get("d_"+month.getDriverId());
 				if(!Check.NuNObj(info)){
 					month.setStatus(info.getStatus());

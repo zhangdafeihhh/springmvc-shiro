@@ -174,7 +174,7 @@ public class DriverSchController {
             StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append(carDriverDayDutyDTO.getDriverName());
             stringBuffer.append(",");
-            stringBuffer.append(carDriverDayDutyDTO.getPhone());
+            stringBuffer.append(carDriverDayDutyDTO.getPhone()==null?"-":carDriverDayDutyDTO.getPhone());
             stringBuffer.append(",");
             stringBuffer.append(carDriverDayDutyDTO.getCityName());
             stringBuffer.append(",");
