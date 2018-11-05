@@ -1,5 +1,6 @@
 package com.zhuanche.controller.driverdailyreport;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -138,7 +139,7 @@ public class DriverDailyReportController extends DriverQueryController {
 		//初始化查询参数
 		DriverDailyReportParams params = new DriverDailyReportParams(licensePlates,driverName,driverIds,teamIds,suppliers,cities,statDateStart,statDateEnd,sortName,sortOrder,groupIds,page,pageSize);
 
-		log.info("司机周报列表数据:queryDriverDailyReportData，参数："+params.toString());
+		log.info("司机周报列表数据:queryDriverDailyReportData，参数："+(params==null?"null": JSON.toJSONString(params)));
 		int total = 0;
 		//判断权限   如果司机id为空为查询列表页
 		if(StringUtils.isEmpty(params.getDriverIds())){

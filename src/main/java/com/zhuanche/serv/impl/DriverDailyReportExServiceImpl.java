@@ -1,5 +1,6 @@
 package com.zhuanche.serv.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -47,6 +48,7 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
 
     @Override
     public PageInfo<DriverDailyReport> findDayDriverDailyReportByparam(DriverDailyReportParams params) {
+        logger.info("查询工作报告，日报，参数为："+(params==null?"null": JSON.toJSONString(params)));
         PageHelper.startPage(params.getPage(), params.getPageSize(), true);
         List<DriverDailyReport> list  = this.driverDailyReportExMapper.queryForListObject(params);
         PageInfo<DriverDailyReport> pageInfo = new PageInfo<>(list);
@@ -56,6 +58,7 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
     @Override
     public PageInfo<DriverDailyReport> findWeekDriverDailyReportByparam(DriverDailyReportParams params,String statDateStart,  String statDateEnd  ) {
         PageHelper.startPage(params.getPage(), params.getPageSize(), true);
+        logger.info("查询工作报告，周报，参数为："+(params==null?"null": JSON.toJSONString(params)));
         List<DriverDailyReport> list  = this.driverDailyReportExMapper.queryWeekForListObject(params);
         PageInfo<DriverDailyReport> pageInfo = new PageInfo<>(list);
         if(list!=null && list.size()>0){
