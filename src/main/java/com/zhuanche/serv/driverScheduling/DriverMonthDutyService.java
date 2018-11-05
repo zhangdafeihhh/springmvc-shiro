@@ -882,12 +882,14 @@ public class DriverMonthDutyService {
 
 		for(int i=1;i<=maxDate;i++){
 			com.alibaba.fastjson.JSONObject columen = new com.alibaba.fastjson.JSONObject();
-			columen.put("proName","day"+i);
+
 			if(i<10){
 
 				columen.put("showName", monthStr+"-0"+i+"");
+				columen.put("proName", monthStr+"-0"+i+"");
 			}else{
 				columen.put("showName", monthStr+"-"+i+"");
+				columen.put("proName", monthStr+"-"+i+"");
 			}
 
 			columnList.add(columen);

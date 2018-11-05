@@ -281,16 +281,16 @@ public class DriverMonthDutyController {
 
                 String statusKey = header.getString("proName");
                 String statusValue = null;
-                if (null != jsonObject && !jsonObject.isEmpty()) {
-                    String status = jsonObject.getString(statusKey);
-                    if (null != status && !"".equals(status.trim())&&!"null".equals(status.trim())) {
-                        try {
-                            statusValue = EnumDriverMonthDutyStatus.getStatus(Integer.parseInt(status));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+
+                String status = jsonObject.getString(statusKey);
+                if (null != status && !"".equals(status.trim())&&!"null".equals(status.trim())) {
+                    try {
+                        statusValue = EnumDriverMonthDutyStatus.getStatus(Integer.parseInt(status));
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
+
                 if (null == statusValue) {
                     statusValue = "--";
                 }
