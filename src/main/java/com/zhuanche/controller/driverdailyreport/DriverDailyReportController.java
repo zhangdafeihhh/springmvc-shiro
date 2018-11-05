@@ -295,7 +295,7 @@ public class DriverDailyReportController extends DriverQueryController {
 			driverList = params.getDriverIds();
 		}
 
-
+		params.setPageSize(10000);
 		long  start = System.currentTimeMillis();
 		if(!(StringUtils.isNotEmpty(params.getGroupIds()) && (StringUtils.isEmpty(driverList)))){
 			params.setDriverIds(driverList);
