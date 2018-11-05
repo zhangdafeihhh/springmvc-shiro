@@ -260,7 +260,7 @@ public class DriverDutyStatisticController extends DriverQueryController{
 				if(pageInfo != null){
 					list.addAll( pageInfo.getList());
 
-					for(int pageno = 2 ;pageno < pageInfo.getPages();pageno ++ ){
+					for(int pageno = 2 ;pageno <= pageInfo.getPages();pageno ++ ){
 						params.setPage(pageno);
 						pageInfo =  driverDutyStatisticService.queryDriverDayDutyList(params);
 						list.addAll( pageInfo.getList());
@@ -270,7 +270,7 @@ public class DriverDutyStatisticController extends DriverQueryController{
 				pageInfo =  driverDutyStatisticService.queryDriverMonthDutyList(params);
 				if(pageInfo != null){
 					list.addAll( pageInfo.getList());
-					for(int pageno = 2 ;pageno < pageInfo.getPages();pageno ++ ){
+					for(int pageno = 2 ;pageno <= pageInfo.getPages();pageno ++ ){
 						params.setPage(pageno);
 						pageInfo =  driverDutyStatisticService.queryDriverMonthDutyList(params);
 						list.addAll( pageInfo.getList());
