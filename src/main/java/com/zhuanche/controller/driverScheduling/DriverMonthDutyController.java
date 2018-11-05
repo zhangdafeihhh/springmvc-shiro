@@ -238,6 +238,7 @@ public class DriverMonthDutyController {
         if (null == result) {
             return;
         }
+        JSONObject jsonObject = null;
         for(CarDriverMonthDTO s:result){
            StringBuffer rowBuffer = new StringBuffer();
             rowBuffer.append(s.getDriverId()!=null?""+s.getDriverId()+"":"");
@@ -258,9 +259,18 @@ public class DriverMonthDutyController {
             rowBuffer.append(",");
 
             String data = s.getData();
-            JSONObject jsonObject = null;
             if(StringUtils.isNotEmpty(data)){
-                jsonObject = JSON.parseObject(data);
+                data = data.replace("{", "");
+                data = data.replace("}", "");
+               String[] dataArray = data.split(",");
+                jsonObject = new JSONObject();
+                for(String item :dataArray){
+                    String[] itemInfoArray =  item.split(":");
+                    if(itemInfoArray.length == 2){
+                        jsonObject.put(""+itemInfoArray[0],itemInfoArray[1]);
+                    }
+                }
+
             }else {
                 jsonObject = new JSONObject();
             }
