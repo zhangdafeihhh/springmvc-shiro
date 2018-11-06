@@ -117,13 +117,16 @@ public class CarDriverDurationService {
 		}
 	}
 
-	/** 
-	* @Desc: 保存/修改排班时长 
-	* @param:
-	* @return:  
-	* @Author: lunan
-	* @Date: 2018/9/3 
-	*/
+	/**
+	 * @Desc: 保存/修改排班时长
+	 * @param:
+	 * @return:
+	 * @Author: lunan
+	 * @Date: 2018/9/3
+	 */
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public int saveOrUpdateCarDriverDuration(CarDutyDuration carDutyDuration){
 		if(Check.NuNObj(carDutyDuration)
 				|| Check.NuNObj(carDutyDuration.getCity())
