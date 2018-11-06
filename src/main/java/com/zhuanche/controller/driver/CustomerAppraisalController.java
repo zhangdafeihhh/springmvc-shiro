@@ -211,6 +211,8 @@ public class CustomerAppraisalController {
                                                      @Verify(param = "month", rule = "required") String month,
                                                      HttpServletRequest request, HttpServletResponse response) {
 
+        long start = System.currentTimeMillis();
+
         // 数据权限控制SSOLoginUser
         Set<Integer> permOfCity        = WebSessionUtil.getCurrentLoginUser().getCityIds(); //普通管理员可以管理的所有城市ID
         Set<Integer> permOfSupplier    = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); //普通管理员可以管理的所有供应商ID
@@ -290,6 +292,8 @@ public class CustomerAppraisalController {
                 fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
             }
             CsvUtils.exportCsv(response,csvDataList,headerList,fileName);
+            long end = System.currentTimeMillis();
+            logger.info("司机评分导出完成，耗时"+(end -start)+"毫秒");
 
 
         } catch (Exception e) {
