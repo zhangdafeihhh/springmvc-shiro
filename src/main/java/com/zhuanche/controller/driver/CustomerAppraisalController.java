@@ -1,5 +1,6 @@
 package com.zhuanche.controller.driver;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -17,6 +18,7 @@ import com.zhuanche.serv.CustomerAppraisalService;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.excel.CsvUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -223,12 +225,21 @@ public class CustomerAppraisalController {
             logger.info(LOGTAG + "查询teamId={},teamGroupId={},permOfTeam={}没有司机评分信息", teamId, teamGroupId, permOfTeam);
             list =  Lists.newArrayList();
         }else {
+
             CarBizCustomerAppraisalStatisticsDTO carBizCustomerAppraisalStatisticsDTO = new CarBizCustomerAppraisalStatisticsDTO();
             carBizCustomerAppraisalStatisticsDTO.setDriverName(name);
             carBizCustomerAppraisalStatisticsDTO.setDriverPhone(phone);
             carBizCustomerAppraisalStatisticsDTO.setCreateDate(month);
             carBizCustomerAppraisalStatisticsDTO.setCityId(cityId);
             carBizCustomerAppraisalStatisticsDTO.setSupplierId(supplierId);
+
+            if(StringUtils.isEmpty(name) && StringUtils.isEmpty(phone)){
+                if(cityId == null && supplierId == null){
+                    logger.info("导出司机评价，供应商必选，参数为"+ JSON.toJSONString(carBizCustomerAppraisalStatisticsDTO));
+                    return "供应商必选";
+                }
+            }
+
             //数据权限
             carBizCustomerAppraisalStatisticsDTO.setCityIds(permOfCity);
             carBizCustomerAppraisalStatisticsDTO.setSupplierIds(permOfSupplier);
