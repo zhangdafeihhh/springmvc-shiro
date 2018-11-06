@@ -1508,7 +1508,7 @@
     where license_plates = #{license_plates}
   </select>
 
-  <select id="queryCarBizDriverList" resultMap="ResultMapWithBLOBs"  parameterType="com.zhuanche.request.DutyParamRequest">
+  <select id="queryCarBizDriverList" resultMap="ResultMapWithBLOBs"  parameterType="com.zhuanche.dto.rentcar.CarBizDriverInfoDTO">
     select
     <include refid="Base_Column_List" />
     from car_biz_driver_info  i
@@ -1541,7 +1541,7 @@
         and  i.supplier_id = #{supplierId,jdbcType=INTEGER}
       </if>
       <if test="driverName!=null and driverName!=''">
-        and i.name LIKE CONCAT(#{driverName},'%')
+        and i.name  = #{driverName}
       </if>
 
     </where>
