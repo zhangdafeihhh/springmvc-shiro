@@ -149,13 +149,11 @@ public class DriverSchController {
                     newparam.setPageNo(pageNumber);
                     new DriverDayhDutyExportHelper(carDriverDutyService,hashtable,newparam,endGate).start();
                 }
-                try {
-                    logger.info("多线程分页查询司机司机排班信息,所有的线程在等待中。。。"+JSON.toJSONString(param));
-                    //主线程阻塞,等待其他所有 worker 线程完成后再执行
-                    endGate.await();
-                } catch (InterruptedException e) {
-                    logger.error("多线程分页查询司机司机排班信息,所有的线程在等待中。。异常，"+JSON.toJSONString(param),e);
-                }
+
+                logger.info("多线程分页查询司机司机排班信息,所有的线程在等待中。。。"+JSON.toJSONString(param));
+                //主线程阻塞,等待其他所有 worker 线程完成后再执行
+                endGate.await();
+
                 for(int i = 2 ;i <= pages ; i++){
                     PageInfo<CarDriverDayDutyDTO> pageInfoX = hashtable.get("page_"+i);
                     if(pageInfoX != null){
