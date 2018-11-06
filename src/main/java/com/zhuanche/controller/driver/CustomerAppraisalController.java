@@ -179,13 +179,14 @@ public class CustomerAppraisalController {
         carBizCustomerAppraisalStatisticsDTO.setTeamIds(permOfTeam);
         carBizCustomerAppraisalStatisticsDTO.setDriverIds(driverIds);
 
-        Page p = PageHelper.startPage(page, pageSize, true);
-        try {
-            list = customerAppraisalService.queryCustomerAppraisalStatisticsList(carBizCustomerAppraisalStatisticsDTO);
+
+        PageInfo<CarBizCustomerAppraisalStatisticsDTO> p = customerAppraisalService.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO,page,pageSize);
+        if(p != null){
+            list = p.getList();
             total = (int)p.getTotal();
-        } finally {
-            PageHelper.clearPage();
         }
+
+
         PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
         return AjaxResponse.success(pageDTO);
     }
@@ -232,8 +233,12 @@ public class CustomerAppraisalController {
 
             if(StringUtils.isEmpty(phone)  && StringUtils.isEmpty(name)){
                 if(cityId == null  || cityId <= 0){
-                    logger.info(LOGTAG + "查询参数错误，城市必填");
-                    return "查询参数错误，城市必填";
+                    logger.info(LOGTAG + "查询参数错误，城市必选");
+                    return "查询参数错误，城市必选";
+                }
+                if(supplierId == null  || supplierId <= 0){
+                    logger.info(LOGTAG + "查询参数错误，供应商必选");
+                    return "查询参数错误，供应商必选";
                 }
             }
             CarBizCustomerAppraisalStatisticsDTO carBizCustomerAppraisalStatisticsDTO = new CarBizCustomerAppraisalStatisticsDTO();

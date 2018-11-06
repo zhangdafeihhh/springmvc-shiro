@@ -140,5 +140,5 @@ public interface CarBizDriverInfoExMapper {
      * @param driverTeamRequest
      * @return
      */
-    List<CarBizDriverInfoDTO> queryCarBizDriverList(DutyParamRequest driverTeamRequest);
+    List<CarBizDriverInfoDTO> queryCarBizDriverList(CarBizDriverInfoDTO driverTeamRequest);
 }
