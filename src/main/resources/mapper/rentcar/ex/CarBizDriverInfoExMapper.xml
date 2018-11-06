@@ -1513,11 +1513,8 @@
     <include refid="Base_Column_List" />
     from car_biz_driver_info  i
     <where>
-      <if test="driverIds!=null and driverIds.size()>0">
-        and i.driver_id IN
-        <foreach collection="driverIds" open="(" close=")" separator="," item="did" >
-          #{did}
-        </foreach>
+      <if test="driverIds!=null and driverIds != ''">
+        and i.driver_id IN #{driverIds}
       </if>
       <if test="driverId != null and driverId != 0">
         and i.driver_id = #{driverId}
