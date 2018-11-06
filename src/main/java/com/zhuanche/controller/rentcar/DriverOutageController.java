@@ -1,6 +1,9 @@
 package com.zhuanche.controller.rentcar;
 
 import com.google.common.collect.Maps;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -59,6 +62,9 @@ public class DriverOutageController {
      * @return
      */
     @RequestMapping(value = "/queryDriverOutageData")
+    @MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
+	} )
     public AjaxResponse queryDriverOutageData(@Verify(param = "cityId",rule = "") Integer cityId,
                                               Integer supplierId,
                                               Integer carGroupId,
@@ -111,6 +117,9 @@ public class DriverOutageController {
      */
 
     @RequestMapping("/exportDriverOutage")
+    @MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
+	} )
     public void exportDriverOutage(@Verify(param = "cityId",rule = "") Integer cityId,
                                    Integer supplierId,
                                    Integer carGroupId,
@@ -168,6 +177,9 @@ public class DriverOutageController {
      * @return
      */
     @RequestMapping(value = "/queryDriverNameByPhone")
+    @MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
+	} )
     public AjaxResponse queryDriverNameByPhone(@Verify(param = "driverPhone", rule = "mobile") String driverPhone){
         logger.info("【司机停运】查询手机号"+driverPhone+"所对应的司机姓名");
         Map<String,Object> result = new HashMap<String,Object>();

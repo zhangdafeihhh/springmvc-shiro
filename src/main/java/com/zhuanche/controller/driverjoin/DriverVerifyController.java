@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -61,6 +64,9 @@ public class DriverVerifyController {
 	 */
 	@RequestMapping("/queryDriverVerifyData")
 	@ResponseBody
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
+	} )
 	public AjaxResponse queryDriverVerifyData(Integer page, Integer pageSize, Long cityId, String supplier,
 			String mobile, Integer verifyStatus, String createDateBegin, String createDateEnd) {
 
@@ -81,6 +87,9 @@ public class DriverVerifyController {
 	/** 查询司机加盟注册信息通过司机ID **/
 	@RequestMapping(value = "/queryDriverVerifyById")
 	@ResponseBody
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
+	} )
 	public AjaxResponse queryDriverVerifyById(@Verify(param = "driverId", rule = "required") Long driverId) {
 
 		DriverVerifyDto driverDto = driverVerifyService.queryDriverVerifyById(driverId);
@@ -90,6 +99,9 @@ public class DriverVerifyController {
 	/** 查询司机证件照片通过司机ID和证件照片类型 **/
 	@RequestMapping(value = "/queryImageByDriverIdAndType")
 	@ResponseBody
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
+	} )
 	public AjaxResponse queryImageByDriverIdAndType(@Verify(param = "driverId", rule = "required") Long driverId,
 			@Verify(param = "type", rule = "required") Integer type) {
 
@@ -102,6 +114,9 @@ public class DriverVerifyController {
 	/** 查询司机加盟记录列表数据 **/
 	@ResponseBody
 	@RequestMapping(value = "/queryDriverJoinRecordData")
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
+	} )
 	public AjaxResponse queryDriverJoinRecordData(Integer page, Integer pageSize, @Verify(param = "driverId", rule = "required") Long driverId){
 		logger.info("查询司机加盟记录列表数据通过司机ID,driverId="+driverId);
 		if (null == page || page.intValue() <= 0) {
