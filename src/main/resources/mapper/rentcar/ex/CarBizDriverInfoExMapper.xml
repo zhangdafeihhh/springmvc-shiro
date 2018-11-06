@@ -1507,5 +1507,49 @@
       car_biz_driver_info
     where license_plates = #{license_plates}
   </select>
+
+  <select id="queryCarBizDriverList" resultMap="ResultMapWithBLOBs"  parameterType="com.zhuanche.request.DutyParamRequest">
+    select
+    <include refid="Base_Column_List" />
+    from car_biz_driver_info  i
+    <where>
+      <if test="driverIds!=null and driverIds.size()>0">
+        and i.driver_id IN
+        <foreach collection="driverIds" open="(" close=")" separator="," item="did" >
+          #{did}
+        </foreach>
+      </if>
+      <if test="driverId != null and driverId != 0">
+        and i.driver_id = #{driverId}
+      </if>
+      <if test="phone!=null and phone!=''">
+        and i.phone = #{phone}
+      </if>
+      <if test="cityIds!=null and cityIds.size()>0">
+        and i.service_city IN
+        <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
+          #{cid}
+        </foreach>
+      </if>
+      <if test="cityId!=null and cityId != 0">
+        and i.service_city  = #{cityId}
+      </if>
+      <if test="supplierIds!=null and supplierIds.size()>0">
+        and i.supplier_id IN
+        <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
+          #{sid}
+        </foreach>
+      </if>
+      <if test="supplierId != null" >
+        i.supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="driverName!=null and driverName!=''">
+        and i.name LIKE CONCAT(#{driverName},'%')
+      </if>
+
+    </where>
+    order by driver_id desc
+  </select>
+
   
 </mapper>

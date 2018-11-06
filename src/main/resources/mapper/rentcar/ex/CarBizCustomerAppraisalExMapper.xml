@@ -201,4 +201,31 @@
     </if>
   </select>
 
+  <select id="queryDriverAppraisalDetailByParam"
+          parameterType="com.zhuanche.dto.rentcar.CarBizCustomerAppraisalExtDTO"
+          resultType="com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO">
+    select
+    appraisal_id,order_id,order_no,booking_customer_id,booking_customer_phone
+    ,rider_phone,driver_id,car_id,instrument_and_service,environment_and_equipped
+    ,efficiency_and_safety,memo,create_by,create_date as createDate,update_by
+    ,update_date,evaluate_score,evaluate,platform_evaluate,platform_evaluate_score as evaluateScore
+    ,platform_memo,customer_ip,point,pointBD
+
+    from car_biz_customer_appraisal  ca
+    <where>
+      <if test="driverIds !=null and driverIds.size()>0">
+        and ca.driver_id IN
+        <foreach collection="driverIds" open="(" close=")" separator="," item="did">
+          #{did}
+        </foreach>
+      </if>
+      <if test="startTime !=null and startTime !=''">
+        <![CDATA[ AND ca.create_date >=  concat(#{startTime},' 00:00:00') ]]>
+      </if>
+      <if test="endTime !=null and endTime !=''">
+        <![CDATA[ AND ca.create_date <=  concat(#{endTime},' 23:59:59') ]]>
+      </if>
+    </where>
+  </select>
+
 </mapper>

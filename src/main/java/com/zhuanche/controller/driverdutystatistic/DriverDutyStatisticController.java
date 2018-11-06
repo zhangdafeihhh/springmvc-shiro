@@ -260,7 +260,7 @@ public class DriverDutyStatisticController extends DriverQueryController{
 				if(pageInfo != null){
 					list.addAll( pageInfo.getList());
 
-					for(int pageno = 2 ;pageno < pageInfo.getPages();pageno ++ ){
+					for(int pageno = 2 ;pageno <= pageInfo.getPages();pageno ++ ){
 						params.setPage(pageno);
 						pageInfo =  driverDutyStatisticService.queryDriverDayDutyList(params);
 						list.addAll( pageInfo.getList());
@@ -270,7 +270,7 @@ public class DriverDutyStatisticController extends DriverQueryController{
 				pageInfo =  driverDutyStatisticService.queryDriverMonthDutyList(params);
 				if(pageInfo != null){
 					list.addAll( pageInfo.getList());
-					for(int pageno = 2 ;pageno < pageInfo.getPages();pageno ++ ){
+					for(int pageno = 2 ;pageno <= pageInfo.getPages();pageno ++ ){
 						params.setPage(pageno);
 						pageInfo =  driverDutyStatisticService.queryDriverMonthDutyList(params);
 						list.addAll( pageInfo.getList());
@@ -288,8 +288,6 @@ public class DriverDutyStatisticController extends DriverQueryController{
 			}else{
 				headerList.add("司机姓名,手机号,车牌号,班制之内上班上线时_有效,强制上班内上班上线时长_有效,加班时长,班制内上班上线时长,强制上班内上班上线时长,城市,早高峰在线时长,晚高峰在线时长,其他时段1在线时长,其他时段2在线时长");
 			}
-
-
 
 			if(rows == null){
 				rows = new ArrayList<>();

@@ -133,4 +133,12 @@ public interface CarBizDriverInfoExMapper {
      * @return
      */
     public List<CarBizDriverInfoDTO> queryDriverByLicensePlates(String license_plates);
+
+
+    /**
+     * 查看司机列表
+     * @param driverTeamRequest
+     * @return
+     */
+    List<CarDriverInfoDTO> queryCarBizDriverList(DutyParamRequest driverTeamRequest);
 }

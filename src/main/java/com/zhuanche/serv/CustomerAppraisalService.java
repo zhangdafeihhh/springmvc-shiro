@@ -1,24 +1,34 @@
 package com.zhuanche.serv;
 
+import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalDTO;
+import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalExtDTO;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
+import com.zhuanche.request.DutyParamRequest;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import mapper.rentcar.ex.CarBizCustomerAppraisalExMapper;
 import mapper.rentcar.ex.CarBizCustomerAppraisalStatisticsExMapper;
+import mapper.rentcar.ex.CarBizDriverInfoExMapper;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class CustomerAppraisalService {
+
+    private static final Logger log =  LoggerFactory.getLogger(CustomerAppraisalService.class);
 
     @Autowired
     private CarBizCustomerAppraisalExMapper carBizCustomerAppraisalExMapper;
@@ -28,6 +38,8 @@ public class CustomerAppraisalService {
 
     @Autowired
     private CarDriverTeamService carDriverTeamService;
+
+    private CarBizDriverInfoExMapper carBizDriverInfoExMapper;
 
     /**
      * 查询订单评分信息
@@ -125,5 +137,70 @@ public class CustomerAppraisalService {
             }
         }
         return driverId;
+    }
+
+    public PageInfo<CarBizCustomerAppraisalStatisticsDTO> queryDriverAppraisalDetailV2(
+            CarBizCustomerAppraisalStatisticsDTO carBizCustomerAppraisalDTO,int pageNo
+            ,int pageSize,String startTime,String endTime) {
+
+        /**
+         * 先查司机
+         */
+        DutyParamRequest dutyParamRequest = new DutyParamRequest();
+        dutyParamRequest.setPhone(carBizCustomerAppraisalDTO.getDriverPhone());
+        dutyParamRequest.setDriverName(carBizCustomerAppraisalDTO.getDriverName());
+        dutyParamRequest.setCityId(carBizCustomerAppraisalDTO.getCityId());
+        dutyParamRequest.setCityIds(carBizCustomerAppraisalDTO.getCityIds());
+        dutyParamRequest.setSupplierId(carBizCustomerAppraisalDTO.getSupplierId());
+        dutyParamRequest.setSupplierIds(carBizCustomerAppraisalDTO.getSupplierIds());
+        String driverIds = "";
+        if(carBizCustomerAppraisalDTO.getDriverIds() != null && !carBizCustomerAppraisalDTO.getDriverIds().isEmpty()){
+            for(Integer driverIdTemp : carBizCustomerAppraisalDTO.getDriverIds()){
+                if(driverIds.length() >= 1){
+                    driverIds += ",";
+                }
+                driverIds += (driverIdTemp+"");
+            }
+        }
+        dutyParamRequest.setDriverIds(driverIds);
+        dutyParamRequest.setDriverId(carBizCustomerAppraisalDTO.getDriverId());
+
+        List<CarDriverInfoDTO> carDriverInfoDTOList = carBizDriverInfoExMapper.queryCarBizDriverList(dutyParamRequest);
+        if(carDriverInfoDTOList == null){
+            log.info("查询评价信息，查询结果为空。参数为："+ JSON.toJSONString(dutyParamRequest));
+            return null;
+        }
+        //再根据司机id、评价开始时间、结束时间 查询评分信息
+        Set<Integer> driverIdSet = new HashSet<>();
+        Map<String,CarDriverInfoDTO> cacheCarDriverInfoDTO = new HashMap<>();
+        for(CarDriverInfoDTO item : carDriverInfoDTOList){
+            driverIdSet.add(Integer.parseInt(item.getDriverId()));
+            cacheCarDriverInfoDTO.put("d_"+item.getDriverId(),item);
+        }
+
+        CarBizCustomerAppraisalExtDTO params = new  CarBizCustomerAppraisalExtDTO();
+        params.setDriverIds(driverIdSet);
+        params.setStartTime(startTime);
+        params.setEndTime(endTime);
+
+        PageHelper.startPage(pageNo, pageSize, true);
+        List<CarBizCustomerAppraisalStatisticsDTO> list  = carBizCustomerAppraisalExMapper.queryDriverAppraisalDetailByParam(params);
+        PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfo = new PageInfo<>(list);
+        if(list.size() > 0){
+            //遍历赋值，司机姓名
+            CarDriverInfoDTO temp = null;
+            for(CarBizCustomerAppraisalStatisticsDTO item : list){
+                temp = cacheCarDriverInfoDTO.get("d_"+item.getDriverId());
+                if(temp != null){
+                    item.setDriverName(temp.getName());
+                    item.setDriverPhone(temp.getPhone());
+                    item.setIdCardNo(temp.getIdCardNo());
+                }
+            }
+        }
+
+
+        return  pageInfo;
+        //return carBizCustomerAppraisalExMapper.queryDriverAppraisalDetail(carBizCustomerAppraisalDTO);
     }
 }

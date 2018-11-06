@@ -64,4 +64,5 @@
     <include refid="allBaseColumnWhereList"/>
     ORDER BY ca.driver_id DESC
   </select>
-</mapper>
+
+ </mapper>

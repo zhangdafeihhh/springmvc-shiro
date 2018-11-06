@@ -2,6 +2,7 @@ package com.zhuanche.controller.driver;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
@@ -11,9 +12,11 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalDTO;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
+import com.zhuanche.dto.rentcar.DriverDutyStatisticDTO;
 import com.zhuanche.serv.CustomerAppraisalService;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.excel.CsvUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +29,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.util.List;
-import java.util.Set;
+import java.net.URLEncoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Controller
 @RequestMapping("/customerAppraisal")
@@ -41,6 +46,8 @@ public class CustomerAppraisalController {
 
     @Autowired
     private CarDriverTeamService carDriverTeamService;
+
+
 
     /**
      * 订单评分
@@ -228,11 +235,53 @@ public class CustomerAppraisalController {
             carBizCustomerAppraisalStatisticsDTO.setTeamIds(permOfTeam);
             carBizCustomerAppraisalStatisticsDTO.setDriverIds(driverIds);
 
-            list = customerAppraisalService.queryCustomerAppraisalStatisticsList(carBizCustomerAppraisalStatisticsDTO);
+            String startTime = month+"-01";
+            String endTime = null;
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            try {
+                Date firstDay = simpleDateFormat.parse(startTime);
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(firstDay);
+
+                calendar.add(Calendar.MONTH,1);//加1个月
+                calendar.add(Calendar.DAY_OF_MONTH,-1);//减1天
+                endTime = simpleDateFormat.format(calendar.getTime());
+
+            } catch (ParseException e) {
+              logger.error("导出司机评分异常，参数month="+month,e);
+                return ;
+            }
+            int pageSize = 10000;
+
+            PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfo = customerAppraisalService.queryDriverAppraisalDetailV2(carBizCustomerAppraisalStatisticsDTO,1
+            ,  pageSize,  startTime,  endTime);
+            list.addAll(pageInfo.getList());
+
+            int pages = pageInfo.getPages();
+            //循环加载其他页数据
+            for(int i = 2 ;i < pages ; i++){
+                pageInfo = customerAppraisalService.queryDriverAppraisalDetailV2(carBizCustomerAppraisalStatisticsDTO,i
+                        ,  pageSize,  startTime,  endTime);
+                list.addAll(pageInfo.getList());
+            }
         }
         try {
-            Workbook wb = customerAppraisalService.exportExcelDriverAppraisal(list, request.getRealPath("/")+File.separator+"template"+File.separator+"driver_appraisal.xlsx");
-            Componment.fileDownload(response, wb, new String("司机评分".getBytes("utf-8"), "iso8859-1"));
+            List<String> headerList = new ArrayList<>();
+            headerList.add("司机姓名,手机号,评价月份,本月得分,身份证号,车队");
+
+            List<String> csvDataList  = new ArrayList<>(list.size());
+            dataTrans(list,csvDataList);
+
+            String fileName = "司机评分"+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
+            String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
+            if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
+                fileName = URLEncoder.encode(fileName, "UTF-8");
+            } else {  //其他浏览器
+                fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+            }
+            CsvUtils.exportCsv(response,csvDataList,headerList,fileName);
+
+
         } catch (Exception e) {
             if(list != null){
                 list.clear();
@@ -240,6 +289,46 @@ public class CustomerAppraisalController {
             logger.error("司机信息列表查询导出error",e);
 
         }
+    }
+    private void dataTrans(List<CarBizCustomerAppraisalStatisticsDTO> list, List<String>  csvDataList ){
+        if(null == list){
+            return;
+        }
+        Map<Integer, String> teamMap = null;
+        try {
+            String driverIds = customerAppraisalService.pingDriverIds(list);
+            teamMap = carDriverTeamService.queryDriverTeamListByDriverId(driverIds);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        for(CarBizCustomerAppraisalStatisticsDTO s:list){
+            StringBuffer stringBuffer = new StringBuffer();
+
+
+            stringBuffer.append(s.getDriverName());
+            stringBuffer.append(",");
+
+            stringBuffer.append(s.getDriverPhone());
+            stringBuffer.append(",");
+
+            stringBuffer.append(s.getCreateDate());
+            stringBuffer.append(",");
+
+            stringBuffer.append(s.getEvaluateScore());
+            stringBuffer.append(",");
+
+            stringBuffer.append(s.getIdCardNo());
+            stringBuffer.append(",");
+
+            String teamName = "";
+            if(teamMap!=null){
+                teamName = teamMap.get(s.getDriverId());
+            }
+            stringBuffer.append(teamName);
+
+            csvDataList.add(stringBuffer.toString());
+        }
+
     }
 
     /**
