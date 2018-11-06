@@ -1,6 +1,9 @@
 package com.zhuanche.controller.rentcar;
 
 import com.google.common.collect.Maps;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -34,6 +37,9 @@ public class DriverOutageAllController {
 
 
     @RequestMapping(value = "/queryDriverOutageData")
+    @MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
+	} )
     public AjaxResponse queryDriverOutageData(@Verify(param = "cityId",rule = "") Integer cityId,
                                               Integer supplierId,
                                               Integer carGroupId,

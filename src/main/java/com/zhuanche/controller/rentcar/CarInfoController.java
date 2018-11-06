@@ -1,6 +1,10 @@
 package com.zhuanche.controller.rentcar;
 
 import com.google.common.collect.Maps;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.Verify;
@@ -56,6 +60,9 @@ public class CarInfoController {
      * @return
      */
     @RequestMapping(value = "/queryCarData")
+    @MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
+	} )
     public Object queryCarData(@Verify(param = "cities",rule="") String cities,
                                @Verify(param = "supplierIds",rule="") String supplierIds,
                                @Verify(param = "carModelIds",rule="") String carModelIds,
@@ -112,6 +119,10 @@ public class CarInfoController {
      * @return
      */
     @RequestMapping(value = "/queryCarInfo")
+    @MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE ),
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	} )
     public AjaxResponse queryCarInfo(@Verify(param = "carId",rule = "required") Integer carId) {
         logger.info("queryCar:查看车辆详情列表");
         CarInfo params = new CarInfo();
