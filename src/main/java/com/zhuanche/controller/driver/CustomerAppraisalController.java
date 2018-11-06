@@ -235,22 +235,22 @@ public class CustomerAppraisalController {
             carBizCustomerAppraisalStatisticsDTO.setTeamIds(permOfTeam);
             carBizCustomerAppraisalStatisticsDTO.setDriverIds(driverIds);
 
-            String startTime = month+"-01";
-            String endTime = null;
+            Calendar calendar = Calendar.getInstance();
+            String[] monthInfo = month.split("-");
+            calendar.set(Calendar.YEAR,Integer.parseInt(monthInfo[0]));
+            calendar.set(Calendar.MONTH,(Integer.parseInt(monthInfo[1]) -1));
+            calendar.set(Calendar.DAY_OF_MONTH,1);
+
+
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            try {
-                Date firstDay = simpleDateFormat.parse(startTime);
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(firstDay);
 
-                calendar.add(Calendar.MONTH,1);//加1个月
-                calendar.add(Calendar.DAY_OF_MONTH,-1);//减1天
-                endTime = simpleDateFormat.format(calendar.getTime());
+            String startTime = simpleDateFormat.format(calendar.getTime());
 
-            } catch (ParseException e) {
-              logger.error("导出司机评分异常，参数month="+month,e);
-                return "";
-            }
+            calendar.add(Calendar.MONTH,1);//加1个月
+            calendar.add(Calendar.DAY_OF_MONTH,-1);//减1天
+            String endTime  = simpleDateFormat.format(calendar.getTime());
+
+
             int pageSize = 10000;
 
             PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfo = customerAppraisalService.queryDriverAppraisalDetailV2(carBizCustomerAppraisalStatisticsDTO,1
