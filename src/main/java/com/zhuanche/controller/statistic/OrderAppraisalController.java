@@ -234,7 +234,7 @@ public class OrderAppraisalController extends DriverQueryController{
 			CsvUtils.exportCsv(response,csvDataList,headerList,fileName);
 			return AjaxResponse.success("文件导出成功！");
 		} catch (Exception e) {
-			log.error("订单评分导出--导出失败,参数为："+(params == null ? "null":JSON.toJSONString(params)));
+			log.error("订单评分导出--导出失败,参数为："+(params == null ? "null":JSON.toJSONString(params)),e);
 			if(rows != null){
 				rows.clear();
 			}
