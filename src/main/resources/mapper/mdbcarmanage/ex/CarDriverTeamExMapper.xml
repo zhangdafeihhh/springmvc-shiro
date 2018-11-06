@@ -194,7 +194,7 @@
     </select>
 
 
-    <select id="queryForListByStatusNotEq2" resultMap="BaseExResultMap" >
+    <select id="queryForListByStatusNotEq2" resultMap="BaseResultMap" >
         select
         <include refid="Base_Column_List" />
         from car_driver_team
