@@ -1,8 +1,6 @@
 package mapper.rentcar.ex;
 
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalDTO;
-import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalExtDTO;
-import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
 import com.zhuanche.entity.rentcar.CarBizCustomerAppraisal;
 import com.zhuanche.entity.rentcar.CarBizCustomerAppraisalParams;
 
@@ -17,8 +15,5 @@ public interface CarBizCustomerAppraisalExMapper {
     public List<CarBizCustomerAppraisal> queryForListObject(CarBizCustomerAppraisalParams params);
 
     CarBizCustomerAppraisalDTO queryCustomerAppraisalListById(Integer appraisalId);
-
-
-    List<CarBizCustomerAppraisalStatisticsDTO> queryDriverAppraisalDetailByParam(CarBizCustomerAppraisalExtDTO param);
 
 }
