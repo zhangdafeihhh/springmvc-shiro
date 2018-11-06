@@ -44,6 +44,8 @@ public class DriverTeamRequest extends PageRequest{
 
     private Set<String> supplierIds;
 
+    private Set<String> teamIds;
+
     //车牌号(可多个)
     private String plates;
 
@@ -171,5 +173,17 @@ public class DriverTeamRequest extends PageRequest{
 
     public void setTeamId(Integer teamId) {
         this.teamId = teamId;
+    }
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public Set<String> getTeamIds() {
+        return teamIds;
+    }
+
+    public void setTeamIds(Set<String> teamIds) {
+        this.teamIds = teamIds;
     }
 }
