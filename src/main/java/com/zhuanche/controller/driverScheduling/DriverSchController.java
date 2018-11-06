@@ -105,18 +105,30 @@ public class DriverSchController {
     */ 
     @RequestMapping("/exportDutyToExcel")
     @ResponseBody
-    public void exportDutyToExcel(HttpServletResponse response, HttpServletRequest request,DutyParamRequest param){
+    public String  exportDutyToExcel(HttpServletResponse response, HttpServletRequest request,DutyParamRequest param){
 
         try{
 
             logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param));
             SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
             if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
-                return  ;
+                logger.info("下载符合条件排班，用户未登陆，下载符合条件排班列表入参:"+ JSON.toJSONString(param));
+                return  "";
             }
             if(Check.NuNObj(param) || Check.NuNObj(param.getUnpublishedFlag()) ){
-                return  ;
+                logger.info("下载符合条件排班，参数不符要求，入参:"+ JSON.toJSONString(param));
+                return  "";
             }
+            String startTime = param.getStartTime();
+            String endTime = param.getEndTime();
+            if(StringUtils.isEmpty(startTime)){
+                return  "排班开始时间不能为空";
+            }
+            if(StringUtils.isEmpty(endTime)){
+                return  "排班结束时间不能为空";
+            }
+
+
             long start = System.currentTimeMillis();
             param.setPage(1);
             //设置导出单文件阈值 3000
@@ -170,10 +182,10 @@ public class DriverSchController {
             logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，耗时："+(end-start)+"毫秒;总条数："+pageInfos.getTotal());
 
         }catch (Exception e){
-            logger.error("导出排班信息 异常:{}",e);
-            return ;
+            logger.error("导出排班信息异常:{}",e);
+            return  "导出排班信息异常";
         }
-        return ;
+        return "";
     }
     private  void dataTrans(List<CarDriverDayDutyDTO> result,List<String> csvDataList){
         if(null == result){
