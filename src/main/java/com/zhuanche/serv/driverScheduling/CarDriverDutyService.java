@@ -12,8 +12,10 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.dto.driver.CarDriverDayDutyDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverDayDuty;
+import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
 import com.zhuanche.entity.mdbcarmanage.DriverDutyTimeInfo;
 import com.zhuanche.request.CommonRequest;
+import com.zhuanche.request.DriverTeamRequest;
 import com.zhuanche.request.DutyParamRequest;
 import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.serv.common.DataPermissionHelper;
@@ -22,6 +24,7 @@ import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.Check;
 import com.zhuanche.util.Common;
 import mapper.mdbcarmanage.ex.CarDriverDayDutyExMapper;
+import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.mdbcarmanage.ex.DriverDutyTimeInfoExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
 import net.sf.json.JSONObject;
@@ -76,6 +79,9 @@ public class CarDriverDutyService {
 	@Autowired
 	private AsyncDutyService asyncDutyService;
 
+	@Autowired
+	private CarDriverTeamExMapper carDriverTeamExMapper;
+
 	private static final ExecutorService es = Executors.newCachedThreadPool();
 
 	/** 
@@ -112,9 +118,64 @@ public class CarDriverDutyService {
 			//组装权限参数
 			dutyParamRequest = generateDutyParamRequestByUser(dutyParamRequest);
 
+			//组装获取team状态不为2的数据
+			DriverTeamRequest driverTeamRequest = new DriverTeamRequest();
+			Set<String> cityIdStringSet = new HashSet<>();
+			if(dutyParamRequest.getCityIds() != null){
+				for(Integer cityIdTemp :dutyParamRequest.getCityIds()){
+					cityIdStringSet.add(cityIdTemp+"");
+				}
+				driverTeamRequest.setCityIds(cityIdStringSet);
+			}
+			Set<String> supplierIdStringSet = new HashSet<>();
+			if(dutyParamRequest.getSupplierIds() != null){
+				for(Integer idTemp :dutyParamRequest.getSupplierIds()){
+					supplierIdStringSet.add(idTemp+"");
+				}
+				driverTeamRequest.setSupplierIds(supplierIdStringSet);
+			}
+			driverTeamRequest.setCityId(dutyParamRequest.getCityId()+"");
+			driverTeamRequest.setSupplierId(dutyParamRequest.getSupplierId()+"");
+			driverTeamRequest.setTeamId(dutyParamRequest.getTeamId());
+			List<CarDriverTeam> carDriverTeamList = carDriverTeamExMapper.queryForListByStatusNotEq2(driverTeamRequest);
+
+			if((dutyParamRequest.getTeamIds() != null && dutyParamRequest.getTeamIds().size() >= 1) ||
+					dutyParamRequest.getTeamId() != null){
+				//移除状态为“删除状态【2】的team”
+				if(carDriverTeamList != null){
+					Map<String,CarDriverTeam> carDriverTeamMap = new HashMap<>();
+					for(CarDriverTeam temp : carDriverTeamList){
+						carDriverTeamMap.put("team_"+temp.getId(),temp);
+					}
+
+					//保证teamId都是有效的id，已经删除的teamId则不在范围内
+					Set<Integer> newTeamSet = new HashSet<>();
+					Set<Integer> teamSet = dutyParamRequest.getTeamIds();
+					if(teamSet.isEmpty()){
+						for(Integer teamId : teamSet){
+							if(carDriverTeamMap.get("team_"+teamId) != null){
+								newTeamSet.add(teamId);
+							}
+						}
+					}
+					dutyParamRequest.setTeamIds(newTeamSet);
+
+					if(carDriverTeamMap.get("team_"+dutyParamRequest.getTeamId()) == null){
+						dutyParamRequest.setTeamId(-1);
+					}
+				}
+			}else if(dutyParamRequest.getTeamIds() != null){
+				Set<Integer> newTeamSet = new HashSet<>();
+				for(CarDriverTeam team : carDriverTeamList){
+					newTeamSet.add(team.getId());
+				}
+				dutyParamRequest.setTeamIds(newTeamSet);
+			}
+
 			PageHelper.startPage(dutyParamRequest.getPageNo(), dutyParamRequest.getPageSize());
+
 			logger.info("查询司机排班的参数为："+JSON.toJSONString(dutyParamRequest));
-			List<CarDriverDayDutyDTO> listData = carDriverDayDutyExMapper.selectForList(dutyParamRequest);
+			List<CarDriverDayDutyDTO> listData = carDriverDayDutyExMapper.selectForListV2(dutyParamRequest);
 			PageInfo<CarDriverDayDutyDTO> pageInfo = new PageInfo<>(listData);
 			List<CarDriverDayDutyDTO> list = pageInfo.getList();
 			if(list != null){
@@ -139,11 +200,6 @@ public class CarDriverDutyService {
 					}
 				}
 			}
-
-//			PageDTO pageDTO = new PageDTO();
-//			pageDTO.setTotal((int)pageInfo.getTotal());
-//			pageDTO.setResult(list);
-//			pageDTO.setPageSize(pageInfo.getPages());
 
 			return pageInfo;
 		}catch (Exception e){

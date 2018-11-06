@@ -434,7 +434,7 @@ public class DriverSchController {
                 return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
             }
             long start = System.currentTimeMillis();
-          PageInfo<CarDriverDayDutyDTO> pageInfos = carDriverDutyService.queryDriverDayDutyList(param);
+            PageInfo<CarDriverDayDutyDTO> pageInfos = carDriverDutyService.queryDriverDayDutyList(param);
 
             PageDTO pageDTO = new PageDTO();
 			pageDTO.setTotal((int)pageInfos.getTotal());
