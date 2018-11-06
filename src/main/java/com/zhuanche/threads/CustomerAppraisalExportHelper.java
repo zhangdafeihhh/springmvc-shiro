@@ -42,7 +42,10 @@ public class CustomerAppraisalExportHelper extends Thread {
     @Override
     public void run() {
         try{
-            PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfo = customerAppraisalService.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO,1
+            logger.info("多线程分页查询司机评分,参数为：pageNo="+pageNo+",pageSize="+pageSize
+                            +",carBizCustomerAppraisalStatisticsDTO="+(carBizCustomerAppraisalStatisticsDTO==null?"null": JSON.toJSONString(carBizCustomerAppraisalStatisticsDTO))
+                    );
+            PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfo = customerAppraisalService.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO,pageNo
                     ,  pageSize  );
             hashtable.put("page_"+pageNo,pageInfo);
 
