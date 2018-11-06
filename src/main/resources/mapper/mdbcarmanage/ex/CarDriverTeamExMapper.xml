@@ -193,4 +193,41 @@
 		WHERE rt.driver_id in (${driverIds})
     </select>
 
+
+    <select id="queryForListByStatusNotEq2" resultMap="BaseExResultMap" >
+        select
+        <include refid="Base_Column_List" />
+        from car_driver_team
+        where  status!=2
+        <if test="cityIds!=null and cityIds.size()>0">
+            and city IN
+            <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
+                #{cid}
+            </foreach>
+        </if>
+        <if test="supplierIds!=null and supplierIds.size()>0">
+            and supplier IN
+            <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
+                #{sid}
+            </foreach>
+        </if>
+        <if test="teamIds!=null and teamIds.size()>0">
+            and id IN
+            <foreach collection="teamIds" open="(" close=")" separator="," item="tid" >
+                #{tid}
+            </foreach>
+        </if>
+        <if test="cityId!=null and cityId!=''">
+            and  city = #{cityId}
+        </if>
+        <if test="supplierId!=null and supplierId!=''">
+            and  supplier = #{supplierId}
+        </if>
+        <if test="teamId!=null and teamId!=''">
+            and  id = #{teamId}
+        </if>
+
+        order by city, id
+    </select>
+
 </mapper>

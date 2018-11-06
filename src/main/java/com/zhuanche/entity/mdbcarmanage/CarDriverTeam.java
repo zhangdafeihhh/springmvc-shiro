@@ -27,7 +27,7 @@ public class CarDriverTeam implements Serializable{
 
     private String remark;
 
-    private Integer status;//状态   0关闭 1启用
+    private Integer status;//状态   0关闭 1启用，2：删除
 
     private Integer pId;
 
