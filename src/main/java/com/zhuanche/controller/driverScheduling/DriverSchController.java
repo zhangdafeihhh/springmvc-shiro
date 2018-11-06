@@ -11,6 +11,7 @@ import com.zhuanche.dto.driver.CarDriverDayDutyDTO;
 import com.zhuanche.dto.driverDuty.CarDriverDurationDTO;
 import com.zhuanche.dto.driverDuty.CarDriverMustDutyDTO;
 import com.zhuanche.dto.driverDuty.DutyExcelDTO;
+import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverMustDuty;
 import com.zhuanche.entity.mdbcarmanage.CarDutyDuration;
 import com.zhuanche.request.DutyParamRequest;
@@ -22,6 +23,7 @@ import com.zhuanche.serv.driverScheduling.CarDriverMustDutyService;
 import com.zhuanche.serv.driverScheduling.CarDriverShiftsService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.threads.DriverDayhDutyExportHelper;
 import com.zhuanche.util.Check;
 import com.zhuanche.util.PageUtils;
 import com.zhuanche.util.dateUtil.DateUtil;
@@ -43,10 +45,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @description: 司机排班
@@ -140,19 +140,28 @@ public class DriverSchController {
             //计算总页数
             int pages = pageInfos.getPages();//临时计算总页数
 
-            for(int pageNumber = 2; pageNumber <= pages; pageNumber++){
-                param.setPageNo(pageNumber);
-                pageInfos = carDriverDutyService.queryDriverDayDutyList(param);
-                logger.info("下载符合条件排班列表入参:"+
-                                JSON.toJSONString(param)
-                                +"，pageNumber="+pageNumber+";总条数为："+pageInfos.getTotal()
-                                +"；总页数totalPage = "+pageInfos.getPages()
-                );
-
-                result = pageInfos.getList();
-                dataTrans( result,  csvDataList);
-
+            Hashtable<String,PageInfo<CarDriverDayDutyDTO> > hashtable = new Hashtable<>();
+            if(pages >= 2) {
+                CountDownLatch endGate = new CountDownLatch(pages - 1);
+                for(int pageNumber = 2; pageNumber <= pages; pageNumber++){
+                    param.setPageNo(pageNumber);
+                    new DriverDayhDutyExportHelper(carDriverDutyService,hashtable,param,endGate).start();
+                }
+                try {
+                    logger.info("多线程分页查询司机司机排班信息,所有的线程在等待中。。。"+JSON.toJSONString(param));
+                    //主线程阻塞,等待其他所有 worker 线程完成后再执行
+                    endGate.await();
+                } catch (InterruptedException e) {
+                    logger.error("多线程分页查询司机司机排班信息,所有的线程在等待中。。异常，"+JSON.toJSONString(param),e);
+                }
+                for(int i = 2 ;i <= pages ; i++){
+                    PageInfo<CarDriverDayDutyDTO> pageInfoX = hashtable.get("page_"+i);
+                    if(pageInfoX != null){
+                        dataTrans( pageInfoX.getList(),  csvDataList);
+                    }
+                }
             }
+
             List<String> headerList = new ArrayList<>();
             headerList.add("司机姓名,手机号,城市,供应商,车队,排班日期,强制上班时间,排班时长,状态");
 
