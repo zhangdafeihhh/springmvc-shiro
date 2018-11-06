@@ -108,8 +108,8 @@ public class CustomerAppraisalService {
             for(CarBizCustomerAppraisalStatisticsDTO item : list){
                 driverInfotemp = cacheItem.get("d_"+item.getDriverId());
                 if(driverInfotemp != null){
-                    item.setDriverName(driverInfotemp.getName());
-                    item.setDriverPhone(driverInfotemp.getPhone());
+//                    item.setDriverName(driverInfotemp.getName());
+//                    item.setDriverPhone(driverInfotemp.getPhone());
                     item.setIdCardNo(driverInfotemp.getIdCardNo());
                     item.setCityId(driverInfotemp.getServiceCity());
                 }
