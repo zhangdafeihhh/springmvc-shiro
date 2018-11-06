@@ -134,9 +134,17 @@ public class CarDriverDutyService {
 				}
 				driverTeamRequest.setSupplierIds(supplierIdStringSet);
 			}
+			Set<String> teamIdStringSet = new HashSet<>();
+			if(dutyParamRequest.getTeamIds() != null){
+				for(Integer idTemp :dutyParamRequest.getTeamIds()){
+					teamIdStringSet.add(idTemp+"");
+				}
+				driverTeamRequest.setTeamIds(teamIdStringSet);
+			}
 			driverTeamRequest.setCityId(dutyParamRequest.getCityId()+"");
 			driverTeamRequest.setSupplierId(dutyParamRequest.getSupplierId()+"");
 			driverTeamRequest.setTeamId(dutyParamRequest.getTeamId());
+
 			List<CarDriverTeam> carDriverTeamList = carDriverTeamExMapper.queryForListByStatusNotEq2(driverTeamRequest);
 
 			if((dutyParamRequest.getTeamIds() != null && dutyParamRequest.getTeamIds().size() >= 1) ||
