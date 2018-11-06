@@ -210,21 +210,21 @@
     ,efficiency_and_safety,memo,create_by,create_date as createDate,update_by
     ,update_date,evaluate_score,evaluate,platform_evaluate,platform_evaluate_score as evaluateScore
     ,platform_memo,customer_ip,point,pointBD
-
     from car_biz_customer_appraisal  ca
     <where>
-      <if test="driverIds !=null and driverIds.size()>0">
-        and ca.driver_id IN
-        <foreach collection="driverIds" open="(" close=")" separator="," item="did">
-          #{did}
-        </foreach>
-      </if>
       <if test="startTime !=null and startTime !=''">
         <![CDATA[ AND ca.create_date >=  concat(#{startTime},' 00:00:00') ]]>
       </if>
       <if test="endTime !=null and endTime !=''">
         <![CDATA[ AND ca.create_date <=  concat(#{endTime},' 23:59:59') ]]>
       </if>
+      <if test="driverIds !=null and driverIds.size()>0">
+        and ca.driver_id IN
+        <foreach collection="driverIds" open="(" close=")" separator="," item="did">
+          #{did}
+        </foreach>
+      </if>
+
     </where>
   </select>
 

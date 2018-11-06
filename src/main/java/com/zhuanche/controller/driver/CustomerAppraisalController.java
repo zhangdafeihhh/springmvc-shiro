@@ -233,12 +233,12 @@ public class CustomerAppraisalController {
             carBizCustomerAppraisalStatisticsDTO.setCityId(cityId);
             carBizCustomerAppraisalStatisticsDTO.setSupplierId(supplierId);
 
-            if(StringUtils.isEmpty(name) && StringUtils.isEmpty(phone)){
-                if(cityId == null && supplierId == null){
-                    logger.info("导出司机评价，供应商必选，参数为"+ JSON.toJSONString(carBizCustomerAppraisalStatisticsDTO));
-                    return "供应商必选";
-                }
-            }
+//            if(StringUtils.isEmpty(name) && StringUtils.isEmpty(phone)){
+//                if(cityId == null && supplierId == null){
+//                    logger.info("导出司机评价，供应商必选，参数为"+ JSON.toJSONString(carBizCustomerAppraisalStatisticsDTO));
+//                    return "供应商必选";
+//                }
+//            }
 
             //数据权限
             carBizCustomerAppraisalStatisticsDTO.setCityIds(permOfCity);
@@ -246,33 +246,39 @@ public class CustomerAppraisalController {
             carBizCustomerAppraisalStatisticsDTO.setTeamIds(permOfTeam);
             carBizCustomerAppraisalStatisticsDTO.setDriverIds(driverIds);
 
-            Calendar calendar = Calendar.getInstance();
-            String[] monthInfo = month.split("-");
-            calendar.set(Calendar.YEAR,Integer.parseInt(monthInfo[0]));
-            calendar.set(Calendar.MONTH,(Integer.parseInt(monthInfo[1]) -1));
-            calendar.set(Calendar.DAY_OF_MONTH,1);
-
-
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-            String startTime = simpleDateFormat.format(calendar.getTime());
-
-            calendar.add(Calendar.MONTH,1);//加1个月
-            calendar.add(Calendar.DAY_OF_MONTH,-1);//减1天
-            String endTime  = simpleDateFormat.format(calendar.getTime());
+//            Calendar calendar = Calendar.getInstance();
+//            String[] monthInfo = month.split("-");
+//            calendar.set(Calendar.YEAR,Integer.parseInt(monthInfo[0]));
+//            calendar.set(Calendar.MONTH,(Integer.parseInt(monthInfo[1]) -1));
+//            calendar.set(Calendar.DAY_OF_MONTH,1);
+//
+//
+//            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//
+//            String startTime = simpleDateFormat.format(calendar.getTime());
+//
+//            calendar.add(Calendar.MONTH,1);//加1个月
+//            calendar.add(Calendar.DAY_OF_MONTH,-1);//减1天
+//            String endTime  = simpleDateFormat.format(calendar.getTime());
 
 
             int pageSize = 10000;
 
-            PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfo = customerAppraisalService.queryDriverAppraisalDetailV2(carBizCustomerAppraisalStatisticsDTO,1
-            ,  pageSize,  startTime,  endTime);
+
+//            PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfo = customerAppraisalService.queryDriverAppraisalDetail(carBizCustomerAppraisalStatisticsDTO,1
+//            ,  pageSize,  startTime,  endTime);
+
+            PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfo = customerAppraisalService.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO,1
+                    ,  pageSize  );
             list.addAll(pageInfo.getList());
 
             int pages = pageInfo.getPages();
             //循环加载其他页数据
             for(int i = 2 ;i < pages ; i++){
-                pageInfo = customerAppraisalService.queryDriverAppraisalDetailV2(carBizCustomerAppraisalStatisticsDTO,i
-                        ,  pageSize,  startTime,  endTime);
+//                pageInfo = customerAppraisalService.queryDriverAppraisalDetailV2(carBizCustomerAppraisalStatisticsDTO,i
+//                        ,  pageSize,  startTime,  endTime);
+                pageInfo = customerAppraisalService.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO,i
+                        ,  pageSize  );
                 list.addAll(pageInfo.getList());
             }
         }
