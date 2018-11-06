@@ -7,6 +7,7 @@ import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalDTO;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalExtDTO;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
+import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.request.DutyParamRequest;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import mapper.rentcar.ex.CarBizCustomerAppraisalExMapper;
@@ -165,16 +166,16 @@ public class CustomerAppraisalService {
         dutyParamRequest.setDriverIds(driverIds);
         dutyParamRequest.setDriverId(carBizCustomerAppraisalDTO.getDriverId());
 
-        List<CarDriverInfoDTO> carDriverInfoDTOList = carBizDriverInfoExMapper.queryCarBizDriverList(dutyParamRequest);
+        List<CarBizDriverInfoDTO> carDriverInfoDTOList = carBizDriverInfoExMapper.queryCarBizDriverList(dutyParamRequest);
         if(carDriverInfoDTOList == null){
             log.info("查询评价信息，查询结果为空。参数为："+ JSON.toJSONString(dutyParamRequest));
             return null;
         }
         //再根据司机id、评价开始时间、结束时间 查询评分信息
         Set<Integer> driverIdSet = new HashSet<>();
-        Map<String,CarDriverInfoDTO> cacheCarDriverInfoDTO = new HashMap<>();
-        for(CarDriverInfoDTO item : carDriverInfoDTOList){
-            driverIdSet.add(Integer.parseInt(item.getDriverId()));
+        Map<String,CarBizDriverInfoDTO> cacheCarDriverInfoDTO = new HashMap<>();
+        for(CarBizDriverInfoDTO item : carDriverInfoDTOList){
+            driverIdSet.add(item.getDriverId());
             cacheCarDriverInfoDTO.put("d_"+item.getDriverId(),item);
         }
 
@@ -188,7 +189,7 @@ public class CustomerAppraisalService {
         PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfo = new PageInfo<>(list);
         if(list.size() > 0){
             //遍历赋值，司机姓名
-            CarDriverInfoDTO temp = null;
+            CarBizDriverInfoDTO temp = null;
             for(CarBizCustomerAppraisalStatisticsDTO item : list){
                 temp = cacheCarDriverInfoDTO.get("d_"+item.getDriverId());
                 if(temp != null){
@@ -198,9 +199,6 @@ public class CustomerAppraisalService {
                 }
             }
         }
-
-
         return  pageInfo;
-        //return carBizCustomerAppraisalExMapper.queryDriverAppraisalDetail(carBizCustomerAppraisalDTO);
     }
 }
