@@ -243,7 +243,7 @@ public class CustomerAppraisalController {
             carBizCustomerAppraisalStatisticsDTO.setTeamIds(permOfTeam);
             carBizCustomerAppraisalStatisticsDTO.setDriverIds(driverIds);
 
-            int pageSize = 50;
+            int pageSize = 200;
 
             PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfo = customerAppraisalService.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO,1
                     ,  pageSize  );
