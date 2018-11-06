@@ -17,6 +17,7 @@ import com.zhuanche.dto.rentcar.DriverDutyStatisticDTO;
 import com.zhuanche.serv.CustomerAppraisalService;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.threads.CustomerAppraisalExportHelper;
 import com.zhuanche.util.excel.CsvUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -35,6 +36,7 @@ import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 @Controller
 @RequestMapping("/customerAppraisal")
@@ -214,7 +216,7 @@ public class CustomerAppraisalController {
         Set<Integer> permOfSupplier    = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); //普通管理员可以管理的所有供应商ID
         Set<Integer> permOfTeam        = WebSessionUtil.getCurrentLoginUser().getTeamIds(); //普通管理员可以管理的所有车队ID
 
-        List<CarBizCustomerAppraisalStatisticsDTO> list =  Lists.newArrayList();
+        Vector<CarBizCustomerAppraisalStatisticsDTO> list =  new Vector();
         Set<Integer> driverIds = null;
         Boolean had = false;
         if(teamGroupId!=null || teamId!=null || (permOfTeam!=null && permOfTeam.size()>0)){
@@ -223,7 +225,7 @@ public class CustomerAppraisalController {
         }
         if(had && (driverIds==null || driverIds.size()==0)){
             logger.info(LOGTAG + "查询teamId={},teamGroupId={},permOfTeam={}没有司机评分信息", teamId, teamGroupId, permOfTeam);
-            list =  Lists.newArrayList();
+            list =   new Vector();
         }else {
 
             CarBizCustomerAppraisalStatisticsDTO carBizCustomerAppraisalStatisticsDTO = new CarBizCustomerAppraisalStatisticsDTO();
@@ -233,53 +235,44 @@ public class CustomerAppraisalController {
             carBizCustomerAppraisalStatisticsDTO.setCityId(cityId);
             carBizCustomerAppraisalStatisticsDTO.setSupplierId(supplierId);
 
-//            if(StringUtils.isEmpty(name) && StringUtils.isEmpty(phone)){
-//                if(cityId == null && supplierId == null){
-//                    logger.info("导出司机评价，供应商必选，参数为"+ JSON.toJSONString(carBizCustomerAppraisalStatisticsDTO));
-//                    return "供应商必选";
-//                }
-//            }
-
             //数据权限
             carBizCustomerAppraisalStatisticsDTO.setCityIds(permOfCity);
             carBizCustomerAppraisalStatisticsDTO.setSupplierIds(permOfSupplier);
             carBizCustomerAppraisalStatisticsDTO.setTeamIds(permOfTeam);
             carBizCustomerAppraisalStatisticsDTO.setDriverIds(driverIds);
 
-//            Calendar calendar = Calendar.getInstance();
-//            String[] monthInfo = month.split("-");
-//            calendar.set(Calendar.YEAR,Integer.parseInt(monthInfo[0]));
-//            calendar.set(Calendar.MONTH,(Integer.parseInt(monthInfo[1]) -1));
-//            calendar.set(Calendar.DAY_OF_MONTH,1);
-//
-//
-//            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//
-//            String startTime = simpleDateFormat.format(calendar.getTime());
-//
-//            calendar.add(Calendar.MONTH,1);//加1个月
-//            calendar.add(Calendar.DAY_OF_MONTH,-1);//减1天
-//            String endTime  = simpleDateFormat.format(calendar.getTime());
-
-
-            int pageSize = 10000;
-
-
-//            PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfo = customerAppraisalService.queryDriverAppraisalDetail(carBizCustomerAppraisalStatisticsDTO,1
-//            ,  pageSize,  startTime,  endTime);
+            int pageSize = 50;
 
             PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfo = customerAppraisalService.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO,1
                     ,  pageSize  );
             list.addAll(pageInfo.getList());
 
             int pages = pageInfo.getPages();
-            //循环加载其他页数据
-            for(int i = 2 ;i < pages ; i++){
-//                pageInfo = customerAppraisalService.queryDriverAppraisalDetailV2(carBizCustomerAppraisalStatisticsDTO,i
-//                        ,  pageSize,  startTime,  endTime);
-                pageInfo = customerAppraisalService.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO,i
-                        ,  pageSize  );
-                list.addAll(pageInfo.getList());
+
+            Hashtable<String,PageInfo<CarBizCustomerAppraisalStatisticsDTO> > hashtable = new Hashtable<>();
+
+            if(pages >= 2){
+                CountDownLatch endGate = new CountDownLatch(pages-1);
+                //循环加载其他页数据
+                for(int i = 2 ;i <= pages ; i++){
+                    CustomerAppraisalExportHelper
+                             helper = new CustomerAppraisalExportHelper(customerAppraisalService,i,pageSize,hashtable,carBizCustomerAppraisalStatisticsDTO,endGate);
+                    helper.start();
+                }
+                try {
+                    logger.info("所有的线程在等待中。。。"+JSON.toJSONString(carBizCustomerAppraisalStatisticsDTO));
+                    //主线程阻塞,等待其他所有 worker 线程完成后再执行
+                    endGate.await();
+                } catch (InterruptedException e) {
+                   logger.error("所有的线程在等待中。。异常，"+JSON.toJSONString(carBizCustomerAppraisalStatisticsDTO),e);
+                }
+                for(int i = 2 ;i <= pages ; i++){
+                    PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfoX = hashtable.get("page_"+i);
+                    if(pageInfoX != null){
+                        list.addAll(pageInfoX.getList());
+                    }
+                }
+
             }
         }
         try {
