@@ -46,6 +46,9 @@
   <!-- mapper基础标准: 当前表所有字段查询条件集 -->
   <sql id="allBaseColumnWhereList" >
     <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR" >
+      <if test="driverId !=null and driverId !=''">
+        AND driver_id = #{driverId}
+      </if>
       <if test="driverName !=null and driverName !=''">
         AND driver_name = #{driverName}
       </if>
