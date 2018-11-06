@@ -202,7 +202,7 @@ public class CustomerAppraisalController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
-    public void queryCustomerAppraisalStatisticsList(String name, String phone, Integer cityId, Integer supplierId,
+    public String queryCustomerAppraisalStatisticsList(String name, String phone, Integer cityId, Integer supplierId,
                                                      Integer teamId, Integer teamGroupId,
                                                      @Verify(param = "month", rule = "required") String month,
                                                      HttpServletRequest request, HttpServletResponse response) {
@@ -249,7 +249,7 @@ public class CustomerAppraisalController {
 
             } catch (ParseException e) {
               logger.error("导出司机评分异常，参数month="+month,e);
-                return ;
+                return "";
             }
             int pageSize = 10000;
 
@@ -289,6 +289,7 @@ public class CustomerAppraisalController {
             logger.error("司机信息列表查询导出error",e);
 
         }
+        return null;
     }
     private void dataTrans(List<CarBizCustomerAppraisalStatisticsDTO> list, List<String>  csvDataList ){
         if(null == list){
