@@ -1528,8 +1528,8 @@
           #{cid}
         </foreach>
       </if>
-      <if test="cityId!=null and cityId != 0">
-        and i.service_city  = #{cityId}
+      <if test="serviceCity!=null and serviceCity != 0">
+        and i.service_city  = #{serviceCity}
       </if>
       <if test="supplierIds!=null and supplierIds.size()>0">
         and i.supplier_id IN
