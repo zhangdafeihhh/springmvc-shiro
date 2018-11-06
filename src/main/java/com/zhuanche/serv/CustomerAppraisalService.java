@@ -38,7 +38,7 @@ public class CustomerAppraisalService {
 
     @Autowired
     private CarDriverTeamService carDriverTeamService;
-
+    @Autowired
     private CarBizDriverInfoExMapper carBizDriverInfoExMapper;
 
     /**
