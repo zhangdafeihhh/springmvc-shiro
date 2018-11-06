@@ -291,7 +291,7 @@
        </foreach>
      </if>
      <if test="supplierId != null" >
-       and  d.supplierId = #{supplierId,jdbcType=INTEGER}
+       and  d.supplier_id = #{supplierId,jdbcType=INTEGER}
      </if>
      <if test="teamIds!=null and teamIds.size()>0">
        and d.team_id IN
