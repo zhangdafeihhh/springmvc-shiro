@@ -144,8 +144,10 @@ public class DriverSchController {
             if(pages >= 2) {
                 CountDownLatch endGate = new CountDownLatch(pages - 1);
                 for(int pageNumber = 2; pageNumber <= pages; pageNumber++){
-                    param.setPageNo(pageNumber);
-                    new DriverDayhDutyExportHelper(carDriverDutyService,hashtable,param,endGate).start();
+                    DutyParamRequest newparam  = new  DutyParamRequest();
+                    BeanUtils.copyProperties(param,newparam);
+                    newparam.setPageNo(pageNumber);
+                    new DriverDayhDutyExportHelper(carDriverDutyService,hashtable,newparam,endGate).start();
                 }
                 try {
                     logger.info("多线程分页查询司机司机排班信息,所有的线程在等待中。。。"+JSON.toJSONString(param));
