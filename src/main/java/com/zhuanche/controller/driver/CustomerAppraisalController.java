@@ -230,6 +230,12 @@ public class CustomerAppraisalController {
             list =   new Vector();
         }else {
 
+            if(StringUtils.isEmpty(phone)  && StringUtils.isEmpty(name)){
+                if(cityId == null  || cityId <= 0){
+                    logger.info(LOGTAG + "查询参数错误，城市必填");
+                    return "查询参数错误，城市必填";
+                }
+            }
             CarBizCustomerAppraisalStatisticsDTO carBizCustomerAppraisalStatisticsDTO = new CarBizCustomerAppraisalStatisticsDTO();
             carBizCustomerAppraisalStatisticsDTO.setDriverName(name);
             carBizCustomerAppraisalStatisticsDTO.setDriverPhone(phone);
