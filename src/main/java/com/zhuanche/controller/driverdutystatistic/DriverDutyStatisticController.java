@@ -289,8 +289,6 @@ public class DriverDutyStatisticController extends DriverQueryController{
 				headerList.add("司机姓名,手机号,车牌号,班制之内上班上线时_有效,强制上班内上班上线时长_有效,加班时长,班制内上班上线时长,强制上班内上班上线时长,城市,早高峰在线时长,晚高峰在线时长,其他时段1在线时长,其他时段2在线时长");
 			}
 
-
-
 			if(rows == null){
 				rows = new ArrayList<>();
 			}

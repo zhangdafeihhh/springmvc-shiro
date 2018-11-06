@@ -299,47 +299,6 @@ public class OrderAppraisalController extends DriverQueryController{
 		return params;
 	}
 
-//	public Workbook exportExcel(List<CarBizCustomerAppraisal> list, String path) throws Exception{
-//		FileInputStream io = new FileInputStream(path);
-//		Workbook wb = new XSSFWorkbook(io);
-//		if(list != null && list.size()>0){
-//			Sheet sheet = wb.getSheetAt(0);
-//			Cell cell = null;
-//			int i=0;
-//			for(CarBizCustomerAppraisal s:list){
-//				Row row = sheet.createRow(i + 1);
-//
-//				cell = row.createCell(0);
-//				cell.setCellValue(s.getDriverName());
-//
-//				cell = row.createCell(1);
-//				cell.setCellValue(s.getDriverPhone());
-//
-//				cell = row.createCell(2);
-//				cell.setCellValue(s.getLicensePlates());
-//
-//				cell = row.createCell(3);
-//				cell.setCellValue(s.getOrderNo());
-//
-//				cell = row.createCell(4);
-//				cell.setCellValue(s.getEvaluateScore());
-//
-//				cell = row.createCell(5);
-//				cell.setCellValue(s.getEvaluate());
-//
-//				cell = row.createCell(6);
-//				cell.setCellValue(s.getMemo());
-//
-//				cell = row.createCell(7);
-//				cell.setCellValue(DateUtils.formatDateTime_CN(s.getCreateDate()));
-//
-//				i++;
-//			}
-//		}
-//		return wb;
-//	}
-
-
 	@ResponseBody
 	@RequestMapping("/orderAppraisalListFromDriverOutageData")
 	@MasterSlaveConfigs(configs = {
