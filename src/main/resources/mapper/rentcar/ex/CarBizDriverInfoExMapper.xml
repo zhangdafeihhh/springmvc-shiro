@@ -1543,7 +1543,7 @@
       <if test="supplierId != null" >
         and  i.supplier_id = #{supplierId,jdbcType=INTEGER}
       </if>
-      <if test="driverName!=null and driverName!=''">
+      <if test="name!=null and name!=''">
         and i.name  = #{driverName}
       </if>
 
