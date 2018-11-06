@@ -178,6 +178,9 @@ public final class RestErrorCode{
     public static final int TEAMID_OR_DRIVERID_ISNULL = 5201;
     @ResultMessage("文件导出失败")
     public static final int FILE_EXPORT_FAIL = 5202;
+
+	@ResultMessage("存在未审核的申请记录")
+	public static final int UPDATE_APPLY_EXIST = 8001;
 	//---------------------------------------------------------------------------------------------------------------------------------------------
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系

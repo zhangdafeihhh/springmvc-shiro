@@ -169,6 +169,17 @@ public class DriverInfoUpdateApplyController {
         if(carBizDriverInfo==null){
             return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
         }
+
+        //是否存在已提交未审核的记录
+        DriverInfoUpdateApplyDTO driverInfoUpdateApplyDTO = new DriverInfoUpdateApplyDTO();
+        driverInfoUpdateApplyDTO.setDriverId(driverId);
+        driverInfoUpdateApplyDTO.setStatus(1);//已提交
+        driverInfoUpdateApplyDTO.setType(1);//业务类型(1-司机修改,2-车辆修改)
+        List<DriverInfoUpdateApplyDTO> driverInfoUpdateApplyDTOS = driverInfoUpdateService.queryDriverInfoUpdateList(driverInfoUpdateApplyDTO);
+        if(driverInfoUpdateApplyDTOS==null || driverInfoUpdateApplyDTOS.size()==0){
+            return AjaxResponse.fail(RestErrorCode.UPDATE_APPLY_EXIST);
+        }
+
         CarBizDriverInfoDTO carBizDriverInfoDTO = BeanUtil.copyObject(carBizDriverInfo, CarBizDriverInfoDTO.class);
         carBizDriverInfoDTO = carBizDriverInfoService.getBaseStatis(carBizDriverInfoDTO);
 
@@ -233,6 +244,15 @@ public class DriverInfoUpdateApplyController {
         if(carBizCarInfoDTO==null){
             return AjaxResponse.fail(RestErrorCode.BUS_NOT_EXIST);
         }
+        //是否存在已提交未审核的记录
+        DriverInfoUpdateApplyDTO driverInfoUpdateApplyDTO = new DriverInfoUpdateApplyDTO();
+        driverInfoUpdateApplyDTO.setLicensePlates(licensePlates);
+        driverInfoUpdateApplyDTO.setStatus(1);//已提交
+        driverInfoUpdateApplyDTO.setType(2);//业务类型(1-司机修改,2-车辆修改)
+        List<DriverInfoUpdateApplyDTO> driverInfoUpdateApplyDTOS = driverInfoUpdateService.queryDriverInfoUpdateList(driverInfoUpdateApplyDTO);
+        if(driverInfoUpdateApplyDTOS==null || driverInfoUpdateApplyDTOS.size()==0){
+            return AjaxResponse.fail(RestErrorCode.UPDATE_APPLY_EXIST);
+        }
         DriverInfoUpdateApply driverInfoUpdateApply = new DriverInfoUpdateApply();
         driverInfoUpdateApply.setLicensePlates(licensePlates);
         driverInfoUpdateApply.setCarPurchaseDate(carBizCarInfoDTO.getCarPurchaseDate());
@@ -244,7 +264,16 @@ public class DriverInfoUpdateApplyController {
         driverInfoUpdateApply.setSupplierName(carBizCarInfoDTO.getSupplierName());
 
         //老司机信息
-        if(carBizCarInfoDTO.getDriverId()!=null && carBizCarInfoDTO.getDriverId()!=0){
+        List<CarBizDriverInfoDTO> carBizDriverInfoDTOS = carBizDriverInfoService.queryDriverByLicensePlates(licensePlates);
+        if(carBizDriverInfoDTOS!=null && carBizDriverInfoDTOS.size()>0){
+            CarBizDriverInfoDTO carBizDriverInfo = carBizDriverInfoDTOS.get(0);
+            //存在，加入
+            driverInfoUpdateApply.setDriverId(carBizDriverInfo.getDriverId());
+            driverInfoUpdateApply.setDriverName(carBizDriverInfo.getName());
+            driverInfoUpdateApply.setDriverPhone(carBizDriverInfo.getPhone());
+            driverInfoUpdateApply.setIdCardNo(carBizDriverInfo.getIdCardNo());
+        }
+        /*if(carBizCarInfoDTO.getDriverId()!=null && carBizCarInfoDTO.getDriverId()!=0){
             CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(carBizCarInfoDTO.getDriverId());
             if(carBizDriverInfo==null){
                 return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
@@ -254,7 +283,7 @@ public class DriverInfoUpdateApplyController {
             driverInfoUpdateApply.setDriverName(carBizDriverInfo.getName());
             driverInfoUpdateApply.setDriverPhone(carBizDriverInfo.getPhone());
             driverInfoUpdateApply.setIdCardNo(carBizDriverInfo.getIdCardNo());
-        }
+        }*/
         if(carBizCarInfoDTO.getCarModelId()!=null){
             CarBizModel carBizModel = carBizModelService.selectByPrimaryKey(carBizCarInfoDTO.getCarModelId());
             if(carBizModel==null){

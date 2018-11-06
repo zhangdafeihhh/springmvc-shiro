@@ -1502,7 +1502,7 @@
 
   <select id="queryDriverByLicensePlates" parameterType="java.lang.String" resultMap="BaseResultMap">
     SELECT
-      driver_id,phone,name,supplier_id,license_plates,service_city
+      driver_id,phone,name,supplier_id,license_plates,service_city,id_card_no
     FROM
       car_biz_driver_info
     where license_plates = #{license_plates}
