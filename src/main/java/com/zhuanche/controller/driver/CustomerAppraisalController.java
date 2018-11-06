@@ -264,15 +264,21 @@ public class CustomerAppraisalController {
 
             int pageSize = 10000;
 
-            PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfo = customerAppraisalService.queryDriverAppraisalDetailV2(carBizCustomerAppraisalStatisticsDTO,1
-            ,  pageSize,  startTime,  endTime);
+
+//            PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfo = customerAppraisalService.queryDriverAppraisalDetail(carBizCustomerAppraisalStatisticsDTO,1
+//            ,  pageSize,  startTime,  endTime);
+
+            PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfo = customerAppraisalService.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO,1
+                    ,  pageSize  );
             list.addAll(pageInfo.getList());
 
             int pages = pageInfo.getPages();
             //循环加载其他页数据
             for(int i = 2 ;i < pages ; i++){
-                pageInfo = customerAppraisalService.queryDriverAppraisalDetailV2(carBizCustomerAppraisalStatisticsDTO,i
-                        ,  pageSize,  startTime,  endTime);
+//                pageInfo = customerAppraisalService.queryDriverAppraisalDetailV2(carBizCustomerAppraisalStatisticsDTO,i
+//                        ,  pageSize,  startTime,  endTime);
+                pageInfo = customerAppraisalService.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO,i
+                        ,  pageSize  );
                 list.addAll(pageInfo.getList());
             }
         }
