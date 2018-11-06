@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -268,8 +269,10 @@ public class CustomerAppraisalController {
                 CountDownLatch endGate = new CountDownLatch(pages-1);
                 //循环加载其他页数据
                 for(int i = 2 ;i <= pages ; i++){
+                    CarBizCustomerAppraisalStatisticsDTO carBizCustomerAppraisalStatisticsDTOThread = new CarBizCustomerAppraisalStatisticsDTO();
+                    BeanUtils.copyProperties(carBizCustomerAppraisalStatisticsDTO,carBizCustomerAppraisalStatisticsDTOThread);
                     CustomerAppraisalExportHelper
-                             helper = new CustomerAppraisalExportHelper(customerAppraisalService,i,pageSize,hashtable,carBizCustomerAppraisalStatisticsDTO,endGate);
+                             helper = new CustomerAppraisalExportHelper(customerAppraisalService,i,pageSize,hashtable,carBizCustomerAppraisalStatisticsDTOThread,endGate);
                     helper.start();
                 }
                 try {
