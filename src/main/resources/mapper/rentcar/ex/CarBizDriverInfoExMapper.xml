@@ -1538,7 +1538,7 @@
         </foreach>
       </if>
       <if test="supplierId != null" >
-        i.supplier_id = #{supplierId,jdbcType=INTEGER},
+        and  i.supplier_id = #{supplierId,jdbcType=INTEGER},
       </if>
       <if test="driverName!=null and driverName!=''">
         and i.name LIKE CONCAT(#{driverName},'%')
