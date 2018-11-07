@@ -178,19 +178,32 @@ public class DriverIntegraController {
 //				logger.info("调用策略平台批量查询积分-driverId："+driverId+";driverIntegraInfo="+(driverIntegraInfo==null?"null":driverIntegraInfo.toJSONString()));
                     if(driverIntegraInfo != null){
                         //设置司机当月积分
-                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("monthIntegral"))) {
+                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("monthIntegral")) && !("null".equals(driverIntegraInfo.getString("monthIntegral")))) {
+                            try{
                             temp = new BigDecimal(driverIntegraInfo.getString("monthIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
                             driverVoEntity.setMonthIntegral(temp.toString());
+                            }catch (Exception e){
+
+                            }
                         }
                         //设置司机当日积分
-                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("todayIntegral"))) {
-                            temp = new BigDecimal(driverIntegraInfo.getString("todayIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
-                            driverVoEntity.setDayIntegral(temp.toString());
+                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("todayIntegral")) && !("null".equals(driverIntegraInfo.getString("todayIntegral")))) {
+                            try{
+                                temp = new BigDecimal(driverIntegraInfo.getString("todayIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
+                                driverVoEntity.setDayIntegral(temp.toString());
+                            }catch (Exception e){
+
+                            }
+
                         }
                         //设置司机司机等级
-                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("membershipName"))){
+                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("membershipName"))  && !("null".equals(driverIntegraInfo.getString("membershipName")))){
+                            try{
                             temp = new BigDecimal(driverIntegraInfo.getString("membershipName")).setScale(3,BigDecimal.ROUND_HALF_UP);
                             driverVoEntity.setMembershipName(temp.toString());
+                            }catch (Exception e){
+
+                            }
                         }
 
                     }
@@ -391,19 +404,32 @@ public class DriverIntegraController {
 //				logger.info("调用策略平台批量查询积分-driverId："+driverId+";driverIntegraInfo="+(driverIntegraInfo==null?"null":driverIntegraInfo.toJSONString()));
                     if(driverIntegraInfo != null){
                         //设置司机当月积分
-                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("monthIntegral"))) {
-                            temp = new BigDecimal(driverIntegraInfo.getString("monthIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
-                            driverVoEntity.setMonthIntegral(temp.toString());
+                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("monthIntegral")) && !("null".equals(driverIntegraInfo.getString("monthIntegral")))) {
+                            try{
+                                temp = new BigDecimal(driverIntegraInfo.getString("monthIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
+                                driverVoEntity.setMonthIntegral(temp.toString());
+                            }catch (Exception e){
+
+                            }
                         }
                         //设置司机当日积分
-                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("todayIntegral"))) {
-                            temp = new BigDecimal(driverIntegraInfo.getString("todayIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
-                            driverVoEntity.setDayIntegral(temp.toString());
+                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("todayIntegral")) && !("null".equals(driverIntegraInfo.getString("todayIntegral")))) {
+                            try{
+                                temp = new BigDecimal(driverIntegraInfo.getString("todayIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
+                                driverVoEntity.setDayIntegral(temp.toString());
+                            }catch (Exception e){
+
+                            }
+
                         }
                         //设置司机司机等级
-                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("membershipName"))){
-                            temp = new BigDecimal(driverIntegraInfo.getString("membershipName")).setScale(3,BigDecimal.ROUND_HALF_UP);
-                            driverVoEntity.setMembershipName(temp.toString());
+                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("membershipName"))  && !("null".equals(driverIntegraInfo.getString("membershipName")))){
+                            try{
+                                temp = new BigDecimal(driverIntegraInfo.getString("membershipName")).setScale(3,BigDecimal.ROUND_HALF_UP);
+                                driverVoEntity.setMembershipName(temp.toString());
+                            }catch (Exception e){
+
+                            }
                         }
                     }
                 }
