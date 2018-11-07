@@ -1,9 +1,14 @@
 package com.zhuanche.controller;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +26,6 @@ import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
-import com.zhuanche.dto.rentcar.CarFactOrderInfoDTO;
 import com.zhuanche.dto.rentcar.ServiceTypeDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
@@ -37,7 +41,6 @@ import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
-import com.zhuanche.util.Common;
 
 /**
   * @description: 多级联动查询
@@ -79,72 +82,67 @@ public class CommonController {
 	private CarFactOrderInfoService carFactOrderInfoService;
     /**
     * @Desc:  获取城市列表
-    * @param:
-    * @return:
     * @Author: lunan
     * @Date: 2018/9/3
     */
     @RequestMapping("/citys")
     @ResponseBody
     public AjaxResponse getCities(){
-        SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
-        if(Check.NuNObj(currentLoginUser)){
-            return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST);
-        }
-        try{
-            List<CarBizCity> carBizCities = citySupplierTeamCommonService.queryCityList();
-            return AjaxResponse.success(carBizCities);
-        }catch (Exception e){
-            logger.error("查询城市列表异常:{}",e);
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-        }
+        List<CarBizCity> carBizCities = citySupplierTeamCommonService.queryCityList();
+        return AjaxResponse.success(carBizCities);
     }
 
     /**
     * @Desc: 查询城市供应列表
-    * @param:
-    * @return:
     * @Author: lunan
     * @Date: 2018/9/3
     */
     @RequestMapping("/suppliers")
     @ResponseBody
-    public AjaxResponse getSuppliers(@Verify(param = "cityId", rule = "required") Integer cityId){
-        SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
-        if(Check.NuNObj(currentLoginUser)){
-            return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST);
-        }
-        try{
-            List<CarBizSupplier> carBizSuppliers = citySupplierTeamCommonService.querySupplierList(cityId);
-            return AjaxResponse.success(carBizSuppliers);
-        }catch (Exception e){
-            logger.error("查询城市供应商列表异常:{}",e);
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-        }
+    public AjaxResponse getSuppliers(
+		@Verify(param = "cityId", rule = "required") Integer cityId,  String cityIds ){
+    	
+    	Set<Integer> cityIdset = new HashSet<Integer>();
+    	cityIdset.add(cityId);
+    	if(StringUtils.isNotEmpty(cityIds)) {//当传入多个cityid时
+    		Set<Integer> cityids = Stream.of(cityIds.split(",")).mapToInt( s -> {
+    			if(StringUtils.isNotEmpty(s)) {
+        			return Integer.valueOf(s); 
+    			}else {
+        			return -1; 
+    			}
+			}).boxed().collect(Collectors.toSet());
+    		cityIdset.addAll(cityids);
+    	}
+    	
+        List<CarBizSupplier> carBizSuppliers = citySupplierTeamCommonService.querySupplierList( cityIdset );
+        return AjaxResponse.success(carBizSuppliers);
     }
 
     /**
      * @Desc: 查询车队列表
-     * @param:
-     * @return:
      * @Author: lunan
      * @Date: 2018/9/3
      */
     @RequestMapping("/teams")
     @ResponseBody
     public AjaxResponse getTeams(Integer cityId
-                ,@Verify(param = "supplierId", rule = "required") Integer supplierId){
-        SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
-        if(Check.NuNObj(currentLoginUser)){
-            return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST);
-        }
-        try{
-            List<CarDriverTeam> carDriverTeams = citySupplierTeamCommonService.queryDriverTeamList(cityId, supplierId);
-            return AjaxResponse.success(carDriverTeams);
-        }catch (Exception e){
-            logger.error("查询城市供应商车队列表异常:{}",e);
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-        }
+      ,@Verify(param = "supplierId", rule = "required") Integer supplierId,  String supplierIds ){
+    	//城市ID
+    	Set<String> cityIdset = new HashSet<String>();
+    	if(cityId!=null && cityId.intValue()>0) {
+        	cityIdset.add(cityId.toString());
+    	}
+    	//供应商ID
+    	Set<String> supplieridSet = new HashSet<String>();
+    	supplieridSet.add(supplierId.toString());
+    	if(StringUtils.isNotEmpty(supplierIds)) {//当传入多个supplierId时
+    		Set<String> supplierids = Stream.of(supplierIds.split(",")).collect(Collectors.toSet());
+    		supplieridSet.addAll(supplierids);
+    	}
+    	
+        List<CarDriverTeam> carDriverTeams = citySupplierTeamCommonService.queryDriverTeamList(cityIdset, supplieridSet);
+        return AjaxResponse.success(carDriverTeams);
     }
 
     /**

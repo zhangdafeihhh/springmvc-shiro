@@ -264,21 +264,19 @@ public class CitySupplierTeamCommonService {
 //            Set<Integer> permOfcityids = dataPermissionHelper.havePermOfCityIds("");
             Set<Integer> cityIds = WebSessionUtil.getCurrentLoginUser().getCityIds();
             if(cityIds.size()==0) {
-                carBizCityExMapper.queryByIds(null);
+                return carBizCityExMapper.queryByIds(null);
             }
             return carBizCityExMapper.queryByIds(cityIds);
         }
     }
 
     /**
-     * @Desc: 根据一个城市ID，查询供应商列表（超级管理员可以查询出所有供应商、普通管理员只能查询自己数据权限内的供应商）
-     * @param:
-     * @return:
+     * @Desc: 根据城市ID，查询供应商列表（超级管理员可以查询出所有供应商、普通管理员只能查询自己数据权限内的供应商）
      * @Author: lunan
      * @Date: 2018/8/29
      */
-    public List<CarBizSupplier> querySupplierList(Integer cityId ){
-        if(cityId==null || cityId.intValue()<=0) {
+    public List<CarBizSupplier> querySupplierList( Set<Integer> cityIds ){
+        if(cityIds==null || cityIds.size()==0) {
             return new ArrayList<CarBizSupplier>();
         }
         //对城市ID进行校验数据权限
@@ -294,14 +292,14 @@ public class CitySupplierTeamCommonService {
         }*/
         //进行查询 (区分 超级管理员 、普通管理员 )
         if( WebSessionUtil.isSupperAdmin() ) {
-            return carBizSupplierExMapper.querySuppliers(cityId, null);
+            return carBizSupplierExMapper.querySuppliers(cityIds, null);
         }else {
 //            Set<Integer> permOfsupplierIds = dataPermissionHelper.havePermOfSupplierIds("");
             Set<Integer> supplierIds = WebSessionUtil.getCurrentLoginUser().getSupplierIds();
             if(supplierIds.size()==0 ) {
-                carBizSupplierExMapper.querySuppliers(cityId, null);
+                return carBizSupplierExMapper.querySuppliers(cityIds, null);
             }
-            return carBizSupplierExMapper.querySuppliers(cityId, supplierIds);
+            return carBizSupplierExMapper.querySuppliers(cityIds, supplierIds);
         }
     }
 
@@ -312,17 +310,7 @@ public class CitySupplierTeamCommonService {
      * @Author: lunan
      * @Date: 2018/8/29
      */
-    public List<CarDriverTeam> queryDriverTeamList(Integer cityId, Integer supplierId){
-
-        if(Check.NuNObj(cityId) && !Check.NuNObj(supplierId)){
-            Set<String> supplierIds = new HashSet<String>(2);
-            supplierIds.add(String.valueOf(supplierId));
-            return carDriverTeamExMapper.queryDriverTeam(null, supplierIds, null);
-        }
-
-        if(cityId==null || cityId.intValue()<=0 || supplierId==null || supplierId.intValue()<=0) {
-            return new ArrayList<CarDriverTeam>();
-        }
+    public List<CarDriverTeam> queryDriverTeamList(  Set<String> cityIds, Set<String> supplierIds ){
         //对城市ID、供应商ID 进行校验数据权限
         /*if(WebSessionUtil.isSupperAdmin()==false ) {
             Set<Integer> cityIds = WebSessionUtil.getCurrentLoginUser().getCityIds();
@@ -339,10 +327,6 @@ public class CitySupplierTeamCommonService {
             }
         }*/
         //进行查询 (区分 超级管理员 、普通管理员 )
-        Set<String> cityIds = new HashSet<String>(2);
-        cityIds.add(String.valueOf(cityId));
-        Set<String> supplierIds = new HashSet<String>(2);
-        supplierIds.add(String.valueOf(supplierId));
         if( WebSessionUtil.isSupperAdmin() ) {
             return carDriverTeamExMapper.queryDriverTeam(cityIds, supplierIds, null);
         }else {
