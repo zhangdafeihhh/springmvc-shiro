@@ -244,23 +244,20 @@ public class OrderController{
 			 // 从订单组取统计数据
 			 responseX = carFactOrderInfoService.queryOrderDataList(paramMap);
 			 code = responseX.getCode();
-			 logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code);
 			 if(code == 0){
 			 	JSONObject jsonObject = (JSONObject) responseX.getData();
 				 List<CarFactOrderInfoDTO> dtoList  = (List<CarFactOrderInfoDTO>) jsonObject.get("data");
 				 if(dtoList != null && dtoList.size() >=1){
+					 logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code+";总条数为："+jsonObject.get("total")+"，当前页返回结果条数为："+dtoList.size());
 					 result.addAll( dtoList );
 				 }else{
+					 logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code+";总条数为："+jsonObject.get("total")+"，当前页返回结果条数为："+ (dtoList==null?"null":dtoList.size()));
 					 break;
 				 }
 			 }else{
+				 logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code);
 				 break;
 			 }
-		    //List<CarFactOrderInfoDTO> dtoList = carFactOrderInfoService.queryOrderDataList(paramMap);
-//			if(dtoList==null || dtoList.size()==0) {
-//				break;
-//			}
-//			result.addAll( dtoList );
 		}
 		
 
