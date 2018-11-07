@@ -248,7 +248,7 @@ public class OrderController{
 			 if(code == 0){
 			 	JSONObject jsonObject = (JSONObject) responseX.getData();
 				 List<CarFactOrderInfoDTO> dtoList  = (List<CarFactOrderInfoDTO>) jsonObject.get("data");
-				 if(dtoList != null && dtoList.size() >=0){
+				 if(dtoList != null && dtoList.size() >=1){
 					 result.addAll( dtoList );
 				 }else{
 					 break;
