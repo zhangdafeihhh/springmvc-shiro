@@ -128,7 +128,7 @@
 	    #{tid}
 	    </foreach>
     </if>
-	order by CITY, id
+	order by city, supplier, id
   </select>
 
     <select id="queryTeamNameAndGroupNameByDriverId" parameterType="java.lang.Integer" resultType="java.util.Map">
