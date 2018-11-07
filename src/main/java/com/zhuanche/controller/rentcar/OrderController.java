@@ -248,11 +248,13 @@ public class OrderController{
 			 if(code == 0){
 			 	JSONObject jsonObject = (JSONObject) responseX.getData();
 				 List<CarFactOrderInfoDTO> dtoList  = (List<CarFactOrderInfoDTO>) jsonObject.get("data");
-				 if(dtoList != null){
+				 if(dtoList != null && dtoList.size() >=0){
 					 result.addAll( dtoList );
 				 }else{
 					 break;
 				 }
+			 }else{
+				 break;
 			 }
 		    //List<CarFactOrderInfoDTO> dtoList = carFactOrderInfoService.queryOrderDataList(paramMap);
 //			if(dtoList==null || dtoList.size()==0) {
