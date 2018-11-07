@@ -40,8 +40,11 @@
     ,<include refid="Blob_Column_List" />
     from car_biz_supplier
     where status=1
-    <if test="cityId!=null and  cityId!='' ">
-    	and supplier_city=#{cityId}
+    <if test="cityIds!=null and cityIds.size()>0">
+    	and supplier_city IN 
+    	<foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
+    	#{cid}
+    	</foreach>
     </if>
     <if test="supplierIds!=null and supplierIds.size()>0">
       and supplier_id IN
@@ -49,7 +52,7 @@
           #{sid}
       </foreach>
   </if>
-    order by supplier_id
+    order by supplier_city , supplier_id
   </select>
 
     <select id="queryForObject" parameterType="com.zhuanche.entity.rentcar.CarBizSupplier"  resultType="com.zhuanche.entity.rentcar.CarBizSupplier">
