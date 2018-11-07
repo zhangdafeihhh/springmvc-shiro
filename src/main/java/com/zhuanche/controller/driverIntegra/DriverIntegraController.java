@@ -409,7 +409,7 @@ public class DriverIntegraController {
                                 temp = new BigDecimal(driverIntegraInfo.getString("monthIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
                                 driverVoEntity.setMonthIntegral(temp.toString());
                             }catch (Exception e){
-
+                                logger.error("设置司机当月积分异常，driverId="+driverId+"，monthIntegral="+driverIntegraInfo.getString("monthIntegral"));
                             }
                         }
                         //设置司机当日积分
@@ -418,7 +418,7 @@ public class DriverIntegraController {
                                 temp = new BigDecimal(driverIntegraInfo.getString("todayIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
                                 driverVoEntity.setDayIntegral(temp.toString());
                             }catch (Exception e){
-
+                                logger.error("设置司机当日积分异常，driverId="+driverId+"，todayIntegral="+driverIntegraInfo.getString("todayIntegral"));
                             }
 
                         }
@@ -428,6 +428,7 @@ public class DriverIntegraController {
                                 temp = new BigDecimal(driverIntegraInfo.getString("membershipName")).setScale(3,BigDecimal.ROUND_HALF_UP);
                                 driverVoEntity.setMembershipName(temp.toString());
                             }catch (Exception e){
+                                logger.error("设置司机等级异常，driverId="+driverId+"，membershipName="+driverIntegraInfo.getString("membershipName"));
 
                             }
                         }
