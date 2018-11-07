@@ -18,6 +18,8 @@ public class BusCarRicherDTO extends BusCarDTO {
 	private List<String> licensePlatesList;
 	/** 供应商ID集合 **/
 	private Set<Integer> supplierIds;
+	/** 座位数 **/
+	private Integer seatNum;
 
 	public List<String> getLicensePlatesList() {
 		return licensePlatesList;
@@ -33,6 +35,14 @@ public class BusCarRicherDTO extends BusCarDTO {
 
 	public void setSupplierIds(Set<Integer> supplierIds) {
 		this.supplierIds = supplierIds;
+	}
+
+	public Integer getSeatNum() {
+		return seatNum;
+	}
+
+	public void setSeatNum(Integer seatNum) {
+		this.seatNum = seatNum;
 	}
 
 }

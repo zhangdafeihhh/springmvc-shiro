@@ -115,4 +115,14 @@
         <include refid="Blob_Column_List" />
       FROM car_biz_car_group
   </select>
+  
+  	<!-- 根据groupId查询车型类别座位数 -->
+	<select id="getSeatNumByGroupId" resultType="int">
+		SELECT
+			seat_num
+		FROM
+			car_biz_car_group
+		WHERE
+			group_id = #{groupId}
+	</select>
 </mapper>

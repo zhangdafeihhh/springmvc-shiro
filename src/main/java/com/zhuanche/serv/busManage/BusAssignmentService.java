@@ -32,6 +32,7 @@ import com.zhuanche.util.MyRestTemplate;
 import com.zhuanche.util.SignUtils;
 import com.zhuanche.vo.busManage.BusOrderVO;
 
+import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
 
@@ -53,6 +54,9 @@ public class BusAssignmentService {
 	
 	@Autowired
 	private CarBizDriverInfoExMapper carBizDriverInfoExMapper;
+	
+	@Autowired
+	private CarBizCarGroupExMapper carBizCarGroupExMapper;
 
 	@Autowired
 	@Qualifier("busAssignmentTemplate")
@@ -154,6 +158,11 @@ public class BusAssignmentService {
 			
 			// 封装查询参数, 查询可用车辆
 			BusCarRicherDTO richerDTO = BeanUtil.copyObject(busCarDTO, BusCarRicherDTO.class);
+			// 扩大车型查询范围
+			if (busCarDTO.getGroupId() != null) {
+				int seatNum = carBizCarGroupExMapper.getSeatNumByGroupId(busCarDTO.getGroupId());
+				richerDTO.setSeatNum(seatNum);
+			}
 			if (!licensePlatesList.isEmpty()) {
 				richerDTO.setLicensePlatesList(licensePlatesList);
 			}
@@ -214,6 +223,11 @@ public class BusAssignmentService {
 
 			// 封装查询参数, 查询可用司机
 			BusDriverRicherDTO richerDTO = BeanUtil.copyObject(busDriverDTO, BusDriverRicherDTO.class);
+			// 扩大车型查询范围
+			if (busDriverDTO.getGroupId() != null) {
+				int seatNum = carBizCarGroupExMapper.getSeatNumByGroupId(busDriverDTO.getGroupId());
+				richerDTO.setSeatNum(seatNum);
+			}
 			if (!driverIds.isEmpty()) {
 				richerDTO.setDriverIds(driverIds);
 			}

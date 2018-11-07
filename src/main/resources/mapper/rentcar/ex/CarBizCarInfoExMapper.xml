@@ -158,8 +158,11 @@
 				#{item}
 			</foreach>
 		</if>
-		<if test="groupId != null">
-			and g.group_id = #{groupId}
+<!-- 		<if test="groupId != null"> -->
+<!-- 			and g.group_id = #{groupId} -->
+<!-- 		</if> -->
+		<if test="seatNum != null">
+			and g.seat_num >= #{seatNum}
 		</if>
 		<if test="cityId != null">
 			and c.city_id = #{cityId}

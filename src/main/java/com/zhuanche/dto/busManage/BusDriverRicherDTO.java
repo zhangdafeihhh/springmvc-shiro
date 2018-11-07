@@ -20,6 +20,8 @@ public class BusDriverRicherDTO extends BusDriverDTO {
 	private List<Integer> driverIds;
 	// 供应商ID集合
 	private Set<Integer> supplierIds;
+	// 座位数
+	private Integer seatNum;
 
 	public Integer getDriverId() {
 		return driverId;
@@ -43,6 +45,14 @@ public class BusDriverRicherDTO extends BusDriverDTO {
 
 	public void setSupplierIds(Set<Integer> supplierIds) {
 		this.supplierIds = supplierIds;
+	}
+
+	public Integer getSeatNum() {
+		return seatNum;
+	}
+
+	public void setSeatNum(Integer seatNum) {
+		this.seatNum = seatNum;
 	}
 
 }

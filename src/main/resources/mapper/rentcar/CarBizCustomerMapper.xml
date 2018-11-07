@@ -62,6 +62,10 @@
     from car_biz_customer
     where customer_id = #{customerId,jdbcType=INTEGER}
   </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from car_biz_customer
+    where customer_id = #{customerId,jdbcType=INTEGER}
+  </delete>
   <insert id="insert" parameterType="com.zhuanche.entity.rentcar.CarBizCustomer" >
     <selectKey resultType="java.lang.Integer" keyProperty="customerId" order="AFTER" >
       SELECT LAST_INSERT_ID()
