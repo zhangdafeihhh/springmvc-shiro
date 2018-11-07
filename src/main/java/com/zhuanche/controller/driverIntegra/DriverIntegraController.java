@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.math.BigDecimal;
 import java.util.*;
 
 @Controller
@@ -169,6 +170,7 @@ public class DriverIntegraController {
                     itemMap.put("flag_"+item.getInteger("driverId"),item);
                 }
                 String driverId = null;
+                BigDecimal temp = null;
                 for (DriverVoEntity driverVoEntity : rows) {
 
                     driverId = driverVoEntity.getDriverId() ;
@@ -176,11 +178,21 @@ public class DriverIntegraController {
 //				logger.info("调用策略平台批量查询积分-driverId："+driverId+";driverIntegraInfo="+(driverIntegraInfo==null?"null":driverIntegraInfo.toJSONString()));
                     if(driverIntegraInfo != null){
                         //设置司机当月积分
-                        driverVoEntity.setMonthIntegral(driverIntegraInfo.getString("monthIntegral"));
+                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("monthIntegral"))) {
+                            temp = new BigDecimal(driverIntegraInfo.getString("monthIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
+                            driverVoEntity.setMonthIntegral(temp.toString());
+                        }
                         //设置司机当日积分
-                        driverVoEntity.setDayIntegral(driverIntegraInfo.getString("todayIntegral"));
+                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("todayIntegral"))) {
+                            temp = new BigDecimal(driverIntegraInfo.getString("todayIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
+                            driverVoEntity.setDayIntegral(temp.toString());
+                        }
                         //设置司机司机等级
-                        driverVoEntity.setMembershipName(driverIntegraInfo.getString("membershipName"));
+                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("membershipName"))){
+                            temp = new BigDecimal(driverIntegraInfo.getString("membershipName")).setScale(3,BigDecimal.ROUND_HALF_UP);
+                            driverVoEntity.setMembershipName(temp.toString());
+                        }
+
                     }
                 }
             }
@@ -371,7 +383,7 @@ public class DriverIntegraController {
                     itemMap.put("flag_"+item.getInteger("driverId"),item);
                 }
                 String driverId = null;
-
+                BigDecimal temp;
                 for (DriverVoEntity driverVoEntity : rows) {
 
                     driverId = driverVoEntity.getDriverId() ;
@@ -379,11 +391,20 @@ public class DriverIntegraController {
 //				logger.info("调用策略平台批量查询积分-driverId："+driverId+";driverIntegraInfo="+(driverIntegraInfo==null?"null":driverIntegraInfo.toJSONString()));
                     if(driverIntegraInfo != null){
                         //设置司机当月积分
-                        driverVoEntity.setMonthIntegral(driverIntegraInfo.getString("monthIntegral"));
+                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("monthIntegral"))) {
+                            temp = new BigDecimal(driverIntegraInfo.getString("monthIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
+                            driverVoEntity.setMonthIntegral(temp.toString());
+                        }
                         //设置司机当日积分
-                        driverVoEntity.setDayIntegral(driverIntegraInfo.getString("todayIntegral"));
+                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("todayIntegral"))) {
+                            temp = new BigDecimal(driverIntegraInfo.getString("todayIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
+                            driverVoEntity.setDayIntegral(temp.toString());
+                        }
                         //设置司机司机等级
-                        driverVoEntity.setMembershipName(driverIntegraInfo.getString("membershipName"));
+                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("membershipName"))){
+                            temp = new BigDecimal(driverIntegraInfo.getString("membershipName")).setScale(3,BigDecimal.ROUND_HALF_UP);
+                            driverVoEntity.setMembershipName(temp.toString());
+                        }
                     }
                 }
             }
