@@ -166,7 +166,6 @@ public class DriverIntegraController {
                 int size = driverIntegralInfoArray.size();
                 for(int i=0;i<size;i++ ){
                     JSONObject item = driverIntegralInfoArray.getJSONObject(i);
-//				itemMap.put(item.getString("driverId"),item);
                     itemMap.put("flag_"+item.getInteger("driverId"),item);
                 }
                 String driverId = null;
@@ -230,8 +229,10 @@ public class DriverIntegraController {
             paramMap.put("driverInfo", driverInfoList);
 
             jsonObj = driverIntegralApiTemplate.postForObject(url,driverInfoList,JSONObject.class);
-            logger.info("调用策略平台批量查询积分正常,耗时+"+(System.currentTimeMillis() - start)+";参数为"+(driverInfoList==null?"": driverInfoList.toString())
-                    +";返回结果为："+ (jsonObj == null ?"null":JSON.toJSONString(jsonObj)));
+            logger.info("调用策略平台批量查询积分正常,耗时+"+(System.currentTimeMillis() - start)
+                    //+";参数为"+(driverInfoList==null?"": driverInfoList.toString())
+                    //+";返回结果为："+ (jsonObj == null ?"null":JSON.toJSONString(jsonObj))
+            );
             if (jsonObj != null) {
                 int code = jsonObj.getInteger("code");
                 if(code == 0) {
