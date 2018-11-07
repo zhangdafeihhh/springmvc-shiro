@@ -39,7 +39,7 @@ public interface CarFactOrderInfoService {
      * @param orderNo 订单号
      * @return java.lang.String
      */
-    public List<CarFactOrderInfoDTO>  queryAllOrderDataList(Map<String, Object> paramMap);
+//    public List<CarFactOrderInfoDTO>  queryAllOrderDataList(Map<String, Object> paramMap);
     /**
 	 * 查询LBS提供的轨迹坐标
 	 * @param paramsStr

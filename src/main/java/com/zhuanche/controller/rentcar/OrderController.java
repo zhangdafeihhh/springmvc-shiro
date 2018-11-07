@@ -162,17 +162,7 @@ public class OrderController{
 	     AjaxResponse result = carFactOrderInfoService.queryOrderDataList(paramMap);
 	     return result;
 	 }
-	 
-	 public String arrayToStr(String v[]){
-		 String temp = "";
-		 for(String str : v){
-			 temp+=str+",";
-		 }
-		 if(!"".equals(temp)){
-			 temp=temp.substring(0, temp.length()-1);
-		 }
-		 return temp;
-	 }
+
 	 
 		/**
 	    * 订单 列表导出
@@ -246,15 +236,29 @@ public class OrderController{
 			
 		// 查询ES（性能优化：采用分页的方式进行检索并获取数据）
 		List<CarFactOrderInfoDTO> result = new ArrayList<CarFactOrderInfoDTO>(10000);
-		for(int pageNo=1; ; pageNo++  ) {
+		 int code = -1;
+		 AjaxResponse responseX = null;
+		 paramMap.put("pageSize",500);//每页记录数
+		 for(int pageNo=1; ; pageNo++  ) {
 			paramMap.put("pageNo",pageNo);//页号
-		    paramMap.put("pageSize",500);//每页记录数
 			 // 从订单组取统计数据
-		    List<CarFactOrderInfoDTO> dtoList = carFactOrderInfoService.queryAllOrderDataList(paramMap);
-			if(dtoList==null || dtoList.size()==0) {
-				break;
-			}
-			result.addAll( dtoList );
+			 responseX = carFactOrderInfoService.queryOrderDataList(paramMap);
+			 code = responseX.getCode();
+			 logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code);
+			 if(code == 0){
+			 	JSONObject jsonObject = (JSONObject) responseX.getData();
+				 List<CarFactOrderInfoDTO> dtoList  = (List<CarFactOrderInfoDTO>) jsonObject.get("data");
+				 if(dtoList != null){
+					 result.addAll( dtoList );
+				 }else{
+					 break;
+				 }
+			 }
+		    //List<CarFactOrderInfoDTO> dtoList = carFactOrderInfoService.queryOrderDataList(paramMap);
+//			if(dtoList==null || dtoList.size()==0) {
+//				break;
+//			}
+//			result.addAll( dtoList );
 		}
 		
 
@@ -529,8 +533,6 @@ public class OrderController{
 	
 	 /**
 	    * 查询LBS提供的轨迹坐标
-	    * @param orderNo	订单号
-		* @param batchNo	批次号 
 		* @param startDate  订单开始时间
 		* @param endDate    订单结束时间
 		* @param driverId   司机ID

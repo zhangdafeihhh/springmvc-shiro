@@ -276,38 +276,38 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 	 * @param paramMap
 	 * @return
 	 */
-	@Override
-	public List<CarFactOrderInfoDTO>  queryAllOrderDataList(Map<String, Object> paramMap) {
-		List<CarFactOrderInfoDTO> list = null;
-		String url = orderSearchUrl+Common.ORDER_ORDER_LIST_DATE;
-		try {
-			String result = HttpClientUtil.buildPostRequest(url).addParams(paramMap).setConnectTimeOut(CONNECT_TIMEOUT)
-					.setReadTimeOut(READ_TIMEOUT).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
-			JSONObject job = JSON.parseObject(result);
-			if (job == null) {
-				logger.error("调用订单接口" + url + "返回结果为null");
-				return list;
-			}
-			if (!job.getString("code").equals("0")) {
-				logger.info("调用订单接口" + url + "返回结果为result"+result);
-				return list;
-			}
-			if (job != null) {
-				if("0".equals(job.get("code").toString())){
-					JSONObject jobres = JSON.parseObject(job.get("data").toString());
-					if(jobres!=null){
-						list =  JSONArray.parseArray(jobres.get("data").toString(), CarFactOrderInfoDTO.class);   
-						return list;
-					}
-				}
-			}
-		} catch (Exception e) {
-			logger.error("调用订单接口" + url + "异常", e);
-			e.printStackTrace();
-			return null;
-		}
-		return list;
-	}
+//	@Override
+//	public List<CarFactOrderInfoDTO>  queryAllOrderDataList(Map<String, Object> paramMap) {
+//		List<CarFactOrderInfoDTO> list = null;
+//		String url = orderSearchUrl+Common.ORDER_ORDER_LIST_DATE;
+//		try {
+//			String result = HttpClientUtil.buildPostRequest(url).addParams(paramMap).setConnectTimeOut(CONNECT_TIMEOUT)
+//					.setReadTimeOut(READ_TIMEOUT).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
+//			JSONObject job = JSON.parseObject(result);
+//			if (job == null) {
+//				logger.error("调用订单接口" + url + "返回结果为null");
+//				return list;
+//			}
+//			if (!job.getString("code").equals("0")) {
+//				logger.info("调用订单接口" + url + "返回结果为result"+result);
+//				return list;
+//			}
+//			if (job != null) {
+//				if("0".equals(job.get("code").toString())){
+//					JSONObject jobres = JSON.parseObject(job.get("data").toString());
+//					if(jobres!=null){
+//						list =  JSONArray.parseArray(jobres.get("data").toString(), CarFactOrderInfoDTO.class);
+//						return list;
+//					}
+//				}
+//			}
+//		} catch (Exception e) {
+//			logger.error("调用订单接口" + url + "异常", e);
+//			e.printStackTrace();
+//			return null;
+//		}
+//		return list;
+//	}
 	
 	@Override
 	public CarBizOrderSettleEntity selectDriverSettleByOrderId(Long orderId) {
