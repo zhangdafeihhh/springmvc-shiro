@@ -71,10 +71,10 @@
 				and o.remove_status = #{removeStatus}
 			</if> 
 			<if test = "driverName !=null and driverName !=''" > 
-				and i.name like '%${driverName}%'
+				and i.name like '${driverName}%'
 			</if> 
 			<if test = "driverPhone !=null and driverPhone !=''" > 
-				and i.phone like '%${driverPhone}%'
+				and i.phone like '${driverPhone}%'
 			</if> 
 			<if test = "cityId !=null and cityId !=''" > 
 				and c.city_id = #{cityId}
@@ -117,10 +117,10 @@
 				and o.remove_status = #{removeStatus}
 			</if> 
 			<if test = "driverName !=null and driverName !=''" > 
-				and i.name like '%${driverName}%'
+				and i.name like '${driverName}%'
 			</if> 
 			<if test = "driverPhone !=null and driverPhone !=''" > 
-				and i.phone like '%${driverPhone}%'
+				and i.phone like '${driverPhone}%'
 			</if> 
 			<if test = "cityId !=null and cityId !=''" > 
 				and c.city_id = #{cityId}
@@ -195,10 +195,10 @@
 				and o.remove_status = #{removeStatus}
 			</if> 
 			<if test = "driverName !=null and driverName !=''" > 
-				and i.name like '%${driverName}%'
+				and i.name like '${driverName}%'
 			</if> 
 			<if test = "driverPhone !=null and driverPhone !=''" > 
-				and i.phone like '%${driverPhone}%'
+				and i.phone like '${driverPhone}%'
 			</if> 
 			<if test = "cityId !=null and cityId !=''" > 
 				and c.city_id = #{cityId}
@@ -271,10 +271,10 @@
 				and o.remove_status = #{removeStatus}
 			</if> 
 			<if test = "driverName !=null and driverName !=''" > 
-				and i.name like '%${driverName}%'
+				and i.name like '${driverName}%'
 			</if> 
 			<if test = "driverPhone !=null and driverPhone !=''" > 
-				and i.phone like '%${driverPhone}%'
+				and i.phone like '${driverPhone}%'
 			</if> 
 			<if test = "cityId !=null and cityId !=''" > 
 				and c.city_id = #{cityId}
@@ -350,10 +350,10 @@
 				and o.remove_status = #{removeStatus}
 			</if> 
 			<if test = "driverName !=null and driverName !=''" > 
-				and i.name like '%${driverName}%'
+				and i.name like '${driverName}%'
 			</if> 
 			<if test = "driverPhone !=null and driverPhone !=''" > 
-				and i.phone like '%${driverPhone}%'
+				and i.phone like '${driverPhone}%'
 			</if> 
 			<if test = "cityId !=null and cityId !=''" > 
 				and c.city_id = #{cityId}
@@ -396,10 +396,10 @@
 				and o.remove_status = #{removeStatus}
 			</if> 
 			<if test = "driverName !=null and driverName !=''" > 
-				and i.name like '%${driverName}%'
+				and i.name like '${driverName}%'
 			</if> 
 			<if test = "driverPhone !=null and driverPhone !=''" > 
-				and i.phone like '%${driverPhone}%'
+				and i.phone like '${driverPhone}%'
 			</if> 
 			<if test = "cityId !=null and cityId !=''" > 
 				and c.city_id = #{cityId}

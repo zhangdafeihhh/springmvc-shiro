@@ -23,7 +23,7 @@
 		            and id = #{id} 
 		    </if>
 			<if test="cooperationName !=null and cooperationName !='' ">
-		            and cooperation_name like '%${cooperationName}%' 
+		            and cooperation_name like '${cooperationName}%' 
 		    </if>
 		    <if test="status !=null and status !='' ">
 		            and status = #{status} 
@@ -49,7 +49,7 @@
 		            and id = #{id} 
 		    </if>
 			<if test="cooperationName !=null and cooperationName !='' ">
-		            and cooperation_name like '%${cooperationName}%' 
+		            and cooperation_name like '${cooperationName}%' 
 		    </if>
 		    <if test="status !=null and status !='' ">
 		            and status = #{status} 
@@ -68,7 +68,7 @@
 		            and id = #{id} 
 		    </if>
 			<if test="cooperationName !=null and cooperationName !='' ">
-		            and cooperation_name like '%${cooperationName}%' 
+		            and cooperation_name like '${cooperationName}%' 
 		    </if>
 		    <if test="status !=null and status !='' ">
 		            and status = #{status}

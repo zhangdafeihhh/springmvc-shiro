@@ -56,7 +56,7 @@
             AND id = #{teamId}
         </if>
         <if test="teamName!=null">
-            AND team_name like CONCAT('%',#{teamName,jdbcType=VARCHAR},'%')
+            AND team_name like CONCAT(#{teamName,jdbcType=VARCHAR},'%')
         </if>
         limit 1
     </select>
