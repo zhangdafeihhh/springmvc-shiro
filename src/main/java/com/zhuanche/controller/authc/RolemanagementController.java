@@ -112,4 +112,9 @@ public class RolemanagementController{
 		return AjaxResponse.success( pageDto );
 	}
 	
+	/**九、删除一个角色（只能开发人员用）**/
+	@RequestMapping("/deleteSaasRole")
+	public AjaxResponse deleteSaasRole ( @Verify(param="roleId",rule="required|min(1)") Integer roleId ) {
+		return roleManagementService.deleteSaasRole(roleId);
+	}
 }

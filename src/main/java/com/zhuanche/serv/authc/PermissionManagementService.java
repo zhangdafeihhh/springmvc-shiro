@@ -16,6 +16,7 @@ import com.zhuanche.util.BeanUtil;
 
 import mapper.mdbcarmanage.SaasPermissionMapper;
 import mapper.mdbcarmanage.ex.SaasPermissionExMapper;
+import mapper.mdbcarmanage.ex.SaasRolePermissionRalationExMapper;
 
 /**权限管理功能**/
 @Service
@@ -24,6 +25,8 @@ public class PermissionManagementService{
 	private SaasPermissionMapper     saasPermissionMapper;
 	@Autowired
 	private SaasPermissionExMapper  saasPermissionExMapper;
+	@Autowired
+	private SaasRolePermissionRalationExMapper saasRolePermissionRalationExMapper;
 	@Autowired
 	private RedisSessionDAO              redisSessionDAO;
 	
@@ -166,5 +169,23 @@ public class PermissionManagementService{
 		}
 		return childrenDtos;
 	}
-
+	
+	/**六、删除一个权限**/
+	public 	AjaxResponse deleteSaasPermission( Integer permissionId ) {
+		//权限不存在
+		SaasPermission thisPermission = saasPermissionMapper.selectByPrimaryKey( permissionId );
+		if(thisPermission == null ) {
+			return AjaxResponse.fail(RestErrorCode.PERMISSION_NOT_EXIST );
+		}
+		//系统预置权限，不能禁用、修改
+		if( SaasConst.SYSTEM_PERMISSIONS.contains( thisPermission.getPermissionCode() ) ) {
+			return AjaxResponse.fail(RestErrorCode.SYSTEM_PERMISSION_CANOT_CHANGE , thisPermission.getPermissionCode() );
+		}
+		//执行
+		redisSessionDAO.clearRelativeSession(permissionId, null, null); //自动清理用户会话
+		try {Thread.sleep(3000);} catch (InterruptedException e) {	}//目的是等待一会儿，因会话清理也要查表的
+		saasRolePermissionRalationExMapper.deleteRoleIdsOfPermission(permissionId);
+		saasPermissionMapper.deleteByPrimaryKey(permissionId);
+		return AjaxResponse.success( null );
+	}
 }

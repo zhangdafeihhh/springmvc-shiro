@@ -84,4 +84,9 @@ public class PermissionManageController {
 		return AjaxResponse.success(allDtos);
 	}
 	
+	/**六、删除一个权限（只能开发人员用）**/
+	@RequestMapping("deleteSaasPermission")
+	public AjaxResponse deleteSaasPermission( @Verify(param="permissionId",rule="required|min(1)")  Integer permissionId ){
+		return permissionManagementService.deleteSaasPermission(permissionId);
+	}
 }

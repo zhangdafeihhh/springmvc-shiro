@@ -11,6 +11,8 @@ public interface SaasRolePermissionRalationExMapper {
 	List<Integer> queryPermissionIdsOfRole( @Param("roleId")  Integer roleId );
 	/**删除一个角色的所有权限ID**/
 	int deletePermissionIdsOfRole( @Param("roleId")  Integer roleId );
+	/**删除一个权限的所有角色ID**/
+	int deleteRoleIdsOfPermission( @Param("permissionId")  Integer permissionId );
 	/**保存一个角色的所有权限ID(批量插入)**/
 	int insertBatch( @Param("records") List<SaasRolePermissionRalation> records );
 	
