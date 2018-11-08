@@ -123,13 +123,13 @@
       </foreach>
     </if>
     <if test="driverName!=null and driverName!=''">
-      AND i.driver_name LIKE CONCAT('%', #{driverName}, '%')
+      AND i.driver_name LIKE CONCAT( #{driverName}, '%')
     </if>
     <if test="driverPhone!=null and driverPhone!=''">
-      AND i.driver_phone LIKE CONCAT('%', #{driverPhone}, '%')
+      AND i.driver_phone LIKE CONCAT( #{driverPhone}, '%')
     </if>
     <if test="licensePlates!=null and licensePlates!=''">
-      AND i.license_plates LIKE CONCAT('%', #{licensePlates}, '%')
+      AND i.license_plates LIKE CONCAT( #{licensePlates}, '%')
     </if>
     <if test="sortname != null and sortname !=''">
       ORDER BY

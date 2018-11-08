@@ -95,7 +95,7 @@
             and car.driver_id = 0  
         </if>
 		<if test=" licensePlates !=null and licensePlates !=''">
-			and car.license_plates like '%${licensePlates}%'
+			and car.license_plates like '${licensePlates}%'
 		</if>
 		<if test="carModelIds !=null and carModelIds !=''">
 			and car.car_model_id in (${carModelIds})

@@ -270,7 +270,7 @@
     car_biz_driver_info i
     where 1=1
     <if test="licensePlates!=null and licensePlates!=''">
-      and i.license_plates LIKE '%${licensePlates}%'
+      and i.license_plates like '${licensePlates}%'
     </if>
     <if test="driverId!=null and driverId!=''">
       and i.driver_id = #{driverId}
@@ -288,7 +288,7 @@
     car_biz_driver_info i
     where 1=1
     <if test="licensePlates!=null and licensePlates!=''">
-      and i.license_plates LIKE '%${licensePlates}%'
+      and i.license_plates like '${licensePlates}%'
     </if>
     <if test="cityIds!=null and cityIds.size()>0">
       and i.service_city IN
@@ -350,17 +350,17 @@
       and i.status= #{status}
     </if>
     <if test="licensePlates!=null and licensePlates!=''">
-      and i.license_plates LIKE '%${licensePlates}%'
+      and i.license_plates like '${licensePlates}%'
     </if>
     <if test="name!=null and name!=''">
-      <!-- and i.name like '%name%' -->
+      <!-- and i.name like 'name%' -->
       and i.name LIKE CONCAT(#{name},'%')
     </if>
     <if test="supplierId!=null and supplierId!=''">
       and i.supplier_Id = #{supplierId}
     </if>
     <if test="phone!=null and phone!=''">
-      and i.phone LIKE '%${phone}%'
+      and i.phone like '${phone}%'
     </if>
     <if test="cityIds!=null and cityIds.size()>0">
       and i.service_city IN
@@ -381,13 +381,13 @@
   <sql id="allBaseColumnWhereList" >
     <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR" >
       <if test="phone != null and phone != ''" >
-        and phone LIKE '%${phone}%'
+        and phone like '${phone}%'
       </if>
       <if test="name != null and name != ''" >
         and name LIKE CONCAT(#{name},'%')
       </if>
       <if test="licensePlates != null and licensePlates != ''" >
-        and license_plates LIKE '%${licensePlates}%'
+        and license_plates like '${licensePlates}%'
       </if>
       <if test="status != null" >
         and status = #{status,jdbcType=INTEGER}
