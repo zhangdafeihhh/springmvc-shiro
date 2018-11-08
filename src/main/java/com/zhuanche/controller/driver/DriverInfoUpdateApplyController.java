@@ -176,7 +176,7 @@ public class DriverInfoUpdateApplyController {
         driverInfoUpdateApplyDTO.setStatus(1);//已提交
         driverInfoUpdateApplyDTO.setType(1);//业务类型(1-司机修改,2-车辆修改)
         List<DriverInfoUpdateApplyDTO> driverInfoUpdateApplyDTOS = driverInfoUpdateService.queryDriverInfoUpdateList(driverInfoUpdateApplyDTO);
-        if(driverInfoUpdateApplyDTOS==null || driverInfoUpdateApplyDTOS.size()==0){
+        if(driverInfoUpdateApplyDTOS!=null && driverInfoUpdateApplyDTOS.size()>0){
             return AjaxResponse.fail(RestErrorCode.UPDATE_APPLY_EXIST);
         }
 
@@ -250,7 +250,7 @@ public class DriverInfoUpdateApplyController {
         driverInfoUpdateApplyDTO.setStatus(1);//已提交
         driverInfoUpdateApplyDTO.setType(2);//业务类型(1-司机修改,2-车辆修改)
         List<DriverInfoUpdateApplyDTO> driverInfoUpdateApplyDTOS = driverInfoUpdateService.queryDriverInfoUpdateList(driverInfoUpdateApplyDTO);
-        if(driverInfoUpdateApplyDTOS==null || driverInfoUpdateApplyDTOS.size()==0){
+        if(driverInfoUpdateApplyDTOS!=null && driverInfoUpdateApplyDTOS.size()>0){
             return AjaxResponse.fail(RestErrorCode.UPDATE_APPLY_EXIST);
         }
         DriverInfoUpdateApply driverInfoUpdateApply = new DriverInfoUpdateApply();
