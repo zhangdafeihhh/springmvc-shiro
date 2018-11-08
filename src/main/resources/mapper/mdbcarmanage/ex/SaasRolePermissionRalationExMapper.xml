@@ -10,6 +10,10 @@
   <delete id="deletePermissionIdsOfRole">
   		delete from saas_role_permission_ralation where role_id = #{roleId}
   </delete>
+  <!-- 删除一个权限的所有角色ID -->
+  <delete id="deleteRoleIdsOfPermission">
+  		delete from saas_role_permission_ralation where permission_id = #{permissionId}
+  </delete>
   <!-- 保存一个角色的所有权限ID(批量插入) -->
   <insert id="insertBatch">
     insert into saas_role_permission_ralation (role_id, permission_id)
