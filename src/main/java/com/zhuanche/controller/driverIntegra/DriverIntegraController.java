@@ -197,12 +197,10 @@ public class DriverIntegraController {
                         }
                         //设置司机司机等级
                         if(StringUtils.isNotEmpty(driverIntegraInfo.getString("membershipName"))  && !("null".equals(driverIntegraInfo.getString("membershipName")))){
-                            try{
-                            temp = new BigDecimal(driverIntegraInfo.getString("membershipName")).setScale(3,BigDecimal.ROUND_HALF_UP);
-                            driverVoEntity.setMembershipName(temp.toString());
-                            }catch (Exception e){
+                            
+                             
+                            driverVoEntity.setMembershipName(driverIntegraInfo.getString("membershipName"));
 
-                            }
                         }
 
                     }
