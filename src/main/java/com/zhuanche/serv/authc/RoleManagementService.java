@@ -136,6 +136,9 @@ public class RoleManagementService{
 			if( checkedPermissionIds.contains(dto.getPermissionId()) ) {
 				dto.setChecked(true);//置为选中
 			}
+			if(SaasConst.SYSTEM_PERMISSIONS.contains(dto.getPermissionCode())) {
+				dto.setPresetPerm(true);//设置是否为系统预置权限
+			}
 		}
 		return allDtos;
 	}
@@ -153,6 +156,9 @@ public class RoleManagementService{
 		for( SaasPermissionDTO childrenDto : childrenDtos ) {
 			if( checkedPermissionIds.contains(childrenDto.getPermissionId()) ) {
 				childrenDto.setChecked(true);//置为选中
+			}
+			if(SaasConst.SYSTEM_PERMISSIONS.contains(childrenDto.getPermissionCode())) {
+				childrenDto.setPresetPerm(true);//设置是否为系统预置权限
 			}
 			
 			List<SaasPermissionDTO> childs = this.getChildren( checkedPermissionIds, childrenDto.getPermissionId() );
