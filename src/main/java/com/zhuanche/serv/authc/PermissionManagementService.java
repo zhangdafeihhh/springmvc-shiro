@@ -150,7 +150,9 @@ public class PermissionManagementService{
 	/**返回的数据格式：列表**/
 	private List<SaasPermissionDTO> getAllPermissions_list(){
 		List<SaasPermission> allPos = saasPermissionExMapper.queryPermissions(null, null, null, null, null, null);
-		return BeanUtil.copyList(allPos, SaasPermissionDTO.class);
+		List<SaasPermissionDTO> saasPermissionDTOs = BeanUtil.copyList(allPos, SaasPermissionDTO.class);
+		saasPermissionDTOs.stream().forEach( p -> { if(SaasConst.SYSTEM_PERMISSIONS.contains(p.getPermissionCode())) { p.setPresetPerm(true); }  });//设置是否为系统预置权限
+		return saasPermissionDTOs;
 	}
 	/**返回的数据格式：树形**/
 	private List<SaasPermissionDTO> getAllPermissions_tree(){
@@ -163,6 +165,7 @@ public class PermissionManagementService{
 		}
 		//递归
 		List<SaasPermissionDTO> childrenDtos = BeanUtil.copyList(childrenPos, SaasPermissionDTO.class);
+		childrenDtos.stream().forEach( p -> { if(SaasConst.SYSTEM_PERMISSIONS.contains(p.getPermissionCode())) { p.setPresetPerm(true); }  });//设置是否为系统预置权限
 		for( SaasPermissionDTO childrenDto : childrenDtos ) {
 			List<SaasPermissionDTO> childs = this.getChildren( childrenDto.getPermissionId() );
  			childrenDto.setChildPermissions(childs);

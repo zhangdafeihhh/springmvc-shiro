@@ -43,7 +43,14 @@ public class SaasPermissionDTO implements Serializable{
 		this.checked = checked;
 	}
 	
-	
+	/**是否是系统预置权限**/
+	private boolean presetPerm = false;
+	public boolean isPresetPerm() {
+		return presetPerm;
+	}
+	public void setPresetPerm(boolean presetPerm) {
+		this.presetPerm = presetPerm;
+	}
 	
 	public Integer getPermissionId() {
         return permissionId;
