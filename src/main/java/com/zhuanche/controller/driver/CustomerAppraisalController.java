@@ -325,7 +325,7 @@ public class CustomerAppraisalController {
             stringBuffer.append(s.getDriverName());
             stringBuffer.append(",");
 
-            stringBuffer.append("\t"+s.getDriverPhone());
+            stringBuffer.append("\t"+(s.getDriverPhone()==null?"":s.getDriverPhone()));
             stringBuffer.append(",");
 
             stringBuffer.append("\t"+s.getCreateDate());
