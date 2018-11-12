@@ -1546,10 +1546,7 @@
       <if test="name!=null and name!=''">
         and i.name  = #{driverName}
       </if>
-
     </where>
     order by driver_id desc
   </select>
-
-  
 </mapper>

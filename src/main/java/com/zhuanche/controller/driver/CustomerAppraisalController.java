@@ -36,6 +36,7 @@ import java.io.File;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
@@ -180,14 +181,11 @@ public class CustomerAppraisalController {
         carBizCustomerAppraisalStatisticsDTO.setTeamIds(permOfTeam);
         carBizCustomerAppraisalStatisticsDTO.setDriverIds(driverIds);
 
-
         PageInfo<CarBizCustomerAppraisalStatisticsDTO> p = customerAppraisalService.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO,page,pageSize);
         if(p != null){
             list = p.getList();
             total = (int)p.getTotal();
         }
-
-
         PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
         return AjaxResponse.success(pageDTO);
     }
@@ -257,13 +255,10 @@ public class CustomerAppraisalController {
                 carBizCustomerAppraisalStatisticsDTO.setDriverIds(driverIds);
 
                 int pageSize = 10000;
-
                 PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfo = customerAppraisalService.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO,1
                         ,  pageSize  );
                 list.addAll(pageInfo.getList());
-
                 int pages = pageInfo.getPages();
-
                 Hashtable<String,PageInfo<CarBizCustomerAppraisalStatisticsDTO> > hashtable = new Hashtable<>();
 
                 if(pages >= 2){
@@ -286,7 +281,6 @@ public class CustomerAppraisalController {
                             list.addAll(pageInfoX.getList());
                         }
                     }
-
                 }
             }
             List<String> headerList = new ArrayList<>();
@@ -340,11 +334,12 @@ public class CustomerAppraisalController {
             stringBuffer.append(s.getEvaluateScore());
             stringBuffer.append(",");
 
-            stringBuffer.append(s.getIdCardNo());
+
+            stringBuffer.append(s.getIdCardNo()==null?"":s.getIdCardNo());
             stringBuffer.append(",");
 
             String teamName = "";
-            if(teamMap!=null){
+            if(teamMap !=null && StringUtils.isNotEmpty(teamMap.get(s.getDriverId()))){
                 teamName = teamMap.get(s.getDriverId());
             }
             stringBuffer.append(teamName);
@@ -352,8 +347,8 @@ public class CustomerAppraisalController {
             csvDataList.add(stringBuffer.toString());
         }
 
-    }
 
+    }
     /**
      * 司机评分一个月详情
      * @param driverId 司机ID

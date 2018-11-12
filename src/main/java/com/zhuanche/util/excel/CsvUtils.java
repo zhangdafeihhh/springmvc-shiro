@@ -1,48 +1,13 @@
 package com.zhuanche.util.excel;
 
-import com.csvreader.CsvWriter;
-import org.apache.commons.lang3.StringUtils;
-
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
 import java.util.List;
 
 public class CsvUtils {
-    /**
-     * 导出
-     * @param dataList 数据
-     * @param headdataList 逗号分隔的标题数据
-     * @return
-     */
-//    public static boolean exportCsv(HttpServletResponse response,
-//                                    List<String> dataList,
-//                                    String headdataList,
-//                                    String  fileName) throws IOException {
-//
-//        response.setContentType("application/csv");
-//        response.setHeader("content-disposition", "attachment; filename="+fileName);
-//
-//        CsvWriter csvWriter = new CsvWriter(response.getOutputStream(),',', Charset.forName("UTF-8"));
-//        // 写表头
-//        long s= System.currentTimeMillis();
-//        System.err.println();
-//        String[] headers = {"姓名","年龄","编号","性别"};
-//        csvWriter.writeRecord(headers);
-//        csvWriter.writeRecord(headers);
-////        for (Student stu : ls) {
-////            csvWriter.write(stu.getName());
-////            csvWriter.write(stu.getAge()+"");
-////            csvWriter.write(stu.getScore());
-////            csvWriter.write(stu.getSex());
-////            csvWriter.endRecord();
-////        }
-////        csvWriter.close();
-//
-//        return true;
-//    }
+
 
     public static boolean exportCsv(HttpServletResponse response,
                                     List<String> dataList,
@@ -88,70 +53,6 @@ public class CsvUtils {
                     osw=null;
                 } catch (IOException e) {
                     e.printStackTrace();
-                }
-            }
-        }
-        return isSucess;
-    }
-
-    public static boolean exportCsvV2(HttpServletResponse response,
-                                    List<List<String>> dataList,
-                                    List<List<String>> headdataList,
-                                    String  fileName) throws IOException {
-        OutputStreamWriter osw = null;
-        boolean isSucess=false;
-        BufferedWriter bw=null;
-        CsvWriter csvWriter =null;
-        try {
-
-            response.reset();
-            response.setContentType("multipart/form-data");
-            response.setHeader("content-disposition", "attachment; filename="+fileName);
-              csvWriter = new CsvWriter(response.getOutputStream(), ',', Charset.forName("UTF-8"));
-
-            if(headdataList!=null && !headdataList.isEmpty()){
-
-                for(List<String> data : headdataList){
-                    String[] array = new String[data.size()];
-                    for(int i = 0;i<data.size();i++){
-                        array[i] = data.get(i);
-                    }
-                    csvWriter.writeRecord(array);
-                }
-            }
-            if(dataList!=null && !dataList.isEmpty()){
-                for(List<String> data : dataList){
-                    String[] array = new String[data.size()];
-                    for(int i = 0;i<data.size();i++){
-                        array[i] = data.get(i);
-                    }
-                    csvWriter.writeRecord(array);
-                }
-            }
-            isSucess=true;
-        } catch (Exception e) {
-            isSucess=false;
-        }finally{
-            if(bw!=null){
-                try {
-                    bw.close();
-                    bw=null;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if(osw!=null){
-                try {
-                    osw.close();
-                    osw=null;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if(csvWriter != null){
-                try {
-                csvWriter.close();
-                } catch (Exception e) {
                 }
             }
         }
