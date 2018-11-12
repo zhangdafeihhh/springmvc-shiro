@@ -325,17 +325,16 @@ public class CustomerAppraisalController {
             stringBuffer.append(s.getDriverName());
             stringBuffer.append(",");
 
-            stringBuffer.append(s.getDriverPhone());
+            stringBuffer.append("\t"+s.getDriverPhone());
             stringBuffer.append(",");
 
-            stringBuffer.append(s.getCreateDate());
+            stringBuffer.append("\t"+s.getCreateDate());
             stringBuffer.append(",");
 
             stringBuffer.append(s.getEvaluateScore());
             stringBuffer.append(",");
 
-
-            stringBuffer.append(s.getIdCardNo()==null?"":s.getIdCardNo());
+            stringBuffer.append("\t"+(s.getIdCardNo()==null?"":s.getIdCardNo()));
             stringBuffer.append(",");
 
             String teamName = "";
