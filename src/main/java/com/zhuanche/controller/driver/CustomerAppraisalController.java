@@ -325,11 +325,11 @@ public class CustomerAppraisalController {
             stringBuffer.append(s.getEvaluateScore());
             stringBuffer.append(",");
 
-            stringBuffer.append(s.getIdCardNo());
+            stringBuffer.append(s.getIdCardNo()==null?"":s.getIdCardNo());
             stringBuffer.append(",");
 
             String teamName = "";
-            if(teamMap!=null){
+            if(teamMap !=null && StringUtils.isNotEmpty(teamMap.get(s.getDriverId()))){
                 teamName = teamMap.get(s.getDriverId());
             }
             stringBuffer.append(teamName);
