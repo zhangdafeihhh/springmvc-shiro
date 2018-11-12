@@ -36,6 +36,7 @@ public class DriverServiceImpl implements IDriverService<DriverEntity> {
 
     @Override
     public int selectDriverByKeyCountAddCooperation(DriverVoEntity params) {
+        logger.info("查询司机信息总条数，参数为："+(params == null?"null":JSON.toJSONString(params)));
         return carBizDriverInfoExMapper.selectDriverByKeyCountAddCooperation(params);
     }
 

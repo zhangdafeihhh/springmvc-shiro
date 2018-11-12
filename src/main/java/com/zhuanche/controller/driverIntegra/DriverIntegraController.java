@@ -148,7 +148,7 @@ public class DriverIntegraController {
             }
             driverEntity.setDriverId(driverIdTeam);
             if(driverEntity.getCityId() != 0){
-                driverEntity.setServiceCity(driverEntity.getCityId()+"");
+                driverEntity.setServiceCityId(driverEntity.getCityId());
             }
             total = this.driverService.selectDriverByKeyCountAddCooperation(driverEntity);
             if (total == 0) {
@@ -345,7 +345,7 @@ public class DriverIntegraController {
             }
             driverEntity.setDriverId(driverIdTeam);
             if(driverEntity.getCityId() != 0){
-                driverEntity.setServiceCity(driverEntity.getCityId()+"");
+                driverEntity.setServiceCityId(driverEntity.getCityId());
             }
 
             total = this.driverService.selectDriverByKeyCountAddCooperation(driverEntity);
