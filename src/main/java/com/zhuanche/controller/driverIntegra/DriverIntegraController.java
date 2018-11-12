@@ -147,6 +147,9 @@ public class DriverIntegraController {
                 driverIdTeam = driverEntity.getDriverId();
             }
             driverEntity.setDriverId(driverIdTeam);
+            if(driverEntity.getCityId() != 0){
+                driverEntity.setServiceCity(driverEntity.getCityId()+"");
+            }
             total = this.driverService.selectDriverByKeyCountAddCooperation(driverEntity);
             if (total == 0) {
                 return this.gridJsonFormate(rows, total);
@@ -341,6 +344,9 @@ public class DriverIntegraController {
                 driverIdTeam = driverEntity.getDriverId();
             }
             driverEntity.setDriverId(driverIdTeam);
+            if(driverEntity.getCityId() != 0){
+                driverEntity.setServiceCity(driverEntity.getCityId()+"");
+            }
 
             total = this.driverService.selectDriverByKeyCountAddCooperation(driverEntity);
             if (total == 0) {
@@ -351,6 +357,7 @@ public class DriverIntegraController {
                 }
                 return null;
             }
+
             rows = this.driverService.selectDriverByKeyAddCooperation(driverEntity);
 
             List<JSONObject> driverInfoList = new ArrayList<>();
