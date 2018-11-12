@@ -1,5 +1,6 @@
 package com.zhuanche.serv.rentcar.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.zhuanche.dto.driver.DriverTeamRelationEntity;
 import com.zhuanche.dto.driver.DriverVoEntity;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
@@ -41,6 +42,7 @@ public class DriverServiceImpl implements IDriverService<DriverEntity> {
     @Override
     public List<DriverVoEntity> selectDriverByKeyAddCooperation(DriverVoEntity params) {
         //查询司机信息
+        logger.info("查询司机信息，参数为"+(params == null ?"null": JSON.toJSONString(params)));
         List<DriverVoEntity> driverEntity = carBizDriverInfoExMapper.selectDriverByKeyAddCooperation(params);
         if(driverEntity != null){
             Set<String> driverIdSet = new HashSet<>();
