@@ -523,6 +523,9 @@ public class CarDriverTeamService{
 	 * @Author: lunan
 	 * @Date: 2018/8/30
 	 */
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.MASTER )
+	} )
 	public int saveOneDriverTeam(CarDriverTeamDTO paramDto){
 		if(Check.NuNObj(paramDto) || Check.NuNStr(paramDto.getCity()) || Check.NuNStr(paramDto.getSupplier())){
 			return ServiceReturnCodeEnum.DEAL_FAILURE.getCode();
@@ -531,12 +534,15 @@ public class CarDriverTeamService{
 			DriverTeamRequest driverTeamRequest = new DriverTeamRequest();
 			driverTeamRequest.setTeamName(paramDto.getTeamName());
 			DynamicRoutingDataSource.DataSourceMode mdbcarManageMode = DynamicRoutingDataSource.getMasterSlave("mdbcarmanage-DataSource");
+			logger.info("mdb-datasource={}",mdbcarManageMode.name());
 			CarDriverTeam carDriverTeam = null;
 			try{
 				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource", DynamicRoutingDataSource.DataSourceMode.SLAVE);
+				logger.info("mdb-datasource={}",mdbcarManageMode.name());
 				carDriverTeam = carDriverTeamExMapper.selectByCondition(driverTeamRequest);
 			}finally {
 				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",mdbcarManageMode);
+				logger.info("mdb-datasource={}",mdbcarManageMode.name());
 			}
 
 //			CarDriverTeamDTO carDriverTeamDTO = this.selectOneDriverTeam(driverTeamRequest);
