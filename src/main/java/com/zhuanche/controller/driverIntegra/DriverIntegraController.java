@@ -125,11 +125,9 @@ public class DriverIntegraController {
             if (StringUtils.isNotBlank(teamIds)) {
                 String[] teamId = teamIds.split(",");
                 DriverTeamRelationEntity params = new DriverTeamRelationEntity();
-
                 params.setDriverId(driverEntity.getDriverId());
-                DriverTeamEntity paramsTeam = new DriverTeamEntity();
                 for (int i = 0; i < teamId.length; i++) {
-                    paramsTeam.setTeamId(teamId[i]);
+                    params.setTeamId(teamId[i]);
                     //不分页查询司机-车队关系
                     List<DriverTeamRelationEntity> driverIdList = this.driverTeamRelationService
                             .selectDriverIdsNoLimit(params);
@@ -314,9 +312,8 @@ public class DriverIntegraController {
                 String[] teamId = teamIds.split(",");
                 DriverTeamRelationEntity params = new DriverTeamRelationEntity();
                 params.setDriverId(driverEntity.getDriverId());
-                DriverTeamEntity paramsTeam = new DriverTeamEntity();
                 for (int i = 0; i < teamId.length; i++) {
-                    paramsTeam.setTeamId(teamId[i]);
+                    params.setTeamId(teamId[i]);
                     //不分页查询司机-车队关系
                     List<DriverTeamRelationEntity> driverIdList = this.driverTeamRelationService
                             .selectDriverIdsNoLimit(params);
