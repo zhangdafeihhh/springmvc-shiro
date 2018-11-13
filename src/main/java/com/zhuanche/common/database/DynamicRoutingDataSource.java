@@ -58,6 +58,8 @@ public class DynamicRoutingDataSource extends AbstractRoutingDataSource implemen
 		}
 		if(mode!=null) {
 			holder.set( mode.getValue()  );
+		}else {
+			holder.remove();
 		}
 	}
 	/***************************************切换为默认数据源*********************************/
