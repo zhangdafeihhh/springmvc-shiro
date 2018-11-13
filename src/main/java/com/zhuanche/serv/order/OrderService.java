@@ -86,6 +86,7 @@ public class OrderService{
 			}
 		}
 		String responseText = new RPCAPI().requestWithRetry(RPCAPI.HttpMethod.POST, ORDER_SEARCH_API_V1+"/order/v1/search", httpParams, null, "UTF-8");
+		httpParams.remove(ORDER_SEARCH_API_V1_transId);//清理掉
 		//接收响应，反序列化
 		if(responseText==null) {
 			return null;

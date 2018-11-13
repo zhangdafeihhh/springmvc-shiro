@@ -270,7 +270,7 @@
     car_biz_driver_info i
     where 1=1
     <if test="licensePlates!=null and licensePlates!=''">
-      and i.license_plates LIKE '%${licensePlates}%'
+      and i.license_plates like '${licensePlates}%'
     </if>
     <if test="driverId!=null and driverId!=''">
       and i.driver_id = #{driverId}
@@ -288,7 +288,7 @@
     car_biz_driver_info i
     where 1=1
     <if test="licensePlates!=null and licensePlates!=''">
-      and i.license_plates LIKE '%${licensePlates}%'
+      and i.license_plates like '${licensePlates}%'
     </if>
     <if test="cityIds!=null and cityIds.size()>0">
       and i.service_city IN
@@ -350,17 +350,17 @@
       and i.status= #{status}
     </if>
     <if test="licensePlates!=null and licensePlates!=''">
-      and i.license_plates LIKE '%${licensePlates}%'
+      and i.license_plates like '${licensePlates}%'
     </if>
     <if test="name!=null and name!=''">
-      <!-- and i.name like '%name%' -->
+      <!-- and i.name like 'name%' -->
       and i.name LIKE CONCAT(#{name},'%')
     </if>
     <if test="supplierId!=null and supplierId!=''">
       and i.supplier_Id = #{supplierId}
     </if>
     <if test="phone!=null and phone!=''">
-      and i.phone LIKE '%${phone}%'
+      and i.phone like '${phone}%'
     </if>
     <if test="cityIds!=null and cityIds.size()>0">
       and i.service_city IN
@@ -381,13 +381,13 @@
   <sql id="allBaseColumnWhereList" >
     <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR" >
       <if test="phone != null and phone != ''" >
-        and phone LIKE '%${phone}%'
+        and phone like '${phone}%'
       </if>
       <if test="name != null and name != ''" >
         and name LIKE CONCAT(#{name},'%')
       </if>
       <if test="licensePlates != null and licensePlates != ''" >
-        and license_plates LIKE '%${licensePlates}%'
+        and license_plates like '${licensePlates}%'
       </if>
       <if test="status != null" >
         and status = #{status,jdbcType=INTEGER}
@@ -1489,6 +1489,47 @@
     FROM
       car_biz_driver_info
     where license_plates = #{license_plates}
+  </select>
+  <select id="queryCarBizDriverList" resultMap="ResultMapWithBLOBs"  parameterType="com.zhuanche.dto.rentcar.CarBizDriverInfoDTO">
+    select
+    <include refid="Base_Column_List" />
+    from car_biz_driver_info  i
+    <where>
+      <if test="driverIds!=null and driverIds.size()>0">
+        and driver_id IN
+        <foreach collection="driverIds" open="(" close=")" separator="," item="did">
+          #{did}
+        </foreach>
+      </if>
+      <if test="driverId != null and driverId != 0">
+        and i.driver_id = #{driverId}
+      </if>
+      <if test="phone!=null and phone!=''">
+        and i.phone = #{phone}
+      </if>
+      <if test="cityIds!=null and cityIds.size()>0">
+        and i.service_city IN
+        <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
+          #{cid}
+        </foreach>
+      </if>
+      <if test="serviceCity!=null and serviceCity != 0">
+        and i.service_city  = #{serviceCity}
+      </if>
+      <if test="supplierIds!=null and supplierIds.size()>0">
+        and i.supplier_id IN
+        <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
+          #{sid}
+        </foreach>
+      </if>
+      <if test="supplierId != null" >
+        and  i.supplier_id = #{supplierId,jdbcType=INTEGER}
+      </if>
+      <if test="name!=null and name!=''">
+        and i.name  = #{driverName}
+      </if>
+    </where>
+    order by driver_id desc
   </select>
   
 </mapper>

@@ -5,14 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.zhuanche.entity.rentcar.CarBizCity;
-import mapper.rentcar.CarBizCityMapper;
-import mapper.rentcar.CarBizSupplierMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.common.collect.Sets;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 
+import mapper.rentcar.CarBizSupplierMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 /**供应商信息 的 基本服务层**/
 @Service
@@ -25,7 +24,9 @@ public class CarBizSupplierService{
 
 	/**查询供应商信息**/
 	public Map<Integer, CarBizSupplier> querySupplier( Integer cityId,  Set<Integer> supplierids ){
-		List<CarBizSupplier> list = carBizSupplierExMapper.querySuppliers(cityId, supplierids);
+        Set<Integer> cityIds = Sets.newHashSet();
+        cityIds.add(cityId);
+		List<CarBizSupplier> list = carBizSupplierExMapper.querySuppliers(cityIds, supplierids);
 		if(list==null||list.size()==0) {
 			return new HashMap<Integer, CarBizSupplier>(4);
 		}

@@ -16,6 +16,7 @@ import com.zhuanche.util.BeanUtil;
 
 import mapper.mdbcarmanage.SaasPermissionMapper;
 import mapper.mdbcarmanage.ex.SaasPermissionExMapper;
+import mapper.mdbcarmanage.ex.SaasRolePermissionRalationExMapper;
 
 /**权限管理功能**/
 @Service
@@ -24,6 +25,8 @@ public class PermissionManagementService{
 	private SaasPermissionMapper     saasPermissionMapper;
 	@Autowired
 	private SaasPermissionExMapper  saasPermissionExMapper;
+	@Autowired
+	private SaasRolePermissionRalationExMapper saasRolePermissionRalationExMapper;
 	@Autowired
 	private RedisSessionDAO              redisSessionDAO;
 	
@@ -147,7 +150,9 @@ public class PermissionManagementService{
 	/**返回的数据格式：列表**/
 	private List<SaasPermissionDTO> getAllPermissions_list(){
 		List<SaasPermission> allPos = saasPermissionExMapper.queryPermissions(null, null, null, null, null, null);
-		return BeanUtil.copyList(allPos, SaasPermissionDTO.class);
+		List<SaasPermissionDTO> saasPermissionDTOs = BeanUtil.copyList(allPos, SaasPermissionDTO.class);
+		saasPermissionDTOs.stream().forEach( p -> { if(SaasConst.SYSTEM_PERMISSIONS.contains(p.getPermissionCode())) { p.setPresetPerm(true); }  });//设置是否为系统预置权限
+		return saasPermissionDTOs;
 	}
 	/**返回的数据格式：树形**/
 	private List<SaasPermissionDTO> getAllPermissions_tree(){
@@ -160,11 +165,30 @@ public class PermissionManagementService{
 		}
 		//递归
 		List<SaasPermissionDTO> childrenDtos = BeanUtil.copyList(childrenPos, SaasPermissionDTO.class);
+		childrenDtos.stream().forEach( p -> { if(SaasConst.SYSTEM_PERMISSIONS.contains(p.getPermissionCode())) { p.setPresetPerm(true); }  });//设置是否为系统预置权限
 		for( SaasPermissionDTO childrenDto : childrenDtos ) {
 			List<SaasPermissionDTO> childs = this.getChildren( childrenDto.getPermissionId() );
  			childrenDto.setChildPermissions(childs);
 		}
 		return childrenDtos;
 	}
-
+	
+	/**六、删除一个权限**/
+	public 	AjaxResponse deleteSaasPermission( Integer permissionId ) {
+		//权限不存在
+		SaasPermission thisPermission = saasPermissionMapper.selectByPrimaryKey( permissionId );
+		if(thisPermission == null ) {
+			return AjaxResponse.fail(RestErrorCode.PERMISSION_NOT_EXIST );
+		}
+		//系统预置权限，不能禁用、修改
+		if( SaasConst.SYSTEM_PERMISSIONS.contains( thisPermission.getPermissionCode() ) ) {
+			return AjaxResponse.fail(RestErrorCode.SYSTEM_PERMISSION_CANOT_CHANGE , thisPermission.getPermissionCode() );
+		}
+		//执行
+		redisSessionDAO.clearRelativeSession(permissionId, null, null); //自动清理用户会话
+		try {Thread.sleep(3000);} catch (InterruptedException e) {	}//目的是等待一会儿，因会话清理也要查表的
+		saasRolePermissionRalationExMapper.deleteRoleIdsOfPermission(permissionId);
+		saasPermissionMapper.deleteByPrimaryKey(permissionId);
+		return AjaxResponse.success( null );
+	}
 }

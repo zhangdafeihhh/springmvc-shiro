@@ -48,16 +48,19 @@ public final class SaasConst {
 		SYSTEM_PERMISSIONS.add("SYSTEM_MANAGEMENT");
 		//----------------------------------------------------用户管理
 		SYSTEM_PERMISSIONS.add("USER_MANAGEMENT");
+		SYSTEM_PERMISSIONS.add("QUERY_USER_LIST");               //用户列表
+		SYSTEM_PERMISSIONS.add("UserManages_look");             //查看
 		SYSTEM_PERMISSIONS.add("ADD_USER");                          //增加一个用户
 		SYSTEM_PERMISSIONS.add("DISABLE_USER");                     //禁用一个用户
 		SYSTEM_PERMISSIONS.add("ENABLE_USER");                     //启用一个用户
 		SYSTEM_PERMISSIONS.add("CHANGE_USER");                    //修改一个用户
 		SYSTEM_PERMISSIONS.add("GET_ALL_ROLEIDS_OF_USER"); //查询一个用户中的角色ID
 		SYSTEM_PERMISSIONS.add("SAVE_ROLEIDS_OF_USER");     //保存一个用户中的角色ID
-		SYSTEM_PERMISSIONS.add("QUERY_USER_LIST");              //查询用户列表
 		SYSTEM_PERMISSIONS.add("RESET_USER_PASSWORD");    //重置用户密码
 		//----------------------------------------------------角色管理
 		SYSTEM_PERMISSIONS.add("ROLE_MANAGEMENT");
+		SYSTEM_PERMISSIONS.add("QUERY_SAAS_ROLE_LIST");          //角色列表
+		SYSTEM_PERMISSIONS.add("RoleManages_look");                 //查看
 		SYSTEM_PERMISSIONS.add("ADD_SAAS_ROLE");                     //增加一个角色
 		SYSTEM_PERMISSIONS.add("DISABLE_SAAS_ROLE");                //禁用一个角色
 		SYSTEM_PERMISSIONS.add("ENABLE_SAAS_ROLE");                //启用一个角色
@@ -65,14 +68,14 @@ public final class SaasConst {
 		SYSTEM_PERMISSIONS.add("GET_ALL_ROLE_PERMISSIONS");   //查询一个角色中的权限
 		SYSTEM_PERMISSIONS.add("GET_PERMISSIONIDS_OF_ROLE"); //查询一个角色中的权限ID
 		SYSTEM_PERMISSIONS.add("SAVE_ROLE_PERMISSIONIDS");    //保存一个角色中的权限ID
-		SYSTEM_PERMISSIONS.add("QUERY_SAAS_ROLE_LIST");          //查询角色列表
-		//----------------------------------------------------权限管理
+		//----------------------------------------------------权限管理 (功能管理)
 		SYSTEM_PERMISSIONS.add("PERMISSION_MANAGENT");
+		SYSTEM_PERMISSIONS.add("GET_ALL_SAAS_PERMISSIONS_INFO");  //查询所有的权限信息, 功能列表
+		SYSTEM_PERMISSIONS.add("CammelCase_look");                          //查看
 		SYSTEM_PERMISSIONS.add("ADD_SAAS_PERMISSION");                 //增加一个权限
 		SYSTEM_PERMISSIONS.add("DISABLE_SAAS_PERMISSION");            //禁用一个权限
 		SYSTEM_PERMISSIONS.add("ENABLE_SAAS_PERMISSION");             //启用一个权限
 		SYSTEM_PERMISSIONS.add("CHANGE_SAAS_PERMISSION");           //修改一个权限
-		SYSTEM_PERMISSIONS.add("GET_ALL_SAAS_PERMISSIONS_INFO");  //查询所有的权限信息
 	}
 	
 

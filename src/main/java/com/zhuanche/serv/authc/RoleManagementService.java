@@ -136,6 +136,9 @@ public class RoleManagementService{
 			if( checkedPermissionIds.contains(dto.getPermissionId()) ) {
 				dto.setChecked(true);//置为选中
 			}
+			if(SaasConst.SYSTEM_PERMISSIONS.contains(dto.getPermissionCode())) {
+				dto.setPresetPerm(true);//设置是否为系统预置权限
+			}
 		}
 		return allDtos;
 	}
@@ -153,6 +156,9 @@ public class RoleManagementService{
 		for( SaasPermissionDTO childrenDto : childrenDtos ) {
 			if( checkedPermissionIds.contains(childrenDto.getPermissionId()) ) {
 				childrenDto.setChecked(true);//置为选中
+			}
+			if(SaasConst.SYSTEM_PERMISSIONS.contains(childrenDto.getPermissionCode())) {
+				childrenDto.setPresetPerm(true);//设置是否为系统预置权限
 			}
 			
 			List<SaasPermissionDTO> childs = this.getChildren( checkedPermissionIds, childrenDto.getPermissionId() );
@@ -238,5 +244,23 @@ public class RoleManagementService{
     	PageDTO pageDto = new PageDTO( page, pageSize, total , roledtos);
     	return pageDto;
 	}
-
+	
+	/**九、删除一个角色**/
+	public AjaxResponse deleteSaasRole ( Integer roleId ) {
+		//角色不存在
+		SaasRole role = saasRoleMapper.selectByPrimaryKey(roleId);
+		if( role==null ) {
+			return AjaxResponse.fail(RestErrorCode.ROLE_NOT_EXIST );
+		}
+		//系统预置角色，不能被禁用
+		if( SaasConst.SYSTEM_ROLE.equalsIgnoreCase(role.getRoleCode()) ) {
+			return AjaxResponse.fail(RestErrorCode.SYSTEM_ROLE_CANOT_CHANGE , role.getRoleCode() );
+		}
+		//执行
+		redisSessionDAO.clearRelativeSession(null, roleId, null); //自动清理用户会话
+		try {Thread.sleep(3000);} catch (InterruptedException e) {	}//目的是等待一会儿，因会话清理也要查表的
+		saasRolePermissionRalationExMapper.deletePermissionIdsOfRole(roleId);
+		saasRoleMapper.deleteByPrimaryKey(roleId);
+		return AjaxResponse.success( null );
+	}
 }

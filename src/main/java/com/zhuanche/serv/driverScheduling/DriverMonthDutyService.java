@@ -85,7 +85,7 @@ public class DriverMonthDutyService {
 
 	@Autowired
 	private CarBizDriverInfoExMapper carBizDriverInfoExMapper;
-	
+
 	@Autowired
 	private CarDriverMonthDutyExMapper carDriverMonthDutyExMapper;
 
@@ -93,13 +93,16 @@ public class DriverMonthDutyService {
 	private CarDriverMonthDutyMapper carDriverMonthDutyMapper;
 
 
-	/** 
-	* @Desc: 导入排班信息 
-	* @param:
-	* @return:  
-	* @Author: lunan
-	* @Date: 2018/9/4 
-	*/
+	/**
+	 * @Desc: 导入排班信息
+	 * @param:
+	 * @return:
+	 * @Author: lunan
+	 * @Date: 2018/9/4
+	 */
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public Map<String, Object> importDriverMonthDuty(
 			DriverMonthDutyRequest params, HttpServletRequest request,MultipartFile file) {
 
@@ -257,116 +260,122 @@ public class DriverMonthDutyService {
 					} else {
 						cellStringValue = cellValue.getStringValue().trim();
 					}
-					if (colIx == 0) {
-						logger.info("司机编码："+cellStringValue);
-						if (cellStringValue == null) {
-							isTrue = false;
-						} else {
-							if (driverIdSet.contains(cellStringValue)) { // 导入数据如果存在重复数据，已第一条未准
+					DynamicRoutingDataSource.DataSourceMode mdbcarManageMode = DynamicRoutingDataSource.getMasterSlave("mdbcarmanage-DataSource");
+					try{
+						if (colIx == 0) {
+							logger.info("司机编码："+cellStringValue);
+							if (cellStringValue == null) {
 								isTrue = false;
-								continue;
 							} else {
-								driverIdSet.add(cellStringValue);
+								if (driverIdSet.contains(cellStringValue)) { // 导入数据如果存在重复数据，已第一条未准
+									isTrue = false;
+									continue;
+								} else {
+									driverIdSet.add(cellStringValue);
+								}
+								driverEntity = carBizDriverInfoExMapper.selectDriverDetail(cellValue.getStringValue());
+								if (null == driverEntity) {
+									isTrue = false;
+									break;
+								}
+								driverMonthDutyEntity.setDriverId(Integer.parseInt(cellValue.getStringValue()));
+								DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource", DynamicRoutingDataSource.DataSourceMode.SLAVE);
+								List<CarDriverMonthDTO> oldRecordList = carDriverMonthDutyExMapper.queryDriverDutyList(driverMonthDutyEntity);
+								if (null != oldRecordList && !oldRecordList.isEmpty()) {
+									hasDuty = true;
+									oldRecord = oldRecordList.get(0);
+									driverMonthDutyEntity.setId(oldRecord.getId());
+								}
 							}
-							driverEntity = carBizDriverInfoExMapper.selectDriverDetail(cellValue.getStringValue());
-							if (null == driverEntity) {
+						} else if (colIx == 1) { // 车队
+							logger.info("车队："+cellStringValue);
+							Map<String, Object> teamInfo = null;
+							try {
+								teamInfo = carDriverTeamExMapper.queryTeamIdByDriverId(Integer.parseInt(driverEntity.getDriverId()));
+								if (cellStringValue != null
+										&& !(teamInfo != null
+										&& !StringUtils.isEmpty(teamInfo.get("teamName").toString())
+										&& teamInfo.get("teamName").toString().equals(cellValue.getStringValue()))) { // 导入的数据与查询的数据不一致
+									isTrue = false;
+								} else {
+									if (teamInfo != null
+											&& !StringUtils.isEmpty(teamInfo.get("teamId").toString())) {
+										driverMonthDutyEntity.setTeamId(teamInfo.get("teamId").toString());
+									}
+								}
+							} catch (Exception e) {
 								isTrue = false;
 								break;
 							}
-							driverMonthDutyEntity.setDriverId(Integer.parseInt(cellValue.getStringValue()));
-							List<CarDriverMonthDTO> oldRecordList = carDriverMonthDutyExMapper.queryDriverDutyList(driverMonthDutyEntity);
-							if (null != oldRecordList && !oldRecordList.isEmpty()) {
-								hasDuty = true;
-								oldRecord = oldRecordList.get(0);
-								driverMonthDutyEntity.setId(oldRecord.getId());
-							}
-						}
-					} else if (colIx == 1) { // 车队
-						logger.info("车队："+cellStringValue);
-						Map<String, Object> teamInfo = null;
-						try {
-							teamInfo = carDriverTeamExMapper.queryTeamIdByDriverId(Integer.parseInt(driverEntity.getDriverId()));
+
+						} else if (colIx == 2) { // 司机名称
+							logger.info("司机名称："+cellStringValue);
 							if (cellStringValue != null
-									&& !(teamInfo != null
-									&& !StringUtils.isEmpty(teamInfo.get("teamName").toString())
-									&& teamInfo.get("teamName").toString().equals(cellValue.getStringValue()))) { // 导入的数据与查询的数据不一致
+									&& !((driverEntity.getName() != null
+									&& !StringUtils.isEmpty(driverEntity.getName()))
+									&& driverEntity.getName().equals(cellValue.getStringValue()))) { // 导入的数据与查询的数据不一致
 								isTrue = false;
 							} else {
-								if (teamInfo != null
-										&& !StringUtils.isEmpty(teamInfo.get("teamId").toString())) {
-									driverMonthDutyEntity.setTeamId(teamInfo.get("teamId").toString());
+								driverMonthDutyEntity.setDriverName(driverEntity.getName());
+							}
+						} else if (colIx == 3) { // 是否在职
+							logger.info("是否在职："+cellStringValue);
+							if (cellStringValue == null
+									|| !("在职".equals(cellStringValue) || "离职".equals(cellStringValue))) {
+								isTrue = false;
+							} else if ("在职".equals(cellStringValue)) {
+								if (null != driverEntity.getStatus() && 1 == driverEntity.getStatus().intValue()) {
+									driverMonthDutyEntity.setStatus(1);
+								} else {
+									isTrue = false;
+								}
+							} else if ("离职".equals(cellStringValue)) {
+								if (null != driverEntity.getStatus() && 0 == driverEntity.getStatus().intValue()) {
+									isTrue = false;
+								} else {
+									isTrue = false;
 								}
 							}
-						} catch (Exception e) {
-							isTrue = false;
-							break;
-						}
-
-					} else if (colIx == 2) { // 司机名称
-						logger.info("司机名称："+cellStringValue);
-						if (cellStringValue != null
-								&& !((driverEntity.getName() != null
-								&& !StringUtils.isEmpty(driverEntity.getName()))
-								&& driverEntity.getName().equals(cellValue.getStringValue()))) { // 导入的数据与查询的数据不一致
-							isTrue = false;
-						} else {
-							driverMonthDutyEntity.setDriverName(driverEntity.getName());
-						}
-					} else if (colIx == 3) { // 是否在职
-						logger.info("是否在职："+cellStringValue);
-						if (cellStringValue == null
-								|| !("在职".equals(cellStringValue) || "离职".equals(cellStringValue))) {
-							isTrue = false;
-						} else if ("在职".equals(cellStringValue)) {
-							if (null != driverEntity.getStatus() && 1 == driverEntity.getStatus().intValue()) {
-								driverMonthDutyEntity.setStatus(1);
-							} else {
-								isTrue = false;
-							}
-						} else if ("离职".equals(cellStringValue)) {
-							if (null != driverEntity.getStatus() && 0 == driverEntity.getStatus().intValue()) {
+						} else if (colIx == 4) { // 车牌号
+							logger.info("车牌号："+cellStringValue);
+							if (cellStringValue != null
+									&& !((driverEntity.getName() != null
+									&& !StringUtils.isEmpty(driverEntity.getLicensePlates()))
+									&& driverEntity.getLicensePlates().equals(cellValue.getStringValue()))) { // 导入的数据与查询的数据不一致
 								isTrue = false;
 							} else {
+								driverMonthDutyEntity.setLicensePlates(driverEntity.getLicensePlates());
+							}
+						} else if (colIx > 4) { // 每天的排班
+							int day_num = colIx - 4;
+							String key = null;
+							if (day_num < 10) {
+								key = monthStr +"-0" + day_num;
+							} else if (day_num <= maxDate) {
+								key = monthStr +"-" + day_num;
+							} else if (day_num > maxDate) {
+								break;
+							}
+							logger.info(key + "排班："+cellStringValue);
+							if (1 == day_num) {
+								data = "{";
+							} else {
+								data += ",";
+							}
+							data += key +":";
+							if (null != EnumDriverMonthDutyStatus.getValue(cellStringValue)) {
+								data += EnumDriverMonthDutyStatus.getValue(cellStringValue);
+							} else {
 								isTrue = false;
+								continue;
+							}
+							if (maxDate == day_num) {
+								data += "}";
+								driverMonthDutyEntity.setData(data);
 							}
 						}
-					} else if (colIx == 4) { // 车牌号
-						logger.info("车牌号："+cellStringValue);
-						if (cellStringValue != null
-								&& !((driverEntity.getName() != null
-								&& !StringUtils.isEmpty(driverEntity.getLicensePlates()))
-								&& driverEntity.getLicensePlates().equals(cellValue.getStringValue()))) { // 导入的数据与查询的数据不一致
-							isTrue = false;
-						} else {
-							driverMonthDutyEntity.setLicensePlates(driverEntity.getLicensePlates());
-						}
-					} else if (colIx > 4) { // 每天的排班
-						int day_num = colIx - 4;
-						String key = null;
-						if (day_num < 10) {
-							key = monthStr +"-0" + day_num;
-						} else if (day_num <= maxDate) {
-							key = monthStr +"-" + day_num;
-						} else if (day_num > maxDate) {
-							break;
-						}
-						logger.info(key + "排班："+cellStringValue);
-						if (1 == day_num) {
-							data = "{";
-						} else {
-							data += ",";
-						}
-						data += key +":";
-						if (null != EnumDriverMonthDutyStatus.getValue(cellStringValue)) {
-							data += EnumDriverMonthDutyStatus.getValue(cellStringValue);
-						} else {
-							isTrue = false;
-							continue;
-						}
-						if (maxDate == day_num) {
-							data += "}";
-							driverMonthDutyEntity.setData(data);
-						}
+					}finally {
+						DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",mdbcarManageMode);
 					}
 				}// 循环列结束
 				//cityId
@@ -471,14 +480,14 @@ public class DriverMonthDutyService {
 
 		return newData;
 	}
-	
-	/** 
-	* @Desc: 更新排班信息 
-	* @param:
-	* @return:  
-	* @Author: lunan
-	* @Date: 2018/9/4 
-	*/
+
+	/**
+	 * @Desc: 更新排班信息
+	 * @param:
+	 * @return:
+	 * @Author: lunan
+	 * @Date: 2018/9/4
+	 */
 	@MasterSlaveConfigs(configs={
 			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.MASTER )
 	} )
@@ -494,13 +503,13 @@ public class DriverMonthDutyService {
 		return result;
 	}
 
-	/** 
-	* @Desc: 查询月排班详情By Id
-	* @param:
-	* @return:  
-	* @Author: lunan
-	* @Date: 2018/9/4 
-	*/
+	/**
+	 * @Desc: 查询月排班详情By Id
+	 * @param:
+	 * @return:
+	 * @Author: lunan
+	 * @Date: 2018/9/4
+	 */
 	@MasterSlaveConfigs(configs={
 			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
 	} )
@@ -508,15 +517,15 @@ public class DriverMonthDutyService {
 		CarDriverMonthDuty month = carDriverMonthDutyMapper.selectByPrimaryKey(id);
 		return month;
 	}
-	
 
-	/** 
-	* @Desc: 查询在职司机 
-	* @param:
-	* @return:  
-	* @Author: lunan
-	* @Date: 2018/9/4 
-	*/
+
+	/**
+	 * @Desc: 查询在职司机
+	 * @param:
+	 * @return:
+	 * @Author: lunan
+	 * @Date: 2018/9/4
+	 */
 	@MasterSlaveConfigs(configs={
 			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
 	} )
@@ -524,13 +533,13 @@ public class DriverMonthDutyService {
 		return carRelateTeamExMapper.queryDriverIdsByTeamIds(teamIds);
 	}
 
-	/** 
-	* @Desc: 查询月排班列表 
-	* @param:
-	* @return:  
-	* @Author: lunan
-	* @Date: 2018/9/4 
-	*/
+	/**
+	 * @Desc: 查询月排班列表
+	 * @param:
+	 * @return:
+	 * @Author: lunan
+	 * @Date: 2018/9/4
+	 */
 	@MasterSlaveConfigs(configs={
 			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
 	} )
@@ -718,14 +727,14 @@ public class DriverMonthDutyService {
 		}
 		return rows;
 	}
-	
-	/** 
-	* @Desc: 查询月排班司机信息列表 
-	* @param:
-	* @return:  
-	* @Author: lunan
-	* @Date: 2018/9/4 
-	*/
+
+	/**
+	 * @Desc: 查询月排班司机信息列表
+	 * @param:
+	 * @return:
+	 * @Author: lunan
+	 * @Date: 2018/9/4
+	 */
 	@MasterSlaveConfigs(configs={
 			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
 	} )
@@ -733,13 +742,13 @@ public class DriverMonthDutyService {
 		return carBizDriverInfoExMapper.queryDriverListForMonthDuty(param);
 	}
 
-	/** 
-	* @Desc: 返回月排班模板司机列表 
-	* @param:
-	* @return:  
-	* @Author: lunan
-	* @Date: 2018/9/4 
-	*/
+	/**
+	 * @Desc: 返回月排班模板司机列表
+	 * @param:
+	 * @return:
+	 * @Author: lunan
+	 * @Date: 2018/9/4
+	 */
 	@MasterSlaveConfigs(configs={
 			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
 	} )
@@ -767,13 +776,13 @@ public class DriverMonthDutyService {
 	}
 
 
-	/** 
-	* @Desc: 司机月排班表头 
-	* @param:
-	* @return:  
-	* @Author: lunan
-	* @Date: 2018/9/4 
-	*/ 
+	/**
+	 * @Desc: 司机月排班表头
+	 * @param:
+	 * @return:
+	 * @Author: lunan
+	 * @Date: 2018/9/4
+	 */
 	public Map<String,Object> queryDriverDutyTable(DriverMonthDutyRequest params) {
 		Map<String,Object> result = new LinkedHashMap<String,Object>();
 		Map<String,Object> map = new LinkedHashMap<String,Object>();

@@ -64,4 +64,24 @@
     <include refid="allBaseColumnWhereList"/>
     ORDER BY ca.driver_id DESC
   </select>
+
+
+  <select id="queryCustomerAppraisalStatisticsListV2" resultMap="BaseResultMap" parameterType="com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO" >
+    select
+    ca.appraisal_statistics_id, ca.driver_id, ca.driver_name, ca.driver_phone, ca.instrument_and_service,
+    ca.environment_and_equipped, ca.efficiency_and_safety, ca.evaluate_score, ca.create_date, ca.sys_date
+    from car_biz_customer_appraisal_statistics ca
+    <where>
+      <if test="driverIds !=null and driverIds.size()>0">
+        and ca.driver_id IN
+        <foreach collection="driverIds" open="(" close=")" separator="," item="did">
+          #{did}
+        </foreach>
+      </if>
+      <if test="createDate !=null and createDate !=''">
+        <![CDATA[ AND ca.create_date =  concat(#{createDate}) ]]>
+      </if>
+    </where>
+    ORDER BY ca.driver_id DESC
+  </select>
 </mapper>

@@ -22,7 +22,7 @@
   <sql id="allBaseColumnWhereList" >
     <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR" >
       <if test="name != null and name != ''" >
-        and name like '%${name}%'
+        and name like '${name}%'
       </if>
       <if test="status != null and status !='' " >
         and status = #{status}
