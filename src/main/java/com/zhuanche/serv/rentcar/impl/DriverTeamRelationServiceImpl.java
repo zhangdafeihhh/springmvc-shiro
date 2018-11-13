@@ -1,8 +1,12 @@
 package com.zhuanche.serv.rentcar.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.zhuanche.controller.driverIntegra.DriverIntegraController;
 import com.zhuanche.dto.driver.DriverTeamRelationEntity;
 import com.zhuanche.serv.rentcar.IDriverTeamRelationService;
 import mapper.mdbcarmanage.ex.CarRelateTeamExMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,12 +15,13 @@ import java.util.Set;
 
 @Service
 public class DriverTeamRelationServiceImpl implements IDriverTeamRelationService<DriverTeamRelationEntity> {
-
+    private static Logger logger =  LoggerFactory.getLogger(DriverTeamRelationServiceImpl.class);
     @Autowired
     private CarRelateTeamExMapper carRelateTeamExMapper;
 
     @Override
     public List<DriverTeamRelationEntity> selectDriverIdsNoLimit(DriverTeamRelationEntity params) {
+        logger.info("查询司机与车队关系，参数为："+(params==null?null: JSON.toJSONString(params)));
         return carRelateTeamExMapper.queryForListObjectNoLimit(params);
     }
 
