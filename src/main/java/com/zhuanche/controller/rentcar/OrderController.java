@@ -411,7 +411,7 @@ public class OrderController{
 			 }else {
 				 AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
 				 ajaxResponse.setMsg("下单开始时间或者结束时间参数错误");
-				 return ajaxResponse;
+				 return JSON.toJSONString(ajaxResponse);
 			 }
 		 }
 	     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmssSS");
