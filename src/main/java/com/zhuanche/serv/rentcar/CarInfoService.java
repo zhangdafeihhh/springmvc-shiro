@@ -52,4 +52,6 @@ public interface CarInfoService {
     Map<String,Object> importDeleteCarInfo(CarInfo params,HttpServletRequest request);
 
     String selectModelNameByLicensePlates(String params);
+
+    void getExportExcel(CarInfo params, List<String> datas);
 }

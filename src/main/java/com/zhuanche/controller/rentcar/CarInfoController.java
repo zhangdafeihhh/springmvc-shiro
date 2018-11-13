@@ -12,6 +12,7 @@ import com.zhuanche.serv.rentcar.CarInfoService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.Common;
+import com.zhuanche.util.excel.CsvUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
@@ -24,11 +25,9 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController("CarInfoController")
 @RequestMapping("carInfo")
@@ -459,9 +458,25 @@ public class CarInfoController {
             params.setStatus(status);
             params.setIsFree(isFree);
 
-            @SuppressWarnings("deprecation")
+            /*@SuppressWarnings("deprecation")
             Workbook wb = this.carService.exportExcel(params,request.getRealPath("/")+File.separator+"template"+File.separator+"car_info.xlsx");
-            exportExcelFromTemplet(request, response, wb, new String("车辆信息列表".getBytes("gb2312"), "iso8859-1"));
+            exportExcelFromTemplet(request, response, wb, new String("车辆信息列表".getBytes("gb2312"), "iso8859-1"));*/
+            List<String> header = new ArrayList<>();
+            header.add("车牌号,城市,状态,供应商,车型,具体车型,购买日期,颜色,发动机号,车架号,下次车检时间,下次维保时间,租赁到期时间,下次等级鉴定时间," +
+                    "下次检营运证时间,下次检治安证时间,二级维户时间,核定载客位,车辆厂牌,车牌颜色,车辆VIN码,车辆注册日期,车辆燃料类型,发动机排量（毫升）," +
+                    "发动机功率（千瓦）,车辆轴距（毫米）,运输证字号,车辆运输证发证机构,车辆经营区域,车辆运输证有效期起,车辆运输证有效期止,车辆初次登记日期," +
+                    "车辆检修状态,车辆年度审验状态,车辆年度审验日期,发票打印设备序列号,卫星定位装置品牌,卫星定位装置型号,卫星定位装置IMEI号,卫星定位设备安装日期," +
+                    "创建人,创建时间,修改人,修改时间,备注,司机姓名,所属车主,车辆类型(以机动车行驶证为主)");
+            String fileName = "车辆信息" + com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
+            String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
+            if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
+                fileName = URLEncoder.encode(fileName, "UTF-8");
+            } else {  //其他浏览器
+                fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+            }
+            List<String> datas = new ArrayList<>();
+            carService.getExportExcel(params, datas);
+            CsvUtils.exportCsv(response, datas, header, fileName);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Exception e) {

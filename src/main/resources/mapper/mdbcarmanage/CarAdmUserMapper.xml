@@ -196,4 +196,14 @@
       phone = #{phone,jdbcType=VARCHAR}
     where user_id = #{userId,jdbcType=INTEGER}
   </update>
+  <select id="selectUsersByIdList" resultMap="BaseResultMap" parameterType="java.util.List">
+    select
+    user_id,user_name
+    from car_adm_user
+    where
+    user_id in
+    <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+                      #{item}
+    </foreach>
+  </select>
 </mapper>

@@ -193,6 +193,23 @@
 		WHERE rt.driver_id in (${driverIds})
     </select>
 
+    <select id="queryDriverTeamListByDriverIdList" parameterType="java.util.List" resultType="com.zhuanche.entity.mdbcarmanage.CarRelateTeam">
+
+        SELECT
+			rt.driver_id driverId,
+			rt.team_id teamId,
+			dt.team_name teamName,
+			rg.group_id groupId,
+			dtm.team_name groupName
+		FROM car_relate_team rt
+		LEFT JOIN car_relate_group rg ON rg.driver_id=rt.driver_id
+		LEFT JOIN car_driver_team dt  ON rt.team_id=dt.id
+		LEFT JOIN car_driver_team dtm ON rg.group_id=dtm.id
+		WHERE rt.driver_id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+                            #{item}
+        </foreach>
+    </select>
 
     <select id="queryForListByStatusNotEq2" resultMap="BaseResultMap" >
         select
@@ -229,5 +246,4 @@
 
         order by city, id
     </select>
-
 </mapper>

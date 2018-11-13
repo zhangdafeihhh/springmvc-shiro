@@ -21,6 +21,7 @@ import com.zhuanche.serv.*;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
+import com.zhuanche.util.excel.CsvUtils;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -36,17 +37,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Controller
 @RequestMapping("/driverInfo")
@@ -295,11 +292,27 @@ public class DriverInfoController {
             list = carBizDriverInfoService.queryDriverList(carBizDriverInfoDTO);
         }
         try {
-            Workbook wb = carBizDriverInfoService.exportExcel(list, cityId, supplierId, request.getRealPath("/")+File.separator+"template"+File.separator+"driver_info.xlsx");
+//            Workbook wb = carBizDriverInfoService.exportExcel(list, cityId, supplierId, request.getRealPath("/")+File.separator+"template"+File.separator+"driver_info.xlsx");
+            List<String> header = new ArrayList<>();
+            header.add("车牌号,机动车驾驶员姓名,驾驶员身份证号,驾驶员手机号,司机手机型号,司机手机运营商,驾驶员性别,出生日期,年龄,服务监督号码,服务监督链接,车型类别,驾照类型,驾照领证日期, 驾龄," +
+                    "驾照到期时间,档案编号,国籍,驾驶员民族,驾驶员婚姻状况,驾驶员外语能力,驾驶员学历,户口登记机关名称,户口住址或长住地址,驾驶员通信地址,驾驶员照片文件编号,机动车驾驶证号," +
+                    "机动车驾驶证扫描件文件编号,初次领取驾驶证日期,是否巡游出租汽车驾驶员,网络预约出租汽车驾驶员资格证号,网络预约出租汽车驾驶员证初领日期,巡游出租汽车驾驶员资格证号," +
+                    "网络预约出租汽车驾驶员证发证机构,资格证发证日期,初次领取资格证日期,资格证有效起始日期,资格证有效截止日期,注册日期,是否专职驾驶员,驾驶员合同（或协议）签署公司,有效合同时间," +
+                    "合同（或协议）有效期起,合同（或协议）有效期止,紧急情况联系人,紧急情况联系人电话,紧急情况联系人通讯地址,供应商,城市,车队,小组,司机id,创建时间");
+            String fileName = "司机信息" + com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
+            String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
+            if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
+                fileName = URLEncoder.encode(fileName, "UTF-8");
+            } else {  //其他浏览器
+                fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+            }
+            List<String> datas = new ArrayList<>();
+            carBizDriverInfoService.getExportExcelData(datas, list, cityId, supplierId);
+            CsvUtils.exportCsv(response, datas, header, fileName);
 //            Componment.fileDownload(response, wb, new String("司机信息".getBytes("utf-8"), "iso8859-1"));
             long end=System.currentTimeMillis(); //获取结束时间
             logger.info(LOGTAG + "司机导出cityId={},supplierId={}的查询写入数据时间为={}ms", cityId, supplierId, (end-start));
-            this.exportExcelFromTemplet(response, wb, new String("司机信息".getBytes("utf-8"), "iso8859-1"));
+//            this.exportExcelFromTemplet(response, wb, new String("司机信息".getBytes("utf-8"), "iso8859-1"));
         } catch (Exception e) {
            logger.error("司机信息列表查询导出error",e);
         }finally {
