@@ -327,7 +327,13 @@ public class DriverIntegraController {
                     }
                 }
                 if (StringUtils.isEmpty(driverIds)) {
-                    return this.gridJsonFormate(rows, total).toJSONString();
+
+                    try {
+                        doDownExcel( rows,   response);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
                 }
             }
             driverEntity.setDriverIds(driverIds);
