@@ -14,6 +14,7 @@ import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.mdbcarmanage.DriverInfoUpdateApplyDTO;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
+import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoUpdateApply;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.entity.rentcar.CarBizModel;
@@ -23,7 +24,9 @@ import com.zhuanche.serv.mdbcarmanage.DriverInfoUpdateService;
 import com.zhuanche.serv.rentcar.CarBizModelService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
+import com.zhuanche.util.Check;
 import com.zhuanche.util.ValidateUtils;
+import mapper.mdbcarmanage.ex.CarRelateTeamExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +61,9 @@ public class DriverInfoUpdateApplyController {
 
     @Autowired
     private CarBizModelService carBizModelService;
+
+    @Autowired
+    private CarRelateTeamExMapper carRelateTeamExMapper;
 
     /**
      * 司机\车辆修改申请信息列表（有分页）
@@ -204,6 +210,14 @@ public class DriverInfoUpdateApplyController {
         driverInfoUpdateApply.setType(1);
         driverInfoUpdateApply.setStatus(1);
 
+        CarRelateTeam carRelateTeam = new CarRelateTeam();
+        carRelateTeam.setDriverId(driverId);
+        CarRelateTeam teamRelate = carRelateTeamExMapper.selectOneTeam(carRelateTeam);
+        if(!Check.NuNObj(teamRelate)){
+            driverInfoUpdateApply.setTeamName(teamRelate.getTeamName());
+            driverInfoUpdateApply.setTeamId(teamRelate.getTeamId());
+        }
+
         int i = driverInfoUpdateService.insertSelective(driverInfoUpdateApply);
         if(i>0){
             return AjaxResponse.success(null);
@@ -272,6 +286,14 @@ public class DriverInfoUpdateApplyController {
             driverInfoUpdateApply.setDriverName(carBizDriverInfo.getName());
             driverInfoUpdateApply.setDriverPhone(carBizDriverInfo.getPhone());
             driverInfoUpdateApply.setIdCardNo(carBizDriverInfo.getIdCardNo());
+
+            CarRelateTeam carRelateTeam = new CarRelateTeam();
+            carRelateTeam.setDriverId(carBizDriverInfo.getDriverId());
+            CarRelateTeam teamRelate = carRelateTeamExMapper.selectOneTeam(carRelateTeam);
+            if(!Check.NuNObj(teamRelate)){
+                driverInfoUpdateApply.setTeamName(teamRelate.getTeamName());
+                driverInfoUpdateApply.setTeamId(teamRelate.getTeamId());
+            }
         }
         /*if(carBizCarInfoDTO.getDriverId()!=null && carBizCarInfoDTO.getDriverId()!=0){
             CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(carBizCarInfoDTO.getDriverId());
