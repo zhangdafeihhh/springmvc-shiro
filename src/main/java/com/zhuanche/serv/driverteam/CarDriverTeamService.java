@@ -508,6 +508,8 @@ public class CarDriverTeamService{
 			}else if(paramDto.getOpenCloseFlag() !=0 && paramDto.getStatus() == existsTeam.getStatus()){
 				return ServiceReturnCodeEnum.DEAL_SUCCESS.getCode();
 			}
+			existsTeam.setUpdateDate(new Date());
+			existsTeam.setUpdateBy(String.valueOf(WebSessionUtil.getCurrentLoginUser().getId()));
 			existsTeam.setCharge1(paramDto.getCharge1());
 			existsTeam.setCharge2(paramDto.getCharge2());
 			existsTeam.setCharge3(paramDto.getCharge3());
@@ -555,16 +557,19 @@ public class CarDriverTeamService{
 			CarDriverTeam record = new CarDriverTeam();
 			record.setSupplier(paramDto.getSupplier());
 			record.setCity(paramDto.getCity());
+			record.setCreateDate(new Date());
+			record.setCreateBy(String.valueOf(WebSessionUtil.getCurrentLoginUser().getId()));
 			if(!Check.NuNObj(paramDto.getpId())){
 				record.setpId(paramDto.getpId());
 			}
 			record.setTeamName(paramDto.getTeamName());
 			if(Check.NuNObj(paramDto.getStatus())){
-				record.setStatus(2);
+				record.setStatus(1);
 			}
 			record.setCharge1(paramDto.getCharge1());
 			record.setCharge2(paramDto.getCharge2());
 			record.setCharge3(paramDto.getCharge3());
+			record.setRemark(paramDto.getRemark());
 //			BeanUtils.copyProperties(record,paramDto);
 			record.setCreateBy(String.valueOf(WebSessionUtil.getCurrentLoginUser().getId()));
 			return carDriverTeamMapper.insertSelective(record);
