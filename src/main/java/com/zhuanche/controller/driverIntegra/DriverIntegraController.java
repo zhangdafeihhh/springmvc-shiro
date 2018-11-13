@@ -107,6 +107,7 @@ public class DriverIntegraController {
                     teamIds += id;
                 }
             }
+
             if (driverEntity.getServiceCityId() != null && !"".equals(driverEntity.getServiceCityId())) {
                 cities = String.valueOf(driverEntity.getServiceCityId());
             }
@@ -120,33 +121,32 @@ public class DriverIntegraController {
             int total = 0;
             driverEntity.setCities(cities);
             driverEntity.setSuppliers(suppliers);
-            String driverIdTeam = "";
+            String driverIds = "";
             if (StringUtils.isNotBlank(teamIds)) {
                 String[] teamId = teamIds.split(",");
                 DriverTeamRelationEntity params = new DriverTeamRelationEntity();
-                params.setTeamId(teamIds);
+
+                params.setDriverId(driverEntity.getDriverId());
                 DriverTeamEntity paramsTeam = new DriverTeamEntity();
-                int j = 0;
                 for (int i = 0; i < teamId.length; i++) {
                     paramsTeam.setTeamId(teamId[i]);
                     //不分页查询司机-车队关系
                     List<DriverTeamRelationEntity> driverIdList = this.driverTeamRelationService
                             .selectDriverIdsNoLimit(params);
-                    String driverIds = this.driverTeamRelationService.pingDriverIds(driverIdList);
-                    if (j == 0) {
-                        driverIdTeam = driverIds;
+                    String driverIdsArray = this.driverTeamRelationService.pingDriverIds(driverIdList);
+                    if(StringUtils.isEmpty(driverIds)){
+                        driverIds = driverIdsArray;
                     } else {
-                        driverIdTeam += "," + driverIds;
+                        if(StringUtils.isNotEmpty(driverIdsArray)){
+                            driverIds += "," + driverIdsArray;
+                        }
                     }
-                    j++;
                 }
-                if (driverIdTeam == null || "".equals(driverIdTeam)) {
+                if (StringUtils.isEmpty(driverIds)) {
                     return this.gridJsonFormate(rows, total);
                 }
-            }else{
-                driverIdTeam = driverEntity.getDriverId();
             }
-            driverEntity.setDriverId(driverIdTeam);
+            driverEntity.setDriverIds(driverIds);
             if(driverEntity.getCityId() != 0){
                 driverEntity.setServiceCityId(driverEntity.getCityId());
             }
@@ -309,41 +309,31 @@ public class DriverIntegraController {
             int total = 0;
             driverEntity.setCities(cities);
             driverEntity.setSuppliers(suppliers);
-            String driverIdTeam = "";
-            if (StringUtils.isNotEmpty(teamIds)) {
+            String driverIds = "";
+            if (StringUtils.isNotBlank(teamIds)) {
                 String[] teamId = teamIds.split(",");
                 DriverTeamRelationEntity params = new DriverTeamRelationEntity();
-                params.setTeamId(teamIds);
+                params.setDriverId(driverEntity.getDriverId());
                 DriverTeamEntity paramsTeam = new DriverTeamEntity();
-                int j = 0;
                 for (int i = 0; i < teamId.length; i++) {
                     paramsTeam.setTeamId(teamId[i]);
-                    //根据车队查询车队下所有司机的id
+                    //不分页查询司机-车队关系
                     List<DriverTeamRelationEntity> driverIdList = this.driverTeamRelationService
                             .selectDriverIdsNoLimit(params);
-                    //从list里将司机id拼接成字符串
-                    String driverIds = this.driverTeamRelationService.pingDriverIds(driverIdList);
-                    if (j == 0) {
-                        driverIdTeam = driverIds;
+                    String driverIdsArray = this.driverTeamRelationService.pingDriverIds(driverIdList);
+                    if(StringUtils.isEmpty(driverIds)){
+                        driverIds = driverIdsArray;
                     } else {
-                        driverIdTeam += "," + driverIds;
+                        if(StringUtils.isNotEmpty(driverIdsArray)){
+                            driverIds += "," + driverIdsArray;
+                        }
                     }
-                    j++;
                 }
-                //如果id为空，则只打印头部
-                if (StringUtils.isEmpty(driverIdTeam)) {
-                    long start = System.currentTimeMillis();
-                    try {
-                        doDownExcel( rows,   response);
-                    } catch (IOException e) {
-                        logger.error("下载司机积分数据列表异常,耗时"+(System.currentTimeMillis() - start),e);
-                    }
-                    return null;
+                if (StringUtils.isEmpty(driverIds)) {
+                    return this.gridJsonFormate(rows, total).toJSONString();
                 }
-            }else{
-                driverIdTeam = driverEntity.getDriverId();
             }
-            driverEntity.setDriverId(driverIdTeam);
+            driverEntity.setDriverIds(driverIds);
             if(driverEntity.getCityId() != 0){
                 driverEntity.setServiceCityId(driverEntity.getCityId());
             }

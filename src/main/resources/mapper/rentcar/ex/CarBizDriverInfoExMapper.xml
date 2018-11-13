@@ -1513,8 +1513,13 @@
         and i.license_plates LIKE '%${licensePlates}%'
       </if>
       <if test="driverId!=null and driverId !=''">
-        and i.driver_id in (${driverId})
+        and i.driver_id = ${driverId}
       </if>
+      <if test="driverIds!=null and driverIds !=''">
+        and i.driver_id in(${driverIds})
+      </if>
+
+
       <if test="name!=null and name!=''">
         <!-- and i.name like '%name%' -->
         and i.name LIKE CONCAT(#{name},'%')
@@ -1608,7 +1613,10 @@
         and i.license_plates LIKE '%${licensePlates}%'
       </if>
       <if test="driverId!=null and driverId !=''">
-        and i.driver_id in (${driverId})
+        and i.driver_id = ${driverId}
+      </if>
+      <if test="driverIds!=null and driverIds !=''">
+        and i.driver_id in(${driverIds})
       </if>
       <if test="name!=null and name!=''">
         and i.name LIKE CONCAT(#{name},'%')
