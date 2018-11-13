@@ -489,11 +489,14 @@ public class CarDriverTeamService{
 		try{
 			DynamicRoutingDataSource.DataSourceMode mdbcarManageMode = DynamicRoutingDataSource.getMasterSlave("mdbcarmanage-DataSource");
 			CarDriverTeam existsTeam = null;
+			logger.info("-updateOneDriverTeam-mdb-datasource-first={}",mdbcarManageMode);
 			try{
 				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource", DynamicRoutingDataSource.DataSourceMode.SLAVE);
 				existsTeam = carDriverTeamMapper.selectByPrimaryKey(paramDto.getId());
+				logger.info("-updateOneDriverTeam-mdb-datasource-second={}",DynamicRoutingDataSource.getMasterSlave("mdbcarmanage-DataSource"));
 			}finally {
 				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",mdbcarManageMode);
+				logger.info("-updateOneDriverTeam-mdb-datasource-third={}",mdbcarManageMode);
 			}
 			if(Check.NuNObj(existsTeam)){
 				return ServiceReturnCodeEnum.NONE_RECODE_EXISTS.getCode();
@@ -534,15 +537,15 @@ public class CarDriverTeamService{
 			DriverTeamRequest driverTeamRequest = new DriverTeamRequest();
 			driverTeamRequest.setTeamName(paramDto.getTeamName());
 			DynamicRoutingDataSource.DataSourceMode mdbcarManageMode = DynamicRoutingDataSource.getMasterSlave("mdbcarmanage-DataSource");
-			logger.info("mdb-datasource={}",mdbcarManageMode.name());
+			logger.info("-saveOneDriverTeam-mdb-datasource-first={}",mdbcarManageMode);
 			CarDriverTeam carDriverTeam = null;
 			try{
 				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource", DynamicRoutingDataSource.DataSourceMode.SLAVE);
-				logger.info("mdb-datasource={}",mdbcarManageMode.name());
+				logger.info("-saveOneDriverTeam-mdb-datasource-second={}",DynamicRoutingDataSource.getMasterSlave("mdbcarmanage-DataSource"));
 				carDriverTeam = carDriverTeamExMapper.selectByCondition(driverTeamRequest);
 			}finally {
 				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",mdbcarManageMode);
-				logger.info("mdb-datasource={}",mdbcarManageMode.name());
+				logger.info("-saveOneDriverTeam-mdb-datasource-third={}",mdbcarManageMode);
 			}
 
 //			CarDriverTeamDTO carDriverTeamDTO = this.selectOneDriverTeam(driverTeamRequest);
