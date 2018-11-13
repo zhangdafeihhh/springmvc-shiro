@@ -2,6 +2,7 @@ package com.zhuanche.controller.rentcar;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,7 +14,10 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.util.DateUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,9 +89,37 @@ public class OrderController{
 	private CarBizCarInfoExMapper carBizCarInfoExMapper;
 	/**
 	    * 查询订单 列表
-	    * @param queryDate	查询日期
 	    * @return
 	  */
+//	输入【订单号】参数，无需搭配其他限定条件，可直接查询；
+//			【订单状态】选择“已完成”，必须限定【下单日期】范围或【完成日期】范围，支持跨度31天；
+//			【订单状态】选择其他，必须限定【下单日期】范围，支持跨度31天；
+
+	/**
+	 *
+	 * @param serviceId
+	 * @param airportIdnot
+	 * @param airportId
+	 * @param carGroupId
+	 * @param statusStr
+	 * @param cityId
+	 * @param supplierId
+	 * @param teamId
+	 * @param teamClassId
+	 * @param bookingUserName
+	 * @param bookingUserPhone
+	 * @param driverPhone
+	 * @param licensePlates
+	 * @param orderNo
+	 * @param orderType
+	 * @param beginCreateDate	下单开始日期
+	 * @param endCreateDate		下单结束日期
+	 * @param beginCostEndDate	订单完成开始时间
+	 * @param endCostEndDate     订单完成结束时间
+	 * @param pageNo
+	 * @param pageSize
+	 * @return
+	 */
 	 @ResponseBody
 	 @RequestMapping(value = "/queryOrderList", method = { RequestMethod.POST,RequestMethod.GET })
 	 public AjaxResponse queryOrderList(
@@ -106,16 +138,69 @@ public class OrderController{
 	                                           String licensePlates, 
 	                                           String orderNo, 
 	                                           String orderType,
-	                                           @Verify(param = "beginCreateDate",rule = "required") String beginCreateDate,
-	                                           @Verify(param = "endCreateDate",rule = "required") String endCreateDate,
-	                                           @Verify(param = "beginCostEndDate",rule = "required") String beginCostEndDate,
-	                                           @Verify(param = "endCostEndDate",rule = "required") String endCostEndDate,
+	                                          String beginCreateDate,
+	                                           String endCreateDate,
+	                                            String beginCostEndDate,
+	                                      		String endCostEndDate,
 	                                           @Verify(param = "pageNo",rule = "required") Integer pageNo,
 	                                           @Verify(param = "pageSize",rule = "required") Integer pageSize
 	                                           ){
 	     logger.info("【运营管理-统计分析】查询订单 列表:queryOrderList");
 	     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmssSS");
 	     String  transId =sdf.format(new Date());
+	     if(StringUtils.isEmpty(orderNo)){
+	     	//【订单状态】选择“已完成”，必须限定【下单日期】范围或【完成日期】范围，支持跨度31天；
+	     	if(StringUtils.isNotEmpty(statusStr) && "50".equals(statusStr))
+			{
+				if(StringUtils.isEmpty(beginCreateDate) && StringUtils.isEmpty(endCreateDate) && StringUtils.isEmpty(beginCostEndDate) && StringUtils.isEmpty(endCostEndDate)){
+					AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
+					ajaxResponse.setMsg("下单日期开始时间和结束时间或者是完成日期的开始时间和结束时间二者之一不能为空");
+					return ajaxResponse;
+				}else if( (StringUtils.isNotEmpty(beginCreateDate) && StringUtils.isNotEmpty(endCreateDate))  ){
+					try {
+						Date beginCreateDateD = DateUtils.parseDate(beginCreateDate,"yyyy-MM-dd");
+						Date endCreateDateD = DateUtils.parseDate(endCreateDate,"yyyy-MM-dd");
+
+						int intervalDays = com.zhuanche.util.DateUtils.getIntervalDays(beginCreateDateD,endCreateDateD);
+						if(intervalDays > 31){
+							AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
+							ajaxResponse.setMsg("下单日期开始时间和结束时间之间的跨度不能超过31天");
+							return ajaxResponse;
+						}
+
+					} catch (ParseException e) {
+						logger.error("订单查询，参数错误。beginCreateDate="+beginCreateDate+";endCreateDate="+endCreateDate);
+						AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
+						ajaxResponse.setMsg("下单开始时间或者结束时间参数错误");
+						return ajaxResponse;
+					}
+
+				}else if( (StringUtils.isNotEmpty(beginCostEndDate) && StringUtils.isNotEmpty(endCostEndDate))  ){
+					try {
+						Date beginCostEndDateD = DateUtils.parseDate(beginCostEndDate,"yyyy-MM-dd");
+						Date endCostEndDateD = DateUtils.parseDate(endCostEndDate,"yyyy-MM-dd");
+
+						int intervalDays = com.zhuanche.util.DateUtils.getIntervalDays(beginCostEndDateD,endCostEndDateD);
+						if(intervalDays > 31){
+							AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
+							ajaxResponse.setMsg("订单完成日期开始时间和结束时间之间的跨度不能超过31天");
+							return ajaxResponse;
+						}
+
+					} catch (ParseException e) {
+						logger.error("订单查询，参数错误。beginCostEndDate="+beginCostEndDate+";endCostEndDate="+endCostEndDate);
+						AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
+						ajaxResponse.setMsg("订单完成日期开始时间和结束时间错误");
+						return ajaxResponse;
+					}
+
+				}else {
+					AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
+					ajaxResponse.setMsg("订单完成时间必填或者是订单创建时间必填");
+					return ajaxResponse;
+				}
+			}
+		 }
 	     
 	     Map<String, Object> paramMap = new HashMap<String, Object>();
 		 paramMap.put("serviceId", serviceId);// 
@@ -181,7 +266,7 @@ public class OrderController{
 	  */
 	 @ResponseBody
 	 @RequestMapping(value = "/exportOrderList", method = { RequestMethod.POST,RequestMethod.GET })
-	 public void exportOrderList(
+	 public String exportOrderList(
 											   String serviceId,
 											   String airportIdnot,
 											   String airportId,
@@ -204,6 +289,59 @@ public class OrderController{
 	                                           HttpServletRequest request,HttpServletResponse response
 	                                           ){
 	     logger.info("【运营管理-统计分析】查询订单 列表:queryOrderList");
+		 if(StringUtils.isEmpty(orderNo)){
+			 //【订单状态】选择“已完成”，必须限定【下单日期】范围或【完成日期】范围，支持跨度31天；
+			 if(StringUtils.isNotEmpty(statusStr) && "50".equals(statusStr))
+			 {
+				 if(StringUtils.isEmpty(beginCreateDate) && StringUtils.isEmpty(endCreateDate) && StringUtils.isEmpty(beginCostEndDate) && StringUtils.isEmpty(endCostEndDate)){
+					 AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
+					 ajaxResponse.setMsg("下单日期开始时间和结束时间或者是完成日期的开始时间和结束时间二者之一不能为空");
+					 return JSON.toJSONString(ajaxResponse);
+				 }else if( (StringUtils.isNotEmpty(beginCreateDate) && StringUtils.isNotEmpty(endCreateDate))  ){
+					 try {
+						 Date beginCreateDateD = DateUtils.parseDate(beginCreateDate,"yyyy-MM-dd");
+						 Date endCreateDateD = DateUtils.parseDate(endCreateDate,"yyyy-MM-dd");
+
+						 int intervalDays = com.zhuanche.util.DateUtils.getIntervalDays(beginCreateDateD,endCreateDateD);
+						 if(intervalDays > 31){
+							 AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
+							 ajaxResponse.setMsg("下单日期开始时间和结束时间之间的跨度不能超过31天");
+							 return JSON.toJSONString(ajaxResponse);
+						 }
+
+					 } catch (ParseException e) {
+						 logger.error("订单查询，参数错误。beginCreateDate="+beginCreateDate+";endCreateDate="+endCreateDate);
+						 AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
+						 ajaxResponse.setMsg("下单开始时间或者结束时间参数错误");
+						 return JSON.toJSONString(ajaxResponse);
+					 }
+
+				 }else if( (StringUtils.isNotEmpty(beginCostEndDate) && StringUtils.isNotEmpty(endCostEndDate))  ){
+					 try {
+						 Date beginCostEndDateD = DateUtils.parseDate(beginCostEndDate,"yyyy-MM-dd");
+						 Date endCostEndDateD = DateUtils.parseDate(endCostEndDate,"yyyy-MM-dd");
+
+						 int intervalDays = com.zhuanche.util.DateUtils.getIntervalDays(beginCostEndDateD,endCostEndDateD);
+						 if(intervalDays > 31){
+							 AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
+							 ajaxResponse.setMsg("订单完成日期开始时间和结束时间之间的跨度不能超过31天");
+							 return JSON.toJSONString(ajaxResponse);
+						 }
+
+					 } catch (ParseException e) {
+						 logger.error("订单查询，参数错误。beginCostEndDate="+beginCostEndDate+";endCostEndDate="+endCostEndDate);
+						 AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
+						 ajaxResponse.setMsg("订单完成日期开始时间和结束时间错误");
+						 return JSON.toJSONString(ajaxResponse);
+					 }
+
+				 }else {
+					 AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
+					 ajaxResponse.setMsg("订单完成时间必填或者是订单创建时间必填");
+					 return JSON.toJSONString(ajaxResponse);
+				 }
+			 }
+		 }
 	     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmssSS");
 	     String  transId =sdf.format(new Date());
 	     
@@ -265,6 +403,7 @@ public class OrderController{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return null;
 	 }
 	public void exportExcelFromTemplet(HttpServletRequest request, HttpServletResponse response, Workbook wb, String fileName) throws IOException {
 		if(StringUtils.isEmpty(fileName)) {
@@ -328,7 +467,6 @@ public class OrderController{
 	
 	/**
      * 查询主订单详情
-     * @param orderId
      * @return CarFactOrderInfo
      * @createdate 2018-09-11
      * Jdd
@@ -389,8 +527,6 @@ public class OrderController{
 	
 	 /**
 	    * 查询LBS提供的轨迹坐标
-	    * @param orderNo	订单号
-		* @param batchNo	批次号 
 		* @param startDate  订单开始时间
 		* @param endDate    订单结束时间
 		* @param driverId   司机ID
