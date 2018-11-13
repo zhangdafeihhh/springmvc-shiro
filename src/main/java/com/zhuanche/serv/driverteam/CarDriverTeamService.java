@@ -487,13 +487,16 @@ public class CarDriverTeamService{
 	public int updateOneDriverTeam(CarDriverTeamDTO paramDto){
 
 		try{
-			DynamicRoutingDataSource.DataSourceMode mdbcarManageMode = DynamicRoutingDataSource.getMasterSlave("mdbcarmanage-DataSource");
 			CarDriverTeam existsTeam = null;
+			DynamicRoutingDataSource.DataSourceMode mdbcarManageMode = DynamicRoutingDataSource.getMasterSlave("mdbcarmanage-DataSource");
+			logger.info("-updateOneDriverTeam-mdb-datasource-first1={}",DynamicRoutingDataSource.getMasterSlave("mdbcarmanage-DataSource"));
 			try{
 				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource", DynamicRoutingDataSource.DataSourceMode.SLAVE);
 				existsTeam = carDriverTeamMapper.selectByPrimaryKey(paramDto.getId());
+				logger.info("-updateOneDriverTeam-mdb-datasource-second2={}",DynamicRoutingDataSource.getMasterSlave("mdbcarmanage-DataSource"));
 			}finally {
 				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",mdbcarManageMode);
+				logger.info("-updateOneDriverTeam-mdb-datasource-third3={}",DynamicRoutingDataSource.getMasterSlave("mdbcarmanage-DataSource"));
 			}
 			if(Check.NuNObj(existsTeam)){
 				return ServiceReturnCodeEnum.NONE_RECODE_EXISTS.getCode();
@@ -505,24 +508,29 @@ public class CarDriverTeamService{
 			}else if(paramDto.getOpenCloseFlag() !=0 && paramDto.getStatus() == existsTeam.getStatus()){
 				return ServiceReturnCodeEnum.DEAL_SUCCESS.getCode();
 			}
+			existsTeam.setUpdateDate(new Date());
+			existsTeam.setUpdateBy(String.valueOf(WebSessionUtil.getCurrentLoginUser().getId()));
 			existsTeam.setCharge1(paramDto.getCharge1());
 			existsTeam.setCharge2(paramDto.getCharge2());
 			existsTeam.setCharge3(paramDto.getCharge3());
 			existsTeam.setRemark(paramDto.getRemark());
 			return carDriverTeamMapper.updateByPrimaryKeySelective(existsTeam);
 		}catch (Exception e){
-			logger.error("更新车队失败:{}"+JSON.toJSONString(e));
+			logger.error("更新车队失败!", e );
 			return ServiceReturnCodeEnum.DEAL_FAILURE.getCode();
 		}
 	}
 
 	/**
-	 * @Desc:  新增车队
+	 * @Desc:  新增车队1113
 	 * @param:
 	 * @return:
 	 * @Author: lunan
 	 * @Date: 2018/8/30
 	 */
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.MASTER )
+	} )
 	public int saveOneDriverTeam(CarDriverTeamDTO paramDto){
 		if(Check.NuNObj(paramDto) || Check.NuNStr(paramDto.getCity()) || Check.NuNStr(paramDto.getSupplier())){
 			return ServiceReturnCodeEnum.DEAL_FAILURE.getCode();
@@ -531,12 +539,15 @@ public class CarDriverTeamService{
 			DriverTeamRequest driverTeamRequest = new DriverTeamRequest();
 			driverTeamRequest.setTeamName(paramDto.getTeamName());
 			DynamicRoutingDataSource.DataSourceMode mdbcarManageMode = DynamicRoutingDataSource.getMasterSlave("mdbcarmanage-DataSource");
+			logger.info("-saveOneDriverTeam-mdb-datasource-first1={}",DynamicRoutingDataSource.getMasterSlave("mdbcarmanage-DataSource"));
 			CarDriverTeam carDriverTeam = null;
 			try{
 				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource", DynamicRoutingDataSource.DataSourceMode.SLAVE);
+				logger.info("-saveOneDriverTeam-mdb-datasource-second2={}",DynamicRoutingDataSource.getMasterSlave("mdbcarmanage-DataSource"));
 				carDriverTeam = carDriverTeamExMapper.selectByCondition(driverTeamRequest);
 			}finally {
 				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",mdbcarManageMode);
+				logger.info("-saveOneDriverTeam-mdb-datasource-third3={}",DynamicRoutingDataSource.getMasterSlave("mdbcarmanage-DataSource"));
 			}
 
 //			CarDriverTeamDTO carDriverTeamDTO = this.selectOneDriverTeam(driverTeamRequest);
@@ -546,21 +557,24 @@ public class CarDriverTeamService{
 			CarDriverTeam record = new CarDriverTeam();
 			record.setSupplier(paramDto.getSupplier());
 			record.setCity(paramDto.getCity());
+			record.setCreateDate(new Date());
+			record.setCreateBy(String.valueOf(WebSessionUtil.getCurrentLoginUser().getId()));
 			if(!Check.NuNObj(paramDto.getpId())){
 				record.setpId(paramDto.getpId());
 			}
 			record.setTeamName(paramDto.getTeamName());
 			if(Check.NuNObj(paramDto.getStatus())){
-				record.setStatus(2);
+				record.setStatus(1);
 			}
 			record.setCharge1(paramDto.getCharge1());
 			record.setCharge2(paramDto.getCharge2());
 			record.setCharge3(paramDto.getCharge3());
+			record.setRemark(paramDto.getRemark());
 //			BeanUtils.copyProperties(record,paramDto);
 			record.setCreateBy(String.valueOf(WebSessionUtil.getCurrentLoginUser().getId()));
 			return carDriverTeamMapper.insertSelective(record);
 		}catch (Exception e){
-			logger.error("新增车队失败:{}"+JSON.toJSONString(e));
+			logger.error("新增车队失败!", e );
 			return ServiceReturnCodeEnum.DEAL_FAILURE.getCode();
 		}
 	}
