@@ -96,7 +96,8 @@ public class OrderController{
 //			【订单状态】选择其他，必须限定【下单日期】范围，支持跨度31天；
 
 	/**
-	 *
+	 * 订单查询
+	 *es 输出的wiki: http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=21047769
 	 * @param serviceId
 	 * @param airportIdnot
 	 * @param airportId
@@ -258,12 +259,33 @@ public class OrderController{
 		 }
 		 return temp;
 	 }
-	 
-		/**
-	    * 订单 列表导出
-	    * @param queryDate	查询日期
-	    * @return
-	  */
+
+	/**
+	 * 订单导出：
+	 * es 输出的wiki: http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=21047769
+	 * @param serviceId
+	 * @param airportIdnot
+	 * @param airportId
+	 * @param carGroupId
+	 * @param statusStr
+	 * @param cityId
+	 * @param supplierId
+	 * @param teamId
+	 * @param teamClassId
+	 * @param bookingUserName
+	 * @param bookingUserPhone
+	 * @param driverPhone
+	 * @param licensePlates
+	 * @param orderNo
+	 * @param orderType
+	 * @param beginCreateDate
+	 * @param endCreateDate
+	 * @param beginCostEndDate
+	 * @param endCostEndDate
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	 @ResponseBody
 	 @RequestMapping(value = "/exportOrderList", method = { RequestMethod.POST,RequestMethod.GET })
 	 public String exportOrderList(
