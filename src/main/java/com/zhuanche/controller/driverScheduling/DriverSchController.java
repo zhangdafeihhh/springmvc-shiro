@@ -195,19 +195,19 @@ public class DriverSchController {
             StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append(carDriverDayDutyDTO.getDriverName());
             stringBuffer.append(",");
-            stringBuffer.append(carDriverDayDutyDTO.getPhone()==null?"-":carDriverDayDutyDTO.getPhone());
+            stringBuffer.append(carDriverDayDutyDTO.getPhone()==null?"-":("\t"+carDriverDayDutyDTO.getPhone()));
             stringBuffer.append(",");
-            stringBuffer.append(carDriverDayDutyDTO.getCityName());
+            stringBuffer.append(carDriverDayDutyDTO.getCityName()==null?"-":(""+carDriverDayDutyDTO.getCityName()));
             stringBuffer.append(",");
-            stringBuffer.append(carDriverDayDutyDTO.getSupplierName());
+            stringBuffer.append(carDriverDayDutyDTO.getSupplierName()==null?"-":(""+carDriverDayDutyDTO.getSupplierName()));
             stringBuffer.append(",");
-            stringBuffer.append(carDriverDayDutyDTO.getTeamName());
+            stringBuffer.append(carDriverDayDutyDTO.getTeamName()==null?"-":(""+carDriverDayDutyDTO.getTeamName()));
             stringBuffer.append(",");
-            stringBuffer.append(carDriverDayDutyDTO.getTime());//排班日期
+            stringBuffer.append(carDriverDayDutyDTO.getTime()==null?"-":(""+carDriverDayDutyDTO.getTime()));//排班日期
             stringBuffer.append(",");
-            stringBuffer.append(StringUtils.isNoneEmpty(carDriverDayDutyDTO.getForcedTimes())?carDriverDayDutyDTO.getForcedTimes().replace(",","  "):carDriverDayDutyDTO.getForcedTimes());//强制上班时间
+            stringBuffer.append(StringUtils.isNotEmpty(carDriverDayDutyDTO.getForcedTimes())?carDriverDayDutyDTO.getForcedTimes().replace(",","  "):carDriverDayDutyDTO.getForcedTimes());//强制上班时间
             stringBuffer.append(",");
-            stringBuffer.append(carDriverDayDutyDTO.getDutyTimes());//排班时长
+            stringBuffer.append(carDriverDayDutyDTO.getDutyTimes()==null?"":carDriverDayDutyDTO.getDutyTimes());//排班时长
 
             stringBuffer.append(",");
 

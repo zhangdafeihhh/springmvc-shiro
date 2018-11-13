@@ -323,44 +323,44 @@ public class DriverDutyStatisticController extends DriverQueryController{
 			stringBuffer.append(s.getName());
 			stringBuffer.append(",");
 			if (reportType  == 0){
-				stringBuffer.append(s.getTime());
+				stringBuffer.append(s.getTime()==null?"":s.getTime());
 				stringBuffer.append(",");
 			}
 
-			stringBuffer.append(s.getPhone());
+			stringBuffer.append(s.getPhone()==null?"":("\t"+s.getPhone()));
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getLicenseplates());
+			stringBuffer.append(s.getLicenseplates()==null?"":s.getLicenseplates());
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getDutytime());
+			stringBuffer.append(s.getDutytime()==null?"":s.getDutytime());
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getForcedtime());
+			stringBuffer.append(s.getForcedtime()==null?"":s.getForcedtime());
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getOvertime());
+			stringBuffer.append(s.getOvertime()==null?"":s.getOvertime());
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getDutyTimeAll());
+			stringBuffer.append(s.getDutyTimeAll()==null?"":s.getDutyTimeAll());
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getForcedTimeAll());
+			stringBuffer.append(s.getForcedTimeAll()==null?"":s.getForcedTimeAll());
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getCityName());
+			stringBuffer.append(s.getCityName()==null?"":s.getCityName());
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getForcedtime1());
+			stringBuffer.append(s.getForcedtime1()==null?"":s.getForcedtime1());
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getForcedtime2());
+			stringBuffer.append(s.getForcedtime2()==null?"":s.getForcedtime2());
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getForcedtime3());
+			stringBuffer.append(s.getForcedtime3()==null?"":s.getForcedtime3());
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getForcedtime4());
+			stringBuffer.append(s.getForcedtime4()==null?"":s.getForcedtime4());
 
 			csvDataList.add(stringBuffer.toString());
 		}

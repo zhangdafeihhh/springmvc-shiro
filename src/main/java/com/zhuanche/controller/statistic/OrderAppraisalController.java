@@ -267,7 +267,7 @@ public class OrderAppraisalController extends DriverQueryController{
 			stringBuffer.append(StringUtils.isEmpty(s.getEvaluate())?"":s.getEvaluate());
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getMemo());
+			stringBuffer.append(s.getMemo()==null?"":s.getMemo());
 			stringBuffer.append(",");
 
 			stringBuffer.append(DateUtils.formatDateTime_CN(s.getCreateDate()));
