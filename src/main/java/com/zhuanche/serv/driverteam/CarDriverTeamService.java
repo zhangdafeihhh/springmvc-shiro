@@ -569,6 +569,7 @@ public class CarDriverTeamService{
 			record.setCharge1(paramDto.getCharge1());
 			record.setCharge2(paramDto.getCharge2());
 			record.setCharge3(paramDto.getCharge3());
+			record.setRemark(paramDto.getRemark());
 //			BeanUtils.copyProperties(record,paramDto);
 			record.setCreateBy(String.valueOf(WebSessionUtil.getCurrentLoginUser().getId()));
 			return carDriverTeamMapper.insertSelective(record);
