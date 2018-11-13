@@ -98,6 +98,8 @@ public class OrderController{
 	/**
 	 * 订单查询
 	 *es 输出的wiki: http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=21047769
+	 * 输出wiki:
+	 * http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=21047320
 	 * @param serviceId
 	 * @param airportIdnot
 	 * @param airportId
@@ -197,7 +199,32 @@ public class OrderController{
 
 				}else {
 					AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
-					ajaxResponse.setMsg("订单完成时间必填或者是订单创建时间必填");
+					ajaxResponse.setMsg("订单完成时间必填或者是订单下单时间必填");
+					return ajaxResponse;
+				}
+			}else{
+				if( (StringUtils.isNotEmpty(beginCreateDate) && StringUtils.isNotEmpty(endCreateDate))  ){
+					try {
+						Date beginCreateDateD = DateUtils.parseDate(beginCreateDate,"yyyy-MM-dd");
+						Date endCreateDateD = DateUtils.parseDate(endCreateDate,"yyyy-MM-dd");
+
+						int intervalDays = com.zhuanche.util.DateUtils.getIntervalDays(beginCreateDateD,endCreateDateD);
+						if(intervalDays > 31){
+							AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
+							ajaxResponse.setMsg("下单日期开始时间和结束时间之间的跨度不能超过31天");
+							return ajaxResponse;
+						}
+
+					} catch (ParseException e) {
+						logger.error("订单查询，参数错误。beginCreateDate="+beginCreateDate+";endCreateDate="+endCreateDate);
+						AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
+						ajaxResponse.setMsg("下单开始时间或者结束时间参数错误");
+						return ajaxResponse;
+					}
+
+				}else {
+					AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
+					ajaxResponse.setMsg("下单开始时间或者结束时间参数错误");
 					return ajaxResponse;
 				}
 			}
@@ -359,9 +386,32 @@ public class OrderController{
 
 				 }else {
 					 AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
-					 ajaxResponse.setMsg("订单完成时间必填或者是订单创建时间必填");
+					 ajaxResponse.setMsg("订单完成时间必填或者是订单下单时间必填");
 					 return JSON.toJSONString(ajaxResponse);
 				 }
+			 }else  if( (StringUtils.isNotEmpty(beginCreateDate) && StringUtils.isNotEmpty(endCreateDate))  ){
+				 try {
+					 Date beginCreateDateD = DateUtils.parseDate(beginCreateDate,"yyyy-MM-dd");
+					 Date endCreateDateD = DateUtils.parseDate(endCreateDate,"yyyy-MM-dd");
+
+					 int intervalDays = com.zhuanche.util.DateUtils.getIntervalDays(beginCreateDateD,endCreateDateD);
+					 if(intervalDays > 31){
+						 AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
+						 ajaxResponse.setMsg("下单日期开始时间和结束时间之间的跨度不能超过31天");
+						 return JSON.toJSONString(ajaxResponse);
+					 }
+
+				 } catch (ParseException e) {
+					 logger.error("订单查询，参数错误。beginCreateDate="+beginCreateDate+";endCreateDate="+endCreateDate);
+					 AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
+					 ajaxResponse.setMsg("下单开始时间或者结束时间参数错误");
+					 return JSON.toJSONString(ajaxResponse);
+				 }
+
+			 }else {
+				 AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
+				 ajaxResponse.setMsg("下单开始时间或者结束时间参数错误");
+				 return ajaxResponse;
 			 }
 		 }
 	     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmssSS");
