@@ -61,7 +61,10 @@ public class DriverOutageServiceImpl implements DriverOutageService {
 
     @Override
     public int queryForInt(DriverOutage params) {
-        return driverOutageExMapper.queryForInt(params);
+        logger.info("查询停运司机总数，参数为："+(params==null?"null":JSON.toJSONString(params)));
+        int count =  driverOutageExMapper.queryForInt(params);
+        logger.info("查询停运司机总数，返回结果为:"+count+",参数为："+(params==null?"null":JSON.toJSONString(params)));
+        return count;
     }
 
     @Override

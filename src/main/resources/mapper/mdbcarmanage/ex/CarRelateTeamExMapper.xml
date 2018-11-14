@@ -59,7 +59,7 @@
     <include refid="Base_Column_List" />
     FROM
     car_relate_team
-    WHERE 1=1
+   <where>
     <if test="relationId!=null and relationId!=''">
       AND relation_id = #{relationId}
     </if>
@@ -69,6 +69,7 @@
     <if test="driverId!=null and driverId!=''">
       AND driver_id = #{driverId}
     </if>
+   </where>
   </select>
   <delete id="deleteByDriverId" parameterType="java.lang.Integer" >
     delete from car_relate_team

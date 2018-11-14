@@ -63,7 +63,10 @@
 		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
 		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
 		LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
-		WHERE 1=1
+		<where>
+			  <if test = "driverIds !=null and driverIds !=''" >
+				  <![CDATA[AND o.driver_id in (${driverIds}) ]]>
+			  </if>
 			<if test = "outageSource !=null and outageSource !=''" > 
 				and o.outage_source = #{outageSource}
 			</if> 
@@ -97,6 +100,7 @@
 			<if test = "startDateEnd !=null and startDateEnd !=''" > 
 				<![CDATA[AND o.out_start_date<= '${startDateEnd} 23:59:59' ]]> 
 			</if>
+		</where>
 		ORDER BY o.create_date desc 
 		LIMIT ${offSet},${pagesize}
   </select>
@@ -109,7 +113,10 @@
 		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
 		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
 		LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
-		WHERE 1=1
+		<where>
+			<if test = "driverIds !=null and driverIds !=''" >
+				<![CDATA[AND o.driver_id in (${driverIds}) ]]>
+			</if>
 			<if test = "outageSource !=null and outageSource !=''" > 
 				and o.outage_source = #{outageSource}
 			</if> 
@@ -143,6 +150,7 @@
 			<if test = "startDateEnd !=null and startDateEnd !=''" > 
 				<![CDATA[AND o.out_start_date<= '${startDateEnd} 23:59:59' ]]> 
 			</if>
+		</where>
   </select>
   <select id="queryForObject" resultType="com.zhuanche.entity.rentcar.DriverOutage" parameterType="com.zhuanche.entity.rentcar.DriverOutage">
 		SELECT     
@@ -263,7 +271,10 @@
 		LEFT JOIN car_biz_city c ON c.city_id = i.service_city
 		LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
 		LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
-		WHERE 1=1
+		<where>
+			<if test = "driverIds !=null and driverIds !=''" >
+				<![CDATA[AND o.driver_id in (${driverIds}) ]]>
+			</if>
 			<if test = "outageSource !=null and outageSource !=''" > 
 				and o.outage_source = #{outageSource}
 			</if> 
@@ -297,6 +308,7 @@
 			<if test = "startDateEnd !=null and startDateEnd !=''" > 
 				<![CDATA[AND o.out_start_date<= '${startDateEnd} 23:59:59' ]]> 
 			</if>
+		</where>
   </select>
   <select id="queryDriverNameByPhone" resultType="com.zhuanche.entity.rentcar.DriverOutage" parameterType="com.zhuanche.entity.rentcar.DriverOutage">
 		SELECT   
