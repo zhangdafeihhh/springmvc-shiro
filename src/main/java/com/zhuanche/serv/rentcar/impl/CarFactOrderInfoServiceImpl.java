@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -417,5 +418,140 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 			e.printStackTrace();
 		}
 	}
+	 
+	@Override
+	public Workbook exportExceleOrderList(List<CarFactOrderInfoDTO> list,String path) throws Exception {
 	
+		FileInputStream io = new FileInputStream(path);
+		// 创建 excel
+ 		Workbook wb = new XSSFWorkbook(io);
+		if (list != null && list.size() > 0) {
+			Sheet sheet = null;
+			try {
+				sheet = wb.getSheetAt(0);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			Cell cell = null;
+			int i = 0;
+			for (CarFactOrderInfoDTO s : list) {
+				Row row = sheet.createRow(i + 1);
+				// //订单号 
+				cell = row.createCell(0);
+				cell.setCellValue(s.getOrderNo() != null ? ""
+						+ s.getOrderNo() + "" : "");
+				//  订单指派方式 
+				cell = row.createCell(1);
+				cell.setCellValue(s.getPushDriverType() != null ? ""
+						+ s.getPushDriverType() + "" : "");
+				// 城市 
+				cell = row.createCell(2);
+				cell.setCellValue(s.getCityName() != null ? ""
+						+ s.getCityName() + "" : "");
+				// 
+				cell = row.createCell(3);
+				cell.setCellValue(s.getServiceName() != null ? ""
+						+ s.getServiceName() + "" : "");
+				// 车型类别
+				cell = row.createCell(4);
+				cell.setCellValue(s.getGroupName() != null ? ""
+						+ s.getGroupName() + "" : "");
+				//  
+				cell = row.createCell(5);
+				cell.setCellValue(s.getType() != null ? ""
+						+ s.getType() + "" : "");
+				//  
+				cell = row.createCell(6);
+				cell.setCellValue(s.getBookingUserName() != null ? ""
+						+ s.getBookingUserName() + "" : "");
+				// 
+				cell = row.createCell(7);
+				cell.setCellValue(s.getBookingUserPhone() != null ? ""
+						+ s.getBookingUserPhone() + "" : "");
+				// 
+				cell = row.createCell(8);
+				cell.setCellValue(s.getRiderName() != null ? ""
+						+ s.getRiderName() + "" : "");
+				//  
+				cell = row.createCell(9);
+				cell.setCellValue(s.getRiderPhone() != null ? ""
+						+ s.getRiderPhone() + "" : "");
+				//  
+				cell = row.createCell(10);
+				cell.setCellValue(s.getDriverName() != null ? ""
+						+ s.getDriverName() + "" : "");
+				//  
+				cell = row.createCell(11);
+				cell.setCellValue(s.getDriverPhone() != null ? ""
+						+ s.getDriverPhone() + "" : "");
+				//  
+				cell = row.createCell(12);
+				cell.setCellValue(s.getLicensePlates() != null ? ""
+						+ s.getLicensePlates() + "" : "");
+				//  
+				cell = row.createCell(13);
+				cell.setCellValue(s.getSupplierFullName() != null ? ""
+						+ s.getSupplierFullName() + "" : "");
+				//  
+				//BigDecimal b = new BigDecimal((Integer.valueOf(s.getTravelTime())/60/1000));
+				cell = row.createCell(14);
+				cell.setCellValue(s.getTravelTime() != null ? ""
+						+ formatDouble(Double.valueOf(s.getTravelTime())/60/1000) + "" : "");
+				
+				
+				
+			//  
+				cell = row.createCell(15);
+				cell.setCellValue(s.getTravelMileage() != null ? ""
+						+ s.getTravelMileage() + "" : "");
+				//  
+				cell = row.createCell(16);
+				cell.setCellValue(s.getActualPayAmount() != null ? ""
+						+ s.getActualPayAmount() + "" : "");
+				//  
+				cell = row.createCell(17);
+				cell.setCellValue(s.getCouponId() != null ? ""
+						+ s.getCouponId() + "" : "");
+				//  
+				cell = row.createCell(18);
+				cell.setCellValue(s.getCouponAmount() != null ? ""
+						+ s.getCouponAmount() + "" : "");
+				 //
+				cell = row.createCell(19);
+				cell.setCellValue(s.getCreateDate() != null ? ""
+						+ s.getCreateDate() + "" : "");
+				//  
+				cell = row.createCell(20);
+				cell.setCellValue(s.getCostEndDate() != null ? ""
+						+ s.getCostEndDate() + "" : "");
+
+				//  
+				cell = row.createCell(21);
+				cell.setCellValue(s.getFactStartAddr() != null ? ""
+						+ s.getFactStartAddr() + "" : "");
+				//  
+				cell = row.createCell(22);
+				cell.setCellValue(s.getFactEndAddr() != null ? ""
+						+ s.getFactEndAddr() + "" : "");
+				//  
+				cell = row.createCell(23);
+				cell.setCellValue(s.getDicName() != null ? ""
+						+ s.getDicName() + "" : "");
+				//  
+				cell = row.createCell(24);
+				cell.setCellValue(s.getAirportId() != null ? ""
+						+ s.getAirportId() + "" : "");
+				//  
+				cell = row.createCell(25);
+				cell.setCellValue(s.getMainOrderNo() != null ? ""
+						+ s.getMainOrderNo() + "" : "");
+				i++;
+			}
+		}
+		return wb;
+	}
+    public static double formatDouble(double d) {
+        return (double)Math.round(d*100)/100;
+    }
+    
 }
