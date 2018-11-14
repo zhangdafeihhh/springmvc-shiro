@@ -208,13 +208,14 @@ public class CitySupplierTeamCommonService {
             if( WebSessionUtil.isSupperAdmin() ) {
                 cityIds.clear();
             }else {
-                if(Check.NuNCollection(cityIds)){
+                for(Integer cityid : permOfCity ) {
+                    cityIds.add( String.valueOf(cityid)  );
+                }
+                /*if(Check.NuNCollection(cityIds)){
                     cityIds.clear();
                 }else{
-                    for(Integer cityid : permOfCity ) {
-                        cityIds.add( String.valueOf(cityid)  );
-                    }
-                }
+
+                }*/
             }
         }
         //A2供应商ID
@@ -224,13 +225,14 @@ public class CitySupplierTeamCommonService {
             if( WebSessionUtil.isSupperAdmin() ) {
                 supplierIds.clear();
             }else {
-                if(Check.NuNCollection(permOfSupplier)){
+                for(Integer sid : permOfSupplier) {
+                    supplierIds.add( String.valueOf(sid)  );
+                }
+                /*if(Check.NuNCollection(permOfSupplier)){
                     supplierIds.clear();
                 }else{
-                    for(Integer sid : permOfSupplier) {
-                        supplierIds.add( String.valueOf(sid)  );
-                    }
-                }
+
+                }*/
             }
         }
         //A3车队ID
