@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -420,6 +421,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 	 
 	@Override
 	public Workbook exportExceleOrderList(List<CarFactOrderInfoDTO> list,String path) throws Exception {
+	
 		FileInputStream io = new FileInputStream(path);
 		// 创建 excel
  		Workbook wb = new XSSFWorkbook(io);
@@ -491,9 +493,13 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 				cell.setCellValue(s.getSupplierFullName() != null ? ""
 						+ s.getSupplierFullName() + "" : "");
 				//  
+				//BigDecimal b = new BigDecimal((Integer.valueOf(s.getTravelTime())/60/1000));
 				cell = row.createCell(14);
 				cell.setCellValue(s.getTravelTime() != null ? ""
-						+ s.getTravelTime() + "" : "");
+						+ formatDouble(Double.valueOf(s.getTravelTime())/60/1000) + "" : "");
+				
+				
+				
 			//  
 				cell = row.createCell(15);
 				cell.setCellValue(s.getTravelMileage() != null ? ""
@@ -529,8 +535,8 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 						+ s.getFactEndAddr() + "" : "");
 				//  
 				cell = row.createCell(23);
-				cell.setCellValue(s.getStatus() != null ? ""
-						+ s.getStatus() + "" : "");
+				cell.setCellValue(s.getDicName() != null ? ""
+						+ s.getDicName() + "" : "");
 				//  
 				cell = row.createCell(24);
 				cell.setCellValue(s.getAirportId() != null ? ""
@@ -544,5 +550,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 		}
 		return wb;
 	}
-	
+    public static double formatDouble(double d) {
+        return (double)Math.round(d*100)/100;
+    }
 }
