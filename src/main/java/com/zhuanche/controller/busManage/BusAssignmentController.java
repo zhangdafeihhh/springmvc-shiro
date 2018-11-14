@@ -107,7 +107,7 @@ public class BusAssignmentController extends BaseController {
 	 * @throws
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/queryData", method = { RequestMethod.POST })
+	@RequestMapping(value = "/queryData")
 	public AjaxResponse queryData(BusOrderDTO params) {
 		PageDTO pageDTO = new PageDTO();
 		try {
