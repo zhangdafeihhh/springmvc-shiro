@@ -22,6 +22,9 @@ public class BusOrderVO {
 	private String bookingUserPhone;
 	// 预定车型
 	private String bookingGroupid;
+	// 下单时间
+	@JSONField(format = "yyyy-MM-dd HH:mm:ss")
+	private Date createDate;
 	// 预约用车时间
 	@JSONField(format = "yyyy-MM-dd HH:mm:ss")
 	private Date bookingDate;
@@ -119,6 +122,14 @@ public class BusOrderVO {
 
 	public void setBookingGroupid(String bookingGroupid) {
 		this.bookingGroupid = bookingGroupid;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
 	}
 
 	public Date getBookingDate() {
