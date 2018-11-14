@@ -108,12 +108,12 @@ public class DriverIntegraController {
                 }
             }
 
-            if (driverEntity.getServiceCityId() != null && !"".equals(driverEntity.getServiceCityId())) {
-                cities = String.valueOf(driverEntity.getServiceCityId());
-            }
-            if (driverEntity.getSupplierId() != null && !"".equals(driverEntity.getSupplierId())) {
-                suppliers = String.valueOf(driverEntity.getSupplierId());
-            }
+//            if (driverEntity.getServiceCityId() != null && !"".equals(driverEntity.getServiceCityId())) {
+//                cities = String.valueOf(driverEntity.getServiceCityId());
+//            }
+//            if (driverEntity.getSupplierId() != null && !"".equals(driverEntity.getSupplierId())) {
+//                suppliers = String.valueOf(driverEntity.getSupplierId());
+//            }
             if (!"".equals(driverEntity.getTeamIds()) && driverEntity.getTeamIds() != null) {
                 teamIds = driverEntity.getTeamIds();
             }
@@ -294,12 +294,12 @@ public class DriverIntegraController {
                     teamIds += id;
                 }
             }
-            if (driverEntity.getServiceCityId() != null && !"".equals(driverEntity.getServiceCityId())) {
-                cities = String.valueOf(driverEntity.getServiceCityId());
-            }
-            if (driverEntity.getSupplierId() != null && !"".equals(driverEntity.getSupplierId())) {
-                suppliers = String.valueOf(driverEntity.getSupplierId());
-            }
+//            if (driverEntity.getServiceCityId() != null && !"".equals(driverEntity.getServiceCityId())) {
+//                cities = String.valueOf(driverEntity.getServiceCityId());
+//            }
+//            if (driverEntity.getSupplierId() != null && !"".equals(driverEntity.getSupplierId())) {
+//                suppliers = String.valueOf(driverEntity.getSupplierId());
+//            }
             if (!"".equals(driverEntity.getTeamIds()) && driverEntity.getTeamIds() != null) {
                 teamIds = driverEntity.getTeamIds();
             }
