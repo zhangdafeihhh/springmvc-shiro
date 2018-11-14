@@ -355,7 +355,7 @@ public class OrderController{
 			stringBuffer.append(",");
 
 			stringBuffer.append(s.getTravelTime() != null ? ""
-					+ s.getTravelTime() + "" : "");
+					+ formatDouble(Double.valueOf(s.getTravelTime())/60/1000)  + "" : "");
 			stringBuffer.append(",");
 
 			stringBuffer.append(s.getTravelMileage() != null ? ""
@@ -394,8 +394,8 @@ public class OrderController{
 					+ s.getFactEndAddr() + "" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getStatus() != null ? ""
-					+ s.getStatus() + "" : "");
+			stringBuffer.append(s.getDicName() != null ? ""
+					+ s.getDicName() + "" : "");
 			stringBuffer.append(",");
 
 			stringBuffer.append(s.getAirportId() != null ? ""
@@ -973,4 +973,7 @@ public class OrderController{
 			}
 			return order;
 		}
+		 public static double formatDouble(double d) {
+		        return (double)Math.round(d*100)/100;
+		 }
 	}
