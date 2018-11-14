@@ -764,4 +764,8 @@ public class CarDriverTeamService{
 		}
 		return result;
 	}
+
+	public List<Integer> queryDriverIdsByTeamIdss(Set<Integer> teamIds){
+		return carRelateTeamExMapper.queryDriverIdsByTeamIdss(  teamIds);
+	}
 }

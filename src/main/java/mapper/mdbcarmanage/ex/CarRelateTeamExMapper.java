@@ -35,6 +35,11 @@ public interface CarRelateTeamExMapper {
      */
     List<Integer> queryDriverIdsByTeamId(@Param("teamId") Integer teamId);
 
+    /**
+     * 根据teamIds返回司机id
+     * @param teamIds
+     * @return
+     */
     List<Integer> queryDriverIdsByTeamIdss(@Param("teamIds") Set<Integer> teamIds);
     /**
      * <p>Title: queryListByTeamId</p>
