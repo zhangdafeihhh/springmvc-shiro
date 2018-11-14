@@ -123,5 +123,7 @@ public interface CarFactOrderInfoService {
      * 订单服务类型
      */
     public List<ServiceTypeDTO> selectServiceEntityList(ServiceEntity serviceEntity);
+	
+    Workbook exportExceleOrderList(List<CarFactOrderInfoDTO> list, String path) throws Exception;
 
 }
