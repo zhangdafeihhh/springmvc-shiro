@@ -4,6 +4,7 @@ import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.dto.CarDriverInfoDTO;
+import com.zhuanche.dto.driver.DriverVoEntity;
 import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.request.DriverMonthDutyRequest;
@@ -133,10 +134,19 @@ public interface CarBizDriverInfoExMapper {
      * @return
      */
     public List<CarBizDriverInfoDTO> queryDriverByLicensePlates(String license_plates);
+
     /**
      * 查看司机列表
      * @param driverTeamRequest
      * @return
      */
     List<CarBizDriverInfoDTO> queryCarBizDriverList(CarBizDriverInfoDTO driverTeamRequest);
+
+
+    int selectDriverByKeyCountAddCooperation(DriverVoEntity params);
+
+    public List<DriverVoEntity> selectDriverByKeyAddCooperation(DriverVoEntity params);
+
+    CarBizDriverInfoDTO selectByPhone(@Param("phone") String phone);
+
 }
