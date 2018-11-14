@@ -276,26 +276,18 @@ public class OrderController{
 				 break;
 			 }
 		}
-		
-
 
 		try {
 
-			List<String> csvDataList = new ArrayList<>();
-			dataTrans(result,csvDataList);
-
-			List<String> headerList = new ArrayList<>();
-			headerList.add("订单号,订单指派方式,城市,服务类别,车型类别,订单类别,预订人,预订人手机,乘车人,乘车人手机,司机,司机手机,车牌号,供应商,乘车时长(分钟),乘车里程,金额,是否使用优惠券,优惠券支付（元）,下单时间,完成时间,实际上车地址,实际下车地址,订单状态,是否拼车,主订单号");
-
-
-			String fileName = "订单列表"+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
-			String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
-			if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
-				fileName = URLEncoder.encode(fileName, "UTF-8");
-			} else {  //其他浏览器
-				fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+			@SuppressWarnings("deprecation")
+			Workbook wb;
+			try {
+				wb = carFactOrderInfoService.exportExceleOrderList(result,request.getServletContext().getRealPath("/")+ "template" + File.separator +"orderList_info.xlsx");
+				Componment.fileDownload(response, wb, new String("订单列表".getBytes("gb2312"), "iso8859-1"));
+				
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			CsvUtils.exportCsv(response,csvDataList,headerList,fileName);
 			long end = System.currentTimeMillis();
 			logger.info("订单导出成功，参数为"+JSON.toJSONString(paramMap)+";耗时："+(end -start)+"毫秒");
 		} catch (Exception e) {
