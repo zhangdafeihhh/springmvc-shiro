@@ -105,7 +105,7 @@
 				/getMsgCode.json = anon
 				/dologin.json = anon
 				/logout.html = logout
-				/** = user
+				/** = anon
 			</value>
 		</property>
 	</bean>
