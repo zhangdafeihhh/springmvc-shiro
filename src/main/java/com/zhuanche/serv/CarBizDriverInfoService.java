@@ -2909,8 +2909,8 @@ public class CarBizDriverInfoService {
         }
     }
 
-    public CarBizDriverInfo selectByPhone(String phone){
-        CarBizDriverInfo carBizDriverInfo = carBizDriverInfoMapper.selectByPhone(phone);
+    public CarBizDriverInfoDTO selectByPhone(String phone){
+        CarBizDriverInfoDTO carBizDriverInfo = carBizDriverInfoExMapper.selectByPhone(phone);
         return carBizDriverInfo;
     }
 

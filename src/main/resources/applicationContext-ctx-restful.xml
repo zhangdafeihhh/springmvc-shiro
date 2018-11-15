@@ -368,4 +368,26 @@
         </property>
     </bean>
 
+    <!-- 策略平台  处理司机标签  -->
+    <bean id="driverIntegralApiTemplate" class="com.zhuanche.util.MyRestTemplate">
+        <constructor-arg ref="httpClientFactory" />
+        <property name="errorHandler">
+            <bean class="org.springframework.web.client.DefaultResponseErrorHandler"/>
+        </property>
+        <property name="failover" value="${driver.integral.url}"></property>
+        <property name="messageConverters">
+            <list>
+                <bean class="org.springframework.http.converter.FormHttpMessageConverter"/>
+                <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
+                <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                    <property name="supportedMediaTypes">
+                        <list>
+                            <value>text/plain;charset=UTF-8</value>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
 </beans>
