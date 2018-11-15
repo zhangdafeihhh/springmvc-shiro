@@ -10,10 +10,12 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.rentcar.DriverOutageDTO;
 import com.zhuanche.entity.rentcar.DriverOutage;
+import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.serv.rentcar.DriverOutageService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.DateUtils;
+import com.zhuanche.util.DriverUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
@@ -46,6 +48,8 @@ public class DriverOutageController {
 
     @Autowired
     private DriverOutageService driverOutageService;
+    @Autowired
+    private CarDriverTeamService carDriverTeamService;
 
 
     /**
@@ -99,6 +103,10 @@ public class DriverOutageController {
         String suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds(),",");
         params.setCities(cities);
         params.setSupplierIds(suppliers);
+        //查询用户权限范围内里的司机信息
+        String driverIds = DriverUtils.getDriverIdsByUserTeams(carDriverTeamService,WebSessionUtil.getCurrentLoginUser().getTeamIds());
+        params.setDriverIds(driverIds);
+
         //查数量
         total = driverOutageService.queryForInt(params);
         if(total==0){
@@ -148,6 +156,10 @@ public class DriverOutageController {
             String suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds(),",");
             params.setCities(cities);
             params.setSupplierIds(suppliers);
+            //查询用户权限范围内里的司机信息
+            String driverIds = DriverUtils.getDriverIdsByUserTeams(carDriverTeamService,WebSessionUtil.getCurrentLoginUser().getTeamIds());
+            params.setDriverIds(driverIds);
+
             List<DriverOutage> rows = driverOutageService.queryForListObjectNoLimit(params);
             @SuppressWarnings("deprecation")
             Workbook wb = driverOutageService.exportExcelDriverOutage(rows,request.getRealPath("/")+File.separator+"template"+File.separator+"driverOutage_info.xlsx");
