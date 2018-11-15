@@ -398,13 +398,13 @@
   <sql id="allBaseColumnWhereList" >
     <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR" >
       <if test="phone != null and phone != ''" >
-        and phone like '${phone}%'
+        and phone LIKE '%${phone}%'
       </if>
       <if test="name != null and name != ''" >
         and name LIKE CONCAT(#{name},'%')
       </if>
       <if test="licensePlates != null and licensePlates != ''" >
-        and license_plates like '${licensePlates}%'
+        and license_plates LIKE '%${licensePlates}%'
       </if>
       <if test="status != null" >
         and status = #{status,jdbcType=INTEGER}
@@ -1548,6 +1548,7 @@
     </where>
     order by driver_id desc
   </select>
+
   <select id="selectDriverByKeyCountAddCooperation" resultType="java.lang.Integer"  parameterType="com.zhuanche.dto.driver.DriverVoEntity">
     SELECT
     count(*)
@@ -1612,7 +1613,6 @@
       </if>
     </where>
   </select>
-
 
   <select id="selectDriverByKeyAddCooperation"
           resultType="com.zhuanche.dto.driver.DriverVoEntity"

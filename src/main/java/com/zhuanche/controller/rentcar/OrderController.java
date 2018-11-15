@@ -1,5 +1,33 @@
 package com.zhuanche.controller.rentcar;
 
+
+import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.util.DateUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.util.StringUtil;
@@ -118,7 +146,7 @@ public class OrderController{
 	                                           String licensePlates, 
 	                                           String orderNo, 
 	                                           String orderType,
-	                                           String beginCreateDate,
+	                                          String beginCreateDate,
 	                                           String endCreateDate,
 	                                           String beginCostEndDate,
 	                                           String endCostEndDate,
@@ -301,7 +329,6 @@ public class OrderController{
 	 * @param response
 	 * @return
 	 */
-
 	 @ResponseBody
 	 @RequestMapping(value = "/exportOrderList", method = { RequestMethod.POST,RequestMethod.GET })
 	 public String exportOrderList(
@@ -322,8 +349,10 @@ public class OrderController{
 	                                           String orderType,
 	                                           String beginCreateDate,
 
+
 	                                           String endCreateDate,
 	                                           String beginCostEndDate,
+
 	                                           String endCostEndDate,
 	                                           HttpServletRequest request,HttpServletResponse response
 	                                           ){
