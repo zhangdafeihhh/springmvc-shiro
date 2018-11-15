@@ -339,10 +339,10 @@ public class OrderController{
 	                                           String licensePlates, 
 	                                           String orderNo, 
 	                                           String orderType,
-	                                           @Verify(param = "beginCreateDate",rule = "required") String beginCreateDate,
-	                                           @Verify(param = "endCreateDate",rule = "required") String endCreateDate,
-	                                           @Verify(param = "beginCostEndDate",rule = "required") String beginCostEndDate,
-	                                           @Verify(param = "endCostEndDate",rule = "required") String endCostEndDate,
+	                                           String beginCreateDate,
+	                                            String endCreateDate,
+	                                          String beginCostEndDate,
+	                                           String endCostEndDate,
 	                                           HttpServletRequest request,HttpServletResponse response
 	                                           ){
 	     logger.info("【运营管理-统计分析】查询订单 列表:queryOrderList");
