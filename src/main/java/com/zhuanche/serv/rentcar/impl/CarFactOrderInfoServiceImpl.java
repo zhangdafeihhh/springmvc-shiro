@@ -14,6 +14,7 @@ import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.util.Common;
+import com.zhuanche.util.MyRestTemplate;
 import mapper.driverOrderRecord.DriverOrderRecordMapper;
 import mapper.orderPlatform.PoolMainOrderMapper;
 import mapper.rentcar.ex.*;
@@ -29,6 +30,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -64,6 +66,10 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
     //订单组提供 拼车子orderNo查主订单URL
     @Value("${car.rest.url}")
 	String  carRestUrl;
+
+	@Autowired
+	@Qualifier("orderApiTemplate")
+	private MyRestTemplate orderApiTemplate;
     
     
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -243,7 +249,9 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 		List<CarFactOrderInfoDTO> list = null;
 		String url = orderSearchUrl+Common.ORDER_ORDER_LIST_DATE;
 		try {
-			String result = HttpClientUtil.buildPostRequest(url).addParams(paramMap).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
+			String result = orderApiTemplate.postForObject(Common.ORDER_ORDER_LIST_DATE,
+					String.class, paramMap);
+//			String result = HttpClientUtil.buildPostRequest(url).addParams(paramMap).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
 			JSONObject job = JSON.parseObject(result);
 			if (job == null) {
 				logger.error("调用订单接口" + url + "返回结果为null");
