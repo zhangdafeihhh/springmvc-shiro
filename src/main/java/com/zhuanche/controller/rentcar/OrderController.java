@@ -106,10 +106,10 @@ public class OrderController{
 	                                           String licensePlates, 
 	                                           String orderNo, 
 	                                           String orderType,
-	                                           @Verify(param = "beginCreateDate",rule = "required") String beginCreateDate,
-	                                           @Verify(param = "endCreateDate",rule = "required") String endCreateDate,
-	                                           @Verify(param = "beginCostEndDate",rule = "required") String beginCostEndDate,
-	                                           @Verify(param = "endCostEndDate",rule = "required") String endCostEndDate,
+	                                           String beginCreateDate,
+	                                           String endCreateDate,
+	                                           String beginCostEndDate,
+	                                           String endCostEndDate,
 	                                           @Verify(param = "pageNo",rule = "required") Integer pageNo,
 	                                           @Verify(param = "pageSize",rule = "required") Integer pageSize
 	                                           ){
@@ -133,10 +133,18 @@ public class OrderController{
 	     paramMap.put("licensePlates", licensePlates);// 
 	     paramMap.put("orderNo", orderNo);//
 	     paramMap.put("type", orderType);//
-	     paramMap.put("beginCreateDate", beginCreateDate+" 00:00:00");//
-	     paramMap.put("endCreateDate", endCreateDate+" 23:59:59");//
-	     paramMap.put("beginCostEndDate", beginCostEndDate+" 00:00:00");//
-	     paramMap.put("endCostEndDate", endCostEndDate+" 23:59:59");//
+	     if(StringUtils.isNotEmpty(beginCreateDate)){
+	    	 paramMap.put("beginCreateDate", beginCreateDate+" 00:00:00");// 
+	     }
+	     if(StringUtils.isNotEmpty(endCreateDate)){
+	    	 paramMap.put("endCreateDate", endCreateDate+" 23:59:59");//
+	     }
+	     if(StringUtils.isNotEmpty(beginCostEndDate)){
+	    	 paramMap.put("beginCostEndDate", beginCostEndDate+" 00:00:00");//
+	     }
+	     if(StringUtils.isNotEmpty(endCostEndDate)){
+	    	 paramMap.put("endCostEndDate", endCostEndDate+" 23:59:59");//
+	     }
 	     paramMap.put("transId", transId );//
 	     if(null != pageNo && pageNo > 0)
 	     paramMap.put("pageNo", pageNo);//页号
@@ -197,10 +205,10 @@ public class OrderController{
 	                                           String licensePlates, 
 	                                           String orderNo, 
 	                                           String orderType,
-	                                           @Verify(param = "beginCreateDate",rule = "required") String beginCreateDate,
-	                                           @Verify(param = "endCreateDate",rule = "required") String endCreateDate,
-	                                           @Verify(param = "beginCostEndDate",rule = "required") String beginCostEndDate,
-	                                           @Verify(param = "endCostEndDate",rule = "required") String endCostEndDate,
+	                                           String beginCreateDate,
+	                                           String endCreateDate,
+	                                           String beginCostEndDate,
+	                                           String endCostEndDate,
 	                                           HttpServletRequest request,HttpServletResponse response
 	                                           ){
 	     logger.info("【运营管理-统计分析】查询订单 列表:queryOrderList");
@@ -223,10 +231,19 @@ public class OrderController{
 	     paramMap.put("licensePlates", licensePlates);// 
 	     paramMap.put("orderNo", orderNo);//
 	     paramMap.put("type", orderType);//
-	     paramMap.put("beginCreateDate", beginCreateDate+" 00:00:00");//
-	     paramMap.put("endCreateDate", endCreateDate+" 23:59:59");//
-	     paramMap.put("beginCostEndDate", beginCostEndDate+" 00:00:00");//
-	     paramMap.put("endCostEndDate", endCostEndDate+" 23:59:59");//
+	     if(StringUtils.isNotEmpty(beginCreateDate)){
+	    	 paramMap.put("beginCreateDate", beginCreateDate+" 00:00:00");// 
+	     }
+	     if(StringUtils.isNotEmpty(endCreateDate)){
+	    	 paramMap.put("endCreateDate", endCreateDate+" 23:59:59");//
+	     }
+	     if(StringUtils.isNotEmpty(beginCostEndDate)){
+	    	 paramMap.put("beginCostEndDate", beginCostEndDate+" 00:00:00");//
+	     }
+	     if(StringUtils.isNotEmpty(endCostEndDate)){
+	    	 paramMap.put("endCostEndDate", endCostEndDate+" 23:59:59");//
+	     }
+	     
 	     paramMap.put("transId", transId );//
 	     paramMap.put("pageNo", "1");//页号
 	     paramMap.put("pageSize", "20000");//每页记录数
