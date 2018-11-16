@@ -1708,7 +1708,6 @@
       </if>
     </where>
     order by i.update_date desc
-    LIMIT ${offSet},${pagesize}
   </select>
 
 
