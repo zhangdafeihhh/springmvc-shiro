@@ -256,6 +256,12 @@ public class DriverIntegraController {
         int max = 10000;
         driverEntity.setPagesize(max);
         logger.info("queryDriverIntegralListDataDown:下载司机积分数据列表,参数为："+(driverEntity==null?"null": JSON.toJSONString(driverEntity)));
+        if(driverEntity.getCityId() == 0){
+            return "请选择城市";
+        }
+        if(driverEntity.getSupplierId() == 0){
+            return "请选择供应商";
+        }
 
         try {
             // 权限
