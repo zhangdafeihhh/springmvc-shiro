@@ -132,5 +132,25 @@
 		and city_id = #{cityId}
 		and supplier_id = #{supplierId}
     </select>
+
+	<select id="selectByLicensePlates" resultType="com.zhuanche.entity.rentcar.CarBizCarInfo" parameterType="java.util.Set" >
+		SELECT
+		c.license_plates AS licensePlates,
+		c.city_id AS cityId,
+		c.supplier_id AS supplierId,
+		c.driver_id AS driverId,
+		c.car_purchase_date AS carPurchaseDate,
+		c.color AS color,
+		c.model_detail AS modelDetail,
+		city.city_name AS cityName,
+		FROM
+		car_biz_car_info c
+		WHERE
+		c.license_plates  IN
+		<foreach collection="license_platess" open="(" close=")" separator="," item="item">
+			#{item}
+		</foreach>
+
+	</select>
 </mapper>
 

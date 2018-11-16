@@ -243,7 +243,21 @@
         <if test="teamId!=null and teamId!=''">
             and  id = #{teamId}
         </if>
-
         order by city, id
     </select>
+
+
+
+
+    <select id="queryTeamListByTemIdList" parameterType="java.util.List" resultType="java.lang.Integer">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM car_driver_team dt
+        WHERE dt.id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
 </mapper>

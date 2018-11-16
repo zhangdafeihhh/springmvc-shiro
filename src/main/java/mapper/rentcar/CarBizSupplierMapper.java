@@ -1,6 +1,10 @@
 package mapper.rentcar;
 
 import com.zhuanche.entity.rentcar.CarBizSupplier;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Set;
 
 public interface CarBizSupplierMapper {
     int deleteByPrimaryKey(Integer supplierId);
@@ -16,4 +20,6 @@ public interface CarBizSupplierMapper {
     int updateByPrimaryKeyWithBLOBs(CarBizSupplier record);
 
     int updateByPrimaryKey(CarBizSupplier record);
+
+    List<CarBizSupplier> findByIdSet(@Param("supplierIdSet") Set<Integer> supplierIdSet);
 }

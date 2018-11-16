@@ -1,6 +1,8 @@
 package com.zhuanche.serv;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.cache.RedisCacheDriverUtil;
@@ -11,6 +13,7 @@ import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.rocketmq.CommonRocketProducer;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.dto.driver.DriverTeamRelationEntity;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
@@ -39,6 +42,7 @@ import mapper.rentcar.CarBizDriverAccountMapper;
 import mapper.rentcar.CarBizDriverInfoMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
+import mapper.rentcar.ex.CarBizModelExMapper;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -150,6 +154,9 @@ public class CarBizDriverInfoService {
     @Autowired
     private CarDriverTeamService carDriverTeamService;
 
+    @Autowired
+    private CarBizModelExMapper carBizModelExMapper;
+
 
     /**
      * 查询司机信息列表展示
@@ -159,6 +166,13 @@ public class CarBizDriverInfoService {
      */
     public List<CarBizDriverInfoDTO> queryDriverList(CarBizDriverInfoDTO params) {
         return carBizDriverInfoExMapper.queryDriverList(params);
+    }
+
+    public PageInfo<CarBizDriverInfoDTO> queryDriverPage(CarBizDriverInfoDTO params,int pageSize,int pageNo) {
+        PageHelper.startPage(pageSize, pageNo, true);
+        List<CarBizDriverInfoDTO> list = carBizDriverInfoExMapper.queryDriverList(params);
+        PageInfo<CarBizDriverInfoDTO> pageInfo = new PageInfo<>(list);
+        return pageInfo;
     }
 
     /**
@@ -774,6 +788,7 @@ public class CarBizDriverInfoService {
         }
         return carBizDriverInfo;
     }
+
 
     public Map<String, Object> batchInputDriverInfo(Integer cityId, Integer supplierId, Integer teamId,
                                                     Integer teamGroupId, MultipartFile file,
@@ -2954,126 +2969,370 @@ public class CarBizDriverInfoService {
         return driverId;
     }
 
-    public void getExportExcelData(List<String> datas,List<CarBizDriverInfoDTO> list, Integer cityId,Integer supplierId) {
-        CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(supplierId);
-        String supplierName = "";
-        String cityName = "";
-        if (carBizSupplier != null) {
-            supplierName = carBizSupplier.getSupplierFullName();
-        }
-        // 根据城市ID查找城市名称
-        CarBizCity carBizCity = carBizCityService.selectByPrimaryKey(cityId);
-        if (carBizCity != null) {
-            cityName = carBizCity.getCityName();
-        }
-        Map<Integer, String> groupMap = null;
-        try {
-            groupMap = carBizCarGroupService.queryGroupNameMap();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Map<Integer, String> teamMap = null;
-        Map<Integer, String> teamGroupMap = null;
-        try {
-            List<String> driverIds = this.getDriverIds(list);
-            teamMap = carDriverTeamService.queryDriverTeamListByDriverId(driverIds);
-            teamGroupMap = carDriverTeamService.queryDriverTeamGroupListByDriverId(driverIds);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-        StringBuilder builder = new StringBuilder();
-        for(CarBizDriverInfoDTO dto:list){
+    /**
+     * 兼容导出和查询两种情况
+     * @param carBizDriverInfoList
+     * @param exportStringList
+     */
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE),
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE)
+    })
+    public void batchGetBaseStatis(List<CarBizDriverInfoDTO> carBizDriverInfoList,List<String> exportStringList) {
+        if(carBizDriverInfoList == null || carBizDriverInfoList.isEmpty()){
+            return ;
+        }
+        Set<Integer> createBySet = new HashSet<>();
+        Set<Integer> updateBySet = new HashSet<>();
 
-            this.getBaseStatis(dto);
-            builder.append(dto.getLicensePlates()!=null?""+dto.getLicensePlates()+"":"").append(",");
-            builder.append(dto.getName()!=null?""+dto.getName()+"":"").append(",");
-            builder.append(dto.getIdCardNo()!=null?"\t"+dto.getIdCardNo()+"":"").append(",");
-            builder.append(dto.getPhone()!=null?"\t"+dto.getPhone()+"":"").append(",");
-            builder.append(dto.getPhonetype()!=null?""+dto.getPhonetype()+"":"").append(",");
-            builder.append(dto.getPhonecorp()!=null?""+dto.getPhonecorp()+"":"").append(",");
-            builder.append(dto.getGender()!=null?""+(dto.getGender()==1?"男":"女"+""):"").append(",");
-            builder.append(dto.getBirthDay()!=null?"\t"+dto.getBirthDay()+"":"").append(",");
-            builder.append(dto.getAge()!=null?""+dto.getAge()+"":"").append(",");
-            builder.append(dto.getSuperintendNo()!=null?"\t"+dto.getSuperintendNo()+"":"").append(",");
-            builder.append(dto.getSuperintendUrl()!=null?""+dto.getSuperintendUrl()+"":"").append(",");
-            String groupName = "";
-            if(groupMap!=null){
-                groupName = groupMap.get(dto.getGroupId());
+        Set<Integer> supplierIdSet = new HashSet<>();
+        Set<Integer> cooperationTypeIdSet = new HashSet<>();
+        Set<String> licensePlatesSet = new HashSet<>();
+        Set<Integer> cityIdSet = new HashSet<>();
+        Set<Integer> driveridSet = new HashSet<>();
+        Set<Integer> carBizCarGroupSet = new HashSet<>();
+
+
+        //拼装集合参数
+        for(CarBizDriverInfoDTO item:carBizDriverInfoList){
+            if(item.getCreateBy() != null){
+                createBySet.add(item.getCreateBy());
             }
-            builder.append(groupName).append(",");
-            // 驾照类型
-            builder.append(dto.getDrivingLicenseType()!=null?""+dto.getDrivingLicenseType()+"":"").append(",");
-            builder.append("\t").append(DateUtil.getTimeString(dto.getIssueDate())).append(",");
-            builder.append(dto.getDrivingYears()!=null?""+dto.getDrivingYears()+"":"").append(",");
-            builder.append("\t").append(DateUtil.getTimeString(dto.getExpireDate())).append(",");
-            builder.append("\t").append(dto.getArchivesNo()!=null?""+dto.getArchivesNo()+"":"").append(",");
-            builder.append(dto.getNationality()!=null?""+dto.getNationality()+"":"").append(",");
-            builder.append(dto.getNation()!=null?""+dto.getNation()+"":"").append(",");
-            builder.append(dto.getMarriage()!=null?""+dto.getMarriage()+"":"").append(",");
-            // 驾驶员外语能力
-            String foreignlanguageName= "无";
-            String foreignLanguage = dto.getForeignlanguage();
-            if(StringUtils.isNotEmpty(foreignLanguage)){
-                if("1".equals(foreignLanguage)){
-                    foreignlanguageName = "英语";
-                }else if("2".equals(foreignLanguage)){
-                    foreignlanguageName = "德语";
-                }else if("3".equals(foreignLanguage)){
-                    foreignlanguageName = "法语";
-                }else if("4".equals(foreignLanguage)){
-                    foreignlanguageName = "其他";
+            if(item.getUpdateBy() != null){
+                updateBySet.add(item.getUpdateBy());
+            }
+            if(item.getSupplierId() != null){
+                supplierIdSet.add(item.getSupplierId());
+            }
+            if(item.getCooperationType() != null){
+                cooperationTypeIdSet.add(item.getCooperationType());
+            }
+            if(StringUtils.isNotEmpty(item.getLicensePlates())){
+                licensePlatesSet.add(item.getLicensePlates());
+            }
+            if(item.getServiceCity() != null){
+                cityIdSet.add(item.getServiceCity());
+            }
+            if(item.getGroupId() != null){
+                carBizCarGroupSet.add(item.getGroupId());
+            }
+
+            driveridSet.add(item.getDriverId());
+
+        }
+        //根据createBySet查找创建人信息
+        List<CarAdmUser> createUserList = null;
+        if(!(createBySet.isEmpty())){
+            createUserList = carAdmUserMapper.selectUsersByIdList(new ArrayList<>(createBySet));
+        }
+        //根据createBySet查找修改人信息
+        List<CarAdmUser> updateUserList = null;
+        if(!(updateBySet.isEmpty())){
+            updateUserList = carAdmUserMapper.selectUsersByIdList(new ArrayList<>(updateBySet));
+        }
+        //根据supplierIdSet查找供应商信息
+       List<CarBizSupplier> supplierList =  null;
+        if(!supplierIdSet.isEmpty()){
+            supplierList =  carBizSupplierService.findByIdSet(supplierIdSet);
+        }
+        //查找所有的合作类型
+        List<CarBizCooperationType> carBizCooperationTypeList = carBizCooperationTypeService.queryCarBizCooperationTypeList();
+
+        //根据cityIdSet查找城市信息
+        Map<Integer, CarBizCity> cityMap =  null;
+        if(!cityIdSet.isEmpty()){
+            cityMap =  carBizCityService.queryCity(cityIdSet);
+        }
+        //根据carBizCarGroupSet查找所属组信息
+        List<CarBizCarGroup> carBizCarGroupList =  null;
+        if(carBizCarGroupSet != null){
+            carBizCarGroupList =  carBizCarGroupService.queryCarGroupByIdSet(carBizCarGroupSet);
+        }
+        //根据车牌查找汽车信息
+        List<CarBizCarInfo> carBizCarInfolist = null;
+        //根据车牌记录车信息
+        Map<String,CarBizCarInfo> carBizCarInfoMap = new HashMap<>();
+        Set<Integer> carModelIdSet = new HashSet<>();
+        if(!licensePlatesSet.isEmpty()){
+            carBizCarInfolist =   carBizCarInfoExMapper.selectByLicensePlates(licensePlatesSet);
+            if(carBizCarInfolist != null){
+                for(CarBizCarInfo item :carBizCarInfolist){
+                    carBizCarInfoMap.put(item.getLicensePlates(),item);
+                    if(item.getCarModelId() != null){
+                        carModelIdSet.add(item.getCarModelId());
+                    }
+
                 }
             }
-            builder.append(foreignlanguageName).append(",");
-            builder.append(dto.getEducation()!=null?""+dto.getEducation()+"":"").append(",");
-            builder.append(dto.getHouseHoldRegisterPermanent()!=null?""+dto.getHouseHoldRegisterPermanent()+"":"").append(",");
-            builder.append(dto.getHouseholdregister()!=null?""+dto.getHouseholdregister()+"":"").append(",");
-            builder.append(dto.getCurrentAddress()!=null?""+dto.getCurrentAddress()+"":"").append(",");
-            builder.append(dto.getPhotosrct()!=null?""+dto.getPhotosrct()+"":"").append(",");
-            builder.append(dto.getDriverlicensenumber()!=null?"\t"+dto.getDriverlicensenumber()+"":"").append(",");
-            builder.append(dto.getDrivinglicenseimg()!=null?""+dto.getDrivinglicenseimg()+"":"").append(",");
-            builder.append(dto.getFirstdrivinglicensedate()!=null?"\t"+dto.getFirstdrivinglicensedate()+"":"").append(",");
-            builder.append(dto.getIsxydriver()!=null?""+(dto.getIsxydriver()==1?"是":"否"+""):"").append(",");
-            builder.append(dto.getDriverlicenseissuingnumber()!=null?"\t"+dto.getDriverlicenseissuingnumber()+"":"").append(",");
-            builder.append(dto.getFirstmeshworkdrivinglicensedate()!=null?"\t"+dto.getFirstmeshworkdrivinglicensedate()+"":"").append(",");
-            builder.append(dto.getXyDriverNumber()!=null?"\t"+dto.getXyDriverNumber()+"":"").append(",");
-            builder.append(dto.getDriverlicenseissuingcorp()!=null?""+dto.getDriverlicenseissuingcorp()+"":"").append(",");
-            builder.append(dto.getDriverLicenseIssuingGrantDate()!=null?"\t"+dto.getDriverLicenseIssuingGrantDate()+"":"").append(",");
-            builder.append(dto.getDriverLicenseIssuingFirstDate()!=null?"\t"+dto.getDriverLicenseIssuingFirstDate()+"":"").append(",");
-            builder.append(dto.getDriverlicenseissuingdatestart()!=null?"\t"+dto.getDriverlicenseissuingdatestart()+"":"").append(",");
-            builder.append(dto.getDriverlicenseissuingdateend()!=null?"\t"+dto.getDriverlicenseissuingdateend()+"":"").append(",");
-            builder.append(dto.getDriverLicenseIssuingRegisterDate()!=null?"\t"+dto.getDriverLicenseIssuingRegisterDate()+"":"").append(",");
-            builder.append(dto.getParttimejobdri()!=null?""+dto.getParttimejobdri()+"":"").append(",");
-            builder.append(dto.getCorptype()!=null?""+dto.getCorptype()+"":"").append(",");
-            builder.append(dto.getContractdate()!=null?"\t"+dto.getContractdate()+"":"").append(",");
-            builder.append(dto.getSigndate()!=null?"\t"+dto.getSigndate()+"":"").append(",");
-            builder.append(dto.getSigndateend()!=null?"\t"+dto.getSigndateend()+"":"").append(",");
-            builder.append(dto.getEmergencyContactPerson()!=null?""+dto.getEmergencyContactPerson()+"":"").append(",");
-            builder.append(dto.getEmergencyContactNumber()!=null?"\t"+dto.getEmergencyContactNumber()+"":"").append(",");
-            builder.append(dto.getEmergencycontactaddr()!=null?""+dto.getEmergencycontactaddr()+"":"").append(",");
-            builder.append(supplierName).append(",");
-            builder.append(cityName).append(",");
-            //车队
-            String teamName = "";
-            if(teamMap!=null){
-                teamName = teamMap.get(dto.getDriverId());
-                teamName = StringUtils.isNotBlank(teamName) ? teamName : "";
-            }
-            builder.append(teamName).append(",");
-            //小组
-            String teamGroupName = "";
-            if(teamGroupMap!=null){
-                teamGroupName =teamGroupMap.get(dto.getDriverId());
-                teamGroupName = StringUtils.isNotBlank(teamGroupName) ? teamGroupName : "" ;
-            }
-            builder.append(teamGroupName).append(",");
-            builder.append(dto.getDriverId()!=null?"\t"+dto.getDriverId()+"":"").append(",");
-            builder.append("\t").append(DateUtil.getTimeString(dto.getCreateDate()));
-            datas.add(builder.toString());
-            builder.setLength(0);
         }
+        Map<String,CarBizModel> carBizModelMap = new HashMap<>();
+        if(!carModelIdSet.isEmpty()){
+            List<CarBizModel>  carBizModels = carBizModelExMapper.findByIdSet(carModelIdSet);
+            if(carBizModels != null){
+                for(CarBizModel item : carBizModels){
+                    carBizModelMap.put("t_"+item.getModelId(),item);
+                }
+            }
+        }
+
+        //查找车队信息
+        List<Integer>  teamIdList = null;
+        List<Integer>  teamGroupIdList = null;
+        List<CarDriverTeam>  carDriverTeamList = null; //车队列表
+
+        List<CarRelateGroup>  driverTeamGroupIdList = null;//车队组列表
+        List<CarDriverTeam>  carGroupDriverTeamList = null; //车队小组列表
+        List<DriverTeamRelationEntity> driverTeamRelationEntityList = null;
+
+        Map<String,String> driverTeamMap = new HashMap<>();
+        Map<String,Integer> driverGroupMap = new HashMap<>();
+        if(!driveridSet.isEmpty()){
+            //查询司机车队关系
+              driverTeamRelationEntityList = carRelateTeamExMapper.queryByDriverIdList(driveridSet);
+              if(driverTeamRelationEntityList != null){
+                  teamIdList = new ArrayList<>();
+                  for(DriverTeamRelationEntity item : driverTeamRelationEntityList){
+                      if(StringUtils.isNotEmpty(item.getTeamId())){
+                          teamIdList.add(Integer.parseInt(item.getTeamId()));
+                      }
+                      driverTeamMap.put("t_"+item.getDriverId(),item.getTeamId());
+
+                  }
+              }
+              //查找车队列表
+              if(teamIdList != null){
+                    carDriverTeamList =  carDriverTeamExMapper.queryTeamListByTemIdList(teamIdList);
+              }
+                //查找司机小组关系
+            List<Integer> driverList = new ArrayList(driveridSet);
+            //小组id列表
+            driverTeamGroupIdList = carRelateGroupExMapper.queryDriverGroupRelationListByDriverIdSet(driverList);
+            if(driverTeamGroupIdList != null){
+                if(driverTeamGroupIdList != null){
+                    teamGroupIdList = new ArrayList<>();
+                    for(CarRelateGroup item : driverTeamGroupIdList){
+                        if( item.getGroupId() != null){
+                            teamGroupIdList.add(item.getGroupId());
+                        }
+                        driverGroupMap.put("t_"+item.getDriverId(),item.getGroupId());
+
+                    }
+                }
+                carGroupDriverTeamList =  carDriverTeamExMapper.queryTeamListByTemIdList(teamGroupIdList);
+            }
+        }
+
+        //根据list组装Map
+        Map<String,CarAdmUser> createByMap = new HashMap<>();
+        Map<String,CarAdmUser> updateByMap = new HashMap<>();
+        Map<String,CarBizSupplier> supplierMap = new HashMap<>();
+        Map<String,CarBizCooperationType> cooperationTypeMap = new HashMap<>();
+        Map<String,CarDriverTeam> teamMap = new HashMap<>();
+        Map<String,CarDriverTeam> teamGroupMap = new HashMap<>();
+        Map<String,CarBizCarGroup> groupMap = new HashMap<>();
+
+        if(createUserList != null){
+            for(CarAdmUser item : createUserList){
+                createByMap.put("t_"+item.getUserId(),item);
+            }
+        }
+        if(updateUserList != null){
+            for(CarAdmUser item : updateUserList){
+                updateByMap.put("t_"+item.getUserId(),item);
+            }
+        }
+        if(supplierList != null){
+            for(CarBizSupplier item : supplierList){
+                supplierMap.put("t_"+item.getSupplierId(),item);
+            }
+        }
+        if(carBizCooperationTypeList != null){
+            for(CarBizCooperationType item : carBizCooperationTypeList){
+                cooperationTypeMap.put("t_"+item.getId(),item);
+            }
+        }
+        if(carDriverTeamList != null){
+            for(CarDriverTeam item : carDriverTeamList){
+                teamMap.put("t_"+item.getId(),item);
+            }
+        }
+        if(carGroupDriverTeamList != null){
+            for(CarDriverTeam item : carGroupDriverTeamList){
+                teamGroupMap.put("t_"+item.getId(),item);
+            }
+        }
+
+        if(carBizCarGroupList != null){
+            for(CarBizCarGroup item : carBizCarGroupList){
+                groupMap.put("t_"+item.getGroupId(),item);
+            }
+        }
+
+        CarBizSupplier carBizSupplier = null;
+        CarBizCity carBizCity = null;
+        CarAdmUser carAdmUser = null;
+        String teamId = null;
+        Integer driverId = null;
+        Integer groupId = null;
+        CarDriverTeam carDriverTeam = null;
+        CarDriverTeam driverTeamGroup = null;
+        CarBizCarGroup carBizCarGroup = null;
+        CarBizCarInfo carBizCarInfo = null;
+        CarBizModel carBizModel = null;
+        CarBizDriverInfoDTO dto = null;
+        for(CarBizDriverInfoDTO carBizDriverInfo:carBizDriverInfoList){
+
+            driverId = carBizDriverInfo.getDriverId();
+            carBizSupplier = supplierMap.get("t_"+carBizDriverInfo.getSupplierId());
+
+            if (carBizSupplier != null) {
+                carBizDriverInfo.setSupplierName(carBizSupplier.getSupplierFullName());
+                carBizDriverInfo.setCooperationType(carBizSupplier.getCooperationType());
+                CarBizCooperationType carBizCooperationType = carBizCooperationTypeService.selectByPrimaryKey(carBizSupplier.getCooperationType());
+                if (carBizCooperationType != null) {
+                    carBizDriverInfo.setCooperationTypeName(carBizCooperationType.getCooperationName());
+                }
+            }
+            //设置城市信息
+            carBizCity = cityMap.get(carBizDriverInfo.getServiceCity());
+            if (carBizCity != null) {
+                carBizDriverInfo.setCityName(carBizCity.getCityName());
+            }
+            //设置创建人信息
+            if(carBizDriverInfo.getCreateBy()!=null){
+                  carAdmUser = createByMap.get("t_"+carBizDriverInfo.getCreateBy());
+                if(carAdmUser!=null){
+                    carBizDriverInfo.setCreateName(carAdmUser.getUserName());
+                }
+            }
+            //设置修改人信息
+            if(carBizDriverInfo.getUpdateBy()!=null){
+                  carAdmUser = updateByMap.get("t_"+carBizDriverInfo.getUpdateBy());
+                if(carAdmUser!=null){
+                    carBizDriverInfo.setUpdateName(carAdmUser.getUserName());
+                }
+            }
+
+            //设置车队名称和车队id
+            teamId = driverTeamMap.get("t_"+driverId);
+            if( teamId != null){
+                carBizDriverInfo.setTeamId(Integer.parseInt(teamId));
+                carDriverTeam =  teamMap.get("t_"+teamId);
+                if(carDriverTeam != null){
+                    carBizDriverInfo.setTeamName(carDriverTeam.getTeamName());
+                }
+            }
+
+            //设置车队下的小组的名称和id
+            groupId = driverGroupMap.get("t_"+driverId);
+            if( groupId != null){
+                carBizDriverInfo.setTeamGroupId(groupId);
+                driverTeamGroup =  teamGroupMap.get("t_"+groupId);
+                if(driverTeamGroup != null){
+                    carBizDriverInfo.setTeamGroupName(driverTeamGroup.getTeamName());
+                }
+            }
+            //设置车组
+            carBizCarGroup = groupMap.get("t_"+carBizDriverInfo.getGroupId());
+            if(carBizCarGroup != null){
+                carBizDriverInfo.setCarGroupName(carBizCarGroup.getGroupName());
+            }
+
+            if(StringUtils.isNotEmpty(carBizDriverInfo.getLicensePlates())){
+                carBizCarInfo = carBizCarInfoMap.get(carBizDriverInfo.getLicensePlates());
+                if(carBizCarInfo != null){
+                    carBizModel = carBizModelMap.get("t_"+carBizCarInfo.getCarModelId());
+
+                    carBizDriverInfo.setModelId(carBizModel.getModelId());
+                    carBizDriverInfo.setModelName(carBizModel.getModelName());
+                }
+            }
+
+            if(exportStringList != null){
+                dto = carBizDriverInfo;
+
+                StringBuilder builder = new StringBuilder();
+                builder.append(dto.getLicensePlates()!=null?""+dto.getLicensePlates()+"":"").append(",");
+                builder.append(dto.getName()!=null?""+dto.getName()+"":"").append(",");
+                builder.append(dto.getIdCardNo()!=null?"\t"+dto.getIdCardNo()+"":"").append(",");
+                builder.append(dto.getPhone()!=null?"\t"+dto.getPhone()+"":"").append(",");
+                builder.append(dto.getPhonetype()!=null?""+dto.getPhonetype()+"":"").append(",");
+                builder.append(dto.getPhonecorp()!=null?""+dto.getPhonecorp()+"":"").append(",");
+                builder.append(dto.getGender()!=null?""+(dto.getGender()==1?"男":"女"+""):"").append(",");
+                builder.append(dto.getBirthDay()!=null?"\t"+dto.getBirthDay()+"":"").append(",");
+                builder.append(dto.getAge()!=null?""+dto.getAge()+"":"").append(",");
+                builder.append(dto.getSuperintendNo()!=null?"\t"+dto.getSuperintendNo()+"":"").append(",");
+                builder.append(dto.getSuperintendUrl()!=null?""+dto.getSuperintendUrl()+"":"").append(",");
+
+                builder.append(StringUtils.isEmpty(dto.getCarGroupName())?"":dto.getCarGroupName()).append(",");
+                // 驾照类型
+                builder.append(dto.getDrivingLicenseType()!=null?""+dto.getDrivingLicenseType()+"":"").append(",");
+                builder.append("\t").append(DateUtil.getTimeString(dto.getIssueDate())).append(",");
+                builder.append(dto.getDrivingYears()!=null?""+dto.getDrivingYears()+"":"").append(",");
+                builder.append("\t").append(DateUtil.getTimeString(dto.getExpireDate())).append(",");
+                builder.append("\t").append(dto.getArchivesNo()!=null?""+dto.getArchivesNo()+"":"").append(",");
+                builder.append(dto.getNationality()!=null?""+dto.getNationality()+"":"").append(",");
+                builder.append(dto.getNation()!=null?""+dto.getNation()+"":"").append(",");
+                builder.append(dto.getMarriage()!=null?""+dto.getMarriage()+"":"").append(",");
+                // 驾驶员外语能力
+                String foreignlanguageName= "无";
+                String foreignLanguage = dto.getForeignlanguage();
+                if(StringUtils.isNotEmpty(foreignLanguage)){
+                    if("1".equals(foreignLanguage)){
+                        foreignlanguageName = "英语";
+                    }else if("2".equals(foreignLanguage)){
+                        foreignlanguageName = "德语";
+                    }else if("3".equals(foreignLanguage)){
+                        foreignlanguageName = "法语";
+                    }else if("4".equals(foreignLanguage)){
+                        foreignlanguageName = "其他";
+                    }
+                }
+                builder.append(foreignlanguageName).append(",");
+                builder.append(dto.getEducation()!=null?""+dto.getEducation()+"":"").append(",");
+                builder.append(dto.getHouseHoldRegisterPermanent()!=null?""+dto.getHouseHoldRegisterPermanent()+"":"").append(",");
+                builder.append(dto.getHouseholdregister()!=null?""+dto.getHouseholdregister()+"":"").append(",");
+                builder.append(dto.getCurrentAddress()!=null?""+dto.getCurrentAddress()+"":"").append(",");
+                builder.append(dto.getPhotosrct()!=null?""+dto.getPhotosrct()+"":"").append(",");
+                builder.append(dto.getDriverlicensenumber()!=null?"\t"+dto.getDriverlicensenumber()+"":"").append(",");
+                builder.append(dto.getDrivinglicenseimg()!=null?""+dto.getDrivinglicenseimg()+"":"").append(",");
+                builder.append(dto.getFirstdrivinglicensedate()!=null?"\t"+dto.getFirstdrivinglicensedate()+"":"").append(",");
+                builder.append(dto.getIsxydriver()!=null?""+(dto.getIsxydriver()==1?"是":"否"+""):"").append(",");
+                builder.append(dto.getDriverlicenseissuingnumber()!=null?"\t"+dto.getDriverlicenseissuingnumber()+"":"").append(",");
+                builder.append(dto.getFirstmeshworkdrivinglicensedate()!=null?"\t"+dto.getFirstmeshworkdrivinglicensedate()+"":"").append(",");
+                builder.append(dto.getXyDriverNumber()!=null?"\t"+dto.getXyDriverNumber()+"":"").append(",");
+                builder.append(dto.getDriverlicenseissuingcorp()!=null?""+dto.getDriverlicenseissuingcorp()+"":"").append(",");
+                builder.append(dto.getDriverLicenseIssuingGrantDate()!=null?"\t"+dto.getDriverLicenseIssuingGrantDate()+"":"").append(",");
+                builder.append(dto.getDriverLicenseIssuingFirstDate()!=null?"\t"+dto.getDriverLicenseIssuingFirstDate()+"":"").append(",");
+                builder.append(dto.getDriverlicenseissuingdatestart()!=null?"\t"+dto.getDriverlicenseissuingdatestart()+"":"").append(",");
+                builder.append(dto.getDriverlicenseissuingdateend()!=null?"\t"+dto.getDriverlicenseissuingdateend()+"":"").append(",");
+                builder.append(dto.getDriverLicenseIssuingRegisterDate()!=null?"\t"+dto.getDriverLicenseIssuingRegisterDate()+"":"").append(",");
+                builder.append(dto.getParttimejobdri()!=null?""+dto.getParttimejobdri()+"":"").append(",");
+                builder.append(dto.getCorptype()!=null?""+dto.getCorptype()+"":"").append(",");
+                builder.append(dto.getContractdate()!=null?"\t"+dto.getContractdate()+"":"").append(",");
+                builder.append(dto.getSigndate()!=null?"\t"+dto.getSigndate()+"":"").append(",");
+                builder.append(dto.getSigndateend()!=null?"\t"+dto.getSigndateend()+"":"").append(",");
+                builder.append(dto.getEmergencyContactPerson()!=null?""+dto.getEmergencyContactPerson()+"":"").append(",");
+                builder.append(dto.getEmergencyContactNumber()!=null?"\t"+dto.getEmergencyContactNumber()+"":"").append(",");
+                builder.append(dto.getEmergencycontactaddr()!=null?""+dto.getEmergencycontactaddr()+"":"").append(",");
+                builder.append(dto.getSupplierName() == null?"":dto.getSupplierName()).append(",");
+                builder.append(dto.getCityName() == null?"":dto.getCityName()).append(",");
+                //车队
+
+                builder.append(dto.getTeamName()==null?"":dto.getTeamName()).append(",");
+                //小组
+                builder.append(dto.getTeamGroupName()==null?"":dto.getTeamGroupName()).append(",");
+                builder.append(dto.getDriverId()!=null?"\t"+dto.getDriverId()+"":"").append(",");
+                builder.append("\t").append(DateUtil.getTimeString(dto.getCreateDate()));
+
+                exportStringList.add(builder.toString());
+            }
+
+        }
+
     }
+
 
     private List<String> getDriverIds(List<CarBizDriverInfoDTO> list) {
         List<String> ids = Lists.newArrayList();

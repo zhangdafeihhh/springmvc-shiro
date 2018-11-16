@@ -3,16 +3,18 @@ package com.zhuanche.serv;
 import com.zhuanche.entity.rentcar.CarBizChatUser;
 import com.zhuanche.entity.rentcar.CarBizUserAction;
 import mapper.rentcar.CarBizChatUserMapper;
-import mapper.rentcar.CarBizUserActionMapper;
 import mapper.rentcar.ex.CarBizUserActionExMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Service
 public class CarBizChatUserService {
+
+    private static final Logger logger = LoggerFactory.getLogger(CarBizChatUserService.class);
 
     @Autowired
     private CarBizChatUserMapper carBizChatUserMapper;
