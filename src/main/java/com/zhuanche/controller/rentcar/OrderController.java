@@ -447,7 +447,7 @@ public class OrderController{
 		List<CarFactOrderInfoDTO> result = new ArrayList<CarFactOrderInfoDTO>(10000);
 		 int code = -1;
 		 AjaxResponse responseX = null;
-		 paramMap.put("pageSize",500);//每页记录数
+		 paramMap.put("pageSize",10000);//每页记录数
 		 for(int pageNo=1; ; pageNo++  ) {
 			paramMap.put("pageNo",pageNo);//页号
 			 // 从订单组取统计数据
