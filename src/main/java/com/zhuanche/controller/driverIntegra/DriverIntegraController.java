@@ -261,7 +261,7 @@ public class DriverIntegraController {
         if(driverEntity.getCityId() == 0){
             return "请选择城市";
         }
-        if(driverEntity.getSupplierId() == 0){
+        if(driverEntity.getSupplierId() == null){
             return "请选择供应商";
         }
         try {
