@@ -3189,9 +3189,10 @@ public class CarBizDriverInfoService {
             if (carBizSupplier != null) {
                 carBizDriverInfo.setSupplierName(carBizSupplier.getSupplierFullName());
                 carBizDriverInfo.setCooperationType(carBizSupplier.getCooperationType());
-                CarBizCooperationType carBizCooperationType = carBizCooperationTypeService.selectByPrimaryKey(carBizSupplier.getCooperationType());
-                if (carBizCooperationType != null) {
-                    carBizDriverInfo.setCooperationTypeName(carBizCooperationType.getCooperationName());
+                if(carBizDriverInfo.getCooperationType() != null){
+                    if(cooperationTypeMap.get("t_"+carBizDriverInfo.getCooperationType()) != null){
+                        carBizDriverInfo.setCooperationTypeName(cooperationTypeMap.get("t_"+carBizDriverInfo.getCooperationType()).getCooperationName());
+                    }
                 }
             }
             //设置城市信息
@@ -3248,6 +3249,8 @@ public class CarBizDriverInfoService {
                     carBizDriverInfo.setModelName(carBizModel.getModelName());
                 }
             }
+
+
 
             if(exportStringList != null){
                 dto = carBizDriverInfo;
