@@ -120,7 +120,7 @@ public class MyRestTemplate extends RestTemplate {
 			logger.info("MyRestTemplate:"+((end-begin)/1000000)+" url:"+this.getHost() + url);
 			HttpEntity entity = response.getEntity();
 			String body = EntityUtils.toString(entity);
-			logger.info("调用地址:url:"+url+"返回结果:body:"+body);
+//			logger.info("调用地址:url:"+url+"返回结果:body:"+body);
 			in = entity.getContent();
 			try {
 				if ( responseType.equals(JSONArray.class)){

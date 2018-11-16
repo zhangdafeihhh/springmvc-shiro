@@ -3302,10 +3302,10 @@ public class CarBizDriverInfoService {
                 builder.append(dto.getHouseHoldRegisterPermanent()!=null?""+dto.getHouseHoldRegisterPermanent()+"":"").append(",");
                 builder.append(dto.getHouseholdregister()!=null?""+dto.getHouseholdregister()+"":"").append(",");
                 builder.append(dto.getCurrentAddress()!=null?""+dto.getCurrentAddress()+"":"").append(",");
-                builder.append(dto.getPhotosrct()!=null?""+dto.getPhotosrct()+"":"").append(",");
+                builder.append(dto.getPhotosrct()!=null?""+dto.getPhotosrct()+"":"").append(",");//驾驶员照片文件编号
                 builder.append(dto.getDriverlicensenumber()!=null?"\t"+dto.getDriverlicensenumber()+"":"").append(",");
-                builder.append(dto.getDrivinglicenseimg()!=null?""+dto.getDrivinglicenseimg()+"":"").append(",");
-                builder.append(dto.getFirstdrivinglicensedate()!=null?"\t"+dto.getFirstdrivinglicensedate()+"":"").append(",");
+                builder.append(dto.getDrivinglicenseimg()!=null?""+dto.getDrivinglicenseimg()+"":"").append(",");//机动车驾驶证扫描件文件编号
+                builder.append(dto.getFirstdrivinglicensedate()!=null?"\t"+dto.getFirstdrivinglicensedate()+"":"").append(",");//初次领取驾证日期
                 builder.append(dto.getIsxydriver()!=null?""+(dto.getIsxydriver()==1?"是":"否"+""):"").append(",");
                 builder.append(dto.getDriverlicenseissuingnumber()!=null?"\t"+dto.getDriverlicenseissuingnumber()+"":"").append(",");
                 builder.append(dto.getFirstmeshworkdrivinglicensedate()!=null?"\t"+dto.getFirstmeshworkdrivinglicensedate()+"":"").append(",");
