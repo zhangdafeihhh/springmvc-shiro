@@ -234,4 +234,15 @@
         </foreach>
     </select>
 
+
+    <select id="queryByDriverIdList" parameterType="java.util.Set" resultMap="BaseResultMap" >
+        SELECT
+        relation_id,team_id,driver_id
+        FROM car_relate_team rt
+        WHERE rt.driver_id in
+        <foreach collection="driverIdSet" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
 </mapper>

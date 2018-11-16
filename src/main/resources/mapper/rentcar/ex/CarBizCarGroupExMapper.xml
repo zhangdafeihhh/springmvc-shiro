@@ -115,4 +115,16 @@
         <include refid="Blob_Column_List" />
       FROM car_biz_car_group
   </select>
+
+    <select id="queryCarGroupByIdSet" resultMap="ResultMapWithBLOBs" parameterType="java.util.Map" >
+        select
+        <include refid="Base_Column_List" />
+        ,
+        <include refid="Blob_Column_List" />
+        from car_biz_car_group
+        where group_id in
+        <foreach item="item" index="index" collection="carBizCarGroupSet"  open="(" separator="," close=")">
+        #{item}
+        </foreach>
+    </select>
 </mapper>

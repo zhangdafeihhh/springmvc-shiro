@@ -3,6 +3,7 @@ package com.zhuanche.controller.driver;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
@@ -264,6 +265,7 @@ public class DriverInfoController {
         Boolean had = false;
         if(teamGroupId!=null || teamId!=null || (permOfTeam!=null && permOfTeam.size()>0)){
             had = true;
+
             driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
         }
         if(had && (driverIds==null || driverIds.size()==0)){
@@ -289,10 +291,20 @@ public class DriverInfoController {
             carBizDriverInfoDTO.setSupplierIds(permOfSupplier);
             carBizDriverInfoDTO.setTeamIds(permOfTeam);
             carBizDriverInfoDTO.setDriverIds(driverIds);
-            list = carBizDriverInfoService.queryDriverList(carBizDriverInfoDTO);
+            int pageSize = 10000;
+            PageInfo page  = carBizDriverInfoService.queryDriverPage(carBizDriverInfoDTO,1,pageSize);
+            list.addAll( page.getList());
+            int pages = page.getPages();
+            if(pages >= 2){
+                for(int i = 2;i <= pages;i++){
+                    page  = carBizDriverInfoService.queryDriverPage(carBizDriverInfoDTO,1,pageSize);
+                    list.addAll( page.getList());
+                }
+
+            }
         }
         try {
-//            Workbook wb = carBizDriverInfoService.exportExcel(list, cityId, supplierId, request.getRealPath("/")+File.separator+"template"+File.separator+"driver_info.xlsx");
+
             List<String> header = new ArrayList<>();
             header.add("车牌号,机动车驾驶员姓名,驾驶员身份证号,驾驶员手机号,司机手机型号,司机手机运营商,驾驶员性别,出生日期,年龄,服务监督号码,服务监督链接,车型类别,驾照类型,驾照领证日期, 驾龄," +
                     "驾照到期时间,档案编号,国籍,驾驶员民族,驾驶员婚姻状况,驾驶员外语能力,驾驶员学历,户口登记机关名称,户口住址或长住地址,驾驶员通信地址,驾驶员照片文件编号,机动车驾驶证号," +
@@ -307,14 +319,13 @@ public class DriverInfoController {
                 fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
             }
             List<String> datas = new ArrayList<>();
-            carBizDriverInfoService.getExportExcelData(datas, list, cityId, supplierId);
+            carBizDriverInfoService.batchGetBaseStatis( list,datas);
             CsvUtils.exportCsv(response, datas, header, fileName);
-//            Componment.fileDownload(response, wb, new String("司机信息".getBytes("utf-8"), "iso8859-1"));
             long end=System.currentTimeMillis(); //获取结束时间
             logger.info(LOGTAG + "司机导出cityId={},supplierId={}的查询写入数据时间为={}ms", cityId, supplierId, (end-start));
-//            this.exportExcelFromTemplet(response, wb, new String("司机信息".getBytes("utf-8"), "iso8859-1"));
         } catch (Exception e) {
            logger.error("司机信息列表查询导出error",e);
+           e.printStackTrace();
         }finally {
             if(list != null){
                 list.clear();// 帮助GC回收内存
@@ -325,17 +336,6 @@ public class DriverInfoController {
         }
     }
 
-    public void exportExcelFromTemplet(HttpServletResponse response, Workbook wb, String fileName) throws IOException {
-        if(StringUtils.isEmpty(fileName)) {
-            fileName = "exportExcel";
-        }
-        response.setHeader("Content-Disposition","attachment;filename="+fileName+".xlsx");//指定下载的文件名
-        response.setContentType("application/octet-stream");
-        ServletOutputStream os =  response.getOutputStream();
-        wb.write(os);
-        os.flush();
-        os.close();
-    }
 
     /**
      * 司机信息

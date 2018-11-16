@@ -3,6 +3,7 @@ package mapper.rentcar.ex;
 import com.zhuanche.entity.rentcar.CarBizModel;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author wzq
@@ -21,4 +22,6 @@ public interface CarBizModelExMapper {
      * @return
      */
     List<CarBizModel> queryAllList();
+
+    List<CarBizModel> findByIdSet(Set<Integer> carModelIdSet);
 }

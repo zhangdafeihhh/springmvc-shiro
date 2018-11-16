@@ -1,20 +1,23 @@
 package com.zhuanche.serv;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
-import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import mapper.rentcar.CarBizCarGroupMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 public class CarBizCarGroupService {
-
+    private static final Logger logger = LoggerFactory.getLogger(CarBizCarGroupService.class);
     @Autowired
     private CarBizCarGroupMapper carBizCarGroupMapper;
 
@@ -68,4 +71,11 @@ public class CarBizCarGroupService {
         return result;
     }
 
+    public List<CarBizCarGroup> queryCarGroupByIdSet(Set<Integer> carBizCarGroupSet) {
+        if(carBizCarGroupSet == null || carBizCarGroupSet.isEmpty()){
+            logger.info("参数为空，carBizCarGroupSet="+(carBizCarGroupSet==null?"null": JSON.toJSONString(carBizCarGroupSet)));
+            return null;
+        }
+         return carBizCarGroupExMapper.queryCarGroupByIdSet(carBizCarGroupSet);
+    }
 }
