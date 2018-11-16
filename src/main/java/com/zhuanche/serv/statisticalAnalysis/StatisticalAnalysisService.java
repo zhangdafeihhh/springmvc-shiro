@@ -335,7 +335,6 @@ public class  StatisticalAnalysisService {
 		if(!cityIds.isEmpty()){
 			paramMap.put("visibleCityIds", cityIds); //可见城市ID
 		}
-
 		//非管理员  没有任何可见权限返回null
 		/*if(cityIds.isEmpty() && teamIds.isEmpty() && supplierIds.isEmpty() && !WebSessionUtil.isSupperAdmin()){
 			return null;

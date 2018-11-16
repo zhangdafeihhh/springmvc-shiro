@@ -1,34 +1,27 @@
 package com.zhuanche.controller.rentcar;
 
-import java.io.File;
-import java.io.IOException;
-<<<<<<< HEAD
-import java.net.URLEncoder;
-=======
-import java.text.ParseException;
->>>>>>> origin/master
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-<<<<<<< HEAD
-import com.zhuanche.dto.rentcar.*;
-import com.zhuanche.util.excel.CsvUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Row;
-=======
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.util.StringUtil;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.util.DateUtil;
+import com.zhuanche.common.web.Verify;
+import com.zhuanche.dto.rentcar.*;
+import com.zhuanche.entity.DriverOrderRecord.OrderTimeEntity;
+import com.zhuanche.entity.rentcar.*;
+import com.zhuanche.serv.order.OrderService;
+import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
+import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
+import com.zhuanche.util.excel.CsvUtils;
+import mapper.rentcar.CarBizCustomerMapper;
+import mapper.rentcar.CarBizDriverInfoMapper;
+import mapper.rentcar.ex.CarBizCarInfoExMapper;
+import mapper.rentcar.ex.CarFactOrderExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
->>>>>>> origin/master
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,33 +31,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.github.pagehelper.util.StringUtil;
-import com.zhuanche.common.database.MasterSlaveConfig;
-import com.zhuanche.common.database.MasterSlaveConfigs;
-import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
-import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.Verify;
-import com.zhuanche.controller.driver.Componment;
-import com.zhuanche.entity.DriverOrderRecord.OrderTimeEntity;
-import com.zhuanche.entity.rentcar.CarBizCity;
-import com.zhuanche.entity.rentcar.CarBizCustomer;
-import com.zhuanche.entity.rentcar.CarBizDriverInfo;
-import com.zhuanche.entity.rentcar.CarBizOrderSettleEntity;
-import com.zhuanche.entity.rentcar.CarBizOrderWaitingPeriod;
-import com.zhuanche.entity.rentcar.CarBizSupplier;
-import com.zhuanche.entity.rentcar.CarFactOrderInfo;
-import com.zhuanche.entity.rentcar.CarGroupEntity;
-import com.zhuanche.entity.rentcar.ServiceEntity;
-import com.zhuanche.serv.order.OrderService;
-import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
-import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
-
-import mapper.rentcar.CarBizCustomerMapper;
-import mapper.rentcar.CarBizDriverInfoMapper;
-import mapper.rentcar.ex.CarBizCarInfoExMapper;
-import mapper.rentcar.ex.CarFactOrderExMapper;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * ClassName: OrderController 
@@ -95,10 +69,6 @@ public class OrderController{
 	private CarBizCarInfoExMapper carBizCarInfoExMapper;
 	/**
 	    * 查询订单 列表
-<<<<<<< HEAD
-	    * @param serviceId
-=======
->>>>>>> origin/master
 	    * @return
 	  */
 //	输入【订单号】参数，无需搭配其他限定条件，可直接查询；
@@ -294,26 +264,8 @@ public class OrderController{
 	     AjaxResponse result = carFactOrderInfoService.queryOrderDataList(paramMap);
 	     return result;
 	 }
-<<<<<<< HEAD
 
-	 
-		/**
-	    * 订单 列表导出
-	    * @param serviceId	查询日期
-	    * @return
-	  */
-=======
-	 
-	 public String arrayToStr(String v[]){
-		 String temp = "";
-		 for(String str : v){
-			 temp+=str+",";
-		 }
-		 if(!"".equals(temp)){
-			 temp=temp.substring(0, temp.length()-1);
-		 }
-		 return temp;
-	 }
+
 
 	/**
 	 * 订单导出：
@@ -341,7 +293,6 @@ public class OrderController{
 	 * @param response
 	 * @return
 	 */
->>>>>>> origin/master
 	 @ResponseBody
 	 @RequestMapping(value = "/exportOrderList", method = { RequestMethod.POST,RequestMethod.GET })
 	 public String exportOrderList(
@@ -517,8 +468,6 @@ public class OrderController{
 				 break;
 			 }
 		}
-		
-
 
 		try {
 
@@ -552,132 +501,96 @@ public class OrderController{
 		for (CarFactOrderInfoDTO s : rows) {
 			StringBuffer stringBuffer = new StringBuffer();
 			// //订单号
-			stringBuffer.append(s.getOrderNo() != null ? ""
-					+ s.getOrderNo() + "" : "");
+			stringBuffer.append(s.getOrderNo() != null ? "" + s.getOrderNo() + "" : "");
 			stringBuffer.append(",");
 
 			//  订单指派方式
 
-			stringBuffer.append(s.getPushDriverType() != null ? ""
-					+ s.getPushDriverType() + "" : "");
+			stringBuffer.append(s.getPushDriverType() != null ? "" + s.getPushDriverType() + "" : "");
 			stringBuffer.append(",");
 
 			// 城市
 
-			stringBuffer.append(s.getCityName() != null ? ""
-					+ s.getCityName() + "" : "");
+			stringBuffer.append(s.getCityName() != null ? "" + s.getCityName() + "" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getServiceName() != null ? ""
-					+ s.getServiceName() + "" : "");
+			stringBuffer.append(s.getServiceName() != null ? "" + s.getServiceName() + "" : "");
 			stringBuffer.append(",");
 
 			// 车型类别
-			stringBuffer.append(s.getGroupName() != null ? ""
-					+ s.getGroupName() + "" : "");
+			stringBuffer.append(s.getGroupName() != null ? "" + s.getGroupName() + "" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getType() != null ? ""
-					+ s.getType() + "" : "");
+			stringBuffer.append(s.getType() != null ? "" + s.getType() + "" : "");
 			stringBuffer.append(",");
 			//
-			stringBuffer.append(s.getBookingUserName() != null ? ""
-					+ s.getBookingUserName() + "" : "");
+			stringBuffer.append(s.getBookingUserName() != null ? "" + s.getBookingUserName() + "" : "");
 			stringBuffer.append(",");
 			//
-			stringBuffer.append(s.getBookingUserPhone() != null ? ""
-					+ s.getBookingUserPhone() + "" : "");
+			stringBuffer.append(s.getBookingUserPhone() != null ? "" + s.getBookingUserPhone() + "" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getRiderName() != null ? ""
-					+ s.getRiderName() + "" : "");
+			stringBuffer.append(s.getRiderName() != null ? "" + s.getRiderName() + "" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getRiderPhone() != null ? ""
-					+ s.getRiderPhone() + "" : "");
+			stringBuffer.append(s.getRiderPhone() != null ? "" + s.getRiderPhone() + "" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getDriverName() != null ? ""
-					+ s.getDriverName() + "" : "");
+			stringBuffer.append(s.getDriverName() != null ? "" + s.getDriverName() + "" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getDriverPhone() != null ? ""
-					+ s.getDriverPhone() + "" : "");
+			stringBuffer.append(s.getDriverPhone() != null ? "" + s.getDriverPhone() + "" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getLicensePlates() != null ? ""
-					+ s.getLicensePlates() + "" : "");
+			stringBuffer.append(s.getLicensePlates() != null ? "" + s.getLicensePlates() + "" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getSupplierFullName() != null ? ""
-					+ s.getSupplierFullName() + "" : "");
+			stringBuffer.append(s.getSupplierFullName() != null ? "" + s.getSupplierFullName() + "" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getTravelTime() != null ? ""
-					+ formatDouble(Double.valueOf(s.getTravelTime())/60/1000)  + "" : "");
+			stringBuffer.append(s.getTravelTime() != null ? "" + formatDouble(Double.valueOf(s.getTravelTime())/60/1000)  + "" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getTravelMileage() != null ? ""
-					+ s.getTravelMileage() + "" : "");
+			stringBuffer.append(s.getTravelMileage() != null ? "" + s.getTravelMileage() + "" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getActualPayAmount() != null ? ""
-					+ s.getActualPayAmount() + "" : "");
+			stringBuffer.append(s.getActualPayAmount() != null ? "" + s.getActualPayAmount() + "" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getCouponId() != null ? ""
-					+ s.getCouponId() + "" : "");
+			stringBuffer.append(s.getCouponId() != null ? "" + s.getCouponId() + "" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getCouponAmount() != null ? ""
-					+ s.getCouponAmount() + "" : "");
+			stringBuffer.append(s.getCouponAmount() != null ? "" + s.getCouponAmount() + "" : "");
 			stringBuffer.append(",");
 
 
-			stringBuffer.append(s.getCreateDate() != null ? ""
-					+ s.getCreateDate() + "" : "");
+			stringBuffer.append(s.getCreateDate() != null ? "" + s.getCreateDate() + "" : "");
 			stringBuffer.append(",");
 
 
-			stringBuffer.append(s.getCostEndDate() != null ? ""
-					+ s.getCostEndDate() + "" : "");
-
+			stringBuffer.append(s.getCostEndDate() != null ? "" + s.getCostEndDate() + "" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getFactStartAddr() != null ? ""
-					+ s.getFactStartAddr() + "" : "");
+			stringBuffer.append(s.getFactStartAddr() != null ? "" + s.getFactStartAddr() + "" : "");
 			stringBuffer.append(",");
 
 
-			stringBuffer.append(s.getFactEndAddr() != null ? ""
-					+ s.getFactEndAddr() + "" : "");
+			stringBuffer.append(s.getFactEndAddr() != null ? "" + s.getFactEndAddr() + "" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getDicName() != null ? ""
-					+ s.getDicName() + "" : "");
+			stringBuffer.append(s.getDicName() != null ? "" + s.getDicName() + "" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getAirportId() != null ? ""
-					+ s.getAirportId() + "" : "");
+			stringBuffer.append(s.getAirportId() != null ? "" + s.getAirportId() + "" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getMainOrderNo() != null ? ""
-					+ s.getMainOrderNo() + "" : "");
+			stringBuffer.append(s.getMainOrderNo() != null ? "" + s.getMainOrderNo() + "" : "");
 
 			csvDataList.add(stringBuffer.toString());
 		}
 
 	}
-	public void exportExcelFromTemplet(HttpServletRequest request, HttpServletResponse response, Workbook wb, String fileName) throws IOException {
-		if(StringUtils.isEmpty(fileName)) {
-			fileName = "exportExcel";
-		}
-		response.setHeader("Content-Disposition","attachment;filename="+fileName+".xlsx");//指定下载的文件名
-		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); 
-		ServletOutputStream os =  response.getOutputStream();
-		wb.write(os);
-		os.close();
-	}
+
 	 
 	/**
      * 查询订单详情
@@ -730,10 +643,6 @@ public class OrderController{
 	
 	/**
      * 查询主订单详情
-<<<<<<< HEAD
-     * @param mainOrderNo
-=======
->>>>>>> origin/master
      * @return CarFactOrderInfo
      * @createdate 2018-09-11
      * Jdd
