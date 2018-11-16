@@ -3333,13 +3333,4 @@ public class CarBizDriverInfoService {
 
     }
 
-
-    private List<String> getDriverIds(List<CarBizDriverInfoDTO> list) {
-        List<String> ids = Lists.newArrayList();
-        list.forEach( carBizDriverInfoDTO ->
-            { if (carBizDriverInfoDTO != null && carBizDriverInfoDTO.getDriverId() != null)
-                ids.add(carBizDriverInfoDTO.getDriverId().toString());
-            });
-        return ids;
-    }
 }
