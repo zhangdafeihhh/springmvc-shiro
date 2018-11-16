@@ -40,7 +40,7 @@ public class DriverServiceImpl implements IDriverService<DriverEntity> {
     @Override
     public PageInfo<DriverVoEntity> findPageDriver(DriverVoEntity params) {
         logger.info("查询司机信息，参数为"+(params == null ?"null": JSON.toJSONString(params)));
-        PageHelper.startPage(params.getPage(), params.getPagerSize(), true);
+        PageHelper.startPage(params.getPage(), params.getPagesize(), true);
         List<DriverVoEntity> list = carBizDriverInfoExMapper.selectDriverByKeyAddCooperation(params);
         PageInfo<DriverVoEntity> pageInfo = new PageInfo<>(list);
         list = pageInfo.getList();

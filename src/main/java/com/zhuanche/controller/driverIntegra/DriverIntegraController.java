@@ -376,10 +376,9 @@ public class DriverIntegraController {
             }
             JSONArray driverIntegralInfoArray = new JSONArray();
             //司机等级积分
-            driverIntegralInfoArray = getDriverIntegralInfoList(driverInfoList);
+            driverIntegralInfoArray.addAll(getDriverIntegralInfoList(driverInfoList));
 
             //进行分页处理
-            List<JSONObject> paramDriverInfoList = new ArrayList<>();
             int pageCount = page.getPages();
             for(int i=2;i<=pageCount;i++){
                 driverEntity.setPage(i);
