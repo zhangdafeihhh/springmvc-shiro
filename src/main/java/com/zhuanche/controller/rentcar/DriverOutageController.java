@@ -1,16 +1,21 @@
 package com.zhuanche.controller.rentcar;
 
 import com.google.common.collect.Maps;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.rentcar.DriverOutageDTO;
 import com.zhuanche.entity.rentcar.DriverOutage;
+import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.serv.rentcar.DriverOutageService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.DateUtils;
+import com.zhuanche.util.DriverUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
@@ -43,6 +48,8 @@ public class DriverOutageController {
 
     @Autowired
     private DriverOutageService driverOutageService;
+    @Autowired
+    private CarDriverTeamService carDriverTeamService;
 
 
     /**
@@ -59,6 +66,9 @@ public class DriverOutageController {
      * @return
      */
     @RequestMapping(value = "/queryDriverOutageData")
+    @MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
+	} )
     public AjaxResponse queryDriverOutageData(@Verify(param = "cityId",rule = "") Integer cityId,
                                               Integer supplierId,
                                               Integer carGroupId,
@@ -93,6 +103,10 @@ public class DriverOutageController {
         String suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds(),",");
         params.setCities(cities);
         params.setSupplierIds(suppliers);
+        //查询用户权限范围内里的司机信息
+        String driverIds = DriverUtils.getDriverIdsByUserTeams(carDriverTeamService,WebSessionUtil.getCurrentLoginUser().getTeamIds());
+        params.setDriverIds(driverIds);
+
         //查数量
         total = driverOutageService.queryForInt(params);
         if(total==0){
@@ -111,6 +125,9 @@ public class DriverOutageController {
      */
 
     @RequestMapping("/exportDriverOutage")
+    @MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
+	} )
     public void exportDriverOutage(@Verify(param = "cityId",rule = "") Integer cityId,
                                    Integer supplierId,
                                    Integer carGroupId,
@@ -139,6 +156,10 @@ public class DriverOutageController {
             String suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds(),",");
             params.setCities(cities);
             params.setSupplierIds(suppliers);
+            //查询用户权限范围内里的司机信息
+            String driverIds = DriverUtils.getDriverIdsByUserTeams(carDriverTeamService,WebSessionUtil.getCurrentLoginUser().getTeamIds());
+            params.setDriverIds(driverIds);
+
             List<DriverOutage> rows = driverOutageService.queryForListObjectNoLimit(params);
             @SuppressWarnings("deprecation")
             Workbook wb = driverOutageService.exportExcelDriverOutage(rows,request.getRealPath("/")+File.separator+"template"+File.separator+"driverOutage_info.xlsx");
@@ -168,6 +189,9 @@ public class DriverOutageController {
      * @return
      */
     @RequestMapping(value = "/queryDriverNameByPhone")
+    @MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
+	} )
     public AjaxResponse queryDriverNameByPhone(@Verify(param = "driverPhone", rule = "mobile") String driverPhone){
         logger.info("【司机停运】查询手机号"+driverPhone+"所对应的司机姓名");
         Map<String,Object> result = new HashMap<String,Object>();

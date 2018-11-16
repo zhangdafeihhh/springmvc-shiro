@@ -1502,7 +1502,7 @@
 
   <select id="queryDriverByLicensePlates" parameterType="java.lang.String" resultMap="BaseResultMap">
     SELECT
-      driver_id,phone,name,supplier_id,license_plates,service_city
+      driver_id,phone,name,supplier_id,license_plates,service_city,id_card_no
     FROM
       car_biz_driver_info
     where license_plates = #{license_plates}
@@ -1546,10 +1546,181 @@
       <if test="name!=null and name!=''">
         and i.name  = #{driverName}
       </if>
-
     </where>
     order by driver_id desc
   </select>
+  
+  <select id="selectDriverByKeyCountAddCooperation" resultType="java.lang.Integer"  parameterType="com.zhuanche.dto.driver.DriverVoEntity">
+    SELECT
+    count(*)
+    FROM
+    car_biz_driver_info i
+    LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+    LEFT JOIN car_biz_car_info a ON a.license_plates = i.license_plates
+    LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+    LEFT JOIN car_biz_model m ON a.car_model_id = m.model_id
+    LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+    left join car_sys_user d on d.user_id=i.create_by
+    left join car_sys_user e on e.user_id=i.update_by
+    left join car_biz_cooperation_type t on t.id=i.cooperation_type
+    <where>
+      <if test="status!=null">
+        and i.status= #{status}
+      </if>
+      <if test="licensePlates!=null and licensePlates!=''">
+        and i.license_plates LIKE '%${licensePlates}%'
+      </if>
+      <if test="driverId!=null and driverId !=''">
+        and i.driver_id = ${driverId}
+      </if>
+      <if test="driverIds!=null and driverIds !=''">
+        and i.driver_id in(${driverIds})
+      </if>
 
+
+      <if test="name!=null and name!=''">
+        <!-- and i.name like '%name%' -->
+        and i.name LIKE CONCAT(#{name},'%')
+      </if>
+      <if test="supplierId!=null and supplierId!=''">
+        and i.supplier_Id = #{supplierId}
+      </if>
+      <if test="phone!=null and phone!=''">
+        and i.phone LIKE '%${phone}%'
+      </if>
+      <if test="serviceCityId!=null and serviceCityId!=''">
+        and i.service_city = #{serviceCityId}
+      </if>
+      <if test="cities !=null and cities !=''">
+        and i.service_city in (${cities})
+      </if>
+      <if test="suppliers !=null and suppliers !=''">
+        and i.supplier_id in (${suppliers})
+      </if>
+      <if test="cooperationType !=null and cooperationType !=''">
+        and t.id= #{cooperationType}
+      </if>
+      <if test="groupid !=null and groupid !=''">
+        and i.group_id = #{groupid}
+      </if>
+      <if test="imei!=null and imei!=''">
+        and i.imei LIKE '%${imei}%'
+      </if>
+      <if test="idCardNo!=null and idCardNo!=''">
+        and i.id_card_no = #{idCardNo}
+      </if>
+      <if test="isImage!=null and isImage!=''">
+        and i.is_image = #{isImage}
+      </if>
+    </where>
+  </select>
+
+  <select id="selectDriverByKeyAddCooperation"
+          resultType="com.zhuanche.dto.driver.DriverVoEntity"
+          parameterType="com.zhuanche.dto.driver.DriverVoEntity">
+    SELECT
+    i.driver_id AS driverId,
+    i.service_city as serviceCityId,
+    i.phone AS phone,
+    i.gender gender,
+    i.NAME,
+    g.group_id AS groupid,
+    g.group_name AS carGroupName,
+    c.city_name AS serviceCity,
+    i.license_plates AS licensePlates,
+    i.supplier_id supplieId,
+    p.supplier_full_name AS supplierName,
+    i.STATUS AS status,
+    d.`name` createByName,
+    e.`name` updateByName,
+    i.id_card_no as idCardNo,
+    i.age as age,
+    i.memo as memo,
+    i.imei as imei,
+    i.superintend_no AS superintendNo,
+    i.superintend_url AS superintendUrl,
+    i.current_address as currentAddress,
+    i.emergency_contact_number as emergencyContactNumber,
+    i.emergency_contact_person as emergencyContactPerson,
+    i.driving_license_type as drivingLicenseType,
+    DATE_FORMAT(i.issue_date,'%Y-%m-%d %T')as issueDate,
+    i.driving_years as drivingYears,
+    DATE_FORMAT(i.expire_date,'%Y-%m-%d %T')as expireDate,
+    i.archives_no as archivesNo,
+    DATE_FORMAT(i.create_date,'%Y-%m-%d %H:%i:%s') createDateStr,
+    DATE_FORMAT(i.update_date,'%Y-%m-%d %H:%i:%s') updateDateStr,
+    i.cooperation_type cooperationType,
+    t.cooperation_name cooperationName,
+    i.is_image isImage
+    FROM
+    car_biz_driver_info i
+    LEFT JOIN car_biz_city c ON c.city_id = i.service_city
+    LEFT JOIN car_biz_car_info a ON a.license_plates = i.license_plates
+    LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+    LEFT JOIN car_biz_model m ON a.car_model_id = m.model_id
+    LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+    left join car_sys_user d on d.user_id=i.create_by
+    left join car_sys_user e on e.user_id=i.update_by
+    left join car_biz_cooperation_type t on t.id=i.cooperation_type
+    <where>
+      <if test="status!=null">
+        and i.status= #{status}
+      </if>
+      <if test="licensePlates!=null and licensePlates!=''">
+        and i.license_plates LIKE '%${licensePlates}%'
+      </if>
+      <if test="driverId!=null and driverId !=''">
+        and i.driver_id = ${driverId}
+      </if>
+      <if test="driverIds!=null and driverIds !=''">
+        and i.driver_id in(${driverIds})
+      </if>
+      <if test="name!=null and name!=''">
+        and i.name LIKE CONCAT(#{name},'%')
+      </if>
+      <if test="supplierId!=null and supplierId!=''">
+        and i.supplier_Id = #{supplierId}
+      </if>
+      <if test="phone!=null and phone!=''">
+        and i.phone LIKE '%${phone}%'
+      </if>
+      <if test="serviceCityId!=null and serviceCityId!=''">
+        and i.service_city = #{serviceCityId}
+      </if>
+      <if test="cities !=null and cities !=''">
+        and i.service_city in (${cities})
+      </if>
+      <if test="suppliers !=null and suppliers !=''">
+        and i.supplier_id in (${suppliers})
+      </if>
+      <if test="cooperationType !=null and cooperationType !=''">
+        and t.id= #{cooperationType}
+      </if>
+      <if test="groupid !=null and groupid !=''">
+        and i.group_id = #{groupid}
+      </if>
+      <if test="imei!=null and imei!=''">
+        and i.imei LIKE '%${imei}%'
+      </if>
+      <if test="idCardNo!=null and idCardNo!=''">
+        and i.id_card_no = #{idCardNo}
+      </if>
+      <if test="isImage!=null and isImage!=''">
+        and i.is_image = #{isImage}
+      </if>
+    </where>
+    order by i.update_date desc
+    LIMIT ${offSet},${pagesize}
+  </select>
+
+
+  <select id="selectByPhone" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from car_biz_driver_info
+    where phone = #{phone,jdbcType=INTEGER}
+  </select>
   
 </mapper>

@@ -3,6 +3,10 @@ package com.zhuanche.controller.driverteam;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.BaseController;
@@ -66,6 +70,10 @@ public class CarInfoTemporaryController extends BaseController {
      */
 	@ResponseBody
 	@RequestMapping(value = "/queryCarData", method =  RequestMethod.GET )
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE ),
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	} )
 	public AjaxResponse queryCarData(@RequestParam(value = "page",defaultValue="1") Integer page,
                                      @RequestParam(value = "pageSize",defaultValue="10") Integer pageSize,
                                      @RequestParam(value = "licensePlates",required = false,defaultValue = "") String licensePlates,
@@ -175,6 +183,10 @@ public class CarInfoTemporaryController extends BaseController {
      */
     @ResponseBody
     @RequestMapping(value = "/queryCarInfo", method = RequestMethod.GET )
+    @MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE ),
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	} )
     public AjaxResponse queryCarInfo(@Verify(param = "carId",rule="required") Integer carId) {
         log.info("queryCarInfo:查看车辆详情Id:"+carId);
         Map<String,Object> params = Maps.newHashMap();

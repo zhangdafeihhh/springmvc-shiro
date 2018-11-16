@@ -581,7 +581,7 @@ public class CarInfoServiceImpl implements CarInfoService {
                                     } else {
                                         Set<Integer> cityIds = Sets.newHashSet();
                                         cityIds.add(cityId);
-                                        List<CarBizSupplier> supplierList = carBizSupplierExMapper.querySuppliers(cityId, null);
+                                        List<CarBizSupplier> supplierList = carBizSupplierExMapper.querySuppliers(cityIds, null);
                                         Boolean fal = false;
                                         if(supplierList!=null&&supplierList.size()>0){
                                             for(int i=0;i<supplierList.size();i++){

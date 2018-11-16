@@ -34,8 +34,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.net.URLEncoder;
+<<<<<<< HEAD
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+=======
+>>>>>>> origin/master
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
@@ -180,7 +183,10 @@ public class CustomerAppraisalController {
         carBizCustomerAppraisalStatisticsDTO.setTeamIds(permOfTeam);
         carBizCustomerAppraisalStatisticsDTO.setDriverIds(driverIds);
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/master
         PageInfo<CarBizCustomerAppraisalStatisticsDTO> p = customerAppraisalService.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO,page,pageSize);
         if(p != null){
             list = p.getList();
@@ -255,6 +261,7 @@ public class CustomerAppraisalController {
                 carBizCustomerAppraisalStatisticsDTO.setSupplierIds(permOfSupplier);
                 carBizCustomerAppraisalStatisticsDTO.setTeamIds(permOfTeam);
                 carBizCustomerAppraisalStatisticsDTO.setDriverIds(driverIds);
+<<<<<<< HEAD
 
                 int pageSize = 10000;
 
@@ -266,6 +273,14 @@ public class CustomerAppraisalController {
 
                 Hashtable<String,PageInfo<CarBizCustomerAppraisalStatisticsDTO> > hashtable = new Hashtable<>();
 
+=======
+                int pageSize = 10000;
+                PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfo = customerAppraisalService.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO,1
+                        ,  pageSize  );
+                list.addAll(pageInfo.getList());
+                int pages = pageInfo.getPages();
+                Hashtable<String,PageInfo<CarBizCustomerAppraisalStatisticsDTO> > hashtable = new Hashtable<>();
+>>>>>>> origin/master
                 if(pages >= 2){
                     CountDownLatch endGate = new CountDownLatch(pages-1);
                     //循环加载其他页数据
@@ -276,8 +291,12 @@ public class CustomerAppraisalController {
                                 helper = new CustomerAppraisalExportHelper(customerAppraisalService,i,pageSize,hashtable,carBizCustomerAppraisalStatisticsDTOThread,endGate);
                         helper.start();
                     }
+<<<<<<< HEAD
 
                     logger.info("所有的线程在等待中。。。"+JSON.toJSONString(carBizCustomerAppraisalStatisticsDTO));
+=======
+                    logger.info("所有的线程在等待中。。。"+ JSON.toJSONString(carBizCustomerAppraisalStatisticsDTO));
+>>>>>>> origin/master
                     //主线程阻塞,等待其他所有 worker 线程完成后再执行
                     endGate.await();
                     for(int i = 2 ;i <= pages ; i++){
@@ -286,7 +305,10 @@ public class CustomerAppraisalController {
                             list.addAll(pageInfoX.getList());
                         }
                     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/master
                 }
             }
             List<String> headerList = new ArrayList<>();
@@ -331,29 +353,48 @@ public class CustomerAppraisalController {
             stringBuffer.append(s.getDriverName());
             stringBuffer.append(",");
 
+<<<<<<< HEAD
             stringBuffer.append(s.getDriverPhone());
             stringBuffer.append(",");
 
             stringBuffer.append(s.getCreateDate());
+=======
+            stringBuffer.append("\t"+(s.getDriverPhone()==null?"":s.getDriverPhone()));
+            stringBuffer.append(",");
+
+            stringBuffer.append("\t"+s.getCreateDate());
+>>>>>>> origin/master
             stringBuffer.append(",");
 
             stringBuffer.append(s.getEvaluateScore());
             stringBuffer.append(",");
 
+<<<<<<< HEAD
             stringBuffer.append(s.getIdCardNo());
             stringBuffer.append(",");
 
             String teamName = "";
             if(teamMap!=null){
+=======
+            stringBuffer.append("\t"+(s.getIdCardNo()==null?"":s.getIdCardNo()));
+            stringBuffer.append(",");
+
+            String teamName = "";
+            if(teamMap !=null && StringUtils.isNotEmpty(teamMap.get(s.getDriverId()))){
+>>>>>>> origin/master
                 teamName = teamMap.get(s.getDriverId());
             }
             stringBuffer.append(teamName);
 
             csvDataList.add(stringBuffer.toString());
         }
+<<<<<<< HEAD
 
     }
+=======
+>>>>>>> origin/master
 
+    }
     /**
      * 司机评分一个月详情
      * @param driverId 司机ID

@@ -3,6 +3,7 @@ package com.zhuanche.controller.authc;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -90,7 +91,13 @@ public class UserManagementController {
 			String[]  ids = roleIds.split(",");
 			if(ids.length>0) {
 				for(String id : ids ) {
-					newroleIds.add(Integer.valueOf(id));
+					if(StringUtils.isNotEmpty(id)) {
+						try {
+							newroleIds.add(Integer.valueOf(id));
+						}catch(Exception ex) {
+							ex.printStackTrace();
+						}
+					}
 				}
 			}
 		}

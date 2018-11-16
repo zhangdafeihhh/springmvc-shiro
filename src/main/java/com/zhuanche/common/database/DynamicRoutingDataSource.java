@@ -58,6 +58,8 @@ public class DynamicRoutingDataSource extends AbstractRoutingDataSource implemen
 		}
 		if(mode!=null) {
 			holder.set( mode.getValue()  );
+		}else {
+			holder.remove();
 		}
 	}
 	/***************************************切换为默认数据源*********************************/
@@ -67,6 +69,11 @@ public class DynamicRoutingDataSource extends AbstractRoutingDataSource implemen
 			return;
 		}
 		holder.remove();
+    }
+    public static void setDefault() {
+    	for( String databaseTag :  allContextHolderMappings.keySet() ) {
+    		DynamicRoutingDataSource.setDefault(databaseTag);
+    	}
     }
 	/***************************************获得数据源的类型*********************************/
     public static DataSourceMode getMasterSlave(  String databaseTag ) {

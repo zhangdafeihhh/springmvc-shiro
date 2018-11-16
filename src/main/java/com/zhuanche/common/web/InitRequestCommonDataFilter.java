@@ -17,6 +17,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+
 /**对每一个请求，初始化各种变量及参数，以用于日志输出、展现层输出等目的
  * @author zhaoyali
  **/
@@ -127,6 +129,9 @@ public class InitRequestCommonDataFilter extends OncePerRequestFilter {
 		
 		//五、常用的页面变量参数(用于页面渲染)
 		request.setAttribute("webctx", request.getContextPath() );
+		
+		//六、重置所有DB数据源的主从为默认设置（解决问题：当WEB容器比如TOMCAT采用线程池模型时，由于线程是重用的，所以当前后两个请求应用了同一个线程处理HTTP请求时会出现问题）
+		DynamicRoutingDataSource.setDefault();
 		
 		//TODO 增加其它共性的逻辑
 		filterChain.doFilter(request, response);

@@ -1,22 +1,34 @@
 package com.zhuanche.serv;
 
+<<<<<<< HEAD
 import com.alibaba.fastjson.JSON;
+=======
+>>>>>>> origin/master
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
+<<<<<<< HEAD
 import com.zhuanche.dto.CarDriverInfoDTO;
+=======
+>>>>>>> origin/master
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalDTO;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalExtDTO;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
+<<<<<<< HEAD
 import com.zhuanche.request.DutyParamRequest;
+=======
+>>>>>>> origin/master
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import mapper.rentcar.ex.CarBizCustomerAppraisalExMapper;
 import mapper.rentcar.ex.CarBizCustomerAppraisalStatisticsExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
+<<<<<<< HEAD
 import org.apache.commons.lang3.StringUtils;
+=======
+>>>>>>> origin/master
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -144,5 +156,52 @@ public class CustomerAppraisalService {
         }
         return driverId;
     }
+<<<<<<< HEAD
 
+=======
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
+    public PageInfo<CarBizCustomerAppraisalStatisticsDTO> queryCustomerAppraisalStatisticsListV2(CarBizCustomerAppraisalStatisticsDTO carBizCustomerAppraisalStatisticsDTO
+            , int pageNo, int pageSize) {
+
+        //查询司机信息
+        CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();
+
+        carBizDriverInfoDTO.setPhone(carBizCustomerAppraisalStatisticsDTO.getDriverPhone());
+        carBizDriverInfoDTO.setName(carBizCustomerAppraisalStatisticsDTO.getDriverName());
+
+        carBizDriverInfoDTO.setCityIds(carBizCustomerAppraisalStatisticsDTO.getCityIds());
+        carBizDriverInfoDTO.setServiceCity(carBizCustomerAppraisalStatisticsDTO.getCityId());
+        carBizDriverInfoDTO.setSupplierIds(carBizCustomerAppraisalStatisticsDTO.getSupplierIds());
+        carBizDriverInfoDTO.setSupplierId(carBizCustomerAppraisalStatisticsDTO.getSupplierId());
+        carBizDriverInfoDTO.setDriverIds(carBizCustomerAppraisalStatisticsDTO.getDriverIds());
+        List<CarBizDriverInfoDTO>  driverInfoDTOList = carBizDriverInfoExMapper.queryCarBizDriverList(carBizDriverInfoDTO);
+        if(driverInfoDTOList == null){
+            return null;
+        }
+        Set<Integer> driverIdSet = new HashSet<>();
+        Map<String,CarBizDriverInfoDTO> cacheItem = new HashMap<>();
+
+        for(CarBizDriverInfoDTO item :driverInfoDTOList){
+            driverIdSet.add(item.getDriverId());
+            cacheItem.put("d_"+item.getDriverId(),item);
+        }
+        carBizCustomerAppraisalStatisticsDTO.setDriverIds(driverIdSet);
+        PageHelper.startPage(pageNo, pageSize, true);
+        List<CarBizCustomerAppraisalStatisticsDTO> list  = carBizCustomerAppraisalStatisticsExMapper.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO);
+        PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfo = new PageInfo<>(list);
+        if(list != null && list.size() >= 1){
+            CarBizDriverInfoDTO driverInfotemp = null;
+            for(CarBizCustomerAppraisalStatisticsDTO item : list){
+                driverInfotemp = cacheItem.get("d_"+item.getDriverId());
+                if(driverInfotemp != null){
+                    item.setIdCardNo(driverInfotemp.getIdCardNo());
+                    item.setCityId(driverInfotemp.getServiceCity());
+                }
+            }
+        }
+        return pageInfo;
+    }
+>>>>>>> origin/master
 }

@@ -2,6 +2,10 @@ package com.zhuanche.controller.driverteam;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.BaseController;
@@ -73,6 +77,10 @@ public class DriverInfoTemporaryController extends BaseController {
      */
     @ResponseBody
     @RequestMapping(value = "/driverListData", method =  RequestMethod.GET )
+    @MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE ),
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	} )
     public AjaxResponse driverListData(@RequestParam(value = "page",defaultValue="1") Integer page,
                                        @Verify(param = "pageSize",rule = "max(50)")
                                        @RequestParam(value = "pageSize",defaultValue="10") Integer pageSize,
@@ -277,6 +285,10 @@ public class DriverInfoTemporaryController extends BaseController {
      */
     @ResponseBody
     @RequestMapping(value = "/driverInfo",method =  RequestMethod.GET)
+    @MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE ),
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	} )
     public AjaxResponse driverInfo(@Verify(param = "driverId",rule="required") String driverId) {
         log.info("查询司机个人信息:driverInfo,司机Id:"+driverId);
         CarBizDriverInfoTemp entity = new CarBizDriverInfoTemp();

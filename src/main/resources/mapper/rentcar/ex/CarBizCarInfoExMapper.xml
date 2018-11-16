@@ -117,7 +117,7 @@
 			and supplier_id = #{supplierId}
 		</if>
 		<if test=" licensePlates !=null and licensePlates !=''">
-			and license_plates like '%${licensePlates}%'
+			and license_plates like '${licensePlates}%'
 		</if>
 		<if test="driverId !=null and driverId != ''">
 			or driver_id = #{driverId}

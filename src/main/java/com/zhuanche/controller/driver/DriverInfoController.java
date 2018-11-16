@@ -723,7 +723,8 @@ public class DriverInfoController {
     public AjaxResponse selectByPhone(  @Verify(param = "phone",rule="required") String phone) {
         logger.info(LOGTAG + "根据手机号查询司机信息phone={}", phone);
         try{
-            CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPhone(phone);
+
+            CarBizDriverInfoDTO carBizDriverInfo = carBizDriverInfoService.selectByPhone(phone);
             if(carBizDriverInfo==null){
                 return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
             }

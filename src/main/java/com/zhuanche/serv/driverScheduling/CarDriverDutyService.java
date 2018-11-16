@@ -84,13 +84,13 @@ public class CarDriverDutyService {
 
 	private static final ExecutorService es = Executors.newCachedThreadPool();
 
-	/** 
-	* @Desc: 查询司机排班 (包含发布司机排班数据列表 status 1)
-	* @param:
-	* @return:  
-	* @Author: lunan
-	* @Date: 2018/9/1 
-	*/
+	/**
+	 * @Desc: 查询司机排班 (包含发布司机排班数据列表 status 1)
+	 * @param:
+	 * @return:
+	 * @Author: lunan
+	 * @Date: 2018/9/1
+	 */
 	@MasterSlaveConfigs(configs={
 			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
 	} )
@@ -252,13 +252,16 @@ public class CarDriverDutyService {
 		}
 	}
 
-	/** 
-	* @Desc: 发布排班 
-	* @param:
-	* @return:  
-	* @Author: lunan
-	* @Date: 2018/9/3
-	*/
+	/**
+	 * @Desc: 发布排班
+	 * @param:
+	 * @return:
+	 * @Author: lunan
+	 * @Date: 2018/9/3
+	 */
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public int issueDriverDuty(DutyParamRequest dutyParamRequest){
 		if(Check.NuNObj(dutyParamRequest)){
 			return 0;

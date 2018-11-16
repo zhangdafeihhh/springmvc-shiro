@@ -8,12 +8,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.zhuanche.dto.rentcar.CancelOrderDTO;
+import com.zhuanche.dto.rentcar.CompleteOrderDTO;
+import com.zhuanche.util.excel.ExportExcelUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
@@ -22,6 +23,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -170,7 +172,6 @@ public class  StatisticalAnalysisService {
    	
    	 /**
    	  * 根据uri远程调用接口下载文件
-   	  * @param paramMap
    	  * @param uri 远程接口地址
    	  * @param path 保存文件路径+文件名
    	  */
@@ -341,5 +342,125 @@ public class  StatisticalAnalysisService {
 		}*/
 		return paramMap;
 	}
-	
+    /**
+     * 根据条件查询完成订单详情
+     * @param url 调用链接
+     * @param paramMap 参数
+     * @return
+     */
+    public List<CompleteOrderDTO> queryCompleteOrderDataList(String url, Map<String,Object> paramMap) {
+        List<CompleteOrderDTO> list = null;
+        try {
+            String jsonString = JSON.toJSONString(paramMap);
+            logger.info("调用大数据接口，参数--" + jsonString);
+            String result = HttpClientUtil.buildPostRequest(url).setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON)
+                    .setConnectTimeOut(1000000)
+                    .setReadTimeOut(1000000).setIgnoreResult(true).execute();
+            result = result.replaceAll("null", "\"\"");
+            result = result.replaceAll("NULL", "\"\"");
+            JSONObject obj = JSON.parseObject(result);
+            if (obj == null) {
+                logger.info("调用大数据完成订单详情接口:{}返回结果为null",url);
+                return list;
+            }
+            if (!obj.getString("code").equals("0")) {
+                logger.info("调用大数据完成订单接口:{}返回结果为:{}",url,result);
+                return list;
+            }
+            if (obj != null) {
+                if("0".equals(obj.get("code").toString())){
+                    JSONObject dataList = (JSONObject) obj.get("result");
+                    if(dataList!=null){
+                        JSONArray recordList = dataList.getJSONArray("recordList");
+                        list = JSONObject.parseArray(recordList.toJSONString(), CompleteOrderDTO.class);
+                        return list;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("调用大数据完成订单接口:{}异常:{}",url,e);
+            return null;
+        }
+        return list;
+    }
+
+	/**
+	 * 根据条件查询取消订单详情
+	 * @param url 调用链接
+	 * @param paramMap 参数
+	 * @return
+	 */
+	public <T> List<T>   queryCancelOrderDataList(String url, Map<String,Object> paramMap, Class<T> object) {
+
+		List<T> list = null;
+		try {
+			String jsonString = JSON.toJSONString(paramMap);
+			logger.info("调用大数据接口，参数--" + jsonString);
+			String result = HttpClientUtil.buildPostRequest(url).setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON)
+					.setConnectTimeOut(100000)
+					.setReadTimeOut(100000).setIgnoreResult(true).execute();
+			result = result.replaceAll("null", "\"\"");
+			result = result.replaceAll("NULL", "\"\"");
+			JSONObject obj = JSON.parseObject(result);
+			if (obj == null) {
+				logger.info("调用大数据取消订单详情接口:{}返回结果为null",url);
+				return list;
+			}
+			if (!obj.getString("code").equals("0")) {
+				logger.info("调用大数据取消订单接口:{}返回结果为:{}",url,result);
+				return list;
+			}
+			if (obj != null) {
+				if("0".equals(obj.get("code").toString())){
+					JSONObject dataList = (JSONObject) obj.get("result");
+					if(dataList!=null){
+						JSONArray recordList = dataList.getJSONArray("recordList");
+						list = JSONObject.parseArray(recordList.toJSONString(), object);
+						return list;
+					}
+				}
+			}
+		} catch (Exception e) {
+			logger.error("调用大数据取消订单接口:{}异常:{}",url,e);
+			return null;
+		}
+		return list;
+	}
+
+    /**
+     * 完成订单详情导出
+     * @param completeOrderDTOList 导出的数据
+     * @param response
+     * @return
+     * @throws IOException
+     */
+    public void exportExceleCompleteOrder(List<CompleteOrderDTO> completeOrderDTOList,HttpServletResponse response) throws IOException {
+        response.setContentType("application/octet-stream;charset=ISO8859-1");
+        response.setHeader("Content-Disposition", "attachment;filename=" + new String("完成订单详情Excel".getBytes("GB2312"), "ISO8859-1") + ".xls");
+        response.addHeader("Pargam", "no-cache");
+        response.addHeader("Cache-Control", "no-cache");
+        Collection c = completeOrderDTOList;
+        String [] headers = new String[]{"订单号","下单城市","订单完成时间","产品类型","预定车型","总流水","折扣后金额","司机端金额","优惠金额",
+                "优惠券折扣","返现结算","价外费用","订单类别","订车人ID","创建时间","是否带人叫车","司机ID","司机名称","车牌号",
+                "服务车型","加盟商名称","计价前行驶里程","载客里程","计价后行驶里程","计价前行驶时长","载客时长","计价后行驶时长",
+                "实际上车地址","实际下车地址","机构名称","酒店名称","渠道名称","等候分钟"};
+        new ExportExcelUtil<>().exportExcel("完成订单详情Excel", headers, c, response.getOutputStream());
+    }
+
+	/**
+	 * 取消订单详情导出
+	 * @param list 导出的数据
+	 * @param response
+	 * @param headers	标题名
+	 * @return
+	 * @throws IOException
+	 */
+	public void exportExceleCancelOrder(List list,HttpServletResponse response, String[] headers, String shellName) throws IOException {
+		response.setContentType("application/octet-stream;charset=ISO8859-1");
+		response.setHeader("Content-Disposition", "attachment;filename=" + new String("完成订单详情Excel".getBytes("GB2312"), "ISO8859-1") + ".xls");
+		response.addHeader("Pargam", "no-cache");
+		response.addHeader("Cache-Control", "no-cache");
+		Collection c = list;
+		new ExportExcelUtil<>().exportExcel(shellName, headers, c, response.getOutputStream());
+	}
 }

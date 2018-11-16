@@ -3,6 +3,7 @@ package mapper.mdbcarmanage.ex;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.dto.driver.DriverTeamRelationEntity;
 import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.request.TeamGroupRequest;
 import org.apache.ibatis.annotations.Param;
@@ -35,6 +36,11 @@ public interface CarRelateTeamExMapper {
      */
     List<Integer> queryDriverIdsByTeamId(@Param("teamId") Integer teamId);
 
+    /**
+     * 根据teamIds返回司机id
+     * @param teamIds
+     * @return
+     */
     List<Integer> queryDriverIdsByTeamIdss(@Param("teamIds") Set<Integer> teamIds);
     /**
      * <p>Title: queryListByTeamId</p>
@@ -54,4 +60,12 @@ public interface CarRelateTeamExMapper {
      */
     List<CarRelateTeam> queryListByGroupIds(@Param("groupIds") String groupIds);
 
+
+    List<DriverTeamRelationEntity> queryForListObjectNoLimit(DriverTeamRelationEntity params);
+
+    public DriverTeamRelationEntity queryForObject(DriverTeamRelationEntity params);
+
+    public DriverTeamRelationEntity queryForObjectGroup(DriverTeamRelationEntity params);
+
+    List<DriverTeamRelationEntity> selectByDriverIdSet(@Param("driverIdSet")Set<String> driverIdSet);
 }
