@@ -255,7 +255,7 @@ public class DriverIntegraController {
     })
     public String queryDriverIntegralListDataDown(DriverVoEntity driverEntity, HttpServletRequest request, HttpServletResponse response) {
         driverEntity.setPage(1);
-        int pageSize = 10000;
+        int pageSize = 1000;
         driverEntity.setPagesize(pageSize);
         logger.info("queryDriverIntegralListDataDown:下载司机积分数据列表,参数为："+(driverEntity==null?"null": JSON.toJSONString(driverEntity)));
         if(driverEntity.getCityId() == 0){
@@ -301,6 +301,8 @@ public class DriverIntegraController {
                 teamIds = driverEntity.getTeamIds();
             }
             List<DriverVoEntity> rows = new ArrayList<DriverVoEntity>();
+
+            List<DriverVoEntity> allRows = new ArrayList<DriverVoEntity>();
             long total = 0;
             driverEntity.setCities(cities);
             driverEntity.setSuppliers(suppliers);
@@ -366,6 +368,7 @@ public class DriverIntegraController {
             }
 
             rows = page.getList();
+            allRows.addAll(rows);
 
             List<JSONObject> driverInfoList = new ArrayList<>();
             for (DriverVoEntity driverVoEntity : rows) {
@@ -374,9 +377,9 @@ public class DriverIntegraController {
                 item.put("cityId",driverVoEntity.getServiceCityId());
                 driverInfoList.add(item);
             }
-            JSONArray driverIntegralInfoArray = new JSONArray();
-            //司机等级积分
-            driverIntegralInfoArray.addAll(getDriverIntegralInfoList(driverInfoList));
+            JSONArray allDriverIntegralInfoArray = new JSONArray();
+            //查询司机等级积分
+            allDriverIntegralInfoArray.addAll(getDriverIntegralInfoList(driverInfoList));
 
             //进行分页处理
             int pageCount = page.getPages();
@@ -396,56 +399,58 @@ public class DriverIntegraController {
                 //司机等级积分
                 JSONArray newdriverIntegralInfoArray  = getDriverIntegralInfoList(driverInfoList);
 
-                driverIntegralInfoArray.add(newdriverIntegralInfoArray);
+                allDriverIntegralInfoArray.add(newdriverIntegralInfoArray);
+
+                allRows.addAll(rows);
             }
 
-            if(driverIntegralInfoArray != null){
-                Map<String,JSONObject> itemMap = new HashMap<>();
-                int size = driverIntegralInfoArray.size();
-                for(int i=0;i<size;i++ ){
-                    JSONObject item = driverIntegralInfoArray.getJSONObject(i);
-                    itemMap.put("flag_"+item.getInteger("driverId"),item);
-                }
-                String driverId = null;
-                BigDecimal temp;
-                for (DriverVoEntity driverVoEntity : rows) {
 
-                    driverId = driverVoEntity.getDriverId() ;
-                    JSONObject driverIntegraInfo = itemMap.get("flag_"+driverId);
-                    if(driverIntegraInfo != null){
-                        //设置司机当月积分
-                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("monthIntegral")) && !("null".equals(driverIntegraInfo.getString("monthIntegral")))) {
-                            try{
-                                temp = new BigDecimal(driverIntegraInfo.getString("monthIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
-                                driverVoEntity.setMonthIntegral(temp.toString());
-                            }catch (Exception e){
-                                logger.error("设置司机当月积分异常，driverId="+driverId+"，monthIntegral="+driverIntegraInfo.getString("monthIntegral"));
-                            }
+            Map<String,JSONObject> itemMap = new HashMap<>();
+            int size = allDriverIntegralInfoArray.size();
+            for(int i=0;i<size;i++ ){
+                JSONObject item = allDriverIntegralInfoArray.getJSONObject(i);
+                itemMap.put("flag_"+item.getInteger("driverId"),item);
+            }
+            String driverId = null;
+            BigDecimal temp;
+            for (DriverVoEntity driverVoEntity : allRows) {
+
+                driverId = driverVoEntity.getDriverId() ;
+                JSONObject driverIntegraInfo = itemMap.get("flag_"+driverId);
+                if(driverIntegraInfo != null){
+                    //设置司机当月积分
+                    if(StringUtils.isNotEmpty(driverIntegraInfo.getString("monthIntegral")) && !("null".equals(driverIntegraInfo.getString("monthIntegral")))) {
+                        try{
+                            temp = new BigDecimal(driverIntegraInfo.getString("monthIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
+                            driverVoEntity.setMonthIntegral(temp.toString());
+                        }catch (Exception e){
+                            logger.error("设置司机当月积分异常，driverId="+driverId+"，monthIntegral="+driverIntegraInfo.getString("monthIntegral"));
                         }
-                        //设置司机当日积分
-                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("todayIntegral")) && !("null".equals(driverIntegraInfo.getString("todayIntegral")))) {
-                            try{
-                                temp = new BigDecimal(driverIntegraInfo.getString("todayIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
-                                driverVoEntity.setDayIntegral(temp.toString());
-                            }catch (Exception e){
-                                logger.error("设置司机当日积分异常，driverId="+driverId+"，todayIntegral="+driverIntegraInfo.getString("todayIntegral"));
-                            }
-
+                    }
+                    //设置司机当日积分
+                    if(StringUtils.isNotEmpty(driverIntegraInfo.getString("todayIntegral")) && !("null".equals(driverIntegraInfo.getString("todayIntegral")))) {
+                        try{
+                            temp = new BigDecimal(driverIntegraInfo.getString("todayIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
+                            driverVoEntity.setDayIntegral(temp.toString());
+                        }catch (Exception e){
+                            logger.error("设置司机当日积分异常，driverId="+driverId+"，todayIntegral="+driverIntegraInfo.getString("todayIntegral"));
                         }
-                        //设置司机司机等级
-                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("membershipName"))  && !("null".equals(driverIntegraInfo.getString("membershipName")))){
-                            try{
-                                driverVoEntity.setMembershipName(driverIntegraInfo.getString("membershipName"));
-                            }catch (Exception e){
-                                logger.error("设置司机等级异常，driverId="+driverId+"，membershipName="+driverIntegraInfo.getString("membershipName"));
 
-                            }
+                    }
+                    //设置司机司机等级
+                    if(StringUtils.isNotEmpty(driverIntegraInfo.getString("membershipName"))  && !("null".equals(driverIntegraInfo.getString("membershipName")))){
+                        try{
+                            driverVoEntity.setMembershipName(driverIntegraInfo.getString("membershipName"));
+                        }catch (Exception e){
+                            logger.error("设置司机等级异常，driverId="+driverId+"，membershipName="+driverIntegraInfo.getString("membershipName"));
+
                         }
                     }
                 }
             }
 
-            dataTrans(rows,csvDataList);
+
+            dataTrans(allRows,csvDataList);
 
             CsvUtils.exportCsv(response,csvDataList,headerList,fileName);
             return null;
