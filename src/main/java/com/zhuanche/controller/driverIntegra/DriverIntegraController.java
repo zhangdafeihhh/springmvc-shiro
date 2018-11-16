@@ -396,10 +396,8 @@ public class DriverIntegraController {
                     item.put("cityId",driverVoEntity.getServiceCityId());
                     driverInfoList.add(item);
                 }
-                //司机等级积分
-                JSONArray newdriverIntegralInfoArray  = getDriverIntegralInfoList(driverInfoList);
-
-                allDriverIntegralInfoArray.add(newdriverIntegralInfoArray);
+                //司机等级积分 
+                allDriverIntegralInfoArray.addAll(getDriverIntegralInfoList(driverInfoList));
 
                 allRows.addAll(rows);
             }
