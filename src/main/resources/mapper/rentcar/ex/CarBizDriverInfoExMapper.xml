@@ -1576,8 +1576,6 @@
       <if test="driverIds!=null and driverIds !=''">
         and i.driver_id in(${driverIds})
       </if>
-
-
       <if test="name!=null and name!=''">
         <!-- and i.name like '%name%' -->
         and i.name LIKE CONCAT(#{name},'%')
