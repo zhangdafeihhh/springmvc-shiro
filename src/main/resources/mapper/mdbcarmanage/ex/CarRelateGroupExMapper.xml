@@ -106,7 +106,7 @@
 			</if>
 	</select>
 
-    <select id="queryDriverGroupRelationListByDriverIdSet" parameterType="java.util.List" resultType="java.lang.Integer">
+    <select id="queryDriverGroupRelationListByDriverIdSet" parameterType="java.util.List" resultMap="BaseResultMap">
         SELECT
         relation_id, group_id,driver_id
         FROM
