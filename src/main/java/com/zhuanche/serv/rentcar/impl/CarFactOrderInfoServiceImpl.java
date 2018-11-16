@@ -274,7 +274,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 
 	/**
 	 * 查询 订单接口dataList
-	 * @param paramMap
+	 * @param
 	 * @return
 	 */
 //	@Override
@@ -419,7 +419,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 		}
 	}
 	 
-	@Override
+
 	public Workbook exportExceleOrderList(List<CarFactOrderInfoDTO> list,String path) throws Exception {
 	
 		FileInputStream io = new FileInputStream(path);
