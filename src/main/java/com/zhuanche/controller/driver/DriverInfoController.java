@@ -325,6 +325,7 @@ public class DriverInfoController {
             logger.info(LOGTAG + "司机导出cityId={},supplierId={}的查询写入数据时间为={}ms", cityId, supplierId, (end-start));
         } catch (Exception e) {
            logger.error("司机信息列表查询导出error",e);
+           e.printStackTrace();
         }finally {
             if(list != null){
                 list.clear();// 帮助GC回收内存

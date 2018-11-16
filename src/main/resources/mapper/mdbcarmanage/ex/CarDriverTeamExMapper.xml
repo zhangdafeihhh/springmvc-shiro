@@ -246,10 +246,7 @@
         order by city, id
     </select>
 
-
-
-
-    <select id="queryTeamListByTemIdList" parameterType="java.util.List" resultType="java.lang.Integer">
+    <select id="queryTeamListByTemIdList" parameterType="java.util.List" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List" />
         FROM car_driver_team dt

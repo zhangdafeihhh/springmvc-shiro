@@ -141,8 +141,7 @@
 		c.driver_id AS driverId,
 		c.car_purchase_date AS carPurchaseDate,
 		c.color AS color,
-		c.model_detail AS modelDetail,
-		city.city_name AS cityName,
+		c.model_detail AS modelDetail
 		FROM
 		car_biz_car_info c
 		WHERE

@@ -57,5 +57,5 @@ public interface CarBizCarInfoExMapper {
     Integer validateCityAndSupplier(@Param("cityId") Integer cityId, @Param("supplierId") Integer supplierId, @Param("licensePlates") String licensePlates);
 
 
-    List<CarBizCarInfo> selectByLicensePlates(Set<String> license_platesList);
+    List<CarBizCarInfo> selectByLicensePlates(@Param("license_platess") Set<String> license_platesList);
 }
