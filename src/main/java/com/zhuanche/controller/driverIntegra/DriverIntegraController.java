@@ -458,10 +458,10 @@ public class DriverIntegraController {
         if(null == list){
             return;
         }
-        int index  = 1;
+        int index  = 0;
         for(DriverVoEntity rowEntity:list){
             StringBuffer stringBuffer = new StringBuffer();
-
+            index++;
             stringBuffer.append(index);
             stringBuffer.append(",");
 
