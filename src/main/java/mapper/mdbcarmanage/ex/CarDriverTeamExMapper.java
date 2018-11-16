@@ -37,6 +37,7 @@ public interface CarDriverTeamExMapper{
 
 	List<CarRelateTeam> queryDriverTeamListByDriverId(@Param("driverIds") String driverIds);
 
+    List<CarRelateTeam> queryDriverTeamListByDriverIdList(List<String> driverIds);
 
 	/**
 	 * 查询权限范围内，状态不为2的小组

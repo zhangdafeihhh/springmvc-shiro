@@ -313,5 +313,9 @@ public class UserManagementService{
 		redisSessionDAO.clearRelativeSession(null, null , userId );//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
-	
+
+    public List<CarAdmUser> getUsersByIdList(List<Integer> ids) {
+		return carAdmUserMapper.selectUsersByIdList(ids);
+	}
+
 }

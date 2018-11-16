@@ -71,9 +71,8 @@ public class CompleteOrderController{
 	                                              String hotelId,
 	                                              String driverId,
 	                                              @Verify(param = "pageNo",rule = "required") Integer pageNo,
-	                                              @Verify(param = "pageSize",rule = "required") Integer pageSize) {
-            logger.info("【运营管理-统计分析】完成订单列表数据:queryCompleteOrderData");
-
+	                                              @Verify(param = "pageSize",rule = "required") Integer pageSize){
+	        logger.info("【运营管理-统计分析】完成订单列表数据:queryCompleteOrderData");
             Map<String, Object> paramMap = new HashMap<String, Object>();
             paramMap.put("queryDate", queryDate);//查询日期
             if (null != cityId) {
@@ -123,6 +122,7 @@ public class CompleteOrderController{
 	        if(null != pageSize && pageSize > 0) {
                 paramMap.put("pageSize", pageSize);//每页记录数
             }
+
 		    String jsonString = JSON.toJSONString(paramMap);
 		    logger.info("【运营管理-统计分析】完成订单列表请求参数--"+jsonString);
 		    //从大数据仓库获取统计数据

@@ -13,14 +13,12 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalDTO;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
-import com.zhuanche.dto.rentcar.DriverDutyStatisticDTO;
 import com.zhuanche.serv.CustomerAppraisalService;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.threads.CustomerAppraisalExportHelper;
 import com.zhuanche.util.excel.CsvUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -32,11 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.net.URLEncoder;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
@@ -181,11 +175,14 @@ public class CustomerAppraisalController {
         carBizCustomerAppraisalStatisticsDTO.setTeamIds(permOfTeam);
         carBizCustomerAppraisalStatisticsDTO.setDriverIds(driverIds);
 
+
         PageInfo<CarBizCustomerAppraisalStatisticsDTO> p = customerAppraisalService.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO,page,pageSize);
         if(p != null){
             list = p.getList();
             total = (int)p.getTotal();
         }
+
+
         PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
         return AjaxResponse.success(pageDTO);
     }
@@ -272,7 +269,7 @@ public class CustomerAppraisalController {
                         helper.start();
                     }
 
-                    logger.info("所有的线程在等待中。。。"+JSON.toJSONString(carBizCustomerAppraisalStatisticsDTO));
+                    logger.info("所有的线程在等待中。。。"+ JSON.toJSONString(carBizCustomerAppraisalStatisticsDTO));
                     //主线程阻塞,等待其他所有 worker 线程完成后再执行
                     endGate.await();
                     for(int i = 2 ;i <= pages ; i++){
@@ -325,10 +322,12 @@ public class CustomerAppraisalController {
             stringBuffer.append(s.getDriverName());
             stringBuffer.append(",");
 
+
             stringBuffer.append("\t"+(s.getDriverPhone()==null?"":s.getDriverPhone()));
             stringBuffer.append(",");
 
             stringBuffer.append("\t"+s.getCreateDate());
+
             stringBuffer.append(",");
 
             stringBuffer.append(s.getEvaluateScore());
@@ -339,6 +338,7 @@ public class CustomerAppraisalController {
 
             String teamName = "";
             if(teamMap !=null && StringUtils.isNotEmpty(teamMap.get(s.getDriverId()))){
+
                 teamName = teamMap.get(s.getDriverId());
             }
             stringBuffer.append(teamName);
@@ -348,6 +348,7 @@ public class CustomerAppraisalController {
 
 
     }
+
     /**
      * 司机评分一个月详情
      * @param driverId 司机ID

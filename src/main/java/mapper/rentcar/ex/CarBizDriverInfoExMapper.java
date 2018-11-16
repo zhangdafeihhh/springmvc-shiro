@@ -135,6 +135,7 @@ public interface CarBizDriverInfoExMapper {
      */
     public List<CarBizDriverInfoDTO> queryDriverByLicensePlates(String license_plates);
 
+
     /**
      * 查看司机列表
      * @param driverTeamRequest
@@ -142,11 +143,12 @@ public interface CarBizDriverInfoExMapper {
      */
     List<CarBizDriverInfoDTO> queryCarBizDriverList(CarBizDriverInfoDTO driverTeamRequest);
 
-
     int selectDriverByKeyCountAddCooperation(DriverVoEntity params);
 
     public List<DriverVoEntity> selectDriverByKeyAddCooperation(DriverVoEntity params);
 
+
     CarBizDriverInfoDTO selectByPhone(@Param("phone") String phone);
+
 
 }

@@ -1507,6 +1507,7 @@
       car_biz_driver_info
     where license_plates = #{license_plates}
   </select>
+
   <select id="queryCarBizDriverList" resultMap="ResultMapWithBLOBs"  parameterType="com.zhuanche.dto.rentcar.CarBizDriverInfoDTO">
     select
     <include refid="Base_Column_List" />
@@ -1548,7 +1549,7 @@
     </where>
     order by driver_id desc
   </select>
-
+  
   <select id="selectDriverByKeyCountAddCooperation" resultType="java.lang.Integer"  parameterType="com.zhuanche.dto.driver.DriverVoEntity">
     SELECT
     count(*)
@@ -1575,8 +1576,6 @@
       <if test="driverIds!=null and driverIds !=''">
         and i.driver_id in(${driverIds})
       </if>
-
-
       <if test="name!=null and name!=''">
         <!-- and i.name like '%name%' -->
         and i.name LIKE CONCAT(#{name},'%')
@@ -1721,4 +1720,5 @@
     from car_biz_driver_info
     where phone = #{phone,jdbcType=INTEGER}
   </select>
+  
 </mapper>
