@@ -197,9 +197,9 @@ public class DriverMonthDutyController {
             PageInfo<CarDriverMonthDTO> pageInfo= driverMonthDutyService.queryDriverDutyList(param);
             List<CarDriverMonthDTO> pageList = pageInfo.getList();
 
-
             List<JSONObject>  headerList=  driverMonthDutyService.generateTableHeader(param.getMonitorDate());
             dataTrans(pageList, csvDataList,headerList);
+            logger.info("司机排班第一页，数据条数为csvDataList.size="+csvDataList.size()+";pageList.size()="+pageList.size());
             //计算总页数
             Integer totalPage = pageInfo.getPages();
             for(int pageNumber = 2; pageNumber <= totalPage; pageNumber++){
