@@ -376,7 +376,7 @@ public class DriverDutyStatisticController extends DriverQueryController{
 					}
 				}
 
-			} 
+			}
 			return AjaxResponse.success("导出司机考勤操作成功");
 		} catch (Exception e) {
 			if(rows != null){
