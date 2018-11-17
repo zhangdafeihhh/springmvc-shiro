@@ -47,6 +47,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.ParseException;
@@ -157,7 +158,7 @@ public class DriverDailyReportController extends DriverQueryController {
 			}
 			params.setDriverIds(driverList);
 		}
-		//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限 
+		//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
 		params = this.chuliDriverDailyReportEntity(params);
 		List<DriverDailyReport> x = null;
 		//开始查询
@@ -248,7 +249,21 @@ public class DriverDailyReportController extends DriverQueryController {
 	public AjaxResponse exportDriverReportData(String licensePlates, String driverName, String driverIds, String teamIds,
 											   @Verify(rule = "required",param = "suppliers") String suppliers,
 											   @Verify(rule = "required",param = "cities") String cities,
-											   @Verify(rule = "required",param = "statDateStart") String statDateStart, String statDateEnd, String sortName, String sortOrder, String groupIds, Integer reportType, HttpServletRequest request, HttpServletResponse response) throws ParseException {
+											   @Verify(rule = "required",param = "statDateStart") String statDateStart,
+											   String statDateEnd,
+											   String sortName, String sortOrder, String groupIds, Integer reportType, HttpServletRequest request, HttpServletResponse response) throws ParseException {
+
+		JSONObject searchParam = new JSONObject();
+		searchParam.put("teamIds",teamIds);
+		searchParam.put("suppliers",suppliers);
+		searchParam.put("cities",cities);
+		searchParam.put("statDateStart",statDateStart);
+		searchParam.put("statDateEnd",statDateEnd);
+		searchParam.put("sortName",sortName);
+		searchParam.put("sortOrder",sortOrder);
+		searchParam.put("groupIds",groupIds);
+		searchParam.put("reportType",reportType);
+
 
 		//默认报告类型为日报
 		reportType = reportType == null ? 0 : reportType;
@@ -271,13 +286,33 @@ public class DriverDailyReportController extends DriverQueryController {
 				return AjaxResponse.fail(RestErrorCode.ONLY_QUERY_ONE_MONTH);
 			}
 		}
+		List<String> headerList = new ArrayList<>();
+		String fileName = "";
+		List<String> csvDataList = new ArrayList<>();
+		try {
+
+			headerList.add("车牌号,姓名,供应商,车队,小组,上线时间,总在线时长（小时）,班在线时长（min）,计价前时间(min),计价前里程(km),载客中时间(min),载客里程(km)," +
+					"总服务时间(min),总服务里程(km),计算异动时间(min),结算异动里程（km）,订单流水(元),价外费用（元）,绑单完成数,抢单完成数," +
+					"后台派单,接机,送机,完成单数,日期"
+			);
+
+			fileName = "司机工作报告"+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
+			String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
+			if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
+
+				fileName = URLEncoder.encode(fileName, "UTF-8");
+
+			} else {  //其他浏览器
+				fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		DriverDailyReportParams params = new DriverDailyReportParams(licensePlates,driverName,driverIds,teamIds,suppliers,cities,statDateStart,statDateEnd,sortName,sortOrder,groupIds,null,null);
 
 		log.info("司机周报列表数据:queryDriverDailyReportData");
 		List<DriverDailyReportDTO> rows = new ArrayList<>();
-		List<DriverDailyReport> list = new ArrayList<>();
-
 		String driverList = null;
 		if (StringUtils.isEmpty(params.getDriverIds())){
 			//判断权限   如果司机id为空为查询列表页
@@ -287,80 +322,112 @@ public class DriverDailyReportController extends DriverQueryController {
 				driverList = super.queryAuthorityDriverIdsByTeamAndGroup(null, String.valueOf(params.getGroupIds()));
 				//如果该小组下无司机，返回空
 				if(StringUtils.isEmpty(driverList)){
-					log.info("司机日报列表-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds());
-					list = new ArrayList<DriverDailyReport>();
+					csvDataList.add("没有查到符合条件的数据");
+					CsvUtils entity = new CsvUtils();
+					try {
+						CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,entity);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					return AjaxResponse.success("没有查到符合条件的数据");
 				}
 			}
 		}else{
 			driverList = params.getDriverIds();
 		}
-
 		params.setPageSize(10000);
 		long  start = System.currentTimeMillis();
-		if(!(StringUtils.isNotEmpty(params.getGroupIds()) && (StringUtils.isEmpty(driverList)))){
-			params.setDriverIds(driverList);
-			//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
-			params = this.chuliDriverDailyReportEntity(params);
-			//开始查询
-			//开始查询
-			PageInfo<DriverDailyReport> pages = null;
-			if ( reportType==0 ) {
-				pages = driverDailyReportExService.findDayDriverDailyReportByparam(params);
-				list.addAll(pages.getList());
-				if(pages.getPages() >=2 ){
-					for(int i=2;i<pages.getPages();i++){
-						params.setPage(i);
-						pages = driverDailyReportExService.findDayDriverDailyReportByparam(params);
-						list.addAll(pages.getList());
-					}
-				}
-			}else{
-				pages = driverDailyReportExService.findWeekDriverDailyReportByparam(params,  statDateStart,    statDateEnd);
-				list.addAll(pages.getList());
-				if(pages.getPages() >=2 ){
-					for(int i=2;i<pages.getPages();i++){
-						params.setPage(i);
-						pages = driverDailyReportExService.findWeekDriverDailyReportByparam(params,  statDateStart,    statDateEnd);
-						list.addAll(pages.getList());
-					}
-				}
-			}
-			long  end = System.currentTimeMillis();
-			log.info("工作报告导出-查询耗时："+(end-start)+"毫秒");
 
-			rows = driverDailyReportExService.selectSuppierNameAndCityNameDays(list,reportType);
-			long  end1 = System.currentTimeMillis();
-			log.info("工作报告导出-数据转化耗时："+(end1-end)+"毫秒");
-
-		}
 		try {
-			List<String> headerList = new ArrayList<>();
-			headerList.add("车牌号,姓名,供应商,车队,小组,上线时间,总在线时长（小时）,班在线时长（min）,计价前时间(min),计价前里程(km),载客中时间(min),载客里程(km)," +
-					"总服务时间(min),总服务里程(km),计算异动时间(min),结算异动里程（km）,订单流水(元),价外费用（元）,绑单完成数,抢单完成数," +
-							"后台派单,接机,送机,完成单数,日期"
-						);
+			if(!(StringUtils.isNotEmpty(params.getGroupIds()) && (StringUtils.isEmpty(driverList)))){
+				params.setDriverIds(driverList);
+				//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
+				params = this.chuliDriverDailyReportEntity(params);
+				//开始查询
+				//开始查询
+				PageInfo<DriverDailyReport> pageInfos = null;
+				if ( reportType==0 ) {
+					pageInfos = driverDailyReportExService.findDayDriverDailyReportByparam(params);
+					List<DriverDailyReport> result = pageInfos.getList();
+					if(result == null || result.size() == 0){
+						csvDataList.add("没有查到符合条件的数据");
+						CsvUtils entity = new CsvUtils();
+						CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,entity);
+						return AjaxResponse.success("没有查到符合条件的数据");
+					}
+					int pages = pageInfos.getPages();//临时计算总页数
+					boolean isFirst = true;
+					boolean isLast = false;
+					if(pages == 1){
+						isLast = true;
+					}
+					rows = driverDailyReportExService.selectSuppierNameAndCityNameDays(result,reportType);
+					dataTrans(rows,csvDataList,reportType);
 
-			if(rows == null){
-				rows = new ArrayList<>();
+					CsvUtils entity = new CsvUtils();
+					CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+					csvDataList = null;
+					isFirst = false;
+					for(int pageNumber = 2;pageNumber < pageInfos.getPages() ; pageNumber++){
+						params.setPage(pageNumber);
+						rows = null;
+						pageInfos = driverDailyReportExService.findDayDriverDailyReportByparam(params);
+						result = pageInfos.getList();
+						csvDataList = new ArrayList<>();
+						if(pageNumber == pages){
+							isLast = true;
+						}
+						rows = driverDailyReportExService.selectSuppierNameAndCityNameDays(result,reportType);
+						dataTrans(rows,csvDataList,reportType);
+						CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+					}
+
+
+				}else{
+					pageInfos = driverDailyReportExService.findWeekDriverDailyReportByparam(params,  statDateStart,    statDateEnd);
+
+					List<DriverDailyReport> result = pageInfos.getList();
+					if(result == null || result.size() == 0){
+						csvDataList.add("没有查到符合条件的数据");
+						CsvUtils entity = new CsvUtils();
+						CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,entity);
+						return AjaxResponse.success("没有查到符合条件的数据");
+					}
+					int pages = pageInfos.getPages();//临时计算总页数
+					boolean isFirst = true;
+					boolean isLast = false;
+					if(pages == 1){
+						isLast = true;
+					}
+					rows = driverDailyReportExService.selectSuppierNameAndCityNameDays(result,reportType);
+					dataTrans(rows,csvDataList,reportType);
+
+					CsvUtils entity = new CsvUtils();
+					CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+					csvDataList = null;
+					isFirst = false;
+					for(int pageNumber = 2;pageNumber < pageInfos.getPages() ; pageNumber++){
+						params.setPage(pageNumber);
+
+						rows = null;
+						pageInfos = driverDailyReportExService.findWeekDriverDailyReportByparam(params,  statDateStart,    statDateEnd);
+						result = pageInfos.getList();
+						csvDataList = new ArrayList<>();
+						if(pageNumber == pages){
+							isLast = true;
+						}
+						rows = driverDailyReportExService.selectSuppierNameAndCityNameDays(result,reportType);
+						dataTrans(rows,csvDataList,reportType);
+						CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+					}
+
+				}
+				long  end = System.currentTimeMillis();
+				log.info("工作报告导出-查询耗时："+(end-start)+"毫秒");
 			}
-			List<String> csvDataList  = new ArrayList<>(rows.size());
-			dataTrans(rows,csvDataList,reportType);
-
-			String fileName = "司机工作报告"+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
-			String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
-			if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
-				fileName = URLEncoder.encode(fileName, "UTF-8");
-			} else {  //其他浏览器
-				fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
-			}
-			CsvUtils.exportCsv(response,csvDataList,headerList,fileName);
-
 			return AjaxResponse.success("文件导出成功");
 		} catch (Exception e) {
-			if(rows != null){
-				rows.clear();
-			}
-			log.error("导出失败哦！",e);
+			log.error("导出失败哦，参数为："+(searchParam.toJSONString()),e);
 			return AjaxResponse.fail(RestErrorCode.FILE_EXCEL_REPORT_FAIL);
 		}
 	}
@@ -400,7 +467,7 @@ public class DriverDailyReportController extends DriverQueryController {
 			stringBuffer.append(s.getUpOnlineTime()==null?"":s.getUpOnlineTime());
 			stringBuffer.append(",");
 
-			 
+
 			stringBuffer.append(s.getOnlineTime() );
 			stringBuffer.append(",");
 
@@ -498,5 +565,5 @@ public class DriverDailyReportController extends DriverQueryController {
 	}
 
 
-	 
+
 }
