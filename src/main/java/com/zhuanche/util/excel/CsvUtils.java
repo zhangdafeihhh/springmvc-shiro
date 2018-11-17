@@ -141,8 +141,7 @@ public class CsvUtils {
             }else{
                 if(bw!=null){
                     try {
-                        bw.flush();
-                        bw=null;
+                        bw.flush(); 
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
