@@ -265,7 +265,7 @@ public class OrderAppraisalController extends DriverQueryController{
 			stringBuffer.append(s.getDriverName());
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getDriverPhone()==null?"":s.getDriverPhone());
+			stringBuffer.append(s.getDriverPhone()==null?"":"\t"+s.getDriverPhone());
 			stringBuffer.append(",");
 
 			stringBuffer.append(s.getLicensePlates()==null?"":s.getLicensePlates());
@@ -280,7 +280,7 @@ public class OrderAppraisalController extends DriverQueryController{
 			stringBuffer.append(StringUtils.isEmpty(s.getEvaluate())?"":s.getEvaluate());
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getMemo()==null?"":s.getMemo());
+			stringBuffer.append(s.getMemo()==null?"":s.getMemo().replaceAll(",","，"));//评价
 			stringBuffer.append(",");
 
 			stringBuffer.append(DateUtils.formatDateTime_CN(s.getCreateDate()));
