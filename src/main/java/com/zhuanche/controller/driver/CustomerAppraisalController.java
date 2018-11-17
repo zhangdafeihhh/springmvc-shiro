@@ -274,14 +274,15 @@ public class CustomerAppraisalController {
                 int pages = pageInfos.getPages();//临时计算总页数
                 boolean isFirst = true;
                 boolean isLast = false;
-                if(pages == 1){
-                    isLast = true;
-                }
+
                 List<CarBizCustomerAppraisalStatisticsDTO> result = pageInfos.getList();
                 if(result == null || result.size() == 0){
                     csvDataList.add("没有查到符合条件的数据");
-                    CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+                    CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,entity);
                 }else{
+                    if(pages == 1){
+                        isLast = true;
+                    }
                     dataTrans(result,csvDataList);
                     CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
                     csvDataList = null;
@@ -308,7 +309,7 @@ public class CustomerAppraisalController {
         return null;
     }
     private void dataTrans(List<CarBizCustomerAppraisalStatisticsDTO> list, List<String>  csvDataList ){
-        if(null == list){
+        if(null == list || list.size() == 0){
             return;
         }
         Map<Integer, String> teamMap = null;
