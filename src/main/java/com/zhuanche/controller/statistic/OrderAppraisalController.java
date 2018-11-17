@@ -242,7 +242,7 @@ public class OrderAppraisalController extends DriverQueryController{
 					}
 				}
 			}else{
-				log.info("订单评分导出-参数不符合要求"+(params == null ? "null":JSON.toJSONString(params)),e);
+				log.info("订单评分导出-参数不符合要求"+(params == null ? "null":JSON.toJSONString(params)));
 			}
 
 			return AjaxResponse.success("文件导出成功！");
