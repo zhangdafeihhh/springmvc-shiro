@@ -447,7 +447,8 @@ public class OrderController{
 
 		 int code = -1;
 		 AjaxResponse responseX = null;
-		 paramMap.put("pageSize",10000);//每页记录数
+		 int pageSize = 10000;
+		 paramMap.put("pageSize",pageSize);//每页记录数
 		 List<String> csvDataList = new ArrayList<>();
 
 		try {
@@ -466,7 +467,20 @@ public class OrderController{
 			boolean isFirst = true;
 			boolean isLast = false;
 			boolean breakTag = false;
-			for(int pageNo=1; ; pageNo++  ) {
+			responseX = carFactOrderInfoService.queryOrderDataList(paramMap);
+			code = responseX.getCode();
+			int total = 0;
+			int pageCount = 0;
+			if(code == 0) {
+				JSONObject pageObj = (JSONObject) responseX.getData();
+				if(pageObj != null){
+					total = pageObj.getInteger("total");
+
+					pageCount = total%pageSize==0?total/pageSize:(total/pageSize)+1;
+				}
+
+			}
+			for(int pageNo=1; pageNo <=pageCount; pageNo++  ) {
 				if(pageNo == 1){
 					isFirst = true;
 				}else {
