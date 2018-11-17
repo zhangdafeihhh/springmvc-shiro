@@ -170,7 +170,8 @@ public class DriverMonthDutyController {
     @ResponseBody
     @RequestMapping("/exportDriverMonthDuty")
     public String exportDriverMonthDuty(DriverMonthDutyRequest param, HttpServletRequest request,HttpServletResponse response){
-        try {
+        logger.info("下载月排班列表数据入参:"+JSON.toJSONString(param));
+        try{
             if(Check.NuNStr(param.getMonitorDate())){
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
                 param.setMonitorDate(sdf.format(new Date()));
@@ -185,6 +186,12 @@ public class DriverMonthDutyController {
                 logger.error("没有权限操作,用户："+JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));
                 return "没有权限操作";
             }
+            param.setCityIds(commonService.setStringShiftInteger(data.getCityIds()));
+            param.setSupplierIds(commonService.setStringShiftInteger(data.getSupplierIds()));
+            param.setTeamIds(data.getTeamIds());
+            param.setPageSize(10000);
+            long start = System.currentTimeMillis();
+            PageInfo<CarDriverMonthDTO> pageInfo = driverMonthDutyService.queryDriverDutyList(param);
 
             List<JSONObject>  headerList=  driverMonthDutyService.generateTableHeader(param.getMonitorDate());
             List<String> csvheaderList = new ArrayList<>();
@@ -195,7 +202,6 @@ public class DriverMonthDutyController {
             }
             String header2 = stringBuffer.toString();
             header2 = header2.substring(0,header2.lastIndexOf(","));
-
             csvheaderList.add(header2);
 
             String fileName = "司机月排班"+ DateUtil.dateFormat(new Date(),"yyyy-MM")+".csv";
@@ -206,16 +212,6 @@ public class DriverMonthDutyController {
                 fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
             }
 
-            //开始第一页查询
-            param.setPageSize(10000);
-            param.setCityIds(commonService.setStringShiftInteger(data.getCityIds()));
-            param.setSupplierIds(commonService.setStringShiftInteger(data.getSupplierIds()));
-            param.setTeamIds(data.getTeamIds());
-
-
-
-            long start = System.currentTimeMillis();
-            PageInfo<CarDriverMonthDTO> pageInfo= driverMonthDutyService.queryDriverDutyList(param);
             List<CarDriverMonthDTO> pageList = pageInfo.getList();
             CsvUtils utilEntity = new CsvUtils();
 
@@ -227,17 +223,15 @@ public class DriverMonthDutyController {
                 csvDataList.add("没有找到符合条件的数据");
                 CsvUtils.exportCsvV2(response,csvDataList,csvheaderList,fileName,true,true,utilEntity);
                 long end = System.currentTimeMillis();
-                logger.info("司机月排班成功,参数param："+(param==null?"null":JSON.toJSONString(param))+",耗时："+(end-start)+"毫秒");
+                logger.info("司机月排班成功,没有找到符合条件的数据,参数param："+(param==null?"null":JSON.toJSONString(param))+",耗时："+(end-start)+"毫秒");
                 return "导出司机排班成功";
             }else {
-                //按页导出
-                if(totalPage ==1){
+                List<String> csvDataList = new ArrayList<>();
+                if(totalPage == 1){
                     isLast = true;
                 }
-                List<String> csvDataList = new ArrayList<>();
                 //数据转换
                 dataTrans( pageList,  csvDataList,headerList);
-
                 CsvUtils.exportCsvV2(response,csvDataList,csvheaderList,fileName,isFirst,isLast,utilEntity);
                 if(isLast){
                     long end = System.currentTimeMillis();
@@ -259,12 +253,14 @@ public class DriverMonthDutyController {
                 long end = System.currentTimeMillis();
                 logger.info("司机月排班成功,参数param："+(param==null?"null":JSON.toJSONString(param))+",耗时："+(end-start)+"毫秒");
                 return "导出司机排班成功";
-
             }
-        } catch (Exception e) {
-            logger.error("司机月排班异常,参数param："+(param==null?"null":JSON.toJSONString(param)),e);
-            return "导出司机排班失败，请联系管理员";
+
+        }catch (Exception e){
+            logger.error("下载月排班列表数据入参:"+JSON.toJSONString(param),e);
+            e.printStackTrace();
         }
+
+        return "";
     }
     private  void dataTrans(List<CarDriverMonthDTO> result, List<String> csvDataList,List<JSONObject>  headerList) {
         if (null == result) {
