@@ -287,6 +287,7 @@ public class CustomerAppraisalController {
                     dataTrans(result,csvDataList);
                     CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
                     csvDataList = null;
+                    isFirst = false;
                     for(int pageNumber = 2 ;pageNumber <= pages ; pageNumber++){
                         pageInfos = customerAppraisalService.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO,pageNumber
                                 ,  pageSize  );
