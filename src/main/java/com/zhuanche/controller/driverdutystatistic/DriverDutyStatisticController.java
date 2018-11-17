@@ -454,6 +454,7 @@ public class DriverDutyStatisticController extends DriverQueryController{
 
 		for(int pageNoTemp = 2; pageNoTemp <= pages; pageNoTemp ++){
 			//循环调自己
+			params.setPage(pageNoTemp);
 			doExportExcel(pageNoTemp,  reportType,  params,  response,
 					  headerList,  fileName,  entity );
 		}
