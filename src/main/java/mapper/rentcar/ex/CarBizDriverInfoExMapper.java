@@ -138,10 +138,10 @@ public interface CarBizDriverInfoExMapper {
 
     /**
      * 查看司机列表
-     * @param driverTeamRequest
+     * @param driverInfoDTO
      * @return
      */
-    List<CarBizDriverInfoDTO> queryCarBizDriverList(CarBizDriverInfoDTO driverTeamRequest);
+    List<CarBizDriverInfoDTO> queryCarBizDriverList(CarBizDriverInfoDTO driverInfoDTO);
 
     int selectDriverByKeyCountAddCooperation(DriverVoEntity params);
 

@@ -169,9 +169,7 @@ public class DriverMonthDutyController {
     @SuppressWarnings("unchecked")
     @ResponseBody
     @RequestMapping("/exportDriverMonthDuty")
-    public void exportDriverMonthDuty(DriverMonthDutyRequest param, HttpServletRequest request,HttpServletResponse response){
-
-
+    public String exportDriverMonthDuty(DriverMonthDutyRequest param, HttpServletRequest request,HttpServletResponse response){
         try {
             if(Check.NuNStr(param.getMonitorDate())){
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
@@ -185,30 +183,11 @@ public class DriverMonthDutyController {
             CommonRequest data = commonService.paramDeal(commonRequest);
             if(Check.NuNObj(data)){
                 logger.error("没有权限操作,用户："+JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));
-                return ;
+                return "没有权限操作";
             }
-            param.setPageSize(10000);
-            param.setCityIds(commonService.setStringShiftInteger(data.getCityIds()));
-            param.setSupplierIds(commonService.setStringShiftInteger(data.getSupplierIds()));
-            param.setTeamIds(data.getTeamIds());
-
-            List<String> csvDataList = new ArrayList<>();
-            long start = System.currentTimeMillis();
-            PageInfo<CarDriverMonthDTO> pageInfo= driverMonthDutyService.queryDriverDutyList(param);
-            List<CarDriverMonthDTO> pageList = pageInfo.getList();
 
             List<JSONObject>  headerList=  driverMonthDutyService.generateTableHeader(param.getMonitorDate());
-            dataTrans(pageList, csvDataList,headerList);
-            logger.info("司机排班第一页，数据条数为csvDataList.size="+csvDataList.size()+";pageList.size()="+pageList.size());
-            //计算总页数
-            Integer totalPage = pageInfo.getPages();
-            for(int pageNumber = 2; pageNumber <= totalPage; pageNumber++){
-                param.setPageNo(pageNumber);
-                pageInfo = driverMonthDutyService.queryDriverDutyList(param);
-                dataTrans( pageInfo.getList(),  csvDataList,headerList);
-            }
             List<String> csvheaderList = new ArrayList<>();
-
             StringBuffer stringBuffer = new StringBuffer();
             for(JSONObject item : headerList){
                 stringBuffer.append(item.get("showName"));
@@ -227,11 +206,64 @@ public class DriverMonthDutyController {
                 fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
             }
 
-            CsvUtils.exportCsv(response,csvDataList,csvheaderList,fileName);
-            long end = System.currentTimeMillis();
-            logger.error("司机月排班成功,参数param："+(param==null?"null":JSON.toJSONString(param))+",耗时："+(end-start)+"毫秒");
+            //开始第一页查询
+            param.setPageSize(10000);
+            param.setCityIds(commonService.setStringShiftInteger(data.getCityIds()));
+            param.setSupplierIds(commonService.setStringShiftInteger(data.getSupplierIds()));
+            param.setTeamIds(data.getTeamIds());
+
+
+
+            long start = System.currentTimeMillis();
+            PageInfo<CarDriverMonthDTO> pageInfo= driverMonthDutyService.queryDriverDutyList(param);
+            List<CarDriverMonthDTO> pageList = pageInfo.getList();
+            CsvUtils utilEntity = new CsvUtils();
+
+            Integer totalPage = pageInfo.getPages();
+            boolean isLast = false;
+            boolean isFirst = true;
+            if(pageList == null || pageList.size() == 0){
+                List<String> csvDataList = new ArrayList<>();
+                csvDataList.add("没有找到符合条件的数据");
+                CsvUtils.exportCsvV2(response,csvDataList,csvheaderList,fileName,true,true,utilEntity);
+                long end = System.currentTimeMillis();
+                logger.info("司机月排班成功,参数param："+(param==null?"null":JSON.toJSONString(param))+",耗时："+(end-start)+"毫秒");
+                return "导出司机排班成功";
+            }else {
+                //按页导出
+                if(totalPage ==1){
+                    isLast = true;
+                }
+                List<String> csvDataList = new ArrayList<>();
+                //数据转换
+                dataTrans( pageList,  csvDataList,headerList);
+
+                CsvUtils.exportCsvV2(response,csvDataList,csvheaderList,fileName,isFirst,isLast,utilEntity);
+                if(isLast){
+                    long end = System.currentTimeMillis();
+                    logger.info("司机月排班成功,参数param："+(param==null?"null":JSON.toJSONString(param))+",耗时："+(end-start)+"毫秒");
+                    return "导出司机排班成功";
+                }
+                //置isFirst为false;
+                isFirst = false;
+                for(int pageNumber = 2; pageNumber <= totalPage; pageNumber++){
+                    param.setPageNo(pageNumber);
+                    pageInfo = driverMonthDutyService.queryDriverDutyList(param);
+                    csvDataList = new ArrayList<>();
+                    dataTrans( pageInfo.getList(),  csvDataList,headerList);
+                    if(pageNumber == totalPage){
+                        isLast = true;
+                    }
+                    CsvUtils.exportCsvV2(response,csvDataList,csvheaderList,fileName,isFirst,isLast,utilEntity);
+                }
+                long end = System.currentTimeMillis();
+                logger.info("司机月排班成功,参数param："+(param==null?"null":JSON.toJSONString(param))+",耗时："+(end-start)+"毫秒");
+                return "导出司机排班成功";
+
+            }
         } catch (Exception e) {
             logger.error("司机月排班异常,参数param："+(param==null?"null":JSON.toJSONString(param)),e);
+            return "导出司机排班失败，请联系管理员";
         }
     }
     private  void dataTrans(List<CarDriverMonthDTO> result, List<String> csvDataList,List<JSONObject>  headerList) {

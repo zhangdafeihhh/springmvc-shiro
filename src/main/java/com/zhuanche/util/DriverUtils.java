@@ -34,4 +34,24 @@ public class DriverUtils {
         }
         return driverIds;
     }
+
+    public static Set<Integer> getDriverIdsByUserTeamsV2(CarDriverTeamService carDriverTeamService , Set<Integer> teamIds){
+        if(teamIds == null || teamIds.isEmpty()){
+            return null;
+        }
+        TeamGroupRequest teamGroupRequest = new TeamGroupRequest();
+        Set<String> teamIdString = new HashSet<>();
+        for(Integer item : teamIds){
+            teamIdString.add(item+"");
+        }
+        teamGroupRequest.setTeamIds(teamIdString);
+        List<Integer> driverIdList =  carDriverTeamService.queryDriverIdsByTeamIdss(teamIds);
+        Set<Integer> driverIdSet = new HashSet<>();
+        if(!CollectionUtils.isEmpty(driverIdList)){
+            for(Integer driverId : driverIdList){
+                driverIdSet.add(driverId);
+            }
+        }
+        return driverIdSet;
+    }
 }
