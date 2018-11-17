@@ -206,7 +206,7 @@ public class DriverSchController {
             stringBuffer.append(",");
             stringBuffer.append(StringUtils.isNotEmpty(carDriverDayDutyDTO.getForcedTimes())?carDriverDayDutyDTO.getForcedTimes().replace(",","  "):carDriverDayDutyDTO.getForcedTimes());//强制上班时间
             stringBuffer.append(",");
-            stringBuffer.append(carDriverDayDutyDTO.getDutyTimes()==null?"":carDriverDayDutyDTO.getDutyTimes());//排班时长
+            stringBuffer.append(carDriverDayDutyDTO.getDutyTimes()==null?"":carDriverDayDutyDTO.getDutyTimes().replaceAll(",","  "));//排班时长
 
             stringBuffer.append(",");
 
