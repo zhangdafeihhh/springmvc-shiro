@@ -486,6 +486,10 @@ public class OrderController{
 				}else {
 					isFirst = false;
 				}
+
+				if(pageNo == pageCount){
+					isLast = true;
+				}
 				paramMap.put("pageNo",pageNo);//页号
 				// 从订单组取统计数据
 				responseX = carFactOrderInfoService.queryOrderDataList(paramMap);
@@ -508,7 +512,7 @@ public class OrderController{
 					breakTag = true;
 				}
 				if(breakTag){
-					isLast = false;
+					isLast = true;
 					if(pageNo == 1 && csvDataList.size() == 0 ){
 						csvDataList.add("没有查到符合条件的数据");
 					}
