@@ -210,7 +210,7 @@ public class DriverDutyStatisticController extends DriverQueryController{
 			stringBuffer.append(s.getName());
 			stringBuffer.append(",");
 			if (reportType  == 0){
-				stringBuffer.append(s.getTime()==null?"":s.getTime());
+				stringBuffer.append(s.getTime()==null?"":("\t"+s.getTime()));
 				stringBuffer.append(",");
 			}
 
