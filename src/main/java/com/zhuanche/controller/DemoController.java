@@ -1,10 +1,15 @@
 package com.zhuanche.controller;
 
+import com.zhuanche.controller.rentcar.OrderController;
+import com.zhuanche.util.excel.CsvUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
@@ -15,9 +20,20 @@ import com.zhuanche.serv.DemoService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 @Controller
 @RequestMapping("/demo")
 public class DemoController{
+
+    private static final Logger logger = LoggerFactory.getLogger(DemoController.class);
+
 	@Autowired
 	private DemoService demoService;
 	
@@ -75,6 +91,45 @@ public class DemoController{
     	AjaxResponse respJson = AjaxResponse.success(loginUser);
     	Integer.parseInt("0000ajaxException");
         return respJson;
+    }
+    @ResponseBody
+    @RequestMapping(value = "/export", method = { RequestMethod.POST,RequestMethod.GET })
+    public void exportDemo(HttpServletRequest request, HttpServletResponse response)  {
+
+
+        List<String> headerList = new ArrayList<>();
+        headerList.add("test");
+        String fileName = "测试"+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
+        List<String> csvDataList = new ArrayList<>();
+
+        try {
+
+            CsvUtils utilEntity = new CsvUtils();
+            for(int i=0;i<62;i++){
+                logger.info("开始导出第"+(i+1)+"页数据");
+                if(i == 0){
+                    csvDataList.add("第1页");
+                     CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,false,utilEntity);
+
+                }else{
+                    csvDataList.add("第"+(i+1)+"页");
+                    CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,false,false,utilEntity);
+                }
+                try {
+                    Thread.sleep(1000);
+                    csvDataList.clear();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,false,true,utilEntity);
+            logger.info("导出结束");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }
