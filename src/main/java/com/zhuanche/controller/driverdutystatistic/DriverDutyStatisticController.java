@@ -385,8 +385,44 @@ public class DriverDutyStatisticController extends DriverQueryController{
 			params = chuliDriverDutyStatisticParams(params);
 			params.setPageSize(10000);
 			//递归实现
-			doExportExcel(1,  reportType,  params,  response,
-					  headerList,  fileName,null );
+			PageInfo<DriverDutyStatistic> pageInfos = null;
+			List<DriverDutyStatistic> list = null;
+			if (reportType.equals(0)){
+				pageInfos =  driverDutyStatisticService.queryDriverDayDutyList(params);
+				if(pageInfos != null){
+					list = pageInfos.getList();
+				}
+			}else{
+				pageInfos =  driverDutyStatisticService.queryDriverMonthDutyList(params);
+				if(pageInfos != null){
+					list = pageInfos.getList();
+				}
+			}
+			int pages = 0;
+			if(pageInfos != null){
+				pages = pageInfos.getPages();
+			}
+			List<String> csvDataList = new ArrayList<>();
+			if(pages == 0 && (list == null || list.size() == 0)){
+				csvDataList.add("根据条件没有查到符合条件的数据");
+				CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,new CsvUtils());
+
+			}else{
+				boolean isLast = false;
+				for(int pageNoTemp = 1; pageNoTemp <= pages; pageNoTemp ++){
+					//循环调
+					if(pageNoTemp == pages){
+						isLast = true;
+					}
+					params.setPage(pageNoTemp);
+					doExportExcel(pageNoTemp,  reportType,  params,  response,
+							headerList,  fileName,  null ,isLast);
+				}
+			}
+
+
+
+
 
 		}catch (Exception e){
 			log.error("导出司机考勤报告异常，参数为："+(params==null?"null":JSON.toJSONString(params)),e);
@@ -404,21 +440,9 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	 * @param params
 	 */
 	private void doExportExcel(int pageNo,Integer reportType,DriverDutyStatisticParams params,HttpServletResponse response,
-							   List<String> headerList,String fileName,CsvUtils entity ) throws IOException {
+							   List<String> headerList,String fileName,CsvUtils entity,boolean isLast ) throws IOException {
 		PageInfo<DriverDutyStatistic> pageInfos = null;
 		List<DriverDutyStatistic> list = null;
-		if (reportType.equals(0)){
-			pageInfos =  driverDutyStatisticService.queryDriverDayDutyList(params);
-			if(pageInfos != null){
-				list = pageInfos.getList();
-			}
-		}else{
-			pageInfos =  driverDutyStatisticService.queryDriverMonthDutyList(params);
-			if(pageInfos != null){
-				list = pageInfos.getList();
-			}
-		}
-
 		if (reportType.equals(0)){
 			pageInfos =  driverDutyStatisticService.queryDriverDayDutyList(params);
 			if(pageInfos != null){
@@ -433,31 +457,19 @@ public class DriverDutyStatisticController extends DriverQueryController{
 		if(entity == null){
 			entity = new CsvUtils();
 		}
-		int pages = pageInfos.getPages();//临时计算总页数
+
 		boolean isFirst = true;
-		boolean isLast = false;
+
 		List<String> csvDataList = new ArrayList<>();
-		if(pages == 1){
-			isLast = true;
-		}
 		if(pageNo != 1){
 			isFirst = false;
 		}
-		if(pageNo == 1 && (list == null || list.size() ==0)){
-			csvDataList.add("根据条件没有查到符合条件的数据");
-		}else{
-			List<DriverDutyStatisticDTO> dtoList = driverDutyStatisticService.selectSuppierNameAndCityName(list);
-			dataTrans(dtoList,csvDataList,reportType);
 
-		}
+		List<DriverDutyStatisticDTO> dtoList = driverDutyStatisticService.selectSuppierNameAndCityName(list);
+		dataTrans(dtoList,csvDataList,reportType);
 		CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
 
-		for(int pageNoTemp = 2; pageNoTemp <= pages; pageNoTemp ++){
-			//循环调自己
-			params.setPage(pageNoTemp);
-			doExportExcel(pageNoTemp,  reportType,  params,  response,
-					  headerList,  fileName,  entity );
-		}
+
 	}
 
 }
