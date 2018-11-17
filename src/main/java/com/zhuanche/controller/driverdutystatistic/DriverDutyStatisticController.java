@@ -383,7 +383,7 @@ public class DriverDutyStatisticController extends DriverQueryController{
 			}
 			//处理参数
 			params = chuliDriverDutyStatisticParams(params);
-
+			params.setPageSize(10000);
 			//递归实现
 			doExportExcel(1,  reportType,  params,  response,
 					  headerList,  fileName,null );
