@@ -523,7 +523,7 @@ public class DriverDailyReportController extends DriverQueryController {
 			stringBuffer.append(",");
 
 			if (reportType == 0){
-				stringBuffer.append(s.getStatDate());
+				stringBuffer.append(s.getStatDate()==null?"":("\t"+s.getStatDate()));
 			}else{
 				stringBuffer.append("("+s.getStatDateStart()+")-("+s.getStatDateEnd()+")");
 			}
