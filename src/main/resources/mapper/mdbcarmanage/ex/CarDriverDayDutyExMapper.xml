@@ -269,18 +269,22 @@
     <include refid="Base_Column_List" />
     from car_driver_day_duty d
    <where>
-     <if test="driverIds!=null and driverIds !=''">
-       and d.driver_id IN  (#{driverIds})
-     </if>
       <if test="driverId!=null and driverId!=''">
         and d.driver_id = #{driverId}
       </if>
+     <if test="driverIdSet!=null and driverIdSet.size()>0">
+       and d.driver_id IN
+       <foreach collection="driverIdSet" open="(" close=")" separator="," item="cid" >
+         #{cid}
+       </foreach>
+     </if>
      <if test="cityIds!=null and cityIds.size()>0">
        and d.city_id IN
        <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
          #{cid}
        </foreach>
      </if>
+
      <if test="cityId!=null and cityId!=''">
        and d.city_id = #{cityId}
      </if>

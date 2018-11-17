@@ -82,12 +82,9 @@ public class CsvUtils {
                                     String  fileName,boolean isFirst,boolean islast,CsvUtils entity) throws IOException {
 
         boolean isSucess=false;
-
-
         OutputStreamWriter osw = entity.getOsw();
         BufferedWriter bw = entity.getBw();
         try {
-
 
             if(isFirst){
                 response.reset();

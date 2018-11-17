@@ -404,7 +404,7 @@
         and name LIKE CONCAT(#{name},'%')
       </if>
       <if test="licensePlates != null and licensePlates != ''" >
-        and license_plates LIKE '%${licensePlates}%'
+        and license_plates LIKE   CONCAT('%',CONCAT(#{licensePlates},'%'))
       </if>
       <if test="status != null" >
         and status = #{status,jdbcType=INTEGER}
@@ -1719,5 +1719,8 @@
     from car_biz_driver_info
     where phone = #{phone,jdbcType=INTEGER}
   </select>
+
+
+
   
 </mapper>

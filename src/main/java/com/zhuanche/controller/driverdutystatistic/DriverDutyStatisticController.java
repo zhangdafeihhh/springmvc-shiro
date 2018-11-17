@@ -1,5 +1,7 @@
 package com.zhuanche.controller.driverdutystatistic;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -212,6 +214,18 @@ public class DriverDutyStatisticController extends DriverQueryController{
 		 String  phone, String licensePlates,@Verify(param = "startTime",rule = "required")  String startTime,
 		 String endTime, Integer reportType, HttpServletRequest request, HttpServletResponse response) throws ParseException {
 
+		JSONObject searchParam = new JSONObject();
+		searchParam.put("cityId",cityId);
+		searchParam.put("supplierId",supplierId);
+		searchParam.put("teamId",teamId);
+		searchParam.put("groupIds",groupIds);
+		searchParam.put("name",name);
+		searchParam.put("phone",phone);
+		searchParam.put("licensePlates",licensePlates);
+		searchParam.put("startTime",startTime);
+		searchParam.put("endTime",endTime);
+		searchParam.put("reportType",reportType);
+
 		//默认日统计
 		reportType = reportType == null ? 0 : reportType;
 		//如果是日统计，开始时间和结束时间不能为空并且开始时间和结束时间在一个月内
@@ -243,73 +257,132 @@ public class DriverDutyStatisticController extends DriverQueryController{
 			}
 		}
 		params.setPageSize(10000);
-		if ((StringUtils.isEmpty(params.getGroupIds()) &&  StringUtils.isEmpty(params.getTeamId()) && StringUtils.isEmpty(driverList)) || StringUtils.isNotEmpty(driverList)){
-			params.setDriverIds(driverList);
-			params = chuliDriverDutyStatisticParams(params);
-			if(StringUtils.isNotEmpty(params.getStartTime())){
-				String time = params.getStartTime();
-				int value = setDriverDutyStatisticValue(time);
-				params.setValue(value);
-				params.setTable("statistic_duty_"+time.substring(0,7).replaceAll("-", "_"));
-			}
-			List<DriverDutyStatistic> list = new ArrayList<>();
-			PageInfo<DriverDutyStatistic> pageInfo = null;
-			long start = System.currentTimeMillis();
-			if (reportType.equals(0)){
-				pageInfo =  driverDutyStatisticService.queryDriverDayDutyList(params);
-				if(pageInfo != null){
-					list.addAll( pageInfo.getList());
-
-					for(int pageno = 2 ;pageno <= pageInfo.getPages();pageno ++ ){
-						params.setPage(pageno);
-						pageInfo =  driverDutyStatisticService.queryDriverDayDutyList(params);
-						list.addAll( pageInfo.getList());
-					}
-				}
-			}else{
-				pageInfo =  driverDutyStatisticService.queryDriverMonthDutyList(params);
-				if(pageInfo != null){
-					list.addAll( pageInfo.getList());
-					for(int pageno = 2 ;pageno <= pageInfo.getPages();pageno ++ ){
-						params.setPage(pageno);
-						pageInfo =  driverDutyStatisticService.queryDriverMonthDutyList(params);
-						list.addAll( pageInfo.getList());
-					}
-				}
-			}
-			//设置供应商名称和城市名称
-			rows = driverDutyStatisticService.selectSuppierNameAndCityName(list);
-		}
-
+		List<String> headerList = new ArrayList<>();
+		String fileName = "";
+		List<String> csvDataList = new ArrayList<>();
 		try {
-			List<String> headerList = new ArrayList<>();
+
 			if (reportType  == 0){
 				headerList.add("司机姓名,日期,手机号,车牌号,班制之内上班上线时_有效,强制上班内上班上线时长_有效,加班时长,班制内上班上线时长,强制上班内上班上线时长,城市,早高峰在线时长,晚高峰在线时长,其他时段1在线时长,其他时段2在线时长");
 			}else{
 				headerList.add("司机姓名,手机号,车牌号,班制之内上班上线时_有效,强制上班内上班上线时长_有效,加班时长,班制内上班上线时长,强制上班内上班上线时长,城市,早高峰在线时长,晚高峰在线时长,其他时段1在线时长,其他时段2在线时长");
 			}
 
-			if(rows == null){
-				rows = new ArrayList<>();
-			}
-			List<String> csvDataList  = new ArrayList<>(rows.size());
-			dataTrans(rows,csvDataList,reportType);
-
-			String fileName = "司机考勤报告"+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
+			fileName ="司机考勤报告"+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
 			String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
 			if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
+
 				fileName = URLEncoder.encode(fileName, "UTF-8");
+
 			} else {  //其他浏览器
 				fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
 			}
-			CsvUtils.exportCsv(response,csvDataList,headerList,fileName);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		List<DriverDutyStatistic> result = null;
+		try {
 
+			if ((StringUtils.isEmpty(params.getGroupIds()) &&  StringUtils.isEmpty(params.getTeamId()) && StringUtils.isEmpty(driverList)) || StringUtils.isNotEmpty(driverList)){
+				params.setDriverIds(driverList);
+				params = chuliDriverDutyStatisticParams(params);
+				if(StringUtils.isNotEmpty(params.getStartTime())){
+					String time = params.getStartTime();
+					int value = setDriverDutyStatisticValue(time);
+					params.setValue(value);
+					params.setTable("statistic_duty_"+time.substring(0,7).replaceAll("-", "_"));
+				}
+				List<DriverDutyStatistic> list = new ArrayList<>();
+				PageInfo<DriverDutyStatistic> pageInfos = null;
+				long start = System.currentTimeMillis();
+				if (reportType.equals(0)){
+					pageInfos =  driverDutyStatisticService.queryDriverDayDutyList(params);
+					result = pageInfos.getList();
+					if(result == null || result.size() == 0){
+						csvDataList.add("没有查到符合条件的数据");
+						CsvUtils entity = new CsvUtils();
+						CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,entity);
+						return AjaxResponse.success("没有查到符合条件的数据");
+					}
+
+					int pages = pageInfos.getPages();//临时计算总页数
+					boolean isFirst = true;
+					boolean isLast = false;
+					if(pages == 1){
+						isLast = true;
+					}
+					CsvUtils entity = new CsvUtils();
+					//设置供应商名称和城市名称
+					rows = driverDutyStatisticService.selectSuppierNameAndCityName(list);
+					dataTrans(rows,csvDataList,reportType);
+
+					CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+					csvDataList = null;
+					isFirst = false;
+
+					for(int pageno = 2 ;pageno <= pages;pageno ++ ){
+						params.setPage(pageno);
+						pageInfos =  driverDutyStatisticService.queryDriverDayDutyList(params);
+						result = pageInfos.getList();
+						rows = driverDutyStatisticService.selectSuppierNameAndCityName(list);
+						csvDataList = new ArrayList<>();
+						if(pageno == pages){
+							isLast = true;
+						}
+						rows = driverDutyStatisticService.selectSuppierNameAndCityName(list);
+						dataTrans(rows,csvDataList,reportType);
+
+						CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+					}
+
+				}else{
+					pageInfos =  driverDutyStatisticService.queryDriverMonthDutyList(params);
+					result = pageInfos.getList();
+					if(result == null || result.size() == 0){
+						csvDataList.add("没有查到符合条件的数据");
+						CsvUtils entity = new CsvUtils();
+						CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,entity);
+						return AjaxResponse.success("没有查到符合条件的数据");
+					}
+
+					int pages = pageInfos.getPages();//临时计算总页数
+					boolean isFirst = true;
+					boolean isLast = false;
+					if(pages == 1){
+						isLast = true;
+					}
+					CsvUtils entity = new CsvUtils();
+					//设置供应商名称和城市名称
+					rows = driverDutyStatisticService.selectSuppierNameAndCityName(list);
+					dataTrans(rows,csvDataList,reportType);
+
+					CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+					csvDataList = null;
+					isFirst = false;
+
+					for(int pageno = 2 ;pageno <= pages;pageno ++ ){
+						params.setPage(pageno);
+						pageInfos =  driverDutyStatisticService.queryDriverMonthDutyList(params);
+						result = pageInfos.getList();
+						rows = driverDutyStatisticService.selectSuppierNameAndCityName(list);
+						csvDataList = new ArrayList<>();
+						if(pageno == pages){
+							isLast = true;
+						}
+						rows = driverDutyStatisticService.selectSuppierNameAndCityName(list);
+						dataTrans(rows,csvDataList,reportType);
+
+						CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+					}
+				}
+
+			}
 			return AjaxResponse.success("导出司机考勤操作成功");
 		} catch (Exception e) {
 			if(rows != null){
 				rows.clear();
 			}
-			log.error("导出司机考勤操作异常！",e);
+			log.error("导出司机考勤操作异常！参数为："+ JSON.toJSONString(searchParam),e);
 			return AjaxResponse.fail(RestErrorCode.FILE_EXCEL_REPORT_FAIL);
 		}
 	}

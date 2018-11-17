@@ -14,13 +14,17 @@ import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.dto.driver.CarDriverDayDutyDTO;
 import com.zhuanche.dto.driverDuty.CarDriverMonthDTO;
 import com.zhuanche.dto.driverDuty.ColumnEntity;
+import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverMonthDuty;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.request.DriverMonthDutyRequest;
 import com.zhuanche.request.DutyParamRequest;
+import com.zhuanche.serv.CarBizDriverInfoService;
+import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.util.Check;
 import com.zhuanche.util.DateUtils;
+import com.zhuanche.util.DriverUtils;
 import mapper.mdbcarmanage.CarDriverMonthDutyMapper;
 import mapper.mdbcarmanage.ex.CarDriverMonthDutyExMapper;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
@@ -93,7 +97,10 @@ public class DriverMonthDutyService {
 	@Autowired
 	private CarDriverMonthDutyMapper carDriverMonthDutyMapper;
 
-
+	@Autowired
+	private CarBizDriverInfoService carBizDriverInfoService;
+	@Autowired
+	private CarDriverTeamService carDriverTeamService;
 	/**
 	 * @Desc: 导入排班信息
 	 * @param:
@@ -547,6 +554,60 @@ public class DriverMonthDutyService {
 	public PageInfo<CarDriverMonthDTO> queryDriverDutyList(DriverMonthDutyRequest param){
 		try{
 			logger.info("查询排班列表service入参："+ JSON.toJSONString(param));
+			//权限team检测
+			Set<Integer> teamIds = param.getTeamIds();
+
+			if(teamIds != null && !teamIds.isEmpty()){
+				//查看小队信息,只允许查看自己权限范围的小队的信息
+				if(StringUtils.isNotEmpty(param.getTeamId())){
+					Integer testTeamId = Integer.parseInt(param.getTeamId());
+					if(!teamIds.contains(testTeamId)){//权限范围内不能看到该小队，则返回空
+						PageInfo<CarDriverMonthDTO> pageInfo = new PageInfo(new ArrayList());
+						return pageInfo;
+					}
+				}else {
+					teamIds = new HashSet<>();
+					teamIds.add(Integer.parseInt(param.getTeamId()));
+					Set<Integer> authDriverIds = DriverUtils.getDriverIdsByUserTeamsV2(carDriverTeamService,teamIds);
+					if(authDriverIds != null && !authDriverIds.isEmpty()){
+						param.setDriverIds(authDriverIds);
+					}
+				}
+			}
+
+
+			if(StringUtils.isNotEmpty(param.getDriverName()) || StringUtils.isNotEmpty(param.getLicensePlates())){
+				//过滤出姓名一致且车牌一致的司机ids
+				CarBizDriverInfoDTO driverSearchParam = new CarBizDriverInfoDTO();
+				driverSearchParam.setCityIds(param.getCityIds());
+				driverSearchParam.setSupplierIds(param.getSupplierIds());
+				if(StringUtils.isNotEmpty(param.getCityId())){
+					driverSearchParam.setServiceCity(Integer.parseInt(param.getCityId()));
+				}
+				if(StringUtils.isNotEmpty(param.getSupplierId())){
+					driverSearchParam.setSupplierId(Integer.parseInt(param.getSupplierId()));
+				}
+				driverSearchParam.setDriverIds(param.getDriverIds());
+
+				driverSearchParam.setName(param.getDriverName());
+				driverSearchParam.setLicensePlates(param.getLicensePlates());
+
+				List<CarBizDriverInfoDTO> driverInfoDTOList = carBizDriverInfoService.queryDriverList(driverSearchParam);
+
+				if(driverInfoDTOList == null ){
+					//根据姓名和车牌号没有找到司机
+					PageInfo<CarDriverMonthDTO> pageInfo = new PageInfo(new ArrayList());
+					return pageInfo;
+
+				}else{
+					Set<Integer>  driverIdSet = new HashSet<>();
+					for(CarBizDriverInfoDTO item : driverInfoDTOList){
+						driverIdSet.add(item.getDriverId());
+					}
+					//重置司机id列表
+					param.setDriverIds(driverIdSet);
+				}
+			}
 			PageInfo<CarDriverMonthDTO> pageInfo = PageHelper.startPage(param.getPageNo(),param.getPageSize(),true).doSelectPageInfo(
 					()->carDriverMonthDutyExMapper.queryDriverDutyList(param));
 			logger.info("查询排班列表service入参"+ (param==null?"null":JSON.toJSONString(param))

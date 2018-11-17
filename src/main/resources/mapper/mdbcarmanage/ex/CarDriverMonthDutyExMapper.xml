@@ -97,13 +97,19 @@
     Left Join car_relate_team r on r.driver_id = i.driver_id
     Left Join car_driver_team t on r.team_id = t.id
     Left Join car_driver_team g on g.id = i.group_id
-    where 1=1
+    <where>
     <if test="monitorDate !=null and monitorDate !=''">
       <![CDATA[ and i.time = str_to_date(#{monitorDate},'%Y-%m') ]]>
     </if>
     <if test="driverId !=null">
       and i.driver_id = #{driverId}
     </if>
+      <if test="driverIds!=null and driverIds.size()>0">
+        and r.driver_id IN
+        <foreach collection="driverIds" open="(" close=")" separator="," item="tid" >
+          #{tid}
+        </foreach>
+      </if>
     <if test="cityIds!=null and cityIds.size()>0">
       and i.city_id IN
       <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
@@ -131,6 +137,7 @@
     <if test="licensePlates!=null and licensePlates!=''">
       AND i.license_plates LIKE CONCAT( #{licensePlates}, '%')
     </if>
+    </where>
     <if test="sortname != null and sortname !=''">
       ORDER BY
       convert(${sortname} using gbk) ${sortorder}

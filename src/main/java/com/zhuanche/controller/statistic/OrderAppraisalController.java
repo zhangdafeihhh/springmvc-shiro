@@ -181,57 +181,70 @@ public class OrderAppraisalController extends DriverQueryController{
 
 		log.info("订单评分导出--/orderAppraisal/exportOrderAppraisal---参数："+params.toString());
 		List<CarBizCustomerAppraisal> rows = new ArrayList<>();
+
+		List<String> headerList = new ArrayList<>();
+		String fileName = "";
+		List<String> csvDataList = new ArrayList<>();
+		CsvUtils entity = new CsvUtils();
+
+		try {
+
+			headerList.add("司机姓名,司机手机,车牌号,订单号,评分,评价,备注,时间");
+
+			fileName = "订单评分"+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
+			String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
+			if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
+
+				fileName = URLEncoder.encode(fileName, "UTF-8");
+
+			} else {  //其他浏览器
+				fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		try {
 
 			String driverList = "";
 			if(StringUtils.isNotEmpty(params.getGroupIds()) || StringUtils.isNotEmpty(params.getTeamId())){
 				driverList = super.queryAuthorityDriverIdsByTeamAndGroup(params.getTeamId(), params.getGroupIds());
 				if(driverList==null || "".equals(driverList)){
-					log.info("订单评分导出-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds());
-					log.info("订单评分导出-有选择车队查询条件-该车队下没有司机teamId=="+params.getTeamId());
+					log.info("订单评分导出-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds()+"teamId=="+params.getTeamId());
 				}
 			}
 			if(!((StringUtils.isNotEmpty(params.getGroupIds()) || StringUtils.isNotEmpty(params.getTeamId())) && StringUtils.isEmpty(driverList))){
 				params.setDriverIds(driverList);
 				//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
 				params = this.chuliParams(params);
-
 				params.setPageSize(10000);
-
-				PageInfo<CarBizCustomerAppraisal> pageInfo = carBizCustomerAppraisalExService.findPageByparam(params);
-				if(pageInfo != null && pageInfo.getList() != null && pageInfo.getList().size() >= 1) {
-					rows.addAll( pageInfo.getList());
-					int pages = pageInfo.getPages();
-
-					for(int i=2; i<=pages; i++){
-						pageInfo = carBizCustomerAppraisalExService.findPageByparam(params);
-						if(pageInfo != null && pageInfo.getList() != null && pageInfo.getList().size() >= 1) {
-							rows.add((CarBizCustomerAppraisal) pageInfo.getList());
-						}
+				PageInfo<CarBizCustomerAppraisal> pageInfos = carBizCustomerAppraisalExService.findPageByparam(params);
+				if(pageInfos != null && pageInfos.getList() != null && pageInfos.getList().size() >= 1) {
+					dataTrans(rows,csvDataList);
+					int pages = pageInfos.getPages();//临时计算总页数
+					boolean isFirst = true;
+					boolean isLast = false;
+					if(pages == 1){
+						isLast = true;
 					}
+					CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+					isFirst = false;
 
+					for(int pageNumber=2; pageNumber <= pages; pageNumber++){
+						params.setPage(pageNumber);
+						pageInfos = carBizCustomerAppraisalExService.findPageByparam(params);
+						if(pageInfos != null && pageInfos.getList() != null && pageInfos.getList().size() >= 1) {
+							if(pageNumber == pages){
+								isLast = true;
+							}
+						}
+						dataTrans(rows,csvDataList);
+						CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+					}
 				}
-
+			}else{
+				log.info("订单评分导出-参数不符合要求"+(params == null ? "null":JSON.toJSONString(params)));
 			}
 
-			List<String> headerList = new ArrayList<>();
-
-			 headerList.add("司机姓名,司机手机,车牌号,订单号,评分,评价,备注,时间");
-
-			if(rows == null){
-				rows = new ArrayList<>();
-			}
-			List<String> csvDataList  = new ArrayList<>(rows.size());
-			dataTrans(rows,csvDataList);
-
-			String fileName = "订单评分"+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
-			String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
-			if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
-				fileName = URLEncoder.encode(fileName, "UTF-8");
-			} else {  //其他浏览器
-				fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
-			}
-			CsvUtils.exportCsv(response,csvDataList,headerList,fileName);
 			return AjaxResponse.success("文件导出成功！");
 		} catch (Exception e) {
 			log.error("订单评分导出--导出失败,参数为："+(params == null ? "null":JSON.toJSONString(params)),e);
