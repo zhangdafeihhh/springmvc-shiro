@@ -19,10 +19,12 @@ import com.zhuanche.request.DriverTeamRequest;
 import com.zhuanche.request.DutyParamRequest;
 import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.serv.common.DataPermissionHelper;
+import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.Check;
 import com.zhuanche.util.Common;
+import com.zhuanche.util.DriverUtils;
 import mapper.mdbcarmanage.ex.CarDriverDayDutyExMapper;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.mdbcarmanage.ex.DriverDutyTimeInfoExMapper;
@@ -81,6 +83,8 @@ public class CarDriverDutyService {
 
 	@Autowired
 	private CarDriverTeamExMapper carDriverTeamExMapper;
+	@Autowired
+	private CarDriverTeamService carDriverTeamService;
 
 	private static final ExecutorService es = Executors.newCachedThreadPool();
 
@@ -117,6 +121,27 @@ public class CarDriverDutyService {
 			}
 			//组装权限参数
 			dutyParamRequest = generateDutyParamRequestByUser(dutyParamRequest);
+			if(dutyParamRequest.getTeamId() != null){
+				Set<Integer> authTeamIdSet =  dutyParamRequest.getTeamIds();
+				if(authTeamIdSet != null && !authTeamIdSet.isEmpty()){
+					if(!authTeamIdSet.contains(dutyParamRequest.getTeamId())){
+						PageInfo<CarDriverDayDutyDTO> pageInfo = new PageInfo<>(new ArrayList<>());
+						logger.info("无权查看小队【"+dutyParamRequest.getTeamId() +"】的排班信息");
+						return pageInfo;
+					}else {
+						Set<Integer> teamIdSet = new HashSet<>();
+						teamIdSet.contains(dutyParamRequest.getTeamId());
+						Set<Integer> driverIdSet = DriverUtils.getDriverIdsByUserTeamsV2(  carDriverTeamService , teamIdSet);
+						if( driverIdSet == null || driverIdSet.isEmpty()){
+							PageInfo<CarDriverDayDutyDTO> pageInfo = new PageInfo<>(new ArrayList<>());
+							logger.info("查看小队【"+dutyParamRequest.getTeamId() +"】的排班信息,司机id为空");
+							return pageInfo;
+						}else {
+							dutyParamRequest.setDriverIdSet(driverIdSet);
+						}
+					}
+				}
+			}
 
 			//组装获取team状态不为2的数据
 			DriverTeamRequest driverTeamRequest = new DriverTeamRequest();
@@ -239,6 +264,7 @@ public class CarDriverDutyService {
 				commonRequest.setTeamId(dutyParamRequest.getTeamId());
 			}
 			CommonRequest resultParmam = citySupplierTeamCommonService.paramDeal(commonRequest);
+			//参数转换
 			dutyParamRequest.setCityIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getCityIds()));
 			dutyParamRequest.setSupplierIds(citySupplierTeamCommonService.setStringShiftInteger(resultParmam.getSupplierIds()));
 			dutyParamRequest.setTeamIds(resultParmam.getTeamIds());
