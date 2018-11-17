@@ -153,35 +153,32 @@ public class DriverSchController {
                 return "";
             }
             int pages = pageInfos.getPages();//临时计算总页数
+            boolean isFirst = true;
+            boolean isLast = false;
             if(pages == 1){
-                dataTrans( result,  csvDataList);
-                CsvUtils entity = new CsvUtils();
-                CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,entity);
-                return "";
-            }else{
-                boolean isFirst = true;
-                boolean isLast = false;
-                dataTrans( result,  csvDataList);
-                CsvUtils entity = new CsvUtils();
-                CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
-                csvDataList = null;
-                isFirst = false;
-
-                for(int pageNumber = 2; pageNumber <= pages; pageNumber++){
-                    param.setPage(pageNumber);
-                    param.setPageNo(pageNumber);
-                    pageInfos = carDriverDutyService.queryDriverDayDutyList(param);
-                    result = pageInfos.getList();
-                    csvDataList = new ArrayList<>();
-                    if(pageNumber == pages){
-                        isLast = true;
-                    }
-                    dataTrans( result,  csvDataList);
-                    CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
-                }
-                long end = System.currentTimeMillis();
-                logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，耗时："+(end-start)+"毫秒;总条数："+pageInfos.getTotal());
+                isLast = true;
             }
+            dataTrans( result,  csvDataList);
+            CsvUtils entity = new CsvUtils();
+            CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+            csvDataList = null;
+            isFirst = false;
+
+            for(int pageNumber = 2; pageNumber <= pages; pageNumber++){
+                param.setPage(pageNumber);
+                param.setPageNo(pageNumber);
+                pageInfos = carDriverDutyService.queryDriverDayDutyList(param);
+                result = pageInfos.getList();
+                csvDataList = new ArrayList<>();
+                if(pageNumber == pages){
+                    isLast = true;
+                }
+                dataTrans( result,  csvDataList);
+                CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+            }
+            long end = System.currentTimeMillis();
+            logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，耗时："+(end-start)+"毫秒;总条数："+pageInfos.getTotal());
+
 
         }catch (Exception e){
             logger.error("导出排班信息异常:参数为："+(param == null?"null":JSON.toJSONString(param)),e);
