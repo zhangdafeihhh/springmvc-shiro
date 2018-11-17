@@ -127,6 +127,7 @@ public class BusAssignmentService {
 		Map<String, Object> param = new HashMap<>();
 		param.put("orderNo", busCarDTO.getOrderNo());
 		param.put("businessId", Common.BUSINESSID);
+		param.put("type", busCarDTO.getType());
 		param.put("sign", SignUtils.createMD5Sign(param, Common.KEY));// 签名
 		logger.info("[ BusAssignmentService-orderToDoListForCar ] 请求参数   param={}", param);
 		
@@ -192,6 +193,7 @@ public class BusAssignmentService {
 		Map<String, Object> param = new HashMap<>();
 		param.put("orderNo", busDriverDTO.getOrderNo());
 		param.put("businessId", Common.BUSINESSID);
+		param.put("type", busDriverDTO.getType());
 		param.put("sign", SignUtils.createMD5Sign(param, Common.KEY));// 签名
 		logger.info("[ BusAssignmentService-orderToDoListForDriver ] 请求参数   param={}", param);
 

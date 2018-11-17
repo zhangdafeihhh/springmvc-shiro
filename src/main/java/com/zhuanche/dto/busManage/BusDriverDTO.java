@@ -25,6 +25,8 @@ public class BusDriverDTO extends BaseDTO {
 	private String name;
 	// 司机手机号
 	private String phone;
+	// 业务类型
+	private Integer type;
 
 	public String getOrderNo() {
 		return orderNo;
@@ -72,6 +74,14 @@ public class BusDriverDTO extends BaseDTO {
 
 	public void setPhone(String phone) {
 		this.phone = phone;
+	}
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
 	}
 
 	public void setPageSize(Integer pageSize) {

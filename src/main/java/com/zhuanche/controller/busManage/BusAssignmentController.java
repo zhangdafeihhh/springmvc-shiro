@@ -131,7 +131,12 @@ public class BusAssignmentController extends BaseController {
 	public AjaxResponse queryCarData(@Verify(param = "orderNo", rule = "required") String orderNo,
 			@Verify(param = "groupId", rule = "required") Integer groupId,
 			@Verify(param = "cityId", rule = "required") Integer cityId, 
+			@Verify(param = "type", rule = "required") Integer type, 
 			BusCarDTO busCarDTO) {
+		if (type != 1 && type != 2) {
+			return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "业务类型不存在");
+		}
+		
 		PageDTO pageDTO = new PageDTO();
 		try {
 			pageDTO = busAssignmentService.orderToDoListForCar(busCarDTO);
@@ -154,7 +159,12 @@ public class BusAssignmentController extends BaseController {
 	public AjaxResponse queryDriverData(@Verify(param = "orderNo", rule = "required") String orderNo,
 			@Verify(param = "groupId", rule = "required") Integer groupId,
 			@Verify(param = "cityId", rule = "required") Integer cityId, 
+			@Verify(param = "type", rule = "required") Integer type, 
 			BusDriverDTO busDriverDTO) {
+		if (type != 1 && type != 2) {
+			return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "业务类型不存在");
+		}
+		
 		PageDTO pageDTO = new PageDTO();
 		try {
 			pageDTO = busAssignmentService.orderToDoListForDriver(busDriverDTO);

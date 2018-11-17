@@ -23,6 +23,8 @@ public class BusCarDTO extends BaseDTO {
 	private Integer supplierId;
 	/** 车牌号 **/
 	private String licensePlates;
+	/** 业务类型 **/
+	private Integer type;
 
 	public String getOrderNo() {
 		return orderNo;
@@ -62,6 +64,14 @@ public class BusCarDTO extends BaseDTO {
 
 	public void setLicensePlates(String licensePlates) {
 		this.licensePlates = licensePlates;
+	}
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
 	}
 
 	public void setPageSize(Integer pageSize) {
