@@ -564,19 +564,19 @@ public class OrderController{
 			stringBuffer.append(s.getBookingUserName() != null ? "" + s.getBookingUserName() + "" : "");
 			stringBuffer.append(",");
 			//
-			stringBuffer.append(s.getBookingUserPhone() != null ? "" + s.getBookingUserPhone() + "" : "");
+			stringBuffer.append(s.getBookingUserPhone() != null ? "\t" + s.getBookingUserPhone() : "");
 			stringBuffer.append(",");
 
 			stringBuffer.append(s.getRiderName() != null ? "" + s.getRiderName() + "" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getRiderPhone() != null ? "" + s.getRiderPhone() + "" : "");
+			stringBuffer.append(s.getRiderPhone() != null ? "\t" + s.getRiderPhone() : "");
 			stringBuffer.append(",");
 
 			stringBuffer.append(s.getDriverName() != null ? "" + s.getDriverName() + "" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getDriverPhone() != null ? "" + s.getDriverPhone() + "" : "");
+			stringBuffer.append(s.getDriverPhone() != null ? "\t" + s.getDriverPhone() + "" : "");
 			stringBuffer.append(",");
 
 			stringBuffer.append(s.getLicensePlates() != null ? "" + s.getLicensePlates() + "" : "");
@@ -601,14 +601,14 @@ public class OrderController{
 			stringBuffer.append(",");
 
 
-			stringBuffer.append(s.getCreateDate() != null ? "" + s.getCreateDate() + "" : "");
+			stringBuffer.append(s.getCreateDate() != null ? "\t" + s.getCreateDate() + "" : "");
 			stringBuffer.append(",");
 
 
-			stringBuffer.append(s.getCostEndDate() != null ? "" + s.getCostEndDate() + "" : "");
+			stringBuffer.append(s.getCostEndDate() != null ? "\t" + s.getCostEndDate() + "" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getFactStartAddr() != null ? "" + s.getFactStartAddr() + "" : "");
+			stringBuffer.append(s.getFactStartAddr() != null ? "\t" + s.getFactStartAddr() + "" : "");
 			stringBuffer.append(",");
 
 
