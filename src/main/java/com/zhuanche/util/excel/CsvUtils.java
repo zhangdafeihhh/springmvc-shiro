@@ -138,6 +138,22 @@ public class CsvUtils {
                         e.printStackTrace();
                     }
                 }
+            }else{
+                if(bw!=null){
+                    try {
+                        bw.flush(); 
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if(osw!=null){
+                    try {
+                        osw.flush();
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
 
         }
