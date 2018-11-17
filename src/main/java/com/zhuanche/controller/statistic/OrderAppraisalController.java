@@ -200,7 +200,7 @@ public class OrderAppraisalController extends DriverQueryController{
 
 				PageInfo<CarBizCustomerAppraisal> pageInfo = carBizCustomerAppraisalExService.findPageByparam(params);
 				if(pageInfo != null && pageInfo.getList() != null && pageInfo.getList().size() >= 1) {
-					rows.add((CarBizCustomerAppraisal) pageInfo.getList());
+					rows.addAll( pageInfo.getList());
 					int pages = pageInfo.getPages();
 
 					for(int i=2; i<=pages; i++){
