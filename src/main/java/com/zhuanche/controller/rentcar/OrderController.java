@@ -511,12 +511,11 @@ public class OrderController{
 					logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code);
 					breakTag = true;
 				}
+				if(pageNo == 1 && csvDataList.size() == 0 ){
+					csvDataList.add("没有查到符合条件的数据");
+				}
+				CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
 				if(breakTag){
-					isLast = true;
-					if(pageNo == 1 && csvDataList.size() == 0 ){
-						csvDataList.add("没有查到符合条件的数据");
-					}
-					CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
 					break;
 				}else{
 					CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
