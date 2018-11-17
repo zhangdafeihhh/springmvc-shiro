@@ -107,7 +107,7 @@ public class OrderAppraisalController extends DriverQueryController{
 		}
 		CarBizCustomerAppraisalParams params = new CarBizCustomerAppraisalParams(cityId,supplierId,teamId,groupIds,driverName,driverPhone,orderNo,
 				createDateBegin,createDateEnd,evaluateScore,sortName,sortOrder,page,pageSize);
-		log.info("/web/orderAppraisal/orderAppraisalListData:司机评分数据列表数据---参数："+params.toString());
+		log.info("司机评分数据列表数据---参数："+params.toString());
 
 		int total = 0;
 		String driverList = "";
@@ -124,11 +124,10 @@ public class OrderAppraisalController extends DriverQueryController{
 		//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
 		params = this.chuliParams(params);
 		//开始查询
-		List<CarBizCustomerAppraisalBean> list = null;
+		List<CarBizCustomerAppraisal> list = null;
 		try {
 			PageInfo<CarBizCustomerAppraisal> pageInfo = carBizCustomerAppraisalExService.findPageByparam(params);
-			List<CarBizCustomerAppraisal> appraisalList = pageInfo.getList();
-			list = BeanUtil.copyList(appraisalList,CarBizCustomerAppraisalBean.class);
+			list = pageInfo.getList();
 			total = (int)pageInfo.getTotal();
 		} catch (Exception e){
 			 log.error("查询订单评分异常，参数为"+(params==null?"null": JSON.toJSONString(params)),e);
@@ -171,88 +170,89 @@ public class OrderAppraisalController extends DriverQueryController{
 									 @Verify(param="createDateBegin",rule="required")String createDateBegin,
 									 @Verify(param="createDateEnd",rule="required")String createDateEnd,
 									 String evaluateScore,String sortName, String sortOrder,HttpServletRequest request,HttpServletResponse response){
+		int page =1;
+		int pageSize = 10000;
 
 		if (StringUtils.isEmpty(driverPhone) && StringUtils.isEmpty(teamId)){
-			//请选择一个车队或输入司机手机号
+			//请选择一个车队号或输入司机手机
 			return AjaxResponse.fail(RestErrorCode.TEAMID_OR_DRIVERID_ISNULL);
 		}
 		CarBizCustomerAppraisalParams params = new CarBizCustomerAppraisalParams(cityId,supplierId,teamId,groupIds,driverName,driverPhone,orderNo,
-				createDateBegin,createDateEnd,evaluateScore,sortName,sortOrder,null,null);
+				createDateBegin,createDateEnd,evaluateScore,sortName,sortOrder,page,pageSize);
+		log.info("订单评分数据列表数据---参数："+params.toString());
 
-		log.info("订单评分导出--/orderAppraisal/exportOrderAppraisal---参数："+params.toString());
-		List<CarBizCustomerAppraisal> rows = new ArrayList<>();
-
-		List<String> headerList = new ArrayList<>();
-		String fileName = "";
+		int total = 0;
+		String driverList = "";
+		if(StringUtils.isNotEmpty(params.getGroupIds()) || StringUtils.isNotEmpty(params.getTeamId())){
+			driverList = super.queryAuthorityDriverIdsByTeamAndGroup(params.getTeamId(), params.getGroupIds());
+			if(driverList==null || "".equals(driverList)){
+				log.info("订单评价列表-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds()+",teamId=="+params.getTeamId());
+				PageDTO pageDTO = new PageDTO(params.getPage(), params.getPageSize(), total, null);
+				return AjaxResponse.success(pageDTO);
+			}
+		}
+		params.setDriverIds(driverList);
+		//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
+		params = this.chuliParams(params);
+		//开始查询
+		List<CarBizCustomerAppraisal> list = null;
 		List<String> csvDataList = new ArrayList<>();
-		CsvUtils entity = new CsvUtils();
+		List<String> headerList = new ArrayList<>();
+
+		headerList.add("司机姓名,司机手机,车牌号,订单号,评分,评价,备注,时间");
+
+		String fileName = "";
 
 		try {
-
-			headerList.add("司机姓名,司机手机,车牌号,订单号,评分,评价,备注,时间");
-
 			fileName = "订单评分"+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
 			String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
 			if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
-
 				fileName = URLEncoder.encode(fileName, "UTF-8");
-
 			} else {  //其他浏览器
 				fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		try {
 
-			String driverList = "";
-			if(StringUtils.isNotEmpty(params.getGroupIds()) || StringUtils.isNotEmpty(params.getTeamId())){
-				driverList = super.queryAuthorityDriverIdsByTeamAndGroup(params.getTeamId(), params.getGroupIds());
-				if(driverList==null || "".equals(driverList)){
-					log.info("订单评分导出-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds()+"teamId=="+params.getTeamId());
+			PageInfo<CarBizCustomerAppraisal> pageInfo = carBizCustomerAppraisalExService.findPageByparam(params);
+			int totalPage = pageInfo.getPages();
+			CsvUtils entity = new CsvUtils();
+			if(totalPage == 0){
+				csvDataList.add("没有查到符合条件的数据");
+
+				CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,entity);
+			}else{
+				boolean isFirst = true;
+				boolean isLast = false;
+				List<CarBizCustomerAppraisal> rows = pageInfo.getList();
+				//数据转换
+				dataTrans(rows,csvDataList);
+				if(totalPage == 1){
+					isLast = true;
 				}
-			}
-			if(!((StringUtils.isNotEmpty(params.getGroupIds()) || StringUtils.isNotEmpty(params.getTeamId())) && StringUtils.isEmpty(driverList))){
-				params.setDriverIds(driverList);
-				//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
-				params = this.chuliParams(params);
-				params.setPageSize(10000);
-				PageInfo<CarBizCustomerAppraisal> pageInfos = carBizCustomerAppraisalExService.findPageByparam(params);
-				if(pageInfos != null && pageInfos.getList() != null && pageInfos.getList().size() >= 1) {
-					dataTrans(rows,csvDataList);
-					int pages = pageInfos.getPages();//临时计算总页数
-					boolean isFirst = true;
-					boolean isLast = false;
-					if(pages == 1){
+
+				CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+				isFirst = false;
+				csvDataList = new ArrayList<>();
+
+				for(int pageNumber=2; pageNumber <= totalPage; pageNumber++){
+					params.setPage(pageNumber);
+					pageInfo = carBizCustomerAppraisalExService.findPageByparam(params);
+					if(pageNumber == totalPage){
 						isLast = true;
 					}
+					rows = pageInfo.getList();
+					dataTrans(rows,csvDataList);
 					CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
-					isFirst = false;
-
-					for(int pageNumber=2; pageNumber <= pages; pageNumber++){
-						params.setPage(pageNumber);
-						pageInfos = carBizCustomerAppraisalExService.findPageByparam(params);
-						if(pageInfos != null && pageInfos.getList() != null && pageInfos.getList().size() >= 1) {
-							if(pageNumber == pages){
-								isLast = true;
-							}
-						}
-						dataTrans(rows,csvDataList);
-						CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
-					}
 				}
-			}else{
-				log.info("订单评分导出-参数不符合要求"+(params == null ? "null":JSON.toJSONString(params)));
+				log.info("导出司机评分成功，参数为"+(params==null?"null": JSON.toJSONString(params)));
 			}
 
-			return AjaxResponse.success("文件导出成功！");
-		} catch (Exception e) {
-			log.error("订单评分导出--导出失败,参数为："+(params == null ? "null":JSON.toJSONString(params)),e);
-			if(rows != null){
-				rows.clear();
-			}
-			return AjaxResponse.fail(RestErrorCode.FILE_EXPORT_FAIL);
+
+
+		} catch (Exception e){
+			log.error("导出司机评分异常，参数为"+(params==null?"null": JSON.toJSONString(params)),e);
 		}
+
+		return AjaxResponse.success(null);
 	}
 	private void dataTrans(List<CarBizCustomerAppraisal> result, List<String>  csvDataList ){
 		if(null == result){
