@@ -208,7 +208,7 @@ public class DriverIntegraController {
     })
     public String queryDriverIntegralListDataDown(DriverVoEntity driverEntity, HttpServletRequest request, HttpServletResponse response) {
         driverEntity.setPage(1);
-        int pageSize = 1000;
+        int pageSize = CsvUtils.downPerSize;
         driverEntity.setPagesize(pageSize);
         logger.info("queryDriverIntegralListDataDown:下载司机积分数据列表,参数为："+(driverEntity==null?"null": JSON.toJSONString(driverEntity)));
         if(driverEntity.getCityId() == 0){
@@ -342,6 +342,7 @@ public class DriverIntegraController {
 
                 //拼装当前页数据
                 generatePageData(  pageRows);
+                csvDataList  = new ArrayList<String>();
                 dataTrans(pageRows,csvDataList);
                 if(pageNumber == pages){
                     isLast = true;
