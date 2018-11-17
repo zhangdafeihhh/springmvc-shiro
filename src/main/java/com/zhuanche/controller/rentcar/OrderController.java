@@ -444,36 +444,13 @@ public class OrderController{
 		}
 			
 		// 查询ES（性能优化：采用分页的方式进行检索并获取数据）
-		List<CarFactOrderInfoDTO> result = new ArrayList<CarFactOrderInfoDTO>(10000);
+
 		 int code = -1;
 		 AjaxResponse responseX = null;
 		 paramMap.put("pageSize",10000);//每页记录数
-		 for(int pageNo=1; ; pageNo++  ) {
-			paramMap.put("pageNo",pageNo);//页号
-			 // 从订单组取统计数据
-			 responseX = carFactOrderInfoService.queryOrderDataList(paramMap);
-			 code = responseX.getCode();
-			 if(code == 0){
-			 	JSONObject jsonObject = (JSONObject) responseX.getData();
-				 List<CarFactOrderInfoDTO> dtoList  = (List<CarFactOrderInfoDTO>) jsonObject.get("data");
-				 if(dtoList != null && dtoList.size() >=1){
-					 logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code+";总条数为："+jsonObject.get("total")+"，当前页返回结果条数为："+dtoList.size());
-					 result.addAll( dtoList );
-				 }else{
-					 logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code+";总条数为："+jsonObject.get("total")+"，当前页返回结果条数为："+ (dtoList==null?"null":dtoList.size()));
-					 break;
-				 }
-			 }else{
-				 logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code);
-				 break;
-			 }
-		}
+		 List<String> csvDataList = new ArrayList<>();
 
 		try {
-
-			List<String> csvDataList = new ArrayList<>();
-			dataTrans(result,csvDataList);
-
 			List<String> headerList = new ArrayList<>();
 			headerList.add("订单号,订单指派方式,城市,服务类别,车型类别,订单类别,预订人,预订人手机,乘车人,乘车人手机,司机,司机手机,车牌号,供应商,乘车时长(分钟),乘车里程,金额,是否使用优惠券,优惠券支付（元）,下单时间,完成时间,实际上车地址,实际下车地址,订单状态,是否拼车,主订单号");
 
@@ -485,7 +462,50 @@ public class OrderController{
 			} else {  //其他浏览器
 				fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
 			}
-			CsvUtils.exportCsv(response,csvDataList,headerList,fileName);
+			CsvUtils entity = new CsvUtils();
+			boolean isFirst = true;
+			boolean isLast = false;
+			boolean breakTag = false;
+			for(int pageNo=1; ; pageNo++  ) {
+				if(pageNo == 1){
+					isFirst = true;
+				}else {
+					isFirst = false;
+				}
+				paramMap.put("pageNo",pageNo);//页号
+				// 从订单组取统计数据
+				responseX = carFactOrderInfoService.queryOrderDataList(paramMap);
+				code = responseX.getCode();
+				csvDataList = new ArrayList<>();
+				if(code == 0){
+					JSONObject pageObj = (JSONObject) responseX.getData();
+					List<CarFactOrderInfoDTO> pageList  = (List<CarFactOrderInfoDTO>) pageObj.get("data");
+					if(pageList != null && pageList.size() >=1){
+						dataTrans(pageList,csvDataList);
+						logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code+";总条数为："+pageObj.get("total")+"，当前页返回结果条数为："
+								+ (pageList==null?"null":pageList.size()));
+					}else{
+						logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code+";总条数为："+pageObj.get("total")+"，当前页返回结果条数为："
+								+ (pageList==null?"null":pageList.size()));
+						breakTag = true;
+					}
+				}else{
+					logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code);
+					breakTag = true;
+				}
+				if(breakTag){
+					isLast = false;
+					if(pageNo == 1 && csvDataList.size() == 0 ){
+						csvDataList.add("没有查到符合条件的数据");
+					}
+					CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+					break;
+				}else{
+					CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+				}
+			}
+
+//			CsvUtils.exportCsv(response,csvDataList,headerList,fileName);
 			long end = System.currentTimeMillis();
 			logger.info("订单导出成功，参数为"+JSON.toJSONString(paramMap)+";耗时："+(end -start)+"毫秒");
 		} catch (Exception e) {

@@ -251,7 +251,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 		try {
 			String result = orderApiTemplate.postForObject(Common.ORDER_ORDER_LIST_DATE,
 					String.class, paramMap);
-//			String result = HttpClientUtil.buildPostRequest(url).addParams(paramMap).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
+
 			JSONObject job = JSON.parseObject(result);
 			if (job == null) {
 				logger.error("调用订单接口" + url + "返回结果为null");
