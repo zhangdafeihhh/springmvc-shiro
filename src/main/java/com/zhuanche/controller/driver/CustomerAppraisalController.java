@@ -283,13 +283,16 @@ public class CustomerAppraisalController {
                     if(pages == 1){
                         isLast = true;
                     }
+                    logger.info("执行查询第"+1+"页数据，当前页数据条数为"+(result==null?"null":result.size()));
                     dataTrans(result,csvDataList);
                     CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
                     csvDataList = null;
                     for(int pageNumber = 2 ;pageNumber <= pages ; pageNumber++){
                         pageInfos = customerAppraisalService.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO,pageNumber
                                 ,  pageSize  );
+
                         result = pageInfos.getList();
+                        logger.info("执行查询第"+pageNumber+"页数据，当前页数据条数为"+(result==null?"null":result.size()));
                         csvDataList = new ArrayList<>();
                         if(pageNumber == pages){
                             isLast = true;
