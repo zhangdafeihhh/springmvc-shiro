@@ -268,7 +268,7 @@ public class CustomerAppraisalController {
                 carBizCustomerAppraisalStatisticsDTO.setTeamIds(permOfTeam);
                 carBizCustomerAppraisalStatisticsDTO.setDriverIds(driverIds);
 
-                int pageSize = 100;
+                int pageSize = CsvUtils.downPerSize;
                 PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfos = customerAppraisalService.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO,1
                         ,  pageSize  );
                 int pages = pageInfos.getPages();//临时计算总页数

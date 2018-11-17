@@ -7,6 +7,7 @@ import java.io.OutputStreamWriter;
 import java.util.List;
 
 public class CsvUtils {
+    public static final Integer downPerSize = 10000;
     private OutputStreamWriter osw;
     private BufferedWriter bw = null;
 
