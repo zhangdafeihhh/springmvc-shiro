@@ -59,8 +59,6 @@ public interface CarFactOrderExMapper {
 	public Double selectPartnerPayAmount( String orderNo);
 	//查询dissent
 	public CarFactOrderInfo selectDissent(Long orderId);
-	//查询cancel_reason
-	public CarFactOrderInfo selectCancelReason(Long orderId);
 	//查询car_biz_order_settle_detail_extension
 	public CarFactOrderInfo selectOrderSettleDetail(Long orderId);
 }
