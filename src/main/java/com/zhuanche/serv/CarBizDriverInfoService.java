@@ -165,7 +165,7 @@ public class CarBizDriverInfoService {
         return carBizDriverInfoExMapper.queryDriverList(params);
     }
 
-    public PageInfo<CarBizDriverInfoDTO> queryDriverPage(CarBizDriverInfoDTO params,int pageSize,int pageNo) {
+    public PageInfo<CarBizDriverInfoDTO> queryDriverPage(CarBizDriverInfoDTO params,int pageNo,int pageSize) {
         PageHelper.startPage(pageSize, pageNo, true);
         List<CarBizDriverInfoDTO> list = carBizDriverInfoExMapper.queryDriverList(params);
         PageInfo<CarBizDriverInfoDTO> pageInfo = new PageInfo<>(list);

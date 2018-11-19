@@ -335,7 +335,7 @@ public class DriverDailyReportController extends DriverQueryController {
 		}else{
 			driverList = params.getDriverIds();
 		}
-		params.setPageSize(10000);
+		params.setPageSize(CsvUtils.downPerSize);
 		long  start = System.currentTimeMillis();
 
 		try {
@@ -358,7 +358,7 @@ public class DriverDailyReportController extends DriverQueryController {
 					int pages = pageInfos.getPages();//临时计算总页数
 					boolean isFirst = true;
 					boolean isLast = false;
-					if(pages == 1){
+					if(pages == 1 ||pages == 0 ){
 						isLast = true;
 					}
 					rows = driverDailyReportExService.selectSuppierNameAndCityNameDays(result,reportType);

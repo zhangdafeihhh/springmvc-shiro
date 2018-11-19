@@ -1,5 +1,6 @@
 package com.zhuanche.serv.rentcar;
 
+import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.entity.rentcar.CarInfo;
 import com.zhuanche.entity.rentcar.CarInfoVo;
@@ -53,5 +54,10 @@ public interface CarInfoService {
 
     String selectModelNameByLicensePlates(String params);
 
-    void getExportExcel(CarInfo params, List<String> datas);
+//    void getExportExcel(CarInfo params, List<String> datas);
+
+
+    public PageInfo<CarInfo> findCarInfo(CarInfo params);
+
+    public void doTrans4Csv(List<String> csvList,List<CarInfo> carInfoList);
 }

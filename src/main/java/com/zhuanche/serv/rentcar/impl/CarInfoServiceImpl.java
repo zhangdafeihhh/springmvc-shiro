@@ -1,5 +1,7 @@
 package com.zhuanche.serv.rentcar.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Sets;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -2505,8 +2507,153 @@ public class CarInfoServiceImpl implements CarInfoService {
         return carInfoExMapper.selectModelNameByLicensePlates(params);
     }
 
+
+
+//    @Override
+//    public void getExportExcel(CarInfo params, List<String> datas) {
+//        String cities = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getCityIds(), ",");
+//        String suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds(), ",");
+//        String teamIds = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getTeamIds(), ",");
+//        String carModelIds = "";
+//        if(!"".equals(params.getCities())&&params.getCities()!=null&&!"null".equals(params.getCities())){
+//            cities = params.getCities().replace(";", ",");
+//        }
+//        if(!"".equals(params.getSupplierIds())&&params.getSupplierIds()!=null&&!"null".equals(params.getSupplierIds())){
+//            suppliers = params.getSupplierIds().replace(";", ",");
+//        }
+//        if(!"".equals(params.getCarModelIds())&&params.getCarModelIds()!=null&&!"null".equals(params.getCarModelIds())){
+//            carModelIds = params.getCarModelIds().replace(";", ",");
+//        }
+//        params.setCarModelIds(carModelIds);
+//        params.setSupplierIds(suppliers);
+//        params.setCities(cities);
+//        params.setTeamIds(teamIds);
+//        List<CarInfo> list = carInfoExMapper.selectListNoPage(params);
+//        StringBuilder builder = new StringBuilder();
+//        if(list != null && list.size()>0){
+//            List<Integer> createIds = new ArrayList<>();
+//            List<Integer> updateIds = new ArrayList<>();
+//            for(CarInfo carInfo:list){
+//                if(carInfo.getCreateBy()!=null && StringUtils.isBlank(carInfo.getCreateName())){
+//                    createIds.add(carInfo.getCreateBy());
+//                }
+//                if(carInfo.getUpdateBy()!=null && StringUtils.isBlank(carInfo.getUpdateName())){
+//                    updateIds.add(carInfo.getUpdateBy());
+//                }
+//            }
+//            List<CarAdmUser>  creator = userManagementService.getUsersByIdList(createIds);
+//            List<CarAdmUser>  updator = userManagementService.getUsersByIdList(updateIds);
+//            for (CarInfo carInfo : list){
+//                if (carInfo.getCreateBy()!=null && StringUtils.isBlank(carInfo.getCreateName())){
+//                    for (CarAdmUser user : creator){
+//                        if ((carInfo.getCreateBy()).equals(user.getUserId())){
+//                            carInfo.setCreateName(user.getUserName());
+//                            break;
+//                        }
+//                    }
+//                }
+//                if (carInfo.getUpdateBy()!=null && StringUtils.isBlank(carInfo.getUpdateName())){
+//                    for (CarAdmUser user : updator){
+//                        if ((carInfo.getUpdateBy()).equals(user.getUserId())){
+//                            carInfo.setUpdateName(user.getUserName());
+//                            break;
+//                        }
+//                    }
+//                }
+//
+//                builder.append(carInfo.getLicensePlates() == null ? "" : carInfo.getLicensePlates()).append(",");
+//                builder.append(carInfo.getCityName() == null ? "" : carInfo.getCityName()).append(",");
+//                builder.append(carInfo.getStatus()==1?"有效":"无效").append(",");
+//                builder.append(carInfo.getSupplierName() == null ? "" : carInfo.getSupplierName()).append(",");
+//                builder.append(carInfo.getModeName() == null ? "" : carInfo.getModeName()).append(",");
+//                builder.append(carInfo.getModelDetail() == null ? "" : carInfo.getModelDetail()).append(",");
+//                builder.append(carInfo.getPurchaseDate() == null ? "" : "\t" + carInfo.getPurchaseDate()).append(",");
+//                builder.append(carInfo.getColor() == null ? "" : carInfo.getColor()).append(",");
+//                builder.append(carInfo.getEngineNo() == null ? "" : "\t" + carInfo.getEngineNo()).append(",");
+//                builder.append(carInfo.getFrameNo() == null ? "" : "\t" + carInfo.getFrameNo()).append(",");
+//                builder.append(carInfo.getNextInspectDate() == null ? "" : "\t" + carInfo.getNextInspectDate()).append(",");
+//                builder.append(carInfo.getNextMaintenanceDate() == null ? "" : "\t" + carInfo.getNextMaintenanceDate()).append(",");
+//                builder.append(carInfo.getRentalExpireDate() == null ? "" : "\t" + carInfo.getRentalExpireDate()).append(",");
+//                builder.append(carInfo.getNextClassDate() == null ? "" : "\t" + carInfo.getNextClassDate()).append(",");
+//                builder.append(carInfo.getNextOperationDate() == null ? "" : "\t" + carInfo.getNextOperationDate()).append(",");
+//                builder.append(carInfo.getNextSecurityDate() == null ? "" : "\t" + carInfo.getNextSecurityDate()).append(",");
+//                builder.append(carInfo.getTwoLevelMaintenanceDate() == null ? "" : "\t" + carInfo.getTwoLevelMaintenanceDate()).append(",");
+//                builder.append(carInfo.getCarryPassengers() == null ? "" : carInfo.getCarryPassengers()).append(",");
+//                builder.append(carInfo.getVehicleBrand() == null ? "" : carInfo.getVehicleBrand()).append(",");
+//                builder.append(carInfo.getClicensePlatesColor() == null ? "" : carInfo.getClicensePlatesColor()).append(",");
+//                builder.append(carInfo.getVehicleVINCode() == null ? "" : "\t" + carInfo.getVehicleVINCode()).append(",");
+//                builder.append(carInfo.getVehicleRegistrationDate() == null ? "" : "\t" + carInfo.getVehicleRegistrationDate()).append(",");
+//                Integer fuelType = carInfo.getOverHaulStatus();
+//                String  fuelTypeStr = "无";
+//                if(null!=fuelType && fuelType==1){
+//                    fuelTypeStr = "汽油";
+//                }else if(null!=fuelType && fuelType==2){
+//                    fuelTypeStr = "柴油";
+//                }else if(null!=fuelType && fuelType==3){
+//                    fuelTypeStr = "电";
+//                }else if(null!=fuelType && fuelType==4){
+//                    fuelTypeStr = "混合油";
+//                }else if(null!=fuelType && fuelType==5){
+//                    fuelTypeStr = "天然气";
+//                }else if(null!=fuelType && fuelType==6){
+//                    fuelTypeStr = "液化石油气";
+//                }else if(null!=fuelType && fuelType==7){
+//                    fuelTypeStr = "甲醇";
+//                }else if(null!=fuelType && fuelType==8){
+//                    fuelTypeStr = "乙醇";
+//                }else if(null!=fuelType && fuelType==9){
+//                    fuelTypeStr = "太阳能";
+//                }else if(null!=fuelType && fuelType==10){
+//                    fuelTypeStr = "混合动力";
+//                }
+//                builder.append(fuelTypeStr).append(",");
+//                builder.append(carInfo.getVehicleEngineDisplacement() == null ? "" : carInfo.getVehicleEngineDisplacement()).append(",");
+//                builder.append(carInfo.getVehicleEnginePower() == null ? "" : carInfo.getVehicleEnginePower()).append(",");
+//                builder.append(carInfo.getVehicleEngineWheelbase() == null ? "" : carInfo.getVehicleEngineWheelbase()).append(",");
+//                builder.append(carInfo.getTransportNumber() == null ? "" : "\t" + carInfo.getTransportNumber()).append(",");
+//                builder.append(carInfo.getCertificationAuthority() == null ? "" : carInfo.getCertificationAuthority()).append(",");
+//                builder.append(carInfo.getOperatingRegion() == null ? "" : carInfo.getOperatingRegion()).append(",");
+//                builder.append(carInfo.getTransportNumberDateStart() == null ? "" : "\t" + carInfo.getTransportNumberDateStart()).append(",");
+//                builder.append(carInfo.getTransportNumberDateEnd() == null ? "" : "\t" + carInfo.getTransportNumberDateEnd()).append(",");
+//                builder.append(carInfo.getFirstDate() == null ? "" : "\t" + carInfo.getFirstDate()).append(",");
+//                Integer overHaulStatus = carInfo.getOverHaulStatus();
+//                String  statusStr = "未知";
+//                if(null!=overHaulStatus && overHaulStatus==1){
+//                    statusStr = "已检修";
+//                }else if(null!=overHaulStatus && overHaulStatus==0){
+//                    statusStr = "未检修";
+//                }
+//                builder.append(statusStr).append(",");
+//                Integer auditingStatus = carInfo.getAuditingStatus();
+//                String  auditingStatusStr = "未审验";
+//                if(null!=auditingStatus && auditingStatus==1){
+//                    auditingStatusStr = "合格";
+//                }else if(null!=auditingStatus && auditingStatus==2){
+//                    auditingStatusStr = "不合格";
+//                }
+//                builder.append(auditingStatusStr).append(",");
+//                builder.append(carInfo.getAuditingDate() == null ? "" : "\t" + carInfo.getAuditingDate()).append(",");
+//                builder.append(carInfo.getEquipmentNumber() == null ? "" : "\t" + carInfo.getEquipmentNumber()).append(",");
+//                builder.append(carInfo.getGpsBrand() == null ? "" : carInfo.getGpsBrand()).append(",");
+//                builder.append(carInfo.getGpsType() == null ? "" : carInfo.getGpsType()).append(",");
+//                builder.append(carInfo.getGpsImei() == null ? "" : "\t" + carInfo.getGpsImei()).append(",");
+//                builder.append(carInfo.getGpsDate() == null ? "" : "\t" + carInfo.getGpsDate()).append(",");
+//                builder.append(carInfo.getCreateName() == null ? "" : carInfo.getCreateName()).append(",");
+//                builder.append(carInfo.getCreateDate() == null ? "" : "\t" + carInfo.getCreateDate()).append(",");
+//                builder.append(carInfo.getUpdateName() == null ? "" : carInfo.getUpdateName()).append(",");
+//                builder.append(carInfo.getUpdateDate() == null ? "" : "\t" + carInfo.getUpdateDate()).append(",");
+//                builder.append(carInfo.getMemo() == null ? "" : carInfo.getMemo()).append(",");
+//                builder.append(carInfo.getDriverName() == null ? "" : carInfo.getDriverName()).append(",");
+//                builder.append(carInfo.getVehicleOwner() == null ? "" : carInfo.getVehicleOwner()).append(",");
+//                builder.append(carInfo.getVehicleType() == null ? "" : carInfo.getVehicleType());
+//                datas.add(builder.toString());
+//                builder.setLength(0);
+//            }
+//        }
+//    }
+
     @Override
-    public void getExportExcel(CarInfo params, List<String> datas) {
+    public PageInfo<CarInfo> findCarInfo(CarInfo params) {
         String cities = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getCityIds(), ",");
         String suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds(), ",");
         String teamIds = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getTeamIds(), ",");
@@ -2524,12 +2671,19 @@ public class CarInfoServiceImpl implements CarInfoService {
         params.setSupplierIds(suppliers);
         params.setCities(cities);
         params.setTeamIds(teamIds);
+
+        PageHelper.startPage(params.getPage(), params.getPagesize(),true);
         List<CarInfo> list = carInfoExMapper.selectListNoPage(params);
-        StringBuilder builder = new StringBuilder();
-        if(list != null && list.size()>0){
+        PageInfo<CarInfo> pageInfo = new PageInfo<>(list);
+        return pageInfo;
+    }
+
+    @Override
+    public void doTrans4Csv(List<String> casDataList, List<CarInfo> carInfoList) {
+        if(carInfoList != null && carInfoList.size()>0){
             List<Integer> createIds = new ArrayList<>();
             List<Integer> updateIds = new ArrayList<>();
-            for(CarInfo carInfo:list){
+            for(CarInfo carInfo:carInfoList){
                 if(carInfo.getCreateBy()!=null && StringUtils.isBlank(carInfo.getCreateName())){
                     createIds.add(carInfo.getCreateBy());
                 }
@@ -2539,21 +2693,34 @@ public class CarInfoServiceImpl implements CarInfoService {
             }
             List<CarAdmUser>  creator = userManagementService.getUsersByIdList(createIds);
             List<CarAdmUser>  updator = userManagementService.getUsersByIdList(updateIds);
-            for (CarInfo carInfo : list){
-                if (carInfo.getCreateBy()!=null && StringUtils.isBlank(carInfo.getCreateName())){
-                    for (CarAdmUser user : creator){
-                        if ((carInfo.getCreateBy()).equals(user.getUserId())){
-                            carInfo.setCreateName(user.getUserName());
-                            break;
-                        }
+
+            Map<String,CarAdmUser> createByMap = new HashMap<>();
+            Map<String,CarAdmUser> updateByMap = new HashMap<>();
+
+            if(creator != null){
+                for (CarAdmUser user : creator){
+                    createByMap.put("t_"+user.getUserId(),user);
+                }
+            }
+            if(updator != null){
+                for (CarAdmUser user : updator){
+                    updateByMap.put("t_"+user.getUserId(),user);
+                }
+            }
+
+            CarAdmUser item = null;
+            for (CarInfo carInfo : carInfoList){
+                StringBuilder builder = new StringBuilder();
+                if (carInfo.getCreateBy()!=null && StringUtils.isEmpty(carInfo.getCreateName())){
+                    item = createByMap.get("t_"+carInfo.getCreateBy());
+                    if(item != null){
+                        carInfo.setCreateName(item.getUserName());
                     }
                 }
                 if (carInfo.getUpdateBy()!=null && StringUtils.isBlank(carInfo.getUpdateName())){
-                    for (CarAdmUser user : updator){
-                        if ((carInfo.getUpdateBy()).equals(user.getUserId())){
-                            carInfo.setUpdateName(user.getUserName());
-                            break;
-                        }
+                    item = updateByMap.get("t_"+carInfo.getUpdateBy());
+                    if(item != null){
+                        carInfo.setUpdateName(item.getUserName());
                     }
                 }
                 builder.append(carInfo.getLicensePlates() == null ? "" : carInfo.getLicensePlates()).append(",");
@@ -2641,9 +2808,10 @@ public class CarInfoServiceImpl implements CarInfoService {
                 builder.append(carInfo.getDriverName() == null ? "" : carInfo.getDriverName()).append(",");
                 builder.append(carInfo.getVehicleOwner() == null ? "" : carInfo.getVehicleOwner()).append(",");
                 builder.append(carInfo.getVehicleType() == null ? "" : carInfo.getVehicleType());
-                datas.add(builder.toString());
-                builder.setLength(0);
+                casDataList.add(builder.toString());
             }
         }
     }
+
+
 }
