@@ -171,7 +171,7 @@ public class OrderAppraisalController extends DriverQueryController{
 									 @Verify(param="createDateEnd",rule="required")String createDateEnd,
 									 String evaluateScore,String sortName, String sortOrder,HttpServletRequest request,HttpServletResponse response){
 		int page =1;
-		int pageSize = 10000;
+		int pageSize = CsvUtils.downPerSize;
 
 		if (StringUtils.isEmpty(driverPhone) && StringUtils.isEmpty(teamId)){
 			//请选择一个车队号或输入司机手机
@@ -277,7 +277,7 @@ public class OrderAppraisalController extends DriverQueryController{
 			stringBuffer.append(s.getEvaluateScore()==null?"":s.getEvaluateScore());
 			stringBuffer.append(",");
 
-			stringBuffer.append(StringUtils.isEmpty(s.getEvaluate())?"":s.getEvaluate());
+			stringBuffer.append(StringUtils.isEmpty(s.getEvaluate())?"":s.getEvaluate().replaceAll(",","，"));
 			stringBuffer.append(",");
 
 			stringBuffer.append(s.getMemo()==null?"":s.getMemo().replaceAll(",","，"));//评价

@@ -539,10 +539,10 @@ public class CarInfoController {
                 if(pages == 1 ||pages == 0 ){
                     isLast = true;
                 }
-                isFirst = false;
+
                 carService.doTrans4Csv(csvDataList,carInfoList);
                 CsvUtils.exportCsvV2(response,csvDataList,header,fileName,isFirst,isLast,entity);
-
+                isFirst = false;
                 for(int pageNumber = 2;pageNumber <= pages ; pageNumber++){
 
                     params.setPage(pageNumber);
