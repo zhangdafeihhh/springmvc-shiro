@@ -465,7 +465,7 @@
     LEFT JOIN car_sys_user b on car.create_by=b.user_id
     LEFT JOIN car_sys_user c on car.update_by=c.user_id
     LEFT JOIN car_biz_driver_info driver ON car.driver_id=driver.driver_id
-    WHERE
+     
   <where>
     <if test="cityId !=null and cityId !=0">
       and car.city_id = #{cityId}
