@@ -244,7 +244,7 @@ public class DriverMonthDutyController {
                 isFirst = false;
                 for(int pageNumber = 2; pageNumber <= totalPage; pageNumber++){
                     param.setPageNo(pageNumber);
-                    logger.info("下载司机月排班,参数param："+JSON.toJSONString(param));
+                    logger.info("下载司机月排班,第"+pageNumber+"页，参数param："+JSON.toJSONString(param));
                     pageInfo = driverMonthDutyService.queryDriverDutyList(param);
                     csvDataList = new ArrayList<>();
                     dataTrans( pageInfo.getList(),  csvDataList,headerList);
