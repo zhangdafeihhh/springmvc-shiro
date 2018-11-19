@@ -16,7 +16,7 @@ public interface CarInfoExMapper {
     //查所有车辆信息  有分页
      List<CarInfo> selectList(CarInfo  params);
     //查所有车辆信息  无分页
-     List<CarInfo> selectListNoPage(CarInfo  params);
+//     List<CarInfo> selectListNoPage(CarInfo  params);
     //查所有车辆信息的数量
      int selectListCount(CarInfo carInfoEntity);
     //查询车辆详情信息----车牌号

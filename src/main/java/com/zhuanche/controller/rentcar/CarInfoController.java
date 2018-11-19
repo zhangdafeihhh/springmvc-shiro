@@ -108,11 +108,12 @@ public class CarInfoController {
         params.setSupplierIds(_suppliers);
         params.setCities(_cities);
         params.setTeamIds(_teamId);
-        List<CarInfo> rows = new ArrayList<CarInfo>();
-        rows = carService.selectList(params);
-        int total = carService.selectListCount(params);
 
-        return AjaxResponse.success(new PageDTO(params.getPage(), params.getPagesize(), total, BeanUtil.copyList(rows, CarInfoDTO.class)));
+        PageInfo<CarInfo> pageInfo = carService.findPageByCarInfo(params,params.getPage(),params.getPagesize());
+        List<CarInfo> rows =  pageInfo.getList();
+
+        return AjaxResponse.success(new PageDTO(params.getPage(), params.getPagesize(), Integer.parseInt(pageInfo.getTotal()+""),
+                BeanUtil.copyList(rows, CarInfoDTO.class)));
     }
 
     /**
@@ -464,7 +465,6 @@ public class CarInfoController {
         long  start = System.currentTimeMillis();
         CarInfo params = new CarInfo();
         try {
-
             params.setCities(cities);
             params.setSupplierIds(supplierIds);
             params.setCarModelIds(carModelIds);
@@ -473,7 +473,28 @@ public class CarInfoController {
             params.setCreateDateEnd(createDateEnd);
             params.setStatus(status);
             params.setIsFree(isFree);
+
+            String _cities = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getCityIds(), ",");
+            String _suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds(), ",");
+            String _teamId = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getTeamIds(), ",");
+            String _carModelIds = "";
+            if(params.getCities()!=null && !"".equals(params.getCities()) ){
+                _cities = params.getCities().replace(";", ",");
+            }
+            if(!"".equals(params.getSupplierIds())&&params.getSupplierIds()!=null){
+                _suppliers = params.getSupplierIds().replace(";", ",");
+            }
+            if(!"".equals(params.getCarModelIds())&&params.getCarModelIds()!=null){
+                _carModelIds = params.getCarModelIds().replace(";", ",");
+            }
+            params.setCarModelIds(_carModelIds);
+            params.setSupplierIds(_suppliers);
+            params.setCities(_cities);
+            params.setTeamIds(_teamId);
             params.setPagerSize(CsvUtils.downPerSize);
+
+
+
             logger.info("exportCarInfo:车辆信息导出，请求参数为："+ JSON.toJSONString(params));
 
             /*@SuppressWarnings("deprecation")
@@ -493,7 +514,7 @@ public class CarInfoController {
                 fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
             }
 
-            PageInfo<CarInfo> pageInfos =  carService.findCarInfo(params);
+            PageInfo<CarInfo> pageInfos = carService.findPageByCarInfo(params,params.getPage(),params.getPagesize());
 
 
             CsvUtils entity = new CsvUtils();
@@ -516,7 +537,7 @@ public class CarInfoController {
 
                 for(int pageNumber = 2;pageNumber < pageInfos.getPages() ; pageNumber++){
                     params.setPage(pageNumber);
-                    pageInfos =  carService.findCarInfo(params);
+                    pageInfos =  carService.findPageByCarInfo(params,params.getPage(),params.getPagesize());
                     csvDataList = new ArrayList<>();
                     if(pageNumber == pages){
                         isLast = true;

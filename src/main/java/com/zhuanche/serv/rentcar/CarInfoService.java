@@ -17,7 +17,8 @@ public interface CarInfoService {
 
 
     //查询车辆列表  有分页
-    List<CarInfo> selectList(CarInfo params);
+    public PageInfo<CarInfo> findPageByCarInfo(CarInfo params,int pageNo,int pageSize);
+
 
     //查询车辆列表中的司机数量
     int selectListCount(CarInfo params);
@@ -45,7 +46,7 @@ public interface CarInfoService {
     /*
      * 导出车辆信息操作
      */
-    Workbook exportExcel(CarInfo params, String path) throws Exception;
+//    Workbook exportExcel(CarInfo params, String path) throws Exception;
 
     /*
      * 车辆导入删除
@@ -57,7 +58,7 @@ public interface CarInfoService {
 //    void getExportExcel(CarInfo params, List<String> datas);
 
 
-    public PageInfo<CarInfo> findCarInfo(CarInfo params);
+//    public PageInfo<CarInfo> findCarInfo(CarInfo params);
 
     public void doTrans4Csv(List<String> csvList,List<CarInfo> carInfoList);
 }
