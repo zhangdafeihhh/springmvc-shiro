@@ -3,6 +3,9 @@ package com.zhuanche.serv.rentcar.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Sets;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
@@ -29,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -86,6 +90,9 @@ public class CarInfoServiceImpl implements CarInfoService {
     }
 
     @Override
+    @MasterSlaveConfigs(configs={
+            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+    } )
     public PageInfo<CarInfo> findPageByCarInfo(CarInfo params,int pageNo,int pageSize){
         PageHelper.startPage(pageNo, pageSize, true);
         List<CarInfo> list =   carInfoExMapper.selectList(params);
@@ -93,10 +100,7 @@ public class CarInfoServiceImpl implements CarInfoService {
         return pageInfo;
     }
 
-    @Override
-    public int selectListCount(CarInfo params) {
-        return carInfoExMapper.selectListCount(params);
-    }
+
 
     @Override
     public CarInfo selectCarInfoByLicensePlates(

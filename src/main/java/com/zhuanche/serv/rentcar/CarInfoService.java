@@ -20,8 +20,7 @@ public interface CarInfoService {
     public PageInfo<CarInfo> findPageByCarInfo(CarInfo params,int pageNo,int pageSize);
 
 
-    //查询车辆列表中的司机数量
-    int selectListCount(CarInfo params);
+
 
     //查询车辆详情信息
     CarInfo selectCarInfoByLicensePlates(CarInfo params);
