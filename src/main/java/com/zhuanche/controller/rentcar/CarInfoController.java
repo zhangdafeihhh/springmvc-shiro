@@ -499,7 +499,7 @@ public class CarInfoController {
             params.setSupplierIds(_suppliers);
             params.setCities(_cities);
             params.setTeamIds(_teamId);
-            params.setPagerSize(CsvUtils.downPerSize);
+            params.setPagesize(CsvUtils.downPerSize);
             params.setPage(1);
 
             logger.info("exportCarInfo:车辆信息导出，请求参数为："+ JSON.toJSONString(params));
