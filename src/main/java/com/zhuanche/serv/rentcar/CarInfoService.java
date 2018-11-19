@@ -60,4 +60,6 @@ public interface CarInfoService {
 //    public PageInfo<CarInfo> findCarInfo(CarInfo params);
 
     public void doTrans4Csv(List<String> csvList,List<CarInfo> carInfoList);
+
+    void transContent(List<CarInfo> list);
 }
