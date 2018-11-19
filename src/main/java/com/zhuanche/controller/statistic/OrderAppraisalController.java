@@ -174,8 +174,6 @@ public class OrderAppraisalController extends DriverQueryController{
 		int page =1;
 		int pageSize = CsvUtils.downPerSize;
 
-
-
 		List<String> headerList = new ArrayList<>();
 		headerList.add("司机姓名,司机手机,车牌号,订单号,评分,评价,备注,时间");
 

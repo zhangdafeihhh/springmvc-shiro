@@ -447,7 +447,7 @@ public class OrderController{
 
 		 int code = -1;
 		 AjaxResponse responseX = null;
-		 int pageSize = 10000;
+		 int pageSize = CsvUtils.downPerSize;
 		 paramMap.put("pageSize",pageSize);//每页记录数
 		 List<String> csvDataList = new ArrayList<>();
 
