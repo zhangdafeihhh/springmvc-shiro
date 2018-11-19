@@ -215,7 +215,6 @@
     DATE_FORMAT(car.next_class_date, '%Y-%m-%d') AS next_class_date,
     DATE_FORMAT(car.two_level_maintenance_date, '%Y-%m-%d') AS two_level_maintenance_date,
     model.model_name ,
-    supplier.supplier_full_name    ,
     car.license_plates  , car.brand, car.car_model_id,car.model_detail,color,
     car.engine_no,car.frame_no,
     DATE_FORMAT(car.next_inspect_date, '%Y-%m-%d') next_inspect_date,
