@@ -16,13 +16,14 @@
     <result column="suppliers" property="suppliers" jdbcType="VARCHAR" />
     <result column="team_id" property="teamId" jdbcType="VARCHAR" />
     <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="group_ids" property="groupIds" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    user_id, account, user_name, password, role_id, account_type, status, remark, create_user, 
-    create_date, cities, suppliers, team_id, phone
+    user_id, account, user_name, password, role_id, account_type, status, remark, create_user,
+    create_date, cities, suppliers, team_id, phone, group_ids
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select 
+    select
     <include refid="Base_Column_List" />
     from car_adm_user
     where user_id = #{userId,jdbcType=INTEGER}
@@ -35,16 +36,16 @@
     <selectKey resultType="java.lang.Integer" keyProperty="userId" order="AFTER" >
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into car_adm_user (account, user_name, password, 
-      role_id, account_type, status, 
-      remark, create_user, create_date, 
-      cities, suppliers, team_id, 
-      phone)
-    values (#{account,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
-      #{roleId,jdbcType=INTEGER}, #{accountType,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
-      #{remark,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, 
-      #{cities,jdbcType=VARCHAR}, #{suppliers,jdbcType=VARCHAR}, #{teamId,jdbcType=VARCHAR}, 
-      #{phone,jdbcType=VARCHAR})
+    insert into car_adm_user (account, user_name, password,
+    role_id, account_type, status,
+    remark, create_user, create_date,
+    cities, suppliers, team_id,
+    phone, group_ids)
+    values (#{account,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
+    #{roleId,jdbcType=INTEGER}, #{accountType,jdbcType=INTEGER}, #{status,jdbcType=INTEGER},
+    #{remark,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP},
+    #{cities,jdbcType=VARCHAR}, #{suppliers,jdbcType=VARCHAR}, #{teamId,jdbcType=VARCHAR},
+    #{phone,jdbcType=VARCHAR}, #{groupIds,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarAdmUser" >
     <selectKey resultType="java.lang.Integer" keyProperty="userId" order="AFTER" >
@@ -91,6 +92,9 @@
       <if test="phone != null" >
         phone,
       </if>
+      <if test="groupIds != null" >
+        group_ids,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="account != null" >
@@ -131,6 +135,9 @@
       </if>
       <if test="phone != null" >
         #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="groupIds != null" >
+        #{groupIds,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -176,24 +183,29 @@
       <if test="phone != null" >
         phone = #{phone,jdbcType=VARCHAR},
       </if>
+      <if test="groupIds != null" >
+        group_ids = #{groupIds,jdbcType=VARCHAR},
+      </if>
+
     </set>
     where user_id = #{userId,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.CarAdmUser" >
     update car_adm_user
     set account = #{account,jdbcType=VARCHAR},
-      user_name = #{userName,jdbcType=VARCHAR},
-      password = #{password,jdbcType=VARCHAR},
-      role_id = #{roleId,jdbcType=INTEGER},
-      account_type = #{accountType,jdbcType=INTEGER},
-      status = #{status,jdbcType=INTEGER},
-      remark = #{remark,jdbcType=VARCHAR},
-      create_user = #{createUser,jdbcType=VARCHAR},
-      create_date = #{createDate,jdbcType=TIMESTAMP},
-      cities = #{cities,jdbcType=VARCHAR},
-      suppliers = #{suppliers,jdbcType=VARCHAR},
-      team_id = #{teamId,jdbcType=VARCHAR},
-      phone = #{phone,jdbcType=VARCHAR}
+    user_name = #{userName,jdbcType=VARCHAR},
+    password = #{password,jdbcType=VARCHAR},
+    role_id = #{roleId,jdbcType=INTEGER},
+    account_type = #{accountType,jdbcType=INTEGER},
+    status = #{status,jdbcType=INTEGER},
+    remark = #{remark,jdbcType=VARCHAR},
+    create_user = #{createUser,jdbcType=VARCHAR},
+    create_date = #{createDate,jdbcType=TIMESTAMP},
+    cities = #{cities,jdbcType=VARCHAR},
+    suppliers = #{suppliers,jdbcType=VARCHAR},
+    team_id = #{teamId,jdbcType=VARCHAR},
+    phone = #{phone,jdbcType=VARCHAR},
+    group_ids = #{groupIds,jdbcType=VARCHAR}
     where user_id = #{userId,jdbcType=INTEGER}
   </update>
 </mapper>

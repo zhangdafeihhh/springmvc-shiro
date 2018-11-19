@@ -4,6 +4,7 @@ import com.zhuanche.dto.CarDriverTeamDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
 import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.request.DriverTeamRequest;
+import com.zhuanche.request.TeamGroupRequest;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -36,4 +37,6 @@ public interface CarDriverTeamExMapper{
 	List<CarDriverTeam> queryDriverTeamList(@Param("cityId") Integer cityId, @Param("supplierId") Integer supplierId);
 
 	List<CarRelateTeam> queryDriverTeamListByDriverId(@Param("driverIds") String driverIds);
+
+	List<Map<String, Object>> queryForListByPids(TeamGroupRequest teamGroupRequest);
 }

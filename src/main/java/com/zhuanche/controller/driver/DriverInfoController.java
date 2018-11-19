@@ -12,6 +12,7 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.dto.driver.TelescopeDriverInfo;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
@@ -750,5 +751,26 @@ public class DriverInfoController {
             logger.error(LOGTAG + "根据车牌号查询司机信息异常license_plates="+license_plates,e );
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
+    }
+
+    /**
+     * 司机信息
+     * @param phone
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/findTelescopeDriverInfo")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
+    })
+    public AjaxResponse findTelescopeDriverInfo(@Verify(param = "phone", rule = "required") String phone) {
+        CarBizDriverInfoDTO carBizDriverInfoDTO = carBizDriverInfoService.selectByPhone(phone);
+        if(null == carBizDriverInfoDTO){
+            return AjaxResponse.fail(RestErrorCode.NOT_FOUND_RESULT);
+        }
+        // 查询城市名称，供应商名称，服务类型，加盟类型
+        carBizDriverInfoDTO = carBizDriverInfoService.getBaseStatis(carBizDriverInfoDTO);
+        TelescopeDriverInfo telescopeDriverInfo = BeanUtil.copyObject(carBizDriverInfoDTO, TelescopeDriverInfo.class);
+        return AjaxResponse.success(telescopeDriverInfo);
     }
 }

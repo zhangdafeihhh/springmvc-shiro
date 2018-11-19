@@ -25,10 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
   * @description: 城市供应商车队联动查询返回service
@@ -380,5 +377,26 @@ public class CitySupplierTeamCommonService {
         return carDriverTeams;
     }
 
+    /**
+     * @Desc: pid查询车队下小组
+     * @param:
+     * @return:
+     * @Author: lunan
+     * @Date: 2018/9/3
+     */
+    public List<Map<String, Object>> getTeamsByPids(Set<String> teamIds ){
+        if(Check.NuNObj(teamIds)) {
+            return null;
+        }
+        try{
+            TeamGroupRequest teamGroupRequest = new TeamGroupRequest();
+            teamGroupRequest.setTeamIds(teamIds);
+            List<Map<String, Object>> carDriverTeams = carDriverTeamExMapper.queryForListByPids(teamGroupRequest);
+            return carDriverTeams;
+        }catch (Exception e){
+            logger.error("查询车队下小组异常:{}",e);
+            return null;
+        }
+    }
 }
 

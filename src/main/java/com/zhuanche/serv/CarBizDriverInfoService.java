@@ -9,6 +9,7 @@ import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.rocketmq.CommonRocketProducer;
+import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
@@ -22,10 +23,8 @@ import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.serv.mdbcarmanage.CarBizDriverUpdateService;
 import com.zhuanche.serv.mongo.DriverMongoService;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.BeanUtil;
-import com.zhuanche.util.Common;
+import com.zhuanche.util.*;
 import com.zhuanche.util.DateUtil;
-import com.zhuanche.util.ValidateUtils;
 import com.zhuanche.util.encrypt.MD5Utils;
 import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.mdbcarmanage.CarDriverTeamMapper;
@@ -149,6 +148,9 @@ public class CarBizDriverInfoService {
 
     @Autowired
     private CarDriverTeamService carDriverTeamService;
+
+    @Value("${telescope.supplierId}")
+    private Integer telescopeSupplierId ;
 
 
     /**
@@ -2952,5 +2954,33 @@ public class CarBizDriverInfoService {
             }
         }
         return driverId;
+    }
+
+
+    public boolean addTelescopeDriver(String phone,String name){
+        CarBizDriverInfoDTO carBizDriverInfoDTO = carBizDriverInfoExMapper.selectByPhone(phone);
+        if(null != carBizDriverInfoDTO){
+            return true;
+        }
+        CarBizDriverInfo record = new CarBizDriverInfo();
+        CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(telescopeSupplierId);
+        record.setServiceCity(carBizSupplier.getSupplierCity());
+        record.setSupplierId(carBizSupplier.getSupplierId());
+        record.setPhone(phone);
+        record.setName(name);
+        record.setStatus(1);
+        String initPwd = String.valueOf((int)((Math.random()*9+1)*100000));
+        record.setPassword(Md5Util.md5(initPwd));
+        boolean result = carBizDriverInfoMapper.insertSelective(record)>0;
+        if(result){
+            try{
+                //短信通知
+                String text = record.getName() + "，您好！已为您成功开通“首汽约车司机端”千里眼管理账号。登录账号为："+record.getPhone()+"，初始密码为："+initPwd+"（为保障账户安全，请您登录后进行密码修改）";
+                SmsSendUtil.send( record.getPhone() , text);
+            }catch (Exception e){
+                logger.error("开通千里眼账号短信通知异常：",e);
+            }
+        }
+        return result;
     }
 }

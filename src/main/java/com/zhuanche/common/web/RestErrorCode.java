@@ -65,6 +65,8 @@ public final class RestErrorCode{
 	public static final int MSG_CODE_REPEAT_SEND                      = 1012;
 	@ResultMessage("登录太频繁，请{0}分钟后重新登录")
 	public static final int DO_LOGIN_FREQUENTLY           = 1013;
+	@ResultMessage("手机号已存在")
+	public static final int PHONE_EXIST                          = 1014;
 
 	//----------------------------------------------权限管理
 	@ResultMessage("父权限不存在")

@@ -313,5 +313,11 @@ public class UserManagementService{
 		redisSessionDAO.clearRelativeSession(null, null , userId );//自动清理用户会话
 		return AjaxResponse.success( null );
 	}
-	
+
+
+	/**八、查询用户列表**/
+	public boolean userPhoneExist(String phone) {
+		List<CarAdmUser> users = carAdmUserExMapper.queryUsers( null ,  null, null, phone, null );
+		return (null!=users && users.size()>0);
+	}
 }
