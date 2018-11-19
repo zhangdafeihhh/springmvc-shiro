@@ -363,6 +363,7 @@ public class DriverMonthDutyController {
         param.setCityIds(commonService.setStringShiftInteger(data.getCityIds()));
         param.setSupplierIds(commonService.setStringShiftInteger(data.getSupplierIds()));
         param.setTeamIds(data.getTeamIds());
+        logger.info("分页查询月排班列表数据参数为:"+JSON.toJSONString(param));
         PageInfo<CarDriverMonthDTO> pageInfo = driverMonthDutyService.queryDriverDutyList(param);
 
         PageDTO pageDTO = new PageDTO();
