@@ -118,7 +118,7 @@ public class BusAssignmentService {
 	 * @return BaseEntity
 	 * @throws
 	 */
-	@SuppressWarnings("resource")
+	@SuppressWarnings({ "resource" })
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE) })
 	public PageDTO orderToDoListForCar(BusCarDTO busCarDTO) {
@@ -148,14 +148,14 @@ public class BusAssignmentService {
 
 			// 返回数据
 			JSONArray data = result.getJSONArray("data");
-			List<String> licensePlatesList = new ArrayList<>();
+			List<String> invalidLicensePlatesList = new ArrayList<>();
 			if (data != null) {
 				for (int i = 0; i < data.size(); i++) {
 					JSONObject bean = data.getJSONObject(i);
-					licensePlatesList.add((String) bean.get("licensePlates"));
+					invalidLicensePlatesList.add((String) bean.get("licensePlates"));
 				}
 			}
-			logger.info("[ BusAssignmentService-orderToDoListForCar ] 当前不可以指派车辆车牌号:{}", licensePlatesList);
+			logger.info("[ BusAssignmentService-orderToDoListForCar ] 当前不可以指派车辆车牌号:{}", invalidLicensePlatesList);
 			
 			// 封装查询参数, 查询可用车辆
 			BusCarRicherDTO richerDTO = BeanUtil.copyObject(busCarDTO, BusCarRicherDTO.class);
@@ -164,10 +164,12 @@ public class BusAssignmentService {
 				int seatNum = carBizCarGroupExMapper.getSeatNumByGroupId(busCarDTO.getGroupId());
 				richerDTO.setSeatNum(seatNum);
 			}
-			if (!licensePlatesList.isEmpty()) {
-				richerDTO.setLicensePlatesList(licensePlatesList);
+			// 不可用车辆
+			if (!invalidLicensePlatesList.isEmpty()) {
+				richerDTO.setInvalidLicensePlatesList(invalidLicensePlatesList);
 			}
-			richerDTO.setSupplierIds(WebSessionUtil.getCurrentLoginUser().getSupplierIds());// 当然用户的供应商权限
+			// 当然用户的供应商权限
+			richerDTO.setSupplierIds(WebSessionUtil.getCurrentLoginUser().getSupplierIds());
 			List<Map<String, Object>> busCarList = carBizCarInfoExMapper.queryBusCarList(richerDTO);
 			Page<Map<String, Object>> page = (Page<Map<String, Object>>) busCarList;
 			return new PageDTO(page.getPageNum(), page.getPageSize(), page.getTotal(), busCarList);
@@ -214,14 +216,14 @@ public class BusAssignmentService {
 
 			// 返回数据
 			JSONArray data = result.getJSONArray("data");
-			List<Integer> driverIds = new ArrayList<>();
+			List<Integer> invalidDriverIds = new ArrayList<>();
 			if (data != null) {
 				for (int i = 0; i < data.size(); i++) {
 					JSONObject bean = data.getJSONObject(i);
-					driverIds.add((Integer) bean.get("driverId"));
+					invalidDriverIds.add((Integer) bean.get("driverId"));
 				}
 			}
-			logger.info("[ BusAssignmentService-orderToDoListForDriver ] 当前不可以指派司机ID:{}", driverIds);
+			logger.info("[ BusAssignmentService-orderToDoListForDriver ] 当前不可以指派司机ID:{}", invalidDriverIds);
 
 			// 封装查询参数, 查询可用司机
 			BusDriverRicherDTO richerDTO = BeanUtil.copyObject(busDriverDTO, BusDriverRicherDTO.class);
@@ -230,10 +232,12 @@ public class BusAssignmentService {
 				int seatNum = carBizCarGroupExMapper.getSeatNumByGroupId(busDriverDTO.getGroupId());
 				richerDTO.setSeatNum(seatNum);
 			}
-			if (!driverIds.isEmpty()) {
-				richerDTO.setDriverIds(driverIds);
+			// 不可用司机
+			if (!invalidDriverIds.isEmpty()) {
+				richerDTO.setInvalidDriverIds(invalidDriverIds);
 			}
-			richerDTO.setSupplierIds(WebSessionUtil.getCurrentLoginUser().getSupplierIds());// 当然用户的供应商权限
+			// 当然用户的供应商权限
+			richerDTO.setSupplierIds(WebSessionUtil.getCurrentLoginUser().getSupplierIds());
 			List<Map<String, Object>> busDriverList = carBizDriverInfoExMapper.queryBusDriverList(richerDTO);
 			Page<Map<String, Object>> page = (Page<Map<String, Object>>) busDriverList;
 			return new PageDTO(page.getPageNum(), page.getPageSize(), page.getTotal(), busDriverList);

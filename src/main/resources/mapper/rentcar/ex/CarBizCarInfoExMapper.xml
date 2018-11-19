@@ -148,19 +148,17 @@
 			car_biz_car_group g ON m.group_id = g.group_id
 		WHERE
 			c.STATUS = 1 AND
-			g.type = 2
+			g.type = 2 AND
+			car_id != 0
 		<if test="licensePlates != null and licensePlates != ''">
-			and c.license_plates = #{licensePlates}
+			and c.license_plates LIKE CONCAT('%',#{licensePlates},'%')
 		</if>
-		<if test="licensePlatesList != null and !licensePlatesList.isEmpty()">
+		<if test="invalidLicensePlatesList != null and !invalidLicensePlatesList.isEmpty()">
 			and c.license_plates not in
-			<foreach item="item" index="index" collection="licensePlatesList" open="(" separator="," close=")">
+			<foreach item="item" index="index" collection="invalidLicensePlatesList" open="(" separator="," close=")">
 				#{item}
 			</foreach>
 		</if>
-<!-- 		<if test="groupId != null"> -->
-<!-- 			and g.group_id = #{groupId} -->
-<!-- 		</if> -->
 		<if test="seatNum != null">
 			and g.seat_num >= #{seatNum}
 		</if>

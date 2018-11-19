@@ -1504,25 +1504,22 @@
 			LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
 			LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
 		where 
-			g.type=2 and i.status=1
+			g.type=2 AND i.status=1 AND i.driver_id != 0
 		<if test="driverId != null">
 			and i.driver_id = #{driverId}
 		</if>
-		<if test="driverIds != null and !driverIds.isEmpty()">
+		<if test="invalidDriverIds != null and !invalidDriverIds.isEmpty()">
 			and i.driver_id not in
-			<foreach item="item" index="index" collection="driverIds" open="(" separator="," close=")">
+			<foreach item="item" index="index" collection="invalidDriverIds" open="(" separator="," close=")">
 				#{item}
 			</foreach>
 		</if>
 		<if test="name != null and name != ''">
-			and i.name LIKE CONCAT(#{name},'%')
+			and i.name LIKE CONCAT('%',#{name},'%')
 		</if>
 		<if test="phone != null and phone != ''">
-			and i.phone LIKE CONCAT(#{phone},'%')
+			and i.phone LIKE CONCAT('%',#{phone},'%')
 		</if>
-<!-- 		<if test="groupId != null"> -->
-<!-- 			and i.group_id = #{groupId} -->
-<!-- 		</if> -->
 		<if test="seatNum != null">
 			and g.seat_num >= #{seatNum}
 		</if>

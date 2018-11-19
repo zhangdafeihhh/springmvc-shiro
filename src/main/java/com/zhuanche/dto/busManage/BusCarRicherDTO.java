@@ -14,8 +14,10 @@ public class BusCarRicherDTO extends BusCarDTO {
 
 	private static final long serialVersionUID = 2418814219259764973L;
 
-	/** 不可用车牌号 **/
+	/** 可用车牌号 **/
 	private List<String> licensePlatesList;
+	/** 不可用车牌号 **/
+	private List<String> invalidLicensePlatesList;
 	/** 供应商ID集合 **/
 	private Set<Integer> supplierIds;
 	/** 座位数 **/
@@ -27,6 +29,14 @@ public class BusCarRicherDTO extends BusCarDTO {
 
 	public void setLicensePlatesList(List<String> licensePlatesList) {
 		this.licensePlatesList = licensePlatesList;
+	}
+
+	public List<String> getInvalidLicensePlatesList() {
+		return invalidLicensePlatesList;
+	}
+
+	public void setInvalidLicensePlatesList(List<String> invalidLicensePlatesList) {
+		this.invalidLicensePlatesList = invalidLicensePlatesList;
 	}
 
 	public Set<Integer> getSupplierIds() {
