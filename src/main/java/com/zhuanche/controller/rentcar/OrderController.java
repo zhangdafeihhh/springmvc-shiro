@@ -1,5 +1,27 @@
 package com.zhuanche.controller.rentcar;
 
+import java.net.URLEncoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.util.StringUtil;
@@ -9,36 +31,31 @@ import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
-import com.zhuanche.dto.rentcar.*;
+import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
+import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
+import com.zhuanche.dto.rentcar.CarFactOrderInfoDTO;
+import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
+import com.zhuanche.dto.rentcar.ServiceTypeDTO;
 import com.zhuanche.entity.DriverOrderRecord.OrderTimeEntity;
-import com.zhuanche.entity.rentcar.*;
+import com.zhuanche.entity.rentcar.CarBizCity;
+import com.zhuanche.entity.rentcar.CarBizCustomer;
+import com.zhuanche.entity.rentcar.CarBizDriverInfo;
+import com.zhuanche.entity.rentcar.CarBizOrderSettleEntity;
+import com.zhuanche.entity.rentcar.CarBizOrderWaitingPeriod;
+import com.zhuanche.entity.rentcar.CarBizSupplier;
+import com.zhuanche.entity.rentcar.CarFactOrderInfo;
+import com.zhuanche.entity.rentcar.CarGroupEntity;
+import com.zhuanche.entity.rentcar.ServiceEntity;
 import com.zhuanche.serv.order.OrderService;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import com.zhuanche.util.excel.CsvUtils;
+
 import mapper.rentcar.CarBizCustomerMapper;
 import mapper.rentcar.CarBizDriverInfoMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarFactOrderExMapper;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
  * ClassName: OrderController 
@@ -953,13 +970,17 @@ public class OrderController{
 			result.setYyperson(orderDissent.getYyperson());
 		}
 		//九、补全此订单的cancel_reason
-		CarFactOrderInfo orderCancelReason = carFactOrderExMapper.selectCancelReason( Long.valueOf(orderId) );
-		if(orderCancelReason!=null) {
-			result.setQxmemo(orderCancelReason.getQxmemo());
-			result.setQxdate(orderCancelReason.getQxdate());
-			result.setQxperson(orderCancelReason.getQxperson());
-			result.setQxreasonname(orderCancelReason.getQxreasonname());
-			result.setQxcancelstatus(orderCancelReason.getQxcancelstatus());
+		JSONObject orderCancelInfo = orderService.getOrderCancelInfo(""+orderId);
+		//示例：{"reasonId":226286645,"orderId":457740549,"shouldDeducted":null,"factDeducted":null,"cancelReasonId":null,"updateDate":1542357165000,"createDate":1542357165000,"updateBy":null,"createBy":null,"cancelType":"551","cancelStatus":2,"memo":"混派出租车派单成功，专车订单取消"}
+		if( orderCancelInfo!=null ) {
+			result.setQxmemo( orderCancelInfo.getString("memo") );
+			long qxCreateDate = orderCancelInfo.getLongValue("createDate");
+			if(qxCreateDate>0) {
+				result.setQxdate( yyyyMMddHHmmssSDF.format(new Date(qxCreateDate)) );
+			}
+			result.setQxperson("");
+			result.setQxreasonname(orderCancelInfo.getString("cancelType") );
+			result.setQxcancelstatus( orderCancelInfo.getIntValue("cancelStatus") );
 		}
 		//十、补全此订单的car_biz_partner_pay_detail
 		Double baiDuOrCtripPrice = carFactOrderExMapper.selectPartnerPayAmount(result.getOrderNo());
