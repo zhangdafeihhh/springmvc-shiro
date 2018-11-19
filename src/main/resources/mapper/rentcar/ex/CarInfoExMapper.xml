@@ -225,7 +225,7 @@
     car.equipmentNumber, car.gpsBrand,car.gpsType,car.gpsDate,car.gps_imei,car.clicensePlatesColor,
     car.vehicle_owner, car.vehicle_type,car.memo,car.status,car.create_by,car.update_by,car.create_date,
     car.update_date,DATE_FORMAT(car.car_purchase_date, '%Y-%m-%d')   AS purchaseDate,
-    city.city_name AS cityName,car.supplier_id supplierId,modelDetail,
+    city.city_name AS cityName,car.supplier_id supplierId,car.model_detail modelDetail,
     (case when car.driver_id =0 then 0 else 1 end)isFree,
     supplier.cooperation_type cooperationType
     FROM
