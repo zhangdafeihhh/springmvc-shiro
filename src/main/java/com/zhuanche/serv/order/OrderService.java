@@ -145,6 +145,26 @@ public class OrderService{
 		JSONObject order = (JSONObject)orderResponse.getData();
 		return order;
 	}
+	/**调用order-api接口：根据orderId查询订单取消原因信息**/
+	public JSONObject getOrderCancelInfo(String orderId) {
+		Map<String,Object> httpParams = new HashMap<String,Object>(4);
+		httpParams.put("orderId", orderId ); 
+		httpParams.put("businessId", ORDER_API_BUSINESS_ID );
+		String sign = HttpParamSignGenerator.genSignForOrderAPI (httpParams, ORDER_API_BUSINESS_SIGNKEY );
+		httpParams.put("sign", sign);
+		String orderCancelInfo = new RPCAPI().requestWithRetry(RPCAPI.HttpMethod.POST, ORDER_API_URL.trim()+"/order/getOrderCancelInfo", httpParams, null, "UTF-8");
+		if(orderCancelInfo==null ) {
+			log.info("查询订单取消原因失败。" );
+			return null;
+		}
+		RPCResponse orderResponse = RPCResponse.parse(orderCancelInfo);
+		if(orderResponse.getCode()!=0 || orderResponse.getData()==null) {
+			log.info( "订单取消原因不存在。" );
+			return null;
+		}
+		JSONObject order = (JSONObject)orderResponse.getData();
+		return order;
+	}
 	
 	
 

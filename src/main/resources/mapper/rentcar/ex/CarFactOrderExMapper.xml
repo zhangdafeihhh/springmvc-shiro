@@ -404,18 +404,6 @@
 			car_biz_order_dissent AS c
 		LEFT JOIN car_sys_user AS a ON a.user_id = c.create_by where c.order_id=#{orderId , jdbcType=BIGINT}
 	</select>	
-	<!-- 此订单的cancel_reason -->
-	<select id="selectCancelReason" resultMap="CarFactOrderInfoMap"	parameterType="java.lang.Long">
-		SELECT
-			c.memo as qxmemo,
-			DATE_FORMAT(c.create_date, '%Y-%m-%d %T') AS qxdate,
-			a.`name` AS qxperson,
-	    	c.cancel_type as qxreasonname,
-	    	c.cancel_status as qxcancelstatus
-		FROM
-			car_biz_order_cancel_reason AS c
-		LEFT JOIN car_sys_user AS a ON a.user_id = c.create_by where c.order_id=#{orderId , jdbcType=BIGINT}
-	</select>	
 	<!-- 此订单的car_biz_order_settle_detail_extension -->
 	<select id="selectOrderSettleDetail" resultMap="CarFactOrderInfoMap"	parameterType="java.lang.Long">
 		SELECT

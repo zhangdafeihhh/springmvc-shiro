@@ -30,9 +30,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.util.StringUtil;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
-import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.controller.driver.Componment;
@@ -830,13 +830,17 @@ public class OrderController{
 			result.setYyperson(orderDissent.getYyperson());
 		}
 		//九、补全此订单的cancel_reason
-		CarFactOrderInfo orderCancelReason = carFactOrderExMapper.selectCancelReason( Long.valueOf(orderId) );
-		if(orderCancelReason!=null) {
-			result.setQxmemo(orderCancelReason.getQxmemo());
-			result.setQxdate(orderCancelReason.getQxdate());
-			result.setQxperson(orderCancelReason.getQxperson());
-			result.setQxreasonname(orderCancelReason.getQxreasonname());
-			result.setQxcancelstatus(orderCancelReason.getQxcancelstatus());
+		JSONObject orderCancelInfo = orderService.getOrderCancelInfo(""+orderId);
+		//示例：{"reasonId":226286645,"orderId":457740549,"shouldDeducted":null,"factDeducted":null,"cancelReasonId":null,"updateDate":1542357165000,"createDate":1542357165000,"updateBy":null,"createBy":null,"cancelType":"551","cancelStatus":2,"memo":"混派出租车派单成功，专车订单取消"}
+		if( orderCancelInfo!=null ) {
+			result.setQxmemo( orderCancelInfo.getString("memo") );
+			long qxCreateDate = orderCancelInfo.getLongValue("createDate");
+			if(qxCreateDate>0) {
+				result.setQxdate( yyyyMMddHHmmssSDF.format(new Date(qxCreateDate)) );
+			}
+			result.setQxperson("");
+			result.setQxreasonname(orderCancelInfo.getString("cancelType") );
+			result.setQxcancelstatus( orderCancelInfo.getIntValue("cancelStatus") );
 		}
 		//十、补全此订单的car_biz_partner_pay_detail
 		Double baiDuOrCtripPrice = carFactOrderExMapper.selectPartnerPayAmount(result.getOrderNo());
