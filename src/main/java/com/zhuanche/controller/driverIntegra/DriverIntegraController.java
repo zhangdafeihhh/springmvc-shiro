@@ -293,7 +293,7 @@ public class DriverIntegraController {
 
                     try {
                         csvDataList.add("没有查到符合条件的数据");
-                        CsvUtils.exportCsv(response,csvDataList,headerList,fileName);
+                        CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,new CsvUtils());
                     } catch (IOException e) {
                         logger.error("导出司机积分异常，参数driverEntity="+(driverEntity==null?"null":JSON.toJSONString(driverEntity)));
                         e.printStackTrace();

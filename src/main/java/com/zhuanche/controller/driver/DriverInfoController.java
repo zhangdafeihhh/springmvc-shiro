@@ -313,7 +313,7 @@ public class DriverInfoController {
                 carBizDriverInfoDTO.setTeamIds(permOfTeam);
                 carBizDriverInfoDTO.setDriverIds(driverIds);
 
-                
+
 
                 int pageSize = CsvUtils.downPerSize;
                 PageInfo pageInfos  = carBizDriverInfoService.queryDriverPage(carBizDriverInfoDTO,1,pageSize);

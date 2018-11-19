@@ -1,5 +1,7 @@
 package com.zhuanche.controller.rentcar;
 
+import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
@@ -10,6 +12,7 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.rentcar.CarInfoDTO;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
+import com.zhuanche.entity.mdbcarmanage.DriverDailyReport;
 import com.zhuanche.entity.rentcar.CarInfo;
 import com.zhuanche.serv.authc.UserManagementService;
 import com.zhuanche.serv.rentcar.CarInfoService;
@@ -448,8 +451,8 @@ public class CarInfoController {
      * @return
      */
     @RequestMapping("/exportCarInfo")
-    public void exportCarInfo(String cities,
-                              String supplierIds,
+    public String exportCarInfo(@Verify(param = "cities",rule="required")String cities,
+                              @Verify(param = "supplierIds",rule="required")String supplierIds,
                               String carModelIds,
                               String licensePlates,
                               String createDateBegin,
@@ -457,9 +460,11 @@ public class CarInfoController {
                               Integer status,
                               Integer isFree,
                               HttpServletRequest request, HttpServletResponse response){
-        logger.info("exportCarInfo:车辆信息导出");
+
+        long  start = System.currentTimeMillis();
+        CarInfo params = new CarInfo();
         try {
-            CarInfo params = new CarInfo();
+
             params.setCities(cities);
             params.setSupplierIds(supplierIds);
             params.setCarModelIds(carModelIds);
@@ -468,6 +473,8 @@ public class CarInfoController {
             params.setCreateDateEnd(createDateEnd);
             params.setStatus(status);
             params.setIsFree(isFree);
+            params.setPagerSize(CsvUtils.downPerSize);
+            logger.info("exportCarInfo:车辆信息导出，请求参数为："+ JSON.toJSONString(params));
 
             /*@SuppressWarnings("deprecation")
             Workbook wb = this.carService.exportExcel(params,request.getRealPath("/")+File.separator+"template"+File.separator+"car_info.xlsx");
@@ -485,14 +492,53 @@ public class CarInfoController {
             } else {  //其他浏览器
                 fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
             }
-            List<String> datas = new ArrayList<>();
-            carService.getExportExcel(params, datas);
-            CsvUtils.exportCsv(response, datas, header, fileName);
+
+            PageInfo<CarInfo> pageInfos =  carService.findCarInfo(params);
+
+
+            CsvUtils entity = new CsvUtils();
+            List<CarInfo> carInfoList  = pageInfos.getList();
+            List<String> csvDataList = new ArrayList<>();
+            if(carInfoList == null || carInfoList.size() == 0){
+                csvDataList.add("没有查到符合条件的数据");
+
+                CsvUtils.exportCsvV2(response,csvDataList,header,fileName,true,true,entity);
+                return "没有查到符合条件的数据";
+            }else{
+                int pages = pageInfos.getPages();//临时计算总页数
+                boolean isFirst = true;
+                boolean isLast = false;
+                if(pages == 1 ||pages == 0 ){
+                    isLast = true;
+                }
+                carService.doTrans4Csv(csvDataList,carInfoList);
+                CsvUtils.exportCsvV2(response,csvDataList,header,fileName,isFirst,isLast,entity);
+
+                for(int pageNumber = 2;pageNumber < pageInfos.getPages() ; pageNumber++){
+                    params.setPage(pageNumber);
+                    pageInfos =  carService.findCarInfo(params);
+                    csvDataList = new ArrayList<>();
+                    if(pageNumber == pages){
+                        isLast = true;
+                    }
+                    carInfoList  = pageInfos.getList();
+                    carService.doTrans4Csv(csvDataList,carInfoList);
+                    CsvUtils.exportCsvV2(response,csvDataList,header,fileName,isFirst,isLast,entity);
+                }
+
+                long  end = System.currentTimeMillis();
+
+                logger.info("车辆信息导出成功，请求参数为："+ JSON.toJSONString(params)+",耗时："+(end-start)+"毫秒");
+            }
+
         } catch (IOException e) {
-            e.printStackTrace();
+            long  end = System.currentTimeMillis();
+            logger.error("车辆信息导出异常，请求参数为："+ JSON.toJSONString(params)+",耗时："+(end-start)+"毫秒",e);
         } catch (Exception e) {
-            e.printStackTrace();
+            long  end = System.currentTimeMillis();
+            logger.error("车辆信息导出异常，请求参数为："+ JSON.toJSONString(params)+",耗时："+(end-start)+"毫秒",e);
         }
+        return "";
     }
 
     /**
