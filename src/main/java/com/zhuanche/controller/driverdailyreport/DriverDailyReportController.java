@@ -294,8 +294,10 @@ public class DriverDailyReportController extends DriverQueryController {
 		List<String> headerList = new ArrayList<>();
 		String fileName = "";
 		List<String> csvDataList = new ArrayList<>();
-		try {
 
+		long  start = System.currentTimeMillis();
+
+		try {
 			headerList.add("车牌号,姓名,供应商,车队,小组,上线时间,总在线时长（小时）,班在线时长（min）,计价前时间(min),计价前里程(km),载客中时间(min),载客里程(km)," +
 					"总服务时间(min),总服务里程(km),计算异动时间(min),结算异动里程（km）,订单流水(元),价外费用（元）,绑单完成数,抢单完成数," +
 					"后台派单,接机,送机,完成单数,日期"
@@ -310,48 +312,42 @@ public class DriverDailyReportController extends DriverQueryController {
 			} else {  //其他浏览器
 				fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 
-		DriverDailyReportParams params = new DriverDailyReportParams(licensePlates,driverName,driverIds,teamIds,suppliers,cities,statDateStart,statDateEnd,sortName,sortOrder,groupIds,null,null);
+			DriverDailyReportParams params = new DriverDailyReportParams(licensePlates,driverName,driverIds,teamIds,suppliers,cities,statDateStart,statDateEnd,sortName,sortOrder,groupIds,null,null);
 
-		log.info("司机周报列表数据:queryDriverDailyReportData");
-		List<DriverDailyReportDTO> rows = new ArrayList<>();
-		String driverList = null;
-		if (StringUtils.isEmpty(params.getDriverIds())){
-			//判断权限   如果司机id为空为查询列表页
-			//如果页面输入了小组id
-			if(StringUtils.isNotEmpty(params.getGroupIds())){
-				//通过小组id查询司机id, 如果用户
-				driverList = super.queryAuthorityDriverIdsByTeamAndGroup(null, String.valueOf(params.getGroupIds()));
-				//如果该小组下无司机，返回空
-				if(StringUtils.isEmpty(driverList)){
-					csvDataList.add("没有查到符合条件的数据");
-					CsvUtils entity = new CsvUtils();
-					try {
-						CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,entity);
-					} catch (IOException e) {
-						e.printStackTrace();
+
+			List<DriverDailyReportDTO> rows = new ArrayList<>();
+			String driverList = null;
+			if (StringUtils.isEmpty(params.getDriverIds())){
+				//判断权限   如果司机id为空为查询列表页
+				//如果页面输入了小组id
+				if(StringUtils.isNotEmpty(params.getGroupIds())){
+					//通过小组id查询司机id, 如果用户
+					driverList = super.queryAuthorityDriverIdsByTeamAndGroup(null, String.valueOf(params.getGroupIds()));
+					//如果该小组下无司机，返回空
+					if(StringUtils.isEmpty(driverList)){
+						csvDataList.add("没有查到符合条件的数据");
+						CsvUtils entity = new CsvUtils();
+						try {
+							CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,entity);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						return AjaxResponse.success("没有查到符合条件的数据");
 					}
-					return AjaxResponse.success("没有查到符合条件的数据");
 				}
+			}else{
+				driverList = params.getDriverIds();
 			}
-		}else{
-			driverList = params.getDriverIds();
-		}
-		params.setPageSize(CsvUtils.downPerSize);
-		long  start = System.currentTimeMillis();
-
-		try {
+			params.setPageSize(CsvUtils.downPerSize);
 			if(!(StringUtils.isNotEmpty(params.getGroupIds()) && (StringUtils.isEmpty(driverList)))){
 				params.setDriverIds(driverList);
 				//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
 				params = this.chuliDriverDailyReportEntity(params);
 				//开始查询
-				//开始查询
 				PageInfo<DriverDailyReport> pageInfos = null;
 				if ( reportType==0 ) {
+
 					pageInfos = driverDailyReportExService.findDayDriverDailyReportByparam(params);
 					List<DriverDailyReport> result = pageInfos.getList();
 					if(result == null || result.size() == 0){
@@ -366,16 +362,18 @@ public class DriverDailyReportController extends DriverQueryController {
 					if(pages == 1 ||pages == 0 ){
 						isLast = true;
 					}
+
 					rows = driverDailyReportExService.selectSuppierNameAndCityNameDays(result,reportType);
 					dataTrans(rows,csvDataList,reportType);
-
+					log.info("工作日报:第1页/共"+pages+"页，查询条件为："+JSON.toJSONString(params));
 					CsvUtils entity = new CsvUtils();
 					CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
 					csvDataList = null;
 					isFirst = false;
-					for(int pageNumber = 2;pageNumber < pageInfos.getPages() ; pageNumber++){
+					for(int pageNumber = 2;pageNumber < pages ; pageNumber++){
 						params.setPage(pageNumber);
 						rows = null;
+						log.info("工作日报:第"+pageNumber+"页/共"+pages+"页，查询条件为："+JSON.toJSONString(params));
 						pageInfos = driverDailyReportExService.findDayDriverDailyReportByparam(params);
 						result = pageInfos.getList();
 						csvDataList = new ArrayList<>();
@@ -389,8 +387,10 @@ public class DriverDailyReportController extends DriverQueryController {
 
 
 				}else{
-					pageInfos = driverDailyReportExService.findWeekDriverDailyReportByparam(params,  statDateStart,    statDateEnd);
 
+					pageInfos = driverDailyReportExService.findWeekDriverDailyReportByparam(params,  statDateStart,    statDateEnd);
+					int pages = pageInfos.getPages();//临时计算总页数
+					log.info(fileTag+":第"+1+"页/共"+pages+"页，查询条件为："+JSON.toJSONString(params));
 					List<DriverDailyReport> result = pageInfos.getList();
 					if(result == null || result.size() == 0){
 						csvDataList.add("没有查到符合条件的数据");
@@ -398,7 +398,7 @@ public class DriverDailyReportController extends DriverQueryController {
 						CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,entity);
 						return AjaxResponse.success("没有查到符合条件的数据");
 					}
-					int pages = pageInfos.getPages();//临时计算总页数
+
 					boolean isFirst = true;
 					boolean isLast = false;
 					if(pages == 1){
@@ -411,9 +411,9 @@ public class DriverDailyReportController extends DriverQueryController {
 					CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
 					csvDataList = null;
 					isFirst = false;
-					for(int pageNumber = 2;pageNumber < pageInfos.getPages() ; pageNumber++){
+					for(int pageNumber = 2;pageNumber < pages ; pageNumber++){
 						params.setPage(pageNumber);
-
+						log.info(fileTag+":第"+pageNumber+"页/共"+pages+"页，查询条件为："+JSON.toJSONString(params));
 						rows = null;
 						pageInfos = driverDailyReportExService.findWeekDriverDailyReportByparam(params,  statDateStart,    statDateEnd);
 						result = pageInfos.getList();
