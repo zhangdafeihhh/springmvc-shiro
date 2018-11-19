@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -436,6 +437,7 @@ public class DriverDailyReportController extends DriverQueryController {
 		if(null == result){
 			return;
 		}
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// 24小时制
 
 		for (DriverDailyReportDTO s : result) {
 			StringBuffer stringBuffer = new StringBuffer();
@@ -464,7 +466,7 @@ public class DriverDailyReportController extends DriverQueryController {
 			stringBuffer.append(",");
 
 
-			stringBuffer.append(s.getUpOnlineTime()==null?"":s.getUpOnlineTime());
+			stringBuffer.append(s.getUpOnlineTime()==null?"":format.format(s.getUpOnlineTime()));
 			stringBuffer.append(",");
 
 
