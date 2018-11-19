@@ -2686,50 +2686,56 @@ public class CarInfoServiceImpl implements CarInfoService {
 //    }
 
     @Override
+    public void transContent(List<CarInfo> list) {
+        List<Integer> createIds = new ArrayList<>();
+        List<Integer> updateIds = new ArrayList<>();
+        for(CarInfo carInfo:list){
+            if(carInfo.getCreateBy()!=null && StringUtils.isBlank(carInfo.getCreateName())){
+                createIds.add(carInfo.getCreateBy());
+            }
+            if(carInfo.getUpdateBy()!=null && StringUtils.isBlank(carInfo.getUpdateName())){
+                updateIds.add(carInfo.getUpdateBy());
+            }
+        }
+        List<CarAdmUser>  creator = userManagementService.getUsersByIdList(createIds);
+        List<CarAdmUser>  updator = userManagementService.getUsersByIdList(updateIds);
+
+        Map<String,CarAdmUser> createByMap = new HashMap<>();
+        Map<String,CarAdmUser> updateByMap = new HashMap<>();
+
+        if(creator != null){
+            for (CarAdmUser user : creator){
+                createByMap.put("t_"+user.getUserId(),user);
+            }
+        }
+        if(updator != null){
+            for (CarAdmUser user : updator){
+                updateByMap.put("t_"+user.getUserId(),user);
+            }
+        }
+        CarAdmUser item;
+        for (CarInfo carInfo : list){
+            if (carInfo.getCreateBy()!=null && StringUtils.isEmpty(carInfo.getCreateName())){
+                item = createByMap.get("t_"+carInfo.getCreateBy());
+                if(item != null){
+                    carInfo.setCreateName(item.getUserName());
+                }
+            }
+            if (carInfo.getUpdateBy()!=null && StringUtils.isBlank(carInfo.getUpdateName())){
+                item = updateByMap.get("t_"+carInfo.getUpdateBy());
+                if(item != null){
+                    carInfo.setUpdateName(item.getUserName());
+                }
+            }
+        }
+    }
+
+    @Override
     public void doTrans4Csv(List<String> casDataList, List<CarInfo> carInfoList) {
         if(carInfoList != null && carInfoList.size()>0){
-            List<Integer> createIds = new ArrayList<>();
-            List<Integer> updateIds = new ArrayList<>();
-            for(CarInfo carInfo:carInfoList){
-                if(carInfo.getCreateBy()!=null && StringUtils.isBlank(carInfo.getCreateName())){
-                    createIds.add(carInfo.getCreateBy());
-                }
-                if(carInfo.getUpdateBy()!=null && StringUtils.isBlank(carInfo.getUpdateName())){
-                    updateIds.add(carInfo.getUpdateBy());
-                }
-            }
-            List<CarAdmUser>  creator = userManagementService.getUsersByIdList(createIds);
-            List<CarAdmUser>  updator = userManagementService.getUsersByIdList(updateIds);
-
-            Map<String,CarAdmUser> createByMap = new HashMap<>();
-            Map<String,CarAdmUser> updateByMap = new HashMap<>();
-
-            if(creator != null){
-                for (CarAdmUser user : creator){
-                    createByMap.put("t_"+user.getUserId(),user);
-                }
-            }
-            if(updator != null){
-                for (CarAdmUser user : updator){
-                    updateByMap.put("t_"+user.getUserId(),user);
-                }
-            }
-
-            CarAdmUser item = null;
+            transContent(carInfoList);
             for (CarInfo carInfo : carInfoList){
                 StringBuilder builder = new StringBuilder();
-                if (carInfo.getCreateBy()!=null && StringUtils.isEmpty(carInfo.getCreateName())){
-                    item = createByMap.get("t_"+carInfo.getCreateBy());
-                    if(item != null){
-                        carInfo.setCreateName(item.getUserName());
-                    }
-                }
-                if (carInfo.getUpdateBy()!=null && StringUtils.isBlank(carInfo.getUpdateName())){
-                    item = updateByMap.get("t_"+carInfo.getUpdateBy());
-                    if(item != null){
-                        carInfo.setUpdateName(item.getUserName());
-                    }
-                }
                 builder.append(carInfo.getLicensePlates() == null ? "" : carInfo.getLicensePlates()).append(",");
                 builder.append(carInfo.getCityName() == null ? "" : carInfo.getCityName()).append(",");
                 builder.append(carInfo.getStatus()==1?"有效":"无效").append(",");
