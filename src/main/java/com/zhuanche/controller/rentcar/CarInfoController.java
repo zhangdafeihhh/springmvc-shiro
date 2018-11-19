@@ -112,8 +112,7 @@ public class CarInfoController {
         PageInfo<CarInfo> pageInfo = carService.findPageByCarInfo(params,params.getPage(),params.getPagesize());
         List<CarInfo> rows =  pageInfo.getList();
 
-        return AjaxResponse.success(new PageDTO(params.getPage(), params.getPagesize(), Integer.parseInt(pageInfo.getTotal()+""),
-                BeanUtil.copyList(rows, CarInfoDTO.class)));
+        return AjaxResponse.success(new PageDTO(params.getPage(), params.getPagesize(), Integer.parseInt(pageInfo.getTotal()+""),rows));
     }
 
     /**
