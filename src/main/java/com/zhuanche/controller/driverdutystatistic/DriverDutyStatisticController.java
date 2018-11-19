@@ -324,12 +324,15 @@ public class DriverDutyStatisticController extends DriverQueryController{
 		String fileName = "";
 		DriverDutyStatisticParams params = null;
 		try{
+			String fileTag = "";
 			if (reportType  == 0){
+				fileTag = "司机考勤日报";
 				headerList.add("司机姓名,日期,手机号,车牌号,班制之内上班上线时_有效,强制上班内上班上线时长_有效,加班时长,班制内上班上线时长,强制上班内上班上线时长,城市,早高峰在线时长,晚高峰在线时长,其他时段1在线时长,其他时段2在线时长");
 			}else{
+				fileTag = "司机考勤月报";
 				headerList.add("司机姓名,手机号,车牌号,班制之内上班上线时_有效,强制上班内上班上线时长_有效,加班时长,班制内上班上线时长,强制上班内上班上线时长,城市,早高峰在线时长,晚高峰在线时长,其他时段1在线时长,其他时段2在线时长");
 			}
-			fileName ="司机考勤报告"+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
+			fileName =fileTag+""+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
 			String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
 			if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
 
@@ -383,7 +386,7 @@ public class DriverDutyStatisticController extends DriverQueryController{
 			}
 			//处理参数
 			params = chuliDriverDutyStatisticParams(params);
-			params.setPageSize(10000);
+			params.setPageSize(CsvUtils.downPerSize);
 			//递归实现
 			PageInfo<DriverDutyStatistic> pageInfos = null;
 			List<DriverDutyStatistic> list = null;

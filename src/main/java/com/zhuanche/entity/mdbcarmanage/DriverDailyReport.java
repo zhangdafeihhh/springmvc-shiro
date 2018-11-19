@@ -15,7 +15,7 @@ public class DriverDailyReport {
 
     private Integer operationNum;
 
-    private String upOnlineTime;
+    private Date upOnlineTime;
 
     private double orderTime;
 
@@ -120,11 +120,11 @@ public class DriverDailyReport {
         this.operationNum = operationNum;
     }
 
-    public String getUpOnlineTime() {
+    public Date getUpOnlineTime() {
         return upOnlineTime;
     }
 
-    public void setUpOnlineTime(String upOnlineTime) {
+    public void setUpOnlineTime(Date upOnlineTime) {
         this.upOnlineTime = upOnlineTime;
     }
 

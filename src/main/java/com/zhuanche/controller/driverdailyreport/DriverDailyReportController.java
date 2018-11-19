@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -266,10 +267,13 @@ public class DriverDailyReportController extends DriverQueryController {
 
 
 		//默认报告类型为日报
+		String fileTag = "";
 		reportType = reportType == null ? 0 : reportType;
 		if (reportType.equals(0)){
+			fileTag = "工作报告日报";
 			statDateEnd = statDateStart;
 		}else if(reportType.equals(1)){
+			fileTag = "工作报告周报";
 			//如果是周报，但是开始时间和结束时间不再同一周，不可以
 			if (statDateStart.compareTo(statDateEnd) > 0 ){
 				return AjaxResponse.fail(RestErrorCode.STARTTIME_GREATE_ENDTIME);
@@ -278,6 +282,7 @@ public class DriverDailyReportController extends DriverQueryController {
 				return AjaxResponse.fail(RestErrorCode.ONLY_QUERY_WEEK);
 			}
 		}else if (reportType.equals(2)){
+			fileTag = "工作报告月报";
 			if (statDateStart.compareTo(statDateEnd) > 0 ){
 				return AjaxResponse.fail(RestErrorCode.STARTTIME_GREATE_ENDTIME);
 			}
@@ -296,7 +301,7 @@ public class DriverDailyReportController extends DriverQueryController {
 					"后台派单,接机,送机,完成单数,日期"
 			);
 
-			fileName = "司机工作报告"+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
+			fileName = fileTag+""+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
 			String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
 			if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
 
@@ -436,6 +441,7 @@ public class DriverDailyReportController extends DriverQueryController {
 		if(null == result){
 			return;
 		}
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// 24小时制
 
 		for (DriverDailyReportDTO s : result) {
 			StringBuffer stringBuffer = new StringBuffer();
@@ -464,7 +470,7 @@ public class DriverDailyReportController extends DriverQueryController {
 			stringBuffer.append(",");
 
 
-			stringBuffer.append(s.getUpOnlineTime()==null?"":s.getUpOnlineTime());
+			stringBuffer.append(s.getUpOnlineTime()==null?"":format.format(s.getUpOnlineTime()));
 			stringBuffer.append(",");
 
 
