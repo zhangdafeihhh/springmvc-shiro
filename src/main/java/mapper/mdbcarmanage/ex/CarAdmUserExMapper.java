@@ -14,4 +14,7 @@ public interface CarAdmUserExMapper {
     
     /**查询所有的登录账号名称**/
     List<String> queryAccountsOfUsers( @Param("userIds") List<Integer> userIds );
+
+
+    List<CarAdmUser> selectUsersByIdList(List<Integer> ids);
 }

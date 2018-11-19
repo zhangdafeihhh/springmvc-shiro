@@ -315,7 +315,7 @@ public class UserManagementService{
 	}
 
     public List<CarAdmUser> getUsersByIdList(List<Integer> ids) {
-		return carAdmUserMapper.selectUsersByIdList(ids);
+		return carAdmUserExMapper.selectUsersByIdList(ids);
 	}
 
 }

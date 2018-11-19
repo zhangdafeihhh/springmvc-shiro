@@ -34,10 +34,7 @@ import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.mdbcarmanage.CarDriverTeamMapper;
 import mapper.mdbcarmanage.CarRelateGroupMapper;
 import mapper.mdbcarmanage.CarRelateTeamMapper;
-import mapper.mdbcarmanage.ex.CarBizAgreementCompanyExMapper;
-import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
-import mapper.mdbcarmanage.ex.CarRelateGroupExMapper;
-import mapper.mdbcarmanage.ex.CarRelateTeamExMapper;
+import mapper.mdbcarmanage.ex.*;
 import mapper.rentcar.CarBizDriverAccountMapper;
 import mapper.rentcar.CarBizDriverInfoMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
@@ -156,6 +153,8 @@ public class CarBizDriverInfoService {
 
     @Autowired
     private CarBizModelExMapper carBizModelExMapper;
+    @Autowired
+    private CarAdmUserExMapper carAdmUserExMapper;
     /**
      * 查询司机信息列表展示
      *
@@ -3023,12 +3022,12 @@ public class CarBizDriverInfoService {
         //根据createBySet查找创建人信息
         List<CarAdmUser> createUserList = null;
         if(!(createBySet.isEmpty())){
-            createUserList = carAdmUserMapper.selectUsersByIdList(new ArrayList<>(createBySet));
+            createUserList = carAdmUserExMapper.selectUsersByIdList(new ArrayList<>(createBySet));
         }
         //根据createBySet查找修改人信息
         List<CarAdmUser> updateUserList = null;
         if(!(updateBySet.isEmpty())){
-            updateUserList = carAdmUserMapper.selectUsersByIdList(new ArrayList<>(updateBySet));
+            updateUserList = carAdmUserExMapper.selectUsersByIdList(new ArrayList<>(updateBySet));
         }
         //根据supplierIdSet查找供应商信息
        List<CarBizSupplier> supplierList =  null;

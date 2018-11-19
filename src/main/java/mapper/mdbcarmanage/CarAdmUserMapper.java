@@ -16,6 +16,4 @@ public interface CarAdmUserMapper {
     int updateByPrimaryKeySelective(CarAdmUser record);
 
     int updateByPrimaryKey(CarAdmUser record);
-
-    List<CarAdmUser> selectUsersByIdList(List<Integer> ids);
 }

@@ -51,6 +51,6 @@ public class CarBizSupplierService{
 	}
 
     public List<CarBizSupplier> findByIdSet(Set<Integer> supplierIdSet) {
-		return carBizSupplierMapper.findByIdSet(supplierIdSet);
+		return carBizSupplierExMapper.findByIdSet(supplierIdSet);
     }
 }
