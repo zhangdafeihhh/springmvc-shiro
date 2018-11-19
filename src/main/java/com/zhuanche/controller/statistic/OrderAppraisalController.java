@@ -195,21 +195,21 @@ public class OrderAppraisalController extends DriverQueryController{
 				//请选择一个车队号或输入司机手机
 				return AjaxResponse.fail(RestErrorCode.TEAMID_OR_DRIVERID_ISNULL);
 			}
+			CsvUtils entity = new CsvUtils();
 			params = new CarBizCustomerAppraisalParams(cityId,supplierId,teamId,groupIds,driverName,driverPhone,orderNo,
 					createDateBegin,createDateEnd,evaluateScore,sortName,sortOrder,page,pageSize);
 
 
-			int total = 0;
 			String driverList = "";
 			if(StringUtils.isNotEmpty(params.getGroupIds()) || StringUtils.isNotEmpty(params.getTeamId())){
 				driverList = super.queryAuthorityDriverIdsByTeamAndGroup(params.getTeamId(), params.getGroupIds());
 				if(driverList==null || "".equals(driverList)){
 					log.info("订单评价列表-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds());
 					log.info("订单评价列表-有选择车队查询条件-该车队下没有司机teamId=="+params.getTeamId());
-					PageDTO pageDTO = new PageDTO(params.getPage(), params.getPageSize(), total, null);
+
 
 					csvDataList.add("没有查到符合条件的数据");
-					return AjaxResponse.success(pageDTO);
+					CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,entity);
 				}
 			}
 			params.setDriverIds(driverList);
@@ -218,8 +218,9 @@ public class OrderAppraisalController extends DriverQueryController{
 
 
 			PageInfo<CarBizCustomerAppraisal> pageInfo = carBizCustomerAppraisalExService.findPageByparam(params);
+
 			int totalPage = pageInfo.getPages();
-			CsvUtils entity = new CsvUtils();
+			log.info("导出订单评分，参数为"+JSON.toJSONString(params)+"第1页，共"+totalPage+"页");
 			if(totalPage == 0){
 				csvDataList.add("没有查到符合条件的数据");
 
@@ -239,7 +240,7 @@ public class OrderAppraisalController extends DriverQueryController{
 				for(int pageNumber=2; pageNumber <= totalPage; pageNumber++){
 
 					params.setPage(pageNumber);
-					log.info("导出订单评分，参数为"+JSON.toJSONString(params));
+					log.info("导出订单评分，第"+pageNumber+"页，共"+totalPage+"页，参数为"+JSON.toJSONString(params));
 					pageInfo = carBizCustomerAppraisalExService.findPageByparam(params);
 					if(pageNumber == totalPage){
 						isLast = true;
