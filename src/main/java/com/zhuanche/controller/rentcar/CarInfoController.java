@@ -110,6 +110,47 @@ public class CarInfoController {
         params.setTeamIds(_teamId);
         logger.info("车辆信息查询，参数为:"+JSON.toJSONString(params));
         PageInfo<CarInfo> pageInfo = carService.findPageByCarInfo(params,params.getPage(),params.getPagesize());
+        List<Integer> createIds = new ArrayList<>();
+        List<Integer> updateIds = new ArrayList<>();
+        for(CarInfo carInfo:pageInfo.getList()){
+            if(carInfo.getCreateBy()!=null && StringUtils.isBlank(carInfo.getCreateName())){
+                createIds.add(carInfo.getCreateBy());
+            }
+            if(carInfo.getUpdateBy()!=null && StringUtils.isBlank(carInfo.getUpdateName())){
+                updateIds.add(carInfo.getUpdateBy());
+            }
+        }
+        List<CarAdmUser>  creator = userManagementService.getUsersByIdList(createIds);
+        List<CarAdmUser>  updator = userManagementService.getUsersByIdList(updateIds);
+
+        Map<String,CarAdmUser> createByMap = new HashMap<>();
+        Map<String,CarAdmUser> updateByMap = new HashMap<>();
+
+        if(creator != null){
+            for (CarAdmUser user : creator){
+                createByMap.put("t_"+user.getUserId(),user);
+            }
+        }
+        if(updator != null){
+            for (CarAdmUser user : updator){
+                updateByMap.put("t_"+user.getUserId(),user);
+            }
+        }
+        CarAdmUser item;
+        for (CarInfo carInfo : pageInfo.getList()){
+            if (carInfo.getCreateBy()!=null && StringUtils.isEmpty(carInfo.getCreateName())){
+                item = createByMap.get("t_"+carInfo.getCreateBy());
+                if(item != null){
+                    carInfo.setCreateName(item.getUserName());
+                }
+            }
+            if (carInfo.getUpdateBy()!=null && StringUtils.isBlank(carInfo.getUpdateName())){
+                item = updateByMap.get("t_"+carInfo.getUpdateBy());
+                if(item != null){
+                    carInfo.setUpdateName(item.getUserName());
+                }
+            }
+        }
         List<CarInfo> rows =  pageInfo.getList();
 
         return AjaxResponse.success(new PageDTO(params.getPage(), params.getPagesize(), Integer.parseInt(pageInfo.getTotal()+""),rows));
