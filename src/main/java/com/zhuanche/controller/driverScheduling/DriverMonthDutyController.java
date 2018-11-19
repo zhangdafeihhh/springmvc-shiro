@@ -171,6 +171,7 @@ public class DriverMonthDutyController {
     @RequestMapping("/exportDriverMonthDuty")
     public String exportDriverMonthDuty(DriverMonthDutyRequest param, HttpServletRequest request,HttpServletResponse response){
         logger.info("下载月排班列表数据入参:"+JSON.toJSONString(param));
+        long start = System.currentTimeMillis();
         try{
             if(Check.NuNStr(param.getMonitorDate())){
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
@@ -181,20 +182,21 @@ public class DriverMonthDutyController {
             if(!Check.NuNStr(param.getTeamId())){
                 commonRequest.setTeamId(Integer.parseInt(param.getTeamId()));
             }
+            List<String> csvheaderList = new ArrayList<>();
+
             CommonRequest data = commonService.paramDeal(commonRequest);
             if(Check.NuNObj(data)){
-                logger.error("没有权限操作,用户："+JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));
+                logger.error("没有权限操作下载司机排班,用户："+JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));
                 return "没有权限操作";
             }
             param.setCityIds(commonService.setStringShiftInteger(data.getCityIds()));
             param.setSupplierIds(commonService.setStringShiftInteger(data.getSupplierIds()));
             param.setTeamIds(data.getTeamIds());
-            param.setPageSize(10000);
-            long start = System.currentTimeMillis();
-            PageInfo<CarDriverMonthDTO> pageInfo = driverMonthDutyService.queryDriverDutyList(param);
+            param.setPageSize(CsvUtils.downPerSize);
 
+            PageInfo<CarDriverMonthDTO> pageInfo = driverMonthDutyService.queryDriverDutyList(param);
             List<JSONObject>  headerList=  driverMonthDutyService.generateTableHeader(param.getMonitorDate());
-            List<String> csvheaderList = new ArrayList<>();
+
             StringBuffer stringBuffer = new StringBuffer();
             for(JSONObject item : headerList){
                 stringBuffer.append(item.get("showName"));
@@ -242,6 +244,7 @@ public class DriverMonthDutyController {
                 isFirst = false;
                 for(int pageNumber = 2; pageNumber <= totalPage; pageNumber++){
                     param.setPageNo(pageNumber);
+                    logger.info("下载司机月排班,参数param："+JSON.toJSONString(param));
                     pageInfo = driverMonthDutyService.queryDriverDutyList(param);
                     csvDataList = new ArrayList<>();
                     dataTrans( pageInfo.getList(),  csvDataList,headerList);
@@ -511,16 +514,6 @@ public class DriverMonthDutyController {
         }
     }
 
-    /**
-     * 设置文件下载 response格式
-     */
-    private HttpServletResponse setResponse(HttpServletResponse response, String filename) throws IOException {
-        response.setContentType("application/octet-stream;charset=ISO8859-1");
-        response.setHeader("Content-Disposition", "attachment;filename=" + new String(filename.getBytes("GB2312"), "ISO8859-1") + ".xls");
-        response.addHeader("Pargam", "no-cache");
-        response.addHeader("Cache-Control", "no-cache");
-        return response;
-    }
 
     public void exportExcelFromTemplet(HttpServletRequest request, HttpServletResponse response, Workbook wb, String fileName) throws IOException {
         if(StringUtils.isEmpty(fileName)) {
