@@ -16,10 +16,11 @@
     <result column="suppliers" property="suppliers" jdbcType="VARCHAR" />
     <result column="team_id" property="teamId" jdbcType="VARCHAR" />
     <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="group_ids" property="groupIds" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     user_id, account, user_name, password, role_id, account_type, status, remark, create_user, 
-    create_date, cities, suppliers, team_id, phone
+    create_date, cities, suppliers, team_id, phone, group_ids
   </sql>
   
   <!-- 根据账户查询 -->
