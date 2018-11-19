@@ -86,8 +86,11 @@ public class CarInfoServiceImpl implements CarInfoService {
     }
 
     @Override
-    public List<CarInfo> selectList(CarInfo params) {
-        return carInfoExMapper.selectList(params);
+    public PageInfo<CarInfo> findPageByCarInfo(CarInfo params,int pageNo,int pageSize){
+        PageHelper.startPage(pageNo, pageSize, true);
+        List<CarInfo> list =   carInfoExMapper.selectList(params);
+        PageInfo<CarInfo> pageInfo = new PageInfo<>(list);
+        return pageInfo;
     }
 
     @Override
@@ -2094,248 +2097,248 @@ public class CarInfoServiceImpl implements CarInfoService {
         return result;
     }
 
-    @Override
-    public Workbook exportExcel(CarInfo params, String path)
-            throws Exception {
-        FileInputStream io = new FileInputStream(path);
-        Workbook wb = new XSSFWorkbook(io);
-        String cities = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getCityIds(), ",");
-        String suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds(), ",");
-        String teamIds = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getTeamIds(), ",");
-        String carModelIds = "";
-        if(!"".equals(params.getCities())&&params.getCities()!=null&&!"null".equals(params.getCities())){
-            cities = params.getCities().replace(";", ",");
-        }
-        if(!"".equals(params.getSupplierIds())&&params.getSupplierIds()!=null&&!"null".equals(params.getSupplierIds())){
-            suppliers = params.getSupplierIds().replace(";", ",");
-        }
-        if(!"".equals(params.getCarModelIds())&&params.getCarModelIds()!=null&&!"null".equals(params.getCarModelIds())){
-            carModelIds = params.getCarModelIds().replace(";", ",");
-        }
-        params.setCarModelIds(carModelIds);
-        params.setSupplierIds(suppliers);
-        params.setCities(cities);
-        params.setTeamIds(teamIds);
-        List<CarInfo> list = carInfoExMapper.selectListNoPage(params);
-
-        if(list != null && list.size()>0){
-            Sheet sheet = wb.getSheetAt(0);
-            Cell cell;
-            int i=0;
-            List<Integer> createIds = new ArrayList<>();
-            List<Integer> updateIds = new ArrayList<>();
-            for(CarInfo s:list){
-                if(s.getCreateBy()!=null && StringUtils.isBlank(s.getCreateName())){
-                    createIds.add(s.getCreateBy());
-                }
-                if(s.getUpdateBy()!=null && StringUtils.isBlank(s.getUpdateName())){
-                    updateIds.add(s.getUpdateBy());
-                }
-            }
-            List<CarAdmUser>  creator = userManagementService.getUsersByIdList(createIds);
-            List<CarAdmUser>  updator = userManagementService.getUsersByIdList(updateIds);
-            for (CarInfo s : list){
-                if (s.getCreateBy()!=null && StringUtils.isBlank(s.getCreateName())){
-                    for (CarAdmUser user : creator){
-                        if ((s.getCreateBy()).equals(user.getUserId())){
-                            s.setCreateName(user.getUserName());
-                            break;
-                        }
-                    }
-                }
-                if (s.getUpdateBy()!=null && StringUtils.isBlank(s.getUpdateName())){
-                    for (CarAdmUser user : updator){
-                        if ((s.getUpdateBy()).equals(user.getUserId())){
-                            s.setUpdateName(user.getUserName());
-                            break;
-                        }
-                    }
-                }
-                Row row = sheet.createRow(i + 1);
-                cell = row.createCell(0);
-                cell.setCellValue(s.getLicensePlates());
-
-                cell = row.createCell(1);
-                cell.setCellValue(s.getCityName());
-
-                cell = row.createCell(2);
-                cell.setCellValue(s.getStatus()==1?"有效":"无效");
-
-                cell = row.createCell(3);
-                cell.setCellValue(s.getSupplierName());
-
-                cell = row.createCell(4);
-                cell.setCellValue(s.getModeName());
-
-                cell = row.createCell(5);
-                cell.setCellValue(s.getModelDetail());
-
-                cell = row.createCell(6);
-                cell.setCellValue(s.getPurchaseDate());
-
-                cell = row.createCell(7);
-                cell.setCellValue(s.getColor());
-
-                cell = row.createCell(8);
-                cell.setCellValue(s.getEngineNo());
-
-                cell = row.createCell(9);
-                cell.setCellValue(s.getFrameNo());
-
-                cell = row.createCell(10);
-                cell.setCellValue(s.getNextInspectDate());
-
-                cell = row.createCell(11);
-                cell.setCellValue(s.getNextMaintenanceDate());
-
-                cell = row.createCell(12);
-                cell.setCellValue(s.getRentalExpireDate());
-
-                cell = row.createCell(13);
-                cell.setCellValue(s.getNextClassDate());
-
-                cell = row.createCell(14);
-                cell.setCellValue(s.getNextOperationDate());
-
-                cell = row.createCell(15);
-                cell.setCellValue(s.getNextSecurityDate());
-
-                cell = row.createCell(16);
-                cell.setCellValue(s.getTwoLevelMaintenanceDate());
-
-                cell = row.createCell(17);
-                cell.setCellValue(s.getCarryPassengers());
-
-                cell = row.createCell(18);
-                cell.setCellValue(s.getVehicleBrand());
-
-                cell = row.createCell(19);
-                cell.setCellValue(s.getClicensePlatesColor());
-
-                cell = row.createCell(20);
-                cell.setCellValue(s.getVehicleVINCode());
-
-                cell = row.createCell(21);
-                cell.setCellValue(s.getVehicleRegistrationDate());
-
-                cell = row.createCell(22);
-                Integer fuelType = s.getOverHaulStatus();
-                String  fuelTypeStr = "无";
-                if(null!=fuelType && fuelType==1){
-                    fuelTypeStr = "汽油";
-                }else if(null!=fuelType && fuelType==2){
-                    fuelTypeStr = "柴油";
-                }else if(null!=fuelType && fuelType==3){
-                    fuelTypeStr = "电";
-                }else if(null!=fuelType && fuelType==4){
-                    fuelTypeStr = "混合油";
-                }else if(null!=fuelType && fuelType==5){
-                    fuelTypeStr = "天然气";
-                }else if(null!=fuelType && fuelType==6){
-                    fuelTypeStr = "液化石油气";
-                }else if(null!=fuelType && fuelType==7){
-                    fuelTypeStr = "甲醇";
-                }else if(null!=fuelType && fuelType==8){
-                    fuelTypeStr = "乙醇";
-                }else if(null!=fuelType && fuelType==9){
-                    fuelTypeStr = "太阳能";
-                }else if(null!=fuelType && fuelType==10){
-                    fuelTypeStr = "混合动力";
-                }
-                cell.setCellValue(fuelTypeStr);
-
-                cell = row.createCell(23);
-                cell.setCellValue(s.getVehicleEngineDisplacement());
-
-                cell = row.createCell(24);
-                cell.setCellValue(s.getVehicleEnginePower());
-
-                cell = row.createCell(25);
-                cell.setCellValue(s.getVehicleEngineWheelbase());
-
-                cell = row.createCell(26);
-                cell.setCellValue(s.getTransportNumber());
-
-                cell = row.createCell(27);
-                cell.setCellValue(s.getCertificationAuthority());
-
-                cell = row.createCell(28);
-                cell.setCellValue(s.getOperatingRegion());
-
-                cell = row.createCell(29);
-                cell.setCellValue(s.getTransportNumberDateStart());
-
-                cell = row.createCell(30);
-                cell.setCellValue(s.getTransportNumberDateEnd());
-
-                cell = row.createCell(31);
-                cell.setCellValue(s.getFirstDate());
-
-                cell = row.createCell(32);
-                Integer overHaulStatus = s.getOverHaulStatus();
-                String  statusStr = "未知";
-                if(null!=overHaulStatus && overHaulStatus==1){
-                    statusStr = "已检修";
-                }else if(null!=overHaulStatus && overHaulStatus==0){
-                    statusStr = "未检修";
-                }
-                cell.setCellValue(statusStr);
-                cell = row.createCell(33);
-                Integer auditingStatus = s.getAuditingStatus();
-                String  auditingStatusStr = "未审验";
-                if(null!=auditingStatus && auditingStatus==1){
-                    auditingStatusStr = "合格";
-                }else if(null!=auditingStatus && auditingStatus==2){
-                    auditingStatusStr = "不合格";
-                }
-                cell.setCellValue(auditingStatusStr);
-                cell = row.createCell(34);
-                cell.setCellValue(s.getAuditingDate());
-
-                cell = row.createCell(35);
-                cell.setCellValue(s.getEquipmentNumber());
-
-                cell = row.createCell(36);
-                cell.setCellValue(s.getGpsBrand());
-
-                cell = row.createCell(37);
-                cell.setCellValue(s.getGpsType());
-
-                cell = row.createCell(38);
-                cell.setCellValue(s.getGpsImei());
-
-                cell = row.createCell(39);
-                cell.setCellValue(s.getGpsDate());
-
-                cell = row.createCell(40);
-                cell.setCellValue(s.getCreateName());
-
-                cell = row.createCell(41);
-                cell.setCellValue(s.getCreateDate());
-
-                cell = row.createCell(42);
-                cell.setCellValue(s.getUpdateName());
-
-                cell = row.createCell(43);
-                cell.setCellValue(s.getUpdateDate());
-
-                cell = row.createCell(44);
-                cell.setCellValue(s.getMemo());
-
-                cell = row.createCell(45);
-                cell.setCellValue(s.getDriverName());
-
-                cell = row.createCell(46);
-                cell.setCellValue(s.getVehicleOwner());
-
-                cell = row.createCell(47);
-                cell.setCellValue(s.getVehicleType());
-
-                i++;
-            }
-        }
-        return wb;
-    }
+//    @Override
+//    public Workbook exportExcel(CarInfo params, String path)
+//            throws Exception {
+//        FileInputStream io = new FileInputStream(path);
+//        Workbook wb = new XSSFWorkbook(io);
+//        String cities = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getCityIds(), ",");
+//        String suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds(), ",");
+//        String teamIds = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getTeamIds(), ",");
+//        String carModelIds = "";
+//        if(!"".equals(params.getCities())&&params.getCities()!=null&&!"null".equals(params.getCities())){
+//            cities = params.getCities().replace(";", ",");
+//        }
+//        if(!"".equals(params.getSupplierIds())&&params.getSupplierIds()!=null&&!"null".equals(params.getSupplierIds())){
+//            suppliers = params.getSupplierIds().replace(";", ",");
+//        }
+//        if(!"".equals(params.getCarModelIds())&&params.getCarModelIds()!=null&&!"null".equals(params.getCarModelIds())){
+//            carModelIds = params.getCarModelIds().replace(";", ",");
+//        }
+//        params.setCarModelIds(carModelIds);
+//        params.setSupplierIds(suppliers);
+//        params.setCities(cities);
+//        params.setTeamIds(teamIds);
+//        List<CarInfo> list = carInfoExMapper.selectListNoPage(params);
+//
+//        if(list != null && list.size()>0){
+//            Sheet sheet = wb.getSheetAt(0);
+//            Cell cell;
+//            int i=0;
+//            List<Integer> createIds = new ArrayList<>();
+//            List<Integer> updateIds = new ArrayList<>();
+//            for(CarInfo s:list){
+//                if(s.getCreateBy()!=null && StringUtils.isBlank(s.getCreateName())){
+//                    createIds.add(s.getCreateBy());
+//                }
+//                if(s.getUpdateBy()!=null && StringUtils.isBlank(s.getUpdateName())){
+//                    updateIds.add(s.getUpdateBy());
+//                }
+//            }
+//            List<CarAdmUser>  creator = userManagementService.getUsersByIdList(createIds);
+//            List<CarAdmUser>  updator = userManagementService.getUsersByIdList(updateIds);
+//            for (CarInfo s : list){
+//                if (s.getCreateBy()!=null && StringUtils.isBlank(s.getCreateName())){
+//                    for (CarAdmUser user : creator){
+//                        if ((s.getCreateBy()).equals(user.getUserId())){
+//                            s.setCreateName(user.getUserName());
+//                            break;
+//                        }
+//                    }
+//                }
+//                if (s.getUpdateBy()!=null && StringUtils.isBlank(s.getUpdateName())){
+//                    for (CarAdmUser user : updator){
+//                        if ((s.getUpdateBy()).equals(user.getUserId())){
+//                            s.setUpdateName(user.getUserName());
+//                            break;
+//                        }
+//                    }
+//                }
+//                Row row = sheet.createRow(i + 1);
+//                cell = row.createCell(0);
+//                cell.setCellValue(s.getLicensePlates());
+//
+//                cell = row.createCell(1);
+//                cell.setCellValue(s.getCityName());
+//
+//                cell = row.createCell(2);
+//                cell.setCellValue(s.getStatus()==1?"有效":"无效");
+//
+//                cell = row.createCell(3);
+//                cell.setCellValue(s.getSupplierName());
+//
+//                cell = row.createCell(4);
+//                cell.setCellValue(s.getModeName());
+//
+//                cell = row.createCell(5);
+//                cell.setCellValue(s.getModelDetail());
+//
+//                cell = row.createCell(6);
+//                cell.setCellValue(s.getPurchaseDate());
+//
+//                cell = row.createCell(7);
+//                cell.setCellValue(s.getColor());
+//
+//                cell = row.createCell(8);
+//                cell.setCellValue(s.getEngineNo());
+//
+//                cell = row.createCell(9);
+//                cell.setCellValue(s.getFrameNo());
+//
+//                cell = row.createCell(10);
+//                cell.setCellValue(s.getNextInspectDate());
+//
+//                cell = row.createCell(11);
+//                cell.setCellValue(s.getNextMaintenanceDate());
+//
+//                cell = row.createCell(12);
+//                cell.setCellValue(s.getRentalExpireDate());
+//
+//                cell = row.createCell(13);
+//                cell.setCellValue(s.getNextClassDate());
+//
+//                cell = row.createCell(14);
+//                cell.setCellValue(s.getNextOperationDate());
+//
+//                cell = row.createCell(15);
+//                cell.setCellValue(s.getNextSecurityDate());
+//
+//                cell = row.createCell(16);
+//                cell.setCellValue(s.getTwoLevelMaintenanceDate());
+//
+//                cell = row.createCell(17);
+//                cell.setCellValue(s.getCarryPassengers());
+//
+//                cell = row.createCell(18);
+//                cell.setCellValue(s.getVehicleBrand());
+//
+//                cell = row.createCell(19);
+//                cell.setCellValue(s.getClicensePlatesColor());
+//
+//                cell = row.createCell(20);
+//                cell.setCellValue(s.getVehicleVINCode());
+//
+//                cell = row.createCell(21);
+//                cell.setCellValue(s.getVehicleRegistrationDate());
+//
+//                cell = row.createCell(22);
+//                Integer fuelType = s.getOverHaulStatus();
+//                String  fuelTypeStr = "无";
+//                if(null!=fuelType && fuelType==1){
+//                    fuelTypeStr = "汽油";
+//                }else if(null!=fuelType && fuelType==2){
+//                    fuelTypeStr = "柴油";
+//                }else if(null!=fuelType && fuelType==3){
+//                    fuelTypeStr = "电";
+//                }else if(null!=fuelType && fuelType==4){
+//                    fuelTypeStr = "混合油";
+//                }else if(null!=fuelType && fuelType==5){
+//                    fuelTypeStr = "天然气";
+//                }else if(null!=fuelType && fuelType==6){
+//                    fuelTypeStr = "液化石油气";
+//                }else if(null!=fuelType && fuelType==7){
+//                    fuelTypeStr = "甲醇";
+//                }else if(null!=fuelType && fuelType==8){
+//                    fuelTypeStr = "乙醇";
+//                }else if(null!=fuelType && fuelType==9){
+//                    fuelTypeStr = "太阳能";
+//                }else if(null!=fuelType && fuelType==10){
+//                    fuelTypeStr = "混合动力";
+//                }
+//                cell.setCellValue(fuelTypeStr);
+//
+//                cell = row.createCell(23);
+//                cell.setCellValue(s.getVehicleEngineDisplacement());
+//
+//                cell = row.createCell(24);
+//                cell.setCellValue(s.getVehicleEnginePower());
+//
+//                cell = row.createCell(25);
+//                cell.setCellValue(s.getVehicleEngineWheelbase());
+//
+//                cell = row.createCell(26);
+//                cell.setCellValue(s.getTransportNumber());
+//
+//                cell = row.createCell(27);
+//                cell.setCellValue(s.getCertificationAuthority());
+//
+//                cell = row.createCell(28);
+//                cell.setCellValue(s.getOperatingRegion());
+//
+//                cell = row.createCell(29);
+//                cell.setCellValue(s.getTransportNumberDateStart());
+//
+//                cell = row.createCell(30);
+//                cell.setCellValue(s.getTransportNumberDateEnd());
+//
+//                cell = row.createCell(31);
+//                cell.setCellValue(s.getFirstDate());
+//
+//                cell = row.createCell(32);
+//                Integer overHaulStatus = s.getOverHaulStatus();
+//                String  statusStr = "未知";
+//                if(null!=overHaulStatus && overHaulStatus==1){
+//                    statusStr = "已检修";
+//                }else if(null!=overHaulStatus && overHaulStatus==0){
+//                    statusStr = "未检修";
+//                }
+//                cell.setCellValue(statusStr);
+//                cell = row.createCell(33);
+//                Integer auditingStatus = s.getAuditingStatus();
+//                String  auditingStatusStr = "未审验";
+//                if(null!=auditingStatus && auditingStatus==1){
+//                    auditingStatusStr = "合格";
+//                }else if(null!=auditingStatus && auditingStatus==2){
+//                    auditingStatusStr = "不合格";
+//                }
+//                cell.setCellValue(auditingStatusStr);
+//                cell = row.createCell(34);
+//                cell.setCellValue(s.getAuditingDate());
+//
+//                cell = row.createCell(35);
+//                cell.setCellValue(s.getEquipmentNumber());
+//
+//                cell = row.createCell(36);
+//                cell.setCellValue(s.getGpsBrand());
+//
+//                cell = row.createCell(37);
+//                cell.setCellValue(s.getGpsType());
+//
+//                cell = row.createCell(38);
+//                cell.setCellValue(s.getGpsImei());
+//
+//                cell = row.createCell(39);
+//                cell.setCellValue(s.getGpsDate());
+//
+//                cell = row.createCell(40);
+//                cell.setCellValue(s.getCreateName());
+//
+//                cell = row.createCell(41);
+//                cell.setCellValue(s.getCreateDate());
+//
+//                cell = row.createCell(42);
+//                cell.setCellValue(s.getUpdateName());
+//
+//                cell = row.createCell(43);
+//                cell.setCellValue(s.getUpdateDate());
+//
+//                cell = row.createCell(44);
+//                cell.setCellValue(s.getMemo());
+//
+//                cell = row.createCell(45);
+//                cell.setCellValue(s.getDriverName());
+//
+//                cell = row.createCell(46);
+//                cell.setCellValue(s.getVehicleOwner());
+//
+//                cell = row.createCell(47);
+//                cell.setCellValue(s.getVehicleType());
+//
+//                i++;
+//            }
+//        }
+//        return wb;
+//    }
 
     @Override
     public CarInfo selectCarInfoByCarId(CarInfo params) {
@@ -2652,31 +2655,31 @@ public class CarInfoServiceImpl implements CarInfoService {
 //        }
 //    }
 
-    @Override
-    public PageInfo<CarInfo> findCarInfo(CarInfo params) {
-        String cities = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getCityIds(), ",");
-        String suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds(), ",");
-        String teamIds = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getTeamIds(), ",");
-        String carModelIds = "";
-        if(!"".equals(params.getCities())&&params.getCities()!=null&&!"null".equals(params.getCities())){
-            cities = params.getCities().replace(";", ",");
-        }
-        if(!"".equals(params.getSupplierIds())&&params.getSupplierIds()!=null&&!"null".equals(params.getSupplierIds())){
-            suppliers = params.getSupplierIds().replace(";", ",");
-        }
-        if(!"".equals(params.getCarModelIds())&&params.getCarModelIds()!=null&&!"null".equals(params.getCarModelIds())){
-            carModelIds = params.getCarModelIds().replace(";", ",");
-        }
-        params.setCarModelIds(carModelIds);
-        params.setSupplierIds(suppliers);
-        params.setCities(cities);
-        params.setTeamIds(teamIds);
-
-        PageHelper.startPage(params.getPage(), params.getPagesize(),true);
-        List<CarInfo> list = carInfoExMapper.selectListNoPage(params);
-        PageInfo<CarInfo> pageInfo = new PageInfo<>(list);
-        return pageInfo;
-    }
+//    @Override
+//    public PageInfo<CarInfo> findCarInfo(CarInfo params) {
+//        String cities = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getCityIds(), ",");
+//        String suppliers = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getSupplierIds(), ",");
+//        String teamIds = StringUtils.join(WebSessionUtil.getCurrentLoginUser().getTeamIds(), ",");
+//        String carModelIds = "";
+//        if(!"".equals(params.getCities())&&params.getCities()!=null&&!"null".equals(params.getCities())){
+//            cities = params.getCities().replace(";", ",");
+//        }
+//        if(!"".equals(params.getSupplierIds())&&params.getSupplierIds()!=null&&!"null".equals(params.getSupplierIds())){
+//            suppliers = params.getSupplierIds().replace(";", ",");
+//        }
+//        if(!"".equals(params.getCarModelIds())&&params.getCarModelIds()!=null&&!"null".equals(params.getCarModelIds())){
+//            carModelIds = params.getCarModelIds().replace(";", ",");
+//        }
+//        params.setCarModelIds(carModelIds);
+//        params.setSupplierIds(suppliers);
+//        params.setCities(cities);
+//        params.setTeamIds(teamIds);
+//
+//        PageHelper.startPage(params.getPage(), params.getPagesize(),true);
+//        List<CarInfo> list = carInfoExMapper.selectListNoPage(params);
+//        PageInfo<CarInfo> pageInfo = new PageInfo<>(list);
+//        return pageInfo;
+//    }
 
     @Override
     public void doTrans4Csv(List<String> casDataList, List<CarInfo> carInfoList) {
