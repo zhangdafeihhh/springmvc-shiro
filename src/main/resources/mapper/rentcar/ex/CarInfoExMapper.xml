@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="mapper.rentcar.ex.CarInfoExMapper" >
-
-   
   <resultMap id="BasicCarBizCarInfoMap" type="com.zhuanche.entity.rentcar.CarInfo">
     <result property="carId" column="car_id" javaType="int" jdbcType="INTEGER" />
 
@@ -237,7 +235,7 @@
     city.city_name  ,car.supplier_id  ,
     (case when car.driver_id =0 then 0 else 1 end)isFree,
     supplier.cooperation_type cooperationType,
-    driver.`name` as driverName,supplier.
+    driver.`name` as driverName
     FROM
     car_biz_car_info car
     LEFT JOIN car_biz_driver_info driver ON driver.driver_id = car.driver_id
