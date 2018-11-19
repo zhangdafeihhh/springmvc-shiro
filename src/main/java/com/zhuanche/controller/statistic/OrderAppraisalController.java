@@ -107,7 +107,7 @@ public class OrderAppraisalController extends DriverQueryController{
 		}
 		CarBizCustomerAppraisalParams params = new CarBizCustomerAppraisalParams(cityId,supplierId,teamId,groupIds,driverName,driverPhone,orderNo,
 				createDateBegin,createDateEnd,evaluateScore,sortName,sortOrder,page,pageSize);
-		log.info("司机评分数据列表数据---参数："+params.toString());
+
 
 		int total = 0;
 		String driverList = "";
@@ -126,6 +126,7 @@ public class OrderAppraisalController extends DriverQueryController{
 		//开始查询
 		List<CarBizCustomerAppraisal> list = null;
 		try {
+			log.info("查询订单评分---参数："+params.toString());
 			PageInfo<CarBizCustomerAppraisal> pageInfo = carBizCustomerAppraisalExService.findPageByparam(params);
 			list = pageInfo.getList();
 			total = (int)pageInfo.getTotal();
@@ -173,36 +174,14 @@ public class OrderAppraisalController extends DriverQueryController{
 		int page =1;
 		int pageSize = CsvUtils.downPerSize;
 
-		if (StringUtils.isEmpty(driverPhone) && StringUtils.isEmpty(teamId)){
-			//请选择一个车队号或输入司机手机
-			return AjaxResponse.fail(RestErrorCode.TEAMID_OR_DRIVERID_ISNULL);
-		}
-		CarBizCustomerAppraisalParams params = new CarBizCustomerAppraisalParams(cityId,supplierId,teamId,groupIds,driverName,driverPhone,orderNo,
-				createDateBegin,createDateEnd,evaluateScore,sortName,sortOrder,page,pageSize);
-		log.info("订单评分数据列表数据---参数："+params.toString());
 
-		int total = 0;
-		String driverList = "";
-		if(StringUtils.isNotEmpty(params.getGroupIds()) || StringUtils.isNotEmpty(params.getTeamId())){
-			driverList = super.queryAuthorityDriverIdsByTeamAndGroup(params.getTeamId(), params.getGroupIds());
-			if(driverList==null || "".equals(driverList)){
-				log.info("订单评价列表-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds()+",teamId=="+params.getTeamId());
-				PageDTO pageDTO = new PageDTO(params.getPage(), params.getPageSize(), total, null);
-				return AjaxResponse.success(pageDTO);
-			}
-		}
-		params.setDriverIds(driverList);
-		//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
-		params = this.chuliParams(params);
-		//开始查询
-		List<CarBizCustomerAppraisal> list = null;
-		List<String> csvDataList = new ArrayList<>();
+
 		List<String> headerList = new ArrayList<>();
-
 		headerList.add("司机姓名,司机手机,车牌号,订单号,评分,评价,备注,时间");
 
 		String fileName = "";
-
+		List<String> csvDataList = new ArrayList<>();
+		CarBizCustomerAppraisalParams params = null;
 		try {
 			fileName = "订单评分"+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
 			String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
@@ -211,6 +190,32 @@ public class OrderAppraisalController extends DriverQueryController{
 			} else {  //其他浏览器
 				fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
 			}
+
+			if (StringUtils.isEmpty(driverPhone) && StringUtils.isEmpty(teamId)){
+				//请选择一个车队号或输入司机手机
+				return AjaxResponse.fail(RestErrorCode.TEAMID_OR_DRIVERID_ISNULL);
+			}
+			params = new CarBizCustomerAppraisalParams(cityId,supplierId,teamId,groupIds,driverName,driverPhone,orderNo,
+					createDateBegin,createDateEnd,evaluateScore,sortName,sortOrder,page,pageSize);
+
+
+			int total = 0;
+			String driverList = "";
+			if(StringUtils.isNotEmpty(params.getGroupIds()) || StringUtils.isNotEmpty(params.getTeamId())){
+				driverList = super.queryAuthorityDriverIdsByTeamAndGroup(params.getTeamId(), params.getGroupIds());
+				if(driverList==null || "".equals(driverList)){
+					log.info("订单评价列表-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds());
+					log.info("订单评价列表-有选择车队查询条件-该车队下没有司机teamId=="+params.getTeamId());
+					PageDTO pageDTO = new PageDTO(params.getPage(), params.getPageSize(), total, null);
+
+					csvDataList.add("没有查到符合条件的数据");
+					return AjaxResponse.success(pageDTO);
+				}
+			}
+			params.setDriverIds(driverList);
+			//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
+			params = this.chuliParams(params);
+
 
 			PageInfo<CarBizCustomerAppraisal> pageInfo = carBizCustomerAppraisalExService.findPageByparam(params);
 			int totalPage = pageInfo.getPages();
@@ -228,13 +233,13 @@ public class OrderAppraisalController extends DriverQueryController{
 				if(totalPage == 1){
 					isLast = true;
 				}
-
 				CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
 				isFirst = false;
 				csvDataList = new ArrayList<>();
-
 				for(int pageNumber=2; pageNumber <= totalPage; pageNumber++){
+
 					params.setPage(pageNumber);
+					log.info("导出订单评分，参数为"+JSON.toJSONString(params));
 					pageInfo = carBizCustomerAppraisalExService.findPageByparam(params);
 					if(pageNumber == totalPage){
 						isLast = true;
@@ -245,8 +250,6 @@ public class OrderAppraisalController extends DriverQueryController{
 				}
 				log.info("导出司机评分成功，参数为"+(params==null?"null": JSON.toJSONString(params)));
 			}
-
-
 
 		} catch (Exception e){
 			log.error("导出司机评分异常，参数为"+(params==null?"null": JSON.toJSONString(params)),e);
