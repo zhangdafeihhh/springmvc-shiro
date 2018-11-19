@@ -65,19 +65,20 @@ public class CarInfoController {
     @MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
 	} )
-    public Object queryCarData(@Verify(param = "cities",rule="") String cities,
-                               @Verify(param = "supplierIds",rule="") String supplierIds,
-                               @Verify(param = "carModelIds",rule="") String carModelIds,
-                               @Verify(param = "licensePlates",rule="") String licensePlates,
-                               @Verify(param = "createDateBegin",rule="") String createDateBegin,
-                               @Verify(param = "createDateEnd",rule="") String createDateEnd,
+    public Object queryCarData(@Verify(param = "cities",rule = "required") String cities,
+                               @Verify(param = "supplierIds",rule = "required") String supplierIds,
+                               String carModelIds,
+                              String licensePlates,
+                              String createDateBegin,
+                                String createDateEnd,
                                @Verify(param = "status",rule="") Integer status,
                                @Verify(param = "isFree",rule="") Integer isFree,
                                @Verify(param = "page",rule="") Integer page,
                                @Verify(param = "pageSize",rule = "max(50)") Integer pageSize) {
         logger.info("车辆列表数据:queryCarData");
-
         CarInfo params = new CarInfo();
+    try{
+
         params.setCities(cities);
         params.setSupplierIds(supplierIds);
         params.setCarModelIds(carModelIds);
@@ -113,6 +114,11 @@ public class CarInfoController {
         List<CarInfo> rows =  pageInfo.getList();
 
         return AjaxResponse.success(new PageDTO(params.getPage(), params.getPagesize(), Integer.parseInt(pageInfo.getTotal()+""),rows));
+    }catch (Exception e){
+        e.printStackTrace();
+        logger.error("车辆信息查询异常，参数为："+JSON.toJSONString(params),e);
+        return null;
+    }
     }
 
     /**
@@ -491,6 +497,7 @@ public class CarInfoController {
             params.setCities(_cities);
             params.setTeamIds(_teamId);
             params.setPagerSize(CsvUtils.downPerSize);
+            params.setPage(1);
 
 
 
@@ -534,8 +541,10 @@ public class CarInfoController {
                 carService.doTrans4Csv(csvDataList,carInfoList);
                 CsvUtils.exportCsvV2(response,csvDataList,header,fileName,isFirst,isLast,entity);
 
-                for(int pageNumber = 2;pageNumber < pageInfos.getPages() ; pageNumber++){
+                for(int pageNumber = 2;pageNumber <= pages ; pageNumber++){
+
                     params.setPage(pageNumber);
+                    logger.info("车辆信息导出，请求参数为："+ JSON.toJSONString(params)+",第"+pageNumber+"页");
                     pageInfos =  carService.findPageByCarInfo(params,params.getPage(),params.getPagesize());
                     csvDataList = new ArrayList<>();
                     if(pageNumber == pages){
