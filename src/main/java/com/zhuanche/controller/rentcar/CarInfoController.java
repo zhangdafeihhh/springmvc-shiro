@@ -75,10 +75,9 @@ public class CarInfoController {
                                @Verify(param = "isFree",rule="") Integer isFree,
                                @Verify(param = "page",rule="") Integer page,
                                @Verify(param = "pageSize",rule = "max(50)") Integer pageSize) {
-        logger.info("车辆列表数据:queryCarData");
+
         CarInfo params = new CarInfo();
     try{
-
         params.setCities(cities);
         params.setSupplierIds(supplierIds);
         params.setCarModelIds(carModelIds);
@@ -109,7 +108,7 @@ public class CarInfoController {
         params.setSupplierIds(_suppliers);
         params.setCities(_cities);
         params.setTeamIds(_teamId);
-
+        logger.info("车辆信息查询，参数为:"+JSON.toJSONString(params));
         PageInfo<CarInfo> pageInfo = carService.findPageByCarInfo(params,params.getPage(),params.getPagesize());
         List<CarInfo> rows =  pageInfo.getList();
 
@@ -503,8 +502,6 @@ public class CarInfoController {
             params.setPagerSize(CsvUtils.downPerSize);
             params.setPage(1);
 
-
-
             logger.info("exportCarInfo:车辆信息导出，请求参数为："+ JSON.toJSONString(params));
 
             /*@SuppressWarnings("deprecation")
@@ -549,8 +546,9 @@ public class CarInfoController {
                 for(int pageNumber = 2;pageNumber <= pages ; pageNumber++){
 
                     params.setPage(pageNumber);
-                    logger.info("车辆信息导出，请求参数为："+ JSON.toJSONString(params)+",第"+pageNumber+"页");
+
                     pageInfos =  carService.findPageByCarInfo(params,params.getPage(),params.getPagesize());
+                    logger.info("车辆信息导出，请求参数为："+ JSON.toJSONString(params)+",第"+pageNumber+"页，总页数为："+pages);
                     csvDataList = new ArrayList<>();
                     if(pageNumber == pages){
                         isLast = true;
