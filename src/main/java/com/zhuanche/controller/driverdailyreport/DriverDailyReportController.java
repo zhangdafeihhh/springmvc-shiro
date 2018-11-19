@@ -470,7 +470,7 @@ public class DriverDailyReportController extends DriverQueryController {
 			stringBuffer.append(",");
 
 
-			stringBuffer.append(s.getUpOnlineTime()==null?"":format.format(s.getUpOnlineTime()));
+			stringBuffer.append(s.getUpOnlineTime()==null?"":s.getUpOnlineTime().replace(".0",""));
 			stringBuffer.append(",");
 
 
