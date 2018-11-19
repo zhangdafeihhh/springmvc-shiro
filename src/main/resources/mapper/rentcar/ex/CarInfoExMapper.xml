@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="mapper.rentcar.ex.CarInfoExMapper" >
+
+   cargroup.group_name,
   <resultMap id="BasicCarBizCarInfoMap" type="com.zhuanche.entity.rentcar.CarInfo">
     <result property="carId" column="car_id" javaType="int" jdbcType="INTEGER" />
 
@@ -73,6 +75,9 @@
     <result property="cooperationType" column="cooperation_type" />
     <result property="isFree" column="isFree" />
 
+    <result property="supplierName" column="supplier_full_name" />
+    <result property="cityName" column="city_name" />
+    <result property="groupName" column="group_name" />
   </resultMap>
   <select id="selectCarInfoByLicensePlates" resultMap="BasicCarBizCarInfoVOMap" parameterType="com.zhuanche.entity.rentcar.CarInfo">
     	SELECT
@@ -205,6 +210,7 @@
 
   <select id="selectList" resultMap="BasicCarBizCarInfoVOMap" parameterType="com.zhuanche.entity.rentcar.CarInfo">
     SELECT
+    supplier.supplier_full_name,city.city_name,cargroup.group_name,
     car_id  ,car.city_id,car.car_photograph ,
     DATE_FORMAT(car.next_operation_date, '%Y-%m-%d') AS next_operation_date,
     DATE_FORMAT(car.next_security_date, '%Y-%m-%d')    AS next_security_date,
@@ -231,7 +237,7 @@
     city.city_name  ,car.supplier_id  ,
     (case when car.driver_id =0 then 0 else 1 end)isFree,
     supplier.cooperation_type cooperationType,
-    driver.`name` as driverName
+    driver.`name` as driverName,supplier.
     FROM
     car_biz_car_info car
     LEFT JOIN car_biz_driver_info driver ON driver.driver_id = car.driver_id
