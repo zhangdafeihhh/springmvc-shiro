@@ -456,6 +456,10 @@ public class CarInfoController {
      * @param isFree        车辆状态
      * @return
      */
+
+    @MasterSlaveConfigs(configs={
+            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
+    } )
     @RequestMapping("/exportCarInfo")
     public String exportCarInfo(@Verify(param = "cities",rule="required")String cities,
                               @Verify(param = "supplierIds",rule="required")String supplierIds,
@@ -538,6 +542,7 @@ public class CarInfoController {
                 if(pages == 1 ||pages == 0 ){
                     isLast = true;
                 }
+                isLast = false;
                 carService.doTrans4Csv(csvDataList,carInfoList);
                 CsvUtils.exportCsvV2(response,csvDataList,header,fileName,isFirst,isLast,entity);
 
