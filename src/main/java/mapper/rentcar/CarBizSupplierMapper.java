@@ -20,6 +20,4 @@ public interface CarBizSupplierMapper {
     int updateByPrimaryKeyWithBLOBs(CarBizSupplier record);
 
     int updateByPrimaryKey(CarBizSupplier record);
-
-    List<CarBizSupplier> findByIdSet(@Param("supplierIdSet") Set<Integer> supplierIdSet);
 }
