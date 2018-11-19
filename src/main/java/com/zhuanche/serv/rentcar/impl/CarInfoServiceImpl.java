@@ -100,10 +100,7 @@ public class CarInfoServiceImpl implements CarInfoService {
         return pageInfo;
     }
 
-    @Override
-    public int selectListCount(CarInfo params) {
-        return carInfoExMapper.selectListCount(params);
-    }
+
 
     @Override
     public CarInfo selectCarInfoByLicensePlates(
