@@ -2697,8 +2697,15 @@ public class CarInfoServiceImpl implements CarInfoService {
                 updateIds.add(carInfo.getUpdateBy());
             }
         }
-        List<CarAdmUser>  creator = userManagementService.getUsersByIdList(createIds);
-        List<CarAdmUser>  updator = userManagementService.getUsersByIdList(updateIds);
+        List<CarAdmUser> creator = null;
+        if ( createIds.size() > 0){
+            creator = userManagementService.getUsersByIdList(createIds);
+        }
+
+        List<CarAdmUser>  updator = null;
+        if (updateIds.size() > 0){
+            updator  = userManagementService.getUsersByIdList(updateIds);
+        }
 
         Map<String,CarAdmUser> createByMap = new HashMap<>();
         Map<String,CarAdmUser> updateByMap = new HashMap<>();
