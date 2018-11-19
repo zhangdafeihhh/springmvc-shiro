@@ -236,9 +236,9 @@ public class OrderAppraisalController extends DriverQueryController{
 				}
 				CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
 				isFirst = false;
-				csvDataList = new ArrayList<>();
-				for(int pageNumber=2; pageNumber <= totalPage; pageNumber++){
 
+				for(int pageNumber=2; pageNumber <= totalPage; pageNumber++){
+					csvDataList = new ArrayList<>();
 					params.setPage(pageNumber);
 					log.info("导出订单评分，第"+pageNumber+"页，共"+totalPage+"页，参数为"+JSON.toJSONString(params));
 					pageInfo = carBizCustomerAppraisalExService.findPageByparam(params);
