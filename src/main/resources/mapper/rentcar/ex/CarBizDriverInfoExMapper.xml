@@ -268,7 +268,7 @@
     i.STATUS AS status
     FROM
     car_biz_driver_info i
-    where 1=1
+    <where>
     <if test="licensePlates!=null and licensePlates!=''">
       and i.license_plates LIKE '%${licensePlates}%'
     </if>
@@ -278,6 +278,10 @@
     <if test="phone!=null and phone!=''">
       and i.phone = #{phone}
     </if>
+      <if test="driverName!=null and driverName!=''">
+        and i.NAME = #{driverName}
+      </if>
+    </where>
     limit 1
   </select>
 
