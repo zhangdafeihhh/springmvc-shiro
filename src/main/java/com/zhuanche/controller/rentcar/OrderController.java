@@ -445,7 +445,7 @@ public class OrderController{
 	     
 	     paramMap.put("transId", transId );//
 	     paramMap.put("pageNo", "1");//页号
-	     paramMap.put("pageSize", "20000");//每页记录数
+	     paramMap.put("pageSize",CsvUtils.downPerSize);//每页记录数
 		 long start = System.currentTimeMillis();
 	    paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,supplierId,teamId);
 	     if(paramMap.get("visibleAllianceIds")!=null){
@@ -497,6 +497,7 @@ public class OrderController{
 				}
 
 			}
+
 			for(int pageNo=1; pageNo <=totalPage; pageNo++  ) {
 				if(pageNo == 1){
 					isFirst = true;
@@ -519,11 +520,11 @@ public class OrderController{
 						csvDataList = new ArrayList<>();
 						dataTrans(pageList,csvDataList);
 						logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code
-								+";总条数为："+pageObj.get("total")+"，当前页返回结果条数为："
+								+";总条数为："+pageObj.get("total")+"，共"+pageObj.get("totalPage")+"页，当前页返回结果条数为："
 								+ (pageList==null?"null":pageList.size())
 						+",pageNo="+pageNo);
 					}else{
-						logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code+";总条数为："+pageObj.get("total")+"，当前页返回结果条数为："
+						logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code+";总条数为："+pageObj.get("total")+"，共"+pageObj.get("totalPage")+"页，当前页返回结果条数为："
 								+ (pageList==null?"null":pageList.size()));
 						breakTag = true;
 					}
