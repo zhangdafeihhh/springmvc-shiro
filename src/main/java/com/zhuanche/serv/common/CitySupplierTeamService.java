@@ -44,12 +44,9 @@ public class CitySupplierTeamService {
 		if (WebSessionUtil.isSupperAdmin()) {
 			suppliers = carBizSupplierExMapper.querySuppliers(null, null);
 		} else {
+			Set<Integer> citys = WebSessionUtil.getCurrentLoginUser().getCityIds();
 			Set<Integer> supplierIds = WebSessionUtil.getCurrentLoginUser().getSupplierIds();
-			if (null != supplierIds && supplierIds.size() > 0) {
-				suppliers = carBizSupplierExMapper.querySuppliers(null, supplierIds);
-			}else{
-				suppliers = carBizSupplierExMapper.querySuppliers(null, null);
-			}
+			suppliers = carBizSupplierExMapper.querySuppliers(citys, supplierIds);
 		}
 		return suppliers;
 	}
