@@ -293,7 +293,7 @@ public class DriverIntegraController {
 
                     try {
                         csvDataList.add("没有查到符合条件的数据");
-                        CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,new CsvUtils());
+                        new CsvUtils().exportCsvV2(response,csvDataList,headerList,fileName,true,true);
                     } catch (IOException e) {
                         logger.error("导出司机积分异常，参数driverEntity="+(driverEntity==null?"null":JSON.toJSONString(driverEntity)));
                         e.printStackTrace();
@@ -311,7 +311,7 @@ public class DriverIntegraController {
             if (total == 0) {
                 try {
                     csvDataList.add("没有查到符合条件的数据");
-                    CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,entity);
+                    entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
                 } catch (IOException e) {
                     logger.error("导出司机积分异常，参数driverEntity="+(driverEntity==null?"null":JSON.toJSONString(driverEntity)));
                     e.printStackTrace();
@@ -330,7 +330,7 @@ public class DriverIntegraController {
             if(pages == 1){
                 isLast = true;
             }
-            CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+            entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
             csvDataList = null;
             isFirst = false;
 
@@ -347,7 +347,7 @@ public class DriverIntegraController {
                 if(pageNumber == pages){
                     isLast = true;
                 }
-                CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+                entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
 
             }
 

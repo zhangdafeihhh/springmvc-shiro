@@ -207,7 +207,7 @@ public class OrderAppraisalController extends DriverQueryController{
 
 
 					csvDataList.add("没有查到符合条件的数据");
-					CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,entity);
+					entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
 				}
 			}
 			params.setDriverIds(driverList);
@@ -222,7 +222,7 @@ public class OrderAppraisalController extends DriverQueryController{
 			if(totalPage == 0){
 				csvDataList.add("没有查到符合条件的数据");
 
-				CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,entity);
+				entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
 			}else{
 				boolean isFirst = true;
 				boolean isLast = false;
@@ -232,7 +232,7 @@ public class OrderAppraisalController extends DriverQueryController{
 				if(totalPage == 1){
 					isLast = true;
 				}
-				CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+				entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
 				isFirst = false;
 
 				for(int pageNumber=2; pageNumber <= totalPage; pageNumber++){
@@ -245,7 +245,7 @@ public class OrderAppraisalController extends DriverQueryController{
 					}
 					rows = pageInfo.getList();
 					dataTrans(rows,csvDataList);
-					CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+					entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
 				}
 				log.info("导出司机评分成功，参数为"+(params==null?"null": JSON.toJSONString(params)));
 			}

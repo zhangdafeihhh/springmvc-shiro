@@ -149,7 +149,7 @@ public class DriverSchController {
             if(result == null || result.size() == 0){
                 csvDataList.add("没有查到符合条件的数据");
                 CsvUtils entity = new CsvUtils();
-                CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,entity);
+                entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
                 return "";
             }
             int pages = pageInfos.getPages();//临时计算总页数
@@ -160,7 +160,7 @@ public class DriverSchController {
             }
             dataTrans( result,  csvDataList);
             CsvUtils entity = new CsvUtils();
-            CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+            entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
             csvDataList = null;
             isFirst = false;
 
@@ -174,7 +174,7 @@ public class DriverSchController {
                     isLast = true;
                 }
                 dataTrans( result,  csvDataList);
-                CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+                entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
             }
             long end = System.currentTimeMillis();
             logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，耗时："+(end-start)+"毫秒;总条数："+pageInfos.getTotal());

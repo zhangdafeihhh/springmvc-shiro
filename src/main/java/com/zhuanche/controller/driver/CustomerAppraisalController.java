@@ -241,7 +241,7 @@ public class CustomerAppraisalController {
             if(had && (driverIds==null || driverIds.size()==0)){
                 logger.info(LOGTAG + "查询teamId={},teamGroupId={},permOfTeam={}没有司机评分信息", teamId, teamGroupId, permOfTeam);
                 csvDataList.add("没有查到符合条件的数据");
-                 CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,entity);
+                entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
 
             }else {
 
@@ -278,14 +278,14 @@ public class CustomerAppraisalController {
                 List<CarBizCustomerAppraisalStatisticsDTO> result = pageInfos.getList();
                 if(result == null || result.size() == 0){
                     csvDataList.add("没有查到符合条件的数据");
-                    CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,entity);
+                    entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
                 }else{
                     if(pages == 1){
                         isLast = true;
                     }
                     logger.info("执行查询第"+1+"页数据，当前页数据条数为"+(result==null?"null":result.size()));
                     dataTrans(result,csvDataList);
-                    CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+                    entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
                     csvDataList = null;
                     isFirst = false;
                     for(int pageNumber = 2 ;pageNumber <= pages ; pageNumber++){
@@ -299,7 +299,7 @@ public class CustomerAppraisalController {
                             isLast = true;
                         }
                         dataTrans(result,csvDataList);
-                        CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+                        entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
                         csvDataList = null;
                     }
                 }

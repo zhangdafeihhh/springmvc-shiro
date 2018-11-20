@@ -223,7 +223,7 @@ public class DriverMonthDutyController {
             if(pageList == null || pageList.size() == 0){
                 List<String> csvDataList = new ArrayList<>();
                 csvDataList.add("没有找到符合条件的数据");
-                CsvUtils.exportCsvV2(response,csvDataList,csvheaderList,fileName,true,true,utilEntity);
+                utilEntity.exportCsvV2(response,csvDataList,csvheaderList,fileName,true,true);
                 long end = System.currentTimeMillis();
                 logger.info("司机月排班成功,没有找到符合条件的数据,参数param："+(param==null?"null":JSON.toJSONString(param))+",耗时："+(end-start)+"毫秒");
                 return "导出司机排班成功";
@@ -234,7 +234,7 @@ public class DriverMonthDutyController {
                 }
                 //数据转换
                 dataTrans( pageList,  csvDataList,headerList);
-                CsvUtils.exportCsvV2(response,csvDataList,csvheaderList,fileName,isFirst,isLast,utilEntity);
+                utilEntity.exportCsvV2(response,csvDataList,csvheaderList,fileName,isFirst,isLast);
                 if(isLast){
                     long end = System.currentTimeMillis();
                     logger.info("司机月排班成功,参数param："+(param==null?"null":JSON.toJSONString(param))+",耗时："+(end-start)+"毫秒");
@@ -251,7 +251,7 @@ public class DriverMonthDutyController {
                     if(pageNumber == totalPage){
                         isLast = true;
                     }
-                    CsvUtils.exportCsvV2(response,csvDataList,csvheaderList,fileName,isFirst,isLast,utilEntity);
+                    utilEntity.exportCsvV2(response,csvDataList,csvheaderList,fileName,isFirst,isLast);
                 }
                 long end = System.currentTimeMillis();
                 logger.info("司机月排班成功,参数param："+(param==null?"null":JSON.toJSONString(param))+",耗时："+(end-start)+"毫秒");

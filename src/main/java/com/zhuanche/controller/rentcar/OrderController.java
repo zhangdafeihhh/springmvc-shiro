@@ -531,12 +531,12 @@ public class OrderController{
 				if(pageNo == 1 && csvDataList.size() == 0 ){
 					csvDataList.add("没有查到符合条件的数据");
 				}
-				CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+				entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
 				if(breakTag){
-					CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,true,entity);
+					entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,true);
 					break;
 				}else{
-					CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+					entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
 				}
 			}
 

@@ -109,11 +109,11 @@ public class DemoController{
                 logger.info("开始导出第"+(i+1)+"页数据");
                 if(i == 0){
                     csvDataList.add("第1页");
-                     CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,false,utilEntity);
+                    utilEntity.exportCsvV2(response,csvDataList,headerList,fileName,true,false);
 
                 }else{
                     csvDataList.add("第"+(i+1)+"页");
-                    CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,false,false,utilEntity);
+                    utilEntity.exportCsvV2(response,csvDataList,headerList,fileName,false,false);
                 }
                 try {
                     Thread.sleep(1000);
@@ -123,7 +123,7 @@ public class DemoController{
                 }
             }
 
-            CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,false,true,utilEntity);
+            utilEntity.exportCsvV2(response,csvDataList,headerList,fileName,false,true);
             logger.info("导出结束");
 
         } catch (IOException e) {

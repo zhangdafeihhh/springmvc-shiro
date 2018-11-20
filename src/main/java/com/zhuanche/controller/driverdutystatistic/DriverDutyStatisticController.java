@@ -405,10 +405,11 @@ public class DriverDutyStatisticController extends DriverQueryController{
 			if(pageInfos != null){
 				pages = pageInfos.getPages();
 			}
+			CsvUtils entity=  new CsvUtils();
 			List<String> csvDataList = new ArrayList<>();
 			if(pages == 0 && (list == null || list.size() == 0)){
 				csvDataList.add("根据条件没有查到符合条件的数据");
-				CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,new CsvUtils());
+				entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
 
 			}else{
 				boolean isLast = false;
@@ -470,7 +471,7 @@ public class DriverDutyStatisticController extends DriverQueryController{
 
 		List<DriverDutyStatisticDTO> dtoList = driverDutyStatisticService.selectSuppierNameAndCityName(list);
 		dataTrans(dtoList,csvDataList,reportType);
-		CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+		entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
 
 
 	}

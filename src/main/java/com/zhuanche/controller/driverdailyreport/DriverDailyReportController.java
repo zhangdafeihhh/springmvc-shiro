@@ -329,7 +329,7 @@ public class DriverDailyReportController extends DriverQueryController {
 						csvDataList.add("没有查到符合条件的数据");
 						CsvUtils entity = new CsvUtils();
 						try {
-							CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,entity);
+							entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
@@ -353,7 +353,7 @@ public class DriverDailyReportController extends DriverQueryController {
 					if(result == null || result.size() == 0){
 						csvDataList.add("没有查到符合条件的数据");
 						CsvUtils entity = new CsvUtils();
-						CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,entity);
+						entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
 						return AjaxResponse.success("没有查到符合条件的数据");
 					}
 					int pages = pageInfos.getPages();//临时计算总页数
@@ -367,7 +367,7 @@ public class DriverDailyReportController extends DriverQueryController {
 					dataTrans(rows,csvDataList,reportType);
 					log.info("工作日报:第1页/共"+pages+"页，查询条件为："+JSON.toJSONString(params));
 					CsvUtils entity = new CsvUtils();
-					CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+					entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
 					csvDataList = null;
 					isFirst = false;
 					for(int pageNumber = 2;pageNumber < pages ; pageNumber++){
@@ -382,7 +382,7 @@ public class DriverDailyReportController extends DriverQueryController {
 						}
 						rows = driverDailyReportExService.selectSuppierNameAndCityNameDays(result,reportType);
 						dataTrans(rows,csvDataList,reportType);
-						CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+						entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
 					}
 
 
@@ -395,7 +395,7 @@ public class DriverDailyReportController extends DriverQueryController {
 					if(result == null || result.size() == 0){
 						csvDataList.add("没有查到符合条件的数据");
 						CsvUtils entity = new CsvUtils();
-						CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,entity);
+						entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
 						return AjaxResponse.success("没有查到符合条件的数据");
 					}
 
@@ -408,7 +408,7 @@ public class DriverDailyReportController extends DriverQueryController {
 					dataTrans(rows,csvDataList,reportType);
 
 					CsvUtils entity = new CsvUtils();
-					CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+					entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
 					csvDataList = null;
 					isFirst = false;
 					for(int pageNumber = 2;pageNumber < pages ; pageNumber++){
@@ -423,7 +423,7 @@ public class DriverDailyReportController extends DriverQueryController {
 						}
 						rows = driverDailyReportExService.selectSuppierNameAndCityNameDays(result,reportType);
 						dataTrans(rows,csvDataList,reportType);
-						CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
+						entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
 					}
 
 				}
