@@ -520,23 +520,23 @@ public class OrderController{
 					if(pageList != null && pageList.size() >=1){
 
 						dataTrans(pageList,csvDataList);
-						logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code
-								+";总条数为："+pageObj.get("total")+"，共"+pageObj.get("totalPage")+"页，当前页返回结果条数为："
-								+ (pageList==null?"null":pageList.size())
-						+",pageNo="+pageNo);
+//						logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code
+//								+";总条数为："+pageObj.get("total")+"，共"+pageObj.get("totalPage")+"页，当前页返回结果条数为："
+//								+ (pageList==null?"null":pageList.size())
+//						+",pageNo="+pageNo);
 					}else{
-						logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code+";总条数为："+pageObj.get("total")+"，共"+pageObj.get("totalPage")+"页，当前页返回结果条数为："
-								+ (pageList==null?"null":pageList.size()));
+//						logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code+";总条数为："+pageObj.get("total")+"，共"+pageObj.get("totalPage")+"页，当前页返回结果条数为："
+//								+ (pageList==null?"null":pageList.size()));
 						breakTag = true;
 						isLast = true;
 					}
 				}else{
-					logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code);
+//					logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code);
 					breakTag = true;
 					isLast = true;
 				}
 
-				String msg = "订单下载，下载第"+pageNo+"页数据，isFirst="+isFirst+",isLast="+isLast+",返回结果code为："+code;
+				String msg = "订单下载，下载第"+pageNo+"页数据，isFirst="+isFirst+",isLast="+isLast+",csvDataList的长度为："+(csvDataList==null?"null":csvDataList.size())+";返回结果code为："+code;
 				if(pageObj != null){
 					msg += ";总条数为："+pageObj.get("total")+"，共"+pageObj.get("totalPage")+"页";
 				}
@@ -556,8 +556,6 @@ public class OrderController{
 					entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
 				}
 			}
-
-//			CsvUtils.exportCsv(response,csvDataList,headerList,fileName);
 			long end = System.currentTimeMillis();
 			logger.info("订单导出成功，参数为"+JSON.toJSONString(paramMap)+";耗时："+(end -start)+"毫秒");
 		} catch (Exception e) {
