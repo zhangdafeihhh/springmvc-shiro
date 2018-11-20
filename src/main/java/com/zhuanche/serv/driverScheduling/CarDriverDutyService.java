@@ -106,7 +106,7 @@ public class CarDriverDutyService {
 		}
 		try{
 			//手机号转换driverId进行查询
-			if(!Check.NuNStr(dutyParamRequest.getPhone())  ||  !StringUtils.isEmpty(dutyParamRequest.getDriverName())) {
+			if(!Check.NuNStr(dutyParamRequest.getPhone())) {
 				DutyParamRequest request = new DutyParamRequest();
 				request.setPhone(dutyParamRequest.getPhone());
 
