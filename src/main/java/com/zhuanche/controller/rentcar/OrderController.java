@@ -487,38 +487,41 @@ public class OrderController{
 			responseX = carFactOrderInfoService.queryOrderDataList(paramMap);
 			code = responseX.getCode();
 			int total = 0;
-			int pageCount = 0;
+			int totalPage = 0;
 			if(code == 0) {
 				JSONObject pageObj = (JSONObject) responseX.getData();
 				if(pageObj != null){
 					total = pageObj.getInteger("total");
 
-					pageCount = total%pageSize==0?total/pageSize:(total/pageSize)+1;
+					totalPage = pageObj.getInteger("totalPage");
 				}
 
 			}
-			for(int pageNo=1; pageNo <=pageCount; pageNo++  ) {
+			for(int pageNo=1; pageNo <=totalPage; pageNo++  ) {
 				if(pageNo == 1){
 					isFirst = true;
 				}else {
 					isFirst = false;
 				}
 
-				if(pageNo == pageCount){
+				if(pageNo == totalPage){
 					isLast = true;
 				}
 				paramMap.put("pageNo",pageNo);//页号
 				// 从订单组取统计数据
 				responseX = carFactOrderInfoService.queryOrderDataList(paramMap);
 				code = responseX.getCode();
-				csvDataList = new ArrayList<>();
+
 				if(code == 0){
 					JSONObject pageObj = (JSONObject) responseX.getData();
 					List<CarFactOrderInfoDTO> pageList  = (List<CarFactOrderInfoDTO>) pageObj.get("data");
 					if(pageList != null && pageList.size() >=1){
+						csvDataList = new ArrayList<>();
 						dataTrans(pageList,csvDataList);
-						logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code+";总条数为："+pageObj.get("total")+"，当前页返回结果条数为："
-								+ (pageList==null?"null":pageList.size()));
+						logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code
+								+";总条数为："+pageObj.get("total")+"，当前页返回结果条数为："
+								+ (pageList==null?"null":pageList.size())
+						+",pageNo="+pageNo);
 					}else{
 						logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code+";总条数为："+pageObj.get("total")+"，当前页返回结果条数为："
 								+ (pageList==null?"null":pageList.size()));
