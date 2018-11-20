@@ -71,6 +71,11 @@
     <result property="vehicleType" column="vehicle_type" />
     <result property="vehicleDrivingLicense" column="vehicle_driving_license" />
     <result property="cooperationType" column="cooperation_type" />
+    <result property="isFree" column="isFree" />
+
+    <result property="supplierName" column="supplier_full_name" />
+    <result property="cityName" column="city_name" />
+    <result property="groupName" column="group_name" />
   </resultMap>
   <select id="selectCarInfoByLicensePlates" resultMap="BasicCarBizCarInfoVOMap" parameterType="com.zhuanche.entity.rentcar.CarInfo">
     	SELECT
@@ -201,41 +206,44 @@
     </if>
   </select>
 
-  <select id="selectList" resultType="com.zhuanche.entity.rentcar.CarInfo" parameterType="com.zhuanche.entity.rentcar.CarInfo">
+  <select id="selectList" resultMap="BasicCarBizCarInfoVOMap" parameterType="com.zhuanche.entity.rentcar.CarInfo">
     SELECT
-    car_id,car.city_id,car.car_photograph imageUrl,DATE_FORMAT(car.next_operation_date, '%Y-%m-%d') AS next_operation_date,
-    DATE_FORMAT(car.next_security_date, '%Y-%m-%d') AS next_security_date,
-    DATE_FORMAT(car.next_class_date, '%Y-%m-%d') AS next_class_date,DATE_FORMAT(car.two_level_maintenance_date, '%Y-%m-%d') AS two_level_maintenance_date,
-    model.model_name AS modeName,
-
-    supplier.supplier_full_name AS supplierName,
-
-    car.license_plates,
-    car.brand, car.car_model_id carModelId,car.model_detail,color,
+    supplier.supplier_full_name, cargroup.group_name,
+    car_id  ,car.city_id,car.car_photograph ,
+    DATE_FORMAT(car.next_operation_date, '%Y-%m-%d') AS next_operation_date,
+    DATE_FORMAT(car.next_security_date, '%Y-%m-%d')    AS next_security_date,
+    DATE_FORMAT(car.next_class_date, '%Y-%m-%d') AS next_class_date,
+    DATE_FORMAT(car.two_level_maintenance_date, '%Y-%m-%d') AS two_level_maintenance_date,
+    model.model_name ,
+    car.license_plates  , car.brand, car.car_model_id,car.model_detail,color,
     car.engine_no,car.frame_no,
     DATE_FORMAT(car.next_inspect_date, '%Y-%m-%d') next_inspect_date,
     DATE_FORMAT(car.next_maintenance_date, '%Y-%m-%d') next_maintenance_date,
     DATE_FORMAT(car.rental_expire_date, '%Y-%m-%d') rental_expire_date,
-    car.fuelType,car.carryPassengers,car.auditingStatus, car.auditing_date,  car.insuranceCompany,
-    car.insuranceNumber,car.insuranceType,car.insuranceMoney,car.insuranceDateStart,car.insuranceDateEnd,
-    car.freightType,car.vehicleEngineDisplacement,car.vehicle_engine_power, car.vehicle_engine_wheelbase,car.vehicle_registration_date,
-
+    car.fuelType,car.carryPassengers, car.auditingStatus,car.auditing_date,car.insuranceCompany,
+    car.insuranceNumber,car.insuranceType,  car.insuranceMoney,car.insuranceDateStart,
+    car.insuranceDateEnd,
+    car.freightType, car.vehicleEngineDisplacement, car.vehicle_engine_power,
+    car.vehicle_engine_wheelbase,
+    car.vehicle_registration_date,
     car.vehicle_VIN_code,car.vehicle_brand, car.totalMileage,car.overhaulStatus, car.transportNumber,
     car.certificationAuthority,car.operatingRegion,car.firstDate, car.transportNumberDateStart,car.transportNumberDateEnd,
     car.equipmentNumber, car.gpsBrand,car.gpsType,car.gpsDate,car.gps_imei,car.clicensePlatesColor,
     car.vehicle_owner, car.vehicle_type,car.memo,car.status,car.create_by,car.update_by,car.create_date,
-    car.update_date,DATE_FORMAT(car.car_purchase_date, '%Y-%m-%d')   AS purchaseDate,
-    city.city_name AS cityName,car.supplier_id supplierId,modelDetail,
+    car.update_date,DATE_FORMAT(car.car_purchase_date, '%Y-%m-%d')   AS car_purchase_date,
+    city.city_name  ,car.supplier_id  ,
     (case when car.driver_id =0 then 0 else 1 end)isFree,
-    supplier.cooperation_type cooperationType
+    supplier.cooperation_type cooperationType,
+    driver.`name` as driverName
     FROM
     car_biz_car_info car
     LEFT JOIN car_biz_driver_info driver ON driver.driver_id = car.driver_id
     LEFT JOIN car_biz_city city ON car.city_id = city.city_id
     LEFT JOIN car_biz_model model ON model.model_id = car.car_model_id
     LEFT JOIN car_biz_supplier supplier ON supplier.supplier_id = car.supplier_id
-    WHERE
-    1 = 1
+    LEFT JOIN car_biz_car_group cargroup ON cargroup.group_id = car.car_model_id
+    <where>
+
     <if test="cityId !=null and cityId !=0">
       and car.city_id = #{cityId}
     </if>
@@ -302,6 +310,7 @@
     <if test="createDateEnd !=null and createDateEnd !=''">
       <![CDATA[ and car.create_date <=  concat(#{createDateEnd},' 23:59:59') ]]>
     </if>
+    </where>
     order by car.update_date  desc
 
   </select>
