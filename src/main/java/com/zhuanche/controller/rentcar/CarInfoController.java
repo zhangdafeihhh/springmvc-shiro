@@ -530,7 +530,7 @@ public class CarInfoController {
             if(carInfoList == null || carInfoList.size() == 0){
                 csvDataList.add("没有查到符合条件的数据");
 
-                CsvUtils.exportCsvV2(response,csvDataList,header,fileName,true,true,entity);
+                entity.exportCsvV2(response,csvDataList,header,fileName,true,true);
                 return "没有查到符合条件的数据";
             }else{
                 int pages = pageInfos.getPages();//临时计算总页数
@@ -541,7 +541,7 @@ public class CarInfoController {
                 }
 
                 carService.doTrans4Csv(csvDataList,carInfoList);
-                CsvUtils.exportCsvV2(response,csvDataList,header,fileName,isFirst,isLast,entity);
+                entity.exportCsvV2(response,csvDataList,header,fileName,isFirst,isLast);
                 isFirst = false;
                 for(int pageNumber = 2;pageNumber <= pages ; pageNumber++){
 
@@ -555,7 +555,7 @@ public class CarInfoController {
                     }
                     carInfoList  = pageInfos.getList();
                     carService.doTrans4Csv(csvDataList,carInfoList);
-                    CsvUtils.exportCsvV2(response,csvDataList,header,fileName,isFirst,isLast,entity);
+                    entity.exportCsvV2(response,csvDataList,header,fileName,isFirst,isLast);
                 }
 
                 long  end = System.currentTimeMillis();

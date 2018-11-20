@@ -304,7 +304,7 @@ public class DriverInfoController {
             if(had && (driverIds==null || driverIds.size()==0)){
                 logger.info(LOGTAG + "查询teamId={},teamGroupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
                 csvDataList.add("没有查到符合条件的数据");
-                CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,utilEntity);
+                utilEntity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
                 return;
             }else{
                 //数据权限
@@ -328,13 +328,13 @@ public class DriverInfoController {
                 if(rows == null || rows.size() == 0){
                     logger.info(LOGTAG + "查询teamId={},teamGroupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
                     csvDataList.add("没有查到符合条件的数据");
-                    CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,true,true,utilEntity);
+                    utilEntity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
                     return;
                 }else{
                     //数据转换
                     carBizDriverInfoService.batchGetBaseStatis( rows,csvDataList);
 
-                    CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,utilEntity);
+                    utilEntity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
                     isFirst = false;
                     for(int pageNo = 2;pageNo <= pages ; pageNo++){
                         csvDataList = new ArrayList<>();
@@ -345,7 +345,7 @@ public class DriverInfoController {
                         rows =  pageInfos.getList();
                         carBizDriverInfoService.batchGetBaseStatis( rows,csvDataList);
 
-                        CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,utilEntity);
+                        utilEntity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
                     }
                 }
 

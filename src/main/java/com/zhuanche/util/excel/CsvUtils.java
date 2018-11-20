@@ -27,14 +27,14 @@ public class CsvUtils {
         this.bw = bw;
     }
 
-    public static boolean exportCsvV2(HttpServletResponse response,
+    public  boolean exportCsvV2(HttpServletResponse response,
                                     List<String> dataList,
                                     List<String> headdataList,
-                                    String  fileName,boolean isFirst,boolean islast,CsvUtils entity) throws IOException {
+                                    String  fileName,boolean isFirst,boolean islast) throws IOException {
 
         boolean isSucess=false;
-        OutputStreamWriter osw = entity.getOsw();
-        BufferedWriter bw = entity.getBw();
+        OutputStreamWriter osw = this.getOsw();
+        BufferedWriter bw = this.getBw();
         try {
 
             if(isFirst){
@@ -48,11 +48,11 @@ public class CsvUtils {
                 osw = new OutputStreamWriter(response.getOutputStream(), "UTF-8");
                 osw.write(new String(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF }));
 
-                entity.setOsw(osw);
+                this.setOsw(osw);
             }
             if(bw == null){
                 bw = new BufferedWriter(osw);
-                entity.setBw(bw);
+                this.setBw(bw);
             }
 
 
