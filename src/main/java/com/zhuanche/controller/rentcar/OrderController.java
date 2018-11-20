@@ -550,10 +550,8 @@ public class OrderController{
 				}
 				entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
 				if(breakTag){
-					entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,true);
+					entity.exportCsvV2(response,new ArrayList<>(),headerList,fileName,isFirst,true);
 					break;
-				}else{
-					entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
 				}
 			}
 			long end = System.currentTimeMillis();
