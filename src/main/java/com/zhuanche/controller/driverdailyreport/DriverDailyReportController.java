@@ -247,7 +247,7 @@ public class DriverDailyReportController extends DriverQueryController {
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})
-	public AjaxResponse exportDriverReportData(String licensePlates, String driverName, String driverIds, String teamIds,
+	public String exportDriverReportData(String licensePlates, String driverName, String driverIds, String teamIds,
 											   @Verify(rule = "required",param = "suppliers") String suppliers,
 											   @Verify(rule = "required",param = "cities") String cities,
 											   @Verify(rule = "required",param = "statDateStart") String statDateStart,
@@ -276,19 +276,23 @@ public class DriverDailyReportController extends DriverQueryController {
 			fileTag = "工作报告周报";
 			//如果是周报，但是开始时间和结束时间不再同一周，不可以
 			if (statDateStart.compareTo(statDateEnd) > 0 ){
-				return AjaxResponse.fail(RestErrorCode.STARTTIME_GREATE_ENDTIME);
+//				return AjaxResponse.fail(RestErrorCode.STARTTIME_GREATE_ENDTIME);
+				return "";
 			}
 			if (!DateUtil.isWeekSame(statDateStart,statDateEnd)){
-				return AjaxResponse.fail(RestErrorCode.ONLY_QUERY_WEEK);
+//				return AjaxResponse.fail(RestErrorCode.ONLY_QUERY_WEEK);
+				return "";
 			}
 		}else if (reportType.equals(2)){
 			fileTag = "工作报告月报";
 			if (statDateStart.compareTo(statDateEnd) > 0 ){
-				return AjaxResponse.fail(RestErrorCode.STARTTIME_GREATE_ENDTIME);
+//				return AjaxResponse.fail(RestErrorCode.STARTTIME_GREATE_ENDTIME);
+				return "";
 			}
 			//如果是月报，但是开始时间和结束时间不再同一月，不可以
 			if (!statDateStart.substring(0,7).equals(statDateEnd.substring(0,7))){
-				return AjaxResponse.fail(RestErrorCode.ONLY_QUERY_ONE_MONTH);
+//				return AjaxResponse.fail(RestErrorCode.ONLY_QUERY_ONE_MONTH);
+				return "";
 			}
 		}
 		List<String> headerList = new ArrayList<>();
@@ -333,7 +337,9 @@ public class DriverDailyReportController extends DriverQueryController {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-						return AjaxResponse.success("没有查到符合条件的数据");
+//						return AjaxResponse.success("没有查到符合条件的数据");
+						return "没有查到符合条件的数据";
+
 					}
 				}
 			}else{
@@ -354,7 +360,8 @@ public class DriverDailyReportController extends DriverQueryController {
 						csvDataList.add("没有查到符合条件的数据");
 						CsvUtils entity = new CsvUtils();
 						entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
-						return AjaxResponse.success("没有查到符合条件的数据");
+//						return AjaxResponse.success("没有查到符合条件的数据");
+						return "没有查到符合条件的数据";
 					}
 					int pages = pageInfos.getPages();//临时计算总页数
 					boolean isFirst = true;
@@ -370,7 +377,7 @@ public class DriverDailyReportController extends DriverQueryController {
 					entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
 					csvDataList = null;
 					isFirst = false;
-					for(int pageNumber = 2;pageNumber < pages ; pageNumber++){
+					for(int pageNumber = 2;pageNumber <= pages ; pageNumber++){
 						params.setPage(pageNumber);
 						rows = null;
 						log.info("工作日报:第"+pageNumber+"页/共"+pages+"页，查询条件为："+JSON.toJSONString(params));
@@ -396,7 +403,7 @@ public class DriverDailyReportController extends DriverQueryController {
 						csvDataList.add("没有查到符合条件的数据");
 						CsvUtils entity = new CsvUtils();
 						entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
-						return AjaxResponse.success("没有查到符合条件的数据");
+						return "";
 					}
 
 					boolean isFirst = true;
@@ -411,7 +418,7 @@ public class DriverDailyReportController extends DriverQueryController {
 					entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
 					csvDataList = null;
 					isFirst = false;
-					for(int pageNumber = 2;pageNumber < pages ; pageNumber++){
+					for(int pageNumber = 2;pageNumber <= pages ; pageNumber++){
 						params.setPage(pageNumber);
 						log.info(fileTag+":第"+pageNumber+"页/共"+pages+"页，查询条件为："+JSON.toJSONString(params));
 						rows = null;
@@ -430,10 +437,10 @@ public class DriverDailyReportController extends DriverQueryController {
 				long  end = System.currentTimeMillis();
 				log.info("工作报告导出-查询耗时："+(end-start)+"毫秒");
 			}
-			return AjaxResponse.success("文件导出成功");
+			return "";
 		} catch (Exception e) {
 			log.error("导出失败哦，参数为："+(searchParam.toJSONString()),e);
-			return AjaxResponse.fail(RestErrorCode.FILE_EXCEL_REPORT_FAIL);
+			return "";
 		}
 	}
 

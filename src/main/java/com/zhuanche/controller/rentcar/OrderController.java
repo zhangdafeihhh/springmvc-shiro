@@ -823,7 +823,7 @@ public class OrderController{
 			return null;
 		}
 		orderId = ""+orderInfoJson.getIntValue("orderId");//重新赋下值
-		
+
 		//System.out.println( ">>>>>>" + orderInfoJson );
 		//>>>>>>{"channelsNum":"partner-homeinns","factStartLongAddr":"安徽省 合肥市 包河区 徽州大道 靠近合肥南站 ","cityId":93,"factStartAddr":"安徽省 合肥市 包河区 徽州大道 靠近合肥南站 ","bookingEndAddr":"CBC拓基广场","cityName":"合肥","carGroupName":"畅享型","bookingEndLongAddr":"CBC拓基广场","buyoutPrice":53.0,"type":2,"bookingEndPoint":"117.171879,31.856586;117.178469,31.862267","laterMinute":0,"bookingGroupName":"畅享型","estimatedId":"1000","factStartPoint":"117.28889973958333,31.799595811631946;117.295479,31.805302","factDate":1538325568000,"factEndShortAddr":"安徽天正司法鉴定中心","businessId":20010453,"riderPhone":"15555331059","orderType":4,"status":50,"imei":"f4f6e38d-dd0e-49f4-8c72-706a9dea560d","goHomeStatus":0,"airportId":-1,"bookingDriverId":0,"factEndLongAddr":"安徽省 合肥市 蜀山区 井岗路 靠近CBC拓基广场 ","bookingStartShortAddr":"","pushDriverType":2,"bookingStartPoint":"117.290288,31.798983;117.29687,31.804675","bookingCurrentPoint":"null,","factEndPoint":"117.17165418836805,31.857140028211806;117.178244,31.862822","bookingStartLongAddr":"合肥南站","isOtherDrivers":1,"buyoutFlag":1,"memo":"{}","serviceTypeId":2,"licensePlates":"皖A6X984","bookingUserId":100047277,"receiveSMS":1,"riderName":"首旅如家乘车人","factEndDate":1538327131000,"bookingStartAddr":"合肥南站","payFlag":0,"version":"5.0","airlineStatus":"0","serviceTypeName":"预约用车","estimatedAmount":83.0,"bookingDateStr":"2018-10-01 00:30:00","driverId":321721,"carGroupId":43,"bookingUserPhone":"13228973156","createDate":1538320625000,"orderTypeName":"首旅如家","orderId":388510487,"bookingDate":1538325000000,"bookingGroupids":"43","agentId":"0","updateDate":1538334604000,"factEndAddr":"安徽省 合肥市 蜀山区 井岗路 靠近CBC拓基广场 ","factStartShortAddr":"肯德基(合肥南站)","bookingEndShortAddr":"","orderNo":"B5538320625920973","isOrderOthers":1}
 		//一、获取订单的基本信息
@@ -860,7 +860,7 @@ public class OrderController{
 		result.setBookinkGroupids( orderInfoJson.getString("bookingGroupids")  );
 		result.setBookinggroupids( orderInfoJson.getString("bookingGroupids") );
 		result.setBookingGroupIds( orderInfoJson.getString("bookingGroupids") );
-		
+
 		result.setBookingGroupName( orderInfoJson.getString("bookingGroupName") );
 		result.setBookingGroupnames( orderInfoJson.getString("bookingGroupName") );
 		if(orderInfoJson.containsKey("createDate") && orderInfoJson.getLongValue("createDate")>0 ) {//创建时间
@@ -927,7 +927,7 @@ public class OrderController{
 			result.setDesignatedDriverFee(orderCostDetailData.getDesignatedDriverFee());
 			result.setWaitingTime(orderCostDetailData.getWaitingTime());
 			result.setWaitingPrice(orderCostDetailData.getWaitingPrice());
-			result.setBasePrice(orderCostDetailData.getBasePrice());   
+			result.setBasePrice(orderCostDetailData.getBasePrice());
 			result.setJmname(orderCostDetailData.getJmname());
 			result.setJmdate(orderCostDetailData.getJmdate());
 			result.setJmprice(orderCostDetailData.getJmprice());
@@ -1012,7 +1012,7 @@ public class OrderController{
 			result.setCustomerRejectPay(orderSettleDetail.getCustomerRejectPay());
 		}
 		//-------------------------------------------------------------------------------------------------------------------------car_fact_order拆表完成END
-		
+
 		//B 设置Payperson
 		Integer flag = result.getPayFlag();
 		if (flag == 1) {
@@ -1032,13 +1032,13 @@ public class OrderController{
 		String costDetailResult = carFactOrderInfoService.queryCostDetailData(costDetailParamStr);
 		if(!"".equals(costDetailResult)){
 			JSONObject costDetailJson = JSON.parseObject(costDetailResult);
-			 //超时长数（单位：分钟）
+			//超时长数（单位：分钟）
 			result.setOverTimeNum(Double.valueOf(String.valueOf(costDetailJson.get("overTimeNum")==null?"0.00":costDetailJson.get("overTimeNum"))));
 			//超时长费（超时长数*超时长单价）
 			result.setOverTimePrice(Double.valueOf(String.valueOf(costDetailJson.get("overTimePrice")==null?"0.00":costDetailJson.get("overTimePrice"))));
 			//基础资费（套餐费用）
 			result.setBasePrice(Double.valueOf(String.valueOf(costDetailJson.get("basePrice")==null?"0.00":costDetailJson.get("basePrice"))));
-			//基础价包含公里(单位,公里) 
+			//基础价包含公里(单位,公里)
 			result.setIncludemileage(Integer.valueOf(String.valueOf(costDetailJson.get("includeMileage")==null?"0":costDetailJson.get("includeMileage"))));
 			logger.info("基础价包含公里(单位,公里)  :includemileage"+costDetailJson.get("includeMileage"));
 			//基础价包含时长(单位,分钟)
@@ -1089,12 +1089,12 @@ public class OrderController{
 				if (carBizGroup != null) {
 					if (!groupStr.contains(carBizGroup.getGroupName())) {
 						groupStr += carBizGroup.getGroupName()+ ",";
-							}
-						}
 					}
-			if (groupStr.length() > 0) {
-					groupStr = groupStr.substring(0,groupStr.length() - 1);
 				}
+			}
+			if (groupStr.length() > 0) {
+				groupStr = groupStr.substring(0,groupStr.length() - 1);
+			}
 			result.setBookingGroupnames(groupStr);
 		}
 		//G: 设置优惠券
