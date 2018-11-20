@@ -315,7 +315,7 @@ public class DriverDutyStatisticController extends DriverQueryController{
 			@Verify(param = "cityId",rule = "required") String cityId,
 			@Verify(param = "supplierId",rule = "required")String supplierId, String teamId,
 			String groupIds, String name, String driverId, String  phone, String licensePlates,
-			@Verify(param = "startTime",rule = "required") String startTime,
+			String startTime,
 			String endTime, String sortName,
 			String sortOrder, Integer page,
 			Integer pageSize, Integer reportType, HttpServletRequest request, HttpServletResponse response) {
