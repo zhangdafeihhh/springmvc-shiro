@@ -65,8 +65,7 @@ public class CarInfoController {
     @MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
 	} )
-    public Object queryCarData(@Verify(param = "cities",rule = "required") String cities,
-                               @Verify(param = "supplierIds",rule = "required") String supplierIds,
+    public Object queryCarData( String cities, String supplierIds,
                                String carModelIds,
                               String licensePlates,
                               String createDateBegin,
