@@ -764,6 +764,7 @@ public class DriverInfoController {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
     public AjaxResponse findTelescopeDriverInfo(@Verify(param = "phone", rule = "required") String phone) {
+        logger.info("【查询千里眼司机信息】请求参数:phone={}",phone);
         CarBizDriverInfoDTO carBizDriverInfoDTO = carBizDriverInfoService.selectByPhone(phone);
         if(null == carBizDriverInfoDTO){
             return AjaxResponse.fail(RestErrorCode.NOT_FOUND_RESULT);
