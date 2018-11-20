@@ -1,7 +1,9 @@
 package com.zhuanche.controller.statistic;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -11,13 +13,16 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.controller.DriverQueryController;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalBean;
+import com.zhuanche.dto.rentcar.DriverDutyStatisticDTO;
 import com.zhuanche.entity.rentcar.CarBizCustomerAppraisal;
 import com.zhuanche.entity.rentcar.CarBizCustomerAppraisalParams;
 import com.zhuanche.entity.rentcar.DriverOutage;
+import com.zhuanche.serv.CarBizCustomerAppraisalExService;
 import com.zhuanche.serv.rentcar.DriverOutageService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.DateUtils;
+import com.zhuanche.util.excel.CsvUtils;
 import mapper.rentcar.ex.CarBizCustomerAppraisalExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -36,7 +41,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -49,11 +56,13 @@ public class OrderAppraisalController extends DriverQueryController{
 
 	private static Logger log =  LoggerFactory.getLogger(OrderAppraisalController.class);
 
-	@Autowired
-	private CarBizCustomerAppraisalExMapper carBizCustomerAppraisalExMapper;
+
 
 	@Autowired
 	private DriverOutageService driverOutageService;
+
+	@Autowired
+	private CarBizCustomerAppraisalExService carBizCustomerAppraisalExService;
 
 	/**
 	 * 订单评分查询
@@ -98,7 +107,7 @@ public class OrderAppraisalController extends DriverQueryController{
 		}
 		CarBizCustomerAppraisalParams params = new CarBizCustomerAppraisalParams(cityId,supplierId,teamId,groupIds,driverName,driverPhone,orderNo,
 				createDateBegin,createDateEnd,evaluateScore,sortName,sortOrder,page,pageSize);
-		log.info("/web/orderAppraisal/orderAppraisalListData:司机评分数据列表数据---参数："+params.toString());
+
 
 		int total = 0;
 		String driverList = "";
@@ -115,14 +124,14 @@ public class OrderAppraisalController extends DriverQueryController{
 		//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
 		params = this.chuliParams(params);
 		//开始查询
-		Page<CarBizCustomerAppraisal> p = PageHelper.startPage(params.getPage(), params.getPageSize());
-		List<CarBizCustomerAppraisalBean> list = null;
+		List<CarBizCustomerAppraisal> list = null;
 		try {
-			List<CarBizCustomerAppraisal> appraisalList = this.carBizCustomerAppraisalExMapper.queryForListObject(params);
-			list = BeanUtil.copyList(appraisalList,CarBizCustomerAppraisalBean.class);
-			total = (int) p.getTotal();
-		} finally {
-			PageHelper.clearPage();
+			log.info("查询订单评分---参数："+params.toString());
+			PageInfo<CarBizCustomerAppraisal> pageInfo = carBizCustomerAppraisalExService.findPageByparam(params);
+			list = pageInfo.getList();
+			total = (int)pageInfo.getTotal();
+		} catch (Exception e){
+			 log.error("查询订单评分异常，参数为"+(params==null?"null": JSON.toJSONString(params)),e);
 		}
 		PageDTO pageDTO = new PageDTO(params.getPage(), params.getPageSize(), total, list);
 		return AjaxResponse.success(pageDTO);
@@ -162,44 +171,125 @@ public class OrderAppraisalController extends DriverQueryController{
 									 @Verify(param="createDateBegin",rule="required")String createDateBegin,
 									 @Verify(param="createDateEnd",rule="required")String createDateEnd,
 									 String evaluateScore,String sortName, String sortOrder,HttpServletRequest request,HttpServletResponse response){
+		int page =1;
+		int pageSize = CsvUtils.downPerSize;
 
-		if (StringUtils.isEmpty(driverPhone) && StringUtils.isEmpty(teamId)){
-			//请选择一个车队或输入司机手机号
-			return AjaxResponse.fail(RestErrorCode.TEAMID_OR_DRIVERID_ISNULL);
-		}
-		CarBizCustomerAppraisalParams params = new CarBizCustomerAppraisalParams(cityId,supplierId,teamId,groupIds,driverName,driverPhone,orderNo,
-				createDateBegin,createDateEnd,evaluateScore,sortName,sortOrder,null,null);
+		List<String> headerList = new ArrayList<>();
+		headerList.add("司机姓名,司机手机,车牌号,订单号,评分,评价,备注,时间");
 
-		log.info("订单评分导出--/orderAppraisal/exportOrderAppraisal---参数："+params.toString());
-		List<CarBizCustomerAppraisal> rows = new ArrayList<>();
+		String fileName = "";
+		List<String> csvDataList = new ArrayList<>();
+		CarBizCustomerAppraisalParams params = null;
 		try {
+			fileName = "订单评分"+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
+			String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
+			if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
+				fileName = URLEncoder.encode(fileName, "UTF-8");
+			} else {  //其他浏览器
+				fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+			}
+
+			if (StringUtils.isEmpty(driverPhone) && StringUtils.isEmpty(teamId)){
+				//请选择一个车队号或输入司机手机
+				return AjaxResponse.fail(RestErrorCode.TEAMID_OR_DRIVERID_ISNULL);
+			}
+			CsvUtils entity = new CsvUtils();
+			params = new CarBizCustomerAppraisalParams(cityId,supplierId,teamId,groupIds,driverName,driverPhone,orderNo,
+					createDateBegin,createDateEnd,evaluateScore,sortName,sortOrder,page,pageSize);
+
 
 			String driverList = "";
 			if(StringUtils.isNotEmpty(params.getGroupIds()) || StringUtils.isNotEmpty(params.getTeamId())){
 				driverList = super.queryAuthorityDriverIdsByTeamAndGroup(params.getTeamId(), params.getGroupIds());
 				if(driverList==null || "".equals(driverList)){
-					log.info("订单评分导出-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds());
-					log.info("订单评分导出-有选择车队查询条件-该车队下没有司机teamId=="+params.getTeamId());
+					log.info("订单评价列表-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds());
+					log.info("订单评价列表-有选择车队查询条件-该车队下没有司机teamId=="+params.getTeamId());
+
+
+					csvDataList.add("没有查到符合条件的数据");
+					entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
 				}
 			}
-			if(!((StringUtils.isNotEmpty(params.getGroupIds()) || StringUtils.isNotEmpty(params.getTeamId())) && StringUtils.isEmpty(driverList))){
-				params.setDriverIds(driverList);
-				//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
-				params = this.chuliParams(params);
-				rows = carBizCustomerAppraisalExMapper.queryForListObject(params);
+			params.setDriverIds(driverList);
+			//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
+			params = this.chuliParams(params);
+
+
+			PageInfo<CarBizCustomerAppraisal> pageInfo = carBizCustomerAppraisalExService.findPageByparam(params);
+
+			int totalPage = pageInfo.getPages();
+			log.info("导出订单评分，参数为"+JSON.toJSONString(params)+"第1页，共"+totalPage+"页");
+			if(totalPage == 0){
+				csvDataList.add("没有查到符合条件的数据");
+
+				entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
+			}else{
+				boolean isFirst = true;
+				boolean isLast = false;
+				List<CarBizCustomerAppraisal> rows = pageInfo.getList();
+				//数据转换
+				dataTrans(rows,csvDataList);
+				if(totalPage == 1){
+					isLast = true;
+				}
+				entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
+				isFirst = false;
+
+				for(int pageNumber=2; pageNumber <= totalPage; pageNumber++){
+					csvDataList = new ArrayList<>();
+					params.setPage(pageNumber);
+					log.info("导出订单评分，第"+pageNumber+"页，共"+totalPage+"页，参数为"+JSON.toJSONString(params));
+					pageInfo = carBizCustomerAppraisalExService.findPageByparam(params);
+					if(pageNumber == totalPage){
+						isLast = true;
+					}
+					rows = pageInfo.getList();
+					dataTrans(rows,csvDataList);
+					entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
+				}
+				log.info("导出司机评分成功，参数为"+(params==null?"null": JSON.toJSONString(params)));
 			}
-			@SuppressWarnings("deprecation")
-			Workbook wb = this.exportExcel(rows,request.getRealPath("/")+ File.separator+"template"+File.separator+"order_appraisal.xlsx");
-			super.exportExcelFromTemplet(request, response, wb, new String("订单评分".getBytes("utf-8"), "iso8859-1"));
-			log.error("订单评分导出--导出成功");
-			return AjaxResponse.success("文件导出成功！");
-		} catch (Exception e) {
-			log.error("订单评分导出--导出失败");
-			if(rows != null){
-				rows.clear();
-			}
-			return AjaxResponse.fail(RestErrorCode.FILE_EXPORT_FAIL);
+
+		} catch (Exception e){
+			log.error("导出司机评分异常，参数为"+(params==null?"null": JSON.toJSONString(params)),e);
 		}
+
+		return AjaxResponse.success(null);
+	}
+	private void dataTrans(List<CarBizCustomerAppraisal> result, List<String>  csvDataList ){
+		if(null == result){
+			return;
+		}
+		for(CarBizCustomerAppraisal s:result){
+			StringBuffer stringBuffer = new StringBuffer();
+
+
+			stringBuffer.append(s.getDriverName());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getDriverPhone()==null?"":"\t"+s.getDriverPhone());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getLicensePlates()==null?"":s.getLicensePlates());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getOrderNo());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getEvaluateScore()==null?"":s.getEvaluateScore());
+			stringBuffer.append(",");
+
+			stringBuffer.append(StringUtils.isEmpty(s.getEvaluate())?"":s.getEvaluate().replaceAll(",","，"));
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getMemo()==null?"":s.getMemo().replaceAll(",","，"));//评价
+			stringBuffer.append(",");
+
+			stringBuffer.append(DateUtils.formatDateTime_CN(s.getCreateDate()));
+
+			csvDataList.add(stringBuffer.toString());
+		}
+
 	}
 
 	/**
@@ -223,47 +313,6 @@ public class OrderAppraisalController extends DriverQueryController{
 
 		return params;
 	}
-
-	public Workbook exportExcel(List<CarBizCustomerAppraisal> list, String path) throws Exception{
-		FileInputStream io = new FileInputStream(path);
-		Workbook wb = new XSSFWorkbook(io);
-		if(list != null && list.size()>0){
-			Sheet sheet = wb.getSheetAt(0);
-			Cell cell = null;
-			int i=0;
-			for(CarBizCustomerAppraisal s:list){
-				Row row = sheet.createRow(i + 1);
-
-				cell = row.createCell(0);
-				cell.setCellValue(s.getDriverName());
-
-				cell = row.createCell(1);
-				cell.setCellValue(s.getDriverPhone());
-
-				cell = row.createCell(2);
-				cell.setCellValue(s.getLicensePlates());
-
-				cell = row.createCell(3);
-				cell.setCellValue(s.getOrderNo());
-
-				cell = row.createCell(4);
-				cell.setCellValue(s.getEvaluateScore());
-
-				cell = row.createCell(5);
-				cell.setCellValue(s.getEvaluate());
-
-				cell = row.createCell(6);
-				cell.setCellValue(s.getMemo());
-
-				cell = row.createCell(7);
-				cell.setCellValue(DateUtils.formatDateTime_CN(s.getCreateDate()));
-
-				i++;
-			}
-		}
-		return wb;
-	}
-
 
 	@ResponseBody
 	@RequestMapping("/orderAppraisalListFromDriverOutageData")
@@ -293,12 +342,14 @@ public class OrderAppraisalController extends DriverQueryController{
 			customerAppraisalEntity.setOrderNos(orderNos);
 
 
-			Page<CarBizCustomerAppraisal> p = PageHelper.startPage(page, pageSize);
 			List<CarBizCustomerAppraisalBean> list = null;
 			try {
-				List<CarBizCustomerAppraisal> appraisalList = this.carBizCustomerAppraisalExMapper.queryForListObject(customerAppraisalEntity);
+				PageInfo<CarBizCustomerAppraisal> pageInfo = carBizCustomerAppraisalExService.findPageByparam(customerAppraisalEntity);
+				List<CarBizCustomerAppraisal> appraisalList = pageInfo.getList();
 				list = BeanUtil.copyList(appraisalList,CarBizCustomerAppraisalBean.class);
-				total = (int) p.getTotal();
+				total = (int) pageInfo.getTotal();
+			}catch (Exception e){
+				log.error("异常，参数为："+JSON.toJSONString(customerAppraisalEntity),e);
 			} finally {
 				PageHelper.clearPage();
 			}

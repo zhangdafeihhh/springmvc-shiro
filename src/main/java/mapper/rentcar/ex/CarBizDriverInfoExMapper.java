@@ -15,6 +15,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface CarBizDriverInfoExMapper {
 
@@ -23,6 +24,8 @@ public interface CarBizDriverInfoExMapper {
     List<CarDriverInfoDTO> queryListByLimits(DriverTeamRequest driverTeamRequest);
 
     CarDriverInfoDTO queryOneDriver(DutyParamRequest dutyParamRequest);
+
+    List<CarDriverInfoDTO> queryListDriverByDriverIds(@Param("set") Set<Integer> driverIds);
 
     /** 更改车队信息查询司机信息*/
     CarDriverInfoDTO selectDriverInfoByDriverId(Integer driverId);
@@ -132,13 +135,13 @@ public interface CarBizDriverInfoExMapper {
      */
     public List<CarBizDriverInfoDTO> queryDriverByLicensePlates(String license_plates);
 
+
     /**
      * 查看司机列表
-     * @param driverTeamRequest
+     * @param driverInfoDTO
      * @return
      */
-    List<CarBizDriverInfoDTO> queryCarBizDriverList(CarBizDriverInfoDTO driverTeamRequest);
-
+    List<CarBizDriverInfoDTO> queryCarBizDriverList(CarBizDriverInfoDTO driverInfoDTO);
 
     int selectDriverByKeyCountAddCooperation(DriverVoEntity params);
 
@@ -146,5 +149,6 @@ public interface CarBizDriverInfoExMapper {
 
 
     CarBizDriverInfoDTO selectByPhone(@Param("phone") String phone);
+
 
 }

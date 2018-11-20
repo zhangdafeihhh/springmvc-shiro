@@ -765,7 +765,38 @@ public class CarDriverTeamService{
 		return result;
 	}
 
+ 
+	public Map<Integer, String> queryDriverTeamListByDriverId(List<String> driverIds) {
+		if(driverIds==null||driverIds.size()==0) {
+			return new HashMap<>(4);
+		}
+		List<CarRelateTeam> list = carDriverTeamExMapper.queryDriverTeamListByDriverIdList(driverIds);
+		if(list==null||list.size()==0) {
+			return new HashMap<>(4);
+		}
+		Map<Integer, String> result = Maps.newHashMap();
+		for(CarRelateTeam c : list) {
+			result.put(c.getDriverId(),  c.getTeamName());
+		}
+		return result;
+	}
+
+	public Map<Integer, String> queryDriverTeamGroupListByDriverId(List<String> driverIds) {
+		if(driverIds==null||driverIds.size()==0) {
+			return new HashMap<>(4);
+		}
+		List<CarRelateTeam> list = carDriverTeamExMapper.queryDriverTeamListByDriverIdList(driverIds);
+		if(list==null||list.size()==0) {
+			return new HashMap<>(4);
+		}
+		Map<Integer, String> result = Maps.newHashMap();
+		for(CarRelateTeam c : list) {
+			result.put(c.getDriverId(),  c.getGroupName());
+		}
+		return result;
+	}
 	public List<Integer> queryDriverIdsByTeamIdss(Set<Integer> teamIds){
 		return carRelateTeamExMapper.queryDriverIdsByTeamIdss(  teamIds);
+
 	}
 }

@@ -3,18 +3,21 @@ package com.zhuanche.controller.driverIntegra;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.dto.driver.DriverTeamEntity;
 import com.zhuanche.dto.driver.DriverTeamRelationEntity;
 import com.zhuanche.dto.driver.DriverVoEntity;
+import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
 import com.zhuanche.serv.rentcar.IDriverService;
 import com.zhuanche.serv.rentcar.IDriverTeamRelationService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Common;
 import com.zhuanche.util.MyRestTemplate;
+import com.zhuanche.util.excel.CsvUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -30,9 +33,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.util.*;
 
 @Controller
@@ -53,7 +58,7 @@ public class DriverIntegraController {
     private MyRestTemplate driverIntegralApiTemplate;
 
 
-    protected JSONObject gridJsonFormate(List<?> rows, int total) {
+    protected JSONObject gridJsonFormate(List<?> rows, long total) {
         rows = null == rows ? new ArrayList<>() : rows;
         Map<String, Object> result = new HashMap<String, Object>();
         result.put(Common.RESULT_ROWS, rows);
@@ -107,18 +112,11 @@ public class DriverIntegraController {
                     teamIds += id;
                 }
             }
-
-//            if (driverEntity.getServiceCityId() != null && !"".equals(driverEntity.getServiceCityId())) {
-//                cities = String.valueOf(driverEntity.getServiceCityId());
-//            }
-//            if (driverEntity.getSupplierId() != null && !"".equals(driverEntity.getSupplierId())) {
-//                suppliers = String.valueOf(driverEntity.getSupplierId());
-//            }
             if (!"".equals(driverEntity.getTeamIds()) && driverEntity.getTeamIds() != null) {
                 teamIds = driverEntity.getTeamIds();
             }
             List<DriverVoEntity> rows = new ArrayList<DriverVoEntity>();
-            int total = 0;
+            long total = 0;
             driverEntity.setCities(cities);
             driverEntity.setSuppliers(suppliers);
             String driverIds = "";
@@ -148,63 +146,15 @@ public class DriverIntegraController {
             if(driverEntity.getCityId() != 0){
                 driverEntity.setServiceCityId(driverEntity.getCityId());
             }
-            total = this.driverService.selectDriverByKeyCountAddCooperation(driverEntity);
+            PageInfo<DriverVoEntity> page = this.driverService.findPageDriver(driverEntity);
+            total = page.getTotal();
             if (total == 0) {
                 return this.gridJsonFormate(rows, total);
             }
             //查询司机信息
-            rows = this.driverService.selectDriverByKeyAddCooperation(driverEntity);
-            List<JSONObject> driverInfoList = new ArrayList<>();
-            for (DriverVoEntity driverVoEntity : rows) {
-                JSONObject item = new JSONObject();
-                item.put("driverId",StringUtils.isNotEmpty(driverVoEntity.getDriverId())?Integer.parseInt(driverVoEntity.getDriverId()):0);
-                item.put("cityId",driverVoEntity.getServiceCityId());
-                driverInfoList.add(item);
-            }
-            JSONArray driverIntegralInfoArray = getDriverIntegralInfoList(driverInfoList);
-            if(driverIntegralInfoArray != null){
-                Map<String,JSONObject> itemMap = new HashMap<>();
-                int size = driverIntegralInfoArray.size();
-                for(int i=0;i<size;i++ ){
-                    JSONObject item = driverIntegralInfoArray.getJSONObject(i);
-                    itemMap.put("flag_"+item.getInteger("driverId"),item);
-                }
-                String driverId = null;
-                BigDecimal temp = null;
-                for (DriverVoEntity driverVoEntity : rows) {
-
-                    driverId = driverVoEntity.getDriverId() ;
-                    JSONObject driverIntegraInfo = itemMap.get("flag_"+driverId);
-//				logger.info("调用策略平台批量查询积分-driverId："+driverId+";driverIntegraInfo="+(driverIntegraInfo==null?"null":driverIntegraInfo.toJSONString()));
-                    if(driverIntegraInfo != null){
-                        //设置司机当月积分
-                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("monthIntegral")) && !("null".equals(driverIntegraInfo.getString("monthIntegral")))) {
-                            try{
-                            temp = new BigDecimal(driverIntegraInfo.getString("monthIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
-                            driverVoEntity.setMonthIntegral(temp.toString());
-                            }catch (Exception e){
-
-                            }
-                        }
-                        //设置司机当日积分
-                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("todayIntegral")) && !("null".equals(driverIntegraInfo.getString("todayIntegral")))) {
-                            try{
-                                temp = new BigDecimal(driverIntegraInfo.getString("todayIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
-                                driverVoEntity.setDayIntegral(temp.toString());
-                            }catch (Exception e){
-
-                            }
-
-                        }
-                        //设置司机司机等级
-                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("membershipName"))  && !("null".equals(driverIntegraInfo.getString("membershipName")))){
-                            driverVoEntity.setMembershipName(driverIntegraInfo.getString("membershipName"));
-
-                        }
-
-                    }
-                }
-            }
+            rows = page.getList();
+            //组装当前页对象
+            generatePageData(rows);
             return this.gridJsonFormate(rows, total);
         }catch (Exception e){
             logger.error("司机积分数据列表异常,参数为："+(driverEntity==null?"null": JSON.toJSONString(driverEntity)),e);
@@ -216,7 +166,9 @@ public class DriverIntegraController {
     }
 
     private JSONArray getDriverIntegralInfoList(List<JSONObject> driverInfoList){
-
+        if(driverInfoList == null || driverInfoList.size() == 0){
+            return null;
+        }
         JSONObject jsonObj = null;
         JSONArray  retArray = null;
         long start = System.currentTimeMillis();
@@ -254,13 +206,17 @@ public class DriverIntegraController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
-    public String queryDriverIntegralListDataDown(DriverVoEntity driverEntity, HttpServletResponse response) {
+    public String queryDriverIntegralListDataDown(DriverVoEntity driverEntity, HttpServletRequest request, HttpServletResponse response) {
         driverEntity.setPage(1);
-        driverEntity.setPagesize(Integer.MAX_VALUE);
-
+        int pageSize = CsvUtils.downPerSize;
+        driverEntity.setPagesize(pageSize);
         logger.info("queryDriverIntegralListDataDown:下载司机积分数据列表,参数为："+(driverEntity==null?"null": JSON.toJSONString(driverEntity)));
-
-
+        if(driverEntity.getCityId() == 0){
+            return "请选择城市";
+        }
+        if(driverEntity.getSupplierId() == null){
+            return "请选择供应商";
+        }
         try {
             // 权限
             SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
@@ -294,20 +250,27 @@ public class DriverIntegraController {
                     teamIds += id;
                 }
             }
-//            if (driverEntity.getServiceCityId() != null && !"".equals(driverEntity.getServiceCityId())) {
-//                cities = String.valueOf(driverEntity.getServiceCityId());
-//            }
-//            if (driverEntity.getSupplierId() != null && !"".equals(driverEntity.getSupplierId())) {
-//                suppliers = String.valueOf(driverEntity.getSupplierId());
-//            }
             if (!"".equals(driverEntity.getTeamIds()) && driverEntity.getTeamIds() != null) {
                 teamIds = driverEntity.getTeamIds();
             }
-            List<DriverVoEntity> rows = new ArrayList<DriverVoEntity>();
-            int total = 0;
+
+            List<DriverVoEntity> pageRows = new ArrayList<DriverVoEntity>();
+            long total = 0;
             driverEntity.setCities(cities);
             driverEntity.setSuppliers(suppliers);
             String driverIds = "";
+
+            String fileName = "司机积分"+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
+            String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
+            if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
+                fileName = URLEncoder.encode(fileName, "UTF-8");
+            } else {  //其他浏览器
+                fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+            }
+
+            List<String> headerList = new ArrayList<>();
+            headerList.add("序号, 城市,司机ID, 司机姓名,当前司机等级,手机号,供应商,车队,车牌号,当月积分,当日积分");
+            List<String> csvDataList  = new ArrayList<String>();
             if (StringUtils.isNotBlank(teamIds)) {
                 String[] teamId = teamIds.split(",");
                 DriverTeamRelationEntity params = new DriverTeamRelationEntity();
@@ -329,8 +292,10 @@ public class DriverIntegraController {
                 if (StringUtils.isEmpty(driverIds)) {
 
                     try {
-                        doDownExcel( rows,   response);
+                        csvDataList.add("没有查到符合条件的数据");
+                        new CsvUtils().exportCsvV2(response,csvDataList,headerList,fileName,true,true);
                     } catch (IOException e) {
+                        logger.error("导出司机积分异常，参数driverEntity="+(driverEntity==null?"null":JSON.toJSONString(driverEntity)));
                         e.printStackTrace();
                     }
                     return null;
@@ -340,205 +305,162 @@ public class DriverIntegraController {
             if(driverEntity.getCityId() != 0){
                 driverEntity.setServiceCityId(driverEntity.getCityId());
             }
-
-            total = this.driverService.selectDriverByKeyCountAddCooperation(driverEntity);
+            PageInfo<DriverVoEntity> page = this.driverService.findPageDriver(driverEntity);
+            total = page.getTotal();
+            CsvUtils entity = new CsvUtils();
             if (total == 0) {
                 try {
-                    doDownExcel( rows,   response);
+                    csvDataList.add("没有查到符合条件的数据");
+                    entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
                 } catch (IOException e) {
+                    logger.error("导出司机积分异常，参数driverEntity="+(driverEntity==null?"null":JSON.toJSONString(driverEntity)));
                     e.printStackTrace();
                 }
                 return null;
             }
+            pageRows = page.getList();
+            //拼装当前页数据
+            generatePageData(  pageRows);
+            dataTrans(pageRows,csvDataList);
 
-            rows = this.driverService.selectDriverByKeyAddCooperation(driverEntity);
+            int pages = page.getPages();
 
+            boolean isFirst = true;
+            boolean isLast = false;
+            if(pages == 1){
+                isLast = true;
+            }
+            entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
+            csvDataList = null;
+            isFirst = false;
+
+            //进行分页处理
+            for(int pageNumber=2 ; pageNumber <= pages ;pageNumber++){
+                driverEntity.setPage(pageNumber);
+                page = this.driverService.findPageDriver(driverEntity);
+                pageRows = page.getList();
+
+                //拼装当前页数据
+                generatePageData(  pageRows);
+                csvDataList  = new ArrayList<String>();
+                dataTrans(pageRows,csvDataList);
+                if(pageNumber == pages){
+                    isLast = true;
+                }
+                entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
+
+            }
+
+            return "下载成功";
+        } catch (Exception e) {
+            logger.error("下载司机积分异常,driverEntity="+(driverEntity==null?"null":JSON.toJSONString(driverEntity)),e);
+        }
+        return "下载失败，请联系管理员";
+    }
+    private void generatePageData(List<DriverVoEntity> pageRows){
+        if(pageRows != null){
             List<JSONObject> driverInfoList = new ArrayList<>();
-            for (DriverVoEntity driverVoEntity : rows) {
+            Map<String,JSONObject> itemMap = new HashMap<>();
+
+            for (DriverVoEntity driverVoEntity : pageRows) {
                 JSONObject item = new JSONObject();
                 item.put("driverId",StringUtils.isNotEmpty(driverVoEntity.getDriverId())?Integer.parseInt(driverVoEntity.getDriverId()):0);
                 item.put("cityId",driverVoEntity.getServiceCityId());
                 driverInfoList.add(item);
             }
-            JSONArray driverIntegralInfoArray = new JSONArray();
-            int length = driverInfoList.size();
-            int max = 1000;
-            if(length <= max){
-                driverIntegralInfoArray = getDriverIntegralInfoList(driverInfoList);
-            }else {
-                //进行分页处理
-                List<JSONObject> paramDriverInfoList = new ArrayList<>();
-
-                for(int i=0;i<length;i++){
-                    if((i+1) % max == 0){
-                        JSONArray newDriverIntegralInfoArray = getDriverIntegralInfoList(paramDriverInfoList);
-                        driverIntegralInfoArray.addAll(newDriverIntegralInfoArray);
-                        paramDriverInfoList.clear();
-                    }else{
-                        paramDriverInfoList.add(driverInfoList.get(i));
-                    }
-                }
-                if(paramDriverInfoList.size() >= 1){
-                    JSONArray newDriverIntegralInfoArray = getDriverIntegralInfoList(paramDriverInfoList);
-                    driverIntegralInfoArray.addAll(newDriverIntegralInfoArray);
-                }
-
-            }
-
-            if(driverIntegralInfoArray != null){
-                Map<String,JSONObject> itemMap = new HashMap<>();
-                int size = driverIntegralInfoArray.size();
+            //查询司机等级积分
+            JSONArray allDriverIntegralInfoArray = getDriverIntegralInfoList(driverInfoList);
+            if(allDriverIntegralInfoArray != null){
+                int size = allDriverIntegralInfoArray.size();
                 for(int i=0;i<size;i++ ){
-                    JSONObject item = driverIntegralInfoArray.getJSONObject(i);
+                    JSONObject item = allDriverIntegralInfoArray.getJSONObject(i);
                     itemMap.put("flag_"+item.getInteger("driverId"),item);
                 }
-                String driverId = null;
-                BigDecimal temp;
-                for (DriverVoEntity driverVoEntity : rows) {
-
-                    driverId = driverVoEntity.getDriverId() ;
-                    JSONObject driverIntegraInfo = itemMap.get("flag_"+driverId);
-//				logger.info("调用策略平台批量查询积分-driverId："+driverId+";driverIntegraInfo="+(driverIntegraInfo==null?"null":driverIntegraInfo.toJSONString()));
-                    if(driverIntegraInfo != null){
-                        //设置司机当月积分
-                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("monthIntegral")) && !("null".equals(driverIntegraInfo.getString("monthIntegral")))) {
-                            try{
-                                temp = new BigDecimal(driverIntegraInfo.getString("monthIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
-                                driverVoEntity.setMonthIntegral(temp.toString());
-                            }catch (Exception e){
-                                logger.error("设置司机当月积分异常，driverId="+driverId+"，monthIntegral="+driverIntegraInfo.getString("monthIntegral"));
-                            }
+            }
+            String driverId = null;
+            BigDecimal temp;
+            for (DriverVoEntity driverVoEntity : pageRows) {
+                driverId = driverVoEntity.getDriverId() ;
+                JSONObject driverIntegraInfo = itemMap.get("flag_"+driverId);
+                if(driverIntegraInfo != null){
+                    //设置司机当月积分
+                    if(StringUtils.isNotEmpty(driverIntegraInfo.getString("monthIntegral")) && !("null".equals(driverIntegraInfo.getString("monthIntegral")))) {
+                        try{
+                            temp = new BigDecimal(driverIntegraInfo.getString("monthIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
+                            driverVoEntity.setMonthIntegral(temp.toString());
+                        }catch (Exception e){
+                            logger.error("设置司机当月积分异常，driverId="+driverId+"，monthIntegral="+driverIntegraInfo.getString("monthIntegral"));
                         }
-                        //设置司机当日积分
-                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("todayIntegral")) && !("null".equals(driverIntegraInfo.getString("todayIntegral")))) {
-                            try{
-                                temp = new BigDecimal(driverIntegraInfo.getString("todayIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
-                                driverVoEntity.setDayIntegral(temp.toString());
-                            }catch (Exception e){
-                                logger.error("设置司机当日积分异常，driverId="+driverId+"，todayIntegral="+driverIntegraInfo.getString("todayIntegral"));
-                            }
-
+                    }
+                    //设置司机当日积分
+                    if(StringUtils.isNotEmpty(driverIntegraInfo.getString("todayIntegral")) && !("null".equals(driverIntegraInfo.getString("todayIntegral")))) {
+                        try{
+                            temp = new BigDecimal(driverIntegraInfo.getString("todayIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
+                            driverVoEntity.setDayIntegral(temp.toString());
+                        }catch (Exception e){
+                            logger.error("设置司机当日积分异常，driverId="+driverId+"，todayIntegral="+driverIntegraInfo.getString("todayIntegral"));
                         }
-                        //设置司机司机等级
-                        if(StringUtils.isNotEmpty(driverIntegraInfo.getString("membershipName"))  && !("null".equals(driverIntegraInfo.getString("membershipName")))){
-                            try{
-                                driverVoEntity.setMembershipName(driverIntegraInfo.getString("membershipName"));
-                            }catch (Exception e){
-                                logger.error("设置司机等级异常，driverId="+driverId+"，membershipName="+driverIntegraInfo.getString("membershipName"));
 
-                            }
+                    }
+                    //设置司机司机等级
+                    if(StringUtils.isNotEmpty(driverIntegraInfo.getString("membershipName"))  && !("null".equals(driverIntegraInfo.getString("membershipName")))){
+                        try{
+                            driverVoEntity.setMembershipName(driverIntegraInfo.getString("membershipName"));
+                        }catch (Exception e){
+                            logger.error("设置司机等级异常，driverId="+driverId+"，membershipName="+driverIntegraInfo.getString("membershipName"));
+
                         }
                     }
                 }
             }
-            doDownExcel( rows,   response);
-            return null;
-        } catch (Exception e) {
-            logger.error("下载司机积分异常",e);
         }
-        return "下载失败，请稍后重试";
     }
-    private void  doDownExcel(List<DriverVoEntity> rows, HttpServletResponse response) throws IOException {
-        //生成一个Excel文件
-
-        String columnNames[] = {"序号", "城市", "司机ID", "司机姓名", "当前司机等级", "手机号", "供应商", "车队", "车牌号", "当月积分", "当日积分"};//列名
-        // 创建excel工作簿
-        Workbook wb = new HSSFWorkbook();
-        // 创建第一个sheet（页），并命名
-        Sheet sheet = wb.createSheet("司机等级积分列表");
-        // 手动设置列宽。
-        // 第一个参数表示要为第几列设；
-        // 第二个参数表示列的宽度，n为列高的像素数。
-        int columnLength = columnNames.length;
-        for (int i = 0; i < columnLength; i++) {
-            sheet.setColumnWidth((short) i, (short) (35.7 * 150));
+    private void dataTrans(List<DriverVoEntity> list, List<String>  csvDataList ){
+        if(null == list){
+            return;
         }
-        // 创建第一行
-        Row row = sheet.createRow((short) 0);
+        int index  = 0;
+        for(DriverVoEntity rowEntity:list){
+            StringBuffer stringBuffer = new StringBuffer();
+            index++;
+            stringBuffer.append(index);
+            stringBuffer.append(",");
 
-        //设置列名
-        for (int i = 0; i < columnNames.length; i++) {
-            Cell cell = row.createCell(i);
-            cell.setCellValue(columnNames[i]);
-        }
-        if(rows == null || rows.size() ==0){
-            Row rowItem = sheet.createRow((short) 1);
-            Cell cell = rowItem.createCell(0);
-            cell.setCellValue("没有查到数据");
-        } else {
-            int rowIndex = 1;
-            for(DriverVoEntity rowEntity:rows){
-                Row rowItem = sheet.createRow((short) rowIndex);
+            stringBuffer.append(rowEntity.getServiceCity()==null?"":rowEntity.getServiceCity());
+            stringBuffer.append(",");
 
-                Cell cell = rowItem.createCell(0);
-                cell.setCellValue(rowIndex);
+            stringBuffer.append(rowEntity.getDriverId()==null?"":("\t"+rowEntity.getDriverId()));
+            stringBuffer.append(",");
 
-                cell = rowItem.createCell(1);
-                cell.setCellValue(rowEntity.getServiceCity());
+            stringBuffer.append(rowEntity.getName()==null?"":rowEntity.getName());
+            stringBuffer.append(",");
 
-                cell = rowItem.createCell(2);
-                cell.setCellValue(rowEntity.getDriverId());
 
-                cell = rowItem.createCell(3);
-                cell.setCellValue(rowEntity.getName());
+            stringBuffer.append(rowEntity.getMembershipName()==null?"":rowEntity.getMembershipName());
+            stringBuffer.append(",");
 
-                cell = rowItem.createCell(4);
-                cell.setCellValue(rowEntity.getMembershipName());
+            stringBuffer.append(rowEntity.getPhone()==null?"":("\t"+rowEntity.getPhone()));
+            stringBuffer.append(",");
 
-                cell = rowItem.createCell(5);
-                cell.setCellValue(rowEntity.getPhone());
+            stringBuffer.append(rowEntity.getSupplierName()==null?"":rowEntity.getSupplierName());
+            stringBuffer.append(",");
 
-                cell = rowItem.createCell(6);
-                cell.setCellValue(rowEntity.getSupplierName());
 
-                cell = rowItem.createCell(7);
-                cell.setCellValue(rowEntity.getTeamName());
+            stringBuffer.append(rowEntity.getTeamName()==null?"":rowEntity.getTeamName());
+            stringBuffer.append(",");
 
-                cell = rowItem.createCell(8);
-                cell.setCellValue(rowEntity.getLicensePlates());
 
-                cell = rowItem.createCell(9);
-                cell.setCellValue(rowEntity.getMonthIntegral());
+            stringBuffer.append(rowEntity.getLicensePlates()==null?"":rowEntity.getLicensePlates());
+            stringBuffer.append(",");
 
-                cell = rowItem.createCell(10);
-                cell.setCellValue(rowEntity.getDayIntegral());
-                rowIndex ++;
-            }
-        }
-        //同理可以设置数据行
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        try {
-            wb.write(os);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        byte[] content = os.toByteArray();
-        InputStream is = new ByteArrayInputStream(content);
-        // 设置response参数，可以打开下载页
-        response.reset();
-        response.setContentType("application/vnd.ms-excel;charset=utf-8");
-        response.setHeader("Content-Disposition", "attachment;filename=" + new String("司机等级积分列表.xls".getBytes(), "iso-8859-1"));
-        ServletOutputStream out = response.getOutputStream();
-        BufferedInputStream bis = null;
-        BufferedOutputStream bos = null;
-        try {
-            bis = new BufferedInputStream(is);
-            bos = new BufferedOutputStream(out);
-            byte[] buff = new byte[2048];
-            int bytesRead;
-            // Simple read/write loop.
-            while (-1 != (bytesRead = bis.read(buff, 0, buff.length))) {
-                bos.write(buff, 0, bytesRead);
-            }
-        } catch (final IOException e) {
-            throw e;
-        } finally {
-            if (bis != null) {
-                bis.close();
-            }
-            if (bos != null) {
-                bos.close();
-            }
+
+            stringBuffer.append(rowEntity.getMonthIntegral()==null?"":rowEntity.getMonthIntegral());
+            stringBuffer.append(",");
+
+            stringBuffer.append(rowEntity.getDayIntegral()==null?"":rowEntity.getDayIntegral());
+
+            csvDataList.add(stringBuffer.toString());
+
         }
     }
 

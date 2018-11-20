@@ -65,7 +65,6 @@
     ORDER BY ca.driver_id DESC
   </select>
 
-
   <select id="queryCustomerAppraisalStatisticsListV2" resultMap="BaseResultMap" parameterType="com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO" >
     select
     ca.appraisal_statistics_id, ca.driver_id, ca.driver_name, ca.driver_phone, ca.instrument_and_service,
@@ -84,4 +83,5 @@
     </where>
     ORDER BY ca.driver_id DESC
   </select>
-</mapper>
+ </mapper>
+

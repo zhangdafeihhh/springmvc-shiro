@@ -106,4 +106,16 @@
 			</if>
 	</select>
 
+    <select id="queryDriverGroupRelationListByDriverIdSet" parameterType="java.util.List" resultMap="BaseResultMap">
+        SELECT
+        relation_id, group_id,driver_id
+        FROM
+        car_relate_group
+        WHERE
+        driver_id IN
+        <foreach collection="list" open="(" close=")" separator="," item="gid" >
+            #{gid}
+        </foreach>
+    </select>
+
 </mapper>

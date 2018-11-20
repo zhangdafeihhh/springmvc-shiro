@@ -21,7 +21,7 @@ public class CarDriverDayDuty {
 
     private String teamName;
 
-    private String time;
+    private String time;//排班日期
 
     private String forcedIds;
 
@@ -29,7 +29,7 @@ public class CarDriverDayDuty {
 
     private String forcedTimes;
 
-    private String dutyTimes;
+    private String dutyTimes;//排班时长
 
     private Integer type;
 
@@ -139,7 +139,7 @@ public class CarDriverDayDuty {
         this.forcedTimes = forcedTimes == null ? null : forcedTimes.trim();
     }
 
-    public String getDutyTimes() {
+    public String getDutyTimes() {//排班时长
         return dutyTimes;
     }
 

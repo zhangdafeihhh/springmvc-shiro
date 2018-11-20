@@ -14,6 +14,7 @@ import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.util.Common;
+import com.zhuanche.util.MyRestTemplate;
 import mapper.driverOrderRecord.DriverOrderRecordMapper;
 import mapper.orderPlatform.PoolMainOrderMapper;
 import mapper.rentcar.ex.*;
@@ -29,6 +30,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -64,6 +66,10 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
     //订单组提供 拼车子orderNo查主订单URL
     @Value("${car.rest.url}")
 	String  carRestUrl;
+
+	@Autowired
+	@Qualifier("orderApiTemplate")
+	private MyRestTemplate orderApiTemplate;
     
     
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -243,7 +249,9 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 		List<CarFactOrderInfoDTO> list = null;
 		String url = orderSearchUrl+Common.ORDER_ORDER_LIST_DATE;
 		try {
-			String result = HttpClientUtil.buildPostRequest(url).addParams(paramMap).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
+			String result = orderApiTemplate.postForObject(Common.ORDER_ORDER_LIST_DATE,
+					String.class, paramMap);
+
 			JSONObject job = JSON.parseObject(result);
 			if (job == null) {
 				logger.error("调用订单接口" + url + "返回结果为null");
@@ -272,43 +280,6 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 		return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 	}
 
-	/**
-	 * 查询 订单接口dataList
-	 * @param paramMap
-	 * @return
-	 */
-	@Override
-	public List<CarFactOrderInfoDTO>  queryAllOrderDataList(Map<String, Object> paramMap) {
-		List<CarFactOrderInfoDTO> list = null;
-		String url = orderSearchUrl+Common.ORDER_ORDER_LIST_DATE;
-		try {
-			String result = HttpClientUtil.buildPostRequest(url).addParams(paramMap).setConnectTimeOut(CONNECT_TIMEOUT)
-					.setReadTimeOut(READ_TIMEOUT).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
-			JSONObject job = JSON.parseObject(result);
-			if (job == null) {
-				logger.error("调用订单接口" + url + "返回结果为null");
-				return list;
-			}
-			if (!job.getString("code").equals("0")) {
-				logger.info("调用订单接口" + url + "返回结果为result"+result);
-				return list;
-			}
-			if (job != null) {
-				if("0".equals(job.get("code").toString())){
-					JSONObject jobres = JSON.parseObject(job.get("data").toString());
-					if(jobres!=null){
-						list =  JSONArray.parseArray(jobres.get("data").toString(), CarFactOrderInfoDTO.class);   
-						return list;
-					}
-				}
-			}
-		} catch (Exception e) {
-			logger.error("调用订单接口" + url + "异常", e);
-			e.printStackTrace();
-			return null;
-		}
-		return list;
-	}
 	
 	@Override
 	public CarBizOrderSettleEntity selectDriverSettleByOrderId(Long orderId) {
@@ -384,173 +355,6 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 	public List<ServiceTypeDTO> selectServiceEntityList(ServiceEntity serviceEntity) {
 		return carFactOrderExMapper.selectServiceEntityList(serviceEntity);
 	}
-	
-	 public static void main(String[] args) {
-		List<CarFactOrderInfoDTO> list = null;
-		String url = "http://test-inside-trace-source-lbs.01zhuanche.com/grapsRoad";
-		 Map<String, Object> paramMap = new HashMap<String, Object>();
-	     paramMap.put("startDate", "2018-06-20 17:39:40");// 
-	     paramMap.put("endDate", "2018-06-20 17:57:10");//
-	     paramMap.put("driverId", "199824");//
-	     paramMap.put("output", "0");//
-	     paramMap.put("platform", "3");// 
-		try {
-			String result = HttpClientUtil.buildPostRequest(url).addParams(paramMap).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
-			JSONObject job = JSON.parseObject(result);
-			if (job == null) {
-				logger.error("调用订单接口" + url + "返回结果为null");
-			}
-			if (!job.getString("code").equals("0")) {
-				logger.info("调用订单接口" + url + "返回结果为result"+result);
-			}
-			if (job != null) {
-				if("0".equals(job.get("code").toString())){
-					JSONObject jobres = JSON.parseObject(job.get("data").toString());
-					if(jobres!=null){
-						list =  JSONArray.parseArray(jobres.get("data").toString(), CarFactOrderInfoDTO.class);   
-						jobres.remove("data");
-						jobres.put("data", list);
-					}
-				}
-			}
-		} catch (Exception e) {
-			logger.error("调用订单接口" + url + "异常", e);
-			e.printStackTrace();
-		}
-	}
-	 
-	@Override
-	public Workbook exportExceleOrderList(List<CarFactOrderInfoDTO> list,String path) throws Exception {
-	
-		FileInputStream io = new FileInputStream(path);
-		// 创建 excel
- 		Workbook wb = new XSSFWorkbook(io);
-		if (list != null && list.size() > 0) {
-			Sheet sheet = null;
-			try {
-				sheet = wb.getSheetAt(0);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			Cell cell = null;
-			int i = 0;
-			for (CarFactOrderInfoDTO s : list) {
-				Row row = sheet.createRow(i + 1);
-				// //订单号 
-				cell = row.createCell(0);
-				cell.setCellValue(s.getOrderNo() != null ? ""
-						+ s.getOrderNo() + "" : "");
-				//  订单指派方式 
-				cell = row.createCell(1);
-				cell.setCellValue(s.getPushDriverType() != null ? ""
-						+ s.getPushDriverType() + "" : "");
-				// 城市 
-				cell = row.createCell(2);
-				cell.setCellValue(s.getCityName() != null ? ""
-						+ s.getCityName() + "" : "");
-				// 
-				cell = row.createCell(3);
-				cell.setCellValue(s.getServiceName() != null ? ""
-						+ s.getServiceName() + "" : "");
-				// 车型类别
-				cell = row.createCell(4);
-				cell.setCellValue(s.getGroupName() != null ? ""
-						+ s.getGroupName() + "" : "");
-				//  
-				cell = row.createCell(5);
-				cell.setCellValue(s.getType() != null ? ""
-						+ s.getType() + "" : "");
-				//  
-				cell = row.createCell(6);
-				cell.setCellValue(s.getBookingUserName() != null ? ""
-						+ s.getBookingUserName() + "" : "");
-				// 
-				cell = row.createCell(7);
-				cell.setCellValue(s.getBookingUserPhone() != null ? ""
-						+ s.getBookingUserPhone() + "" : "");
-				// 
-				cell = row.createCell(8);
-				cell.setCellValue(s.getRiderName() != null ? ""
-						+ s.getRiderName() + "" : "");
-				//  
-				cell = row.createCell(9);
-				cell.setCellValue(s.getRiderPhone() != null ? ""
-						+ s.getRiderPhone() + "" : "");
-				//  
-				cell = row.createCell(10);
-				cell.setCellValue(s.getDriverName() != null ? ""
-						+ s.getDriverName() + "" : "");
-				//  
-				cell = row.createCell(11);
-				cell.setCellValue(s.getDriverPhone() != null ? ""
-						+ s.getDriverPhone() + "" : "");
-				//  
-				cell = row.createCell(12);
-				cell.setCellValue(s.getLicensePlates() != null ? ""
-						+ s.getLicensePlates() + "" : "");
-				//  
-				cell = row.createCell(13);
-				cell.setCellValue(s.getSupplierFullName() != null ? ""
-						+ s.getSupplierFullName() + "" : "");
-				//  
-				//BigDecimal b = new BigDecimal((Integer.valueOf(s.getTravelTime())/60/1000));
-				cell = row.createCell(14);
-				cell.setCellValue(s.getTravelTime() != null ? ""
-						+ formatDouble(Double.valueOf(s.getTravelTime())/60/1000) + "" : "");
-				
-				
-				
-			//  
-				cell = row.createCell(15);
-				cell.setCellValue(s.getTravelMileage() != null ? ""
-						+ s.getTravelMileage() + "" : "");
-				//  
-				cell = row.createCell(16);
-				cell.setCellValue(s.getActualPayAmount() != null ? ""
-						+ s.getActualPayAmount() + "" : "");
-				//  
-				cell = row.createCell(17);
-				cell.setCellValue(s.getCouponId() != null ? ""
-						+ s.getCouponId() + "" : "");
-				//  
-				cell = row.createCell(18);
-				cell.setCellValue(s.getCouponAmount() != null ? ""
-						+ s.getCouponAmount() + "" : "");
-				 //
-				cell = row.createCell(19);
-				cell.setCellValue(s.getCreateDate() != null ? ""
-						+ s.getCreateDate() + "" : "");
-				//  
-				cell = row.createCell(20);
-				cell.setCellValue(s.getCostEndDate() != null ? ""
-						+ s.getCostEndDate() + "" : "");
 
-				//  
-				cell = row.createCell(21);
-				cell.setCellValue(s.getFactStartAddr() != null ? ""
-						+ s.getFactStartAddr() + "" : "");
-				//  
-				cell = row.createCell(22);
-				cell.setCellValue(s.getFactEndAddr() != null ? ""
-						+ s.getFactEndAddr() + "" : "");
-				//  
-				cell = row.createCell(23);
-				cell.setCellValue(s.getDicName() != null ? ""
-						+ s.getDicName() + "" : "");
-				//  
-				cell = row.createCell(24);
-				cell.setCellValue(s.getAirportId() != null ? ""
-						+ s.getAirportId() + "" : "");
-				//  
-				cell = row.createCell(25);
-				cell.setCellValue(s.getMainOrderNo() != null ? ""
-						+ s.getMainOrderNo() + "" : "");
-				i++;
-			}
-		}
-		return wb;
-	}
-    public static double formatDouble(double d) {
-        return (double)Math.round(d*100)/100;
-    }
+
 }

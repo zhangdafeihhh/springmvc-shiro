@@ -1,7 +1,10 @@
 package com.zhuanche.controller.driverdutystatistic;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -16,9 +19,11 @@ import com.zhuanche.entity.mdbcarmanage.DriverDutyStatisticParams;
 import com.zhuanche.entity.mdblog.StatisticDutyHalf;
 import com.zhuanche.entity.mdblog.StatisticDutyHalfParams;
 import com.zhuanche.entity.rentcar.CarBizCity;
+import com.zhuanche.serv.DriverDutyStatisticService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
+import com.zhuanche.util.excel.CsvUtils;
 import mapper.mdbcarmanage.ex.DriverDutyStatisticExMapper;
 import mapper.mdblog.ex.StatisticDutyHalfExMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
@@ -39,6 +44,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -54,11 +61,11 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	private static Logger log =  LoggerFactory.getLogger(DriverDutyStatisticController.class);
 
 	@Autowired
-	private DriverDutyStatisticExMapper driverDutyStatisticExMapper;
+	private DriverDutyStatisticService driverDutyStatisticService;
+
 	@Autowired
 	private StatisticDutyHalfExMapper statisticDutyHalfExMapper;
-	@Autowired
-	private CarBizCityExMapper carBizCityExMapper;
+
 
 	/**
 	 * 司机考勤查询
@@ -132,20 +139,25 @@ public class DriverDutyStatisticController extends DriverQueryController{
 		//处理参数
 		params = chuliDriverDutyStatisticParams(params);
 		//开始查询
-		Page<DriverDutyStatistic> p = PageHelper.startPage(params.getPage(), params.getPageSize());
+
 		List<DriverDutyStatistic> list = null;
-		try{
-			if (reportType.equals(0)){
-				list = this.driverDutyStatisticExMapper.queryForListObject(params);
-			}else{
-				list = this.driverDutyStatisticExMapper.queryDriverMonthDutyList(params);
+		PageInfo<DriverDutyStatistic> pageInfo = null;
+
+		if (reportType.equals(0)){
+			pageInfo =  driverDutyStatisticService.queryDriverDayDutyList(params);
+			if(pageInfo != null){
+				list = pageInfo.getList();
 			}
-			total = (int) p.getTotal();
-		}finally {
-			PageHelper.clearPage();
+		}else{
+			pageInfo =  driverDutyStatisticService.queryDriverMonthDutyList(params);
+			if(pageInfo != null){
+				list = pageInfo.getList();
+			}
 		}
+		total = (int) pageInfo.getTotal();
+
 		//数据转换
-		List<DriverDutyStatisticDTO> dtoList = selectSuppierNameAndCityName(list);
+		List<DriverDutyStatisticDTO> dtoList = driverDutyStatisticService.selectSuppierNameAndCityName(list);
 		PageDTO pageDTO = new PageDTO(params.getPage(), params.getPageSize(), total, dtoList);
 		return AjaxResponse.success(pageDTO);
 	}
@@ -188,87 +200,58 @@ public class DriverDutyStatisticController extends DriverQueryController{
 		return AjaxResponse.success(pageDTO);
 	}
 
-	/**
-	 * 导出司机考勤操作
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	@ResponseBody
-	@RequestMapping("/exportDriverDutyStatistic")
-	@MasterSlaveConfigs(configs = {
-			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
-	})
-	public AjaxResponse exportDriverDuty(@Verify(param = "cityId",rule = "required") String cityId, @Verify(param = "supplierId",rule = "required") String supplierId, String teamId, String groupIds, String name,
-		 String  phone, String licensePlates,@Verify(param = "startTime",rule = "required")  String startTime,
-		 String endTime, Integer reportType, HttpServletRequest request, HttpServletResponse response) throws ParseException {
+	private void dataTrans(List<DriverDutyStatisticDTO> result,List<String>  csvDataList,int reportType){
+		if(null == result){
+			return;
+		}
+		for(DriverDutyStatisticDTO s:result){
+			StringBuffer stringBuffer = new StringBuffer();
 
-		//默认日统计
-		reportType = reportType == null ? 0 : reportType;
-		//如果是日统计，开始时间和结束时间不能为空并且开始时间和结束时间在一个月内
-		if (reportType.equals(0)){
-			if(StringUtils.isEmpty(endTime)){
-				return AjaxResponse.fail(RestErrorCode.ENDTIME_IS_NULL);
+			stringBuffer.append(s.getName());
+			stringBuffer.append(",");
+			if (reportType  == 0){
+				stringBuffer.append(s.getTime()==null?"":("\t"+s.getTime()));
+				stringBuffer.append(",");
 			}
-			if (startTime.compareTo(endTime) > 0 ){
-				return AjaxResponse.fail(RestErrorCode.STARTTIME_GREATE_ENDTIME);
-			}
-			if(!startTime.substring(0,7).equals(endTime.substring(0,7))){
-				return AjaxResponse.fail(RestErrorCode.ONLY_QUERY_ONE_MONTH);
-			}
+
+			stringBuffer.append(s.getPhone()==null?"":("\t"+s.getPhone()));
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getLicenseplates()==null?"":s.getLicenseplates());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getDutytime()==null?"":s.getDutytime());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getForcedtime()==null?"":s.getForcedtime());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getOvertime()==null?"":s.getOvertime());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getDutyTimeAll()==null?"":s.getDutyTimeAll());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getForcedTimeAll()==null?"":s.getForcedTimeAll());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getCityName()==null?"":s.getCityName());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getForcedtime1()==null?"":s.getForcedtime1());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getForcedtime2()==null?"":s.getForcedtime2());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getForcedtime3()==null?"":s.getForcedtime3());
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getForcedtime4()==null?"":s.getForcedtime4());
+
+			csvDataList.add(stringBuffer.toString());
 		}
-		//初始化参数
-		DriverDutyStatisticParams params = new DriverDutyStatisticParams(cityId,supplierId,teamId,groupIds,name,
-				null,phone,licensePlates,startTime,endTime,null, null,null,null);
-		log.info("导出司机考勤操作，入参：" + params.toString());
-		String driverList = "";
-		List<DriverDutyStatisticDTO> rows = new ArrayList<>();
-		//如果页面输入了小组id或者车队id
-		if(StringUtils.isNotEmpty(params.getGroupIds()) ||  StringUtils.isNotEmpty(params.getTeamId())){
-			//通过小组id查询司机id, 如果用户
-			driverList = super.queryAuthorityDriverIdsByTeamAndGroup(params.getTeamId(), String.valueOf(params.getGroupIds()));
-			//如果该小组下无司机，返回空
-			if(StringUtils.isEmpty(driverList)){
-				log.info("司机考勤3.0列表-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds());
-				log.info("或者司机考勤3.0列表-有选择车队查询条件-该车队下没有司机teamId=="+params.getTeamId());
-			}
-		}
-		if ((StringUtils.isEmpty(params.getGroupIds()) &&  StringUtils.isEmpty(params.getTeamId()) && StringUtils.isEmpty(driverList)) || StringUtils.isNotEmpty(driverList)){
-			params.setDriverIds(driverList);
-			params = chuliDriverDutyStatisticParams(params);
-			if(StringUtils.isNotEmpty(params.getStartTime())){
-				String time = params.getStartTime();
-				int value = setDriverDutyStatisticValue(time);
-				params.setValue(value);
-				params.setTable("statistic_duty_"+time.substring(0,7).replaceAll("-", "_"));
-			}
-			List<DriverDutyStatistic> list = null;
-			if (reportType.equals(0)){
-				list = this.driverDutyStatisticExMapper.queryForListObject(params);
-			}else{
-				list = this.driverDutyStatisticExMapper.queryDriverMonthDutyList(params);
-			}
-			//设置供应商名称和城市名称
-			rows = selectSuppierNameAndCityName(list);
-		}
-		try {
-			Workbook wb = null;
-			String  fileName = "司机考勤日列表";
-			if (reportType==0){
-				wb = this.exportExcelTongyong(rows,request.getRealPath("/")+ File.separator+"template"+File.separator+"driverDuty2_info.xlsx");
-			}else{
-				wb = this.exportMonthExcelTongyong(rows,request.getRealPath("/")+ File.separator+"template"+File.separator+"driverDuty2_info_month.xlsx");
-				fileName = "司机考勤月统计列表";
-			}
-			super.exportExcelFromTemplet(request, response, wb, new String(fileName.getBytes("utf-8"), "iso8859-1"));
-			return AjaxResponse.success("文件导出成功");
-		} catch (Exception e) {
-			if(rows!=null){
-				rows.clear();
-			}
-			log.error("导出司机考勤操作失败",e);
-			return AjaxResponse.fail(RestErrorCode.FILE_EXCEL_REPORT_FAIL);
-		}
+
 	}
 
 	/**
@@ -302,38 +285,7 @@ public class DriverDutyStatisticController extends DriverQueryController{
 		return params;
 	}
 
-	/**
-	 * <p>Title: selectSuppierNameAndCityNameDays</p>
-	 * <p>Description: 转换</p>
-	 * @param rows
-	 * @return
-	 * return: List<DriverDailyReportDTO>
-	 */
-	@MasterSlaveConfigs(configs = {
-			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
-	})
-	public List<DriverDutyStatisticDTO> selectSuppierNameAndCityName(List<DriverDutyStatistic> rows){
-		List<DriverDutyStatisticDTO> list = null;
-		//不为空进行转换并查询城市名称和供应商名称
-		if(rows!=null&&rows.size()>0){
-			Set<Integer> s = new HashSet();
-			for(DriverDutyStatistic driverDutyStatistic : rows){
-				s.add(driverDutyStatistic.getCityid());
-			}
-			//查询供应商名称，一次查询出来避免多次读库
-			List<CarBizCity> names = carBizCityExMapper.queryNameByIds(s);
-			for (DriverDutyStatistic entity: rows) {
-				for (CarBizCity name: names) {
-					if (name.getCityId().equals(entity.getCityid())){
-						entity.setCityName(name.getCityName());
-						break;
-					}
-				}
-			}
-			list = BeanUtil.copyList(rows, DriverDutyStatisticDTO.class);
-		}
-		return list;
-	}
+
 
 	/**
 	 *  如果输入时间小于2017-09，则返回0，否则返回1
@@ -353,114 +305,175 @@ public class DriverDutyStatisticController extends DriverQueryController{
 		return value;
 	}
 
-	/** 整理excel
-	 * @param list
-	 * @param path
-	 * @return
-	 * @throws Exception
+
+	@RequestMapping(value = "/exportDriverDutyStatistic")
+	@ResponseBody
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
+	public AjaxResponse exportDriverDutyStatistic(
+			@Verify(param = "cityId",rule = "required") String cityId,
+			@Verify(param = "supplierId",rule = "required")String supplierId, String teamId,
+			String groupIds, String name, String driverId, String  phone, String licensePlates,
+			@Verify(param = "startTime",rule = "required") String startTime,
+			String endTime, String sortName,
+			String sortOrder, Integer page,
+			Integer pageSize, Integer reportType, HttpServletRequest request, HttpServletResponse response) {
+
+		List<String> headerList = new ArrayList<>();
+		String fileName = "";
+		DriverDutyStatisticParams params = null;
+		try{
+			String fileTag = "";
+			if (reportType  == 0){
+				fileTag = "司机考勤日报";
+				headerList.add("司机姓名,日期,手机号,车牌号,班制之内上班上线时_有效,强制上班内上班上线时长_有效,加班时长,班制内上班上线时长,强制上班内上班上线时长,城市,早高峰在线时长,晚高峰在线时长,其他时段1在线时长,其他时段2在线时长");
+			}else{
+				fileTag = "司机考勤月报";
+				headerList.add("司机姓名,手机号,车牌号,班制之内上班上线时_有效,强制上班内上班上线时长_有效,加班时长,班制内上班上线时长,强制上班内上班上线时长,城市,早高峰在线时长,晚高峰在线时长,其他时段1在线时长,其他时段2在线时长");
+			}
+			fileName =fileTag+""+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
+			String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
+			if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
+
+				fileName = URLEncoder.encode(fileName, "UTF-8");
+
+			} else {  //其他浏览器
+				fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+			}
+
+			//默认日统计
+			reportType = reportType == null ? 0 : reportType;
+			//如果是日统计，开始时间和结束时间不能为空并且开始时间和结束时间在一个月内
+			if (reportType.equals(0)){
+				if(StringUtils.isEmpty(endTime)){
+					return AjaxResponse.fail(RestErrorCode.ENDTIME_IS_NULL);
+				}
+				if (startTime.compareTo(endTime) > 0 ){
+					return AjaxResponse.fail(RestErrorCode.STARTTIME_GREATE_ENDTIME);
+				}
+				if(!startTime.substring(0,7).equals(endTime.substring(0,7))){
+					return AjaxResponse.fail(RestErrorCode.ONLY_QUERY_ONE_MONTH);
+				}
+			}
+
+			//初始化参数
+			 params = new DriverDutyStatisticParams(cityId, supplierId, teamId, groupIds, name,driverId,phone, licensePlates, startTime, endTime, sortName, sortOrder, page, pageSize);
+			log.info("司机考勤记录列表数据:driverDutyStatisticDailData,参数"+ params.toString());
+			int total = 0;
+			//判断权限  如果司机id为空为查询列表页
+			if (StringUtils.isEmpty(params.getDriverIds())){
+				String driverList = "";
+				//如果页面输入了小组id或者车队id
+				if(StringUtils.isNotEmpty(params.getGroupIds()) ||  StringUtils.isNotEmpty(params.getTeamId())){
+					//通过小组id查询司机id, 如果用户
+					driverList = super.queryAuthorityDriverIdsByTeamAndGroup(params.getTeamId(), String.valueOf(params.getGroupIds()));
+					//如果该小组下无司机，返回空
+					if(StringUtils.isEmpty(driverList)){
+						log.info("司机考勤3.0列表-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds() +";teamId=="+params.getTeamId());
+						PageDTO pageDTO = new PageDTO(params.getPage(), params.getPageSize(), total, null);
+						return AjaxResponse.success(pageDTO);
+					}
+				}
+				params.setDriverIds(driverList);
+			}
+			//如果输入开始时间重置查询表名称
+			if(StringUtils.isNotEmpty(params.getStartTime())){
+				String time = params.getStartTime();
+				int value = setDriverDutyStatisticValue(time);
+				params.setValue(value);
+				params.setTable("statistic_duty_"+time.substring(0,7).replaceAll("-", "_"));
+			}
+			//处理参数
+			params = chuliDriverDutyStatisticParams(params);
+			params.setPageSize(CsvUtils.downPerSize);
+			//递归实现
+			PageInfo<DriverDutyStatistic> pageInfos = null;
+			List<DriverDutyStatistic> list = null;
+			if (reportType.equals(0)){
+				pageInfos =  driverDutyStatisticService.queryDriverDayDutyList(params);
+				if(pageInfos != null){
+					list = pageInfos.getList();
+				}
+			}else{
+				pageInfos =  driverDutyStatisticService.queryDriverMonthDutyList(params);
+				if(pageInfos != null){
+					list = pageInfos.getList();
+				}
+			}
+			int pages = 0;
+			if(pageInfos != null){
+				pages = pageInfos.getPages();
+			}
+			CsvUtils entity=  new CsvUtils();
+			List<String> csvDataList = new ArrayList<>();
+			if(pages == 0 && (list == null || list.size() == 0)){
+				csvDataList.add("根据条件没有查到符合条件的数据");
+				entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
+
+			}else{
+				boolean isLast = false;
+				for(int pageNoTemp = 1; pageNoTemp <= pages; pageNoTemp ++){
+					//循环调
+					if(pageNoTemp == pages){
+						isLast = true;
+					}
+					params.setPage(pageNoTemp);
+					doExportExcel(pageNoTemp,  reportType,  params,  response,
+							headerList,  fileName,  null ,isLast);
+				}
+			}
+
+
+
+
+
+		}catch (Exception e){
+			log.error("导出司机考勤报告异常，参数为："+(params==null?"null":JSON.toJSONString(params)),e);
+
+		}
+
+		return null;
+
+	}
+
+	/**
+	 *
+	 * @param pageNo		从1开始
+	 * @param reportType
+	 * @param params
 	 */
-	public Workbook exportExcelTongyong(List<DriverDutyStatisticDTO> list, String path) throws Exception{
-		FileInputStream io = new FileInputStream(path);
-		Workbook wb = new XSSFWorkbook(io);
-		if(list != null && list.size()>0){
-			Sheet sheet = wb.getSheetAt(0);
-			Cell cell = null;
-			int i=0;
-			for(DriverDutyStatisticDTO s:list){
-				Row row = sheet.createRow(i + 1);
-				cell = row.createCell(0);
-				cell.setCellValue(s.getName());
-
-				cell = row.createCell(1);
-				cell.setCellValue(s.getTime());
-
-				cell = row.createCell(2);
-				cell.setCellValue(s.getPhone());
-
-				cell = row.createCell(3);
-				cell.setCellValue(s.getLicenseplates());
-
-				cell = row.createCell(4);
-				cell.setCellValue(s.getDutytime());
-
-				cell = row.createCell(5);
-				cell.setCellValue(s.getForcedtime());
-
-				cell = row.createCell(6);
-				cell.setCellValue(s.getOvertime());
-
-				cell = row.createCell(7);
-				cell.setCellValue(s.getCityName());
-
-				cell = row.createCell(8);
-				cell.setCellValue(s.getForcedtime1());
-
-				cell = row.createCell(9);
-				cell.setCellValue(s.getForcedtime2());
-
-				cell = row.createCell(10);
-				cell.setCellValue(s.getForcedtime3());
-
-				cell = row.createCell(11);
-				cell.setCellValue(s.getForcedtime4());
-
-				i++;
+	private void doExportExcel(int pageNo,Integer reportType,DriverDutyStatisticParams params,HttpServletResponse response,
+							   List<String> headerList,String fileName,CsvUtils entity,boolean isLast ) throws IOException {
+		PageInfo<DriverDutyStatistic> pageInfos = null;
+		List<DriverDutyStatistic> list = null;
+		if (reportType.equals(0)){
+			pageInfos =  driverDutyStatisticService.queryDriverDayDutyList(params);
+			if(pageInfos != null){
+				list = pageInfos.getList();
+			}
+		}else{
+			pageInfos =  driverDutyStatisticService.queryDriverMonthDutyList(params);
+			if(pageInfos != null){
+				list = pageInfos.getList();
 			}
 		}
-		return wb;
-	}
-
-	public Workbook exportMonthExcelTongyong(List<DriverDutyStatisticDTO> list, String path) throws Exception{
-		FileInputStream io = new FileInputStream(path);
-		Workbook wb = new XSSFWorkbook(io);
-		if(list != null && list.size()>0){
-			Sheet sheet = wb.getSheetAt(0);
-			Cell cell = null;
-			int i=0;
-			for(DriverDutyStatisticDTO s:list){
-				Row row = sheet.createRow(i + 1);
-				cell = row.createCell(0);
-				cell.setCellValue(s.getName());
-
-				cell = row.createCell(1);
-				cell.setCellValue(s.getPhone());
-
-				cell = row.createCell(2);
-				cell.setCellValue(s.getLicenseplates());
-
-				cell = row.createCell(3);
-				cell.setCellValue(s.getDutytime());
-
-				cell = row.createCell(4);
-				cell.setCellValue(s.getForcedtime());
-
-				cell = row.createCell(5);
-				cell.setCellValue(s.getOvertime());
-
-				cell = row.createCell(6);
-				cell.setCellValue(s.getDutyTimeAll());
-
-				cell = row.createCell(7);
-				cell.setCellValue(s.getForcedTimeAll());
-
-				cell = row.createCell(8);
-				cell.setCellValue(s.getCityName());
-
-				cell = row.createCell(9);
-				cell.setCellValue(s.getForcedtime1());
-
-				cell = row.createCell(10);
-				cell.setCellValue(s.getForcedtime2());
-
-				cell = row.createCell(11);
-				cell.setCellValue(s.getForcedtime3());
-
-				cell = row.createCell(12);
-				cell.setCellValue(s.getForcedtime4());
-
-				i++;
-			}
+		if(entity == null){
+			entity = new CsvUtils();
 		}
-		return wb;
+
+		boolean isFirst = true;
+
+		List<String> csvDataList = new ArrayList<>();
+		if(pageNo != 1){
+			isFirst = false;
+		}
+
+		List<DriverDutyStatisticDTO> dtoList = driverDutyStatisticService.selectSuppierNameAndCityName(list);
+		dataTrans(dtoList,csvDataList,reportType);
+		entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
+
+
 	}
+
 }

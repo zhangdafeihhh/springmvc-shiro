@@ -19,7 +19,6 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.threads.CustomerAppraisalExportHelper;
 import com.zhuanche.util.excel.CsvUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -31,7 +30,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -48,6 +46,8 @@ public class CustomerAppraisalController {
 
     @Autowired
     private CarDriverTeamService carDriverTeamService;
+
+
 
     /**
      * 订单评分
@@ -175,11 +175,14 @@ public class CustomerAppraisalController {
         carBizCustomerAppraisalStatisticsDTO.setTeamIds(permOfTeam);
         carBizCustomerAppraisalStatisticsDTO.setDriverIds(driverIds);
 
+
         PageInfo<CarBizCustomerAppraisalStatisticsDTO> p = customerAppraisalService.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO,page,pageSize);
         if(p != null){
             list = p.getList();
             total = (int)p.getTotal();
         }
+
+
         PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
         return AjaxResponse.success(pageDTO);
     }
@@ -213,16 +216,33 @@ public class CustomerAppraisalController {
             Set<Integer> permOfSupplier    = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); //普通管理员可以管理的所有供应商ID
             Set<Integer> permOfTeam        = WebSessionUtil.getCurrentLoginUser().getTeamIds(); //普通管理员可以管理的所有车队ID
 
-            Vector<CarBizCustomerAppraisalStatisticsDTO> list =  new Vector();
+
             Set<Integer> driverIds = null;
             Boolean had = false;
             if(teamGroupId!=null || teamId!=null || (permOfTeam!=null && permOfTeam.size()>0)){
                 had = true;
                 driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
             }
+            List<String> headerList = new ArrayList<>();
+            String fileName = "";
+            List<String> csvDataList = new ArrayList<>();
+            CsvUtils entity = new CsvUtils();
+            headerList.add("司机姓名,手机号,评价月份,本月得分,身份证号,车队");
+
+            fileName = "司机评分"+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
+            String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
+            if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
+
+                fileName = URLEncoder.encode(fileName, "UTF-8");
+
+            } else {  //其他浏览器
+                fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+            }
             if(had && (driverIds==null || driverIds.size()==0)){
                 logger.info(LOGTAG + "查询teamId={},teamGroupId={},permOfTeam={}没有司机评分信息", teamId, teamGroupId, permOfTeam);
-                list =   new Vector();
+                csvDataList.add("没有查到符合条件的数据");
+                entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
+
             }else {
 
                 if(StringUtils.isEmpty(phone)  && StringUtils.isEmpty(name)){
@@ -247,51 +267,45 @@ public class CustomerAppraisalController {
                 carBizCustomerAppraisalStatisticsDTO.setSupplierIds(permOfSupplier);
                 carBizCustomerAppraisalStatisticsDTO.setTeamIds(permOfTeam);
                 carBizCustomerAppraisalStatisticsDTO.setDriverIds(driverIds);
-                int pageSize = 10000;
-                PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfo = customerAppraisalService.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO,1
+
+                int pageSize = CsvUtils.downPerSize;
+                PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfos = customerAppraisalService.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO,1
                         ,  pageSize  );
-                list.addAll(pageInfo.getList());
-                int pages = pageInfo.getPages();
-                Hashtable<String,PageInfo<CarBizCustomerAppraisalStatisticsDTO> > hashtable = new Hashtable<>();
-                if(pages >= 2){
-                    CountDownLatch endGate = new CountDownLatch(pages-1);
-                    //循环加载其他页数据
-                    for(int i = 2 ;i <= pages ; i++){
-                        CarBizCustomerAppraisalStatisticsDTO carBizCustomerAppraisalStatisticsDTOThread = new CarBizCustomerAppraisalStatisticsDTO();
-                        BeanUtils.copyProperties(carBizCustomerAppraisalStatisticsDTO,carBizCustomerAppraisalStatisticsDTOThread);
-                        CustomerAppraisalExportHelper
-                                helper = new CustomerAppraisalExportHelper(customerAppraisalService,i,pageSize,hashtable,carBizCustomerAppraisalStatisticsDTOThread,endGate);
-                        helper.start();
+                int pages = pageInfos.getPages();//临时计算总页数
+                boolean isFirst = true;
+                boolean isLast = false;
+
+                List<CarBizCustomerAppraisalStatisticsDTO> result = pageInfos.getList();
+                if(result == null || result.size() == 0){
+                    csvDataList.add("没有查到符合条件的数据");
+                    entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
+                }else{
+                    if(pages == 1){
+                        isLast = true;
                     }
-                    logger.info("所有的线程在等待中。。。"+ JSON.toJSONString(carBizCustomerAppraisalStatisticsDTO));
-                    //主线程阻塞,等待其他所有 worker 线程完成后再执行
-                    endGate.await();
-                    for(int i = 2 ;i <= pages ; i++){
-                        PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfoX = hashtable.get("page_"+i);
-                        if(pageInfoX != null){
-                            list.addAll(pageInfoX.getList());
+                    logger.info("执行查询第"+1+"页数据，当前页数据条数为"+(result==null?"null":result.size()));
+                    dataTrans(result,csvDataList);
+                    entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
+                    csvDataList = null;
+                    isFirst = false;
+                    for(int pageNumber = 2 ;pageNumber <= pages ; pageNumber++){
+                        pageInfos = customerAppraisalService.queryCustomerAppraisalStatisticsListV2(carBizCustomerAppraisalStatisticsDTO,pageNumber
+                                ,  pageSize  );
+
+                        result = pageInfos.getList();
+                        logger.info("执行查询第"+pageNumber+"页数据，当前页数据条数为"+(result==null?"null":result.size()));
+                        csvDataList = new ArrayList<>();
+                        if(pageNumber == pages){
+                            isLast = true;
                         }
+                        dataTrans(result,csvDataList);
+                        entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
+                        csvDataList = null;
                     }
                 }
             }
-            List<String> headerList = new ArrayList<>();
-            headerList.add("司机姓名,手机号,评价月份,本月得分,身份证号,车队");
-
-            List<String> csvDataList  = new ArrayList<>(list.size());
-            dataTrans(list,csvDataList);
-
-            String fileName = "司机评分"+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
-            String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
-            if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
-                fileName = URLEncoder.encode(fileName, "UTF-8");
-            } else {  //其他浏览器
-                fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
-            }
-            CsvUtils.exportCsv(response,csvDataList,headerList,fileName);
             long end = System.currentTimeMillis();
             logger.info("司机评分导出完成，耗时"+(end -start)+"毫秒");
-
-
         } catch (Exception e) {
             logger.error("司机信息列表查询导出异常，参数为："+JSON.toJSONString(carBizCustomerAppraisalStatisticsDTO),e);
 
@@ -299,7 +313,7 @@ public class CustomerAppraisalController {
         return null;
     }
     private void dataTrans(List<CarBizCustomerAppraisalStatisticsDTO> list, List<String>  csvDataList ){
-        if(null == list){
+        if(null == list || list.size() == 0){
             return;
         }
         Map<Integer, String> teamMap = null;
@@ -316,10 +330,12 @@ public class CustomerAppraisalController {
             stringBuffer.append(s.getDriverName());
             stringBuffer.append(",");
 
+
             stringBuffer.append("\t"+(s.getDriverPhone()==null?"":s.getDriverPhone()));
             stringBuffer.append(",");
 
             stringBuffer.append("\t"+s.getCreateDate());
+
             stringBuffer.append(",");
 
             stringBuffer.append(s.getEvaluateScore());
@@ -330,6 +346,7 @@ public class CustomerAppraisalController {
 
             String teamName = "";
             if(teamMap !=null && StringUtils.isNotEmpty(teamMap.get(s.getDriverId()))){
+
                 teamName = teamMap.get(s.getDriverId());
             }
             stringBuffer.append(teamName);
@@ -337,7 +354,9 @@ public class CustomerAppraisalController {
             csvDataList.add(stringBuffer.toString());
         }
 
+
     }
+
     /**
      * 司机评分一个月详情
      * @param driverId 司机ID

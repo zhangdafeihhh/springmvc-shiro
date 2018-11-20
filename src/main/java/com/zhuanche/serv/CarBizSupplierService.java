@@ -49,4 +49,8 @@ public class CarBizSupplierService{
 	public CarBizSupplier selectByPrimaryKey(Integer supplierId){
 		return carBizSupplierMapper.selectByPrimaryKey(supplierId);
 	}
+
+    public List<CarBizSupplier> findByIdSet(Set<Integer> supplierIdSet) {
+		return carBizSupplierExMapper.findByIdSet(supplierIdSet);
+    }
 }

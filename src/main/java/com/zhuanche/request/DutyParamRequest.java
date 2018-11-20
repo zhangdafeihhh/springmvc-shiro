@@ -48,6 +48,7 @@ public class DutyParamRequest extends PageRequest{
     // 批量处理字段
     private String times; // 要设置的日期集， 用 ,分隔
     private String driverIds; // 要设置的司机id集， 用 ,分隔
+    private Set<Integer> driverIdSet;//司机id列表，新版本使用
 
     /** 高峰时间*/
     private String peakTimes;
@@ -280,5 +281,13 @@ public class DutyParamRequest extends PageRequest{
 
     public void setEndTime(String endTime) {
         this.endTime = endTime;
+    }
+
+    public Set<Integer> getDriverIdSet() {
+        return driverIdSet;
+    }
+
+    public void setDriverIdSet(Set<Integer> driverIdSet) {
+        this.driverIdSet = driverIdSet;
     }
 }

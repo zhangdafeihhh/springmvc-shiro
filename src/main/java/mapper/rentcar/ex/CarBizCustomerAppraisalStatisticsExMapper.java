@@ -11,5 +11,4 @@ public interface CarBizCustomerAppraisalStatisticsExMapper {
 
     List<CarBizCustomerAppraisalStatisticsDTO> queryCustomerAppraisalStatisticsListV2(CarBizCustomerAppraisalStatisticsDTO carBizCustomerAppraisalStatisticsDTO);
 
-
 }

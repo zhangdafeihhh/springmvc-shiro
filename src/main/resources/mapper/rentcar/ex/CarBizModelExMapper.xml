@@ -32,4 +32,15 @@
         from
         car_biz_model
     </select>
+
+    <select id="findByIdSet" resultMap="BaseResultMap" parameterType="java.util.Set">
+        select
+        <include refid="Base_Column_List" />
+        from
+        car_biz_model
+        where model_id in
+        <foreach collection="list" open="(" close=")" separator="," item="item">
+            #{item }
+        </foreach>
+    </select>
 </mapper>

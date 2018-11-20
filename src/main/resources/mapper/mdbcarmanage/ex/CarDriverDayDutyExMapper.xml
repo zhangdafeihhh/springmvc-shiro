@@ -175,7 +175,7 @@
     select
     <include refid="Base_Column_List" />
     from car_driver_day_duty d LEFT JOIN car_driver_team t3 on d.team_id = t3.id
-    where 1=1 and t3.status!=2
+    where   t3.status!=2
     <if test="driverId!=null and driverId!=''">
       and d.driver_id = #{driverId}
     </if>
@@ -262,5 +262,68 @@
       WHERE
       id = #{id}
   </update>
+
+
+  <select id="selectForListV2" resultMap="BaseExResultMap" parameterType="com.zhuanche.request.DutyParamRequest" >
+    select
+    <include refid="Base_Column_List" />
+    from car_driver_day_duty d
+   <where>
+      <if test="driverId!=null and driverId!=''">
+        and d.driver_id = #{driverId}
+      </if>
+     <if test="driverIdSet!=null and driverIdSet.size()>0">
+       and d.driver_id IN
+       <foreach collection="driverIdSet" open="(" close=")" separator="," item="cid" >
+         #{cid}
+       </foreach>
+     </if>
+     <if test="cityIds!=null and cityIds.size()>0">
+       and d.city_id IN
+       <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
+         #{cid}
+       </foreach>
+     </if>
+
+     <if test="cityId!=null and cityId!=''">
+       and d.city_id = #{cityId}
+     </if>
+     <if test="supplierIds!=null and supplierIds.size()>0">
+       and d.supplier_id IN
+       <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
+         #{sid}
+       </foreach>
+     </if>
+     <if test="supplierId != null" >
+       and  d.supplier_id = #{supplierId,jdbcType=INTEGER}
+     </if>
+     <if test="teamIds!=null and teamIds.size()>0">
+       and d.team_id IN
+       <foreach collection="teamIds" open="(" close=")" separator="," item="tid" >
+         #{tid}
+       </foreach>
+     </if>
+     <if test="teamId != null" >
+       and  d.team_id = #{teamId,jdbcType=INTEGER}
+     </if>
+     <if test="status!=null and status!=''">
+       and d.status = #{status}
+     </if>
+     <if test = "startTime !=null and startTime !=''" >
+       <![CDATA[
+              and d.time >= #{startTime, jdbcType=TIMESTAMP}
+          ]]>
+     </if>
+     <if test = "endTime !=null and endTime !=''" >
+       <![CDATA[
+              and d.time <= #{endTime, jdbcType=TIMESTAMP}
+          ]]>
+     </if>
+     <if test="driverName!=null and driverName!=''">
+       and d.driver_name = #{driverName}
+     </if>
+   </where>
+    order by d.time DESC
+  </select>
 
 </mapper>

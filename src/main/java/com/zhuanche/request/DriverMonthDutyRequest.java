@@ -59,7 +59,7 @@ public class DriverMonthDutyRequest extends PageRequest{
 
 	private Set<Integer> teamIds;//普通管理员可以管理的所有车队ID
 
-
+	private Set<Integer> driverIds;//车队长可以看到的司机id列表
 	
 	private String value;
 	private String day1;
@@ -531,5 +531,12 @@ public class DriverMonthDutyRequest extends PageRequest{
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
-	
+
+	public Set<Integer> getDriverIds() {
+		return driverIds;
+	}
+
+	public void setDriverIds(Set<Integer> driverIds) {
+		this.driverIds = driverIds;
+	}
 }

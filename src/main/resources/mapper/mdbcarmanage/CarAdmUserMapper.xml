@@ -196,4 +196,5 @@
       phone = #{phone,jdbcType=VARCHAR}
     where user_id = #{userId,jdbcType=INTEGER}
   </update>
+
 </mapper>

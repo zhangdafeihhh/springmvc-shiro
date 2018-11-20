@@ -93,5 +93,17 @@
             </foreach>
         </if>
     </select>
+
+    <select id="findByIdSet" resultMap="ResultMapWithBLOBs" parameterType="java.util.Map" >
+        select
+        <include refid="Base_Column_List" />
+        ,
+        <include refid="Blob_Column_List" />
+        from car_biz_supplier
+        where supplier_id in
+        <foreach item="item" index="index" collection="supplierIdSet" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
     
 </mapper>

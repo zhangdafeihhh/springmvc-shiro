@@ -36,13 +36,16 @@ public enum EnumDriverMonthDutyStatus {
 		this.status = status;
 	}
 	private static EnumDriverMonthDutyStatus[] statusEnums  = EnumDriverMonthDutyStatus.values();
+
+	private static Map<String,String> cacheMap = new HashMap<>();
 	public static String getStatus(int value) {
-		for (EnumDriverMonthDutyStatus statusEnum: statusEnums) {
-			if (value == statusEnum.value) {
-				return statusEnum.getStatus();
+		if(cacheMap.isEmpty()){
+			for (EnumDriverMonthDutyStatus statusEnum: statusEnums) {
+				cacheMap.put("cache_"+statusEnum.value,statusEnum.getStatus());
 			}
 		}
-		return null;
+
+		return cacheMap.get("cache_"+value);
 	}
 	
 	public static Integer getValue(String status) {

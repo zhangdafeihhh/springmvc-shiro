@@ -2,6 +2,7 @@ package mapper.mdbcarmanage.ex;
 
 import com.zhuanche.dto.CarDriverTeamDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
+import com.zhuanche.entity.mdbcarmanage.CarRelateGroup;
 import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.request.DriverTeamRequest;
 import org.apache.ibatis.annotations.Param;
@@ -36,4 +37,21 @@ public interface CarDriverTeamExMapper{
 	List<CarDriverTeam> queryDriverTeamList(@Param("cityId") Integer cityId, @Param("supplierId") Integer supplierId);
 
 	List<CarRelateTeam> queryDriverTeamListByDriverId(@Param("driverIds") String driverIds);
+
+    List<CarRelateTeam> queryDriverTeamListByDriverIdList(List<String> driverIds);
+
+	/**
+	 * 查询权限范围内，状态不为2的小组
+	 * @param driverTeamRequest
+	 * @return
+	 */
+	List<CarDriverTeam> queryForListByStatusNotEq2(DriverTeamRequest driverTeamRequest);
+
+
+	/**
+	 * 根据id查找对象
+	 * @param teamIdList
+	 * @return
+	 */
+	List<CarDriverTeam> queryTeamListByTemIdList(List<Integer> teamIdList);
 }

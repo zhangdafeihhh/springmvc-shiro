@@ -39,7 +39,7 @@ public interface CarFactOrderInfoService {
      * @param orderNo 订单号
      * @return java.lang.String
      */
-    public List<CarFactOrderInfoDTO>  queryAllOrderDataList(Map<String, Object> paramMap);
+//    public List<CarFactOrderInfoDTO>  queryAllOrderDataList(Map<String, Object> paramMap);
     /**
 	 * 查询LBS提供的轨迹坐标
 	 * @param paramsStr
@@ -82,13 +82,13 @@ public interface CarFactOrderInfoService {
     public List<CarBizOrderWaitingPeriod> selectWaitingPeriodListSlave(String orderNo);
     /**
      * 
-     * @param paramsStr
+     * @param paramMap
      * @return
      */
     public AjaxResponse  queryOrderDataList(Map<String, Object> paramMap);
     /**
      * 根据拼车订单号，查询主订单信息
-     * @param paramsStr
+     * @param params
      * @return
      */
 	public CarPoolMainOrderDTO queryCarpoolMainForObject(CarPoolMainOrderDTO params);
@@ -123,6 +123,7 @@ public interface CarFactOrderInfoService {
      * 订单服务类型
      */
     public List<ServiceTypeDTO> selectServiceEntityList(ServiceEntity serviceEntity);
-    
-    public Workbook exportExceleOrderList(List<CarFactOrderInfoDTO> list,String path) throws Exception;
+	
+//    Workbook exportExceleOrderList(List<CarFactOrderInfoDTO> list, String path) throws Exception;
+
 }

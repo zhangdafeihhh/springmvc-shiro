@@ -1,8 +1,10 @@
 package com.zhuanche.controller.driver;
 
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
@@ -21,6 +23,7 @@ import com.zhuanche.serv.*;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
+import com.zhuanche.util.excel.CsvUtils;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -36,17 +39,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Controller
 @RequestMapping("/driverInfo")
@@ -255,25 +254,12 @@ public class DriverInfoController {
                                          String imei, String idCardNo, Integer isImage,
                                          HttpServletRequest request, HttpServletResponse response) {
 
-        // 数据权限控制SSOLoginUser
-        Set<Integer> permOfCity        = WebSessionUtil.getCurrentLoginUser().getCityIds(); //普通管理员可以管理的所有城市ID
-        Set<Integer> permOfSupplier    = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); //普通管理员可以管理的所有供应商ID
-        Set<Integer> permOfTeam        = WebSessionUtil.getCurrentLoginUser().getTeamIds(); //普通管理员可以管理的所有车队ID
+
 
         long start=System.currentTimeMillis(); //获取开始时间
+        CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();
+        try {
 
-        List<CarBizDriverInfoDTO> list =  Lists.newArrayList();
-        Set<Integer> driverIds = null;
-        Boolean had = false;
-        if(teamGroupId!=null || teamId!=null || (permOfTeam!=null && permOfTeam.size()>0)){
-            had = true;
-            driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
-        }
-        if(had && (driverIds==null || driverIds.size()==0)){
-            logger.info(LOGTAG + "查询teamId={},teamGroupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
-            list =  Lists.newArrayList();
-        }else{
-            CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();
             carBizDriverInfoDTO.setName(name);
             carBizDriverInfoDTO.setPhone(phone);
             carBizDriverInfoDTO.setLicensePlates(licensePlates);
@@ -287,42 +273,92 @@ public class DriverInfoController {
             carBizDriverInfoDTO.setImei(imei);
             carBizDriverInfoDTO.setIdCardNo(idCardNo);
             carBizDriverInfoDTO.setIsImage(isImage);
-            //数据权限
-            carBizDriverInfoDTO.setCityIds(permOfCity);
-            carBizDriverInfoDTO.setSupplierIds(permOfSupplier);
-            carBizDriverInfoDTO.setTeamIds(permOfTeam);
-            carBizDriverInfoDTO.setDriverIds(driverIds);
-            list = carBizDriverInfoService.queryDriverList(carBizDriverInfoDTO);
-        }
-        try {
-            Workbook wb = carBizDriverInfoService.exportExcel(list, cityId, supplierId, request.getRealPath("/")+File.separator+"template"+File.separator+"driver_info.xlsx");
-//            Componment.fileDownload(response, wb, new String("司机信息".getBytes("utf-8"), "iso8859-1"));
-            long end=System.currentTimeMillis(); //获取结束时间
-            logger.info(LOGTAG + "司机导出cityId={},supplierId={}的查询写入数据时间为={}ms", cityId, supplierId, (end-start));
-            this.exportExcelFromTemplet(response, wb, new String("司机信息".getBytes("utf-8"), "iso8859-1"));
-        } catch (Exception e) {
-           logger.error("司机信息列表查询导出error",e);
-        }finally {
-            if(list != null){
-                list.clear();// 帮助GC回收内存
+
+            // 数据权限控制SSOLoginUser
+            Set<Integer> permOfCity        = WebSessionUtil.getCurrentLoginUser().getCityIds(); //普通管理员可以管理的所有城市ID
+            Set<Integer> permOfSupplier    = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); //普通管理员可以管理的所有供应商ID
+            Set<Integer> permOfTeam        = WebSessionUtil.getCurrentLoginUser().getTeamIds(); //普通管理员可以管理的所有车队ID
+
+            List<String> headerList = new ArrayList<>();
+            headerList.add("车牌号,机动车驾驶员姓名,驾驶员身份证号,驾驶员手机号,司机手机型号,司机手机运营商,驾驶员性别,出生日期,年龄,服务监督号码,服务监督链接,车型类别,驾照类型,驾照领证日期, 驾龄," +
+                    "驾照到期时间,档案编号,国籍,驾驶员民族,驾驶员婚姻状况,驾驶员外语能力,驾驶员学历,户口登记机关名称,户口住址或长住地址,驾驶员通信地址,驾驶员照片文件编号,机动车驾驶证号," +
+                    "机动车驾驶证扫描件文件编号,初次领取驾驶证日期,是否巡游出租汽车驾驶员,网络预约出租汽车驾驶员资格证号,网络预约出租汽车驾驶员证初领日期,巡游出租汽车驾驶员资格证号," +
+                    "网络预约出租汽车驾驶员证发证机构,资格证发证日期,初次领取资格证日期,资格证有效起始日期,资格证有效截止日期,注册日期,是否专职驾驶员,驾驶员合同（或协议）签署公司,有效合同时间," +
+                    "合同（或协议）有效期起,合同（或协议）有效期止,紧急情况联系人,紧急情况联系人电话,紧急情况联系人通讯地址,供应商,城市,车队,小组,司机id,创建时间");
+            String fileName = "司机信息" + com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
+            String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
+            if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
+                fileName = URLEncoder.encode(fileName, "UTF-8");
+            } else {  //其他浏览器
+                fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
             }
+            List<String> csvDataList = new ArrayList<>();
+            Set<Integer> driverIds = null;
+            Boolean had = false;
+            CsvUtils utilEntity = new CsvUtils();
+            if(teamGroupId!=null || teamId!=null || (permOfTeam!=null && permOfTeam.size()>0)){
+                had = true;
 
+                driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(teamGroupId, teamId, permOfTeam);
+            }
+            if(had && (driverIds==null || driverIds.size()==0)){
+                logger.info(LOGTAG + "查询teamId={},teamGroupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
+                csvDataList.add("没有查到符合条件的数据");
+                utilEntity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
+                return;
+            }else{
+                //数据权限
+                carBizDriverInfoDTO.setCityIds(permOfCity);
+                carBizDriverInfoDTO.setSupplierIds(permOfSupplier);
+                carBizDriverInfoDTO.setTeamIds(permOfTeam);
+                carBizDriverInfoDTO.setDriverIds(driverIds);
+
+
+
+                int pageSize = CsvUtils.downPerSize;
+                PageInfo pageInfos  = carBizDriverInfoService.queryDriverPage(carBizDriverInfoDTO,1,pageSize);
+
+                int pages = pageInfos.getPages();//临时计算总页数
+                boolean isFirst = true;
+                boolean isLast = false;
+                if(pages == 1 || pages == 0){
+                    isLast = true;
+                }
+                List<CarBizDriverInfoDTO> rows =  pageInfos.getList();
+                if(rows == null || rows.size() == 0){
+                    logger.info(LOGTAG + "查询teamId={},teamGroupId={},permOfTeam={}没有司机信息", teamId, teamGroupId, permOfTeam);
+                    csvDataList.add("没有查到符合条件的数据");
+                    utilEntity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
+                    return;
+                }else{
+                    //数据转换
+                    carBizDriverInfoService.batchGetBaseStatis( rows,csvDataList);
+
+                    utilEntity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
+                    isFirst = false;
+                    for(int pageNo = 2;pageNo <= pages ; pageNo++){
+                        csvDataList = new ArrayList<>();
+                        pageInfos  = carBizDriverInfoService.queryDriverPage(carBizDriverInfoDTO,pageNo,pageSize);
+                        if(pageNo == pages){
+                            isLast = true;
+                        }
+                        rows =  pageInfos.getList();
+                        carBizDriverInfoService.batchGetBaseStatis( rows,csvDataList);
+
+                        utilEntity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
+                    }
+                }
+
+            }
             long end=System.currentTimeMillis(); //获取结束时间
-            logger.info(LOGTAG + "司机导出cityId={},supplierId={}的时间为={}ms", cityId, supplierId, (end-start));
+            logger.info(LOGTAG + "司机导出成功，参数为："+ JSON.toJSONString(carBizDriverInfoDTO)+",耗时="+(end-start)+"ms");
+        } catch (Exception e) {
+            long end=System.currentTimeMillis(); //获取结束时间
+            logger.error(LOGTAG + "司机导出成功，参数为："+ JSON.toJSONString(carBizDriverInfoDTO)+",耗时="+(end-start)+"ms",e);
+           e.printStackTrace();
         }
     }
 
-    public void exportExcelFromTemplet(HttpServletResponse response, Workbook wb, String fileName) throws IOException {
-        if(StringUtils.isEmpty(fileName)) {
-            fileName = "exportExcel";
-        }
-        response.setHeader("Content-Disposition","attachment;filename="+fileName+".xlsx");//指定下载的文件名
-        response.setContentType("application/octet-stream");
-        ServletOutputStream os =  response.getOutputStream();
-        wb.write(os);
-        os.flush();
-        os.close();
-    }
 
     /**
      * 司机信息

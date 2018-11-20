@@ -1,6 +1,7 @@
 package com.zhuanche.controller.driverScheduling;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.dutyEnum.ServiceReturnCodeEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
@@ -10,6 +11,7 @@ import com.zhuanche.dto.driver.CarDriverDayDutyDTO;
 import com.zhuanche.dto.driverDuty.CarDriverDurationDTO;
 import com.zhuanche.dto.driverDuty.CarDriverMustDutyDTO;
 import com.zhuanche.dto.driverDuty.DutyExcelDTO;
+import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverMustDuty;
 import com.zhuanche.entity.mdbcarmanage.CarDutyDuration;
 import com.zhuanche.request.DutyParamRequest;
@@ -21,10 +23,14 @@ import com.zhuanche.serv.driverScheduling.CarDriverMustDutyService;
 import com.zhuanche.serv.driverScheduling.CarDriverShiftsService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.threads.DriverDayhDutyExportHelper;
 import com.zhuanche.util.Check;
+import com.zhuanche.util.PageUtils;
 import com.zhuanche.util.dateUtil.DateUtil;
+import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.excel.ExportExcelUtil;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,10 +44,9 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.net.URLEncoder;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @description: 司机排班
@@ -90,6 +95,7 @@ public class DriverSchController {
         return response;
     }
 
+
     /** 
     * @Desc: 导出排班信息 
     * @param:
@@ -99,82 +105,122 @@ public class DriverSchController {
     */ 
     @RequestMapping("/exportDutyToExcel")
     @ResponseBody
-    public void exportDutyToExcel(HttpServletResponse response, HttpServletRequest request,DutyParamRequest param){
-        String[] title = {"司机姓名","手机号","城市","供应商","车队",
-                "排班日期","强制上班时间","排班时长","状态"};
+    public String  exportDutyToExcel(HttpServletResponse response, HttpServletRequest request,DutyParamRequest param){
+
         try{
-            if(Check.NuNObj(param)){
-                param = new DutyParamRequest();
+            logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param));
+            SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+            if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
+                logger.info("下载符合条件排班，用户未登陆，下载符合条件排班列表入参:"+ JSON.toJSONString(param));
+                return  "";
             }
+            if(Check.NuNObj(param) || Check.NuNObj(param.getUnpublishedFlag()) ){
+                logger.info("下载符合条件排班，参数不符要求，入参:"+ JSON.toJSONString(param));
+                return  "";
+            }
+            String startTime = param.getStartTime();
+            String endTime = param.getEndTime();
+            if(StringUtils.isEmpty(startTime)){
+                return  "排班开始时间不能为空";
+            }
+            if(StringUtils.isEmpty(endTime)){
+                return  "排班结束时间不能为空";
+            }
+            String fileName = "司机排班信息"+DateUtil.dateFormat(new Date(),DateUtil.intTimestampPattern)+".csv";
+            String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
+            if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
+                fileName = URLEncoder.encode(fileName, "UTF-8");
+            } else {  //其他浏览器
+                fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+            }
+            List<String> headerList = new ArrayList<>();
+            headerList.add("司机姓名,手机号,城市,供应商,车队,排班日期,强制上班时间,排班时长,状态");
+
+
+            long start = System.currentTimeMillis();
+            param.setPage(1);
             //设置导出单文件阈值 3000
-            param.setPageSize(1000);
-            PageDTO pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
-            if(Check.NuNObj(pageDTO)){
-                return ;
+            param.setPageSize(10000);
+            PageInfo<CarDriverDayDutyDTO> pageInfos = carDriverDutyService.queryDriverDayDutyList(param);
+            List<CarDriverDayDutyDTO> result = pageInfos.getList();
+            logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，pageNumber="+0+";总条数为："+pageInfos.getTotal()
+                    +"；总页数为："+pageInfos.getPages());
+            List<String> csvDataList = new ArrayList<>();
+            if(result == null || result.size() == 0){
+                csvDataList.add("没有查到符合条件的数据");
+                CsvUtils entity = new CsvUtils();
+                entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
+                return "";
             }
-            Integer total = pageDTO.getTotal();
-            List<DutyExcelDTO> firstList = new ArrayList<>();
-            List<CarDriverDayDutyDTO> result = pageDTO.getResult();
-            for (CarDriverDayDutyDTO carDriverDayDutyDTO : result) {
-                DutyExcelDTO excel = new DutyExcelDTO();
-                BeanUtils.copyProperties(carDriverDayDutyDTO,excel);
-                if(carDriverDayDutyDTO.getStatus() == 2){
-                    excel.setStatus("已发布");
-                }else if(carDriverDayDutyDTO.getStatus() == 1){
-                    excel.setStatus("未发布");
-                }else{
-                    excel.setStatus("未发布");
-                }
-                firstList.add(excel);
+            int pages = pageInfos.getPages();//临时计算总页数
+            boolean isFirst = true;
+            boolean isLast = false;
+            if(pages == 1){
+                isLast = true;
             }
-//            List<DutyExcelDTO> firstList = BeanUtil.copyList(result, DutyExcelDTO.class);
-            if(Check.NuNCollection(result)){
-                return ;
-            }
-            String fileName = DateUtil.dateFormat(new Date(),DateUtil.intTimestampPattern);
-            HttpServletResponse reponseOut = this.setResponse(response, fileName);
-            // 声明一个工作薄
-            ExportExcelUtil excelUtil = new ExportExcelUtil();
+            dataTrans( result,  csvDataList);
+            CsvUtils entity = new CsvUtils();
+            entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
+            csvDataList = null;
+            isFirst = false;
 
-            HSSFWorkbook workbook = new HSSFWorkbook();
-
-            workbook = excelUtil.exportExcelSheet(workbook, "排班信息"+param.getPageNo(), title, firstList);
-            for(int pageNumber = 2; ((pageNumber-1)*param.getPageSize()) < total; pageNumber++){
+            for(int pageNumber = 2; pageNumber <= pages; pageNumber++){
+                param.setPage(pageNumber);
                 param.setPageNo(pageNumber);
-                PageDTO page = carDriverDutyService.queryDriverDayDutyList(param);
-                List<DutyExcelDTO> targetList = new ArrayList<>();
-                List<CarDriverDayDutyDTO> sourceList = page.getResult();
-                for (CarDriverDayDutyDTO carDriverDayDutyDTO : sourceList) {
-                    DutyExcelDTO excel = new DutyExcelDTO();
-                    BeanUtils.copyProperties(carDriverDayDutyDTO,excel);
-                    if(carDriverDayDutyDTO.getStatus() == 2){
-                        excel.setStatus("已发布");
-                    }else if(carDriverDayDutyDTO.getStatus() == 1){
-                        excel.setStatus("未发布");
-                    }else{
-                        excel.setStatus("未发布");
-                    }
-                    targetList.add(excel);
+                pageInfos = carDriverDutyService.queryDriverDayDutyList(param);
+                result = pageInfos.getList();
+                csvDataList = new ArrayList<>();
+                if(pageNumber == pages){
+                    isLast = true;
                 }
-//                List<DutyExcelDTO> targetList = BeanUtil.copyList(sourceList, DutyExcelDTO.class);
-                if(!Check.NuNCollection(targetList)){
-                    workbook = excelUtil.exportExcelSheet(workbook, "排班信息" + pageNumber, title, targetList);
-                }
+                dataTrans( result,  csvDataList);
+                entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
             }
-            ServletOutputStream out = reponseOut.getOutputStream();
-            workbook.write(out);
-            out.flush();
-            out.close();
-            if(total <= 1000){
-                return ;
-            }
+            long end = System.currentTimeMillis();
+            logger.info("下载符合条件排班列表入参:"+ JSON.toJSONString(param)+"，耗时："+(end-start)+"毫秒;总条数："+pageInfos.getTotal());
+
 
         }catch (Exception e){
-            logger.error("导出排班信息 异常:{}",e);
-            return ;
+            logger.error("导出排班信息异常:参数为："+(param == null?"null":JSON.toJSONString(param)),e);
+            return  "导出排班信息异常";
         }
-        return ;
+        return "";
     }
+    private  void dataTrans(List<CarDriverDayDutyDTO> result,List<String> csvDataList){
+        if(null == result){
+            return;
+        }
+        for (CarDriverDayDutyDTO carDriverDayDutyDTO : result) {
+            StringBuffer stringBuffer = new StringBuffer();
+            stringBuffer.append(carDriverDayDutyDTO.getDriverName());
+            stringBuffer.append(",");
+            stringBuffer.append(carDriverDayDutyDTO.getPhone()==null?"-":("\t"+carDriverDayDutyDTO.getPhone()));
+            stringBuffer.append(",");
+            stringBuffer.append(carDriverDayDutyDTO.getCityName()==null?"-":(""+carDriverDayDutyDTO.getCityName()));
+            stringBuffer.append(",");
+            stringBuffer.append(carDriverDayDutyDTO.getSupplierName()==null?"-":(""+carDriverDayDutyDTO.getSupplierName()));
+            stringBuffer.append(",");
+            stringBuffer.append(carDriverDayDutyDTO.getTeamName()==null?"-":(""+carDriverDayDutyDTO.getTeamName()));
+            stringBuffer.append(",");
+            stringBuffer.append(carDriverDayDutyDTO.getTime()==null?"-":("\t"+carDriverDayDutyDTO.getTime()));//排班日期
+            stringBuffer.append(",");
+            stringBuffer.append(StringUtils.isNotEmpty(carDriverDayDutyDTO.getForcedTimes())?carDriverDayDutyDTO.getForcedTimes().replace(",","  "):carDriverDayDutyDTO.getForcedTimes());//强制上班时间
+            stringBuffer.append(",");
+            stringBuffer.append(carDriverDayDutyDTO.getDutyTimes()==null?"":carDriverDayDutyDTO.getDutyTimes().replaceAll(",","  "));//排班时长
+
+            stringBuffer.append(",");
+
+            if(carDriverDayDutyDTO.getStatus() == 2){
+                stringBuffer.append("已发布");
+            }else if(carDriverDayDutyDTO.getStatus() == 1){
+                stringBuffer.append("未发布");
+            }else{
+                stringBuffer.append("未发布");
+            }
+            csvDataList.add(stringBuffer.toString());
+        }
+    }
+
 
     /**
      * @Desc: 保存司机日排班信息
@@ -389,16 +435,32 @@ public class DriverSchController {
     @ResponseBody
     @RequestMapping(value = "/queryDriverMonthDutyData")
     public AjaxResponse queryDriverMonthDutyData(DutyParamRequest param) {
-        logger.info("查看符合条件排班列表入参:"+ JSON.toJSONString(param));
-        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-        if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
-            return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
+        logger.info("查看符合条件排班列表，入参:"+ (param== null?"null":JSON.toJSONString(param)));
+      try{
+            SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+            if(Check.NuNObj(loginUser) || Check.NuNObj(loginUser.getId())){
+                return AjaxResponse.fail(RestErrorCode.HTTP_FORBIDDEN);
+            }
+            if(Check.NuNObj(param) || Check.NuNObj(param.getUnpublishedFlag()) ){
+                return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
+            }
+            long start = System.currentTimeMillis();
+            PageInfo<CarDriverDayDutyDTO> pageInfos = carDriverDutyService.queryDriverDayDutyList(param);
+
+            PageDTO pageDTO = new PageDTO();
+			pageDTO.setTotal((int)pageInfos.getTotal());
+			pageDTO.setResult(pageInfos.getList());
+
+            long end = System.currentTimeMillis();
+            logger.info("分页查询符合条件排班列表入参:"+ JSON.toJSONString(param)+"，耗时："+(end-start)+"毫秒，pageNumber="+param.getPageNo()
+                            +";总条数为："+pageDTO.getTotal()
+                    +"；总页数totalPage = "+pageInfos.getPages()
+            );
+            return AjaxResponse.success(pageDTO);
+        }catch (Exception e){
+            logger.error("查看符合条件排班列表异常，入参:"+ (param== null?"null":JSON.toJSONString(param)),e);
+              return AjaxResponse.success(null);
         }
-        if(Check.NuNObj(param) || Check.NuNObj(param.getUnpublishedFlag()) ){
-            return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
-        }
-        PageDTO pageDTO = carDriverDutyService.queryDriverDayDutyList(param);
-        return AjaxResponse.success(pageDTO);
     }
 
 }

@@ -193,4 +193,68 @@
 		WHERE rt.driver_id in (${driverIds})
     </select>
 
+    <select id="queryDriverTeamListByDriverIdList" parameterType="java.util.List" resultType="com.zhuanche.entity.mdbcarmanage.CarRelateTeam">
+
+        SELECT
+			rt.driver_id driverId,
+			rt.team_id teamId,
+			dt.team_name teamName,
+			rg.group_id groupId,
+			dtm.team_name groupName
+		FROM car_relate_team rt
+		LEFT JOIN car_relate_group rg ON rg.driver_id=rt.driver_id
+		LEFT JOIN car_driver_team dt  ON rt.team_id=dt.id
+		LEFT JOIN car_driver_team dtm ON rg.group_id=dtm.id
+		WHERE rt.driver_id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+                            #{item}
+        </foreach>
+    </select>
+
+    <select id="queryForListByStatusNotEq2" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List" />
+        from car_driver_team
+        where  status!=2
+        <if test="cityIds!=null and cityIds.size()>0">
+            and city IN
+            <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
+                #{cid}
+            </foreach>
+        </if>
+        <if test="supplierIds!=null and supplierIds.size()>0">
+            and supplier IN
+            <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
+                #{sid}
+            </foreach>
+        </if>
+        <if test="teamIds!=null and teamIds.size()>0">
+            and id IN
+            <foreach collection="teamIds" open="(" close=")" separator="," item="tid" >
+                #{tid}
+            </foreach>
+        </if>
+        <if test="cityId!=null and cityId!=''">
+            and  city = #{cityId}
+        </if>
+        <if test="supplierId!=null and supplierId!=''">
+            and  supplier = #{supplierId}
+        </if>
+        <if test="teamId!=null and teamId!=''">
+            and  id = #{teamId}
+        </if>
+        order by city, id
+    </select>
+
+    <select id="queryTeamListByTemIdList" parameterType="java.util.List" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM car_driver_team dt
+        WHERE dt.id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
 </mapper>

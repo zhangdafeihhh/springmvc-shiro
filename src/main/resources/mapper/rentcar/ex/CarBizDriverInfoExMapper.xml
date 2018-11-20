@@ -268,7 +268,7 @@
     i.STATUS AS status
     FROM
     car_biz_driver_info i
-    where 1=1
+    <where>
     <if test="licensePlates!=null and licensePlates!=''">
       and i.license_plates LIKE '%${licensePlates}%'
     </if>
@@ -278,7 +278,28 @@
     <if test="phone!=null and phone!=''">
       and i.phone = #{phone}
     </if>
+      <if test="driverName!=null and driverName!=''">
+        and i.NAME = #{driverName}
+      </if>
+    </where>
     limit 1
+  </select>
+
+  <select id="queryListDriverByDriverIds" parameterType="java.util.Map" resultType="com.zhuanche.dto.CarDriverInfoDTO">
+    SELECT
+    i.driver_id AS driverId,
+    i.phone AS phone,
+    i.gender gender,
+    i.NAME,
+    i.license_plates AS licensePlates,
+    i.supplier_id supplieId,
+    i.STATUS AS status
+    FROM
+    car_biz_driver_info i
+    where driver_id in
+    <foreach collection="set" index="index" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
   </select>
 
   <select id="queryListByLimits" parameterType="com.zhuanche.request.DriverTeamRequest" resultType="com.zhuanche.dto.CarDriverInfoDTO">
@@ -387,7 +408,7 @@
         and name LIKE CONCAT(#{name},'%')
       </if>
       <if test="licensePlates != null and licensePlates != ''" >
-        and license_plates LIKE '%${licensePlates}%'
+        and license_plates LIKE   CONCAT('%',CONCAT(#{licensePlates},'%'))
       </if>
       <if test="status != null" >
         and status = #{status,jdbcType=INTEGER}
@@ -1490,6 +1511,7 @@
       car_biz_driver_info
     where license_plates = #{license_plates}
   </select>
+
   <select id="queryCarBizDriverList" resultMap="ResultMapWithBLOBs"  parameterType="com.zhuanche.dto.rentcar.CarBizDriverInfoDTO">
     select
     <include refid="Base_Column_List" />
@@ -1558,8 +1580,6 @@
       <if test="driverIds!=null and driverIds !=''">
         and i.driver_id in(${driverIds})
       </if>
-
-
       <if test="name!=null and name!=''">
         <!-- and i.name like '%name%' -->
         and i.name LIKE CONCAT(#{name},'%')
@@ -1692,7 +1712,6 @@
       </if>
     </where>
     order by i.update_date desc
-    LIMIT ${offSet},${pagesize}
   </select>
 
 
@@ -1704,5 +1723,8 @@
     from car_biz_driver_info
     where phone = #{phone,jdbcType=INTEGER}
   </select>
+
+
+
   
 </mapper>
