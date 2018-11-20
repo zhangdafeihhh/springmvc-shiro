@@ -109,7 +109,7 @@ public class CarDriverDutyService {
 			if(!Check.NuNStr(dutyParamRequest.getPhone())  ||  !StringUtils.isEmpty(dutyParamRequest.getDriverName())) {
 				DutyParamRequest request = new DutyParamRequest();
 				request.setPhone(dutyParamRequest.getPhone());
-				request.setDriverName(dutyParamRequest.getDriverName());
+
 				CarDriverInfoDTO driverInfo = carBizDriverInfoExMapper.queryOneDriver(request);
 				if(driverInfo == null){
 					PageInfo<CarDriverDayDutyDTO> pageInfo = new PageInfo<>();

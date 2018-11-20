@@ -319,6 +319,9 @@
               and d.time <= #{endTime, jdbcType=TIMESTAMP}
           ]]>
      </if>
+     <if test="driverName!=null and driverName!=''">
+       and d.driver_name = #{driverName}
+     </if>
    </where>
     order by d.time DESC
   </select>
