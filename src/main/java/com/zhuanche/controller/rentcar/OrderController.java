@@ -495,12 +495,12 @@ public class OrderController{
 				// 从订单组取统计数据
 				responseX = carFactOrderInfoService.queryOrderDataList(paramMap);
 				code = responseX.getCode();
-
+				csvDataList = new ArrayList<>();
 				if(code == 0){
 					JSONObject pageObj = (JSONObject) responseX.getData();
 					List<CarFactOrderInfoDTO> pageList  = (List<CarFactOrderInfoDTO>) pageObj.get("data");
 					if(pageList != null && pageList.size() >=1){
-						csvDataList = new ArrayList<>();
+
 						dataTrans(pageList,csvDataList);
 						logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code
 								+";总条数为："+pageObj.get("total")+"，共"+pageObj.get("totalPage")+"页，当前页返回结果条数为："
@@ -510,10 +510,12 @@ public class OrderController{
 						logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code+";总条数为："+pageObj.get("total")+"，共"+pageObj.get("totalPage")+"页，当前页返回结果条数为："
 								+ (pageList==null?"null":pageList.size()));
 						breakTag = true;
+						isLast = true;
 					}
 				}else{
 					logger.info("订单下载，下载第"+pageNo+"页数据，返回结果code为："+code);
 					breakTag = true;
+					isLast = true;
 				}
 				if(pageNo == 1 && csvDataList.size() == 0 ){
 					csvDataList.add("没有查到符合条件的数据");
