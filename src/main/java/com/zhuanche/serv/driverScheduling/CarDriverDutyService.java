@@ -106,9 +106,10 @@ public class CarDriverDutyService {
 		}
 		try{
 			//手机号转换driverId进行查询
-			if(!Check.NuNStr(dutyParamRequest.getPhone())) {
+			if(!Check.NuNStr(dutyParamRequest.getPhone())  ||  StringUtils.isEmpty(dutyParamRequest.getDriverName())) {
 				DutyParamRequest request = new DutyParamRequest();
 				request.setPhone(dutyParamRequest.getPhone());
+				request.setDriverName(dutyParamRequest.getDriverName());
 				CarDriverInfoDTO driverInfo = carBizDriverInfoExMapper.queryOneDriver(request);
 				if(driverInfo == null){
 					PageInfo<CarDriverDayDutyDTO> pageInfo = new PageInfo<>();
@@ -119,6 +120,7 @@ public class CarDriverDutyService {
 				}
 				dutyParamRequest.setDriverId(Integer.parseInt(driverInfo.getDriverId()));
 			}
+
 			//组装权限参数
 			dutyParamRequest = generateDutyParamRequestByUser(dutyParamRequest);
 			if(dutyParamRequest.getTeamId() != null){
