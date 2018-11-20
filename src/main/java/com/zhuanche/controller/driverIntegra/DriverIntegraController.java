@@ -269,7 +269,7 @@ public class DriverIntegraController {
             }
 
             List<String> headerList = new ArrayList<>();
-            headerList.add("序号, 城市,司机ID, 司机姓名,当前司机等级,手机号,供应商,车队,车牌号,当月积分,当日积分");
+            headerList.add("城市,司机ID, 司机姓名,当前司机等级,手机号,供应商,车队,车牌号,当月积分,当日积分");
             List<String> csvDataList  = new ArrayList<String>();
             if (StringUtils.isNotBlank(teamIds)) {
                 String[] teamId = teamIds.split(",");
@@ -419,12 +419,12 @@ public class DriverIntegraController {
         if(null == list){
             return;
         }
-        int index  = 0;
+//        int index  = 0;
         for(DriverVoEntity rowEntity:list){
             StringBuffer stringBuffer = new StringBuffer();
-            index++;
-            stringBuffer.append(index);
-            stringBuffer.append(",");
+//            index++;
+//            stringBuffer.append(index);
+//            stringBuffer.append(",");
 
             stringBuffer.append(rowEntity.getServiceCity()==null?"":rowEntity.getServiceCity());
             stringBuffer.append(",");
