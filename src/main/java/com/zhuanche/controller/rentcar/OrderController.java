@@ -497,7 +497,8 @@ public class OrderController{
 				}
 
 			}
-
+			List<CarFactOrderInfoDTO> pageList = null;
+			JSONObject pageObj = null;
 			for(int pageNo=1; pageNo <=totalPage; pageNo++  ) {
 				if(pageNo == 1){
 					isFirst = true;
@@ -514,8 +515,8 @@ public class OrderController{
 				code = responseX.getCode();
 				csvDataList = new ArrayList<>();
 				if(code == 0){
-					JSONObject pageObj = (JSONObject) responseX.getData();
-					List<CarFactOrderInfoDTO> pageList  = (List<CarFactOrderInfoDTO>) pageObj.get("data");
+					  pageObj = (JSONObject) responseX.getData();
+					 pageList  = (List<CarFactOrderInfoDTO>) pageObj.get("data");
 					if(pageList != null && pageList.size() >=1){
 
 						dataTrans(pageList,csvDataList);
@@ -534,11 +535,22 @@ public class OrderController{
 					breakTag = true;
 					isLast = true;
 				}
+
+				String msg = "订单下载，下载第"+pageNo+"页数据，isFirst="+isFirst+",isLast="+isLast+",返回结果code为："+code;
+				if(pageObj != null){
+					msg += ";总条数为："+pageObj.get("total")+"，共"+pageObj.get("totalPage")+"页";
+				}
+				if(pageList != null){
+					msg += "，当前页返回结果条数为："
+							+ (pageList==null?"null":pageList.size());
+				}
+				logger.info(msg);
 				if(pageNo == 1 && csvDataList.size() == 0 ){
 					csvDataList.add("没有查到符合条件的数据");
 				}
 				CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
 				if(breakTag){
+					CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,true,entity);
 					break;
 				}else{
 					CsvUtils.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast,entity);
