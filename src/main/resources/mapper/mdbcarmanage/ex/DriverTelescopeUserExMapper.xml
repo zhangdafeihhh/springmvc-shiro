@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.DriverTelescopeUserExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.DriverTelescopeUser" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    user_id, driver_id, status, remark, create_date, update_date
+  </sql>
+  <select id="selectTelescopeUserByUserId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from driver_telescope_user
+    where user_id = #{userId,jdbcType=INTEGER} and driver_id>0
+  </select>
+
+  <update id="disableDriverTelescopeUser" parameterType="java.lang.Integer" >
+    update driver_telescope_user set status=0
+    where user_id = #{userId,jdbcType=INTEGER} and status=1
+  </update>
+
+  <update id="enableDriverTelescopeUser" parameterType="java.lang.Integer" >
+    update driver_telescope_user set status=1
+    where user_id = #{userId,jdbcType=INTEGER} and status=0
+  </update>
+</mapper>

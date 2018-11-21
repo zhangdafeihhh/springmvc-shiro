@@ -49,10 +49,11 @@ public class UserManagementController {
 		if(phoneExist){
 			return AjaxResponse.fail(RestErrorCode.PHONE_EXIST );
 		}
+		AjaxResponse ajaxResponse = userManagementService.addUser(user);
 		if(addTelescope!=null && addTelescope.compareTo(1)==0){
-			carBizDriverInfoService.addTelescopeDriver(phone,user.getUserName());
+			carBizDriverInfoService.addTelescopeDriver(user);
 		}
-		return userManagementService.addUser(user);
+		return ajaxResponse;
 	}
 	
 	/**二、禁用一个用户**/
@@ -90,7 +91,9 @@ public class UserManagementController {
 		newUser.setTeamId( teamIds );
 		newUser.setGroupIds(groupIds);
 		if(addTelescope!=null && addTelescope.compareTo(1)==0){
-			carBizDriverInfoService.addTelescopeDriver(phone,newUser.getUserName());
+			carBizDriverInfoService.addTelescopeDriver(newUser);
+		}else{
+			carBizDriverInfoService.disableTelescopeDriver(newUser);
 		}
 		return userManagementService.changeUser(newUser);
 	}

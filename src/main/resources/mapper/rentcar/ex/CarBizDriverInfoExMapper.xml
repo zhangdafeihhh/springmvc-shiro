@@ -1704,5 +1704,15 @@
     from car_biz_driver_info
     where phone = #{phone,jdbcType=INTEGER}
   </select>
+
+
+  <select id="selectByDriverId" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from car_biz_driver_info
+    where driver_id = ${driverId,jdbcType=INTEGER}
+  </select>
   
 </mapper>
