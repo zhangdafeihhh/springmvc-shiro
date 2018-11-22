@@ -9,14 +9,14 @@ public final class PageDTO{
 	/**页面大小**/
     private int pageSize = 20;
 	/**查询出来的总记录条数**/
-    private int total    = 0;
+    private long total    = 0;
 	/**查询出来的结果**/
     @SuppressWarnings("rawtypes")
 	private List result;
     
 	public PageDTO(){}
 	@SuppressWarnings("rawtypes")
-	public PageDTO(int page, int pageSize, int total, List result){
+	public PageDTO(int page, int pageSize, long total, List result){
 		super();
 		this.page = page;
 		this.pageSize = pageSize;
@@ -35,10 +35,10 @@ public final class PageDTO{
 	public void setPageSize(int pageSize) {
 		this.pageSize = pageSize;
 	}
-	public int getTotal() {
+	public long getTotal() {
 		return total;
 	}
-	public void setTotal(int total) {
+	public void setTotal(long total) {
         this.total = (total < 0) ? 0 : total;
         if (this.page > this.getPages()) {
 			this.page = this.getPages();
@@ -55,19 +55,25 @@ public final class PageDTO{
 	
 	//----------------------------------------------------------分页相关BEGIN
     public int getPages() {
-        return (total + getPageSize() - 1) / getPageSize();
+    	if (getPageSize() == 0) {
+			return 0;
+		} else {
+			return (int) ((total + getPageSize() - 1) / getPageSize());
+		}
     }
     public int getStartNo() {
-        return ((getPage() - 1) * getPageSize() + 1);
+		int page = Math.max(getPage() - 1, 0);
+		return page == 0 ? 0 : page * getPageSize() + 1;
     }
-    public int getEndNo() {
-        return Math.min(getPage() * getPageSize(), total);
+    public long getEndNo() {
+		int page = getPage() == 0 ? 1 : getPage();
+        return Math.min(page * getPageSize(), total);
     }
     public int getPrePageNo() {
-        return Math.max(getPage() - 1, 1);
+        return Math.max(getPage() - 1, 0);
     }
     public int getNextPageNo() {
-        return Math.min(getPage() + 1, getPages());
+		return Math.min(getPage() + 1, getPages());
     }
 	//----------------------------------------------------------分页相关END
 }
