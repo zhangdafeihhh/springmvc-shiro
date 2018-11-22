@@ -15,20 +15,20 @@ public class BusBizException extends Exception {
 		super();
 	}
 
-	public BusBizException(String arg0, Throwable arg1, boolean arg2, boolean arg3) {
-		super(arg0, arg1, arg2, arg3);
+	public BusBizException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
 	}
 
-	public BusBizException(String arg0, Throwable arg1) {
-		super(arg0, arg1);
+	public BusBizException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
-	public BusBizException(String arg0) {
-		super(arg0);
+	public BusBizException(String message) {
+		super(message);
 	}
 
-	public BusBizException(Throwable arg0) {
-		super(arg0);
+	public BusBizException(Throwable cause) {
+		super(cause);
 	}
 
 }
