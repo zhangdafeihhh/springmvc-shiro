@@ -2973,13 +2973,13 @@ public class CarBizDriverInfoService {
                 carBizDriverInfo.setPassword(Md5Util.md5(initPwd));
                 carBizDriverInfoMapper.insertSelective(carBizDriverInfo);
                 driverTelescopeUser = new DriverTelescopeUser();
-                driverTelescopeUser.setUserId(1);
+                driverTelescopeUser.setUserId(user.getUserId());
                 driverTelescopeUser.setDriverId(carBizDriverInfo.getDriverId());
                 driverTelescopeUser.setStatus(1);
                 result = driverTelescopeUserMapper.insertSelective(driverTelescopeUser)>0;
             }else{
                 driverTelescopeUser = new DriverTelescopeUser();
-                driverTelescopeUser.setUserId(1);
+                driverTelescopeUser.setUserId(user.getUserId());
                 driverTelescopeUser.setDriverId(carBizDriverInfoDTO.getDriverId());
                 driverTelescopeUser.setStatus(1);
                 result = driverTelescopeUserMapper.insertSelective(driverTelescopeUser)>0;
