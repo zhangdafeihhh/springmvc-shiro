@@ -5,6 +5,7 @@ import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
 import com.zhuanche.entity.mdbcarmanage.CarRelateGroup;
 import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.request.DriverTeamRequest;
+import com.zhuanche.request.TeamGroupRequest;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -54,4 +55,6 @@ public interface CarDriverTeamExMapper{
 	 * @return
 	 */
 	List<CarDriverTeam> queryTeamListByTemIdList(List<Integer> teamIdList);
+
+	List<Map<String, Object>> queryForListByPids(TeamGroupRequest teamGroupRequest);
 }

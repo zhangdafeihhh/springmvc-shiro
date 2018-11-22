@@ -257,4 +257,18 @@
     </select>
 
 
+    <select id="queryForListByPids" parameterType="com.zhuanche.request.TeamGroupRequest" resultType="java.util.HashMap">
+        SELECT
+        id,
+        team_name AS groupName
+        FROM
+        car_driver_team
+        WHERE 1=1  and status!=2
+        <if test="teamIds!=null and teamIds.size()>0">
+            and p_id IN
+            <foreach collection="teamIds" open="(" close=")" separator="," item="tid" >
+                #{tid}
+            </foreach>
+        </if>
+    </select>
 </mapper>

@@ -11,6 +11,7 @@ import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.rocketmq.CommonRocketProducer;
+import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.dto.driver.DriverTeamRelationEntity;
@@ -25,11 +26,11 @@ import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.serv.mdbcarmanage.CarBizDriverUpdateService;
 import com.zhuanche.serv.mongo.DriverMongoService;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.BeanUtil;
-import com.zhuanche.util.Common;
+import com.zhuanche.util.*;
 import com.zhuanche.util.DateUtil;
-import com.zhuanche.util.ValidateUtils;
 import com.zhuanche.util.encrypt.MD5Utils;
+import mapper.mdbcarmanage.*;
+import mapper.mdbcarmanage.ex.*;
 import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.mdbcarmanage.CarDriverTeamMapper;
 import mapper.mdbcarmanage.CarRelateGroupMapper;
@@ -155,6 +156,15 @@ public class CarBizDriverInfoService {
     private CarBizModelExMapper carBizModelExMapper;
     @Autowired
     private CarAdmUserExMapper carAdmUserExMapper;
+    @Value("${telescope.supplierId}")
+    private Integer telescopeSupplierId ;
+
+    @Autowired
+    private DriverTelescopeUserMapper driverTelescopeUserMapper;
+
+    @Autowired
+    private DriverTelescopeUserExMapper driverTelescopeUserExMapper;
+
     /**
      * 查询司机信息列表展示
      *
@@ -3338,4 +3348,66 @@ public class CarBizDriverInfoService {
 
     }
 
+
+    public boolean addTelescopeDriver(CarAdmUser user){
+        boolean result = false;
+        String initPwd = String.valueOf((int)((Math.random()*9+1)*100000));
+        DriverTelescopeUser driverTelescopeUser = driverTelescopeUserExMapper.selectTelescopeUserByUserId(user.getUserId());
+        //关联关系不存在
+        if(null == driverTelescopeUser){
+            CarBizDriverInfoDTO carBizDriverInfoDTO = carBizDriverInfoExMapper.selectByPhone(user.getPhone());
+            if(null == carBizDriverInfoDTO){
+                CarBizDriverInfo carBizDriverInfo = new CarBizDriverInfo();
+                CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(telescopeSupplierId);
+                carBizDriverInfo.setServiceCity(carBizSupplier.getSupplierCity());
+                carBizDriverInfo.setSupplierId(carBizSupplier.getSupplierId());
+                carBizDriverInfo.setPhone(user.getPhone());
+                carBizDriverInfo.setName(user.getUserName());
+                carBizDriverInfo.setStatus(1);
+                carBizDriverInfo.setPassword(Md5Util.md5(initPwd));
+                carBizDriverInfoMapper.insertSelective(carBizDriverInfo);
+                driverTelescopeUser = new DriverTelescopeUser();
+                driverTelescopeUser.setUserId(user.getUserId());
+                driverTelescopeUser.setDriverId(carBizDriverInfo.getDriverId());
+                driverTelescopeUser.setStatus(1);
+                result = driverTelescopeUserMapper.insertSelective(driverTelescopeUser)>0;
+            }else{
+                driverTelescopeUser = new DriverTelescopeUser();
+                driverTelescopeUser.setUserId(user.getUserId());
+                driverTelescopeUser.setDriverId(carBizDriverInfoDTO.getDriverId());
+                driverTelescopeUser.setStatus(1);
+                result = driverTelescopeUserMapper.insertSelective(driverTelescopeUser)>0;
+            }
+            if(result){
+                try{
+                    //短信通知
+                    String text = carBizDriverInfoDTO.getName() + "，您好！已为您成功开通“首汽约车司机端”千里眼管理账号。登录账号为："+carBizDriverInfoDTO.getPhone()+"，初始密码为："+initPwd+"（为保障账户安全，请您登录后进行密码修改）";
+                    SmsSendUtil.send( carBizDriverInfoDTO.getPhone() , text);
+                }catch (Exception e){
+                    logger.error("开通千里眼账号短信通知异常：",e);
+                }
+            }
+        }else{
+            //关联关系存在
+            if(driverTelescopeUser.getStatus()==0){
+                result = driverTelescopeUserExMapper.enableDriverTelescopeUser(driverTelescopeUser.getUserId())>0;
+            }else{
+                result = true;
+            }
+        }
+        return result;
+    }
+
+    public void disableTelescopeDriver(CarAdmUser user){
+        driverTelescopeUserExMapper.disableDriverTelescopeUser(user.getUserId());
+    }
+
+    public CarBizDriverInfoDTO selectByPhone(Integer userId){
+        DriverTelescopeUser driverTelescopeUser = driverTelescopeUserExMapper.selectTelescopeUserByUserId(userId);
+        if(null == driverTelescopeUser){
+            return null;
+        }
+        CarBizDriverInfoDTO carBizDriverInfo = carBizDriverInfoExMapper.selectByDriverId(driverTelescopeUser.getDriverId());
+        return carBizDriverInfo;
+    }
 }

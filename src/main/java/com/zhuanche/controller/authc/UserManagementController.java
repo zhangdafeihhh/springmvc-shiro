@@ -3,6 +3,8 @@ package com.zhuanche.controller.authc;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.serv.CarBizDriverInfoService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +21,9 @@ import com.zhuanche.serv.authc.UserManagementService;
 public class UserManagementController {
 	@Autowired
 	private UserManagementService userManagementService;
+
+	@Autowired
+	private CarBizDriverInfoService carBizDriverInfoService;
 	
 	/**一、增加一个用户**/
 	@RequestMapping("/addUser")
@@ -29,7 +34,9 @@ public class UserManagementController {
 			@Verify(param="phone",rule="required|mobile") String phone, 
 			@Verify(param="cityIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String cityIds, 
 			@Verify(param="supplierIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String supplierIds, 
-			@Verify(param="teamIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String teamIds ) {
+			@Verify(param="teamIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String teamIds,
+			@Verify(param="groupIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String groupIds,
+			Integer addTelescope) {
 		CarAdmUser user  = new CarAdmUser();
 		user.setAccount(account.trim());
 		user.setUserName(userName.trim());
@@ -37,7 +44,16 @@ public class UserManagementController {
 		user.setCities( cityIds );
 		user.setSuppliers( supplierIds );
 		user.setTeamId( teamIds );
-		return userManagementService.addUser(user);
+		user.setGroupIds(groupIds);
+		boolean phoneExist = userManagementService.userPhoneExist(phone);
+		if(phoneExist){
+			return AjaxResponse.fail(RestErrorCode.PHONE_EXIST );
+		}
+		AjaxResponse ajaxResponse = userManagementService.addUser(user);
+		if(addTelescope!=null && addTelescope.compareTo(1)==0){
+			carBizDriverInfoService.addTelescopeDriver(user);
+		}
+		return ajaxResponse;
 	}
 	
 	/**二、禁用一个用户**/
@@ -63,7 +79,9 @@ public class UserManagementController {
 			@Verify(param="phone",rule="required|mobile") String phone, 
 			@Verify(param="cityIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String cityIds, 
 			@Verify(param="supplierIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String supplierIds, 
-			@Verify(param="teamIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String teamIds ) {
+			@Verify(param="teamIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String teamIds,
+			@Verify(param="groupIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String groupIds,
+			Integer addTelescope) {
 		CarAdmUser newUser = new CarAdmUser();
 		newUser.setUserId(userId);
 		newUser.setUserName(userName.trim());
@@ -71,6 +89,12 @@ public class UserManagementController {
 		newUser.setCities( cityIds );
 		newUser.setSuppliers( supplierIds );
 		newUser.setTeamId( teamIds );
+		newUser.setGroupIds(groupIds);
+		if(addTelescope!=null && addTelescope.compareTo(1)==0){
+			carBizDriverInfoService.addTelescopeDriver(newUser);
+		}else{
+			carBizDriverInfoService.disableTelescopeDriver(newUser);
+		}
 		return userManagementService.changeUser(newUser);
 	}
 	
