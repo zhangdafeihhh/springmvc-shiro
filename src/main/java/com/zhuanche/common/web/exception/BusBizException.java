@@ -3,6 +3,9 @@ package com.zhuanche.common.web.exception;
 /**
  * @ClassName: BusBizException
  * @Description: 巴士异常类
+ * 
+ *               禁止将不明来源的异常e.getMessage()做为自定义异常的异常信息,此举可能将后台框架类或SQL类等非业务异常信息返回给前端
+ * 
  * @author: yanyunpeng
  * @date: 2018年11月22日 下午3:29:16
  * 
