@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.exception.BusBizException;
 
 /**
  * @ClassName:  ExceptionHandleController
@@ -59,15 +60,15 @@ public class ExceptionHandleController{
 	}
 	
 	/**
-	 * @Title: handleException
-	 * @Description: 其它异常
+	 * @Title: handleBusBizException
+	 * @Description: 巴士异常
 	 * @param exception
 	 * @return AjaxResponse
 	 * @throws
 	 */
-	@ExceptionHandler(Exception.class)
-	public AjaxResponse handleException(Exception exception) {
-		logger.error("[ ExceptionHandleController-handleException ] 异常信息:{}", exception.getMessage(), exception);
+	@ExceptionHandler(BusBizException.class)
+	public AjaxResponse handleBusBizException(BusBizException exception) {
+		logger.error("[ ExceptionHandleController-handleBusBizException ] 异常信息:{}", exception.getMessage(), exception);
 		return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, exception.getMessage());
 	}
 	
