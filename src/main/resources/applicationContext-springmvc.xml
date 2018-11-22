@@ -11,7 +11,7 @@
         http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd">
 
 	<!-- 配置Spring MVC 中的RequestMappingHandlerMapping-->
-    <mvc:annotation-driven>
+    <mvc:annotation-driven validator="validator">
         <mvc:message-converters register-defaults="true">
             <bean class="org.springframework.http.converter.StringHttpMessageConverter">
                 <constructor-arg value="UTF-8" />
@@ -40,8 +40,13 @@
                 </property>
             </bean>
             <bean id="byteArrayHttpMessageConverter" class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>
-        </mvc:message-converters>
+        </mvc:message-converters> 
     </mvc:annotation-driven>
+    
+    <!-- 参数校验 -->
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+		<property name="providerClass" value="org.hibernate.validator.HibernateValidator" />
+    </bean>
 
 	<!-- 配置View层 JSP-->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
