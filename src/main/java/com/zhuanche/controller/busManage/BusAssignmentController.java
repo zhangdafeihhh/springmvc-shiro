@@ -114,7 +114,7 @@ public class BusAssignmentController extends BaseController {
 			pageDTO = busAssignmentService.selectList(params);
 		} catch (Exception e) {
 			logger.error("[ BusAssignmentController-queryData ] 查询巴士订单列表出错", e);
-			return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, e.getMessage());
+			return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
 		}
 		return AjaxResponse.success(pageDTO);
 	}
@@ -142,7 +142,7 @@ public class BusAssignmentController extends BaseController {
 			pageDTO = busAssignmentService.orderToDoListForCar(busCarDTO);
 		} catch (Exception e) {
 			logger.error("[ BusAssignmentController-queryCarData ] 根据订单号获取当前可指派的车辆数据异常", e);
-			return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, e.getMessage());
+			return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
 		}
 		return AjaxResponse.success(pageDTO);
 	}
@@ -170,7 +170,7 @@ public class BusAssignmentController extends BaseController {
 			pageDTO = busAssignmentService.orderToDoListForDriver(busDriverDTO);
 		} catch (Exception e) {
 			logger.error("[ BusAssignmentController-queryDriverData ] 根据订单号获取当前可指派的车辆数据异常", e);
-			return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, e.getMessage());
+			return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
 		}
 		return AjaxResponse.success(pageDTO);
 	}
@@ -273,7 +273,7 @@ public class BusAssignmentController extends BaseController {
 			orderOperationTime.setDriverName(driverName);
 		} catch (Exception e) {
 			logger.error("[ BusAssignmentController-assignment ] 巴士指派司机出错", e);
-			ajaxResponse = AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, e.getMessage());
+			ajaxResponse = AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
 
 			orderOperationTime.setStatus(OrderOperation.FAIL_STATUS);
 			orderOperationTime.setDescription("订单指派异常orderNo=" + orderNo);
@@ -404,7 +404,7 @@ public class BusAssignmentController extends BaseController {
 			orderOperationTime.setDriverName(driverName);
 		} catch (Exception e) {
 			logger.error("[ BusAssignmentController-updateDriver ] 巴士改派司机出错", e);
-			ajaxResponse = AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, e.getMessage());
+			ajaxResponse = AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
 
 			orderOperationTime.setDirverPhone("");
 			orderOperationTime.setDriverName("");
@@ -556,7 +556,7 @@ public class BusAssignmentController extends BaseController {
 			return AjaxResponse.success(result);
 		} catch (Exception e) {
 			logger.error("[ BusAssignmentController-saveMessageTask ] ", e);
-			return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, e.getMessage());
+			return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
 		}
     }
 
