@@ -99,5 +99,14 @@
             </foreach>
         </if>
     </select>
+
+    <!-- 根据城市ID，查询城市信息 -->
+    <select id="queryNameByCityIds" resultType="com.zhuanche.entity.rentcar.CarBizCity" parameterType="java.lang.String">
+        select t.city_id cityId, t.city_name cityName from car_biz_city t
+        where status=1
+        <if test="cityIds!=null and cityIds!=''">
+            and city_id IN (${cityIds})
+        </if>
+    </select>
 	 
   </mapper>

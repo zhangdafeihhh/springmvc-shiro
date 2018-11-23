@@ -256,5 +256,11 @@
         </foreach>
     </select>
 
+    <select id="queryTeamNameByTemIds" parameterType="java.util.List" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM car_driver_team dt
+        WHERE dt.id in (${teamIds})
+    </select>
 
 </mapper>
