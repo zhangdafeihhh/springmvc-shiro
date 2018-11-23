@@ -32,6 +32,7 @@ import mapper.rentcar.CarBizDriverAccountMapper;
 import mapper.rentcar.CarBizDriverInfoMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -2963,6 +2964,7 @@ public class CarBizDriverInfoService {
         if(null == driverTelescopeUser){
             CarBizDriverInfoDTO carBizDriverInfoDTO = carBizDriverInfoExMapper.selectByPhone(user.getPhone());
             if(null == carBizDriverInfoDTO){
+                List driverList = new ArrayList();
                 CarBizDriverInfo carBizDriverInfo = new CarBizDriverInfo();
                 CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(telescopeSupplierId);
                 carBizDriverInfo.setServiceCity(carBizSupplier.getSupplierCity());
@@ -2971,7 +2973,32 @@ public class CarBizDriverInfoService {
                 carBizDriverInfo.setName(user.getUserName());
                 carBizDriverInfo.setStatus(1);
                 carBizDriverInfo.setPassword(Md5Util.md5(initPwd));
-                carBizDriverInfoMapper.insertSelective(carBizDriverInfo);
+                carBizDriverInfo.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
+                carBizDriverInfo.setCreateDate(new Date());
+                carBizDriverInfo.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
+                carBizDriverInfo.setUpdateDate(new Date());
+                int insertResult = carBizDriverInfoMapper.insertSelective(carBizDriverInfo);
+                if(insertResult>0){
+                    CarBizDriverInfoDTO driverInfoDTO = new CarBizDriverInfoDTO();
+                    driverInfoDTO.setDriverId(carBizDriverInfo.getDriverId());
+                    driverInfoDTO.setServiceCity(carBizSupplier.getSupplierCity());
+                    driverInfoDTO.setSupplierId(carBizSupplier.getSupplierId());
+                    driverInfoDTO.setPhone(user.getPhone());
+                    driverInfoDTO.setName(user.getUserName());
+                    driverInfoDTO.setStatus(1);
+                    driverInfoDTO.setPassword(Md5Util.md5(initPwd));
+                    driverInfoDTO.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
+                    driverInfoDTO.setCreateDate(new Date());
+                    driverInfoDTO.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
+                    driverInfoDTO.setUpdateDate(new Date());
+                    // 更新mongoDB
+                    DriverMongo driverMongo = driverMongoService.findByDriverId(carBizDriverInfo.getDriverId());
+                    if (driverMongo != null) {
+                        driverMongoService.updateDriverMongo(driverInfoDTO);
+                    } else {
+                        driverMongoService.saveDriverMongo(driverInfoDTO);
+                    }
+                }
                 driverTelescopeUser = new DriverTelescopeUser();
                 driverTelescopeUser.setUserId(user.getUserId());
                 driverTelescopeUser.setDriverId(carBizDriverInfo.getDriverId());
