@@ -2969,6 +2969,7 @@ public class CarBizDriverInfoService {
                 CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(telescopeSupplierId);
                 carBizDriverInfo.setServiceCity(carBizSupplier.getSupplierCity());
                 carBizDriverInfo.setSupplierId(carBizSupplier.getSupplierId());
+                carBizDriverInfo.setCooperationType(Byte.valueOf(carBizSupplier.getCooperationType().toString()));
                 carBizDriverInfo.setPhone(user.getPhone());
                 carBizDriverInfo.setName(user.getUserName());
                 carBizDriverInfo.setStatus(1);
@@ -2991,6 +2992,7 @@ public class CarBizDriverInfoService {
                     driverInfoDTO.setCreateDate(new Date());
                     driverInfoDTO.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
                     driverInfoDTO.setUpdateDate(new Date());
+                    driverInfoDTO.setCooperationType(carBizSupplier.getCooperationType());
                     // 更新mongoDB
                     DriverMongo driverMongo = driverMongoService.findByDriverId(carBizDriverInfo.getDriverId());
                     if (driverMongo != null) {
