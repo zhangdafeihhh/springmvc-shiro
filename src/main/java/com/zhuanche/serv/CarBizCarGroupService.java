@@ -78,4 +78,16 @@ public class CarBizCarGroupService {
         }
          return carBizCarGroupExMapper.queryCarGroupByIdSet(carBizCarGroupSet);
     }
+    /**
+     * 判断该groupId是否是巴士的服务类型
+     * @param
+     * @return
+     */
+    public boolean groupIfExist(Integer groupId){
+        int result = carBizCarGroupExMapper.countByGroupId(groupId);
+        if(result >0 ){
+            return true;
+        }
+        return false;
+    }
 }

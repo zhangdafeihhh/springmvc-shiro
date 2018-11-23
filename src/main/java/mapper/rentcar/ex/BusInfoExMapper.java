@@ -1,20 +1,20 @@
 package mapper.rentcar.ex;
 
 
-import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
-import com.zhuanche.common.database.MasterSlaveConfig;
-import com.zhuanche.common.database.MasterSlaveConfigs;
-import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
+import com.zhuanche.dto.rentcar.BusInfoDTO;
 import com.zhuanche.entity.rentcar.CarBizCarInfo;
-import org.apache.ibatis.annotations.Param;
+import com.zhuanche.vo.rentcar.BusDetailVO;
+import com.zhuanche.vo.rentcar.BusInfoVO;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author wzq
  */
 public interface BusInfoExMapper {
-
+    List<BusInfoVO> selectList(BusInfoDTO busInfoDTO);
+    BusDetailVO selectCarByCarId(Integer carId);
+    Integer insertCar(CarBizCarInfo carInfo);
+    int countLicensePlates(String licensePlates);
+    String getLicensePlatesByCarId(Integer carId);
 }

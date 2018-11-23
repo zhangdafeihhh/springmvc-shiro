@@ -40,7 +40,7 @@
                 </property>
             </bean>
             <bean id="byteArrayHttpMessageConverter" class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>
-        </mvc:message-converters>
+        </mvc:message-converters> 
     </mvc:annotation-driven>
 
     <!-- 参数校验 -->

@@ -1,5 +1,7 @@
-package com.zhuanche.dto.busManage;
+package com.zhuanche.dto.rentcar;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.zhuanche.dto.BaseDTO;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -12,7 +14,8 @@ import java.util.Date;
  * @create: 2018-11-22 16:30
  **/
 @Data
-public class BusInfoDTO {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class BusInfoDTO extends BaseDTO{
     /**城市ID*/
     private Integer cityId;
     /**供应商ID*/
@@ -29,7 +32,5 @@ public class BusInfoDTO {
     /**创建时间（结束）*/
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createDateEnd;
-
-
 
 }
