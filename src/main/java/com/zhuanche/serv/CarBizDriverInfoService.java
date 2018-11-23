@@ -3381,8 +3381,8 @@ public class CarBizDriverInfoService {
             if(result){
                 try{
                     //短信通知
-                    String text = carBizDriverInfoDTO.getName() + "，您好！已为您成功开通“首汽约车司机端”千里眼管理账号。登录账号为："+carBizDriverInfoDTO.getPhone()+"，初始密码为："+initPwd+"（为保障账户安全，请您登录后进行密码修改）";
-                    SmsSendUtil.send( carBizDriverInfoDTO.getPhone() , text);
+                    String text = user.getUserName() + "，您好！已为您成功开通“首汽约车司机端”千里眼管理账号。登录账号为："+user.getPhone()+"，初始密码为："+initPwd+"（为保障账户安全，请您登录后进行密码修改）";
+                    SmsSendUtil.send(user.getPhone() , text);
                 }catch (Exception e){
                     logger.error("开通千里眼账号短信通知异常：",e);
                 }
