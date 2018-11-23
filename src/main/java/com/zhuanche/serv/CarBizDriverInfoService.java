@@ -2974,6 +2974,7 @@ public class CarBizDriverInfoService {
                 carBizDriverInfo.setName(user.getUserName());
                 carBizDriverInfo.setStatus(1);
                 carBizDriverInfo.setPassword(Md5Util.md5(initPwd));
+                carBizDriverInfo.setGroupId(34);
                 carBizDriverInfo.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
                 carBizDriverInfo.setCreateDate(new Date());
                 carBizDriverInfo.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
@@ -2993,6 +2994,7 @@ public class CarBizDriverInfoService {
                     driverInfoDTO.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
                     driverInfoDTO.setUpdateDate(new Date());
                     driverInfoDTO.setCooperationType(carBizSupplier.getCooperationType());
+                    driverInfoDTO.setGroupId(34);
                     // 更新mongoDB
                     DriverMongo driverMongo = driverMongoService.findByDriverId(carBizDriverInfo.getDriverId());
                     if (driverMongo != null) {
