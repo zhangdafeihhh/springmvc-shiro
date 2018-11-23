@@ -3,6 +3,7 @@ package com.zhuanche.serv.subscription;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.dto.driver.SubscriptionReportConfigureDTO;
 import com.zhuanche.dto.rentcar.CarBizSupplierDTO;
 import com.zhuanche.entity.driver.SubscriptionReport;
 import com.zhuanche.entity.driver.SubscriptionReportConfigure;
@@ -61,7 +62,7 @@ public class SubscriptionReportConfigureService {
      * @param subscriptionCycle 订阅周期,1-周;2-月;
      * @return
      */
-    public List<SubscriptionReportConfigure> selectBySubscriptionCycle (Integer subscriptionCycle){
+    public List<SubscriptionReportConfigureDTO> selectBySubscriptionCycle (Integer subscriptionCycle){
         return subscriptionReportConfigureExMapper.selectBySubscriptionCycle(subscriptionCycle);
     }
 

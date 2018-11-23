@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="mapper.driver.ex.SubscriptionReportConfigureExMapper" >
-  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.SubscriptionReportConfigure" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.dto.driver.SubscriptionReportConfigureDTO" >
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="report_id" property="reportId" jdbcType="INTEGER" />
     <result column="report_name" property="reportName" jdbcType="VARCHAR" />

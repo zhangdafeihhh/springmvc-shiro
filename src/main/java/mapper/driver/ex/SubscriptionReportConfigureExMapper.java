@@ -1,5 +1,6 @@
 package mapper.driver.ex;
 
+import com.zhuanche.dto.driver.SubscriptionReportConfigureDTO;
 import com.zhuanche.entity.driver.SubscriptionReportConfigure;
 import org.apache.ibatis.annotations.Param;
 
@@ -12,7 +13,7 @@ public interface SubscriptionReportConfigureExMapper {
      * @param subscriptionCycle 订阅周期,1-周;2-月;
      * @return
      */
-    List<SubscriptionReportConfigure> selectBySubscriptionCycle (@Param("subscriptionCycle") Integer subscriptionCycle);
+    List<SubscriptionReportConfigureDTO> selectBySubscriptionCycle (@Param("subscriptionCycle") Integer subscriptionCycle);
 
     /**
      * 对已存在的配置做无效

@@ -12,6 +12,7 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.dto.driver.SubscriptionReportConfigureDTO;
 import com.zhuanche.entity.driver.SubscriptionReport;
 import com.zhuanche.entity.driver.SubscriptionReportConfigure;
 import com.zhuanche.serv.subscription.SubscriptionReportConfigureService;
@@ -138,7 +139,7 @@ public class SubscriptionReportConfigureController {
             @Verify(param = "subscriptionCycle",rule="required") Integer subscriptionCycle) {
 
         logger.info(LOGTAG + "/querySubscriptionConfigure,subscriptionCycle={}", subscriptionCycle);
-        List<SubscriptionReportConfigure> cycleList = subscriptionReportConfigureService.selectBySubscriptionCycle(subscriptionCycle);
+        List<SubscriptionReportConfigureDTO> cycleList = subscriptionReportConfigureService.selectBySubscriptionCycle(subscriptionCycle);
         return AjaxResponse.success(cycleList);
     }
 
