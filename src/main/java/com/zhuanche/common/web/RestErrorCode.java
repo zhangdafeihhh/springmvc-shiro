@@ -185,6 +185,8 @@ public final class RestErrorCode{
 	//-----------------------------------------------业务参数：数据报表
 	@ResultMessage("未查询到相应数据报表任务")
 	public static final int SUBSCRIPTION_NOT_EXIST = 7010;
+	@ResultMessage("数据报表：{0}")
+	public static final int SUBSCRIPTION_INVALID              = 7011;
 	//---------------------------------------------------------------------------------------------------------------------------------------------
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系

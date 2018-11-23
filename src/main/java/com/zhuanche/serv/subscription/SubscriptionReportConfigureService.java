@@ -18,7 +18,6 @@ import mapper.driver.ex.SubscriptionReportExMapper;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,108 +125,166 @@ public class SubscriptionReportConfigureService {
      * @param cities 城市ID（多个ID用英文逗号分隔）
      * @param supplierIds 供应商ID（多个ID用英文逗号分隔）
      * @param teamIds 车队ID（多个ID用英文逗号分隔）
+     * @param isWhole 是否有全国级别
+     * @param isCity 是否有城市级别
+     * @param isSupplier 是否有供应商级别
+     * @param isTeam 是否有车队级别
      * @return
      */
     public AjaxResponse saveSubscription(Integer reportId, String reportName,
                                          Integer subscriptionCycle, String level,
-                                         String cities, String supplierIds, String teamIds) {
+                                         String cities, String supplierIds, String teamIds,
+                                         Boolean isWhole, Boolean isCity,
+                                         Boolean isSupplier, Boolean isTeam) {
 
         //TODO 更新订阅配置的状态status=0
-        int i1 = subscriptionReportConfigureExMapper.updateConfigureStatus();
-        //解析等级
-        String[] levels = level.split(",");
-        for (int i = 0; i < levels.length; i++) {
-            Integer levelGrade = Integer.parseInt(levels[i]);
-            if(levelGrade==1) { //全国,需要单独生成一个配置
-                String bussinessNumber = reportId + "" + subscriptionCycle + "" + level + "" + "000";
-                String md5DigestBase64 = null;
-                try {
-                    md5DigestBase64 = MD5Utils.getMD5DigestBase64(bussinessNumber);
-                    logger.info(LOGTAG + "加密,md5DigestBase64={}", md5DigestBase64);
-                } catch (NoSuchAlgorithmException e) {
-                    logger.info(LOGTAG + "加密,error:", e);
-                }
-                SubscriptionReportConfigure configure = new SubscriptionReportConfigure();
-                configure.setBussinessNumber(md5DigestBase64);
-                configure.setStatus(1);
-                configure.setLevel(levelGrade);
-                configure.setReportId(reportId);
-                configure.setReportName(reportName);
-                configure.setSubscriptionCycle(subscriptionCycle);
-                //TODO 查询md5DigestBase64是否存在，存在不保存，不存在保存
-                int had = this.saveSubscriptionReportConfigure(configure);
-                logger.info(LOGTAG + "配置, 全国, result={}", had);
+        subscriptionReportConfigureExMapper.updateConfigureStatus();
+
+        if(isWhole) { //全国,需要单独生成一个配置
+            String bussinessNumber = reportId + "" + subscriptionCycle + "" + level + "" + "000";
+            String md5DigestBase64 = null;
+            try {
+                md5DigestBase64 = MD5Utils.getMD5DigestBase64(bussinessNumber);
+                logger.info(LOGTAG + "加密,md5DigestBase64={}", md5DigestBase64);
+            } catch (NoSuchAlgorithmException e) {
+                logger.info(LOGTAG + "加密,error:", e);
             }
-            if(levelGrade==2){ //城市
-                if(StringUtils.isEmpty(cities)){
-                    return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "选择城市级别需要传城市ID");
-                }
-                //解析城市
-                //查询城市名称，一次查询出来避免多次读库
-                List<CarBizCity> cityList = carBizCityExMapper.queryNameByCityIds(cities);
-                if(cityList==null || cityList.size()==0){
-                    return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "选择城市不存在");
-                }
-                Map<String,CarBizCity> byCityIds = new HashMap();
-                if(cityList != null){
-                    for(CarBizCity city :cityList){
-                        byCityIds.put("c_"+city.getCityId(),city);
-                    }
-                }
-                String[] citiesStr = cities.split(",");
-                CarBizCity carBizCity = null;
-                for (int j = 0; j < citiesStr.length; j++) {
-                    Integer cityId = Integer.parseInt(citiesStr[j]);
-                    carBizCity = byCityIds.get("c_"+cityId);
-                    if(carBizCity!=null){
-                        String bussinessNumber = reportId + "" + subscriptionCycle + "" + level + "" + cityId + "00";
-                        String md5DigestBase64 = null;
-                        try {
-                            md5DigestBase64 = MD5Utils.getMD5DigestBase64(bussinessNumber);
-                            logger.info(LOGTAG + "加密,md5DigestBase64={}", md5DigestBase64);
-                        } catch (NoSuchAlgorithmException e) {
-                            logger.info(LOGTAG + "加密,error:", e);
-                        }
-                        SubscriptionReportConfigure configure = new SubscriptionReportConfigure();
-                        configure.setBussinessNumber(md5DigestBase64);
-                        configure.setStatus(1);
-                        configure.setLevel(levelGrade);
-                        configure.setReportId(reportId);
-                        configure.setReportName(reportName);
-                        configure.setSubscriptionCycle(subscriptionCycle);
-                        configure.setCityId(cityId);
-                        configure.setCityName(carBizCity.getCityName());
-                        //TODO 查询md5DigestBase64是否存在，存在不保存，不存在保存
-                        int had = this.saveSubscriptionReportConfigure(configure);
-                        logger.info(LOGTAG + "配置, 城市, cityId={}, result={}", had);
-                    }
+            SubscriptionReportConfigure configure = new SubscriptionReportConfigure();
+            configure.setBussinessNumber(md5DigestBase64);
+            configure.setStatus(1);
+            configure.setLevel(1);
+            configure.setReportId(reportId);
+            configure.setReportName(reportName);
+            configure.setSubscriptionCycle(subscriptionCycle);
+            //TODO 存在
+            int had = this.saveSubscriptionReportConfigure(configure);
+            logger.info(LOGTAG + "配置, 全国, result={}", had);
+        }
+        if(isCity){ //城市
+            //查询城市名称，一次查询出来避免多次读库
+            List<CarBizCity> cityList = carBizCityExMapper.queryNameByCityIds(cities);
+            if(cityList==null || cityList.size()==0){
+                return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "选择城市不存在");
+            }
+            Map<String,CarBizCity> byCityIds = new HashMap();
+            if(cityList != null){
+                for(CarBizCity city :cityList){
+                    byCityIds.put("c_"+city.getCityId(),city);
                 }
             }
-            if(levelGrade==4) { //供应商
-                if(StringUtils.isEmpty(supplierIds)){
-                    return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "选择供应商级别需要传供应商ID");
-                }
-                //解析供应商
-                //查询供应商名称，一次查询出来避免多次读库
-                List<CarBizSupplierDTO> supplierList = carBizSupplierExMapper.queryNameBySupplierIds(supplierIds);
-                if(supplierList==null || supplierList.size()==0){
-                    return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "选择供应商不存在");
-                }
-                Map<String, CarBizSupplierDTO> bySuppliers = Maps.newHashMap();
-                if(supplierList != null){
-                    for(CarBizSupplierDTO supplierDTO :supplierList){
-                        bySuppliers.put("s_"+supplierDTO.getSupplierId(), supplierDTO);
+            String[] citiesStr = cities.split(",");
+            CarBizCity carBizCity = null;
+            for (int j = 0; j < citiesStr.length; j++) {
+                Integer cityId = Integer.parseInt(citiesStr[j]);
+                carBizCity = byCityIds.get("c_"+cityId);
+                if(carBizCity!=null){
+                    String bussinessNumber = reportId + "" + subscriptionCycle + "" + level + "" + cityId + "00";
+                    String md5DigestBase64 = null;
+                    try {
+                        md5DigestBase64 = MD5Utils.getMD5DigestBase64(bussinessNumber);
+                        logger.info(LOGTAG + "加密,md5DigestBase64={}", md5DigestBase64);
+                    } catch (NoSuchAlgorithmException e) {
+                        logger.info(LOGTAG + "加密,error:", e);
                     }
+                    SubscriptionReportConfigure configure = new SubscriptionReportConfigure();
+                    configure.setBussinessNumber(md5DigestBase64);
+                    configure.setStatus(1);
+                    configure.setLevel(2);
+                    configure.setReportId(reportId);
+                    configure.setReportName(reportName);
+                    configure.setSubscriptionCycle(subscriptionCycle);
+                    configure.setCityId(cityId);
+                    configure.setCityName(carBizCity.getCityName());
+                    //TODO 存在
+                    int had = this.saveSubscriptionReportConfigure(configure);
+                    logger.info(LOGTAG + "配置, 城市, cityId={}, result={}", had);
                 }
-                CarBizSupplierDTO temp = null;
-                String[] supplierStr = supplierIds.split(",");
-                for (int j = 0; j < supplierStr.length; j++) {
-                    Integer supplierId = Integer.parseInt(supplierStr[j]);
-                    temp = bySuppliers.get("s_"+supplierId);
-                    if(temp != null){
+            }
+        }
+        if(isSupplier) { //供应商
+            //查询供应商名称，一次查询出来避免多次读库
+            List<CarBizSupplierDTO> supplierList = carBizSupplierExMapper.queryNameBySupplierIds(supplierIds);
+            if(supplierList==null || supplierList.size()==0){
+                return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "选择供应商不存在");
+            }
+            Map<String, CarBizSupplierDTO> bySuppliers = Maps.newHashMap();
+            if(supplierList != null){
+                for(CarBizSupplierDTO supplierDTO :supplierList){
+                    bySuppliers.put("s_"+supplierDTO.getSupplierId(), supplierDTO);
+                }
+            }
+            CarBizSupplierDTO temp = null;
+            String[] supplierStr = supplierIds.split(",");
+            for (int j = 0; j < supplierStr.length; j++) {
+                Integer supplierId = Integer.parseInt(supplierStr[j]);
+                temp = bySuppliers.get("s_"+supplierId);
+                if(temp != null){
+                    SubscriptionReportConfigure configure = new SubscriptionReportConfigure();
+                    String bussinessNumber = reportId + "" + subscriptionCycle + "" + level + ""
+                            + temp.getSupplierCity() + "" + supplierId + "0";
+                    String md5DigestBase64 = null;
+                    try {
+                        md5DigestBase64 = MD5Utils.getMD5DigestBase64(bussinessNumber);
+                        logger.info(LOGTAG + "加密,md5DigestBase64={}", md5DigestBase64);
+                    } catch (NoSuchAlgorithmException e) {
+                        logger.info(LOGTAG + "加密,error:", e);
+                    }
+                    configure.setBussinessNumber(md5DigestBase64);
+                    configure.setStatus(1);
+                    configure.setLevel(4);
+                    configure.setReportId(reportId);
+                    configure.setReportName(reportName);
+                    configure.setSubscriptionCycle(subscriptionCycle);
+                    configure.setCityId(temp.getSupplierCity());
+                    configure.setCityName(temp.getCityName());
+                    configure.setSupplierId(supplierId);
+                    configure.setSupplierName(temp.getSupplierFullName());
+                    //TODO 存在
+                    int had = this.saveSubscriptionReportConfigure(configure);
+                    logger.info(LOGTAG + "配置, 供应商, cityId={}, result={}", had);
+                }
+            }
+        }
+        if(isTeam) { //车队
+            //查询车队名称，一次查询出来避免多次读库
+            List<CarDriverTeam> teamList = carDriverTeamExMapper.queryTeamNameByTemIds(teamIds);
+            if(teamList==null || teamList.size()==0){
+                return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "选择车队不存在");
+            }
+            String suppliers = "";
+            Map<String, CarDriverTeam> byTeams = Maps.newHashMap();
+            if(teamList!=null) {
+                for (CarDriverTeam carDriverTeam : teamList) {
+                    byTeams.put("t_" + carDriverTeam.getId(), carDriverTeam);
+                    suppliers += "," + carDriverTeam.getSupplier();
+                }
+            }
+            if(suppliers.length()>1){
+                suppliers = suppliers.substring(1,suppliers.length());
+            }
+            List<CarBizSupplierDTO> supplierList = carBizSupplierExMapper.queryNameBySupplierIds(suppliers);
+            if(supplierList==null || supplierList.size()==0){
+                return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "选择供应商不存在");
+            }
+            Map<String, CarBizSupplierDTO> bySuppliers = Maps.newHashMap();
+            if(supplierList != null){
+                for(CarBizSupplierDTO supplierDTO :supplierList){
+                    bySuppliers.put("s_"+supplierDTO.getSupplierId(), supplierDTO);
+                }
+            }
+            CarDriverTeam teamTemp = null;
+            CarBizSupplierDTO supplierTemp = null;
+            String[] teamStr = teamIds.split(",");
+            for (int j = 0; j < teamStr.length; j++) {
+                Integer teamId = Integer.parseInt(teamStr[j]);
+                teamTemp = byTeams.get("t_"+teamId);
+                if(teamTemp!=null) {
+                    supplierTemp = bySuppliers.get("s_" + teamTemp.getSupplier());
+                    if (supplierTemp != null) {
                         SubscriptionReportConfigure configure = new SubscriptionReportConfigure();
                         String bussinessNumber = reportId + "" + subscriptionCycle + "" + level + ""
-                                + temp.getSupplierCity() + "" + supplierId + "0";
+                                + supplierTemp.getSupplierCity() + "" + supplierTemp.getSupplierId()
+                                + "" + teamTemp.getId();
                         String md5DigestBase64 = null;
                         try {
                             md5DigestBase64 = MD5Utils.getMD5DigestBase64(bussinessNumber);
@@ -237,92 +294,23 @@ public class SubscriptionReportConfigureService {
                         }
                         configure.setBussinessNumber(md5DigestBase64);
                         configure.setStatus(1);
-                        configure.setLevel(levelGrade);
+                        configure.setLevel(8);
                         configure.setReportId(reportId);
                         configure.setReportName(reportName);
                         configure.setSubscriptionCycle(subscriptionCycle);
-                        configure.setCityId(temp.getSupplierCity());
-                        configure.setCityName(temp.getCityName());
-                        configure.setSupplierId(supplierId);
-                        configure.setSupplierName(temp.getSupplierFullName());
-                        //TODO 查询md5DigestBase64是否存在，存在不保存，不存在保存
+                        configure.setCityId(supplierTemp.getSupplierCity());
+                        configure.setCityName(supplierTemp.getCityName());
+                        configure.setSupplierId(supplierTemp.getSupplierId());
+                        configure.setSupplierName(supplierTemp.getSupplierFullName());
+                        configure.setTeamId(teamTemp.getId());
+                        configure.setTeamName(teamTemp.getTeamName());
+                        //TODO 存在
                         int had = this.saveSubscriptionReportConfigure(configure);
                         logger.info(LOGTAG + "配置, 供应商, cityId={}, result={}", had);
-                    }
-                }
-            }
-            if(levelGrade==8) { //车队
-                if(StringUtils.isEmpty(teamIds)){
-                    return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "选择车队级别需要传车队ID");
-                }
-                //解析车队
-                //查询车队名称，一次查询出来避免多次读库
-                List<CarDriverTeam> teamList = carDriverTeamExMapper.queryTeamNameByTemIds(teamIds);
-                if(teamList==null || teamList.size()==0){
-                    return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "选择车队不存在");
-                }
-                String suppliers = "";
-                Map<String, CarDriverTeam> byTeams = Maps.newHashMap();
-                if(teamList!=null) {
-                    for (CarDriverTeam carDriverTeam : teamList) {
-                        byTeams.put("t_" + carDriverTeam.getId(), carDriverTeam);
-                        suppliers += "," + carDriverTeam.getSupplier();
-                    }
-                }
-                if(suppliers.length()>1){
-                    suppliers = suppliers.substring(1,suppliers.length());
-                }
-                List<CarBizSupplierDTO> supplierList = carBizSupplierExMapper.queryNameBySupplierIds(suppliers);
-                if(supplierList==null || supplierList.size()==0){
-                    return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "选择供应商不存在");
-                }
-                Map<String, CarBizSupplierDTO> bySuppliers = Maps.newHashMap();
-                if(supplierList != null){
-                    for(CarBizSupplierDTO supplierDTO :supplierList){
-                        bySuppliers.put("s_"+supplierDTO.getSupplierId(), supplierDTO);
-                    }
-                }
-                CarDriverTeam teamTemp = null;
-                CarBizSupplierDTO supplierTemp = null;
-                String[] teamStr = teamIds.split(",");
-                for (int j = 0; j < teamStr.length; j++) {
-                    Integer teamId = Integer.parseInt(teamStr[j]);
-                    teamTemp = byTeams.get("t_"+teamId);
-                    if(teamTemp!=null) {
-                        supplierTemp = bySuppliers.get("s_" + teamTemp.getSupplier());
-                        if (supplierTemp != null) {
-                            SubscriptionReportConfigure configure = new SubscriptionReportConfigure();
-                            String bussinessNumber = reportId + "" + subscriptionCycle + "" + level + ""
-                                    + supplierTemp.getSupplierCity() + "" + supplierTemp.getSupplierId()
-                                    + "" + teamTemp.getId();
-                            String md5DigestBase64 = null;
-                            try {
-                                md5DigestBase64 = MD5Utils.getMD5DigestBase64(bussinessNumber);
-                                logger.info(LOGTAG + "加密,md5DigestBase64={}", md5DigestBase64);
-                            } catch (NoSuchAlgorithmException e) {
-                                logger.info(LOGTAG + "加密,error:", e);
-                            }
-                            configure.setBussinessNumber(md5DigestBase64);
-                            configure.setStatus(1);
-                            configure.setLevel(levelGrade);
-                            configure.setReportId(reportId);
-                            configure.setReportName(reportName);
-                            configure.setSubscriptionCycle(subscriptionCycle);
-                            configure.setCityId(supplierTemp.getSupplierCity());
-                            configure.setCityName(supplierTemp.getCityName());
-                            configure.setSupplierId(supplierTemp.getSupplierId());
-                            configure.setSupplierName(supplierTemp.getSupplierFullName());
-                            configure.setTeamId(teamTemp.getId());
-                            configure.setTeamName(teamTemp.getTeamName());
-                            //TODO 查询md5DigestBase64是否存在，存在不保存，不存在保存
-                            int had = this.saveSubscriptionReportConfigure(configure);
-                            logger.info(LOGTAG + "配置, 供应商, cityId={}, result={}", had);
-                        }
                     }
                 }
             }
         }
         return AjaxResponse.success(null);
     }
-
 }

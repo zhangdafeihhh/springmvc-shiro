@@ -68,10 +68,42 @@ public class SubscriptionReportConfigureController {
         long start = System.currentTimeMillis();
         logger.info(LOGTAG + "数据报表订阅, reportName={}, subscriptionCycle={}, level={}, cities={}, supplierIds={}, teamIds={}",
                 reportName, subscriptionCycle, level, cities, supplierIds, teamIds);
+        //解析等级
+        String[] levels = level.split(",");
+        Boolean isWhole = false;
+        Boolean isCity = false;
+        Boolean isSupplier = false;
+        Boolean isTeam = false;
+        for (int i = 0; i < levels.length; i++) {
+            Integer levelGrade = Integer.parseInt(levels[i]);
+            if(levelGrade==1) { //全国
+                isWhole = true;
+            }
+            if(levelGrade==2) { //城市
+                if(StringUtils.isEmpty(cities)){
+                    return AjaxResponse.fail(RestErrorCode.SUBSCRIPTION_INVALID, "选择城市级别需要传城市ID");
+                }
+                isCity = true;
+            }
+            if(levelGrade==4) { //供应商
+                if(StringUtils.isEmpty(supplierIds)){
+                    return AjaxResponse.fail(RestErrorCode.SUBSCRIPTION_INVALID, "选择供应商级别需要传供应商ID");
+                }
+                isSupplier = true;
+            }
+            if(levelGrade==8) { //车队
+                if(StringUtils.isEmpty(teamIds)){
+                    return AjaxResponse.fail(RestErrorCode.SUBSCRIPTION_INVALID, "选择车队级别需要传车队ID");
+                }
+                isTeam = true;
+            }
+        }
+
         AjaxResponse ajaxResponse = null;
         try {
             //验证码
             String isLock = (String) WebSessionUtil.getAttribute(SUBSCRIPTION);
+            logger.info(LOGTAG + "数据报表订阅, isLock={}", isLock);
             if(StringUtils.isNotEmpty(isLock)){
                 if(Integer.parseInt(isLock)==1){
                     return AjaxResponse.fail(RestErrorCode.CAR_API_ERROR, "操作太频繁，请稍后。");
@@ -79,8 +111,8 @@ public class SubscriptionReportConfigureController {
             }
             WebSessionUtil.setAttribute(SUBSCRIPTION, 1);
 
-            ajaxResponse = subscriptionReportConfigureService.saveSubscription(reportId, reportName, subscriptionCycle, level,
-                    cities, supplierIds, teamIds);
+            ajaxResponse = subscriptionReportConfigureService.saveSubscription(reportId, reportName, subscriptionCycle,
+                    level, cities, supplierIds, teamIds, isWhole, isCity, isSupplier, isTeam);
         } finally {
             logger.info(LOGTAG + "数据报表订阅,删除锁");
             WebSessionUtil.removeAttribute(SUBSCRIPTION);
