@@ -1,6 +1,11 @@
 package mapper.rentcar.ex;
 
+import com.zhuanche.dto.rentcar.CarBizSupplierDTO;
+import com.zhuanche.entity.rentcar.CarBizSupplier;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.ibatis.annotations.Param;
@@ -19,4 +24,8 @@ public interface CarBizSupplierExMapper{
 	List<CarBizSupplier> queryNamesByIds(@Param("supplierIds") Set<Integer> supplierIds);
 
 	List<CarBizSupplier> findByIdSet(@Param("supplierIdSet") Set<Integer> supplierIdSet);
+
+	List<CarBizSupplierDTO> queryNameBySupplierIds(@Param("supplierIds")  String supplierIds );
+	
+	List<Map<String, Object>> getSupplierList(@Param("supplierIds") Set<String> supplierIds);
 }

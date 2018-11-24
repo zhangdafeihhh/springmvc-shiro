@@ -12,28 +12,28 @@
 		</commentGenerator>
 
 		<!-- 数据库连接信息 -->
-		<jdbcConnection driverClass="com.mysql.jdbc.Driver"	connectionURL="jdbc:mysql://10.20.10.100:3306/MDB_CAR_MANAGE?useUnicode=true&amp;characterEncoding=UTF-8" userId="sqhc_rentcar" password="BzkmQM%O^U7Dy8X3">
+		<jdbcConnection driverClass="com.mysql.jdbc.Driver"	connectionURL="jdbc:mysql://10.35.0.39:3306/MDB_CAR_MANAGE?useUnicode=true&amp;characterEncoding=UTF-8" userId="dev_sqhc_rentcar" password="dev_BzkmQM%O^U7Dy8X3">
 		</jdbcConnection>
 		<javaTypeResolver>
 			<property name="forceBigDecimals" value="true"/>
 		</javaTypeResolver>
 
 		<!-- po实体类代码位置 -->
-		<javaModelGenerator targetPackage="com.zhuanche.entity.mdbcarmanage"	targetProject="/Users/fan/workspace/mp-manage/src/main/java">
+		<javaModelGenerator targetPackage="com.zhuanche.entity.mdbcarmanage"	targetProject="D:\\shouqi_project\\car\\mp-manage\\src\\main\\java">
 			<property name="enableSubPackages" value="true" />
 			<property name="trimStrings" value="true" />
 		</javaModelGenerator>
 		<!-- sql代码的xml映射文件位置 -->
-		<sqlMapGenerator targetPackage="mapper.mdbcarmanage" targetProject="/Users/fan/workspace/mp-manage/src/main/resources">
+		<sqlMapGenerator targetPackage="mapper.mdbcarmanage" targetProject="D:\\shouqi_project\\car\\mp-manage\\src\\main\\resources">
 			<property name="enableSubPackages" value="true" />
 		</sqlMapGenerator>
 		<!-- mapper接口位置 -->
-		<javaClientGenerator type="XMLMAPPER" targetPackage="mapper.mdbcarmanage" targetProject="/Users/fan/workspace/mp-manage/src/main/java">
+		<javaClientGenerator type="XMLMAPPER" targetPackage="mapper.mdbcarmanage" targetProject="D:\\shouqi_project\\car\\mp-manage\\src\\main\\java">
 			<property name="enableSubPackages" value="true" />
 		</javaClientGenerator>
 
 		<!-- 需要自动生成的表 -->
-		<table tableName="car_message_post" domainObjectName="CarMessagePost"
+		<table tableName="car_driver_month_duty" domainObjectName="CarDriverMonthDuty"
 			   enableSelectByExample="false" enableDeleteByExample="false"
 			   enableCountByExample="false" enableUpdateByExample="false">
 			<property name="useActualColumnNames" value="false" />

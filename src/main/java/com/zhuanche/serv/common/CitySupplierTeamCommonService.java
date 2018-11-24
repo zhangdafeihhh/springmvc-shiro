@@ -25,10 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
   * @description: 城市供应商车队联动查询返回service
@@ -380,5 +377,69 @@ public class CitySupplierTeamCommonService {
         return carDriverTeams;
     }
 
+    /**
+     * @Desc: pid查询车队下小组
+     * @param:
+     * @return:
+     * @Author: lunan
+     * @Date: 2018/9/3
+     */
+    public List<Map<String, Object>> getTeamsByPids(Set<String> teamIds ){
+        if(Check.NuNObj(teamIds)) {
+            return null;
+        }
+        try{
+            TeamGroupRequest teamGroupRequest = new TeamGroupRequest();
+            teamGroupRequest.setTeamIds(teamIds);
+            List<Map<String, Object>> carDriverTeams = carDriverTeamExMapper.queryForListByPids(teamGroupRequest);
+            return carDriverTeams;
+        }catch (Exception e){
+            logger.error("查询车队下小组异常:{}",e);
+            return null;
+        }
+    }
+
+    public List<String> getCityList(Set<String> cityIds) {
+        return carBizCityExMapper.getCityList(cityIds);
+    }
+
+    public List<String> getSupplierList(Set<String> supplierIds) {
+        List<Map<String, Object>> supplierList = carBizSupplierExMapper.getSupplierList(supplierIds);
+        List<String> suppliers = new ArrayList<>();
+        supplierList.forEach(stringObjectMap -> suppliers.add(stringObjectMap.get("supplierName").toString()));
+        return suppliers;
+    }
+
+    public List<String> getTeamList(Set<String> teamIds) {
+        List<Map<String, Object>> teamList = carDriverTeamExMapper.getTeamList(teamIds);
+        Set<String> supplierIds = new HashSet<>();
+        teamList.forEach(stringObjectMap -> supplierIds.add(stringObjectMap.get("supplier").toString()));
+        List<Map<String, Object>> supplierList = carBizSupplierExMapper.getSupplierList(supplierIds);
+        List<String> result = new ArrayList<>();
+        teamList.forEach(stringObjectMap ->
+            supplierList.forEach(stringObjectMap1 -> {
+                if (stringObjectMap.get("supplier").toString().equals(stringObjectMap1.get("supplierId").toString())){
+                    result.add(stringObjectMap1.get("supplierName").toString() + "-" + stringObjectMap.get("teamName").toString());
+                }
+            })
+        );
+        return result;
+    }
+
+    public List<String> getGroupList(Set<String> groupIds) {
+        List<Map<String, Object>> groupList = carDriverTeamExMapper.getGroupList(groupIds);
+        Set<String> supplierIds = new HashSet<>();
+        groupList.forEach(stringObjectMap -> supplierIds.add(stringObjectMap.get("supplier").toString()));
+        List<Map<String, Object>> supplierList = carBizSupplierExMapper.getSupplierList(supplierIds);
+        List<String> result = new ArrayList<>();
+        groupList.forEach(stringObjectMap ->
+                supplierList.forEach(stringObjectMap1 -> {
+                    if (stringObjectMap.get("supplier").toString().equals(stringObjectMap1.get("supplierId").toString())){
+                        result.add(stringObjectMap1.get("supplierName").toString() + "-" + stringObjectMap.get("teamName").toString());
+                    }
+                })
+        );
+        return result;
+    }
 }
 

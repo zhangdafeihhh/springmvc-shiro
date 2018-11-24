@@ -65,6 +65,8 @@ public final class RestErrorCode{
 	public static final int MSG_CODE_REPEAT_SEND                      = 1012;
 	@ResultMessage("登录太频繁，请{0}分钟后重新登录")
 	public static final int DO_LOGIN_FREQUENTLY           = 1013;
+	@ResultMessage("手机号已存在")
+	public static final int PHONE_EXIST                          = 1014;
 
 	//----------------------------------------------权限管理
 	@ResultMessage("父权限不存在")
@@ -181,6 +183,12 @@ public final class RestErrorCode{
 
 	@ResultMessage("存在未审核的申请记录")
 	public static final int UPDATE_APPLY_EXIST = 8001;
+
+	//-----------------------------------------------业务参数：数据报表
+	@ResultMessage("未查询到相应数据报表任务")
+	public static final int SUBSCRIPTION_NOT_EXIST = 7010;
+	@ResultMessage("数据报表：{0}")
+	public static final int SUBSCRIPTION_INVALID              = 7011;
 	//---------------------------------------------------------------------------------------------------------------------------------------------
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系

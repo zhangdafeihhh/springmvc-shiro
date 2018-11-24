@@ -18,5 +18,12 @@ public interface CarAdmUserExMapper {
 
     List<CarAdmUser> selectUsersByIdList(List<Integer> ids);
 
+    /**根据等级范围查询**/
     List<CarAdmUser> selectUsersByLevel(@Param("level")Integer level);
+
+    List<CarAdmUser> queryAllUser();
+
+    void updateUserList(List<CarAdmUser> users);
+
+    CarAdmUser queryUserPermissionInfo(@Param("userId")Integer userId);
 }

@@ -1,5 +1,6 @@
 package com.zhuanche.controller.homekanban;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -8,6 +9,7 @@ import org.apache.http.HttpException;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +22,9 @@ import com.google.common.collect.Maps;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.http.HttpClientUtil;
+import com.zhuanche.serv.common.CitySupplierTeamService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 
@@ -60,6 +64,9 @@ public class HomeKanBanController {
 	private static final Integer CONNECT_TIMEOUT = 30000;
 	/**读取超时时间**/
 	private static final Integer READ_TIMEOUT = 30000;
+	
+	@Autowired
+	CitySupplierTeamService citySupplierTeamService;
 
 	/** 日均运营车辆统计查询接口 **/
 	@RequestMapping("/operatingVehicleStatistics")
@@ -143,7 +150,15 @@ public class HomeKanBanController {
 		return parseResult(onlineTimeUrl, paramMap);
 	}
 
-	/** 司机排名统计 **/
+	/**
+	 * 司机排名统计
+	 * @param allianceId 加盟商ID
+	 * @param motorcadeId 车队ID
+	 * @param orderByColumnCode 排序字段编号 1：订单数量;2：平均得分;3：在线时长;4：流水合计
+	 * @param orderByTypeCode 排序方式 1：升序;2：降序
+	 * @param topNum 取前几名 最多不允许超过50
+	 * @return
+	 */
 	@RequestMapping("/vehicleTopStatistics")
 	@ResponseBody
 	public AjaxResponse vehicleTopStatistics(String allianceId, String motorcadeId,
@@ -185,6 +200,14 @@ public class HomeKanBanController {
 		if(WebSessionUtil.isSupperAdmin() == false){// 如果是普通管理员
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
 			Set<Integer> supplierIds = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
+			if(supplierIds == null || supplierIds.size() <= 0){
+				List<CarBizSupplier> querySupplierList = citySupplierTeamService.querySupplierList();// 获取用户可见的供应商信息
+				if(querySupplierList != null && querySupplierList.size() > 0){
+					for (CarBizSupplier carBizSupplier : querySupplierList) {
+						supplierIds.add(carBizSupplier.getSupplierId());
+					}
+				}
+			}
 			visibleAllianceIds = setToArray(supplierIds);
 			Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
 			visibleMotocadeIds = setToArray(teamIds);
@@ -231,6 +254,14 @@ public class HomeKanBanController {
 		if(WebSessionUtil.isSupperAdmin() == false){// 如果是普通管理员
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
 			Set<Integer> supplierIds = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
+			if(supplierIds == null || supplierIds.size() <= 0){
+				List<CarBizSupplier> querySupplierList = citySupplierTeamService.querySupplierList();// 获取用户可见的供应商信息
+				if(querySupplierList != null && querySupplierList.size() > 0){
+					for (CarBizSupplier carBizSupplier : querySupplierList) {
+						supplierIds.add(carBizSupplier.getSupplierId());
+					}
+				}
+			}
 			visibleAllianceIds = setToArray(supplierIds);
 			Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
 			visibleMotocadeIds = setToArray(teamIds);
@@ -273,21 +304,5 @@ public class HomeKanBanController {
 		}
 		return stra;
 	}
-	public static void main(String[] args) {
-		Map<String, Object> paramMap = Maps.newHashMap();
-		paramMap.put("startDate", "2018-08-21");
-		paramMap.put("endDate", "2018-08-28");
-		paramMap.put("allianceId", "");
-		paramMap.put("motorcadeId", "");
-		paramMap.put("visibleAllianceIds", new String[]{"1", "3", "5"});
-		paramMap.put("visibleMotocadeIds", new String[]{"1", "3", "5"});
-		String jsonString = JSON.toJSONString(paramMap);
-		System.out.println(jsonString);
-		try {
-			String result = HttpClientUtil.buildPostRequest("http://test-inside-bigdata-saas-data.01zhuanche.com/dayMotionCar/statistic").setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
-			System.out.println(result);
-		} catch (HttpException e) {
-			e.printStackTrace();
-		}
-	}
+	
 }
