@@ -1,10 +1,10 @@
 package com.zhuanche.controller.subscription;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/subscription/report")
@@ -234,12 +233,11 @@ public class SubscriptionReportConfigureController {
             @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
     })
     public AjaxResponse querySubscriptionName() {
-
-        Map<Integer, Object> map = Maps.newHashMap();
-        map.put( 1, "工资明细");
-        map.put( 2, "完单详情");
-        map.put( 3, "积分");
-        map.put( 4, "数单奖");
+        JSONObject map = new JSONObject();
+        map.put( "1", "工资明细");
+        map.put( "2", "完单详情");
+        map.put( "3", "积分");
+        map.put( "4", "数单奖");
         return AjaxResponse.success(map);
     }
 }
