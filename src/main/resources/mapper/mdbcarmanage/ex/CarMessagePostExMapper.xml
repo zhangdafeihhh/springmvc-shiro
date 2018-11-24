@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.CarMessagePostExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.CarMessagePost" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="mesage_title" property="mesageTitle" jdbcType="VARCHAR" />
+    <result column="message_content" property="messageContent" jdbcType="VARCHAR" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="level" property="level" jdbcType="INTEGER" />
+    <result column="cities" property="cities" jdbcType="VARCHAR" />
+    <result column="suppliers" property="suppliers" jdbcType="VARCHAR" />
+    <result column="teamIds" property="teamids" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, mesage_title, message_content, user_id, status, level, cities, suppliers,
+    teamIds, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from car_message_post
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from car_message_post
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+
+  <update id="withDraw" parameterType="java.lang.Long" >
+    update car_message_post
+    set status = #{status,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+
+
+
+  <select id="listCarMessagePost" parameterType="java.util.List" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from car_message_post
+    where 1=1
+    <if test="ids!=null and ids>0">
+      and id IN
+      <foreach collection="ids" open="(" close=")" separator="," item="id" >
+        #{id}
+      </foreach>
+    </if>
+  </select>
+
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarMessagePost" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_message_post
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="mesageTitle != null" >
+        mesage_title,
+      </if>
+      <if test="messageContent != null" >
+        message_content,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="level != null" >
+        level,
+      </if>
+      <if test="cities != null" >
+        cities,
+      </if>
+      <if test="suppliers != null" >
+        suppliers,
+      </if>
+      <if test="teamids != null" >
+        teamIds,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="mesageTitle != null" >
+        #{mesageTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="messageContent != null" >
+        #{messageContent,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="level != null" >
+        #{level,jdbcType=INTEGER},
+      </if>
+      <if test="cities != null" >
+        #{cities,jdbcType=VARCHAR},
+      </if>
+      <if test="suppliers != null" >
+        #{suppliers,jdbcType=VARCHAR},
+      </if>
+      <if test="teamids != null" >
+        #{teamids,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+
+
+
+
+
+
+
+
+  <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.CarMessagePost" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_message_post (mesage_title, message_content, user_id,
+      status, level, cities,
+      suppliers, teamIds, create_time,
+      update_time)
+    values (#{mesageTitle,jdbcType=VARCHAR}, #{messageContent,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR},
+      #{status,jdbcType=INTEGER}, #{level,jdbcType=INTEGER}, #{cities,jdbcType=VARCHAR},
+      #{suppliers,jdbcType=VARCHAR}, #{teamids,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+
+
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.CarMessagePost" >
+    update car_message_post
+    set mesage_title = #{mesageTitle,jdbcType=VARCHAR},
+      message_content = #{messageContent,jdbcType=VARCHAR},
+      user_id = #{userId,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      level = #{level,jdbcType=INTEGER},
+      cities = #{cities,jdbcType=VARCHAR},
+      suppliers = #{suppliers,jdbcType=VARCHAR},
+      teamIds = #{teamids,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarMessagePost" >
+    update car_message_post
+    <set >
+      <if test="mesageTitle != null" >
+        mesage_title = #{mesageTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="messageContent != null" >
+        message_content = #{messageContent,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="level != null" >
+        level = #{level,jdbcType=INTEGER},
+      </if>
+      <if test="cities != null" >
+        cities = #{cities,jdbcType=VARCHAR},
+      </if>
+      <if test="suppliers != null" >
+        suppliers = #{suppliers,jdbcType=VARCHAR},
+      </if>
+      <if test="teamids != null" >
+        teamIds = #{teamids,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

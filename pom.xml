@@ -99,7 +99,7 @@
 		<dependency>
 			<groupId>com.zhuanche</groupId>
 			<artifactId>mp-util</artifactId>
-			<version>0.0.3-SNAPSHOT</version>
+			<version>0.0.5-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mybatis</groupId>
@@ -321,15 +321,15 @@
 			<properties>
 				<env.name>dev</env.name>
 			</properties>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
 		</profile>
 		<profile>
 			<id>test</id>
 			<properties>
 				<env.name>test</env.name>
 			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 		</profile>
 		<profile>
 			<id>pre</id>

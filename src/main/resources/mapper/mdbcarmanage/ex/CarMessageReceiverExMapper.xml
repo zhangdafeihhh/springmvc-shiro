@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.CarMessageReceiverExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.CarMessageReceiver" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="receive_user_id" property="receiveUserId" jdbcType="INTEGER" />
+    <result column="message_id" property="messageId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="is_sender" property="isSender" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, status, receive_user_id, message_id, create_time, update_time, is_sender
+  </sql>
+
+  <select id="messageUnreadCount" resultType="java.lang.Integer" parameterType="java.lang.Long" >
+    select COUNT(id)
+    from car_message_receiver
+    where receive_user_id = #{receiveUserId,jdbcType=BIGINT} AND status = 1
+  </select>
+
+
+  <delete id="deleteByMessageId" parameterType="java.lang.Long" >
+    delete from car_message_receiver
+    where message_id = #{messageId,jdbcType=BIGINT}
+  </delete>
+
+
+
+  <select id="carMessageReceiverList" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from car_message_receiver
+    where 1=1
+
+    <if test="messageId != null" >
+      AND message_id = #{messageId,jdbcType=INTEGER}
+    </if>
+
+    <if test="receiveUserId != null" >
+      AND receive_user_id = #{receiveUserId,jdbcType=INTEGER}
+    </if>
+    <if test="status != null" >
+      AND status = #{status,jdbcType=INTEGER}
+    </if>
+    ORDER BY update_time DESC
+
+  </select>
+
+
+  <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.CarMessageReceiver" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_message_receiver (status, receive_user_id, message_id,
+    create_time, update_time, is_sender
+    )
+    values (#{status,jdbcType=INTEGER}, #{receiveUserId,jdbcType=INTEGER}, #{messageId,jdbcType=INTEGER},
+    #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{isSender,jdbcType=VARCHAR}
+    )
+  </insert>
+
+  <update id="updateReadState" >
+    update car_message_receiver
+     set status = 2, update_time = now()
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

@@ -32,4 +32,16 @@ public final class Constants {
 	
 
 	public static final String yyyy_MM_dd_HH_mm_ss = "yyyy-MM-dd HH:mm:ss";
+
+
+	public static final int  CONTRY  = 1; //全国
+	public static final int  CITY  = 2;   //城市
+	public static final int  SUPPY  = 4;  //加盟商
+	public static final int  CITYANDSUPPY  = 6; //城市+加盟商
+	public static final int  TEAM  = 8;  //车队
+	public static final int  CITYANDTEAM  = 10; //城市+车队
+	public static final int  SUPPYANDTEAM  = 12; //城市+车队
+	public static final int  CITYANDSUPPYANDTEAM  = 14;//城市+加盟商+车队
+	public static final String  SEPERATER = ",";
+
 }

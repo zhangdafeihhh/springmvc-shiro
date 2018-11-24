@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.CarMessagePostDtoExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.dto.mdbcarmanage.CarMessagePostDto" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="mesage_title" property="mesageTitle" jdbcType="VARCHAR" />
+    <result column="message_content" property="messageContent" jdbcType="VARCHAR" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="doc_name" property="docName" jdbcType="VARCHAR" />
+    <result column="doc_url" property="docUrl" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    p.id, p.mesage_title, p.message_content, u.user_name,d.doc_name,d.doc_url,
+      p.create_time, p.update_time
+  </sql>
+  <select id="listCarMessagePostBymesageIds" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+    <include refid="Base_Column_List" />
+    FROM car_message_post p LEFT  JOIN car_message_receiver r on p.id = r.message_id LEFT JOIN car_message_doc d on p.id = d.message_id
+    INNER JOIN car_adm_user u on  p.user_id = u.user_id
+    WHERE  1=1
+    <if test="userId!=null and userId!=''">
+      AND r.receive_user_id = #{userId}
+    </if>
+    <if test="status!=null and status!=''">
+      AND r.status = #{status}
+    </if>
+    <if test="postStatus!=null and postStatus!=''">
+      AND p.status = #{postStatus}
+    </if>
+    <if test="postUserId!=null and postUserId!=''">
+      AND p.user_id = #{postUserId}
+    </if>
+    ORDER BY p.create_time DESC
+  </select>
+</mapper>

@@ -17,4 +17,6 @@ public interface CarAdmUserExMapper {
 
 
     List<CarAdmUser> selectUsersByIdList(List<Integer> ids);
+
+    List<CarAdmUser> selectUsersByLevel(@Param("level")Integer level);
 }
