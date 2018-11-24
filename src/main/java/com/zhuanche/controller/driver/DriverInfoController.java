@@ -769,24 +769,28 @@ public class DriverInfoController {
     })
     public AjaxResponse findTelescopeDriverInfo(String phone,Integer userId) {
         logger.info("【查询千里眼司机信息】请求参数:phone={},userId={}",phone,userId);
+        boolean auth = false;
+        TelescopeDriverInfo telescopeDriverInfo = new  TelescopeDriverInfo();
         if(userId!=null){
             DriverTelescopeUser driverTelescopeUser = userManagementService.selectTelescopeUserByUserId(userId);
-            if(driverTelescopeUser==null || driverTelescopeUser.getStatus()==0){
-                return AjaxResponse.fail(RestErrorCode.NOT_FOUND_RESULT);
+            if(null!=driverTelescopeUser && driverTelescopeUser.getStatus()==1){
+                auth = true;
             }
-            CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(driverTelescopeUser.getDriverId());
-            if(carBizDriverInfo==null || carBizDriverInfo.getStatus()==0){
-                return AjaxResponse.fail(RestErrorCode.NOT_FOUND_RESULT);
+            if(null!=driverTelescopeUser){
+                CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(driverTelescopeUser.getDriverId());
+                if(null!=carBizDriverInfo && carBizDriverInfo.getStatus()==1){
+                    phone = carBizDriverInfo.getPhone();
+                }
             }
-            phone = carBizDriverInfo.getPhone();
         }
         CarBizDriverInfoDTO carBizDriverInfoDTO = carBizDriverInfoService.selectByPhone(phone);
-        if(null == carBizDriverInfoDTO){
-            return AjaxResponse.fail(RestErrorCode.NOT_FOUND_RESULT);
+        if(null != carBizDriverInfoDTO){
+            // 查询城市名称，供应商名称，服务类型，加盟类型
+            carBizDriverInfoDTO = carBizDriverInfoService.getBaseStatis(carBizDriverInfoDTO);
+            telescopeDriverInfo = BeanUtil.copyObject(carBizDriverInfoDTO, TelescopeDriverInfo.class);
         }
-        // 查询城市名称，供应商名称，服务类型，加盟类型
-        carBizDriverInfoDTO = carBizDriverInfoService.getBaseStatis(carBizDriverInfoDTO);
-        TelescopeDriverInfo telescopeDriverInfo = BeanUtil.copyObject(carBizDriverInfoDTO, TelescopeDriverInfo.class);
+        telescopeDriverInfo.setAuth(auth);
         return AjaxResponse.success(telescopeDriverInfo);
     }
+
 }

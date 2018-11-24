@@ -15,6 +15,7 @@ public class TelescopeDriverInfo implements java.io.Serializable{
     private String teamName;//			车队名称
     private Integer teamGroupId;//			车队下小组ID
     private String teamGroupName;//			车队下小组名称
+    private boolean auth;//是否有千里眼权限
 
     public Integer getDriverId() {
         return driverId;
@@ -104,6 +105,14 @@ public class TelescopeDriverInfo implements java.io.Serializable{
         this.teamGroupName = teamGroupName;
     }
 
+    public boolean isAuth() {
+        return auth;
+    }
+
+    public void setAuth(boolean auth) {
+        this.auth = auth;
+    }
+
     @Override
     public String toString() {
         return "TelescopeDriverInfo{" +
@@ -118,6 +127,7 @@ public class TelescopeDriverInfo implements java.io.Serializable{
                 ", teamName='" + teamName + '\'' +
                 ", teamGroupId=" + teamGroupId +
                 ", teamGroupName='" + teamGroupName + '\'' +
+                ", auth=" + auth +
                 '}';
     }
 }
