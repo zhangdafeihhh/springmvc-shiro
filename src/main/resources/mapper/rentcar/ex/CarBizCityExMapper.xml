@@ -100,7 +100,7 @@
         </if>
     </select>
 
-    <select id="queryNameByIds" resultType="java.lang.String" >
+    <select id="getCityList" resultType="java.lang.String" >
         select t.city_name cityName from car_biz_city t
         where status=1
         <if test="cityIds!=null and cityIds.size()>0">

@@ -1,6 +1,7 @@
 package mapper.rentcar.ex;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.ibatis.annotations.Param;
@@ -20,5 +21,5 @@ public interface CarBizSupplierExMapper{
 
 	List<CarBizSupplier> findByIdSet(@Param("supplierIdSet") Set<Integer> supplierIdSet);
 
-	List<String> getSupplierList(@Param("supplierIds") Set<String> supplierIds);
+	List<Map<String, Object>> getSupplierList(@Param("supplierIds") Set<String> supplierIds);
 }

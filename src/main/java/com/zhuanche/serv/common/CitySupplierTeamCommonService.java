@@ -404,15 +404,42 @@ public class CitySupplierTeamCommonService {
     }
 
     public List<String> getSupplierList(Set<String> supplierIds) {
-        return carBizSupplierExMapper.getSupplierList(supplierIds);
+        List<Map<String, Object>> supplierList = carBizSupplierExMapper.getSupplierList(supplierIds);
+        List<String> suppliers = new ArrayList<>();
+        supplierList.forEach(stringObjectMap -> suppliers.add(stringObjectMap.get("supplierName").toString()));
+        return suppliers;
     }
 
     public List<String> getTeamList(Set<String> teamIds) {
-        return carDriverTeamExMapper.getTeamList(teamIds);
+        List<Map<String, Object>> teamList = carDriverTeamExMapper.getTeamList(teamIds);
+        Set<String> supplierIds = new HashSet<>();
+        teamList.forEach(stringObjectMap -> supplierIds.add(stringObjectMap.get("supplier").toString()));
+        List<Map<String, Object>> supplierList = carBizSupplierExMapper.getSupplierList(supplierIds);
+        List<String> result = new ArrayList<>();
+        teamList.forEach(stringObjectMap ->
+            supplierList.forEach(stringObjectMap1 -> {
+                if (stringObjectMap.get("supplier").toString().equals(stringObjectMap1.get("supplierId").toString())){
+                    result.add(stringObjectMap1.get("supplierName").toString() + "-" + stringObjectMap.get("teamName").toString());
+                }
+            })
+        );
+        return result;
     }
 
     public List<String> getGroupList(Set<String> groupIds) {
-        return carDriverTeamExMapper.getGroupList(groupIds);
+        List<Map<String, Object>> groupList = carDriverTeamExMapper.getGroupList(groupIds);
+        Set<String> supplierIds = new HashSet<>();
+        groupList.forEach(stringObjectMap -> supplierIds.add(stringObjectMap.get("supplier").toString()));
+        List<Map<String, Object>> supplierList = carBizSupplierExMapper.getSupplierList(supplierIds);
+        List<String> result = new ArrayList<>();
+        groupList.forEach(stringObjectMap ->
+                supplierList.forEach(stringObjectMap1 -> {
+                    if (stringObjectMap.get("supplier").toString().equals(stringObjectMap1.get("supplierId").toString())){
+                        result.add(stringObjectMap1.get("supplierName").toString() + "-" + stringObjectMap.get("teamName").toString());
+                    }
+                })
+        );
+        return result;
     }
 }
 
