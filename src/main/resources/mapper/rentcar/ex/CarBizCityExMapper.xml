@@ -99,5 +99,16 @@
             </foreach>
         </if>
     </select>
+
+    <select id="queryNameByIds" resultType="java.lang.String" >
+        select t.city_name cityName from car_biz_city t
+        where status=1
+        <if test="cityIds!=null and cityIds.size()>0">
+            and city_id IN
+            <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
+                #{cid}
+            </foreach>
+        </if>
+    </select>
 	 
   </mapper>

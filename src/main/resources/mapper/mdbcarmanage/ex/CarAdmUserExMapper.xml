@@ -17,6 +17,7 @@
     <result column="team_id" property="teamId" jdbcType="VARCHAR" />
     <result column="phone" property="phone" jdbcType="VARCHAR" />
     <result column="group_ids" property="groupIds" jdbcType="VARCHAR" />
+    <result column="level" property="level" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
     user_id, account, user_name, password, role_id, account_type, status, remark, create_user, 
@@ -78,4 +79,43 @@
       #{item}
     </foreach>
   </select>
+
+  <select id="queryAllUser" resultMap="BaseResultMap">
+    SELECT
+	  user_id,
+	  user_name,
+	  cities,
+	  suppliers,
+	  team_id,
+	  group_ids,
+	  LEVEL
+    FROM
+	car_adm_user
+  </select>
+
+  <update id="updateUserList" parameterType="java.util.List">
+      <foreach collection="list" separator=";" item="cus">
+          update car_adm_user set
+          level = #{cus.level}
+          where user_id = #{cus.userId}
+      </foreach>
+  </update>
+
+
+  <select id="queryUserPermissionInfo" resultMap="BaseResultMap">
+    SELECT
+	  user_id,
+	  user_name,
+	  account,
+	  phone,
+	  cities,
+	  suppliers,
+	  team_id,
+	  group_ids,
+	  LEVEL
+    FROM
+	car_adm_user
+	where user_id = #{userId}
+  </select>
+
 </mapper>

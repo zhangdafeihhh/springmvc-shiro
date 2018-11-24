@@ -398,5 +398,21 @@ public class CitySupplierTeamCommonService {
             return null;
         }
     }
+
+    public List<String> getCityList(Set<String> cityIds) {
+        return carBizCityExMapper.getCityList(cityIds);
+    }
+
+    public List<String> getSupplierList(Set<String> supplierIds) {
+        return carBizSupplierExMapper.getSupplierList(supplierIds);
+    }
+
+    public List<String> getTeamList(Set<String> teamIds) {
+        return carDriverTeamExMapper.getTeamList(teamIds);
+    }
+
+    public List<String> getGroupList(Set<String> groupIds) {
+        return carDriverTeamExMapper.getGroupList(groupIds);
+    }
 }
 

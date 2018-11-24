@@ -17,4 +17,10 @@ public interface CarAdmUserExMapper {
 
 
     List<CarAdmUser> selectUsersByIdList(List<Integer> ids);
+
+    List<CarAdmUser> queryAllUser();
+
+    void updateUserList(List<CarAdmUser> users);
+
+    CarAdmUser queryUserPermissionInfo(@Param("userId")Integer userId);
 }

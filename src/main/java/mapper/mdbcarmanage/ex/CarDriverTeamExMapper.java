@@ -57,4 +57,8 @@ public interface CarDriverTeamExMapper{
 	List<CarDriverTeam> queryTeamListByTemIdList(List<Integer> teamIdList);
 
 	List<Map<String, Object>> queryForListByPids(TeamGroupRequest teamGroupRequest);
+
+    List<String> getTeamList(Set<String> teamIds);
+
+    List<String> getGroupList(Set<String> groupIds);
 }

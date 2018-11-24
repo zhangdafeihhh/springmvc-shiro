@@ -19,4 +19,5 @@ public interface CarBizCityExMapper{
      * 根据城市ID，查询城市名称**/
     List<CarBizCity> queryNameByIds( @Param("cityIds")  Set<Integer> cityIds );
 
+    List<String> getCityList(@Param("cityIds") Set<String> cityIds);
 }

@@ -19,4 +19,6 @@ public interface CarBizSupplierExMapper{
 	List<CarBizSupplier> queryNamesByIds(@Param("supplierIds") Set<Integer> supplierIds);
 
 	List<CarBizSupplier> findByIdSet(@Param("supplierIdSet") Set<Integer> supplierIdSet);
+
+	List<String> getSupplierList(@Param("supplierIds") Set<String> supplierIds);
 }
