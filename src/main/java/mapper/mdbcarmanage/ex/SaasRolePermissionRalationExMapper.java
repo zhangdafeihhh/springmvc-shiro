@@ -18,5 +18,6 @@ public interface SaasRolePermissionRalationExMapper {
 	
 	/**查询一个权限的所有角色ID**/
 	List<Integer> queryRoleIdsOfPermission( @Param("permissionId")  Integer permissionId );
-	
+
+    List<String> queryRoleNameList(@Param("userId") Integer userId);
 }

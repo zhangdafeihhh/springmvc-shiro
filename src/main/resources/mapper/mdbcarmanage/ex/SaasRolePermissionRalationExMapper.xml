@@ -27,4 +27,12 @@
   <select id="queryRoleIdsOfPermission" resultType="java.lang.Integer">
   		select DISTINCT role_id from saas_role_permission_ralation where permission_id = #{permissionId}
   </select>
+
+  <select id="queryRoleNameList" resultType="java.lang.String">
+      SELECT sr.role_name
+      FROM
+        saas_user_role_ralation surr
+        LEFT JOIN saas_role sr ON surr.role_id = sr.role_id
+        WHERE user_id = #{userId}
+  </select>
 </mapper>

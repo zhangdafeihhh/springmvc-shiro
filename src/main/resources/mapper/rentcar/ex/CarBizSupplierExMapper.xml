@@ -118,4 +118,16 @@
         </if>
     </select>
     
+    <select id="getSupplierList" resultType="java.util.Map">
+        SELECT
+        CONCAT_WS('-', cbc.city_name, cbs.supplier_full_name) supplierName,
+        cbs.supplier_id as supplierId
+        FROM car_biz_supplier cbs
+          LEFT JOIN car_biz_city cbc ON cbs.supplier_city = cbc.city_id
+        where cbs.supplier_id in
+        <foreach item="item" index="index" collection="supplierIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+    
 </mapper>

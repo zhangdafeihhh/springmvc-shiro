@@ -21,5 +21,7 @@ public interface CarBizCityExMapper{
     List<CarBizCity> queryNameByIds( @Param("cityIds")  Set<Integer> cityIds );
 
     List<CarBizCity> queryNameByCityIds(@Param("cityIds")  String cityIds );
+	
+	List<String> getCityList(@Param("cityIds") Set<String> cityIds);
 
 }
