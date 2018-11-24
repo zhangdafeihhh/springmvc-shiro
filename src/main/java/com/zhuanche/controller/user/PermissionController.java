@@ -11,6 +11,7 @@ import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.serv.authc.RoleManagementService;
 import com.zhuanche.serv.common.CitySupplierTeamCommonService;
+import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -38,6 +39,9 @@ public class PermissionController {
 
     @Autowired
     private CarAdmUserExMapper carAdmUserExMapper;
+
+    @Autowired
+    private CarAdmUserMapper carAdmUserMapper;
 
     @Autowired
     private RoleManagementService roleManagementService;
@@ -184,6 +188,46 @@ public class PermissionController {
             default:
                 return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR, "param level is invalid");
         }
+    }
+
+    @RequestMapping("/upsert")
+    @ResponseBody
+    public AjaxResponse savePermissionInfo(Integer level, String cities, String suppliers, String teams, String groups, Integer userId){
+        PermissionLevelEnum enumByCode = PermissionLevelEnum.getEnumByCode(level);
+        if (enumByCode == null){
+            return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR, "param level is invalid");
+        }
+        CarAdmUser user = new CarAdmUser();
+        user.setUserId(userId);
+        switch (enumByCode){
+            case ALL:
+                user.setLevel(PermissionLevelEnum.ALL.getCode());
+                break;
+            case CITY:
+                user.setCities(cities);
+                user.setLevel(PermissionLevelEnum.CITY.getCode());
+                break;
+            case SUPPLIER:
+                user.setCities(cities);
+                user.setSuppliers(suppliers);
+                user.setLevel(PermissionLevelEnum.SUPPLIER.getCode());
+                break;
+            case TEAM:
+                user.setCities(cities);
+                user.setSuppliers(suppliers);
+                user.setTeamId(teams);
+                user.setLevel(PermissionLevelEnum.TEAM.getCode());
+                break;
+            case GROUP:
+                user.setCities(cities);
+                user.setSuppliers(suppliers);
+                user.setTeamId(teams);
+                user.setGroupIds(groups);
+                user.setLevel(PermissionLevelEnum.GROUP.getCode());
+                break;
+        }
+        carAdmUserMapper.updateByPrimaryKey(user);
+        return AjaxResponse.success("success");
     }
 
     private void stringToSet(String str, Set set, boolean isNum) {
