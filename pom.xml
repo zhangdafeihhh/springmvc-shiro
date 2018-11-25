@@ -6,11 +6,11 @@
 		<artifactId>mp-parent</artifactId>
 		<version>1.2-SNAPSHOT</version>
 	</parent>
-	<artifactId>mp-manage</artifactId>
+	<artifactId>mp-third-api</artifactId>
 	<packaging>war</packaging>
 	<version>1.0-SNAPSHOT</version>
 
-	<name>mp-manage</name>
+	<name>mp-third-api</name>
 	<url>http://maven.apache.org</url>
 
 	<dependencies>
@@ -347,7 +347,7 @@
 	<!-- 多环境配置END -->
 
 	<build>
-		<finalName>mp-manage</finalName>
+		<finalName>mp-third-api</finalName>
 		<resources>
 			<!-- 先排除资源根目录下各环境的配置 -->
 			<resource>
