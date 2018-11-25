@@ -30,7 +30,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.util.*;
 
@@ -494,5 +496,28 @@ public class MessageService {
         StringBuilder sb = new StringBuilder();
         sb.append("/upload/").append("message/messageDoc/");
         return sb.toString();
+    }
+
+    public PageDTO messageSearch(String range, String keyword, String startDate,
+                                 String endDate, List<Integer> idList, Integer pageSize, Integer pageNum, Integer userId) {
+
+        String[] split = range.split(",");
+        int count = 0;
+        List<CarMessagePostDto> data = null;
+        if (split.length > 1) {
+            count = receiverExMapper.queryAllCount(keyword , startDate, endDate, idList, userId);
+            data = receiverExMapper.queryALlData(keyword , startDate, endDate, idList, userId, (pageNum - 1) * pageSize ,pageSize);
+        } else {
+            String rangeStr = split[0];
+            if (rangeStr.equals(Constants.TITLE)) {
+                count = receiverExMapper.queryCountInTitle(keyword , startDate, endDate, idList, userId);
+                data = receiverExMapper.queryDataInTitle(keyword , startDate, endDate, idList, userId, (pageNum - 1) * pageSize ,pageSize);
+            }
+            if (rangeStr.equals(Constants.ATTACHMENT)) {
+                count = receiverExMapper.queryCountInAttachment(keyword , startDate, endDate, idList, userId);
+                data = receiverExMapper.queryDataInAttachment(keyword , startDate, endDate, idList, userId, (pageNum - 1) * pageSize ,pageSize);
+            }
+        }
+        return new PageDTO(pageNum, pageSize, count, data);
     }
 }

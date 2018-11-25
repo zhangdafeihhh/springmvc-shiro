@@ -129,4 +129,15 @@
 
 
    </select>
+
+    <select id="queryIdListByName" resultType="java.lang.Integer" parameterType="java.lang.String">
+        select user_id
+        from car_adm_user
+        where 1=1
+        <if test="userName!=null">
+            and locate (#{userName} , car_adm_user.user_name) > 0
+        </if>
+
+    </select>
+
 </mapper>

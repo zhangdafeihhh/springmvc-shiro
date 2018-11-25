@@ -1,5 +1,6 @@
 package mapper.mdbcarmanage.ex;
 
+import com.zhuanche.dto.mdbcarmanage.CarMessagePostDto;
 import com.zhuanche.entity.mdbcarmanage.CarMessageReceiver;
 import org.apache.ibatis.annotations.Param;
 
@@ -48,4 +49,24 @@ public interface CarMessageReceiverExMapper {
      */
     int updateReadState(@Param("id")Long id);
 
+    int queryAllCount(@Param("keyword")String keyword, @Param("startDate") String startDate, @Param("endDate") String endDate,
+                      @Param("idList") List<Integer> idList, @Param("userId")Integer userId);
+
+    int queryCountInTitle(@Param("keyword") String keyword, @Param("startDate") String startDate, @Param("endDate") String endDate,
+                          @Param("idList") List<Integer> idList, @Param("userId") Integer userId);
+
+    int queryCountInAttachment(@Param("keyword")String keyword, @Param("startDate") String startDate, @Param("endDate") String endDate,
+                               @Param("idList") List<Integer> idList, @Param("userId") Integer userId);
+
+    List<CarMessagePostDto> queryALlData(@Param("keyword") String keyword, @Param("startDate") String startDate, @Param("endDate") String endDate,
+                                         @Param("idList") List<Integer> idList, @Param("userId") Integer userId,
+                                         @Param("offset") Integer offset, @Param("limit") Integer limit);
+
+    List<CarMessagePostDto> queryDataInTitle(@Param("keyword") String keyword, @Param("startDate") String startDate, @Param("endDate") String endDate,
+                                             @Param("idList") List<Integer> idList, @Param("userId") Integer userId,
+                                             @Param("offset") Integer offset, @Param("limit") Integer limit);
+
+    List<CarMessagePostDto> queryDataInAttachment(@Param("keyword") String keyword, @Param("startDate") String startDate, @Param("endDate") String endDate,
+                                                  @Param("idList") List<Integer> idList, @Param("userId") Integer userId,
+                                                  @Param("offset") Integer offset, @Param("limit") Integer limit);
 }

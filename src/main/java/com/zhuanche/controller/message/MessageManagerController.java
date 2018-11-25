@@ -7,9 +7,13 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.mdbcarmanage.CarMessageDetailDto;
 import com.zhuanche.entity.mdbcarmanage.CarMessagePost;
 import com.zhuanche.serv.message.MessageService;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.session.WebSessionUtil;
+import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,6 +47,9 @@ public class MessageManagerController {
 
     @Autowired
     private MessageService messageService;
+
+    @Autowired
+    private CarAdmUserExMapper carAdmUserExMapper;
 
 
     /**
@@ -260,6 +268,40 @@ public class MessageManagerController {
             map.put("count",0);
         }
         return AjaxResponse.success(map);
+    }
+
+    @RequestMapping(value = "/messageSearch",method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
+    public AjaxResponse messageSearch(String range, String keyword,
+                                      String timeRange, String createUser,
+                                      @RequestParam(value = "pageSize",defaultValue = "10") Integer pageSize,
+                                      @RequestParam(value = "pageNum",defaultValue = "1") Integer pageNum){
+        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+        Integer userId = loginUser.getId();
+        if (StringUtils.isEmpty(range)){
+            range = Constants.ALL_RANGE;
+        }else {
+            if (!range.equals(Constants.TITLE)&&!range.equals(Constants.ATTACHMENT)){
+                return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR, "range is invalid");
+            }
+        }
+        String startDate = "";
+        String endDate = "";
+        if (StringUtils.isNotEmpty(timeRange)){
+            String[] split = timeRange.split("~");
+            startDate = split[0];
+            endDate = split[1];
+        }
+        List<Integer> idList = null;
+        if (StringUtils.isNotBlank(createUser)){
+            idList = carAdmUserExMapper.queryIdListByName(createUser);
+        }
+        PageDTO pageDTO = messageService.messageSearch(range, keyword,
+                startDate, endDate, idList, pageSize, pageNum, userId);
+        return AjaxResponse.success(pageDTO);
     }
 
 

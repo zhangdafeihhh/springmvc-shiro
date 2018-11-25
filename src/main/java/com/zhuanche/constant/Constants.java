@@ -44,4 +44,8 @@ public final class Constants {
 	public static final int  CITYANDSUPPYANDTEAM  = 14;//城市+加盟商+车队
 	public static final String  SEPERATER = ",";
 
+	public static final String ALL_RANGE = "1,2";
+	public static final String TITLE = "1";
+	public static final String ATTACHMENT = "2";
+
 }

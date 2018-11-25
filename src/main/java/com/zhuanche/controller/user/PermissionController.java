@@ -11,6 +11,9 @@ import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.serv.authc.RoleManagementService;
 import com.zhuanche.serv.common.CitySupplierTeamCommonService;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.Check;
 import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import org.apache.commons.lang.StringUtils;
@@ -188,6 +191,15 @@ public class PermissionController {
             default:
                 return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR, "param level is invalid");
         }
+    }
+
+    @RequestMapping("/personalPermission")
+    @ResponseBody
+    public AjaxResponse getPermission(Integer level,String cityIds, String supplierIds, String teamIds){
+        SSOLoginUser ssoLoginUser = WebSessionUtil.getCurrentLoginUser();
+        Integer userId = ssoLoginUser.getId();
+        CarAdmUser user = carAdmUserExMapper.queryUserPermissionInfo(userId);
+        return null;
     }
 
     @RequestMapping("/upsert")
