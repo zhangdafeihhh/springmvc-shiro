@@ -293,7 +293,7 @@ public class MessageManagerController {
     @RequestMapping(value = "/messageDetail")
     @ResponseBody
     @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
     })
     public AjaxResponse messageDetail(@RequestParam(value = "messageId",defaultValue = "0")Integer messageId,
                                       @RequestParam(value = "userId",defaultValue = "0")Integer userId){

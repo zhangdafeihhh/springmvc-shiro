@@ -31,12 +31,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @Author fanht
@@ -81,8 +88,25 @@ public class MessageService {
     private MessageReceiveService receiveService;
 
 
-
-
+    /**
+     * 发布消息和草稿
+     * @param messageId
+     * @param status 1 草稿 2 发布
+     * @param userId
+     * @param messageTitle
+     * @param messageContent
+     * @param level
+     * @param cities
+     * @param suppliers
+     * @param teamId
+     * @param docName
+     * @param docUrl
+     * @param file
+     * @param request
+     * @return
+     * @throws MessageException
+     */
+    @Transactional(rollbackFor = MessageException.class)
     public int postMessage(Integer messageId,
                            Integer status,
                            Integer userId,
@@ -96,6 +120,9 @@ public class MessageService {
                            String docUrl,
                            MultipartFile file,
                            HttpServletRequest request) throws MessageException{
+
+         AtomicInteger  resultOpe = new AtomicInteger(0);
+
         try {
             try {
                 CarMessagePost post = new CarMessagePost();
@@ -114,66 +141,88 @@ public class MessageService {
                     post.setCreateTime(new Date());
                     postExMapper.insertSelective(post);
                     messageId = post.getId().intValue();
+                    resultOpe.addAndGet(1);
                 }else {
                     post.setId(messageId.longValue());
                     messageId = postExMapper.updateByPrimaryKeySelective(post);
+                    resultOpe.addAndGet(1);
                 }
 
-                Integer newMessageId = messageId;
+                final   Integer newMessageId = messageId;
 
                 if (newMessageId > 0){
                     logger.info("消息发布成功！messageId=" + messageId);
-                    receiveService.sendMessage(messageId,level,cities,suppliers,teamId);
-
-                //上传附件
-                if (file != null && !file.isEmpty()){
-                    MultipartHttpServletRequest req = (MultipartHttpServletRequest) request;
-
-                    Map<String,MultipartFile> map = new HashMap<>();
-
-                    Collection<MultipartFile> multipartFileCollection = req.getFileMap().values();
-
-                    for (MultipartFile multFile : multipartFileCollection){
-                        map.put(multFile.getName(),multFile);
+                    if (status.equals(CarMessagePost.Status.publish.getMessageStatus())){
+                        ExecutorService executor = Executors.newCachedThreadPool();
+                        Future<String> future = executor.submit(new Callable<String>() {
+                            @Override
+                            public String call() throws Exception {
+                              int code =  receiveService.sendMessage(newMessageId,level,cities,suppliers,teamId);
+                              logger.info("异步发送消息" + code);
+                              return String.valueOf(code);
+                            }
+                        });
                     }
 
-                    MultipartFile multipartFile;
-                    for (Map.Entry<String,MultipartFile> entry: map.entrySet()){
-                        multipartFile = entry.getValue();
+                    //上传附件
+                    try {
+                        if (file != null && !file.isEmpty()){
+                            MultipartHttpServletRequest req = (MultipartHttpServletRequest) request;
 
-                        Map<String,Object> result = this.upload(multipartFile);
-                        Boolean ok = (Boolean) result.get("ok");
-                        if (ok== null || !ok){
-                            logger.error("消息中心-上传附件-异常");
+                            Map<String,MultipartFile> map = new HashMap<>();
 
-                        }else {
-                            CarMessageDoc doc = new CarMessageDoc();
-                            doc.setDocName(result.get("fileName").toString());
-                            doc.setCreateTime(new Date());
-                            doc.setMessageId(messageId);
-                            doc.setUpdateTime(new Date());
-                            doc.setDocUrl(FtpConstants.FTP+FtpConstants.FTPURL+":"+FtpConstants.FTPPORT + result.get("oppositeUrl").toString());
-                            doc.setState(status);
-                            int code = docExMapper.insert(doc);
-                            if (code > 0 ){
-                                logger.info("====doc文档上传成功====");
-                                return 1;
-                            }else {
-                                logger.info("====doc上传文档失败======");
+                            Collection<MultipartFile> multipartFileCollection = req.getFileMap().values();
+
+                            for (MultipartFile multFile : multipartFileCollection){
+                                map.put(multFile.getName(),multFile);
                             }
 
-                        }
+                            MultipartFile multipartFile;
+                            for (Map.Entry<String,MultipartFile> entry: map.entrySet()){
+                                multipartFile = entry.getValue();
 
+                                Map<String,Object> result = this.upload(multipartFile);
+                                Boolean ok = (Boolean) result.get("ok");
+                                if (ok== null || !ok){
+                                    logger.error("消息中心-上传附件-异常");
+
+                                }else {
+                                    CarMessageDoc doc = new CarMessageDoc();
+                                    doc.setDocName(result.get("fileName").toString());
+                                    doc.setCreateTime(new Date());
+                                    doc.setMessageId(messageId);
+                                    doc.setUpdateTime(new Date());
+                                    doc.setDocUrl(FtpConstants.FTP+FtpConstants.FTPURL+":"+FtpConstants.FTPPORT + result.get("oppositeUrl").toString());
+                                    doc.setState(status);
+                                    int code = docExMapper.insert(doc);
+                                    if (code > 0 ){
+                                        resultOpe.addAndGet(1);
+                                        logger.info("====doc文档上传成功====");
+                                    }else {
+                                        logger.info("====doc上传文档失败======");
+                                    }
+
+                                }
+
+                            }
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException();
                     }
-                }
 
                 }
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            if (resultOpe.get() == 2){
 
-            return 1;
+                return 1;
+            }else {
+                logger.info("新建消息异常，数据回滚");
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                throw new RuntimeException();
+            }
         } catch (Exception e) {
             logger.info("新建消息异常" + e.getMessage());
             throw new MessageException(RestErrorCode.UNKNOWN_ERROR,RestErrorCode.renderMsg(RestErrorCode.UNKNOWN_ERROR));
@@ -245,20 +294,20 @@ public class MessageService {
             List<CarMessagePostDto> dtoList = null;
 
             switch (status){
-                case 1:
-                    dtoList = postDtoExMapper.listCarMessagePostBymesageIds(userId,null,null,null);
+                case 1://已收到的消息
+                    dtoList = postDtoExMapper.listCarMessagePostBymesageIds(userId,null,CarMessagePost.Status.publish.getMessageStatus(),null);
                     break;
-                case 2:
-                    dtoList = postDtoExMapper.listCarMessagePostBymesageIds(userId,status,null,null);
+                case 2://未读的消息
+                    dtoList = postDtoExMapper.listCarMessagePostBymesageIds(userId,status,CarMessagePost.Status.publish.getMessageStatus(),null);
                     break;
-                case 3:
+                case 3://已发布的消息
                     dtoList = postDtoExMapper.listCarMessagePostBymesageIds(null,null,CarMessagePost.Status.publish.getMessageStatus(),userId);
                     break;
-                case 4:
+                case 4://草稿
                     dtoList = postDtoExMapper.listCarMessagePostBymesageIds(null,null,CarMessagePost.Status.draft.getMessageStatus(),userId);
                     break;
                 default:
-                    dtoList = postDtoExMapper.listCarMessagePostBymesageIds(userId,null,null,null);
+                    dtoList = postDtoExMapper.listCarMessagePostBymesageIds(userId,null,CarMessagePost.Status.publish.getMessageStatus(),null);
 
             }
 
@@ -426,7 +475,8 @@ public class MessageService {
         StringBuffer sb = new StringBuffer();
         String[] cityArray = cities.split(Constants.SEPERATER);
         for (String str : cityArray){
-            sb.append(map.get(str));
+            sb.append(map.get(Integer.valueOf(str)));
+
         }
 
         return sb.toString();
@@ -448,7 +498,9 @@ public class MessageService {
         StringBuffer sb = new StringBuffer();
         String[] suppyArray = suppy.split(Constants.SEPERATER);
         for (String str : suppyArray){
-            sb.append(map.get(str));
+            if (StringUtils.isNotBlank(map.get(Integer.valueOf(str)))){
+                sb.append(map.get(Integer.valueOf(str))).append(" ");
+            }
         }
         return sb.toString();
     }
@@ -470,7 +522,10 @@ public class MessageService {
         StringBuffer sb = new StringBuffer();
         String[] teamIdArray = teamIds.split(Constants.SEPERATER);
         for (String str : teamIdArray){
-            sb.append(map.get(str));
+            if (StringUtils.isNotBlank(map.get(Integer.valueOf(str)))){
+                sb.append(map.get(Integer.valueOf(str))).append(" ");
+
+            }
         }
         return sb.toString();
     }
