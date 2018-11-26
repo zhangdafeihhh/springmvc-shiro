@@ -26,8 +26,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -280,9 +278,8 @@ public class MessageManagerController {
     public AjaxResponse messageSearch(String range, String keyword,
                                       String timeRange, String createUser,
                                       @RequestParam(value = "pageSize",defaultValue = "10") Integer pageSize,
-                                      @RequestParam(value = "pageNum",defaultValue = "1") Integer pageNum) throws UnsupportedEncodingException {
+                                      @RequestParam(value = "pageNum",defaultValue = "1") Integer pageNum) {
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-        keyword = URLEncoder.encode(keyword, "UTF-8");
         Integer userId = loginUser.getId();
         if (StringUtils.isEmpty(range)){
             range = Constants.ALL_RANGE;
@@ -294,7 +291,7 @@ public class MessageManagerController {
         String startDate = null;
         String endDate = null;
         if (StringUtils.isNotEmpty(timeRange)){
-            String[] split = timeRange.split("~");
+            String[] split = timeRange.split(Constants.TILDE);
             startDate = split[0];
             endDate = split[1];
         }

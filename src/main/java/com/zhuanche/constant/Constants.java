@@ -48,5 +48,6 @@ public final class Constants {
 	public static final String TITLE = "1";
 	public static final String ATTACHMENT = "2";
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
+	public static final String TILDE = "~";
 
 }
