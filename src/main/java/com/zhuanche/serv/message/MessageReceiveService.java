@@ -36,6 +36,7 @@ public class MessageReceiveService {
 
         switch (level){
             case Constants.CONTRY:
+                this.insertByLevel(Constants.CONTRY,messageId,cities);
                 break;
             case Constants.CITY:
                 this.insertByLevel(Constants.CITY,messageId,cities);
@@ -85,6 +86,9 @@ public class MessageReceiveService {
         for(CarAdmUser admUser : carAdmUserList){
             String levelName = "";
             switch (level){
+                case Constants.CONTRY:
+                    levelName = "全国";
+                    break;
                 case Constants.CITY:
                     levelName = admUser.getCities();
                     break;
@@ -97,19 +101,23 @@ public class MessageReceiveService {
                 default:
                     levelName = admUser.getCities();
             }
-            HashSet<String> hashSet = new HashSet<>(list);
-            if (StringUtils.isNotBlank(levelName)){
-                String[] city = levelName.split(Constants.SEPERATER);
-                List<String>  userHasCity= Arrays.asList(city);
-                Iterator it = userHasCity.iterator();
-                while (it.hasNext()){
-                    if (hashSet.contains(it.next())){
-                        sendList.add(admUser);
-                        break;
+
+            if(level.equals(Constants.CONTRY)){
+                sendList.add(admUser);
+            }else {
+                HashSet<String> hashSet = new HashSet<>(list);
+                if (StringUtils.isNotBlank(levelName)){
+                    String[] city = levelName.split(Constants.SEPERATER);
+                    List<String>  userHasCity= Arrays.asList(city);
+                    Iterator it = userHasCity.iterator();
+                    while (it.hasNext()){
+                        if (hashSet.contains(it.next())){
+                            sendList.add(admUser);
+                            break;
+                        }
                     }
                 }
             }
-
         }
 
         for (CarAdmUser admUser : sendList){

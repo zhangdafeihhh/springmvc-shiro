@@ -77,6 +77,9 @@ public class MessageService {
     @Autowired
     private FtpUtil ftpUtil;
 
+    @Autowired
+    private MessageReceiveService receiveService;
+
 
 
 
@@ -121,13 +124,15 @@ public class MessageService {
                 if (newMessageId > 0){
                     logger.info("消息发布成功！messageId=" + messageId);
                     //异步向子表插入数据
-                    Map<String,Object> map = new HashMap();
+                   /* Map<String,Object> map = new HashMap();
                     map.put("messageId",messageId);
                     map.put("level",level);
                     map.put("cities",cities);
                     map.put("suppliers",suppliers);
-                    map.put("teamId",teamId);
-                    MpOkHttpUtil.okHttpPostAsync(FtpConstants.URL+ "messageReceive/sendMessage.json", map, 0, "异步向子表发消息", new Callback() {
+                    map.put("teamId",teamId);*/
+                    receiveService.sendMessage(messageId,level,cities,suppliers,teamId);
+
+                   /* MpOkHttpUtil.okHttpPostAsync(FtpConstants.URL+ "messageReceive/sendMessage.json", map, 0, "异步向子表发消息", new Callback() {
                         @Override
                         public void onFailure(Call call, IOException e) {
                             logger.info("向子表插入数据失败。。。 messageId:" + newMessageId);
@@ -137,7 +142,7 @@ public class MessageService {
                         public void onResponse(Call call, Response response) throws IOException {
                              logger.info("插入数据成功" + response.toString());
                         }
-                    });
+                    });*/
                 }
 
             } catch (Exception e) {

@@ -14,7 +14,7 @@ public class CarMessageDetailDto {
     /**主键**/
     private Long id;
     /**消息标题**/
-    private String mesageTitle;
+    private String messageTitle;
     /**消息内容**/
     private String messageContent;
     /**创建人**/
@@ -41,8 +41,8 @@ public class CarMessageDetailDto {
     private List<MessageDocDto> messageDocDto;
 
 
-    public CarMessageDetailDto(String mesageTitle, String messageContent, Date createTime, Date updateTime) {
-        this.mesageTitle = mesageTitle;
+    public CarMessageDetailDto(String messageTitle, String messageContent, Date createTime, Date updateTime) {
+        this.messageTitle = messageTitle;
         this.messageContent = messageContent;
         this.createTime = createTime;
         this.updateTime = updateTime;
@@ -56,12 +56,12 @@ public class CarMessageDetailDto {
         this.id = id;
     }
 
-    public String getMesageTitle() {
-        return mesageTitle;
+    public String getMessageTitle() {
+        return messageTitle;
     }
 
-    public void setMesageTitle(String mesageTitle) {
-        this.mesageTitle = mesageTitle;
+    public void setMessageTitle(String messageTitle) {
+        this.messageTitle = messageTitle;
     }
 
     public String getMessageContent() {
@@ -156,7 +156,7 @@ public class CarMessageDetailDto {
     public String toString() {
         return "CarMessageDetailDto{" +
                 "id=" + id +
-                ", mesageTitle='" + mesageTitle + '\'' +
+                ", messageTitle='" + messageTitle + '\'' +
                 ", messageContent='" + messageContent + '\'' +
                 ", createUser='" + createUser + '\'' +
                 ", status=" + status +
