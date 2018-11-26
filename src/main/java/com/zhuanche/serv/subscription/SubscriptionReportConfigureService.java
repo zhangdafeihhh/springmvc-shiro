@@ -138,7 +138,7 @@ public class SubscriptionReportConfigureService {
                                          Boolean isSupplier, Boolean isTeam) {
 
         //TODO 更新订阅配置的状态status=0
-        subscriptionReportConfigureExMapper.updateConfigureStatus();
+        subscriptionReportConfigureExMapper.updateConfigureStatus(subscriptionCycle);
 
         if(isWhole) { //全国,需要单独生成一个配置
             String bussinessNumber = reportId + "" + subscriptionCycle + "" + level + "" + "000";
@@ -313,4 +313,15 @@ public class SubscriptionReportConfigureService {
         }
         return AjaxResponse.success(null);
     }
+
+
+    /**
+     * 根据id查询历史数据报表信息
+     * @param id
+     * @return
+     */
+    public SubscriptionReport selectSubscriptionReportByPrimaryKey (Long id){
+        return subscriptionReportMapper.selectByPrimaryKey(id);
+    }
+
 }
