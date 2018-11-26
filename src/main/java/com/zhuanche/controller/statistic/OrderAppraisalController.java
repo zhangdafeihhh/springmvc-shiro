@@ -162,12 +162,11 @@ public class OrderAppraisalController extends DriverQueryController{
 	})
 	public AjaxResponse exportOrderAppraisal(
 			@Verify(param="cityId",rule="required")String cityId,
-			@Verify(param="supplierId",rule="required")String supplierId,
+			@Verify(param="supplierId",rule="required") String supplierId,
 									 String teamId,
 									 String groupIds,
 									 String driverName,
-									 @Verify(param="driverPhone",rule="mobile")
-														 String driverPhone,
+									 @Verify(param="driverPhone",rule="mobile")  String driverPhone,
 									 String orderNo,
 									 @Verify(param="createDateBegin",rule="required")String createDateBegin,
 									 @Verify(param="createDateEnd",rule="required")String createDateEnd,
