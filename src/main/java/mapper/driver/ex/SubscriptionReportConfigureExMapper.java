@@ -17,9 +17,10 @@ public interface SubscriptionReportConfigureExMapper {
 
     /**
      * 对已存在的配置做无效
+     * @param subscriptionCycle 订阅周期,1-周;2-月;
      * @return
      */
-    int updateConfigureStatus();
+    int updateConfigureStatus(Integer subscriptionCycle);
 
     /**
      * 保存
@@ -28,7 +29,4 @@ public interface SubscriptionReportConfigureExMapper {
      * @return
      */
     int saveSubscriptionReportConfigure(SubscriptionReportConfigure record);
-
-
-
 }

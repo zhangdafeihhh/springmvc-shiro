@@ -17,6 +17,9 @@ import com.zhuanche.entity.driver.SubscriptionReport;
 import com.zhuanche.entity.driver.SubscriptionReportConfigure;
 import com.zhuanche.serv.subscription.SubscriptionReportConfigureService;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.BigDataFtpUtil;
+import com.zhuanche.util.DateUtil;
+import com.zhuanche.util.FtpUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +30,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.List;
 
 @Controller
@@ -40,6 +48,9 @@ public class SubscriptionReportConfigureController {
 
     @Autowired
     private SubscriptionReportConfigureService subscriptionReportConfigureService;
+
+    @Autowired
+    private BigDataFtpUtil bigDataFtpUtil;
 
     /**
      * 数据报表订阅
@@ -105,7 +116,7 @@ public class SubscriptionReportConfigureController {
             logger.info(LOGTAG + "数据报表订阅, isLock={}", isLock);
             if(StringUtils.isNotEmpty(isLock)){
                 if(Integer.parseInt(isLock)==1){
-                    return AjaxResponse.fail(RestErrorCode.CAR_API_ERROR, "操作太频繁，请稍后。");
+                    return AjaxResponse.fail(RestErrorCode.CAR_API_ERROR, "报表正在被订阅，请稍后处理。");
                 }
             }
             WebSessionUtil.setAttribute(SUBSCRIPTION, 1);
@@ -174,55 +185,6 @@ public class SubscriptionReportConfigureController {
         return AjaxResponse.success(cycleList);
     }
 
-
-    /**
-     * 数据报表下载地址保存
-     *
-     * @param bussinessNumber subscription_report_configure表中的主键
-     * @param subscriptionTime 时间范围:年-月-日~年-月-日
-     * @param url 报表链接
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping(value = "/saveSubscriptionUrl", method = RequestMethod.POST)
-    @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
-    })
-    public AjaxResponse saveSubscriptionUrl(
-            @Verify(param = "bussinessNumber",rule="required") Integer bussinessNumber,
-            @Verify(param = "subscriptionTime",rule="required") String subscriptionTime,
-            @Verify(param = "url",rule="required") String url) {
-
-        logger.info(LOGTAG + "数据报表下载地址保存,bussinessNumber={}, subscriptionTime={}, url={}", bussinessNumber, subscriptionTime, url);
-        SubscriptionReportConfigure reportConfigure = subscriptionReportConfigureService.selectByPrimaryKey(new Long(bussinessNumber));
-        if(reportConfigure==null){
-            return AjaxResponse.fail(RestErrorCode.SUBSCRIPTION_NOT_EXIST);
-        }
-        SubscriptionReport subscriptionReport = new SubscriptionReport();
-        subscriptionReport.setBussinessNumber(bussinessNumber);
-        subscriptionReport.setSubscriptionTime(subscriptionTime);
-        subscriptionReport.setUrl(url);
-        subscriptionReport.setReportId(reportConfigure.getReportId());
-        subscriptionReport.setReportName(reportConfigure.getReportName());
-        subscriptionReport.setCityId(reportConfigure.getCityId());
-        subscriptionReport.setCityName(reportConfigure.getCityName());
-        subscriptionReport.setSupplierId(reportConfigure.getSupplierId());
-        subscriptionReport.setSupplierName(reportConfigure.getSupplierName());
-        subscriptionReport.setTeamId(reportConfigure.getTeamId());
-        subscriptionReport.setTeamName(reportConfigure.getTeamName());
-        subscriptionReport.setLevel(reportConfigure.getLevel());
-        subscriptionReport.setSubscriptionCycle(reportConfigure.getSubscriptionCycle());
-        subscriptionReport.setCreateId(reportConfigure.getCreateId());
-        subscriptionReport.setCreateName(reportConfigure.getCreateName());
-
-        int i = subscriptionReportConfigureService.saveSubscriptionUrl(subscriptionReport);
-        if(i>0){
-            return AjaxResponse.success(null);
-        }else {
-            return AjaxResponse.fail(RestErrorCode.CAR_API_ERROR, "保存失败");
-        }
-    }
-
     /**
      * 数据报表
      * @return
@@ -240,4 +202,112 @@ public class SubscriptionReportConfigureController {
         map.put( "4", "数单奖");
         return AjaxResponse.success(map);
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/exportSubscriptionUrl")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
+    })
+    public void exportSubscriptionUrl(@Verify(param = "id",rule="required") Long id,
+                                      HttpServletRequest request, HttpServletResponse response) {
+
+        SubscriptionReport report = subscriptionReportConfigureService.selectSubscriptionReportByPrimaryKey(id);
+        if (report == null) {
+//            return AjaxResponse.fail(RestErrorCode.SUBSCRIPTION_INVALID, "选择城市级别需要传城市ID");
+            return;
+        }
+        String url = report.getUrl();
+        logger.info(LOGTAG + "下载地址,url={}", url);
+        if (StringUtils.isEmpty(url)) {
+            return;
+        }
+        String file = url.split("/")[4];
+        //名称
+        String fileName = report.getReportName();
+        if (StringUtils.isNotEmpty(report.getCityName())) {
+            fileName += "_" + report.getCityName();
+        }
+        if (StringUtils.isNotEmpty(report.getSupplierName())) {
+            fileName += "_" + report.getSupplierName();
+        }
+        if (StringUtils.isNotEmpty(report.getTeamName())) {
+            fileName += "_" + report.getTeamName();
+        }
+        fileName += "_" + report.getSubscriptionTime();
+
+
+        response.setContentType("application/binary;charset=ISO8859_1");
+        try {
+            InputStream in = bigDataFtpUtil.download(File.separator + url, file);
+            logger.info(LOGTAG + "下载地址,url={}", url);
+            response.setHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes("utf-8"), "iso8859-1"));//指定下载的文件名
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            ServletOutputStream os = response.getOutputStream();
+            byte[] buffer = new byte[1024];
+            int len = -1;
+            while ((len = in.read(buffer)) != -1) {
+                os.write(buffer, 0, len);
+            }
+            in.close();
+            os.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/exportSubscriptionUrlnEW")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
+    })
+    public void exportSubscriptionUrlnEW(@Verify(param = "id",rule="required") Long id,
+                                      HttpServletRequest request, HttpServletResponse response) {
+
+        SubscriptionReport report = subscriptionReportConfigureService.selectSubscriptionReportByPrimaryKey(id);
+        if (report == null) {
+//            return AjaxResponse.fail(RestErrorCode.SUBSCRIPTION_INVALID, "选择城市级别需要传城市ID");
+            return;
+        }
+        String url = report.getUrl();
+        logger.info(LOGTAG + "下载地址,url={}", url);
+        if (StringUtils.isEmpty(url)) {
+            return;
+        }
+        String file = url.split("/")[4];
+        //名称
+        String fileName = report.getReportName();
+        if (StringUtils.isNotEmpty(report.getCityName())) {
+            fileName += "_" + report.getCityName();
+        }
+        if (StringUtils.isNotEmpty(report.getSupplierName())) {
+            fileName += "_" + report.getSupplierName();
+        }
+        if (StringUtils.isNotEmpty(report.getTeamName())) {
+            fileName += "_" + report.getTeamName();
+        }
+        fileName += "_" + report.getSubscriptionTime();
+
+
+        response.setContentType("application/binary;charset=ISO8859_1");
+        try {
+            InputStream in = bigDataFtpUtil.download( url, file.split("\\.")[0]);
+            logger.info(LOGTAG + "下载地址,url={}", url);
+            response.setHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes("utf-8"), "iso8859-1"));//指定下载的文件名
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            ServletOutputStream os = response.getOutputStream();
+            byte[] buffer = new byte[1024];
+            int len = -1;
+            while ((len = in.read(buffer)) != -1) {
+                os.write(buffer, 0, len);
+            }
+            in.close();
+            os.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ;
+    }
+
+
 }

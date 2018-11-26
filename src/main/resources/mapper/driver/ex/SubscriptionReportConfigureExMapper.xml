@@ -29,8 +29,11 @@
     where subscription_cycle = #{subscriptionCycle,jdbcType=INTEGER} and status=1
   </select>
 
-  <update id="updateConfigureStatus" parameterType="com.zhuanche.entity.mdbcarmanage.CarAdmUser" >
-    update subscription_report_configure set status = 0
+  <update id="updateConfigureStatus" parameterType="java.lang.Integer" >
+    update
+      subscription_report_configure
+    set status = 0
+    where subscription_cycle = #{subscriptionCycle,jdbcType=INTEGER}
   </update>
 
   <insert id="saveSubscriptionReportConfigure" parameterType="com.zhuanche.entity.driver.SubscriptionReportConfigure" >

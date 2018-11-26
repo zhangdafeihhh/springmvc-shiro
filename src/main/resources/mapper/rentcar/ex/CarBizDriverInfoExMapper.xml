@@ -482,7 +482,7 @@
       <![CDATA[ AND driver_id <>#{driverId}  ]]>
     </if>
   </select>
-  <insert id="insertCarBizDriverInfoDTO" parameterType="com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO" >
+  <insert id="insertCarBizDriverInfoDTO" parameterType="com.zhuanche.dto.rentcar.CarBizDriverInfoDTO" >
     <selectKey resultType="java.lang.Integer" keyProperty="driverId" order="AFTER" >
       SELECT LAST_INSERT_ID()
     </selectKey>
@@ -1098,7 +1098,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateCarBizDriverInfoDTO" parameterType="com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO" >
+  <update id="updateCarBizDriverInfoDTO" parameterType="com.zhuanche.dto.rentcar.CarBizDriverInfoDTO" >
     update car_biz_driver_info
     <set >
       <if test="password != null" >

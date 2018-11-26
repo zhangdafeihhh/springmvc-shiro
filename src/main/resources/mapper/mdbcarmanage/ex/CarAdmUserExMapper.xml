@@ -80,28 +80,6 @@
     </foreach>
   </select>
 
-  <select id="queryAllUser" resultMap="BaseResultMap">
-    SELECT
-	  user_id,
-	  user_name,
-	  cities,
-	  suppliers,
-	  team_id,
-	  group_ids,
-	  LEVEL
-    FROM
-	car_adm_user
-  </select>
-
-  <update id="updateUserList" parameterType="java.util.List">
-      <foreach collection="list" separator=";" item="cus">
-          update car_adm_user set
-          level = #{cus.level}
-          where user_id = #{cus.userId}
-      </foreach>
-  </update>
-
-
   <select id="queryUserPermissionInfo" resultMap="BaseResultMap">
     SELECT
 	  user_id,
