@@ -160,9 +160,10 @@
 
   <select id="queryALlData" resultMap="MessageResultMap" >
     SELECT
-    cmp.id as id, cmp.mesage_title as mesageTitle,
-    cmr.`status` as status, cmp.create_time as createTime,
-    cmp.message_content as messageContent
+    DISTINCT
+    cmp.id as id, cmp.mesage_title as mesage_title,
+    cmr.`status` as status, cmp.create_time as create_time,
+    cmp.message_content as message_content
     FROM car_message_post cmp
     INNER JOIN car_message_receiver cmr ON cmp.id = cmr.message_id
     INNER JOIN car_message_doc cmd ON cmd.message_id = cmp.id
@@ -193,9 +194,10 @@
 
   <select id="queryDataInTitle" resultMap="MessageResultMap" >
     SELECT
-    cmp.id as id, cmp.mesage_title as mesageTitle,
-    cmr.status as status, cmp.create_time as createTime,
-    cmp.message_content as messageContent
+    DISTINCT
+    cmp.id as id, cmp.mesage_title as mesage_title,
+    cmr.status as status, cmp.create_time as create_time,
+    cmp.message_content as message_content
     FROM car_message_post cmp
     INNER JOIN car_message_receiver cmr ON cmp.id = cmr.message_id
     WHERE 1=1
@@ -222,9 +224,10 @@
 
   <select id="queryDataInAttachment" resultMap="MessageResultMap" >
     SELECT
-    cmp.id as id, cmp.mesage_title as mesageTitle,
-    cmr.status as status, cmp.create_time as createTime,
-    cmp.message_content as messageContent
+    DISTINCT
+    cmp.id as id, cmp.mesage_title as mesage_title,
+    cmr.status as status, cmp.create_time as create_time,
+    cmp.message_content as message_content
     FROM car_message_post cmp
     INNER JOIN car_message_receiver cmr ON cmp.id = cmr.message_id
     INNER JOIN car_message_doc cmd ON cmd.message_id = cmp.id

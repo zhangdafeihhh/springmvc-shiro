@@ -16,6 +16,7 @@ import com.zhuanche.exception.MessageException;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.util.FtpUtil;
 import com.zhuanche.util.FtpUtils;
+import com.zhuanche.util.dateUtil.DateUtil;
 import mapper.mdbcarmanage.ex.*;
 import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
@@ -32,7 +33,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.util.*;
 
@@ -503,19 +503,36 @@ public class MessageService {
 
         String[] split = range.split(",");
         int count = 0;
+        Date start = (startDate != null) ? DateUtil.parseDate(startDate, Constants.DATE_FORMAT) : null;
+        Date end = endDate != null ? DateUtil.parseDate(endDate, Constants.DATE_FORMAT) : null ;
         List<CarMessagePostDto> data = null;
         if (split.length > 1) {
-            count = receiverExMapper.queryAllCount(keyword , startDate, endDate, idList, userId);
-            data = receiverExMapper.queryALlData(keyword , startDate, endDate, idList, userId, (pageNum - 1) * pageSize ,pageSize);
+            count = receiverExMapper.queryAllCount(keyword ,
+                    start,
+                    end, idList, userId);
+            data = receiverExMapper.queryALlData(keyword ,
+                    start,
+                    end,
+                    idList, userId, (pageNum - 1) * pageSize ,pageSize);
         } else {
             String rangeStr = split[0];
             if (rangeStr.equals(Constants.TITLE)) {
-                count = receiverExMapper.queryCountInTitle(keyword , startDate, endDate, idList, userId);
-                data = receiverExMapper.queryDataInTitle(keyword , startDate, endDate, idList, userId, (pageNum - 1) * pageSize ,pageSize);
+                count = receiverExMapper.queryCountInTitle(keyword ,
+                        start,
+                        end, idList, userId);
+                data = receiverExMapper.queryDataInTitle(keyword ,
+                        start,
+                        end,
+                        idList, userId, (pageNum - 1) * pageSize ,pageSize);
             }
             if (rangeStr.equals(Constants.ATTACHMENT)) {
-                count = receiverExMapper.queryCountInAttachment(keyword , startDate, endDate, idList, userId);
-                data = receiverExMapper.queryDataInAttachment(keyword , startDate, endDate, idList, userId, (pageNum - 1) * pageSize ,pageSize);
+                count = receiverExMapper.queryCountInAttachment(keyword ,
+                        start,
+                        end, idList, userId);
+                data = receiverExMapper.queryDataInAttachment(keyword ,
+                        start,
+                        end,
+                        idList, userId, (pageNum - 1) * pageSize ,pageSize);
             }
         }
         return new PageDTO(pageNum, pageSize, count, data);
