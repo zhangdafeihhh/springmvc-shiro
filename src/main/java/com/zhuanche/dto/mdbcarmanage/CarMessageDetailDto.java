@@ -34,9 +34,11 @@ public class CarMessageDetailDto {
     /**更新时间**/
     private Date updateTime;
 
-    private String docName;
-
     private List<ReadRecordDto> readRecord;
+
+
+    /**附件对象**/
+    private List<MessageDocDto> messageDocDto;
 
 
     public CarMessageDetailDto(String mesageTitle, String messageContent, Date createTime, Date updateTime) {
@@ -134,12 +136,12 @@ public class CarMessageDetailDto {
         this.updateTime = updateTime;
     }
 
-    public String getDocName() {
-        return docName;
+    public List<MessageDocDto> getMessageDocDto() {
+        return messageDocDto;
     }
 
-    public void setDocName(String docName) {
-        this.docName = docName;
+    public void setMessageDocDto(List<MessageDocDto> messageDocDto) {
+        this.messageDocDto = messageDocDto;
     }
 
     public List<ReadRecordDto> getReadRecord() {
@@ -158,14 +160,14 @@ public class CarMessageDetailDto {
                 ", messageContent='" + messageContent + '\'' +
                 ", createUser='" + createUser + '\'' +
                 ", status=" + status +
-                ", level=" + level +
+                ", level='" + level + '\'' +
                 ", cities='" + cities + '\'' +
                 ", suppliers='" + suppliers + '\'' +
                 ", teamids='" + teamids + '\'' +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +
-                ", docName='" + docName + '\'' +
                 ", readRecord=" + readRecord +
+                ", messageDocDto=" + messageDocDto +
                 '}';
     }
 }

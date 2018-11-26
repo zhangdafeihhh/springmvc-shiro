@@ -8,6 +8,7 @@ import com.zhuanche.constant.Constants;
 import com.zhuanche.constants.FtpConstants;
 import com.zhuanche.dto.mdbcarmanage.CarMessageDetailDto;
 import com.zhuanche.dto.mdbcarmanage.CarMessagePostDto;
+import com.zhuanche.dto.mdbcarmanage.MessageDocDto;
 import com.zhuanche.dto.mdbcarmanage.ReadRecordDto;
 import com.zhuanche.entity.mdbcarmanage.*;
 import com.zhuanche.entity.rentcar.CarBizCity;
@@ -208,8 +209,9 @@ public class MessageService {
             //撤回后状态变为草稿
              docExMapper.updateStatus(messageId.longValue(),CarMessagePost.Status.draft.getMessageStatus());
 
-              postExMapper.withDraw(Long.valueOf(messageId));
-            logger.info("字表删除成功");
+             postExMapper.withDraw(Long.valueOf(messageId));
+
+             logger.info("字表删除成功");
 
             return 1;
         } catch (Exception e) {
@@ -387,13 +389,19 @@ public class MessageService {
 
             List<CarMessageDoc> listDoc = new ArrayList<>();
             listDoc = docExMapper.listDoc(Long.valueOf(messaageId));
-            StringBuffer stringBuffer = new StringBuffer();
+            List<MessageDocDto> messageDocDtoList = new ArrayList<>();
             for (CarMessageDoc doc  : listDoc){
-                stringBuffer.append(doc.getDocName());
+                MessageDocDto messageDocDto = new MessageDocDto(doc.getDocName(),doc.getDocUrl());
+                messageDocDtoList.add(messageDocDto);
             }
-            if (StringUtils.isNotBlank(stringBuffer.toString())){
-                detailDto.setDocName(stringBuffer.toString());
+            detailDto.setMessageDocDto(messageDocDtoList);
+            List<Integer> createUser = new ArrayList<>();
+            createUser.add(userId);
+            List<CarAdmUser> createrList = carAdmUserExMapper.queryUsers(createUser,null,null,null,null);
+            if (CollectionUtils.isNotEmpty(createrList)){
+                detailDto.setCreateUser(createrList.get(0).getUserName());
             }
+            detailDto.setId(messaageId.longValue());
 
             try {
                 List<CarMessageReceiver> listUnRead = receiverExMapper.carMessageReceiverList(messaageId,userId,CarMessageReceiver.ReadStatus.unRead.getValue());
@@ -403,7 +411,6 @@ public class MessageService {
                         logger.info("状态更改成功");
                     }else {
                        logger.info("状态更改失败");
-                        // throw new MessageException(RestErrorCode.UNKNOWN_ERROR,RestErrorCode.renderMsg(RestErrorCode.UNKNOWN_ERROR));
                     }
                 }
             } catch (Exception e) {
@@ -540,7 +547,7 @@ public class MessageService {
 
     private String getRemoteFileDir() {
         StringBuilder sb = new StringBuilder();
-        sb.append("/upload/").append("message/messageDoc/");
+        sb.append("/u01").append("/upload/");
         return sb.toString();
     }
 

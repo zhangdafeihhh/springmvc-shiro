@@ -17,7 +17,7 @@
 
 
   <select id="listDoc" parameterType="java.lang.Long" resultMap="BaseResultMap" >
-    select doc_name from car_message_doc WHERE  1=1
+    select doc_name,doc_url from car_message_doc WHERE  1=1
 
     <if test="messageId!=null and messageId!=''">
       AND message_id = #{messageId}
