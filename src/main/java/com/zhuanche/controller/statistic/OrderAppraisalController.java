@@ -87,8 +87,8 @@ public class OrderAppraisalController extends DriverQueryController{
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})
-	public AjaxResponse appraisalDataList(String cityId,
-										  String supplierId,
+	public AjaxResponse appraisalDataList(@Verify(param="cityId",rule="required")String cityId,
+										  @Verify(param="supplierId",rule="required")String supplierId,
 										  String teamId,
 										  String groupIds,
 										  String driverName,
@@ -160,13 +160,13 @@ public class OrderAppraisalController extends DriverQueryController{
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})
-	public AjaxResponse exportOrderAppraisal(String cityId,
-									 String supplierId,
+	public AjaxResponse exportOrderAppraisal(
+			@Verify(param="cityId",rule="required")String cityId,
+			@Verify(param="supplierId",rule="required") String supplierId,
 									 String teamId,
 									 String groupIds,
 									 String driverName,
-									 @Verify(param="driverPhone",rule="mobile")
-														 String driverPhone,
+									 @Verify(param="driverPhone",rule="mobile")  String driverPhone,
 									 String orderNo,
 									 @Verify(param="createDateBegin",rule="required")String createDateBegin,
 									 @Verify(param="createDateEnd",rule="required")String createDateEnd,
