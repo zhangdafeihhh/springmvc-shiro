@@ -139,7 +139,7 @@ public class TransferController {
         //获取Excel对象
         XSSFWorkbook wb = null;
         try {
-            wb = new XSSFWorkbook(new FileInputStream("E:/shouqi/20181125_test.xlsx"));
+            wb = new XSSFWorkbook(new FileInputStream(fileAddr));
         } catch (IOException e) {
             e.printStackTrace();
         }
