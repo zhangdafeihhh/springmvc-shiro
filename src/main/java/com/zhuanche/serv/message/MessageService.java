@@ -122,51 +122,53 @@ public class MessageService {
                 Integer newMessageId = messageId;
 
 
-                logger.info("主表插入数据返回的messageId:" + messageId);
 
                 if (newMessageId > 0){
                     logger.info("消息发布成功！messageId=" + messageId);
                     receiveService.sendMessage(messageId,level,cities,suppliers,teamId);
-                    //上传附件
-                    if (file != null && !file.isEmpty()){
-                        MultipartHttpServletRequest req = (MultipartHttpServletRequest) request;
 
-                        Map<String,MultipartFile> map = new HashMap<>();
+                //上传附件
+                if (file != null && !file.isEmpty()){
+                    MultipartHttpServletRequest req = (MultipartHttpServletRequest) request;
 
-                        Collection<MultipartFile> multipartFileCollection = req.getFileMap().values();
+                    Map<String,MultipartFile> map = new HashMap<>();
 
-                        for (MultipartFile multFile : multipartFileCollection){
-                            map.put(multFile.getName(),multFile);
-                        }
+                    Collection<MultipartFile> multipartFileCollection = req.getFileMap().values();
 
-                        MultipartFile multipartFile;
-                        for (Map.Entry<String,MultipartFile> entry: map.entrySet()){
-                            multipartFile = entry.getValue();
+                    for (MultipartFile multFile : multipartFileCollection){
+                        map.put(multFile.getName(),multFile);
+                    }
 
-                            Map<String,Object> result = this.upload(multipartFile);
-                            Boolean ok = (Boolean) result.get("ok");
-                            if (ok== null || !ok){
-                                logger.error("消息中心-上传附件-异常");
+                    MultipartFile multipartFile;
+                    for (Map.Entry<String,MultipartFile> entry: map.entrySet()){
+                        multipartFile = entry.getValue();
 
+                        Map<String,Object> result = this.upload(multipartFile);
+                        Boolean ok = (Boolean) result.get("ok");
+                        if (ok== null || !ok){
+                            logger.error("消息中心-上传附件-异常");
+
+                        }else {
+                            CarMessageDoc doc = new CarMessageDoc();
+                            doc.setDocName(result.get("fileName").toString());
+                            doc.setCreateTime(new Date());
+                            doc.setMessageId(messageId);
+                            doc.setUpdateTime(new Date());
+                            doc.setDocUrl(FtpConstants.FTP+FtpConstants.FTPURL+":"+FtpConstants.FTPPORT + result.get("oppositeUrl").toString());
+                            doc.setState(status);
+                            int code = docExMapper.insert(doc);
+                            if (code > 0 ){
+                                logger.info("====doc文档上传成功====");
+                                return 1;
                             }else {
-                                CarMessageDoc doc = new CarMessageDoc();
-                                doc.setDocName(result.get("fileName").toString());
-                                doc.setCreateTime(new Date());
-                                doc.setMessageId(messageId);
-                                doc.setUpdateTime(new Date());
-                                doc.setDocUrl(FtpConstants.FTP+FtpConstants.FTPURL+":"+FtpConstants.FTPPORT + result.get("oppositeUrl").toString());
-                                doc.setState(status);
-                                int code = docExMapper.insert(doc);
-                                if (code > 0 ){
-                                    logger.info("====doc文档上传成功====");
-                                    return 1;
-                                }else {
-                                    logger.info("====doc上传文档失败======");
-                                }
-
+                                logger.info("====doc上传文档失败======");
                             }
 
                         }
+
+                    }
+                }
+
                 }
 
             } catch (Exception e) {
@@ -176,9 +178,7 @@ public class MessageService {
 
 
 
-            }
-
-            return 1;
+            return 0;
         } catch (Exception e) {
             logger.info("新建消息异常" + e.getMessage());
             throw new MessageException(RestErrorCode.UNKNOWN_ERROR,RestErrorCode.renderMsg(RestErrorCode.UNKNOWN_ERROR));
