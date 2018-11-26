@@ -193,15 +193,6 @@ public class PermissionController {
         }
     }
 
-    @RequestMapping("/personalPermission")
-    @ResponseBody
-    public AjaxResponse getPermission(Integer level,String cityIds, String supplierIds, String teamIds){
-        SSOLoginUser ssoLoginUser = WebSessionUtil.getCurrentLoginUser();
-        Integer userId = ssoLoginUser.getId();
-        CarAdmUser user = carAdmUserExMapper.queryUserPermissionInfo(userId);
-        return null;
-    }
-
     @RequestMapping("/upsert")
     @ResponseBody
     public AjaxResponse savePermissionInfo(Integer level, String cities, String suppliers, String teams, String groups, Integer userId){
