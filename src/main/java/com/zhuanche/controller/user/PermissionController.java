@@ -58,13 +58,13 @@ public class PermissionController {
         }
         JSONObject data = new JSONObject();
         data.put("uid", user.getUserId());
-        data.put("username", user.getUserId());
+        data.put("username", user.getUserName());
         data.put("account", user.getAccount());
         data.put("phone", user.getPhone());
         PermissionLevelEnum enumByCode = PermissionLevelEnum.getEnumByCode(user.getLevel());
         data.put("level", enumByCode == null ? "暂无" : enumByCode.getName());
         List<String> roleName = roleManagementService.getAllRoleName(user.getUserId());
-        data.put("roleList", roleName);
+        data.put("roleNames", roleName);
         List<String> levelRange = null;
         if (enumByCode != null) {
             switch (enumByCode) {
@@ -96,7 +96,7 @@ public class PermissionController {
                     break;
             }
         }
-        data.put("levelRange", levelRange);
+        data.put("levelInfos", levelRange);
         return AjaxResponse.success(data);
     }
 
