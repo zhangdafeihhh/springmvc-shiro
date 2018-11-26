@@ -34,6 +34,9 @@ public class CarMessageDetailDto {
     /**更新时间**/
     private Date updateTime;
 
+    /**手机号码**/
+    private String phone;
+
     private List<ReadRecordDto> readRecord;
 
 
@@ -150,6 +153,14 @@ public class CarMessageDetailDto {
 
     public void setReadRecord(List<ReadRecordDto> readRecord) {
         this.readRecord = readRecord;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     @Override

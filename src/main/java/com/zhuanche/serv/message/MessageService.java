@@ -121,28 +121,52 @@ public class MessageService {
 
                 Integer newMessageId = messageId;
 
+
+                logger.info("主表插入数据返回的messageId:" + messageId);
+
                 if (newMessageId > 0){
                     logger.info("消息发布成功！messageId=" + messageId);
-                    //异步向子表插入数据
-                   /* Map<String,Object> map = new HashMap();
-                    map.put("messageId",messageId);
-                    map.put("level",level);
-                    map.put("cities",cities);
-                    map.put("suppliers",suppliers);
-                    map.put("teamId",teamId);*/
                     receiveService.sendMessage(messageId,level,cities,suppliers,teamId);
+                    //上传附件
+                    if (file != null && !file.isEmpty()){
+                        MultipartHttpServletRequest req = (MultipartHttpServletRequest) request;
 
-                   /* MpOkHttpUtil.okHttpPostAsync(FtpConstants.URL+ "messageReceive/sendMessage.json", map, 0, "异步向子表发消息", new Callback() {
-                        @Override
-                        public void onFailure(Call call, IOException e) {
-                            logger.info("向子表插入数据失败。。。 messageId:" + newMessageId);
+                        Map<String,MultipartFile> map = new HashMap<>();
+
+                        Collection<MultipartFile> multipartFileCollection = req.getFileMap().values();
+
+                        for (MultipartFile multFile : multipartFileCollection){
+                            map.put(multFile.getName(),multFile);
                         }
 
-                        @Override
-                        public void onResponse(Call call, Response response) throws IOException {
-                             logger.info("插入数据成功" + response.toString());
+                        MultipartFile multipartFile;
+                        for (Map.Entry<String,MultipartFile> entry: map.entrySet()){
+                            multipartFile = entry.getValue();
+
+                            Map<String,Object> result = this.upload(multipartFile);
+                            Boolean ok = (Boolean) result.get("ok");
+                            if (ok== null || !ok){
+                                logger.error("消息中心-上传附件-异常");
+
+                            }else {
+                                CarMessageDoc doc = new CarMessageDoc();
+                                doc.setDocName(result.get("fileName").toString());
+                                doc.setCreateTime(new Date());
+                                doc.setMessageId(messageId);
+                                doc.setUpdateTime(new Date());
+                                doc.setDocUrl(FtpConstants.FTP+FtpConstants.FTPURL+":"+FtpConstants.FTPPORT + result.get("oppositeUrl").toString());
+                                doc.setState(status);
+                                int code = docExMapper.insert(doc);
+                                if (code > 0 ){
+                                    logger.info("====doc文档上传成功====");
+                                    return 1;
+                                }else {
+                                    logger.info("====doc上传文档失败======");
+                                }
+
+                            }
+
                         }
-                    });*/
                 }
 
             } catch (Exception e) {
@@ -150,46 +174,7 @@ public class MessageService {
             }
 
 
-            //上传附件
-            if (file != null && !file.isEmpty()){
-                MultipartHttpServletRequest req = (MultipartHttpServletRequest) request;
 
-                Map<String,MultipartFile> map = new HashMap<>();
-
-                Collection<MultipartFile> multipartFileCollection = req.getFileMap().values();
-
-                for (MultipartFile multFile : multipartFileCollection){
-                    map.put(multFile.getName(),multFile);
-                }
-
-                MultipartFile multipartFile;
-                for (Map.Entry<String,MultipartFile> entry: map.entrySet()){
-                  multipartFile = entry.getValue();
-
-                  Map<String,Object> result = this.upload(multipartFile);
-                    Boolean ok = (Boolean) result.get("ok");
-                    if (ok== null || !ok){
-                        logger.error("消息中心-上传附件-异常");
-
-                    }else {
-                        CarMessageDoc doc = new CarMessageDoc();
-                        doc.setDocName(result.get("fileName").toString());
-                        doc.setCreateTime(new Date());
-                        doc.setMessageId(messageId);
-                        doc.setUpdateTime(new Date());
-                        doc.setDocUrl(FtpConstants.FTP+FtpConstants.FTPURL+":"+FtpConstants.FTPPORT + result.get("oppositeUrl").toString());
-                        doc.setState(status);
-                        int code = docExMapper.insert(doc);
-                        if (code > 0 ){
-                            logger.info("====doc文档上传成功====");
-                            return 1;
-                        }else {
-                            logger.info("====doc上传文档失败======");
-                        }
-
-                    }
-
-                }
 
             }
 
@@ -405,6 +390,7 @@ public class MessageService {
             List<CarAdmUser> createrList = carAdmUserExMapper.queryUsers(createUser,null,null,null,null);
             if (CollectionUtils.isNotEmpty(createrList)){
                 detailDto.setCreateUser(createrList.get(0).getUserName());
+                detailDto.setPhone(createrList.get(0).getPhone());
             }
             detailDto.setId(messaageId.longValue());
 
