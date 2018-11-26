@@ -76,4 +76,17 @@ public class DriverTelescopeUser implements Serializable{
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
     }
+
+    @Override
+    public String toString() {
+        return "DriverTelescopeUser{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", driverId=" + driverId +
+                ", status=" + status +
+                ", remark='" + remark + '\'' +
+                ", createDate=" + createDate +
+                ", updateDate=" + updateDate +
+                '}';
+    }
 }

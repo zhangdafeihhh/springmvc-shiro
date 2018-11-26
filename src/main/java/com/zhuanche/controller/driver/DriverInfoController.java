@@ -773,21 +773,25 @@ public class DriverInfoController {
         TelescopeDriverInfo telescopeDriverInfo = new  TelescopeDriverInfo();
         if(userId!=null){
             DriverTelescopeUser driverTelescopeUser = userManagementService.selectTelescopeUserByUserId(userId);
+            logger.info("【查询千里眼司机信息】请求参数:phone={},userId={},telescopeDriverInfo={}",phone,userId,telescopeDriverInfo);
             if(null!=driverTelescopeUser && driverTelescopeUser.getStatus()==1){
                 auth = true;
             }
             if(null!=driverTelescopeUser){
                 CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(driverTelescopeUser.getDriverId());
+                logger.info("【查询千里眼司机信息】请求参数:phone={},userId={},carBizDriverInfo={}",phone,userId,carBizDriverInfo);
                 if(null!=carBizDriverInfo && carBizDriverInfo.getStatus()==1){
                     phone = carBizDriverInfo.getPhone();
                 }
             }
         }
         CarBizDriverInfoDTO carBizDriverInfoDTO = carBizDriverInfoService.selectByPhone(phone);
+        logger.info("【查询千里眼司机信息】请求参数:phone={},userId={},carBizDriverInfoDTO={}",phone,userId,carBizDriverInfoDTO);
         if(null != carBizDriverInfoDTO){
             // 查询城市名称，供应商名称，服务类型，加盟类型
             carBizDriverInfoDTO = carBizDriverInfoService.getBaseStatis(carBizDriverInfoDTO);
             telescopeDriverInfo = BeanUtil.copyObject(carBizDriverInfoDTO, TelescopeDriverInfo.class);
+            logger.info("【查询千里眼司机信息】请求参数:phone={},userId={},telescopeDriverInfo2={}",phone,userId,telescopeDriverInfo);
         }
         telescopeDriverInfo.setAuth(auth);
         return AjaxResponse.success(telescopeDriverInfo);
