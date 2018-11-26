@@ -113,8 +113,6 @@ public class TransferController {
     @Autowired
     private DriverTelescopeUserExMapper driverTelescopeUserExMapper;
 
-    private static String ACTION="【千里眼信息导入】";
-
     @Autowired
     private CarAdmUserMapper carAdmUserMapper;
 
@@ -125,8 +123,9 @@ public class TransferController {
     private String indexOfPhone; //用户初始密码取自手机号第多少位
 
     @Value("${transfer.user.fileAddr}")
-    private String fileAddr; //用户初始密码取自手机号第多少位
+    private String fileAddr; //文件地址
 
+    private static String ACTION="【千里眼信息导入】";
 
     @ResponseBody
     @RequestMapping(value = "/transferUser", method = { RequestMethod.POST,RequestMethod.GET })
