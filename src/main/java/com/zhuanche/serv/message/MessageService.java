@@ -112,7 +112,7 @@ public class MessageService {
                 if (messageId == null) {
                     //主表插入数据
                     post.setCreateTime(new Date());
-                    postExMapper.insertSelective(post).intValue();
+                    postExMapper.insertSelective(post);
                     messageId = post.getId().intValue();
                 }else {
                     post.setId(messageId.longValue());
@@ -120,8 +120,6 @@ public class MessageService {
                 }
 
                 Integer newMessageId = messageId;
-
-
 
                 if (newMessageId > 0){
                     logger.info("消息发布成功！messageId=" + messageId);
@@ -175,10 +173,7 @@ public class MessageService {
                 e.printStackTrace();
             }
 
-
-
-
-            return 0;
+            return 1;
         } catch (Exception e) {
             logger.info("新建消息异常" + e.getMessage());
             throw new MessageException(RestErrorCode.UNKNOWN_ERROR,RestErrorCode.renderMsg(RestErrorCode.UNKNOWN_ERROR));
@@ -251,6 +246,8 @@ public class MessageService {
 
             switch (status){
                 case 1:
+                    dtoList = postDtoExMapper.listCarMessagePostBymesageIds(userId,null,null,null);
+                    break;
                 case 2:
                     dtoList = postDtoExMapper.listCarMessagePostBymesageIds(userId,status,null,null);
                     break;
@@ -261,7 +258,7 @@ public class MessageService {
                     dtoList = postDtoExMapper.listCarMessagePostBymesageIds(null,null,CarMessagePost.Status.draft.getMessageStatus(),userId);
                     break;
                 default:
-                    dtoList = new ArrayList<>();
+                    dtoList = postDtoExMapper.listCarMessagePostBymesageIds(userId,null,null,null);
 
             }
 
