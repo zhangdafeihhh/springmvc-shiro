@@ -6,11 +6,11 @@
 		<artifactId>mp-parent</artifactId>
 		<version>1.2-SNAPSHOT</version>
 	</parent>
-
+	<artifactId>mp-manage</artifactId>
 	<packaging>war</packaging>
 	<version>1.0-SNAPSHOT</version>
 
-	<artifactId>mp-manage</artifactId>
+	<name>mp-manage</name>
 	<url>http://maven.apache.org</url>
 
 	<dependencies>
