@@ -88,7 +88,7 @@ public class OrderAppraisalController extends DriverQueryController{
 			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})
 	public AjaxResponse appraisalDataList(@Verify(param="cityId",rule="required")String cityId,
-										  @Verify(param="cityId",rule="required")String supplierId,
+										  @Verify(param="supplierId",rule="required")String supplierId,
 										  String teamId,
 										  String groupIds,
 										  String driverName,
