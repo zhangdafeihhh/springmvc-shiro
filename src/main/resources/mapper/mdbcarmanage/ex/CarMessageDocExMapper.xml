@@ -15,6 +15,16 @@
   </sql>
 
 
+
+  <select id="listDoc" parameterType="java.lang.Long" resultMap="BaseResultMap" >
+    select doc_name from car_message_doc WHERE  1=1
+
+    <if test="messageId!=null and messageId!=''">
+      AND message_id = #{messageId}
+    </if>
+
+  </select>
+
   <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.CarMessageDoc" >
     <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
       SELECT LAST_INSERT_ID()

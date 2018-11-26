@@ -38,7 +38,7 @@ public interface CarMessagePostExMapper {
      * @param record
      * @return
      */
-    int insertSelective(CarMessagePost record);
+    Long insertSelective(CarMessagePost record);
 
     /**
      * 更改数据
@@ -48,6 +48,11 @@ public interface CarMessagePostExMapper {
     int updateByPrimaryKeySelective(CarMessagePost record);
 
 
+    /**
+     * 删除
+     * @param id
+     * @return
+     */
     int deleteByPrimaryKey(Long id);
 
     int insert(CarMessagePost record);

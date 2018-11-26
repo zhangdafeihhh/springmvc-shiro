@@ -9,6 +9,7 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.mdbcarmanage.CarMessageDetailDto;
 import com.zhuanche.entity.mdbcarmanage.CarMessagePost;
+import com.zhuanche.exception.MessageException;
 import com.zhuanche.serv.message.MessageService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -82,25 +83,32 @@ public class MessageManagerController {
                 String.valueOf(status),creater,messageTitle,messageContent,String.valueOf(level),cities,
                 suppliers,teamId,docName,docUrl));
 
+        if (StringUtils.isBlank(creater) || StringUtils.isBlank(String.valueOf(status)) ){
+            logger.info("消息为发布状态，必传参数为空");
+            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
+        }
+
         if(status.equals(CarMessagePost.Status.publish)){
           if (StringUtils.isBlank(creater) || StringUtils.isBlank(messageTitle) || StringUtils.isBlank(messageContent)
                   || StringUtils.isBlank(String.valueOf(level)) ){
               logger.info("消息为发布状态，必传参数为空");
               return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
-
           }
         }
 
         AjaxResponse response = AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
-        int code = messageService.postMessage(null,status, Integer.valueOf(creater), messageTitle, messageContent, level, cities, suppliers, teamId, docName, docUrl,
-                file,request);
+        try {
+            int code = messageService.postMessage(null,status, Integer.valueOf(creater), messageTitle, messageContent, level, cities, suppliers, teamId, docName, docUrl,
+                    file,request);
 
-        if (code > 0){
-            logger.info("消息发送成功");
-            return AjaxResponse.success(null);
+            if (code > 0){
+                logger.info("消息发送成功");
+                return AjaxResponse.success(null);
+            }
+        } catch (MessageException e) {
+           response = AjaxResponse.fail(e.getCode());
         }
         return  response;
-        //return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
     }
 
 
@@ -141,6 +149,13 @@ public class MessageManagerController {
                 String.valueOf(status),creater,messageTitle,messageContent,String.valueOf(level),cities,
                 suppliers,teamId,docName,docUrl));
 
+
+        if (StringUtils.isBlank(creater) || StringUtils.isBlank(String.valueOf(status)) ){
+            logger.info("消息为发布状态，必传参数为空");
+            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
+        }
+
+
         if(status.equals(CarMessagePost.Status.publish)){
             if (StringUtils.isBlank(creater) || StringUtils.isBlank(messageTitle) || StringUtils.isBlank(messageContent)
                     || StringUtils.isBlank(String.valueOf(level)) ){
@@ -150,14 +165,19 @@ public class MessageManagerController {
             }
         }
         AjaxResponse response = AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
-        int code = messageService.postMessage(Integer.valueOf(messageId),status, Integer.valueOf(creater), messageTitle, messageContent, level, cities, suppliers, teamId, docName, docUrl,
-                file,request);
-
-        if (code > 0){
-            logger.info("消息发送成功");
-            return AjaxResponse.success(null);
+        try {
+            int code = messageService.postMessage(Integer.valueOf(messageId),status, Integer.valueOf(creater), messageTitle, messageContent, level, cities, suppliers, teamId, docName, docUrl,
+                    file,request);
+            if (code > 0){
+                logger.info("消息发送成功");
+                return AjaxResponse.success(null);
+            }
+        } catch (MessageException e) {
+            response = AjaxResponse.fail(e.getCode());
         }
+
         return  response;
+
 
     }
 
@@ -167,7 +187,7 @@ public class MessageManagerController {
      * @param messageId
      * @return
      */
-    @RequestMapping(value = "/messageWithDraw",method = RequestMethod.POST)
+    @RequestMapping(value = "/messageWithDraw")
     @ResponseBody
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
@@ -182,47 +202,87 @@ public class MessageManagerController {
         if (StringUtils.isBlank(String.valueOf(messageId))){
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
         }
-        int code = messageService.withDraw(messageId);
-        if (code > 0){
-            return AjaxResponse.success(null);
-        }else {
-            return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
+        try {
+            int code = messageService.withDraw(messageId);
+            if (code > 0){
+                return AjaxResponse.success(null);
+            }else {
+                return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
+            }
+        } catch (MessageException e) {
+            return AjaxResponse.fail(e.getCode());
+        }
+    }
+
+
+
+    /**
+     * 撤回操作
+     * @param messageId
+     * @return
+     */
+    @RequestMapping(value = "/messageDeleteDraw")
+    @ResponseBody
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
+    })
+    public AjaxResponse messageDeleteDraw(@RequestParam(value = "messageId") Integer messageId){
+
+        logger.info(MessageFormat.format("messageDeleteDraw入参:{0}",messageId));
+        if (StringUtils.isBlank(String.valueOf(messageId))){
+            logger.info("messageWithDraw入参 messageId为空");
+            return  AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
+        }
+        if (StringUtils.isBlank(String.valueOf(messageId))){
+            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
+        }
+        try {
+            int code = messageService.messageDeleteDraw(messageId);
+            if (code > 0){
+                return AjaxResponse.success(null);
+            }else {
+                return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
+            }
+        } catch (MessageException e) {
+            return AjaxResponse.fail(e.getCode());
         }
     }
 
 
     /**
      * 获取列表
-     * @param messageId
      * @param userId
      * @param status
      * @param pageSize
      * @param pageNum
      * @return
      */
-    @RequestMapping(value = "/messageLisByStatus",method = RequestMethod.GET)
+    @RequestMapping(value = "/messageLisByStatus")
     @ResponseBody
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
-    public AjaxResponse messageLisByStatus(@RequestParam(value = "messageId",defaultValue = "0")Integer messageId,
-                                           @RequestParam(value = "userId",defaultValue = "0")Integer userId,
+    public AjaxResponse messageLisByStatus(@RequestParam(value = "userId",defaultValue = "0")Integer userId,
                                            @RequestParam(value = "status",defaultValue = "1")Integer status,
                                            @RequestParam(value = "pageSize",defaultValue = "10")Integer pageSize,
                                            @RequestParam(value = "pageNum",defaultValue = "1")Integer pageNum){
 
-        logger.info(MessageFormat.format("messageLisByStatus入参:messageId:{0},userId:{1},status:{3}",
-                messageId,userId,status));
-        if(StringUtils.isBlank(String.valueOf(messageId)) || StringUtils.isBlank(String.valueOf(userId))){
+        logger.info(MessageFormat.format("messageLisByStatus入参:userId:{0},status:{1},pageSize:{2},pageNum:{3}",
+                userId,status,pageSize,pageNum));
+        if(StringUtils.isBlank(String.valueOf(status)) || StringUtils.isBlank(String.valueOf(userId))){
             logger.info("查询条件缺失");
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
         }
-        PageDTO pageDTO = messageService.messageLisByStatus(userId,status,pageSize,pageNum);
-        return AjaxResponse.success(pageDTO);
+        try {
+            PageDTO pageDTO = messageService.messageLisByStatus(userId,status,pageSize,pageNum);
+            return AjaxResponse.success(pageDTO);
+        } catch (MessageException e) {
+            return AjaxResponse.fail(e.getCode());
+        }
 
     }
 
-    @RequestMapping(value = "/messageDetail",method = RequestMethod.POST)
+    @RequestMapping(value = "/messageDetail")
     @ResponseBody
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
@@ -235,31 +295,38 @@ public class MessageManagerController {
             logger.info("messageDetail 入参确实");
             return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
         }
-        CarMessageDetailDto detailDto = messageService.messageDetail(messageId,userId);
-        return AjaxResponse.success(detailDto);
+        try {
+            CarMessageDetailDto detailDto = messageService.messageDetail(messageId,userId);
+            return AjaxResponse.success(detailDto);
+        } catch (MessageException e) {
+            return AjaxResponse.fail(e.getCode());
+        }
     }
 
-    @RequestMapping(value = "/messageUnreadCount",method = RequestMethod.POST)
+    @RequestMapping(value = "/messageUnreadCount")
     @ResponseBody
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
     public AjaxResponse messageUnreadCount(@RequestParam(value = "userId",defaultValue = "")Integer userId){
         logger.info(MessageFormat.format("messageUnreadCount入参:userId:{0}",userId));
-        if (StringUtils.isBlank(String.valueOf(userId))) {
+        if (StringUtils.isEmpty(String.valueOf(userId))) {
             logger.info("messageUnreadCount参数为空");
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
         }
-
-        Integer count = messageService.unReadCount(userId);
-        Map<String,Object> map = new HashMap<>();
-        map.put("userId",userId);
-        if (count != null && count>0){
-         map.put("count",count);
-        }else {
-            map.put("count",0);
+        try {
+            Integer count = messageService.unReadCount(userId);
+            Map<String,Object> map = new HashMap<>();
+            map.put("userId",userId);
+            if (count != null && count>0){
+             map.put("count",count);
+            }else {
+                map.put("count",0);
+            }
+            return AjaxResponse.success(map);
+        } catch (MessageException e) {
+            return AjaxResponse.fail(e.getCode());
         }
-        return AjaxResponse.success(map);
     }
 
 

@@ -58,7 +58,6 @@
     <filter-name>shiroFilter</filter-name>
     <url-pattern>*.json</url-pattern>
   </filter-mapping>
-  
   <!-- 日志中增加登录用户信息 -->
   <filter>
     <filter-name>initRequestAuthDataFilter</filter-name>

@@ -3,6 +3,8 @@ package mapper.mdbcarmanage.ex;
 import com.zhuanche.entity.mdbcarmanage.CarMessageDoc;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 public interface CarMessageDocExMapper {
     int deleteByPrimaryKey(Long id);
 
@@ -20,6 +22,14 @@ public interface CarMessageDocExMapper {
      * @return
      */
     int deleteByMessaeId(@Param("messageId")Long messageId);
+
+
+    /**
+     * 根据messageId获取详情
+     * @param messageId
+     * @return
+     */
+    List<CarMessageDoc> listDoc(@Param("messageId")Long messageId);
 
     int insertSelective(CarMessageDoc record);
 
