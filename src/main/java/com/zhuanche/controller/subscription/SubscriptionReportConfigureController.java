@@ -14,12 +14,9 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.driver.SubscriptionReportConfigureDTO;
 import com.zhuanche.entity.driver.SubscriptionReport;
-import com.zhuanche.entity.driver.SubscriptionReportConfigure;
 import com.zhuanche.serv.subscription.SubscriptionReportConfigureService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BigDataFtpUtil;
-import com.zhuanche.util.DateUtil;
-import com.zhuanche.util.FtpUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -213,7 +209,6 @@ public class SubscriptionReportConfigureController {
 
         SubscriptionReport report = subscriptionReportConfigureService.selectSubscriptionReportByPrimaryKey(id);
         if (report == null) {
-//            return AjaxResponse.fail(RestErrorCode.SUBSCRIPTION_INVALID, "选择城市级别需要传城市ID");
             return;
         }
         String url = report.getUrl();
@@ -221,6 +216,8 @@ public class SubscriptionReportConfigureController {
         if (StringUtils.isEmpty(url)) {
             return;
         }
+        String operation = url.split("/")[0] +"/"+ url.split("/")[1]
+                + "/" + url.split("/")[2] + "/" + url.split("/")[3];
         String file = url.split("/")[4];
         //名称
         String fileName = report.getReportName();
@@ -233,14 +230,11 @@ public class SubscriptionReportConfigureController {
         if (StringUtils.isNotEmpty(report.getTeamName())) {
             fileName += "_" + report.getTeamName();
         }
-        fileName += "_" + report.getSubscriptionTime();
-
-
-        response.setContentType("application/binary;charset=ISO8859_1");
+        fileName += "_" + report.getSubscriptionTime()+".csv";
         try {
-            InputStream in = bigDataFtpUtil.download(File.separator + url, file);
-            logger.info(LOGTAG + "下载地址,url={}", url);
+            InputStream in = bigDataFtpUtil.downloadFile(operation, file);
             response.setHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes("utf-8"), "iso8859-1"));//指定下载的文件名
+            response.setContentType("application/binary;charset=ISO8859_1");
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             ServletOutputStream os = response.getOutputStream();
             byte[] buffer = new byte[1024];
@@ -255,59 +249,4 @@ public class SubscriptionReportConfigureController {
         }
         return ;
     }
-
-    @ResponseBody
-    @RequestMapping(value = "/exportSubscriptionUrlnEW")
-    @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
-    })
-    public void exportSubscriptionUrlnEW(@Verify(param = "id",rule="required") Long id,
-                                      HttpServletRequest request, HttpServletResponse response) {
-
-        SubscriptionReport report = subscriptionReportConfigureService.selectSubscriptionReportByPrimaryKey(id);
-        if (report == null) {
-//            return AjaxResponse.fail(RestErrorCode.SUBSCRIPTION_INVALID, "选择城市级别需要传城市ID");
-            return;
-        }
-        String url = report.getUrl();
-        logger.info(LOGTAG + "下载地址,url={}", url);
-        if (StringUtils.isEmpty(url)) {
-            return;
-        }
-        String file = url.split("/")[4];
-        //名称
-        String fileName = report.getReportName();
-        if (StringUtils.isNotEmpty(report.getCityName())) {
-            fileName += "_" + report.getCityName();
-        }
-        if (StringUtils.isNotEmpty(report.getSupplierName())) {
-            fileName += "_" + report.getSupplierName();
-        }
-        if (StringUtils.isNotEmpty(report.getTeamName())) {
-            fileName += "_" + report.getTeamName();
-        }
-        fileName += "_" + report.getSubscriptionTime();
-
-
-        response.setContentType("application/binary;charset=ISO8859_1");
-        try {
-            InputStream in = bigDataFtpUtil.download( url, file.split("\\.")[0]);
-            logger.info(LOGTAG + "下载地址,url={}", url);
-            response.setHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes("utf-8"), "iso8859-1"));//指定下载的文件名
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            ServletOutputStream os = response.getOutputStream();
-            byte[] buffer = new byte[1024];
-            int len = -1;
-            while ((len = in.read(buffer)) != -1) {
-                os.write(buffer, 0, len);
-            }
-            in.close();
-            os.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return ;
-    }
-
-
 }
