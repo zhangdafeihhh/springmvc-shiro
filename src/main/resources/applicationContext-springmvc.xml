@@ -10,8 +10,8 @@
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
         http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd">
 
-	<!-- 配置Spring MVC 中的RequestMappingHandlerMapping-->
-    <mvc:annotation-driven validator="validator">
+	<!-- 配置Spring MVC 中的RequestMappingHandlerMapping , 并支持hibernate-validate校验器-->
+    <mvc:annotation-driven validator="hibernateValidator">
         <mvc:message-converters register-defaults="true">
             <bean class="org.springframework.http.converter.StringHttpMessageConverter">
                 <constructor-arg value="UTF-8" />
@@ -43,10 +43,16 @@
         </mvc:message-converters> 
     </mvc:annotation-driven>
     
-    <!-- 参数校验 -->
-    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
-		<property name="providerClass" value="org.hibernate.validator.HibernateValidator" />
-    </bean>
+    <!-- 配置hibernate-validate校验器 -->
+	<bean id="hibernateValidator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"> 
+		<property name="providerClass" value="org.hibernate.validator.HibernateValidator"/> 
+		<property name="validationMessageSource" ref="validatorMessageSource"/> 
+	</bean>
+	<bean id="validatorMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+	    <property name="useCodeAsDefaultMessage" value="false" />
+		<property name="defaultEncoding" value="UTF-8"/> 
+	    <property name="basename" value="validationMessages" />
+	</bean>
 
 	<!-- 配置View层 JSP-->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
