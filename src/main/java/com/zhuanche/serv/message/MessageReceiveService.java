@@ -72,7 +72,7 @@ public class MessageReceiveService {
         }
 
 
-        return 0;
+        return 1;
     }
 
 
@@ -124,13 +124,13 @@ public class MessageReceiveService {
             CarMessageReceiver receiver = new CarMessageReceiver();
             receiver.setCreateTime(new Date());
             receiver.setMessageId(messageId);
-            receiver.setStatus(1);
+            receiver.setStatus(CarMessageReceiver.ReadStatus.unRead.getValue());
             receiver.setReceiveUserId(admUser.getUserId());
             receiver.setUpdateTime(new Date());
             receiverMapper.insert(receiver);
         }
 
-        return 0;
+        return 1;
     }
 
 }

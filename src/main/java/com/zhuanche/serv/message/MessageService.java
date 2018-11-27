@@ -282,7 +282,7 @@ public class MessageService {
 
             switch (status){
                 case 1://已收到的消息
-                    dtoList = postDtoExMapper.listCarMessagePostBymesageIds(userId,status);
+                    dtoList = postDtoExMapper.listCarMessagePostBymesageIds(userId,null);
                     break;
                 case 2://未读的消息
                     dtoList = postDtoExMapper.listCarMessagePostBymesageIds(userId,status);
@@ -348,6 +348,48 @@ public class MessageService {
             detailDto.setCities(carMessagePost.getCities());
             detailDto.setSuppliers(carMessagePost.getSuppliers());
             detailDto.setTeamids(carMessagePost.getTeamids());
+
+            switch (carMessagePost.getLevel()){
+                case Constants.CONTRY:
+                    detailDto.setLevelName(CarMessagePost.Level.contry.getName());
+                    break;
+                case Constants.CITY:
+                    detailDto.setLevelName(CarMessagePost.Level.city.getName());
+                    detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
+                    break;
+                case Constants.SUPPY:
+                    detailDto.setLevelName(CarMessagePost.Level.suppy.getName());
+                    detailDto.setSuppliersName(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
+                    break;
+                case Constants.CITYANDSUPPY:
+                    detailDto.setLevelName(CarMessagePost.Level.cityAndSuppy.getName());
+                    detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
+                    detailDto.setSuppliersName(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
+                    break;
+                case Constants.TEAM:
+                    detailDto.setLevelName(CarMessagePost.Level.team.getName());
+                    detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
+                    break;
+                case Constants.CITYANDTEAM:
+                    detailDto.setLevelName(CarMessagePost.Level.cityAndTeam.getName());
+                    detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
+                    detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
+                    break;
+                case Constants.SUPPYANDTEAM:
+                    detailDto.setLevelName(CarMessagePost.Level.suppyAndTeam.getName());
+                    detailDto.setSuppliersName(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
+                    detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
+                    break;
+                case Constants.CITYANDSUPPYANDTEAM:
+                    detailDto.setLevelName(CarMessagePost.Level.cityAndSuppyAndTeam.getName());
+                    detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
+                    detailDto.setSuppliersName(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
+                    detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
+                    break;
+                default:
+                    detailDto.setLevelName(CarMessagePost.Level.contry.getName());
+
+            }
 
             //已读
             List<CarMessageReceiver> list = receiverExMapper.carMessageReceiverList(messaageId,null,CarMessageReceiver.ReadStatus.read.getValue());
@@ -424,8 +466,7 @@ public class MessageService {
         StringBuffer sb = new StringBuffer();
         String[] cityArray = cities.split(Constants.SEPERATER);
         for (String str : cityArray){
-            sb.append(map.get(Integer.valueOf(str)));
-
+            sb.append(map.get(Integer.valueOf(str))).append(" ");
         }
 
         return sb.toString();
