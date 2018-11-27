@@ -1,7 +1,5 @@
 package com.zhuanche.dto.mdbcarmanage;
 
-import com.zhuanche.common.paging.PageDTO;
-
 import java.util.Date;
 
 /**
@@ -27,6 +25,8 @@ public class CarMessagePostDto {
     private Date createTime;
     /**更新时间**/
     private Date updateTime;
+    /**通知状态**/
+    private Integer status;
 
 
     public Long getId() {
@@ -91,5 +91,13 @@ public class CarMessagePostDto {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 }
