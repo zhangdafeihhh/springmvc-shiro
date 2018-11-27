@@ -150,5 +150,6 @@ public interface CarBizDriverInfoExMapper {
 
     CarBizDriverInfoDTO selectByPhone(@Param("phone") String phone);
 
+    CarBizDriverInfoDTO selectByDriverId(@Param("driverId") Integer driverId);
 
 }
