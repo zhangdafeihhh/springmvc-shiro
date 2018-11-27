@@ -387,14 +387,17 @@ public class MessageManagerController {
                                            Model model)throws Exception {
         //下载文件路径
         try {
-            String path = "/u01/upload";
+            String path = "/u01/upload";  //服务器
+            //String path = "/Users/fan/upload";  //本地
             logger.info("path:" + path);
             File file = new File(path + File.separator + fileUrl);
             HttpHeaders headers = new HttpHeaders();
             //下载显示的文件名，解决中文名称乱码问题
             String downloadFielName = new String(fileUrl.getBytes("UTF-8"),"iso-8859-1");
+            String fileName = downloadFielName.substring(downloadFielName.lastIndexOf(File.separator)+1);
+            System.out.println(fileName);
             //通知浏览器以attachment（下载方式）打开图片
-            headers.setContentDispositionFormData("attachment", downloadFielName);
+            headers.setContentDispositionFormData("attachment", fileName);
             //application/octet-stream ： 二进制流数据（最常见的文件下载）。
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
             return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(file),

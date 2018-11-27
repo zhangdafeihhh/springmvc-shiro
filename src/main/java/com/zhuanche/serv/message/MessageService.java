@@ -582,8 +582,11 @@ public class MessageService {
     }
 
 
-
-
+    /**
+     * 文件服务器上传
+     * @param file
+     * @return
+     */
     public Map<String,Object> fileUpload(MultipartFile file){
         Map<String,Object> map = new HashMap<>();
         if (!file.isEmpty()) {
@@ -616,8 +619,10 @@ public class MessageService {
     }
 
     private String getRemoteFileDir() {
+        Calendar now = Calendar.getInstance();
         StringBuilder sb = new StringBuilder();
         sb.append(File.separator).append("u01").append(File.separator).append("upload").append(File.separator).append("message")
+        .append(File.separator).append(now.get(Calendar.YEAR)).append(File.separator).append(now.get(Calendar.MONTH))
         .append(File.separator);
         return sb.toString();
     }
