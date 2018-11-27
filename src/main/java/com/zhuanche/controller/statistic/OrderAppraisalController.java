@@ -189,10 +189,6 @@ public class OrderAppraisalController extends DriverQueryController{
 				fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
 			}
 
-			if (StringUtils.isEmpty(driverPhone) && StringUtils.isEmpty(teamId)){
-				//请选择一个车队号或输入司机手机
-				return AjaxResponse.fail(RestErrorCode.TEAMID_OR_DRIVERID_ISNULL);
-			}
 			CsvUtils entity = new CsvUtils();
 			params = new CarBizCustomerAppraisalParams(cityId,supplierId,teamId,groupIds,driverName,driverPhone,orderNo,
 					createDateBegin,createDateEnd,evaluateScore,sortName,sortOrder,page,pageSize);
