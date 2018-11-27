@@ -10,18 +10,14 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="is_sender" property="isSender" jdbcType="VARCHAR" />
   </resultMap>
-  <resultMap id="MessageResultMap" type="com.zhuanche.entity.mdbcarmanage.CarMessagePost" >
+  <resultMap id="MessageResultMap" type="com.zhuanche.dto.mdbcarmanage.CarMessagePostDto" >
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="mesage_title" property="mesageTitle" jdbcType="VARCHAR" />
     <result column="message_content" property="messageContent" jdbcType="VARCHAR" />
-    <result column="user_id" property="userId" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
-    <result column="level" property="level" jdbcType="INTEGER" />
-    <result column="cities" property="cities" jdbcType="VARCHAR" />
-    <result column="suppliers" property="suppliers" jdbcType="VARCHAR" />
-    <result column="teamIds" property="teamids" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="docName" property="docName" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, status, receive_user_id, message_id, create_time, update_time, is_sender
@@ -83,8 +79,9 @@
   <select id="queryAllCount" resultType="java.lang.Integer" >
     SELECT COUNT(DISTINCT(cmp.id)) as total FROM car_message_post cmp
     INNER JOIN car_message_receiver cmr ON cmp.id = cmr.message_id
-    INNER JOIN car_message_doc cmd ON cmd.message_id = cmp.id
-    WHERE 1=1
+    LEFT JOIN car_message_doc cmd ON cmd.message_id = cmp.id
+    WHERE
+    cmp.status = 2
     <if test="startDate != null" >
     AND cmp.create_time &gt;= #{startDate}
     </if>
@@ -92,14 +89,12 @@
     AND cmp.create_time &lt;= #{endDate}
     </if>
     <if test="keyword != null" >
-    AND LOCATE(#{keyword},cmp.mesage_title) &gt; 0
-    </if>
-    <if test="keyword != null" >
-    or LOCATE(#{keyword},cmd.doc_name) &gt; 0
+    AND (LOCATE(#{keyword},cmp.mesage_title) &gt; 0
+    OR LOCATE(#{keyword},cmd.doc_name) &gt; 0)
     </if>
     <if test="idList != null" >
       AND cmp.user_id in
-      <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+      <foreach collection="idList" index="index" item="item" open="(" separator="," close=")">
         #{item}
       </foreach>
     </if>
@@ -111,7 +106,8 @@
   <select id="queryCountInTitle" resultType="java.lang.Integer" >
     SELECT COUNT(DISTINCT(cmp.id)) as total FROM car_message_post cmp
     INNER JOIN car_message_receiver cmr ON cmp.id = cmr.message_id
-    WHERE 1=1
+    WHERE
+    cmp.status = 2
     <if test="startDate != null" >
     AND cmp.create_time &gt;= #{startDate}
     </if>
@@ -123,7 +119,7 @@
     </if>
     <if test="idList != null" >
     AND cmp.user_id in
-      <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+      <foreach collection="idList" index="index" item="item" open="(" separator="," close=")">
         #{item}
       </foreach>
     </if>
@@ -136,7 +132,8 @@
     SELECT COUNT(DISTINCT(cmp.id)) as total FROM car_message_post cmp
     INNER JOIN car_message_receiver cmr ON cmp.id = cmr.message_id
     INNER JOIN car_message_doc cmd ON cmd.message_id = cmp.id
-    WHERE 1=1
+    WHERE
+    cmp.status = 2
     <if test="startDate != null" >
     AND cmp.create_time &gt;= #{startDate}
     </if>
@@ -148,7 +145,7 @@
     </if>
     <if test="idList != null" >
     AND cmp.user_id in
-    <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+    <foreach collection="idList" index="index" item="item" open="(" separator="," close=")">
       #{item}
     </foreach>
     </if>
@@ -163,11 +160,13 @@
     DISTINCT
     cmp.id as id, cmp.mesage_title as mesage_title,
     cmr.`status` as status, cmp.create_time as create_time,
-    cmp.message_content as message_content
+    cmp.message_content as message_content,
+    IFNULL(GROUP_CONCAT(cmd.doc_name),'') as docName
     FROM car_message_post cmp
     INNER JOIN car_message_receiver cmr ON cmp.id = cmr.message_id
-    INNER JOIN car_message_doc cmd ON cmd.message_id = cmp.id
-    WHERE 1=1
+    LEFT JOIN car_message_doc cmd ON cmd.message_id = cmp.id
+    WHERE
+    cmp.status = 2
     <if test="startDate != null" >
     AND cmp.create_time &gt;= #{startDate}
     </if>
@@ -175,20 +174,19 @@
     AND cmp.create_time &lt;= #{endDate}
     </if>
     <if test="keyword != null" >
-    AND LOCATE(#{keyword},cmp.mesage_title) &gt; 0
-    </if>
-    <if test="keyword != null" >
-    or LOCATE(#{keyword},cmd.doc_name) &gt; 0
+    AND (LOCATE(#{keyword},cmp.mesage_title) &gt; 0
+    OR LOCATE(#{keyword},cmd.doc_name) &gt; 0)
     </if>
     <if test="idList != null" >
     AND cmp.user_id in
-    <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+    <foreach collection="idList" index="index" item="item" open="(" separator="," close=")">
       #{item}
     </foreach>
     </if>
     <if test="userId != null" >
     AND cmr.receive_user_id = #{userId}
     </if>
+    GROUP BY id,mesage_title,STATUS,create_time,message_content
     LIMIT #{limit} OFFSET #{offset}
   </select>
 
@@ -197,10 +195,13 @@
     DISTINCT
     cmp.id as id, cmp.mesage_title as mesage_title,
     cmr.status as status, cmp.create_time as create_time,
-    cmp.message_content as message_content
+    cmp.message_content as message_content,
+    IFNULL(GROUP_CONCAT(cmd.doc_name),'') as docName
     FROM car_message_post cmp
     INNER JOIN car_message_receiver cmr ON cmp.id = cmr.message_id
-    WHERE 1=1
+    LEFT JOIN car_message_doc cmd ON cmd.message_id = cmp.id
+    WHERE
+    cmp.status = 2
     <if test="startDate != null" >
     AND cmp.create_time &gt;= #{startDate}
     </if>
@@ -212,13 +213,14 @@
     </if>
     <if test="idList != null" >
     AND cmp.user_id in
-    <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+    <foreach collection="idList" index="index" item="item" open="(" separator="," close=")">
       #{item}
     </foreach>
     </if>
     <if test="userId != null" >
     AND cmr.receive_user_id = #{userId}
     </if>
+    GROUP BY id,mesage_title,STATUS,create_time,message_content
     LIMIT #{limit} OFFSET #{offset}
   </select>
 
@@ -227,11 +229,13 @@
     DISTINCT
     cmp.id as id, cmp.mesage_title as mesage_title,
     cmr.status as status, cmp.create_time as create_time,
-    cmp.message_content as message_content
+    cmp.message_content as message_content,
+    IFNULL(GROUP_CONCAT(cmd.doc_name),'') as docName
     FROM car_message_post cmp
     INNER JOIN car_message_receiver cmr ON cmp.id = cmr.message_id
     INNER JOIN car_message_doc cmd ON cmd.message_id = cmp.id
-    WHERE 1=1
+    WHERE
+    cmp.status = 2
     <if test="startDate != null" >
     AND cmp.create_time &gt;= #{startDate}
     </if>
@@ -243,13 +247,14 @@
     </if>
     <if test="idList != null" >
     AND cmp.user_id in
-    <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+    <foreach collection="idList" index="index" item="item" open="(" separator="," close=")">
       #{item}
     </foreach>
     </if>
     <if test="userId != null" >
     AND cmr.receive_user_id = #{userId}
     </if>
+    GROUP BY id,mesage_title,STATUS,create_time,message_content
     LIMIT #{limit} OFFSET #{offset}
   </select>
 
