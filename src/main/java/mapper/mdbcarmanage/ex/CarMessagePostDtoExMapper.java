@@ -20,15 +20,19 @@ public interface CarMessagePostDtoExMapper {
      *
      * @param userId 用户id
      * @param status 状态 1.草稿 2 发布
-     * @param postStatus
-     * @param postUserId
      * @return
      */
     List<CarMessagePostDto> listCarMessagePostBymesageIds(@Param("userId")Integer userId,
-                                                          @Param("status") Integer status,
-                                                          @Param("postStatus")Integer postStatus,
-                                                          @Param("postUserId")Integer postUserId);
+                                                          @Param("status") Integer status);
 
+    /**
+     * 草稿和已发布列表
+     * @param userId
+     * @param status
+     * @return
+     */
+    List<CarMessagePostDto> listDraftOrPublish(@Param("userId")Integer userId,
+                                               @Param("status") Integer status);
 
 
 

@@ -17,7 +17,8 @@
   </sql>
   <select id="listCarMessagePostBymesageIds" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select
-    <include refid="Base_Column_List" />
+    p.id, p.mesage_title, p.message_content, u.user_name,GROUP_CONCAT(d.doc_name) as  doc_name,
+    p.create_time, p.update_time
     FROM car_message_post p LEFT  JOIN car_message_receiver r on p.id = r.message_id LEFT JOIN car_message_doc d on p.id = d.message_id
     INNER JOIN car_adm_user u on  p.user_id = u.user_id
     WHERE  1=1
@@ -26,13 +27,26 @@
     </if>
     <if test="status!=null and status!=''">
       AND r.status = #{status}
+    </if> group BY p.id
+    ORDER BY p.create_time DESC
+  </select>
+
+
+  <select id="listDraftOrPublish" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+    p.id, p.mesage_title, p.message_content, u.user_name,GROUP_CONCAT(d.doc_name) as  doc_name,
+    p.create_time, p.update_time
+    FROM car_message_post p
+    LEFT JOIN car_message_doc d on p.id = d.message_id
+    INNER JOIN car_adm_user u on  p.user_id = u.user_id
+    WHERE  1=1
+
+    <if test="status!=null and status!=''">
+      AND p.status = #{status}
     </if>
-    <if test="postStatus!=null and postStatus!=''">
-      AND p.status = #{postStatus}
-    </if>
-    <if test="postUserId!=null and postUserId!=''">
-      AND p.user_id = #{postUserId}
-    </if>
+    <if test="userId!=null and userId!=''">
+      AND p.user_id = #{userId}
+    </if>  group BY p.id
     ORDER BY p.create_time DESC
   </select>
 </mapper>

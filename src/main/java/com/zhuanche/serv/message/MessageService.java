@@ -120,9 +120,6 @@ public class MessageService {
                            String docUrl,
                            MultipartFile file,
                            HttpServletRequest request) throws MessageException{
-
-         AtomicInteger  resultOpe = new AtomicInteger(0);
-
         try {
             try {
                 CarMessagePost post = new CarMessagePost();
@@ -141,11 +138,9 @@ public class MessageService {
                     post.setCreateTime(new Date());
                     postExMapper.insertSelective(post);
                     messageId = post.getId().intValue();
-                    resultOpe.addAndGet(1);
                 }else {
                     post.setId(messageId.longValue());
                     messageId = postExMapper.updateByPrimaryKeySelective(post);
-                    resultOpe.addAndGet(1);
                 }
 
                 final   Integer newMessageId = messageId;
@@ -196,7 +191,6 @@ public class MessageService {
                                     doc.setState(status);
                                     int code = docExMapper.insert(doc);
                                     if (code > 0 ){
-                                        resultOpe.addAndGet(1);
                                         logger.info("====doc文档上传成功====");
                                     }else {
                                         logger.info("====doc上传文档失败======");
@@ -215,14 +209,7 @@ public class MessageService {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if (resultOpe.get() == 2){
-
                 return 1;
-            }else {
-                logger.info("新建消息异常，数据回滚");
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                throw new RuntimeException();
-            }
         } catch (Exception e) {
             logger.info("新建消息异常" + e.getMessage());
             throw new MessageException(RestErrorCode.UNKNOWN_ERROR,RestErrorCode.renderMsg(RestErrorCode.UNKNOWN_ERROR));
@@ -245,7 +232,7 @@ public class MessageService {
 
              postExMapper.withDraw(Long.valueOf(messageId));
 
-             logger.info("字表删除成功");
+             logger.info("撤回操作成功，messageId:" + messageId);
 
             return 1;
         } catch (Exception e) {
@@ -279,7 +266,7 @@ public class MessageService {
 
 
     /**
-     * 获取
+     * 获取列表
      * @param userId
      * @param status
      * @param pageSize
@@ -295,20 +282,19 @@ public class MessageService {
 
             switch (status){
                 case 1://已收到的消息
-                    dtoList = postDtoExMapper.listCarMessagePostBymesageIds(userId,null,CarMessagePost.Status.publish.getMessageStatus(),null);
+                    dtoList = postDtoExMapper.listCarMessagePostBymesageIds(userId,status);
                     break;
                 case 2://未读的消息
-                    dtoList = postDtoExMapper.listCarMessagePostBymesageIds(userId,status,CarMessagePost.Status.publish.getMessageStatus(),null);
+                    dtoList = postDtoExMapper.listCarMessagePostBymesageIds(userId,status);
                     break;
                 case 3://已发布的消息
-                    dtoList = postDtoExMapper.listCarMessagePostBymesageIds(null,null,CarMessagePost.Status.publish.getMessageStatus(),userId);
+                    dtoList = postDtoExMapper.listDraftOrPublish(userId,CarMessagePost.Status.publish.getMessageStatus());
                     break;
                 case 4://草稿
-                    dtoList = postDtoExMapper.listCarMessagePostBymesageIds(null,null,CarMessagePost.Status.draft.getMessageStatus(),userId);
+                    dtoList = postDtoExMapper.listDraftOrPublish(userId,CarMessagePost.Status.draft.getMessageStatus());
                     break;
                 default:
-                    dtoList = postDtoExMapper.listCarMessagePostBymesageIds(userId,null,CarMessagePost.Status.publish.getMessageStatus(),null);
-
+                    dtoList = postDtoExMapper.listCarMessagePostBymesageIds(userId,status);
             }
 
             int total = (int)page.getTotal();
@@ -358,47 +344,10 @@ public class MessageService {
                     carMessagePost.getMesageTitle(),carMessagePost.getMessageContent(),
                     carMessagePost.getCreateTime(),carMessagePost.getUpdateTime());
 
-            switch (carMessagePost.getLevel()){
-                case Constants.CONTRY:
-                    detailDto.setLevel(CarMessagePost.Level.contry.getName());
-                    break;
-                case Constants.CITY:
-                    detailDto.setLevel(CarMessagePost.Level.city.getName());
-                    detailDto.setCities(this.getCityNames(carMessagePost.getCities()));
-                    break;
-                case Constants.SUPPY:
-                    detailDto.setLevel(CarMessagePost.Level.suppy.getName());
-                    detailDto.setSuppliers(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
-                    break;
-                case Constants.CITYANDSUPPY:
-                    detailDto.setLevel(CarMessagePost.Level.cityAndSuppy.getName());
-                    detailDto.setCities(this.getCityNames(carMessagePost.getCities()));
-                    detailDto.setSuppliers(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
-                    break;
-                case Constants.TEAM:
-                    detailDto.setLevel(CarMessagePost.Level.team.getName());
-                    detailDto.setTeamids(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
-                    break;
-                case Constants.CITYANDTEAM:
-                    detailDto.setLevel(CarMessagePost.Level.cityAndTeam.getName());
-                    detailDto.setCities(this.getCityNames(carMessagePost.getCities()));
-                    detailDto.setTeamids(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
-                    break;
-                case Constants.SUPPYANDTEAM:
-                    detailDto.setLevel(CarMessagePost.Level.suppyAndTeam.getName());
-                    detailDto.setSuppliers(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
-                    detailDto.setTeamids(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
-                    break;
-                case Constants.CITYANDSUPPYANDTEAM:
-                    detailDto.setLevel(CarMessagePost.Level.cityAndSuppyAndTeam.getName());
-                    detailDto.setCities(this.getCityNames(carMessagePost.getCities()));
-                    detailDto.setSuppliers(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
-                    detailDto.setTeamids(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
-                    break;
-                default:
-                    detailDto.setLevel(CarMessagePost.Level.contry.getName());
-
-            }
+            detailDto.setLevel(carMessagePost.getLevel().toString());
+            detailDto.setCities(carMessagePost.getCities());
+            detailDto.setSuppliers(carMessagePost.getSuppliers());
+            detailDto.setTeamids(carMessagePost.getTeamids());
 
             //已读
             List<CarMessageReceiver> list = receiverExMapper.carMessageReceiverList(messaageId,null,CarMessageReceiver.ReadStatus.read.getValue());

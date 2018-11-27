@@ -31,7 +31,7 @@
 
   <update id="withDraw" parameterType="java.lang.Long" >
     update car_message_post
-    set status = #{status,jdbcType=INTEGER}
+    set status = 1
     where id = #{id,jdbcType=BIGINT}
   </update>
 

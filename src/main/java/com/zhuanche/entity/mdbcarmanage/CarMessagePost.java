@@ -118,7 +118,7 @@ public class CarMessagePost{
     }
 
     public void setMesageTitle(String mesageTitle) {
-        this.mesageTitle = mesageTitle == null ? null : mesageTitle.trim();
+        this.mesageTitle = mesageTitle;
     }
 
     public String getMessageContent() {
