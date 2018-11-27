@@ -594,6 +594,7 @@ public class MessageService {
                 // 文件存放服务端的位置
                 String rootPath = this.getRemoteFileDir();
                 File filePath = new File(rootPath);
+
                 logger.info("文件路径:" +rootPath);
                 if (!filePath.exists())
                     filePath.mkdirs();
@@ -603,7 +604,7 @@ public class MessageService {
                 file.transferTo(serverFile);
                 logger.info("消息附件上传地址：" + absoluteUrl);
                 map.put("ok",true);
-                map.put("fileUrl",FtpConstants.URL+absoluteUrl);
+                map.put("fileUrl",absoluteUrl);
                 map.put("fileName",file.getOriginalFilename());
             } catch (Exception e) {
                 logger.info("文件上传失败");
@@ -616,7 +617,8 @@ public class MessageService {
 
     private String getRemoteFileDir() {
         StringBuilder sb = new StringBuilder();
-        sb.append(File.separator).append("u01").append(File.separator).append("upload").append(File.separator);
+        sb.append(File.separator).append("u01").append(File.separator).append("upload").append(File.separator).append("message")
+        .append(File.separator);
         return sb.toString();
     }
 
