@@ -48,6 +48,4 @@
     <import resource="applicationContext-redis-driver.xml"/>
     <!--块钱的服务-->
     <import resource="applicationContext-kuaiqian.xml"/>
-    <!--ftp服务器-->
-    <import resource="applicationContext-ftp-bigdata.xml"/>
 </beans>

@@ -19,8 +19,8 @@ public class CarMessageReceiver {
 
     public enum  ReadStatus{
 
-        unRead(1), //未读
-        read(2);   //已读
+        read(1), //已读
+        unRead(2);   //未读
         private int value;
 
         ReadStatus(int value) {

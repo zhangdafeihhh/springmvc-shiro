@@ -23,12 +23,20 @@ public class CarMessageDetailDto {
     private Integer status;
     /**级别1；全国权限2；城市权限4；加盟商权限8；车队权限16；可以多个组合**/
     private String level;
+    /**等级名称**/
+    private String levelName;
     /**城市id，多个逗号分隔**/
     private String cities;
+    /**城市名称**/
+    private String citiesName;
     /**加盟商id，中间逗号分隔**/
     private String suppliers;
+    /**加盟商名称**/
+    private String suppliersName;
     /**teamIds 车队id，多个 的话逗号分隔**/
     private String teamids;
+    /**车队名称**/
+    private String teamidsName;
     /**创建时间*/
     private Date createTime;
     /**更新时间**/
@@ -163,6 +171,39 @@ public class CarMessageDetailDto {
         this.phone = phone;
     }
 
+
+    public String getLevelName() {
+        return levelName;
+    }
+
+    public void setLevelName(String levelName) {
+        this.levelName = levelName;
+    }
+
+    public String getCitiesName() {
+        return citiesName;
+    }
+
+    public void setCitiesName(String citiesName) {
+        this.citiesName = citiesName;
+    }
+
+    public String getSuppliersName() {
+        return suppliersName;
+    }
+
+    public void setSuppliersName(String suppliersName) {
+        this.suppliersName = suppliersName;
+    }
+
+    public String getTeamidsName() {
+        return teamidsName;
+    }
+
+    public void setTeamidsName(String teamidsName) {
+        this.teamidsName = teamidsName;
+    }
+
     @Override
     public String toString() {
         return "CarMessageDetailDto{" +
@@ -172,11 +213,16 @@ public class CarMessageDetailDto {
                 ", createUser='" + createUser + '\'' +
                 ", status=" + status +
                 ", level='" + level + '\'' +
+                ", levelName='" + levelName + '\'' +
                 ", cities='" + cities + '\'' +
+                ", citiesName='" + citiesName + '\'' +
                 ", suppliers='" + suppliers + '\'' +
+                ", suppliersName='" + suppliersName + '\'' +
                 ", teamids='" + teamids + '\'' +
+                ", teamidsName='" + teamidsName + '\'' +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +
+                ", phone='" + phone + '\'' +
                 ", readRecord=" + readRecord +
                 ", messageDocDto=" + messageDocDto +
                 '}';
