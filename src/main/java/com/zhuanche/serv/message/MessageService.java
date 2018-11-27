@@ -37,6 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -176,18 +177,20 @@ public class MessageService {
                             for (Map.Entry<String,MultipartFile> entry: map.entrySet()){
                                 multipartFile = entry.getValue();
 
-                                Map<String,Object> result = this.upload(multipartFile);
-                                Boolean ok = (Boolean) result.get("ok");
+                                Map<String,Object> mapResult = this.fileUpload(multipartFile);
+                               // Map<String,Object> result = this.upload(multipartFile);
+                                Boolean ok = (Boolean) mapResult.get("ok");
                                 if (ok== null || !ok){
                                     logger.error("消息中心-上传附件-异常");
 
                                 }else {
                                     CarMessageDoc doc = new CarMessageDoc();
-                                    doc.setDocName(result.get("fileName").toString());
+                                    doc.setDocName(mapResult.get("fileName").toString());
                                     doc.setCreateTime(new Date());
                                     doc.setMessageId(messageId);
                                     doc.setUpdateTime(new Date());
-                                    doc.setDocUrl(FtpConstants.FTP+FtpConstants.FTPURL+":"+FtpConstants.FTPPORT + result.get("oppositeUrl").toString());
+                                    doc.setDocUrl(mapResult.get("fileUrl").toString());
+                                    // doc.setDocUrl(FtpConstants.FTP+FtpConstants.FTPURL+":"+FtpConstants.FTPPORT + result.get("oppositeUrl").toString());
                                     doc.setState(status);
                                     int code = docExMapper.insert(doc);
                                     if (code > 0 ){
@@ -578,9 +581,42 @@ public class MessageService {
         return  resultMap;
     }
 
+
+
+
+    public Map<String,Object> fileUpload(MultipartFile file){
+        Map<String,Object> map = new HashMap<>();
+        if (!file.isEmpty()) {
+            try {
+                String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+                String uuid = UUID.randomUUID().toString();
+                String timeStamp = System.currentTimeMillis() + "";
+                // 文件存放服务端的位置
+                String rootPath = this.getRemoteFileDir();
+                File filePath = new File(rootPath);
+                logger.info("文件路径:" +rootPath);
+                if (!filePath.exists())
+                    filePath.mkdirs();
+                // 写文件到服务器
+                String  absoluteUrl = rootPath + uuid + "_" + timeStamp + "." + extension;
+                File serverFile = new File(absoluteUrl);
+                file.transferTo(serverFile);
+                logger.info("消息附件上传地址：" + absoluteUrl);
+                map.put("ok",true);
+                map.put("fileUrl",FtpConstants.URL+absoluteUrl);
+                map.put("fileName",file.getOriginalFilename());
+            } catch (Exception e) {
+                logger.info("文件上传失败");
+            }
+        } else {
+            logger.info("文件上传失败");
+        }
+        return map;
+    }
+
     private String getRemoteFileDir() {
         StringBuilder sb = new StringBuilder();
-        sb.append("/u01").append("/upload/");
+        sb.append(File.separator).append("u01").append(File.separator).append("upload").append(File.separator);
         return sb.toString();
     }
 
