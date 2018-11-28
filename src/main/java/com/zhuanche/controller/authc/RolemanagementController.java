@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -101,7 +102,7 @@ public class RolemanagementController{
 	
 	/**八、查询角色列表**/
 	@RequestMapping("/queryRoleList")
-//	@RequiresPermissions(value = { "QUERY_SAAS_ROLE_LIST" } )
+	@RequiresPermissions(value = { "RoleManages_look" } )
 	public AjaxResponse queryRoleList( 
 			@Verify(param="page",rule="required|min(1)") Integer page, 
 			@Verify(param="pageSize",rule="required|min(10)") Integer pageSize,  

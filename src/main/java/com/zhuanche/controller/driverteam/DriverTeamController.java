@@ -15,6 +15,7 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,7 @@ public class DriverTeamController{
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/queryDriverTeamList")
+	@RequiresPermissions(value = { "TeamManage_look" } )
 	public AjaxResponse queryDriverTeamList(DriverTeamRequest param){
 		logger.info("查询车队列表入参:"+ JSON.toJSONString(param));
 		SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();

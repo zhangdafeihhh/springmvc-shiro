@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,6 +123,7 @@ public class OrderController{
 	 */
 	 @ResponseBody
 	 @RequestMapping(value = "/queryOrderList", method = { RequestMethod.POST,RequestMethod.GET })
+	 @RequiresPermissions(value = { "OrderList_look" } )
 	 public AjaxResponse queryOrderList(
 			 								   String serviceId,
 			 								   String airportIdnot,

@@ -3,6 +3,7 @@ package com.zhuanche.controller.driverjoin;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +64,7 @@ public class DriverVerifyController {
 	 * @return
 	 */
 	@RequestMapping("/queryDriverVerifyData")
+	@RequiresPermissions(value = { "DriverInvite_look" } )
 	@ResponseBody
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )

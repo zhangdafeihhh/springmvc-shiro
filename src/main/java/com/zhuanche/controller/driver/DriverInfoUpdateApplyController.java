@@ -28,6 +28,8 @@ import com.zhuanche.util.Check;
 import com.zhuanche.util.ValidateUtils;
 import mapper.mdbcarmanage.ex.CarRelateTeamExMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +85,7 @@ public class DriverInfoUpdateApplyController {
      */
     @ResponseBody
     @RequestMapping(value = "/findDriverInfoUpdateList")
+	@RequiresPermissions(value = { "FranchiserDriverChange_look" , "SupplierCarModifyApply_look" } ,logical=Logical.OR )
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })

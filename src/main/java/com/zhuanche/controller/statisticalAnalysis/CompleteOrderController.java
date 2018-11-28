@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.zhuanche.controller.driver.Componment;
 import com.zhuanche.dto.rentcar.CompleteOrderDTO;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,7 @@ public class CompleteOrderController{
 	     */
 		@ResponseBody
 	    @RequestMapping(value = "/queryCompleteOrdeData", method = { RequestMethod.POST,RequestMethod.GET })
+		@RequiresPermissions(value = { "CompleteOrderDetail_look" } )
 	    public AjaxResponse queryCompleteOrderData(
 	    										  @Verify(param = "queryDate",rule = "required") String queryDate,
 	    										  Long cityId,

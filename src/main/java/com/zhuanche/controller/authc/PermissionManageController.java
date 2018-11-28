@@ -2,6 +2,7 @@ package com.zhuanche.controller.authc;
 
 import java.util.List;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -75,7 +76,7 @@ public class PermissionManageController {
 
 	/**五、查询所有的权限信息（返回的数据格式：列表、树形）**/
 	@RequestMapping("getAllSaasPermissionsInfo")
-//	@RequiresPermissions(value = { "GET_ALL_SAAS_PERMISSIONS_INFO" } )
+	@RequiresPermissions(value = { "CammelCase_look" } )
 	public AjaxResponse getAllSaasPermissionsInfo( String dataFormat ){
 		if( !SaasConst.PermissionDataFormat.TREE.equalsIgnoreCase(dataFormat) && !SaasConst.PermissionDataFormat.LIST.equalsIgnoreCase(dataFormat) ) {
 			dataFormat = SaasConst.PermissionDataFormat.TREE;//默认为树形

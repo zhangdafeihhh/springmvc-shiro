@@ -31,6 +31,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -345,6 +346,7 @@ public class DriverMonthDutyController {
     */ 
     @ResponseBody
     @RequestMapping(value = "/queryDriverMonthDutyData")
+	@RequiresPermissions(value = { "DriverWorkManage_look" } )
     public AjaxResponse queryDriverMonthDutyData(DriverMonthDutyRequest param) {
         logger.info("查询月排班列表数据入参:"+JSON.toJSONString(param));
         if(Check.NuNStr(param.getMonitorDate())){

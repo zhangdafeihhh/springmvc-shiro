@@ -23,6 +23,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.excel.ExportExcelUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +71,7 @@ public class CarInfoTemporaryController extends BaseController {
      */
 	@ResponseBody
 	@RequestMapping(value = "/queryCarData", method =  RequestMethod.GET )
+	@RequiresPermissions(value = { "SupplierCarEntry_look" } )
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE ),
 			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE)

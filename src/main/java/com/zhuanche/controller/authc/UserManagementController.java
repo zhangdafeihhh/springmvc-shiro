@@ -3,17 +3,18 @@ package com.zhuanche.controller.authc;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.serv.CarBizDriverInfoService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
+import com.zhuanche.serv.CarBizDriverInfoService;
 import com.zhuanche.serv.authc.UserManagementService;
 
 /**用户管理**/
@@ -130,7 +131,7 @@ public class UserManagementController {
 	
 	/**八、查询用户列表**/
 	@RequestMapping("/queryUserList")
-//	@RequiresPermissions(value = { "QUERY_USER_LIST" } )
+	@RequiresPermissions(value = { "UserManages_look" } )
 	public AjaxResponse queryUserList( 
 			@Verify(param="page",rule="required|min(1)") Integer page, 
 			@Verify(param="pageSize",rule="required|min(10)") Integer pageSize,  

@@ -30,6 +30,7 @@ import com.zhuanche.util.excel.CsvUtils;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,6 +100,7 @@ public class DriverInfoController {
      */
     @ResponseBody
     @RequestMapping(value = "/findDriverList")
+	@RequiresPermissions(value = { "DriverinfoManage_look" } )
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
