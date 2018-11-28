@@ -81,7 +81,8 @@ public class MessageManagerController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
     })
-    public AjaxResponse postMessage(@RequestParam(value = "status",required = true) Integer status,
+    public AjaxResponse postMessage(@RequestParam(value = "messageId",required = true)Integer messageId,
+                                    @RequestParam(value = "status",required = true) Integer status,
                                     //@Verify(param = "status",rule = "required") Integer status,
                                     @RequestParam(value = "creater",required = false) String creater,
                                     @RequestParam(value = "messageTitle",required = false) String messageTitle,
@@ -96,9 +97,9 @@ public class MessageManagerController {
                                     HttpServletRequest request){
 
         logger.info(MessageFormat.format("postMessage入参：status:{0},creater:{1},messageTitle:{2},messageContent:{3}," +
-                "level:{4},cities:{5},suppliers:{6},teamId{7},docName:{8},docUrl:{9}",
+                "level:{4},cities:{5},suppliers:{6},teamId{7},docName:{8},docUrl:{9},messageId:{10}",
                 String.valueOf(status),creater,messageTitle,messageContent,String.valueOf(level),cities,
-                suppliers,teamId,docName,docUrl));
+                suppliers,teamId,docName,docUrl,messageId));
 
         if (StringUtils.isBlank(creater) || StringUtils.isBlank(String.valueOf(status)) ){
             logger.info("消息为发布状态，必传参数为空");
@@ -115,7 +116,7 @@ public class MessageManagerController {
 
         AjaxResponse response = AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
         try {
-            int code = messageService.postMessage(null,status, Integer.valueOf(creater), messageTitle, messageContent, level, cities, suppliers, teamId, docName, docUrl,
+            int code = messageService.postMessage(messageId,status, Integer.valueOf(creater), messageTitle, messageContent, level, cities, suppliers, teamId, docName, docUrl,
                     file,request);
 
             if (code > 0){

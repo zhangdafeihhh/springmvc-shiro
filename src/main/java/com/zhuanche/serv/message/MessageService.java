@@ -141,7 +141,7 @@ public class MessageService {
                     messageId = post.getId().intValue();
                 }else {
                     post.setId(messageId.longValue());
-                    messageId = postExMapper.updateByPrimaryKeySelective(post);
+                    postExMapper.updateByPrimaryKeySelective(post);
                 }
 
                 final   Integer newMessageId = messageId;
