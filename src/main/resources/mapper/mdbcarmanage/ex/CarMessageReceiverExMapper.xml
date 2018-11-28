@@ -14,6 +14,7 @@
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="mesage_title" property="mesageTitle" jdbcType="VARCHAR" />
     <result column="message_content" property="messageContent" jdbcType="VARCHAR" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
@@ -157,13 +158,14 @@
 
   <select id="queryALlData" resultMap="MessageResultMap" >
     SELECT
-    DISTINCT
+    cdu.user_name as user_name,
     cmp.id as id, cmp.mesage_title as mesage_title,
     cmr.`status` as status, cmp.create_time as create_time,
     cmp.message_content as message_content,
     IFNULL(GROUP_CONCAT(cmd.doc_name),'') as docName
     FROM car_message_post cmp
     INNER JOIN car_message_receiver cmr ON cmp.id = cmr.message_id
+    INNER JOIN car_adm_user cdu ON cmp.user_id = cdu.user_id
     LEFT JOIN car_message_doc cmd ON cmd.message_id = cmp.id
     WHERE
     cmp.status = 2
@@ -192,13 +194,14 @@
 
   <select id="queryDataInTitle" resultMap="MessageResultMap" >
     SELECT
-    DISTINCT
+    cdu.user_name as user_name,
     cmp.id as id, cmp.mesage_title as mesage_title,
     cmr.status as status, cmp.create_time as create_time,
     cmp.message_content as message_content,
     IFNULL(GROUP_CONCAT(cmd.doc_name),'') as docName
     FROM car_message_post cmp
     INNER JOIN car_message_receiver cmr ON cmp.id = cmr.message_id
+    INNER JOIN car_adm_user cdu ON cmp.user_id = cdu.user_id
     LEFT JOIN car_message_doc cmd ON cmd.message_id = cmp.id
     WHERE
     cmp.status = 2
@@ -226,7 +229,7 @@
 
   <select id="queryDataInAttachment" resultMap="MessageResultMap" >
     SELECT
-    DISTINCT
+    cdu.user_name as user_name,
     cmp.id as id, cmp.mesage_title as mesage_title,
     cmr.status as status, cmp.create_time as create_time,
     cmp.message_content as message_content,
@@ -234,6 +237,7 @@
     FROM car_message_post cmp
     INNER JOIN car_message_receiver cmr ON cmp.id = cmr.message_id
     INNER JOIN car_message_doc cmd ON cmd.message_id = cmp.id
+    INNER JOIN car_adm_user cdu ON cmp.user_id = cdu.user_id
     WHERE
     cmp.status = 2
     <if test="startDate != null" >
