@@ -81,7 +81,7 @@ public class MessageManagerController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
     })
-    public AjaxResponse postMessage(@RequestParam(value = "messageId",required = true)Integer messageId,
+    public AjaxResponse postMessage(@RequestParam(value = "messageId",required = false)Integer messageId,
                                     @RequestParam(value = "status",required = true) Integer status,
                                     @RequestParam(value = "creater",required = false) String creater,
                                     @RequestParam(value = "messageTitle",required = false) String messageTitle,
