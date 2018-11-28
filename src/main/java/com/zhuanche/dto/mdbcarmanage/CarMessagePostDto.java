@@ -25,7 +25,7 @@ public class CarMessagePostDto {
     private Date createTime;
     /**更新时间**/
     private Date updateTime;
-    /**通知状态**/
+    /**通知状态 已读未读**/
     private Integer status;
 
 
