@@ -391,8 +391,16 @@ public class MessageService {
                     detailDto.setLevelName(CarMessagePost.Level.city.getName());
                     detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
                     break;
+                case Constants.CONTRYANDCITY:
+                    detailDto.setLevelName(CarMessagePost.Level.contryAndCity.getName());
+                    detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
+                    break;
                 case Constants.SUPPY:
                     detailDto.setLevelName(CarMessagePost.Level.suppy.getName());
+                    detailDto.setSuppliersName(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
+                    break;
+                case Constants.CONTRYANDSUPPY:
+                    detailDto.setLevelName(CarMessagePost.Level.contryAndSuppy.getName());
                     detailDto.setSuppliersName(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
                     break;
                 case Constants.CITYANDSUPPY:
@@ -400,12 +408,26 @@ public class MessageService {
                     detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
                     detailDto.setSuppliersName(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
                     break;
+                case Constants.CONTRYANDCITYANDSUPPY:
+                    detailDto.setLevelName(CarMessagePost.Level.contryAndCityAndSuppy.getName());
+                    detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
+                    detailDto.setSuppliersName(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
+                    break;
                 case Constants.TEAM:
                     detailDto.setLevelName(CarMessagePost.Level.team.getName());
                     detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
                     break;
+                case Constants.CONTRYANDTEAM:
+                    detailDto.setLevelName(CarMessagePost.Level.contryAndTeam.getName());
+                    detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
+                    break;
                 case Constants.CITYANDTEAM:
                     detailDto.setLevelName(CarMessagePost.Level.cityAndTeam.getName());
+                    detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
+                    detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
+                    break;
+                case Constants.CONTRYANDCITYANDTEAM:
+                    detailDto.setLevelName(CarMessagePost.Level.contryAndCityAndTeam.getName());
                     detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
                     detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
                     break;
@@ -414,8 +436,19 @@ public class MessageService {
                     detailDto.setSuppliersName(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
                     detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
                     break;
+                case Constants.CONTRYANDSUPPYANDTEAM:
+                    detailDto.setLevelName(CarMessagePost.Level.contryAndSuppyAndTeam.getName());
+                    detailDto.setSuppliersName(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
+                    detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
+                    break;
                 case Constants.CITYANDSUPPYANDTEAM:
                     detailDto.setLevelName(CarMessagePost.Level.cityAndSuppyAndTeam.getName());
+                    detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
+                    detailDto.setSuppliersName(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
+                    detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
+                    break;
+                case Constants.CONTRYANDCITYANDSUPPYANDTEAM:
+                    detailDto.setLevelName(CarMessagePost.Level.counryAndCityAndSuppyAndTeam.getName());
                     detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
                     detailDto.setSuppliersName(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
                     detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));

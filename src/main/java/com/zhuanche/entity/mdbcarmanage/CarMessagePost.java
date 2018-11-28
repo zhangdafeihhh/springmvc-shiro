@@ -63,12 +63,21 @@ public class CarMessagePost{
 
         contry(1,"全国"), //全国
         city(2,"城市"),   //城市
+        contryAndCity(3,"全国 城市"),//
         suppy(4,"加盟商"),  //加盟商
+        contryAndSuppy(5,"全国 加盟商"),
         cityAndSuppy(6,"城市 加盟商"),//城市+加盟商
+        contryAndCityAndSuppy(7,"全国 城市 加盟商"),
         team(8,"车队"),   //车队
+        contryAndTeam(9,"全国 车队"),
         cityAndTeam(10,"城市 车队"), //城市+车队
-        suppyAndTeam(10,"加盟商 车队"), //加盟商+车队
-        cityAndSuppyAndTeam(14,"城市 加盟商 车队");//城市+加盟商+车队
+        contryAndCityAndTeam(11,"全国 城市 车队"),
+        suppyAndTeam(12,"加盟商 车队"), //加盟商+车队
+        contryAndSuppyAndTeam(13,"全国 加盟商 车队"),
+        cityAndSuppyAndTeam(14,"城市 加盟商 车队"),//城市+加盟商+车队
+        counryAndCityAndSuppyAndTeam(15,"城市 加盟商 车队");//城市+加盟商+车队
+
+
 
 
         private Integer level;
