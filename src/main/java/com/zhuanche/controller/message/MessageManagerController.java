@@ -360,7 +360,7 @@ public class MessageManagerController {
         if (StringUtils.isEmpty(range)){
             range = Constants.ALL_RANGE;
         }else {
-            if (!range.equals(Constants.TITLE)&&!range.equals(Constants.ATTACHMENT)){
+            if (!range.equals(Constants.TITLE) && !range.equals(Constants.ATTACHMENT) && !range.equals(Constants.ALL_RANGE)){
                 return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR, "range is invalid");
             }
         }
