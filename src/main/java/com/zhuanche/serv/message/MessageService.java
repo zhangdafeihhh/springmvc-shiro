@@ -634,7 +634,10 @@ public class MessageService {
         int count = 0;
         Date start = (startDate != null) ? DateUtil.parseDate(startDate, Constants.DATE_FORMAT) : null;
         Date end = endDate != null ? DateUtil.parseDate(endDate, Constants.DATE_FORMAT) : null ;
-        List<CarMessagePostDto> data = null;
+        List<CarMessagePostDto> data = new ArrayList<>();
+        if (idList != null && idList.size() == 0){
+            return new PageDTO(pageNum, pageSize, count, data);
+        }
         if (split.length > 1) {
             count = receiverExMapper.queryAllCount(keyword ,
                     start,
