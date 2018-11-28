@@ -1,4 +1,4 @@
-package com.zhuanche.common.busManage;
+package com.zhuanche.constants.busManage;
 
 /**
  * @program: mp-manage
@@ -55,6 +55,23 @@ public enum EnumFuel{
         for (EnumFuel fuel:EnumFuel.values()) {
             if(fuel.code.equals(code)){
                 return fuel.name;
+            }
+        }
+        return null;
+    }
+
+    public static boolean codeIfExist(String code){
+        for (EnumFuel fuel:EnumFuel.values()) {
+            if(fuel.code.equals(code)){
+                return true;
+            }
+        }
+        return false;
+    }
+    public static String getFuelCodeByName(String name){
+        for (EnumFuel fuel:EnumFuel.values()) {
+            if(fuel.name.equals(name)){
+                return fuel.code;
             }
         }
         return null;

@@ -2,25 +2,59 @@ package com.zhuanche.controller.busManage;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
-import com.zhuanche.common.busManage.EnumFuel;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.constants.busManage.BusConstant.CarConstant;
+import com.zhuanche.constants.busManage.EnumFuel;
 import com.zhuanche.dto.rentcar.BusInfoDTO;
-import com.zhuanche.entity.rentcar.CarBizCarInfo;
+import com.zhuanche.entity.rentcar.BusCarInfo;
+import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.serv.CarBizCarGroupService;
+import com.zhuanche.serv.CarBizCityService;
+import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.busManage.BusInfoService;
-import com.zhuanche.shiro.constants.BusConstant;
+import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.DateUtils;
+import com.zhuanche.util.excel.CsvUtils;
+import com.zhuanche.util.excel.ExportExcelUtil;
 import com.zhuanche.vo.rentcar.BusDetailVO;
 import com.zhuanche.vo.rentcar.BusInfoVO;
+import com.zhuanche.vo.rentcar.ErrorReason;
+import com.zhuanche.vo.rentcar.ImportErrorVO;
+import org.apache.commons.lang.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.InputStream;
+import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 
 /**
  * @program: mp-manage
@@ -37,6 +71,10 @@ public class BusInfoController {
     private BusInfoService busInfoService;
     @Autowired
     private CarBizCarGroupService groupService;
+    @Autowired
+    private CarBizSupplierService supplierService;
+    @Autowired
+    private CarBizCityService cityService;
 
     /**
      * @Description:查询巴士车辆列表
@@ -45,6 +83,9 @@ public class BusInfoController {
      * @Date: 2018/11/23
      */
     @RequestMapping(value = "/queryList", method = RequestMethod.POST)
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     public AjaxResponse queryList(BusInfoDTO busDTO) {
         //从session中获取权限
         busDTO.setCityIds(WebSessionUtil.getCurrentLoginUser().getCityIds());
@@ -61,6 +102,9 @@ public class BusInfoController {
      * @Date: 2018/11/23
      */
     @RequestMapping(value = "/getDetail", method = RequestMethod.GET)
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     public AjaxResponse getDetail(@Verify(param = "carId", rule = "required") Integer carId) {
         logger.info(LOG_PRE + "查询车辆详情参数carId=" + carId);
         BusDetailVO detail = busInfoService.getDetail(carId);
@@ -76,14 +120,14 @@ public class BusInfoController {
     @RequestMapping(value = "/saveCar", method = RequestMethod.POST)
     public AjaxResponse saveCar(@Verify(param = "carId", rule = "") Integer carId, @Verify(param = "cityId", rule = "") Integer cityId,
                                 @Verify(param = "supplierId", rule = "") Integer supplierId,
-                                @Verify(param = "licensePlates", rule = "request") String licensePlates,
-                                @Verify(param = "groupId", rule = "request") Integer groupId,
-                                @Verify(param = "vehicleBrand", rule = "request") String vehicleBrand,
-                                @Verify(param = "modelDetail", rule = "request") String modelDetail,
-                                @Verify(param = "color", rule = "request") String color,
-                                @Verify(param = "fuelType", rule = "request") String fuelType,
-                                @Verify(param = "transportNumber", rule = "request") String transportNumber,
-                                @Verify(param = "status", rule = "request|min(0)|max(1)") Integer status) {
+                                @Verify(param = "licensePlates", rule = "required") String licensePlates,
+                                @Verify(param = "groupId", rule = "required") Integer groupId,
+                                @Verify(param = "vehicleBrand", rule = "required") String vehicleBrand,
+                                @Verify(param = "modelDetail", rule = "") String modelDetail,
+                                @Verify(param = "color", rule = "required") String color,
+                                @Verify(param = "fuelType", rule = "required") String fuelType,
+                                @Verify(param = "transportNumber", rule = "required") String transportNumber,
+                                @Verify(param = "status", rule = "required") Integer status) {
 
         boolean checkResult = busInfoService.licensePlatesIfExist(licensePlates);
         if (checkResult && carId == null) {
@@ -91,20 +135,20 @@ public class BusInfoController {
         }
         if (checkResult && carId != null) {
             String licensePlatesOld = busInfoService.getLicensePlatesByCarId(carId);
-            if(!licensePlatesOld.equals(licensePlates)){
+            if (!licensePlatesOld.equals(licensePlates)) {
                 return AjaxResponse.fail(RestErrorCode.LICENSE_PLATES_EXIST);
             }
         }
-        if(EnumFuel.getFuelNameByCode(fuelType)==null){
-            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID,"燃料类型不存在");
+        if (EnumFuel.getFuelNameByCode(fuelType) == null) {
+            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "燃料类型不存在");
         }
         //判断服务类型是否存在
         boolean checkoutGroup = groupService.groupIfExist(groupId);
-        if(!checkoutGroup) {
-            return AjaxResponse.success("服务类型有误");
+        if (!checkoutGroup) {
+            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "服务类型有误");
         }
         //封装保存的参数
-        CarBizCarInfo carInfo = new CarBizCarInfo();
+        BusCarInfo carInfo = new BusCarInfo();
         carInfo.setCarId(carId);
         carInfo.setLicensePlates(licensePlates);
         carInfo.setCityId(cityId);
@@ -112,81 +156,399 @@ public class BusInfoController {
         carInfo.setGroupId(groupId);
         carInfo.setVehicleBrand(vehicleBrand);
         carInfo.setModelDetail(modelDetail);
+        carInfo.setCarModelId(0);//因为不填写车型所以默认为0
         carInfo.setColor(color);
-        //有问题和数据库不匹配
-        carInfo.setFuelType(Integer.parseInt(fuelType));
-        carInfo.setTransportNumber(transportNumber);
+        carInfo.setFueltype(fuelType);
+        carInfo.setTransportnumber(transportNumber);
         carInfo.setStatus(status);
-        Integer userId = WebSessionUtil.getCurrentLoginUser().getId();
-        carInfo.setCreateBy(userId);
+
+        //所属车主字段，默认供应商名称
+        String supplierName = supplierService.getSupplierNameById(carInfo.getSupplierId());
+        //Vehicle_owner
+        carInfo.setVehicleOwner(supplierName);
+        SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+        Integer userId = currentLoginUser.getId();
         carInfo.setUpdateBy(userId);
-        //=====================将巴士不需要的字段设置为默认值 或者空=================
-        carInfo.setVehicleType(BusConstant.);
+        carInfo.setUpdateDate(new Date());
+        int saveResult = 0;
+        if (carId == null) {
+            carInfo.setCreateBy(userId);
+            carInfo.setCreateDate(new Date());
+            //保存车辆信息
+            logger.info(LOG_PRE + " 新增车辆" + JSON.toJSONString(carInfo));
+            saveResult = busInfoService.saveCar(carInfo);
+        } else {
+            //更新车辆信息
+            logger.info(LOG_PRE + currentLoginUser.getName() + " 修改车辆信息" + JSON.toJSONString(carInfo));
+            //TODO 查询修改之前的信息，并记录日志
+            saveResult = busInfoService.updateCarById(carInfo);
+        }
+        if (saveResult > 0) {
+            logger.info(LOG_PRE + currentLoginUser.getName() + "操作成功");
+            return AjaxResponse.success(null);
+        } else {
+            logger.info(LOG_PRE + currentLoginUser.getName() + "操作失败");
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+        }
+    }
 
-        /**
-         * 车辆类型（以机动车行驶证为主）
-         */
-        String vehicle_type = "car54856656";
-        /**
-         * 车辆注册日期
-         */
-        String vehicle_registration_date="2012-5-10";
-        /**
-         * 网络预约出租汽车运输证发证机构
-         */
-        String certificationAuthority = "道路运输管理局";
-        /**
-         * 经营区域
-         */
-        String operatingRegion = "全国";
-        /**
-         * 网络预约出租汽车运输证有效期起
-         */
-        String transportNumberDateStart ="2016-6-1";
-        /**
-         * 网络预约出租汽车运输证有效期止
-         */
-        String transportNumberDateEnd = "2026-6-1";
-        /**
-         * 网约车初次登记日期
-         */
-        String firstDate = "2016-6-1";
-        /**
-         * 车辆检修状态（合格）
-         */
-        int overhaulStatus = 1;
-        /**
-         * 年度审验状态（合格）
-         */
-        int auditingStatus = 1;
-        /**
-         * 车辆年度审验日期
-         */
-        String auditing_date = "2016-6-1";
-        /**
-         * 网约车发票打印设备序列号
-         */
-        String equipmentNumber = "asf54asd8564688";
-        /**
-         * 卫星定位装置品牌
-         */
-        String gpsBrand = "brand";
-        /**
-         * 卫星定位装置型号
-         */
-        String gpsType = "vasmd";
-        /**
-         * 卫星定位装置IMEI号
-         */
-        String gps_imei ="imeiv2015";
-        /**
-         * 卫星定位装置安装日期
-         */
-        String gpsDate = "2016-6-1";
+    /**
+     * @Description: 导出车辆信息
+     * @Param: [busDTO, request, response]
+     * @return: void
+     * @Date: 2018/11/28
+     */
+    @RequestMapping("/exportBusInfo")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
+    public void exportCarInfo(BusInfoDTO busDTO, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        //从session中获取权限
+        SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+        busDTO.setCityIds(user.getCityIds());
+        busDTO.setSupplierIds(user.getSupplierIds());
+        logger.info(LOG_PRE + "下载车辆信息参数=" + JSON.toJSONString(busDTO));
+        PageInfo<BusInfoVO> pageInfo = busInfoService.queryList(busDTO);
+        //文件标题
+        List<String> headerList = new ArrayList<>();
+        headerList.add(CarConstant.EXPORT_HEAD);
+        String fileName = "巴士信息" + com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern) + ".csv";
+        String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
+        if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO") > 0 && agent.indexOf("RV:11") > 0)) {  //IE浏览器和Edge浏览器
+            fileName = URLEncoder.encode(fileName, "UTF-8");
+        } else {  //其他浏览器
+            fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+        }
+        List<String> csvDataList = new ArrayList<>();
+        CsvUtils utilEntity = new CsvUtils();
+        long total = pageInfo.getTotal();
+        if (total == 0) {
+            csvDataList.add("没有符合条件的车辆");
+            utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, true, true);
+            return;
+        }
+        buidCSVdata(pageInfo.getList(), csvDataList);
+        //总页数
+        int pages = pageInfo.getPages();
 
+        if (pages == 1) {
+            utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, true, true);
+            return;
+        }
+        utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, true, false);
+        for (int i = 2; i <= pages; i++) {
+            csvDataList.clear();
+            busDTO.setPageNum(i);
+            List<BusInfoVO> list = busInfoService.queryList(busDTO).getList();
+            buidCSVdata(list, csvDataList);
+            if (i == pages) {
+                utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, false, true);
+            } else {
+                utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, false, false);
+            }
+        }
+    }
 
+    private void buidCSVdata(List<BusInfoVO> infoVOS, List<String> csvData) {
+        for (BusInfoVO info : infoVOS) {
+            StringBuffer sb = new StringBuffer();
+            sb.append(info.getLicensePlates()).append(",").append(info.getCityName()).append(",").append(info.getSupplierName()).append(",")
+                    .append(info.getGroupName()).append(",").append(info.getModelDetail()).append(",").append((info.getStatus() != null && info.getStatus() == 1) ? "有效" : "无效")
+                    .append(",").append(info.getCreateDate() != null ? info.getCreateDate() : "");
+            csvData.add(sb.toString());
+        }
+    }
 
+    /**
+     * @Description: 下载导入模板
+     * @Param: [request, response]
+     * @return: void
+     * @Date: 2018/11/28
+     */
+    @RequestMapping("/exportTemplate")
+    public void exportTemplate(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String fileName = "巴士车辆导入模板" + com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern);
+        String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
+        if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO") > 0 && agent.indexOf("RV:11") > 0)) {  //IE浏览器和Edge浏览器
+            fileName = URLEncoder.encode(fileName, "UTF-8");
+        } else {  //其他浏览器
+            fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+        }
+        response.setContentType("application/octet-stream;charset=ISO8859-1");
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xls");
+        response.addHeader("Pargam", "no-cache");
+        response.addHeader("Cache-Control", "no-cache");
+        new ExportExcelUtil<>().exportExcel("巴士车辆", CarConstant.TEMPLATE_HEAD, response.getOutputStream());
+    }
 
-        return AjaxResponse.success(null);
+    /**
+     * @Description: 导入巴士车辆信息
+     * @Param: [cityId, supplierId, file]
+     * @return: com.zhuanche.common.web.AjaxResponse
+     * @Date: 2018/11/28
+     */
+    @RequestMapping("/importBusInfo")
+    public AjaxResponse importBusInfo(@Verify(param = "cityId", rule = "request") Integer cityId,
+                                      @Verify(param = "supplierId", rule = "request") Integer supplierId,
+                                      MultipartFile file) throws Exception {
+        String supplierName = supplierService.getSupplierNameById(supplierId);
+        if (StringUtils.isBlank(supplierName)) {
+            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "供应商不存在");
+        }
+        String cityName = cityService.queryNameById(cityId);
+        if (StringUtils.isBlank(cityName)) {
+            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "城市不存在");
+        }
+        if (file.isEmpty()) {
+            logger.error(LOG_PRE+"巴士导入车辆文件为空");
+            return AjaxResponse.fail(RestErrorCode.FILE_ERROR);
+        }
+        String fileName = file.getOriginalFilename();
+        String suffixName = fileName.substring(fileName.lastIndexOf("."));
+        logger.info(LOG_PRE+"上传的文件名为:{},上传的后缀名为:{}", fileName, suffixName);
+        InputStream is = file.getInputStream();
+        Workbook workbook = null;
+        if (suffixName.equals(".xls")) {
+            workbook = new HSSFWorkbook(is);
+        } else if (suffixName.equals(".xlsx")) {
+            workbook = new XSSFWorkbook(is);
+        } else {
+            logger.error(LOG_PRE+"巴士导入车辆文件后缀名错误");
+            return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
+        }
+        //默认值导入第一个sheet;
+        Sheet sheet = workbook.getSheetAt(0);
+        //校验模板表头
+        Row rowFirst = sheet.getRow(0);
+        if (rowFirst == null || rowFirst.getLastCellNum() != CarConstant.TEMPLATE_HEAD.length) {
+            logger.error(LOG_PRE+"巴士导入车辆文件表头为空或者长度错误");
+            return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
+        }
+        boolean templateFlag = checkTableHead(rowFirst, CarConstant.TEMPLATE_HEAD);
+        if (!templateFlag) {
+            logger.error(LOG_PRE+"巴士导入车辆文件表头内容错误");
+            return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
+        }
+        // 过滤掉标题，从第一行开始导入数据
+        int start = 1;
+        // 要导入数据的总条数
+        int total = sheet.getLastRowNum();
+        // 成功导入条数
+        int successCount = 0;
+        List<ErrorReason> errList = new ArrayList();
+        logger.info(LOG_PRE+"巴士导入车辆，总条数=" + total);
+        //循环行
+        for (int rowIdx = start; rowIdx <= total; rowIdx++) {
+            // 获取行对象
+            Row row = sheet.getRow(rowIdx);
+            if (row == null) {
+                saveErrorMsg(errList, rowIdx, 0, "数据为空");
+                continue;
+            }
+            BusCarInfo carInfo = new BusCarInfo();
+            boolean validFlag = true;
+            // 循环列
+            for (int colIdx = 0; colIdx < row.getLastCellNum(); colIdx++) {
+                Cell cell = row.getCell(colIdx);
+                String value = readCellValue(cell);
+                switch (colIdx) {
+                    //车牌号
+                    case 0:
+                        if (StringUtils.isBlank(value)) {
+                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[0] + " 为空");
+                            validFlag = false;
+                            break;
+                        }
+                        boolean checkResult = busInfoService.licensePlatesIfExist(value);
+                        if (checkResult) {
+                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[0] + " 已经存在");
+                            validFlag = false;
+                            break;
+                        }
+                        carInfo.setLicensePlates(value);
+                        break;
+                    // 车型类别
+                    case 1:
+                        if (StringUtils.isBlank(value)) {
+                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[1] + " 为空");
+                            validFlag = false;
+                            break;
+                        }
+                        CarBizCarGroup group = groupService.queryGroupByGroupName(value);
+                        if (group == null) {
+                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[1] + " 不存在");
+                            validFlag = false;
+                            break;
+                        }
+                        carInfo.setGroupId(group.getGroupId());
+                        break;
+                    //车辆颜色
+                    case 2:
+                        if (StringUtils.isBlank(value)) {
+                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[2] + " 为空");
+                            validFlag = false;
+                            break;
+                        }
+                        carInfo.setColor(value);
+                        break;
+                    //燃料类型
+                    case 3:
+                        if (StringUtils.isBlank(value)) {
+                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[3] + " 为空");
+                            validFlag = false;
+                            break;
+                        }
+                        String code = EnumFuel.getFuelCodeByName(value);
+                        if (code == null) {
+                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[3] + " 不存在");
+                            validFlag = false;
+                            break;
+                        }
+                        carInfo.setFueltype(code);
+                        break;
+                    //运输证字号
+                    case 4:
+                        if (StringUtils.isBlank(value)) {
+                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[4] + " 为空");
+                            validFlag = false;
+                            break;
+                        }
+                        carInfo.setTransportnumber(value);
+                        break;
+                    //车厂厂牌
+                    case 5:
+                        if (StringUtils.isBlank(value)) {
+                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[5] + " 为空");
+                            validFlag = false;
+                            break;
+                        }
+                        carInfo.setVehicleBrand(value);
+                        break;
+                    //具体车型
+                    case 6:
+                        carInfo.setModelDetail(value);
+                        break;
+                    //下次车检时间
+                    case 7:
+                        if (StringUtils.isNotBlank(value)) {
+                            try {
+                                carInfo.setNextInspectDate(DateUtils.getDate1(value));
+                            } catch (ParseException e) {
+                                saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[7] + " 时间格式错误，例：2018-01-01");
+                            }
+                        }
+                        break;
+                    //下次维保时间
+                    case 8:
+                        if (StringUtils.isNotBlank(value)) {
+                            try {
+                                carInfo.setNextMaintenanceDate(DateUtils.getDate1(value));
+                            } catch (ParseException e) {
+                                saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[8] + " 时间格式错误，例：2018-01-01");
+                            }
+                        }
+                        break;
+                    //下次运营检测时间
+                    case 9:
+                        if (StringUtils.isNotBlank(value)) {
+                            try {
+                                carInfo.setNextOperationDate(DateUtils.getDate1(value));
+                            } catch (ParseException e) {
+                                saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[9] + " 时间格式错误，例：2018-01-01");
+                            }
+                        }
+                        break;
+                    //购买时间
+                    case 10:
+                        if (StringUtils.isNotBlank(value)) {
+                            try {
+                                carInfo.setCarPurchaseDate(DateUtils.getDate1(value));
+                            } catch (ParseException e) {
+                                saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[10] + " 时间格式错误，例：2018-01-01");
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }// switch end
+
+            }// 循环列结束
+            if (validFlag) {
+                carInfo.setCityId(cityId);
+                carInfo.setSupplierId(supplierId);
+                //所属车主默认供应商名称
+                carInfo.setVehicleOwner(supplierName);
+                SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+                Integer userId = currentLoginUser.getId();
+                carInfo.setCreateBy(userId);
+                carInfo.setUpdateBy(userId);
+                carInfo.setUpdateDate(new Date());
+                carInfo.setCreateDate(new Date());
+                int saveResult = busInfoService.saveCar(carInfo);
+                if (saveResult > 0) {
+                    successCount++;
+                }
+            }
+        }
+        ImportErrorVO errorVO = new ImportErrorVO(total, successCount, (total - successCount), errList);
+        return AjaxResponse.success(errorVO);
+    }
+
+    private String readCellValue(Cell cell) {
+        int cellType = cell.getCellType();
+        String value = null;
+        switch (cellType) {
+            case Cell.CELL_TYPE_NUMERIC:
+                if (HSSFDateUtil.isCellDateFormatted(cell)) {
+                    //  如果是date类型则 ，获取该cell的date值
+                    Date val = cell.getDateCellValue();
+                    DateFormat formater = new SimpleDateFormat("yyyy-MM-dd");
+                    value = formater.format(val);
+                } else { // 纯数字 只保留整数部分
+                    DecimalFormat df = new DecimalFormat("########");
+                    value = df.format(cell.getNumericCellValue());
+                }
+                break;
+            case Cell.CELL_TYPE_STRING:
+                value = cell.getStringCellValue();
+                break;
+            case Cell.CELL_TYPE_BOOLEAN:
+                value = String.valueOf(cell.getBooleanCellValue());
+                break;
+            case Cell.CELL_TYPE_FORMULA:
+                value = String.valueOf(cell.getCellFormula());
+                break;
+            default:
+                value = "";
+                break;
+
+        }
+        return value;
+    }
+
+    private void saveErrorMsg(List<ErrorReason> reasons, int row, int col, String reason) {
+        ErrorReason errorReason = new ErrorReason();
+        errorReason.setRow(row);
+        errorReason.setCol(col);
+        errorReason.setReason(reason);
+        reasons.add(errorReason);
+    }
+
+    private boolean checkTableHead(Row row, String[] head) {
+        boolean templateFlag = true;
+        for (int colIdx = 0; colIdx < row.getLastCellNum(); colIdx++) {
+            Cell cell = row.getCell(colIdx); // 获取列对象
+            if (cell == null) {
+                templateFlag = false;
+                break;
+            } else {
+                String stringValue = cell.getStringCellValue();
+                if (!stringValue.contains(head[colIdx])) {
+                    templateFlag = false;
+                    break;
+                }
+            }
+        }
+        return templateFlag;
     }
 }

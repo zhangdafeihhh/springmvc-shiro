@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ import java.util.Map;
 @Service
 public class DriverMongoService {
 
-	@Autowired
+	@Resource(name = "driverMongoTemplate")
 	private MongoTemplate driverMongoTemplate;
 
 	/**
