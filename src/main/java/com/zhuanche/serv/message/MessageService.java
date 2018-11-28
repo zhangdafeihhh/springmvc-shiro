@@ -40,10 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -134,6 +131,8 @@ public class MessageService {
                 post.setSuppliers(suppliers);
                 post.setTeamids(teamId);
 
+
+                boolean isUpdate = false;
                 if (messageId == null) {
                     //主表插入数据
                     post.setCreateTime(new Date());
@@ -142,6 +141,7 @@ public class MessageService {
                 }else {
                     post.setId(messageId.longValue());
                     postExMapper.updateByPrimaryKeySelective(post);
+                    isUpdate = true;
                 }
 
                 final   Integer newMessageId = messageId;
@@ -163,6 +163,13 @@ public class MessageService {
                     //上传附件
                     try {
                         if (file != null && !file.isEmpty()){
+                            //查询出来原来上次的附件
+
+                            List<CarMessageDoc> listDoc = null;
+                            if (isUpdate)
+                                listDoc = docExMapper.listDoc(messageId.longValue());
+
+
                             MultipartHttpServletRequest req = (MultipartHttpServletRequest) request;
 
                             Map<String,MultipartFile> map = new HashMap<>();
@@ -195,6 +202,15 @@ public class MessageService {
                                     int code = docExMapper.insert(doc);
                                     if (code > 0 ){
                                         logger.info("====doc文档上传成功====");
+
+                                        if (CollectionUtils.isNotEmpty(listDoc)){
+                                            Iterator<CarMessageDoc> iterator = listDoc.iterator();
+                                            while (iterator.hasNext()){
+                                                CarMessageDoc docDel = (CarMessageDoc) iterator.next();
+                                                docExMapper.deleteByPrimaryKey(docDel.getId());
+                                            }
+                                            listDoc.clear();
+                                        }
                                     }else {
                                         logger.info("====doc上传文档失败======");
                                     }

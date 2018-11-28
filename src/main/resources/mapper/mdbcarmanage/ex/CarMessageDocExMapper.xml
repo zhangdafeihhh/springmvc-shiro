@@ -53,4 +53,9 @@
     where message_id = #{messageId,jdbcType=BIGINT}
   </delete>
 
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from car_message_doc
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+
 </mapper>

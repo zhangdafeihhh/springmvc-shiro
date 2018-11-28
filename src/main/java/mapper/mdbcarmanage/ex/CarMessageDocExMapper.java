@@ -6,6 +6,12 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface CarMessageDocExMapper {
+
+    /**
+     * 更新附件后删除原来的附件
+     * @param id
+     * @return
+     */
     int deleteByPrimaryKey(Long id);
 
     /**
