@@ -112,9 +112,9 @@
         t.supplier_city supplierCity, c.city_name cityName
         from car_biz_supplier t
         left join car_biz_city c on c.city_id = t.supplier_city
-        where status=1
+        where t.status=1
         <if test="supplierIds!=null and supplierIds!=''">
-            and supplier_id IN (${supplierIds})
+            and t.supplier_id IN (${supplierIds})
         </if>
     </select>
     
