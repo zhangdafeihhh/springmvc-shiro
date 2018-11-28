@@ -207,6 +207,7 @@ public class MessageService {
                                             Iterator<CarMessageDoc> iterator = listDoc.iterator();
                                             while (iterator.hasNext()){
                                                 CarMessageDoc docDel = (CarMessageDoc) iterator.next();
+                                                logger.info("删除上次上传文档" + docDel.getId());
                                                 docExMapper.deleteByPrimaryKey(docDel.getId());
                                             }
                                             listDoc.clear();

@@ -83,7 +83,6 @@ public class MessageManagerController {
     })
     public AjaxResponse postMessage(@RequestParam(value = "messageId",required = true)Integer messageId,
                                     @RequestParam(value = "status",required = true) Integer status,
-                                    //@Verify(param = "status",rule = "required") Integer status,
                                     @RequestParam(value = "creater",required = false) String creater,
                                     @RequestParam(value = "messageTitle",required = false) String messageTitle,
                                     @RequestParam(value = "messageContent",required = false) String messageContent,
