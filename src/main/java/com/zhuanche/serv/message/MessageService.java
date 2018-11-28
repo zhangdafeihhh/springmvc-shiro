@@ -368,7 +368,21 @@ public class MessageService {
             detailDto.setCities(carMessagePost.getCities());
             detailDto.setSuppliers(carMessagePost.getSuppliers());
             detailDto.setTeamids(carMessagePost.getTeamids());
+            /**返回前端的级别**/
+            String str   = Integer.toBinaryString(carMessagePost.getLevel());
+            String levelToStr = "";
+            String[] levelStr = {"1","2","4","8"};
+            for(int t  = 0;t<str.length();t++){
+                char c = str.charAt(t);
+                if (c=='1'){
+                    levelToStr += levelStr[str.length()-t-1] +",";
+                }
+            }
+            if (StringUtils.isNotBlank(levelToStr)){
+                detailDto.setLevelToStr(levelToStr.substring(0,levelToStr.length()-1));
+            }
 
+            //有时间了再做优化
             switch (carMessagePost.getLevel()){
                 case Constants.CONTRY:
                     detailDto.setLevelName(CarMessagePost.Level.contry.getName());
@@ -530,14 +544,18 @@ public class MessageService {
             map.put(carDriverTeam.getId(),carDriverTeam.getTeamName());
         }
         StringBuffer sb = new StringBuffer();
-        String[] teamIdArray = teamIds.split(Constants.SEPERATER);
-        for (String str : teamIdArray){
-            if (StringUtils.isNotBlank(map.get(Integer.valueOf(str)))){
-                sb.append(map.get(Integer.valueOf(str))).append(" ");
+        if (StringUtils.isNotBlank(teamIds)){
+            String[] teamIdArray = teamIds.split(Constants.SEPERATER);
+            for (String str : teamIdArray){
+                if (StringUtils.isNotBlank(map.get(Integer.valueOf(str)))){
+                    sb.append(map.get(Integer.valueOf(str))).append(" ");
 
+                }
             }
+            return sb.toString();
         }
-        return sb.toString();
+        return null;
+
     }
 
     private Set<Integer> getCities(String cities){

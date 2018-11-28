@@ -68,7 +68,6 @@
 	        <bean class="com.zhuanche.common.web.HttpParamVerifyInterceptor"/> <!-- 请求参数规则校验 -->
 	    </mvc:interceptor>
     </mvc:interceptors>
-	
     <!-- 配置统一异常处理（需要区分页面请求异常、XHR请求异常、文件上传请求异常时的特殊处理） -->
 	<bean class="com.zhuanche.common.web.CustomExceptionResolver"></bean>
 </beans>

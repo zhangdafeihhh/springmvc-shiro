@@ -41,6 +41,8 @@ public class CarMessageDetailDto {
     private Date createTime;
     /**更新时间**/
     private Date updateTime;
+    /**h5专用**/
+    private String levelToStr;
 
     /**手机号码**/
     private String phone;
@@ -202,6 +204,15 @@ public class CarMessageDetailDto {
 
     public void setTeamidsName(String teamidsName) {
         this.teamidsName = teamidsName;
+    }
+
+
+    public String getLevelToStr() {
+        return levelToStr;
+    }
+
+    public void setLevelToStr(String levelToStr) {
+        this.levelToStr = levelToStr;
     }
 
     @Override

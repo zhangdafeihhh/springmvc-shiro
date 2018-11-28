@@ -387,8 +387,8 @@ public class MessageManagerController {
                                            Model model)throws Exception {
         //下载文件路径
         try {
-            String path = "";  //服务器
-            //String path = "/Users/fan/upload";  //本地
+            //String path = "";  //服务器
+            String path = "/Users/fan/upload";  //本地
             logger.info("path:" + path);
             File file = new File(path + File.separator + fileUrl);
             HttpHeaders headers = new HttpHeaders();
