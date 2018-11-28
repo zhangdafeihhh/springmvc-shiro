@@ -34,6 +34,7 @@
       subscription_report_configure
     set status = 0
     where subscription_cycle = #{subscriptionCycle,jdbcType=INTEGER}
+      and report_id = #{reportId}
   </update>
 
   <insert id="saveSubscriptionReportConfigure" parameterType="com.zhuanche.entity.driver.SubscriptionReportConfigure" >

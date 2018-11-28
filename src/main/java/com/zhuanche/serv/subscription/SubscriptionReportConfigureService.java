@@ -138,7 +138,7 @@ public class SubscriptionReportConfigureService {
                                          Boolean isSupplier, Boolean isTeam) {
 
         //TODO 更新订阅配置的状态status=0
-        subscriptionReportConfigureExMapper.updateConfigureStatus(subscriptionCycle);
+        subscriptionReportConfigureExMapper.updateConfigureStatus(reportId, subscriptionCycle);
 
         if(isWhole) { //全国,需要单独生成一个配置
             String bussinessNumber = reportId + "" + subscriptionCycle + "" + level + "" + "000";

@@ -20,7 +20,7 @@ public interface SubscriptionReportConfigureExMapper {
      * @param subscriptionCycle 订阅周期,1-周;2-月;
      * @return
      */
-    int updateConfigureStatus(Integer subscriptionCycle);
+    int updateConfigureStatus(@Param("reportId") Integer reportId, @Param("subscriptionCycle") Integer subscriptionCycle);
 
     /**
      * 保存
