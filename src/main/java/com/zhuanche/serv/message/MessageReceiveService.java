@@ -1,6 +1,7 @@
 package com.zhuanche.serv.message;
 
 import com.google.common.collect.Lists;
+import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 import com.zhuanche.entity.mdbcarmanage.CarMessagePost;
@@ -10,6 +11,8 @@ import mapper.mdbcarmanage.CarMessageReceiverMapper;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import mapper.mdbcarmanage.ex.CarMessageReceiverExMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.*;
@@ -23,6 +26,7 @@ import java.util.*;
 @Service
 public class MessageReceiveService {
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private CarMessageReceiverExMapper receiverMapper;
@@ -121,13 +125,19 @@ public class MessageReceiveService {
         }
 
         for (CarAdmUser admUser : sendList){
-            CarMessageReceiver receiver = new CarMessageReceiver();
-            receiver.setCreateTime(new Date());
-            receiver.setMessageId(messageId);
-            receiver.setStatus(CarMessageReceiver.ReadStatus.unRead.getValue());
-            receiver.setReceiveUserId(admUser.getUserId());
-            receiver.setUpdateTime(new Date());
-            receiverMapper.insert(receiver);
+            try {
+                CarMessageReceiver receiver = new CarMessageReceiver();
+                receiver.setCreateTime(new Date());
+                receiver.setMessageId(messageId);
+                receiver.setStatus(CarMessageReceiver.ReadStatus.unRead.getValue());
+                receiver.setReceiveUserId(admUser.getUserId());
+                receiver.setUpdateTime(new Date());
+                receiver.setIsSender("1");
+                receiverMapper.insert(receiver);
+            } catch (Exception e) {
+                logger.info("向字表发送消息异常" + e.getMessage());
+                throw new MessageException(RestErrorCode.UNKNOWN_ERROR,RestErrorCode.renderMsg(RestErrorCode.UNKNOWN_ERROR));
+            }
         }
 
         return 1;
