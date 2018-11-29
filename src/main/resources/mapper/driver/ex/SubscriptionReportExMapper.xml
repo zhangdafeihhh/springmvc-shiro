@@ -3,7 +3,8 @@
 <mapper namespace="mapper.driver.ex.SubscriptionReportExMapper" >
   <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.SubscriptionReport" >
     <id column="id" property="id" jdbcType="BIGINT" />
-    <result column="bussiness_number" property="bussinessNumber" jdbcType="INTEGER" />
+    <result column="bussiness_number" property="bussinessNumber" jdbcType="VARCHAR" />
+    <result column="configure_id" property="configureId" jdbcType="BIGINT" />
     <result column="report_id" property="reportId" jdbcType="INTEGER" />
     <result column="report_name" property="reportName" jdbcType="VARCHAR" />
     <result column="city_id" property="cityId" jdbcType="INTEGER" />
@@ -22,9 +23,9 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, bussiness_number, report_id, report_name, city_id, city_name, supplier_id, supplier_name, 
-    team_id, team_name, level, subscription_cycle, subscription_time, url, create_id, 
-    create_name, create_time, update_time
+    id, bussiness_number, configure_id, report_id, report_name, city_id, city_name, supplier_id,
+    supplier_name, team_id, team_name, level, subscription_cycle, subscription_time,
+    url, create_id, create_name, create_time, update_time
   </sql>
   <sql id="Base_where">
     <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR">

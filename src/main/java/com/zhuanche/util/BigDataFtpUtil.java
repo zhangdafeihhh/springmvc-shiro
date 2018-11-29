@@ -318,16 +318,19 @@ public class BigDataFtpUtil {
 			initFtpClient();
 			//切换FTP目录
 			ftpClient.changeWorkingDirectory(pathname);
-			FTPFile[] ftpFiles = ftpClient.listFiles();
-			for(FTPFile file : ftpFiles){
-				if(filename.equalsIgnoreCase(file.getName())){
-					String path = pathname+"/"+filename;
-					in = ftpClient.retrieveFileStream(path);
-					return in;
-				}
-			}
-			ftpClient.logout();
-			System.out.println("下载文件成功");
+			String path = pathname+"/"+filename;
+			in = ftpClient.retrieveFileStream(path);
+			return in;
+//			FTPFile[] ftpFiles = ftpClient.listFiles();
+//			for(FTPFile file : ftpFiles){
+//				if(filename.equalsIgnoreCase(file.getName())){
+//					String path = pathname+"/"+filename;
+//					in = ftpClient.retrieveFileStream(path);
+//					return in;
+//				}
+//			}
+//			ftpClient.logout();
+//			System.out.println("下载文件成功");
 		} catch (Exception e) {
 			System.out.println("下载文件失败");
 			e.printStackTrace();

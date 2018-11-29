@@ -18,6 +18,7 @@ import com.zhuanche.serv.subscription.SubscriptionReportConfigureService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BigDataFtpUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -140,6 +141,7 @@ public class SubscriptionReportConfigureController {
      */
     @ResponseBody
     @RequestMapping(value = "/querySubscriptionList")
+    @RequiresPermissions(value = "DownloadStatement_look")
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
     })
@@ -170,6 +172,7 @@ public class SubscriptionReportConfigureController {
      */
     @ResponseBody
     @RequestMapping(value = "/querySubscriptionConfigure")
+    @RequiresPermissions(value = "SubscribeStatement_look")
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
     })
@@ -187,6 +190,7 @@ public class SubscriptionReportConfigureController {
      */
     @ResponseBody
     @RequestMapping(value = "/querySubscriptionName")
+    @RequiresPermissions(value = "SubscribeStatement_look")
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
     })
@@ -201,6 +205,7 @@ public class SubscriptionReportConfigureController {
 
     @ResponseBody
     @RequestMapping(value = "/exportSubscriptionUrl")
+    @RequiresPermissions(value = "DownloadStatement_look")
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
     })

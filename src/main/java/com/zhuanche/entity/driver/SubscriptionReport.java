@@ -5,7 +5,9 @@ import java.util.Date;
 public class SubscriptionReport {
     private Long id;
 
-    private Integer bussinessNumber;
+    private String bussinessNumber;
+
+    private Long configureId;
 
     private Integer reportId;
 
@@ -47,12 +49,20 @@ public class SubscriptionReport {
         this.id = id;
     }
 
-    public Integer getBussinessNumber() {
+    public String getBussinessNumber() {
         return bussinessNumber;
     }
 
-    public void setBussinessNumber(Integer bussinessNumber) {
-        this.bussinessNumber = bussinessNumber;
+    public void setBussinessNumber(String bussinessNumber) {
+        this.bussinessNumber = bussinessNumber == null ? null : bussinessNumber.trim();
+    }
+
+    public Long getConfigureId() {
+        return configureId;
+    }
+
+    public void setConfigureId(Long configureId) {
+        this.configureId = configureId;
     }
 
     public Integer getReportId() {

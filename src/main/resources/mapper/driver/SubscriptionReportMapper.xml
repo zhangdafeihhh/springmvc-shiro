@@ -3,7 +3,8 @@
 <mapper namespace="mapper.driver.SubscriptionReportMapper" >
   <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.SubscriptionReport" >
     <id column="id" property="id" jdbcType="BIGINT" />
-    <result column="bussiness_number" property="bussinessNumber" jdbcType="INTEGER" />
+    <result column="bussiness_number" property="bussinessNumber" jdbcType="VARCHAR" />
+    <result column="configure_id" property="configureId" jdbcType="BIGINT" />
     <result column="report_id" property="reportId" jdbcType="INTEGER" />
     <result column="report_name" property="reportName" jdbcType="VARCHAR" />
     <result column="city_id" property="cityId" jdbcType="INTEGER" />
@@ -22,9 +23,9 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, bussiness_number, report_id, report_name, city_id, city_name, supplier_id, supplier_name, 
-    team_id, team_name, level, subscription_cycle, subscription_time, url, create_id, 
-    create_name, create_time, update_time
+    id, bussiness_number, configure_id, report_id, report_name, city_id, city_name, supplier_id, 
+    supplier_name, team_id, team_name, level, subscription_cycle, subscription_time, 
+    url, create_id, create_name, create_time, update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -40,18 +41,20 @@
     <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into subscription_report (bussiness_number, report_id, report_name, 
-      city_id, city_name, supplier_id, 
-      supplier_name, team_id, team_name, 
-      level, subscription_cycle, subscription_time, 
-      url, create_id, create_name, 
-      create_time, update_time)
-    values (#{bussinessNumber,jdbcType=INTEGER}, #{reportId,jdbcType=INTEGER}, #{reportName,jdbcType=VARCHAR}, 
-      #{cityId,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR}, #{supplierId,jdbcType=INTEGER}, 
-      #{supplierName,jdbcType=VARCHAR}, #{teamId,jdbcType=INTEGER}, #{teamName,jdbcType=VARCHAR}, 
-      #{level,jdbcType=INTEGER}, #{subscriptionCycle,jdbcType=INTEGER}, #{subscriptionTime,jdbcType=VARCHAR}, 
-      #{url,jdbcType=VARCHAR}, #{createId,jdbcType=INTEGER}, #{createName,jdbcType=VARCHAR}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+    insert into subscription_report (bussiness_number, configure_id, report_id, 
+      report_name, city_id, city_name, 
+      supplier_id, supplier_name, team_id, 
+      team_name, level, subscription_cycle, 
+      subscription_time, url, create_id, 
+      create_name, create_time, update_time
+      )
+    values (#{bussinessNumber,jdbcType=VARCHAR}, #{configureId,jdbcType=BIGINT}, #{reportId,jdbcType=INTEGER}, 
+      #{reportName,jdbcType=VARCHAR}, #{cityId,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR}, 
+      #{supplierId,jdbcType=INTEGER}, #{supplierName,jdbcType=VARCHAR}, #{teamId,jdbcType=INTEGER}, 
+      #{teamName,jdbcType=VARCHAR}, #{level,jdbcType=INTEGER}, #{subscriptionCycle,jdbcType=INTEGER}, 
+      #{subscriptionTime,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, #{createId,jdbcType=INTEGER}, 
+      #{createName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.SubscriptionReport" >
     <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
@@ -61,6 +64,9 @@
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="bussinessNumber != null" >
         bussiness_number,
+      </if>
+      <if test="configureId != null" >
+        configure_id,
       </if>
       <if test="reportId != null" >
         report_id,
@@ -113,7 +119,10 @@
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="bussinessNumber != null" >
-        #{bussinessNumber,jdbcType=INTEGER},
+        #{bussinessNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="configureId != null" >
+        #{configureId,jdbcType=BIGINT},
       </if>
       <if test="reportId != null" >
         #{reportId,jdbcType=INTEGER},
@@ -169,7 +178,10 @@
     update subscription_report
     <set >
       <if test="bussinessNumber != null" >
-        bussiness_number = #{bussinessNumber,jdbcType=INTEGER},
+        bussiness_number = #{bussinessNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="configureId != null" >
+        configure_id = #{configureId,jdbcType=BIGINT},
       </if>
       <if test="reportId != null" >
         report_id = #{reportId,jdbcType=INTEGER},
@@ -224,7 +236,8 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.SubscriptionReport" >
     update subscription_report
-    set bussiness_number = #{bussinessNumber,jdbcType=INTEGER},
+    set bussiness_number = #{bussinessNumber,jdbcType=VARCHAR},
+      configure_id = #{configureId,jdbcType=BIGINT},
       report_id = #{reportId,jdbcType=INTEGER},
       report_name = #{reportName,jdbcType=VARCHAR},
       city_id = #{cityId,jdbcType=INTEGER},
