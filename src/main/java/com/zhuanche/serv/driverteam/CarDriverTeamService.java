@@ -514,6 +514,7 @@ public class CarDriverTeamService{
 			existsTeam.setCharge2(paramDto.getCharge2());
 			existsTeam.setCharge3(paramDto.getCharge3());
 			existsTeam.setRemark(paramDto.getRemark());
+			existsTeam.setShortName(paramDto.getShortName());
 			return carDriverTeamMapper.updateByPrimaryKeySelective(existsTeam);
 		}catch (Exception e){
 			logger.error("更新车队失败!", e );
@@ -572,6 +573,7 @@ public class CarDriverTeamService{
 			record.setRemark(paramDto.getRemark());
 //			BeanUtils.copyProperties(record,paramDto);
 			record.setCreateBy(String.valueOf(WebSessionUtil.getCurrentLoginUser().getId()));
+			record.setShortName(paramDto.getShortName());
 			return carDriverTeamMapper.insertSelective(record);
 		}catch (Exception e){
 			logger.error("新增车队失败!", e );
