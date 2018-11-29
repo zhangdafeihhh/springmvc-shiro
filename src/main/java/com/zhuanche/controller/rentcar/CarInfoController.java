@@ -462,6 +462,7 @@ public class CarInfoController {
             @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
     } )
     @RequestMapping("/exportCarInfo")
+	@RequiresPermissions(value = { "CarInfoManageSearch_export" } )
     public String exportCarInfo(@Verify(param = "cities",rule="required")String cities,
                               @Verify(param = "supplierIds",rule="required")String supplierIds,
                               String carModelIds,

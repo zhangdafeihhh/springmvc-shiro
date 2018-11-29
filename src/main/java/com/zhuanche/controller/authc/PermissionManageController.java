@@ -22,7 +22,7 @@ public class PermissionManageController {
 	
 	/**一、增加一个权限**/
 	@RequestMapping("addSaasPermission")
-//	@RequiresPermissions(value = { "ADD_SAAS_PERMISSION" } )
+	@RequiresPermissions(value = { "ADD_SAAS_PERMISSION" } )
 	public AjaxResponse addSaasPermission( 
 			@Verify(param="parentPermissionId",rule="required|min(0)")  Integer parentPermissionId, 
 			@Verify(param="permissionName",rule="required") String permissionName, 
@@ -42,21 +42,21 @@ public class PermissionManageController {
 	
 	/**二、禁用一个权限**/
 	@RequestMapping("disableSaasPermission")
-//	@RequiresPermissions(value = { "DISABLE_SAAS_PERMISSION" } )
+	@RequiresPermissions(value = { "DISABLE_SAAS_PERMISSION" } )
 	public AjaxResponse disableSaasPermission (@Verify(param="permissionId",rule="required|min(1)") Integer permissionId ) {
 		return permissionManagementService.disableSaasPermission(permissionId);
 	}
 	
 	/**三、启用一个权限**/
 	@RequestMapping("enableSaasPermission")
-//	@RequiresPermissions(value = { "ENABLE_SAAS_PERMISSION" } )
+	@RequiresPermissions(value = { "ENABLE_SAAS_PERMISSION" } )
 	public AjaxResponse enableSaasPermission (@Verify(param="permissionId",rule="required|min(1)")  Integer permissionId ) {
 		return permissionManagementService.enableSaasPermission(permissionId);
 	}
 	
 	/**四、修改一个权限**/
 	@RequestMapping("changeSaasPermission")
-//	@RequiresPermissions(value = { "CHANGE_SAAS_PERMISSION" } )
+	@RequiresPermissions(value = { "CHANGE_SAAS_PERMISSION" } )
 	public 	AjaxResponse changeSaasPermission(  
 			@Verify(param="permissionId",rule="required|min(1)")  Integer permissionId, 
 			@Verify(param="permissionName",rule="required") String permissionName, 

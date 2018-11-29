@@ -309,6 +309,7 @@ public class DriverDutyStatisticController extends DriverQueryController{
 
 
 	@RequestMapping(value = "/exportDriverDutyStatistic")
+	@RequiresPermissions(value = { "DriverPreparation_export" } )
 	@ResponseBody
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)

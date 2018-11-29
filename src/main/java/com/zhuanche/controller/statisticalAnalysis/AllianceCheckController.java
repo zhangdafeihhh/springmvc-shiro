@@ -110,6 +110,7 @@ public class AllianceCheckController{
 		    * @return
 		  */
   	@RequestMapping(value = "/exportAllianceCheckData", method = { RequestMethod.POST,RequestMethod.GET })
+	@RequiresPermissions(value = { "JoinBusinessAssessment_export" } )
 	public void exportAllianceCheckData( 
 										 @Verify(param = "queryDate",rule = "required") String queryDate,
 							             String allianceId,

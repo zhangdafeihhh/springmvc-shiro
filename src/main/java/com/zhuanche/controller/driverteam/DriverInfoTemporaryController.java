@@ -198,6 +198,7 @@ public class DriverInfoTemporaryController extends BaseController {
      * @param response
      */
     @RequestMapping(value = "/fileDownloadDriverInfo",method =  RequestMethod.GET)
+	@RequiresPermissions(value = { "SupplierDriverEntry_download" } )
     public void fileDownloadDriverInfo(HttpServletRequest request, HttpServletResponse response) {
         String path = request.getSession().getServletContext().getRealPath("/upload")+File.separator+"IMPORTDRIVERINFO.xlsx";
         super.fileDownload(request,response,path);
@@ -214,6 +215,7 @@ public class DriverInfoTemporaryController extends BaseController {
      */
     @ResponseBody
     @RequestMapping(value = "/importDriverInfo",method =  RequestMethod.POST)
+	@RequiresPermissions(value = { "SupplierDriverEntry_import" } )
     public AjaxResponse importDriverInfo(@RequestParam(value="fileName") MultipartFile file,
                                          @Verify(param = "cityId",rule="required") Integer cityId,
                                          @Verify(param = "supplierId",rule="required") Integer supplierId,

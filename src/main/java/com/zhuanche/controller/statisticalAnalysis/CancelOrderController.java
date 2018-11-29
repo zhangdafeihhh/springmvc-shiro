@@ -237,6 +237,7 @@ public class CancelOrderController{
      */
     @ResponseBody
     @RequestMapping(value = "/exportCancelOrderData", method = { RequestMethod.POST,RequestMethod.GET })
+	@RequiresPermissions(value = { "CancelOrderDetail_export" } )
     public AjaxResponse exportCancelOrderData(
             Long driverCityId,
             String allianceId,

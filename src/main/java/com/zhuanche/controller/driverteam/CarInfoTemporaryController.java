@@ -157,6 +157,7 @@ public class CarInfoTemporaryController extends BaseController {
      * @param response
      */
     @RequestMapping(value = "/fileDownloadCarInfo",method =  RequestMethod.GET)
+	@RequiresPermissions(value = { "SupplierCarEntry_download" } )
     public void fileDownloadCarInfo(HttpServletRequest request,
                                     HttpServletResponse response) {
         String path = request.getRealPath("/") + File.separator + "upload"
@@ -514,6 +515,7 @@ public class CarInfoTemporaryController extends BaseController {
      */
     @ResponseBody
     @RequestMapping(value = "/importCarInfo",method = RequestMethod.POST)
+	@RequiresPermissions(value = { "SupplierCarEntry_import" } )
     public AjaxResponse importCarInfo(@RequestParam(value="fileName") MultipartFile file,
                                       @Verify(param = "cityId",rule="required") Integer cityId,
                                       @Verify(param = "supplierId",rule="required") Integer supplierId) {

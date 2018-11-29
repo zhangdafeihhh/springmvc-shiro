@@ -246,6 +246,7 @@ public class DriverDailyReportController extends DriverQueryController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/exportDriverReportData")
+	@RequiresPermissions(value = { "DriverDaily_export" } )
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})

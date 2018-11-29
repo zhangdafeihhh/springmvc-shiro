@@ -150,6 +150,7 @@ public class CompleteOrderController{
      * @param response
      */
      @RequestMapping(value = "/exportCompleteOrderData", method = RequestMethod.GET)
+ 	 @RequiresPermissions(value = { "CompleteOrderDetail_export" } )
  	 public void exportCompleteOrderData(@Verify(param = "queryDate",rule = "required") String queryDate,
                                          @Verify(param = "cityId",rule = "required") Long cityId,
                                          String productId,

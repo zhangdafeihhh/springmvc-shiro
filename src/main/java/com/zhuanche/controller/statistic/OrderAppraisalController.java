@@ -158,6 +158,7 @@ public class OrderAppraisalController extends DriverQueryController{
 	 * @return
 	 */
 	@RequestMapping("/exportOrderAppraisal")
+	@RequiresPermissions(value = { "OrderScore_export" } )
 	@ResponseBody
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)

@@ -127,6 +127,7 @@ public class DriverOperateDetailController{
 	    * @return
 	  */
   	@RequestMapping(value = "/exportDriverOperateDetailData", method = { RequestMethod.POST,RequestMethod.GET })
+	@RequiresPermissions(value = { "DriverOperateDetail_export" } )
 	public void exportDriverOperateDetailData( 
 										Long driverCityId,
 										String genderId,

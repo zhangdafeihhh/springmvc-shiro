@@ -124,6 +124,7 @@ public class DriverEvaluateController{
 		    * @return
 		  */
   	@RequestMapping(value = "/exportDriverEvaluateData", method = { RequestMethod.POST,RequestMethod.GET })
+	@RequiresPermissions(value = { "DriverEvaluateDetail_export" } )
 	public void exportDriverEvaluateData( 
 										Long orderCityId,
 										String driverTypeId,

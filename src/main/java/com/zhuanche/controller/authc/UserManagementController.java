@@ -28,7 +28,7 @@ public class UserManagementController {
 	
 	/**一、增加一个用户**/
 	@RequestMapping("/addUser")
-//	@RequiresPermissions(value = { "ADD_USER" } )
+	@RequiresPermissions(value = { "ADD_USER" } )
 	public AjaxResponse addUser( 
 			@Verify(param="account",rule="required|RegExp(^[a-zA-Z0-9_\\-]{3,30}$)") String account, 
 			@Verify(param="userName",rule="required") String userName, 
@@ -59,21 +59,21 @@ public class UserManagementController {
 	
 	/**二、禁用一个用户**/
 	@RequestMapping("/disableUser")
-//	@RequiresPermissions(value = { "DISABLE_USER" } )
+	@RequiresPermissions(value = { "DISABLE_USER" } )
 	public AjaxResponse disableUser ( @Verify(param="userId",rule="required|min(1)") Integer userId ) {
 		return userManagementService.disableUser(userId);
 	}
 	
 	/**三、启用一个用户**/
 	@RequestMapping("/enableUser")
-//	@RequiresPermissions(value = { "ENABLE_USER" } )
+	@RequiresPermissions(value = { "ENABLE_USER" } )
 	public AjaxResponse enableUser ( @Verify(param="userId",rule="required|min(1)") Integer userId ) {
 		return userManagementService.enableUser(userId);
 	}
 	
 	/**四、修改一个用户**/
 	@RequestMapping("/changeUser")
-//	@RequiresPermissions(value = { "CHANGE_USER" } )
+	@RequiresPermissions(value = { "CHANGE_USER" } )
 	public 	AjaxResponse changeUser( 
 			@Verify(param="userId",rule="required|min(1)") Integer userId, 
 			@Verify(param="userName",rule="required") String userName, 
@@ -101,7 +101,7 @@ public class UserManagementController {
 	
 	/**六、查询一个用户中的角色ID**/
 	@RequestMapping("/getAllRoleIds")
-//	@RequiresPermissions(value = { "GET_ALL_ROLEIDS_OF_USER" } )
+	@RequiresPermissions(value = { "GET_ALL_ROLEIDS_OF_USER" } )
 	public AjaxResponse getAllRoleIds( @Verify(param="userId",rule="required|min(1)") Integer userId ){
 		List<Integer> roleIds = userManagementService.getAllRoleIds(userId);
 		return AjaxResponse.success( roleIds  );
@@ -109,7 +109,7 @@ public class UserManagementController {
 	
 	/**七、保存一个用户中的角色ID**/
 	@RequestMapping("/saveRoleIds")
-//	@RequiresPermissions(value = { "SAVE_ROLEIDS_OF_USER" } )
+	@RequiresPermissions(value = { "SAVE_ROLEIDS_OF_USER" } )
 	public AjaxResponse saveRoleIds( @Verify(param="userId",rule="required|min(1)") Integer userId,  @Verify(param="roleIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String roleIds) {
 		List<Integer> newroleIds = new ArrayList<Integer>();
 		if(roleIds!=null) {
@@ -147,7 +147,7 @@ public class UserManagementController {
 
 	/**九、重置用户密码**/
 	@RequestMapping("/resetPassword")
-//	@RequiresPermissions(value = { "RESET_USER_PASSWORD" } )
+	@RequiresPermissions(value = { "RESET_USER_PASSWORD" } )
 	public AjaxResponse resetPassword( @Verify(param="userId",rule="required|min(1)") Integer userId ) {
 		return userManagementService.resetPassword(userId);
 	}

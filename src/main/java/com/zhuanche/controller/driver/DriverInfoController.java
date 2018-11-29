@@ -251,6 +251,7 @@ public class DriverInfoController {
      */
     @ResponseBody
     @RequestMapping(value = "/exportDriverList")
+	@RequiresPermissions(value = { "DriverinfoManage_export" } )
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })

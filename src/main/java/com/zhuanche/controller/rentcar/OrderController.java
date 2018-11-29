@@ -314,6 +314,7 @@ public class OrderController{
 	 */
 	 @ResponseBody
 	 @RequestMapping(value = "/exportOrderList", method = { RequestMethod.POST,RequestMethod.GET })
+ 	 @RequiresPermissions(value = { "OrderList_export" } )
 	 public String exportOrderList(
 											   String serviceId,
 											   String airportIdnot,

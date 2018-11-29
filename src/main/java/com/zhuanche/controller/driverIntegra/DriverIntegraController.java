@@ -205,6 +205,7 @@ public class DriverIntegraController {
 
     @ResponseBody
     @RequestMapping("/queryDriverIntegralListDataDown")
+	@RequiresPermissions(value = { "DriverRankIntegral_export" } )
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })

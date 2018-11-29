@@ -106,6 +106,7 @@ public class DriverSchController {
     * @Date: 2018/9/5 
     */ 
     @RequestMapping("/exportDutyToExcel")
+	@RequiresPermissions(value = { "LookArrange_export" } )
     @ResponseBody
     public String  exportDutyToExcel(HttpServletResponse response, HttpServletRequest request,DutyParamRequest param){
 

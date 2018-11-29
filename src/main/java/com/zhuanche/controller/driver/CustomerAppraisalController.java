@@ -202,6 +202,7 @@ public class CustomerAppraisalController {
      */
     @ResponseBody
     @RequestMapping(value = "/exportCustomerAppraisalStatistics")
+	@RequiresPermissions(value = { "DriverScore_export" } )
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
