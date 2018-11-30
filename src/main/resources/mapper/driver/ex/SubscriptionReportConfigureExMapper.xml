@@ -27,6 +27,15 @@
     <include refid="Base_Column_List" />
     from subscription_report_configure
     where subscription_cycle = #{subscriptionCycle,jdbcType=INTEGER} and status=1
+          and report_id = #{reportId,jdbcType=INTEGER}
+  </select>
+
+  <select id="querySubscriptionConfigure" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from subscription_report_configure
+    where subscription_cycle = #{subscriptionCycle,jdbcType=INTEGER} and status=1
+    and report_id = #{reportId,jdbcType=INTEGER} and level = #{level}
   </select>
 
   <update id="updateConfigureStatus" parameterType="java.lang.Integer" >

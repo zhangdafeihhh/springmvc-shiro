@@ -62,6 +62,7 @@ public class SubscriptionReportConfigureController {
      */
     @ResponseBody
     @RequestMapping(value = "/saveSubscription", method = RequestMethod.POST)
+    @RequiresPermissions(value = "SubscribeStatement_look")
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.MASTER)
     })
@@ -168,19 +169,21 @@ public class SubscriptionReportConfigureController {
     /**
      * 根据订阅周期查询数据报表订阅配置
      * @param subscriptionCycle 订阅周期,1-周;2-月;
+     * @param reportId 报表ID,1-工资明细;2-完单详情;3-积分;4-数单奖
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = "/querySubscriptionConfigure")
+    @RequestMapping(value = "/querySubscriptionConfigureList")
     @RequiresPermissions(value = "SubscribeStatement_look")
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
     })
-    public AjaxResponse querySubscriptionConfigure(
-            @Verify(param = "subscriptionCycle",rule="required") Integer subscriptionCycle) {
+    public AjaxResponse querySubscriptionConfigureList(
+            @Verify(param = "subscriptionCycle",rule="required") Integer subscriptionCycle,
+            @Verify(param = "reportId",rule="required") Integer reportId) {
 
-        logger.info(LOGTAG + "/querySubscriptionConfigure,subscriptionCycle={}", subscriptionCycle);
-        List<SubscriptionReportConfigureDTO> cycleList = subscriptionReportConfigureService.selectBySubscriptionCycle(subscriptionCycle);
+        logger.info(LOGTAG + "/querySubscriptionConfigureList,subscriptionCycle={}, reportId={}", subscriptionCycle, reportId);
+        List<SubscriptionReportConfigureDTO> cycleList = subscriptionReportConfigureService.selectBySubscriptionCycle(subscriptionCycle, reportId);
         return AjaxResponse.success(cycleList);
     }
 
@@ -253,5 +256,75 @@ public class SubscriptionReportConfigureController {
             e.printStackTrace();
         }
         return ;
+    }
+
+    /**
+     * 根据订阅周期查询数据报表订阅配置
+     * @param subscriptionCycle 订阅周期,1-周;2-月;
+     * @param reportId 报表ID,1-工资明细;2-完单详情;3-积分;4-数单奖
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/querySubscriptionConfigure")
+    @RequiresPermissions(value = "SubscribeStatement_look")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
+    })
+    public AjaxResponse querySubscriptionConfigure(
+            @Verify(param = "subscriptionCycle",rule="required") Integer subscriptionCycle,
+            @Verify(param = "reportId",rule="required") Integer reportId) {
+
+        logger.info(LOGTAG + "/querySubscriptionConfigure,subscriptionCycle={}, reportId={}", subscriptionCycle, reportId);
+        String level = "";//级别,1-全国;2-城市;4-加盟商;8-车队;16-班组（多个ID用英文逗号分隔）
+        String cities = "";//城市ID（多个ID用英文逗号分隔）
+        String supplierIds = "";//供应商ID（多个ID用英文逗号分隔）
+        String teamIds = "";//车队ID（多个ID用英文逗号分隔）
+        //查询全国
+        List<SubscriptionReportConfigureDTO> allList = subscriptionReportConfigureService.querySubscriptionConfigure(subscriptionCycle, reportId, 1);
+        if(allList!=null && allList.size()>0){
+            level += ",1";
+        }
+        //查询城市
+        List<SubscriptionReportConfigureDTO> cityList = subscriptionReportConfigureService.querySubscriptionConfigure(subscriptionCycle, reportId, 2);
+        if(cityList!=null && cityList.size()>0){
+            level += ",2";
+            for (SubscriptionReportConfigureDTO sub : cityList) {
+                cities += "," + sub.getCityId();
+            }
+        }
+        //查询供应商
+        List<SubscriptionReportConfigureDTO> supplerList = subscriptionReportConfigureService.querySubscriptionConfigure(subscriptionCycle, reportId, 4);
+        if(supplerList!=null && supplerList.size()>0){
+            level += ",4";
+            for (SubscriptionReportConfigureDTO sub : supplerList) {
+                supplierIds += "," + sub.getSupplierId();
+            }
+        }
+        //查询车队
+        List<SubscriptionReportConfigureDTO> teamList = subscriptionReportConfigureService.querySubscriptionConfigure(subscriptionCycle, reportId, 8);
+        if(teamList!=null && teamList.size()>0){
+            level += ",8";
+            for (SubscriptionReportConfigureDTO sub : teamList) {
+                teamIds += "," + sub.getTeamId();
+            }
+        }
+        if(level.length()>1){
+            level = level.substring(1,level.length());
+        }
+        if(cities.length()>1){
+            cities = cities.substring(1,cities.length());
+        }
+        if(supplierIds.length()>1){
+            supplierIds = supplierIds.substring(1,supplierIds.length());
+        }
+        if(teamIds.length()>1){
+            teamIds = teamIds.substring(1,teamIds.length());
+        }
+        JSONObject map = new JSONObject();
+        map.put( "level", level);
+        map.put( "cities", cities);
+        map.put( "supplierIds", supplierIds);
+        map.put( "teamIds", teamIds);
+        return AjaxResponse.success(map);
     }
 }

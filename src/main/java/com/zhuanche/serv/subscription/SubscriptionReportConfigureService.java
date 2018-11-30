@@ -59,10 +59,22 @@ public class SubscriptionReportConfigureService {
     /**
      * 根据订阅周期查询数据报表订阅配置
      * @param subscriptionCycle 订阅周期,1-周;2-月;
+     * @reportId 报表ID,1-工资明细;2-完单详情;3-积分;4-数单奖
      * @return
      */
-    public List<SubscriptionReportConfigureDTO> selectBySubscriptionCycle (Integer subscriptionCycle){
-        return subscriptionReportConfigureExMapper.selectBySubscriptionCycle(subscriptionCycle);
+    public List<SubscriptionReportConfigureDTO> selectBySubscriptionCycle (Integer subscriptionCycle, Integer reportId){
+        return subscriptionReportConfigureExMapper.selectBySubscriptionCycle(subscriptionCycle, reportId);
+    }
+
+    /**
+     * 根据订阅周期查询数据报表订阅配置
+     * @param subscriptionCycle 订阅周期,1-周;2-月;
+     * @param reportId 报表ID,1-工资明细;2-完单详情;3-积分;4-数单奖
+     * @param level 级别,1-全国;2-城市;4-加盟商;8-车队;16-班组
+     * @return
+     */
+    public List<SubscriptionReportConfigureDTO> querySubscriptionConfigure (Integer subscriptionCycle, Integer reportId, Integer level){
+        return subscriptionReportConfigureExMapper.querySubscriptionConfigure(subscriptionCycle, reportId, level);
     }
 
     /**
