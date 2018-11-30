@@ -1,0 +1,1075 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.ex.BusCarBizDriverInfoExMapper">
+
+	<!-- 查询司机信息列表展示 -->
+	<select id="queryDriverPageList" parameterType="com.zhuanche.dto.busManage.BusDriverQueryDTO"
+		resultType="com.zhuanche.vo.busManage.BusDriverInfoPageVO">
+		SELECT
+			d.driver_id AS driverId,
+			d.`name` AS NAME,
+			d.phone AS phone,
+			d.service_city AS cityId,
+			d.supplier_id AS supplierId,
+			d.group_id AS groupId,
+			g.group_name AS groupName,
+			d.create_date AS createDate,
+			d.`status` AS STATUS
+		FROM
+			car_biz_driver_info d
+		LEFT JOIN car_biz_car_group g ON g.group_id = d.group_id
+		WHERE
+			g.type = 2
+		<if test="cityId != null">
+			AND d.service_city = #{cityId}
+		</if>
+		<if test="supplierId != null">
+			AND d.supplier_id = #{supplierId}
+		</if>
+		<if test="groupId != null">
+			AND d.group_id = #{groupId}
+		</if>
+		<if test="name != null and name != ''">
+			AND d.`name` = #{name}
+		</if>
+		<if test="phone != null and phone != ''">
+			AND d.phone = #{phone}
+		</if>
+		<if test="createDateBegin != null">
+			AND d.create_date <![CDATA[ >= ]]>
+			#{createDateBegin}
+		</if>
+		<if test="createDateEnd != null">
+			AND d.create_date <![CDATA[ <= ]]>
+			#{createDateEnd}
+		</if>
+		<if test="driverIds != null and driverIds.size() > 0">
+			AND d.driver_id IN
+			<foreach collection="driverIds" open="(" close=")"
+				separator="," item="driverId">
+				#{driverId}
+			</foreach>
+		</if>
+		<if test="cityIds != null and cityIds.size() > 0">
+			AND d.service_city IN
+			<foreach collection="cityIds" open="(" close=")" separator=","
+				item="cityId">
+				#{cityId}
+			</foreach>
+		</if>
+		<if test="supplierIds != null and supplierIds.size() > 0">
+			AND d.supplier_id IN
+			<foreach collection="supplierIds" open="(" close=")"
+				separator="," item="supplierId">
+				#{supplierId}
+			</foreach>
+		</if>
+	</select>
+	
+	<!-- 查询司机信息导出列表 -->
+	<select id="queryDriverExportList" parameterType="com.zhuanche.dto.busManage.BusDriverExportDTO"
+		resultType="com.zhuanche.vo.busManage.BusDriverInfoExportVO">
+		SELECT
+			d.service_city AS cityId,
+			d.supplier_id AS supplierId,
+			d.`name` AS name,
+			d.gender AS gender,
+			g.group_name AS groupName,
+			d.id_card_no AS idCardNo,
+			d.phone AS phone,
+			d.birth_day AS birthDay,
+			d.driving_license_type AS drivingLicenseType,
+			d.driverLicenseNumber AS driverlicensenumber,
+			d.issue_date AS issueDate,
+			d.xy_driver_number AS xyDriverNumber
+		FROM
+			car_biz_driver_info d
+		LEFT JOIN car_biz_car_group g ON g.group_id = d.group_id
+		WHERE
+			g.type = 2
+		<if test="cityId != null">
+			AND d.service_city = #{cityId}
+		</if>
+		<if test="supplierId != null">
+			AND d.supplier_id = #{supplierId}
+		</if>
+		<if test="groupId != null">
+			AND d.group_id = #{groupId}
+		</if>
+		<if test="name != null and name != ''">
+			AND d.`name` = #{name}
+		</if>
+		<if test="phone != null and phone != ''">
+			AND d.phone = #{phone}
+		</if>
+		<if test="createDateBegin != null">
+			AND d.create_date <![CDATA[ >= ]]>
+			#{createDateBegin}
+		</if>
+		<if test="createDateEnd != null">
+			AND d.create_date <![CDATA[ <= ]]>
+			#{createDateEnd}
+		</if>
+		<if test="driverIds != null and driverIds.size() > 0">
+			AND d.driver_id IN
+			<foreach collection="driverIds" open="(" close=")"
+				separator="," item="driverId">
+				#{driverId}
+			</foreach>
+		</if>
+		<if test="cityIds != null and cityIds.size() > 0">
+			AND d.service_city IN
+			<foreach collection="cityIds" open="(" close=")" separator=","
+				item="cityId">
+				#{cityId}
+			</foreach>
+		</if>
+		<if test="supplierIds != null and supplierIds.size() > 0">
+			AND d.supplier_id IN
+			<foreach collection="supplierIds" open="(" close=")"
+				separator="," item="supplierId">
+				#{supplierId}
+			</foreach>
+		</if>
+	</select>
+
+	<!-- 修改司机信息 -->
+	<update id="updateBusDriverInfo" parameterType="com.zhuanche.dto.busManage.BusDriverSaveDTO">
+		update car_biz_driver_info
+		<set>
+			<if test="password != null">
+				password = #{password,jdbcType=VARCHAR},
+			</if>
+			<if test="phone != null">
+				phone = #{phone,jdbcType=VARCHAR},
+			</if>
+			<if test="gender != null">
+				gender = #{gender,jdbcType=INTEGER},
+			</if>
+			<if test="name != null">
+				name = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="supplierId != null">
+				supplier_id = #{supplierId,jdbcType=INTEGER},
+			</if>
+			<if test="age != null">
+				age = #{age,jdbcType=INTEGER},
+			</if>
+			<if test="currentAddress != null">
+				current_address = #{currentAddress,jdbcType=VARCHAR},
+			</if>
+			<if test="emergencyContactPerson != null">
+				emergency_contact_person =
+				#{emergencyContactPerson,jdbcType=VARCHAR},
+			</if>
+			<if test="emergencyContactNumber != null">
+				emergency_contact_number =
+				#{emergencyContactNumber,jdbcType=VARCHAR},
+			</if>
+			<if test="idCardNo != null">
+				id_card_no = #{idCardNo,jdbcType=VARCHAR},
+			</if>
+			<if test="superintendNo != null">
+				superintend_no = #{superintendNo,jdbcType=VARCHAR},
+			</if>
+			<if test="superintendUrl != null">
+				superintend_url = #{superintendUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="drivingLicenseType != null">
+				driving_license_type = #{drivingLicenseType,jdbcType=VARCHAR},
+			</if>
+			<if test="drivingYears != null">
+				driving_years = #{drivingYears,jdbcType=INTEGER},
+			</if>
+			<if test="archivesNo != null">
+				archives_no = #{archivesNo,jdbcType=VARCHAR},
+			</if>
+			<if test="issueDate != null">
+				issue_date = #{issueDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="expireDate != null">
+				expire_date = #{expireDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="serviceCity != null">
+				service_city = #{serviceCity,jdbcType=INTEGER},
+			</if>
+			<if test="attachmentName != null">
+				attachment_name = #{attachmentName,jdbcType=VARCHAR},
+			</if>
+			<if test="attachmentAddr != null">
+				attachment_addr = #{attachmentAddr,jdbcType=VARCHAR},
+			</if>
+			<if test="accountBank != null">
+				account_bank = #{accountBank,jdbcType=VARCHAR},
+			</if>
+			<if test="bankAccountNo != null">
+				bank_account_no = #{bankAccountNo,jdbcType=VARCHAR},
+			</if>
+			<if test="licensePlates != null">
+				license_plates = #{licensePlates,jdbcType=VARCHAR},
+			</if>
+			<if test="updateDate != null">
+				update_date = #{updateDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createDate != null">
+				create_date = #{createDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateBy != null">
+				update_by = #{updateBy,jdbcType=INTEGER},
+			</if>
+			<if test="createBy != null">
+				create_by = #{createBy,jdbcType=INTEGER},
+			</if>
+			<if test="status != null">
+				status = #{status,jdbcType=INTEGER},
+			</if>
+			<if test="mac != null">
+				mac = #{mac,jdbcType=VARCHAR},
+			</if>
+			<if test="photosrct != null">
+				photoSrct = #{photosrct,jdbcType=VARCHAR},
+			</if>
+			<if test="pushId != null">
+				push_id = #{pushId,jdbcType=VARCHAR},
+			</if>
+			<if test="isBindingCreditCard != null">
+				is_binding_credit_card = #{isBindingCreditCard,jdbcType=INTEGER},
+			</if>
+			<if test="appVersion != null">
+				app_version = #{appVersion,jdbcType=VARCHAR},
+			</if>
+			<if test="creditCardNo != null">
+				credit_card_no = #{creditCardNo,jdbcType=VARCHAR},
+			</if>
+			<if test="storableCardNo != null">
+				storable_card_no = #{storableCardNo,jdbcType=VARCHAR},
+			</if>
+			<if test="creditOpenAccountBank != null">
+				credit_open_account_bank = #{creditOpenAccountBank,jdbcType=VARCHAR},
+			</if>
+			<if test="creditCardPeriodOfValidity != null">
+				credit_card_period_of_validity =
+				#{creditCardPeriodOfValidity,jdbcType=VARCHAR},
+			</if>
+			<if test="grabNotice != null">
+				grab_notice = #{grabNotice,jdbcType=INTEGER},
+			</if>
+			<if test="creditCvn2 != null">
+				credit_CVN2 = #{creditCvn2,jdbcType=VARCHAR},
+			</if>
+			<if test="creditBindDate != null">
+				credit_bind_date = #{creditBindDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="quickpayCustomerid != null">
+				quickpay_customerid = #{quickpayCustomerid,jdbcType=VARCHAR},
+			</if>
+			<if test="isRead != null">
+				is_read = #{isRead,jdbcType=INTEGER},
+			</if>
+			<if test="bankid != null">
+				bankid = #{bankid,jdbcType=VARCHAR},
+			</if>
+			<if test="goHomeAddress != null">
+				go_home_address = #{goHomeAddress,jdbcType=VARCHAR},
+			</if>
+			<if test="goHomePointLobd != null">
+				go_home_point_loBD = #{goHomePointLobd,jdbcType=VARCHAR},
+			</if>
+			<if test="goHomePointLabd != null">
+				go_home_point_laBD = #{goHomePointLabd,jdbcType=VARCHAR},
+			</if>
+			<if test="goHomePointLa != null">
+				go_home_point_la = #{goHomePointLa,jdbcType=VARCHAR},
+			</if>
+			<if test="goHomePointLo != null">
+				go_home_point_lo = #{goHomePointLo,jdbcType=VARCHAR},
+			</if>
+			<if test="goHomeStatus != null">
+				go_home_status = #{goHomeStatus,jdbcType=INTEGER},
+			</if>
+			<if test="updateGoHomeDate != null">
+				update_go_home_date = #{updateGoHomeDate,jdbcType=VARCHAR},
+			</if>
+			<if test="imei != null">
+				imei = #{imei,jdbcType=VARCHAR},
+			</if>
+			<if test="driverlicensenumber != null">
+				driverLicenseNumber = #{driverlicensenumber,jdbcType=VARCHAR},
+			</if>
+			<if test="drivinglicenseimg != null">
+				drivingLicenseImg = #{drivinglicenseimg,jdbcType=VARCHAR},
+			</if>
+			<if test="firstdrivinglicensedate != null">
+				firstDrivingLicenseDate =
+				#{firstdrivinglicensedate,jdbcType=VARCHAR},
+			</if>
+			<if test="firstmeshworkdrivinglicensedate != null">
+				firstMeshworkDrivingLicenseDate =
+				#{firstmeshworkdrivinglicensedate,jdbcType=VARCHAR},
+			</if>
+			<if test="nationality != null">
+				nationality = #{nationality,jdbcType=VARCHAR},
+			</if>
+			<if test="householdregister != null">
+				householdRegister = #{householdregister,jdbcType=VARCHAR},
+			</if>
+			<if test="nation != null">
+				nation = #{nation,jdbcType=VARCHAR},
+			</if>
+			<if test="marriage != null">
+				marriage = #{marriage,jdbcType=VARCHAR},
+			</if>
+			<if test="foreignlanguage != null">
+				foreignLanguage = #{foreignlanguage,jdbcType=VARCHAR},
+			</if>
+			<if test="currentAddress != null">
+				address = #{currentAddress,jdbcType=VARCHAR},
+			</if>
+			<if test="education != null">
+				education = #{education,jdbcType=VARCHAR},
+			</if>
+			<if test="coursename != null">
+				courseName = #{coursename,jdbcType=VARCHAR},
+			</if>
+			<if test="coursedate != null">
+				courseDate = #{coursedate,jdbcType=VARCHAR},
+			</if>
+			<if test="coursedatestart != null">
+				courseDateStart = #{coursedatestart,jdbcType=VARCHAR},
+			</if>
+			<if test="coursedateend != null">
+				courseDateEnd = #{coursedateend,jdbcType=VARCHAR},
+			</if>
+			<if test="coursetime != null">
+				courseTime = #{coursetime,jdbcType=VARCHAR},
+			</if>
+			<if test="corptype != null">
+				corpType = #{corptype,jdbcType=VARCHAR},
+			</if>
+			<if test="trafficviolations != null">
+				trafficViolations = #{trafficviolations,jdbcType=VARCHAR},
+			</if>
+			<if test="signdate != null">
+				signDate = #{signdate,jdbcType=VARCHAR},
+			</if>
+			<if test="signdateend != null">
+				signDateEnd = #{signdateend,jdbcType=VARCHAR},
+			</if>
+			<if test="contractdate != null">
+				contractDate = #{contractdate,jdbcType=VARCHAR},
+			</if>
+			<if test="isxydriver != null">
+				isXyDriver = #{isxydriver,jdbcType=INTEGER},
+			</if>
+			<if test="parttimejobdri != null">
+				partTimeJobDri = #{parttimejobdri,jdbcType=VARCHAR},
+			</if>
+			<if test="phonetype != null">
+				phoneType = #{phonetype,jdbcType=VARCHAR},
+			</if>
+			<if test="phonecorp != null">
+				phoneCorp = #{phonecorp,jdbcType=VARCHAR},
+			</if>
+			<if test="appversion != null">
+				appVersion = #{appversion,jdbcType=VARCHAR},
+			</if>
+			<if test="maptype != null">
+				mapType = #{maptype,jdbcType=VARCHAR},
+			</if>
+			<if test="emergencycontactaddr != null">
+				emergencyContactAddr = #{emergencycontactaddr,jdbcType=VARCHAR},
+			</if>
+			<if test="assessment != null">
+				assessment = #{assessment,jdbcType=VARCHAR},
+			</if>
+			<if test="driverlicenseissuingdatestart != null">
+				driverLicenseIssuingDateStart =
+				#{driverlicenseissuingdatestart,jdbcType=VARCHAR},
+			</if>
+			<if test="driverlicenseissuingdateend != null">
+				driverLicenseIssuingDateEnd =
+				#{driverlicenseissuingdateend,jdbcType=VARCHAR},
+			</if>
+			<if test="driverlicenseissuingcorp != null">
+				driverLicenseIssuingCorp =
+				#{driverlicenseissuingcorp,jdbcType=VARCHAR},
+			</if>
+			<if test="driverlicenseissuingnumber != null">
+				driverLicenseIssuingNumber =
+				#{driverlicenseissuingnumber,jdbcType=VARCHAR},
+			</if>
+			<if test="xyDriverNumber != null">
+				xy_driver_number = #{xyDriverNumber,jdbcType=VARCHAR},
+			</if>
+			<if test="driverLicenseIssuingRegisterDate != null">
+				driver_license_issuing_register_date =
+				#{driverLicenseIssuingRegisterDate,jdbcType=VARCHAR},
+			</if>
+			<if test="driverLicenseIssuingFirstDate != null">
+				driver_license_issuing_first_date =
+				#{driverLicenseIssuingFirstDate,jdbcType=VARCHAR},
+			</if>
+			<if test="driverLicenseIssuingGrantDate != null">
+				driver_license_issuing_grant_date =
+				#{driverLicenseIssuingGrantDate,jdbcType=VARCHAR},
+			</if>
+			<if test="birthDay != null">
+				birth_day = #{birthDay,jdbcType=VARCHAR},
+			</if>
+			<if test="houseHoldRegisterPermanent != null">
+				house_hold_register_permanent =
+				#{houseHoldRegisterPermanent,jdbcType=VARCHAR},
+			</if>
+			<if test="isUploadCard != null">
+				is_upload_card = #{isUploadCard,jdbcType=INTEGER},
+			</if>
+			<if test="isMustConfirmation != null">
+				is_must_confirmation = #{isMustConfirmation,jdbcType=INTEGER},
+			</if>
+			<if test="contractType != null">
+				contract_type = #{contractType,jdbcType=VARCHAR},
+			</if>
+			<if test="contractNo != null">
+				contract_no = #{contractNo,jdbcType=VARCHAR},
+			</if>
+			<if test="contractFile != null">
+				contract_file = #{contractFile,jdbcType=VARCHAR},
+			</if>
+			<if test="cooperationType != null">
+				cooperation_type = #{cooperationType,jdbcType=TINYINT},
+			</if>
+			<if test="accountType != null">
+				account_type = #{accountType,jdbcType=INTEGER},
+			</if>
+			<if test="groupId != null">
+				group_id = #{groupId,jdbcType=INTEGER},
+			</if>
+			<if test="isTwoShifts != null">
+				is_two_shifts = #{isTwoShifts,jdbcType=INTEGER},
+			</if>
+			<if test="isImage != null">
+				is_image = #{isImage,jdbcType=TINYINT},
+			</if>
+			<if test="memo != null">
+				memo = #{memo,jdbcType=LONGVARCHAR},
+			</if>
+		</set>
+		where driver_id = #{driverId,jdbcType=INTEGER}
+	</update>
+
+	<!-- 新增司机信息 -->
+	<insert id="insertBusDriverInfo" parameterType="com.zhuanche.dto.busManage.BusDriverSaveDTO" keyProperty="driverId">
+		insert into car_biz_driver_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="password != null">
+				password,
+			</if>
+			<if test="phone != null">
+				phone,
+			</if>
+			<if test="gender != null">
+				gender,
+			</if>
+			<if test="name != null">
+				name,
+			</if>
+			<if test="supplierId != null">
+				supplier_id,
+			</if>
+			<if test="age != null">
+				age,
+			</if>
+			<if test="currentAddress != null">
+				current_address,
+			</if>
+			<if test="emergencyContactPerson != null">
+				emergency_contact_person,
+			</if>
+			<if test="emergencyContactNumber != null">
+				emergency_contact_number,
+			</if>
+			<if test="idCardNo != null">
+				id_card_no,
+			</if>
+			<if test="superintendNo != null">
+				superintend_no,
+			</if>
+			<if test="superintendUrl != null">
+				superintend_url,
+			</if>
+			<if test="drivingLicenseType != null">
+				driving_license_type,
+			</if>
+			<if test="drivingYears != null">
+				driving_years,
+			</if>
+			<if test="archivesNo != null">
+				archives_no,
+			</if>
+			<if test="issueDate != null">
+				issue_date,
+			</if>
+			<if test="expireDate != null">
+				expire_date,
+			</if>
+			<if test="serviceCity != null">
+				service_city,
+			</if>
+			<if test="attachmentName != null">
+				attachment_name,
+			</if>
+			<if test="attachmentAddr != null">
+				attachment_addr,
+			</if>
+			<if test="accountBank != null">
+				account_bank,
+			</if>
+			<if test="bankAccountNo != null">
+				bank_account_no,
+			</if>
+			<if test="licensePlates != null">
+				license_plates,
+			</if>
+			<if test="updateDate != null">
+				update_date,
+			</if>
+			<if test="createDate != null">
+				create_date,
+			</if>
+			<if test="updateBy != null">
+				update_by,
+			</if>
+			<if test="createBy != null">
+				create_by,
+			</if>
+			<if test="status != null">
+				status,
+			</if>
+			<if test="mac != null">
+				mac,
+			</if>
+			<if test="photosrct != null">
+				photoSrct,
+			</if>
+			<if test="pushId != null">
+				push_id,
+			</if>
+			<if test="isBindingCreditCard != null">
+				is_binding_credit_card,
+			</if>
+			<if test="appVersion != null">
+				app_version,
+			</if>
+			<if test="creditCardNo != null">
+				credit_card_no,
+			</if>
+			<if test="storableCardNo != null">
+				storable_card_no,
+			</if>
+			<if test="creditOpenAccountBank != null">
+				credit_open_account_bank,
+			</if>
+			<if test="creditCardPeriodOfValidity != null">
+				credit_card_period_of_validity,
+			</if>
+			<if test="grabNotice != null">
+				grab_notice,
+			</if>
+			<if test="creditCvn2 != null">
+				credit_CVN2,
+			</if>
+			<if test="creditBindDate != null">
+				credit_bind_date,
+			</if>
+			<if test="quickpayCustomerid != null">
+				quickpay_customerid,
+			</if>
+			<if test="isRead != null">
+				is_read,
+			</if>
+			<if test="bankid != null">
+				bankid,
+			</if>
+			<if test="goHomeAddress != null">
+				go_home_address,
+			</if>
+			<if test="goHomePointLobd != null">
+				go_home_point_loBD,
+			</if>
+			<if test="goHomePointLabd != null">
+				go_home_point_laBD,
+			</if>
+			<if test="goHomePointLa != null">
+				go_home_point_la,
+			</if>
+			<if test="goHomePointLo != null">
+				go_home_point_lo,
+			</if>
+			<if test="goHomeStatus != null">
+				go_home_status,
+			</if>
+			<if test="updateGoHomeDate != null">
+				update_go_home_date,
+			</if>
+			<if test="imei != null">
+				imei,
+			</if>
+			<if test="driverlicensenumber != null">
+				driverLicenseNumber,
+			</if>
+			<if test="drivinglicenseimg != null">
+				drivingLicenseImg,
+			</if>
+			<if test="firstdrivinglicensedate != null">
+				firstDrivingLicenseDate,
+			</if>
+			<if test="firstmeshworkdrivinglicensedate != null">
+				firstMeshworkDrivingLicenseDate,
+			</if>
+			<if test="nationality != null">
+				nationality,
+			</if>
+			<if test="householdregister != null">
+				householdRegister,
+			</if>
+			<if test="nation != null">
+				nation,
+			</if>
+			<if test="marriage != null">
+				marriage,
+			</if>
+			<if test="foreignlanguage != null">
+				foreignLanguage,
+			</if>
+			<if test="currentAddress != null">
+				address,
+			</if>
+			<if test="education != null">
+				education,
+			</if>
+			<if test="coursename != null">
+				courseName,
+			</if>
+			<if test="coursedate != null">
+				courseDate,
+			</if>
+			<if test="coursedatestart != null">
+				courseDateStart,
+			</if>
+			<if test="coursedateend != null">
+				courseDateEnd,
+			</if>
+			<if test="coursetime != null">
+				courseTime,
+			</if>
+			<if test="corptype != null">
+				corpType,
+			</if>
+			<if test="trafficviolations != null">
+				trafficViolations,
+			</if>
+			<if test="signdate != null">
+				signDate,
+			</if>
+			<if test="signdateend != null">
+				signDateEnd,
+			</if>
+			<if test="contractdate != null">
+				contractDate,
+			</if>
+			<if test="isxydriver != null">
+				isXyDriver,
+			</if>
+			<if test="parttimejobdri != null">
+				partTimeJobDri,
+			</if>
+			<if test="phonetype != null">
+				phoneType,
+			</if>
+			<if test="phonecorp != null">
+				phoneCorp,
+			</if>
+			<if test="appversion != null">
+				appVersion,
+			</if>
+			<if test="maptype != null">
+				mapType,
+			</if>
+			<if test="emergencycontactaddr != null">
+				emergencyContactAddr,
+			</if>
+			<if test="assessment != null">
+				assessment,
+			</if>
+			<if test="driverlicenseissuingdatestart != null">
+				driverLicenseIssuingDateStart,
+			</if>
+			<if test="driverlicenseissuingdateend != null">
+				driverLicenseIssuingDateEnd,
+			</if>
+			<if test="driverlicenseissuingcorp != null">
+				driverLicenseIssuingCorp,
+			</if>
+			<if test="driverlicenseissuingnumber != null">
+				driverLicenseIssuingNumber,
+			</if>
+			<if test="xyDriverNumber != null">
+				xy_driver_number,
+			</if>
+			<if test="driverLicenseIssuingRegisterDate != null">
+				driver_license_issuing_register_date,
+			</if>
+			<if test="driverLicenseIssuingFirstDate != null">
+				driver_license_issuing_first_date,
+			</if>
+			<if test="driverLicenseIssuingGrantDate != null">
+				driver_license_issuing_grant_date,
+			</if>
+			<if test="birthDay != null">
+				birth_day,
+			</if>
+			<if test="houseHoldRegisterPermanent != null">
+				house_hold_register_permanent,
+			</if>
+			<if test="isUploadCard != null">
+				is_upload_card,
+			</if>
+			<if test="isMustConfirmation != null">
+				is_must_confirmation,
+			</if>
+			<if test="contractType != null">
+				contract_type,
+			</if>
+			<if test="contractNo != null">
+				contract_no,
+			</if>
+			<if test="contractFile != null">
+				contract_file,
+			</if>
+			<if test="cooperationType != null">
+				cooperation_type,
+			</if>
+			<if test="accountType != null">
+				account_type,
+			</if>
+			<if test="groupId != null">
+				group_id,
+			</if>
+			<if test="isTwoShifts != null">
+				is_two_shifts,
+			</if>
+			<if test="isImage != null">
+				is_image,
+			</if>
+			<if test="memo != null">
+				memo,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="password != null">
+				#{password,jdbcType=VARCHAR},
+			</if>
+			<if test="phone != null">
+				#{phone,jdbcType=VARCHAR},
+			</if>
+			<if test="gender != null">
+				#{gender,jdbcType=INTEGER},
+			</if>
+			<if test="name != null">
+				#{name,jdbcType=VARCHAR},
+			</if>
+			<if test="supplierId != null">
+				#{supplierId,jdbcType=INTEGER},
+			</if>
+			<if test="age != null">
+				#{age,jdbcType=INTEGER},
+			</if>
+			<if test="currentAddress != null">
+				#{currentAddress,jdbcType=VARCHAR},
+			</if>
+			<if test="emergencyContactPerson != null">
+				#{emergencyContactPerson,jdbcType=VARCHAR},
+			</if>
+			<if test="emergencyContactNumber != null">
+				#{emergencyContactNumber,jdbcType=VARCHAR},
+			</if>
+			<if test="idCardNo != null">
+				#{idCardNo,jdbcType=VARCHAR},
+			</if>
+			<if test="superintendNo != null">
+				#{superintendNo,jdbcType=VARCHAR},
+			</if>
+			<if test="superintendUrl != null">
+				#{superintendUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="drivingLicenseType != null">
+				#{drivingLicenseType,jdbcType=VARCHAR},
+			</if>
+			<if test="drivingYears != null">
+				#{drivingYears,jdbcType=INTEGER},
+			</if>
+			<if test="archivesNo != null">
+				#{archivesNo,jdbcType=VARCHAR},
+			</if>
+			<if test="issueDate != null">
+				#{issueDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="expireDate != null">
+				#{expireDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="serviceCity != null">
+				#{serviceCity,jdbcType=INTEGER},
+			</if>
+			<if test="attachmentName != null">
+				#{attachmentName,jdbcType=VARCHAR},
+			</if>
+			<if test="attachmentAddr != null">
+				#{attachmentAddr,jdbcType=VARCHAR},
+			</if>
+			<if test="accountBank != null">
+				#{accountBank,jdbcType=VARCHAR},
+			</if>
+			<if test="bankAccountNo != null">
+				#{bankAccountNo,jdbcType=VARCHAR},
+			</if>
+			<if test="licensePlates != null">
+				#{licensePlates,jdbcType=VARCHAR},
+			</if>
+			<if test="updateDate != null">
+				#{updateDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createDate != null">
+				#{createDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateBy != null">
+				#{updateBy,jdbcType=INTEGER},
+			</if>
+			<if test="createBy != null">
+				#{createBy,jdbcType=INTEGER},
+			</if>
+			<if test="status != null">
+				#{status,jdbcType=INTEGER},
+			</if>
+			<if test="mac != null">
+				#{mac,jdbcType=VARCHAR},
+			</if>
+			<if test="photosrct != null">
+				#{photosrct,jdbcType=VARCHAR},
+			</if>
+			<if test="pushId != null">
+				#{pushId,jdbcType=VARCHAR},
+			</if>
+			<if test="isBindingCreditCard != null">
+				#{isBindingCreditCard,jdbcType=INTEGER},
+			</if>
+			<if test="appVersion != null">
+				#{appVersion,jdbcType=VARCHAR},
+			</if>
+			<if test="creditCardNo != null">
+				#{creditCardNo,jdbcType=VARCHAR},
+			</if>
+			<if test="storableCardNo != null">
+				#{storableCardNo,jdbcType=VARCHAR},
+			</if>
+			<if test="creditOpenAccountBank != null">
+				#{creditOpenAccountBank,jdbcType=VARCHAR},
+			</if>
+			<if test="creditCardPeriodOfValidity != null">
+				#{creditCardPeriodOfValidity,jdbcType=VARCHAR},
+			</if>
+			<if test="grabNotice != null">
+				#{grabNotice,jdbcType=INTEGER},
+			</if>
+			<if test="creditCvn2 != null">
+				#{creditCvn2,jdbcType=VARCHAR},
+			</if>
+			<if test="creditBindDate != null">
+				#{creditBindDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="quickpayCustomerid != null">
+				#{quickpayCustomerid,jdbcType=VARCHAR},
+			</if>
+			<if test="isRead != null">
+				#{isRead,jdbcType=INTEGER},
+			</if>
+			<if test="bankid != null">
+				#{bankid,jdbcType=VARCHAR},
+			</if>
+			<if test="goHomeAddress != null">
+				#{goHomeAddress,jdbcType=VARCHAR},
+			</if>
+			<if test="goHomePointLobd != null">
+				#{goHomePointLobd,jdbcType=VARCHAR},
+			</if>
+			<if test="goHomePointLabd != null">
+				#{goHomePointLabd,jdbcType=VARCHAR},
+			</if>
+			<if test="goHomePointLa != null">
+				#{goHomePointLa,jdbcType=VARCHAR},
+			</if>
+			<if test="goHomePointLo != null">
+				#{goHomePointLo,jdbcType=VARCHAR},
+			</if>
+			<if test="goHomeStatus != null">
+				#{goHomeStatus,jdbcType=INTEGER},
+			</if>
+			<if test="updateGoHomeDate != null">
+				#{updateGoHomeDate,jdbcType=VARCHAR},
+			</if>
+			<if test="imei != null">
+				#{imei,jdbcType=VARCHAR},
+			</if>
+			<if test="driverlicensenumber != null">
+				#{driverlicensenumber,jdbcType=VARCHAR},
+			</if>
+			<if test="drivinglicenseimg != null">
+				#{drivinglicenseimg,jdbcType=VARCHAR},
+			</if>
+			<if test="firstdrivinglicensedate != null">
+				#{firstdrivinglicensedate,jdbcType=VARCHAR},
+			</if>
+			<if test="firstmeshworkdrivinglicensedate != null">
+				#{firstmeshworkdrivinglicensedate,jdbcType=VARCHAR},
+			</if>
+			<if test="nationality != null">
+				#{nationality,jdbcType=VARCHAR},
+			</if>
+			<if test="householdregister != null">
+				#{householdregister,jdbcType=VARCHAR},
+			</if>
+			<if test="nation != null">
+				#{nation,jdbcType=VARCHAR},
+			</if>
+			<if test="marriage != null">
+				#{marriage,jdbcType=VARCHAR},
+			</if>
+			<if test="foreignlanguage != null">
+				#{foreignlanguage,jdbcType=VARCHAR},
+			</if>
+			<if test="currentAddress != null">
+				#{currentAddress,jdbcType=VARCHAR},
+			</if>
+			<if test="education != null">
+				#{education,jdbcType=VARCHAR},
+			</if>
+			<if test="coursename != null">
+				#{coursename,jdbcType=VARCHAR},
+			</if>
+			<if test="coursedate != null">
+				#{coursedate,jdbcType=VARCHAR},
+			</if>
+			<if test="coursedatestart != null">
+				#{coursedatestart,jdbcType=VARCHAR},
+			</if>
+			<if test="coursedateend != null">
+				#{coursedateend,jdbcType=VARCHAR},
+			</if>
+			<if test="coursetime != null">
+				#{coursetime,jdbcType=VARCHAR},
+			</if>
+			<if test="corptype != null">
+				#{corptype,jdbcType=VARCHAR},
+			</if>
+			<if test="trafficviolations != null">
+				#{trafficviolations,jdbcType=VARCHAR},
+			</if>
+			<if test="signdate != null">
+				#{signdate,jdbcType=VARCHAR},
+			</if>
+			<if test="signdateend != null">
+				#{signdateend,jdbcType=VARCHAR},
+			</if>
+			<if test="contractdate != null">
+				#{contractdate,jdbcType=VARCHAR},
+			</if>
+			<if test="isxydriver != null">
+				#{isxydriver,jdbcType=INTEGER},
+			</if>
+			<if test="parttimejobdri != null">
+				#{parttimejobdri,jdbcType=VARCHAR},
+			</if>
+			<if test="phonetype != null">
+				#{phonetype,jdbcType=VARCHAR},
+			</if>
+			<if test="phonecorp != null">
+				#{phonecorp,jdbcType=VARCHAR},
+			</if>
+			<if test="appversion != null">
+				#{appversion,jdbcType=VARCHAR},
+			</if>
+			<if test="maptype != null">
+				#{maptype,jdbcType=VARCHAR},
+			</if>
+			<if test="emergencycontactaddr != null">
+				#{emergencycontactaddr,jdbcType=VARCHAR},
+			</if>
+			<if test="assessment != null">
+				#{assessment,jdbcType=VARCHAR},
+			</if>
+			<if test="driverlicenseissuingdatestart != null">
+				#{driverlicenseissuingdatestart,jdbcType=VARCHAR},
+			</if>
+			<if test="driverlicenseissuingdateend != null">
+				#{driverlicenseissuingdateend,jdbcType=VARCHAR},
+			</if>
+			<if test="driverlicenseissuingcorp != null">
+				#{driverlicenseissuingcorp,jdbcType=VARCHAR},
+			</if>
+			<if test="driverlicenseissuingnumber != null">
+				#{driverlicenseissuingnumber,jdbcType=VARCHAR},
+			</if>
+			<if test="xyDriverNumber != null">
+				#{xyDriverNumber,jdbcType=VARCHAR},
+			</if>
+			<if test="driverLicenseIssuingRegisterDate != null">
+				#{driverLicenseIssuingRegisterDate,jdbcType=VARCHAR},
+			</if>
+			<if test="driverLicenseIssuingFirstDate != null">
+				#{driverLicenseIssuingFirstDate,jdbcType=VARCHAR},
+			</if>
+			<if test="driverLicenseIssuingGrantDate != null">
+				#{driverLicenseIssuingGrantDate,jdbcType=VARCHAR},
+			</if>
+			<if test="birthDay != null">
+				#{birthDay,jdbcType=VARCHAR},
+			</if>
+			<if test="houseHoldRegisterPermanent != null">
+				#{houseHoldRegisterPermanent,jdbcType=VARCHAR},
+			</if>
+			<if test="isUploadCard != null">
+				#{isUploadCard,jdbcType=INTEGER},
+			</if>
+			<if test="isMustConfirmation != null">
+				#{isMustConfirmation,jdbcType=INTEGER},
+			</if>
+			<if test="contractType != null">
+				#{contractType,jdbcType=VARCHAR},
+			</if>
+			<if test="contractNo != null">
+				#{contractNo,jdbcType=VARCHAR},
+			</if>
+			<if test="contractFile != null">
+				#{contractFile,jdbcType=VARCHAR},
+			</if>
+			<if test="cooperationType != null">
+				#{cooperationType,jdbcType=TINYINT},
+			</if>
+			<if test="accountType != null">
+				#{accountType,jdbcType=INTEGER},
+			</if>
+			<if test="groupId != null">
+				#{groupId,jdbcType=INTEGER},
+			</if>
+			<if test="isTwoShifts != null">
+				#{isTwoShifts,jdbcType=INTEGER},
+			</if>
+			<if test="isImage != null">
+				#{isImage,jdbcType=TINYINT},
+			</if>
+			<if test="memo != null">
+				#{memo,jdbcType=LONGVARCHAR},
+			</if>
+		</trim>
+	</insert>
+
+</mapper>
