@@ -208,6 +208,7 @@ public class MessageManagerController {
      */
     @RequestMapping(value = "/messageWithDraw")
     @ResponseBody
+    @RequiresPermissions(value = {"PublishMessage"})
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
     })
@@ -241,6 +242,7 @@ public class MessageManagerController {
      * @return
      */
     @RequestMapping(value = "/messageDeleteDraw")
+    @RequiresPermissions(value = {"PublishMessage"})
     @ResponseBody
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
