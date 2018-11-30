@@ -173,13 +173,13 @@ public class UserManagementService{
         if( StringUtils.isEmpty(newUser.getGroupIds()) ) {
             newUser.setGroupIds("");
         }
-        if (StringUtils.isNotBlank(newUser.getGroupIds()) || StringUtils.isNotBlank(rawuser.getGroupIds())){
+        if (StringUtils.isNotBlank(newUser.getGroupIds())){
 		    newUser.setLevel(PermissionLevelEnum.GROUP.getCode());
-        }else if (StringUtils.isNotBlank(newUser.getTeamId()) || StringUtils.isNotBlank(rawuser.getTeamId())){
+        }else if (StringUtils.isNotBlank(newUser.getTeamId())){
 		    newUser.setLevel(PermissionLevelEnum.TEAM.getCode());
-        }else if(StringUtils.isNotBlank(newUser.getSuppliers()) || StringUtils.isNotBlank(rawuser.getSuppliers())){
+        }else if(StringUtils.isNotBlank(newUser.getSuppliers())){
             newUser.setLevel(PermissionLevelEnum.SUPPLIER.getCode());
-        }else if(StringUtils.isNotBlank(newUser.getCities()) || StringUtils.isNotBlank(rawuser.getCities())){
+        }else if(StringUtils.isNotBlank(newUser.getCities())){
             newUser.setLevel(PermissionLevelEnum.CITY.getCode());
         }else {
             newUser.setLevel(PermissionLevelEnum.ALL.getCode());
