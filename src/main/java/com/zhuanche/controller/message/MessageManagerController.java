@@ -79,6 +79,7 @@ public class MessageManagerController {
      */
     @RequestMapping(value = "/postMessage",method = RequestMethod.POST)
     @ResponseBody
+    @RequiresPermissions(value = {"PublishMessage"})
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
     })

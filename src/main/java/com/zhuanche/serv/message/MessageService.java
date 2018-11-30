@@ -222,13 +222,15 @@ public class MessageService {
                             }
                         }
                     } catch (Exception e) {
+                        logger.info(e.getMessage());
                         throw new RuntimeException();
                     }
 
                 }
 
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.info(e.getMessage());
+                throw new RuntimeException();
             }
                 return 1;
         } catch (Exception e) {
