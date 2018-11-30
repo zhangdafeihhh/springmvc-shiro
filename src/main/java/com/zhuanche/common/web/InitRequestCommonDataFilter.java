@@ -44,7 +44,8 @@ public class InitRequestCommonDataFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)throws ServletException, IOException {
 		/***************支持跨域请求BEGIN***********************/
 		String Origin = request.getHeader("Origin");
-		if(StringUtils.isNotEmpty(Origin)) {
+		logger.info("获取响应头信息：" + Origin);
+		if(StringUtils.isNotEmpty(Origin) && !"null".equals(Origin.toLowerCase())) {
 			response.setHeader("Access-Control-Allow-Origin", Origin);
 		}else {
 			response.setHeader("Access-Control-Allow-Origin", "*");
