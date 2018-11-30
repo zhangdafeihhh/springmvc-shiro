@@ -21,7 +21,7 @@
   </resultMap>
   <sql id="Base_Column_List" >
     user_id, account, user_name, password, role_id, account_type, status, remark, create_user, 
-    create_date, cities, suppliers, team_id, phone, group_ids
+    create_date, cities, suppliers, team_id, phone, group_ids,level
   </sql>
   
   <!-- 根据账户查询 -->
