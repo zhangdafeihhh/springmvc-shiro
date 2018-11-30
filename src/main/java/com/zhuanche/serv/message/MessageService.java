@@ -17,6 +17,7 @@ import com.zhuanche.exception.MessageException;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.util.FtpUtil;
 import com.zhuanche.util.FtpUtils;
+import com.zhuanche.util.HtmlFilterUtil;
 import com.zhuanche.util.dateUtil.DateUtil;
 import mapper.mdbcarmanage.ex.*;
 import mapper.rentcar.ex.CarBizCityExMapper;
@@ -321,7 +322,14 @@ public class MessageService {
 
             PageHelper.clearPage();
 
-            PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, dtoList);
+            List<CarMessagePostDto> removeHtmlList = new ArrayList<>();
+            for (CarMessagePostDto post : dtoList){
+                post.setMessageContent(HtmlFilterUtil.HTMLTagSpirit(post.getMessageContent()));
+                post.setMesageTitle(HtmlFilterUtil.HTMLTagSpirit(post.getMesageTitle()));
+                removeHtmlList.add(post);
+            }
+
+            PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, removeHtmlList);
 
             return pageDTO;
         } catch (Exception e) {

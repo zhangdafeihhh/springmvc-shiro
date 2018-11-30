@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.zhuanche.common.enums.PermissionLevelEnum;
 import com.zhuanche.entity.mdbcarmanage.DriverTelescopeUser;
 import mapper.mdbcarmanage.ex.DriverTelescopeUserExMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -169,6 +170,21 @@ public class UserManagementService{
 		if( StringUtils.isEmpty(newUser.getTeamId()) ) {
 			newUser.setTeamId("");
 		}
+        if( StringUtils.isEmpty(newUser.getGroupIds()) ) {
+            newUser.setGroupIds("");
+        }
+        if (StringUtils.isNotBlank(newUser.getGroupIds())){
+		    newUser.setLevel(PermissionLevelEnum.GROUP.getCode());
+        }else if (StringUtils.isNotBlank(newUser.getTeamId())){
+		    newUser.setLevel(PermissionLevelEnum.TEAM.getCode());
+        }else if(StringUtils.isNotBlank(newUser.getSuppliers())){
+            newUser.setLevel(PermissionLevelEnum.SUPPLIER.getCode());
+        }else if(StringUtils.isNotBlank(newUser.getCities())){
+            newUser.setLevel(PermissionLevelEnum.CITY.getCode());
+        }else {
+            newUser.setLevel(PermissionLevelEnum.ALL.getCode());
+        }
+
 		//执行
 		carAdmUserMapper.updateByPrimaryKeySelective(newUser);
 		redisSessionDAO.clearRelativeSession(null, null , newUser.getUserId() );//自动清理用户会话

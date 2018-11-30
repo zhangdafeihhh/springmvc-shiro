@@ -33,9 +33,9 @@ public class CarAdmUser implements Serializable{
 
     private String phone;
 
-    private Integer level;
-
     private String groupIds;
+
+    private Integer level;
 
     public Integer getUserId() {
         return userId;
@@ -149,14 +149,6 @@ public class CarAdmUser implements Serializable{
         this.phone = phone == null ? null : phone.trim();
     }
 
-    public Integer getLevel() {
-        return level;
-    }
-
-    public void setLevel(Integer level) {
-        this.level = level;
-    }
-
     public String getGroupIds() {
         return groupIds;
     }
@@ -165,4 +157,11 @@ public class CarAdmUser implements Serializable{
         this.groupIds = groupIds == null ? null : groupIds.trim();
     }
 
+    public Integer getLevel() {
+        return level;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
+    }
 }
