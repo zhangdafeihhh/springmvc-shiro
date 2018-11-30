@@ -3,6 +3,7 @@ package com.zhuanche.controller.authc;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.zhuanche.common.enums.PermissionLevelEnum;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.serv.CarBizDriverInfoService;
 import org.apache.commons.lang.StringUtils;
@@ -45,6 +46,21 @@ public class UserManagementController {
 		user.setSuppliers( supplierIds );
 		user.setTeamId( teamIds );
 		user.setGroupIds(groupIds);
+		if (StringUtils.isNotBlank(groupIds)){
+			user.setLevel(PermissionLevelEnum.GROUP.getCode());
+		}
+		else if (StringUtils.isNotBlank(teamIds)){
+			user.setLevel(PermissionLevelEnum.TEAM.getCode());
+		}
+		else if (StringUtils.isNotBlank(supplierIds)){
+			user.setLevel(PermissionLevelEnum.SUPPLIER.getCode());
+		}
+		else if (StringUtils.isNotBlank(cityIds)){
+			user.setLevel(PermissionLevelEnum.CITY.getCode());
+		}
+		else {
+			user.setLevel(PermissionLevelEnum.ALL.getCode());
+		}
 		boolean phoneExist = userManagementService.userPhoneExist(phone);
 		if(phoneExist){
 			return AjaxResponse.fail(RestErrorCode.PHONE_EXIST );
