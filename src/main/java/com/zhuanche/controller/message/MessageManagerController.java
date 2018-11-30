@@ -18,6 +18,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -382,9 +383,8 @@ public class MessageManagerController {
 
 
     @RequestMapping(value="/download")
-    public ResponseEntity<byte[]> download(HttpServletRequest request,
-                                           @RequestParam("fileUrl") String fileUrl,
-                                           Model model)throws Exception {
+    public ResponseEntity<byte[]> download(@RequestParam("fileUrl") String fileUrl)
+            throws Exception {
         //下载文件路径
         try {
             String path = "";  //服务器
