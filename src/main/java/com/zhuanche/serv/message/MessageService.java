@@ -183,6 +183,8 @@ public class MessageService {
                             //多文件上传
                             MultipartFile multipartFile;
                             for (Map.Entry<String, List<MultipartFile>> entry: multiFileMap.entrySet()){
+
+                                //
                                 List<MultipartFile> list = entry.getValue();
                                 for (MultipartFile fileDetail : list) {
                                     multipartFile = fileDetail;
@@ -297,7 +299,7 @@ public class MessageService {
      * @param pageNum
      * @return
      */
-    public PageDTO messageLisByStatus(int userId,int status,int pageSize,int pageNum) throws MessageException{
+    public PageDTO messageLisByStatus(int userId,int status,int pageNum,int pageSize) throws MessageException{
 
         try {
             Page page = PageHelper.startPage(pageNum,pageSize,true);
