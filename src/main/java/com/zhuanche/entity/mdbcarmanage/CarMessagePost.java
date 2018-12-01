@@ -75,7 +75,7 @@ public class CarMessagePost{
         suppyAndTeam(12,"加盟商 车队"), //加盟商+车队
         contryAndSuppyAndTeam(13,"全国 加盟商 车队"),
         cityAndSuppyAndTeam(14,"城市 加盟商 车队"),//城市+加盟商+车队
-        counryAndCityAndSuppyAndTeam(15,"城市 加盟商 车队");//城市+加盟商+车队
+        counryAndCityAndSuppyAndTeam(15,"全国 城市 加盟商 车队");//城市+加盟商+车队
 
 
 
