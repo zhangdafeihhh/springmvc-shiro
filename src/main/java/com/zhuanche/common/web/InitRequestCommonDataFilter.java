@@ -44,8 +44,7 @@ public class InitRequestCommonDataFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)throws ServletException, IOException {
 		/***************支持跨域请求BEGIN***********************/
 		String Origin = request.getHeader("Origin");
-		logger.info("获取响应头信息：" + Origin);
-		if(StringUtils.isNotEmpty(Origin) && !"null".equals(Origin.toLowerCase())) {
+		if(StringUtils.isNotEmpty(Origin)) {
 			response.setHeader("Access-Control-Allow-Origin", Origin);
 		}else {
 			response.setHeader("Access-Control-Allow-Origin", "*");
@@ -55,7 +54,7 @@ public class InitRequestCommonDataFilter extends OncePerRequestFilter {
         response.setHeader("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Accept,XRequestedWith,LastModified");
         response.setHeader("Access-Control-Allow-Credentials", "true");		
 		/***************支持跨域请求END***********************/
-        
+
 		/***************是否为AJAX请求BEGIN******************/
 		String XMLHttpRequest = request.getHeader("X-Requested-With");
 		if( (XMLHttpRequest!=null && XMLHttpRequest.trim().length()>0) || request.getRequestURI().endsWith(".json") ){
