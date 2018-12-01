@@ -14,9 +14,11 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.driver.SubscriptionReportConfigureDTO;
 import com.zhuanche.entity.driver.SubscriptionReport;
+import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 import com.zhuanche.serv.subscription.SubscriptionReportConfigureService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BigDataFtpUtil;
+import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
@@ -32,7 +34,9 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/subscription/report")
@@ -48,6 +52,9 @@ public class SubscriptionReportConfigureController {
 
     @Autowired
     private BigDataFtpUtil bigDataFtpUtil;
+
+    @Autowired
+    private CarAdmUserExMapper carAdmUserExMapper;
 
     /**
      * 数据报表订阅
@@ -325,6 +332,53 @@ public class SubscriptionReportConfigureController {
         map.put( "cities", cities);
         map.put( "supplierIds", supplierIds);
         map.put( "teamIds", teamIds);
+        return AjaxResponse.success(map);
+    }
+
+    /**
+     * 数据报表
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/querySubscriptionLevel")
+//    @RequiresPermissions(value = "SubscribeStatement_look")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
+    })
+    public AjaxResponse querySubscriptionLevel() {
+
+        Integer id = WebSessionUtil.getCurrentLoginUser().getId();//获取用户的ID
+        CarAdmUser user = carAdmUserExMapper.queryUserPermissionInfo(id);
+        if (user == null){
+            return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST);
+        }
+        Integer level = user.getLevel();//获取用户的级别,1-全国;2-城市;4-加盟商;8-车队;16-班组
+        JSONObject map = new JSONObject();
+        if (level != null) {
+            switch (level) {
+                case 1:
+                    map.put( "1", "全国");
+                    map.put( "2", "城市");
+                    map.put( "4", "供应商");
+                    map.put( "8", "车队");
+                    break;
+                case 2:
+                    map.put( "2", "城市");
+                    map.put( "4", "供应商");
+                    map.put( "8", "车队");
+                    break;
+                case 4:
+                    map.put( "4", "供应商");
+                    map.put( "8", "车队");
+                    break;
+                case 8:
+                    map.put( "8", "车队");
+                    break;
+                case 16:
+                    map.put( "16", "小组");
+                    break;
+            }
+        }
         return AjaxResponse.success(map);
     }
 }
