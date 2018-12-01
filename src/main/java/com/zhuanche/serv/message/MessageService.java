@@ -34,10 +34,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.text.html.parser.Entity;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -163,6 +165,7 @@ public class MessageService {
 
                     //上传附件
                     try {
+
                         if (file != null && !file.isEmpty()){
                             //查询出来原来上次的附件
 
@@ -173,50 +176,50 @@ public class MessageService {
 
                             MultipartHttpServletRequest req = (MultipartHttpServletRequest) request;
 
-                            Map<String,MultipartFile> map = new HashMap<>();
 
-                            Collection<MultipartFile> multipartFileCollection = req.getFileMap().values();
+                            MultiValueMap<String, MultipartFile> multiFileMap = req.getMultiFileMap();
 
-                            for (MultipartFile multFile : multipartFileCollection){
-                                map.put(multFile.getName(),multFile);
-                            }
 
+                            //多文件上传
                             MultipartFile multipartFile;
-                            for (Map.Entry<String,MultipartFile> entry: map.entrySet()){
-                                multipartFile = entry.getValue();
+                            for (Map.Entry<String, List<MultipartFile>> entry: multiFileMap.entrySet()){
 
-                                Map<String,Object> mapResult = this.fileUpload(multipartFile);
-                               // Map<String,Object> result = this.upload(multipartFile);
-                                Boolean ok = (Boolean) mapResult.get("ok");
-                                if (ok== null || !ok){
-                                    logger.error("消息中心-上传附件-异常");
+                                //
+                                List<MultipartFile> list = entry.getValue();
+                                for (MultipartFile fileDetail : list) {
+                                    multipartFile = fileDetail;
+                                    Map<String, Object> mapResult = this.fileUpload(multipartFile);
+                                    Boolean ok = (Boolean) mapResult.get("ok");
+                                    if (ok == null || !ok) {
+                                        logger.error("消息中心-上传附件-异常");
 
-                                }else {
-                                    CarMessageDoc doc = new CarMessageDoc();
-                                    doc.setDocName(mapResult.get("fileName").toString());
-                                    doc.setCreateTime(new Date());
-                                    doc.setMessageId(messageId);
-                                    doc.setUpdateTime(new Date());
-                                    doc.setDocUrl(mapResult.get("fileUrl").toString());
-                                    // doc.setDocUrl(FtpConstants.FTP+FtpConstants.FTPURL+":"+FtpConstants.FTPPORT + result.get("oppositeUrl").toString());
-                                    doc.setState(status);
-                                    int code = docExMapper.insert(doc);
-                                    if (code > 0 ){
-                                        logger.info("====doc文档上传成功====");
+                                    } else {
+                                        CarMessageDoc doc = new CarMessageDoc();
+                                        doc.setDocName(mapResult.get("fileName").toString());
+                                        doc.setCreateTime(new Date());
+                                        doc.setMessageId(messageId);
+                                        doc.setUpdateTime(new Date());
+                                        doc.setDocUrl(mapResult.get("fileUrl").toString());
+                                        // doc.setDocUrl(FtpConstants.FTP+FtpConstants.FTPURL+":"+FtpConstants.FTPPORT + result.get("oppositeUrl").toString());
+                                        doc.setState(status);
+                                        int code = docExMapper.insert(doc);
+                                        if (code > 0) {
+                                            logger.info("====doc文档上传成功====");
 
-                                        if (CollectionUtils.isNotEmpty(listDoc)){
-                                            Iterator<CarMessageDoc> iterator = listDoc.iterator();
-                                            while (iterator.hasNext()){
-                                                CarMessageDoc docDel = (CarMessageDoc) iterator.next();
-                                                logger.info("删除上次上传文档" + docDel.getId());
-                                                docExMapper.deleteByPrimaryKey(docDel.getId());
+                                            if (CollectionUtils.isNotEmpty(listDoc)) {
+                                                Iterator<CarMessageDoc> iterator = listDoc.iterator();
+                                                while (iterator.hasNext()) {
+                                                    CarMessageDoc docDel = (CarMessageDoc) iterator.next();
+                                                    logger.info("删除上次上传文档" + docDel.getId());
+                                                    docExMapper.deleteByPrimaryKey(docDel.getId());
+                                                }
+                                                listDoc.clear();
                                             }
-                                            listDoc.clear();
+                                        } else {
+                                            logger.info("====doc上传文档失败======");
                                         }
-                                    }else {
-                                        logger.info("====doc上传文档失败======");
-                                    }
 
+                                    }
                                 }
 
                             }
@@ -296,7 +299,7 @@ public class MessageService {
      * @param pageNum
      * @return
      */
-    public PageDTO messageLisByStatus(int userId,int status,int pageSize,int pageNum) throws MessageException{
+    public PageDTO messageLisByStatus(int userId,int status,int pageNum,int pageSize) throws MessageException{
 
         try {
             Page page = PageHelper.startPage(pageNum,pageSize,true);
@@ -535,6 +538,8 @@ public class MessageService {
      * @return
      */
     private String getCityNames(String cities){
+        if (StringUtils.isEmpty(cities))
+            return null;
         List<CarBizCity> carBizCityList = carBizCityExMapper.queryByIds(null);
         Map<Integer,String> map = new HashMap<>();
         for (CarBizCity bizCity : carBizCityList){
@@ -563,10 +568,12 @@ public class MessageService {
             map.put(supplier.getSupplierId(),supplier.getSupplierFullName());
         }
         StringBuffer sb = new StringBuffer();
-        String[] suppyArray = suppy.split(Constants.SEPERATER);
-        for (String str : suppyArray){
-            if (StringUtils.isNotBlank(map.get(Integer.valueOf(str)))){
-                sb.append(map.get(Integer.valueOf(str))).append(" ");
+        if (StringUtils.isNotEmpty(suppy)){
+            String[] suppyArray = suppy.split(Constants.SEPERATER);
+            for (String str : suppyArray){
+                if (StringUtils.isNotBlank(map.get(Integer.valueOf(str)))){
+                    sb.append(map.get(Integer.valueOf(str))).append(" ");
+                }
             }
         }
         return sb.toString();
@@ -587,7 +594,7 @@ public class MessageService {
             map.put(carDriverTeam.getId(),carDriverTeam.getTeamName());
         }
         StringBuffer sb = new StringBuffer();
-        if (StringUtils.isNotBlank(teamIds)){
+        if (StringUtils.isNotEmpty(teamIds)){
             String[] teamIdArray = teamIds.split(Constants.SEPERATER);
             for (String str : teamIdArray){
                 if (StringUtils.isNotBlank(map.get(Integer.valueOf(str)))){
@@ -602,6 +609,8 @@ public class MessageService {
     }
 
     private Set<Integer> getCities(String cities){
+        if (StringUtils.isEmpty(cities))
+            return null;
         String[] cityArray = cities.split(Constants.SEPERATER);
         Set<Integer> setCities = new HashSet<>();
         for (String str : cityArray){
@@ -613,6 +622,8 @@ public class MessageService {
 
 
     private Set<String> getSetMaps(String str){
+        if (StringUtils.isEmpty(str))
+            return null;
         String[] strArray = str.split(Constants.SEPERATER);
         Set<String> setStr = new HashSet<>();
         for (String s : strArray){
