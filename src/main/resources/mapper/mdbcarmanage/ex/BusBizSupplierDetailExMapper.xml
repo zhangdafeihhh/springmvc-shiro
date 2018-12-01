@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="mapper.mdbcarmanage.BusBizSupplierDetailMapper">
+<mapper namespace="mapper.mdbcarmanage.ex.BusBizSupplierDetailExMapper">
 	<resultMap id="BaseResultMap"
 		type="com.zhuanche.entity.mdbcarmanage.BusBizSupplierDetail">
 		<id column="id" property="id" jdbcType="INTEGER" />
@@ -26,49 +26,15 @@
 			jdbcType="VARCHAR" />
 	</resultMap>
 	<sql id="Base_Column_List">
-		id, supplier_id, create_by, update_by, create_date, update_date, deposit,
+		id, supplier_id, create_by, update_by, create_date,
+		update_date, deposit,
 		franchise_fee,
-		invoice_company_name, invoice_company_phone, invoice_company_addr, invoice_deposit_bank,
+		invoice_company_name,
+		invoice_company_phone, invoice_company_addr, invoice_deposit_bank,
 		invoice_bank_account, invoice_duty_paragraph
 	</sql>
-	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
-		parameterType="java.lang.Integer">
-		select
-		<include refid="Base_Column_List" />
-		from bus_biz_supplier_detail
-		where id = #{id,jdbcType=INTEGER}
-	</select>
-	<insert id="insert"
-		parameterType="com.zhuanche.entity.mdbcarmanage.BusBizSupplierDetail">
-		<selectKey resultType="java.lang.Integer" keyProperty="id"
-			order="AFTER">
-			SELECT LAST_INSERT_ID()
-		</selectKey>
-		insert into bus_biz_supplier_detail (supplier_id, create_by,
-		update_by,
-		create_date, update_date, deposit,
-		franchise_fee, invoice_company_name, invoice_company_phone,
-		invoice_company_addr, invoice_deposit_bank,
-		invoice_bank_account, invoice_duty_paragraph
-		)
-		values (#{supplierId,jdbcType=INTEGER}, #{createBy,jdbcType=INTEGER},
-		#{updateBy,jdbcType=INTEGER},
-		#{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{deposit,jdbcType=DECIMAL},
-		#{franchiseFee,jdbcType=DECIMAL},
-		#{invoiceCompanyName,jdbcType=VARCHAR},
-		#{invoiceCompanyPhone,jdbcType=VARCHAR},
-		#{invoiceCompanyAddr,jdbcType=VARCHAR},
-		#{invoiceDepositBank,jdbcType=VARCHAR},
-		#{invoiceBankAccount,jdbcType=VARCHAR},
-		#{invoiceDutyParagraph,jdbcType=VARCHAR}
-		)
-	</insert>
 	<insert id="insertSelective"
-		parameterType="com.zhuanche.entity.mdbcarmanage.BusBizSupplierDetail">
-		<selectKey resultType="java.lang.Integer" keyProperty="id"
-			order="AFTER">
-			SELECT LAST_INSERT_ID()
-		</selectKey>
+		parameterType="com.zhuanche.dto.busManage.BusSupplierDetailDTO">
 		insert into bus_biz_supplier_detail
 		<trim prefix="(" suffix=")" suffixOverrides=",">
 			<if test="supplierId != null">
@@ -153,13 +119,10 @@
 			</if>
 		</trim>
 	</insert>
-	<update id="updateByPrimaryKeySelective"
-		parameterType="com.zhuanche.entity.mdbcarmanage.BusBizSupplierDetail">
+	<update id="updateBySupplierIdSelective"
+		parameterType="com.zhuanche.dto.busManage.BusSupplierDetailDTO">
 		update bus_biz_supplier_detail
 		<set>
-			<if test="supplierId != null">
-				supplier_id = #{supplierId,jdbcType=INTEGER},
-			</if>
 			<if test="createBy != null">
 				create_by = #{createBy,jdbcType=INTEGER},
 			</if>
@@ -179,42 +142,40 @@
 				franchise_fee = #{franchiseFee,jdbcType=DECIMAL},
 			</if>
 			<if test="invoiceCompanyName != null">
-				invoice_company_name = #{invoiceCompanyName,jdbcType=VARCHAR},
+				invoice_company_name =
+				#{invoiceCompanyName,jdbcType=VARCHAR},
 			</if>
 			<if test="invoiceCompanyPhone != null">
-				invoice_company_phone = #{invoiceCompanyPhone,jdbcType=VARCHAR},
+				invoice_company_phone =
+				#{invoiceCompanyPhone,jdbcType=VARCHAR},
 			</if>
 			<if test="invoiceCompanyAddr != null">
-				invoice_company_addr = #{invoiceCompanyAddr,jdbcType=VARCHAR},
+				invoice_company_addr =
+				#{invoiceCompanyAddr,jdbcType=VARCHAR},
 			</if>
 			<if test="invoiceDepositBank != null">
-				invoice_deposit_bank = #{invoiceDepositBank,jdbcType=VARCHAR},
+				invoice_deposit_bank =
+				#{invoiceDepositBank,jdbcType=VARCHAR},
 			</if>
 			<if test="invoiceBankAccount != null">
-				invoice_bank_account = #{invoiceBankAccount,jdbcType=VARCHAR},
+				invoice_bank_account =
+				#{invoiceBankAccount,jdbcType=VARCHAR},
 			</if>
 			<if test="invoiceDutyParagraph != null">
-				invoice_duty_paragraph = #{invoiceDutyParagraph,jdbcType=VARCHAR},
+				invoice_duty_paragraph =
+				#{invoiceDutyParagraph,jdbcType=VARCHAR},
 			</if>
 		</set>
-		where id = #{id,jdbcType=INTEGER}
+		where supplier_id = #{supplierId,jdbcType=INTEGER}
 	</update>
-	<update id="updateByPrimaryKey"
-		parameterType="com.zhuanche.entity.mdbcarmanage.BusBizSupplierDetail">
-		update bus_biz_supplier_detail
-		set supplier_id = #{supplierId,jdbcType=INTEGER},
-		create_by = #{createBy,jdbcType=INTEGER},
-		update_by = #{updateBy,jdbcType=INTEGER},
-		create_date = #{createDate,jdbcType=TIMESTAMP},
-		update_date = #{updateDate,jdbcType=TIMESTAMP},
-		deposit = #{deposit,jdbcType=DECIMAL},
-		franchise_fee = #{franchiseFee,jdbcType=DECIMAL},
-		invoice_company_name = #{invoiceCompanyName,jdbcType=VARCHAR},
-		invoice_company_phone = #{invoiceCompanyPhone,jdbcType=VARCHAR},
-		invoice_company_addr = #{invoiceCompanyAddr,jdbcType=VARCHAR},
-		invoice_deposit_bank = #{invoiceDepositBank,jdbcType=VARCHAR},
-		invoice_bank_account = #{invoiceBankAccount,jdbcType=VARCHAR},
-		invoice_duty_paragraph = #{invoiceDutyParagraph,jdbcType=VARCHAR}
-		where id = #{id,jdbcType=INTEGER}
-	</update>
+	
+	<!-- 查询供应商是否存在  -->
+	<select id="checkExist" parameterType="java.lang.Integer">
+		select count(*) from bus_biz_supplier_detail where supplier_id = #{supplierId}
+	</select>
+	
+	<!-- 查询供应商是否存在  -->
+	<select id="querySupplierList" parameterType="java.util.Map" resultType="com.zhuanche.entity.mdbcarmanage.BusBizSupplierDetail">
+		
+	</select>
 </mapper>

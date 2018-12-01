@@ -199,4 +199,20 @@ public class DriverMongoService {
 		update.set("expireDate", map.get("expireDate"));
 		driverMongoTemplate.updateFirst(query, update,DriverMongo.class);
 	}
+	
+	/**
+	 * @Title: updateDriverCooperationTypeBySupplierId
+	 * @Description: 更新司机的加盟类型
+	 * @param supplierId
+	 * @param cooperationType 
+	 * @return void
+	 * @throws
+	 */
+	public void updateDriverCooperationTypeBySupplierId(Integer supplierId, Integer cooperationType) {
+		// 更新mongoDB
+		Query query = new Query(Criteria.where("supplierId").is(supplierId));
+		Update update = new Update();
+		update.set("cooperationType", cooperationType);
+		driverMongoTemplate.updateFirst(query, update, DriverMongo.class);
+	}
 }

@@ -32,7 +32,7 @@ import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.common.web.constraint.InArray;
+import com.zhuanche.common.web.datavalidate.custom.InArray;
 import com.zhuanche.dto.busManage.BusDriverExportDTO;
 import com.zhuanche.dto.busManage.BusDriverQueryDTO;
 import com.zhuanche.dto.busManage.BusDriverSaveDTO;

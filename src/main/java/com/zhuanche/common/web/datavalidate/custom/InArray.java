@@ -1,4 +1,4 @@
-package com.zhuanche.common.web.constraint;
+package com.zhuanche.common.web.datavalidate.custom;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
