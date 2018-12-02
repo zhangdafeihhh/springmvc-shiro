@@ -190,7 +190,7 @@ public final class RestErrorCode{
 	@ResultMessage("数据报表：{0}")
 	public static final int SUBSCRIPTION_INVALID              = 7011;
 
-	@ResultMessage("通知消息内容非法")
+	@ResultMessage("通知消息内容超过最大字数限制")
 	public static final int MESSAGE_CONTENT_ERROR = 8002;
 	//---------------------------------------------------------------------------------------------------------------------------------------------
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);

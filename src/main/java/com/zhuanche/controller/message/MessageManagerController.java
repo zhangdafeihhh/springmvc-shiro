@@ -104,7 +104,7 @@ public class MessageManagerController {
             logger.info("消息为发布状态，必传参数为空");
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
         }
-        if (StringUtils.isEmpty(messageContent) || messageContent.length() > Constants.MAX_CONTENT_LENGTH){
+        if (StringUtils.isNotEmpty(messageContent) && messageContent.length() > Constants.MAX_CONTENT_LENGTH){
             logger.info("消息内容非法");
             return AjaxResponse.fail(RestErrorCode.MESSAGE_CONTENT_ERROR);
         }

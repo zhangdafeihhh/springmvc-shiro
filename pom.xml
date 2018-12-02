@@ -321,7 +321,7 @@
 			<properties>
 				<env.name>dev</env.name>
 			</properties>
-			<activation>
+            <activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
 		</profile>
