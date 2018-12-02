@@ -27,6 +27,12 @@ public class CarMessagePostDto {
     private Date updateTime;
     /**通知状态 已读未读**/
     private Integer status;
+    /**通知状态(草稿 or 已发布) **/
+    private Integer messageStatus;
+    /**创建者id**/
+    private Integer createId;
+    /**接收者id**/
+    private Integer receiveId;
 
 
     public Long getId() {
@@ -99,5 +105,29 @@ public class CarMessagePostDto {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Integer getMessageStatus() {
+        return messageStatus;
+    }
+
+    public void setMessageStatus(Integer messageStatus) {
+        this.messageStatus = messageStatus;
+    }
+
+    public Integer getCreateId() {
+        return createId;
+    }
+
+    public void setCreateId(Integer createId) {
+        this.createId = createId;
+    }
+
+    public Integer getReceiveId() {
+        return receiveId;
+    }
+
+    public void setReceiveId(Integer receiveId) {
+        this.receiveId = receiveId;
     }
 }

@@ -756,6 +756,11 @@ public class MessageService {
                         idList, userId, (pageNum - 1) * pageSize ,pageSize);
             }
         }
+        for (CarMessagePostDto dto : data){
+            if (dto.getMessageStatus().equals(2)){
+                dto.setMessageStatus(dto.getCreateId().equals(dto.getReceiveId()) ? 1 : 0);
+            }
+        }
         return new PageDTO(pageNum, pageSize, count, data);
     }
 }
