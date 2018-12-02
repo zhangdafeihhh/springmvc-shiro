@@ -8,7 +8,6 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.constant.Constants;
-import com.zhuanche.constants.FtpConstants;
 import com.zhuanche.dto.mdbcarmanage.CarMessageDetailDto;
 import com.zhuanche.entity.mdbcarmanage.CarMessagePost;
 import com.zhuanche.exception.MessageException;
@@ -27,7 +26,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -105,6 +103,10 @@ public class MessageManagerController {
         if (StringUtils.isBlank(creater) || StringUtils.isBlank(String.valueOf(status)) ){
             logger.info("消息为发布状态，必传参数为空");
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
+        }
+        if (StringUtils.isEmpty(messageContent) || messageContent.length() > Constants.MAX_CONTENT_LENGTH){
+            logger.info("消息内容非法");
+            return AjaxResponse.fail(RestErrorCode.MESSAGE_CONTENT_ERROR);
         }
 
         if(status.equals(CarMessagePost.Status.publish)){
