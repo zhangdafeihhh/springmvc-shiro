@@ -15,7 +15,6 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.driver.SubscriptionReportConfigureDTO;
 import com.zhuanche.entity.driver.SubscriptionReport;
-import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 import com.zhuanche.serv.subscription.SubscriptionReportConfigureService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BigDataFtpUtil;
@@ -82,6 +81,11 @@ public class SubscriptionReportConfigureController {
             String cities, String supplierIds, String teamIds) {
 
         long start = System.currentTimeMillis();
+
+        Integer currentLevel = WebSessionUtil.getCurrentLoginUser().getLevel();//获取用户的级别,1-全国;2-城市;4-加盟商;8-车队;16-班组
+        if(currentLevel!=null && currentLevel==16){
+            return AjaxResponse.fail(RestErrorCode.SUBSCRIPTION_INVALID, "当前账户没权限");
+        }
         logger.info(LOGTAG + "数据报表订阅, reportName={}, subscriptionCycle={}, level={}, cities={}, supplierIds={}, teamIds={}",
                 reportName, subscriptionCycle, level, cities, supplierIds, teamIds);
         //解析等级
@@ -162,6 +166,11 @@ public class SubscriptionReportConfigureController {
         int total = 0;
         List<SubscriptionReport> list =  Lists.newArrayList();
 
+        Integer currentLevel = WebSessionUtil.getCurrentLoginUser().getLevel();//获取用户的级别,1-全国;2-城市;4-加盟商;8-车队;16-班组
+        if(currentLevel!=null && currentLevel==16){
+            PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
+            return AjaxResponse.success(pageDTO);
+        }
         Page p = PageHelper.startPage(page, pageSize, true);
         try {
             list = subscriptionReportConfigureService.
@@ -288,6 +297,17 @@ public class SubscriptionReportConfigureController {
         Set citiesSet = Sets.newHashSet();
         Set supplierIdsSet = Sets.newHashSet();
         Set teamIdsSet = Sets.newHashSet();
+
+        Integer currentLevel = WebSessionUtil.getCurrentLoginUser().getLevel();//获取用户的级别,1-全国;2-城市;4-加盟商;8-车队;16-班组
+        if(currentLevel!=null && currentLevel==16){
+            JSONObject map = new JSONObject();
+            map.put( "level", level);
+            map.put( "cities", citiesSet);
+            map.put( "supplierIds", supplierIdsSet);
+            map.put( "teamIds", teamIdsSet);
+            logger.info(LOGTAG + "/querySubscriptionConfigure班组权限无权查询");
+            return AjaxResponse.success(map);
+        }
         //查询全国
         List<SubscriptionReportConfigureDTO> allList = subscriptionReportConfigureService.querySubscriptionConfigure(subscriptionCycle, reportId, 1);
         if(allList!=null && allList.size()>0){
@@ -341,18 +361,12 @@ public class SubscriptionReportConfigureController {
      */
     @ResponseBody
     @RequestMapping(value = "/querySubscriptionLevel")
-//    @RequiresPermissions(value = "SubscribeStatement_look")
+    @RequiresPermissions(value = "SubscribeStatement_look")
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
     })
     public AjaxResponse querySubscriptionLevel() {
-
-        Integer id = WebSessionUtil.getCurrentLoginUser().getId();//获取用户的ID
-        CarAdmUser user = carAdmUserExMapper.queryUserPermissionInfo(id);
-        if (user == null){
-            return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST);
-        }
-        Integer level = user.getLevel();//获取用户的级别,1-全国;2-城市;4-加盟商;8-车队;16-班组
+        Integer level = WebSessionUtil.getCurrentLoginUser().getLevel();//获取用户的级别,1-全国;2-城市;4-加盟商;8-车队;16-班组
         JSONObject map = new JSONObject();
         if (level != null) {
             switch (level) {

@@ -47,7 +47,8 @@ public class UsernamePasswordRealm extends AuthorizingRealm {
 		loginUser.setEmail(  null ); //邮箱地址
 		loginUser.setType( null );   //
 		loginUser.setStatus( adMUser.getStatus() );           //状态
-		loginUser.setAccountType( adMUser.getAccountType() );   //自有的帐号类型：[100 普通用户]、[900 管理员]  
+		loginUser.setAccountType( adMUser.getAccountType() );   //自有的帐号类型：[100 普通用户]、[900 管理员]
+		loginUser.setLevel(adMUser.getLevel());
 		//---------------------------------------------------------------------------------------------------------数据权限BEGIN
 		/**此用户可以管理的城市ID**/
 		if( StringUtils.isNotEmpty(adMUser.getCities()) ) {
