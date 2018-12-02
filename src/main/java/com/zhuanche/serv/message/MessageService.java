@@ -757,8 +757,9 @@ public class MessageService {
             }
         }
         for (CarMessagePostDto dto : data){
-            if (dto.getMessageStatus().equals(2)){
-                dto.setMessageStatus(dto.getCreateId().equals(dto.getReceiveId()) ? 1 : 0);
+            if (dto.getMessageStatus().equals(CarMessagePost.Status.publish.getMessageStatus())){
+                dto.setMessageStatus(dto.getCreateId().equals(dto.getReceiveId()) ?
+                        CarMessagePost.Status.publish.getMessageStatus() : CarMessagePost.Status.receive.getMessageStatus());
             }
         }
         return new PageDTO(pageNum, pageSize, count, data);
