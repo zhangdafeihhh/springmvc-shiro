@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -20,6 +21,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BigDataFtpUtil;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +35,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.util.HashSet;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
@@ -273,7 +274,7 @@ public class SubscriptionReportConfigureController {
      */
     @ResponseBody
     @RequestMapping(value = "/querySubscriptionConfigure")
-    @RequiresPermissions(value = "SubscribeStatement_look")
+//    @RequiresPermissions(value = "SubscribeStatement_look")
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
     })
@@ -281,11 +282,12 @@ public class SubscriptionReportConfigureController {
             @Verify(param = "subscriptionCycle",rule="required") Integer subscriptionCycle,
             @Verify(param = "reportId",rule="required") Integer reportId) {
 
+        long start = System.currentTimeMillis();
         logger.info(LOGTAG + "/querySubscriptionConfigure,subscriptionCycle={}, reportId={}", subscriptionCycle, reportId);
         String level = "";//级别,1-全国;2-城市;4-加盟商;8-车队;16-班组（多个ID用英文逗号分隔）
-        String cities = "";//城市ID（多个ID用英文逗号分隔）
-        String supplierIds = "";//供应商ID（多个ID用英文逗号分隔）
-        String teamIds = "";//车队ID（多个ID用英文逗号分隔）
+        Set citiesSet = Sets.newHashSet();
+        Set supplierIdsSet = Sets.newHashSet();
+        Set teamIdsSet = Sets.newHashSet();
         //查询全国
         List<SubscriptionReportConfigureDTO> allList = subscriptionReportConfigureService.querySubscriptionConfigure(subscriptionCycle, reportId, 1);
         if(allList!=null && allList.size()>0){
@@ -296,7 +298,7 @@ public class SubscriptionReportConfigureController {
         if(cityList!=null && cityList.size()>0){
             level += ",2";
             for (SubscriptionReportConfigureDTO sub : cityList) {
-                cities += "," + sub.getCityId();
+                citiesSet.add(sub.getCityId());
             }
         }
         //查询供应商
@@ -304,7 +306,9 @@ public class SubscriptionReportConfigureController {
         if(supplerList!=null && supplerList.size()>0){
             level += ",4";
             for (SubscriptionReportConfigureDTO sub : supplerList) {
-                supplierIds += "," + sub.getSupplierId();
+                citiesSet.add(sub.getCityId());
+                supplierIdsSet.add(sub.getSupplierId());
+
             }
         }
         //查询车队
@@ -312,11 +316,31 @@ public class SubscriptionReportConfigureController {
         if(teamList!=null && teamList.size()>0){
             level += ",8";
             for (SubscriptionReportConfigureDTO sub : teamList) {
-                teamIds += "," + sub.getTeamId();
+                citiesSet.add(sub.getCityId());
+                supplierIdsSet.add(sub.getSupplierId());
+                teamIdsSet.add(sub.getTeamId());
             }
         }
         if(level.length()>1){
             level = level.substring(1,level.length());
+        }
+        String cities = "";//城市ID（多个ID用英文逗号分隔）
+        String supplierIds = "";//供应商ID（多个ID用英文逗号分隔）
+        String teamIds = "";//车队ID（多个ID用英文逗号分隔）
+        if(citiesSet!=null && citiesSet.size()>0){
+            for (Object obj: citiesSet) {
+                cities += "," + obj;
+            }
+        }
+        if(supplierIdsSet!=null && supplierIdsSet.size()>0){
+            for (Object obj: supplierIdsSet) {
+                supplierIds += "," + obj;
+            }
+        }
+        if(teamIdsSet!=null && teamIdsSet.size()>0){
+            for (Object obj: teamIdsSet) {
+                teamIds += "," + obj;
+            }
         }
         if(cities.length()>1){
             cities = cities.substring(1,cities.length());
@@ -332,6 +356,9 @@ public class SubscriptionReportConfigureController {
         map.put( "cities", cities);
         map.put( "supplierIds", supplierIds);
         map.put( "teamIds", teamIds);
+        long end = System.currentTimeMillis();
+        logger.info(LOGTAG + "/querySubscriptionConfigure,subscriptionCycle={}, reportId={}，map={}, 耗时={}",
+                subscriptionCycle, reportId, ToStringBuilder.reflectionToString(map), (end-start));
         return AjaxResponse.success(map);
     }
 
