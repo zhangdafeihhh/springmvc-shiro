@@ -87,10 +87,10 @@
     WHERE
     1=1
     <if test="startDate != null" >
-    AND cmp.create_time &gt;= #{startDate}
+    AND cmp.create_time &gt;= DATE_FORMAT(#{startDate},'%Y%m%d')
     </if>
     <if test="endDate != null" >
-    AND cmp.create_time &lt;= #{endDate}
+    AND cmp.create_time &lt;= DATE_FORMAT(#{endDate},'%Y%m%d')
     </if>
     <if test="keyword != null" >
     AND (LOCATE(#{keyword},cmp.mesage_title) &gt; 0
@@ -113,10 +113,10 @@
     WHERE
     1=1
     <if test="startDate != null" >
-    AND cmp.create_time &gt;= #{startDate}
+      AND cmp.create_time &gt;=DATE_FORMAT(#{startDate},'%Y%m%d')
     </if>
     <if test="endDate != null" >
-    AND cmp.create_time &lt;= #{endDate}
+    AND cmp.create_time &lt;= DATE_FORMAT(#{endDate},'%Y%m%d')
     </if>
     <if test="keyword != null" >
     AND LOCATE(#{keyword},cmp.mesage_title) &gt; 0
@@ -139,10 +139,10 @@
     WHERE
     1=1
     <if test="startDate != null" >
-    AND cmp.create_time &gt;= #{startDate}
+      AND cmp.create_time &gt;=DATE_FORMAT(#{startDate},'%Y%m%d')
     </if>
     <if test="endDate != null" >
-    AND cmp.create_time &lt;= #{endDate}
+      AND cmp.create_time &lt;= DATE_FORMAT(#{endDate},'%Y%m%d')
     </if>
     <if test="keyword != null" >
     AND LOCATE(#{keyword},cmd.doc_name) &gt; 0
@@ -176,10 +176,10 @@
     WHERE
     1=1
     <if test="startDate != null" >
-    AND cmp.create_time &gt;= #{startDate}
+      AND cmp.create_time &gt;=DATE_FORMAT(#{startDate},'%Y%m%d')
     </if>
     <if test="endDate != null" >
-    AND cmp.create_time &lt;= #{endDate}
+    AND cmp.create_time &lt;= DATE_FORMAT(#{endDate},'%Y%m%d')
     </if>
     <if test="keyword != null" >
     AND (LOCATE(#{keyword},cmp.mesage_title) &gt; 0
@@ -215,12 +215,14 @@
     LEFT JOIN car_message_doc cmd ON cmd.message_id = cmp.id
     WHERE
     1=1
+
     <if test="startDate != null" >
-    AND cmp.create_time &gt;= #{startDate}
+      AND cmp.create_time &gt;=DATE_FORMAT(#{startDate},'%Y%m%d')
     </if>
     <if test="endDate != null" >
-    AND cmp.create_time &lt;= #{endDate}
+      AND cmp.create_time &lt;= DATE_FORMAT(#{endDate},'%Y%m%d')
     </if>
+
     <if test="keyword != null" >
     AND LOCATE(#{keyword},cmd.doc_name) &gt; 0
     </if>
@@ -253,11 +255,12 @@
     LEFT JOIN car_message_doc cmd ON cmd.message_id = cmp.id
     WHERE
     1=1
+
     <if test="startDate != null" >
-      AND cmp.create_time &gt;= #{startDate}
+      AND cmp.create_time &gt;=DATE_FORMAT(#{startDate},'%Y%m%d')
     </if>
     <if test="endDate != null" >
-      AND cmp.create_time &lt;= #{endDate}
+      AND cmp.create_time &lt;= DATE_FORMAT(#{endDate},'%Y%m%d')
     </if>
     <if test="keyword != null" >
       AND LOCATE(#{keyword},cmp.mesage_title) &gt; 0
