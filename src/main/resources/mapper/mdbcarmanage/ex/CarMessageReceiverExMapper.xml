@@ -212,7 +212,6 @@
     LEFT JOIN car_message_receiver cmr ON cmp.id = cmr.message_id
     INNER JOIN car_message_doc cmd ON cmd.message_id = cmp.id
     INNER JOIN car_adm_user cdu ON cmp.user_id = cdu.user_id
-    LEFT JOIN car_message_doc cmd ON cmd.message_id = cmp.id
     WHERE
     1=1
 
