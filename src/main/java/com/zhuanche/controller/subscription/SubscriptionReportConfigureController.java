@@ -210,10 +210,6 @@ public class SubscriptionReportConfigureController {
      */
     @ResponseBody
     @RequestMapping(value = "/querySubscriptionName")
-    @RequiresPermissions(value = "SubscribeStatement_look")
-    @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
-    })
     public AjaxResponse querySubscriptionName() {
         JSONObject map = new JSONObject();
         map.put( "1", "工资明细");
@@ -361,10 +357,6 @@ public class SubscriptionReportConfigureController {
      */
     @ResponseBody
     @RequestMapping(value = "/querySubscriptionLevel")
-    @RequiresPermissions(value = "SubscribeStatement_look")
-    @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
-    })
     public AjaxResponse querySubscriptionLevel() {
         Integer level = WebSessionUtil.getCurrentLoginUser().getLevel();//获取用户的级别,1-全国;2-城市;4-加盟商;8-车队;16-班组
         JSONObject map = new JSONObject();
