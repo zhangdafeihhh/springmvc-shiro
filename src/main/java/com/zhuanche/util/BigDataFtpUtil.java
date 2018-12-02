@@ -318,6 +318,7 @@ public class BigDataFtpUtil {
 			System.out.println("开始下载文件");
 			initFtpClient();
 			//切换FTP目录
+			ftpClient.setBufferSize(1024);//可以控制上传或下载的速度
 			ftpClient.changeWorkingDirectory(pathname);
 			String path = pathname+"/"+filename;
 			in = ftpClient.retrieveFileStream(path);
