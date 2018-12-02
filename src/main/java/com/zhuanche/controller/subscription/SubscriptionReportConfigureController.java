@@ -274,7 +274,7 @@ public class SubscriptionReportConfigureController {
      */
     @ResponseBody
     @RequestMapping(value = "/querySubscriptionConfigure")
-//    @RequiresPermissions(value = "SubscribeStatement_look")
+    @RequiresPermissions(value = "SubscribeStatement_look")
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
     })
@@ -324,38 +324,11 @@ public class SubscriptionReportConfigureController {
         if(level.length()>1){
             level = level.substring(1,level.length());
         }
-        String cities = "";//城市ID（多个ID用英文逗号分隔）
-        String supplierIds = "";//供应商ID（多个ID用英文逗号分隔）
-        String teamIds = "";//车队ID（多个ID用英文逗号分隔）
-        if(citiesSet!=null && citiesSet.size()>0){
-            for (Object obj: citiesSet) {
-                cities += "," + obj;
-            }
-        }
-        if(supplierIdsSet!=null && supplierIdsSet.size()>0){
-            for (Object obj: supplierIdsSet) {
-                supplierIds += "," + obj;
-            }
-        }
-        if(teamIdsSet!=null && teamIdsSet.size()>0){
-            for (Object obj: teamIdsSet) {
-                teamIds += "," + obj;
-            }
-        }
-        if(cities.length()>1){
-            cities = cities.substring(1,cities.length());
-        }
-        if(supplierIds.length()>1){
-            supplierIds = supplierIds.substring(1,supplierIds.length());
-        }
-        if(teamIds.length()>1){
-            teamIds = teamIds.substring(1,teamIds.length());
-        }
         JSONObject map = new JSONObject();
         map.put( "level", level);
-        map.put( "cities", cities);
-        map.put( "supplierIds", supplierIds);
-        map.put( "teamIds", teamIds);
+        map.put( "cities", citiesSet);
+        map.put( "supplierIds", supplierIdsSet);
+        map.put( "teamIds", teamIdsSet);
         long end = System.currentTimeMillis();
         logger.info(LOGTAG + "/querySubscriptionConfigure,subscriptionCycle={}, reportId={}，map={}, 耗时={}",
                 subscriptionCycle, reportId, ToStringBuilder.reflectionToString(map), (end-start));
