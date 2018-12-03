@@ -47,6 +47,7 @@ public class BigDataFtpUtil {
 			System.out.println("connecting...ftp服务器:"+this.hostname+":"+this.port);
 			ftpClient.connect(hostname, port); //连接ftp服务器
 			ftpClient.login(username, password); //登录ftp服务器
+			ftpClient.setBufferSize(1024);//可以控制上传或下载的速度
 			int replyCode = ftpClient.getReplyCode(); //是否成功登录服务器
 			if(!FTPReply.isPositiveCompletion(replyCode)){
 				System.out.println("connect failed...ftp服务器:"+this.hostname+":"+this.port);
@@ -317,6 +318,7 @@ public class BigDataFtpUtil {
 			System.out.println("开始下载文件");
 			initFtpClient();
 			//切换FTP目录
+			ftpClient.setBufferSize(1024);//可以控制上传或下载的速度
 			ftpClient.changeWorkingDirectory(pathname);
 			String path = pathname+"/"+filename;
 			in = ftpClient.retrieveFileStream(path);

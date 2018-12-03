@@ -40,26 +40,53 @@ public class MessageReceiveService {
 
         switch (level){
             case Constants.CONTRY:
-                this.insertByLevel(Constants.CONTRY,messageId,cities);
+                this.insertByLevel(Constants.CONTRY,messageId,null);
                 break;
             case Constants.CITY:
                 this.insertByLevel(Constants.CITY,messageId,cities);
                 break;
+            case Constants.CONTRYANDCITY:
+                this.insertByLevel(Constants.CONTRY,messageId,null);
+                this.insertByLevel(Constants.CITY,messageId,cities);
+                break;
             case Constants.SUPPY:
+                this.insertByLevel(Constants.SUPPY,messageId,suppliers);
+                break;
+            case Constants.CONTRYANDSUPPY:
+                this.insertByLevel(Constants.CONTRY,messageId,null);
                 this.insertByLevel(Constants.SUPPY,messageId,suppliers);
                 break;
             case Constants.CITYANDSUPPY:
                 this.insertByLevel(Constants.CITY,messageId,cities);
                 this.insertByLevel(Constants.SUPPY,messageId,suppliers);
                 break;
+            case Constants.CONTRYANDCITYANDSUPPY:
+                this.insertByLevel(Constants.CONTRY,messageId,null);
+                this.insertByLevel(Constants.CITY,messageId,cities);
+                this.insertByLevel(Constants.SUPPY,messageId,suppliers);
+                break;
             case Constants.TEAM:
+                this.insertByLevel(Constants.TEAM,messageId,teamId);
+                break;
+            case Constants.CONTRYANDTEAM:
+                this.insertByLevel(Constants.CONTRY,messageId,null);
                 this.insertByLevel(Constants.TEAM,messageId,teamId);
                 break;
             case Constants.CITYANDTEAM:
                 this.insertByLevel(Constants.CITY,messageId,cities);
                 this.insertByLevel(Constants.TEAM,messageId,teamId);
                 break;
+            case Constants.CONTRYANDCITYANDTEAM:
+                this.insertByLevel(Constants.CONTRY,messageId,null);
+                this.insertByLevel(Constants.CITY,messageId,cities);
+                this.insertByLevel(Constants.TEAM,messageId,teamId);
+                break;
             case Constants.SUPPYANDTEAM:
+                this.insertByLevel(Constants.SUPPY,messageId,suppliers);
+                this.insertByLevel(Constants.TEAM,messageId,teamId);
+                break;
+            case Constants.CONTRYANDSUPPYANDTEAM:
+                this.insertByLevel(Constants.CONTRY,messageId,null);
                 this.insertByLevel(Constants.SUPPY,messageId,suppliers);
                 this.insertByLevel(Constants.TEAM,messageId,teamId);
                 break;
@@ -68,13 +95,16 @@ public class MessageReceiveService {
                 this.insertByLevel(Constants.SUPPY,messageId,suppliers);
                 this.insertByLevel(Constants.TEAM,messageId,teamId);
                 break;
+            case Constants.CONTRYANDCITYANDSUPPYANDTEAM:
+                this.insertByLevel(Constants.CONTRY,messageId,null);
+                this.insertByLevel(Constants.CITY,messageId,cities);
+                this.insertByLevel(Constants.SUPPY,messageId,suppliers);
+                this.insertByLevel(Constants.TEAM,messageId,teamId);
+                break;
             default:
                 ;
 
-
-
         }
-
 
         return 1;
     }
@@ -85,7 +115,12 @@ public class MessageReceiveService {
         //查询出所有符合等级的用户
         List<CarAdmUser> carAdmUserList = exMapper.selectUsersByLevel(level);
         //如果选择的是城市用户 则查询该用户选择的城市 有没有 城市等级下选择的城市
-        String[] sendCity = cities.split(Constants.SEPERATER);
+        String[] sendCity = null;
+        if (StringUtils.isEmpty(cities)){
+            sendCity = new String[]{};
+        }else {
+            sendCity = cities.split(Constants.SEPERATER);
+        }
         List<String> list = Arrays.asList(sendCity);
         for(CarAdmUser admUser : carAdmUserList){
             String levelName = "";

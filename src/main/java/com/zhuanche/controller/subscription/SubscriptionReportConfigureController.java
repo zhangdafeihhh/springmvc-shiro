@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -14,10 +15,15 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.driver.SubscriptionReportConfigureDTO;
 import com.zhuanche.entity.driver.SubscriptionReport;
+import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
+import com.zhuanche.entity.rentcar.CarBizCity;
+import com.zhuanche.entity.rentcar.CarBizSupplier;
+import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.serv.subscription.SubscriptionReportConfigureService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BigDataFtpUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +37,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.InputStream;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 @RequestMapping("/subscription/report")
@@ -48,6 +58,9 @@ public class SubscriptionReportConfigureController {
 
     @Autowired
     private BigDataFtpUtil bigDataFtpUtil;
+
+    @Autowired
+    private CitySupplierTeamCommonService citySupplierTeamCommonService;
 
     /**
      * 数据报表订阅
@@ -74,6 +87,11 @@ public class SubscriptionReportConfigureController {
             String cities, String supplierIds, String teamIds) {
 
         long start = System.currentTimeMillis();
+
+        Integer currentLevel = WebSessionUtil.getCurrentLoginUser().getLevel();//获取用户的级别,1-全国;2-城市;4-加盟商;8-车队;16-班组
+        if(currentLevel!=null && currentLevel==16){
+            return AjaxResponse.fail(RestErrorCode.SUBSCRIPTION_INVALID, "当前账户没权限");
+        }
         logger.info(LOGTAG + "数据报表订阅, reportName={}, subscriptionCycle={}, level={}, cities={}, supplierIds={}, teamIds={}",
                 reportName, subscriptionCycle, level, cities, supplierIds, teamIds);
         //解析等级
@@ -154,6 +172,11 @@ public class SubscriptionReportConfigureController {
         int total = 0;
         List<SubscriptionReport> list =  Lists.newArrayList();
 
+        Integer currentLevel = WebSessionUtil.getCurrentLoginUser().getLevel();//获取用户的级别,1-全国;2-城市;4-加盟商;8-车队;16-班组
+        if(currentLevel!=null && currentLevel==16){
+            PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
+            return AjaxResponse.success(pageDTO);
+        }
         Page p = PageHelper.startPage(page, pageSize, true);
         try {
             list = subscriptionReportConfigureService.
@@ -193,10 +216,6 @@ public class SubscriptionReportConfigureController {
      */
     @ResponseBody
     @RequestMapping(value = "/querySubscriptionName")
-    @RequiresPermissions(value = "SubscribeStatement_look")
-    @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
-    })
     public AjaxResponse querySubscriptionName() {
         JSONObject map = new JSONObject();
         map.put( "1", "工资明细");
@@ -274,11 +293,23 @@ public class SubscriptionReportConfigureController {
             @Verify(param = "subscriptionCycle",rule="required") Integer subscriptionCycle,
             @Verify(param = "reportId",rule="required") Integer reportId) {
 
+        long start = System.currentTimeMillis();
         logger.info(LOGTAG + "/querySubscriptionConfigure,subscriptionCycle={}, reportId={}", subscriptionCycle, reportId);
         String level = "";//级别,1-全国;2-城市;4-加盟商;8-车队;16-班组（多个ID用英文逗号分隔）
-        String cities = "";//城市ID（多个ID用英文逗号分隔）
-        String supplierIds = "";//供应商ID（多个ID用英文逗号分隔）
-        String teamIds = "";//车队ID（多个ID用英文逗号分隔）
+        Set citiesSet = Sets.newHashSet();
+        Set supplierIdsSet = Sets.newHashSet();
+        Set teamIdsSet = Sets.newHashSet();
+
+        Integer currentLevel = WebSessionUtil.getCurrentLoginUser().getLevel();//获取用户的级别,1-全国;2-城市;4-加盟商;8-车队;16-班组
+        if(currentLevel!=null && currentLevel==16){
+            JSONObject map = new JSONObject();
+            map.put( "level", level);
+            map.put( "cities", citiesSet);
+            map.put( "supplierIds", supplierIdsSet);
+            map.put( "teamIds", teamIdsSet);
+            logger.info(LOGTAG + "/querySubscriptionConfigure班组权限无权查询");
+            return AjaxResponse.success(map);
+        }
         //查询全国
         List<SubscriptionReportConfigureDTO> allList = subscriptionReportConfigureService.querySubscriptionConfigure(subscriptionCycle, reportId, 1);
         if(allList!=null && allList.size()>0){
@@ -289,7 +320,7 @@ public class SubscriptionReportConfigureController {
         if(cityList!=null && cityList.size()>0){
             level += ",2";
             for (SubscriptionReportConfigureDTO sub : cityList) {
-                cities += "," + sub.getCityId();
+                citiesSet.add(sub.getCityId());
             }
         }
         //查询供应商
@@ -297,7 +328,9 @@ public class SubscriptionReportConfigureController {
         if(supplerList!=null && supplerList.size()>0){
             level += ",4";
             for (SubscriptionReportConfigureDTO sub : supplerList) {
-                supplierIds += "," + sub.getSupplierId();
+                citiesSet.add(sub.getCityId());
+                supplierIdsSet.add(sub.getSupplierId());
+
             }
         }
         //查询车队
@@ -305,26 +338,125 @@ public class SubscriptionReportConfigureController {
         if(teamList!=null && teamList.size()>0){
             level += ",8";
             for (SubscriptionReportConfigureDTO sub : teamList) {
-                teamIds += "," + sub.getTeamId();
+                citiesSet.add(sub.getCityId());
+                supplierIdsSet.add(sub.getSupplierId());
+                teamIdsSet.add(sub.getTeamId());
             }
         }
         if(level.length()>1){
             level = level.substring(1,level.length());
         }
-        if(cities.length()>1){
-            cities = cities.substring(1,cities.length());
-        }
-        if(supplierIds.length()>1){
-            supplierIds = supplierIds.substring(1,supplierIds.length());
-        }
-        if(teamIds.length()>1){
-            teamIds = teamIds.substring(1,teamIds.length());
-        }
         JSONObject map = new JSONObject();
         map.put( "level", level);
-        map.put( "cities", cities);
-        map.put( "supplierIds", supplierIds);
-        map.put( "teamIds", teamIds);
+        map.put( "cities", citiesSet);
+        map.put( "supplierIds", supplierIdsSet);
+        map.put( "teamIds", teamIdsSet);
+        long end = System.currentTimeMillis();
+        logger.info(LOGTAG + "/querySubscriptionConfigure,subscriptionCycle={}, reportId={}，map={}, 耗时={}",
+                subscriptionCycle, reportId, ToStringBuilder.reflectionToString(map), (end-start));
         return AjaxResponse.success(map);
+    }
+
+    /**
+     * 数据报表
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/querySubscriptionLevel")
+    public AjaxResponse querySubscriptionLevel(Integer authority) {
+        Integer level = WebSessionUtil.getCurrentLoginUser().getLevel();//获取用户的级别,1-全国;2-城市;4-加盟商;8-车队;16-班组
+        JSONObject map = new JSONObject();
+        if (level != null) {
+            if(authority!=null && authority==1){
+                map.put( "1", "全国");
+                map.put( "2", "城市");
+                map.put( "4", "供应商");
+                map.put( "8", "车队");
+                return AjaxResponse.success(map);
+            }
+            switch (level) {
+                case 1:
+                    map.put( "1", "全国");
+                    map.put( "2", "城市");
+                    map.put( "4", "供应商");
+                    map.put( "8", "车队");
+                    break;
+                case 2:
+                    map.put( "2", "城市");
+                    map.put( "4", "供应商");
+                    map.put( "8", "车队");
+                    break;
+                case 4:
+                    map.put( "4", "供应商");
+                    map.put( "8", "车队");
+                    break;
+                case 8:
+                    map.put( "8", "车队");
+                    break;
+                case 16:
+//                    map.put( "16", "小组");
+                    break;
+            }
+        }
+        return AjaxResponse.success(map);
+    }
+
+
+
+    /**
+     * @Desc:  获取城市列表(没有数据权限)
+     */
+    @RequestMapping("/getCities")
+    @ResponseBody
+    public AjaxResponse getCities(){
+        List<CarBizCity> carBizCities = citySupplierTeamCommonService.getCities();
+        return AjaxResponse.success(carBizCities);
+    }
+
+    /**
+     * @Desc: 查询城市供应列表(没有数据权限)
+     */
+    @RequestMapping("/getSuppliers")
+    @ResponseBody
+    public AjaxResponse getSuppliers(@Verify(param = "cityId", rule = "required") Integer cityId, String cityIds ){
+
+        Set<Integer> cityIdset = new HashSet<Integer>();
+        cityIdset.add(cityId);
+        if(org.apache.commons.lang.StringUtils.isNotEmpty(cityIds)) {//当传入多个cityid时
+            Set<Integer> cityids = Stream.of(cityIds.split(",")).mapToInt(s -> {
+                if(org.apache.commons.lang.StringUtils.isNotEmpty(s)) {
+                    return Integer.valueOf(s);
+                }else {
+                    return -1;
+                }
+            }).boxed().collect(Collectors.toSet());
+            cityIdset.addAll(cityids);
+        }
+
+        List<CarBizSupplier> carBizSuppliers = citySupplierTeamCommonService.getSuppliers( cityIdset );
+        return AjaxResponse.success(carBizSuppliers);
+    }
+
+    /**
+     * @Desc: 查询车队列表(没有数据权限)
+     */
+    @RequestMapping("/getTeams")
+    @ResponseBody
+    public AjaxResponse getTeams(@Verify(param = "supplierId", rule = "required") Integer supplierId,
+                                 Integer cityId, String supplierIds ){
+        //城市ID
+        Set<String> cityIdset = new HashSet<String>();
+        if(cityId!=null && cityId.intValue()>0) {
+            cityIdset.add(cityId.toString());
+        }
+        //供应商ID
+        Set<String> supplieridSet = new HashSet<String>();
+        supplieridSet.add(supplierId.toString());
+        if(org.apache.commons.lang.StringUtils.isNotEmpty(supplierIds)) {//当传入多个supplierId时
+            Set<String> supplierids = Stream.of(supplierIds.split(",")).collect(Collectors.toSet());
+            supplieridSet.addAll(supplierids);
+        }
+        List<CarDriverTeam> carDriverTeams = citySupplierTeamCommonService.getTeams(cityIdset, supplieridSet);
+        return AjaxResponse.success(carDriverTeams);
     }
 }

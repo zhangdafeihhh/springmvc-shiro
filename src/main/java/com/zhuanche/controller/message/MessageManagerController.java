@@ -8,13 +8,13 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.constant.Constants;
-import com.zhuanche.constants.FtpConstants;
 import com.zhuanche.dto.mdbcarmanage.CarMessageDetailDto;
 import com.zhuanche.entity.mdbcarmanage.CarMessagePost;
 import com.zhuanche.exception.MessageException;
 import com.zhuanche.serv.message.MessageService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.HtmlFilterUtil;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -27,7 +27,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -79,6 +78,7 @@ public class MessageManagerController {
      */
     @RequestMapping(value = "/postMessage",method = RequestMethod.POST)
     @ResponseBody
+    @RequiresPermissions(value = {"PublishMessage"})
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
     })
@@ -104,6 +104,19 @@ public class MessageManagerController {
         if (StringUtils.isBlank(creater) || StringUtils.isBlank(String.valueOf(status)) ){
             logger.info("消息为发布状态，必传参数为空");
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
+        }
+
+        if (StringUtils.isNotEmpty(messageContent)){
+           String  clearCss = HtmlFilterUtil.HTMLTagSpirit(messageContent);
+           if (clearCss.length() > 2000){
+               logger.info("字体长度大于2000");
+               return AjaxResponse.fail(RestErrorCode.MESSAGE_CONTENT_ERROR);
+           }
+           if (messageContent.length() - clearCss.length() > 4000-clearCss.length()){
+               logger.info("样式长度过于复杂");
+               return AjaxResponse.fail(RestErrorCode.MESSAGE_CONTENT_CSS_TOO_MANY);
+           }
+
         }
 
         if(status.equals(CarMessagePost.Status.publish)){
@@ -207,6 +220,7 @@ public class MessageManagerController {
      */
     @RequestMapping(value = "/messageWithDraw")
     @ResponseBody
+    @RequiresPermissions(value = {"PublishMessage"})
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
     })
@@ -240,6 +254,7 @@ public class MessageManagerController {
      * @return
      */
     @RequestMapping(value = "/messageDeleteDraw")
+    @RequiresPermissions(value = {"PublishMessage"})
     @ResponseBody
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
@@ -292,7 +307,7 @@ public class MessageManagerController {
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
         }
         try {
-            PageDTO pageDTO = messageService.messageLisByStatus(userId,status,pageSize,pageNum);
+            PageDTO pageDTO = messageService.messageLisByStatus(userId,status,pageNum,pageSize);
             return AjaxResponse.success(pageDTO);
         } catch (MessageException e) {
             return AjaxResponse.fail(e.getCode());

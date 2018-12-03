@@ -441,5 +441,28 @@ public class CitySupplierTeamCommonService {
         );
         return result;
     }
+    /**
+     * @Desc: 查询城市列表(没有数据权限)
+     */
+    public List<CarBizCity> getCities(){
+        return carBizCityExMapper.queryByIds(null);
+    }
+
+    /**
+     * @Desc: 根据城市ID，查询供应商列表(没有数据权限)
+     */
+    public List<CarBizSupplier> getSuppliers( Set<Integer> cityIds ){
+        if(cityIds==null || cityIds.size()==0) {
+            return new ArrayList<CarBizSupplier>();
+        }
+        return carBizSupplierExMapper.querySuppliers(cityIds, null);
+    }
+
+    /**
+     * @Desc: 根据一个城市ID、一个供应商ID，查询车队列表(没有数据权限)
+     */
+    public List<CarDriverTeam> getTeams(  Set<String> cityIds, Set<String> supplierIds ){
+        return carDriverTeamExMapper.queryDriverTeam(cityIds, supplierIds, null);
+    }
 }
 
