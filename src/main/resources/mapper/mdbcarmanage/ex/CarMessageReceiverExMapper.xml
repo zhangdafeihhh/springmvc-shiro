@@ -182,8 +182,18 @@
     AND cmp.create_time &lt;= DATE_FORMAT(#{endDate},'%Y%m%d')
     </if>
     <if test="keyword != null" >
-    AND (LOCATE(#{keyword},cmp.mesage_title) &gt; 0
-    OR LOCATE(#{keyword},cmd.doc_name) &gt; 0)
+      AND (LOCATE(#{keyword},cmp.mesage_title) &gt; 0
+
+
+      OR cmd.message_id in
+
+      (SELECT message_id FROM car_message_doc WHERE LOCATE(#{keyword}, doc_name ) > 0 GROUP BY message_id)
+
+      <!--<foreach collection="idList" index="index" item="item" open="(" separator="," close=")">
+        SELECT message_id FROM car_message_doc WHERE LOCATE(#{keyword}, doc_name ) > 0 GROUP BY message_id
+      </foreach>-->
+
+      )
     </if>
     <if test="idList != null" >
     AND cmp.user_id in
@@ -223,7 +233,13 @@
     </if>
 
     <if test="keyword != null" >
-    AND LOCATE(#{keyword},cmd.doc_name) &gt; 0
+      and cmd.message_id in
+      (SELECT message_id FROM car_message_doc WHERE LOCATE(#{keyword}, doc_name ) > 0 GROUP BY message_id)
+
+      <!--<foreach collection="keyword" index="index" item="item" open="(" separator="," close=")">
+        SELECT message_id FROM car_message_doc WHERE LOCATE(#{keyword}, doc_name ) > 0 GROUP BY message_id
+      </foreach>-->
+
     </if>
     <if test="idList != null" >
     AND cmp.user_id in
