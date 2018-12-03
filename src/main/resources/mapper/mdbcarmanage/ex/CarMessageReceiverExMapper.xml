@@ -103,7 +103,7 @@
       </foreach>
     </if>
     <if test="userId != null" >
-    AND cmr.receive_user_id = #{userId}
+      AND (cmp.user_id=#{userId} OR cmr.receive_user_id=#{userId})
     </if>
   </select>
 
@@ -128,14 +128,14 @@
       </foreach>
     </if>
     <if test="userId != null" >
-    AND cmr.receive_user_id = #{userId}
+      AND (cmp.user_id=#{userId} OR cmr.receive_user_id=#{userId})
     </if>
   </select>
 
   <select id="queryCountInAttachment" resultType="java.lang.Integer" >
     SELECT COUNT(DISTINCT(cmp.id)) as total FROM car_message_post cmp
     LEFT JOIN car_message_receiver cmr ON cmp.id = cmr.message_id
-    INNER JOIN car_message_doc cmd ON cmd.message_id = cmp.id
+    LEFT JOIN car_message_doc cmd ON cmd.message_id = cmp.id
     WHERE
     1=1
     <if test="startDate != null" >
@@ -154,7 +154,7 @@
     </foreach>
     </if>
     <if test="userId != null" >
-    AND cmr.receive_user_id = #{userId}
+      AND (cmp.user_id=#{userId} OR cmr.receive_user_id=#{userId})
     </if>
   </select>
 
@@ -192,9 +192,9 @@
     </foreach>
     </if>
     <if test="userId != null" >
-    AND cmr.receive_user_id = #{userId}
+      AND (cmp.user_id=#{userId} OR cmr.receive_user_id=#{userId})
     </if>
-    GROUP BY id,mesage_title,STATUS,create_time,message_content
+    GROUP BY id,mesage_title,create_time,message_content
     LIMIT #{limit} OFFSET #{offset}
   </select>
 
@@ -210,7 +210,7 @@
     IFNULL(GROUP_CONCAT(cmd.doc_name),'') as docName
     FROM car_message_post cmp
     LEFT JOIN car_message_receiver cmr ON cmp.id = cmr.message_id
-    INNER JOIN car_message_doc cmd ON cmd.message_id = cmp.id
+    LEFT JOIN car_message_doc cmd ON cmd.message_id = cmp.id
     INNER JOIN car_adm_user cdu ON cmp.user_id = cdu.user_id
     WHERE
     1=1
@@ -232,9 +232,9 @@
     </foreach>
     </if>
     <if test="userId != null" >
-    AND cmr.receive_user_id = #{userId}
+      AND (cmp.user_id=#{userId} OR cmr.receive_user_id=#{userId})
     </if>
-    GROUP BY id,mesage_title,STATUS,create_time,message_content
+    GROUP BY id,mesage_title,create_time,message_content
     LIMIT #{limit} OFFSET #{offset}
   </select>
 
@@ -271,9 +271,9 @@
       </foreach>
     </if>
     <if test="userId != null" >
-      AND cmr.receive_user_id = #{userId}
+      AND (cmp.user_id=#{userId} OR cmr.receive_user_id=#{userId})
     </if>
-    GROUP BY id,mesage_title,STATUS,create_time,message_content
+    GROUP BY id,mesage_title,create_time,message_content
     LIMIT #{limit} OFFSET #{offset}
   </select>
 
