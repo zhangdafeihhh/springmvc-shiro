@@ -329,10 +329,13 @@ public class MessageService {
 
             PageHelper.clearPage();
 
+            SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
             List<CarMessagePostDto> removeHtmlList = new ArrayList<>();
             for (CarMessagePostDto post : dtoList){
                 post.setMessageContent(HtmlFilterUtil.HTMLTagSpirit(post.getMessageContent()));
                 post.setMesageTitle(HtmlFilterUtil.HTMLTagSpirit(post.getMesageTitle()));
+                post.setMessageStatus(user.getId().equals(post.getCreateId()) ?
+                                CarMessagePost.Status.publish.getMessageStatus() : CarMessagePost.Status.receive.getMessageStatus());
                 removeHtmlList.add(post);
             }
 
