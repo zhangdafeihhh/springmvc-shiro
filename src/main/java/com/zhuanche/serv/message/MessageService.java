@@ -15,6 +15,8 @@ import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.exception.MessageException;
 import com.zhuanche.http.MpOkHttpUtil;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.FtpUtil;
 import com.zhuanche.util.FtpUtils;
 import com.zhuanche.util.HtmlFilterUtil;
@@ -762,9 +764,11 @@ public class MessageService {
                         idList, userId, (pageNum - 1) * pageSize ,pageSize);
             }
         }
+        SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+
         for (CarMessagePostDto dto : data){
             if (dto.getMessageStatus().equals(CarMessagePost.Status.publish.getMessageStatus())){
-                dto.setMessageStatus(dto.getCreateId().equals(dto.getReceiveId()) ?
+                dto.setMessageStatus(user.getId().equals(dto.getCreateId()) ?
                         CarMessagePost.Status.publish.getMessageStatus() : CarMessagePost.Status.receive.getMessageStatus());
             }
         }

@@ -7,8 +7,10 @@ import com.zhuanche.common.enums.PermissionLevelEnum;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.serv.CarBizDriverInfoService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.zhuanche.common.paging.PageDTO;
@@ -92,8 +94,9 @@ public class UserManagementController {
 	public 	AjaxResponse changeUser( 
 			@Verify(param="userId",rule="required|min(1)") Integer userId, 
 			@Verify(param="userName",rule="required") String userName, 
-			@Verify(param="phone",rule="required|mobile") String phone, 
-			@Verify(param="cityIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String cityIds, 
+			@Verify(param="phone",rule="required|mobile") String phone,
+			@RequestParam("cityIds") String cityIds,
+			//@Verify(param="cityIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String cityIds,
 			@Verify(param="supplierIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String supplierIds, 
 			@Verify(param="teamIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String teamIds,
 			@Verify(param="groupIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String groupIds,

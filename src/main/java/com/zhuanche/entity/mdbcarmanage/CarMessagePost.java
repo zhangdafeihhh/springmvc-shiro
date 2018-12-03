@@ -29,7 +29,7 @@ public class CarMessagePost{
 
     public enum Status{
         draft(1),  //草稿状态
-        receive(3),  //草稿状态
+        receive(3),  //已接收
         publish(2); //发布状态
 
 
