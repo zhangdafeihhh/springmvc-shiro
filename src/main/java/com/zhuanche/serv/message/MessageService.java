@@ -710,6 +710,12 @@ public class MessageService {
         int count = 0;
         Date start = (startDate != null) ? DateUtil.parseDate(startDate, Constants.DATE_FORMAT) : null;
         Date end = endDate != null ? DateUtil.parseDate(endDate, Constants.DATE_FORMAT) : null ;
+        if (end != null){
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(end);
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+            end = calendar.getTime();
+        }
         List<CarMessagePostDto> data = new ArrayList<>();
         if (idList != null && idList.size() == 0){
             return new PageDTO(pageNum, pageSize, count, data);
