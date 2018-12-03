@@ -14,6 +14,7 @@ import com.zhuanche.exception.MessageException;
 import com.zhuanche.serv.message.MessageService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.HtmlFilterUtil;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -104,9 +105,18 @@ public class MessageManagerController {
             logger.info("消息为发布状态，必传参数为空");
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
         }
-        if (StringUtils.isNotEmpty(messageContent) && messageContent.length() > Constants.MAX_CONTENT_LENGTH){
-            logger.info("消息内容非法");
-            return AjaxResponse.fail(RestErrorCode.MESSAGE_CONTENT_ERROR);
+
+        if (StringUtils.isNotEmpty(messageContent)){
+           String  clearCss = HtmlFilterUtil.HTMLTagSpirit(messageContent);
+           if (clearCss.length() > 2000){
+               logger.info("字体长度大于2000");
+               return AjaxResponse.fail(RestErrorCode.MESSAGE_CONTENT_ERROR);
+           }
+           if (messageContent.length() - clearCss.length() > 4000-clearCss.length()){
+               logger.info("样式长度过于复杂");
+               return AjaxResponse.fail(RestErrorCode.MESSAGE_CONTENT_CSS_TOO_MANY);
+           }
+
         }
 
         if(status.equals(CarMessagePost.Status.publish)){
