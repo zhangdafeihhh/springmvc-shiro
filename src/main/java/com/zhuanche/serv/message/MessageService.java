@@ -508,7 +508,7 @@ public class MessageService {
             }
             detailDto.setMessageDocDto(messageDocDtoList);
             List<Integer> createUser = new ArrayList<>();
-            createUser.add(userId);
+            createUser.add(carMessagePost.getUserId());
             List<CarAdmUser> createrList = carAdmUserExMapper.queryUsers(createUser,null,null,null,null);
             if (CollectionUtils.isNotEmpty(createrList)){
                 detailDto.setCreateUser(createrList.get(0).getUserName());
