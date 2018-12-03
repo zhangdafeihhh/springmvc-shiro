@@ -96,10 +96,9 @@ public class UserManagementController {
 			@Verify(param="userName",rule="required") String userName, 
 			@Verify(param="phone",rule="required|mobile") String phone,
 			@RequestParam("cityIds") String cityIds,
-			//@Verify(param="cityIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String cityIds,
-			@Verify(param="supplierIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String supplierIds, 
-			@Verify(param="teamIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String teamIds,
-			@Verify(param="groupIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String groupIds,
+			@RequestParam("supplierIds") String supplierIds,
+			@RequestParam("teamIds") String teamIds,
+			@RequestParam("groupIds") String groupIds,
 			Integer addTelescope) {
 		CarAdmUser newUser = new CarAdmUser();
 		newUser.setUserId(userId);
