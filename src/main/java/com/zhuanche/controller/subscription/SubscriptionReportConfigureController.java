@@ -41,6 +41,8 @@ import java.io.InputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 @RequestMapping("/subscription/report")
@@ -416,10 +418,21 @@ public class SubscriptionReportConfigureController {
      */
     @RequestMapping("/getSuppliers")
     @ResponseBody
-    public AjaxResponse getSuppliers(@Verify(param = "cityId", rule = "required") Integer cityId){
+    public AjaxResponse getSuppliers(@Verify(param = "cityId", rule = "required") Integer cityId, String cityIds ){
 
         Set<Integer> cityIdset = new HashSet<Integer>();
         cityIdset.add(cityId);
+        if(org.apache.commons.lang.StringUtils.isNotEmpty(cityIds)) {//当传入多个cityid时
+            Set<Integer> cityids = Stream.of(cityIds.split(",")).mapToInt(s -> {
+                if(org.apache.commons.lang.StringUtils.isNotEmpty(s)) {
+                    return Integer.valueOf(s);
+                }else {
+                    return -1;
+                }
+            }).boxed().collect(Collectors.toSet());
+            cityIdset.addAll(cityids);
+        }
+
         List<CarBizSupplier> carBizSuppliers = citySupplierTeamCommonService.getSuppliers( cityIdset );
         return AjaxResponse.success(carBizSuppliers);
     }
@@ -429,8 +442,8 @@ public class SubscriptionReportConfigureController {
      */
     @RequestMapping("/getTeams")
     @ResponseBody
-    public AjaxResponse getTeams(Integer cityId,
-                                 @Verify(param = "supplierId", rule = "required") Integer supplierId){
+    public AjaxResponse getTeams(@Verify(param = "supplierId", rule = "required") Integer supplierId,
+                                 Integer cityId, String supplierIds ){
         //城市ID
         Set<String> cityIdset = new HashSet<String>();
         if(cityId!=null && cityId.intValue()>0) {
@@ -439,6 +452,10 @@ public class SubscriptionReportConfigureController {
         //供应商ID
         Set<String> supplieridSet = new HashSet<String>();
         supplieridSet.add(supplierId.toString());
+        if(org.apache.commons.lang.StringUtils.isNotEmpty(supplierIds)) {//当传入多个supplierId时
+            Set<String> supplierids = Stream.of(supplierIds.split(",")).collect(Collectors.toSet());
+            supplieridSet.addAll(supplierids);
+        }
         List<CarDriverTeam> carDriverTeams = citySupplierTeamCommonService.getTeams(cityIdset, supplieridSet);
         return AjaxResponse.success(carDriverTeams);
     }
