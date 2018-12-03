@@ -297,7 +297,7 @@ public class MessageManagerController {
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
         }
         try {
-            PageDTO pageDTO = messageService.messageLisByStatus(userId,status,pageSize,pageNum);
+            PageDTO pageDTO = messageService.messageLisByStatus(userId,status,pageNum,pageSize);
             return AjaxResponse.success(pageDTO);
         } catch (MessageException e) {
             return AjaxResponse.fail(e.getCode());
