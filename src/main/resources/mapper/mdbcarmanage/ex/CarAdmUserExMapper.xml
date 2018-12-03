@@ -17,10 +17,11 @@
     <result column="team_id" property="teamId" jdbcType="VARCHAR" />
     <result column="phone" property="phone" jdbcType="VARCHAR" />
     <result column="group_ids" property="groupIds" jdbcType="VARCHAR" />
+    <result column="level" property="level" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
     user_id, account, user_name, password, role_id, account_type, status, remark, create_user, 
-    create_date, cities, suppliers, team_id, phone, group_ids
+    create_date, cities, suppliers, team_id, phone, group_ids,level
   </sql>
   
   <!-- 根据账户查询 -->
@@ -78,4 +79,43 @@
       #{item}
     </foreach>
   </select>
+
+  <select id="queryUserPermissionInfo" resultMap="BaseResultMap">
+    SELECT
+	  user_id,
+	  user_name,
+	  account,
+	  phone,
+	  cities,
+	  suppliers,
+	  team_id,
+	  group_ids,
+	  LEVEL
+    FROM
+	car_adm_user
+	where user_id = #{userId}
+  </select>
+
+
+   <select id="selectUsersByLevel" resultMap="BaseResultMap" parameterType="java.util.List">
+        select user_id,user_name,cities, suppliers, team_id, phone
+        from car_adm_user
+        where 1=1
+        <if test="level!=null">
+            and level = #{level}
+        </if>
+
+
+   </select>
+
+    <select id="queryIdListByName" resultType="java.lang.Integer" parameterType="java.lang.String">
+        select user_id
+        from car_adm_user
+        where 1=1
+        <if test="userName!=null">
+            and locate (#{userName} , car_adm_user.user_name) > 0
+        </if>
+
+    </select>
+
 </mapper>

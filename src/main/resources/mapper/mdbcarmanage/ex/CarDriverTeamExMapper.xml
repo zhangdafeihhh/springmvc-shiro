@@ -256,6 +256,12 @@
         </foreach>
     </select>
 
+    <select id="queryTeamNameByTemIds" parameterType="java.util.List" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM car_driver_team dt
+        WHERE dt.id in (${teamIds})
+    </select>
 
     <select id="queryForListByPids" parameterType="com.zhuanche.request.TeamGroupRequest" resultType="java.util.HashMap">
         SELECT
@@ -271,4 +277,32 @@
             </foreach>
         </if>
     </select>
+
+    <select id="getTeamList" resultType="java.util.HashMap">
+        SELECT
+        team_name as teamName,
+        supplier
+        FROM car_driver_team
+        where status!=2
+        and p_id is null
+        and id in
+        <foreach item="item" index="index" collection="collection" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getGroupList" resultType="java.util.HashMap">
+        SELECT CONCAT_WS('-', cdt1.team_name, cdt2.team_name) teamName,
+        cdt1.supplier
+        FROM
+        car_driver_team cdt1
+        INNER JOIN car_driver_team cdt2 ON cdt1.id = cdt2.p_id
+        WHERE cdt2.status != 2
+        and cdt2.id in
+        <foreach item="item" index="index" collection="collection" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
 </mapper>

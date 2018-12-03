@@ -35,6 +35,8 @@ public class CarAdmUser implements Serializable{
 
     private String groupIds;
 
+    private Integer level;
+
     public Integer getUserId() {
         return userId;
     }
@@ -153,5 +155,13 @@ public class CarAdmUser implements Serializable{
 
     public void setGroupIds(String groupIds) {
         this.groupIds = groupIds == null ? null : groupIds.trim();
+    }
+
+    public Integer getLevel() {
+        return level;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
     }
 }

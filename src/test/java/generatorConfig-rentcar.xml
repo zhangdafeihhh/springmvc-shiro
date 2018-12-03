@@ -4,7 +4,7 @@
 	<context id="DB2Tables"  defaultModelType="flat"  targetRuntime="MyBatis3">
 		<!-- Mybatis generator mapper文件重新生成不会覆盖原文件，为了解决此问题 -->
 		<plugin type="OverIsMergeablePlugin"></plugin>
-	
+
 		<!-- 是否去除自动生成的注释 -->
 		<commentGenerator>
 			<property name="suppressAllComments" value="true"/>
@@ -12,23 +12,23 @@
 		</commentGenerator>
 
 		<!-- 数据库连接信息 -->
-		<jdbcConnection driverClass="com.mysql.jdbc.Driver"	connectionURL="jdbc:mysql://10.35.0.35:3306/rentcar?useUnicode=true&amp;characterEncoding=UTF-8" userId="dev_sqhc_rentcar" password="dev_BzkmQM%O^U7Dy8X3">
+		<jdbcConnection driverClass="com.mysql.jdbc.Driver"	connectionURL="jdbc:mysql://10.20.10.100:3306/rentcar?useUnicode=true&amp;characterEncoding=UTF-8" userId="sqhc_rentcar" password="BzkmQM%O^U7Dy8X3">
 		</jdbcConnection>
 		<javaTypeResolver>
 			<property name="forceBigDecimals" value="true"/>
 		</javaTypeResolver>
 
 		<!-- po实体类代码位置 -->
-		<javaModelGenerator targetPackage="com.zhuanche.entity.rentcar"	targetProject="C:\\Users\\admin\\git\\mp-manage\\src\main\\java">
+		<javaModelGenerator targetPackage="com.zhuanche.entity.rentcar"	targetProject="C:\\mp-manage\\src\main\\java">
 			<property name="enableSubPackages" value="true" />
 			<property name="trimStrings" value="true" />
 		</javaModelGenerator>
 		<!-- sql代码的xml映射文件位置 -->
-		<sqlMapGenerator targetPackage="mapper.rentcar" targetProject="C:\\Users\\admin\\git\\mp-manage\\src\main\\resources">
+		<sqlMapGenerator targetPackage="mapper.rentcar" targetProject="C:\\mp-manage\\src\main\\resources">
 			<property name="enableSubPackages" value="true" />
 		</sqlMapGenerator>
 		<!-- mapper接口位置 -->
-		<javaClientGenerator type="XMLMAPPER" targetPackage="mapper.rentcar" targetProject="C:\\Users\\admin\\git\\mp-manage\\src\main\\java">
+		<javaClientGenerator type="XMLMAPPER" targetPackage="mapper.rentcar" targetProject="C:\\mp-manage\\src\main\\java">
 			<property name="enableSubPackages" value="true" />
 		</javaClientGenerator>
 
@@ -44,24 +44,19 @@
 			enableCountByExample="false" enableUpdateByExample="false">
 			<property name="useActualColumnNames" value="false" />
 			<generatedKey column="supplier_id" sqlStatement="MySql" identity="true" />
-		</table> 
+		</table> -->
 		<table tableName="car_biz_car_group" domainObjectName="CarBizCarGroup"
-			enableSelectByExample="false" enableDeleteByExample="false"
-			enableCountByExample="false" enableUpdateByExample="false">
+			   enableSelectByExample="false" enableDeleteByExample="false"
+			   enableCountByExample="false" enableUpdateByExample="false">
 			<property name="useActualColumnNames" value="false" />
 			<generatedKey column="supplier_id" sqlStatement="MySql" identity="true" />
 		</table>
 		<table tableName="car_biz_model" domainObjectName="CarBizModel"
-			enableSelectByExample="false" enableDeleteByExample="false"
-			enableCountByExample="false" enableUpdateByExample="false">
+			   enableSelectByExample="false" enableDeleteByExample="false"
+			   enableCountByExample="false" enableUpdateByExample="false">
 			<property name="useActualColumnNames" value="false" />
 			<generatedKey column="supplier_id" sqlStatement="MySql" identity="true" />
-		</table> -->
-		<table tableName="car_biz_customer" domainObjectName="CarBizCustomer"
-			enableSelectByExample="false" enableDeleteByExample="false"
-			enableCountByExample="false" enableUpdateByExample="false">
-			<property name="useActualColumnNames" value="false" />
-			<generatedKey column="customer_id" sqlStatement="MySql" identity="true" />
 		</table>
+
 	</context>
 </generatorConfiguration>

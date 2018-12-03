@@ -150,7 +150,15 @@ public class HomeKanBanController {
 		return parseResult(onlineTimeUrl, paramMap);
 	}
 
-	/** 司机排名统计 **/
+	/**
+	 * 司机排名统计
+	 * @param allianceId 加盟商ID
+	 * @param motorcadeId 车队ID
+	 * @param orderByColumnCode 排序字段编号 1：订单数量;2：平均得分;3：在线时长;4：流水合计
+	 * @param orderByTypeCode 排序方式 1：升序;2：降序
+	 * @param topNum 取前几名 最多不允许超过50
+	 * @return
+	 */
 	@RequestMapping("/vehicleTopStatistics")
 	@ResponseBody
 	public AjaxResponse vehicleTopStatistics(String allianceId, String motorcadeId,

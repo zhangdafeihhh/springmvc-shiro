@@ -16,6 +16,7 @@
             <bean class="org.springframework.http.converter.StringHttpMessageConverter">
                 <constructor-arg value="UTF-8" />
             </bean>
+            <bean id="byteArrayHttpMessageConverter" class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>
             <bean  class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
                 <property name="supportedMediaTypes">
                     <list>
@@ -39,7 +40,37 @@
                 	</bean>
                 </property>
             </bean>
-            <bean id="byteArrayHttpMessageConverter" class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>
+<!--
+-->
+
+            <!--解决下载后无法打开-->
+           <!-- <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+                <property name="messageConverters">
+                    <list>
+                        <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>
+                        <bean
+                                class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                            <property name="supportedMediaTypes">
+                                <list>
+                                    <value>application/json;charset=UTF-8</value>
+                                    <value>text/json;charset=UTF-8</value>
+                                    <value>text/html;charset=UTF-8</value>
+                                </list>
+                            </property>
+                        </bean>
+                        &lt;!&ndash;<bean
+                                class="org.springframework.http.converter.StringHttpMessageConverter">
+                            <property name="supportedMediaTypes">
+                                <list>
+                                    <value>text/plain;charset=UTF-8</value>
+                                </list>
+                            </property>
+                        </bean>&ndash;&gt;
+
+                    </list>
+                </property>
+            </bean>-->
+
         </mvc:message-converters>
     </mvc:annotation-driven>
 
@@ -68,7 +99,6 @@
 	        <bean class="com.zhuanche.common.web.HttpParamVerifyInterceptor"/> <!-- 请求参数规则校验 -->
 	    </mvc:interceptor>
     </mvc:interceptors>
-	
     <!-- 配置统一异常处理（需要区分页面请求异常、XHR请求异常、文件上传请求异常时的特殊处理） -->
 	<bean class="com.zhuanche.common.web.CustomExceptionResolver"></bean>
 </beans>

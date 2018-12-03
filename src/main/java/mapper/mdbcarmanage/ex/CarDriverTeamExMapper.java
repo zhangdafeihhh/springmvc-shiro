@@ -55,6 +55,12 @@ public interface CarDriverTeamExMapper{
 	 * @return
 	 */
 	List<CarDriverTeam> queryTeamListByTemIdList(List<Integer> teamIdList);
+	
+	List<CarDriverTeam> queryTeamNameByTemIds(@Param("teamIds") String teamIds);
 
 	List<Map<String, Object>> queryForListByPids(TeamGroupRequest teamGroupRequest);
+
+    List<Map<String, Object>> getTeamList(Set<String> teamIds);
+
+    List<Map<String, Object>> getGroupList(Set<String> groupIds);
 }

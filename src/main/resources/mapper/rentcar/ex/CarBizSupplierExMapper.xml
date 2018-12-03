@@ -105,5 +105,29 @@
             #{item}
         </foreach>
     </select>
+
+    <select id="queryNameBySupplierIds" resultType="com.zhuanche.dto.rentcar.CarBizSupplierDTO" parameterType="java.lang.String" >
+        select
+        t.supplier_id supplierId, t.supplier_full_name supplierFullName,
+        t.supplier_city supplierCity, c.city_name cityName
+        from car_biz_supplier t
+        left join car_biz_city c on c.city_id = t.supplier_city
+        where t.status=1
+        <if test="supplierIds!=null and supplierIds!=''">
+            and t.supplier_id IN (${supplierIds})
+        </if>
+    </select>
+    
+    <select id="getSupplierList" resultType="java.util.Map">
+        SELECT
+        CONCAT_WS('-', cbc.city_name, cbs.supplier_full_name) supplierName,
+        cbs.supplier_id as supplierId
+        FROM car_biz_supplier cbs
+          LEFT JOIN car_biz_city cbc ON cbs.supplier_city = cbc.city_id
+        where cbs.supplier_id in
+        <foreach item="item" index="index" collection="supplierIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
     
 </mapper>

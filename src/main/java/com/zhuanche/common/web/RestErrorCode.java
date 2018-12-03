@@ -183,6 +183,17 @@ public final class RestErrorCode{
 
 	@ResultMessage("存在未审核的申请记录")
 	public static final int UPDATE_APPLY_EXIST = 8001;
+
+	//-----------------------------------------------业务参数：数据报表
+	@ResultMessage("未查询到相应数据报表任务")
+	public static final int SUBSCRIPTION_NOT_EXIST = 7010;
+	@ResultMessage("数据报表：{0}")
+	public static final int SUBSCRIPTION_INVALID              = 7011;
+
+	@ResultMessage("通知消息内容超过最大字数限制")
+	public static final int MESSAGE_CONTENT_ERROR = 8002;
+	@ResultMessage("通知消息样式过于复杂")
+	public static final int MESSAGE_CONTENT_CSS_TOO_MANY = 8003;
 	//---------------------------------------------------------------------------------------------------------------------------------------------
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系

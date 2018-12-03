@@ -5,8 +5,14 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import com.zhuanche.common.enums.PermissionLevelEnum;
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.serv.CarBizDriverInfoService;
+import org.apache.commons.lang.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.zhuanche.common.paging.PageDTO;
@@ -46,6 +52,21 @@ public class UserManagementController {
 		user.setSuppliers( supplierIds );
 		user.setTeamId( teamIds );
 		user.setGroupIds(groupIds);
+		if (StringUtils.isNotBlank(groupIds)){
+			user.setLevel(PermissionLevelEnum.GROUP.getCode());
+		}
+		else if (StringUtils.isNotBlank(teamIds)){
+			user.setLevel(PermissionLevelEnum.TEAM.getCode());
+		}
+		else if (StringUtils.isNotBlank(supplierIds)){
+			user.setLevel(PermissionLevelEnum.SUPPLIER.getCode());
+		}
+		else if (StringUtils.isNotBlank(cityIds)){
+			user.setLevel(PermissionLevelEnum.CITY.getCode());
+		}
+		else {
+			user.setLevel(PermissionLevelEnum.ALL.getCode());
+		}
 		boolean phoneExist = userManagementService.userPhoneExist(phone);
 		if(phoneExist){
 			return AjaxResponse.fail(RestErrorCode.PHONE_EXIST );
@@ -77,11 +98,11 @@ public class UserManagementController {
 	public 	AjaxResponse changeUser( 
 			@Verify(param="userId",rule="required|min(1)") Integer userId, 
 			@Verify(param="userName",rule="required") String userName, 
-			@Verify(param="phone",rule="required|mobile") String phone, 
-			@Verify(param="cityIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String cityIds, 
-			@Verify(param="supplierIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String supplierIds, 
-			@Verify(param="teamIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String teamIds,
-			@Verify(param="groupIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String groupIds,
+			@Verify(param="phone",rule="required|mobile") String phone,
+			@RequestParam("cityIds") String cityIds,
+			@RequestParam("supplierIds") String supplierIds,
+			@RequestParam("teamIds") String teamIds,
+			@RequestParam("groupIds") String groupIds,
 			Integer addTelescope) {
 		CarAdmUser newUser = new CarAdmUser();
 		newUser.setUserId(userId);

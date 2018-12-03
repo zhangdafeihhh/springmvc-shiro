@@ -38,6 +38,8 @@ public class CarAdmUserDTO{
 
     private String groupIds;
 
+    private Integer level;
+
     public String getRoleIds() {
 		return roleIds;
 	}
@@ -140,5 +142,13 @@ public class CarAdmUserDTO{
 
     public void setGroupIds(String groupIds) {
         this.groupIds = groupIds == null ? null : groupIds.trim();
+    }
+
+    public Integer getLevel() {
+        return level;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
     }
 }
