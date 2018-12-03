@@ -15,10 +15,13 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.driver.SubscriptionReportConfigureDTO;
 import com.zhuanche.entity.driver.SubscriptionReport;
+import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
+import com.zhuanche.entity.rentcar.CarBizCity;
+import com.zhuanche.entity.rentcar.CarBizSupplier;
+import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.serv.subscription.SubscriptionReportConfigureService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BigDataFtpUtil;
-import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -35,6 +38,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -54,7 +58,7 @@ public class SubscriptionReportConfigureController {
     private BigDataFtpUtil bigDataFtpUtil;
 
     @Autowired
-    private CarAdmUserExMapper carAdmUserExMapper;
+    private CitySupplierTeamCommonService citySupplierTeamCommonService;
 
     /**
      * 数据报表订阅
@@ -357,10 +361,17 @@ public class SubscriptionReportConfigureController {
      */
     @ResponseBody
     @RequestMapping(value = "/querySubscriptionLevel")
-    public AjaxResponse querySubscriptionLevel() {
+    public AjaxResponse querySubscriptionLevel(Integer authority) {
         Integer level = WebSessionUtil.getCurrentLoginUser().getLevel();//获取用户的级别,1-全国;2-城市;4-加盟商;8-车队;16-班组
         JSONObject map = new JSONObject();
         if (level != null) {
+            if(authority!=null && authority==1){
+                map.put( "1", "全国");
+                map.put( "2", "城市");
+                map.put( "4", "供应商");
+                map.put( "8", "车队");
+                return AjaxResponse.success(map);
+            }
             switch (level) {
                 case 1:
                     map.put( "1", "全国");
@@ -381,10 +392,54 @@ public class SubscriptionReportConfigureController {
                     map.put( "8", "车队");
                     break;
                 case 16:
-                    map.put( "16", "小组");
+//                    map.put( "16", "小组");
                     break;
             }
         }
         return AjaxResponse.success(map);
+    }
+
+
+
+    /**
+     * @Desc:  获取城市列表(没有数据权限)
+     */
+    @RequestMapping("/getCities")
+    @ResponseBody
+    public AjaxResponse getCities(){
+        List<CarBizCity> carBizCities = citySupplierTeamCommonService.getCities();
+        return AjaxResponse.success(carBizCities);
+    }
+
+    /**
+     * @Desc: 查询城市供应列表(没有数据权限)
+     */
+    @RequestMapping("/getSuppliers")
+    @ResponseBody
+    public AjaxResponse getSuppliers(@Verify(param = "cityId", rule = "required") Integer cityId){
+
+        Set<Integer> cityIdset = new HashSet<Integer>();
+        cityIdset.add(cityId);
+        List<CarBizSupplier> carBizSuppliers = citySupplierTeamCommonService.getSuppliers( cityIdset );
+        return AjaxResponse.success(carBizSuppliers);
+    }
+
+    /**
+     * @Desc: 查询车队列表(没有数据权限)
+     */
+    @RequestMapping("/getTeams")
+    @ResponseBody
+    public AjaxResponse getTeams(Integer cityId,
+                                 @Verify(param = "supplierId", rule = "required") Integer supplierId){
+        //城市ID
+        Set<String> cityIdset = new HashSet<String>();
+        if(cityId!=null && cityId.intValue()>0) {
+            cityIdset.add(cityId.toString());
+        }
+        //供应商ID
+        Set<String> supplieridSet = new HashSet<String>();
+        supplieridSet.add(supplierId.toString());
+        List<CarDriverTeam> carDriverTeams = citySupplierTeamCommonService.getTeams(cityIdset, supplieridSet);
+        return AjaxResponse.success(carDriverTeams);
     }
 }
