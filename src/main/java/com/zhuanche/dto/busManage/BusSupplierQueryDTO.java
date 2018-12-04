@@ -1,5 +1,7 @@
 package com.zhuanche.dto.busManage;
 
+import java.util.List;
+
 import com.zhuanche.common.web.datavalidate.custom.InArray;
 import com.zhuanche.dto.BaseDTO;
 
@@ -22,6 +24,14 @@ public class BusSupplierQueryDTO extends BaseDTO {
 	// TODO 分佣比例
 
 	// ========================业务字段=========================
+
+	/** 某分佣比例下的供应商ids **/
+	private List<Integer> commissionIds;
+
+	/** 合同快到期的供应商ids **/
+	private List<Integer> contractIds;
+
+	private List<Integer> excludeContractIds;
 
 	// =======================getter/setter====================
 
@@ -47,6 +57,30 @@ public class BusSupplierQueryDTO extends BaseDTO {
 
 	public void setStatus(Integer status) {
 		this.status = status;
+	}
+
+	public List<Integer> getCommissionIds() {
+		return commissionIds;
+	}
+
+	public void setCommissionIds(List<Integer> commissionIds) {
+		this.commissionIds = commissionIds;
+	}
+
+	public List<Integer> getContractIds() {
+		return contractIds;
+	}
+
+	public void setContractIds(List<Integer> contractIds) {
+		this.contractIds = contractIds;
+	}
+
+	public List<Integer> getExcludeContractIds() {
+		return excludeContractIds;
+	}
+
+	public void setExcludeContractIds(List<Integer> excludeContractIds) {
+		this.excludeContractIds = excludeContractIds;
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.zhuanche.vo.busManage;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 public class BusSupplierPageVO {
 
@@ -8,7 +9,7 @@ public class BusSupplierPageVO {
 	private Integer supplierId;
 
 	/** 供应商名称 **/
-	private String supplierNum;
+	private String supplierName;
 
 	/** 城市名称 **/
 	private Integer cityName;
@@ -26,10 +27,15 @@ public class BusSupplierPageVO {
 	// TODO
 
 	/** 合同时间 **/
-	// TODO
+	private Date contractDate;
 
 	/** 状态 **/
 	private Integer status;
+
+	// ====================其它业务数据======================
+
+	/** 是否快过期 **/
+	private Integer isExpireSoon;
 
 	public Integer getSupplierId() {
 		return supplierId;
@@ -39,12 +45,12 @@ public class BusSupplierPageVO {
 		this.supplierId = supplierId;
 	}
 
-	public String getSupplierNum() {
-		return supplierNum;
+	public String getSupplierName() {
+		return supplierName;
 	}
 
-	public void setSupplierNum(String supplierNum) {
-		this.supplierNum = supplierNum;
+	public void setSupplierName(String supplierName) {
+		this.supplierName = supplierName;
 	}
 
 	public Integer getCityName() {
@@ -77,6 +83,22 @@ public class BusSupplierPageVO {
 
 	public void setStatus(Integer status) {
 		this.status = status;
+	}
+
+	public Date getContractDate() {
+		return contractDate;
+	}
+
+	public void setContractDate(Date contractDate) {
+		this.contractDate = contractDate;
+	}
+
+	public Integer getIsExpireSoon() {
+		return isExpireSoon;
+	}
+
+	public void setIsExpireSoon(Integer isExpireSoon) {
+		this.isExpireSoon = isExpireSoon;
 	}
 
 }

@@ -168,4 +168,52 @@
 		</set>
 		where supplier_id = #{supplierId}
 	</update>
+	
+	<!-- 查询合同即将到期的供应商 -->
+	<select id="querySupplierPageListByMaster" parameterType="com.zhuanche.dto.busManage.BusSupplierQueryDTO"
+		resultType="com.zhuanche.vo.busManage.BusSupplierPageVO">
+		SELECT
+			s.supplier_id AS supplierId,
+			s.supplier_full_name AS supplierName,
+			c.city_name AS cityName,
+			s.`status` AS status,
+			'0' as isExpireSoon
+		FROM
+			car_biz_supplier s
+		LEFT JOIN car_biz_city c ON c.city_id = s.supplier_city
+		<where>
+			<if test="cityId != null">
+				AND s.supplier_city = #{cityId}
+			</if>
+			<if test="supplierId != null">
+				AND s.supplier_id = #{supplierId}
+			</if>
+			<if test="status != null">
+				AND s.`status` = #{status}
+			</if>
+			<if test="commissionIds != null and commissionIds.size() > 0">
+				AND s.supplier_id IN 
+				<foreach collection="commissionIds" item="item" open="("
+					separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="contractIds != null and contractIds > 0">
+				AND s.supplier_id IN 
+				<foreach collection="contractIds" item="item" open="("
+					separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="excludeContractIds != null and excludeContractIds > 0">
+				AND s.supplier_id NOT IN 
+				<foreach collection="excludeContractIds" item="item" open="("
+					separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+		ORDER BY
+			s.create_date DESC
+	</select>
 </mapper>

@@ -20,6 +20,8 @@ public class BusBizSupplierDetail {
 
     private BigDecimal franchiseFee;
 
+    private Date contractDate;
+
     private String invoiceCompanyName;
 
     private String invoiceCompanyPhone;
@@ -94,6 +96,14 @@ public class BusBizSupplierDetail {
 
     public void setFranchiseFee(BigDecimal franchiseFee) {
         this.franchiseFee = franchiseFee;
+    }
+
+    public Date getContractDate() {
+        return contractDate;
+    }
+
+    public void setContractDate(Date contractDate) {
+        this.contractDate = contractDate;
     }
 
     public String getInvoiceCompanyName() {

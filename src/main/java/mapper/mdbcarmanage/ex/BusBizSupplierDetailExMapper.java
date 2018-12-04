@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.zhuanche.dto.busManage.BusSupplierDetailDTO;
 import com.zhuanche.entity.mdbcarmanage.BusBizSupplierDetail;
+import com.zhuanche.vo.busManage.BusSupplierPageVO;
 
 public interface BusBizSupplierDetailExMapper {
 
@@ -40,12 +41,22 @@ public interface BusBizSupplierDetailExMapper {
 
 	/**
 	 * @Title: querySupplierList
-	 * @Description: 供应商其它信息查询
+	 * @Description: 查询巴士供应商分页信息
 	 * @param param
 	 * @return 
 	 * @return List<BusBizSupplierDetail>
 	 * @throws
 	 */
-	List<BusBizSupplierDetail> querySupplierList(Map<Object, Object> param);
+	List<BusSupplierPageVO> querySupplierContractExpireSoonList(Map<Object, Object> param);
+
+	/**
+	 * @Title: selectBySupplierId
+	 * @Description: 根据供应商ID查询巴士供应商其它信息
+	 * @param supplierId
+	 * @return 
+	 * @return BusBizSupplierDetail
+	 * @throws
+	 */
+	BusBizSupplierDetail selectBySupplierId(Integer supplierId);
 
 }
