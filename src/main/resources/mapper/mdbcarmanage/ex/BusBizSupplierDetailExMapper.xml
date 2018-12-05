@@ -10,8 +10,12 @@
 		<result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
 		<result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
 		<result column="deposit" property="deposit" jdbcType="DECIMAL" />
-		<result column="franchise_fee" property="franchiseFee" jdbcType="DECIMAL" />
-		<result column="contract_date" property="contractDate" jdbcType="TIMESTAMP" />
+		<result column="franchise_fee" property="franchiseFee"
+			jdbcType="DECIMAL" />
+		<result column="contract_date_start" property="contractDateStart"
+			jdbcType="TIMESTAMP" />
+		<result column="contract_date_end" property="contractDateEnd"
+			jdbcType="TIMESTAMP" />
 		<result column="invoice_company_name" property="invoiceCompanyName"
 			jdbcType="VARCHAR" />
 		<result column="invoice_company_phone" property="invoiceCompanyPhone"
@@ -28,8 +32,9 @@
 	<sql id="Base_Column_List">
 		id, supplier_id, create_by, update_by, create_date, update_date, deposit,
 		franchise_fee,
-		contract_date, invoice_company_name, invoice_company_phone, invoice_company_addr,
-		invoice_deposit_bank, invoice_bank_account, invoice_duty_paragraph
+		contract_date_start, contract_date_end, invoice_company_name, invoice_company_phone,
+		invoice_company_addr, invoice_deposit_bank, invoice_bank_account,
+		invoice_duty_paragraph
 	</sql>
 	
 	<insert id="insertSelective"
@@ -57,9 +62,12 @@
 			<if test="franchiseFee != null">
 				franchise_fee,
 			</if>
-			<if test="contractDate != null" >
-	        	contract_date,
-	      	</if>
+			<if test="contractDateStart != null">
+				contract_date_start,
+			</if>
+			<if test="contractDateEnd != null">
+				contract_date_end,
+			</if>
 			<if test="invoiceCompanyName != null">
 				invoice_company_name,
 			</if>
@@ -101,9 +109,12 @@
 			<if test="franchiseFee != null">
 				#{franchiseFee,jdbcType=DECIMAL},
 			</if>
-			<if test="contractDate != null" >
-	        	#{contractDate,jdbcType=TIMESTAMP},
-	      	</if>
+			<if test="contractDateStart != null" >
+				#{contractDateStart,jdbcType=TIMESTAMP},
+			</if>
+			<if test="contractDateEnd != null" >
+				#{contractDateEnd,jdbcType=TIMESTAMP},
+			</if>
 			<if test="invoiceCompanyName != null">
 				#{invoiceCompanyName,jdbcType=VARCHAR},
 			</if>
@@ -146,9 +157,12 @@
 			<if test="franchiseFee != null">
 				franchise_fee = #{franchiseFee,jdbcType=DECIMAL},
 			</if>
-			<if test="contractDate != null" >
-	        	contract_date = #{contractDate,jdbcType=TIMESTAMP},
-		    </if>
+			<if test="contractDateStart != null" >
+				contract_date_start = #{contractDateStart,jdbcType=TIMESTAMP},
+			</if>
+			<if test="contractDateEnd != null" >
+				contract_date_end = #{contractDateEnd,jdbcType=TIMESTAMP},
+			</if>
 			<if test="invoiceCompanyName != null">
 				invoice_company_name =
 				#{invoiceCompanyName,jdbcType=VARCHAR},
@@ -188,26 +202,35 @@
 			supplier_id AS supplierId,
 			franchise_fee AS franchiseFee,
 			deposit AS deposit,
-			contract_date as contractDate,
+			contract_date_start as contractDateStart,
+			contract_date_end as contractDateEnd,
 			'1' as isExpireSoon
 		FROM
 			bus_biz_supplier_detail
 		where 
-        	TIMESTAMPDIFF(MONTH, contract_date, now()) <![CDATA[<]]> 3
+        	TIMESTAMPDIFF(MONTH, contract_date_end, now()) <![CDATA[<]]> 3
             <if test="commissionIds != null and commissionIds.size() > 0">
                 AND supplier_id IN
                 <foreach collection="commissionIds" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>
-         ORDER BY contract_date DESC
+            <if test="supplierIds != null and supplierIds.size() > 0">
+				AND supplier_id IN
+				<foreach collection="supplierIds" open="(" close=")"
+					separator="," item="supplierId">
+					#{supplierId}
+				</foreach>
+			</if>
+         ORDER BY contract_date_end DESC
     </select>
     
-    <!--  -->
+    <!-- 根据供应商ID查询巴士供应商其它信息 -->
     <select id="selectBySupplierId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     	select 
 	    	<include refid="Base_Column_List" />
 	    from bus_biz_supplier_detail
 	    where supplier_id = #{supplierId}
+	    limit 1
     </select>
 </mapper>

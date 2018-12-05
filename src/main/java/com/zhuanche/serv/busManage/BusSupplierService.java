@@ -1,13 +1,18 @@
 package com.zhuanche.serv.busManage;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -32,6 +37,8 @@ import com.zhuanche.entity.mdbcarmanage.BusBizSupplierDetail;
 import com.zhuanche.serv.CarBizDriverInfoService;
 import com.zhuanche.serv.mdbcarmanage.CarBizDriverInfoTempService;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.vo.busManage.BusSupplierExportVO;
+import com.zhuanche.vo.busManage.BusSupplierInfoVO;
 import com.zhuanche.vo.busManage.BusSupplierPageVO;
 
 import mapper.mdbcarmanage.CarAdmUserMapper;
@@ -160,6 +167,8 @@ public class BusSupplierService implements BusConst {
 	 * @throws
 	 */
 	@SuppressWarnings("rawtypes")
+	@MasterSlaveConfigs(configs = { @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE),
+			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE) })
 	public List<BusSupplierPageVO> queryBusSupplierPageList(BusSupplierQueryDTO queryDTO) {
 		Integer pageNum = queryDTO.getPageNum();
 		Integer pageSize = queryDTO.getPageSize();
@@ -192,7 +201,7 @@ public class BusSupplierService implements BusConst {
 		List<BusSupplierPageVO> contractSuppliers = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
 		int offset = Math.max(pageNum, 1) - 1 * pageSize;
 		int limit = offset + pageSize;
-		// 封装结果集
+		// 四、封装结果集
 		List<BusSupplierPageVO> resultList = new ArrayList<>();
 		if (offset > contractSuppliers.size()) {
 			queryDTO.setContractIds(null);
@@ -213,13 +222,15 @@ public class BusSupplierService implements BusConst {
 					if (carBizSupplier.getSupplierId().equals(busSupplierDetail.getSupplierId())) {
 						carBizSupplier.setDeposit(busSupplierDetail.getDeposit());
 						carBizSupplier.setFranchiseFee(busSupplierDetail.getFranchiseFee());
-						carBizSupplier.setContractDate(busSupplierDetail.getContractDate());
+						carBizSupplier.setContractDateStart(busSupplierDetail.getContractDateStart());
+						carBizSupplier.setContractDateEnd(busSupplierDetail.getContractDateEnd());
+						carBizSupplier.setIsExpireSoon(busSupplierDetail.getIsExpireSoon());
 						allContractList.add(carBizSupplier);
 					}
 				}
 			}
 			List<BusSupplierPageVO> orderedAllContractList = allContractList.stream()
-					.sorted(Comparator.comparing(BusSupplierPageVO::getContractDate).reversed())
+					.sorted(Comparator.comparing(BusSupplierPageVO::getContractDateEnd).reversed())
 					.collect(Collectors.toList());
 			if (limit > contractSuppliers.size()) {
 				// 合同快到期供应商
@@ -242,9 +253,19 @@ public class BusSupplierService implements BusConst {
 				resultList.addAll(subList);
 			}
 		}
+		
+		// 五、补充分佣信息(分佣比例、是否有返点)
+		// TODO
 		return resultList;
 	}
 
+	/**
+	 * @Title: completeDetailInfo
+	 * @Description: 补充巴士供应商信息
+	 * @param t 
+	 * @return void
+	 * @throws
+	 */
 	private <T> void completeDetailInfo(T t) {
 		if (t == null) {
 			return;
@@ -256,6 +277,113 @@ public class BusSupplierService implements BusConst {
 
 		// 返回补充的信息
 		BeanUtils.copyProperties(detail, t);
+	}
+
+	/**
+	 * @Title: querySupplierExportList
+	 * @Description: 查询供应商导出列表
+	 * @param queryDTO
+	 * @return 
+	 * @return List<BusDriverInfoExportVO>
+	 * @throws
+	 */
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
+	public List<BusSupplierExportVO> querySupplierExportList(BusSupplierQueryDTO queryDTO) {
+		List<BusSupplierExportVO> supplierList = busCarBizSupplierExMapper.querySupplierExportList(queryDTO);
+		return supplierList;
+	}
+
+	/**
+	 * @Title: completeSupplierExportList
+	 * @Description: 补充其它信息
+	 * @param list
+	 * @return 
+	 * @return List<String>
+	 * @throws
+	 */
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE))
+	public List<String> completeSupplierExportList(List<BusSupplierExportVO> list) {
+//		供应商,城市 ,分佣比例,加盟费,保证金,是否有返点,合同开始时间,合同到期时间,状态
+		
+		// 返回结果
+		List<String> csvDataList = new ArrayList<>();
+		if (list == null || list.isEmpty()) {
+			return csvDataList;
+		}
+	
+		list.forEach(supplier -> {
+			/** 行数据 */
+			StringBuilder builder = new StringBuilder();
+			BusBizSupplierDetail detail = busBizSupplierDetailExMapper.selectBySupplierId(supplier.getSupplierId());
+	
+			// 一、供应商
+			String supplierName = supplier.getSupplierName();
+			builder.append(StringUtils.defaultIfBlank(supplierName, "")).append(",");
+	
+			// 二、城市
+			String ciytName = supplier.getCityName();
+			builder.append(StringUtils.defaultIfBlank(ciytName, "")).append(",");
+	
+			// 三、分佣比例
+			// TODO
+			String rate = "";
+			builder.append(StringUtils.defaultIfBlank(rate, "")).append(",");
+	
+			// 四、加盟费
+			BigDecimal franchiseFee = detail.getFranchiseFee();
+			builder.append(franchiseFee == null ? "0.00" : format.format(franchiseFee)).append(",");
+	
+			// 五、保证金
+			BigDecimal deposit = detail.getDeposit();
+			builder.append(deposit == null ? "0.00" : format.format(deposit)).append(",");
+	
+			// 六、是否有返点
+			// TODO
+			String isHas = "";
+			builder.append(StringUtils.defaultIfBlank(isHas, "")).append(",");
+	
+			// 七、合同开始时间
+			Date contractDateStart = detail.getContractDateStart();
+			String contractDateStartFormatter = "";
+			if (contractDateStart != null) {
+				contractDateStartFormatter = FORMATTER_DATE_BY_HYPHEN.format(LocalDateTime.ofInstant(contractDateStart.toInstant(), ZoneId.systemDefault()));
+			}
+			builder.append(StringUtils.defaultIfBlank(contractDateStartFormatter, "")).append(",");
+	
+			// 八、合同到期时间
+			Date contractDateEnd = detail.getContractDateEnd();
+			String contractDateEndFormatter = "";
+			if (contractDateEnd != null) {
+				contractDateEndFormatter = FORMATTER_DATE_BY_HYPHEN.format(LocalDateTime.ofInstant(contractDateEnd.toInstant(), ZoneId.systemDefault()));
+			}
+			builder.append(StringUtils.defaultIfBlank(contractDateEndFormatter, "")).append(",");
+	
+			// 九、状态
+			String status = supplier.getStatus() == 1 ? "有效" : "无效";
+			builder.append(StringUtils.defaultIfBlank(status, "")).append(",");
+	
+			csvDataList.add(builder.toString());
+		});
+		return csvDataList;
+	}
+
+	/**
+	 * @Title: querySupplierById
+	 * @Description: 根据供应商ID查询巴士供应商详情
+	 * @param supplierId
+	 * @return 
+	 * @return BusSupplierInfoVO
+	 * @throws
+	 */
+	public BusSupplierInfoVO querySupplierById(Integer supplierId) {
+		// 一、查询供应商基础信息
+		BusSupplierInfoVO supplierVO = busCarBizSupplierExMapper.selectBusSupplierById(supplierId);
+		// 二、查询巴士供应商其它信息
+		completeDetailInfo(supplierVO);
+
+		// 三、调用分佣接口，修改分佣、返点信息 TODO
+
+		return null;
 	}
 
 }

@@ -169,6 +169,55 @@
 		where supplier_id = #{supplierId}
 	</update>
 	
+	<!-- 巴士供应商查询/导出列表查询条件 -->
+	<sql id="queryAndExportWhereSql">
+		s.supplier_type = 1
+		<if test="cityId != null">
+			AND s.supplier_city = #{cityId}
+		</if>
+		<if test="supplierId != null">
+			AND s.supplier_id = #{supplierId}
+		</if>
+		<if test="status != null">
+			AND s.`status` = #{status}
+		</if>
+		<if test="commissionIds != null and commissionIds.size() > 0">
+			AND s.supplier_id IN 
+			<foreach collection="commissionIds" item="item" open="("
+				separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="contractIds != null and contractIds > 0">
+			AND s.supplier_id IN 
+			<foreach collection="contractIds" item="item" open="("
+				separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="excludeContractIds != null and excludeContractIds > 0">
+			AND s.supplier_id NOT IN 
+			<foreach collection="excludeContractIds" item="item" open="("
+				separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="cityIds != null and cityIds.size() > 0">
+			AND s.supplier_city IN
+			<foreach collection="cityIds" open="(" close=")" separator=","
+				item="cityId">
+				#{cityId}
+			</foreach>
+		</if>
+		<if test="supplierIds != null and supplierIds.size() > 0">
+			AND s.supplier_id IN
+			<foreach collection="supplierIds" open="(" close=")"
+				separator="," item="supplierId">
+				#{supplierId}
+			</foreach>
+		</if>
+	</sql>
+	
 	<!-- 查询合同即将到期的供应商 -->
 	<select id="querySupplierPageListByMaster" parameterType="com.zhuanche.dto.busManage.BusSupplierQueryDTO"
 		resultType="com.zhuanche.vo.busManage.BusSupplierPageVO">
@@ -181,39 +230,42 @@
 		FROM
 			car_biz_supplier s
 		LEFT JOIN car_biz_city c ON c.city_id = s.supplier_city
-		<where>
-			<if test="cityId != null">
-				AND s.supplier_city = #{cityId}
-			</if>
-			<if test="supplierId != null">
-				AND s.supplier_id = #{supplierId}
-			</if>
-			<if test="status != null">
-				AND s.`status` = #{status}
-			</if>
-			<if test="commissionIds != null and commissionIds.size() > 0">
-				AND s.supplier_id IN 
-				<foreach collection="commissionIds" item="item" open="("
-					separator="," close=")">
-					#{item}
-				</foreach>
-			</if>
-			<if test="contractIds != null and contractIds > 0">
-				AND s.supplier_id IN 
-				<foreach collection="contractIds" item="item" open="("
-					separator="," close=")">
-					#{item}
-				</foreach>
-			</if>
-			<if test="excludeContractIds != null and excludeContractIds > 0">
-				AND s.supplier_id NOT IN 
-				<foreach collection="excludeContractIds" item="item" open="("
-					separator="," close=")">
-					#{item}
-				</foreach>
-			</if>
-		</where>
+		WHERE
+			<include refid="queryAndExportWhereSql"/>
 		ORDER BY
 			s.create_date DESC
+	</select>
+	
+	<!-- 查询巴士供应商导出列表 -->
+	<select id="querySupplierExportList" parameterType="com.zhuanche.dto.busManage.BusSupplierQueryDTO"
+		resultType="com.zhuanche.vo.busManage.BusSupplierExportVO">
+		SELECT
+			s.supplier_id AS supplierId,
+			s.supplier_full_name AS supplierName,
+			c.city_name AS cityName,
+			s.`status` AS status
+		FROM
+			car_biz_supplier s
+		LEFT JOIN car_biz_city c ON c.city_id = s.supplier_city
+		WHERE
+			<include refid="queryAndExportWhereSql"/>
+	</select>
+	
+	<!-- 查询巴士供应商基础信息 -->
+	<select id="selectBusSupplierById" parameterType="java.lang.Integer" resultType="com.zhuanche.vo.busManage.BusSupplierInfoVO">
+		SELECT
+			s.supplier_id AS supplierId,
+			s.supplier_full_name AS supplierName,
+			s.supplier_city AS supplierCity,
+			c.city_name AS cityName,
+			s.contacts AS contacts,
+			s.contacts_phone AS contactsPhone,
+			s.dispatcher_phone AS dispatcherPhone,
+			s.cooperation_type AS cooperationType,
+			s.`status` AS status
+		FROM
+			car_biz_supplier s
+		LEFT JOIN car_biz_city c ON c.city_id = s.supplier_city
+		WHERE s.supplier_type = 1 AND s.supplier_id = #{supplierId}
 	</select>
 </mapper>

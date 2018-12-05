@@ -17,8 +17,8 @@ public class BusSupplierQueryDTO extends BaseDTO {
 	/** 供应商ID **/
 	private Integer supplierId;
 
-	/** 状态：1.有效 2.无效 **/
-	@InArray(values = { "1", "2" }, message = "状态不在有效状态范围内")
+	/** 状态：1.有效 0.无效 **/
+	@InArray(values = { "1", "0" }, message = "状态不在有效状态范围内")
 	private Integer status;
 
 	// TODO 分佣比例

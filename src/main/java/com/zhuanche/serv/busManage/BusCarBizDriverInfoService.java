@@ -45,7 +45,6 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constants.BusConst;
 import com.zhuanche.dto.busManage.BusBaseStatisDTO;
-import com.zhuanche.dto.busManage.BusDriverExportDTO;
 import com.zhuanche.dto.busManage.BusDriverQueryDTO;
 import com.zhuanche.dto.busManage.BusDriverSaveDTO;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
@@ -213,7 +212,7 @@ public class BusCarBizDriverInfoService implements BusConst{
 	 * @return List<BusDriverInfoVO>
 	 * @throws
 	 */
-	public List<BusDriverInfoExportVO> queryDriverExportList(BusDriverExportDTO exportDTO) {
+	public List<BusDriverInfoExportVO> queryDriverExportList(BusDriverQueryDTO exportDTO) {
 		List<BusDriverInfoExportVO> driverList = busCarBizDriverInfoExMapper.queryDriverExportList(exportDTO);
 		return driverList;
 	}
@@ -913,6 +912,7 @@ public class BusCarBizDriverInfoService implements BusConst{
 		}
 	}
 
+	@SuppressWarnings("resource")
 	public AjaxResponse batchInputDriverInfo(Integer cityId, Integer supplierId, MultipartFile file,
 			HttpServletRequest request, HttpServletResponse response) {
 

@@ -5,7 +5,6 @@ import java.util.List;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
-import com.zhuanche.dto.busManage.BusDriverExportDTO;
 import com.zhuanche.dto.busManage.BusDriverQueryDTO;
 import com.zhuanche.dto.busManage.BusDriverSaveDTO;
 import com.zhuanche.vo.busManage.BusDriverInfoExportVO;
@@ -31,7 +30,7 @@ public interface BusCarBizDriverInfoExMapper {
 	 * @return List<BusDriverInfoVO>
 	 * @throws
 	 */
-	List<BusDriverInfoExportVO> queryDriverExportList(BusDriverExportDTO exportDTO);
+	List<BusDriverInfoExportVO> queryDriverExportList(BusDriverQueryDTO exportDTO);
 	
 	/**
 	 * @Title: updateBusDriverInfo

@@ -3,11 +3,12 @@ package com.zhuanche.dto.busManage;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonView;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * @ClassName: BusSupplierDetailDTO
@@ -26,13 +27,24 @@ public class BusSupplierDetailDTO implements BusSupplierDTO {
 	/** 保证金 **/
 	@NotNull(message = "保证金不能为空")
 	@DecimalMin(value = "0", inclusive = false, message = "保证金必须大于0元")
-	@JsonView
+	@DecimalMax(value = " 9999999999.99", message = "保证金必须小于 9999999999.99 元")
 	private BigDecimal deposit;
 
 	/** 加盟费 **/
 	@NotNull(message = "加盟费不能为空")
 	@DecimalMin(value = "0", inclusive = false, message = "加盟费必须大于0元")
+	@DecimalMax(value = " 9999999999.99", message = "加盟费必须小于 9999999999.99 元")
 	private BigDecimal franchiseFee;
+
+	/** 合同开始日期 **/
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@NotNull(message = "合同开始日期不能为空")
+	private Date contractDateStart;
+
+	/** 合同结束日期 **/
+	@NotNull(message = "合同结束日期不能为空")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date contractDateEnd;
 
 	/** 公司名称(发票信息) **/
 	@NotBlank(message = "公司名称不能为空")
@@ -72,6 +84,15 @@ public class BusSupplierDetailDTO implements BusSupplierDTO {
 	private Date updateDate;
 
 	// =======================getter/setter====================
+
+	public Integer getSupplierId() {
+		return supplierId;
+	}
+
+	public void setSupplierId(Integer supplierId) {
+		this.supplierId = supplierId;
+	}
+
 	public BigDecimal getDeposit() {
 		return deposit;
 	}
@@ -86,6 +107,22 @@ public class BusSupplierDetailDTO implements BusSupplierDTO {
 
 	public void setFranchiseFee(BigDecimal franchiseFee) {
 		this.franchiseFee = franchiseFee;
+	}
+
+	public Date getContractDateStart() {
+		return contractDateStart;
+	}
+
+	public void setContractDateStart(Date contractDateStart) {
+		this.contractDateStart = contractDateStart;
+	}
+
+	public Date getContractDateEnd() {
+		return contractDateEnd;
+	}
+
+	public void setContractDateEnd(Date contractDateEnd) {
+		this.contractDateEnd = contractDateEnd;
 	}
 
 	public String getInvoiceCompanyName() {
@@ -134,14 +171,6 @@ public class BusSupplierDetailDTO implements BusSupplierDTO {
 
 	public void setInvoiceDutyParagraph(String invoiceDutyParagraph) {
 		this.invoiceDutyParagraph = invoiceDutyParagraph;
-	}
-
-	public Integer getSupplierId() {
-		return supplierId;
-	}
-
-	public void setSupplierId(Integer supplierId) {
-		this.supplierId = supplierId;
 	}
 
 	public Integer getCreateBy() {

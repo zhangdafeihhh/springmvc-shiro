@@ -38,9 +38,9 @@ public class BusSupplierBaseDTO implements BusSupplierDTO {
 	@NotNull(message = "加盟类型不能为空")
 	private Integer cooperationType;
 
-	/** 状态：1.有效 2.无效 **/
+	/** 状态：1.有效 0.无效 **/
 	@NotNull(message = "状态不能为空")
-	@InArray(values = { "1", "2" }, message = "状态不在有效状态范围内")
+	@InArray(values = { "1", "0" }, message = "状态不在有效状态范围内")
 	private Integer status;
 
 	// ========================业务字段=========================

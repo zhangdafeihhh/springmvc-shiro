@@ -33,7 +33,6 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.datavalidate.custom.InArray;
-import com.zhuanche.dto.busManage.BusDriverExportDTO;
 import com.zhuanche.dto.busManage.BusDriverQueryDTO;
 import com.zhuanche.dto.busManage.BusDriverSaveDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
@@ -304,8 +303,8 @@ public class BusDriverInfoController implements BusFileDownload {
 	@RequestMapping(value = "/exportDriverList")
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE) })
-	@Validated(BusDriverExportDTO.Export.class)
-	public void exportDriverList(BusDriverExportDTO exportDTO, HttpServletRequest request,
+	@Validated(BusDriverQueryDTO.Export.class)
+	public void exportDriverList(BusDriverQueryDTO exportDTO, HttpServletRequest request,
 			HttpServletResponse response) {
 
 		long start = System.currentTimeMillis(); // 获取开始时间

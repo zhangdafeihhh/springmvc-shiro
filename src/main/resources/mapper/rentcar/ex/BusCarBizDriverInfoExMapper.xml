@@ -2,23 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="mapper.rentcar.ex.BusCarBizDriverInfoExMapper">
 
-	<!-- 查询司机信息列表展示 -->
-	<select id="queryDriverPageList" parameterType="com.zhuanche.dto.busManage.BusDriverQueryDTO"
-		resultType="com.zhuanche.vo.busManage.BusDriverInfoPageVO">
-		SELECT
-			d.driver_id AS driverId,
-			d.`name` AS NAME,
-			d.phone AS phone,
-			d.service_city AS cityId,
-			d.supplier_id AS supplierId,
-			d.group_id AS groupId,
-			g.group_name AS groupName,
-			d.create_date AS createDate,
-			d.`status` AS STATUS
-		FROM
-			car_biz_driver_info d
-		LEFT JOIN car_biz_car_group g ON g.group_id = d.group_id
-		WHERE
+	<!-- 巴士司机查询/导出列表查询条件 -->
+	<sql id="queryAndExportWhereSql">
 			g.type = 2
 		<if test="cityId != null">
 			AND d.service_city = #{cityId}
@@ -64,10 +49,30 @@
 				#{supplierId}
 			</foreach>
 		</if>
+	</sql>
+	
+	<!-- 查询司机信息列表展示 -->
+	<select id="queryDriverPageList" parameterType="com.zhuanche.dto.busManage.BusDriverQueryDTO"
+		resultType="com.zhuanche.vo.busManage.BusDriverInfoPageVO">
+		SELECT
+			d.driver_id AS driverId,
+			d.`name` AS NAME,
+			d.phone AS phone,
+			d.service_city AS cityId,
+			d.supplier_id AS supplierId,
+			d.group_id AS groupId,
+			g.group_name AS groupName,
+			d.create_date AS createDate,
+			d.`status` AS STATUS
+		FROM
+			car_biz_driver_info d
+		LEFT JOIN car_biz_car_group g ON g.group_id = d.group_id
+		WHERE
+			<include refid="queryAndExportWhereSql"/>
 	</select>
 	
 	<!-- 查询司机信息导出列表 -->
-	<select id="queryDriverExportList" parameterType="com.zhuanche.dto.busManage.BusDriverExportDTO"
+	<select id="queryDriverExportList" parameterType="com.zhuanche.dto.busManage.BusDriverQueryDTO"
 		resultType="com.zhuanche.vo.busManage.BusDriverInfoExportVO">
 		SELECT
 			d.service_city AS cityId,
@@ -86,51 +91,7 @@
 			car_biz_driver_info d
 		LEFT JOIN car_biz_car_group g ON g.group_id = d.group_id
 		WHERE
-			g.type = 2
-		<if test="cityId != null">
-			AND d.service_city = #{cityId}
-		</if>
-		<if test="supplierId != null">
-			AND d.supplier_id = #{supplierId}
-		</if>
-		<if test="groupId != null">
-			AND d.group_id = #{groupId}
-		</if>
-		<if test="name != null and name != ''">
-			AND d.`name` = #{name}
-		</if>
-		<if test="phone != null and phone != ''">
-			AND d.phone = #{phone}
-		</if>
-		<if test="createDateBegin != null">
-			AND d.create_date <![CDATA[ >= ]]>
-			#{createDateBegin}
-		</if>
-		<if test="createDateEnd != null">
-			AND d.create_date <![CDATA[ <= ]]>
-			#{createDateEnd}
-		</if>
-		<if test="driverIds != null and driverIds.size() > 0">
-			AND d.driver_id IN
-			<foreach collection="driverIds" open="(" close=")"
-				separator="," item="driverId">
-				#{driverId}
-			</foreach>
-		</if>
-		<if test="cityIds != null and cityIds.size() > 0">
-			AND d.service_city IN
-			<foreach collection="cityIds" open="(" close=")" separator=","
-				item="cityId">
-				#{cityId}
-			</foreach>
-		</if>
-		<if test="supplierIds != null and supplierIds.size() > 0">
-			AND d.supplier_id IN
-			<foreach collection="supplierIds" open="(" close=")"
-				separator="," item="supplierId">
-				#{supplierId}
-			</foreach>
-		</if>
+			<include refid="queryAndExportWhereSql"/>
 	</select>
 
 	<!-- 修改司机信息 -->

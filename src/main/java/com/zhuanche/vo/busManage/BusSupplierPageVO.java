@@ -26,16 +26,19 @@ public class BusSupplierPageVO {
 	/** 是否有返点 **/
 	// TODO
 
-	/** 合同时间 **/
-	private Date contractDate;
+	/** 合同开始时间 **/
+	private Date contractDateStart;
 
-	/** 状态 **/
-	private Integer status;
-
-	// ====================其它业务数据======================
+	/** 合同结束时间 **/
+	private Date contractDateEnd;
 
 	/** 是否快过期 **/
 	private Integer isExpireSoon;
+
+	/** 状态：1.有效 0.无效 **/
+	private Integer status;
+
+	// ====================其它业务数据======================
 
 	public Integer getSupplierId() {
 		return supplierId;
@@ -85,12 +88,20 @@ public class BusSupplierPageVO {
 		this.status = status;
 	}
 
-	public Date getContractDate() {
-		return contractDate;
+	public Date getContractDateStart() {
+		return contractDateStart;
 	}
 
-	public void setContractDate(Date contractDate) {
-		this.contractDate = contractDate;
+	public void setContractDateStart(Date contractDateStart) {
+		this.contractDateStart = contractDateStart;
+	}
+
+	public Date getContractDateEnd() {
+		return contractDateEnd;
+	}
+
+	public void setContractDateEnd(Date contractDateEnd) {
+		this.contractDateEnd = contractDateEnd;
 	}
 
 	public Integer getIsExpireSoon() {
