@@ -22,12 +22,14 @@ public class BusOrderVO {
 	private String bookingUserPhone;
 	// 预定车型
 	private String bookingGroupid;
-	// 下单时间
-	@JSONField(format = "yyyy-MM-dd HH:mm:ss")
-	private Date createDate;
+	// 预定车型名称
+	private String bookingGroupName;
 	// 预约用车时间
 	@JSONField(format = "yyyy-MM-dd HH:mm:ss")
 	private Date bookingDate;
+	// 下单时间
+	@JSONField(format = "yyyy-MM-dd HH:mm:ss")
+	private Date createDate;
 	// 城市id
 	private Integer cityId;
 	// 城市名称
@@ -122,6 +124,14 @@ public class BusOrderVO {
 
 	public void setBookingGroupid(String bookingGroupid) {
 		this.bookingGroupid = bookingGroupid;
+	}
+
+	public String getBookingGroupName() {
+		return bookingGroupName;
+	}
+
+	public void setBookingGroupName(String bookingGroupName) {
+		this.bookingGroupName = bookingGroupName;
 	}
 
 	public Date getCreateDate() {

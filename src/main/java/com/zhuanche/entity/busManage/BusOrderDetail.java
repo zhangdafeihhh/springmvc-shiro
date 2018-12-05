@@ -21,6 +21,7 @@ public class BusOrderDetail implements Serializable {
 	private String bookingUserPhone;// 预订人电话
 	private Integer receivesSms;// 预订人是否接收短信 1 接收 2 不接受
 	private String bookingGroupid;// 预定车型
+	private String bookingGroupName; // 预定车型名称
 	@JSONField(format = "yyyy-MM-dd HH:mm:ss")
 	private Date bookingDate;// 预约用车时间 (时间戳)
 	private String bookingCurrentAddr;// 预订人下单时地点
@@ -170,6 +171,14 @@ public class BusOrderDetail implements Serializable {
 
 	public void setBookingGroupid(String bookingGroupid) {
 		this.bookingGroupid = bookingGroupid;
+	}
+
+	public String getBookingGroupName() {
+		return bookingGroupName;
+	}
+
+	public void setBookingGroupName(String bookingGroupName) {
+		this.bookingGroupName = bookingGroupName;
 	}
 
 	public Date getBookingDate() {

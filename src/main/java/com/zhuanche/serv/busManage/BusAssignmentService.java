@@ -24,6 +24,7 @@ import com.zhuanche.dto.busManage.BusCarRicherDTO;
 import com.zhuanche.dto.busManage.BusDriverDTO;
 import com.zhuanche.dto.busManage.BusDriverRicherDTO;
 import com.zhuanche.dto.busManage.BusOrderDTO;
+import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.Common;
@@ -104,6 +105,12 @@ public class BusAssignmentService {
 			JSONArray dataList = data.getJSONArray("dataList");
 			int total = data.getIntValue("totalCount");
 			List<BusOrderVO> orderList = JSON.parseArray(dataList.toString(), BusOrderVO.class);
+			// 查询所有车别类型
+			List<CarBizCarGroup> groupList = carBizCarGroupExMapper.queryCarGroupList(2);
+			Map<String, String> groupMap = new HashMap<>();
+			groupList.forEach(group -> groupMap.put(String.valueOf(group.getGroupId()), group.getGroupName()));
+			// 转换车别类型
+			orderList.forEach(order -> order.setBookingGroupName(groupMap.get(order.getBookingGroupid())));
 			return new PageDTO(params.getPageNum(), params.getPageSize(), total, orderList);
 		} catch (Exception e) {
 			logger.error("[ BusAssignmentService-selectList ] 查询巴士订单列表出错 {}", e);
