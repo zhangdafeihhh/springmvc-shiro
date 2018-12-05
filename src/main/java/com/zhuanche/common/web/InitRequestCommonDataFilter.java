@@ -51,7 +51,7 @@ public class InitRequestCommonDataFilter extends OncePerRequestFilter {
 		}
         response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
         response.setHeader("Access-Control-Max-Age", "1800");
-        response.setHeader("Access-Control-Allow-Headers", "*");
+        response.setHeader("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Accept,XRequestedWith,LastModified");
         response.setHeader("Access-Control-Allow-Credentials", "true");		
 		/***************支持跨域请求END***********************/
         
