@@ -476,28 +476,34 @@ public class MessageService {
 
             }
 
-            //已读
-            List<CarMessageReceiver> list = receiverExMapper.carMessageReceiverList(messaageId,null,CarMessageReceiver.ReadStatus.read.getValue());
-            List<Integer> listUsers = new ArrayList<>();
-            for (CarMessageReceiver receiver : list){
-                listUsers.add(receiver.getReceiveUserId());
-            }
-            List<CarAdmUser> carAdmUserList = new ArrayList<>();
-            if (CollectionUtils.isNotEmpty(listUsers)){
-                carAdmUserList = carAdmUserExMapper.queryUsers(listUsers,null,null,null,null);
+            //创建人才能查看阅读记录
+            SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+
+            if (user.getId().equals(carMessagePost.getUserId())){
+                //已读
+                List<CarMessageReceiver> list = receiverExMapper.carMessageReceiverList(messaageId,null,CarMessageReceiver.ReadStatus.read.getValue());
+                List<Integer> listUsers = new ArrayList<>();
+                for (CarMessageReceiver receiver : list){
+                    listUsers.add(receiver.getReceiveUserId());
+                }
+                List<CarAdmUser> carAdmUserList = new ArrayList<>();
+                if (CollectionUtils.isNotEmpty(listUsers)){
+                    carAdmUserList = carAdmUserExMapper.queryUsers(listUsers,null,null,null,null);
+                }
+
+                Map<Integer,String> mapUser = new HashMap<>();
+                for (CarAdmUser carAdmUser : carAdmUserList){
+                    mapUser.put(carAdmUser.getUserId(),carAdmUser.getUserName());
+                }
+                List<ReadRecordDto> readRecordDtoList = new ArrayList<>();
+                for (CarMessageReceiver receiver : list){
+                    ReadRecordDto readRecordDto  = new ReadRecordDto(mapUser.get(receiver.getReceiveUserId()),receiver.getUpdateTime());
+                    readRecordDtoList.add(readRecordDto);
+                }
+
+                detailDto.setReadRecord(readRecordDtoList);
             }
 
-            Map<Integer,String> mapUser = new HashMap<>();
-            for (CarAdmUser carAdmUser : carAdmUserList){
-                mapUser.put(carAdmUser.getUserId(),carAdmUser.getUserName());
-            }
-            List<ReadRecordDto> readRecordDtoList = new ArrayList<>();
-            for (CarMessageReceiver receiver : list){
-                ReadRecordDto readRecordDto  = new ReadRecordDto(mapUser.get(receiver.getReceiveUserId()),receiver.getUpdateTime());
-                readRecordDtoList.add(readRecordDto);
-            }
-
-            detailDto.setReadRecord(readRecordDtoList);
 
             List<CarMessageDoc> listDoc = new ArrayList<>();
             listDoc = docExMapper.listDoc(Long.valueOf(messaageId));
