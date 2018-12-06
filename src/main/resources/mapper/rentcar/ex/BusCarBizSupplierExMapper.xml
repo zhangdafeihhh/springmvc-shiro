@@ -44,11 +44,10 @@
 	</sql>
 
 	<!-- 根据条件查询供应商 -->
-	<select id="querySuppliers" resultMap="ResultMapWithBLOBs" parameterType="java.util.Map">
+	<select id="querySuppliers" resultType="java.util.HashMap" parameterType="java.util.Map">
 		select
-		<include refid="Base_Column_List" />
-		,
-		<include refid="Blob_Column_List" />
+			supplier_id AS supplierId,
+			supplier_full_name AS supplierName
 		from car_biz_supplier
 		where s.`status`  = 1 
 		and s.supplier_type = 1

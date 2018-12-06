@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.ex.BusCarBizCarGroupExMapper">
+	<resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarBizCarGroup">
+		<id column="group_id" property="groupId" jdbcType="INTEGER" />
+		<result column="group_name" property="groupName" jdbcType="VARCHAR" />
+		<result column="seat_num" property="seatNum" jdbcType="INTEGER" />
+		<result column="rank" property="rank" jdbcType="INTEGER" />
+		<result column="sort" property="sort" jdbcType="INTEGER" />
+		<result column="chartered_status" property="charteredStatus"
+			jdbcType="INTEGER" />
+		<result column="type" property="type" jdbcType="INTEGER" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="create_by" property="createBy" jdbcType="INTEGER" />
+		<result column="update_by" property="updateBy" jdbcType="INTEGER" />
+		<result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+		<result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+		<result column="selected_img_url" property="selectedImgUrl"
+			jdbcType="VARCHAR" />
+		<result column="selected_url_new" property="selectedUrlNew"
+			jdbcType="VARCHAR" />
+		<result column="unselected_url_new" property="unselectedUrlNew"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizCarGroup"
+		extends="BaseResultMap">
+		<result column="memo" property="memo" jdbcType="LONGVARCHAR" />
+		<result column="img_url" property="imgUrl" jdbcType="LONGVARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		group_id, group_name, seat_num, rank, sort,
+		chartered_status, type, status,
+		create_by,
+		update_by, create_date,
+		update_date, selected_img_url, selected_url_new,
+		unselected_url_new
+	</sql>
+	<sql id="Blob_Column_List">
+		memo, img_url
+	</sql>
+	
+	<!-- 查询车型类别 -->
+	<select id="queryGroups" resultType="java.util.HashMap">
+		SELECT
+			group_id AS groupId,
+			group_name AS groupName
+		FROM
+			car_biz_car_group
+		WHERE status=1 and type = 2
+	</select>
+</mapper>

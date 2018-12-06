@@ -13,11 +13,10 @@ import org.springframework.stereotype.Service;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
-import com.zhuanche.entity.mdbcarmanage.BusBizChangeLog;
-import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.shiro.session.WebSessionUtil;
 
 import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper;
+import mapper.rentcar.ex.BusCarBizCarGroupExMapper;
 import mapper.rentcar.ex.BusCarBizSupplierExMapper;
 
 /**
@@ -33,10 +32,14 @@ public class BusCommonService {
 	private static final Logger logger = LoggerFactory.getLogger(BusCommonService.class);
 
 	@Autowired
+	private BusBizChangeLogExMapper busBizChangeLogExMapper;
+	
+	@Autowired
 	private BusCarBizSupplierExMapper busCarBizSupplierExMapper;
 	
 	@Autowired
-	private BusBizChangeLogExMapper busBizChangeLogExMapper;
+	private BusCarBizCarGroupExMapper busCarBizCarGroupExMapper;
+	
 	
 	/**
 	 * @Title: queryChangeLogs
@@ -47,9 +50,9 @@ public class BusCommonService {
 	 * @return List<BusBizChangeLog>
 	 * @throws
 	 */
-	public List<BusBizChangeLog> queryChangeLogs(String businessType,
-			String businessKey) {
-		Map<String,Object> param = new HashMap<>();
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE))
+	public List<Map<Object, Object>> queryChangeLogs(Integer businessType, String businessKey) {
+		Map<String, Object> param = new HashMap<>();
 		param.put("businessType", businessType);
 		param.put("businessKey", businessKey);
 		return busBizChangeLogExMapper.queryRecnetlyChangeLogs(param);
@@ -63,20 +66,31 @@ public class BusCommonService {
 	 * @return List<CarBizSupplier>
 	 * @throws
 	 */
-	@MasterSlaveConfigs(configs = {
-			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE) })
-	public List<CarBizSupplier> querySuppliers(Integer cityId) {
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
+	public List<Map<Object, Object>> querySuppliers(Integer cityId) {
 		// 数据权限控制SSOLoginUser
 		Set<Integer> authOfCity = WebSessionUtil.getCurrentLoginUser().getCityIds(); // 普通管理员可以管理的所有城市ID
 		Set<Integer> authOfSupplier = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); // 普通管理员可以管理的所有供应商ID
 
-		if (authOfCity != null && authOfCity.contains(cityId)) {
+		if (authOfCity == null || authOfCity.isEmpty() || authOfCity.contains(cityId)) {
 			Map<String, Object> param = new HashMap<>();
 			param.put("cityId", cityId);
 			param.put("authOfSupplier", authOfSupplier);
 			return busCarBizSupplierExMapper.querySuppliers(param);
 		}
 		return null;
+	}
+
+	/**
+	 * @Title: queryGroups
+	 * @Description: 查询车型类别
+	 * @return 
+	 * @return List<CarBizCarGroup>
+	 * @throws
+	 */
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
+	public List<Map<Object, Object>> queryGroups() {
+		return busCarBizCarGroupExMapper.queryGroups();
 	}
 
 }

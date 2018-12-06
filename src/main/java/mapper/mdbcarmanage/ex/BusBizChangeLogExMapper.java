@@ -3,8 +3,6 @@ package mapper.mdbcarmanage.ex;
 import java.util.List;
 import java.util.Map;
 
-import com.zhuanche.entity.mdbcarmanage.BusBizChangeLog;
-
 /**
  * @ClassName: BusBizChangeLogExMapper
  * @Description: 操作日志
@@ -22,8 +20,37 @@ public interface BusBizChangeLogExMapper {
 	 * 
 	 */
 	enum BusinessType {
-		SUPPLIER(), DRIVER(), CAR();
-		
+		/** 供应商 **/
+		SUPPLIER(100, "supplierId"),
+		/** 司机 **/
+		DRIVER(200, "driverId"),
+		/** 车辆 **/
+		CAR(300, "carId");
+
+		/** 业务类型 **/
+		private Integer businessType;
+		/** 业务主键描述(备注) **/
+		private String businessKeyNote;
+
+		private BusinessType(Integer businessType, String businessKeyNote) {
+			this.businessType = businessType;
+			this.businessKeyNote = businessKeyNote;
+		}
+		public Integer getBusinessType() {
+			return businessType;
+		}
+		public String getBusinessKeyNote() {
+			return businessKeyNote;
+		}
+		/** 业务类型是否存在 **/
+		public static boolean isExist(Integer businessType) {
+			for (BusinessType type : values()) {
+				if (type.businessType.equals(businessType)) {
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 
 	/**
@@ -34,6 +61,6 @@ public interface BusBizChangeLogExMapper {
 	 * @return List<BusBizChangeLog>
 	 * @throws
 	 */
-	List<BusBizChangeLog> queryRecnetlyChangeLogs(Map<String, Object> param);
+	List<Map<Object, Object>> queryRecnetlyChangeLogs(Map<String, Object> param);
 	
 }

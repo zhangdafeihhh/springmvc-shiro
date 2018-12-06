@@ -17,17 +17,16 @@
 		update_date,
 		build_time
 	</sql>
-	<select id="queryRecnetlyChangeLogs" resultMap="BaseResultMap"
-		parameterType="java.util.Map">
+	<select id="queryRecnetlyChangeLogs" resultType="java.util.HashMap" parameterType="java.util.Map">
 		select
-		<include refid="Base_Column_List" />
+			update_name AS updateName,
+			update_date AS updateDate
 		from bus_biz_change_log
 		WHERE
-		business_type = #{businessType}
-		AND
-		business_key = #{businessKey}
+			business_type = #{businessType}
+		AND business_key = #{businessKey}
 		ORDER BY
-		id DESC
+			id DESC
 		LIMIT 15
 	</select>
 </mapper>
