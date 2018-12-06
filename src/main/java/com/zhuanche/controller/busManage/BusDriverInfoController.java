@@ -85,9 +85,9 @@ public class BusDriverInfoController implements BusFileDownload {
 		Set<Integer> permOfCity = WebSessionUtil.getCurrentLoginUser().getCityIds(); // 普通管理员可以管理的所有城市ID
 		Set<Integer> permOfSupplier = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); // 普通管理员可以管理的所有供应商ID
 		Set<Integer> permOfTeam = WebSessionUtil.getCurrentLoginUser().getTeamIds(); // 普通管理员可以管理的所有车队ID
-		queryDTO.setCityIds(permOfCity);
-		queryDTO.setSupplierIds(permOfSupplier);
-		queryDTO.setTeamIds(permOfTeam);
+		queryDTO.setAuthOfCity(permOfCity);
+		queryDTO.setAuthOfSupplier(permOfSupplier);
+		queryDTO.setAuthOfTeam(permOfTeam);
 
 		// 查询结果
 		PageDTO pageDTO = new PageDTO(queryDTO.getPageNum(), queryDTO.getPageSize(), 0, null);
@@ -313,9 +313,9 @@ public class BusDriverInfoController implements BusFileDownload {
 			Set<Integer> permOfCity = WebSessionUtil.getCurrentLoginUser().getCityIds(); // 普通管理员可以管理的所有城市ID
 			Set<Integer> permOfSupplier = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); // 普通管理员可以管理的所有供应商ID
 			Set<Integer> permOfTeam = WebSessionUtil.getCurrentLoginUser().getTeamIds(); // 普通管理员可以管理的所有车队ID
-			exportDTO.setCityIds(permOfCity);
-			exportDTO.setSupplierIds(permOfSupplier);
-			exportDTO.setTeamIds(permOfTeam);
+			exportDTO.setAuthOfCity(permOfCity);
+			exportDTO.setAuthOfSupplier(permOfSupplier);
+			exportDTO.setAuthOfTeam(permOfTeam);
 
 			// 文件名
 			LocalDateTime now = LocalDateTime.now();

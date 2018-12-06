@@ -7,13 +7,6 @@ package com.zhuanche.vo.busManage;
  * @date: 2018年12月4日 下午4:38:15
  * 
  */
-/**
- * @ClassName: BusSupplierExportVO
- * @Description:TODO
- * @author: yanyunpeng
- * @date: 2018年12月4日 下午5:59:40
- * 
- */
 public class BusSupplierExportVO {
 
 	/** 供应商ID **/

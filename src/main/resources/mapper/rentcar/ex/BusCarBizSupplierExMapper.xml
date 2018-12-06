@@ -202,16 +202,16 @@
 				#{item}
 			</foreach>
 		</if>
-		<if test="cityIds != null and cityIds.size() > 0">
+		<if test="authOfCity != null and authOfCity.size() > 0">
 			AND s.supplier_city IN
-			<foreach collection="cityIds" open="(" close=")" separator=","
+			<foreach collection="authOfCity" open="(" close=")" separator=","
 				item="cityId">
 				#{cityId}
 			</foreach>
 		</if>
-		<if test="supplierIds != null and supplierIds.size() > 0">
+		<if test="authOfSupplier != null and authOfSupplier.size() > 0">
 			AND s.supplier_id IN
-			<foreach collection="supplierIds" open="(" close=")"
+			<foreach collection="authOfSupplier" open="(" close=")"
 				separator="," item="supplierId">
 				#{supplierId}
 			</foreach>

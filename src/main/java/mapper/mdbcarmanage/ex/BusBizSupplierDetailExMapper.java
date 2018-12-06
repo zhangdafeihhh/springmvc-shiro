@@ -30,11 +30,11 @@ public interface BusBizSupplierDetailExMapper {
 	int updateBySupplierIdSelective(BusSupplierDetailDTO record);
 
 	/**
-	 * @Title: 校验是否存在
-	 * @Description: TODO
+	 * @Title: checkExist
+	 * @Description: 校验是否存在
 	 * @param supplierId
 	 * @return 
-	 * @return boolean
+	 * @return int
 	 * @throws
 	 */
 	int checkExist(Integer supplierId);
