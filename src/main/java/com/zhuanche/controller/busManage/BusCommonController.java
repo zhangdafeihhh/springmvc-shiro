@@ -1,7 +1,9 @@
 package com.zhuanche.controller.busManage;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
 
@@ -14,10 +16,8 @@ import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.Verify;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.serv.busManage.BusCommonService;
-import com.zhuanche.shiro.session.WebSessionUtil;
 
 /**
  * @ClassName: BusCommonController
@@ -33,6 +33,14 @@ public class BusCommonController {
 	@Autowired
 	private BusCommonService busCommonService;
 
+	/**
+	 * @Title: suppliers
+	 * @Description: 查询供应商
+	 * @param cityId
+	 * @return 
+	 * @return AjaxResponse
+	 * @throws
+	 */
 	@RequestMapping(value = "/suppliers")
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE) })
@@ -40,7 +48,14 @@ public class BusCommonController {
 	public AjaxResponse suppliers(@NotNull(message = "城市ID不能为空") Integer cityId) {
 		
 		List<CarBizSupplier> suppliers = busCommonService.querySuppliers(cityId);
-		return AjaxResponse.success(suppliers);
+		List<Map<String,Object>> list = suppliers.stream().map(supplier -> {
+			Map<String, Object> map = new HashMap<>();
+			map.put("supplierId", supplier.getSupplierId());
+			map.put("supplierName", supplier.getSupplierFullName());
+			return map;
+		}).collect(Collectors.toList());
+		
+		return AjaxResponse.success(list);
 	}
 
 }
