@@ -8,16 +8,15 @@ public class BaseDTO implements Serializable {
 	private static final long serialVersionUID = -4735370780290630864L;
 
 	/** 页码 **/
-	protected Integer pageNum;
+	public Integer pageNum;
 
 	/** 每页条数 **/
-	protected Integer pageSize;
-	
-	//数据权限控制字段
-    private Set<Integer> cityIds;//可以管理的所有城市ID
-    private Set<Integer> supplierIds;//可以管理的所有供应商ID
-    private Set<Integer> teamIds;//可以管理的所有车队ID
-	
+	public Integer pageSize;
+
+	// 数据权限控制字段
+	private Set<Integer> authOfCity;// 可以管理的所有城市ID
+	private Set<Integer> authOfSupplier;// 可以管理的所有供应商ID
+	private Set<Integer> authOfTeam;// 可以管理的所有车队ID
 
 	public BaseDTO() {
 		super();
@@ -41,28 +40,28 @@ public class BaseDTO implements Serializable {
 		this.pageSize = pageSize == null ? 30 : pageSize;
 	}
 
-	public Set<Integer> getCityIds() {
-		return cityIds;
+	public Set<Integer> getAuthOfCity() {
+		return authOfCity;
 	}
 
-	public void setCityIds(Set<Integer> cityIds) {
-		this.cityIds = cityIds;
+	public void setAuthOfCity(Set<Integer> authOfCity) {
+		this.authOfCity = authOfCity;
 	}
 
-	public Set<Integer> getSupplierIds() {
-		return supplierIds;
+	public Set<Integer> getAuthOfSupplier() {
+		return authOfSupplier;
 	}
 
-	public void setSupplierIds(Set<Integer> supplierIds) {
-		this.supplierIds = supplierIds;
+	public void setAuthOfSupplier(Set<Integer> authOfSupplier) {
+		this.authOfSupplier = authOfSupplier;
 	}
 
-	public Set<Integer> getTeamIds() {
-		return teamIds;
+	public Set<Integer> getAuthOfTeam() {
+		return authOfTeam;
 	}
 
-	public void setTeamIds(Set<Integer> teamIds) {
-		this.teamIds = teamIds;
+	public void setAuthOfTeam(Set<Integer> authOfTeam) {
+		this.authOfTeam = authOfTeam;
 	}
 
 }
