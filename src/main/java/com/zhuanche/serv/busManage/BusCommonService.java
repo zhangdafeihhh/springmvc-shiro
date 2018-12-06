@@ -13,9 +13,11 @@ import org.springframework.stereotype.Service;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.entity.mdbcarmanage.BusBizChangeLog;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.shiro.session.WebSessionUtil;
 
+import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper;
 import mapper.rentcar.ex.BusCarBizSupplierExMapper;
 
 /**
@@ -32,6 +34,26 @@ public class BusCommonService {
 
 	@Autowired
 	private BusCarBizSupplierExMapper busCarBizSupplierExMapper;
+	
+	@Autowired
+	private BusBizChangeLogExMapper busBizChangeLogExMapper;
+	
+	/**
+	 * @Title: queryChangeLogs
+	 * @Description: 查询操作日志
+	 * @param businessType
+	 * @param businessKey
+	 * @return 
+	 * @return List<BusBizChangeLog>
+	 * @throws
+	 */
+	public List<BusBizChangeLog> queryChangeLogs(String businessType,
+			String businessKey) {
+		Map<String,Object> param = new HashMap<>();
+		param.put("businessType", businessType);
+		param.put("businessKey", businessKey);
+		return busBizChangeLogExMapper.queryRecnetlyChangeLogs(param);
+	}
 
 	/**
 	 * @Title: querySuppliers

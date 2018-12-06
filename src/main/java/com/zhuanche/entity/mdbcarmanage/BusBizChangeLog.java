@@ -5,7 +5,7 @@ import java.util.Date;
 public class BusBizChangeLog {
     private Integer id;
 
-    private String businessType;
+    private Integer businessType;
 
     private String businessKey;
 
@@ -25,12 +25,12 @@ public class BusBizChangeLog {
         this.id = id;
     }
 
-    public String getBusinessType() {
+    public Integer getBusinessType() {
         return businessType;
     }
 
-    public void setBusinessType(String businessType) {
-        this.businessType = businessType == null ? null : businessType.trim();
+    public void setBusinessType(Integer businessType) {
+        this.businessType = businessType;
     }
 
     public String getBusinessKey() {
