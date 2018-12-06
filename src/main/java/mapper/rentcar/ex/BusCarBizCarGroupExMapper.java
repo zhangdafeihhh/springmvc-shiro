@@ -6,7 +6,7 @@ import java.util.Map;
 public interface BusCarBizCarGroupExMapper {
 	/**
 	 * @Title: queryGroups
-	 * @Description: 查询车型类别
+	 * @Description: 查询巴士车型类别
 	 * @return 
 	 * @return List<Map<Object,Object>>
 	 * @throws

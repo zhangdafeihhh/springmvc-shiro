@@ -39,7 +39,7 @@
 		memo, img_url
 	</sql>
 	
-	<!-- 查询车型类别 -->
+	<!-- 查询巴士车型类别 -->
 	<select id="queryGroups" resultType="java.util.HashMap">
 		SELECT
 			group_id AS groupId,

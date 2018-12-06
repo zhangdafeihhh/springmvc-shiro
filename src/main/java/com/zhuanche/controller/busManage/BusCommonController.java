@@ -76,18 +76,30 @@ public class BusCommonController {
 	
 	/**
 	 * @Title: groups
-	 * @Description: 车型类别
+	 * @Description: 巴士车型类别
 	 * @return 
 	 * @return AjaxResponse
 	 * @throws
 	 */
 	@RequestMapping(value = "/groups")
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
-	@Validated
 	public AjaxResponse groups() {
 		List<Map<Object, Object>> groups = busCommonService.queryGroups();
 		return AjaxResponse.success(groups);
 	}
-
+	
+	/**
+	 * @Title: services
+	 * @Description: 查询巴士服务类型
+	 * @return 
+	 * @return AjaxResponse
+	 * @throws
+	 */
+	@RequestMapping(value = "/services")
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
+	public AjaxResponse services() {
+		List<Map<Object, Object>> services = busCommonService.queryServices();
+		return AjaxResponse.success(services);
+	}
 
 }

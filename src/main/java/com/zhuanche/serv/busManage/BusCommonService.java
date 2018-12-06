@@ -17,6 +17,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 
 import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper;
 import mapper.rentcar.ex.BusCarBizCarGroupExMapper;
+import mapper.rentcar.ex.BusCarBizServiceExMapper;
 import mapper.rentcar.ex.BusCarBizSupplierExMapper;
 
 /**
@@ -39,6 +40,9 @@ public class BusCommonService {
 	
 	@Autowired
 	private BusCarBizCarGroupExMapper busCarBizCarGroupExMapper;
+	
+	@Autowired
+	private BusCarBizServiceExMapper busCarBizServiceExMapper;
 	
 	
 	/**
@@ -83,7 +87,7 @@ public class BusCommonService {
 
 	/**
 	 * @Title: queryGroups
-	 * @Description: 查询车型类别
+	 * @Description: 查询巴士车型类别
 	 * @return 
 	 * @return List<CarBizCarGroup>
 	 * @throws
@@ -91,6 +95,18 @@ public class BusCommonService {
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public List<Map<Object, Object>> queryGroups() {
 		return busCarBizCarGroupExMapper.queryGroups();
+	}
+
+	/**
+	 * @Title: queryServices
+	 * @Description: 查询巴士服务类型
+	 * @return 
+	 * @return List<Map<Object,Object>>
+	 * @throws
+	 */
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
+	public List<Map<Object, Object>> queryServices() {
+		return busCarBizServiceExMapper.queryServices();
 	}
 
 }
