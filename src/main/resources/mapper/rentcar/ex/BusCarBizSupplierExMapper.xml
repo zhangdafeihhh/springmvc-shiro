@@ -26,13 +26,6 @@
 			jdbcType="INTEGER" />
 		<result column="address" property="address" jdbcType="VARCHAR" />
 	</resultMap>
-	<resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizSupplier"
-		extends="BaseResultMap">
-		<result column="cooperation_type" property="cooperationType" jdbcType="INTEGER" />
-		<result column="isTest" property="istest" jdbcType="INTEGER" />
-		<result column="enterprise_type" property="enterpriseType" jdbcType="INTEGER" />
-		<result column="address" property="address" jdbcType="VARCHAR" />
-	</resultMap>
 	<resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizSupplier" extends="BaseResultMap">
 		<result column="memo" property="memo" jdbcType="LONGVARCHAR" />
 	</resultMap>
