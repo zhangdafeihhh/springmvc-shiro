@@ -28,6 +28,12 @@
 	</resultMap>
 	<resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizSupplier"
 		extends="BaseResultMap">
+		<result column="cooperation_type" property="cooperationType" jdbcType="INTEGER" />
+		<result column="isTest" property="istest" jdbcType="INTEGER" />
+		<result column="enterprise_type" property="enterpriseType" jdbcType="INTEGER" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+	</resultMap>
+	<resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizSupplier" extends="BaseResultMap">
 		<result column="memo" property="memo" jdbcType="LONGVARCHAR" />
 	</resultMap>
 	<sql id="Base_Column_List">
@@ -43,6 +49,238 @@
 		memo
 	</sql>
 
+	<insert id="insertSelective" parameterType="com.zhuanche.dto.busManage.BusSupplierBaseDTO" keyProperty="supplierId">
+		insert into car_biz_supplier
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="supplierName != null">
+				supplier_full_name,
+			</if>
+			<if test="supplierCity != null">
+				supplier_city,
+			</if>
+			<if test="contacts != null">
+				contacts,
+			</if>
+			<if test="contactsPhone != null">
+				contacts_phone,
+			</if>
+			<if test="dispatcherPhone != null">
+				dispatcher_phone,
+			</if>
+			<if test="cooperationType != null">
+				cooperation_type,
+			</if>
+			<if test="status != null">
+				status,
+			</if>
+			<if test="supplierType != null">
+				supplier_type,
+			</if>
+			<if test="enterpriseType != null">
+				enterprise_type,
+			</if>
+			<if test="isTwoShifts != null">
+				is_two_shifts,
+			</if>
+			<if test="address != null">
+				address,
+			</if>
+			<if test="createBy != null">
+				create_by,
+			</if>
+			<if test="updateBy != null">
+				update_by,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="supplierName != null">
+				#{supplierName},
+			</if>
+			<if test="supplierCity != null">
+				#{supplierCity},
+			</if>
+			<if test="contacts != null">
+				#{contacts},
+			</if>
+			<if test="contactsPhone != null">
+				#{contactsPhone},
+			</if>
+			<if test="dispatcherPhone != null">
+				#{dispatcherPhone},
+			</if>
+			<if test="cooperationType != null">
+				#{cooperationType},
+			</if>
+			<if test="status != null">
+				#{status},
+			</if>
+			<if test="supplierType != null">
+				#{supplierType},
+			</if>
+			<if test="enterpriseType != null">
+				#{enterpriseType},
+			</if>
+			<if test="isTwoShifts != null">
+				#{isTwoShifts},
+			</if>
+			<if test="address != null">
+				#{address},
+			</if>
+			<if test="createBy != null">
+				#{createBy},
+			</if>
+			<if test="updateBy != null">
+				#{updateBy},
+			</if>
+		</trim>
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.dto.busManage.BusSupplierBaseDTO" >
+		update car_biz_supplier
+		<set>
+			<if test="supplierName != null">
+				supplier_full_name = #{supplierName},
+			</if>
+			<if test="supplierCity != null">
+				supplier_city = #{supplierCity},
+			</if>
+			<if test="contacts != null">
+				contacts = #{contacts},
+			</if>
+			<if test="contactsPhone != null">
+				contacts_phone = #{contactsPhone},
+			</if>
+			<if test="dispatcherPhone != null">
+				dispatcher_phone = #{dispatcherPhone},
+			</if>
+			<if test="cooperationType != null">
+				cooperation_type = #{cooperationType},
+			</if>
+			<if test="status != null">
+				status = #{status},
+			</if>
+			<if test="supplierType != null">
+				supplier_type = #{supplierType},
+			</if>
+			<if test="enterpriseType != null">
+				enterprise_type = #{enterpriseType},
+			</if>
+			<if test="isTwoShifts != null">
+				is_two_shifts = #{isTwoShifts},
+			</if>
+			<if test="address != null">
+				address = #{address},
+			</if>
+			<if test="createBy != null">
+				create_by = #{createBy},
+			</if>
+			<if test="updateBy != null">
+				update_by = #{updateBy},
+			</if>
+		</set>
+		where supplier_id = #{supplierId}
+	</update>
+	
+	<!-- 巴士供应商查询/导出列表查询条件 -->
+	<sql id="queryAndExportWhereSql">
+		s.supplier_type = 1
+		<if test="cityId != null">
+			AND s.supplier_city = #{cityId}
+		</if>
+		<if test="supplierId != null">
+			AND s.supplier_id = #{supplierId}
+		</if>
+		<if test="status != null">
+			AND s.`status` = #{status}
+		</if>
+		<if test="commissionIds != null and commissionIds.size() > 0">
+			AND s.supplier_id IN 
+			<foreach collection="commissionIds" item="item" open="("
+				separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="contractIds != null and contractIds > 0">
+			AND s.supplier_id IN 
+			<foreach collection="contractIds" item="item" open="("
+				separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="excludeContractIds != null and excludeContractIds > 0">
+			AND s.supplier_id NOT IN 
+			<foreach collection="excludeContractIds" item="item" open="("
+				separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="authOfCity != null and authOfCity.size() > 0">
+			AND s.supplier_city IN
+			<foreach collection="authOfCity" open="(" close=")" separator=","
+				item="cityId">
+				#{cityId}
+			</foreach>
+		</if>
+		<if test="authOfSupplier != null and authOfSupplier.size() > 0">
+			AND s.supplier_id IN
+			<foreach collection="authOfSupplier" open="(" close=")"
+				separator="," item="supplierId">
+				#{supplierId}
+			</foreach>
+		</if>
+	</sql>
+	
+	<!-- 查询合同即将到期的供应商 -->
+	<select id="querySupplierPageListByMaster" parameterType="com.zhuanche.dto.busManage.BusSupplierQueryDTO"
+		resultType="com.zhuanche.vo.busManage.BusSupplierPageVO">
+		SELECT
+			s.supplier_id AS supplierId,
+			s.supplier_full_name AS supplierName,
+			c.city_name AS cityName,
+			s.`status` AS status,
+			'0' as isExpireSoon
+		FROM
+			car_biz_supplier s
+		LEFT JOIN car_biz_city c ON c.city_id = s.supplier_city
+		WHERE
+			<include refid="queryAndExportWhereSql"/>
+		ORDER BY
+			s.create_date DESC
+	</select>
+	
+	<!-- 查询巴士供应商导出列表 -->
+	<select id="querySupplierExportList" parameterType="com.zhuanche.dto.busManage.BusSupplierQueryDTO"
+		resultType="com.zhuanche.vo.busManage.BusSupplierExportVO">
+		SELECT
+			s.supplier_id AS supplierId,
+			s.supplier_full_name AS supplierName,
+			c.city_name AS cityName,
+			s.`status` AS status
+		FROM
+			car_biz_supplier s
+		LEFT JOIN car_biz_city c ON c.city_id = s.supplier_city
+		WHERE
+			<include refid="queryAndExportWhereSql"/>
+	</select>
+	
+	<!-- 查询巴士供应商基础信息 -->
+	<select id="selectBusSupplierById" parameterType="java.lang.Integer" resultType="com.zhuanche.vo.busManage.BusSupplierInfoVO">
+		SELECT
+			s.supplier_id AS supplierId,
+			s.supplier_full_name AS supplierName,
+			s.supplier_city AS supplierCity,
+			c.city_name AS cityName,
+			s.contacts AS contacts,
+			s.contacts_phone AS contactsPhone,
+			s.dispatcher_phone AS dispatcherPhone,
+			s.cooperation_type AS cooperationType,
+			s.`status` AS status
+		FROM
+			car_biz_supplier s
+		LEFT JOIN car_biz_city c ON c.city_id = s.supplier_city
+		WHERE s.supplier_type = 1 AND s.supplier_id = #{supplierId}
+	</select>
+	
 	<!-- 根据条件查询供应商 -->
 	<select id="querySuppliers" resultType="java.util.HashMap" parameterType="java.util.Map">
 		select

@@ -1,10 +1,34 @@
 package com.zhuanche.serv.mdbcarmanage;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellValue;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.controller.driverteam.DriverInfoTemporaryController;
 import com.zhuanche.entity.mdbcarmanage.AgreementCompany;
 import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
 import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
@@ -15,9 +39,10 @@ import com.zhuanche.entity.rentcar.CarImportExceptionEntity;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Common;
+import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.ImportTempletUtils;
 import com.zhuanche.util.ValidateUtils;
-import com.zhuanche.util.excel.ExportExcelUtil;
+
 import mapper.mdbcarmanage.AgreementCompanyMapper;
 import mapper.mdbcarmanage.CarBizDriverInfoTempMapper;
 import mapper.mdbcarmanage.ex.CarBizCarInfoTempExMapper;
@@ -25,26 +50,6 @@ import mapper.mdbcarmanage.ex.CarBizDriverInfoTempExMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import com.zhuanche.util.DateUtil;
 
 
 /**
@@ -2657,4 +2662,20 @@ public class CarBizDriverInfoTempService {
     public List<CarBizCarInfoTemp> licensePlatesNotDriverIdList(Map<String,Object> map) {
         return carBizCarInfoTempExMapper.licensePlatesNotDriverIdList(map);
     }
+    
+	/**
+	 * @Title: updateDriverCooperationTypeBySupplierId
+	 * @Description: 更新司机的加盟类型
+	 * @param supplierId
+	 * @param cooperationType 
+	 * @return void
+	 * @throws
+	 */
+	public void updateDriverCooperationTypeBySupplierId(Integer supplierId, Integer cooperationType) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("supplierId", supplierId);
+		map.put("cooperationType", cooperationType);
+		carBizDriverInfoTempExMapper.updateDriverCooperationTypeBySupplierId(map);
+	}
+    
 }
