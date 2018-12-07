@@ -106,13 +106,6 @@ public class BusDriverInfoController implements BusFileDownload {
 		// 根据条件查询司机
 		queryDTO.setDriverIds(driverIds);
 		List<BusDriverInfoPageVO> list = busCarBizDriverInfoService.queryDriverPageList(queryDTO);
-
-		// TODO 司机订单量、司机平均评分
-		list.forEach(driver -> {
-			driver.setFinishedOrderCount(null);
-			driver.setAverage(null);
-		});
-
 		Page<BusDriverInfoPageVO> page = (Page<BusDriverInfoPageVO>) list;
 		pageDTO = new PageDTO(page.getPageNum(), page.getPageSize(), page.getTotal(), list);
 		return AjaxResponse.success(pageDTO);

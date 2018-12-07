@@ -56,6 +56,7 @@ import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizCooperationType;
+import com.zhuanche.entity.rentcar.CarBizCustomerAppraisalStatistics;
 import com.zhuanche.entity.rentcar.CarBizDriverAccount;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.entity.rentcar.CarBizDriverInfoDetail;
@@ -85,12 +86,20 @@ import mapper.rentcar.CarBizCooperationTypeMapper;
 import mapper.rentcar.CarBizDriverAccountMapper;
 import mapper.rentcar.CarBizDriverInfoMapper;
 import mapper.rentcar.CarBizSupplierMapper;
+import mapper.rentcar.ex.BusCarBizCustomerAppraisalStatisticsExMapper;
 import mapper.rentcar.ex.BusCarBizDriverInfoExMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
 import net.sf.json.JSONObject;
 
+/**
+ * @ClassName:  BusCarBizDriverInfoService
+ * @Description:TODO
+ * @author: yanyunpeng
+ * @date:   2018年12月7日 下午7:17:15
+ * 
+ */
 @Service
 public class BusCarBizDriverInfoService implements BusConst{
 
@@ -149,6 +158,9 @@ public class BusCarBizDriverInfoService implements BusConst{
 	// ===========================巴士业务拓展mapper==================================
 	@Autowired
 	private BusCarBizDriverInfoExMapper busCarBizDriverInfoExMapper;
+	
+	@Autowired
+	private BusCarBizCustomerAppraisalStatisticsExMapper busCarBizCustomerAppraisalStatisticsExMapper;
 
 	// ===========================专车业务拓展service==================================
 	@Autowired
@@ -1192,6 +1204,47 @@ public class BusCarBizDriverInfoService implements BusConst{
 			break;
 		}
 		return cellStringValue;
+	}
+	
+	public String getScore(Integer driverId) {
+		// 司机评分
+		Map<Object, Object> param = new HashMap<>();
+		param.put("driverId", driverId);
+		param.put("createDate", null);
+		CarBizCustomerAppraisalStatistics appraisal = busCarBizCustomerAppraisalStatisticsExMapper.queryAppraisal(param);
+		String average = appraisal == null ? null : appraisal.getEvaluateScore();
+		if (average == null) {
+			double num = 0d;
+			int count = 0;
+			try {
+				Double instrumentAndServiceNum = 0d;
+				if ((instrumentAndServiceNum = Double.valueOf(appraisal.getInstrumentAndService())) != 0) {
+					num += instrumentAndServiceNum;
+					count++;
+				}
+			} catch (NumberFormatException e) {
+			}
+			try {
+				Double environmentAndEquippedNum = 0d;
+				if ((environmentAndEquippedNum = Double.valueOf(appraisal.getEnvironmentAndEquipped())) != 0) {
+					num += environmentAndEquippedNum;
+					count++;
+				}
+			} catch (NumberFormatException e) {
+			}
+			try {
+				Double efficiencyAndSafetyNum = 0d;
+				if ((efficiencyAndSafetyNum = Double.valueOf(appraisal.getEfficiencyAndSafety())) != 0) {
+					num += efficiencyAndSafetyNum;
+					count++;
+				}
+			} catch (NumberFormatException e) {
+			}
+			if (count != 0) {
+				average = String.valueOf(num / count);
+			}
+		}
+		return average;
 	}
 
 }

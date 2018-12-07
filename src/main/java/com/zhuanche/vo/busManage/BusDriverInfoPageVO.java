@@ -11,6 +11,13 @@ import com.alibaba.fastjson.annotation.JSONField;
  * @date: 2018年11月22日 下午5:37:44
  * 
  */
+/**
+ * @ClassName: BusDriverInfoPageVO
+ * @Description:TODO
+ * @author: yanyunpeng
+ * @date: 2018年12月7日 下午5:35:21
+ * 
+ */
 public class BusDriverInfoPageVO {
 
 	/** 司机ID **/
@@ -25,21 +32,21 @@ public class BusDriverInfoPageVO {
 	/** 城市ID **/
 	@JSONField(serialize = false)
 	private Integer cityId;
-	
+
 	/** 城市名称 **/
 	private String cityName;
 
 	/** 供应商ID **/
 	@JSONField(serialize = false)
 	private Integer supplierId;
-	
+
 	/** 供应商名称 **/
 	private String supplierName;
 
 	/** 车型类别ID **/
 	@JSONField(serialize = false)
 	private Integer groupId;
-	
+
 	/** 车型类别名称 **/
 	private String groupName;
 
@@ -50,7 +57,7 @@ public class BusDriverInfoPageVO {
 	private Integer finishedOrderCount;
 
 	/** 平均评分 **/
-	private Double average;
+	private String average;
 
 	/** 司机状态 **/
 	private Integer status;
@@ -143,11 +150,11 @@ public class BusDriverInfoPageVO {
 		this.finishedOrderCount = finishedOrderCount;
 	}
 
-	public Double getAverage() {
+	public String getAverage() {
 		return average;
 	}
 
-	public void setAverage(Double average) {
+	public void setAverage(String average) {
 		this.average = average;
 	}
 
