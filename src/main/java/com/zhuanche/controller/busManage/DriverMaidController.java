@@ -10,7 +10,9 @@ import com.zhuanche.dto.busManage.BusDriverMaidDTO;
 import com.zhuanche.dto.busManage.withdrawalsRecordDTO;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.http.HttpClientUtil;
+import com.zhuanche.mongo.DriverMongo;
 import com.zhuanche.serv.CarBizCityService;
+import com.zhuanche.serv.mongo.DriverMongoService;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
@@ -21,10 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -76,6 +75,8 @@ public class DriverMaidController {
      */
     @Value("${bus.driver.account.balance.url}")
     private String ACCOUNT_BALANCE_URL;
+    @Autowired
+    private DriverMongoService driverMongoService;
 
     /**
      * @Description: 查询司机分佣明细
@@ -85,26 +86,9 @@ public class DriverMaidController {
      */
     @RequestMapping("/queryMaidData")
     public AjaxResponse queryMaidData(BusDriverMaidDTO dto) {
-        //TODO 控制权限，只有管理员可见
         long start = System.currentTimeMillis();
-        Map<String, Object> param = new HashMap<>(16);
-        if (dto.getCityId() != null) {
-            param.put("cityCode", dto.getCityId());
-        }
-        if (StringUtils.isNotBlank(dto.getPhone())) {
-            param.put("phone", dto.getPhone());
-        }
-        if (StringUtils.isNotBlank(dto.getOrderNo())) {
-            param.put("orderNo", dto.getOrderNo());
-        }
-        if (StringUtils.isNotBlank(dto.getStartDate())) {
-            param.put("startDate", dto.getStartDate());
-        }
-        if (StringUtils.isNotBlank(dto.getEndDate())) {
-            param.put("endDate", dto.getEndDate());
-        }
-        buidNecessaryParam(param,dto.getPageNum(),dto.getPageSize());
-        Set<Integer> cityIds = new HashSet<>();
+        Map<String, Object> param = buidMaidParam(dto);
+        buidNecessaryParam(param, dto.getPageNum(), dto.getPageSize());
         logger.info(LOG_PRE + "明细接口查询参数=" + JSON.toJSONString(param));
         JSONObject data = parseResult(MAID_LIST_URL, param);
         if (data == null) {
@@ -119,7 +103,6 @@ public class DriverMaidController {
         return AjaxResponse.success(page);
     }
 
-    //TODO 需要控制权限，还有根据司机姓名查询有待实现,根据司机名字查询需要先查司机表或者mongoDB查出司机id,然后传入
 
     /**
      * @Description: 查询提现记录
@@ -137,14 +120,17 @@ public class DriverMaidController {
         if (StringUtils.isNotBlank(dto.getStartDate())) {
             param.put("startDate", dto.getStartDate());
         }
-        // if(StringUtils.isNotBlank(dto.getName())){
-        //TODO 查询司机id
-        //   requestParam.put("name",dto.getName());
-        // }
+        if (StringUtils.isNotBlank(dto.getName())) {
+            String driverids = getDriverIdsByName(dto.getName());
+            if (StringUtils.isEmpty(driverids)) {
+                return AjaxResponse.success(new PageDTO(dto.getPageNum(), dto.getPageSize(), 0, new ArrayList()));
+            }
+            param.put("accountIds", driverids);
+        }
         if (StringUtils.isNotBlank(dto.getEndDate())) {
             param.put("endDate", dto.getEndDate());
         }
-        buidNecessaryParam(param,dto.getPageNum(),dto.getPageSize());
+        buidNecessaryParam(param, dto.getPageNum(), dto.getPageSize());
         logger.info(LOG_PRE + "提现记录查询参数=" + JSON.toJSONString(param));
         JSONObject data = parseResult(WITHDRAWALS_LIST_ULR, param);
         if (data == null) {
@@ -159,19 +145,22 @@ public class DriverMaidController {
 
     @RequestMapping("/queryAccountBalance")
     public AjaxResponse queryAccountBalance(withdrawalsRecordDTO dto) {
-        long start=System.currentTimeMillis();
+        long start = System.currentTimeMillis();
         Map<String, Object> param = new HashedMap();
         if (StringUtils.isNotBlank(dto.getPhone())) {
             param.put("phone", dto.getPhone());
         }
-        // if(StringUtils.isNotBlank(dto.getName())){
-        //TODO 查询司机id
-        //   param.put("name",dto.getName());
-        // }
+        if (StringUtils.isNotBlank(dto.getName())) {
+            String driverids = getDriverIdsByName(dto.getName());
+            if (StringUtils.isEmpty(driverids)) {
+                return AjaxResponse.success(new PageDTO(dto.getPageNum(), dto.getPageSize(), 0, new ArrayList()));
+            }
+            param.put("accountIds", driverids);
+        }
         if (dto.getCityId() != null) {
             param.put("cityCode", dto.getCityId());
         }
-        buidNecessaryParam(param,dto.getPageNum(),dto.getPageSize());
+        buidNecessaryParam(param, dto.getPageNum(), dto.getPageSize());
         logger.info(LOG_PRE + "账户余额查询参数=" + JSON.toJSONString(param));
         JSONObject data = parseResult(ACCOUNT_BALANCE_URL, param);
         if (data == null) {
@@ -185,14 +174,49 @@ public class DriverMaidController {
         logger.info(LOG_PRE + "提现记录查询参数=" + JSON.toJSONString(param) + "结果=" + data + " 耗时=" + (System.currentTimeMillis() - start));
         return AjaxResponse.success(page);
     }
+
+    private Map<String,Object> buidMaidParam(BusDriverMaidDTO dto){
+        Map<String, Object> param = new HashMap<>(16);
+        if (dto.getCityId() != null) {
+            param.put("cityCode", dto.getCityId());
+        }
+        if (StringUtils.isNotBlank(dto.getPhone())) {
+            param.put("phone", dto.getPhone());
+        }
+        if (StringUtils.isNotBlank(dto.getOrderNo())) {
+            param.put("orderNo", dto.getOrderNo());
+        }
+        if (StringUtils.isNotBlank(dto.getStartDate())) {
+            param.put("startDate", dto.getStartDate());
+        }
+        if (StringUtils.isNotBlank(dto.getEndDate())) {
+            param.put("endDate", dto.getEndDate());
+        }
+        return param;
+    }
+
+    //=============================================导出=========================================
+
+    public void exportMaidData(BusDriverMaidDTO dto){
+        Map<String, Object> param = buidMaidParam(dto);
+        dto.setPageSize(EXPORT_PAGE_SIZE);
+        buidNecessaryParam(param,dto.getPageNum(),dto.getPageSize());
+        JSONObject dataFirst = parseResult(MAID_LIST_URL, param);
+
+
+
+
+    }
+
     /**
-    * 数据集合中的每个元素添加一个城市名称参数
-    * @Param: [array]
-    * @return: com.alibaba.fastjson.JSONArray
-    * @Date: 2018/12/7
-    */
-    private JSONArray addCityName2jsonArray(JSONArray array){
-        if(array == null || array.size()==0){
+     * 数据集合中的每个元素添加一个城市名称参数
+     *
+     * @Param: [array]
+     * @return: com.alibaba.fastjson.JSONArray
+     * @Date: 2018/12/7
+     */
+    private JSONArray addCityName2jsonArray(JSONArray array) {
+        if (array == null || array.size() == 0) {
             return new JSONArray();
         }
         //取出所有的城市id
@@ -203,21 +227,33 @@ public class DriverMaidController {
         array.stream().map(o -> (JSONObject) o).forEach(o -> {
             Integer cityCode = o.getInteger("cityCode");
             String cityName = cityMap.get(cityCode).getCityName();
-            o.put("cityName", cityName!=null?cityName:"");
+            o.put("cityName", cityName != null ? cityName : "");
         });
         return array;
     }
+
     /**
-    * 构建查询的必要参数 pageNo,pageSize,accountType（业务类型,巴士司机等于3）
-    * @Param: [param, pageNum, pageSize]
-    * @return: void
-    * @Date: 2018/12/7
-    */
+     * 构建查询的必要参数 pageNo,pageSize,accountType（业务类型,巴士司机等于3）
+     *
+     * @Param: [param, pageNum, pageSize]
+     * @return: void
+     * @Date: 2018/12/7
+     */
     private void buidNecessaryParam(Map<String, Object> param, Integer pageNum, Integer pageSize) {
         //accountType 计费定义的参数 3代表巴士司机
         param.put("accountType", ACCOUNT_TYPE);
         param.put("pageNum", pageNum == null ? 1 : pageNum);
         param.put("pageSize", pageSize == null ? 30 : pageSize);
+    }
+
+
+    private String getDriverIdsByName(String name) {
+        List<DriverMongo> drivers = driverMongoService.queryDriverByName(name);
+        if (drivers == null || drivers.size() == 0) {
+            return StringUtils.EMPTY;
+        }
+        String ids = drivers.stream().map(o -> String.valueOf(o.getDriverId())).collect(Collectors.joining(","));
+        return ids;
     }
 
 

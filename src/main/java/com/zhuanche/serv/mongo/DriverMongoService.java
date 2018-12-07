@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -199,5 +200,16 @@ public class DriverMongoService {
 		update.set("bindTime", map.get("bindTime"));
 		update.set("expireDate", map.get("expireDate"));
 		driverMongoTemplate.updateFirst(query, update,DriverMongo.class);
+	}
+
+	/**
+	 * 根据司机姓名查询司机信息
+	 * @param name
+	 * @return
+	 */
+	public List<DriverMongo> queryDriverByName(String name){
+		Query query = new Query(Criteria.where("name").is(name));
+		List<DriverMongo> driverMongos = driverMongoTemplate.find(query, DriverMongo.class);
+		return driverMongos;
 	}
 }
