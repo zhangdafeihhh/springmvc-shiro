@@ -45,4 +45,8 @@ public class CarBizCityService{
 	public CarBizCity selectByPrimaryKey(Integer cityId){
 		return carBizCityMapper.selectByPrimaryKey(cityId);
 	}
+
+	public String queryNameById(Integer cityId){
+		return carBizCityExMapper.queryNameById(cityId);
+	}
 }

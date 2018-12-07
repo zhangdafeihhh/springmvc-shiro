@@ -47,18 +47,16 @@
             <bean id="byteArrayHttpMessageConverter" class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>
         </mvc:message-converters> 
     </mvc:annotation-driven>
-    
     <!-- 配置hibernate-validate校验器 -->
+	<bean id="validatorMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="useCodeAsDefaultMessage" value="false" />
+		<property name="defaultEncoding" value="UTF-8"/>
+		<property name="basename" value="validationMessages" />
+	</bean>
 	<bean id="hibernateValidator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"> 
 		<property name="providerClass" value="org.hibernate.validator.HibernateValidator"/> 
 		<property name="validationMessageSource" ref="validatorMessageSource"/> 
 	</bean>
-	<bean id="validatorMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
-	    <property name="useCodeAsDefaultMessage" value="false" />
-		<property name="defaultEncoding" value="UTF-8"/> 
-	    <property name="basename" value="validationMessages" />
-	</bean>
-
 	<!-- 配置View层 JSP-->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/pages/"/>

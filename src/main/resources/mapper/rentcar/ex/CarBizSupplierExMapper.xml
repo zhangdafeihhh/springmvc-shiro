@@ -105,5 +105,9 @@
             #{item}
         </foreach>
     </select>
-    
+
+    <select id="getSupplierNameById" parameterType="java.lang.Integer" resultType="java.lang.String">
+        select supplier_full_name from car_biz_supplier where supplier_id = #{supplierId}
+    </select>
+
 </mapper>
