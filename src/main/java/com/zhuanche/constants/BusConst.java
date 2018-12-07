@@ -26,5 +26,16 @@ public interface BusConst {
 	// ==========================其它==============================
 	/** 驾照类型 **/
 	String[] DRIVING_LICENSE_TYPES = { "A1", "A2", "A3", "B1", "B2", "C1", "C2", "N", "P" };
+	
+	/**
+	 * @ClassName:  SettlementAdvice
+	 * @Description: 结算单接口列表
+	 * @author: yanyunpeng
+	 * @date:   2018年12月7日 上午11:37:41
+	 */
+	interface SettlementAdviceRemote{
+		/** 查询供应商的账单 **/
+		String LIST = "/settle/detail/list";
+	}
 
 }
