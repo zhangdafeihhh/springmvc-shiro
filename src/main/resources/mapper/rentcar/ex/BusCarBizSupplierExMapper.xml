@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.ex.BusCarBizSupplierExMapper">
+	<resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarBizSupplier">
+		<id column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+		<result column="supplier_num" property="supplierNum" jdbcType="VARCHAR" />
+		<result column="supplier_full_name" property="supplierFullName"
+			jdbcType="VARCHAR" />
+		<result column="supplier_city" property="supplierCity"
+			jdbcType="INTEGER" />
+		<result column="type" property="type" jdbcType="INTEGER" />
+		<result column="contacts" property="contacts" jdbcType="VARCHAR" />
+		<result column="contacts_phone" property="contactsPhone"
+			jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="create_by" property="createBy" jdbcType="INTEGER" />
+		<result column="update_by" property="updateBy" jdbcType="INTEGER" />
+		<result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+		<result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+		<result column="isCommission" property="iscommission" jdbcType="INTEGER" />
+		<result column="posPayFlag" property="pospayflag" jdbcType="INTEGER" />
+		<result column="cooperation_type" property="cooperationType"
+			jdbcType="INTEGER" />
+		<result column="isTest" property="istest" jdbcType="INTEGER" />
+		<result column="enterprise_type" property="enterpriseType"
+			jdbcType="INTEGER" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+	</resultMap>
+	<resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizSupplier"
+		extends="BaseResultMap">
+		<result column="memo" property="memo" jdbcType="LONGVARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		supplier_id, supplier_num, supplier_full_name,
+		supplier_city, type, contacts,
+		contacts_phone,
+		status, create_by,
+		update_by, create_date, update_date, isCommission,
+		posPayFlag,
+		cooperation_type, isTest, enterprise_type, address
+	</sql>
+	<sql id="Blob_Column_List">
+		memo
+	</sql>
+
+	<!-- 根据条件查询供应商 -->
+	<select id="querySuppliers" resultType="java.util.HashMap" parameterType="java.util.Map">
+		select
+			supplier_id AS supplierId,
+			supplier_full_name AS supplierName
+		from car_biz_supplier
+		where s.`status`  = 1 
+		and s.supplier_type = 1
+		<if test="cityId != null">
+			and supplier_city = #{cityId}
+		</if>
+		<if test="authOfSupplier != null and authOfSupplier.size() > 0">
+			and supplier_id in 
+			<foreach collection="authOfSupplier" item="item" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+	</select>
+</mapper>

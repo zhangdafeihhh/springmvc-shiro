@@ -269,7 +269,6 @@ public class CommonController {
         }
         return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
     }
-    
 	
     
 }

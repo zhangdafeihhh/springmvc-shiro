@@ -19,16 +19,16 @@
 		</javaTypeResolver>
 
 		<!-- po实体类代码位置 -->
-		<javaModelGenerator targetPackage="com.zhuanche.entity.rentcar"	targetProject="C:\\Users\\admin\\git\\mp-manage\\src\main\\java">
+		<javaModelGenerator targetPackage="com.zhuanche.entity.rentcar"	targetProject="F:\gitLocalRep\mp-manage\src\main\java">
 			<property name="enableSubPackages" value="true" />
 			<property name="trimStrings" value="true" />
 		</javaModelGenerator>
 		<!-- sql代码的xml映射文件位置 -->
-		<sqlMapGenerator targetPackage="mapper.rentcar" targetProject="C:\\Users\\admin\\git\\mp-manage\\src\main\\resources">
+		<sqlMapGenerator targetPackage="mapper.rentcar" targetProject="F:\gitLocalRep\mp-manage\src\main\resources">
 			<property name="enableSubPackages" value="true" />
 		</sqlMapGenerator>
 		<!-- mapper接口位置 -->
-		<javaClientGenerator type="XMLMAPPER" targetPackage="mapper.rentcar" targetProject="C:\\Users\\admin\\git\\mp-manage\\src\main\\java">
+		<javaClientGenerator type="XMLMAPPER" targetPackage="mapper.rentcar" targetProject="F:\gitLocalRep\mp-manage\src\main\java">
 			<property name="enableSubPackages" value="true" />
 		</javaClientGenerator>
 
@@ -57,11 +57,12 @@
 			<property name="useActualColumnNames" value="false" />
 			<generatedKey column="supplier_id" sqlStatement="MySql" identity="true" />
 		</table> -->
-		<table tableName="car_biz_customer" domainObjectName="CarBizCustomer"
+		<table tableName="car_biz_service" domainObjectName="CarBizService"
 			enableSelectByExample="false" enableDeleteByExample="false"
-			enableCountByExample="false" enableUpdateByExample="false">
+			enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByPrimaryKey="false">
 			<property name="useActualColumnNames" value="false" />
-			<generatedKey column="customer_id" sqlStatement="MySql" identity="true" />
+			<generatedKey column="service_id" sqlStatement="MySql" identity="true" />
 		</table>
 	</context>
 </generatorConfiguration>

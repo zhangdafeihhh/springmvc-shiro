@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.BusBizChangeLogExMapper">
+	<resultMap id="BaseResultMap"
+		type="com.zhuanche.entity.mdbcarmanage.BusBizChangeLog">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="business_type" property="businessType"
+			jdbcType="INTEGER" />
+		<result column="business_key" property="businessKey" jdbcType="VARCHAR" />
+		<result column="update_by" property="updateBy" jdbcType="INTEGER" />
+		<result column="update_name" property="updateName" jdbcType="VARCHAR" />
+		<result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+		<result column="build_time" property="buildTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, business_type, business_key, update_by, update_name,
+		update_date,
+		build_time
+	</sql>
+	<select id="queryRecnetlyChangeLogs" resultType="java.util.HashMap" parameterType="java.util.Map">
+		select
+			update_name AS updateName,
+			update_date AS updateDate
+		from bus_biz_change_log
+		WHERE
+			business_type = #{businessType}
+		AND business_key = #{businessKey}
+		ORDER BY
+			id DESC
+		LIMIT 15
+	</select>
+</mapper>

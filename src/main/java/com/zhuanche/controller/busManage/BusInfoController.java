@@ -88,8 +88,8 @@ public class BusInfoController {
     })
     public AjaxResponse queryList(BusInfoDTO busDTO) {
         //从session中获取权限
-        busDTO.setCityIds(WebSessionUtil.getCurrentLoginUser().getCityIds());
-        busDTO.setSupplierIds(WebSessionUtil.getCurrentLoginUser().getSupplierIds());
+        busDTO.setAuthOfCity(WebSessionUtil.getCurrentLoginUser().getCityIds());
+        busDTO.setAuthOfSupplier(WebSessionUtil.getCurrentLoginUser().getSupplierIds());
         logger.info(LOG_PRE + "查询车辆列表参数=" + JSON.toJSONString(busDTO));
         PageInfo<BusInfoVO> pageInfo = busInfoService.queryList(busDTO);
         return AjaxResponse.success(new PageDTO(busDTO.getPageNum(), busDTO.getPageSize(), Integer.parseInt(pageInfo.getTotal() + ""), pageInfo.getList()));
@@ -206,8 +206,8 @@ public class BusInfoController {
     public void exportCarInfo(BusInfoDTO busDTO, HttpServletRequest request, HttpServletResponse response) throws Exception {
         //从session中获取权限
         SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
-        busDTO.setCityIds(user.getCityIds());
-        busDTO.setSupplierIds(user.getSupplierIds());
+        busDTO.setAuthOfCity(user.getCityIds());
+        busDTO.setAuthOfSupplier(user.getSupplierIds());
         //导出信息指定每次查询的页数
         busDTO.setPageSize(CsvUtils.downPerSize);
         logger.info(LOG_PRE + "下载车辆信息参数=" + JSON.toJSONString(busDTO));

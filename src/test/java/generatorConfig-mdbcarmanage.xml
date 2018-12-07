@@ -19,23 +19,31 @@
 		</javaTypeResolver>
 
 		<!-- po实体类代码位置 -->
-		<javaModelGenerator targetPackage="com.zhuanche.entity.mdbcarmanage"	targetProject="D:\\shouqi_project\\car\\mp-manage\\src\\main\\java">
+		<javaModelGenerator targetPackage="com.zhuanche.entity.mdbcarmanage"	targetProject="F:\gitLocalRep\mp-manage\src\main\java">
 			<property name="enableSubPackages" value="true" />
 			<property name="trimStrings" value="true" />
 		</javaModelGenerator>
 		<!-- sql代码的xml映射文件位置 -->
-		<sqlMapGenerator targetPackage="mapper.mdbcarmanage" targetProject="D:\\shouqi_project\\car\\mp-manage\\src\\main\\resources">
+		<sqlMapGenerator targetPackage="mapper.mdbcarmanage" targetProject="F:\gitLocalRep\mp-manage\src\main\resources">
 			<property name="enableSubPackages" value="true" />
 		</sqlMapGenerator>
 		<!-- mapper接口位置 -->
-		<javaClientGenerator type="XMLMAPPER" targetPackage="mapper.mdbcarmanage" targetProject="D:\\shouqi_project\\car\\mp-manage\\src\\main\\java">
+		<javaClientGenerator type="XMLMAPPER" targetPackage="mapper.mdbcarmanage" targetProject="F:\gitLocalRep\mp-manage\src\main\java">
 			<property name="enableSubPackages" value="true" />
 		</javaClientGenerator>
 
 		<!-- 需要自动生成的表 -->
-		<table tableName="car_driver_month_duty" domainObjectName="CarDriverMonthDuty"
+		<table tableName="bus_biz_supplier_detail" domainObjectName="BusBizSupplierDetail"
 			   enableSelectByExample="false" enableDeleteByExample="false"
-			   enableCountByExample="false" enableUpdateByExample="false">
+			   enableCountByExample="false" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false">
+			<property name="useActualColumnNames" value="false" />
+			<generatedKey column="id" sqlStatement="MySql" identity="true" />
+		</table>
+		<table tableName="bus_biz_change_log" domainObjectName="BusBizChangeLog"
+			   enableSelectByExample="false" enableDeleteByExample="false"
+			   enableCountByExample="false" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false">
 			<property name="useActualColumnNames" value="false" />
 			<generatedKey column="id" sqlStatement="MySql" identity="true" />
 		</table>
