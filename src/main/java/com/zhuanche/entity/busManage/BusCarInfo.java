@@ -1,4 +1,4 @@
-package com.zhuanche.entity.rentcar;
+package com.zhuanche.entity.busManage;
 
 import java.util.Date;
 

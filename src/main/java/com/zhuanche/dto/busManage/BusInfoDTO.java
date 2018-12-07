@@ -1,4 +1,4 @@
-package com.zhuanche.dto.rentcar;
+package com.zhuanche.dto.busManage;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.zhuanche.dto.BaseDTO;

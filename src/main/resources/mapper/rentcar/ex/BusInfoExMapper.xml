@@ -30,7 +30,7 @@
         <result property="nextClassDate" column="next_class_date"/>
         <result property="twoLevelMaintenanceDate" column="two_level_maintenance_date"/>
     </resultMap>
-    <resultMap id="BasicCarInfoVOMap" type="com.zhuanche.vo.rentcar.BusInfoVO">
+    <resultMap id="BasicCarInfoVOMap" type="com.zhuanche.vo.busManage.BusInfoVO">
         <result property="carId" column="car_id"/>
         <result property="licensePlates" column="license_plates"/>
         <result property="cityName" column="city_name"/>
@@ -40,7 +40,7 @@
         <result property="status" column="status"/>
         <result property="createDate" column="create_date"/>
     </resultMap>
-    <resultMap id="DetailVOMap" type="com.zhuanche.vo.rentcar.BusDetailVO">
+    <resultMap id="DetailVOMap" type="com.zhuanche.vo.busManage.BusDetailVO">
         <result property="carId" column="car_id"/>
         <result property="cityId" column="city_id"/>
         <result property="cityName" column="city_name"/>
@@ -57,7 +57,7 @@
         <result property="status" column="status"/>
     </resultMap>
     <!--巴士saas 查询车辆列表信息-->
-    <select id="selectList" parameterType="com.zhuanche.dto.rentcar.BusInfoDTO" resultMap="BasicCarInfoVOMap">
+    <select id="selectList" parameterType="com.zhuanche.dto.busManage.BusInfoDTO" resultMap="BasicCarInfoVOMap">
         SELECT
         info.car_id,
         info.license_plates,
@@ -133,7 +133,7 @@
         select license_plates from car_biz_car_info where car_id = #{carId}
     </select>
     <!--保存巴士车辆-->
-    <insert id="insertCar" parameterType="com.zhuanche.entity.rentcar.BusCarInfo" >
+    <insert id="insertCar" parameterType="com.zhuanche.entity.busManage.BusCarInfo" >
         <selectKey keyProperty="carId" keyColumn="car_id" order="AFTER" resultType="java.lang.Integer">
             SELECT LAST_INSERT_ID()
         </selectKey>
@@ -533,7 +533,7 @@
             </if>
         </trim>
     </insert>
-    <update id="updateCarById" parameterType="com.zhuanche.entity.rentcar.BusCarInfo">
+    <update id="updateCarById" parameterType="com.zhuanche.entity.busManage.BusCarInfo">
         update car_biz_car_info
         <set >
             <if test="cityId != null" >

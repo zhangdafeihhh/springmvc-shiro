@@ -1,4 +1,4 @@
-package com.zhuanche.vo.rentcar;
+package com.zhuanche.vo.busManage;
 
 public class ErrorReason {
     private int row;

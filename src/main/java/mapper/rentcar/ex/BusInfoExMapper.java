@@ -1,11 +1,10 @@
 package mapper.rentcar.ex;
 
 
-import com.zhuanche.dto.rentcar.BusInfoDTO;
-import com.zhuanche.entity.rentcar.BusCarInfo;
-import com.zhuanche.entity.rentcar.CarBizCarInfo;
-import com.zhuanche.vo.rentcar.BusDetailVO;
-import com.zhuanche.vo.rentcar.BusInfoVO;
+import com.zhuanche.dto.busManage.BusInfoDTO;
+import com.zhuanche.entity.busManage.BusCarInfo;
+import com.zhuanche.vo.busManage.BusDetailVO;
+import com.zhuanche.vo.busManage.BusInfoVO;
 
 import java.util.List;
 

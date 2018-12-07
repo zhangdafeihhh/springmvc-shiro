@@ -11,8 +11,8 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.constants.busManage.BusConstant.CarConstant;
 import com.zhuanche.constants.busManage.EnumFuel;
-import com.zhuanche.dto.rentcar.BusInfoDTO;
-import com.zhuanche.entity.rentcar.BusCarInfo;
+import com.zhuanche.dto.busManage.BusInfoDTO;
+import com.zhuanche.entity.busManage.BusCarInfo;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.serv.CarBizCarGroupService;
 import com.zhuanche.serv.CarBizCityService;
@@ -23,10 +23,10 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.excel.ExportExcelUtil;
-import com.zhuanche.vo.rentcar.BusDetailVO;
-import com.zhuanche.vo.rentcar.BusInfoVO;
-import com.zhuanche.vo.rentcar.ErrorReason;
-import com.zhuanche.vo.rentcar.ImportErrorVO;
+import com.zhuanche.vo.busManage.BusDetailVO;
+import com.zhuanche.vo.busManage.BusInfoVO;
+import com.zhuanche.vo.busManage.ErrorReason;
+import com.zhuanche.vo.busManage.ImportErrorVO;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -156,7 +156,8 @@ public class BusInfoController {
         carInfo.setGroupId(groupId);
         carInfo.setVehicleBrand(vehicleBrand);
         carInfo.setModelDetail(modelDetail);
-        carInfo.setCarModelId(0);//因为不填写车型所以默认为0
+        //因为不填写车型所以默认为0
+        carInfo.setCarModelId(0);
         carInfo.setColor(color);
         carInfo.setFueltype(fuelType);
         carInfo.setTransportnumber(transportNumber);
@@ -207,14 +208,18 @@ public class BusInfoController {
         SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
         busDTO.setCityIds(user.getCityIds());
         busDTO.setSupplierIds(user.getSupplierIds());
+        //导出信息指定每次查询的页数
+        busDTO.setPageSize(CsvUtils.downPerSize);
         logger.info(LOG_PRE + "下载车辆信息参数=" + JSON.toJSONString(busDTO));
         PageInfo<BusInfoVO> pageInfo = busInfoService.queryList(busDTO);
         //文件标题
         List<String> headerList = new ArrayList<>();
         headerList.add(CarConstant.EXPORT_HEAD);
         String fileName = "巴士信息" + com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern) + ".csv";
-        String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
-        if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO") > 0 && agent.indexOf("RV:11") > 0)) {  //IE浏览器和Edge浏览器
+        //获得浏览器信息并转换为大写
+        String agent = request.getHeader("User-Agent").toUpperCase();
+        //IE浏览器和Edge浏览器
+        if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO") > 0 && agent.indexOf("RV:11") > 0)) {
             fileName = URLEncoder.encode(fileName, "UTF-8");
         } else {  //其他浏览器
             fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
@@ -268,8 +273,10 @@ public class BusInfoController {
     @RequestMapping("/exportTemplate")
     public void exportTemplate(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String fileName = "巴士车辆导入模板" + com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern);
-        String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
-        if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO") > 0 && agent.indexOf("RV:11") > 0)) {  //IE浏览器和Edge浏览器
+        //获得浏览器信息并转换为大写
+        String agent = request.getHeader("User-Agent").toUpperCase();
+        //IE浏览器和Edge浏览器
+        if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO") > 0 && agent.indexOf("RV:11") > 0)) {
             fileName = URLEncoder.encode(fileName, "UTF-8");
         } else {  //其他浏览器
             fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
@@ -537,7 +544,8 @@ public class BusInfoController {
     private boolean checkTableHead(Row row, String[] head) {
         boolean templateFlag = true;
         for (int colIdx = 0; colIdx < row.getLastCellNum(); colIdx++) {
-            Cell cell = row.getCell(colIdx); // 获取列对象
+            // 获取列对象
+            Cell cell = row.getCell(colIdx);
             if (cell == null) {
                 templateFlag = false;
                 break;

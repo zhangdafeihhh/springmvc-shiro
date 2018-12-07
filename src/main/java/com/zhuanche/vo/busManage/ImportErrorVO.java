@@ -1,4 +1,4 @@
-package com.zhuanche.vo.rentcar;
+package com.zhuanche.vo.busManage;
 
 import java.io.Serializable;
 import java.util.List;
