@@ -6,13 +6,16 @@ import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.constants.busManage.BusConstant.DriverMaidConstant;
 import com.zhuanche.dto.busManage.BusDriverMaidDTO;
 import com.zhuanche.dto.busManage.withdrawalsRecordDTO;
+import com.zhuanche.entity.busManage.MaidListEntity;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.mongo.DriverMongo;
 import com.zhuanche.serv.CarBizCityService;
 import com.zhuanche.serv.mongo.DriverMongoService;
+import com.zhuanche.util.excel.CsvUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
@@ -23,6 +26,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -197,15 +202,68 @@ public class DriverMaidController {
 
     //=============================================导出=========================================
 
-    public void exportMaidData(BusDriverMaidDTO dto){
+    @RequestMapping("/exportMaidData")
+    public void exportMaidData(HttpServletRequest request, BusDriverMaidDTO dto, HttpServletResponse response) throws Exception{
         Map<String, Object> param = buidMaidParam(dto);
+        logger.info(LOG_PRE+"导出分佣明细参数="+JSON.toJSONString(param));
         dto.setPageSize(EXPORT_PAGE_SIZE);
         buidNecessaryParam(param,dto.getPageNum(),dto.getPageSize());
         JSONObject dataFirst = parseResult(MAID_LIST_URL, param);
+        Long total = dataFirst.getLong("total");
+        logger.info(LOG_PRE+"导出分佣明细总条数="+total);
+        //构建文件名称
+        String fileName = BusCSVDataUtil.buidFileName(request, DriverMaidConstant.MAID_FILE_NAME);
+        //构建文件标题
+        List<String> headerList = new ArrayList<>();
+        headerList.add(DriverMaidConstant.MAID_EXPORT_HEAD);
+        CsvUtils utilEntity = new CsvUtils();
+        if (total == 0) {
+            List<String> csvDataList = new ArrayList<>();
+            csvDataList.add("没有符合条件的数据");
+            utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, true, true);
+            return;
+        }
+        JSONArray arrayFirst = dataFirst.getJSONArray("listData");
+        JSONArray resultArrayFirst = addCityName2jsonArray(arrayFirst);
+        List<String> csvDataFirst = resultArrayFirst.stream().map(o -> (JSONObject) o).map(o -> JSONObject.toJavaObject(o, MaidListEntity.class)).map(o ->o.toString()).collect(Collectors.toList());
+        PageDTO page = new PageDTO(dataFirst.getInteger("pageNo"), dataFirst.getInteger("pageSize"), dataFirst.getLong("total"), resultArrayFirst);
+        int pages = page.getPages();
+        if(pages==1){
+            utilEntity.exportCsvV2(response, csvDataFirst, headerList, fileName, true, true);
+            return;
+        }
+        utilEntity.exportCsvV2(response, csvDataFirst, headerList, fileName, true, false);
+        for (int i = 2; i <= pages; i++) {
+            dto.setPageNum(i);
+            Map<String, Object> paramNext = buidMaidParam(dto);
+            buidNecessaryParam(paramNext,dto.getPageNum(),dto.getPageSize());
+            JSONObject data = parseResult(MAID_LIST_URL, paramNext);
+            JSONArray array = data.getJSONArray("listData");
+            JSONArray resultArray = addCityName2jsonArray(array);
+            List<String> csvData = resultArray.stream().map(o -> (JSONObject) o).map(o -> JSONObject.toJavaObject(o, MaidListEntity.class)).map(o ->o.toString()).collect(Collectors.toList());
+            if (i == pages) {
+                utilEntity.exportCsvV2(response, csvData, headerList, fileName, false, true);
+            } else {
+                utilEntity.exportCsvV2(response, csvData, headerList, fileName, false, false);
+            }
+        }
 
+    }
 
-
-
+    /**
+     * 根据分佣接口返回的cityCode查询城市
+     * @param array
+     * @return
+     */
+    private Map<Integer,CarBizCity> queryCity(JSONArray array){
+        if (array == null || array.size() == 0) {
+            return new HashMap<Integer,CarBizCity>(0);
+        }
+        //取出所有的城市id
+        Set<Integer> cityIds = array.stream().map(o -> (JSONObject) o).map(o -> o.getInteger("cityCode")).collect(Collectors.toSet());
+        //查询城市
+        Map<Integer, CarBizCity> cityMap = cityService.queryCity(cityIds);
+        return cityMap;
     }
 
     /**
@@ -216,13 +274,7 @@ public class DriverMaidController {
      * @Date: 2018/12/7
      */
     private JSONArray addCityName2jsonArray(JSONArray array) {
-        if (array == null || array.size() == 0) {
-            return new JSONArray();
-        }
-        //取出所有的城市id
-        Set<Integer> cityIds = array.stream().map(o -> (JSONObject) o).map(o -> o.getInteger("cityCode")).collect(Collectors.toSet());
-        //查询城市名称
-        Map<Integer, CarBizCity> cityMap = cityService.queryCity(cityIds);
+        Map<Integer, CarBizCity> cityMap = queryCity(array);
         //将城市名称放到array中
         array.stream().map(o -> (JSONObject) o).forEach(o -> {
             Integer cityCode = o.getInteger("cityCode");

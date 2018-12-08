@@ -1,6 +1,8 @@
 package com.zhuanche.entity.busManage;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 
@@ -11,7 +13,7 @@ import java.math.BigDecimal;
  * @create: 2018-09-17 10:45
  **/
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MaidListEntity{
+public class MaidListEntity {
     /**
      * 账户ID
      */
@@ -178,5 +180,21 @@ public class MaidListEntity{
 
     public void setOrderId(Integer orderId) {
         this.orderId = orderId;
+    }
+
+    @Override
+    public String toString() {
+        if (orderDetail != null) {
+            setOrderDetailJSON(JSONObject.parseObject(orderDetail, MaidOrderEntity.class));
+            if (orderDetailJSON.getOrderAmount() != null && orderDetailJSON.getPrePayAmount() != null) {
+                orderDetailJSON.setSettleAmount(orderDetailJSON.getOrderAmount().subtract(orderDetailJSON.getPrePayAmount()));
+            }
+        }
+
+        return StringUtils.defaultString(orderNo) + "," + cityName + ",\t" + phone + ",\t" + settleDate + ","
+                + orderDetailJSON.getOrderAmount() + "," + orderDetailJSON.getPrePayAmount() + ","
+                + orderDetailJSON.getSettleAmount() + "," + orderDetailJSON.getHighWayFee() + ","
+                + orderDetailJSON.getParkFee() + "," + orderDetailJSON.getSettleRatio() + ","
+                + settleAmount;
     }
 }
