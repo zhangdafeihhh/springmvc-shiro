@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,4 +56,15 @@ public class CarBizSupplierService{
     public List<CarBizSupplier> findByIdSet(Set<Integer> supplierIdSet) {
 		return carBizSupplierExMapper.findByIdSet(supplierIdSet);
     }
+	/**
+	 * 根据供应商ID查询供应商名称
+	 * @param supplierId
+	 * @return
+	 */
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
+	public String getSupplierNameById(Integer supplierId){
+		return carBizSupplierExMapper.getSupplierNameById(supplierId);
+	}
 }

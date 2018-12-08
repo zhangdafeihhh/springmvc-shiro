@@ -6,10 +6,13 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 
 import org.apache.http.HttpStatus;
 import org.apache.shiro.authz.UnauthorizedException;
@@ -65,6 +68,14 @@ public class CustomExceptionAdvice {
     	}
     	logger.info( "[PARAM_VERIFY_ERROR] "+ message );
         return AjaxResponse.failMsg( RestErrorCode.HTTP_PARAM_INVALID,  message );
+	}
+	
+	@ExceptionHandler(ConstraintViolationException.class)
+	@ResponseBody
+	public AjaxResponse handleConstraintViolationException(ConstraintViolationException e, HttpServletRequest request, HttpServletResponse response){
+		Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
+		String errorMsg = violations.stream().map(violation -> violation.getMessage()).collect(Collectors.toList()).toString();
+		return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, errorMsg);
 	}
 	
 	/**用户shiro授权不通过时**/

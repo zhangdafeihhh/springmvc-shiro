@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.ex.BusCarBizServiceExMapper">
+	<resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarBizService">
+		<id column="service_id" property="serviceId" jdbcType="INTEGER" />
+		<result column="service_name" property="serviceName" jdbcType="VARCHAR" />
+		<result column="service_no" property="serviceNo" jdbcType="VARCHAR" />
+		<result column="sort" property="sort" jdbcType="INTEGER" />
+		<result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+		<result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+		<result column="update_by" property="updateBy" jdbcType="INTEGER" />
+		<result column="create_by" property="createBy" jdbcType="INTEGER" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+	</resultMap>
+	<resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizService"
+		extends="BaseResultMap">
+		<result column="memo" property="memo" jdbcType="LONGVARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		service_id, service_name, service_no, sort, update_date,
+		create_date, update_by,
+		create_by, status
+	</sql>
+	<sql id="Blob_Column_List">
+		memo
+	</sql>
+	
+	
+	<!-- 查询巴士服务类型 -->
+	<select id="queryServices" resultType="java.util.HashMap">
+		SELECT
+			service_id AS serviceId,
+			service_name AS serviceName
+		FROM
+			car_biz_service
+		WHERE
+			service_name LIKE '%巴士%'
+	</select>
+</mapper>

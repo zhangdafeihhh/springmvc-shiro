@@ -2,8 +2,9 @@ package com.zhuanche.dto.busManage;
 
 import java.util.Date;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotBlank;
 
 import com.zhuanche.common.web.datavalidate.custom.InArray;
 

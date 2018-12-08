@@ -4,11 +4,14 @@
 	<resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarBizSupplier">
 		<id column="supplier_id" property="supplierId" jdbcType="INTEGER" />
 		<result column="supplier_num" property="supplierNum" jdbcType="VARCHAR" />
-		<result column="supplier_full_name" property="supplierFullName" jdbcType="VARCHAR" />
-		<result column="supplier_city" property="supplierCity" jdbcType="INTEGER" />
+		<result column="supplier_full_name" property="supplierFullName"
+			jdbcType="VARCHAR" />
+		<result column="supplier_city" property="supplierCity"
+			jdbcType="INTEGER" />
 		<result column="type" property="type" jdbcType="INTEGER" />
 		<result column="contacts" property="contacts" jdbcType="VARCHAR" />
-		<result column="contacts_phone" property="contactsPhone" jdbcType="VARCHAR" />
+		<result column="contacts_phone" property="contactsPhone"
+			jdbcType="VARCHAR" />
 		<result column="status" property="status" jdbcType="INTEGER" />
 		<result column="create_by" property="createBy" jdbcType="INTEGER" />
 		<result column="update_by" property="updateBy" jdbcType="INTEGER" />
@@ -16,9 +19,11 @@
 		<result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
 		<result column="isCommission" property="iscommission" jdbcType="INTEGER" />
 		<result column="posPayFlag" property="pospayflag" jdbcType="INTEGER" />
-		<result column="cooperation_type" property="cooperationType" jdbcType="INTEGER" />
+		<result column="cooperation_type" property="cooperationType"
+			jdbcType="INTEGER" />
 		<result column="isTest" property="istest" jdbcType="INTEGER" />
-		<result column="enterprise_type" property="enterpriseType" jdbcType="INTEGER" />
+		<result column="enterprise_type" property="enterpriseType"
+			jdbcType="INTEGER" />
 		<result column="address" property="address" jdbcType="VARCHAR" />
 	</resultMap>
 	<resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizSupplier" extends="BaseResultMap">
@@ -267,5 +272,24 @@
 			car_biz_supplier s
 		LEFT JOIN car_biz_city c ON c.city_id = s.supplier_city
 		WHERE s.supplier_type = 1 AND s.supplier_id = #{supplierId}
+	</select>
+	
+	<!-- 根据条件查询供应商 -->
+	<select id="querySuppliers" resultType="java.util.HashMap" parameterType="java.util.Map">
+		select
+			supplier_id AS supplierId,
+			supplier_full_name AS supplierName
+		from car_biz_supplier
+		where `status`  = 1 
+		and supplier_type = 1
+		<if test="cityId != null">
+			and supplier_city = #{cityId}
+		</if>
+		<if test="authOfSupplier != null and authOfSupplier.size() > 0">
+			and supplier_id in 
+			<foreach collection="authOfSupplier" item="item" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
 	</select>
 </mapper>
