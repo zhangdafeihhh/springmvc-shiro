@@ -280,8 +280,8 @@
 			supplier_id AS supplierId,
 			supplier_full_name AS supplierName
 		from car_biz_supplier
-		where s.`status`  = 1 
-		and s.supplier_type = 1
+		where `status`  = 1 
+		and supplier_type = 1
 		<if test="cityId != null">
 			and supplier_city = #{cityId}
 		</if>
