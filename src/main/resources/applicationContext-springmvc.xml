@@ -57,6 +57,9 @@
 		<property name="providerClass" value="org.hibernate.validator.HibernateValidator"/> 
 		<property name="validationMessageSource" ref="validatorMessageSource"/> 
 	</bean>
+	<bean class="org.springframework.validation.beanvalidation.MethodValidationPostProcessor">
+		<property name="validator" ref="hibernateValidator"/>
+	</bean>
 	<!-- 配置View层 JSP-->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/pages/"/>

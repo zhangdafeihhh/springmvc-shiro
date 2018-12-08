@@ -51,6 +51,7 @@ import com.zhuanche.vo.busManage.BusDriverInfoPageVO;
 
 @RestController
 @RequestMapping("/bus/driverInfo")
+@Validated
 public class BusDriverInfoController implements BusFileDownload {
 
 	private static final Logger logger = LoggerFactory.getLogger(BusDriverInfoController.class);
@@ -114,7 +115,6 @@ public class BusDriverInfoController implements BusFileDownload {
 	@RequestMapping(value = "/saveDriver")
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE) })
-	@Validated
 	public AjaxResponse saveDriver(BusDriverSaveDTO saveDTO) {
 		
 		/** 补充默认信息(用户不想填但业务需要的字段)*/
@@ -195,7 +195,6 @@ public class BusDriverInfoController implements BusFileDownload {
 	@RequestMapping(value = "/resetIMEI")
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE) })
-	@Validated
 	public AjaxResponse resetIMEI(@NotNull(message = "司机ID不能为空") Integer driverId) {
 
 		logger.info("[ BusDriverInfoController-resetIMEI ] 司机driverId={} 重置imei", driverId);
@@ -217,7 +216,6 @@ public class BusDriverInfoController implements BusFileDownload {
     @MasterSlaveConfigs(configs={
             @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
     } )
-    @Validated
 	public AjaxResponse updateDriverStatus(@NotNull(message = "司机ID不能为空") Integer driverId,
 			@NotNull(message = "司机状态不能为空") @InArray(values = { "0", "1" }, message = "司机状态不在有效范围内") Integer status) {
 
@@ -275,7 +273,6 @@ public class BusDriverInfoController implements BusFileDownload {
 	@RequestMapping(value = "/findDriverInfoByDriverId")
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE) })
-	@Validated
 	public AjaxResponse findDriverInfoByDriverId(@NotNull(message = "司机ID不能为空") Integer driverId) {
 
 		CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(driverId);
@@ -297,8 +294,7 @@ public class BusDriverInfoController implements BusFileDownload {
 	@RequestMapping(value = "/exportDriverList")
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE) })
-	@Validated(BusDriverQueryDTO.Export.class)
-	public void exportDriverList(BusDriverQueryDTO exportDTO, HttpServletRequest request,
+	public void exportDriverList(@Validated(BusDriverQueryDTO.Export.class) BusDriverQueryDTO exportDTO, HttpServletRequest request,
 			HttpServletResponse response) {
 
 		long start = System.currentTimeMillis(); // 获取开始时间
@@ -427,7 +423,6 @@ public class BusDriverInfoController implements BusFileDownload {
     @MasterSlaveConfigs(configs={
             @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
     } )
-    @Validated
 	public AjaxResponse batchInputDriverInfo(@NotNull(message = "请选择城市") Integer cityId,
 			@NotNull(message = "请选择供应商") Integer supplierId, MultipartFile file, HttpServletRequest request,
 			HttpServletResponse response) {

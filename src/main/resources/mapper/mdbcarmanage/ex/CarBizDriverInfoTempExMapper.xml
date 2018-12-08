@@ -931,11 +931,4 @@
 		WHERE license_plates = #{licensePlates}
     </select>
     
-    <!-- 更新司机的加盟类型 -->
-    <update id="updateDriverCooperationTypeBySupplierId" parameterType="java.util.Map">
-		UPDATE car_biz_driver_info_temp
-		set cooperation_type = #{cooperationType}
-		WHERE supplier_id = #{supplierId}
-    </update>
-    
 </mapper>

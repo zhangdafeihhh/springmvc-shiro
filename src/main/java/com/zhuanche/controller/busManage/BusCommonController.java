@@ -26,6 +26,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/bus/common")
+@Validated
 public class BusCommonController {
 
 	@Autowired
@@ -42,7 +43,6 @@ public class BusCommonController {
 	 */
 	@RequestMapping(value = "/changeLogs")
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE))
-	@Validated
 	public AjaxResponse changeLogs(@NotNull(message = "业务类型不能为空") Integer businessType,
 			@NotBlank(message = "业务主键不能为空") String businessKey) {
 		// 一、校验业务类型是否存在
@@ -65,7 +65,6 @@ public class BusCommonController {
 	 */
 	@RequestMapping(value = "/suppliers")
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
-	@Validated
 	public AjaxResponse suppliers(@NotNull(message = "城市ID不能为空") Integer cityId) {
 		List<Map<Object, Object>> suppliers = busCommonService.querySuppliers(cityId);
 		return AjaxResponse.success(suppliers);

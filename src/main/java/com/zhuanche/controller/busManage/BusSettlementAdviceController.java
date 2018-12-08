@@ -20,6 +20,7 @@ import com.zhuanche.serv.busManage.BusSettlementAdviceService;
  */
 @RestController
 @RequestMapping("/bus/settlement")
+@Validated
 public class BusSettlementAdviceController {
 	
 	@Autowired
@@ -27,7 +28,6 @@ public class BusSettlementAdviceController {
 	
 	@RequestMapping(value = "/pageList")
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
-	@Validated
 	public AjaxResponse pageList() {
 		// TODO
 		return AjaxResponse.success(null);
@@ -35,14 +35,12 @@ public class BusSettlementAdviceController {
 	
 	@RequestMapping(value = "/exportList")
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
-	@Validated
 	public void exportList() {
 		// TODO
 	}
 	
 	@RequestMapping(value = "/detail")
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
-	@Validated
 	public AjaxResponse detail() {
 		// TODO
 		return AjaxResponse.success(null);
