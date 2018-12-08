@@ -1,18 +1,12 @@
 package com.zhuanche.controller.busManage;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.zhuanche.common.paging.PageDTO;
-import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.dto.busManage.BusDriverMaidDTO;
-import com.zhuanche.dto.busManage.withdrawalsRecordDTO;
-import com.zhuanche.entity.rentcar.CarBizCity;
-import com.zhuanche.http.HttpClientUtil;
-import com.zhuanche.mongo.DriverMongo;
-import com.zhuanche.serv.CarBizCityService;
-import com.zhuanche.serv.mongo.DriverMongoService;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
@@ -23,8 +17,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.dto.busManage.BusDriverMaidDTO;
+import com.zhuanche.dto.busManage.WithdrawalsRecordDTO;
+import com.zhuanche.entity.rentcar.CarBizCity;
+import com.zhuanche.http.HttpClientUtil;
+import com.zhuanche.mongo.DriverMongo;
+import com.zhuanche.serv.CarBizCityService;
+import com.zhuanche.serv.mongo.DriverMongoService;
 
 /**
  * @program: mp-manage
@@ -111,7 +116,7 @@ public class DriverMaidController {
      * @Date: 2018/12/5
      */
     @RequestMapping("/withdrawalsRecord")
-    public AjaxResponse withdrawalsRecord(withdrawalsRecordDTO dto) {
+    public AjaxResponse withdrawalsRecord(WithdrawalsRecordDTO dto) {
         long start = System.currentTimeMillis();
         Map<String, Object> param = new HashedMap();
         if (StringUtils.isNotBlank(dto.getPhone())) {
@@ -144,7 +149,7 @@ public class DriverMaidController {
     }
 
     @RequestMapping("/queryAccountBalance")
-    public AjaxResponse queryAccountBalance(withdrawalsRecordDTO dto) {
+    public AjaxResponse queryAccountBalance(WithdrawalsRecordDTO dto) {
         long start = System.currentTimeMillis();
         Map<String, Object> param = new HashedMap();
         if (StringUtils.isNotBlank(dto.getPhone())) {
