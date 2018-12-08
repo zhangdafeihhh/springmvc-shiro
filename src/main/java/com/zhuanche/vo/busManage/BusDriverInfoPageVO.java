@@ -13,7 +13,7 @@ import com.alibaba.fastjson.annotation.JSONField;
  */
 /**
  * @ClassName: BusDriverInfoPageVO
- * @Description:TODO
+ * @Description: 
  * @author: yanyunpeng
  * @date: 2018年12月7日 下午5:35:21
  * 
