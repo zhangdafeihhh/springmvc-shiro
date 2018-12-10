@@ -21,8 +21,6 @@ public class BusSupplierQueryDTO extends BaseDTO {
 	@InArray(values = { "1", "0" }, message = "状态不在有效状态范围内")
 	private Integer status;
 
-	// TODO 分佣比例
-
 	// ========================业务字段=========================
 
 	/** 某分佣比例下的供应商ids **/

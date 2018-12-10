@@ -2,6 +2,8 @@ package com.zhuanche.vo.busManage;
 
 import java.math.BigDecimal;
 
+import com.alibaba.fastjson.JSON;
+
 /**
  * @ClassName: BusSupplierInfoVO
  * @Description: 供应商详情
@@ -67,6 +69,12 @@ public class BusSupplierInfoVO {
 
 	/** 税号 **/
 	private String invoiceDutyParagraph;
+
+	/** 供应商基本信息 **/
+	private JSON commissionInfo;
+
+	/** 供应商返佣配置 **/
+	private JSON rebateInfo;
 
 	public Integer getSupplierId() {
 		return supplierId;
@@ -218,6 +226,22 @@ public class BusSupplierInfoVO {
 
 	public void setInvoiceDutyParagraph(String invoiceDutyParagraph) {
 		this.invoiceDutyParagraph = invoiceDutyParagraph;
+	}
+
+	public JSON getCommissionInfo() {
+		return commissionInfo;
+	}
+
+	public void setCommissionInfo(JSON commissionInfo) {
+		this.commissionInfo = commissionInfo;
+	}
+
+	public JSON getRebateInfo() {
+		return rebateInfo;
+	}
+
+	public void setRebateInfo(JSON rebateInfo) {
+		this.rebateInfo = rebateInfo;
 	}
 
 }
