@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.zhuanche.constants.BusConst;
@@ -38,8 +39,7 @@ public class BusSettlementAdviceService implements BusConst {
 	@Autowired
 	private BusCarBizServiceExMapper busCarBizServiceExMapper;
 
-	@Autowired
-	@Qualifier("orderPayTemplate")
-	private MyRestTemplate orderPayTemplate;
+	@Value("${order.pay.url}")
+	private String orderPayUrl;
 
 }
