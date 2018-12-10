@@ -176,7 +176,6 @@
             </list>
         </property>
 	</bean>
-	
 	<!--  风控订单申诉httpclient类   -->
 	<bean id="riskOrderCompalinTemplate" class="com.zhuanche.util.MyRestTemplate">
 		<constructor-arg ref="httpClientFactory" />

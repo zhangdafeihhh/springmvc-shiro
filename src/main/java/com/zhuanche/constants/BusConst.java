@@ -1,6 +1,8 @@
 package com.zhuanche.constants;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -21,8 +23,13 @@ public interface BusConst {
 	DateTimeFormatter FORMATTER_DATE_BY_HYPHEN = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 	// ========================DecimalFormat========================
-	DecimalFormat format = new DecimalFormat("##########.00");
-
+	default String decimalFormat(BigDecimal value) {
+		if (value == null) {
+			return "0.00";
+		}
+		DecimalFormat format = new DecimalFormat("#########0.00");
+		return format.format(value);
+	}
 	// ==========================其它==============================
 	/** 驾照类型 **/
 	String[] DRIVING_LICENSE_TYPES = { "A1", "A2", "A3", "B1", "B2", "C1", "C2", "N", "P" };
@@ -35,7 +42,10 @@ public interface BusConst {
 	 */
 	interface SettlementAdviceRemote{
 		/** 查询供应商的账单 **/
-		String LIST = "/settle/detail/list";
+		String SETTLE_DETAIL_LIST = "/settle/detail/list";
+		
+		/** 查询供应商分佣有关的信息（批量） **/
+		String SETTLE_SUPPLIER_PRORATE_LIST = "/settle/supplier/prorate/list";
 	}
 
 }

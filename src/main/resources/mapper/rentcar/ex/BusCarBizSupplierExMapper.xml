@@ -193,14 +193,14 @@
 				#{item}
 			</foreach>
 		</if>
-		<if test="contractIds != null and contractIds > 0">
+		<if test="contractIds != null and contractIds.size() > 0">
 			AND s.supplier_id IN 
 			<foreach collection="contractIds" item="item" open="("
 				separator="," close=")">
 				#{item}
 			</foreach>
 		</if>
-		<if test="excludeContractIds != null and excludeContractIds > 0">
+		<if test="excludeContractIds != null and excludeContractIds.size() > 0">
 			AND s.supplier_id NOT IN 
 			<foreach collection="excludeContractIds" item="item" open="("
 				separator="," close=")">
