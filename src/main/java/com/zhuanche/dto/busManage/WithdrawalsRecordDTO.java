@@ -3,8 +3,6 @@ package com.zhuanche.dto.busManage;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.zhuanche.dto.BaseDTO;
 
-import java.math.BigDecimal;
-
 /**
  * @program: car-manage
  * @description:自营司机提现记录
@@ -12,7 +10,7 @@ import java.math.BigDecimal;
  * @create: 2018-10-09 18:42
  **/
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class withdrawalsRecordDTO extends BaseDTO {
+public class WithdrawalsRecordDTO extends BaseDTO {
     private String phone;
     private String startDate;
     private String endDate;

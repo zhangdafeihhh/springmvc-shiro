@@ -2,8 +2,6 @@ package com.zhuanche.dto.busManage;
 
 import com.zhuanche.dto.BaseDTO;
 
-import java.io.Serializable;
-
 /**
  * @program: mp-manage
  * @description: 巴士司机分佣扩展类

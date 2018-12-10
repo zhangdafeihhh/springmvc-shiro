@@ -14,11 +14,11 @@ public class BusConstant {
     }
     public interface DriverMaidConstant{
         String MAID_FILE_NAME="分佣明细";
-        String MAID_EXPORT_HEAD="订单号,城市名称,手机号,结算时间,订单总金额,预付金额,代收金额,高速费,停车费,抽佣比例（%）,司机实际收入";
+        String MAID_EXPORT_HEAD="订单号,城市名称,手机号,结算时间,订单总金额,预付金额,代收金额,高速费,停车费,住宿费,餐饮费,抽佣比例（%）,司机实际收入";
         String DRAW_FILE_NAME="提现记录";
-        String DRAW_EXPORT_HEAD="手机号,城市名称,结算时间,到账金额,银行卡号,银行名称";
+        String DRAW_EXPORT_HEAD="账户名称,手机号,城市名称,结算时间,到账金额,银行卡号,银行名称";
         String ACCOUNT_FILE_NAME="账户余额";
-        String ACCOUNT_EXPORT_HEAD="手机号,城市名称,可提现金额,冻结金额,累计提现";
+        String ACCOUNT_EXPORT_HEAD="账户名称,手机号,城市名称,可提现金额,冻结金额,累计提现";
     }
 
 

@@ -2,6 +2,7 @@ package com.zhuanche.entity.busManage;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.google.protobuf.StringValue;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
@@ -49,7 +50,7 @@ public class MaidListEntity {
     /**
      * 分佣比例，例：百分之二十，如20
      */
-    private BigDecimal settleRatio;
+    private Double settleRatio;
     /**
      * 分佣结果
      */
@@ -118,11 +119,11 @@ public class MaidListEntity {
         this.settleDate = settleDate;
     }
 
-    public BigDecimal getSettleRatio() {
+    public Double getSettleRatio() {
         return settleRatio;
     }
 
-    public void setSettleRatio(BigDecimal settleRatio) {
+    public void setSettleRatio(Double settleRatio) {
         this.settleRatio = settleRatio;
     }
 
@@ -182,19 +183,5 @@ public class MaidListEntity {
         this.orderId = orderId;
     }
 
-    @Override
-    public String toString() {
-        if (orderDetail != null) {
-            setOrderDetailJSON(JSONObject.parseObject(orderDetail, MaidOrderEntity.class));
-            if (orderDetailJSON.getOrderAmount() != null && orderDetailJSON.getPrePayAmount() != null) {
-                orderDetailJSON.setSettleAmount(orderDetailJSON.getOrderAmount().subtract(orderDetailJSON.getPrePayAmount()));
-            }
-        }
 
-        return StringUtils.defaultString(orderNo) + "," + cityName + ",\t" + phone + ",\t" + settleDate + ","
-                + orderDetailJSON.getOrderAmount() + "," + orderDetailJSON.getPrePayAmount() + ","
-                + orderDetailJSON.getSettleAmount() + "," + orderDetailJSON.getHighWayFee() + ","
-                + orderDetailJSON.getParkFee() + "," + orderDetailJSON.getSettleRatio() + ","
-                + settleAmount;
-    }
 }

@@ -3337,5 +3337,24 @@ public class CarBizDriverInfoService {
         }
 
     }
+    
+	/**
+	 * @Title: updateDriverCooperationTypeBySupplierId
+	 * @Description: 更新司机的加盟类型
+	 * @param supplierId
+	 * @param cooperationType 
+	 * @return void
+	 * @throws
+	 */
+	public void updateDriverCooperationTypeBySupplierId(Integer supplierId,Integer cooperationType){
+		// 更新mongo
+		driverMongoService.updateDriverCooperationTypeBySupplierId(supplierId, cooperationType);
+		
+		// 更新司机表
+		Map<String, Object> map = new HashMap<>();
+		map.put("supplierId", supplierId);
+		map.put("cooperationType", cooperationType);
+		carBizDriverInfoExMapper.updateDriverCooperationTypeBySupplierId(map);
+	}
 
 }

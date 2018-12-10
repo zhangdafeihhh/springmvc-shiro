@@ -930,4 +930,5 @@
 		FROM car_biz_car_info_temp car
 		WHERE license_plates = #{licensePlates}
     </select>
+    
 </mapper>
