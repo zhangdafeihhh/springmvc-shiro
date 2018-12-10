@@ -1,8 +1,6 @@
 package com.zhuanche.serv.busManage;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -17,10 +15,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
@@ -34,6 +35,7 @@ import com.zhuanche.dto.busManage.BusSupplierBaseDTO;
 import com.zhuanche.dto.busManage.BusSupplierDetailDTO;
 import com.zhuanche.dto.busManage.BusSupplierQueryDTO;
 import com.zhuanche.entity.mdbcarmanage.BusBizSupplierDetail;
+import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.CarBizDriverInfoService;
 import com.zhuanche.serv.mdbcarmanage.CarBizDriverInfoTempService;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -53,7 +55,7 @@ import mapper.rentcar.ex.BusCarBizSupplierExMapper;
 public class BusSupplierService implements BusConst {
 
 	private static final Logger logger = LoggerFactory.getLogger(BusSupplierService.class);
-
+	
 	// ===========================表基础mapper==================================
 	@Autowired
 	private CarBizCityMapper carBizCityMapper;
@@ -90,6 +92,8 @@ public class BusSupplierService implements BusConst {
 	// ===============================专车其它服务===================================
 
 	// ===============================巴士其它服务===================================
+	@Value("${order.pay.url}")
+	private String orderPayUrl;
 
 	/**
 	 * @Title: saveSupplierInfo
@@ -186,19 +190,19 @@ public class BusSupplierService implements BusConst {
 		queryDTO.setAuthOfSupplier(permOfSupplier);
 		queryDTO.setAuthOfTeam(permOfTeam);
 		
-		// 二、查询快合同快到期供应商
+		// 一、查询快合同快到期供应商
 		Map<Object,Object> param = new HashMap<>();
 		param.put("permOfSupplier", permOfSupplier);
 		List<BusSupplierPageVO> contractList = busBizSupplierDetailExMapper.querySupplierContractExpireSoonList(param);
 		List<Integer> contractIds = new ArrayList<>();
 		contractList.forEach(e -> contractIds.add(e.getSupplierId()));
 		
-		// 三、所有快到期的供应商的基础信息
+		// 二、所有快到期的供应商的基础信息
 		queryDTO.setContractIds(contractIds);
 		List<BusSupplierPageVO> contractSuppliers = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
 		int offset = (Math.max(pageNum, 1) - 1) * pageSize;
 		int limit = offset + pageSize;
-		// 四、封装结果集
+		// 三、封装结果集
 		List<BusSupplierPageVO> resultList = new ArrayList<>();
 		if (offset > contractSuppliers.size()) {
 			queryDTO.setContractIds(null);
@@ -251,8 +255,9 @@ public class BusSupplierService implements BusConst {
 			}
 		}
 		
-		// 五、补充分佣信息(分佣比例、是否有返点)
-		// TODO
+		// 四、补充分佣信息(分佣比例、是否有返点)
+		completeCommissionInfo(resultList);
+		
 		return resultList;
 	}
 
@@ -274,6 +279,39 @@ public class BusSupplierService implements BusConst {
 
 		// 返回补充的信息
 		BeanUtils.copyProperties(detail, t);
+	}
+	
+	private void completeCommissionInfo(List<BusSupplierPageVO> resultList) {
+		
+		String supplierIds = StringUtils.join(resultList.stream().map(e -> e.getSupplierId()).collect(Collectors.toList()), ",");;
+		if (StringUtils.isNotBlank(supplierIds)) {
+			Map<String, Object> params = new HashMap<>();
+			params.put("supplierIds", supplierIds);
+			try {
+				logger.info("[ BusSupplierService-completeCommissionInfo ] 补充分佣信息(分佣比例、是否有返点)异常,params={}", params);
+				JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + SettlementRemote.SETTLE_SUPPLIER_PRORATE_LIST, params , 2000, "查询供应商分佣信息（分佣比例、是否有返点）");
+				if (result.getIntValue("code") == 0) {
+					JSONArray jsonArray = result.getJSONArray("data");
+					// 组装数据
+					resultList.forEach(supplier -> {
+						// 查找对应供应商数据
+						Integer supplierId = supplier.getSupplierId();
+						jsonArray.stream().filter(e -> {
+							JSONObject jsonObject = (JSONObject) JSON.toJSON(e);
+							return supplierId.equals(jsonObject.getInteger("supplierId"));
+						}).findFirst().ifPresent(e -> {
+							JSONObject jsonObject = (JSONObject) JSON.toJSON(e);
+							supplier.setSupplierRate(jsonObject.getDouble("supplierRate"));
+							supplier.setIsRebate(jsonObject.getInteger("isRebate"));
+						});
+					});
+				} else {
+					logger.info("[ BusSupplierService-completeCommissionInfo ] 补充分佣信息(分佣比例、是否有返点)调用接口出错,params={},errorMsg={}", params, result.getString("msg"));
+				}
+			} catch (Exception e) {
+				logger.error("[ BusSupplierService-completeCommissionInfo ] 补充分佣信息(分佣比例、是否有返点)异常,params={},errorMsg={}", params, e.getMessage(), e);
+			}
+		}
 	}
 
 	/**
@@ -300,14 +338,42 @@ public class BusSupplierService implements BusConst {
 	 */
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE))
 	public List<String> completeSupplierExportList(List<BusSupplierExportVO> list) {
-//		供应商,城市 ,分佣比例,加盟费,保证金,是否有返点,合同开始时间,合同到期时间,状态
-		
 		// 返回结果
 		List<String> csvDataList = new ArrayList<>();
 		if (list == null || list.isEmpty()) {
 			return csvDataList;
 		}
-	
+		// 补充分佣信息(分佣比例、是否有返点)
+		String supplierIds = StringUtils.join(list.stream().map(e -> e.getSupplierId()).collect(Collectors.toList()), ",");;
+		if (StringUtils.isNotBlank(supplierIds)) {
+			Map<String, Object> params = new HashMap<>();
+			params.put("supplierIds", supplierIds);
+			try {
+				logger.info("[ BusSupplierService-completeSupplierExportList ] 补充分佣信息(分佣比例、是否有返点)异常,params={}", params);
+				JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + SettlementRemote.SETTLE_SUPPLIER_PRORATE_LIST, params , 2000, "查询供应商分佣信息（分佣比例、是否有返点）");
+				if (result.getIntValue("code") == 0) {
+					JSONArray jsonArray = result.getJSONArray("data");
+					// 组装数据
+					list.forEach(supplier -> {
+						// 查找对应供应商数据
+						Integer supplierId = supplier.getSupplierId();
+						jsonArray.stream().filter(e -> {
+							JSONObject jsonObject = (JSONObject) JSON.toJSON(e);
+							return supplierId.equals(jsonObject.getInteger("supplierId"));
+						}).findFirst().ifPresent(e -> {
+							JSONObject jsonObject = (JSONObject) JSON.toJSON(e);
+							supplier.setSupplierRate(jsonObject.getDouble("supplierRate"));
+							supplier.setIsRebate(jsonObject.getInteger("isRebate"));
+						});
+					});
+				} else {
+					logger.info("[ BusSupplierService-completeSupplierExportList ] 补充分佣信息(分佣比例、是否有返点)调用接口出错,params={},errorMsg={}", params, result.getString("msg"));
+				}
+			} catch (Exception e) {
+				logger.error("[ BusSupplierService-completeSupplierExportList ] 补充分佣信息(分佣比例、是否有返点)异常,params={},errorMsg={}", params, e.getMessage(), e);
+			}
+		}
+		
 		list.forEach(supplier -> {
 			/** 行数据 */
 			StringBuilder builder = new StringBuilder();
@@ -322,28 +388,26 @@ public class BusSupplierService implements BusConst {
 			builder.append(StringUtils.defaultIfBlank(ciytName, "")).append(",");
 	
 			// 三、分佣比例
-			// TODO
-			String rate = "";
-			builder.append(StringUtils.defaultIfBlank(rate, "")).append(",");
+			Double supplierRate = supplier.getSupplierRate();
+			builder.append(supplierRate).append(",");
 	
 			// 四、加盟费
 			BigDecimal franchiseFee = detail.getFranchiseFee();
-			builder.append(franchiseFee == null ? "0.00" : format.format(franchiseFee)).append(",");
+			builder.append(decimalFormat(franchiseFee)).append(",");
 	
 			// 五、保证金
 			BigDecimal deposit = detail.getDeposit();
-			builder.append(deposit == null ? "0.00" : format.format(deposit)).append(",");
+			builder.append(decimalFormat(deposit)).append(",");
 	
 			// 六、是否有返点
-			// TODO
-			String isHas = "";
-			builder.append(StringUtils.defaultIfBlank(isHas, "")).append(",");
+			String isRebate = supplier.getIsRebate() == 0 ? "不返点" : "返点";
+			builder.append(isRebate).append(",");
 	
 			// 七、合同开始时间
 			Date contractDateStart = detail.getContractDateStart();
 			String contractDateStartFormatter = "";
 			if (contractDateStart != null) {
-				contractDateStartFormatter = FORMATTER_DATE_BY_HYPHEN.format(LocalDateTime.ofInstant(contractDateStart.toInstant(), ZoneId.systemDefault()));
+				contractDateStartFormatter = formatDate(FORMATTER_DATE_BY_HYPHEN, contractDateStart);
 			}
 			builder.append(StringUtils.defaultIfBlank(contractDateStartFormatter, "")).append(",");
 	
@@ -351,13 +415,13 @@ public class BusSupplierService implements BusConst {
 			Date contractDateEnd = detail.getContractDateEnd();
 			String contractDateEndFormatter = "";
 			if (contractDateEnd != null) {
-				contractDateEndFormatter = FORMATTER_DATE_BY_HYPHEN.format(LocalDateTime.ofInstant(contractDateEnd.toInstant(), ZoneId.systemDefault()));
+				contractDateEndFormatter = formatDate(FORMATTER_DATE_BY_HYPHEN, contractDateEnd);
 			}
 			builder.append(StringUtils.defaultIfBlank(contractDateEndFormatter, "")).append(",");
 	
 			// 九、状态
 			String status = supplier.getStatus() == 1 ? "有效" : "无效";
-			builder.append(StringUtils.defaultIfBlank(status, "")).append(",");
+			builder.append(status).append(",");
 	
 			csvDataList.add(builder.toString());
 		});
@@ -378,9 +442,13 @@ public class BusSupplierService implements BusConst {
 		// 二、查询巴士供应商其它信息
 		completeDetailInfo(supplierVO);
 
-		// 三、调用分佣接口，修改分佣、返点信息 TODO
+		// 三、调用分佣接口，修改分佣、返点信息
+//		Map<String, Object> params = new HashMap<>();
+//		params.put("supplierIds", supplierIds);
+//		logger.info("[ BusSupplierService-completeSupplierExportList ] 补充分佣信息(分佣比例、是否有返点)异常,params={}", params);
+//		JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + SettlementAdviceRemote.SETTLE_SUPPLIER_PRORATE_LIST, params , 2000, "查询供应商分佣信息（分佣比例、是否有返点）");
 
-		return null;
+		return supplierVO;
 	}
 
 }

@@ -2,8 +2,10 @@ package com.zhuanche.constants;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 /**
  * @ClassName: BusConst
@@ -21,13 +23,21 @@ public interface BusConst {
 
 	// ========================日期格式化器========================
 	DateTimeFormatter FORMATTER_DATE_BY_HYPHEN = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	
+	default String formatDate(DateTimeFormatter formatter, Date date) {
+		if (formatter == null || date == null) {
+			return "";
+		}
+		return formatter.format(LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()));
+	}
 
 	// ========================DecimalFormat========================
+    DecimalFormat format = new DecimalFormat("##########.00");
+
 	default String decimalFormat(BigDecimal value) {
 		if (value == null) {
 			return "0.00";
 		}
-		DecimalFormat format = new DecimalFormat("#########0.00");
 		return format.format(value);
 	}
 	// ==========================其它==============================
@@ -40,12 +50,18 @@ public interface BusConst {
 	 * @author: yanyunpeng
 	 * @date:   2018年12月7日 上午11:37:41
 	 */
-	interface SettlementAdviceRemote{
-		/** 查询供应商的账单 **/
-		String SETTLE_DETAIL_LIST = "/settle/detail/list";
+	interface SettlementRemote {
+		/** 供应商基本信息查询 **/
+		String SETTLE_SUPPLIER_INFO = "/settle/supplier/info";
 		
+		/** 查找供应商返佣配置 **/
+		String SETTLE_SUPPLIER_REBATE_INFO = "/settle/supplier/rebate/info";
+
 		/** 查询供应商分佣有关的信息（批量） **/
 		String SETTLE_SUPPLIER_PRORATE_LIST = "/settle/supplier/prorate/list";
+
+		/** 查询供应商的账单 **/
+		String SETTLE_DETAIL_LIST = "/settle/detail/list";
 	}
 
 }
