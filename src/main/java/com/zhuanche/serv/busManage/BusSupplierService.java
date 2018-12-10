@@ -183,23 +183,17 @@ public class BusSupplierService implements BusConst {
 		queryDTO.setAuthOfSupplier(permOfSupplier);
 		queryDTO.setAuthOfTeam(permOfTeam);
 		
-		// 一、TODO 调用分佣接口返回ids
-		List<Integer> commissionIds = new ArrayList<>();
-		if (false) {
-			commissionIds = null;
-		}
 		// 二、查询快合同快到期供应商
 		Map<Object,Object> param = new HashMap<>();
-		param.put("commissionIds", commissionIds);
+		param.put("permOfSupplier", permOfSupplier);
 		List<BusSupplierPageVO> contractList = busBizSupplierDetailExMapper.querySupplierContractExpireSoonList(param);
 		List<Integer> contractIds = new ArrayList<>();
 		contractList.forEach(e -> contractIds.add(e.getSupplierId()));
 		
 		// 三、所有快到期的供应商的基础信息
-		queryDTO.setCommissionIds(commissionIds);
 		queryDTO.setContractIds(contractIds);
 		List<BusSupplierPageVO> contractSuppliers = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
-		int offset = Math.max(pageNum, 1) - 1 * pageSize;
+		int offset = (Math.max(pageNum, 1) - 1) * pageSize;
 		int limit = offset + pageSize;
 		// 四、封装结果集
 		List<BusSupplierPageVO> resultList = new ArrayList<>();
