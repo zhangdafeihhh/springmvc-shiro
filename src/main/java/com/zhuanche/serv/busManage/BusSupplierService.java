@@ -42,6 +42,7 @@ import com.zhuanche.vo.busManage.BusSupplierInfoVO;
 import com.zhuanche.vo.busManage.BusSupplierPageVO;
 
 import mapper.mdbcarmanage.CarAdmUserMapper;
+import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
 import mapper.mdbcarmanage.ex.BusBizSupplierDetailExMapper;
 import mapper.rentcar.CarBizCityMapper;
 import mapper.rentcar.CarBizCooperationTypeMapper;
@@ -83,6 +84,8 @@ public class BusSupplierService implements BusConst {
 	private CarBizDriverInfoTempService carBizDriverInfoTempService;
 
 	// ===========================巴士业务拓展service==================================
+	@Autowired
+	private BusBizChangeLogService busBizChangeLogService;
 
 	// ===============================专车其它服务===================================
 
@@ -138,7 +141,7 @@ public class BusSupplierService implements BusConst {
 		// 四、调用分佣接口，修改分佣、返点信息  TODO
 
 		// 五、保存操作记录
-		// TODO
+		busBizChangeLogService.insertLog(BusinessType.SUPPLIER, String.valueOf(supplierId), new Date());
 		
 		// 六、MQ消息写入 供应商
 		try {

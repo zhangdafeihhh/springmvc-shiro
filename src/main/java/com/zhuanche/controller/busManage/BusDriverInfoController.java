@@ -5,6 +5,7 @@ import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,13 +33,13 @@ import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.common.web.datavalidate.custom.InArray;
 import com.zhuanche.dto.busManage.BusDriverQueryDTO;
 import com.zhuanche.dto.busManage.BusDriverSaveDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.serv.CarBizDriverInfoDetailService;
 import com.zhuanche.serv.CarBizDriverInfoService;
+import com.zhuanche.serv.busManage.BusBizChangeLogService;
 import com.zhuanche.serv.busManage.BusCarBizDriverInfoService;
 import com.zhuanche.serv.busManage.BusCarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -47,6 +48,8 @@ import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.vo.busManage.BusDriverDetailInfoVO;
 import com.zhuanche.vo.busManage.BusDriverInfoExportVO;
 import com.zhuanche.vo.busManage.BusDriverInfoPageVO;
+
+import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
 
 @RestController
 @RequestMapping("/bus/driverInfo")
@@ -63,6 +66,9 @@ public class BusDriverInfoController extends BusBaseController {
 	private CarBizDriverInfoDetailService carBizDriverInfoDetailService;
 
 	// ===========================巴士业务拓展service==================================
+	@Autowired
+	private BusBizChangeLogService busBizChangeLogService;
+	
 	@Autowired
 	private BusCarBizDriverInfoService busCarBizDriverInfoService;
 
@@ -199,7 +205,7 @@ public class BusDriverInfoController extends BusBaseController {
 		if (carBizDriverInfo == null) {
 			return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
 		}
-		carBizDriverInfoService.resetIMEI(driverId);
+		busCarBizDriverInfoService.resetIMEI(driverId);
 		return AjaxResponse.success(null);
 	}
 	
@@ -213,10 +219,9 @@ public class BusDriverInfoController extends BusBaseController {
     @MasterSlaveConfigs(configs={
             @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
     } )
-	public AjaxResponse updateDriverStatus(@NotNull(message = "司机ID不能为空") Integer driverId,
-			@NotNull(message = "司机状态不能为空") @InArray(values = { "0", "1" }, message = "司机状态不在有效范围内") Integer status) {
+	public AjaxResponse updateDriverStatus(@NotNull(message = "司机ID不能为空") Integer driverId) {
 
-        logger.info("[ BusDriverInfoController-updateDriverStatus ] 司机driverId={} 状态置为status={}", driverId, status);
+        logger.info("[ BusDriverInfoController-updateDriverStatus ] 司机driverId={} 状态置为无效", driverId);
         CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(driverId);
         if(carBizDriverInfo==null){
             return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
@@ -232,7 +237,7 @@ public class BusDriverInfoController extends BusBaseController {
             // 调用接口清除，key
             carBizDriverInfoService.flashDriverInfo(driverId);
         } catch (Exception e) {
-            logger.error("[ BusDriverInfoController-updateDriverStatus ] 司机driverId={} 状态置为status={},调用清除接口异常={}", driverId, status, e.getMessage(), e);
+            logger.error("[ BusDriverInfoController-updateDriverStatus ] 司机driverId={} 状态置为无效,调用清除接口异常={}", driverId, e.getMessage(), e);
         }
         // 获取当前用户Id
         carBizDriverInfo.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
@@ -245,17 +250,19 @@ public class BusDriverInfoController extends BusBaseController {
         try {
             rtn = busCarBizDriverInfoService.updateDriverByXiao(driverSaveDTO);
         } catch (Exception e) {
-           logger.error("[ BusDriverInfoController-updateDriverStatus ] 司机driverId={},状态置为status={},释放车辆资源error={}", driverId, status, e.getMessage(), e);
+           logger.error("[ BusDriverInfoController-updateDriverStatus ] 司机driverId={},状态置为无效,释放车辆资源error={}", driverId, e.getMessage(), e);
         }
         if (rtn == 0) {
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
+        // 创建操作记录
+        busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId), new Date());
         try {
             // 查询城市名称，供应商名称，服务类型，加盟类型
         	busCarBizDriverInfoService.getBaseStatis(driverSaveDTO);
         	busCarBizDriverInfoService.sendDriverToMq(driverSaveDTO, "DELETE");
         } catch (Exception e) {
-            logger.error("[ BusDriverInfoController-updateDriverStatus ] 司机driverId={},状态置为status={},发MQ出现error={}", driverId, status, e.getMessage(), e);
+            logger.error("[ BusDriverInfoController-updateDriverStatus ] 司机driverId={},状态置为,发MQ出现error={}", driverId, e.getMessage(), e);
         }
         return AjaxResponse.success(null);
     }

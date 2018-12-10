@@ -3,6 +3,8 @@ package mapper.mdbcarmanage.ex;
 import java.util.List;
 import java.util.Map;
 
+import com.zhuanche.entity.mdbcarmanage.BusBizChangeLog;
+
 /**
  * @ClassName: BusBizChangeLogExMapper
  * @Description: 操作日志
@@ -36,10 +38,10 @@ public interface BusBizChangeLogExMapper {
 			this.businessType = businessType;
 			this.businessKeyNote = businessKeyNote;
 		}
-		public Integer getBusinessType() {
+		public Integer businessType() {
 			return businessType;
 		}
-		public String getBusinessKeyNote() {
+		public String businessKeyNote() {
 			return businessKeyNote;
 		}
 		/** 业务类型是否存在 **/
@@ -62,5 +64,15 @@ public interface BusBizChangeLogExMapper {
 	 * @throws
 	 */
 	List<Map<Object, Object>> queryRecnetlyChangeLogs(Map<String, Object> param);
+
+	/**
+	 * @Title: insertLog
+	 * @Description: 保存操作
+	 * @param log
+	 * @return 
+	 * @return int
+	 * @throws
+	 */
+	int insertLog(BusBizChangeLog log);
 	
 }

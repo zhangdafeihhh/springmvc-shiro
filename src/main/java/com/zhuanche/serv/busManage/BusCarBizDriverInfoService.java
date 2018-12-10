@@ -76,6 +76,7 @@ import com.zhuanche.vo.busManage.BusDriverInfoPageVO;
 import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.mdbcarmanage.CarRelateGroupMapper;
 import mapper.mdbcarmanage.CarRelateTeamMapper;
+import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
 import mapper.mdbcarmanage.ex.CarBizAgreementCompanyExMapper;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.mdbcarmanage.ex.CarRelateGroupExMapper;
@@ -176,6 +177,8 @@ public class BusCarBizDriverInfoService implements BusConst{
 	private CarBizChatUserService carBizChatUserService;
 
 	// ===========================巴士业务拓展service==================================
+	@Autowired
+	private BusBizChangeLogService busBizChangeLogService;
 
 	// ===============================专车其它服务===================================
 	@Autowired
@@ -186,8 +189,12 @@ public class BusCarBizDriverInfoService implements BusConst{
 	private BusDriverMongoService busDriverMongoService;
 
 	/**
-	 * @Title: queryDriverList @Description: 分页查询司机信息列表
-	 * 数据量较大的表不做表关联查询，单表查询组装数据 @param queryDTO @return List<BusDriverInfoVO> @throws
+	 * @Title: queryDriverList 
+	 * @Description: 分页查询司机信息列表
+	 * 数据量较大的表不做表关联查询，单表查询组装数据
+	 * @param queryDTO 
+	 * @return List<BusDriverInfoVO> 
+	 * @throws
 	 */
 	public List<BusDriverInfoPageVO> queryDriverPageList(BusDriverQueryDTO queryDTO) {
 
@@ -470,7 +477,8 @@ public class BusCarBizDriverInfoService implements BusConst{
 		busCarBizDriverInfoExMapper.updateBusDriverInfo(saveDTO);
 		int id = saveDTO.getDriverId();
 
-		// TODO 创建操作记录
+		// 创建操作记录
+		busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(id), saveDTO.getUpdateDate());
 
 		// 司机信息扩展表，司机银行卡号
 		CarBizDriverInfoDetailDTO infoDetail = carBizDriverInfoDetailService.selectByDriverId(saveDTO.getDriverId());
@@ -660,7 +668,8 @@ public class BusCarBizDriverInfoService implements BusConst{
 		busCarBizDriverInfoExMapper.insertBusDriverInfo(saveDTO);
 		int driverId = saveDTO.getDriverId();
 
-		// TODO 创建操作记录
+		// 创建操作记录
+		busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId), saveDTO.getUpdateDate());
 
 		// 司机信息扩展表，司机银行卡号
 		CarBizDriverInfoDetail carBizDriverInfoDetail = new CarBizDriverInfoDetail();
@@ -1250,6 +1259,19 @@ public class BusCarBizDriverInfoService implements BusConst{
 			}
 		}
 		return average;
+	}
+	
+	/**
+	 * @Title: resetIMEI
+	 * @Description: 重置imei
+	 * @param driverId 
+	 * @return void
+	 * @throws
+	 */
+	public int resetIMEI(Integer driverId) {
+		// 创建操作记录
+		busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId), new Date());
+		return carBizDriverInfoExMapper.resetIMEI(driverId);
 	}
 
 }
