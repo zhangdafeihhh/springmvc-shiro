@@ -164,8 +164,6 @@ public class BusDriverInfoController implements BusFileDownload {
 			}
 		}
 
-		// TODO 创建操作记录
-		
 		if (driverId != null) {
 			logger.info("[ BusDriverInfoController-saveDriver ] 操作方式：编辑");
 			// 司机获取派单的接口，是否可以修改

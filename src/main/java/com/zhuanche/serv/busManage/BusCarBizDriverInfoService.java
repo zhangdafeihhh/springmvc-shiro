@@ -95,7 +95,7 @@ import net.sf.json.JSONObject;
 
 /**
  * @ClassName:  BusCarBizDriverInfoService
- * @Description:TODO
+ * @Description:
  * @author: yanyunpeng
  * @date:   2018年12月7日 下午7:17:15
  * 
@@ -400,6 +400,7 @@ public class BusCarBizDriverInfoService implements BusConst{
 			// 更新司机信息
 			DynamicRoutingDataSource.setMasterSlave("rentcar-DataSource", DataSourceMode.MASTER);
 			int n = this.updateDriverInfo(saveDTO);
+
 			// 更新车辆信息 根据 车牌号更新车辆 信息（更换车辆所属人）
 			if (n > 0) {
 				logger.info("****************根据 车牌号更新车辆 信息（更换车辆所属人）");
@@ -468,6 +469,8 @@ public class BusCarBizDriverInfoService implements BusConst{
 		// 司机基础信息表
 		busCarBizDriverInfoExMapper.updateBusDriverInfo(saveDTO);
 		int id = saveDTO.getDriverId();
+
+		// TODO 创建操作记录
 
 		// 司机信息扩展表，司机银行卡号
 		CarBizDriverInfoDetailDTO infoDetail = carBizDriverInfoDetailService.selectByDriverId(saveDTO.getDriverId());
@@ -656,6 +659,8 @@ public class BusCarBizDriverInfoService implements BusConst{
 		
 		busCarBizDriverInfoExMapper.insertBusDriverInfo(saveDTO);
 		int driverId = saveDTO.getDriverId();
+
+		// TODO 创建操作记录
 
 		// 司机信息扩展表，司机银行卡号
 		CarBizDriverInfoDetail carBizDriverInfoDetail = new CarBizDriverInfoDetail();
