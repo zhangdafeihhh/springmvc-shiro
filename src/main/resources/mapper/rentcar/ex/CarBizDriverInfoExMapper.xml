@@ -1548,7 +1548,7 @@
         and  i.supplier_id = #{supplierId,jdbcType=INTEGER}
       </if>
       <if test="name!=null and name!=''">
-        and i.name  = #{driverName}
+        and i.name  = #{name}
       </if>
     </where>
     order by driver_id desc
