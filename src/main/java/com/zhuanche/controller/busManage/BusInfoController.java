@@ -122,6 +122,9 @@ public class BusInfoController {
     }
 
     @RequestMapping(value = "/saveCar", method = RequestMethod.POST)
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     public AjaxResponse saveCar(@Verify(param = "carId", rule = "") Integer carId, @Verify(param = "cityId", rule = "") Integer cityId,
                                 @Verify(param = "supplierId", rule = "") Integer supplierId,
                                 @Verify(param = "licensePlates", rule = "required") String licensePlates,
@@ -182,11 +185,17 @@ public class BusInfoController {
             //保存车辆信息
             logger.info(LOG_PRE + " 新增车辆" + JSON.toJSONString(carInfo));
             saveResult = busInfoService.saveCar(carInfo);
-            carId = carInfo.getCarId();
+            if(saveResult>0){
+               busInfoService.saveCar2MongoDB(carInfo);
+                carId = carInfo.getCarId();
+            }
         } else {
             //更新车辆信息
             logger.info(LOG_PRE + currentLoginUser.getName() + " 修改车辆信息" + JSON.toJSONString(carInfo));
             saveResult = busInfoService.updateCarById(carInfo);
+            if(saveResult>0){
+                busInfoService.update2mongoDB(carInfo);
+            }
         }
         if (saveResult > 0) {
             logger.info(LOG_PRE + currentLoginUser.getName() + "操作成功");
@@ -198,9 +207,7 @@ public class BusInfoController {
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
     }
-    @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
-    })
+
     private void saveCarLog(String carId){
         // 创建操作记录
         try {
@@ -313,6 +320,9 @@ public class BusInfoController {
      * @Date: 2018/11/28
      */
     @RequestMapping("/importBusInfo")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     public AjaxResponse importBusInfo(@Verify(param = "cityId", rule = "request") Integer cityId,
                                       @Verify(param = "supplierId", rule = "request") Integer supplierId,
                                       MultipartFile file) throws Exception {
@@ -512,6 +522,7 @@ public class BusInfoController {
                 int saveResult = busInfoService.saveCar(carInfo);
                 if (saveResult > 0) {
                     saveCarLog(String.valueOf(carInfo.getCarId()));
+                    busInfoService.saveCar2MongoDB(carInfo);
                     successCount++;
                 }
             }

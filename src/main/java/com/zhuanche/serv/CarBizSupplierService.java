@@ -61,9 +61,6 @@ public class CarBizSupplierService{
 	 * @param supplierId
 	 * @return
 	 */
-	@MasterSlaveConfigs(configs={
-			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-	} )
 	public String getSupplierNameById(Integer supplierId){
 		return carBizSupplierExMapper.getSupplierNameById(supplierId);
 	}

@@ -191,6 +191,9 @@ public class DriverMaidController {
      * @Date: 2018/12/5
      */
     @RequestMapping("/withdrawalsRecord")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     public AjaxResponse withdrawalsRecord(WithdrawalsRecordDTO dto) {
         long start = System.currentTimeMillis();
         Map<String, Object> param = new HashedMap();
@@ -216,6 +219,9 @@ public class DriverMaidController {
     }
 
     @RequestMapping("/queryAccountBalance")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     public AjaxResponse queryAccountBalance(WithdrawalsRecordDTO dto) {
         long start = System.currentTimeMillis();
         Map<String, Object> param = new HashedMap();
@@ -289,6 +295,9 @@ public class DriverMaidController {
      * @Date: 2018/12/10
      */
     @RequestMapping("/exportMaidData")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     public void exportMaidData(HttpServletRequest request, BusDriverMaidDTO dto, HttpServletResponse response) throws Exception {
         long start = System.currentTimeMillis();
         logger.info(LOG_PRE + "导出分佣明细参数=" + JSON.toJSONString(dto));
@@ -346,6 +355,9 @@ public class DriverMaidController {
      * @Date: 2018/12/10
      */
     @RequestMapping("/exportWithdrawalsData")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     public void exportWithdrawalsData(HttpServletRequest request, WithdrawalsRecordDTO dto, HttpServletResponse response) throws Exception {
         long start = System.currentTimeMillis();
         logger.info(LOG_PRE + "导出提现记录参数=" + JSON.toJSONString(dto));
@@ -411,6 +423,9 @@ public class DriverMaidController {
      * @Date: 2018/12/10
      */
     @RequestMapping("/exportAccBalnce")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     public void exportAccBalnce(HttpServletRequest request, WithdrawalsRecordDTO dto, HttpServletResponse response) throws Exception {
         long start = System.currentTimeMillis();
         logger.info(LOG_PRE + "导出账户余额=" + JSON.toJSONString(dto));
@@ -488,9 +503,6 @@ public class DriverMaidController {
      * @param array
      * @return
      */
-    @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
-    })
     private Map<Integer, CarBizCity> queryCity(JSONArray array) {
         if (array == null || array.size() == 0) {
             return new HashMap<Integer, CarBizCity>(0);

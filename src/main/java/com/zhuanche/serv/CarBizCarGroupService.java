@@ -86,9 +86,6 @@ public class CarBizCarGroupService {
      * @param
      * @return
      */
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-    } )
     public boolean groupIfExist(Integer groupId){
         int result = carBizCarGroupExMapper.countByGroupId(groupId);
         if(result >0 ){
