@@ -3,12 +3,12 @@ package com.zhuanche.serv.busManage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 
 import com.zhuanche.constants.BusConst;
-import com.zhuanche.util.MyRestTemplate;
 
 import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper;
 import mapper.rentcar.ex.BusCarBizCarGroupExMapper;
@@ -23,6 +23,7 @@ import mapper.rentcar.ex.BusCarBizSupplierExMapper;
  * 
  */
 @Service
+@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class BusSettlementAdviceService implements BusConst {
 
 	private static final Logger logger = LoggerFactory.getLogger(BusSettlementAdviceService.class);
