@@ -45,12 +45,8 @@ import com.zhuanche.vo.busManage.BusSupplierExportVO;
 import com.zhuanche.vo.busManage.BusSupplierInfoVO;
 import com.zhuanche.vo.busManage.BusSupplierPageVO;
 
-import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
 import mapper.mdbcarmanage.ex.BusBizSupplierDetailExMapper;
-import mapper.rentcar.CarBizCityMapper;
-import mapper.rentcar.CarBizCooperationTypeMapper;
-import mapper.rentcar.CarBizSupplierMapper;
 import mapper.rentcar.ex.BusCarBizSupplierExMapper;
 
 @Service
@@ -60,17 +56,6 @@ public class BusSupplierService implements BusConst {
 	private static final Logger logger = LoggerFactory.getLogger(BusSupplierService.class);
 	
 	// ===========================表基础mapper==================================
-	@Autowired
-	private CarBizCityMapper carBizCityMapper;
-
-	@Autowired
-	private CarBizSupplierMapper carBizSupplierMapper;
-
-	@Autowired
-	private CarBizCooperationTypeMapper carBizCooperationTypeMapper;
-
-	@Autowired
-	private CarAdmUserMapper carAdmUserMapper;
 
 	// ===========================专车业务拓展mapper==================================
 
@@ -292,7 +277,7 @@ public class BusSupplierService implements BusConst {
 			params.put("supplierIds", supplierIds);
 			try {
 				logger.info("[ BusSupplierService-completeCommissionInfo ] 补充分佣信息(分佣比例、是否有返点)异常,params={}", params);
-				JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + SettlementRemote.SETTLE_SUPPLIER_PRORATE_LIST, params , 2000, "查询供应商分佣信息（分佣比例、是否有返点）");
+				JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + SETTLE_SUPPLIER_PRORATE_LIST, params , 2000, "查询供应商分佣信息（分佣比例、是否有返点）");
 				if (result.getIntValue("code") == 0) {
 					JSONArray jsonArray = result.getJSONArray("data");
 					// 组装数据
@@ -353,7 +338,7 @@ public class BusSupplierService implements BusConst {
 			params.put("supplierIds", supplierIds);
 			try {
 				logger.info("[ BusSupplierService-completeSupplierExportList ] 补充分佣信息(分佣比例、是否有返点)异常,params={}", params);
-				JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + SettlementRemote.SETTLE_SUPPLIER_PRORATE_LIST, params , 2000, "查询供应商分佣信息（分佣比例、是否有返点）");
+				JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + SETTLE_SUPPLIER_PRORATE_LIST, params , 2000, "查询供应商分佣信息（分佣比例、是否有返点）");
 				if (result.getIntValue("code") == 0) {
 					JSONArray jsonArray = result.getJSONArray("data");
 					// 组装数据
@@ -449,7 +434,7 @@ public class BusSupplierService implements BusConst {
 //		Map<String, Object> params = new HashMap<>();
 //		params.put("supplierIds", supplierIds);
 //		logger.info("[ BusSupplierService-completeSupplierExportList ] 补充分佣信息(分佣比例、是否有返点)异常,params={}", params);
-//		JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + SettlementAdviceRemote.SETTLE_SUPPLIER_PRORATE_LIST, params , 2000, "查询供应商分佣信息（分佣比例、是否有返点）");
+//		JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + SETTLE_SUPPLIER_PRORATE_LIST, params , 2000, "查询供应商分佣信息（分佣比例、是否有返点）");
 
 		return supplierVO;
 	}

@@ -44,24 +44,17 @@ public interface BusConst {
 	/** 驾照类型 **/
 	String[] DRIVING_LICENSE_TYPES = { "A1", "A2", "A3", "B1", "B2", "C1", "C2", "N", "P" };
 	
-	/**
-	 * @ClassName:  SettlementAdvice
-	 * @Description: 结算单接口列表
-	 * @author: yanyunpeng
-	 * @date:   2018年12月7日 上午11:37:41
-	 */
-	interface SettlementRemote {
-		/** 供应商基本信息查询 **/
-		String SETTLE_SUPPLIER_INFO = "/settle/supplier/info";
-		
-		/** 查找供应商返佣配置 **/
-		String SETTLE_SUPPLIER_REBATE_INFO = "/settle/supplier/rebate/info";
+	// =============================================结算单接口列表===================================================
+	/** 供应商基本信息查询 **/
+	String SETTLE_SUPPLIER_INFO = "/settle/supplier/info";
+	
+	/** 查找供应商返佣配置 **/
+	String SETTLE_SUPPLIER_REBATE_INFO = "/settle/supplier/rebate/info";
 
-		/** 查询供应商分佣有关的信息（批量） **/
-		String SETTLE_SUPPLIER_PRORATE_LIST = "/settle/supplier/prorate/list";
+	/** 查询供应商分佣有关的信息（批量） **/
+	String SETTLE_SUPPLIER_PRORATE_LIST = "/settle/supplier/prorate/list";
 
-		/** 查询供应商的账单 **/
-		String SETTLE_DETAIL_LIST = "/settle/detail/list";
-	}
+	/** 查询供应商的账单 **/
+	String SETTLE_DETAIL_LIST = "/settle/detail/list";
 
 }
