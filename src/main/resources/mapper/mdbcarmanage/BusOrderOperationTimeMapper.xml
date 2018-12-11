@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.BusOrderOperationTimeMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.BusOrderOperationTime" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="order_id" property="orderId" jdbcType="INTEGER" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="time" property="time" jdbcType="TIMESTAMP" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="dirver_phone" property="dirverPhone" jdbcType="VARCHAR" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, order_id, order_no, time, type, driver_id, status, driver_name, dirver_phone, 
+    description
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bus_order_operation_time
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.BusOrderOperationTime" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into bus_order_operation_time (order_id, order_no, time, 
+      type, driver_id, status, 
+      driver_name, dirver_phone, description
+      )
+    values (#{orderId,jdbcType=INTEGER}, #{orderNo,jdbcType=VARCHAR}, #{time,jdbcType=TIMESTAMP}, 
+      #{type,jdbcType=INTEGER}, #{driverId,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
+      #{driverName,jdbcType=VARCHAR}, #{dirverPhone,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.BusOrderOperationTime" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into bus_order_operation_time
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        order_id,
+      </if>
+      <if test="orderNo != null" >
+        order_no,
+      </if>
+      <if test="time != null" >
+        time,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="driverId != null" >
+        driver_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="driverName != null" >
+        driver_name,
+      </if>
+      <if test="dirverPhone != null" >
+        dirver_phone,
+      </if>
+      <if test="description != null" >
+        description,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        #{orderId,jdbcType=INTEGER},
+      </if>
+      <if test="orderNo != null" >
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null" >
+        #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="driverId != null" >
+        #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="driverName != null" >
+        #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="dirverPhone != null" >
+        #{dirverPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.mdbcarmanage.BusOrderOperationTime" >
+    update bus_order_operation_time
+    <set >
+      <if test="orderId != null" >
+        order_id = #{orderId,jdbcType=INTEGER},
+      </if>
+      <if test="orderNo != null" >
+        order_no = #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null" >
+        time = #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="driverId != null" >
+        driver_id = #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="driverName != null" >
+        driver_name = #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="dirverPhone != null" >
+        dirver_phone = #{dirverPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.BusOrderOperationTime" >
+    update bus_order_operation_time
+    set order_id = #{orderId,jdbcType=INTEGER},
+      order_no = #{orderNo,jdbcType=VARCHAR},
+      time = #{time,jdbcType=TIMESTAMP},
+      type = #{type,jdbcType=INTEGER},
+      driver_id = #{driverId,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      driver_name = #{driverName,jdbcType=VARCHAR},
+      dirver_phone = #{dirverPhone,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

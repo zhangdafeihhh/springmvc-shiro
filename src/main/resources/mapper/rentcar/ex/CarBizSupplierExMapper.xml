@@ -130,4 +130,12 @@
         </foreach>
     </select>
     
+	<select id="queryDispatcherPhoneBySupplierId" resultType="java.lang.String">
+		SELECT
+			t.dispatcher_phone
+		FROM
+			car_biz_supplier t
+		WHERE
+			t.supplier_id = #{supplierId}
+	</select>
 </mapper>

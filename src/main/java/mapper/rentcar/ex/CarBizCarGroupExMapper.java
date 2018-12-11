@@ -1,11 +1,11 @@
 package mapper.rentcar.ex;
 
-import com.zhuanche.entity.rentcar.CarBizCarGroup;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.zhuanche.entity.rentcar.CarBizCarGroup;
 
 public interface CarBizCarGroupExMapper {
     CarBizCarGroup queryGroupByGroupName (@Param("groupName") String groupName);
@@ -31,4 +31,13 @@ public interface CarBizCarGroupExMapper {
     List<CarBizCarGroup> queryGroupNameList();
 
     List<CarBizCarGroup> queryCarGroupByIdSet(@Param("carBizCarGroupSet")Set<Integer> carBizCarGroupSet);
+    
+	/**
+	 * @Title: getSeatNumByGroupId
+	 * @Description: 根据groupId查询车型类别座位数
+	 * @param groupId
+	 * @return int
+	 * @throws
+	 */
+	int getSeatNumByGroupId(Integer groupId);
 }

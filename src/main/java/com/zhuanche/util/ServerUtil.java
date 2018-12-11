@@ -1,24 +1,38 @@
 package com.zhuanche.util;
 
-import com.zhuanche.util.encrypt.MD5Utils;
-import com.zhuanche.util.encrypt.SHAUtils;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PropertiesLoaderUtils;
-
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
+
+import com.zhuanche.util.encrypt.MD5Utils;
+import com.zhuanche.util.encrypt.SHAUtils;
+
 public class ServerUtil {
+	private static Properties allenv;
 	private static Properties props;
 	static {
-		Resource resource = new ClassPathResource("global.properties");
 		try {
+			allenv = PropertiesLoaderUtils.loadProperties(new ClassPathResource("application-allenv.properties"));
+			String runMode = getRunMode();
+			Resource resource = new ClassPathResource(runMode + "/global.properties");
 			props = PropertiesLoaderUtils.loadProperties(resource);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * @Title: getRunMode
+	 * @Description: 获取运行环境
+	 * @return String
+	 * @throws
+	 */
+	public static String getRunMode() {
+		return allenv.getProperty("runMode", "");
 	}
 
 	/**

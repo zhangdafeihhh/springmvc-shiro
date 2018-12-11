@@ -1,15 +1,12 @@
 package mapper.rentcar.ex;
 
-import com.zhuanche.dto.rentcar.CarBizSupplierDTO;
-import com.zhuanche.entity.rentcar.CarBizSupplier;
-import org.apache.ibatis.annotations.Param;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.zhuanche.dto.rentcar.CarBizSupplierDTO;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 
 public interface CarBizSupplierExMapper{
@@ -28,4 +25,6 @@ public interface CarBizSupplierExMapper{
 	List<CarBizSupplierDTO> queryNameBySupplierIds(@Param("supplierIds")  String supplierIds );
 	
 	List<Map<String, Object>> getSupplierList(@Param("supplierIds") Set<String> supplierIds);
+	/** 根据供应商ID查询其调度员电话 **/
+	String queryDispatcherPhoneBySupplierId(@Param("supplierId") Integer supplierId);
 }

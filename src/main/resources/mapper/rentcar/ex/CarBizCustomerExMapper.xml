@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.ex.CarBizCustomerExMapper">
+	<resultMap id="BaseResultMap" type="com.zhuanche.entity.rentcar.CarBizCustomer">
+		<id column="customer_id" property="customerId" jdbcType="INTEGER" />
+		<result column="is_binding_credit_card" property="isBindingCreditCard" jdbcType="INTEGER" />
+		<result column="credit_card_no" property="creditCardNo" jdbcType="VARCHAR" />
+		<result column="storable_card_no" property="storableCardNo" jdbcType="VARCHAR" />
+		<result column="open_account_bank" property="openAccountBank" jdbcType="VARCHAR" />
+		<result column="credit_card_period_of_validity" property="creditCardPeriodOfValidity" jdbcType="VARCHAR" />
+		<result column="user_from" property="userFrom" jdbcType="VARCHAR" />
+		<result column="CVN2" property="cvn2" jdbcType="VARCHAR" />
+		<result column="user_lv" property="userLv" jdbcType="INTEGER" />
+		<result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+		<result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+		<result column="update_by" property="updateBy" jdbcType="INTEGER" />
+		<result column="create_by" property="createBy" jdbcType="INTEGER" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="gender" property="gender" jdbcType="INTEGER" />
+		<result column="phone" property="phone" jdbcType="VARCHAR" />
+		<result column="password" property="password" jdbcType="VARCHAR" />
+		<result column="user_type" property="userType" jdbcType="INTEGER" />
+		<result column="city_id" property="cityId" jdbcType="INTEGER" />
+		<result column="user_photo_url" property="userPhotoUrl" jdbcType="VARCHAR" />
+		<result column="push_id" property="pushId" jdbcType="VARCHAR" />
+		<result column="IMEI" property="imei" jdbcType="VARCHAR" />
+		<result column="os_platform" property="osPlatform" jdbcType="VARCHAR" />
+		<result column="app_version" property="appVersion" jdbcType="VARCHAR" />
+		<result column="mobile_brand" property="mobileBrand" jdbcType="VARCHAR" />
+		<result column="os_version" property="osVersion" jdbcType="VARCHAR" />
+		<result column="channel_num" property="channelNum" jdbcType="VARCHAR" />
+		<result column="binding_card_date" property="bindingCardDate" jdbcType="TIMESTAMP" />
+		<result column="bankid" property="bankid" jdbcType="VARCHAR" />
+		<result column="is_used_account" property="isUsedAccount" jdbcType="TINYINT" />
+		<result column="register_source" property="registerSource" jdbcType="TINYINT" />
+		<result column="freeze_account" property="freezeAccount" jdbcType="INTEGER" />
+		<result column="id_number" property="idNumber" jdbcType="VARCHAR" />
+		<result column="is_member" property="isMember" jdbcType="INTEGER" />
+		<result column="account_type" property="accountType" jdbcType="INTEGER" />
+		<result column="birth_day" property="birthDay" jdbcType="VARCHAR" />
+	</resultMap>
+	<resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizCustomer" extends="BaseResultMap">
+		<result column="memo" property="memo" jdbcType="LONGVARCHAR" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		customer_id, is_binding_credit_card, credit_card_no,
+		storable_card_no, open_account_bank, credit_card_period_of_validity,
+		user_from, CVN2, user_lv, update_date, create_date, update_by,
+		create_by, status, name, gender, phone, password, user_type, city_id,
+		user_photo_url, push_id, IMEI, os_platform, app_version, mobile_brand,
+		os_version, channel_num, binding_card_date, bankid, is_used_account,
+		register_source, freeze_account, id_number, is_member, account_type,
+		birth_day
+	</sql>
+	<sql id="Blob_Column_List">
+		memo
+	</sql>
+
+	<!-- 根据ID查询乘客名称 -->
+	<select id="selectCustomerNameById" resultType="java.lang.String">
+		SELECT
+			`name` AS NAME
+		FROM
+			car_biz_customer
+		WHERE
+			customer_id = #{customerId}
+	</select>
+
+</mapper>
