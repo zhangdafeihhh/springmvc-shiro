@@ -404,6 +404,9 @@ public class CitySupplierTeamCommonService {
     }
 
     public List<String> getSupplierList(Set<String> supplierIds) {
+        if (supplierIds == null || supplierIds.size() == 0){
+            return new ArrayList<>();
+        }
         List<Map<String, Object>> supplierList = carBizSupplierExMapper.getSupplierList(supplierIds);
         List<String> suppliers = new ArrayList<>();
         supplierList.forEach(stringObjectMap -> suppliers.add(stringObjectMap.get("supplierName").toString()));
@@ -411,6 +414,9 @@ public class CitySupplierTeamCommonService {
     }
 
     public List<String> getTeamList(Set<String> teamIds) {
+        if (teamIds == null || teamIds.size() == 0){
+            return new ArrayList<>();
+        }
         List<Map<String, Object>> teamList = carDriverTeamExMapper.getTeamList(teamIds);
         Set<String> supplierIds = new HashSet<>();
         teamList.forEach(stringObjectMap -> supplierIds.add(stringObjectMap.get("supplier").toString()));
@@ -427,6 +433,9 @@ public class CitySupplierTeamCommonService {
     }
 
     public List<String> getGroupList(Set<String> groupIds) {
+        if (groupIds == null || groupIds.size() == 0){
+            return new ArrayList<>();
+        }
         List<Map<String, Object>> groupList = carDriverTeamExMapper.getGroupList(groupIds);
         Set<String> supplierIds = new HashSet<>();
         groupList.forEach(stringObjectMap -> supplierIds.add(stringObjectMap.get("supplier").toString()));
