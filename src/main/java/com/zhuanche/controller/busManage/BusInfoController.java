@@ -198,7 +198,9 @@ public class BusInfoController {
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
     }
-
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
+    })
     private void saveCarLog(String carId){
         // 创建操作记录
         try {
