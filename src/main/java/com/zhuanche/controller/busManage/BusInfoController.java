@@ -17,6 +17,7 @@ import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.serv.CarBizCarGroupService;
 import com.zhuanche.serv.CarBizCityService;
 import com.zhuanche.serv.CarBizSupplierService;
+import com.zhuanche.serv.busManage.BusBizChangeLogService;
 import com.zhuanche.serv.busManage.BusInfoService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -27,6 +28,7 @@ import com.zhuanche.vo.busManage.BusDetailVO;
 import com.zhuanche.vo.busManage.BusInfoVO;
 import com.zhuanche.vo.busManage.ErrorReason;
 import com.zhuanche.vo.busManage.ImportErrorVO;
+import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -66,7 +68,7 @@ import java.util.List;
 @RequestMapping("/bus/busInfo")
 public class BusInfoController {
     private static Logger logger = LoggerFactory.getLogger(BusInfoController.class);
-    private static String LOG_PRE = "【巴士】";
+    private static String LOG_PRE = "【巴士车辆】";
     @Autowired
     private BusInfoService busInfoService;
     @Autowired
@@ -75,6 +77,8 @@ public class BusInfoController {
     private CarBizSupplierService supplierService;
     @Autowired
     private CarBizCityService cityService;
+    @Autowired
+    private BusBizChangeLogService busBizChangeLogService;
 
     /**
      * @Description:查询巴士车辆列表
@@ -178,20 +182,32 @@ public class BusInfoController {
             //保存车辆信息
             logger.info(LOG_PRE + " 新增车辆" + JSON.toJSONString(carInfo));
             saveResult = busInfoService.saveCar(carInfo);
+            carId = carInfo.getCarId();
         } else {
             //更新车辆信息
             logger.info(LOG_PRE + currentLoginUser.getName() + " 修改车辆信息" + JSON.toJSONString(carInfo));
-            //TODO 查询修改之前的信息，并记录日志
             saveResult = busInfoService.updateCarById(carInfo);
         }
         if (saveResult > 0) {
             logger.info(LOG_PRE + currentLoginUser.getName() + "操作成功");
+            //记录操作日志信息
+            saveCarLog(String.valueOf(carId));
             return AjaxResponse.success(null);
         } else {
             logger.info(LOG_PRE + currentLoginUser.getName() + "操作失败");
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
     }
+
+    private void saveCarLog(String carId){
+        // 创建操作记录
+        try {
+            busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carId), new Date());
+        } catch (Exception e) {
+            logger.error(LOG_PRE+"保存操作记录异常="+JSON.toJSONString(e));
+        }
+    }
+
 
     /**
      * @Description: 导出车辆信息
@@ -479,7 +495,7 @@ public class BusInfoController {
                         break;
                 }// switch end
 
-            }// 循环列结束
+            }// 列循环结束
             if (validFlag) {
                 carInfo.setCityId(cityId);
                 carInfo.setSupplierId(supplierId);
@@ -493,6 +509,7 @@ public class BusInfoController {
                 carInfo.setCreateDate(new Date());
                 int saveResult = busInfoService.saveCar(carInfo);
                 if (saveResult > 0) {
+                    saveCarLog(String.valueOf(carInfo.getCarId()));
                     successCount++;
                 }
             }

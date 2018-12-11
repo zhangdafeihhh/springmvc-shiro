@@ -3,6 +3,9 @@ package com.zhuanche.controller.busManage;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.rpc.HttpParamSignGenerator;
 import com.zhuanche.common.rpc.RPCAPI;
@@ -115,12 +118,15 @@ public class DriverMaidController {
 
 
     /**
-     * @Description: 查询司机分佣明细
+     * @Description: 查询司机分佣明细,
      * @Param: [dto]
      * @return: com.zhuanche.common.web.AjaxResponse
      * @Date: 2018/12/4
      */
     @RequestMapping("/queryMaidData")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     public AjaxResponse queryMaidData(BusDriverMaidDTO dto) {
         long start = System.currentTimeMillis();
         Map<String, Object> param = buidMaidParam(dto);
@@ -482,6 +488,9 @@ public class DriverMaidController {
      * @param array
      * @return
      */
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     private Map<Integer, CarBizCity> queryCity(JSONArray array) {
         if (array == null || array.size() == 0) {
             return new HashMap<Integer, CarBizCity>(0);
