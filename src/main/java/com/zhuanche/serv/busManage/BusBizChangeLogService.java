@@ -7,6 +7,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.constants.BusConst;
 import com.zhuanche.entity.mdbcarmanage.BusBizChangeLog;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -39,6 +42,7 @@ public class BusBizChangeLogService implements BusConst {
 	 * @return int
 	 * @throws
 	 */
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.MASTER))
 	public int insertLog(BusinessType businessType, String businessKey, Date updateDate) {
 		BusBizChangeLog log = new BusBizChangeLog();
         if (updateDate == null) {
