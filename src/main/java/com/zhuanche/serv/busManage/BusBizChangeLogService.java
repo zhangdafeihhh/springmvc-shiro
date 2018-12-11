@@ -41,13 +41,14 @@ public class BusBizChangeLogService implements BusConst {
 	 */
 	public int insertLog(BusinessType businessType, String businessKey, Date updateDate) {
 		BusBizChangeLog log = new BusBizChangeLog();
+        if (updateDate == null) {
+            updateDate = new Date();
+        }
 		log.setBusinessType(businessType.businessType());
 		log.setBusinessKey(businessKey);
 		log.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
 		log.setUpdateName(WebSessionUtil.getCurrentLoginUser().getName());
-		if (updateDate == null) {
-			log.setUpdateDate(new Date());
-		}
+        log.setUpdateDate(updateDate);
 		return busBizChangeLogExMapper.insertLog(log);
 	}
 
