@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -52,6 +54,7 @@ import mapper.rentcar.CarBizSupplierMapper;
 import mapper.rentcar.ex.BusCarBizSupplierExMapper;
 
 @Service
+@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class BusSupplierService implements BusConst {
 
 	private static final Logger logger = LoggerFactory.getLogger(BusSupplierService.class);

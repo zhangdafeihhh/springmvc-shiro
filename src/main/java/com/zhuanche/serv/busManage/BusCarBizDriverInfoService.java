@@ -32,6 +32,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -92,7 +94,6 @@ import mapper.rentcar.ex.BusCarBizDriverInfoExMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
-import net.sf.json.JSONObject;
 
 /**
  * @ClassName:  BusCarBizDriverInfoService
@@ -102,6 +103,7 @@ import net.sf.json.JSONObject;
  * 
  */
 @Service
+@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class BusCarBizDriverInfoService implements BusConst{
 
 	private static final Logger logger = LoggerFactory.getLogger(BusCarBizDriverInfoService.class);
@@ -929,8 +931,7 @@ public class BusCarBizDriverInfoService implements BusConst{
 			messageMap.put("teamGroupId", saveDTO.getTeamGroupId() == null ? "" : saveDTO.getTeamGroupId()); // 司机所属小组ID
 			messageMap.put("teamGroupName", saveDTO.getTeamGroupName() == null ? "" : saveDTO.getTeamGroupName()); // 司机所属小组名称
 
-			String messageStr = JSONObject.fromObject(messageMap).toString();
-			logger.info("专车司机driverId={}，同步发送数据={}", saveDTO.getDriverId(), messageStr);
+			logger.info("专车司机driverId={}，同步发送数据={}", saveDTO.getDriverId(), JSON.toJSONString(messageMap));
 			CommonRocketProducer.publishMessage("driver_info", method, String.valueOf(saveDTO.getDriverId()),
 					messageMap);
 		} catch (Exception e) {

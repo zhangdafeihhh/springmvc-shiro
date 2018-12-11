@@ -3,6 +3,8 @@ package com.zhuanche.serv.busManage;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 
 import com.zhuanche.constants.BusConst;
@@ -20,6 +22,7 @@ import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
  * 
  */
 @Service
+@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class BusBizChangeLogService implements BusConst {
 
 	// ===========================巴士业务拓展mapper==================================
