@@ -21,7 +21,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -84,8 +83,6 @@ public class BusDriverInfoController extends BusBaseController {
 	 */
 	@SuppressWarnings("resource")
 	@RequestMapping(value = "/findDriverList")
-	@MasterSlaveConfigs(configs = {
-			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE) })
 	public AjaxResponse findDriverList(BusDriverQueryDTO queryDTO) {
 
 		// 数据权限控制SSOLoginUser
@@ -117,9 +114,15 @@ public class BusDriverInfoController extends BusBaseController {
 		return AjaxResponse.success(pageDTO);
 	}
 
+	/**
+	 * @Title: saveDriver
+	 * @Description: 保存司机信息
+	 * @param saveDTO
+	 * @return 
+	 * @return AjaxResponse
+	 * @throws
+	 */
 	@RequestMapping(value = "/saveDriver")
-	@MasterSlaveConfigs(configs = {
-			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE) })
 	public AjaxResponse saveDriver(BusDriverSaveDTO saveDTO) {
 		
 		/** 补充默认信息(用户不想填但业务需要的字段)*/
@@ -190,17 +193,18 @@ public class BusDriverInfoController extends BusBaseController {
 	}
 
 	/**
-	 * 重置IMEI
-	 * 
+	 * @Title: resetIMEI
+	 * @Description: 重置IMEI
 	 * @param driverId
-	 * @return
+	 * @return 
+	 * @return AjaxResponse
+	 * @throws
 	 */
 	@RequestMapping(value = "/resetIMEI")
-	@MasterSlaveConfigs(configs = {
-			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE) })
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public AjaxResponse resetIMEI(@NotNull(message = "司机ID不能为空") Integer driverId) {
-
 		logger.info("[ BusDriverInfoController-resetIMEI ] 司机driverId={} 重置imei", driverId);
+		
 		CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(driverId);
 		if (carBizDriverInfo == null) {
 			return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
@@ -209,19 +213,19 @@ public class BusDriverInfoController extends BusBaseController {
 		return AjaxResponse.success(null);
 	}
 	
-	/**
-     * 修改司机状态信息 ,司机设置为无效后释放其绑定的车辆
+    /**
+     * @Title: updateDriverStatus
+     * @Description: 修改司机状态信息 ,司机设置为无效后释放其绑定的车辆
      * @param driverId
-     * @return
+     * @return 
+     * @return AjaxResponse
+     * @throws
      */
-    @ResponseBody
     @RequestMapping(value = "/updateDriverStatus")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
-    } )
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public AjaxResponse updateDriverStatus(@NotNull(message = "司机ID不能为空") Integer driverId) {
+    	logger.info("[ BusDriverInfoController-updateDriverStatus ] 司机driverId={} 状态置为无效", driverId);
 
-        logger.info("[ BusDriverInfoController-updateDriverStatus ] 司机driverId={} 状态置为无效", driverId);
         CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(driverId);
         if(carBizDriverInfo==null){
             return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
@@ -268,15 +272,15 @@ public class BusDriverInfoController extends BusBaseController {
     }
     
 	/**
-	 * 司机信息
-	 * 
+	 * @Title: findDriverInfoByDriverId
+	 * @Description: 查询司机信息
 	 * @param driverId
-	 * @return
+	 * @return 
+	 * @return AjaxResponse
+	 * @throws
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/findDriverInfoByDriverId")
-	@MasterSlaveConfigs(configs = {
-			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE) })
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public AjaxResponse findDriverInfoByDriverId(@NotNull(message = "司机ID不能为空") Integer driverId) {
 
 		CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(driverId);
@@ -293,14 +297,19 @@ public class BusDriverInfoController extends BusBaseController {
 	}
 	
 	
+	/**
+	 * @Title: exportDriverList
+	 * @Description: 导出司机列表信息
+	 * @param exportDTO
+	 * @param request
+	 * @param response 
+	 * @return void
+	 * @throws
+	 */
 	@SuppressWarnings("resource")
-	@ResponseBody
 	@RequestMapping(value = "/exportDriverList")
-	@MasterSlaveConfigs(configs = {
-			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE) })
 	public void exportDriverList(@Validated(BusDriverQueryDTO.Export.class) BusDriverQueryDTO exportDTO, HttpServletRequest request,
 			HttpServletResponse response) {
-
 		long start = System.currentTimeMillis(); // 获取开始时间
 		try {
 			// 数据权限控制SSOLoginUser
@@ -407,30 +416,26 @@ public class BusDriverInfoController extends BusBaseController {
 	 */
 	@RequestMapping(value = "/downloadDriverInfoImportTemplate")
 	public void fileDownloadDriverInfo(HttpServletRequest request, HttpServletResponse response) {
-		String path = request.getSession().getServletContext().getRealPath("/upload") + File.separator
-				+ "IMPORT_BUS_DRIVER_INFO.xlsx";
+		String path = request.getSession().getServletContext().getRealPath("/upload") + File.separator + "IMPORT_BUS_DRIVER_INFO.xlsx";
 		fileDownload(request, response, path);
 	}
 	
-	/**
-     * 导入司机信息
+    /**
+     * @Title: batchInputDriverInfo
+     * @Description: 导入司机信息
      * @param cityId
      * @param supplierId
-     * @param teamId
-     * @param teamGroupId
-     * @param fileName
+     * @param file
      * @param request
-     * @return
+     * @param response
+     * @return 
+     * @return AjaxResponse
+     * @throws
      */
-    @ResponseBody
     @RequestMapping(value = "/importDriverInfo")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
-    } )
 	public AjaxResponse batchInputDriverInfo(@NotNull(message = "请选择城市") Integer cityId,
 			@NotNull(message = "请选择供应商") Integer supplierId, MultipartFile file, HttpServletRequest request,
 			HttpServletResponse response) {
-
         if (file.isEmpty()) {
             logger.info("file is empty!");
             return AjaxResponse.fail(RestErrorCode.FILE_ERROR);

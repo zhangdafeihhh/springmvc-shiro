@@ -8,6 +8,4 @@ public interface BusCarBizCustomerAppraisalStatisticsExMapper {
 
 	CarBizCustomerAppraisalStatistics queryAppraisal(Map<Object, Object> param);
 
-	
-
 }
