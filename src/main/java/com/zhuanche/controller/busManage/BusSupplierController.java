@@ -5,12 +5,19 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 
+import com.alibaba.fastjson.JSONArray;
+import com.zhuanche.common.web.Verify;
+import com.zhuanche.dto.busManage.BusSupplierSettleListDTO;
+import com.zhuanche.serv.busManage.BusCommonService;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,13 +62,16 @@ public class BusSupplierController {
 	// ===========================巴士业务拓展service==================================
 	@Autowired
 	private BusSupplierService busSupplierService;
+	//============================巴士共有服务service==================================
+	@Autowired
+	private BusCommonService busCommonService;
 
 	/**
 	 * @Title: saveSupplier
 	 * @Description: 保存/修改供应商
 	 * @param baseDTO
 	 * @param detailDTO
-	 * @return 
+	 * @return
 	 * @return AjaxResponse
 	 * @throws
 	 */
@@ -69,13 +79,13 @@ public class BusSupplierController {
 	public AjaxResponse saveSupplier(BusSupplierBaseDTO baseDTO, BusSupplierDetailDTO detailDTO) {// TODO 封装分佣、返点信息
 		return busSupplierService.saveSupplierInfo(baseDTO, detailDTO);
 	}
-	
+
 	/**
 	 * @Title: querySupplierPageList
 	 * @Description: 查询供应商分页列表
 	 * @param baseDTO
 	 * @param detailDTO
-	 * @return 
+	 * @return
 	 * @return AjaxResponse
 	 * @throws
 	 */
@@ -85,10 +95,10 @@ public class BusSupplierController {
 	public AjaxResponse querySupplierPageList(BusSupplierQueryDTO queryDTO) {
 		Integer pageNum = queryDTO.getPageNum();
 		Integer pageSize = queryDTO.getPageSize();
-		
+
 		// 查询列表
 		List<BusSupplierPageVO> resultList = busSupplierService.queryBusSupplierPageList(queryDTO);
-        
+
         // 计算total
 		queryDTO.setPageNum(pageNum);
 		queryDTO.setPageSize(pageSize);
@@ -98,14 +108,14 @@ public class BusSupplierController {
         Page<BusSupplierPageVO> page = (Page<BusSupplierPageVO>) totalList;
 		return AjaxResponse.success(new PageDTO(queryDTO.getPageNum(), queryDTO.getPageSize(), page.getTotal(), resultList));
 	}
-	
+
 	/**
 	 * @Title: exportSupplierList
 	 * @Description: 导出供应商列表
 	 * @param queryDTO
 	 * @param request
 	 * @param response
-	 * @return 
+	 * @return
 	 * @return AjaxResponse
 	 * @throws
 	 */
@@ -148,7 +158,7 @@ public class BusSupplierController {
 			do {
 				// 页码+1
 				pageNum++;
-				
+
 				// 查询数据
 				queryDTO.setPageNum(pageNum);
 				queryDTO.setPageSize(CsvUtils.downPerSize);
@@ -166,7 +176,7 @@ public class BusSupplierController {
 				if (pages <= 1 || pageNum == pages) {
 					isLast = true;
 				}
-				
+
 				// 数据区
 				// 如果查询结果为空
 				if (list == null || list.isEmpty()) {
@@ -197,7 +207,7 @@ public class BusSupplierController {
 	 * @Title: querySupplierPageList
 	 * @Description: 查询供应商详情
 	 * @param queryDTO
-	 * @return 
+	 * @return
 	 * @return AjaxResponse
 	 * @throws
 	 */
@@ -205,5 +215,48 @@ public class BusSupplierController {
 	public AjaxResponse querySupplierById(@NotNull(message = "供应商ID不能为空") Integer supplierId) {
 		BusSupplierInfoVO supplierVO = busSupplierService.querySupplierById(supplierId);
 		return AjaxResponse.success(supplierVO);
+	}
+
+	/**
+	 * 查询供应商分佣订单明细 TODO 等计费完成接口完善
+	 * @param dto
+	 * @return
+	 */
+	@RequestMapping(value = "/querySettleDetailList")
+	public AjaxResponse querySettleDetailList(BusSupplierSettleListDTO dto){
+		logger.info("巴士供应商查询账单列表参数="+JSON.toJSONString(dto));
+		SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+		Set<Integer> supplierIds = loginUser.getSupplierIds();
+		Set<Integer> cityIds = loginUser.getCityIds();
+		Set<Integer> teamIds = loginUser.getTeamIds();
+		dto.setAuthOfCity(cityIds);
+		dto.setAuthOfSupplier(supplierIds);
+		dto.setAuthOfTeam(teamIds);
+		Integer cityId = dto.getCityId();
+		//按照城市查询，需要查询该城市下所有的供应商
+		if(cityId !=null && StringUtils.isBlank(dto.getSupplierIds())){
+			List<Map<Object, Object>> maps = busCommonService.querySuppliers(cityId);
+			if(maps.isEmpty()){
+				return AjaxResponse.success(new ArrayList());
+			}
+			StringBuffer sb = new StringBuffer();
+			for (Map map:maps) {
+				String supplierId = String.valueOf(map.get("supplierId"));
+				sb.append(supplierId).append(",");
+			}
+			dto.setSupplierIds(sb.substring(0,sb.length()-1));
+		}
+		//城市条件和供应商条件都没有，获取session中的supplierid
+		if(cityId==null && StringUtils.isBlank(dto.getSupplierIds())){
+			if(supplierIds!=null&&!supplierIds.isEmpty()){
+			    StringBuffer sb = new StringBuffer();
+                for (Integer supplierId:supplierIds) {
+                    sb.append(supplierId).append(",");
+                }
+                dto.setSupplierIds(sb.substring(0,sb.length()-1));
+            }
+		}
+		JSONArray array = busSupplierService.querySettleDetailList(dto);
+		return AjaxResponse.success(array);
 	}
 }

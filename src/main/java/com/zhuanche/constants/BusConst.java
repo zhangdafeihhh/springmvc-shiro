@@ -60,4 +60,5 @@ public interface BusConst {
 	/** 查询供应商的账单 **/
 	String SETTLE_DETAIL_LIST = "/settle/detail/list";
 
+
 }

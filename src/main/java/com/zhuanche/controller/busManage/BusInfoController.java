@@ -56,6 +56,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -530,6 +531,19 @@ public class BusInfoController {
         ImportErrorVO errorVO = new ImportErrorVO(total, successCount, (total - successCount), errList);
         return AjaxResponse.success(errorVO);
     }
+
+    /**
+    * 获取所有的燃料类型
+    * @Param: []
+    * @return: com.zhuanche.common.web.AjaxResponse
+    * @Date: 2018/12/12
+    */
+    @RequestMapping(value = "/queryFuel",method = RequestMethod.GET)
+    public AjaxResponse queryFuel(){
+        List<Map<String, String>> allFuel = EnumFuel.getAllFuel();
+        return AjaxResponse.success(allFuel);
+    }
+
 
     private String readCellValue(Cell cell) {
         int cellType = cell.getCellType();
