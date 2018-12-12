@@ -8,6 +8,8 @@ import java.util.Set;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +60,7 @@ public class CarAnalysisIndexController{
 	  */
 	  @ResponseBody
 	  @RequestMapping(value = "/queryCarAnalysisIndexDetailData", method = { RequestMethod.POST,RequestMethod.GET })
+  	  @RequiresPermissions(value = { "CarOperateAnalysis_look" } )
 	  public AjaxResponse queryCarAnalysisIndexDetailData(
 			  @Verify(param = "startDate",rule = "required") String startDate,
 			  @Verify(param = "endDate",rule = "required") String endDate, 
@@ -97,6 +100,7 @@ public class CarAnalysisIndexController{
 		  */
 		@ResponseBody
 	    @RequestMapping(value = "/queryCarAnalysisIndexWayData", method = { RequestMethod.POST,RequestMethod.GET })
+		@RequiresPermissions(value = { "CarOperateAnalysis_look" } )
 	    public AjaxResponse queryCarAnalysisIndexWayData(
 	    			@Verify(param = "startDate",rule = "required") String startDate,
 	    			@Verify(param = "endDate",rule = "required") String endDate, 

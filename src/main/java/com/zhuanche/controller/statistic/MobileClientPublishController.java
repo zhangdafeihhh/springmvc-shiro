@@ -15,6 +15,7 @@ import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.IPv4Util2;
 import mapper.rentcar.ex.CarSysMobileClientPublishExMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,7 @@ public class MobileClientPublishController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/queryMobileClientPublish")
+	@RequiresPermissions(value = { "DriverApp_look" } )
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})
@@ -69,6 +71,7 @@ public class MobileClientPublishController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/valiteCode")
+	@RequiresPermissions(value = { "DriverApp_look" } )
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})
@@ -107,6 +110,7 @@ public class MobileClientPublishController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/phoneCode")
+	@RequiresPermissions(value = { "DriverApp_look" } )
 	public AjaxResponse sendPhoneCode(HttpServletRequest request) {
 		SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
 		String userName = WebSessionUtil.getCurrentLoginUser().getLoginName();

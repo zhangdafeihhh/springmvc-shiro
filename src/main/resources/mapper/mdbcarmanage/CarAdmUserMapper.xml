@@ -16,10 +16,12 @@
     <result column="suppliers" property="suppliers" jdbcType="VARCHAR" />
     <result column="team_id" property="teamId" jdbcType="VARCHAR" />
     <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="group_ids" property="groupIds" jdbcType="VARCHAR" />
+    <result column="level" property="level" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
     user_id, account, user_name, password, role_id, account_type, status, remark, create_user, 
-    create_date, cities, suppliers, team_id, phone
+    create_date, cities, suppliers, team_id, phone, group_ids, level
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -39,12 +41,14 @@
       role_id, account_type, status, 
       remark, create_user, create_date, 
       cities, suppliers, team_id, 
-      phone)
+      phone, group_ids, level
+      )
     values (#{account,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
       #{roleId,jdbcType=INTEGER}, #{accountType,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
       #{remark,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, 
       #{cities,jdbcType=VARCHAR}, #{suppliers,jdbcType=VARCHAR}, #{teamId,jdbcType=VARCHAR}, 
-      #{phone,jdbcType=VARCHAR})
+      #{phone,jdbcType=VARCHAR}, #{groupIds,jdbcType=VARCHAR}, #{level,jdbcType=INTEGER}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarAdmUser" >
     <selectKey resultType="java.lang.Integer" keyProperty="userId" order="AFTER" >
@@ -91,6 +95,12 @@
       <if test="phone != null" >
         phone,
       </if>
+      <if test="groupIds != null" >
+        group_ids,
+      </if>
+      <if test="level != null" >
+        level,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="account != null" >
@@ -131,6 +141,12 @@
       </if>
       <if test="phone != null" >
         #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="groupIds != null" >
+        #{groupIds,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null" >
+        #{level,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -176,6 +192,12 @@
       <if test="phone != null" >
         phone = #{phone,jdbcType=VARCHAR},
       </if>
+      <if test="groupIds != null" >
+        group_ids = #{groupIds,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null" >
+        level = #{level,jdbcType=INTEGER},
+      </if>
     </set>
     where user_id = #{userId,jdbcType=INTEGER}
   </update>
@@ -193,8 +215,9 @@
       cities = #{cities,jdbcType=VARCHAR},
       suppliers = #{suppliers,jdbcType=VARCHAR},
       team_id = #{teamId,jdbcType=VARCHAR},
-      phone = #{phone,jdbcType=VARCHAR}
+      phone = #{phone,jdbcType=VARCHAR},
+      group_ids = #{groupIds,jdbcType=VARCHAR},
+      level = #{level,jdbcType=INTEGER}
     where user_id = #{userId,jdbcType=INTEGER}
   </update>
-
 </mapper>

@@ -15,6 +15,7 @@ import com.zhuanche.util.FtpUtils;
 import com.zhuanche.util.MyRestTemplate;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,7 @@ public class RiskOrderComplainController {
 
     @ResponseBody
     @RequestMapping(value = "/dopage", method = { RequestMethod.POST,RequestMethod.GET })
+	@RequiresPermissions(value = { "RiskOrder_look" } )
     public AjaxResponse incontrolorderDopage(
             @RequestParam(value = "pageNum", required = false,defaultValue = "0")int pageNo,
             @Verify(param = "pageSize",rule = "max(50)")@RequestParam(value = "pageSize", required = false,defaultValue = "20")int pageSize,

@@ -101,6 +101,8 @@
 			<value>
 				/nginx.html = anon
 				/login.json = anon
+				/updateLevel.json = anon
+				/permission/levelList.json = anon
 				/unauthorized.json=anon
 				/getMsgCode.json = anon
 				/dologin.json = anon

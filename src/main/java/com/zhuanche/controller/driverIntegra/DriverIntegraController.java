@@ -24,6 +24,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +74,7 @@ public class DriverIntegraController {
     }
     @ResponseBody
     @RequestMapping("/queryDriverIntegralListData")
+	@RequiresPermissions(value = { "DriverRankIntegral_look" } )
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
@@ -203,6 +205,7 @@ public class DriverIntegraController {
 
     @ResponseBody
     @RequestMapping("/queryDriverIntegralListDataDown")
+	@RequiresPermissions(value = { "DriverRankIntegral_export" } )
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })

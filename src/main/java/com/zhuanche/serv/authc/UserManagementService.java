@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.zhuanche.common.enums.PermissionLevelEnum;
+import com.zhuanche.entity.mdbcarmanage.DriverTelescopeUser;
+import mapper.mdbcarmanage.ex.DriverTelescopeUserExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,7 +53,9 @@ public class UserManagementService{
 	private CarAdmUserMapper      carAdmUserMapper;
 	@Autowired
 	private CarAdmUserExMapper  carAdmUserExMapper;
-	
+	@Autowired
+	private DriverTelescopeUserExMapper driverTelescopeUserExMapper;
+
 	@Value("${resetpassword.msgnotify.switch}")
 	private String resetpasswordMsgotifySwitch = "OFF";//重置密码时是否短信通知用户
 	@Value("${user.password.indexOfPhone}")
@@ -165,6 +170,21 @@ public class UserManagementService{
 		if( StringUtils.isEmpty(newUser.getTeamId()) ) {
 			newUser.setTeamId("");
 		}
+        if( StringUtils.isEmpty(newUser.getGroupIds()) ) {
+            newUser.setGroupIds("");
+        }
+        if (StringUtils.isNotBlank(newUser.getGroupIds())){
+		    newUser.setLevel(PermissionLevelEnum.GROUP.getCode());
+        }else if (StringUtils.isNotBlank(newUser.getTeamId())){
+		    newUser.setLevel(PermissionLevelEnum.TEAM.getCode());
+        }else if(StringUtils.isNotBlank(newUser.getSuppliers())){
+            newUser.setLevel(PermissionLevelEnum.SUPPLIER.getCode());
+        }else if(StringUtils.isNotBlank(newUser.getCities())){
+            newUser.setLevel(PermissionLevelEnum.CITY.getCode());
+        }else {
+            newUser.setLevel(PermissionLevelEnum.ALL.getCode());
+        }
+
 		//执行
 		carAdmUserMapper.updateByPrimaryKeySelective(newUser);
 		redisSessionDAO.clearRelativeSession(null, null , newUser.getUserId() );//自动清理用户会话
@@ -318,4 +338,17 @@ public class UserManagementService{
 		return carAdmUserExMapper.selectUsersByIdList(ids);
 	}
 
+
+
+	/**八、查询用户列表**/
+	public boolean userPhoneExist(String phone) {
+		List<CarAdmUser> users = carAdmUserExMapper.queryUsers( null ,  null, null, phone, null );
+		return (null!=users && users.size()>0);
+	}
+
+	/**查询用户千里眼关联关系**/
+	public DriverTelescopeUser selectTelescopeUserByUserId(Integer userId) {
+		DriverTelescopeUser driverTelescopeUser = driverTelescopeUserExMapper.selectTelescopeUserByUserId(userId);
+		return driverTelescopeUser;
+	}
 }

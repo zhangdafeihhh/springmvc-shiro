@@ -99,8 +99,28 @@
             </foreach>
         </if>
     </select>
-    <select id="queryNameById" resultType="java.lang.String" parameterType="java.lang.Integer" >
-        select city_name from car_biz_city where city_id =#{cityId}
+
+    <!-- 根据城市ID，查询城市信息 -->
+    <select id="queryNameByCityIds" resultType="com.zhuanche.entity.rentcar.CarBizCity" parameterType="java.lang.String">
+        select t.city_id cityId, t.city_name cityName from car_biz_city t
+        where status=1
+        <if test="cityIds!=null and cityIds!=''">
+            and city_id IN (${cityIds})
+        </if>
     </select>
-	 
+    
+    <select id="getCityList" resultType="java.lang.String" >
+        select t.city_name cityName from car_biz_city t
+        where status=1
+        <if test="cityIds!=null and cityIds.size()>0">
+            and city_id IN
+            <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
+                #{cid}
+            </foreach>
+        </if>
+    </select>
+
+	<select id="queryNameById" resultType="java.lang.String" parameterType="java.lang.Integer">
+		select city_name from car_biz_city where city_id =#{cityId}
+	</select>
   </mapper>

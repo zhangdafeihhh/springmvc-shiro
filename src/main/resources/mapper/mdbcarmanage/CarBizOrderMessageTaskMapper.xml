@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.CarBizOrderMessageTaskMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.CarBizOrderMessageTask" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="driver_phone" property="driverPhone" jdbcType="VARCHAR" />
+    <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="license_plates" property="licensePlates" jdbcType="VARCHAR" />
+    <result column="rider_name" property="riderName" jdbcType="VARCHAR" />
+    <result column="rider_phone" property="riderPhone" jdbcType="VARCHAR" />
+    <result column="booking_date" property="bookingDate" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="BIT" />
+    <result column="err_msg" property="errMsg" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="msg_id" property="msgId" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, order_no, driver_phone, driver_name, license_plates, rider_name, rider_phone, 
+    booking_date, status, err_msg, create_time, update_time, msg_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from car_biz_order_message_task
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizOrderMessageTask" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_biz_order_message_task (order_no, driver_phone, driver_name, 
+      license_plates, rider_name, rider_phone, 
+      booking_date, status, err_msg, 
+      create_time, update_time, msg_id
+      )
+    values (#{orderNo,jdbcType=VARCHAR}, #{driverPhone,jdbcType=VARCHAR}, #{driverName,jdbcType=VARCHAR}, 
+      #{licensePlates,jdbcType=VARCHAR}, #{riderName,jdbcType=VARCHAR}, #{riderPhone,jdbcType=VARCHAR}, 
+      #{bookingDate,jdbcType=TIMESTAMP}, #{status,jdbcType=BIT}, #{errMsg,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{msgId,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizOrderMessageTask" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_biz_order_message_task
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="orderNo != null" >
+        order_no,
+      </if>
+      <if test="driverPhone != null" >
+        driver_phone,
+      </if>
+      <if test="driverName != null" >
+        driver_name,
+      </if>
+      <if test="licensePlates != null" >
+        license_plates,
+      </if>
+      <if test="riderName != null" >
+        rider_name,
+      </if>
+      <if test="riderPhone != null" >
+        rider_phone,
+      </if>
+      <if test="bookingDate != null" >
+        booking_date,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="errMsg != null" >
+        err_msg,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="msgId != null" >
+        msg_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="orderNo != null" >
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="driverPhone != null" >
+        #{driverPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="driverName != null" >
+        #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="licensePlates != null" >
+        #{licensePlates,jdbcType=VARCHAR},
+      </if>
+      <if test="riderName != null" >
+        #{riderName,jdbcType=VARCHAR},
+      </if>
+      <if test="riderPhone != null" >
+        #{riderPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="bookingDate != null" >
+        #{bookingDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=BIT},
+      </if>
+      <if test="errMsg != null" >
+        #{errMsg,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="msgId != null" >
+        #{msgId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizOrderMessageTask" >
+    update car_biz_order_message_task
+    <set >
+      <if test="orderNo != null" >
+        order_no = #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="driverPhone != null" >
+        driver_phone = #{driverPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="driverName != null" >
+        driver_name = #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="licensePlates != null" >
+        license_plates = #{licensePlates,jdbcType=VARCHAR},
+      </if>
+      <if test="riderName != null" >
+        rider_name = #{riderName,jdbcType=VARCHAR},
+      </if>
+      <if test="riderPhone != null" >
+        rider_phone = #{riderPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="bookingDate != null" >
+        booking_date = #{bookingDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=BIT},
+      </if>
+      <if test="errMsg != null" >
+        err_msg = #{errMsg,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="msgId != null" >
+        msg_id = #{msgId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizOrderMessageTask" >
+    update car_biz_order_message_task
+    set order_no = #{orderNo,jdbcType=VARCHAR},
+      driver_phone = #{driverPhone,jdbcType=VARCHAR},
+      driver_name = #{driverName,jdbcType=VARCHAR},
+      license_plates = #{licensePlates,jdbcType=VARCHAR},
+      rider_name = #{riderName,jdbcType=VARCHAR},
+      rider_phone = #{riderPhone,jdbcType=VARCHAR},
+      booking_date = #{bookingDate,jdbcType=TIMESTAMP},
+      status = #{status,jdbcType=BIT},
+      err_msg = #{errMsg,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      msg_id = #{msgId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

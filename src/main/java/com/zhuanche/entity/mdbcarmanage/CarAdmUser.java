@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class CarAdmUser implements Serializable{
-	private static final long serialVersionUID = -1373760761780841082L;
+    private static final long serialVersionUID = -1373760761780841082L;
     private Integer userId;
 
     private String account;
@@ -32,6 +32,10 @@ public class CarAdmUser implements Serializable{
     private String teamId;
 
     private String phone;
+
+    private String groupIds;
+
+    private Integer level;
 
     public Integer getUserId() {
         return userId;
@@ -143,5 +147,21 @@ public class CarAdmUser implements Serializable{
 
     public void setPhone(String phone) {
         this.phone = phone == null ? null : phone.trim();
+    }
+
+    public String getGroupIds() {
+        return groupIds;
+    }
+
+    public void setGroupIds(String groupIds) {
+        this.groupIds = groupIds == null ? null : groupIds.trim();
+    }
+
+    public Integer getLevel() {
+        return level;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
     }
 }

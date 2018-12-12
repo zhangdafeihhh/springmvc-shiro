@@ -1032,4 +1032,113 @@ public class CarBizDriverInfo {
     public void setMemo(String memo) {
         this.memo = memo == null ? null : memo.trim();
     }
+
+    @Override
+    public String toString() {
+        return "CarBizDriverInfo{" +
+                "driverId=" + driverId +
+                ", password='" + password + '\'' +
+                ", phone='" + phone + '\'' +
+                ", gender=" + gender +
+                ", name='" + name + '\'' +
+                ", supplierId=" + supplierId +
+                ", age=" + age +
+                ", currentAddress='" + currentAddress + '\'' +
+                ", emergencyContactPerson='" + emergencyContactPerson + '\'' +
+                ", emergencyContactNumber='" + emergencyContactNumber + '\'' +
+                ", idCardNo='" + idCardNo + '\'' +
+                ", superintendNo='" + superintendNo + '\'' +
+                ", superintendUrl='" + superintendUrl + '\'' +
+                ", drivingLicenseType='" + drivingLicenseType + '\'' +
+                ", drivingYears=" + drivingYears +
+                ", archivesNo='" + archivesNo + '\'' +
+                ", issueDate=" + issueDate +
+                ", expireDate=" + expireDate +
+                ", serviceCity=" + serviceCity +
+                ", attachmentName='" + attachmentName + '\'' +
+                ", attachmentAddr='" + attachmentAddr + '\'' +
+                ", accountBank='" + accountBank + '\'' +
+                ", bankAccountNo='" + bankAccountNo + '\'' +
+                ", licensePlates='" + licensePlates + '\'' +
+                ", updateDate=" + updateDate +
+                ", createDate=" + createDate +
+                ", updateBy=" + updateBy +
+                ", createBy=" + createBy +
+                ", status=" + status +
+                ", mac='" + mac + '\'' +
+                ", photosrct='" + photosrct + '\'' +
+                ", pushId='" + pushId + '\'' +
+                ", isBindingCreditCard=" + isBindingCreditCard +
+                ", appVersion='" + appVersion + '\'' +
+                ", creditCardNo='" + creditCardNo + '\'' +
+                ", storableCardNo='" + storableCardNo + '\'' +
+                ", creditOpenAccountBank='" + creditOpenAccountBank + '\'' +
+                ", creditCardPeriodOfValidity='" + creditCardPeriodOfValidity + '\'' +
+                ", grabNotice=" + grabNotice +
+                ", creditCvn2='" + creditCvn2 + '\'' +
+                ", creditBindDate=" + creditBindDate +
+                ", quickpayCustomerid='" + quickpayCustomerid + '\'' +
+                ", isRead=" + isRead +
+                ", bankid='" + bankid + '\'' +
+                ", goHomeAddress='" + goHomeAddress + '\'' +
+                ", goHomePointLobd='" + goHomePointLobd + '\'' +
+                ", goHomePointLabd='" + goHomePointLabd + '\'' +
+                ", goHomePointLa='" + goHomePointLa + '\'' +
+                ", goHomePointLo='" + goHomePointLo + '\'' +
+                ", goHomeStatus=" + goHomeStatus +
+                ", updateGoHomeDate='" + updateGoHomeDate + '\'' +
+                ", imei='" + imei + '\'' +
+                ", driverlicensenumber='" + driverlicensenumber + '\'' +
+                ", drivinglicenseimg='" + drivinglicenseimg + '\'' +
+                ", firstdrivinglicensedate='" + firstdrivinglicensedate + '\'' +
+                ", firstmeshworkdrivinglicensedate='" + firstmeshworkdrivinglicensedate + '\'' +
+                ", nationality='" + nationality + '\'' +
+                ", householdregister='" + householdregister + '\'' +
+                ", nation='" + nation + '\'' +
+                ", marriage='" + marriage + '\'' +
+                ", foreignlanguage='" + foreignlanguage + '\'' +
+                ", address='" + address + '\'' +
+                ", education='" + education + '\'' +
+                ", coursename='" + coursename + '\'' +
+                ", coursedate='" + coursedate + '\'' +
+                ", coursedatestart='" + coursedatestart + '\'' +
+                ", coursedateend='" + coursedateend + '\'' +
+                ", coursetime='" + coursetime + '\'' +
+                ", corptype='" + corptype + '\'' +
+                ", trafficviolations='" + trafficviolations + '\'' +
+                ", signdate='" + signdate + '\'' +
+                ", signdateend='" + signdateend + '\'' +
+                ", contractdate='" + contractdate + '\'' +
+                ", isxydriver=" + isxydriver +
+                ", parttimejobdri='" + parttimejobdri + '\'' +
+                ", phonetype='" + phonetype + '\'' +
+                ", phonecorp='" + phonecorp + '\'' +
+                ", appversion='" + appversion + '\'' +
+                ", maptype='" + maptype + '\'' +
+                ", emergencycontactaddr='" + emergencycontactaddr + '\'' +
+                ", assessment='" + assessment + '\'' +
+                ", driverlicenseissuingdatestart='" + driverlicenseissuingdatestart + '\'' +
+                ", driverlicenseissuingdateend='" + driverlicenseissuingdateend + '\'' +
+                ", driverlicenseissuingcorp='" + driverlicenseissuingcorp + '\'' +
+                ", driverlicenseissuingnumber='" + driverlicenseissuingnumber + '\'' +
+                ", xyDriverNumber='" + xyDriverNumber + '\'' +
+                ", driverLicenseIssuingRegisterDate='" + driverLicenseIssuingRegisterDate + '\'' +
+                ", driverLicenseIssuingFirstDate='" + driverLicenseIssuingFirstDate + '\'' +
+                ", driverLicenseIssuingGrantDate='" + driverLicenseIssuingGrantDate + '\'' +
+                ", birthDay='" + birthDay + '\'' +
+                ", houseHoldRegisterPermanent='" + houseHoldRegisterPermanent + '\'' +
+                ", isUploadCard=" + isUploadCard +
+                ", isMustConfirmation=" + isMustConfirmation +
+                ", englishName='" + englishName + '\'' +
+                ", contractType='" + contractType + '\'' +
+                ", contractNo='" + contractNo + '\'' +
+                ", contractFile='" + contractFile + '\'' +
+                ", cooperationType=" + cooperationType +
+                ", accountType=" + accountType +
+                ", groupId=" + groupId +
+                ", isTwoShifts=" + isTwoShifts +
+                ", isImage=" + isImage +
+                ", memo='" + memo + '\'' +
+                '}';
+    }
 }

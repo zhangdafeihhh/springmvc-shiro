@@ -49,7 +49,7 @@
                     <property name="properties">
                         <value>
                             helperDialect=mysql
-                            reasonable=true
+                            reasonable=false
                             supportMethodsArguments=true
                             params=count=countSql
                             autoRuntimeDialect=true
@@ -66,5 +66,13 @@
 		<!-- 请修改此处： 请修改为实际的mapper接口包路径 -->
 		<property name="basePackage" value="mapper.mdbcarmanage" />
 	</bean>
+
+    <!--事务配置开始位置-->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="mdbcarmanage-master-DataSource"/>
+    </bean>
+    <!-- enable transaction annotation support -->
+    <tx:annotation-driven transaction-manager="txManager"/>
+    <!--事务配置结束-->
 
 </beans>

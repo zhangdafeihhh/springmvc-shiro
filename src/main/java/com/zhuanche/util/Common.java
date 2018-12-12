@@ -41,6 +41,11 @@ public class Common {
 	public static final String RESULT_MSG = "msg";
 	
 	public static final Integer DEFAULT_PAGE_SIZE = 10;
+	
+	// 巴士接口begin
+	public static final String BUSINESSID = ServerUtil.get("bus.order.businessId");// 业务线
+	public static final String KEY = ServerUtil.get("bus.order.key");
+	// 巴士接口end
 
 	//拼车订单查询begin
 	public static final String GET_MAIN_ORDER_BY_ORDERNO = "/order/carpool/getMainOrderBySubOrderNo";

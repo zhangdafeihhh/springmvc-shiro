@@ -35,6 +35,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,6 +110,7 @@ public class DriverDailyReportController extends DriverQueryController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/queryDriverReportData")
+	@RequiresPermissions(value = { "DriverDaily_look" } )
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})
@@ -244,6 +246,7 @@ public class DriverDailyReportController extends DriverQueryController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/exportDriverReportData")
+	@RequiresPermissions(value = { "DriverDaily_export" } )
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})

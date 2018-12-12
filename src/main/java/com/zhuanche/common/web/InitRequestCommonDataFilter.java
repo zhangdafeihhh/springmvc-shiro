@@ -54,7 +54,7 @@ public class InitRequestCommonDataFilter extends OncePerRequestFilter {
         response.setHeader("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Accept,XRequestedWith,LastModified");
         response.setHeader("Access-Control-Allow-Credentials", "true");		
 		/***************支持跨域请求END***********************/
-        
+
 		/***************是否为AJAX请求BEGIN******************/
 		String XMLHttpRequest = request.getHeader("X-Requested-With");
 		if( (XMLHttpRequest!=null && XMLHttpRequest.trim().length()>0) || request.getRequestURI().endsWith(".json") ){

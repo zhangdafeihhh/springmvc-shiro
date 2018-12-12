@@ -1,21 +1,23 @@
 package mapper.rentcar.ex;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.ibatis.annotations.Param;
+
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.dto.CarDriverInfoDTO;
+import com.zhuanche.dto.busManage.BusDriverRicherDTO;
 import com.zhuanche.dto.driver.DriverVoEntity;
+import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.request.DriverMonthDutyRequest;
 import com.zhuanche.request.DriverTeamRequest;
 import com.zhuanche.request.DutyParamRequest;
-import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public interface CarBizDriverInfoExMapper {
 
@@ -159,5 +161,16 @@ public interface CarBizDriverInfoExMapper {
 	 */
 	void updateDriverCooperationTypeBySupplierId(Map<String, Object> map);
 
+    CarBizDriverInfoDTO selectByDriverId(@Param("driverId") Integer driverId);
 
+    
+    /**
+     * @Title: queryBusDriverList
+     * @Description: 查询巴士订单指派/改派可用司机
+     * @param busDriverDTO
+     * @return List<Map<String,Object>>
+     * @throws
+     */
+    List<Map<String, Object>> queryBusDriverList(BusDriverRicherDTO richerDTO);
+    
 }

@@ -16,6 +16,7 @@ import java.lang.annotation.Target;
  *                   5、idcard      身份证号码<br>
  *                   6、email       电子邮箱地址<br>
  *                   7、RegExp(N)  正则表达式（可自定义正则式N）<br>
+ *                   8、multiNumber  逗号分隔的数字<br>
  *                   
  *  多项规则： 多个规则之间用"|"分隔开来。<br>
  *  关于扩展： 如需增加更多的校验规则，只需继承并扩展com.zhuanche.common.web.HttpParamVerifyValidator类即可。 <br>
@@ -23,6 +24,7 @@ import java.lang.annotation.Target;
  *                   @Verify(param="money",rule="required|min(100)|max(300)")  <br>
  *                   @Verify(param="phone",rule="mobile")  <br>
  *                   @Verify(param="mailAddr",rule="required|email")  <br>
+ *                   @Verify(param="roleIds",rule="multiNumber")  <br>
  **/
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)

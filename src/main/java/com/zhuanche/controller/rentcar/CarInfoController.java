@@ -22,6 +22,7 @@ import com.zhuanche.util.Common;
 import com.zhuanche.util.excel.CsvUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,7 @@ public class CarInfoController {
      * @return
      */
     @RequestMapping(value = "/queryCarData")
+	@RequiresPermissions(value = { "CarInfoManageSearch_look" } )
     @MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
 	} )
@@ -460,6 +462,7 @@ public class CarInfoController {
             @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
     } )
     @RequestMapping("/exportCarInfo")
+	@RequiresPermissions(value = { "CarInfoManageSearch_export" } )
     public String exportCarInfo(@Verify(param = "cities",rule="required")String cities,
                               @Verify(param = "supplierIds",rule="required")String supplierIds,
                               String carModelIds,

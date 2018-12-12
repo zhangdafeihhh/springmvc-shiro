@@ -23,6 +23,7 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +78,7 @@ public class DriverInfoTemporaryController extends BaseController {
      */
     @ResponseBody
     @RequestMapping(value = "/driverListData", method =  RequestMethod.GET )
+	@RequiresPermissions(value = { "SupplierDriverEntry_look" } )
     @MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE ),
 			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE)
@@ -196,6 +198,7 @@ public class DriverInfoTemporaryController extends BaseController {
      * @param response
      */
     @RequestMapping(value = "/fileDownloadDriverInfo",method =  RequestMethod.GET)
+	@RequiresPermissions(value = { "SupplierDriverEntry_download" } )
     public void fileDownloadDriverInfo(HttpServletRequest request, HttpServletResponse response) {
         String path = request.getSession().getServletContext().getRealPath("/upload")+File.separator+"IMPORTDRIVERINFO.xlsx";
         super.fileDownload(request,response,path);
@@ -212,6 +215,7 @@ public class DriverInfoTemporaryController extends BaseController {
      */
     @ResponseBody
     @RequestMapping(value = "/importDriverInfo",method =  RequestMethod.POST)
+	@RequiresPermissions(value = { "SupplierDriverEntry_import" } )
     public AjaxResponse importDriverInfo(@RequestParam(value="fileName") MultipartFile file,
                                          @Verify(param = "cityId",rule="required") Integer cityId,
                                          @Verify(param = "supplierId",rule="required") Integer supplierId,

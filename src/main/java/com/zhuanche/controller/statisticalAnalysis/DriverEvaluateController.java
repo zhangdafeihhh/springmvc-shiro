@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,7 @@ public class DriverEvaluateController{
 		  */
 		@ResponseBody
 	    @RequestMapping(value = "/queryDriverEvaluateData", method = { RequestMethod.POST,RequestMethod.GET })
+		@RequiresPermissions(value = { "DriverEvaluateDetail_look" } )
 	    public AjaxResponse queryDriverEvaluateData(
 	    										  Long orderCityId,
 	    										  String driverTypeId,
@@ -122,6 +124,7 @@ public class DriverEvaluateController{
 		    * @return
 		  */
   	@RequestMapping(value = "/exportDriverEvaluateData", method = { RequestMethod.POST,RequestMethod.GET })
+	@RequiresPermissions(value = { "DriverEvaluateDetail_export" } )
 	public void exportDriverEvaluateData( 
 										Long orderCityId,
 										String driverTypeId,

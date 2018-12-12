@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,7 @@ public class DriverOperAnlayController{
 	  */
 	  @ResponseBody
 	  @RequestMapping(value = "/queryDriverOperAnlayData", method = { RequestMethod.POST,RequestMethod.GET })
+	  @RequiresPermissions(value = { "JoinDriverOperateAnalysis_look" } )
 	  public AjaxResponse queryCarAnalysisIndexDetailData(
 			  @Verify(param = "startDate",rule = "required") String startDate,
 			  @Verify(param = "endDate",rule = "required") String endDate, 
@@ -81,6 +83,7 @@ public class DriverOperAnlayController{
 	  */
 	@ResponseBody
     @RequestMapping(value = "/queryDriverOperAnlayTrendData", method = { RequestMethod.POST,RequestMethod.GET })
+	@RequiresPermissions(value = { "JoinDriverOperateAnalysis_look" } )
     public AjaxResponse queryCarAnalysisIndexWayData(
     		  @Verify(param = "startDate",rule = "required") String startDate,
 			  @Verify(param = "endDate",rule = "required") String endDate, 

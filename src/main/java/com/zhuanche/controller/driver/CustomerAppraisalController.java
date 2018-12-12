@@ -19,6 +19,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.threads.CustomerAppraisalExportHelper;
 import com.zhuanche.util.excel.CsvUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -135,6 +136,7 @@ public class CustomerAppraisalController {
      */
     @ResponseBody
     @RequestMapping(value = "/queryCustomerAppraisalStatisticsList")
+	@RequiresPermissions(value = { "DriverScore_look" } )
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
@@ -200,6 +202,7 @@ public class CustomerAppraisalController {
      */
     @ResponseBody
     @RequestMapping(value = "/exportCustomerAppraisalStatistics")
+	@RequiresPermissions(value = { "DriverScore_export" } )
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })

@@ -6,6 +6,7 @@ import org.apache.commons.net.ftp.FTPReply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -355,5 +356,20 @@ public final class FtpUtil {
             return false;
         }
     }
+
+	/**初始化配置    文件位置configLocation **/
+	public static synchronized void init( String configLocation) {
+		try{
+			logger.info("***************initializing ftp"+configLocation+"]");
+			ftpPathConfig = PropertiesLoaderUtils.loadAllProperties(configLocation);
+			logger.info( ftpPathConfig.toString()  );
+			logger.info("***************initialized ftp["+configLocation+"]\n");
+		} catch (Exception e) {
+			logger.error("ftp初始化配置文件："+ configLocation, e);
+			System.err.println("ftp初始化配置文件："+ configLocation );
+			e.printStackTrace();
+			System.exit(-1);
+		}
+	}
 
 }

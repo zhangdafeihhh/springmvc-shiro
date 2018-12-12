@@ -30,6 +30,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,11 +85,12 @@ public class OrderAppraisalController extends DriverQueryController{
 	 */
 	@ResponseBody
 	@RequestMapping("/orderAppraisalListData")
+	@RequiresPermissions(value = { "OrderScore_look" } )
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})
-	public AjaxResponse appraisalDataList(String cityId,
-										  String supplierId,
+	public AjaxResponse appraisalDataList(@Verify(param="cityId",rule="required")String cityId,
+										  @Verify(param="supplierId",rule="required")String supplierId,
 										  String teamId,
 										  String groupIds,
 										  String driverName,
@@ -101,10 +103,10 @@ public class OrderAppraisalController extends DriverQueryController{
 										  Integer page,
 										  @Verify(param = "pageSize",rule = "max(50)")Integer pageSize) {
 
-		if (StringUtils.isEmpty(driverPhone) && StringUtils.isEmpty(teamId)){
-			//请选择一个车队号或输入司机手机
-			return AjaxResponse.fail(RestErrorCode.TEAMID_OR_DRIVERID_ISNULL);
-		}
+//		if (StringUtils.isEmpty(driverPhone) && StringUtils.isEmpty(teamId)){
+//			//请选择一个车队号或输入司机手机
+//			return AjaxResponse.fail(RestErrorCode.TEAMID_OR_DRIVERID_ISNULL);
+//		}
 		CarBizCustomerAppraisalParams params = new CarBizCustomerAppraisalParams(cityId,supplierId,teamId,groupIds,driverName,driverPhone,orderNo,
 				createDateBegin,createDateEnd,evaluateScore,sortName,sortOrder,page,pageSize);
 
@@ -156,17 +158,18 @@ public class OrderAppraisalController extends DriverQueryController{
 	 * @return
 	 */
 	@RequestMapping("/exportOrderAppraisal")
+	@RequiresPermissions(value = { "OrderScore_export" } )
 	@ResponseBody
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})
-	public AjaxResponse exportOrderAppraisal(String cityId,
-									 String supplierId,
+	public AjaxResponse exportOrderAppraisal(
+			@Verify(param="cityId",rule="required")String cityId,
+			@Verify(param="supplierId",rule="required") String supplierId,
 									 String teamId,
 									 String groupIds,
 									 String driverName,
-									 @Verify(param="driverPhone",rule="mobile")
-														 String driverPhone,
+									 @Verify(param="driverPhone",rule="mobile")  String driverPhone,
 									 String orderNo,
 									 @Verify(param="createDateBegin",rule="required")String createDateBegin,
 									 @Verify(param="createDateEnd",rule="required")String createDateEnd,
@@ -189,10 +192,6 @@ public class OrderAppraisalController extends DriverQueryController{
 				fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
 			}
 
-			if (StringUtils.isEmpty(driverPhone) && StringUtils.isEmpty(teamId)){
-				//请选择一个车队号或输入司机手机
-				return AjaxResponse.fail(RestErrorCode.TEAMID_OR_DRIVERID_ISNULL);
-			}
 			CsvUtils entity = new CsvUtils();
 			params = new CarBizCustomerAppraisalParams(cityId,supplierId,teamId,groupIds,driverName,driverPhone,orderNo,
 					createDateBegin,createDateEnd,evaluateScore,sortName,sortOrder,page,pageSize);
