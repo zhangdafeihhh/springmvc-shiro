@@ -1,6 +1,7 @@
 package com.zhuanche.serv.mongo;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -158,6 +159,34 @@ public class BusDriverMongoService {
 		update.set("superintendUrl", saveDTO.getSuperintendUrl());
 		update.set("cooperationType", saveDTO.getCooperationType());
 		driverMongoTemplate.updateFirst(query, update, DriverMongo.class);
+	}
+
+	/**
+	 * @Title: queryDriverByName
+	 * @Description: 根据司机姓名查询司机信息
+	 * @param name
+	 * @return 
+	 * @return List<DriverMongo>
+	 * @throws
+	 */
+	public List<DriverMongo> queryDriverByName(String name) {
+		Query query = new Query(Criteria.where("name").is(name));
+		List<DriverMongo> driverMongos = driverMongoTemplate.find(query, DriverMongo.class);
+		return driverMongos;
+	}
+	
+	/**
+	 * @Title: queryDriverByPhone
+	 * @Description: 根据司机手机号查询司机信息
+	 * @param phone
+	 * @return 
+	 * @return List<DriverMongo>
+	 * @throws
+	 */
+	public List<DriverMongo> queryDriverByPhone(String phone) {
+		Query query = new Query(Criteria.where("phone").is(phone));
+		List<DriverMongo> driverMongos = driverMongoTemplate.find(query, DriverMongo.class);
+		return driverMongos;
 	}
 
 }

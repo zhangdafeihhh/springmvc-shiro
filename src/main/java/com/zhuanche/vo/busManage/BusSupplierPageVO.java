@@ -19,7 +19,7 @@ public class BusSupplierPageVO {
 	private String supplierName;
 
 	/** 城市名称 **/
-	private Integer cityName;
+	private String cityName;
 
 	/** 分佣比例 **/
 	private Double supplierRate;
@@ -61,11 +61,11 @@ public class BusSupplierPageVO {
 		this.supplierName = supplierName;
 	}
 
-	public Integer getCityName() {
+	public String getCityName() {
 		return cityName;
 	}
 
-	public void setCityName(Integer cityName) {
+	public void setCityName(String cityName) {
 		this.cityName = cityName;
 	}
 

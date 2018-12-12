@@ -244,7 +244,7 @@ public class BusSupplierService implements BusConst {
 		}
 		
 		// 四、补充分佣信息(分佣比例、是否有返点)
-		String supplierIds = StringUtils.join(resultList.stream().map(e -> e.getSupplierId()).collect(Collectors.toList()), ",");
+		String supplierIds = resultList.stream().map(e -> e.getSupplierId().toString()).collect(Collectors.joining(","));
 		JSONArray jsonArray = getProrateList(supplierIds);
 		if (jsonArray != null) {
 			// 组装数据
@@ -316,7 +316,7 @@ public class BusSupplierService implements BusConst {
 			return csvDataList;
 		}
 		// 补充分佣信息(分佣比例、是否有返点)
-		String supplierIds = StringUtils.join(list.stream().map(e -> e.getSupplierId()).collect(Collectors.toList()), ",");;
+		String supplierIds = list.stream().map(e -> e.getSupplierId().toString()).collect(Collectors.joining(","));
 		JSONArray jsonArray = getProrateList(supplierIds);
 		// 组装数据
 		if (jsonArray != null) {
@@ -406,15 +406,91 @@ public class BusSupplierService implements BusConst {
 		completeDetailInfo(supplierVO);
 
 		// 三、调用分佣接口，查询结算、分佣、返点信息
-//		Map<String, Object> params = new HashMap<>();
-//		params.put("supplierId", supplierId);
-//		logger.info("[ BusSupplierService-querySupplierById ] 补充分佣信息(分佣比例、是否有返点)异常,params={}", params);
-//		JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + SETTLE_SUPPLIER_PRORATE_LIST, params , 2000, "查询供应商分佣信息（分佣比例、是否有返点）");
+		supplierVO.setCommissionInfo(getRemoteCommissionInfo(supplierId));
+		supplierVO.setProrateList(getRemoteProrateInfoList(supplierId));
+		supplierVO.setRebateList(getRemoteRebateInfo(supplierId));
 
 		return supplierVO;
 	}
-	
-	
+
+	/**
+	 * @Title: getRemoteCommissionInfo
+	 * @Description: 获取供应商结算信息
+	 * @param supplierId
+	 * @return 
+	 * @return Map<String,Object>
+	 * @throws
+	 */
+	private JSON getRemoteCommissionInfo(Integer supplierId) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("supplierId", supplierId);
+		try {
+			logger.info("[ BusSupplierService-getRemoteCommissionInfo ] 查询供应商结算信息,params={}", params);
+			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_SUPPLIER_INFO, params, 2000, "查询供应商结算信息");
+			if (result.getIntValue("code") == 0) {
+				JSONObject jsonObject = result.getJSONObject("data");
+				return jsonObject;
+			} else {
+				logger.info("[ BusSupplierService-getRemoteCommissionInfo ] 查询供应商结算信息调用接口出错,params={},errorMsg={}", params, result.getString("msg"));
+			}
+		} catch (Exception e) {
+			logger.error("[ BusSupplierService-getRemoteCommissionInfo ] 查询供应商结算信息异常,params={},errorMsg={}", params, e.getMessage(), e);
+		}
+		return null;
+	}
+
+	/**
+	 * @Title: getRemoteProrateInfoList
+	 * @Description: 获取供应商分佣信息
+	 * @param supplierId 
+	 * @return void
+	 * @throws
+	 */
+	private JSON getRemoteProrateInfoList(Integer supplierId) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("supplierId", supplierId);
+		params.put("status", 0);
+		try {
+			logger.info("[ BusSupplierService-getRemoteProrateInfoList ] 查询供应商分佣信息,params={}", params);
+			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_SUPPLIER_PRORATE_INFO_LIST, params, 2000, "查询供应商分佣信息");
+			if (result.getIntValue("code") == 0) {
+				JSONArray jsonArray = result.getJSONArray("data");
+				return jsonArray;
+			} else {
+				logger.info("[ BusSupplierService-getRemoteProrateInfoList ] 查询供应商分佣信息调用接口出错,params={},errorMsg={}", params, result.getString("msg"));
+			}
+		} catch (Exception e) {
+			logger.error("[ BusSupplierService-getRemoteProrateInfoList ] 查询供应商分佣信息异常,params={},errorMsg={}", params, e.getMessage(), e);
+		}
+		return null;
+	}
+
+	/**
+	 * @Title: getRemoteRebateInfo
+	 * @Description: 获取供应商返点信息
+	 * @param supplierId 
+	 * @return void
+	 * @throws
+	 */
+	private JSON getRemoteRebateInfo(Integer supplierId) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("supplierId", supplierId);
+		params.put("status", 0);
+		try {
+			logger.info("[ BusSupplierService-getRemoteRebateInfo ] 查询供应商返点信息,params={}", params);
+			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_SUPPLIER_REBATE_INFO, params, 2000, "查询供应商返点信息");
+			if (result.getIntValue("code") == 0) {
+				JSONArray jsonArray = result.getJSONArray("data");
+				return jsonArray;
+			} else {
+				logger.info("[ BusSupplierService-getRemoteRebateInfo ] 查询供应商返点信息调用接口出错,params={},errorMsg={}", params, result.getString("msg"));
+			}
+		} catch (Exception e) {
+			logger.error("[ BusSupplierService-getRemoteRebateInfo ] 查询供应商返点信息异常,params={},errorMsg={}", params, e.getMessage(), e);
+		}
+		return null;
+	}
+
 	/**
 	 * @Title: getProrateList
 	 * @Description: 查询供应商分佣有关的信息（批量）
@@ -429,7 +505,7 @@ public class BusSupplierService implements BusConst {
 			params.put("supplierIds", supplierIds);
 			try {
 				logger.info("[ BusSupplierService-getProrateList ] 补充分佣信息(分佣比例、是否有返点)异常,params={}", params);
-				JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + SETTLE_SUPPLIER_PRORATE_LIST, params , 2000, "查询供应商分佣信息（分佣比例、是否有返点）");
+				JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_SUPPLIER_PRORATE_LIST, params , 2000, "查询供应商分佣信息（分佣比例、是否有返点）");
 				if (result.getIntValue("code") == 0) {
 					JSONArray jsonArray = result.getJSONArray("data");
 					return jsonArray;

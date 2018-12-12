@@ -157,12 +157,12 @@
         </property>
 	</bean>
  	<!--支付接口-->
-    <bean id="busOrderPayTemplate" class="com.zhuanche.util.MyRestTemplate">
+    <bean id="orderPayOldTemplate" class="com.zhuanche.util.MyRestTemplate">
         <constructor-arg ref="httpClientFactory" />
         <property name="errorHandler">
             <bean class="org.springframework.web.client.DefaultResponseErrorHandler"/>
         </property>
-        <property name="failover" value="${bus.pay.url}"></property>
+        <property name="failover" value="${order.pay.old.url}"></property>
         <property name="messageConverters">
             <list>
                 <bean class="org.springframework.http.converter.FormHttpMessageConverter"/>

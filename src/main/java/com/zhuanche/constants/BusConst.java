@@ -23,7 +23,7 @@ public interface BusConst {
 
 	// ========================日期格式化器========================
 	DateTimeFormatter FORMATTER_DATE_BY_HYPHEN = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-	
+
 	default String formatDate(DateTimeFormatter formatter, Date date) {
 		if (formatter == null || date == null) {
 			return "";
@@ -32,7 +32,7 @@ public interface BusConst {
 	}
 
 	// ========================DecimalFormat========================
-    DecimalFormat format = new DecimalFormat("##########.00");
+	DecimalFormat format = new DecimalFormat("##########.00");
 
 	default String decimalFormat(BigDecimal value) {
 		if (value == null) {
@@ -40,24 +40,103 @@ public interface BusConst {
 		}
 		return format.format(value);
 	}
+
 	// ==========================其它==============================
 	/** 驾照类型 **/
 	String[] DRIVING_LICENSE_TYPES = { "A1", "A2", "A3", "B1", "B2", "C1", "C2", "N", "P" };
-	
-	// =============================================结算单接口列表===================================================
-	/** 供应商基本信息查询 **/
-	String SETTLE_SUPPLIER_INFO = "/settle/supplier/info";
-	
-	/** 查询分佣协议 **/
-	String SETTLE_SUPPLIER_PRORATE_INFO_LIST = "/settle/supplier/prorate/info/list";
-	
-	/** 查找供应商返佣配置 **/
-	String SETTLE_SUPPLIER_REBATE_INFO = "/settle/supplier/rebate/info";
 
-	/** 查询供应商分佣有关的信息（批量） **/
-	String SETTLE_SUPPLIER_PRORATE_LIST = "/settle/supplier/prorate/list";
+	/**
+	 * @ClassName: Pay
+	 * @Description: 支付系统【重构版】(pay.01zhuanche.com)
+	 * @author: yanyunpeng
+	 * @date: 2018年12月12日 下午5:17:38
+	 * 
+	 */
+	interface Pay {
+		// =============================================供应商接口列表===================================================
+		/** 供应商基本信息查询 **/
+		String SETTLE_SUPPLIER_INFO = "/settle/supplier/info";
 
-	/** 查询供应商的账单 **/
-	String SETTLE_DETAIL_LIST = "/settle/detail/list";
+		/** 查询分佣协议 **/
+		String SETTLE_SUPPLIER_PRORATE_INFO_LIST = "/settle/supplier/prorate/info/list";
+
+		/** 查找供应商返佣配置 **/
+		String SETTLE_SUPPLIER_REBATE_INFO = "/settle/supplier/rebate/info";
+
+		/** 查询供应商分佣有关的信息（批量） **/
+		String SETTLE_SUPPLIER_PRORATE_LIST = "/settle/supplier/prorate/list";
+
+		// =============================================结算单接口列表===================================================
+		/** 查询供应商的账单 **/
+		String SETTLE_DETAIL_LIST = "/settle/detail/list";
+	}
+
+	/**
+	 * @ClassName: Payment
+	 * @Description: 支付系统【旧版】(payment.01zhuanche.com)
+	 * @author: yanyunpeng
+	 * @date: 2018年12月12日 下午5:24:03
+	 * 
+	 */
+	interface Payment {
+		/** 批量查询企业信息 **/
+		String BUSINESS_QUERYBUSINESSINFOBATCH = "/business/queryBusinessInfoBatch";
+
+	}
+
+	/**
+	 * @ClassName: Charge
+	 * @Description: 计费系统(charge.01zhuanche.com)
+	 * @author: yanyunpeng
+	 * @date: 2018年12月12日 下午5:19:56
+	 * 
+	 */
+	interface Charge {
+		/** 大巴车-批量获取费用明细 **/
+		String BUSS_GETBUSCOSTDETAILLIST = "/buss/getBusCostDetailList";
+	}
+
+	/**
+	 * @ClassName: BusinessRest
+	 * @Description: 企业前端接口文档(business-rest.01zhuanche.com)
+	 * @author: yanyunpeng
+	 * @date: 2018年12月12日 下午5:52:06
+	 * 
+	 */
+	interface BusinessRest {
+		// ================================================企业信息接口列表===========================================================
+		/** 根据手机号查询企业信息 **/
+		String COMPANY_QUERYCOMPANYBYPHONE = "/api/v1/company/queryCompanyByPhone";
+	}
+
+	/**
+	 * @ClassName: Order
+	 * @Description: 新订单服务（order.01zhuanche.com）
+	 * @author: yanyunpeng
+	 * @date: 2018年12月12日 下午5:59:17
+	 * 
+	 */
+	interface Order {
+		/** 查询订单列表 **/
+		String SELECT_ORDER_LIST = "/busOrder/selectOrderList";
+
+		/** 服务中的司机列表 **/
+		String BUS_IN_SERVICE_LIST = "/busInService/list";
+
+		/** 巴士订单改派 **/
+		String UPDATE_DRIVER = "/busOrder/updateDriver";
+	}
+
+	/**
+	 * @ClassName: Dispatcher
+	 * @Description: 派单服务(dispatcher.01zhuanche.com)
+	 * @author: yanyunpeng
+	 * @date: 2018年12月12日 下午6:03:34
+	 * 
+	 */
+	interface Dispatcher {
+		/** 指定司机绑单接口 **/
+		String BUS_DISPATCHER = "/bus/busDispatcher";
+	}
 
 }

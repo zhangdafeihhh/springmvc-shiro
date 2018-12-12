@@ -73,8 +73,11 @@ public class BusSupplierInfoVO {
 	/** 供应商基本信息 **/
 	private JSON commissionInfo;
 
+	/** 供应商分佣信息 **/
+	private JSON prorateList;
+
 	/** 供应商返佣配置 **/
-	private JSON rebateInfo;
+	private JSON rebateList;
 
 	public Integer getSupplierId() {
 		return supplierId;
@@ -236,12 +239,20 @@ public class BusSupplierInfoVO {
 		this.commissionInfo = commissionInfo;
 	}
 
-	public JSON getRebateInfo() {
-		return rebateInfo;
+	public JSON getProrateList() {
+		return prorateList;
 	}
 
-	public void setRebateInfo(JSON rebateInfo) {
-		this.rebateInfo = rebateInfo;
+	public void setProrateList(JSON prorateList) {
+		this.prorateList = prorateList;
+	}
+
+	public JSON getRebateList() {
+		return rebateList;
+	}
+
+	public void setRebateList(JSON rebateList) {
+		this.rebateList = rebateList;
 	}
 
 }
