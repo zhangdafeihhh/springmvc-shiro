@@ -378,6 +378,7 @@ public class DriverMaidController {
             }
             param.put("accountIds", driverids);
         }
+        buidDrawalsParam(param, dto);
         Integer pageNum = 0;
         boolean isFirst = true;
         boolean isList = false;
@@ -445,6 +446,12 @@ public class DriverMaidController {
                 return;
             }
             param.put("accountIds", driverids);
+        }
+        if (StringUtils.isNotBlank(dto.getPhone())) {
+            param.put("phone", dto.getPhone());
+        }
+        if (dto.getCityId() != null) {
+            param.put("cityCode", dto.getCityId());
         }
         Integer pageNum = 0;
         boolean isFirst = true;
