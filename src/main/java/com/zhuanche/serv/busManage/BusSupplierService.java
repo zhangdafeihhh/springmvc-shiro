@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -170,41 +169,31 @@ public class BusSupplierService implements BusConst {
 		queryDTO.pageNum = null;
 		queryDTO.pageSize = null;
 		
-		// 数据权限控制SSOLoginUser
-		Set<Integer> permOfCity = WebSessionUtil.getCurrentLoginUser().getCityIds(); // 普通管理员可以管理的所有城市ID
-		Set<Integer> permOfSupplier = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); // 普通管理员可以管理的所有供应商ID
-		Set<Integer> permOfTeam = WebSessionUtil.getCurrentLoginUser().getTeamIds(); // 普通管理员可以管理的所有车队ID
-		queryDTO.setAuthOfCity(permOfCity);
-		queryDTO.setAuthOfSupplier(permOfSupplier);
-		queryDTO.setAuthOfTeam(permOfTeam);
-		
 		// 一、查询快合同快到期供应商
 		Map<Object,Object> param = new HashMap<>();
-		param.put("permOfSupplier", permOfSupplier);
+		param.put("permOfSupplier", queryDTO.getAuthOfSupplier());
 		List<BusSupplierPageVO> contractList = busBizSupplierDetailExMapper.querySupplierContractExpireSoonList(param);
-		List<Integer> contractIds = new ArrayList<>();
-		contractList.forEach(e -> contractIds.add(e.getSupplierId()));
-		
+		if (contractList.isEmpty()) {
+			return null;// 没有则走正常查询
+		}
 		// 二、所有快到期的供应商的基础信息
+		List<Integer> contractIds = contractList.stream().map(BusSupplierPageVO::getSupplierId).collect(Collectors.toList());
 		queryDTO.setContractIds(contractIds);
 		List<BusSupplierPageVO> contractSuppliers = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
 		int offset = (Math.max(pageNum, 1) - 1) * pageSize;
 		int limit = offset + pageSize;
-		// 三、封装结果集
+		// 三、封装结果集(按区间分别查询:完全不在快到期区间、一部分在快到期区间、完全在快到期区间)
 		List<BusSupplierPageVO> resultList = new ArrayList<>();
 		if (offset > contractSuppliers.size()) {
 			queryDTO.setContractIds(null);
 			queryDTO.setExcludeContractIds(contractIds);// 其它供应商(not in 上面的供应商)
 			try(Page p = PageHelper.offsetPage(offset - contractSuppliers.size(), limit)) {
 				List<BusSupplierPageVO> supplierList = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
-				// 补充巴士供应商其它信息
-				supplierList.forEach(e -> {
-					completeDetailInfo(e);
-				});
+				supplierList.forEach(this::completeDetailInfo);// 补充巴士供应商其它信息
 				resultList.addAll(supplierList);
 			}
 		} else {
-			// 组合排序
+			// 组合
 			List<BusSupplierPageVO> allContractList = new ArrayList<>();
 			for (BusSupplierPageVO carBizSupplier : contractSuppliers) {
 				for (BusSupplierPageVO busSupplierDetail : contractList) {
@@ -218,20 +207,19 @@ public class BusSupplierService implements BusConst {
 					}
 				}
 			}
+			// 排序
 			List<BusSupplierPageVO> orderedAllContractList = allContractList.stream()
 					.sorted(Comparator.comparing(BusSupplierPageVO::getContractDateEnd).reversed())
 					.collect(Collectors.toList());
 			if (limit > contractSuppliers.size()) {
 				// 合同快到期供应商
 				List<BusSupplierPageVO> subList = orderedAllContractList.subList(offset, contractSuppliers.size());
+				// 正常供应商
 				try(Page p = PageHelper.offsetPage(0, limit)) {
-					// 补充巴士供应商其它信息
 					queryDTO.setContractIds(null);
 					queryDTO.setExcludeContractIds(contractIds);// 其它供应商(not in 上面的供应商)
 					List<BusSupplierPageVO> otherList = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
-					otherList.forEach(e -> {
-						completeDetailInfo(e);
-					});
+					otherList.forEach(this::completeDetailInfo);// 补充巴士供应商其它信息
 					
 					resultList.addAll(subList);
 					resultList.addAll(otherList);
@@ -241,25 +229,6 @@ public class BusSupplierService implements BusConst {
 				List<BusSupplierPageVO> subList = orderedAllContractList.subList(offset, limit);
 				resultList.addAll(subList);
 			}
-		}
-		
-		// 四、补充分佣信息(分佣比例、是否有返点)
-		String supplierIds = resultList.stream().map(e -> e.getSupplierId().toString()).collect(Collectors.joining(","));
-		JSONArray jsonArray = getProrateList(supplierIds);
-		if (jsonArray != null) {
-			// 组装数据
-			resultList.forEach(supplier -> {
-				// 查找对应供应商数据
-				Integer supplierId = supplier.getSupplierId();
-				jsonArray.stream().filter(e -> {
-					JSONObject jsonObject = (JSONObject) JSON.toJSON(e);
-					return supplierId.equals(jsonObject.getInteger("supplierId"));
-				}).findFirst().ifPresent(e -> {
-					JSONObject jsonObject = (JSONObject) JSON.toJSON(e);
-					supplier.setSupplierRate(jsonObject.getDouble("supplierRate"));
-					supplier.setIsRebate(jsonObject.getInteger("isRebate"));
-				});
-			});
 		}
 		
 		return resultList;

@@ -60,7 +60,7 @@ public class BusCarBizCustomerAppraisalStatisticsService {
 		param.put("createDate", DateTimeFormatter.ofPattern("y-M").format(date));// 处理成字符串
 		CarBizCustomerAppraisalStatistics appraisal = this.queryAppraisal(param);
 		String average = appraisal == null ? null : appraisal.getEvaluateScore();
-		if (average == null) {
+		if (average == null && appraisal != null) {
 			double num = 0d;
 			int count = 0;
 			try {
