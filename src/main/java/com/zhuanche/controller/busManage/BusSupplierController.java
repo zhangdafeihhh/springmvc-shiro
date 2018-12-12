@@ -66,8 +66,6 @@ public class BusSupplierController {
 	 * @throws
 	 */
 	@RequestMapping(value = "/saveSupplier")
-	@MasterSlaveConfigs(configs = { @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER),
-			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.MASTER) })
 	public AjaxResponse saveSupplier(BusSupplierBaseDTO baseDTO, BusSupplierDetailDTO detailDTO) {// TODO 封装分佣、返点信息
 		return busSupplierService.saveSupplierInfo(baseDTO, detailDTO);
 	}
@@ -83,8 +81,7 @@ public class BusSupplierController {
 	 */
 	@SuppressWarnings("resource")
 	@RequestMapping(value = "/querySupplierPageList")
-	@MasterSlaveConfigs(configs = { @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE),
-			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE) })
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public AjaxResponse querySupplierPageList(BusSupplierQueryDTO queryDTO) {
 		Integer pageNum = queryDTO.getPageNum();
 		Integer pageSize = queryDTO.getPageSize();
@@ -114,11 +111,8 @@ public class BusSupplierController {
 	 */
 	@SuppressWarnings("resource")
 	@RequestMapping(value = "/exportSupplierList")
-	@MasterSlaveConfigs(configs = { @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE),
-			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE) })
 	public void exportSupplierList(BusSupplierQueryDTO queryDTO, HttpServletRequest request,
 			HttpServletResponse response) {
-		
         long start = System.currentTimeMillis(); // 获取开始时间
 		try {
 			// 数据权限控制SSOLoginUser
@@ -208,8 +202,6 @@ public class BusSupplierController {
 	 * @throws
 	 */
 	@RequestMapping(value = "/querySupplierById")
-	@MasterSlaveConfigs(configs = { @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE),
-			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE) })
 	public AjaxResponse querySupplierById(@NotNull(message = "供应商ID不能为空") Integer supplierId) {
 		BusSupplierInfoVO supplierVO = busSupplierService.querySupplierById(supplierId);
 		return AjaxResponse.success(supplierVO);

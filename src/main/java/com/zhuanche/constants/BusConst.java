@@ -48,6 +48,9 @@ public interface BusConst {
 	/** 供应商基本信息查询 **/
 	String SETTLE_SUPPLIER_INFO = "/settle/supplier/info";
 	
+	/** 查询分佣协议 **/
+	String SETTLE_SUPPLIER_PRORATE_INFO_LIST = "/settle/supplier/prorate/info/list";
+	
 	/** 查找供应商返佣配置 **/
 	String SETTLE_SUPPLIER_REBATE_INFO = "/settle/supplier/rebate/info";
 
