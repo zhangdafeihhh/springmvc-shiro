@@ -6,6 +6,14 @@ public class BusOrderDTO extends BaseDTO {
 
 	private static final long serialVersionUID = 4684174070702790458L;
 
+	// 订单号
+	private String orderNo;
+	// 服务类别ID
+	private Integer serviceTypeId;
+	// 实际车型类别ID
+	private Integer carGroupId;
+	// 预约车型类别ID
+	private Integer bookingGroupid;
 	// 预订人手机号
 	private String bookingUserPhone;
 	// 乘车人手机号
@@ -16,12 +24,56 @@ public class BusOrderDTO extends BaseDTO {
 	private Integer cityId;
 	// 供应商ID
 	private Integer supplierId;
+	// 司机姓名
+	private String driverName;
+	// 司机手机号
+	private String driverPhone;
 	// 下单开始时间(yyyy-MM-dd)
 	private String createDateBegin;
 	// 下单结束时间(yyyy-MM-dd)
 	private String createDateEnd;
+	// 预定上车开始时间(yyyy-MM-dd)
+	private String bookingDateBegin;
+	// 预定上车结束时间(yyyy-MM-dd)
+	private String bookingDateEnd;
+	// 下车开始时间(yyyy-MM-dd)
+	private String factEndDateBegin;
+	// 下车结束时间(yyyy-MM-dd)
+	private String factEndDateEnd;
 	// 订单状态
 	private Integer status;
+
+	public String getOrderNo() {
+		return orderNo;
+	}
+
+	public void setOrderNo(String orderNo) {
+		this.orderNo = orderNo;
+	}
+
+	public Integer getServiceTypeId() {
+		return serviceTypeId;
+	}
+
+	public void setServiceTypeId(Integer serviceTypeId) {
+		this.serviceTypeId = serviceTypeId;
+	}
+
+	public Integer getCarGroupId() {
+		return carGroupId;
+	}
+
+	public void setCarGroupId(Integer carGroupId) {
+		this.carGroupId = carGroupId;
+	}
+
+	public Integer getBookingGroupid() {
+		return bookingGroupid;
+	}
+
+	public void setBookingGroupid(Integer bookingGroupid) {
+		this.bookingGroupid = bookingGroupid;
+	}
 
 	public String getBookingUserPhone() {
 		return bookingUserPhone;
@@ -63,6 +115,22 @@ public class BusOrderDTO extends BaseDTO {
 		this.supplierId = supplierId;
 	}
 
+	public String getDriverName() {
+		return driverName;
+	}
+
+	public void setDriverName(String driverName) {
+		this.driverName = driverName;
+	}
+
+	public String getDriverPhone() {
+		return driverPhone;
+	}
+
+	public void setDriverPhone(String driverPhone) {
+		this.driverPhone = driverPhone;
+	}
+
 	public String getCreateDateBegin() {
 		return createDateBegin;
 	}
@@ -77,6 +145,38 @@ public class BusOrderDTO extends BaseDTO {
 
 	public void setCreateDateEnd(String createDateEnd) {
 		this.createDateEnd = createDateEnd;
+	}
+
+	public String getBookingDateBegin() {
+		return bookingDateBegin;
+	}
+
+	public void setBookingDateBegin(String bookingDateBegin) {
+		this.bookingDateBegin = bookingDateBegin;
+	}
+
+	public String getBookingDateEnd() {
+		return bookingDateEnd;
+	}
+
+	public void setBookingDateEnd(String bookingDateEnd) {
+		this.bookingDateEnd = bookingDateEnd;
+	}
+
+	public String getFactEndDateBegin() {
+		return factEndDateBegin;
+	}
+
+	public void setFactEndDateBegin(String factEndDateBegin) {
+		this.factEndDateBegin = factEndDateBegin;
+	}
+
+	public String getFactEndDateEnd() {
+		return factEndDateEnd;
+	}
+
+	public void setFactEndDateEnd(String factEndDateEnd) {
+		this.factEndDateEnd = factEndDateEnd;
 	}
 
 	public Integer getStatus() {

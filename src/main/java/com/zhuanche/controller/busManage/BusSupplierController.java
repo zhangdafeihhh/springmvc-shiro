@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
@@ -96,16 +99,45 @@ public class BusSupplierController {
 		Integer pageNum = queryDTO.getPageNum();
 		Integer pageSize = queryDTO.getPageSize();
 
-		// 查询列表
+		// 数据权限控制SSOLoginUser
+		Set<Integer> permOfCity = WebSessionUtil.getCurrentLoginUser().getCityIds(); // 普通管理员可以管理的所有城市ID
+		Set<Integer> permOfSupplier = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); // 普通管理员可以管理的所有供应商ID
+		Set<Integer> permOfTeam = WebSessionUtil.getCurrentLoginUser().getTeamIds(); // 普通管理员可以管理的所有车队ID
+		queryDTO.setAuthOfCity(permOfCity);
+		queryDTO.setAuthOfSupplier(permOfSupplier);
+		queryDTO.setAuthOfTeam(permOfTeam);
+		// 一、查询列表
 		List<BusSupplierPageVO> resultList = busSupplierService.queryBusSupplierPageList(queryDTO);
-
-        // 计算total
+        
+        // 二、计算total
 		queryDTO.setPageNum(pageNum);
 		queryDTO.setPageSize(pageSize);
         queryDTO.setContractIds(null);
 		queryDTO.setExcludeContractIds(null);
         List<BusSupplierPageVO> totalList = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
         Page<BusSupplierPageVO> page = (Page<BusSupplierPageVO>) totalList;
+        
+        // 三、补充分佣信息(分佣比例、是否有返点)
+        if (resultList == null || resultList.isEmpty()) {
+        	resultList = totalList;
+        }
+		String supplierIds = resultList.stream().map(e -> e.getSupplierId().toString()).collect(Collectors.joining(","));
+		JSONArray jsonArray = busSupplierService.getProrateList(supplierIds);
+		if (jsonArray != null) {
+			// 组装数据
+			resultList.forEach(supplier -> {
+				// 查找对应供应商数据
+				Integer supplierId = supplier.getSupplierId();
+				jsonArray.stream().filter(e -> {
+					JSONObject jsonObject = (JSONObject) JSON.toJSON(e);
+					return supplierId.equals(jsonObject.getInteger("supplierId"));
+				}).findFirst().ifPresent(e -> {
+					JSONObject jsonObject = (JSONObject) JSON.toJSON(e);
+					supplier.setSupplierRate(jsonObject.getDouble("supplierRate"));
+					supplier.setIsRebate(jsonObject.getInteger("isRebate"));
+				});
+			});
+		}
 		return AjaxResponse.success(new PageDTO(queryDTO.getPageNum(), queryDTO.getPageSize(), page.getTotal(), resultList));
 	}
 

@@ -1,6 +1,7 @@
 package com.zhuanche.serv.busManage;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,19 +47,20 @@ public class BusCarBizCustomerAppraisalStatisticsService {
 	 * @Title: getScore
 	 * @Description: 获取司机某月评分
 	 * @param driverId
+	 * @param date
 	 * @return 
 	 * @return String
 	 * @throws
 	 */
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
-	public String getScore(Integer driverId, Date date) {
+	public String getScore(Integer driverId, LocalDate date) {
 		// 司机评分
 		Map<Object, Object> param = new HashMap<>();
 		param.put("driverId", driverId);
-		param.put("createDate", date);// TODO 处理成字符串
+		param.put("createDate", DateTimeFormatter.ofPattern("y-M").format(date));// 处理成字符串
 		CarBizCustomerAppraisalStatistics appraisal = this.queryAppraisal(param);
 		String average = appraisal == null ? null : appraisal.getEvaluateScore();
-		if (average == null) {
+		if (average == null && appraisal != null) {
 			double num = 0d;
 			int count = 0;
 			try {

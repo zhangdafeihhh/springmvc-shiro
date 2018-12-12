@@ -60,8 +60,8 @@ public class BusOrderService {
 	private MyRestTemplate busOrderCostTemplate;
 
 	@Autowired
-	@Qualifier("busOrderPayTemplate")
-	private MyRestTemplate busOrderPayTemplate;
+	@Qualifier("orderPayOldTemplate")
+	private MyRestTemplate orderPayOldTemplate;
 
 	/**
 	 * @Title: selectOrderDetail
@@ -70,8 +70,7 @@ public class BusOrderService {
 	 * @return BusOrderDetail
 	 * @throws
 	 */
-	@MasterSlaveConfigs(configs = {
-			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE) })
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public BusOrderDetail selectOrderDetail(String orderNo) {
 
 		// 组装接口参数
@@ -188,7 +187,7 @@ public class BusOrderService {
 		try {
 			Map<String, Object> paramMap = new HashMap<>();
 			paramMap.put("tradeOrderNo", orderNo);
-			String response = busOrderPayTemplate.postForObject(BUS_PAY_DETAIL, JSONObject.class, paramMap);
+			String response = orderPayOldTemplate.postForObject(BUS_PAY_DETAIL, JSONObject.class, paramMap);
 			JSONObject result = JSON.parseObject(response);
 			logger.info("[ BusOrderService-selectOrderPayDetail ] 订单详情，调用支付接口返回值={}", result);
 			int code = result.getIntValue("code");

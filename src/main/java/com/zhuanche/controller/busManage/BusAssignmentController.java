@@ -26,7 +26,6 @@ import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.BaseController;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.busManage.BusCarDTO;
@@ -54,7 +53,7 @@ import mapper.rentcar.ex.CarBizSupplierExMapper;
 
 @Controller("busAssignmentController")
 @RequestMapping(value = "/busAssignment")
-public class BusAssignmentController extends BaseController {
+public class BusAssignmentController {
 
 	private static final Logger logger = LoggerFactory.getLogger(BusAssignmentController.class);
 
