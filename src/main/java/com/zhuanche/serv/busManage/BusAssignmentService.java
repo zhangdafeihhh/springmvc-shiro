@@ -31,7 +31,6 @@ import com.zhuanche.dto.busManage.BusCarRicherDTO;
 import com.zhuanche.dto.busManage.BusDriverDTO;
 import com.zhuanche.dto.busManage.BusDriverRicherDTO;
 import com.zhuanche.dto.busManage.BusOrderDTO;
-import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.mongo.DriverMongo;
@@ -193,10 +192,9 @@ public class BusAssignmentService {
 						order.setDriverScore(score);
 					}
 					// c)预约车别类型
-					List<CarBizCarGroup> groupList = carBizCarGroupExMapper.queryCarGroupList(2);
-					Map<String, String> groupMap = new HashMap<>();
-					groupList.forEach(group -> groupMap.put(String.valueOf(group.getGroupId()), group.getGroupName()));
-					order.setBookingGroupName(groupMap.get(order.getBookingGroupid()));
+					if (StringUtils.isNotBlank(order.getBookingGroupid())) {
+						order.setBookingGroupName(carBizCarGroupExMapper.getGroupNameByGroupId(Integer.valueOf(order.getBookingGroupid())));
+					}
 				});
 				// d)预估里程
 				String orderNos = orderList.stream().map(order -> order.getOrderNo()).collect(Collectors.joining(","));
@@ -216,7 +214,14 @@ public class BusAssignmentService {
 					});
 				}
 //				// e)企业名称/企业折扣/付款类型
-				String phones = orderList.stream().map(order -> order.getBookingUserPhone()).collect(Collectors.joining(","));
+				List<Object> phoneList = new ArrayList<>();
+				orderList.forEach(order -> {
+					String bookingUserPhone = order.getBookingUserPhone();
+					if (StringUtils.isNotBlank(bookingUserPhone)) {
+						phoneList.add(bookingUserPhone);
+					}
+				});
+				String phones = StringUtils.join(phoneList, ",");
 				JSONArray queryBatchOrgInfo = queryCompanyByPhone(phones);
 				if (queryBatchOrgInfo != null) {
 					// 匹配企业ID/企业名称
@@ -235,7 +240,14 @@ public class BusAssignmentService {
 					});
 					
 					// 付款类型/企业折扣
-					String companyIds = orderList.stream().map(order -> order.getCompanyId().toString()).collect(Collectors.joining(","));
+					List<String> companyIdList = new ArrayList<>();
+					orderList.forEach(order -> {
+						Integer companyId = order.getCompanyId();
+						if (companyId != null) {
+							companyIdList.add(companyId.toString());
+						}
+					});
+					String companyIds = StringUtils.join(companyIdList, ",");
 					JSONArray queryBusinessInfoBatch = queryBusinessInfoBatch(companyIds);
 					if (queryBusinessInfoBatch != null) {
 						orderList.forEach(order -> {
