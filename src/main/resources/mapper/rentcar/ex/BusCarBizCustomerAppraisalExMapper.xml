@@ -51,7 +51,7 @@
 	</sql>
 	
 	<!-- 查询订单评分 -->
-	<select id="queryAppraisal" parameterType="java.util.Map" resultMap="BaseResultMap">
+	<select id="queryAppraisal" parameterType="java.lang.String" resultMap="BaseResultMap">
 		SELECT
 			<include refid="Base_Column_List"/>
 		FROM

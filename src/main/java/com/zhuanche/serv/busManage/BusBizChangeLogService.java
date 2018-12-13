@@ -2,6 +2,7 @@ package com.zhuanche.serv.busManage;
 
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -44,6 +45,9 @@ public class BusBizChangeLogService implements BusConst {
 	 */
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.MASTER))
 	public int insertLog(BusinessType businessType, String businessKey, Date updateDate) {
+		if (businessType == null || StringUtils.isBlank(businessKey)) {
+			return 0;
+		}
 		BusBizChangeLog log = new BusBizChangeLog();
         if (updateDate == null) {
             updateDate = new Date();

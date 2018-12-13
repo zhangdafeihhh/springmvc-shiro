@@ -272,7 +272,7 @@ public class BusAssignmentController {
 			orderOperationTime.setDriverName(driverName);
 		} catch (Exception e) {
 			logger.error("[ BusAssignmentController-assignment ] 巴士指派司机出错", e);
-			ajaxResponse = AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+			ajaxResponse = AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "巴士指派司机出错");
 
 			orderOperationTime.setStatus(OrderOperation.FAIL_STATUS);
 			orderOperationTime.setDescription("订单指派异常orderNo=" + orderNo);

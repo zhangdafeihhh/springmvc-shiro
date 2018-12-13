@@ -1,8 +1,5 @@
 package com.zhuanche.serv.busManage;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,8 +33,8 @@ public class BusCarBizCustomerAppraisalService {
 	 * @throws
 	 */
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
-	public CarBizCustomerAppraisal queryAppraisal(Map<Object, Object> param) {
-		CarBizCustomerAppraisal appraisal = busCarBizCustomerAppraisalExMapper.queryAppraisal(param);
+	public CarBizCustomerAppraisal queryAppraisal(String orderNo) {
+		CarBizCustomerAppraisal appraisal = busCarBizCustomerAppraisalExMapper.queryAppraisal(orderNo);
 		return appraisal;
 	}
 	
@@ -53,9 +50,7 @@ public class BusCarBizCustomerAppraisalService {
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public String getScore(String orderNo) {
 		// 司机评分
-		Map<Object, Object> param = new HashMap<>();
-		param.put("orderNo", orderNo);
-		CarBizCustomerAppraisal appraisal = this.queryAppraisal(param);
+		CarBizCustomerAppraisal appraisal = this.queryAppraisal(orderNo);
 		String average = appraisal == null ? null : appraisal.getEvaluateScore();
 		if (average == null && appraisal != null) {
 			double num = 0d;

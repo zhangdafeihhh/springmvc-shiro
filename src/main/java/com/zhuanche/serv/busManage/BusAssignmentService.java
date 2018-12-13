@@ -31,6 +31,8 @@ import com.zhuanche.dto.busManage.BusCarRicherDTO;
 import com.zhuanche.dto.busManage.BusDriverDTO;
 import com.zhuanche.dto.busManage.BusDriverRicherDTO;
 import com.zhuanche.dto.busManage.BusOrderDTO;
+import com.zhuanche.entity.rentcar.CarBizCustomerAppraisal;
+import com.zhuanche.entity.rentcar.CarBizCustomerAppraisalStatistics;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.mongo.DriverMongo;
@@ -188,8 +190,10 @@ public class BusAssignmentService {
 					}
 					// b)本单司机评分
 					if (StringUtils.isNotBlank(order.getOrderNo())) {
-						String score = busCarBizCustomerAppraisalService.getScore(order.getOrderNo());
-						order.setDriverScore(score);
+						CarBizCustomerAppraisal appraisal = busCarBizCustomerAppraisalService.queryAppraisal(order.getOrderNo());
+						if (appraisal != null) {
+							order.setDriverScore(appraisal.getEvaluateScore());
+						}
 					}
 					// c)预约车别类型
 					if (StringUtils.isNotBlank(order.getBookingGroupid())) {
@@ -491,8 +495,11 @@ public class BusAssignmentService {
 			// 补充司机评分
 			if (busDriverList != null && busDriverList.size() > 0) {
 				busDriverList.forEach(driver -> {
-					String score = busCarBizCustomerAppraisalStatisticsService.getScore((Integer) driver.get("driverId"), LocalDate.now());
-					driver.put("monthlyScore", score);
+					CarBizCustomerAppraisalStatistics appraisal = busCarBizCustomerAppraisalStatisticsService
+							.queryAppraisal((Integer) driver.get("driverId"), LocalDate.now());
+					if (appraisal != null) {
+						driver.put("monthlyScore", appraisal.getEvaluateScore());
+					}
 				});
 			}
 			Page<Map<String, Object>> page = (Page<Map<String, Object>>) busDriverList;

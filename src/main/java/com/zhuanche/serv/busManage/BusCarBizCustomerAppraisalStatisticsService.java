@@ -38,7 +38,10 @@ public class BusCarBizCustomerAppraisalStatisticsService {
 	 * @throws
 	 */
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
-	public CarBizCustomerAppraisalStatistics queryAppraisal(Map<Object, Object> param) {
+	public CarBizCustomerAppraisalStatistics queryAppraisal(Integer driverId, LocalDate date) {
+		Map<Object, Object> param = new HashMap<>();
+		param.put("driverId", driverId);
+		param.put("createDate", DateTimeFormatter.ofPattern("y-M").format(date));// 处理成字符串
 		CarBizCustomerAppraisalStatistics appraisal = busCarBizCustomerAppraisalStatisticsExMapper.queryAppraisal(param);
 		return appraisal;
 	}
@@ -55,10 +58,7 @@ public class BusCarBizCustomerAppraisalStatisticsService {
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public String getScore(Integer driverId, LocalDate date) {
 		// 司机评分
-		Map<Object, Object> param = new HashMap<>();
-		param.put("driverId", driverId);
-		param.put("createDate", DateTimeFormatter.ofPattern("y-M").format(date));// 处理成字符串
-		CarBizCustomerAppraisalStatistics appraisal = this.queryAppraisal(param);
+		CarBizCustomerAppraisalStatistics appraisal = this.queryAppraisal(driverId, date);
 		String average = appraisal == null ? null : appraisal.getEvaluateScore();
 		if (average == null && appraisal != null) {
 			double num = 0d;

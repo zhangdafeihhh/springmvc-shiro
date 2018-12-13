@@ -33,7 +33,7 @@ public class BusDriverSaveDTO extends BusBaseStatisDTO {
 	/** 司机姓名 **/
 	@NotBlank(message = "司机姓名不能为空")
 	private String name;
-	
+
 	/** 司机性别，[1.男0.女] **/
 	@NotNull(message = "司机性别不能为空")
 	@InArray(values = { "0", "1" }, message = "司机性别不在有效范围内")
@@ -66,7 +66,7 @@ public class BusDriverSaveDTO extends BusBaseStatisDTO {
 	@NotNull(message = "驾照领证日期不能为空")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date issueDate;
-	
+
 	@NotBlank(message = "道路运输从业资格证编号不能为空")
 	/** 道路运输从业资格证编号(巡游出租汽车驾驶员资格证号,巴士业务无“巡游...”业务，复用此字段) **/
 	private String xyDriverNumber;
@@ -229,6 +229,9 @@ public class BusDriverSaveDTO extends BusBaseStatisDTO {
 	private String bankAccountNo;
 	/** 驾龄 **/
 	private Integer drivingYears;
+
+	/** 驾龄:0默认为单班, 1双班 **/
+	private Integer isTwoShifts;
 
 	// =========================交通委需要修改以下信息的记录==========================
 	private String oldPhone;// 手机号
@@ -735,6 +738,14 @@ public class BusDriverSaveDTO extends BusBaseStatisDTO {
 
 	public void setDrivingYears(Integer drivingYears) {
 		this.drivingYears = drivingYears;
+	}
+
+	public Integer getIsTwoShifts() {
+		return isTwoShifts;
+	}
+
+	public void setIsTwoShifts(Integer isTwoShifts) {
+		this.isTwoShifts = isTwoShifts;
 	}
 
 	public String getOldPhone() {

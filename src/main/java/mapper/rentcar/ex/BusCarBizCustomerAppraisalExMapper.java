@@ -1,7 +1,5 @@
 package mapper.rentcar.ex;
 
-import java.util.Map;
-
 import com.zhuanche.entity.rentcar.CarBizCustomerAppraisal;
 
 public interface BusCarBizCustomerAppraisalExMapper {
@@ -14,6 +12,6 @@ public interface BusCarBizCustomerAppraisalExMapper {
 	 * @return CarBizCustomerAppraisal
 	 * @throws
 	 */
-	CarBizCustomerAppraisal queryAppraisal(Map<Object, Object> param);
+	CarBizCustomerAppraisal queryAppraisal(String orderNo);
 
 }

@@ -184,75 +184,8 @@
 			<if test="status != null">
 				status = #{status,jdbcType=INTEGER},
 			</if>
-			<if test="mac != null">
-				mac = #{mac,jdbcType=VARCHAR},
-			</if>
 			<if test="photosrct != null">
 				photoSrct = #{photosrct,jdbcType=VARCHAR},
-			</if>
-			<if test="pushId != null">
-				push_id = #{pushId,jdbcType=VARCHAR},
-			</if>
-			<if test="isBindingCreditCard != null">
-				is_binding_credit_card = #{isBindingCreditCard,jdbcType=INTEGER},
-			</if>
-			<if test="appVersion != null">
-				app_version = #{appVersion,jdbcType=VARCHAR},
-			</if>
-			<if test="creditCardNo != null">
-				credit_card_no = #{creditCardNo,jdbcType=VARCHAR},
-			</if>
-			<if test="storableCardNo != null">
-				storable_card_no = #{storableCardNo,jdbcType=VARCHAR},
-			</if>
-			<if test="creditOpenAccountBank != null">
-				credit_open_account_bank = #{creditOpenAccountBank,jdbcType=VARCHAR},
-			</if>
-			<if test="creditCardPeriodOfValidity != null">
-				credit_card_period_of_validity =
-				#{creditCardPeriodOfValidity,jdbcType=VARCHAR},
-			</if>
-			<if test="grabNotice != null">
-				grab_notice = #{grabNotice,jdbcType=INTEGER},
-			</if>
-			<if test="creditCvn2 != null">
-				credit_CVN2 = #{creditCvn2,jdbcType=VARCHAR},
-			</if>
-			<if test="creditBindDate != null">
-				credit_bind_date = #{creditBindDate,jdbcType=TIMESTAMP},
-			</if>
-			<if test="quickpayCustomerid != null">
-				quickpay_customerid = #{quickpayCustomerid,jdbcType=VARCHAR},
-			</if>
-			<if test="isRead != null">
-				is_read = #{isRead,jdbcType=INTEGER},
-			</if>
-			<if test="bankid != null">
-				bankid = #{bankid,jdbcType=VARCHAR},
-			</if>
-			<if test="goHomeAddress != null">
-				go_home_address = #{goHomeAddress,jdbcType=VARCHAR},
-			</if>
-			<if test="goHomePointLobd != null">
-				go_home_point_loBD = #{goHomePointLobd,jdbcType=VARCHAR},
-			</if>
-			<if test="goHomePointLabd != null">
-				go_home_point_laBD = #{goHomePointLabd,jdbcType=VARCHAR},
-			</if>
-			<if test="goHomePointLa != null">
-				go_home_point_la = #{goHomePointLa,jdbcType=VARCHAR},
-			</if>
-			<if test="goHomePointLo != null">
-				go_home_point_lo = #{goHomePointLo,jdbcType=VARCHAR},
-			</if>
-			<if test="goHomeStatus != null">
-				go_home_status = #{goHomeStatus,jdbcType=INTEGER},
-			</if>
-			<if test="updateGoHomeDate != null">
-				update_go_home_date = #{updateGoHomeDate,jdbcType=VARCHAR},
-			</if>
-			<if test="imei != null">
-				imei = #{imei,jdbcType=VARCHAR},
 			</if>
 			<if test="driverlicensenumber != null">
 				driverLicenseNumber = #{driverlicensenumber,jdbcType=VARCHAR},
@@ -289,26 +222,8 @@
 			<if test="education != null">
 				education = #{education,jdbcType=VARCHAR},
 			</if>
-			<if test="coursename != null">
-				courseName = #{coursename,jdbcType=VARCHAR},
-			</if>
-			<if test="coursedate != null">
-				courseDate = #{coursedate,jdbcType=VARCHAR},
-			</if>
-			<if test="coursedatestart != null">
-				courseDateStart = #{coursedatestart,jdbcType=VARCHAR},
-			</if>
-			<if test="coursedateend != null">
-				courseDateEnd = #{coursedateend,jdbcType=VARCHAR},
-			</if>
-			<if test="coursetime != null">
-				courseTime = #{coursetime,jdbcType=VARCHAR},
-			</if>
 			<if test="corptype != null">
 				corpType = #{corptype,jdbcType=VARCHAR},
-			</if>
-			<if test="trafficviolations != null">
-				trafficViolations = #{trafficviolations,jdbcType=VARCHAR},
 			</if>
 			<if test="signdate != null">
 				signDate = #{signdate,jdbcType=VARCHAR},
@@ -330,9 +245,6 @@
 			</if>
 			<if test="phonecorp != null">
 				phoneCorp = #{phonecorp,jdbcType=VARCHAR},
-			</if>
-			<if test="appversion != null">
-				appVersion = #{appversion,jdbcType=VARCHAR},
 			</if>
 			<if test="maptype != null">
 				mapType = #{maptype,jdbcType=VARCHAR},
@@ -381,35 +293,14 @@
 				house_hold_register_permanent =
 				#{houseHoldRegisterPermanent,jdbcType=VARCHAR},
 			</if>
-			<if test="isUploadCard != null">
-				is_upload_card = #{isUploadCard,jdbcType=INTEGER},
-			</if>
-			<if test="isMustConfirmation != null">
-				is_must_confirmation = #{isMustConfirmation,jdbcType=INTEGER},
-			</if>
-			<if test="contractType != null">
-				contract_type = #{contractType,jdbcType=VARCHAR},
-			</if>
-			<if test="contractNo != null">
-				contract_no = #{contractNo,jdbcType=VARCHAR},
-			</if>
-			<if test="contractFile != null">
-				contract_file = #{contractFile,jdbcType=VARCHAR},
-			</if>
 			<if test="cooperationType != null">
 				cooperation_type = #{cooperationType,jdbcType=TINYINT},
-			</if>
-			<if test="accountType != null">
-				account_type = #{accountType,jdbcType=INTEGER},
 			</if>
 			<if test="groupId != null">
 				group_id = #{groupId,jdbcType=INTEGER},
 			</if>
 			<if test="isTwoShifts != null">
 				is_two_shifts = #{isTwoShifts,jdbcType=INTEGER},
-			</if>
-			<if test="isImage != null">
-				is_image = #{isImage,jdbcType=TINYINT},
 			</if>
 			<if test="memo != null">
 				memo = #{memo,jdbcType=LONGVARCHAR},
@@ -419,7 +310,10 @@
 	</update>
 
 	<!-- 新增司机信息 -->
-	<insert id="insertBusDriverInfo" parameterType="com.zhuanche.dto.busManage.BusDriverSaveDTO" keyProperty="driverId">
+	<insert id="insertBusDriverInfo" parameterType="com.zhuanche.dto.busManage.BusDriverSaveDTO">
+		<selectKey resultType="java.lang.Integer" keyProperty="driverId" order="AFTER" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
 		insert into car_biz_driver_info
 		<trim prefix="(" suffix=")" suffixOverrides=",">
 			<if test="password != null">
@@ -506,74 +400,8 @@
 			<if test="status != null">
 				status,
 			</if>
-			<if test="mac != null">
-				mac,
-			</if>
 			<if test="photosrct != null">
 				photoSrct,
-			</if>
-			<if test="pushId != null">
-				push_id,
-			</if>
-			<if test="isBindingCreditCard != null">
-				is_binding_credit_card,
-			</if>
-			<if test="appVersion != null">
-				app_version,
-			</if>
-			<if test="creditCardNo != null">
-				credit_card_no,
-			</if>
-			<if test="storableCardNo != null">
-				storable_card_no,
-			</if>
-			<if test="creditOpenAccountBank != null">
-				credit_open_account_bank,
-			</if>
-			<if test="creditCardPeriodOfValidity != null">
-				credit_card_period_of_validity,
-			</if>
-			<if test="grabNotice != null">
-				grab_notice,
-			</if>
-			<if test="creditCvn2 != null">
-				credit_CVN2,
-			</if>
-			<if test="creditBindDate != null">
-				credit_bind_date,
-			</if>
-			<if test="quickpayCustomerid != null">
-				quickpay_customerid,
-			</if>
-			<if test="isRead != null">
-				is_read,
-			</if>
-			<if test="bankid != null">
-				bankid,
-			</if>
-			<if test="goHomeAddress != null">
-				go_home_address,
-			</if>
-			<if test="goHomePointLobd != null">
-				go_home_point_loBD,
-			</if>
-			<if test="goHomePointLabd != null">
-				go_home_point_laBD,
-			</if>
-			<if test="goHomePointLa != null">
-				go_home_point_la,
-			</if>
-			<if test="goHomePointLo != null">
-				go_home_point_lo,
-			</if>
-			<if test="goHomeStatus != null">
-				go_home_status,
-			</if>
-			<if test="updateGoHomeDate != null">
-				update_go_home_date,
-			</if>
-			<if test="imei != null">
-				imei,
 			</if>
 			<if test="driverlicensenumber != null">
 				driverLicenseNumber,
@@ -608,26 +436,8 @@
 			<if test="education != null">
 				education,
 			</if>
-			<if test="coursename != null">
-				courseName,
-			</if>
-			<if test="coursedate != null">
-				courseDate,
-			</if>
-			<if test="coursedatestart != null">
-				courseDateStart,
-			</if>
-			<if test="coursedateend != null">
-				courseDateEnd,
-			</if>
-			<if test="coursetime != null">
-				courseTime,
-			</if>
 			<if test="corptype != null">
 				corpType,
-			</if>
-			<if test="trafficviolations != null">
-				trafficViolations,
 			</if>
 			<if test="signdate != null">
 				signDate,
@@ -649,9 +459,6 @@
 			</if>
 			<if test="phonecorp != null">
 				phoneCorp,
-			</if>
-			<if test="appversion != null">
-				appVersion,
 			</if>
 			<if test="maptype != null">
 				mapType,
@@ -692,35 +499,14 @@
 			<if test="houseHoldRegisterPermanent != null">
 				house_hold_register_permanent,
 			</if>
-			<if test="isUploadCard != null">
-				is_upload_card,
-			</if>
-			<if test="isMustConfirmation != null">
-				is_must_confirmation,
-			</if>
-			<if test="contractType != null">
-				contract_type,
-			</if>
-			<if test="contractNo != null">
-				contract_no,
-			</if>
-			<if test="contractFile != null">
-				contract_file,
-			</if>
 			<if test="cooperationType != null">
 				cooperation_type,
-			</if>
-			<if test="accountType != null">
-				account_type,
 			</if>
 			<if test="groupId != null">
 				group_id,
 			</if>
 			<if test="isTwoShifts != null">
 				is_two_shifts,
-			</if>
-			<if test="isImage != null">
-				is_image,
 			</if>
 			<if test="memo != null">
 				memo,
@@ -811,74 +597,8 @@
 			<if test="status != null">
 				#{status,jdbcType=INTEGER},
 			</if>
-			<if test="mac != null">
-				#{mac,jdbcType=VARCHAR},
-			</if>
 			<if test="photosrct != null">
 				#{photosrct,jdbcType=VARCHAR},
-			</if>
-			<if test="pushId != null">
-				#{pushId,jdbcType=VARCHAR},
-			</if>
-			<if test="isBindingCreditCard != null">
-				#{isBindingCreditCard,jdbcType=INTEGER},
-			</if>
-			<if test="appVersion != null">
-				#{appVersion,jdbcType=VARCHAR},
-			</if>
-			<if test="creditCardNo != null">
-				#{creditCardNo,jdbcType=VARCHAR},
-			</if>
-			<if test="storableCardNo != null">
-				#{storableCardNo,jdbcType=VARCHAR},
-			</if>
-			<if test="creditOpenAccountBank != null">
-				#{creditOpenAccountBank,jdbcType=VARCHAR},
-			</if>
-			<if test="creditCardPeriodOfValidity != null">
-				#{creditCardPeriodOfValidity,jdbcType=VARCHAR},
-			</if>
-			<if test="grabNotice != null">
-				#{grabNotice,jdbcType=INTEGER},
-			</if>
-			<if test="creditCvn2 != null">
-				#{creditCvn2,jdbcType=VARCHAR},
-			</if>
-			<if test="creditBindDate != null">
-				#{creditBindDate,jdbcType=TIMESTAMP},
-			</if>
-			<if test="quickpayCustomerid != null">
-				#{quickpayCustomerid,jdbcType=VARCHAR},
-			</if>
-			<if test="isRead != null">
-				#{isRead,jdbcType=INTEGER},
-			</if>
-			<if test="bankid != null">
-				#{bankid,jdbcType=VARCHAR},
-			</if>
-			<if test="goHomeAddress != null">
-				#{goHomeAddress,jdbcType=VARCHAR},
-			</if>
-			<if test="goHomePointLobd != null">
-				#{goHomePointLobd,jdbcType=VARCHAR},
-			</if>
-			<if test="goHomePointLabd != null">
-				#{goHomePointLabd,jdbcType=VARCHAR},
-			</if>
-			<if test="goHomePointLa != null">
-				#{goHomePointLa,jdbcType=VARCHAR},
-			</if>
-			<if test="goHomePointLo != null">
-				#{goHomePointLo,jdbcType=VARCHAR},
-			</if>
-			<if test="goHomeStatus != null">
-				#{goHomeStatus,jdbcType=INTEGER},
-			</if>
-			<if test="updateGoHomeDate != null">
-				#{updateGoHomeDate,jdbcType=VARCHAR},
-			</if>
-			<if test="imei != null">
-				#{imei,jdbcType=VARCHAR},
 			</if>
 			<if test="driverlicensenumber != null">
 				#{driverlicensenumber,jdbcType=VARCHAR},
@@ -913,26 +633,8 @@
 			<if test="education != null">
 				#{education,jdbcType=VARCHAR},
 			</if>
-			<if test="coursename != null">
-				#{coursename,jdbcType=VARCHAR},
-			</if>
-			<if test="coursedate != null">
-				#{coursedate,jdbcType=VARCHAR},
-			</if>
-			<if test="coursedatestart != null">
-				#{coursedatestart,jdbcType=VARCHAR},
-			</if>
-			<if test="coursedateend != null">
-				#{coursedateend,jdbcType=VARCHAR},
-			</if>
-			<if test="coursetime != null">
-				#{coursetime,jdbcType=VARCHAR},
-			</if>
 			<if test="corptype != null">
 				#{corptype,jdbcType=VARCHAR},
-			</if>
-			<if test="trafficviolations != null">
-				#{trafficviolations,jdbcType=VARCHAR},
 			</if>
 			<if test="signdate != null">
 				#{signdate,jdbcType=VARCHAR},
@@ -954,9 +656,6 @@
 			</if>
 			<if test="phonecorp != null">
 				#{phonecorp,jdbcType=VARCHAR},
-			</if>
-			<if test="appversion != null">
-				#{appversion,jdbcType=VARCHAR},
 			</if>
 			<if test="maptype != null">
 				#{maptype,jdbcType=VARCHAR},
@@ -997,35 +696,14 @@
 			<if test="houseHoldRegisterPermanent != null">
 				#{houseHoldRegisterPermanent,jdbcType=VARCHAR},
 			</if>
-			<if test="isUploadCard != null">
-				#{isUploadCard,jdbcType=INTEGER},
-			</if>
-			<if test="isMustConfirmation != null">
-				#{isMustConfirmation,jdbcType=INTEGER},
-			</if>
-			<if test="contractType != null">
-				#{contractType,jdbcType=VARCHAR},
-			</if>
-			<if test="contractNo != null">
-				#{contractNo,jdbcType=VARCHAR},
-			</if>
-			<if test="contractFile != null">
-				#{contractFile,jdbcType=VARCHAR},
-			</if>
 			<if test="cooperationType != null">
 				#{cooperationType,jdbcType=TINYINT},
-			</if>
-			<if test="accountType != null">
-				#{accountType,jdbcType=INTEGER},
 			</if>
 			<if test="groupId != null">
 				#{groupId,jdbcType=INTEGER},
 			</if>
 			<if test="isTwoShifts != null">
 				#{isTwoShifts,jdbcType=INTEGER},
-			</if>
-			<if test="isImage != null">
-				#{isImage,jdbcType=TINYINT},
 			</if>
 			<if test="memo != null">
 				#{memo,jdbcType=LONGVARCHAR},
