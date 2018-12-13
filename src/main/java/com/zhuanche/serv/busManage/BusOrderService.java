@@ -15,6 +15,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.constants.BusConst;
 import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import com.zhuanche.entity.busManage.BusCostDetail;
@@ -34,10 +35,6 @@ public class BusOrderService {
 
 	private static final Logger logger = LoggerFactory.getLogger(BusOrderService.class);
 
-	private static String GET_ORDER_DETAIL = "/busOrder/getOrderDetail";
-	private static String BUSS_BACK = "/buss/back";
-	private static String BUS_PAY_DETAIL = "/pay/bus/details";
-
 	@Autowired
 	private CarBizDriverInfoExMapper carBizDriverInfoExMapper;
 
@@ -50,7 +47,6 @@ public class BusOrderService {
 	@Autowired
 	private CarBizCustomerExMapper carBizCustomerExMapper;
 
-	// TODO 检查是否存在
 	@Autowired
 	@Qualifier("carRestTemplate")
 	private MyRestTemplate carRestTemplate;
@@ -82,7 +78,7 @@ public class BusOrderService {
 
 		BusOrderDetail entity = null;
 		try {
-			String response = carRestTemplate.postForObject(GET_ORDER_DETAIL, JSONObject.class, paramMap);
+			String response = carRestTemplate.postForObject(BusConst.Order.GET_ORDER_DETAIL, JSONObject.class, paramMap);
 			logger.info("[ BusOrderService-selectOrderDetail ] 订单详情调用，订单接口返回值={}", response);
 
 			JSONObject result = JSON.parseObject(response);
@@ -156,7 +152,7 @@ public class BusOrderService {
 		try {
 			Map<String, Object> paramMap = new HashMap<>();
 			paramMap.put("orderId", orderId);
-			String response = busOrderCostTemplate.postForObject(BUSS_BACK, JSONObject.class, paramMap);
+			String response = busOrderCostTemplate.postForObject(BusConst.Charge.BUSS_BACK, JSONObject.class, paramMap);
 			JSONObject result = JSON.parseObject(response);
 			logger.info("[ BusOrderService-selectOrderCostDetail ] 查询订单详情，调用计费接口返回值={}", result);
 			int code = result.getIntValue("code");
@@ -187,7 +183,7 @@ public class BusOrderService {
 		try {
 			Map<String, Object> paramMap = new HashMap<>();
 			paramMap.put("tradeOrderNo", orderNo);
-			String response = orderPayOldTemplate.postForObject(BUS_PAY_DETAIL, JSONObject.class, paramMap);
+			String response = orderPayOldTemplate.postForObject(BusConst.Payment.BUS_PAY_DETAIL, JSONObject.class, paramMap);
 			JSONObject result = JSON.parseObject(response);
 			logger.info("[ BusOrderService-selectOrderPayDetail ] 订单详情，调用支付接口返回值={}", result);
 			int code = result.getIntValue("code");

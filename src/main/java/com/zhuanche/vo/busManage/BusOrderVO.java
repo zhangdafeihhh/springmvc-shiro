@@ -75,8 +75,10 @@ public class BusOrderVO {
 	private String driverScore;
 	// 付款类型（费用类型：1 预付费；-1 后付费）
 	private Integer companyType;
+	// 企业ID
+	private Integer companyId;
 	// 企业名称
-	private String businessName;
+	private String companyName;
 	// 企业折扣
 	private Integer percent;
 
@@ -344,12 +346,20 @@ public class BusOrderVO {
 		this.companyType = companyType;
 	}
 
-	public String getBusinessName() {
-		return businessName;
+	public Integer getCompanyId() {
+		return companyId;
 	}
 
-	public void setBusinessName(String businessName) {
-		this.businessName = businessName;
+	public void setCompanyId(Integer companyId) {
+		this.companyId = companyId;
+	}
+
+	public String getCompanyName() {
+		return companyName;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
 	}
 
 	public Integer getPercent() {

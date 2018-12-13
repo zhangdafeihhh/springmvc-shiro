@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.zhuanche.dto.busManage.BusSupplierSettleListDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +35,7 @@ import com.zhuanche.constants.BusConst;
 import com.zhuanche.dto.busManage.BusSupplierBaseDTO;
 import com.zhuanche.dto.busManage.BusSupplierDetailDTO;
 import com.zhuanche.dto.busManage.BusSupplierQueryDTO;
+import com.zhuanche.dto.busManage.BusSupplierSettleListDTO;
 import com.zhuanche.entity.mdbcarmanage.BusBizSupplierDetail;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.CarBizDriverInfoService;
@@ -253,7 +253,9 @@ public class BusSupplierService implements BusConst {
 		BusBizSupplierDetail detail = busBizSupplierDetailExMapper.selectBySupplierId(scope.getSupplierId());
 
 		// 返回补充的信息
-		BeanUtils.copyProperties(detail, t);
+		if (detail != null) {
+			BeanUtils.copyProperties(detail, t);
+		}
 	}
 	
 	/**
@@ -474,7 +476,7 @@ public class BusSupplierService implements BusConst {
 			Map<String, Object> params = new HashMap<>();
 			params.put("supplierIds", supplierIds);
 			try {
-				logger.info("[ BusSupplierService-getProrateList ] 补充分佣信息(分佣比例、是否有返点)异常,params={}", params);
+				logger.info("[ BusSupplierService-getProrateList ] 补充分佣信息(分佣比例、是否有返点),params={}", params);
 				JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_SUPPLIER_PRORATE_LIST, params , 2000, "查询供应商分佣信息（分佣比例、是否有返点）");
 				if (result.getIntValue("code") == 0) {
 					JSONArray jsonArray = result.getJSONArray("data");
@@ -489,7 +491,7 @@ public class BusSupplierService implements BusConst {
 		return null;
 	}
 
-	public JSONArray querySettleDetailList(BusSupplierSettleListDTO dto){
+	public JSONArray querySettleDetailList(BusSupplierSettleListDTO dto) {
 		Map<String,Object> params= new HashMap<>(16);
 		if(StringUtils.isNotBlank(dto.getSupplierIds())){
 			params.put("supplierIds",dto.getSupplierIds());

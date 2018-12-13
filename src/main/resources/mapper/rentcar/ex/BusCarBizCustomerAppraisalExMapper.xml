@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.ex.BusCarBizCustomerAppraisalExMapper">
+	<resultMap id="BaseResultMap"
+		type="com.zhuanche.entity.rentcar.CarBizCustomerAppraisal">
+		<id column="appraisal_id" property="appraisalId" jdbcType="INTEGER" />
+		<result column="order_id" property="orderId" jdbcType="INTEGER" />
+		<result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+		<result column="booking_customer_id" property="bookingCustomerId"
+			jdbcType="INTEGER" />
+		<result column="booking_customer_phone" property="bookingCustomerPhone"
+			jdbcType="VARCHAR" />
+		<result column="rider_phone" property="riderPhone" jdbcType="VARCHAR" />
+		<result column="driver_id" property="driverId" jdbcType="INTEGER" />
+		<result column="car_id" property="carId" jdbcType="INTEGER" />
+		<result column="instrument_and_service" property="instrumentAndService"
+			jdbcType="VARCHAR" />
+		<result column="environment_and_equipped" property="environmentAndEquipped"
+			jdbcType="VARCHAR" />
+		<result column="efficiency_and_safety" property="efficiencyAndSafety"
+			jdbcType="VARCHAR" />
+		<result column="memo" property="memo" jdbcType="VARCHAR" />
+		<result column="create_by" property="createBy" jdbcType="INTEGER" />
+		<result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+		<result column="update_by" property="updateBy" jdbcType="INTEGER" />
+		<result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+		<result column="evaluate_score" property="evaluateScore"
+			jdbcType="VARCHAR" />
+		<result column="evaluate" property="evaluate" jdbcType="VARCHAR" />
+		<result column="platform_evaluate" property="platformEvaluate"
+			jdbcType="VARCHAR" />
+		<result column="platform_evaluate_score" property="platformEvaluateScore"
+			jdbcType="VARCHAR" />
+		<result column="platform_memo" property="platformMemo"
+			jdbcType="VARCHAR" />
+		<result column="customer_ip" property="customerIp" jdbcType="VARCHAR" />
+		<result column="point" property="point" jdbcType="VARCHAR" />
+		<result column="pointBD" property="pointbd" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		appraisal_id, order_id, order_no, booking_customer_id,
+		booking_customer_phone,
+		rider_phone,
+		driver_id, car_id,
+		instrument_and_service, environment_and_equipped,
+		efficiency_and_safety,
+		memo, create_by, create_date, update_by,
+		update_date, evaluate_score,
+		evaluate, platform_evaluate,
+		platform_evaluate_score, platform_memo, customer_ip, point, pointBD
+	</sql>
+	
+	<!-- 查询订单评分 -->
+	<select id="queryAppraisal" parameterType="java.util.Map" resultMap="BaseResultMap">
+		SELECT
+			<include refid="Base_Column_List"/>
+		FROM
+			car_biz_customer_appraisal a
+		WHERE
+			a.order_no = #{orderNo}
+	</select>
+</mapper>
