@@ -59,7 +59,7 @@ public class BusSupplierCommissionInfoDTO {
 	@InArray(values = { "0" }, message = "返点类型不在有效值范围内")
 	private Integer rebateType;
 
-	/** 返点周期0 月 1周 **/
+	/** 返点周期0 月 1季度 **/
 	@NotNull(message = "返点周期不能为空")
 	@InArray(values = { "0", "1" }, message = "返点周期不在有效值范围内")
 	private Integer rebateCycle;
