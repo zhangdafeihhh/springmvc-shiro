@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.SubscriptionReportMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.SubscriptionReport" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="bussiness_number" property="bussinessNumber" jdbcType="VARCHAR" />
+    <result column="configure_id" property="configureId" jdbcType="BIGINT" />
+    <result column="report_id" property="reportId" jdbcType="INTEGER" />
+    <result column="report_name" property="reportName" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+    <result column="team_id" property="teamId" jdbcType="INTEGER" />
+    <result column="team_name" property="teamName" jdbcType="VARCHAR" />
+    <result column="level" property="level" jdbcType="INTEGER" />
+    <result column="subscription_cycle" property="subscriptionCycle" jdbcType="INTEGER" />
+    <result column="subscription_time" property="subscriptionTime" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="create_id" property="createId" jdbcType="INTEGER" />
+    <result column="create_name" property="createName" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, bussiness_number, configure_id, report_id, report_name, city_id, city_name, supplier_id, 
+    supplier_name, team_id, team_name, level, subscription_cycle, subscription_time, 
+    url, create_id, create_name, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from subscription_report
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from subscription_report
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.driver.SubscriptionReport" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into subscription_report (bussiness_number, configure_id, report_id, 
+      report_name, city_id, city_name, 
+      supplier_id, supplier_name, team_id, 
+      team_name, level, subscription_cycle, 
+      subscription_time, url, create_id, 
+      create_name, create_time, update_time
+      )
+    values (#{bussinessNumber,jdbcType=VARCHAR}, #{configureId,jdbcType=BIGINT}, #{reportId,jdbcType=INTEGER}, 
+      #{reportName,jdbcType=VARCHAR}, #{cityId,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR}, 
+      #{supplierId,jdbcType=INTEGER}, #{supplierName,jdbcType=VARCHAR}, #{teamId,jdbcType=INTEGER}, 
+      #{teamName,jdbcType=VARCHAR}, #{level,jdbcType=INTEGER}, #{subscriptionCycle,jdbcType=INTEGER}, 
+      #{subscriptionTime,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, #{createId,jdbcType=INTEGER}, 
+      #{createName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.SubscriptionReport" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into subscription_report
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="bussinessNumber != null" >
+        bussiness_number,
+      </if>
+      <if test="configureId != null" >
+        configure_id,
+      </if>
+      <if test="reportId != null" >
+        report_id,
+      </if>
+      <if test="reportName != null" >
+        report_name,
+      </if>
+      <if test="cityId != null" >
+        city_id,
+      </if>
+      <if test="cityName != null" >
+        city_name,
+      </if>
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="supplierName != null" >
+        supplier_name,
+      </if>
+      <if test="teamId != null" >
+        team_id,
+      </if>
+      <if test="teamName != null" >
+        team_name,
+      </if>
+      <if test="level != null" >
+        level,
+      </if>
+      <if test="subscriptionCycle != null" >
+        subscription_cycle,
+      </if>
+      <if test="subscriptionTime != null" >
+        subscription_time,
+      </if>
+      <if test="url != null" >
+        url,
+      </if>
+      <if test="createId != null" >
+        create_id,
+      </if>
+      <if test="createName != null" >
+        create_name,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="bussinessNumber != null" >
+        #{bussinessNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="configureId != null" >
+        #{configureId,jdbcType=BIGINT},
+      </if>
+      <if test="reportId != null" >
+        #{reportId,jdbcType=INTEGER},
+      </if>
+      <if test="reportName != null" >
+        #{reportName,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null" >
+        #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierName != null" >
+        #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="teamId != null" >
+        #{teamId,jdbcType=INTEGER},
+      </if>
+      <if test="teamName != null" >
+        #{teamName,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null" >
+        #{level,jdbcType=INTEGER},
+      </if>
+      <if test="subscriptionCycle != null" >
+        #{subscriptionCycle,jdbcType=INTEGER},
+      </if>
+      <if test="subscriptionTime != null" >
+        #{subscriptionTime,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null" >
+        #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="createId != null" >
+        #{createId,jdbcType=INTEGER},
+      </if>
+      <if test="createName != null" >
+        #{createName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.driver.SubscriptionReport" >
+    update subscription_report
+    <set >
+      <if test="bussinessNumber != null" >
+        bussiness_number = #{bussinessNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="configureId != null" >
+        configure_id = #{configureId,jdbcType=BIGINT},
+      </if>
+      <if test="reportId != null" >
+        report_id = #{reportId,jdbcType=INTEGER},
+      </if>
+      <if test="reportName != null" >
+        report_name = #{reportName,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null" >
+        city_name = #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierName != null" >
+        supplier_name = #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="teamId != null" >
+        team_id = #{teamId,jdbcType=INTEGER},
+      </if>
+      <if test="teamName != null" >
+        team_name = #{teamName,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null" >
+        level = #{level,jdbcType=INTEGER},
+      </if>
+      <if test="subscriptionCycle != null" >
+        subscription_cycle = #{subscriptionCycle,jdbcType=INTEGER},
+      </if>
+      <if test="subscriptionTime != null" >
+        subscription_time = #{subscriptionTime,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null" >
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="createId != null" >
+        create_id = #{createId,jdbcType=INTEGER},
+      </if>
+      <if test="createName != null" >
+        create_name = #{createName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.SubscriptionReport" >
+    update subscription_report
+    set bussiness_number = #{bussinessNumber,jdbcType=VARCHAR},
+      configure_id = #{configureId,jdbcType=BIGINT},
+      report_id = #{reportId,jdbcType=INTEGER},
+      report_name = #{reportName,jdbcType=VARCHAR},
+      city_id = #{cityId,jdbcType=INTEGER},
+      city_name = #{cityName,jdbcType=VARCHAR},
+      supplier_id = #{supplierId,jdbcType=INTEGER},
+      supplier_name = #{supplierName,jdbcType=VARCHAR},
+      team_id = #{teamId,jdbcType=INTEGER},
+      team_name = #{teamName,jdbcType=VARCHAR},
+      level = #{level,jdbcType=INTEGER},
+      subscription_cycle = #{subscriptionCycle,jdbcType=INTEGER},
+      subscription_time = #{subscriptionTime,jdbcType=VARCHAR},
+      url = #{url,jdbcType=VARCHAR},
+      create_id = #{createId,jdbcType=INTEGER},
+      create_name = #{createName,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

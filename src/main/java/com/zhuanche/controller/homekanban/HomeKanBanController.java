@@ -150,7 +150,15 @@ public class HomeKanBanController {
 		return parseResult(onlineTimeUrl, paramMap);
 	}
 
-	/** 司机排名统计 **/
+	/**
+	 * 司机排名统计
+	 * @param allianceId 加盟商ID
+	 * @param motorcadeId 车队ID
+	 * @param orderByColumnCode 排序字段编号 1：订单数量;2：平均得分;3：在线时长;4：流水合计
+	 * @param orderByTypeCode 排序方式 1：升序;2：降序
+	 * @param topNum 取前几名 最多不允许超过50
+	 * @return
+	 */
 	@RequestMapping("/vehicleTopStatistics")
 	@ResponseBody
 	public AjaxResponse vehicleTopStatistics(String allianceId, String motorcadeId,
@@ -191,18 +199,22 @@ public class HomeKanBanController {
 		// 数据权限设置
 		if(WebSessionUtil.isSupperAdmin() == false){// 如果是普通管理员
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-			Set<Integer> supplierIds = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-			if(supplierIds == null || supplierIds.size() <= 0){
-				List<CarBizSupplier> querySupplierList = citySupplierTeamService.querySupplierList();// 获取用户可见的供应商信息
-				if(querySupplierList != null && querySupplierList.size() > 0){
-					for (CarBizSupplier carBizSupplier : querySupplierList) {
-						supplierIds.add(carBizSupplier.getSupplierId());
+			Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取当前登录用户可见城市ID
+			// 如果城市id为空，代表可查全国所有数据
+			if(cityIds != null && cityIds.size() > 0){
+				Set<Integer> supplierIds = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
+				if(supplierIds == null || supplierIds.size() <= 0){
+					List<CarBizSupplier> querySupplierList = citySupplierTeamService.querySupplierList();// 获取用户可见的供应商信息
+					if(querySupplierList != null && querySupplierList.size() > 0){
+						for (CarBizSupplier carBizSupplier : querySupplierList) {
+							supplierIds.add(carBizSupplier.getSupplierId());
+						}
 					}
 				}
+				visibleAllianceIds = setToArray(supplierIds);
+				Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
+				visibleMotocadeIds = setToArray(teamIds);
 			}
-			visibleAllianceIds = setToArray(supplierIds);
-			Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-			visibleMotocadeIds = setToArray(teamIds);
 		}
 		// 从大数据仓库获取统计数据
 		Map<String, Object> paramMap = Maps.newHashMap();
@@ -246,19 +258,23 @@ public class HomeKanBanController {
 		if(WebSessionUtil.isSupperAdmin() == false){// 如果是普通管理员
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
 			Set<Integer> supplierIds = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
-			if(supplierIds == null || supplierIds.size() <= 0){
-				List<CarBizSupplier> querySupplierList = citySupplierTeamService.querySupplierList();// 获取用户可见的供应商信息
-				if(querySupplierList != null && querySupplierList.size() > 0){
-					for (CarBizSupplier carBizSupplier : querySupplierList) {
-						supplierIds.add(carBizSupplier.getSupplierId());
+			Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取当前登录用户可见城市ID
+			// 如果城市id为空，代表可查全国所有数据
+			if(cityIds != null && cityIds.size() > 0){
+				if(supplierIds == null || supplierIds.size() <= 0){
+					List<CarBizSupplier> querySupplierList = citySupplierTeamService.querySupplierList();// 获取用户可见的供应商信息
+					if(querySupplierList != null && querySupplierList.size() > 0){
+						for (CarBizSupplier carBizSupplier : querySupplierList) {
+							supplierIds.add(carBizSupplier.getSupplierId());
+						}
 					}
 				}
+				visibleAllianceIds = setToArray(supplierIds);
+				Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
+				visibleMotocadeIds = setToArray(teamIds);
+				paramMap.put("visibleAllianceIds", visibleAllianceIds);
+				paramMap.put("visibleMotocadeIds", visibleMotocadeIds);
 			}
-			visibleAllianceIds = setToArray(supplierIds);
-			Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
-			visibleMotocadeIds = setToArray(teamIds);
-			paramMap.put("visibleAllianceIds", visibleAllianceIds);
-			paramMap.put("visibleMotocadeIds", visibleMotocadeIds);
 		}
 		try {
 			String jsonString = JSON.toJSONString(paramMap);

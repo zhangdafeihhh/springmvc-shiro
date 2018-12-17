@@ -4,10 +4,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 
 import mapper.mdbcarmanage.ex.CarRelateGroupExMapper;
 import mapper.mdbcarmanage.ex.CarRelateTeamExMapper;
@@ -21,8 +23,6 @@ import mapper.mdbcarmanage.ex.CarRelateTeamExMapper;
  */
 @Service
 public class BusCarDriverTeamService {
-
-	private static final Logger logger = LoggerFactory.getLogger(BusCarDriverTeamService.class);
 
 	// ===========================表基础mapper==================================
 
@@ -43,6 +43,7 @@ public class BusCarDriverTeamService {
 	 * @param teamIds
 	 * @return
 	 */
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE))
 	public Set<Integer> selectDriverIdsByTeamIdOrGroupId(Integer groupId, Integer teamId, Set<Integer> teamIds) {
 		Set<Integer> result = new HashSet<Integer>();
 		if (groupId != null) {// 有车队下小组ID传入，故以此ID为主

@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,7 @@ public class AllianceCheckController{
 		  */
 		@ResponseBody
 	    @RequestMapping(value = "/queryAllianceCheckData", method = { RequestMethod.POST,RequestMethod.GET })
+		@RequiresPermissions(value = { "JoinBusinessAssessment_look" } )
 	    public AjaxResponse queryAllianceCheckData(
 	    										  @Verify(param = "queryDate",rule = "required") String queryDate,
 	                                              String allianceId,
@@ -108,6 +110,7 @@ public class AllianceCheckController{
 		    * @return
 		  */
   	@RequestMapping(value = "/exportAllianceCheckData", method = { RequestMethod.POST,RequestMethod.GET })
+	@RequiresPermissions(value = { "JoinBusinessAssessment_export" } )
 	public void exportAllianceCheckData( 
 										 @Verify(param = "queryDate",rule = "required") String queryDate,
 							             String allianceId,

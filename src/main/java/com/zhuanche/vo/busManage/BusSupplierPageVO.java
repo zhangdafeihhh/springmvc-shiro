@@ -3,6 +3,13 @@ package com.zhuanche.vo.busManage;
 import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * @ClassName: BusSupplierPageVO
+ * @Description:
+ * @author: yanyunpeng
+ * @date: 2018年12月10日 下午4:26:17
+ * 
+ */
 public class BusSupplierPageVO {
 
 	/** 供应商ID **/
@@ -12,10 +19,10 @@ public class BusSupplierPageVO {
 	private String supplierName;
 
 	/** 城市名称 **/
-	private Integer cityName;
+	private String cityName;
 
 	/** 分佣比例 **/
-	// TODO
+	private Double supplierRate;
 
 	/** 加盟费 **/
 	private BigDecimal franchiseFee;
@@ -23,8 +30,8 @@ public class BusSupplierPageVO {
 	/** 保证金 **/
 	private BigDecimal deposit;
 
-	/** 是否有返点 **/
-	// TODO
+	/** 是否有返点   0不返点 1返点**/
+	private Integer isRebate;
 
 	/** 合同开始时间 **/
 	private Date contractDateStart;
@@ -37,8 +44,6 @@ public class BusSupplierPageVO {
 
 	/** 状态：1.有效 0.无效 **/
 	private Integer status;
-
-	// ====================其它业务数据======================
 
 	public Integer getSupplierId() {
 		return supplierId;
@@ -56,12 +61,20 @@ public class BusSupplierPageVO {
 		this.supplierName = supplierName;
 	}
 
-	public Integer getCityName() {
+	public String getCityName() {
 		return cityName;
 	}
 
-	public void setCityName(Integer cityName) {
+	public void setCityName(String cityName) {
 		this.cityName = cityName;
+	}
+
+	public Double getSupplierRate() {
+		return supplierRate;
+	}
+
+	public void setSupplierRate(Double supplierRate) {
+		this.supplierRate = supplierRate;
 	}
 
 	public BigDecimal getFranchiseFee() {
@@ -80,12 +93,12 @@ public class BusSupplierPageVO {
 		this.deposit = deposit;
 	}
 
-	public Integer getStatus() {
-		return status;
+	public Integer getIsRebate() {
+		return isRebate;
 	}
 
-	public void setStatus(Integer status) {
-		this.status = status;
+	public void setIsRebate(Integer isRebate) {
+		this.isRebate = isRebate;
 	}
 
 	public Date getContractDateStart() {
@@ -111,5 +124,15 @@ public class BusSupplierPageVO {
 	public void setIsExpireSoon(Integer isExpireSoon) {
 		this.isExpireSoon = isExpireSoon;
 	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
+	// ====================其它业务数据======================
 
 }

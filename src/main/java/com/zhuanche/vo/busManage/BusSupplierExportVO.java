@@ -21,6 +21,12 @@ public class BusSupplierExportVO {
 	/** 状态：1.有效 0.无效 **/
 	private Integer status;
 
+	/** 分佣比例 **/
+	private Double supplierRate;
+
+	/** 是否有返点  0不返点 1返点 **/
+	private Integer isRebate;
+
 	public Integer getSupplierId() {
 		return supplierId;
 	}
@@ -51,6 +57,22 @@ public class BusSupplierExportVO {
 
 	public void setStatus(Integer status) {
 		this.status = status;
+	}
+
+	public Double getSupplierRate() {
+		return supplierRate;
+	}
+
+	public void setSupplierRate(Double supplierRate) {
+		this.supplierRate = supplierRate;
+	}
+
+	public Integer getIsRebate() {
+		return isRebate;
+	}
+
+	public void setIsRebate(Integer isRebate) {
+		this.isRebate = isRebate;
 	}
 
 }

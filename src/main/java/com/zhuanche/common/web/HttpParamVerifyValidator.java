@@ -1,6 +1,12 @@
 package com.zhuanche.common.web;
 
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -8,6 +14,7 @@ import com.zhuanche.constants.SaasConst;
 import com.zhuanche.util.IdNumberUtil;
 
 public class HttpParamVerifyValidator {
+	private static final Predicate<String> NOT_NUMBER_PREDICATE = Pattern.compile("^\\d+$").asPredicate().negate();
 	/**最小值**/
 	public String min( String value , String threadHold ) {
 		if(StringUtils.isEmpty(value) || StringUtils.isEmpty(threadHold)){
@@ -82,4 +89,37 @@ public class HttpParamVerifyValidator {
 		}
 		return null;
 	}
+
+	/**逗号分隔的数字**/
+	public String multiNumber( String value ) {
+		if(StringUtils.isEmpty(value) ){
+			return null;
+		}
+		String[] numbers = value.split(",");
+		List<String> notNumbers = Arrays.asList(numbers).parallelStream().filter( NOT_NUMBER_PREDICATE  ).collect(Collectors.toList());
+		if(notNumbers!=null && notNumbers.size()>0 ) {
+			return "格式错误，不是逗号分隔的数字";
+		}
+		return null;
+	}
+	
+	
+	
+	public static void main(String[] args) throws Exception {
+		StringBuffer sb = new StringBuffer();
+		for( int i=0;i<1000;i++) {
+			sb.append(i).append(",");
+		}
+		sb.append("1a");
+		
+		HttpParamVerifyValidator validator = new HttpParamVerifyValidator();
+//		Method validatorMethod = validator.getClass().getMethod("RegExp", String.class, String.class );
+//		String invalidReason = (String) validatorMethod.invoke(validator, sb.toString() ,"^\\d+(,\\d+)*$");////校验不通过的原因
+//		System.out.println( invalidReason );
+		
+		Method validatorMethod2 = validator.getClass().getMethod("multiNumber", String.class );
+		String invalidReason2 = (String) validatorMethod2.invoke(validator, sb.toString());//校验不通过的原因
+		System.out.println( invalidReason2 );
+	}
+	
 }

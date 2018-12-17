@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
@@ -26,8 +29,11 @@ import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.dto.busManage.BusSupplierBaseDTO;
+import com.zhuanche.dto.busManage.BusSupplierCommissionInfoDTO;
 import com.zhuanche.dto.busManage.BusSupplierDetailDTO;
+import com.zhuanche.dto.busManage.BusSupplierProrateDTO;
 import com.zhuanche.dto.busManage.BusSupplierQueryDTO;
+import com.zhuanche.dto.busManage.BusSupplierRebateDTO;
 import com.zhuanche.serv.busManage.BusSupplierService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.excel.CsvUtils;
@@ -55,70 +61,96 @@ public class BusSupplierController {
 	// ===========================巴士业务拓展service==================================
 	@Autowired
 	private BusSupplierService busSupplierService;
+	//============================巴士共有服务service==================================
 
 	/**
 	 * @Title: saveSupplier
 	 * @Description: 保存/修改供应商
 	 * @param baseDTO
 	 * @param detailDTO
-	 * @return 
+	 * @return
 	 * @return AjaxResponse
 	 * @throws
 	 */
 	@RequestMapping(value = "/saveSupplier")
-	@MasterSlaveConfigs(configs = { @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER),
-			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.MASTER) })
-	public AjaxResponse saveSupplier(BusSupplierBaseDTO baseDTO, BusSupplierDetailDTO detailDTO) {// TODO 封装分佣、返点信息
-		return busSupplierService.saveSupplierInfo(baseDTO, detailDTO);
+	public AjaxResponse saveSupplier(@Validated BusSupplierBaseDTO baseDTO, @Validated BusSupplierDetailDTO detailDTO,
+			@Validated BusSupplierCommissionInfoDTO commissionDTO, @Validated List<BusSupplierProrateDTO> prorateList,
+			@Validated List<BusSupplierRebateDTO> rebateList) {
+		return busSupplierService.saveSupplierInfo(baseDTO, detailDTO, commissionDTO, prorateList, rebateList);
 	}
-	
+
 	/**
 	 * @Title: querySupplierPageList
 	 * @Description: 查询供应商分页列表
 	 * @param baseDTO
 	 * @param detailDTO
-	 * @return 
+	 * @return
 	 * @return AjaxResponse
 	 * @throws
 	 */
 	@SuppressWarnings("resource")
 	@RequestMapping(value = "/querySupplierPageList")
-	@MasterSlaveConfigs(configs = { @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE),
-			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE) })
-	public AjaxResponse querySupplierPageList(BusSupplierQueryDTO queryDTO) {
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
+	public AjaxResponse querySupplierPageList(@Validated BusSupplierQueryDTO queryDTO) {
 		Integer pageNum = queryDTO.getPageNum();
 		Integer pageSize = queryDTO.getPageSize();
-		
-		// 查询列表
+
+		// 数据权限控制SSOLoginUser
+		Set<Integer> permOfCity = WebSessionUtil.getCurrentLoginUser().getCityIds(); // 普通管理员可以管理的所有城市ID
+		Set<Integer> permOfSupplier = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); // 普通管理员可以管理的所有供应商ID
+		Set<Integer> permOfTeam = WebSessionUtil.getCurrentLoginUser().getTeamIds(); // 普通管理员可以管理的所有车队ID
+		queryDTO.setAuthOfCity(permOfCity);
+		queryDTO.setAuthOfSupplier(permOfSupplier);
+		queryDTO.setAuthOfTeam(permOfTeam);
+		// 一、查询列表
 		List<BusSupplierPageVO> resultList = busSupplierService.queryBusSupplierPageList(queryDTO);
         
-        // 计算total
+        // 二、计算total
 		queryDTO.setPageNum(pageNum);
 		queryDTO.setPageSize(pageSize);
         queryDTO.setContractIds(null);
 		queryDTO.setExcludeContractIds(null);
         List<BusSupplierPageVO> totalList = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
         Page<BusSupplierPageVO> page = (Page<BusSupplierPageVO>) totalList;
+        
+        // 三、补充分佣信息(分佣比例、是否有返点)
+        if (resultList == null || resultList.isEmpty()) {
+        	resultList = totalList;
+        }
+		String supplierIds = resultList.stream().map(e -> e.getSupplierId().toString()).collect(Collectors.joining(","));
+		JSONArray jsonArray = busSupplierService.getProrateList(supplierIds);
+		if (jsonArray != null) {
+			// 组装数据
+			resultList.forEach(supplier -> {
+				// 查找对应供应商数据
+				Integer supplierId = supplier.getSupplierId();
+				jsonArray.stream().filter(e -> {
+					JSONObject jsonObject = (JSONObject) JSON.toJSON(e);
+					return supplierId.equals(jsonObject.getInteger("supplierId"));
+				}).findFirst().ifPresent(e -> {
+					JSONObject jsonObject = (JSONObject) JSON.toJSON(e);
+					supplier.setSupplierRate(jsonObject.getDouble("supplierRate"));
+					supplier.setIsRebate(jsonObject.getInteger("isRebate"));
+				});
+			});
+		}
 		return AjaxResponse.success(new PageDTO(queryDTO.getPageNum(), queryDTO.getPageSize(), page.getTotal(), resultList));
 	}
-	
+
 	/**
 	 * @Title: exportSupplierList
 	 * @Description: 导出供应商列表
 	 * @param queryDTO
 	 * @param request
 	 * @param response
-	 * @return 
+	 * @return
 	 * @return AjaxResponse
 	 * @throws
 	 */
 	@SuppressWarnings("resource")
 	@RequestMapping(value = "/exportSupplierList")
-	@MasterSlaveConfigs(configs = { @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE),
-			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE) })
-	public void exportSupplierList(BusSupplierQueryDTO queryDTO, HttpServletRequest request,
+	public void exportSupplierList(@Validated BusSupplierQueryDTO queryDTO, HttpServletRequest request,
 			HttpServletResponse response) {
-		
         long start = System.currentTimeMillis(); // 获取开始时间
 		try {
 			// 数据权限控制SSOLoginUser
@@ -154,7 +186,7 @@ public class BusSupplierController {
 			do {
 				// 页码+1
 				pageNum++;
-				
+
 				// 查询数据
 				queryDTO.setPageNum(pageNum);
 				queryDTO.setPageSize(CsvUtils.downPerSize);
@@ -172,7 +204,7 @@ public class BusSupplierController {
 				if (pages <= 1 || pageNum == pages) {
 					isLast = true;
 				}
-				
+
 				// 数据区
 				// 如果查询结果为空
 				if (list == null || list.isEmpty()) {
@@ -203,15 +235,14 @@ public class BusSupplierController {
 	 * @Title: querySupplierPageList
 	 * @Description: 查询供应商详情
 	 * @param queryDTO
-	 * @return 
+	 * @return
 	 * @return AjaxResponse
 	 * @throws
 	 */
 	@RequestMapping(value = "/querySupplierById")
-	@MasterSlaveConfigs(configs = { @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE),
-			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE) })
 	public AjaxResponse querySupplierById(@NotNull(message = "供应商ID不能为空") Integer supplierId) {
 		BusSupplierInfoVO supplierVO = busSupplierService.querySupplierById(supplierId);
 		return AjaxResponse.success(supplierVO);
 	}
+
 }

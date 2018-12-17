@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.CarMessageDocMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.CarMessageDoc" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="doc_name" property="docName" jdbcType="VARCHAR" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+    <result column="doc_url" property="docUrl" jdbcType="VARCHAR" />
+    <result column="message_id" property="messageId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, doc_name, state, doc_url, message_id, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from car_message_doc
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from car_message_doc
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.CarMessageDoc" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_message_doc (doc_name, state, doc_url, 
+      message_id, create_time, update_time
+      )
+    values (#{docName,jdbcType=VARCHAR}, #{state,jdbcType=INTEGER}, #{docUrl,jdbcType=VARCHAR}, 
+      #{messageId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarMessageDoc" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_message_doc
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="docName != null" >
+        doc_name,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+      <if test="docUrl != null" >
+        doc_url,
+      </if>
+      <if test="messageId != null" >
+        message_id,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="docName != null" >
+        #{docName,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=INTEGER},
+      </if>
+      <if test="docUrl != null" >
+        #{docUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="messageId != null" >
+        #{messageId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarMessageDoc" >
+    update car_message_doc
+    <set >
+      <if test="docName != null" >
+        doc_name = #{docName,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="docUrl != null" >
+        doc_url = #{docUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="messageId != null" >
+        message_id = #{messageId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.CarMessageDoc" >
+    update car_message_doc
+    set doc_name = #{docName,jdbcType=VARCHAR},
+      state = #{state,jdbcType=INTEGER},
+      doc_url = #{docUrl,jdbcType=VARCHAR},
+      message_id = #{messageId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

@@ -32,6 +32,8 @@ import com.zhuanche.util.excel.ExportExcelUtil;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -104,6 +106,7 @@ public class DriverSchController {
     * @Date: 2018/9/5 
     */ 
     @RequestMapping("/exportDutyToExcel")
+	@RequiresPermissions(value = { "LookArrange_export" } )
     @ResponseBody
     public String  exportDutyToExcel(HttpServletResponse response, HttpServletRequest request,DutyParamRequest param){
 
@@ -258,6 +261,7 @@ public class DriverSchController {
      */
     @ResponseBody
     @RequestMapping(value = "/queryDriverTeamReList")
+	@RequiresPermissions(value = { "DriverArrange_look" } )
     public AjaxResponse queryDriverTeamReList(TeamGroupRequest teamGroupRequest){
         logger.info("获取班制设置司机列表入参:"+ JSON.toJSONString(teamGroupRequest));
         PageDTO pageDTO = carDriverShiftsService.queryDriverTeamReList(teamGroupRequest);
@@ -339,6 +343,7 @@ public class DriverSchController {
      */
     @ResponseBody
     @RequestMapping(value = "/getDriverMustDutyList")
+	@RequiresPermissions(value = { "WorkTimeManage_look" } )
     public AjaxResponse getDriverMustDutyList(DutyParamRequest param){
         logger.info("查询强制上班配置列表 入参:"+ JSON.toJSONString(param));
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
@@ -392,6 +397,7 @@ public class DriverSchController {
     */
     @ResponseBody
     @RequestMapping(value = "/getDriverDurationList")
+	@RequiresPermissions(value = { "TimeLengthManage_look" } )
     public AjaxResponse getDriverDurationList(DutyParamRequest param){
         logger.info("查询排班时长列表入参:"+ JSON.toJSONString(param));
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
@@ -434,6 +440,7 @@ public class DriverSchController {
     */ 
     @ResponseBody
     @RequestMapping(value = "/queryDriverMonthDutyData")
+	@RequiresPermissions(value = { "PublishArrange_look" , "LookArrange_look"} , logical=Logical.OR )
     public AjaxResponse queryDriverMonthDutyData(DutyParamRequest param) {
         logger.info("查看符合条件排班列表，入参:"+ (param== null?"null":JSON.toJSONString(param)));
       try{

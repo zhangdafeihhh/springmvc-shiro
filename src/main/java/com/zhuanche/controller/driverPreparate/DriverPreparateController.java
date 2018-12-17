@@ -8,6 +8,7 @@ import com.zhuanche.entity.DriverPreparate.DriverPreparate;
 import com.zhuanche.serv.driverPreparate.DriverPreparateService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.util.TextUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,7 @@ public class DriverPreparateController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/queryDriverPreparateData")
+	@RequiresPermissions(value = { "DriverAttendance_look" } )
 	public AjaxResponse queryDriverPreparateData(String orderNo, String driverPhone, String licensePlates,
 												 @Verify(param = "page",rule = "required|min(1)") Integer page,
 												 @Verify(param = "pageSize",rule = "required|min(5)") Integer pageSize) {

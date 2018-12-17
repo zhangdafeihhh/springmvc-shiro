@@ -13,6 +13,7 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.MyRestTemplate;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,7 @@ public class LbsController {
      */
     @ResponseBody
     @RequestMapping(value = "/getGpsByDriver", method = { RequestMethod.POST,RequestMethod.GET })
+	@RequiresPermissions(value = { "CarMonitor_look" } )
     public AjaxResponse getGpsByDriver(
             @RequestParam(value = "driverId", required = true,defaultValue = "")String driverId,
             @RequestParam(value = "startTime", required = true)String startTime,

@@ -67,11 +67,6 @@ public class BusInfoService {
         buidDefaultParam(carInfo);
         //保存到mysql
         int result = busInfoExMapper.insertCar(carInfo);
-        if(result>0){
-            //保存到mongoDB
-            CarMongoDTO carMongo = buidMongoDTO(carInfo);
-            carMongoTemplate.insert(carMongo, mongoCollectionName);
-        }
         return result;
     }
     @MasterSlaveConfigs(configs={
@@ -79,17 +74,9 @@ public class BusInfoService {
     } )
     public int updateCarById(BusCarInfo carInfo) {
         int result = busInfoExMapper.updateCarById(carInfo);
-        if(result>0){
-            //修改mongoDB
-            update2mongoDB(carInfo);
-        }
         return result;
     }
-
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-    } )
-    private CarMongoDTO buidMongoDTO(BusCarInfo carInfo) {
+    public void saveCar2MongoDB(BusCarInfo carInfo) {
         CarMongoDTO carMongo = new CarMongoDTO();
         carMongo.setStatus(carInfo.getStatus());
         carMongo.setCreateBy(carInfo.getCreateBy());
@@ -121,12 +108,10 @@ public class BusInfoService {
         carMongo.setNextInspectDate(carInfo.getNextInspectDate());
         carMongo.setRentalExpireDate(carInfo.getRentalExpireDate());
         carMongo.setMemo(carInfo.getMemo());
-        return carMongo;
+        carMongoTemplate.insert(carMongo, mongoCollectionName);
     }
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-    } )
-    private void update2mongoDB(BusCarInfo info) {
+
+    public void update2mongoDB(BusCarInfo info) {
         Query query = new Query(Criteria.where("carId").is(String.valueOf(info.getCarId())));
 
         Update update = new Update();
@@ -235,9 +220,7 @@ public class BusInfoService {
 
 
 
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-    } )
+
     public boolean licensePlatesIfExist(String licensePlates) {
         int result = busInfoExMapper.countLicensePlates(licensePlates);
         if (result > 0) {
@@ -245,9 +228,7 @@ public class BusInfoService {
         }
         return false;
     }
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
-    } )
+
     public String getLicensePlatesByCarId(Integer carId) {
         return busInfoExMapper.getLicensePlatesByCarId(carId);
     }

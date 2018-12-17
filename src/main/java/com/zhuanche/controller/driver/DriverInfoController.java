@@ -14,12 +14,15 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.dto.driver.TelescopeDriverInfo;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
+import com.zhuanche.entity.mdbcarmanage.DriverTelescopeUser;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.serv.*;
+import com.zhuanche.serv.authc.UserManagementService;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
@@ -27,6 +30,7 @@ import com.zhuanche.util.excel.CsvUtils;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +76,8 @@ public class DriverInfoController {
     @Autowired
     private CarBizCarGroupService carBizCarGroupService;
 
+    @Autowired
+    private UserManagementService userManagementService;
 
     /**
      * 司机信息列表（有分页）
@@ -94,6 +100,7 @@ public class DriverInfoController {
      */
     @ResponseBody
     @RequestMapping(value = "/findDriverList")
+	@RequiresPermissions(value = { "DriverinfoManage_look" } )
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
@@ -244,6 +251,7 @@ public class DriverInfoController {
      */
     @ResponseBody
     @RequestMapping(value = "/exportDriverList")
+	@RequiresPermissions(value = { "DriverinfoManage_export" } )
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
@@ -787,4 +795,45 @@ public class DriverInfoController {
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
     }
+
+    /**
+     * 司机信息
+     * @param phone
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/findTelescopeDriverInfo")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
+    })
+    public AjaxResponse findTelescopeDriverInfo(String phone,Integer userId) {
+        logger.info("【查询千里眼司机信息】请求参数:phone={},userId={}",phone,userId);
+        boolean auth = false;
+        TelescopeDriverInfo telescopeDriverInfo = new  TelescopeDriverInfo();
+        if(userId!=null){
+            DriverTelescopeUser driverTelescopeUser = userManagementService.selectTelescopeUserByUserId(userId);
+            logger.info("【查询千里眼司机信息】请求参数:phone={},userId={},telescopeDriverInfo={}",phone,userId,telescopeDriverInfo);
+            if(null!=driverTelescopeUser && driverTelescopeUser.getStatus()==1){
+                auth = true;
+            }
+            if(null!=driverTelescopeUser){
+                CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(driverTelescopeUser.getDriverId());
+                logger.info("【查询千里眼司机信息】请求参数:phone={},userId={},carBizDriverInfo={}",phone,userId,carBizDriverInfo);
+                if(null!=carBizDriverInfo && carBizDriverInfo.getStatus()==1){
+                    phone = carBizDriverInfo.getPhone();
+                }
+            }
+        }
+        CarBizDriverInfoDTO carBizDriverInfoDTO = carBizDriverInfoService.selectByPhone(phone);
+        logger.info("【查询千里眼司机信息】请求参数:phone={},userId={},carBizDriverInfoDTO={}",phone,userId,carBizDriverInfoDTO);
+        if(null != carBizDriverInfoDTO){
+            // 查询城市名称，供应商名称，服务类型，加盟类型
+            carBizDriverInfoDTO = carBizDriverInfoService.getBaseStatis(carBizDriverInfoDTO);
+            telescopeDriverInfo = BeanUtil.copyObject(carBizDriverInfoDTO, TelescopeDriverInfo.class);
+            logger.info("【查询千里眼司机信息】请求参数:phone={},userId={},telescopeDriverInfo2={}",phone,userId,telescopeDriverInfo);
+        }
+        telescopeDriverInfo.setAuth(auth);
+        return AjaxResponse.success(telescopeDriverInfo);
+    }
+
 }

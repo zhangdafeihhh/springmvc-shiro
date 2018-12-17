@@ -32,6 +32,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -56,7 +58,6 @@ import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizCooperationType;
-import com.zhuanche.entity.rentcar.CarBizCustomerAppraisalStatistics;
 import com.zhuanche.entity.rentcar.CarBizDriverAccount;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.entity.rentcar.CarBizDriverInfoDetail;
@@ -76,6 +77,7 @@ import com.zhuanche.vo.busManage.BusDriverInfoPageVO;
 import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.mdbcarmanage.CarRelateGroupMapper;
 import mapper.mdbcarmanage.CarRelateTeamMapper;
+import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
 import mapper.mdbcarmanage.ex.CarBizAgreementCompanyExMapper;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.mdbcarmanage.ex.CarRelateGroupExMapper;
@@ -86,21 +88,20 @@ import mapper.rentcar.CarBizCooperationTypeMapper;
 import mapper.rentcar.CarBizDriverAccountMapper;
 import mapper.rentcar.CarBizDriverInfoMapper;
 import mapper.rentcar.CarBizSupplierMapper;
-import mapper.rentcar.ex.BusCarBizCustomerAppraisalStatisticsExMapper;
 import mapper.rentcar.ex.BusCarBizDriverInfoExMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
-import net.sf.json.JSONObject;
 
 /**
  * @ClassName:  BusCarBizDriverInfoService
  * @Description: 
  * @author: yanyunpeng
- * @date:   2018年12月7日 下午7:17:15
+ * @date:   2018年12月17日 下午7:49:33
  * 
  */
 @Service
+@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class BusCarBizDriverInfoService implements BusConst{
 
 	private static final Logger logger = LoggerFactory.getLogger(BusCarBizDriverInfoService.class);
@@ -160,7 +161,7 @@ public class BusCarBizDriverInfoService implements BusConst{
 	private BusCarBizDriverInfoExMapper busCarBizDriverInfoExMapper;
 	
 	@Autowired
-	private BusCarBizCustomerAppraisalStatisticsExMapper busCarBizCustomerAppraisalStatisticsExMapper;
+	private BusCarBizCustomerAppraisalStatisticsService busCarBizCustomerAppraisalStatisticsService;
 
 	// ===========================专车业务拓展service==================================
 	@Autowired
@@ -176,6 +177,8 @@ public class BusCarBizDriverInfoService implements BusConst{
 	private CarBizChatUserService carBizChatUserService;
 
 	// ===========================巴士业务拓展service==================================
+	@Autowired
+	private BusBizChangeLogService busBizChangeLogService;
 
 	// ===============================专车其它服务===================================
 	@Autowired
@@ -186,9 +189,14 @@ public class BusCarBizDriverInfoService implements BusConst{
 	private BusDriverMongoService busDriverMongoService;
 
 	/**
-	 * @Title: queryDriverList @Description: 分页查询司机信息列表
-	 * 数据量较大的表不做表关联查询，单表查询组装数据 @param queryDTO @return List<BusDriverInfoVO> @throws
+	 * @Title: queryDriverList 
+	 * @Description: 分页查询司机信息列表
+	 * 数据量较大的表不做表关联查询，单表查询组装数据
+	 * @param queryDTO 
+	 * @return List<BusDriverInfoVO> 
+	 * @throws
 	 */
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public List<BusDriverInfoPageVO> queryDriverPageList(BusDriverQueryDTO queryDTO) {
 
 		List<BusDriverInfoPageVO> driverList = busCarBizDriverInfoExMapper.queryDriverPageList(queryDTO);
@@ -224,6 +232,7 @@ public class BusCarBizDriverInfoService implements BusConst{
 	 * @return List<BusDriverInfoVO>
 	 * @throws
 	 */
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public List<BusDriverInfoExportVO> queryDriverExportList(BusDriverQueryDTO exportDTO) {
 		List<BusDriverInfoExportVO> driverList = busCarBizDriverInfoExMapper.queryDriverExportList(exportDTO);
 		return driverList;
@@ -238,6 +247,7 @@ public class BusCarBizDriverInfoService implements BusConst{
 	 * @return void
 	 * @throws
 	 */
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public List<String> completeDriverExportList(List<BusDriverInfoExportVO> list) {
 
 		// 返回结果
@@ -327,9 +337,7 @@ public class BusCarBizDriverInfoService implements BusConst{
 			// 十一、驾照领证日期
 			String issueDate = "";
 			if (driver.getIssueDate() != null) {
-				DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-				issueDate = pattern
-						.format(LocalDateTime.ofInstant(driver.getIssueDate().toInstant(), ZoneId.systemDefault()));
+				issueDate = formatDate(FORMATTER_DATE_BY_HYPHEN, driver.getIssueDate());
 			}
 			builder.append(StringUtils.defaultIfBlank(issueDate, "")).append(",");
 
@@ -349,7 +357,7 @@ public class BusCarBizDriverInfoService implements BusConst{
 	 * @return
 	 */
 	@MasterSlaveConfigs(configs = { @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE),
-			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.MASTER) })
+			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE) })
 	public AjaxResponse updateDriver(BusDriverSaveDTO saveDTO) {
 		try {
 			logger.info("操作方式：编辑,新数据:" + JSON.toJSONString(saveDTO));
@@ -400,6 +408,7 @@ public class BusCarBizDriverInfoService implements BusConst{
 			// 更新司机信息
 			DynamicRoutingDataSource.setMasterSlave("rentcar-DataSource", DataSourceMode.MASTER);
 			int n = this.updateDriverInfo(saveDTO);
+
 			// 更新车辆信息 根据 车牌号更新车辆 信息（更换车辆所属人）
 			if (n > 0) {
 				logger.info("****************根据 车牌号更新车辆 信息（更换车辆所属人）");
@@ -427,6 +436,7 @@ public class BusCarBizDriverInfoService implements BusConst{
 							&& !saveDTO.getOldSupplier().equals(saveDTO.getSupplierId()))) {
 				logger.info("修改司机driverId=" + saveDTO.getDriverId() + "的城市或者供应商，需将司机移除车队小组");
 				// 移除司机车队小组信息
+				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource", DataSourceMode.MASTER);
 				carRelateTeamExMapper.deleteByDriverId(saveDTO.getDriverId());
 				carRelateGroupExMapper.deleteByDriverId(saveDTO.getDriverId());
 				saveDTO.setTeamId(null);
@@ -462,12 +472,14 @@ public class BusCarBizDriverInfoService implements BusConst{
 	 * @param saveDTO
 	 * @return
 	 */
-	@MasterSlaveConfigs(configs = {
-			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER) })
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER))
 	public int updateDriverInfo(BusDriverSaveDTO saveDTO) {
 		// 司机基础信息表
 		busCarBizDriverInfoExMapper.updateBusDriverInfo(saveDTO);
 		int id = saveDTO.getDriverId();
+
+		// 创建操作记录
+		busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(id), saveDTO.getUpdateDate());
 
 		// 司机信息扩展表，司机银行卡号
 		CarBizDriverInfoDetailDTO infoDetail = carBizDriverInfoDetailService.selectByDriverId(saveDTO.getDriverId());
@@ -490,8 +502,7 @@ public class BusCarBizDriverInfoService implements BusConst{
 	 * @param saveDTO
 	 * @return
 	 */
-	@MasterSlaveConfigs(configs = {
-			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER) })
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER))
 	public int updateDriverByXiao(BusDriverSaveDTO saveDTO) {
 		int rtn = 0;
 		try {
@@ -524,6 +535,7 @@ public class BusCarBizDriverInfoService implements BusConst{
 	 * @param saveDTO void
 	 * @throws
 	 */
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER))
 	public void driverUpdate(BusDriverSaveDTO saveDTO) {
 		try {
 			// 判断 车牌号是否修改 如果修改 释放 车牌号
@@ -531,8 +543,7 @@ public class BusCarBizDriverInfoService implements BusConst{
 					&& !saveDTO.getOldLicensePlates().equals(saveDTO.getLicensePlates())) {
 				logger.info("****************修改车牌号 释放以前的车牌号");
 				carBizCarInfoExMapper.updateCarLicensePlates(saveDTO.getOldLicensePlates(), 0);
-				carBizDriverUpdateService.insert(saveDTO.getOldLicensePlates(), saveDTO.getLicensePlates(),
-						saveDTO.getDriverId(), 1);
+				carBizDriverUpdateService.insert(saveDTO.getOldLicensePlates(), saveDTO.getLicensePlates(), saveDTO.getDriverId(), 1);
 			}
 			// 判断 手机号是否修改 如果修改 添加司机事件
 			if (saveDTO.getOldPhone() != null && saveDTO.getOldPhone().length() >= 1
@@ -544,23 +555,20 @@ public class BusCarBizDriverInfoService implements BusConst{
 			if (saveDTO.getOldIdCardNo() != null && saveDTO.getOldIdCardNo().length() >= 1
 					&& !saveDTO.getOldIdCardNo().equals(saveDTO.getIdCardNo())) {
 				logger.info("****************修改身份证");
-				carBizDriverUpdateService.insert(saveDTO.getOldIdCardNo(), saveDTO.getIdCardNo(), saveDTO.getDriverId(),
-						3);
+				carBizDriverUpdateService.insert(saveDTO.getOldIdCardNo(), saveDTO.getIdCardNo(), saveDTO.getDriverId(), 3);
 			}
 			// 判断 机动车驾驶证号是否修改 如果修改 添加司机事件
 			if (saveDTO.getOldDriverLicenseNumber() != null && saveDTO.getOldDriverLicenseNumber().length() >= 1
 					&& !saveDTO.getOldDriverLicenseNumber().equals(saveDTO.getDriverlicensenumber())) {
 				logger.info("****************修改 机动车驾驶证号");
-				carBizDriverUpdateService.insert(saveDTO.getOldDriverLicenseNumber(), saveDTO.getDriverlicensenumber(),
-						saveDTO.getDriverId(), 4);
+				carBizDriverUpdateService.insert(saveDTO.getOldDriverLicenseNumber(), saveDTO.getDriverlicensenumber(), saveDTO.getDriverId(), 4);
 			}
 			// 判断 网络预约出租汽车驾驶员资格证号是否修改 如果修改 添加司机事件
 			if (saveDTO.getOldDriverLicenseIssuingNumber() != null
 					&& saveDTO.getOldDriverLicenseIssuingNumber().length() >= 1
 					&& !saveDTO.getOldDriverLicenseIssuingNumber().equals(saveDTO.getDriverlicenseissuingnumber())) {
 				logger.info("****************修改网络预约出租汽车驾驶员资格证号");
-				carBizDriverUpdateService.insert(saveDTO.getOldDriverLicenseIssuingNumber(),
-						saveDTO.getDriverlicenseissuingnumber(), saveDTO.getDriverId(), 5);
+				carBizDriverUpdateService.insert(saveDTO.getOldDriverLicenseIssuingNumber(), saveDTO.getDriverlicenseissuingnumber(), saveDTO.getDriverId(), 5);
 			}
 		} catch (Exception e) {
 			logger.info("driverUpdateService error:" + e);
@@ -573,6 +581,8 @@ public class BusCarBizDriverInfoService implements BusConst{
 	 * @param saveDTO
 	 * @return
 	 */
+	@MasterSlaveConfigs(configs = { @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE),
+			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE) })
 	public AjaxResponse saveDriver(BusDriverSaveDTO saveDTO) {
 
 		logger.info("操作方式：新建,数据:" + JSON.toJSONString(saveDTO));
@@ -624,12 +634,14 @@ public class BusCarBizDriverInfoService implements BusConst{
 
 			// teamId teamGroupId 存在，则新增车队与司机的关联表
 			if (saveDTO.getTeamId() != null) {// 新增车队
+				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource", DataSourceMode.MASTER);
 				CarRelateTeam record = new CarRelateTeam();
 				record.setTeamId(saveDTO.getTeamId());
 				record.setDriverId(saveDTO.getDriverId());
 				carRelateTeamMapper.insertSelective(record);
 			}
 			if (saveDTO.getTeamGroupId() != null) {// 新增小组
+				DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource", DataSourceMode.MASTER);
 				CarRelateGroup record = new CarRelateGroup();
 				record.setGroupId(saveDTO.getTeamGroupId());
 				record.setDriverId(saveDTO.getDriverId());
@@ -652,10 +664,14 @@ public class BusCarBizDriverInfoService implements BusConst{
 	 * @param saveDTO
 	 * @return
 	 */
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER))
 	public int saveDriverInfo(BusDriverSaveDTO saveDTO) {
 		
 		busCarBizDriverInfoExMapper.insertBusDriverInfo(saveDTO);
-		int driverId = saveDTO.getDriverId();
+		Integer driverId = saveDTO.getDriverId();
+
+		// 创建操作记录
+		busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId), saveDTO.getUpdateDate());
 
 		// 司机信息扩展表，司机银行卡号
 		CarBizDriverInfoDetail carBizDriverInfoDetail = new CarBizDriverInfoDetail();
@@ -774,6 +790,7 @@ public class BusCarBizDriverInfoService implements BusConst{
 	 * @return AjaxResponse
 	 * @throws
 	 */
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public AjaxResponse completeInfo(BusDriverSaveDTO saveDTO) {
 		
 		// 判断一些基础信息是否正确
@@ -915,16 +932,15 @@ public class BusCarBizDriverInfoService implements BusConst{
 			messageMap.put("teamGroupId", saveDTO.getTeamGroupId() == null ? "" : saveDTO.getTeamGroupId()); // 司机所属小组ID
 			messageMap.put("teamGroupName", saveDTO.getTeamGroupName() == null ? "" : saveDTO.getTeamGroupName()); // 司机所属小组名称
 
-			String messageStr = JSONObject.fromObject(messageMap).toString();
-			logger.info("专车司机driverId={}，同步发送数据={}", saveDTO.getDriverId(), messageStr);
-			CommonRocketProducer.publishMessage("driver_info", method, String.valueOf(saveDTO.getDriverId()),
-					messageMap);
+			logger.info("专车司机driverId={}，同步发送数据={}", saveDTO.getDriverId(), JSON.toJSONString(messageMap));
+			CommonRocketProducer.publishMessage("driver_info", method, String.valueOf(saveDTO.getDriverId()), messageMap);
 		} catch (Exception e) {
 			logger.error("发送MQ异常,method={},error={}", method, e.getMessage(), e);
 		}
 	}
 
 	@SuppressWarnings("resource")
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public AjaxResponse batchInputDriverInfo(Integer cityId, Integer supplierId, MultipartFile file,
 			HttpServletRequest request, HttpServletResponse response) {
 
@@ -1206,45 +1222,18 @@ public class BusCarBizDriverInfoService implements BusConst{
 		return cellStringValue;
 	}
 	
-	public String getScore(Integer driverId) {
-		// 司机评分
-		Map<Object, Object> param = new HashMap<>();
-		param.put("driverId", driverId);
-		param.put("createDate", null);
-		CarBizCustomerAppraisalStatistics appraisal = busCarBizCustomerAppraisalStatisticsExMapper.queryAppraisal(param);
-		String average = appraisal == null ? null : appraisal.getEvaluateScore();
-		if (average == null) {
-			double num = 0d;
-			int count = 0;
-			try {
-				Double instrumentAndServiceNum = 0d;
-				if ((instrumentAndServiceNum = Double.valueOf(appraisal.getInstrumentAndService())) != 0) {
-					num += instrumentAndServiceNum;
-					count++;
-				}
-			} catch (NumberFormatException e) {
-			}
-			try {
-				Double environmentAndEquippedNum = 0d;
-				if ((environmentAndEquippedNum = Double.valueOf(appraisal.getEnvironmentAndEquipped())) != 0) {
-					num += environmentAndEquippedNum;
-					count++;
-				}
-			} catch (NumberFormatException e) {
-			}
-			try {
-				Double efficiencyAndSafetyNum = 0d;
-				if ((efficiencyAndSafetyNum = Double.valueOf(appraisal.getEfficiencyAndSafety())) != 0) {
-					num += efficiencyAndSafetyNum;
-					count++;
-				}
-			} catch (NumberFormatException e) {
-			}
-			if (count != 0) {
-				average = String.valueOf(num / count);
-			}
-		}
-		return average;
+	/**
+	 * @Title: resetIMEI
+	 * @Description: 重置imei
+	 * @param driverId 
+	 * @return void
+	 * @throws
+	 */
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER))
+	public int resetIMEI(Integer driverId) {
+		// 创建操作记录
+		busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId), new Date());
+		return carBizDriverInfoExMapper.resetIMEI(driverId);
 	}
 
 }

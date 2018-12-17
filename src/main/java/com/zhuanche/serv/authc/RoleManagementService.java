@@ -263,4 +263,8 @@ public class RoleManagementService{
 		saasRoleMapper.deleteByPrimaryKey(roleId);
 		return AjaxResponse.success( null );
 	}
+
+	public List<String> getAllRoleName(Integer userId) {
+		return saasRolePermissionRalationExMapper.queryRoleNameList(userId);
+	}
 }

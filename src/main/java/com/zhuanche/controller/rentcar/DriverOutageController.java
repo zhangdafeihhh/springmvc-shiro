@@ -18,6 +18,7 @@ import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.DriverUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,7 @@ public class DriverOutageController {
      * @return
      */
     @RequestMapping(value = "/queryDriverOutageData")
+	@RequiresPermissions(value = { "TemporaryCarry_look" } )
     @MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
 	} )

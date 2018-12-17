@@ -209,15 +209,9 @@
 			bus_biz_supplier_detail
 		where 
         	TIMESTAMPDIFF(MONTH, contract_date_end, now()) <![CDATA[<]]> 3
-            <if test="commissionIds != null and commissionIds.size() > 0">
-                AND supplier_id IN
-                <foreach collection="commissionIds" item="item" open="(" close=")" separator=",">
-                    #{item}
-                </foreach>
-            </if>
-            <if test="supplierIds != null and supplierIds.size() > 0">
+            <if test="permOfSupplier != null and permOfSupplier.size() > 0">
 				AND supplier_id IN
-				<foreach collection="supplierIds" open="(" close=")"
+				<foreach collection="permOfSupplier" open="(" close=")"
 					separator="," item="supplierId">
 					#{supplierId}
 				</foreach>

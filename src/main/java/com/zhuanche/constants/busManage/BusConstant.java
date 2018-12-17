@@ -8,8 +8,17 @@ package com.zhuanche.constants.busManage;
  **/
 public class BusConstant {
     public interface CarConstant{
+        String FILE_NAME="巴士信息";
         String EXPORT_HEAD="车牌号,城市,供应商,车型类别,具体车型,是否有效,创建时间";
         String[] TEMPLATE_HEAD={"车牌号","车型类别名称","车辆颜色","燃料类别","运输证字号","车辆厂牌","具体车型（选填）","下次车检时间（选填）","下次维保时间（选填）","下次运营证检测时间（选填）","购买时间（选填）"};
+    }
+    public interface DriverMaidConstant{
+        String MAID_FILE_NAME="分佣明细";
+        String MAID_EXPORT_HEAD="订单号,城市名称,手机号,结算时间,订单总金额,预付金额,代收金额,高速费,停车费,住宿费,餐饮费,抽佣比例（%）,司机实际收入";
+        String DRAW_FILE_NAME="提现记录";
+        String DRAW_EXPORT_HEAD="账户名称,手机号,城市名称,结算时间,到账金额,银行卡号,银行名称";
+        String ACCOUNT_FILE_NAME="账户余额";
+        String ACCOUNT_EXPORT_HEAD="账户名称,手机号,城市名称,可提现金额,冻结金额,累计提现";
     }
 
 

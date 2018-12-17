@@ -5,6 +5,7 @@ import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +21,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,14 +32,13 @@ import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.common.web.datavalidate.custom.InArray;
-import com.zhuanche.controller.busManage.extend.BusFileDownload;
 import com.zhuanche.dto.busManage.BusDriverQueryDTO;
 import com.zhuanche.dto.busManage.BusDriverSaveDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.serv.CarBizDriverInfoDetailService;
 import com.zhuanche.serv.CarBizDriverInfoService;
+import com.zhuanche.serv.busManage.BusBizChangeLogService;
 import com.zhuanche.serv.busManage.BusCarBizDriverInfoService;
 import com.zhuanche.serv.busManage.BusCarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -49,10 +48,12 @@ import com.zhuanche.vo.busManage.BusDriverDetailInfoVO;
 import com.zhuanche.vo.busManage.BusDriverInfoExportVO;
 import com.zhuanche.vo.busManage.BusDriverInfoPageVO;
 
+import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
+
 @RestController
 @RequestMapping("/bus/driverInfo")
 @Validated
-public class BusDriverInfoController implements BusFileDownload {
+public class BusDriverInfoController extends BusBaseController {
 
 	private static final Logger logger = LoggerFactory.getLogger(BusDriverInfoController.class);
 
@@ -64,6 +65,9 @@ public class BusDriverInfoController implements BusFileDownload {
 	private CarBizDriverInfoDetailService carBizDriverInfoDetailService;
 
 	// ===========================巴士业务拓展service==================================
+	@Autowired
+	private BusBizChangeLogService busBizChangeLogService;
+	
 	@Autowired
 	private BusCarBizDriverInfoService busCarBizDriverInfoService;
 
@@ -79,9 +83,7 @@ public class BusDriverInfoController implements BusFileDownload {
 	 */
 	@SuppressWarnings("resource")
 	@RequestMapping(value = "/findDriverList")
-	@MasterSlaveConfigs(configs = {
-			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE) })
-	public AjaxResponse findDriverList(BusDriverQueryDTO queryDTO) {
+	public AjaxResponse findDriverList(@Validated BusDriverQueryDTO queryDTO) {
 
 		// 数据权限控制SSOLoginUser
 		Set<Integer> permOfCity = WebSessionUtil.getCurrentLoginUser().getCityIds(); // 普通管理员可以管理的所有城市ID
@@ -112,10 +114,16 @@ public class BusDriverInfoController implements BusFileDownload {
 		return AjaxResponse.success(pageDTO);
 	}
 
+	/**
+	 * @Title: saveDriver
+	 * @Description: 保存司机信息
+	 * @param saveDTO
+	 * @return 
+	 * @return AjaxResponse
+	 * @throws
+	 */
 	@RequestMapping(value = "/saveDriver")
-	@MasterSlaveConfigs(configs = {
-			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE) })
-	public AjaxResponse saveDriver(BusDriverSaveDTO saveDTO) {
+	public AjaxResponse saveDriver(@Validated BusDriverSaveDTO saveDTO) {
 		
 		/** 补充默认信息(用户不想填但业务需要的字段)*/
 		AjaxResponse checkResult = busCarBizDriverInfoService.completeInfo(saveDTO);
@@ -164,14 +172,12 @@ public class BusDriverInfoController implements BusFileDownload {
 			}
 		}
 
-		// TODO 创建操作记录
-		
 		if (driverId != null) {
 			logger.info("[ BusDriverInfoController-saveDriver ] 操作方式：编辑");
 			// 司机获取派单的接口，是否可以修改
 			Map<String, Object> updateDriverMap = carBizDriverInfoService.isUpdateDriver(driverId, phone);
 			if (updateDriverMap != null && "2".equals(updateDriverMap.get("result").toString())) {
-				return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR, updateDriverMap.get("msg").toString());
+				return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, updateDriverMap.get("msg").toString());
 			}
 			try {
 				// 调用接口清除，key
@@ -187,39 +193,39 @@ public class BusDriverInfoController implements BusFileDownload {
 	}
 
 	/**
-	 * 重置IMEI
-	 * 
+	 * @Title: resetIMEI
+	 * @Description: 重置IMEI
 	 * @param driverId
-	 * @return
+	 * @return 
+	 * @return AjaxResponse
+	 * @throws
 	 */
 	@RequestMapping(value = "/resetIMEI")
-	@MasterSlaveConfigs(configs = {
-			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE) })
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public AjaxResponse resetIMEI(@NotNull(message = "司机ID不能为空") Integer driverId) {
-
 		logger.info("[ BusDriverInfoController-resetIMEI ] 司机driverId={} 重置imei", driverId);
+		
 		CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(driverId);
 		if (carBizDriverInfo == null) {
 			return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
 		}
-		carBizDriverInfoService.resetIMEI(driverId);
+		busCarBizDriverInfoService.resetIMEI(driverId);
 		return AjaxResponse.success(null);
 	}
 	
-	/**
-     * 修改司机状态信息 ,司机设置为无效后释放其绑定的车辆
+    /**
+     * @Title: updateDriverStatus
+     * @Description: 修改司机状态信息 ,司机设置为无效后释放其绑定的车辆
      * @param driverId
-     * @return
+     * @return 
+     * @return AjaxResponse
+     * @throws
      */
-    @ResponseBody
     @RequestMapping(value = "/updateDriverStatus")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
-    } )
-	public AjaxResponse updateDriverStatus(@NotNull(message = "司机ID不能为空") Integer driverId,
-			@NotNull(message = "司机状态不能为空") @InArray(values = { "0", "1" }, message = "司机状态不在有效范围内") Integer status) {
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
+	public AjaxResponse updateDriverStatus(@NotNull(message = "司机ID不能为空") Integer driverId) {
+    	logger.info("[ BusDriverInfoController-updateDriverStatus ] 司机driverId={} 状态置为无效", driverId);
 
-        logger.info("[ BusDriverInfoController-updateDriverStatus ] 司机driverId={} 状态置为status={}", driverId, status);
         CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(driverId);
         if(carBizDriverInfo==null){
             return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
@@ -235,7 +241,7 @@ public class BusDriverInfoController implements BusFileDownload {
             // 调用接口清除，key
             carBizDriverInfoService.flashDriverInfo(driverId);
         } catch (Exception e) {
-            logger.error("[ BusDriverInfoController-updateDriverStatus ] 司机driverId={} 状态置为status={},调用清除接口异常={}", driverId, status, e.getMessage(), e);
+            logger.error("[ BusDriverInfoController-updateDriverStatus ] 司机driverId={} 状态置为无效,调用清除接口异常={}", driverId, e.getMessage(), e);
         }
         // 获取当前用户Id
         carBizDriverInfo.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
@@ -248,31 +254,33 @@ public class BusDriverInfoController implements BusFileDownload {
         try {
             rtn = busCarBizDriverInfoService.updateDriverByXiao(driverSaveDTO);
         } catch (Exception e) {
-           logger.error("[ BusDriverInfoController-updateDriverStatus ] 司机driverId={},状态置为status={},释放车辆资源error={}", driverId, status, e.getMessage(), e);
+           logger.error("[ BusDriverInfoController-updateDriverStatus ] 司机driverId={},状态置为无效,释放车辆资源error={}", driverId, e.getMessage(), e);
         }
         if (rtn == 0) {
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
+        // 创建操作记录
+        busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId), new Date());
         try {
             // 查询城市名称，供应商名称，服务类型，加盟类型
         	busCarBizDriverInfoService.getBaseStatis(driverSaveDTO);
         	busCarBizDriverInfoService.sendDriverToMq(driverSaveDTO, "DELETE");
         } catch (Exception e) {
-            logger.error("[ BusDriverInfoController-updateDriverStatus ] 司机driverId={},状态置为status={},发MQ出现error={}", driverId, status, e.getMessage(), e);
+            logger.error("[ BusDriverInfoController-updateDriverStatus ] 司机driverId={},状态置为,发MQ出现error={}", driverId, e.getMessage(), e);
         }
         return AjaxResponse.success(null);
     }
     
 	/**
-	 * 司机信息
-	 * 
+	 * @Title: findDriverInfoByDriverId
+	 * @Description: 查询司机信息
 	 * @param driverId
-	 * @return
+	 * @return 
+	 * @return AjaxResponse
+	 * @throws
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/findDriverInfoByDriverId")
-	@MasterSlaveConfigs(configs = {
-			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE) })
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public AjaxResponse findDriverInfoByDriverId(@NotNull(message = "司机ID不能为空") Integer driverId) {
 
 		CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(driverId);
@@ -289,14 +297,19 @@ public class BusDriverInfoController implements BusFileDownload {
 	}
 	
 	
+	/**
+	 * @Title: exportDriverList
+	 * @Description: 导出司机列表信息
+	 * @param exportDTO
+	 * @param request
+	 * @param response 
+	 * @return void
+	 * @throws
+	 */
 	@SuppressWarnings("resource")
-	@ResponseBody
 	@RequestMapping(value = "/exportDriverList")
-	@MasterSlaveConfigs(configs = {
-			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE) })
 	public void exportDriverList(@Validated(BusDriverQueryDTO.Export.class) BusDriverQueryDTO exportDTO, HttpServletRequest request,
 			HttpServletResponse response) {
-
 		long start = System.currentTimeMillis(); // 获取开始时间
 		try {
 			// 数据权限控制SSOLoginUser
@@ -403,30 +416,26 @@ public class BusDriverInfoController implements BusFileDownload {
 	 */
 	@RequestMapping(value = "/downloadDriverInfoImportTemplate")
 	public void fileDownloadDriverInfo(HttpServletRequest request, HttpServletResponse response) {
-		String path = request.getSession().getServletContext().getRealPath("/upload") + File.separator
-				+ "IMPORT_BUS_DRIVER_INFO.xlsx";
+		String path = request.getSession().getServletContext().getRealPath("/upload") + File.separator + "IMPORT_BUS_DRIVER_INFO.xlsx";
 		fileDownload(request, response, path);
 	}
 	
-	/**
-     * 导入司机信息
+    /**
+     * @Title: batchInputDriverInfo
+     * @Description: 导入司机信息
      * @param cityId
      * @param supplierId
-     * @param teamId
-     * @param teamGroupId
-     * @param fileName
+     * @param file
      * @param request
-     * @return
+     * @param response
+     * @return 
+     * @return AjaxResponse
+     * @throws
      */
-    @ResponseBody
     @RequestMapping(value = "/importDriverInfo")
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
-    } )
 	public AjaxResponse batchInputDriverInfo(@NotNull(message = "请选择城市") Integer cityId,
 			@NotNull(message = "请选择供应商") Integer supplierId, MultipartFile file, HttpServletRequest request,
 			HttpServletResponse response) {
-
         if (file.isEmpty()) {
             logger.info("file is empty!");
             return AjaxResponse.fail(RestErrorCode.FILE_ERROR);

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.CarMessagePostDtoExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.dto.mdbcarmanage.CarMessagePostDto" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="mesage_title" property="mesageTitle" jdbcType="VARCHAR" />
+    <result column="message_content" property="messageContent" jdbcType="VARCHAR" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="doc_name" property="docName" jdbcType="VARCHAR" />
+    <result column="doc_url" property="docUrl" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="INTEGER"></result>
+    <result column="create_id" property="createId" jdbcType="INTEGER"></result>
+
+  </resultMap>
+  <sql id="Base_Column_List" >
+    p.id, p.mesage_title, p.message_content, u.user_name,d.doc_name,d.doc_url,
+      p.create_time, p.update_time,p.user_id
+  </sql>
+  <select id="listCarMessagePostBymesageIds" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+    p.id, p.mesage_title, p.message_content, u.user_name,GROUP_CONCAT(d.doc_name) as  doc_name,r.status,
+    p.create_time, p.update_time,p.user_id as create_id
+    FROM car_message_post p LEFT  JOIN car_message_receiver r on p.id = r.message_id LEFT JOIN car_message_doc d on p.id = d.message_id
+    INNER JOIN car_adm_user u on  p.user_id = u.user_id
+    WHERE  1=1
+    <if test="userId!=null and userId!=''">
+      AND r.receive_user_id = #{userId}
+    </if>
+    <if test="status!=null and status!=''">
+      AND r.status = #{status}
+    </if> group BY p.id
+    ORDER BY p.create_time DESC
+  </select>
+
+
+  <select id="listDraftOrPublish" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+    p.id, p.mesage_title, p.message_content, u.user_name,GROUP_CONCAT(d.doc_name) as  doc_name,
+    p.create_time, p.update_time,CASE p.`status`  WHEN 1 THEN 4   WHEN 2 THEN	3 END as status,
+    p.user_id as create_id
+    FROM car_message_post p
+    LEFT JOIN car_message_doc d on p.id = d.message_id
+    INNER JOIN car_adm_user u on  p.user_id = u.user_id
+    WHERE  1=1
+
+    <if test="status!=null and status!=''">
+      AND p.status = #{status}
+    </if>
+    <if test="userId!=null and userId!=''">
+      AND p.user_id = #{userId}
+    </if>  group BY p.id
+    ORDER BY p.create_time DESC
+  </select>
+</mapper>

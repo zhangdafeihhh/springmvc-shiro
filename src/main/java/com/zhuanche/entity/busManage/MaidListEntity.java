@@ -1,6 +1,9 @@
 package com.zhuanche.entity.busManage;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.google.protobuf.StringValue;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 
@@ -11,7 +14,7 @@ import java.math.BigDecimal;
  * @create: 2018-09-17 10:45
  **/
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MaidListEntity{
+public class MaidListEntity {
     /**
      * 账户ID
      */
@@ -47,7 +50,7 @@ public class MaidListEntity{
     /**
      * 分佣比例，例：百分之二十，如20
      */
-    private BigDecimal settleRatio;
+    private Double settleRatio;
     /**
      * 分佣结果
      */
@@ -116,11 +119,11 @@ public class MaidListEntity{
         this.settleDate = settleDate;
     }
 
-    public BigDecimal getSettleRatio() {
+    public Double getSettleRatio() {
         return settleRatio;
     }
 
-    public void setSettleRatio(BigDecimal settleRatio) {
+    public void setSettleRatio(Double settleRatio) {
         this.settleRatio = settleRatio;
     }
 
@@ -179,4 +182,6 @@ public class MaidListEntity{
     public void setOrderId(Integer orderId) {
         this.orderId = orderId;
     }
+
+
 }

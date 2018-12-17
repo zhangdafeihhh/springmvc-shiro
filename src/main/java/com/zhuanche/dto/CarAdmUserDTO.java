@@ -36,6 +36,10 @@ public class CarAdmUserDTO{
     //-----扩展: 角色ID    （多个以逗号分隔）
     private String roleIds       = "";
 
+    private String groupIds;
+
+    private Integer level;
+
     public String getRoleIds() {
 		return roleIds;
 	}
@@ -130,5 +134,21 @@ public class CarAdmUserDTO{
 
     public void setPhone(String phone) {
         this.phone = phone == null ? null : phone.trim();
+    }
+
+    public String getGroupIds() {
+        return groupIds;
+    }
+
+    public void setGroupIds(String groupIds) {
+        this.groupIds = groupIds == null ? null : groupIds.trim();
+    }
+
+    public Integer getLevel() {
+        return level;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
     }
 }

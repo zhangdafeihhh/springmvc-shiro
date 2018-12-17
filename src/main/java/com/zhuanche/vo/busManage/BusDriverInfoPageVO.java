@@ -11,13 +11,6 @@ import com.alibaba.fastjson.annotation.JSONField;
  * @date: 2018年11月22日 下午5:37:44
  * 
  */
-/**
- * @ClassName: BusDriverInfoPageVO
- * @Description: 
- * @author: yanyunpeng
- * @date: 2018年12月7日 下午5:35:21
- * 
- */
 public class BusDriverInfoPageVO {
 
 	/** 司机ID **/

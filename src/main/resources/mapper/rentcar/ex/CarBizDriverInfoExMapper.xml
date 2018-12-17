@@ -482,7 +482,7 @@
       <![CDATA[ AND driver_id <>#{driverId}  ]]>
     </if>
   </select>
-  <insert id="insertCarBizDriverInfoDTO" parameterType="com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO" >
+  <insert id="insertCarBizDriverInfoDTO" parameterType="com.zhuanche.dto.rentcar.CarBizDriverInfoDTO" >
     <selectKey resultType="java.lang.Integer" keyProperty="driverId" order="AFTER" >
       SELECT LAST_INSERT_ID()
     </selectKey>
@@ -1098,7 +1098,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateCarBizDriverInfoDTO" parameterType="com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO" >
+  <update id="updateCarBizDriverInfoDTO" parameterType="com.zhuanche.dto.rentcar.CarBizDriverInfoDTO" >
     update car_biz_driver_info
     <set >
       <if test="password != null" >
@@ -1548,7 +1548,7 @@
         and  i.supplier_id = #{supplierId,jdbcType=INTEGER}
       </if>
       <if test="name!=null and name!=''">
-        and i.name  = #{driverName}
+        and i.name  = #{name}
       </if>
     </where>
     order by driver_id desc
@@ -1732,4 +1732,61 @@
 		WHERE supplier_id = #{supplierId}
 	</update>
   
+
+  <select id="selectByDriverId" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from car_biz_driver_info
+    where driver_id = ${driverId,jdbcType=INTEGER}
+  </select>
+
+  <!-- 查询巴士订单指派/改派可用司机 -->
+	<select id="queryBusDriverList" parameterType="com.zhuanche.dto.busManage.BusDriverRicherDTO" resultType="java.util.HashMap">
+		SELECT 
+			i.driver_id AS driverId ,
+			i.name as name,
+			i.phone as phone,
+			p.supplier_full_name AS supplierName,
+			g.group_name as groupName
+		FROM 
+			car_biz_driver_info i 
+			LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+			LEFT JOIN car_biz_car_group g ON i.group_id = g.group_id
+		where 
+			g.type=2 AND i.status=1 AND i.driver_id != 0
+		<if test="driverId != null">
+			and i.driver_id = #{driverId}
+		</if>
+		<if test="invalidDriverIds != null and !invalidDriverIds.isEmpty()">
+			and i.driver_id not in
+			<foreach item="item" index="index" collection="invalidDriverIds" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="name != null and name != ''">
+			and i.name LIKE CONCAT('%',#{name},'%')
+		</if>
+		<if test="phone != null and phone != ''">
+			and i.phone LIKE CONCAT('%',#{phone},'%')
+		</if>
+		<if test="seatNum != null">
+			and g.seat_num >= #{seatNum}
+		</if>
+		<if test="cityId != null">
+			and i.service_city = #{cityId}
+		</if>
+		<if test="supplierId != null">
+			and i.supplier_Id = #{supplierId}
+		</if>
+		<if test="supplierIds != null and !supplierIds.isEmpty()">
+			and i.supplier_Id in 
+			<foreach item="item" index="index" collection="supplierIds" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		order by i.update_date desc
+	</select>
+	
 </mapper>

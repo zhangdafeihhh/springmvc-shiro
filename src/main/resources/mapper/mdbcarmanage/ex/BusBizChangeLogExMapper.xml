@@ -17,6 +17,8 @@
 		update_date,
 		build_time
 	</sql>
+	
+	<!-- 查询操作记录 -->
 	<select id="queryRecnetlyChangeLogs" resultType="java.util.HashMap" parameterType="java.util.Map">
 		select
 			update_name AS updateName,
@@ -29,4 +31,14 @@
 			id DESC
 		LIMIT 15
 	</select>
+
+	<!-- 保存操作记录 -->
+	<insert id="insertLog" parameterType="com.zhuanche.entity.mdbcarmanage.BusBizChangeLog">
+		insert into bus_biz_change_log (business_type, business_key,
+			update_by, update_name, update_date
+		)
+		values (#{businessType}, #{businessKey},
+			#{updateBy}, #{updateName}, #{updateDate}
+		)
+	</insert>
 </mapper>

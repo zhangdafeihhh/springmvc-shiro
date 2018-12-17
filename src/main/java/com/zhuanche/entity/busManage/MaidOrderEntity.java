@@ -31,7 +31,7 @@ public class MaidOrderEntity {
     /**
      * 结算比例
      */
-    private BigDecimal settleRatio;
+    private Double settleRatio;
     /**
      * 餐补费
      */
@@ -89,11 +89,11 @@ public class MaidOrderEntity {
         this.parkFee = parkFee;
     }
 
-    public BigDecimal getSettleRatio() {
+    public Double getSettleRatio() {
         return settleRatio;
     }
 
-    public void setSettleRatio(BigDecimal settleRatio) {
+    public void setSettleRatio(Double settleRatio) {
         this.settleRatio = settleRatio;
     }
 

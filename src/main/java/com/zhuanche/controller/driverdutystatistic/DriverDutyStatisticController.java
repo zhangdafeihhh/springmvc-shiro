@@ -33,6 +33,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,8 +86,9 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	 * @param reportType 查询类型，0：日统计，1：月统计
 	 * @return
 	 */
-	@RequestMapping(value = "/driverDutyStatisticDailData")
 	@ResponseBody
+	@RequestMapping(value = "/driverDutyStatisticDailData")
+	@RequiresPermissions(value = { "DriverPreparation_look" } )
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})
@@ -307,6 +309,7 @@ public class DriverDutyStatisticController extends DriverQueryController{
 
 
 	@RequestMapping(value = "/exportDriverDutyStatistic")
+	@RequiresPermissions(value = { "DriverPreparation_export" } )
 	@ResponseBody
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)

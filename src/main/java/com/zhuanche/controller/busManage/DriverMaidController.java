@@ -3,16 +3,29 @@ package com.zhuanche.controller.busManage;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.common.rpc.HttpParamSignGenerator;
+import com.zhuanche.common.rpc.RPCAPI;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.constants.busManage.BusConstant.DriverMaidConstant;
 import com.zhuanche.dto.busManage.BusDriverMaidDTO;
-import com.zhuanche.dto.busManage.withdrawalsRecordDTO;
+import com.zhuanche.dto.busManage.WithdrawalsRecordDTO;
+import com.zhuanche.entity.busManage.MaidListEntity;
+import com.zhuanche.entity.busManage.MaidOrderEntity;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.mongo.DriverMongo;
 import com.zhuanche.serv.CarBizCityService;
 import com.zhuanche.serv.mongo.DriverMongoService;
+import com.zhuanche.util.dateUtil.DateUtil;
+import com.zhuanche.util.excel.CsvUtils;
+import com.zhuanche.vo.busManage.AccountBalanceVO;
+import com.zhuanche.vo.busManage.MaidVO;
+import com.zhuanche.vo.busManage.WithDrawDetailRecordVO;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
@@ -23,6 +36,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,8 +56,7 @@ public class DriverMaidController {
 
     private static final Logger logger = LoggerFactory.getLogger(DriverMaidController.class);
 
-    @Autowired
-    private CarBizCityService cityService;
+
     /**
      * 本类的日志前缀
      */
@@ -55,11 +72,13 @@ public class DriverMaidController {
     /**
      * 导出订单时每页查询的条数
      */
-    private static int EXPORT_PAGE_SIZE = 500;
+    private static int EXPORT_PAGE_SIZE = 1000;
     /**
-     * 代表巴士司机业务类型
+     * 代表巴士司机业务类型(巴士司机分佣)
      */
     private static int ACCOUNT_TYPE = 3;
+
+
     /**
      * 分佣明细url
      */
@@ -75,16 +94,39 @@ public class DriverMaidController {
      */
     @Value("${bus.driver.account.balance.url}")
     private String ACCOUNT_BALANCE_URL;
+    /**
+     * 查询订单ID by orderNo
+     */
+    @Value("${bus.query.orderId.url}")
+    private String QUERY_ORDER_ID_URL;
+
+    /**
+     * 订单标识巴士业务businessId
+     */
+    @Value("${bus.order.businessId}")
+    private int ORDER_BUSINESS_ID;
+    /**
+     * 订单定义的关于巴士的KEY
+     */
+    @Value("${bus.order.key}")
+    private String ORDER_KEY;
+
+    @Autowired
+    private CarBizCityService cityService;
     @Autowired
     private DriverMongoService driverMongoService;
 
+
     /**
-     * @Description: 查询司机分佣明细
+     * @Description: 查询司机分佣明细,
      * @Param: [dto]
      * @return: com.zhuanche.common.web.AjaxResponse
      * @Date: 2018/12/4
      */
     @RequestMapping("/queryMaidData")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     public AjaxResponse queryMaidData(BusDriverMaidDTO dto) {
         long start = System.currentTimeMillis();
         Map<String, Object> param = buidMaidParam(dto);
@@ -96,13 +138,51 @@ public class DriverMaidController {
         }
         logger.info(LOG_PRE + "明细接口查询参数=" + JSON.toJSONString(param) + "查询结果=" + data);
         JSONArray array = data.getJSONArray("listData");
-        //封装城市名称
-        JSONArray resultArray = addCityName2jsonArray(array);
-        PageDTO page = new PageDTO(data.getInteger("pageNo"), data.getInteger("pageSize"), data.getLong("total"), resultArray);
+        Set<Integer> cityIds = new HashSet<>();
+        List<String> orderNos = array.stream().map(o -> (JSONObject) o).map(o -> {
+            cityIds.add(o.getInteger("cityCode"));
+            return o;
+        }).map(o -> o.getString("orderNo")).collect(Collectors.toList());
+        Map<Integer, CarBizCity> cityMap = cityService.queryCity(cityIds);
+        Map<String, Integer> orderIdMap = queryOrderIds(JSON.toJSONString(orderNos));
+        List<MaidVO> collect = array.stream().map(o -> (JSONObject) o).map(this::transformType).map(o -> {
+            Integer cityCode = o.getCityCode();
+            CarBizCity carBizCity = cityMap.get(cityCode);
+            o.setCityName(carBizCity == null ? "" : carBizCity.getCityName());
+            o.setOrderId(orderIdMap.get(o.getOrderNo()));
+            return o;
+        }).collect(Collectors.toList());
+        PageDTO page = new PageDTO(data.getInteger("pageNo"), data.getInteger("pageSize"), data.getLong("total"), collect);
         logger.info(LOG_PRE + "明细接口查询参数=" + JSON.toJSONString(param) + " 耗时=" + (System.currentTimeMillis() - start));
         return AjaxResponse.success(page);
     }
 
+    private MaidVO transformType(JSONObject o) {
+        MaidVO maid = new MaidVO();
+        MaidListEntity entity = JSONObject.toJavaObject(o, MaidListEntity.class);
+        maid.setOrderNo(entity.getOrderNo());
+        maid.setSettleDate(entity.getSettleDate());
+        maid.setPhone(entity.getPhone());
+        maid.setCityCode(entity.getCityCode());
+        maid.setSettleAmount(entity.getSettleAmount());
+        if (StringUtils.isNotBlank(entity.getOrderDetail())) {
+            MaidOrderEntity orderEntity = JSONObject.parseObject(entity.getOrderDetail(), MaidOrderEntity.class);
+            BigDecimal orderAmount = orderEntity.getOrderAmount();
+            BigDecimal prePayAmount = orderEntity.getPrePayAmount();
+            maid.setOrderId(orderEntity.getOrderId());
+            maid.setOrderAmount(orderAmount);
+            maid.setPrePayAmount(prePayAmount);
+            if (orderAmount != null && prePayAmount != null) {
+                maid.setProxyAmount(orderAmount.subtract(prePayAmount));
+            }
+            maid.setHighWayFee(orderEntity.getHighWayFee());
+            maid.setParkFee(orderEntity.getParkFee());
+            maid.setHotelFee(orderEntity.getHotelFee());
+            maid.setFoodFee(orderEntity.getFoodFee());
+            maid.setSettleRatio(orderEntity.getSettleRatio());
+        }
+        return maid;
+    }
 
     /**
      * @Description: 查询提现记录
@@ -111,24 +191,19 @@ public class DriverMaidController {
      * @Date: 2018/12/5
      */
     @RequestMapping("/withdrawalsRecord")
-    public AjaxResponse withdrawalsRecord(withdrawalsRecordDTO dto) {
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
+    public AjaxResponse withdrawalsRecord(WithdrawalsRecordDTO dto) {
         long start = System.currentTimeMillis();
         Map<String, Object> param = new HashedMap();
-        if (StringUtils.isNotBlank(dto.getPhone())) {
-            param.put("phone", dto.getPhone());
-        }
-        if (StringUtils.isNotBlank(dto.getStartDate())) {
-            param.put("startDate", dto.getStartDate());
-        }
+        buidDrawalsParam(param, dto);
         if (StringUtils.isNotBlank(dto.getName())) {
             String driverids = getDriverIdsByName(dto.getName());
             if (StringUtils.isEmpty(driverids)) {
                 return AjaxResponse.success(new PageDTO(dto.getPageNum(), dto.getPageSize(), 0, new ArrayList()));
             }
             param.put("accountIds", driverids);
-        }
-        if (StringUtils.isNotBlank(dto.getEndDate())) {
-            param.put("endDate", dto.getEndDate());
         }
         buidNecessaryParam(param, dto.getPageNum(), dto.getPageSize());
         logger.info(LOG_PRE + "提现记录查询参数=" + JSON.toJSONString(param));
@@ -144,7 +219,10 @@ public class DriverMaidController {
     }
 
     @RequestMapping("/queryAccountBalance")
-    public AjaxResponse queryAccountBalance(withdrawalsRecordDTO dto) {
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
+    public AjaxResponse queryAccountBalance(WithdrawalsRecordDTO dto) {
         long start = System.currentTimeMillis();
         Map<String, Object> param = new HashedMap();
         if (StringUtils.isNotBlank(dto.getPhone())) {
@@ -175,7 +253,7 @@ public class DriverMaidController {
         return AjaxResponse.success(page);
     }
 
-    private Map<String,Object> buidMaidParam(BusDriverMaidDTO dto){
+    private Map<String, Object> buidMaidParam(BusDriverMaidDTO dto) {
         Map<String, Object> param = new HashMap<>(16);
         if (dto.getCityId() != null) {
             param.put("cityCode", dto.getCityId());
@@ -195,17 +273,252 @@ public class DriverMaidController {
         return param;
     }
 
+    private void buidDrawalsParam(Map<String, Object> param, WithdrawalsRecordDTO dto) {
+        if (StringUtils.isNotBlank(dto.getPhone())) {
+            param.put("phone", dto.getPhone());
+        }
+        if (StringUtils.isNotBlank(dto.getStartDate())) {
+            param.put("startDate", dto.getStartDate());
+        }
+        if (StringUtils.isNotBlank(dto.getEndDate())) {
+            param.put("endDate", dto.getEndDate());
+        }
+    }
+
     //=============================================导出=========================================
 
-    public void exportMaidData(BusDriverMaidDTO dto){
-        Map<String, Object> param = buidMaidParam(dto);
-        dto.setPageSize(EXPORT_PAGE_SIZE);
-        buidNecessaryParam(param,dto.getPageNum(),dto.getPageSize());
-        JSONObject dataFirst = parseResult(MAID_LIST_URL, param);
+    /**
+     * 导出分佣明细
+     *
+     * @Param: [request, dto, response]
+     * @return: void
+     * @Date: 2018/12/10
+     */
+    @RequestMapping("/exportMaidData")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
+    public void exportMaidData(HttpServletRequest request, BusDriverMaidDTO dto, HttpServletResponse response) throws Exception {
+        long start = System.currentTimeMillis();
+        logger.info(LOG_PRE + "导出分佣明细参数=" + JSON.toJSONString(dto));
+        //构建文件名称
+        String fileName = buidFileName(request, DriverMaidConstant.MAID_FILE_NAME);
+        //构建文件标题
+        List<String> headerList = new ArrayList<>();
+        headerList.add(DriverMaidConstant.MAID_EXPORT_HEAD);
+        CsvUtils utilEntity = new CsvUtils();
+        Integer pageNum = 0;
+        boolean isFirst = true;
+        boolean isList = false;
+        do {
+            pageNum++;
+            dto.setPageNum(pageNum);
+            Map<String, Object> param = buidMaidParam(dto);
+            dto.setPageSize(EXPORT_PAGE_SIZE);
+            buidNecessaryParam(param, dto.getPageNum(), dto.getPageSize());
+            JSONObject data = parseResult(MAID_LIST_URL, param);
+            if (data == null || data.getLong("total") == null || data.getLong("total") == 0) {
+                List<String> csvDataList = new ArrayList<>();
+                csvDataList.add("没有符合条件的数据");
+                isList = true;
+                utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, isFirst, isList);
+                break;
+            }
+            Integer pages = data.getInteger("pages");
+            JSONArray array = data.getJSONArray("listData");
+            if (pageNum != 1) {
+                isFirst = false;
+            }
+            if (pageNum.equals(pages)) {
+                isList = true;
+            }
+            Map<Integer, CarBizCity> cityMap = queryCity(array);
+            List<String> collect = array.stream().map(o -> (JSONObject) o).map(this::transformType)
+                    .map(o -> {
+                        Integer cityCode = o.getCityCode();
+                        CarBizCity carBizCity = cityMap.get(cityCode);
+                        o.setCityName(carBizCity == null ? "" : carBizCity.getCityName());
+                        return o;
+                    }).map(o -> o.toString()).collect(Collectors.toList());
+            utilEntity.exportCsvV2(response, collect, headerList, fileName, isFirst, isList);
+            // isList=true时表示时之后一页停止循环
+        } while (!isList);
+        logger.info(LOG_PRE + "导出分佣明细参数=" + JSON.toJSONString(dto) + " 消耗时间=" + (System.currentTimeMillis() - start));
+    }
 
 
+    /**
+     * 导出导出提现记录
+     *
+     * @Param: [request, dto, response]
+     * @return: void
+     * @Date: 2018/12/10
+     */
+    @RequestMapping("/exportWithdrawalsData")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
+    public void exportWithdrawalsData(HttpServletRequest request, WithdrawalsRecordDTO dto, HttpServletResponse response) throws Exception {
+        long start = System.currentTimeMillis();
+        logger.info(LOG_PRE + "导出提现记录参数=" + JSON.toJSONString(dto));
+        Map<String, Object> param = new HashedMap();
+        CsvUtils utilEntity = new CsvUtils();
+        //构建文件名称
+        String fileName = buidFileName(request, DriverMaidConstant.DRAW_FILE_NAME);
+        //构建文件标题
+        List<String> headerList = new ArrayList<>();
+        headerList.add(DriverMaidConstant.DRAW_EXPORT_HEAD);
+        if (StringUtils.isNotBlank(dto.getName())) {
+            String driverids = getDriverIdsByName(dto.getName());
+            if (StringUtils.isEmpty(driverids)) {
+                List<String> csvDataList = new ArrayList<>();
+                csvDataList.add("没有符合条件的数据");
+                utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, true, true);
+                return;
+            }
+            param.put("accountIds", driverids);
+        }
+        buidDrawalsParam(param, dto);
+        Integer pageNum = 0;
+        boolean isFirst = true;
+        boolean isList = false;
+        do {
+            pageNum++;
+            dto.setPageNum(pageNum);
+            buidNecessaryParam(param, pageNum, EXPORT_PAGE_SIZE);
+            JSONObject data = parseResult(WITHDRAWALS_LIST_ULR, param);
+            if (data == null || data.getLong("total") == null || data.getLong("total") == 0) {
+                List<String> csvDataList = new ArrayList<>();
+                csvDataList.add("没有符合条件的数据");
+                isList = true;
+                utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, isFirst, isList);
+                break;
+            }
+            Integer pages = data.getInteger("pages");
+            JSONArray array = data.getJSONArray("listData");
+            if (pageNum != 1) {
+                isFirst = false;
+            }
+            if (pageNum.equals(pages)) {
+                isList = true;
+            }
+            Map<Integer, CarBizCity> cityMap = queryCity(array);
+            List<String> csvData = array.stream().map(o -> (JSONObject) o).map(o -> JSONObject.toJavaObject(o, WithDrawDetailRecordVO.class))
+                    .map(o -> {
+                        Integer cityCode = o.getCityCode();
+                        CarBizCity carBizCity = cityMap.get(cityCode);
+                        o.setCityName(carBizCity == null ? "" : carBizCity.getCityName());
+                        return o;
+                    }).map(o -> o.toString()).collect(Collectors.toList());
+            utilEntity.exportCsvV2(response, csvData, headerList, fileName, isFirst, isList);
+            // isList=true时表示时之后一页停止循环
+        } while (!isList);
+        logger.info(LOG_PRE + "导出提现记录参数=" + JSON.toJSONString(dto) + " 消耗时间=" + (System.currentTimeMillis() - start));
+    }
+
+    /**
+     * 导出账户余额
+     *
+     * @Param: [request, dto, response]
+     * @return: void
+     * @Date: 2018/12/10
+     */
+    @RequestMapping("/exportAccBalnce")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
+    public void exportAccBalnce(HttpServletRequest request, WithdrawalsRecordDTO dto, HttpServletResponse response) throws Exception {
+        long start = System.currentTimeMillis();
+        logger.info(LOG_PRE + "导出账户余额=" + JSON.toJSONString(dto));
+        Map<String, Object> param = new HashedMap();
+        CsvUtils utilEntity = new CsvUtils();
+        //构建文件名称
+        String fileName = buidFileName(request, DriverMaidConstant.ACCOUNT_FILE_NAME);
+        //构建文件标题
+        List<String> headerList = new ArrayList<>();
+        headerList.add(DriverMaidConstant.ACCOUNT_EXPORT_HEAD);
+        if (StringUtils.isNotBlank(dto.getName())) {
+            String driverids = getDriverIdsByName(dto.getName());
+            if (StringUtils.isEmpty(driverids)) {
+                List<String> csvDataList = new ArrayList<>();
+                csvDataList.add("没有符合条件的数据");
+                utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, true, true);
+                return;
+            }
+            param.put("accountIds", driverids);
+        }
+        if (StringUtils.isNotBlank(dto.getPhone())) {
+            param.put("phone", dto.getPhone());
+        }
+        if (dto.getCityId() != null) {
+            param.put("cityCode", dto.getCityId());
+        }
+        Integer pageNum = 0;
+        boolean isFirst = true;
+        boolean isList = false;
+        do {
+            pageNum++;
+            dto.setPageNum(pageNum);
+            buidNecessaryParam(param, pageNum, EXPORT_PAGE_SIZE);
+            JSONObject data = parseResult(ACCOUNT_BALANCE_URL, param);
+            if (data == null || data.getLong("total") == null || data.getLong("total") == 0) {
+                List<String> csvDataList = new ArrayList<>();
+                csvDataList.add("没有符合条件的数据");
+                isList = true;
+                utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, isFirst, isList);
+                break;
+            }
+            Integer pages = data.getInteger("pages");
+            JSONArray array = data.getJSONArray("listData");
+            if (pageNum != 1) {
+                isFirst = false;
+            }
+            if (pageNum.equals(pages)) {
+                isList = true;
+            }
+            Map<Integer, CarBizCity> cityMap = queryCity(array);
+            List<String> csvData = array.stream().map(o -> (JSONObject) o).map(o -> JSONObject.toJavaObject(o, AccountBalanceVO.class))
+                    .map(o -> {
+                        Integer cityCode = o.getCityCode();
+                        CarBizCity carBizCity = cityMap.get(cityCode);
+                        o.setCityName(carBizCity == null ? "" : carBizCity.getCityName());
+                        return o;
+                    }).map(o -> o.toString()).collect(Collectors.toList());
+            utilEntity.exportCsvV2(response, csvData, headerList, fileName, isFirst, isList);
+            // isList=true时表示时之后一页停止循环
+        } while (!isList);
+        logger.info(LOG_PRE + "导出提现记录参数=" + JSON.toJSONString(dto) + " 消耗时间=" + (System.currentTimeMillis() - start));
+    }
 
 
+    public  String buidFileName (HttpServletRequest request,String name) throws UnsupportedEncodingException {
+        String fileName = name + com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), DateUtil.intTimestampPattern) + ".csv";
+        //获得浏览器信息并转换为大写
+        String agent = request.getHeader("User-Agent").toUpperCase();
+        //IE浏览器和Edge浏览器
+        if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO") > 0 && agent.indexOf("RV:11") > 0)) {
+            fileName = URLEncoder.encode(fileName, "UTF-8");
+        } else {  //其他浏览器
+            fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+        }
+        return fileName;
+    }
+
+    /**
+     * 根据分佣接口返回的cityCode查询城市
+     *
+     * @param array
+     * @return
+     */
+    private Map<Integer, CarBizCity> queryCity(JSONArray array) {
+        if (array == null || array.size() == 0) {
+            return new HashMap<Integer, CarBizCity>(0);
+        }
+        //取出所有的城市id
+        Set<Integer> cityIds = array.stream().map(o -> (JSONObject) o).map(o -> o.getInteger("cityCode")).collect(Collectors.toSet());
+        //查询城市
+        Map<Integer, CarBizCity> cityMap = cityService.queryCity(cityIds);
+        return cityMap;
     }
 
     /**
@@ -216,13 +529,7 @@ public class DriverMaidController {
      * @Date: 2018/12/7
      */
     private JSONArray addCityName2jsonArray(JSONArray array) {
-        if (array == null || array.size() == 0) {
-            return new JSONArray();
-        }
-        //取出所有的城市id
-        Set<Integer> cityIds = array.stream().map(o -> (JSONObject) o).map(o -> o.getInteger("cityCode")).collect(Collectors.toSet());
-        //查询城市名称
-        Map<Integer, CarBizCity> cityMap = cityService.queryCity(cityIds);
+        Map<Integer, CarBizCity> cityMap = queryCity(array);
         //将城市名称放到array中
         array.stream().map(o -> (JSONObject) o).forEach(o -> {
             Integer cityCode = o.getInteger("cityCode");
@@ -287,4 +594,37 @@ public class DriverMaidController {
         }
     }
 
+    /**
+     * 根据订单号，查询订单ID
+     *
+     * @Param: [orderNos]
+     * @return: java.util.Map<java.lang.String,java.lang.Integer>
+     * @Date: 2018/12/10
+     */
+    private Map<String, Integer> queryOrderIds(String orderNos) {
+        Map<String, Object> httpParams = new HashMap<String, Object>(4);
+        httpParams.put("orderNo", orderNos);
+        httpParams.put("businessId", ORDER_BUSINESS_ID);
+        String sign = HttpParamSignGenerator.genSignForOrderAPI(httpParams, ORDER_KEY);
+        httpParams.put("sign", sign);
+        try {
+            String body = new RPCAPI().requestWithRetry(RPCAPI.HttpMethod.GET, QUERY_ORDER_ID_URL, httpParams, null, "UTF-8");
+            JSONObject result = JSON.parseObject(body);
+            int code = result.getIntValue("code");
+            if (code != 0) {
+                logger.error(LOG_PRE + "查询订单id 返回错误 msg=" + result.getString("msg"));
+                //订单接口有异常返回空的map,不能影响其他的功能
+                return new HashMap<>(0);
+            }
+            JSONArray data = result.getJSONArray("data");
+            Map<String, Integer> noAndId = new HashedMap();
+            data.stream().map(o -> (JSONObject) o).forEach(o -> {
+                noAndId.put(o.getString("orderNo"), o.getIntValue("orderId"));
+            });
+            return noAndId;
+        } catch (Exception e) {
+            logger.error(LOG_PRE + "查询订单id 异常 e=" + JSON.toJSONString(e));
+            return new HashMap(0);
+        }
+    }
 }

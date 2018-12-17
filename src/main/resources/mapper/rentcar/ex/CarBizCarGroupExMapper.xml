@@ -131,4 +131,14 @@
     <select id="countByGroupId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
         select count(1) from car_biz_car_group where type=2 and group_id =#{groupId}
     </select>
+  
+  	<!-- 根据groupId查询车型类别座位数 -->
+	<select id="getSeatNumByGroupId" resultType="int">
+		SELECT
+			seat_num
+		FROM
+			car_biz_car_group
+		WHERE
+			group_id = #{groupId}
+	</select>
 </mapper>

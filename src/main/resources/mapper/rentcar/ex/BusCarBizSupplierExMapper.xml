@@ -42,7 +42,10 @@
 		memo
 	</sql>
 
-	<insert id="insertSelective" parameterType="com.zhuanche.dto.busManage.BusSupplierBaseDTO" keyProperty="supplierId">
+	<insert id="insertSelective" parameterType="com.zhuanche.dto.busManage.BusSupplierBaseDTO">
+		<selectKey resultType="java.lang.Integer" keyProperty="supplierId" order="AFTER" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
 		insert into car_biz_supplier
 		<trim prefix="(" suffix=")" suffixOverrides=",">
 			<if test="supplierName != null">
@@ -193,14 +196,14 @@
 				#{item}
 			</foreach>
 		</if>
-		<if test="contractIds != null and contractIds > 0">
+		<if test="contractIds != null and contractIds.size() > 0">
 			AND s.supplier_id IN 
 			<foreach collection="contractIds" item="item" open="("
 				separator="," close=")">
 				#{item}
 			</foreach>
 		</if>
-		<if test="excludeContractIds != null and excludeContractIds > 0">
+		<if test="excludeContractIds != null and excludeContractIds.size() > 0">
 			AND s.supplier_id NOT IN 
 			<foreach collection="excludeContractIds" item="item" open="("
 				separator="," close=")">

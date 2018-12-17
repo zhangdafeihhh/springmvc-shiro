@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.zhuanche.dto.rentcar.CancelOrderDTO;
 import com.zhuanche.dto.rentcar.CancelOrderDetailDTO;
 import com.zhuanche.dto.rentcar.CompleteOrderDTO;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +70,7 @@ public class CancelOrderController{
 		  */
 	    @ResponseBody
 	    @RequestMapping(value = "/queryCancelOrderData", method = { RequestMethod.POST,RequestMethod.GET })
+		@RequiresPermissions(value = { "CancelOrderDetail_look" } )
 	    public AjaxResponse queryCancelOrderData(
 	    										  Long driverCityId,
 	    										  String allianceId,
@@ -234,6 +237,7 @@ public class CancelOrderController{
      */
     @ResponseBody
     @RequestMapping(value = "/exportCancelOrderData", method = { RequestMethod.POST,RequestMethod.GET })
+	@RequiresPermissions(value = { "CancelOrderDetail_export" } )
     public AjaxResponse exportCancelOrderData(
             Long driverCityId,
             String allianceId,

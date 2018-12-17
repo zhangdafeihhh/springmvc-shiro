@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.CarMessageDocExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.CarMessageDoc" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="doc_name" property="docName" jdbcType="VARCHAR" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+    <result column="doc_url" property="docUrl" jdbcType="VARCHAR" />
+    <result column="message_id" property="messageId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, doc_name, state, doc_url, message_id, create_time, update_time
+  </sql>
+
+
+
+  <select id="listDoc" parameterType="java.lang.Long" resultMap="BaseResultMap" >
+    select id, doc_name,doc_url from car_message_doc WHERE  1=1
+
+    <if test="messageId!=null and messageId!=''">
+      AND message_id = #{messageId}
+    </if>
+
+  </select>
+
+  <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.CarMessageDoc" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_message_doc (doc_name, state, doc_url,
+    message_id, create_time, update_time
+    )
+    values (#{docName,jdbcType=VARCHAR}, #{state,jdbcType=INTEGER}, #{docUrl,jdbcType=VARCHAR},
+    #{messageId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+    )
+  </insert>
+
+
+  <update id="updateStatus" >
+    update car_message_doc
+    SET state = #{state,jdbcType=INTEGER},update_time = now()
+    where message_id = #{messageId,jdbcType=INTEGER}
+
+  </update>
+
+
+
+
+  <delete id="deleteByMessaeId" parameterType="java.lang.Long" >
+    delete from car_message_doc
+    where message_id = #{messageId,jdbcType=BIGINT}
+  </delete>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from car_message_doc
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+
+</mapper>

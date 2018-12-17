@@ -269,7 +269,38 @@ public class CommonController {
         }
         return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
     }
-	
+
+    /**
+     * @Desc: 查询车队小组列表
+     * @param:
+     * @return:
+     * @Author: lunan
+     * @Date: 2018/9/3
+     */
+    @RequestMapping("/groupsByTeams")
+    @ResponseBody
+    public AjaxResponse getGroupsByTeams(@Verify(param = "teamIds", rule = "required") String teamIds){
+        SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+        if(Check.NuNObj(currentLoginUser)){
+            return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST);
+        }
+        if(Check.NuNObjs(teamIds)){
+            return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
+        }
+        //供应商ID
+        Set<String> teamidSet = new HashSet<String>();
+        if(StringUtils.isNotEmpty(teamIds)) {//当传入多个supplierId时
+            Set<String> teamids = Stream.of(teamIds.split(",")).collect(Collectors.toSet());
+            teamidSet.addAll(teamids);
+        }
+        try{
+            List<Map<String, Object>> carDriverTeams = citySupplierTeamCommonService.getTeamsByPids(teamidSet);
+            return AjaxResponse.success(carDriverTeams);
+        }catch (Exception e){
+            logger.error("查询城市供应商车队列表异常:{}",e);
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+    }
     
 }
 

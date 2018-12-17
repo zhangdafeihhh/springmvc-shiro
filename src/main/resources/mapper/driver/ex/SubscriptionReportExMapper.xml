@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.ex.SubscriptionReportExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.SubscriptionReport" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="bussiness_number" property="bussinessNumber" jdbcType="VARCHAR" />
+    <result column="configure_id" property="configureId" jdbcType="BIGINT" />
+    <result column="report_id" property="reportId" jdbcType="INTEGER" />
+    <result column="report_name" property="reportName" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+    <result column="team_id" property="teamId" jdbcType="INTEGER" />
+    <result column="team_name" property="teamName" jdbcType="VARCHAR" />
+    <result column="level" property="level" jdbcType="INTEGER" />
+    <result column="subscription_cycle" property="subscriptionCycle" jdbcType="INTEGER" />
+    <result column="subscription_time" property="subscriptionTime" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="create_id" property="createId" jdbcType="INTEGER" />
+    <result column="create_name" property="createName" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, bussiness_number, configure_id, report_id, report_name, city_id, city_name, supplier_id,
+    supplier_name, team_id, team_name, level, subscription_cycle, subscription_time,
+    url, create_id, create_name, create_time, update_time
+  </sql>
+  <sql id="Base_where">
+    <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR">
+      <if test="reportId != null and reportId != ''">
+        and report_id = #{reportId,jdbcType=INTEGER}
+      </if>
+      <if test="subscriptionCycle != null and subscriptionCycle != ''">
+        and subscription_cycle = #{subscriptionCycle,jdbcType=INTEGER}
+      </if>
+      <if test="cityId != null and cityId != ''">
+        and city_id = #{cityId,jdbcType=INTEGER}
+      </if>
+      <if test="supplierId != null and supplierId != ''">
+        and supplier_id = #{supplierId,jdbcType=INTEGER}
+      </if>
+      <if test="teamId != null and teamId != ''">
+        and team_id = #{teamId,jdbcType=INTEGER}
+      </if>
+      <if test="cityIds!=null and cityIds.size()>0">
+        and city_id IN
+        <foreach collection="cityIds" open="(" close=")" separator="," item="cityId" >
+          #{cityId}
+        </foreach>
+      </if>
+      <if test="supplierIds!=null and supplierIds.size()>0">
+        and supplier_id IN
+        <foreach collection="supplierIds" open="(" close=")" separator="," item="supplierId" >
+          #{supplierId}
+        </foreach>
+      </if>
+      <if test="teamIds!=null and teamIds.size()>0">
+        and team_id IN
+        <foreach collection="teamIds" open="(" close=")" separator="," item="teamId" >
+          #{teamId}
+        </foreach>
+      </if>
+    </trim>
+  </sql>
+  <select id="querySubscriptionList" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from subscription_report
+    <include refid="Base_where" />
+    order by update_time desc
+  </select>
+</mapper>

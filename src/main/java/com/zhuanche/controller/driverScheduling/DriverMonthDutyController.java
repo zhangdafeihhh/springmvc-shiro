@@ -31,6 +31,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -87,6 +88,7 @@ public class DriverMonthDutyController {
     */ 
     @ResponseBody
     @RequestMapping(value = "/importDriverMonthDutyInfo")
+	@RequiresPermissions(value = { "DriverWorkManage_import" } )
     public AjaxResponse importDriverMonthDutyInfo(DriverMonthDutyRequest params,HttpServletRequest request,MultipartFile file){
         //TODO
         logger.info("导入月排班模板数据入参："+JSON.toJSONString(params));
@@ -169,6 +171,7 @@ public class DriverMonthDutyController {
     @SuppressWarnings("unchecked")
     @ResponseBody
     @RequestMapping("/exportDriverMonthDuty")
+	@RequiresPermissions(value = { "DriverWorkManage_export" } )
     public String exportDriverMonthDuty(DriverMonthDutyRequest param, HttpServletRequest request,HttpServletResponse response){
         logger.info("下载月排班列表数据入参:"+JSON.toJSONString(param));
         long start = System.currentTimeMillis();
@@ -345,6 +348,7 @@ public class DriverMonthDutyController {
     */ 
     @ResponseBody
     @RequestMapping(value = "/queryDriverMonthDutyData")
+	@RequiresPermissions(value = { "DriverWorkManage_look" } )
     public AjaxResponse queryDriverMonthDutyData(DriverMonthDutyRequest param) {
         logger.info("查询月排班列表数据入参:"+JSON.toJSONString(param));
         if(Check.NuNStr(param.getMonitorDate())){
@@ -382,6 +386,7 @@ public class DriverMonthDutyController {
     */ 
     @SuppressWarnings({ "deprecation", "unchecked" })
     @RequestMapping(value = "/downloadTemplateMonthDuty")
+	@RequiresPermissions(value = { "DriverWorkManage_demo" } )
     @ResponseBody
     public synchronized void downloadTemplateMonthDuty(DriverMonthDutyRequest param,HttpServletRequest request, HttpServletResponse response) {
         logger.info("downloadTemplateMonthDuty:下载 司机月排行 导入模板"+"--入参:"+ JSON.toJSONString(param));

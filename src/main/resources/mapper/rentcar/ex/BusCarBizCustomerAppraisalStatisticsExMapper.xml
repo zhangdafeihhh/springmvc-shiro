@@ -20,13 +20,22 @@
 		<result column="sys_date" property="sysDate" jdbcType="TIMESTAMP" />
 	</resultMap>
 	<sql id="Base_Column_List">
-		appraisal_statistics_id, driver_id, driver_name, driver_phone, instrument_and_service,
-		environment_and_equipped, efficiency_and_safety, evaluate_score,
+		appraisal_statistics_id, driver_id, driver_name,
+		driver_phone, instrument_and_service,
+		environment_and_equipped,
+		efficiency_and_safety, evaluate_score,
 		create_date, sys_date
 	</sql>
-	
+
+	<!-- 获取司机某月评分 -->
 	<select id="queryAppraisal" parameterType="java.util.Map" resultMap="BaseResultMap">
-	
+		SELECT
+			<include refid="Base_Column_List" />
+		FROM
+			car_biz_customer_appraisal_statistics
+		WHERE
+			driver_id = #{driverId}
+		AND create_date = #{createDate}
 	</select>
 </mapper>
 
