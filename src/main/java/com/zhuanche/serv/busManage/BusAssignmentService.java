@@ -31,7 +31,10 @@ import com.zhuanche.dto.busManage.BusCarRicherDTO;
 import com.zhuanche.dto.busManage.BusDriverDTO;
 import com.zhuanche.dto.busManage.BusDriverRicherDTO;
 import com.zhuanche.dto.busManage.BusOrderDTO;
-import com.zhuanche.entity.rentcar.CarBizCarGroup;
+import com.zhuanche.entity.rentcar.CarBizCustomerAppraisal;
+import com.zhuanche.entity.rentcar.CarBizCustomerAppraisalStatistics;
+import com.zhuanche.entity.rentcar.CarBizDriverInfo;
+import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.mongo.DriverMongo;
 import com.zhuanche.serv.mongo.BusDriverMongoService;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -42,6 +45,7 @@ import com.zhuanche.util.MyRestTemplate;
 import com.zhuanche.util.SignUtils;
 import com.zhuanche.vo.busManage.BusOrderVO;
 
+import mapper.rentcar.ex.BusCarBizDriverInfoExMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
@@ -61,7 +65,13 @@ public class BusAssignmentService {
 	private CarBizCarGroupExMapper carBizCarGroupExMapper;
 	
 	@Autowired
+	private BusCarBizCustomerAppraisalService busCarBizCustomerAppraisalService;
+	
+	@Autowired
 	private BusCarBizCustomerAppraisalStatisticsService busCarBizCustomerAppraisalStatisticsService;
+	
+	@Autowired
+	private BusCarBizDriverInfoExMapper busCarBizDriverInfoExMapper;
 	
 	@Autowired
 	private BusDriverMongoService busDriverMongoService;
@@ -168,25 +178,192 @@ public class BusAssignmentService {
 			JSONArray dataList = data.getJSONArray("dataList");
 			int total = data.getIntValue("totalCount");
 			List<BusOrderVO> orderList = JSON.parseArray(dataList.toString(), BusOrderVO.class);
-			// a)司机姓名/司机手机号/本单司机评分 TODO
+			if (orderList != null && orderList.size() > 0) {
+				orderList.forEach(order -> {
+					// a)司机姓名/司机手机号
+					if (order.getDriverId() != null) {
+						CarBizDriverInfo driver = busCarBizDriverInfoExMapper.queryDriverSimpleInfoById(order.getDriverId());
+						if (driver != null) {
+							order.setDriverName(driver.getName());
+							order.setDriverPhone(driver.getPhone());
+						}
+					}
+					// b)本单司机评分
+					if (StringUtils.isNotBlank(order.getOrderNo())) {
+						CarBizCustomerAppraisal appraisal = busCarBizCustomerAppraisalService.queryAppraisal(order.getOrderNo());
+						if (appraisal != null) {
+							order.setDriverScore(appraisal.getEvaluateScore());
+						}
+					}
+					// c)预约车别类型
+					if (StringUtils.isNotBlank(order.getBookingGroupid())) {
+						order.setBookingGroupName(carBizCarGroupExMapper.getGroupNameByGroupId(Integer.valueOf(order.getBookingGroupid())));
+					}
+				});
+				// d)预估里程
+				String orderNos = orderList.stream().map(order -> order.getOrderNo()).collect(Collectors.joining(","));
+				JSONArray busCostDetailList = getBusCostDetailList(orderNos);
+				if (busCostDetailList != null) {
+					orderList.forEach(order -> {
+						String orderNo = order.getOrderNo();
+						if (StringUtils.isNotBlank(orderNo)) {
+							busCostDetailList.stream().filter(cost -> {
+								JSONObject jsonObject = (JSONObject) JSON.toJSON(cost);
+								return orderNo.equals(jsonObject.getString("orderNo"));
+							}).findFirst().ifPresent(cost -> {
+								JSONObject jsonObject = (JSONObject) JSON.toJSON(cost);
+								order.setEstimateDistance(jsonObject.getDouble("estimateDistance"));
+							});
+						}
+					});
+				}
+//				// e)企业名称/企业折扣/付款类型
+				List<Object> phoneList = new ArrayList<>();
+				orderList.forEach(order -> {
+					String bookingUserPhone = order.getBookingUserPhone();
+					if (StringUtils.isNotBlank(bookingUserPhone)) {
+						phoneList.add(bookingUserPhone);
+					}
+				});
+				String phones = StringUtils.join(phoneList, ",");
+				JSONArray queryBatchOrgInfo = queryCompanyByPhone(phones);
+				if (queryBatchOrgInfo != null) {
+					// 匹配企业ID/企业名称
+					orderList.forEach(order -> {
+						String bookingUserPhone = order.getBookingUserPhone();
+						if (StringUtils.isNotBlank(bookingUserPhone)) {
+							queryBatchOrgInfo.stream().filter(company -> {
+								JSONObject jsonObject = (JSONObject) JSON.toJSON(company);
+								return bookingUserPhone.equals(jsonObject.getString("phone"));
+							}).findFirst().ifPresent(company -> {
+								JSONObject jsonObject = (JSONObject) JSON.toJSON(company);
+								order.setCompanyId(jsonObject.getInteger("companyId"));
+								order.setCompanyName(jsonObject.getString("companyName"));
+							});
+						}
+					});
+					
+					// 付款类型/企业折扣
+					List<String> companyIdList = new ArrayList<>();
+					orderList.forEach(order -> {
+						Integer companyId = order.getCompanyId();
+						if (companyId != null) {
+							companyIdList.add(companyId.toString());
+						}
+					});
+					String companyIds = StringUtils.join(companyIdList, ",");
+					JSONArray queryBusinessInfoBatch = queryBusinessInfoBatch(companyIds);
+					if (queryBusinessInfoBatch != null) {
+						orderList.forEach(order -> {
+							Integer companyId = order.getCompanyId();
+							if (companyId != null) {
+								queryBusinessInfoBatch.stream().filter(business -> {
+									JSONObject jsonObject = (JSONObject) JSON.toJSON(business);
+									return companyId.toString().equals(jsonObject.getString("businessId"));
+								}).findFirst().ifPresent(business -> {
+									JSONObject jsonObject = (JSONObject) JSON.toJSON(business);
+									order.setCompanyType(jsonObject.getInteger("type"));
+									order.setPercent(jsonObject.getInteger("percent"));
+								});
+							}
+						});
+					}
+				}
+			}
 			
-			// b)预约车别类型
-			List<CarBizCarGroup> groupList = carBizCarGroupExMapper.queryCarGroupList(2);
-			Map<String, String> groupMap = new HashMap<>();
-			groupList.forEach(group -> groupMap.put(String.valueOf(group.getGroupId()), group.getGroupName()));
-			orderList.forEach(order -> order.setBookingGroupName(groupMap.get(order.getBookingGroupid())));
-			// c)预估里程 TODO
-//			String url = chargeBaseUrl + BusConst.Charge.BUSS_GETBUSCOSTDETAILLIST;
-			// d)企业名称/企业折扣/付款类型 TODO 
-//			String url = businessRestBaseUrl + BusConst.BusinessRest.COMPANY_QUERYCOMPANYBYPHONE;
-//			String url = paymentBaseUrl + BusConst.Payment.BUSINESS_QUERYBUSINESSINFOBATCH;
-			
-			
+			// 返回结果
 			return new PageDTO(params.getPageNum(), params.getPageSize(), total, orderList);
 		} catch (Exception e) {
 			logger.error("[ BusAssignmentService-selectList ] 查询巴士订单列表出错 {}", e);
 		}
 		return new PageDTO();
+	}
+	
+	/**
+	 * @Title: getBusCostDetailList
+	 * @Description: 批量获取费用明细
+	 * @param orderNos
+	 * @return 
+	 * @return JSONArray
+	 * @throws
+	 */
+	public JSONArray getBusCostDetailList(String orderNos) {
+		Map<String,Object> params = new HashMap<>();
+		params.put("orderNos", orderNos);
+		logger.info("[ BusAssignmentService-getBusCostDetailList ] 大巴车-批量获取费用明细,请求参数,params={}", params);
+		try {
+			String url = chargeBaseUrl + BusConst.Charge.BUSS_GETBUSCOSTDETAILLIST;
+			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(url, params, 3000, "大巴车-批量获取费用明细");
+			if (result.getIntValue("code") != 0) {
+				logger.info("[ BusAssignmentService-getBusCostDetailList ] 大巴车-批量获取费用明细,调用接口出错 code:{},错误原因:{}",
+						result.getIntValue("code"), result.getString("msg"));
+				return null;
+			}
+			JSONArray jsonArray = result.getJSONArray("data");
+			return jsonArray;
+		} catch (Exception e) {
+			logger.error("[ BusAssignmentService-getBusCostDetailList ] 大巴车-批量获取费用明细,调用接口异常errorMsg={}", e.getMessage(), e);
+			return null;
+		}
+	}
+	
+	/**
+	 * @Title: queryBatchOrgInfo
+	 * @Description: 根据手机号查询企业信息 
+	 * @param phones
+	 * @return 
+	 * @return JSONArray
+	 * @throws
+	 */
+	public JSONArray queryCompanyByPhone(String phones) {
+        try {
+        	Map<String,Object> params = new HashMap<>();
+    		params.put("phone", phones);
+    		logger.info("[ BusAssignmentService-queryCompanyByPhone ] 根据手机号查询企业信息,请求参数,params={}", params);
+    		
+        	String url = businessRestBaseUrl + BusConst.BusinessRest.COMPANY_QUERYCOMPANYBYPHONE;
+        	JSONObject result = MpOkHttpUtil.okHttpGetBackJson(url, params, 3000, "根据手机号查询企业信息");
+            int code = result.getIntValue("code");
+            String msg = result.getString("msg");
+			if (code != 0) {
+                logger.error("[ BusAssignmentService-queryCompanyByPhone ] 根据手机号查询企业信息,调用接口错误,code:{},错误原因:{}", code, msg);
+                return null;
+            }
+            JSONArray jsonArray = result.getJSONArray("data");
+            return jsonArray;
+        } catch (Exception e) {
+			logger.error("[ BusAssignmentService-queryCompanyByPhone ] 根据手机号查询企业信息,订单接口异常,{}", e.getMessage(), e);
+            return null;
+        }
+    }
+	
+	/**
+	 * @Title: queryBusinessInfoBatch
+	 * @Description: 批量查询企业信息
+	 * @param companyIds
+	 * @return 
+	 * @return JSONArray
+	 * @throws
+	 */
+	public JSONArray queryBusinessInfoBatch(String companyIds) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("businessIdStr", companyIds);
+		logger.info("[ BusAssignmentService-queryBusinessInfoBatch ] 批量查询企业信息,请求参数,params={}", params);
+		try {
+			String url = paymentBaseUrl + BusConst.Payment.BUSINESS_QUERYBUSINESSINFOBATCH;
+			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(url, params, 3000, "批量查询企业信息");
+			int code = result.getIntValue("code");
+			String msg = result.getString("msg");
+			if (code != 0) {
+				logger.error("[ BusAssignmentService-queryBusinessInfoBatch ] 批量查询企业信息,错误码:{},错误原因:{}", code, msg);
+				return null;
+			}
+			JSONArray jsonArray = result.getJSONArray("data");
+			return jsonArray;
+		} catch (Exception e) {
+			logger.error("[ BusAssignmentService-queryBusinessInfoBatch ] 批量查询企业信息,调用接口异常errorMsg={}", e.getMessage(), e);
+			return null;
+		}
 	}
 
 	/**
@@ -318,8 +495,11 @@ public class BusAssignmentService {
 			// 补充司机评分
 			if (busDriverList != null && busDriverList.size() > 0) {
 				busDriverList.forEach(driver -> {
-					String score = busCarBizCustomerAppraisalStatisticsService.getScore((Integer) driver.get("driverId"), LocalDate.now());
-					driver.put("monthlyScore", score);
+					CarBizCustomerAppraisalStatistics appraisal = busCarBizCustomerAppraisalStatisticsService
+							.queryAppraisal((Integer) driver.get("driverId"), LocalDate.now());
+					if (appraisal != null) {
+						driver.put("monthlyScore", appraisal.getEvaluateScore());
+					}
 				});
 			}
 			Page<Map<String, Object>> page = (Page<Map<String, Object>>) busDriverList;

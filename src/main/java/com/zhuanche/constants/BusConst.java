@@ -82,6 +82,8 @@ public interface BusConst {
 		/** 批量查询企业信息 **/
 		String BUSINESS_QUERYBUSINESSINFOBATCH = "/business/queryBusinessInfoBatch";
 
+		/** 大巴车支付明细 **/
+		String BUS_PAY_DETAIL = "/pay/bus/details";
 	}
 
 	/**
@@ -94,6 +96,9 @@ public interface BusConst {
 	interface Charge {
 		/** 大巴车-批量获取费用明细 **/
 		String BUSS_GETBUSCOSTDETAILLIST = "/buss/getBusCostDetailList";
+
+		/** 费用详情 （巴士费用明细） **/
+		String BUSS_BACK = "/buss/back";
 	}
 
 	/**
@@ -125,6 +130,9 @@ public interface BusConst {
 
 		/** 巴士订单改派 **/
 		String UPDATE_DRIVER = "/busOrder/updateDriver";
+
+		/** 查询订单详情 **/
+		String GET_ORDER_DETAIL = "/busOrder/getOrderDetail";
 	}
 
 	/**
@@ -138,6 +146,5 @@ public interface BusConst {
 		/** 指定司机绑单接口 **/
 		String BUS_DISPATCHER = "/bus/busDispatcher";
 	}
-
 
 }

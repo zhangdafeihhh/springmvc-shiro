@@ -668,7 +668,7 @@ public class BusCarBizDriverInfoService implements BusConst{
 	public int saveDriverInfo(BusDriverSaveDTO saveDTO) {
 		
 		busCarBizDriverInfoExMapper.insertBusDriverInfo(saveDTO);
-		int driverId = saveDTO.getDriverId();
+		Integer driverId = saveDTO.getDriverId();
 
 		// 创建操作记录
 		busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId), saveDTO.getUpdateDate());

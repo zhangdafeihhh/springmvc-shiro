@@ -1,19 +1,14 @@
 package com.zhuanche.serv.busManage;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
-import com.zhuanche.entity.rentcar.CarBizCustomerAppraisalStatistics;
+import com.zhuanche.entity.rentcar.CarBizCustomerAppraisal;
 
-import mapper.rentcar.ex.BusCarBizCustomerAppraisalStatisticsExMapper;
+import mapper.rentcar.ex.BusCarBizCustomerAppraisalExMapper;
 
 /**
  * @ClassName: BusCarBizCustomerAppraisalStatisticsService
@@ -23,11 +18,11 @@ import mapper.rentcar.ex.BusCarBizCustomerAppraisalStatisticsExMapper;
  * 
  */
 @Service
-public class BusCarBizCustomerAppraisalStatisticsService {
+public class BusCarBizCustomerAppraisalService {
 
 	// ===========================巴士业务拓展mapper==================================
 	@Autowired
-	private BusCarBizCustomerAppraisalStatisticsExMapper busCarBizCustomerAppraisalStatisticsExMapper;
+	private BusCarBizCustomerAppraisalExMapper busCarBizCustomerAppraisalExMapper;
 
 	/**
 	 * @Title: queryAppraisal
@@ -38,11 +33,8 @@ public class BusCarBizCustomerAppraisalStatisticsService {
 	 * @throws
 	 */
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
-	public CarBizCustomerAppraisalStatistics queryAppraisal(Integer driverId, LocalDate date) {
-		Map<Object, Object> param = new HashMap<>();
-		param.put("driverId", driverId);
-		param.put("createDate", DateTimeFormatter.ofPattern("y-M").format(date));// 处理成字符串
-		CarBizCustomerAppraisalStatistics appraisal = busCarBizCustomerAppraisalStatisticsExMapper.queryAppraisal(param);
+	public CarBizCustomerAppraisal queryAppraisal(String orderNo) {
+		CarBizCustomerAppraisal appraisal = busCarBizCustomerAppraisalExMapper.queryAppraisal(orderNo);
 		return appraisal;
 	}
 	
@@ -56,9 +48,9 @@ public class BusCarBizCustomerAppraisalStatisticsService {
 	 * @throws
 	 */
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
-	public String getScore(Integer driverId, LocalDate date) {
+	public String getScore(String orderNo) {
 		// 司机评分
-		CarBizCustomerAppraisalStatistics appraisal = this.queryAppraisal(driverId, date);
+		CarBizCustomerAppraisal appraisal = this.queryAppraisal(orderNo);
 		String average = appraisal == null ? null : appraisal.getEvaluateScore();
 		if (average == null && appraisal != null) {
 			double num = 0d;

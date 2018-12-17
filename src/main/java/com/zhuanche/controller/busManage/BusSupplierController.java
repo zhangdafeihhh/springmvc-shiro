@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -13,12 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 
-import com.alibaba.fastjson.JSONArray;
-import com.zhuanche.common.web.Verify;
-import com.zhuanche.dto.busManage.BusSupplierSettleListDTO;
-import com.zhuanche.serv.busManage.BusCommonService;
-import com.zhuanche.shiro.realm.SSOLoginUser;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,8 +59,6 @@ public class BusSupplierController {
 	@Autowired
 	private BusSupplierService busSupplierService;
 	//============================巴士共有服务service==================================
-	@Autowired
-	private BusCommonService busCommonService;
 
 	/**
 	 * @Title: saveSupplier
@@ -249,46 +240,4 @@ public class BusSupplierController {
 		return AjaxResponse.success(supplierVO);
 	}
 
-	/**
-	 * 查询供应商分佣订单明细 TODO 等计费完成接口完善
-	 * @param dto
-	 * @return
-	 */
-	@RequestMapping(value = "/querySettleDetailList")
-	public AjaxResponse querySettleDetailList(BusSupplierSettleListDTO dto){
-		logger.info("巴士供应商查询账单列表参数="+JSON.toJSONString(dto));
-		SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-		Set<Integer> supplierIds = loginUser.getSupplierIds();
-		Set<Integer> cityIds = loginUser.getCityIds();
-		Set<Integer> teamIds = loginUser.getTeamIds();
-		dto.setAuthOfCity(cityIds);
-		dto.setAuthOfSupplier(supplierIds);
-		dto.setAuthOfTeam(teamIds);
-		Integer cityId = dto.getCityId();
-		//按照城市查询，需要查询该城市下所有的供应商
-		if(cityId !=null && StringUtils.isBlank(dto.getSupplierIds())){
-			List<Map<Object, Object>> maps = busCommonService.querySuppliers(cityId);
-			if(maps.isEmpty()){
-				return AjaxResponse.success(new ArrayList());
-			}
-			StringBuffer sb = new StringBuffer();
-			for (Map map:maps) {
-				String supplierId = String.valueOf(map.get("supplierId"));
-				sb.append(supplierId).append(",");
-			}
-			dto.setSupplierIds(sb.substring(0,sb.length()-1));
-		}
-		//城市条件和供应商条件都没有，获取session中的supplierid
-		if(cityId==null && StringUtils.isBlank(dto.getSupplierIds())){
-			if(supplierIds!=null&&!supplierIds.isEmpty()){
-			    StringBuffer sb = new StringBuffer();
-                for (Integer supplierId:supplierIds) {
-                    sb.append(supplierId).append(",");
-                }
-                dto.setSupplierIds(sb.substring(0,sb.length()-1));
-            }
-		}
-		JSONArray array = busSupplierService.querySettleDetailList(dto);
-		return AjaxResponse.success(array);
-	}
 }

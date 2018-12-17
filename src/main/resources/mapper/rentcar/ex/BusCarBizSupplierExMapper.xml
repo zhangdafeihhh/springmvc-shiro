@@ -42,7 +42,10 @@
 		memo
 	</sql>
 
-	<insert id="insertSelective" parameterType="com.zhuanche.dto.busManage.BusSupplierBaseDTO" keyProperty="supplierId">
+	<insert id="insertSelective" parameterType="com.zhuanche.dto.busManage.BusSupplierBaseDTO">
+		<selectKey resultType="java.lang.Integer" keyProperty="supplierId" order="AFTER" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
 		insert into car_biz_supplier
 		<trim prefix="(" suffix=")" suffixOverrides=",">
 			<if test="supplierName != null">
