@@ -18,6 +18,7 @@ import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.common.securityLog.SensitiveDataOperationLog;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -69,6 +70,7 @@ public class DriverVerifyController {
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
 	} )
+	@SensitiveDataOperationLog(primaryDataType="加盟司机数据",secondaryDataType="加盟司机个人基本信息",desc="加盟司机信息列表查询")
 	public AjaxResponse queryDriverVerifyData(Integer page, Integer pageSize, Long cityId, String supplier,
 			String mobile, Integer verifyStatus, String createDateBegin, String createDateEnd) {
 
@@ -92,6 +94,7 @@ public class DriverVerifyController {
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
 	} )
+	@SensitiveDataOperationLog(primaryDataType="加盟司机数据",secondaryDataType="加盟司机个人信息详情",desc="加盟司机信息详情查看")
 	public AjaxResponse queryDriverVerifyById(@Verify(param = "driverId", rule = "required") Long driverId) {
 
 		DriverVerifyDto driverDto = driverVerifyService.queryDriverVerifyById(driverId);
