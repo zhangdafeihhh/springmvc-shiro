@@ -1,12 +1,7 @@
 package com.zhuanche.serv.busManage;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -490,4 +485,38 @@ public class BusSupplierService implements BusConst {
 		return null;
 	}
 
+	/**
+	 * @Title: getProrateList
+	 * @Description: 查询供应商分佣有关的信息（批量）
+	 * @param cityIds
+	 * @return
+	 * @return JSONArray
+	 * @throws
+	 */
+	public List<Integer> querySupplierIdByCitys(Map<String,Set<Integer>> cityIds){
+		return busCarBizSupplierExMapper.querySupplierIdByCitys(cityIds);
+	}
+
+	/**
+	 * 批量查询供应商基本信息
+	 * @param supplierIds
+	 * @return
+	 */
+	public List<BusSupplierInfoVO> queryBasicInfoByIds(Set<Integer> supplierIds){
+		if(supplierIds == null || supplierIds.isEmpty()){
+			return new ArrayList<>();
+		}
+		Map<String,Set<Integer>> param = new HashMap<>(4);
+		param.put("supplierIds",supplierIds);
+		return busCarBizSupplierExMapper.queryBasicInfoByIds(param);
+	}
+
+	public List<BusBizSupplierDetail> querySettleInfoByIds(Set<Integer> supplierIds){
+		if(supplierIds == null || supplierIds.isEmpty()){
+			return new ArrayList<>();
+		}
+		Map<String,Set<Integer>> param = new HashMap<>(4);
+		param.put("supplierIds",supplierIds);
+		return busBizSupplierDetailExMapper.querySettleInfoByIds(param);
+	}
 }

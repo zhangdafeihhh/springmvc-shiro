@@ -15,6 +15,7 @@ public class BusSupplierSettleListDTO extends BaseDTO{
     private Integer type;
     private String startTime;
     private String endTime;
+    private Integer supplierId;
 
     public String getSupplierIds() {
         return supplierIds;
@@ -62,5 +63,13 @@ public class BusSupplierSettleListDTO extends BaseDTO{
 
     public void setCityId(Integer cityId) {
         this.cityId = cityId;
+    }
+
+    public Integer getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(Integer supplierId) {
+        this.supplierId = supplierId;
     }
 }

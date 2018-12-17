@@ -2,6 +2,7 @@ package mapper.mdbcarmanage.ex;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.zhuanche.dto.busManage.BusSupplierDetailDTO;
 import com.zhuanche.entity.mdbcarmanage.BusBizSupplierDetail;
@@ -59,4 +60,10 @@ public interface BusBizSupplierDetailExMapper {
 	 */
 	BusBizSupplierDetail selectBySupplierId(Integer supplierId);
 
+	/**
+	 * 批量查询供应商的结算信息
+	 * @param supplierIds
+	 * @return
+	 */
+	List<BusBizSupplierDetail> querySettleInfoByIds(Map<String,Set<Integer>> supplierIds);
 }

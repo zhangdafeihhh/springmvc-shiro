@@ -227,4 +227,14 @@
 	    where supplier_id = #{supplierId}
 	    limit 1
     </select>
+	<select id="querySettleInfoByIds" parameterType="java.util.Map" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from bus_biz_supplier_detail
+		where supplier_id in
+		<foreach collection="supplierIds" open="(" close=")" separator="," item="item">
+			#{item}
+		</foreach>
+	</select>
+
 </mapper>
