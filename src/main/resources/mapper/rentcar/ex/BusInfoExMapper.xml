@@ -100,6 +100,9 @@
         <if test="status !=null">
             and info.status = #{status}
         </if>
+        <if test="licensePlates !=null and licensePlates !=''">
+            and info.license_plates like "%"#{licensePlates}"%"
+        </if>
     </select>
     <select id="selectCarByCarId" parameterType="java.lang.Integer" resultMap="DetailVOMap">
        SELECT
