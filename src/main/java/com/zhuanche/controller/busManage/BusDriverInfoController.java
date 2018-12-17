@@ -83,7 +83,7 @@ public class BusDriverInfoController extends BusBaseController {
 	 */
 	@SuppressWarnings("resource")
 	@RequestMapping(value = "/findDriverList")
-	public AjaxResponse findDriverList(BusDriverQueryDTO queryDTO) {
+	public AjaxResponse findDriverList(@Validated BusDriverQueryDTO queryDTO) {
 
 		// 数据权限控制SSOLoginUser
 		Set<Integer> permOfCity = WebSessionUtil.getCurrentLoginUser().getCityIds(); // 普通管理员可以管理的所有城市ID
@@ -123,7 +123,7 @@ public class BusDriverInfoController extends BusBaseController {
 	 * @throws
 	 */
 	@RequestMapping(value = "/saveDriver")
-	public AjaxResponse saveDriver(BusDriverSaveDTO saveDTO) {
+	public AjaxResponse saveDriver(@Validated BusDriverSaveDTO saveDTO) {
 		
 		/** 补充默认信息(用户不想填但业务需要的字段)*/
 		AjaxResponse checkResult = busCarBizDriverInfoService.completeInfo(saveDTO);

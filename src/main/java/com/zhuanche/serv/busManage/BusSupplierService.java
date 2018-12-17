@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
@@ -33,8 +34,11 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constants.BusConst;
 import com.zhuanche.dto.busManage.BusSupplierBaseDTO;
+import com.zhuanche.dto.busManage.BusSupplierCommissionInfoDTO;
 import com.zhuanche.dto.busManage.BusSupplierDetailDTO;
+import com.zhuanche.dto.busManage.BusSupplierProrateDTO;
 import com.zhuanche.dto.busManage.BusSupplierQueryDTO;
+import com.zhuanche.dto.busManage.BusSupplierRebateDTO;
 import com.zhuanche.entity.mdbcarmanage.BusBizSupplierDetail;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.CarBizDriverInfoService;
@@ -83,6 +87,9 @@ public class BusSupplierService implements BusConst {
 	private String orderPayUrl;
 
 	/**
+	 * @param rebateDTO 
+	 * @param prorateDTO 
+	 * @param commissionDTO 
 	 * @Title: saveSupplierInfo
 	 * @Description: 保存/修改供应商
 	 * @param baseDTO
@@ -94,7 +101,9 @@ public class BusSupplierService implements BusConst {
 	@RequestMapping(value = "/saveSupplier")
 	@MasterSlaveConfigs(configs = { @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER),
 			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.MASTER) })
-	public AjaxResponse saveSupplierInfo(BusSupplierBaseDTO baseDTO, BusSupplierDetailDTO detailDTO) {
+	public AjaxResponse saveSupplierInfo(BusSupplierBaseDTO baseDTO, BusSupplierDetailDTO detailDTO,
+			BusSupplierCommissionInfoDTO commissionDTO, List<BusSupplierProrateDTO> prorateDTOList,
+			List<BusSupplierRebateDTO> rebateDTOList) {
 		String method = "UPDATE";
 		int f = 0;
 		Integer supplierId = baseDTO.getSupplierId();
@@ -128,12 +137,28 @@ public class BusSupplierService implements BusConst {
 			carBizDriverInfoService.updateDriverCooperationTypeBySupplierId(baseDTO.getSupplierId(), baseDTO.getCooperationType());
 			carBizDriverInfoTempService.updateDriverCooperationTypeBySupplierId(baseDTO.getSupplierId(), baseDTO.getCooperationType());
 		}
-		
-		// 四、调用分佣接口，修改分佣、返点信息  TODO
+
+		// 四、调用分佣接口，修改分佣、返点信息
+		StringBuilder errorMsg = new StringBuilder();
+
+		String commissionMsg = saveSupplierCommission(commissionDTO, supplierId);// 分佣基本信息
+		if (StringUtils.isNotBlank(commissionMsg)) {
+			errorMsg.append(commissionMsg).append(";");
+		}
+
+		String prorateMsg = saveSupplierProrate(prorateDTOList, supplierId);// 分佣信息
+		if (StringUtils.isNotBlank(prorateMsg)) {
+			errorMsg.append(prorateMsg).append(";");
+		}
+
+		String rebateMsg = saveSupplierRebate(rebateDTOList, supplierId);// 返点信息
+		if (StringUtils.isNotBlank(rebateMsg)) {
+			errorMsg.append(rebateMsg).append(";");
+		}
 
 		// 五、保存操作记录
 		busBizChangeLogService.insertLog(BusinessType.SUPPLIER, String.valueOf(supplierId), new Date());
-		
+
 		// 六、MQ消息写入 供应商
 		try {
 			Map<String, Object> msgMap = new HashMap<String, Object>();
@@ -145,13 +170,142 @@ public class BusSupplierService implements BusConst {
 			logger.error("[ BusSupplierService-saveSupplierInfo ] 供应商信息发送MQ出错", e.getMessage(), e);
 		}
 		logger.info("***********************新增/修改 厂商信息  END***********************");
-		if (f > 0) {
+		if (f > 0 && StringUtils.isBlank(errorMsg.toString())) {
 			return AjaxResponse.success(null);
 		} else {
-			return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, "操作失败");
+			return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, StringUtils.defaultIfBlank(errorMsg.toString(), "操作失败"));
 		}
 	}
 	
+	/**
+	 * @Title: saveSupplierCommission
+	 * @Description: 保存分佣基本信息
+	 * @param commissionDTO
+	 * @param supplierId
+	 * @return 
+	 * @return String
+	 * @throws
+	 */
+	private String saveSupplierCommission(BusSupplierCommissionInfoDTO commissionDTO, Integer supplierId) {
+		commissionDTO.setSupplierId(supplierId);
+		commissionDTO.setCreateName(WebSessionUtil.getCurrentLoginUser().getName());
+		commissionDTO.setUpdateName(WebSessionUtil.getCurrentLoginUser().getName());
+		
+		String jsonString = JSON.toJSONStringWithDateFormat(commissionDTO, JSON.DEFFAULT_DATE_FORMAT, new SerializerFeature[0]);
+		JSONObject json = (JSONObject) JSONObject.parse(jsonString);
+		Map<String, Object> params = json.getInnerMap();
+		
+		Long id = commissionDTO.getId();// 主键
+		try {
+			String url = null;
+			if (id == null) {
+				url = orderPayUrl + Pay.SETTLE_SUPPLIER_INFO_ADD;
+			} else {
+				url = orderPayUrl + Pay.SETTLE_SUPPLIER_INFO_UPDATE;
+			}
+			
+			logger.info("[ BusSupplierService-saveSupplierCommission ] 保存分佣基本信息,params={},url={}", params, url);
+			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(url, params , 2000, "保存分佣基本信息");
+			if (result.getIntValue("code") != 0) {
+				String msg = result.getString("msg");
+				logger.info("[ BusSupplierService-saveSupplierCommission ] 保存分佣基本信息调用接口出错,params={},errorMsg={}", params, msg);
+				return msg;
+			}
+		} catch (Exception e) {
+			logger.error("[ BusSupplierService-saveSupplierCommission ] 保存分佣基本信息异常,params={},errorMsg={}", params, e.getMessage(), e);
+			return "保存分佣基本信息" + (id == null ? "调用新增接口失败" : "调用修改接口失败");
+		}
+		return null;
+	}
+
+	/**
+	 * @Title: saveSupplierProrate
+	 * @Description: 保存供应商分佣信息
+	 * @param prorateDTOList
+	 * @param supplierId
+	 * @return 
+	 * @return String
+	 * @throws
+	 */
+	private String saveSupplierProrate(List<BusSupplierProrateDTO> prorateDTOList, Integer supplierId) {
+		if (prorateDTOList == null || prorateDTOList.isEmpty()) {
+			return null;
+		}
+
+		for (BusSupplierProrateDTO prorate : prorateDTOList) {
+			prorate.setSupplierId(supplierId);
+
+			String jsonString = JSON.toJSONStringWithDateFormat(prorate, JSON.DEFFAULT_DATE_FORMAT, new SerializerFeature[0]);
+			JSONObject json = (JSONObject) JSONObject.parse(jsonString);
+			Map<String, Object> params = json.getInnerMap();
+
+			Long id = prorate.getId();// 主键
+			try {
+				String url = null;
+				if (id == null) {
+					url = orderPayUrl + Pay.SETTLE_SUPPLIER_PRORATE_ADD;
+				} else {
+					url = orderPayUrl + Pay.SETTLE_SUPPLIER_PRORATE_UPDATE;
+				}
+				logger.info("[ BusSupplierService-saveSupplierProrate ] 保存供应商分佣信息,params={},url={}", params, url);
+				JSONObject result = MpOkHttpUtil.okHttpPostBackJson(url, params, 2000, "保存供应商分佣信息");
+				if (result.getIntValue("code") != 0) {
+					String msg = result.getString("msg");
+					logger.info("[ BusSupplierService-saveSupplierProrate ] 保存供应商分佣信息调用接口出错,params={},errorMsg={}", params, msg);
+					return msg;
+				}
+			} catch (Exception e) {
+				logger.error("[ BusSupplierService-saveSupplierProrate ] 保存供应商分佣信息异常,params={},errorMsg={}", params, e.getMessage(), e);
+				return "保存供应商分佣信息" + (id == null ? "调用新增接口失败" : "调用修改接口失败");
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @Title: saveSupplierRebate
+	 * @Description: 保存供应商返点信息
+	 * @param rebateDTOList
+	 * @param supplierId
+	 * @return 
+	 * @return String
+	 * @throws
+	 */
+	private String saveSupplierRebate(List<BusSupplierRebateDTO> rebateDTOList, Integer supplierId) {
+		if (rebateDTOList == null || rebateDTOList.isEmpty()) {
+			return null;
+		}
+
+		for (BusSupplierRebateDTO rebate : rebateDTOList) {
+			rebate.setSupplierId(supplierId);
+
+			String jsonString = JSON.toJSONStringWithDateFormat(rebate, JSON.DEFFAULT_DATE_FORMAT, new SerializerFeature[0]);
+			JSONObject json = (JSONObject) JSONObject.parse(jsonString);
+			Map<String, Object> params = json.getInnerMap();
+
+			Integer id = rebate.getId();// 主键
+			try {
+				String url = null;
+				if (id == null) {
+					url = orderPayUrl + Pay.SETTLE_SUPPLIER_REBATE_ADD;
+				} else {
+					url = orderPayUrl + Pay.SETTLE_SUPPLIER_REBATE_UPDATE;
+				}
+				logger.info("[ BusSupplierService-saveSupplierRebate ] 保存供应商返点信息,params={},url={}", params, url);
+				JSONObject result = MpOkHttpUtil.okHttpPostBackJson(url, params, 2000, "保存供应商返点信息");
+				if (result.getIntValue("code") != 0) {
+					String msg = result.getString("msg");
+					logger.info("[ BusSupplierService-saveSupplierRebate ] 保存供应商返点信息调用接口出错,params={},errorMsg={}", params, msg);
+					return msg;
+				}
+			} catch (Exception e) {
+				logger.error("[ BusSupplierService-saveSupplierRebate ] 保存供应商返点信息异常,params={},errorMsg={}", params, e.getMessage(), e);
+				return "保存供应商返点信息" + (id == null ? "调用新增接口失败" : "调用修改接口失败");
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * @Title: queryBusSupplierPageList
 	 * @Description: 查询巴士供应商列表
