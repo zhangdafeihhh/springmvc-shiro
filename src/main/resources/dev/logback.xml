@@ -29,10 +29,25 @@
         </encoder>
     </appender>
 
+    <appender name="securityLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/u01/tomcat_docker_8080/logs/security.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/u01/tomcat_docker_8080/logs/security.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss:SSS}%msg%n</pattern>
+        </encoder>
+    </appender>
+    
     <logger name="com.zhuanche.http" level="info" additivity="false">
         <appender-ref ref="thirdFile"/>
     </logger>
 
+    <logger name="com.zhuanche.common.securityLog" level="INFO" additivity="false">
+        <appender-ref ref="securityLog"/>
+    </logger>
+    
     <logger name="com.alibaba" level="INFO"/>
     <logger name="jdbc.sqltiming" level="INFO"/>
     <logger name="com.ibatis" level="INFO" />
