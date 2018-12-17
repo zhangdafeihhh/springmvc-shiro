@@ -74,9 +74,9 @@ public class BusSupplierController {
 	 */
 	@RequestMapping(value = "/saveSupplier")
 	public AjaxResponse saveSupplier(@Validated BusSupplierBaseDTO baseDTO, @Validated BusSupplierDetailDTO detailDTO,
-			@Validated BusSupplierCommissionInfoDTO commissionDTO, @Validated List<BusSupplierProrateDTO> prorateDTOList,
-			@Validated List<BusSupplierRebateDTO> rebateDTOList) {
-		return busSupplierService.saveSupplierInfo(baseDTO, detailDTO, commissionDTO, prorateDTOList, rebateDTOList);
+			@Validated BusSupplierCommissionInfoDTO commissionDTO, @Validated List<BusSupplierProrateDTO> prorateList,
+			@Validated List<BusSupplierRebateDTO> rebateList) {
+		return busSupplierService.saveSupplierInfo(baseDTO, detailDTO, commissionDTO, prorateList, rebateList);
 	}
 
 	/**

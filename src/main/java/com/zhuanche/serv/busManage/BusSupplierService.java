@@ -102,8 +102,8 @@ public class BusSupplierService implements BusConst {
 	@MasterSlaveConfigs(configs = { @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER),
 			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.MASTER) })
 	public AjaxResponse saveSupplierInfo(BusSupplierBaseDTO baseDTO, BusSupplierDetailDTO detailDTO,
-			BusSupplierCommissionInfoDTO commissionDTO, List<BusSupplierProrateDTO> prorateDTOList,
-			List<BusSupplierRebateDTO> rebateDTOList) {
+			BusSupplierCommissionInfoDTO commissionDTO, List<BusSupplierProrateDTO> prorateList,
+			List<BusSupplierRebateDTO> rebateList) {
 		String method = "UPDATE";
 		int f = 0;
 		Integer supplierId = baseDTO.getSupplierId();
@@ -146,12 +146,12 @@ public class BusSupplierService implements BusConst {
 			errorMsg.append(commissionMsg).append(";");
 		}
 
-		String prorateMsg = saveSupplierProrate(prorateDTOList, supplierId);// 分佣信息
+		String prorateMsg = saveSupplierProrate(prorateList, supplierId);// 分佣信息
 		if (StringUtils.isNotBlank(prorateMsg)) {
 			errorMsg.append(prorateMsg).append(";");
 		}
 
-		String rebateMsg = saveSupplierRebate(rebateDTOList, supplierId);// 返点信息
+		String rebateMsg = saveSupplierRebate(rebateList, supplierId);// 返点信息
 		if (StringUtils.isNotBlank(rebateMsg)) {
 			errorMsg.append(rebateMsg).append(";");
 		}
@@ -227,13 +227,15 @@ public class BusSupplierService implements BusConst {
 	 * @return String
 	 * @throws
 	 */
-	private String saveSupplierProrate(List<BusSupplierProrateDTO> prorateDTOList, Integer supplierId) {
-		if (prorateDTOList == null || prorateDTOList.isEmpty()) {
+	private String saveSupplierProrate(List<BusSupplierProrateDTO> prorateList, Integer supplierId) {
+		if (prorateList == null || prorateList.isEmpty()) {
 			return null;
 		}
 
-		for (BusSupplierProrateDTO prorate : prorateDTOList) {
+		for (BusSupplierProrateDTO prorate : prorateList) {
 			prorate.setSupplierId(supplierId);
+			prorate.setCreateName(WebSessionUtil.getCurrentLoginUser().getName());
+			prorate.setUpdateName(WebSessionUtil.getCurrentLoginUser().getName());
 
 			String jsonString = JSON.toJSONStringWithDateFormat(prorate, JSON.DEFFAULT_DATE_FORMAT, new SerializerFeature[0]);
 			JSONObject json = (JSONObject) JSONObject.parse(jsonString);
@@ -271,13 +273,15 @@ public class BusSupplierService implements BusConst {
 	 * @return String
 	 * @throws
 	 */
-	private String saveSupplierRebate(List<BusSupplierRebateDTO> rebateDTOList, Integer supplierId) {
-		if (rebateDTOList == null || rebateDTOList.isEmpty()) {
+	private String saveSupplierRebate(List<BusSupplierRebateDTO> rebateList, Integer supplierId) {
+		if (rebateList == null || rebateList.isEmpty()) {
 			return null;
 		}
 
-		for (BusSupplierRebateDTO rebate : rebateDTOList) {
+		for (BusSupplierRebateDTO rebate : rebateList) {
 			rebate.setSupplierId(supplierId);
+			rebate.setCreateName(WebSessionUtil.getCurrentLoginUser().getName());
+			rebate.setUpdateName(WebSessionUtil.getCurrentLoginUser().getName());
 
 			String jsonString = JSON.toJSONStringWithDateFormat(rebate, JSON.DEFFAULT_DATE_FORMAT, new SerializerFeature[0]);
 			JSONObject json = (JSONObject) JSONObject.parse(jsonString);
