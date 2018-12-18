@@ -218,7 +218,7 @@ public class BusAssignmentService {
 						}
 					});
 				}
-//				// e)企业名称/企业折扣/付款类型
+				// e)企业名称/企业折扣/付款类型
 				List<Object> phoneList = new ArrayList<>();
 				orderList.forEach(order -> {
 					String bookingUserPhone = order.getBookingUserPhone();
