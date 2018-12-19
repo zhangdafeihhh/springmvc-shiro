@@ -56,12 +56,30 @@ public interface BusConst {
 		// =============================================供应商接口列表===================================================
 		/** 供应商基本信息查询 **/
 		String SETTLE_SUPPLIER_INFO = "/settle/supplier/info";
+		
+		/** 供应商增加基础信息 **/
+		String SETTLE_SUPPLIER_INFO_ADD = "/settle/supplier/info/add";
+		
+		/** 供应商更新基础信息 **/
+		String SETTLE_SUPPLIER_INFO_UPDATE = "/settle/supplier/info/update";
 
 		/** 查询分佣协议 **/
 		String SETTLE_SUPPLIER_PRORATE_INFO_LIST = "/settle/supplier/prorate/info/list";
+		
+		/** 供应商分佣协议增加 **/
+		String SETTLE_SUPPLIER_PRORATE_ADD = "/settle/supplier/prorate/add";
+		
+		/** 供应商分佣协议更新 **/
+		String SETTLE_SUPPLIER_PRORATE_UPDATE = "/settle/supplier/prorate/update";
 
 		/** 查找供应商返佣配置 **/
 		String SETTLE_SUPPLIER_REBATE_INFO = "/settle/supplier/rebate/info";
+		
+		/** 供应商返点协议增加 **/
+		String SETTLE_SUPPLIER_REBATE_ADD = "/settle/supplier/rebate/add";
+		
+		/** 供应商返点协议更新**/
+		String SETTLE_SUPPLIER_REBATE_UPDATE = "/settle/supplier/rebate/update";
 
 		/** 查询供应商分佣有关的信息（批量） **/
 		String SETTLE_SUPPLIER_PRORATE_LIST = "/settle/supplier/prorate/list";

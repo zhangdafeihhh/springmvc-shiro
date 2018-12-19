@@ -85,19 +85,20 @@ public final class RedisCacheDriverUtil {
 	}
 	
 	/**保存对象到Redis, 设置过期时间**/
-	public static void set(String key, Object value, int seconds) {
+	public static String set(String key, Object value, int seconds) {
+		String result = null;
 		if(key==null||value==null) {
-			return;
+			return result;
 		}
 		if( seconds<=0) {
-			return;
+			return result;
 		}
 		if( seconds>MAX_EXPIRE_SECONDS ) {
 			seconds = MAX_EXPIRE_SECONDS;
 		}
 		Jedis jedis = pool.getResource();
         try{
-            jedis.setex(key, seconds, JSON.toJSONString(value) );
+			result = jedis.setex(key, seconds, JSON.toJSONString(value));
         } catch (Exception e) {
         	log.error("RedisCacheDriverUtil have Exception", e);
         }finally {
@@ -105,6 +106,7 @@ public final class RedisCacheDriverUtil {
             	jedis.close();
             }
         }
+        return result;
 	}
 
 	/**保存对象到Redis , 只有当不存在时才保存成功**/

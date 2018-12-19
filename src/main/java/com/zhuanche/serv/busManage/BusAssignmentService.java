@@ -132,11 +132,12 @@ public class BusAssignmentService {
 			if (driverIds.size() == 1) {
 				driverIds.stream().findFirst().ifPresent(driverId -> paramMap.put("driverId", driverId));
 			} else {
-				paramMap.put("driverIds", StringUtils.join(driverIds, ","));// TODO 确定字段key
+				String driverIdsStr = StringUtils.join(driverIds, ",");
+				paramMap.put("driverIds", StringUtils.isBlank(driverIdsStr) ? null : driverIdsStr);
 			}
 			// 补充权限控制
-			paramMap.put("cityIds", cityIds);// TODO 确定字段key
-			paramMap.put("supplierIds", supplierIds);// TODO 确定字段key
+			paramMap.put("cityIds", StringUtils.isBlank(cityIds) ? null : cityIds);
+			paramMap.put("supplierIds", StringUtils.isBlank(supplierIds) ? null : supplierIds);
 			
 			// 签名
 			paramMap.put("businessId", Common.BUSINESSID);
@@ -202,7 +203,7 @@ public class BusAssignmentService {
 						}
 					});
 				}
-//				// e)企业名称/企业折扣/付款类型
+				// e)企业名称/企业折扣/付款类型
 				List<Object> phoneList = new ArrayList<>();
 				orderList.forEach(order -> {
 					String bookingUserPhone = order.getBookingUserPhone();

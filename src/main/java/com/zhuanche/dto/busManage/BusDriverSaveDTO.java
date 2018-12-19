@@ -73,6 +73,11 @@ public class BusDriverSaveDTO extends BusBaseStatisDTO {
 	/** 是否巡游出租汽车驾驶员 **/
 	private Integer isxydriver = 1;// 巴士业务默认为"是"
 
+	/** 司机状态 (0:无效, 1:有效) **/
+	@NotNull(message = "司机状态不能为空")
+	@InArray(values = { "0", "1" }, message = "司机状态不在有效范围内")
+	private Integer status;
+
 	// ======================其它业务信息字段==================
 	/** 司机Id,修改时必传 **/
 	private Integer driverId;
@@ -80,10 +85,6 @@ public class BusDriverSaveDTO extends BusBaseStatisDTO {
 	/** 密码重置 修改时传值[1.是 2.否] **/
 	@InArray(values = { "1", "2" }, message = "密码重置标识不在有效范围内")
 	private Integer passwordReset;
-
-	/** 司机状态 (0:无效, 1:有效) **/
-	@InArray(values = { "0", "1" }, message = "司机状态不在有效范围内")
-	private Integer status;
 
 	/** 密码 **/
 	private String password;

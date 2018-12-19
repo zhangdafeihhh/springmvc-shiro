@@ -29,8 +29,11 @@ import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.dto.busManage.BusSupplierBaseDTO;
+import com.zhuanche.dto.busManage.BusSupplierCommissionInfoDTO;
 import com.zhuanche.dto.busManage.BusSupplierDetailDTO;
+import com.zhuanche.dto.busManage.BusSupplierProrateDTO;
 import com.zhuanche.dto.busManage.BusSupplierQueryDTO;
+import com.zhuanche.dto.busManage.BusSupplierRebateDTO;
 import com.zhuanche.serv.busManage.BusSupplierService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.excel.CsvUtils;
@@ -70,8 +73,10 @@ public class BusSupplierController {
 	 * @throws
 	 */
 	@RequestMapping(value = "/saveSupplier")
-	public AjaxResponse saveSupplier(BusSupplierBaseDTO baseDTO, BusSupplierDetailDTO detailDTO) {// TODO 封装分佣、返点信息
-		return busSupplierService.saveSupplierInfo(baseDTO, detailDTO);
+	public AjaxResponse saveSupplier(@Validated BusSupplierBaseDTO baseDTO, @Validated BusSupplierDetailDTO detailDTO,
+			@Validated BusSupplierCommissionInfoDTO commissionDTO, @Validated List<BusSupplierProrateDTO> prorateList,
+			@Validated List<BusSupplierRebateDTO> rebateList) {
+		return busSupplierService.saveSupplierInfo(baseDTO, detailDTO, commissionDTO, prorateList, rebateList);
 	}
 
 	/**
@@ -86,7 +91,7 @@ public class BusSupplierController {
 	@SuppressWarnings("resource")
 	@RequestMapping(value = "/querySupplierPageList")
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
-	public AjaxResponse querySupplierPageList(BusSupplierQueryDTO queryDTO) {
+	public AjaxResponse querySupplierPageList(@Validated BusSupplierQueryDTO queryDTO) {
 		Integer pageNum = queryDTO.getPageNum();
 		Integer pageSize = queryDTO.getPageSize();
 
@@ -144,7 +149,7 @@ public class BusSupplierController {
 	 */
 	@SuppressWarnings("resource")
 	@RequestMapping(value = "/exportSupplierList")
-	public void exportSupplierList(BusSupplierQueryDTO queryDTO, HttpServletRequest request,
+	public void exportSupplierList(@Validated BusSupplierQueryDTO queryDTO, HttpServletRequest request,
 			HttpServletResponse response) {
         long start = System.currentTimeMillis(); // 获取开始时间
 		try {
