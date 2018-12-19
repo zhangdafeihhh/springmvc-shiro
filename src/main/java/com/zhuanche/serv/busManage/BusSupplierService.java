@@ -519,4 +519,5 @@ public class BusSupplierService implements BusConst {
 		param.put("supplierIds",supplierIds);
 		return busBizSupplierDetailExMapper.querySettleInfoByIds(param);
 	}
+
 }

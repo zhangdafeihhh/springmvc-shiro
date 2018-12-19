@@ -1,12 +1,22 @@
 package com.zhuanche.controller.busManage;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.entity.mdbcarmanage.BusBizSupplierDetail;
+import com.zhuanche.dto.busManage.BusSettlementAmendmentDTO;
+import com.zhuanche.dto.busManage.BusSupplierSettleListDTO;
+import com.zhuanche.entity.rentcar.CarBizSupplier;
+import com.zhuanche.serv.CarBizSupplierService;
+import com.zhuanche.serv.busManage.BusCommonService;
+import com.zhuanche.serv.busManage.BusSettlementAdviceService;
 import com.zhuanche.serv.busManage.BusSupplierService;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtil;
 import com.zhuanche.vo.busManage.BusSupplierInfoVO;
 import com.zhuanche.vo.busManage.BusSupplierSettleDetailVO;
@@ -16,19 +26,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
-import com.zhuanche.common.database.MasterSlaveConfig;
-import com.zhuanche.common.database.MasterSlaveConfigs;
-import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.dto.busManage.BusSupplierSettleListDTO;
-import com.zhuanche.serv.busManage.BusCommonService;
-import com.zhuanche.serv.busManage.BusSettlementAdviceService;
-import com.zhuanche.shiro.realm.SSOLoginUser;
-import com.zhuanche.shiro.session.WebSessionUtil;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName: BusSettlementAdviceController
@@ -42,6 +44,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 public class BusSettlementAdviceController {
 
     private static final Logger logger = LoggerFactory.getLogger(BusSettlementAdviceController.class);
+    private static final String LOG_PRE="【供应商分佣结算单管理】";
 
     @Autowired
     private BusCommonService busCommonService;
@@ -52,9 +55,12 @@ public class BusSettlementAdviceController {
     @Autowired
     private BusSupplierService busSupplierService;
 
+    @Autowired
+    private CarBizSupplierService supplierService;
+
 
     /**
-     * 查询供应商分佣订单明细 TODO 等计费完成接口完善
+     * 查询供应商账单列表 TODO 等计费完成接口完善
      *
      * @param dto
      * @return
@@ -87,7 +93,7 @@ public class BusSettlementAdviceController {
         }
         JSONObject result = busSettlementAdviceService.querySettleDetailList(dto);
         Integer code = result.getInteger("code");
-        if (0 != code) {
+        if (code ==null||0 != code) {
             return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "查询失败，请联系管理员");
         }
         JSONArray data = result.getJSONArray("data");
@@ -105,8 +111,10 @@ public class BusSettlementAdviceController {
             BusSupplierSettleDetailVO detail = JSONObject.toJavaObject(o, BusSupplierSettleDetailVO.class);
             Date startTime = new Date(o.getLong("startTime"));
             Date endTime = new Date(o.getLong("endTime"));
+            Date settleTime = new Date(o.getLong("settleTime"));
             detail.setStartTime(DateUtil.getTimeString(startTime));
             detail.setEndTime(DateUtil.getTimeString(endTime));
+            detail.setSettleTime(DateUtil.getTimeString(settleTime));
             return detail;
         }).map(o -> {
             return buidSettleDetailVO(o, supplierInfoMap);
@@ -136,4 +144,55 @@ public class BusSettlementAdviceController {
         dto.setAuthOfCity(authCity);
         dto.setAuthOfSupplier(authSupper);
     }
+
+    @RequestMapping(value = "/transactions/save",method = RequestMethod.POST)
+    @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
+    public AjaxResponse orderRevision(BusSettlementAmendmentDTO dto){
+        logger.info(LOG_PRE+"修改订单记录,参数="+JSON.toJSONString(dto));
+        CarBizSupplier supplier = supplierService.selectByPrimaryKey(dto.getSupplierId());
+        Map<String,Object> param = new HashMap(16);
+        param.put("supplierBillId",dto.getSupplierBillId());
+        param.put("addMoney",dto.getAddMoney());
+        param.put("type",6);
+        param.put("orderNo",dto.getOrderNo());
+        param.put("phone",supplier.getContactsPhone());
+        param.put("cityCode",supplier.getSupplierCity());
+        JSONObject otherInfo = new JSONObject();
+        otherInfo.put("reasonCode",dto.getReasonCode());
+        otherInfo.put("reason",EnumUpdateReason.getReason(dto.getReasonCode()));
+        otherInfo.put("settleWay",dto.getSettleWay());
+        otherInfo.put("desc",dto.getDesc()==null?"":dto.getDesc());
+        param.put("otherInfo",otherInfo);
+        JSONObject result = busSettlementAdviceService.updateSupplierBill(param);
+        Integer code = result.getInteger("code");
+        if (code==null||0 != code) {
+            logger.error(LOG_PRE+"修改账单失败="+result.getString("msg"));
+            return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "修改账单失败");
+        }
+        return AjaxResponse.success(new ArrayList());
+    }
+
+
+
+    public enum EnumUpdateReason{
+        ORDER_PROBLEM(0,"订单问题"),
+        SUPPLEMENT_COST(1,"补录费用");
+        EnumUpdateReason(int code, String reason) {
+            this.code = code;
+            this.reason = reason;
+        }
+
+        private int code;
+        private String reason;
+
+        public static String getReason(int code){
+            for (EnumUpdateReason r:EnumUpdateReason.values()) {
+                if(r.code==code){
+                    return r.reason;
+                }
+            }
+            return StringUtils.EMPTY;
+        }
+    }
+
 }

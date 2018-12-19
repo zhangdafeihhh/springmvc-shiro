@@ -1,7 +1,5 @@
 package com.zhuanche.vo.busManage;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.math.BigDecimal;
 
 /**
@@ -42,15 +40,11 @@ public class BusSupplierSettleDetailVO {
     /**
      * 到期付款日期
      */
-    private String aaa;//TODO
-    /**
-     * 订单金额
-     */
-    private BigDecimal billAmount;
+    private String settleTime;
     /**
      * 结算金额
      */
-    private BigDecimal bbb;//TODO
+    private BigDecimal billAmount;
 
     /**
      * 结算类型
@@ -125,12 +119,12 @@ public class BusSupplierSettleDetailVO {
         this.endTime = endTime;
     }
 
-    public String getAaa() {
-        return aaa;
+    public String getSettleTime() {
+        return settleTime;
     }
 
-    public void setAaa(String aaa) {
-        this.aaa = aaa;
+    public void setSettleTime(String settleTime) {
+        this.settleTime = settleTime;
     }
 
     public BigDecimal getBillAmount() {

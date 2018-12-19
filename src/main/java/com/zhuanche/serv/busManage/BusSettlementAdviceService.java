@@ -57,5 +57,9 @@ public class BusSettlementAdviceService implements BusConst {
         return result;
     }
 
+    public JSONObject updateSupplierBill(Map<String,Object> param){
+        JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLT_SUPPLIER_BILL_LISET, param, 2000, "查供应商分佣账单列表");
+        return result;
+    }
 
 }

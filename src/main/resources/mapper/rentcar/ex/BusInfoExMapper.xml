@@ -103,6 +103,9 @@
         <if test="licensePlates !=null and licensePlates !=''">
             and info.license_plates like "%"#{licensePlates}"%"
         </if>
+        <if test="groupId !=null">
+           and info.group_id=#{groupId}
+        </if>
     </select>
     <select id="selectCarByCarId" parameterType="java.lang.Integer" resultMap="DetailVOMap">
        SELECT
