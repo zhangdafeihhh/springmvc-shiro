@@ -1,5 +1,22 @@
 package com.zhuanche.serv.busManage;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -9,36 +26,39 @@ import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.constants.BusConst;
-import com.zhuanche.dto.busManage.*;
+import com.zhuanche.dto.busManage.BusCarDTO;
+import com.zhuanche.dto.busManage.BusCarRicherDTO;
+import com.zhuanche.dto.busManage.BusDriverDTO;
+import com.zhuanche.dto.busManage.BusDriverRicherDTO;
+import com.zhuanche.dto.busManage.BusOrderDTO;
 import com.zhuanche.entity.rentcar.CarBizCustomerAppraisal;
 import com.zhuanche.entity.rentcar.CarBizCustomerAppraisalStatistics;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
+import com.zhuanche.entity.rentcar.CarBizService;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.mongo.DriverMongo;
 import com.zhuanche.serv.mongo.BusDriverMongoService;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.*;
+import com.zhuanche.util.BeanUtil;
+import com.zhuanche.util.Common;
+import com.zhuanche.util.MapUrlParamUtils;
+import com.zhuanche.util.MyRestTemplate;
+import com.zhuanche.util.SignUtils;
 import com.zhuanche.vo.busManage.BusOrderVO;
+
+import mapper.rentcar.CarBizServiceMapper;
 import mapper.rentcar.ex.BusCarBizDriverInfoExMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service("busAssignmentService")
 public class BusAssignmentService {
 	
 	private static final Logger logger = LoggerFactory.getLogger(BusAssignmentService.class);
+	
+	@Autowired
+	private CarBizServiceMapper carBizServiceMapper;
 	
 	@Autowired
 	private CarBizCarInfoExMapper carBizCarInfoExMapper;
@@ -50,13 +70,13 @@ public class BusAssignmentService {
 	private CarBizCarGroupExMapper carBizCarGroupExMapper;
 	
 	@Autowired
+	private BusCarBizDriverInfoExMapper busCarBizDriverInfoExMapper;
+	
+	@Autowired
 	private BusCarBizCustomerAppraisalService busCarBizCustomerAppraisalService;
 	
 	@Autowired
 	private BusCarBizCustomerAppraisalStatisticsService busCarBizCustomerAppraisalStatisticsService;
-	
-	@Autowired
-	private BusCarBizDriverInfoExMapper busCarBizDriverInfoExMapper;
 	
 	@Autowired
 	private BusDriverMongoService busDriverMongoService;
@@ -184,6 +204,14 @@ public class BusAssignmentService {
 					// c)预约车别类型
 					if (StringUtils.isNotBlank(order.getBookingGroupid())) {
 						order.setBookingGroupName(carBizCarGroupExMapper.getGroupNameByGroupId(Integer.valueOf(order.getBookingGroupid())));
+					}
+					
+					// d)订单类型名称
+					if (order.getServiceTypeId() != null) {
+						CarBizService service = carBizServiceMapper.selectByPrimaryKey(order.getServiceTypeId());
+						if (service != null) {
+							order.setServiceTypeName(service.getServiceName());
+						}
 					}
 				});
 				// d)预估里程
