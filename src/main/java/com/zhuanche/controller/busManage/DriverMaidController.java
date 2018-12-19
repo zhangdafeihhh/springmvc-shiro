@@ -11,6 +11,7 @@ import com.zhuanche.common.rpc.HttpParamSignGenerator;
 import com.zhuanche.common.rpc.RPCAPI;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.constants.busManage.BusConstant;
 import com.zhuanche.constants.busManage.BusConstant.DriverMaidConstant;
 import com.zhuanche.dto.busManage.BusDriverMaidDTO;
 import com.zhuanche.dto.busManage.WithdrawalsRecordDTO;
@@ -69,10 +70,7 @@ public class DriverMaidController {
      * httpclient 读取超时时间
      **/
     private static final Integer READ_TIMEOUT = 30000;
-    /**
-     * 导出订单时每页查询的条数
-     */
-    private static int EXPORT_PAGE_SIZE = 1000;
+
     /**
      * 代表巴士司机业务类型(巴士司机分佣)
      */
@@ -302,7 +300,7 @@ public class DriverMaidController {
         long start = System.currentTimeMillis();
         logger.info(LOG_PRE + "导出分佣明细参数=" + JSON.toJSONString(dto));
         //构建文件名称
-        String fileName = buidFileName(request, DriverMaidConstant.MAID_FILE_NAME);
+        String fileName = BusConstant.buidFileName(request, DriverMaidConstant.MAID_FILE_NAME);
         //构建文件标题
         List<String> headerList = new ArrayList<>();
         headerList.add(DriverMaidConstant.MAID_EXPORT_HEAD);
@@ -314,7 +312,7 @@ public class DriverMaidController {
             pageNum++;
             dto.setPageNum(pageNum);
             Map<String, Object> param = buidMaidParam(dto);
-            dto.setPageSize(EXPORT_PAGE_SIZE);
+            dto.setPageSize(BusConstant.EXPORT_PAGE_SIZE);
             buidNecessaryParam(param, dto.getPageNum(), dto.getPageSize());
             JSONObject data = parseResult(MAID_LIST_URL, param);
             if (data == null || data.getLong("total") == null || data.getLong("total") == 0) {
@@ -364,7 +362,7 @@ public class DriverMaidController {
         Map<String, Object> param = new HashedMap();
         CsvUtils utilEntity = new CsvUtils();
         //构建文件名称
-        String fileName = buidFileName(request, DriverMaidConstant.DRAW_FILE_NAME);
+        String fileName = BusConstant.buidFileName(request, DriverMaidConstant.DRAW_FILE_NAME);
         //构建文件标题
         List<String> headerList = new ArrayList<>();
         headerList.add(DriverMaidConstant.DRAW_EXPORT_HEAD);
@@ -385,7 +383,7 @@ public class DriverMaidController {
         do {
             pageNum++;
             dto.setPageNum(pageNum);
-            buidNecessaryParam(param, pageNum, EXPORT_PAGE_SIZE);
+            buidNecessaryParam(param, pageNum, BusConstant.EXPORT_PAGE_SIZE);
             JSONObject data = parseResult(WITHDRAWALS_LIST_ULR, param);
             if (data == null || data.getLong("total") == null || data.getLong("total") == 0) {
                 List<String> csvDataList = new ArrayList<>();
@@ -433,7 +431,7 @@ public class DriverMaidController {
         Map<String, Object> param = new HashedMap();
         CsvUtils utilEntity = new CsvUtils();
         //构建文件名称
-        String fileName = buidFileName(request, DriverMaidConstant.ACCOUNT_FILE_NAME);
+        String fileName = BusConstant.buidFileName(request, DriverMaidConstant.ACCOUNT_FILE_NAME);
         //构建文件标题
         List<String> headerList = new ArrayList<>();
         headerList.add(DriverMaidConstant.ACCOUNT_EXPORT_HEAD);
@@ -459,7 +457,7 @@ public class DriverMaidController {
         do {
             pageNum++;
             dto.setPageNum(pageNum);
-            buidNecessaryParam(param, pageNum, EXPORT_PAGE_SIZE);
+            buidNecessaryParam(param, pageNum, BusConstant.EXPORT_PAGE_SIZE);
             JSONObject data = parseResult(ACCOUNT_BALANCE_URL, param);
             if (data == null || data.getLong("total") == null || data.getLong("total") == 0) {
                 List<String> csvDataList = new ArrayList<>();
@@ -491,18 +489,7 @@ public class DriverMaidController {
     }
 
 
-    public  String buidFileName (HttpServletRequest request,String name) throws UnsupportedEncodingException {
-        String fileName = name + com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), DateUtil.intTimestampPattern) + ".csv";
-        //获得浏览器信息并转换为大写
-        String agent = request.getHeader("User-Agent").toUpperCase();
-        //IE浏览器和Edge浏览器
-        if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO") > 0 && agent.indexOf("RV:11") > 0)) {
-            fileName = URLEncoder.encode(fileName, "UTF-8");
-        } else {  //其他浏览器
-            fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
-        }
-        return fileName;
-    }
+
 
     /**
      * 根据分佣接口返回的cityCode查询城市

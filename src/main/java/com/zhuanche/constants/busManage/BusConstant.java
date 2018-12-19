@@ -1,5 +1,12 @@
 package com.zhuanche.constants.busManage;
 
+import com.zhuanche.util.dateUtil.DateUtil;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.Date;
+
 /**
  * @program: mp-manage
  * @description: 巴士涉及的部分常量
@@ -7,6 +14,10 @@ package com.zhuanche.constants.busManage;
  * @create: 2018-11-27 11:48
  **/
 public class BusConstant {
+    /**
+     * 导出订单时每页查询的条数
+     */
+    public static int EXPORT_PAGE_SIZE = 1000;
     public interface CarConstant{
         String FILE_NAME="巴士信息";
         String EXPORT_HEAD="车牌号,城市,供应商,车型类别,具体车型,是否有效,创建时间";
@@ -20,9 +31,10 @@ public class BusConstant {
         String ACCOUNT_FILE_NAME="账户余额";
         String ACCOUNT_EXPORT_HEAD="账户名称,手机号,城市名称,可提现金额,冻结金额,累计提现";
     }
-
-
-
+    public interface SupplierMaidConstant{
+        String BILL_FILE_NAME="供应商账单列表";
+        String BILL_EXPORT_HEAD="供应商编号,供应商名称,城市,业务类型,账单编号,账单开始日期,账单结束日期,到期付款日期,账单金额,付款方式,分佣方式,分佣类型,账单状态";
+    }
 
     /**
      * 巴士车辆保存某些字段的默认值(经过产品确认)
@@ -117,4 +129,19 @@ public class BusConstant {
         /*VIN码*/
         String vehicle_VIN_code = "LA9LA2E3XFBBFC272";
     }
+
+    //写一些共有的静态方法
+    public static String buidFileName (HttpServletRequest request, String name) throws UnsupportedEncodingException {
+        String fileName = name + com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), DateUtil.intTimestampPattern) + ".csv";
+        //获得浏览器信息并转换为大写
+        String agent = request.getHeader("User-Agent").toUpperCase();
+        //IE浏览器和Edge浏览器
+        if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO") > 0 && agent.indexOf("RV:11") > 0)) {
+            fileName = URLEncoder.encode(fileName, "UTF-8");
+        } else {  //其他浏览器
+            fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+        }
+        return fileName;
+    }
+
 }

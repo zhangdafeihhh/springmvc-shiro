@@ -168,4 +168,15 @@ public class BusSupplierSettleDetailVO {
         this.status = status;
     }
 
+    @Override
+    public String toString() {
+        //String BILL_EXPORT_HEAD="供应商编号,供应商名称,城市,业务类型,账单编号,账单开始日期,账单结束日期,到期付款日期,账单金额,付款方式,分佣方式,分佣类型,账单状态";
+        String split=",";
+        StringBuffer sb = new StringBuffer();
+        sb.append(supplierId).append(split).append(supplierName).append(split).append(cityName).append(split)
+                .append("巴士").append(split).append(supplierBillId).append(split).append(startTime).append(split)
+                .append(endTime).append(split).append(settleTime).append(split).append(billAmount).append(split)
+                .append(settleType).append(split).append(shareWay).append(split).append(status);
+        return sb.toString();
+    }
 }

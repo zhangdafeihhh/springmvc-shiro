@@ -90,7 +90,7 @@ public interface BusConst {
 		/**
 		 * 结算单或者账单信息修改
 		 */
-		String SETTLT_SUPPLIER_BILL_LISET="/settle/supplier/bill/list";
+		String SETTLT_SUPPLIER_BILL_UPDATE="/settle/supplier/bill/update";
 	}
 
 	/**
