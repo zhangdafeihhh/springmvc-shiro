@@ -1,25 +1,16 @@
 package com.zhuanche.controller.busManage;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
-import com.zhuanche.common.database.MasterSlaveConfig;
-import com.zhuanche.common.database.MasterSlaveConfigs;
-import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.dto.busManage.BusSettlementAmendmentDTO;
-import com.zhuanche.dto.busManage.BusSupplierSettleListDTO;
-import com.zhuanche.entity.rentcar.CarBizSupplier;
-import com.zhuanche.serv.CarBizSupplierService;
-import com.zhuanche.serv.busManage.BusCommonService;
-import com.zhuanche.serv.busManage.BusSettlementAdviceService;
-import com.zhuanche.serv.busManage.BusSupplierService;
-import com.zhuanche.shiro.realm.SSOLoginUser;
-import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.DateUtil;
-import com.zhuanche.vo.busManage.BusSupplierInfoVO;
-import com.zhuanche.vo.busManage.BusSupplierSettleDetailVO;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.validation.constraints.NotBlank;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +20,30 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.dto.busManage.BusSettlementAmendmentDTO;
+import com.zhuanche.dto.busManage.BusSettlementInvoiceDTO;
+import com.zhuanche.dto.busManage.BusSettlementPaymentDTO;
+import com.zhuanche.dto.busManage.BusSupplierSettleListDTO;
+import com.zhuanche.entity.rentcar.CarBizSupplier;
+import com.zhuanche.serv.CarBizSupplierService;
+import com.zhuanche.serv.busManage.BusCommonService;
+import com.zhuanche.serv.busManage.BusSettlementAdviceService;
+import com.zhuanche.serv.busManage.BusSupplierService;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.DateUtil;
+import com.zhuanche.vo.busManage.BusSettlementInvoiceVO;
+import com.zhuanche.vo.busManage.BusSettlementPaymentVO;
+import com.zhuanche.vo.busManage.BusSupplierInfoVO;
+import com.zhuanche.vo.busManage.BusSupplierSettleDetailVO;
 
 /**
  * @ClassName: BusSettlementAdviceController
@@ -194,5 +207,66 @@ public class BusSettlementAdviceController {
             return StringUtils.EMPTY;
         }
     }
+    
+	/**
+	 * @Title: confirm
+	 * @Description: 结算单确认
+	 * @param supplierBillId
+	 * @return AjaxResponse
+	 * @throws
+	 */
+	@RequestMapping(value = "/confirm")
+	public AjaxResponse confirm(@NotBlank(message = "账单编号不能为空") String supplierBillId) {
+		return busSettlementAdviceService.confirm(supplierBillId);
+	}
+
+    /**
+     * @Title: invoiceInit
+     * @Description: 结算单确认收票窗口查询
+     * @return AjaxResponse
+     * @throws
+     */
+	@RequestMapping(value = "/invoice/init")
+	public AjaxResponse invoiceInit(@NotBlank(message = "账单编号不能为空") String supplierBillId) {
+		BusSettlementInvoiceVO invoice = busSettlementAdviceService.queryInvoiceInfo(supplierBillId);
+		return AjaxResponse.success(invoice);
+	}
+	
+	/**
+	 * @Title: invoiceSave
+	 * @Description: 结算单确认收票窗口保存
+	 * @param invoiceDTO
+	 * @return AjaxResponse
+	 * @throws
+	 */
+	@RequestMapping(value = "/invoice/save")
+	public AjaxResponse invoiceSave(@Validated BusSettlementInvoiceDTO invoiceDTO) {
+		return busSettlementAdviceService.saveInvoiceInfo(invoiceDTO);
+	}
+	
+	/**
+	 * @Title: paymentInit
+	 * @Description: 结算单确认收款窗口查询
+	 * @param supplierBillId
+	 * @return AjaxResponse
+	 * @throws
+	 */
+	@RequestMapping(value = "/payment/init")
+	public AjaxResponse paymentInit(@NotBlank(message = "账单编号不能为空") String supplierBillId) {
+		BusSettlementPaymentVO payment = busSettlementAdviceService.queryPaymentInfo(supplierBillId);
+		return AjaxResponse.success(payment);
+	}
+	
+	/**
+	 * @Title: paymentSave
+	 * @Description: 结算单确认收款窗口保存
+	 * @param invoiceDTO
+	 * @return AjaxResponse
+	 * @throws
+	 */
+	@RequestMapping(value = "/payment/save")
+	public AjaxResponse paymentSave(@Validated BusSettlementPaymentDTO paymentDTO) {
+		return busSettlementAdviceService.savePaymentInfo(paymentDTO);
+	}
 
 }

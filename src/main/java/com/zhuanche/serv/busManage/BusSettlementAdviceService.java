@@ -3,20 +3,31 @@ package com.zhuanche.serv.busManage;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constants.BusConst;
+import com.zhuanche.dto.busManage.BusSettlementInvoiceDTO;
+import com.zhuanche.dto.busManage.BusSettlementPaymentDTO;
 import com.zhuanche.dto.busManage.BusSupplierSettleListDTO;
+import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.http.MpOkHttpUtil;
+import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.vo.busManage.BusSettlementInvoiceVO;
+import com.zhuanche.vo.busManage.BusSettlementPaymentVO;
+
+import mapper.rentcar.CarBizSupplierMapper;
 
 /**
  * @ClassName: BusCommonService
@@ -27,12 +38,15 @@ import com.zhuanche.http.MpOkHttpUtil;
 @Service
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class BusSettlementAdviceService implements BusConst {
+	
+	private static final Logger logger = LoggerFactory.getLogger(BusSettlementAdviceService.class);
+	private final static String LOG_PRE = "【供应商分佣结算单】";
 
-    private static final Logger logger = LoggerFactory.getLogger(BusSettlementAdviceService.class);
-    private final static String LOG_PRE="【供应商分佣结算单】";
+	@Autowired
+	private CarBizSupplierMapper carBizSupplierMapper;
 
-    @Value("${order.pay.url}")
-    private String orderPayUrl;
+	@Value("${order.pay.url}")
+	private String orderPayUrl;
 
     public JSONObject querySettleDetailList(BusSupplierSettleListDTO dto) {
         Map<String, Object> params = new HashMap<>(16);
@@ -61,5 +75,233 @@ public class BusSettlementAdviceService implements BusConst {
         JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLT_SUPPLIER_BILL_LISET, param, 2000, "查供应商分佣账单列表");
         return result;
     }
+
+    /**
+     * @Title: confirmSettle
+     * @Description: 结算单确认
+     * @param supplierBillId
+     * @return AjaxResponse
+     * @throws
+     */
+    public AjaxResponse confirm(String supplierBillId) {
+    	String errorMsg = confirmSettle(supplierBillId);
+		if (StringUtils.isNotBlank(errorMsg)) {
+			return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, errorMsg);
+		}
+		return AjaxResponse.success(null);
+	}
+
+	/**
+	 * @Title: queryInvoiceInfo
+	 * @Description: 结算单确认收票窗口查询
+	 * @param supplierBillId
+	 * @return BusSettlementInvoiceVO
+	 * @throws
+	 */
+	public BusSettlementInvoiceVO queryInvoiceInfo(String supplierBillId) {
+		// 查询账单信息
+		JSONObject billDetail = getBillDetail(supplierBillId);
+		if (billDetail == null) {
+			return null;
+		}
+		BusSettlementInvoiceVO invoiceVO = JSON.toJavaObject(billDetail, BusSettlementInvoiceVO.class);
+		
+		// 补充信息
+		// 供应商名称
+		if (invoiceVO != null) {
+			Integer supplierId = billDetail.getInteger("supplierId");
+			if (supplierId != null) {
+				CarBizSupplier supplier = carBizSupplierMapper.selectByPrimaryKey(supplierId);
+				if (supplier != null) {
+					invoiceVO.setSupplierName(supplier.getSupplierFullName());
+				}
+			}
+		}
+		
+		return invoiceVO;
+	}
+	
+	/**
+	 * @Title: saveInvoiceInfo
+	 * @Description: 结算单确认收票窗口保存
+	 * @param invoiceDTO
+	 * @return AjaxResponse
+	 * @throws
+	 */
+	public AjaxResponse saveInvoiceInfo(BusSettlementInvoiceDTO invoiceDTO) {
+		String errorMsg = confirmInvoice(invoiceDTO);
+		if (StringUtils.isNotBlank(errorMsg)) {
+			return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, errorMsg);
+		}
+		return AjaxResponse.success(null);
+	}
+	
+	/**
+	 * @Title: queryPaymentInfo
+	 * @Description: 结算单确认收款窗口查询
+	 * @param supplierBillId
+	 * @return BusSettlementPaymentVO
+	 * @throws
+	 */
+	public BusSettlementPaymentVO queryPaymentInfo(String supplierBillId) {
+		// 查询账单信息
+		JSONObject billDetail = getBillDetail(supplierBillId);
+		if (billDetail == null) {
+			return null;
+		}
+		BusSettlementPaymentVO paymentVO = JSON.toJavaObject(billDetail, BusSettlementPaymentVO.class);
+		
+		// 补充信息
+		// 供应商名称
+		if (paymentVO != null) {
+			Integer supplierId = billDetail.getInteger("supplierId");
+			if (supplierId != null) {
+				CarBizSupplier supplier = carBizSupplierMapper.selectByPrimaryKey(supplierId);
+				if (supplier != null) {
+					paymentVO.setSupplierName(supplier.getSupplierFullName());
+				}
+			}
+		}
+		
+		return paymentVO;
+	}
+	
+	/**
+	 * @Title: savePaymentInfo
+	 * @Description: 结算单确认收款窗口保存
+	 * @param paymentDTO
+	 * @return AjaxResponse
+	 * @throws
+	 */
+	public AjaxResponse savePaymentInfo(BusSettlementPaymentDTO paymentDTO) {
+		String errorMsg = confirmPay(paymentDTO);
+		if (StringUtils.isNotBlank(errorMsg)) {
+			return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, errorMsg);
+		}
+		return AjaxResponse.success(null);
+	}
+
+	/**
+	 * @Title: confirmSettle
+	 * @Description: 供应商账单确认结算
+	 * @param paymentDTO
+	 * @return String
+	 * @throws
+	 */
+	public String confirmSettle(String supplierBillId) {
+		if (StringUtils.isNotBlank(supplierBillId)) {
+			// 请求参数
+			Map<String,Object> params = new HashMap<>();
+			params.put("supplierBillId", supplierBillId);
+			params.put("settleName", WebSessionUtil.getCurrentLoginUser().getName());// 结算人
+			
+			try {
+				logger.info("[ BusSettlementAdviceService-confirmSettle ] 供应商账单确认结算,params={}", params);
+				JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_SUPPLIER_BILL_CONFIRM_SETTLE, params , 2000, "供应商账单确认结算");
+				if (result.getIntValue("code") != 0) {
+					String errorMsg = result.getString("msg");
+					logger.info("[ BusSettlementAdviceService-confirmSettle ] 供应商账单确认结算调用接口出错,params={},errorMsg={}", params, errorMsg);
+					return errorMsg;
+				}
+			} catch (Exception e) {
+				logger.error("[ BusSettlementAdviceService-confirmSettle ] 供应商账单确认结算异常,params={},errorMsg={}", params, e.getMessage(), e);
+				return "供应商账单确认开票异常";
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @Title: getBillDetail
+	 * @Description: 供应商账单查询根据账单id
+	 * @param supplierBillId
+	 * @return JSONObject
+	 * @throws
+	 */
+	public JSONObject getBillDetail(String supplierBillId) {
+		if (StringUtils.isNotBlank(supplierBillId)) {
+			Map<String, Object> params = new HashMap<>();
+			params.put("supplierBillId", supplierBillId);
+			try {
+				logger.info("[ BusSettlementAdviceService-getBillDetail ] 供应商账单查询根据账单id,params={}", params);
+				JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_SUPPLIER_BILL_DETAIL, params , 2000, "供应商账单查询根据账单id");
+				if (result.getIntValue("code") == 0) {
+					JSONObject jsonArray = result.getJSONObject("data");
+					return jsonArray;
+				} else {
+					logger.info("[ BusSettlementAdviceService-getBillDetail ] 供应商账单查询根据账单id调用接口出错,params={},errorMsg={}", params, result.getString("msg"));
+				}
+			} catch (Exception e) {
+				logger.error("[ BusSettlementAdviceService-getBillDetail ] 供应商账单查询根据账单id异常,params={},errorMsg={}", params, e.getMessage(), e);
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * @Title: getBillDetail
+	 * @Description: 供应商账单确认开票
+	 * @param supplierBillId
+	 * @return JSONObject
+	 * @throws
+	 */
+	public String confirmInvoice(BusSettlementInvoiceDTO invoiceDTO) {
+		if (invoiceDTO != null) {
+			// 开票人
+			invoiceDTO.setInvoiceName(WebSessionUtil.getCurrentLoginUser().getName());
+			
+			// 请求参数
+			String jsonString = JSON.toJSONStringWithDateFormat(invoiceDTO, JSON.DEFFAULT_DATE_FORMAT, new SerializerFeature[0]);
+			JSONObject json = (JSONObject) JSONObject.parse(jsonString);
+			Map<String, Object> params = json.getInnerMap();
+			
+			try {
+				logger.info("[ BusSettlementAdviceService-confirmInvoice ] 供应商账单确认开票,params={}", params);
+				JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_SUPPLIER_BILL_CONFIRM_INVOICE, params , 2000, "供应商账单确认开票");
+				if (result.getIntValue("code") != 0) {
+					String errorMsg = result.getString("msg");
+					logger.info("[ BusSettlementAdviceService-confirmInvoice ] 供应商账单确认开票调用接口出错,params={},errorMsg={}", params, errorMsg);
+					return errorMsg;
+				}
+			} catch (Exception e) {
+				logger.error("[ BusSettlementAdviceService-confirmInvoice ] 供应商账单确认开票异常,params={},errorMsg={}", params, e.getMessage(), e);
+				return "供应商账单确认开票异常";
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * @Title: confirmPay
+	 * @Description: 供应商账单确认收款
+	 * @param invoiceDTO
+	 * @return String
+	 * @throws
+	 */
+	public String confirmPay(BusSettlementPaymentDTO paymentDTO) {
+		if (paymentDTO != null) {
+			// 开票人
+			paymentDTO.setPayName(WebSessionUtil.getCurrentLoginUser().getName());
+			
+			// 请求参数
+			String jsonString = JSON.toJSONStringWithDateFormat(paymentDTO, JSON.DEFFAULT_DATE_FORMAT, new SerializerFeature[0]);
+			JSONObject json = (JSONObject) JSONObject.parse(jsonString);
+			Map<String, Object> params = json.getInnerMap();
+			
+			try {
+				logger.info("[ BusSettlementAdviceService-confirmPay ] 供应商账单确认打款,params={}", params);
+				JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_SUPPLIER_BILL_CONFIRM_PAY, params , 2000, "供应商账单确认打款");
+				if (result.getIntValue("code") != 0) {
+					String errorMsg = result.getString("msg");
+					logger.info("[ BusSettlementAdviceService-confirmPay ] 供应商账单确认打款调用接口出错,params={},errorMsg={}", params, errorMsg);
+					return errorMsg;
+				}
+			} catch (Exception e) {
+				logger.error("[ BusSettlementAdviceService-confirmPay ] 供应商账单确认打款异常,params={},errorMsg={}", params, e.getMessage(), e);
+				return "供应商账单确认开票异常";
+			}
+		}
+		return null;
+	}
 
 }
