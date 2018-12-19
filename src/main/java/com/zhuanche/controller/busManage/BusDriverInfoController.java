@@ -436,7 +436,7 @@ public class BusDriverInfoController extends BusBaseController {
 	public AjaxResponse batchInputDriverInfo(@NotNull(message = "请选择城市") Integer cityId,
 			@NotNull(message = "请选择供应商") Integer supplierId, MultipartFile file, HttpServletRequest request,
 			HttpServletResponse response) {
-        if (file.isEmpty()) {
+        if (file == null || file.isEmpty()) {
             logger.info("file is empty!");
             return AjaxResponse.fail(RestErrorCode.FILE_ERROR);
         }

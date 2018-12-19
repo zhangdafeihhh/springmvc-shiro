@@ -27,9 +27,9 @@
 		WHERE
 			business_type = #{businessType}
 		AND business_key = #{businessKey}
+		AND build_time <![CDATA[>=]]> #{startDate}
 		ORDER BY
 			id DESC
-		LIMIT 15
 	</select>
 
 	<!-- 保存操作记录 -->

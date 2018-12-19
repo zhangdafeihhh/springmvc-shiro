@@ -1,5 +1,8 @@
 package com.zhuanche.controller.busManage;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -50,7 +53,8 @@ public class BusCommonController {
 		}
 		
 		// 二、查询日志
-		List<Map<Object,Object>> logs = busCommonService.queryChangeLogs(businessType, businessKey);
+		Date now = Date.from(LocalDate.now().plusWeeks(-1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+		List<Map<Object,Object>> logs = busCommonService.queryChangeLogs(businessType, businessKey, now);
 		return AjaxResponse.success(logs);
 	}
 
