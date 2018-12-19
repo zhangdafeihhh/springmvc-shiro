@@ -27,10 +27,8 @@ public class BusInfoDTO extends BaseDTO{
     /**状态 0无效，1有效，2逻辑删除，3三方车辆数据*/
     private Integer status;
     /**创建时间（开始）*/
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createDateStart;
+    private String createDateStart;
     /**创建时间（结束）*/
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createDateEnd;
+    private String createDateEnd;
 
 }

@@ -285,7 +285,7 @@ public class BusInfoController {
             StringBuffer sb = new StringBuffer();
             sb.append(info.getLicensePlates()).append(",").append(info.getCityName()).append(",").append(info.getSupplierName()).append(",")
                     .append(info.getGroupName()).append(",").append(info.getModelDetail()).append(",").append((info.getStatus() != null && info.getStatus() == 1) ? "有效" : "无效")
-                    .append(",").append(info.getCreateDate() != null ? info.getCreateDate() : "");
+                    .append(",").append(info.getCreateDate() != null ? DateUtils.formatDateTime((info.getCreateDate())): "");
             csvData.add(sb.toString());
         }
     }
@@ -320,13 +320,16 @@ public class BusInfoController {
      * @return: com.zhuanche.common.web.AjaxResponse
      * @Date: 2018/11/28
      */
-    @RequestMapping("/importBusInfo")
+    @RequestMapping(value = "/importBusInfo",method = RequestMethod.POST)
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
-    public AjaxResponse importBusInfo(@Verify(param = "cityId", rule = "request") Integer cityId,
-                                      @Verify(param = "supplierId", rule = "request") Integer supplierId,
+    public AjaxResponse importBusInfo( Integer cityId,
+                                       Integer supplierId,
                                       MultipartFile file) throws Exception {
+        if (file.isEmpty()||cityId == null||supplierId==null) {
+            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID,"有参数为空");
+        }
         String supplierName = supplierService.getSupplierNameById(supplierId);
         if (StringUtils.isBlank(supplierName)) {
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "供应商不存在");
@@ -335,10 +338,7 @@ public class BusInfoController {
         if (StringUtils.isBlank(cityName)) {
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "城市不存在");
         }
-        if (file.isEmpty()) {
-            logger.error(LOG_PRE+"巴士导入车辆文件为空");
-            return AjaxResponse.fail(RestErrorCode.FILE_ERROR);
-        }
+
         String fileName = file.getOriginalFilename();
         String suffixName = fileName.substring(fileName.lastIndexOf("."));
         logger.info(LOG_PRE+"上传的文件名为:{},上传的后缀名为:{}", fileName, suffixName);

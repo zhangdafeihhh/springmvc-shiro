@@ -1,8 +1,10 @@
 package com.zhuanche.vo.busManage;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @program: mp-manage
@@ -19,7 +21,8 @@ public class BusInfoVO implements Serializable{
     private String groupName;
     private String modelDetail;
     private Integer status;
-    private String createDate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    private Date createDate;
 
     public Integer getCarId() {
         return carId;
@@ -77,11 +80,11 @@ public class BusInfoVO implements Serializable{
         this.status = status;
     }
 
-    public String getCreateDate() {
+    public Date getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(String createDate) {
+    public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
 }

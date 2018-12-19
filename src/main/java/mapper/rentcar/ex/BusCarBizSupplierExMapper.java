@@ -2,6 +2,7 @@ package mapper.rentcar.ex;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.zhuanche.dto.busManage.BusSupplierBaseDTO;
 import com.zhuanche.dto.busManage.BusSupplierQueryDTO;
@@ -54,5 +55,19 @@ public interface BusCarBizSupplierExMapper {
 	 * @throws
 	 */
 	List<Map<Object, Object>> querySuppliers(Map<String, Object> param);
-	
+
+	/**
+	 * 传入批量城市查询供应商ID
+	 * @param cityIds
+	 * @return
+	 */
+
+	List<Integer> querySupplierIdByCitys(Map<String,Set<Integer>> cityIds);
+
+	/**
+	 * 根据供应商Id查询供应商的基本信息
+	 * @param supplierIds
+	 * @return
+	 */
+	List<BusSupplierInfoVO> queryBasicInfoByIds(Map<String,Set<Integer>> supplierIds);
 }

@@ -295,4 +295,38 @@
 			</foreach>
 		</if>
 	</select>
+	<!--根据城市批量查询巴士供应商ID-->
+	<select id="querySupplierIdByCitys" resultType="java.lang.Integer" parameterType="java.util.Map">
+		select
+			supplier_id AS supplierId
+		from car_biz_supplier
+		where `status`  = 1
+		and supplier_type = 1
+		<if test="cityIds != null and cityIds.size()>0">
+			and supplier_city in
+			<foreach collection="cityIds" item="item" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+	</select>
+	<select id="queryBasicInfoByIds" resultType="com.zhuanche.vo.busManage.BusSupplierInfoVO" parameterType="java.util.Map">
+		SELECT
+		s.supplier_id AS supplierId,
+		s.supplier_full_name AS supplierName,
+		s.supplier_city AS supplierCity,
+		c.city_name AS cityName,
+		s.contacts AS contacts,
+		s.contacts_phone AS contactsPhone,
+		s.dispatcher_phone AS dispatcherPhone,
+		s.cooperation_type AS cooperationType,
+		s.`status` AS status
+		FROM
+		car_biz_supplier s
+		LEFT JOIN car_biz_city c ON c.city_id = s.supplier_city
+		WHERE s.supplier_type = 1
+		AND s.supplier_id in
+			<foreach collection="supplierIds" item="item" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+	</select>
 </mapper>
