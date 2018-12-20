@@ -96,6 +96,9 @@ public interface BusConst {
 
 		/** 供应商账单查询根据账单id **/
 		String SETTLE_SUPPLIER_BILL_DETAIL = "/settle/supplier/bill/detail";
+
+		/**分佣流水查询根据id*/
+		String SETTLE_DETAIL_INFO="/settle/detail/info";
 		
 		/** 供应商账单确认开票 **/
 		String SETTLE_SUPPLIER_BILL_CONFIRM_INVOICE = "/settle/supplier/bill/confirm/invoice";

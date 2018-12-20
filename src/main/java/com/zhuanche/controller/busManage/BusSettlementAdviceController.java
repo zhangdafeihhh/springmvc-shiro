@@ -13,9 +13,12 @@ import com.zhuanche.common.web.Verify;
 import com.zhuanche.constants.busManage.BusConstant;
 import com.zhuanche.constants.busManage.BusConstant.SupplierMaidConstant;
 import com.zhuanche.dto.busManage.*;
+import com.zhuanche.entity.busManage.BusOrderDetail;
+import com.zhuanche.entity.rentcar.CarBizService;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.busManage.BusCommonService;
+import com.zhuanche.serv.busManage.BusOrderService;
 import com.zhuanche.serv.busManage.BusSettlementAdviceService;
 import com.zhuanche.serv.busManage.BusSupplierService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
@@ -23,6 +26,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.vo.busManage.*;
+import mapper.rentcar.CarBizServiceMapper;
 import mapper.rentcar.CarBizSupplierMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -67,6 +71,10 @@ public class BusSettlementAdviceController {
     private BusSupplierService busSupplierService;
     @Autowired
     private CarBizSupplierService supplierService;
+    @Autowired
+    private BusOrderService busOrderService;
+    @Autowired
+    private CarBizServiceMapper serviceMapper;
 
     /**
      * 查询供应商账单列表 TODO 等计费完成接口完善
@@ -110,18 +118,10 @@ public class BusSettlementAdviceController {
             return AjaxResponse.success(new ArrayList<>());
         }
         Map<Integer, BusSupplierInfoVO> supplierInfoMap = querySupplierInfo(data);
-        List<BusSupplierSettleDetailVO> collect = data.stream().map(o -> (JSONObject) o).map(o -> {
-            BusSupplierSettleDetailVO detail = JSONObject.toJavaObject(o, BusSupplierSettleDetailVO.class);
-            Date startTime = new Date(o.getLong("startTime"));
-            Date endTime = new Date(o.getLong("endTime"));
-            Date settleTime = new Date(o.getLong("settleTime"));
-            detail.setStartTime(DateUtil.getTimeString(startTime));
-            detail.setEndTime(DateUtil.getTimeString(endTime));
-            detail.setSettleTime(DateUtil.getTimeString(settleTime));
-            return detail;
-        }).map(o -> {
-            return buidSettleDetailVO(o, supplierInfoMap);
-        }).collect(Collectors.toList());
+        List<BusSupplierSettleDetailVO> collect = data.stream().map(o -> (JSONObject) o).map(o -> JSONObject.toJavaObject(o, BusSupplierSettleDetailVO.class))
+                .map(o -> {
+                  return buidSettleDetailVO(o, supplierInfoMap);
+                }).collect(Collectors.toList());
         logger.info(LOG_PRE + "查询账单列表参数=" + JSON.toJSONString(dto) + "结果=" + JSON.toJSONString(collect));
         return AjaxResponse.success(collect);
     }
@@ -163,6 +163,7 @@ public class BusSettlementAdviceController {
     @RequestMapping("/exportList")
     @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
     public void exportSettleDetailList(BusSupplierSettleListDTO dto, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        long start = System.currentTimeMillis();
         logger.info("巴士供应商查询账单列表参数=" + JSON.toJSONString(dto));
         //文件名称
         String fileName = BusConstant.buidFileName(request, SupplierMaidConstant.BILL_FILE_NAME);
@@ -201,7 +202,7 @@ public class BusSettlementAdviceController {
         do {
             pageNum++;
             dto.setPageNum(pageNum);
-            dto.setPageSize(BusConstant.EXPORT_PAGE_SIZE);
+            dto.setPageSize(CsvUtils.downPerSize);
             JSONObject result = busSettlementAdviceService.querySettleDetailList(dto);
             Integer code = result.getInteger("code");
             if (code == null || code != 0) {
@@ -219,61 +220,57 @@ public class BusSettlementAdviceController {
             if (pageNum == 1) {
                 csvData = new ArrayList<>();
                 csvData.add("没有符合条件的数据");
+                isList =true;
+                utilEntity.exportCsvV2(response, csvData, headerList, fileName, isFirst, isList);
+                break;
             }
             Map<Integer, BusSupplierInfoVO> supplierInfoMap = querySupplierInfo(array);
-            csvData = array.stream().map(o -> (JSONObject) o).map(o -> {
-                BusSupplierSettleDetailVO detail = JSONObject.toJavaObject(o, BusSupplierSettleDetailVO.class);
-                Date startTime = new Date(o.getLong("startTime"));
-                Date endTime = new Date(o.getLong("endTime"));
-                Date settleTime = new Date(o.getLong("settleTime"));
-                detail.setStartTime(DateUtil.getTimeString(startTime));
-                detail.setEndTime(DateUtil.getTimeString(endTime));
-                detail.setSettleTime(DateUtil.getTimeString(settleTime));
-                return detail;
-            }).map(o -> {
+            csvData = array.stream().map(o -> (JSONObject) o).map(o -> JSONObject.toJavaObject(o, BusSupplierSettleDetailVO.class)).map(o -> {
                 return buidSettleDetailVO(o, supplierInfoMap);
             }).map(BusSupplierSettleDetailVO::toString).collect(Collectors.toList());
             utilEntity.exportCsvV2(response, csvData, headerList, fileName, isFirst, isList);
             // isList=true时表示时之后一页停止循环
         } while (!isList);
+        logger.info(LOG_PRE + "巴士供应商查询账单列表参数=" + JSON.toJSONString(dto) + " 消耗时间=" + (System.currentTimeMillis() - start));
     }
 
     /**
      * 查询结算单详情
+     *
      * @param supplierBillId
      * @return
      */
-    @RequestMapping("detail")
+    @RequestMapping("/detail")
     @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
-    public AjaxResponse querySettleDetail(@Verify(param = "supplierBillId",rule = "required") String supplierBillId	){
+    public AjaxResponse querySettleDetail(@Verify(param = "supplierBillId", rule = "required") String supplierBillId, HttpServletRequest request) {
         JSONObject result = busSettlementAdviceService.getBillDetail(supplierBillId);
-        if(result==null){
-          return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "查询失败，请联系管理员");
+        if (result == null) {
+            return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "查询失败，请联系管理员");
         }
         BusSettlementDetailVO busSettlementDetailVO = JSONObject.toJavaObject(result, BusSettlementDetailVO.class);
         Integer supplierId = result.getInteger("supplierId");
         CarBizSupplier carBizSupplier = supplierService.selectByPrimaryKey(supplierId);
         busSettlementDetailVO.setSupplierName(carBizSupplier.getSupplierFullName());
         //暂时没有上次结算金额，如果为空，赋值0
-        if(busSettlementDetailVO.getLastAmount()==null){
-           busSettlementDetailVO.setLastAmount(new BigDecimal(0));
+        if (busSettlementDetailVO.getLastAmount() == null) {
+            busSettlementDetailVO.setLastAmount(new BigDecimal(0));
         }
         return AjaxResponse.success(busSettlementDetailVO);
     }
 
-    /** 
-    * @Description: 供应商账单修改页回显数据
-    * @Param: [supplierBillId] 
-    * @return: com.zhuanche.common.web.AjaxResponse 
-    * @Date: 2018/12/20 
-    */ 
+    /**
+     * @Description: 供应商账单修改页回显数据
+     * @Param: [supplierBillId]
+     * @return: com.zhuanche.common.web.AjaxResponse
+     * @Date: 2018/12/20
+     */
     @RequestMapping("/update/init")
     @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
-    public AjaxResponse querySettleUpdateInit(@Verify(param = "supplierBillId",rule = "required") String supplierBillId){
+    public AjaxResponse querySettleUpdateInit(@Verify(param = "supplierBillId", rule = "required") String supplierBillId) {
         JSONObject result = busSettlementAdviceService.getBillDetail(supplierBillId);
-        if(result==null){
+        if (result == null) {
             return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "查询失败，请联系管理员");
-        }//BusSettlementUdateInitVO
+        }
 
         BusSettlementUdateInitVO updateInitVO = JSONObject.toJavaObject(result, BusSettlementUdateInitVO.class);
         Integer supplierId = result.getInteger("supplierId");
@@ -282,38 +279,131 @@ public class BusSettlementAdviceController {
         return AjaxResponse.success(updateInitVO);
     }
 
+    @RequestMapping("/transactions/init")
+    @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
+    public AjaxResponse querySettleTransactionsInit(@Verify(param = "supplierBillId", rule = "required") String supplierBillId,
+                                                    @Verify(param = "id", rule = "required") Integer id) {
+        //先查询账单详情
+        JSONObject billDetail = busSettlementAdviceService.getBillDetail(supplierBillId);
+        //查询明细详情
+        JSONObject transactionsDetail = busSettlementAdviceService.getTransactionsDetail(id);
+        if (billDetail == null || transactionsDetail == null) {
+            return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "查询失败，请联系管理员");
+        }
+        String s = JSON.toJSONString(transactionsDetail);
+
+        //调用订单接口查询订单详情
+        String orderNo = transactionsDetail.getString("orderNo");
+        BusOrderDetail orderDetail = busOrderService.selectOrderDetail("PD201812192812544510");
+        //封装结果
+        BusTransactionsDetailVO resultDetail = new BusTransactionsDetailVO();
+        resultDetail.setOrderNo(orderNo);
+        //订单金额
+        resultDetail.setOrderAmount(transactionsDetail.getBigDecimal("orderAmount"));
+
+        resultDetail.setBookingGroupName(orderDetail.getBookingGroupName());
+        resultDetail.setBookingGroupName(orderDetail.getBookingUserName());
+        resultDetail.setLicensePlates(orderDetail.getLicensePlates());
+        //分佣比例
+        resultDetail.setSettleRatio(transactionsDetail.getBigDecimal("settleRatio"));
+        //账单金额
+        resultDetail.setBillAmount(billDetail.getBigDecimal("billAmount"));
+        //账单ID
+        resultDetail.setSupplierBillId(billDetail.getString("supplierBillId"));
+        Integer serviceTypeId = orderDetail.getServiceTypeId();
+        if(serviceTypeId!=null) {
+            CarBizService carBizService = serviceMapper.selectByPrimaryKey(serviceTypeId);
+            resultDetail.setServiceTypeName(carBizService.getServiceName());
+        }
+        return AjaxResponse.success(resultDetail);
+    }
 
     /**
-    * @Description: 查询结算单流水列表
-    * @Param: [dto]
-    * @return: com.zhuanche.common.web.AjaxResponse
-    * @Date: 2018/12/19
-    */
-    @RequestMapping(value = "/transactions/List",method = RequestMethod.POST)
-    public AjaxResponse queryOrderList(BusSettleOrderListDTO dto){
-        logger.info(LOG_PRE+"查询特定账单流水列表参数="+JSON.toJSONString(dto));
+     * @Description: 查询结算单流水列表
+     * @Param: [dto]
+     * @return: com.zhuanche.common.web.AjaxResponse
+     * @Date: 2018/12/19
+     */
+    @RequestMapping(value = "/transactions/List", method = RequestMethod.POST)
+    public AjaxResponse queryOrderList(BusSettleOrderListDTO dto) {
+        logger.info(LOG_PRE + "查询特定账单流水列表参数=" + JSON.toJSONString(dto));
         JSONObject result = busSettlementAdviceService.queryOrderList(dto);
         //接口查询失败，需要查看原因
         Integer code = result.getInteger("code");
-        if(code==null||code!=0){
-           return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "查询失败，请联系管理员");
+        if (code == null || code != 0) {
+            return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "查询失败，请联系管理员");
         }
         JSONObject data = result.getJSONObject("data");
-        logger.info(LOG_PRE+"查询特定账单流水列表参数="+JSON.toJSONString(dto)+" 查询结果="+data);
+        logger.info(LOG_PRE + "查询特定账单流水列表参数=" + JSON.toJSONString(dto) + " 查询结果=" + data);
         //没有查询到符合条件的数据直接返回
         if (data == null || data.isEmpty()) {
             return AjaxResponse.success(new ArrayList<>());
         }
         JSONArray array = data.getJSONArray("listData");
-        if(array==null || array.isEmpty()){
+        if (array == null || array.isEmpty()) {
             return AjaxResponse.success(new ArrayList<>());
         }
         //处理返回结果
         List<BusSettleOrderListVO> collect = array.stream().map(o -> (JSONObject) o).map(o -> JSONObject.toJavaObject(o, BusSettleOrderListVO.class))
                 .collect(Collectors.toList());
-        PageDTO page=new PageDTO(data.getInteger("pageNo"),data.getInteger("pageSize"),data.getLong("total"),collect);
-       return AjaxResponse.success(page);
+        PageDTO page = new PageDTO(data.getInteger("pageNo"), data.getInteger("pageSize"), data.getLong("total"), collect);
+        return AjaxResponse.success(page);
     }
+    @RequestMapping("/transactions/export")
+    public void exportOrderList(BusSettleOrderListDTO dto,HttpServletRequest request,HttpServletResponse response)throws Exception{
+        long start = System.currentTimeMillis();
+        logger.info(LOG_PRE + "导出特定账单流水列表参数=" + JSON.toJSONString(dto));
+        //构建文件名称
+        String fileName = BusConstant.buidFileName(request, SupplierMaidConstant.TRANSACTION_FLOW_FILE_NAME);
+        //构建文件标题
+        List<String> headerList = new ArrayList<>();
+        headerList.add(SupplierMaidConstant.TRANSACTION_FALOW_FALE_NAME);
+        CsvUtils utilEntity = new CsvUtils();
+        Integer pageNum = 0;
+        boolean isFirst = true;
+        boolean isList = false;
+        //每次查询的最大条数
+        dto.setPageSize(CsvUtils.downPerSize);
+        do {
+            pageNum++;
+            dto.setPageNum(pageNum);
+            JSONObject result = busSettlementAdviceService.queryOrderList(dto);
+            //接口查询失败，需要查看原因
+            Integer code = result.getInteger("code");
+            if (code == null || code != 0) {
+                List<String> csvDataList = new ArrayList<>();
+                csvDataList.add("导出失败，请联系管理员");
+                isList = true;
+                utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, isFirst, isList);
+                break;
+            }
+            JSONObject data = result.getJSONObject("data");
+            Long total = data.getLong("total");
+            Integer pages = data.getInteger("pages");
+            JSONArray array = data.getJSONArray("listData");
+            if (total==null||total==0) {
+                List<String> csvDataList = new ArrayList<>();
+                csvDataList.add("没有查询到符合条件的数据");
+                isList = true;
+                utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, isFirst, isList);
+                break;
+            }
+            if (pageNum != 1) {
+                isFirst = false;
+            }
+            if (pageNum.equals(pages)) {
+                isList = true;
+            }
+            //处理返回结果
+            List<String> collect = array.stream().map(o -> (JSONObject) o).map(o -> JSONObject.toJavaObject(o, BusSettleOrderListVO.class)).map(BusSettleOrderListVO::toString)
+                    .collect(Collectors.toList());
+            utilEntity.exportCsvV2(response, collect, headerList, fileName, isFirst, isList);
+        }while (!isList);
+        logger.info(LOG_PRE + "导出特定账单流水列表参数=" + JSON.toJSONString(dto) + " 消耗时间=" + (System.currentTimeMillis() - start));
+    }
+
+
+
 
     /**
      * 修改账单
@@ -356,66 +446,66 @@ public class BusSettlementAdviceController {
         return AjaxResponse.success(new ArrayList());
     }
 
-    
-	/**
-	 * @Title: confirm
-	 * @Description: 结算单确认
-	 * @param supplierBillId
-	 * @return AjaxResponse
-	 * @throws
-	 */
-	@RequestMapping(value = "/confirm")
-	public AjaxResponse confirm(@NotBlank(message = "账单编号不能为空") String supplierBillId) {
-		return busSettlementAdviceService.confirm(supplierBillId);
-	}
 
     /**
-     * @Title: invoiceInit
-     * @Description: 结算单确认收票窗口查询
+     * @param supplierBillId
      * @return AjaxResponse
      * @throws
+     * @Title: confirm
+     * @Description: 结算单确认
      */
-	@RequestMapping(value = "/invoice/init")
-	public AjaxResponse invoiceInit(@NotBlank(message = "账单编号不能为空") String supplierBillId) {
-		BusSettlementInvoiceVO invoice = busSettlementAdviceService.queryInvoiceInfo(supplierBillId);
-		return AjaxResponse.success(invoice);
-	}
-	
-	/**
-	 * @Title: invoiceSave
-	 * @Description: 结算单确认收票窗口保存
-	 * @param invoiceDTO
-	 * @return AjaxResponse
-	 * @throws
-	 */
-	@RequestMapping(value = "/invoice/save")
-	public AjaxResponse invoiceSave(@Validated BusSettlementInvoiceDTO invoiceDTO) {
-		return busSettlementAdviceService.saveInvoiceInfo(invoiceDTO);
-	}
-	
-	/**
-	 * @Title: paymentInit
-	 * @Description: 结算单确认收款窗口查询
-	 * @param supplierBillId
-	 * @return AjaxResponse
-	 * @throws
-	 */
-	@RequestMapping(value = "/payment/init")
-	public AjaxResponse paymentInit(@NotBlank(message = "账单编号不能为空") String supplierBillId) {
-		BusSettlementPaymentVO payment = busSettlementAdviceService.queryPaymentInfo(supplierBillId);
-		return AjaxResponse.success(payment);
-	}
-	
-	/**
-	 * @Title: paymentSave
-	 * @Description: 结算单确认收款窗口保存
-	 * @param invoiceDTO
-	 * @return AjaxResponse
-	 * @throws
-	 */
-	@RequestMapping(value = "/payment/save")
-	public AjaxResponse paymentSave(@Validated BusSettlementPaymentDTO paymentDTO) {
-		return busSettlementAdviceService.savePaymentInfo(paymentDTO);
-	}
+    @RequestMapping(value = "/confirm")
+    public AjaxResponse confirm(@NotBlank(message = "账单编号不能为空") String supplierBillId) {
+        return busSettlementAdviceService.confirm(supplierBillId);
+    }
+
+    /**
+     * @return AjaxResponse
+     * @throws
+     * @Title: invoiceInit
+     * @Description: 结算单确认收票窗口查询
+     */
+    @RequestMapping(value = "/invoice/init")
+    public AjaxResponse invoiceInit(@NotBlank(message = "账单编号不能为空") String supplierBillId) {
+        BusSettlementInvoiceVO invoice = busSettlementAdviceService.queryInvoiceInfo(supplierBillId);
+        return AjaxResponse.success(invoice);
+    }
+
+    /**
+     * @param invoiceDTO
+     * @return AjaxResponse
+     * @throws
+     * @Title: invoiceSave
+     * @Description: 结算单确认收票窗口保存
+     */
+    @RequestMapping(value = "/invoice/save")
+    public AjaxResponse invoiceSave(@Validated BusSettlementInvoiceDTO invoiceDTO) {
+        return busSettlementAdviceService.saveInvoiceInfo(invoiceDTO);
+    }
+
+    /**
+     * @param supplierBillId
+     * @return AjaxResponse
+     * @throws
+     * @Title: paymentInit
+     * @Description: 结算单确认收款窗口查询
+     */
+    @RequestMapping(value = "/payment/init")
+    public AjaxResponse paymentInit(@NotBlank(message = "账单编号不能为空") String supplierBillId) {
+        BusSettlementPaymentVO payment = busSettlementAdviceService.queryPaymentInfo(supplierBillId);
+        return AjaxResponse.success(payment);
+    }
+
+    /**
+     * @param invoiceDTO
+     * @return AjaxResponse
+     * @throws
+     * @Title: paymentSave
+     * @Description: 结算单确认收款窗口保存
+     */
+    @RequestMapping(value = "/payment/save")
+    public AjaxResponse paymentSave(@Validated BusSettlementPaymentDTO paymentDTO) {
+        return busSettlementAdviceService.savePaymentInfo(paymentDTO);
+    }
 
 }

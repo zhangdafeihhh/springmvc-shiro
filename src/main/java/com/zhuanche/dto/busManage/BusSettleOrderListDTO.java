@@ -11,7 +11,6 @@ import javax.validation.constraints.NotBlank;
  * @author: niuzilian
  * @create: 2018-12-19 18:05
  **/
-@Data
 public class BusSettleOrderListDTO extends BaseDTO{
     /** 账单编号 **/
     @NotBlank(message = "账单编号不能为空")
@@ -20,4 +19,27 @@ public class BusSettleOrderListDTO extends BaseDTO{
     private String startDate;
     private String endDate;
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
+    }
 }

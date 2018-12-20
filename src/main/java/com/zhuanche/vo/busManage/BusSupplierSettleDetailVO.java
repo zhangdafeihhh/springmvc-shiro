@@ -1,6 +1,10 @@
 package com.zhuanche.vo.busManage;
 
+import com.zhuanche.constants.busManage.BusConstant.SupplierMaidConstant.EnumStatus;
+import com.zhuanche.util.DateUtils;
+
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * @program: mp-manage
@@ -12,35 +16,39 @@ public class BusSupplierSettleDetailVO {
     /**
      * 供应商id
      */
-   private Integer supplierId;
+    private Integer supplierId;
     /**
      * 供应商名称
      */
-   private String supplierName;
+    private String supplierName;
     /**
      * 城市名称
      */
-   private String cityName;
+    private String cityName;
     /**
      * 类型
      */
-   private Integer type;
+    private Integer type;
+    /**
+     * 类型名称
+     */
+    private String typeName;
     /**
      * 账单主键（结算编号）
      */
-   private String supplierBillId;
+    private String supplierBillId;
     /**
      * 开始时间
      */
-    private String startTime;
+    private Date startTime;
     /**
      * 结束时间
      */
-    private String endTime;
+    private Date endTime;
     /**
      * 到期付款日期
      */
-    private String settleTime;
+    private Date settleTime;
     /**
      * 结算金额
      */
@@ -55,9 +63,17 @@ public class BusSupplierSettleDetailVO {
      */
     private Integer shareWay;
     /**
+     * 分佣方式名称
+     */
+    private String shareWayName;
+    /**
      * 分佣类型
      */
     private Integer shareType;
+    /**
+     * 分佣类型名称
+     */
+    private String shareTypeName;
     /**
      * 账单状态
      */
@@ -103,27 +119,27 @@ public class BusSupplierSettleDetailVO {
         this.supplierBillId = supplierBillId;
     }
 
-    public String getStartTime() {
+    public Date getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(String startTime) {
+    public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
-    public String getEndTime() {
+    public Date getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(String endTime) {
+    public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
 
-    public String getSettleTime() {
+    public Date getSettleTime() {
         return settleTime;
     }
 
-    public void setSettleTime(String settleTime) {
+    public void setSettleTime(Date settleTime) {
         this.settleTime = settleTime;
     }
 
@@ -168,15 +184,43 @@ public class BusSupplierSettleDetailVO {
         this.status = status;
     }
 
+    public String getTypeName() {
+        return typeName;
+    }
+
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
+    }
+
+    public String getShareWayName() {
+        return shareWayName;
+    }
+
+    public void setShareWayName(String shareWayName) {
+        this.shareWayName = shareWayName;
+    }
+
+    public String getShareTypeName() {
+        return shareTypeName;
+    }
+
+    public void setShareTypeName(String shareTypeName) {
+        this.shareTypeName = shareTypeName;
+    }
+    //String BILL_EXPORT_HEAD="供应商编号,供应商名称,城市,业务类型,账单编号,账单开始日期,账单结束日期,到期付款日期,账单金额,结算方式,分佣方式,分佣类型,账单状态";
+
     @Override
     public String toString() {
-        //String BILL_EXPORT_HEAD="供应商编号,供应商名称,城市,业务类型,账单编号,账单开始日期,账单结束日期,到期付款日期,账单金额,付款方式,分佣方式,分佣类型,账单状态";
-        String split=",";
         StringBuffer sb = new StringBuffer();
+        String split = ",";
         sb.append(supplierId).append(split).append(supplierName).append(split).append(cityName).append(split)
-                .append("巴士").append(split).append(supplierBillId).append(split).append(startTime).append(split)
-                .append(endTime).append(split).append(settleTime).append(split).append(billAmount).append(split)
-                .append(settleType).append(split).append(shareWay).append(split).append(status);
+                .append(typeName).append(split).append(supplierBillId).append(split)
+                .append("\t").append(DateUtils.formatDate(startTime)).append(split)
+                .append("\t").append(DateUtils.formatDate(endTime)).append(split)
+                .append("\t").append(DateUtils.formatDate(settleTime)).append(split)
+                .append(billAmount).append(split).append(settleType == 0 ? "自动" : "手动").append(split)
+                .append(shareWayName).append(split).append(shareTypeName).append(split)
+                .append(EnumStatus.getDescByCode(status));
         return sb.toString();
     }
 }

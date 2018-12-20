@@ -22,6 +22,7 @@ import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.mongo.DriverMongo;
 import com.zhuanche.serv.CarBizCityService;
 import com.zhuanche.serv.mongo.DriverMongoService;
+import com.zhuanche.util.CSVUtil;
 import com.zhuanche.util.dateUtil.DateUtil;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.vo.busManage.AccountBalanceVO;
@@ -312,7 +313,7 @@ public class DriverMaidController {
             pageNum++;
             dto.setPageNum(pageNum);
             Map<String, Object> param = buidMaidParam(dto);
-            dto.setPageSize(BusConstant.EXPORT_PAGE_SIZE);
+            dto.setPageSize(CsvUtils.downPerSize);
             buidNecessaryParam(param, dto.getPageNum(), dto.getPageSize());
             JSONObject data = parseResult(MAID_LIST_URL, param);
             if (data == null || data.getLong("total") == null || data.getLong("total") == 0) {
@@ -383,7 +384,7 @@ public class DriverMaidController {
         do {
             pageNum++;
             dto.setPageNum(pageNum);
-            buidNecessaryParam(param, pageNum, BusConstant.EXPORT_PAGE_SIZE);
+            buidNecessaryParam(param, pageNum, CsvUtils.downPerSize);
             JSONObject data = parseResult(WITHDRAWALS_LIST_ULR, param);
             if (data == null || data.getLong("total") == null || data.getLong("total") == 0) {
                 List<String> csvDataList = new ArrayList<>();
@@ -457,7 +458,7 @@ public class DriverMaidController {
         do {
             pageNum++;
             dto.setPageNum(pageNum);
-            buidNecessaryParam(param, pageNum, BusConstant.EXPORT_PAGE_SIZE);
+            buidNecessaryParam(param, pageNum, CsvUtils.downPerSize);
             JSONObject data = parseResult(ACCOUNT_BALANCE_URL, param);
             if (data == null || data.getLong("total") == null || data.getLong("total") == 0) {
                 List<String> csvDataList = new ArrayList<>();

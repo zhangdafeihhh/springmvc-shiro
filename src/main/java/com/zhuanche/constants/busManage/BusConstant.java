@@ -1,6 +1,7 @@
 package com.zhuanche.constants.busManage;
 
 import com.zhuanche.util.dateUtil.DateUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
@@ -17,7 +18,6 @@ public class BusConstant {
     /**
      * 导出订单时每页查询的条数
      */
-    public static int EXPORT_PAGE_SIZE = 1000;
     public interface CarConstant{
         String FILE_NAME="巴士信息";
         String EXPORT_HEAD="车牌号,城市,供应商,车型类别,具体车型,是否有效,创建时间";
@@ -33,7 +33,45 @@ public class BusConstant {
     }
     public interface SupplierMaidConstant{
         String BILL_FILE_NAME="供应商账单列表";
-        String BILL_EXPORT_HEAD="供应商编号,供应商名称,城市,业务类型,账单编号,账单开始日期,账单结束日期,到期付款日期,账单金额,付款方式,分佣方式,分佣类型,账单状态";
+        String BILL_EXPORT_HEAD="供应商编号,供应商名称,城市,业务类型,账单编号,账单开始日期,账单结束日期,到期付款日期,账单金额,结算方式,分佣方式,分佣类型,账单状态";
+        String TRANSACTION_FLOW_FILE_NAME="交易流水";
+        String TRANSACTION_FALOW_FALE_NAME="来源编号,结算金额,发生时间,结算类型";
+        //账单状态
+         enum EnumStatus{
+          INITIAL(0,"初始"),WAIT_PROOFREAD_BILL(1,"代对帐"),WAIT_FRO_INVOICE(2,"待开票"),WAIT_PAYMENT(3,"待支付"),COMPLETE(4,"已完成")  ;
+            // 0 初始 1 待对账 2 待开票 3 待付款 4 已完成
+            private int code;
+            private String desc;
+
+            EnumStatus(int code, String desc) {
+                this.code = code;
+                this.desc = desc;
+            }
+
+            public int getCode() {
+                return code;
+            }
+
+            public void setCode(int code) {
+                this.code = code;
+            }
+
+            public String getDesc() {
+                return desc;
+            }
+
+            public void setDesc(String desc) {
+                this.desc = desc;
+            }
+            public static String getDescByCode(Integer code){
+                for (EnumStatus status:EnumStatus.values()) {
+                    if(status.code==code){
+                        return status.desc;
+                    }
+                }
+                return StringUtils.EMPTY;
+            }
+        }
     }
 
     /**

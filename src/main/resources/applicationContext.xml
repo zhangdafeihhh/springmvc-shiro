@@ -49,4 +49,9 @@
     <import resource="applicationContext-redis-driver.xml"/>
     <!--块钱的服务-->
     <import resource="applicationContext-kuaiqian.xml"/>
+   <!-- <bean id="" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close" parent="commonsAbstractDataSource">
+        <property name="url" value="${mdbcarmanage.master.jdbc.url}"/>
+        <property name="username" value="${mdbcarmanage.master.jdbc.username}"/>
+        <property name="password" value="${mdbcarmanage.master.jdbc.password}"/>
+    </bean>-->
 </beans>
