@@ -132,18 +132,26 @@ public class BusSupplierController {
 		queryDTO.setExcludeContractIds(null);
         List<BusSupplierPageVO> totalList = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
         Page<BusSupplierPageVO> page = (Page<BusSupplierPageVO>) totalList;
-        
-        // 三、补充分佣信息(分佣比例、是否有返点)
+
         if (resultList == null || resultList.isEmpty()) {
         	resultList = totalList;
+        	if (resultList == null || resultList.isEmpty()) {
+        		return AjaxResponse.success(new PageDTO(queryDTO.getPageNum(), queryDTO.getPageSize(), page.getTotal(), resultList));
+			} else {
+				// 补充巴士供应商其它信息
+				resultList.forEach(busSupplierService::completeDetailInfo);
+			}
         }
+        
+        // 三、补充信息
 		String supplierIds = resultList.stream().map(e -> e.getSupplierId().toString()).collect(Collectors.joining(","));
 		JSONArray jsonArray = busSupplierService.getProrateList(supplierIds);
-		if (jsonArray != null) {
-			// 组装数据
-			resultList.forEach(supplier -> {
+		// 组装数据
+		resultList.forEach(supplier -> {
+			Integer supplierId = supplier.getSupplierId();
+			// 补充分佣信息(分佣比例、是否有返点)
+			if (jsonArray != null) {
 				// 查找对应供应商数据
-				Integer supplierId = supplier.getSupplierId();
 				jsonArray.stream().filter(e -> {
 					JSONObject jsonObject = (JSONObject) JSON.toJSON(e);
 					return supplierId.equals(jsonObject.getInteger("supplierId"));
@@ -152,8 +160,8 @@ public class BusSupplierController {
 					supplier.setSupplierRate(jsonObject.getDouble("supplierRate"));
 					supplier.setIsRebate(jsonObject.getInteger("isRebate"));
 				});
-			});
-		}
+			}
+		});
 		return AjaxResponse.success(new PageDTO(queryDTO.getPageNum(), queryDTO.getPageSize(), page.getTotal(), resultList));
 	}
 
