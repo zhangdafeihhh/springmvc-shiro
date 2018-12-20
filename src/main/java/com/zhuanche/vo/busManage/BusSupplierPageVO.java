@@ -39,7 +39,7 @@ public class BusSupplierPageVO {
 	/** 合同结束时间 **/
 	private Date contractDateEnd;
 
-	/** 是否快过期 **/
+	/** 是否快过期  0否  1是 **/
 	private Integer isExpireSoon;
 
 	/** 状态：1.有效 0.无效 **/

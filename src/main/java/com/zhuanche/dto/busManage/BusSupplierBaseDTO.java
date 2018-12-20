@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import com.zhuanche.common.web.datavalidate.custom.InArray;
 
@@ -16,6 +17,7 @@ public class BusSupplierBaseDTO implements BusSupplierDTO {
 
 	/** 供应商名称 **/
 	@NotBlank(message = "供应商名称不能为空")
+	@Size(max = 100, message = "供应商名称长度不能超过100")
 	private String supplierName;
 
 	/** 城市ID **/
@@ -24,14 +26,17 @@ public class BusSupplierBaseDTO implements BusSupplierDTO {
 
 	/** 企业联系人 **/
 	@NotBlank(message = "企业联系人不能为空")
+	@Size(max = 100, message = "企业联系人长度不能超过20")
 	private String contacts;
 
 	/** 企业联系人电话 **/
 	@NotBlank(message = "企业联系人电话不能为空")
+	@Size(max = 100, message = "企业联系人电话长度不能超过23")
 	private String contactsPhone;
 
 	/** 调度员电话 **/
 	@NotBlank(message = "调度员电话不能为空")
+	@Size(max = 100, message = "调度员电话长度不能超过23")
 	private String dispatcherPhone;
 
 	/** 加盟类型:car_biz_cooperation_type **/
