@@ -123,7 +123,10 @@ public class BusAssignmentService {
 					cityIds = StringUtils.join(authOfCity, ",");
 				}
 			}
-			if (supplierId == null && authOfSupplier != null) {
+			if (Integer.valueOf(10103).equals(params.getStatus())) {// 指派列表不限制供应商
+				params.setSupplierId(null);
+				supplierIds = null;
+			} else if (supplierId == null && authOfSupplier != null) {
 				int size = authOfSupplier.size();
 				if (size == 1) {
 					authOfSupplier.stream().findFirst().ifPresent(params::setSupplierId);
