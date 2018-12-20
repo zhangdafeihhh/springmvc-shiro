@@ -349,11 +349,12 @@ public class BusSupplierService implements BusConst {
 		if (offset > contractSuppliers.size()) {
 			queryDTO.setContractIds(null);
 			queryDTO.setExcludeContractIds(contractIds);// 其它供应商(not in 上面的供应商)
+			List<BusSupplierPageVO> supplierList = null;
 			try(Page p = PageHelper.offsetPage(offset - contractSuppliers.size(), limit)) {
-				List<BusSupplierPageVO> supplierList = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
-				supplierList.forEach(this::completeDetailInfo);// 补充巴士供应商其它信息
-				resultList.addAll(supplierList);
+				supplierList = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
 			}
+			supplierList.forEach(this::completeDetailInfo);// 补充巴士供应商其它信息
+			resultList.addAll(supplierList);
 		} else {
 			// 组合
 			List<BusSupplierPageVO> allContractList = new ArrayList<>();
@@ -377,15 +378,16 @@ public class BusSupplierService implements BusConst {
 				// 合同快到期供应商
 				List<BusSupplierPageVO> subList = orderedAllContractList.subList(offset, contractSuppliers.size());
 				// 正常供应商
-				try(Page p = PageHelper.offsetPage(0, limit)) {
-					queryDTO.setContractIds(null);
-					queryDTO.setExcludeContractIds(contractIds);// 其它供应商(not in 上面的供应商)
-					List<BusSupplierPageVO> otherList = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
-					otherList.forEach(this::completeDetailInfo);// 补充巴士供应商其它信息
-					
-					resultList.addAll(subList);
-					resultList.addAll(otherList);
+				queryDTO.setContractIds(null);
+				queryDTO.setExcludeContractIds(contractIds);// 其它供应商(not in 上面的供应商)
+				List<BusSupplierPageVO> otherList = null;
+				try (Page p = PageHelper.offsetPage(0, limit - contractSuppliers.size())) {
+					otherList = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
 				}
+				otherList.forEach(this::completeDetailInfo);// 补充巴士供应商其它信息
+				
+				resultList.addAll(subList);
+				resultList.addAll(otherList);
 			} else {
 				// 合同快到期供应商
 				List<BusSupplierPageVO> subList = orderedAllContractList.subList(offset, limit);
