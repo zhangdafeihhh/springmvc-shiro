@@ -1,5 +1,6 @@
 package com.zhuanche.serv.busManage;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,7 @@ public class BusCommonService {
 	
 	
 	/**
+	 * @param now 
 	 * @Title: queryChangeLogs
 	 * @Description: 查询操作日志
 	 * @param businessType
@@ -51,10 +53,11 @@ public class BusCommonService {
 	 * @throws
 	 */
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE))
-	public List<Map<Object, Object>> queryChangeLogs(Integer businessType, String businessKey) {
+	public List<Map<Object, Object>> queryChangeLogs(Integer businessType, String businessKey, Date date) {
 		Map<String, Object> param = new HashMap<>();
 		param.put("businessType", businessType);
 		param.put("businessKey", businessKey);
+		param.put("startDate", date);
 		return busBizChangeLogExMapper.queryRecnetlyChangeLogs(param);
 	}
 

@@ -87,10 +87,24 @@ public interface BusConst {
 		// =============================================结算单接口列表===================================================
 		/** 查询供应商的账单 **/
 		String SETTLE_SUPPLIER_BILL_LIST = "/settle/supplier/bill/list";
-		/**
-		 * 结算单或者账单信息修改
-		 */
+
+		/** 查询账单信息列表（流水列表）*/
+		String SETTLT_DETAIL_LIST="/settle/detail/list";
+
+		/**结算单或者账单信息修改 */
 		String SETTLT_SUPPLIER_BILL_UPDATE="/settle/supplier/bill/update";
+
+		/** 供应商账单查询根据账单id **/
+		String SETTLE_SUPPLIER_BILL_DETAIL = "/settle/supplier/bill/detail";
+		
+		/** 供应商账单确认开票 **/
+		String SETTLE_SUPPLIER_BILL_CONFIRM_INVOICE = "/settle/supplier/bill/confirm/invoice";
+		
+		/** 供应商账单确认打款 **/
+		String SETTLE_SUPPLIER_BILL_CONFIRM_PAY = "/settle/supplier/bill/confirm/pay";
+		
+		/** 供应商账单确认打款 **/
+		String SETTLE_SUPPLIER_BILL_CONFIRM_SETTLE = "/settle/supplier/bill/confirm/settle";
 	}
 
 	/**

@@ -6,13 +6,15 @@ import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.constants.busManage.BusConstant;
 import com.zhuanche.constants.busManage.BusConstant.SupplierMaidConstant;
-import com.zhuanche.dto.busManage.BusSettleChangeDTO;
-import com.zhuanche.dto.busManage.BusSettlementOrderChangeDTO;
-import com.zhuanche.dto.busManage.BusSupplierSettleListDTO;
+import com.zhuanche.dto.busManage.*;
+import com.zhuanche.entity.rentcar.CarBizSupplier;
+import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.busManage.BusCommonService;
 import com.zhuanche.serv.busManage.BusSettlementAdviceService;
 import com.zhuanche.serv.busManage.BusSupplierService;
@@ -20,9 +22,11 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.excel.CsvUtils;
-import com.zhuanche.vo.busManage.BusSupplierInfoVO;
-import com.zhuanche.vo.busManage.BusSupplierSettleDetailVO;
+import com.zhuanche.vo.busManage.*;
+import mapper.rentcar.CarBizSupplierMapper;
+import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.aspectj.weaver.loadtime.Aj;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -34,6 +38,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotBlank;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -59,7 +65,8 @@ public class BusSettlementAdviceController {
 
     @Autowired
     private BusSupplierService busSupplierService;
-
+    @Autowired
+    private CarBizSupplierService supplierService;
 
     /**
      * 查询供应商账单列表 TODO 等计费完成接口完善
@@ -232,6 +239,83 @@ public class BusSettlementAdviceController {
     }
 
     /**
+     * 查询结算单详情
+     * @param supplierBillId
+     * @return
+     */
+    @RequestMapping("detail")
+    @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
+    public AjaxResponse querySettleDetail(@Verify(param = "supplierBillId",rule = "required") String supplierBillId	){
+        JSONObject result = busSettlementAdviceService.getBillDetail(supplierBillId);
+        if(result==null){
+          return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "查询失败，请联系管理员");
+        }
+        BusSettlementDetailVO busSettlementDetailVO = JSONObject.toJavaObject(result, BusSettlementDetailVO.class);
+        Integer supplierId = result.getInteger("supplierId");
+        CarBizSupplier carBizSupplier = supplierService.selectByPrimaryKey(supplierId);
+        busSettlementDetailVO.setSupplierName(carBizSupplier.getSupplierFullName());
+        //暂时没有上次结算金额，如果为空，赋值0
+        if(busSettlementDetailVO.getLastAmount()==null){
+           busSettlementDetailVO.setLastAmount(new BigDecimal(0));
+        }
+        return AjaxResponse.success(busSettlementDetailVO);
+    }
+
+    /** 
+    * @Description: 供应商账单修改页回显数据
+    * @Param: [supplierBillId] 
+    * @return: com.zhuanche.common.web.AjaxResponse 
+    * @Date: 2018/12/20 
+    */ 
+    @RequestMapping("/update/init")
+    @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
+    public AjaxResponse querySettleUpdateInit(@Verify(param = "supplierBillId",rule = "required") String supplierBillId){
+        JSONObject result = busSettlementAdviceService.getBillDetail(supplierBillId);
+        if(result==null){
+            return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "查询失败，请联系管理员");
+        }//BusSettlementUdateInitVO
+
+        BusSettlementUdateInitVO updateInitVO = JSONObject.toJavaObject(result, BusSettlementUdateInitVO.class);
+        Integer supplierId = result.getInteger("supplierId");
+        CarBizSupplier carBizSupplier = supplierService.selectByPrimaryKey(supplierId);
+        updateInitVO.setSupplierName(carBizSupplier.getSupplierFullName());
+        return AjaxResponse.success(updateInitVO);
+    }
+
+
+    /**
+    * @Description: 查询结算单流水列表
+    * @Param: [dto]
+    * @return: com.zhuanche.common.web.AjaxResponse
+    * @Date: 2018/12/19
+    */
+    @RequestMapping(value = "/transactions/List",method = RequestMethod.POST)
+    public AjaxResponse queryOrderList(BusSettleOrderListDTO dto){
+        logger.info(LOG_PRE+"查询特定账单流水列表参数="+JSON.toJSONString(dto));
+        JSONObject result = busSettlementAdviceService.queryOrderList(dto);
+        //接口查询失败，需要查看原因
+        Integer code = result.getInteger("code");
+        if(code==null||code!=0){
+           return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "查询失败，请联系管理员");
+        }
+        JSONObject data = result.getJSONObject("data");
+        logger.info(LOG_PRE+"查询特定账单流水列表参数="+JSON.toJSONString(dto)+" 查询结果="+data);
+        //没有查询到符合条件的数据直接返回
+        if (data == null || data.isEmpty()) {
+            return AjaxResponse.success(new ArrayList<>());
+        }
+        JSONArray array = data.getJSONArray("listData");
+        if(array==null || array.isEmpty()){
+            return AjaxResponse.success(new ArrayList<>());
+        }
+        //处理返回结果
+        List<BusSettleOrderListVO> collect = array.stream().map(o -> (JSONObject) o).map(o -> JSONObject.toJavaObject(o, BusSettleOrderListVO.class))
+                .collect(Collectors.toList());
+        PageDTO page=new PageDTO(data.getInteger("pageNo"),data.getInteger("pageSize"),data.getLong("total"),collect);
+       return AjaxResponse.success(page);
+    }
+
+    /**
      * 修改账单
      *
      * @param dto
@@ -271,4 +355,67 @@ public class BusSettlementAdviceController {
         }
         return AjaxResponse.success(new ArrayList());
     }
+
+    
+	/**
+	 * @Title: confirm
+	 * @Description: 结算单确认
+	 * @param supplierBillId
+	 * @return AjaxResponse
+	 * @throws
+	 */
+	@RequestMapping(value = "/confirm")
+	public AjaxResponse confirm(@NotBlank(message = "账单编号不能为空") String supplierBillId) {
+		return busSettlementAdviceService.confirm(supplierBillId);
+	}
+
+    /**
+     * @Title: invoiceInit
+     * @Description: 结算单确认收票窗口查询
+     * @return AjaxResponse
+     * @throws
+     */
+	@RequestMapping(value = "/invoice/init")
+	public AjaxResponse invoiceInit(@NotBlank(message = "账单编号不能为空") String supplierBillId) {
+		BusSettlementInvoiceVO invoice = busSettlementAdviceService.queryInvoiceInfo(supplierBillId);
+		return AjaxResponse.success(invoice);
+	}
+	
+	/**
+	 * @Title: invoiceSave
+	 * @Description: 结算单确认收票窗口保存
+	 * @param invoiceDTO
+	 * @return AjaxResponse
+	 * @throws
+	 */
+	@RequestMapping(value = "/invoice/save")
+	public AjaxResponse invoiceSave(@Validated BusSettlementInvoiceDTO invoiceDTO) {
+		return busSettlementAdviceService.saveInvoiceInfo(invoiceDTO);
+	}
+	
+	/**
+	 * @Title: paymentInit
+	 * @Description: 结算单确认收款窗口查询
+	 * @param supplierBillId
+	 * @return AjaxResponse
+	 * @throws
+	 */
+	@RequestMapping(value = "/payment/init")
+	public AjaxResponse paymentInit(@NotBlank(message = "账单编号不能为空") String supplierBillId) {
+		BusSettlementPaymentVO payment = busSettlementAdviceService.queryPaymentInfo(supplierBillId);
+		return AjaxResponse.success(payment);
+	}
+	
+	/**
+	 * @Title: paymentSave
+	 * @Description: 结算单确认收款窗口保存
+	 * @param invoiceDTO
+	 * @return AjaxResponse
+	 * @throws
+	 */
+	@RequestMapping(value = "/payment/save")
+	public AjaxResponse paymentSave(@Validated BusSettlementPaymentDTO paymentDTO) {
+		return busSettlementAdviceService.savePaymentInfo(paymentDTO);
+	}
+
 }
