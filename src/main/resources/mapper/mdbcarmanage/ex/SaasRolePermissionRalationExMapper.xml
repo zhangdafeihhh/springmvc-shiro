@@ -33,6 +33,6 @@
       FROM
         saas_user_role_ralation surr
         LEFT JOIN saas_role sr ON surr.role_id = sr.role_id
-        WHERE user_id = #{userId}
+        WHERE sr.valid = 1 and user_id = #{userId}
   </select>
 </mapper>
