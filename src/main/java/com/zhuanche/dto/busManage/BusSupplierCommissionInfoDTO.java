@@ -41,7 +41,7 @@ public class BusSupplierCommissionInfoDTO {
 
 	/** 触发提前结算的金额 允许结算 >0 ；不允许 = 0 **/
 	@NotNull(message = "触发提前结算的金额允许结算不能为空")
-	@DecimalMin(value = "0", inclusive = false, message = "触发提前结算的金额 允许结算 >0 ；不允许 = 0")
+	@DecimalMin(value = "0", inclusive = true, message = "触发提前结算的金额 允许结算 >=0 ")
 	private BigDecimal settleAmount;
 
 	/** 是否返点 0是 1不 **/

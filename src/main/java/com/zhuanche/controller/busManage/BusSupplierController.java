@@ -1,5 +1,6 @@
 package com.zhuanche.controller.busManage;
 
+import java.beans.PropertyEditorSupport;
 import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -72,10 +75,27 @@ public class BusSupplierController {
 	 * @return AjaxResponse
 	 * @throws
 	 */
+	@InitBinder
+	public void initBinder(WebDataBinder binder) {
+		binder.registerCustomEditor(List.class, "prorateList", new PropertyEditorSupport() {
+			@Override
+			public void setAsText(String text) throws IllegalArgumentException {
+				JSONArray jsonArray = JSONArray.parseArray(text);
+				List<Object> list = new ArrayList<>();
+				jsonArray.stream().forEach(e -> {
+					JSONObject jsonObject = (JSONObject) JSON.toJSON(e);
+					BusSupplierProrateDTO prorate = JSON.toJavaObject(jsonObject, BusSupplierProrateDTO.class);
+					list.add(prorate);
+				});
+				super.setValue(list);
+			}
+		});
+	}
+	
 	@RequestMapping(value = "/saveSupplier")
 	public AjaxResponse saveSupplier(@Validated BusSupplierBaseDTO baseDTO, @Validated BusSupplierDetailDTO detailDTO,
-			@Validated BusSupplierCommissionInfoDTO commissionDTO, @Validated List<BusSupplierProrateDTO> prorateList,
-			@Validated List<BusSupplierRebateDTO> rebateList) {
+			@Validated BusSupplierCommissionInfoDTO commissionDTO, @Validated ArrayList<BusSupplierProrateDTO> prorateList,
+			@Validated ArrayList<BusSupplierRebateDTO> rebateList) {
 		return busSupplierService.saveSupplierInfo(baseDTO, detailDTO, commissionDTO, prorateList, rebateList);
 	}
 
