@@ -5,7 +5,6 @@ import java.util.Date;
 
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotNull;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -25,28 +24,23 @@ public class BusSupplierRebateDTO {
 	private Integer supplierId;
 
 	/** 返佣比例 **/
-	@NotNull(message = "返佣比例不能为空")
 	@DecimalMin(value = "0", inclusive = false, message = "返佣比例必须大于0")
 	@DecimalMax(value = "100", inclusive = false, message = "返佣比例必须小于100")
 	private BigDecimal rebateRate;
 
 	/** 最小金额 **/
-	@NotNull(message = "最小金额不能为空")
 	@DecimalMin(value = "0", inclusive = true, message = "最小金额必须大于0")
 	private BigDecimal minMoney;
 
 	/** 最大金额 **/
-	@NotNull(message = "最大金额不能为空")
 	@DecimalMin(value = "0", inclusive = false, message = "最大金额必须大于0")
 	private BigDecimal maxMoney;
 
 	/** 开始时间 **/
-	@NotNull(message = "开始时间不能为空")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date startTime;
 
 	/** 结束时间 **/
-	@NotNull(message = "结束时间不能为空")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date endTime;
 

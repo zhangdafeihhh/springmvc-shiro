@@ -5,7 +5,6 @@ import java.util.Date;
 
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotNull;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -25,18 +24,15 @@ public class BusSupplierProrateDTO {
 	private Integer supplierId;
 
 	/** 供应商比例 **/
-	@NotNull(message = "供应商比例不能为空")
 	@DecimalMin(value = "0", inclusive = false, message = "供应商比例必须大于0")
 	@DecimalMax(value = "100", inclusive = false, message = "供应商比例必须小于100")
 	private BigDecimal supplierRate;
 
 	/** 协议开始时间 **/
-	@NotNull(message = "协议开始时间不能为空")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date startTime;
 
 	/** 协议结束日期 **/
-	@NotNull(message = "协议结束时间不能为空")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date endTime;
 

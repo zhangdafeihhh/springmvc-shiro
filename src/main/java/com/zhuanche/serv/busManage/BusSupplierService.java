@@ -136,7 +136,7 @@ public class BusSupplierService implements BusConst {
 		}
 
 		// 四、调用分佣接口，修改分佣、返点信息
-		StringBuilder errorMsg = new StringBuilder("保存分佣结算信息:");
+		StringBuilder errorMsg = new StringBuilder();
 
 		String commissionMsg = saveSupplierCommission(commissionDTO, supplierId, method);// 分佣基本信息
 		if (StringUtils.isNotBlank(commissionMsg)) {
@@ -170,7 +170,11 @@ public class BusSupplierService implements BusConst {
 		if (f > 0) {
 			return AjaxResponse.success(null);
 		} else {
-			return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, StringUtils.defaultIfBlank(errorMsg.toString(), "保存分佣结算信息失败"));
+			if (StringUtils.isBlank(errorMsg.toString())) {
+				return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, "保存供应商失败");
+			} else {
+				return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, "保存分佣结算信息失败:" + errorMsg.toString());
+			}
 		}
 	}
 	
