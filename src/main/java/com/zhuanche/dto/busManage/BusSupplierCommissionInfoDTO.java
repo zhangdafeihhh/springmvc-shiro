@@ -2,6 +2,7 @@ package com.zhuanche.dto.busManage;
 
 import java.math.BigDecimal;
 
+import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 
@@ -41,7 +42,7 @@ public class BusSupplierCommissionInfoDTO {
 
 	/** 触发提前结算的金额 允许结算 >0 ；不允许 = 0 **/
 	@NotNull(message = "触发提前结算的金额允许结算不能为空")
-	@DecimalMin(value = "0", inclusive = false, message = "触发提前结算的金额 允许结算 >0 ；不允许 = 0")
+	@DecimalMin(value = "0", inclusive = true, message = "触发提前结算的金额 允许结算 >=0 ")
 	private BigDecimal settleAmount;
 
 	/** 是否返点 0是 1不 **/
@@ -67,6 +68,7 @@ public class BusSupplierCommissionInfoDTO {
 	/** 结算周期天数 >0 **/
 	@NotNull(message = "结算周期天数不能为空")
 	@DecimalMin(value = "0", inclusive = false, message = "结算周期天数必须大于0")
+	@DecimalMax(value = "365", inclusive = false, message = "结算周期天数不能超过365天")
 	private Integer settleBillCycle;
 
 	/** 结算方式 0 手动 1自动 **/

@@ -192,7 +192,7 @@
 	</update>
 	
 	<!-- 查询供应商是否存在  -->
-	<select id="checkExist" parameterType="java.lang.Integer">
+	<select id="checkExist" parameterType="java.lang.Integer" resultType="java.lang.Integer">
 		select count(*) from bus_biz_supplier_detail where supplier_id = #{supplierId}
 	</select>
 	

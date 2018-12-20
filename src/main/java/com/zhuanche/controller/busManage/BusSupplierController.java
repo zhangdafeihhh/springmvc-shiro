@@ -1,5 +1,6 @@
 package com.zhuanche.controller.busManage;
 
+import java.beans.PropertyEditorSupport;
 import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -72,10 +75,27 @@ public class BusSupplierController {
 	 * @return AjaxResponse
 	 * @throws
 	 */
+	@InitBinder
+	public void initBinder(WebDataBinder binder) {
+		binder.registerCustomEditor(List.class, "prorateList", new PropertyEditorSupport() {
+			@Override
+			public void setAsText(String text) throws IllegalArgumentException {
+				JSONArray jsonArray = JSONArray.parseArray(text);
+				List<Object> list = new ArrayList<>();
+				jsonArray.stream().forEach(e -> {
+					JSONObject jsonObject = (JSONObject) JSON.toJSON(e);
+					BusSupplierProrateDTO prorate = JSON.toJavaObject(jsonObject, BusSupplierProrateDTO.class);
+					list.add(prorate);
+				});
+				super.setValue(list);
+			}
+		});
+	}
+	
 	@RequestMapping(value = "/saveSupplier")
 	public AjaxResponse saveSupplier(@Validated BusSupplierBaseDTO baseDTO, @Validated BusSupplierDetailDTO detailDTO,
-			@Validated BusSupplierCommissionInfoDTO commissionDTO, @Validated List<BusSupplierProrateDTO> prorateList,
-			@Validated List<BusSupplierRebateDTO> rebateList) {
+			@Validated BusSupplierCommissionInfoDTO commissionDTO, @Validated ArrayList<BusSupplierProrateDTO> prorateList,
+			@Validated ArrayList<BusSupplierRebateDTO> rebateList) {
 		return busSupplierService.saveSupplierInfo(baseDTO, detailDTO, commissionDTO, prorateList, rebateList);
 	}
 
@@ -112,18 +132,26 @@ public class BusSupplierController {
 		queryDTO.setExcludeContractIds(null);
         List<BusSupplierPageVO> totalList = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
         Page<BusSupplierPageVO> page = (Page<BusSupplierPageVO>) totalList;
-        
-        // 三、补充分佣信息(分佣比例、是否有返点)
+
         if (resultList == null || resultList.isEmpty()) {
         	resultList = totalList;
+        	if (resultList == null || resultList.isEmpty()) {
+        		return AjaxResponse.success(new PageDTO(queryDTO.getPageNum(), queryDTO.getPageSize(), page.getTotal(), resultList));
+			} else {
+				// 补充巴士供应商其它信息
+				resultList.forEach(busSupplierService::completeDetailInfo);
+			}
         }
+        
+        // 三、补充信息
 		String supplierIds = resultList.stream().map(e -> e.getSupplierId().toString()).collect(Collectors.joining(","));
 		JSONArray jsonArray = busSupplierService.getProrateList(supplierIds);
-		if (jsonArray != null) {
-			// 组装数据
-			resultList.forEach(supplier -> {
+		// 组装数据
+		resultList.forEach(supplier -> {
+			Integer supplierId = supplier.getSupplierId();
+			// 补充分佣信息(分佣比例、是否有返点)
+			if (jsonArray != null) {
 				// 查找对应供应商数据
-				Integer supplierId = supplier.getSupplierId();
 				jsonArray.stream().filter(e -> {
 					JSONObject jsonObject = (JSONObject) JSON.toJSON(e);
 					return supplierId.equals(jsonObject.getInteger("supplierId"));
@@ -132,8 +160,8 @@ public class BusSupplierController {
 					supplier.setSupplierRate(jsonObject.getDouble("supplierRate"));
 					supplier.setIsRebate(jsonObject.getInteger("isRebate"));
 				});
-			});
-		}
+			}
+		});
 		return AjaxResponse.success(new PageDTO(queryDTO.getPageNum(), queryDTO.getPageSize(), page.getTotal(), resultList));
 	}
 

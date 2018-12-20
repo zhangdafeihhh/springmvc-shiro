@@ -27,13 +27,13 @@ public class BusSupplierDetailDTO implements BusSupplierDTO {
 	/** 保证金 **/
 	@NotNull(message = "保证金不能为空")
 	@DecimalMin(value = "0", inclusive = false, message = "保证金必须大于0元")
-	@DecimalMax(value = " 9999999999.99", message = "保证金必须小于 9999999999.99 元")
+	@DecimalMax(value = "9999999999.99", message = "保证金必须小于 9999999999.99 元")
 	private BigDecimal deposit;
 
 	/** 加盟费 **/
 	@NotNull(message = "加盟费不能为空")
 	@DecimalMin(value = "0", inclusive = false, message = "加盟费必须大于0元")
-	@DecimalMax(value = " 9999999999.99", message = "加盟费必须小于 9999999999.99 元")
+	@DecimalMax(value = "9999999999.99", message = "加盟费必须小于 9999999999.99 元")
 	private BigDecimal franchiseFee;
 
 	/** 合同开始日期 **/

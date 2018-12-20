@@ -134,7 +134,7 @@ public class BusSupplierService implements BusConst {
 		}
 
 		// 四、调用分佣接口，修改分佣、返点信息
-		StringBuilder errorMsg = new StringBuilder();
+		StringBuilder errorMsg = new StringBuilder("保存分佣结算信息:");
 
 		String commissionMsg = saveSupplierCommission(commissionDTO, supplierId);// 分佣基本信息
 		if (StringUtils.isNotBlank(commissionMsg)) {
@@ -168,7 +168,7 @@ public class BusSupplierService implements BusConst {
 		if (f > 0 && StringUtils.isBlank(errorMsg.toString())) {
 			return AjaxResponse.success(null);
 		} else {
-			return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, StringUtils.defaultIfBlank(errorMsg.toString(), "操作失败"));
+			return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, StringUtils.defaultIfBlank(errorMsg.toString(), "保存分佣结算信息失败"));
 		}
 	}
 	
@@ -463,6 +463,7 @@ public class BusSupplierService implements BusConst {
 			/** 行数据 */
 			StringBuilder builder = new StringBuilder();
 			BusBizSupplierDetail detail = busBizSupplierDetailExMapper.selectBySupplierId(supplier.getSupplierId());
+			detail = detail == null ? new BusBizSupplierDetail() : detail;
 	
 			// 一、供应商
 			String supplierName = supplier.getSupplierName();
@@ -474,7 +475,7 @@ public class BusSupplierService implements BusConst {
 	
 			// 三、分佣比例
 			Double supplierRate = supplier.getSupplierRate();
-			builder.append(supplierRate).append(",");
+			builder.append(supplierRate == null ? 0.00 : supplierRate).append(",");
 	
 			// 四、加盟费
 			BigDecimal franchiseFee = detail.getFranchiseFee();
@@ -485,7 +486,7 @@ public class BusSupplierService implements BusConst {
 			builder.append(decimalFormat(deposit)).append(",");
 	
 			// 六、是否有返点
-			String isRebate = supplier.getIsRebate() == 0 ? "不返点" : "返点";
+			String isRebate = supplier.getIsRebate() == null || supplier.getIsRebate() == 0 ? "不返点" : "返点";
 			builder.append(isRebate).append(",");
 	
 			// 七、合同开始时间
@@ -505,7 +506,7 @@ public class BusSupplierService implements BusConst {
 			builder.append(StringUtils.defaultIfBlank(contractDateEndFormatter, "")).append(",");
 	
 			// 九、状态
-			String status = supplier.getStatus() == 1 ? "有效" : "无效";
+			String status = supplier.getStatus() != null && supplier.getStatus() == 1 ? "有效" : "无效";
 			builder.append(status).append(",");
 	
 			csvDataList.add(builder.toString());
