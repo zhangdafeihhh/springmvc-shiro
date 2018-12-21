@@ -542,6 +542,9 @@ public class BusSupplierService implements BusConst {
 	public BusSupplierInfoVO querySupplierById(Integer supplierId) {
 		// 一、查询供应商基础信息
 		BusSupplierInfoVO supplierVO = busCarBizSupplierExMapper.selectBusSupplierById(supplierId);
+		if (supplierVO == null) {
+			return supplierVO;
+		}
 		// 二、查询巴士供应商其它信息
 		completeDetailInfo(supplierVO);
 
@@ -564,6 +567,7 @@ public class BusSupplierService implements BusConst {
 	private JSON getRemoteCommissionInfo(Integer supplierId) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("supplierId", supplierId);
+		
 		try {
 			logger.info("[ BusSupplierService-getRemoteCommissionInfo ] 查询供应商结算信息,params={}", params);
 			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_SUPPLIER_INFO, params, 2000, "查询供应商结算信息");
@@ -592,7 +596,7 @@ public class BusSupplierService implements BusConst {
 		params.put("status", 0);
 		try {
 			logger.info("[ BusSupplierService-getRemoteProrateInfoList ] 查询供应商分佣信息,params={}", params);
-			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_SUPPLIER_PRORATE_INFO_LIST, params, 2000, "查询供应商分佣信息");
+			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_SUPPLIER_PRORATE_DETAIL, params, 2000, "查询供应商分佣信息");
 			if (result.getIntValue("code") == 0) {
 				JSONArray jsonArray = result.getJSONArray("data");
 				return jsonArray;

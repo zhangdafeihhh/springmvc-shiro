@@ -41,7 +41,6 @@
 								<bean class="com.zhuanche.common.web.fastjson.filter.BigDecimalFilter"></bean>
 							</list>
 						</property>
-						<property name="dateFormat" value="yyyy-MM-dd HH:mm:ss"/>
                 	</bean>
                 </property>
             </bean>

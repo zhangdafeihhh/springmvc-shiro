@@ -160,9 +160,6 @@ public class BusCarBizDriverInfoService implements BusConst{
 	@Autowired
 	private BusCarBizDriverInfoExMapper busCarBizDriverInfoExMapper;
 	
-	@Autowired
-	private BusCarBizCustomerAppraisalStatisticsService busCarBizCustomerAppraisalStatisticsService;
-
 	// ===========================专车业务拓展service==================================
 	@Autowired
 	private CarBizDriverInfoService carBizDriverInfoService;
