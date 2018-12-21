@@ -308,7 +308,7 @@ public class BusDriverInfoController extends BusBaseController {
 	 */
 	@SuppressWarnings("resource")
 	@RequestMapping(value = "/exportDriverList")
-	public void exportDriverList(@Validated(BusDriverQueryDTO.Export.class) BusDriverQueryDTO exportDTO, HttpServletRequest request,
+	public void exportDriverList(BusDriverQueryDTO exportDTO, HttpServletRequest request,
 			HttpServletResponse response) {
 		long start = System.currentTimeMillis(); // 获取开始时间
 		try {
