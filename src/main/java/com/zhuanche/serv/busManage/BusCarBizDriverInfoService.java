@@ -277,13 +277,10 @@ public class BusCarBizDriverInfoService implements BusConst{
 			}
 			builder.append(StringUtils.defaultIfBlank(supplierName, "")).append(",");
 
-			// 三、车型类别
-			builder.append(StringUtils.defaultIfBlank(driver.getGroupName(), "")).append(",");
-
-			// 四、司机姓名
+			// 三、司机姓名
 			builder.append(StringUtils.defaultIfBlank(driver.getName(), "")).append(",");
 
-			// 五、司机性别
+			// 四、司机性别
 			String gender = "";
 			if (driver.getGender() == 1) {
 				gender = "男";
@@ -291,6 +288,9 @@ public class BusCarBizDriverInfoService implements BusConst{
 				gender = "女";
 			}
 			builder.append(gender).append(",");
+
+			// 五、车型类别
+			builder.append(StringUtils.defaultIfBlank(driver.getGroupName(), "")).append(",");
 
 			// 六、身份证号
 			builder.append(StringUtils.defaultIfBlank(driver.getIdCardNo(), "")).append(",");
