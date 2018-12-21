@@ -38,13 +38,13 @@ public class BusSupplierDetailDTO implements BusSupplierDTO {
 	private BigDecimal franchiseFee;
 
 	/** 合同开始日期 **/
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@NotNull(message = "合同开始日期不能为空")
 	private Date contractDateStart;
 
 	/** 合同结束日期 **/
 	@NotNull(message = "合同结束日期不能为空")
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date contractDateEnd;
 
 	/** 公司名称(发票信息) **/

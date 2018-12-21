@@ -64,7 +64,7 @@ public interface BusConst {
 		String SETTLE_SUPPLIER_INFO_UPDATE = "/settle/supplier/info/update";
 
 		/** 查询分佣协议 **/
-		String SETTLE_SUPPLIER_PRORATE_INFO_LIST = "/settle/supplier/prorate/info/list";
+		String SETTLE_SUPPLIER_PRORATE_DETAIL = "/settle/supplier/prorate/detail";
 		
 		/** 供应商分佣协议增加 **/
 		String SETTLE_SUPPLIER_PRORATE_ADD = "/settle/supplier/prorate/add";

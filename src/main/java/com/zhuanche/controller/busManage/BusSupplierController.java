@@ -85,7 +85,13 @@ public class BusSupplierController {
 	public AjaxResponse saveSupplier(@Validated BusSupplierBaseDTO baseDTO, @Validated BusSupplierDetailDTO detailDTO,
 			@Validated BusSupplierCommissionInfoDTO commissionDTO, String prorateList, String rebateList) {
 		// 分佣
-		JSONArray prorateArray = JSONArray.parseArray(prorateList);
+		JSONArray prorateArray = null;
+		try {
+			prorateArray = JSONArray.parseArray(prorateList);
+		} catch (Exception e) {
+			logger.error("[ BusSupplierController-saveSupplier ] 分佣协议格式不正确", e.getMessage(), e);
+			return AjaxResponse.failMsg(RestErrorCode.PARAMS_ERROR, "分佣协议格式不正确");
+		}
 		List<BusSupplierProrateDTO> prorates = new ArrayList<>();
 		if (prorateArray != null) {
 			prorateArray.stream().forEach(e -> {
@@ -104,7 +110,13 @@ public class BusSupplierController {
 		}
 		
 		// 返点
-		JSONArray rebateArray = JSONArray.parseArray(rebateList);
+		JSONArray rebateArray = null;
+		try {
+			rebateArray = JSONArray.parseArray(rebateList);
+		} catch (Exception e) {
+			logger.error("[ BusSupplierController-saveSupplier ] 返点协议格式不正确", e.getMessage(), e);
+			return AjaxResponse.failMsg(RestErrorCode.PARAMS_ERROR, "返点协议格式不正确");
+		}
 		List<BusSupplierRebateDTO> rebates = new ArrayList<>();
 		if (rebateArray != null) {
 			rebateArray.stream().forEach(e -> {
