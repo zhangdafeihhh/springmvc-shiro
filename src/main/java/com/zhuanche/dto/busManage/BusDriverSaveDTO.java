@@ -6,6 +6,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -32,6 +33,7 @@ public class BusDriverSaveDTO extends BusBaseStatisDTO {
 
 	/** 司机姓名 **/
 	@NotBlank(message = "司机姓名不能为空")
+	@Size(max = 100, message = "司机姓名长度不能超过20")
 	private String name;
 
 	/** 司机性别，[1.男0.女] **/
@@ -41,6 +43,7 @@ public class BusDriverSaveDTO extends BusBaseStatisDTO {
 
 	/** 身份证号 **/
 	@NotBlank(message = "身份证号不能为空")
+	@Size(max = 100, message = "身份证号长度不能超过18")
 	private String idCardNo;
 
 	/** 手机号 **/
@@ -60,6 +63,7 @@ public class BusDriverSaveDTO extends BusBaseStatisDTO {
 
 	/** 机动车驾驶证号 **/
 	@NotBlank(message = "机动车驾驶证号不能为空")
+	@Size(max = 100, message = "机动车驾驶证号长度不能超过30")
 	private String driverlicensenumber;
 
 	/** 驾照领证日期 **/
@@ -67,8 +71,9 @@ public class BusDriverSaveDTO extends BusBaseStatisDTO {
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date issueDate;
 
-	@NotBlank(message = "道路运输从业资格证编号不能为空")
 	/** 道路运输从业资格证编号(巡游出租汽车驾驶员资格证号,巴士业务无“巡游...”业务，复用此字段) **/
+	@NotBlank(message = "道路运输从业资格证编号不能为空")
+	@Size(max = 100, message = "道路运输从业资格证编号长度不能超过20")
 	private String xyDriverNumber;
 	/** 是否巡游出租汽车驾驶员 **/
 	private Integer isxydriver = 1;// 巴士业务默认为"是"

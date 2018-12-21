@@ -208,7 +208,8 @@
 		FROM
 			bus_biz_supplier_detail
 		where 
-        	TIMESTAMPDIFF(MONTH, contract_date_end, now()) <![CDATA[<]]> 3
+        		TIMESTAMPDIFF(MONTH, contract_date_end, now()) <![CDATA[<=]]> 3
+        	AND TIMESTAMPDIFF(MONTH, contract_date_end, now()) <![CDATA[>=]]> 0
             <if test="permOfSupplier != null and permOfSupplier.size() > 0">
 				AND supplier_id IN
 				<foreach collection="permOfSupplier" open="(" close=")"
