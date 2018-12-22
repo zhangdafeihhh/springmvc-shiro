@@ -123,6 +123,12 @@ public interface BusConst {
 
 		/** 大巴车支付明细 **/
 		String BUS_PAY_DETAIL = "/pay/bus/details";
+		/**订单评价*/
+		String BUS_APPRAISAL = "/appraisal/queryAppraisalDetailsByOrderNos";
+		/**查询企业ID*/
+		String ORG_URL = "/api/v1/company/decide";
+		/**查询企业折扣信息*/
+		String ORG_COST_URL = "/business/queryBusinessInfo";
 	}
 
 	/**
