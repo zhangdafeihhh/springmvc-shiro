@@ -127,13 +127,13 @@ public class BusAssignmentController {
 	@RequestMapping(value = "/queryCarData", method = { RequestMethod.POST })
 	public AjaxResponse queryCarData(@Verify(param = "orderNo", rule = "required") String orderNo,
 			@Verify(param = "groupId", rule = "required") Integer groupId,
-			@Verify(param = "cityId", rule = "required") Integer cityId, 
-			@Verify(param = "type", rule = "required") Integer type, 
+			@Verify(param = "cityId", rule = "required") Integer cityId,
+			@Verify(param = "type", rule = "required") Integer type,
 			BusCarDTO busCarDTO) {
 		if (type != 1 && type != 2) {
 			return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "业务类型不存在");
 		}
-		
+
 		PageDTO pageDTO = new PageDTO();
 		try {
 			pageDTO = busAssignmentService.orderToDoListForCar(busCarDTO);
@@ -155,13 +155,13 @@ public class BusAssignmentController {
 	@RequestMapping(value = "/queryDriverData", method = { RequestMethod.POST })
 	public AjaxResponse queryDriverData(@Verify(param = "orderNo", rule = "required") String orderNo,
 			@Verify(param = "groupId", rule = "required") Integer groupId,
-			@Verify(param = "cityId", rule = "required") Integer cityId, 
-			@Verify(param = "type", rule = "required") Integer type, 
+			@Verify(param = "cityId", rule = "required") Integer cityId,
+			@Verify(param = "type", rule = "required") Integer type,
 			BusDriverDTO busDriverDTO) {
 		if (type != 1 && type != 2) {
 			return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "业务类型不存在");
 		}
-		
+
 		PageDTO pageDTO = new PageDTO();
 		try {
 			pageDTO = busAssignmentService.orderToDoListForDriver(busDriverDTO);
@@ -418,7 +418,7 @@ public class BusAssignmentController {
 
 	/**
 	 * @Title: saveBusOrderOperation
-	 * @Description: 保存操作轨迹 
+	 * @Description: 保存操作轨迹
 	 * @param orderOperationTime void
 	 * @throws
 	 */
@@ -515,7 +515,7 @@ public class BusAssignmentController {
 		}
 		return result;
 	}
-	
+
 	@ResponseBody
 	@RequestMapping(value = "/queryOrderDetails", method = {RequestMethod.POST})
 	@MasterSlaveConfigs(configs = {
@@ -526,20 +526,20 @@ public class BusAssignmentController {
         if (orderId == null || StringUtils.isBlank(orderNo)) {
         	return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "订单ID或订单编号不能为空");
         }
-        
+
         try {
 			// 调用订单接口查询订单详情
 			BusOrderDetail orderDetail = busOrderService.selectOrderDetail(orderNo);
 			logger.info("[ BusAssignmentController-saveMessageTask ] 订单详情 = {}", JSON.toJSONString(orderDetail));
-			
+
 			// 调用计费接口
 			BusCostDetail busCostDetail = busOrderService.selectOrderCostDetail(orderId);
 			logger.info("[ BusAssignmentController-saveMessageTask ] 计费详情 = {}", JSON.toJSONString(busCostDetail));
-			
+
 			// 调用支付接口
 			BusPayDetail busPayDetail = busOrderService.selectOrderPayDetail(orderNo);
 			logger.info("[ BusAssignmentController-saveMessageTask ] 支付详情 = {}", JSON.toJSONString(busPayDetail));
-			
+
 			// 查询派单订单操作状态
 			List<BusOrderOperationTime> orderOperations = busOrderOperationTimeExMapper.queryOperationByOrderId(orderId);
 			logger.info("[ BusAssignmentController-saveMessageTask ] 操作详情 = {}", JSON.toJSONString(orderOperations));

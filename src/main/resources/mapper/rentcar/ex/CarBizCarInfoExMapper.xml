@@ -155,20 +155,21 @@
     <!-- 查询巴士订单指派/改派可用车辆 -->
 	<select id="queryBusCarList" parameterType="com.zhuanche.dto.busManage.BusCarRicherDTO" resultType="java.util.HashMap">
 		SELECT
-			c.car_id AS carId,
-			c.license_plates AS licensePlates,
-			c.color AS color,
-			p.supplier_full_name AS supplierName,
-			g.group_name AS groupName
+		c.car_id AS carId,
+		c.license_plates AS licensePlates,
+		c.color AS color,
+		p.supplier_full_name AS supplierName,
+		CASE when g.group_name is null then gop.group_name else g.group_name end as groupName,
 		FROM
-			car_biz_car_info c 
-			LEFT JOIN car_biz_supplier p ON c.supplier_id = p.supplier_id
-			LEFT JOIN car_biz_model m ON m.model_id = c.car_model_id LEFT JOIN
-			car_biz_car_group g ON m.group_id = g.group_id
+		car_biz_car_info c
+		LEFT JOIN car_biz_supplier p ON c.supplier_id = p.supplier_id
+		LEFT JOIN car_biz_model m ON m.model_id = c.car_model_id LEFT JOIN
+		car_biz_car_group g ON m.group_id = g.group_id
+		LEFT JOIN car_biz_car_group gop ON c.group_id = gop.group_id
 		WHERE
-			c.STATUS = 1 AND
-			g.type = 2 AND
-			car_id != 0
+		c.STATUS = 1 AND
+		(g.type = 2 or gop.type = 2) AND
+		car_id != 0
 		<if test="licensePlates != null and licensePlates != ''">
 			and c.license_plates LIKE CONCAT('%',#{licensePlates},'%')
 		</if>
@@ -211,7 +212,7 @@
 		LIMIT 1
 	</select>
 
-	<select id="selectBasicCarInfo" parameterType="java.lang.Integer" resultType="com.zhuanche.web.entity.car.CarInfoEntity">
+	<select id="selectBasicCarInfo" parameterType="java.lang.Integer" resultType="com.zhuanche.dto.rentcar.CarBizCarInfoDTO">
 		SELECT
 		info.license_plates licensePlates,
 		city.city_id cityId,

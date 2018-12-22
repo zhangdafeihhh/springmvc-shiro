@@ -63,16 +63,20 @@
         info.license_plates,
         city.city_name,
         sup.supplier_full_name,
-        gop.group_name,
-        info.model_detail,
+        CASE when g.group_name is null then gop.group_name else g.group_name end as group_name,
+        CASE when m.model_name is null then info.model_detail else m.model_name end as model_detail,
         info.`status`,
         info.create_date
         FROM
         car_biz_car_info info
         LEFT JOIN car_biz_city city ON info.city_id = city.city_id
         LEFT JOIN car_biz_supplier sup ON info.supplier_id = sup.supplier_id
+
+        LEFT JOIN car_biz_model m ON m.model_id = info.car_model_id
+        LEFT JOIN car_biz_car_group g ON m.group_id = g.group_id
+
         LEFT JOIN car_biz_car_group gop ON info.group_id = gop.group_id
-        where gop.type = 2
+        where (gop.type = 2 or g.type=2)
         <if test="authOfCity !=null and authOfCity.size >0 ">
            and  info.city_id in
         <foreach collection="authOfCity" item="item" separator=","  open="(" close=")" >
@@ -115,8 +119,10 @@
           info.supplier_id,
           sup.supplier_full_name,
           info.license_plates,
-          info.group_id,
-          gop.group_name,
+
+		  CASE when g.group_id is null then gop.group_id else g.group_id end as group_id,
+          CASE when g.group_name is null then gop.group_name else g.group_name end as group_name,
+          CASE when m.model_name is null then info.model_detail else m.model_name end as model_detail,
           info.vehicle_brand,
           info.model_detail,
           info.color,
@@ -127,9 +133,14 @@
           	car_biz_car_info info
         LEFT JOIN car_biz_city city ON info.city_id = city.city_id
         LEFT JOIN car_biz_supplier sup ON info.supplier_id = sup.supplier_id
+
+        LEFT JOIN car_biz_model m ON m.model_id = info.car_model_id
+        LEFT JOIN car_biz_car_group g ON m.group_id = g.group_id
+
+
         LEFT JOIN car_biz_car_group gop ON info.group_id = gop.group_id
           WHERE
-	      info.car_id = #{carId}
+	      info.car_id = #{carId};
     </select>
 
     <select id="countLicensePlates" parameterType="java.lang.String" resultType="java.lang.Integer">
