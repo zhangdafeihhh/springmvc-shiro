@@ -56,30 +56,36 @@ public interface BusConst {
 		// =============================================供应商接口列表===================================================
 		/** 供应商基本信息查询 **/
 		String SETTLE_SUPPLIER_INFO = "/settle/supplier/info";
-		
+
 		/** 供应商增加基础信息 **/
 		String SETTLE_SUPPLIER_INFO_ADD = "/settle/supplier/info/add";
-		
+
 		/** 供应商更新基础信息 **/
 		String SETTLE_SUPPLIER_INFO_UPDATE = "/settle/supplier/info/update";
 
 		/** 查询分佣协议 **/
 		String SETTLE_SUPPLIER_PRORATE_DETAIL = "/settle/supplier/prorate/detail";
-		
+
 		/** 供应商分佣协议增加 **/
 		String SETTLE_SUPPLIER_PRORATE_ADD = "/settle/supplier/prorate/add";
-		
+
 		/** 供应商分佣协议更新 **/
 		String SETTLE_SUPPLIER_PRORATE_UPDATE = "/settle/supplier/prorate/update";
 
+		/** 供应商分佣协议删除 **/
+		String SETTLE_SUPPLIER_PRORATE_DELETE = "/settle/supplier/prorate/delete";
+
 		/** 查找供应商返佣配置 **/
 		String SETTLE_SUPPLIER_REBATE_INFO = "/settle/supplier/rebate/info";
-		
+
 		/** 供应商返点协议增加 **/
 		String SETTLE_SUPPLIER_REBATE_ADD = "/settle/supplier/rebate/add";
-		
-		/** 供应商返点协议更新**/
+
+		/** 供应商返点协议更新 **/
 		String SETTLE_SUPPLIER_REBATE_UPDATE = "/settle/supplier/rebate/update";
+
+		/** 供应商返点协议删除 **/
+		String SETTLE_SUPPLIER_REBATE_DELETE = "/settle/supplier/rebate/delete";
 
 		/** 查询供应商分佣有关的信息（批量） **/
 		String SETTLE_SUPPLIER_PRORATE_LIST = "/settle/supplier/prorate/list";
@@ -87,19 +93,19 @@ public interface BusConst {
 		// =============================================结算单接口列表===================================================
 		/** 查询供应商的账单 **/
 		String SETTLE_SUPPLIER_BILL_LIST = "/settle/supplier/bill/list";
-		
+
 		/** 结算单或者账单信息修改 **/
 		String SETTLT_SUPPLIER_BILL_LISET = "/settle/supplier/bill/list";
 
 		/** 供应商账单查询根据账单id **/
 		String SETTLE_SUPPLIER_BILL_DETAIL = "/settle/supplier/bill/detail";
-		
+
 		/** 供应商账单确认开票 **/
 		String SETTLE_SUPPLIER_BILL_CONFIRM_INVOICE = "/settle/supplier/bill/confirm/invoice";
-		
+
 		/** 供应商账单确认打款 **/
 		String SETTLE_SUPPLIER_BILL_CONFIRM_PAY = "/settle/supplier/bill/confirm/pay";
-		
+
 		/** 供应商账单确认打款 **/
 		String SETTLE_SUPPLIER_BILL_CONFIRM_SETTLE = "/settle/supplier/bill/confirm/settle";
 	}
