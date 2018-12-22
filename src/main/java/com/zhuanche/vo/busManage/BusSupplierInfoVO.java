@@ -1,6 +1,7 @@
 package com.zhuanche.vo.busManage;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import com.alibaba.fastjson.JSON;
 
@@ -47,10 +48,10 @@ public class BusSupplierInfoVO {
 	private BigDecimal franchiseFee;
 
 	/** 合同开始日期(yyyy-MM-dd HH:mm:ss) **/
-	private String contractDateStart;
+	private Date contractDateStart;
 
 	/** 合同结束日期(yyyy-MM-dd HH:mm:ss) **/
-	private String contractDateEnd;
+	private Date contractDateEnd;
 
 	/** 公司名称 **/
 	private String invoiceCompanyName;
@@ -167,19 +168,19 @@ public class BusSupplierInfoVO {
 		this.franchiseFee = franchiseFee;
 	}
 
-	public String getContractDateStart() {
+	public Date getContractDateStart() {
 		return contractDateStart;
 	}
 
-	public void setContractDateStart(String contractDateStart) {
+	public void setContractDateStart(Date contractDateStart) {
 		this.contractDateStart = contractDateStart;
 	}
 
-	public String getContractDateEnd() {
+	public Date getContractDateEnd() {
 		return contractDateEnd;
 	}
 
-	public void setContractDateEnd(String contractDateEnd) {
+	public void setContractDateEnd(Date contractDateEnd) {
 		this.contractDateEnd = contractDateEnd;
 	}
 

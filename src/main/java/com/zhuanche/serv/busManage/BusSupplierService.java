@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.alibaba.fastjson.JSON;
@@ -49,6 +50,7 @@ import mapper.rentcar.ex.BusCarBizSupplierExMapper;
 
 @Service
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Validated
 public class BusSupplierService implements BusConst {
 
 	private static final Logger logger = LoggerFactory.getLogger(BusSupplierService.class);
@@ -97,15 +99,15 @@ public class BusSupplierService implements BusConst {
 	@MasterSlaveConfigs(configs = { @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER),
 			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.MASTER) })
 	public AjaxResponse saveSupplierInfo(BusSupplierBaseDTO baseDTO, BusSupplierDetailDTO detailDTO,
-			BusSupplierCommissionInfoDTO commissionDTO, List<BusSupplierProrateDTO> prorateList,
-			List<BusSupplierRebateDTO> rebateList) {
-		String method = "UPDATE";
+			BusSupplierCommissionInfoDTO commissionDTO, @Validated List<BusSupplierProrateDTO> prorateList,
+			@Validated List<BusSupplierRebateDTO> rebateList) {
+		Method method = Method.UPDATE;
 		int f = 0;
 		Integer supplierId = baseDTO.getSupplierId();
 		// 一、操作主表
 		baseDTO.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
 		if (supplierId == null || supplierId == 0) {
-			method = "CREATE";
+			method = Method.CREATE;
 			baseDTO.setAddress(detailDTO.getInvoiceCompanyAddr());// 默认发票公司地址
 			baseDTO.setSupplierType(1);// 巴士供应商
 			baseDTO.setEnterpriseType(2);// 非客运企业
@@ -128,25 +130,25 @@ public class BusSupplierService implements BusConst {
 		}
 
 		// 三、查询供应商底下是否有司机，并修改司机加盟类型
-		if ("UPDATE".equals(method)) {
+		if (Method.UPDATE.equals(method)) {
 			carBizDriverInfoService.updateDriverCooperationTypeBySupplierId(baseDTO.getSupplierId(), baseDTO.getCooperationType());
 			carBizDriverInfoTempService.updateDriverCooperationTypeBySupplierId(baseDTO.getSupplierId(), baseDTO.getCooperationType());
 		}
 
 		// 四、调用分佣接口，修改分佣、返点信息
-		StringBuilder errorMsg = new StringBuilder("保存分佣结算信息:");
+		StringBuilder errorMsg = new StringBuilder();
 
-		String commissionMsg = saveSupplierCommission(commissionDTO, supplierId);// 分佣基本信息
+		String commissionMsg = saveSupplierCommission(commissionDTO, supplierId, method);// 分佣基本信息
 		if (StringUtils.isNotBlank(commissionMsg)) {
 			errorMsg.append(commissionMsg).append(";");
 		}
 
-		String prorateMsg = saveSupplierProrate(prorateList, supplierId);// 分佣信息
+		String prorateMsg = saveSupplierProrate(prorateList, supplierId, method);// 分佣信息
 		if (StringUtils.isNotBlank(prorateMsg)) {
 			errorMsg.append(prorateMsg).append(";");
 		}
 
-		String rebateMsg = saveSupplierRebate(rebateList, supplierId);// 返点信息
+		String rebateMsg = saveSupplierRebate(rebateList, supplierId, method);// 返点信息
 		if (StringUtils.isNotBlank(rebateMsg)) {
 			errorMsg.append(rebateMsg).append(";");
 		}
@@ -160,19 +162,28 @@ public class BusSupplierService implements BusConst {
 			msgMap.put("method", method);
 			msgMap.put("data", JSON.toJSONString(baseDTO));
 			logger.info("专车供应商，同步发送数据：", JSON.toJSONString(msgMap));
-			CommonRocketProducer.publishMessage("vipSupplierTopic", method, String.valueOf(baseDTO.getSupplierId()), msgMap);
+			CommonRocketProducer.publishMessage("vipSupplierTopic", method.name(), String.valueOf(baseDTO.getSupplierId()), msgMap);
 		} catch (Exception e) {
 			logger.error("[ BusSupplierService-saveSupplierInfo ] 供应商信息发送MQ出错", e.getMessage(), e);
 		}
 		logger.info("***********************新增/修改 厂商信息  END***********************");
-		if (f > 0 && StringUtils.isBlank(errorMsg.toString())) {
+		if (f > 0) {
 			return AjaxResponse.success(null);
 		} else {
-			return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, StringUtils.defaultIfBlank(errorMsg.toString(), "保存分佣结算信息失败"));
+			if (StringUtils.isBlank(errorMsg.toString())) {
+				return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, "保存供应商失败");
+			} else {
+				return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, "保存分佣结算信息失败:" + errorMsg.toString());
+			}
 		}
 	}
 	
+	enum Method {
+		UPDATE, CREATE
+	}
+	
 	/**
+	 * @param method 
 	 * @Title: saveSupplierCommission
 	 * @Description: 保存分佣基本信息
 	 * @param commissionDTO
@@ -181,7 +192,7 @@ public class BusSupplierService implements BusConst {
 	 * @return String
 	 * @throws
 	 */
-	private String saveSupplierCommission(BusSupplierCommissionInfoDTO commissionDTO, Integer supplierId) {
+	private String saveSupplierCommission(BusSupplierCommissionInfoDTO commissionDTO, Integer supplierId, Method method) {
 		commissionDTO.setSupplierId(supplierId);
 		commissionDTO.setCreateName(WebSessionUtil.getCurrentLoginUser().getName());
 		commissionDTO.setUpdateName(WebSessionUtil.getCurrentLoginUser().getName());
@@ -214,6 +225,7 @@ public class BusSupplierService implements BusConst {
 	}
 
 	/**
+	 * @param method 
 	 * @Title: saveSupplierProrate
 	 * @Description: 保存供应商分佣信息
 	 * @param prorateDTOList
@@ -222,7 +234,7 @@ public class BusSupplierService implements BusConst {
 	 * @return String
 	 * @throws
 	 */
-	private String saveSupplierProrate(List<BusSupplierProrateDTO> prorateList, Integer supplierId) {
+	private String saveSupplierProrate(List<BusSupplierProrateDTO> prorateList, Integer supplierId, Method method) {
 		if (prorateList == null || prorateList.isEmpty()) {
 			return null;
 		}
@@ -260,6 +272,7 @@ public class BusSupplierService implements BusConst {
 	}
 
 	/**
+	 * @param method 
 	 * @Title: saveSupplierRebate
 	 * @Description: 保存供应商返点信息
 	 * @param rebateDTOList
@@ -268,7 +281,7 @@ public class BusSupplierService implements BusConst {
 	 * @return String
 	 * @throws
 	 */
-	private String saveSupplierRebate(List<BusSupplierRebateDTO> rebateList, Integer supplierId) {
+	private String saveSupplierRebate(List<BusSupplierRebateDTO> rebateList, Integer supplierId, Method method) {
 		if (rebateList == null || rebateList.isEmpty()) {
 			return null;
 		}
@@ -340,11 +353,12 @@ public class BusSupplierService implements BusConst {
 		if (offset > contractSuppliers.size()) {
 			queryDTO.setContractIds(null);
 			queryDTO.setExcludeContractIds(contractIds);// 其它供应商(not in 上面的供应商)
+			List<BusSupplierPageVO> supplierList = null;
 			try(Page p = PageHelper.offsetPage(offset - contractSuppliers.size(), limit)) {
-				List<BusSupplierPageVO> supplierList = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
-				supplierList.forEach(this::completeDetailInfo);// 补充巴士供应商其它信息
-				resultList.addAll(supplierList);
+				supplierList = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
 			}
+			supplierList.forEach(this::completeDetailInfo);// 补充巴士供应商其它信息
+			resultList.addAll(supplierList);
 		} else {
 			// 组合
 			List<BusSupplierPageVO> allContractList = new ArrayList<>();
@@ -368,15 +382,16 @@ public class BusSupplierService implements BusConst {
 				// 合同快到期供应商
 				List<BusSupplierPageVO> subList = orderedAllContractList.subList(offset, contractSuppliers.size());
 				// 正常供应商
-				try(Page p = PageHelper.offsetPage(0, limit)) {
-					queryDTO.setContractIds(null);
-					queryDTO.setExcludeContractIds(contractIds);// 其它供应商(not in 上面的供应商)
-					List<BusSupplierPageVO> otherList = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
-					otherList.forEach(this::completeDetailInfo);// 补充巴士供应商其它信息
-					
-					resultList.addAll(subList);
-					resultList.addAll(otherList);
+				queryDTO.setContractIds(null);
+				queryDTO.setExcludeContractIds(contractIds);// 其它供应商(not in 上面的供应商)
+				List<BusSupplierPageVO> otherList = null;
+				try (Page p = PageHelper.offsetPage(0, limit - contractSuppliers.size())) {
+					otherList = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
 				}
+				otherList.forEach(this::completeDetailInfo);// 补充巴士供应商其它信息
+				
+				resultList.addAll(subList);
+				resultList.addAll(otherList);
 			} else {
 				// 合同快到期供应商
 				List<BusSupplierPageVO> subList = orderedAllContractList.subList(offset, limit);
@@ -527,6 +542,9 @@ public class BusSupplierService implements BusConst {
 	public BusSupplierInfoVO querySupplierById(Integer supplierId) {
 		// 一、查询供应商基础信息
 		BusSupplierInfoVO supplierVO = busCarBizSupplierExMapper.selectBusSupplierById(supplierId);
+		if (supplierVO == null) {
+			return supplierVO;
+		}
 		// 二、查询巴士供应商其它信息
 		completeDetailInfo(supplierVO);
 
@@ -549,6 +567,7 @@ public class BusSupplierService implements BusConst {
 	private JSON getRemoteCommissionInfo(Integer supplierId) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("supplierId", supplierId);
+		
 		try {
 			logger.info("[ BusSupplierService-getRemoteCommissionInfo ] 查询供应商结算信息,params={}", params);
 			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_SUPPLIER_INFO, params, 2000, "查询供应商结算信息");
@@ -577,7 +596,7 @@ public class BusSupplierService implements BusConst {
 		params.put("status", 0);
 		try {
 			logger.info("[ BusSupplierService-getRemoteProrateInfoList ] 查询供应商分佣信息,params={}", params);
-			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_SUPPLIER_PRORATE_INFO_LIST, params, 2000, "查询供应商分佣信息");
+			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_SUPPLIER_PRORATE_DETAIL, params, 2000, "查询供应商分佣信息");
 			if (result.getIntValue("code") == 0) {
 				JSONArray jsonArray = result.getJSONArray("data");
 				return jsonArray;

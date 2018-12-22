@@ -160,9 +160,6 @@ public class BusCarBizDriverInfoService implements BusConst{
 	@Autowired
 	private BusCarBizDriverInfoExMapper busCarBizDriverInfoExMapper;
 	
-	@Autowired
-	private BusCarBizCustomerAppraisalStatisticsService busCarBizCustomerAppraisalStatisticsService;
-
 	// ===========================专车业务拓展service==================================
 	@Autowired
 	private CarBizDriverInfoService carBizDriverInfoService;
@@ -280,13 +277,10 @@ public class BusCarBizDriverInfoService implements BusConst{
 			}
 			builder.append(StringUtils.defaultIfBlank(supplierName, "")).append(",");
 
-			// 三、车型类别
-			builder.append(StringUtils.defaultIfBlank(driver.getGroupName(), "")).append(",");
-
-			// 四、司机姓名
+			// 三、司机姓名
 			builder.append(StringUtils.defaultIfBlank(driver.getName(), "")).append(",");
 
-			// 五、司机性别
+			// 四、司机性别
 			String gender = "";
 			if (driver.getGender() == 1) {
 				gender = "男";
@@ -294,6 +288,9 @@ public class BusCarBizDriverInfoService implements BusConst{
 				gender = "女";
 			}
 			builder.append(gender).append(",");
+
+			// 五、车型类别
+			builder.append(StringUtils.defaultIfBlank(driver.getGroupName(), "")).append(",");
 
 			// 六、身份证号
 			builder.append(StringUtils.defaultIfBlank(driver.getIdCardNo(), "")).append(",");
@@ -1032,7 +1029,12 @@ public class BusCarBizDriverInfoService implements BusConst{
                         // 司机姓名
                         case 1:
                             String name = StringUtils.deleteWhitespace(cellValue);
-                            saveDTO.setName(name);
+                            if (name.length() > 20) {
+                            	errorMsgs.add(errorPrefix + "司机姓名长度不能超过20");
+                            	isTrue = false;
+							} else {
+								saveDTO.setName(name);
+							}
                             break;
                          // 性别
                         case 2:
@@ -1060,6 +1062,11 @@ public class BusCarBizDriverInfoService implements BusConst{
                         // 司机身份证号
                         case 4:
 							String idCardNo = StringUtils.deleteWhitespace(cellValue);
+							if (idCardNo.length() > 18) {
+								errorMsgs.add(errorPrefix + "身份证号长度不能超过18");
+								isTrue = false;
+								break;
+							}
 							if ("X".equals(idCardNo.substring(idCardNo.length() - 1, idCardNo.length()))) {
 								idCardNo = idCardNo.toLowerCase();
 							}
@@ -1131,12 +1138,22 @@ public class BusCarBizDriverInfoService implements BusConst{
                         // 驾驶证号
                         case 27:
                             String driverLicenseNumber = StringUtils.deleteWhitespace(cellValue);
-                            saveDTO.setDriverlicensenumber(driverLicenseNumber);
+                            if (driverLicenseNumber.length() > 30) {
+                            	errorMsgs.add(errorPrefix + "驾驶证号长度不能超过30");
+                            	isTrue = false;
+							} else {
+								saveDTO.setDriverlicensenumber(driverLicenseNumber);
+							}
                             break;
                         // 道路运输从业资格证编号
                         case 33:
                             String xyDriverNumber = StringUtils.deleteWhitespace(cellValue);
-                            saveDTO.setXyDriverNumber(xyDriverNumber);
+                            if (xyDriverNumber.length() > 20) {
+                            	errorMsgs.add(errorPrefix + "道路运输从业资格证编号长度不能超过20");
+                            	isTrue = false;
+							} else {
+								saveDTO.setXyDriverNumber(xyDriverNumber);
+							}
                             break;
                     }// switch end
                 }// 循环列结束

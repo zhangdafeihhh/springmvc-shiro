@@ -1,6 +1,5 @@
 package com.zhuanche.controller.busManage;
 
-import java.beans.PropertyEditorSupport;
 import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,9 +15,11 @@ import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,6 +32,7 @@ import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.dto.busManage.BusSupplierBaseDTO;
 import com.zhuanche.dto.busManage.BusSupplierCommissionInfoDTO;
 import com.zhuanche.dto.busManage.BusSupplierDetailDTO;
@@ -64,7 +66,11 @@ public class BusSupplierController {
 	// ===========================巴士业务拓展service==================================
 	@Autowired
 	private BusSupplierService busSupplierService;
-	//============================巴士共有服务service==================================
+	// ============================巴士共有服务service==================================
+
+	@Autowired
+	@Qualifier("hibernateValidator")
+	private Validator validator;
 
 	/**
 	 * @Title: saveSupplier
@@ -75,28 +81,59 @@ public class BusSupplierController {
 	 * @return AjaxResponse
 	 * @throws
 	 */
-	@InitBinder
-	public void initBinder(WebDataBinder binder) {
-		binder.registerCustomEditor(List.class, "prorateList", new PropertyEditorSupport() {
-			@Override
-			public void setAsText(String text) throws IllegalArgumentException {
-				JSONArray jsonArray = JSONArray.parseArray(text);
-				List<Object> list = new ArrayList<>();
-				jsonArray.stream().forEach(e -> {
-					JSONObject jsonObject = (JSONObject) JSON.toJSON(e);
-					BusSupplierProrateDTO prorate = JSON.toJavaObject(jsonObject, BusSupplierProrateDTO.class);
-					list.add(prorate);
-				});
-				super.setValue(list);
-			}
-		});
-	}
-	
 	@RequestMapping(value = "/saveSupplier")
 	public AjaxResponse saveSupplier(@Validated BusSupplierBaseDTO baseDTO, @Validated BusSupplierDetailDTO detailDTO,
-			@Validated BusSupplierCommissionInfoDTO commissionDTO, @Validated ArrayList<BusSupplierProrateDTO> prorateList,
-			@Validated ArrayList<BusSupplierRebateDTO> rebateList) {
-		return busSupplierService.saveSupplierInfo(baseDTO, detailDTO, commissionDTO, prorateList, rebateList);
+			@Validated BusSupplierCommissionInfoDTO commissionDTO, String prorateList, String rebateList) {
+		// 分佣
+		JSONArray prorateArray = null;
+		try {
+			prorateArray = JSONArray.parseArray(prorateList);
+		} catch (Exception e) {
+			logger.error("[ BusSupplierController-saveSupplier ] 分佣协议格式不正确", e.getMessage(), e);
+			return AjaxResponse.failMsg(RestErrorCode.PARAMS_ERROR, "分佣协议格式不正确");
+		}
+		List<BusSupplierProrateDTO> prorates = new ArrayList<>();
+		if (prorateArray != null) {
+			prorateArray.stream().forEach(e -> {
+				JSONObject jsonObject = (JSONObject) JSON.toJSON(e);
+				BusSupplierProrateDTO prorate = JSON.toJavaObject(jsonObject, BusSupplierProrateDTO.class);
+				prorates.add(prorate);
+			});
+			for (BusSupplierProrateDTO prorateDTO : prorates) {
+				BindingResult result = new BeanPropertyBindingResult(prorateDTO, "prorateDTO");
+				validator.validate(prorateDTO, result);
+				if (result.hasErrors()) {
+					String errors = result.getAllErrors().stream().map(error -> error.getDefaultMessage()).collect(Collectors.toList()).toString();
+					return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, errors);
+				}
+			}
+		}
+		
+		// 返点
+		JSONArray rebateArray = null;
+		try {
+			rebateArray = JSONArray.parseArray(rebateList);
+		} catch (Exception e) {
+			logger.error("[ BusSupplierController-saveSupplier ] 返点协议格式不正确", e.getMessage(), e);
+			return AjaxResponse.failMsg(RestErrorCode.PARAMS_ERROR, "返点协议格式不正确");
+		}
+		List<BusSupplierRebateDTO> rebates = new ArrayList<>();
+		if (rebateArray != null) {
+			rebateArray.stream().forEach(e -> {
+				JSONObject jsonObject = (JSONObject) JSON.toJSON(e);
+				BusSupplierRebateDTO prorate = JSON.toJavaObject(jsonObject, BusSupplierRebateDTO.class);
+				rebates.add(prorate);
+			});
+			for (BusSupplierRebateDTO rebateDTO : rebates) {
+				BindingResult result = new BeanPropertyBindingResult(rebateDTO, "rebateDTO");
+				validator.validate(rebateDTO, result);
+				if (result.hasErrors()) {
+					String errors = result.getAllErrors().stream().map(error -> error.getDefaultMessage()).collect(Collectors.toList()).toString();
+					return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, errors);
+				}
+			}
+		}
+		return busSupplierService.saveSupplierInfo(baseDTO, detailDTO, commissionDTO, prorates, rebates);
 	}
 
 	/**

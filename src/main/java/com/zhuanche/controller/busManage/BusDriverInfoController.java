@@ -308,7 +308,7 @@ public class BusDriverInfoController extends BusBaseController {
 	 */
 	@SuppressWarnings("resource")
 	@RequestMapping(value = "/exportDriverList")
-	public void exportDriverList(@Validated(BusDriverQueryDTO.Export.class) BusDriverQueryDTO exportDTO, HttpServletRequest request,
+	public void exportDriverList(BusDriverQueryDTO exportDTO, HttpServletRequest request,
 			HttpServletResponse response) {
 		long start = System.currentTimeMillis(); // 获取开始时间
 		try {
@@ -436,10 +436,10 @@ public class BusDriverInfoController extends BusBaseController {
 	public AjaxResponse batchInputDriverInfo(@NotNull(message = "请选择城市") Integer cityId,
 			@NotNull(message = "请选择供应商") Integer supplierId, MultipartFile file, HttpServletRequest request,
 			HttpServletResponse response) {
-        if (file == null || file.isEmpty()) {
-            logger.info("file is empty!");
-            return AjaxResponse.fail(RestErrorCode.FILE_ERROR);
-        }
+		if (file == null || file.isEmpty()) {
+			logger.info("file is empty!");
+			return AjaxResponse.failMsg(RestErrorCode.FILE_ERROR, "导入文件不能为空");
+		}
 
         AjaxResponse result = busCarBizDriverInfoService.batchInputDriverInfo(cityId, supplierId, file, request, response);
         return result;

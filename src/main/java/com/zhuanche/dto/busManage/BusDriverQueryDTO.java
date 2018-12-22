@@ -3,8 +3,6 @@ package com.zhuanche.dto.busManage;
 import java.util.Date;
 import java.util.Set;
 
-import javax.validation.constraints.NotNull;
-
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.zhuanche.dto.BaseDTO;
@@ -18,16 +16,9 @@ import com.zhuanche.dto.BaseDTO;
  */
 public class BusDriverQueryDTO extends BaseDTO {
 
-	/**
-	 * 导出分组
-	 */
-	public interface Export {
-	}
-
 	private static final long serialVersionUID = -5047520202731725106L;
 
 	/** 城市ID **/
-	@NotNull(groups = { Export.class }, message = "城市不能为空")
 	private Integer cityId;
 
 	/** 供应商ID **/
