@@ -135,6 +135,30 @@ public class BusSupplierController {
 		}
 		return busSupplierService.saveSupplierInfo(baseDTO, detailDTO, commissionDTO, prorates, rebates);
 	}
+	
+	/**
+	 * @Title: deleteProrate
+	 * @Description: 根据ID删除供应商分佣协议
+	 * @param id
+	 * @return AjaxResponse
+	 * @throws
+	 */
+	@RequestMapping(value = "/deleteProrate")
+	public AjaxResponse deleteProrate(@NotNull(message = "id不能为空") Long id) {
+		return busSupplierService.deleteProrate(id);
+	}
+
+	/**
+	 * @Title: deleteRebate
+	 * @Description: 根据ID删除供应商返点协议
+	 * @param id
+	 * @return AjaxResponse
+	 * @throws
+	 */
+	@RequestMapping(value = "/deleteRebate")
+	public AjaxResponse deleteRebate(@NotNull(message = "id不能为空") Integer id) {
+		return busSupplierService.deleteRebate(id);
+	}
 
 	/**
 	 * @Title: querySupplierPageList
