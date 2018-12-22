@@ -159,7 +159,7 @@
 		c.license_plates AS licensePlates,
 		c.color AS color,
 		p.supplier_full_name AS supplierName,
-		CASE when g.group_name is null then gop.group_name else g.group_name end as groupName,
+		CASE when g.group_name is null then gop.group_name else g.group_name end as groupName
 		FROM
 		car_biz_car_info c
 		LEFT JOIN car_biz_supplier p ON c.supplier_id = p.supplier_id
