@@ -202,29 +202,27 @@ public class BusAssignmentController {
 		AjaxResponse ajaxResponse = AjaxResponse.success(null);
 		try {
 			CarBizDriverInfo driverInfo = carBizDriverInfoMapper.selectByPrimaryKey(driverId);
-			if (driverInfo == null) {
-				return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "司机信息不存在");
+			CarBizCarInfoDTO carInfo = this.carBizCarInfoExMapper.selectBasicCarInfo(carId);
+			if (driverInfo == null||carInfo ==null) {
+				return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "司机或者车辆信息不存在");
 			}
 			String driverPhone = driverInfo.getPhone();
 			String driverName = driverInfo.getName();
-			// 车型id
-			Integer groupId = driverInfo.getGroupId();
-
-			CarBizCarInfoDTO carInfo = this.carBizCarInfoExMapper.selectCarCitySupplierInfoByCarId(carId);
-			if (carInfo == null) {
-				return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "车辆信息不存在");
-			}
-			// 城市名称
+			// 车型类别ID
+			Integer groupId = carInfo.getGroupId();
+			//车型类别名称
+			String groupName = carInfo.getGroupName();
+			// 车型类别名称
 			String cityName = carInfo.getCityName();
 			// 供应商ID
 			Integer supplierId = carInfo.getSupplierId();
+			//供应商手机号
+			String dispatcherPhone =carInfo.getDispatcherPhone();
 			// 车牌号
 			String licensePlates = carInfo.getLicensePlates();
-
 			if (groupId == null) {
-				return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "司机未指定服务类型");
+				return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "车辆未指定车型类别");
 			}
-			String groupName = carBizCarGroupExMapper.getGroupNameByGroupId(groupId);
 			if (StringUtils.isBlank(groupName)) {
 				return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "服务类型名称为空");
 			}
@@ -243,13 +241,10 @@ public class BusAssignmentController {
 			if (supplierId == null) {
 				return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "供应商为空");
 			}
-			String dispatcherPhone = this.carBizSupplierExMapper.queryDispatcherPhoneBySupplierId(supplierId);
-
 			JSONObject result = busAssignmentService.busDispatcher(cityName, driverId, driverName, driverPhone,
 					dispatcherPhone, groupId, groupName, licensePlates, orderId, orderNo, serviceTypeId);
 			int code = result.getIntValue("code");
 			String msg = result.getString("msg");
-
 			// 0成功1失败
 			if (code != 0) {
 				logger.info("[ BusAssignmentController-assignment ] 巴士指派失败, 错误码:{}, 错误原因:{}", code, msg);
@@ -318,28 +313,30 @@ public class BusAssignmentController {
 		// 处理结果
 		AjaxResponse ajaxResponse = AjaxResponse.success(null);
 		try {
+
 			CarBizDriverInfo driverInfo = carBizDriverInfoMapper.selectByPrimaryKey(driverId);
-			if (driverInfo == null) {
-				return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "司机信息不存在");
+			CarBizCarInfoDTO carInfo = this.carBizCarInfoExMapper.selectBasicCarInfo(carId);
+			if (driverInfo == null||carInfo ==null) {
+				return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "司机或者车辆信息不存在");
 			}
 			String driverPhone = driverInfo.getPhone();
 			String driverName = driverInfo.getName();
-			// 车型id
-			Integer groupId = driverInfo.getGroupId();
-
-			CarBizCarInfoDTO carInfo = this.carBizCarInfoExMapper.selectCarCitySupplierInfoByCarId(carId);
-			if (carInfo == null) {
-				return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "车辆信息不存在");
-			}
-			// 城市名称
+			// 车型类别ID
+			Integer groupId = carInfo.getGroupId();
+			//车型类别名称
+			String groupName = carInfo.getGroupName();
+			// 车型类别名称
 			String cityName = carInfo.getCityName();
+			// 供应商ID
+			Integer supplierId = carInfo.getSupplierId();
+			//供应商手机号
+			String dispatcherPhone =carInfo.getDispatcherPhone();
 			// 车牌号
 			String licensePlates = carInfo.getLicensePlates();
 
 			if (groupId == null) {
-				return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "司机未指定服务类型");
+				return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "车辆未指定车型类别");
 			}
-			String groupName = carBizCarGroupExMapper.getGroupNameByGroupId(groupId);
 			if (StringUtils.isBlank(groupName)) {
 				return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "服务类型名称为空");
 			}
@@ -355,10 +352,12 @@ public class BusAssignmentController {
 			if (StringUtils.isBlank(cityName)) {
 				return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "城市名称为空");
 			}
+			if (supplierId == null) {
+				return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "供应商为空");
+			}
 
 			// 查询改派前订单信息
 			BusOrderDetail beforeBusOrder = busOrderService.selectOrderDetail(orderNo);
-
 			// 调用接口改派司机
 			JSONObject result = busAssignmentService.updateDriver(cityName, driverId, driverName, driverPhone, groupId,
 					groupName, licensePlates, orderId, orderNo, serviceTypeId);

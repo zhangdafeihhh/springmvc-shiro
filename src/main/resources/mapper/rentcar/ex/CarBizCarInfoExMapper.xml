@@ -210,6 +210,25 @@
 		WHERE c.car_id = #{carId}
 		LIMIT 1
 	</select>
+
+	<select id="selectBasicCarInfo" parameterType="java.lang.Integer" resultType="com.zhuanche.web.entity.car.CarInfoEntity">
+		SELECT
+		info.license_plates licensePlates,
+		city.city_id cityId,
+		city.city_name cityName,
+		sup.supplier_id supplierId,
+		sup.dispatcher_phone dispatcherPhone,
+		gop.group_id groupId,
+		gop.group_name groupName,
+		info.car_id carId
+		FROM
+		car_biz_car_info info
+		LEFT JOIN car_biz_model model ON info.car_model_id = model.model_id
+		left join car_biz_car_group gop on model.group_id = gop.group_id
+		left join car_biz_supplier sup on info.supplier_id = sup.supplier_id
+		left join car_biz_city city on info.city_id = city.city_id
+		where info.car_id = #{carId}
+	</select>
   
 </mapper>
 

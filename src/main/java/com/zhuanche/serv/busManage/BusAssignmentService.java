@@ -599,8 +599,9 @@ public class BusAssignmentService {
 			paramMap.put("businessId", Common.BUSSINESSID);
 			paramMap.put("driverId", driverId);
 			paramMap.put("licensePlates", licensePlates);
+			paramMap.put("carGroupId", groupId);
+			paramMap.put("carGroupName", groupName);
 			paramMap.put("sign", SignUtils.createMD5Sign(paramMap, key));
-			
 			logger.info("[ BusAssignmentService-updateDriver ] 接口参数：{}", paramMap);
 			String response = carRestTemplate.postForObject(BusConst.Order.UPDATE_DRIVER, JSONObject.class, paramMap);
 			return JSON.parseObject(response);

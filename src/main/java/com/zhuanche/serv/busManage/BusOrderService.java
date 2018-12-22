@@ -111,6 +111,7 @@ public class BusOrderService {
 						entity.setDriverPhone(driverInfo.getPhone());
 						entity.setSupplierId(driverInfo.getSupplierId());
 						entity.setSupplierName(driverInfo.getSupplierName());
+						entity.setDriverCarGroupName(driverInfo.getCarGroupName());
 					}
 
 				}
