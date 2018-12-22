@@ -211,7 +211,7 @@
 		LIMIT 1
 	</select>
 
-	<select id="selectBasicCarInfo" parameterType="java.lang.Integer" resultType="com.zhuanche.web.entity.car.CarInfoEntity">
+	<select id="selectBasicCarInfo" parameterType="java.lang.Integer" resultType="com.zhuanche.dto.rentcar.CarBizCarInfoDTO">
 		SELECT
 		info.license_plates licensePlates,
 		city.city_id cityId,
