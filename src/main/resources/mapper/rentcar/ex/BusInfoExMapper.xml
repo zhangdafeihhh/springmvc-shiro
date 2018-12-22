@@ -75,14 +75,14 @@
         where gop.type = 2
         <if test="authOfCity !=null and authOfCity.size >0 ">
            and  info.city_id in
-        <foreach collection="authOfCity" item="cityId" separator=","  open="(" close=")" >
-            #{cityId}
+        <foreach collection="authOfCity" item="item" separator=","  open="(" close=")" >
+            #{item}
         </foreach>
         </if>
         <if test="authOfSupplier != null and authOfSupplier.size>0">
           and  info.supplier_id in
-        <foreach open="(" close=")" separator="," collection="authOfSupplier" item="supplierId">
-            #{supplierId}
+        <foreach open="(" close=")" separator="," collection="authOfSupplier" item="item">
+            #{item}
         </foreach>
         </if>
         <if test="cityId !=null">
