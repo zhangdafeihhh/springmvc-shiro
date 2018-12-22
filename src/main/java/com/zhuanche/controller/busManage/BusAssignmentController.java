@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.zhuanche.entity.busManage.*;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -32,9 +33,6 @@ import com.zhuanche.dto.busManage.BusCarDTO;
 import com.zhuanche.dto.busManage.BusDriverDTO;
 import com.zhuanche.dto.busManage.BusOrderDTO;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
-import com.zhuanche.entity.busManage.BusCostDetail;
-import com.zhuanche.entity.busManage.BusOrderDetail;
-import com.zhuanche.entity.busManage.BusPayDetail;
 import com.zhuanche.entity.mdbcarmanage.BusOrderOperationTime;
 import com.zhuanche.entity.mdbcarmanage.CarBizOrderMessageTask;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
@@ -546,12 +544,22 @@ public class BusAssignmentController {
 			// 查询派单订单操作状态
 			List<BusOrderOperationTime> orderOperations = busOrderOperationTimeExMapper.queryOperationByOrderId(orderId);
 			logger.info("[ BusAssignmentController-saveMessageTask ] 操作详情 = {}", JSON.toJSONString(orderOperations));
-			
+
+			//查询司机评分
+			Appraisal appraisal = busOrderService.selectOrderAppraisal(orderNo);
+			logger.info("[ BusAssignmentController-saveMessageTask ] 评分信息 = {}", JSON.toJSONString(appraisal));
+
+			//查询企业信息
+			OrgCostInfo orgCostInfo = busOrderService.selectOrgInfo(orderDetail.getBookingUserPhone());
+			logger.info("[ BusAssignmentController-saveMessageTask ] 企业折扣信息 = {}", JSON.toJSONString(orgCostInfo));
+
 			Map<String,Object> result = new HashMap<>();
 			result.put("orderDetail", orderDetail);
 			result.put("busCostDetail", busCostDetail);
 			result.put("busPayDetail", busPayDetail);
 			result.put("orderOperations", orderOperations);
+			result.put("appraisal",appraisal);
+			result.put("orgInfo",orgCostInfo);
 			return AjaxResponse.success(result);
 		} catch (Exception e) {
 			logger.error("[ BusAssignmentController-saveMessageTask ] ", e);
