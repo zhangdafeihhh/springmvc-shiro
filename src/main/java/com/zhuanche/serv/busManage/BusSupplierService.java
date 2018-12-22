@@ -226,7 +226,6 @@ public class BusSupplierService implements BusConst {
 	 */
 	private String saveSupplierCommission(BusSupplierCommissionInfoDTO commissionDTO, Integer supplierId, Method method) {
 		commissionDTO.setSupplierId(supplierId);
-		commissionDTO.setCreateName(WebSessionUtil.getCurrentLoginUser().getName());
 		commissionDTO.setUpdateName(WebSessionUtil.getCurrentLoginUser().getName());
 		
 		String jsonString = JSON.toJSONStringWithDateFormat(commissionDTO, JSON.DEFFAULT_DATE_FORMAT, new SerializerFeature[0]);
@@ -238,6 +237,7 @@ public class BusSupplierService implements BusConst {
 			String url = null;
 			if (id == null) {
 				url = orderPayUrl + Pay.SETTLE_SUPPLIER_INFO_ADD;
+				commissionDTO.setCreateName(WebSessionUtil.getCurrentLoginUser().getName());
 			} else {
 				url = orderPayUrl + Pay.SETTLE_SUPPLIER_INFO_UPDATE;
 			}
@@ -273,7 +273,6 @@ public class BusSupplierService implements BusConst {
 
 		for (BusSupplierProrateDTO prorate : prorateList) {
 			prorate.setSupplierId(supplierId);
-			prorate.setCreateName(WebSessionUtil.getCurrentLoginUser().getName());
 			prorate.setUpdateName(WebSessionUtil.getCurrentLoginUser().getName());
 
 			String jsonString = JSON.toJSONStringWithDateFormat(prorate, JSON.DEFFAULT_DATE_FORMAT, new SerializerFeature[0]);
@@ -285,6 +284,7 @@ public class BusSupplierService implements BusConst {
 				String url = null;
 				if (id == null) {
 					url = orderPayUrl + Pay.SETTLE_SUPPLIER_PRORATE_ADD;
+					prorate.setCreateName(WebSessionUtil.getCurrentLoginUser().getName());
 				} else {
 					url = orderPayUrl + Pay.SETTLE_SUPPLIER_PRORATE_UPDATE;
 				}
@@ -320,7 +320,6 @@ public class BusSupplierService implements BusConst {
 
 		for (BusSupplierRebateDTO rebate : rebateList) {
 			rebate.setSupplierId(supplierId);
-			rebate.setCreateName(WebSessionUtil.getCurrentLoginUser().getName());
 			rebate.setUpdateName(WebSessionUtil.getCurrentLoginUser().getName());
 
 			String jsonString = JSON.toJSONStringWithDateFormat(rebate, JSON.DEFFAULT_DATE_FORMAT, new SerializerFeature[0]);
@@ -332,6 +331,7 @@ public class BusSupplierService implements BusConst {
 				String url = null;
 				if (id == null) {
 					url = orderPayUrl + Pay.SETTLE_SUPPLIER_REBATE_ADD;
+					rebate.setCreateName(WebSessionUtil.getCurrentLoginUser().getName());
 				} else {
 					url = orderPayUrl + Pay.SETTLE_SUPPLIER_REBATE_UPDATE;
 				}
@@ -363,6 +363,7 @@ public class BusSupplierService implements BusConst {
 		}
 		Map<String, Object> params = new HashMap<>();
 		params.put("id", id);
+		params.put("updateName", WebSessionUtil.getCurrentLoginUser().getName());
 		try {
 			String url = orderPayUrl + Pay.SETTLE_SUPPLIER_PRORATE_DELETE;
 			logger.info("[ BusSupplierService-prorateDelete ] 供应商分佣协议删除,params={},url={}", params, url);
@@ -392,6 +393,7 @@ public class BusSupplierService implements BusConst {
 		}
 		Map<String, Object> params = new HashMap<>();
 		params.put("id", id);
+		params.put("updateName", WebSessionUtil.getCurrentLoginUser().getName());
 		try {
 			String url = orderPayUrl + Pay.SETTLE_SUPPLIER_REBATE_DELETE;
 			logger.info("[ BusSupplierService-rebateDelete ] 供应商返点协议删除,params={},url={}", params, url);
