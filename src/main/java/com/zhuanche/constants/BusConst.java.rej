@@ -1,7 +1,0 @@
-diff a/src/main/java/com/zhuanche/constants/BusConst.java b/src/main/java/com/zhuanche/constants/BusConst.java	(rejected hunks)
-@@ -60,4 +60,5 @@
- 	/** 查询供应商的账单 **/
- 	String SETTLE_DETAIL_LIST = "/settle/detail/list";
- 
-+
- }

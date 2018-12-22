@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -181,7 +183,37 @@ public class BusSupplierService implements BusConst {
 	enum Method {
 		UPDATE, CREATE
 	}
-	
+
+	/**
+	 * @Title: deleteProrate
+	 * @Description: 根据ID删除供应商分佣协议
+	 * @param id
+	 * @return AjaxResponse
+	 * @throws
+	 */
+	public AjaxResponse deleteProrate(@NotNull(message = "id不能为空") Long id) {
+		String errorMsg = prorateDelete(id);
+		if (StringUtils.isNotBlank(errorMsg)) {
+			return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, errorMsg);
+		}
+		return AjaxResponse.success(null);
+	}
+
+	/**
+	 * @Title: deleteRebate
+	 * @Description: 根据ID删除供应商返点协议
+	 * @param id
+	 * @return AjaxResponse
+	 * @throws
+	 */
+	public AjaxResponse deleteRebate(@NotNull(message = "id不能为空") Integer id) {
+		String errorMsg = rebateDelete(id);
+		if (StringUtils.isNotBlank(errorMsg)) {
+			return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, errorMsg);
+		}
+		return AjaxResponse.success(null);
+	}
+
 	/**
 	 * @param method 
 	 * @Title: saveSupplierCommission
@@ -314,6 +346,64 @@ public class BusSupplierService implements BusConst {
 				logger.error("[ BusSupplierService-saveSupplierRebate ] 保存供应商返点信息异常,params={},errorMsg={}", params, e.getMessage(), e);
 				return "保存供应商返点信息" + (id == null ? "调用新增接口失败" : "调用修改接口失败");
 			}
+		}
+		return null;
+	}
+
+	/**
+	 * @Title: prorateDelete
+	 * @Description: 供应商分佣协议删除
+	 * @param id
+	 * @return String
+	 * @throws
+	 */
+	private String prorateDelete(Long id) {
+		if (id == null) {
+			return null;
+		}
+		Map<String, Object> params = new HashMap<>();
+		params.put("id", id);
+		try {
+			String url = orderPayUrl + Pay.SETTLE_SUPPLIER_PRORATE_DELETE;
+			logger.info("[ BusSupplierService-prorateDelete ] 供应商分佣协议删除,params={},url={}", params, url);
+			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(url, params, 2000, "供应商分佣协议删除");
+			if (result.getIntValue("code") != 0) {
+				String msg = result.getString("msg");
+				logger.info("[ BusSupplierService-prorateDelete ] 供应商分佣协议删除,调用接口出错,params={},errorMsg={}", params, msg);
+				return msg;
+			}
+		} catch (Exception e) {
+			logger.error("[ BusSupplierService-prorateDelete ] 供应商分佣协议删除,异常,params={},errorMsg={}", params, e.getMessage(), e);
+			return "供应商分佣协议删除异常";
+		}
+		return null;
+	}
+
+	/**
+	 * @Title: rebateDelete
+	 * @Description: 供应商返点协议删除
+	 * @param id
+	 * @return String
+	 * @throws
+	 */
+	private String rebateDelete(Integer id) {
+		if (id == null) {
+			return null;
+		}
+		Map<String, Object> params = new HashMap<>();
+		params.put("id", id);
+		try {
+			String url = orderPayUrl + Pay.SETTLE_SUPPLIER_REBATE_DELETE;
+			logger.info("[ BusSupplierService-rebateDelete ] 供应商返点协议删除,params={},url={}", params, url);
+			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(url, params, 2000, "供应商返点协议删除");
+			if (result.getIntValue("code") != 0) {
+				String msg = result.getString("msg");
+				logger.info("[ BusSupplierService-rebateDelete ] 供应商返点协议删除,调用接口出错,params={},errorMsg={}", params, msg);
+				return msg;
+			}
+		} catch (Exception e) {
+			logger.error("[ BusSupplierService-rebateDelete ] 供应商返点协议删除,异常,params={},errorMsg={}", params, e.getMessage(), e);
+			return "供应商返点协议删除异常";
 		}
 		return null;
 	}

@@ -56,30 +56,36 @@ public interface BusConst {
 		// =============================================供应商接口列表===================================================
 		/** 供应商基本信息查询 **/
 		String SETTLE_SUPPLIER_INFO = "/settle/supplier/info";
-		
+
 		/** 供应商增加基础信息 **/
 		String SETTLE_SUPPLIER_INFO_ADD = "/settle/supplier/info/add";
-		
+
 		/** 供应商更新基础信息 **/
 		String SETTLE_SUPPLIER_INFO_UPDATE = "/settle/supplier/info/update";
 
 		/** 查询分佣协议 **/
 		String SETTLE_SUPPLIER_PRORATE_DETAIL = "/settle/supplier/prorate/detail";
-		
+
 		/** 供应商分佣协议增加 **/
 		String SETTLE_SUPPLIER_PRORATE_ADD = "/settle/supplier/prorate/add";
-		
+
 		/** 供应商分佣协议更新 **/
 		String SETTLE_SUPPLIER_PRORATE_UPDATE = "/settle/supplier/prorate/update";
 
+		/** 供应商分佣协议删除 **/
+		String SETTLE_SUPPLIER_PRORATE_DELETE = "/settle/supplier/prorate/delete";
+
 		/** 查找供应商返佣配置 **/
 		String SETTLE_SUPPLIER_REBATE_INFO = "/settle/supplier/rebate/info";
-		
+
 		/** 供应商返点协议增加 **/
 		String SETTLE_SUPPLIER_REBATE_ADD = "/settle/supplier/rebate/add";
-		
-		/** 供应商返点协议更新**/
+
+		/** 供应商返点协议更新 **/
 		String SETTLE_SUPPLIER_REBATE_UPDATE = "/settle/supplier/rebate/update";
+
+		/** 供应商返点协议删除 **/
+		String SETTLE_SUPPLIER_REBATE_DELETE = "/settle/supplier/rebate/delete";
 
 		/** 查询供应商分佣有关的信息（批量） **/
 		String SETTLE_SUPPLIER_PRORATE_LIST = "/settle/supplier/prorate/list";
