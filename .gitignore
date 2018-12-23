@@ -21,3 +21,7 @@ src/test/java/generatorConfig-rentcar.xml
 src/test/java/generatorConfig-mdbcarmanage.xml
 src/test/java/generatorConfig-driver.xml
 src/test/java/com/zhuanche/dao/BaseFunctionalTestCase.java
+src/main/resources/rebel.xml
+src/main/resources/rebel-remote.xml
+out
+gen

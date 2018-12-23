@@ -25,5 +25,8 @@ public interface DriverDailyReportExService {
     public PageInfo<DriverDailyReport> findWeekDriverDailyReportByparam(DriverDailyReportParams params,String statDateStart,  String statDateEnd );
 
 
-    public List<DriverDailyReportDTO> selectSuppierNameAndCityNameDays(List<DriverDailyReport> rows, Integer reportType) throws ParseException ;
+    public List<DriverDailyReportDTO> selectSuppierNameAndCityNameDays(List<DriverDailyReport> rows,
+                                                                       Integer reportType,
+                                                                       String statDateStart,
+                                                                       String statDateEnd) throws ParseException ;
 }

@@ -61,4 +61,7 @@ public final class Constants {
 
 	public static final int MAX_CONTENT_LENGTH = 2000;
 
+	public static final String QUERY_DATE="2018-01-01";
+
+
 }

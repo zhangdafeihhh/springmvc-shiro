@@ -173,7 +173,7 @@ public class DriverDailyReportController extends DriverQueryController {
 		}
 
 		//如果不为空，进行查询供应商名称
-		List<DriverDailyReportDTO> dtoList = driverDailyReportExService.selectSuppierNameAndCityNameDays(pages.getList(),reportType);
+		List<DriverDailyReportDTO> dtoList = driverDailyReportExService.selectSuppierNameAndCityNameDays(pages.getList(),reportType,statDateStart,statDateEnd);
 		PageDTO pageDTO =  new PageDTO();
 		pageDTO.setPage(params.getPage());
 		pageDTO.setPageSize(params.getPageSize());
@@ -222,7 +222,7 @@ public class DriverDailyReportController extends DriverQueryController {
 			PageHelper.clearPage();
 		}
 		//如果不为空，进行查询供应商名称
-		List<DriverDailyReportDTO> dtoList = driverDailyReportExService.selectSuppierNameAndCityNameDays(list,0);
+		List<DriverDailyReportDTO> dtoList = driverDailyReportExService.selectSuppierNameAndCityNameDays(list,0,statDateStart,statDateEnd);
 		PageDTO pageDTO = new PageDTO(params.getPage(), params.getPageSize(), total, dtoList);
 		return AjaxResponse.success(pageDTO);
 	}
@@ -373,7 +373,7 @@ public class DriverDailyReportController extends DriverQueryController {
 						isLast = true;
 					}
 
-					rows = driverDailyReportExService.selectSuppierNameAndCityNameDays(result,reportType);
+					rows = driverDailyReportExService.selectSuppierNameAndCityNameDays(result,reportType,statDateStart,statDateEnd);
 					dataTrans(rows,csvDataList,reportType);
 					log.info("工作日报:第1页/共"+pages+"页，查询条件为："+JSON.toJSONString(params));
 					CsvUtils entity = new CsvUtils();
@@ -390,7 +390,7 @@ public class DriverDailyReportController extends DriverQueryController {
 						if(pageNumber == pages){
 							isLast = true;
 						}
-						rows = driverDailyReportExService.selectSuppierNameAndCityNameDays(result,reportType);
+						rows = driverDailyReportExService.selectSuppierNameAndCityNameDays(result,reportType,statDateStart,statDateEnd);
 						dataTrans(rows,csvDataList,reportType);
 						entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
 					}
@@ -414,7 +414,7 @@ public class DriverDailyReportController extends DriverQueryController {
 					if(pages == 1){
 						isLast = true;
 					}
-					rows = driverDailyReportExService.selectSuppierNameAndCityNameDays(result,reportType);
+					rows = driverDailyReportExService.selectSuppierNameAndCityNameDays(result,reportType,statDateStart,statDateEnd);
 					dataTrans(rows,csvDataList,reportType);
 
 					CsvUtils entity = new CsvUtils();
@@ -431,7 +431,7 @@ public class DriverDailyReportController extends DriverQueryController {
 						if(pageNumber == pages){
 							isLast = true;
 						}
-						rows = driverDailyReportExService.selectSuppierNameAndCityNameDays(result,reportType);
+						rows = driverDailyReportExService.selectSuppierNameAndCityNameDays(result,reportType,statDateStart,statDateEnd);
 						dataTrans(rows,csvDataList,reportType);
 						entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
 					}
