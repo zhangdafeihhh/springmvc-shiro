@@ -399,6 +399,10 @@ public class MessageService {
             if (StringUtils.isNotBlank(levelToStr)){
                 detailDto.setLevelToStr(levelToStr.substring(0,levelToStr.length()-1));
             }
+            //创建人才能查看阅读记录
+            SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+
+            if (user.getId().equals(carMessagePost.getUserId())){
 
             //有时间了再做优化
             switch (carMessagePost.getLevel()){
@@ -476,10 +480,7 @@ public class MessageService {
 
             }
 
-            //创建人才能查看阅读记录
-            SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
 
-            if (user.getId().equals(carMessagePost.getUserId())){
                 //已读
                 List<CarMessageReceiver> list = receiverExMapper.carMessageReceiverList(messaageId,null,CarMessageReceiver.ReadStatus.read.getValue());
                 List<Integer> listUsers = new ArrayList<>();
