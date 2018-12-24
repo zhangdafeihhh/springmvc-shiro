@@ -65,6 +65,7 @@ public class BusOrderDetail implements Serializable {
 	private String licensePlates;// 车牌号
 	private Integer carModelId;// 车型ID
 	private String carModelName;// 车型名称
+	private String  driverCarGroupName;//司机所属车型名称
 	private Integer carGroupId;// 车组
 	private String carGroupName;// 车型名称
 
@@ -132,6 +133,7 @@ public class BusOrderDetail implements Serializable {
 	 */
 	private Integer status;
 	private Integer type;// 订单类型(1:普通用户订单, 2:企业用户订单)
+
 
 	public Integer getBookingUserId() {
 		return bookingUserId;
@@ -781,4 +783,11 @@ public class BusOrderDetail implements Serializable {
 		this.type = type;
 	}
 
+	public String getDriverCarGroupName() {
+		return driverCarGroupName;
+	}
+
+	public void setDriverCarGroupName(String driverCarGroupName) {
+		this.driverCarGroupName = driverCarGroupName;
+	}
 }

@@ -135,6 +135,10 @@ public class CarBizCarInfoDTO extends Base {
 
     private String carModelName;//车型名称
 
+    private String dispatcherPhone;
+    private Integer groupId;
+    private String groupName;
+
     public String getCarModelName() {
         return carModelName;
     }
@@ -653,5 +657,29 @@ public class CarBizCarInfoDTO extends Base {
 
     public void setMemo(String memo) {
         this.memo = memo == null ? null : memo.trim();
+    }
+
+    public String getDispatcherPhone() {
+        return dispatcherPhone;
+    }
+
+    public void setDispatcherPhone(String dispatcherPhone) {
+        this.dispatcherPhone = dispatcherPhone;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public Integer getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(Integer groupId) {
+        this.groupId = groupId;
     }
 }

@@ -12,12 +12,11 @@ public class BaseDTO implements Serializable {
 
 	/** 每页条数 **/
 	public Integer pageSize;
-	
-	//数据权限控制字段
-    private Set<Integer> authOfCity;//可以管理的所有城市ID
-    private Set<Integer> authOfSupplier;//可以管理的所有供应商ID
-    private Set<Integer> authOfTeam;//可以管理的所有车队ID
-	
+
+	// 数据权限控制字段
+	private Set<Integer> authOfCity;// 可以管理的所有城市ID
+	private Set<Integer> authOfSupplier;// 可以管理的所有供应商ID
+	private Set<Integer> authOfTeam;// 可以管理的所有车队ID
 
 	public BaseDTO() {
 		super();

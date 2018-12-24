@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.rentcar.ex.BusCarBizCustomerAppraisalStatisticsExMapper">
+	<resultMap id="BaseResultMap"
+		type="com.zhuanche.entity.rentcar.CarBizCustomerAppraisalStatistics">
+		<id column="appraisal_statistics_id" property="appraisalStatisticsId"
+			jdbcType="INTEGER" />
+		<result column="driver_id" property="driverId" jdbcType="INTEGER" />
+		<result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+		<result column="driver_phone" property="driverPhone" jdbcType="VARCHAR" />
+		<result column="instrument_and_service" property="instrumentAndService"
+			jdbcType="VARCHAR" />
+		<result column="environment_and_equipped" property="environmentAndEquipped"
+			jdbcType="VARCHAR" />
+		<result column="efficiency_and_safety" property="efficiencyAndSafety"
+			jdbcType="VARCHAR" />
+		<result column="evaluate_score" property="evaluateScore"
+			jdbcType="VARCHAR" />
+		<result column="create_date" property="createDate" jdbcType="VARCHAR" />
+		<result column="sys_date" property="sysDate" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		appraisal_statistics_id, driver_id, driver_name,
+		driver_phone, instrument_and_service,
+		environment_and_equipped,
+		efficiency_and_safety, evaluate_score,
+		create_date, sys_date
+	</sql>
+
+	<!-- 获取司机某月评分 -->
+	<select id="queryAppraisal" parameterType="java.util.Map" resultMap="BaseResultMap">
+		SELECT
+			<include refid="Base_Column_List" />
+		FROM
+			car_biz_customer_appraisal_statistics
+		WHERE
+			driver_id = #{driverId}
+		AND create_date = #{createDate}
+	</select>
+</mapper>
+

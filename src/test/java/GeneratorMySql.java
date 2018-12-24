@@ -29,7 +29,7 @@ public class GeneratorMySql{
         //指定 逆向工程配置文件
 //        File configFile = new File("F:\\gitLocalRep\\mp-manage\\src\\test\\java\\generatorConfig-mdbcarmanage.xml");
 //        File configFile = new File("D:\\shouqi_project\\car\\mp-manage\\src\\test\\java\\generatorConfig-driver.xml");
-        File configFile = new File("F:\\\\gitLocalRep\\\\mp-manage\\\\src\\\\test\\\\java\\\\generatorConfig-rentcar.xml");
+        File configFile = new File("F:\\gitLocalRep\\mp-manage\\src\\test\\java\\generatorConfig-rentcar.xml");
         ConfigurationParser cp = new ConfigurationParser(warnings);
         Configuration config = cp.parseConfiguration(configFile);
         DefaultShellCallback callback = new DefaultShellCallback(overwrite);
