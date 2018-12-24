@@ -228,20 +228,19 @@ public class BusSupplierService implements BusConst {
 		commissionDTO.setSupplierId(supplierId);
 		commissionDTO.setUpdateName(WebSessionUtil.getCurrentLoginUser().getName());
 		
+		Long id = commissionDTO.getId();// 主键
+		String url = null;
+		if (id == null) {
+			url = orderPayUrl + Pay.SETTLE_SUPPLIER_INFO_ADD;
+			commissionDTO.setCreateName(WebSessionUtil.getCurrentLoginUser().getName());
+		} else {
+			url = orderPayUrl + Pay.SETTLE_SUPPLIER_INFO_UPDATE;
+		}
+		
 		String jsonString = JSON.toJSONStringWithDateFormat(commissionDTO, JSON.DEFFAULT_DATE_FORMAT, new SerializerFeature[0]);
 		JSONObject json = (JSONObject) JSONObject.parse(jsonString);
 		Map<String, Object> params = json.getInnerMap();
-		
-		Long id = commissionDTO.getId();// 主键
 		try {
-			String url = null;
-			if (id == null) {
-				url = orderPayUrl + Pay.SETTLE_SUPPLIER_INFO_ADD;
-				commissionDTO.setCreateName(WebSessionUtil.getCurrentLoginUser().getName());
-			} else {
-				url = orderPayUrl + Pay.SETTLE_SUPPLIER_INFO_UPDATE;
-			}
-			
 			logger.info("[ BusSupplierService-saveSupplierCommission ] 保存分佣基本信息,params={},url={}", params, url);
 			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(url, params , 2000, "保存分佣基本信息");
 			if (result.getIntValue("code") != 0) {
@@ -275,19 +274,19 @@ public class BusSupplierService implements BusConst {
 			prorate.setSupplierId(supplierId);
 			prorate.setUpdateName(WebSessionUtil.getCurrentLoginUser().getName());
 
+			Long id = prorate.getId();// 主键
+			String url = null;
+			if (id == null) {
+				url = orderPayUrl + Pay.SETTLE_SUPPLIER_PRORATE_ADD;
+				prorate.setCreateName(WebSessionUtil.getCurrentLoginUser().getName());
+			} else {
+				url = orderPayUrl + Pay.SETTLE_SUPPLIER_PRORATE_UPDATE;
+			}
+
 			String jsonString = JSON.toJSONStringWithDateFormat(prorate, JSON.DEFFAULT_DATE_FORMAT, new SerializerFeature[0]);
 			JSONObject json = (JSONObject) JSONObject.parse(jsonString);
 			Map<String, Object> params = json.getInnerMap();
-
-			Long id = prorate.getId();// 主键
 			try {
-				String url = null;
-				if (id == null) {
-					url = orderPayUrl + Pay.SETTLE_SUPPLIER_PRORATE_ADD;
-					prorate.setCreateName(WebSessionUtil.getCurrentLoginUser().getName());
-				} else {
-					url = orderPayUrl + Pay.SETTLE_SUPPLIER_PRORATE_UPDATE;
-				}
 				logger.info("[ BusSupplierService-saveSupplierProrate ] 保存供应商分佣信息,params={},url={}", params, url);
 				JSONObject result = MpOkHttpUtil.okHttpPostBackJson(url, params, 2000, "保存供应商分佣信息");
 				if (result.getIntValue("code") != 0) {
@@ -322,19 +321,19 @@ public class BusSupplierService implements BusConst {
 			rebate.setSupplierId(supplierId);
 			rebate.setUpdateName(WebSessionUtil.getCurrentLoginUser().getName());
 
+			Integer id = rebate.getId();// 主键
+			String url = null;
+			if (id == null) {
+				url = orderPayUrl + Pay.SETTLE_SUPPLIER_REBATE_ADD;
+				rebate.setCreateName(WebSessionUtil.getCurrentLoginUser().getName());
+			} else {
+				url = orderPayUrl + Pay.SETTLE_SUPPLIER_REBATE_UPDATE;
+			}
+			
 			String jsonString = JSON.toJSONStringWithDateFormat(rebate, JSON.DEFFAULT_DATE_FORMAT, new SerializerFeature[0]);
 			JSONObject json = (JSONObject) JSONObject.parse(jsonString);
 			Map<String, Object> params = json.getInnerMap();
-
-			Integer id = rebate.getId();// 主键
 			try {
-				String url = null;
-				if (id == null) {
-					url = orderPayUrl + Pay.SETTLE_SUPPLIER_REBATE_ADD;
-					rebate.setCreateName(WebSessionUtil.getCurrentLoginUser().getName());
-				} else {
-					url = orderPayUrl + Pay.SETTLE_SUPPLIER_REBATE_UPDATE;
-				}
 				logger.info("[ BusSupplierService-saveSupplierRebate ] 保存供应商返点信息,params={},url={}", params, url);
 				JSONObject result = MpOkHttpUtil.okHttpPostBackJson(url, params, 2000, "保存供应商返点信息");
 				if (result.getIntValue("code") != 0) {
