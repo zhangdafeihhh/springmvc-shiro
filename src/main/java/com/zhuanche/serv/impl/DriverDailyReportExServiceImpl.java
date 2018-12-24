@@ -125,10 +125,12 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
                     Map<String,DriverIncomeForEveryDay> map = this.modifyDriverVolume(driverIds,statDateStart);
                     for(DriverDailyReportDTO ddre : list){
                         DriverIncomeForEveryDay driver = map.get(ddre.getDriverId().toString());
-                        ddre.setOperationNum(driver.getOperationNum());
-                        ddre.setActualPay(driver.getActualPay());
-                        ddre.setServiceMileage(driver.getServiceMileage());
-                        ddre.setDriverOutPay(driver.getDriverOutPay());
+                        if(driver != null){
+                            ddre.setOperationNum(driver.getOperationNum());
+                            ddre.setActualPay(driver.getActualPay());
+                            ddre.setServiceMileage(driver.getServiceMileage());
+                            ddre.setDriverOutPay(driver.getDriverOutPay());
+                        }
                     }
                 }
                 long endTime = System.currentTimeMillis();
