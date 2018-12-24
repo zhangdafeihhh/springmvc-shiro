@@ -139,7 +139,7 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
                 long startTime = System.currentTimeMillis();
                 if (!CollectionUtils.isEmpty(list) && StringUtils.isNotEmpty(stringBuffer.toString())){
                     String drivers = stringBuffer.substring(0,stringBuffer.length()-1).toString();
-                    Map<String,DriverIncome> maps = this.modifyMonthDriverVolumes(drivers,statDateStart,statDateEnd);
+                    Map<String,DriverIncome> maps = this.modifyMonthDriverVolumes(drivers,statDateStart,statDateEnd,reportType);
                     if (maps != null && maps.size() >0){
                         for (DriverDailyReportDTO dto : list){
                             DriverIncome driverIncome = maps.get(dto.getDriverId().toString());
@@ -273,7 +273,8 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
      * @param endDate
      * @return
      */
-    private Map<String, DriverIncome> modifyMonthDriverVolumes(String drivers, String startDate, String endDate) {
+
+    private Map<String, DriverIncome> modifyMonthDriverVolumes(String drivers, String startDate, String endDate,Integer type) {
         Map<String, DriverIncome> maps = new HashMap<>();
         if (StringUtils.isNotEmpty(startDate) && startDate.compareTo(Constants.QUERY_DATE) > 0) {
             long statTime = 0;
@@ -284,9 +285,17 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            String url = "/driverIncome/findDriverDateIncomes?driverIds=" + drivers + "&startDate=" + statTime + "&endDate=" + endTime;
+            long time = System.currentTimeMillis();
+            String url = "";
+            if (Constants.WEEK.equals(type)){
+                url = "/driverIncome/findDriverDateIncomes?driverIds=" + drivers + "&startDate=" + statTime + "&endDate=" + endTime;
+            }else if(Constants.MONTH.equals(type)){
+                url = "/driverIncome/findDriverIncomes?driverIds="+drivers+"&incomeDate="+startDate ;
+            }
             String result = busOrderCostTemplate.getForObject(url, String.class);
 
+            long invokeEndTime = System.currentTimeMillis();
+            logger.info("调用计费时长：" + (invokeEndTime-time));
             Map<String, Object> resultMap = JSONObject.parseObject(result, HashMap.class);
             if (null == resultMap || !String.valueOf(resultMap.get("code")).equals("0")) {
                 logger.info("modifyMonthDriverVolumes查询接口【/driverIncome/getDriverIncomes】返回异常,code:" + String.valueOf(resultMap.get("code")));
@@ -307,13 +316,14 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
                 JSONArray jsonArray = JSONObject.parseArray(driverIncome);
                 for (int i = 0; i < jsonArray.size(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    logger.info("modifyMonthDriverVolumes查询接口【/driverIncome/getDriverIncome】返回jsonObject成功." + jsonObject);
                     // 当段日期完成订单量
                     DriverIncome driverObject = null;
                     try {
-                        Integer orderCounts = jsonObject.getInteger("orderCounts");
+                        Integer orderCounts = Constants.WEEK.equals(type)?
+                                jsonObject.getInteger("orderCounts"):jsonObject.getInteger("monthOrderCounts");
                         // 当段日期营业额
-                        BigDecimal incomeAmount = new BigDecimal(jsonObject.getString("incomeAmount"));
+                        BigDecimal incomeAmount = new BigDecimal(Constants.WEEK.equals(type)?
+                                jsonObject.getString("incomeAmount"):jsonObject.getString("monthIncomeAmount"));
 
                         driverObject = new DriverIncome(orderCounts, incomeAmount);
 
@@ -328,6 +338,8 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
         }
         return maps;
     }
+
+
 
     private void modifyMonthDriverVolume(DriverDailyReportDTO ddre, String statDateStart,String endDateStart) throws ParseException {
         if (StringUtils.isNotEmpty(statDateStart) && statDateStart.compareTo("2018-01-01") > 0) {

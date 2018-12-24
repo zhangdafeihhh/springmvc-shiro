@@ -62,6 +62,7 @@ public final class Constants {
 	public static final int MAX_CONTENT_LENGTH = 2000;
 
 	public static final String QUERY_DATE="2018-01-01";
-
+	public static final Integer WEEK=1; //周报
+	public static final Integer MONTH=2;//月报
 
 }
