@@ -120,6 +120,10 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
             }
             if (reportType==0){
                 long startTime = System.currentTimeMillis();
+                for(DriverDailyReportDTO ddre : list) {
+                    this.modifyDriverVolume(ddre, ddre.getStatDate());
+                }
+               /*
                 if (StringUtils.isNotEmpty(stringBuffer.toString())){
                     String driverIds = stringBuffer.substring(0,stringBuffer.length()-1).toString();
                     Map<String,DriverIncomeForEveryDay> map = this.modifyDriverVolume(driverIds,statDateStart);
@@ -132,7 +136,7 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
                             ddre.setDriverOutPay(driver.getDriverOutPay());
                         }
                     }
-                }
+                }*/
                 long endTime = System.currentTimeMillis();
 
                 long totalTime = (endTime-startTime);
@@ -162,68 +166,7 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
     }
 
 
-    /**
-     * 单个获取改为批量获取
-     * @param driverIds
-     * @param statDateStart
-     * @return
-     */
-    private Map<String,DriverIncomeForEveryDay> modifyDriverVolume(String driverIds, String statDateStart) {
-        Map<String,DriverIncomeForEveryDay> map = new HashMap<>();
-        try {
-            String url = "/driverIncome/findDriverIncomes?driverIds="+driverIds+"&incomeDate=" + statDateStart;
-            String result = busOrderCostTemplate.getForObject(url, String.class);
-
-            Map<String, Object> resultMap = JSONObject.parseObject(result, HashMap.class);
-            if (null == resultMap || !String.valueOf(resultMap.get("code")).equals("0")) {
-                logger.info("查询接口【/driverIncome/getDriverIncome】返回异常.");
-            }
-
-            String reData = String.valueOf(resultMap.get("data"));
-            if (StringUtils.isBlank(reData)) {
-                logger.info("查询接口【/driverIncome/getDriverIncome】返回data为空.");
-            }
-
-            Map dataMap = JSONObject.parseObject(String.valueOf(resultMap.get("data")), Map.class);
-            String driverIncomes = String.valueOf(dataMap.get("driverIncomes"));
-            if (StringUtils.isBlank(driverIncomes)) {
-                logger.info("查询接口【/driverIncome/getDriverIncome】返回driverIncomes为空.");
-            }
-
-            JSONArray jsonArray = JSONArray.parseArray(driverIncomes);
-            if (jsonArray != null && jsonArray.size() > 0){
-                for (int i = 0;i < jsonArray.size();i++){
-                    try {
-                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-
-                        // 当日完成订单量
-                        Integer orderCounts= Integer.valueOf(String.valueOf(jsonObject.get("orderCounts")));
-                        // 当日营业额
-                        BigDecimal todayIncomeAmount = new BigDecimal(String.valueOf(jsonObject.get("todayIncomeAmount")));
-                        // 当日载客里程
-                        BigDecimal todayTravelMileage = new BigDecimal(String.valueOf(jsonObject.get("todayTravelMileage")));
-                        // 当日司机代付价外费
-                        BigDecimal todayOtherFee = new BigDecimal(String.valueOf(jsonObject.get("todayOtherFee")));
-
-                        DriverIncomeForEveryDay driverIncomeForEveryDay =new DriverIncomeForEveryDay(orderCounts,
-                                todayIncomeAmount.doubleValue(),todayTravelMileage.doubleValue(),todayOtherFee.doubleValue());
-                        map.put(jsonObject.getString("driverId"),driverIncomeForEveryDay);
-
-                        // 当日司机代收
-                        //BigDecimal todayDriverPay = new BigDecimal(String.valueOf(jsonObject.get("todayDriverPay")));
-                    } catch (NumberFormatException e) {
-                        logger.info(e.getMessage());
-                        continue;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            logger.error("查询计费接口[司机营业信息]异常.", e);
-        }
-        return map;
-    }
-
-   /* private void modifyDriverVolume(DriverDailyReportDTO ddre, String statDateStart) {
+    private void modifyDriverVolume(DriverDailyReportDTO ddre, String statDateStart) {
         if(StringUtils.isNotEmpty(statDateStart) && statDateStart.compareTo("2018-01-01") >0 ){
             String url = "/driverIncome/getDriverIncome?driverId="+ddre.getDriverId()+"&incomeDate=" + statDateStart;
             String result = busOrderCostTemplate.getForObject(url, String.class);
@@ -265,7 +208,12 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
                 BigDecimal todayDriverPay = new BigDecimal(String.valueOf(jsonObject.get("todayDriverPay")));
             }
         }
-    }*/
+    }
+
+
+
+
+
 
 
     /**
@@ -340,55 +288,5 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
         }
         return maps;
     }
-
-
-
-    private void modifyMonthDriverVolume(DriverDailyReportDTO ddre, String statDateStart,String endDateStart) throws ParseException {
-        if (StringUtils.isNotEmpty(statDateStart) && statDateStart.compareTo("2018-01-01") > 0) {
-            long statTime = DateUtil.DATE_SIMPLE_FORMAT.parse(statDateStart).getTime();
-            long endTime = DateUtil.DATE_SIMPLE_FORMAT.parse(endDateStart).getTime();
-            String url = "/driverIncome/getDriverDateIncome?driverId=" + ddre.getDriverId() + "&startDate=" + statTime + "&endDate=" + endTime;
-            String result = busOrderCostTemplate.getForObject(url, String.class);
-
-            Map<String, Object> resultMap = JSONObject.parseObject(result, HashMap.class);
-            if (null == resultMap || !String.valueOf(resultMap.get("code")).equals("0")) {
-                logger.info("modifyMonthDriverVolume查询接口【/driverIncome/getDriverIncome】返回异常,code:" + String.valueOf(resultMap.get("code")));
-                return;
-            }
-
-            String reData = String.valueOf(resultMap.get("data"));
-            if (StringUtils.isBlank(reData)) {
-                logger.info("modifyMonthDriverVolume查询接口【/driverIncome/getDriverIncome】返回data为空.");
-                return;
-            }
-
-            Map dataMap = JSONObject.parseObject(String.valueOf(resultMap.get("data")), Map.class);
-            if (dataMap != null) {
-                String driverIncome = String.valueOf(dataMap.get("driverIncome"));
-                if (StringUtils.isBlank(driverIncome)) {
-                    logger.info("modifyMonthDriverVolume查询接口【/driverIncome/getDriverIncome】返回driverIncome为空.");
-                    return;
-                }
-
-                JSONObject jsonObject = JSONObject.parseObject(driverIncome);
-//				log.info("modifyMonthDriverVolume查询接口【/driverIncome/getDriverIncome】返回jsonObject成功."+jsonObject);
-                // 当段日期完成订单量
-                Integer orderCounts = Integer.valueOf(String.valueOf(jsonObject.get("orderCounts")));
-                ddre.setOperationNum(orderCounts);
-                // 当段日期营业额
-                BigDecimal incomeAmount = new BigDecimal(String.valueOf(jsonObject.get("incomeAmount")));
-                ddre.setActualPay(incomeAmount.doubleValue());
-//					// 当段日期载客里程
-//					BigDecimal todayTravelMileage = new BigDecimal(String.valueOf(jsonObject.get("todayTravelMileage")));
-//					ddre.setServiceMileage(todayTravelMileage.doubleValue());
-//					// 当段日期司机代付价外费
-//					BigDecimal todayOtherFee = new BigDecimal(String.valueOf(jsonObject.get("todayOtherFee")));
-//					ddre.setDriverOutPay(todayOtherFee.doubleValue());
-//					// 当段日期司机代收
-//					BigDecimal todayDriverPay = new BigDecimal(String.valueOf(jsonObject.get("todayDriverPay")));
-            }
-        }
-    }
-
 
 }
