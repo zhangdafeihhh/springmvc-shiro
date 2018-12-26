@@ -312,6 +312,35 @@
 			<artifactId>log4j-over-slf4j</artifactId>
 			<version>1.7.25</version>
 		</dependency>
+		<!--elasticsearch-->
+		<dependency>
+			<groupId>org.elasticsearch.client</groupId>
+			<artifactId>transport</artifactId>
+			<version>6.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.elasticsearch.client</groupId>
+			<artifactId>elasticsearch-rest-high-level-client</artifactId>
+			<version>6.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>2.9.7</version>
+		</dependency>
+
+		<dependency>
+			<groupId>co.elastic.apm</groupId>
+			<artifactId>elastic-apm-agent</artifactId>
+			<version>0.7.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>co.elastic.apm</groupId>
+			<artifactId>apm-agent-api</artifactId>
+			<version>0.7.1</version>
+		</dependency>
+
 	</dependencies>
 
 	<!-- 多环境配置BEGIN -->
@@ -321,7 +350,7 @@
 			<properties>
 				<env.name>dev</env.name>
 			</properties>
-			<activation>
+            <activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
 		</profile>

@@ -1,14 +1,23 @@
 package com.zhuanche.common.securityLog;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.zhuanche.common.elasticsearch.ElasticSearchInit;
+import org.apache.http.HttpHost;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
+import org.elasticsearch.ElasticsearchGenerationException;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,25 +60,64 @@ public class SensitiveDataOprationLogAspect {
     
 	private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-	
+
+
+
+
 	@Autowired
 	HttpServletRequest httpServletRequest;
 
 	@AfterReturning("within(com.zhuanche.controller..*) && @annotation(sdol)")
     public void addLogSuccess(JoinPoint jp , SensitiveDataOperationLog sdol){
-		LocalDateTime localDateTime = LocalDateTime.now();
-		String dateTime = DF.format(localDateTime);
-		SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
-		String user = currentLoginUser.getName();
-//		Object[] parames = jp.getArgs();// 获取目标方法体参数     
-//        String params = parseParames(parames); // 解析目标方法体的参数     
-//        String className = jp.getTarget().getClass().toString();// 获取目标类名     
-//        className = className.substring(className.indexOf("com"));     
-//        String signature = jp.getSignature().toString();// 获取目标方法签名     
-//        String methodName = signature.substring(signature.lastIndexOf(".")+1, signature.indexOf("("));     
-        String ip = IpAddr.getIpAddr(httpServletRequest);// 用户IP
-        log.info("[{}][{}][{}][{}][{}][{}][{}]",dateTime,ip,SYSTEM_NAME,user,sdol.primaryDataType(),sdol.secondaryDataType(),sdol.desc());
-	}
+        try {
+            LocalDateTime localDateTime = LocalDateTime.now();
+            String dateTime = DF.format(localDateTime);
+            SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
+            String user = currentLoginUser.getName();
+//		Object[] parames = jp.getArgs();// 获取目标方法体参数
+//        String params = parseParames(parames); // 解析目标方法体的参数
+//        String className = jp.getTarget().getClass().toString();// 获取目标类名
+//        className = className.substring(className.indexOf("com"));
+//        String signature = jp.getSignature().toString();// 获取目标方法签名
+//        String methodName = signature.substring(signature.lastIndexOf(".")+1, signature.indexOf("("));
+
+            String ip = IpAddr.getIpAddr(httpServletRequest);// 用户IP
+            log.info("[{}][{}][{}][{}][{}][{}][{}]",dateTime,ip,SYSTEM_NAME,user,sdol.primaryDataType(),sdol.secondaryDataType(),sdol.desc());
+
+            RestHighLevelClient highLevelClient = new RestHighLevelClient(
+                    RestClient.builder(
+                            new HttpHost(ElasticSearchInit.hostName, new Integer(ElasticSearchInit.port), "http")));
+            Map<String,Object> map = new LinkedHashMap<>();
+            map.put("dateTime",dateTime);
+            map.put("ip",ip);
+            map.put("systemName",SYSTEM_NAME);
+            map.put("user",user);
+            map.put("primaryDataType",sdol.primaryDataType());
+            map.put("secondaryDataType",sdol.secondaryDataType());
+            map.put("desc",sdol.desc());
+
+            IndexRequest indexRequest = new IndexRequest(ElasticSearchInit.index, "senseLog", "").source(map);
+
+            try {
+                IndexResponse response = highLevelClient.index(indexRequest, RequestOptions.DEFAULT);
+                log.info("response:" + response);
+            } catch (IOException e) {
+                log.info(e.getMessage());
+            }
+
+            try {
+                highLevelClient.close();
+            } catch (IOException e) {
+                log.info("关闭错误"+e.getMessage());
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        } catch (ElasticsearchGenerationException e) {
+            e.printStackTrace();
+        }
+
+
+    }
 	
 	/**   
      * 解析方法参数   
