@@ -14,7 +14,7 @@ public class ElasticSearchInit {
 
     public static String index;
 
-    public static String hostName;
+    public static String serviceIp;
 
     public static String port;
 
@@ -24,9 +24,9 @@ public class ElasticSearchInit {
         ElasticSearchInit.index = index;
     }
 
-    @Value("${hostName}")
-    public  void setHostName(String hostName) {
-        ElasticSearchInit.hostName = hostName;
+    @Value("${serviceIp}")
+    public  void setServiceIp(String serviceIp) {
+        ElasticSearchInit.serviceIp = serviceIp;
     }
 
     @Value("${port}")

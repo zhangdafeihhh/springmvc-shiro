@@ -350,7 +350,7 @@
 			<properties>
 				<env.name>dev</env.name>
 			</properties>
-            <activation>
+			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
 		</profile>
@@ -359,6 +359,7 @@
 			<properties>
 				<env.name>test</env.name>
 			</properties>
+
 		</profile>
 		<profile>
 			<id>pre</id>

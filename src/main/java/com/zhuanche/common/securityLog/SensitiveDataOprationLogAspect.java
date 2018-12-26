@@ -1,6 +1,7 @@
 package com.zhuanche.common.securityLog;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -84,9 +85,10 @@ public class SensitiveDataOprationLogAspect {
             String ip = IpAddr.getIpAddr(httpServletRequest);// 用户IP
             log.info("[{}][{}][{}][{}][{}][{}][{}]",dateTime,ip,SYSTEM_NAME,user,sdol.primaryDataType(),sdol.secondaryDataType(),sdol.desc());
 
+            log.info(MessageFormat.format("es地址：{0},port:{1}",ElasticSearchInit.serviceIp,ElasticSearchInit.port));
             RestHighLevelClient highLevelClient = new RestHighLevelClient(
                     RestClient.builder(
-                            new HttpHost(ElasticSearchInit.hostName, new Integer(ElasticSearchInit.port), "http")));
+                            new HttpHost(ElasticSearchInit.serviceIp, new Integer(ElasticSearchInit.port), "http")));
             Map<String,Object> map = new LinkedHashMap<>();
             map.put("dateTime",dateTime);
             map.put("ip",ip);
