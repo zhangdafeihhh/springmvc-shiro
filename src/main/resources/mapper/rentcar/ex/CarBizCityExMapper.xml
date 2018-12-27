@@ -120,4 +120,8 @@
         </if>
     </select>
 	 
+
+	<select id="queryNameById" resultType="java.lang.String" parameterType="java.lang.Integer">
+		select city_name from car_biz_city where city_id =#{cityId}
+	</select>
   </mapper>

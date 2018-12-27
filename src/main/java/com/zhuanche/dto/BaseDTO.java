@@ -29,7 +29,7 @@ public class BaseDTO implements Serializable {
 	}
 
 	public void setPageNum(Integer pageNum) {
-		this.pageNum = pageNum == null ? 0 : pageNum;
+		this.pageNum = pageNum == null ? 1 : pageNum;
 	}
 
 	public Integer getPageSize() {

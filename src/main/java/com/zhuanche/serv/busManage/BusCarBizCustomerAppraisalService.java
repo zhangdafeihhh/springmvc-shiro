@@ -11,7 +11,7 @@ import com.zhuanche.entity.rentcar.CarBizCustomerAppraisal;
 import mapper.rentcar.ex.BusCarBizCustomerAppraisalExMapper;
 
 /**
- * @ClassName: BusCarBizCustomerAppraisalService
+ * @ClassName: BusCarBizCustomerAppraisalStatisticsService
  * @Description: 查询司机评分
  * @author: yanyunpeng
  * @date: 2018年12月11日 下午6:08:56

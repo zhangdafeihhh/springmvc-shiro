@@ -106,6 +106,10 @@
         </foreach>
     </select>
 
+    <select id="getSupplierNameById" parameterType="java.lang.Integer" resultType="java.lang.String">
+        select supplier_full_name from car_biz_supplier where supplier_id = #{supplierId}
+    </select>
+
     <select id="queryNameBySupplierIds" resultType="com.zhuanche.dto.rentcar.CarBizSupplierDTO" parameterType="java.lang.String" >
         select
         t.supplier_id supplierId, t.supplier_full_name supplierFullName,

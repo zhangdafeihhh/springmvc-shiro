@@ -16,9 +16,11 @@ public class DateUtil {
 	public static final String TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
 	public static final String MONTH_FORMAT = "yyyy_MM";
+	public static final String CONCISE_TIME_FORMAT="yyyyMMddHHmmss";
 	public static final SimpleDateFormat TIME_SIMPLE_FORMAT = new SimpleDateFormat(TIME_FORMAT);
 	public static final SimpleDateFormat DATE_SIMPLE_FORMAT = new SimpleDateFormat(DATE_FORMAT);
 	public static final SimpleDateFormat DATE_MONTH_FORMAT = new SimpleDateFormat(MONTH_FORMAT);
+	public static final SimpleDateFormat CONCISE_SIMPLE_TIME_FORMAT = new SimpleDateFormat(CONCISE_TIME_FORMAT);
 	/**返回yyyy-MM-dd HH:mm:ss格式的字符串时间*/
 	public static String createTimeString(){
 		return TIME_SIMPLE_FORMAT.format(new Date());
@@ -32,7 +34,9 @@ public class DateUtil {
 	public static String createMonthString(){
 		return DATE_MONTH_FORMAT.format(new Date());
 	}
-	
+	/**返回yyyyMMddHHmmss格式的字符串时间*/
+	public static String creatConciseTimeString(){return CONCISE_SIMPLE_TIME_FORMAT.format(new Date());}
+
 	/**根据传入的参数返回yyyy-MM-dd格式的字符串时间*/
 	public static String getDateString(Date date){
 		return date==null?"":DATE_SIMPLE_FORMAT.format(date);

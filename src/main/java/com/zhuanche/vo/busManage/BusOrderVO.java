@@ -54,6 +54,8 @@ public class BusOrderVO {
 	private String bookingEndAddrShort;
 	// 预定下车坐标点
 	private String bookingEndPoint;
+	// 实际下车时间
+	private Date factEndDate;
 	/*
 	 * 
 	 * 订单状态：10100, 预定中/待支付 10103, 支付成功/待接单 10105, 待服务 10200, 已出发 10205, 已到达 10300,
@@ -280,6 +282,14 @@ public class BusOrderVO {
 
 	public void setBookingEndPoint(String bookingEndPoint) {
 		this.bookingEndPoint = bookingEndPoint;
+	}
+
+	public Date getFactEndDate() {
+		return factEndDate;
+	}
+
+	public void setFactEndDate(Date factEndDate) {
+		this.factEndDate = factEndDate;
 	}
 
 	public Integer getStatus() {

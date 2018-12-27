@@ -9,7 +9,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,8 +21,8 @@ import java.util.Map;
 @Service
 public class DriverMongoService {
 
-	@Autowired
-	private MongoTemplate driverMongoTemplate;
+    @Resource(name = "driverMongoTemplate")
+    private MongoTemplate driverMongoTemplate;
 
 	/**
 	 * 查询司机mongo
@@ -199,4 +201,32 @@ public class DriverMongoService {
 		update.set("expireDate", map.get("expireDate"));
 		driverMongoTemplate.updateFirst(query, update,DriverMongo.class);
 	}
+
+    /**
+     * @param supplierId
+     * @param cooperationType
+     * @return void
+     * @throws
+     * @Title: updateDriverCooperationTypeBySupplierId
+     * @Description: 更新司机的加盟类型
+     */
+    public void updateDriverCooperationTypeBySupplierId(Integer supplierId, Integer cooperationType) {
+        // 更新mongoDB
+        Query query = new Query(Criteria.where("supplierId").is(supplierId));
+        Update update = new Update();
+        update.set("cooperationType", cooperationType);
+        driverMongoTemplate.updateFirst(query, update, DriverMongo.class);
+    }
+
+    /**
+     * 根据司机姓名查询司机信息
+     *
+     * @param name
+     * @return
+     */
+    public List<DriverMongo> queryDriverByName(String name) {
+        Query query = new Query(Criteria.where("name").is(name));
+        List<DriverMongo> driverMongos = driverMongoTemplate.find(query, DriverMongo.class);
+        return driverMongos;
+    }
 }

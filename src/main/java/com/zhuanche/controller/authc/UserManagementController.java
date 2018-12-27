@@ -5,19 +5,14 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import com.zhuanche.common.enums.PermissionLevelEnum;
-import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.serv.CarBizDriverInfoService;
-import org.apache.commons.lang.StringUtils;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.zhuanche.common.enums.PermissionLevelEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 import com.zhuanche.serv.CarBizDriverInfoService;
@@ -67,10 +62,11 @@ public class UserManagementController {
 		else {
 			user.setLevel(PermissionLevelEnum.ALL.getCode());
 		}
-		boolean phoneExist = userManagementService.userPhoneExist(phone);
-		if(phoneExist){
-			return AjaxResponse.fail(RestErrorCode.PHONE_EXIST );
-		}
+		// 暂时不用
+//		boolean phoneExist = userManagementService.userPhoneExist(phone);
+//		if(phoneExist){
+//			return AjaxResponse.fail(RestErrorCode.PHONE_EXIST );
+//		}
 		AjaxResponse ajaxResponse = userManagementService.addUser(user);
 		if(addTelescope!=null && addTelescope.compareTo(1)==0){
 			carBizDriverInfoService.addTelescopeDriver(user);

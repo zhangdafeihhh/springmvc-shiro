@@ -8,6 +8,7 @@ import java.util.List;
 
 public class CsvUtils {
     public static final Integer downPerSize = 10000;
+	public static final String tab = "\t";
     private OutputStreamWriter osw;
     private BufferedWriter bw = null;
 

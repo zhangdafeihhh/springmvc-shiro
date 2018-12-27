@@ -1727,6 +1727,14 @@
 
 
 
+	<!-- 根据供应商ID，修改司机的加盟类型 -->
+	<update id="updateDriverCooperationTypeBySupplierId" parameterType="java.util.Map">
+		UPDATE car_biz_driver_info
+		set cooperation_type =
+		#{cooperationType}
+		WHERE supplier_id = #{supplierId}
+	</update>
+  
 
   <select id="selectByDriverId" resultMap="BaseResultMap" parameterType="java.util.Map" >
     select
