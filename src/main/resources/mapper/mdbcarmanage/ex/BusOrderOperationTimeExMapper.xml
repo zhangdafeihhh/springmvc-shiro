@@ -13,7 +13,7 @@
 		<result column="dirver_phone" property="dirverPhone" jdbcType="VARCHAR" />
 		<result column="description" property="description" jdbcType="VARCHAR" />
 	</resultMap>
-	<resultMap id="ResultMapType1" type="java.util.HashMap">
+	<resultMap id="ResultMapType1" type="com.zhuanche.entity.mdbcarmanage.BusOrderOperationTime">
 		<result column="order_id" property="orderId" jdbcType="INTEGER" />
 		<result column="order_no" property="orderNo" jdbcType="VARCHAR" />
 		<result column="time" property="time" jdbcType="TIMESTAMP" javaType="java.util.Date"/>

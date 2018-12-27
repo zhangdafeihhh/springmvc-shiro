@@ -324,8 +324,12 @@ public class LoginController{
 				AuthorizationInfo info = cache.get(  usernamePasswordRealm.getAuthorizationCacheKey(principalCollection)  );
 				if(info!=null) {
 					Collection<String> pemissionStrings = info.getStringPermissions();
+					Collection<String> roles = info.getRoles();
 					if(pemissionStrings!=null && pemissionStrings.size()>0 ) {
 						ajaxLoginUserDTO.setHoldPerms( new  HashSet<String>( pemissionStrings )  );
+					}
+					if (roles != null && roles.size() > 0) {
+						ajaxLoginUserDTO.setHoldRoles(new HashSet<String>(roles));
 					}
 				}
 			}

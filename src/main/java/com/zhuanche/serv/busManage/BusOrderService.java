@@ -3,11 +3,15 @@ package com.zhuanche.serv.busManage;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSONArray;
+import com.zhuanche.entity.busManage.*;
+import com.zhuanche.http.MpOkHttpUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
@@ -15,11 +19,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.constants.BusConst;
 import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
-import com.zhuanche.entity.busManage.BusCostDetail;
-import com.zhuanche.entity.busManage.BusOrderDetail;
-import com.zhuanche.entity.busManage.BusPayDetail;
 import com.zhuanche.util.Common;
 import com.zhuanche.util.MyRestTemplate;
 import com.zhuanche.util.SignUtils;
@@ -34,10 +36,6 @@ public class BusOrderService {
 
 	private static final Logger logger = LoggerFactory.getLogger(BusOrderService.class);
 
-	private static String GET_ORDER_DETAIL = "/busOrder/getOrderDetail";
-	private static String BUSS_BACK = "/buss/back";
-	private static String BUS_PAY_DETAIL = "/pay/bus/details";
-
 	@Autowired
 	private CarBizDriverInfoExMapper carBizDriverInfoExMapper;
 
@@ -50,7 +48,6 @@ public class BusOrderService {
 	@Autowired
 	private CarBizCustomerExMapper carBizCustomerExMapper;
 
-	// TODO 检查是否存在
 	@Autowired
 	@Qualifier("carRestTemplate")
 	private MyRestTemplate carRestTemplate;
@@ -60,8 +57,17 @@ public class BusOrderService {
 	private MyRestTemplate busOrderCostTemplate;
 
 	@Autowired
-	@Qualifier("busOrderPayTemplate")
-	private MyRestTemplate busOrderPayTemplate;
+	@Qualifier("orderPayOldTemplate")
+	private MyRestTemplate orderPayOldTemplate;
+
+	@Value("${mp.restapi.url}")
+	private String mpReatApiUrl;
+
+	@Value("${business.url}")
+	private String businessRestBaseUrl;
+
+	@Value("${order.pay.old.url}")
+	private String paymentBaseUrl;
 
 	/**
 	 * @Title: selectOrderDetail
@@ -70,8 +76,7 @@ public class BusOrderService {
 	 * @return BusOrderDetail
 	 * @throws
 	 */
-	@MasterSlaveConfigs(configs = {
-			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE) })
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public BusOrderDetail selectOrderDetail(String orderNo) {
 
 		// 组装接口参数
@@ -83,7 +88,7 @@ public class BusOrderService {
 
 		BusOrderDetail entity = null;
 		try {
-			String response = carRestTemplate.postForObject(GET_ORDER_DETAIL, JSONObject.class, paramMap);
+			String response = carRestTemplate.postForObject(BusConst.Order.GET_ORDER_DETAIL, JSONObject.class, paramMap);
 			logger.info("[ BusOrderService-selectOrderDetail ] 订单详情调用，订单接口返回值={}", response);
 
 			JSONObject result = JSON.parseObject(response);
@@ -106,6 +111,7 @@ public class BusOrderService {
 						entity.setDriverPhone(driverInfo.getPhone());
 						entity.setSupplierId(driverInfo.getSupplierId());
 						entity.setSupplierName(driverInfo.getSupplierName());
+						entity.setDriverCarGroupName(driverInfo.getCarGroupName());
 					}
 
 				}
@@ -157,7 +163,7 @@ public class BusOrderService {
 		try {
 			Map<String, Object> paramMap = new HashMap<>();
 			paramMap.put("orderId", orderId);
-			String response = busOrderCostTemplate.postForObject(BUSS_BACK, JSONObject.class, paramMap);
+			String response = busOrderCostTemplate.postForObject(BusConst.Charge.BUSS_BACK, JSONObject.class, paramMap);
 			JSONObject result = JSON.parseObject(response);
 			logger.info("[ BusOrderService-selectOrderCostDetail ] 查询订单详情，调用计费接口返回值={}", result);
 			int code = result.getIntValue("code");
@@ -188,7 +194,7 @@ public class BusOrderService {
 		try {
 			Map<String, Object> paramMap = new HashMap<>();
 			paramMap.put("tradeOrderNo", orderNo);
-			String response = busOrderPayTemplate.postForObject(BUS_PAY_DETAIL, JSONObject.class, paramMap);
+			String response = orderPayOldTemplate.postForObject(BusConst.Payment.BUS_PAY_DETAIL, JSONObject.class, paramMap);
 			JSONObject result = JSON.parseObject(response);
 			logger.info("[ BusOrderService-selectOrderPayDetail ] 订单详情，调用支付接口返回值={}", result);
 			int code = result.getIntValue("code");
@@ -208,5 +214,67 @@ public class BusOrderService {
 			return new BusPayDetail();
 		}
 	}
-	
+
+
+	public Appraisal selectOrderAppraisal(String orderNo) {
+		Map<String, Object> paramMap = new HashMap();
+		paramMap.put("orderNos", orderNo);
+		String url = mpReatApiUrl+BusConst.Payment.BUS_APPRAISAL;
+		try {
+			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(url , paramMap, 2000, "巴士订单详情查询评分信息");
+			int code = result.getIntValue("code");
+			String msg = result.getString("msg");
+			if (code != 0) {
+				logger.error("[ BusOrderService-selectOrderAppraisal ],错误码:" + code + ",错误原因:" + msg);
+				return null;
+			}
+			JSONArray dataArray = result.getJSONArray("data");
+			if (dataArray != null && dataArray.size() > 0) {
+				JSONObject jsonObject = (JSONObject) dataArray.get(0);
+				Appraisal appraisal = JSONObject.toJavaObject(jsonObject, Appraisal.class);
+				return appraisal;
+			}
+			return null;
+		} catch (Exception e) {
+			logger.error("[ BusOrderService-selectOrderAppraisal ]订单详情查询评价接口异常，{}", e);
+			return null;
+		}
+	}
+
+	public OrgCostInfo selectOrgInfo(String phone) {
+		//查询企业信息
+		Map<String, Object> paramMap = new HashMap(2);
+		paramMap.put("phone", phone);
+		try {
+			JSONObject orgResult = MpOkHttpUtil.okHttpPostBackJson(businessRestBaseUrl+BusConst.Payment.ORG_URL , paramMap, 2000, "巴士订单详情查询企业ID");
+			if (orgResult.getIntValue("code") != 0) {
+				logger.error("[ BusOrderService-selectOrgInfo ] 订单详情查询机构ID 接口出错,错误码:" + orgResult.getIntValue("code") + ",错误原因:" + orgResult.getString("msg"));
+				return null;
+			}
+			logger.error("[ BusOrderService-selectOrgInfo ] 订单详情查询机构ID 结果="+JSON.toJSONString(orgResult));
+			JSONObject dataJson = orgResult.getJSONObject("data");
+			OrganizationInfo orgInfo = JSONObject.toJavaObject(dataJson, OrganizationInfo.class);
+			//type =1 表示新机构用户
+			if(orgInfo == null || orgInfo.getType() !=1){
+				logger.error("[ BusOrderService-selectOrgInfo ] 订单详情查询机构ID 该用户非企业用户不再继续查询折扣信息 phone="+phone);
+				return null;
+			}
+			Map<String,Object> param=new HashMap(2);
+			param.put("businessId",orgInfo.getCompanyId());
+			//查询企业折扣信息
+			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(paymentBaseUrl+BusConst.Payment.ORG_COST_URL , param, 2000, "巴士订单详情查询企业折扣信息");
+			if(result.getIntValue("code")!=0){
+				logger.error("[ BusOrderService-selectOrgInfo ] 订单详情查询查询折扣信息 接口出错,错误码:" + orgResult.getIntValue("code") + ",错误原因:" + orgResult.getString("msg"));
+				return null;
+			}
+			JSONObject data = result.getJSONObject("data");
+			JSONObject businessJson = data.getJSONObject("businessRepDTO");
+			OrgCostInfo orgCostInfo = JSONObject.toJavaObject(businessJson, OrgCostInfo.class);
+			return orgCostInfo;
+		} catch (Exception e) {
+			logger.error("[ BusOrderService-selectOrgInfo ]订单详情查询机构id接口异常，{}", e);
+			return null;
+		}
+	}
+
 }

@@ -32,6 +32,7 @@ public final class AjaxLoginUserDTO implements Serializable{
 	
 	//---------------------------------------------------------------------------------------------------------用户的权限信息BEGIN
 	private Set<String> holdPerms = new HashSet<String>();
+	private Set<String> holdRoles = new HashSet<String>();
 	//---------------------------------------------------------------------------------------------------------用户的权限信息END
 	
 	//---------------------------------------------------------------------------------------------------------用户的数据权限BEGIN
@@ -107,6 +108,14 @@ public final class AjaxLoginUserDTO implements Serializable{
 
 	public void setHoldPerms(Set<String> holdPerms) {
 		this.holdPerms = holdPerms;
+	}
+
+	public Set<String> getHoldRoles() {
+		return holdRoles;
+	}
+
+	public void setHoldRoles(Set<String> holdRoles) {
+		this.holdRoles = holdRoles;
 	}
 
 	public Set<Integer> getCityIds() {

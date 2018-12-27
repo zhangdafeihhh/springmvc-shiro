@@ -77,4 +77,6 @@ public interface CarBizCarInfoExMapper {
 	 * @throws
 	 */
 	CarBizCarInfoDTO selectCarCitySupplierInfoByCarId(Integer carId);
+
+	CarBizCarInfoDTO  selectBasicCarInfo(Integer carId);
 }

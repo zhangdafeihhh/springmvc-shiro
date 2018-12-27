@@ -12,7 +12,7 @@
 		</commentGenerator>
 
 		<!-- 数据库连接信息 -->
-		<jdbcConnection driverClass="com.mysql.jdbc.Driver"	connectionURL="jdbc:mysql://10.20.10.100:3306/rentcar?useUnicode=true&amp;characterEncoding=UTF-8" userId="sqhc_rentcar" password="BzkmQM%O^U7Dy8X3">
+		<jdbcConnection driverClass="com.mysql.jdbc.Driver"	connectionURL="jdbc:mysql://10.35.0.35:3306/rentcar?useUnicode=true&amp;characterEncoding=UTF-8" userId="dev_sqhc_rentcar" password="dev_BzkmQM%O^U7Dy8X3">
 		</jdbcConnection>
 		<javaTypeResolver>
 			<property name="forceBigDecimals" value="true"/>
@@ -44,20 +44,25 @@
 			enableCountByExample="false" enableUpdateByExample="false">
 			<property name="useActualColumnNames" value="false" />
 			<generatedKey column="supplier_id" sqlStatement="MySql" identity="true" />
+		</table> 
+		<table tableName="car_biz_car_group" domainObjectName="CarBizCarGroup"
+			enableSelectByExample="false" enableDeleteByExample="false"
+			enableCountByExample="false" enableUpdateByExample="false">
+			<property name="useActualColumnNames" value="false" />
+			<generatedKey column="supplier_id" sqlStatement="MySql" identity="true" />
+		</table>
+		<table tableName="car_biz_model" domainObjectName="CarBizModel"
+			enableSelectByExample="false" enableDeleteByExample="false"
+			enableCountByExample="false" enableUpdateByExample="false">
+			<property name="useActualColumnNames" value="false" />
+			<generatedKey column="supplier_id" sqlStatement="MySql" identity="true" />
 		</table> -->
-<!-- 		<table tableName="car_biz_car_group" domainObjectName="CarBizCarGroup" -->
-<!-- 			enableSelectByExample="false" enableDeleteByExample="false" -->
-<!-- 			enableCountByExample="false" enableUpdateByExample="false"> -->
-<!-- 			<property name="useActualColumnNames" value="false" /> -->
-<!-- 			<generatedKey column="supplier_id" sqlStatement="MySql" identity="true" /> -->
-<!-- 		</table> -->
-		<table tableName="car_biz_car_info" domainObjectName="CarBizCarInfo"
+		<table tableName="car_biz_service" domainObjectName="CarBizService"
 			enableSelectByExample="false" enableDeleteByExample="false"
 			enableCountByExample="false" enableUpdateByExample="false"
 			enableDeleteByPrimaryKey="false">
 			<property name="useActualColumnNames" value="false" />
-			<generatedKey column="car_id" sqlStatement="MySql" identity="true" />
+			<generatedKey column="service_id" sqlStatement="MySql" identity="true" />
 		</table>
-
 	</context>
 </generatorConfiguration>
