@@ -260,6 +260,13 @@
 			<version>3.4.6</version>
 		</dependency>
 
+		<!--解决mq和 es依赖netty包冲突-->
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
+			<version>4.1.16.Final</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
