@@ -2198,4 +2198,8 @@ public class CarBizCarInfoTempService {
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
     }
+
+    public void updateDriverCooperationTypeBySupplierId(Integer supplierId, Integer cooperationType) {
+        carBizCarInfoTempExMapper.updateDriverCooperationTypeBySupplierId(supplierId, cooperationType);
+    }
 }

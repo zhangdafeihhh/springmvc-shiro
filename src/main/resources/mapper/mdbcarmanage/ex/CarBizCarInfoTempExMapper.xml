@@ -318,5 +318,11 @@
             and supplier_id = #{supplierId}
         </if>
     </select>
+
+	<update id="updateDriverCooperationTypeBySupplierId">
+		UPDATE car_biz_driver_info_temp
+			set cooperation_type = #{cooperationType}
+		WHERE supplier_id = #{supplierId}
+	</update>
 </mapper>
 

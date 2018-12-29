@@ -163,5 +163,6 @@ public interface CarBizDriverInfoExMapper {
      * @throws
      */
     List<Map<String, Object>> queryBusDriverList(BusDriverRicherDTO richerDTO);
-    
+
+    void updateDriverCooperationTypeBySupplierId(Map<String, Object> map);
 }
