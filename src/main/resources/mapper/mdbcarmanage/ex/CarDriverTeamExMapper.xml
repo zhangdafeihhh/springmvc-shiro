@@ -19,6 +19,7 @@
     <result column="charge1" property="charge1" jdbcType="VARCHAR" />
     <result column="charge2" property="charge2" jdbcType="VARCHAR" />
     <result column="charge3" property="charge3" jdbcType="VARCHAR" />
+    <result column="short_name" property="shortName" jdbcType="VARCHAR" />
   </resultMap>
 
     <resultMap id="BaseExResultMap" type="com.zhuanche.dto.CarDriverTeamDTO" extends="BaseResultMap">
@@ -28,7 +29,7 @@
 
   <sql id="Base_Column_List" >
     id, team_name, sort, create_by, create_date, update_by, update_date, city, supplier, 
-    remark, status, p_id, duty_start_date, duty_end_date, charge1, charge2, charge3
+    remark, status, p_id, duty_start_date, duty_end_date, charge1, charge2, charge3, short_name
   </sql>
 
     <update id="updateTeamDuty" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverTeam">
@@ -74,7 +75,8 @@
         remark,
         status,
         p_id pId,
-        charge1, charge2, charge3
+        charge1, charge2, charge3,
+        short_name AS shortName
         FROM
         car_driver_team
         WHERE 1=1
@@ -95,7 +97,8 @@
         supplier AS suppliers,
         remark,
         status,
-        p_id pId
+        p_id pId,
+        short_name AS shortName
         FROM
         car_driver_team
         WHERE 1=1  and status!=2
