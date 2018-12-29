@@ -1,18 +1,19 @@
 package com.zhuanche.serv.mongo;
 
-import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
-import com.zhuanche.mongo.DriverMongo;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
+import com.zhuanche.mongo.DriverMongo;
 
 /**
  * @ClassName: DriverMongoServiceImpl
@@ -215,7 +216,7 @@ public class DriverMongoService {
         Query query = new Query(Criteria.where("supplierId").is(supplierId));
         Update update = new Update();
         update.set("cooperationType", cooperationType);
-        driverMongoTemplate.updateFirst(query, update, DriverMongo.class);
+        driverMongoTemplate.updateMulti(query, update, DriverMongo.class);
     }
 
     /**

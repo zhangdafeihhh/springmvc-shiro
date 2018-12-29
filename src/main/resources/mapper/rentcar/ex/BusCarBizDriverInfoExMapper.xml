@@ -37,16 +37,14 @@
 		</if>
 		<if test="authOfCity != null and authOfCity.size() > 0">
 			AND d.service_city IN
-			<foreach collection="authOfCity" open="(" close=")" separator=","
-				item="cityId">
-				#{cityId}
+			<foreach collection="authOfCity" open="(" close=")" separator="," item="item">
+				#{item}
 			</foreach>
 		</if>
 		<if test="authOfSupplier != null and authOfSupplier.size() > 0">
 			AND d.supplier_id IN
-			<foreach collection="authOfSupplier" open="(" close=")"
-				separator="," item="supplierId">
-				#{supplierId}
+			<foreach collection="authOfSupplier" open="(" close=")" separator="," item="item">
+				#{item}
 			</foreach>
 		</if>
 	</sql>
