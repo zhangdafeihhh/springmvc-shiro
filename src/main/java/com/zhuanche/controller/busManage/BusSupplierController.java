@@ -191,6 +191,7 @@ public class BusSupplierController {
 		queryDTO.setPageSize(pageSize);
         queryDTO.setContractIds(null);
 		queryDTO.setExcludeContractIds(null);
+		logger.info("[ BusSupplierController-querySupplierPageList ] 查询供应商分页列表params={}", JSON.toJSONString(queryDTO));
         List<BusSupplierPageVO> totalList = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
         Page<BusSupplierPageVO> page = (Page<BusSupplierPageVO>) totalList;
 

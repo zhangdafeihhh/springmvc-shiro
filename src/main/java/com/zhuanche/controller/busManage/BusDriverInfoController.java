@@ -84,6 +84,8 @@ public class BusDriverInfoController extends BusBaseController {
 	@SuppressWarnings("resource")
 	@RequestMapping(value = "/findDriverList")
 	public AjaxResponse findDriverList(@Validated BusDriverQueryDTO queryDTO) {
+		
+		logger.info("当前登录人信息={}", JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));
 
 		// 数据权限控制SSOLoginUser
 		Set<Integer> permOfCity = WebSessionUtil.getCurrentLoginUser().getCityIds(); // 普通管理员可以管理的所有城市ID

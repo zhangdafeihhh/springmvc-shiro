@@ -197,6 +197,7 @@ public class BusCarBizDriverInfoService implements BusConst{
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public List<BusDriverInfoPageVO> queryDriverPageList(BusDriverQueryDTO queryDTO) {
 
+		logger.info("[ BusCarBizDriverInfoService-queryDriverPageList ] 查询司机列表params={}", JSON.toJSONString(queryDTO));
 		List<BusDriverInfoPageVO> driverList = busCarBizDriverInfoExMapper.queryDriverPageList(queryDTO);
 
 		if (driverList == null) {
@@ -232,6 +233,7 @@ public class BusCarBizDriverInfoService implements BusConst{
 	 */
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public List<BusDriverInfoExportVO> queryDriverExportList(BusDriverQueryDTO exportDTO) {
+		logger.info("[ BusCarBizDriverInfoService-queryDriverExportList ] 导出司机列表params={}", JSON.toJSONString(exportDTO));
 		List<BusDriverInfoExportVO> driverList = busCarBizDriverInfoExMapper.queryDriverExportList(exportDTO);
 		return driverList;
 	}
