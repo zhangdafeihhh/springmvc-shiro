@@ -884,8 +884,7 @@ public class BusCarBizDriverInfoService implements BusConst{
 		saveDTO.setSigndateend("2020-05-12");
 		// 有效合同时间：2020-05-12
 		saveDTO.setContractdate("2020-05-12");
-		// 巡游出租汽车驾驶员资格证号：123456
-		saveDTO.setXyDriverNumber("123456");
+
 		// 是否专职司机：是
 		saveDTO.setParttimejobdri("是");
 		// 地图类型：高德
@@ -1215,6 +1214,9 @@ public class BusCarBizDriverInfoService implements BusConst{
 	 * @throws
 	 */
 	public String getCellValue(Cell cell, FormulaEvaluator evaluator) {
+		if(cell==null){
+			return null;
+		}
 		String cellStringValue = "";
 		// 以下是判断数据的类型
 		switch (cell.getCellType()) {
