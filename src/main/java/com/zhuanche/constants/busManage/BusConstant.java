@@ -38,7 +38,7 @@ public class BusConstant {
         String TRANSACTION_FALOW_FALE_NAME="来源编号,结算金额,发生时间,结算类型";
         //账单状态
          enum EnumStatus{
-          INITIAL(0,"初始"),WAIT_PROOFREAD_BILL(1,"代对帐"),WAIT_FRO_INVOICE(2,"待开票"),WAIT_PAYMENT(3,"待支付"),COMPLETE(4,"已完成")  ;
+          INITIAL(0,"初始"),WAIT_PROOFREAD_BILL(1,"待对账"),WAIT_FRO_INVOICE(2,"待开票"),WAIT_PAYMENT(3,"待支付"),COMPLETE(4,"已完成")  ;
             // 0 初始 1 待对账 2 待开票 3 待付款 4 已完成
             private int code;
             private String desc;
