@@ -274,7 +274,7 @@ public class BusInfoController {
         for (BusInfoVO info : infoVOS) {
             StringBuffer sb = new StringBuffer();
             sb.append(info.getLicensePlates()).append(",").append(info.getCityName()).append(",").append(info.getSupplierName()).append(",")
-                    .append(info.getGroupName()).append(",").append(info.getModelDetail()).append(",").append((info.getStatus() != null && info.getStatus() == 1) ? "有效" : "无效")
+                    .append(info.getGroupName()).append(",").append(StringUtils.isBlank(info.getModelDetail())?StringUtils.EMPTY:info.getModelDetail()).append(",").append((info.getStatus() != null && info.getStatus() == 1) ? "有效" : "无效")
                     .append(",").append(info.getCreateDate() != null ? DateUtils.formatDateTime((info.getCreateDate())): "");
             csvData.add(sb.toString());
         }

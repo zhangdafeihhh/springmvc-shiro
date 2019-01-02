@@ -587,7 +587,7 @@ public class BusAssignmentController {
             } else {
                 process.setEventName("改派");
             }
-            if (o.getType() == 1) {
+            if (o.getStatus() == 1) {
                 process.setDesc("操作成功 司机姓名:" + o.getDriverName() + "手机号:" + o.getDirverPhone());
             } else {
                 process.setDesc("操作失败 原因:" + o.getDescription());

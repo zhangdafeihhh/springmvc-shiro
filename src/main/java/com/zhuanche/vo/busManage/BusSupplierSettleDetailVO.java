@@ -218,7 +218,7 @@ public class BusSupplierSettleDetailVO {
                 .append("\t").append(DateUtils.formatDate(startTime)).append(split)
                 .append("\t").append(DateUtils.formatDate(endTime)).append(split)
                 .append("\t").append(DateUtils.formatDate(settleTime)).append(split)
-                .append(billAmount).append(split).append(settleType == 0 ? "自动" : "手动").append(split)
+                .append(billAmount).append(split).append(settleType == 0 ? "手动" : "自动").append(split)
                 .append(shareWayName).append(split).append(shareTypeName).append(split)
                 .append(EnumStatus.getDescByCode(status));
         return sb.toString();
