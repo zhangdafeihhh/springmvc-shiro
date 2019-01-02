@@ -67,6 +67,7 @@
 		LEFT JOIN car_biz_car_group g ON g.group_id = d.group_id
 		WHERE
 			<include refid="queryAndExportWhereSql"/>
+		order by d.driver_id desc
 	</select>
 	
 	<!-- 查询司机信息导出列表 -->
