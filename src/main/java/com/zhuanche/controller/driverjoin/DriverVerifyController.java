@@ -216,11 +216,11 @@ public class DriverVerifyController {
 			if (driverVerify == null){
 				continue;
 			}
-			builder.append(driverVerify.getCityName()).append(Constants.SEPERATER);
-			builder.append(driverVerify.getId()).append(Constants.SEPERATER);
-			builder.append(driverVerify.getName() == null ? "" : driverVerify.getName()).append(Constants.SEPERATER);
-			builder.append(driverVerify.getSupplierName() == null ? "" : driverVerify.getSupplierName()).append(Constants.SEPERATER);
-			builder.append(driverVerify.getPlateNum() == null ? "" : driverVerify.getPlateNum()).append(Constants.SEPERATER);
+			builder.append("\t").append(driverVerify.getCityName()).append(Constants.SEPERATER);
+			builder.append("\t").append(driverVerify.getId()).append(Constants.SEPERATER);
+			builder.append("\t").append(driverVerify.getName() == null ? "" : driverVerify.getName()).append(Constants.SEPERATER);
+			builder.append("\t").append(driverVerify.getSupplierName() == null ? "" : driverVerify.getSupplierName()).append(Constants.SEPERATER);
+			builder.append("\t").append(driverVerify.getPlateNum() == null ? "" : driverVerify.getPlateNum()).append(Constants.SEPERATER);
 			builder.append("\t").append(DateUtil.timestampFormat(driverVerify.getCreateAt())).append(Constants.SEPERATER);
 			Integer verifyStatus = driverVerify.getVerifyStatus();
 			//1注册、2资料完善、3资料审核通过、4资料审核未通过、5验车通过、6验车未通过
