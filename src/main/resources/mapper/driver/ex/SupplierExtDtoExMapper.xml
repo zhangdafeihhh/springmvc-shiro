@@ -41,4 +41,10 @@
     </if>
     where supplier_id = #{supplierId}
   </update>
+
+  <select id="selectBySupplierId" parameterType="integer" resultMap="BaseResultMap">
+    select id
+      from supplier_ext
+      where supplier_id = #{supplierId}
+  </select>
 </mapper>

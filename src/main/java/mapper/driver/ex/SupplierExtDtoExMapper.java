@@ -8,5 +8,7 @@ import java.util.List;
 public interface SupplierExtDtoExMapper {
     List<SupplierExtDto> queryExtDtoByIdList(@Param("idList") List<Integer> idList);
 
-    SupplierExtDto updateBySupplierId(SupplierExtDto extDto);
+    int updateBySupplierId(SupplierExtDto extDto);
+
+    SupplierExtDto selectBySupplierId(@Param("supplierId")Integer supplierId);
 }
