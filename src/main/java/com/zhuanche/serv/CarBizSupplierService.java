@@ -95,20 +95,29 @@ public class CarBizSupplierService{
 				method = Constants.CREATE;
 				supplier.setCreateBy(id);
 				supplier.setCreateDate(new Date());
-				carBizSupplierMapper.insert(supplier);
+				carBizSupplierMapper.insertSelective(supplier);
 				SupplierExtDto extDto = new SupplierExtDto();
 				extDto.setEmail(supplier.getEmail());
 				extDto.setSupplierShortName(supplier.getSupplierShortName());
 				extDto.setSupplierId(supplier.getSupplierId());
-				supplierExtDtoMapper.insert(extDto);
+				extDto.setCreateDate(new Date());
+				extDto.setUpdateDate(new Date());
+				supplierExtDtoMapper.insertSelective(extDto);
 			}else {
-				carBizSupplierMapper.updateByPrimaryKey(supplier);
+				carBizSupplierMapper.updateByPrimaryKeySelective(supplier);
 				SupplierExtDto extDto = new SupplierExtDto();
 				extDto.setEmail(supplier.getEmail());
 				extDto.setSupplierShortName(supplier.getSupplierShortName());
 				extDto.setSupplierId(supplier.getSupplierId());
 				extDto.setStatus(supplier.getStatus().byteValue());
-				supplierExtDtoExMapper.updateBySupplierId(extDto);
+				extDto.setUpdateDate(new Date());
+				SupplierExtDto supplierExtDto = supplierExtDtoExMapper.selectBySupplierId(supplier.getSupplierId());
+				if (supplierExtDto == null){
+					extDto.setCreateDate(new Date());
+					supplierExtDtoMapper.insertSelective(extDto);
+				}else {
+					supplierExtDtoExMapper.updateBySupplierId(extDto);
+				}
 			}
 			try{
 				Map<String, Object> messageMap = new HashMap<String, Object>();
