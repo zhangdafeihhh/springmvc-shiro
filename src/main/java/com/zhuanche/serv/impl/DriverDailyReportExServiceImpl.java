@@ -240,7 +240,8 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
             if (Constants.WEEK.equals(type)){
                 url = "/driverIncome/findDriverDateIncomes?driverIds=" + drivers + "&startDate=" + statTime + "&endDate=" + endTime;
             }else if(Constants.MONTH.equals(type)){
-                url = "/driverIncome/findDriverIncomes?driverIds="+drivers+"&incomeDate="+startDate ;
+                url = "/driverIncome/findDriverDateIncomes?driverIds=" + drivers + "&startDate=" + statTime + "&endDate=" + endTime;
+                //url = "/driverIncome/findDriverIncomes?driverIds="+drivers+"&incomeDate="+startDate ;
             }
             String result = busOrderCostTemplate.getForObject(url, String.class);
 
