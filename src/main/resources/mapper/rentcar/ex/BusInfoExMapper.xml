@@ -110,6 +110,7 @@
         <if test="groupId !=null">
            and (info.group_id=#{groupId} or g.group_id=#{groupId})
         </if>
+        ORDER BY info.car_id desc
     </select>
     <select id="selectCarByCarId" parameterType="java.lang.Integer" resultMap="DetailVOMap">
        SELECT
