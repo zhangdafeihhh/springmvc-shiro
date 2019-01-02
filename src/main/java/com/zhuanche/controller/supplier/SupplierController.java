@@ -5,7 +5,6 @@ import com.github.pagehelper.PageHelper;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.entity.rentcar.CarBizCooperationType;
-import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.entity.rentcar.CarBizSupplierQuery;
 import com.zhuanche.entity.rentcar.CarBizSupplierVo;
 import com.zhuanche.serv.CarBizCooperationTypeService;
