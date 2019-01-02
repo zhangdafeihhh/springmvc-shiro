@@ -65,4 +65,13 @@ public final class Constants {
 	public static final Integer WEEK=1; //周报
 	public static final Integer MONTH=2;//月报
 
+	public static final String UPDATE = "UPDATE";
+	public static final String CREATE = "CREATE";
+
+	public static final String SAVE_SUPPLIER_ERROR = "保存供应商失败";
+	public static final String SAVE_SUPPLIER_SUCCESS = "保存供应商成功";
+
+	public static final String SUPPLIER_TOPIC = "vipSupplierTopic";
+	public static final String SUPPLIER_MQ_SEND_FAILED = "专车供应商发送MQ失败";
+
 }

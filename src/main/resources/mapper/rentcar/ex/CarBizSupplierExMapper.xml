@@ -21,6 +21,29 @@
     <result column="enterprise_type" property="enterpriseType" jdbcType="INTEGER" />
     <result column="address" property="address" jdbcType="VARCHAR" />
   </resultMap>
+  <resultMap id="VoResultMap" type="com.zhuanche.entity.rentcar.CarBizSupplierVo" >
+    <id column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_num" property="supplierNum" jdbcType="VARCHAR" />
+    <result column="supplier_full_name" property="supplierFullName" jdbcType="VARCHAR" />
+    <result column="supplier_city" property="supplierCity" jdbcType="INTEGER" />
+    <result column="supplier_city_name" property="supplierCityName" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="contacts" property="contacts" jdbcType="VARCHAR" />
+    <result column="contacts_phone" property="contactsPhone" jdbcType="VARCHAR" />
+    <result column="dispatcher_phone" property="dispatcherPhone" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="isCommission" property="iscommission" jdbcType="INTEGER" />
+    <result column="is_two_shifts" property="isTwoShifts" jdbcType="INTEGER" />
+    <result column="posPayFlag" property="pospayflag" jdbcType="INTEGER" />
+    <result column="cooperation_type" property="cooperationType" jdbcType="INTEGER" />
+    <result column="cooperation_name" property="cooperationName" jdbcType="INTEGER" />
+    <result column="enterprise_type" property="enterpriseType" jdbcType="INTEGER" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+  </resultMap>
   <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizSupplier" extends="BaseResultMap" >
     <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
   </resultMap>
@@ -138,4 +161,58 @@
 		WHERE
 			t.supplier_id = #{supplierId}
 	</select>
+
+    <select id="findByParams" resultMap="VoResultMap" parameterType="com.zhuanche.entity.rentcar.CarBizSupplierQuery">
+        SELECT
+            t.supplier_id supplier_id,
+            t.supplier_num supplier_num,
+            t.supplier_full_name supplier_full_name,
+            t.supplier_city supplier_city,
+            t.type,
+            t.contacts,
+            t.contacts_phone contacts_phone,
+            t. STATUS,
+            t.create_by createBy,
+            t.update_by updateBy,
+            t.create_date createDate,
+            t.update_date updateDate,
+            c.city_name supplier_city_name,
+            t.isCommission isCommission,
+            t.posPayFlag,
+            t.enterprise_type enterprise_type,
+            t.cooperation_type cooperation_type,
+            ct.cooperation_name cooperation_name,
+            t.address,
+            t.dispatcher_Phone dispatcher_phone,
+            t.is_two_shifts is_two_shifts
+        FROM
+            car_biz_supplier t
+        LEFT JOIN car_biz_city c ON c.city_id = t.supplier_city
+        LEFT JOIN car_biz_cooperation_type ct ON ct.id = t.cooperation_type
+        where 1=1
+        <if test="supplierFullName != null and supplierFullName != ''">
+            and t.supplier_full_name like '${supplierFullName}%'
+        </if>
+        <if test="cityIds != null and cityIds.size()>0">
+            AND t.supplier_city in
+            <foreach item="item" index="index" collection="cityIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="supplierIds != null and supplierIds.size()>0">
+            AND t.supplier_id in
+            <foreach item="item" index="index" collection="supplierIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="cooperationType != null">
+            and t.cooperation_type = #{cooperationType}
+        </if>
+        <if test="enterpriseType != null">
+            and t.enterprise_type = #{enterpriseType}
+        </if>
+        <if test="status != null">
+            AND t.status = #{status}
+        </if>
+    </select>
 </mapper>

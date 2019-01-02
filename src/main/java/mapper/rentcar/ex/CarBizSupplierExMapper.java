@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.zhuanche.entity.rentcar.CarBizSupplierQuery;
+import com.zhuanche.entity.rentcar.CarBizSupplierVo;
 import org.apache.ibatis.annotations.Param;
 
 import com.zhuanche.dto.rentcar.CarBizSupplierDTO;
@@ -27,4 +29,6 @@ public interface CarBizSupplierExMapper{
 	List<Map<String, Object>> getSupplierList(@Param("supplierIds") Set<String> supplierIds);
 	/** 根据供应商ID查询其调度员电话 **/
 	String queryDispatcherPhoneBySupplierId(@Param("supplierId") Integer supplierId);
+
+    List<CarBizSupplierVo> findByParams(CarBizSupplierQuery queryParam);
 }

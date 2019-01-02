@@ -14,7 +14,6 @@ import com.zhuanche.common.rocketmq.CommonRocketProducer;
 import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.dto.driver.DriverTeamRelationEntity;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
@@ -26,20 +25,17 @@ import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.serv.mdbcarmanage.CarBizDriverUpdateService;
 import com.zhuanche.serv.mongo.DriverMongoService;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.*;
+import com.zhuanche.util.Common;
 import com.zhuanche.util.DateUtil;
+import com.zhuanche.util.Md5Util;
+import com.zhuanche.util.ValidateUtils;
 import com.zhuanche.util.encrypt.MD5Utils;
 import mapper.mdbcarmanage.*;
 import mapper.mdbcarmanage.ex.*;
-import mapper.mdbcarmanage.CarAdmUserMapper;
-import mapper.mdbcarmanage.CarDriverTeamMapper;
-import mapper.mdbcarmanage.CarRelateGroupMapper;
-import mapper.mdbcarmanage.CarRelateTeamMapper;
 import mapper.rentcar.CarBizDriverAccountMapper;
 import mapper.rentcar.CarBizDriverInfoMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
-import net.sf.json.JSONArray;
 import mapper.rentcar.ex.CarBizModelExMapper;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
@@ -3684,5 +3680,13 @@ public class CarBizDriverInfoService {
         }
         CarBizDriverInfoDTO carBizDriverInfo = carBizDriverInfoExMapper.selectByDriverId(driverTelescopeUser.getDriverId());
         return carBizDriverInfo;
+    }
+
+    public void updateDriverCooperationTypeBySupplierId(Integer supplierId, Integer cooperationType) {
+        driverMongoService.updateDriverCooperationTypeBySupplierId(supplierId, cooperationType);
+        Map<String, Object> map = new HashMap<>();
+        map.put("supplierId", supplierId);
+        map.put("cooperationType", cooperationType);
+        carBizDriverInfoExMapper.updateDriverCooperationTypeBySupplierId(map);
     }
 }

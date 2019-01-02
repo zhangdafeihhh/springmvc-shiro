@@ -48,4 +48,6 @@ public interface CarBizCarInfoTempExMapper {
      * @return
      */
     List<CarBizCarInfoTemp> licensePlatesNotDriverIdList(Map<String,Object> map);
+
+    void updateDriverCooperationTypeBySupplierId(Integer supplierId, Integer cooperationType);
 }
