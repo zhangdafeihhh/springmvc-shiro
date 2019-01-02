@@ -33,7 +33,7 @@ public class BusSupplierDetailDTO implements BusSupplierDTO {
 
 	/** 加盟费 **/
 	@NotNull(message = "加盟费不能为空")
-	@DecimalMin(value = "0", inclusive = false, message = "加盟费必须大于0元")
+	@DecimalMin(value = "0", inclusive = true, message = "加盟费必须大于或等于0元")
 	@DecimalMax(value = "9999999999.99", message = "加盟费必须小于 9999999999.99 元")
 	private BigDecimal franchiseFee;
 
