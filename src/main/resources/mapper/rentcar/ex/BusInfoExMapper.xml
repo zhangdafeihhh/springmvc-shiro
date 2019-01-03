@@ -38,7 +38,15 @@
         <result property="groupName" column="group_name"/>
         <result property="modelDetail" column="model_detail"/>
         <result property="status" column="status"/>
+        <result property="color" column="color"/>
+        <result property="fuelType" column="fuelType"/>
+        <result property="transportNumber" column="transportNumber"/>
         <result property="createDate" column="create_date"/>
+        <result property="vehicleBrand" column="vehicle_brand"/>
+        <result property="nextInspectDate" column="next_inspect_date"/>
+        <result property="nextMaintenanceDate" column="next_maintenance_date"/>
+        <result property="nextOperationDate" column="next_operation_date"/>
+        <result property="carPurchaseDate" column="car_purchase_date"/>
     </resultMap>
     <resultMap id="DetailVOMap" type="com.zhuanche.vo.busManage.BusDetailVO">
         <result property="carId" column="car_id"/>
@@ -66,7 +74,15 @@
         CASE when g.group_name is null then gop.group_name else g.group_name end as group_name,
         CASE when m.model_name is null then info.model_detail else m.model_name end as model_detail,
         info.`status`,
-        info.create_date
+        info.color,
+        info.fuelType,
+        info.transportNumber,
+        info.create_date,
+        info.vehicle_brand,
+        info.next_inspect_date,
+        info.next_maintenance_date,
+        info.next_operation_date,
+        info.car_purchase_date
         FROM
         car_biz_car_info info
         LEFT JOIN car_biz_city city ON info.city_id = city.city_id

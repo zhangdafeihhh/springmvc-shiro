@@ -9,6 +9,7 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.constants.busManage.BusConstant;
 import com.zhuanche.constants.busManage.BusConstant.CarConstant;
 import com.zhuanche.constants.busManage.EnumFuel;
 import com.zhuanche.dto.busManage.BusInfoDTO;
@@ -186,15 +187,15 @@ public class BusInfoController {
             //保存车辆信息
             logger.info(LOG_PRE + " 新增车辆" + JSON.toJSONString(carInfo));
             saveResult = busInfoService.saveCar(carInfo);
-            if(saveResult>0){
-               busInfoService.saveCar2MongoDB(carInfo);
+            if (saveResult > 0) {
+                busInfoService.saveCar2MongoDB(carInfo);
                 carId = carInfo.getCarId();
             }
         } else {
             //更新车辆信息
             logger.info(LOG_PRE + currentLoginUser.getName() + " 修改车辆信息" + JSON.toJSONString(carInfo));
             saveResult = busInfoService.updateCarById(carInfo);
-            if(saveResult>0){
+            if (saveResult > 0) {
                 busInfoService.update2mongoDB(carInfo);
             }
         }
@@ -230,16 +231,10 @@ public class BusInfoController {
         PageInfo<BusInfoVO> pageInfo = busInfoService.queryList(busDTO);
         //文件标题
         List<String> headerList = new ArrayList<>();
-        headerList.add(CarConstant.EXPORT_HEAD);
-        String fileName = "巴士信息" + com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern) + ".csv";
-        //获得浏览器信息并转换为大写
-        String agent = request.getHeader("User-Agent").toUpperCase();
-        //IE浏览器和Edge浏览器
-        if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO") > 0 && agent.indexOf("RV:11") > 0)) {
-            fileName = URLEncoder.encode(fileName, "UTF-8");
-        } else {  //其他浏览器
-            fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
-        }
+        String head = StringUtils.join(CarConstant.TEMPLATE_HEAD,",");
+        headerList.add(head);
+        String fileName = CarConstant.FILE_NAME + com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern) + ".csv";
+        fileName = BusConstant.buidFileName(request, fileName);
         List<String> csvDataList = new ArrayList<>();
         CsvUtils utilEntity = new CsvUtils();
         long total = pageInfo.getTotal();
@@ -272,10 +267,19 @@ public class BusInfoController {
 
     private void buidCSVdata(List<BusInfoVO> infoVOS, List<String> csvData) {
         for (BusInfoVO info : infoVOS) {
+            String split = ",";
             StringBuffer sb = new StringBuffer();
-            sb.append(info.getLicensePlates()).append(",").append(info.getCityName()).append(",").append(info.getSupplierName()).append(",")
-                    .append(info.getGroupName()).append(",").append(StringUtils.isBlank(info.getModelDetail())?StringUtils.EMPTY:info.getModelDetail()).append(",").append((info.getStatus() != null && info.getStatus() == 1) ? "有效" : "无效")
-                    .append(",").append(info.getCreateDate() != null ? DateUtils.formatDateTime((info.getCreateDate())): "");
+            //        String[] TEMPLATE_HEAD={"城市","供应商","车牌号","车型类别名称","车辆颜色","燃料类别","运输证字号","车辆厂牌","具体车型（选填）","下次车检时间（选填）","下次维保时间（选填）","下次运营证检测时间（选填）","购买时间（选填）"};
+
+            String fuelName = EnumFuel.getFuelNameByCode(info.getFuelType());
+            sb.append(info.getCityName()).append(split).append(info.getSupplierName()).append(split).append(info.getLicensePlates()).append(split)
+                    .append(info.getGroupName()).append(split).append(StringUtils.defaultString(info.getColor())).append(split).append(StringUtils.defaultString(fuelName)).append(split)
+                    .append(StringUtils.defaultString(info.getTransportNumber())).append(split)
+                    .append(StringUtils.defaultString(info.getVehicleBrand())).append(split).append(info.getModelDetail()).append(split)
+                    .append(info.getNextInspectDate() == null ? StringUtils.EMPTY : DateUtils.formatDateTime(info.getNextInspectDate())).append(split)
+                    .append(info.getNextMaintenanceDate() == null ? StringUtils.EMPTY : DateUtils.formatDateTime(info.getNextMaintenanceDate())).append(split)
+                    .append(info.getNextOperationDate() == null ? StringUtils.EMPTY : DateUtils.formatDateTime(info.getNextOperationDate())).append(split)
+                    .append(info.getCarPurchaseDate() == null ? StringUtils.EMPTY : DateUtils.formatDateTime(info.getCarPurchaseDate()));
             csvData.add(sb.toString());
         }
     }
@@ -310,15 +314,15 @@ public class BusInfoController {
      * @return: com.zhuanche.common.web.AjaxResponse
      * @Date: 2018/11/28
      */
-    @RequestMapping(value = "/importBusInfo",method = RequestMethod.POST)
+    @RequestMapping(value = "/importBusInfo", method = RequestMethod.POST)
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
-    public AjaxResponse importBusInfo( Integer cityId,
-                                       Integer supplierId,
+    public AjaxResponse importBusInfo(Integer cityId,
+                                      Integer supplierId,
                                       MultipartFile file) throws Exception {
-        if (file.isEmpty()||cityId == null||supplierId==null) {
-            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID,"有参数为空");
+        if (file.isEmpty() || cityId == null || supplierId == null) {
+            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "有参数为空");
         }
         String supplierName = supplierService.getSupplierNameById(supplierId);
         if (StringUtils.isBlank(supplierName)) {
@@ -331,7 +335,7 @@ public class BusInfoController {
 
         String fileName = file.getOriginalFilename();
         String suffixName = fileName.substring(fileName.lastIndexOf("."));
-        logger.info(LOG_PRE+"上传的文件名为:{},上传的后缀名为:{}", fileName, suffixName);
+        logger.info(LOG_PRE + "上传的文件名为:{},上传的后缀名为:{}", fileName, suffixName);
         InputStream is = file.getInputStream();
         Workbook workbook = null;
         if (suffixName.equals(".xls")) {
@@ -339,7 +343,7 @@ public class BusInfoController {
         } else if (suffixName.equals(".xlsx")) {
             workbook = new XSSFWorkbook(is);
         } else {
-            logger.error(LOG_PRE+"巴士导入车辆文件后缀名错误");
+            logger.error(LOG_PRE + "巴士导入车辆文件后缀名错误");
             return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
         }
         //默认值导入第一个sheet;
@@ -347,26 +351,26 @@ public class BusInfoController {
         //校验模板表头
         Row rowFirst = sheet.getRow(0);
         if (rowFirst == null || rowFirst.getLastCellNum() != CarConstant.TEMPLATE_HEAD.length) {
-            logger.error(LOG_PRE+"巴士导入车辆文件表头为空或者长度错误");
+            logger.error(LOG_PRE + "巴士导入车辆文件表头为空或者长度错误");
             return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
         }
         boolean templateFlag = checkTableHead(rowFirst, CarConstant.TEMPLATE_HEAD);
         if (!templateFlag) {
-            logger.error(LOG_PRE+"巴士导入车辆文件表头内容错误");
+            logger.error(LOG_PRE + "巴士导入车辆文件表头内容错误");
             return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
         }
         // 过滤掉标题，从第一行开始导入数据
         int start = 1;
         // 要导入数据的总条数
         int total = sheet.getLastRowNum();
-        if(total==0){
-            logger.error(LOG_PRE+"巴士导入车辆文件内容为空");
+        if (total == 0) {
+            logger.error(LOG_PRE + "巴士导入车辆文件内容为空");
             return AjaxResponse.fail(RestErrorCode.BUS_NOT_EXIST);
         }
         // 成功导入条数
         int successCount = 0;
         List<ErrorReason> errList = new ArrayList();
-        logger.info(LOG_PRE+"巴士导入车辆，总条数=" + total);
+        logger.info(LOG_PRE + "巴士导入车辆，总条数=" + total);
         //循环行
         for (int rowIdx = start; rowIdx <= total; rowIdx++) {
             // 获取行对象
@@ -529,20 +533,21 @@ public class BusInfoController {
     }
 
     /**
-    * 获取所有的燃料类型
-    * @Param: []
-    * @return: com.zhuanche.common.web.AjaxResponse
-    * @Date: 2018/12/12
-    */
-    @RequestMapping(value = "/queryFuel",method = RequestMethod.GET)
-    public AjaxResponse queryFuel(){
+     * 获取所有的燃料类型
+     *
+     * @Param: []
+     * @return: com.zhuanche.common.web.AjaxResponse
+     * @Date: 2018/12/12
+     */
+    @RequestMapping(value = "/queryFuel", method = RequestMethod.GET)
+    public AjaxResponse queryFuel() {
         List<Map<String, String>> allFuel = EnumFuel.getAllFuel();
         return AjaxResponse.success(allFuel);
     }
 
 
     private String readCellValue(Cell cell) {
-        if(cell==null){
+        if (cell == null) {
             return StringUtils.EMPTY;
         }
         int cellType = cell.getCellType();
