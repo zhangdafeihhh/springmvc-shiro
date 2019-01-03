@@ -41,11 +41,15 @@
 	
 	<!-- 查询巴士车型类别 -->
 	<select id="queryGroups" resultType="java.util.HashMap">
-		SELECT
-			group_id AS groupId,
-			group_name AS groupName
-		FROM
-			car_biz_car_group
-		WHERE status=1 and type = 2
+	SELECT
+	group_id AS groupId,
+	group_name AS groupName
+    FROM
+	car_biz_car_group
+    WHERE
+	STATUS = 1
+    AND type = 2
+    ORDER BY
+	seat_num ASC
 	</select>
 </mapper>
