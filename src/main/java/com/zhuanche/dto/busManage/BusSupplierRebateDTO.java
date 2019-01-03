@@ -24,8 +24,8 @@ public class BusSupplierRebateDTO {
 	private Integer supplierId;
 
 	/** 返佣比例 **/
-	@DecimalMin(value = "0", inclusive = false, message = "返佣比例必须大于0")
-	@DecimalMax(value = "100", inclusive = false, message = "返佣比例必须小于100")
+	@DecimalMin(value = "0", inclusive = true, message = "返佣比例必须大于或等于0")
+	@DecimalMax(value = "100", inclusive = true, message = "返佣比例必须小于或等于100")
 	private BigDecimal rebateRate;
 
 	/** 最小金额 **/

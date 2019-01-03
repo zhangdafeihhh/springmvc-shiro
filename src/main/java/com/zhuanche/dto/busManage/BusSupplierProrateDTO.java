@@ -24,8 +24,8 @@ public class BusSupplierProrateDTO {
 	private Integer supplierId;
 
 	/** 供应商比例 **/
-	@DecimalMin(value = "0", inclusive = false, message = "供应商比例必须大于0")
-	@DecimalMax(value = "100", inclusive = false, message = "供应商比例必须小于100")
+	@DecimalMin(value = "0", inclusive = true, message = "供应商比例必须大于或等于0")
+	@DecimalMax(value = "100", inclusive = true, message = "供应商比例必须小于或等于100")
 	private BigDecimal supplierRate;
 
 	/** 协议开始时间 **/
