@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 /**
  * @ClassName: DriverMongoServiceImpl
  * @Description: 司机mongo服务
@@ -19,7 +21,7 @@ import java.util.Map;
 @Service
 public class DriverMongoService {
 
-	@Autowired
+	@Resource(name="driverMongoTemplate")
 	private MongoTemplate driverMongoTemplate;
 
 	/**

@@ -2,7 +2,8 @@ package com.zhuanche.serv.mongo;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -17,7 +18,7 @@ import com.zhuanche.mongo.DriverMongo;
 @Service
 public class BusDriverMongoService {
 
-	@Autowired
+	@Resource(name="driverMongoTemplate")
 	private MongoTemplate driverMongoTemplate;
 
 	/**
