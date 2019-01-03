@@ -36,8 +36,10 @@
     <import resource="applicationContext-sms.xml"/>
     <!-- 配置SpringMVC -->
     <import resource="applicationContext-springmvc.xml"/>
-    <!--mongo的服务-->
+    <!--配置mongo的服务(司机)-->
     <import resource="applicationContext-mongodb-driver.xml"/>
+    <!--配置mongo的服务(用户操作日志)-->
+    <import resource="applicationContext-mongodb-userOperationLog.xml"/>
     <!--接口服务-->
     <import resource="applicationContext-ctx-restful.xml"/>
      <!--ftp服务器-->

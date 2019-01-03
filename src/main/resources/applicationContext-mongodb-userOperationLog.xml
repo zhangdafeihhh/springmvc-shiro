@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	   xsi:schemaLocation="http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<!--创建 mongo-client -->
+	<mongo:mongo id="userOperationLogMongoClient"  replica-set="${userOperationLog.mongo.host}">
+		<mongo:options
+			auto-connect-retry="${userOperationLog.mongo.autoConnectRetry}"
+			connections-per-host="${userOperationLog.mongo.connectionsPerHost}"
+			threads-allowed-to-block-for-connection-multiplier="${userOperationLog.mongo.threadsAllowedToBlockForConnectionMultiplier}"
+			max-wait-time="${userOperationLog.mongo.maxWaitTime}"
+			connect-timeout="${userOperationLog.mongo.connectTimeout}" />
+	</mongo:mongo>
+	
+	<!-- Spring data的mongodb模板 -->
+	<bean id="userOperationLogMongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory">
+			<mongo:db-factory dbname="${userOperationLog.mongo.database}"  mongo-ref="userOperationLogMongoClient" 
+				username="${userOperationLog.mongo.username}"  password="${userOperationLog.mongo.password}" />
+		</constructor-arg>
+	</bean>
+</beans>

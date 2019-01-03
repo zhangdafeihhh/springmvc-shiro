@@ -1,12 +1,20 @@
 package com.zhuanche.controller;
 
-import com.zhuanche.controller.rentcar.OrderController;
-import com.zhuanche.util.excel.CsvUtils;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,17 +24,11 @@ import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.mongo.UserOperationLog;
 import com.zhuanche.serv.DemoService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.zhuanche.util.excel.CsvUtils;
 
 @Controller
 @RequestMapping("/demo")
@@ -36,6 +38,9 @@ public class DemoController{
 
 	@Autowired
 	private DemoService demoService;
+	
+	@Resource(name="userOperationLogMongoTemplate")
+	private MongoTemplate mongoTemplate;
 	
 	//---------------------------------------------------------------------请求页面时
 	/**有权限**/
@@ -68,8 +73,11 @@ public class DemoController{
     @RequestMapping("/ajaxOK")
     @ResponseBody
     public AjaxResponse ajaxOK(){
+    	//mongoTemplate.insert( loginUser );
+    	UserOperationLog po = mongoTemplate.findById("5c2e0e34bcccf00b4491ddd5", UserOperationLog.class);
+    	
     	SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-    	AjaxResponse respJson = AjaxResponse.success(loginUser);
+    	AjaxResponse respJson = AjaxResponse.success( po );
         return respJson;
     }
     
