@@ -61,6 +61,16 @@ public class CarBizCustomerAppraisal implements Serializable{
 
     private String licensePlates;
 
+    /**
+     * 评论是否有效 0:有效 1:无效
+     */
+    private Integer appraisalStatus;
+
+    /**
+     * 备用字段
+     */
+    private String remarks;
+
 
     public Integer getAppraisalId() {
         return appraisalId;
@@ -276,5 +286,21 @@ public class CarBizCustomerAppraisal implements Serializable{
 
     public void setLicensePlates(String licensePlates) {
         this.licensePlates = licensePlates;
+    }
+
+    public Integer getAppraisalStatus() {
+        return appraisalStatus;
+    }
+
+    public void setAppraisalStatus(Integer appraisalStatus) {
+        this.appraisalStatus = appraisalStatus;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
 }

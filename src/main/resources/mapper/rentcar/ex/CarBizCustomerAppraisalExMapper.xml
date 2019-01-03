@@ -26,12 +26,14 @@
     <result column="customer_ip" property="customerIp" jdbcType="VARCHAR" />
     <result column="point" property="point" jdbcType="VARCHAR" />
     <result column="pointBD" property="pointbd" jdbcType="VARCHAR" />
+    <result column="appraisal_status" property="appraisalStatus" jdbcType="INTEGER" />
+    <result column="remarks" property="remarks" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     appraisal_id, order_id, order_no, booking_customer_id, booking_customer_phone, rider_phone, 
     driver_id, car_id, instrument_and_service, environment_and_equipped, efficiency_and_safety, 
     memo, create_by, create_date, update_by, update_date, evaluate_score, evaluate, platform_evaluate, 
-    platform_evaluate_score, platform_memo, customer_ip, point, pointBD
+    platform_evaluate_score, platform_memo, customer_ip, point, pointBD, appraisal_status, remarks
   </sql>
 
   <!-- mapper基础标准: 当前表所有字段查询条件集 -->
@@ -51,6 +53,9 @@
       </if>
       <if test="licensePlates !=null and licensePlates !=''">
         AND di.license_plates = #{licensePlates}
+      </if>
+      <if test="appraisalStatus!=null">
+        AND di.appraisal_status = #{appraisalStatus}
       </if>
       <if test="driverId !=null and driverId !='' ">
         and di.driver_id = #{driverId}
@@ -113,6 +118,7 @@
     SELECT
     DISTINCT(ca.order_no) AS orderNo,
     DATE_FORMAT(ca.create_date,'%Y-%m-%d') AS createDate,
+    ca.appraisal_status AS appraisalStatus,
     ca.memo,
     (case when ca.evaluate_score then ca.evaluate_score
     else ROUND((ca.instrument_and_service+ca.environment_and_equipped+ca.efficiency_and_safety)/3,2) end ) AS evaluateScore
@@ -146,12 +152,16 @@
     di.driver_id AS driverId,
     di.name AS driverName,
     di.phone AS driverPhone,
-    di.license_plates AS licensePlates
+    di.license_plates AS licensePlates,
+    ca.appraisal_status AS appraisalStatus
     FROM
     car_biz_customer_appraisal ca
     LEFT JOIN car_biz_driver_info di ON di.driver_id = ca.driver_id
     WHERE
     1 = 1
+    <if test="appraisalStatus!=null">
+      AND ca.appraisal_status = #{appraisalStatus}
+    </if>
     <if test="evaluateScore !=null and evaluateScore !=''">
       AND ca.evaluate_score in (${evaluateScore})
     </if>
