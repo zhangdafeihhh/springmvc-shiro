@@ -32,7 +32,7 @@ public class CompareObejctUtils {
 				if (StringUtils.isBlank(old)) {
 					results.add(note + " 设置为：" + fresh);
 				} else if (StringUtils.isBlank(fresh)) {
-					results.add("将原有的  " + note + "( " + old + " )" + " 清空");
+					results.add("将原有的  " + note + " " + old + " " + " 清空");
 				} else {
 					results.add("将  " + note + " 由  " + old + " 更新为   " + fresh);
 				}
