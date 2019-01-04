@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.zhuanche.objcompare.entity.Person;
 
-public class CompareTest {
+public class DemoTest {
 	public static void main(String[] args) {
 
 		Person person1 = new Person();
@@ -26,7 +26,7 @@ public class CompareTest {
 		person4.setName("abc");
 		person4.setAge(22);
 
-		System.out.println(CompareObejct.contrastObj(person1, person2, (attr, results) -> {
+		System.out.println(CompareObejctUtils.contrastObj(person1, person2, (attr, results) -> {
 			String old = attr.getOld();
 			String fresh = attr.getFresh();
 			String note = attr.getNote();
@@ -39,8 +39,8 @@ public class CompareTest {
 				results.add("将  " + note + " 由  " + old + " 更新为   " + fresh);
 			}
 		}));
-		System.out.println(CompareObejct.contrastObj(person2, person3, null));
-		System.out.println(CompareObejct.contrastObj(person3, person4, null));
+		System.out.println(CompareObejctUtils.contrastObj(person2, person3, null));
+		System.out.println(CompareObejctUtils.contrastObj(person3, person4, null));
 
 	}
 }

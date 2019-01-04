@@ -17,7 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.zhuanche.objcompare.FieldNote.Pattern;
 
-public class CompareObejct<T> {
+public class CompareObejctUtils {
 
 	private static BiConsumer<CompareObjectAttr, List<Object>> defaultConsumer = null;
 
