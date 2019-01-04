@@ -37,7 +37,7 @@
 	</bean>
 	<!-- 会话管理器 -->
 	<bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
-		<property name="globalSessionTimeout" value="1800000" /> <!-- 这里设置为30分钟会话过期时效 -->
+		<property name="globalSessionTimeout" value="3600000" /> <!-- 这里设置为60分钟会话过期时效 -->
 		<property name="deleteInvalidSessions" value="true" />
 		<property name="sessionValidationSchedulerEnabled" value="true" />
 		<property name="sessionValidationScheduler" ref="sessionValidationScheduler" />
@@ -47,7 +47,7 @@
 	</bean>
 	<!-- 会话过期校验调度器 -->
 	<bean id="sessionValidationScheduler" class="org.apache.shiro.session.mgt.quartz.QuartzSessionValidationScheduler">
-		<property name="sessionValidationInterval" value="900000" />
+		<property name="sessionValidationInterval" value="1800000" />
 		<property name="sessionManager" ref="sessionManager" />
 	</bean>
 
