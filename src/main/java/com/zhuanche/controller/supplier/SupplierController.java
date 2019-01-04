@@ -86,5 +86,11 @@ public class SupplierController {
         return AjaxResponse.success(carBizCooperationTypes);
     }
 
+    @RequestMapping("/querySupplierById")
+    @ResponseBody
+    public AjaxResponse getSupplierInfoById(Integer supplierId){
+        return supplierService.querySupplierById(supplierId);
+    }
+
 
 }
