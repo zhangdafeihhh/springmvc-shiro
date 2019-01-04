@@ -1,9 +1,11 @@
 package com.zhuanche.common.web;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,12 +43,16 @@ public class HttpRequestStatisticsInterceptor implements HandlerInterceptor,  In
 	
 	private static final ArrayBlockingQueue<UserOperationLog> USER_LOG_QUEUE = new ArrayBlockingQueue<>(2000);//一个内存队列（用户的操作日志）
 	private int insertLog2DBWorkers = 2; //插入日志的线程数
+	private List<String> excludeURIs  = new ArrayList<>();
 	private MongoTemplate userOperationMongoTemplate;
 	public void setUserOperationMongoTemplate(MongoTemplate userOperationMongoTemplate) {
 		this.userOperationMongoTemplate = userOperationMongoTemplate;
 	}
 	public void setInsertLog2DBWorkers(int insertLog2DBWorkers) {
 		this.insertLog2DBWorkers = insertLog2DBWorkers;
+	}
+	public void setExcludeURIs(List<String> excludeURIs) {
+		this.excludeURIs = excludeURIs;
 	}
 	
 	@Override
@@ -112,9 +118,13 @@ public class HttpRequestStatisticsInterceptor implements HandlerInterceptor,  In
 	//记录用户操作日志 (added by zhaoyali 20190105)
 	private void addRequestLog2DBAsync( HttpServletRequest request, HttpServletResponse response, Object handler , long reqTimeStamp, long costMiliseconds ) {
 		String uri = request.getRequestURI();
-		if( StringUtils.isBlank(uri) || "/".equals(uri) ) {
+		if( StringUtils.isBlank(uri) ) {
 			return;
 		}
+		if(excludeURIs!=null && excludeURIs.contains(uri) ) {
+			return;
+		}
+		
 		//一、生成用户操作日志的记录
 		UserOperationLog opLog = new UserOperationLog();
 		SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();

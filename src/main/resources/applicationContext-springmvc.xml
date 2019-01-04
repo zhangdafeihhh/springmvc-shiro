@@ -93,6 +93,12 @@
 	        <bean class="com.zhuanche.common.web.HttpRequestStatisticsInterceptor"><!-- 打印请求参数、打印请求状况统计 -->
 	        	<property name="insertLog2DBWorkers" value="3"/>
 	        	<property name="userOperationMongoTemplate" ref="userOperationLogMongoTemplate"/>
+	        	<property name="excludeURIs"><!-- 排除统计的URI -->
+	        		<list>
+	        			<value>/</value>
+	        			<value>/message/messageUnreadCount.json</value>
+	        		</list>
+	        	</property>
 	        </bean>
 	    </mvc:interceptor>
 	    <mvc:interceptor>
