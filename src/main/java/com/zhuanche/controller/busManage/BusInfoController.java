@@ -2,6 +2,7 @@ package com.zhuanche.controller.busManage;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
+import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -19,6 +20,7 @@ import com.zhuanche.serv.CarBizCarGroupService;
 import com.zhuanche.serv.CarBizCityService;
 import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.busManage.BusBizChangeLogService;
+import com.zhuanche.serv.busManage.BusCommonService;
 import com.zhuanche.serv.busManage.BusInfoService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -54,10 +56,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -81,6 +80,7 @@ public class BusInfoController {
     private CarBizCityService cityService;
     @Autowired
     private BusBizChangeLogService busBizChangeLogService;
+
 
     /**
      * @Description:查询巴士车辆列表
@@ -231,7 +231,7 @@ public class BusInfoController {
         PageInfo<BusInfoVO> pageInfo = busInfoService.queryList(busDTO);
         //文件标题
         List<String> headerList = new ArrayList<>();
-        String head = StringUtils.join(CarConstant.TEMPLATE_HEAD,",");
+        String head = StringUtils.join(CarConstant.TEMPLATE_HEAD, ",");
         headerList.add(head);
         String fileName = CarConstant.FILE_NAME + com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern) + ".csv";
         fileName = BusConstant.buidFileName(request, fileName);
@@ -386,119 +386,147 @@ public class BusInfoController {
                 Cell cell = row.getCell(colIdx);
                 String value = readCellValue(cell);
                 switch (colIdx) {
-                    //车牌号
+                    //城市：
                     case 0:
                         if (StringUtils.isBlank(value)) {
-                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[0] + " 为空");
+                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 为空");
+                            validFlag = false;
+                            break;
+                        }
+                        if (!value.equals(cityName)) {
+                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 城市名称和页面选择的不一致");
+                            validFlag = false;
+                            break;
+                        }
+                        carInfo.setCityId(cityId);
+                        break;
+                    //供应商：
+                    case 1:
+                        if (StringUtils.isBlank(value)) {
+                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 为空");
+                            validFlag = false;
+                            break;
+                        }
+                        if (!value.equals(supplierName)) {
+                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 供应商名称和页面选择的不一致");
+                            validFlag = false;
+                            break;
+                        }
+                        carInfo.setSupplierId(supplierId);
+                        break;
+                    //车牌号
+                    case 2:
+                        if (StringUtils.isBlank(value)) {
+                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 为空");
                             validFlag = false;
                             break;
                         }
                         boolean checkResult = busInfoService.licensePlatesIfExist(value);
                         if (checkResult) {
-                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[0] + " 已经存在");
+                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 已经存在");
                             validFlag = false;
                             break;
                         }
                         carInfo.setLicensePlates(value);
                         break;
                     // 车型类别
-                    case 1:
+                    case 3:
                         if (StringUtils.isBlank(value)) {
-                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[1] + " 为空");
+                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 为空");
                             validFlag = false;
                             break;
                         }
                         CarBizCarGroup group = groupService.queryGroupByGroupName(value);
                         if (group == null) {
-                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[1] + " 不存在");
+                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 不存在");
                             validFlag = false;
                             break;
                         }
                         carInfo.setGroupId(group.getGroupId());
                         break;
                     //车辆颜色
-                    case 2:
+                    case 4:
                         if (StringUtils.isBlank(value)) {
-                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[2] + " 为空");
+                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 为空");
                             validFlag = false;
                             break;
                         }
                         carInfo.setColor(value);
                         break;
                     //燃料类型
-                    case 3:
+                    case 5:
                         if (StringUtils.isBlank(value)) {
-                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[3] + " 为空");
+                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 为空");
                             validFlag = false;
                             break;
                         }
                         String code = EnumFuel.getFuelCodeByName(value);
                         if (code == null) {
-                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[3] + " 不存在");
+                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 不存在");
                             validFlag = false;
                             break;
                         }
                         carInfo.setFueltype(code);
                         break;
                     //运输证字号
-                    case 4:
+                    case 6:
                         if (StringUtils.isBlank(value)) {
-                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[4] + " 为空");
+                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 为空");
                             validFlag = false;
                             break;
                         }
                         carInfo.setTransportnumber(value);
                         break;
                     //车厂厂牌
-                    case 5:
+                    case 7:
                         if (StringUtils.isBlank(value)) {
-                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[5] + " 为空");
+                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 为空");
                             validFlag = false;
                             break;
                         }
                         carInfo.setVehicleBrand(value);
                         break;
                     //具体车型
-                    case 6:
+                    case 8:
                         carInfo.setModelDetail(value);
                         break;
                     //下次车检时间
-                    case 7:
+                    case 9:
                         if (StringUtils.isNotBlank(value)) {
                             try {
                                 carInfo.setNextInspectDate(DateUtils.getDate1(value));
                             } catch (ParseException e) {
-                                saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[7] + " 时间格式错误，例：2018-01-01");
+                                saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 时间格式错误，例：2018-01-01");
                             }
                         }
                         break;
                     //下次维保时间
-                    case 8:
+                    case 10:
                         if (StringUtils.isNotBlank(value)) {
                             try {
                                 carInfo.setNextMaintenanceDate(DateUtils.getDate1(value));
                             } catch (ParseException e) {
-                                saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[8] + " 时间格式错误，例：2018-01-01");
+                                saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 时间格式错误，例：2018-01-01");
                             }
                         }
                         break;
                     //下次运营检测时间
-                    case 9:
+                    case 11:
                         if (StringUtils.isNotBlank(value)) {
                             try {
                                 carInfo.setNextOperationDate(DateUtils.getDate1(value));
                             } catch (ParseException e) {
-                                saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[9] + " 时间格式错误，例：2018-01-01");
+                                saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 时间格式错误，例：2018-01-01");
                             }
                         }
                         break;
                     //购买时间
-                    case 10:
+                    case 12:
                         if (StringUtils.isNotBlank(value)) {
                             try {
                                 carInfo.setCarPurchaseDate(DateUtils.getDate1(value));
                             } catch (ParseException e) {
-                                saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[10] + " 时间格式错误，例：2018-01-01");
+                                saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 时间格式错误，例：2018-01-01");
                             }
                         }
                         break;
@@ -508,8 +536,6 @@ public class BusInfoController {
 
             }// 列循环结束
             if (validFlag) {
-                carInfo.setCityId(cityId);
-                carInfo.setSupplierId(supplierId);
                 //所属车主默认供应商名称
                 carInfo.setVehicleOwner(supplierName);
                 SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
@@ -529,7 +555,21 @@ public class BusInfoController {
             }
         }
         ImportErrorVO errorVO = new ImportErrorVO(total, successCount, (total - successCount), errList);
+        //如果有错误信息将信息放到redis中以便下载
+        if (errList.size() > 0) {
+            String errMsgKey = BusConstant.ERROR_CAR_KEY + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+            saveErrorMsg2Redis(errMsgKey,errList);
+            errorVO.setErrorMsgKey(errMsgKey);
+        }
         return AjaxResponse.success(errorVO);
+    }
+
+    private void saveErrorMsg2Redis(String key, List<ErrorReason> errorList) {
+        List<String> array = new ArrayList();
+        errorList.forEach(o -> {
+            array.add("第" + o.getRow() + "行，" + "第" + o.getCol() + "列  " + o.getReason());
+        });
+        RedisCacheUtil.set(key,array,BusConstant.ERROR_IMPORT_KEY_EXPIRE);
     }
 
     /**

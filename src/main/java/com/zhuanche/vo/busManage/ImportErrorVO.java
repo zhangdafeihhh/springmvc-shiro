@@ -13,6 +13,7 @@ public class ImportErrorVO implements Serializable{
     private int total;
     private int successNum;
     private int errorNum;
+    private String errorMsgKey;
     private List<ErrorReason> reasons;
 
     public ImportErrorVO() {
@@ -55,5 +56,13 @@ public class ImportErrorVO implements Serializable{
 
     public void setReasons(List<ErrorReason> reasons) {
         this.reasons = reasons;
+    }
+
+    public String getErrorMsgKey() {
+        return errorMsgKey;
+    }
+
+    public void setErrorMsgKey(String errorMsgKey) {
+        this.errorMsgKey = errorMsgKey;
     }
 }

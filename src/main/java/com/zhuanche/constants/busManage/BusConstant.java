@@ -16,6 +16,19 @@ import java.util.Date;
  **/
 public class BusConstant {
     /**
+     * 导入时车辆信息
+     */
+    public static String ERROR_CAR_KEY="bus:errmsg:car:";
+    /**
+     * 导入时司机信息
+     */
+    public static String ERROR_DRIVER_KEY="bus:errmsg:driver:";
+    /**
+     * 导入时车辆和司机信息 失效时间 15 分钟
+     */
+    public static int ERROR_IMPORT_KEY_EXPIRE=900;
+
+    /**
      * 导出订单时每页查询的条数
      */
     public interface CarConstant{

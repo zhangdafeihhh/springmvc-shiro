@@ -217,15 +217,19 @@ public class BusSettlementAdviceController {
             }
             List<String> csvData;
             JSONArray array = result.getJSONArray("data");
-            if (array == null || array.isEmpty()) {
+            boolean isnull = (array == null || array.isEmpty());
+            if (isnull && pageNum == 1) {
+                csvData = new ArrayList<>();
+                csvData.add("没有符合条件的数据");
                 isList = true;
-                if (pageNum == 1) {
-                    csvData = new ArrayList<>();
-                    csvData.add("没有符合条件的数据");
-                    isList = true;
-                    utilEntity.exportCsvV2(response, csvData, headerList, fileName, isFirst, isList);
-                    break;
-                }
+                utilEntity.exportCsvV2(response, csvData, headerList, fileName, isFirst, isList);
+                break;
+            }
+            if(pageNum!=1){
+                isFirst=false;
+            }
+            if(isnull){
+                isList=true;
             }
             Map<Integer, BusSupplierInfoVO> supplierInfoMap = querySupplierInfo(array);
             csvData = array.stream().map(o -> (JSONObject) o).map(o -> JSONObject.toJavaObject(o, BusSupplierSettleDetailVO.class)).map(o -> {
@@ -307,7 +311,7 @@ public class BusSettlementAdviceController {
         resultDetail.setBookingGroupName(orderDetail.getBookingGroupName());
         resultDetail.setLicensePlates(orderDetail.getLicensePlates());
         //显示乘车人
-        resultDetail.setBookingUserName(orderDetail.getRiderName()!=null?orderDetail.getRiderName():StringUtils.EMPTY);
+        resultDetail.setBookingUserName(orderDetail.getRiderName() != null ? orderDetail.getRiderName() : StringUtils.EMPTY);
         //分佣比例
         resultDetail.setSettleRatio(transactionsDetail.getBigDecimal("settleRatio"));
         //账单金额
