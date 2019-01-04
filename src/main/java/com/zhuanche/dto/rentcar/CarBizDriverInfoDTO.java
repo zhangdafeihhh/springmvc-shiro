@@ -541,6 +541,8 @@ public class CarBizDriverInfoDTO extends Base {
     private Integer oldCity;//城市
     private Integer oldSupplier;//供应商
 
+    private String activeDate;
+
     public String getOldPhone() {
         return oldPhone;
     }
@@ -1555,5 +1557,13 @@ public class CarBizDriverInfoDTO extends Base {
 
     public void setCooperationTypeName(String cooperationTypeName) {
         this.cooperationTypeName = cooperationTypeName;
+    }
+
+    public String getActiveDate() {
+        return activeDate;
+    }
+
+    public void setActiveDate(String activeDate) {
+        this.activeDate = activeDate;
     }
 }

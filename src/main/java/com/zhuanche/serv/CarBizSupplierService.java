@@ -159,4 +159,8 @@ public class CarBizSupplierService{
 			}
 		}
 	}
+
+    public AjaxResponse querySupplierById(Integer supplierId) {
+        return null;
+    }
 }

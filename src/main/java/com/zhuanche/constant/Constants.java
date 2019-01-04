@@ -74,4 +74,11 @@ public final class Constants {
 	public static final String SUPPLIER_TOPIC = "vipSupplierTopic";
 	public static final String SUPPLIER_MQ_SEND_FAILED = "专车供应商发送MQ失败";
 
+	public static final int SUCCESS_CODE = 0;
+	public static final String CODE = "code";
+	public static final String DRIVER = "driver";
+	public static final String DATA = "data";
+	public static final String FIRST_ORDER_NO = "firstOrderNo";
+
+
 }

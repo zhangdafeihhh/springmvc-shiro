@@ -14,12 +14,14 @@ import com.zhuanche.common.rocketmq.CommonRocketProducer;
 import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
 import com.zhuanche.entity.mdbcarmanage.*;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.HttpClientUtil;
+import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.mongo.DriverMongo;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.serv.mdbcarmanage.CarBizDriverUpdateService;
@@ -81,6 +83,9 @@ public class CarBizDriverInfoService {
 
     @Value("${driver.server.api.url}")
     String driverServiceApiUrl;
+
+    @Value("${order.statistics.url}")
+    String orderStatisticsUrl;
 
     @Autowired
     private CarBizDriverInfoMapper carBizDriverInfoMapper;
@@ -788,9 +793,29 @@ public class CarBizDriverInfoService {
                     carBizDriverInfo.setUpdateName(carAdmUser.getUserName());
                 }
             }
+
+            //TODO 调用订单接口查询激活时间
+            Map<String, Object> params = new HashMap<>();
+            params.put("driverId", carBizDriverInfo.getDriverId());
+            com.alibaba.fastjson.JSONObject resultJson = MpOkHttpUtil.okHttpGetBackJson(orderStatisticsUrl, params, 1, driverInfo);
+            if (resultJson != null && Constants.SUCCESS_CODE == resultJson.getInteger(Constants.CODE)){
+                String orderNum = resultJson.getJSONObject(Constants.DATA).
+                        getJSONObject(Constants.DRIVER).getString(Constants.FIRST_ORDER_NO);
+                if (StringUtils.isNotBlank(orderNum)){
+                    String url = orderServiceApiBaseUrl + "/orderMain/getOrdersByOrderNo";
+                    params.clear();
+                    params.put("orderNo", orderNum);
+                    com.alibaba.fastjson.JSONObject result = MpOkHttpUtil.okHttpGetBackJson(url, params, 1, driverInfo);
+                    if (result != null && Constants.SUCCESS_CODE == result.getInteger(Constants.CODE)){
+                        carBizDriverInfo.setActiveDate(result.getJSONArray(Constants.DATA).getJSONObject(0).getString("updateDate"));
+                    }
+                }
+            }
         }
         return carBizDriverInfo;
     }
+
+    private static final String driverInfo = "";
 
 
     public Map<String, Object> batchInputDriverInfo(Integer cityId, Integer supplierId, Integer teamId,
