@@ -1,5 +1,6 @@
 package com.zhuanche.common.web;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -127,7 +129,16 @@ public class HttpRequestStatisticsInterceptor implements HandlerInterceptor,  In
 		}
         opLog.setClientIp( IpAddr.getIpAddr(request)  );           //用户IP
         opLog.setRequestUri(uri);                                            //请求的URI
-        opLog.setRequestFuncName( null );                             //请求的功能名称--------------------------------------------------后续再获取进行补充
+		if( handler instanceof HandlerMethod) {                    //请求的功能名称
+			Method method = ((HandlerMethod)handler).getMethod();
+			RequestFunction requestFunction = method.getAnnotation(RequestFunction.class);
+			if(requestFunction!=null) {
+		        opLog.setRequestFuncName1( requestFunction.name1() );                             
+		        opLog.setRequestFuncName2( requestFunction.name2() );
+		        opLog.setRequestFuncName3( requestFunction.name3() );
+		        opLog.setRequestFuncName4( requestFunction.name4() );
+			}
+		}
         opLog.setRequestMethod(request.getMethod().toUpperCase());   //请求方法
 		Boolean isAjax = (Boolean) request.getAttribute("X_IS_AJAX");       //请求类型
         if(  isAjax ) {

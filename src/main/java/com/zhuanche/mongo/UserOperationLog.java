@@ -18,7 +18,13 @@ public class UserOperationLog implements Serializable {
 	//请求的URI
 	private String requestUri;
 	//请求的功能名称
-	private String requestFuncName;
+	private String requestFuncName1;
+	//请求的功能名称
+	private String requestFuncName2;
+	//请求的功能名称
+	private String requestFuncName3;
+	//请求的功能名称
+	private String requestFuncName4;
 	//请求方法
 	private String requestMethod;
 	//请求类型
@@ -74,12 +80,36 @@ public class UserOperationLog implements Serializable {
 		this.requestUri = requestUri;
 	}
 
-	public String getRequestFuncName() {
-		return requestFuncName;
+	public String getRequestFuncName1() {
+		return requestFuncName1;
 	}
 
-	public void setRequestFuncName(String requestFuncName) {
-		this.requestFuncName = requestFuncName;
+	public void setRequestFuncName1(String requestFuncName1) {
+		this.requestFuncName1 = requestFuncName1;
+	}
+
+	public String getRequestFuncName2() {
+		return requestFuncName2;
+	}
+
+	public void setRequestFuncName2(String requestFuncName2) {
+		this.requestFuncName2 = requestFuncName2;
+	}
+
+	public String getRequestFuncName3() {
+		return requestFuncName3;
+	}
+
+	public void setRequestFuncName3(String requestFuncName3) {
+		this.requestFuncName3 = requestFuncName3;
+	}
+
+	public String getRequestFuncName4() {
+		return requestFuncName4;
+	}
+
+	public void setRequestFuncName4(String requestFuncName4) {
+		this.requestFuncName4 = requestFuncName4;
 	}
 
 	public String getRequestMethod() {
