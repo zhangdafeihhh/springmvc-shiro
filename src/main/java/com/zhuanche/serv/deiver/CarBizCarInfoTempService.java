@@ -1324,7 +1324,7 @@ public class CarBizCarInfoTempService {
                                 listException.add(returnVO);
                                 isTrue = false;
                             } else {
-                                if (cellValue.getStringValue().matches("[\u4e00-\u9fa5]*交运管[\u4e00-\u9fa5]{1,2}字\\d{6}\\s\\d{6}号$")) {
+                                if (cellValue.getStringValue().matches("[\u4e00-\u9fa5]*交运管[\u4e00-\u9fa5]{1,2}字\\d{4,6}\\s\\d{4,6}号$")) {
                                     carBizCarInfo.setTransportNumber(cellValue.getStringValue());
                                 } else {
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -2056,7 +2056,7 @@ public class CarBizCarInfoTempService {
                                 listException.add(returnVO);
                                 isTrue = false;
                             } else {
-                                if (cellValue.getStringValue().matches("[\u4e00-\u9fa5]*交运管[\u4e00-\u9fa5]{1,2}字\\d{6}\\s\\d{6}号$")) {
+                                if (cellValue.getStringValue().matches("[\u4e00-\u9fa5]*交运管[\u4e00-\u9fa5]{1,2}字\\d{4,6}\\s\\d{4,6}号$")) {
                                     entity.setTransportNumber(cellValue.getStringValue());
                                 } else {
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
