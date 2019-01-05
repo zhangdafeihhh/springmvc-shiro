@@ -309,47 +309,6 @@ public class BusInfoController {
 
 
     /**
-     * @param @param  uuid
-     * @param @param  request
-     * @param @param  response
-     * @param @return
-     * @return Data
-     * @throws
-     * @Title: getExcelTemplate
-     * @Description: 生成Excel模板并导出
-     */
-    @RequestMapping("/getExcelTemplate")
-    public void getExcelTemplate(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-        String fileName = "车辆信息"; //模板名称
-        String[] handers = {"姓名", "性别", "证件类型", "证件号码", "服务结束时间", "参保地", "民族"}; //列标题
-        response.setContentType("application/octet-stream;charset=ISO8859-1");
-        response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xls");
-        response.addHeader("Pargam", "no-cache");
-        response.addHeader("Cache-Control", "no-cache");
-        //下拉框数据
-        List<String[]> downData = new ArrayList();
-        String[] str1 = {"男", "女", "未知"};
-        String[] str2 = {"北京", "上海", "广州", "深圳", "武汉", "长沙", "湘潭"};
-        String[] str3 = {"01-汉族", "02-蒙古族", "03-回族", "04-藏族", "05-维吾尔族", "06-苗族", "07-彝族", "08-壮族", "09-布依族",
-                "10-朝鲜族", "11-满族", "12-侗族", "13-瑶族", "14-白族", "15-土家族", "16-哈尼族", "17-哈萨克族", "18-傣族", "19-黎族", "20-傈僳族",
-                "21-佤族", "22-畲族", "23-高山族", "24-拉祜族", "25-水族", "26-东乡族", "27-纳西族", "28-景颇族", "29-柯尔克孜族", "30-土族",
-                "31-达斡尔族", "32-仫佬族", "33-羌族", "34-布朗族", "35-撒拉族", "36-毛难族", "37-仡佬族", "38-锡伯族", "39-阿昌族", "40-普米族",
-                "41-塔吉克族", "42-怒族", "43-乌孜别克族", "44-俄罗斯族", "45-鄂温克族", "46-德昂族", "47-保安族", "48-裕固族", "49-京族", "50-塔塔尔族",
-                "51-独龙族", "52-鄂伦春族", "53-赫哲族", "54-门巴族", "55-珞巴族", "56-基诺族", "98-外国血统", "99-其他"};
-        downData.add(str1);
-        downData.add(str2);
-        downData.add(str3);
-        String[] downRows = {"1", "5", "6"}; //下拉的列序号数组(序号从0开始)
-
-        try {
-            ExportExcelUtil.exportExcel(fileName, handers, downData, downRows, request, response);
-        } catch (Exception e) {
-            System.out.println("批量导入信息异常：" + e.getMessage());
-        }
-    }
-
-    /**
      * @Description: 导入巴士车辆信息
      * @Param: [cityId, supplierId, file]
      * @return: com.zhuanche.common.web.AjaxResponse
@@ -426,6 +385,7 @@ public class BusInfoController {
             for (int colIdx = 0; colIdx < row.getLastCellNum(); colIdx++) {
                 Cell cell = row.getCell(colIdx);
                 String value = readCellValue(cell);
+                DateFormat df =new SimpleDateFormat("yyyy-M-d");
                 switch (colIdx) {
                     //城市：
                     case 0:
@@ -535,7 +495,7 @@ public class BusInfoController {
                     case 9:
                         if (StringUtils.isNotBlank(value)) {
                             try {
-                                carInfo.setNextInspectDate(DateUtils.getDate1(value));
+                                carInfo.setNextInspectDate(df.parse(transfTime(value)));
                             } catch (ParseException e) {
                                 saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 时间格式错误，例：2018-01-01");
                             }
@@ -545,7 +505,7 @@ public class BusInfoController {
                     case 10:
                         if (StringUtils.isNotBlank(value)) {
                             try {
-                                carInfo.setNextMaintenanceDate(DateUtils.getDate1(value));
+                                carInfo.setNextMaintenanceDate(df.parse(transfTime(value)));
                             } catch (ParseException e) {
                                 saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 时间格式错误，例：2018-01-01");
                             }
@@ -555,7 +515,7 @@ public class BusInfoController {
                     case 11:
                         if (StringUtils.isNotBlank(value)) {
                             try {
-                                carInfo.setNextOperationDate(DateUtils.getDate1(value));
+                                carInfo.setNextOperationDate(df.parse(transfTime(value)));
                             } catch (ParseException e) {
                                 saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 时间格式错误，例：2018-01-01");
                             }
@@ -565,7 +525,7 @@ public class BusInfoController {
                     case 12:
                         if (StringUtils.isNotBlank(value)) {
                             try {
-                                carInfo.setCarPurchaseDate(DateUtils.getDate1(value));
+                                carInfo.setCarPurchaseDate(df.parse(transfTime(value)));
                             } catch (ParseException e) {
                                 saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 时间格式错误，例：2018-01-01");
                             }
@@ -595,6 +555,7 @@ public class BusInfoController {
                 }
             }
         }
+
         ImportErrorVO errorVO = new ImportErrorVO(total, successCount, (total - successCount), errList);
         //如果有错误信息将信息放到redis中以便下载
         if (errList.size() > 0) {
@@ -604,7 +565,12 @@ public class BusInfoController {
         }
         return AjaxResponse.success(errorVO);
     }
-
+    private String transfTime(String data){
+        if(data.contains("/")){
+           data = data.replace("/","-");
+        }
+        return data;
+    }
     private void saveErrorMsg2Redis(String key, List<ErrorReason> errorList) {
         List<String> array = new ArrayList();
         errorList.forEach(o -> {

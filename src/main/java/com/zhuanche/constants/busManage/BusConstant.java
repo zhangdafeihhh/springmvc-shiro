@@ -36,6 +36,10 @@ public class BusConstant {
        // String EXPORT_HEAD="车牌号,城市,供应商,车型类别,具体车型,是否有效,创建时间";
         String[] TEMPLATE_HEAD={"城市","供应商","车牌号","车型类别名称","车辆颜色","燃料类别","运输证字号","车辆厂牌","具体车型（选填）","下次车检时间（选填）","下次维保时间（选填）","下次运营证检测时间（选填）","购买时间（选填）"};
     }
+    public interface DriverContant{
+        String FILE_NAME="司机信息模板";
+        String[] TEMPLATE_HEAD={"城市（必填）","供应商（必填）","司机姓名（必填）","性别（必填）","车型类别（必填）","司机身份证号（必填）","司机手机号（必填）","出生日期（必填 年龄：21-60）","驾照类型（必填）","驾驶证号（必填）","驾照领证日期（必填 驾龄≥3）","道路运输从业资格证编号（必填）"};
+    }
     public interface DriverMaidConstant{
         String MAID_FILE_NAME="分佣明细";
         String MAID_EXPORT_HEAD="订单号,城市名称,手机号,结算时间,订单总金额,预付金额,代收金额,高速费,停车费,住宿费,餐饮费,抽佣比例（%）,司机实际收入";

@@ -14,6 +14,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 
+import com.zhuanche.constants.BusConst;
+import com.zhuanche.constants.busManage.BusConstant;
+import com.zhuanche.constants.busManage.EnumFuel;
+import com.zhuanche.serv.busManage.BusCommonService;
+import com.zhuanche.util.excel.ExportExcelUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +78,8 @@ public class BusDriverInfoController extends BusBaseController {
 
 	@Autowired
 	private BusCarDriverTeamService busCarDriverTeamService;
+	@Autowired
+	private BusCommonService commonService;
 
 	/**
 	 * @Title: findDriverList
@@ -417,9 +424,27 @@ public class BusDriverInfoController extends BusBaseController {
 	 * @throws
 	 */
 	@RequestMapping(value = "/downloadDriverInfoImportTemplate")
-	public void fileDownloadDriverInfo(HttpServletRequest request, HttpServletResponse response) {
-		String path = request.getSession().getServletContext().getRealPath("/upload") + File.separator + "IMPORT_BUS_DRIVER_INFO.xlsx";
-		fileDownload(request, response, path);
+	public void fileDownloadDriverInfo(HttpServletRequest request, HttpServletResponse response) throws Exception{
+		//文件名
+		String fileName = BusConstant.DriverContant.FILE_NAME;
+		//性别
+		String[] genders = {"男","女"};
+		//车型类别
+		List<Map<Object, Object>> maps = commonService.queryGroups();
+		String[] groupNames = new String[maps.size()];
+		for(int i=0;i<maps.size();i++){
+			groupNames[i]=(String) maps.get(i).get("groupName");
+		}
+		//驾照类型
+		String[] drivingLicenseTypes = BusConst.DRIVING_LICENSE_TYPES;
+
+		List<String[]> downdata = new ArrayList<>();
+		downdata.add(genders);
+		downdata.add(groupNames);
+		downdata.add(drivingLicenseTypes);
+		//表示生成的下拉框在第三列和第五列
+		String[] downRows={"3","4","8"};
+		ExportExcelUtil.exportExcel(fileName, BusConstant.DriverContant.TEMPLATE_HEAD, downdata, downRows, request, response);
 	}
 	
     /**
