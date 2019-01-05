@@ -27,10 +27,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.excel.ExportExcelUtil;
-import com.zhuanche.vo.busManage.BusDetailVO;
-import com.zhuanche.vo.busManage.BusInfoVO;
-import com.zhuanche.vo.busManage.ErrorReason;
-import com.zhuanche.vo.busManage.ImportErrorVO;
+import com.zhuanche.vo.busManage.*;
 import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
@@ -80,6 +77,8 @@ public class BusInfoController {
     private CarBizCityService cityService;
     @Autowired
     private BusBizChangeLogService busBizChangeLogService;
+    @Autowired
+    private BusCommonService commonService;
 
 
     /**
@@ -292,20 +291,62 @@ public class BusInfoController {
      */
     @RequestMapping("/exportTemplate")
     public void exportTemplate(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        String fileName = "巴士车辆导入模板" + com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern);
-        //获得浏览器信息并转换为大写
-        String agent = request.getHeader("User-Agent").toUpperCase();
-        //IE浏览器和Edge浏览器
-        if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO") > 0 && agent.indexOf("RV:11") > 0)) {
-            fileName = URLEncoder.encode(fileName, "UTF-8");
-        } else {  //其他浏览器
-            fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+        String fileName = "巴士车辆导入模板";
+        List<Map<Object, Object>> maps = commonService.queryGroups();
+        String[] groupNames = new String[maps.size()];
+        for(int i=0;i<maps.size();i++){
+            groupNames[i]=(String) maps.get(i).get("groupName");
         }
+        String allFuelName = EnumFuel.getAllFuelName();
+        String[] fuelNames = allFuelName.split(",");
+        List<String[]> downdata = new ArrayList<>();
+        downdata.add(groupNames);
+        downdata.add(fuelNames);
+        //表示生成的下拉框在第三列和第五列
+        String[] downRows={"3","5"};
+        ExportExcelUtil.exportExcel(fileName, CarConstant.TEMPLATE_HEAD, downdata, downRows, request, response);
+    }
+
+
+    /**
+     * @param @param  uuid
+     * @param @param  request
+     * @param @param  response
+     * @param @return
+     * @return Data
+     * @throws
+     * @Title: getExcelTemplate
+     * @Description: 生成Excel模板并导出
+     */
+    @RequestMapping("/getExcelTemplate")
+    public void getExcelTemplate(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        String fileName = "车辆信息"; //模板名称
+        String[] handers = {"姓名", "性别", "证件类型", "证件号码", "服务结束时间", "参保地", "民族"}; //列标题
         response.setContentType("application/octet-stream;charset=ISO8859-1");
         response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xls");
         response.addHeader("Pargam", "no-cache");
         response.addHeader("Cache-Control", "no-cache");
-        new ExportExcelUtil<>().exportExcel("巴士车辆", CarConstant.TEMPLATE_HEAD, response.getOutputStream());
+        //下拉框数据
+        List<String[]> downData = new ArrayList();
+        String[] str1 = {"男", "女", "未知"};
+        String[] str2 = {"北京", "上海", "广州", "深圳", "武汉", "长沙", "湘潭"};
+        String[] str3 = {"01-汉族", "02-蒙古族", "03-回族", "04-藏族", "05-维吾尔族", "06-苗族", "07-彝族", "08-壮族", "09-布依族",
+                "10-朝鲜族", "11-满族", "12-侗族", "13-瑶族", "14-白族", "15-土家族", "16-哈尼族", "17-哈萨克族", "18-傣族", "19-黎族", "20-傈僳族",
+                "21-佤族", "22-畲族", "23-高山族", "24-拉祜族", "25-水族", "26-东乡族", "27-纳西族", "28-景颇族", "29-柯尔克孜族", "30-土族",
+                "31-达斡尔族", "32-仫佬族", "33-羌族", "34-布朗族", "35-撒拉族", "36-毛难族", "37-仡佬族", "38-锡伯族", "39-阿昌族", "40-普米族",
+                "41-塔吉克族", "42-怒族", "43-乌孜别克族", "44-俄罗斯族", "45-鄂温克族", "46-德昂族", "47-保安族", "48-裕固族", "49-京族", "50-塔塔尔族",
+                "51-独龙族", "52-鄂伦春族", "53-赫哲族", "54-门巴族", "55-珞巴族", "56-基诺族", "98-外国血统", "99-其他"};
+        downData.add(str1);
+        downData.add(str2);
+        downData.add(str3);
+        String[] downRows = {"1", "5", "6"}; //下拉的列序号数组(序号从0开始)
+
+        try {
+            ExportExcelUtil.exportExcel(fileName, handers, downData, downRows, request, response);
+        } catch (Exception e) {
+            System.out.println("批量导入信息异常：" + e.getMessage());
+        }
     }
 
     /**
@@ -558,7 +599,7 @@ public class BusInfoController {
         //如果有错误信息将信息放到redis中以便下载
         if (errList.size() > 0) {
             String errMsgKey = BusConstant.ERROR_CAR_KEY + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
-            saveErrorMsg2Redis(errMsgKey,errList);
+            saveErrorMsg2Redis(errMsgKey, errList);
             errorVO.setErrorMsgKey(errMsgKey);
         }
         return AjaxResponse.success(errorVO);
@@ -569,7 +610,7 @@ public class BusInfoController {
         errorList.forEach(o -> {
             array.add("第" + o.getRow() + "行，" + "第" + o.getCol() + "列  " + o.getReason());
         });
-        RedisCacheUtil.set(key,array,BusConstant.ERROR_IMPORT_KEY_EXPIRE);
+        RedisCacheUtil.set(key, array, BusConstant.ERROR_IMPORT_KEY_EXPIRE);
     }
 
     /**

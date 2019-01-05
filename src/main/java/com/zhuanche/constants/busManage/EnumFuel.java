@@ -12,16 +12,6 @@ import java.util.Map;
  * @create: 2018-11-23 21:33
  **/
 public enum EnumFuel {
-    //gasoline 汽油
-    //diesel oil 柴油
-    //electric 电
-    //Mixed oil 混合油
-    //Natural gas 天然气
-    //petroleum gas 石油气
-    //methanol 甲醇
-    //ethanol 乙醇
-    //solar power 太阳能
-    //Hybrid power 混合动力
     GASOLINE("1", "汽油"),
     DIESEL_OIL("2", "柴油"),
     ELECTRIC("3", "电"),
@@ -93,5 +83,12 @@ public enum EnumFuel {
             list.add(fuelMap);
         }
         return list;
+    }
+    public static String getAllFuelName(){
+        StringBuffer sb = new StringBuffer();
+        for (EnumFuel fuel : EnumFuel.values()) {
+            sb.append(fuel.name).append(",");
+        }
+        return sb.substring(0,sb.length()-1);
     }
 }
