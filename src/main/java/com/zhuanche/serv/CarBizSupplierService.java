@@ -1,25 +1,32 @@
 package com.zhuanche.serv;
 
+import com.alibaba.fastjson.JSONArray;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.zhuanche.common.rocketmq.CommonRocketProducer;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.entity.driver.SupplierExtDto;
+import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.entity.rentcar.CarBizSupplierQuery;
 import com.zhuanche.entity.rentcar.CarBizSupplierVo;
+import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.deiver.CarBizCarInfoTempService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import mapper.driver.SupplierExtDtoMapper;
 import mapper.driver.ex.SupplierExtDtoExMapper;
 import mapper.rentcar.CarBizSupplierMapper;
+import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -48,6 +55,12 @@ public class CarBizSupplierService{
 
 	@Autowired
 	private CarBizCarInfoTempService carBizCarInfoTempService;
+
+	@Autowired
+	private CarBizCarGroupExMapper carBizCarGroupExMapper;
+
+	@Value("${commission.url}")
+	String commissionUrl;
 
 	/**查询供应商信息**/
 	public Map<Integer, CarBizSupplier> querySupplier( Integer cityId,  Set<Integer> supplierids ){
@@ -151,7 +164,7 @@ public class CarBizSupplierService{
 		List<SupplierExtDto> extDtos = supplierExtDtoExMapper.queryExtDtoByIdList(idList);
 		for (SupplierExtDto supplierExtDto : extDtos){
 			for (CarBizSupplierVo vo : list){
-				if (vo.getSupplierId().equals(supplierExtDto.getSupplierId())){
+				if (vo != null && vo.getSupplierId().equals(supplierExtDto.getSupplierId())){
 					vo.setSupplierShortName(supplierExtDto.getSupplierShortName());
 					vo.setEmail(supplierExtDto.getEmail());
 					break;
@@ -161,6 +174,26 @@ public class CarBizSupplierService{
 	}
 
     public AjaxResponse querySupplierById(Integer supplierId) {
-        return null;
+		CarBizSupplier carBizSupplier = carBizSupplierMapper.selectByPrimaryKey(supplierId);
+		CarBizSupplierVo vo = new CarBizSupplierVo();
+		BeanUtils.copyProperties(carBizSupplier, vo);
+		SupplierExtDto supplierExtDto = supplierExtDtoExMapper.selectBySupplierId(supplierId);
+		if (supplierExtDto != null) {
+			vo.setEmail(supplierExtDto.getEmail());
+			vo.setSupplierShortName(supplierExtDto.getSupplierShortName());
+		}
+		List<CarBizCarGroup> carBizCarGroups = carBizCarGroupExMapper.queryGroupNameList();
+		JSONArray groupList = new JSONArray();
+		for (CarBizCarGroup group : carBizCarGroups){
+			Map<String, Object> params = Maps.newHashMap();
+			params.put("supplierId", vo.getSupplierId());
+			params.put("groupId", group.getGroupId());
+			com.alibaba.fastjson.JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(commissionUrl, params, 1, "");
+			if (jsonObject != null && (Constants.SUCCESS_CODE == jsonObject.getInteger(Constants.CODE))){
+				groupList.add(jsonObject.getJSONObject(Constants.DATA));
+			}
+		}
+		vo.setGroupList(groupList);
+		return AjaxResponse.success(vo);
     }
 }
