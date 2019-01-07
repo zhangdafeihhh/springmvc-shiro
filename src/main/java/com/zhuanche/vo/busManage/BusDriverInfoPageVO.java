@@ -19,6 +19,9 @@ public class BusDriverInfoPageVO {
 	/** 司机姓名 **/
 	private String name;
 
+	/** 身份证 **/
+	private String idCardNo;
+
 	/** 手机号 **/
 	private String phone;
 
@@ -69,6 +72,14 @@ public class BusDriverInfoPageVO {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getIdCardNo() {
+		return idCardNo;
+	}
+
+	public void setIdCardNo(String idCardNo) {
+		this.idCardNo = idCardNo;
 	}
 
 	public String getPhone() {

@@ -28,6 +28,9 @@
 			AND d.create_date <![CDATA[ <= ]]>
 			#{createDateEnd}
 		</if>
+		<if test="status !=null">
+			AND d.status = #{status}
+		</if>
 		<if test="driverIds != null and driverIds.size() > 0">
 			AND d.driver_id IN
 			<foreach collection="driverIds" open="(" close=")"
@@ -55,6 +58,7 @@
 		SELECT
 			d.driver_id AS driverId,
 			d.`name` AS NAME,
+		    d.id_card_no AS idCardNo,
 			d.phone AS phone,
 			d.service_city AS cityId,
 			d.supplier_id AS supplierId,

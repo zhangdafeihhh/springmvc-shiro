@@ -33,6 +33,8 @@ public class BusDriverQueryDTO extends BaseDTO {
 	/** 司机手机号 **/
 	private String phone;
 
+	private Integer status;
+
 	/** 创建时间开始 **/
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createDateBegin;
@@ -110,4 +112,11 @@ public class BusDriverQueryDTO extends BaseDTO {
 		this.driverIds = driverIds;
 	}
 
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
 }
