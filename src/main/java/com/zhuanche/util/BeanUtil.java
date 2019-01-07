@@ -80,6 +80,7 @@ public final class BeanUtil {
 	public static void transMap2Bean(Map<String, Object> map, Object obj) {
 		if (map == null || obj == null) {
 			log.info("map or obj can not be null");
+			return;
 		}
 
 		try {
@@ -103,6 +104,7 @@ public final class BeanUtil {
 	public static void transBean2Map(Object obj, Map<String, Object> map) {
 		if (map == null || obj == null) {
 			log.info("obj or map can not be null");
+			return;
 		}
 
 		try {
