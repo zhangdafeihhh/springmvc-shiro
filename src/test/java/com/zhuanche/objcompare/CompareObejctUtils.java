@@ -88,8 +88,8 @@ public class CompareObejctUtils {
 					}
 				};
 
-				String value1 = (String) Optional.ofNullable(o1).map(defaultFunction).orElseGet(String::new);
-				String value2 = (String) Optional.ofNullable(o2).map(defaultFunction).orElseGet(String::new);
+				String value1 = Optional.ofNullable(o1).map(defaultFunction).orElseGet(String::new);
+				String value2 = Optional.ofNullable(o2).map(defaultFunction).orElseGet(String::new);
 
 				if (consumer == null) {
 					consumer = defaultConsumer;
