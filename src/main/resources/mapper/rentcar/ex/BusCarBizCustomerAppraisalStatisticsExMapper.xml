@@ -36,6 +36,7 @@
 		WHERE
 			driver_id = #{driverId}
 		AND create_date = #{createDate}
+		limit 1
 	</select>
 </mapper>
 

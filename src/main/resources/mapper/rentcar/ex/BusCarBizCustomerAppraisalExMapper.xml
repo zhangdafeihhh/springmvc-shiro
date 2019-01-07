@@ -58,5 +58,6 @@
 			car_biz_customer_appraisal a
 		WHERE
 			a.order_no = #{orderNo}
+		limit 1
 	</select>
 </mapper>
