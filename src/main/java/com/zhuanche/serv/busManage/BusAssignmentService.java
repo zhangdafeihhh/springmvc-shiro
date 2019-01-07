@@ -143,7 +143,7 @@ public class BusAssignmentService {
 			}
 			
 			// 请求参数
-			String jsonString = JSON.toJSONStringWithDateFormat(params, JSON.DEFFAULT_DATE_FORMAT, new SerializerFeature[0]);
+			String jsonString = JSON.toJSONStringWithDateFormat(params, JSON.DEFFAULT_DATE_FORMAT);
 			JSONObject json = (JSONObject) JSONObject.parse(jsonString);
 			Map<String, Object> paramMap = json.getInnerMap();
 			
