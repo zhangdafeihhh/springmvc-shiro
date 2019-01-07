@@ -108,7 +108,7 @@ public class CarBizSupplierService{
 				method = Constants.CREATE;
 				supplier.setCreateBy(id);
 				supplier.setCreateDate(new Date());
-				carBizSupplierMapper.insertSelective(supplier);
+				carBizSupplierExMapper.insertSelective(supplier);
 				SupplierExtDto extDto = new SupplierExtDto();
 				extDto.setEmail(supplier.getEmail());
 				extDto.setSupplierShortName(supplier.getSupplierShortName());
@@ -117,7 +117,7 @@ public class CarBizSupplierService{
 				extDto.setUpdateDate(new Date());
 				supplierExtDtoMapper.insertSelective(extDto);
 			}else {
-				carBizSupplierMapper.updateByPrimaryKeySelective(supplier);
+				carBizSupplierExMapper.updateByPrimaryKeySelective(supplier);
 				SupplierExtDto extDto = new SupplierExtDto();
 				extDto.setEmail(supplier.getEmail());
 				extDto.setSupplierShortName(supplier.getSupplierShortName());

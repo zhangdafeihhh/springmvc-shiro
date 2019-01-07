@@ -29,16 +29,17 @@
   <update id="updateBySupplierId" parameterType="com.zhuanche.entity.driver.SupplierExtDto">
     update
       supplier_ext
-    set
-    <if test="status != null">
-      status = #{status}
-    </if>
-    <if test="supplierShortName != null and supplierShortName != ''">
-      supplier_short_name = #{supplierShortName}
-    </if>
-    <if test="email != null and email != ''">
-      email = #{email}
-    </if>
+    <set>
+      <if test="status != null">
+        status = #{status},
+      </if>
+      <if test="supplierShortName != null and supplierShortName != ''">
+        supplier_short_name = #{supplierShortName},
+      </if>
+      <if test="email != null and email != ''">
+        email = #{email},
+      </if>
+    </set>
     where supplier_id = #{supplierId}
   </update>
 

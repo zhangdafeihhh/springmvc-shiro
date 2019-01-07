@@ -215,4 +215,201 @@
             AND t.status = #{status}
         </if>
     </select>
+    <insert id="insertSelective">
+        <selectKey resultType="java.lang.Integer" keyProperty="supplierId" order="AFTER" >
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into car_biz_supplier
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="supplierNum != null" >
+                supplier_num,
+            </if>
+            <if test="supplierFullName != null" >
+                supplier_full_name,
+            </if>
+            <if test="supplierCity != null" >
+                supplier_city,
+            </if>
+            <if test="type != null" >
+                type,
+            </if>
+            <if test="contacts != null" >
+                contacts,
+            </if>
+            <if test="contactsPhone != null" >
+                contacts_phone,
+            </if>
+            <if test="status != null" >
+                status,
+            </if>
+            <if test="createBy != null" >
+                create_by,
+            </if>
+            <if test="updateBy != null" >
+                update_by,
+            </if>
+            <if test="createDate != null" >
+                create_date,
+            </if>
+            <if test="updateDate != null" >
+                update_date,
+            </if>
+            <if test="iscommission != null" >
+                isCommission,
+            </if>
+            <if test="pospayflag != null" >
+                posPayFlag,
+            </if>
+            <if test="cooperationType != null" >
+                cooperation_type,
+            </if>
+            <if test="istest != null" >
+                isTest,
+            </if>
+            <if test="enterpriseType != null" >
+                enterprise_type,
+            </if>
+            <if test="address != null" >
+                address,
+            </if>
+            <if test="memo != null" >
+                memo,
+            </if>
+            <if test="dispatcherPhone != null and dispatcherPhone != ''" >
+                dispatcher_phone,
+            </if>
+            <if test="isTwoShifts != null" >
+                is_two_shifts,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="supplierNum != null" >
+                #{supplierNum,jdbcType=VARCHAR},
+            </if>
+            <if test="supplierFullName != null" >
+                #{supplierFullName,jdbcType=VARCHAR},
+            </if>
+            <if test="supplierCity != null" >
+                #{supplierCity,jdbcType=INTEGER},
+            </if>
+            <if test="type != null" >
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="contacts != null" >
+                #{contacts,jdbcType=VARCHAR},
+            </if>
+            <if test="contactsPhone != null" >
+                #{contactsPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null" >
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="createBy != null" >
+                #{createBy,jdbcType=INTEGER},
+            </if>
+            <if test="updateBy != null" >
+                #{updateBy,jdbcType=INTEGER},
+            </if>
+            <if test="createDate != null" >
+                #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateDate != null" >
+                #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="iscommission != null" >
+                #{iscommission,jdbcType=INTEGER},
+            </if>
+            <if test="pospayflag != null" >
+                #{pospayflag,jdbcType=INTEGER},
+            </if>
+            <if test="cooperationType != null" >
+                #{cooperationType,jdbcType=INTEGER},
+            </if>
+            <if test="istest != null" >
+                #{istest,jdbcType=INTEGER},
+            </if>
+            <if test="enterpriseType != null" >
+                #{enterpriseType,jdbcType=INTEGER},
+            </if>
+            <if test="address != null" >
+                #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="memo != null" >
+                #{memo,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="dispatcherPhone != null and dispatcherPhone != ''" >
+                #{dispatcherPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="isTwoShifts != null" >
+                #{isTwoShifts,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective">
+        update car_biz_supplier
+        <set >
+            <if test="supplierNum != null" >
+                supplier_num = #{supplierNum,jdbcType=VARCHAR},
+            </if>
+            <if test="supplierFullName != null" >
+                supplier_full_name = #{supplierFullName,jdbcType=VARCHAR},
+            </if>
+            <if test="supplierCity != null" >
+                supplier_city = #{supplierCity,jdbcType=INTEGER},
+            </if>
+            <if test="type != null" >
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="contacts != null" >
+                contacts = #{contacts,jdbcType=VARCHAR},
+            </if>
+            <if test="contactsPhone != null" >
+                contacts_phone = #{contactsPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null" >
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="createBy != null" >
+                create_by = #{createBy,jdbcType=INTEGER},
+            </if>
+            <if test="updateBy != null" >
+                update_by = #{updateBy,jdbcType=INTEGER},
+            </if>
+            <if test="createDate != null" >
+                create_date = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateDate != null" >
+                update_date = #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="iscommission != null" >
+                isCommission = #{iscommission,jdbcType=INTEGER},
+            </if>
+            <if test="pospayflag != null" >
+                posPayFlag = #{pospayflag,jdbcType=INTEGER},
+            </if>
+            <if test="cooperationType != null" >
+                cooperation_type = #{cooperationType,jdbcType=INTEGER},
+            </if>
+            <if test="istest != null" >
+                isTest = #{istest,jdbcType=INTEGER},
+            </if>
+            <if test="enterpriseType != null" >
+                enterprise_type = #{enterpriseType,jdbcType=INTEGER},
+            </if>
+            <if test="address != null" >
+                address = #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="memo != null" >
+                memo = #{memo,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="dispatcherPhone != null and dispatcherPhone != ''" >
+                dispatcher_phone = #{dispatcherPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="isTwoShifts != null" >
+                is_two_shifts = #{isTwoShifts,jdbcType=INTEGER},
+            </if>
+        </set>
+        where supplier_id = #{supplierId,jdbcType=INTEGER}
+    </update>
 </mapper>

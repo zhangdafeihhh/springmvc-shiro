@@ -31,4 +31,8 @@ public interface CarBizSupplierExMapper{
 	String queryDispatcherPhoneBySupplierId(@Param("supplierId") Integer supplierId);
 
     List<CarBizSupplierVo> findByParams(CarBizSupplierQuery queryParam);
+
+    int insertSelective(CarBizSupplierVo supplier);
+
+	int updateByPrimaryKeySelective(CarBizSupplierVo supplier);
 }
