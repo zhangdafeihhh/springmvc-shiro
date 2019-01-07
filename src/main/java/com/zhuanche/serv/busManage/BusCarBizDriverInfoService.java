@@ -13,6 +13,7 @@ import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.protobuf.StringValue;
 import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.constants.busManage.BusConstant;
 import mapper.rentcar.ex.*;
@@ -157,6 +158,8 @@ public class BusCarBizDriverInfoService implements BusConst {
     // ===========================巴士业务拓展mapper==================================
     @Autowired
     private BusCarBizDriverInfoExMapper busCarBizDriverInfoExMapper;
+    @Autowired
+    private BusCarBizCustomerAppraisalStatisticsExMapper appraisalStatisticsExMapper;
 
     // ===========================专车业务拓展service==================================
     @Autowired
@@ -216,8 +219,10 @@ public class BusCarBizDriverInfoService implements BusConst {
                     driver.setSupplierName(supplier.getSupplierFullName());
                 }
             }
+            //司机的平均分
+            Double evaScore = appraisalStatisticsExMapper.queryAvgAppraisal(driver.getDriverId());
+            driver.setAverage(evaScore==null?StringUtils.EMPTY:String.valueOf(Math.round(evaScore)));
         });
-
         return driverList;
     }
 
@@ -339,8 +344,11 @@ public class BusCarBizDriverInfoService implements BusConst {
 
             // 十二、道路运输从业资格证编号
             builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(driver.getXyDriverNumber(), "")).append(",");
-
+            // 司机积分
+            Double score = appraisalStatisticsExMapper.queryAvgAppraisal(driver.getDriverId());
+            builder.append(CsvUtils.tab).append(score==null?StringUtils.EMPTY:Math.round(score));
             csvDataList.add(builder.toString());
+            
         });
 
         return csvDataList;

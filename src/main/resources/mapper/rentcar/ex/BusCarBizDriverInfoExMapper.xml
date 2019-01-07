@@ -74,6 +74,7 @@
 	<select id="queryDriverExportList" parameterType="com.zhuanche.dto.busManage.BusDriverQueryDTO"
 		resultType="com.zhuanche.vo.busManage.BusDriverInfoExportVO">
 		SELECT
+		    d.driver_id as driverId,
 			d.service_city AS cityId,
 			d.supplier_id AS supplierId,
 			d.`name` AS name,

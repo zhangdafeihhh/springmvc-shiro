@@ -343,7 +343,7 @@ public class BusDriverInfoController extends BusBaseController {
 			CsvUtils utilEntity = new CsvUtils();
 			// 表头
 			List<String> csvHeaderList = new ArrayList<>();
-			String headerStr = "城市,供应商,司机姓名,性别,车型类别,司机身份证号,司机手机号,出生日期,驾照类型,驾驶证号,驾照领证日期,道路运输从业资格证编号";
+			String headerStr = "城市,供应商,司机姓名,性别,车型类别,司机身份证号,司机手机号,出生日期,驾照类型,驾驶证号,驾照领证日期,道路运输从业资格证编号,司机评分";
 			csvHeaderList.add(headerStr);
 
 			// 查询车队、小组查询司机

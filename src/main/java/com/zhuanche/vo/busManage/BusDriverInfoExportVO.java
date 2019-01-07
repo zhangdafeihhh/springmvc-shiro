@@ -10,7 +10,8 @@ import java.util.Date;
  * 
  */
 public class BusDriverInfoExportVO {
-
+	/** 司机ID*/
+	private Integer driverId;
 	/** 服务城市 */
 	private Integer cityId;
 
@@ -46,6 +47,14 @@ public class BusDriverInfoExportVO {
 
 	/** 道路运输从业资格证编号(巡游出租汽车驾驶员资格证号,巴士业务无“巡游...”业务，复用此字段) **/
 	private String xyDriverNumber;
+
+	public Integer getDriverId() {
+		return driverId;
+	}
+
+	public void setDriverId(Integer driverId) {
+		this.driverId = driverId;
+	}
 
 	public Integer getCityId() {
 		return cityId;
