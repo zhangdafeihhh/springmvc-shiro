@@ -76,7 +76,7 @@ public class DriverVerifyController {
 	 * @return
 	 */
 	@RequestMapping("/queryDriverVerifyData")
-//	@RequiresPermissions(value = { "DriverInvite_look" } )
+	@RequiresPermissions(value = { "DriverInvite_look" } )
 	@ResponseBody
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
