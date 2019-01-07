@@ -79,6 +79,11 @@ public final class Constants {
 	public static final String DRIVER = "driver";
 	public static final String DATA = "data";
 	public static final String FIRST_ORDER_NO = "firstOrderNo";
+	public static final String SUPPLIER_ID = "supplierId";
+	public static final String GROUP_ID = "groupId";
+	public static final String GROUP_NAME = "groupName";
+	public static final String GROUP_INFO_TAG = "groupInfo";
+	public static final int ZERO = 0;
 
 
 }

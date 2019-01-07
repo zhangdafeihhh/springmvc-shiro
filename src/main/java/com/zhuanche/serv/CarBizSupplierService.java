@@ -182,18 +182,36 @@ public class CarBizSupplierService{
 			vo.setEmail(supplierExtDto.getEmail());
 			vo.setSupplierShortName(supplierExtDto.getSupplierShortName());
 		}
-		List<CarBizCarGroup> carBizCarGroups = carBizCarGroupExMapper.queryGroupNameList();
-		JSONArray groupList = new JSONArray();
-		for (CarBizCarGroup group : carBizCarGroups){
-			Map<String, Object> params = Maps.newHashMap();
-			params.put("supplierId", vo.getSupplierId());
-			params.put("groupId", group.getGroupId());
-			com.alibaba.fastjson.JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(commissionUrl, params, 1, "");
-			if (jsonObject != null && (Constants.SUCCESS_CODE == jsonObject.getInteger(Constants.CODE))){
-				groupList.add(jsonObject.getJSONObject(Constants.DATA));
+		Map<String, Object> params = Maps.newHashMap();
+		params.put(Constants.SUPPLIER_ID, vo.getSupplierId());
+		com.alibaba.fastjson.JSONObject jsonObject = MpOkHttpUtil.okHttpPostBackJson(commissionUrl, params, 1, Constants.GROUP_INFO_TAG);
+		if (jsonObject != null && Constants.SUCCESS_CODE == jsonObject.getInteger(Constants.CODE)){
+			JSONArray jsonArray = jsonObject.getJSONArray(Constants.DATA);
+			List<Integer> idList = new ArrayList<>();
+			jsonArray.forEach(elem -> {
+				com.alibaba.fastjson.JSONObject jsonData = (com.alibaba.fastjson.JSONObject) elem;
+				Integer id = jsonData.getInteger(Constants.GROUP_ID);
+				if (id != null && id > Constants.ZERO){
+					idList.add(id);
+				}
+			});
+			if (!idList.isEmpty()){
+				List<CarBizCarGroup> carBizCarGroups = carBizCarGroupExMapper.queryGroupNameByIds(idList);
+				JSONArray groupList = new JSONArray();
+				for (CarBizCarGroup groupInfo : carBizCarGroups){
+					for (Object data : jsonArray){
+						com.alibaba.fastjson.JSONObject jsonData = (com.alibaba.fastjson.JSONObject) data;
+						Integer id = jsonData.getInteger(Constants.GROUP_ID);
+						if (id.equals(groupInfo.getGroupId())){
+							jsonData.put(Constants.GROUP_NAME, groupInfo.getGroupName());
+							groupList.add(jsonData);
+							break;
+						}
+					}
+				}
+				vo.setGroupList(groupList);
 			}
 		}
-		vo.setGroupList(groupList);
 		return AjaxResponse.success(vo);
     }
 }

@@ -137,4 +137,16 @@
 		WHERE
 			group_id = #{groupId}
 	</select>
+
+    <select id="queryGroupNameByIds" resultMap="BaseResultMap">
+        select
+          group_id,
+          group_name
+        from
+          car_biz_car_group
+        where group_id in
+        <foreach item="item" index="index" collection="idList"  open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

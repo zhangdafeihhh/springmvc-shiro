@@ -43,8 +43,11 @@
   </update>
 
   <select id="selectBySupplierId" parameterType="integer" resultMap="BaseResultMap">
-    select id
-      from supplier_ext
-      where supplier_id = #{supplierId}
+    select
+      id,
+      supplier_short_name,
+      email
+    from supplier_ext
+    where supplier_id = #{supplierId}
   </select>
 </mapper>
