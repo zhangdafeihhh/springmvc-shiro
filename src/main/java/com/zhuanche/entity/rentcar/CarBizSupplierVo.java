@@ -10,6 +10,8 @@ public class CarBizSupplierVo extends CarBizSupplier {
     private String email;
     private String supplierShortName;
     private JSONArray groupList;
+    private String createName;
+    private String updateName;
 
     public String getSupplierCityName() {
         return supplierCityName;
@@ -65,5 +67,21 @@ public class CarBizSupplierVo extends CarBizSupplier {
 
     public void setGroupList(JSONArray groupList) {
         this.groupList = groupList;
+    }
+
+    public String getCreateName() {
+        return createName;
+    }
+
+    public void setCreateName(String createName) {
+        this.createName = createName;
+    }
+
+    public String getUpdateName() {
+        return updateName;
+    }
+
+    public void setUpdateName(String updateName) {
+        this.updateName = updateName;
     }
 }

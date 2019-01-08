@@ -14,10 +14,10 @@ import com.zhuanche.entity.rentcar.CarBizSupplierQuery;
 import com.zhuanche.entity.rentcar.CarBizSupplierVo;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.deiver.CarBizCarInfoTempService;
-import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import mapper.driver.SupplierExtDtoMapper;
 import mapper.driver.ex.SupplierExtDtoExMapper;
+import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import mapper.rentcar.CarBizSupplierMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.*;
 
 /**供应商信息 的 基本服务层**/
@@ -58,6 +57,9 @@ public class CarBizSupplierService{
 
 	@Autowired
 	private CarBizCarGroupExMapper carBizCarGroupExMapper;
+
+	@Autowired
+	private CarAdmUserExMapper carAdmUserExMapper;
 
 	@Value("${commission.url}")
 	String commissionUrl;
@@ -181,6 +183,14 @@ public class CarBizSupplierService{
 		if (supplierExtDto != null) {
 			vo.setEmail(supplierExtDto.getEmail());
 			vo.setSupplierShortName(supplierExtDto.getSupplierShortName());
+		}
+		if (vo.getCreateBy() != null && vo.getCreateBy() > Constants.ZERO){
+			String create = carAdmUserExMapper.queryNameById(vo.getCreateBy());
+			vo.setCreateName(create);
+		}
+		if (vo.getUpdateBy() != null && vo.getUpdateBy() > Constants.ZERO){
+			String update = carAdmUserExMapper.queryNameById(vo.getUpdateBy());
+			vo.setUpdateName(update);
 		}
 		Map<String, Object> params = Maps.newHashMap();
 		params.put(Constants.SUPPLIER_ID, vo.getSupplierId());

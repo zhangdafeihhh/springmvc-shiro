@@ -118,4 +118,10 @@
 
     </select>
 
+    <select id="queryNameById" resultType="string" parameterType="integer">
+        select user_name
+          from car_adm_user
+        where user_id = #{userId}
+    </select>
+
 </mapper>
