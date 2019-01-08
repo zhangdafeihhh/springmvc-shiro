@@ -27,10 +27,8 @@ import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.serv.mdbcarmanage.CarBizDriverUpdateService;
 import com.zhuanche.serv.mongo.DriverMongoService;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.Common;
+import com.zhuanche.util.*;
 import com.zhuanche.util.DateUtil;
-import com.zhuanche.util.Md5Util;
-import com.zhuanche.util.ValidateUtils;
 import com.zhuanche.util.encrypt.MD5Utils;
 import mapper.mdbcarmanage.*;
 import mapper.mdbcarmanage.ex.*;
@@ -86,6 +84,13 @@ public class CarBizDriverInfoService {
 
     @Value("${order.statistics.url}")
     String orderStatisticsUrl;
+
+    //车管业务id
+    @Value("${order.bid}")
+    String bId;
+
+    @Value("${order.sign.key}")
+    String signKey;
 
     @Autowired
     private CarBizDriverInfoMapper carBizDriverInfoMapper;
@@ -799,15 +804,24 @@ public class CarBizDriverInfoService {
             params.put("driverId", carBizDriverInfo.getDriverId());
             com.alibaba.fastjson.JSONObject resultJson = MpOkHttpUtil.okHttpGetBackJson(orderStatisticsUrl, params, 1, driverInfo);
             if (resultJson != null && Constants.SUCCESS_CODE == resultJson.getInteger(Constants.CODE)){
-                String orderNum = resultJson.getJSONObject(Constants.DATA).
-                        getJSONObject(Constants.DRIVER).getString(Constants.FIRST_ORDER_NO);
-                if (StringUtils.isNotBlank(orderNum)){
-                    String url = orderServiceApiBaseUrl + "/orderMain/getOrdersByOrderNo";
-                    params.clear();
-                    params.put("orderNo", orderNum);
-                    com.alibaba.fastjson.JSONObject result = MpOkHttpUtil.okHttpGetBackJson(url, params, 1, driverInfo);
-                    if (result != null && Constants.SUCCESS_CODE == result.getInteger(Constants.CODE)){
-                        carBizDriverInfo.setActiveDate(result.getJSONArray(Constants.DATA).getJSONObject(0).getString("updateDate"));
+                com.alibaba.fastjson.JSONObject data = resultJson.getJSONObject(Constants.DATA);
+                if (data != null){
+                    String orderNum = data.getJSONObject(Constants.DRIVER).getString(Constants.FIRST_ORDER_NO);
+                    if (StringUtils.isNotBlank(orderNum)){
+                        String url = orderServiceApiBaseUrl + "/orderMain/getOrdersByOrderNo";
+                        params.clear();
+                        params.put("orderNo", orderNum);
+                        params.put("bId", bId);
+                        params.put("columns", "update_date");
+                        try{
+                            params.put("sign", MD5Utils.getMD5DigestBase64(SignatureUtils.getMD5Sign(params, signKey)));
+                        }catch (Exception e){
+                            logger.error("签名错误");
+                        }
+                        com.alibaba.fastjson.JSONObject result = MpOkHttpUtil.okHttpGetBackJson(url, params, 1, driverInfo);
+                        if (result != null && Constants.SUCCESS_CODE == result.getInteger(Constants.CODE)){
+                            carBizDriverInfo.setActiveDate(result.getJSONArray(Constants.DATA).getJSONObject(0).getString("updateDate"));
+                        }
                     }
                 }
             }
