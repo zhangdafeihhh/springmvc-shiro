@@ -56,8 +56,21 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
     public PageInfo<DriverDailyReport> findDayDriverDailyReportByparam(DriverDailyReportParams params) {
         logger.info("查询工作报告，日报，参数为："+(params==null?"null": JSON.toJSONString(params)));
         PageHelper.startPage(params.getPage(), params.getPageSize(), true);
+        List<Integer> listDriverIds = this.driverDailyReportExMapper.queryDriverIds(params);
+        PageInfo<Integer> pageInfoDriver = new PageInfo<>(listDriverIds);
+        String driverIds = "";
+        if (listDriverIds != null && listDriverIds.size()>0){
+            for(Integer driverId : listDriverIds){
+                driverIds += driverId + Constants.SEPERATER;
+            }
+            if (StringUtils.isNotEmpty(driverIds)){
+                params.setDriverIds(driverIds.substring(0,driverIds.length()-1));
+            }
+        }
+
         List<DriverDailyReport> list  = this.driverDailyReportExMapper.queryForListObject(params);
         PageInfo<DriverDailyReport> pageInfo = new PageInfo<>(list);
+        pageInfo.setTotal(pageInfoDriver.getTotal());
         return pageInfo;
     }
 
@@ -65,8 +78,21 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
     public PageInfo<DriverDailyReport> findWeekDriverDailyReportByparam(DriverDailyReportParams params,String statDateStart,  String statDateEnd  ) {
         PageHelper.startPage(params.getPage(), params.getPageSize(), true);
         logger.info("查询工作报告，周报，参数为："+(params==null?"null": JSON.toJSONString(params)));
+        List<Integer> listDriverIds = this.driverDailyReportExMapper.queryDriverIds(params);
+        PageInfo<Integer> pageInfoDriver = new PageInfo<>(listDriverIds);
+        String driverIds = "";
+        if (listDriverIds != null && listDriverIds.size()>0){
+            for(Integer driverId : listDriverIds){
+                driverIds += driverId + Constants.SEPERATER;
+            }
+            if (StringUtils.isNotEmpty(driverIds)){
+                params.setDriverIds(driverIds.substring(0,driverIds.length()-1));
+            }
+        }
+
         List<DriverDailyReport> list  = this.driverDailyReportExMapper.queryWeekForListObject(params);
         PageInfo<DriverDailyReport> pageInfo = new PageInfo<>(list);
+        pageInfo.setTotal(pageInfoDriver.getTotal());
         if(list!=null && list.size()>0){
             for (DriverDailyReport report: list) {
                 report.setStatDateStart(statDateStart);

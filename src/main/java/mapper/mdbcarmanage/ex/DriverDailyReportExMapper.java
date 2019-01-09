@@ -23,4 +23,9 @@ public interface DriverDailyReportExMapper {
 	})
 	public List<DriverDailyReport> queryDriverReportData(DriverDailyReportParams params);
 
+	@MasterSlaveConfigs(configs = {
+			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+	})
+	List<Integer> queryDriverIds(DriverDailyReportParams params);
+
 }
