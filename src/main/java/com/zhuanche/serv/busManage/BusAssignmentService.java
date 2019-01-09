@@ -1,36 +1,23 @@
 package com.zhuanche.serv.busManage;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.github.pagehelper.Page;
-import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
-import com.zhuanche.common.database.MasterSlaveConfig;
-import com.zhuanche.common.database.MasterSlaveConfigs;
-import com.zhuanche.common.paging.PageDTO;
-import com.zhuanche.constants.BusConst;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import com.zhuanche.constants.busManage.EnumOrder;
 import com.zhuanche.constants.busManage.EnumOrderType;
 import com.zhuanche.constants.busManage.EnumPayType;
 import com.zhuanche.constants.busManage.EnumServiceType;
-import com.zhuanche.dto.busManage.*;
 import com.zhuanche.entity.busManage.BusCostDetail;
 import com.zhuanche.entity.busManage.BusOrderPayExport;
 import com.zhuanche.entity.busManage.OrgCostInfo;
 import com.zhuanche.entity.mdbcarmanage.BusOrderOperationTime;
 import com.zhuanche.entity.rentcar.*;
-import com.zhuanche.http.MpOkHttpUtil;
-import com.zhuanche.mongo.DriverMongo;
-import com.zhuanche.serv.mongo.BusDriverMongoService;
-import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.*;
 import com.zhuanche.vo.busManage.BusOrderExVO;
 import com.zhuanche.vo.busManage.BusOrderExportVO;
-import com.zhuanche.vo.busManage.BusOrderVO;
 import mapper.mdbcarmanage.ex.BusOrderOperationTimeExMapper;
-import mapper.rentcar.CarBizServiceMapper;
-import mapper.rentcar.CarBizSupplierMapper;
 import mapper.rentcar.ex.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -40,10 +27,27 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.Page;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.constants.BusConst;
+import com.zhuanche.dto.busManage.BusCarDTO;
+import com.zhuanche.dto.busManage.BusCarRicherDTO;
+import com.zhuanche.dto.busManage.BusDriverDTO;
+import com.zhuanche.dto.busManage.BusDriverRicherDTO;
+import com.zhuanche.dto.busManage.BusOrderDTO;
+import com.zhuanche.http.MpOkHttpUtil;
+import com.zhuanche.mongo.DriverMongo;
+import com.zhuanche.serv.mongo.BusDriverMongoService;
+import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.vo.busManage.BusOrderVO;
+
+import mapper.rentcar.CarBizServiceMapper;
 
 @Service("busAssignmentService")
 public class BusAssignmentService {
@@ -64,21 +68,12 @@ public class BusAssignmentService {
 
     @Autowired
     private BusCarBizDriverInfoExMapper busCarBizDriverInfoExMapper;
-
-    @Autowired
-    private BusOrderOperationTimeExMapper operationTimeExMapper;
-
-    @Autowired
-    private BusCarBizCustomerAppraisalExMapper appraisalExMapper;
-
-    @Autowired
-    private BusCarBizCarGroupExMapper groupExMapper;
-
-    @Autowired
-    private CarBizSupplierMapper supplierMapper;
-
     @Autowired
     private CarBizCustomerExMapper customerExMapper;
+    @Autowired
+    private BusCarBizCustomerAppraisalExMapper appraisalExMapper;
+    @Autowired
+    private BusOrderOperationTimeExMapper operationTimeExMapper;
 
     @Autowired
     private BusCarBizCustomerAppraisalService busCarBizCustomerAppraisalService;
@@ -105,10 +100,8 @@ public class BusAssignmentService {
 
     @Value("${order.pay.old.url}")
     private String paymentBaseUrl;
-
     @Value("${order.pay.url}")
     private String orderPayUrl;
-
     /**
      * @param params
      * @return BaseEntity
@@ -260,7 +253,7 @@ public class BusAssignmentService {
             orderIdList.add(String.valueOf(order.getOrderId()));
             orderNoList.add(order.getOrderNo());
             phoneList.add(order.getBookingUserPhone());
-           //收集司机ID
+            //收集司机ID
             Integer driverId = order.getDriverId();
             if(driverId!=null){
                 driverIds.add(driverId);
@@ -367,7 +360,7 @@ public class BusAssignmentService {
                                                          Map<String, BusOrderPayExport> payResult, Map<String, String> assignResult,
                                                          Map<String, String> reassigResult, Map<String, OrgCostInfo> orgInfoMap,
                                                          Map<Integer, String> groupMap,Map<Integer,Map<String,Object>> driverInfoMap
-                                                         ,Map<Integer,String> userNames, Map<String, String> appraisalMap) {
+            ,Map<Integer,String> userNames, Map<String, String> appraisalMap) {
         List<BusOrderExportVO> list = new ArrayList<>();
         //拼装参数
         for (BusOrderExVO order : orderResult) {
@@ -487,9 +480,9 @@ public class BusAssignmentService {
             Integer driverId = order.getDriverId();
             Map<String, Object> driverInfo = driverInfoMap.get(driverId);
             if(driverInfo!=null){
-               orderExport.setDriverName(driverInfo.get("name")==null?StringUtils.EMPTY:driverInfo.get("name").toString());
-               orderExport.setDriverPhone(driverInfo.get("phone")==null?StringUtils.EMPTY:driverInfo.get("phone").toString());
-               orderExport.setSupplierName(driverInfo.get("supplierName")==null?StringUtils.EMPTY:driverInfo.get("supplierName").toString());
+                orderExport.setDriverName(driverInfo.get("name")==null?StringUtils.EMPTY:driverInfo.get("name").toString());
+                orderExport.setDriverPhone(driverInfo.get("phone")==null?StringUtils.EMPTY:driverInfo.get("phone").toString());
+                orderExport.setSupplierName(driverInfo.get("supplierName")==null?StringUtils.EMPTY:driverInfo.get("supplierName").toString());
             }
             //预定人名称
             String username = userNames.get(order.getBookingUserId());
@@ -551,7 +544,7 @@ public class BusAssignmentService {
         }
 
         // 请求参数
-        String jsonString = JSON.toJSONStringWithDateFormat(params, JSON.DEFFAULT_DATE_FORMAT, new SerializerFeature[0]);
+        String jsonString = JSON.toJSONStringWithDateFormat(params, JSON.DEFFAULT_DATE_FORMAT);
         JSONObject json = (JSONObject) JSONObject.parse(jsonString);
         Map<String, Object> paramMap = json.getInnerMap();
 
@@ -601,15 +594,17 @@ public class BusAssignmentService {
         return result;
     }
 
+
     /**
-     * @param orderNos
-     * @return JSONArray
-     * @throws
      * @Title: getBusCostDetailList
      * @Description: 批量获取费用明细
+     * @param orderNos
+     * @return
+     * @return JSONArray
+     * @throws
      */
     public JSONArray getBusCostDetailList(String orderNos) {
-        Map<String, Object> params = new HashMap<>();
+        Map<String,Object> params = new HashMap<>();
         params.put("orderNos", orderNos);
         logger.info("[ BusAssignmentService-getBusCostDetailList ] 大巴车-批量获取费用明细,请求参数,params={}", params);
         try {
@@ -629,15 +624,16 @@ public class BusAssignmentService {
     }
 
     /**
-     * @param phones
-     * @return JSONArray
-     * @throws
      * @Title: queryBatchOrgInfo
      * @Description: 根据手机号查询企业信息
+     * @param phones
+     * @return
+     * @return JSONArray
+     * @throws
      */
     public JSONArray queryCompanyByPhone(String phones) {
         try {
-            Map<String, Object> params = new HashMap<>();
+            Map<String,Object> params = new HashMap<>();
             params.put("phone", phones);
             logger.info("[ BusAssignmentService-queryCompanyByPhone ] 根据手机号查询企业信息,请求参数,params={}", params);
 
@@ -658,11 +654,12 @@ public class BusAssignmentService {
     }
 
     /**
-     * @param companyIds
-     * @return JSONArray
-     * @throws
      * @Title: queryBusinessInfoBatch
      * @Description: 批量查询企业信息
+     * @param companyIds
+     * @return
+     * @return JSONArray
+     * @throws
      */
     public JSONArray queryBusinessInfoBatch(String companyIds) {
         Map<String, Object> params = new HashMap<>();
@@ -686,13 +683,13 @@ public class BusAssignmentService {
     }
 
     /**
+     * @Title: orderToDoListForCar
+     * @Description: 根据订单编号调取订单服务获取当前可派单车辆
      * @param busCarDTO
      * @return BaseEntity
      * @throws
-     * @Title: orderToDoListForCar
-     * @Description: 根据订单编号调取订单服务获取当前可派单车辆
      */
-    @SuppressWarnings({"resource"})
+    @SuppressWarnings({ "resource" })
     @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
     public PageDTO orderToDoListForCar(BusCarDTO busCarDTO) {
 
@@ -753,11 +750,11 @@ public class BusAssignmentService {
     }
 
     /**
+     * @Title: orderToDoListForDriver
+     * @Description: 根据订单编号调取订单服务获取当前可派单司机
      * @param busDriverDTO
      * @return BaseEntity
      * @throws
-     * @Title: orderToDoListForDriver
-     * @Description: 根据订单编号调取订单服务获取当前可派单司机
      */
     @SuppressWarnings("resource")
     @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
@@ -830,7 +827,10 @@ public class BusAssignmentService {
     }
 
 
+
     /**
+     * @Title: busDispatcher
+     * @Description: 指派巴士订单
      * @param cityName
      * @param driverId
      * @param driverName
@@ -844,8 +844,6 @@ public class BusAssignmentService {
      * @param serviceTypeId
      * @return JSONObject
      * @throws
-     * @Title: busDispatcher
-     * @Description: 指派巴士订单
      */
     public JSONObject busDispatcher(String cityName, Integer driverId, String driverName, String driverPhone,
                                     String dispatcherPhone, Integer groupId, String groupName, String licensePlates,
@@ -875,6 +873,8 @@ public class BusAssignmentService {
     }
 
     /**
+     * @Title: updateDriver
+     * @Description: 指派巴士订单
      * @param cityName
      * @param driverId
      * @param driverName
@@ -887,8 +887,6 @@ public class BusAssignmentService {
      * @param serviceTypeId
      * @return JSONObject
      * @throws
-     * @Title: updateDriver
-     * @Description: 指派巴士订单
      */
     public JSONObject updateDriver(String cityName, Integer driverId, String driverName, String driverPhone,
                                    Integer groupId, String groupName, String licensePlates, Integer orderId, String orderNo,

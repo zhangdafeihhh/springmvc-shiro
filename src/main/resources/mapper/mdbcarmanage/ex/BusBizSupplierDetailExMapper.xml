@@ -213,9 +213,8 @@
         	AND contract_date_end >= NOW()
             <if test="permOfSupplier != null and permOfSupplier.size() > 0">
 				AND supplier_id IN
-				<foreach collection="permOfSupplier" open="(" close=")"
-					separator="," item="supplierId">
-					#{supplierId}
+				<foreach collection="permOfSupplier" open="(" close=")" separator="," item="item">
+					#{item}
 				</foreach>
 			</if>
          ORDER BY contract_date_end DESC

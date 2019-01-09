@@ -313,7 +313,7 @@ public class BusSettlementAdviceService implements BusConst {
             invoiceDTO.setInvoiceName(WebSessionUtil.getCurrentLoginUser().getName());
 
             // 请求参数
-            String jsonString = JSON.toJSONStringWithDateFormat(invoiceDTO, JSON.DEFFAULT_DATE_FORMAT, new SerializerFeature[0]);
+            String jsonString = JSON.toJSONStringWithDateFormat(invoiceDTO, JSON.DEFFAULT_DATE_FORMAT);
             JSONObject json = (JSONObject) JSONObject.parse(jsonString);
             Map<String, Object> params = json.getInnerMap();
 
@@ -346,7 +346,7 @@ public class BusSettlementAdviceService implements BusConst {
             paymentDTO.setPayName(WebSessionUtil.getCurrentLoginUser().getName());
 
             // 请求参数
-            String jsonString = JSON.toJSONStringWithDateFormat(paymentDTO, JSON.DEFFAULT_DATE_FORMAT, new SerializerFeature[0]);
+            String jsonString = JSON.toJSONStringWithDateFormat(paymentDTO, JSON.DEFFAULT_DATE_FORMAT);
             JSONObject json = (JSONObject) JSONObject.parse(jsonString);
             Map<String, Object> params = json.getInnerMap();
 

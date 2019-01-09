@@ -33,9 +33,8 @@
 		</if>
 		<if test="driverIds != null and driverIds.size() > 0">
 			AND d.driver_id IN
-			<foreach collection="driverIds" open="(" close=")"
-				separator="," item="driverId">
-				#{driverId}
+			<foreach collection="driverIds" open="(" close=")" separator="," item="item">
+				#{item}
 			</foreach>
 		</if>
 		<if test="authOfCity != null and authOfCity.size() > 0">

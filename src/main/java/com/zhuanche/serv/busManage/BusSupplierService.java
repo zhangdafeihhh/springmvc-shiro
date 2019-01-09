@@ -1,7 +1,13 @@
 package com.zhuanche.serv.busManage;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
@@ -21,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
@@ -238,7 +243,7 @@ public class BusSupplierService implements BusConst {
 			url = orderPayUrl + Pay.SETTLE_SUPPLIER_INFO_UPDATE;
 		}
 		
-		String jsonString = JSON.toJSONStringWithDateFormat(commissionDTO, JSON.DEFFAULT_DATE_FORMAT, new SerializerFeature[0]);
+		String jsonString = JSON.toJSONStringWithDateFormat(commissionDTO, JSON.DEFFAULT_DATE_FORMAT);
 		JSONObject json = (JSONObject) JSONObject.parse(jsonString);
 		Map<String, Object> params = json.getInnerMap();
 		try {
@@ -284,7 +289,7 @@ public class BusSupplierService implements BusConst {
 				url = orderPayUrl + Pay.SETTLE_SUPPLIER_PRORATE_UPDATE;
 			}
 
-			String jsonString = JSON.toJSONStringWithDateFormat(prorate, JSON.DEFFAULT_DATE_FORMAT, new SerializerFeature[0]);
+			String jsonString = JSON.toJSONStringWithDateFormat(prorate, JSON.DEFFAULT_DATE_FORMAT);
 			JSONObject json = (JSONObject) JSONObject.parse(jsonString);
 			Map<String, Object> params = json.getInnerMap();
 			try {
@@ -331,7 +336,7 @@ public class BusSupplierService implements BusConst {
 				url = orderPayUrl + Pay.SETTLE_SUPPLIER_REBATE_UPDATE;
 			}
 			
-			String jsonString = JSON.toJSONStringWithDateFormat(rebate, JSON.DEFFAULT_DATE_FORMAT, new SerializerFeature[0]);
+			String jsonString = JSON.toJSONStringWithDateFormat(rebate, JSON.DEFFAULT_DATE_FORMAT);
 			JSONObject json = (JSONObject) JSONObject.parse(jsonString);
 			Map<String, Object> params = json.getInnerMap();
 			try {
