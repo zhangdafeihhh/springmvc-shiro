@@ -92,5 +92,11 @@ public class SupplierController {
         return supplierService.querySupplierById(supplierId);
     }
 
+    @RequestMapping("/checkSupplierFullName")
+    @ResponseBody
+    public AjaxResponse checkSupplierFullName(String supplierFullName){
+        return supplierService.checkSupplierFullName(supplierFullName);
+    }
+
 
 }

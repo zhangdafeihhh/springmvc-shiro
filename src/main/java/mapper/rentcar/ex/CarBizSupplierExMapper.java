@@ -35,4 +35,6 @@ public interface CarBizSupplierExMapper{
     int insertSelective(CarBizSupplierVo supplier);
 
 	int updateByPrimaryKeySelective(CarBizSupplierVo supplier);
+
+    int checkSupplierFullName(@Param("supplierName")String supplierName);
 }

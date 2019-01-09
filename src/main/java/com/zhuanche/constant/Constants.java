@@ -90,6 +90,8 @@ public final class Constants {
 	public static final String PAGE_NUM = "pageNum";
 	public static final String LIST = "list";
 	public static final int ZERO = 0;
+	public static final String SUPPLIER_NAME_AVAILABLE = "供应商名称可以使用";
+	public static final String SUPPLIER_NAME_EXIST = "供应商名称已存在";
 
 
 }

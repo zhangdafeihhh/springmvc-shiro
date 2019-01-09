@@ -412,4 +412,13 @@
         </set>
         where supplier_id = #{supplierId,jdbcType=INTEGER}
     </update>
+
+    <select id="checkSupplierFullName" resultType="integer">
+        select count(1)
+          from
+            car_biz_supplier
+          where
+            supplier_full_name = #{supplierName,jdbcType=VARCHAR}
+    </select>
+
 </mapper>

@@ -224,4 +224,12 @@ public class CarBizSupplierService{
 		}
 		return AjaxResponse.success(vo);
     }
+
+	public AjaxResponse checkSupplierFullName(String supplierName) {
+		int count = carBizSupplierExMapper.checkSupplierFullName(supplierName);
+		if (count > 0){
+			return AjaxResponse.failMsg(RestErrorCode.PARAMS_ERROR, Constants.SUPPLIER_NAME_EXIST);
+		}
+		return AjaxResponse.success(Constants.SUPPLIER_NAME_AVAILABLE);
+	}
 }
