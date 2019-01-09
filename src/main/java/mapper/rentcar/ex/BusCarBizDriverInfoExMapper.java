@@ -1,6 +1,7 @@
 package mapper.rentcar.ex;
 
 import java.util.List;
+import java.util.Map;
 
 import com.zhuanche.dto.busManage.BusDriverQueryDTO;
 import com.zhuanche.dto.busManage.BusDriverSaveDTO;
@@ -57,6 +58,8 @@ public interface BusCarBizDriverInfoExMapper {
 	 * @throws
 	 */
 	CarBizDriverInfo queryDriverSimpleInfoById(Integer driverId);
+
+	List<Map<String,Object>> queryDriverSimpleBatch(List<Integer> driverIds);
 
 
 }

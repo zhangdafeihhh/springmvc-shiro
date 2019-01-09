@@ -135,6 +135,8 @@ public interface BusConst {
 		String ORG_URL = "/api/v1/company/decide";
 		/**查询企业折扣信息*/
 		String ORG_COST_URL = "/business/queryBusinessInfo";
+		/**巴士支付信息*/
+		String PAY_LIST = "/pay/details/bus/list";
 	}
 
 	/**

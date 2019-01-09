@@ -1,5 +1,9 @@
 package mapper.rentcar.ex;
 
+import com.zhuanche.entity.rentcar.CarBizCustomer;
+
+import java.util.List;
+
 public interface CarBizCustomerExMapper {
 
 	/**
@@ -10,5 +14,7 @@ public interface CarBizCustomerExMapper {
 	 * @throws
 	 */
 	String selectCustomerNameById(Integer customerId);
+
+	List<CarBizCustomer> selectBatchCusName(List<Integer> ids);
 	
 }

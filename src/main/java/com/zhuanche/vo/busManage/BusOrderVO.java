@@ -2,7 +2,7 @@ package com.zhuanche.vo.busManage;
 
 import java.util.Date;
 
-public class BusOrderVO {
+public class BusOrderVO {    // carGroupName  riderCount  factDate   factStartAddr  factEndAddr  supplierName
 
 	// 订单id
 	private Integer orderId;
@@ -36,7 +36,6 @@ public class BusOrderVO {
 	private Date createDate;
 	// 城市id
 	private Integer cityId;
-	// 城市名称
 	private String cityName;
 	// 乘车人姓名
 	private String riderName;

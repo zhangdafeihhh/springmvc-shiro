@@ -7,5 +7,6 @@ import com.zhuanche.entity.mdbcarmanage.BusOrderOperationTime;
 public interface BusOrderOperationTimeExMapper {
 
 	List<BusOrderOperationTime> queryOperationByOrderId(Integer orderId);
-	
+
+	List<BusOrderOperationTime> selectOperByNos(List<String> orderNos);
 }

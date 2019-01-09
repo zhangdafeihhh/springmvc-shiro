@@ -68,4 +68,17 @@
 			customer_id = #{customerId}
 	</select>
 
+	<select id="selectBatchCusName" resultType="com.zhuanche.entity.rentcar.CarBizCustomer" parameterType="java.util.List">
+		SELECT
+		    customer_id AS customerId,
+			`name`
+		FROM
+			car_biz_customer
+		WHERE
+			customer_id IN
+			<foreach collection="list" item="item" close=")" open="(" separator=",">
+				#{item}
+			</foreach>
+	</select>
+
 </mapper>

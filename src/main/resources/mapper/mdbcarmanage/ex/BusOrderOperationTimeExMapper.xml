@@ -37,5 +37,22 @@
         from bus_order_operation_time
         where order_id = #{orderId}
     </select>
+	<select id="selectOperByNos" parameterType="java.util.List" resultMap="BaseResultMap">
+		SELECT
+		id,
+		order_no,
+		time,
+		type
+		FROM
+		bus_order_operation_time
+		WHERE
+		STATUS = 1
+		AND order_no IN
+      <foreach collection = "list" item = "orderNo" open = "(" close = ")" separator = "," >
+		  #{orderNo}
+	  </foreach>
+	</select>
+	
+	
 
 </mapper>

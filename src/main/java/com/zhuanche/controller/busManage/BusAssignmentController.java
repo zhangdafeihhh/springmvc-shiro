@@ -1,5 +1,9 @@
 package com.zhuanche.controller.busManage;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -7,7 +11,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSONArray;
+import com.zhuanche.constants.busManage.BusConstant;
+import com.zhuanche.entity.rentcar.CarBizCity;
+import com.zhuanche.serv.busManage.BusCommonService;
+import com.zhuanche.util.excel.CsvUtils;
+import com.zhuanche.vo.busManage.WithDrawDetailRecordVO;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -53,6 +64,9 @@ import mapper.mdbcarmanage.ex.BusOrderOperationTimeExMapper;
 import mapper.rentcar.CarBizDriverInfoMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 @Controller("busAssignmentController")
 @RequestMapping(value = "/busAssignment")
 public class BusAssignmentController {
@@ -79,6 +93,8 @@ public class BusAssignmentController {
 
     @Autowired
     private BusOrderService busOrderService;
+    @Autowired
+    private BusCommonService commonService;
 
     public interface OrderOperation {
         /**
@@ -113,6 +129,110 @@ public class BusAssignmentController {
         }
         return AjaxResponse.success(pageDTO);
     }
+
+    @RequestMapping(value = "/exportOrder")
+    public void exportExcel(BusOrderDTO params, HttpServletRequest request, HttpServletResponse response) throws Exception{
+
+        long start = System.currentTimeMillis();
+        logger.info("[ BusAssignmentController-exportExcel ]" + "导出订单列表参数=" + JSON.toJSONString(params));
+        CsvUtils utilEntity = new CsvUtils();
+        //构建文件名称
+        String fileName = BusConstant.buidFileName(request, "订单明细");
+        //构建文件标题
+        List<String> headerList = new ArrayList<>();
+        String head = StringUtils.join(BusConstant.Order.ORDER_HEAD, ",");
+        headerList.add(head);
+
+        Integer pageNum = 0;
+        params.setPageSize(500);
+        boolean isFirst = true;
+        boolean isList = false;
+        //查询所有的巴士车型类别，减少访问数据库的次数
+        List<Map<Object, Object>> maps = commonService.queryGroups();
+        Map<Integer, String> groupMap = new HashMap<>(16);
+        maps.forEach(o -> {
+            groupMap.put(Integer.parseInt(String.valueOf(o.get("groupId"))), String.valueOf(o.get("groupName")));
+        });
+        do {
+            pageNum++;
+            PageDTO pageDTO = busAssignmentService.buidExportData(params,groupMap);
+            long total = pageDTO.getTotal();
+            List result = pageDTO.getResult();
+            int pages = pageDTO.getPages();
+            if (total == 0||result==null||result.isEmpty()) {
+                List<String> csvDataList = new ArrayList<>();
+                csvDataList.add("没有符合条件的数据");
+                isList = true;
+                utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, isFirst, isList);
+                break;
+            }
+            if (pageNum != 1) {
+                isFirst = false;
+            }
+            if (pageNum.equals(pages)) {
+                isList = true;
+            }
+            List<String> csvData = new ArrayList<>();
+            result.forEach(o->{
+                String s = FieldValueToString(o);
+                csvData.add(s);
+            });
+            utilEntity.exportCsvV2(response, csvData, headerList, fileName, isFirst, isList);
+            // isList=true时表示时之后一页停止循环
+        } while (!isList);
+        logger.info("[ BusAssignmentController-exportExcel ]" + "导出订单数据=" + JSON.toJSONString(params) + " 消耗时间=" + (System.currentTimeMillis() - start));
+    }
+
+    /**
+     * 将bean中的所有属性，按照顺序组成字符串，以便导出csv格式的文件
+     * @param t
+     * @return
+     */
+    private  String FieldValueToString(Object t) {
+        StringBuffer sb = new StringBuffer();
+        String tab="\t";
+        String split=",";
+        //利用反射，根据javabean属性的先后顺序，动态调用getXxx()方法得到属性值
+        Field[] fields = t.getClass().getDeclaredFields();
+        try {
+            for (short i = 0; i < fields.length; i++) {
+                Field field = fields[i];
+                String fieldName = field.getName();
+                String getMethodName = "get"
+                        + fieldName.substring(0, 1).toUpperCase()
+                        + fieldName.substring(1);
+                Class tCls = t.getClass();
+                Method getMethod = tCls.getMethod(getMethodName, new Class[]{});
+                Object value = getMethod.invoke(t, new Object[]{});
+                //判断值的类型后进行强制类型转换
+                String textValue = null;
+
+                if (value instanceof Date) {
+                    Date value1 = (Date) value;
+                    SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    textValue = sf.format(value1);
+
+                } else {
+                    //其它数据类型都当作字符串简单处理
+                    if (value != null&&!value.toString().equals("null")) {
+                        textValue = value.toString();
+                    } else {
+                        textValue = StringUtils.EMPTY;
+                    }
+                }
+                sb.append(tab).append(textValue).append(split);
+            }
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return sb.length()==0?StringUtils.EMPTY:sb.substring(0,sb.length()-1);
+    }
+
+
 
     /**
      * 根据订单号获取当前可指派的车辆数据
