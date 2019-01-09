@@ -179,6 +179,9 @@
 				#{item}
 			</foreach>
 		</if>
+		<if test="groupIdSel !=null">
+			and (g.group_id = #{groupIdSel} or gop.group_id =#{groupIdSel})
+		</if>
 		<if test="seatNum != null">
 			and (g.seat_num >= #{seatNum} or gop.seat_num >=#{seatNum})
 		</if>

@@ -15,7 +15,7 @@ public class BusDriverDTO extends BaseDTO {
 
 	// 订单号
 	private String orderNo;
-	// 车型类别ID
+	// 车型类别ID（预定车型类别）
 	private Integer groupId;
 	// 城市ID
 	private Integer cityId;
@@ -27,6 +27,8 @@ public class BusDriverDTO extends BaseDTO {
 	private String phone;
 	// 业务类型
 	private Integer type;
+	/** 车型类别 （查询条件）**/
+	private Integer groupIdSel;
 
 	public String getOrderNo() {
 		return orderNo;
@@ -88,4 +90,11 @@ public class BusDriverDTO extends BaseDTO {
 		super.pageSize = pageSize == null ? 20 : pageSize;
 	}
 
+	public Integer getGroupIdSel() {
+		return groupIdSel;
+	}
+
+	public void setGroupIdSel(Integer groupIdSel) {
+		this.groupIdSel = groupIdSel;
+	}
 }

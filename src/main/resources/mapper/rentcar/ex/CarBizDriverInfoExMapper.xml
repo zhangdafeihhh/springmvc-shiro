@@ -1774,6 +1774,9 @@
 		<if test="phone != null and phone != ''">
 			and i.phone LIKE CONCAT('%',#{phone},'%')
 		</if>
+       <if test="groupIdSel !=null">
+        and g.group_id = #{groupIdSel}
+       </if>
 		<if test="seatNum != null">
 			and g.seat_num >= #{seatNum}
 		</if>

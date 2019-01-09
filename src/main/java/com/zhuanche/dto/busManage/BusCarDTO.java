@@ -15,7 +15,7 @@ public class BusCarDTO extends BaseDTO {
 
 	/** 订单号 **/
 	private String orderNo;
-	/** 车型类别ID **/
+	/** 车型类别ID （预定车型类别）**/
 	private Integer groupId;
 	/** 城市ID **/
 	private Integer cityId;
@@ -23,6 +23,8 @@ public class BusCarDTO extends BaseDTO {
 	private Integer supplierId;
 	/** 车牌号 **/
 	private String licensePlates;
+	/**车型类别ID（页面筛选条件）*/
+	private Integer groupIdSel;
 	/** 业务类型 **/
 	private Integer type;
 
@@ -78,4 +80,12 @@ public class BusCarDTO extends BaseDTO {
 		super.pageSize = pageSize == null ? 20 : pageSize;
 	}
 
+
+	public Integer getGroupIdSel() {
+		return groupIdSel;
+	}
+
+	public void setGroupIdSel(Integer groupIdSel) {
+		this.groupIdSel = groupIdSel;
+	}
 }

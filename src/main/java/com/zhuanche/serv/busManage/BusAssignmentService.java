@@ -251,7 +251,10 @@ public class BusAssignmentService {
         orderList.forEach(order -> {
             orderIdList.add(String.valueOf(order.getOrderId()));
             orderNoList.add(order.getOrderNo());
-            phoneList.add(order.getBookingUserPhone());
+            String bookingUserPhone = order.getBookingUserPhone();
+            if(bookingUserPhone!=null){
+                phoneList.add(bookingUserPhone);
+            }
             //收集司机ID
             Integer driverId = order.getDriverId();
             if(driverId!=null){
@@ -265,20 +268,21 @@ public class BusAssignmentService {
 
         });
         //批量查询司机信息和供应商名称
-        Map<Integer,Map<String,Object>> driverInfoMap=new HashMap(16);
         List<Map<String, Object>> driverInfos = busCarBizDriverInfoExMapper.queryDriverSimpleBatch(driverIds);
+        Map<Integer,Map<String,Object>> driverInfoMap=new HashMap(driverInfos.size());
         driverInfos.forEach(o->{
             driverInfoMap.put(Integer.parseInt(o.get("driverId").toString()),o);
         });
 
         //批量查询预定人名称
-        Map<Integer,String> userNames = new HashMap<>(16);
         List<CarBizCustomer> carBizCustomers = customerExMapper.selectBatchCusName(userIds);
+        Map<Integer,String> userNames = new HashMap<>(carBizCustomers.size());
         carBizCustomers.forEach(o->{userNames.put(o.getCustomerId(),o.getName());});
 
         //批量调用计费接口
-        Map<String, BusCostDetail> orderCostMap = new HashMap(16);
+
         String orderNos = StringUtils.join(orderNoList, ",");
+        Map<String, BusCostDetail> orderCostMap = new HashMap(16);
         JSONArray busCostList = this.getBusCostDetailList(orderNos);
         if (busCostList != null && !busCostList.isEmpty()) {
             busCostList.stream().map(o -> JSONObject.toJavaObject((JSONObject) o, BusCostDetail.class))
