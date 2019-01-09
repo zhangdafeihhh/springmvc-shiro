@@ -54,7 +54,7 @@ public class CarBizSupplierService{
 		return carBizSupplierExMapper.findByIdSet(supplierIdSet);
     }
 
-	CarBizSupplier queryQianLiYanSupplierByCityId(CarBizSupplier carBizSupplier){
+	public CarBizSupplier queryQianLiYanSupplierByCityId(CarBizSupplier carBizSupplier){
 		return carBizSupplierExMapper.queryQianLiYanSupplierByCityId(carBizSupplier);
 	}
 }
