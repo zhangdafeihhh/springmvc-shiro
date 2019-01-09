@@ -42,7 +42,13 @@ public class DriverEvaluateController{
 	 
 	 @Value("${bigdata.saas.data.url}")
 	 String  saasBigdataApiUrl;
-	 
+
+	 @Value("${driver.evaluate.query.url}")
+	 String evaluateQueryUrl;
+
+	 @Value("${driver.evaluate.export.url}")
+	 String evaluateExportUrl;
+
 	 @Autowired
 	 private StatisticalAnalysisService statisticalAnalysisService;
 		 /**
@@ -105,7 +111,7 @@ public class DriverEvaluateController{
 	        if(null != pageSize && pageSize > 0)
 	        	paramMap.put("pageSize", pageSize);//每页记录数
 	        // 从大数据仓库获取统计数据
-	        AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/driverEvaluateDetail/queryList",paramMap);
+	        AjaxResponse result = statisticalAnalysisService.parseResults(evaluateQueryUrl,paramMap);
 	        return result;
 	    }
 	    
@@ -167,7 +173,7 @@ public class DriverEvaluateController{
 		   statisticalAnalysisService.exportCsvFromToPage(
 				response,
 				jsonString,
-				saasBigdataApiUrl+"/driverEvaluateDetail/download" ,
+			    evaluateExportUrl ,
 				new String("对司机评级详情分析".getBytes("gb2312"), "iso8859-1"),
 				request.getRealPath("/")+File.separator+"template"+File.separator+"driverEvaluate_info.csv");
       } catch (Exception e) {

@@ -802,7 +802,7 @@ public class CarBizDriverInfoService {
             //TODO 调用订单接口查询激活时间
             Map<String, Object> params = new HashMap<>();
             params.put("driverId", carBizDriverInfo.getDriverId());
-            com.alibaba.fastjson.JSONObject resultJson = MpOkHttpUtil.okHttpGetBackJson(orderStatisticsUrl, params, 1, driverInfo);
+            com.alibaba.fastjson.JSONObject resultJson = MpOkHttpUtil.okHttpGetBackJson(orderStatisticsUrl, params, 1, Constants.DRIVER_INFO_TAG);
             if (resultJson != null && Constants.SUCCESS_CODE == resultJson.getInteger(Constants.CODE)){
                 com.alibaba.fastjson.JSONObject data = resultJson.getJSONObject(Constants.DATA);
                 if (data != null){
@@ -818,7 +818,7 @@ public class CarBizDriverInfoService {
                         }catch (Exception e){
                             logger.error("签名错误");
                         }
-                        com.alibaba.fastjson.JSONObject result = MpOkHttpUtil.okHttpGetBackJson(url, params, 1, driverInfo);
+                        com.alibaba.fastjson.JSONObject result = MpOkHttpUtil.okHttpGetBackJson(url, params, 1, Constants.DRIVER_INFO_TAG);
                         if (result != null && Constants.SUCCESS_CODE == result.getInteger(Constants.CODE)){
                             carBizDriverInfo.setActiveDate(result.getJSONArray(Constants.DATA).getJSONObject(0).getString("updateDate"));
                         }
