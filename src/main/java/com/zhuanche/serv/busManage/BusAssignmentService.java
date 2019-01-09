@@ -230,7 +230,6 @@ public class BusAssignmentService {
         return new PageDTO();
     }
 
-    @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
     public PageDTO buidExportData(BusOrderDTO params,Map<Integer, String> groupMap,boolean permission) {
         JSONObject result = queryOrderData(params);
         if (result == null) {

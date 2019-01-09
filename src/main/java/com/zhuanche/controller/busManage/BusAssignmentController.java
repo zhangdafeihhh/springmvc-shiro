@@ -131,8 +131,9 @@ public class BusAssignmentController {
         }
         return AjaxResponse.success(pageDTO);
     }
-
     @RequestMapping(value = "/exportOrder")
+    @MasterSlaveConfigs(configs={ @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE) ,
+            @MasterSlaveConfig (databaseTag = "mdbcarmanage-DataSource",mode = DataSourceMode.SLAVE)})
     public void exportExcel(BusOrderDTO params, HttpServletRequest request, HttpServletResponse response) throws Exception{
 
         long start = System.currentTimeMillis();
