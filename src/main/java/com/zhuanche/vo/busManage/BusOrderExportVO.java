@@ -200,6 +200,12 @@ public class BusOrderExportVO implements Serializable {
     private String reassingTime;
 
     /**
+     * 评分
+     * @return
+     */
+    private String evaluateScore;
+
+    /**
      * 企业名称
      */
     private String businessName;
@@ -212,11 +218,6 @@ public class BusOrderExportVO implements Serializable {
      */
     private String percent;
 
-    /**
-     * 评分
-     * @return
-     */
-    private String evaluateScore;
 
     public String getOrderId() {
         return orderId;

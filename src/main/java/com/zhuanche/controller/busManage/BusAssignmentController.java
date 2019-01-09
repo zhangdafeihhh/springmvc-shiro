@@ -11,14 +11,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import com.alibaba.fastjson.JSONArray;
 import com.zhuanche.constants.busManage.BusConstant;
-import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.serv.busManage.BusCommonService;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.excel.CsvUtils;
-import com.zhuanche.vo.busManage.WithDrawDetailRecordVO;
+import mapper.mdbcarmanage.ex.SaasRolePermissionRalationExMapper;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -96,6 +95,9 @@ public class BusAssignmentController {
     @Autowired
     private BusCommonService commonService;
 
+    @Autowired
+    private SaasRolePermissionRalationExMapper saasRolePermissionRalationExMapper;
+
     public interface OrderOperation {
         /**
          * 状态 1操作成功 2操作失败
@@ -135,12 +137,22 @@ public class BusAssignmentController {
 
         long start = System.currentTimeMillis();
         logger.info("[ BusAssignmentController-exportExcel ]" + "导出订单列表参数=" + JSON.toJSONString(params));
+        SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+        List<String> strings = saasRolePermissionRalationExMapper.queryRoleNameList(currentLoginUser.getId());
+        boolean roleBoolean = strings.contains("巴士运营");
+        String[] headArray = null;
+        if(roleBoolean){
+            headArray=BusConstant.Order.ORDER_HEAD;
+        }else{
+            headArray = new String[BusConstant.Order.ORDER_HEAD.length-3];//无权导出企业信息
+            System.arraycopy(BusConstant.Order.ORDER_HEAD,0,headArray,0,BusConstant.Order.ORDER_HEAD.length-3);
+        }
         CsvUtils utilEntity = new CsvUtils();
         //构建文件名称
         String fileName = BusConstant.buidFileName(request, "订单明细");
         //构建文件标题
         List<String> headerList = new ArrayList<>();
-        String head = StringUtils.join(BusConstant.Order.ORDER_HEAD, ",");
+        String head = StringUtils.join(headArray, ",");
         headerList.add(head);
 
         Integer pageNum = 0;
@@ -155,7 +167,7 @@ public class BusAssignmentController {
         });
         do {
             pageNum++;
-            PageDTO pageDTO = busAssignmentService.buidExportData(params,groupMap);
+            PageDTO pageDTO = busAssignmentService.buidExportData(params,groupMap,roleBoolean);
             long total = pageDTO.getTotal();
             List result = pageDTO.getResult();
             int pages = pageDTO.getPages();
@@ -174,7 +186,7 @@ public class BusAssignmentController {
             }
             List<String> csvData = new ArrayList<>();
             result.forEach(o->{
-                String s = FieldValueToString(o);
+                String s = this.fieldValueToString(o);
                 csvData.add(s);
             });
             utilEntity.exportCsvV2(response, csvData, headerList, fileName, isFirst, isList);
@@ -188,7 +200,7 @@ public class BusAssignmentController {
      * @param t
      * @return
      */
-    private  String FieldValueToString(Object t) {
+    private  String fieldValueToString(Object t) {
         StringBuffer sb = new StringBuffer();
         String tab="\t";
         String split=",";

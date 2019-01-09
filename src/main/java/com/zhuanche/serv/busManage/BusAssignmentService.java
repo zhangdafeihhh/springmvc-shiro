@@ -231,7 +231,7 @@ public class BusAssignmentService {
     }
 
     @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
-    public PageDTO buidExportData(BusOrderDTO params,Map<Integer, String> groupMap) {
+    public PageDTO buidExportData(BusOrderDTO params,Map<Integer, String> groupMap,boolean permission) {
         JSONObject result = queryOrderData(params);
         if (result == null) {
             return new PageDTO();
@@ -317,39 +317,41 @@ public class BusAssignmentService {
         });
 
         // 企业信息
-        Map<String, Integer> phone2CompanyId = new HashMap<>(16);//存储对应关系 phone-id
-        Map<Integer, OrgCostInfo> companyId2Cost = new HashMap<>(16);//id-cost
-        Map<String, OrgCostInfo> phone2Cost = new HashMap<>(16);//phone-cost对应关系
-        //分页查询调用机构和支付
-        int orgTotal = phoneList.size();
-        int orgPage = orgTotal % 200 == 0 ? orgTotal / 200 : orgTotal / 200 + 1;
-        for (int i = 0; i < orgPage; i++) {
-            int start = i * 200;
-            int end = orgTotal > start + 200 ? start + 200 : orgTotal;
-            String phonesJoin = StringUtils.join(phoneList.subList(start, end), ",");
-            JSONArray array=this.queryCompanyByPhone(phonesJoin);
-            if (array != null && !array.isEmpty()) {
-                String companyIds = array.stream().map(o -> {
-                    JSONObject org = (JSONObject) o;
-                    String phone = org.getString("phone");
-                    Integer companyId = org.getInteger("companyId");
-                    phone2CompanyId.put(phone, companyId);
-                    return String.valueOf(companyId);
-                }).collect(Collectors.joining(","));
-                //查询企业折扣信息
-                JSONArray orgCosts = queryBusinessInfoBatch(companyIds);
-                orgCosts.stream().map(orgCost -> JSONObject.toJavaObject((JSONObject) orgCost, OrgCostInfo.class)).forEach(o -> {
-                    companyId2Cost.put(o.getBusinessId(), o);
-                });
+        Map<String, OrgCostInfo> phone2Cost=new HashMap<>(16);
+        if(permission){
+            Map<String, Integer> phone2CompanyId = new HashMap<>(16);//存储对应关系 phone-id
+            Map<Integer, OrgCostInfo> companyId2Cost = new HashMap<>(16);//id-cost
+            //分页查询调用机构和支付
+            int orgTotal = phoneList.size();
+            int orgPage = orgTotal % 200 == 0 ? orgTotal / 200 : orgTotal / 200 + 1;
+            for (int i = 0; i < orgPage; i++) {
+                int start = i * 200;
+                int end = orgTotal > start + 200 ? start + 200 : orgTotal;
+                String phonesJoin = StringUtils.join(phoneList.subList(start, end), ",");
+                JSONArray array=this.queryCompanyByPhone(phonesJoin);
+                if (array != null && !array.isEmpty()) {
+                    String companyIds = array.stream().map(o -> {
+                        JSONObject org = (JSONObject) o;
+                        String phone = org.getString("phone");
+                        Integer companyId = org.getInteger("companyId");
+                        phone2CompanyId.put(phone, companyId);
+                        return String.valueOf(companyId);
+                    }).collect(Collectors.joining(","));
+                    //查询企业折扣信息
+                    JSONArray orgCosts = queryBusinessInfoBatch(companyIds);
+                    orgCosts.stream().map(orgCost -> JSONObject.toJavaObject((JSONObject) orgCost, OrgCostInfo.class)).forEach(o -> {
+                        companyId2Cost.put(o.getBusinessId(), o);
+                    });
+                }
             }
+            //处理企业信息结果
+            phone2CompanyId.forEach((phone, companyId) -> {
+                OrgCostInfo orgCostInfo = companyId2Cost.get(companyId);
+                if (orgCostInfo != null) {
+                    phone2Cost.put(phone, orgCostInfo);
+                }
+            });
         }
-        //处理企业信息结果
-        phone2CompanyId.forEach((phone, companyId) -> {
-            OrgCostInfo orgCostInfo = companyId2Cost.get(companyId);
-            if (orgCostInfo != null) {
-                phone2Cost.put(phone, orgCostInfo);
-            }
-        });
         List<BusOrderExportVO> export = buidOrderOperExportVO(orderList, orderCostMap, orderPayMap,
                 assignMap, reassigMap, phone2Cost, groupMap,driverInfoMap,userNames,appraisalMap);
         PageDTO page = new PageDTO(params.getPageNum(), params.getPageSize(), total, export);
