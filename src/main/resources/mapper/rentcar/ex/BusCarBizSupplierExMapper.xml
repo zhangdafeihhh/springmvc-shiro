@@ -191,22 +191,19 @@
 		</if>
 		<if test="commissionIds != null and commissionIds.size() > 0">
 			AND s.supplier_id IN 
-			<foreach collection="commissionIds" item="item" open="("
-				separator="," close=")">
+			<foreach collection="commissionIds" item="item" open="(" separator="," close=")">
 				#{item}
 			</foreach>
 		</if>
 		<if test="contractIds != null and contractIds.size() > 0">
 			AND s.supplier_id IN 
-			<foreach collection="contractIds" item="item" open="("
-				separator="," close=")">
+			<foreach collection="contractIds" item="item" open="(" separator="," close=")">
 				#{item}
 			</foreach>
 		</if>
 		<if test="excludeContractIds != null and excludeContractIds.size() > 0">
 			AND s.supplier_id NOT IN 
-			<foreach collection="excludeContractIds" item="item" open="("
-				separator="," close=")">
+			<foreach collection="excludeContractIds" item="item" open="(" separator="," close=")">
 				#{item}
 			</foreach>
 		</if>
