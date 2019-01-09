@@ -138,4 +138,17 @@
 		WHERE
 			t.supplier_id = #{supplierId}
 	</select>
+
+    <select id="queryQianLiYanSupplierByCityId"  parameterType="com.zhuanche.entity.rentcar.CarBizSupplier"  resultType="com.zhuanche.entity.rentcar.CarBizSupplier">
+        select
+        <include refid="Base_Column_List" />
+        ,
+        <include refid="Blob_Column_List" />
+        from
+        car_biz_supplier
+        where
+        supplier_city #{supplierCity}
+        and status = 1
+        and supplier_num = #{supplierNum}
+    </select>
 </mapper>

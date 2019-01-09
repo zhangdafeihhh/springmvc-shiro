@@ -3604,7 +3604,11 @@ public class CarBizDriverInfoService {
             if(null == carBizDriverInfoDTO){
                 List driverList = new ArrayList();
                 CarBizDriverInfo carBizDriverInfo = new CarBizDriverInfo();
-                CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(telescopeSupplierId);
+//                CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(telescopeSupplierId);
+                CarBizSupplier param = new CarBizSupplier();
+                param.setSupplierNum("qianliyan");
+                param.setSupplierCity(Integer.valueOf(user.getCities().split(",")[0]));
+                CarBizSupplier carBizSupplier = carBizSupplierService.queryQianLiYanSupplierByCityId(param);
                 carBizDriverInfo.setServiceCity(carBizSupplier.getSupplierCity());
                 carBizDriverInfo.setSupplierId(carBizSupplier.getSupplierId());
                 carBizDriverInfo.setCooperationType(Byte.valueOf(carBizSupplier.getCooperationType().toString()));

@@ -27,4 +27,6 @@ public interface CarBizSupplierExMapper{
 	List<Map<String, Object>> getSupplierList(@Param("supplierIds") Set<String> supplierIds);
 	/** 根据供应商ID查询其调度员电话 **/
 	String queryDispatcherPhoneBySupplierId(@Param("supplierId") Integer supplierId);
+
+	CarBizSupplier queryQianLiYanSupplierByCityId(CarBizSupplier carBizSupplier);
 }
