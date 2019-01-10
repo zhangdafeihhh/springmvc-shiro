@@ -155,7 +155,7 @@ public class DriverInfoUpdateApplyController {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = "/saveDriverInfoUpdateApply",method = RequestMethod.POST)
+    @RequestMapping(value = "/saveDriverInfoUpdateApply")
     @MasterSlaveConfigs(configs={
             @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
     } )
