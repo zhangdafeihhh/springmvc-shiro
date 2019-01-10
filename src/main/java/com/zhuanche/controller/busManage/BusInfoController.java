@@ -694,7 +694,7 @@ public class BusInfoController {
                 break;
             } else {
                 String stringValue = cell.getStringCellValue();
-                if (!stringValue.contains(head[colIdx])) {
+                if (!stringValue.equals(head[colIdx])) {
                     templateFlag = false;
                     break;
                 }

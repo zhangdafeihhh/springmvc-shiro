@@ -442,9 +442,22 @@ public class BusDriverInfoController extends BusBaseController {
 		downdata.add(genders);
 		downdata.add(groupNames);
 		downdata.add(drivingLicenseTypes);
-		//表示生成的下拉框在第三列和第五列
+		//下拉框位置
 		String[] downRows={"3","4","8"};
-		ExportExcelUtil.exportExcel(fileName, BusConstant.DriverContant.TEMPLATE_HEAD, downdata, downRows, request, response);
+		String[] heads=null;
+		//判断是否是运营角色
+		boolean roleBoolean = commonService.ifOperate();
+		if(roleBoolean){
+			heads=BusConstant.DriverContant.TEMPLATE_HEAD;
+		}else{
+			//非运营角色下载的模板不包括城市和供应商
+			heads=new String[BusConstant.DriverContant.TEMPLATE_HEAD.length-2];
+			System.arraycopy(BusConstant.DriverContant.TEMPLATE_HEAD,2,heads,0, BusConstant.DriverContant.TEMPLATE_HEAD.length-2);
+			downRows[0]="1";
+			downRows[1]="2";
+			downRows[2]="6";
+		}
+		ExportExcelUtil.exportExcel(fileName, heads, downdata, downRows, request, response);
 	}
 	
     /**

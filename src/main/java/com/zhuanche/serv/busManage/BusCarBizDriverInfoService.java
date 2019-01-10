@@ -185,7 +185,8 @@ public class BusCarBizDriverInfoService implements BusConst {
     // ===============================巴士其它服务===================================
     @Autowired
     private BusDriverMongoService busDriverMongoService;
-
+    @Autowired
+    private BusCommonService commonService;
     /**
      * @param queryDTO
      * @return List<BusDriverInfoVO>
@@ -978,18 +979,29 @@ public class BusCarBizDriverInfoService implements BusConst {
             if (headRow == null) {
                 return AjaxResponse.failMsg(RestErrorCode.FILE_TRMPLATE_ERROR, "导入文件列表缺少表头字段");
             }
-
+            String[] heads=null;
+            //判断是否是运营角色
+            boolean roleBoolean = commonService.ifOperate();
+            if(roleBoolean){
+                heads=BusConstant.DriverContant.TEMPLATE_HEAD;
+            }else{
+                //非运营角色下载的模板不包括城市和供应商
+                heads=new String[BusConstant.DriverContant.TEMPLATE_HEAD.length-2];
+                System.arraycopy(BusConstant.DriverContant.TEMPLATE_HEAD,2,heads,0, BusConstant.DriverContant.TEMPLATE_HEAD.length-2);
+            }
+            short lastCellNum = headRow.getLastCellNum();
+            if(lastCellNum!=heads.length){
+                return AjaxResponse.failMsg(RestErrorCode.FILE_TRMPLATE_ERROR, "模板错误");
+            }
             // 判断模板列是否缺少
-            String[] templetFields = BusConstant.DriverContant.TEMPLATE_HEAD;
-            for (int colIndex = 0; colIndex < templetFields.length; colIndex++) {
-                String field = templetFields[colIndex];
+            for (int colIndex = 0; colIndex < heads.length; colIndex++) {
+                String field = heads[colIndex];
                 Cell cell = headRow.getCell(colIndex);// 获取列对象
                 String cellValue = getCellValue(cell, evaluator);// 获取单元格值
-                if (cell == null || cellValue == null || !field.contains(cellValue)) {
+                if (cell == null || cellValue == null || !field.equals(cellValue)) {
                     return AjaxResponse.failMsg(RestErrorCode.FILE_TRMPLATE_ERROR, "模板缺少【" + field + "】列");
                 }
             }
-
             // 处理导入数据
             int startIndex = 1;// 过滤掉标题，从第一行开始导入数据
             int endIndex = sheet.getLastRowNum(); // 要导入数据的总条数
@@ -1003,17 +1015,15 @@ public class BusCarBizDriverInfoService implements BusConst {
                     continue;
                 }
                 count++;
-
                 // 数据封装对象
                 BusDriverSaveDTO saveDTO = new BusDriverSaveDTO();
                 boolean isTrue = true;// 标识是否为有效数据
                 StringBuffer rePhone = new StringBuffer();//手机号
                 StringBuffer reIdCarNo = new StringBuffer(); //身份证号
-
                 // 司机导入模板总共11列
-                for (int colIndex = 0; colIndex < templetFields.length; colIndex++) {
+                for (int colIndex = 0; colIndex < heads.length; colIndex++) {
                     // 错误信息前缀
-                    String headerText = templetFields[colIndex];
+                    String headerText = heads[colIndex];
                     String errorPrefix = "第" + (rowIndex + 1) + "行数据，第" + (colIndex + 1) + "列 【" + headerText + "】:";
 
                     // 获取某列单元格对象
@@ -1024,27 +1034,25 @@ public class BusCarBizDriverInfoService implements BusConst {
                         isTrue = false;
                         continue;
                     }
-                    switch (colIndex) {
-                        case 0:
+                    switch (headerText) {
+                        case "城市(必填)":
                             String cname = StringUtils.deleteWhitespace(cellValue);
                             if (!cityName.equals(cname)) {
                                 errorMsgs.add(errorPrefix + "城市名称和页面选择的不一致");
                                 isTrue = false;
                                 break;
                             }
-                            saveDTO.setServiceCity(cityId);
                             break;
-                        case 1:
+                        case "供应商(必填)":
                             String supName = StringUtils.deleteWhitespace(cellValue);
                             if (!supplierName.equals(supName)) {
                                 errorMsgs.add(errorPrefix + "供应商名称和页面选择的不一致");
                                 isTrue = false;
                                 break;
                             }
-                            saveDTO.setSupplierId(supplierId);
                             break;
                         // 司机姓名
-                        case 2:
+                        case "司机姓名(必填)":
                             String name = StringUtils.deleteWhitespace(cellValue);
                             if (name.length() > 20) {
                                 errorMsgs.add(errorPrefix + "司机姓名长度不能超过20");
@@ -1054,7 +1062,7 @@ public class BusCarBizDriverInfoService implements BusConst {
                             }
                             break;
                         // 性别
-                        case 3:
+                        case "性别(必填)":
                             String gender = StringUtils.deleteWhitespace(cellValue);
                             if ("男".equals(gender)) {
                                 saveDTO.setGender(1);
@@ -1066,7 +1074,7 @@ public class BusCarBizDriverInfoService implements BusConst {
                             }
                             break;
                         // 车型类别（巴士xx座）
-                        case 4:
+                        case "车型类别(必填)":
                             String groupName = StringUtils.deleteWhitespace(cellValue);
                             CarBizCarGroup carBizCarGroup = carBizCarGroupExMapper.queryGroupByGroupName(groupName);
                             if (carBizCarGroup == null) {
@@ -1077,7 +1085,7 @@ public class BusCarBizDriverInfoService implements BusConst {
                             }
                             break;
                         // 司机身份证号
-                        case 5:
+                        case "司机身份证号(必填)":
                             String idCardNo = StringUtils.deleteWhitespace(cellValue);
                             if (idCardNo.length() > 18) {
                                 errorMsgs.add(errorPrefix + "身份证号长度不能超过18");
@@ -1106,14 +1114,13 @@ public class BusCarBizDriverInfoService implements BusConst {
                             }
                             break;
                         // 驾驶员手机
-                        case 6:
+                        case "司机手机号(必填)":
                             String phone = StringUtils.deleteWhitespace(cellValue);
                             if (rePhone.indexOf(phone) > 0) {
                                 errorMsgs.add(errorPrefix + "表中有重复的驾驶员手机号——" + phone);
                                 isTrue = false;
                                 break;
                             }
-
                             rePhone.append(phone);
                             if (StringUtils.isEmpty(phone) || !ValidateUtils.validatePhone(phone)) {
                                 errorMsgs.add(errorPrefix + "不合法");
@@ -1126,7 +1133,7 @@ public class BusCarBizDriverInfoService implements BusConst {
                             }
                             break;
                         // 出生日期
-                        case 7:
+                        case "出生日期(必填 年龄：21-60)":
                             try {
                                 String data = transfTime(cellValue);
                                 LocalDate localDate = LocalDate.parse(data, DateTimeFormatter.ofPattern("yyyy-M-d"));
@@ -1138,14 +1145,14 @@ public class BusCarBizDriverInfoService implements BusConst {
                             }
                             break;
                         // 驾照类型
-                        case 8:
+                        case "驾照类型(必填)":
                             String drivingLicenseType = StringUtils.deleteWhitespace(cellValue);
                             boolean isMatch = Arrays.stream(DRIVING_LICENSE_TYPES).anyMatch(type -> type.equals(drivingLicenseType));
                             String initDrivingLicenseType = isMatch ? drivingLicenseType : "C1";
                             saveDTO.setDrivingLicenseType(initDrivingLicenseType);
                             break;
                         // 驾驶证号
-                        case 9:
+                        case "驾驶证号(必填)":
                             String driverLicenseNumber = StringUtils.deleteWhitespace(cellValue);
                             if (driverLicenseNumber.length() > 30) {
                                 errorMsgs.add(errorPrefix + "驾驶证号长度不能超过30");
@@ -1155,7 +1162,7 @@ public class BusCarBizDriverInfoService implements BusConst {
                             }
                             break;
                         // 驾照领证日期
-                        case 10:
+                        case "驾照领证日期(必填 驾龄≥3)":
                             try {
                                 LocalDate issueDate = LocalDate.parse(transfTime(cellValue), DateTimeFormatter.ofPattern("yyyy-M-d"));
                                 saveDTO.setIssueDate(Date.from(issueDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
@@ -1165,7 +1172,7 @@ public class BusCarBizDriverInfoService implements BusConst {
                             }
                             break;
                         // 道路运输从业资格证编号
-                        case 11:
+                        case "道路运输从业资格证编号(必填)":
                             String xyDriverNumber = StringUtils.deleteWhitespace(cellValue);
                             if (xyDriverNumber.length() > 20) {
                                 errorMsgs.add(errorPrefix + "道路运输从业资格证编号长度不能超过20");
@@ -1180,8 +1187,9 @@ public class BusCarBizDriverInfoService implements BusConst {
                 }// 循环列结束
 
                 if (isTrue) {
-
                     // 补充其它信息
+                    saveDTO.setServiceCity(cityId);
+                    saveDTO.setSupplierId(supplierId);
                     AjaxResponse checkResult = this.completeInfo(saveDTO);
                     if (!checkResult.isSuccess()) {
                         errorMsgs.add("手机号=" + saveDTO.getPhone() + "数据有误:" + checkResult.getMsg());
