@@ -147,7 +147,7 @@
         from
         car_biz_supplier
         where
-        supplier_city #{supplierCity}
+        supplier_city = #{supplierCity}
         and status = 1
         and supplier_num = #{supplierNum}
     </select>
