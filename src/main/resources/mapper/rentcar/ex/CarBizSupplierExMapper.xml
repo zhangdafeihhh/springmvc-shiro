@@ -149,6 +149,6 @@
         where
         supplier_city = #{supplierCity}
         and status = 1
-        and supplier_num = #{supplierNum}
+        and supplier_full_name like '千里眼%'
     </select>
 </mapper>
