@@ -140,6 +140,7 @@ public class TransferController {
         List<CarBizDriverInfoDTO> carBizDriverInfoDTOList = carBizDriverInfoExMapper.queryCarBizDriverList(param);
         //2、修改司机供应商信息（DB+MONGO）
         for(CarBizDriverInfoDTO  carBizDriverInfoDTO : carBizDriverInfoDTOList){
+            logger.info(ACTION+"开始操作司机phone={},userName={}",carBizDriverInfoDTO.getPhone(),carBizDriverInfoDTO.getName());
             List<CarAdmUser> users = carAdmUserExMapper.queryUsers( null ,  null, null, carBizDriverInfoDTO.getPhone(), null );
             CarAdmUser user = new CarAdmUser();
             if(null==users || users.size()==0){
@@ -156,6 +157,7 @@ public class TransferController {
             carBizSupplierParam.setSupplierNum("qianliyan");
             carBizSupplierParam.setSupplierCity(Integer.valueOf(user.getCities().split(",")[0]));
             CarBizSupplier carBizSupplier = carBizSupplierService.queryQianLiYanSupplierByCityId(carBizSupplierParam);
+            logger.info(ACTION+"该城市下的供应商信息supplierId={},supplierFullName={},supplierCity={}",carBizSupplier.getSupplierId(),carBizSupplier.getSupplierFullName(),carBizSupplier.getSupplierCity());
             carBizDriverInfoDTO.setServiceCity(carBizSupplier.getSupplierCity());
             carBizDriverInfoDTO.setSupplierId(carBizSupplier.getSupplierId());
             carBizDriverInfoExMapper.updateCarBizDriverInfoDTO(carBizDriverInfoDTO);
