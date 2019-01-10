@@ -135,9 +135,7 @@ public class TransferController {
 
     public void changeSupplierDeal(HttpServletRequest request, HttpServletResponse response) {
         //1、查询北京千里眼临时机构下的所有司机
-        CarBizDriverInfoDTO param = new CarBizDriverInfoDTO();
-        param.setSupplierId(telescopeSupplierId);
-        List<CarBizDriverInfoDTO> carBizDriverInfoDTOList = carBizDriverInfoExMapper.queryCarBizDriverList(param);
+        List<CarBizDriverInfoDTO> carBizDriverInfoDTOList = carBizDriverInfoExMapper.queryCarBizDriverListBySupplierId(telescopeSupplierId);
         //2、修改司机供应商信息（DB+MONGO）
         for(CarBizDriverInfoDTO  carBizDriverInfoDTO : carBizDriverInfoDTOList){
             logger.info(ACTION+"开始操作司机phone={},userName={}",carBizDriverInfoDTO.getPhone(),carBizDriverInfoDTO.getName());
