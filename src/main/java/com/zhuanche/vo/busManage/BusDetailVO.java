@@ -1,6 +1,10 @@
 package com.zhuanche.vo.busManage;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @program: mp-manage
@@ -24,6 +28,14 @@ public class BusDetailVO implements Serializable{
     private String fuelName;
     private String transportNumber;
     private Integer status;
+    @JSONField(format = "yyyy-MM-dd")
+    private Date nextInspectDate;
+    @JSONField(format = "yyyy-MM-dd")
+    private Date nextMaintenanceDate;
+    @JSONField(format = "yyyy-MM-dd")
+    private Date nextOperationDate;
+    @JSONField(format = "yyyy-MM-dd")
+    private Date carPurchaseDate;
 
     public Integer getCarId() {
         return carId;
@@ -143,5 +155,37 @@ public class BusDetailVO implements Serializable{
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Date getNextInspectDate() {
+        return nextInspectDate;
+    }
+
+    public void setNextInspectDate(Date nextInspectDate) {
+        this.nextInspectDate = nextInspectDate;
+    }
+
+    public Date getNextMaintenanceDate() {
+        return nextMaintenanceDate;
+    }
+
+    public void setNextMaintenanceDate(Date nextMaintenanceDate) {
+        this.nextMaintenanceDate = nextMaintenanceDate;
+    }
+
+    public Date getNextOperationDate() {
+        return nextOperationDate;
+    }
+
+    public void setNextOperationDate(Date nextOperationDate) {
+        this.nextOperationDate = nextOperationDate;
+    }
+
+    public Date getCarPurchaseDate() {
+        return carPurchaseDate;
+    }
+
+    public void setCarPurchaseDate(Date carPurchaseDate) {
+        this.carPurchaseDate = carPurchaseDate;
     }
 }

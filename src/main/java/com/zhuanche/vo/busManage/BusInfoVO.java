@@ -1,5 +1,6 @@
 package com.zhuanche.vo.busManage;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.zhuanche.constants.busManage.EnumFuel;
 import com.zhuanche.util.DateUtil;
@@ -34,15 +35,15 @@ public class BusInfoVO implements Serializable {
     private String fuelType;
     private String transportNumber;
     private String vehicleBrand;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JSONField(format = "yyyy-MM-dd")
     private Date createDate;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JSONField(format = "yyyy-MM-dd")
     private Date nextInspectDate;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JSONField(format = "yyyy-MM-dd")
     private Date nextMaintenanceDate;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JSONField(format = "yyyy-MM-dd")
     private Date nextOperationDate;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JSONField(format = "yyyy-MM-dd")
     private Date carPurchaseDate;
 
     public Integer getCarId() {

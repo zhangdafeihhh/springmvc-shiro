@@ -24,11 +24,13 @@ import com.zhuanche.serv.busManage.BusCommonService;
 import com.zhuanche.serv.busManage.BusInfoService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.excel.ExportExcelUtil;
 import com.zhuanche.vo.busManage.*;
 import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper;
+import mapper.mdbcarmanage.ex.SaasRolePermissionRalationExMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -79,6 +81,8 @@ public class BusInfoController {
     private BusBizChangeLogService busBizChangeLogService;
     @Autowired
     private BusCommonService commonService;
+    @Autowired
+    private SaasRolePermissionRalationExMapper saasRolePermissionRalationExMapper;
 
 
     /**
@@ -135,7 +139,11 @@ public class BusInfoController {
                                 @Verify(param = "color", rule = "required") String color,
                                 @Verify(param = "fuelType", rule = "required") String fuelType,
                                 @Verify(param = "transportNumber", rule = "required") String transportNumber,
-                                @Verify(param = "status", rule = "required") Integer status) {
+                                @Verify(param = "status", rule = "required") Integer status,
+                                String nextInspectDate,
+                                String nextMaintenanceDate,
+                                String nextOperationDate,
+                                String carPurchaseDate) {
 
         boolean checkResult = busInfoService.licensePlatesIfExist(licensePlates);
         if (checkResult && carId == null) {
@@ -170,7 +178,22 @@ public class BusInfoController {
         carInfo.setFueltype(fuelType);
         carInfo.setTransportnumber(transportNumber);
         carInfo.setStatus(status);
-
+        try {
+            if(nextInspectDate!=null){
+                carInfo.setNextInspectDate(DateUtils.getDate1(nextInspectDate));
+            }
+            if(nextMaintenanceDate!=null){
+                carInfo.setNextMaintenanceDate(DateUtils.getDate1(nextMaintenanceDate));
+            }
+            if(nextOperationDate!=null){
+                carInfo.setNextOperationDate(DateUtils.getDate1(nextOperationDate));
+            }
+            if(carPurchaseDate!=null){
+                carInfo.setCarPurchaseDate(DateUtils.getDate1(carPurchaseDate));
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         //所属车主字段，默认供应商名称
         String supplierName = supplierService.getSupplierNameById(carInfo.getSupplierId());
         //Vehicle_owner
@@ -275,10 +298,10 @@ public class BusInfoController {
                     .append(info.getGroupName()).append(split).append(StringUtils.defaultString(info.getColor())).append(split).append(StringUtils.defaultString(fuelName)).append(split)
                     .append(StringUtils.defaultString(info.getTransportNumber())).append(split)
                     .append(StringUtils.defaultString(info.getVehicleBrand())).append(split).append(info.getModelDetail()).append(split)
-                    .append(info.getNextInspectDate() == null ? StringUtils.EMPTY : DateUtils.formatDateTime(info.getNextInspectDate())).append(split)
-                    .append(info.getNextMaintenanceDate() == null ? StringUtils.EMPTY : DateUtils.formatDateTime(info.getNextMaintenanceDate())).append(split)
-                    .append(info.getNextOperationDate() == null ? StringUtils.EMPTY : DateUtils.formatDateTime(info.getNextOperationDate())).append(split)
-                    .append(info.getCarPurchaseDate() == null ? StringUtils.EMPTY : DateUtils.formatDateTime(info.getCarPurchaseDate()));
+                    .append(info.getNextInspectDate() == null ? StringUtils.EMPTY : DateUtils.formatDate(info.getNextInspectDate())).append(split)
+                    .append(info.getNextMaintenanceDate() == null ? StringUtils.EMPTY : DateUtils.formatDate(info.getNextMaintenanceDate())).append(split)
+                    .append(info.getNextOperationDate() == null ? StringUtils.EMPTY : DateUtils.formatDate(info.getNextOperationDate())).append(split)
+                    .append(info.getCarPurchaseDate() == null ? StringUtils.EMPTY : DateUtils.formatDate(info.getCarPurchaseDate()));
             csvData.add(sb.toString());
         }
     }
@@ -302,9 +325,27 @@ public class BusInfoController {
         List<String[]> downdata = new ArrayList<>();
         downdata.add(groupNames);
         downdata.add(fuelNames);
+        SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+        List<String> strings = saasRolePermissionRalationExMapper.queryRoleNameList(currentLoginUser.getId());
+        boolean roleBoolean = strings.contains("巴士运营");
+        //文件表头
+        String[] head=null;
+        //下拉框所在位置
+        String[] downRows=new String[2];
+        //如果是巴士运营角色,下载的模板包括城市和供应商
+        if(roleBoolean){
+            head=CarConstant.TEMPLATE_HEAD;
+            downRows[0]="3";
+            downRows[1]="5";
+        }else{
+            //非运营角色下载的模板不包括城市和供应商
+            head=new String[CarConstant.TEMPLATE_HEAD.length-2];
+            System.arraycopy(CarConstant.TEMPLATE_HEAD,2,head,0,CarConstant.TEMPLATE_HEAD.length-2);
+            downRows[0]="1";
+            downRows[1]="3";
+        }
         //表示生成的下拉框在第三列和第五列
-        String[] downRows={"3","5"};
-        ExportExcelUtil.exportExcel(fileName, CarConstant.TEMPLATE_HEAD, downdata, downRows, request, response);
+        ExportExcelUtil.exportExcel(fileName, head, downdata, downRows, request, response);
     }
 
 
