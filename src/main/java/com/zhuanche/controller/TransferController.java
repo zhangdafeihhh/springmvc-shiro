@@ -144,8 +144,13 @@ public class TransferController {
             CarAdmUser user = new CarAdmUser();
             if(null==users || users.size()==0){
                 logger.info(ACTION+"根据手机号查询当前用户不存在saas账号需要创建新账号phone={},userName={}",carBizDriverInfoDTO.getPhone(),carBizDriverInfoDTO.getName());
+                continue;
             }else{
                 user = users.get(0);
+            }
+            if(StringUtils.isEmpty(user.getCities())){
+                logger.info(ACTION+"根据手机号查询当前用户没有城市信息phone={},userName={}",carBizDriverInfoDTO.getPhone(),carBizDriverInfoDTO.getName());
+                continue;
             }
             CarBizSupplier carBizSupplierParam = new CarBizSupplier();
             carBizSupplierParam.setSupplierNum("qianliyan");
