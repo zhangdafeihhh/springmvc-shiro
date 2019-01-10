@@ -13,6 +13,7 @@ import com.alibaba.rocketmq.client.producer.SendResult;
 import com.alibaba.rocketmq.client.producer.SendStatus;
 import com.alibaba.rocketmq.common.message.Message;
 import com.alibaba.rocketmq.common.message.MessageQueue;
+import com.alibaba.rocketmq.remoting.common.RemotingUtil;
 
 /**通用的RocketMQ生产者
  * @author zhaoyali
@@ -32,6 +33,7 @@ public class CommonRocketProducer{
 	}
 	private synchronized static void startProducer(String namesrvAddr) throws MQClientException {
 		producer = new DefaultMQProducer("mp-manage");
+		producer.setInstanceName( RemotingUtil.getLocalAddress() +"@"+System.nanoTime()  );
 		producer.setNamesrvAddr(namesrvAddr);
 		producer.setRetryAnotherBrokerWhenNotStoreOK(true);//消息没有存储成功是否发送到另外一个broker
 		producer.setRetryTimesWhenSendFailed(4); //定义重试次数,默认是2
