@@ -139,7 +139,7 @@
 			t.supplier_id = #{supplierId}
 	</select>
 
-    <select id="queryQianLiYanSupplierByCityId"  parameterType="com.zhuanche.entity.rentcar.CarBizSupplier"  resultType="com.zhuanche.entity.rentcar.CarBizSupplier">
+    <select id="queryQianLiYanSupplierByCityId"  parameterType="com.zhuanche.entity.rentcar.CarBizSupplier"  resultMap="BaseResultMap" >
         select
         <include refid="Base_Column_List" />
         ,
