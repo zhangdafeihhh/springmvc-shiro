@@ -35,7 +35,7 @@ public class SupplierController {
     @ResponseBody
     public AjaxResponse getSupplierDataList(String supplierFullName, Integer supplierCity,
                                             Integer status, Integer cooperationType, Integer enterpriseType,
-                                            @RequestParam(defaultValue = "0") Integer pageNum,
+                                            @RequestParam(defaultValue = "1") Integer pageNum,
                                             @RequestParam(defaultValue = "30") Integer pageSize){
         CarBizSupplierQuery queryParam = new CarBizSupplierQuery();
         if (supplierCity == null){
