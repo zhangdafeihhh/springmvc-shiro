@@ -81,8 +81,7 @@ public class BusInfoController {
     private BusBizChangeLogService busBizChangeLogService;
     @Autowired
     private BusCommonService commonService;
-    @Autowired
-    private SaasRolePermissionRalationExMapper saasRolePermissionRalationExMapper;
+
 
 
     /**
@@ -325,9 +324,8 @@ public class BusInfoController {
         List<String[]> downdata = new ArrayList<>();
         downdata.add(groupNames);
         downdata.add(fuelNames);
-        SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
-        List<String> strings = saasRolePermissionRalationExMapper.queryRoleNameList(currentLoginUser.getId());
-        boolean roleBoolean = strings.contains("巴士运营");
+        //判断是否是运营角色
+        boolean roleBoolean = commonService.ifOperate();
         //文件表头
         String[] head=null;
         //下拉框所在位置
@@ -389,13 +387,23 @@ public class BusInfoController {
         }
         //默认值导入第一个sheet;
         Sheet sheet = workbook.getSheetAt(0);
+        //判断是否是运营角色
+        boolean roleBoolean = commonService.ifOperate();
         //校验模板表头
         Row rowFirst = sheet.getRow(0);
-        if (rowFirst == null || rowFirst.getLastCellNum() != CarConstant.TEMPLATE_HEAD.length) {
+
+        String[] heads = null;
+        if(roleBoolean){
+            heads=CarConstant.TEMPLATE_HEAD;
+        }else{
+            heads = new String[CarConstant.TEMPLATE_HEAD.length-2];
+            System.arraycopy(CarConstant.TEMPLATE_HEAD,2,heads,0,CarConstant.TEMPLATE_HEAD.length-2);
+        }
+        if (rowFirst == null || rowFirst.getLastCellNum() != heads.length) {
             logger.error(LOG_PRE + "巴士导入车辆文件表头为空或者长度错误");
             return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
         }
-        boolean templateFlag = checkTableHead(rowFirst, CarConstant.TEMPLATE_HEAD);
+        boolean templateFlag = checkTableHead(rowFirst, heads);
         if (!templateFlag) {
             logger.error(LOG_PRE + "巴士导入车辆文件表头内容错误");
             return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
@@ -427,148 +435,146 @@ public class BusInfoController {
                 Cell cell = row.getCell(colIdx);
                 String value = readCellValue(cell);
                 DateFormat df =new SimpleDateFormat("yyyy-M-d");
-                switch (colIdx) {
+                //获取表头信息
+                String head = heads[colIdx];
+                switch (head) {
                     //城市：
-                    case 0:
+                    case "城市":
                         if (StringUtils.isBlank(value)) {
-                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 为空");
+                            saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 为空");
                             validFlag = false;
                             break;
                         }
                         if (!value.equals(cityName)) {
-                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 城市名称和页面选择的不一致");
+                            saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 城市名称和页面选择的不一致");
                             validFlag = false;
                             break;
                         }
-                        carInfo.setCityId(cityId);
                         break;
                     //供应商：
-                    case 1:
+                    case "供应商":
                         if (StringUtils.isBlank(value)) {
-                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 为空");
+                            saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 为空");
                             validFlag = false;
-                            break;
                         }
                         if (!value.equals(supplierName)) {
-                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 供应商名称和页面选择的不一致");
+                            saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 供应商名称和页面选择的不一致");
                             validFlag = false;
-                            break;
                         }
-                        carInfo.setSupplierId(supplierId);
                         break;
                     //车牌号
-                    case 2:
+                    case "车牌号":
                         if (StringUtils.isBlank(value)) {
-                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 为空");
+                            saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 为空");
                             validFlag = false;
                             break;
                         }
                         boolean checkResult = busInfoService.licensePlatesIfExist(value);
                         if (checkResult) {
-                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 已经存在");
+                            saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 已经存在");
                             validFlag = false;
                             break;
                         }
                         carInfo.setLicensePlates(value);
                         break;
                     // 车型类别
-                    case 3:
+                    case "车型类别名称":
                         if (StringUtils.isBlank(value)) {
-                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 为空");
+                            saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 为空");
                             validFlag = false;
                             break;
                         }
                         CarBizCarGroup group = groupService.queryGroupByGroupName(value);
                         if (group == null) {
-                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 不存在");
+                            saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 不存在");
                             validFlag = false;
                             break;
                         }
                         carInfo.setGroupId(group.getGroupId());
                         break;
                     //车辆颜色
-                    case 4:
+                    case "车辆颜色":
                         if (StringUtils.isBlank(value)) {
-                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 为空");
+                            saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 为空");
                             validFlag = false;
                             break;
                         }
                         carInfo.setColor(value);
                         break;
                     //燃料类型
-                    case 5:
+                    case "燃料类别":
                         if (StringUtils.isBlank(value)) {
-                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 为空");
+                            saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 为空");
                             validFlag = false;
                             break;
                         }
                         String code = EnumFuel.getFuelCodeByName(value);
                         if (code == null) {
-                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 不存在");
+                            saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 不存在");
                             validFlag = false;
                             break;
                         }
                         carInfo.setFueltype(code);
                         break;
                     //运输证字号
-                    case 6:
+                    case "运输证字号":
                         if (StringUtils.isBlank(value)) {
-                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 为空");
+                            saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 为空");
                             validFlag = false;
                             break;
                         }
                         carInfo.setTransportnumber(value);
                         break;
                     //车厂厂牌
-                    case 7:
+                    case "车辆厂牌":
                         if (StringUtils.isBlank(value)) {
-                            saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 为空");
+                            saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 为空");
                             validFlag = false;
                             break;
                         }
                         carInfo.setVehicleBrand(value);
                         break;
                     //具体车型
-                    case 8:
+                    case "具体车型(选填)":
                         carInfo.setModelDetail(value);
                         break;
                     //下次车检时间
-                    case 9:
+                    case "下次车检时间(选填)":
                         if (StringUtils.isNotBlank(value)) {
                             try {
                                 carInfo.setNextInspectDate(df.parse(transfTime(value)));
                             } catch (ParseException e) {
-                                saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 时间格式错误，例：2018-01-01");
+                                saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 时间格式错误，例：2018-01-01");
                             }
                         }
                         break;
                     //下次维保时间
-                    case 10:
+                    case "下次维保时间(选填)":
                         if (StringUtils.isNotBlank(value)) {
                             try {
                                 carInfo.setNextMaintenanceDate(df.parse(transfTime(value)));
                             } catch (ParseException e) {
-                                saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 时间格式错误，例：2018-01-01");
+                                saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 时间格式错误，例：2018-01-01");
                             }
                         }
                         break;
                     //下次运营检测时间
-                    case 11:
+                    case "下次运营证检测时间(选填)":
                         if (StringUtils.isNotBlank(value)) {
                             try {
                                 carInfo.setNextOperationDate(df.parse(transfTime(value)));
                             } catch (ParseException e) {
-                                saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 时间格式错误，例：2018-01-01");
+                                saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 时间格式错误，例：2018-01-01");
                             }
                         }
                         break;
                     //购买时间
-                    case 12:
+                    case "购买时间(选填)":
                         if (StringUtils.isNotBlank(value)) {
                             try {
                                 carInfo.setCarPurchaseDate(df.parse(transfTime(value)));
                             } catch (ParseException e) {
-                                saveErrorMsg(errList, rowIdx, colIdx, CarConstant.TEMPLATE_HEAD[colIdx] + " 时间格式错误，例：2018-01-01");
+                                saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 时间格式错误，例：2018-01-01");
                             }
                         }
                         break;
@@ -578,6 +584,8 @@ public class BusInfoController {
 
             }// 列循环结束
             if (validFlag) {
+                carInfo.setCityId(cityId);
+                carInfo.setSupplierId(supplierId);
                 //所属车主默认供应商名称
                 carInfo.setVehicleOwner(supplierName);
                 SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();

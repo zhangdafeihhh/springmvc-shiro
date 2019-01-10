@@ -132,15 +132,12 @@ public class BusAssignmentController {
         return AjaxResponse.success(pageDTO);
     }
     @RequestMapping(value = "/exportOrder")
-    @MasterSlaveConfigs(configs={ @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE) ,
-            @MasterSlaveConfig (databaseTag = "mdbcarmanage-DataSource",mode = DataSourceMode.SLAVE)})
+    @MasterSlaveConfigs(configs=@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
     public void exportExcel(BusOrderDTO params, HttpServletRequest request, HttpServletResponse response) throws Exception{
 
         long start = System.currentTimeMillis();
         logger.info("[ BusAssignmentController-exportExcel ]" + "导出订单列表参数=" + JSON.toJSONString(params));
-        SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
-        List<String> strings = saasRolePermissionRalationExMapper.queryRoleNameList(currentLoginUser.getId());
-        boolean roleBoolean = strings.contains("巴士运营");
+        boolean roleBoolean = commonService.ifOperate();
         String[] headArray = null;
         if(roleBoolean){
             headArray=BusConstant.Order.ORDER_HEAD;

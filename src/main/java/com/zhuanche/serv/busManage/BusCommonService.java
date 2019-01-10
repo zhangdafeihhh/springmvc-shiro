@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import mapper.mdbcarmanage.ex.SaasRolePermissionRalationExMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +42,8 @@ public class BusCommonService {
 	
 	@Autowired
 	private BusCarBizServiceExMapper busCarBizServiceExMapper;
+	@Autowired
+	private SaasRolePermissionRalationExMapper saasRolePermissionRalationExMapper;
 	
 	
 	/**
@@ -106,6 +110,18 @@ public class BusCommonService {
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public List<Map<Object, Object>> queryServices() {
 		return busCarBizServiceExMapper.queryServices();
+	}
+
+
+	/**
+	 * 判断是否是巴士运营角色
+	 */
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE))
+	public boolean ifOperate(){
+		SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+		List<String> strings = saasRolePermissionRalationExMapper.queryRoleNameList(currentLoginUser.getId());
+		boolean roleBoolean = strings.contains("巴士运营");
+		return roleBoolean;
 	}
 
 }
