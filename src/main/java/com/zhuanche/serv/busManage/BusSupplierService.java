@@ -556,9 +556,9 @@ public class BusSupplierService implements BusConst {
 		// 补充分佣信息(分佣比例、是否有返点)
 		String supplierIds = list.stream().map(e -> e.getSupplierId().toString()).collect(Collectors.joining(","));
 		JSONArray jsonArray = getProrateList(supplierIds);
-		// 组装数据
-		if (jsonArray != null) {
-			list.forEach(supplier -> {
+		list.forEach(supplier -> {
+			
+			if (jsonArray != null) {
 				// 查找对应供应商数据
 				Integer supplierId = supplier.getSupplierId();
 				jsonArray.stream().filter(e -> {
@@ -569,59 +569,106 @@ public class BusSupplierService implements BusConst {
 					supplier.setSupplierRate(jsonObject.getDouble("supplierRate"));
 					supplier.setIsRebate(jsonObject.getInteger("isRebate"));
 				});
-			});
-		}
-		
-		
-		list.forEach(supplier -> {
+			}
+			
 			/** 行数据 */
 			StringBuilder builder = new StringBuilder();
 			BusBizSupplierDetail detail = busBizSupplierDetailExMapper.selectBySupplierId(supplier.getSupplierId());
 			detail = detail == null ? new BusBizSupplierDetail() : detail;
 	
-			// 一、供应商
+			//====================================基本信息===========================================
+			// 一、城市
+			String ciytName = supplier.getCityName();
+			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(ciytName, "")).append(",");
+			
+			// 二、供应商ID
+			Integer supplierId = supplier.getSupplierId();
+			builder.append(CsvUtils.tab).append(String.valueOf(supplierId)).append(",");
+	
+			// 三、供应商名称
 			String supplierName = supplier.getSupplierName();
 			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(supplierName, "")).append(",");
 	
-			// 二、城市
-			String ciytName = supplier.getCityName();
-			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(ciytName, "")).append(",");
-	
+			// 四、状态
+			String status = supplier.getStatus() != null && supplier.getStatus() == 1 ? "有效" : "无效";
+			builder.append(CsvUtils.tab).append(status).append(",");
+
+			// 五、企业联系人
+			String contacts = supplier.getContacts();
+			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(contacts, "")).append(",");
+			
+			// 六、企业联系人电话
+			String contactsPhone = supplier.getContactsPhone();
+			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(contactsPhone, "")).append(",");
+			
+			// 七、调度员电话
+			String dispatcherPhone = supplier.getDispatcherPhone();
+			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(dispatcherPhone, "")).append(",");
+			
+			// 八、加盟类型
+			String cooperationName = supplier.getCooperationName();
+			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(cooperationName, "")).append(",");
+			
+//			// 七、合同开始时间
+//			Date contractDateStart = detail.getContractDateStart();
+//			String contractDateStartFormatter = "";
+//			if (contractDateStart != null) {
+//				contractDateStartFormatter = formatDate(FORMATTER_DATE_BY_HYPHEN, contractDateStart);
+//			}
+//			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(contractDateStartFormatter, "")).append(",");
+//			
+//			// 八、合同到期时间
+//			Date contractDateEnd = detail.getContractDateEnd();
+//			String contractDateEndFormatter = "";
+//			if (contractDateEnd != null) {
+//				contractDateEndFormatter = formatDate(FORMATTER_DATE_BY_HYPHEN, contractDateEnd);
+//			}
+//			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(contractDateEndFormatter, "")).append(",");
+			//====================================结算信息===========================================
+			
 			// 三、分佣比例
 			Double supplierRate = supplier.getSupplierRate();
 			builder.append(CsvUtils.tab).append(supplierRate == null ? 0.00 : supplierRate).append(",");
-	
+			
+			//====================================付款信息===========================================
+			// 一、账户名称
+			String invoiceCompanyName = detail.getInvoiceCompanyName();
+			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(invoiceCompanyName, "")).append(",");
+			
+			// 二、开户银行
+			String invoiceDepositBank = detail.getInvoiceDepositBank();
+			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(invoiceDepositBank, "")).append(",");
+			
+			// 三、银行账户
+			String invoiceBankAccount = detail.getInvoiceBankAccount();
+			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(invoiceBankAccount, "")).append(",");
+			
+			// 四、电话号码
+			String invoiceCompanyPhone = detail.getInvoiceCompanyPhone();
+			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(invoiceCompanyPhone, "")).append(",");
+			
+			// 五、税号
+			String invoiceDutyParagraph = detail.getInvoiceDutyParagraph();
+			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(invoiceDutyParagraph, "")).append(",");
+			
+			// 五、单位地址
+			String invoiceCompanyAddr = detail.getInvoiceCompanyAddr();
+			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(invoiceCompanyAddr, "")).append(",");
+			
+			//====================================其他信息===========================================
+			
 			// 四、加盟费
 			BigDecimal franchiseFee = detail.getFranchiseFee();
 			builder.append(CsvUtils.tab).append(decimalFormat(franchiseFee)).append(",");
-	
+			
 			// 五、保证金
 			BigDecimal deposit = detail.getDeposit();
 			builder.append(CsvUtils.tab).append(decimalFormat(deposit)).append(",");
-	
+			
 			// 六、是否有返点
 			String isRebate = supplier.getIsRebate() == null || supplier.getIsRebate() == 0 ? "不返点" : "返点";
 			builder.append(CsvUtils.tab).append(isRebate).append(",");
-	
-			// 七、合同开始时间
-			Date contractDateStart = detail.getContractDateStart();
-			String contractDateStartFormatter = "";
-			if (contractDateStart != null) {
-				contractDateStartFormatter = formatDate(FORMATTER_DATE_BY_HYPHEN, contractDateStart);
-			}
-			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(contractDateStartFormatter, "")).append(",");
-	
-			// 八、合同到期时间
-			Date contractDateEnd = detail.getContractDateEnd();
-			String contractDateEndFormatter = "";
-			if (contractDateEnd != null) {
-				contractDateEndFormatter = formatDate(FORMATTER_DATE_BY_HYPHEN, contractDateEnd);
-			}
-			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(contractDateEndFormatter, "")).append(",");
-	
-			// 九、状态
-			String status = supplier.getStatus() != null && supplier.getStatus() == 1 ? "有效" : "无效";
-			builder.append(CsvUtils.tab).append(status).append(",");
+			
 	
 			csvDataList.add(builder.toString());
 		});

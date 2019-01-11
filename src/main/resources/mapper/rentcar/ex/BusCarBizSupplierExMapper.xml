@@ -243,14 +243,18 @@
 	<select id="querySupplierExportList" parameterType="com.zhuanche.dto.busManage.BusSupplierQueryDTO"
 		resultType="com.zhuanche.vo.busManage.BusSupplierExportVO">
 		SELECT
+			c.city_name AS cityName,
 			s.supplier_id AS supplierId,
 			s.supplier_full_name AS supplierName,
-			c.city_name AS cityName,
-			s.`status` AS status
+			s.`status` AS status,
+			s.contacts AS contacts,
+			s.contacts_phone AS contactsPhone,
+			s.dispatcher_phone AS dispatcherPhone,
+			t.cooperation_name AS cooperationName
 		FROM
 			car_biz_supplier s
 		LEFT JOIN car_biz_city c ON c.city_id = s.supplier_city
-		WHERE
+		LEFT JOIN car_biz_cooperation_type t ON t.id = s.cooperation_type
 			<include refid="queryAndExportWhereSql"/>
 	</select>
 	
