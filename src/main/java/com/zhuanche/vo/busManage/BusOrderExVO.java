@@ -1,7 +1,5 @@
 package com.zhuanche.vo.busManage;
 
-import com.sun.xml.internal.rngom.binary.DataExceptPattern;
-
 import java.util.Date;
 
 /**

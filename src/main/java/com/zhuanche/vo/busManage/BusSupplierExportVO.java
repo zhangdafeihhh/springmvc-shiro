@@ -1,5 +1,7 @@
 package com.zhuanche.vo.busManage;
 
+import lombok.Data;
+
 /**
  * @ClassName: BusSupplierExportVO
  * @Description: 巴士供应商信息VO
@@ -7,7 +9,11 @@ package com.zhuanche.vo.busManage;
  * @date: 2018年12月4日 下午4:38:15
  * 
  */
+@Data
 public class BusSupplierExportVO {
+
+	/** 城市 */
+	private String cityName;
 
 	/** 供应商ID **/
 	private Integer supplierId;
@@ -15,64 +21,27 @@ public class BusSupplierExportVO {
 	/** 供应商 **/
 	private String supplierName;
 
-	/** 城市 */
-	private String cityName;
-
 	/** 状态：1.有效 0.无效 **/
 	private Integer status;
+
+	/** 企业联系人 **/
+	private String contacts;
+
+	/** 企业联系人电话 **/
+	private String contactsPhone;
+
+	/** 调度员电话 **/
+	private String dispatcherPhone;
+
+	/** 加盟类型:car_biz_cooperation_type **/
+	private String cooperationName;
+
+	// ======================结算信息======================
 
 	/** 分佣比例 **/
 	private Double supplierRate;
 
-	/** 是否有返点  0不返点 1返点 **/
+	/** 是否有返点 0不返点 1返点 **/
 	private Integer isRebate;
-
-	public Integer getSupplierId() {
-		return supplierId;
-	}
-
-	public void setSupplierId(Integer supplierId) {
-		this.supplierId = supplierId;
-	}
-
-	public String getSupplierName() {
-		return supplierName;
-	}
-
-	public void setSupplierName(String supplierName) {
-		this.supplierName = supplierName;
-	}
-
-	public String getCityName() {
-		return cityName;
-	}
-
-	public void setCityName(String cityName) {
-		this.cityName = cityName;
-	}
-
-	public Integer getStatus() {
-		return status;
-	}
-
-	public void setStatus(Integer status) {
-		this.status = status;
-	}
-
-	public Double getSupplierRate() {
-		return supplierRate;
-	}
-
-	public void setSupplierRate(Double supplierRate) {
-		this.supplierRate = supplierRate;
-	}
-
-	public Integer getIsRebate() {
-		return isRebate;
-	}
-
-	public void setIsRebate(Integer isRebate) {
-		this.isRebate = isRebate;
-	}
 
 }
