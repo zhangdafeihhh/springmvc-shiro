@@ -48,7 +48,7 @@ public class BusBizChangeLogService implements BusConst {
 	 * @throws
 	 */
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.MASTER))
-	public int insertLog(BusinessType businessType, String businessKey, Date updateDate) {
+	public int insertLog(BusinessType businessType, String businessKey,String description, Date updateDate) {
 		try {
 			if (businessType == null || StringUtils.isBlank(businessKey)) {
 				return 0;
@@ -62,6 +62,7 @@ public class BusBizChangeLogService implements BusConst {
 			log.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
 			log.setUpdateName(WebSessionUtil.getCurrentLoginUser().getName());
 			log.setUpdateDate(updateDate);
+			log.setDescription(description);
 			return busBizChangeLogExMapper.insertLog(log);
 		} catch (Exception e) {
 			logger.error("[ BusBizChangeLogService-insertLog ] 保存操作记录异常,errorMsg={}", e.getMessage(), e);

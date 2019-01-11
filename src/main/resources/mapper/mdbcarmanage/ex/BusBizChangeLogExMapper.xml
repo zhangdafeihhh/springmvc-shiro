@@ -31,10 +31,10 @@
 	<!-- 保存操作记录 -->
 	<insert id="insertLog" parameterType="com.zhuanche.entity.mdbcarmanage.BusBizChangeLog">
 		insert into bus_biz_change_log (business_type, business_key,
-			update_by, update_name, update_date
+			update_by, update_name, update_date,description
 		)
 		values (#{businessType}, #{businessKey},
-			#{updateBy}, #{updateName}, #{updateDate}
+			#{updateBy}, #{updateName}, #{updateDate},#{description}
 		)
 	</insert>
 </mapper>

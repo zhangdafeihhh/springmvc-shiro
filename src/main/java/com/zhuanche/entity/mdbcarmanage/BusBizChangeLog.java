@@ -17,6 +17,8 @@ public class BusBizChangeLog {
 
     private Date createDate;
 
+    private String description;
+
     public Integer getId() {
         return id;
     }
@@ -71,5 +73,13 @@ public class BusBizChangeLog {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description == null ? null : description.trim();
     }
 }

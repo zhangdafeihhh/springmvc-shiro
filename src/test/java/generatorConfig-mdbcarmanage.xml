@@ -12,34 +12,34 @@
 		</commentGenerator>
 
 		<!-- 数据库连接信息 -->
-		<jdbcConnection driverClass="com.mysql.jdbc.Driver"	connectionURL="jdbc:mysql://10.35.0.39:3306/MDB_CAR_MANAGE?useUnicode=true&amp;characterEncoding=UTF-8" userId="dev_sqhc_rentcar" password="dev_BzkmQM%O^U7Dy8X3">
+		<jdbcConnection driverClass="com.mysql.jdbc.Driver"	connectionURL="jdbc:mysql://mysql-m-wr-car-all-dev-new-db.01zhuanche.com:3307/MDB_CAR_MANAGE?useUnicode=true&amp;characterEncoding=UTF-8" userId="dev_sqhc_rentcar" password="dev_BzkmQM%O^U7Dy8X3">
 		</jdbcConnection>
 		<javaTypeResolver>
 			<property name="forceBigDecimals" value="true"/>
 		</javaTypeResolver>
 
 		<!-- po实体类代码位置 -->
-		<javaModelGenerator targetPackage="com.zhuanche.entity.mdbcarmanage"	targetProject="F:\gitLocalRep\mp-manage\src\main\java">
+		<javaModelGenerator targetPackage="com.zhuanche.entity.mdbcarmanage"	targetProject="C:\myCode\mp-manage\src\main\java">
 			<property name="enableSubPackages" value="true" />
 			<property name="trimStrings" value="true" />
 		</javaModelGenerator>
 		<!-- sql代码的xml映射文件位置 -->
-		<sqlMapGenerator targetPackage="mapper.mdbcarmanage" targetProject="F:\gitLocalRep\mp-manage\src\main\resources">
+		<sqlMapGenerator targetPackage="mapper.mdbcarmanage" targetProject="C:\myCode\mp-manage\src\main\resources">
 			<property name="enableSubPackages" value="true" />
 		</sqlMapGenerator>
 		<!-- mapper接口位置 -->
-		<javaClientGenerator type="XMLMAPPER" targetPackage="mapper.mdbcarmanage" targetProject="F:\gitLocalRep\mp-manage\src\main\java">
+		<javaClientGenerator type="XMLMAPPER" targetPackage="mapper.mdbcarmanage" targetProject="C:\myCode\mp-manage\src\main\java">
 			<property name="enableSubPackages" value="true" />
 		</javaClientGenerator>
 
 		<!-- 需要自动生成的表 -->
-		<table tableName="bus_biz_supplier_detail" domainObjectName="BusBizSupplierDetail"
+		<!--<table tableName="bus_biz_supplier_detail" domainObjectName="BusBizSupplierDetail"
 			   enableSelectByExample="false" enableDeleteByExample="false"
 			   enableCountByExample="false" enableUpdateByExample="false"
 			   enableDeleteByPrimaryKey="false">
 			<property name="useActualColumnNames" value="false" />
 			<generatedKey column="id" sqlStatement="MySql" identity="true" />
-		</table>
+		</table>-->
 		<table tableName="bus_biz_change_log" domainObjectName="BusBizChangeLog"
 			   enableSelectByExample="false" enableDeleteByExample="false"
 			   enableCountByExample="false" enableUpdateByExample="false"

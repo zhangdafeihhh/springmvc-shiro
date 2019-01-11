@@ -210,7 +210,7 @@ public class BusInfoController {
             saveResult = busInfoService.saveCar(carInfo);
             if (saveResult > 0) {
                 busInfoService.saveCar2MongoDB(carInfo);
-                carId = carInfo.getCarId();
+                busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carInfo.getCarId()), "创建车辆",new Date());
             }
         } else {
             //更新车辆信息
@@ -218,12 +218,11 @@ public class BusInfoController {
             saveResult = busInfoService.updateCarById(carInfo);
             if (saveResult > 0) {
                 busInfoService.update2mongoDB(carInfo);
+
             }
         }
         if (saveResult > 0) {
             logger.info(LOG_PRE + currentLoginUser.getName() + "操作成功");
-            //记录操作日志信息
-            busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carId), new Date());
             return AjaxResponse.success(null);
         } else {
             logger.info(LOG_PRE + currentLoginUser.getName() + "操作失败");

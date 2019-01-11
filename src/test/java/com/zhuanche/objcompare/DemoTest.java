@@ -1,6 +1,7 @@
 package com.zhuanche.objcompare;
 
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,8 +26,7 @@ public class DemoTest {
 		Person person4 = new Person();
 		person4.setName("abc");
 		person4.setAge(22);
-
-		System.out.println(CompareObejctUtils.contrastObj(person1, person2, (attr, results) -> {
+		CompareObejctUtils.contrastObj(person1, person2, (attr, results) -> {
 			String old = attr.getOld();
 			String fresh = attr.getFresh();
 			String note = attr.getNote();
@@ -38,9 +38,10 @@ public class DemoTest {
 			} else {
 				results.add("将  " + note + " 由  " + old + " 更新为   " + fresh);
 			}
-		}));
-		System.out.println(CompareObejctUtils.contrastObj(person2, person3, null));
-		System.out.println(CompareObejctUtils.contrastObj(person3, person4, null));
+		});
+		System.out.println();
+		//System.out.println(CompareObejctUtils.contrastObj(person2, person3, null));
+		//System.out.println(CompareObejctUtils.contrastObj(person3, person4, null));
 
 	}
 }
