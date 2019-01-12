@@ -107,7 +107,7 @@
         charge3,
       </if>
       <if test="shortName != null" >
-        shortName,
+        short_name,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
