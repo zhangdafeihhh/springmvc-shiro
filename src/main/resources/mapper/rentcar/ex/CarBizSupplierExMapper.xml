@@ -43,6 +43,7 @@
     <result column="cooperation_name" property="cooperationName" jdbcType="INTEGER" />
     <result column="enterprise_type" property="enterpriseType" jdbcType="INTEGER" />
     <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
   </resultMap>
   <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizSupplier" extends="BaseResultMap" >
     <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
@@ -419,6 +420,38 @@
             car_biz_supplier
           where
             supplier_full_name = #{supplierName,jdbcType=VARCHAR}
+    </select>
+
+    <select id="querySupplierById" resultMap="VoResultMap">
+      SELECT
+          supplier_id,
+          supplier_num,
+          supplier_full_name,
+          supplier_city,
+          supplier_type,
+          type,
+          contacts,
+          contacts_phone,
+          cbs.memo,
+          cbs.status,
+          cbs.create_by,
+          cbs.update_by,
+          cbs.create_date,
+          cbs.update_date,
+          isCommission,
+          posPayFlag,
+          cooperation_type,
+          enterprise_type ,
+          address ,
+          dispatcher_phone,
+          is_two_shifts,
+          cbc.city_name as supplier_city_name,
+          cbct.cooperation_name
+        FROM car_biz_supplier cbs
+        LEFT JOIN car_biz_city cbc ON cbs.supplier_city = cbc.city_id
+        LEFT JOIN car_biz_cooperation_type cbct ON cbs.cooperation_type = cbct.id
+        WHERE cbs.supplier_id = #{supplierId}
+
     </select>
 
 </mapper>

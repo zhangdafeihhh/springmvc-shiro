@@ -37,4 +37,6 @@ public interface CarBizSupplierExMapper{
 	int updateByPrimaryKeySelective(CarBizSupplierVo supplier);
 
     int checkSupplierFullName(@Param("supplierName")String supplierName);
+
+	CarBizSupplierVo querySupplierById(@Param("supplierId") Integer supplierId);
 }

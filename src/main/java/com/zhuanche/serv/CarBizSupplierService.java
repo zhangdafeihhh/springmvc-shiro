@@ -176,9 +176,10 @@ public class CarBizSupplierService{
 	}
 
     public AjaxResponse querySupplierById(Integer supplierId) {
-		CarBizSupplier carBizSupplier = carBizSupplierMapper.selectByPrimaryKey(supplierId);
-		CarBizSupplierVo vo = new CarBizSupplierVo();
-		BeanUtils.copyProperties(carBizSupplier, vo);
+		CarBizSupplierVo vo = carBizSupplierExMapper.querySupplierById(supplierId);
+		if (vo == null){
+			return AjaxResponse.fail(RestErrorCode.SUPPLIER_NOT_EXIST);
+		}
 		SupplierExtDto supplierExtDto = supplierExtDtoExMapper.selectBySupplierId(supplierId);
 		if (supplierExtDto != null) {
 			vo.setEmail(supplierExtDto.getEmail());
