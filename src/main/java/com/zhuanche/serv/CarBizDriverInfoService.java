@@ -1,6 +1,7 @@
 package com.zhuanche.serv;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
@@ -27,8 +28,8 @@ import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.serv.mdbcarmanage.CarBizDriverUpdateService;
 import com.zhuanche.serv.mongo.DriverMongoService;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.*;
 import com.zhuanche.util.DateUtil;
+import com.zhuanche.util.*;
 import com.zhuanche.util.encrypt.MD5Utils;
 import mapper.mdbcarmanage.*;
 import mapper.mdbcarmanage.ex.*;
@@ -799,7 +800,7 @@ public class CarBizDriverInfoService {
                 }
             }
 
-            //TODO 调用订单接口查询激活时间
+            //调用订单接口查询激活时间
             Map<String, Object> params = new HashMap<>();
             params.put("driverId", carBizDriverInfo.getDriverId());
             com.alibaba.fastjson.JSONObject resultJson = MpOkHttpUtil.okHttpGetBackJson(orderStatisticsUrl, params, 1, Constants.DRIVER_INFO_TAG);
@@ -820,7 +821,11 @@ public class CarBizDriverInfoService {
                         }
                         com.alibaba.fastjson.JSONObject result = MpOkHttpUtil.okHttpGetBackJson(url, params, 1, Constants.DRIVER_INFO_TAG);
                         if (result != null && Constants.SUCCESS_CODE == result.getInteger(Constants.CODE)){
-                            carBizDriverInfo.setActiveDate(result.getJSONArray(Constants.DATA).getJSONObject(0).getString("updateDate"));
+                            JSONArray jsonArray = result.getJSONArray(Constants.DATA);
+                            if (jsonArray != null && !jsonArray.isEmpty()){
+                                String updateDate = jsonArray.getJSONObject(0).getString("updateDate");
+                                carBizDriverInfo.setActiveDate(DateUtil.getTimeString(updateDate));
+                            }
                         }
                     }
                 }
@@ -828,9 +833,6 @@ public class CarBizDriverInfoService {
         }
         return carBizDriverInfo;
     }
-
-    private static final String driverInfo = "";
-
 
     public Map<String, Object> batchInputDriverInfo(Integer cityId, Integer supplierId, Integer teamId,
                                                     Integer teamGroupId, MultipartFile file,

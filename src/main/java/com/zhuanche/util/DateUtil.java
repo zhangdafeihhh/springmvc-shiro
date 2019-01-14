@@ -454,4 +454,9 @@ public class DateUtil {
 		return false;
 	}
 
+	public static String getTimeString(String updateDate) {
+		Date date = new Date();
+		date.setTime(Long.valueOf(updateDate));
+		return TIME_SIMPLE_FORMAT.format(date);
+	}
 }
