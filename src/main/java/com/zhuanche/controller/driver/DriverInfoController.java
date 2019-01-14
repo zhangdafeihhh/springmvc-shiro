@@ -101,7 +101,7 @@ public class DriverInfoController {
      */
     @ResponseBody
     @RequestMapping(value = "/findDriverList")
-//	@RequiresPermissions(value = { "DriverinfoManage_look" } )
+	@RequiresPermissions(value = { "DriverinfoManage_look" } )
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
