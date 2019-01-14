@@ -194,11 +194,17 @@ public class BusDriverInfoController extends BusBaseController {
 			} catch (Exception e) {
 				logger.error("[ BusDriverInfoController-saveDriver ] 司机driverId={},修改调用清除接口异常={}", driverId, e.getMessage(), e);
 			}
-			return busCarBizDriverInfoService.updateDriver(saveDTO);
+			AjaxResponse response = busCarBizDriverInfoService.updateDriver(saveDTO);
+			return response;
 		} else {
 			logger.info("[ BusDriverInfoController-saveDriver ] 操作方式：新建");
-			return busCarBizDriverInfoService.saveDriver(saveDTO);
+			AjaxResponse response = busCarBizDriverInfoService.saveDriver(saveDTO);
+			if(response.isSuccess()){
+				busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId),"新建司机", new Date());
+			}
+			return response;
 		}
+
 	}
 
 	/**
