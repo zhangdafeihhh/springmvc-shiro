@@ -227,7 +227,7 @@ public class BusInfoController {
             saveResult = busInfoService.updateCarById(carInfo);
             if (saveResult > 0) {
                 busInfoService.update2mongoDB(carInfo);
-                saveUpdateLog(oldDetail,carInfo);
+                saveUpdateLog(oldDetail,carId);
             }
         }
         if (saveResult > 0) {
@@ -239,18 +239,21 @@ public class BusInfoController {
         }
     }
 
-    private void saveUpdateLog(BusDetailVO oldDetail, BusCarInfo carInfo){
+    private void saveUpdateLog(BusDetailVO oldDetail,Integer carId){
         BusCarCompareEntity oldRecord =new BusCarCompareEntity();
         BeanUtils.copyProperties(oldDetail,oldRecord);
-        oldDetail.setFuelName(EnumFuel.getFuelNameByCode(oldDetail.getFuelType()));
+        oldRecord.setFuelName(EnumFuel.getFuelNameByCode(oldDetail.getFuelType()));
         oldRecord.setStatus(oldDetail.getStatus()==1?"有效":"无效");
+        //查询一下最新的信息
+        BusDetailVO carInfoNew = busInfoService.getDetail(carId);
         BusCarCompareEntity newRecord = new BusCarCompareEntity();
-        BeanUtils.copyProperties(carInfo,newRecord);
-        newRecord.setStatus(carInfo.getStatus()==1?"有效":"无效");
-        newRecord.setFuelName(EnumFuel.getFuelNameByCode(carInfo.getFueltype()));
+        BeanUtils.copyProperties(carInfoNew,newRecord);
+        newRecord.setStatus(carInfoNew.getStatus()==1?"有效":"无效");
+        newRecord.setFuelName(EnumFuel.getFuelNameByCode(carInfoNew.getFuelType()));
         List<Object> objects = CompareObejctUtils.contrastObj(oldRecord, newRecord, null);
         if(objects.size()!=0){
-            busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carInfo.getCarId()), objects.toString(), new Date());
+            String join = StringUtils.join(objects, ",");
+            busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carId), join, new Date());
         }
     }
 
@@ -621,7 +624,7 @@ public class BusInfoController {
                 carInfo.setCreateDate(new Date());
                 int saveResult = busInfoService.saveCar(carInfo);
                 if (saveResult > 0) {
-                    // busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carInfo.getCarId()), new Date());
+                    busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carInfo.getCarId()), "创建车辆", new Date());
                     busInfoService.saveCar2MongoDB(carInfo);
                     successCount++;
                 }
