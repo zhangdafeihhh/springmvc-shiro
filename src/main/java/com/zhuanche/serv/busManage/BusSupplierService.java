@@ -162,7 +162,7 @@ public class BusSupplierService implements BusConst {
 		}
 
 		// 五、保存操作记录
-		busBizChangeLogService.insertLog(BusinessType.SUPPLIER, String.valueOf(supplierId), new Date());
+	//	busBizChangeLogService.insertLog(BusinessType.SUPPLIER, String.valueOf(supplierId), new Date());
 
 		// 六、MQ消息写入 供应商
 		try {

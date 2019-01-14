@@ -484,7 +484,7 @@ public class BusCarBizDriverInfoService implements BusConst {
         int id = saveDTO.getDriverId();
 
         // 创建操作记录
-        busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(id), saveDTO.getUpdateDate());
+      //  busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(id), saveDTO.getUpdateDate());
 
         // 司机信息扩展表，司机银行卡号
         CarBizDriverInfoDetailDTO infoDetail = carBizDriverInfoDetailService.selectByDriverId(saveDTO.getDriverId());
@@ -676,7 +676,7 @@ public class BusCarBizDriverInfoService implements BusConst {
         Integer driverId = saveDTO.getDriverId();
 
         // 创建操作记录
-        busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId), saveDTO.getUpdateDate());
+        //busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId), saveDTO.getUpdateDate());
 
         // 司机信息扩展表，司机银行卡号
         CarBizDriverInfoDetail carBizDriverInfoDetail = new CarBizDriverInfoDetail();
@@ -1291,7 +1291,7 @@ public class BusCarBizDriverInfoService implements BusConst {
     @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER))
     public int resetIMEI(Integer driverId) {
         // 创建操作记录
-        busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId), new Date());
+       // busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId), new Date());
         return carBizDriverInfoExMapper.resetIMEI(driverId);
     }
 

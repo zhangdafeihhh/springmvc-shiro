@@ -16,6 +16,7 @@ import com.zhuanche.constants.busManage.EnumFuel;
 import com.zhuanche.dto.busManage.BusInfoDTO;
 import com.zhuanche.entity.busManage.BusCarInfo;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
+import com.zhuanche.entity.rentcar.CarBizCarInfo;
 import com.zhuanche.serv.CarBizCarGroupService;
 import com.zhuanche.serv.CarBizCityService;
 import com.zhuanche.serv.CarBizSupplierService;
@@ -28,6 +29,8 @@ import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.excel.ExportExcelUtil;
+import com.zhuanche.util.objcompare.CompareObejctUtils;
+import com.zhuanche.util.objcompare.entity.BusCarCompareEntity;
 import com.zhuanche.vo.busManage.*;
 import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper;
 import mapper.mdbcarmanage.ex.SaasRolePermissionRalationExMapper;
@@ -41,6 +44,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -81,7 +85,6 @@ public class BusInfoController {
     private BusBizChangeLogService busBizChangeLogService;
     @Autowired
     private BusCommonService commonService;
-
 
 
     /**
@@ -148,9 +151,15 @@ public class BusInfoController {
         if (checkResult && carId == null) {
             return AjaxResponse.fail(RestErrorCode.LICENSE_PLATES_EXIST);
         }
+        //获取一下详情
+        BusDetailVO oldDetail = null;
         if (checkResult && carId != null) {
-            String licensePlatesOld = busInfoService.getLicensePlatesByCarId(carId);
-            if (!licensePlatesOld.equals(licensePlates)) {
+            oldDetail = busInfoService.getDetail(carId);
+            if (oldDetail == null) {
+                return AjaxResponse.fail(RestErrorCode.BUS_NOT_EXIST);
+            }
+            String licensePlatesOld = oldDetail.getLicensePlates();
+            if (!licensePlates.equals(licensePlatesOld)) {
                 return AjaxResponse.fail(RestErrorCode.LICENSE_PLATES_EXIST);
             }
         }
@@ -178,16 +187,16 @@ public class BusInfoController {
         carInfo.setTransportnumber(transportNumber);
         carInfo.setStatus(status);
         try {
-            if(nextInspectDate!=null){
+            if (nextInspectDate != null) {
                 carInfo.setNextInspectDate(DateUtils.getDate1(nextInspectDate));
             }
-            if(nextMaintenanceDate!=null){
+            if (nextMaintenanceDate != null) {
                 carInfo.setNextMaintenanceDate(DateUtils.getDate1(nextMaintenanceDate));
             }
-            if(nextOperationDate!=null){
+            if (nextOperationDate != null) {
                 carInfo.setNextOperationDate(DateUtils.getDate1(nextOperationDate));
             }
-            if(carPurchaseDate!=null){
+            if (carPurchaseDate != null) {
                 carInfo.setCarPurchaseDate(DateUtils.getDate1(carPurchaseDate));
             }
         } catch (ParseException e) {
@@ -210,7 +219,7 @@ public class BusInfoController {
             saveResult = busInfoService.saveCar(carInfo);
             if (saveResult > 0) {
                 busInfoService.saveCar2MongoDB(carInfo);
-                busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carInfo.getCarId()), "创建车辆",new Date());
+                busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carInfo.getCarId()), "创建车辆", new Date());
             }
         } else {
             //更新车辆信息
@@ -218,7 +227,7 @@ public class BusInfoController {
             saveResult = busInfoService.updateCarById(carInfo);
             if (saveResult > 0) {
                 busInfoService.update2mongoDB(carInfo);
-
+                saveUpdateLog(oldDetail,carInfo);
             }
         }
         if (saveResult > 0) {
@@ -227,6 +236,21 @@ public class BusInfoController {
         } else {
             logger.info(LOG_PRE + currentLoginUser.getName() + "操作失败");
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+        }
+    }
+
+    private void saveUpdateLog(BusDetailVO oldDetail, BusCarInfo carInfo){
+        BusCarCompareEntity oldRecord =new BusCarCompareEntity();
+        BeanUtils.copyProperties(oldDetail,oldRecord);
+        oldDetail.setFuelName(EnumFuel.getFuelNameByCode(oldDetail.getFuelType()));
+        oldRecord.setStatus(oldDetail.getStatus()==1?"有效":"无效");
+        BusCarCompareEntity newRecord = new BusCarCompareEntity();
+        BeanUtils.copyProperties(carInfo,newRecord);
+        newRecord.setStatus(carInfo.getStatus()==1?"有效":"无效");
+        newRecord.setFuelName(EnumFuel.getFuelNameByCode(carInfo.getFueltype()));
+        List<Object> objects = CompareObejctUtils.contrastObj(oldRecord, newRecord, null);
+        if(objects.size()!=0){
+            busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carInfo.getCarId()), objects.toString(), new Date());
         }
     }
 
@@ -315,8 +339,8 @@ public class BusInfoController {
         String fileName = "巴士车辆导入模板";
         List<Map<Object, Object>> maps = commonService.queryGroups();
         String[] groupNames = new String[maps.size()];
-        for(int i=0;i<maps.size();i++){
-            groupNames[i]=(String) maps.get(i).get("groupName");
+        for (int i = 0; i < maps.size(); i++) {
+            groupNames[i] = (String) maps.get(i).get("groupName");
         }
         String allFuelName = EnumFuel.getAllFuelName();
         String[] fuelNames = allFuelName.split(",");
@@ -326,20 +350,20 @@ public class BusInfoController {
         //判断是否是运营角色
         boolean roleBoolean = commonService.ifOperate();
         //文件表头
-        String[] head=null;
+        String[] head = null;
         //下拉框所在位置
-        String[] downRows=new String[2];
+        String[] downRows = new String[2];
         //如果是巴士运营角色,下载的模板包括城市和供应商
-        if(roleBoolean){
-            head=CarConstant.TEMPLATE_HEAD;
-            downRows[0]="3";
-            downRows[1]="5";
-        }else{
+        if (roleBoolean) {
+            head = CarConstant.TEMPLATE_HEAD;
+            downRows[0] = "3";
+            downRows[1] = "5";
+        } else {
             //非运营角色下载的模板不包括城市和供应商
-            head=new String[CarConstant.TEMPLATE_HEAD.length-2];
-            System.arraycopy(CarConstant.TEMPLATE_HEAD,2,head,0,CarConstant.TEMPLATE_HEAD.length-2);
-            downRows[0]="1";
-            downRows[1]="3";
+            head = new String[CarConstant.TEMPLATE_HEAD.length - 2];
+            System.arraycopy(CarConstant.TEMPLATE_HEAD, 2, head, 0, CarConstant.TEMPLATE_HEAD.length - 2);
+            downRows[0] = "1";
+            downRows[1] = "3";
         }
         //表示生成的下拉框在第三列和第五列
         ExportExcelUtil.exportExcel(fileName, head, downdata, downRows, request, response);
@@ -392,11 +416,11 @@ public class BusInfoController {
         Row rowFirst = sheet.getRow(0);
 
         String[] heads = null;
-        if(roleBoolean){
-            heads=CarConstant.TEMPLATE_HEAD;
-        }else{
-            heads = new String[CarConstant.TEMPLATE_HEAD.length-2];
-            System.arraycopy(CarConstant.TEMPLATE_HEAD,2,heads,0,CarConstant.TEMPLATE_HEAD.length-2);
+        if (roleBoolean) {
+            heads = CarConstant.TEMPLATE_HEAD;
+        } else {
+            heads = new String[CarConstant.TEMPLATE_HEAD.length - 2];
+            System.arraycopy(CarConstant.TEMPLATE_HEAD, 2, heads, 0, CarConstant.TEMPLATE_HEAD.length - 2);
         }
         if (rowFirst == null || rowFirst.getLastCellNum() != heads.length) {
             logger.error(LOG_PRE + "巴士导入车辆文件表头为空或者长度错误");
@@ -433,7 +457,7 @@ public class BusInfoController {
             for (int colIdx = 0; colIdx < row.getLastCellNum(); colIdx++) {
                 Cell cell = row.getCell(colIdx);
                 String value = readCellValue(cell);
-                DateFormat df =new SimpleDateFormat("yyyy-M-d");
+                DateFormat df = new SimpleDateFormat("yyyy-M-d");
                 //获取表头信息
                 String head = heads[colIdx];
                 switch (head) {
@@ -597,7 +621,7 @@ public class BusInfoController {
                 carInfo.setCreateDate(new Date());
                 int saveResult = busInfoService.saveCar(carInfo);
                 if (saveResult > 0) {
-                    busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carInfo.getCarId()), new Date());
+                    // busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carInfo.getCarId()), new Date());
                     busInfoService.saveCar2MongoDB(carInfo);
                     successCount++;
                 }
@@ -613,12 +637,14 @@ public class BusInfoController {
         }
         return AjaxResponse.success(errorVO);
     }
-    private String transfTime(String data){
-        if(data.contains("/")){
-           data = data.replace("/","-");
+
+    private String transfTime(String data) {
+        if (data.contains("/")) {
+            data = data.replace("/", "-");
         }
         return data;
     }
+
     private void saveErrorMsg2Redis(String key, List<ErrorReason> errorList) {
         List<String> array = new ArrayList();
         errorList.forEach(o -> {

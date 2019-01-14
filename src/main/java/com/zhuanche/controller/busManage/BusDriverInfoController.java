@@ -269,7 +269,7 @@ public class BusDriverInfoController extends BusBaseController {
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
         // 创建操作记录
-        busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId), new Date());
+      //  busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId), new Date());
         try {
             // 查询城市名称，供应商名称，服务类型，加盟类型
         	busCarBizDriverInfoService.getBaseStatis(driverSaveDTO);
