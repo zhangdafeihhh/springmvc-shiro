@@ -1229,24 +1229,22 @@ public class BusCarBizDriverInfoService implements BusConst {
             logger.error("[ BusCarBizDriverInfoService-batchInputDriverInfo ] 导入司机信息异常, error={}", e.getMessage(), e);
             return AjaxResponse.failMsg(RestErrorCode.FILE_IMPORT_ERROR, "导入文件错误");
         }
-
+        if(count==0){
+            return AjaxResponse.failMsg(RestErrorCode.FILE_ERROR, "表中没有数据，请检查");
+        }
         // 将错误列表导出
+        Map<Object, Object> result = new HashMap<>();
+        result.put("successCount", successCount);
+        result.put("failedCount", failedCount);
+        result.put("errorMsgs", errorMsgs);
+        result.put("total",count);
         if (errorMsgs.size() > 0) {
-            Map<Object, Object> result = new HashMap<>();
-            result.put("successCount", successCount);
-            result.put("failedCount", failedCount);
-            result.put("errorMsgs", errorMsgs);
             //将错误信息放到redis中
             String errMsgKey = BusConstant.ERROR_DRIVER_KEY + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
             RedisCacheUtil.set(errMsgKey, errorMsgs, BusConstant.ERROR_IMPORT_KEY_EXPIRE);
             result.put("errorMsgKey", errMsgKey);
-            return AjaxResponse.success(result);
         }
-        if (count == 0) {
-            return AjaxResponse.failMsg(RestErrorCode.FILE_ERROR, "表中没有数据，请检查");
-        } else {
-            return AjaxResponse.success(null);
-        }
+        return AjaxResponse.success(result);
     }
 
     private String transfTime(String data) {
