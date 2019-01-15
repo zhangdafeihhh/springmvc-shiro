@@ -19,6 +19,9 @@ import com.zhuanche.constants.busManage.BusConstant;
 import com.zhuanche.constants.busManage.EnumFuel;
 import com.zhuanche.serv.busManage.BusCommonService;
 import com.zhuanche.util.excel.ExportExcelUtil;
+import com.zhuanche.util.objcompare.CompareObejctUtils;
+import com.zhuanche.util.objcompare.entity.BusDriverCompareEntity;
+import com.zhuanche.vo.busManage.BusDetailVO;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,6 +135,7 @@ public class BusDriverInfoController extends BusBaseController {
 	 * @throws
 	 */
 	@RequestMapping(value = "/saveDriver")
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public AjaxResponse saveDriver(@Validated BusDriverSaveDTO saveDTO) {
 		
 		/** 补充默认信息(用户不想填但业务需要的字段)*/
@@ -194,12 +198,77 @@ public class BusDriverInfoController extends BusBaseController {
 			} catch (Exception e) {
 				logger.error("[ BusDriverInfoController-saveDriver ] 司机driverId={},修改调用清除接口异常={}", driverId, e.getMessage(), e);
 			}
-			return busCarBizDriverInfoService.updateDriver(saveDTO);
+			//查询修改之前的数据
+			AjaxResponse detail = findDriverInfoByDriverId(driverId);
+			BusDriverDetailInfoVO data =(BusDriverDetailInfoVO) detail.getData();
+			AjaxResponse response = busCarBizDriverInfoService.updateDriver(saveDTO);
+			if(response.isSuccess()){
+				this.saveUpdateLog(data,driverId);
+			}
+			return response;
 		} else {
 			logger.info("[ BusDriverInfoController-saveDriver ] 操作方式：新建");
-			return busCarBizDriverInfoService.saveDriver(saveDTO);
+			AjaxResponse response = busCarBizDriverInfoService.saveDriver(saveDTO);
+			if(response.isSuccess()){
+				busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId),"新建司机", new Date());
+			}
+			return response;
+		}
+
+	}
+
+	private void saveUpdateLog(BusDriverDetailInfoVO driverInfo,Integer driverId){
+		BusDriverCompareEntity oldDriver = new BusDriverCompareEntity();
+		BeanUtils.copyProperties(driverInfo,oldDriver);
+		oldDriver.setStatus(driverInfo.getStatus()==1?"有效":"无效");
+		oldDriver.setGender(driverInfo.getGender()==0?"女":"男");
+		String oldLicenseType = this.getDrivingLicenseType(driverInfo.getDrivingLicenseType());
+		oldDriver.setDrivingLicenseType(oldLicenseType);
+		BusDriverCompareEntity newDriver=new BusDriverCompareEntity();
+		//查询最新的信息
+		AjaxResponse detail = findDriverInfoByDriverId(driverId);
+		BusDriverDetailInfoVO carBizDriverInfo  = (BusDriverDetailInfoVO)detail.getData();
+		BeanUtils.copyProperties(carBizDriverInfo,newDriver);
+		newDriver.setStatus(carBizDriverInfo.getStatus()==1?"有效":"无效");
+		newDriver.setGender(carBizDriverInfo.getGender()==0?"女":"男");
+		String newLicenseType = this.getDrivingLicenseType(carBizDriverInfo.getDrivingLicenseType());
+		newDriver.setDrivingLicenseType(newLicenseType);
+		List<Object> objects = CompareObejctUtils.contrastObj(oldDriver, newDriver, null);
+		if(objects.size()!=0){
+			String join = StringUtils.join(objects, ",");
+			busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId),join, new Date());
 		}
 	}
+
+	private String getDrivingLicenseType(String drivingLicenseType){
+		String value="";
+		switch (drivingLicenseType) {
+			case "1":
+				value = "A1";
+				break;
+			case "2":
+				value = "A2";
+				break;
+			case "3":
+				value = "B1";
+				break;
+			case "4":
+				value = "B2";
+				break;
+			case "5":
+				value = "C1";
+				break;
+			case "6":
+				value = "C2";
+				break;
+			default:
+				value = drivingLicenseType;
+				break;
+		}
+		return value;
+	}
+
+
 
 	/**
 	 * @Title: resetIMEI
@@ -221,6 +290,7 @@ public class BusDriverInfoController extends BusBaseController {
 		busCarBizDriverInfoService.resetIMEI(driverId);
 		return AjaxResponse.success(null);
 	}
+
 	
     /**
      * @Title: updateDriverStatus
