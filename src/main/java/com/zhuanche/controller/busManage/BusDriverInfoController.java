@@ -287,7 +287,10 @@ public class BusDriverInfoController extends BusBaseController {
 		if (carBizDriverInfo == null) {
 			return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_EXIST);
 		}
-		busCarBizDriverInfoService.resetIMEI(driverId);
+		int i = busCarBizDriverInfoService.resetIMEI(driverId);
+		if(i>0){
+			busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId),"重置IMEI", new Date());
+		}
 		return AjaxResponse.success(null);
 	}
 
@@ -339,7 +342,7 @@ public class BusDriverInfoController extends BusBaseController {
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
         // 创建操作记录
-      //  busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId), new Date());
+        busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId),"置为无效", new Date());
         try {
             // 查询城市名称，供应商名称，服务类型，加盟类型
         	busCarBizDriverInfoService.getBaseStatis(driverSaveDTO);
