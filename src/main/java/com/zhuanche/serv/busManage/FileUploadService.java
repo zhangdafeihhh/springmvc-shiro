@@ -1,10 +1,13 @@
 package com.zhuanche.serv.busManage;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.InputStreamBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,29 +37,27 @@ public class FileUploadService {
 	// 返回处理结果-value
 	public String SUCCESS = "success";
 	public String ERROR = "error";
+	
+	// ===============上传接口===================
+	private final String publicUrl = "/upload/public";
+	private final String privateUrl = "/upload/private";
 
 	/**
-	 * 不清楚该www-api接口是否支持上传图片之外的其它图片，慎用
-	 * 
-	 * @param file
+	 * @param content
 	 * @param url
 	 * @param currentUser
 	 * @return
 	 */
-	private Map<String, Object> uploadFile(File file, String url, SSOLoginUser currentUser) {
-		logger.info("[ FileUploadService-uploadCarFile ] 上传车辆相关图片，参数：file {}, url {}", file, url);
-
+	private UploadResult uploadFile(ContentBody content, String url) {
 		// 处理结果
-		Map<String, Object> resultMap = new HashMap<String, Object>();
-
-		if (file == null) {
-			logger.info("[ FileUploadService-uploadCarFile ] 文件为空，无需要上传，参数：file {}, url {}", file, url);
-			return resultMap;
+		UploadResult uploadResult = new UploadResult();
+		if (content == null) {
+			logger.info("[ FileUploadService-uploadFile ] 文件为空，无需要上传，参数：url {}", url);
+			return uploadResult;
 		}
+		logger.info("[ FileUploadService-uploadFile ] 上传文件参数：file {}, url {}", content.getFilename(), url);
 
-		if (currentUser == null) {
-			currentUser = WebSessionUtil.getCurrentLoginUser();
-		}
+		SSOLoginUser currentUser = WebSessionUtil.getCurrentLoginUser();
 		try {
 			// 上传操作人
 			Integer userId = currentUser.getId();
@@ -64,79 +65,85 @@ public class FileUploadService {
 
 			// 上传图片参数
 			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("carFile", new FileBody(file));
+			String filename = content.getFilename();
+			params.put(filename, content);
 			params.put("create_uid", userId);
-			String result = null;
-			JSONObject jsonResult = null;
-			try {
-				logger.info( "[ FileUploadService-uploadCarFile ] 调用 www-api 上传车辆相关图片接口，参数：file {}, url {}, userId{}, username {}", file, url, userId, username);
+			
+			logger.info( "[ FileUploadService-uploadFile ] 调用 www-api 上传文件接口，参数：file {}, url {}, userId{}, username {}", filename, url, userId, username);
+			long start = System.currentTimeMillis();
+			String result = wwwApiTemplate.postMultipartData(url, String.class, params);
+			long end = System.currentTimeMillis();
+			logger.info("[ FileUploadService-uploadFile ] 调用 www-api 上传文件接口,花费时间:file={},cost={} ms", filename, end - start);
 
-				long start = System.currentTimeMillis();
-				result = wwwApiTemplate.postMultipartData(url, String.class, params);
-				long end = System.currentTimeMillis();
-				logger.info("[ FileUploadService-uploadCarFile ] 生成二维码  {} ,花费时间:cost {} ms", file.getName(), end - start);
-
-				jsonResult = JSONObject.parseObject(result);
-			} catch (Exception e) {
-				logger.error( "[ FileUploadService-uploadCarFile ] 调用 www-api 上传车辆相关图片接口  异常，参数：file {}, url {}, userId{}, username {}", file, url, userId, username, e);
-
-				resultMap.put(CODE, ERROR);
-				resultMap.put(MSG, e.getMessage());
-
-				return resultMap;
+			logger.info("[ FileUploadService-uploadFile ] 调用 www-api 上传文件接口结果：result={}", result);
+			JSONObject jsonResult = JSONObject.parseObject(result);
+			if (jsonResult == null) {
+				logger.info( "[ FileUploadService-uploadFile ] 调用 www-api 上传文件接口返回结果为空，参数：file {}, url {}, userId{}, username {}", filename, url, userId, username);
+				uploadResult.setSuccess(false);
+				uploadResult.setMsg("上传文件接口出错");
+				return uploadResult;
 			}
-
 			if (1 == jsonResult.getIntValue("code")) {
 				String filePath = jsonResult.getJSONArray("data").getJSONObject(0).getString("path");
-				logger.info("[ FileUploadService-uploadCarFile ] 上传车辆相关图片：" + result);
-				logger.info("[ FileUploadService-uploadCarFile ] 上传车辆相关图片接口返回路径:" + filePath);
+				logger.info("[ FileUploadService-uploadFile ] 上传文件接口返回路径:filePath={}", filePath);
 
 				// 返回 filePath
-				resultMap.put(CODE, SUCCESS);
-				resultMap.put(FILE_PATH, filePath);
-				return resultMap;
+				uploadResult.setSuccess(true);
+				uploadResult.setFilePath(filePath);
+				return uploadResult;
 			} else {
-				logger.info("[ FileUploadService-uploadCarFile ] 上传车辆相关图片接口处理失败，返回信息" + result);
-
-				resultMap.put(CODE, ERROR);
-				resultMap.put(MSG, result);
-				return resultMap;
+				uploadResult.setSuccess(false);
+				uploadResult.setMsg(jsonResult.getString("msg"));
+				return uploadResult;
 			}
-		} catch (NullPointerException nullPointEx) {
-			logger.error("[ FileUploadService-uploadCarFile ] 上传车辆相关图片处理出现空指针异常", nullPointEx);
-
-			resultMap.put(CODE, ERROR);
-			resultMap.put(MSG, "上传车辆相关图片处理出现异常");
-			return resultMap;
-		} catch (Exception ex) {
-			logger.error("[ FileUploadService-uploadCarFile ] 上传车辆相关图片处理异常", ex);
-
-			resultMap.put(CODE, ERROR);
-			resultMap.put(MSG, ex.getMessage());
-			return resultMap;
-		} finally {
-			file.delete();// 删除上传的临时文件
+		} catch (Exception e) {
+			logger.error("[ FileUploadService-uploadFile ] 上传文件接口处理异常", e);
+			uploadResult.setSuccess(false);
+			uploadResult.setMsg(e.getMessage());
+			return uploadResult;
 		}
 	}
-
-	public Map<String, Object> uploadPublicFile(File file) {
-		String url = "/upload/public";
-		return uploadFile(file, url, null);
+	
+	static class UploadResult {
+		public boolean success;
+		public String msg;
+		public String filePath;
+		
+		public boolean isSuccess() {
+			return success;
+		}
+		public void setSuccess(boolean success) {
+			this.success = success;
+		}
+		public String getMsg() {
+			return msg;
+		}
+		public void setMsg(String msg) {
+			this.msg = msg;
+		}
+		public String getFilePath() {
+			return filePath;
+		}
+		public void setFilePath(String filePath) {
+			this.filePath = filePath;
+		}
+	}
+	
+	public UploadResult uploadPublicFile(File file) {
+		return uploadFile(new FileBody(file), publicUrl);// 如果文件为临时文件则应该在finally块中删除file.delete(); 
 	}
 
-	public Map<String, Object> uploadPublicFile(File file, SSOLoginUser currentUser) {
-		String url = "/upload/public";
-		return uploadFile(file, url, currentUser);
+	public UploadResult uploadPrivateFile(File file) {
+		return uploadFile(new FileBody(file), privateUrl);// 如果文件为临时文件则应该在finally块中删除file.delete(); 
+	}
+	
+	public UploadResult uploadPublicStream(InputStream in, String filename) {
+		return uploadFile(new InputStreamBody(in, filename), publicUrl);
+	}
+	
+	public UploadResult uploadPrivateStream(InputStream in, String filename) {
+		return uploadFile(new InputStreamBody(in, filename), privateUrl);
 	}
 
-	public Map<String, Object> uploadPrivateFile(File file) {
-		String url = "/upload/private";
-		return uploadFile(file, url, null);
-	}
-
-	public Map<String, Object> uploadPrivateFile(File file, SSOLoginUser currentUser) {
-		String url = "/upload/private";
-		return uploadFile(file, url, currentUser);
-	}
 
 }

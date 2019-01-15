@@ -1,20 +1,10 @@
 package com.zhuanche.serv.busManage;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.constants.BusConst;
-import com.zhuanche.dto.busManage.*;
-import com.zhuanche.entity.rentcar.CarBizSupplier;
-import com.zhuanche.http.MpOkHttpUtil;
-import com.zhuanche.shiro.realm.SSOLoginUser;
-import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.DateUtil;
-import com.zhuanche.vo.busManage.BusSettlementInvoiceVO;
-import com.zhuanche.vo.busManage.BusSettlementPaymentVO;
-import mapper.rentcar.CarBizSupplierMapper;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +13,28 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.constants.BusConst;
+import com.zhuanche.dto.busManage.BusSettleOrderListDTO;
+import com.zhuanche.dto.busManage.BusSettlementInvoiceDTO;
+import com.zhuanche.dto.busManage.BusSettlementOrderChangeDTO;
+import com.zhuanche.dto.busManage.BusSettlementPaymentDTO;
+import com.zhuanche.dto.busManage.BusSupplierSettleListDTO;
+import com.zhuanche.entity.rentcar.CarBizSupplier;
+import com.zhuanche.http.MpOkHttpUtil;
+import com.zhuanche.serv.busManage.FileUploadService.UploadResult;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.DateUtil;
+import com.zhuanche.vo.busManage.BusSettlementInvoiceVO;
+import com.zhuanche.vo.busManage.BusSettlementPaymentVO;
+
+import mapper.rentcar.CarBizSupplierMapper;
 
 /**
  * @ClassName: BusCommonService
@@ -37,17 +46,20 @@ import java.util.Map;
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class BusSettlementAdviceService implements BusConst {
 
-    private static final Logger logger = LoggerFactory.getLogger(BusSettlementAdviceService.class);
-    private final static String LOG_PRE = "【供应商分佣结算单】";
+	private static final Logger logger = LoggerFactory.getLogger(BusSettlementAdviceService.class);
+	private final static String LOG_PRE = "【供应商分佣结算单】";
 
-    @Autowired
-    private CarBizSupplierMapper carBizSupplierMapper;
+	@Autowired
+	private CarBizSupplierMapper carBizSupplierMapper;
 
-    @Value("${order.pay.url}")
-    private String orderPayUrl;
-    @Autowired
-    private CarBizSupplierMapper supplierMapper;
+	@Autowired
+	private CarBizSupplierMapper supplierMapper;
 
+	@Autowired
+	private FileUploadService fileUploadService;
+
+	@Value("${order.pay.url}")
+	private String orderPayUrl;
 
     public JSONObject querySettleDetailList(BusSupplierSettleListDTO dto) {
         Map<String, Object> params = new HashMap<>(16);
@@ -165,12 +177,25 @@ public class BusSettlementAdviceService implements BusConst {
 
     /**
      * @param invoiceDTO
+     * @param file 
      * @return AjaxResponse
+     * @throws IOException 
      * @throws
      * @Title: saveInvoiceInfo
      * @Description: 结算单确认收票窗口保存
      */
-    public AjaxResponse saveInvoiceInfo(BusSettlementInvoiceDTO invoiceDTO) {
+    public AjaxResponse saveInvoiceInfo(BusSettlementInvoiceDTO invoiceDTO, MultipartFile file) throws IOException {
+    	// 一、上传文件
+    	String fileName = file.getOriginalFilename();
+		logger.info("[ BusSettlementAdviceService-saveInvoiceInfo ] 上传文件名:{}", fileName);
+        try (InputStream in = file.getInputStream()) {
+        	UploadResult result = fileUploadService.uploadPublicStream(in, fileName);
+        	if (result.isSuccess()) {
+        		String filePath = result.getFilePath();
+        		// TODO invoiceDTO放入文件路径
+			}
+        }
+    	// 二、保存信息
         String errorMsg = confirmInvoice(invoiceDTO);
         if (StringUtils.isNotBlank(errorMsg)) {
             return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, errorMsg);
