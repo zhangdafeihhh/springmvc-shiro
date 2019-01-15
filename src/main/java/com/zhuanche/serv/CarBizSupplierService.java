@@ -195,35 +195,40 @@ public class CarBizSupplierService{
 		}
 		Map<String, Object> params = Maps.newHashMap();
 		params.put(Constants.SUPPLIER_ID, vo.getSupplierId());
-		com.alibaba.fastjson.JSONObject jsonObject = MpOkHttpUtil.okHttpPostBackJson(commissionUrl, params, 1, Constants.GROUP_INFO_TAG);
-		if (jsonObject != null && Constants.SUCCESS_CODE == jsonObject.getInteger(Constants.CODE)){
-			JSONArray jsonArray = jsonObject.getJSONArray(Constants.DATA);
-			List<Integer> idList = new ArrayList<>();
-			jsonArray.forEach(elem -> {
-				com.alibaba.fastjson.JSONObject jsonData = (com.alibaba.fastjson.JSONObject) elem;
-				Integer id = jsonData.getInteger(Constants.GROUP_ID);
-				if (id != null && id > Constants.ZERO){
-					idList.add(id);
-				}
-			});
-			if (!idList.isEmpty()){
-				List<CarBizCarGroup> carBizCarGroups = carBizCarGroupExMapper.queryGroupNameByIds(idList);
-				JSONArray groupList = new JSONArray();
-				for (CarBizCarGroup groupInfo : carBizCarGroups){
-					for (Object data : jsonArray){
-						com.alibaba.fastjson.JSONObject jsonData = (com.alibaba.fastjson.JSONObject) data;
-						Integer id = jsonData.getInteger(Constants.GROUP_ID);
-						if (id.equals(groupInfo.getGroupId())){
-							jsonData.put(Constants.GROUP_NAME, groupInfo.getGroupName());
-							groupList.add(jsonData);
-							break;
+		try {
+			com.alibaba.fastjson.JSONObject jsonObject = MpOkHttpUtil.okHttpPostBackJson(commissionUrl, params, 1, Constants.GROUP_INFO_TAG);
+			if (jsonObject != null && Constants.SUCCESS_CODE == jsonObject.getInteger(Constants.CODE)) {
+				JSONArray jsonArray = jsonObject.getJSONArray(Constants.DATA);
+				List<Integer> idList = new ArrayList<>();
+				jsonArray.forEach(elem -> {
+					com.alibaba.fastjson.JSONObject jsonData = (com.alibaba.fastjson.JSONObject) elem;
+					Integer id = jsonData.getInteger(Constants.GROUP_ID);
+					if (id != null && id > Constants.ZERO) {
+						idList.add(id);
+					}
+				});
+				if (!idList.isEmpty()) {
+					List<CarBizCarGroup> carBizCarGroups = carBizCarGroupExMapper.queryGroupNameByIds(idList);
+					JSONArray groupList = new JSONArray();
+					for (CarBizCarGroup groupInfo : carBizCarGroups) {
+						for (Object data : jsonArray) {
+							com.alibaba.fastjson.JSONObject jsonData = (com.alibaba.fastjson.JSONObject) data;
+							Integer id = jsonData.getInteger(Constants.GROUP_ID);
+							if (id.equals(groupInfo.getGroupId())) {
+								jsonData.put(Constants.GROUP_NAME, groupInfo.getGroupName());
+								groupList.add(jsonData);
+								break;
+							}
 						}
 					}
+					vo.setGroupList(groupList);
 				}
-				vo.setGroupList(groupList);
 			}
+			return AjaxResponse.success(vo);
+		}catch (Exception e){
+			logger.info("获取分佣信息失败", e);
+			return AjaxResponse.fail(RestErrorCode.GET_SUPPLIER_COMMISSION_INFO_FAILED);
 		}
-		return AjaxResponse.success(vo);
     }
 
 	public AjaxResponse checkSupplierFullName(String supplierName) {
