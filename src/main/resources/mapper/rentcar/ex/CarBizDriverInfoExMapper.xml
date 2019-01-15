@@ -270,7 +270,7 @@
     car_biz_driver_info i
     <where>
     <if test="licensePlates!=null and licensePlates!=''">
-      and i.license_plates LIKE '%${licensePlates}%'
+      and i.license_plates LIKE '${licensePlates}%'
     </if>
     <if test="driverId!=null and driverId!=''">
       and i.driver_id = #{driverId}
@@ -309,7 +309,7 @@
     car_biz_driver_info i
     where 1=1
     <if test="licensePlates!=null and licensePlates!=''">
-      and i.license_plates LIKE '%${licensePlates}%'
+      and i.license_plates LIKE '${licensePlates}%'
     </if>
     <if test="cityIds!=null and cityIds.size()>0">
       and i.service_city IN
@@ -371,7 +371,7 @@
       and i.status= #{status}
     </if>
     <if test="licensePlates!=null and licensePlates!=''">
-      and i.license_plates LIKE '%${licensePlates}%'
+      and i.license_plates LIKE '${licensePlates}%'
     </if>
     <if test="name!=null and name!=''">
       <!-- and i.name like '%name%' -->
@@ -381,7 +381,7 @@
       and i.supplier_Id = #{supplierId}
     </if>
     <if test="phone!=null and phone!=''">
-      and i.phone LIKE '%${phone}%'
+      and i.phone LIKE '${phone}%'
     </if>
     <if test="cityIds!=null and cityIds.size()>0">
       and i.service_city IN
@@ -402,13 +402,13 @@
   <sql id="allBaseColumnWhereList" >
     <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR" >
       <if test="phone != null and phone != ''" >
-        and phone LIKE '%${phone}%'
+        and phone LIKE '${phone}%'
       </if>
       <if test="name != null and name != ''" >
         and name LIKE CONCAT(#{name},'%')
       </if>
       <if test="licensePlates != null and licensePlates != ''" >
-        and license_plates LIKE   CONCAT('%',CONCAT(#{licensePlates},'%'))
+        and license_plates LIKE CONCAT(#{licensePlates},'%')
       </if>
       <if test="status != null" >
         and status = #{status,jdbcType=INTEGER}
@@ -1572,7 +1572,7 @@
         and i.status= #{status}
       </if>
       <if test="licensePlates!=null and licensePlates!=''">
-        and i.license_plates LIKE '%${licensePlates}%'
+        and i.license_plates LIKE '${licensePlates}%'
       </if>
       <if test="driverId!=null and driverId !=''">
         and i.driver_id = ${driverId}
@@ -1588,7 +1588,7 @@
         and i.supplier_Id = #{supplierId}
       </if>
       <if test="phone!=null and phone!=''">
-        and i.phone LIKE '%${phone}%'
+        and i.phone LIKE '${phone}%'
       </if>
       <if test="serviceCityId!=null and serviceCityId!=''">
         and i.service_city = #{serviceCityId}
@@ -1606,7 +1606,7 @@
         and i.group_id = #{groupid}
       </if>
       <if test="imei!=null and imei!=''">
-        and i.imei LIKE '%${imei}%'
+        and i.imei LIKE '${imei}%'
       </if>
       <if test="idCardNo!=null and idCardNo!=''">
         and i.id_card_no = #{idCardNo}
@@ -1669,7 +1669,7 @@
         and i.status= #{status}
       </if>
       <if test="licensePlates!=null and licensePlates!=''">
-        and i.license_plates LIKE '%${licensePlates}%'
+        and i.license_plates LIKE '${licensePlates}%'
       </if>
       <if test="driverId!=null and driverId !=''">
         and i.driver_id = ${driverId}
@@ -1684,7 +1684,7 @@
         and i.supplier_Id = #{supplierId}
       </if>
       <if test="phone!=null and phone!=''">
-        and i.phone LIKE '%${phone}%'
+        and i.phone LIKE '${phone}%'
       </if>
       <if test="serviceCityId!=null and serviceCityId!=''">
         and i.service_city = #{serviceCityId}
@@ -1702,7 +1702,7 @@
         and i.group_id = #{groupid}
       </if>
       <if test="imei!=null and imei!=''">
-        and i.imei LIKE '%${imei}%'
+        and i.imei LIKE '${imei}%'
       </if>
       <if test="idCardNo!=null and idCardNo!=''">
         and i.id_card_no = #{idCardNo}
@@ -1761,10 +1761,10 @@
 			</foreach>
 		</if>
 		<if test="name != null and name != ''">
-			and i.name LIKE CONCAT('%',#{name},'%')
+			and i.name LIKE CONCAT(#{name},'%')
 		</if>
 		<if test="phone != null and phone != ''">
-			and i.phone LIKE CONCAT('%',#{phone},'%')
+			and i.phone LIKE CONCAT(#{phone},'%')
 		</if>
 		<if test="seatNum != null">
 			and g.seat_num >= #{seatNum}

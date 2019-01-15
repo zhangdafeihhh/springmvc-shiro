@@ -171,6 +171,9 @@ public class CarBizDriverInfoService {
      * @param params
      * @return
      */
+    @MasterSlaveConfigs(configs={
+            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+    } )
     public List<CarBizDriverInfoDTO> queryDriverList(CarBizDriverInfoDTO params) {
         return carBizDriverInfoExMapper.queryDriverList(params);
     }
