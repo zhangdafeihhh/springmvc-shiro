@@ -197,6 +197,8 @@ public final class RestErrorCode{
 	//---------------------------------------------------------------------------------------------------------------------------------------------
 	@ResultMessage("获取分佣信息失败")
 	public static final int GET_SUPPLIER_COMMISSION_INFO_FAILED = 9001;
+	@ResultMessage("供应商简称无效")
+	public static final int GET_SUPPLIER_SHORT_NAME_INVALID = 9001;
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系
 	static{

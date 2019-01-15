@@ -102,6 +102,9 @@ public class CarBizSupplierService{
 
     public AjaxResponse saveSupplierInfo(CarBizSupplierVo supplier) {
 		try{
+			if (supplier.getSupplierShortName() != null && supplier.getSupplierShortName().length() > 10){
+				return AjaxResponse.fail(RestErrorCode.GET_SUPPLIER_SHORT_NAME_INVALID);
+			}
 			String method = Constants.UPDATE;
 			Integer id = WebSessionUtil.getCurrentLoginUser().getId();
 			supplier.setUpdateBy(id);
