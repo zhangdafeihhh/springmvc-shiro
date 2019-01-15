@@ -1219,6 +1219,7 @@ public class BusCarBizDriverInfoService implements BusConst {
             result.put("successCount", successCount);
             result.put("failedCount", failedCount);
             result.put("errorMsgs", errorMsgs);
+            result.put("total",count);
             //将错误信息放到redis中
             String errMsgKey = BusConstant.ERROR_DRIVER_KEY + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
             RedisCacheUtil.set(errMsgKey, errorMsgs, BusConstant.ERROR_IMPORT_KEY_EXPIRE);
