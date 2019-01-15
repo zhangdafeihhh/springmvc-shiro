@@ -3,6 +3,7 @@ package com.zhuanche.objcompare.entity;
 import java.util.Date;
 
 import com.zhuanche.objcompare.FieldNote;
+import com.zhuanche.objcompare.FieldNote.Pattern;
 
 public class Person {
 
@@ -12,7 +13,7 @@ public class Person {
 	@FieldNote("年龄")
 	private Integer age;
 
-	@FieldNote("出生日期")
+	@FieldNote(value = "出生日期", pattern = Pattern.DATE)
 	private Date birthday;
 
 	public String getName() {

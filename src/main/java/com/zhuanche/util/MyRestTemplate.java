@@ -175,7 +175,7 @@ public class MyRestTemplate extends RestTemplate {
 	 * @throws IOException
 	 * @throws ClientProtocolException
 	 */
-	@SuppressWarnings({ "unchecked", "deprecation" })
+	@SuppressWarnings("unchecked")
 	public <T> T postMultipartData(String url, Class<T> responseType, Map<String, Object> params) {
 
 		HttpPost post = new HttpPost(getHost() + url);
@@ -204,7 +204,6 @@ public class MyRestTemplate extends RestTemplate {
 					}
 				}
 			}
-			httpClient.getConnectionManager().shutdown();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
