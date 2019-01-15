@@ -1,5 +1,6 @@
 package com.zhuanche.serv;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -14,6 +15,7 @@ import com.zhuanche.entity.rentcar.CarBizSupplierQuery;
 import com.zhuanche.entity.rentcar.CarBizSupplierVo;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.deiver.CarBizCarInfoTempService;
+import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import mapper.driver.SupplierExtDtoMapper;
 import mapper.driver.ex.SupplierExtDtoExMapper;
@@ -106,13 +108,13 @@ public class CarBizSupplierService{
 				return AjaxResponse.fail(RestErrorCode.GET_SUPPLIER_SHORT_NAME_INVALID);
 			}
 			String method = Constants.UPDATE;
-			Integer id = WebSessionUtil.getCurrentLoginUser().getId();
-			supplier.setUpdateBy(id);
-			supplier.setUpdateDate(new Date());
+			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+			supplier.setUpdateBy(currentLoginUser.getId());
+			supplier.setUpdateName(currentLoginUser.getName());
 			if (supplier.getSupplierId() == null || supplier.getSupplierId() == 0){
 				method = Constants.CREATE;
-				supplier.setCreateBy(id);
-				supplier.setCreateDate(new Date());
+				supplier.setCreateBy(currentLoginUser.getId());
+				supplier.setCreateName(currentLoginUser.getName());
 				carBizSupplierExMapper.insertSelective(supplier);
 				SupplierExtDto extDto = new SupplierExtDto();
 				extDto.setEmail(supplier.getEmail());
@@ -140,9 +142,9 @@ public class CarBizSupplierService{
 			try{
 				Map<String, Object> messageMap = new HashMap<String, Object>();
 				messageMap.put("method",method);
-				JSONObject json = JSONObject.fromObject(supplier);
+				Object json = JSON.toJSON(supplier);
 				messageMap.put("data", json);
-				String messageStr = JSONObject.fromObject(messageMap).toString();
+				String messageStr = JSON.toJSONStringWithDateFormat(messageMap, JSON.DEFFAULT_DATE_FORMAT);
 				logger.info("专车供应商，同步发送数据：" + messageStr);
 				CommonRocketProducer.publishMessage(Constants.SUPPLIER_TOPIC, method, String.valueOf(supplier.getSupplierId()), messageMap);
 			}catch (Exception e){
