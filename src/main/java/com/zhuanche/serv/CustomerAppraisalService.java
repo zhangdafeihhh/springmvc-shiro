@@ -124,7 +124,7 @@ public class CustomerAppraisalService {
         carBizDriverInfoDTO.setSupplierId(carBizCustomerAppraisalStatisticsDTO.getSupplierId());
         carBizDriverInfoDTO.setDriverIds(carBizCustomerAppraisalStatisticsDTO.getDriverIds());
         List<CarBizDriverInfoDTO>  driverInfoDTOList = carBizDriverInfoExMapper.queryCarBizDriverList(carBizDriverInfoDTO);
-        if(driverInfoDTOList == null){
+        if(driverInfoDTOList == null || driverInfoDTOList.isEmpty()){
             return null;
         }
         Set<Integer> driverIdSet = new HashSet<>();
