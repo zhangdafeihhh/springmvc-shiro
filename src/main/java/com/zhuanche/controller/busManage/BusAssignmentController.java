@@ -647,17 +647,15 @@ public class BusAssignmentController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE),
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)})
-    public AjaxResponse queryOrderDetails(@Verify(param = "orderId", rule = "required") Integer orderId,
-                                          @Verify(param = "orderNo", rule = "required") String orderNo) {
-        if (orderId == null || StringUtils.isBlank(orderNo)) {
-            return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "订单ID或订单编号不能为空");
+    public AjaxResponse queryOrderDetails(@Verify(param = "orderNo", rule = "required") String orderNo) {
+        if (StringUtils.isBlank(orderNo)) {
+            return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "订单编号不能为空");
         }
-
         try {
             // 调用订单接口查询订单详情
             BusOrderDetail orderDetail = busOrderService.selectOrderDetail(orderNo);
             logger.info("[ BusAssignmentController-saveMessageTask ] 订单详情 = {}", JSON.toJSONString(orderDetail));
-
+            Integer orderId=orderDetail.getOrderId();
             // 调用计费接口
             BusCostDetail busCostDetail = busOrderService.selectOrderCostDetail(orderId);
             logger.info("[ BusAssignmentController-saveMessageTask ] 计费详情 = {}", JSON.toJSONString(busCostDetail));
