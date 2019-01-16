@@ -16,9 +16,11 @@ import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalExtDTO;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 
+import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.request.DutyParamRequest;
 
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
+import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.rentcar.ex.CarBizCustomerAppraisalExMapper;
 import mapper.rentcar.ex.CarBizCustomerAppraisalStatisticsExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
@@ -53,6 +55,8 @@ public class CustomerAppraisalService {
     private CarDriverTeamService carDriverTeamService;
     @Autowired
     private CarBizDriverInfoExMapper carBizDriverInfoExMapper;
+    @Autowired
+    private CarDriverTeamExMapper carDriverTeamExMapper;
 
     /**
      * 查询订单评分信息
@@ -140,13 +144,26 @@ public class CustomerAppraisalService {
         PageInfo<CarBizCustomerAppraisalStatisticsDTO> pageInfo = new PageInfo<>(list);
         if(list != null && list.size() >= 1){
             CarBizDriverInfoDTO driverInfotemp = null;
+            List<Integer> ids = new ArrayList<>();
             for(CarBizCustomerAppraisalStatisticsDTO item : list){
+                ids.add(item.getDriverId());
                 driverInfotemp = cacheItem.get("d_"+item.getDriverId());
                 if(driverInfotemp != null){
                     item.setIdCardNo(driverInfotemp.getIdCardNo());
                     item.setCityId(driverInfotemp.getServiceCity());
                 }
             }
+            List<CarRelateTeam> relateTeams = carDriverTeamExMapper.queryDriverTeamListByDriverIds(ids);
+            relateTeams.forEach( carRelateTeam -> {
+                list.forEach( appraisalStatisticsDTO-> {
+                    if (appraisalStatisticsDTO.getDriverId().equals(carRelateTeam.getDriverId())){
+                        appraisalStatisticsDTO.setTeamId(carRelateTeam.getTeamId());
+                        appraisalStatisticsDTO.setTeamName(carRelateTeam.getTeamName());
+                        appraisalStatisticsDTO.setTeamGroupId(StringUtils.isNotBlank(carRelateTeam.getGroupId()) ? Integer.valueOf(carRelateTeam.getGroupId()): null );
+                        appraisalStatisticsDTO.setTeamGroupName(carRelateTeam.getGroupName());
+                    }
+                });
+            });
         }
         return pageInfo;
     }

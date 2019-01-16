@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.zhuanche.constant.Constants;
-import com.zhuanche.entity.driver.DriverVerify;
-import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.dateUtil.DateUtil;
 import com.zhuanche.util.excel.CsvUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -105,12 +103,12 @@ public class DriverVerifyController {
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
 	} )
 	@SensitiveDataOperationLog(primaryDataType="加盟司机数据",secondaryDataType="加盟司机个人基本信息",desc="加盟司机信息列表查询")
-	public void exportDriverVerifyData(Long cityId, String supplier,
+	public void exportDriverVerifyData(Long cityId, String supplierId,
 									   String mobile, Integer verifyStatus, String createDateBegin, String createDateEnd,
 									   HttpServletRequest request, HttpServletResponse response){
 		int page = 1;
 		int pageSize = CsvUtils.downPerSize;
-		PageDTO pageDTO = driverVerifyService.queryDriverVerifyList(page, pageSize, cityId, supplier, mobile, verifyStatus,
+		PageDTO pageDTO = driverVerifyService.queryDriverVerifyList(page, pageSize, cityId, supplierId, mobile, verifyStatus,
 				createDateBegin, createDateEnd);
 		pageDTO.setPageSize(CsvUtils.downPerSize);
 		int pages = pageDTO.getPages();
@@ -128,7 +126,7 @@ public class DriverVerifyController {
 			utilEntity.exportCsvV2(response, transferData(pageDTO),headerList,fileName,true, page == pages);
 			page+=1;
 			while (page <= pages) {
-				pageDTO = driverVerifyService.queryDriverVerifyList(page, pageSize, cityId, supplier, mobile, verifyStatus,
+				pageDTO = driverVerifyService.queryDriverVerifyList(page, pageSize, cityId, supplierId, mobile, verifyStatus,
 						createDateBegin, createDateEnd);
 				utilEntity.exportCsvV2(response, transferData(pageDTO),headerList,fileName,false, page == pages);
 				page++;
