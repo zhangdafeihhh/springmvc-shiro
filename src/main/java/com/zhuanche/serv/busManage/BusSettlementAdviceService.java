@@ -3,7 +3,9 @@ package com.zhuanche.serv.busManage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -86,7 +89,7 @@ public class BusSettlementAdviceService implements BusConst {
 
     public JSONObject updateSupplierBill(BusSettlementOrderChangeDTO dto) {
         CarBizSupplier supplier = supplierMapper.selectByPrimaryKey(dto.getSupplierId());
-        Map<String, Object> param = new HashMap(16);
+        Map<String, Object> param = new HashMap<>(16);
         param.put("supplierBillId", dto.getSupplierBillId());
         param.put("addMoney", dto.getAddMoney());
         param.put("type",dto.getType());
@@ -111,7 +114,7 @@ public class BusSettlementAdviceService implements BusConst {
         return result;
     }
     public JSONObject queryOrderList(BusSettleOrderListDTO dto) {
-        Map<String,Object> param = new HashMap(16);
+        Map<String,Object> param = new HashMap<>(16);
         if(dto.getUserId()!=null){
             param.put("userId",dto.getUserId());
         }
@@ -153,16 +156,16 @@ public class BusSettlementAdviceService implements BusConst {
      * @Description: 结算单确认收票窗口查询
      */
     public BusSettlementInvoiceVO queryInvoiceInfo(String supplierBillId) {
-        // 查询账单信息
+        // 一、查询账单信息
         JSONObject billDetail = getBillDetail(supplierBillId);
         if (billDetail == null) {
             return null;
         }
         BusSettlementInvoiceVO invoiceVO = JSON.toJavaObject(billDetail, BusSettlementInvoiceVO.class);
 
-        // 补充信息
-        // 供应商名称
+        // 二、补充信息
         if (invoiceVO != null) {
+        	// 供应商名称
             Integer supplierId = billDetail.getInteger("supplierId");
             if (supplierId != null) {
                 CarBizSupplier supplier = carBizSupplierMapper.selectByPrimaryKey(supplierId);
@@ -170,10 +173,18 @@ public class BusSettlementAdviceService implements BusConst {
                     invoiceVO.setSupplierName(supplier.getSupplierFullName());
                 }
             }
+            // 发票附件
+            JSONArray invoiceFiles = getInvoiceFile(supplierBillId);
+            if (invoiceFiles != null) {
+            	List<String> filePaths = invoiceFiles.stream().map(file -> {
+            		 JSONObject jsonObject = (JSONObject) JSON.toJSON(file);
+            		 return jsonObject.getString("supplierInvoiceUrl");
+            	}).collect(Collectors.toList());
+            	invoiceVO.setInvoiceFiles(filePaths);
+			}
         }
-
-        return invoiceVO;
-    }
+		return invoiceVO;
+	}
 
     /**
      * @param invoiceDTO
@@ -184,17 +195,24 @@ public class BusSettlementAdviceService implements BusConst {
      * @Title: saveInvoiceInfo
      * @Description: 结算单确认收票窗口保存
      */
-    public AjaxResponse saveInvoiceInfo(BusSettlementInvoiceDTO invoiceDTO, MultipartFile file) throws IOException {
+    public AjaxResponse saveInvoiceInfo(BusSettlementInvoiceDTO invoiceDTO) throws IOException {
     	// 一、上传文件
-    	String fileName = file.getOriginalFilename();
-		logger.info("[ BusSettlementAdviceService-saveInvoiceInfo ] 上传文件名:{}", fileName);
-        try (InputStream in = file.getInputStream()) {
-        	UploadResult result = fileUploadService.uploadPublicStream(in, fileName);
-        	if (result.isSuccess()) {
-        		String filePath = result.getFilePath();
-        		// TODO invoiceDTO放入文件路径
-			}
-        }
+    	MultipartFile file = invoiceDTO.getInvoiceFile();
+    	if (file != null) {
+    		String fileName = file.getOriginalFilename();
+    		logger.info("[ BusSettlementAdviceService-saveInvoiceInfo ] 上传文件名:{}", fileName);
+    		try (InputStream in = file.getInputStream()) {
+    			UploadResult result = fileUploadService.uploadPublicStream(in, fileName);
+    			if (!result.isSuccess()) {
+    				return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, result.getMsg());
+    			}
+    			String filePath = result.getFilePath();
+    			String errorMsg = saveInvoiceFile(invoiceDTO, filePath);
+    			if (StringUtils.isNotBlank(errorMsg)) {
+    				return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, errorMsg);
+    			}
+    		}
+		}
     	// 二、保存信息
         String errorMsg = confirmInvoice(invoiceDTO);
         if (StringUtils.isNotBlank(errorMsg)) {
@@ -219,8 +237,8 @@ public class BusSettlementAdviceService implements BusConst {
         BusSettlementPaymentVO paymentVO = JSON.toJavaObject(billDetail, BusSettlementPaymentVO.class);
 
         // 补充信息
-        // 供应商名称
         if (paymentVO != null) {
+        	// 供应商名称
             Integer supplierId = billDetail.getInteger("supplierId");
             if (supplierId != null) {
                 CarBizSupplier supplier = carBizSupplierMapper.selectByPrimaryKey(supplierId);
@@ -356,6 +374,66 @@ public class BusSettlementAdviceService implements BusConst {
             }
         }
         return null;
+    }
+    
+    /**
+     * @Title: saveInvoiceFile
+     * @Description: 保存发票附件
+     * @param invoiceDTO
+     * @param filePath
+     * @return String
+     * @throws
+     */
+    public String saveInvoiceFile(BusSettlementInvoiceDTO invoiceDTO, String filePath) {
+        if (invoiceDTO != null) {
+			// 请求参数
+			Map<String, Object> params = new HashMap<>();
+			params.put("supplierBillId", invoiceDTO.getSupplierBillId());
+			params.put("supplierInvoiceUrl", filePath);
+			params.put("createName", WebSessionUtil.getCurrentLoginUser().getName());
+
+			try {
+				logger.info("[ BusSettlementAdviceService-saveInvoiceFile ] 供应商账单确认开票保存发票附件,params={}", params);
+				JSONObject result = MpOkHttpUtil.okHttpPostBackJson( orderPayUrl + Pay.SETTLE_SUPPLIER_ADD_INVOICE_URL, params, 2000, "保存发票附件");
+				if (result.getIntValue("code") != 0) {
+					String errorMsg = result.getString("msg");
+					logger.info("[ BusSettlementAdviceService-saveInvoiceFile ] 供应商账单确认开票保存发票附件调用接口出错,params={},errorMsg={}", params, errorMsg);
+					return errorMsg;
+				}
+			} catch (Exception e) {
+				logger.error("[ BusSettlementAdviceService-saveInvoiceFile ] 供应商账单确认开票保存发票附件异常,params={},errorMsg={}", params, e.getMessage(), e);
+				return "供应商账单确认开票保存发票附件异常";
+			}
+		}
+		return null;
+	}
+
+    /**
+     * @Title: getInvoiceFile
+     * @Description: 查询发票附件
+     * @param supplierBillId
+     * @return JSONArray
+     * @throws
+     */
+    public JSONArray getInvoiceFile(String supplierBillId) {
+    	if (StringUtils.isNotBlank(supplierBillId)) {
+			// 请求参数
+			Map<String, Object> params = new HashMap<>();
+			params.put("supplierBillId", supplierBillId);
+    		
+    		try {
+    			logger.info("[ BusSettlementAdviceService-getInvoiceFile ] 供应商账单确认开票查询发票附件,params={}", params);
+    			JSONObject result = MpOkHttpUtil.okHttpPostBackJson( orderPayUrl + Pay.SETTLE_SUPPLIER_QUERY_INVOICE_URL, params, 2000, "查询发票附件");
+    			if (result.getIntValue("code") != 0) {
+    				logger.info("[ BusSettlementAdviceService-getInvoiceFile ] 供应商账单确认开票查询发票附件调用接口出错,params={},errorMsg={}", params, result.getString("msg"));
+    				return null;
+    			}
+    			return result.getJSONArray("data");
+    		} catch (Exception e) {
+    			logger.error("[ BusSettlementAdviceService-getInvoiceFile ] 供应商账单确认开票查询发票附件异常,params={},errorMsg={}", params, e.getMessage(), e);
+    		} 
+    	}
+    	return null;
     }
 
     /**

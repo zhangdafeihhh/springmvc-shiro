@@ -94,26 +94,32 @@ public interface BusConst {
 		/** 查询供应商的账单 **/
 		String SETTLE_SUPPLIER_BILL_LIST = "/settle/supplier/bill/list";
 
-		/** 查询账单信息列表（流水列表）*/
-		String SETTLT_DETAIL_LIST="/settle/detail/list";
+		/** 查询账单信息列表（流水列表） */
+		String SETTLT_DETAIL_LIST = "/settle/detail/list";
 
-		/**结算单或者账单信息修改 */
-		String SETTLT_SUPPLIER_BILL_UPDATE="/settle/supplier/bill/update";
+		/** 结算单或者账单信息修改 */
+		String SETTLT_SUPPLIER_BILL_UPDATE = "/settle/supplier/bill/update";
 
 		/** 供应商账单查询根据账单id **/
 		String SETTLE_SUPPLIER_BILL_DETAIL = "/settle/supplier/bill/detail";
 
-		/**分佣流水查询根据id*/
-		String SETTLE_DETAIL_INFO="/settle/detail/info";
-		
+		/** 分佣流水查询根据id */
+		String SETTLE_DETAIL_INFO = "/settle/detail/info";
+
 		/** 供应商账单确认开票 **/
 		String SETTLE_SUPPLIER_BILL_CONFIRM_INVOICE = "/settle/supplier/bill/confirm/invoice";
-		
+
 		/** 供应商账单确认打款 **/
 		String SETTLE_SUPPLIER_BILL_CONFIRM_PAY = "/settle/supplier/bill/confirm/pay";
-		
+
 		/** 供应商账单确认打款 **/
 		String SETTLE_SUPPLIER_BILL_CONFIRM_SETTLE = "/settle/supplier/bill/confirm/settle";
+
+		/** 增加发票链接 **/
+		String SETTLE_SUPPLIER_ADD_INVOICE_URL = "/settle/supplier/add/invoice/url";
+		
+		/** 查询发票链接 **/
+		String SETTLE_SUPPLIER_QUERY_INVOICE_URL = "/settle/supplier/query/invoice/url";
 	}
 
 	/**

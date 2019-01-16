@@ -29,15 +29,6 @@ public class FileUploadService {
 	@Qualifier("wwwApiTemplate")
 	private MyRestTemplate wwwApiTemplate;
 
-	// 返回处理结果-key
-	public String CODE = "code";
-	public String MSG = "msg";
-	public String FILE_PATH = "filePath";
-
-	// 返回处理结果-value
-	public String SUCCESS = "success";
-	public String ERROR = "error";
-	
 	// ===============上传接口===================
 	private final String publicUrl = "/upload/public";
 	private final String privateUrl = "/upload/private";

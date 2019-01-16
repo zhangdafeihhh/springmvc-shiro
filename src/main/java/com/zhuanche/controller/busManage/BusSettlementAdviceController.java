@@ -1,8 +1,6 @@
 package com.zhuanche.controller.busManage;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,9 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -511,9 +507,8 @@ public class BusSettlementAdviceController {
      * @Description: 结算单确认收票窗口保存
      */
     @RequestMapping(value = "/invoice/save")
-	public AjaxResponse invoiceSave(@Validated BusSettlementInvoiceDTO invoiceDTO, MultipartFile file,
-			HttpServletRequest request, HttpServletResponse response) throws IOException {
-        return busSettlementAdviceService.saveInvoiceInfo(invoiceDTO, file);
+	public AjaxResponse invoiceSave(@Validated BusSettlementInvoiceDTO invoiceDTO) throws IOException {
+        return busSettlementAdviceService.saveInvoiceInfo(invoiceDTO);
     }
 
     /**
@@ -539,23 +534,6 @@ public class BusSettlementAdviceController {
     @RequestMapping(value = "/payment/save")
     public AjaxResponse paymentSave(@Validated BusSettlementPaymentDTO paymentDTO) {
         return busSettlementAdviceService.savePaymentInfo(paymentDTO);
-    }
-    
-	public void createValidateCodeImage(@RequestParam(value = "width", defaultValue = "82") Integer width,
-			@RequestParam(value = "height", defaultValue = "32") Integer height,
-			@RequestParam(value = "size", defaultValue = "20") Integer size, HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
-
-		response.setContentType("image/png");
-		response.setHeader("Cache-Control", "no-cache, no-store");
-
-		try (OutputStream ops = response.getOutputStream(); ByteArrayOutputStream byteArrayOutputStream = null;) {
-			byte[] imgs = byteArrayOutputStream.toByteArray();
-			ops.write(imgs);
-			ops.flush();
-		} catch (IOException e) {
-			logger.error("createValidateCodeImage", e);
-		}
 	}
 
 }
