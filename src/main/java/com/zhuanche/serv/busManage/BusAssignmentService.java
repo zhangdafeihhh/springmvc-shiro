@@ -245,8 +245,8 @@ public class BusAssignmentService {
         }
         List<String> orderIdList = new ArrayList<>();
         List<String> orderNoList = new ArrayList<>();
-        List<String> phoneList = new ArrayList();
-        List<Integer> userIds= new ArrayList();
+        List<String> phoneList = new ArrayList<>();
+        List<Integer> userIds= new ArrayList<>();
         List<Integer> driverIds=new ArrayList<>();
         orderList.forEach(order -> {
             orderIdList.add(String.valueOf(order.getOrderId()));
@@ -269,7 +269,7 @@ public class BusAssignmentService {
         });
         //批量查询司机信息和供应商名称
         List<Map<String, Object>> driverInfos = busCarBizDriverInfoExMapper.queryDriverSimpleBatch(driverIds);
-        Map<Integer,Map<String,Object>> driverInfoMap=new HashMap(driverInfos.size());
+        Map<Integer,Map<String,Object>> driverInfoMap=new HashMap<>(driverInfos.size());
         driverInfos.forEach(o->{
             driverInfoMap.put(Integer.parseInt(o.get("driverId").toString()),o);
         });
@@ -282,7 +282,7 @@ public class BusAssignmentService {
         //批量调用计费接口
 
         String orderNos = StringUtils.join(orderNoList, ",");
-        Map<String, BusCostDetail> orderCostMap = new HashMap(16);
+        Map<String, BusCostDetail> orderCostMap = new HashMap<>(16);
         JSONArray busCostList = this.getBusCostDetailList(orderNos);
         if (busCostList != null && !busCostList.isEmpty()) {
             busCostList.stream().map(o -> JSONObject.toJavaObject((JSONObject) o, BusCostDetail.class))

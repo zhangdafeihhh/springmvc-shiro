@@ -8,15 +8,17 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.protobuf.StringValue;
-import com.zhuanche.common.cache.RedisCacheUtil;
-import com.zhuanche.constants.busManage.BusConstant;
-import mapper.rentcar.ex.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -37,6 +39,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson.JSON;
+import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
@@ -45,6 +48,7 @@ import com.zhuanche.common.rocketmq.CommonRocketProducer;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constants.BusConst;
+import com.zhuanche.constants.busManage.BusConstant;
 import com.zhuanche.dto.busManage.BusBaseStatisDTO;
 import com.zhuanche.dto.busManage.BusDriverQueryDTO;
 import com.zhuanche.dto.busManage.BusDriverSaveDTO;
@@ -77,7 +81,6 @@ import com.zhuanche.vo.busManage.BusDriverInfoPageVO;
 import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.mdbcarmanage.CarRelateGroupMapper;
 import mapper.mdbcarmanage.CarRelateTeamMapper;
-import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
 import mapper.mdbcarmanage.ex.CarBizAgreementCompanyExMapper;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.mdbcarmanage.ex.CarRelateGroupExMapper;
@@ -88,6 +91,13 @@ import mapper.rentcar.CarBizCooperationTypeMapper;
 import mapper.rentcar.CarBizDriverAccountMapper;
 import mapper.rentcar.CarBizDriverInfoMapper;
 import mapper.rentcar.CarBizSupplierMapper;
+import mapper.rentcar.ex.BusCarBizCustomerAppraisalStatisticsExMapper;
+import mapper.rentcar.ex.BusCarBizDriverInfoExMapper;
+import mapper.rentcar.ex.CarBizCarGroupExMapper;
+import mapper.rentcar.ex.CarBizCarInfoExMapper;
+import mapper.rentcar.ex.CarBizCityExMapper;
+import mapper.rentcar.ex.CarBizDriverInfoExMapper;
+import mapper.rentcar.ex.CarBizSupplierExMapper;
 
 /**
  * @ClassName: BusCarBizDriverInfoService
@@ -927,15 +937,22 @@ public class BusCarBizDriverInfoService implements BusConst {
             messageMap.put("supplierId", saveDTO.getSupplierId()); // 司机供应商
             messageMap.put("cooperationType", saveDTO.getCooperationType()); // 司机加盟类型
             messageMap.put("groupId", saveDTO.getGroupId()); // 司机服务类型ID
-            messageMap.put("create_date", saveDTO.getCreateDate()); // 司机创建时间
+            
+            Date createDate = saveDTO.getCreateDate();
+            String create_date = "";
+            if (createDate != null) {
+            	create_date = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.ofInstant(createDate.toInstant(), ZoneId.systemDefault()));
+			}
+            messageMap.put("create_date", create_date); // 司机创建时间
             messageMap.put("carType", saveDTO.getGroupName() == null ? "" : saveDTO.getGroupName()); // 司机服务类型
             messageMap.put("teamId", saveDTO.getTeamId() == null ? "" : saveDTO.getTeamId()); // 司机所属车队ID
             messageMap.put("teamName", saveDTO.getTeamName() == null ? "" : saveDTO.getTeamName()); // 司机所属车队名称
             messageMap.put("teamGroupId", saveDTO.getTeamGroupId() == null ? "" : saveDTO.getTeamGroupId()); // 司机所属小组ID
             messageMap.put("teamGroupName", saveDTO.getTeamGroupName() == null ? "" : saveDTO.getTeamGroupName()); // 司机所属小组名称
 
-            logger.info("专车司机driverId={}，同步发送数据={}", saveDTO.getDriverId(), JSON.toJSONString(messageMap));
-            CommonRocketProducer.publishMessage("driver_info", method, String.valueOf(saveDTO.getDriverId()), messageMap);
+            Integer driverId = saveDTO.getDriverId();
+            logger.info("专车司机driverId={}，同步发送数据={}", driverId, JSON.toJSONString(messageMap));
+            CommonRocketProducer.publishMessage("driver_info", method, String.valueOf(driverId), messageMap);
         } catch (Exception e) {
             logger.error("发送MQ异常,method={},error={}", method, e.getMessage(), e);
         }

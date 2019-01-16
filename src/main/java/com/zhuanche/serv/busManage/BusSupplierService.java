@@ -1,9 +1,11 @@
 package com.zhuanche.serv.busManage;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,8 +45,11 @@ import com.zhuanche.dto.busManage.BusSupplierProrateDTO;
 import com.zhuanche.dto.busManage.BusSupplierQueryDTO;
 import com.zhuanche.dto.busManage.BusSupplierRebateDTO;
 import com.zhuanche.entity.mdbcarmanage.BusBizSupplierDetail;
+import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
+import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.CarBizDriverInfoService;
+import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.mdbcarmanage.CarBizDriverInfoTempService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.excel.CsvUtils;
@@ -52,7 +57,7 @@ import com.zhuanche.vo.busManage.BusSupplierExportVO;
 import com.zhuanche.vo.busManage.BusSupplierInfoVO;
 import com.zhuanche.vo.busManage.BusSupplierPageVO;
 
-import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
+import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.mdbcarmanage.ex.BusBizSupplierDetailExMapper;
 import mapper.rentcar.ex.BusCarBizSupplierExMapper;
 
@@ -64,6 +69,8 @@ public class BusSupplierService implements BusConst {
 	private static final Logger logger = LoggerFactory.getLogger(BusSupplierService.class);
 	
 	// ===========================表基础mapper==================================
+	@Autowired
+    private CarAdmUserMapper carAdmUserMapper;
 
 	// ===========================专车业务拓展mapper==================================
 
@@ -80,6 +87,9 @@ public class BusSupplierService implements BusConst {
 
 	@Autowired
 	private CarBizDriverInfoTempService carBizDriverInfoTempService;
+	
+	@Autowired
+	private CarBizSupplierService carBizSupplierService;
 
 	// ===========================巴士业务拓展service==================================
 	@Autowired
@@ -166,11 +176,7 @@ public class BusSupplierService implements BusConst {
 
 		// 六、MQ消息写入 供应商
 		try {
-			Map<String, Object> msgMap = new HashMap<String, Object>();
-			msgMap.put("method", method);
-			msgMap.put("data", JSON.toJSONString(baseDTO));
-			logger.info("专车供应商，同步发送数据：", JSON.toJSONString(msgMap));
-			CommonRocketProducer.publishMessage("vipSupplierTopic", method.name(), String.valueOf(baseDTO.getSupplierId()), msgMap);
+			sendSupplierToMq(method, supplierId);
 		} catch (Exception e) {
 			logger.error("[ BusSupplierService-saveSupplierInfo ] 供应商信息发送MQ出错", e.getMessage(), e);
 		}
@@ -185,9 +191,74 @@ public class BusSupplierService implements BusConst {
 			}
 		}
 	}
-	
+
+	/**
+	 * @Title: sendSupplierToMq
+	 * @Description: TODO
+	 * @param method
+	 * @param supplierId void
+	 * @throws
+	 */
 	enum Method {
 		UPDATE, CREATE
+	}
+	private void sendSupplierToMq(Method methodEnum, Integer supplierId) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		// 供应商信息
+		CarBizSupplier supplier = carBizSupplierService.selectByPrimaryKey(supplierId);
+		// 一、创建人名称
+		String createName = "";
+        if (supplier.getCreateBy() != null) {
+            CarAdmUser carAdmUser = carAdmUserMapper.selectByPrimaryKey(supplier.getCreateBy());
+            if (carAdmUser != null) {
+            	createName = carAdmUser.getUserName();
+            }
+        }
+        // 二、修改人名称
+        String updateName = "";
+        if (supplier.getUpdateBy() != null) {
+            CarAdmUser carAdmUser = carAdmUserMapper.selectByPrimaryKey(supplier.getUpdateBy());
+            if (carAdmUser != null) {
+            	updateName = carAdmUser.getUserName();
+            }
+        }
+        // 三、创建时间
+        String createDate = "";
+        if (supplier.getCreateDate() != null) {
+        	createDate = formatter.format(LocalDateTime.ofInstant(supplier.getCreateDate().toInstant(), ZoneId.systemDefault()));
+		}
+        // 四、修改时间
+        String updateDate = "";
+        if (supplier.getUpdateDate() != null) {
+        	updateDate = formatter.format(LocalDateTime.ofInstant(supplier.getUpdateDate().toInstant(), ZoneId.systemDefault()));
+        }
+        
+        String method = methodEnum.name();
+		Map<String, Object> data = new HashMap<>();
+		data.put("supplierId", supplier.getSupplierId());
+		data.put("supplierNum", supplier.getSupplierNum());
+		data.put("supplierFullName", supplier.getSupplierFullName());
+		data.put("supplierCity", supplier.getSupplierCity());
+		data.put("type", supplier.getType());
+		data.put("contacts", supplier.getContacts());
+		data.put("contactsPhone", supplier.getContactsPhone());
+		data.put("memo", supplier.getMemo());
+		data.put("status", supplier.getStatus());
+		data.put("createBy", supplier.getCreateBy());
+		data.put("updateBy", supplier.getUpdateBy());
+		data.put("createDate", createDate);
+		data.put("updateDate", updateDate);
+		data.put("iscommission", supplier.getIscommission());
+		data.put("pospayflag", supplier.getPospayflag());
+		data.put("cooperationType", supplier.getCooperationType());
+		data.put("createName", createName);
+		data.put("updateName", updateName);
+		
+		Map<String, Object> msgMap = new HashMap<String, Object>();
+		msgMap.put("method", method);
+		msgMap.put("data", JSON.toJSONString(data));
+		logger.info("专车供应商，同步发送数据：", JSON.toJSONString(msgMap));
+		CommonRocketProducer.publishMessage("vipSupplierTopic", method, String.valueOf(supplierId), msgMap);
 	}
 
 	/**

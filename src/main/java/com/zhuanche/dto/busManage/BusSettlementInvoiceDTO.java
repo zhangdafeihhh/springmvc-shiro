@@ -9,6 +9,9 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
+import org.springframework.web.multipart.MultipartFile;
+
+import lombok.Data;
 
 /**
  * @ClassName: BusSettlementInvoiceVO
@@ -17,6 +20,7 @@ import org.springframework.format.annotation.DateTimeFormat.ISO;
  * @date: 2018年12月19日 下午2:29:14
  * 
  */
+@Data
 public class BusSettlementInvoiceDTO {
 
 	/** 账单编号 **/
@@ -33,39 +37,10 @@ public class BusSettlementInvoiceDTO {
 	@DateTimeFormat(iso = ISO.DATE)
 	private Date invoiceDate;
 
+	/** 发票附件 **/
+	private MultipartFile invoiceFile;
+
 	/** 开票人 **/
 	private String invoiceName;
-
-	public String getSupplierBillId() {
-		return supplierBillId;
-	}
-
-	public void setSupplierBillId(String supplierBillId) {
-		this.supplierBillId = supplierBillId;
-	}
-
-	public BigDecimal getInvoiceAmount() {
-		return invoiceAmount;
-	}
-
-	public void setInvoiceAmount(BigDecimal invoiceAmount) {
-		this.invoiceAmount = invoiceAmount;
-	}
-
-	public Date getInvoiceDate() {
-		return invoiceDate;
-	}
-
-	public void setInvoiceDate(Date invoiceDate) {
-		this.invoiceDate = invoiceDate;
-	}
-
-	public String getInvoiceName() {
-		return invoiceName;
-	}
-
-	public void setInvoiceName(String invoiceName) {
-		this.invoiceName = invoiceName;
-	}
 
 }

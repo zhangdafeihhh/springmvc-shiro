@@ -1,5 +1,29 @@
 package com.zhuanche.controller.busManage;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotBlank;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -12,9 +36,13 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.constants.busManage.BusConstant;
 import com.zhuanche.constants.busManage.BusConstant.SupplierMaidConstant;
-import com.zhuanche.dto.busManage.*;
+import com.zhuanche.dto.busManage.BusSettleChangeDTO;
+import com.zhuanche.dto.busManage.BusSettleOrderListDTO;
+import com.zhuanche.dto.busManage.BusSettlementInvoiceDTO;
+import com.zhuanche.dto.busManage.BusSettlementOrderChangeDTO;
+import com.zhuanche.dto.busManage.BusSettlementPaymentDTO;
+import com.zhuanche.dto.busManage.BusSupplierSettleListDTO;
 import com.zhuanche.entity.busManage.BusOrderDetail;
-import com.zhuanche.entity.rentcar.CarBizCustomer;
 import com.zhuanche.entity.rentcar.CarBizService;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.serv.CarBizSupplierService;
@@ -26,28 +54,16 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.excel.CsvUtils;
-import com.zhuanche.vo.busManage.*;
-import mapper.rentcar.CarBizCustomerMapper;
-import mapper.rentcar.CarBizServiceMapper;
-import mapper.rentcar.CarBizSupplierMapper;
-import mapper.rentcar.ex.CarBizSupplierExMapper;
-import org.apache.commons.lang3.StringUtils;
-import org.aspectj.weaver.loadtime.Aj;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import com.zhuanche.vo.busManage.BusSettleOrderListVO;
+import com.zhuanche.vo.busManage.BusSettlementDetailVO;
+import com.zhuanche.vo.busManage.BusSettlementInvoiceVO;
+import com.zhuanche.vo.busManage.BusSettlementPaymentVO;
+import com.zhuanche.vo.busManage.BusSettlementUdateInitVO;
+import com.zhuanche.vo.busManage.BusSupplierInfoVO;
+import com.zhuanche.vo.busManage.BusSupplierSettleDetailVO;
+import com.zhuanche.vo.busManage.BusTransactionsDetailVO;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotBlank;
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.stream.Collectors;
+import mapper.rentcar.CarBizServiceMapper;
 
 /**
  * @ClassName: BusSettlementAdviceController
@@ -433,7 +449,7 @@ public class BusSettlementAdviceController {
             logger.error(LOG_PRE + "修改账单失败=" + result.getString("msg"));
             return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "修改账单失败");
         }
-        return AjaxResponse.success(new ArrayList());
+        return AjaxResponse.success(new ArrayList<>());
     }
 
     /**
@@ -454,7 +470,7 @@ public class BusSettlementAdviceController {
             logger.error(LOG_PRE + "修改订单记录失败=" + result.getString("msg"));
             return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "修改订单记录失败");
         }
-        return AjaxResponse.success(new ArrayList());
+        return AjaxResponse.success(new ArrayList<>());
     }
 
 
@@ -485,12 +501,13 @@ public class BusSettlementAdviceController {
     /**
      * @param invoiceDTO
      * @return AjaxResponse
+     * @throws IOException 
      * @throws
      * @Title: invoiceSave
      * @Description: 结算单确认收票窗口保存
      */
     @RequestMapping(value = "/invoice/save")
-    public AjaxResponse invoiceSave(@Validated BusSettlementInvoiceDTO invoiceDTO) {
+	public AjaxResponse invoiceSave(@Validated BusSettlementInvoiceDTO invoiceDTO) throws IOException {
         return busSettlementAdviceService.saveInvoiceInfo(invoiceDTO);
     }
 
@@ -517,6 +534,6 @@ public class BusSettlementAdviceController {
     @RequestMapping(value = "/payment/save")
     public AjaxResponse paymentSave(@Validated BusSettlementPaymentDTO paymentDTO) {
         return busSettlementAdviceService.savePaymentInfo(paymentDTO);
-    }
+	}
 
 }
