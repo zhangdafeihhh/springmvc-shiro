@@ -4,6 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.rocketmq.CommonRocketProducer;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -23,10 +26,8 @@ import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import mapper.rentcar.CarBizSupplierMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
-import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -67,6 +68,9 @@ public class CarBizSupplierService{
 	String commissionUrl;
 
 	/**查询供应商信息**/
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public Map<Integer, CarBizSupplier> querySupplier( Integer cityId,  Set<Integer> supplierids ){
         Set<Integer> cityIds = Sets.newHashSet();
         cityIds.add(cityId);
@@ -81,6 +85,9 @@ public class CarBizSupplierService{
 		return result;
 	}
 
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
     public CarBizSupplier queryForObject(CarBizSupplier carBizSupplier){
 	    return carBizSupplierExMapper.queryForObject(carBizSupplier);
     }
@@ -90,17 +97,30 @@ public class CarBizSupplierService{
 	 * @param supplierId
 	 * @return
 	 */
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public CarBizSupplier selectByPrimaryKey(Integer supplierId){
 		return carBizSupplierMapper.selectByPrimaryKey(supplierId);
 	}
 
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
     public List<CarBizSupplier> findByIdSet(Set<Integer> supplierIdSet) {
 		return carBizSupplierExMapper.findByIdSet(supplierIdSet);
     }
 
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public List<CarBizSupplierVo> findSupplierListByPage(CarBizSupplierQuery queryParam) {
 		return carBizSupplierExMapper.findByParams(queryParam);
 	}
+
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 
     public AjaxResponse saveSupplierInfo(CarBizSupplierVo supplier) {
 		try{
