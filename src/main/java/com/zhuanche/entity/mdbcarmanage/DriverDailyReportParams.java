@@ -28,6 +28,9 @@ public class DriverDailyReportParams implements Serializable{
 	private Integer page;
 	private Integer pageSize;
 
+	private String tableName;//按月份表的表名
+
+
 	public DriverDailyReportParams(String licensePlates, String driverName, String driverIds, String teamIds, String suppliers, String cities, String statDateStart,
 		   String statDateEnd, String sortName, String sortOrder, String groupIds, Integer page, Integer pageSize) {
 		this.licensePlates = licensePlates;
@@ -164,6 +167,14 @@ public class DriverDailyReportParams implements Serializable{
 		this.pageSize = pageSize;
 	}
 
+	public String getTableName() {
+		return tableName;
+	}
+
+	public void setTableName(String tableName) {
+		this.tableName = tableName;
+	}
+
 	@Override
 	public String toString() {
 		return "DriverDailyReportParams{" +
@@ -180,6 +191,7 @@ public class DriverDailyReportParams implements Serializable{
 				", groupIds='" + groupIds + '\'' +
 				", page=" + page +
 				", pageSize=" + pageSize +
+				", tableName=" + tableName +
 				'}';
 	}
 }
