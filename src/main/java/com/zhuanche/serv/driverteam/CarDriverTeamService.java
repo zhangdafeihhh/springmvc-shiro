@@ -228,9 +228,9 @@ public class CarDriverTeamService{
 			DutyParamRequest param = new DutyParamRequest();
 			param.setDriverId(Integer.valueOf(id));
 			String driverId = carBizDriverInfoExMapper.queryOneDriver(param).getDriverId();
-			if(!Check.NuNObj(driverTeamRequest.getpId())){
+			if(!Check.NuNObj(carDriverTeam.getpId())){
 				//小组
-				group.setGroupId(driverTeamRequest.getpId());
+				group.setGroupId(driverTeamRequest.getTeamId());
 				group.setDriverId(Integer.valueOf(driverId));
 				CarRelateGroup existsGroup = null;
 				try{
