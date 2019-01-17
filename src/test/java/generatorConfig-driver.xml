@@ -55,7 +55,7 @@
 			enableSelectByExample="false" enableDeleteByExample="false"
 			enableCountByExample="false" enableUpdateByExample="false">
 			<property name="useActualColumnNames" value="false" />
-			<generatedKey column="ID" sqlStatement="MySql" identity="true" />
+			<generatedKey column="id" sqlStatement="MySql" identity="true" />
 		</table>
 		
 	</context>

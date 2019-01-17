@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="mapper.driver.SupplierExtDtoMapper" >
   <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.SupplierExtDto" >
-    <id column="ID" property="id" jdbcType="BIGINT" />
+    <id column="id" property="id" jdbcType="BIGINT" />
     <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
     <result column="status" property="status" jdbcType="TINYINT" />
     <result column="supplier_short_name" property="supplierShortName" jdbcType="VARCHAR" />
@@ -12,17 +12,17 @@
     <result column="remark" property="remark" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    ID, supplier_id, status, supplier_short_name, create_date, update_date, email, remark
+    id, supplier_id, status, supplier_short_name, create_date, update_date, email, remark
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
     <include refid="Base_Column_List" />
     from supplier_ext
-    where ID = #{id,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     delete from supplier_ext
-    where ID = #{id,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.zhuanche.entity.driver.SupplierExtDto" >
     <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
@@ -112,7 +112,7 @@
         remark = #{remark,jdbcType=VARCHAR},
       </if>
     </set>
-    where ID = #{id,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.SupplierExtDto" >
     update supplier_ext
@@ -123,6 +123,6 @@
       update_date = #{updateDate,jdbcType=TIMESTAMP},
       email = #{email,jdbcType=VARCHAR},
       remark = #{remark,jdbcType=VARCHAR}
-    where ID = #{id,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>
