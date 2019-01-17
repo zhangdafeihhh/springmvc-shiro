@@ -159,7 +159,7 @@ public class BusSupplierController {
 			busBizChangeLogService.insertLog(BusinessType.SUPPLIER, String.valueOf(supplierId), "创建供应商", new Date());
 		} else {
 			List<Object> freshes = busSupplierService.getContents(supplierId);;
-			busSupplierService.saveChangeLog(mtehod,old,fresh);
+//			busSupplierService.saveChangeLog(mtehod,old,fresh);
 		}
 		
 		return response;
