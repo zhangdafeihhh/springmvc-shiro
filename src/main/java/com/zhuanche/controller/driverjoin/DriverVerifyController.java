@@ -217,6 +217,7 @@ public class DriverVerifyController {
 			builder.append("\t").append(driverVerify.getCityName() == null ? "" : driverVerify.getCityName()).append(Constants.SEPERATER);
 			builder.append("\t").append(driverVerify.getId()).append(Constants.SEPERATER);
 			builder.append("\t").append(driverVerify.getName() == null ? "" : driverVerify.getName()).append(Constants.SEPERATER);
+			builder.append("\t").append(driverVerify.getMobile() == null ? "" : driverVerify.getMobile()).append(Constants.SEPERATER);
 			builder.append("\t").append(driverVerify.getSupplierName() == null ? "" : driverVerify.getSupplierName()).append(Constants.SEPERATER);
 			builder.append("\t").append(driverVerify.getPlateNum() == null ? "" : driverVerify.getPlateNum()).append(Constants.SEPERATER);
 			builder.append("\t").append(DateUtil.timestampFormat(driverVerify.getCreateAt())).append(Constants.SEPERATER);
