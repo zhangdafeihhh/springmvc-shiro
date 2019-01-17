@@ -813,7 +813,7 @@ public class CarBizDriverInfoService {
                         params.clear();
                         params.put("orderNo", orderNum);
                         params.put("bId", bId);
-                        params.put("columns", "update_date");
+                        params.put("columns", "fact_end_date");
                         try{
                             params.put("sign", MD5Utils.getMD5DigestBase64(SignatureUtils.getMD5Sign(params, signKey)));
                         }catch (Exception e){
@@ -823,8 +823,10 @@ public class CarBizDriverInfoService {
                         if (result != null && Constants.SUCCESS_CODE == result.getInteger(Constants.CODE)){
                             JSONArray jsonArray = result.getJSONArray(Constants.DATA);
                             if (jsonArray != null && !jsonArray.isEmpty()){
-                                String updateDate = jsonArray.getJSONObject(0).getString("updateDate");
-                                carBizDriverInfo.setActiveDate(DateUtil.getTimeString(updateDate));
+                                String updateDate = jsonArray.getJSONObject(0).getString("factEndDate");
+                                if(StringUtils.isNotBlank(updateDate)){
+                                    carBizDriverInfo.setActiveDate(DateUtil.getTimeString(updateDate));
+                                }
                             }
                         }
                     }
