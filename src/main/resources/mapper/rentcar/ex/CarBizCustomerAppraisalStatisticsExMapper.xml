@@ -67,7 +67,7 @@
 
   <select id="queryCustomerAppraisalStatisticsListV2" resultMap="BaseResultMap" parameterType="com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO" >
     select
-    ca.appraisal_statistics_id, ca.driver_id, ca.driver_name, ca.driver_phone, ca.instrument_and_service,
+    distinct ca.appraisal_statistics_id, ca.driver_id, ca.driver_name, ca.driver_phone, ca.instrument_and_service,
     ca.environment_and_equipped, ca.efficiency_and_safety, ca.evaluate_score, ca.create_date, ca.sys_date
     from car_biz_customer_appraisal_statistics ca
     <where>
