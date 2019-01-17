@@ -18,6 +18,9 @@ import java.util.function.Function;
 public class CompareObejctUtils {
 
 	private static BiConsumer<CompareObjectAttr, List<Object>> defaultConsumer = null;
+	
+	/** 分隔符 **/
+	public static final String separator = "<::>";
 
 	static {
 		defaultConsumer = new BiConsumer<CompareObjectAttr, List<Object>>() {
@@ -25,14 +28,14 @@ public class CompareObejctUtils {
 			public void accept(CompareObjectAttr attr, List<Object> results) {
 				String old = attr.getOld();
 				String fresh = attr.getFresh();
-				String note = attr.getNote();
+				String note = "[" + attr.getNote() + "]";
 
 				if (StringUtils.isBlank(old)) {
-					results.add(note + " 设置为：" + fresh);
+					results.add(note + "设为 " + fresh);
 				} else if (StringUtils.isBlank(fresh)) {
-					results.add("将原有的  " + note + " " + old + " " + " 清空");
+					results.add("将原有" + note + old + " 清空");
 				} else {
-					results.add("将  " + note + " 由  " + old + " 更新为   " + fresh);
+					results.add("将" + note + "由 " + old + " 改为 " + fresh);
 				}
 			}
 		};

@@ -87,8 +87,14 @@ public interface BusConst {
 		/** 供应商返点协议删除 **/
 		String SETTLE_SUPPLIER_REBATE_DELETE = "/settle/supplier/rebate/delete";
 
+		/** 根据有效比例获取供应商 **/
+		String SETTLE_SUPPLIER_INFO_BY_PRORATE_RATE = "/settle/supplier/info/by/prorate/rate";
+
 		/** 查询供应商分佣有关的信息（批量） **/
 		String SETTLE_SUPPLIER_PRORATE_LIST = "/settle/supplier/prorate/list";
+		
+		/** 导出供应商分佣信息 **/
+		String SETTLE_EXPORT_SUPPLIER_INFO = "/settle/export/supplier/info";
 
 		// =============================================结算单接口列表===================================================
 		/** 查询供应商的账单 **/

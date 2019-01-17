@@ -211,9 +211,9 @@
         		TIMESTAMPDIFF(MONTH, now(), contract_date_end) <![CDATA[<]]> 3
         	AND TIMESTAMPDIFF(MONTH, now(), contract_date_end) <![CDATA[>=]]> 0
         	AND contract_date_end >= NOW()
-            <if test="permOfSupplier != null and permOfSupplier.size() > 0">
+            <if test="supplierIds != null and supplierIds.size() > 0">
 				AND supplier_id IN
-				<foreach collection="permOfSupplier" open="(" close=")" separator="," item="item">
+				<foreach collection="supplierIds" item="item" open="(" separator="," close=")">
 					#{item}
 				</foreach>
 			</if>

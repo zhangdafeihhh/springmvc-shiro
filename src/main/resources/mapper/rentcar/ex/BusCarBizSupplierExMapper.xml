@@ -189,9 +189,9 @@
 		<if test="status != null">
 			AND s.`status` = #{status}
 		</if>
-		<if test="commissionIds != null and commissionIds.size() > 0">
+		<if test="supplierRateIds != null and supplierRateIds.size() > 0">
 			AND s.supplier_id IN 
-			<foreach collection="commissionIds" item="item" open="(" separator="," close=")">
+			<foreach collection="supplierRateIds" item="item" open="(" separator="," close=")">
 				#{item}
 			</foreach>
 		</if>
