@@ -119,9 +119,9 @@ public class CarBizSupplierService{
 	}
 
 	@MasterSlaveConfigs(configs={
-			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource"),
+			@MasterSlaveConfig(databaseTag="driver-DataSource")
 	} )
-
     public AjaxResponse saveSupplierInfo(CarBizSupplierVo supplier) {
 		try{
 			if (supplier.getSupplierShortName() != null && supplier.getSupplierShortName().length() > 10){
@@ -182,6 +182,10 @@ public class CarBizSupplierService{
 		}
     }
 
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE ),
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public void addExtInfo(List<CarBizSupplierVo> list) {
 		List<Integer> idList = new ArrayList<>(list.size());
 		list.forEach( carBizSupplierVo -> idList.add(carBizSupplierVo.getSupplierId()));
@@ -200,6 +204,11 @@ public class CarBizSupplierService{
 		}
 	}
 
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE ),
+			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE ),
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
     public AjaxResponse querySupplierById(Integer supplierId) {
 		CarBizSupplierVo vo = carBizSupplierExMapper.querySupplierById(supplierId);
 		if (vo == null){
@@ -256,6 +265,9 @@ public class CarBizSupplierService{
 		}
     }
 
+	@MasterSlaveConfigs(configs={
+			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+	} )
 	public AjaxResponse checkSupplierFullName(String supplierName) {
 		int count = carBizSupplierExMapper.checkSupplierFullName(supplierName);
 		if (count > 0){
