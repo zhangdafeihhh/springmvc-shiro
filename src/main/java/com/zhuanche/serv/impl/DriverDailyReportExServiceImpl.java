@@ -270,7 +270,7 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
                 //url = "/driverIncome/findDriverIncomes?driverIds="+drivers+"&incomeDate="+startDate ;
             }
             String result = busOrderCostTemplate.getForObject(url, String.class);
-
+            logger.info("返回结果：" + result);
             long invokeEndTime = System.currentTimeMillis();
             logger.info("调用计费时长：" + (invokeEndTime-time));
             Map<String, Object> resultMap = JSONObject.parseObject(result, HashMap.class);
@@ -296,11 +296,9 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
                     // 当段日期完成订单量
                     DriverIncome driverObject = null;
                     try {
-                        Integer orderCounts = Constants.WEEK.equals(type)?
-                                jsonObject.getInteger("orderCounts"):jsonObject.getInteger("monthOrderCounts");
+                        Integer orderCounts = jsonObject.getInteger("orderCounts");
                         // 当段日期营业额
-                        BigDecimal incomeAmount = new BigDecimal(Constants.WEEK.equals(type)?
-                                jsonObject.getString("incomeAmount"):jsonObject.getString("monthIncomeAmount"));
+                        BigDecimal incomeAmount = new BigDecimal(jsonObject.getString("incomeAmount"));
 
                         driverObject = new DriverIncome(orderCounts, incomeAmount);
 
