@@ -209,6 +209,9 @@ public class DriverVerifyController {
 	private List<String> transferData(PageDTO pageDTO){
 		List<String> data = new ArrayList<>();
 		List<DriverVerifyDto> result = pageDTO.getResult();
+		if (result == null || result.isEmpty()){
+			return data;
+		}
 		StringBuilder builder = new StringBuilder();
 		for (DriverVerifyDto driverVerify : result){
 			if (driverVerify == null){
