@@ -270,7 +270,6 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
                 //url = "/driverIncome/findDriverIncomes?driverIds="+drivers+"&incomeDate="+startDate ;
             }
             String result = busOrderCostTemplate.getForObject(url, String.class);
-            logger.info("返回结果：" + result);
             long invokeEndTime = System.currentTimeMillis();
             logger.info("调用计费时长：" + (invokeEndTime-time));
             Map<String, Object> resultMap = JSONObject.parseObject(result, HashMap.class);
