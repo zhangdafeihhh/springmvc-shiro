@@ -3680,6 +3680,11 @@ public class CarBizDriverInfoService {
                     } else {
                         driverMongoService.saveDriverMongo(driverInfoDTO);
                     }
+                    try {
+                        carBizChatUserService.insertChat(driverInfoDTO.getDriverId());
+                    } catch (Exception e) {
+                        logger.error("开通千里眼账号carBizChatUserService.insertChat异常：",e);
+                    }
                 }
                 driverTelescopeUser = new DriverTelescopeUser();
                 driverTelescopeUser.setUserId(user.getUserId());
