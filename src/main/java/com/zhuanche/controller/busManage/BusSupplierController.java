@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -167,14 +168,36 @@ public class BusSupplierController {
 	
 	/**
 	 * @Title: deleteProrate
-	 * @Description: 根据ID删除供应商分佣协议
+	 * @Description: 根据ID删除供应商结算比例
 	 * @param id
 	 * @return AjaxResponse
 	 * @throws
 	 */
 	@RequestMapping(value = "/deleteProrate")
-	public AjaxResponse deleteProrate(@NotNull(message = "id不能为空") Long id) {
-		return busSupplierService.deleteProrate(id);
+	public AjaxResponse deleteProrate(@NotNull(message = "id不能为空") Long id,
+			@NotNull(message = "供应商ID不能为空") Integer supplierId, String supplierRate, String startTime, String endTime,
+			String createName, String createTime) {
+		// 一、删除分佣协议
+		AjaxResponse response = busSupplierService.deleteProrate(id);
+		// 二、保存操作日志
+		StringBuilder builder = new StringBuilder("删除供应商结算比例配置   ");
+		if (StringUtils.isNotBlank(supplierRate)) {
+			builder.append("结算比例:").append(supplierRate).append(";");
+		}
+		if (StringUtils.isNotBlank(startTime)) {
+			builder.append("生效日期开始时间:").append(startTime).append(";");
+		}
+		if (StringUtils.isNotBlank(endTime)) {
+			builder.append("生效日期结束日期:").append(endTime).append(";");
+		}
+		if (StringUtils.isNotBlank(createName)) {
+			builder.append("创建人:").append(createName).append(";");
+		}
+		if (StringUtils.isNotBlank(createTime)) {
+			builder.append("创建时间:").append(createTime).append(";");
+		}
+		busBizChangeLogService.insertLog(BusinessType.SUPPLIER, String.valueOf(supplierId), builder.toString(), new Date());
+		return response;
 	}
 
 	/**
@@ -185,8 +208,33 @@ public class BusSupplierController {
 	 * @throws
 	 */
 	@RequestMapping(value = "/deleteRebate")
-	public AjaxResponse deleteRebate(@NotNull(message = "id不能为空") Integer id) {
-		return busSupplierService.deleteRebate(id);
+	public AjaxResponse deleteRebate(@NotNull(message = "id不能为空") Integer id,
+			@NotNull(message = "供应商ID不能为空") Integer supplierId, String rebateRate, String maxMoney, String startTime,
+			String endTime, String createName, String createTime) {
+		// 一、删除分佣协议
+		AjaxResponse response = busSupplierService.deleteRebate(id);
+		// 二、保存操作日志
+		StringBuilder builder = new StringBuilder("删除供应商返点比例配置   ");
+		if (StringUtils.isNotBlank(rebateRate)) {
+			builder.append("返点比例:").append(rebateRate).append(";");
+		}
+		if (StringUtils.isNotBlank(maxMoney)) {
+			builder.append("金额:").append(maxMoney).append(";");
+		}
+		if (StringUtils.isNotBlank(startTime)) {
+			builder.append("生效日期开始时间:").append(startTime).append(";");
+		}
+		if (StringUtils.isNotBlank(endTime)) {
+			builder.append("生效日期结束日期:").append(endTime).append(";");
+		}
+		if (StringUtils.isNotBlank(createName)) {
+			builder.append("创建人:").append(createName).append(";");
+		}
+		if (StringUtils.isNotBlank(createTime)) {
+			builder.append("创建时间:").append(createTime).append(";");
+		}
+		busBizChangeLogService.insertLog(BusinessType.SUPPLIER, String.valueOf(supplierId), builder.toString(), new Date());
+		return response;
 	}
 
 	/**
