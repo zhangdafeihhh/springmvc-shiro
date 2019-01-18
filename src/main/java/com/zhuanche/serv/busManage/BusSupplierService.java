@@ -6,6 +6,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,13 +55,23 @@ import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.mdbcarmanage.CarBizDriverInfoTempService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.excel.CsvUtils;
+import com.zhuanche.util.objcompare.CompareObejctUtils;
+import com.zhuanche.util.objcompare.entity.supplier.BusSupplierBaseCO;
+import com.zhuanche.util.objcompare.entity.supplier.BusSupplierCommissionInfoCO;
+import com.zhuanche.util.objcompare.entity.supplier.BusSupplierDetailCO;
+import com.zhuanche.util.objcompare.entity.supplier.BusSupplierProrateCO;
+import com.zhuanche.util.objcompare.entity.supplier.BusSupplierRebateCO;
 import com.zhuanche.vo.busManage.BusSupplierExportVO;
 import com.zhuanche.vo.busManage.BusSupplierInfoVO;
 import com.zhuanche.vo.busManage.BusSupplierPageVO;
 
 import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.mdbcarmanage.ex.BusBizSupplierDetailExMapper;
+import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
+import mapper.rentcar.CarBizSupplierMapper;
 import mapper.rentcar.ex.BusCarBizSupplierExMapper;
+import mapper.rentcar.ex.CarBizCityExMapper;
+import mapper.rentcar.ex.CarBizCooperationTypeExMapper;
 
 @Service
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -71,9 +82,17 @@ public class BusSupplierService implements BusConst {
 	
 	// ===========================表基础mapper==================================
 	@Autowired
-    private CarAdmUserMapper carAdmUserMapper;
+	private CarAdmUserMapper carAdmUserMapper;
+
+	@Autowired
+	private CarBizSupplierMapper carBizSupplierMapper;
 
 	// ===========================专车业务拓展mapper==================================
+	@Autowired
+	private CarBizCityExMapper carBizCityExMapper;
+	
+	@Autowired
+	private CarBizCooperationTypeExMapper carBizCooperationTypeExMapper;
 
 	// ===========================巴士业务拓展mapper==================================
 	@Autowired
@@ -93,6 +112,8 @@ public class BusSupplierService implements BusConst {
 	private CarBizSupplierService carBizSupplierService;
 
 	// ===========================巴士业务拓展service==================================
+	@Autowired
+	private BusBizChangeLogService busBizChangeLogService;
 
 	// ===============================专车其它服务===================================
 
@@ -766,12 +787,12 @@ public class BusSupplierService implements BusConst {
 				case 2:
 					return "季度";
 				}
-				return "";
+				return "未知类型";
 			}).orElse("");
 			builder.append(CsvUtils.tab).append(settleCycle).append(",");
 			
 			// 二、结算天数
-			String settleBillCycle = Optional.ofNullable(settleInfo.getInteger("settleBillCycle")).map(String::valueOf).orElse("");
+			String settleBillCycle = Optional.ofNullable(settleInfo.getString("settleBillCycle")).orElse("");
 			builder.append(CsvUtils.tab).append(settleBillCycle).append(",");
 			
 			// 三、结算方式
@@ -782,7 +803,7 @@ public class BusSupplierService implements BusConst {
 				case 1:
 					return "自动";
 				}
-				return "";
+				return "未知类型";
 			}).orElse("");
 			builder.append(CsvUtils.tab).append(settleType).append(",");
 			
@@ -792,7 +813,7 @@ public class BusSupplierService implements BusConst {
 				case 0:
 					return "订单";
 				}
-				return "";
+				return "未知类型";
 			}).orElse("");
 			builder.append(CsvUtils.tab).append(shareType).append(",");
 			
@@ -854,26 +875,26 @@ public class BusSupplierService implements BusConst {
 			builder.append(CsvUtils.tab).append(decimalFormat(deposit)).append(",");
 			
 			// 三、是否提前结算
-			String isAdvance = Optional.ofNullable(settleInfo.getInteger("isAdvance")).map(value -> {// TODO 确定值项
+			String isAdvance = Optional.ofNullable(settleInfo.getInteger("isAdvance")).map(value -> {
 				switch (value) {
 				case 0:
 					return "否";
 				case 1:
 					return "是";
 				}
-				return "";
+				return "未知类型";
 			}).orElse("");
 			builder.append(CsvUtils.tab).append(isAdvance).append(",");
 			
 			// 四、是否有返点
-			String isRebate = Optional.ofNullable(settleInfo.getInteger("isRebate")).map(value -> {// TODO 确定值项
+			String isRebate = Optional.ofNullable(settleInfo.getInteger("isRebate")).map(value -> {
 				switch (value) {
 				case 0:
 					return "不返点";
 				case 1:
 					return "返点";
 				}
-				return "";
+				return "未知类型";
 			}).orElse("");
 			builder.append(CsvUtils.tab).append(isRebate).append(",");
 			
@@ -1131,10 +1152,192 @@ public class BusSupplierService implements BusConst {
 	}
 
 	
+	/**
+	 * @Title: getContents
+	 * @Description: 获取比对信息
+	 * @param supplierId
+	 * @return List<Object>
+	 * @throws
+	 */
+	@MasterSlaveConfigs(configs = { @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE),
+			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE) })
 	public List<Object> getContents(Integer supplierId) {
+		List<Object> resultList = new ArrayList<>();
+		/** 供应商基本信息**/
+		BusSupplierBaseCO supplierCO = busCarBizSupplierExMapper.querySupplierCOById(supplierId);
 		
+		/** 供应商其它信息**/
+		BusSupplierDetailCO detailCO = busBizSupplierDetailExMapper.queryDetailCOBySupplierId(supplierId);
 		
-		return null;
+		/** 供应商结算信息**/
+		// 基本结算信息
+		BusSupplierCommissionInfoCO commissionInfo = Optional.ofNullable((JSONObject) getRemoteCommissionInfo(supplierId)).map(object -> {
+			BusSupplierCommissionInfoCO commissionInfoCO = new BusSupplierCommissionInfoCO();
+			
+			commissionInfoCO.setRoleType (Optional.ofNullable(object.getInteger("roleType")).map(value -> {
+				switch (value) {
+				case 0:
+					return "大巴车";
+				}
+				return "未知类型";
+			}).orElse(""));
+			commissionInfoCO.setSettleCycle (Optional.ofNullable(object.getInteger("settleCycle")).map(value -> {
+				switch (value) {
+				case 0:
+					return "周";
+				case 1:
+					return "月";
+				case 2:
+					return "季度";
+				}
+				return "未知类型";
+			}).orElse(""));
+			commissionInfoCO.setSettleBillCycle (object.getString("settleBillCycle"));
+			commissionInfoCO.setSettleType (Optional.ofNullable(object.getInteger("settleType")).map(value -> {
+				switch (value) {
+				case 0:
+					return "手动";
+				case 1:
+					return "自动";
+				}
+				return "未知类型";
+			}).orElse(""));
+			commissionInfoCO.setShareWay (Optional.ofNullable(object.getInteger("shareWay")).map(value -> {
+				switch (value) {
+				case 0:
+					return "固定比例";
+				}
+				return "未知类型";
+			}).orElse(""));
+			commissionInfoCO.setShareType (Optional.ofNullable(object.getInteger("shareType")).map(value -> {
+				switch (value) {
+				case 0:
+					return "订单";
+				}
+				return "未知类型";
+			}).orElse(""));
+			commissionInfoCO.setIsRebate (Optional.ofNullable(object.getInteger("isRebate")).map(value -> {
+				switch (value) {
+				case 0:
+					return "不返点";
+				case 1:
+					return "返点";
+				}
+				return "未知类型";
+			}).orElse(""));
+			commissionInfoCO.setRebateType (Optional.ofNullable(object.getInteger("rebateType")).map(value -> {
+				switch (value) {
+				case 0:
+					return "金额";
+				}
+				return "未知类型";
+			}).orElse(""));
+			commissionInfoCO.setRebateCycle (Optional.ofNullable(object.getInteger("rebateCycle")).map(value -> {
+				switch (value) {
+				case 0:
+					return "月";
+				case 1:
+					return "季度";
+				}
+				return "未知类型";
+			}).orElse(""));
+			commissionInfoCO.setIsAdvance (Optional.ofNullable(object.getInteger("isAdvance")).map(value -> {
+				switch (value) {
+				case 0:
+					return "否";
+				case 1:
+					return "是";
+				}
+				return "未知类型";
+			}).orElse(""));
+			commissionInfoCO.setAdvanceType (Optional.ofNullable(object.getInteger("advanceType")).map(value -> {
+				switch (value) {
+				case 0:
+					return "金额";
+				}
+				return "未知类型";
+			}).orElse(""));
+			commissionInfoCO.setSettleAmount (object.getString("settleAmount"));
+			
+			return commissionInfoCO;
+		}).orElseGet(BusSupplierCommissionInfoCO::new);
+		// 结算比例
+		List<BusSupplierProrateCO> prorateList = Optional.ofNullable((JSONArray) getRemoteProrateInfoList(supplierId, null)).map(jsonArray -> {
+			List<BusSupplierProrateCO> list = new ArrayList<>();
+			jsonArray.forEach(object -> {
+				JSONObject prorate = (JSONObject) JSON.toJSON(object);
+				BusSupplierProrateCO prorateCO = new BusSupplierProrateCO();
+				
+				prorateCO.setSupplierRate(prorate.getString("supplierRate"));
+				prorateCO.setStartTime(prorate.getString("startTime"));
+				prorateCO.setEndTime(prorate.getString("endTime"));
+				
+				list.add(prorateCO);
+			});
+			return list;
+		}).orElseGet(ArrayList::new);
+		// 返点比例
+		List<BusSupplierRebateCO> rebateList = Optional.ofNullable((JSONArray) getRemoteRebateInfo(supplierId)).map(jsonArray -> {
+			List<BusSupplierRebateCO> list = new ArrayList<>();
+			jsonArray.forEach(object -> {
+				JSONObject rebate = (JSONObject) JSON.toJSON(object);
+				BusSupplierRebateCO rebateCO = new BusSupplierRebateCO();
+				
+				rebateCO.setRebateRate(rebate.getString("rebateRate"));
+				rebateCO.setMaxMoney(rebate.getString("maxMoney"));
+				rebateCO.setStartTime(rebate.getString("startTime"));
+				rebateCO.setEndTime(rebate.getString("endTime"));
+				
+				list.add(rebateCO);
+			});
+			return list;
+		}).orElseGet(ArrayList::new);
+		
+		resultList.add(supplierCO);
+		resultList.add(detailCO);
+		resultList.add(commissionInfo);
+		resultList.add(prorateList);
+		resultList.add(rebateList);
+		return resultList;
+	}
+
+	/**
+	 * @param supplierId 
+	 * @Title: saveChangeLog
+	 * @Description: 对比操作记录并保存日志
+	 * @param old
+	 * @param fresh void
+	 * @throws
+	 */
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.MASTER))
+	public void saveChangeLog(Integer supplierId, List<Object> oldList, List<Object> freshList) {
+		String result = compareSupplierContents(oldList, freshList);
+		String description = StringUtils.isBlank(result) ? "未变更信息" : result;
+		busBizChangeLogService.insertLog(BusinessType.SUPPLIER, String.valueOf(supplierId), description, new Date());
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private String compareSupplierContents(List<Object> oldList, List<Object> freshList) {
+		// 比对结果
+		List<String> result = new ArrayList<>(oldList.size());
+		for (int i = 0; i < oldList.size(); i++) {
+			Object old = oldList.get(i);
+			Object fresh = freshList.get(i);
+			if (old instanceof List) {
+				// 递归操作
+				String join = compareSupplierContents((List) old, (List) fresh);
+				if (StringUtils.isNotBlank(join)) {
+					result.add(join);
+				}
+			} else {
+				List<Object> list = CompareObejctUtils.contrastObj(old, fresh, null);
+				String join = StringUtils.join(list, CompareObejctUtils.separator);
+				if (StringUtils.isNotBlank(join)) {
+					result.add(join);
+				}
+			}
+		}
+		return StringUtils.join(result, CompareObejctUtils.separator);
 	}
 	
 }

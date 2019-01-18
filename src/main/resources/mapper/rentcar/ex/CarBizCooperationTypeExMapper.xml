@@ -182,5 +182,10 @@
 			car_biz_cooperation_type
 		WHERE status = 1
 	</select>
+	
+	<!--  -->
+	<select id="queryNameById" parameterType="java.lang.Integer" resultType="java.lang.String">
+		select cooperation_name from car_biz_cooperation_type where id = #{id}
+	</select>
 </mapper>
 

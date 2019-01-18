@@ -32,13 +32,13 @@ public interface BusConst {
 	}
 
 	// ========================DecimalFormat========================
-	DecimalFormat format = new DecimalFormat("##########.00");
+	DecimalFormat decimalFormat = new DecimalFormat("#########0.00");
 
 	default String decimalFormat(BigDecimal value) {
 		if (value == null) {
 			return "0.00";
 		}
-		return format.format(value);
+		return decimalFormat.format(value);
 	}
 
 	// ==========================其它==============================

@@ -145,10 +145,10 @@ public class BusSupplierController {
 		// 一、判断
 		Integer supplierId = baseDTO.getSupplierId();
 		boolean isAdd = true;
-		List<Object> olds = null;
+		List<Object> old = null;
 		if (supplierId != null && supplierId != 0) {
 			isAdd = false;
-			olds = busSupplierService.getContents(supplierId);
+			old = busSupplierService.getContents(supplierId);
 		}
 		
 		// 二、保存数据
@@ -158,8 +158,8 @@ public class BusSupplierController {
 		if (isAdd) {
 			busBizChangeLogService.insertLog(BusinessType.SUPPLIER, String.valueOf(supplierId), "创建供应商", new Date());
 		} else {
-			List<Object> freshes = busSupplierService.getContents(supplierId);;
-//			busSupplierService.saveChangeLog(mtehod,old,fresh);
+			List<Object> fresh = busSupplierService.getContents(supplierId);;
+			busSupplierService.saveChangeLog(supplierId, old, fresh);
 		}
 		
 		return response;

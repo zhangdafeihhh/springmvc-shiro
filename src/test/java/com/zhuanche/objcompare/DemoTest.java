@@ -1,11 +1,11 @@
 package com.zhuanche.objcompare;
 
 import java.util.Date;
-import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.zhuanche.objcompare.entity.Person;
+import com.zhuanche.util.objcompare.CompareObejctUtils;
+import com.zhuanche.util.objcompare.entity.Person;
 
 public class DemoTest {
 	public static void main(String[] args) {

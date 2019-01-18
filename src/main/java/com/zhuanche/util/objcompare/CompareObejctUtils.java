@@ -1,10 +1,9 @@
 package com.zhuanche.util.objcompare;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -14,6 +13,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.zhuanche.constants.BusConst;
 
 public class CompareObejctUtils {
 
@@ -44,7 +47,8 @@ public class CompareObejctUtils {
 	public static List<Object> contrastObj(Object old, Object fresh,
 			BiConsumer<CompareObjectAttr, List<Object>> consumer) {
 
-		if (old == fresh) {
+		// 如果两个对象为null或者内容相等，则直接返回
+		if (old == fresh || old.equals(fresh)) {
 			return new ArrayList<>();
 		}
 
@@ -82,8 +86,10 @@ public class CompareObejctUtils {
 					public String apply(Object obj) {
 						if (obj instanceof Date) {
 							DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern.value());
-							return formatter
-									.format(LocalDateTime.ofInstant(((Date) obj).toInstant(), ZoneId.systemDefault()));
+							return formatter.format(LocalDateTime.ofInstant(((Date) obj).toInstant(), ZoneId.systemDefault()));
+						}
+						if (obj instanceof BigDecimal) {
+							return BusConst.decimalFormat.format(obj);
 						}
 						return obj.toString();
 					}
@@ -110,7 +116,7 @@ public class CompareObejctUtils {
 		}
 	}
 
-	static class CompareObjectAttr {
+	public static class CompareObjectAttr {
 		private String old;
 		private String fresh;
 		private String note;

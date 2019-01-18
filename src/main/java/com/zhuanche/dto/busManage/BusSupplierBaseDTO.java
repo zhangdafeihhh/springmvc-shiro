@@ -64,7 +64,7 @@ public class BusSupplierBaseDTO implements BusSupplierDTO {
 	/** 供应商地址 **/
 	private String address;
 
-	/** 供应商类型（0：其他，1：巴士供应商） **/
+	/** 供应商类型（0：其他，1：含巴士业务） **/
 	private Integer supplierType;
 
 	/** 是否客运企业:1是,2否 **/

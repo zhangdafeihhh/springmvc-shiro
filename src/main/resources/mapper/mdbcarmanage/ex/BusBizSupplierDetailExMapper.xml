@@ -237,5 +237,25 @@
 			#{item}
 		</foreach>
 	</select>
+	
+	<!-- 查询供应商其它信息比对信息 -->
+	<select id="queryDetailCOBySupplierId" parameterType="java.lang.Integer" resultType="com.zhuanche.util.objcompare.entity.supplier.BusSupplierDetailCO">
+		SELECT
+			deposit AS deposit,
+			franchise_fee AS franchiseFee,
+			contract_date_start AS contractDateStart,
+			contract_date_end AS contractDateEnd,
+			invoice_company_name AS invoiceCompanyName,
+			invoice_deposit_bank AS invoiceDepositBank,
+			invoice_bank_account AS invoiceBankAccount,
+			invoice_company_phone AS invoiceCompanyPhone,
+			invoice_duty_paragraph AS invoiceDutyParagraph,
+			invoice_company_addr AS invoiceCompanyAddr
+		FROM
+			bus_biz_supplier_detail
+		WHERE
+			supplier_id = #{supplierId}
+		LIMIT 1
+	</select>
 
 </mapper>
