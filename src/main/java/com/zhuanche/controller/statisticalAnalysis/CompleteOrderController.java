@@ -10,8 +10,12 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.controller.driver.Componment;
 import com.zhuanche.dto.rentcar.CompleteOrderDTO;
+import com.zhuanche.util.CommonStringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
@@ -129,6 +133,14 @@ public class CompleteOrderController{
 		    logger.info("【运营管理-统计分析】完成订单列表请求参数--"+jsonString);
 		    //从大数据仓库获取统计数据
 		    AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/completeOrderDetail/queryList",paramMap);
+            if (result.isSuccess()){
+                JSONArray data =  (JSONArray) result.getData();
+                data.forEach(o -> {
+                    JSONObject element = (JSONObject) o;
+                    element.put(Constants.BOOKING_USER_PHONE, CommonStringUtils.protectPhoneInfo(element.getString(Constants.BOOKING_USER_PHONE)));
+                    element.put(Constants.RIDER_PHONE, CommonStringUtils.protectPhoneInfo(element.getString(Constants.RIDER_PHONE)));
+                });
+            }
 		    return result;
 	  }
 

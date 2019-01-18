@@ -93,5 +93,8 @@ public final class Constants {
 	public static final String SUPPLIER_NAME_AVAILABLE = "供应商名称可以使用";
 	public static final String SUPPLIER_NAME_EXIST = "供应商名称已存在";
 
+	public static final String RIDER_PHONE = "riderPhone";
+	public static final String BOOKING_USER_PHONE = "bookingUserPhone";
+
 
 }

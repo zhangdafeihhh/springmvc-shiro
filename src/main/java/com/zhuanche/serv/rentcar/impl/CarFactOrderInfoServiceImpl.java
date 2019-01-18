@@ -14,6 +14,7 @@ import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.util.Common;
+import com.zhuanche.util.CommonStringUtils;
 import com.zhuanche.util.MyRestTemplate;
 import mapper.driverOrderRecord.DriverOrderRecordMapper;
 import mapper.orderPlatform.PoolMainOrderMapper;
@@ -268,6 +269,10 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 						list =  JSONArray.parseArray(jobres.get("data").toString(), CarFactOrderInfoDTO.class);   
 						jobres.remove("data");
 						jobres.put("data", list);
+						list.forEach( carFactOrderInfoDTO -> {
+							carFactOrderInfoDTO.setBookingUserPhone(CommonStringUtils.protectPhoneInfo(carFactOrderInfoDTO.getBookingUserPhone()));
+							carFactOrderInfoDTO.setRiderPhone(CommonStringUtils.protectPhoneInfo(carFactOrderInfoDTO.getRiderPhone()));
+						});
 						return AjaxResponse.success(jobres);
 					}
 				}

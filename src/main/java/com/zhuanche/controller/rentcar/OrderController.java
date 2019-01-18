@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.zhuanche.util.CommonStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -958,8 +959,8 @@ public class OrderController{
 			CarBizCustomer carBizCustomer = carBizCustomerMapper.selectByPrimaryKey(result.getBookingUserId());
 			if(carBizCustomer!=null) {
 				result.setBookingname(carBizCustomer.getName());
-				result.setBookingphone(carBizCustomer.getPhone());
-				result.setBookingUserPhone(carBizCustomer.getPhone());
+				result.setBookingphone(CommonStringUtils.protectPhoneInfo(carBizCustomer.getPhone()));
+				result.setBookingUserPhone(CommonStringUtils.protectPhoneInfo(carBizCustomer.getPhone()));
 			}
 		}
 		//六、补全此订单的车辆详情信息
