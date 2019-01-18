@@ -239,6 +239,7 @@ public class HomeKanBanController {
 				return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 			}
 			if (!job.getString(Constants.CODE).equals("0")) {
+				logger.error("调用大数据接口错误" + coreIndicatorsUrl + "返回code" + job.getString(Constants.CODE) + "返回错误信息: " + job.getString("message") );
 				return AjaxResponse.fail(Integer.parseInt(job.getString(Constants.CODE)), job.getString("message"));
 			}
 			JSONObject jobj = JSON.parseObject(job.getString(Constants.DATA));
