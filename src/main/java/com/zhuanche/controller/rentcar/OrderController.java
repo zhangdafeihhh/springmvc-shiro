@@ -599,13 +599,13 @@ public class OrderController{
 			stringBuffer.append(s.getBookingUserName() != null ? "" + s.getBookingUserName() + "" : "");
 			stringBuffer.append(",");
 			//
-			stringBuffer.append(s.getBookingUserPhone() != null ? "\t" + s.getBookingUserPhone() : "");
+			stringBuffer.append(s.getBookingUserPhone() != null ? "\t" + CommonStringUtils.protectPhoneInfo(s.getBookingUserPhone()) : "");
 			stringBuffer.append(",");
 
 			stringBuffer.append(s.getRiderName() != null ? "" + s.getRiderName() + "" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getRiderPhone() != null ? "\t" + s.getRiderPhone() : "");
+			stringBuffer.append(s.getRiderPhone() != null ? "\t" + CommonStringUtils.protectPhoneInfo(s.getRiderPhone()) : "");
 			stringBuffer.append(",");
 
 			stringBuffer.append(s.getDriverName() != null ? "" + s.getDriverName() + "" : "");
@@ -841,7 +841,7 @@ public class OrderController{
 		result.setPayFlag(  orderInfoJson.getIntValue("payFlag")  );
 		result.setPushDriverType( orderInfoJson.getIntValue("pushDriverType") );
 		result.setRiderName( orderInfoJson.getString("riderName") );
-		result.setRiderPhone( orderInfoJson.getString("riderPhone") );
+		result.setRiderPhone( CommonStringUtils.protectPhoneInfo(orderInfoJson.getString("riderPhone")) );
 		result.setCityId( orderInfoJson.getIntValue("cityId")  );
 		result.setCityName(  orderInfoJson.getString("cityName") );
 		result.setBookingStartAddr( orderInfoJson.getString("bookingStartAddr") );
@@ -949,9 +949,7 @@ public class OrderController{
 			CarBizDriverInfo carBizDriverInfo = carBizDriverInfoMapper.selectByPrimaryKey(Integer.valueOf(result.getDriverId()));
 			if(carBizDriverInfo!=null) {
 				result.setDrivername(carBizDriverInfo.getName());
-				result.setDriverName(carBizDriverInfo.getName());
 				result.setDriverphone(carBizDriverInfo.getPhone());
-				result.setDriverPhone(carBizDriverInfo.getPhone());
 			}
 		}
 		//五、补全此订单的预订人信息
