@@ -189,9 +189,9 @@
 		<if test="status != null">
 			AND s.`status` = #{status}
 		</if>
-		<if test="commissionIds != null and commissionIds.size() > 0">
+		<if test="supplierRateIds != null and supplierRateIds.size() > 0">
 			AND s.supplier_id IN 
-			<foreach collection="commissionIds" item="item" open="(" separator="," close=")">
+			<foreach collection="supplierRateIds" item="item" open="(" separator="," close=")">
 				#{item}
 			</foreach>
 		</if>
@@ -327,5 +327,55 @@
 			<foreach collection="supplierIds" item="item" open="(" separator="," close=")">
 				#{item}
 			</foreach>
+	</select>
+	
+	<!-- 查询供应商比对信息 -->
+	<select id="querySupplierCOById" parameterType="java.lang.Integer" resultType="com.zhuanche.util.objcompare.entity.supplier.BusSupplierBaseCO">
+		SELECT
+			c.city_name AS cityName,
+			s.supplier_full_name AS supplierName,
+			s.contacts AS contacts,
+			s.contacts_phone AS contactsPhone,
+			s.dispatcher_phone AS dispatcherPhone,
+			cp.cooperation_name AS cooperationName,
+			CASE s.`status`
+		WHEN 0 THEN
+			"无效"
+		WHEN 1 THEN
+			"有效"
+		ELSE
+			"未知状态"
+		END AS status,
+		 s.address AS address,
+		 CASE s.supplier_type
+		WHEN 0 THEN
+			"其他"
+		WHEN 1 THEN
+			"含巴士业务"
+		ELSE
+			"未知类型"
+		END AS supplierType,
+		 CASE s.enterprise_type
+		WHEN 1 THEN
+			"是"
+		WHEN 2 THEN
+			"否"
+		ELSE
+			"未知类型"
+		END AS enterpriseType,
+		 CASE s.is_two_shifts
+		WHEN 0 THEN
+			"单班"
+		WHEN 1 THEN
+			"双班"
+		ELSE
+			"未知类型"
+		END AS isTwoShifts
+		FROM
+			car_biz_supplier s
+		LEFT JOIN car_biz_city c ON c.city_id = s.supplier_city
+		LEFT JOIN car_biz_cooperation_type cp ON cp.id = s.cooperation_type
+		WHERE
+			supplier_id = #{supplierId}
 	</select>
 </mapper>

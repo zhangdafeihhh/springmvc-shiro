@@ -14,7 +14,6 @@ import com.zhuanche.common.rocketmq.CommonRocketProducer;
 import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.dto.driver.DriverTeamRelationEntity;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
@@ -40,13 +39,11 @@ import mapper.rentcar.CarBizDriverAccountMapper;
 import mapper.rentcar.CarBizDriverInfoMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
-import net.sf.json.JSONArray;
 import mapper.rentcar.ex.CarBizModelExMapper;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
-import org.apache.http.entity.ContentType;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -3597,6 +3594,7 @@ public class CarBizDriverInfoService {
 	 * @return void
 	 * @throws
 	 */
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER))
 	public void updateDriverCooperationTypeBySupplierId(Integer supplierId,Integer cooperationType){
 		// 更新mongo
 		driverMongoService.updateDriverCooperationTypeBySupplierId(supplierId, cooperationType);

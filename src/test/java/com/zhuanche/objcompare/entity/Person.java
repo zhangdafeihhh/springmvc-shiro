@@ -1,9 +1,11 @@
+
 package com.zhuanche.objcompare.entity;
 
-import java.util.Date;
 
-import com.zhuanche.objcompare.FieldNote;
-import com.zhuanche.objcompare.FieldNote.Pattern;
+
+import com.zhuanche.util.objcompare.FieldNote;
+
+import java.util.Date;
 
 public class Person {
 
@@ -13,7 +15,7 @@ public class Person {
 	@FieldNote("年龄")
 	private Integer age;
 
-	@FieldNote(value = "出生日期", pattern = Pattern.DATE)
+	@FieldNote("出生日期")
 	private Date birthday;
 
 	public String getName() {

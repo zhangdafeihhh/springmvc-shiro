@@ -36,12 +36,6 @@ public class BusSupplierProrateDTO {
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date endTime;
 
-	/** 人为终结日期 **/
-	private Date stopTime;
-
-	/** 状态 0 弃用 1启用 **/
-	private Integer status;
-
 	/** 创建人 **/
 	private String createName;
 
@@ -86,22 +80,6 @@ public class BusSupplierProrateDTO {
 
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
-	}
-
-	public Date getStopTime() {
-		return stopTime;
-	}
-
-	public void setStopTime(Date stopTime) {
-		this.stopTime = stopTime;
-	}
-
-	public Integer getStatus() {
-		return status;
-	}
-
-	public void setStatus(Integer status) {
-		this.status = status;
 	}
 
 	public String getCreateName() {

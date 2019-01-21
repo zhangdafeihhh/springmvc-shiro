@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.zhuanche.dto.busManage.BusSupplierDetailDTO;
 import com.zhuanche.entity.mdbcarmanage.BusBizSupplierDetail;
+import com.zhuanche.util.objcompare.entity.supplier.BusSupplierDetailCO;
 import com.zhuanche.vo.busManage.BusSupplierPageVO;
 
 public interface BusBizSupplierDetailExMapper {
@@ -66,4 +67,13 @@ public interface BusBizSupplierDetailExMapper {
 	 * @return
 	 */
 	List<BusBizSupplierDetail> querySettleInfoByIds(Map<String,Set<Integer>> supplierIds);
+
+	/**
+	 * @Title: queryDetailCOBySupplierId
+	 * @Description: 查询供应商其它信息比对信息
+	 * @param supplierId
+	 * @return BusSupplierDetailCO
+	 * @throws
+	 */
+	BusSupplierDetailCO queryDetailCOBySupplierId(Integer supplierId);
 }

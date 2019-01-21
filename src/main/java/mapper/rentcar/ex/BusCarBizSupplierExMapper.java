@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.zhuanche.dto.busManage.BusSupplierBaseDTO;
 import com.zhuanche.dto.busManage.BusSupplierQueryDTO;
+import com.zhuanche.util.objcompare.entity.supplier.BusSupplierBaseCO;
 import com.zhuanche.vo.busManage.BusSupplierExportVO;
 import com.zhuanche.vo.busManage.BusSupplierInfoVO;
 import com.zhuanche.vo.busManage.BusSupplierPageVO;
@@ -70,4 +71,13 @@ public interface BusCarBizSupplierExMapper {
 	 * @return
 	 */
 	List<BusSupplierInfoVO> queryBasicInfoByIds(Map<String,Set<Integer>> supplierIds);
+
+	/**
+	 * @Title: querySupplierCoById
+	 * @Description: 查询供应商比对信息
+	 * @param supplierId
+	 * @return BusSupplierBaseCO
+	 * @throws
+	 */
+	BusSupplierBaseCO querySupplierCOById(Integer supplierId);
 }

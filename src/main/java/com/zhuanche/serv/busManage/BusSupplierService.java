@@ -6,9 +6,11 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -53,13 +55,23 @@ import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.mdbcarmanage.CarBizDriverInfoTempService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.excel.CsvUtils;
+import com.zhuanche.util.objcompare.CompareObejctUtils;
+import com.zhuanche.util.objcompare.entity.supplier.BusSupplierBaseCO;
+import com.zhuanche.util.objcompare.entity.supplier.BusSupplierCommissionInfoCO;
+import com.zhuanche.util.objcompare.entity.supplier.BusSupplierDetailCO;
+import com.zhuanche.util.objcompare.entity.supplier.BusSupplierProrateCO;
+import com.zhuanche.util.objcompare.entity.supplier.BusSupplierRebateCO;
 import com.zhuanche.vo.busManage.BusSupplierExportVO;
 import com.zhuanche.vo.busManage.BusSupplierInfoVO;
 import com.zhuanche.vo.busManage.BusSupplierPageVO;
 
 import mapper.mdbcarmanage.CarAdmUserMapper;
+import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
 import mapper.mdbcarmanage.ex.BusBizSupplierDetailExMapper;
+import mapper.rentcar.CarBizSupplierMapper;
 import mapper.rentcar.ex.BusCarBizSupplierExMapper;
+import mapper.rentcar.ex.CarBizCityExMapper;
+import mapper.rentcar.ex.CarBizCooperationTypeExMapper;
 
 @Service
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -70,9 +82,17 @@ public class BusSupplierService implements BusConst {
 	
 	// ===========================表基础mapper==================================
 	@Autowired
-    private CarAdmUserMapper carAdmUserMapper;
+	private CarAdmUserMapper carAdmUserMapper;
+
+	@Autowired
+	private CarBizSupplierMapper carBizSupplierMapper;
 
 	// ===========================专车业务拓展mapper==================================
+	@Autowired
+	private CarBizCityExMapper carBizCityExMapper;
+	
+	@Autowired
+	private CarBizCooperationTypeExMapper carBizCooperationTypeExMapper;
 
 	// ===========================巴士业务拓展mapper==================================
 	@Autowired
@@ -171,10 +191,7 @@ public class BusSupplierService implements BusConst {
 			errorMsg.append(rebateMsg).append(";");
 		}
 
-		// 五、保存操作记录
-	//	busBizChangeLogService.insertLog(BusinessType.SUPPLIER, String.valueOf(supplierId), new Date());
-
-		// 六、MQ消息写入 供应商
+		// 五、MQ消息写入 供应商
 		try {
 			sendSupplierToMq(method, supplierId);
 		} catch (Exception e) {
@@ -194,7 +211,7 @@ public class BusSupplierService implements BusConst {
 
 	/**
 	 * @Title: sendSupplierToMq
-	 * @Description: TODO
+	 * @Description: 发送供应商信息
 	 * @param method
 	 * @param supplierId void
 	 * @throws
@@ -506,19 +523,22 @@ public class BusSupplierService implements BusConst {
 		queryDTO.pageSize = null;
 		
 		// 一、查询快合同快到期供应商
+		List<BusSupplierPageVO> supplierIds = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
+		if (supplierIds.isEmpty()) {
+			return null;// 没有则走正常查询
+		}
 		Map<Object,Object> param = new HashMap<>();
-		param.put("permOfSupplier", queryDTO.getAuthOfSupplier());
+		param.put("supplierIds", supplierIds.stream().map(BusSupplierPageVO::getSupplierId).collect(Collectors.toList()));
 		List<BusSupplierPageVO> contractList = busBizSupplierDetailExMapper.querySupplierContractExpireSoonList(param);
 		if (contractList.isEmpty()) {
 			return null;// 没有则走正常查询
 		}
-		// 二、所有快到期的供应商的基础信息
 		List<Integer> contractIds = contractList.stream().map(BusSupplierPageVO::getSupplierId).collect(Collectors.toList());
 		queryDTO.setContractIds(contractIds);
+		// 二、分页查询,并封装结果集(按区间分别查询:完全不在快到期区间、一部分在快到期区间、完全在快到期区间)
 		List<BusSupplierPageVO> contractSuppliers = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
 		int offset = (Math.max(pageNum, 1) - 1) * pageSize;
 		int limit = offset + pageSize;
-		// 三、封装结果集(按区间分别查询:完全不在快到期区间、一部分在快到期区间、完全在快到期区间)
 		List<BusSupplierPageVO> resultList = new ArrayList<>();
 		if (offset > contractSuppliers.size()) {
 			queryDTO.setContractIds(null);
@@ -619,47 +639,107 @@ public class BusSupplierService implements BusConst {
 	 */
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE))
 	public List<String> completeSupplierExportList(List<BusSupplierExportVO> list) {
+		
 		// 返回结果
 		List<String> csvDataList = new ArrayList<>();
 		if (list == null || list.isEmpty()) {
 			return csvDataList;
 		}
-		// 补充分佣信息(分佣比例、是否有返点)
-		String supplierIds = list.stream().map(e -> e.getSupplierId().toString()).collect(Collectors.joining(","));
-		JSONArray jsonArray = getProrateList(supplierIds);
+		
+		// 供应商结算信息集合
+		Map<Integer,JSONObject> settleInfoMap = new HashMap<>();
+		List<JSONObject> settleInfoList = new ArrayList<>();
 		list.forEach(supplier -> {
+			Integer supplierId = supplier.getSupplierId();
+			// 供应商结算信息
+			JSONObject settleInfo = Optional.ofNullable(getSettleExportInfo(supplierId)).orElseGet(JSONObject::new);
+			settleInfoMap.put(supplierId, settleInfo);
+			settleInfoList.add(settleInfo);
 			
-			if (jsonArray != null) {
-				// 查找对应供应商数据
-				Integer supplierId = supplier.getSupplierId();
-				jsonArray.stream().filter(e -> {
-					JSONObject jsonObject = (JSONObject) JSON.toJSON(e);
-					return supplierId.equals(jsonObject.getInteger("supplierId"));
-				}).findFirst().ifPresent(e -> {
-					JSONObject jsonObject = (JSONObject) JSON.toJSON(e);
-					supplier.setSupplierRate(jsonObject.getDouble("supplierRate"));
-					supplier.setIsRebate(jsonObject.getInteger("isRebate"));
-				});
-			}
-			
+		});
+		int maxCount2SupplierRate = settleInfoList.stream().mapToInt(settleInfo -> {
+			JSONArray supplierRates = Optional.ofNullable(settleInfo.getJSONArray("prorateRateList")).orElseGet(JSONArray::new);
+			return supplierRates.size();
+		}).max().orElse(0);// 结算比例配置项最大数
+	
+		int maxCount2RebateRate = settleInfoList.stream().mapToInt(settleInfo -> {
+			JSONArray rebateRates = Optional.ofNullable(settleInfo.getJSONArray("rebateRateList")).orElseGet(JSONArray::new);
+			return rebateRates.size();
+		}).max().orElse(0);// 返点比例配置项最大数
+		
+		// 表头
+		List<Object> heads = new ArrayList<>();
+		List<Object> baseHeads = new ArrayList<>();// 基本信息
+		baseHeads.add("城市");
+		baseHeads.add("供应商ID");
+		baseHeads.add("供应商名称");
+		baseHeads.add("状态");
+		baseHeads.add("企业联系人");
+		baseHeads.add("企业联系人电话");
+		baseHeads.add("调度员电话");
+		baseHeads.add("加盟类型");
+		
+		List<Object> settleHeads = new ArrayList<>();// 结算信息
+		settleHeads.add("结算周期");
+		settleHeads.add("结算天数");
+		settleHeads.add("结算方式");
+		settleHeads.add("分佣类型");
+		for (int i = 1; i < maxCount2SupplierRate + 1; i++) {
+			settleHeads.add("结算比例"+i);
+			settleHeads.add("生效起始时间"+i);
+			settleHeads.add("生效结束时间"+i);
+		}
+		
+		List<Object> invoiceHeads = new ArrayList<>();// 付款信息
+		invoiceHeads.add("账户名称");
+		invoiceHeads.add("开户银行");
+		invoiceHeads.add("银行账户");
+		invoiceHeads.add("电话号码");
+		invoiceHeads.add("税号");
+		invoiceHeads.add("单位地址");
+		
+		List<Object> otherHeads = new ArrayList<>();
+		otherHeads.add("加盟费");
+		otherHeads.add("保证金");
+		otherHeads.add("是否提前结算");
+		otherHeads.add("是否有返点");
+		for (int i = 1; i < maxCount2RebateRate + 1; i++) {
+			otherHeads.add("返点比例"+i);
+			otherHeads.add("金额"+i);
+			otherHeads.add("生效起始时间"+i);
+			otherHeads.add("生效结束时间"+i);
+		}
+		
+		heads.addAll(baseHeads);
+		heads.addAll(settleHeads);
+		heads.addAll(invoiceHeads);
+		heads.addAll(otherHeads);
+		csvDataList.add(StringUtils.join(heads, ","));
+		
+		// 数据区
+		list.forEach(supplier -> {
+
+			Integer supplierId = supplier.getSupplierId();
+
 			/** 行数据 */
 			StringBuilder builder = new StringBuilder();
-			BusBizSupplierDetail detail = busBizSupplierDetailExMapper.selectBySupplierId(supplier.getSupplierId());
-			detail = detail == null ? new BusBizSupplierDetail() : detail;
-	
-			//====================================基本信息===========================================
+			// 供应商其它信息
+			BusBizSupplierDetail detail = Optional.ofNullable(busBizSupplierDetailExMapper.selectBySupplierId(supplierId)).orElseGet(BusBizSupplierDetail::new);
+			// 供应商结算信息
+			JSONObject settleInfo = Optional.ofNullable(settleInfoMap.get(supplierId)).orElseGet(JSONObject::new);
+
+			// ====================================基本信息===========================================
 			// 一、城市
 			String ciytName = supplier.getCityName();
 			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(ciytName, "")).append(",");
-			
+
 			// 二、供应商ID
-			Integer supplierId = supplier.getSupplierId();
 			builder.append(CsvUtils.tab).append(String.valueOf(supplierId)).append(",");
-	
+
 			// 三、供应商名称
 			String supplierName = supplier.getSupplierName();
 			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(supplierName, "")).append(",");
-	
+
 			// 四、状态
 			String status = supplier.getStatus() != null && supplier.getStatus() == 1 ? "有效" : "无效";
 			builder.append(CsvUtils.tab).append(status).append(",");
@@ -667,21 +747,21 @@ public class BusSupplierService implements BusConst {
 			// 五、企业联系人
 			String contacts = supplier.getContacts();
 			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(contacts, "")).append(",");
-			
+
 			// 六、企业联系人电话
 			String contactsPhone = supplier.getContactsPhone();
 			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(contactsPhone, "")).append(",");
-			
+
 			// 七、调度员电话
 			String dispatcherPhone = supplier.getDispatcherPhone();
 			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(dispatcherPhone, "")).append(",");
-			
+
 			// 八、加盟类型
 			String cooperationName = supplier.getCooperationName();
 			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(cooperationName, "")).append(",");
-			
-//			// 七、合同开始时间
-//			Date contractDateStart = detail.getContractDateStart();
+
+			// // 七、合同开始时间
+			// Date contractDateStart = detail.getContractDateStart();
 //			String contractDateStartFormatter = "";
 //			if (contractDateStart != null) {
 //				contractDateStartFormatter = formatDate(FORMATTER_DATE_BY_HYPHEN, contractDateStart);
@@ -695,54 +775,160 @@ public class BusSupplierService implements BusConst {
 //				contractDateEndFormatter = formatDate(FORMATTER_DATE_BY_HYPHEN, contractDateEnd);
 //			}
 //			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(contractDateEndFormatter, "")).append(",");
-			//====================================结算信息===========================================
-			
-			// 三、分佣比例
-			Double supplierRate = supplier.getSupplierRate();
-			builder.append(CsvUtils.tab).append(supplierRate == null ? 0.00 : supplierRate).append(",");
-			
-			//====================================付款信息===========================================
+
+			// ====================================结算信息===========================================
+			// 一、结算周期
+			String settleCycle = Optional.ofNullable(settleInfo.getInteger("settleCycle")).map(value -> {
+				switch (value) {
+				case 0:
+					return "周";
+				case 1:
+					return "月";
+				case 2:
+					return "季度";
+				}
+				return "未知类型";
+			}).orElse("");
+			builder.append(CsvUtils.tab).append(settleCycle).append(",");
+
+			// 二、结算天数
+			String settleBillCycle = StringUtils.defaultIfBlank(settleInfo.getString("settleBillCycle"), "");
+			builder.append(CsvUtils.tab).append(settleBillCycle).append(",");
+
+			// 三、结算方式
+			String settleType = Optional.ofNullable(settleInfo.getInteger("settleType")).map(value -> {
+				switch (value) {
+				case 0:
+					return "手动";
+				case 1:
+					return "自动";
+				}
+				return "未知类型";
+			}).orElse("");
+			builder.append(CsvUtils.tab).append(settleType).append(",");
+
+			// 四、分佣类型
+			String shareType = Optional.ofNullable(settleInfo.getInteger("shareType")).map(value -> {
+				switch (value) {
+				case 0:
+					return "订单";
+				}
+				return "未知类型";
+			}).orElse("");
+			builder.append(CsvUtils.tab).append(shareType).append(",");
+
+			JSONArray supplierRates = Optional.ofNullable(settleInfo.getJSONArray("prorateRateList")).orElseGet(JSONArray::new);
+			supplierRates.forEach(object -> {
+				// 结算比例信息
+				JSONObject rate = (JSONObject) JSON.toJSON(object);
+
+				// 五、结算比例
+				String supplierRate = StringUtils.defaultIfBlank(rate.getString("supplierRate"), "0.00");
+				builder.append(CsvUtils.tab).append(supplierRate).append(",");
+
+				// 六、生效起始时间
+				String startTime = StringUtils.defaultIfBlank(rate.getString("startTime"), "");
+				builder.append(CsvUtils.tab).append(startTime).append(",");
+
+				// 七、生效结束时间
+				String endTime = StringUtils.defaultIfBlank(rate.getString("endTime"), "");
+				builder.append(CsvUtils.tab).append(endTime).append(",");
+			});
+			for (int i = 0; i < maxCount2SupplierRate - supplierRates.size(); i++) {
+				builder.append(CsvUtils.tab).append("").append(",");
+				builder.append(CsvUtils.tab).append("").append(",");
+				builder.append(CsvUtils.tab).append("").append(",");
+			}
+
+			// ====================================付款信息===========================================
 			// 一、账户名称
 			String invoiceCompanyName = detail.getInvoiceCompanyName();
 			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(invoiceCompanyName, "")).append(",");
-			
+
 			// 二、开户银行
 			String invoiceDepositBank = detail.getInvoiceDepositBank();
 			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(invoiceDepositBank, "")).append(",");
-			
+
 			// 三、银行账户
 			String invoiceBankAccount = detail.getInvoiceBankAccount();
 			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(invoiceBankAccount, "")).append(",");
-			
+
 			// 四、电话号码
 			String invoiceCompanyPhone = detail.getInvoiceCompanyPhone();
 			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(invoiceCompanyPhone, "")).append(",");
-			
+
 			// 五、税号
 			String invoiceDutyParagraph = detail.getInvoiceDutyParagraph();
 			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(invoiceDutyParagraph, "")).append(",");
-			
-			// 五、单位地址
+
+			// 六、单位地址
 			String invoiceCompanyAddr = detail.getInvoiceCompanyAddr();
 			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(invoiceCompanyAddr, "")).append(",");
-			
-			//====================================其他信息===========================================
-			
-			// 四、加盟费
+
+			// ====================================其他信息===========================================
+			// 一、加盟费
 			BigDecimal franchiseFee = detail.getFranchiseFee();
 			builder.append(CsvUtils.tab).append(decimalFormat(franchiseFee)).append(",");
-			
-			// 五、保证金
+
+			// 二、保证金
 			BigDecimal deposit = detail.getDeposit();
 			builder.append(CsvUtils.tab).append(decimalFormat(deposit)).append(",");
-			
-			// 六、是否有返点
-			String isRebate = supplier.getIsRebate() == null || supplier.getIsRebate() == 0 ? "不返点" : "返点";
+
+			// 三、是否提前结算
+			String isAdvance = Optional.ofNullable(settleInfo.getInteger("isAdvance")).map(value -> {
+				switch (value) {
+				case 0:
+					return "否";
+				case 1:
+					return "是";
+				}
+				return "未知类型";
+			}).orElse("");
+			builder.append(CsvUtils.tab).append(isAdvance).append(",");
+
+			// 四、是否有返点
+			String isRebate = Optional.ofNullable(settleInfo.getInteger("isRebate")).map(value -> {
+				switch (value) {
+				case 0:
+					return "不返点";
+				case 1:
+					return "返点";
+				}
+				return "未知类型";
+			}).orElse("");
 			builder.append(CsvUtils.tab).append(isRebate).append(",");
-			
-	
+
+			JSONArray rebateRates = Optional.ofNullable(settleInfo.getJSONArray("rebateRateList")).orElseGet(JSONArray::new);
+			rebateRates.forEach(object -> {
+				// 结算比例信息
+				JSONObject rate = (JSONObject) JSON.toJSON(object);
+
+				// 五、返点比例
+				String rebateRate = StringUtils.defaultIfBlank(rate.getString("rebateRate"), "0.00");
+				builder.append(CsvUtils.tab).append(rebateRate).append(",");
+
+				// 六、金额
+				String maxMoney = StringUtils.defaultIfBlank(rate.getString("maxMoney"), "0.00");
+				builder.append(CsvUtils.tab).append(maxMoney).append(",");
+
+				// 七、生效起始时间
+				String startTime = StringUtils.defaultIfBlank(rate.getString("startTime"), "");
+				builder.append(CsvUtils.tab).append(startTime).append(",");
+
+				// 八、生效结束时间
+				String endTime = StringUtils.defaultIfBlank(rate.getString("endTime"), "");
+				builder.append(CsvUtils.tab).append(endTime).append(",");
+			});
+			for (int i = 0; i < maxCount2RebateRate - rebateRates.size(); i++) {
+				builder.append(CsvUtils.tab).append("").append(",");
+				builder.append(CsvUtils.tab).append("").append(",");
+				builder.append(CsvUtils.tab).append("").append(",");
+				builder.append(CsvUtils.tab).append("").append(",");
+			}
+
 			csvDataList.add(builder.toString());
 		});
+
 		return csvDataList;
 	}
 
@@ -854,6 +1040,32 @@ public class BusSupplierService implements BusConst {
 	}
 
 	/**
+	 * @Title: getSupplierByProrateRate
+	 * @Description: 按结算比例筛选供应商
+	 * @param supplierRate
+	 * @return JSONArray
+	 * @throws
+	 */
+	public JSONArray getSupplierByProrateRate(Double supplierRate) {
+		if (supplierRate != null) {
+			Map<String, Object> params = new HashMap<>();
+			params.put("supplierId", supplierRate);
+			try {
+				logger.info("[ BusSupplierService-getSupplierByProrateRate ] 按结算比例筛选供应商,params={}", params);
+				JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_SUPPLIER_INFO_BY_PRORATE_RATE, params , 2000, "按结算比例筛选供应商");
+				if (result.getIntValue("code") == 0) {
+					JSONArray jsonArray = result.getJSONArray("data");
+					return jsonArray;
+				}
+				logger.info("[ BusSupplierService-getSupplierByProrateRate ] 按结算比例筛选供应商调用接口出错,params={},errorMsg={}", params, result.getString("msg"));
+			} catch (Exception e) {
+				logger.error("[ BusSupplierService-getSupplierByProrateRate ] 按结算比例筛选供应商异常,params={},errorMsg={}", params, e.getMessage(), e);
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * @Title: getProrateList
 	 * @Description: 查询供应商分佣有关的信息（批量）
 	 * @param supplierIds
@@ -871,12 +1083,35 @@ public class BusSupplierService implements BusConst {
 				if (result.getIntValue("code") == 0) {
 					JSONArray jsonArray = result.getJSONArray("data");
 					return jsonArray;
-				} else {
-					logger.info("[ BusSupplierService-getProrateList ] 补充分佣信息(分佣比例、是否有返点)调用接口出错,params={},errorMsg={}", params, result.getString("msg"));
 				}
+				logger.info("[ BusSupplierService-getProrateList ] 补充分佣信息(分佣比例、是否有返点)调用接口出错,params={},errorMsg={}", params, result.getString("msg"));
 			} catch (Exception e) {
 				logger.error("[ BusSupplierService-getProrateList ] 补充分佣信息(分佣比例、是否有返点)异常,params={},errorMsg={}", params, e.getMessage(), e);
 			}
+		}
+		return null;
+	}
+	
+	/**
+	 * @Title: getSettleExportInfo
+	 * @Description: 查询供应商列表导出结算相关信息
+	 * @param supplierId
+	 * @return JSONObject
+	 * @throws
+	 */
+	public JSONObject getSettleExportInfo(Integer supplierId) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("supplierId", supplierId);
+		try {
+			logger.info("[ BusSupplierService-getSettleExportInfo ] 查询供应商列表导出结算相关信息,params={}", params);
+			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_EXPORT_SUPPLIER_INFO, params, 2000, "查询供应商列表导出结算相关信息");
+			if (result.getIntValue("code") == 0) {
+				JSONObject jsonObject = result.getJSONObject("data");
+				return jsonObject;
+			}
+			logger.info("[ BusSupplierService-getSettleExportInfo ] 查询供应商列表导出结算相关信息接口出错,params={},errorMsg={}", params, result.getString("msg"));
+		} catch (Exception e) {
+			logger.error("[ BusSupplierService-getSettleExportInfo ] 查询供应商列表导出结算相关信息异常,params={},errorMsg={}", params, e.getMessage(), e);
 		}
 		return null;
 	}
@@ -916,4 +1151,202 @@ public class BusSupplierService implements BusConst {
 		return busBizSupplierDetailExMapper.querySettleInfoByIds(param);
 	}
 
+	
+	/**
+	 * @Title: getContents
+	 * @Description: 获取比对信息
+	 * @param supplierId
+	 * @return List<Object>
+	 * @throws
+	 */
+	@MasterSlaveConfigs(configs = { @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE),
+			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE) })
+	public List<Object> getContents(Integer supplierId) {
+		try {
+			List<Object> resultList = new ArrayList<>();
+			/** 供应商基本信息**/
+			BusSupplierBaseCO supplierCO = busCarBizSupplierExMapper.querySupplierCOById(supplierId);
+			
+			/** 供应商其它信息**/
+			BusSupplierDetailCO detailCO = busBizSupplierDetailExMapper.queryDetailCOBySupplierId(supplierId);
+			
+			/** 供应商结算信息**/
+			// 基本结算信息
+			BusSupplierCommissionInfoCO commissionInfo = Optional.ofNullable((JSONObject) getRemoteCommissionInfo(supplierId)).map(object -> {
+				BusSupplierCommissionInfoCO commissionInfoCO = new BusSupplierCommissionInfoCO();
+				
+				commissionInfoCO.setRoleType (Optional.ofNullable(object.getInteger("roleType")).map(value -> {
+					switch (value) {
+					case 0:
+						return "大巴车";
+					}
+					return "未知类型";
+				}).orElse(""));
+				commissionInfoCO.setSettleCycle (Optional.ofNullable(object.getInteger("settleCycle")).map(value -> {
+					switch (value) {
+					case 0:
+						return "周";
+					case 1:
+						return "月";
+					case 2:
+						return "季度";
+					}
+					return "未知类型";
+				}).orElse(""));
+				commissionInfoCO.setSettleBillCycle (object.getString("settleBillCycle"));
+				commissionInfoCO.setSettleType (Optional.ofNullable(object.getInteger("settleType")).map(value -> {
+					switch (value) {
+					case 0:
+						return "手动";
+					case 1:
+						return "自动";
+					}
+					return "未知类型";
+				}).orElse(""));
+				commissionInfoCO.setShareWay (Optional.ofNullable(object.getInteger("shareWay")).map(value -> {
+					switch (value) {
+					case 0:
+						return "固定比例";
+					}
+					return "未知类型";
+				}).orElse(""));
+				commissionInfoCO.setShareType (Optional.ofNullable(object.getInteger("shareType")).map(value -> {
+					switch (value) {
+					case 0:
+						return "订单";
+					}
+					return "未知类型";
+				}).orElse(""));
+				commissionInfoCO.setIsRebate (Optional.ofNullable(object.getInteger("isRebate")).map(value -> {
+					switch (value) {
+					case 0:
+						return "不返点";
+					case 1:
+						return "返点";
+					}
+					return "未知类型";
+				}).orElse(""));
+				commissionInfoCO.setRebateType (Optional.ofNullable(object.getInteger("rebateType")).map(value -> {
+					switch (value) {
+					case 0:
+						return "金额";
+					}
+					return "未知类型";
+				}).orElse(""));
+				commissionInfoCO.setRebateCycle (Optional.ofNullable(object.getInteger("rebateCycle")).map(value -> {
+					switch (value) {
+					case 0:
+						return "月";
+					case 1:
+						return "季度";
+					}
+					return "未知类型";
+				}).orElse(""));
+				commissionInfoCO.setIsAdvance (Optional.ofNullable(object.getInteger("isAdvance")).map(value -> {
+					switch (value) {
+					case 0:
+						return "否";
+					case 1:
+						return "是";
+					}
+					return "未知类型";
+				}).orElse(""));
+				commissionInfoCO.setAdvanceType (Optional.ofNullable(object.getInteger("advanceType")).map(value -> {
+					switch (value) {
+					case 0:
+						return "金额";
+					}
+					return "未知类型";
+				}).orElse(""));
+				commissionInfoCO.setSettleAmount (object.getString("settleAmount"));
+				
+				return commissionInfoCO;
+			}).orElseGet(BusSupplierCommissionInfoCO::new);
+			// 结算比例
+			List<BusSupplierProrateCO> prorateList = Optional.ofNullable((JSONArray) getRemoteProrateInfoList(supplierId, null)).map(jsonArray -> {
+				List<BusSupplierProrateCO> list = new ArrayList<>();
+				jsonArray.forEach(object -> {
+					JSONObject prorate = (JSONObject) JSON.toJSON(object);
+					BusSupplierProrateCO prorateCO = new BusSupplierProrateCO();
+					
+					prorateCO.setSupplierRate(prorate.getString("supplierRate"));
+					prorateCO.setStartTime(prorate.getString("startTime"));
+					prorateCO.setEndTime(prorate.getString("endTime"));
+					
+					list.add(prorateCO);
+				});
+				return list;
+			}).orElseGet(ArrayList::new);
+			// 返点比例
+			List<BusSupplierRebateCO> rebateList = Optional.ofNullable((JSONArray) getRemoteRebateInfo(supplierId)).map(jsonArray -> {
+				List<BusSupplierRebateCO> list = new ArrayList<>();
+				jsonArray.forEach(object -> {
+					JSONObject rebate = (JSONObject) JSON.toJSON(object);
+					BusSupplierRebateCO rebateCO = new BusSupplierRebateCO();
+					
+					rebateCO.setRebateRate(rebate.getString("rebateRate"));
+					rebateCO.setMaxMoney(rebate.getString("maxMoney"));
+					rebateCO.setStartTime(rebate.getString("startTime"));
+					rebateCO.setEndTime(rebate.getString("endTime"));
+					
+					list.add(rebateCO);
+				});
+				return list;
+			}).orElseGet(ArrayList::new);
+			
+			resultList.add(supplierCO);
+			resultList.add(detailCO);
+			resultList.add(commissionInfo);
+			resultList.add(prorateList);
+			resultList.add(rebateList);
+			return resultList;
+		} catch (Exception e) {
+			logger.error("[ BusSupplierService-getContents ] 获取比对信息异常,supplierId={},errorMsg={}", supplierId, e.getMessage(), e);
+		}
+		return null;
+	}
+
+	/**
+	 * @param supplierId 
+	 * @Title: saveChangeLog
+	 * @Description: 对比操作记录并保存日志
+	 * @param old
+	 * @param fresh void
+	 * @throws
+	 */
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.MASTER))
+	public void saveChangeLog(Integer supplierId, List<Object> oldList, List<Object> freshList) {
+		try {
+			String result = compareSupplierContents(oldList, freshList);
+			String description = StringUtils.isBlank(result) ? "未变更信息" : result;
+			busBizChangeLogService.insertLog(BusinessType.SUPPLIER, String.valueOf(supplierId), description, new Date());
+		} catch (Exception e) {
+			logger.error("[ BusSupplierService-saveChangeLog ] 对比操作记录并保存日志异常,supplierId={},errorMsg={}", supplierId, e.getMessage(), e);
+		}
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private String compareSupplierContents(List<Object> oldList, List<Object> freshList) {
+		// 比对结果
+		List<String> result = new ArrayList<>(oldList.size());
+		for (int i = 0; i < oldList.size(); i++) {
+			Object old = oldList.get(i);
+			Object fresh = freshList.get(i);
+			if (old instanceof List) {
+				// 递归操作
+				String join = compareSupplierContents((List) old, (List) fresh);
+				if (StringUtils.isNotBlank(join)) {
+					result.add(join);
+				}
+			} else {
+				List<Object> list = CompareObejctUtils.contrastObj(old, fresh, null);
+				String join = StringUtils.join(list, CompareObejctUtils.separator);
+				if (StringUtils.isNotBlank(join)) {
+					result.add(join);
+				}
+			}
+		}
+		return StringUtils.join(result, CompareObejctUtils.separator);
+	}
+	
 }

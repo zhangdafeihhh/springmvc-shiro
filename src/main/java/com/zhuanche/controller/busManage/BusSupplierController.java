@@ -4,7 +4,9 @@ import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -12,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +42,7 @@ import com.zhuanche.dto.busManage.BusSupplierDetailDTO;
 import com.zhuanche.dto.busManage.BusSupplierProrateDTO;
 import com.zhuanche.dto.busManage.BusSupplierQueryDTO;
 import com.zhuanche.dto.busManage.BusSupplierRebateDTO;
+import com.zhuanche.serv.busManage.BusBizChangeLogService;
 import com.zhuanche.serv.busManage.BusSupplierService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.excel.CsvUtils;
@@ -46,6 +50,7 @@ import com.zhuanche.vo.busManage.BusSupplierExportVO;
 import com.zhuanche.vo.busManage.BusSupplierInfoVO;
 import com.zhuanche.vo.busManage.BusSupplierPageVO;
 
+import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
 import mapper.rentcar.ex.BusCarBizSupplierExMapper;
 
 @RestController
@@ -66,6 +71,10 @@ public class BusSupplierController {
 	// ===========================巴士业务拓展service==================================
 	@Autowired
 	private BusSupplierService busSupplierService;
+
+	@Autowired
+	private BusBizChangeLogService busBizChangeLogService;
+
 	// ============================巴士共有服务service==================================
 
 	@Autowired
@@ -133,19 +142,62 @@ public class BusSupplierController {
 				}
 			}
 		}
-		return busSupplierService.saveSupplierInfo(baseDTO, detailDTO, commissionDTO, prorates, rebates);
+		
+		// 一、判断
+		Integer supplierId = baseDTO.getSupplierId();
+		boolean isAdd = true;
+		List<Object> old = null;
+		if (supplierId != null && supplierId != 0) {
+			isAdd = false;
+			old = busSupplierService.getContents(supplierId);
+		}
+		
+		// 二、保存数据
+		AjaxResponse response = busSupplierService.saveSupplierInfo(baseDTO, detailDTO, commissionDTO, prorates, rebates);
+		
+		// 三、保存操作记录
+		if (isAdd) {
+			busBizChangeLogService.insertLog(BusinessType.SUPPLIER, String.valueOf(supplierId), "创建供应商", new Date());
+		} else {
+			List<Object> fresh = busSupplierService.getContents(supplierId);;
+			busSupplierService.saveChangeLog(supplierId, old, fresh);
+		}
+		
+		return response;
 	}
 	
 	/**
 	 * @Title: deleteProrate
-	 * @Description: 根据ID删除供应商分佣协议
+	 * @Description: 根据ID删除供应商结算比例
 	 * @param id
 	 * @return AjaxResponse
 	 * @throws
 	 */
 	@RequestMapping(value = "/deleteProrate")
-	public AjaxResponse deleteProrate(@NotNull(message = "id不能为空") Long id) {
-		return busSupplierService.deleteProrate(id);
+	public AjaxResponse deleteProrate(@NotNull(message = "id不能为空") Long id,
+			@NotNull(message = "供应商ID不能为空") Integer supplierId, String supplierRate, String startTime, String endTime,
+			String createName, String createTime) {
+		// 一、删除分佣协议
+		AjaxResponse response = busSupplierService.deleteProrate(id);
+		// 二、保存操作日志
+		StringBuilder builder = new StringBuilder("删除供应商结算比例配置   ");
+		if (StringUtils.isNotBlank(supplierRate)) {
+			builder.append("结算比例:").append(supplierRate).append(";");
+		}
+		if (StringUtils.isNotBlank(startTime)) {
+			builder.append("生效日期开始时间:").append(startTime).append(";");
+		}
+		if (StringUtils.isNotBlank(endTime)) {
+			builder.append("生效日期结束日期:").append(endTime).append(";");
+		}
+		if (StringUtils.isNotBlank(createName)) {
+			builder.append("创建人:").append(createName).append(";");
+		}
+		if (StringUtils.isNotBlank(createTime)) {
+			builder.append("创建时间:").append(createTime).append(";");
+		}
+		busBizChangeLogService.insertLog(BusinessType.SUPPLIER, String.valueOf(supplierId), builder.toString(), new Date());
+		return response;
 	}
 
 	/**
@@ -156,8 +208,33 @@ public class BusSupplierController {
 	 * @throws
 	 */
 	@RequestMapping(value = "/deleteRebate")
-	public AjaxResponse deleteRebate(@NotNull(message = "id不能为空") Integer id) {
-		return busSupplierService.deleteRebate(id);
+	public AjaxResponse deleteRebate(@NotNull(message = "id不能为空") Integer id,
+			@NotNull(message = "供应商ID不能为空") Integer supplierId, String rebateRate, String maxMoney, String startTime,
+			String endTime, String createName, String createTime) {
+		// 一、删除分佣协议
+		AjaxResponse response = busSupplierService.deleteRebate(id);
+		// 二、保存操作日志
+		StringBuilder builder = new StringBuilder("删除供应商返点比例配置   ");
+		if (StringUtils.isNotBlank(rebateRate)) {
+			builder.append("返点比例:").append(rebateRate).append(";");
+		}
+		if (StringUtils.isNotBlank(maxMoney)) {
+			builder.append("金额:").append(maxMoney).append(";");
+		}
+		if (StringUtils.isNotBlank(startTime)) {
+			builder.append("生效日期开始时间:").append(startTime).append(";");
+		}
+		if (StringUtils.isNotBlank(endTime)) {
+			builder.append("生效日期结束日期:").append(endTime).append(";");
+		}
+		if (StringUtils.isNotBlank(createName)) {
+			builder.append("创建人:").append(createName).append(";");
+		}
+		if (StringUtils.isNotBlank(createTime)) {
+			builder.append("创建时间:").append(createTime).append(";");
+		}
+		busBizChangeLogService.insertLog(BusinessType.SUPPLIER, String.valueOf(supplierId), builder.toString(), new Date());
+		return response;
 	}
 
 	/**
@@ -183,7 +260,15 @@ public class BusSupplierController {
 		queryDTO.setAuthOfCity(permOfCity);
 		queryDTO.setAuthOfSupplier(permOfSupplier);
 		queryDTO.setAuthOfTeam(permOfTeam);
-		// 一、查询列表
+		// 按结算比例筛选供应商
+		if (queryDTO.getSupplierRate() != null) {
+			List<Integer> supplierRateIds = new ArrayList<>();
+			Optional.ofNullable(busSupplierService.getSupplierByProrateRate(queryDTO.getSupplierRate())).orElseGet(JSONArray::new).forEach(item -> {
+				supplierRateIds.add((Integer) item);
+			});
+			queryDTO.setSupplierRateIds(supplierRateIds);
+		}
+		// 一、查询供应商列表（如果有合同快到期的情况下）
 		List<BusSupplierPageVO> resultList = busSupplierService.queryBusSupplierPageList(queryDTO);
         
         // 二、计算total
@@ -194,7 +279,6 @@ public class BusSupplierController {
 		logger.info("[ BusSupplierController-querySupplierPageList ] 查询供应商分页列表params={}", JSON.toJSONString(queryDTO));
         List<BusSupplierPageVO> totalList = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
         Page<BusSupplierPageVO> page = (Page<BusSupplierPageVO>) totalList;
-
         if (resultList == null || resultList.isEmpty()) {
         	resultList = totalList;
         	if (resultList == null || resultList.isEmpty()) {
@@ -237,7 +321,6 @@ public class BusSupplierController {
 	 * @return AjaxResponse
 	 * @throws
 	 */
-	@SuppressWarnings("resource")
 	@RequestMapping(value = "/exportSupplierList")
 	public void exportSupplierList(@Validated BusSupplierQueryDTO queryDTO, HttpServletRequest request,
 			HttpServletResponse response) {
@@ -250,6 +333,14 @@ public class BusSupplierController {
 			queryDTO.setAuthOfCity(permOfCity);
 			queryDTO.setAuthOfSupplier(permOfSupplier);
 			queryDTO.setAuthOfTeam(permOfTeam);
+			// 按结算比例筛选供应商
+			if (queryDTO.getSupplierRate() != null) {
+				List<Integer> supplierRateIds = new ArrayList<>();
+				Optional.ofNullable(busSupplierService.getSupplierByProrateRate(queryDTO.getSupplierRate())).orElseGet(JSONArray::new).forEach(item -> {
+					supplierRateIds.add((Integer) item);
+				});
+				queryDTO.setSupplierRateIds(supplierRateIds);
+			}
 
 			// 文件名
 			LocalDateTime now = LocalDateTime.now();
@@ -263,53 +354,25 @@ public class BusSupplierController {
 			}
 
 			CsvUtils utilEntity = new CsvUtils();
-			// 表头
-			List<String> csvHeaderList = new ArrayList<>();
-			String headerStr = "供应商,城市 ,分佣比例,加盟费,保证金,是否有返点,合同开始时间,合同到期时间,状态";
-			csvHeaderList.add(headerStr);
 
 			/**导出逻辑*/
-			int pageNum = 0;
-			int pages = 1;
-			boolean isFirst = true;
-			boolean isLast = false;
-			do {
-				// 页码+1
-				pageNum++;
+			// 查询数据
+			queryDTO.pageNum = null;
+			queryDTO.pageSize = null;
+			List<BusSupplierExportVO> list = busSupplierService.querySupplierExportList(queryDTO);
 
-				// 查询数据
-				queryDTO.setPageNum(pageNum);
-				queryDTO.setPageSize(CsvUtils.downPerSize);
-				List<BusSupplierExportVO> list = busSupplierService.querySupplierExportList(queryDTO);
-				Page<BusSupplierExportVO> page = (Page<BusSupplierExportVO>) list;
-				// 总页数(以第一次查询结果为准)
-				if (pageNum == 1 && page != null) {
-					pages = page.getPages();
-				}
-				// 判断是否为第一页
-				if (pageNum > 1) {
-					isFirst = false;
-				}
-				// 判断是否为最后一页
-				if (pages <= 1 || pageNum == pages) {
-					isLast = true;
-				}
-
-				// 数据区
-				// 如果查询结果为空
-				if (list == null || list.isEmpty()) {
-					logger.info("[ BusSupplierController-exportSupplierList ] 导出条件params={}没有查询出对应的巴士供应商信息", JSON.toJSONString(queryDTO));
-					if (isFirst) {
-						List<String> csvDataList = new ArrayList<>();
-						csvDataList.add("没有查到符合条件的数据");
-						utilEntity.exportCsvV2(response, csvDataList, csvHeaderList, fileName, true, true);
-					}
-					break;
-				}
-				// 导出查询数据
-				List<String> csvDataList = busSupplierService.completeSupplierExportList(list);// 补充其它字段
-				utilEntity.exportCsvV2(response, csvDataList, csvHeaderList, fileName, isFirst, isLast);
-			} while (!isLast);// 不到最后一页则继续导出
+			// 数据区
+			// 如果查询结果为空
+			if (list == null || list.isEmpty()) {
+				logger.info("[ BusSupplierController-exportSupplierList ] 导出条件params={}没有查询出对应的巴士供应商信息", JSON.toJSONString(queryDTO));
+				List<String> csvDataList = new ArrayList<>();
+				csvDataList.add("没有查到符合条件的数据");
+				utilEntity.exportCsvV2(response, csvDataList, null, fileName, true, true);
+			}
+			
+			// 导出查询数据
+			List<String> csvDataList = busSupplierService.completeSupplierExportList(list);// 补充其它字段
+			utilEntity.exportCsvV2(response, csvDataList, null, fileName, true, true);
 
 			// 获取结束时间
 			long end = System.currentTimeMillis();

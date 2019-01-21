@@ -424,11 +424,10 @@ public class BusSettlementAdviceService implements BusConst {
     		try {
     			logger.info("[ BusSettlementAdviceService-getInvoiceFile ] 供应商账单确认开票查询发票附件,params={}", params);
     			JSONObject result = MpOkHttpUtil.okHttpPostBackJson( orderPayUrl + Pay.SETTLE_SUPPLIER_QUERY_INVOICE_URL, params, 2000, "查询发票附件");
-    			if (result.getIntValue("code") != 0) {
-    				logger.info("[ BusSettlementAdviceService-getInvoiceFile ] 供应商账单确认开票查询发票附件调用接口出错,params={},errorMsg={}", params, result.getString("msg"));
-    				return null;
+    			if (result.getIntValue("code") == 0) {
+    				return result.getJSONArray("data");
     			}
-    			return result.getJSONArray("data");
+    			logger.info("[ BusSettlementAdviceService-getInvoiceFile ] 供应商账单确认开票查询发票附件调用接口出错,params={},errorMsg={}", params, result.getString("msg"));
     		} catch (Exception e) {
     			logger.error("[ BusSettlementAdviceService-getInvoiceFile ] 供应商账单确认开票查询发票附件异常,params={},errorMsg={}", params, e.getMessage(), e);
     		} 
