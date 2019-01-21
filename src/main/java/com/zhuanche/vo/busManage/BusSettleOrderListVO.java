@@ -16,6 +16,23 @@ public class BusSettleOrderListVO {
     private BigDecimal settleAmount;
     private String createDate;
     private Integer accountType;
+    //订单创建时间
+    private String orderCreateDate;
+    //预约用车时间
+    private String bookingDate;
+    //预约上车地点
+    private String bookingStartAddr;
+    //预约下车地点
+    private String bookingEndAddr;
+    //司机姓名
+    private String driverName;
+    //服务类型
+    private String serviceName;
+    //预约车型类别
+    private String bookingGroupName;
+    //预估金额
+    private Double estimatedAmountYuan;
+
     private String orderDetail;
 
     public Integer getId() {
@@ -64,6 +81,70 @@ public class BusSettleOrderListVO {
 
     public void setOrderDetail(String orderDetail) {
         this.orderDetail = orderDetail;
+    }
+
+    public Double getEstimatedAmountYuan() {
+        return estimatedAmountYuan;
+    }
+
+    public void setEstimatedAmountYuan(Double estimatedAmountYuan) {
+        this.estimatedAmountYuan = estimatedAmountYuan;
+    }
+
+    public String getOrderCreateDate() {
+        return orderCreateDate;
+    }
+
+    public void setOrderCreateDate(String orderCreateDate) {
+        this.orderCreateDate = orderCreateDate;
+    }
+
+    public String getBookingDate() {
+        return bookingDate;
+    }
+
+    public void setBookingDate(String bookingDate) {
+        this.bookingDate = bookingDate;
+    }
+
+    public String getBookingStartAddr() {
+        return bookingStartAddr;
+    }
+
+    public void setBookingStartAddr(String bookingStartAddr) {
+        this.bookingStartAddr = bookingStartAddr;
+    }
+
+    public String getBookingEndAddr() {
+        return bookingEndAddr;
+    }
+
+    public void setBookingEndAddr(String bookingEndAddr) {
+        this.bookingEndAddr = bookingEndAddr;
+    }
+
+    public String getDriverName() {
+        return driverName;
+    }
+
+    public void setDriverName(String driverName) {
+        this.driverName = driverName;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    public String getBookingGroupName() {
+        return bookingGroupName;
+    }
+
+    public void setBookingGroupName(String bookingGroupName) {
+        this.bookingGroupName = bookingGroupName;
     }
 
     @Override

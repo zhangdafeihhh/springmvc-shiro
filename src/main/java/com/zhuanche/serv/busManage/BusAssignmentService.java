@@ -1,6 +1,10 @@
 package com.zhuanche.serv.busManage;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -102,6 +106,18 @@ public class BusAssignmentService {
     private String paymentBaseUrl;
     @Value("${order.pay.url}")
     private String orderPayUrl;
+    /**
+     * 订单组域名
+     */
+    @Value("${car.rest.url}")
+    private String ORDER_API_URL;
+    /**
+     * 查询订单列表url
+     */
+    private String ORDER_INFO_URL="/busOrder/selectOrderInfo";
+
+
+
     /**
      * @param params
      * @return BaseEntity
@@ -230,6 +246,13 @@ public class BusAssignmentService {
         return new PageDTO();
     }
 
+    /**
+     * 根据页面选择条件导出订单信息
+     * @param params
+     * @param @param groupMap 巴士车型类别，因为只是配置，可以在调用前查出来，不必每次都访问数据库查询该配置
+     * @param permission 是不是巴士运营权限，只有巴士运营才能导出预定人的企业相关信息
+     * @return
+     */
     public PageDTO buidExportData(BusOrderDTO params,Map<Integer, String> groupMap,boolean permission) {
         JSONObject result = queryOrderData(params);
         if (result == null) {
@@ -243,6 +266,179 @@ public class BusAssignmentService {
         if (orderList == null || orderList.isEmpty()) {
             return new PageDTO();
         }
+        List<BusOrderExportVO> export = this.addOtherResult4Export(orderList, groupMap, permission);
+        PageDTO page = new PageDTO(params.getPageNum(), params.getPageSize(), total, export);
+        return page;
+    }
+
+    /**
+     * 传入最多30个订单号，返回符合导出条件的所有字段
+     * @param orderNos 订单号，用英文逗号分隔，最多30个
+     * @param groupMap 巴士车型类别，因为只是配置，可以在调用前查出来，不必每次都访问数据库查询该配置
+     * @param permission 是不是巴士运营权限，只有巴士运营才能导出预定人的企业相关信息
+     * @return
+     */
+    public List<BusOrderExportVO> buidExportData(String orderNos,Map<Integer, String> groupMap,boolean permission){
+        Map<String,Object>orderParam=new TreeMap<>();
+        orderParam.put("orderNos",orderNos);
+        // 签名
+        orderParam.put("businessId", Common.BUSINESSID);
+        String sign = SignUtils.createMD5Sign(orderParam, Common.KEY);
+        orderParam.put("sign", sign);
+        try {
+            JSONObject orderResult = MpOkHttpUtil.okHttpPostBackJson(ORDER_API_URL+ORDER_INFO_URL, orderParam, 2000, "批量查询订单信息");
+            if(orderResult!=null&&orderResult.getInteger("code")!=null&&orderResult.getInteger("code")==0){
+                JSONArray orderArray = orderResult.getJSONObject("data").getJSONArray("dataList");
+                if(orderArray==null||orderArray.isEmpty()){
+                    return null;
+                }
+                List<BusOrderExVO> orderExVOS = orderArray.stream().map(o -> (JSONObject) o).map(o -> JSONObject.toJavaObject(o, BusOrderExVO.class)).collect(Collectors.toList());
+                List<BusOrderExportVO> busOrderExportVOS = this.addOtherResult4Export(orderExVOS, groupMap, permission);
+                return busOrderExportVOS;
+            }else{
+                logger.error("[ BusAssignmentService-getBatchOrderDetail ]批量查询订单信息,调用接口出错="+orderResult.toJSONString());
+            }
+        } catch (Exception e) {
+            logger.error("[ BusAssignmentService-getBatchOrderDetail ]批量查询订单信息,调用接口异常="+JSON.toJSONString(e));
+        }
+        return null;
+    }
+
+    /**
+     * 将bean中的所有属性，按照顺序组成字符串，以便导出csv格式的文件
+     * @param t
+     * @return
+     */
+    public String fieldValueToString(Object t) {
+        StringBuffer sb = new StringBuffer();
+        String tab="\t";
+        String split=",";
+        //利用反射，根据javabean属性的先后顺序，动态调用getXxx()方法得到属性值
+        Field[] fields = t.getClass().getDeclaredFields();
+        try {
+            for (short i = 0; i < fields.length; i++) {
+                Field field = fields[i];
+                String fieldName = field.getName();
+                String getMethodName = "get"
+                        + fieldName.substring(0, 1).toUpperCase()
+                        + fieldName.substring(1);
+                Class tCls = t.getClass();
+                Method getMethod = tCls.getMethod(getMethodName, new Class[]{});
+                Object value = getMethod.invoke(t, new Object[]{});
+                //判断值的类型后进行强制类型转换
+                String textValue = null;
+
+                if (value instanceof Date) {
+                    Date value1 = (Date) value;
+                    SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    textValue = sf.format(value1);
+
+                } else {
+                    //其它数据类型都当作字符串简单处理
+                    if (value != null&&!value.toString().equals("null")) {
+                        textValue = value.toString();
+                    } else {
+                        textValue = StringUtils.EMPTY;
+                    }
+                }
+                sb.append(tab).append(textValue).append(split);
+            }
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return sb.length()==0?StringUtils.EMPTY:sb.substring(0,sb.length()-1);
+    }
+
+
+    /**
+     *根据权限和页面参数调用订单查询列表接口，有分页
+     */
+    private JSONObject queryOrderData(BusOrderDTO params) {
+        // 数据权限控制SSOLoginUser
+        String cityIds = null;
+        String supplierIds = null;
+        Integer cityId = params.getCityId();
+        Integer supplierId = params.getSupplierId();
+        Set<Integer> authOfCity = WebSessionUtil.getCurrentLoginUser().getCityIds(); // 普通管理员可以管理的所有城市ID
+        Set<Integer> authOfSupplier = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); // 普通管理员可以管理的所有供应商ID
+        if (cityId == null && authOfCity != null) {
+            int size = authOfCity.size();
+            if (size == 1) {
+                authOfCity.stream().findFirst().ifPresent(params::setCityId);
+            } else {
+                cityIds = StringUtils.join(authOfCity, ",");
+            }
+        }
+        if (Integer.valueOf(10103).equals(params.getStatus())) {// 指派列表不限制供应商
+            params.setSupplierId(null);
+            supplierIds = null;
+        } else if (supplierId == null && authOfSupplier != null) {
+            int size = authOfSupplier.size();
+            if (size == 1) {
+                authOfSupplier.stream().findFirst().ifPresent(params::setSupplierId);
+            } else {
+                supplierIds = StringUtils.join(authOfSupplier, ",");
+            }
+        }
+
+        // 请求参数
+        String jsonString = JSON.toJSONStringWithDateFormat(params, JSON.DEFFAULT_DATE_FORMAT);
+        JSONObject json = (JSONObject) JSONObject.parse(jsonString);
+        Map<String, Object> paramMap = json.getInnerMap();
+
+        // 补充司机信息
+        Set<Integer> driverIds = new HashSet<>();
+        if (StringUtils.isNotBlank(params.getDriverName())) {
+            List<DriverMongo> driversByName = busDriverMongoService.queryDriverByName(params.getDriverName());
+            if (driversByName != null) {
+                driverIds.addAll(driversByName.stream().map(driver -> driver.getDriverId()).collect(Collectors.toList()));
+            }
+        }
+        if (StringUtils.isNotBlank(params.getDriverPhone())) {
+            List<DriverMongo> driversByPhone = busDriverMongoService.queryDriverByPhone(params.getDriverPhone());
+            if (driversByPhone != null) {
+                driverIds.addAll(driversByPhone.stream().map(driver -> driver.getDriverId()).collect(Collectors.toList()));
+            }
+        }
+        if (driverIds.size() == 1) {
+            driverIds.stream().findFirst().ifPresent(driverId -> paramMap.put("driverId", driverId));
+        } else {
+            String driverIdsStr = StringUtils.join(driverIds, ",");
+            paramMap.put("driverIds", StringUtils.isBlank(driverIdsStr) ? null : driverIdsStr);
+        }
+        // 补充权限控制
+        paramMap.put("cityIds", StringUtils.isBlank(cityIds) ? null : cityIds);
+        paramMap.put("supplierIds", StringUtils.isBlank(supplierIds) ? null : supplierIds);
+
+        // 签名
+        paramMap.put("businessId", Common.BUSINESSID);
+        String sign = SignUtils.createMD5Sign(paramMap, Common.KEY);
+        logger.info("[ BusAssignmentService-selectList ] 请求参数签名   sign={}", sign);
+        paramMap.put("sign", sign);
+
+        logger.info("[ BusAssignmentService-selectList ] 请求参数   paramMap={}", paramMap);
+
+        // 请求接口
+        String response = carRestTemplate.postForObject(BusConst.Order.SELECT_ORDER_LIST, JSONObject.class, paramMap);
+        JSONObject result = JSON.parseObject(response);
+        int code = result.getIntValue("code");
+        String msg = result.getString("msg");
+
+        // 接口错误
+        if (code == 1) {
+            logger.info("[ BusAssignmentService-selectList ] 查询巴士订单列表出错, 错误码:{}, 错误原因:{}", code, msg);
+            return null;
+        }
+        return result;
+    }
+    /**
+     * 导出订单详情时，封装其他信息 如司机姓名，供应商，计费信息，企业信息，评分信息
+     */
+    private List<BusOrderExportVO> addOtherResult4Export(List<BusOrderExVO> orderList,Map<Integer, String> groupMap,boolean permission){
         List<String> orderIdList = new ArrayList<>();
         List<String> orderNoList = new ArrayList<>();
         List<String> phoneList = new ArrayList<>();
@@ -268,19 +464,20 @@ public class BusAssignmentService {
 
         });
         //批量查询司机信息和供应商名称
-        List<Map<String, Object>> driverInfos = busCarBizDriverInfoExMapper.queryDriverSimpleBatch(driverIds);
-        Map<Integer,Map<String,Object>> driverInfoMap=new HashMap<>(driverInfos.size());
-        driverInfos.forEach(o->{
-            driverInfoMap.put(Integer.parseInt(o.get("driverId").toString()),o);
-        });
-
+        Map<Integer,Map<String,Object>> driverInfoMap=new HashMap<>();
+        if(driverIds.size()>0){
+            List<Map<String, Object>> driverInfos = busCarBizDriverInfoExMapper.queryDriverSimpleBatch(driverIds);
+            driverInfos.forEach(o->{
+                driverInfoMap.put(Integer.parseInt(o.get("driverId").toString()),o);
+            });
+        }
         //批量查询预定人名称
-        List<CarBizCustomer> carBizCustomers = customerExMapper.selectBatchCusName(userIds);
-        Map<Integer,String> userNames = new HashMap<>(carBizCustomers.size());
-        carBizCustomers.forEach(o->{userNames.put(o.getCustomerId(),o.getName());});
-
+        Map<Integer,String> userNames = new HashMap<>();
+        if(userIds.size()>0){
+            List<CarBizCustomer> carBizCustomers = customerExMapper.selectBatchCusName(userIds);
+            carBizCustomers.forEach(o->{userNames.put(o.getCustomerId(),o.getName());});
+        }
         //批量调用计费接口
-
         String orderNos = StringUtils.join(orderNoList, ",");
         Map<String, BusCostDetail> orderCostMap = new HashMap<>(16);
         JSONArray busCostList = this.getBusCostDetailList(orderNos);
@@ -355,32 +552,22 @@ public class BusAssignmentService {
                 }
             });
         }
-        List<BusOrderExportVO> export = buidOrderOperExportVO(orderList, orderCostMap, orderPayMap,
-                assignMap, reassigMap, phone2Cost, groupMap,driverInfoMap,userNames,appraisalMap);
-        PageDTO page = new PageDTO(params.getPageNum(), params.getPageSize(), total, export);
-        return page;
-    }
-
-    private List<BusOrderExportVO> buidOrderOperExportVO(List<BusOrderExVO> orderResult, Map<String, BusCostDetail> costResult,
-                                                         Map<String, BusOrderPayExport> payResult, Map<String, String> assignResult,
-                                                         Map<String, String> reassigResult, Map<String, OrgCostInfo> orgInfoMap,
-                                                         Map<Integer, String> groupMap,Map<Integer,Map<String,Object>> driverInfoMap
-            ,Map<Integer,String> userNames, Map<String, String> appraisalMap) {
-        List<BusOrderExportVO> list = new ArrayList<>();
+        //=====================拼装信息==================================================================
+        List<BusOrderExportVO> export = new ArrayList<>();
         //拼装参数
-        for (BusOrderExVO order : orderResult) {
+        for (BusOrderExVO order : orderList) {
             String orderNo = order.getOrderNo();
             //计费信息
-            BusCostDetail cost = costResult.get(orderNo);
+            BusCostDetail cost = orderCostMap.get(orderNo);
             //支付信息
-            BusOrderPayExport pay = payResult.get(orderNo);
+            BusOrderPayExport pay = orderPayMap.get(orderNo);
             //指派时间
-            String assigTime = assignResult.get(orderNo);
+            String assigTime = reassigMap.get(orderNo);
             //改派时间
-            String reassingTime = reassigResult.get(orderNo);
+            String reassingTime = reassigMap.get(orderNo);
             //企业信息
             String phone = order.getBookingUserPhone();
-            OrgCostInfo orgInfo = orgInfoMap.get(phone);
+            OrgCostInfo orgInfo = phone2Cost.get(phone);
 
             BusOrderExportVO orderExport = new BusOrderExportVO();
             orderExport.setOrderId(String.valueOf(order.getOrderId()));
@@ -494,12 +681,10 @@ public class BusAssignmentService {
             orderExport.setBookingUserName(username==null?StringUtils.EMPTY:username);
             //订单评分
             orderExport.setEvaluateScore(StringUtils.trimToEmpty(appraisalMap.get(orderNo)));
-            list.add(orderExport);
-
+            export.add(orderExport);
         }
-        return list;
+        return export;
     }
-
     private List<BusOrderPayExport> getPayDetailList(String orderNos) {
         logger.info("导出巴士订单列表，开始调用支付接口");
         Map<String, Object> param = new HashMap<>();
@@ -519,86 +704,6 @@ public class BusAssignmentService {
             return null;
         }
     }
-
-    private JSONObject queryOrderData(BusOrderDTO params) {
-        // 数据权限控制SSOLoginUser
-        String cityIds = null;
-        String supplierIds = null;
-        Integer cityId = params.getCityId();
-        Integer supplierId = params.getSupplierId();
-        Set<Integer> authOfCity = WebSessionUtil.getCurrentLoginUser().getCityIds(); // 普通管理员可以管理的所有城市ID
-        Set<Integer> authOfSupplier = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); // 普通管理员可以管理的所有供应商ID
-        if (cityId == null && authOfCity != null) {
-            int size = authOfCity.size();
-            if (size == 1) {
-                authOfCity.stream().findFirst().ifPresent(params::setCityId);
-            } else {
-                cityIds = StringUtils.join(authOfCity, ",");
-            }
-        }
-        if (Integer.valueOf(10103).equals(params.getStatus())) {// 指派列表不限制供应商
-            params.setSupplierId(null);
-            supplierIds = null;
-        } else if (supplierId == null && authOfSupplier != null) {
-            int size = authOfSupplier.size();
-            if (size == 1) {
-                authOfSupplier.stream().findFirst().ifPresent(params::setSupplierId);
-            } else {
-                supplierIds = StringUtils.join(authOfSupplier, ",");
-            }
-        }
-
-        // 请求参数
-        String jsonString = JSON.toJSONStringWithDateFormat(params, JSON.DEFFAULT_DATE_FORMAT);
-        JSONObject json = (JSONObject) JSONObject.parse(jsonString);
-        Map<String, Object> paramMap = json.getInnerMap();
-
-        // 补充司机信息
-        Set<Integer> driverIds = new HashSet<>();
-        if (StringUtils.isNotBlank(params.getDriverName())) {
-            List<DriverMongo> driversByName = busDriverMongoService.queryDriverByName(params.getDriverName());
-            if (driversByName != null) {
-                driverIds.addAll(driversByName.stream().map(driver -> driver.getDriverId()).collect(Collectors.toList()));
-            }
-        }
-        if (StringUtils.isNotBlank(params.getDriverPhone())) {
-            List<DriverMongo> driversByPhone = busDriverMongoService.queryDriverByPhone(params.getDriverPhone());
-            if (driversByPhone != null) {
-                driverIds.addAll(driversByPhone.stream().map(driver -> driver.getDriverId()).collect(Collectors.toList()));
-            }
-        }
-        if (driverIds.size() == 1) {
-            driverIds.stream().findFirst().ifPresent(driverId -> paramMap.put("driverId", driverId));
-        } else {
-            String driverIdsStr = StringUtils.join(driverIds, ",");
-            paramMap.put("driverIds", StringUtils.isBlank(driverIdsStr) ? null : driverIdsStr);
-        }
-        // 补充权限控制
-        paramMap.put("cityIds", StringUtils.isBlank(cityIds) ? null : cityIds);
-        paramMap.put("supplierIds", StringUtils.isBlank(supplierIds) ? null : supplierIds);
-
-        // 签名
-        paramMap.put("businessId", Common.BUSINESSID);
-        String sign = SignUtils.createMD5Sign(paramMap, Common.KEY);
-        logger.info("[ BusAssignmentService-selectList ] 请求参数签名   sign={}", sign);
-        paramMap.put("sign", sign);
-
-        logger.info("[ BusAssignmentService-selectList ] 请求参数   paramMap={}", paramMap);
-
-        // 请求接口
-        String response = carRestTemplate.postForObject(BusConst.Order.SELECT_ORDER_LIST, JSONObject.class, paramMap);
-        JSONObject result = JSON.parseObject(response);
-        int code = result.getIntValue("code");
-        String msg = result.getString("msg");
-
-        // 接口错误
-        if (code == 1) {
-            logger.info("[ BusAssignmentService-selectList ] 查询巴士订单列表出错, 错误码:{}, 错误原因:{}", code, msg);
-            return null;
-        }
-        return result;
-    }
-
 
     /**
      * @Title: getBusCostDetailList
@@ -830,8 +935,6 @@ public class BusAssignmentService {
         }
         return new PageDTO();
     }
-
-
 
     /**
      * @Title: busDispatcher

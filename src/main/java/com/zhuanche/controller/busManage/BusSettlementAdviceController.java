@@ -2,23 +2,27 @@ package com.zhuanche.controller.busManage;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
 
+import com.zhuanche.constants.BusConst;
+import com.zhuanche.entity.busManage.BusCostDetail;
+import com.zhuanche.http.MpOkHttpUtil;
+import com.zhuanche.serv.busManage.*;
+import com.zhuanche.util.BeanUtil;
+import com.zhuanche.util.Common;
+import com.zhuanche.util.SignUtils;
+import com.zhuanche.vo.busManage.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -46,22 +50,10 @@ import com.zhuanche.entity.busManage.BusOrderDetail;
 import com.zhuanche.entity.rentcar.CarBizService;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.serv.CarBizSupplierService;
-import com.zhuanche.serv.busManage.BusCommonService;
-import com.zhuanche.serv.busManage.BusOrderService;
-import com.zhuanche.serv.busManage.BusSettlementAdviceService;
-import com.zhuanche.serv.busManage.BusSupplierService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.excel.CsvUtils;
-import com.zhuanche.vo.busManage.BusSettleOrderListVO;
-import com.zhuanche.vo.busManage.BusSettlementDetailVO;
-import com.zhuanche.vo.busManage.BusSettlementInvoiceVO;
-import com.zhuanche.vo.busManage.BusSettlementPaymentVO;
-import com.zhuanche.vo.busManage.BusSettlementUdateInitVO;
-import com.zhuanche.vo.busManage.BusSupplierInfoVO;
-import com.zhuanche.vo.busManage.BusSupplierSettleDetailVO;
-import com.zhuanche.vo.busManage.BusTransactionsDetailVO;
 
 import mapper.rentcar.CarBizServiceMapper;
 
@@ -93,6 +85,9 @@ public class BusSettlementAdviceController {
     private BusOrderService busOrderService;
     @Autowired
     private CarBizServiceMapper serviceMapper;
+
+    @Autowired
+    private BusAssignmentService busAssignmentService;
 
 
     /**
@@ -382,13 +377,32 @@ public class BusSettlementAdviceController {
         String fileName = BusConstant.buidFileName(request, SupplierMaidConstant.TRANSACTION_FLOW_FILE_NAME);
         //构建文件标题
         List<String> headerList = new ArrayList<>();
-        headerList.add(SupplierMaidConstant.TRANSACTION_FALOW_FALE_NAME);
+        //判断是否为巴士运营权限
+        boolean roleBoolean = busCommonService.ifOperate();
+        String[] settleHead = SupplierMaidConstant.TRANSACTION_FALOW_FALE_NAME.split(",");
+        String[] orderHead=null;
+        if(roleBoolean){
+            orderHead=BusConstant.Order.ORDER_HEAD;
+        }else{
+            orderHead = new String[BusConstant.Order.ORDER_HEAD.length-3];//无权导出企业信息
+            System.arraycopy(BusConstant.Order.ORDER_HEAD,0,orderHead,0,BusConstant.Order.ORDER_HEAD.length-3);
+        }
+        String[] head = new String[settleHead.length+orderHead.length];
+        System.arraycopy(settleHead,0,head,0,settleHead.length);
+        System.arraycopy(orderHead,0,head,settleHead.length,orderHead.length);
+        headerList.add(StringUtils.join(head,","));
         CsvUtils utilEntity = new CsvUtils();
         Integer pageNum = 0;
         boolean isFirst = true;
         boolean isList = false;
-        //每次查询的最大条数
-        dto.setPageSize(CsvUtils.downPerSize);
+        //每次查询的最大条数,订单组只支持每次查询30个
+        dto.setPageSize(30);
+        //查询出所有的巴士车型类别
+        List<Map<Object, Object>> maps = busCommonService.queryGroups();
+        Map<Integer, String> groupMap = new HashMap<>(16);
+        maps.forEach(o -> {
+            groupMap.put(Integer.parseInt(String.valueOf(o.get("groupId"))), String.valueOf(o.get("groupName")));
+        });
         do {
             pageNum++;
             dto.setPageNum(pageNum);
@@ -419,14 +433,46 @@ public class BusSettlementAdviceController {
             if (pageNum.equals(pages)) {
                 isList = true;
             }
-            //处理返回结果
-            List<String> collect = array.stream().map(o -> (JSONObject) o).map(o -> JSONObject.toJavaObject(o, BusSettleOrderListVO.class)).map(BusSettleOrderListVO::toString)
-                    .collect(Collectors.toList());
-            utilEntity.exportCsvV2(response, collect, headerList, fileName, isFirst, isList);
+            //遍历结果取出orderNo去调用订单组接口，补充数据
+            String orderNos = array.stream().map(o -> (JSONObject) o).map(o -> o.getString("orderNo")).collect(Collectors.joining(","));
+            List<BusOrderExportVO> exportVOS = busAssignmentService.buidExportData(orderNos, groupMap, roleBoolean);
+            Map<String,BusOrderExportVO> orderMap=new HashMap<>();
+            if(exportVOS!=null){
+                exportVOS.forEach(order->orderMap.put(order.getOrderNo(),order));
+            }
+            List<String> dataCsv=new ArrayList<>();
+            array.forEach(o->{
+                BusSettleOrderListVO settleDetail = JSONObject.toJavaObject((JSONObject) o, BusSettleOrderListVO.class);
+                BusSettleOrderExportVO settleOrderExportVO = new BusSettleOrderExportVO();
+                if(orderMap.size()>0){
+                    String orderNo = settleDetail.getOrderNo();
+                    BusOrderExportVO orderExportVO = orderMap.get(orderNo);
+                    if(orderExportVO!=null){
+                        BeanUtils.copyProperties(orderExportVO,settleOrderExportVO);
+                    }
+                }
+                settleOrderExportVO.setFromNum(settleDetail.getOrderNo());
+                Integer accountType = settleDetail.getAccountType();
+                String accountTypeName=StringUtils.EMPTY;
+                if (accountType == 5) {
+                    accountTypeName = "巴士分佣收入";
+                } else if (accountType == 6) {
+                    accountTypeName = "修正订单";
+                } else if (accountType == 7) {
+                    accountTypeName = "修正账单";
+                }else{
+                    accountTypeName="未知类型";
+                }
+                settleOrderExportVO.setAccountTypeName(accountTypeName);
+                settleOrderExportVO.setSettleCreateDate(settleDetail.getCreateDate());
+                settleOrderExportVO.setSettleMaidAmount(settleDetail.getSettleAmount());
+                String s = busAssignmentService.fieldValueToString(settleOrderExportVO);
+                dataCsv.add(s);
+            });
+            utilEntity.exportCsvV2(response,dataCsv,headerList,fileName,isFirst,isList);
         } while (!isList);
         logger.info(LOG_PRE + "导出特定账单流水列表参数=" + JSON.toJSONString(dto) + " 消耗时间=" + (System.currentTimeMillis() - start));
     }
-
 
     /**
      * 修改账单

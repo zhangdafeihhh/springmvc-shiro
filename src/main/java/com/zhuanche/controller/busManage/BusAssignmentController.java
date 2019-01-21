@@ -184,7 +184,7 @@ public class BusAssignmentController {
             }
             List<String> csvData = new ArrayList<>();
             result.forEach(o->{
-                String s = this.fieldValueToString(o);
+                String s = busAssignmentService.fieldValueToString(o);
                 csvData.add(s);
             });
             utilEntity.exportCsvV2(response, csvData, headerList, fileName, isFirst, isList);
@@ -193,54 +193,6 @@ public class BusAssignmentController {
         logger.info("[ BusAssignmentController-exportExcel ]" + "导出订单数据=" + JSON.toJSONString(params) + " 消耗时间=" + (System.currentTimeMillis() - start));
     }
 
-    /**
-     * 将bean中的所有属性，按照顺序组成字符串，以便导出csv格式的文件
-     * @param t
-     * @return
-     */
-    private  String fieldValueToString(Object t) {
-        StringBuffer sb = new StringBuffer();
-        String tab="\t";
-        String split=",";
-        //利用反射，根据javabean属性的先后顺序，动态调用getXxx()方法得到属性值
-        Field[] fields = t.getClass().getDeclaredFields();
-        try {
-            for (short i = 0; i < fields.length; i++) {
-                Field field = fields[i];
-                String fieldName = field.getName();
-                String getMethodName = "get"
-                        + fieldName.substring(0, 1).toUpperCase()
-                        + fieldName.substring(1);
-                Class tCls = t.getClass();
-                Method getMethod = tCls.getMethod(getMethodName, new Class[]{});
-                Object value = getMethod.invoke(t, new Object[]{});
-                //判断值的类型后进行强制类型转换
-                String textValue = null;
-
-                if (value instanceof Date) {
-                    Date value1 = (Date) value;
-                    SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    textValue = sf.format(value1);
-
-                } else {
-                    //其它数据类型都当作字符串简单处理
-                    if (value != null&&!value.toString().equals("null")) {
-                        textValue = value.toString();
-                    } else {
-                        textValue = StringUtils.EMPTY;
-                    }
-                }
-                sb.append(tab).append(textValue).append(split);
-            }
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return sb.length()==0?StringUtils.EMPTY:sb.substring(0,sb.length()-1);
-    }
 
 
 
