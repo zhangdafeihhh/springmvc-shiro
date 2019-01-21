@@ -814,6 +814,7 @@ public class CarBizDriverInfoService {
                         params.put("orderNo", orderNum);
                         params.put("bId", bId);
                         params.put("columns", "fact_end_date");
+                        params.put("needHistory", 1);
                         try{
                             params.put("sign", MD5Utils.getMD5DigestBase64(SignatureUtils.getMD5Sign(params, signKey)));
                         }catch (Exception e){
