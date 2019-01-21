@@ -3,6 +3,7 @@ package com.zhuanche.vo.busManage;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * @program: mp-manage
@@ -17,9 +18,9 @@ public class BusSettleOrderListVO {
     private String createDate;
     private Integer accountType;
     //订单创建时间
-    private String orderCreateDate;
+    private Date orderCreateDate;
     //预约用车时间
-    private String bookingDate;
+    private Date bookingDate;
     //预约上车地点
     private String bookingStartAddr;
     //预约下车地点
@@ -91,19 +92,19 @@ public class BusSettleOrderListVO {
         this.estimatedAmountYuan = estimatedAmountYuan;
     }
 
-    public String getOrderCreateDate() {
+    public Date getOrderCreateDate() {
         return orderCreateDate;
     }
 
-    public void setOrderCreateDate(String orderCreateDate) {
+    public void setOrderCreateDate(Date orderCreateDate) {
         this.orderCreateDate = orderCreateDate;
     }
 
-    public String getBookingDate() {
+    public Date getBookingDate() {
         return bookingDate;
     }
 
-    public void setBookingDate(String bookingDate) {
+    public void setBookingDate(Date bookingDate) {
         this.bookingDate = bookingDate;
     }
 

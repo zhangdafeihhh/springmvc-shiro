@@ -10,13 +10,17 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
 
 import com.zhuanche.constants.BusConst;
+import com.zhuanche.constants.busManage.EnumServiceType;
 import com.zhuanche.entity.busManage.BusCostDetail;
+import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.busManage.*;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.Common;
 import com.zhuanche.util.SignUtils;
 import com.zhuanche.vo.busManage.*;
+import mapper.rentcar.ex.BusCarBizDriverInfoExMapper;
+import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,6 +92,15 @@ public class BusSettlementAdviceController {
 
     @Autowired
     private BusAssignmentService busAssignmentService;
+
+    @Autowired
+    private CarBizServiceMapper carBizServiceMapper;
+
+    @Autowired
+    private BusCarBizDriverInfoExMapper busCarBizDriverInfoExMapper;
+
+    @Autowired
+    private CarBizCarGroupExMapper carBizCarGroupExMapper;
 
 
     /**
@@ -236,11 +249,11 @@ public class BusSettlementAdviceController {
                 utilEntity.exportCsvV2(response, csvData, headerList, fileName, isFirst, isList);
                 break;
             }
-            if(pageNum!=1){
-                isFirst=false;
+            if (pageNum != 1) {
+                isFirst = false;
             }
-            if(isnull){
-                isList=true;
+            if (isnull) {
+                isList = true;
             }
             Map<Integer, BusSupplierInfoVO> supplierInfoMap = querySupplierInfo(array);
             csvData = array.stream().map(o -> (JSONObject) o).map(o -> JSONObject.toJavaObject(o, BusSupplierSettleDetailVO.class)).map(o -> {
@@ -344,6 +357,7 @@ public class BusSettlementAdviceController {
      * @Date: 2018/12/19
      */
     @RequestMapping(value = "/transactions/List", method = RequestMethod.POST)
+    @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
     public AjaxResponse queryOrderList(@Validated BusSettleOrderListDTO dto) {
         logger.info(LOG_PRE + "查询特定账单流水列表参数=" + JSON.toJSONString(dto));
         JSONObject result = busSettlementAdviceService.queryOrderList(dto);
@@ -362,9 +376,61 @@ public class BusSettlementAdviceController {
         if (array == null || array.isEmpty()) {
             return AjaxResponse.success(new ArrayList<>());
         }
+        List<String> orderNos = array.stream().map(o -> (JSONObject) o).map(o -> o.getString("orderNo")).distinct().collect(Collectors.toList());
+        //查询出所有的巴士车型类别
+        List<Map<Object, Object>> maps = busCommonService.queryGroups();
+        Map<Integer, String> groupMap = new HashMap<>(16);
+        maps.forEach(o -> {
+            groupMap.put(Integer.parseInt(String.valueOf(o.get("groupId"))), String.valueOf(o.get("groupName")));
+        });
+        List<BusOrderExVO> orderExVOS = busAssignmentService.queryOrderDetailByOrderNos(StringUtils.join(orderNos, ","));
+        Map<String, BusOrderExVO> orderMap = new HashMap<>(30);
+        Map<Integer,String>driverNameMap=new HashMap<>();
+        if (orderExVOS != null && !orderExVOS.isEmpty()) {
+            Set<Integer> driverIds = orderExVOS.stream().map(order -> order.getDriverId()).filter(Objects::nonNull).collect(Collectors.toSet());
+            List<Map<String, Object>> driverList = busCarBizDriverInfoExMapper.queryDriverSimpleBatch(driverIds);
+            driverList.forEach(o->{
+                        int driverId = Integer.parseInt(o.get("driverId").toString());
+                        String driverName = o.get("name") == null ? StringUtils.EMPTY : o.get("name").toString();
+                        driverNameMap.put(driverId,driverName);
+            });
+            orderExVOS.forEach(order -> {
+                Integer driverId = order.getDriverId();
+                if (driverId != null) {
+                    order.setDriverName(driverNameMap.get(driverId));
+                }
+                // c)预约车别类型
+                String groupid = order.getBookingGroupid();
+                if (StringUtils.isNotBlank(groupid)) {
+                    int groupId = Integer.parseInt(groupid);
+                    order.setBookingGroupName(groupMap.get(groupId));
+                }
+                //服务类型
+                Integer serviceTypeId = order.getServiceTypeId();
+                if (serviceTypeId != null && serviceTypeId > 0) {
+                    order.setServiceTypeName(EnumServiceType.getI18nByValue(serviceTypeId));
+                }
+                orderMap.put(order.getOrderNo(), order);
+            });
+        }
+
         //处理返回结果
-        List<BusSettleOrderListVO> collect = array.stream().map(o -> (JSONObject) o).map(o -> JSONObject.toJavaObject(o, BusSettleOrderListVO.class))
-                .collect(Collectors.toList());
+        List<BusSettleOrderListVO> collect = array.stream().map(o -> (JSONObject) o).map(o -> {
+            BusSettleOrderListVO settleVO = JSONObject.toJavaObject(o, BusSettleOrderListVO.class);
+            String orderNo = settleVO.getOrderNo();
+            BusOrderExVO order = orderMap.get(orderNo);
+            if (order != null) {
+                settleVO.setOrderCreateDate(order.getCreateDate());
+                settleVO.setBookingDate(order.getBookingDate());
+                settleVO.setBookingEndAddr(order.getBookingEndAddr());
+                settleVO.setBookingStartAddr(order.getBookingStartAddr());
+                settleVO.setDriverName(order.getDriverName());
+                settleVO.setServiceName(order.getServiceTypeName());
+                settleVO.setBookingGroupName(order.getBookingGroupName());
+                settleVO.setEstimatedAmountYuan(order.getEstimatedAmountYuan());
+            }
+            return settleVO;
+        }).collect(Collectors.toList());
         PageDTO page = new PageDTO(data.getInteger("pageNo"), data.getInteger("pageSize"), data.getLong("total"), collect);
         return AjaxResponse.success(page);
     }
@@ -380,17 +446,17 @@ public class BusSettlementAdviceController {
         //判断是否为巴士运营权限
         boolean roleBoolean = busCommonService.ifOperate();
         String[] settleHead = SupplierMaidConstant.TRANSACTION_FALOW_FALE_NAME.split(",");
-        String[] orderHead=null;
-        if(roleBoolean){
-            orderHead=BusConstant.Order.ORDER_HEAD;
-        }else{
-            orderHead = new String[BusConstant.Order.ORDER_HEAD.length-3];//无权导出企业信息
-            System.arraycopy(BusConstant.Order.ORDER_HEAD,0,orderHead,0,BusConstant.Order.ORDER_HEAD.length-3);
+        String[] orderHead = null;
+        if (roleBoolean) {
+            orderHead = BusConstant.Order.ORDER_HEAD;
+        } else {
+            orderHead = new String[BusConstant.Order.ORDER_HEAD.length - 3];//无权导出企业信息
+            System.arraycopy(BusConstant.Order.ORDER_HEAD, 0, orderHead, 0, BusConstant.Order.ORDER_HEAD.length - 3);
         }
-        String[] head = new String[settleHead.length+orderHead.length];
-        System.arraycopy(settleHead,0,head,0,settleHead.length);
-        System.arraycopy(orderHead,0,head,settleHead.length,orderHead.length);
-        headerList.add(StringUtils.join(head,","));
+        String[] head = new String[settleHead.length + orderHead.length];
+        System.arraycopy(settleHead, 0, head, 0, settleHead.length);
+        System.arraycopy(orderHead, 0, head, settleHead.length, orderHead.length);
+        headerList.add(StringUtils.join(head, ","));
         CsvUtils utilEntity = new CsvUtils();
         Integer pageNum = 0;
         boolean isFirst = true;
@@ -434,34 +500,34 @@ public class BusSettlementAdviceController {
                 isList = true;
             }
             //遍历结果取出orderNo去调用订单组接口，补充数据
-            String orderNos = array.stream().map(o -> (JSONObject) o).map(o -> o.getString("orderNo")).collect(Collectors.joining(","));
+            String orderNos = array.stream().map(o -> (JSONObject) o).map(o -> o.getString("orderNo")).distinct().collect(Collectors.joining(","));
             List<BusOrderExportVO> exportVOS = busAssignmentService.buidExportData(orderNos, groupMap, roleBoolean);
-            Map<String,BusOrderExportVO> orderMap=new HashMap<>();
-            if(exportVOS!=null){
-                exportVOS.forEach(order->orderMap.put(order.getOrderNo(),order));
+            Map<String, BusOrderExportVO> orderMap = new HashMap<>();
+            if (exportVOS != null) {
+                exportVOS.forEach(order -> orderMap.put(order.getOrderNo(), order));
             }
-            List<String> dataCsv=new ArrayList<>();
-            array.forEach(o->{
+            List<String> dataCsv = new ArrayList<>();
+            array.forEach(o -> {
                 BusSettleOrderListVO settleDetail = JSONObject.toJavaObject((JSONObject) o, BusSettleOrderListVO.class);
                 BusSettleOrderExportVO settleOrderExportVO = new BusSettleOrderExportVO();
-                if(orderMap.size()>0){
+                if (orderMap.size() > 0) {
                     String orderNo = settleDetail.getOrderNo();
                     BusOrderExportVO orderExportVO = orderMap.get(orderNo);
-                    if(orderExportVO!=null){
-                        BeanUtils.copyProperties(orderExportVO,settleOrderExportVO);
+                    if (orderExportVO != null) {
+                        BeanUtils.copyProperties(orderExportVO, settleOrderExportVO);
                     }
                 }
                 settleOrderExportVO.setFromNum(settleDetail.getOrderNo());
                 Integer accountType = settleDetail.getAccountType();
-                String accountTypeName=StringUtils.EMPTY;
+                String accountTypeName = StringUtils.EMPTY;
                 if (accountType == 5) {
                     accountTypeName = "巴士分佣收入";
                 } else if (accountType == 6) {
                     accountTypeName = "修正订单";
                 } else if (accountType == 7) {
                     accountTypeName = "修正账单";
-                }else{
-                    accountTypeName="未知类型";
+                } else {
+                    accountTypeName = "未知类型";
                 }
                 settleOrderExportVO.setAccountTypeName(accountTypeName);
                 settleOrderExportVO.setSettleCreateDate(settleDetail.getCreateDate());
@@ -469,7 +535,7 @@ public class BusSettlementAdviceController {
                 String s = busAssignmentService.fieldValueToString(settleOrderExportVO);
                 dataCsv.add(s);
             });
-            utilEntity.exportCsvV2(response,dataCsv,headerList,fileName,isFirst,isList);
+            utilEntity.exportCsvV2(response, dataCsv, headerList, fileName, isFirst, isList);
         } while (!isList);
         logger.info(LOG_PRE + "导出特定账单流水列表参数=" + JSON.toJSONString(dto) + " 消耗时间=" + (System.currentTimeMillis() - start));
     }
@@ -547,13 +613,13 @@ public class BusSettlementAdviceController {
     /**
      * @param invoiceDTO
      * @return AjaxResponse
-     * @throws IOException 
+     * @throws IOException
      * @throws
      * @Title: invoiceSave
      * @Description: 结算单确认收票窗口保存
      */
     @RequestMapping(value = "/invoice/save")
-	public AjaxResponse invoiceSave(@Validated BusSettlementInvoiceDTO invoiceDTO) throws IOException {
+    public AjaxResponse invoiceSave(@Validated BusSettlementInvoiceDTO invoiceDTO) throws IOException {
         return busSettlementAdviceService.saveInvoiceInfo(invoiceDTO);
     }
 
@@ -580,6 +646,6 @@ public class BusSettlementAdviceController {
     @RequestMapping(value = "/payment/save")
     public AjaxResponse paymentSave(@Validated BusSettlementPaymentDTO paymentDTO) {
         return busSettlementAdviceService.savePaymentInfo(paymentDTO);
-	}
+    }
 
 }

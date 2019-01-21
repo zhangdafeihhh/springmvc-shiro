@@ -68,7 +68,7 @@
 			customer_id = #{customerId}
 	</select>
 
-	<select id="selectBatchCusName" resultType="com.zhuanche.entity.rentcar.CarBizCustomer" parameterType="java.util.List">
+	<select id="selectBatchCusName" resultType="com.zhuanche.entity.rentcar.CarBizCustomer" parameterType="java.util.Set">
 		SELECT
 		    customer_id AS customerId,
 			`name`
@@ -76,7 +76,7 @@
 			car_biz_customer
 		WHERE
 			customer_id IN
-			<foreach collection="list" item="item" close=")" open="(" separator=",">
+			<foreach collection="customerIds" item="item" close=")" open="(" separator=",">
 				#{item}
 			</foreach>
 	</select>

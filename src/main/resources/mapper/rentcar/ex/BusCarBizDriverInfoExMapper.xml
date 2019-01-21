@@ -725,7 +725,7 @@
 			driver_id = #{driverId}
 	</select>
 
-	<select id="queryDriverSimpleBatch" parameterType="java.util.List" resultType="java.util.Map">
+	<select id="queryDriverSimpleBatch" parameterType="java.util.Set" resultType="java.util.Map">
 		SELECT
 		driver.driver_id AS driverId,
 		driver. name,
@@ -736,7 +736,7 @@
 		car_biz_driver_info driver
 		LEFT JOIN car_biz_supplier sup ON driver.supplier_id = sup.supplier_id
 		where driver_id in
-		<foreach collection="list" item="item" separator="," open="(" close=")">
+		<foreach collection="driverIds" item="item" separator="," open="(" close=")">
 			#{item}
 		</foreach>
 	</select>

@@ -279,27 +279,34 @@ public class BusAssignmentService {
      * @return
      */
     public List<BusOrderExportVO> buidExportData(String orderNos,Map<Integer, String> groupMap,boolean permission){
+        List<BusOrderExVO> orderExVOS = queryOrderDetailByOrderNos(orderNos);
+        if(orderExVOS==null||orderExVOS.isEmpty()){
+            return null;
+        }
+        List<BusOrderExportVO> busOrderExportVOS = this.addOtherResult4Export(orderExVOS, groupMap, permission);
+        return busOrderExportVOS;
+    }
+
+    /**
+     *
+     * @param orderNos 逗号分隔的订单号，用于批量查询订单信息
+     * @return
+     */
+    public List<BusOrderExVO> queryOrderDetailByOrderNos(String orderNos){
         Map<String,Object>orderParam=new TreeMap<>();
         orderParam.put("orderNos",orderNos);
         // 签名
         orderParam.put("businessId", Common.BUSINESSID);
         String sign = SignUtils.createMD5Sign(orderParam, Common.KEY);
         orderParam.put("sign", sign);
-        try {
-            JSONObject orderResult = MpOkHttpUtil.okHttpPostBackJson(ORDER_API_URL+ORDER_INFO_URL, orderParam, 2000, "批量查询订单信息");
-            if(orderResult!=null&&orderResult.getInteger("code")!=null&&orderResult.getInteger("code")==0){
-                JSONArray orderArray = orderResult.getJSONObject("data").getJSONArray("dataList");
-                if(orderArray==null||orderArray.isEmpty()){
-                    return null;
-                }
-                List<BusOrderExVO> orderExVOS = orderArray.stream().map(o -> (JSONObject) o).map(o -> JSONObject.toJavaObject(o, BusOrderExVO.class)).collect(Collectors.toList());
-                List<BusOrderExportVO> busOrderExportVOS = this.addOtherResult4Export(orderExVOS, groupMap, permission);
-                return busOrderExportVOS;
-            }else{
-                logger.error("[ BusAssignmentService-getBatchOrderDetail ]批量查询订单信息,调用接口出错="+orderResult.toJSONString());
+        JSONObject orderResult = MpOkHttpUtil.okHttpPostBackJson(ORDER_API_URL+ORDER_INFO_URL, orderParam, 2000, "批量查询订单信息");
+        if(orderResult!=null&&orderResult.getInteger("code")!=null&&orderResult.getInteger("code")==0) {
+            JSONArray orderArray = orderResult.getJSONObject("data").getJSONArray("dataList");
+            if (orderArray == null || orderArray.isEmpty()) {
+                return null;
             }
-        } catch (Exception e) {
-            logger.error("[ BusAssignmentService-getBatchOrderDetail ]批量查询订单信息,调用接口异常="+JSON.toJSONString(e));
+         List<BusOrderExVO> orderExVOS = orderArray.stream().map(o -> (JSONObject) o).map(o -> JSONObject.toJavaObject(o, BusOrderExVO.class)).collect(Collectors.toList());
+            return orderExVOS;
         }
         return null;
     }
@@ -442,8 +449,8 @@ public class BusAssignmentService {
         List<String> orderIdList = new ArrayList<>();
         List<String> orderNoList = new ArrayList<>();
         List<String> phoneList = new ArrayList<>();
-        List<Integer> userIds= new ArrayList<>();
-        List<Integer> driverIds=new ArrayList<>();
+        Set<Integer> userIds= new HashSet<>();
+        Set<Integer> driverIds=new HashSet<>();
         orderList.forEach(order -> {
             orderIdList.add(String.valueOf(order.getOrderId()));
             orderNoList.add(order.getOrderNo());

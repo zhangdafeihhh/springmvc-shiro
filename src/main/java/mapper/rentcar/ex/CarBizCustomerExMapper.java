@@ -1,8 +1,10 @@
 package mapper.rentcar.ex;
 
 import com.zhuanche.entity.rentcar.CarBizCustomer;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 public interface CarBizCustomerExMapper {
 
@@ -15,6 +17,6 @@ public interface CarBizCustomerExMapper {
 	 */
 	String selectCustomerNameById(Integer customerId);
 
-	List<CarBizCustomer> selectBatchCusName(List<Integer> ids);
+	List<CarBizCustomer> selectBatchCusName(@Param("customerIds") Set<Integer> customerIds);
 	
 }

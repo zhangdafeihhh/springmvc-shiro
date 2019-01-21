@@ -2,12 +2,14 @@ package mapper.rentcar.ex;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.zhuanche.dto.busManage.BusDriverQueryDTO;
 import com.zhuanche.dto.busManage.BusDriverSaveDTO;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.vo.busManage.BusDriverInfoExportVO;
 import com.zhuanche.vo.busManage.BusDriverInfoPageVO;
+import org.apache.ibatis.annotations.Param;
 
 public interface BusCarBizDriverInfoExMapper {
 
@@ -59,7 +61,7 @@ public interface BusCarBizDriverInfoExMapper {
 	 */
 	CarBizDriverInfo queryDriverSimpleInfoById(Integer driverId);
 
-	List<Map<String,Object>> queryDriverSimpleBatch(List<Integer> driverIds);
+	List<Map<String,Object>> queryDriverSimpleBatch(@Param("driverIds") Set<Integer> driverIds);
 
 
 }
