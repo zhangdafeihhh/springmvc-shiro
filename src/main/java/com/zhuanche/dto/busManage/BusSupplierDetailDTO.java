@@ -53,7 +53,6 @@ public class BusSupplierDetailDTO implements BusSupplierDTO {
 	private String invoiceCompanyName;
 
 	/** 电话号码(发票信息) **/
-	@NotBlank(message = "电话号码不能为空")
 	@Size(max = 100, message = "电话号码长度不能超过30")
 	private String invoiceCompanyPhone;
 

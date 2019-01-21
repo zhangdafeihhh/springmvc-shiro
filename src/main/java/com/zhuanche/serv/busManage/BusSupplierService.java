@@ -861,7 +861,7 @@ public class BusSupplierService implements BusConst {
 			String invoiceDutyParagraph = detail.getInvoiceDutyParagraph();
 			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(invoiceDutyParagraph, "")).append(",");
 
-			// 五、单位地址
+			// 六、单位地址
 			String invoiceCompanyAddr = detail.getInvoiceCompanyAddr();
 			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(invoiceCompanyAddr, "")).append(",");
 
