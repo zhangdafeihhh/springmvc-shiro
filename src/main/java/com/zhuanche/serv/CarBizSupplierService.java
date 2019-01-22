@@ -53,4 +53,8 @@ public class CarBizSupplierService{
     public List<CarBizSupplier> findByIdSet(Set<Integer> supplierIdSet) {
 		return carBizSupplierExMapper.findByIdSet(supplierIdSet);
     }
+
+	public CarBizSupplier queryQianLiYanSupplierByCityId(CarBizSupplier carBizSupplier){
+		return carBizSupplierExMapper.queryQianLiYanSupplierByCityId(carBizSupplier);
+	}
 }

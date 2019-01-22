@@ -163,5 +163,12 @@ public interface CarBizDriverInfoExMapper {
      * @throws
      */
     List<Map<String, Object>> queryBusDriverList(BusDriverRicherDTO richerDTO);
+
+    /**
+     * 查看司机列表
+     * @param supplierId
+     * @return
+     */
+    List<CarBizDriverInfoDTO> queryCarBizDriverListBySupplierId(Integer supplierId);
     
 }

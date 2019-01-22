@@ -37,6 +37,7 @@ import mapper.mdbcarmanage.CarRelateGroupMapper;
 import mapper.mdbcarmanage.CarRelateTeamMapper;
 import mapper.rentcar.CarBizDriverAccountMapper;
 import mapper.rentcar.CarBizDriverInfoMapper;
+import mapper.rentcar.CarBizSupplierMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
 import net.sf.json.JSONArray;
@@ -164,6 +165,9 @@ public class CarBizDriverInfoService {
 
     @Autowired
     private DriverTelescopeUserExMapper driverTelescopeUserExMapper;
+
+    @Autowired
+    private CarBizSupplierMapper carBizSupplierMapper;
 
     /**
      * 查询司机信息列表展示
@@ -3607,7 +3611,43 @@ public class CarBizDriverInfoService {
             if(null == carBizDriverInfoDTO){
                 List driverList = new ArrayList();
                 CarBizDriverInfo carBizDriverInfo = new CarBizDriverInfo();
-                CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(telescopeSupplierId);
+//                CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(telescopeSupplierId);
+                CarBizSupplier param = new CarBizSupplier();
+                param.setSupplierCity(Integer.valueOf(user.getCities().split(",")[0]));
+                CarBizCity carBizCity = carBizCityService.selectByPrimaryKey(Integer.valueOf(user.getCities().split(",")[0]));
+                CarBizSupplier carBizSupplier = carBizSupplierService.queryQianLiYanSupplierByCityId(param);
+                if(null == carBizSupplier){
+                    carBizSupplier = new CarBizSupplier();
+                    carBizSupplier.setSupplierCity(Integer.valueOf(user.getCities().split(",")[0]));
+                    carBizSupplier.setSupplierNum("qianliyan");
+                    carBizSupplier.setType(1);
+                    carBizSupplier.setAddress("");
+                    carBizSupplier.setContacts("于文超");
+                    carBizSupplier.setContactsPhone("18611165319");
+                    carBizSupplier.setCooperationType(5);
+                    carBizSupplier.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
+                    carBizSupplier.setCreateDate(new Date());
+                    carBizSupplier.setEnterpriseType(2);
+                    carBizSupplier.setIscommission(2);
+                    carBizSupplier.setIstest(0);
+                    carBizSupplier.setPospayflag(0);
+                    carBizSupplier.setStatus(1);
+                    carBizSupplier.setSupplierFullName("千里眼临时机构（"+carBizCity.getCityName()+")");
+                    carBizSupplierMapper.insertSelective(carBizSupplier);
+                    //MQ消息写入 供应商
+                    try {
+                        String method = "CREATE";
+                        Map<String, Object> messageMap = new HashMap<String, Object>();
+                        messageMap.put("method",method);
+                        JSONObject json = JSONObject.fromObject(carBizSupplier);
+                        messageMap.put("data", json);
+                        String messageStr = JSONObject.fromObject(messageMap).toString();
+                        logger.info("专车供应商，同步发送数据：" + messageStr);
+                        CommonRocketProducer.publishMessage("vipSupplierTopic", method, String.valueOf(carBizSupplier.getSupplierId()), messageMap);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
                 carBizDriverInfo.setServiceCity(carBizSupplier.getSupplierCity());
                 carBizDriverInfo.setSupplierId(carBizSupplier.getSupplierId());
                 carBizDriverInfo.setCooperationType(Byte.valueOf(carBizSupplier.getCooperationType().toString()));
@@ -3642,6 +3682,11 @@ public class CarBizDriverInfoService {
                         driverMongoService.updateDriverMongo(driverInfoDTO);
                     } else {
                         driverMongoService.saveDriverMongo(driverInfoDTO);
+                    }
+                    try {
+                        carBizChatUserService.insertChat(driverInfoDTO.getDriverId());
+                    } catch (Exception e) {
+                        logger.error("开通千里眼账号carBizChatUserService.insertChat异常：",e);
                     }
                 }
                 driverTelescopeUser = new DriverTelescopeUser();

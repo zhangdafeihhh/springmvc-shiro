@@ -1783,5 +1783,14 @@
 		</if>
 		order by i.update_date desc
 	</select>
-	
+
+
+  <select id="queryCarBizDriverListBySupplierId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from car_biz_driver_info
+    where supplier_Id = #{supplierId}
+  </select>
 </mapper>
