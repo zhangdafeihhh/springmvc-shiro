@@ -29,7 +29,7 @@ import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.excel.ExportExcelUtil;
-import com.zhuanche.util.objcompare.CompareObejctUtils;
+import com.zhuanche.util.objcompare.CompareObjectUtils;
 import com.zhuanche.util.objcompare.entity.BusCarCompareEntity;
 import com.zhuanche.vo.busManage.*;
 import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper;
@@ -250,7 +250,7 @@ public class BusInfoController {
         BeanUtils.copyProperties(carInfoNew,newRecord);
         newRecord.setStatus(carInfoNew.getStatus()==1?"有效":"无效");
         newRecord.setFuelName(EnumFuel.getFuelNameByCode(carInfoNew.getFuelType()));
-        List<Object> objects = CompareObejctUtils.contrastObj(oldRecord, newRecord, null);
+        List<Object> objects = CompareObjectUtils.contrastObj(oldRecord, newRecord, null);
         if(objects.size()!=0){
             String join = StringUtils.join(objects, ",");
             busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carId), join, new Date());

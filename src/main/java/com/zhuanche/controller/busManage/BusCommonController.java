@@ -1,28 +1,33 @@
 package com.zhuanche.controller.busManage;
 
-import com.zhuanche.common.cache.RedisCacheUtil;
-import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.constants.busManage.BusConstant;
-import com.zhuanche.serv.busManage.BusCommonService;
-import com.zhuanche.util.excel.CsvUtils;
-import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.zhuanche.common.cache.RedisCacheUtil;
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.constants.busManage.BusConstant;
+import com.zhuanche.serv.busManage.BusCommonService;
+import com.zhuanche.util.excel.CsvUtils;
+import com.zhuanche.util.objcompare.CompareObjectUtils;
+
+import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
 
 /**
  * @ClassName: BusCommonController
@@ -57,6 +62,12 @@ public class BusCommonController {
         // 二、查询日志
         Date now = Date.from(LocalDate.now().plusWeeks(-1).atStartOfDay(ZoneId.systemDefault()).toInstant());
         List<Map<Object, Object>> logs = busCommonService.queryChangeLogs(businessType, businessKey, now);
+        logs.forEach(log -> {
+			String newValue = Optional.ofNullable((String) log.get("description")).map(value -> {
+				return value.replaceAll(CompareObjectUtils.separator, ",");
+			}).orElse("");
+			log.put("description", newValue);
+        });
         return AjaxResponse.success(logs);
     }
 
@@ -103,7 +114,8 @@ public class BusCommonController {
      * @return: void
      * @Date: 2019/1/4
      */
-    @RequestMapping(value = "/downLoadErrorMsg")
+    @SuppressWarnings("rawtypes")
+	@RequestMapping(value = "/downLoadErrorMsg")
     public AjaxResponse downLoadErrorMsg(@RequestParam(value = "errorMsgKey", required = true) String errorMsgKey, HttpServletRequest request, HttpServletResponse response) throws Exception {
         List errorReasons = RedisCacheUtil.get(errorMsgKey, List.class);
         if (errorReasons == null) {

@@ -18,7 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.zhuanche.constants.BusConst;
 
-public class CompareObejctUtils {
+public class CompareObjectUtils {
 
 	private static BiConsumer<CompareObjectAttr, List<Object>> defaultConsumer = null;
 	
