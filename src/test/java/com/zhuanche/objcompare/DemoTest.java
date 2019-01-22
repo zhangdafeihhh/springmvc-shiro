@@ -4,8 +4,8 @@ import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.zhuanche.objcompare.entity.Person;
 import com.zhuanche.util.objcompare.CompareObjectUtils;
-import com.zhuanche.util.objcompare.entity.Person;
 
 public class DemoTest {
 	public static void main(String[] args) {
