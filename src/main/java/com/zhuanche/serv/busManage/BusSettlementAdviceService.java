@@ -196,8 +196,15 @@ public class BusSettlementAdviceService implements BusConst {
      * @Description: 结算单确认收票窗口保存
      */
     public AjaxResponse saveInvoiceInfo(BusSettlementInvoiceDTO invoiceDTO) throws IOException {
-    	// 一、上传文件
     	MultipartFile file = invoiceDTO.getInvoiceFile();
+    	
+    	// 一、保存信息
+        String errorMsg = confirmInvoice(invoiceDTO);
+        if (StringUtils.isNotBlank(errorMsg)) {
+        	return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, errorMsg);
+        }
+        
+        // 二、上传文件
     	if (file != null) {
     		String fileName = file.getOriginalFilename();
     		logger.info("[ BusSettlementAdviceService-saveInvoiceInfo ] 上传文件名:{}", fileName);
@@ -207,17 +214,12 @@ public class BusSettlementAdviceService implements BusConst {
     				return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, result.getMsg());
     			}
     			String filePath = result.getFilePath();
-    			String errorMsg = saveInvoiceFile(invoiceDTO, filePath);
-    			if (StringUtils.isNotBlank(errorMsg)) {
-    				return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, errorMsg);
+    			String uploadErrorMsg = saveInvoiceFile(invoiceDTO, filePath);
+    			if (StringUtils.isNotBlank(uploadErrorMsg)) {
+    				return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, uploadErrorMsg);
     			}
     		}
 		}
-    	// 二、保存信息
-        String errorMsg = confirmInvoice(invoiceDTO);
-        if (StringUtils.isNotBlank(errorMsg)) {
-            return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, errorMsg);
-        }
         return AjaxResponse.success(null);
     }
 
@@ -354,6 +356,7 @@ public class BusSettlementAdviceService implements BusConst {
         if (invoiceDTO != null) {
             // 开票人
             invoiceDTO.setInvoiceName(WebSessionUtil.getCurrentLoginUser().getName());
+            invoiceDTO.setInvoiceFile(null);
 
             // 请求参数
             String jsonString = JSON.toJSONStringWithDateFormat(invoiceDTO, JSON.DEFFAULT_DATE_FORMAT);
