@@ -1491,7 +1491,7 @@ public class CarInfoServiceImpl implements CarInfoService {
                                 listException.add(returnVO);
                                 isTrue = false;
                             } else {
-                                if(cellValue.getStringValue().matches("[\u4e00-\u9fa5]*交运管[\u4e00-\u9fa5]{1,2}字\\d{6}\\s\\d{6}号$")){
+                                if(cellValue.getStringValue().matches("[\u4e00-\u9fa5]*交运管[\u4e00-\u9fa5]{1,2}字\\d{4,6}\\s\\d{4,6}号$")){
                                     carBizCarInfo.setTransportNumber(cellValue.getStringValue());
                                 }else{
                                     CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
@@ -2365,7 +2365,7 @@ public class CarInfoServiceImpl implements CarInfoService {
     }
     //运输证字号
     public boolean isTransportNumber(String str){
-        Pattern pattern = Pattern.compile("/^(^[\u4e00-\u9fa5]交运管[\u4e00-\u9fa5]{1,2}字\\d{6}\\s\\d{6}号$)$/");
+        Pattern pattern = Pattern.compile("/^(^[\u4e00-\u9fa5]交运管[\u4e00-\u9fa5]{1,2}字\\d{4,6}\\s\\d{4,6}号$)$/");
         Matcher isNum = pattern.matcher(str);
         if( !isNum.matches() ){
             return false;

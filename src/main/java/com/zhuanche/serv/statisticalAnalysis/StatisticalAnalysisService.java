@@ -1,19 +1,16 @@
 package com.zhuanche.serv.statisticalAnalysis;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.util.*;
-
-import javax.servlet.http.HttpServletResponse;
-
-import com.zhuanche.dto.rentcar.CancelOrderDTO;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.rentcar.CompleteOrderDTO;
+import com.zhuanche.http.HttpClientUtil;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.ValidateUtils;
 import com.zhuanche.util.excel.ExportExcelUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
@@ -23,20 +20,14 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.http.HttpClientUtil;
-import com.zhuanche.shiro.realm.SSOLoginUser;
-import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.ValidateUtils;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.URI;
+import java.util.*;
 
 @Service
 public class  StatisticalAnalysisService {
@@ -255,6 +246,40 @@ public class  StatisticalAnalysisService {
 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 		}
 	}
+
+	/** 调用企业平台接口 */
+	public  AjaxResponse parseResults(String url,Map<String, Object> paramMap) {
+		try {
+			logger.info("调用企业平台接口，url--" + url);
+			String jsonString = JSON.toJSONString(paramMap);
+			logger.info("调用企业平台接口，参数--" + jsonString);
+			String result = HttpClientUtil.buildPostRequest(url).setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON).setConnectTimeOut(CONNECT_TIMEOUT)
+					.setReadTimeOut(READ_TIMEOUT).execute();
+			logger.info("调用企业平台接口，result--" + result);
+			result = result.replaceAll("null", "\"\"");
+			result = result.replaceAll("NULL", "\"\"");
+			JSONObject job = JSON.parseObject(result);
+			if (job == null) {
+				logger.error("调用企业平台接口" + url + "返回结果为null");
+				return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+			}
+			if (!job.getString(Constants.CODE).equals("0")) {
+				return AjaxResponse.failMsg(Integer.parseInt(job.getString(Constants.CODE)), job.getString("msg"));
+			}
+			JSONObject jsonResult = JSON.parseObject(job.getString(Constants.DATA));
+			if (jsonResult != null){
+				JSONObject transData = new JSONObject();
+				transData.put(Constants.RECORD_LIST, jsonResult.get(Constants.LIST));
+				transData.put(Constants.PAGE_NO, jsonResult.get(Constants.PAGE_NUM));
+				transData.put(Constants.TOTAL, jsonResult.get(Constants.TOTAL));
+				return AjaxResponse.success(transData);
+			}
+			return AjaxResponse.success(jsonResult);
+		} catch (HttpException e) {
+			logger.error("调用企业平台接口" + url + "异常", e);
+			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		}
+	}
 	
 	public Map<String, Object> getCurrentLoginUserParamMap(Map<String, Object> paramMap,Long cityId,String supplier,String teamId){
 		// 数据权限设置
@@ -362,12 +387,12 @@ public class  StatisticalAnalysisService {
                 logger.info("调用大数据完成订单详情接口:{}返回结果为null",url);
                 return list;
             }
-            if (!obj.getString("code").equals("0")) {
+            if (!obj.getString(Constants.CODE).equals("0")) {
                 logger.info("调用大数据完成订单接口:{}返回结果为:{}",url,result);
                 return list;
             }
             if (obj != null) {
-                if("0".equals(obj.get("code").toString())){
+                if("0".equals(obj.get(Constants.CODE).toString())){
                     JSONObject dataList = (JSONObject) obj.get("result");
                     if(dataList!=null){
                         JSONArray recordList = dataList.getJSONArray("recordList");
@@ -405,12 +430,12 @@ public class  StatisticalAnalysisService {
 				logger.info("调用大数据取消订单详情接口:{}返回结果为null",url);
 				return list;
 			}
-			if (!obj.getString("code").equals("0")) {
+			if (!obj.getString(Constants.CODE).equals("0")) {
 				logger.info("调用大数据取消订单接口:{}返回结果为:{}",url,result);
 				return list;
 			}
 			if (obj != null) {
-				if("0".equals(obj.get("code").toString())){
+				if("0".equals(obj.get(Constants.CODE).toString())){
 					JSONObject dataList = (JSONObject) obj.get("result");
 					if(dataList!=null){
 						JSONArray recordList = dataList.getJSONArray("recordList");

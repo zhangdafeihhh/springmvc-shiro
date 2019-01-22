@@ -111,6 +111,7 @@ public class DriverInfoController {
             @RequestParam(value="page", defaultValue="0")Integer page,
             @Verify(param = "pageSize",rule = "max(50)")@RequestParam(value="pageSize", defaultValue="20")Integer pageSize) {
 
+        long startTime = System.currentTimeMillis();
         // 数据权限控制SSOLoginUser
         Set<Integer> permOfCity        = WebSessionUtil.getCurrentLoginUser().getCityIds(); //普通管理员可以管理的所有城市ID
         Set<Integer> permOfSupplier    = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); //普通管理员可以管理的所有供应商ID
@@ -162,6 +163,7 @@ public class DriverInfoController {
             carBizDriverInfoService.getBaseStatis(driver);
         }
         PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
+        System.out.println("time cost : " + (System.currentTimeMillis() - startTime) );
         return AjaxResponse.success(pageDTO);
     }
 

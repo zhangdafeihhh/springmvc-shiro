@@ -1793,4 +1793,10 @@
     from car_biz_driver_info
     where supplier_Id = #{supplierId}
   </select>
+  <update id="updateDriverCooperationTypeBySupplierId" parameterType="java.util.HashMap">
+        UPDATE car_biz_driver_info
+          set cooperation_type = #{cooperationType}
+        WHERE supplier_id = #{supplierId}
+  </update>
+
 </mapper>

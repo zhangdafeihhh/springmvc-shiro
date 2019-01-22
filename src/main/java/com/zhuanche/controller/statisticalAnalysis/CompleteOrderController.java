@@ -1,18 +1,16 @@
 package com.zhuanche.controller.statisticalAnalysis;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.zhuanche.controller.driver.Componment;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.util.StringUtil;
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.rentcar.CompleteOrderDTO;
-import org.apache.poi.ss.usermodel.Workbook;
+import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
+import com.zhuanche.util.CommonStringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,15 +21,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSON;
-import com.github.pagehelper.util.StringUtil;
-import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.common.web.Verify;
-import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
-import com.zhuanche.shiro.realm.SSOLoginUser;
-import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.ValidateUtils;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -129,6 +122,15 @@ public class CompleteOrderController{
 		    logger.info("【运营管理-统计分析】完成订单列表请求参数--"+jsonString);
 		    //从大数据仓库获取统计数据
 		    AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/completeOrderDetail/queryList",paramMap);
+            if (result.isSuccess()){
+                JSONObject data =  (JSONObject) result.getData();
+                JSONArray recordList = data.getJSONArray(Constants.RECORD_LIST);
+                recordList.forEach(o -> {
+                    JSONObject element = (JSONObject) o;
+                    element.put(Constants.BOOKING_USER_PHONE, CommonStringUtils.protectPhoneInfo(element.getString(Constants.BOOKING_USER_PHONE)));
+                    element.put(Constants.RIDER_PHONE, CommonStringUtils.protectPhoneInfo(element.getString(Constants.RIDER_PHONE)));
+                });
+            }
 		    return result;
 	  }
 

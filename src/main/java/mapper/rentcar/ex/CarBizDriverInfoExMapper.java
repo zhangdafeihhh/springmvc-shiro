@@ -170,5 +170,7 @@ public interface CarBizDriverInfoExMapper {
      * @return
      */
     List<CarBizDriverInfoDTO> queryCarBizDriverListBySupplierId(Integer supplierId);
-    
+
+
+    void updateDriverCooperationTypeBySupplierId(Map<String, Object> map);
 }

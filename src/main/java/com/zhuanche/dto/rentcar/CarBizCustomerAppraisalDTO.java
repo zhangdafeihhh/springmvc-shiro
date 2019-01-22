@@ -56,6 +56,16 @@ public class CarBizCustomerAppraisalDTO extends Base {
 
     private String pointbd;
 
+    /**
+     * 评论是否有效 0:有效 1:无效
+     */
+    private Integer appraisalStatus;
+
+    /**
+     * 备用字段
+     */
+    private String remarks;
+
     //查询条件
     private Integer cityId;
     private Integer supplierId;
@@ -64,6 +74,10 @@ public class CarBizCustomerAppraisalDTO extends Base {
     private String licensePlates;
     private String createDateBegin;
     private String createDateEnd;
+
+    private String driverName;
+    private String driverPhone;
+
 
     public Integer getAppraisalId() {
         return appraisalId;
@@ -311,5 +325,37 @@ public class CarBizCustomerAppraisalDTO extends Base {
 
     public void setCreateDateEnd(String createDateEnd) {
         this.createDateEnd = createDateEnd;
+    }
+
+    public Integer getAppraisalStatus() {
+        return appraisalStatus;
+    }
+
+    public void setAppraisalStatus(Integer appraisalStatus) {
+        this.appraisalStatus = appraisalStatus;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public String getDriverName() {
+        return driverName;
+    }
+
+    public void setDriverName(String driverName) {
+        this.driverName = driverName;
+    }
+
+    public String getDriverPhone() {
+        return driverPhone;
+    }
+
+    public void setDriverPhone(String driverPhone) {
+        this.driverPhone = driverPhone;
     }
 }

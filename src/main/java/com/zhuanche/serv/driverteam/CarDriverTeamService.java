@@ -202,7 +202,7 @@ public class CarDriverTeamService{
 	public int addDriverToTeam(DriverTeamRequest driverTeamRequest){
 
 		logger.info("添加司机到车队/小组入参:{}"+JSON.toJSONString(driverTeamRequest));
-		if(Check.NuNObj(driverTeamRequest) || Check.NuNObj(driverTeamRequest.getTeamId()) || Check.NuNStr(driverTeamRequest.getPlates())){
+		if(Check.NuNObj(driverTeamRequest) || Check.NuNObj(driverTeamRequest.getTeamId()) || Check.NuNStr(driverTeamRequest.getDrivers())){
 			logger.info("添加司机到车队/小组参数无效");
 			return ServiceReturnCodeEnum.DEAL_FAILURE.getCode();
 		}
@@ -220,18 +220,17 @@ public class CarDriverTeamService{
 			logger.info("车队/小组不存在");
 			return ServiceReturnCodeEnum.DEAL_FAILURE.getCode();
 		}
-		String[] licenses = driverTeamRequest.getPlates().split(",");
+		String[] driverIds = driverTeamRequest.getDrivers().split(",");
 		int result = 0;
 		CarRelateGroup group = new CarRelateGroup();
 		CarRelateTeam team = new CarRelateTeam();
-		for(int i= 0; i < licenses.length; i++) {
-			driverTeamRequest.setLicense(licenses[i]);
+		for(String id : driverIds) {
 			DutyParamRequest param = new DutyParamRequest();
-			param.setLicensePlates(licenses[i]);
+			param.setDriverId(Integer.valueOf(id));
 			String driverId = carBizDriverInfoExMapper.queryOneDriver(param).getDriverId();
-			if(!Check.NuNObj(driverTeamRequest.getpId())){
+			if(!Check.NuNObj(carDriverTeam.getpId())){
 				//小组
-				group.setGroupId(driverTeamRequest.getpId());
+				group.setGroupId(driverTeamRequest.getTeamId());
 				group.setDriverId(Integer.valueOf(driverId));
 				CarRelateGroup existsGroup = null;
 				try{
@@ -514,6 +513,7 @@ public class CarDriverTeamService{
 			existsTeam.setCharge2(paramDto.getCharge2());
 			existsTeam.setCharge3(paramDto.getCharge3());
 			existsTeam.setRemark(paramDto.getRemark());
+			existsTeam.setShortName(paramDto.getShortName());
 			return carDriverTeamMapper.updateByPrimaryKeySelective(existsTeam);
 		}catch (Exception e){
 			logger.error("更新车队失败!", e );
@@ -572,6 +572,7 @@ public class CarDriverTeamService{
 			record.setRemark(paramDto.getRemark());
 //			BeanUtils.copyProperties(record,paramDto);
 			record.setCreateBy(String.valueOf(WebSessionUtil.getCurrentLoginUser().getId()));
+			record.setShortName(paramDto.getShortName());
 			return carDriverTeamMapper.insertSelective(record);
 		}catch (Exception e){
 			logger.error("新增车队失败!", e );

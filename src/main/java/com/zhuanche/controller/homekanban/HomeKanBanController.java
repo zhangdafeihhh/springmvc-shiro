@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.zhuanche.constant.Constants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
 import org.apache.http.entity.ContentType;
@@ -237,10 +238,11 @@ public class HomeKanBanController {
 				logger.error("调用大数据" + coreIndicatorsUrl + "返回结果为null");
 				return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 			}
-			if (!job.getString("code").equals("0")) {
-				return AjaxResponse.fail(Integer.parseInt(job.getString("code")), job.getString("message"));
+			if (!job.getString(Constants.CODE).equals("0")) {
+				logger.error("调用大数据接口错误" + coreIndicatorsUrl + "返回code" + job.getString(Constants.CODE) + "返回错误信息: " + job.getString("message") );
+				return AjaxResponse.fail(Integer.parseInt(job.getString(Constants.CODE)), job.getString("message"));
 			}
-			JSONObject jobj = JSON.parseObject(job.getString("result"));
+			JSONObject jobj = JSON.parseObject(job.getString(Constants.DATA));
 			return AjaxResponse.success(jobj);
 		} catch (HttpException e) {
 			logger.error("调用大数据" + coreIndicatorsUrl + "异常", e);
@@ -289,10 +291,11 @@ public class HomeKanBanController {
 				logger.error("调用大数据" + url + "返回结果为null");
 				return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 			}
-			if (!job.getString("code").equals("0")) {
-				return AjaxResponse.fail(Integer.parseInt(job.getString("code")), job.getString("message"));
+			if (!job.getString(Constants.CODE).equals("0")) {
+				logger.error("调用大数据接口错误" + url + "返回code" + job.getString(Constants.CODE) + "返回错误信息: " + job.getString("message") );
+				return AjaxResponse.fail(Integer.parseInt(job.getString(Constants.CODE)), job.getString("message"));
 			}
-			JSONArray resultArray = JSON.parseArray(job.getString("result"));
+			JSONArray resultArray = JSON.parseArray(job.getString(Constants.DATA));
 			return AjaxResponse.success(resultArray);
 		} catch (HttpException e) {
 			logger.error("调用大数据" + url + "异常", e);

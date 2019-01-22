@@ -1,13 +1,12 @@
 package com.zhuanche.controller.statisticalAnalysis;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.util.StringUtil;
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
+import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,15 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSON;
-import com.github.pagehelper.util.StringUtil;
-import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.common.web.Verify;
-import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
-import com.zhuanche.shiro.realm.SSOLoginUser;
-import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.ValidateUtils;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 
@@ -42,7 +37,13 @@ public class DriverEvaluateController{
 	 
 	 @Value("${bigdata.saas.data.url}")
 	 String  saasBigdataApiUrl;
-	 
+
+	 @Value("${driver.evaluate.query.url}")
+	 String evaluateQueryUrl;
+
+	 @Value("${driver.evaluate.export.url}")
+	 String evaluateExportUrl;
+
 	 @Autowired
 	 private StatisticalAnalysisService statisticalAnalysisService;
 		 /**
@@ -71,6 +72,7 @@ public class DriverEvaluateController{
 	                                              String motorcadeId,
 	                                              String driverScore,
 	                                              String appScore,
+	                                              String classId,
 	                                              @Verify(param = "queryDate",rule = "required") String queryDate,
 	                                              @Verify(param = "pageNo",rule = "required") Integer pageNo,
 	                                              @Verify(param = "pageSize",rule = "required") Integer pageSize
@@ -95,6 +97,9 @@ public class DriverEvaluateController{
 	        if(StringUtil.isNotEmpty(appScore)){
 	        	 paramMap.put("appScore", appScore);//APP评价分数	
 	        }
+	        if (StringUtils.isNotEmpty(classId)){
+	        	paramMap.put("classId", classId);//班组id
+			}
 			paramMap.put("queryDate", queryDate);//查询日期
 			paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,orderCityId,allianceId,motorcadeId);
 			if(paramMap==null){
@@ -105,7 +110,7 @@ public class DriverEvaluateController{
 	        if(null != pageSize && pageSize > 0)
 	        	paramMap.put("pageSize", pageSize);//每页记录数
 	        // 从大数据仓库获取统计数据
-	        AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/driverEvaluateDetail/queryList",paramMap);
+	        AjaxResponse result = statisticalAnalysisService.parseResults(evaluateQueryUrl,paramMap);
 	        return result;
 	    }
 	    
@@ -132,6 +137,7 @@ public class DriverEvaluateController{
 							            String motorcadeId,
 							            String driverScore,
 							            String appScore,
+							            String classId,
 							            @Verify(param = "queryDate",rule = "required") String queryDate,
 	                                    HttpServletRequest request,
 	                                    HttpServletResponse response){
@@ -156,6 +162,9 @@ public class DriverEvaluateController{
 	        if(StringUtil.isNotEmpty(appScore)){
 	        	 paramMap.put("appScore", appScore);//APP评价分数	
 	        }
+	        if (StringUtils.isNotEmpty(classId)){
+	        	paramMap.put("classId", classId);//班组id
+			}
 			paramMap.put("queryDate", queryDate);//查询日期
 	        // 数据权限设置
 			paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,orderCityId,allianceId,motorcadeId);
@@ -167,7 +176,7 @@ public class DriverEvaluateController{
 		   statisticalAnalysisService.exportCsvFromToPage(
 				response,
 				jsonString,
-				saasBigdataApiUrl+"/driverEvaluateDetail/download" ,
+			    evaluateExportUrl ,
 				new String("对司机评级详情分析".getBytes("gb2312"), "iso8859-1"),
 				request.getRealPath("/")+File.separator+"template"+File.separator+"driverEvaluate_info.csv");
       } catch (Exception e) {

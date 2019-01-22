@@ -26,6 +26,11 @@ public class CarBizCustomerAppraisalParams implements Serializable{
     private String sortName;
     private String sortorder = "desc";
 
+    /**
+     * 评论是否有效 0:有效 1:无效
+     */
+    private Integer appraisalStatus;
+
 
     public CarBizCustomerAppraisalParams(String cityId, String supplierId, String teamId, String groupIds, String driverName, String driverPhone, String orderNo,
             String createDateBegin, String createDateEnd, String evaluateScore, String sortName, String sortorder, Integer page, Integer pageSize) {
@@ -197,6 +202,14 @@ public class CarBizCustomerAppraisalParams implements Serializable{
 
     public void setSortorder(String sortorder) {
         this.sortorder = sortorder;
+    }
+
+    public Integer getAppraisalStatus() {
+        return appraisalStatus;
+    }
+
+    public void setAppraisalStatus(Integer appraisalStatus) {
+        this.appraisalStatus = appraisalStatus;
     }
 
     @Override

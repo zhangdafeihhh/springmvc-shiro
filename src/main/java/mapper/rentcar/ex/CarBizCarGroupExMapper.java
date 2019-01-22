@@ -40,4 +40,6 @@ public interface CarBizCarGroupExMapper {
 	 * @throws
 	 */
 	int getSeatNumByGroupId(Integer groupId);
+
+    List<CarBizCarGroup> queryGroupNameByIds(@Param("idList")List<Integer> idList);
 }

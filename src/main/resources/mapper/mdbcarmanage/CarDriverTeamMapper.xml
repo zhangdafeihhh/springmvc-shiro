@@ -19,10 +19,11 @@
     <result column="charge1" property="charge1" jdbcType="VARCHAR" />
     <result column="charge2" property="charge2" jdbcType="VARCHAR" />
     <result column="charge3" property="charge3" jdbcType="VARCHAR" />
+    <result column="short_name" property="shortName" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, team_name, sort, create_by, create_date, update_by, update_date, city, supplier, 
-    remark, status, p_id, duty_start_date, duty_end_date, charge1, charge2, charge3
+    remark, status, p_id, duty_start_date, duty_end_date, charge1, charge2, charge3,short_name
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -43,13 +44,13 @@
       city, supplier, remark, 
       status, p_id, duty_start_date, 
       duty_end_date, charge1, charge2, 
-      charge3)
+      charge3,short_name)
     values (#{teamName,jdbcType=VARCHAR}, #{sort,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, 
       #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateDate,jdbcType=TIMESTAMP}, 
       #{city,jdbcType=VARCHAR}, #{supplier,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
       #{status,jdbcType=INTEGER}, #{pId,jdbcType=INTEGER}, #{dutyStartDate,jdbcType=VARCHAR},
       #{dutyEndDate,jdbcType=VARCHAR}, #{charge1,jdbcType=VARCHAR}, #{charge2,jdbcType=VARCHAR}, 
-      #{charge3,jdbcType=VARCHAR})
+      #{charge3,jdbcType=VARCHAR},#{shortName,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverTeam" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
@@ -105,6 +106,9 @@
       <if test="charge3 != null" >
         charge3,
       </if>
+      <if test="shortName != null" >
+        short_name,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="teamName != null" >
@@ -154,6 +158,9 @@
       </if>
       <if test="charge3 != null" >
         #{charge3,jdbcType=VARCHAR},
+      </if>
+      <if test="shortName != null" >
+        #{shortName,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -208,6 +215,9 @@
       <if test="charge3 != null" >
         charge3 = #{charge3,jdbcType=VARCHAR},
       </if>
+      <if test="shortName != null" >
+        short_name = #{shortName,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -228,7 +238,8 @@
       duty_end_date = #{dutyEndDate,jdbcType=VARCHAR},
       charge1 = #{charge1,jdbcType=VARCHAR},
       charge2 = #{charge2,jdbcType=VARCHAR},
-      charge3 = #{charge3,jdbcType=VARCHAR}
+      charge3 = #{charge3,jdbcType=VARCHAR},
+      short_name = #{shortName,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

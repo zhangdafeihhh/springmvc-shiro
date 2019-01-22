@@ -1,7 +1,6 @@
 package com.zhuanche.controller.statistic;
 
 import com.alibaba.fastjson.JSON;
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
@@ -9,11 +8,9 @@ import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.controller.DriverQueryController;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalBean;
-import com.zhuanche.dto.rentcar.DriverDutyStatisticDTO;
 import com.zhuanche.entity.rentcar.CarBizCustomerAppraisal;
 import com.zhuanche.entity.rentcar.CarBizCustomerAppraisalParams;
 import com.zhuanche.entity.rentcar.DriverOutage;
@@ -23,13 +20,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.excel.CsvUtils;
-import mapper.rentcar.ex.CarBizCustomerAppraisalExMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +31,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
@@ -56,8 +45,6 @@ import java.util.List;
 public class OrderAppraisalController extends DriverQueryController{
 
 	private static Logger log =  LoggerFactory.getLogger(OrderAppraisalController.class);
-
-
 
 	@Autowired
 	private DriverOutageService driverOutageService;
@@ -81,6 +68,7 @@ public class OrderAppraisalController extends DriverQueryController{
 	 * @param sortOrder 排序
 	 * @param page 当前页
 	 * @param pageSize 当前展示页数
+	 * @param appraisalStatus 评论是否有效 0:有效 1:无效
 	 * @return AjaxResponse
 	 */
 	@ResponseBody
@@ -96,7 +84,7 @@ public class OrderAppraisalController extends DriverQueryController{
 										  String driverName,
 										  @Verify(param="driverPhone",rule="mobile")
 													  String driverPhone,
-										  String orderNo,
+										  String orderNo, Integer appraisalStatus,
 										  @Verify(param="createDateBegin",rule="required")String createDateBegin,
 										  @Verify(param="createDateEnd",rule="required")String createDateEnd,
 										  String evaluateScore,String sortName, String sortOrder,
@@ -109,7 +97,7 @@ public class OrderAppraisalController extends DriverQueryController{
 //		}
 		CarBizCustomerAppraisalParams params = new CarBizCustomerAppraisalParams(cityId,supplierId,teamId,groupIds,driverName,driverPhone,orderNo,
 				createDateBegin,createDateEnd,evaluateScore,sortName,sortOrder,page,pageSize);
-
+		params.setAppraisalStatus(appraisalStatus);
 
 		int total = 0;
 		String driverList = "";
@@ -170,7 +158,7 @@ public class OrderAppraisalController extends DriverQueryController{
 									 String groupIds,
 									 String driverName,
 									 @Verify(param="driverPhone",rule="mobile")  String driverPhone,
-									 String orderNo,
+									 String orderNo, Integer appraisalStatus,
 									 @Verify(param="createDateBegin",rule="required")String createDateBegin,
 									 @Verify(param="createDateEnd",rule="required")String createDateEnd,
 									 String evaluateScore,String sortName, String sortOrder,HttpServletRequest request,HttpServletResponse response){
@@ -178,7 +166,7 @@ public class OrderAppraisalController extends DriverQueryController{
 		int pageSize = CsvUtils.downPerSize;
 
 		List<String> headerList = new ArrayList<>();
-		headerList.add("司机姓名,司机手机,车牌号,订单号,评分,评价,备注,时间");
+		headerList.add("司机姓名,司机手机,车牌号,订单号,评分,评价,备注,时间, 状态");
 
 		String fileName = "";
 		List<String> csvDataList = new ArrayList<>();
@@ -195,7 +183,7 @@ public class OrderAppraisalController extends DriverQueryController{
 			CsvUtils entity = new CsvUtils();
 			params = new CarBizCustomerAppraisalParams(cityId,supplierId,teamId,groupIds,driverName,driverPhone,orderNo,
 					createDateBegin,createDateEnd,evaluateScore,sortName,sortOrder,page,pageSize);
-
+			params.setAppraisalStatus(appraisalStatus);
 
 			String driverList = "";
 			if(StringUtils.isNotEmpty(params.getGroupIds()) || StringUtils.isNotEmpty(params.getTeamId())){
@@ -285,6 +273,9 @@ public class OrderAppraisalController extends DriverQueryController{
 			stringBuffer.append(",");
 
 			stringBuffer.append(DateUtils.formatDateTime_CN(s.getCreateDate()));
+			stringBuffer.append(",");
+
+			stringBuffer.append((s.getAppraisalStatus()!=null&&s.getAppraisalStatus()==0)?"有效":"无效");
 
 			csvDataList.add(stringBuffer.toString());
 		}

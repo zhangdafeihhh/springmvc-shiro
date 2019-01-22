@@ -55,6 +55,8 @@ public class DriverTeamRequest extends PageRequest{
 
     private String phone;
 
+    private String drivers;
+
     public String getPhone() {
         return phone;
     }
@@ -185,5 +187,13 @@ public class DriverTeamRequest extends PageRequest{
 
     public void setTeamIds(Set<String> teamIds) {
         this.teamIds = teamIds;
+    }
+
+    public String getDrivers() {
+        return drivers;
+    }
+
+    public void setDrivers(String drivers) {
+        this.drivers = drivers;
     }
 }

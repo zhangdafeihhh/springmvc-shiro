@@ -21,6 +21,30 @@
     <result column="enterprise_type" property="enterpriseType" jdbcType="INTEGER" />
     <result column="address" property="address" jdbcType="VARCHAR" />
   </resultMap>
+  <resultMap id="VoResultMap" type="com.zhuanche.entity.rentcar.CarBizSupplierVo" >
+    <id column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_num" property="supplierNum" jdbcType="VARCHAR" />
+    <result column="supplier_full_name" property="supplierFullName" jdbcType="VARCHAR" />
+    <result column="supplier_city" property="supplierCity" jdbcType="INTEGER" />
+    <result column="supplier_city_name" property="supplierCityName" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="contacts" property="contacts" jdbcType="VARCHAR" />
+    <result column="contacts_phone" property="contactsPhone" jdbcType="VARCHAR" />
+    <result column="dispatcher_phone" property="dispatcherPhone" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="isCommission" property="iscommission" jdbcType="INTEGER" />
+    <result column="is_two_shifts" property="isTwoShifts" jdbcType="INTEGER" />
+    <result column="posPayFlag" property="pospayflag" jdbcType="INTEGER" />
+    <result column="cooperation_type" property="cooperationType" jdbcType="INTEGER" />
+    <result column="cooperation_name" property="cooperationName" jdbcType="INTEGER" />
+    <result column="enterprise_type" property="enterpriseType" jdbcType="INTEGER" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
+  </resultMap>
   <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.rentcar.CarBizSupplier" extends="BaseResultMap" >
     <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
   </resultMap>
@@ -151,4 +175,296 @@
         and status = 1
         and supplier_full_name like '千里眼%'
     </select>
+
+    <select id="findByParams" resultMap="VoResultMap" parameterType="com.zhuanche.entity.rentcar.CarBizSupplierQuery">
+        SELECT
+            t.supplier_id supplier_id,
+            t.supplier_num supplier_num,
+            t.supplier_full_name supplier_full_name,
+            t.supplier_city supplier_city,
+            t.type,
+            t.contacts,
+            t.contacts_phone contacts_phone,
+            t. STATUS,
+            t.create_by createBy,
+            t.update_by updateBy,
+            t.create_date createDate,
+            t.update_date updateDate,
+            c.city_name supplier_city_name,
+            t.isCommission isCommission,
+            t.posPayFlag,
+            t.enterprise_type enterprise_type,
+            t.cooperation_type cooperation_type,
+            ct.cooperation_name cooperation_name,
+            t.address,
+            t.dispatcher_Phone dispatcher_phone,
+            t.is_two_shifts is_two_shifts
+        FROM
+            car_biz_supplier t
+        LEFT JOIN car_biz_city c ON c.city_id = t.supplier_city
+        LEFT JOIN car_biz_cooperation_type ct ON ct.id = t.cooperation_type
+        where 1=1
+        <if test="supplierFullName != null and supplierFullName != ''">
+            and t.supplier_full_name like '${supplierFullName}%'
+        </if>
+        <if test="cityIds != null and cityIds.size()>0">
+            AND t.supplier_city in
+            <foreach item="item" index="index" collection="cityIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="supplierIds != null and supplierIds.size()>0">
+            AND t.supplier_id in
+            <foreach item="item" index="index" collection="supplierIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="cooperationType != null">
+            and t.cooperation_type = #{cooperationType}
+        </if>
+        <if test="enterpriseType != null">
+            and t.enterprise_type = #{enterpriseType}
+        </if>
+        <if test="status != null">
+            AND t.status = #{status}
+        </if>
+    </select>
+    <insert id="insertSelective">
+        <selectKey resultType="java.lang.Integer" keyProperty="supplierId" order="AFTER" >
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into car_biz_supplier
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="supplierNum != null" >
+                supplier_num,
+            </if>
+            <if test="supplierFullName != null" >
+                supplier_full_name,
+            </if>
+            <if test="supplierCity != null" >
+                supplier_city,
+            </if>
+            <if test="type != null" >
+                type,
+            </if>
+            <if test="contacts != null" >
+                contacts,
+            </if>
+            <if test="contactsPhone != null" >
+                contacts_phone,
+            </if>
+            <if test="status != null" >
+                status,
+            </if>
+            <if test="createBy != null" >
+                create_by,
+            </if>
+            <if test="updateBy != null" >
+                update_by,
+            </if>
+            <if test="createDate != null" >
+                create_date,
+            </if>
+            <if test="updateDate != null" >
+                update_date,
+            </if>
+            <if test="iscommission != null" >
+                isCommission,
+            </if>
+            <if test="pospayflag != null" >
+                posPayFlag,
+            </if>
+            <if test="cooperationType != null" >
+                cooperation_type,
+            </if>
+            <if test="istest != null" >
+                isTest,
+            </if>
+            <if test="enterpriseType != null" >
+                enterprise_type,
+            </if>
+            <if test="address != null" >
+                address,
+            </if>
+            <if test="memo != null" >
+                memo,
+            </if>
+            <if test="dispatcherPhone != null and dispatcherPhone != ''" >
+                dispatcher_phone,
+            </if>
+            <if test="isTwoShifts != null" >
+                is_two_shifts,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="supplierNum != null" >
+                #{supplierNum,jdbcType=VARCHAR},
+            </if>
+            <if test="supplierFullName != null" >
+                #{supplierFullName,jdbcType=VARCHAR},
+            </if>
+            <if test="supplierCity != null" >
+                #{supplierCity,jdbcType=INTEGER},
+            </if>
+            <if test="type != null" >
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="contacts != null" >
+                #{contacts,jdbcType=VARCHAR},
+            </if>
+            <if test="contactsPhone != null" >
+                #{contactsPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null" >
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="createBy != null" >
+                #{createBy,jdbcType=INTEGER},
+            </if>
+            <if test="updateBy != null" >
+                #{updateBy,jdbcType=INTEGER},
+            </if>
+            <if test="createDate != null" >
+                #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateDate != null" >
+                #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="iscommission != null" >
+                #{iscommission,jdbcType=INTEGER},
+            </if>
+            <if test="pospayflag != null" >
+                #{pospayflag,jdbcType=INTEGER},
+            </if>
+            <if test="cooperationType != null" >
+                #{cooperationType,jdbcType=INTEGER},
+            </if>
+            <if test="istest != null" >
+                #{istest,jdbcType=INTEGER},
+            </if>
+            <if test="enterpriseType != null" >
+                #{enterpriseType,jdbcType=INTEGER},
+            </if>
+            <if test="address != null" >
+                #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="memo != null" >
+                #{memo,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="dispatcherPhone != null and dispatcherPhone != ''" >
+                #{dispatcherPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="isTwoShifts != null" >
+                #{isTwoShifts,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective">
+        update car_biz_supplier
+        <set >
+            <if test="supplierNum != null" >
+                supplier_num = #{supplierNum,jdbcType=VARCHAR},
+            </if>
+            <if test="supplierFullName != null" >
+                supplier_full_name = #{supplierFullName,jdbcType=VARCHAR},
+            </if>
+            <if test="supplierCity != null" >
+                supplier_city = #{supplierCity,jdbcType=INTEGER},
+            </if>
+            <if test="type != null" >
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="contacts != null" >
+                contacts = #{contacts,jdbcType=VARCHAR},
+            </if>
+            <if test="contactsPhone != null" >
+                contacts_phone = #{contactsPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null" >
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="createBy != null" >
+                create_by = #{createBy,jdbcType=INTEGER},
+            </if>
+            <if test="updateBy != null" >
+                update_by = #{updateBy,jdbcType=INTEGER},
+            </if>
+            <if test="createDate != null" >
+                create_date = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateDate != null" >
+                update_date = #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="iscommission != null" >
+                isCommission = #{iscommission,jdbcType=INTEGER},
+            </if>
+            <if test="pospayflag != null" >
+                posPayFlag = #{pospayflag,jdbcType=INTEGER},
+            </if>
+            <if test="cooperationType != null" >
+                cooperation_type = #{cooperationType,jdbcType=INTEGER},
+            </if>
+            <if test="istest != null" >
+                isTest = #{istest,jdbcType=INTEGER},
+            </if>
+            <if test="enterpriseType != null" >
+                enterprise_type = #{enterpriseType,jdbcType=INTEGER},
+            </if>
+            <if test="address != null" >
+                address = #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="memo != null" >
+                memo = #{memo,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="dispatcherPhone != null and dispatcherPhone != ''" >
+                dispatcher_phone = #{dispatcherPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="isTwoShifts != null" >
+                is_two_shifts = #{isTwoShifts,jdbcType=INTEGER},
+            </if>
+        </set>
+        where supplier_id = #{supplierId,jdbcType=INTEGER}
+    </update>
+
+    <select id="checkSupplierFullName" resultType="integer">
+        select count(1)
+          from
+            car_biz_supplier
+          where
+            supplier_full_name = #{supplierName,jdbcType=VARCHAR}
+    </select>
+
+    <select id="querySupplierById" resultMap="VoResultMap">
+      SELECT
+          supplier_id,
+          supplier_num,
+          supplier_full_name,
+          supplier_city,
+          supplier_type,
+          type,
+          contacts,
+          contacts_phone,
+          cbs.memo,
+          cbs.status,
+          cbs.create_by,
+          cbs.update_by,
+          cbs.create_date,
+          cbs.update_date,
+          isCommission,
+          posPayFlag,
+          cooperation_type,
+          enterprise_type ,
+          address ,
+          dispatcher_phone,
+          is_two_shifts,
+          cbc.city_name as supplier_city_name,
+          cbct.cooperation_name
+        FROM car_biz_supplier cbs
+        LEFT JOIN car_biz_city cbc ON cbs.supplier_city = cbc.city_id
+        LEFT JOIN car_biz_cooperation_type cbct ON cbs.cooperation_type = cbct.id
+        WHERE cbs.supplier_id = #{supplierId}
+
+    </select>
+
 </mapper>

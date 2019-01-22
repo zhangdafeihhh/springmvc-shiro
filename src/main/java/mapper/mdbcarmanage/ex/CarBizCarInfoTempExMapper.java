@@ -2,6 +2,7 @@ package mapper.mdbcarmanage.ex;
 
 import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
 import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -48,4 +49,6 @@ public interface CarBizCarInfoTempExMapper {
      * @return
      */
     List<CarBizCarInfoTemp> licensePlatesNotDriverIdList(Map<String,Object> map);
+
+    void updateDriverCooperationTypeBySupplierId(@Param("supplierId") Integer supplierId, @Param("cooperationType")Integer cooperationType);
 }

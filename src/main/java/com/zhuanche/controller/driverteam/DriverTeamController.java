@@ -187,7 +187,7 @@ public class DriverTeamController{
 		logger.info("添加司机到车队/小组入参:"+ JSON.toJSONString(param));
 		int result = carDriverTeamService.addDriverToTeam(param);
 		ServiceReturnCodeEnum typeByCode = ServiceReturnCodeEnum.getTypeByCode(result);
-		if(result < 0 ){
+		if(result <= 0 ){
 			AjaxResponse fail = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
 			Map<String,String> map = new HashedMap();
 			map.put("errorMsg",typeByCode.getName());

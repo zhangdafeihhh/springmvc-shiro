@@ -44,6 +44,8 @@ public class CarDriverTeam implements Serializable{
     private String cityName;
     private String supplierName;
 
+    private String shortName;
+
     public String getCityName() {
         return cityName;
     }
@@ -194,5 +196,13 @@ public class CarDriverTeam implements Serializable{
 
     public void setCharge3(String charge3) {
         this.charge3 = charge3 == null ? null : charge3.trim();
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
     }
 }

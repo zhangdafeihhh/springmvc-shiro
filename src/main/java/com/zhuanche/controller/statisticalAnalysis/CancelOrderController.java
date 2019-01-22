@@ -9,10 +9,15 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.sun.tools.internal.jxc.ap.Const;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.rentcar.CancelOrderDTO;
 import com.zhuanche.dto.rentcar.CancelOrderDetailDTO;
 import com.zhuanche.dto.rentcar.CompleteOrderDTO;
 
+import com.zhuanche.util.CommonStringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,6 +137,15 @@ public class CancelOrderController{
    
 			// 从大数据仓库获取统计数据
 	        AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/cancelOrderDetail/queryList",paramMap);
+			if (result.isSuccess()){
+				JSONObject data =  (JSONObject) result.getData();
+				JSONArray recordList = data.getJSONArray(Constants.RECORD_LIST);
+				recordList.forEach(o -> {
+					JSONObject element = (JSONObject) o;
+					element.put(Constants.BOOKING_USER_PHONE, CommonStringUtils.protectPhoneInfo(element.getString(Constants.BOOKING_USER_PHONE)));
+					element.put(Constants.RIDER_PHONE, CommonStringUtils.protectPhoneInfo(element.getString(Constants.RIDER_PHONE)));
+				});
+			}
 	        return result;
 	    }
 	    

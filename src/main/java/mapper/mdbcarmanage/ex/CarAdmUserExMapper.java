@@ -24,4 +24,6 @@ public interface CarAdmUserExMapper {
     CarAdmUser queryUserPermissionInfo(@Param("userId")Integer userId);
 
     List<Integer> queryIdListByName(@Param("userName") String createUser);
+
+    String queryNameById(@Param("userId")Integer userId);
 }

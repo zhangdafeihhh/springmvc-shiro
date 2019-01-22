@@ -19,6 +19,7 @@
     <result column="charge1" property="charge1" jdbcType="VARCHAR" />
     <result column="charge2" property="charge2" jdbcType="VARCHAR" />
     <result column="charge3" property="charge3" jdbcType="VARCHAR" />
+    <result column="short_name" property="shortName" jdbcType="VARCHAR" />
   </resultMap>
 
     <resultMap id="BaseExResultMap" type="com.zhuanche.dto.CarDriverTeamDTO" extends="BaseResultMap">
@@ -28,7 +29,7 @@
 
   <sql id="Base_Column_List" >
     id, team_name, sort, create_by, create_date, update_by, update_date, city, supplier, 
-    remark, status, p_id, duty_start_date, duty_end_date, charge1, charge2, charge3
+    remark, status, p_id, duty_start_date, duty_end_date, charge1, charge2, charge3, short_name
   </sql>
 
     <update id="updateTeamDuty" parameterType="com.zhuanche.entity.mdbcarmanage.CarDriverTeam">
@@ -69,12 +70,13 @@
         create_date AS createDate,
         update_by AS updateBy,
         update_date AS updateDate ,
-        city AS cities,
-        supplier AS suppliers,
+        city AS city,
+        supplier AS supplier,
         remark,
         status,
         p_id pId,
-        charge1, charge2, charge3
+        charge1, charge2, charge3,
+        short_name AS shortName
         FROM
         car_driver_team
         WHERE 1=1
@@ -95,7 +97,8 @@
         supplier AS suppliers,
         remark,
         status,
-        p_id pId
+        p_id pId,
+        short_name AS shortName
         FROM
         car_driver_team
         WHERE 1=1  and status!=2
@@ -300,6 +303,23 @@
         WHERE cdt2.status != 2
         and cdt2.id in
         <foreach item="item" index="index" collection="collection" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="queryDriverTeamListByDriverIds" parameterType="java.util.List" resultType="com.zhuanche.entity.mdbcarmanage.CarRelateTeam">
+        SELECT
+        rt.driver_id driverId,
+        rt.team_id teamId,
+        dt.team_name teamName,
+        rg.group_id groupId,
+        dtm.team_name groupName
+        FROM car_relate_team rt
+        LEFT JOIN car_relate_group rg ON rg.driver_id=rt.driver_id
+        LEFT JOIN car_driver_team dt  ON rt.team_id=dt.id
+        LEFT JOIN car_driver_team dtm ON rg.group_id=dtm.id
+        WHERE rt.driver_id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
     </select>

@@ -201,4 +201,11 @@ public class DriverMongoService {
 		update.set("expireDate", map.get("expireDate"));
 		driverMongoTemplate.updateFirst(query, update,DriverMongo.class);
 	}
+
+	public void updateDriverCooperationTypeBySupplierId(Integer supplierId, Integer cooperationType) {
+		Query query = new Query(Criteria.where("supplierId").is(supplierId));
+		Update update = new Update();
+		update.set("cooperationType", cooperationType);
+		driverMongoTemplate.updateMulti(query, update, DriverMongo.class);
+	}
 }

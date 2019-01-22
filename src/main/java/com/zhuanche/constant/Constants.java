@@ -65,4 +65,36 @@ public final class Constants {
 	public static final Integer WEEK=1; //周报
 	public static final Integer MONTH=2;//月报
 
+	public static final String UPDATE = "UPDATE";
+	public static final String CREATE = "CREATE";
+
+	public static final String SAVE_SUPPLIER_ERROR = "保存供应商失败";
+	public static final String SAVE_SUPPLIER_SUCCESS = "保存供应商成功";
+
+	public static final String SUPPLIER_TOPIC = "vipSupplierTopic";
+	public static final String SUPPLIER_MQ_SEND_FAILED = "专车供应商发送MQ失败";
+
+	public static final int SUCCESS_CODE = 0;
+	public static final String CODE = "code";
+	public static final String DRIVER = "driver";
+	public static final String DATA = "data";
+	public static final String FIRST_ORDER_NO = "firstOrderNo";
+	public static final String SUPPLIER_ID = "supplierId";
+	public static final String GROUP_ID = "groupId";
+	public static final String GROUP_NAME = "groupName";
+	public static final String GROUP_INFO_TAG = "groupInfo";
+	public static final String DRIVER_INFO_TAG = "driverInfo";
+	public static final String TOTAL = "total";
+	public static final String RECORD_LIST = "recordList";
+	public static final String PAGE_NO = "pageNo";
+	public static final String PAGE_NUM = "pageNum";
+	public static final String LIST = "list";
+	public static final int ZERO = 0;
+	public static final String SUPPLIER_NAME_AVAILABLE = "供应商名称可以使用";
+	public static final String SUPPLIER_NAME_EXIST = "供应商名称已存在";
+
+	public static final String RIDER_PHONE = "riderPhone";
+	public static final String BOOKING_USER_PHONE = "bookingUserPhone";
+
+
 }

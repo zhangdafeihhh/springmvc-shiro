@@ -1,6 +1,7 @@
 package com.zhuanche.serv;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
@@ -14,33 +15,29 @@ import com.zhuanche.common.rocketmq.CommonRocketProducer;
 import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.dto.driver.DriverTeamRelationEntity;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
 import com.zhuanche.entity.mdbcarmanage.*;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.HttpClientUtil;
+import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.mongo.DriverMongo;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.serv.mdbcarmanage.CarBizDriverUpdateService;
 import com.zhuanche.serv.mongo.DriverMongoService;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.*;
 import com.zhuanche.util.DateUtil;
+import com.zhuanche.util.*;
 import com.zhuanche.util.encrypt.MD5Utils;
 import mapper.mdbcarmanage.*;
 import mapper.mdbcarmanage.ex.*;
-import mapper.mdbcarmanage.CarAdmUserMapper;
-import mapper.mdbcarmanage.CarDriverTeamMapper;
-import mapper.mdbcarmanage.CarRelateGroupMapper;
-import mapper.mdbcarmanage.CarRelateTeamMapper;
 import mapper.rentcar.CarBizDriverAccountMapper;
 import mapper.rentcar.CarBizDriverInfoMapper;
 import mapper.rentcar.CarBizSupplierMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
-import net.sf.json.JSONArray;
 import mapper.rentcar.ex.CarBizModelExMapper;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
@@ -86,6 +83,16 @@ public class CarBizDriverInfoService {
 
     @Value("${driver.server.api.url}")
     String driverServiceApiUrl;
+
+    @Value("${order.statistics.url}")
+    String orderStatisticsUrl;
+
+    //车管业务id
+    @Value("${order.bid}")
+    String bId;
+
+    @Value("${order.sign.key}")
+    String signKey;
 
     @Autowired
     private CarBizDriverInfoMapper carBizDriverInfoMapper;
@@ -799,10 +806,43 @@ public class CarBizDriverInfoService {
                     carBizDriverInfo.setUpdateName(carAdmUser.getUserName());
                 }
             }
+
+            //调用订单接口查询激活时间
+            Map<String, Object> params = new HashMap<>();
+            params.put("driverId", carBizDriverInfo.getDriverId());
+            com.alibaba.fastjson.JSONObject resultJson = MpOkHttpUtil.okHttpGetBackJson(orderStatisticsUrl, params, 1, Constants.DRIVER_INFO_TAG);
+            if (resultJson != null && Constants.SUCCESS_CODE == resultJson.getInteger(Constants.CODE)){
+                com.alibaba.fastjson.JSONObject data = resultJson.getJSONObject(Constants.DATA);
+                if (data != null){
+                    String orderNum = data.getJSONObject(Constants.DRIVER).getString(Constants.FIRST_ORDER_NO);
+                    if (StringUtils.isNotBlank(orderNum)){
+                        String url = orderServiceApiBaseUrl + "/orderMain/getOrdersByOrderNo";
+                        params.clear();
+                        params.put("orderNo", orderNum);
+                        params.put("bId", bId);
+                        params.put("columns", "fact_end_date");
+                        params.put("needHistory", 1);
+                        try{
+                            params.put("sign", MD5Utils.getMD5DigestBase64(SignatureUtils.getMD5Sign(params, signKey)));
+                        }catch (Exception e){
+                            logger.error("签名错误");
+                        }
+                        com.alibaba.fastjson.JSONObject result = MpOkHttpUtil.okHttpGetBackJson(url, params, 1, Constants.DRIVER_INFO_TAG);
+                        if (result != null && Constants.SUCCESS_CODE == result.getInteger(Constants.CODE)){
+                            JSONArray jsonArray = result.getJSONArray(Constants.DATA);
+                            if (jsonArray != null && !jsonArray.isEmpty()){
+                                String updateDate = jsonArray.getJSONObject(0).getString("factEndDate");
+                                if(StringUtils.isNotBlank(updateDate)){
+                                    carBizDriverInfo.setActiveDate(DateUtil.getTimeString(updateDate));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
         return carBizDriverInfo;
     }
-
 
     public Map<String, Object> batchInputDriverInfo(Integer cityId, Integer supplierId, Integer teamId,
                                                     Integer teamGroupId, MultipartFile file,
@@ -3732,5 +3772,13 @@ public class CarBizDriverInfoService {
         }
         CarBizDriverInfoDTO carBizDriverInfo = carBizDriverInfoExMapper.selectByDriverId(driverTelescopeUser.getDriverId());
         return carBizDriverInfo;
+    }
+
+    public void updateDriverCooperationTypeBySupplierId(Integer supplierId, Integer cooperationType) {
+        driverMongoService.updateDriverCooperationTypeBySupplierId(supplierId, cooperationType);
+        Map<String, Object> map = new HashMap<>();
+        map.put("supplierId", supplierId);
+        map.put("cooperationType", cooperationType);
+        carBizDriverInfoExMapper.updateDriverCooperationTypeBySupplierId(map);
     }
 }
