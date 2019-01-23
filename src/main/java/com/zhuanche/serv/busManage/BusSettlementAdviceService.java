@@ -176,9 +176,12 @@ public class BusSettlementAdviceService implements BusConst {
             // 发票附件
             JSONArray invoiceFiles = getInvoiceFile(supplierBillId);
             if (invoiceFiles != null) {
-            	List<String> filePaths = invoiceFiles.stream().map(file -> {
+            	List<Map<Object, Object>> filePaths = invoiceFiles.stream().map(file -> {
             		 JSONObject jsonObject = (JSONObject) JSON.toJSON(file);
-            		 return jsonObject.getString("supplierInvoiceUrl");
+            		 Map<Object,Object> fileMap = new HashMap<>();
+            		 fileMap.put("fileName", jsonObject.getString("supplierInvoiceUrl"));
+            		 fileMap.put("filePath", jsonObject.getString(""));
+            		 return fileMap;
             	}).collect(Collectors.toList());
             	invoiceVO.setInvoiceFiles(filePaths);
 			}

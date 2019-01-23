@@ -255,6 +255,7 @@
 			car_biz_supplier s
 		LEFT JOIN car_biz_city c ON c.city_id = s.supplier_city
 		LEFT JOIN car_biz_cooperation_type t ON t.id = s.cooperation_type
+		WHERE
 			<include refid="queryAndExportWhereSql"/>
 	</select>
 	

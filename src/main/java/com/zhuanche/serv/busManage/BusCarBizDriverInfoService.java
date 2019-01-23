@@ -493,9 +493,6 @@ public class BusCarBizDriverInfoService implements BusConst {
         busCarBizDriverInfoExMapper.updateBusDriverInfo(saveDTO);
         int id = saveDTO.getDriverId();
 
-        // 创建操作记录
-      //  busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(id), saveDTO.getUpdateDate());
-
         // 司机信息扩展表，司机银行卡号
         CarBizDriverInfoDetailDTO infoDetail = carBizDriverInfoDetailService.selectByDriverId(saveDTO.getDriverId());
         CarBizDriverInfoDetail carBizDriverInfoDetail = new CarBizDriverInfoDetail();
@@ -685,9 +682,6 @@ public class BusCarBizDriverInfoService implements BusConst {
         busCarBizDriverInfoExMapper.insertBusDriverInfo(saveDTO);
         Integer driverId = saveDTO.getDriverId();
 
-        // 创建操作记录
-        //busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId), saveDTO.getUpdateDate());
-
         // 司机信息扩展表，司机银行卡号
         CarBizDriverInfoDetail carBizDriverInfoDetail = new CarBizDriverInfoDetail();
         carBizDriverInfoDetail.setBankCardBank(saveDTO.getBankCardBank());
@@ -749,6 +743,7 @@ public class BusCarBizDriverInfoService implements BusConst {
             CarBizCarGroup carBizCarGroup = carBizCarGroupMapper.selectByPrimaryKey(baseStatisDTO.getGroupId());
             if (carBizCarGroup != null) {
                 baseStatisDTO.setGroupName(carBizCarGroup.getGroupName());
+                baseStatisDTO.setGroupType(carBizCarGroup.getType());
             }
         }
         if (baseStatisDTO.getDriverId() != null) {
@@ -943,12 +938,13 @@ public class BusCarBizDriverInfoService implements BusConst {
             if (createDate != null) {
             	create_date = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.ofInstant(createDate.toInstant(), ZoneId.systemDefault()));
 			}
-            messageMap.put("create_date", create_date); // 司机创建时间
-            messageMap.put("carType", saveDTO.getGroupName() == null ? "" : saveDTO.getGroupName()); // 司机服务类型
-            messageMap.put("teamId", saveDTO.getTeamId() == null ? "" : saveDTO.getTeamId()); // 司机所属车队ID
-            messageMap.put("teamName", saveDTO.getTeamName() == null ? "" : saveDTO.getTeamName()); // 司机所属车队名称
-            messageMap.put("teamGroupId", saveDTO.getTeamGroupId() == null ? "" : saveDTO.getTeamGroupId()); // 司机所属小组ID
-            messageMap.put("teamGroupName", saveDTO.getTeamGroupName() == null ? "" : saveDTO.getTeamGroupName()); // 司机所属小组名称
+			messageMap.put("create_date", create_date); // 司机创建时间
+			messageMap.put("carType", saveDTO.getGroupName() == null ? "" : saveDTO.getGroupName()); // 司机服务类型
+			messageMap.put("groupType", saveDTO.getGroupType() == null ? "" : saveDTO.getGroupType());
+			messageMap.put("teamId", saveDTO.getTeamId() == null ? "" : saveDTO.getTeamId()); // 司机所属车队ID
+			messageMap.put("teamName", saveDTO.getTeamName() == null ? "" : saveDTO.getTeamName()); // 司机所属车队名称
+			messageMap.put("teamGroupId", saveDTO.getTeamGroupId() == null ? "" : saveDTO.getTeamGroupId()); // 司机所属小组ID
+			messageMap.put("teamGroupName", saveDTO.getTeamGroupName() == null ? "" : saveDTO.getTeamGroupName()); // 司机所属小组名称
 
             Integer driverId = saveDTO.getDriverId();
             logger.info("专车司机driverId={}，同步发送数据={}", driverId, JSON.toJSONString(messageMap));

@@ -1049,7 +1049,7 @@ public class BusSupplierService implements BusConst {
 	public JSONArray getSupplierByProrateRate(Double supplierRate) {
 		if (supplierRate != null) {
 			Map<String, Object> params = new HashMap<>();
-			params.put("supplierId", supplierRate);
+			params.put("supplierRate", supplierRate);
 			try {
 				logger.info("[ BusSupplierService-getSupplierByProrateRate ] 按结算比例筛选供应商,params={}", params);
 				JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_SUPPLIER_INFO_BY_PRORATE_RATE, params , 2000, "按结算比例筛选供应商");

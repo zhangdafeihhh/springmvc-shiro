@@ -3,6 +3,7 @@ package com.zhuanche.vo.busManage;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import lombok.Data;
 
@@ -38,6 +39,6 @@ public class BusSettlementInvoiceVO {
 	private Date invoiceDate;
 
 	/** 发票附件地址 **/
-	private List<String> invoiceFiles;
+	private List<Map<Object, Object>> invoiceFiles;
 
 }
