@@ -12,10 +12,7 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.entity.driver.SupplierExtDto;
-import com.zhuanche.entity.rentcar.CarBizCarGroup;
-import com.zhuanche.entity.rentcar.CarBizSupplier;
-import com.zhuanche.entity.rentcar.CarBizSupplierQuery;
-import com.zhuanche.entity.rentcar.CarBizSupplierVo;
+import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.deiver.CarBizCarInfoTempService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
@@ -238,30 +235,33 @@ public class CarBizSupplierService{
 			if (jsonObject != null && Constants.SUCCESS_CODE == jsonObject.getInteger(Constants.CODE)) {
 				JSONArray jsonArray = jsonObject.getJSONArray(Constants.DATA);
 				List<Integer> idList = new ArrayList<>();
+				List<GroupInfo> groupInfos = new ArrayList<>();
 				jsonArray.forEach(elem -> {
 					com.alibaba.fastjson.JSONObject jsonData = (com.alibaba.fastjson.JSONObject) elem;
 					Integer id = jsonData.getInteger(Constants.GROUP_ID);
 					if (id != null && id > Constants.ZERO) {
 						idList.add(id);
 					}
-					jsonData.remove(Constants.DRIVER_RATE);
-					jsonData.remove(Constants.PLATFORM_RATE);
+					GroupInfo info = new GroupInfo();
+					info.setGroupId(id == null ? 0 : id);
+					info.setSupplierId(jsonData.getIntValue(Constants.SUPPLIER_ID));
+					info.setActiveStartDate(jsonData.getDate(Constants.ACTIVE_START_DATE));
+					info.setActiveEndDate(jsonData.getDate(Constants.ACTIVE_END_DATE));
+					info.setProrateId(jsonData.getString(Constants.PROATE_ID));
+					groupInfos.add(info);
 				});
 				if (!idList.isEmpty()) {
 					List<CarBizCarGroup> carBizCarGroups = carBizCarGroupExMapper.queryGroupNameByIds(idList);
-					JSONArray groupList = new JSONArray();
 					for (CarBizCarGroup groupInfo : carBizCarGroups) {
-						for (Object data : jsonArray) {
-							com.alibaba.fastjson.JSONObject jsonData = (com.alibaba.fastjson.JSONObject) data;
-							Integer id = jsonData.getInteger(Constants.GROUP_ID);
+						for (GroupInfo group : groupInfos) {
+							Integer id = group.getGroupId();
 							if (id.equals(groupInfo.getGroupId())) {
-								jsonData.put(Constants.GROUP_NAME, groupInfo.getGroupName());
-								groupList.add(jsonData);
+								group.setGroupName(groupInfo.getGroupName());
 								break;
 							}
 						}
 					}
-					vo.setGroupList(groupList);
+					vo.setGroupList(groupInfos);
 				}
 			}
 			return AjaxResponse.success(vo);

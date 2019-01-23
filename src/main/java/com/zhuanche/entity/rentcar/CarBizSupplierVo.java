@@ -1,6 +1,6 @@
 package com.zhuanche.entity.rentcar;
 
-import com.alibaba.fastjson.JSONArray;
+import java.util.List;
 
 public class CarBizSupplierVo extends CarBizSupplier {
     private String supplierCityName;
@@ -9,7 +9,7 @@ public class CarBizSupplierVo extends CarBizSupplier {
     private Integer isTwoShifts;
     private String email;
     private String supplierShortName;
-    private JSONArray groupList;
+    private List<GroupInfo> groupList;
     private String createName;
     private String updateName;
 
@@ -61,11 +61,11 @@ public class CarBizSupplierVo extends CarBizSupplier {
         this.supplierShortName = supplierShortName;
     }
 
-    public JSONArray getGroupList() {
+    public List<GroupInfo> getGroupList() {
         return groupList;
     }
 
-    public void setGroupList(JSONArray groupList) {
+    public void setGroupList(List<GroupInfo> groupList) {
         this.groupList = groupList;
     }
 

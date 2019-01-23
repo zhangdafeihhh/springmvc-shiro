@@ -96,7 +96,7 @@ public final class Constants {
 	public static final String RIDER_PHONE = "riderPhone";
 	public static final String BOOKING_USER_PHONE = "bookingUserPhone";
 
-	public static final String DRIVER_RATE = "driverRate";
-	public static final String PLATFORM_RATE = "platformRate";
-
+	public static final String PROATE_ID = "proateId";
+	public static final String ACTIVE_START_DATE = "activeStartDate";
+	public static final String ACTIVE_END_DATE = "activeEndDate";
 }
