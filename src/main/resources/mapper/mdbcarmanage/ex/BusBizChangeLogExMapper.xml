@@ -18,7 +18,8 @@
 	<select id="queryRecnetlyChangeLogs" resultType="java.util.HashMap" parameterType="java.util.Map">
 		select
 			update_name AS updateName,
-			update_date AS updateDate
+			update_date AS updateDate,
+			description AS description
 		from bus_biz_change_log
 		WHERE
 			business_type = #{businessType}

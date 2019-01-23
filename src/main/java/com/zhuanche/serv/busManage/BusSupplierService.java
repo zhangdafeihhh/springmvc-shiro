@@ -55,7 +55,7 @@ import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.mdbcarmanage.CarBizDriverInfoTempService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.excel.CsvUtils;
-import com.zhuanche.util.objcompare.CompareObejctUtils;
+import com.zhuanche.util.objcompare.CompareObjectUtils;
 import com.zhuanche.util.objcompare.entity.supplier.BusSupplierBaseCO;
 import com.zhuanche.util.objcompare.entity.supplier.BusSupplierCommissionInfoCO;
 import com.zhuanche.util.objcompare.entity.supplier.BusSupplierDetailCO;
@@ -1049,7 +1049,7 @@ public class BusSupplierService implements BusConst {
 	public JSONArray getSupplierByProrateRate(Double supplierRate) {
 		if (supplierRate != null) {
 			Map<String, Object> params = new HashMap<>();
-			params.put("supplierId", supplierRate);
+			params.put("supplierRate", supplierRate);
 			try {
 				logger.info("[ BusSupplierService-getSupplierByProrateRate ] 按结算比例筛选供应商,params={}", params);
 				JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_SUPPLIER_INFO_BY_PRORATE_RATE, params , 2000, "按结算比例筛选供应商");
@@ -1339,14 +1339,14 @@ public class BusSupplierService implements BusConst {
 					result.add(join);
 				}
 			} else {
-				List<Object> list = CompareObejctUtils.contrastObj(old, fresh, null);
-				String join = StringUtils.join(list, CompareObejctUtils.separator);
+				List<Object> list = CompareObjectUtils.contrastObj(old, fresh, null);
+				String join = StringUtils.join(list, CompareObjectUtils.separator);
 				if (StringUtils.isNotBlank(join)) {
 					result.add(join);
 				}
 			}
 		}
-		return StringUtils.join(result, CompareObejctUtils.separator);
+		return StringUtils.join(result, CompareObjectUtils.separator);
 	}
 	
 }

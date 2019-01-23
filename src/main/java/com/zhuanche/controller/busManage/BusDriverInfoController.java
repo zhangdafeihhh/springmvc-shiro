@@ -47,7 +47,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.excel.ExportExcelUtil;
-import com.zhuanche.util.objcompare.CompareObejctUtils;
+import com.zhuanche.util.objcompare.CompareObjectUtils;
 import com.zhuanche.util.objcompare.entity.BusDriverCompareEntity;
 import com.zhuanche.vo.busManage.BusDriverDetailInfoVO;
 import com.zhuanche.vo.busManage.BusDriverInfoExportVO;
@@ -230,7 +230,7 @@ public class BusDriverInfoController extends BusBaseController {
 		newDriver.setGender(carBizDriverInfo.getGender()==0?"女":"男");
 		String newLicenseType = this.getDrivingLicenseType(carBizDriverInfo.getDrivingLicenseType());
 		newDriver.setDrivingLicenseType(newLicenseType);
-		List<Object> objects = CompareObejctUtils.contrastObj(oldDriver, newDriver, null);
+		List<Object> objects = CompareObjectUtils.contrastObj(oldDriver, newDriver, null);
 		if(objects.size()!=0){
 			String join = StringUtils.join(objects, ",");
 			busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId),join, new Date());

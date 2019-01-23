@@ -1,11 +1,10 @@
 package com.zhuanche.objcompare;
 
-import java.util.Date;
-
 import com.zhuanche.objcompare.entity.Person;
+import com.zhuanche.util.objcompare.CompareObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.zhuanche.util.objcompare.CompareObejctUtils;
+import java.util.Date;
 
 public class DemoTest {
 	public static void main(String[] args) {
@@ -26,7 +25,7 @@ public class DemoTest {
 		Person person4 = new Person();
 		person4.setName("abc");
 		person4.setAge(22);
-		CompareObejctUtils.contrastObj(person1, person2, (attr, results) -> {
+		CompareObjectUtils.contrastObj(person1, person2, (attr, results) -> {
 			String old = attr.getOld();
 			String fresh = attr.getFresh();
 			String note = attr.getNote();

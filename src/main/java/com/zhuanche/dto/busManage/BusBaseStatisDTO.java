@@ -60,6 +60,8 @@ public class BusBaseStatisDTO implements BusConst {
 	private Integer groupId;
 	/** 车型类型名称 **/
 	private String groupName;
+	/** 车辆类型1:专车、2:大巴车 **/
+	private Integer groupType;
 
 	public Integer getDriverId() {
 		return driverId;
@@ -243,6 +245,14 @@ public class BusBaseStatisDTO implements BusConst {
 
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
+	}
+
+	public Integer getGroupType() {
+		return groupType;
+	}
+
+	public void setGroupType(Integer groupType) {
+		this.groupType = groupType;
 	}
 
 }
