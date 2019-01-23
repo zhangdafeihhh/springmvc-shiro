@@ -180,7 +180,7 @@ public class BusSettlementAdviceService implements BusConst {
             		 JSONObject jsonObject = (JSONObject) JSON.toJSON(file);
             		 Map<Object,Object> fileMap = new HashMap<>();
             		 fileMap.put("fileName", jsonObject.getString("supplierInvoiceUrl"));
-            		 fileMap.put("filePath", jsonObject.getString(""));
+            		 fileMap.put("filePath", jsonObject.getString("invoiceFileName"));
             		 return fileMap;
             	}).collect(Collectors.toList());
             	invoiceVO.setInvoiceFiles(filePaths);
@@ -217,7 +217,7 @@ public class BusSettlementAdviceService implements BusConst {
     				return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, result.getMsg());
     			}
     			String filePath = result.getFilePath();
-    			String uploadErrorMsg = saveInvoiceFile(invoiceDTO, filePath);
+    			String uploadErrorMsg = saveInvoiceFile(invoiceDTO.getSupplierBillId(), filePath, fileName);
     			if (StringUtils.isNotBlank(uploadErrorMsg)) {
     				return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, uploadErrorMsg);
     			}
@@ -385,17 +385,19 @@ public class BusSettlementAdviceService implements BusConst {
     /**
      * @Title: saveInvoiceFile
      * @Description: 保存发票附件
-     * @param invoiceDTO
+     * @param supplierBillId
      * @param filePath
+     * @param fileName
      * @return String
      * @throws
      */
-    public String saveInvoiceFile(BusSettlementInvoiceDTO invoiceDTO, String filePath) {
-        if (invoiceDTO != null) {
+    public String saveInvoiceFile(String supplierBillId, String filePath, String fileName) {
+        if (StringUtils.isNotBlank(supplierBillId)) {
 			// 请求参数
 			Map<String, Object> params = new HashMap<>();
-			params.put("supplierBillId", invoiceDTO.getSupplierBillId());
+			params.put("supplierBillId", supplierBillId);
 			params.put("supplierInvoiceUrl", filePath);
+			params.put("invoiceFileName", fileName);
 			params.put("createName", WebSessionUtil.getCurrentLoginUser().getName());
 
 			try {
