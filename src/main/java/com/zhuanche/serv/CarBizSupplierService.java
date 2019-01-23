@@ -244,6 +244,8 @@ public class CarBizSupplierService{
 					if (id != null && id > Constants.ZERO) {
 						idList.add(id);
 					}
+					jsonData.remove(Constants.DRIVER_RATE);
+					jsonData.remove(Constants.PLATFORM_RATE);
 				});
 				if (!idList.isEmpty()) {
 					List<CarBizCarGroup> carBizCarGroups = carBizCarGroupExMapper.queryGroupNameByIds(idList);

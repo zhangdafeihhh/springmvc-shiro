@@ -222,6 +222,7 @@ public class SubscriptionReportConfigureController {
         map.put( "2", "完单详情");
         map.put( "3", "积分");
         map.put( "4", "数单奖");
+        map.put( "5", "对账数据");
         return AjaxResponse.success(map);
     }
 
