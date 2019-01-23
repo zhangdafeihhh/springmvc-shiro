@@ -376,7 +376,12 @@ public class BusSettlementAdviceController {
         if (array == null || array.isEmpty()) {
             return AjaxResponse.success(new ArrayList<>());
         }
-        List<String> orderNos = array.stream().map(o -> (JSONObject) o).map(o -> o.getString("orderNo")).distinct().collect(Collectors.toList());
+        List<String> orderNos = array.stream().map(o -> (JSONObject) o)
+                .filter(o->{
+                    Integer accountType = o.getInteger("accountType");
+                    return accountType!=null&&(accountType==5||accountType==6);})//5 巴士分佣收入 6修正订单 7修正账单, 5/6才能查出订单信息
+                .map(o -> o.getString("orderNo"))
+                .distinct().collect(Collectors.toList());
         //查询出所有的巴士车型类别
         List<Map<Object, Object>> maps = busCommonService.queryGroups();
         Map<Integer, String> groupMap = new HashMap<>(16);
@@ -500,7 +505,11 @@ public class BusSettlementAdviceController {
                 isList = true;
             }
             //遍历结果取出orderNo去调用订单组接口，补充数据
-            String orderNos = array.stream().map(o -> (JSONObject) o).map(o -> o.getString("orderNo")).distinct().collect(Collectors.joining(","));
+            String orderNos = array.stream().map(o -> (JSONObject) o)
+                    .filter(o->{
+                        Integer accountType = o.getInteger("accountType");
+                        return accountType!=null&&(accountType==5||accountType==6);})//5 巴士分佣收入 6修正订单 7修正账单, 5/6才能查出订单信息
+                         .map(o -> o.getString("orderNo")).distinct().collect(Collectors.joining(","));
             List<BusOrderExportVO> exportVOS = busAssignmentService.buidExportData(orderNos, groupMap, roleBoolean);
             Map<String, BusOrderExportVO> orderMap = new HashMap<>();
             if (exportVOS != null) {
