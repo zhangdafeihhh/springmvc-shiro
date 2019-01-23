@@ -247,7 +247,7 @@ public class CarBizSupplierService{
 					info.setSupplierId(jsonData.getIntValue(Constants.SUPPLIER_ID));
 					info.setActiveStartDate(jsonData.getDate(Constants.ACTIVE_START_DATE));
 					info.setActiveEndDate(jsonData.getDate(Constants.ACTIVE_END_DATE));
-					info.setProrateId(jsonData.getString(Constants.PROATE_ID));
+					info.setProrateId(jsonData.getString(Constants.PRORATE_ID));
 					groupInfos.add(info);
 				});
 				if (!idList.isEmpty()) {
