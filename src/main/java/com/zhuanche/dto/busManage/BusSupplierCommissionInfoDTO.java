@@ -60,7 +60,7 @@ public class BusSupplierCommissionInfoDTO {
 	private Integer isRebate;
 
 	/** 返点条件 0金额 **/
-	@NotNull(message = "返点条件不能为空")
+//	@NotNull(message = "返点条件不能为空")
 	@InArray(values = { "0" }, message = "返点条件不在有效值范围内")
 	private Integer rebateType;
 
@@ -70,7 +70,7 @@ public class BusSupplierCommissionInfoDTO {
 	private Integer rebateCycle;
 
 	/** 是否提前结算 0 不 1可以 **/
-//	@NotNull(message = "是否提前结算不能为空")
+	@NotNull(message = "是否提前结算不能为空")
 	@InArray(values = { "0", "1" }, message = "是否提前结算不在有效值范围内")
 	private Integer isAdvance;
 
