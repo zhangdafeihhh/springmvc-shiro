@@ -179,8 +179,8 @@ public class BusSettlementAdviceService implements BusConst {
             	List<Map<Object, Object>> filePaths = invoiceFiles.stream().map(file -> {
             		 JSONObject jsonObject = (JSONObject) JSON.toJSON(file);
             		 Map<Object,Object> fileMap = new HashMap<>();
-            		 fileMap.put("fileName", jsonObject.getString("supplierInvoiceUrl"));
-            		 fileMap.put("filePath", jsonObject.getString("invoiceFileName"));
+            		 fileMap.put("fileName", jsonObject.getString("invoiceFileName"));
+            		 fileMap.put("filePath", jsonObject.getString("supplierInvoiceUrl"));
             		 return fileMap;
             	}).collect(Collectors.toList());
             	invoiceVO.setInvoiceFiles(filePaths);
