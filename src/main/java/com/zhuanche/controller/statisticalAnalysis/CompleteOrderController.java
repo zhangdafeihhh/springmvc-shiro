@@ -222,8 +222,8 @@ public class CompleteOrderController{
 			  statisticalAnalysisService.exportCsvFromToPage(
 					response,
 					jsonString,
-					saasBigdataApiUrl+"/driverOperateDetail/download",
-					new String("司机运营详情分析".getBytes("gb2312"), "iso8859-1"),
+					saasBigdataApiUrl+"/completeOrderDetail/download",
+					new String("完成订单详情".getBytes("gb2312"), "iso8859-1"),
 					request.getRealPath("/")+File.separator+"template"+File.separator+"completeOrderDetail_info.csv");
 			  
             }catch (Exception e){
