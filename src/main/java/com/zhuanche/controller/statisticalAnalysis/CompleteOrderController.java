@@ -21,7 +21,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -162,10 +165,11 @@ public class CompleteOrderController{
                                          String orgnizationId,
                                          String channelId,
                                          String driverTypeId,
-                                         @Verify(param = "allianceId",rule = "required")String allianceId,
+                                         String allianceId,
                                          String motorcardId,
                                          String hotelId,
                                          String driverId,
+                                         HttpServletRequest request,
                                          HttpServletResponse response){
     	    try{
                 logger.info("【订单管理-完成订单详情】导出,完成订单详情列表数据:queryCompleteOrderData.json");
@@ -208,15 +212,20 @@ public class CompleteOrderController{
                     paramMap.put("driverId", driverId);//司机ID
                 }
 
-                //页号
-                paramMap.put("pageNo", 1);
-                //每页记录数
-                paramMap.put("pageSize", Integer.MAX_VALUE);
-                paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap, cityId, allianceId, motorcardId);
-                String jsonString = JSON.toJSONString(paramMap);
-                logger.info("【订单管理-统计分析】导出,完成订单详情请求参数----{}",jsonString);
-                List<CompleteOrderDTO> completeOrderDTOList =  statisticalAnalysisService.queryCompleteOrderDataList(saasBigdataApiUrl+"/completeOrderDetail/queryList",paramMap);
-                statisticalAnalysisService.exportExceleCompleteOrder(completeOrderDTOList,response);
+		  		paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,allianceId,motorcardId);
+				if(paramMap==null){
+					return;
+				}
+    			
+	          String jsonString = JSON.toJSONString(paramMap);
+	          
+			  statisticalAnalysisService.exportCsvFromToPage(
+					response,
+					jsonString,
+					saasBigdataApiUrl+"/driverOperateDetail/download",
+					new String("司机运营详情分析".getBytes("gb2312"), "iso8859-1"),
+					request.getRealPath("/")+File.separator+"template"+File.separator+"completeOrderDetail_info.csv");
+			  
             }catch (Exception e){
     	        logger.error("导出完成订单详情error:{}",e);
             }
