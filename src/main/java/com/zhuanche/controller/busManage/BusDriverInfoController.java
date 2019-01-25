@@ -363,6 +363,9 @@ public class BusDriverInfoController extends BusBaseController {
 	public AjaxResponse findDriverInfoByDriverId(@NotNull(message = "司机ID不能为空") Integer driverId) {
 
 		CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(driverId);
+		if (carBizDriverInfo == null) {
+			return AjaxResponse.failMsg(RestErrorCode.DRIVER_NOT_EXIST, "司机不存在");
+		}
 		BusDriverDetailInfoVO busDriverDetailInfoVO = BeanUtil.copyObject(carBizDriverInfo, BusDriverDetailInfoVO.class);
 		// 查询司机银行卡信息
 		CarBizDriverInfoDetailDTO carBizDriverInfoDetailDTO = carBizDriverInfoDetailService.selectByDriverId(driverId);
