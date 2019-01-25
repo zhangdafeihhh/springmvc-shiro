@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -189,12 +190,6 @@ public class BusDriverInfoController extends BusBaseController {
 			if (updateDriverMap != null && "2".equals(updateDriverMap.get("result").toString())) {
 				return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, updateDriverMap.get("msg").toString());
 			}
-			try {
-				// 调用接口清除，key
-				carBizDriverInfoService.flashDriverInfo(driverId);
-			} catch (Exception e) {
-				logger.error("[ BusDriverInfoController-saveDriver ] 司机driverId={},修改调用清除接口异常={}", driverId, e.getMessage(), e);
-			}
 			//查询修改之前的数据
 			AjaxResponse detail = findDriverInfoByDriverId(driverId);
 			BusDriverDetailInfoVO data =(BusDriverDetailInfoVO) detail.getData();
@@ -202,6 +197,8 @@ public class BusDriverInfoController extends BusBaseController {
 			if(response.isSuccess()){
 				this.saveUpdateLog(data,driverId);
 			}
+			// 调用接口清除，key
+			carBizDriverInfoService.flashDriverInfo(driverId);
 			return response;
 		} else {
 			logger.info("[ BusDriverInfoController-saveDriver ] 操作方式：新建");
@@ -215,25 +212,29 @@ public class BusDriverInfoController extends BusBaseController {
 	}
 
 	private void saveUpdateLog(BusDriverDetailInfoVO driverInfo,Integer driverId){
-		BusDriverCompareEntity oldDriver = new BusDriverCompareEntity();
-		BeanUtils.copyProperties(driverInfo,oldDriver);
-		oldDriver.setStatus(driverInfo.getStatus()==1?"有效":"无效");
-		oldDriver.setGender(driverInfo.getGender()==0?"女":"男");
-		String oldLicenseType = this.getDrivingLicenseType(driverInfo.getDrivingLicenseType());
-		oldDriver.setDrivingLicenseType(oldLicenseType);
-		BusDriverCompareEntity newDriver=new BusDriverCompareEntity();
-		//查询最新的信息
-		AjaxResponse detail = findDriverInfoByDriverId(driverId);
-		BusDriverDetailInfoVO carBizDriverInfo  = (BusDriverDetailInfoVO)detail.getData();
-		BeanUtils.copyProperties(carBizDriverInfo,newDriver);
-		newDriver.setStatus(carBizDriverInfo.getStatus()==1?"有效":"无效");
-		newDriver.setGender(carBizDriverInfo.getGender()==0?"女":"男");
-		String newLicenseType = this.getDrivingLicenseType(carBizDriverInfo.getDrivingLicenseType());
-		newDriver.setDrivingLicenseType(newLicenseType);
-		List<Object> objects = CompareObjectUtils.contrastObj(oldDriver, newDriver, null);
-		if(objects.size()!=0){
-			String join = StringUtils.join(objects, ",");
-			busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId),join, new Date());
+		try {
+			BusDriverCompareEntity oldDriver = new BusDriverCompareEntity();
+			BeanUtils.copyProperties(driverInfo,oldDriver);
+			oldDriver.setStatus(driverInfo.getStatus()==1?"有效":"无效");
+			oldDriver.setGender(driverInfo.getGender()==0?"女":"男");
+			String oldLicenseType = this.getDrivingLicenseType(driverInfo.getDrivingLicenseType());
+			oldDriver.setDrivingLicenseType(oldLicenseType);
+			BusDriverCompareEntity newDriver=new BusDriverCompareEntity();
+			//查询最新的信息
+			AjaxResponse detail = findDriverInfoByDriverId(driverId);
+			BusDriverDetailInfoVO carBizDriverInfo  = (BusDriverDetailInfoVO)detail.getData();
+			BeanUtils.copyProperties(carBizDriverInfo,newDriver);
+			newDriver.setStatus(carBizDriverInfo.getStatus()==1?"有效":"无效");
+			newDriver.setGender(carBizDriverInfo.getGender()==0?"女":"男");
+			String newLicenseType = this.getDrivingLicenseType(carBizDriverInfo.getDrivingLicenseType());
+			newDriver.setDrivingLicenseType(newLicenseType);
+			List<Object> objects = CompareObjectUtils.contrastObj(oldDriver, newDriver, null);
+			if(objects.size()!=0){
+				String join = StringUtils.join(objects, ",");
+				busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId),join, new Date());
+			}
+		} catch (BeansException e) {
+			logger.error("[ BusDriverInfoController-saveUpdateLog ] 保存操作日志异常", e);
 		}
 	}
 
