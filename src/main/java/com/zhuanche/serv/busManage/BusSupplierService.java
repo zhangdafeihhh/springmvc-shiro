@@ -324,7 +324,7 @@ public class BusSupplierService implements BusConst {
 		
 		Long id = commissionDTO.getId();// 主键
 		String url = null;
-		if (id == null) {
+		if (id == null || id == 0) {
 			url = orderPayUrl + Pay.SETTLE_SUPPLIER_INFO_ADD;
 			commissionDTO.setCreateName(WebSessionUtil.getCurrentLoginUser().getName());
 		} else {
@@ -340,7 +340,7 @@ public class BusSupplierService implements BusConst {
 			if (result.getIntValue("code") != 0) {
 				String msg = result.getString("msg");
 				logger.info("[ BusSupplierService-saveSupplierCommission ] 保存分佣基本信息调用接口出错,params={},errorMsg={}", params, msg);
-				return msg;
+				return "保存分佣基本信息:" + msg;
 			}
 		} catch (Exception e) {
 			logger.error("[ BusSupplierService-saveSupplierCommission ] 保存分佣基本信息异常,params={},errorMsg={}", params, e.getMessage(), e);
@@ -370,7 +370,7 @@ public class BusSupplierService implements BusConst {
 
 			Long id = prorate.getId();// 主键
 			String url = null;
-			if (id == null) {
+			if (id == null || id == 0) {
 				url = orderPayUrl + Pay.SETTLE_SUPPLIER_PRORATE_ADD;
 				prorate.setCreateName(WebSessionUtil.getCurrentLoginUser().getName());
 			} else {
@@ -386,7 +386,7 @@ public class BusSupplierService implements BusConst {
 				if (result.getIntValue("code") != 0) {
 					String msg = result.getString("msg");
 					logger.info("[ BusSupplierService-saveSupplierProrate ] 保存供应商分佣信息调用接口出错,params={},errorMsg={}", params, msg);
-					return msg;
+					return "保存供应商分佣信息:" + msg;
 				}
 			} catch (Exception e) {
 				logger.error("[ BusSupplierService-saveSupplierProrate ] 保存供应商分佣信息异常,params={},errorMsg={}", params, e.getMessage(), e);
@@ -417,7 +417,7 @@ public class BusSupplierService implements BusConst {
 
 			Integer id = rebate.getId();// 主键
 			String url = null;
-			if (id == null) {
+			if (id == null || id == 0) {
 				url = orderPayUrl + Pay.SETTLE_SUPPLIER_REBATE_ADD;
 				rebate.setCreateName(WebSessionUtil.getCurrentLoginUser().getName());
 			} else {
@@ -433,7 +433,7 @@ public class BusSupplierService implements BusConst {
 				if (result.getIntValue("code") != 0) {
 					String msg = result.getString("msg");
 					logger.info("[ BusSupplierService-saveSupplierRebate ] 保存供应商返点信息调用接口出错,params={},errorMsg={}", params, msg);
-					return msg;
+					return "保存供应商返点信息:" + msg;
 				}
 			} catch (Exception e) {
 				logger.error("[ BusSupplierService-saveSupplierRebate ] 保存供应商返点信息异常,params={},errorMsg={}", params, e.getMessage(), e);
