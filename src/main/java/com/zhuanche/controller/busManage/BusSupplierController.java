@@ -340,8 +340,12 @@ public class BusSupplierController {
 			// 按结算比例筛选供应商
 			if (queryDTO.getSupplierRate() != null) {
 				List<Integer> supplierRateIds = new ArrayList<>();
-				Optional.ofNullable(busSupplierService.getSupplierByProrateRate(queryDTO.getSupplierRate())).orElseGet(JSONArray::new).forEach(item -> {
-					supplierRateIds.add((Integer) item);
+				Optional.ofNullable(busSupplierService.getSupplierByProrateRate(queryDTO.getSupplierRate())).orElseGet(JSONArray::new).forEach(e -> {
+					JSONObject jsonObject = (JSONObject) JSON.toJSON(e);
+					Integer supplierRateId = jsonObject.getInteger("supplierId");
+					if (supplierRateId != null) {
+						supplierRateIds.add(supplierRateId);
+					}
 				});
 				queryDTO.setSupplierRateIds(supplierRateIds);
 			}
