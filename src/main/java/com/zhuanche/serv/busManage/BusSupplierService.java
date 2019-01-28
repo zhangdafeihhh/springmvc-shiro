@@ -142,6 +142,16 @@ public class BusSupplierService implements BusConst {
 		Method method = Method.UPDATE;
 		int f = 0;
 		Integer supplierId = baseDTO.getSupplierId();
+		// 校验是否存在
+		Map<String,Object> params = new HashMap<>();
+		params.put("supplierId", supplierId);
+		params.put("supplierCity", baseDTO.getSupplierCity());
+		params.put("supplierName", baseDTO.getSupplierName());
+		int count = busCarBizSupplierExMapper.checkIfExists(params);
+		if (count > 0) {
+			return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "供应商已存在");
+		}
+		
 		// 一、操作主表
 		baseDTO.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
 		if (supplierId == null || supplierId == 0) {

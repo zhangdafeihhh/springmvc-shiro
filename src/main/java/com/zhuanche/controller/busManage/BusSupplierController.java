@@ -156,11 +156,13 @@ public class BusSupplierController {
 		AjaxResponse response = busSupplierService.saveSupplierInfo(baseDTO, detailDTO, commissionDTO, prorates, rebates);
 		
 		// 三、保存操作记录
-		if (isAdd) {
-			busBizChangeLogService.insertLog(BusinessType.SUPPLIER, String.valueOf(baseDTO.getSupplierId()), "创建供应商", new Date());
-		} else {
-			List<Object> fresh = busSupplierService.getContents(supplierId);;
-			busSupplierService.saveChangeLog(supplierId, old, fresh);
+		if (response.isSuccess()) {
+			if (isAdd) {
+				busBizChangeLogService.insertLog(BusinessType.SUPPLIER, String.valueOf(baseDTO.getSupplierId()), "创建供应商", new Date());
+			} else {
+				List<Object> fresh = busSupplierService.getContents(supplierId);;
+				busSupplierService.saveChangeLog(supplierId, old, fresh);
+			}
 		}
 		
 		return response;
