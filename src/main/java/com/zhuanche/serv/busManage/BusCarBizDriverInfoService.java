@@ -85,6 +85,7 @@ import mapper.mdbcarmanage.ex.CarBizAgreementCompanyExMapper;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.mdbcarmanage.ex.CarRelateGroupExMapper;
 import mapper.mdbcarmanage.ex.CarRelateTeamExMapper;
+import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
 import mapper.rentcar.CarBizCarGroupMapper;
 import mapper.rentcar.CarBizCityMapper;
 import mapper.rentcar.CarBizCooperationTypeMapper;
@@ -663,6 +664,8 @@ public class BusCarBizDriverInfoService implements BusConst {
             // 发送MQ
             sendDriverToMq(saveDTO, "INSERT");
 
+            // 保存操作记录
+            busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(saveDTO.getDriverId()),"新建司机", new Date());
             return AjaxResponse.success(null);
         } catch (Exception e) {
             logger.error("新增司机信息异常,error={}", e.getMessage(), e);

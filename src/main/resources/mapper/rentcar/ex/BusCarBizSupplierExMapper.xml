@@ -41,6 +41,20 @@
 	<sql id="Blob_Column_List">
 		memo
 	</sql>
+	
+	<!-- 供应商是否存在 -->
+	<select id="checkIfExists" parameterType="java.util.Map" resultType="int">
+		SELECT
+			count(*)
+		FROM
+			car_biz_supplier
+		WHERE
+			supplier_city = #{supplierCity}
+		AND supplier_full_name = #{supplierName}
+		<if test="supplierId != null">
+			AND supplier_id <![CDATA[ <> ]]> #{supplierId}
+		</if>
+	</select>
 
 	<insert id="insertSelective" parameterType="com.zhuanche.dto.busManage.BusSupplierBaseDTO">
 		<selectKey resultType="java.lang.Integer" keyProperty="supplierId" order="AFTER" >

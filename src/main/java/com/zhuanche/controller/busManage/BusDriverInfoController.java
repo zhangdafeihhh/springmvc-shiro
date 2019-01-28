@@ -203,9 +203,6 @@ public class BusDriverInfoController extends BusBaseController {
 		} else {
 			logger.info("[ BusDriverInfoController-saveDriver ] 操作方式：新建");
 			AjaxResponse response = busCarBizDriverInfoService.saveDriver(saveDTO);
-			if(response.isSuccess()){
-				busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId),"新建司机", new Date());
-			}
 			return response;
 		}
 

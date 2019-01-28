@@ -142,6 +142,16 @@ public class BusSupplierService implements BusConst {
 		Method method = Method.UPDATE;
 		int f = 0;
 		Integer supplierId = baseDTO.getSupplierId();
+		// 校验是否存在
+		Map<String,Object> params = new HashMap<>();
+		params.put("supplierId", supplierId);
+		params.put("supplierCity", baseDTO.getSupplierCity());
+		params.put("supplierName", baseDTO.getSupplierName());
+		int count = busCarBizSupplierExMapper.checkIfExists(params);
+		if (count > 0) {
+			return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "供应商已存在");
+		}
+		
 		// 一、操作主表
 		baseDTO.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
 		if (supplierId == null || supplierId == 0) {
@@ -1104,7 +1114,7 @@ public class BusSupplierService implements BusConst {
 		params.put("supplierId", supplierId);
 		try {
 			logger.info("[ BusSupplierService-getSettleExportInfo ] 查询供应商列表导出结算相关信息,params={}", params);
-			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_EXPORT_SUPPLIER_INFO, params, 2000, "查询供应商列表导出结算相关信息");
+			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_SUPPLIER_EXPORT_SUPPLIER_INFO, params, 2000, "查询供应商列表导出结算相关信息");
 			if (result.getIntValue("code") == 0) {
 				JSONObject jsonObject = result.getJSONObject("data");
 				return jsonObject;

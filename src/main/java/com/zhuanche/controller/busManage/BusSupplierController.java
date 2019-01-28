@@ -156,11 +156,13 @@ public class BusSupplierController {
 		AjaxResponse response = busSupplierService.saveSupplierInfo(baseDTO, detailDTO, commissionDTO, prorates, rebates);
 		
 		// 三、保存操作记录
-		if (isAdd) {
-			busBizChangeLogService.insertLog(BusinessType.SUPPLIER, String.valueOf(supplierId), "创建供应商", new Date());
-		} else {
-			List<Object> fresh = busSupplierService.getContents(supplierId);;
-			busSupplierService.saveChangeLog(supplierId, old, fresh);
+		if (response.isSuccess()) {
+			if (isAdd) {
+				busBizChangeLogService.insertLog(BusinessType.SUPPLIER, String.valueOf(baseDTO.getSupplierId()), "创建供应商", new Date());
+			} else {
+				List<Object> fresh = busSupplierService.getContents(supplierId);;
+				busSupplierService.saveChangeLog(supplierId, old, fresh);
+			}
 		}
 		
 		return response;
@@ -340,8 +342,12 @@ public class BusSupplierController {
 			// 按结算比例筛选供应商
 			if (queryDTO.getSupplierRate() != null) {
 				List<Integer> supplierRateIds = new ArrayList<>();
-				Optional.ofNullable(busSupplierService.getSupplierByProrateRate(queryDTO.getSupplierRate())).orElseGet(JSONArray::new).forEach(item -> {
-					supplierRateIds.add((Integer) item);
+				Optional.ofNullable(busSupplierService.getSupplierByProrateRate(queryDTO.getSupplierRate())).orElseGet(JSONArray::new).forEach(e -> {
+					JSONObject jsonObject = (JSONObject) JSON.toJSON(e);
+					Integer supplierRateId = jsonObject.getInteger("supplierId");
+					if (supplierRateId != null) {
+						supplierRateIds.add(supplierRateId);
+					}
 				});
 				queryDTO.setSupplierRateIds(supplierRateIds);
 			}

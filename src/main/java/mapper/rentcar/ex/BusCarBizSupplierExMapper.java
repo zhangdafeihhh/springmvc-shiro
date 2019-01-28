@@ -80,4 +80,13 @@ public interface BusCarBizSupplierExMapper {
 	 * @throws
 	 */
 	BusSupplierBaseCO querySupplierCOById(Integer supplierId);
+
+	/**
+	 * @Title: checkIfExists
+	 * @Description: 供应商是否存在
+	 * @param params
+	 * @return int
+	 * @throws
+	 */
+	int checkIfExists(Map<String, Object> params);
 }
