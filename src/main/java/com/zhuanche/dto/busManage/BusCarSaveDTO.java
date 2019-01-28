@@ -30,9 +30,9 @@ public class BusCarSaveDTO implements Serializable {
     @NotBlank(message = "车辆颜色不能为空")
     private String color;
     @NotBlank(message = "燃料类型不能为空")
-    private String fuelType;
+    private String fueltype;
     @NotBlank(message = "运输证字号不能为空")
-    private String transportNumber;
+    private String transportnumber;
     @NotNull(message = "状态不能为空")
     private Integer status;
     @DateTimeFormat(pattern = "yyyy-MM-dd")

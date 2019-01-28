@@ -83,7 +83,7 @@ public class BusInfoService {
         if (b) {
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "车牌号已经存在");
         }
-        String fuelName = EnumFuel.getFuelNameByCode(saveDTO.getFuelType());
+        String fuelName = EnumFuel.getFuelNameByCode(saveDTO.getFueltype());
         if (fuelName == null) {
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "燃料类型不存在");
         }
@@ -94,9 +94,6 @@ public class BusInfoService {
         }
         BusCarInfo carInfo = new BusCarInfo();
         BeanUtils.copyProperties(saveDTO, carInfo);
-        //TODO 让H5改一下参数名称
-        carInfo.setFueltype(saveDTO.getFuelType());
-        carInfo.setTransportnumber(saveDTO.getTransportNumber());
 
         //补充默认字段
         buidDefaultParam(carInfo);
@@ -165,7 +162,7 @@ public class BusInfoService {
         if (b && !busCarSaveDTO.getLicensePlates().equals(busDetail.getLicensePlates())) {
             return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "该车牌号已经存在,不能修改");
         }
-        String fuelName = EnumFuel.getFuelNameByCode(busCarSaveDTO.getFuelType());
+        String fuelName = EnumFuel.getFuelNameByCode(busCarSaveDTO.getFueltype());
         if (fuelName == null) {
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "燃料类型不存在");
         }
@@ -176,7 +173,7 @@ public class BusInfoService {
         }
         BusCarInfo carInfo = new BusCarInfo();
         BeanUtils.copyProperties(busCarSaveDTO, carInfo);
-        carInfo.setFueltype(busCarSaveDTO.getFuelType());
+
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         Integer userId = currentLoginUser.getId();
         carInfo.setUpdateBy(userId);

@@ -426,7 +426,7 @@ public class BusInfoController {
                             validFlag = false;
                             break;
                         }
-                        saveDTO.setFuelType(code);
+                        saveDTO.setFueltype(code);
                         break;
                     //运输证字号
                     case "运输证字号":
@@ -435,7 +435,7 @@ public class BusInfoController {
                             validFlag = false;
                             break;
                         }
-                        saveDTO.setTransportNumber(value);
+                        saveDTO.setTransportnumber(value);
                         break;
                     //车厂厂牌
                     case "车辆厂牌":
