@@ -579,8 +579,8 @@ public class BusAssignmentService {
             BusOrderExportVO orderExport = new BusOrderExportVO();
             orderExport.setOrderId(String.valueOf(order.getOrderId()));
             orderExport.setOrderNo(order.getOrderNo());
-            orderExport.setCreateDate(DateUtils.formatDate(order.getCreateDate()));
-            orderExport.setBookingDate(DateUtils.formatDate(order.getBookingDate()));
+            orderExport.setCreateDate(DateUtils.formatDateTime(order.getCreateDate()));
+            orderExport.setBookingDate(DateUtils.formatDateTime(order.getBookingDate()));
             orderExport.setBookingStartAddr(order.getBookingStartAddr() == null ? StringUtils.EMPTY : order.getBookingStartAddr());
             orderExport.setBookingEndAddr(order.getBookingEndAddr() == null ? StringUtils.EMPTY : order.getBookingEndAddr());
             orderExport.setCityName(order.getCityName());
@@ -611,8 +611,8 @@ public class BusAssignmentService {
             orderExport.setRiderName(order.getRiderName());
             orderExport.setRiderPhone(order.getRiderPhone());
             orderExport.setLicensePlates(order.getLicensePlates());
-            orderExport.setFactEndDate(order.getFactEndDate() == null ? StringUtils.EMPTY : DateUtils.formatDate(order.getFactEndDate()));
-            orderExport.setFactDate(order.getFactDate() == null ? StringUtils.EMPTY : DateUtils.formatDate(order.getFactDate()));
+            orderExport.setFactEndDate(order.getFactEndDate() == null ? StringUtils.EMPTY : DateUtils.formatDateTime(order.getFactEndDate()));
+            orderExport.setFactDate(order.getFactDate() == null ? StringUtils.EMPTY : DateUtils.formatDateTime(order.getFactDate()));
             orderExport.setFactStartAddr(order.getFactStartAddr());
             orderExport.setFactEndAddr(order.getFactEndAddr());
             Integer isReturn = order.getIsReturn();

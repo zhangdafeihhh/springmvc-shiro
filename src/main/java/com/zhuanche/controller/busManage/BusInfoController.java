@@ -15,9 +15,7 @@ import com.zhuanche.constants.busManage.BusConstant.CarConstant;
 import com.zhuanche.constants.busManage.EnumFuel;
 import com.zhuanche.dto.busManage.BusCarSaveDTO;
 import com.zhuanche.dto.busManage.BusInfoDTO;
-import com.zhuanche.entity.busManage.BusCarInfo;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
-import com.zhuanche.entity.rentcar.CarBizCarInfo;
 import com.zhuanche.serv.CarBizCarGroupService;
 import com.zhuanche.serv.CarBizCityService;
 import com.zhuanche.serv.CarBizSupplierService;
@@ -26,15 +24,13 @@ import com.zhuanche.serv.busManage.BusCommonService;
 import com.zhuanche.serv.busManage.BusInfoService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.excel.ExportExcelUtil;
-import com.zhuanche.util.objcompare.CompareObjectUtils;
-import com.zhuanche.util.objcompare.entity.BusCarCompareEntity;
-import com.zhuanche.vo.busManage.*;
-import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper;
-import mapper.mdbcarmanage.ex.SaasRolePermissionRalationExMapper;
+import com.zhuanche.vo.busManage.BusDetailVO;
+import com.zhuanche.vo.busManage.BusInfoVO;
+import com.zhuanche.vo.busManage.ErrorReason;
+import com.zhuanche.vo.busManage.ImportErrorVO;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -45,7 +41,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,7 +51,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
-import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -132,13 +126,13 @@ public class BusInfoController {
 
     @RequestMapping(value = "/saveCar", method = RequestMethod.POST)
     public AjaxResponse saveCar(@Validated BusCarSaveDTO busCarSaveDTO) {
-       if(busCarSaveDTO.getCarId()==null){
-           logger.info(LOG_PRE+"保存车辆信息，参数="+JSON.toJSONString(busCarSaveDTO));
-          return busInfoService.saveCar(busCarSaveDTO);
-       }else{
-           logger.info(LOG_PRE+"修改车辆信息，参数="+JSON.toJSONString(busCarSaveDTO));
-           return busInfoService.updateCarById(busCarSaveDTO);
-       }
+        if (busCarSaveDTO.getCarId() == null) {
+            logger.info(LOG_PRE + "保存车辆信息，参数=" + JSON.toJSONString(busCarSaveDTO));
+            return busInfoService.saveCar(busCarSaveDTO);
+        } else {
+            logger.info(LOG_PRE + "修改车辆信息，参数=" + JSON.toJSONString(busCarSaveDTO));
+            return busInfoService.updateCarById(busCarSaveDTO);
+        }
 
     }
 
@@ -339,7 +333,7 @@ public class BusInfoController {
                 saveErrorMsg(errList, rowIdx, 0, "数据为空");
                 continue;
             }
-           // BusCarInfo carInfo = new BusCarInfo();
+            // BusCarInfo carInfo = new BusCarInfo();
             BusCarSaveDTO saveDTO = new BusCarSaveDTO();
             boolean validFlag = true;
             // 循环列
