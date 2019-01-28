@@ -157,7 +157,7 @@ public class BusSupplierController {
 		
 		// 三、保存操作记录
 		if (isAdd) {
-			busBizChangeLogService.insertLog(BusinessType.SUPPLIER, String.valueOf(supplierId), "创建供应商", new Date());
+			busBizChangeLogService.insertLog(BusinessType.SUPPLIER, String.valueOf(baseDTO.getSupplierId()), "创建供应商", new Date());
 		} else {
 			List<Object> fresh = busSupplierService.getContents(supplierId);;
 			busSupplierService.saveChangeLog(supplierId, old, fresh);
