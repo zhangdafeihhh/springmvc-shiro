@@ -13,6 +13,7 @@ import com.zhuanche.common.web.Verify;
 import com.zhuanche.constants.busManage.BusConstant;
 import com.zhuanche.constants.busManage.BusConstant.CarConstant;
 import com.zhuanche.constants.busManage.EnumFuel;
+import com.zhuanche.dto.busManage.BusCarSaveDTO;
 import com.zhuanche.dto.busManage.BusInfoDTO;
 import com.zhuanche.entity.busManage.BusCarInfo;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
@@ -46,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -129,132 +131,15 @@ public class BusInfoController {
     }
 
     @RequestMapping(value = "/saveCar", method = RequestMethod.POST)
-    @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
-    })
-    public AjaxResponse saveCar(@Verify(param = "carId", rule = "") Integer carId, @Verify(param = "cityId", rule = "") Integer cityId,
-                                @Verify(param = "supplierId", rule = "") Integer supplierId,
-                                @Verify(param = "licensePlates", rule = "required") String licensePlates,
-                                @Verify(param = "groupId", rule = "required") Integer groupId,
-                                @Verify(param = "vehicleBrand", rule = "required") String vehicleBrand,
-                                @Verify(param = "modelDetail", rule = "") String modelDetail,
-                                @Verify(param = "color", rule = "required") String color,
-                                @Verify(param = "fuelType", rule = "required") String fuelType,
-                                @Verify(param = "transportNumber", rule = "required") String transportNumber,
-                                @Verify(param = "status", rule = "required") Integer status,
-                                String nextInspectDate,
-                                String nextMaintenanceDate,
-                                String nextOperationDate,
-                                String carPurchaseDate) {
+    public AjaxResponse saveCar(@Validated BusCarSaveDTO busCarSaveDTO) {
+       if(busCarSaveDTO.getCarId()==null){
+           logger.info(LOG_PRE+"保存车辆信息，参数="+JSON.toJSONString(busCarSaveDTO));
+          return busInfoService.saveCar(busCarSaveDTO);
+       }else{
+           logger.info(LOG_PRE+"修改车辆信息，参数="+JSON.toJSONString(busCarSaveDTO));
+           return busInfoService.updateCarById(busCarSaveDTO);
+       }
 
-        boolean checkResult = busInfoService.licensePlatesIfExist(licensePlates);
-        if (checkResult && carId == null) {
-            return AjaxResponse.fail(RestErrorCode.LICENSE_PLATES_EXIST);
-        }
-        //获取一下详情
-        BusDetailVO oldDetail = null;
-        if (checkResult && carId != null) {
-            oldDetail = busInfoService.getDetail(carId);
-            if (oldDetail == null) {
-                return AjaxResponse.fail(RestErrorCode.BUS_NOT_EXIST);
-            }
-            String licensePlatesOld = oldDetail.getLicensePlates();
-            if (!licensePlates.equals(licensePlatesOld)) {
-                return AjaxResponse.fail(RestErrorCode.LICENSE_PLATES_EXIST);
-            }
-        }
-        if (EnumFuel.getFuelNameByCode(fuelType) == null) {
-            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "燃料类型不存在");
-        }
-        //判断服务类型是否存在
-        boolean checkoutGroup = groupService.groupIfExist(groupId);
-        if (!checkoutGroup) {
-            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "服务类型有误");
-        }
-        //封装保存的参数
-        BusCarInfo carInfo = new BusCarInfo();
-        carInfo.setCarId(carId);
-        carInfo.setLicensePlates(licensePlates);
-        carInfo.setCityId(cityId);
-        carInfo.setSupplierId(supplierId);
-        carInfo.setGroupId(groupId);
-        carInfo.setVehicleBrand(vehicleBrand);
-        carInfo.setModelDetail(modelDetail);
-        //因为不填写车型所以默认为0
-        carInfo.setCarModelId(0);
-        carInfo.setColor(color);
-        carInfo.setFueltype(fuelType);
-        carInfo.setTransportnumber(transportNumber);
-        carInfo.setStatus(status);
-        try {
-            if (nextInspectDate != null) {
-                carInfo.setNextInspectDate(DateUtils.getDate1(nextInspectDate));
-            }
-            if (nextMaintenanceDate != null) {
-                carInfo.setNextMaintenanceDate(DateUtils.getDate1(nextMaintenanceDate));
-            }
-            if (nextOperationDate != null) {
-                carInfo.setNextOperationDate(DateUtils.getDate1(nextOperationDate));
-            }
-            if (carPurchaseDate != null) {
-                carInfo.setCarPurchaseDate(DateUtils.getDate1(carPurchaseDate));
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        //所属车主字段，默认供应商名称
-        String supplierName = supplierService.getSupplierNameById(carInfo.getSupplierId());
-        //Vehicle_owner
-        carInfo.setVehicleOwner(supplierName);
-        SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
-        Integer userId = currentLoginUser.getId();
-        carInfo.setUpdateBy(userId);
-        carInfo.setUpdateDate(new Date());
-        int saveResult = 0;
-        if (carId == null) {
-            carInfo.setCreateBy(userId);
-            carInfo.setCreateDate(new Date());
-            //保存车辆信息
-            logger.info(LOG_PRE + " 新增车辆" + JSON.toJSONString(carInfo));
-            saveResult = busInfoService.saveCar(carInfo);
-            if (saveResult > 0) {
-                busInfoService.saveCar2MongoDB(carInfo);
-                busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carInfo.getCarId()), "创建车辆", new Date());
-            }
-        } else {
-            //更新车辆信息
-            logger.info(LOG_PRE + currentLoginUser.getName() + " 修改车辆信息" + JSON.toJSONString(carInfo));
-            saveResult = busInfoService.updateCarById(carInfo);
-            if (saveResult > 0) {
-                busInfoService.update2mongoDB(carInfo);
-                saveUpdateLog(oldDetail,carId);
-            }
-        }
-        if (saveResult > 0) {
-            logger.info(LOG_PRE + currentLoginUser.getName() + "操作成功");
-            return AjaxResponse.success(null);
-        } else {
-            logger.info(LOG_PRE + currentLoginUser.getName() + "操作失败");
-            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
-        }
-    }
-
-    private void saveUpdateLog(BusDetailVO oldDetail,Integer carId){
-        BusCarCompareEntity oldRecord =new BusCarCompareEntity();
-        BeanUtils.copyProperties(oldDetail,oldRecord);
-        oldRecord.setFuelName(EnumFuel.getFuelNameByCode(oldDetail.getFuelType()));
-        oldRecord.setStatus(oldDetail.getStatus()==1?"有效":"无效");
-        //查询一下最新的信息
-        BusDetailVO carInfoNew = busInfoService.getDetail(carId);
-        BusCarCompareEntity newRecord = new BusCarCompareEntity();
-        BeanUtils.copyProperties(carInfoNew,newRecord);
-        newRecord.setStatus(carInfoNew.getStatus()==1?"有效":"无效");
-        newRecord.setFuelName(EnumFuel.getFuelNameByCode(carInfoNew.getFuelType()));
-        List<Object> objects = CompareObjectUtils.contrastObj(oldRecord, newRecord, null);
-        if(objects.size()!=0){
-            String join = StringUtils.join(objects, ",");
-            busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carId), join, new Date());
-        }
     }
 
     /**
@@ -454,7 +339,8 @@ public class BusInfoController {
                 saveErrorMsg(errList, rowIdx, 0, "数据为空");
                 continue;
             }
-            BusCarInfo carInfo = new BusCarInfo();
+           // BusCarInfo carInfo = new BusCarInfo();
+            BusCarSaveDTO saveDTO = new BusCarSaveDTO();
             boolean validFlag = true;
             // 循环列
             for (int colIdx = 0; colIdx < row.getLastCellNum(); colIdx++) {
@@ -501,7 +387,7 @@ public class BusInfoController {
                             validFlag = false;
                             break;
                         }
-                        carInfo.setLicensePlates(value);
+                        saveDTO.setLicensePlates(value);
                         break;
                     // 车型类别
                     case "车型类别名称":
@@ -516,7 +402,7 @@ public class BusInfoController {
                             validFlag = false;
                             break;
                         }
-                        carInfo.setGroupId(group.getGroupId());
+                        saveDTO.setGroupId(group.getGroupId());
                         break;
                     //车辆颜色
                     case "车辆颜色":
@@ -525,7 +411,7 @@ public class BusInfoController {
                             validFlag = false;
                             break;
                         }
-                        carInfo.setColor(value);
+                        saveDTO.setColor(value);
                         break;
                     //燃料类型
                     case "燃料类别":
@@ -540,7 +426,7 @@ public class BusInfoController {
                             validFlag = false;
                             break;
                         }
-                        carInfo.setFueltype(code);
+                        saveDTO.setFueltype(code);
                         break;
                     //运输证字号
                     case "运输证字号":
@@ -549,7 +435,7 @@ public class BusInfoController {
                             validFlag = false;
                             break;
                         }
-                        carInfo.setTransportnumber(value);
+                        saveDTO.setTransportnumber(value);
                         break;
                     //车厂厂牌
                     case "车辆厂牌":
@@ -558,17 +444,17 @@ public class BusInfoController {
                             validFlag = false;
                             break;
                         }
-                        carInfo.setVehicleBrand(value);
+                        saveDTO.setVehicleBrand(value);
                         break;
                     //具体车型
                     case "具体车型(选填)":
-                        carInfo.setModelDetail(value);
+                        saveDTO.setModelDetail(value);
                         break;
                     //下次车检时间
                     case "下次车检时间(选填)":
                         if (StringUtils.isNotBlank(value)) {
                             try {
-                                carInfo.setNextInspectDate(df.parse(transfTime(value)));
+                                saveDTO.setNextInspectDate(df.parse(transfTime(value)));
                             } catch (ParseException e) {
                                 saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 时间格式错误，例：2018-01-01");
                             }
@@ -578,7 +464,7 @@ public class BusInfoController {
                     case "下次维保时间(选填)":
                         if (StringUtils.isNotBlank(value)) {
                             try {
-                                carInfo.setNextMaintenanceDate(df.parse(transfTime(value)));
+                                saveDTO.setNextMaintenanceDate(df.parse(transfTime(value)));
                             } catch (ParseException e) {
                                 saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 时间格式错误，例：2018-01-01");
                             }
@@ -588,7 +474,7 @@ public class BusInfoController {
                     case "下次运营证检测时间(选填)":
                         if (StringUtils.isNotBlank(value)) {
                             try {
-                                carInfo.setNextOperationDate(df.parse(transfTime(value)));
+                                saveDTO.setNextOperationDate(df.parse(transfTime(value)));
                             } catch (ParseException e) {
                                 saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 时间格式错误，例：2018-01-01");
                             }
@@ -598,7 +484,7 @@ public class BusInfoController {
                     case "购买时间(选填)":
                         if (StringUtils.isNotBlank(value)) {
                             try {
-                                carInfo.setCarPurchaseDate(df.parse(transfTime(value)));
+                                saveDTO.setCarPurchaseDate(df.parse(transfTime(value)));
                             } catch (ParseException e) {
                                 saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 时间格式错误，例：2018-01-01");
                             }
@@ -610,27 +496,14 @@ public class BusInfoController {
 
             }// 列循环结束
             if (validFlag) {
-                carInfo.setCityId(cityId);
-                carInfo.setSupplierId(supplierId);
-                //所属车主默认供应商名称
-                carInfo.setVehicleOwner(supplierName);
-                SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
-                Integer userId = currentLoginUser.getId();
-                carInfo.setCreateBy(userId);
-                carInfo.setUpdateBy(userId);
-                //默认有效
-                carInfo.setStatus(1);
-                carInfo.setUpdateDate(new Date());
-                carInfo.setCreateDate(new Date());
-                int saveResult = busInfoService.saveCar(carInfo);
-                if (saveResult > 0) {
-                    busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carInfo.getCarId()), "创建车辆", new Date());
-                    busInfoService.saveCar2MongoDB(carInfo);
+                saveDTO.setCityId(cityId);
+                saveDTO.setSupplierId(supplierId);
+                AjaxResponse response = busInfoService.saveCar(saveDTO);
+                if (response.isSuccess()) {
                     successCount++;
                 }
             }
         }
-
         ImportErrorVO errorVO = new ImportErrorVO(total, successCount, (total - successCount), errList);
         //如果有错误信息将信息放到redis中以便下载
         if (errList.size() > 0) {
