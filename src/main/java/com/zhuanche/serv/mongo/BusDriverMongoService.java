@@ -1,5 +1,8 @@
 package com.zhuanche.serv.mongo;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
@@ -19,6 +22,8 @@ import com.zhuanche.mongo.DriverMongo;
  */
 @Service
 public class BusDriverMongoService {
+	
+	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 	@Autowired
 	private MongoTemplate driverMongoTemplate;
@@ -55,10 +60,19 @@ public class BusDriverMongoService {
 		driverMongo.setAttachmentName(saveDTO.getAttachmentName());
 		driverMongo.setBankAccountNo(saveDTO.getBankAccountNo());
 		driverMongo.setCreateBy(saveDTO.getCreateBy());
+		driverMongo.setCreateDate(new Date());
 		driverMongo.setDrivingLicenseType(saveDTO.getDrivingLicenseType());
 		driverMongo.setDrivingYears(saveDTO.getDrivingYears());
+		if (saveDTO.getExpireDate() != null) {
+			String expireDate = formatter.format(LocalDateTime.ofInstant(saveDTO.getExpireDate().toInstant(), ZoneId.systemDefault()));
+			driverMongo.setExpireDate(expireDate);
+		}
 		driverMongo.setGender(saveDTO.getGender());
 		driverMongo.setIdCardNo(saveDTO.getIdCardNo());
+		if (saveDTO.getIssueDate() != null) {
+			String issueDate = formatter.format(LocalDateTime.ofInstant(saveDTO.getIssueDate().toInstant(), ZoneId.systemDefault()));
+			driverMongo.setIssueDate(issueDate);
+		}
 		driverMongo.setLicensePlates(saveDTO.getLicensePlates());
 		driverMongo.setName(saveDTO.getName());
 		driverMongo.setPassword(saveDTO.getPassword());
@@ -69,7 +83,6 @@ public class BusDriverMongoService {
 		driverMongo.setStatus(saveDTO.getStatus());
 		driverMongo.setDutyStatus(0);
 		driverMongo.setServiceStatus(1);
-		driverMongo.setCreateDate(new Date());
 		driverMongo.setSuperintendNo(saveDTO.getSuperintendNo());
 		driverMongo.setSuperintendUrl(saveDTO.getSuperintendUrl());
 		driverMongo.setCooperationType(saveDTO.getCooperationType());
@@ -117,7 +130,8 @@ public class BusDriverMongoService {
 			update.set("drivingYears", saveDTO.getDrivingYears());
 		}
 		if (saveDTO.getExpireDate() != null) {
-			update.set("expireDate", saveDTO.getExpireDate());
+			String expireDate = formatter.format(LocalDateTime.ofInstant(saveDTO.getExpireDate().toInstant(), ZoneId.systemDefault()));
+			update.set("expireDate", expireDate);
 		}
 		if (saveDTO.getGender() != null) {
 			update.set("gender", saveDTO.getGender());
@@ -126,7 +140,8 @@ public class BusDriverMongoService {
 			update.set("idCardNo", saveDTO.getIdCardNo());
 		}
 		if (saveDTO.getIssueDate() != null) {
-			update.set("issueDate", saveDTO.getIssueDate());
+			String issueDate = formatter.format(LocalDateTime.ofInstant(saveDTO.getIssueDate().toInstant(), ZoneId.systemDefault()));
+			update.set("issueDate", issueDate);
 		}
 		if (saveDTO.getGroupId() != null && saveDTO.getGroupId() != 0) {
 			update.set("groupId", saveDTO.getGroupId());
