@@ -27,7 +27,7 @@ public class BusSupplierDetailDTO implements BusSupplierDTO {
 
 	/** 保证金 **/
 	@NotNull(message = "保证金不能为空")
-	@DecimalMin(value = "0", inclusive = false, message = "保证金必须大于0元")
+	@DecimalMin(value = "0", inclusive = true, message = "保证金必须大于或等于0元")
 	@DecimalMax(value = "9999999999.99", message = "保证金必须小于 9999999999.99 元")
 	private BigDecimal deposit;
 

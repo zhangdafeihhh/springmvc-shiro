@@ -29,11 +29,11 @@ public class BusSupplierRebateDTO {
 	private BigDecimal rebateRate;
 
 	/** 最小金额 **/
-	@DecimalMin(value = "0", inclusive = true, message = "最小金额必须大于0")
+	@DecimalMin(value = "0", inclusive = true, message = "最小金额必须大于等于0")
 	private BigDecimal minMoney;
 
 	/** 最大金额 **/
-	@DecimalMin(value = "0", inclusive = false, message = "最大金额必须大于0")
+	@DecimalMin(value = "0", inclusive = true, message = "最大金额必须大于等于0")
 	private BigDecimal maxMoney;
 
 	/** 开始时间 **/
