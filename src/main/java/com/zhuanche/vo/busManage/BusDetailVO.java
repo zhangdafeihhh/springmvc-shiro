@@ -24,9 +24,9 @@ public class BusDetailVO implements Serializable{
     private String vehicleBrand;
     private String modelDetail;
     private String color;
-    private String fuelType;
+    private String fueltype;
     private String fuelName;
-    private String transportNumber;
+    private String transportnumber;
     private Integer status;
     @JSONField(format = "yyyy-MM-dd")
     private Date nextInspectDate;
@@ -125,12 +125,12 @@ public class BusDetailVO implements Serializable{
         this.color = color;
     }
 
-    public String getFuelType() {
-        return fuelType;
+    public String getFueltype() {
+        return fueltype;
     }
 
-    public void setFuelType(String fuelType) {
-        this.fuelType = fuelType;
+    public void setFueltype(String fueltype) {
+        this.fueltype = fueltype;
     }
 
     public String getFuelName() {
@@ -141,12 +141,12 @@ public class BusDetailVO implements Serializable{
         this.fuelName = fuelName;
     }
 
-    public String getTransportNumber() {
-        return transportNumber;
+    public String getTransportnumber() {
+        return transportnumber;
     }
 
-    public void setTransportNumber(String transportNumber) {
-        this.transportNumber = transportNumber;
+    public void setTransportnumber(String transportnumber) {
+        this.transportnumber = transportnumber;
     }
 
     public Integer getStatus() {

@@ -222,14 +222,14 @@ public class BusInfoService {
     private void saveUpdateLog(BusDetailVO oldDetail, Integer carId) {
         BusCarCompareEntity oldRecord = new BusCarCompareEntity();
         BeanUtils.copyProperties(oldDetail, oldRecord);
-        oldRecord.setFuelName(EnumFuel.getFuelNameByCode(oldDetail.getFuelType()));
+        oldRecord.setFuelName(EnumFuel.getFuelNameByCode(oldDetail.getFueltype()));
         oldRecord.setStatus(oldDetail.getStatus() == 1 ? "有效" : "无效");
         //查询一下最新的信息
         BusDetailVO carInfoNew = this.getDetail(carId);
         BusCarCompareEntity newRecord = new BusCarCompareEntity();
         BeanUtils.copyProperties(carInfoNew, newRecord);
         newRecord.setStatus(carInfoNew.getStatus() == 1 ? "有效" : "无效");
-        newRecord.setFuelName(EnumFuel.getFuelNameByCode(carInfoNew.getFuelType()));
+        newRecord.setFuelName(EnumFuel.getFuelNameByCode(carInfoNew.getFueltype()));
         List<Object> objects = CompareObjectUtils.contrastObj(oldRecord, newRecord, null);
         if (objects.size() != 0) {
             String join = StringUtils.join(objects, ",");

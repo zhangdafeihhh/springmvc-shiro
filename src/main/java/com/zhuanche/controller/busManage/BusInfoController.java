@@ -124,7 +124,7 @@ public class BusInfoController {
         if (detail == null) {
             return AjaxResponse.failMsg(RestErrorCode.BUS_NOT_EXIST, "车辆信息不存在");
         }
-        String fuelName = EnumFuel.getFuelNameByCode(detail.getFuelType());
+        String fuelName = EnumFuel.getFuelNameByCode(detail.getFueltype());
         detail.setFuelName(fuelName);
         logger.info(LOG_PRE + "查询车辆详情结果" + JSON.toJSONString(detail));
         return AjaxResponse.success(detail);
@@ -203,10 +203,10 @@ public class BusInfoController {
             StringBuffer sb = new StringBuffer();
             //        String[] TEMPLATE_HEAD={"城市","供应商","车牌号","车型类别名称","车辆颜色","燃料类别","运输证字号","车辆厂牌","具体车型（选填）","下次车检时间（选填）","下次维保时间（选填）","下次运营证检测时间（选填）","购买时间（选填）"};
 
-            String fuelName = EnumFuel.getFuelNameByCode(info.getFuelType());
+            String fuelName = EnumFuel.getFuelNameByCode(info.getFueltype());
             sb.append(info.getCityName()).append(split).append(info.getSupplierName()).append(split).append(info.getLicensePlates()).append(split)
                     .append(info.getGroupName()).append(split).append(StringUtils.defaultString(info.getColor())).append(split).append(StringUtils.defaultString(fuelName)).append(split)
-                    .append(StringUtils.defaultString(info.getTransportNumber())).append(split)
+                    .append(StringUtils.defaultString(info.getTransportnumber())).append(split)
                     .append(StringUtils.defaultString(info.getVehicleBrand())).append(split).append(info.getModelDetail()).append(split)
                     .append(info.getNextInspectDate() == null ? StringUtils.EMPTY : DateUtils.formatDate(info.getNextInspectDate())).append(split)
                     .append(info.getNextMaintenanceDate() == null ? StringUtils.EMPTY : DateUtils.formatDate(info.getNextMaintenanceDate())).append(split)

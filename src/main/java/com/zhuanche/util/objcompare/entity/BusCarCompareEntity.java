@@ -31,7 +31,7 @@ public class BusCarCompareEntity {
     @FieldNote("燃料")
     private String fuelName;
     @FieldNote("运输证字号")
-    private String transportNumber;
+    private String transportnumber;
     @FieldNote("状态")
     private String status;
     @FieldNote(value="下次车检时间",pattern = FieldNote.Pattern.DATE)
@@ -108,12 +108,12 @@ public class BusCarCompareEntity {
         this.fuelName = fuelName;
     }
 
-    public String getTransportNumber() {
-        return transportNumber;
+    public String getTransportnumber() {
+        return transportnumber;
     }
 
-    public void setTransportNumber(String transportNumber) {
-        this.transportNumber = transportNumber;
+    public void setTransportnumber(String transportnumber) {
+        this.transportnumber = transportnumber;
     }
 
     public String getStatus() {

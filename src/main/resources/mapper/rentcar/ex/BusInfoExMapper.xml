@@ -39,8 +39,8 @@
         <result property="modelDetail" column="model_detail"/>
         <result property="status" column="status"/>
         <result property="color" column="color"/>
-        <result property="fuelType" column="fuelType"/>
-        <result property="transportNumber" column="transportNumber"/>
+        <result property="fueltype" column="fuelType"/>
+        <result property="transportnumber" column="transportNumber"/>
         <result property="createDate" column="create_date"/>
         <result property="vehicleBrand" column="vehicle_brand"/>
         <result property="nextInspectDate" column="next_inspect_date"/>
@@ -60,8 +60,8 @@
         <result property="vehicleBrand" column="vehicle_brand"/>
         <result property="modelDetail" column="model_detail"/>
         <result property="color" column="color"/>
-        <result property="fuelType" column="fuelType"/>
-        <result property="transportNumber" column="transportNumber"/>
+        <result property="fueltype" column="fuelType"/>
+        <result property="transportnumber" column="transportNumber"/>
         <result property="status" column="status"/>
         <result property="nextInspectDate" column="next_inspect_date"/>
         <result property="nextMaintenanceDate" column="next_maintenance_date"/>
