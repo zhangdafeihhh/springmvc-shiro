@@ -94,7 +94,7 @@ public interface BusConst {
 		String SETTLE_SUPPLIER_PRORATE_LIST = "/settle/supplier/prorate/list";
 		
 		/** 导出供应商分佣信息 **/
-		String SETTLE_EXPORT_SUPPLIER_INFO = "/settle/export/supplier/info";
+		String SETTLE_SUPPLIER_EXPORT_SUPPLIER_INFO = "/settle/supplier/export/supplier/info";
 
 		// =============================================结算单接口列表===================================================
 		/** 查询供应商的账单 **/

@@ -1104,7 +1104,7 @@ public class BusSupplierService implements BusConst {
 		params.put("supplierId", supplierId);
 		try {
 			logger.info("[ BusSupplierService-getSettleExportInfo ] 查询供应商列表导出结算相关信息,params={}", params);
-			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_EXPORT_SUPPLIER_INFO, params, 2000, "查询供应商列表导出结算相关信息");
+			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(orderPayUrl + Pay.SETTLE_SUPPLIER_EXPORT_SUPPLIER_INFO, params, 2000, "查询供应商列表导出结算相关信息");
 			if (result.getIntValue("code") == 0) {
 				JSONObject jsonObject = result.getJSONObject("data");
 				return jsonObject;
