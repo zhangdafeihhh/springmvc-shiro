@@ -1,9 +1,5 @@
 package com.zhuanche.controller.busManage;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -12,12 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.zhuanche.constants.busManage.BusConstant;
-import com.zhuanche.serv.busManage.BusCommonService;
-import com.zhuanche.shiro.realm.SSOLoginUser;
-import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.excel.CsvUtils;
-import mapper.mdbcarmanage.ex.SaasRolePermissionRalationExMapper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -39,6 +32,7 @@ import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.constants.busManage.BusConstant;
 import com.zhuanche.dto.busManage.BusCarDTO;
 import com.zhuanche.dto.busManage.BusDriverDTO;
 import com.zhuanche.dto.busManage.BusOrderDTO;
@@ -52,19 +46,19 @@ import com.zhuanche.entity.mdbcarmanage.BusOrderOperationTime;
 import com.zhuanche.entity.mdbcarmanage.CarBizOrderMessageTask;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.serv.busManage.BusAssignmentService;
+import com.zhuanche.serv.busManage.BusCommonService;
 import com.zhuanche.serv.busManage.BusOrderService;
 import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.DateUtils;
+import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.vo.busManage.OrderOperationProcessVO;
 
 import mapper.mdbcarmanage.BusOrderOperationTimeMapper;
 import mapper.mdbcarmanage.CarBizOrderMessageTaskMapper;
 import mapper.mdbcarmanage.ex.BusOrderOperationTimeExMapper;
+import mapper.mdbcarmanage.ex.SaasRolePermissionRalationExMapper;
 import mapper.rentcar.CarBizDriverInfoMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @Controller("busAssignmentController")
 @RequestMapping(value = "/busAssignment")
@@ -131,7 +125,8 @@ public class BusAssignmentController {
         }
         return AjaxResponse.success(pageDTO);
     }
-    @RequestMapping(value = "/exportOrder")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value = "/exportOrder")
     @MasterSlaveConfigs(configs=@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
     public void exportExcel(BusOrderDTO params, HttpServletRequest request, HttpServletResponse response) throws Exception{
 

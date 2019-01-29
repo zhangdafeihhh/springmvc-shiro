@@ -635,6 +635,10 @@ public class BusSupplierService implements BusConst {
 	 */
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public List<BusSupplierExportVO> querySupplierExportList(BusSupplierQueryDTO queryDTO) {
+		if (queryDTO.getSupplierRate() != null
+				&& (queryDTO.getSupplierRateIds() == null || queryDTO.getSupplierRateIds().isEmpty())) {
+			return new ArrayList<>();
+		}
 		List<BusSupplierExportVO> supplierList = busCarBizSupplierExMapper.querySupplierExportList(queryDTO);
 		return supplierList;
 	}
@@ -1336,10 +1340,41 @@ public class BusSupplierService implements BusConst {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private String compareSupplierContents(List<Object> oldList, List<Object> freshList) {
+	private String compareSupplierContents(List<Object> oldList, List<Object> freshList) throws InstantiationException, IllegalAccessException {
 		// 比对结果
 		List<String> result = new ArrayList<>(oldList.size());
-		for (int i = 0; i < oldList.size(); i++) {
+		// 其它list
+		int oldSize = oldList.size();
+		int freshSize = freshList.size();
+		String prefix = "";
+		int size = oldSize - freshSize;
+		if (Math.min(oldSize, freshSize) > 0) {
+			Object object = null;
+			StringBuilder builder = new StringBuilder(prefix);
+			if (size > 0) {
+				object = freshList.get(0);
+				builder.append("删除");
+				for (int i = 0; i < Math.abs(size); i++) {
+					freshList.add(object.getClass().newInstance());
+				}
+			}
+			if (size < 0) {
+				object = oldList.get(0);
+				builder.append("新增");
+				for (int i = 0; i < Math.abs(size); i++) {
+					oldList.add(object.getClass().newInstance());
+				}
+			}
+			if (object instanceof BusSupplierProrateCO) {
+				builder.append("结算比例:");
+			}
+			if (object instanceof BusSupplierRebateCO) {
+				builder.append("返点比例:");
+			}
+			prefix = builder.toString();
+		}
+
+		for (int i = 0; i < Math.max(oldSize, freshSize); i++) {
 			Object old = oldList.get(i);
 			Object fresh = freshList.get(i);
 			if (old instanceof List) {
@@ -1352,7 +1387,11 @@ public class BusSupplierService implements BusConst {
 				List<Object> list = CompareObjectUtils.contrastObj(old, fresh, null);
 				String join = StringUtils.join(list, CompareObjectUtils.separator);
 				if (StringUtils.isNotBlank(join)) {
-					result.add(join);
+					if (i >= Math.max(oldSize, freshSize) - Math.abs(size)) {
+						result.add(join = prefix + join);
+					} else {
+						result.add(join);
+					}
 				}
 			}
 		}
