@@ -1,6 +1,7 @@
 package com.zhuanche.controller.busManage;
 
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 
+import com.zhuanche.vo.busManage.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,9 +52,6 @@ import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.excel.ExportExcelUtil;
 import com.zhuanche.util.objcompare.CompareObjectUtils;
 import com.zhuanche.util.objcompare.entity.BusDriverCompareEntity;
-import com.zhuanche.vo.busManage.BusDriverDetailInfoVO;
-import com.zhuanche.vo.busManage.BusDriverInfoExportVO;
-import com.zhuanche.vo.busManage.BusDriverInfoPageVO;
 
 import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
 
@@ -516,10 +515,26 @@ public class BusDriverInfoController extends BusBaseController {
 		//下拉框位置
 		String[] downRows={"3","4","8"};
 		String[] heads=null;
+		List contentList=new ArrayList();
+		BusDriverImportTemplateVO templateVO=new BusDriverImportTemplateVO();
+		templateVO.setCityName("北京");
+		templateVO.setSupplierName("测试集团01");
+		templateVO.setName("例子");
+		templateVO.setGender("男");
+		templateVO.setGroupName("巴士49座");
+		templateVO.setIdCardNo("411122197812083555");
+		templateVO.setPhone("13712344567");
+		SimpleDateFormat sf =new SimpleDateFormat("yyyy-MM-dd");
+		templateVO.setBirthDay(sf.parse("1990-01-01"));
+		templateVO.setDrivingLicenseType("A1");
+		templateVO.setDriverLicenseNumber("1234567890");
+		templateVO.setIssueDate(sf.parse("2010-01-01"));
+		templateVO.setXyDriverNumber("1234567890");
 		//判断是否是运营角色
 		boolean roleBoolean = commonService.ifOperate();
 		if(roleBoolean){
 			heads=BusConstant.DriverContant.TEMPLATE_HEAD;
+			contentList.add(templateVO);
 		}else{
 			//非运营角色下载的模板不包括城市和供应商
 			heads=new String[BusConstant.DriverContant.TEMPLATE_HEAD.length-2];
@@ -527,8 +542,11 @@ public class BusDriverInfoController extends BusBaseController {
 			downRows[0]="1";
 			downRows[1]="2";
 			downRows[2]="6";
+			BusDriverBaseImportTemplateVO baseImportTemplateVO=new BusDriverBaseImportTemplateVO();
+			BeanUtils.copyProperties(templateVO,baseImportTemplateVO);
+			contentList.add(baseImportTemplateVO);
 		}
-		ExportExcelUtil.exportExcel(fileName, heads, downdata, downRows, request, response);
+		ExportExcelUtil.exportExcel(fileName, heads, downdata, downRows, contentList,request, response);
 	}
 	
     /**

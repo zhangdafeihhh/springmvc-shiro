@@ -27,12 +27,8 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.excel.ExportExcelUtil;
-import com.zhuanche.vo.busManage.BusDetailVO;
-import com.zhuanche.vo.busManage.BusInfoVO;
-import com.zhuanche.vo.busManage.ErrorReason;
-import com.zhuanche.vo.busManage.ImportErrorVO;
+import com.zhuanche.vo.busManage.*;
 import org.apache.commons.lang.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -41,6 +37,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -82,6 +79,7 @@ public class BusInfoController {
     @Autowired
     private BusCommonService commonService;
 
+    private static final String licensePlateTemplate="京A12345";
 
     /**
      * @Description:查询巴士车辆列表
@@ -229,6 +227,24 @@ public class BusInfoController {
         List<String[]> downdata = new ArrayList<>();
         downdata.add(groupNames);
         downdata.add(fuelNames);
+
+        //构建模板事例
+        List contentList=new ArrayList();
+        BusCarImportTemplateVO templateVO = new BusCarImportTemplateVO();
+        templateVO.setCityName("北京");
+        templateVO.setSupplierName("测试集团01");
+        templateVO.setLicensePlates(licensePlateTemplate);
+        templateVO.setGroupName("巴士18座");
+        templateVO.setColor("黄色");
+        templateVO.setFuelName("汽油");
+        templateVO.setVehicleBrand("宇通");
+        templateVO.setModelDetail("宇通ZK6908H9");
+        templateVO.setTransportnumber("粤交运管朝阳字123456 123456号");
+        SimpleDateFormat sf=new SimpleDateFormat("yyyy-MM-dd");
+        templateVO.setNextInspectDate(sf.parse("2008-01-01"));
+        templateVO.setNextMaintenanceDate(sf.parse("2019-01-01"));
+        templateVO.setNextOperationDate(sf.parse("2019-01-01"));
+        templateVO.setCarPurchaseDate(sf.parse("2011-01-01"));
         //判断是否是运营角色
         boolean roleBoolean = commonService.ifOperate();
         //文件表头
@@ -240,15 +256,19 @@ public class BusInfoController {
             head = CarConstant.TEMPLATE_HEAD;
             downRows[0] = "3";
             downRows[1] = "5";
+            contentList.add(templateVO);
         } else {
             //非运营角色下载的模板不包括城市和供应商
             head = new String[CarConstant.TEMPLATE_HEAD.length - 2];
             System.arraycopy(CarConstant.TEMPLATE_HEAD, 2, head, 0, CarConstant.TEMPLATE_HEAD.length - 2);
             downRows[0] = "1";
             downRows[1] = "3";
+            BusCarBaseImportTemplateVO busCarBaseImportTemplateVO = new BusCarBaseImportTemplateVO();
+            BeanUtils.copyProperties(templateVO,busCarBaseImportTemplateVO);
+            contentList.add(busCarBaseImportTemplateVO);
         }
-        //表示生成的下拉框在第三列和第五列
-        ExportExcelUtil.exportExcel(fileName, head, downdata, downRows, request, response);
+
+        ExportExcelUtil.exportExcel(fileName, head, downdata, downRows, contentList,request, response);
     }
 
 
@@ -313,20 +333,39 @@ public class BusInfoController {
             logger.error(LOG_PRE + "巴士导入车辆文件表头内容错误");
             return AjaxResponse.fail(RestErrorCode.FILE_TRMPLATE_ERROR);
         }
-        // 过滤掉标题，从第一行开始导入数据
-        int start = 1;
-        // 要导入数据的总条数
-        int total = sheet.getLastRowNum();
-        if (total == 0) {
+
+        // 最后一行数据的下标，刚好可以表示总数据条数（标题不算）
+        int listDataIdx=sheet.getLastRowNum();
+        int total =listDataIdx;
+        if (listDataIdx == 0) {
             logger.error(LOG_PRE + "巴士导入车辆文件内容为空");
             return AjaxResponse.fail(RestErrorCode.BUS_NOT_EXIST);
+        }
+        //判断除了标题外，判断下标1有没有样例数据，如果有从下标2开始读取数据，没有，则从下标1开始读取
+        int licensePlateIdx=0;
+        for(int i=0;i<heads.length;i++){
+            if(heads[i].equals("车牌号")){
+                licensePlateIdx=i;
+                break;
+            }
+        }
+        //读取数据开始行的下标
+        int start = 1;
+        //京A12345 为导出模板时写入的样例数据
+        Row rowDataFirst = sheet.getRow(1);
+        Cell cellFirst = rowDataFirst.getCell(licensePlateIdx);
+        String licenseFirst = readCellValue(cellFirst);
+        if(licensePlateTemplate.equals(licenseFirst)){
+            start = 2;
+            //过滤掉样例，总的条数需要-1；
+            total=total-1;
         }
         // 成功导入条数
         int successCount = 0;
         List<ErrorReason> errList = new ArrayList();
         logger.info(LOG_PRE + "巴士导入车辆，总条数=" + total);
         //循环行
-        for (int rowIdx = start; rowIdx <= total; rowIdx++) {
+        for (int rowIdx = start; rowIdx <= listDataIdx; rowIdx++) {
             // 获取行对象
             Row row = sheet.getRow(rowIdx);
             if (row == null) {
@@ -545,11 +584,18 @@ public class BusInfoController {
         String value = null;
         switch (cellType) {
             case Cell.CELL_TYPE_NUMERIC:
-                if (HSSFDateUtil.isCellDateFormatted(cell)) {
-                    //  如果是date类型则 ，获取该cell的date值
+                short format = cell.getCellStyle().getDataFormat();
+                SimpleDateFormat sdf = null;
+                if (format == 14 || format == 31 || format == 57 || format == 58) {
+                    //日期
+                    sdf = new SimpleDateFormat("yyyy-MM-dd");
                     Date val = cell.getDateCellValue();
-                    DateFormat formater = new SimpleDateFormat("yyyy-MM-dd");
-                    value = formater.format(val);
+                    value = sdf.format(val);
+                } else if (format == 20 || format == 32) {
+                    //时间
+                    sdf = new SimpleDateFormat("HH:mm");
+                    Date val = cell.getDateCellValue();
+                    value = sdf.format(val);
                 } else { // 纯数字 只保留整数部分
                     DecimalFormat df = new DecimalFormat("########");
                     value = df.format(cell.getNumericCellValue());

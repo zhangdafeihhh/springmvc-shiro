@@ -534,8 +534,8 @@ public class ExportExcelUtil<T> {
      * @throws Exception
      */
     public static  void exportExcel(String filename, String[] handers,
-                                    List<String[]> downData, String[] downRows, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        Workbook workbook = ExportTemplateUtil.createExcelTemplate(handers, downData, downRows);
+                                    List<String[]> downData, String[] downRows, List contentList,HttpServletRequest request, HttpServletResponse response) throws Exception {
+        Workbook workbook = ExportTemplateUtil.createExcelTemplate(handers, downData, downRows,contentList);
         filename = filename + DateUtil.dateFormat(new Date(), DateUtil.intTimestampPattern);
         //获得浏览器信息并转换为大写
         String agent = request.getHeader("User-Agent").toUpperCase();

@@ -2,6 +2,7 @@ package com.zhuanche.serv.busManage;
 
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -1021,7 +1022,19 @@ public class BusCarBizDriverInfoService implements BusConst {
             // 处理导入数据
             int startIndex = 1;// 过滤掉标题，从第一行开始导入数据
             int endIndex = sheet.getLastRowNum(); // 要导入数据的总条数
-
+            int driverNameIdx=0;
+            for(int i=0;i<heads.length;i++){
+                if(heads[i].equals("司机姓名(必填)")){
+                    driverNameIdx=i;
+                    break;
+                }
+            }
+            Row dataRowFirst = sheet.getRow(1);
+            Cell driverNameCell = dataRowFirst.getCell(driverNameIdx);
+            String driverName = getCellValue(driverNameCell, evaluator);
+            if("例子".equals(driverName)){
+                startIndex=2;
+            }
             if (endIndex > 10000) {
                 return AjaxResponse.failMsg(RestErrorCode.FILE_ERROR, "导入数据过大（count>10000）,建议分批导入");
             }
@@ -1269,12 +1282,21 @@ public class BusCarBizDriverInfoService implements BusConst {
         // 以下是判断数据的类型
         switch (cell.getCellType()) {
             case Cell.CELL_TYPE_NUMERIC: // 数字
-                if (HSSFDateUtil.isCellDateFormatted(cell)) {
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                    cellStringValue = sdf.format(HSSFDateUtil.getJavaDate(cell.getNumericCellValue())).toString();
-                } else {
-                    DataFormatter dataFormatter = new DataFormatter();
-                    cellStringValue = dataFormatter.formatCellValue(cell);
+                short format = cell.getCellStyle().getDataFormat();
+                SimpleDateFormat sdf = null;
+                if (format == 14 || format == 31 || format == 57 || format == 58) {
+                    //日期
+                    sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    Date val = cell.getDateCellValue();
+                    cellStringValue = sdf.format(val);
+                } else if (format == 20 || format == 32) {
+                    //时间
+                    sdf = new SimpleDateFormat("HH:mm");
+                    Date val = cell.getDateCellValue();
+                    cellStringValue = sdf.format(val);
+                } else { // 纯数字 只保留整数部分
+                    DecimalFormat df = new DecimalFormat("########");
+                    cellStringValue = df.format(cell.getNumericCellValue());
                 }
                 break;
             case Cell.CELL_TYPE_STRING: // 字符串
