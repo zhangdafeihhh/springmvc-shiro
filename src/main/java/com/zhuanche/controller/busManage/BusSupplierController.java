@@ -272,6 +272,9 @@ public class BusSupplierController {
 					supplierRateIds.add(supplierRateId);
 				}
 			});
+			if (supplierRateIds.isEmpty()) {
+				return AjaxResponse.success(new PageDTO(queryDTO.getPageNum(), queryDTO.getPageSize(), 0, new ArrayList<>()));
+			}
 			queryDTO.setSupplierRateIds(supplierRateIds);
 		}
 		// 一、查询供应商列表（如果有合同快到期的情况下）

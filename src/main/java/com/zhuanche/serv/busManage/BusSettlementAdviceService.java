@@ -222,6 +222,8 @@ public class BusSettlementAdviceService implements BusConst {
     				return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, uploadErrorMsg);
     			}
     		}
+		} else {
+			logger.info("[ BusSettlementAdviceService-saveInvoiceInfo ] 本次无上传的附件,supplierBillId={}", invoiceDTO.getSupplierBillId());
 		}
         return AjaxResponse.success(null);
     }
