@@ -531,6 +531,8 @@ public class BusInfoController {
             if (validFlag) {
                 saveDTO.setCityId(cityId);
                 saveDTO.setSupplierId(supplierId);
+                //默认有效
+                saveDTO.setStatus(1);
                 AjaxResponse response = busInfoService.saveCar(saveDTO);
                 if (response.isSuccess()) {
                     successCount++;

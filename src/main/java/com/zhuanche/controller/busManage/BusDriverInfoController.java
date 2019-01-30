@@ -522,7 +522,7 @@ public class BusDriverInfoController extends BusBaseController {
 		templateVO.setName("例子");
 		templateVO.setGender("男");
 		templateVO.setGroupName("巴士49座");
-		templateVO.setIdCardNo("411122197812083555");
+		templateVO.setIdCardNo("130102199003079710");
 		templateVO.setPhone("13712344567");
 		SimpleDateFormat sf =new SimpleDateFormat("yyyy-MM-dd");
 		templateVO.setBirthDay(sf.parse("1990-01-01"));
