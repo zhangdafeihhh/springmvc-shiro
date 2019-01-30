@@ -337,10 +337,7 @@ public class BusInfoController {
         // 最后一行数据的下标，刚好可以表示总数据条数（标题不算）
         int listDataIdx=sheet.getLastRowNum();
         int total =listDataIdx;
-        if (listDataIdx == 0) {
-            logger.error(LOG_PRE + "巴士导入车辆文件内容为空");
-            return AjaxResponse.fail(RestErrorCode.BUS_NOT_EXIST);
-        }
+
         //判断除了标题外，判断下标1有没有样例数据，如果有从下标2开始读取数据，没有，则从下标1开始读取
         int licensePlateIdx=0;
         for(int i=0;i<heads.length;i++){
@@ -359,6 +356,10 @@ public class BusInfoController {
             start = 2;
             //过滤掉样例，总的条数需要-1；
             total=total-1;
+        }
+        if (total == 0) {
+            logger.error(LOG_PRE + "巴士导入车辆文件内容为空");
+            return AjaxResponse.fail(RestErrorCode.BUS_NOT_EXIST);
         }
         // 成功导入条数
         int successCount = 0;
