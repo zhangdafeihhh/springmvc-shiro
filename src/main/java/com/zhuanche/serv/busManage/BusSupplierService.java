@@ -1290,7 +1290,11 @@ public class BusSupplierService implements BusConst {
 					list.add(prorateCO);
 				});
 				return list;
-			}).orElseGet(ArrayList::new);
+			}).orElseGet(() -> {
+				List<BusSupplierProrateCO> list = new ArrayList<>();
+				list.add(new BusSupplierProrateCO());
+				return list;
+			});
 			// 返点比例
 			List<BusSupplierRebateCO> rebateList = Optional.ofNullable((JSONArray) getRemoteRebateInfo(supplierId)).map(jsonArray -> {
 				List<BusSupplierRebateCO> list = new ArrayList<>();
@@ -1306,7 +1310,11 @@ public class BusSupplierService implements BusConst {
 					list.add(rebateCO);
 				});
 				return list;
-			}).orElseGet(ArrayList::new);
+			}).orElseGet(() -> {
+				List<BusSupplierRebateCO> list = new ArrayList<>();
+				list.add(new BusSupplierRebateCO());
+				return list;
+			});
 			
 			resultList.add(supplierCO);
 			resultList.add(detailCO);
@@ -1341,6 +1349,9 @@ public class BusSupplierService implements BusConst {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private String compareSupplierContents(List<Object> oldList, List<Object> freshList) throws InstantiationException, IllegalAccessException {
+		
+		logger.info("[ BusSupplierService-compareSupplierContents ] 对比操作记录, oldList={}, freshList={}", oldList, freshList);
+		
 		// 比对结果
 		List<String> result = new ArrayList<>(oldList.size());
 		// 其它list
