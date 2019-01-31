@@ -1289,6 +1289,9 @@ public class BusSupplierService implements BusConst {
 					
 					list.add(prorateCO);
 				});
+				if (jsonArray.isEmpty()) {
+					list.add(new BusSupplierProrateCO());
+				}
 				return list;
 			}).orElseGet(() -> {
 				List<BusSupplierProrateCO> list = new ArrayList<>();
@@ -1309,6 +1312,9 @@ public class BusSupplierService implements BusConst {
 					
 					list.add(rebateCO);
 				});
+				if (jsonArray.isEmpty()) {
+					list.add(new BusSupplierRebateCO());
+				}
 				return list;
 			}).orElseGet(() -> {
 				List<BusSupplierRebateCO> list = new ArrayList<>();
