@@ -81,7 +81,7 @@ public class BusOrderVO {    // carGroupName  riderCount  factDate   factStartAd
 	// 企业名称
 	private String companyName;
 	// 企业折扣
-	private Integer percent;
+	private Double percent;
 
 	public Integer getOrderId() {
 		return orderId;
@@ -371,11 +371,11 @@ public class BusOrderVO {    // carGroupName  riderCount  factDate   factStartAd
 		this.companyName = companyName;
 	}
 
-	public Integer getPercent() {
+	public Double getPercent() {
 		return percent;
 	}
 
-	public void setPercent(Integer percent) {
+	public void setPercent(Double percent) {
 		this.percent = percent;
 	}
 

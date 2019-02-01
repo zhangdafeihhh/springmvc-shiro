@@ -230,7 +230,7 @@ public class BusAssignmentService {
                                 }).findFirst().ifPresent(business -> {
                                     JSONObject jsonObject = (JSONObject) JSON.toJSON(business);
                                     order.setCompanyType(jsonObject.getInteger("type"));
-                                    order.setPercent(jsonObject.getInteger("percent"));
+                                    order.setPercent(jsonObject.getDouble("percent"));
                                 });
                             }
                         });
