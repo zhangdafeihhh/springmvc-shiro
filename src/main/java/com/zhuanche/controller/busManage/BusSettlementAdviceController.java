@@ -14,6 +14,7 @@ import com.zhuanche.constants.busManage.BusConstant;
 import com.zhuanche.constants.busManage.BusConstant.SupplierMaidConstant;
 import com.zhuanche.constants.busManage.EnumServiceType;
 import com.zhuanche.dto.busManage.*;
+import com.zhuanche.entity.busManage.BusCostDetail;
 import com.zhuanche.entity.busManage.BusOrderDetail;
 import com.zhuanche.entity.rentcar.CarBizService;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
@@ -372,6 +373,7 @@ public class BusSettlementAdviceController {
         maps.forEach(o -> {
             groupMap.put(Integer.parseInt(String.valueOf(o.get("groupId"))), String.valueOf(o.get("groupName")));
         });
+        //批量调用订单接口
         List<BusOrderExVO> orderExVOS = busAssignmentService.queryOrderDetailByOrderNos(StringUtils.join(orderNos, ","));
         Map<String, BusOrderExVO> orderMap = new HashMap<>(30);
         Map<Integer,String>driverNameMap=new HashMap<>();
@@ -402,22 +404,38 @@ public class BusSettlementAdviceController {
                 orderMap.put(order.getOrderNo(), order);
             });
         }
+        
+        //批量调用计费接口
+        Map<String, BusCostDetail> orderCostMap = new HashMap<>();
+        JSONArray busCostList = busAssignmentService.getBusCostDetailList(StringUtils.join(orderNos, ","));
+		if (busCostList != null && !busCostList.isEmpty()) {
+			busCostList.stream().map(o -> JSONObject.toJavaObject((JSONObject) o, BusCostDetail.class))
+					.forEach(cost -> {
+						orderCostMap.put(cost.getOrderNo(), cost);
+					});
+		}
 
         //处理返回结果
         List<BusSettleOrderListVO> collect = array.stream().map(o -> (JSONObject) o).map(o -> {
             BusSettleOrderListVO settleVO = JSONObject.toJavaObject(o, BusSettleOrderListVO.class);
             String orderNo = settleVO.getOrderNo();
-            BusOrderExVO order = orderMap.get(orderNo);
-            if (order != null) {
-                settleVO.setOrderCreateDate(order.getCreateDate());
-                settleVO.setBookingDate(order.getBookingDate());
-                settleVO.setBookingEndAddr(order.getBookingEndAddr());
-                settleVO.setBookingStartAddr(order.getBookingStartAddr());
-                settleVO.setDriverName(order.getDriverName());
-                settleVO.setServiceName(order.getServiceTypeName());
-                settleVO.setBookingGroupName(order.getBookingGroupName());
-                settleVO.setEstimatedAmountYuan(order.getEstimatedAmountYuan());
-            }
+            // 订单信息
+			BusOrderExVO order = orderMap.get(orderNo);
+			if (order != null) {
+				settleVO.setOrderCreateDate(order.getCreateDate());
+				settleVO.setBookingDate(order.getBookingDate());
+				settleVO.setBookingEndAddr(order.getBookingEndAddr());
+				settleVO.setBookingStartAddr(order.getBookingStartAddr());
+				settleVO.setDriverName(order.getDriverName());
+				settleVO.setServiceName(order.getServiceTypeName());
+				settleVO.setBookingGroupName(order.getBookingGroupName());
+				settleVO.setEstimatedAmountYuan(order.getEstimatedAmountYuan());
+			}
+			// 计费信息
+			BusCostDetail cost = orderCostMap.get(orderNo);
+			if (cost != null) {
+				settleVO.setAmount(cost.getAmount());
+			}
             return settleVO;
         }).collect(Collectors.toList());
         PageDTO page = new PageDTO(data.getInteger("pageNo"), data.getInteger("pageSize"), data.getLong("total"), collect);

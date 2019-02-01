@@ -33,6 +33,8 @@ public class BusSettleOrderListVO {
     private String bookingGroupName;
     //预估金额
     private Double estimatedAmountYuan;
+    //订单总金额
+ 	private BigDecimal amount;
 
     private String orderDetail;
 
@@ -148,7 +150,15 @@ public class BusSettleOrderListVO {
         this.bookingGroupName = bookingGroupName;
     }
 
-    @Override
+    public BigDecimal getAmount() {
+		return amount;
+	}
+
+	public void setAmount(BigDecimal amount) {
+		this.amount = amount;
+	}
+
+	@Override
     public String toString() {
         //http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=28755726
         String typeName = "";
