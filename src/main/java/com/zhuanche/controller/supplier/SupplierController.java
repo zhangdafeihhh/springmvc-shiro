@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.entity.rentcar.CarBizCooperationType;
 import com.zhuanche.entity.rentcar.CarBizSupplierQuery;
 import com.zhuanche.entity.rentcar.CarBizSupplierVo;
@@ -20,6 +21,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.zhuanche.common.enums.MenuEnum.*;
+
 @RequestMapping("/supplier")
 @Controller
 public class SupplierController {
@@ -33,6 +36,7 @@ public class SupplierController {
 
     @RequestMapping("/datalist")
     @ResponseBody
+    @RequestFunction(menu = SUPPLIER_LIST)
     public AjaxResponse getSupplierDataList(String supplierFullName, Integer supplierCity,
                                             Integer status, Integer cooperationType, Integer enterpriseType,
                                             @RequestParam(defaultValue = "1") Integer pageNum,
@@ -69,18 +73,21 @@ public class SupplierController {
 
     @RequestMapping("/addSupplier")
     @ResponseBody
+    @RequestFunction(menu = SUPPLIER_ADD)
     public AjaxResponse addSupplier(CarBizSupplierVo supplier){
         return supplierService.saveSupplierInfo(supplier);
     }
 
     @RequestMapping("/updateSupplier")
     @ResponseBody
+    @RequestFunction(menu = SUPPLIER_UPDATE)
     public AjaxResponse updateSupplier(CarBizSupplierVo supplier){
         return supplierService.saveSupplierInfo(supplier);
     }
 
     @RequestMapping("/cooperationType")
     @ResponseBody
+    @RequestFunction(menu = SUPPLIER_COOPERATION_TYPE)
     public AjaxResponse getCooperationType(){
         List<CarBizCooperationType> carBizCooperationTypes = cooperationTypeService.queryCarBizCooperationTypeList();
         return AjaxResponse.success(carBizCooperationTypes);
@@ -88,12 +95,14 @@ public class SupplierController {
 
     @RequestMapping("/querySupplierById")
     @ResponseBody
+    @RequestFunction(menu = SUPPLIER_DETAIL)
     public AjaxResponse getSupplierInfoById(Integer supplierId){
         return supplierService.querySupplierById(supplierId);
     }
 
     @RequestMapping("/checkSupplierFullName")
     @ResponseBody
+    @RequestFunction(menu = SUPPLIER_CHECK_NAME)
     public AjaxResponse checkSupplierFullName(String supplierFullName){
         return supplierService.checkSupplierFullName(supplierFullName);
     }

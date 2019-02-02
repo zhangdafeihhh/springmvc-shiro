@@ -143,10 +143,12 @@ public class HttpRequestStatisticsInterceptor implements HandlerInterceptor,  In
 			Method method = ((HandlerMethod)handler).getMethod();
 			RequestFunction requestFunction = method.getAnnotation(RequestFunction.class);
 			if(requestFunction!=null) {
-		        opLog.setRequestFuncName1( requestFunction.name1() );                             
-		        opLog.setRequestFuncName2( requestFunction.name2() );
-		        opLog.setRequestFuncName3( requestFunction.name3() );
-		        opLog.setRequestFuncName4( requestFunction.name4() );
+				if (requestFunction.menu() != null){
+					opLog.setRequestFuncName1( requestFunction.menu().getLevelOne() );
+					opLog.setRequestFuncName2( requestFunction.menu().getLevelTwo() );
+					opLog.setRequestFuncName3( requestFunction.menu().getLevelThree() );
+					opLog.setRequestFuncName4( requestFunction.menu().getLevelFour() );
+				}
 			}
 		}
         opLog.setRequestMethod(request.getMethod().toUpperCase());   //请求方法

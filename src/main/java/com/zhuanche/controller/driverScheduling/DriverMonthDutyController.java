@@ -6,9 +6,9 @@ import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.dutyEnum.EnumDriverMonthDutyStatus;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.dto.CarDriverInfoDTO;
-import com.zhuanche.dto.driver.CarDriverDayDutyDTO;
 import com.zhuanche.dto.driverDuty.CarDriverMonthDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverMonthDuty;
 import com.zhuanche.request.CommonRequest;
@@ -46,10 +46,11 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static com.zhuanche.common.enums.MenuEnum.*;
 
 
 /**
@@ -89,6 +90,7 @@ public class DriverMonthDutyController {
     @ResponseBody
     @RequestMapping(value = "/importDriverMonthDutyInfo")
 	@RequiresPermissions(value = { "DriverWorkManage_import" } )
+    @RequestFunction(menu = DRIVER_DUTY_MANAGE_IMPORT)
     public AjaxResponse importDriverMonthDutyInfo(DriverMonthDutyRequest params,HttpServletRequest request,MultipartFile file){
         //TODO
         logger.info("导入月排班模板数据入参："+JSON.toJSONString(params));
@@ -127,6 +129,7 @@ public class DriverMonthDutyController {
     */ 
     @ResponseBody
     @RequestMapping(value = "/updateDriverMonthDutyData")
+    @RequestFunction(menu = DRIVER_DUTY_MANAGE_UPDATE)
     public AjaxResponse updateDriverMonthDutyData(DriverMonthDutyRequest param){
         if(Check.NuNObj(param) || Check.NuNObj(param.getId()) || Check.NuNStr(param.getData())){
             return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
@@ -172,6 +175,7 @@ public class DriverMonthDutyController {
     @ResponseBody
     @RequestMapping("/exportDriverMonthDuty")
 	@RequiresPermissions(value = { "DriverWorkManage_export" } )
+    @RequestFunction(menu = DRIVER_DUTY_MANAGE_EXPORT)
     public String exportDriverMonthDuty(DriverMonthDutyRequest param, HttpServletRequest request,HttpServletResponse response){
         logger.info("下载月排班列表数据入参:"+JSON.toJSONString(param));
         long start = System.currentTimeMillis();
@@ -349,6 +353,7 @@ public class DriverMonthDutyController {
     @ResponseBody
     @RequestMapping(value = "/queryDriverMonthDutyData")
 	@RequiresPermissions(value = { "DriverWorkManage_look" } )
+    @RequestFunction(menu = DRIVER_DUTY_MANAGE_LIST)
     public AjaxResponse queryDriverMonthDutyData(DriverMonthDutyRequest param) {
         logger.info("查询月排班列表数据入参:"+JSON.toJSONString(param));
         if(Check.NuNStr(param.getMonitorDate())){
@@ -388,6 +393,7 @@ public class DriverMonthDutyController {
     @RequestMapping(value = "/downloadTemplateMonthDuty")
 	@RequiresPermissions(value = { "DriverWorkManage_demo" } )
     @ResponseBody
+    @RequestFunction(menu = DRIVER_DUTY_MANAGE_TEMPLATE_DOWNLOAD)
     public synchronized void downloadTemplateMonthDuty(DriverMonthDutyRequest param,HttpServletRequest request, HttpServletResponse response) {
         logger.info("downloadTemplateMonthDuty:下载 司机月排行 导入模板"+"--入参:"+ JSON.toJSONString(param));
 

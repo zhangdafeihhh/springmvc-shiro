@@ -1,7 +1,6 @@
 package com.zhuanche.controller.driverdutystatistic;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -10,6 +9,7 @@ import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.controller.DriverQueryController;
@@ -18,21 +18,12 @@ import com.zhuanche.entity.mdbcarmanage.DriverDutyStatistic;
 import com.zhuanche.entity.mdbcarmanage.DriverDutyStatisticParams;
 import com.zhuanche.entity.mdblog.StatisticDutyHalf;
 import com.zhuanche.entity.mdblog.StatisticDutyHalfParams;
-import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.serv.DriverDutyStatisticService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.excel.CsvUtils;
-import mapper.mdbcarmanage.ex.DriverDutyStatisticExMapper;
 import mapper.mdblog.ex.StatisticDutyHalfExMapper;
-import mapper.rentcar.ex.CarBizCityExMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,13 +34,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static com.zhuanche.common.enums.MenuEnum.*;
 
 /**
  * 司机考勤查询
@@ -92,6 +85,7 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})
+	@RequestFunction(menu = DRIVER_ATTENDANCE_REPORT_LIST)
 	public AjaxResponse driverDutyStatisticDailData(@Verify(param = "cityId",rule = "required") String cityId, @Verify(param = "supplierId",rule = "required")String supplierId, String teamId,
 			String groupIds, String name, String driverId, String  phone, String licensePlates,
 			@Verify(param = "startTime",rule = "required") String startTime, String endTime, String sortName, String sortOrder, Integer page, Integer pageSize, Integer reportType) throws ParseException {
@@ -177,6 +171,7 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})
+	@RequestFunction(menu = DRIVER_ATTENDANCE_REPORT_DETAIL)
 	public AjaxResponse driverDutyStatisticHalfData(@Verify(param = "driverId",rule = "required") String driverId,@Verify(param = "time",rule = "required") String time, Integer page, Integer pageSize) throws ParseException {
 
 		StatisticDutyHalfParams params = new StatisticDutyHalfParams(driverId, time, page, pageSize);
@@ -314,6 +309,7 @@ public class DriverDutyStatisticController extends DriverQueryController{
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})
+	@RequestFunction(menu = DRIVER_ATTENDANCE_REPORT_EXPORT)
 	public AjaxResponse exportDriverDutyStatistic(
 			@Verify(param = "cityId",rule = "required") String cityId,
 			@Verify(param = "supplierId",rule = "required")String supplierId, String teamId,
@@ -475,8 +471,6 @@ public class DriverDutyStatisticController extends DriverQueryController{
 		List<DriverDutyStatisticDTO> dtoList = driverDutyStatisticService.selectSuppierNameAndCityName(list);
 		dataTrans(dtoList,csvDataList,reportType);
 		entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
-
-
 	}
 
 }

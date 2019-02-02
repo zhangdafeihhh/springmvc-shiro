@@ -55,8 +55,6 @@ public class AllianceCheckController{
 			* @param pageSize	每页记录数
 			* @param orderByColumnCode	排序字段代码 （1：司机ID 2：入职日期 3：累计差评数 4：完成订单 5：差评数）
 			* @param orderTypeCode	排序方式代码（1：升序 2：降序）
-			* @param visibleAllianceIds	可见加盟商ID
-			* @param visibleCityIds	可见城市ID
 		    * @return
 		  */
 		@ResponseBody
@@ -103,8 +101,6 @@ public class AllianceCheckController{
 		   	* @param queryDate	查询日期
 			* @param allianceId	加盟商ID
 			* @param cityId	城市ID
-			* @param visibleAllianceIds	可见加盟商ID
-			* @param visibleCityIds	可见城市ID
 			* @param orderByColumnCode	排序字段代码 （1：司机ID 2：入职日期 3：累计差评数 4：完成订单 5：差评数）
 			* @param orderTypeCode	排序方式代码（1：升序 2：降序）
 		    * @return
@@ -144,14 +140,6 @@ public class AllianceCheckController{
 					saasBigdataApiUrl+"/allianceCheck/download" ,
 					new String("加盟商考核".getBytes("gb2312"), "iso8859-1"),
 					request.getRealPath("/")+File.separator+"template"+File.separator+"alliancecheck_info.csv");
-						
-			   
-	       /* statisticalAnalysisService.downloadCsvFromTemplet(jsonString,
-	        		saasBigdataApiUrl+"/allianceCheck/download" ,
-					request.getRealPath("/")+File.separator+"template"+File.separator+"alliancecheck_info.csv");
-			statisticalAnalysisService.exportCsvFromTemplet(response,
-					new String("加盟商考核".getBytes("gb2312"), "iso8859-1"),
-					request.getRealPath("/")+File.separator+"template"+File.separator+"alliancecheck_info.csv");*/
       } catch (Exception e) {
           e.printStackTrace();
       }

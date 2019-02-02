@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.util.dateUtil.DateUtil;
 import com.zhuanche.util.excel.CsvUtils;
@@ -38,6 +39,8 @@ import mapper.driver.ex.DriverJoinRecordExMapper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import static com.zhuanche.common.enums.MenuEnum.*;
 
 /**
  * 司机加盟注册 
@@ -80,6 +83,7 @@ public class DriverVerifyController {
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
 	} )
 	@SensitiveDataOperationLog(primaryDataType="加盟司机数据",secondaryDataType="加盟司机个人基本信息",desc="加盟司机信息列表查询")
+	@RequestFunction(menu = DRIVER_JOIN_PROMOTE_LIST)
 	public AjaxResponse queryDriverVerifyData(Integer page, Integer pageSize, Long cityId, String supplier,
 			String mobile, Integer verifyStatus, String createDateBegin, String createDateEnd) {
 
@@ -103,6 +107,7 @@ public class DriverVerifyController {
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
 	} )
 	@SensitiveDataOperationLog(primaryDataType="加盟司机数据",secondaryDataType="加盟司机个人基本信息",desc="加盟司机信息列表查询")
+	@RequestFunction(menu = DRIVER_JOIN_PROMOTE_EXPORT)
 	public void exportDriverVerifyData(Long cityId, String supplierId,
 									   String mobile, Integer verifyStatus, String createDateBegin, String createDateEnd,
 									   HttpServletRequest request, HttpServletResponse response){
@@ -145,6 +150,7 @@ public class DriverVerifyController {
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
 	} )
 	@SensitiveDataOperationLog(primaryDataType="加盟司机数据",secondaryDataType="加盟司机个人信息详情",desc="加盟司机信息详情查看")
+	@RequestFunction(menu = DRIVER_JOIN_PROMOTE_DETAIL)
 	public AjaxResponse queryDriverVerifyById(@Verify(param = "driverId", rule = "required") Long driverId) {
 
 		DriverVerifyDto driverDto = driverVerifyService.queryDriverVerifyById(driverId);
@@ -157,6 +163,7 @@ public class DriverVerifyController {
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
 	} )
+	@RequestFunction(menu = DRIVER_JOIN_PROMOTE_IMAGE)
 	public AjaxResponse queryImageByDriverIdAndType(@Verify(param = "driverId", rule = "required") Long driverId,
 			@Verify(param = "type", rule = "required") Integer type) {
 
@@ -172,6 +179,7 @@ public class DriverVerifyController {
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
 	} )
+	@RequestFunction(menu = DRIVER_JOIN_PROMOTE_RECORD)
 	public AjaxResponse queryDriverJoinRecordData(Integer page, Integer pageSize, @Verify(param = "driverId", rule = "required") Long driverId){
 		logger.info("查询司机加盟记录列表数据通过司机ID,driverId="+driverId);
 		if (null == page || page.intValue() <= 0) {

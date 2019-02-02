@@ -7,10 +7,7 @@ import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.paging.PageDTO;
-import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.BaseController;
-import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.common.web.Verify;
+import com.zhuanche.common.web.*;
 import com.zhuanche.dto.mdbcarmanage.CarBizDriverInfoTempDTO;
 import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
 import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
@@ -42,6 +39,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.zhuanche.common.enums.MenuEnum.*;
 
 /**
  * @author wzq
@@ -83,6 +82,7 @@ public class DriverInfoTemporaryController extends BaseController {
 			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE ),
 			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	} )
+    @RequestFunction(menu = DRIVER_JOIN_APPLY_LIST)
     public AjaxResponse driverListData(@RequestParam(value = "page",defaultValue="1") Integer page,
                                        @Verify(param = "pageSize",rule = "max(50)")
                                        @RequestParam(value = "pageSize",defaultValue="10") Integer pageSize,

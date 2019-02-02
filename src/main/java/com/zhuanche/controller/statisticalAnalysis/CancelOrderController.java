@@ -1,22 +1,15 @@
 package com.zhuanche.controller.statisticalAnalysis;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.sun.tools.internal.jxc.ap.Const;
+import com.github.pagehelper.util.StringUtil;
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.rentcar.CancelOrderDTO;
-import com.zhuanche.dto.rentcar.CancelOrderDetailDTO;
-import com.zhuanche.dto.rentcar.CompleteOrderDTO;
-
+import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import com.zhuanche.util.CommonStringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
@@ -28,15 +21,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSON;
-import com.github.pagehelper.util.StringUtil;
-import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.common.web.Verify;
-import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
-import com.zhuanche.shiro.realm.SSOLoginUser;
-import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.ValidateUtils;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -310,13 +300,6 @@ public class CancelOrderController{
                     saasBigdataApiUrl+"/cancelOrderDetail/download",
                     new String("取消订单分析".getBytes("gb2312"), "iso8859-1"),
                     request.getRealPath("/")+File.separator+"template"+File.separator+"cancelOrder_info.csv");
-
-		/*	statisticalAnalysisService.downloadCsvFromTemplet(jsonString,
-					saasBigdataApiUrl+"/cancelOrderDetail/download" ,
-					request.getRealPath("/")+File.separator+"template"+File.separator+"cancelOrder_info.csv");
-			statisticalAnalysisService.exportCsvFromTemplet(response,
-					new String("取消订单分析".getBytes("gb2312"), "iso8859-1"),
-					request.getRealPath("/")+File.separator+"template"+File.separator+"cancelOrder_info.csv");*/
         } catch (Exception e) {
             e.printStackTrace();
         }

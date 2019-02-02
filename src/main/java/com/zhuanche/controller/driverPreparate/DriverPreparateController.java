@@ -2,6 +2,7 @@ package com.zhuanche.controller.driverPreparate;
 
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.entity.DriverPreparate.DriverPreparate;
@@ -28,6 +29,8 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static com.zhuanche.common.enums.MenuEnum.*;
+
 /**
  *   司机报备查询接口
  *   @Auther  wanghongdong
@@ -53,6 +56,7 @@ public class DriverPreparateController {
 	@ResponseBody
 	@RequestMapping(value = "/queryDriverPreparateData")
 	@RequiresPermissions(value = { "DriverAttendance_look" } )
+	@RequestFunction(menu = ORDER_PREPARATION_LIST)
 	public AjaxResponse queryDriverPreparateData(String orderNo, String driverPhone, String licensePlates,
 												 @Verify(param = "page",rule = "required|min(1)") Integer page,
 												 @Verify(param = "pageSize",rule = "required|min(5)") Integer pageSize) {
@@ -79,6 +83,7 @@ public class DriverPreparateController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/queryDriverPreparateDetails")
+	@RequestFunction(menu = ORDER_PREPARATION_DETAIL)
 	public AjaxResponse queryOrderDetails(@Verify(param = "orderNo",rule = "required") String orderNo) {
 		DriverPreparate entity = driverPreparateService.selectDriverPreparateDetail(orderNo);
 		if(entity!=null){

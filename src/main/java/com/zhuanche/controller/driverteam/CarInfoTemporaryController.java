@@ -8,10 +8,7 @@ import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.paging.PageDTO;
-import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.BaseController;
-import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.common.web.Verify;
+import com.zhuanche.common.web.*;
 import com.zhuanche.dto.mdbcarmanage.CarBizCarInfoTempDTO;
 import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
 import com.zhuanche.entity.rentcar.CarBizModel;
@@ -41,6 +38,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static com.zhuanche.common.enums.MenuEnum.*;
 
 /**
  * @author wzq
@@ -76,6 +75,7 @@ public class CarInfoTemporaryController extends BaseController {
 			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE ),
 			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	} )
+    @RequestFunction(menu = CAR_JOIN_APPLY_LIST)
 	public AjaxResponse queryCarData(@RequestParam(value = "page",defaultValue="1") Integer page,
                                      @RequestParam(value = "pageSize",defaultValue="10") Integer pageSize,
                                      @RequestParam(value = "licensePlates",required = false,defaultValue = "") String licensePlates,
@@ -141,6 +141,7 @@ public class CarInfoTemporaryController extends BaseController {
      */
     @ResponseBody
     @RequestMapping(value = "/deleteCarInfo", method =  RequestMethod.POST )
+    @RequestFunction(menu = CAR_JOIN_APPLY_DELETE)
     public AjaxResponse deleteCarInfo(@Verify(param = "carIds",rule="required") String carIds) {
         log.info("车辆删除:deleteCarInfo,请求参数:"+carIds);
         int code = carBizCarInfoTempService.delete(carIds);
@@ -158,6 +159,7 @@ public class CarInfoTemporaryController extends BaseController {
      */
     @RequestMapping(value = "/fileDownloadCarInfo",method =  RequestMethod.GET)
 	@RequiresPermissions(value = { "SupplierCarEntry_download" } )
+    @RequestFunction(menu = CAR_JOIN_APPLY_TEMPLATE_DOWNLOAD)
     public void fileDownloadCarInfo(HttpServletRequest request,
                                     HttpServletResponse response) {
         String path = request.getRealPath("/") + File.separator + "upload"
@@ -190,6 +192,7 @@ public class CarInfoTemporaryController extends BaseController {
 			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE ),
 			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	} )
+    @RequestFunction(menu = CAR_JOIN_APPLY_DETAIL)
     public AjaxResponse queryCarInfo(@Verify(param = "carId",rule="required") Integer carId) {
         log.info("queryCarInfo:查看车辆详情Id:"+carId);
         Map<String,Object> params = Maps.newHashMap();
@@ -258,6 +261,7 @@ public class CarInfoTemporaryController extends BaseController {
      */
     @ResponseBody
     @RequestMapping(value = "/add", method =  RequestMethod.POST )
+    @RequestFunction(menu = CAR_JOIN_APPLY_ADD)
     public AjaxResponse saveCarInfo(@Verify(param = "licensePlates",rule="required") String licensePlates,
                                     @Verify(param = "cityId",rule="required") Integer cityId,
                                     @Verify(param = "supplierId",rule="required") Integer supplierId,
@@ -404,6 +408,7 @@ public class CarInfoTemporaryController extends BaseController {
      */
     @ResponseBody
     @RequestMapping(value = "/update", method =  RequestMethod.POST )
+    @RequestFunction(menu = CAR_JOIN_APPLY_UPDATE)
     public AjaxResponse updateCarInfo(@Verify(param = "carId",rule="required") Integer carId,
                                     @Verify(param = "licensePlates",rule="required") String licensePlates,
                                     @Verify(param = "cityId",rule="required") Integer cityId,
@@ -516,6 +521,7 @@ public class CarInfoTemporaryController extends BaseController {
     @ResponseBody
     @RequestMapping(value = "/importCarInfo",method = RequestMethod.POST)
 	@RequiresPermissions(value = { "SupplierCarEntry_import" } )
+    @RequestFunction(menu = CAR_JOIN_APPLY_IMPORT)
     public AjaxResponse importCarInfo(@RequestParam(value="fileName") MultipartFile file,
                                       @Verify(param = "cityId",rule="required") Integer cityId,
                                       @Verify(param = "supplierId",rule="required") Integer supplierId) {

@@ -1,5 +1,6 @@
 package com.zhuanche.controller.driverjoin;
 
+import com.zhuanche.common.web.RequestFunction;
 import org.apache.http.HttpException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,8 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.http.HttpClientUtil;
+
+import static com.zhuanche.common.enums.MenuEnum.DRIVER_JOIN_PROMOTE_INVITE;
 
 /** 
  * 司机注册邀请
@@ -37,6 +40,7 @@ public class DriverInvitationController {
 	// 生成短链接
 	@RequestMapping(value = "/makeShortUrl")
 	@ResponseBody
+	@RequestFunction(menu = DRIVER_JOIN_PROMOTE_INVITE)
 	public AjaxResponse makeShortUrl(@Verify(param="supplierId", rule = "required")String supplierId){
 		logger.info("供应商短链接生成,supplierId="+supplierId);
         String url = DRIVER_JOIN_URL+supplierId;

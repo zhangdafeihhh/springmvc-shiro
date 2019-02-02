@@ -7,10 +7,9 @@ import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
-import com.zhuanche.dto.driver.DriverTeamEntity;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.dto.driver.DriverTeamRelationEntity;
 import com.zhuanche.dto.driver.DriverVoEntity;
-import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
 import com.zhuanche.serv.rentcar.IDriverService;
 import com.zhuanche.serv.rentcar.IDriverTeamRelationService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
@@ -19,11 +18,6 @@ import com.zhuanche.util.Common;
 import com.zhuanche.util.MyRestTemplate;
 import com.zhuanche.util.excel.CsvUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,13 +27,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.*;
+
+import static com.zhuanche.common.enums.MenuEnum.*;
 
 @Controller
 @RequestMapping(value = "/driverIntegra")
@@ -78,6 +73,7 @@ public class DriverIntegraController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
+    @RequestFunction(menu = DRIVER_RANK_INTEGRAL_LIST)
     public Object queryDriverIntegralListData(DriverVoEntity driverEntity) {
 
         try{
@@ -209,6 +205,7 @@ public class DriverIntegraController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
+    @RequestFunction(menu = DRIVER_RANK_INTEGRAL_EXPORT)
     public String queryDriverIntegralListDataDown(DriverVoEntity driverEntity, HttpServletRequest request, HttpServletResponse response) {
         driverEntity.setPage(1);
         int pageSize = CsvUtils.downPerSize;

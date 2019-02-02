@@ -66,14 +66,8 @@ public class CommonController {
 	@Value("${bigdata.saas.data.url}")
 	String  saasBigdataApiUrl;
 	
-	@Autowired
-	private StatisticalAnalysisService statisticalAnalysisService;
-	
     @Autowired
     private CitySupplierTeamCommonService citySupplierTeamCommonService;
-
-    @Autowired
-    private CarBizModelService carBizModelService;
 
     @Autowired
     private CarBizCarGroupService carBizCarGroupService;

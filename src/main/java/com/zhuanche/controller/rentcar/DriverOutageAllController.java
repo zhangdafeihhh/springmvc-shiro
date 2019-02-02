@@ -1,16 +1,16 @@
 package com.zhuanche.controller.rentcar;
 
 import com.google.common.collect.Maps;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
-import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.rentcar.DriverOutageAllDTO;
 import com.zhuanche.entity.rentcar.DriverOutage;
-import com.zhuanche.entity.rentcar.DriverOutageVo;
 import com.zhuanche.serv.rentcar.DriverOutageService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
@@ -19,13 +19,19 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.zhuanche.common.enums.MenuEnum.DRIVER_FOREVER_STOP_MANAGE;
 
 @RestController
 @RequestMapping("/driverOutageAll")
@@ -42,6 +48,7 @@ public class DriverOutageAllController {
     @MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
 	} )
+    @RequestFunction(menu = DRIVER_FOREVER_STOP_MANAGE)
     public AjaxResponse queryDriverOutageData(@Verify(param = "cityId",rule = "") Integer cityId,
                                               Integer supplierId,
                                               Integer carGroupId,
@@ -132,17 +139,6 @@ public class DriverOutageAllController {
         result = this.driverOutageService.updateDriverOutagesAll(params);
         return getResponse(result);
     }
-
-//    /**
-//     * 永久停运导入
-//     */
-//    @RequestMapping(value = "/importDriverOutageInfo")
-//    public AjaxResponse importDriverOutageInfo(DriverOutageVo params, HttpServletRequest request) {
-//        logger.info("永久停运导入保存importDriverOutageInfo,参数" + params.toString());
-//        Map<String, Object> result = new HashMap<String, Object>();
-//        result = this.driverOutageService.importDriverOutageInfo(params, request);
-//        return getResponse(result);
-//    }
 
     /**
      * 永久停运导入

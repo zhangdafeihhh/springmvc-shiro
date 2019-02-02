@@ -9,6 +9,7 @@ import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.mdbcarmanage.DriverInfoUpdateApplyDTO;
@@ -35,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -44,6 +44,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
+import static com.zhuanche.common.enums.MenuEnum.*;
 
 @Controller
 @RequestMapping("/driverInfoUpdateApply")
@@ -89,6 +91,7 @@ public class DriverInfoUpdateApplyController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
+    @RequestFunction(menu = DRIVER_INFO_CHANGE_APPLY_LIST)
     public AjaxResponse findDriverInfoUpdateList(String name, String phone, String idCardNo, String licensePlates, Integer status, Integer cityId,
                                                  Integer supplierId,Integer teamId, Integer teamGroupId, String createDateBegin, String createDateEnd,
                                                  @Verify(param = "type", rule = "required") Integer type,
@@ -141,6 +144,7 @@ public class DriverInfoUpdateApplyController {
     @MasterSlaveConfigs(configs={
             @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
     } )
+    @RequestFunction(menu = DRIVER_INFO_CHANGE_APPLY_DETAIL)
     public AjaxResponse findDriverInfoUpdateById(@Verify(param = "id", rule = "required") Integer id) {
 
         DriverInfoUpdateApply driverInfoUpdateApply = driverInfoUpdateService.selectByPrimaryKey(id);
@@ -159,6 +163,7 @@ public class DriverInfoUpdateApplyController {
     @MasterSlaveConfigs(configs={
             @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
     } )
+    @RequestFunction(menu = DRIVER_INFO_CHANGE_APPLY_ADD)
     public AjaxResponse saveDriverInfoUpdateApply(@Verify(param = "driverId", rule = "required") Integer driverId,
                                                   @Verify(param = "driverPhone", rule = "required") String driverPhone,
                                                   @Verify(param = "driverPhoneNew", rule = "required") String driverPhoneNew) {
@@ -245,6 +250,7 @@ public class DriverInfoUpdateApplyController {
     @MasterSlaveConfigs(configs={
             @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
     } )
+    @RequestFunction(menu = CAR_INFO_CHANGE_APPLY_ADD)
     public AjaxResponse saveCarInfoUpdateApply(@Verify(param = "licensePlates", rule = "required") String licensePlates,
                                                @Verify(param = "carModelIdNew", rule = "required") Integer carModelIdNew,
                                                @Verify(param = "modelDetailNew", rule = "required") String modelDetailNew,

@@ -5,13 +5,12 @@ import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.dutyEnum.ServiceReturnCodeEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.driver.CarDriverDayDutyDTO;
 import com.zhuanche.dto.driverDuty.CarDriverDurationDTO;
 import com.zhuanche.dto.driverDuty.CarDriverMustDutyDTO;
-import com.zhuanche.dto.driverDuty.DutyExcelDTO;
-import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverMustDuty;
 import com.zhuanche.entity.mdbcarmanage.CarDutyDuration;
 import com.zhuanche.request.DutyParamRequest;
@@ -23,32 +22,30 @@ import com.zhuanche.serv.driverScheduling.CarDriverMustDutyService;
 import com.zhuanche.serv.driverScheduling.CarDriverShiftsService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.threads.DriverDayhDutyExportHelper;
 import com.zhuanche.util.Check;
-import com.zhuanche.util.PageUtils;
 import com.zhuanche.util.dateUtil.DateUtil;
 import com.zhuanche.util.excel.CsvUtils;
-import com.zhuanche.util.excel.ExportExcelUtil;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.*;
-import java.util.concurrent.CountDownLatch;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import static com.zhuanche.common.enums.MenuEnum.*;
 
 /**
  * @description: 司机排班
@@ -294,6 +291,7 @@ public class DriverSchController {
     */
     @ResponseBody
     @RequestMapping(value = "/queryMustListByField")
+//    @RequestFunction(menu = )
     public AjaxResponse queryMustListByField(@Verify(param = "teamId", rule = "required") Integer teamId){
         logger.info("查询司机强制排班时间段入参:"+ JSON.toJSONString(teamId));
         List<CarDriverMustDutyDTO> list = carDriverShiftsService.queryMustListByField(teamId);
@@ -324,6 +322,7 @@ public class DriverSchController {
      */
     @ResponseBody
     @RequestMapping(value = "/saveOrUpdateDriverMust")
+    @RequestFunction(menu = TEAM_GROUP_DUTY_SAVE)
     public AjaxResponse saveOrUpdateDriverMust(CarDriverMustDuty param){
         logger.info("新增或者修改强制排班信息入参:"+ JSON.toJSONString(param));
         int result = carDriverMustDutyService.saveOrUpdateDriverMust(param);
@@ -344,6 +343,7 @@ public class DriverSchController {
     @ResponseBody
     @RequestMapping(value = "/getDriverMustDutyList")
 	@RequiresPermissions(value = { "WorkTimeManage_look" } )
+    @RequestFunction(menu = TEAM_GROUP_DUTY_LIST)
     public AjaxResponse getDriverMustDutyList(DutyParamRequest param){
         logger.info("查询强制上班配置列表 入参:"+ JSON.toJSONString(param));
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
@@ -363,6 +363,7 @@ public class DriverSchController {
      */
     @ResponseBody
     @RequestMapping(value = "/getCarDriverDurationDetail")
+    @RequestFunction(menu = TEAM_GROUP_DURATION_DETAIL)
     public AjaxResponse getCarDriverDurationDetail(@Verify(param = "paramId", rule = "required") String paramId){
         logger.info("获取排班时长详情入参:"+ JSON.toJSONString(paramId));
         CarDriverDurationDTO detail = carDriverDurationService.getCarDriverDurationDetail(Integer.parseInt(paramId));
@@ -378,6 +379,7 @@ public class DriverSchController {
      */
     @ResponseBody
     @RequestMapping(value = "/saveOrUpdateCarDriverDuration")
+    @RequestFunction(menu = TEAM_GROUP_DURATION_SAVE)
     public AjaxResponse saveOrUpdateCarDriverDuration(CarDutyDuration param){
         logger.info("保存/修改排班时长入参:"+ JSON.toJSONString(param));
         int result = carDriverDurationService.saveOrUpdateCarDriverDuration(param);
@@ -398,6 +400,7 @@ public class DriverSchController {
     @ResponseBody
     @RequestMapping(value = "/getDriverDurationList")
 	@RequiresPermissions(value = { "TimeLengthManage_look" } )
+    @RequestFunction(menu = TEAM_GROUP_DURATION_LIST)
     public AjaxResponse getDriverDurationList(DutyParamRequest param){
         logger.info("查询排班时长列表入参:"+ JSON.toJSONString(param));
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();

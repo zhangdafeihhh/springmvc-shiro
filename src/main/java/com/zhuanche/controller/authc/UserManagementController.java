@@ -1,27 +1,25 @@
 package com.zhuanche.controller.authc;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import com.zhuanche.common.enums.PermissionLevelEnum;
-import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.serv.CarBizDriverInfoService;
-import org.apache.commons.lang.StringUtils;
-import org.apache.ibatis.annotations.Param;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 import com.zhuanche.serv.CarBizDriverInfoService;
 import com.zhuanche.serv.authc.UserManagementService;
+import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.zhuanche.common.enums.MenuEnum.*;
 
 /**用户管理**/
 @RestController
@@ -35,6 +33,7 @@ public class UserManagementController {
 	/**一、增加一个用户**/
 	@RequestMapping("/addUser")
 	@RequiresPermissions(value = { "ADD_USER" } )
+	@RequestFunction(menu = USER_ADD)
 	public AjaxResponse addUser( 
 			@Verify(param="account",rule="required|RegExp(^[a-zA-Z0-9_\\-]{3,30}$)") String account, 
 			@Verify(param="userName",rule="required") String userName, 
@@ -81,6 +80,7 @@ public class UserManagementController {
 	/**二、禁用一个用户**/
 	@RequestMapping("/disableUser")
 	@RequiresPermissions(value = { "DISABLE_USER" } )
+	@RequestFunction(menu = USER_DISABLE)
 	public AjaxResponse disableUser ( @Verify(param="userId",rule="required|min(1)") Integer userId ) {
 		return userManagementService.disableUser(userId);
 	}
@@ -88,6 +88,7 @@ public class UserManagementController {
 	/**三、启用一个用户**/
 	@RequestMapping("/enableUser")
 	@RequiresPermissions(value = { "ENABLE_USER" } )
+	@RequestFunction(menu = USER_ENABLE)
 	public AjaxResponse enableUser ( @Verify(param="userId",rule="required|min(1)") Integer userId ) {
 		return userManagementService.enableUser(userId);
 	}
@@ -95,6 +96,7 @@ public class UserManagementController {
 	/**四、修改一个用户**/
 	@RequestMapping("/changeUser")
 	@RequiresPermissions(value = { "CHANGE_USER" } )
+	@RequestFunction(menu = USER_UPDATE)
 	public 	AjaxResponse changeUser( 
 			@Verify(param="userId",rule="required|min(1)") Integer userId, 
 			@Verify(param="userName",rule="required") String userName, 
@@ -123,6 +125,7 @@ public class UserManagementController {
 	/**六、查询一个用户中的角色ID**/
 	@RequestMapping("/getAllRoleIds")
 	@RequiresPermissions(value = { "GET_ALL_ROLEIDS_OF_USER" } )
+	@RequestFunction(menu = USER_ROLE_LIST)
 	public AjaxResponse getAllRoleIds( @Verify(param="userId",rule="required|min(1)") Integer userId ){
 		List<Integer> roleIds = userManagementService.getAllRoleIds(userId);
 		return AjaxResponse.success( roleIds  );
@@ -131,6 +134,7 @@ public class UserManagementController {
 	/**七、保存一个用户中的角色ID**/
 	@RequestMapping("/saveRoleIds")
 	@RequiresPermissions(value = { "SAVE_ROLEIDS_OF_USER" } )
+	@RequestFunction(menu = USER_ROLE_SAVE)
 	public AjaxResponse saveRoleIds( @Verify(param="userId",rule="required|min(1)") Integer userId,  @Verify(param="roleIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String roleIds) {
 		List<Integer> newroleIds = new ArrayList<Integer>();
 		if(roleIds!=null) {
@@ -153,6 +157,7 @@ public class UserManagementController {
 	/**八、查询用户列表**/
 	@RequestMapping("/queryUserList")
 	@RequiresPermissions(value = { "UserManages_look" } )
+	@RequestFunction(menu = USER_LIST)
 	public AjaxResponse queryUserList( 
 			@Verify(param="page",rule="required|min(1)") Integer page, 
 			@Verify(param="pageSize",rule="required|min(10)") Integer pageSize,  
@@ -169,6 +174,7 @@ public class UserManagementController {
 	/**九、重置用户密码**/
 	@RequestMapping("/resetPassword")
 	@RequiresPermissions(value = { "RESET_USER_PASSWORD" } )
+	@RequestFunction(menu = USER_RESET_PASSWORD)
 	public AjaxResponse resetPassword( @Verify(param="userId",rule="required|min(1)") Integer userId ) {
 		return userManagementService.resetPassword(userId);
 	}

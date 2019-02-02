@@ -1,5 +1,7 @@
 package com.zhuanche.common.web;
 
+import com.zhuanche.common.enums.MenuEnum;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -12,8 +14,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequestFunction {
-	public String name1();//一级功能名称
+/*	public String name1();//一级功能名称
 	public String name2();//二级功能名称
 	public String name3();//三级功能名称
-	public String name4();//四级功能名称
+	public String name4();//四级功能名称*/
+	public MenuEnum menu();
 }

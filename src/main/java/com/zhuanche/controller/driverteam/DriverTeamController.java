@@ -1,10 +1,10 @@
 package com.zhuanche.controller.driverteam;
 
 import com.alibaba.fastjson.JSON;
-import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.dutyEnum.ServiceReturnCodeEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.CarDriverTeamDTO;
@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Map;
+
+import static com.zhuanche.common.enums.MenuEnum.*;
 
 /**
  * @description: 车队设置
@@ -61,6 +63,7 @@ public class DriverTeamController{
 	@ResponseBody
 	@RequestMapping(value = "/queryDriverTeamList")
 	@RequiresPermissions(value = { "TeamManage_look" } )
+	@RequestFunction(menu = TEAM_GROUP_LIST)
 	public AjaxResponse queryDriverTeamList(DriverTeamRequest param){
 		logger.info("查询车队列表入参:"+ JSON.toJSONString(param));
 		SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
@@ -80,6 +83,7 @@ public class DriverTeamController{
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/saveOneDriverTeam")
+	@RequestFunction(menu = TEAM_GROUP_ADD)
 	public AjaxResponse saveOneDriverTeam(CarDriverTeamDTO param){
 		logger.info("新增车队入参:"+ JSON.toJSONString(param));
 		int result = carDriverTeamService.saveOneDriverTeam(param);
@@ -99,6 +103,7 @@ public class DriverTeamController{
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/updateOneDriverTeam")
+	@RequestFunction(menu = TEAM_GROUP_UPDATE)
 	public AjaxResponse updateOneDriverTeam(CarDriverTeamDTO param){
 		logger.info("修改车队入参:"+ JSON.toJSONString(param));
 		if(Check.NuNObj(param) || Check.NuNObj(param.getId())){
@@ -136,6 +141,7 @@ public class DriverTeamController{
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/queryTeamExistsDriverList")
+	@RequestFunction(menu = TEAM_GROUP_DRIVER_LIST)
 	public AjaxResponse queryTeamExistsDriverList(DriverTeamRequest param){
 		logger.info("查询车队/小组已存在司机列表入参:"+ JSON.toJSONString(param));
 		SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
@@ -155,6 +161,7 @@ public class DriverTeamController{
 	*/ 
 	@ResponseBody
 	@RequestMapping(value = "/removeDriverToTeam")
+	@RequestFunction(menu = TEAM_GROUP_DRIVER_REMOVE)
 	public AjaxResponse removeDriverToTeam(@Verify(param = "id", rule = "required") Integer id,@Verify(param = "driverId", rule = "required") Integer driverId){
 		logger.info("车队/小组移除司机 入参:"+ "车队/小组id："+id+"要移除的司机id："+driverId);
 		if(Check.NuNObj(id) || Check.NuNObj(driverId)){
@@ -183,6 +190,7 @@ public class DriverTeamController{
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/addDriverToTeam")
+	@RequestFunction(menu = TEAM_GROUP_ADD_DRIVER)
 	public AjaxResponse addDriverToTeam(DriverTeamRequest param){
 		logger.info("添加司机到车队/小组入参:"+ JSON.toJSONString(param));
 		int result = carDriverTeamService.addDriverToTeam(param);
@@ -214,6 +222,7 @@ public class DriverTeamController{
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/queryAddDriverList")
+	@RequestFunction(menu = TEAM_GROUP_ADD_DRIVER)
 	public AjaxResponse queryAddDriverList(DriverTeamRequest param){
 		logger.info("查询可添加司机列表入参:"+ JSON.toJSONString(param));
 		SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();

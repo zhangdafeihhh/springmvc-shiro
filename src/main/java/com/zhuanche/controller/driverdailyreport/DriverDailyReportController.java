@@ -10,19 +10,17 @@ import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.controller.DriverQueryController;
 import com.zhuanche.dto.DriverDailyReportDTO;
-import com.zhuanche.dto.driver.CarDriverDayDutyDTO;
 import com.zhuanche.entity.mdbcarmanage.DriverDailyReport;
 import com.zhuanche.entity.mdbcarmanage.DriverDailyReportParams;
-import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.serv.DriverDailyReportExService;
 import com.zhuanche.serv.common.DataPermissionHelper;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.MyRestTemplate;
 import com.zhuanche.util.excel.CsvUtils;
@@ -30,11 +28,6 @@ import mapper.mdbcarmanage.ex.CarRelateGroupExMapper;
 import mapper.mdbcarmanage.ex.DriverDailyReportExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,14 +39,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static com.zhuanche.common.enums.MenuEnum.*;
 
 /**
  *   司机日报、周报、月报查询接口
@@ -114,6 +108,7 @@ public class DriverDailyReportController extends DriverQueryController {
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})
+	@RequestFunction(menu = DRIVER_WORK_REPORT_LIST)
 	public AjaxResponse queryDriverWeekReportDataNew(String licensePlates, String driverName, String driverIds, String teamIds,
 													 @Verify(rule = "required",param = "suppliers") String suppliers,
 													 @Verify(rule = "required",param = "cities") String cities,
@@ -201,6 +196,7 @@ public class DriverDailyReportController extends DriverQueryController {
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})
+	@RequestFunction(menu = DRIVER_WORK_REPORT_DETAIL)
 	public AjaxResponse queryDriverWeekReportDataNew(@Verify(rule = "required",param = "statDateStart") String driverIds,
 													 @Verify(rule = "required",param = "statDateStart") String statDateStart,
 													 @Verify(rule = "required",param = "statDateEnd") String statDateEnd, String sortName, String sortOrder, Integer page, Integer pageSize) throws ParseException {
@@ -250,6 +246,7 @@ public class DriverDailyReportController extends DriverQueryController {
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})
+	@RequestFunction(menu = DRIVER_WORK_REPORT_EXPORT)
 	public String exportDriverReportData(String licensePlates, String driverName, String driverIds, String teamIds,
 											   @Verify(rule = "required",param = "suppliers") String suppliers,
 											   @Verify(rule = "required",param = "cities") String cities,

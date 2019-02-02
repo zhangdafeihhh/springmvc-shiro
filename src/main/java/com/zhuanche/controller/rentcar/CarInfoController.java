@@ -4,15 +4,15 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
-import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.rentcar.CarInfoDTO;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
-import com.zhuanche.entity.mdbcarmanage.DriverDailyReport;
 import com.zhuanche.entity.rentcar.CarInfo;
 import com.zhuanche.serv.authc.UserManagementService;
 import com.zhuanche.serv.rentcar.CarInfoService;
@@ -26,7 +26,9 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
@@ -36,6 +38,8 @@ import java.io.*;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static com.zhuanche.common.enums.MenuEnum.*;
 
 @RestController("CarInfoController")
 @RequestMapping("carInfo")
@@ -67,6 +71,7 @@ public class CarInfoController {
     @MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
 	} )
+    @RequestFunction(menu = CAR_INFO_MANAGE_LIST)
     public Object queryCarData( String cities, String supplierIds,
                                String carModelIds,
                               String licensePlates,
@@ -132,6 +137,7 @@ public class CarInfoController {
 			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE ),
 			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	} )
+    @RequestFunction(menu = CAR_INFO_MANAGE_DETAIL)
     public AjaxResponse queryCarInfo(@Verify(param = "carId",rule = "required") Integer carId) {
         logger.info("queryCar:查看车辆详情列表");
         CarInfo params = new CarInfo();
@@ -463,6 +469,7 @@ public class CarInfoController {
     } )
     @RequestMapping("/exportCarInfo")
 	@RequiresPermissions(value = { "CarInfoManageSearch_export" } )
+    @RequestFunction(menu = CAR_INFO_MANAGE_EXPORT)
     public String exportCarInfo(@Verify(param = "cities",rule="required")String cities,
                               @Verify(param = "supplierIds",rule="required")String supplierIds,
                               String carModelIds,

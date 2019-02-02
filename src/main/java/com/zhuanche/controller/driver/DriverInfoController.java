@@ -13,6 +13,7 @@ import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.securityLog.SensitiveDataOperationLog;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.driver.TelescopeDriverInfo;
@@ -30,7 +31,6 @@ import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.excel.CsvUtils;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,14 +43,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static com.zhuanche.common.enums.MenuEnum.*;
 
 @Controller
 @RequestMapping("/driverInfo")
@@ -106,6 +106,7 @@ public class DriverInfoController {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
     @SensitiveDataOperationLog(primaryDataType="司机数据",secondaryDataType="司机个人基本信息",desc="司机信息列表查询")
+    @RequestFunction(menu = DRIVER_INFO_LIST)
     public AjaxResponse findDriverList(String name, String phone, String licensePlates, Integer status, Integer cityId, Integer supplierId,
             Integer teamId, Integer teamGroupId, Integer groupId, Integer cooperationType, String imei, String idCardNo, Integer isImage,
             @RequestParam(value="page", defaultValue="0")Integer page,
@@ -259,6 +260,7 @@ public class DriverInfoController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
+    @RequestFunction(menu = DRIVER_INFO_LIST_EXPORT)
     public void exportDriverList(String name, String phone, String licensePlates, Integer status,
                                          @Verify(param = "cityId",rule="required") Integer cityId,
                                          @Verify(param = "supplierId",rule="required") Integer supplierId,
@@ -382,6 +384,7 @@ public class DriverInfoController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
+    @RequestFunction(menu = DRIVER_INFO_LIST_DETAIL)
     public AjaxResponse findDriverInfoByDriverId(@Verify(param = "driverId", rule = "required") Integer driverId) {
 
         CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(driverId);
@@ -701,6 +704,7 @@ public class DriverInfoController {
     @MasterSlaveConfigs(configs={
             @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
     } )
+    @RequestFunction(menu = DRIVER_INFO_LIST_RESET_IMEI)
     public AjaxResponse resetIMEI(@Verify(param = "driverId", rule = "required") Integer driverId) {
 
         logger.info(LOGTAG + "司机driverId={},重置imei", driverId);
@@ -727,6 +731,7 @@ public class DriverInfoController {
     @MasterSlaveConfigs(configs={
             @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
     } )
+    @RequestFunction(menu = DRIVER_INFO_LIST_IMPORT)
     public AjaxResponse batchInputDriverInfo(@Verify(param = "cityId", rule = "required") Integer cityId,
                                              @Verify(param = "supplierId", rule = "required") Integer supplierId,
                                              Integer teamId, Integer teamGroupId,

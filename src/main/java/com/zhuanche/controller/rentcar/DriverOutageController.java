@@ -6,6 +6,7 @@ import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.rentcar.DriverOutageDTO;
@@ -31,6 +32,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+
+import static com.zhuanche.common.enums.MenuEnum.DRIVER_TEMPORARY_STOP_MANAGE;
 
 
 /**
@@ -71,6 +74,7 @@ public class DriverOutageController {
     @MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
 	} )
+    @RequestFunction(menu = DRIVER_TEMPORARY_STOP_MANAGE)
     public AjaxResponse queryDriverOutageData(@Verify(param = "cityId",rule = "") Integer cityId,
                                               Integer supplierId,
                                               Integer carGroupId,
