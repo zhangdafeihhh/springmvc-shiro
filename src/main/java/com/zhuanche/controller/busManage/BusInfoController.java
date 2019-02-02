@@ -377,7 +377,7 @@ public class BusInfoController {
             BusCarSaveDTO saveDTO = new BusCarSaveDTO();
             boolean validFlag = true;
             // 循环列
-            for (int colIdx = 0; colIdx < row.getLastCellNum(); colIdx++) {
+            for (int colIdx = 0; colIdx < heads.length; colIdx++) {
                 Cell cell = row.getCell(colIdx);
                 String value = readCellValue(cell);
                 DateFormat df = new SimpleDateFormat("yyyy-M-d");
