@@ -1,13 +1,12 @@
 package com.zhuanche.controller.statisticalAnalysis;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.util.StringUtil;
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
+import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,15 +17,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSON;
-import com.github.pagehelper.util.StringUtil;
-import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.common.web.Verify;
-import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
-import com.zhuanche.shiro.realm.SSOLoginUser;
-import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.ValidateUtils;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.zhuanche.common.enums.MenuEnum.DRIVER_WORK_ASSESSMENT;
+import static com.zhuanche.common.enums.MenuEnum.DRIVER_WORK_ASSESSMENT_EXPORT;
 
 /**
  * 
@@ -60,6 +58,7 @@ public class AllianceCheckController{
 		@ResponseBody
 	    @RequestMapping(value = "/queryAllianceCheckData", method = { RequestMethod.POST,RequestMethod.GET })
 		@RequiresPermissions(value = { "JoinBusinessAssessment_look" } )
+		@RequestFunction(menu = DRIVER_WORK_ASSESSMENT)
 	    public AjaxResponse queryAllianceCheckData(
 	    										  @Verify(param = "queryDate",rule = "required") String queryDate,
 	                                              String allianceId,
@@ -107,6 +106,7 @@ public class AllianceCheckController{
 		  */
   	@RequestMapping(value = "/exportAllianceCheckData", method = { RequestMethod.POST,RequestMethod.GET })
 	@RequiresPermissions(value = { "JoinBusinessAssessment_export" } )
+	@RequestFunction(menu = DRIVER_WORK_ASSESSMENT_EXPORT)
 	public void exportAllianceCheckData( 
 										 @Verify(param = "queryDate",rule = "required") String queryDate,
 							             String allianceId,

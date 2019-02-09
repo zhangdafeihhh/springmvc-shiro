@@ -4,12 +4,6 @@ import com.zhuanche.constant.MenuConstants;
 
 public enum MenuEnum {
 
-    //TODO 数据报表接口
-    SUBSCRIPTION_REPORT(MenuConstants.CAR_MANAGE, MenuConstants.SUPPLIER_MANAGE, MenuConstants.SUPPLIER_MANAGE, "加盟商名称是否存在"),
-    REPORT_DOWNLOAD_LIST(MenuConstants.CAR_MANAGE, MenuConstants.SUPPLIER_MANAGE, MenuConstants.SUPPLIER_MANAGE, "加盟商名称是否存在"),
-    REPORT_CONFIGURE_LIST(MenuConstants.CAR_MANAGE, MenuConstants.SUPPLIER_MANAGE, MenuConstants.SUPPLIER_MANAGE, "加盟商名称是否存在"),
-    REPORT_TYPE_LIST(MenuConstants.CAR_MANAGE, MenuConstants.SUPPLIER_MANAGE, MenuConstants.SUPPLIER_MANAGE, "加盟商名称是否存在"),
-    REPORT_DOWNLOAD(MenuConstants.CAR_MANAGE, MenuConstants.SUPPLIER_MANAGE, MenuConstants.SUPPLIER_MANAGE, "加盟商名称是否存在"),
     //权限管理接口
     PERMISSION_ADD(MenuConstants.SYSTEM_MANAGE, MenuConstants.PERMISSION_MANAGEMENT, MenuConstants.PERMISSION_LIST, "增加一个权限"),
     PERMISSION_DISABLE(MenuConstants.SYSTEM_MANAGE, MenuConstants.PERMISSION_MANAGEMENT, MenuConstants.PERMISSION_LIST, "禁用一个权限"),
@@ -163,9 +157,23 @@ public enum MenuEnum {
     DRIVER_RANK_DETAIL(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.COMPLAIN_AND_RANK, MenuConstants.DRIVER_RANK,"司机评分详情查询"),
 
     //统计分析
-    STATISTIC_ANALYSIS(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.STATISTIC_ANALYSIS, MenuConstants.DRIVER_RANK,"司机评分详情查询"),
+    DRIVER_ANALYSIS_DATA(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.STATISTIC_ANALYSIS, MenuConstants.DRIVER_ANALYSIS,"司机运营统计结果查询"),
+    DRIVER_ANALYSIS_GRAPH(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.STATISTIC_ANALYSIS, MenuConstants.DRIVER_ANALYSIS,"司机运营统计图表查询"),
     CAR_DETAIL_ANALYSIS(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.STATISTIC_ANALYSIS, MenuConstants.CAR_ANALYSIS,"车辆分析趋势图明细查询"),
     CAR_TABLE_ANALYSIS(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.STATISTIC_ANALYSIS, MenuConstants.CAR_ANALYSIS,"车辆分析趋势表格查询"),
+    DRIVER_EVALUATE_DETAIL(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.STATISTIC_ANALYSIS, MenuConstants.DRIVER_EVALUATE_DETAIL,"司机评价详情查询"),
+    DRIVER_EVALUATE_EXPORT(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.STATISTIC_ANALYSIS, MenuConstants.DRIVER_EVALUATE_DETAIL,"司机评价详情导出"),
+    DRIVER_OPERATION_DETAIL(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.STATISTIC_ANALYSIS, MenuConstants.DRIVER_OPERATION_DETAIL,"司机运营详情查询"),
+    DRIVER_OPERATION_EXPORT(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.STATISTIC_ANALYSIS, MenuConstants.DRIVER_OPERATION_DETAIL,"司机运营详情导出"),
+    DRIVER_WORK_ASSESSMENT(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.STATISTIC_ANALYSIS, MenuConstants.DRIVER_WORK_ASSESSMENT,"司机工作考核列表查询"),
+    DRIVER_WORK_ASSESSMENT_EXPORT(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.STATISTIC_ANALYSIS, MenuConstants.DRIVER_WORK_ASSESSMENT,"司机工作考核列表导出"),
+
+    REPORT_TYPE_LIST(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.DATA_REPORT, MenuConstants.DATA_REPORT_SUBSCRIPTION, "报表名称列表查询"),
+    REPORT_CONFIGURE(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.DATA_REPORT, MenuConstants.DATA_REPORT_SUBSCRIPTION, "报表订阅配置查询"),
+    REPORT_CONFIGURE_LIST(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.DATA_REPORT, MenuConstants.DATA_REPORT_SUBSCRIPTION, "报表订阅配置列表查询"),
+    SUBSCRIPTION_REPORT(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.DATA_REPORT, MenuConstants.DATA_REPORT_SUBSCRIPTION, "数据报表订阅"),
+    REPORT_DOWNLOAD_LIST(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.DATA_REPORT, MenuConstants.DATA_REPORT_SUBSCRIPTION, "订阅报表下载列表查询"),
+    REPORT_DOWNLOAD(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.DATA_REPORT, MenuConstants.SUPPLIER_MANAGE, "加盟商名称是否存在"),
     ;
 
     private String levelOne;
@@ -184,31 +192,15 @@ public enum MenuEnum {
         return levelOne;
     }
 
-    public void setLevelOne(String levelOne) {
-        this.levelOne = levelOne;
-    }
-
     public String getLevelTwo() {
         return levelTwo;
-    }
-
-    public void setLevelTwo(String levelTwo) {
-        this.levelTwo = levelTwo;
     }
 
     public String getLevelThree() {
         return levelThree;
     }
 
-    public void setLevelThree(String levelThree) {
-        this.levelThree = levelThree;
-    }
-
     public String getLevelFour() {
         return levelFour;
-    }
-
-    public void setLevelFour(String levelFour) {
-        this.levelFour = levelFour;
     }
 }

@@ -3,6 +3,7 @@ package com.zhuanche.controller.statisticalAnalysis;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
@@ -22,6 +23,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.zhuanche.common.enums.MenuEnum.DRIVER_EVALUATE_DETAIL;
+import static com.zhuanche.common.enums.MenuEnum.DRIVER_EVALUATE_EXPORT;
 
 /**
  * 
@@ -57,14 +61,12 @@ public class DriverEvaluateController{
 			* @param appScore APP评价分数	
 			* @param pageNo	页号
 			* @param pageSize	每页记录数
-			* @param visibleCityIds	可见城市ID
-			* @param visibleAllianceIds	可见加盟商ID
-			* @param visibleMotorcadeIds	可见车队ID
 		    * @return
 		  */
 		@ResponseBody
 	    @RequestMapping(value = "/queryDriverEvaluateData", method = { RequestMethod.POST,RequestMethod.GET })
 		@RequiresPermissions(value = { "DriverEvaluateDetail_look" } )
+		@RequestFunction(menu = DRIVER_EVALUATE_DETAIL)
 	    public AjaxResponse queryDriverEvaluateData(
 	    										  Long orderCityId,
 	    										  String driverTypeId,
@@ -122,14 +124,12 @@ public class DriverEvaluateController{
 			* @param allianceId 加盟商ID	
 			* @param motorcadeId 车队ID	
 			* @param driverScore 司机评价分数	
-			* @param appScore APP评价分数	
-			* @param visibleCityIds	可见城市ID
-			* @param visibleAllianceIds	可见加盟商ID
-			* @param visibleMotorcadeIds	可见车队ID
+			* @param appScore APP评价分数
 		    * @return
 		  */
   	@RequestMapping(value = "/exportDriverEvaluateData", method = { RequestMethod.POST,RequestMethod.GET })
 	@RequiresPermissions(value = { "DriverEvaluateDetail_export" } )
+	@RequestFunction(menu = DRIVER_EVALUATE_EXPORT)
 	public void exportDriverEvaluateData( 
 										Long orderCityId,
 										String driverTypeId,

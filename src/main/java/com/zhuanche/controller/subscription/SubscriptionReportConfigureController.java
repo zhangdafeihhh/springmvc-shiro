@@ -11,6 +11,7 @@ import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.driver.SubscriptionReportConfigureDTO;
@@ -43,6 +44,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static com.zhuanche.common.enums.MenuEnum.*;
 
 @Controller
 @RequestMapping("/subscription/report")
@@ -79,6 +82,7 @@ public class SubscriptionReportConfigureController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.MASTER)
     })
+    @RequestFunction(menu = SUBSCRIPTION_REPORT)
     public AjaxResponse saveSubscription(
             @Verify(param = "reportId",rule="required") Integer reportId,
             @Verify(param = "reportName",rule="required") String reportName,
@@ -164,6 +168,7 @@ public class SubscriptionReportConfigureController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
     })
+    @RequestFunction(menu = REPORT_DOWNLOAD_LIST)
     public AjaxResponse querySubscriptionList(Integer reportId, Integer subscriptionCycle, Integer cityId,
                                        Integer supplierId, Integer teamId,
                                        @RequestParam(value="page", defaultValue="0")Integer page,
@@ -201,6 +206,7 @@ public class SubscriptionReportConfigureController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
     })
+    @RequestFunction(menu = REPORT_CONFIGURE_LIST)
     public AjaxResponse querySubscriptionConfigureList(
             @Verify(param = "subscriptionCycle",rule="required") Integer subscriptionCycle,
             @Verify(param = "reportId",rule="required") Integer reportId) {
@@ -216,6 +222,7 @@ public class SubscriptionReportConfigureController {
      */
     @ResponseBody
     @RequestMapping(value = "/querySubscriptionName")
+    @RequestFunction(menu = REPORT_TYPE_LIST)
     public AjaxResponse querySubscriptionName() {
         JSONObject map = new JSONObject();
         map.put( "1", "工资明细");
@@ -232,6 +239,7 @@ public class SubscriptionReportConfigureController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
     })
+    @RequestFunction(menu = REPORT_DOWNLOAD)
     public void exportSubscriptionUrl(@Verify(param = "id",rule="required") Long id,
                                       HttpServletRequest request, HttpServletResponse response) {
 
@@ -290,6 +298,7 @@ public class SubscriptionReportConfigureController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DataSourceMode.SLAVE)
     })
+    @RequestFunction(menu = REPORT_CONFIGURE)
     public AjaxResponse querySubscriptionConfigure(
             @Verify(param = "subscriptionCycle",rule="required") Integer subscriptionCycle,
             @Verify(param = "reportId",rule="required") Integer reportId) {

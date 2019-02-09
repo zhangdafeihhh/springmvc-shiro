@@ -62,4 +62,7 @@ public interface MenuConstants {
     String DRIVER_EVALUATE_DETAIL = "司机评价详情";
     String DRIVER_OPERATION_DETAIL = "司机运营详情";
     String DRIVER_WORK_ASSESSMENT = "司机工作考核";
+    String DATA_REPORT = "数据报表";
+    String DATA_REPORT_SUBSCRIPTION = "数据报表订阅";
+    String DATA_REPORT_DOWNLOAD = "数据报表下载";
 }

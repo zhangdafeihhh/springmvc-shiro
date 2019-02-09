@@ -1,15 +1,12 @@
 package com.zhuanche.controller.statisticalAnalysis;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang3.StringUtils;
+import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.util.StringUtil;
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
+import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,15 +17,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSON;
-import com.github.pagehelper.util.StringUtil;
-import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.common.web.Verify;
-import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
-import com.zhuanche.shiro.realm.SSOLoginUser;
-import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.ValidateUtils;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.zhuanche.common.enums.MenuEnum.DRIVER_OPERATION_DETAIL;
+import static com.zhuanche.common.enums.MenuEnum.DRIVER_OPERATION_EXPORT;
 
 /**
  * 
@@ -58,14 +54,12 @@ public class DriverOperateDetailController{
 		* @param 	driverName	司机姓名
 		* @param 	pageNo	页号
 		* @param 	pageSize	每页记录数
-		* @param 	visibleCityIds	可见城市ID
-		* @param 	visibleAllianceIds	可见加盟商ID
-		* @param 	visibleMotorcadeIds	可见车队ID
 	    * @return
 	  */
 	@ResponseBody
     @RequestMapping(value = "/queryDriverOperateDetailData", method = { RequestMethod.POST,RequestMethod.GET })
 	@RequiresPermissions(value = { "DriverOperateDetail_look" } )
+	@RequestFunction(menu = DRIVER_OPERATION_DETAIL)
     public AjaxResponse queryDriverOperateDetailData(
     										  Long driverCityId,
     										  String genderId,
@@ -121,13 +115,11 @@ public class DriverOperateDetailController{
 		* @param 	allianceId	加盟商ID
 		* @param 	motorcadeId	车队ID
 		* @param 	driverName	司机姓名
-		* @param 	visibleCityIds	可见城市ID
-		* @param 	visibleAllianceIds	可见加盟商ID
-		* @param 	visibleMotorcadeIds	可见车队ID
 	    * @return
 	  */
   	@RequestMapping(value = "/exportDriverOperateDetailData", method = { RequestMethod.POST,RequestMethod.GET })
 	@RequiresPermissions(value = { "DriverOperateDetail_export" } )
+	@RequestFunction(menu = DRIVER_OPERATION_EXPORT)
 	public void exportDriverOperateDetailData( 
 										Long driverCityId,
 										String genderId,
@@ -175,14 +167,6 @@ public class DriverOperateDetailController{
 					saasBigdataApiUrl+"/driverOperateDetail/download",
 					new String("司机运营详情分析".getBytes("gb2312"), "iso8859-1"),
 					request.getRealPath("/")+File.separator+"template"+File.separator+"driveroperatedetail_info.csv");
-				
-				/*
-	          statisticalAnalysisService.downloadCsvFromTemplet(jsonString,
-	        		  	saasBigdataApiUrl+"/driverOperateDetail/download" ,
-						request.getRealPath("/")+File.separator+"template"+File.separator+"driveroperatedetail_info.csv");
-			  statisticalAnalysisService.exportCsvFromTemplet(response,
-						new String("司机运营详情分析".getBytes("gb2312"), "iso8859-1"),
-						request.getRealPath("/")+File.separator+"template"+File.separator+"driveroperatedetail_info.csv");*/
       }  catch (Exception e) {
           e.printStackTrace();
       }

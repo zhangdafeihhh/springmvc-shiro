@@ -1,9 +1,11 @@
 package com.zhuanche.controller.statisticalAnalysis;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
+import com.github.pagehelper.util.StringUtil;
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
+import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,14 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.github.pagehelper.util.StringUtil;
-import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.common.web.Verify;
-import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
-import com.zhuanche.shiro.realm.SSOLoginUser;
-import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.ValidateUtils;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.zhuanche.common.enums.MenuEnum.DRIVER_ANALYSIS_DATA;
+import static com.zhuanche.common.enums.MenuEnum.DRIVER_ANALYSIS_GRAPH;
 
 /**
  * 
@@ -45,12 +44,12 @@ public class DriverOperAnlayController{
 		* @param 	startDate	起始日期
 		* @param 	endDate	结束日期
 		* @param 	allianceId	加盟商ID
-		* @param 	visibleAllianceIds	可见加盟商ID
 	    * @return
 	  */
 	  @ResponseBody
 	  @RequestMapping(value = "/queryDriverOperAnlayData", method = { RequestMethod.POST,RequestMethod.GET })
 	  @RequiresPermissions(value = { "JoinDriverOperateAnalysis_look" } )
+	  @RequestFunction(menu = DRIVER_ANALYSIS_DATA)
 	  public AjaxResponse queryCarAnalysisIndexDetailData(
 			  @Verify(param = "startDate",rule = "required") String startDate,
 			  @Verify(param = "endDate",rule = "required") String endDate, 
@@ -78,12 +77,12 @@ public class DriverOperAnlayController{
 		* @param 	startDate	起始日期
 		* @param 	endDate	结束日期
 		* @param 	allianceId	加盟商ID
-		* @param 	visibleAllianceIds	可见加盟商ID
 	    * @return
 	  */
 	@ResponseBody
     @RequestMapping(value = "/queryDriverOperAnlayTrendData", method = { RequestMethod.POST,RequestMethod.GET })
 	@RequiresPermissions(value = { "JoinDriverOperateAnalysis_look" } )
+	@RequestFunction(menu = DRIVER_ANALYSIS_GRAPH)
     public AjaxResponse queryCarAnalysisIndexWayData(
     		  @Verify(param = "startDate",rule = "required") String startDate,
 			  @Verify(param = "endDate",rule = "required") String endDate, 
