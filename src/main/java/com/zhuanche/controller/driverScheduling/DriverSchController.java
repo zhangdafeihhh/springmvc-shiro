@@ -105,6 +105,7 @@ public class DriverSchController {
     @RequestMapping("/exportDutyToExcel")
 	@RequiresPermissions(value = { "LookArrange_export" } )
     @ResponseBody
+    @RequestFunction(menu = DRIVER_DUTY_EXPORT)
     public String  exportDutyToExcel(HttpServletResponse response, HttpServletRequest request,DutyParamRequest param){
 
         try{
@@ -231,6 +232,7 @@ public class DriverSchController {
      */
     @ResponseBody
     @RequestMapping(value = "/saveDriverDayDuty")
+    @RequestFunction(menu = DRIVER_DUTY_TIME_SAVE)
     public AjaxResponse saveDriverDayDuty(DutyParamRequest param){
         logger.info("保存司机日排班信息入参:"+ JSON.toJSONString(param));
         String result = carDriverShiftsService.saveDriverDayDuty(param);
@@ -259,6 +261,7 @@ public class DriverSchController {
     @ResponseBody
     @RequestMapping(value = "/queryDriverTeamReList")
 	@RequiresPermissions(value = { "DriverArrange_look" } )
+    @RequestFunction(menu = DRIVER_DUTY_LIST)
     public AjaxResponse queryDriverTeamReList(TeamGroupRequest teamGroupRequest){
         logger.info("获取班制设置司机列表入参:"+ JSON.toJSONString(teamGroupRequest));
         PageDTO pageDTO = carDriverShiftsService.queryDriverTeamReList(teamGroupRequest);
@@ -274,6 +277,7 @@ public class DriverSchController {
      */
     @ResponseBody
     @RequestMapping(value = "/queryDurationListByField")
+    @RequestFunction(menu = DRIVER_DUTY_TIME_FIELD)
     public AjaxResponse queryDurationListByField(@Verify(param = "teamId", rule = "required") Integer teamId,
                                                  @Verify(param = "cityId", rule = "required") Integer cityId,
                                                  @Verify(param = "supplierId", rule = "required") Integer supplierId){
@@ -291,7 +295,7 @@ public class DriverSchController {
     */
     @ResponseBody
     @RequestMapping(value = "/queryMustListByField")
-//    @RequestFunction(menu = )
+    @RequestFunction(menu = DRIVER_MUST_DUTY_TIME_FIELD)
     public AjaxResponse queryMustListByField(@Verify(param = "teamId", rule = "required") Integer teamId){
         logger.info("查询司机强制排班时间段入参:"+ JSON.toJSONString(teamId));
         List<CarDriverMustDutyDTO> list = carDriverShiftsService.queryMustListByField(teamId);
@@ -420,6 +424,7 @@ public class DriverSchController {
     */ 
     @ResponseBody
     @RequestMapping(value = "/issueDriverDuty")
+    @RequestFunction(menu = DRIVER_DUTY_PUBLISH)
     public AjaxResponse issueDriverDuty(DutyParamRequest param){
         logger.info("发布排班入参:"+ JSON.toJSONString(param));
         int result = carDriverDutyService.issueDriverDuty(param);
@@ -444,6 +449,7 @@ public class DriverSchController {
     @ResponseBody
     @RequestMapping(value = "/queryDriverMonthDutyData")
 	@RequiresPermissions(value = { "PublishArrange_look" , "LookArrange_look"} , logical=Logical.OR )
+    @RequestFunction(menu = DRIVER_DUTY_PUBLISH_LIST)
     public AjaxResponse queryDriverMonthDutyData(DutyParamRequest param) {
         logger.info("查看符合条件排班列表，入参:"+ (param== null?"null":JSON.toJSONString(param)));
       try{

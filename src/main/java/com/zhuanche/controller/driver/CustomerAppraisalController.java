@@ -10,6 +10,7 @@ import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalDTO;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
@@ -34,6 +35,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+
+import static com.zhuanche.common.enums.MenuEnum.*;
 
 @Controller
 @RequestMapping("/customerAppraisal")
@@ -140,6 +143,7 @@ public class CustomerAppraisalController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
+    @RequestFunction(menu = DRIVER_RANK_LIST)
     public AjaxResponse queryCustomerAppraisalStatisticsList(String name, String phone,Integer cityId, Integer supplierId,
                                                    Integer teamId, Integer teamGroupId,
                                                    @Verify(param = "month", rule = "required") String month,
@@ -206,6 +210,7 @@ public class CustomerAppraisalController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
+    @RequestFunction(menu = DRIVER_RANK_EXPORT)
     public String queryCustomerAppraisalStatisticsList(String name, String phone, Integer cityId, Integer supplierId,
                                                      Integer teamId, Integer teamGroupId,
                                                      @Verify(param = "month", rule = "required") String month,
@@ -374,6 +379,7 @@ public class CustomerAppraisalController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
+    @RequestFunction(menu = DRIVER_RANK_DETAIL)
     public AjaxResponse queryCustomerAppraisalStatisticsDetail(@Verify(param = "driverId", rule = "required") Integer driverId,
                                                                @Verify(param = "month", rule = "required") String month,
                                                                String orderNo,

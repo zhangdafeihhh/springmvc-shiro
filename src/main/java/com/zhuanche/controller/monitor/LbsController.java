@@ -1,13 +1,11 @@
 package com.zhuanche.controller.monitor;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.controller.risk.RiskOrderComplainController;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
-import com.zhuanche.entity.risk.RiskCarManagerOrderComplainEntity;
 import com.zhuanche.serv.CarBizDriverInfoService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -27,10 +25,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import static com.zhuanche.common.enums.MenuEnum.CAR_RUNNING_TRAIL;
 
 @Controller()
 @RequestMapping(value = "/monitor/gps")
@@ -59,6 +58,7 @@ public class LbsController {
     @ResponseBody
     @RequestMapping(value = "/getGpsByDriver", method = { RequestMethod.POST,RequestMethod.GET })
 	@RequiresPermissions(value = { "CarMonitor_look" } )
+    @RequestFunction(menu = CAR_RUNNING_TRAIL)
     public AjaxResponse getGpsByDriver(
             @RequestParam(value = "driverId", required = true,defaultValue = "")String driverId,
             @RequestParam(value = "startTime", required = true)String startTime,

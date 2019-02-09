@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.zhuanche.common.web.RequestFunction;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,9 @@ import com.zhuanche.common.web.Verify;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import com.zhuanche.util.CommonStringUtils;
+
+import static com.zhuanche.common.enums.MenuEnum.COMPLETE_ORDER_LIST;
+import static com.zhuanche.common.enums.MenuEnum.COMPLETE_ORDER_LIST_EXPORT;
 
 /**
  * 
@@ -53,6 +57,7 @@ public class CompleteOrderController{
 		@ResponseBody
 	    @RequestMapping(value = "/queryCompleteOrdeData", method = { RequestMethod.POST,RequestMethod.GET })
 		@RequiresPermissions(value = { "CompleteOrderDetail_look" } )
+        @RequestFunction(menu = COMPLETE_ORDER_LIST)
 	    public AjaxResponse queryCompleteOrderData(
 	    										  @Verify(param = "queryDate",rule = "required") String queryDate,
 	    										  Long cityId,
@@ -155,6 +160,7 @@ public class CompleteOrderController{
      */
      @RequestMapping(value = "/exportCompleteOrderData", method = RequestMethod.GET)
  	 @RequiresPermissions(value = { "CompleteOrderDetail_export" } )
+     @RequestFunction(menu = COMPLETE_ORDER_LIST_EXPORT)
  	 public void exportCompleteOrderData(@Verify(param = "queryDate",rule = "required") String queryDate,
                                          @Verify(param = "cityId",rule = "required") Long cityId,
                                          String productId,

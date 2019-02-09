@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.entity.risk.RiskCarManagerOrderComplainEntity;
@@ -30,6 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.URLEncoder;
 import java.util.*;
 
+import static com.zhuanche.common.enums.MenuEnum.*;
+
 @Controller()
 @RequestMapping(value = "/risk/incontrolorder")
 public class RiskOrderComplainController {
@@ -48,6 +51,7 @@ public class RiskOrderComplainController {
     @ResponseBody
     @RequestMapping(value = "/dopage", method = { RequestMethod.POST,RequestMethod.GET })
 	@RequiresPermissions(value = { "RiskOrder_look" } )
+    @RequestFunction(menu = RISK_ORDER_LIST)
     public AjaxResponse incontrolorderDopage(
             @RequestParam(value = "pageNum", required = false,defaultValue = "0")int pageNo,
             @Verify(param = "pageSize",rule = "max(50)")@RequestParam(value = "pageSize", required = false,defaultValue = "20")int pageSize,
@@ -143,6 +147,7 @@ public class RiskOrderComplainController {
 
     @ResponseBody
     @RequestMapping(value = "/detail", method = { RequestMethod.GET })
+    @RequestFunction(menu = RISK_ORDER_DETAIL)
     public AjaxResponse detail(@RequestParam("orderNo") String orderNo) {
         logger.info("风控-风控-风控订单管理-被风控的订单-获取订单详情信息  orderNo：{" + orderNo + "}");
         JSONObject repData = new JSONObject();
@@ -226,6 +231,7 @@ public class RiskOrderComplainController {
      */
     @RequestMapping(value = "/submitComplain")
     @ResponseBody
+    @RequestFunction(menu = RISK_ORDER_APPEAL)
     public AjaxResponse summitComplain(HttpServletRequest request,
                                  @RequestParam("complainReason") String complainReason,
                                  @RequestParam("orderNo") String orderNo) {

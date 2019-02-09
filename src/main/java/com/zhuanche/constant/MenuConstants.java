@@ -39,4 +39,27 @@ public interface MenuConstants {
     String TEAM_GROUP_MANAGE = "车队班组管理";
     String TEAM_GROUP_DUTY_MANAGE = "车队上班时间管理";
     String TEAM_GROUP_DURATION_MANAGE = "车队上班时长管理";
+    String DRIVER_DUTY_TIME_MANAGE = "司机班制排班";
+    String DRIVER_DUTY_PUBLISH = "发布司机排班";
+    String DRIVER_DUTY_LIST = "查看司机排班";
+    String CAR_RUNNING_MANAGE = "车辆运行管理";
+    String CAR_TRAIL_MANAGE = "车辆轨迹查询";
+
+    //运营管理
+    String OPERATION_MANAGEMENT = "运营管理";
+    String ORDER_MANAGE = "订单管理";
+    String ORDER_LIST = "订单查询";
+    String COMPLETE_ORDER_LIST = "完成订单详情";
+    String CANCEL_ORDER_LIST = "取消订单详情";
+    String RISK_MANAGE = "风控管理";
+    String RISK_ORDER = "风控订单查询";
+    String COMPLAIN_AND_RANK = "投诉评分";
+    String ORDER_RANK = "订单评分";
+    String DRIVER_RANK = "司机评分";
+    String STATISTIC_ANALYSIS = "统计分析";
+    String DRIVER_ANALYSIS = "司机运营分析";
+    String CAR_ANALYSIS = "车辆运营分析";
+    String DRIVER_EVALUATE_DETAIL = "司机评价详情";
+    String DRIVER_OPERATION_DETAIL = "司机运营详情";
+    String DRIVER_WORK_ASSESSMENT = "司机工作考核";
 }

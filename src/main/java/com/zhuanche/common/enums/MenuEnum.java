@@ -123,6 +123,49 @@ public enum MenuEnum {
     TEAM_GROUP_DURATION_SAVE(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.TEAM_GROUP_MANAGE, MenuConstants.TEAM_GROUP_DURATION_MANAGE,"车队排班时长保存"),
     TEAM_GROUP_DURATION_DETAIL(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.TEAM_GROUP_MANAGE, MenuConstants.TEAM_GROUP_DURATION_MANAGE,"车队排班时长详情"),
 
+    DRIVER_MUST_DUTY_TIME_FIELD(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.TEAM_GROUP_MANAGE, MenuConstants.DRIVER_DUTY_TIME_MANAGE,"车队强制排班时间段查询"),
+    DRIVER_DUTY_TIME_FIELD(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.TEAM_GROUP_MANAGE, MenuConstants.DRIVER_DUTY_TIME_MANAGE,"车队排班时间段查询"),
+    DRIVER_DUTY_LIST(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.TEAM_GROUP_MANAGE, MenuConstants.DRIVER_DUTY_TIME_MANAGE,"车队排班司机列表查询"),
+    DRIVER_DUTY_TIME_SAVE(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.TEAM_GROUP_MANAGE, MenuConstants.DRIVER_DUTY_TIME_MANAGE,"车队司机日排班保存"),
+
+    DRIVER_DUTY_PUBLISH_LIST(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.TEAM_GROUP_MANAGE, MenuConstants.DRIVER_DUTY_PUBLISH,"司机排班列表查询"),
+    DRIVER_DUTY_PUBLISH(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.TEAM_GROUP_MANAGE, MenuConstants.DRIVER_DUTY_PUBLISH,"发布司机排班"),
+
+    DRIVER_DUTY_EXPORT(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.TEAM_GROUP_MANAGE, MenuConstants.DRIVER_DUTY_LIST,"司机排班列表导出"),
+
+    //车辆运行管理
+    CAR_RUNNING_DRIVER_INFO(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.CAR_RUNNING_MANAGE, MenuConstants.CAR_TRAIL_MANAGE,"车牌号司机信息查询"),
+    CAR_RUNNING_DRIVER_INDATE(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.CAR_RUNNING_MANAGE, MenuConstants.CAR_TRAIL_MANAGE,"司机指标汇总查询"),
+    CAR_RUNNING_ORDER_LIST(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.CAR_RUNNING_MANAGE, MenuConstants.CAR_TRAIL_MANAGE,"轨迹订单列表"),
+    CAR_RUNNING_TRAIL(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.CAR_RUNNING_MANAGE, MenuConstants.CAR_TRAIL_MANAGE,"车辆轨迹查询"),
+
+
+    //订单管理
+    ORDER_LIST(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.ORDER_MANAGE, MenuConstants.ORDER_LIST,"订单明细查询"),
+    ORDER_LIST_EXPORT(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.ORDER_MANAGE, MenuConstants.ORDER_LIST,"订单明细导出"),
+    ORDER_DETAIL(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.ORDER_MANAGE, MenuConstants.ORDER_LIST,"订单详情查询"),
+    COMPLETE_ORDER_LIST(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.ORDER_MANAGE, MenuConstants.COMPLETE_ORDER_LIST,"完成订单明细查询"),
+    COMPLETE_ORDER_LIST_EXPORT(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.ORDER_MANAGE, MenuConstants.COMPLETE_ORDER_LIST,"完成订单明细导出"),
+    CANCEL_ORDER_LIST(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.ORDER_MANAGE, MenuConstants.CANCEL_ORDER_LIST,"取消订单明细查询"),
+    CANCEL_ORDER_LIST_EXPORT(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.ORDER_MANAGE, MenuConstants.CANCEL_ORDER_LIST,"取消订单明细导出"),
+
+    //风控管理
+    RISK_ORDER_LIST(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.RISK_MANAGE, MenuConstants.RISK_ORDER,"风控订单列表查询"),
+    RISK_ORDER_APPEAL(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.RISK_MANAGE, MenuConstants.RISK_ORDER,"风控订单申诉"),
+    RISK_ORDER_DETAIL(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.RISK_MANAGE, MenuConstants.RISK_ORDER,"风控订单申诉详情查询"),
+
+    //投诉评分
+    ORDER_RANK_LIST(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.COMPLAIN_AND_RANK, MenuConstants.ORDER_RANK,"订单评分列表查询"),
+    OFFLINE_ORDER_RANK_LIST(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.COMPLAIN_AND_RANK, MenuConstants.ORDER_RANK,"停运司机订单评分查询"),
+    ORDER_RANK_EXPORT(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.COMPLAIN_AND_RANK, MenuConstants.ORDER_RANK,"订单评分导出"),
+    DRIVER_RANK_LIST(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.COMPLAIN_AND_RANK, MenuConstants.DRIVER_RANK,"司机评分列表查询"),
+    DRIVER_RANK_EXPORT(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.COMPLAIN_AND_RANK, MenuConstants.DRIVER_RANK,"司机评分导出"),
+    DRIVER_RANK_DETAIL(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.COMPLAIN_AND_RANK, MenuConstants.DRIVER_RANK,"司机评分详情查询"),
+
+    //统计分析
+    STATISTIC_ANALYSIS(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.STATISTIC_ANALYSIS, MenuConstants.DRIVER_RANK,"司机评分详情查询"),
+    CAR_DETAIL_ANALYSIS(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.STATISTIC_ANALYSIS, MenuConstants.CAR_ANALYSIS,"车辆分析趋势图明细查询"),
+    CAR_TABLE_ANALYSIS(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.STATISTIC_ANALYSIS, MenuConstants.CAR_ANALYSIS,"车辆分析趋势表格查询"),
     ;
 
     private String levelOne;

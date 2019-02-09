@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
@@ -35,6 +36,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 
+import static com.zhuanche.common.enums.MenuEnum.CAR_RUNNING_ORDER_LIST;
+
 @Controller()
 @RequestMapping(value = "/monitor/order")
 public class MonitorOrderController {
@@ -63,6 +66,7 @@ public class MonitorOrderController {
      */
     @ResponseBody
     @RequestMapping(value = "/page", method = { RequestMethod.POST })
+    @RequestFunction(menu = CAR_RUNNING_ORDER_LIST)
     public AjaxResponse getGpsByDriver(
             @RequestParam(value = "pageNo", required = false,defaultValue = "1")Integer pageNo,
             @Verify(param = "pageSize",rule = "max(50)")@RequestParam(value = "pageSize", required = false,defaultValue = "20")Integer pageSize,

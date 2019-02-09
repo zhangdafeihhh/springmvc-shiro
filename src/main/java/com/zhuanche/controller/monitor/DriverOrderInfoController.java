@@ -3,6 +3,7 @@ package com.zhuanche.controller.monitor;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.serv.CarBizDriverInfoService;
@@ -25,6 +26,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import static com.zhuanche.common.enums.MenuEnum.CAR_RUNNING_DRIVER_INDATE;
 
 @Controller()
 @RequestMapping(value = "/monitor/driverorder")
@@ -52,6 +55,7 @@ public class DriverOrderInfoController {
      */
     @ResponseBody
     @RequestMapping(value = "/indate", method = { RequestMethod.POST,RequestMethod.GET })
+    @RequestFunction(menu = CAR_RUNNING_DRIVER_INDATE)
     public AjaxResponse driverOrderbBtween(
 
             @RequestParam(value = "vehiclePlate", required = true)String vehiclePlate,

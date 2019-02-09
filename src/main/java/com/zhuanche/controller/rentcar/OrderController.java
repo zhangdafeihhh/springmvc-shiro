@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.util.CommonStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -57,6 +58,8 @@ import mapper.rentcar.CarBizCustomerMapper;
 import mapper.rentcar.CarBizDriverInfoMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarFactOrderExMapper;
+
+import static com.zhuanche.common.enums.MenuEnum.*;
 
 
 /**
@@ -125,6 +128,7 @@ public class OrderController{
 	 @ResponseBody
 	 @RequestMapping(value = "/queryOrderList", method = { RequestMethod.POST,RequestMethod.GET })
 	 @RequiresPermissions(value = { "OrderList_look" } )
+	 @RequestFunction(menu = ORDER_LIST)
 	 public AjaxResponse queryOrderList(
 			 								   String serviceId,
 			 								   String airportIdnot,
@@ -316,6 +320,7 @@ public class OrderController{
 	 @ResponseBody
 	 @RequestMapping(value = "/exportOrderList", method = { RequestMethod.POST,RequestMethod.GET })
  	 @RequiresPermissions(value = { "OrderList_export" } )
+	 @RequestFunction(menu = ORDER_LIST_EXPORT)
 	 public String exportOrderList(
 											   String serviceId,
 											   String airportIdnot,
@@ -677,6 +682,7 @@ public class OrderController{
 		  @MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE ),
 		  @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
 	} )
+	@RequestFunction(menu = ORDER_DETAIL)
 	public AjaxResponse selectUser(String orderId,String orderNo){
 		logger.info("*****************查询订单详情 订单id+"+orderId);
 		if(StringUtil.isEmpty(orderId) && StringUtil.isEmpty(orderNo)){

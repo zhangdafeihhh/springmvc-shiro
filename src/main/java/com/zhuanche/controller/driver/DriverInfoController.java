@@ -780,6 +780,7 @@ public class DriverInfoController {
     @MasterSlaveConfigs(configs={
             @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE )
     } )
+    @RequestFunction(menu = CAR_RUNNING_DRIVER_INFO)
     public AjaxResponse queryDriverByLicensePlates(HttpServletRequest request, @Verify(param = "license_plates",rule="required") String license_plates) {
 
         logger.info(LOGTAG + "根据车牌号查询司机信息license_plates={}", license_plates);

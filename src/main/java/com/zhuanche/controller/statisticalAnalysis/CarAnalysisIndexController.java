@@ -1,14 +1,13 @@
 package com.zhuanche.controller.statisticalAnalysis;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-
+import com.github.pagehelper.util.StringUtil;
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
+import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,16 +20,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.github.pagehelper.util.StringUtil;
-import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.common.web.Verify;
-import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
-import com.zhuanche.shiro.realm.SSOLoginUser;
-import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.ValidateUtils;
 import org.springframework.web.client.RestTemplate;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.zhuanche.common.enums.MenuEnum.CAR_DETAIL_ANALYSIS;
+import static com.zhuanche.common.enums.MenuEnum.CAR_TABLE_ANALYSIS;
 
 /**
  * 
@@ -61,6 +59,7 @@ public class CarAnalysisIndexController{
 	  @ResponseBody
 	  @RequestMapping(value = "/queryCarAnalysisIndexDetailData", method = { RequestMethod.POST,RequestMethod.GET })
   	  @RequiresPermissions(value = { "CarOperateAnalysis_look" } )
+	  @RequestFunction(menu = CAR_TABLE_ANALYSIS)
 	  public AjaxResponse queryCarAnalysisIndexDetailData(
 			  @Verify(param = "startDate",rule = "required") String startDate,
 			  @Verify(param = "endDate",rule = "required") String endDate, 
@@ -101,6 +100,7 @@ public class CarAnalysisIndexController{
 		@ResponseBody
 	    @RequestMapping(value = "/queryCarAnalysisIndexWayData", method = { RequestMethod.POST,RequestMethod.GET })
 		@RequiresPermissions(value = { "CarOperateAnalysis_look" } )
+		@RequestFunction(menu = CAR_DETAIL_ANALYSIS)
 	    public AjaxResponse queryCarAnalysisIndexWayData(
 	    			@Verify(param = "startDate",rule = "required") String startDate,
 	    			@Verify(param = "endDate",rule = "required") String endDate, 
@@ -157,10 +157,4 @@ public class CarAnalysisIndexController{
 
 			}
 	    }
-
-		public static void main(String[] args) throws ParseException {
-			 String string = "2016-10-24 21:59:06";
-		        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		        System.out.println(sdf.parse(string).getTime());
-		}
 }

@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.constant.Constants;
@@ -27,6 +28,9 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.zhuanche.common.enums.MenuEnum.CANCEL_ORDER_LIST;
+import static com.zhuanche.common.enums.MenuEnum.CANCEL_ORDER_LIST_EXPORT;
 
 
 /**
@@ -66,6 +70,7 @@ public class CancelOrderController{
 	    @ResponseBody
 	    @RequestMapping(value = "/queryCancelOrderData", method = { RequestMethod.POST,RequestMethod.GET })
 		@RequiresPermissions(value = { "CancelOrderDetail_look" } )
+		@RequestFunction(menu = CANCEL_ORDER_LIST)
 	    public AjaxResponse queryCancelOrderData(
 	    										  Long driverCityId,
 	    										  String allianceId,
@@ -242,6 +247,7 @@ public class CancelOrderController{
     @ResponseBody
     @RequestMapping(value = "/exportCancelOrderData", method = { RequestMethod.POST,RequestMethod.GET })
 	@RequiresPermissions(value = { "CancelOrderDetail_export" } )
+	@RequestFunction(menu = CANCEL_ORDER_LIST_EXPORT)
     public AjaxResponse exportCancelOrderData(
             Long driverCityId,
             String allianceId,

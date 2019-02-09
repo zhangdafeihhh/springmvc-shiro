@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.zhuanche.common.enums.MenuEnum.*;
+
 /**
  * 投诉评分--订单评分
  *
@@ -78,6 +80,7 @@ public class OrderAppraisalController extends DriverQueryController{
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})
+	@RequestFunction(menu = ORDER_RANK_LIST)
 	public AjaxResponse appraisalDataList(@Verify(param="cityId",rule="required")String cityId,
 										  @Verify(param="supplierId",rule="required")String supplierId,
 										  String teamId,
@@ -152,6 +155,7 @@ public class OrderAppraisalController extends DriverQueryController{
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})
+	@RequestFunction(menu = ORDER_RANK_EXPORT)
 	public AjaxResponse exportOrderAppraisal(
 			@Verify(param="cityId",rule="required")String cityId,
 			@Verify(param="supplierId",rule="required") String supplierId,
@@ -310,7 +314,7 @@ public class OrderAppraisalController extends DriverQueryController{
 	@MasterSlaveConfigs(configs = {
 			@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})
-	//TODO @RequestFunction() 司机临时停运详情
+	@RequestFunction(menu = OFFLINE_ORDER_RANK_LIST)
 	public Object orderAppraisalListFromDriverOutageData(@Verify(param = "outageId", rule = "required") Integer outageId,
 														 Integer page,
 														 Integer pageSize) {
