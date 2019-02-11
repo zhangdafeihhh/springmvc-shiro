@@ -623,7 +623,7 @@ public class BusInfoController {
     private void saveErrorMsg(List<ErrorReason> reasons, int row, int col, String reason) {
         ErrorReason errorReason = new ErrorReason();
         errorReason.setRow(row);
-        errorReason.setCol(col);
+        errorReason.setCol(col+1);
         errorReason.setReason(reason);
         reasons.add(errorReason);
     }
