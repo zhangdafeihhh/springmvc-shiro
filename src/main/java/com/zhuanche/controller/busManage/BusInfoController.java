@@ -79,7 +79,7 @@ public class BusInfoController {
     @Autowired
     private BusCommonService commonService;
 
-    private static final String licensePlateTemplate="京A12345";
+    private static final String licensePlateTemplate = "京A12345";
 
     /**
      * @Description:查询巴士车辆列表
@@ -229,7 +229,7 @@ public class BusInfoController {
         downdata.add(fuelNames);
 
         //构建模板事例
-        List contentList=new ArrayList();
+        List contentList = new ArrayList();
         BusCarImportTemplateVO templateVO = new BusCarImportTemplateVO();
         templateVO.setCityName("北京");
         templateVO.setSupplierName("测试集团01");
@@ -240,7 +240,7 @@ public class BusInfoController {
         templateVO.setVehicleBrand("宇通");
         templateVO.setModelDetail("宇通ZK6908H9");
         templateVO.setTransportnumber("粤交运管朝阳字123456 123456号");
-        SimpleDateFormat sf=new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
         templateVO.setNextInspectDate(sf.parse("2008-01-01"));
         templateVO.setNextMaintenanceDate(sf.parse("2019-01-01"));
         templateVO.setNextOperationDate(sf.parse("2019-01-01"));
@@ -264,11 +264,11 @@ public class BusInfoController {
             downRows[0] = "1";
             downRows[1] = "3";
             BusCarBaseImportTemplateVO busCarBaseImportTemplateVO = new BusCarBaseImportTemplateVO();
-            BeanUtils.copyProperties(templateVO,busCarBaseImportTemplateVO);
+            BeanUtils.copyProperties(templateVO, busCarBaseImportTemplateVO);
             contentList.add(busCarBaseImportTemplateVO);
         }
 
-        ExportExcelUtil.exportExcel(fileName, head, downdata, downRows, contentList,request, response);
+        ExportExcelUtil.exportExcel(fileName, head, downdata, downRows, contentList, request, response);
     }
 
 
@@ -335,14 +335,14 @@ public class BusInfoController {
         }
 
         // 最后一行数据的下标，刚好可以表示总数据条数（标题不算）
-        int listDataIdx=sheet.getLastRowNum();
-        int total =listDataIdx;
+        int listDataIdx = sheet.getLastRowNum();
+        int total = listDataIdx;
 
         //判断除了标题外，判断下标1有没有样例数据，如果有从下标2开始读取数据，没有，则从下标1开始读取
-        int licensePlateIdx=0;
-        for(int i=0;i<heads.length;i++){
-            if(heads[i].equals("车牌号")){
-                licensePlateIdx=i;
+        int licensePlateIdx = 0;
+        for (int i = 0; i < heads.length; i++) {
+            if (heads[i].equals("车牌号")) {
+                licensePlateIdx = i;
                 break;
             }
         }
@@ -352,10 +352,10 @@ public class BusInfoController {
         Row rowDataFirst = sheet.getRow(1);
         Cell cellFirst = rowDataFirst.getCell(licensePlateIdx);
         String licenseFirst = readCellValue(cellFirst);
-        if(licensePlateTemplate.equals(licenseFirst)){
+        if (licensePlateTemplate.equals(licenseFirst)) {
             start = 2;
             //过滤掉样例，总的条数需要-1；
-            total=total-1;
+            total = total - 1;
         }
         if (total == 0) {
             logger.error(LOG_PRE + "巴士导入车辆文件内容为空");
@@ -415,6 +415,11 @@ public class BusInfoController {
                             validFlag = false;
                             break;
                         }
+                        if (value.length() > 10) {
+                            saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 最大长度为10");
+                            validFlag = false;
+                            break;
+                        }
                         boolean checkResult = busInfoService.licensePlatesIfExist(value);
                         if (checkResult) {
                             saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 已经存在");
@@ -445,6 +450,11 @@ public class BusInfoController {
                             validFlag = false;
                             break;
                         }
+                        if (value.length() > 10) {
+                            saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 最大长度为10");
+                            validFlag = false;
+                            break;
+                        }
                         saveDTO.setColor(value);
                         break;
                     //燃料类型
@@ -469,6 +479,11 @@ public class BusInfoController {
                             validFlag = false;
                             break;
                         }
+                        if (value.length() > 50) {
+                            saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 最大长度为50");
+                            validFlag = false;
+                            break;
+                        }
                         saveDTO.setTransportnumber(value);
                         break;
                     //车厂厂牌
@@ -478,11 +493,23 @@ public class BusInfoController {
                             validFlag = false;
                             break;
                         }
+                        if (value.length() > 50) {
+                            saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 最大长度为50");
+                            validFlag = false;
+                            break;
+                        }
                         saveDTO.setVehicleBrand(value);
                         break;
                     //具体车型
                     case "具体车型(选填)":
-                        saveDTO.setModelDetail(value);
+                        if (StringUtils.isNotBlank(value)) {
+                            if (value.length() > 50) {
+                                saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 最大长度为50");
+                                validFlag = false;
+                                break;
+                            }
+                            saveDTO.setModelDetail(value);
+                        }
                         break;
                     //下次车检时间
                     case "下次车检时间(选填)":
@@ -623,7 +650,7 @@ public class BusInfoController {
     private void saveErrorMsg(List<ErrorReason> reasons, int row, int col, String reason) {
         ErrorReason errorReason = new ErrorReason();
         errorReason.setRow(row);
-        errorReason.setCol(col+1);
+        errorReason.setCol(col + 1);
         errorReason.setReason(reason);
         reasons.add(errorReason);
     }
