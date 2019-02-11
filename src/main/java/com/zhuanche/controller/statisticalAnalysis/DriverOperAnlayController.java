@@ -61,7 +61,7 @@ public class DriverOperAnlayController{
           if(StringUtil.isNotEmpty(allianceId)){
         	 paramMap.put("allianceId", allianceId);//加盟商ID
           }
-	      paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,null,allianceId,null);
+	      paramMap = statisticalAnalysisService.transParamMap(paramMap,null,allianceId);
 		  if(paramMap==null){
 			return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 		  }
@@ -94,7 +94,7 @@ public class DriverOperAnlayController{
 		      if(StringUtil.isNotEmpty(allianceId)){
 	        	 paramMap.put("allianceId", allianceId);//加盟商ID
 		       }
-		      paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,null,allianceId,null);
+		      paramMap = statisticalAnalysisService.transParamMap(paramMap,null,allianceId);
 		      if(paramMap==null){
 					return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
 			  }

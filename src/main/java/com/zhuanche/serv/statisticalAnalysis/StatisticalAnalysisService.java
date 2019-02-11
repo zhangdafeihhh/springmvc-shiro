@@ -7,7 +7,9 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.rentcar.CompleteOrderDTO;
+import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.http.HttpClientUtil;
+import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.ValidateUtils;
@@ -22,6 +24,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
@@ -38,6 +41,9 @@ public class  StatisticalAnalysisService {
 	private static final Integer CONNECT_TIMEOUT = 6000;
 	/**读取超时时间**/
 	private static final Integer READ_TIMEOUT = 6000;
+
+	@Autowired
+	private CitySupplierTeamCommonService citySupplierTeamCommonService;
 	
 	public Map<String, Object> currentLoginUserVisibleParam(Map<String, Object> paramMap,SSOLoginUser currentLoginUser){
 		if(currentLoginUser == null || paramMap==null){
@@ -280,6 +286,58 @@ public class  StatisticalAnalysisService {
 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 		}
 	}
+
+	//bug fix 大数据接口只接受供应商id
+	public Map<String, Object> transParamMap(Map<String, Object> paramMap, Long cityId, String supplier){
+		// 数据权限设置
+		Set<Integer> cityIdsForAuth;// 超级管理员可以管理的所有城市ID
+		Set<Integer> supplierIdsForAuth;// 超级管理员可以管理的所有供应商ID
+
+		Set<String> supplierIds = new HashSet<>();
+
+		logger.info("非超级管理员:" + WebSessionUtil.isSupperAdmin() + "cityId:" + cityId + ",supplier:" + supplier);
+		if (!WebSessionUtil.isSupperAdmin()) {// 非超级管理员
+			// 获取当前登录用户信息
+			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+			logger.info("获取当前登录用户信息:"+currentLoginUser);
+			if(null != currentLoginUser){
+				cityIdsForAuth = currentLoginUser.getCityIds();// 获取用户可见的城市ID
+				supplierIdsForAuth = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
+			}else{
+				logger.info("获取当前登录用户信息null");
+				return null;
+			}
+			if (cityIdsForAuth.size() > 0 && cityId != null && !cityIdsForAuth.contains(cityId.intValue())) {
+				logger.info("cityIdsForAuth="+JSON.toJSONString(cityIdsForAuth)
+						+";cityId="+cityId);
+				return null;
+			}
+			if (supplierIdsForAuth.size() > 0 && StringUtils.isNotBlank(supplier) && !supplierIdsForAuth.contains(Integer.valueOf(supplier))) {
+				logger.info("supplierIdsForAuth="+JSON.toJSONString(supplierIdsForAuth)
+						+";supplier="+supplier);
+				return null;
+			}
+			// 供应商权限
+			if(supplierIdsForAuth.size() > 0 ){
+				for (Integer supplierId : supplierIdsForAuth) {
+					supplierIds.add(String.valueOf(supplierId));
+				}
+			}else {
+				if (cityIdsForAuth.size() > 0){
+					List<CarBizSupplier> carBizSuppliers = citySupplierTeamCommonService.querySupplierList(cityIdsForAuth);
+					carBizSuppliers.forEach(carBizSupplier -> supplierIds.add(carBizSupplier.getSupplierId().toString()));
+				}
+			}
+		} else {
+			if(StringUtils.isNotEmpty(supplier)){
+				supplierIds.add(supplier);
+			}
+		}
+		if(!supplierIds.isEmpty()){
+			paramMap.put("visibleAllianceIds", supplierIds); // 可见加盟商ID
+		}
+		return paramMap;
+	}
 	
 	public Map<String, Object> getCurrentLoginUserParamMap(Map<String, Object> paramMap,Long cityId,String supplier,String teamId){
 		// 数据权限设置
@@ -309,13 +367,13 @@ public class  StatisticalAnalysisService {
 				logger.info("cityIdsForAuth="+(cityIdsForAuth==null?"null":JSON.toJSONString(cityIdsForAuth))
 						+";cityId="+cityId);
 				return null;
-			} 
+			}
 			if (supplierIdsForAuth.size() > 0 && StringUtils.isNotBlank(supplier) && !supplierIdsForAuth.contains(Integer.valueOf(supplier))) {
 				logger.info("supplierIdsForAuth="+(supplierIdsForAuth==null?"null":JSON.toJSONString(supplierIdsForAuth))
 						+";supplier="+supplier);
 				return null;
 			}
-			 
+
 			if (teamIdsForAuth.size() > 0 && StringUtils.isNotBlank(teamId) && !teamIdsForAuth.contains(Integer.valueOf(teamId))) {
 				logger.info("teamIdsForAuth="+(teamIdsForAuth==null?"null":JSON.toJSONString(teamIdsForAuth))
 						+";teamId="+teamId);
