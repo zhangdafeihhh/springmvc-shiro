@@ -49,31 +49,31 @@ public class BusSupplierDetailDTO implements BusSupplierDTO {
 
 	/** 公司名称(发票信息) **/
 	@NotBlank(message = "公司名称不能为空")
-	@Size(max = 100, message = "公司名称长度不能超过255")
+	@Size(max = 255, message = "公司名称长度不能超过255")
 	private String invoiceCompanyName;
 
 	/** 电话号码(发票信息) **/
-	@Size(max = 100, message = "电话号码长度不能超过30")
+	@Size(max = 30, message = "电话号码长度不能超过30")
 	private String invoiceCompanyPhone;
 
 	/** 公司地址(发票信息) **/
 	@NotBlank(message = "公司地址不能为空")
-	@Size(max = 100, message = "公司地址长度不能超过255")
+	@Size(max = 255, message = "公司地址长度不能超过255")
 	private String invoiceCompanyAddr;
 
 	/** 开户银行(发票信息) **/
 	@NotBlank(message = "开户银行不能为空")
-	@Size(max = 100, message = "开户银行长度不能超过255")
+	@Size(max = 255, message = "开户银行长度不能超过255")
 	private String invoiceDepositBank;
 
 	/** 银行账户(发票信息) **/
 	@NotBlank(message = "银行账户不能为空")
-	@Size(max = 100, message = "银行账户长度不能超过50")
+	@Size(max = 50, message = "银行账户长度不能超过50")
 	private String invoiceBankAccount;
 
 	/** 税号(发票信息) **/
 	@NotBlank(message = "税号不能为空")
-	@Size(max = 100, message = "税号长度不能超过50")
+	@Size(max = 50, message = "税号长度不能超过50")
 	private String invoiceDutyParagraph;
 
 	// ========================业务字段=========================

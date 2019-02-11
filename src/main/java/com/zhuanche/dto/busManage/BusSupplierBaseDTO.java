@@ -26,17 +26,17 @@ public class BusSupplierBaseDTO implements BusSupplierDTO {
 
 	/** 企业联系人 **/
 	@NotBlank(message = "企业联系人不能为空")
-	@Size(max = 100, message = "企业联系人长度不能超过20")
+	@Size(max = 20, message = "企业联系人长度不能超过20")
 	private String contacts;
 
 	/** 企业联系人电话 **/
 	@NotBlank(message = "企业联系人电话不能为空")
-	@Size(max = 100, message = "企业联系人电话长度不能超过23")
+	@Size(max = 23, message = "企业联系人电话长度不能超过23")
 	private String contactsPhone;
 
 	/** 调度员电话 **/
 	@NotBlank(message = "调度员电话不能为空")
-	@Size(max = 100, message = "调度员电话长度不能超过23")
+	@Size(max = 23, message = "调度员电话长度不能超过23")
 	private String dispatcherPhone;
 
 	/** 加盟类型:car_biz_cooperation_type **/
