@@ -7,7 +7,7 @@ public interface BusCarBizDriverInfoExMapper {
 	/**
 	 * @Title: queryDriverSimpleInfoById
 	 * @Description: 根据司机ID查询简单司机信息
-	 * @param orderId
+	 * @param driverId
 	 * @return 
 	 * @return CarBizDriverInfo
 	 * @throws

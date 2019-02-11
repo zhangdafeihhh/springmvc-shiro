@@ -1,7 +1,5 @@
 package com.zhuanche.entity.mdbcarmanage;
 
-import java.util.Date;
-
 public class DriverDutyStatistic {
     private Integer id;
 

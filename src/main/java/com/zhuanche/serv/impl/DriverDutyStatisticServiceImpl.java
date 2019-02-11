@@ -7,7 +7,6 @@ import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.dto.rentcar.DriverDutyStatisticDTO;
-import com.zhuanche.entity.mdbcarmanage.DriverDailyReport;
 import com.zhuanche.entity.mdbcarmanage.DriverDutyStatistic;
 import com.zhuanche.entity.mdbcarmanage.DriverDutyStatisticParams;
 import com.zhuanche.entity.rentcar.CarBizCity;

@@ -3,7 +3,6 @@ package com.zhuanche.serv.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
@@ -12,12 +11,10 @@ import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.DriverDailyReportDTO;
 import com.zhuanche.dto.driver.DriverIncome;
-import com.zhuanche.dto.driver.DriverIncomeForEveryDay;
 import com.zhuanche.entity.mdbcarmanage.DriverDailyReport;
 import com.zhuanche.entity.mdbcarmanage.DriverDailyReportParams;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.serv.DriverDailyReportExService;
-import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.MyRestTemplate;
@@ -34,7 +31,6 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class DriverDailyReportExServiceImpl implements DriverDailyReportExService {

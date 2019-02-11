@@ -1,7 +1,5 @@
 package com.zhuanche.entity.mdbcarmanage;
 
-import java.util.Date;
-
 public class CarDriverDayDuty {
     private Integer id;
 

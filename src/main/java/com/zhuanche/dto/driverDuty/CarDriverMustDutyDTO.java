@@ -2,8 +2,6 @@ package com.zhuanche.dto.driverDuty;
 
 import com.zhuanche.entity.mdbcarmanage.CarDriverMustDuty;
 
-import java.util.Date;
-
 public class CarDriverMustDutyDTO extends CarDriverMustDuty {
 
     private static final long serialVersionUID = 8479238538627739203L;

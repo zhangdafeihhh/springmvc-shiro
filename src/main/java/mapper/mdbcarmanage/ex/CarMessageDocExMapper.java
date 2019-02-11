@@ -37,13 +37,7 @@ public interface CarMessageDocExMapper {
      */
     List<CarMessageDoc> listDoc(@Param("messageId")Long messageId);
 
-    int insertSelective(CarMessageDoc record);
 
-    CarMessageDoc selectByPrimaryKey(Long id);
-
-    int updateByPrimaryKeySelective(CarMessageDoc record);
-
-    int updateByPrimaryKey(CarMessageDoc record);
 
 
 }

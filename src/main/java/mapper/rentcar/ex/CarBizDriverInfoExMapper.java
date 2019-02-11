@@ -158,7 +158,7 @@ public interface CarBizDriverInfoExMapper {
     /**
      * @Title: queryBusDriverList
      * @Description: 查询巴士订单指派/改派可用司机
-     * @param busDriverDTO
+     * @param richerDTO
      * @return List<Map<String,Object>>
      * @throws
      */

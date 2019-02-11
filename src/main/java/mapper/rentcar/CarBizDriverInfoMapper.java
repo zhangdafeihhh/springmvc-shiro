@@ -1,10 +1,6 @@
 package mapper.rentcar;
 
-import com.zhuanche.dto.driver.DriverVoEntity;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
 
 public interface CarBizDriverInfoMapper {
     int deleteByPrimaryKey(Integer driverId);

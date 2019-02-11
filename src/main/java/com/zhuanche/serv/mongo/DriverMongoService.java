@@ -2,17 +2,15 @@ package com.zhuanche.serv.mongo;
 
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.mongo.DriverMongo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.Map;
-
-import javax.annotation.Resource;
 
 /**
  * @ClassName: DriverMongoServiceImpl

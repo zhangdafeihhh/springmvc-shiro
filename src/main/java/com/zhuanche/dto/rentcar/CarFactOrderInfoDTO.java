@@ -1,8 +1,5 @@
 package com.zhuanche.dto.rentcar;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class CarFactOrderInfoDTO{
 	//订单号 
 	private String orderNo;

@@ -2,9 +2,6 @@ package com.zhuanche.serv.driverScheduling;
 
 import com.alibaba.fastjson.JSON;
 import com.zhuanche.common.cache.RedisCacheUtil;
-import com.zhuanche.common.database.DynamicRoutingDataSource;
-import com.zhuanche.common.database.MasterSlaveConfig;
-import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.dutyEnum.EnumDriverDutyTimeFlag;
 import com.zhuanche.common.rocketmq.CommonRocketProducer;
 import com.zhuanche.constant.Constants;
@@ -35,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
 import java.util.*;
 
 

@@ -1,7 +1,5 @@
 package com.zhuanche.shiro;
 
-import com.zhuanche.util.DESUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.filter.mgt.FilterChainManager;

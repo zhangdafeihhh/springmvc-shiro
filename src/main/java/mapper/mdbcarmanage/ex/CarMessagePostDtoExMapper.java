@@ -1,7 +1,6 @@
 package mapper.mdbcarmanage.ex;
 
 import com.zhuanche.dto.mdbcarmanage.CarMessagePostDto;
-import com.zhuanche.entity.mdbcarmanage.CarMessagePost;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

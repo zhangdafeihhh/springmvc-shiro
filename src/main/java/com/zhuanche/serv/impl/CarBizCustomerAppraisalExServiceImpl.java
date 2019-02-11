@@ -3,7 +3,6 @@ package com.zhuanche.serv.impl;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.zhuanche.entity.mdbcarmanage.DriverDailyReport;
 import com.zhuanche.entity.rentcar.CarBizCustomerAppraisal;
 import com.zhuanche.entity.rentcar.CarBizCustomerAppraisalParams;
 import com.zhuanche.serv.CarBizCustomerAppraisalExService;

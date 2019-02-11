@@ -1,8 +1,6 @@
 package com.zhuanche.entity.rentcar;
 
 
-import com.zhuanche.entity.common.BaseEntity;
-
 public class CarImportExceptionEntity {
 	private String licensePlates;//车牌号
 	private String reson;//异常原因

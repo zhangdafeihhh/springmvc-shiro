@@ -1,8 +1,5 @@
 package mapper.mdbcarmanage.ex;
 
-import com.zhuanche.common.database.DynamicRoutingDataSource;
-import com.zhuanche.common.database.MasterSlaveConfig;
-import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.dto.driverDuty.CarDriverMonthDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverMonthDuty;
 import com.zhuanche.request.DriverMonthDutyRequest;

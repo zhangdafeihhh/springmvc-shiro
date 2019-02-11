@@ -118,7 +118,6 @@ public class BusAssignmentController {
      * 根据订单号获取当前可指派的车辆数据
      *
      * @param orderNo
-     * @param params
      * @return
      */
     @ResponseBody
@@ -146,7 +145,6 @@ public class BusAssignmentController {
      * 根据订单号获取当前可指派的司机数据
      *
      * @param orderNo
-     * @param params
      * @return
      */
     @ResponseBody
@@ -438,7 +436,7 @@ public class BusAssignmentController {
      * 保存发送短信的task
      *
      * @param orderNo
-     * @param bookDate
+     * @param bookingDate
      */
     private void saveMessageTask(String orderNo, Date bookingDate) {
         try {

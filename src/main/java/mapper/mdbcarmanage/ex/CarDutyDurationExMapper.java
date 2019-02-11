@@ -1,10 +1,6 @@
 package mapper.mdbcarmanage.ex;
 
-import com.zhuanche.common.database.DynamicRoutingDataSource;
-import com.zhuanche.common.database.MasterSlaveConfig;
-import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.dto.driverDuty.CarDriverDurationDTO;
-import com.zhuanche.entity.mdbcarmanage.CarDutyDuration;
 import com.zhuanche.request.DutyParamRequest;
 import org.apache.ibatis.annotations.Param;
 

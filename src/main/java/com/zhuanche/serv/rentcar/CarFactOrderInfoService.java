@@ -1,24 +1,14 @@
 package com.zhuanche.serv.rentcar;
 
-import java.util.List;
-import java.util.Map;
-
-import org.apache.poi.ss.usermodel.Workbook;
-
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
-import com.zhuanche.dto.rentcar.CarFactOrderInfoDTO;
 import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
 import com.zhuanche.dto.rentcar.ServiceTypeDTO;
 import com.zhuanche.entity.DriverOrderRecord.OrderTimeEntity;
-import com.zhuanche.entity.rentcar.CarBizCity;
-import com.zhuanche.entity.rentcar.CarBizOrderSettleEntity;
-import com.zhuanche.entity.rentcar.CarBizOrderWaitingPeriod;
-import com.zhuanche.entity.rentcar.CarBizPlanEntity;
-import com.zhuanche.entity.rentcar.CarBizSupplier;
-import com.zhuanche.entity.rentcar.CarFactOrderInfo;
-import com.zhuanche.entity.rentcar.CarGroupEntity;
-import com.zhuanche.entity.rentcar.ServiceEntity;
+import com.zhuanche.entity.rentcar.*;
+
+import java.util.List;
+import java.util.Map;
 
 
 public interface CarFactOrderInfoService {
@@ -30,7 +20,7 @@ public interface CarFactOrderInfoService {
     public String getMainOrderBySubOrderNo(String orderNo);
     /**
      *  （老车管）根据主订单查询子订单信息
-     * @param orderNo 订单号
+     * @param mainOrderNo 订单号
      * @return java.lang.String
      */
     public List<CarFactOrderInfo> getMainOrderByMainOrderNo(String mainOrderNo);
@@ -42,7 +32,7 @@ public interface CarFactOrderInfoService {
 //    public List<CarFactOrderInfoDTO>  queryAllOrderDataList(Map<String, Object> paramMap);
     /**
 	 * 查询LBS提供的轨迹坐标
-	 * @param paramsStr
+	 * @param paramMap
 	 * @return
 	 */
 	public String queryDrivingRouteData(Map<String, Object> paramMap);
@@ -123,7 +113,7 @@ public interface CarFactOrderInfoService {
      * 订单服务类型
      */
     public List<ServiceTypeDTO> selectServiceEntityList(ServiceEntity serviceEntity);
-	
+
 //    Workbook exportExceleOrderList(List<CarFactOrderInfoDTO> list, String path) throws Exception;
 
 }

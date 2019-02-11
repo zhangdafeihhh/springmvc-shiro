@@ -50,7 +50,6 @@ public class CancelOrderController{
 	 private StatisticalAnalysisService statisticalAnalysisService;
 		 /**
 		    * 查询取消订单列表
-		 	* @param 查询日期	queryDate
 		    * @param queryDate	查询日期
 			* @param driverCityId	司机所属城市ID
 			* @param allianceId	加盟商ID
@@ -60,11 +59,9 @@ public class CancelOrderController{
 			* @param orderVehicleTypeId	预约车型ID
 			* @param productTypeId	产品类型ID
 			* @param cancelDurationTypeId	取消时长分类ID
+			* @param cancelTypeId	取消类型ID
 			* @param pageNo	页号
 			* @param pageSize	每页记录数
-			* @param visibleCityIds	可见城市ID
-			* @param visibleAllianceIds	可见加盟商ID
-			* @param visibleMotorcadeIds	可见车队ID
 		    * @return
 		  */
 	    @ResponseBody

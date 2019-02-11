@@ -2,7 +2,6 @@ package mapper.mdbcarmanage.ex;
 
 import com.zhuanche.dto.CarDriverTeamDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
-import com.zhuanche.entity.mdbcarmanage.CarRelateGroup;
 import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.request.DriverTeamRequest;
 import com.zhuanche.request.TeamGroupRequest;

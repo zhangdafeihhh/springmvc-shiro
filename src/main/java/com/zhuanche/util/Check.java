@@ -3,7 +3,6 @@ package com.zhuanche.util;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.Map;
 import java.util.regex.Matcher;

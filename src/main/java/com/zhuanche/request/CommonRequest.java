@@ -1,7 +1,6 @@
 package com.zhuanche.request;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
 /**

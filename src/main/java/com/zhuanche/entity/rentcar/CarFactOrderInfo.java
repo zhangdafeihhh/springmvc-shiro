@@ -173,7 +173,7 @@ public class CarFactOrderInfo extends BaseEntity {
 	// 空驶费
 	private Double longDistancePrice = 0.0;
 	private String costTypeName;
-	private Long cost = 0l;
+	private Long cost = 0L;
 	// 停车目录
 	private String costTypeNameTc;
 	// 高速目录
@@ -185,15 +185,15 @@ public class CarFactOrderInfo extends BaseEntity {
 	// 食宿目录
 	private String costTypeNameYj;
 	// 停车费
-	private Long costTypeNameTcPrice = 0l;
+	private Long costTypeNameTcPrice = 0L;
 	//
-	private Long costTypeNameGsPrice = 0l;
+	private Long costTypeNameGsPrice = 0L;
 	// 高速费
-	private Long costTypeNameQtPrice = 0l;
+	private Long costTypeNameQtPrice = 0L;
 	// 机场服务费
-	private Long costTypeNameJcPrice = 0l;
+	private Long costTypeNameJcPrice = 0L;
 	// 食宿费
-	private Long costTypeNameYjPrice = 0l;
+	private Long costTypeNameYjPrice = 0L;
 
 	private int status;
 	private int serviceTypeId;

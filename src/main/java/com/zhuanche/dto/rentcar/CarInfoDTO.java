@@ -1,10 +1,5 @@
 package com.zhuanche.dto.rentcar;
 
-import com.zhuanche.entity.common.BaseEntity;
-import com.zhuanche.util.DateUtils;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class CarInfoDTO{

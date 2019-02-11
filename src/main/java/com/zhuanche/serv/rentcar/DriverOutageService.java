@@ -2,7 +2,6 @@ package com.zhuanche.serv.rentcar;
 
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.entity.rentcar.DriverOutage;
-import com.zhuanche.entity.rentcar.DriverOutageVo;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.web.multipart.MultipartFile;
 

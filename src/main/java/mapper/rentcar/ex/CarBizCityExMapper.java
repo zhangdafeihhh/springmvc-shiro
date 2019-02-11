@@ -4,7 +4,6 @@ import com.zhuanche.entity.rentcar.CarBizCity;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public interface CarBizCityExMapper{

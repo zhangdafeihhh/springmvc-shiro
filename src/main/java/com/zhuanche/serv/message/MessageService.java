@@ -5,7 +5,6 @@ import com.github.pagehelper.PageHelper;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
-import com.zhuanche.constants.FtpConstants;
 import com.zhuanche.dto.mdbcarmanage.CarMessageDetailDto;
 import com.zhuanche.dto.mdbcarmanage.CarMessagePostDto;
 import com.zhuanche.dto.mdbcarmanage.MessageDocDto;
@@ -14,7 +13,6 @@ import com.zhuanche.entity.mdbcarmanage.*;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.exception.MessageException;
-import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.FtpUtil;
@@ -24,9 +22,6 @@ import com.zhuanche.util.dateUtil.DateUtil;
 import mapper.mdbcarmanage.ex.*;
 import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -35,18 +30,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.text.html.parser.Entity;
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * @Author fanht

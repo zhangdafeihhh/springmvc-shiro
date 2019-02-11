@@ -32,8 +32,9 @@ public class BusCarBizCustomerAppraisalStatisticsService {
 	/**
 	 * @Title: queryAppraisal
 	 * @Description: 查询司机某月评分
-	 * @param param
-	 * @return 
+	 * @param driverId
+	 * @param date
+	 * @return
 	 * @return CarBizCustomerAppraisalStatistics
 	 * @throws
 	 */

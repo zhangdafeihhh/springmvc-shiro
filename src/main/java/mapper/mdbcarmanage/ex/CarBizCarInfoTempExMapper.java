@@ -1,7 +1,6 @@
 package mapper.mdbcarmanage.ex;
 
 import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
-import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

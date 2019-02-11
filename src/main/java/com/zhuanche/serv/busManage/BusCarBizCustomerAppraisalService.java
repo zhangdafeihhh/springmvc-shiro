@@ -27,7 +27,7 @@ public class BusCarBizCustomerAppraisalService {
 	/**
 	 * @Title: queryAppraisal
 	 * @Description: 查询司机某月评分
-	 * @param param
+	 * @param orderNo
 	 * @return 
 	 * @return CarBizCustomerAppraisalStatistics
 	 * @throws
@@ -41,9 +41,7 @@ public class BusCarBizCustomerAppraisalService {
 	/**
 	 * @Title: getScore
 	 * @Description: 获取司机某月评分
-	 * @param driverId
-	 * @param date
-	 * @return 
+	 * @param orderNo
 	 * @return String
 	 * @throws
 	 */

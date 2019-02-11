@@ -1,7 +1,5 @@
 package com.zhuanche.dto.rentcar;
 
-import java.util.Set;
-
 public class CarBizCustomerAppraisalExtDTO extends  CarBizCustomerAppraisalDTO {
 
     private static final long serialVersionUID = 1346427662939958799L;

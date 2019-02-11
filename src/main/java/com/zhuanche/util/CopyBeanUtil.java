@@ -1,18 +1,17 @@
 package com.zhuanche.util;
+
+import com.alibaba.fastjson.JSON;
+import com.zhuanche.dto.rentcar.CarFactOrderInfoDetailDTO;
+import com.zhuanche.entity.rentcar.CarFactOrderInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.beanutils.BeanUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.alibaba.fastjson.JSON;
-import com.zhuanche.dto.rentcar.CarFactOrderInfoDetailDTO;
-import com.zhuanche.entity.rentcar.CarFactOrderInfo;
 
 /**
  * 实体类字段值相同的复制

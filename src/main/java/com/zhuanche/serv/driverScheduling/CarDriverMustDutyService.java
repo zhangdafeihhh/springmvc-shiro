@@ -2,7 +2,6 @@ package com.zhuanche.serv.driverScheduling;
 
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.parser.deserializer.AbstractDateDeserializer;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
@@ -17,7 +16,6 @@ import com.zhuanche.request.CommonRequest;
 import com.zhuanche.request.DutyParamRequest;
 import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.Check;
 import mapper.mdbcarmanage.CarDriverMustDutyMapper;
 import mapper.mdbcarmanage.ex.CarDriverMustDutyExMapper;
@@ -25,11 +23,9 @@ import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.mail.search.SearchTerm;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;

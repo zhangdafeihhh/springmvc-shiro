@@ -1,13 +1,10 @@
 package com.zhuanche.serv.message;
 
-import com.google.common.collect.Lists;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
-import com.zhuanche.entity.mdbcarmanage.CarMessagePost;
 import com.zhuanche.entity.mdbcarmanage.CarMessageReceiver;
 import com.zhuanche.exception.MessageException;
-import mapper.mdbcarmanage.CarMessageReceiverMapper;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import mapper.mdbcarmanage.ex.CarMessageReceiverExMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.*;
 
 /**

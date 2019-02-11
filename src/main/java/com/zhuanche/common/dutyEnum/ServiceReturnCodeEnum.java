@@ -2,9 +2,6 @@ package com.zhuanche.common.dutyEnum;
 
 import com.zhuanche.util.Check;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @program: bus-manage
  * @description: 车辆导入名单的枚举类型

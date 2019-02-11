@@ -1,19 +1,15 @@
 package com.zhuanche.serv.common;
 
-import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.dto.mdbcarmanage.ShiftParamDTO;
 import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
-import com.zhuanche.entity.mdbcarmanage.CarRelateGroup;
-import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
-import com.zhuanche.request.DriverTeamRequest;
 import com.zhuanche.request.CommonRequest;
+import com.zhuanche.request.DriverTeamRequest;
 import com.zhuanche.request.TeamGroupRequest;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
-import mapper.mdbcarmanage.ex.CarRelateTeamExMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -22,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -348,7 +343,7 @@ public class CitySupplierTeamCommonService {
      * @Date: 2018/8/29
      */
     public List<CarDriverTeam> queryDriverTeamList(Integer cityId){
-        if(cityId==null || cityId.intValue()<=00) {
+        if(cityId==null || cityId <= 0) {
             return new ArrayList<CarDriverTeam>();
         }
         //进行查询 (区分 超级管理员 、普通管理员 )

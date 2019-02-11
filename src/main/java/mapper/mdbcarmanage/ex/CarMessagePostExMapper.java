@@ -26,14 +26,6 @@ public interface CarMessagePostExMapper {
                                             @Param("status")Integer status);
 
     /**
-     * 根据messageIds获取列表
-     * @param ids
-     * @return
-     */
-    List<CarMessagePost> listCarMessagePostBymesageIds(@Param("ids")List<Long> ids);
-
-
-    /**
      * 向主表插入数据
      * @param record
      * @return

@@ -17,13 +17,11 @@ import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
 import com.zhuanche.serv.CustomerAppraisalService;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.threads.CustomerAppraisalExportHelper;
 import com.zhuanche.util.excel.CsvUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +32,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.net.URLEncoder;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
 
 import static com.zhuanche.common.enums.MenuEnum.*;
 
