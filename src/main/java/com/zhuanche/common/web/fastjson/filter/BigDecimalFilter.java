@@ -17,7 +17,7 @@ public class BigDecimalFilter implements ValueFilter {
 	@Override
 	public Object process(Object object, String name, Object value) {
 		if (value != null && value instanceof BigDecimal) {
-			DecimalFormat format = new DecimalFormat("#########0.00");
+			DecimalFormat format = new DecimalFormat("#########0.##");
 			return format.format(value);
 		}
 		return value;

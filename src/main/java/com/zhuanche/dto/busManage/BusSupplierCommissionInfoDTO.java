@@ -36,7 +36,7 @@ public class BusSupplierCommissionInfoDTO {
 	/** 结算天数 >0 **/
 	@NotNull(message = "结算天数不能为空")
 	@DecimalMin(value = "0", inclusive = false, message = "结算天数必须大于0")
-	@DecimalMax(value = "365", inclusive = false, message = "结算天数不能超过365天")
+	@DecimalMax(value = "366", inclusive = true, message = "结算天数不能超过366天")
 	private Integer settleBillCycle;
 
 	/** 结算方式 0 手动 1自动 **/
