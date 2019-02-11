@@ -172,8 +172,8 @@ public enum MenuEnum {
     REPORT_CONFIGURE(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.DATA_REPORT, MenuConstants.DATA_REPORT_SUBSCRIPTION, "报表订阅配置查询"),
     REPORT_CONFIGURE_LIST(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.DATA_REPORT, MenuConstants.DATA_REPORT_SUBSCRIPTION, "报表订阅配置列表查询"),
     SUBSCRIPTION_REPORT(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.DATA_REPORT, MenuConstants.DATA_REPORT_SUBSCRIPTION, "数据报表订阅"),
-    REPORT_DOWNLOAD_LIST(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.DATA_REPORT, MenuConstants.DATA_REPORT_SUBSCRIPTION, "订阅报表下载列表查询"),
-    REPORT_DOWNLOAD(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.DATA_REPORT, MenuConstants.SUPPLIER_MANAGE, "加盟商名称是否存在"),
+    REPORT_DOWNLOAD_LIST(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.DATA_REPORT, MenuConstants.DATA_REPORT_DOWNLOAD, "订阅报表下载列表查询"),
+    REPORT_DOWNLOAD(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.DATA_REPORT, MenuConstants.DATA_REPORT_DOWNLOAD, "加盟商名称是否存在"),
     ;
 
     private String levelOne;
