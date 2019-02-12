@@ -197,6 +197,10 @@
 	</select>
 	
 	<!-- 查询巴士供应同分页信息 -->
+	<!-- 不包括已经过期的  start -->
+<!--         	AND TIMESTAMPDIFF(MONTH, now(), contract_date_end) <![CDATA[>=]]> 0 -->
+<!--         	AND contract_date_end >= NOW() -->
+	<!-- 不包括已经过期的  end -->
 	<select id="querySupplierContractExpireSoonList" parameterType="java.util.Map" resultType="com.zhuanche.vo.busManage.BusSupplierPageVO">
 		SELECT
 			supplier_id AS supplierId,
@@ -209,8 +213,6 @@
 			bus_biz_supplier_detail
 		where 
         		TIMESTAMPDIFF(MONTH, now(), contract_date_end) <![CDATA[<]]> 3
-        	AND TIMESTAMPDIFF(MONTH, now(), contract_date_end) <![CDATA[>=]]> 0
-        	AND contract_date_end >= NOW()
             <if test="supplierIds != null and supplierIds.size() > 0">
 				AND supplier_id IN
 				<foreach collection="supplierIds" item="item" open="(" separator="," close=")">
