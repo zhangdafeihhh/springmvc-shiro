@@ -21,10 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -82,11 +80,11 @@ import com.zhuanche.vo.busManage.BusDriverInfoPageVO;
 import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.mdbcarmanage.CarRelateGroupMapper;
 import mapper.mdbcarmanage.CarRelateTeamMapper;
+import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
 import mapper.mdbcarmanage.ex.CarBizAgreementCompanyExMapper;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.mdbcarmanage.ex.CarRelateGroupExMapper;
 import mapper.mdbcarmanage.ex.CarRelateTeamExMapper;
-import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
 import mapper.rentcar.CarBizCarGroupMapper;
 import mapper.rentcar.CarBizCityMapper;
 import mapper.rentcar.CarBizCooperationTypeMapper;
@@ -844,23 +842,26 @@ public class BusCarBizDriverInfoService implements BusConst {
         /** ===========================需要校验的字段=========================== */
         // 出生日期
         String birthDay = saveDTO.getBirthDay();
-        long age = ChronoUnit.YEARS.between(LocalDate.parse(birthDay, pattern), now);
-        if (age < 21 || age > 60) {
-            return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "司机年龄必须满足（21≤司机年龄≤60）");
-        }
-        // 司机年龄
-        saveDTO.setAge((int) age);
-        // 驾照领证日期
+		if (saveDTO.getAge() == null || saveDTO.getAge() == 0) {
+			// 司机年龄
+			long age = ChronoUnit.YEARS.between(LocalDate.parse(birthDay, pattern), now);
+			saveDTO.setAge((int) age);
+		}
+		if (saveDTO.getAge() != null && (saveDTO.getAge() < 21 || saveDTO.getAge() > 60)) {
+			return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "司机年龄必须满足（21≤司机年龄≤60）");
+		}
+		// 驾照领证日期
         Date issueDate = saveDTO.getIssueDate();
-        LocalDate issueLocalDate = LocalDateTime.ofInstant(issueDate.toInstant(), ZoneId.systemDefault()).toLocalDate();
-        long drivingYears = ChronoUnit.YEARS.between(issueLocalDate, now);
-        if (drivingYears < 3) {
-            return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "司机驾龄必须满足（驾龄≥3）");
-        }
-        // 驾龄
-        saveDTO.setDrivingYears((int) drivingYears);
-
-        // ======================以下值属于默认值==============================
+		if (saveDTO.getDrivingYears() == null || saveDTO.getDrivingYears() == 0) {
+			// 驾龄
+			LocalDate issueLocalDate = LocalDateTime.ofInstant(issueDate.toInstant(), ZoneId.systemDefault()).toLocalDate();
+			long drivingYears = ChronoUnit.YEARS.between(issueLocalDate, now);
+			saveDTO.setDrivingYears((int) drivingYears);
+		}
+		if (saveDTO.getDrivingYears() != null && (saveDTO.getDrivingYears() < 3)) {
+			return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "司机驾龄必须满足（驾龄≥3）");
+		}
+		// ======================以下值属于默认值==============================
         // 国籍
         saveDTO.setNationality("中国");
         // 民族：汉
@@ -1168,6 +1169,15 @@ public class BusCarBizDriverInfoService implements BusConst {
                                 LocalDate localDate = LocalDate.parse(data, DateTimeFormatter.ofPattern("yyyy-M-d"));
                                 String format = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(localDate);
                                 saveDTO.setBirthDay(format);
+                                
+                                // 司机年龄
+                                long age = ChronoUnit.YEARS.between(localDate, LocalDate.now());
+                                if (age < 21 || age > 60) {
+                                	errorMsgs.add(errorPrefix + "司机年龄必须满足（21≤司机年龄≤60）");
+                                	isTrue = false;
+                                	break;
+                                }
+                    			saveDTO.setAge((int) age);
                             } catch (Exception e) {
                                 errorMsgs.add(errorPrefix + "格式错误，正确格式为：yyyy-MM-dd");
                                 isTrue = false;
@@ -1195,6 +1205,15 @@ public class BusCarBizDriverInfoService implements BusConst {
                             try {
                                 LocalDate issueDate = LocalDate.parse(transfTime(cellValue), DateTimeFormatter.ofPattern("yyyy-M-d"));
                                 saveDTO.setIssueDate(Date.from(issueDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+                                
+                                // 驾龄
+                                long drivingYears = ChronoUnit.YEARS.between(issueDate, LocalDate.now());
+                    			if (drivingYears < 3) {
+                    				errorMsgs.add(errorPrefix + "司机驾龄必须满足（驾龄≥3）");
+                                	isTrue = false;
+                                	break;
+                    			}
+                    			saveDTO.setDrivingYears((int) drivingYears);
                             } catch (Exception e) {
                                 errorMsgs.add(errorPrefix + "格式错误，正确格式为：yyyy-MM-dd");
                                 isTrue = false;

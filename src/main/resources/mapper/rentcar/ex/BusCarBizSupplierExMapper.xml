@@ -243,6 +243,7 @@
 			s.supplier_full_name AS supplierName,
 			c.city_name AS cityName,
 			s.`status` AS status,
+			s.create_date AS createDate,
 			'0' as isExpireSoon
 		FROM
 			car_biz_supplier s

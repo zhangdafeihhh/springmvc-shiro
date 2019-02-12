@@ -30,7 +30,7 @@ public class BusSupplierPageVO {
 	/** 保证金 **/
 	private BigDecimal deposit;
 
-	/** 是否有返点   0不返点 1返点**/
+	/** 是否有返点 0不返点 1返点 **/
 	private Integer isRebate;
 
 	/** 合同开始时间 **/
@@ -39,7 +39,10 @@ public class BusSupplierPageVO {
 	/** 合同结束时间 **/
 	private Date contractDateEnd;
 
-	/** 是否快过期  0否  1是 **/
+	/** 创建时间 **/
+	private Date createDate;
+
+	/** 是否快过期 0否 1是 **/
 	private Integer isExpireSoon;
 
 	/** 状态：1.有效 0.无效 **/
@@ -115,6 +118,14 @@ public class BusSupplierPageVO {
 
 	public void setContractDateEnd(Date contractDateEnd) {
 		this.contractDateEnd = contractDateEnd;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
 	}
 
 	public Integer getIsExpireSoon() {
