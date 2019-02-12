@@ -186,6 +186,7 @@ public class DriverInfoTemporaryController extends BaseController {
      */
     @ResponseBody
     @RequestMapping(value = "/deleteDriverInfo", method = RequestMethod.POST)
+    @RequestFunction(menu = DRIVER_JOIN_APPLY_DELETE)
     public AjaxResponse deleteDriverInfo(@Verify(param = "driverIds",rule="required") String driverIds) {
         log.info("司机删除:deleteDriverInfo,参数:"+driverIds);
         return carBizDriverInfoTempService.delete(driverIds);
@@ -199,6 +200,7 @@ public class DriverInfoTemporaryController extends BaseController {
      */
     @RequestMapping(value = "/fileDownloadDriverInfo",method =  RequestMethod.GET)
 	@RequiresPermissions(value = { "SupplierDriverEntry_download" } )
+    @RequestFunction(menu = DRIVER_JOIN_APPLY_TEMPLATE_DOWNLOAD)
     public void fileDownloadDriverInfo(HttpServletRequest request, HttpServletResponse response) {
         String path = request.getSession().getServletContext().getRealPath("/upload")+File.separator+"IMPORTDRIVERINFO.xlsx";
         super.fileDownload(request,response,path);
@@ -216,6 +218,7 @@ public class DriverInfoTemporaryController extends BaseController {
     @ResponseBody
     @RequestMapping(value = "/importDriverInfo",method =  RequestMethod.POST)
 	@RequiresPermissions(value = { "SupplierDriverEntry_import" } )
+    @RequestFunction(menu = DRIVER_JOIN_APPLY_IMPORT)
     public AjaxResponse importDriverInfo(@RequestParam(value="fileName") MultipartFile file,
                                          @Verify(param = "cityId",rule="required") Integer cityId,
                                          @Verify(param = "supplierId",rule="required") Integer supplierId,
@@ -293,6 +296,7 @@ public class DriverInfoTemporaryController extends BaseController {
 			@MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.SLAVE ),
 			@MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	} )
+    @RequestFunction(menu = DRIVER_JOIN_APPLY_UPDATE_INFO)
     public AjaxResponse driverInfo(@Verify(param = "driverId",rule="required") String driverId) {
         log.info("查询司机个人信息:driverInfo,司机Id:"+driverId);
         CarBizDriverInfoTemp entity = new CarBizDriverInfoTemp();
@@ -402,6 +406,7 @@ public class DriverInfoTemporaryController extends BaseController {
      */
     @ResponseBody
     @RequestMapping(value = "/addSave", method =  RequestMethod.POST)
+    @RequestFunction(menu = DRIVER_JOIN_APPLY_ADD)
     public AjaxResponse addSave(@Verify(param = "name",rule="required") String name,
                                     @Verify(param = "nationAlity",rule="required") String nationAlity,
                                     @Verify(param = "nation",rule="required") String nation,
@@ -581,6 +586,7 @@ public class DriverInfoTemporaryController extends BaseController {
      */
     @ResponseBody
     @RequestMapping(value = "/updateSave", method =  RequestMethod.POST)
+    @RequestFunction(menu = DRIVER_JOIN_APPLY_UPDATE)
     public AjaxResponse updateSave(@Verify(param = "driverId",rule="required") String driverId,
                                 @Verify(param = "name",rule="required") String name,
                                 @Verify(param = "nationAlity",rule="required") String nationAlity,
@@ -714,6 +720,7 @@ public class DriverInfoTemporaryController extends BaseController {
      */
     @ResponseBody
     @RequestMapping(value = "/licensePlatesTempList")
+    @RequestFunction(menu = DRIVER_JOIN_APPLY_LICENSE_PLATES)
     public Object licensePlatesList(@Verify(param = "cityId", rule = "required") Integer cityId,
                                     @Verify(param = "supplierId", rule = "required") Integer supplierId) {
         Map<String, Object> map=new HashMap<String, Object>();

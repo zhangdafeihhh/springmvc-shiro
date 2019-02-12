@@ -45,8 +45,14 @@ public enum MenuEnum {
     DRIVER_JOIN_PROMOTE_IMAGE(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_JOIN_MANAGE, MenuConstants.DRIVER_JOIN_PROMOTE, "加盟司机证件信息查询"),
     DRIVER_JOIN_PROMOTE_RECORD(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_JOIN_MANAGE, MenuConstants.DRIVER_JOIN_PROMOTE, "加盟司机记录查询"),
 
-    DRIVER_JOIN_APPLY_LIST(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_JOIN_MANAGE, MenuConstants.DRIVER_JOIN_APPLY, "重置用户密码"),
-    DRIVER_JOIN_APPLY_DELETE(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_JOIN_MANAGE, MenuConstants.DRIVER_JOIN_APPLY, "重置用户密码"),
+    DRIVER_JOIN_APPLY_LIST(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_JOIN_MANAGE, MenuConstants.DRIVER_JOIN_APPLY, "司机加盟申请查询"),
+    DRIVER_JOIN_APPLY_DELETE(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_JOIN_MANAGE, MenuConstants.DRIVER_JOIN_APPLY, "司机加盟申请删除"),
+    DRIVER_JOIN_APPLY_TEMPLATE_DOWNLOAD(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_JOIN_MANAGE, MenuConstants.DRIVER_JOIN_APPLY, "司机加盟申请模板下载"),
+    DRIVER_JOIN_APPLY_IMPORT(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_JOIN_MANAGE, MenuConstants.DRIVER_JOIN_APPLY, "司机加盟申请导入"),
+    DRIVER_JOIN_APPLY_UPDATE_INFO(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_JOIN_MANAGE, MenuConstants.DRIVER_JOIN_APPLY, "司机加盟申请详情查询"),
+    DRIVER_JOIN_APPLY_UPDATE(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_JOIN_MANAGE, MenuConstants.DRIVER_JOIN_APPLY, "司机加盟申请修改"),
+    DRIVER_JOIN_APPLY_ADD(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_JOIN_MANAGE, MenuConstants.DRIVER_JOIN_APPLY, "司机加盟申请新增"),
+    DRIVER_JOIN_APPLY_LICENSE_PLATES(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_JOIN_MANAGE, MenuConstants.DRIVER_JOIN_APPLY, "司机加盟申请加盟商车牌查询"),
     //司机信息管理接口
     DRIVER_INFO_LIST(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_INFO_MANAGE, MenuConstants.DRIVER_INFO_LIST, "司机信息查询"),
     DRIVER_INFO_LIST_EXPORT(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_INFO_MANAGE, MenuConstants.DRIVER_INFO_LIST, "司机信息导出"),
