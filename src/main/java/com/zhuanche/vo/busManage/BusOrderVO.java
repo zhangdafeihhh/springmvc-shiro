@@ -89,5 +89,7 @@ public class BusOrderVO { // carGroupName riderCount factDate factStartAddr fact
 	private String companyName;
 	// 企业折扣
 	private Double percent;
+	//供应商名称
+	private String supplierName;
 
 }

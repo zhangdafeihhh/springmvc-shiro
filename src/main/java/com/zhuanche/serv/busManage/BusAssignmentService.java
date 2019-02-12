@@ -19,6 +19,7 @@ import com.zhuanche.entity.busManage.OrgCostInfo;
 import com.zhuanche.entity.mdbcarmanage.BusOrderOperationTime;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.util.*;
+import com.zhuanche.vo.busManage.BusDriverDetailInfoVO;
 import com.zhuanche.vo.busManage.BusOrderExVO;
 import com.zhuanche.vo.busManage.BusOrderExportVO;
 import mapper.mdbcarmanage.ex.BusOrderOperationTimeExMapper;
@@ -141,10 +142,11 @@ public class BusAssignmentService {
                 orderList.forEach(order -> {
                     // a)司机姓名/司机手机号
                     if (order.getDriverId() != null) {
-                        CarBizDriverInfo driver = busCarBizDriverInfoExMapper.queryDriverSimpleInfoById(order.getDriverId());
+                        BusDriverDetailInfoVO driver = busCarBizDriverInfoExMapper.queryDriverExtendInfoById(order.getDriverId());
                         if (driver != null) {
                             order.setDriverName(driver.getName());
                             order.setDriverPhone(driver.getPhone());
+                            order.setSupplierName(driver.getSupplierName());
                         }
                     }
                     // b)本单司机评分

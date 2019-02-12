@@ -7,6 +7,7 @@ import java.util.Set;
 import com.zhuanche.dto.busManage.BusDriverQueryDTO;
 import com.zhuanche.dto.busManage.BusDriverSaveDTO;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
+import com.zhuanche.vo.busManage.BusDriverDetailInfoVO;
 import com.zhuanche.vo.busManage.BusDriverInfoExportVO;
 import com.zhuanche.vo.busManage.BusDriverInfoPageVO;
 import org.apache.ibatis.annotations.Param;
@@ -60,6 +61,8 @@ public interface BusCarBizDriverInfoExMapper {
 	 * @throws
 	 */
 	CarBizDriverInfo queryDriverSimpleInfoById(Integer driverId);
+
+	BusDriverDetailInfoVO queryDriverExtendInfoById(@Param("driverId") Integer driverId);
 
 	List<Map<String,Object>> queryDriverSimpleBatch(@Param("driverIds") Set<Integer> driverIds);
 

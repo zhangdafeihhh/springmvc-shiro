@@ -724,6 +724,19 @@
 		WHERE
 			driver_id = #{driverId}
 	</select>
+	<!--根据司机ID,查询司机信息以及简单的关联表的信息,可扩展-->
+	<select id="queryDriverExtendInfoById" parameterType="java.lang.Integer" resultType="com.zhuanche.vo.busManage.BusDriverDetailInfoVO">
+		SELECT
+		driver.driver_id AS driverId,
+		driver. name,
+		driver.phone,
+		sup.supplier_full_name supplierName,
+		driver.supplier_id AS supplierId
+		FROM
+		car_biz_driver_info driver
+		LEFT JOIN car_biz_supplier sup ON driver.supplier_id = sup.supplier_id
+		where driver_id = #{driverId}
+	</select>
 
 	<select id="queryDriverSimpleBatch" parameterType="java.util.Set" resultType="java.util.Map">
 		SELECT
