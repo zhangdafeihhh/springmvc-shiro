@@ -348,6 +348,7 @@ public class BusAssignmentService {
                     Date value1 = (Date) value;
                     SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     textValue = sf.format(value1);
+                    sb.append(tab);
                 } else {
                     //其它数据类型都当作字符串简单处理
                     if (value != null&&!value.toString().trim().equals("null")) {
