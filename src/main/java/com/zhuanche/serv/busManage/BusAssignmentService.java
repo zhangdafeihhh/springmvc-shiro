@@ -3,10 +3,12 @@ package com.zhuanche.serv.busManage;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.zhuanche.constants.busManage.EnumOrder;
@@ -19,6 +21,7 @@ import com.zhuanche.entity.busManage.OrgCostInfo;
 import com.zhuanche.entity.mdbcarmanage.BusOrderOperationTime;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.util.*;
+import com.zhuanche.util.objcompare.FieldNote;
 import com.zhuanche.vo.busManage.BusDriverDetailInfoVO;
 import com.zhuanche.vo.busManage.BusOrderExVO;
 import com.zhuanche.vo.busManage.BusOrderExportVO;
@@ -58,6 +61,10 @@ import mapper.rentcar.CarBizServiceMapper;
 public class BusAssignmentService {
 
     private static final Logger logger = LoggerFactory.getLogger(BusAssignmentService.class);
+    /**
+     * 校验是否为数字组成
+     */
+    private static final Pattern pattern_compile = Pattern.compile("^[0-9]*$");
 
     @Autowired
     private CarBizServiceMapper carBizServiceMapper;
@@ -328,6 +335,7 @@ public class BusAssignmentService {
             for (short i = 0; i < fields.length; i++) {
                 Field field = fields[i];
                 String fieldName = field.getName();
+                String fieldType = field.getGenericType().toString();
                 String getMethodName = "get"
                         + fieldName.substring(0, 1).toUpperCase()
                         + fieldName.substring(1);
@@ -336,21 +344,23 @@ public class BusAssignmentService {
                 Object value = getMethod.invoke(t, new Object[]{});
                 //判断值的类型后进行强制类型转换
                 String textValue = null;
-
                 if (value instanceof Date) {
                     Date value1 = (Date) value;
                     SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     textValue = sf.format(value1);
-
                 } else {
                     //其它数据类型都当作字符串简单处理
-                    if (value != null&&!value.toString().equals("null")) {
-                        textValue = value.toString();
+                    if (value != null&&!value.toString().trim().equals("null")) {
+                        textValue = value.toString().trim();
+                        //如果是数字组成的字符串，前面加上制表符防止其变成科学计数法
+                        if("class java.lang.String".equals(fieldType)&&pattern_compile.matcher((String)value).matches()){
+                            sb.append(tab);
+                        }
                     } else {
                         textValue = StringUtils.EMPTY;
                     }
                 }
-                sb.append(tab).append(textValue).append(split);
+                sb.append(textValue).append(split);
             }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -579,10 +589,10 @@ public class BusAssignmentService {
             OrgCostInfo orgInfo = phone2Cost.get(phone);
 
             BusOrderExportVO orderExport = new BusOrderExportVO();
-            orderExport.setOrderId(String.valueOf(order.getOrderId()));
+            orderExport.setOrderId(order.getOrderId());
             orderExport.setOrderNo(order.getOrderNo());
-            orderExport.setCreateDate(DateUtils.formatDateTime(order.getCreateDate()));
-            orderExport.setBookingDate(DateUtils.formatDateTime(order.getBookingDate()));
+            orderExport.setCreateDate(order.getCreateDate());
+            orderExport.setBookingDate(order.getBookingDate());
             orderExport.setBookingStartAddr(order.getBookingStartAddr() == null ? StringUtils.EMPTY : order.getBookingStartAddr());
             orderExport.setBookingEndAddr(order.getBookingEndAddr() == null ? StringUtils.EMPTY : order.getBookingEndAddr());
             orderExport.setCityName(order.getCityName());
@@ -607,14 +617,14 @@ public class BusAssignmentService {
             if (orderType != null) {
                 orderExport.setOrderType(EnumOrderType.getDis(orderType));
             }
-            orderExport.setRiderCount(String.valueOf(order.getRiderCount()));
-            orderExport.setLuggageCount(String.valueOf(order.getLuggageCount()));
+            orderExport.setRiderCount(order.getRiderCount());
+            orderExport.setLuggageCount(order.getLuggageCount());
             orderExport.setBookingUserPhone(order.getBookingUserPhone());
             orderExport.setRiderName(order.getRiderName());
             orderExport.setRiderPhone(order.getRiderPhone());
             orderExport.setLicensePlates(order.getLicensePlates());
-            orderExport.setFactEndDate(order.getFactEndDate() == null ? StringUtils.EMPTY : DateUtils.formatDateTime(order.getFactEndDate()));
-            orderExport.setFactDate(order.getFactDate() == null ? StringUtils.EMPTY : DateUtils.formatDateTime(order.getFactDate()));
+            orderExport.setFactEndDate(order.getFactEndDate());
+            orderExport.setFactDate(order.getFactDate());
             orderExport.setFactStartAddr(order.getFactStartAddr());
             orderExport.setFactEndAddr(order.getFactEndAddr());
             Integer isReturn = order.getIsReturn();
@@ -634,30 +644,29 @@ public class BusAssignmentService {
             }
             orderExport.setSupplierName(order.getSupplierName());
             orderExport.setBookingUserName(order.getBookingUserName());
-            orderExport.setEstimatedAmountYuan(String.valueOf(order.getEstimatedAmountYuan()));
+            orderExport.setEstimatedAmountYuan(order.getEstimatedAmountYuan());
             orderExport.setDriverName(order.getDriverName());
             orderExport.setDriverPhone(order.getDriverPhone());
             if (cost != null) {
-                orderExport.setAmount(cost.getAmount() != null ? String.valueOf(cost.getAmount()) : "0");
+                orderExport.setAmount(cost.getAmount() != null ? cost.getAmount() : BigDecimal.ZERO);
                 if (cost.getSettleDate() != null) {
-                    orderExport.setSettleDate(DateUtils.formatDateTime(cost.getSettleDate()));
+                    orderExport.setSettleDate(cost.getSettleDate());
                 }
                 BigDecimal damageFee = cost.getDamageFee();
-                orderExport.setDamageFee(damageFee != null ? String.valueOf(cost.getDamageFee()) : "0");
-                orderExport.setCouponAmount(cost.getCouponAmount() != null ? String.valueOf(cost.getCouponAmount()) : "0");
-                orderExport.setDistance(cost.getDistance() != null ? String.valueOf(cost.getDistance()) : "0");
-                orderExport.setDuration(cost.getDuration() != null ? String.valueOf(cost.getDuration()) : "0");
+                orderExport.setDamageFee(damageFee != null ? cost.getDamageFee() : BigDecimal.ZERO);
+                orderExport.setCouponAmount(cost.getCouponAmount() != null ?cost.getCouponAmount() : BigDecimal.ZERO);
+                orderExport.setDistance(cost.getDistance() != null ? cost.getDistance() : BigDecimal.ZERO);
+                orderExport.setDuration(cost.getDuration() != null ? cost.getDuration() : 0);
                 Integer payType = cost.getPayType();
                 if (payType != null) {
                     orderExport.setPayType(EnumPayType.getDis(payType));
                 }
-                orderExport.setTcFee(cost.getTcFee() != null ? String.valueOf(cost.getTcFee()) : "0");
-                orderExport.setGsFee(cost.getGsFee() != null ? String.valueOf(cost.getGsFee()) : "0");
-                orderExport.setHotelFee(cost.getHotelFee() != null ? String.valueOf(cost.getHotelFee()) : "0");
-                orderExport.setMealFee(cost.getMealFee() != null ? String.valueOf(cost.getMealFee()) : "0");
-                orderExport.setQtFee(cost.getQtFee() != null ? String.valueOf(cost.getQtFee()) : "0");
-                orderExport.setSettleAmount(cost.getSettleAmount() != null ? String.valueOf(cost.getSettleAmount()) : "0");
-
+                orderExport.setTcFee(cost.getTcFee());
+                orderExport.setGsFee(cost.getGsFee());
+                orderExport.setHotelFee(cost.getHotelFee());
+                orderExport.setMealFee(cost.getMealFee());
+                orderExport.setQtFee(cost.getQtFee());
+                orderExport.setSettleAmount(cost.getSettleAmount());
             }
             if (pay != null) {
                 orderExport.setPayToolName(pay.getPayToolName());
@@ -670,7 +679,7 @@ public class BusAssignmentService {
                 orderExport.setReassingTime(reassingTime);
             }
             if (orgInfo != null) {
-                orderExport.setBusinessName(org.apache.commons.lang.StringUtils.trimToEmpty(orgInfo.getBusinessName()));
+                orderExport.setBusinessName(StringUtils.trimToEmpty(orgInfo.getBusinessName()));
                 //空默认是 100%
                 orderExport.setPercent(orgInfo.getPercent() == null ? "1" : String.valueOf(orgInfo.getPercent()));
                 if (orgInfo.getType() != null) {
