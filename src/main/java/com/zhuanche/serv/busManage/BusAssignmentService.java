@@ -670,7 +670,9 @@ public class BusAssignmentService {
             }
             if (pay != null) {
                 orderExport.setPayToolName(pay.getPayToolName());
-                orderExport.setFinishDate(pay.getFinishDate());
+                if(pay.getFinishDate()!=null){
+                    orderExport.setFinishDate(DateUtils.getDate(pay.getFinishDate()));
+                }
             }
             if (assigTime != null) {
                 orderExport.setAssigTime(assigTime);

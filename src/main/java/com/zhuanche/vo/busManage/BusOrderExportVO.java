@@ -190,7 +190,7 @@ public class BusOrderExportVO implements Serializable {
     /**
      * 预付费支付时间
      */
-    private String finishDate;
+    private Date finishDate;
     /**
      * 代收费支付时
      */
