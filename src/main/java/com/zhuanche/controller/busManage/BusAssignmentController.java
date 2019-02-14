@@ -125,20 +125,37 @@ public class BusAssignmentController {
         }
         return AjaxResponse.success(pageDTO);
     }
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/exportOrder")
-    @MasterSlaveConfigs(configs=@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
-    public void exportExcel(BusOrderDTO params, HttpServletRequest request, HttpServletResponse response) throws Exception{
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @RequestMapping(value = "/exportOrder")
+    @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
+    public AjaxResponse exportExcel(BusOrderDTO params, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         long start = System.currentTimeMillis();
         logger.info("[ BusAssignmentController-exportExcel ]" + "导出订单列表参数=" + JSON.toJSONString(params));
+        //下单时间，完成时间必须有一项不为空，且间隔小于92天
+        Integer createGap = null;
+        Integer factEndGap = null;
+        if (params.getCreateDateBegin() != null && params.getCreateDateEnd() != null) {
+            Date begin = DateUtils.getDate(params.getCreateDateBegin(), "yyyy-MM-dd");
+            Date end = DateUtils.getDate(params.getCreateDateEnd(), "yyyy-MM-dd");
+            createGap = DateUtils.getIntervalDays(begin, end);
+        }
+        if (params.getFactEndDateBegin() != null && params.getFactEndDateEnd() != null) {
+            Date begin = DateUtils.getDate(params.getFactEndDateBegin(), "yyyy-MM-dd");
+            Date end = DateUtils.getDate(params.getFactEndDateEnd(), "yyyy-MM-dd");
+            createGap = DateUtils.getIntervalDays(begin, end);
+        }
+        if((createGap!=null&&createGap<92)||(factEndGap!=null&&factEndGap<92)){
+            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "下单时间或者完成时间必须填写一项，并且小于92天");
+        }
         boolean roleBoolean = commonService.ifOperate();
         String[] headArray = null;
-        if(roleBoolean){
-            headArray=BusConstant.Order.ORDER_HEAD;
-        }else{
-            headArray = new String[BusConstant.Order.ORDER_HEAD.length-3];//无权导出企业信息
-            System.arraycopy(BusConstant.Order.ORDER_HEAD,0,headArray,0,BusConstant.Order.ORDER_HEAD.length-3);
+        if (roleBoolean) {
+            headArray = BusConstant.Order.ORDER_HEAD;
+        } else {
+            headArray = new String[BusConstant.Order.ORDER_HEAD.length - 3];//无权导出企业信息
+            System.arraycopy(BusConstant.Order.ORDER_HEAD, 0, headArray, 0, BusConstant.Order.ORDER_HEAD.length - 3);
         }
         CsvUtils utilEntity = new CsvUtils();
         //构建文件名称
@@ -160,11 +177,11 @@ public class BusAssignmentController {
         });
         do {
             pageNum++;
-            PageDTO pageDTO = busAssignmentService.buidExportData(params,groupMap,roleBoolean);
+            PageDTO pageDTO = busAssignmentService.buidExportData(params, groupMap, roleBoolean);
             long total = pageDTO.getTotal();
             List result = pageDTO.getResult();
             int pages = pageDTO.getPages();
-            if (total == 0||result==null||result.isEmpty()) {
+            if (total == 0 || result == null || result.isEmpty()) {
                 List<String> csvDataList = new ArrayList<>();
                 csvDataList.add("没有符合条件的数据");
                 isList = true;
@@ -178,7 +195,7 @@ public class BusAssignmentController {
                 isList = true;
             }
             List<String> csvData = new ArrayList<>();
-            result.forEach(o->{
+            result.forEach(o -> {
                 String s = busAssignmentService.fieldValueToString(o);
                 csvData.add(s);
             });
@@ -186,9 +203,8 @@ public class BusAssignmentController {
             // isList=true时表示时之后一页停止循环
         } while (!isList);
         logger.info("[ BusAssignmentController-exportExcel ]" + "导出订单数据=" + JSON.toJSONString(params) + " 消耗时间=" + (System.currentTimeMillis() - start));
+        return AjaxResponse.success(null);
     }
-
-
 
 
     /**
@@ -602,7 +618,7 @@ public class BusAssignmentController {
             // 调用订单接口查询订单详情
             BusOrderDetail orderDetail = busOrderService.selectOrderDetail(orderNo);
             logger.info("[ BusAssignmentController-saveMessageTask ] 订单详情 = {}", JSON.toJSONString(orderDetail));
-            Integer orderId=orderDetail.getOrderId();
+            Integer orderId = orderDetail.getOrderId();
             // 调用计费接口
             BusCostDetail busCostDetail = busOrderService.selectOrderCostDetail(orderId);
             logger.info("[ BusAssignmentController-saveMessageTask ] 计费详情 = {}", JSON.toJSONString(busCostDetail));
@@ -624,7 +640,7 @@ public class BusAssignmentController {
             logger.info("[ BusAssignmentController-saveMessageTask ] 企业折扣信息 = {}", JSON.toJSONString(orgCostInfo));
 
             //封装各个订单节点操作时间
-            List<OrderOperationProcessVO> operationProcess= buidOperationProcess(orderDetail, busCostDetail, busPayDetail, orderOperations);
+            List<OrderOperationProcessVO> operationProcess = buidOperationProcess(orderDetail, busCostDetail, busPayDetail, orderOperations);
 
             Map<String, Object> result = new HashMap<>(16);
             result.put("orderDetail", orderDetail);
@@ -673,27 +689,27 @@ public class BusAssignmentController {
             OrderOperationProcessVO process = new OrderOperationProcessVO("订单取消", order.getCancelCreateDate(), "取消原因：" + order.getMemo());
             operList.add(process);
         }
-        if(order != null&&order.getStartOffDate()!=null){
+        if (order != null && order.getStartOffDate() != null) {
             OrderOperationProcessVO process = new OrderOperationProcessVO("司机出发时间", order.getStartOffDate(), "司机已出发");
             operList.add(process);
         }
-        if(order != null&&order.getArriveDate()!=null){
+        if (order != null && order.getArriveDate() != null) {
             OrderOperationProcessVO process = new OrderOperationProcessVO("司机到达时间", order.getArriveDate(), "司机已到达");
             operList.add(process);
         }
-        if(order != null&&order.getFactDate()!=null){
+        if (order != null && order.getFactDate() != null) {
             OrderOperationProcessVO process = new OrderOperationProcessVO("开始服务时间", order.getFactDate(), "开始服务");
             operList.add(process);
         }
-        if(order!=null&&order.getEndServiceDate()!=null){
+        if (order != null && order.getEndServiceDate() != null) {
             OrderOperationProcessVO process = new OrderOperationProcessVO("结束服务时间", order.getEndServiceDate(), "服务结束");
             operList.add(process);
         }
-        if(cost!=null&&cost.getSettleDate()!=null){
+        if (cost != null && cost.getSettleDate() != null) {
             OrderOperationProcessVO process = new OrderOperationProcessVO("尾款生成时间", cost.getSettleDate(), "尾款已经生成");
             operList.add(process);
         }
-        if(order!=null&&order.getFactDate()!=null){
+        if (order != null && order.getFactDate() != null) {
             OrderOperationProcessVO process = new OrderOperationProcessVO("订单完成时间", cost.getSettleDate(), "订单已经完成");
             operList.add(process);
         }
