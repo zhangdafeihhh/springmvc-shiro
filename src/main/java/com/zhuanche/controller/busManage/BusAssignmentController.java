@@ -129,25 +129,29 @@ public class BusAssignmentController {
     @SuppressWarnings({"rawtypes", "unchecked"})
     @RequestMapping(value = "/exportOrder")
     @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
+    @ResponseBody
     public AjaxResponse exportExcel(BusOrderDTO params, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         long start = System.currentTimeMillis();
         logger.info("[ BusAssignmentController-exportExcel ]" + "导出订单列表参数=" + JSON.toJSONString(params));
         //下单时间，完成时间必须有一项不为空，且间隔小于92天
-        Integer createGap = null;
-        Integer factEndGap = null;
+        boolean createFlag=false;
+        boolean factEndFlag=false;
         if (params.getCreateDateBegin() != null && params.getCreateDateEnd() != null) {
             Date begin = DateUtils.getDate(params.getCreateDateBegin(), "yyyy-MM-dd");
             Date end = DateUtils.getDate(params.getCreateDateEnd(), "yyyy-MM-dd");
-            createGap = DateUtils.getIntervalDays(begin, end);
+            Integer createGap = DateUtils.getIntervalDays(begin, end);
+            if(createGap<92) createFlag=true;
         }
         if (params.getFactEndDateBegin() != null && params.getFactEndDateEnd() != null) {
             Date begin = DateUtils.getDate(params.getFactEndDateBegin(), "yyyy-MM-dd");
             Date end = DateUtils.getDate(params.getFactEndDateEnd(), "yyyy-MM-dd");
-            createGap = DateUtils.getIntervalDays(begin, end);
+            Integer createGap = DateUtils.getIntervalDays(begin, end);
+            if(createGap<92) factEndFlag=true;
         }
-        if((createGap!=null&&createGap<92)||(factEndGap!=null&&factEndGap<92)){
-            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "下单时间或者完成时间必须填写一项，并且小于92天");
+        //如果两个时间区间都不符合条件，不可以导出
+        if(!createFlag&&!factEndFlag){
+            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "下单时间或者完成时间必须有一个小于92天");
         }
         boolean roleBoolean = commonService.ifOperate();
         String[] headArray = null;
@@ -636,9 +640,14 @@ public class BusAssignmentController {
             logger.info("[ BusAssignmentController-saveMessageTask ] 评分信息 = {}", JSON.toJSONString(appraisal));
 
             //查询企业信息
-            OrgCostInfo orgCostInfo = busOrderService.selectOrgInfo(orderDetail.getBookingUserPhone());
-            logger.info("[ BusAssignmentController-saveMessageTask ] 企业折扣信息 = {}", JSON.toJSONString(orgCostInfo));
-
+            OrgCostInfo orgCostInfo =null;
+            //type=2代表企业订单
+            if(orderDetail.getType()==2&&orderDetail.getBusinessId()!=null){
+                orgCostInfo = busOrderService.selectOrgInfo(orderDetail.getBusinessId());
+                logger.info("[ BusAssignmentController-saveMessageTask ] 企业折扣信息 = {}", JSON.toJSONString(orgCostInfo));
+            }else{
+                logger.info("[ BusAssignmentController-saveMessageTask ] 不是企业订单无企业信息 orderNo={}",orderDetail.getOrderNo());
+            }
             //封装各个订单节点操作时间
             List<OrderOperationProcessVO> operationProcess = buidOperationProcess(orderDetail, busCostDetail, busPayDetail, orderOperations);
 

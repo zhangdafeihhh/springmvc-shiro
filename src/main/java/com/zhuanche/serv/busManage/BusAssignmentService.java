@@ -461,15 +461,21 @@ public class BusAssignmentService {
     private List<BusOrderExportVO> addOtherResult4Export(List<BusOrderExVO> orderList,Map<Integer, String> groupMap,boolean permission){
         List<String> orderIdList = new ArrayList<>();
         List<String> orderNoList = new ArrayList<>();
-        List<String> phoneList = new ArrayList<>();
+        //List<String> phoneList = new ArrayList<>();
+        Set<Integer> businessIds=new HashSet<>();
         Set<Integer> userIds= new HashSet<>();
         Set<Integer> driverIds=new HashSet<>();
         orderList.forEach(order -> {
             orderIdList.add(String.valueOf(order.getOrderId()));
             orderNoList.add(order.getOrderNo());
-            String bookingUserPhone = order.getBookingUserPhone();
+          /*  String bookingUserPhone = order.getBookingUserPhone();
             if(bookingUserPhone!=null){
                 phoneList.add(bookingUserPhone);
+            }*/
+            Integer businessId = order.getBusinessId();
+            //type==2代表是企业订单
+            if(order.getType()==2&&businessId!=null){
+                businessIds.add(businessId);
             }
             //收集司机ID
             Integer driverId = order.getDriverId();
@@ -535,41 +541,14 @@ public class BusAssignmentService {
         appraisals.forEach(o -> {
             appraisalMap.put(o.getOrderNo(), o.getEvaluateScore());
         });
-
         // 企业信息
-        Map<String, OrgCostInfo> phone2Cost=new HashMap<>(16);
-        if(permission){
-            Map<String, Integer> phone2CompanyId = new HashMap<>(16);//存储对应关系 phone-id
-            Map<Integer, OrgCostInfo> companyId2Cost = new HashMap<>(16);//id-cost
-            //分页查询调用机构和支付
-            int orgTotal = phoneList.size();
-            int orgPage = orgTotal % 200 == 0 ? orgTotal / 200 : orgTotal / 200 + 1;
-            for (int i = 0; i < orgPage; i++) {
-                int start = i * 200;
-                int end = orgTotal > start + 200 ? start + 200 : orgTotal;
-                String phonesJoin = StringUtils.join(phoneList.subList(start, end), ",");
-                JSONArray array=this.queryCompanyByPhone(phonesJoin);
-                if (array != null && !array.isEmpty()) {
-                    String companyIds = array.stream().map(o -> {
-                        JSONObject org = (JSONObject) o;
-                        String phone = org.getString("phone");
-                        Integer companyId = org.getInteger("companyId");
-                        phone2CompanyId.put(phone, companyId);
-                        return String.valueOf(companyId);
-                    }).collect(Collectors.joining(","));
-                    //查询企业折扣信息
-                    JSONArray orgCosts = queryBusinessInfoBatch(companyIds);
-                    orgCosts.stream().map(orgCost -> JSONObject.toJavaObject((JSONObject) orgCost, OrgCostInfo.class)).forEach(o -> {
-                        companyId2Cost.put(o.getBusinessId(), o);
-                    });
-                }
-            }
-            //处理企业信息结果
-            phone2CompanyId.forEach((phone, companyId) -> {
-                OrgCostInfo orgCostInfo = companyId2Cost.get(companyId);
-                if (orgCostInfo != null) {
-                    phone2Cost.put(phone, orgCostInfo);
-                }
+        Map<Integer, OrgCostInfo> orgResult=new HashMap<>(16);
+        //有导出企业信息的权限才导出企业信息
+        if(permission&&businessIds.size()>0){
+            String businessIdStr = businessIds.stream().map(o -> String.valueOf(o)).collect(Collectors.joining(","));
+            JSONArray orgCosts = queryBusinessInfoBatch(businessIdStr);
+            orgCosts.stream().map(orgCost -> JSONObject.toJavaObject((JSONObject) orgCost, OrgCostInfo.class)).forEach(o -> {
+                orgResult.put(o.getBusinessId(), o);
             });
         }
         //=====================拼装信息==================================================================
@@ -586,8 +565,8 @@ public class BusAssignmentService {
             //改派时间
             String reassingTime = reassigMap.get(orderNo);
             //企业信息
-            String phone = order.getBookingUserPhone();
-            OrgCostInfo orgInfo = phone2Cost.get(phone);
+            Integer businessId = order.getBusinessId();
+            OrgCostInfo orgInfo = orgResult.get(businessId);
 
             BusOrderExportVO orderExport = new BusOrderExportVO();
             orderExport.setOrderId(order.getOrderId());

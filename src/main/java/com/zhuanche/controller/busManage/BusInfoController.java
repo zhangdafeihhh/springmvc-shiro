@@ -649,7 +649,7 @@ public class BusInfoController {
 
     private void saveErrorMsg(List<ErrorReason> reasons, int row, int col, String reason) {
         ErrorReason errorReason = new ErrorReason();
-        errorReason.setRow(row);
+        errorReason.setRow(row+1);
         errorReason.setCol(col + 1);
         errorReason.setReason(reason);
         reasons.add(errorReason);
