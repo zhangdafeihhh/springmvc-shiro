@@ -25,6 +25,7 @@ import com.zhuanche.serv.busManage.BusInfoService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
+import com.zhuanche.util.dateUtil.DateUtil;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.excel.ExportExcelUtil;
 import com.zhuanche.vo.busManage.*;
@@ -150,15 +151,14 @@ public class BusInfoController {
         busDTO.setAuthOfCity(user.getCityIds());
         busDTO.setAuthOfSupplier(user.getSupplierIds());
         //导出信息指定每次查询的页数
-        busDTO.setPageSize(CsvUtils.downPerSize);
+         busDTO.setPageSize(CsvUtils.downPerSize);
         logger.info(LOG_PRE + "下载车辆信息参数=" + JSON.toJSONString(busDTO));
         PageInfo<BusInfoVO> pageInfo = busInfoService.queryList(busDTO);
         //文件标题
         List<String> headerList = new ArrayList<>();
         String head = StringUtils.join(CarConstant.TEMPLATE_HEAD, ",");
         headerList.add(head);
-        String fileName = CarConstant.FILE_NAME + com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern) + ".csv";
-        fileName = BusConstant.buidFileName(request, fileName);
+        String  fileName = BusConstant.buidFileName(request, CarConstant.FILE_NAME);
         List<String> csvDataList = new ArrayList<>();
         CsvUtils utilEntity = new CsvUtils();
         long total = pageInfo.getTotal();
@@ -196,8 +196,12 @@ public class BusInfoController {
             //        String[] TEMPLATE_HEAD={"城市","供应商","车牌号","车型类别名称","车辆颜色","燃料类别","运输证字号","车辆厂牌","具体车型（选填）","下次车检时间（选填）","下次维保时间（选填）","下次运营证检测时间（选填）","购买时间（选填）"};
 
             String fuelName = EnumFuel.getFuelNameByCode(info.getFueltype());
-            sb.append(info.getCityName()).append(split).append(info.getSupplierName()).append(split).append(info.getLicensePlates()).append(split)
-                    .append(info.getGroupName()).append(split).append(StringUtils.defaultString(info.getColor())).append(split).append(StringUtils.defaultString(fuelName)).append(split)
+            sb.append(StringUtils.defaultString(info.getCityName())).append(split)
+                    .append(StringUtils.defaultString(info.getSupplierName())).append(split)
+                    .append(StringUtils.defaultString(info.getLicensePlates())).append(split)
+                    .append(StringUtils.defaultString(info.getGroupName())).append(split)
+                    .append(StringUtils.defaultString(info.getColor())).append(split)
+                    .append(StringUtils.defaultString(fuelName)).append(split)
                     .append(StringUtils.defaultString(info.getTransportnumber())).append(split)
                     .append(StringUtils.defaultString(info.getVehicleBrand())).append(split)
                     .append(StringUtils.defaultString(info.getModelDetail())).append(split)
