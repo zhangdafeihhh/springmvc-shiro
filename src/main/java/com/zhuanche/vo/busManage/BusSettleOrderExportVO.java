@@ -41,7 +41,7 @@ public class BusSettleOrderExportVO {
     /**
      * 订单id
      */
-    private String orderId;
+    private Integer orderId;
     /**
      * 订单编号
      */
@@ -49,11 +49,11 @@ public class BusSettleOrderExportVO {
     /**
      * 下单时间
      */
-    private String createDate;
+    private Date createDate;
     /**
      * 预定用车时间
      */
-    private String bookingDate;
+    private Date bookingDate;
     /**
      * 预约上车地点
      */
@@ -85,11 +85,11 @@ public class BusSettleOrderExportVO {
     /**
      * 乘车人数量
      */
-    private String riderCount;
+    private Integer riderCount;
     /**
      * 行李数数量
      */
-    private String luggageCount;
+    private Integer luggageCount;
     /**
      * 预定人手机号
      */
@@ -109,11 +109,11 @@ public class BusSettleOrderExportVO {
     /**
      * 完成时间
      */
-    private String factEndDate;
+    private Date factEndDate;
     /**
      * 实际上车时间
      */
-    private String factDate;
+    private Date factDate;
     /**
      * 实际上车地点
      */
@@ -137,24 +137,24 @@ public class BusSettleOrderExportVO {
     /**
      * 总支付金额
      */
-    private String amount;
+    private BigDecimal amount;
     /**
      * 预收费用(订单)
      */
-    private String estimatedAmountYuan;
+    private Double estimatedAmountYuan;
     /**
      * 代收费用
      */
-    private String settleAmount;
+    private BigDecimal settleAmount;
 
     /**
      * 违约金额
      */
-    private String damageFee;
+    private BigDecimal damageFee;
     /**
      * 优惠金额
      */
-    private String couponAmount;
+    private BigDecimal couponAmount;
     /**
      * 供应商
      */
@@ -170,11 +170,11 @@ public class BusSettleOrderExportVO {
     /**
      * 实际里程
      */
-    private String distance;
+    private BigDecimal distance;
     /**
      * 实际时长
      */
-    private String duration;
+    private Integer duration;
     /**
      * 预收支付方式(支付)
      */
@@ -194,31 +194,31 @@ public class BusSettleOrderExportVO {
     /**
      * 停车费
      */
-    private String tcFee;
+    private BigDecimal tcFee;
     /**
      * 高速费
      */
-    private String gsFee;
+    private BigDecimal gsFee;
     /**
      * 司机住宿费
      */
-    private String hotelFee;
+    private BigDecimal hotelFee;
     /**
      * 司机餐费
      */
-    private String mealFee ;
+    private BigDecimal mealFee ;
     /**
      * 其他费
      */
-    private String qtFee;
+    private BigDecimal qtFee;
     /**
      * 预付费支付时间
      */
-    private String finishDate;
+    private Date finishDate;
     /**
      * 代收费支付时
      */
-    private String settleDate;
+    private Date settleDate;
     /**
      * 指派时间
      */
@@ -246,13 +246,4 @@ public class BusSettleOrderExportVO {
      * 折扣信息
      */
     private String percent;
-
-
-
-
-
-
-
-
-
 }

@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -344,21 +345,22 @@ public class BusAssignmentService {
                 Object value = getMethod.invoke(t, new Object[]{});
                 //判断值的类型后进行强制类型转换
                 String textValue = null;
-                if (value instanceof Date) {
+                if (value == null || "null".equalsIgnoreCase(value.toString().trim())) {
+                	textValue = StringUtils.EMPTY;
+                } else if (value instanceof Date) {
                     Date value1 = (Date) value;
                     SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     textValue = sf.format(value1);
                     sb.append(tab);
-                } else {
+                } else if (value instanceof BigDecimal || value instanceof Double) {
+                	textValue = BusConst.decimalFormat.format(value);
+                	sb.append(tab);
+				} else {
                     //其它数据类型都当作字符串简单处理
-                    if (value != null&&!value.toString().trim().equals("null")) {
-                        textValue = value.toString().trim();
-                        //如果是数字组成的字符串，前面加上制表符防止其变成科学计数法
-                        if("class java.lang.String".equals(fieldType)&&pattern_compile.matcher((String)value).matches()){
-                            sb.append(tab);
-                        }
-                    } else {
-                        textValue = StringUtils.EMPTY;
+                	textValue = value.toString().trim();
+                    //如果是数字组成的字符串，前面加上制表符防止其变成科学计数法
+                    if("class java.lang.String".equals(fieldType)&&pattern_compile.matcher((String)value).matches()){
+                        sb.append(tab);
                     }
                 }
                 sb.append(textValue).append(split);

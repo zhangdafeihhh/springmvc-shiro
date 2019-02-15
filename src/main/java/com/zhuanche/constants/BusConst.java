@@ -118,7 +118,7 @@ public interface BusConst {
 		/** 供应商账单确认打款 **/
 		String SETTLE_SUPPLIER_BILL_CONFIRM_PAY = "/settle/supplier/bill/confirm/pay";
 
-		/** 供应商账单确认打款 **/
+		/** 供应商账单确认结算 **/
 		String SETTLE_SUPPLIER_BILL_CONFIRM_SETTLE = "/settle/supplier/bill/confirm/settle";
 
 		/** 增加发票链接 **/
