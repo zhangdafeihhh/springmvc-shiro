@@ -129,8 +129,7 @@ public class BusAssignmentController {
     @SuppressWarnings({"rawtypes", "unchecked"})
     @RequestMapping(value = "/exportOrder")
     @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
-    @ResponseBody
-    public AjaxResponse exportExcel(BusOrderDTO params, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void exportExcel(BusOrderDTO params, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         long start = System.currentTimeMillis();
         logger.info("[ BusAssignmentController-exportExcel ]" + "导出订单列表参数=" + JSON.toJSONString(params));
@@ -141,17 +140,23 @@ public class BusAssignmentController {
             Date begin = DateUtils.getDate(params.getCreateDateBegin(), "yyyy-MM-dd");
             Date end = DateUtils.getDate(params.getCreateDateEnd(), "yyyy-MM-dd");
             Integer createGap = DateUtils.getIntervalDays(begin, end);
-            if(createGap<92) createFlag=true;
+            if(createGap<=92) createFlag=true;
         }
         if (params.getFactEndDateBegin() != null && params.getFactEndDateEnd() != null) {
             Date begin = DateUtils.getDate(params.getFactEndDateBegin(), "yyyy-MM-dd");
             Date end = DateUtils.getDate(params.getFactEndDateEnd(), "yyyy-MM-dd");
             Integer createGap = DateUtils.getIntervalDays(begin, end);
-            if(createGap<92) factEndFlag=true;
+            if(createGap<=92) factEndFlag=true;
         }
         //如果两个时间区间都不符合条件，不可以导出
+        CsvUtils utilEntity = new CsvUtils();
+        //构建文件名称
+        String fileName = BusConstant.buidFileName(request, "订单明细");
         if(!createFlag&&!factEndFlag){
-            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "下单时间或者完成时间必须有一个小于92天");
+            ArrayList csvData = new ArrayList();
+            csvData.add("下单时间、完成时间需要任选其一且不能于三个月");
+            utilEntity.exportCsvV2(response, csvData, new ArrayList<>(), fileName, true, true);
+            return;
         }
         boolean roleBoolean = commonService.ifOperate();
         String[] headArray = null;
@@ -161,9 +166,6 @@ public class BusAssignmentController {
             headArray = new String[BusConstant.Order.ORDER_HEAD.length - 3];//无权导出企业信息
             System.arraycopy(BusConstant.Order.ORDER_HEAD, 0, headArray, 0, BusConstant.Order.ORDER_HEAD.length - 3);
         }
-        CsvUtils utilEntity = new CsvUtils();
-        //构建文件名称
-        String fileName = BusConstant.buidFileName(request, "订单明细");
         //构建文件标题
         List<String> headerList = new ArrayList<>();
         String head = StringUtils.join(headArray, ",");
@@ -181,6 +183,7 @@ public class BusAssignmentController {
         });
         do {
             pageNum++;
+            params.setPageNum(pageNum);
             PageDTO pageDTO = busAssignmentService.buidExportData(params, groupMap, roleBoolean);
             long total = pageDTO.getTotal();
             List result = pageDTO.getResult();
@@ -207,7 +210,6 @@ public class BusAssignmentController {
             // isList=true时表示时之后一页停止循环
         } while (!isList);
         logger.info("[ BusAssignmentController-exportExcel ]" + "导出订单数据=" + JSON.toJSONString(params) + " 消耗时间=" + (System.currentTimeMillis() - start));
-        return AjaxResponse.success(null);
     }
 
 
