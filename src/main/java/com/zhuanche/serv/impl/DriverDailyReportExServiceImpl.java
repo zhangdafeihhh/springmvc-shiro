@@ -309,4 +309,11 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
         return maps;
     }
 
+    @Override
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
+    public List<DriverDailyReport> queryDriverReportData(DriverDailyReportParams params){
+        return  this.driverDailyReportExMapper.queryDriverReportData(params);
+    }
 }

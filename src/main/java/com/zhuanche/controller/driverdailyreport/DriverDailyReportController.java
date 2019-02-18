@@ -18,21 +18,15 @@ import com.zhuanche.dto.DriverDailyReportDTO;
 import com.zhuanche.entity.mdbcarmanage.DriverDailyReport;
 import com.zhuanche.entity.mdbcarmanage.DriverDailyReportParams;
 import com.zhuanche.serv.DriverDailyReportExService;
-import com.zhuanche.serv.common.DataPermissionHelper;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtil;
-import com.zhuanche.util.MyRestTemplate;
 import com.zhuanche.util.excel.CsvUtils;
-import mapper.mdbcarmanage.ex.CarRelateGroupExMapper;
-import mapper.mdbcarmanage.ex.DriverDailyReportExMapper;
-import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -58,28 +52,6 @@ import static com.zhuanche.common.enums.MenuEnum.*;
 public class DriverDailyReportController extends DriverQueryController {
 
 	private static Logger log =  LoggerFactory.getLogger(DriverDailyReportController.class);
-
-	@Autowired
-	private DriverDailyReportExMapper driverDailyReportExMapper;
-
-	@Autowired
-	private DataPermissionHelper dataPermissionHelper;
-
-	@Autowired
-	private CarRelateGroupExMapper carRelateGroupExMapper;
-
-	@Autowired
-	private CarBizSupplierExMapper carBizSupplierExMapper;
-
-
-	@Autowired
-	@Qualifier("busOrderCostTemplate")
-	private MyRestTemplate busOrderCostTemplate;
-
-	@RequestMapping("/list")
-	public String list(){
-		return "driverdailyreport/driverlist";
-	}
 
 	@Autowired
 	private DriverDailyReportExService driverDailyReportExService;
@@ -205,6 +177,8 @@ public class DriverDailyReportController extends DriverQueryController {
 		}
 		//初始化查询参数
 		DriverDailyReportParams params = new DriverDailyReportParams(driverIds,statDateStart,statDateEnd,sortName,sortOrder,page,pageSize);
+		//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
+		params = this.chuliDriverDailyReportEntity(params);
 		log.info("司机周报、月报详情列表数据:queryDriverReportDataDetail，参数："+params.toString());
 		int total = 0;
 		//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
@@ -212,7 +186,7 @@ public class DriverDailyReportController extends DriverQueryController {
 		//开始查询
 		Page<DriverDailyReport> p = PageHelper.startPage(params.getPage(), params.getPageSize());
 		try {
-			list = this.driverDailyReportExMapper.queryDriverReportData(params);
+			list = this.driverDailyReportExService.queryDriverReportData(params);
 			total = (int) p.getTotal();
 		} finally {
 			PageHelper.clearPage();
@@ -574,9 +548,15 @@ public class DriverDailyReportController extends DriverQueryController {
 		if("".equals(driverDailyReportBean.getTeamIds())||driverDailyReportBean.getTeamIds()==null){
 			driverDailyReportBean.setTeamIds(teamIds.substring(1, teamIds.length()-1));
 		}
+		String tableName = "driver_daily_report";
+		String statDateStart = driverDailyReportBean.getStatDateStart();
+		if(StringUtils.isNotEmpty(statDateStart)){
+			String year = statDateStart.substring(0,4);
+			if(!"2018".equals(year)){
+				tableName += "_" + driverDailyReportBean.getStatDateStart().substring(0, 7).replace("-", "_");
+			}
+		}
+		driverDailyReportBean.setTableName(tableName);
 		return driverDailyReportBean;
 	}
-
-
-
 }

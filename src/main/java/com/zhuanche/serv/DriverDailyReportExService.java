@@ -29,4 +29,6 @@ public interface DriverDailyReportExService {
                                                                        Integer reportType,
                                                                        String statDateStart,
                                                                        String statDateEnd) throws ParseException ;
+
+    public List<DriverDailyReport> queryDriverReportData(DriverDailyReportParams params);
 }
