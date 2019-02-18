@@ -71,7 +71,7 @@ public class FileUploadService {
 			if (jsonResult == null) {
 				logger.info( "[ FileUploadService-uploadFile ] 调用 www-api 上传文件接口返回结果为空，参数：file {}, url {}, userId{}, username {}", filename, url, userId, username);
 				uploadResult.setSuccess(false);
-				uploadResult.setMsg("上传文件接口出错");
+				uploadResult.setMsg("上传文件失败");
 				return uploadResult;
 			}
 			if (1 == jsonResult.getIntValue("code")) {
