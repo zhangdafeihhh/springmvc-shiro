@@ -102,7 +102,7 @@ public class AccountBalanceVO {
         StringBuffer sb = new StringBuffer();
         sb.append(StringUtils.defaultString(accountName)).append(",\t")
                 .append(StringUtils.defaultString(phone)).append(",")
-                .append(StringUtils.defaultString(cityName)).append(",\t")
+                .append(StringUtils.defaultString(cityName)).append(",")
                 .append(StringUtils.defaultIfEmpty(canUseAmount + "", "0")).append(",")
                 .append(StringUtils.defaultIfEmpty(waitingUseAmount + "", "0")).append(",")
                 .append(StringUtils.defaultIfEmpty(hasUsedAmount + "", "0"));
