@@ -532,7 +532,7 @@ public class BusSettlementAdviceController {
                 Integer accountType = settleDetail.getAccountType();
                 String accountTypeName = StringUtils.EMPTY;
                 if (accountType == 5) {
-                    accountTypeName = "巴士分佣收入";
+                    accountTypeName = "巴士结算收入";
                 } else if (accountType == 6) {
                     accountTypeName = "修正订单";
                 } else if (accountType == 7) {
