@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+	<context id="DB2Tables"  defaultModelType="flat"  targetRuntime="MyBatis3">
+		<!-- Mybatis generator mapper文件重新生成不会覆盖原文件，为了解决此问题 -->
+		<plugin type="OverIsMergeablePlugin"></plugin>
+	
+		<!-- 是否去除自动生成的注释 -->
+		<commentGenerator>
+			<property name="suppressAllComments" value="true"/>
+			<property name="suppressDate" value="true"/>
+		</commentGenerator>
+
+		<!-- 数据库连接信息 -->
+		<jdbcConnection driverClass="com.mysql.jdbc.Driver"	connectionURL="jdbc:mysql://mysql-m-wr-car-all-dev-new-db.01zhuanche.com:3307/driver_order_record?useUnicode=true&amp;characterEncoding=UTF-8" userId="dev_sqhc_rentcar" password="dev_BzkmQM%O^U7Dy8X3">
+		</jdbcConnection>
+		<javaTypeResolver>
+			<property name="forceBigDecimals" value="true"/>
+		</javaTypeResolver>
+
+		<!-- po实体类代码位置 -->
+		<javaModelGenerator targetPackage="com.zhuanche.entity.driver"  targetProject="C:\\Users\\admin\\IdeaProjects\\mp-manage\\src\main\\java">
+			<property name="enableSubPackages" value="true" />
+			<property name="trimStrings" value="true" />
+		</javaModelGenerator>
+		<!-- sql代码的xml映射文件位置 -->
+		<sqlMapGenerator targetPackage="mapper.driver" targetProject="C:\\Users\admin\\IdeaProjects\\mp-manage\\src\main\\resources">
+			<property name="enableSubPackages" value="true" />
+		</sqlMapGenerator>
+		<!-- mapper接口位置 -->
+		<javaClientGenerator type="XMLMAPPER" targetPackage="mapper.driver"  targetProject="C:\\Users\\admin\\IdeaProjects\\mp-manage\\src\main\\java">
+			<property name="enableSubPackages" value="true" />
+		</javaClientGenerator>
+
+		<!-- 需要自动生成的表 -->
+		<!-- <table tableName="driver_bigdata_district" domainObjectName="DriverBigdataDistrict"
+			enableSelectByExample="false" enableDeleteByExample="false"
+			enableCountByExample="false" enableUpdateByExample="false">
+			<property name="useActualColumnNames" value="false" />
+			<generatedKey column="id" sqlStatement="MySql" identity="true" />
+		</table>
+		<table tableName="driver_city_white_list" domainObjectName="DriverCityWhite"
+			enableSelectByExample="false" enableDeleteByExample="false"
+			enableCountByExample="false" enableUpdateByExample="false">
+			<property name="useActualColumnNames" value="false" />
+			<generatedKey column="id" sqlStatement="MySql" identity="true" />
+		</table>
+		<table tableName="driver_verify" domainObjectName="DriverVerify"
+			enableSelectByExample="false" enableDeleteByExample="false"
+			enableCountByExample="false" enableUpdateByExample="false">
+			<property name="useActualColumnNames" value="false" />
+			<generatedKey column="id" sqlStatement="MySql" identity="true" />
+		</table> -->
+		<table tableName="car_biz_driver_record_2018_07_29" domainObjectName="DriverActionDto"
+			enableSelectByExample="false" enableDeleteByExample="false"
+			enableCountByExample="false" enableUpdateByExample="false">
+			<property name="useActualColumnNames" value="false" />
+			<generatedKey column="id" sqlStatement="MySql" identity="true" />
+		</table>
+		
+	</context>
+</generatorConfiguration>

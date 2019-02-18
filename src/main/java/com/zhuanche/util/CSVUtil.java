@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
@@ -25,30 +26,25 @@ public class CSVUtil {
     /**
      * 往表格中插入记录
      * @param fields       表头
-     * @param fileName     文件名
      * @param clz          导出实体字节码
      * @param data         导出数据集合
      *
      */
-    public static void write(HttpServletResponse response, Map<String,String> fields, String fileName, Class<?> clz, List data) {
-        if(response == null || fields == null || fileName == null || clz == null) {
+    public static void write(FileOutputStream outputStream, Map<String,String> fields, Class<?> clz, List data) {
+        if(fields == null || clz == null) {
             logger.error("导出数据时入参为空");
             return;
         }
-        OutputStream stream = null;
         try {
             // 数据源model所有字段map
             Map<String, Field> fieldMap = new HashMap<>();
             getFieldMap(clz,fieldMap);
-            stream = response.getOutputStream();
-            response.setContentType("application/octet-stream;charset=GBK");
-            response.setHeader("Content-Disposition", "attachment;fileName="+ fileName);
             //写表头，生成指定名字的文件，返回客户端
             StringBuilder hb = new StringBuilder();
             for(Map.Entry<String, String> e : fields.entrySet())
                 hb.append(e.getValue()).append(",");
-            stream.write(hb.substring(0, hb.length() - 1).getBytes("GBK"));
-            stream.flush();
+            outputStream.write(hb.substring(0, hb.length() - 1).getBytes("GBK"));
+            outputStream.flush();
             //遍历处理数据导出
             for(Object o : data){
                 StringBuilder sb = new StringBuilder();
@@ -71,15 +67,15 @@ public class CSVUtil {
                         sb.append(tmp).append(",");
                     }
                 }
-                stream.write(sb.substring(0, sb.length() - 1).getBytes("GBK"));
-                stream.flush();
+                outputStream.write(sb.substring(0, sb.length() - 1).getBytes("GBK"));
+                outputStream.flush();
             }
         }catch (Exception e) {
             logger.error("导出csv数据时异常：" , e);
         }finally {
-            if (stream != null) {
+            if (outputStream != null) {
                 try {
-                    stream.close();
+                    outputStream.close();
                 } catch (IOException e) {
                     logger.error("导出csv数据时关流异常：", e);
                 }
