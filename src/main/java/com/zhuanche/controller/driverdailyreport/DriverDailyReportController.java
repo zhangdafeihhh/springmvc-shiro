@@ -82,7 +82,7 @@ public class DriverDailyReportController extends DriverQueryController {
 	})
 	@RequestFunction(menu = DRIVER_WORK_REPORT_LIST)
 	public AjaxResponse queryDriverWeekReportDataNew(String licensePlates, String driverName, String driverIds, String teamIds,
-													 @Verify(rule = "required",param = "suppliers") String suppliers,
+													 String suppliers,
 													 @Verify(rule = "required",param = "cities") String cities,
 													 @Verify(rule = "required",param = "statDateStart") String statDateStart,
 													 @Verify(rule = "required",param = "statDateEnd") String statDateEnd, String sortName, String sortOrder, String groupIds, Integer page, Integer pageSize, Integer reportType) throws ParseException {
@@ -222,7 +222,7 @@ public class DriverDailyReportController extends DriverQueryController {
 	})
 	@RequestFunction(menu = DRIVER_WORK_REPORT_EXPORT)
 	public String exportDriverReportData(String licensePlates, String driverName, String driverIds, String teamIds,
-											   @Verify(rule = "required",param = "suppliers") String suppliers,
+											 String suppliers,
 											   @Verify(rule = "required",param = "cities") String cities,
 											   @Verify(rule = "required",param = "statDateStart") String statDateStart,
 											   String statDateEnd,
