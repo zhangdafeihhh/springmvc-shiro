@@ -72,6 +72,7 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
 
     @Override
     public PageInfo<DriverDailyReport> findWeekDriverDailyReportByparam(DriverDailyReportParams params,String statDateStart,  String statDateEnd  ) {
+        try{
         PageHelper.startPage(params.getPage(), params.getPageSize(), true);
         logger.info("查询工作报告，周报，参数为："+(params==null?"null": JSON.toJSONString(params)));
         List<Integer> listDriverIds = this.driverDailyReportExMapper.queryDriverIds(params);
@@ -96,6 +97,9 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
             }
         }
         return pageInfo;
+        }finally {
+            PageHelper.clearPage();
+        }
     }
 
     /**
