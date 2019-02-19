@@ -2,6 +2,7 @@ package com.zhuanche.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -339,6 +340,22 @@ public class DateUtil {
 		long time2 = cal.getTimeInMillis();
 		long between_days = (time2 - time1) / (1000 * 3600 * 24);
 		return Integer.parseInt(String.valueOf(between_days));
+	}
+
+	/**
+	 * 计算两个日期之间的间隔天数
+	 * case 2019-01-11 ~ 2019-01-11 返回1
+	 * case 2019-01-11 ~ 2019-01-12 返回2
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	public static int getDays(Date startDate, Date endDate) throws ParseException {
+		if (endDate.compareTo(startDate) < 0){
+			throw new IllegalArgumentException("结束时间小于开始时间");
+		}
+		return daysBetween(startDate, endDate) + 1;
+
 	}
 
 
