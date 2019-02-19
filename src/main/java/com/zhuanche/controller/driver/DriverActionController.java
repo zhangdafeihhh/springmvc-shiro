@@ -1,5 +1,8 @@
 package com.zhuanche.controller.driver;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.enums.DriverActionEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -17,6 +20,7 @@ import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 
 @RequestMapping("/driverAction")
 @Controller
@@ -50,6 +54,22 @@ public class DriverActionController {
         String table = TABLE_PREFIX + tableDate;
         PageDTO actionList = actionService.getActionList(driverActionVO, table, orderNo, pageNum, pageSize);
         return AjaxResponse.success(actionList);
+    }
+
+
+    @RequestMapping("/actionEnum")
+    @ResponseBody
+    public AjaxResponse getActionList(){
+        Map<Integer, String> map = DriverActionEnum.getMap();
+        JSONArray result = new JSONArray();
+        map.forEach((key, value) ->{
+                    JSONObject object = new JSONObject();
+                    object.put("actionId", key);
+                    object.put("actionName", value);
+                    result.add(object);
+                }
+        );
+        return AjaxResponse.success(result);
     }
 
     private String transferDate(String date) {

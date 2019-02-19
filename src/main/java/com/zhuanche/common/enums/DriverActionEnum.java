@@ -64,5 +64,9 @@ public enum DriverActionEnum {
         return name == null ? "other" : name;
     }
 
+    public static Map<Integer, String> getMap(){
+        return map;
+    }
+
 
 }

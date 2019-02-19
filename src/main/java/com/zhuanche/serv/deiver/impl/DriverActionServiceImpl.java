@@ -9,24 +9,17 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.entity.driver.DriverActionDto;
 import com.zhuanche.entity.driver.DriverActionVO;
-import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.deiver.DriverActionService;
 import com.zhuanche.serv.order.OrderService;
-import com.zhuanche.util.DateUtil;
-import com.zhuanche.util.SignatureUtils;
-import com.zhuanche.util.encrypt.MD5Utils;
 import mapper.driver.ex.DriverActionDtoExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
