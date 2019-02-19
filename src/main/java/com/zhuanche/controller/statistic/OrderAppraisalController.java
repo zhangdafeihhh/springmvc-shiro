@@ -94,11 +94,6 @@ public class OrderAppraisalController extends DriverQueryController{
 										  String evaluateScore,String sortName, String sortOrder,
 										  Integer page,
 										  @Verify(param = "pageSize",rule = "max(50)")Integer pageSize) {
-
-//		if (StringUtils.isEmpty(driverPhone) && StringUtils.isEmpty(teamId)){
-//			//请选择一个车队号或输入司机手机
-//			return AjaxResponse.fail(RestErrorCode.TEAMID_OR_DRIVERID_ISNULL);
-//		}
 		CarBizCustomerAppraisalParams params = new CarBizCustomerAppraisalParams(cityId,supplierId,teamId,groupIds,driverName,driverPhone,orderNo,
 				createDateBegin,createDateEnd,evaluateScore,sortName,sortOrder,page,pageSize);
 		params.setAppraisalStatus(appraisalStatus);

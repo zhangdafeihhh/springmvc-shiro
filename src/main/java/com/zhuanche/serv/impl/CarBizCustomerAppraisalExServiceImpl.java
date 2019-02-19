@@ -26,6 +26,8 @@ public class CarBizCustomerAppraisalExServiceImpl implements CarBizCustomerAppra
     public PageInfo<CarBizCustomerAppraisal> findPageByparam(CarBizCustomerAppraisalParams params) {
         logger.info("查询订单评分，参数为："+(params==null?"null": JSON.toJSONString(params)));
         PageHelper.startPage(params.getPage(), params.getPageSize(), true);
+        params.setCreateDateBegin(params.getCreateDateBegin() + " 00:00:00");
+        params.setCreateDateEnd(params.getCreateDateEnd() + " 23:59:59");
         List<CarBizCustomerAppraisal> list  = carBizCustomerAppraisalExMapper.queryForListObject(params);
         PageInfo<CarBizCustomerAppraisal> pageInfo = new PageInfo<>(list);
         return pageInfo;
