@@ -70,7 +70,7 @@ public class Common {
 	// redis key prefix~~~~~~~~~~~~~~~~~~~~~~end~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	public static String REGULAR_IDCARDNO = "(^[A-Z]{1}[0-9]{6}[\\(]{1}[a-zA-Z0-9]{1}[\\)]{1}$)";
-	public static String REGULAR_IDCARDNO2 = "(^[A-Z]{1}[0-9]{10}$)";
+	public static String REGULAR_IDCARDNO2 = "(^[A-Z]{1}[0-9]{8,10}$)";
 
 	public static Pattern COMPILE = Pattern.compile("[0-9]*");
 
