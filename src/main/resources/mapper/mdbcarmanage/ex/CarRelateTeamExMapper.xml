@@ -245,4 +245,8 @@
         </foreach>
     </select>
 
+    <select id="getTeamIdByDriverId" parameterType="integer" resultType="integer">
+        select team_id from car_relate_team where driver_id = #{driverId}
+    </select>
+
 </mapper>

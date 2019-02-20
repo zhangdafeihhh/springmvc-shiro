@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.zhuanche.entity.driver.DriverActionVO;
 import org.apache.ibatis.annotations.Param;
 
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
@@ -173,4 +174,6 @@ public interface CarBizDriverInfoExMapper {
 
 
     void updateDriverCooperationTypeBySupplierId(Map<String, Object> map);
+
+    CarBizDriverInfoDTO queryDriverIdByActionVO(Map map);
 }

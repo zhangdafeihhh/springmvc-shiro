@@ -7,6 +7,7 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.entity.driver.DriverActionVO;
+import com.zhuanche.exception.PermissionException;
 import com.zhuanche.serv.deiver.DriverActionService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -43,6 +44,9 @@ public class DriverActionController {
                 && StringUtils.isEmpty(orderNo)) {
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "司机姓名, 手机号, 车牌号, 订单号 必须有一个不为空");
         }
+        if (StringUtils.isEmpty(driverActionVO.getTime())){
+            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "查询时间不能为空");
+        }
         String tableDate;
         try {
             tableDate = transferDate(driverActionVO.getTime());
@@ -52,8 +56,16 @@ public class DriverActionController {
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
         String table = TABLE_PREFIX + tableDate;
-        PageDTO actionList = actionService.getActionList(driverActionVO, table, orderNo, pageNum, pageSize);
-        return AjaxResponse.success(actionList);
+        try {
+            PageDTO actionList = actionService.getActionList(driverActionVO, table, orderNo, pageNum, pageSize);
+            return AjaxResponse.success(actionList);
+        }
+        catch (PermissionException e){
+            return AjaxResponse.failMsg(RestErrorCode.HTTP_FORBIDDEN, e.getMessage());
+        }
+        catch (Exception e){
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
     }
 
 

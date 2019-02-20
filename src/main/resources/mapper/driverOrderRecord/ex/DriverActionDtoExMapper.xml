@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="mapper.driver.ex.DriverActionDtoExMapper" >
+<mapper namespace="mapper.driverOrderRecord.ex.DriverActionDtoExMapper" >
     <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.DriverActionDto" >
         <id column="id" property="id" jdbcType="INTEGER" />
         <result column="driver_id" property="driverId" jdbcType="INTEGER" />
@@ -19,15 +19,26 @@
         sys_version, platform
     </sql>
 
-    <select id="queryActionList" resultMap="BaseResultMap">
+    <select id="queryActionList" resultMap="BaseResultMap" parameterType="map">
         select
             id,
             driver_id,
             action,
             action_time,
-            order_no,
+            order_no
         from
-          ${table_name}
-        where
+          ${tableName}
+        <where>
+            <if test="driverId != null">
+              and driver_id = #{driverId}
+            </if>
+            <if test="actionId != null">
+              and action = #{actionId}
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+              and order_no = #{orderNo}
+            </if>
+        </where>
+        order by action_time desc
     </select>
 </mapper>
