@@ -40,6 +40,7 @@ public class SignUtils {
 		for (String key : sortedKeys) {
 			Object val = paramMap.get(key);
             if (val == null || StringUtils.isBlank(val.toString())) {
+            	paramMap.remove(key);
 				continue;
 			}
 			buff.append(key).append("=").append(val).append("&");
