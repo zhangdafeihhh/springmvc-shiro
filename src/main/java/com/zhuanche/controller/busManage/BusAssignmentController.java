@@ -720,8 +720,8 @@ public class BusAssignmentController {
             OrderOperationProcessVO process = new OrderOperationProcessVO("尾款生成时间", cost.getSettleDate(), "尾款已经生成");
             operList.add(process);
         }
-        if (order != null && order.getFactDate() != null) {
-            OrderOperationProcessVO process = new OrderOperationProcessVO("订单完成时间", cost.getSettleDate(), "订单已经完成");
+        if (order != null && order.getFactEndDate() != null) {
+            OrderOperationProcessVO process = new OrderOperationProcessVO("订单完成时间", order.getFactEndDate(), "订单已经完成");
             operList.add(process);
         }
         return operList;
