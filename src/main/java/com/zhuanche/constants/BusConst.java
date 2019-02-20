@@ -164,6 +164,9 @@ public interface BusConst {
 
 		/** 费用详情 （巴士费用明细） **/
 		String BUSS_BACK = "/buss/back";
+		
+		/** 巴士订单分佣比例保存 **/
+		String BUS_MAID = "/buss/updateBusOrderCommsion";
 	}
 
 	/**

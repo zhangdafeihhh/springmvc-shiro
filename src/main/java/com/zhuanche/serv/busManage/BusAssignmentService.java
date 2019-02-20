@@ -28,6 +28,8 @@ import com.zhuanche.vo.busManage.BusOrderExVO;
 import com.zhuanche.vo.busManage.BusOrderExportVO;
 import mapper.mdbcarmanage.ex.BusOrderOperationTimeExMapper;
 import mapper.rentcar.ex.*;
+
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1017,6 +1019,35 @@ public class BusAssignmentService {
             logger.error("[ BusAssignmentService-updateDriver ] 巴士改派失败", e);
         }
         return null;
+    }
+    
+    /**
+     * @Title: orderNoToMaid
+     * @Description: 通知分佣账户
+     * @param orderNo void
+     * @throws
+     */
+    public void orderNoToMaid(String orderNo) {
+        if (StringUtils.isBlank(orderNo)) {
+            logger.error("[ BusAssignmentService-orderNoToMaid ] 同步分佣订单号，orderNo is null");
+        }
+        //派单成功后，调用分佣接口，告诉分佣
+        Map<String, Object> params = new HashMap<>();
+        params.put("orderNo", orderNo);
+        logger.info("[ BusAssignmentService-orderNoToMaid ] 同步分佣订单号,请求参数,params={}", params);
+        try {
+        	String url = chargeBaseUrl + BusConst.Charge.BUS_MAID;
+        	JSONObject result = MpOkHttpUtil.okHttpPostBackJson(url, params, 3000, "同步分佣订单号");
+        	logger.info("[ BusAssignmentService-orderNoToMaid ] 同步分佣订单号,响应结果,result={}", result);
+        	
+            if (result.getIntValue("code") == 0) {
+                logger.info("[ BusAssignmentService-orderNoToMaid ] 同步分佣订单号成功,orderNo={}", orderNo);
+            } else {
+				logger.info("[ BusAssignmentService-orderNoToMaid ] 同步分佣订单号失败,orderNo={}, msg={}", orderNo, result.getString("msg"));
+            }
+        } catch (Exception e) {
+            logger.error("[ BusAssignmentService-orderNoToMaid ] 同步分佣订单号异常", e);
+        }
     }
 
 }

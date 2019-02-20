@@ -338,6 +338,11 @@ public class BusAssignmentController {
             if (supplierId == null) {
                 return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "供应商为空");
             }
+            
+            // 一、通知分佣账户
+            busAssignmentService.orderNoToMaid(orderNo);
+            
+            // 二、指派订单
             JSONObject result = busAssignmentService.busDispatcher(cityName, driverId, driverName, driverPhone,
                     dispatcherPhone, groupId, groupName, licensePlates, orderId, orderNo, serviceTypeId);
             int code = result.getIntValue("code");
@@ -451,9 +456,12 @@ public class BusAssignmentController {
                 return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "供应商为空");
             }
 
+            // 一、通知分佣账户
+            busAssignmentService.orderNoToMaid(orderNo);
+            
             // 查询改派前订单信息
             BusOrderDetail beforeBusOrder = busOrderService.selectOrderDetail(orderNo);
-            // 调用接口改派司机
+            // 二、调用接口改派司机
             JSONObject result = busAssignmentService.updateDriver(cityName, driverId, driverName, driverPhone, groupId,
                     groupName, licensePlates, orderId, orderNo, serviceTypeId);
             int code = result.getIntValue("code");
@@ -574,37 +582,43 @@ public class BusAssignmentController {
     private Map<Object, Object> sendMessage(BusOrderDetail beforeBusOrder, BusOrderDetail afterBusOrder) {
         Map<Object, Object> result = new HashMap<Object, Object>();
         try {
-            // 预订人手机
-            String riderPhone = beforeBusOrder.getRiderPhone();
-            // 取消的司机手机号
-            String beforeDriverPhone = beforeBusOrder.getDriverPhone();
-            // 改派后司机姓名
-            String driverName = afterBusOrder.getDriverName();
-            // 改派后司机手机号
-            String afterDriverPhone = afterBusOrder.getDriverPhone();
-            // 改派后车牌号
-            String licensePlates = afterBusOrder.getLicensePlates();
-            // 预订上车地点
-            String bookingStartAddr = beforeBusOrder.getBookingStartAddr();
-            // 预订下车地点
-            String bookingEndAddr = beforeBusOrder.getBookingEndAddr();
-            // 预订上车时间
-            Date bookDate = beforeBusOrder.getBookingDate();
-            String bookingDate = DateUtils.formatDate(bookDate, DateUtil.LOCAL_FORMAT);
-
-            String driverContext = "订单，" + bookingDate + "有乘客从" + bookingStartAddr + "到" + bookingEndAddr;
-            String beforeDriverContext = "尊敬的师傅您好，您的巴士指派" + driverContext + "，已被改派取消。";
-            String afterDriverContext = "尊敬的师傅您好，接到巴士服务" + driverContext + "，请您按时接送。";
-            String riderContext = "尊敬的用户您好，您预订的" + bookingDate + "的巴士服务订单已被改派成功，司机" + driverName + "，"
-                    + afterDriverPhone + "，车牌号" + licensePlates + "，将竭诚为您服务。";
-
-            // 乘客
-            SmsSendUtil.send(riderPhone, riderContext);
-            // 取消司机
-            SmsSendUtil.send(beforeDriverPhone, beforeDriverContext);
-            // 改派司机
-            SmsSendUtil.send(afterDriverPhone, afterDriverContext);
-
+        	// 预订上车时间
+        	Date bookDate = beforeBusOrder.getBookingDate();
+        	String bookingDate = DateUtils.formatDate(bookDate, DateUtil.LOCAL_FORMAT);
+        	
+			Date date = new Date();
+			long difference = bookDate.getTime() - date.getTime();
+			double subResult = difference * 1.0 / (1000 * 60 * 60);
+			if (subResult <= 24) {
+	            // 预订人手机
+	            String riderPhone = beforeBusOrder.getRiderPhone();
+	            // 取消的司机手机号
+	            String beforeDriverPhone = beforeBusOrder.getDriverPhone();
+	            // 改派后司机姓名
+	            String driverName = afterBusOrder.getDriverName();
+	            // 改派后司机手机号
+	            String afterDriverPhone = afterBusOrder.getDriverPhone();
+	            // 改派后车牌号
+	            String licensePlates = afterBusOrder.getLicensePlates();
+	            // 预订上车地点
+	            String bookingStartAddr = beforeBusOrder.getBookingStartAddr();
+	            // 预订下车地点
+	            String bookingEndAddr = beforeBusOrder.getBookingEndAddr();
+	
+	            String driverContext = "订单，" + bookingDate + "有乘客从" + bookingStartAddr + "到" + bookingEndAddr;
+	            String beforeDriverContext = "尊敬的师傅您好，您的巴士指派" + driverContext + "，已被改派取消。";
+	            String afterDriverContext = "尊敬的师傅您好，接到巴士服务" + driverContext + "，请您按时接送。";
+	            String riderContext = "尊敬的用户您好，您预订的" + bookingDate + "的巴士服务订单已被改派成功，司机" + driverName + "，" + afterDriverPhone + "，车牌号" + licensePlates + "，将竭诚为您服务。";
+	
+	            // 乘客
+	            SmsSendUtil.send(riderPhone, riderContext);
+	            // 取消司机
+	            SmsSendUtil.send(beforeDriverPhone, beforeDriverContext);
+	            // 改派司机
+	            SmsSendUtil.send(afterDriverPhone, afterDriverContext);
+			} else {
+				logger.info("巴士改派司机-大于等于24小时，无需发送短信: orderNo = " + beforeBusOrder.getOrderNo() + ", bookingDate = " + bookingDate);
+			}
         } catch (Exception e) {
             logger.error("巴士改派发送短信异常.", e);
         }
