@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driverOrderRecord.DriverActionDtoMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.DriverActionDto" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="action" property="action" jdbcType="INTEGER" />
+    <result column="action_time" property="actionTime" jdbcType="TIMESTAMP" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="channel_number" property="channelNumber" jdbcType="VARCHAR" />
+    <result column="version" property="version" jdbcType="VARCHAR" />
+    <result column="imei" property="imei" jdbcType="VARCHAR" />
+    <result column="mobel_version" property="mobelVersion" jdbcType="VARCHAR" />
+    <result column="sys_version" property="sysVersion" jdbcType="VARCHAR" />
+    <result column="platform" property="platform" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, driver_id, action, action_time, order_no, channel_number, version, imei, mobel_version, 
+    sys_version, platform
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from car_biz_driver_record_2018_07_29
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from car_biz_driver_record_2018_07_29
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.driver.DriverActionDto" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_biz_driver_record_2018_07_29 (driver_id, action, action_time, 
+      order_no, channel_number, version, 
+      imei, mobel_version, sys_version, 
+      platform)
+    values (#{driverId,jdbcType=INTEGER}, #{action,jdbcType=INTEGER}, #{actionTime,jdbcType=TIMESTAMP}, 
+      #{orderNo,jdbcType=VARCHAR}, #{channelNumber,jdbcType=VARCHAR}, #{version,jdbcType=VARCHAR}, 
+      #{imei,jdbcType=VARCHAR}, #{mobelVersion,jdbcType=VARCHAR}, #{sysVersion,jdbcType=VARCHAR}, 
+      #{platform,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.DriverActionDto" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_biz_driver_record_2018_07_29
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="driverId != null" >
+        driver_id,
+      </if>
+      <if test="action != null" >
+        action,
+      </if>
+      <if test="actionTime != null" >
+        action_time,
+      </if>
+      <if test="orderNo != null" >
+        order_no,
+      </if>
+      <if test="channelNumber != null" >
+        channel_number,
+      </if>
+      <if test="version != null" >
+        version,
+      </if>
+      <if test="imei != null" >
+        imei,
+      </if>
+      <if test="mobelVersion != null" >
+        mobel_version,
+      </if>
+      <if test="sysVersion != null" >
+        sys_version,
+      </if>
+      <if test="platform != null" >
+        platform,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="driverId != null" >
+        #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="action != null" >
+        #{action,jdbcType=INTEGER},
+      </if>
+      <if test="actionTime != null" >
+        #{actionTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderNo != null" >
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="channelNumber != null" >
+        #{channelNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null" >
+        #{version,jdbcType=VARCHAR},
+      </if>
+      <if test="imei != null" >
+        #{imei,jdbcType=VARCHAR},
+      </if>
+      <if test="mobelVersion != null" >
+        #{mobelVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="sysVersion != null" >
+        #{sysVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="platform != null" >
+        #{platform,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.driver.DriverActionDto" >
+    update car_biz_driver_record_2018_07_29
+    <set >
+      <if test="driverId != null" >
+        driver_id = #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="action != null" >
+        action = #{action,jdbcType=INTEGER},
+      </if>
+      <if test="actionTime != null" >
+        action_time = #{actionTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderNo != null" >
+        order_no = #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="channelNumber != null" >
+        channel_number = #{channelNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null" >
+        version = #{version,jdbcType=VARCHAR},
+      </if>
+      <if test="imei != null" >
+        imei = #{imei,jdbcType=VARCHAR},
+      </if>
+      <if test="mobelVersion != null" >
+        mobel_version = #{mobelVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="sysVersion != null" >
+        sys_version = #{sysVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="platform != null" >
+        platform = #{platform,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.DriverActionDto" >
+    update car_biz_driver_record_2018_07_29
+    set driver_id = #{driverId,jdbcType=INTEGER},
+      action = #{action,jdbcType=INTEGER},
+      action_time = #{actionTime,jdbcType=TIMESTAMP},
+      order_no = #{orderNo,jdbcType=VARCHAR},
+      channel_number = #{channelNumber,jdbcType=VARCHAR},
+      version = #{version,jdbcType=VARCHAR},
+      imei = #{imei,jdbcType=VARCHAR},
+      mobel_version = #{mobelVersion,jdbcType=VARCHAR},
+      sys_version = #{sysVersion,jdbcType=VARCHAR},
+      platform = #{platform,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

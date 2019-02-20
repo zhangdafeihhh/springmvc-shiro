@@ -68,4 +68,6 @@ public interface CarRelateTeamExMapper {
 
 
     List<CarRelateTeam> queryByDriverIdList(@Param("driverIdSet")Set<Integer> driverIdSet);
+
+    Integer getTeamIdByDriverId(@Param("driverId") Integer driverId);
 }

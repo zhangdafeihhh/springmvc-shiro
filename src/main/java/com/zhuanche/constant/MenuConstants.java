@@ -44,6 +44,7 @@ public interface MenuConstants {
     String DRIVER_DUTY_LIST = "查看司机排班";
     String CAR_RUNNING_MANAGE = "车辆运行管理";
     String CAR_TRAIL_MANAGE = "车辆轨迹查询";
+    String DRIVER_ACTION = "司机事件";
 
     //运营管理
     String OPERATION_MANAGEMENT = "运营管理";
