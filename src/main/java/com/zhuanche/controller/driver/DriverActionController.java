@@ -5,11 +5,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.enums.DriverActionEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.entity.driver.DriverActionVO;
 import com.zhuanche.exception.PermissionException;
 import com.zhuanche.serv.deiver.DriverActionService;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -23,6 +25,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
+import static com.zhuanche.common.enums.MenuEnum.DRIVER_ACTION_ENUM;
+import static com.zhuanche.common.enums.MenuEnum.DRIVER_ACTION_LIST;
+
 @RequestMapping("/driverAction")
 @Controller
 public class DriverActionController {
@@ -35,6 +40,8 @@ public class DriverActionController {
 
     @RequestMapping("/actionList")
     @ResponseBody
+    @RequestFunction(menu = DRIVER_ACTION_LIST)
+    @RequiresPermissions(value = "DriverAction_Look")
     public AjaxResponse getDriverActionList(String orderNo, DriverActionVO driverActionVO,
                                             @RequestParam(defaultValue = "1") int pageNum,
                                             @RequestParam(defaultValue = "30") int pageSize) {
@@ -71,6 +78,8 @@ public class DriverActionController {
 
     @RequestMapping("/actionEnum")
     @ResponseBody
+    @RequestFunction(menu = DRIVER_ACTION_ENUM)
+    @RequiresPermissions(value = "DriverAction_Enums")
     public AjaxResponse getActionList(){
         Map<Integer, String> map = DriverActionEnum.getMap();
         JSONArray result = new JSONArray();
