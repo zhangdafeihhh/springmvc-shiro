@@ -827,7 +827,7 @@ public class BusCarBizDriverInfoService implements BusConst {
         saveDTO.setDriverlicenseissuingcorp(carBizSupplier.getSupplierFullName());
         // 服务城市
         Integer serviceCity = saveDTO.getServiceCity();
-        if (serviceCity != carBizSupplier.getSupplierCity()) {
+        if (serviceCity.equals(carBizSupplier.getSupplierCity())) {
             return AjaxResponse.fail(RestErrorCode.CITY_SUPPLIER_DIFFER);
         }
         // 根据服务类型查找服务类型名称
