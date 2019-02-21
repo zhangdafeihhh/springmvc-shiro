@@ -1,5 +1,6 @@
 package com.zhuanche.entity.mdbcarmanage;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class DriverDailyReport {
@@ -71,6 +72,14 @@ public class DriverDailyReport {
     
     private String statDateStart;
     private String statDateEnd;
+
+    private String downOnlineTime;//收车时间
+
+    private BigDecimal allTime;//总时间（司机上班就算）
+
+    private Integer workStatus;//是否出车；1出车，0未出车（all_time>0,代表出车）
+
+    private Date createDate;
 
     public Integer getId() {
         return id;
@@ -359,4 +368,36 @@ public class DriverDailyReport {
 	public void setStatDateEnd(String statDateEnd) {
 		this.statDateEnd = statDateEnd;
 	}
+
+    public String getDownOnlineTime() {
+        return downOnlineTime;
+    }
+
+    public void setDownOnlineTime(String downOnlineTime) {
+        this.downOnlineTime = downOnlineTime;
+    }
+
+    public BigDecimal getAllTime() {
+        return allTime;
+    }
+
+    public void setAllTime(BigDecimal allTime) {
+        this.allTime = allTime;
+    }
+
+    public Integer getWorkStatus() {
+        return workStatus;
+    }
+
+    public void setWorkStatus(Integer workStatus) {
+        this.workStatus = workStatus;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
 }

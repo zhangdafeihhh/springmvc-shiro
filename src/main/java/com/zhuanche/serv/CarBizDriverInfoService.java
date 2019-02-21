@@ -27,6 +27,7 @@ import com.zhuanche.mongo.DriverMongo;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.serv.mdbcarmanage.CarBizDriverUpdateService;
 import com.zhuanche.serv.mongo.DriverMongoService;
+import com.zhuanche.serv.order.OrderService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.*;
@@ -175,6 +176,9 @@ public class CarBizDriverInfoService {
 
     @Autowired
     private CarBizSupplierMapper carBizSupplierMapper;
+
+    @Autowired
+    private OrderService orderService;
 
     /**
      * 查询司机信息列表展示
@@ -816,18 +820,7 @@ public class CarBizDriverInfoService {
                 if (data != null){
                     String orderNum = data.getJSONObject(Constants.DRIVER).getString(Constants.FIRST_ORDER_NO);
                     if (StringUtils.isNotBlank(orderNum)){
-                        String url = orderServiceApiBaseUrl + "/orderMain/getOrdersByOrderNo";
-                        params.clear();
-                        params.put("orderNo", orderNum);
-                        params.put("bId", bId);
-                        params.put("columns", "fact_end_date");
-                        params.put("needHistory", 1);
-                        try{
-                            params.put("sign", MD5Utils.getMD5DigestBase64(SignatureUtils.getMD5Sign(params, signKey)));
-                        }catch (Exception e){
-                            logger.error("签名错误");
-                        }
-                        com.alibaba.fastjson.JSONObject result = MpOkHttpUtil.okHttpGetBackJson(url, params, 1, Constants.DRIVER_INFO_TAG);
+                        com.alibaba.fastjson.JSONObject result = orderService.getOrderInfoByParams(orderNum, "fact_end_date", Constants.DRIVER_INFO_TAG);
                         if (result != null && Constants.SUCCESS_CODE == result.getInteger(Constants.CODE)){
                             JSONArray jsonArray = result.getJSONArray(Constants.DATA);
                             if (jsonArray != null && !jsonArray.isEmpty()){

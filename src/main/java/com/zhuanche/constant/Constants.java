@@ -84,6 +84,7 @@ public final class Constants {
 	public static final String GROUP_NAME = "groupName";
 	public static final String GROUP_INFO_TAG = "groupInfo";
 	public static final String DRIVER_INFO_TAG = "driverInfo";
+	public static final String ORDER_INFO_TAG = "orderInfo";
 	public static final String TOTAL = "total";
 	public static final String RECORD_LIST = "recordList";
 	public static final String PAGE_NO = "pageNo";

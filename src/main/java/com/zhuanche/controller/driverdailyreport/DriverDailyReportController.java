@@ -551,9 +551,10 @@ public class DriverDailyReportController extends DriverQueryController {
 		String tableName = "driver_daily_report";
 		String statDateStart = driverDailyReportBean.getStatDateStart();
 		if(StringUtils.isNotEmpty(statDateStart)){
-			String year = statDateStart.substring(0,4);
-			if(!"2018".equals(year)){
+			Integer year = Integer.parseInt(statDateStart.substring(0,4));
+			if(year!=null && year>2018){
 				tableName += "_" + driverDailyReportBean.getStatDateStart().substring(0, 7).replace("-", "_");
+				driverDailyReportBean.setValue(1);
 			}
 		}
 		driverDailyReportBean.setTableName(tableName);

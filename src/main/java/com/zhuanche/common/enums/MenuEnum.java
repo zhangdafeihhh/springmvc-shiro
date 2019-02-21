@@ -107,6 +107,8 @@ public enum MenuEnum {
     DRIVER_RANK_INTEGRAL_LIST(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.DRIVER_WORK_MANAGE, MenuConstants.DRIVER_RANK_INTEGRAL,"司机等级积分查询"),
     DRIVER_RANK_INTEGRAL_EXPORT(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.DRIVER_WORK_MANAGE, MenuConstants.DRIVER_RANK_INTEGRAL,"司机等级积分导出"),
 
+    DRIVER_ACTION_ENUM(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.DRIVER_WORK_MANAGE,MenuConstants.DRIVER_ACTION, "司机事件枚举列表"),
+    DRIVER_ACTION_LIST(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.DRIVER_WORK_MANAGE,MenuConstants.DRIVER_ACTION, "司机事件列表查询"),
     //车队班组管理
     TEAM_GROUP_LIST(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.TEAM_GROUP_MANAGE, MenuConstants.TEAM_GROUP_MANAGE,"车队班组信息查询"),
     TEAM_GROUP_ADD(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.TEAM_GROUP_MANAGE, MenuConstants.TEAM_GROUP_MANAGE,"车队班组信息添加"),
