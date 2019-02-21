@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.google.common.collect.Lists;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.enums.DriverActionEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.constant.Constants;
@@ -49,22 +51,33 @@ public class DriverActionServiceImpl implements DriverActionService {
 
 
     @Override
+    @MasterSlaveConfigs(
+            configs = {
+                    @MasterSlaveConfig(databaseTag = "orderrecord-master-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+            }
+    )
     public PageDTO getActionList(DriverActionVO driverActionVO, String table, String orderNo,
                                  int pageNum, int pageSize) {
         if (StringUtils.isNotBlank(orderNo)) {
-            JSONObject result = orderService.getOrderInfoByParams(orderNo, "driver_id", Constants.ORDER_INFO_TAG);
-            if (result != null && Constants.SUCCESS_CODE == result.getInteger(Constants.CODE)) {
-                JSONArray jsonArray = result.getJSONArray(Constants.DATA);
-                if (jsonArray != null && !jsonArray.isEmpty()) {
-                    Integer driverId = jsonArray.getJSONObject(0).getInteger("driverId");
-                    if (driverId != null) {
-                        driverActionVO.setDriverId(driverId);
-                    } else if (StringUtils.isEmpty(driverActionVO.getDriverName())
-                            && StringUtils.isEmpty(driverActionVO.getDriverLicense())
-                            && StringUtils.isEmpty(driverActionVO.getDriverPhone())) {
-                        return new PageDTO(pageNum, pageSize, 0, Collections.emptyList());
+            try {
+                JSONObject result = orderService.getOrderInfoByParams(orderNo, "driver_id", Constants.ORDER_INFO_TAG);
+                if (result != null && Constants.SUCCESS_CODE == result.getInteger(Constants.CODE)) {
+                    JSONArray jsonArray = result.getJSONArray(Constants.DATA);
+                    if (jsonArray != null && !jsonArray.isEmpty()) {
+                        Integer driverId = jsonArray.getJSONObject(0).getInteger("driverId");
+                        if (driverId != null) {
+                            driverActionVO.setDriverId(driverId);
+                        } else if (StringUtils.isEmpty(driverActionVO.getDriverName())
+                                && StringUtils.isEmpty(driverActionVO.getDriverLicense())
+                                && StringUtils.isEmpty(driverActionVO.getDriverPhone())) {
+                            return new PageDTO(pageNum, pageSize, 0, Collections.emptyList());
+                        }
                     }
                 }
+            }catch (Exception e){
+                logger.error("查询订单信息失败 orderNo {} ", orderNo);
+                logger.error("异常信息 ：", e);
+                return null;
             }
         }
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
@@ -75,6 +88,7 @@ public class DriverActionServiceImpl implements DriverActionService {
             if (teamId != null) {
                 Set<Integer> teamIds = loginUser.getTeamIds();
                 if (teamIds != null && !teamIds.isEmpty() && !teamIds.contains(teamId)) {
+                    logger.error("查询权限不足 userId : {} , driverId : {}", loginUser.getId(), driverInfoDTO.getDriverId());
                     throw new PermissionException("查询权限不足");
                 }
             }
@@ -84,6 +98,7 @@ public class DriverActionServiceImpl implements DriverActionService {
             params.put("actionId", driverActionVO.getActionId());
             params.put("tableName", table);
         } else {
+            logger.error("司机信息查询失败,查询参数 {}", ((JSONObject)JSONObject.toJSON(params)).toJSONString());
             throw new PermissionException("司机信息不存在");
         }
         List<DriverActionVO> list;
