@@ -155,7 +155,7 @@ public class BusInfoService {
     public AjaxResponse updateCarById(BusCarSaveDTO busCarSaveDTO) {
         BusDetailVO busDetail = this.getDetail(busCarSaveDTO.getCarId());
         if (busDetail == null) {
-            AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "车辆ID传入错误");
+            return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "车辆ID传入错误");
         }
         boolean b = this.licensePlatesIfExist(busCarSaveDTO.getLicensePlates());
         //如果传入的车牌号存在且跟carId查出来的车牌号不相符，该车牌号已经存在

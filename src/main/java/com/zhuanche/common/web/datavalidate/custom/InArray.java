@@ -56,7 +56,7 @@ public @interface InArray {
 
 		@Override
 		public boolean isValid(Object value, ConstraintValidatorContext context) {
-			if (options == null && options.length == 0) {
+			if (options == null || options.length == 0) {
 				return true;
 			}
 			if (value == null) {
