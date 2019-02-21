@@ -811,27 +811,32 @@ public class CarBizDriverInfoService {
                 }
             }
 
-            //调用订单接口查询激活时间
-            Map<String, Object> params = new HashMap<>();
-            params.put("driverId", carBizDriverInfo.getDriverId());
-            com.alibaba.fastjson.JSONObject resultJson = MpOkHttpUtil.okHttpGetBackJson(orderStatisticsUrl, params, 1, Constants.DRIVER_INFO_TAG);
-            if (resultJson != null && Constants.SUCCESS_CODE == resultJson.getInteger(Constants.CODE)){
-                com.alibaba.fastjson.JSONObject data = resultJson.getJSONObject(Constants.DATA);
-                if (data != null){
-                    String orderNum = data.getJSONObject(Constants.DRIVER).getString(Constants.FIRST_ORDER_NO);
-                    if (StringUtils.isNotBlank(orderNum)){
-                        com.alibaba.fastjson.JSONObject result = orderService.getOrderInfoByParams(orderNum, "fact_end_date", Constants.DRIVER_INFO_TAG);
-                        if (result != null && Constants.SUCCESS_CODE == result.getInteger(Constants.CODE)){
-                            JSONArray jsonArray = result.getJSONArray(Constants.DATA);
-                            if (jsonArray != null && !jsonArray.isEmpty()){
-                                String updateDate = jsonArray.getJSONObject(0).getString("factEndDate");
-                                if(StringUtils.isNotBlank(updateDate)){
-                                    carBizDriverInfo.setActiveDate(DateUtil.getTimeString(updateDate));
+            try {
+                //查询司机激活时间
+                Map<String, Object> params = new HashMap<>();
+                params.put("driverId", carBizDriverInfo.getDriverId());
+                com.alibaba.fastjson.JSONObject resultJson = MpOkHttpUtil.okHttpGetBackJson(orderStatisticsUrl, params, 1, Constants.DRIVER_INFO_TAG);
+                if (resultJson != null && Constants.SUCCESS_CODE == resultJson.getInteger(Constants.CODE)) {
+                    com.alibaba.fastjson.JSONObject data = resultJson.getJSONObject(Constants.DATA);
+                    if (data != null) {
+                        String orderNum = data.getJSONObject(Constants.DRIVER).getString(Constants.FIRST_ORDER_NO);
+                        if (StringUtils.isNotBlank(orderNum)) {
+                            com.alibaba.fastjson.JSONObject result = orderService.getOrderInfoByParams(orderNum, "fact_end_date", Constants.DRIVER_INFO_TAG);
+                            if (result != null && Constants.SUCCESS_CODE == result.getInteger(Constants.CODE)) {
+                                JSONArray jsonArray = result.getJSONArray(Constants.DATA);
+                                if (jsonArray != null && !jsonArray.isEmpty()) {
+                                    String updateDate = jsonArray.getJSONObject(0).getString("factEndDate");
+                                    if (StringUtils.isNotBlank(updateDate)) {
+                                        carBizDriverInfo.setActiveDate(DateUtil.getTimeString(updateDate));
+                                    }
                                 }
                             }
                         }
                     }
                 }
+            }catch (Exception e){
+                logger.error("查询司机激活时间失败 driverId : {}", carBizDriverInfo.getDriverId());
+                logger.error("错误信息 ：", e);
             }
         }
         return carBizDriverInfo;
