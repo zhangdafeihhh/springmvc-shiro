@@ -31,6 +31,9 @@ public interface CarBizCarGroupExMapper {
     List<CarBizCarGroup> queryGroupNameList();
 
     List<CarBizCarGroup> queryCarGroupByIdSet(@Param("carBizCarGroupSet")Set<Integer> carBizCarGroupSet);
+
+    /*判断该groupId是否是巴士的车型类别*/
+    int countByGroupId(Integer groupId);
     
 	/**
 	 * @Title: getSeatNumByGroupId

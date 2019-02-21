@@ -2,6 +2,9 @@ package com.zhuanche.serv;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import mapper.rentcar.CarBizCarGroupMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
@@ -77,5 +80,17 @@ public class CarBizCarGroupService {
             return null;
         }
          return carBizCarGroupExMapper.queryCarGroupByIdSet(carBizCarGroupSet);
+    }
+    /**
+     * 判断该groupId是否是巴士的服务类型
+     * @param
+     * @return
+     */
+    public boolean groupIfExist(Integer groupId){
+        int result = carBizCarGroupExMapper.countByGroupId(groupId);
+        if(result >0 ){
+            return true;
+        }
+        return false;
     }
 }

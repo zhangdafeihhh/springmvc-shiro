@@ -152,6 +152,15 @@ public interface CarBizDriverInfoExMapper {
 
     CarBizDriverInfoDTO selectByPhone(@Param("phone") String phone);
 
+	/**
+	 * @Title: updateDriverCooperationTypeBySupplierId
+	 * @Description: 更新司机的加盟类型
+	 * @param map 
+	 * @return void
+	 * @throws
+	 */
+	void updateDriverCooperationTypeBySupplierId(Map<String, Object> map);
+
     CarBizDriverInfoDTO selectByDriverId(@Param("driverId") Integer driverId);
 
     
@@ -171,6 +180,4 @@ public interface CarBizDriverInfoExMapper {
      */
     List<CarBizDriverInfoDTO> queryCarBizDriverListBySupplierId(Integer supplierId);
 
-
-    void updateDriverCooperationTypeBySupplierId(Map<String, Object> map);
 }

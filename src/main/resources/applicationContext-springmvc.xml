@@ -10,8 +10,8 @@
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
         http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd">
 
-	<!-- 配置Spring MVC 中的RequestMappingHandlerMapping-->
-    <mvc:annotation-driven>
+	<!-- 配置Spring MVC 中的RequestMappingHandlerMapping , 并支持hibernate-validate校验器-->
+    <mvc:annotation-driven validator="hibernateValidator">
         <mvc:message-converters register-defaults="true">
             <bean class="org.springframework.http.converter.StringHttpMessageConverter">
                 <constructor-arg value="UTF-8" />
@@ -36,7 +36,11 @@
 		                        <value>PrettyFormat</value>
 		                    </list>
 		                </property>
-						<property name="dateFormat" value="yyyy-MM-dd HH:mm:ss"/>
+		                <property name="serializeFilters">
+							<list>
+								<bean class="com.zhuanche.common.web.fastjson.filter.BigDecimalFilter"></bean>
+							</list>
+						</property>
                 	</bean>
                 </property>
             </bean>
@@ -73,7 +77,19 @@
 
         </mvc:message-converters>
     </mvc:annotation-driven>
-
+    <!-- 配置hibernate-validate校验器 -->
+	<bean id="validatorMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="useCodeAsDefaultMessage" value="false" />
+		<property name="defaultEncoding" value="UTF-8"/>
+		<property name="basename" value="validationMessages" />
+	</bean>
+	<bean id="hibernateValidator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"> 
+		<property name="providerClass" value="org.hibernate.validator.HibernateValidator"/> 
+		<property name="validationMessageSource" ref="validatorMessageSource"/> 
+	</bean>
+	<bean class="org.springframework.validation.beanvalidation.MethodValidationPostProcessor">
+		<property name="validator" ref="hibernateValidator"/>
+	</bean>
 	<!-- 配置View层 JSP-->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/pages/"/>

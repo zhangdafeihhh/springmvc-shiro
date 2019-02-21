@@ -1724,10 +1724,6 @@
     where phone = #{phone,jdbcType=INTEGER}
   </select>
 
-
-
-
-
   <select id="selectByDriverId" resultMap="BaseResultMap" parameterType="java.util.Map" >
     select
     <include refid="Base_Column_List" />
@@ -1766,6 +1762,9 @@
 		<if test="phone != null and phone != ''">
 			and i.phone LIKE CONCAT(#{phone},'%')
 		</if>
+       <if test="groupIdSel !=null">
+        and g.group_id = #{groupIdSel}
+       </if>
 		<if test="seatNum != null">
 			and g.seat_num >= #{seatNum}
 		</if>
@@ -1783,7 +1782,6 @@
 		</if>
 		order by i.update_date desc
 	</select>
-
 
   <select id="queryCarBizDriverListBySupplierId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select

@@ -25,6 +25,11 @@ import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -280,5 +285,13 @@ public class CarBizSupplierService{
 			return AjaxResponse.failMsg(RestErrorCode.PARAMS_ERROR, Constants.SUPPLIER_NAME_EXIST);
 		}
 		return AjaxResponse.success(Constants.SUPPLIER_NAME_AVAILABLE);
+	}
+	/**
+	 * 根据供应商ID查询供应商名称
+	 * @param supplierId
+	 * @return
+	 */
+	public String getSupplierNameById(Integer supplierId){
+		return carBizSupplierExMapper.getSupplierNameById(supplierId);
 	}
 }

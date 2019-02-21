@@ -43,7 +43,6 @@ import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
-import org.apache.http.entity.ContentType;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -3092,11 +3091,11 @@ public class CarBizDriverInfoService {
 //            long expire = System.currentTimeMillis() + expireTime * 1000 + 1;
             long expire = System.currentTimeMillis() + expireTime * 1000 + 1;
 //            String result = RedisCacheDriverUtil.getSet(key, String.valueOf(expire), String.class);
-            RedisCacheDriverUtil.set(key, String.valueOf(expire), expireTime);
+            String result = RedisCacheDriverUtil.set(key, String.valueOf(expire), expireTime);
 //            logger.info(LOGTAG + "派单锁-缓存KEY[" + key + "] " + result);
-//            if(result != null){
-//                lock = true;
-//            }
+            if(result != null){
+                lock = true;
+            }
         }
         return lock;
     }
@@ -3122,12 +3121,7 @@ public class CarBizDriverInfoService {
         getOrderSignMap(params);
         try {
             logger.info(LOGTAG + "调用订单组服务查询是否存在待服务订单开始...driverId="+driverId);
-            String jsonString = JSON.toJSONString(params);
-            String result = HttpClientUtil.buildPostRequest(orderServiceApiBaseUrl + DRIVER_SERVICE_TRIPLIST_URL)
-                    .setBody(jsonString)
-                    .addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
-            com.alibaba.fastjson.JSONObject jsonObj = JSON.parseObject(result);
-
+            com.alibaba.fastjson.JSONObject jsonObj = MpOkHttpUtil.okHttpPostBackJson(orderServiceApiBaseUrl + DRIVER_SERVICE_TRIPLIST_URL, params, 3000, "调用订单组服务查询是否存在待服务订单");
             logger.info(LOGTAG + "调用订单组服务查询是否存在待服务订单结束...driverId="+driverId+",返回:"+jsonObj.toString());
             if(jsonObj==null || !jsonObj.containsKey("code")){
                 logger.info(LOGTAG + "调用订单组服务查询是否存在待服务订单,失败");
@@ -3639,6 +3633,26 @@ public class CarBizDriverInfoService {
         }
 
     }
+    
+	/**
+	 * @Title: updateDriverCooperationTypeBySupplierId
+	 * @Description: 更新司机的加盟类型
+	 * @param supplierId
+	 * @param cooperationType 
+	 * @return void
+	 * @throws
+	 */
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER))
+	public void updateDriverCooperationTypeBySupplierId(Integer supplierId, Integer cooperationType){
+		// 更新mongo
+		driverMongoService.updateDriverCooperationTypeBySupplierId(supplierId, cooperationType);
+		
+		// 更新司机表
+		Map<String, Object> map = new HashMap<>();
+		map.put("supplierId", supplierId);
+		map.put("cooperationType", cooperationType);
+		carBizDriverInfoExMapper.updateDriverCooperationTypeBySupplierId(map);
+	}
 
 
     public boolean addTelescopeDriver(CarAdmUser user){
@@ -3774,11 +3788,4 @@ public class CarBizDriverInfoService {
         return carBizDriverInfo;
     }
 
-    public void updateDriverCooperationTypeBySupplierId(Integer supplierId, Integer cooperationType) {
-        driverMongoService.updateDriverCooperationTypeBySupplierId(supplierId, cooperationType);
-        Map<String, Object> map = new HashMap<>();
-        map.put("supplierId", supplierId);
-        map.put("cooperationType", cooperationType);
-        carBizDriverInfoExMapper.updateDriverCooperationTypeBySupplierId(map);
-    }
 }

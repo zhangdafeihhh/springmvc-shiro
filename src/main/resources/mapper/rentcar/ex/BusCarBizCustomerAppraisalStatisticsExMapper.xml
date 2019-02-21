@@ -36,6 +36,17 @@
 		WHERE
 			driver_id = #{driverId}
 		AND create_date = #{createDate}
+		limit 1
 	</select>
+	<!--获取司机的平均积分-->
+	<select id="queryAvgAppraisal" parameterType="java.lang.Integer" resultType="java.lang.Double">
+    SELECT
+	 avg(evaluate_score)
+   FROM
+	 car_biz_customer_appraisal_statistics
+    WHERE
+	driver_id = #{driverId}
+	</select>
+
 </mapper>
 

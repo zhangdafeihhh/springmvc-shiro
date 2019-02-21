@@ -23,6 +23,8 @@ public interface CarBizSupplierExMapper{
 	List<CarBizSupplier> queryNamesByIds(@Param("supplierIds") Set<Integer> supplierIds);
 
 	List<CarBizSupplier> findByIdSet(@Param("supplierIdSet") Set<Integer> supplierIdSet);
+	/**根据ID查询供应商名称*/
+	String getSupplierNameById(Integer supplierId);
 
 	List<CarBizSupplierDTO> queryNameBySupplierIds(@Param("supplierIds")  String supplierIds );
 	

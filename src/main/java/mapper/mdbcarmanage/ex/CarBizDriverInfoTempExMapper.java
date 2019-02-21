@@ -3,6 +3,7 @@ package mapper.mdbcarmanage.ex;
 import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author wzq
@@ -92,4 +93,13 @@ public interface CarBizDriverInfoTempExMapper {
      * @return
      */
     int validateBankCardNumber(CarBizDriverInfoTemp carBizDriverInfoTemp);
+
+	/**
+	 * @Title: updateDriverCooperationTypeBySupplierId
+	 * @Description: 更新司机的加盟类型
+	 * @param map 
+	 * @return void
+	 * @throws
+	 */
+	void updateDriverCooperationTypeBySupplierId(Map<String, Object> map);
 }

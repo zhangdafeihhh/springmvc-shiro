@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -29,6 +32,7 @@ import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.constants.busManage.BusConstant;
 import com.zhuanche.dto.busManage.BusCarDTO;
 import com.zhuanche.dto.busManage.BusDriverDTO;
 import com.zhuanche.dto.busManage.BusOrderDTO;
@@ -42,14 +46,17 @@ import com.zhuanche.entity.mdbcarmanage.BusOrderOperationTime;
 import com.zhuanche.entity.mdbcarmanage.CarBizOrderMessageTask;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.serv.busManage.BusAssignmentService;
+import com.zhuanche.serv.busManage.BusCommonService;
 import com.zhuanche.serv.busManage.BusOrderService;
 import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.DateUtils;
+import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.vo.busManage.OrderOperationProcessVO;
 
 import mapper.mdbcarmanage.BusOrderOperationTimeMapper;
 import mapper.mdbcarmanage.CarBizOrderMessageTaskMapper;
 import mapper.mdbcarmanage.ex.BusOrderOperationTimeExMapper;
+import mapper.mdbcarmanage.ex.SaasRolePermissionRalationExMapper;
 import mapper.rentcar.CarBizDriverInfoMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 
@@ -79,6 +86,11 @@ public class BusAssignmentController {
 
     @Autowired
     private BusOrderService busOrderService;
+    @Autowired
+    private BusCommonService commonService;
+
+    @Autowired
+    private SaasRolePermissionRalationExMapper saasRolePermissionRalationExMapper;
 
     public interface OrderOperation {
         /**
@@ -113,6 +125,93 @@ public class BusAssignmentController {
         }
         return AjaxResponse.success(pageDTO);
     }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @RequestMapping(value = "/exportOrder")
+    @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
+    public void exportExcel(BusOrderDTO params, HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        long start = System.currentTimeMillis();
+        logger.info("[ BusAssignmentController-exportExcel ]" + "导出订单列表参数=" + JSON.toJSONString(params));
+        //下单时间，完成时间必须有一项不为空，且间隔小于92天
+        boolean createFlag=false;
+        boolean factEndFlag=false;
+        if (params.getCreateDateBegin() != null && params.getCreateDateEnd() != null) {
+            Date begin = DateUtils.getDate(params.getCreateDateBegin(), "yyyy-MM-dd");
+            Date end = DateUtils.getDate(params.getCreateDateEnd(), "yyyy-MM-dd");
+            Integer createGap = DateUtils.getIntervalDays(begin, end);
+            if(createGap<=92) createFlag=true;
+        }
+        if (params.getFactEndDateBegin() != null && params.getFactEndDateEnd() != null) {
+            Date begin = DateUtils.getDate(params.getFactEndDateBegin(), "yyyy-MM-dd");
+            Date end = DateUtils.getDate(params.getFactEndDateEnd(), "yyyy-MM-dd");
+            Integer createGap = DateUtils.getIntervalDays(begin, end);
+            if(createGap<=92) factEndFlag=true;
+        }
+        //如果两个时间区间都不符合条件，不可以导出
+        CsvUtils utilEntity = new CsvUtils();
+        //构建文件名称
+        String fileName = BusConstant.buidFileName(request, "订单明细");
+        if(!createFlag&&!factEndFlag){
+            ArrayList csvData = new ArrayList();
+            csvData.add("下单时间、完成时间需要任选其一且不能于三个月");
+            utilEntity.exportCsvV2(response, csvData, new ArrayList<>(), fileName, true, true);
+            return;
+        }
+        boolean roleBoolean = commonService.ifOperate();
+        String[] headArray = null;
+        if (roleBoolean) {
+            headArray = BusConstant.Order.ORDER_HEAD;
+        } else {
+            headArray = new String[BusConstant.Order.ORDER_HEAD.length - 3];//无权导出企业信息
+            System.arraycopy(BusConstant.Order.ORDER_HEAD, 0, headArray, 0, BusConstant.Order.ORDER_HEAD.length - 3);
+        }
+        //构建文件标题
+        List<String> headerList = new ArrayList<>();
+        String head = StringUtils.join(headArray, ",");
+        headerList.add(head);
+
+        Integer pageNum = 0;
+        params.setPageSize(500);
+        boolean isFirst = true;
+        boolean isList = false;
+        //查询所有的巴士车型类别，减少访问数据库的次数
+        List<Map<Object, Object>> maps = commonService.queryGroups();
+        Map<Integer, String> groupMap = new HashMap<>(16);
+        maps.forEach(o -> {
+            groupMap.put(Integer.parseInt(String.valueOf(o.get("groupId"))), String.valueOf(o.get("groupName")));
+        });
+        do {
+            pageNum++;
+            params.setPageNum(pageNum);
+            PageDTO pageDTO = busAssignmentService.buidExportData(params, groupMap, roleBoolean);
+            long total = pageDTO.getTotal();
+            List result = pageDTO.getResult();
+            int pages = pageDTO.getPages();
+            if (total == 0 || result == null || result.isEmpty()) {
+                List<String> csvDataList = new ArrayList<>();
+                csvDataList.add("没有符合条件的数据");
+                isList = true;
+                utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, isFirst, isList);
+                break;
+            }
+            if (pageNum != 1) {
+                isFirst = false;
+            }
+            if (pageNum.equals(pages)) {
+                isList = true;
+            }
+            List<String> csvData = new ArrayList<>();
+            result.forEach(o -> {
+                String s = busAssignmentService.fieldValueToString(o);
+                csvData.add(s);
+            });
+            utilEntity.exportCsvV2(response, csvData, headerList, fileName, isFirst, isList);
+            // isList=true时表示时之后一页停止循环
+        } while (!isList);
+        logger.info("[ BusAssignmentController-exportExcel ]" + "导出订单数据=" + JSON.toJSONString(params) + " 消耗时间=" + (System.currentTimeMillis() - start));
+    }
+
 
     /**
      * 根据订单号获取当前可指派的车辆数据
@@ -237,6 +336,11 @@ public class BusAssignmentController {
             if (supplierId == null) {
                 return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "供应商为空");
             }
+            
+            // 一、通知分佣账户
+            busAssignmentService.orderNoToMaid(orderNo);
+            
+            // 二、指派订单
             JSONObject result = busAssignmentService.busDispatcher(cityName, driverId, driverName, driverPhone,
                     dispatcherPhone, groupId, groupName, licensePlates, orderId, orderNo, serviceTypeId);
             int code = result.getIntValue("code");
@@ -350,9 +454,12 @@ public class BusAssignmentController {
                 return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "供应商为空");
             }
 
+            // 一、通知分佣账户
+            busAssignmentService.orderNoToMaid(orderNo);
+            
             // 查询改派前订单信息
             BusOrderDetail beforeBusOrder = busOrderService.selectOrderDetail(orderNo);
-            // 调用接口改派司机
+            // 二、调用接口改派司机
             JSONObject result = busAssignmentService.updateDriver(cityName, driverId, driverName, driverPhone, groupId,
                     groupName, licensePlates, orderId, orderNo, serviceTypeId);
             int code = result.getIntValue("code");
@@ -473,37 +580,43 @@ public class BusAssignmentController {
     private Map<Object, Object> sendMessage(BusOrderDetail beforeBusOrder, BusOrderDetail afterBusOrder) {
         Map<Object, Object> result = new HashMap<Object, Object>();
         try {
-            // 预订人手机
-            String riderPhone = beforeBusOrder.getRiderPhone();
-            // 取消的司机手机号
-            String beforeDriverPhone = beforeBusOrder.getDriverPhone();
-            // 改派后司机姓名
-            String driverName = afterBusOrder.getDriverName();
-            // 改派后司机手机号
-            String afterDriverPhone = afterBusOrder.getDriverPhone();
-            // 改派后车牌号
-            String licensePlates = afterBusOrder.getLicensePlates();
-            // 预订上车地点
-            String bookingStartAddr = beforeBusOrder.getBookingStartAddr();
-            // 预订下车地点
-            String bookingEndAddr = beforeBusOrder.getBookingEndAddr();
-            // 预订上车时间
-            Date bookDate = beforeBusOrder.getBookingDate();
-            String bookingDate = DateUtils.formatDate(bookDate, DateUtil.LOCAL_FORMAT);
-
-            String driverContext = "订单，" + bookingDate + "有乘客从" + bookingStartAddr + "到" + bookingEndAddr;
-            String beforeDriverContext = "尊敬的师傅您好，您的巴士指派" + driverContext + "，已被改派取消。";
-            String afterDriverContext = "尊敬的师傅您好，接到巴士服务" + driverContext + "，请您按时接送。";
-            String riderContext = "尊敬的用户您好，您预订的" + bookingDate + "的巴士服务订单已被改派成功，司机" + driverName + "，"
-                    + afterDriverPhone + "，车牌号" + licensePlates + "，将竭诚为您服务。";
-
-            // 乘客
-            SmsSendUtil.send(riderPhone, riderContext);
-            // 取消司机
-            SmsSendUtil.send(beforeDriverPhone, beforeDriverContext);
-            // 改派司机
-            SmsSendUtil.send(afterDriverPhone, afterDriverContext);
-
+        	// 预订上车时间
+        	Date bookDate = beforeBusOrder.getBookingDate();
+        	String bookingDate = DateUtils.formatDate(bookDate, DateUtil.LOCAL_FORMAT);
+        	
+			Date date = new Date();
+			long difference = bookDate.getTime() - date.getTime();
+			double subResult = difference * 1.0 / (1000 * 60 * 60);
+			if (subResult <= 24) {
+	            // 预订人手机
+	            String riderPhone = beforeBusOrder.getRiderPhone();
+	            // 取消的司机手机号
+	            String beforeDriverPhone = beforeBusOrder.getDriverPhone();
+	            // 改派后司机姓名
+	            String driverName = afterBusOrder.getDriverName();
+	            // 改派后司机手机号
+	            String afterDriverPhone = afterBusOrder.getDriverPhone();
+	            // 改派后车牌号
+	            String licensePlates = afterBusOrder.getLicensePlates();
+	            // 预订上车地点
+	            String bookingStartAddr = beforeBusOrder.getBookingStartAddr();
+	            // 预订下车地点
+	            String bookingEndAddr = beforeBusOrder.getBookingEndAddr();
+	
+	            String driverContext = "订单，" + bookingDate + "有乘客从" + bookingStartAddr + "到" + bookingEndAddr;
+	            String beforeDriverContext = "尊敬的师傅您好，您的巴士指派" + driverContext + "，已被改派取消。";
+	            String afterDriverContext = "尊敬的师傅您好，接到巴士服务" + driverContext + "，请您按时接送。";
+	            String riderContext = "尊敬的用户您好，您预订的" + bookingDate + "的巴士服务订单已被改派成功，司机" + driverName + "，" + afterDriverPhone + "，车牌号" + licensePlates + "，将竭诚为您服务。";
+	
+	            // 乘客
+	            SmsSendUtil.send(riderPhone, riderContext);
+	            // 取消司机
+	            SmsSendUtil.send(beforeDriverPhone, beforeDriverContext);
+	            // 改派司机
+	            SmsSendUtil.send(afterDriverPhone, afterDriverContext);
+			} else {
+				logger.info("巴士改派司机-大于等于24小时，无需发送短信: orderNo = " + beforeBusOrder.getOrderNo() + ", bookingDate = " + bookingDate);
+			}
         } catch (Exception e) {
             logger.error("巴士改派发送短信异常.", e);
         }
@@ -515,17 +628,15 @@ public class BusAssignmentController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE),
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)})
-    public AjaxResponse queryOrderDetails(@Verify(param = "orderId", rule = "required") Integer orderId,
-                                          @Verify(param = "orderNo", rule = "required") String orderNo) {
-        if (orderId == null || StringUtils.isBlank(orderNo)) {
-            return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "订单ID或订单编号不能为空");
+    public AjaxResponse queryOrderDetails(@Verify(param = "orderNo", rule = "required") String orderNo) {
+        if (StringUtils.isBlank(orderNo)) {
+            return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "订单编号不能为空");
         }
-
         try {
             // 调用订单接口查询订单详情
             BusOrderDetail orderDetail = busOrderService.selectOrderDetail(orderNo);
             logger.info("[ BusAssignmentController-saveMessageTask ] 订单详情 = {}", JSON.toJSONString(orderDetail));
-
+            Integer orderId = orderDetail.getOrderId();
             // 调用计费接口
             BusCostDetail busCostDetail = busOrderService.selectOrderCostDetail(orderId);
             logger.info("[ BusAssignmentController-saveMessageTask ] 计费详情 = {}", JSON.toJSONString(busCostDetail));
@@ -543,11 +654,16 @@ public class BusAssignmentController {
             logger.info("[ BusAssignmentController-saveMessageTask ] 评分信息 = {}", JSON.toJSONString(appraisal));
 
             //查询企业信息
-            OrgCostInfo orgCostInfo = busOrderService.selectOrgInfo(orderDetail.getBookingUserPhone());
-            logger.info("[ BusAssignmentController-saveMessageTask ] 企业折扣信息 = {}", JSON.toJSONString(orgCostInfo));
-
+            OrgCostInfo orgCostInfo =null;
+            //type=2代表企业订单
+            if(orderDetail.getType()==2&&orderDetail.getBusinessId()!=null){
+                orgCostInfo = busOrderService.selectOrgInfo(orderDetail.getBusinessId());
+                logger.info("[ BusAssignmentController-saveMessageTask ] 企业折扣信息 = {}", JSON.toJSONString(orgCostInfo));
+            }else{
+                logger.info("[ BusAssignmentController-saveMessageTask ] 不是企业订单无企业信息 orderNo={}",orderDetail.getOrderNo());
+            }
             //封装各个订单节点操作时间
-            List<OrderOperationProcessVO> operationProcess= buidOperationProcess(orderDetail, busCostDetail, busPayDetail, orderOperations);
+            List<OrderOperationProcessVO> operationProcess = buidOperationProcess(orderDetail, busCostDetail, busPayDetail, orderOperations);
 
             Map<String, Object> result = new HashMap<>(16);
             result.put("orderDetail", orderDetail);
@@ -585,7 +701,7 @@ public class BusAssignmentController {
             } else {
                 process.setEventName("改派");
             }
-            if (o.getType() == 1) {
+            if (o.getStatus() == 1) {
                 process.setDesc("操作成功 司机姓名:" + o.getDriverName() + "手机号:" + o.getDirverPhone());
             } else {
                 process.setDesc("操作失败 原因:" + o.getDescription());
@@ -596,30 +712,31 @@ public class BusAssignmentController {
             OrderOperationProcessVO process = new OrderOperationProcessVO("订单取消", order.getCancelCreateDate(), "取消原因：" + order.getMemo());
             operList.add(process);
         }
-        if(order != null&&order.getStartOffDate()!=null){
+        if (order != null && order.getStartOffDate() != null) {
             OrderOperationProcessVO process = new OrderOperationProcessVO("司机出发时间", order.getStartOffDate(), "司机已出发");
             operList.add(process);
         }
-        if(order != null&&order.getArriveDate()!=null){
+        if (order != null && order.getArriveDate() != null) {
             OrderOperationProcessVO process = new OrderOperationProcessVO("司机到达时间", order.getArriveDate(), "司机已到达");
             operList.add(process);
         }
-        if(order != null&&order.getFactDate()!=null){
+        if (order != null && order.getFactDate() != null) {
             OrderOperationProcessVO process = new OrderOperationProcessVO("开始服务时间", order.getFactDate(), "开始服务");
             operList.add(process);
         }
-        if(order!=null&&order.getEndServiceDate()!=null){
+        if (order != null && order.getEndServiceDate() != null) {
             OrderOperationProcessVO process = new OrderOperationProcessVO("结束服务时间", order.getEndServiceDate(), "服务结束");
             operList.add(process);
         }
-        if(cost!=null&&cost.getSettleDate()!=null){
+        if (cost != null && cost.getSettleDate() != null) {
             OrderOperationProcessVO process = new OrderOperationProcessVO("尾款生成时间", cost.getSettleDate(), "尾款已经生成");
             operList.add(process);
         }
-        if(order!=null&&order.getFactDate()!=null){
-            OrderOperationProcessVO process = new OrderOperationProcessVO("订单完成时间", cost.getSettleDate(), "订单已经完成");
+        if (order != null && order.getFactEndDate() != null) {
+            OrderOperationProcessVO process = new OrderOperationProcessVO("订单完成时间", order.getFactEndDate(), "订单已经完成");
             operList.add(process);
         }
         return operList;
     }
+
 }

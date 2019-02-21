@@ -1,17 +1,24 @@
 package com.zhuanche.util.excel;
 
 import com.zhuanche.util.Check;
+import com.zhuanche.util.dateUtil.DateUtil;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.Workbook;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -515,5 +522,37 @@ public class ExportExcelUtil<T> {
 //        return workbook;
 //    }
 
+    /**
+     *  用于生成导入模板，可支持自定义下拉列表
+     *
+     * @param filename 文件名称
+     * @param handers  表格titel
+     * @param downData 下拉框内容
+     * @param downRows 下拉框所在位置
+     * @param request
+     * @param response
+     * @throws Exception
+     */
+    public static  void exportExcel(String filename, String[] handers,
+                                    List<String[]> downData, String[] downRows, List contentList,HttpServletRequest request, HttpServletResponse response) throws Exception {
+        Workbook workbook = ExportTemplateUtil.createExcelTemplate(handers, downData, downRows,contentList);
+        filename = filename + DateUtil.dateFormat(new Date(), DateUtil.intTimestampPattern);
+        //获得浏览器信息并转换为大写
+        String agent = request.getHeader("User-Agent").toUpperCase();
+        //IE浏览器和Edge浏览器
+        if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO") > 0 && agent.indexOf("RV:11") > 0)) {
+            filename = URLEncoder.encode(filename, "UTF-8");
+        } else {  //其他浏览器
+            filename = new String(filename.getBytes("UTF-8"), "iso-8859-1");
+        }
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment;filename="+filename + ".xlsx");
+        response.addHeader("Pargam", "no-cache");
+        response.addHeader("Cache-Control", "no-cache");
+        ServletOutputStream out = response.getOutputStream();
+        workbook.write(out);
+        out.flush();
+        out.close();
+    }
 
 }

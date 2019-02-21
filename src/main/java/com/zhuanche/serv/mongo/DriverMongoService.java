@@ -2,15 +2,18 @@ package com.zhuanche.serv.mongo;
 
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.mongo.DriverMongo;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
-import java.util.Date;
-import java.util.Map;
 
 /**
  * @ClassName: DriverMongoServiceImpl
@@ -19,7 +22,7 @@ import java.util.Map;
 @Service
 public class DriverMongoService {
 
-	@Resource(name="driverMongoTemplate")
+	@Resource(name = "driverMongoTemplate")
 	private MongoTemplate driverMongoTemplate;
 
 	/**
@@ -206,4 +209,16 @@ public class DriverMongoService {
 		update.set("cooperationType", cooperationType);
 		driverMongoTemplate.updateMulti(query, update, DriverMongo.class);
 	}
+
+    /**
+     * 根据司机姓名查询司机信息
+     *
+     * @param name
+     * @return
+     */
+    public List<DriverMongo> queryDriverByName(String name) {
+        Query query = new Query(Criteria.where("name").is(name));
+        List<DriverMongo> driverMongos = driverMongoTemplate.find(query, DriverMongo.class);
+        return driverMongos;
+    }
 }

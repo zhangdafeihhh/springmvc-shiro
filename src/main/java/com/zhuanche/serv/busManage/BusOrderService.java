@@ -241,7 +241,7 @@ public class BusOrderService {
 		}
 	}
 
-	public OrgCostInfo selectOrgInfo(String phone) {
+	/*public OrgCostInfo selectOrgInfo(String phone) {
 		//查询企业信息
 		Map<String, Object> paramMap = new HashMap(2);
 		paramMap.put("phone", phone);
@@ -275,6 +275,25 @@ public class BusOrderService {
 			logger.error("[ BusOrderService-selectOrgInfo ]订单详情查询机构id接口异常，{}", e);
 			return null;
 		}
-	}
+	}*/
 
+	public OrgCostInfo selectOrgInfo(Integer businessId) {
+			Map<String,Object> param=new HashMap(2);
+			param.put("businessId",businessId);
+			//查询企业折扣信息
+		try{
+			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(paymentBaseUrl+BusConst.Payment.ORG_COST_URL , param, 2000, "巴士订单详情查询企业折扣信息");
+			if(result.getIntValue("code")!=0){
+				logger.error("[ BusOrderService-selectOrgInfo ] 订单详情查询折扣信息 接口出错,错误码:" + result.getIntValue("code") + ",错误原因:" + result.getString("msg"));
+				return null;
+			}
+			JSONObject data = result.getJSONObject("data");
+			JSONObject businessJson = data.getJSONObject("businessRepDTO");
+			OrgCostInfo orgCostInfo = JSONObject.toJavaObject(businessJson, OrgCostInfo.class);
+			return orgCostInfo;
+		} catch (Exception e) {
+			logger.error("[ BusOrderService-selectOrgInfo ]订单详情查询折扣信息异常，{}", e);
+			return null;
+		}
+	}
 }

@@ -39,13 +39,9 @@ public class SignUtils {
 		StringBuffer buff = new StringBuffer("");
 		for (String key : sortedKeys) {
 			Object val = paramMap.get(key);
-			if (val == null) {
+            if (val == null || StringUtils.isBlank(val.toString())) {
+            	paramMap.remove(key);
 				continue;
-			}
-			if (val instanceof String) {
-				if (StringUtils.isBlank((String) val)) {
-					continue;
-				}
 			}
 			buff.append(key).append("=").append(val).append("&");
 		}

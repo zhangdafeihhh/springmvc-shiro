@@ -66,10 +66,11 @@ public class UserManagementController {
 		else {
 			user.setLevel(PermissionLevelEnum.ALL.getCode());
 		}
-		boolean phoneExist = userManagementService.userPhoneExist(phone);
-		if(phoneExist){
-			return AjaxResponse.fail(RestErrorCode.PHONE_EXIST );
-		}
+		// 暂时不用
+//		boolean phoneExist = userManagementService.userPhoneExist(phone);
+//		if(phoneExist){
+//			return AjaxResponse.fail(RestErrorCode.PHONE_EXIST );
+//		}
 		AjaxResponse ajaxResponse = userManagementService.addUser(user);
 		if(addTelescope!=null && addTelescope.compareTo(1)==0){
 			carBizDriverInfoService.addTelescopeDriver(user);

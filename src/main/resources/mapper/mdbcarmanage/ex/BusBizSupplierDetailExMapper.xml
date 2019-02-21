@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.BusBizSupplierDetailExMapper">
+	<resultMap id="BaseResultMap"
+		type="com.zhuanche.entity.mdbcarmanage.BusBizSupplierDetail">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+		<result column="create_by" property="createBy" jdbcType="INTEGER" />
+		<result column="update_by" property="updateBy" jdbcType="INTEGER" />
+		<result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+		<result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+		<result column="deposit" property="deposit" jdbcType="DECIMAL" />
+		<result column="franchise_fee" property="franchiseFee"
+			jdbcType="DECIMAL" />
+		<result column="contract_date_start" property="contractDateStart"
+			jdbcType="TIMESTAMP" />
+		<result column="contract_date_end" property="contractDateEnd"
+			jdbcType="TIMESTAMP" />
+		<result column="invoice_company_name" property="invoiceCompanyName"
+			jdbcType="VARCHAR" />
+		<result column="invoice_company_phone" property="invoiceCompanyPhone"
+			jdbcType="VARCHAR" />
+		<result column="invoice_company_addr" property="invoiceCompanyAddr"
+			jdbcType="VARCHAR" />
+		<result column="invoice_deposit_bank" property="invoiceDepositBank"
+			jdbcType="VARCHAR" />
+		<result column="invoice_bank_account" property="invoiceBankAccount"
+			jdbcType="VARCHAR" />
+		<result column="invoice_duty_paragraph" property="invoiceDutyParagraph"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, supplier_id, create_by, update_by, create_date, update_date, deposit,
+		franchise_fee,
+		contract_date_start, contract_date_end, invoice_company_name, invoice_company_phone,
+		invoice_company_addr, invoice_deposit_bank, invoice_bank_account,
+		invoice_duty_paragraph
+	</sql>
+	
+	<insert id="insertSelective"
+		parameterType="com.zhuanche.dto.busManage.BusSupplierDetailDTO">
+		insert into bus_biz_supplier_detail
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="supplierId != null">
+				supplier_id,
+			</if>
+			<if test="createBy != null">
+				create_by,
+			</if>
+			<if test="updateBy != null">
+				update_by,
+			</if>
+			<if test="createDate != null">
+				create_date,
+			</if>
+			<if test="updateDate != null">
+				update_date,
+			</if>
+			<if test="deposit != null">
+				deposit,
+			</if>
+			<if test="franchiseFee != null">
+				franchise_fee,
+			</if>
+			<if test="contractDateStart != null">
+				contract_date_start,
+			</if>
+			<if test="contractDateEnd != null">
+				contract_date_end,
+			</if>
+			<if test="invoiceCompanyName != null">
+				invoice_company_name,
+			</if>
+			<if test="invoiceCompanyPhone != null">
+				invoice_company_phone,
+			</if>
+			<if test="invoiceCompanyAddr != null">
+				invoice_company_addr,
+			</if>
+			<if test="invoiceDepositBank != null">
+				invoice_deposit_bank,
+			</if>
+			<if test="invoiceBankAccount != null">
+				invoice_bank_account,
+			</if>
+			<if test="invoiceDutyParagraph != null">
+				invoice_duty_paragraph,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="supplierId != null">
+				#{supplierId,jdbcType=INTEGER},
+			</if>
+			<if test="createBy != null">
+				#{createBy,jdbcType=INTEGER},
+			</if>
+			<if test="updateBy != null">
+				#{updateBy,jdbcType=INTEGER},
+			</if>
+			<if test="createDate != null">
+				#{createDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateDate != null">
+				#{updateDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="deposit != null">
+				#{deposit,jdbcType=DECIMAL},
+			</if>
+			<if test="franchiseFee != null">
+				#{franchiseFee,jdbcType=DECIMAL},
+			</if>
+			<if test="contractDateStart != null" >
+				#{contractDateStart,jdbcType=TIMESTAMP},
+			</if>
+			<if test="contractDateEnd != null" >
+				#{contractDateEnd,jdbcType=TIMESTAMP},
+			</if>
+			<if test="invoiceCompanyName != null">
+				#{invoiceCompanyName,jdbcType=VARCHAR},
+			</if>
+			<if test="invoiceCompanyPhone != null">
+				#{invoiceCompanyPhone,jdbcType=VARCHAR},
+			</if>
+			<if test="invoiceCompanyAddr != null">
+				#{invoiceCompanyAddr,jdbcType=VARCHAR},
+			</if>
+			<if test="invoiceDepositBank != null">
+				#{invoiceDepositBank,jdbcType=VARCHAR},
+			</if>
+			<if test="invoiceBankAccount != null">
+				#{invoiceBankAccount,jdbcType=VARCHAR},
+			</if>
+			<if test="invoiceDutyParagraph != null">
+				#{invoiceDutyParagraph,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateBySupplierIdSelective"
+		parameterType="com.zhuanche.dto.busManage.BusSupplierDetailDTO">
+		update bus_biz_supplier_detail
+		<set>
+			<if test="createBy != null">
+				create_by = #{createBy,jdbcType=INTEGER},
+			</if>
+			<if test="updateBy != null">
+				update_by = #{updateBy,jdbcType=INTEGER},
+			</if>
+			<if test="createDate != null">
+				create_date = #{createDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateDate != null">
+				update_date = #{updateDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="deposit != null">
+				deposit = #{deposit,jdbcType=DECIMAL},
+			</if>
+			<if test="franchiseFee != null">
+				franchise_fee = #{franchiseFee,jdbcType=DECIMAL},
+			</if>
+			<if test="contractDateStart != null" >
+				contract_date_start = #{contractDateStart,jdbcType=TIMESTAMP},
+			</if>
+			<if test="contractDateEnd != null" >
+				contract_date_end = #{contractDateEnd,jdbcType=TIMESTAMP},
+			</if>
+			<if test="invoiceCompanyName != null">
+				invoice_company_name =
+				#{invoiceCompanyName,jdbcType=VARCHAR},
+			</if>
+			<if test="invoiceCompanyPhone != null">
+				invoice_company_phone =
+				#{invoiceCompanyPhone,jdbcType=VARCHAR},
+			</if>
+			<if test="invoiceCompanyAddr != null">
+				invoice_company_addr =
+				#{invoiceCompanyAddr,jdbcType=VARCHAR},
+			</if>
+			<if test="invoiceDepositBank != null">
+				invoice_deposit_bank =
+				#{invoiceDepositBank,jdbcType=VARCHAR},
+			</if>
+			<if test="invoiceBankAccount != null">
+				invoice_bank_account =
+				#{invoiceBankAccount,jdbcType=VARCHAR},
+			</if>
+			<if test="invoiceDutyParagraph != null">
+				invoice_duty_paragraph =
+				#{invoiceDutyParagraph,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where supplier_id = #{supplierId,jdbcType=INTEGER}
+	</update>
+	
+	<!-- 查询供应商是否存在  -->
+	<select id="checkExist" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+		select count(*) from bus_biz_supplier_detail where supplier_id = #{supplierId}
+	</select>
+	
+	<!-- 查询巴士供应同分页信息 -->
+	<!-- 不包括已经过期的  start -->
+<!--         	AND TIMESTAMPDIFF(MONTH, now(), contract_date_end) <![CDATA[>=]]> 0 -->
+<!--         	AND contract_date_end >= NOW() -->
+	<!-- 不包括已经过期的  end -->
+	<select id="querySupplierContractExpireSoonList" parameterType="java.util.Map" resultType="com.zhuanche.vo.busManage.BusSupplierPageVO">
+		SELECT
+			supplier_id AS supplierId,
+			franchise_fee AS franchiseFee,
+			deposit AS deposit,
+			contract_date_start as contractDateStart,
+			contract_date_end as contractDateEnd,
+			'1' as isExpireSoon
+		FROM
+			bus_biz_supplier_detail
+		where 
+        		TIMESTAMPDIFF(MONTH, now(), contract_date_end) <![CDATA[<]]> 3
+            <if test="supplierIds != null and supplierIds.size() > 0">
+				AND supplier_id IN
+				<foreach collection="supplierIds" item="item" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+         ORDER BY contract_date_end DESC
+    </select>
+    
+    <!-- 根据供应商ID查询巴士供应商其它信息 -->
+    <select id="selectBySupplierId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    	select 
+	    	<include refid="Base_Column_List" />
+	    from bus_biz_supplier_detail
+	    where supplier_id = #{supplierId}
+	    limit 1
+    </select>
+	<select id="querySettleInfoByIds" parameterType="java.util.Map" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from bus_biz_supplier_detail
+		where supplier_id in
+		<foreach collection="supplierIds" open="(" close=")" separator="," item="item">
+			#{item}
+		</foreach>
+	</select>
+	
+	<!-- 查询供应商其它信息比对信息 -->
+	<select id="queryDetailCOBySupplierId" parameterType="java.lang.Integer" resultType="com.zhuanche.util.objcompare.entity.supplier.BusSupplierDetailCO">
+		SELECT
+			deposit AS deposit,
+			franchise_fee AS franchiseFee,
+			contract_date_start AS contractDateStart,
+			contract_date_end AS contractDateEnd,
+			invoice_company_name AS invoiceCompanyName,
+			invoice_deposit_bank AS invoiceDepositBank,
+			invoice_bank_account AS invoiceBankAccount,
+			invoice_company_phone AS invoiceCompanyPhone,
+			invoice_duty_paragraph AS invoiceDutyParagraph,
+			invoice_company_addr AS invoiceCompanyAddr
+		FROM
+			bus_biz_supplier_detail
+		WHERE
+			supplier_id = #{supplierId}
+		LIMIT 1
+	</select>
+
+</mapper>

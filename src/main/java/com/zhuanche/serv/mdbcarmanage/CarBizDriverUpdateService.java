@@ -18,9 +18,7 @@ public class CarBizDriverUpdateService {
     @Autowired
     private CarBizDriverUpdateMapper carBizDriverUpdateMapper;
 
-    @MasterSlaveConfigs(configs={
-            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.MASTER )
-    } )
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.MASTER))
     public void insert (String origin, String updata, Integer driverId, Integer value) {
         try {
             CarBizDriverUpdate driverUpdate = new CarBizDriverUpdate();

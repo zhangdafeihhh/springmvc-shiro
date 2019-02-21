@@ -32,13 +32,13 @@ public interface BusConst {
 	}
 
 	// ========================DecimalFormat========================
-	DecimalFormat format = new DecimalFormat("##########.00");
+	DecimalFormat decimalFormat = new DecimalFormat("#########0.##");
 
 	default String decimalFormat(BigDecimal value) {
 		if (value == null) {
-			return "0.00";
+			return "0";
 		}
-		return format.format(value);
+		return decimalFormat.format(value);
 	}
 
 	// ==========================其它==============================
@@ -87,33 +87,45 @@ public interface BusConst {
 		/** 供应商返点协议删除 **/
 		String SETTLE_SUPPLIER_REBATE_DELETE = "/settle/supplier/rebate/delete";
 
+		/** 根据有效比例获取供应商 **/
+		String SETTLE_SUPPLIER_INFO_BY_PRORATE_RATE = "/settle/supplier/info/by/prorate/rate";
+
 		/** 查询供应商分佣有关的信息（批量） **/
 		String SETTLE_SUPPLIER_PRORATE_LIST = "/settle/supplier/prorate/list";
+		
+		/** 导出供应商分佣信息 **/
+		String SETTLE_SUPPLIER_EXPORT_SUPPLIER_INFO = "/settle/supplier/export/supplier/info";
 
 		// =============================================结算单接口列表===================================================
 		/** 查询供应商的账单 **/
 		String SETTLE_SUPPLIER_BILL_LIST = "/settle/supplier/bill/list";
 
-		/** 查询账单信息列表（流水列表）*/
-		String SETTLT_DETAIL_LIST="/settle/detail/list";
+		/** 查询账单信息列表（流水列表） */
+		String SETTLT_DETAIL_LIST = "/settle/detail/list";
 
-		/**结算单或者账单信息修改 */
-		String SETTLT_SUPPLIER_BILL_UPDATE="/settle/supplier/bill/update";
+		/** 结算单或者账单信息修改 */
+		String SETTLT_SUPPLIER_BILL_UPDATE = "/settle/supplier/bill/update";
 
 		/** 供应商账单查询根据账单id **/
 		String SETTLE_SUPPLIER_BILL_DETAIL = "/settle/supplier/bill/detail";
 
-		/**分佣流水查询根据id*/
-		String SETTLE_DETAIL_INFO="/settle/detail/info";
-		
+		/** 分佣流水查询根据id */
+		String SETTLE_DETAIL_INFO = "/settle/detail/info";
+
 		/** 供应商账单确认开票 **/
 		String SETTLE_SUPPLIER_BILL_CONFIRM_INVOICE = "/settle/supplier/bill/confirm/invoice";
-		
+
 		/** 供应商账单确认打款 **/
 		String SETTLE_SUPPLIER_BILL_CONFIRM_PAY = "/settle/supplier/bill/confirm/pay";
-		
-		/** 供应商账单确认打款 **/
+
+		/** 供应商账单确认结算 **/
 		String SETTLE_SUPPLIER_BILL_CONFIRM_SETTLE = "/settle/supplier/bill/confirm/settle";
+
+		/** 增加发票链接 **/
+		String SETTLE_SUPPLIER_ADD_INVOICE_URL = "/settle/supplier/add/invoice/url";
+		
+		/** 查询发票链接 **/
+		String SETTLE_SUPPLIER_QUERY_INVOICE_URL = "/settle/supplier/query/invoice/url";
 	}
 
 	/**
@@ -135,6 +147,8 @@ public interface BusConst {
 		String ORG_URL = "/api/v1/company/decide";
 		/**查询企业折扣信息*/
 		String ORG_COST_URL = "/business/queryBusinessInfo";
+		/**巴士支付信息*/
+		String PAY_LIST = "/pay/details/bus/list";
 	}
 
 	/**
@@ -150,6 +164,9 @@ public interface BusConst {
 
 		/** 费用详情 （巴士费用明细） **/
 		String BUSS_BACK = "/buss/back";
+		
+		/** 巴士订单分佣比例保存 **/
+		String BUS_MAID = "/buss/updateBusOrderCommsion";
 	}
 
 	/**

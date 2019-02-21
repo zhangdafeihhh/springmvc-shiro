@@ -179,8 +179,11 @@
 				#{item}
 			</foreach>
 		</if>
+		<if test="groupIdSel !=null">
+			and (g.group_id = #{groupIdSel} or gop.group_id =#{groupIdSel})
+		</if>
 		<if test="seatNum != null">
-			and g.seat_num >= #{seatNum}
+			and (g.seat_num >= #{seatNum} or gop.seat_num >=#{seatNum})
 		</if>
 		<if test="cityId != null">
 			and c.city_id = #{cityId}
@@ -214,21 +217,33 @@
 
 	<select id="selectBasicCarInfo" parameterType="java.lang.Integer" resultType="com.zhuanche.dto.rentcar.CarBizCarInfoDTO">
 		SELECT
-		info.license_plates licensePlates,
-		city.city_id cityId,
-		city.city_name cityName,
-		sup.supplier_id supplierId,
-		sup.dispatcher_phone dispatcherPhone,
-		gop.group_id groupId,
-		gop.group_name groupName,
-		info.car_id carId
+			info.license_plates licensePlates,
+			city.city_id cityId,
+			city.city_name cityName,
+			sup.supplier_id supplierId,
+			sup.dispatcher_phone dispatcherPhone,
+			CASE
+		WHEN gop.group_id IS NULL THEN
+			bg.group_id
+		ELSE
+			gop.group_id
+		END groupId,
+		 CASE
+		WHEN gop.group_name IS NULL THEN
+			bg.group_name
+		ELSE
+			gop.group_name
+		END groupName,
+		 info.car_id carId
 		FROM
-		car_biz_car_info info
+			car_biz_car_info info
 		LEFT JOIN car_biz_model model ON info.car_model_id = model.model_id
-		left join car_biz_car_group gop on model.group_id = gop.group_id
-		left join car_biz_supplier sup on info.supplier_id = sup.supplier_id
-		left join car_biz_city city on info.city_id = city.city_id
-		where info.car_id = #{carId}
+		LEFT JOIN car_biz_car_group gop ON model.group_id = gop.group_id
+		LEFT JOIN car_biz_supplier sup ON info.supplier_id = sup.supplier_id
+		LEFT JOIN car_biz_city city ON info.city_id = city.city_id
+		LEFT JOIN car_biz_car_group bg ON bg.group_id = info.group_id
+		WHERE
+			info.car_id = #{carId}
 	</select>
   
 </mapper>

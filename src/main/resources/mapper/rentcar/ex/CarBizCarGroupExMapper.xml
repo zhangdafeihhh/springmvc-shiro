@@ -127,6 +127,10 @@
         #{item}
         </foreach>
     </select>
+    <!--判断传入的groupId 是否是巴士的车型类别-->
+    <select id="countByGroupId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select count(1) from car_biz_car_group where type=2 and group_id =#{groupId}
+    </select>
   
   	<!-- 根据groupId查询车型类别座位数 -->
 	<select id="getSeatNumByGroupId" resultType="int">

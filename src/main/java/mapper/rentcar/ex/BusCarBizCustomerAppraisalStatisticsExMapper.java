@@ -16,4 +16,12 @@ public interface BusCarBizCustomerAppraisalStatisticsExMapper {
 	 */
 	CarBizCustomerAppraisalStatistics queryAppraisal(Map<Object, Object> param);
 
+	/**
+	 * 查询某个司机的平均值
+	 * @param driverId
+	 * @return
+	 */
+	Double queryAvgAppraisal (Integer driverId);
+
+
 }
