@@ -475,7 +475,8 @@ public class BusAssignmentController {
                 String dataStr = result.getString("data");
                 Map<String, Object> resultMap = JSONObject.parseObject(dataStr, HashedMap.class);
                 if (null == resultMap || !"1000".equals(resultMap.get("resultCode"))) {// "1000"-成功, 其它为失败
-                    String errorMsg = (String) resultMap.get("errorMsg");
+					String errorMsg = resultMap == null ? "改派失败" : (String) resultMap.get("errorMsg");
+
                     logger.info("[ BusAssignmentController-updateDriver ] 巴士改派data返回失败,错误码:{},错误原因:{}", code, errorMsg);
                     ajaxResponse = AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, errorMsg);
 
@@ -573,7 +574,11 @@ public class BusAssignmentController {
                 logger.info("[ BusAssignmentController-saveMessageTask ] 巴士指派司机-小于24小时，无需保存发送短信task: orderNo = {}, bookingDate = {}", orderNo, LocalDateTime.ofInstant(bookingDate.toInstant(), ZoneId.systemDefault()));
             }
         } catch (Exception e) {
-            logger.error("[ BusAssignmentController-saveMessageTask ] 巴士指派司机-保存发送短信的task异常：orderNo = {}, bookingDate = {}", orderNo, LocalDateTime.ofInstant(bookingDate.toInstant(), ZoneId.systemDefault()), e);
+        	LocalDateTime bookingLocalDate = null;
+			if (bookingDate != null) {
+				bookingLocalDate = LocalDateTime.ofInstant(bookingDate.toInstant(), ZoneId.systemDefault());
+			}
+            logger.error("[ BusAssignmentController-saveMessageTask ] 巴士指派司机-保存发送短信的task异常：orderNo = {}, bookingDate = {}", orderNo, bookingLocalDate, e);
         }
     }
 
