@@ -3,33 +3,22 @@ package com.zhuanche.serv.busManage;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.zhuanche.constants.busManage.EnumOrder;
-import com.zhuanche.constants.busManage.EnumOrderType;
-import com.zhuanche.constants.busManage.EnumPayType;
-import com.zhuanche.constants.busManage.EnumServiceType;
-import com.zhuanche.entity.busManage.BusCostDetail;
-import com.zhuanche.entity.busManage.BusOrderPayExport;
-import com.zhuanche.entity.busManage.OrgCostInfo;
-import com.zhuanche.entity.mdbcarmanage.BusOrderOperationTime;
-import com.zhuanche.entity.rentcar.*;
-import com.zhuanche.util.*;
-import com.zhuanche.util.objcompare.FieldNote;
-import com.zhuanche.vo.busManage.BusDriverDetailInfoVO;
-import com.zhuanche.vo.busManage.BusOrderExVO;
-import com.zhuanche.vo.busManage.BusOrderExportVO;
-import mapper.mdbcarmanage.ex.BusOrderOperationTimeExMapper;
-import mapper.rentcar.ex.*;
-
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,18 +36,46 @@ import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.constants.BusConst;
+import com.zhuanche.constants.busManage.EnumOrder;
+import com.zhuanche.constants.busManage.EnumOrderType;
+import com.zhuanche.constants.busManage.EnumPayType;
+import com.zhuanche.constants.busManage.EnumServiceType;
 import com.zhuanche.dto.busManage.BusCarDTO;
 import com.zhuanche.dto.busManage.BusCarRicherDTO;
 import com.zhuanche.dto.busManage.BusDriverDTO;
 import com.zhuanche.dto.busManage.BusDriverRicherDTO;
 import com.zhuanche.dto.busManage.BusOrderDTO;
+import com.zhuanche.entity.busManage.BusCostDetail;
+import com.zhuanche.entity.busManage.BusOrderPayExport;
+import com.zhuanche.entity.busManage.OrgCostInfo;
+import com.zhuanche.entity.mdbcarmanage.BusOrderOperationTime;
+import com.zhuanche.entity.rentcar.CarBizCustomer;
+import com.zhuanche.entity.rentcar.CarBizCustomerAppraisal;
+import com.zhuanche.entity.rentcar.CarBizCustomerAppraisalStatistics;
+import com.zhuanche.entity.rentcar.CarBizService;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.mongo.DriverMongo;
 import com.zhuanche.serv.mongo.BusDriverMongoService;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.BeanUtil;
+import com.zhuanche.util.Common;
+import com.zhuanche.util.DateUtils;
+import com.zhuanche.util.MapUrlParamUtils;
+import com.zhuanche.util.MyRestTemplate;
+import com.zhuanche.util.SignUtils;
+import com.zhuanche.vo.busManage.BusDriverDetailInfoVO;
+import com.zhuanche.vo.busManage.BusOrderExVO;
+import com.zhuanche.vo.busManage.BusOrderExportVO;
 import com.zhuanche.vo.busManage.BusOrderVO;
 
+import mapper.mdbcarmanage.ex.BusOrderOperationTimeExMapper;
 import mapper.rentcar.CarBizServiceMapper;
+import mapper.rentcar.ex.BusCarBizCustomerAppraisalExMapper;
+import mapper.rentcar.ex.BusCarBizDriverInfoExMapper;
+import mapper.rentcar.ex.CarBizCarGroupExMapper;
+import mapper.rentcar.ex.CarBizCarInfoExMapper;
+import mapper.rentcar.ex.CarBizCustomerExMapper;
+import mapper.rentcar.ex.CarBizDriverInfoExMapper;
 
 @Service("busAssignmentService")
 public class BusAssignmentService {
@@ -149,6 +166,13 @@ public class BusAssignmentService {
             int total = data.getIntValue("totalCount");
             List<BusOrderVO> orderList = JSON.parseArray(dataList.toString(), BusOrderVO.class);
             if (orderList != null && orderList.size() > 0) {
+            	// 计费信息
+            	String orderNos = orderList.stream().map(order -> order.getOrderNo()).collect(Collectors.joining(","));
+            	JSONArray busCostDetailList = getBusCostDetailList(orderNos);
+            	// 企业信息
+            	String companyIds = orderList.stream().map(BusOrderVO::getBusinessId).filter(Objects::nonNull).distinct().map(String::valueOf).collect(Collectors.joining(","));
+            	JSONArray queryBusinessInfoBatch = queryBusinessInfoBatch(companyIds);
+            	
                 orderList.forEach(order -> {
                     // a)司机姓名/司机手机号
                     if (order.getDriverId() != null) {
@@ -178,78 +202,37 @@ public class BusAssignmentService {
                             order.setServiceTypeName(service.getServiceName());
                         }
                     }
-                });
-                // d)预估里程
-                String orderNos = orderList.stream().map(order -> order.getOrderNo()).collect(Collectors.joining(","));
-                JSONArray busCostDetailList = getBusCostDetailList(orderNos);
-                if (busCostDetailList != null) {
-                    orderList.forEach(order -> {
-                        String orderNo = order.getOrderNo();
-                        if (StringUtils.isNotBlank(orderNo)) {
-                            busCostDetailList.stream().filter(cost -> {
-                                JSONObject jsonObject = (JSONObject) JSON.toJSON(cost);
-                                return orderNo.equals(jsonObject.getString("orderNo"));
-                            }).findFirst().ifPresent(cost -> {
-                                JSONObject jsonObject = (JSONObject) JSON.toJSON(cost);
-                                order.setEstimateDistance(jsonObject.getDouble("estimateDistance"));
-                            });
-                        }
-                    });
-                }
-                // e)企业名称/企业折扣/付款类型
-                List<Object> phoneList = new ArrayList<>();
-                orderList.forEach(order -> {
-                    String bookingUserPhone = order.getBookingUserPhone();
-                    if (StringUtils.isNotBlank(bookingUserPhone)) {
-                        phoneList.add(bookingUserPhone);
+                    // d)预估里程
+                    if (busCostDetailList != null) {
+                    	String orderNo = order.getOrderNo();
+                    	if (StringUtils.isNotBlank(orderNo)) {
+                    		busCostDetailList.stream().filter(cost -> {
+                    			JSONObject jsonObject = (JSONObject) JSON.toJSON(cost);
+                    			return orderNo.equals(jsonObject.getString("orderNo"));
+                    		}).findFirst().ifPresent(cost -> {
+                    			JSONObject jsonObject = (JSONObject) JSON.toJSON(cost);
+                    			order.setEstimateDistance(jsonObject.getDouble("estimateDistance"));
+                    		});
+                    	}
                     }
-                });
-                String phones = StringUtils.join(phoneList, ",");
-                JSONArray queryBatchOrgInfo = queryCompanyByPhone(phones);
-                if (queryBatchOrgInfo != null) {
-                    // 匹配企业ID/企业名称
-                    orderList.forEach(order -> {
-                        String bookingUserPhone = order.getBookingUserPhone();
-                        if (StringUtils.isNotBlank(bookingUserPhone)) {
-                            queryBatchOrgInfo.stream().filter(company -> {
-                                JSONObject jsonObject = (JSONObject) JSON.toJSON(company);
-                                return bookingUserPhone.equals(jsonObject.getString("phone"));
-                            }).findFirst().ifPresent(company -> {
-                                JSONObject jsonObject = (JSONObject) JSON.toJSON(company);
-                                order.setCompanyId(jsonObject.getInteger("companyId"));
-                                order.setCompanyName(jsonObject.getString("companyName"));
-                            });
-                        }
-                    });
-
-                    // 付款类型/企业折扣
-                    List<String> companyIdList = new ArrayList<>();
-                    orderList.forEach(order -> {
-                        Integer companyId = order.getCompanyId();
-                        if (companyId != null) {
-                            companyIdList.add(companyId.toString());
-                        }
-                    });
-                    String companyIds = StringUtils.join(companyIdList, ",");
-                    JSONArray queryBusinessInfoBatch = queryBusinessInfoBatch(companyIds);
+                    // e)企业名称/企业折扣/付款类型
                     if (queryBusinessInfoBatch != null) {
-                        orderList.forEach(order -> {
-                            Integer companyId = order.getCompanyId();
-                            if (companyId != null) {
-                                queryBusinessInfoBatch.stream().filter(business -> {
-                                    JSONObject jsonObject = (JSONObject) JSON.toJSON(business);
-                                    return companyId.toString().equals(jsonObject.getString("businessId"));
-                                }).findFirst().ifPresent(business -> {
-                                    JSONObject jsonObject = (JSONObject) JSON.toJSON(business);
-                                    order.setCompanyType(jsonObject.getInteger("type"));
-                                    order.setPercent(jsonObject.getDouble("percent"));
-                                });
-                            }
-                        });
+                    	Integer businessId = order.getBusinessId();
+                    	if (businessId != null) {
+                    		queryBusinessInfoBatch.stream().filter(business -> {
+                    			JSONObject jsonObject = (JSONObject) JSON.toJSON(business);
+                    			return businessId.toString().equals(jsonObject.getString("businessId"));
+                    		}).findFirst().ifPresent(business -> {
+                    			JSONObject jsonObject = (JSONObject) JSON.toJSON(business);
+                    			order.setCompanyId(businessId);
+                    			order.setCompanyName(jsonObject.getString("businessName"));
+                    			order.setCompanyType(jsonObject.getInteger("type"));
+                    			order.setPercent(jsonObject.getDouble("percent"));
+                    		});
+                    	}
                     }
-                }
+                });
             }
-
             // 返回结果
             return new PageDTO(params.getPageNum(), params.getPageSize(), total, orderList);
         } catch (Exception e) {
