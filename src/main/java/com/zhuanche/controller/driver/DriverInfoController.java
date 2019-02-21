@@ -504,7 +504,7 @@ public class DriverInfoController {
         if (carBizSupplier == null) {
             return AjaxResponse.fail(RestErrorCode.SUPPLIER_NOT_EXIST, supplierId);
         }
-        if(serviceCity!=carBizSupplier.getSupplierCity()){
+        if(!carBizSupplier.getSupplierCity().equals(serviceCity)){
             return AjaxResponse.fail(RestErrorCode.CITY_SUPPLIER_DIFFER);
         }
         Boolean had = carBizCarInfoService.checkLicensePlates(licensePlates);
