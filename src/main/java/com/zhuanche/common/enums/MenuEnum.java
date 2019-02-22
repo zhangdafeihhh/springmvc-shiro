@@ -180,6 +180,11 @@ public enum MenuEnum {
     SUBSCRIPTION_REPORT(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.DATA_REPORT, MenuConstants.DATA_REPORT_SUBSCRIPTION, "数据报表订阅"),
     REPORT_DOWNLOAD_LIST(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.DATA_REPORT, MenuConstants.DATA_REPORT_DOWNLOAD, "订阅报表下载列表查询"),
     REPORT_DOWNLOAD(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.DATA_REPORT, MenuConstants.DATA_REPORT_DOWNLOAD, "加盟商名称是否存在"),
+
+    PROBLEM_FEED_BACK_QUERY(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.PROBLEM_FEED_BACK,MenuConstants.PROBLEM_FEED_BACKS,"问题受理查询"),
+    PROBLEM_FEED_BACK_ADD(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.PROBLEM_FEED_BACK,MenuConstants.PROBLEM_FEED_BACKS,"问题受理新增"),
+    PROBLEM_FEED_BACK_MANAGE(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.PROBLEM_FEED_BACK,MenuConstants.PROBLEM_FEED_BACKS,"问题受理处理"),
+    PROBLEM_FEED_BACK_DOWNLOAD(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.PROBLEM_FEED_BACK,MenuConstants.PROBLEM_FEED_BACKS,"问题受理文件下载"),
     ;
 
     private String levelOne;
