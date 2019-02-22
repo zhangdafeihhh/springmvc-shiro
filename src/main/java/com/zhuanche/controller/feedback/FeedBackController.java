@@ -7,8 +7,10 @@ import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.enums.FeedBackManageStatusEnum;
+import com.zhuanche.common.enums.MenuEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.mdbcarmanage.FeedBackDetailDto;
@@ -20,6 +22,7 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +70,8 @@ public class FeedBackController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
+    @RequestFunction(menu = MenuEnum.PROBLEM_FEED_BACK_QUERY)
+    @RequiresPermissions("ProblemFeedbacks_look")
     public AjaxResponse dataList(
             @RequestParam(value = "createTimeStart",required = false) String createTimeStart,
             @RequestParam(value = "createTimeEnd", required = false) String createTimeEnd,
@@ -102,10 +107,17 @@ public class FeedBackController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
     })
+    @RequestFunction(menu = MenuEnum.PROBLEM_FEED_BACK_ADD)
+    @RequiresPermissions("PROBLEM_FEED_BACK_ADD")
     public AjaxResponse addFeedBack(
             @Verify(param = "feedbackContent",rule = "required") String feedbackContent,
             @RequestParam(value = "files",required = false) MultipartFile[] multipartFiles
     ){
+
+        //最大不能输入500字
+        if (feedbackContent.length() >= 500){
+            return AjaxResponse.fail(RestErrorCode.MESSAGE_CONTENT_ERROR);
+        }
 
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         if (null == currentLoginUser){
@@ -146,6 +158,8 @@ public class FeedBackController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
+    @RequestFunction(menu = MenuEnum.PROBLEM_FEED_BACK_DOWNLOAD)
+    @RequiresPermissions("PROBLEM_FEED_BACK_DOWNLOAD")
     public ResponseEntity<byte[]> download(@Verify(param = "feedbackDocId",rule = "required") Integer feedbackDocId) throws Exception {
 
         FeedbackDoc feedbackDoc = feedBackDocService.selectFeedBackDocById(feedbackDocId);
@@ -173,7 +187,6 @@ public class FeedBackController {
             File file = new File(path + File.separator + fileUrl);
             HttpHeaders headers = new HttpHeaders();
             //下载显示的文件名，解决中文名称乱码问题
-            String downloadFielName = new String(fileUrl.getBytes("UTF-8"),"iso-8859-1");
             //通知浏览器以attachment（下载方式）打开图片
             headers.setContentDispositionFormData("attachment", fileName);
             //application/octet-stream ： 二进制流数据（最常见的文件下载）。
@@ -196,12 +209,17 @@ public class FeedBackController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
+    @RequestFunction(menu = MenuEnum.PROBLEM_FEED_BACK_QUERY)
+    @RequiresPermissions("ProblemFeedbacks_look")
     public AjaxResponse feedBackDetail(@Verify(param = "id",rule = "required") Integer id){
 
         try {
             FeedBackDetailDto feedBackDetailDto = feedBackService.queryFeedBackDetailByFeedBackId(id);
             if (null == feedBackDetailDto){
                 return AjaxResponse.fail(RestErrorCode.NOT_FOUND_RESULT);
+            }
+            if (feedBackDetailDto.getManageStatus() == FeedBackManageStatusEnum.TO_ACCEPT.getCode()){
+                feedBackDetailDto.setManageTime(null);
             }
             return AjaxResponse.success(feedBackDetailDto);
         } catch (Exception e) {
@@ -222,11 +240,17 @@ public class FeedBackController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
     })
+    @RequestFunction(menu = MenuEnum.PROBLEM_FEED_BACK_MANAGE)
+    @RequiresPermissions("PROBLEM_FEED_BACK_MANAGE")
     public AjaxResponse updateFeedBack(
             @Verify(param = "feedbackId",rule = "required") Integer feedbackId,
             @Verify(param = "manageContent",rule = "required") String manageContent
             ){
 
+        //最大不能输入500字
+        if (manageContent.length() >= 500){
+            return AjaxResponse.fail(RestErrorCode.MESSAGE_CONTENT_ERROR);
+        }
 
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         if (null == currentLoginUser){

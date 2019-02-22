@@ -66,4 +66,8 @@ public interface MenuConstants {
     String DATA_REPORT = "数据报表";
     String DATA_REPORT_SUBSCRIPTION = "数据报表订阅";
     String DATA_REPORT_DOWNLOAD = "数据报表下载";
+
+    String PROBLEM_FEED_BACK = "问题受理(二级菜单)";
+    String PROBLEM_FEED_BACKS = "问题受理(三级菜单)";
+
 }

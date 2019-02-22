@@ -6,8 +6,10 @@ import com.google.common.collect.Lists;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.enums.MenuEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.entity.mdbcarmanage.CarMessageReply;
@@ -43,10 +45,16 @@ public class MessageReplyController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
     })
+//    @RequestFunction(menu = )
     public AjaxResponse addReply(
             @Verify(param = "messageId", rule = "required") Long messageId,
             @Verify(param = "replyContent", rule = "required") String replyContent
             ){
+
+        //最大不能输入500字
+        if (replyContent.length() >= 500){
+            return AjaxResponse.fail(RestErrorCode.MESSAGE_CONTENT_ERROR);
+        }
 
         try {
             SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
