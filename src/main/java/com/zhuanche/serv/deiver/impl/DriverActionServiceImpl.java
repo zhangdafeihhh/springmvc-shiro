@@ -83,7 +83,7 @@ public class DriverActionServiceImpl implements DriverActionService {
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
         Map<String, Object> params = generateParamsMap(driverActionVO, loginUser);
         CarBizDriverInfoDTO driverInfoDTO = driverInfoExMapper.queryDriverIdByActionVO(params);
-        if (driverInfoDTO.getDriverId() != null) {
+        if (driverInfoDTO != null && driverInfoDTO.getDriverId() != null) {
             Integer teamId = carRelateTeamExMapper.getTeamIdByDriverId(driverInfoDTO.getDriverId());
             if (teamId != null) {
                 Set<Integer> teamIds = loginUser.getTeamIds();
