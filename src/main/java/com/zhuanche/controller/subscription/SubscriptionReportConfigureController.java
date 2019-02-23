@@ -230,6 +230,9 @@ public class SubscriptionReportConfigureController {
         map.put( "3", "积分");
         map.put( "4", "数单奖");
         map.put( "5", "对账数据");
+        map.put( "6", "自营司机工资");
+        map.put( "7", "红旗司机考勤");
+        map.put( "8", "红旗司机订单");
         return AjaxResponse.success(map);
     }
 
