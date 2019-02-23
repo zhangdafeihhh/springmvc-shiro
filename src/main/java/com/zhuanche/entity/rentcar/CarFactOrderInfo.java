@@ -1,11 +1,10 @@
 package com.zhuanche.entity.rentcar;
 
 
-import java.text.NumberFormat;
+import com.zhuanche.entity.common.BaseEntity;
+
 import java.util.Date;
 import java.util.List;
-
-import com.zhuanche.entity.common.BaseEntity;
 
 /**
  * 订单明细页面实体（老车管）
@@ -19,12 +18,12 @@ public class CarFactOrderInfo extends BaseEntity {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private java.lang.String riderName;
-	private java.lang.String riderPhone;
-	private java.lang.String serviceName;
+	private String riderName;
+	private String riderPhone;
+	private String serviceName;
 	private int cityId;
 	private Integer pushDriverType;
-	private java.lang.String cityName;
+	private String cityName;
 	private String bookingStartAddr;
 	private String bookingEndAddr;
 	private String bookingStartPoint;
@@ -268,13 +267,13 @@ public class CarFactOrderInfo extends BaseEntity {
 	// 订单创建时间
 	private String cretaeDate;
 	// 实际上车地点坐标
-	private java.lang.String factStartPoint;
+	private String factStartPoint;
 	// 实际下车地点坐标
-	private java.lang.String factEndPoint;
+	private String factEndPoint;
 	// 车组ID
-	private java.lang.Integer carGroupId;
+	private Integer carGroupId;
 	// 机场(航站楼)ID
-	private java.lang.Integer airportId;
+	private Integer airportId;
 	// 司机手机号
 	private String driverPhone;
 	// 优惠券金额
