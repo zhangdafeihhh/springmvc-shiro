@@ -1910,20 +1910,7 @@ public class CarFactOrderInfo extends BaseEntity {
 	}
 
 	public Double getTravelTime() {
-		// 毫秒转分钟
-		if (this.travelTime == null || this.travelTime.longValue() == 0) {
-			return 0.0;
-		} else {
-			NumberFormat df = NumberFormat.getInstance();
-			df.setMaximumFractionDigits(2);
-			String timeStr = df.format(travelTime / 60000);
-			if (timeStr != null) {
-				if (timeStr.contains(",")) {
-					timeStr = timeStr.replace(",", "");
-				}
-			}
-			return Double.valueOf(timeStr);
-		}
+		return travelTime;
 	}
 
 	public void setTravelTime(Double travelTime) {

@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.zhuanche.common.util.TimeUtils;
 import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.util.CommonStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -834,9 +835,6 @@ public class OrderController{
 		}
 		orderId = ""+orderInfoJson.getIntValue("orderId");//重新赋下值
 
-		//System.out.println( ">>>>>>" + orderInfoJson );
-		//>>>>>>{"channelsNum":"partner-homeinns","factStartLongAddr":"安徽省 合肥市 包河区 徽州大道 靠近合肥南站 ","cityId":93,"factStartAddr":"安徽省 合肥市 包河区 徽州大道 靠近合肥南站 ","bookingEndAddr":"CBC拓基广场","cityName":"合肥","carGroupName":"畅享型","bookingEndLongAddr":"CBC拓基广场","buyoutPrice":53.0,"type":2,"bookingEndPoint":"117.171879,31.856586;117.178469,31.862267","laterMinute":0,"bookingGroupName":"畅享型","estimatedId":"1000","factStartPoint":"117.28889973958333,31.799595811631946;117.295479,31.805302","factDate":1538325568000,"factEndShortAddr":"安徽天正司法鉴定中心","businessId":20010453,"riderPhone":"15555331059","orderType":4,"status":50,"imei":"f4f6e38d-dd0e-49f4-8c72-706a9dea560d","goHomeStatus":0,"airportId":-1,"bookingDriverId":0,"factEndLongAddr":"安徽省 合肥市 蜀山区 井岗路 靠近CBC拓基广场 ","bookingStartShortAddr":"","pushDriverType":2,"bookingStartPoint":"117.290288,31.798983;117.29687,31.804675","bookingCurrentPoint":"null,","factEndPoint":"117.17165418836805,31.857140028211806;117.178244,31.862822","bookingStartLongAddr":"合肥南站","isOtherDrivers":1,"buyoutFlag":1,"memo":"{}","serviceTypeId":2,"licensePlates":"皖A6X984","bookingUserId":100047277,"receiveSMS":1,"riderName":"首旅如家乘车人","factEndDate":1538327131000,"bookingStartAddr":"合肥南站","payFlag":0,"version":"5.0","airlineStatus":"0","serviceTypeName":"预约用车","estimatedAmount":83.0,"bookingDateStr":"2018-10-01 00:30:00","driverId":321721,"carGroupId":43,"bookingUserPhone":"13228973156","createDate":1538320625000,"orderTypeName":"首旅如家","orderId":388510487,"bookingDate":1538325000000,"bookingGroupids":"43","agentId":"0","updateDate":1538334604000,"factEndAddr":"安徽省 合肥市 蜀山区 井岗路 靠近CBC拓基广场 ","factStartShortAddr":"肯德基(合肥南站)","bookingEndShortAddr":"","orderNo":"B5538320625920973","isOrderOthers":1}
-		//一、获取订单的基本信息
 		CarFactOrderInfo result = new CarFactOrderInfo();
 		result.setOrderId( orderInfoJson.getIntValue("orderId") );
 		result.setOrderNo(  orderInfoJson.getString("orderNo") );
@@ -907,7 +905,7 @@ public class OrderController{
 		//二、补全此订单的order_cost_detail
 		CarFactOrderInfo  orderCostDetailData =  carFactOrderExMapper.selectOrderCostDetailByOrderId( Long.valueOf(orderId) );
 		if(orderCostDetailData!=null) {
-			result.setTravelTime(orderCostDetailData.getTravelTime());
+			result.setTravelTime(TimeUtils.milliToMinute(orderCostDetailData.getTravelTime() == null ? 0 : orderCostDetailData.getTravelTime()));
 			result.setTravelMileage(orderCostDetailData.getTravelMileage());
 			result.setNightdistancenum(orderCostDetailData.getNightdistancenum());
 			result.setNightdistanceprice(orderCostDetailData.getNightdistanceprice());
