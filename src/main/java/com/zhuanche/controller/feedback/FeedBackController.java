@@ -7,6 +7,7 @@ import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.enums.FeedBackManageStatusEnum;
+import com.zhuanche.common.enums.FileSizeEnum;
 import com.zhuanche.common.enums.MenuEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
@@ -20,6 +21,7 @@ import com.zhuanche.serv.feedback.FeedBackDocService;
 import com.zhuanche.serv.feedback.FeedBackService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.FileUploadUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -31,6 +33,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -85,12 +88,17 @@ public class FeedBackController {
         List<Feedback> feedbackList = null;
         try {
             feedbackList = feedBackService.findDataList(createTimeStart,createTimeEnd,manageStatus);
+            if (null == feedbackList){
+                feedbackList = Lists.newArrayList();
+            }
+            feedbackList.forEach(value -> {
+                if (FeedBackManageStatusEnum.TO_ACCEPT.getCode() == value.getManageStatus()){
+                    value.setManageTime(null);
+                }
+            });
             total = (int) p.getTotal();
         } finally {
             PageHelper.clearPage();
-        }
-        if (null == feedbackList){
-            feedbackList = Lists.newArrayList();
         }
         PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, feedbackList);
         return AjaxResponse.success(pageDTO);
@@ -119,6 +127,11 @@ public class FeedBackController {
             return AjaxResponse.fail(RestErrorCode.MESSAGE_CONTENT_ERROR);
         }
 
+        //单个文件长度大小不能超过5m
+        if (!FileUploadUtils.validateFilesSize(multipartFiles, FileSizeEnum.MByte.getSize() * 5)){
+            return AjaxResponse.fail(RestErrorCode.FILE_SIZE_TOO_BIG);
+        }
+
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         if (null == currentLoginUser){
             return AjaxResponse.fail(RestErrorCode.HTTP_INVALID_SESSION);
@@ -143,7 +156,7 @@ public class FeedBackController {
             feedBackService.addFeedBack(feedback, multipartFiles);
             return AjaxResponse.success(null);
         } catch (Exception e) {
-           logger.error("问题反馈异常:",e);
+            logger.error("问题反馈异常:",e);
         }
         return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
     }
@@ -288,5 +301,7 @@ public class FeedBackController {
 
         return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
     }
+
+
 
 }

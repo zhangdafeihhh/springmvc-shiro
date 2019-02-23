@@ -69,10 +69,12 @@
 
     <!--事务配置开始位置-->
     <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="mdbcarmanage-master-DataSource"/>
+        <property name="dataSource" ref="mdbcarmanage-DataSource"/>
     </bean>
     <!-- enable transaction annotation support -->
     <tx:annotation-driven transaction-manager="txManager"/>
     <!--事务配置结束-->
+
+
 
 </beans>
