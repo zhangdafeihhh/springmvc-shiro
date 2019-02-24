@@ -222,14 +222,8 @@ public class DriverDailyReportV3Service {
     private Map<String, DriverIncome> modifyMonthDriverVolumes(String drivers, String startDate, String endDate,Integer type) {
         Map<String, DriverIncome> maps = new HashMap<>();
         if (StringUtils.isNotEmpty(startDate) && startDate.compareTo(Constants.QUERY_DATE) > 0) {
-            long statTime = 0;
-            long endTime = 0;
-            try {
-                statTime = DateUtil.DATE_SIMPLE_FORMAT.parse(startDate).getTime();
-                endTime = DateUtil.DATE_SIMPLE_FORMAT.parse(endDate).getTime();
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+            long statTime = DateUtil.strDateParseLong(startDate);
+            long endTime = DateUtil.strDateParseLong(endDate);
             long time = System.currentTimeMillis();
             String url = "";
             if (Constants.WEEK.equals(type)){

@@ -2,7 +2,12 @@ package com.zhuanche.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -18,34 +23,34 @@ public class DateUtil {
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
 	public static final String MONTH_FORMAT = "yyyy_MM";
 	public static final String CONCISE_TIME_FORMAT="yyyyMMddHHmmss";
-	public static final SimpleDateFormat TIME_SIMPLE_FORMAT = new SimpleDateFormat(TIME_FORMAT);
-	public static final SimpleDateFormat DATE_SIMPLE_FORMAT = new SimpleDateFormat(DATE_FORMAT);
-	public static final SimpleDateFormat DATE_MONTH_FORMAT = new SimpleDateFormat(MONTH_FORMAT);
-	public static final SimpleDateFormat CONCISE_SIMPLE_TIME_FORMAT = new SimpleDateFormat(CONCISE_TIME_FORMAT);
+	public static final DateTimeFormatter TIME_SIMPLE_FORMAT = DateTimeFormatter.ofPattern(TIME_FORMAT);
+	public static final DateTimeFormatter DATE_SIMPLE_FORMAT = DateTimeFormatter.ofPattern(DATE_FORMAT);
+	public static final DateTimeFormatter DATE_MONTH_FORMAT = DateTimeFormatter.ofPattern(MONTH_FORMAT);
+	public static final DateTimeFormatter CONCISE_SIMPLE_TIME_FORMAT = DateTimeFormatter.ofPattern(CONCISE_TIME_FORMAT);
 	/**返回yyyy-MM-dd HH:mm:ss格式的字符串时间*/
 	public static String createTimeString(){
-		return TIME_SIMPLE_FORMAT.format(new Date());
+		return TIME_SIMPLE_FORMAT.format(LocalDateTime.now());
 	}
 	
 	/**返回yyyy-MM-dd格式的字符串时间*/
 	public static String createDateString(){
-		return DATE_SIMPLE_FORMAT.format(new Date());
+		return DATE_SIMPLE_FORMAT.format(LocalDate.now());
 	}
 	/**返回yyyy-MM-dd格式的字符串时间*/
 	public static String createMonthString(){
-		return DATE_MONTH_FORMAT.format(new Date());
+		return DATE_MONTH_FORMAT.format(LocalDate.now());
 	}
 	/**返回yyyyMMddHHmmss格式的字符串时间*/
-	public static String creatConciseTimeString(){return CONCISE_SIMPLE_TIME_FORMAT.format(new Date());}
+	public static String creatConciseTimeString(){return CONCISE_SIMPLE_TIME_FORMAT.format(LocalDateTime.now());}
 
 	/**根据传入的参数返回yyyy-MM-dd格式的字符串时间*/
 	public static String getDateString(Date date){
-		return date==null?"":DATE_SIMPLE_FORMAT.format(date);
+		return date==null?"":DATE_SIMPLE_FORMAT.format(date.toInstant());
 	}
 	
 	/**根据传入的参数返回yyyy-MM-dd HH:mm:ss格式的字符串时间*/
 	public static String getTimeString(Date date){
-		return date==null?"":TIME_SIMPLE_FORMAT.format(date);
+		return date==null?"":TIME_SIMPLE_FORMAT.format(dateToLocalDateTime(date));
 	}
 	
 	
@@ -183,21 +188,6 @@ public class DateUtil {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		return sdf.format(new Date());
 	}
-	
-	/****
-	 * 两个时间之间的时间段
-	 * @param time1
-	 * @param time2
-	 * @param formate
-	 * @return
-	 */
-//	public String[] getBetweenTime(String time1,String time2,String formate){
-//		if(null==formate){
-//			formate = "yyyy-MM-dd";
-//		}
-//		SimpleDateFormat sdf = new SimpleDateFormat(formate);
-//		return null;
-//	}
 	
 	/***
 	 * 两个时间之间的分钟数
@@ -456,8 +446,9 @@ public class DateUtil {
 		Date d1 = null;
 		Date d2 = null;
 		try{
-			d1 = DATE_SIMPLE_FORMAT.parse(date1);
-			d2 = DATE_SIMPLE_FORMAT.parse(date2);
+			ZoneId zoneId = ZoneId.systemDefault();
+			d1 =  Date.from(LocalDate.parse(date1, DATE_SIMPLE_FORMAT).atStartOfDay(zoneId).toInstant());
+			d2 =  Date.from(LocalDate.parse(date2, DATE_SIMPLE_FORMAT).atStartOfDay(zoneId).toInstant());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -475,9 +466,28 @@ public class DateUtil {
 		return false;
 	}
 
-	public static String getTimeString(String updateDate) {
-		Date date = new Date();
-		date.setTime(Long.valueOf(updateDate));
-		return TIME_SIMPLE_FORMAT.format(date);
+	public static String getTimeString(String time) {
+		Calendar instance = Calendar.getInstance();
+		instance.setTimeInMillis(Long.valueOf(time));
+		return TIME_SIMPLE_FORMAT.format(dateToLocalDateTime(instance.getTime()));
 	}
+
+	private static LocalDate dateToLocalDate(Date date){
+		Instant instant = date.toInstant();
+		ZoneId zoneId = ZoneId.systemDefault();
+		return LocalDateTime.ofInstant(instant, zoneId).toLocalDate();
+	}
+
+	private static LocalDateTime dateToLocalDateTime(Date date){
+		Instant instant = date.toInstant();
+		ZoneId zoneId = ZoneId.systemDefault();
+		return LocalDateTime.ofInstant(instant, zoneId);
+	}
+
+	public static long strDateParseLong(String str){
+		TemporalAccessor accessor = DATE_SIMPLE_FORMAT.parse(str);
+		ZoneId zoneId = ZoneId.systemDefault();
+		return LocalDate.from(accessor).atStartOfDay(zoneId).toInstant().toEpochMilli();
+	}
+
 }

@@ -1,23 +1,20 @@
 package com.zhuanche.common.web;
 
-import java.io.IOException;
-import java.security.SecureRandom;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Properties;
-import java.util.Random;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.util.NumberUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.MDC;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.MDC;
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import com.zhuanche.common.database.DynamicRoutingDataSource;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Properties;
 
 /**对每一个请求，初始化各种变量及参数，以用于日志输出、展现层输出等目的
  * @author zhaoyali
@@ -29,15 +26,8 @@ public class InitRequestCommonDataFilter extends OncePerRequestFilter {
 	private static String cmsLogoutUrl;           //SSO单点登出本地回调URL
 	
 	private static final String SEED_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	private static final Random rnd = new  SecureRandom();
-	private String genRequestId( int length ) {
-		StringBuffer sb = new StringBuffer( length  );
-		for(int i=0;i<length;i++) {
-			int index = rnd.nextInt( SEED_CHARS.length()  );
-			char cha = SEED_CHARS.charAt(index);
-			sb.append(cha);
-		}
-		return sb.toString();
+	private String genRequestId(int length) {
+		return NumberUtil.genRandomCode(length, SEED_CHARS);
 	}
 	
 	@Override

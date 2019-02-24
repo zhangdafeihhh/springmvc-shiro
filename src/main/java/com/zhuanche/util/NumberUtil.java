@@ -16,6 +16,16 @@ public final class NumberUtil {
 		}
 		return sb.toString();
 	}
+
+	public static String genRandomCode( int length, String seed ) {
+		StringBuilder builder = new StringBuilder();
+		for(int i=0;i<length;i++) {
+			int index = rnd.nextInt( seed.length()  );
+			char cha = seed.charAt(index);
+			builder.append(cha);
+		}
+		return builder.toString();
+	}
 	
 
 }
