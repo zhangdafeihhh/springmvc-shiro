@@ -1,10 +1,12 @@
 package com.zhuanche.dto.rentcar;
 
 
-import java.util.List;
-
 import com.zhuanche.entity.rentcar.CarFactOrderInfo;
 import com.zhuanche.entity.rentcar.CarPoolMainOrderEntity;
+import com.zhuanche.util.DateUtils;
+
+import java.util.Date;
+import java.util.List;
 
 public class CarPoolMainOrderDTO extends CarPoolMainOrderEntity {
 
@@ -203,5 +205,28 @@ public class CarPoolMainOrderDTO extends CarPoolMainOrderEntity {
 	public void setCarFactOrderInfoList(List<CarFactOrderInfo> carFactOrderInfoList) {
 		this.carFactOrderInfoList = carFactOrderInfoList;
 	}
-    
+
+    @Override
+    public void setDriverStartDate(Date driverStartDate) {
+        super.setDriverStartDate(driverStartDate);
+        driverStartDateStr = DateUtils.formatDateTime(driverStartDate);
+    }
+
+    @Override
+    public void setDriverEndDate(Date driverEndDate) {
+        super.setDriverEndDate(driverEndDate);
+        driverEndDateStr = DateUtils.formatDateTime(driverEndDate);
+    }
+
+    @Override
+    public void setCreateDate(Date createDate) {
+        super.setCreateDate(createDate);
+        createDateStr = DateUtils.formatDateTime(createDate);
+    }
+
+    @Override
+    public void setUpdateDate(Date updateDate) {
+        super.setUpdateDate(updateDate);
+        updateDateStr = DateUtils.formatDateTime(updateDate);
+    }
 }

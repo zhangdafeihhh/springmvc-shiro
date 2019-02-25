@@ -62,7 +62,6 @@ public class RiskOrderComplainController {
         pageData.put("Rows",new JSONArray());
         pageData.put("Total",0);
         try {
-//            SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
             Map<String, Object> paramMap = new HashMap<String, Object>();
             paramMap.put("orderNo", params.getOrderNo());
             paramMap.put("driverId", params.getDriverId());
@@ -127,6 +126,7 @@ public class RiskOrderComplainController {
                 Integer code = responseObject.getInteger("code");
 
                 if (code == 0) {
+                    //TODO 检查风控返回的司机金额
                     JSONObject retPageData = responseObject.getJSONObject("data");
                     int totalRecord = retPageData.getInteger("totalRecord");
                     JSONArray arrayList = retPageData.getJSONArray("dataList") ;
@@ -367,7 +367,6 @@ public class RiskOrderComplainController {
      * @param uploadFile
      */
     public Map<String,Object> upload(MultipartFile uploadFile) {
-//        FtpUtil ftpUtil = FtpUtil.getInstance();
         Map<String,Object> resultMap = new HashMap<>();
         try {
 

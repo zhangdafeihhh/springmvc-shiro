@@ -91,10 +91,6 @@
 	<select id="queryCarpoolMainForObject" resultMap="BaseResultMap" parameterType="com.zhuanche.dto.rentcar.CarPoolMainOrderDTO">
 		select
 		<include refid="Base_Column_List"/>
-		,DATE_FORMAT(driver_start_date,'%Y-%m-%d %H:%i:%s') driverStartDateStr
-		,DATE_FORMAT(driver_end_date,'%Y-%m-%d %H:%i:%s') driverEndDateStr
-		,DATE_FORMAT(create_date,'%Y-%m-%d %H:%i:%s') createDateStr
-		,DATE_FORMAT(update_date,'%Y-%m-%d %H:%i:%s') updateDateStr
 		from carpool_main_order
 		where main_order_no = #{mainOrderNo,jdbcType=VARCHAR}
 	</select>

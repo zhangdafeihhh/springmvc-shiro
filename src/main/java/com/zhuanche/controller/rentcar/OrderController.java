@@ -727,6 +727,7 @@ public class OrderController{
      */
 	@ResponseBody
 	@RequestMapping(value = "/poolMainOrderview", method = { RequestMethod.POST,RequestMethod.GET })
+	@RequestFunction(menu = MAIN_ORDER_DETAIL)
 	public AjaxResponse driverOutageAddView(@Verify(param = "mainOrderNo",rule = "required")  String mainOrderNo) {
 		logger.info("主订单页面mainOrderNo:"+mainOrderNo);
 		CarPoolMainOrderDTO params = new CarPoolMainOrderDTO();

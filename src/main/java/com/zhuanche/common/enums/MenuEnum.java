@@ -144,6 +144,7 @@ public enum MenuEnum {
     ORDER_LIST(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.ORDER_MANAGE, MenuConstants.ORDER_LIST,"订单明细查询"),
     ORDER_LIST_EXPORT(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.ORDER_MANAGE, MenuConstants.ORDER_LIST,"订单明细导出"),
     ORDER_DETAIL(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.ORDER_MANAGE, MenuConstants.ORDER_LIST,"订单详情查询"),
+    MAIN_ORDER_DETAIL(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.ORDER_MANAGE, MenuConstants.ORDER_LIST,"主订单详情查询"),
     COMPLETE_ORDER_LIST(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.ORDER_MANAGE, MenuConstants.COMPLETE_ORDER_LIST,"完成订单明细查询"),
     COMPLETE_ORDER_LIST_EXPORT(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.ORDER_MANAGE, MenuConstants.COMPLETE_ORDER_LIST,"完成订单明细导出"),
     CANCEL_ORDER_LIST(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.ORDER_MANAGE, MenuConstants.CANCEL_ORDER_LIST,"取消订单明细查询"),
