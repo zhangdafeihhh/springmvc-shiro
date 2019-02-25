@@ -1,4 +1,4 @@
-package com.zhuanche.entity.DriverOrderRecord;
+package com.zhuanche.entity.driverOrderRecord;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

@@ -40,7 +40,7 @@ import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarFactOrderInfoDTO;
 import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
 import com.zhuanche.dto.rentcar.ServiceTypeDTO;
-import com.zhuanche.entity.DriverOrderRecord.OrderTimeEntity;
+import com.zhuanche.entity.driverOrderRecord.OrderTimeEntity;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizCustomer;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
@@ -90,6 +90,7 @@ public class OrderController{
 	private CarBizCustomerMapper carBizCustomerMapper;
 	@Autowired
 	private CarBizCarInfoExMapper carBizCarInfoExMapper;
+
 	/**
 	    * 查询订单 列表
 	    * @return
@@ -828,6 +829,7 @@ public class OrderController{
 	 
 	/**查询订单详情( 首先调用订单接口，然后再补全数据)**/
 	private CarFactOrderInfo getOrderInfo(String orderId, String orderNo) {
+		//TODO 司乘分离修改处
 		//-------------------------------------------------------------------------------------------------------------------------car_fact_order拆表开始BEGIN
 		SimpleDateFormat yyyyMMddHHmmssSDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		JSONObject orderInfoJson = orderService.getOrderInfo(orderId, orderNo );

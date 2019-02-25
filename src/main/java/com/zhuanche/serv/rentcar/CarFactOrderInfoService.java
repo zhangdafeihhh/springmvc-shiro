@@ -4,7 +4,7 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
 import com.zhuanche.dto.rentcar.ServiceTypeDTO;
-import com.zhuanche.entity.DriverOrderRecord.OrderTimeEntity;
+import com.zhuanche.entity.driverOrderRecord.OrderTimeEntity;
 import com.zhuanche.entity.rentcar.*;
 
 import java.util.List;

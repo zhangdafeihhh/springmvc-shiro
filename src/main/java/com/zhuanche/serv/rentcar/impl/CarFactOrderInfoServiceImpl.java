@@ -9,9 +9,10 @@ import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarFactOrderInfoDTO;
 import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
 import com.zhuanche.dto.rentcar.ServiceTypeDTO;
-import com.zhuanche.entity.DriverOrderRecord.OrderTimeEntity;
+import com.zhuanche.entity.driverOrderRecord.OrderTimeEntity;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.HttpClientUtil;
+import com.zhuanche.serv.order.DriverFeeDetailService;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.util.Common;
 import com.zhuanche.util.CommonStringUtils;
@@ -30,6 +31,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,9 +65,9 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 	@Autowired
 	@Qualifier("orderApiTemplate")
 	private MyRestTemplate orderApiTemplate;
-    
-    
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+	@Resource
+	private DriverFeeDetailService driverFeeDetailService;
 
     @Autowired
     private CarFactOrderExMapper carFactOrderExMapper;

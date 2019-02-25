@@ -1,4 +1,4 @@
-package com.zhuanche.entity.DriverPreparate;
+package com.zhuanche.entity.driverPreparate;
 
 import java.util.List;
 

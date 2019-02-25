@@ -99,4 +99,6 @@ public final class Constants {
 	public static final String PRORATE_ID = "prorateId";
 	public static final String ACTIVE_START_DATE = "activeStartDate";
 	public static final String ACTIVE_END_DATE = "activeEndDate";
+
+	public static final String RESULT = "result";
 }

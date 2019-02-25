@@ -19,7 +19,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
-import com.zhuanche.entity.DriverPreparate.DriverPreparate;
+import com.zhuanche.entity.driverPreparate.DriverPreparate;
 import com.zhuanche.serv.order.OrderService;
 import com.zhuanche.util.MyRestTemplate;
 
@@ -121,7 +121,7 @@ public class DriverPreparateService {
 	/**
 	 *  通过订单号查询司机报备详情
 	 * @param orderNo
-	 * @return com.zhuanche.entity.DriverPreparate.DriverPreparate
+	 * @return com.zhuanche.entity.driverPreparate.driverPreparate
 	 */
 	public DriverPreparate selectDriverPreparateDetail(String orderNo){
 		// 签名
