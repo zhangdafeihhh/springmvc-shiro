@@ -54,7 +54,7 @@ public class DriverFeeDetailServiceImpl implements DriverFeeDetailService {
         }
         try{
             Map<String, Object> params = new HashMap<>(1);
-            String orders = orderNos.stream().reduce("", (str1, str2) -> str1 + "," + str2);
+            String orders = String.join(",", orderNos);
             params.put("orderNos", orders);
             String url = DRIVER_FEE_SERVICE_API_BASE_URL + "/orderCost/getOrderDriverCostDetails";
             JSONObject result = MpOkHttpUtil.okHttpGetBackJson(url, params, 1, "");
