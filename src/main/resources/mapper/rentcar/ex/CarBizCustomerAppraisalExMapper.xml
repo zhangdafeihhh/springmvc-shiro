@@ -141,11 +141,8 @@
 
   <select id="queryForListObject" parameterType="com.zhuanche.entity.rentcar.CarBizCustomerAppraisalParams" resultType="com.zhuanche.entity.rentcar.CarBizCustomerAppraisal">
     SELECT
-    DISTINCT(ca.order_no) AS orderNo,
-    DATE_FORMAT(ca.create_date,'%Y-%m-%d %T') AS createDate,
-    ca.instrument_and_service AS instrumentAndService,
-    ca.environment_and_equipped AS environmentAndEquipped,
-    ca.efficiency_and_safety AS efficiencyAndSafety,
+    ca.order_no AS orderNo,
+    ca.create_date AS createDate,
     ca.evaluate_score AS evaluateScore,
     ca.evaluate AS evaluate,
     ca.memo,
@@ -156,7 +153,7 @@
     ca.appraisal_status AS appraisalStatus
     FROM
     car_biz_customer_appraisal ca
-    LEFT JOIN car_biz_driver_info di ON di.driver_id = ca.driver_id
+    INNER JOIN car_biz_driver_info di ON di.driver_id = ca.driver_id
     WHERE
     1 = 1
     <if test="appraisalStatus!=null">
@@ -166,10 +163,10 @@
       AND ca.evaluate_score in (${evaluateScore})
     </if>
     <if test="createDateBegin !=null and createDateBegin !=''">
-      <![CDATA[ AND ca.create_date >=  concat(#{createDateBegin},' 00:00:00') ]]>
+      AND ca.create_date &gt;= #{createDateBegin}
     </if>
     <if test="createDateEnd !=null and createDateEnd !=''">
-      <![CDATA[ AND ca.create_date <=  concat(#{createDateEnd},' 23:59:59') ]]>
+      AND ca.create_date &lt;= #{createDateEnd}
     </if>
     <if test="orderNo!=null and orderNo!=''">
       AND ca.order_no LIKE CONCAT(#{orderNo}, '%')
