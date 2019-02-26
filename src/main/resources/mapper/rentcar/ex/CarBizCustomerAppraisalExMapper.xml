@@ -153,7 +153,7 @@
     ca.appraisal_status AS appraisalStatus
     FROM
     car_biz_customer_appraisal ca
-    LEFT JOIN car_biz_driver_info di ON di.driver_id = ca.driver_id
+    INNER JOIN car_biz_driver_info di ON di.driver_id = ca.driver_id
     WHERE
     1 = 1
     <if test="appraisalStatus!=null">
