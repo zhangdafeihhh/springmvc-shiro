@@ -73,7 +73,7 @@ public class DriverActionController {
     @RequestMapping("/actionEnum")
     @ResponseBody
     @RequestFunction(menu = DRIVER_ACTION_ENUM)
-    @RequiresPermissions(value = "DriverAction_Enums")
+//    @RequiresPermissions(value = "DriverAction_Enums")
     public AjaxResponse getActionList(){
         Map<Integer, String> map = DriverActionEnum.getMap();
         JSONArray result = new JSONArray();
