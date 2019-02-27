@@ -905,6 +905,7 @@ public class OrderController{
 			Date   airlinePlanDate = new Date( orderInfoJson.getLongValue("airlinePlanDate") );
 			result.setAirlinePlanDate(airlinePlanDate);
 		}
+		result.setDriverPassengerPriceSeparate(orderInfoJson.getIntValue("isDriverPassengerPriceSeparate"));
 		//二、补全此订单的order_cost_detail
 		CarFactOrderInfo  orderCostDetailData =  carFactOrderExMapper.selectOrderCostDetailByOrderId( Long.valueOf(orderId) );
 		if(orderCostDetailData!=null) {

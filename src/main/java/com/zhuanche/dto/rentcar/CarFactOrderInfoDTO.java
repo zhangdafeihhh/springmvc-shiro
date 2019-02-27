@@ -1,5 +1,7 @@
 package com.zhuanche.dto.rentcar;
 
+import com.zhuanche.dto.CarFactOrderMemo;
+
 public class CarFactOrderInfoDTO{
 	//订单号 
 	private String orderNo;
@@ -57,6 +59,12 @@ public class CarFactOrderInfoDTO{
 	private String airportId; 
 	//主订单号  
 	private String mainOrderNo;
+	//
+	private String memo;
+
+	private String actualPayAmountDriver;
+
+	private CarFactOrderMemo memoObj;
 	public String getOrderNo() {
 		return orderNo;
 	}
@@ -256,10 +264,32 @@ public class CarFactOrderInfoDTO{
 	public void setDicName(String dicName) {
 		this.dicName = dicName;
 	}
-	
-	
-	
-/*
+
+	public String getMemo() {
+		return memo;
+	}
+
+	public void setMemo(String memo) {
+		this.memo = memo;
+	}
+
+	public CarFactOrderMemo getMemoObj() {
+		return memoObj;
+	}
+
+	public void setMemoObj(CarFactOrderMemo memoObj) {
+		this.memoObj = memoObj;
+	}
+
+	public String getActualPayAmountDriver() {
+		return actualPayAmountDriver;
+	}
+
+	public void setActualPayAmountDriver(String actualPayAmountDriver) {
+		this.actualPayAmountDriver = actualPayAmountDriver;
+	}
+
+	/*
     private String licensePlates;
 
     private String brand;

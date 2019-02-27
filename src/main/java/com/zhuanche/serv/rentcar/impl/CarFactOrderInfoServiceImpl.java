@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.dto.CarFactOrderMemo;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarFactOrderInfoDTO;
 import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
@@ -22,6 +23,7 @@ import mapper.orderPlatform.PoolMainOrderMapper;
 import mapper.rentcar.ex.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
@@ -36,6 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
@@ -267,6 +270,8 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 							carFactOrderInfoDTO.setBookingUserPhone(CommonStringUtils.protectPhoneInfo(carFactOrderInfoDTO.getBookingUserPhone()));
 							carFactOrderInfoDTO.setRiderPhone(CommonStringUtils.protectPhoneInfo(carFactOrderInfoDTO.getRiderPhone()));
 						});
+						fillDriverAmount(list);
+						setCarFactOrderMemo(list);
 						return AjaxResponse.success(jobres);
 					}
 				}
@@ -277,6 +282,29 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 		}
 		return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+	}
+
+
+	private void setCarFactOrderMemo(List<CarFactOrderInfoDTO> list){
+		for (CarFactOrderInfoDTO vo : list) {
+			if (StringUtils.isNotBlank(vo.getMemo()))
+				vo.setMemoObj(JSON.parseObject(vo.getMemo(), CarFactOrderMemo.class));
+		}
+	}
+	/**
+	 * 调用计费接口回填司机金额
+	 * wiki:http://inside-yapi.01zhuanche.com/project/91/interface/api/10863
+	 *
+	 * @param list
+	 */
+	private void fillDriverAmount(List<CarFactOrderInfoDTO> list) {
+		List<String> orderNos = list.stream().map(CarFactOrderInfoDTO::getOrderNo).collect(Collectors.toList());
+		List<OrderDriverCostDetailVO> driverCostDetails = driverFeeDetailService.getOrderDriverCostDetailVOBatch(orderNos);
+		Map<String, OrderDriverCostDetailVO> map = driverCostDetails.stream().collect(Collectors.toMap(OrderDriverCostDetailVO::getOrderNo, a -> a, (k1, k2) -> k1));
+		for (CarFactOrderInfoDTO vo : list) {
+			if (null != map.get(vo.getOrderNo()))
+				vo.setActualPayAmountDriver(map.get(vo.getOrderNo()).getTotalAmount().toString());
+		}
 	}
 
 	

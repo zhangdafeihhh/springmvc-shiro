@@ -22,6 +22,7 @@ public class DriverFeeDetailServiceImpl implements DriverFeeDetailService {
     private static final Logger logger = LoggerFactory.getLogger(DriverFeeDetailServiceImpl.class);
 
 
+    @Override
     public OrderDriverCostDetailVO getOrderDriverCostDetailVO(String orderNo){
         if (StringUtils.isBlank(orderNo)){
             return null;
@@ -47,7 +48,8 @@ public class DriverFeeDetailServiceImpl implements DriverFeeDetailService {
         return null;
     }
 
-    public List<OrderDriverCostDetailVO> getOrderDriverCostDetailVOBatch(Set<String> orderNos){
+    @Override
+    public List<OrderDriverCostDetailVO> getOrderDriverCostDetailVOBatch(List<String> orderNos){
         if (orderNos == null || orderNos.isEmpty() || orderNos.size() > 200){
             logger.error("orderNos 参数违法");
             return Collections.EMPTY_LIST;
