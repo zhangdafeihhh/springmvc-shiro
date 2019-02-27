@@ -35,9 +35,6 @@
             <if test="actionId != null">
               and action = #{actionId}
             </if>
-            <if test="orderNo != null and orderNo != ''">
-              and order_no = #{orderNo}
-            </if>
         </where>
         order by action_time desc
     </select>

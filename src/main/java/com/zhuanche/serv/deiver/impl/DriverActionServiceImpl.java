@@ -87,7 +87,6 @@ public class DriverActionServiceImpl implements DriverActionService {
             hasDataPermission(driverInfoDTO, loginUser);
             params.clear();
             params.put("driverId", driverInfoDTO.getDriverId());
-            params.put("orderNo", orderNo);
             params.put("actionId", driverActionVO.getActionId());
             params.put("tableName", table);
         } else {
