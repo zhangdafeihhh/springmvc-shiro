@@ -64,9 +64,14 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
             }
         }
 
-        List<DriverDailyReport> list  = this.driverDailyReportExMapper.queryForListObject(params);
-        PageInfo<DriverDailyReport> pageInfo = new PageInfo<>(list);
+        PageInfo<DriverDailyReport> pageInfo = null;
+        List<DriverDailyReport> list  = new ArrayList<DriverDailyReport>();
+        if (StringUtils.isNotEmpty(driverIds)){
+            list  = this.driverDailyReportExMapper.queryForListObject(params);
+        }
+        pageInfo = new PageInfo<>(list);
         pageInfo.setTotal(pageInfoDriver.getTotal());
+        pageInfo.setPages(pageInfoDriver.getPages());
         return pageInfo;
     }
 
@@ -87,15 +92,21 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
             }
         }
 
-        List<DriverDailyReport> list  = this.driverDailyReportExMapper.queryWeekForListObject(params);
-        PageInfo<DriverDailyReport> pageInfo = new PageInfo<>(list);
+        PageInfo<DriverDailyReport> pageInfo = null;
+        List<DriverDailyReport> list  = new ArrayList<DriverDailyReport>();
+        if (StringUtils.isNotEmpty(driverIds)){
+            list  = this.driverDailyReportExMapper.queryWeekForListObject(params);
+        }
+        pageInfo = new PageInfo<>(list);
         pageInfo.setTotal(pageInfoDriver.getTotal());
+        pageInfo.setPages(pageInfoDriver.getPages());
         if(list!=null && list.size()>0){
             for (DriverDailyReport report: list) {
                 report.setStatDateStart(statDateStart);
                 report.setStatDateEnd(statDateEnd);
             }
         }
+
         return pageInfo;
         }finally {
             PageHelper.clearPage();
@@ -263,13 +274,19 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
             }
             long time = System.currentTimeMillis();
             String url = "";
-            if (Constants.WEEK.equals(type)){
-                url = "/driverIncome/findDriverDateIncomes?driverIds=" + drivers + "&startDate=" + statTime + "&endDate=" + endTime;
-            }else if(Constants.MONTH.equals(type)){
-                url = "/driverIncome/findDriverDateIncomes?driverIds=" + drivers + "&startDate=" + statTime + "&endDate=" + endTime;
-                //url = "/driverIncome/findDriverIncomes?driverIds="+drivers+"&incomeDate="+startDate ;
-            }
-            String result = busOrderCostTemplate.getForObject(url, String.class);
+//            if (Constants.WEEK.equals(type)){
+//                url = "/driverIncome/findDriverDateIncomes?driverIds=" + drivers + "&startDate=" + statTime + "&endDate=" + endTime;
+//            }else if(Constants.MONTH.equals(type)){
+//                url = "/driverIncome/findDriverDateIncomes?driverIds=" + drivers + "&startDate=" + statTime + "&endDate=" + endTime;
+//                //url = "/driverIncome/findDriverIncomes?driverIds="+drivers+"&inselectSuppierNameAndCityNameDayscomeDate="+startDate ;
+//            }
+            url = "/driverIncome/findDriverDateIncomes";
+//            String result = busOrderCostTemplate.getForObject(url, String.class);
+            Map<String, Object> paramMap = new HashMap<String, Object>();
+            paramMap.put("driverIds", drivers);
+            paramMap.put("startDate", statTime);
+            paramMap.put("endDate", endTime);
+            String result = busOrderCostTemplate.postForObject(url, JSONObject.class, paramMap);
             long invokeEndTime = System.currentTimeMillis();
             logger.info("调用计费时长：" + (invokeEndTime-time));
             Map<String, Object> resultMap = JSONObject.parseObject(result, HashMap.class);

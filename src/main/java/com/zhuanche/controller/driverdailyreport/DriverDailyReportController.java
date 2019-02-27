@@ -354,6 +354,7 @@ public class DriverDailyReportController extends DriverQueryController {
 					for(int pageNumber = 2;pageNumber <= pages ; pageNumber++){
 						params.setPage(pageNumber);
 						rows = null;
+						params.setDriverIds(null);
 						log.info("工作日报:第"+pageNumber+"页/共"+pages+"页，查询条件为："+JSON.toJSONString(params));
 						pageInfos = driverDailyReportExService.findDayDriverDailyReportByparam(params);
 						result = pageInfos.getList();
@@ -396,6 +397,7 @@ public class DriverDailyReportController extends DriverQueryController {
 						params.setPage(pageNumber);
 						log.info(fileTag+":第"+pageNumber+"页/共"+pages+"页，查询条件为："+JSON.toJSONString(params));
 						rows = null;
+						params.setDriverIds(null);
 						pageInfos = driverDailyReportExService.findWeekDriverDailyReportByparam(params,  statDateStart,    statDateEnd);
 						result = pageInfos.getList();
 						csvDataList = new ArrayList<>();
