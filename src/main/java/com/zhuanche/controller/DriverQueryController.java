@@ -3,6 +3,7 @@ package com.zhuanche.controller;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
@@ -19,10 +20,10 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.joining;
 
 @Component
 public class DriverQueryController {
@@ -52,7 +53,7 @@ public class DriverQueryController {
         //车队id如果 为空，将用户的车队id赋值
         if(StringUtils.isEmpty(teamIds)){
             Set<Integer> teamIds2 = WebSessionUtil.getCurrentLoginUser().getTeamIds();
-            teamIds = teamIds2 !=null ? teamIds2.toString() : "";//？？
+            teamIds = teamIds2 != null ? teamIds2.toString() : "";
         }
         String driverIdTeam = null;
         //如果组不为空，查该组下的司机列表,如果车队不为空，查询车队下的关联关系
@@ -61,14 +62,7 @@ public class DriverQueryController {
             driverIdTeam = this.pingDriverIds(driverIds);
         }else if(StringUtils.isNotEmpty(teamIds) && !"null".equals(teamIds)){
             //把逗号分隔的字符串改为可以拼接的sql  例如'1','2','3'
-            String[] teamId = teamIds.split(",");
-            String teams = "";
-            for (String string : teamId) {
-                teams += string + ",";
-            }
-            teams = teams.substring(0,teams.length()-1);
-            //查询车队下的司机id
-            List<CarRelateTeam> driverIdList = carRelateTeamExMapper.queryListByTeamIds(teams);
+            List<CarRelateTeam> driverIdList = carRelateTeamExMapper.queryListByTeamIds(teamIds);
             driverIdTeam = this.pingDriverIds(driverIdList);
         }
         return driverIdTeam;
@@ -77,22 +71,22 @@ public class DriverQueryController {
     /**
      * <p>Title: pingSortName</p>
      * <p>Description: 整理排序字段</p>
-     * @param sortname
+     * @param sortName
      * @return String
      */
-    public String pingSortName(String sortname) {
-        String _sortname = "";
-        String[] name = sortname.split("");
-        int length = sortname.length();
+    public String pingSortName(String sortName) {
+        String[] name = sortName.split("");
+        int length = sortName.length();
         for (int i = 0; i < length; i++) {
             if ("ABCDEFGHIJKLMNOPQRSTUVWXYZ".indexOf(name[i]) > 0) {
                 name[i] = "_" + name[i].toLowerCase();
             }
         }
-        for (int i = 0; i < name.length; i++) {
-            _sortname += name[i];
+        try {
+            return String.join(Constants.SEPERATER, name);
+        }catch (Exception e){
         }
-        return _sortname;
+        return "";
     }
 
     /**
@@ -105,13 +99,10 @@ public class DriverQueryController {
      */
     public String pingDriverIds(List<CarRelateTeam> list) {
         String driverIds = "";
-        if(list !=null && list.size()>0){
-            for (CarRelateTeam team : list) {
-                if (team!=null && team.getDriverId()!=null ) {
-                    driverIds += "'" + team.getDriverId() + "',";
-                }
-            }
-            driverIds = driverIds.substring(0, driverIds.length()-1);
+        if (list != null && !list.isEmpty()){
+            driverIds = list.stream().filter((elem) -> elem != null && elem.getDriverId() != null)
+                    .map((carRelateTeam) -> "'" + carRelateTeam.getDriverId() + "'")
+                    .collect(joining(","));
         }
         return driverIds;
     }
@@ -140,7 +131,7 @@ public class DriverQueryController {
     public Map<String,Object> querySupplierName(int supplierId){
         Map<String, Object> result = new HashMap<String, Object>();
         CarBizSupplier supplierEntity = carBizSupplierMapper.selectByPrimaryKey(supplierId);
-        if(supplierEntity!=null){
+        if(Objects.nonNull(supplierEntity)){
             result.put("supplierName", supplierEntity.getSupplierFullName());
         }else{
             result.put("supplierName", "");
@@ -154,7 +145,7 @@ public class DriverQueryController {
     public Map<String,Object> queryCityName(int cityId){
         Map<String, Object> result = new HashMap<String, Object>();
         CarBizCity cityEntity = carBizCityMapper.selectByPrimaryKey(cityId);
-        if(cityEntity!=null){
+        if(Objects.nonNull(cityEntity)){
             result.put("cityName", cityEntity.getCityName());
         }else{
             result.put("cityName", "");

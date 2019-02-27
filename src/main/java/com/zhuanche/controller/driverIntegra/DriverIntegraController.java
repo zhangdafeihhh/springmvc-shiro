@@ -8,6 +8,7 @@ import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.web.RequestFunction;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.driver.DriverTeamRelationEntity;
 import com.zhuanche.dto.driver.DriverVoEntity;
 import com.zhuanche.serv.rentcar.IDriverService;
@@ -34,7 +35,9 @@ import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.*;
 
-import static com.zhuanche.common.enums.MenuEnum.*;
+import static com.zhuanche.common.enums.MenuEnum.DRIVER_RANK_INTEGRAL_EXPORT;
+import static com.zhuanche.common.enums.MenuEnum.DRIVER_RANK_INTEGRAL_LIST;
+import static java.util.stream.Collectors.joining;
 
 @Controller
 @RequestMapping(value = "/driverIntegra")
@@ -56,7 +59,7 @@ public class DriverIntegraController {
 
     protected JSONObject gridJsonFormate(List<?> rows, long total) {
         rows = null == rows ? new ArrayList<>() : rows;
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<>();
         result.put(Common.RESULT_ROWS, rows);
         result.put(Common.RESULT_TOTAL, total);
 
@@ -86,29 +89,17 @@ public class DriverIntegraController {
             String cities = "";
             String suppliers = "";
             String teamIds = "";
-            if(citieSet != null){
-                for(Integer id : citieSet){
-                    if(StringUtils.isNotEmpty(cities)){
-                        cities += ",";
-                    }
-                    cities += id;
-                }
+            if (citieSet != null) {
+                cities = citieSet.stream().filter(Objects::nonNull)
+                        .map(Objects::toString).collect(joining(Constants.SEPERATER));
             }
-            if(supplierSet != null){
-                for(Integer id : supplierSet){
-                    if(StringUtils.isNotEmpty(suppliers)){
-                        suppliers += ",";
-                    }
-                    suppliers += id;
-                }
+            if (supplierSet != null){
+                suppliers = supplierSet.stream().filter(Objects::nonNull)
+                        .map(Objects::toString).collect(joining(Constants.SEPERATER));
             }
-            if(teamIdSet != null){
-                for(Integer id : teamIdSet){
-                    if(StringUtils.isNotEmpty(teamIds)){
-                        teamIds += ",";
-                    }
-                    teamIds += id;
-                }
+            if (teamIdSet != null){
+                teamIds = teamIdSet.stream().filter(Objects::nonNull)
+                        .map(Objects::toString).collect(joining(Constants.SEPERATER));
             }
             if (!"".equals(driverEntity.getTeamIds()) && driverEntity.getTeamIds() != null) {
                 teamIds = driverEntity.getTeamIds();

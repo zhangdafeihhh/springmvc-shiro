@@ -20,10 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class CreditCardService {
@@ -65,19 +62,20 @@ public class CreditCardService {
 
 	public boolean getValNum(String cardNo, String validity, String cvn2,
 			String name, String idCardNo, String phoneNumber,
-			String driverPhoneNumber) throws Exception {
-		Map<String, Object> returnMap = new HashMap<String, Object>();
+			String driverPhoneNumber) {
+		Map<String, Object> returnMap = new HashMap<>();
 		// 外部流水号，随机码
 		Random random = new Random();
-		String val = "";
+		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < 4; i++) {
-			val = val + random.nextInt(10);
+			builder.append(random.nextInt(10));
 		}
-		RedisCacheDriverUtil.set(driverPhoneNumber.trim(), val, 300);
+		String key = builder.toString();
+		RedisCacheDriverUtil.set(driverPhoneNumber.trim(), key, 300);
 		RegisterCard dto = new RegisterCard();
 		String customerId = driverPhoneNumber.trim();
 		dto.setCustomerId(customerId.trim());
-		dto.setExternalRefNumber("B_DB_" + driverPhoneNumber + val);
+		dto.setExternalRefNumber("B_DB_" + driverPhoneNumber + key);
 		dto.setCardHolderId(idCardNo.trim());
 		dto.setCardHolderName(name.trim());
 		dto.setExpiredDate(validity.trim());
@@ -91,13 +89,8 @@ public class CreditCardService {
 			String storablePan = author.getStorablePan();
 			// 保存卡信息到redis
 			RedisCacheDriverUtil.set("S_CARD" + driverPhoneNumber, storablePan,300);
-//			jedisTemplate.set("S_CARD" + driverPhoneNumber, storablePan,300);
-//			redisUtil.expire("S_CARD" + driverPhoneNumber.trim(), 300);
 			// 保存token到redis
 			RedisCacheDriverUtil.set("BIND" + driverPhoneNumber, author.getToken(),300);
-//			jedisTemplate.set("BIND" + driverPhoneNumber, author.getToken(),300);
-//			redisUtil.expire("BIND" + driverPhoneNumber.trim(), 300);
-
 			logger.info("******************** 司机获取验证码接口处理  author.getToken: " + author.getToken());
 			if (!StringUtils.isEmpty(author.getReturnTextMessage())) {
 				// return URLEncoder.encode(author.getReturnTextMessage()) ;
@@ -141,17 +134,12 @@ public class CreditCardService {
 	 * @param driverPhone 司机手机号
 	 * @param driverId 司机ID
 	 * @return
-	 * @throws Exception
 	 */
 	public Map<String, Object> addDriverCreditCard(String cardNo, String expireDate, String cvn2, String carHolderName,
 												   String idCardNo, String phoneNumber, String valCode, String driverPhone,
-												   Integer driverId) throws Exception {
-			Map<String, Object> returnMap = new HashMap<String, Object>();
-			String creditCardNo = cardNo;
-
-			String bandCardphone = phoneNumber;
+												   Integer driverId) {
+			Map<String, Object> returnMap = new HashMap<>();
 			String token = RedisCacheDriverUtil.get("BIND" + driverPhone, String.class);
-			String valdit = valCode;
 			if (token == null || token.equals("")) {
 				logger.info(LOGTAG + "司机绑定信用卡接口处理【银行Token过期】phoneNumber={},司机电话={}", phoneNumber, driverPhone);
 				returnMap.put("returnCode", "1");
@@ -175,24 +163,24 @@ public class CreditCardService {
 				return returnMap;
 			}
 
-			logger.info("******************** 司机绑定信用卡接口处理 creditCardNo:" + creditCardNo);
+			logger.info("******************** 司机绑定信用卡接口处理 creditCardNo:" + cardNo);
 			logger.info("******************** 司机绑定信用卡接口处理 shortCard:" + shortCard);
 			logger.info("******************** 司机绑定信用卡接口处理 expireDate:" + expireDate);
 			logger.info("******************** 司机绑定信用卡接口处理 cvn2:" + cvn2);
 			logger.info("******************** 司机绑定信用卡接口处理 driverPhone:" + driverPhone);
 			logger.info("******************** 司机绑定信用卡接口处理 carHolderName:" + carHolderName);
 			logger.info("******************** 司机绑定信用卡接口处理 idCardNo:" + idCardNo);
-			logger.info("******************** 司机绑定信用卡接口处理 bandCardphone:" + bandCardphone);
-			logger.info("******************** 司机绑定信用卡接口处理 valdit:" + valdit);
+			logger.info("******************** 司机绑定信用卡接口处理 bandCardphone:" + phoneNumber);
+			logger.info("******************** 司机绑定信用卡接口处理 valdit:" + valCode);
 			logger.info("******************** 司机绑定信用卡接口处理 token:" + token);
 			logger.info("******************** 司机绑定信用卡接口处理 val:" + val);
 
 		String quickPayCustomerID = carBizDriverInfoService.selectByPrimaryKey(driverId).getQuickpayCustomerid();
 
 		PayResultInfo payResultInfo = quickPayService.firstPayBill99Pay(3,
-					creditCardNo.trim(), shortCard.trim(), expireDate,
+				cardNo.trim(), shortCard.trim(), expireDate,
 					cvn2.trim(), quickPayCustomerID, carHolderName.trim(), idCardNo.trim(),
-					"", bandCardphone.trim(), valdit.trim(), token.trim(),"B_DB_"+driverPhone + val);
+					"", phoneNumber.trim(), valCode.trim(), token.trim(),"B_DB_"+driverPhone + val);
 
 			if (payResultInfo != null){
 				//获取返回消息状态
@@ -204,16 +192,12 @@ public class CreditCardService {
 					logger.info("*********备注：绑定成功;phone："+driverPhone+"");
 
 					// 查询数据库信息
-//					DriverMongoEntity driverMongo = driverMongoTemplate.findOne(
-//							new Query(Criteria.where("phone").is(driverPhone)),
-//							DriverMongoEntity.class);
-
 					// 增加绑定时间
 					// 信用卡短卡号绑定至司机信息
-					Map<String, Object> cardMap = new HashMap<String, Object>();
+					Map<String, Object> cardMap = new HashMap<>();
 					cardMap.put("driverId", driverId);
 					cardMap.put("phone", driverPhone);
-					cardMap.put("creditCardNo", cardNo.substring(0,4) + " **** **** " + cardNo.substring(12, cardNo.length()));
+					cardMap.put("creditCardNo", cardNo.substring(0,4) + " **** **** " + cardNo.substring(12));
 					cardMap.put("shortCardNo", shortCard);
 					Date bindTime = new Date(System.currentTimeMillis());
 					String bindStr = sdf.format(bindTime);
@@ -222,7 +206,6 @@ public class CreditCardService {
 					cardMap.put("expireDate", expireDate);
 					cardMap.put("CVN2", cvn2);
 					cardMap.put("creditOpenAccountBank",payResultInfo.getIssuer());
-//					cardMap.put("quickpayCustomerid",payResultInfo.getCustomerId());
 					cardMap.put("updateBy", WebSessionUtil.getCurrentLoginUser().getId());
 					carBizDriverInfoService.updateDriverCardInfo(cardMap);
 					// 查询司机账户信息
@@ -240,7 +223,7 @@ public class CreditCardService {
 						cb = carBizDriverAccount.getCreditBalance();
 						cbHis = carBizDriverAccount.getCreditBalanceHis();
 						outCurr = carBizDriverAccount.getOutCurrAccount();
-						if("".equals(outCurr)||outCurr==null){
+						if(Objects.isNull(outCurr)){
 							outCurr = 0.0;
 						}
 						outHis = carBizDriverAccount.getOutHisAccount();
@@ -292,15 +275,9 @@ public class CreditCardService {
 		String quickPayCustomerID = carBizDriverInfoService.selectByPrimaryKey(driverId).getQuickpayCustomerid();
 		if(quickPayCustomerID==null || quickPayCustomerID=="" || quickPayCustomerID.length()==0) {
 			logger.info("******************** 司机获取验证码接口处理【开始】phone={},开始生成customerID", driverPhone);
-//				driverVO =  driverAccountDetailService.getDriverInfo(driverVO);
-//				int driverID =driverVO.getDriverId();// 2621;
-
 			String tmpID = "00000000" + driverId;
-//				String.valueOf(driverID);
-			tmpID = tmpID.substring(tmpID.length()-8, tmpID.length());
-
+			tmpID = tmpID.substring(tmpID.length()-8);
 			quickPayCustomerID = bindType + tmpID.substring(0, 3) + "D" + tmpID.substring(3,6) + "B" + tmpID.substring(6, 8);
-
 			Map<String, Object> updateMap = new HashMap<String, Object>();
 			updateMap.put("quickpayCustomerID", quickPayCustomerID);
 			updateMap.put("driverID", driverId);
@@ -309,12 +286,12 @@ public class CreditCardService {
 		}
 		// 外部流水号，随机码
 		Random random = new Random();
-		String val = "";
+		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < 4; i++) {
-			val = val + random.nextInt(10);
+			builder.append(random.nextInt(10));
 		}
-		RedisCacheDriverUtil.set(driverPhone.trim(), val,300);
-//			jedisTemplate.expire(driverPhoneNumber.trim(), 300);
+		String key = builder.toString();
+		RedisCacheDriverUtil.set(driverPhone.trim(), key,300);
 
 		logger.info("******************** 司机获取验证码接口处理【开始】phone={},调用获取动态码接口开始" , driverPhone);
 		/**
@@ -332,7 +309,7 @@ public class CreditCardService {
 		 */
 		Author author = quickPayService.getDyncCode(
 				quickPayCustomerID,
-				"B_DB_"+driverPhone + val,
+				"B_DB_"+driverPhone + key,
 				idCardNo.trim(),
 				cardHolderName.trim(),
 				expireDate.trim(),

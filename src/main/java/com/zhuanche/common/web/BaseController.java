@@ -11,16 +11,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author wzq
  */
 public class BaseController {
 
-	private final String RESULTKEY = "result";
-	private final Integer SUCCESS = 1;
-	private final Integer FAILED = 0;
-	private final String ERRORMSGKEY = "errorMsg";
 
 	@Autowired
     private CarBizSupplierService carBizSupplierService;
@@ -34,13 +31,13 @@ public class BaseController {
         CarBizSupplier carBizSupplier = new CarBizSupplier();
         carBizSupplier.setSupplierId(supplierId);
         CarBizSupplier supplierEntity = carBizSupplierService.queryForObject(carBizSupplier);
-        if(!"".equals(supplierEntity)&&supplierEntity!=null){
+        if(Objects.nonNull(supplierEntity)){
             result.put("supplierName", supplierEntity.getSupplierFullName());
         }else{
             result.put("supplierName", "");
         }
         CarBizCity cityEntity = carBizCityService.selectByPrimaryKey(cityId);
-        if(!"".equals(cityEntity)&&cityEntity!=null){
+        if(Objects.nonNull(cityEntity)){
             result.put("cityName", cityEntity.getCityName());
         }else{
             result.put("cityName", "");

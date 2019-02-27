@@ -8,25 +8,22 @@ public enum EnumDriverDutyTimeFlag {
 	
 	
 	private String key;
-	public String value;
+	private String value;
 	
-	private EnumDriverDutyTimeFlag(String key, String value) {
+	EnumDriverDutyTimeFlag(String key, String value) {
 		this.key = key;
 		this.value = value;
 	}
 	public String getValue() {
 		return value;
 	}
-	public void setValue(String value) {
-		this.value = value;
-	}
+
 	public String getKey() {
 		return key;
 	}
-	public void setKey(String key) {
-		this.key = key;
-	}
+
 	private static EnumDriverDutyTimeFlag[] enums  = EnumDriverDutyTimeFlag.values();
+
 	public static String getKey(String value) {
 		for (EnumDriverDutyTimeFlag keyEnum: enums) {
 			if (value.equals(keyEnum.value)) {

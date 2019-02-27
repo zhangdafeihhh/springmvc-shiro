@@ -265,11 +265,9 @@ public class SubscriptionReportConfigureService {
             }
             String suppliers = "";
             Map<String, CarDriverTeam> byTeams = Maps.newHashMap();
-            if(teamList!=null) {
-                for (CarDriverTeam carDriverTeam : teamList) {
-                    byTeams.put("t_" + carDriverTeam.getId(), carDriverTeam);
-                    suppliers += "," + carDriverTeam.getSupplier();
-                }
+            for (CarDriverTeam carDriverTeam : teamList) {
+                byTeams.put("t_" + carDriverTeam.getId(), carDriverTeam);
+                suppliers += "," + carDriverTeam.getSupplier();
             }
             if(suppliers.length()>1){
                 suppliers = suppliers.substring(1,suppliers.length());
@@ -279,10 +277,8 @@ public class SubscriptionReportConfigureService {
                 return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "选择供应商不存在");
             }
             Map<String, CarBizSupplierDTO> bySuppliers = Maps.newHashMap();
-            if(supplierList != null){
-                for(CarBizSupplierDTO supplierDTO :supplierList){
-                    bySuppliers.put("s_"+supplierDTO.getSupplierId(), supplierDTO);
-                }
+            for(CarBizSupplierDTO supplierDTO :supplierList){
+                bySuppliers.put("s_"+supplierDTO.getSupplierId(), supplierDTO);
             }
             CarDriverTeam teamTemp = null;
             CarBizSupplierDTO supplierTemp = null;

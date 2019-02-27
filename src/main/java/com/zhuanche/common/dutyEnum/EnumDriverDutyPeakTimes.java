@@ -6,24 +6,18 @@ public enum EnumDriverDutyPeakTimes {
 	DRIVEDUTYPEAKTIMES_THREE(3,"其他时段1"),
 	DRIVEDUTYPEAKTIMES_FOUR(4,"其他时段2");
 	
-	public int value;
+	private int value;
 	private String key;
 	
-	private EnumDriverDutyPeakTimes(int value, String key) {
+	EnumDriverDutyPeakTimes(int value, String key) {
 		this.value = value;
 		this.key = key;
 	}
 	public int getValue() {
 		return value;
 	}
-	public void setValue(int value) {
-		this.value = value;
-	}
 	public String getKey() {
 		return key;
-	}
-	public void setKey(String key) {
-		this.key = key;
 	}
 	private static EnumDriverDutyPeakTimes[] enums  = EnumDriverDutyPeakTimes.values();
 	public static String getKey(int value) {

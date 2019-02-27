@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.zhuanche.common.enums.MenuEnum.*;
 
@@ -82,8 +83,8 @@ public class RiskOrderComplainController {
             paramMap.put("pageSize", pageSize);
 
             // 数据权限设置
-            Set<Integer> cityIdsForAuth = new HashSet<Integer>();// 非超级管理员可以管理的所有城市ID
-            Set<Integer> supplierIdsForAuth = new HashSet<Integer>();// 非超级管理员可以管理的所有供应商ID
+            Set<Integer> cityIdsForAuth = new HashSet<>();// 非超级管理员可以管理的所有城市ID
+            Set<Integer> supplierIdsForAuth = new HashSet<>();// 非超级管理员可以管理的所有供应商ID
             if (!WebSessionUtil.isSupperAdmin()) {// 非超级管理员
                 // 获取当前登录用户信息
                 SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
@@ -94,20 +95,12 @@ public class RiskOrderComplainController {
             }
             // 查询参数设置
             String citys = "";
-            for(Integer cityId : cityIdsForAuth){
-                if(StringUtils.isEmpty(citys)){
-                    citys += cityId;
-                }else {
-                    citys += (","+cityId);
-                }
+            if (cityIdsForAuth != null && !cityIdsForAuth.isEmpty()){
+                citys = cityIdsForAuth.stream().filter(Objects::nonNull).map(Objects::toString).collect(Collectors.joining(","));
             }
             String supplierIds = "";
-            for(Integer supplierId : supplierIdsForAuth){
-                if(StringUtils.isEmpty(supplierIds)){
-                    supplierIds += supplierId;
-                }else {
-                    supplierIds += (","+supplierId);
-                }
+            if (supplierIdsForAuth != null && !supplierIdsForAuth.isEmpty()){
+                supplierIds = supplierIdsForAuth.stream().filter(Objects::nonNull).map(Objects::toString).collect(Collectors.joining(","));
             }
             if(StringUtils.isNotEmpty(citys)){
                 paramMap.put("citys", citys);
@@ -239,7 +232,7 @@ public class RiskOrderComplainController {
                 + "},complainReason:{" + complainReason + "}");
         try {
             String reason = URLEncoder.encode(request.getParameter("complainReason"),"UTF-8");
-            Map<String, Object> paramMap = new HashMap<String, Object>();
+            Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("orderNo", orderNo);
             paramMap.put("complainReason", reason);
             SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
@@ -249,7 +242,7 @@ public class RiskOrderComplainController {
                     String.class, paramMap);
             JSONObject resultJson = JSON.parseObject(result);
            Integer code = resultJson.getInteger("code");
-           if(code != null && code.intValue() == 0){
+           if(code != null && code.equals(0)){
                return AjaxResponse.success(null);
            }else{
                return AjaxResponse.fail(RestErrorCode.RISK_SUBMITCOMPLAIN_FAIL,result);

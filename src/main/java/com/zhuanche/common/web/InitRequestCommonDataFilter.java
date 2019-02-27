@@ -67,12 +67,10 @@ public class InitRequestCommonDataFilter extends OncePerRequestFilter {
 		//二、多环境信息
 		if(envName==null) {
 			envName = request.getServletContext().getInitParameter("env.name");
-			if(envName==null || Arrays.asList(new String[]{"dev","test","pre","online"}).contains(envName)==false ) {
+			if(envName==null || !Arrays.asList(new String[]{"dev","test","pre","online"}).contains(envName)) {
 				envName = "IDE";
 			}
-			if(envName!=null) {
-				envName = envName.toUpperCase();
-			}
+			envName = envName.toUpperCase();
 		}
 		MDC.put("env", envName);
 		
@@ -83,6 +81,7 @@ public class InitRequestCommonDataFilter extends OncePerRequestFilter {
 				pop.load( this.getClass().getClassLoader().getResourceAsStream("application-allenv.properties") );
 				staticResourceVersion = pop.getProperty("staticResourceVersion");
 			}catch(Exception e) {
+				logger.error("", e);
 			}
 		}
 		if(staticResourceVersion==null || "".equals(staticResourceVersion.trim())) {
@@ -94,7 +93,7 @@ public class InitRequestCommonDataFilter extends OncePerRequestFilter {
 		if(ssoLogoutUrl==null || cmsLogoutUrl==null) {
 			try {
 				String env = request.getServletContext().getInitParameter("env.name");
-				if( Arrays.asList(new String[]{"dev","test","pre","online"}).contains(env)==false) {//有的IDE不能自动替换
+				if( !Arrays.asList(new String[]{"dev","test","pre","online"}).contains(env) ) {//有的IDE不能自动替换
 					env = "dev";
 				}
 				Properties pop = new Properties();

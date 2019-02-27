@@ -351,9 +351,7 @@ public class MessageService {
     public Integer unReadCount(int userId) throws MessageException{
 
         try {
-            Integer count = receiverExMapper.messageUnreadCount(Long.valueOf(userId));
-
-            return count;
+            return receiverExMapper.messageUnreadCount((long) userId);
         } catch (Exception e) {
             throw new MessageException(RestErrorCode.UNKNOWN_ERROR,RestErrorCode.renderMsg(RestErrorCode.UNKNOWN_ERROR));
         }
@@ -362,15 +360,15 @@ public class MessageService {
 
     /**
      * 获取详情
-     * @param messaageId
+     * @param messageId
      * @param userId
      * @return
      * @throws MessageException
      */
-    public CarMessageDetailDto messageDetail(Integer messaageId, Integer userId) throws MessageException{
+    public CarMessageDetailDto messageDetail(Integer messageId, Integer userId) throws MessageException{
 
         try {
-            CarMessagePost carMessagePost = postExMapper.selectByPrimaryKey(Long.valueOf(messaageId));
+            CarMessagePost carMessagePost = postExMapper.selectByPrimaryKey(Long.valueOf(messageId));
 
             CarMessageDetailDto detailDto = new CarMessageDetailDto(
                     carMessagePost.getMesageTitle(),carMessagePost.getMessageContent(),
@@ -380,11 +378,10 @@ public class MessageService {
             detailDto.setCities(carMessagePost.getCities());
             detailDto.setSuppliers(carMessagePost.getSuppliers());
             detailDto.setTeamids(carMessagePost.getTeamids());
-            /**返回前端的级别**/
-            String str   = Integer.toBinaryString(carMessagePost.getLevel());
+            String str = Integer.toBinaryString(carMessagePost.getLevel());
             String levelToStr = "";
             String[] levelStr = {"1","2","4","8"};
-            for(int t  = 0;t<str.length();t++){
+            for(int t = 0; t < str.length(); t++){
                 char c = str.charAt(t);
                 if (c=='1'){
                     levelToStr += levelStr[str.length()-t-1] +",";
@@ -413,21 +410,21 @@ public class MessageService {
                     break;
                 case Constants.SUPPY:
                     detailDto.setLevelName(CarMessagePost.Level.suppy.getName());
-                    detailDto.setSuppliersName(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
+                    detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
                     break;
                 case Constants.CONTRYANDSUPPY:
                     detailDto.setLevelName(CarMessagePost.Level.contryAndSuppy.getName());
-                    detailDto.setSuppliersName(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
+                    detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
                     break;
                 case Constants.CITYANDSUPPY:
                     detailDto.setLevelName(CarMessagePost.Level.cityAndSuppy.getName());
                     detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
-                    detailDto.setSuppliersName(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
+                    detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
                     break;
                 case Constants.CONTRYANDCITYANDSUPPY:
                     detailDto.setLevelName(CarMessagePost.Level.contryAndCityAndSuppy.getName());
                     detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
-                    detailDto.setSuppliersName(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
+                    detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
                     break;
                 case Constants.TEAM:
                     detailDto.setLevelName(CarMessagePost.Level.team.getName());
@@ -449,24 +446,24 @@ public class MessageService {
                     break;
                 case Constants.SUPPYANDTEAM:
                     detailDto.setLevelName(CarMessagePost.Level.suppyAndTeam.getName());
-                    detailDto.setSuppliersName(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
+                    detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
                     detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
                     break;
                 case Constants.CONTRYANDSUPPYANDTEAM:
                     detailDto.setLevelName(CarMessagePost.Level.contryAndSuppyAndTeam.getName());
-                    detailDto.setSuppliersName(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
+                    detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
                     detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
                     break;
                 case Constants.CITYANDSUPPYANDTEAM:
                     detailDto.setLevelName(CarMessagePost.Level.cityAndSuppyAndTeam.getName());
                     detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
-                    detailDto.setSuppliersName(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
+                    detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
                     detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
                     break;
                 case Constants.CONTRYANDCITYANDSUPPYANDTEAM:
                     detailDto.setLevelName(CarMessagePost.Level.counryAndCityAndSuppyAndTeam.getName());
                     detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
-                    detailDto.setSuppliersName(this.getSuppyNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
+                    detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
                     detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
                     break;
                 default:
@@ -476,7 +473,7 @@ public class MessageService {
 
 
                 //已读
-                List<CarMessageReceiver> list = receiverExMapper.carMessageReceiverList(messaageId,null,CarMessageReceiver.ReadStatus.read.getValue());
+                List<CarMessageReceiver> list = receiverExMapper.carMessageReceiverList(messageId,null,CarMessageReceiver.ReadStatus.read.getValue());
                 List<Integer> listUsers = new ArrayList<>();
                 for (CarMessageReceiver receiver : list){
                     listUsers.add(receiver.getReceiveUserId());
@@ -500,8 +497,8 @@ public class MessageService {
             }
 
 
-            List<CarMessageDoc> listDoc = new ArrayList<>();
-            listDoc = docExMapper.listDoc(Long.valueOf(messaageId));
+            List<CarMessageDoc> listDoc;
+            listDoc = docExMapper.listDoc(Long.valueOf(messageId));
             List<MessageDocDto> messageDocDtoList = new ArrayList<>();
             for (CarMessageDoc doc  : listDoc){
                 MessageDocDto messageDocDto = new MessageDocDto(doc.getDocName(),doc.getDocUrl());
@@ -515,10 +512,10 @@ public class MessageService {
                 detailDto.setCreateUser(createrList.get(0).getUserName());
                 detailDto.setPhone(createrList.get(0).getPhone());
             }
-            detailDto.setId(messaageId.longValue());
+            detailDto.setId(messageId.longValue());
 
             try {
-                List<CarMessageReceiver> listUnRead = receiverExMapper.carMessageReceiverList(messaageId,userId,CarMessageReceiver.ReadStatus.unRead.getValue());
+                List<CarMessageReceiver> listUnRead = receiverExMapper.carMessageReceiverList(messageId,userId,CarMessageReceiver.ReadStatus.unRead.getValue());
                 if (CollectionUtils.isNotEmpty(listUnRead)){
                     int code = receiverExMapper.updateReadState(listUnRead.get(0).getId());
                     if (code > 0){
@@ -564,18 +561,18 @@ public class MessageService {
     /**
      * 获取加盟商名称
      * @param cities
-     * @param suppy
+     * @param suppliers
      * @return
      */
-    private String getSuppyNames(String cities,String suppy){
+    private String getSupplierNames(String cities, String suppliers){
         List<CarBizSupplier> carBizSupplierList = carBizSupplierExMapper.querySuppliers(this.getCities(cities), null);
         Map<Integer,String> map = new HashMap<>();
         for (CarBizSupplier supplier : carBizSupplierList){
             map.put(supplier.getSupplierId(),supplier.getSupplierFullName());
         }
         StringBuffer sb = new StringBuffer();
-        if (StringUtils.isNotEmpty(suppy)){
-            String[] suppyArray = suppy.split(Constants.SEPERATER);
+        if (StringUtils.isNotEmpty(suppliers)){
+            String[] suppyArray = suppliers.split(Constants.SEPERATER);
             for (String str : suppyArray){
                 if (StringUtils.isNotBlank(map.get(Integer.valueOf(str)))){
                     sb.append(map.get(Integer.valueOf(str))).append(" ");
@@ -632,9 +629,7 @@ public class MessageService {
             return null;
         String[] strArray = str.split(Constants.SEPERATER);
         Set<String> setStr = new HashSet<>();
-        for (String s : strArray){
-            setStr.add(s);
-        }
+        Collections.addAll(setStr, strArray);
         return setStr;
 
     }
