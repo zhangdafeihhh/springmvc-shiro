@@ -90,7 +90,7 @@ public class DriverActionController {
     @RequestMapping("/timeLine")
     @ResponseBody
     @RequestFunction(menu = DRIVER_ACTION_TIMELINE)
-    @RequiresPermissions(value = "DriverAction_TimeLine")
+//    @RequiresPermissions(value = "DriverAction_TimeLine")
     public AjaxResponse getActionTimeLine(DriverActionVO driverActionVO){
         if (driverActionVO.getDriverId() == null || StringUtils.isBlank(driverActionVO.getTime())){
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "司机id 查询时间不能为空");
