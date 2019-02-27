@@ -25,8 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
-import static com.zhuanche.common.enums.MenuEnum.DRIVER_ACTION_ENUM;
-import static com.zhuanche.common.enums.MenuEnum.DRIVER_ACTION_LIST;
+import static com.zhuanche.common.enums.MenuEnum.*;
 
 @RequestMapping("/driverAction")
 @Controller
@@ -54,18 +53,13 @@ public class DriverActionController {
         if (StringUtils.isEmpty(driverActionVO.getTime())){
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "查询时间不能为空");
         }
-        String tableDate;
         try {
-            tableDate = transferDate(driverActionVO.getTime());
-        }catch (IllegalArgumentException e){
-            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "日期格式错误");
-        }catch (Exception e){
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-        }
-        String table = TABLE_PREFIX + tableDate;
-        try {
+            String table = transferTableName(driverActionVO.getTime());
             PageDTO actionList = actionService.getActionList(driverActionVO, table, orderNo, pageNum, pageSize);
             return AjaxResponse.success(actionList);
+        }
+        catch (IllegalArgumentException e){
+            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, e.getMessage());
         }
         catch (PermissionException e){
             return AjaxResponse.failMsg(RestErrorCode.HTTP_FORBIDDEN, e.getMessage());
@@ -93,17 +87,34 @@ public class DriverActionController {
         return AjaxResponse.success(result);
     }
 
-    private String transferDate(String date) {
+    @RequestMapping("/timeLine")
+    @ResponseBody
+    @RequestFunction(menu = DRIVER_ACTION_TIMELINE)
+//    @RequiresPermissions(value = "DriverAction_TimeLine")
+    public AjaxResponse getActionTimeLine(DriverActionVO driverActionVO){
+        if (driverActionVO.getDriverId() == null || StringUtils.isBlank(driverActionVO.getTime())){
+            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "司机id 查询时间不能为空");
+        }
+        try {
+            String tableName = transferTableName(driverActionVO.getTime());
+            return AjaxResponse.success(actionService.queryTimeLine(driverActionVO, tableName));
+        }catch (IllegalArgumentException e){
+            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, e.getMessage());
+        }catch (PermissionException e){
+            return AjaxResponse.failMsg(RestErrorCode.HTTP_FORBIDDEN, e.getMessage());
+        }
+    }
+
+    private String transferTableName(String date) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             Date parse = dateFormat.parse(date);
             SimpleDateFormat format= new SimpleDateFormat("yyyy_MM_dd");
-            return format.format(parse);
+            return "car_biz_driver_record_" + format.format(parse);
         } catch (ParseException e) {
             logger.error("转换日期格式错误", e);
             throw new IllegalArgumentException("date日期错误");
         }
     }
 
-    private static final String TABLE_PREFIX = "car_biz_driver_record_";
 }

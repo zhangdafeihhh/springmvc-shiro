@@ -84,14 +84,7 @@ public class DriverActionServiceImpl implements DriverActionService {
         Map<String, Object> params = generateParamsMap(driverActionVO, loginUser);
         CarBizDriverInfoDTO driverInfoDTO = driverInfoExMapper.queryDriverIdByActionVO(params);
         if (driverInfoDTO != null && driverInfoDTO.getDriverId() != null) {
-            Integer teamId = carRelateTeamExMapper.getTeamIdByDriverId(driverInfoDTO.getDriverId());
-            if (teamId != null) {
-                Set<Integer> teamIds = loginUser.getTeamIds();
-                if (teamIds != null && !teamIds.isEmpty() && !teamIds.contains(teamId)) {
-                    logger.error("查询权限不足 userId : {} , driverId : {}", loginUser.getId(), driverInfoDTO.getDriverId());
-                    throw new PermissionException("查询权限不足");
-                }
-            }
+            hasDataPermission(driverInfoDTO, loginUser);
             params.clear();
             params.put("driverId", driverInfoDTO.getDriverId());
             params.put("orderNo", orderNo);
@@ -111,6 +104,31 @@ public class DriverActionServiceImpl implements DriverActionService {
             PageHelper.clearPage();
         }
         return new PageDTO(pageNum, pageSize, total, list);
+    }
+
+    @Override
+    public List<DriverActionVO> queryTimeLine(DriverActionVO driverActionVO, String tableName) {
+        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+        Map<String, Object> params = generateParamsMap(driverActionVO, loginUser);
+        CarBizDriverInfoDTO driverInfoDTO = driverInfoExMapper.queryDriverIdByActionVO(params);
+        if (driverInfoDTO != null && driverInfoDTO.getDriverId() != null) {
+            hasDataPermission(driverInfoDTO, loginUser);
+            return transferDataType(actionDtoExMapper.queryActionTimeLine(tableName, driverActionVO.getDriverId(), driverActionVO.getTime()), driverInfoDTO);
+        } else {
+            logger.error("司机信息查询失败,查询参数 {}", ((JSONObject)JSONObject.toJSON(params)).toJSONString());
+            throw new PermissionException("司机信息不存在");
+        }
+    }
+
+    private void hasDataPermission(CarBizDriverInfoDTO driverInfoDTO, SSOLoginUser loginUser){
+        Integer teamId = carRelateTeamExMapper.getTeamIdByDriverId(driverInfoDTO.getDriverId());
+        if (teamId != null) {
+            Set<Integer> teamIds = loginUser.getTeamIds();
+            if (teamIds != null && !teamIds.isEmpty() && !teamIds.contains(teamId)) {
+                logger.error("查询权限不足 userId : {} , driverId : {}", loginUser.getId(), driverInfoDTO.getDriverId());
+                throw new PermissionException("查询权限不足");
+            }
+        }
     }
 
     private List<DriverActionVO> transferDataType(List<DriverActionDto> dataList, CarBizDriverInfoDTO driverInfoDTO) {

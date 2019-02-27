@@ -41,4 +41,23 @@
         </where>
         order by action_time desc
     </select>
+
+    <select id="queryActionTimeLine" resultMap="BaseResultMap">
+        select
+            id,
+            driver_id,
+            action,
+            action_time
+        from
+          ${tableName}
+        <where>
+            <if test="driverId != null">
+              and driver_id = #{driverId}
+            </if>
+            <if test="driverId != null">
+                and DATE_FORMAT(action_time,'%Y-%m-%d')= DATE_FORMAT(#{time},'%Y-%m-%d')
+            </if>
+        </where>
+        order by action_time desc
+    </select>
 </mapper>
