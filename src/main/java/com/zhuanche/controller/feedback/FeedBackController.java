@@ -170,7 +170,7 @@ public class FeedBackController {
     ){
 
         //最大不能输入500字
-        if (feedbackContent.length() >= 500){
+        if (feedbackContent.length() > 500){
             return AjaxResponse.fail(RestErrorCode.MESSAGE_CONTENT_ERROR);
         }
 
@@ -244,8 +244,7 @@ public class FeedBackController {
 
         try {
             String path = "";  //服务器
-//            File file = new File(path + File.separator + fileUrl);
-            File file = new File(fileName);
+             File file = new File(path + fileUrl);
             HttpHeaders headers = new HttpHeaders();
             //下载显示的文件名，解决中文名称乱码问题
             //通知浏览器以attachment（下载方式）打开图片
