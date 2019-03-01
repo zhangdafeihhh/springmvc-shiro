@@ -248,7 +248,7 @@ public class FeedBackController {
             ){
 
         //最大不能输入500字
-        if (manageContent.length() >= 500){
+        if (manageContent.length() > 500){
             return AjaxResponse.fail(RestErrorCode.MESSAGE_CONTENT_ERROR);
         }
 
