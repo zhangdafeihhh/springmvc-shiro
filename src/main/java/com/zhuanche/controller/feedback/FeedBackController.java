@@ -71,7 +71,7 @@ public class FeedBackController {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
     @RequestFunction(menu = MenuEnum.PROBLEM_FEED_BACK_QUERY)
-    @RequiresPermissions("ProblemFeedbacks_look")
+    //@RequiresPermissions("ProblemFeedbacks_look")
     public AjaxResponse dataList(
             @RequestParam(value = "createTimeStart",required = false) String createTimeStart,
             @RequestParam(value = "createTimeEnd", required = false) String createTimeEnd,
@@ -111,7 +111,7 @@ public class FeedBackController {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
     @RequestFunction(menu = MenuEnum.PROBLEM_FEED_BACK_QUERY)
-    @RequiresPermissions("ProblemFeedbacks_look")
+    //@RequiresPermissions("ProblemFeedbacks_look")
     public AjaxResponse dataListSelf(
             @RequestParam(value = "createTimeStart",required = false) String createTimeStart,
             @RequestParam(value = "createTimeEnd", required = false) String createTimeEnd,
@@ -154,7 +154,7 @@ public class FeedBackController {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
     })
     @RequestFunction(menu = MenuEnum.PROBLEM_FEED_BACK_ADD)
-    @RequiresPermissions("PROBLEM_FEED_BACK_ADD")
+    //@RequiresPermissions("PROBLEM_FEED_BACK_ADD")
     public AjaxResponse addFeedBack(
             @Verify(param = "feedbackContent",rule = "required") String feedbackContent,
             @RequestParam(value = "files",required = false) MultipartFile[] multipartFiles
@@ -205,7 +205,7 @@ public class FeedBackController {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
     @RequestFunction(menu = MenuEnum.PROBLEM_FEED_BACK_DOWNLOAD)
-    @RequiresPermissions("PROBLEM_FEED_BACK_DOWNLOAD")
+    //@RequiresPermissions("PROBLEM_FEED_BACK_DOWNLOAD")
     public ResponseEntity<byte[]> download(@Verify(param = "feedbackDocId",rule = "required") Integer feedbackDocId) throws Exception {
 
         FeedbackDoc feedbackDoc = feedBackDocService.selectFeedBackDocById(feedbackDocId);
@@ -256,7 +256,7 @@ public class FeedBackController {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
     @RequestFunction(menu = MenuEnum.PROBLEM_FEED_BACK_QUERY)
-    @RequiresPermissions("ProblemFeedbacks_look")
+    //@RequiresPermissions("ProblemFeedbacks_look")
     public AjaxResponse feedBackDetail(@Verify(param = "id",rule = "required") Integer id){
 
         try {
@@ -287,7 +287,7 @@ public class FeedBackController {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
     })
     @RequestFunction(menu = MenuEnum.PROBLEM_FEED_BACK_MANAGE)
-    @RequiresPermissions("PROBLEM_FEED_BACK_MANAGE")
+    //@RequiresPermissions("PROBLEM_FEED_BACK_MANAGE")
     public AjaxResponse updateFeedBack(
             @Verify(param = "feedbackId",rule = "required") Integer feedbackId,
             @Verify(param = "manageContent",rule = "required") String manageContent
