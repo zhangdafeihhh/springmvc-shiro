@@ -7,6 +7,7 @@
     <result column="message_content" property="messageContent" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="level" property="level" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
     <result column="cities" property="cities" jdbcType="VARCHAR" />
     <result column="suppliers" property="suppliers" jdbcType="VARCHAR" />
     <result column="teamIds" property="teamids" jdbcType="VARCHAR" />
@@ -15,7 +16,7 @@
   </resultMap>
   <sql id="Base_Column_List" >
     id, mesage_title, message_content, status, level, cities, suppliers,
-    teamIds, create_time, update_time
+    teamIds, create_time, update_time,user_id
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 

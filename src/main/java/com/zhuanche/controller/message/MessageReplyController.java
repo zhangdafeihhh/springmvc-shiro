@@ -52,7 +52,7 @@ public class MessageReplyController {
             ){
 
         //最大不能输入500字
-        if (replyContent.length() >= 500){
+        if (replyContent.length() > 500){
             return AjaxResponse.fail(RestErrorCode.MESSAGE_CONTENT_ERROR);
         }
 
