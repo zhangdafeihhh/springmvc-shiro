@@ -175,5 +175,7 @@ public interface CarBizDriverInfoExMapper {
 
     void updateDriverCooperationTypeBySupplierId(Map<String, Object> map);
 
-    CarBizDriverInfoDTO queryDriverIdByActionVO(Map map);
+    List<CarBizDriverInfoDTO> queryDriverIdsByActionVO(Map map);
+
+    CarBizDriverInfoDTO queryDriverIdByActionVO(Map<String, Object> params);
 }

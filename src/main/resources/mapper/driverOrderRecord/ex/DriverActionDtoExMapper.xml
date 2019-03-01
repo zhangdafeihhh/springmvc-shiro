@@ -29,8 +29,11 @@
         from
           ${tableName}
         <where>
-            <if test="driverId != null">
+            <if test="driverId != null and driverId != ''">
               and driver_id = #{driverId}
+            </if>
+            <if test="driverIds != null and driverIds != ''">
+                and driver_id in (${driverIds})
             </if>
             <if test="actionId != null">
               and action = #{actionId}
