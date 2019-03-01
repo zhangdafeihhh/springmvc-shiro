@@ -97,6 +97,52 @@ public class FeedBackController {
     }
 
     /**
+     * 个人问题反馈分页列表
+     * @param createTimeStart
+     * @param createTimeEnd
+     * @param manageStatus
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @RequestMapping(value = "/dataListSelf")
+    @ResponseBody
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
+    @RequestFunction(menu = MenuEnum.PROBLEM_FEED_BACK_QUERY)
+    @RequiresPermissions("ProblemFeedbacks_look")
+    public AjaxResponse dataListSelf(
+            @RequestParam(value = "createTimeStart",required = false) String createTimeStart,
+            @RequestParam(value = "createTimeEnd", required = false) String createTimeEnd,
+            @RequestParam(value = "manageStatus",required = false) Integer manageStatus,
+            @RequestParam(value = "pageNum", defaultValue = "0") Integer pageNum,
+            @RequestParam(value = "pageSize", defaultValue = "30") Integer pageSize
+    ){
+
+        SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+        if (null == currentLoginUser){
+            return AjaxResponse.fail(RestErrorCode.HTTP_INVALID_SESSION);
+        }
+
+        Page p = PageHelper.startPage(pageNum, pageSize, true);
+        int total = 0;
+        List<Feedback> feedbackList = null;
+        try {
+            Integer userId = currentLoginUser.getId();
+            feedbackList = feedBackService.findDataListSelf(createTimeStart,createTimeEnd,manageStatus, userId);
+            total = (int) p.getTotal();
+        } finally {
+            PageHelper.clearPage();
+        }
+        if (null == feedbackList){
+            feedbackList = Lists.newArrayList();
+        }
+        PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, feedbackList);
+        return AjaxResponse.success(pageDTO);
+    }
+
+    /**
      * 问题反馈新增
      * @param feedbackContent
      * @param multipartFiles

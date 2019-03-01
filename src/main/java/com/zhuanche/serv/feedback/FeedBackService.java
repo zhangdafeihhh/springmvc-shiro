@@ -153,6 +153,18 @@ public class FeedBackService {
         return map;
     }
 
+    /**
+     * 查询用户自己的历史反馈
+     * @param createTimeStart
+     * @param createTimeEnd
+     * @param manageStatus
+     * @param userId
+     * @return
+     */
+    public List<Feedback> findDataListSelf(String createTimeStart, String createTimeEnd, Integer manageStatus, Integer userId) {
+        return feedbackExMapper.findDataListSelf(createTimeStart, createTimeEnd, manageStatus, userId);
+    }
+
     private String getRemoteFileDir() {
         Calendar now = Calendar.getInstance();
         StringBuilder sb = new StringBuilder();

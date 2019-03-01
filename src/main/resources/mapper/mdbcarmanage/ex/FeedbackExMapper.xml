@@ -36,4 +36,21 @@
         ORDER BY create_time DESC
     </select>
 
+    <select id="findDataListSelf" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from feedback
+        where sender_id = #{userId}
+        <if test="createTimeStart !=null and createTimeStart !=''">
+            <![CDATA[ and create_time >= #{createTimeStart} ]]>
+        </if>
+        <if test="createTimeEnd !=null and createTimeEnd !=''">
+            <![CDATA[ and create_time <= #{createTimeEnd} ]]>
+        </if>
+        <if test="manageStatus != null">
+            and manage_status = #{manageStatus}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
 </mapper>
