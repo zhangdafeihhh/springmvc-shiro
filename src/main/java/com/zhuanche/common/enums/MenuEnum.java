@@ -36,6 +36,7 @@ public enum MenuEnum {
     SUPPLIER_UPDATE(MenuConstants.CAR_MANAGE, MenuConstants.SUPPLIER_MANAGE, MenuConstants.SUPPLIER_MANAGE, "修改加盟商"),
     SUPPLIER_DETAIL(MenuConstants.CAR_MANAGE, MenuConstants.SUPPLIER_MANAGE, MenuConstants.SUPPLIER_MANAGE, "加盟商详情"),
     SUPPLIER_COOPERATION_TYPE(MenuConstants.CAR_MANAGE, MenuConstants.SUPPLIER_MANAGE, MenuConstants.SUPPLIER_MANAGE, "加盟商加盟类型"),
+    COOPERATION_TWO_LEVEL_LIST(MenuConstants.CAR_MANAGE, MenuConstants.SUPPLIER_MANAGE, MenuConstants.SUPPLIER_MANAGE, "二级加盟类型查询"),
     SUPPLIER_CHECK_NAME(MenuConstants.CAR_MANAGE, MenuConstants.SUPPLIER_MANAGE, MenuConstants.SUPPLIER_MANAGE, "加盟商名称是否存在"),
     //司机加盟管理接口
     DRIVER_JOIN_PROMOTE_LIST(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_JOIN_MANAGE, MenuConstants.DRIVER_JOIN_PROMOTE, "加盟司机信息查询"),
