@@ -165,6 +165,10 @@ public class CarBizSupplierService{
 					extDto.setCreateDate(new Date());
 					supplierExtDtoMapper.insertSelective(extDto);
 				}else {
+					//如果修改了供应商加盟类型且没选择二级加盟类型，需要将之前的二级加盟类型制空
+					if (supplier.getCooperationType() != null  && extDto.getTwoLevelCooperation() == null){
+						extDto.setTwoLevelCooperation(0);
+					}
 					supplierExtDtoExMapper.updateBySupplierId(extDto);
 				}
 			}

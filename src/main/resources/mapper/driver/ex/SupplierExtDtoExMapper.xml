@@ -40,7 +40,7 @@
       <if test="email != null and email != ''">
         email = #{email},
       </if>
-      <if test="twoLevelCooperation != null and twoLevelCooperation != 0">
+      <if test="twoLevelCooperation != null">
         two_level_cooperation = #{twoLevelCooperation},
       </if>
     </set>
