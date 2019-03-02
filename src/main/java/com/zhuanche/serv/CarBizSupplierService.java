@@ -231,9 +231,10 @@ public class CarBizSupplierService{
 		if (supplierExtDto != null) {
 			vo.setEmail(supplierExtDto.getEmail());
 			vo.setSupplierShortName(supplierExtDto.getSupplierShortName());
-			String twoLevelCooperationName;
-			if (StringUtils.isNotBlank(twoLevelCooperationName = hasTwoLevelCooperation(supplierExtDto))){
-				vo.setTwoLevelCooperationName(twoLevelCooperationName);
+			TwoLevelCooperationDto twoLevelCooperationDto;
+			if ((twoLevelCooperationDto = hasTwoLevelCooperation(supplierExtDto)) != null){
+				vo.setTwoLevelCooperationName(twoLevelCooperationDto.getCooperationName());
+				vo.setTwoLevelCooperation(twoLevelCooperationDto.getId());
 			}
 		}
 		if (vo.getCreateBy() != null && vo.getCreateBy() > Constants.ZERO){
@@ -306,14 +307,14 @@ public class CarBizSupplierService{
 		return carBizSupplierExMapper.getSupplierNameById(supplierId);
 	}
 
-	private String hasTwoLevelCooperation(SupplierExtDto supplierExtDto){
+	private TwoLevelCooperationDto hasTwoLevelCooperation(SupplierExtDto supplierExtDto){
 		int id;
 		if (supplierExtDto.getTwoLevelCooperation() != null && (id = supplierExtDto.getTwoLevelCooperation()) > 0){
 			TwoLevelCooperationDto twoLevelCooperation = twoLevelCooperationExMapper.getTwoLevelCooperationById(id);
 			if (twoLevelCooperation != null){
-				return twoLevelCooperation.getCooperationName();
+				return twoLevelCooperation;
 			}
 		}
-		return "";
+		return null;
 	}
 }
