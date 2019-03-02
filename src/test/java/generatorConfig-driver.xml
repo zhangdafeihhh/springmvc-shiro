@@ -51,7 +51,7 @@
 			<property name="useActualColumnNames" value="false" />
 			<generatedKey column="id" sqlStatement="MySql" identity="true" />
 		</table> -->
-		<table tableName="supplier_two_level_cooperation_type" domainObjectName="TwoLevelCooperationDto"
+		<table tableName="supplier_ext" domainObjectName="SupplierExtDto"
 			enableSelectByExample="false" enableDeleteByExample="false"
 			enableCountByExample="false" enableUpdateByExample="false">
 			<property name="useActualColumnNames" value="false" />

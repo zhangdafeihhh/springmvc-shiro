@@ -8,4 +8,6 @@ import java.util.List;
 public interface TwoLevelCooperationExMapper {
 
     List<TwoLevelCooperationDto> getTwoLevelCooperationTypeByCooperationId(@Param("cooperationId") Integer cooperationId);
+
+    TwoLevelCooperationDto getTwoLevelCooperationById(@Param("id") int id);
 }

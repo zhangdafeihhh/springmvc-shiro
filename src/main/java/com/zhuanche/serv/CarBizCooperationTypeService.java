@@ -3,7 +3,6 @@ package com.zhuanche.serv;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
-import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.entity.driver.TwoLevelCooperationDto;
 import com.zhuanche.entity.rentcar.CarBizCooperationType;
 import mapper.driver.ex.TwoLevelCooperationExMapper;
