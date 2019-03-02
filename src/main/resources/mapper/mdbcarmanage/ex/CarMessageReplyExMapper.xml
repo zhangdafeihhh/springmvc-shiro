@@ -13,7 +13,10 @@
   <sql id="Base_Column_List" >
     id, reply_content, sender_name, sender_id, create_time, update_time, message_id
   </sql>
-
+  <delete id="deleteByMessageId" parameterType="java.lang.Integer" >
+    delete from car_message_reply
+    where message_id = #{messageId,jdbcType=INTEGER}
+  </delete>
   <select id="findReplyListByMessageIdPage" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
