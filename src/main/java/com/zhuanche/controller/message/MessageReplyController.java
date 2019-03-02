@@ -137,4 +137,48 @@ public class MessageReplyController {
         return AjaxResponse.success(pageDTO);
     }
 
+    /**
+     * 查看自己的回复
+     * @param messageId
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @RequestMapping(value = "/replyListSelf")
+    @ResponseBody
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
+    public AjaxResponse replyListSelf(
+            @Verify(param = "messageId", rule = "required|min(1)") Long messageId,
+            @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
+            @RequestParam(value = "pageSize", defaultValue = "30") Integer pageSize
+    ) {
+
+        //取出当前登陆用户
+        SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+        if (null == currentLoginUser) {
+            return AjaxResponse.fail(RestErrorCode.HTTP_INVALID_SESSION);
+        }
+        Integer userId = currentLoginUser.getId();
+
+
+        Page p = PageHelper.startPage(pageNum, pageSize, true);
+        List<CarMessageReply> list = null;
+        int total = 0;
+        try {
+            list = messageReplyService.findReplyListByMessageIdAndSenderIdPage(messageId, userId);
+            total = (int) p.getTotal();
+        } finally {
+            PageHelper.clearPage();
+        }
+
+        if (null == list) {
+            list = Lists.newArrayList();
+        }
+
+        PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, list);
+        return AjaxResponse.success(pageDTO);
+    }
+
 }
