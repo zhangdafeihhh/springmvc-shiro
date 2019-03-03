@@ -91,12 +91,14 @@ public class DriverActionServiceImpl implements DriverActionService {
                 params.put("driverId", driverInfoDTOs.get(0).getDriverId());
                 params.put("actionId", driverActionVO.getActionId());
                 params.put("tableName", table);
+                params.put("orderNo", orderNo);
             }else {
                 params.clear();
                 String driverIds = hasDataPermissions(driverInfoDTOs, loginUser);
                 params.put("driverIds", driverIds);
                 params.put("actionId", driverActionVO.getActionId());
                 params.put("tableName", table);
+                params.put("orderNo", orderNo);
             }
         } else {
             logger.error("司机信息查询失败,查询参数 {}", ((JSONObject)JSONObject.toJSON(params)).toJSONString());
