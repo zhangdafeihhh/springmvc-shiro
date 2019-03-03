@@ -138,7 +138,10 @@ public class CarBizSupplierService{
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
 			supplier.setUpdateBy(currentLoginUser.getId());
 			supplier.setUpdateName(currentLoginUser.getName());
-			if (supplier.getSupplierId() == null || supplier.getSupplierId() == 0){
+            TwoLevelCooperationDto twoLevelCooperation = twoLevelCooperationExMapper.
+                    getTwoLevelCooperation(supplier.getCooperationType(), supplier.getTwoLevelCooperation());
+            int twoLevelId = twoLevelCooperation != null ? twoLevelCooperation.getId() : 0;
+            if (supplier.getSupplierId() == null || supplier.getSupplierId() == 0){
 				method = Constants.CREATE;
 				supplier.setCreateBy(currentLoginUser.getId());
 				supplier.setCreateName(currentLoginUser.getName());
@@ -149,7 +152,7 @@ public class CarBizSupplierService{
 				extDto.setSupplierId(supplier.getSupplierId());
 				extDto.setCreateDate(new Date());
 				extDto.setUpdateDate(new Date());
-				extDto.setTwoLevelCooperation(supplier.getTwoLevelCooperation());
+				extDto.setTwoLevelCooperation(twoLevelId);
 				supplierExtDtoMapper.insertSelective(extDto);
 			}else {
 				carBizSupplierExMapper.updateByPrimaryKeySelective(supplier);
@@ -159,16 +162,12 @@ public class CarBizSupplierService{
 				extDto.setSupplierId(supplier.getSupplierId());
 				extDto.setStatus(supplier.getStatus().byteValue());
 				extDto.setUpdateDate(new Date());
-				extDto.setTwoLevelCooperation(supplier.getTwoLevelCooperation());
+				extDto.setTwoLevelCooperation(twoLevelId);
 				SupplierExtDto supplierExtDto = supplierExtDtoExMapper.selectBySupplierId(supplier.getSupplierId());
 				if (supplierExtDto == null){
 					extDto.setCreateDate(new Date());
 					supplierExtDtoMapper.insertSelective(extDto);
 				}else {
-					//如果修改了供应商加盟类型且没选择二级加盟类型，需要将之前的二级加盟类型制空
-					if (supplier.getCooperationType() != null  && extDto.getTwoLevelCooperation() == null){
-						extDto.setTwoLevelCooperation(0);
-					}
 					supplierExtDtoExMapper.updateBySupplierId(extDto);
 				}
 			}

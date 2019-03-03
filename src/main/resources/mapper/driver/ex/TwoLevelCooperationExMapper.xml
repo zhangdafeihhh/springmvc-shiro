@@ -35,4 +35,13 @@
         where id = #{id}
     </select>
 
+    <select id="getTwoLevelCooperation" resultMap="BaseResultMap">
+      select
+        id,
+        cooperation_name,
+        status
+      from supplier_two_level_cooperation_type
+      where id = #{id} and pid = #{pid} and status = 1
+    </select>
+
 </mapper>
