@@ -11,4 +11,9 @@ public interface FeedbackExMapper {
                                 @Param("createTimeEnd") String createTimeEnd,
                                 @Param("manageStatus") Integer manageStatus);
 
+    List<Feedback> findDataListSelf(@Param("createTimeStart") String createTimeStart,
+                                    @Param("createTimeEnd") String createTimeEnd,
+                                    @Param("manageStatus") Integer manageStatus,
+                                    @Param("userId") Integer userId);
+
 }

@@ -88,6 +88,9 @@ public class MessageService {
     @Autowired
     private CarMessagePostMapper carMessagePostMapper;
 
+    @Autowired
+    private CarMessageReplyExMapper carMessageReplyExMapper;
+
 
     /**
      * 发布消息和草稿
@@ -248,6 +251,7 @@ public class MessageService {
      * @param messageId
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public int withDraw(Integer messageId) throws MessageException{
 
         try {
@@ -257,6 +261,9 @@ public class MessageService {
              docExMapper.updateStatus(messageId.longValue(),CarMessagePost.Status.draft.getMessageStatus());
 
              postExMapper.withDraw(Long.valueOf(messageId));
+
+            //撤回删除回复
+            carMessageReplyExMapper.deleteByMessageId(messageId);
 
              logger.info("撤回操作成功，messageId:" + messageId);
 

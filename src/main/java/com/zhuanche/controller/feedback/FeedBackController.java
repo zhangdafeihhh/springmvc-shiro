@@ -40,6 +40,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -74,7 +75,7 @@ public class FeedBackController {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
     @RequestFunction(menu = MenuEnum.PROBLEM_FEED_BACK_QUERY)
-    @RequiresPermissions("ProblemFeedbacks_look")
+    //@RequiresPermissions("ProblemFeedbacks_look")
     public AjaxResponse dataList(
             @RequestParam(value = "createTimeStart",required = false) String createTimeStart,
             @RequestParam(value = "createTimeEnd", required = false) String createTimeEnd,
@@ -105,6 +106,52 @@ public class FeedBackController {
     }
 
     /**
+     * 个人问题反馈分页列表
+     * @param createTimeStart
+     * @param createTimeEnd
+     * @param manageStatus
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @RequestMapping(value = "/dataListSelf")
+    @ResponseBody
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
+    @RequestFunction(menu = MenuEnum.PROBLEM_FEED_BACK_QUERY)
+    //@RequiresPermissions("ProblemFeedbacks_look")
+    public AjaxResponse dataListSelf(
+            @RequestParam(value = "createTimeStart",required = false) String createTimeStart,
+            @RequestParam(value = "createTimeEnd", required = false) String createTimeEnd,
+            @RequestParam(value = "manageStatus",required = false) Integer manageStatus,
+            @RequestParam(value = "pageNum", defaultValue = "0") Integer pageNum,
+            @RequestParam(value = "pageSize", defaultValue = "30") Integer pageSize
+    ){
+
+        SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+        if (null == currentLoginUser){
+            return AjaxResponse.fail(RestErrorCode.HTTP_INVALID_SESSION);
+        }
+
+        Page p = PageHelper.startPage(pageNum, pageSize, true);
+        int total = 0;
+        List<Feedback> feedbackList = null;
+        try {
+            Integer userId = currentLoginUser.getId();
+            feedbackList = feedBackService.findDataListSelf(createTimeStart,createTimeEnd,manageStatus, userId);
+            total = (int) p.getTotal();
+        } finally {
+            PageHelper.clearPage();
+        }
+        if (null == feedbackList){
+            feedbackList = Lists.newArrayList();
+        }
+        PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, feedbackList);
+        return AjaxResponse.success(pageDTO);
+    }
+
+    /**
      * 问题反馈新增
      * @param feedbackContent
      * @param multipartFiles
@@ -116,14 +163,14 @@ public class FeedBackController {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
     })
     @RequestFunction(menu = MenuEnum.PROBLEM_FEED_BACK_ADD)
-    @RequiresPermissions("PROBLEM_FEED_BACK_ADD")
+    //@RequiresPermissions("PROBLEM_FEED_BACK_ADD")
     public AjaxResponse addFeedBack(
             @Verify(param = "feedbackContent",rule = "required") String feedbackContent,
             @RequestParam(value = "files",required = false) MultipartFile[] multipartFiles
     ){
 
         //最大不能输入500字
-        if (feedbackContent.length() >= 500){
+        if (feedbackContent.length() > 500){
             return AjaxResponse.fail(RestErrorCode.MESSAGE_CONTENT_ERROR);
         }
 
@@ -172,7 +219,7 @@ public class FeedBackController {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
     @RequestFunction(menu = MenuEnum.PROBLEM_FEED_BACK_DOWNLOAD)
-    @RequiresPermissions("PROBLEM_FEED_BACK_DOWNLOAD")
+    //@RequiresPermissions("PROBLEM_FEED_BACK_DOWNLOAD")
     public ResponseEntity<byte[]> download(@Verify(param = "feedbackDocId",rule = "required") Integer feedbackDocId) throws Exception {
 
         FeedbackDoc feedbackDoc = feedBackDocService.selectFeedBackDocById(feedbackDocId);
@@ -197,11 +244,11 @@ public class FeedBackController {
 
         try {
             String path = "";  //服务器
-            File file = new File(path + File.separator + fileUrl);
+             File file = new File(path + fileUrl);
             HttpHeaders headers = new HttpHeaders();
             //下载显示的文件名，解决中文名称乱码问题
             //通知浏览器以attachment（下载方式）打开图片
-            headers.setContentDispositionFormData("attachment", fileName);
+            headers.add("Content-Disposition", "attchement;filename="+ URLEncoder.encode(fileName,"UTF-8"));
             //application/octet-stream ： 二进制流数据（最常见的文件下载）。
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
             return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(file),
@@ -223,7 +270,7 @@ public class FeedBackController {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
     @RequestFunction(menu = MenuEnum.PROBLEM_FEED_BACK_QUERY)
-    @RequiresPermissions("ProblemFeedbacks_look")
+    //@RequiresPermissions("ProblemFeedbacks_look")
     public AjaxResponse feedBackDetail(@Verify(param = "id",rule = "required") Integer id){
 
         try {
@@ -254,7 +301,7 @@ public class FeedBackController {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
     })
     @RequestFunction(menu = MenuEnum.PROBLEM_FEED_BACK_MANAGE)
-    @RequiresPermissions("PROBLEM_FEED_BACK_MANAGE")
+    //@RequiresPermissions("PROBLEM_FEED_BACK_MANAGE")
     public AjaxResponse updateFeedBack(
             @Verify(param = "feedbackId",rule = "required") Integer feedbackId,
             @Verify(param = "manageContent",rule = "required") String manageContent
