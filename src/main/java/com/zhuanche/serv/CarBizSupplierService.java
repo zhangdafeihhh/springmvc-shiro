@@ -12,6 +12,7 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.entity.driver.SupplierExtDto;
+import com.zhuanche.entity.driver.TwoLevelCooperationDto;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.deiver.CarBizCarInfoTempService;
@@ -19,17 +20,14 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import mapper.driver.SupplierExtDtoMapper;
 import mapper.driver.ex.SupplierExtDtoExMapper;
+import mapper.driver.ex.TwoLevelCooperationExMapper;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import mapper.rentcar.CarBizSupplierMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -65,6 +63,9 @@ public class CarBizSupplierService{
 
 	@Autowired
 	private CarAdmUserExMapper carAdmUserExMapper;
+
+	@Autowired
+	private TwoLevelCooperationExMapper twoLevelCooperationExMapper;
 
 	@Value("${commission.url}")
 	String commissionUrl;
@@ -137,7 +138,10 @@ public class CarBizSupplierService{
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
 			supplier.setUpdateBy(currentLoginUser.getId());
 			supplier.setUpdateName(currentLoginUser.getName());
-			if (supplier.getSupplierId() == null || supplier.getSupplierId() == 0){
+            TwoLevelCooperationDto twoLevelCooperation = twoLevelCooperationExMapper.
+                    getTwoLevelCooperation(supplier.getCooperationType(), supplier.getTwoLevelCooperation());
+            int twoLevelId = twoLevelCooperation != null ? twoLevelCooperation.getId() : 0;
+            if (supplier.getSupplierId() == null || supplier.getSupplierId() == 0){
 				method = Constants.CREATE;
 				supplier.setCreateBy(currentLoginUser.getId());
 				supplier.setCreateName(currentLoginUser.getName());
@@ -148,6 +152,7 @@ public class CarBizSupplierService{
 				extDto.setSupplierId(supplier.getSupplierId());
 				extDto.setCreateDate(new Date());
 				extDto.setUpdateDate(new Date());
+				extDto.setTwoLevelCooperation(twoLevelId);
 				supplierExtDtoMapper.insertSelective(extDto);
 			}else {
 				carBizSupplierExMapper.updateByPrimaryKeySelective(supplier);
@@ -157,6 +162,7 @@ public class CarBizSupplierService{
 				extDto.setSupplierId(supplier.getSupplierId());
 				extDto.setStatus(supplier.getStatus().byteValue());
 				extDto.setUpdateDate(new Date());
+				extDto.setTwoLevelCooperation(twoLevelId);
 				SupplierExtDto supplierExtDto = supplierExtDtoExMapper.selectBySupplierId(supplier.getSupplierId());
 				if (supplierExtDto == null){
 					extDto.setCreateDate(new Date());
@@ -224,6 +230,11 @@ public class CarBizSupplierService{
 		if (supplierExtDto != null) {
 			vo.setEmail(supplierExtDto.getEmail());
 			vo.setSupplierShortName(supplierExtDto.getSupplierShortName());
+			TwoLevelCooperationDto twoLevelCooperationDto;
+			if ((twoLevelCooperationDto = hasTwoLevelCooperation(supplierExtDto)) != null){
+				vo.setTwoLevelCooperationName(twoLevelCooperationDto.getCooperationName());
+				vo.setTwoLevelCooperation(twoLevelCooperationDto.getId());
+			}
 		}
 		if (vo.getCreateBy() != null && vo.getCreateBy() > Constants.ZERO){
 			String create = carAdmUserExMapper.queryNameById(vo.getCreateBy());
@@ -293,5 +304,16 @@ public class CarBizSupplierService{
 	 */
 	public String getSupplierNameById(Integer supplierId){
 		return carBizSupplierExMapper.getSupplierNameById(supplierId);
+	}
+
+	private TwoLevelCooperationDto hasTwoLevelCooperation(SupplierExtDto supplierExtDto){
+		int id;
+		if (supplierExtDto.getTwoLevelCooperation() != null && (id = supplierExtDto.getTwoLevelCooperation()) > 0){
+			TwoLevelCooperationDto twoLevelCooperation = twoLevelCooperationExMapper.getTwoLevelCooperationById(id);
+			if (twoLevelCooperation != null){
+				return twoLevelCooperation;
+			}
+		}
+		return null;
 	}
 }

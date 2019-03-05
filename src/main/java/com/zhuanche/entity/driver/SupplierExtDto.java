@@ -19,6 +19,8 @@ public class SupplierExtDto {
 
     private String remark;
 
+    private Integer twoLevelCooperation;
+
     public Long getId() {
         return id;
     }
@@ -81,5 +83,13 @@ public class SupplierExtDto {
 
     public void setRemark(String remark) {
         this.remark = remark == null ? null : remark.trim();
+    }
+
+    public Integer getTwoLevelCooperation() {
+        return twoLevelCooperation;
+    }
+
+    public void setTwoLevelCooperation(Integer twoLevelCooperation) {
+        this.twoLevelCooperation = twoLevelCooperation;
     }
 }

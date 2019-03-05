@@ -12,6 +12,8 @@ public class CarBizSupplierVo extends CarBizSupplier {
     private List<GroupInfo> groupList;
     private String createName;
     private String updateName;
+    private Integer twoLevelCooperation;
+    private String twoLevelCooperationName;
 
     public String getSupplierCityName() {
         return supplierCityName;
@@ -83,5 +85,21 @@ public class CarBizSupplierVo extends CarBizSupplier {
 
     public void setUpdateName(String updateName) {
         this.updateName = updateName;
+    }
+
+    public Integer getTwoLevelCooperation() {
+        return twoLevelCooperation;
+    }
+
+    public void setTwoLevelCooperation(Integer twoLevelCooperation) {
+        this.twoLevelCooperation = twoLevelCooperation;
+    }
+
+    public String getTwoLevelCooperationName() {
+        return twoLevelCooperationName;
+    }
+
+    public void setTwoLevelCooperationName(String twoLevelCooperationName) {
+        this.twoLevelCooperationName = twoLevelCooperationName;
     }
 }

@@ -10,6 +10,7 @@
     <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
     <result column="email" property="email" jdbcType="VARCHAR" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="two_level_cooperation" property="twoLevelCooperation" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, supplier_id, status, supplier_short_name, create_date, update_date, email, remark
@@ -39,6 +40,9 @@
       <if test="email != null and email != ''">
         email = #{email},
       </if>
+      <if test="twoLevelCooperation != null">
+        two_level_cooperation = #{twoLevelCooperation},
+      </if>
     </set>
     where supplier_id = #{supplierId}
   </update>
@@ -47,7 +51,8 @@
     select
       id,
       supplier_short_name,
-      email
+      email,
+      two_level_cooperation
     from supplier_ext
     where supplier_id = #{supplierId}
   </select>

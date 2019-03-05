@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RequestFunction;
+import com.zhuanche.entity.driver.TwoLevelCooperationDto;
 import com.zhuanche.entity.rentcar.CarBizCooperationType;
 import com.zhuanche.entity.rentcar.CarBizSupplierQuery;
 import com.zhuanche.entity.rentcar.CarBizSupplierVo;
@@ -105,6 +106,15 @@ public class SupplierController {
     @RequestFunction(menu = SUPPLIER_CHECK_NAME)
     public AjaxResponse checkSupplierFullName(String supplierFullName){
         return supplierService.checkSupplierFullName(supplierFullName);
+    }
+
+
+    @RequestMapping("/getTwoLevel")
+    @ResponseBody
+    @RequestFunction(menu = COOPERATION_TWO_LEVEL_LIST)
+    public AjaxResponse getTwoLevelCooperationTypeByCooperationId(@RequestParam Integer cooperationId){
+        List<TwoLevelCooperationDto> twoLevelCooperations = cooperationTypeService.queryTwoLevelCooperationType(cooperationId);
+        return AjaxResponse.success(twoLevelCooperations);
     }
 
 

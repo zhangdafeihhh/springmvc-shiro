@@ -1,6 +1,11 @@
 package com.zhuanche.serv;
 
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.entity.driver.TwoLevelCooperationDto;
 import com.zhuanche.entity.rentcar.CarBizCooperationType;
+import mapper.driver.ex.TwoLevelCooperationExMapper;
 import mapper.rentcar.CarBizCooperationTypeMapper;
 import mapper.rentcar.ex.CarBizCooperationTypeExMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +21,9 @@ public class CarBizCooperationTypeService {
 
     @Autowired
     private CarBizCooperationTypeExMapper carBizCooperationTypeExMapper;
+
+    @Autowired
+    private TwoLevelCooperationExMapper twoLevelCooperationExMapper;
 
     /**
      * 查找加盟类型名称
@@ -42,5 +50,16 @@ public class CarBizCooperationTypeService {
      */
     public List<CarBizCooperationType> queryCarBizCooperationTypeList(){
         return carBizCooperationTypeExMapper.queryCarBizCooperationTypeList();
+    }
+
+
+    @MasterSlaveConfigs(
+            configs = {
+                    @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+            }
+    )
+    public List<TwoLevelCooperationDto> queryTwoLevelCooperationType(Integer cooperationId) {
+        return twoLevelCooperationExMapper.getTwoLevelCooperationTypeByCooperationId(cooperationId);
+
     }
 }
