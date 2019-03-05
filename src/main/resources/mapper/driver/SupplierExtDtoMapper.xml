@@ -11,10 +11,18 @@
     <result column="email" property="email" jdbcType="VARCHAR" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
     <result column="two_level_cooperation" property="twoLevelCooperation" jdbcType="INTEGER" />
+    <result column="settlement_type" property="settlementType" jdbcType="INTEGER" />
+    <result column="settlement_cycle" property="settlementCycle" jdbcType="INTEGER" />
+    <result column="settlement_day" property="settlementDay" jdbcType="INTEGER" />
+    <result column="settlement_account" property="settlementAccount" jdbcType="VARCHAR" />
+    <result column="bank_account" property="bankAccount" jdbcType="VARCHAR" />
+    <result column="bank_name" property="bankName" jdbcType="VARCHAR" />
+    <result column="bank_identify" property="bankIdentify" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, supplier_id, status, supplier_short_name, create_date, update_date, email, remark, 
-    two_level_cooperation
+    two_level_cooperation, settlement_type, settlement_cycle, settlement_day, settlement_account, 
+    bank_account, bank_name, bank_identify
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -32,10 +40,16 @@
     </selectKey>
     insert into supplier_ext (supplier_id, status, supplier_short_name, 
       create_date, update_date, email, 
-      remark, two_level_cooperation)
+      remark, two_level_cooperation, settlement_type, 
+      settlement_cycle, settlement_day, settlement_account, 
+      bank_account, bank_name, bank_identify
+      )
     values (#{supplierId,jdbcType=INTEGER}, #{status,jdbcType=TINYINT}, #{supplierShortName,jdbcType=VARCHAR}, 
       #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{email,jdbcType=VARCHAR}, 
-      #{remark,jdbcType=VARCHAR}, #{twoLevelCooperation,jdbcType=INTEGER})
+      #{remark,jdbcType=VARCHAR}, #{twoLevelCooperation,jdbcType=INTEGER}, #{settlementType,jdbcType=INTEGER}, 
+      #{settlementCycle,jdbcType=INTEGER}, #{settlementDay,jdbcType=INTEGER}, #{settlementAccount,jdbcType=VARCHAR}, 
+      #{bankAccount,jdbcType=VARCHAR}, #{bankName,jdbcType=VARCHAR}, #{bankIdentify,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.SupplierExtDto" >
     <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
@@ -67,6 +81,27 @@
       <if test="twoLevelCooperation != null" >
         two_level_cooperation,
       </if>
+      <if test="settlementType != null" >
+        settlement_type,
+      </if>
+      <if test="settlementCycle != null" >
+        settlement_cycle,
+      </if>
+      <if test="settlementDay != null" >
+        settlement_day,
+      </if>
+      <if test="settlementAccount != null" >
+        settlement_account,
+      </if>
+      <if test="bankAccount != null" >
+        bank_account,
+      </if>
+      <if test="bankName != null" >
+        bank_name,
+      </if>
+      <if test="bankIdentify != null" >
+        bank_identify,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="supplierId != null" >
@@ -92,6 +127,27 @@
       </if>
       <if test="twoLevelCooperation != null" >
         #{twoLevelCooperation,jdbcType=INTEGER},
+      </if>
+      <if test="settlementType != null" >
+        #{settlementType,jdbcType=INTEGER},
+      </if>
+      <if test="settlementCycle != null" >
+        #{settlementCycle,jdbcType=INTEGER},
+      </if>
+      <if test="settlementDay != null" >
+        #{settlementDay,jdbcType=INTEGER},
+      </if>
+      <if test="settlementAccount != null" >
+        #{settlementAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="bankAccount != null" >
+        #{bankAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="bankName != null" >
+        #{bankName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankIdentify != null" >
+        #{bankIdentify,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -122,6 +178,27 @@
       <if test="twoLevelCooperation != null" >
         two_level_cooperation = #{twoLevelCooperation,jdbcType=INTEGER},
       </if>
+      <if test="settlementType != null" >
+        settlement_type = #{settlementType,jdbcType=INTEGER},
+      </if>
+      <if test="settlementCycle != null" >
+        settlement_cycle = #{settlementCycle,jdbcType=INTEGER},
+      </if>
+      <if test="settlementDay != null" >
+        settlement_day = #{settlementDay,jdbcType=INTEGER},
+      </if>
+      <if test="settlementAccount != null" >
+        settlement_account = #{settlementAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="bankAccount != null" >
+        bank_account = #{bankAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="bankName != null" >
+        bank_name = #{bankName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankIdentify != null" >
+        bank_identify = #{bankIdentify,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -134,7 +211,14 @@
       update_date = #{updateDate,jdbcType=TIMESTAMP},
       email = #{email,jdbcType=VARCHAR},
       remark = #{remark,jdbcType=VARCHAR},
-      two_level_cooperation = #{twoLevelCooperation,jdbcType=INTEGER}
+      two_level_cooperation = #{twoLevelCooperation,jdbcType=INTEGER},
+      settlement_type = #{settlementType,jdbcType=INTEGER},
+      settlement_cycle = #{settlementCycle,jdbcType=INTEGER},
+      settlement_day = #{settlementDay,jdbcType=INTEGER},
+      settlement_account = #{settlementAccount,jdbcType=VARCHAR},
+      bank_account = #{bankAccount,jdbcType=VARCHAR},
+      bank_name = #{bankName,jdbcType=VARCHAR},
+      bank_identify = #{bankIdentify,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>

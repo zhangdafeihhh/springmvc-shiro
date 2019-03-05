@@ -2,6 +2,7 @@ package com.zhuanche.serv;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
@@ -25,7 +26,6 @@ import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import mapper.rentcar.CarBizSupplierMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**供应商信息 的 基本服务层**/
 @Service
@@ -141,11 +142,13 @@ public class CarBizSupplierService{
             TwoLevelCooperationDto twoLevelCooperation = twoLevelCooperationExMapper.
                     getTwoLevelCooperation(supplier.getCooperationType(), supplier.getTwoLevelCooperation());
             int twoLevelId = twoLevelCooperation != null ? twoLevelCooperation.getId() : 0;
+            logger.info("二级加盟类型 twoLevelId : {}", twoLevelCooperation);
             if (supplier.getSupplierId() == null || supplier.getSupplierId() == 0){
 				method = Constants.CREATE;
 				supplier.setCreateBy(currentLoginUser.getId());
 				supplier.setCreateName(currentLoginUser.getName());
 				carBizSupplierExMapper.insertSelective(supplier);
+				logger.info("新增供应商信息: supplierInfo {}", JSON.toJSONString(supplier));
 				SupplierExtDto extDto = new SupplierExtDto();
 				extDto.setEmail(supplier.getEmail());
 				extDto.setSupplierShortName(supplier.getSupplierShortName());
@@ -154,8 +157,10 @@ public class CarBizSupplierService{
 				extDto.setUpdateDate(new Date());
 				extDto.setTwoLevelCooperation(twoLevelId);
 				supplierExtDtoMapper.insertSelective(extDto);
+				logger.info("新增供应商扩展信息：supplierExtInfo {}", JSON.toJSONString(extDto));
 			}else {
 				carBizSupplierExMapper.updateByPrimaryKeySelective(supplier);
+				logger.info("更新供应商信息: supplierInfo {}", JSON.toJSONString(supplier));
 				SupplierExtDto extDto = new SupplierExtDto();
 				extDto.setEmail(supplier.getEmail());
 				extDto.setSupplierShortName(supplier.getSupplierShortName());
@@ -167,8 +172,10 @@ public class CarBizSupplierService{
 				if (supplierExtDto == null){
 					extDto.setCreateDate(new Date());
 					supplierExtDtoMapper.insertSelective(extDto);
+					logger.info("新增供应商扩展信息 : supplierExtInfo {}", JSON.toJSONString(extDto));
 				}else {
 					supplierExtDtoExMapper.updateBySupplierId(extDto);
+					logger.info("更新供应商扩展信息 : supplierExtInfo {}", JSON.toJSONString(extDto));
 				}
 			}
 			try{
@@ -199,21 +206,22 @@ public class CarBizSupplierService{
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
 	} )
 	public void addExtInfo(List<CarBizSupplierVo> list) {
-		List<Integer> idList = new ArrayList<>(list.size());
-		list.forEach( carBizSupplierVo -> idList.add(carBizSupplierVo.getSupplierId()));
+		List<Integer> idList = list.stream().filter(Objects::nonNull)
+				.map(CarBizSupplier::getSupplierId).collect(Collectors.toList());
 		if (idList.size() == 0){
 			return;
 		}
+		//补全供应商邮箱,简称字段
 		List<SupplierExtDto> extDtos = supplierExtDtoExMapper.queryExtDtoByIdList(idList);
-		for (SupplierExtDto supplierExtDto : extDtos){
-			for (CarBizSupplierVo vo : list){
-				if (vo != null && vo.getSupplierId().equals(supplierExtDto.getSupplierId())){
-					vo.setSupplierShortName(supplierExtDto.getSupplierShortName());
-					vo.setEmail(supplierExtDto.getEmail());
-					break;
-				}
+		Map<Integer, SupplierExtDto> supplierExtDtoMap =
+				extDtos.stream().filter(Objects::nonNull).collect(Collectors.toMap(SupplierExtDto::getSupplierId, value -> value));
+		list.forEach( supplierVo -> {
+			if (supplierVo != null){
+				SupplierExtDto supplierExtDto = supplierExtDtoMap.get(supplierVo.getSupplierId());
+				supplierVo.setSupplierShortName(supplierExtDto.getSupplierShortName());
+				supplierVo.setEmail(supplierExtDto.getEmail());
 			}
-		}
+		});
 	}
 
 	@MasterSlaveConfigs(configs={
@@ -226,6 +234,7 @@ public class CarBizSupplierService{
 		if (vo == null){
 			return AjaxResponse.fail(RestErrorCode.SUPPLIER_NOT_EXIST);
 		}
+		//补全供应商扩展信息
 		SupplierExtDto supplierExtDto = supplierExtDtoExMapper.selectBySupplierId(supplierId);
 		if (supplierExtDto != null) {
 			vo.setEmail(supplierExtDto.getEmail());
@@ -247,13 +256,15 @@ public class CarBizSupplierService{
 		Map<String, Object> params = Maps.newHashMap();
 		params.put(Constants.SUPPLIER_ID, vo.getSupplierId());
 		try {
-			com.alibaba.fastjson.JSONObject jsonObject = MpOkHttpUtil.okHttpPostBackJson(commissionUrl, params, 1, Constants.GROUP_INFO_TAG);
+			//调用分佣接口获取分佣协议信息
+			JSONObject jsonObject = MpOkHttpUtil.okHttpPostBackJson(commissionUrl, params, 1, Constants.GROUP_INFO_TAG);
+			logger.info("分佣信息协议查询结果 {}", jsonObject == null ? "empty" : jsonObject.toJSONString());
 			if (jsonObject != null && Constants.SUCCESS_CODE == jsonObject.getInteger(Constants.CODE)) {
 				JSONArray jsonArray = jsonObject.getJSONArray(Constants.DATA);
 				List<Integer> idList = new ArrayList<>();
 				List<GroupInfo> groupInfos = new ArrayList<>();
 				jsonArray.forEach(elem -> {
-					com.alibaba.fastjson.JSONObject jsonData = (com.alibaba.fastjson.JSONObject) elem;
+					JSONObject jsonData = (JSONObject) elem;
 					Integer id = jsonData.getInteger(Constants.GROUP_ID);
 					if (id != null && id > Constants.ZERO) {
 						idList.add(id);
@@ -267,16 +278,14 @@ public class CarBizSupplierService{
 					groupInfos.add(info);
 				});
 				if (!idList.isEmpty()) {
+					//补全车型名称
 					List<CarBizCarGroup> carBizCarGroups = carBizCarGroupExMapper.queryGroupNameByIds(idList);
-					for (CarBizCarGroup groupInfo : carBizCarGroups) {
-						for (GroupInfo group : groupInfos) {
-							Integer id = group.getGroupId();
-							if (id.equals(groupInfo.getGroupId())) {
-								group.setGroupName(groupInfo.getGroupName());
-								break;
-							}
-						}
-					}
+					Map<Integer, CarBizCarGroup> carBizCarGroupMap =
+							carBizCarGroups.stream().filter(Objects::nonNull).collect(Collectors.toMap(CarBizCarGroup::getGroupId, v -> v));
+					groupInfos.forEach( groupInfo -> {
+						CarBizCarGroup group = carBizCarGroupMap.get(groupInfo.getGroupId());
+						groupInfo.setGroupName(group.getGroupName());
+					});
 					vo.setGroupList(groupInfos);
 				}
 			}
@@ -306,6 +315,12 @@ public class CarBizSupplierService{
 		return carBizSupplierExMapper.getSupplierNameById(supplierId);
 	}
 
+
+	/**
+	 * 根据供应商扩展信息补填二级加盟类型
+	 * @param supplierExtDto
+	 * @return
+	 */
 	private TwoLevelCooperationDto hasTwoLevelCooperation(SupplierExtDto supplierExtDto){
 		int id;
 		if (supplierExtDto.getTwoLevelCooperation() != null && (id = supplierExtDto.getTwoLevelCooperation()) > 0){

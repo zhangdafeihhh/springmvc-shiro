@@ -2,6 +2,10 @@ package com.zhuanche.entity.driver;
 
 import java.util.Date;
 
+/**
+ * 供应商信息扩展表对象
+ * 参考  mp_driver supplier_ext表
+ */
 public class SupplierExtDto {
     private Long id;
 
@@ -20,6 +24,20 @@ public class SupplierExtDto {
     private String remark;
 
     private Integer twoLevelCooperation;
+
+    private Integer settlementType;
+
+    private Integer settlementCycle;
+
+    private Integer settlementDay;
+
+    private String settlementAccount;
+
+    private String bankAccount;
+
+    private String bankName;
+
+    private String bankIdentify;
 
     public Long getId() {
         return id;
@@ -91,5 +109,61 @@ public class SupplierExtDto {
 
     public void setTwoLevelCooperation(Integer twoLevelCooperation) {
         this.twoLevelCooperation = twoLevelCooperation;
+    }
+
+    public Integer getSettlementType() {
+        return settlementType;
+    }
+
+    public void setSettlementType(Integer settlementType) {
+        this.settlementType = settlementType;
+    }
+
+    public Integer getSettlementCycle() {
+        return settlementCycle;
+    }
+
+    public void setSettlementCycle(Integer settlementCycle) {
+        this.settlementCycle = settlementCycle;
+    }
+
+    public Integer getSettlementDay() {
+        return settlementDay;
+    }
+
+    public void setSettlementDay(Integer settlementDay) {
+        this.settlementDay = settlementDay;
+    }
+
+    public String getSettlementAccount() {
+        return settlementAccount;
+    }
+
+    public void setSettlementAccount(String settlementAccount) {
+        this.settlementAccount = settlementAccount == null ? null : settlementAccount.trim();
+    }
+
+    public String getBankAccount() {
+        return bankAccount;
+    }
+
+    public void setBankAccount(String bankAccount) {
+        this.bankAccount = bankAccount == null ? null : bankAccount.trim();
+    }
+
+    public String getBankName() {
+        return bankName;
+    }
+
+    public void setBankName(String bankName) {
+        this.bankName = bankName == null ? null : bankName.trim();
+    }
+
+    public String getBankIdentify() {
+        return bankIdentify;
+    }
+
+    public void setBankIdentify(String bankIdentify) {
+        this.bankIdentify = bankIdentify == null ? null : bankIdentify.trim();
     }
 }
