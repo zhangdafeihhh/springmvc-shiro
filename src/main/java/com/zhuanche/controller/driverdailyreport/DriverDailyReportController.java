@@ -319,7 +319,8 @@ public class DriverDailyReportController extends DriverQueryController {
 			}else{
 				driverList = params.getDriverIds();
 			}
-			params.setPageSize(CsvUtils.downPerSize);
+			int pageSize = 2000;
+			params.setPageSize(pageSize);
 			if(!(StringUtils.isNotEmpty(params.getGroupIds()) && (StringUtils.isEmpty(driverList)))){
 				params.setDriverIds(driverList);
 				//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
