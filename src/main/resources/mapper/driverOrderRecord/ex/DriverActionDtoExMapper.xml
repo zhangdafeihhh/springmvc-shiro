@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driverOrderRecord.ex.DriverActionDtoExMapper" >
+    <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.DriverActionDto" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+        <result column="action" property="action" jdbcType="INTEGER" />
+        <result column="action_time" property="actionTime" jdbcType="TIMESTAMP" />
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+        <result column="channel_number" property="channelNumber" jdbcType="VARCHAR" />
+        <result column="version" property="version" jdbcType="VARCHAR" />
+        <result column="imei" property="imei" jdbcType="VARCHAR" />
+        <result column="mobel_version" property="mobelVersion" jdbcType="VARCHAR" />
+        <result column="sys_version" property="sysVersion" jdbcType="VARCHAR" />
+        <result column="platform" property="platform" jdbcType="VARCHAR" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        id, driver_id, action, action_time, order_no, channel_number, version, imei, mobel_version,
+        sys_version, platform
+    </sql>
+
+    <select id="queryActionList" resultMap="BaseResultMap" parameterType="map">
+        select
+            id,
+            driver_id,
+            action,
+            action_time,
+            order_no
+        from
+          ${tableName}
+        <where>
+            <if test="driverId != null and driverId != ''">
+              and driver_id = #{driverId}
+            </if>
+            <if test="driverIds != null and driverIds != ''">
+                and driver_id in (${driverIds})
+            </if>
+            <if test="actionId != null">
+              and action = #{actionId}
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                and order_no = #{orderNo}
+            </if>
+        </where>
+        order by action_time desc
+    </select>
+
+    <select id="queryActionTimeLine" resultMap="BaseResultMap">
+        select
+            id,
+            driver_id,
+            action,
+            action_time
+        from
+          ${tableName}
+        <where>
+            <if test="driverId != null">
+              and driver_id = #{driverId}
+            </if>
+            <if test="driverId != null">
+                and DATE_FORMAT(action_time,'%Y-%m-%d')= DATE_FORMAT(#{time},'%Y-%m-%d')
+            </if>
+        </where>
+        order by action_time desc
+    </select>
+</mapper>

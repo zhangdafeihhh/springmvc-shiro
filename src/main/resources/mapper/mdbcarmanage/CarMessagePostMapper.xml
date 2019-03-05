@@ -5,9 +5,9 @@
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="mesage_title" property="mesageTitle" jdbcType="VARCHAR" />
     <result column="message_content" property="messageContent" jdbcType="VARCHAR" />
-    <result column="create_user" property="createUser" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="level" property="level" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
     <result column="cities" property="cities" jdbcType="VARCHAR" />
     <result column="suppliers" property="suppliers" jdbcType="VARCHAR" />
     <result column="teamIds" property="teamids" jdbcType="VARCHAR" />
@@ -15,8 +15,8 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, mesage_title, message_content, create_user, status, level, cities, suppliers, 
-    teamIds, create_time, update_time
+    id, mesage_title, message_content, status, level, cities, suppliers,
+    teamIds, create_time, update_time,user_id
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -32,11 +32,11 @@
     <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into car_message_post (mesage_title, message_content, create_user, 
+    insert into car_message_post (mesage_title, message_content,
       status, level, cities, 
       suppliers, teamIds, create_time, 
       update_time)
-    values (#{mesageTitle,jdbcType=VARCHAR}, #{messageContent,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, 
+    values (#{mesageTitle,jdbcType=VARCHAR}, #{messageContent,jdbcType=VARCHAR},
       #{status,jdbcType=INTEGER}, #{level,jdbcType=INTEGER}, #{cities,jdbcType=VARCHAR}, 
       #{suppliers,jdbcType=VARCHAR}, #{teamids,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP})
@@ -52,9 +52,6 @@
       </if>
       <if test="messageContent != null" >
         message_content,
-      </if>
-      <if test="createUser != null" >
-        create_user,
       </if>
       <if test="status != null" >
         status,
@@ -84,9 +81,6 @@
       </if>
       <if test="messageContent != null" >
         #{messageContent,jdbcType=VARCHAR},
-      </if>
-      <if test="createUser != null" >
-        #{createUser,jdbcType=VARCHAR},
       </if>
       <if test="status != null" >
         #{status,jdbcType=INTEGER},
@@ -120,9 +114,6 @@
       <if test="messageContent != null" >
         message_content = #{messageContent,jdbcType=VARCHAR},
       </if>
-      <if test="createUser != null" >
-        create_user = #{createUser,jdbcType=VARCHAR},
-      </if>
       <if test="status != null" >
         status = #{status,jdbcType=INTEGER},
       </if>
@@ -151,7 +142,6 @@
     update car_message_post
     set mesage_title = #{mesageTitle,jdbcType=VARCHAR},
       message_content = #{messageContent,jdbcType=VARCHAR},
-      create_user = #{createUser,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
       level = #{level,jdbcType=INTEGER},
       cities = #{cities,jdbcType=VARCHAR},

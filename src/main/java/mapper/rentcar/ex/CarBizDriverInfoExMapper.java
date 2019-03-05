@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.zhuanche.entity.driver.DriverActionVO;
 import org.apache.ibatis.annotations.Param;
 
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
@@ -152,15 +153,6 @@ public interface CarBizDriverInfoExMapper {
 
     CarBizDriverInfoDTO selectByPhone(@Param("phone") String phone);
 
-	/**
-	 * @Title: updateDriverCooperationTypeBySupplierId
-	 * @Description: 更新司机的加盟类型
-	 * @param map 
-	 * @return void
-	 * @throws
-	 */
-	void updateDriverCooperationTypeBySupplierId(Map<String, Object> map);
-
     CarBizDriverInfoDTO selectByDriverId(@Param("driverId") Integer driverId);
 
     
@@ -180,4 +172,16 @@ public interface CarBizDriverInfoExMapper {
      */
     List<CarBizDriverInfoDTO> queryCarBizDriverListBySupplierId(Integer supplierId);
 
+    /**
+     * @Title: updateDriverCooperationTypeBySupplierId
+     * @Description: 更新司机的加盟类型
+     * @param map
+     * @return void
+     * @throws
+     */
+    void updateDriverCooperationTypeBySupplierId(Map<String, Object> map);
+
+    List<CarBizDriverInfoDTO> queryDriverIdsByActionVO(Map map);
+
+    CarBizDriverInfoDTO queryDriverIdByActionVO(Map<String, Object> params);
 }

@@ -107,6 +107,9 @@ public enum MenuEnum {
     DRIVER_RANK_INTEGRAL_LIST(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.DRIVER_WORK_MANAGE, MenuConstants.DRIVER_RANK_INTEGRAL,"司机等级积分查询"),
     DRIVER_RANK_INTEGRAL_EXPORT(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.DRIVER_WORK_MANAGE, MenuConstants.DRIVER_RANK_INTEGRAL,"司机等级积分导出"),
 
+    DRIVER_ACTION_ENUM(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.DRIVER_WORK_MANAGE,MenuConstants.DRIVER_ACTION, "司机事件枚举列表"),
+    DRIVER_ACTION_LIST(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.DRIVER_WORK_MANAGE,MenuConstants.DRIVER_ACTION, "司机事件列表查询"),
+    DRIVER_ACTION_TIMELINE(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.DRIVER_WORK_MANAGE,MenuConstants.DRIVER_ACTION, "司机事件时间轴"),
     //车队班组管理
     TEAM_GROUP_LIST(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.TEAM_GROUP_MANAGE, MenuConstants.TEAM_GROUP_MANAGE,"车队班组信息查询"),
     TEAM_GROUP_ADD(MenuConstants.TRANSPORT_CAPACITY, MenuConstants.TEAM_GROUP_MANAGE, MenuConstants.TEAM_GROUP_MANAGE,"车队班组信息添加"),
@@ -180,6 +183,11 @@ public enum MenuEnum {
     SUBSCRIPTION_REPORT(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.DATA_REPORT, MenuConstants.DATA_REPORT_SUBSCRIPTION, "数据报表订阅"),
     REPORT_DOWNLOAD_LIST(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.DATA_REPORT, MenuConstants.DATA_REPORT_DOWNLOAD, "订阅报表下载列表查询"),
     REPORT_DOWNLOAD(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.DATA_REPORT, MenuConstants.DATA_REPORT_DOWNLOAD, "加盟商名称是否存在"),
+
+    PROBLEM_FEED_BACK_QUERY(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.PROBLEM_FEED_BACK,MenuConstants.PROBLEM_FEED_BACKS,"问题受理查询"),
+    PROBLEM_FEED_BACK_ADD(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.PROBLEM_FEED_BACK,MenuConstants.PROBLEM_FEED_BACKS,"问题受理新增"),
+    PROBLEM_FEED_BACK_MANAGE(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.PROBLEM_FEED_BACK,MenuConstants.PROBLEM_FEED_BACKS,"问题受理处理"),
+    PROBLEM_FEED_BACK_DOWNLOAD(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.PROBLEM_FEED_BACK,MenuConstants.PROBLEM_FEED_BACKS,"问题受理文件下载"),
     ;
 
     private String levelOne;

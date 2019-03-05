@@ -49,7 +49,12 @@
     t.team_name teamName,
     r.driver_id,
     (select team_name from car_driver_team tt,car_relate_group gg where tt.id = gg.group_id and gg.driver_id = r.driver_id limit 1) as groupName
-    from driver_daily_report r
+    <if test="value !=null and value !='' and value==1 ">
+      , r.down_online_time AS downOnlineTime
+      , r.all_time AS allTime
+      , r.work_status AS workStatus
+    </if>
+    from ${tableName} r
     left join car_driver_team t on t.id = r.car_team_id
     where 1=1
       <if test="licensePlates != null and licensePlates != '' " >
@@ -122,7 +127,12 @@
     sum(travel_mileage_end) travel_mileage_end,
     t.team_name teamName,
     (select team_name from car_driver_team tt,car_relate_group gg where tt.id = gg.group_id and gg.driver_id = r.driver_id limit 1) as groupName
-    from driver_daily_report r
+    <if test="value !=null and value !='' and value==1 ">
+      , MAX(r.down_online_time) AS downOnlineTime
+      , sum(r.all_time) AS allTime
+      , sum(r.work_status) AS workStatus
+    </if>
+    from ${tableName} r
     left join car_driver_team t on t.id = r.car_team_id
     where 1=1
     <if test="licensePlates != null and licensePlates != '' " >
@@ -166,7 +176,12 @@
     t.team_name teamName,
     r.driver_id,
     (select team_name from car_driver_team tt,car_relate_group gg where tt.id = gg.group_id and gg.driver_id = r.driver_id limit 1) as groupName
-    from driver_daily_report r
+    <if test="value !=null and value !='' and value==1 ">
+      , r.down_online_time AS downOnlineTime
+      , r.all_time AS allTime
+      , r.work_status AS workStatus
+    </if>
+    from ${tableName} r
     left join car_driver_team t on t.id = r.car_team_id
     where r.driver_id = #{driverIds}
     <![CDATA[ and stat_date >=  #{statDateStart} ]]>
@@ -182,7 +197,7 @@
   <select id="queryDriverIds" resultType="java.lang.Integer" parameterType="com.zhuanche.entity.mdbcarmanage.DriverDailyReportParams" >
     select
     distinct driver_id driverId
-    from driver_daily_report r
+    from ${tableName} r
     where 1=1
     <if test="licensePlates != null and licensePlates != '' " >
       and license_plates like '${licensePlates}%'

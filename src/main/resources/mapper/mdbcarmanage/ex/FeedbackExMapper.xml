@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.FeedbackExMapper">
+    <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.Feedback">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="feedback_content" property="feedbackContent" jdbcType="VARCHAR"/>
+        <result column="sender_id" property="senderId" jdbcType="INTEGER"/>
+        <result column="sender_name" property="senderName" jdbcType="VARCHAR"/>
+        <result column="manage_id" property="manageId" jdbcType="INTEGER"/>
+        <result column="manage_name" property="manageName" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="manage_status" property="manageStatus" jdbcType="INTEGER"/>
+        <result column="manage_time" property="manageTime" jdbcType="TIMESTAMP"/>
+        <result column="manage_content" property="manageContent" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, feedback_content, sender_id, sender_name, manage_id, manage_name, create_time, 
+    update_time, manage_status, manage_time, manage_content
+  </sql>
+
+    <select id="findDataList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from feedback
+        where 1=1
+        <if test="createTimeStart !=null and createTimeStart !=''">
+            <![CDATA[ and create_time >= #{createTimeStart} ]]>
+        </if>
+        <if test="createTimeEnd !=null and createTimeEnd !=''">
+            <![CDATA[ and create_time <= #{createTimeEnd} ]]>
+        </if>
+        <if test="manageStatus != null">
+            and manage_status = #{manageStatus}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="findDataListSelf" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from feedback
+        where sender_id = #{userId}
+        <if test="createTimeStart !=null and createTimeStart !=''">
+            <![CDATA[ and create_time >= #{createTimeStart} ]]>
+        </if>
+        <if test="createTimeEnd !=null and createTimeEnd !=''">
+            <![CDATA[ and create_time <= #{createTimeEnd} ]]>
+        </if>
+        <if test="manageStatus != null">
+            and manage_status = #{manageStatus}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+</mapper>

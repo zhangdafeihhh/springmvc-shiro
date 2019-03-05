@@ -41,7 +41,6 @@ public final class RestErrorCode{
 	@ResultMessage("记录操作失败")
 	public static final int RECORD_DEAL_FAILURE                   = 501;
 
-
 	//-----------------------------------------------用户
 	@ResultMessage("获取验证码太频繁,请{0}分钟后重试")
 	public static final int GET_MSGCODE_EXCEED           = 1000;
@@ -199,6 +198,10 @@ public final class RestErrorCode{
 	public static final int GET_SUPPLIER_COMMISSION_INFO_FAILED = 9001;
 	@ResultMessage("供应商简称无效")
 	public static final int GET_SUPPLIER_SHORT_NAME_INVALID = 9002;
+
+	@ResultMessage("文件上传大小超过限制")
+	public static final int FILE_SIZE_TOO_BIG = 20001;
+
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系
 	static{

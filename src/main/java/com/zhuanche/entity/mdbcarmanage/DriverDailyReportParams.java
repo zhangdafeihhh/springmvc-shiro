@@ -30,6 +30,8 @@ public class DriverDailyReportParams implements Serializable{
 
 	private String tableName;//按月份表的表名
 
+	private Integer value; // 标识：2019年之后标识为1，sql查询添加字段
+
 
 	public DriverDailyReportParams(String licensePlates, String driverName, String driverIds, String teamIds, String suppliers, String cities, String statDateStart,
 		   String statDateEnd, String sortName, String sortOrder, String groupIds, Integer page, Integer pageSize) {
@@ -173,6 +175,14 @@ public class DriverDailyReportParams implements Serializable{
 
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
+	}
+
+	public Integer getValue() {
+		return value;
+	}
+
+	public void setValue(Integer value) {
+		this.value = value;
 	}
 
 	@Override

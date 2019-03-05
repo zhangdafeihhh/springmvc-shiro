@@ -1,26 +1,25 @@
 package com.zhuanche.serv.order;
 
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.rpc.HttpParamSignGenerator;
+import com.zhuanche.common.rpc.RPCAPI;
+import com.zhuanche.common.rpc.RPCResponse;
+import com.zhuanche.constant.Constants;
+import com.zhuanche.http.MpOkHttpUtil;
+import com.zhuanche.serv.order.elasticsearch.OrderSearchOrderBy;
+import com.zhuanche.serv.order.elasticsearch.OrderSearchV1Response;
+import com.zhuanche.util.Common;
+import com.zhuanche.util.SignatureUtils;
+import com.zhuanche.util.encrypt.MD5Utils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.zhuanche.common.rpc.HttpParamSignGenerator;
-import com.zhuanche.common.rpc.RPCAPI;
-import com.zhuanche.common.rpc.RPCResponse;
-import com.zhuanche.serv.order.elasticsearch.OrderSearchOrderBy;
-import com.zhuanche.serv.order.elasticsearch.OrderSearchV1Response;
-import com.zhuanche.util.Common;
+import java.security.SecureRandom;
+import java.util.*;
 
 /**  调用订单的接口，集中在这个类中封装
  * 
@@ -36,6 +35,7 @@ public class OrderService{
 	private String ORDER_SERVICE_API_BASE_URL      = "http://inside-orderapi.01zhuanche.com";//方便于自测，直接初始化一下
 	private String ORDER_SERVICE_API_BUSSINESSID = Common.BUSSINESSID;
 	private String ORDER_SERVICE_API_SIGNKEY       = Common.MAIN_ORDER_KEY;
+	public static final String ORDER_INFO_BY_COLUMNS = "/orderMain/getOrdersByOrderNo";
 	//----------------------------------以下是order-api接口配置
 	@Value("${car.rest.url}")
 	private String ORDER_API_URL                           = "http://inside-order.01zhuanche.com";//方便于自测，直接初始化一下
@@ -164,6 +164,26 @@ public class OrderService{
 		}
 		JSONObject order = (JSONObject)orderResponse.getData();
 		return order;
+	}
+
+	public JSONObject getOrderInfoByParams(String orderNo, String columns, String tag){
+		Map<String, Object> params = new HashMap<>();
+		String url = ORDER_SERVICE_API_BASE_URL + ORDER_INFO_BY_COLUMNS;
+		params.put("orderNo", orderNo);
+		params.put("bId", ORDER_SERVICE_API_BUSSINESSID);
+		params.put("columns", columns);
+		params.put("needHistory", 1);
+		try{
+			params.put("sign", MD5Utils.getMD5DigestBase64(SignatureUtils.getMD5Sign(params, ORDER_SERVICE_API_SIGNKEY)));
+		}catch (Exception e){
+			log.error("签名错误");
+			return null;
+		}
+		JSONObject result = MpOkHttpUtil.okHttpGetBackJson(url, params, 1, tag);
+		if (result != null && Constants.SUCCESS_CODE == result.getInteger(Constants.CODE)){
+			return result;
+		}
+		return null;
 	}
 	
 	

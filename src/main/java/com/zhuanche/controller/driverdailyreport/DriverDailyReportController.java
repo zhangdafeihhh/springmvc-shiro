@@ -18,21 +18,15 @@ import com.zhuanche.dto.DriverDailyReportDTO;
 import com.zhuanche.entity.mdbcarmanage.DriverDailyReport;
 import com.zhuanche.entity.mdbcarmanage.DriverDailyReportParams;
 import com.zhuanche.serv.DriverDailyReportExService;
-import com.zhuanche.serv.common.DataPermissionHelper;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtil;
-import com.zhuanche.util.MyRestTemplate;
 import com.zhuanche.util.excel.CsvUtils;
-import mapper.mdbcarmanage.ex.CarRelateGroupExMapper;
-import mapper.mdbcarmanage.ex.DriverDailyReportExMapper;
-import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -58,28 +52,6 @@ import static com.zhuanche.common.enums.MenuEnum.*;
 public class DriverDailyReportController extends DriverQueryController {
 
 	private static Logger log =  LoggerFactory.getLogger(DriverDailyReportController.class);
-
-	@Autowired
-	private DriverDailyReportExMapper driverDailyReportExMapper;
-
-	@Autowired
-	private DataPermissionHelper dataPermissionHelper;
-
-	@Autowired
-	private CarRelateGroupExMapper carRelateGroupExMapper;
-
-	@Autowired
-	private CarBizSupplierExMapper carBizSupplierExMapper;
-
-
-	@Autowired
-	@Qualifier("busOrderCostTemplate")
-	private MyRestTemplate busOrderCostTemplate;
-
-	@RequestMapping("/list")
-	public String list(){
-		return "driverdailyreport/driverlist";
-	}
 
 	@Autowired
 	private DriverDailyReportExService driverDailyReportExService;
@@ -110,7 +82,7 @@ public class DriverDailyReportController extends DriverQueryController {
 	})
 	@RequestFunction(menu = DRIVER_WORK_REPORT_LIST)
 	public AjaxResponse queryDriverWeekReportDataNew(String licensePlates, String driverName, String driverIds, String teamIds,
-													 @Verify(rule = "required",param = "suppliers") String suppliers,
+													 String suppliers,
 													 @Verify(rule = "required",param = "cities") String cities,
 													 @Verify(rule = "required",param = "statDateStart") String statDateStart,
 													 @Verify(rule = "required",param = "statDateEnd") String statDateEnd, String sortName, String sortOrder, String groupIds, Integer page, Integer pageSize, Integer reportType) throws ParseException {
@@ -205,6 +177,8 @@ public class DriverDailyReportController extends DriverQueryController {
 		}
 		//初始化查询参数
 		DriverDailyReportParams params = new DriverDailyReportParams(driverIds,statDateStart,statDateEnd,sortName,sortOrder,page,pageSize);
+		//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
+		params = this.chuliDriverDailyReportEntity(params);
 		log.info("司机周报、月报详情列表数据:queryDriverReportDataDetail，参数："+params.toString());
 		int total = 0;
 		//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
@@ -212,7 +186,7 @@ public class DriverDailyReportController extends DriverQueryController {
 		//开始查询
 		Page<DriverDailyReport> p = PageHelper.startPage(params.getPage(), params.getPageSize());
 		try {
-			list = this.driverDailyReportExMapper.queryDriverReportData(params);
+			list = this.driverDailyReportExService.queryDriverReportData(params);
 			total = (int) p.getTotal();
 		} finally {
 			PageHelper.clearPage();
@@ -248,7 +222,7 @@ public class DriverDailyReportController extends DriverQueryController {
 	})
 	@RequestFunction(menu = DRIVER_WORK_REPORT_EXPORT)
 	public String exportDriverReportData(String licensePlates, String driverName, String driverIds, String teamIds,
-											   @Verify(rule = "required",param = "suppliers") String suppliers,
+											 String suppliers,
 											   @Verify(rule = "required",param = "cities") String cities,
 											   @Verify(rule = "required",param = "statDateStart") String statDateStart,
 											   String statDateEnd,
@@ -302,7 +276,7 @@ public class DriverDailyReportController extends DriverQueryController {
 		long  start = System.currentTimeMillis();
 
 		try {
-			headerList.add("车牌号,姓名,供应商,车队,小组,上线时间,总在线时长（小时）,班在线时长（min）,计价前时间(min),计价前里程(km),载客中时间(min),载客里程(km)," +
+			headerList.add("车牌号,姓名,供应商,车队,小组,出车时间,收车时间,总出车时长(小时),出车天数,总在线时长（小时）,班在线时长（min）,计价前时间(min),计价前里程(km),载客中时间(min),载客里程(km)," +
 					"总服务时间(min),总服务里程(km),计算异动时间(min),结算异动里程（km）,司机营业额(元),价外费用（元）,绑单完成数,抢单完成数," +
 					"后台派单,接机,送机,完成单数,日期"
 			);
@@ -380,6 +354,7 @@ public class DriverDailyReportController extends DriverQueryController {
 					for(int pageNumber = 2;pageNumber <= pages ; pageNumber++){
 						params.setPage(pageNumber);
 						rows = null;
+						params.setDriverIds(null);
 						log.info("工作日报:第"+pageNumber+"页/共"+pages+"页，查询条件为："+JSON.toJSONString(params));
 						pageInfos = driverDailyReportExService.findDayDriverDailyReportByparam(params);
 						result = pageInfos.getList();
@@ -422,6 +397,7 @@ public class DriverDailyReportController extends DriverQueryController {
 						params.setPage(pageNumber);
 						log.info(fileTag+":第"+pageNumber+"页/共"+pages+"页，查询条件为："+JSON.toJSONString(params));
 						rows = null;
+						params.setDriverIds(null);
 						pageInfos = driverDailyReportExService.findWeekDriverDailyReportByparam(params,  statDateStart,    statDateEnd);
 						result = pageInfos.getList();
 						csvDataList = new ArrayList<>();
@@ -478,6 +454,15 @@ public class DriverDailyReportController extends DriverQueryController {
 
 
 			stringBuffer.append(s.getUpOnlineTime()==null?"":"\t"+s.getUpOnlineTime().replace(".0",""));
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getDownOnlineTime()==null?"":"\t"+s.getDownOnlineTime().replace(".0",""));
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getAllTime() );
+			stringBuffer.append(",");
+
+			stringBuffer.append(s.getWorkStatus() );
 			stringBuffer.append(",");
 
 
@@ -574,9 +559,16 @@ public class DriverDailyReportController extends DriverQueryController {
 		if("".equals(driverDailyReportBean.getTeamIds())||driverDailyReportBean.getTeamIds()==null){
 			driverDailyReportBean.setTeamIds(teamIds.substring(1, teamIds.length()-1));
 		}
+		String tableName = "driver_daily_report";
+		String statDateStart = driverDailyReportBean.getStatDateStart();
+		if(StringUtils.isNotEmpty(statDateStart)){
+			Integer year = Integer.parseInt(statDateStart.substring(0,4));
+			if(year!=null && year>2018){
+				tableName += "_" + driverDailyReportBean.getStatDateStart().substring(0, 7).replace("-", "_");
+				driverDailyReportBean.setValue(1);
+			}
+		}
+		driverDailyReportBean.setTableName(tableName);
 		return driverDailyReportBean;
 	}
-
-
-
 }

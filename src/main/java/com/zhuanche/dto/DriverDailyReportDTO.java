@@ -1,5 +1,6 @@
 package com.zhuanche.dto;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -79,7 +80,14 @@ public class DriverDailyReportDTO{
 
     private String statDateStart;
     private String statDateEnd;
- 
+
+    private String downOnlineTime;//收车时间
+
+    private BigDecimal allTime;//总时间（司机上班就算）
+
+    private Integer workStatus;//是否出车；1出车，0未出车（all_time>0,代表出车）
+
+    private Date createDate;
     
     public DriverDailyReportDTO(){
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd");
@@ -368,4 +376,35 @@ public class DriverDailyReportDTO{
 		this.statDateEnd = statDateEnd;
 	}
 
+    public String getDownOnlineTime() {
+        return downOnlineTime;
+    }
+
+    public void setDownOnlineTime(String downOnlineTime) {
+        this.downOnlineTime = downOnlineTime;
+    }
+
+    public BigDecimal getAllTime() {
+        return allTime;
+    }
+
+    public void setAllTime(BigDecimal allTime) {
+        this.allTime = allTime;
+    }
+
+    public Integer getWorkStatus() {
+        return workStatus;
+    }
+
+    public void setWorkStatus(Integer workStatus) {
+        this.workStatus = workStatus;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
 }

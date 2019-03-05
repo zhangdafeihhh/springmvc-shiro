@@ -19,6 +19,7 @@ import com.zhuanche.util.FtpUtil;
 import com.zhuanche.util.FtpUtils;
 import com.zhuanche.util.HtmlFilterUtil;
 import com.zhuanche.util.dateUtil.DateUtil;
+import mapper.mdbcarmanage.CarMessagePostMapper;
 import mapper.mdbcarmanage.ex.*;
 import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
@@ -83,6 +84,12 @@ public class MessageService {
 
     @Autowired
     private MessageReceiveService receiveService;
+
+    @Autowired
+    private CarMessagePostMapper carMessagePostMapper;
+
+    @Autowired
+    private CarMessageReplyExMapper carMessageReplyExMapper;
 
 
     /**
@@ -244,6 +251,7 @@ public class MessageService {
      * @param messageId
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public int withDraw(Integer messageId) throws MessageException{
 
         try {
@@ -253,6 +261,9 @@ public class MessageService {
              docExMapper.updateStatus(messageId.longValue(),CarMessagePost.Status.draft.getMessageStatus());
 
              postExMapper.withDraw(Long.valueOf(messageId));
+
+            //撤回删除回复
+            carMessageReplyExMapper.deleteByMessageId(messageId);
 
              logger.info("撤回操作成功，messageId:" + messageId);
 
@@ -777,5 +788,22 @@ public class MessageService {
             }
         }
         return new PageDTO(pageNum, pageSize, count, data);
+    }
+
+    /**
+     * 判断查询回复用户是否是消息发布者
+     * @param userId
+     * @param messageId
+     * @return
+     * true 是消息发布者
+     * false :不是消息发布者
+     */
+    public boolean isMessageAuthor(Integer userId, Long messageId) {
+        CarMessagePost carMessagePost = carMessagePostMapper.selectByPrimaryKey(messageId);
+        if (carMessagePost == null){
+            return false;
+        }
+        Integer queryUserId = carMessagePost.getUserId();
+        return userId.equals(queryUserId);
     }
 }

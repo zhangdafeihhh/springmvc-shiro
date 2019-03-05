@@ -1797,4 +1797,65 @@
         WHERE supplier_id = #{supplierId}
   </update>
 
+  <select id="queryDriverIdsByActionVO" parameterType="map" resultMap="BaseResultMap">
+    select driver_id,name,phone,license_plates from car_biz_driver_info
+    <where>
+      <if test="driverId != null">
+        and driver_id = #{driverId}
+      </if>
+      <if test="driverPhone != null">
+        and phone = #{driverPhone}
+      </if>
+      <if test="driverName != null">
+        and name = #{driverName}
+      </if>
+      <if test="driverLicense != null">
+        and license_plates = #{driverLicense}
+      </if>
+      <if test="cities != null and !cities.isEmpty()">
+        and service_city in
+        <foreach item="item" index="index" collection="cities" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="supplierIds != null and !supplierIds.isEmpty()">
+        and supplier_id in
+        <foreach item="item" index="index" collection="supplierIds" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+    </where>
+  </select>
+
+    <select id="queryDriverIdByActionVO" parameterType="map" resultMap="BaseResultMap">
+        select driver_id,name,phone,license_plates from car_biz_driver_info
+        <where>
+            <if test="driverId != null">
+                and driver_id = #{driverId}
+            </if>
+            <if test="driverPhone != null">
+                and phone = #{driverPhone}
+            </if>
+            <if test="driverName != null">
+                and name = #{driverName}
+            </if>
+            <if test="driverLicense != null">
+                and license_plates = #{driverLicense}
+            </if>
+            <if test="cities != null and !cities.isEmpty()">
+                and service_city in
+                <foreach item="item" index="index" collection="cities" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="supplierIds != null and !supplierIds.isEmpty()">
+                and supplier_id in
+                <foreach item="item" index="index" collection="supplierIds" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        limit 1
+    </select>
+
 </mapper>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.CarMessageReplyExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.CarMessageReply" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="reply_content" property="replyContent" jdbcType="VARCHAR" />
+    <result column="sender_name" property="senderName" jdbcType="VARCHAR" />
+    <result column="sender_id" property="senderId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="message_id" property="messageId" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, reply_content, sender_name, sender_id, create_time, update_time, message_id
+  </sql>
+  <delete id="deleteByMessageId" parameterType="java.lang.Integer" >
+    delete from car_message_reply
+    where message_id = #{messageId,jdbcType=INTEGER}
+  </delete>
+  <select id="findReplyListByMessageIdPage" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from car_message_reply
+    where message_id = #{messageId,jdbcType=BIGINT}
+  </select>
+
+  <select id="findReplyListByMessageIdAndSenderIdPage" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from car_message_reply
+    where message_id = #{messageId,jdbcType=BIGINT}
+    and sender_id = #{senderId,jdbcType=INTEGER}
+  </select>
+
+
+</mapper>
