@@ -99,7 +99,7 @@
     driver_name,
     sum(operation_num) operation_num,
     min(up_online_time) up_online_time,
-    sum(forced_time) forcedTime,
+    sum(forced_time) forced_time,
     sum(order_time) order_time,
     sum(service_time) service_time,
     sum(online_time) online_time,
