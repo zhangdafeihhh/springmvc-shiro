@@ -78,7 +78,9 @@ public class CarAnalysisIndexController{
 		  }
 		  // 前端新增其他车辆类型
 		  if (visibleVehicleTypeIds.equals("others")){
-		  	  paramMap.put("visibleVehicleTypeIds",-1);
+		  		//接受参数必须为数组
+			  String[] array = new String[]{"-1"};
+		  	  paramMap.put("visibleVehicleTypeIds",array);
 		  }else {
 			  String[] visibleVehicleTypeIdsStr = visibleVehicleTypeIds.split(",");
 			  paramMap.put("visibleVehicleTypeIds", visibleVehicleTypeIdsStr); // 可见车辆类型ID
@@ -122,7 +124,8 @@ public class CarAnalysisIndexController{
 	        }
 			if(StringUtil.isNotEmpty(carGroupId)){
 				if ("others".equals(carGroupId)){
-					paramMap.put("carGroupId", -1);
+					String[] array = new String[]{"-1"};
+					paramMap.put("carGroupId", array);
 				}else {
 					paramMap.put("carGroupId", carGroupId);
 				}// 车辆类型  ??
