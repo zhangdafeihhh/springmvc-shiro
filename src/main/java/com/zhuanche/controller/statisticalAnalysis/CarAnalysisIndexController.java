@@ -121,7 +121,11 @@ public class CarAnalysisIndexController{
 	        	paramMap.put("motorcadeId", motorcadeId);//车队ID
 	        }
 			if(StringUtil.isNotEmpty(carGroupId)){
-				paramMap.put("carGroupId", carGroupId); // 车辆类型  ??
+				if ("others".equals(carGroupId)){
+					paramMap.put("carGroupId", -1);
+				}else {
+					paramMap.put("carGroupId", carGroupId);
+				}// 车辆类型  ??
 			}
 	        String httpUrl = saasBigdataApiUrl+"/carAnalysisIndex/carIndex";
 			logger.info("【运营管理-统计分析】车辆分析指标趋势 数据:"+JSON.toJSONString(paramMap));
