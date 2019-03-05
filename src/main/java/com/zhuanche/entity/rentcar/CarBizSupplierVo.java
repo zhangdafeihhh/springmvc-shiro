@@ -20,9 +20,9 @@ public class CarBizSupplierVo extends CarBizSupplier {
     private Integer twoLevelCooperation;
     private String twoLevelCooperationName;
     //分佣结算化字段
-    private String settlementType;
-    private String settlementCycle;
-    private String settlementDay;
+    private Integer settlementType;
+    private Integer settlementCycle;
+    private Integer settlementDay;
     private String settlementAccount;
     private String bankAccount;
     private String bankName;

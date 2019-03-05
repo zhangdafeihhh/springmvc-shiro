@@ -11,4 +11,6 @@ public interface SupplierExtDtoExMapper {
     int updateBySupplierId(SupplierExtDto extDto);
 
     SupplierExtDto selectBySupplierId(@Param("supplierId")Integer supplierId);
+
+    int selectCountBySupplierId(@Param("supplierId")Integer supplierId);
 }

@@ -28,6 +28,7 @@ import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -149,27 +150,15 @@ public class CarBizSupplierService{
 				supplier.setCreateName(currentLoginUser.getName());
 				carBizSupplierExMapper.insertSelective(supplier);
 				logger.info("新增供应商信息: supplierInfo {}", JSON.toJSONString(supplier));
-				SupplierExtDto extDto = new SupplierExtDto();
-				extDto.setEmail(supplier.getEmail());
-				extDto.setSupplierShortName(supplier.getSupplierShortName());
-				extDto.setSupplierId(supplier.getSupplierId());
-				extDto.setCreateDate(new Date());
-				extDto.setUpdateDate(new Date());
-				extDto.setTwoLevelCooperation(twoLevelId);
+				SupplierExtDto extDto = generateSupplierExtDto(supplier, twoLevelId, true);
 				supplierExtDtoMapper.insertSelective(extDto);
 				logger.info("新增供应商扩展信息：supplierExtInfo {}", JSON.toJSONString(extDto));
 			}else {
 				carBizSupplierExMapper.updateByPrimaryKeySelective(supplier);
 				logger.info("更新供应商信息: supplierInfo {}", JSON.toJSONString(supplier));
-				SupplierExtDto extDto = new SupplierExtDto();
-				extDto.setEmail(supplier.getEmail());
-				extDto.setSupplierShortName(supplier.getSupplierShortName());
-				extDto.setSupplierId(supplier.getSupplierId());
-				extDto.setStatus(supplier.getStatus().byteValue());
-				extDto.setUpdateDate(new Date());
-				extDto.setTwoLevelCooperation(twoLevelId);
-				SupplierExtDto supplierExtDto = supplierExtDtoExMapper.selectBySupplierId(supplier.getSupplierId());
-				if (supplierExtDto == null){
+				SupplierExtDto extDto = generateSupplierExtDto(supplier, twoLevelId, false);
+				int count = supplierExtDtoExMapper.selectCountBySupplierId(supplier.getSupplierId());
+				if (count == 0){
 					extDto.setCreateDate(new Date());
 					supplierExtDtoMapper.insertSelective(extDto);
 					logger.info("新增供应商扩展信息 : supplierExtInfo {}", JSON.toJSONString(extDto));
@@ -212,14 +201,16 @@ public class CarBizSupplierService{
 			return;
 		}
 		//补全供应商邮箱,简称字段
-		List<SupplierExtDto> extDtos = supplierExtDtoExMapper.queryExtDtoByIdList(idList);
+		List<SupplierExtDto> extInfo = supplierExtDtoExMapper.queryExtDtoByIdList(idList);
 		Map<Integer, SupplierExtDto> supplierExtDtoMap =
-				extDtos.stream().filter(Objects::nonNull).collect(Collectors.toMap(SupplierExtDto::getSupplierId, value -> value));
+				extInfo.stream().filter(Objects::nonNull).collect(Collectors.toMap(SupplierExtDto::getSupplierId, value -> value));
 		list.forEach( supplierVo -> {
 			if (supplierVo != null){
 				SupplierExtDto supplierExtDto = supplierExtDtoMap.get(supplierVo.getSupplierId());
-				supplierVo.setSupplierShortName(supplierExtDto.getSupplierShortName());
-				supplierVo.setEmail(supplierExtDto.getEmail());
+				if (supplierExtDto != null) {
+					supplierVo.setSupplierShortName(supplierExtDto.getSupplierShortName());
+					supplierVo.setEmail(supplierExtDto.getEmail());
+				}
 			}
 		});
 	}
@@ -237,8 +228,7 @@ public class CarBizSupplierService{
 		//补全供应商扩展信息
 		SupplierExtDto supplierExtDto = supplierExtDtoExMapper.selectBySupplierId(supplierId);
 		if (supplierExtDto != null) {
-			vo.setEmail(supplierExtDto.getEmail());
-			vo.setSupplierShortName(supplierExtDto.getSupplierShortName());
+			BeanUtils.copyProperties(supplierExtDto, vo);
 			TwoLevelCooperationDto twoLevelCooperationDto;
 			if ((twoLevelCooperationDto = hasTwoLevelCooperation(supplierExtDto)) != null){
 				vo.setTwoLevelCooperationName(twoLevelCooperationDto.getCooperationName());
@@ -330,5 +320,16 @@ public class CarBizSupplierService{
 			}
 		}
 		return null;
+	}
+
+	private SupplierExtDto generateSupplierExtDto(CarBizSupplierVo supplier, int twoLevelCooperation, boolean create){
+		SupplierExtDto extDto = new SupplierExtDto();
+
+		if (create) {
+			extDto.setCreateDate(new Date());
+		}
+		BeanUtils.copyProperties(supplier, extDto);
+		extDto.setTwoLevelCooperation(twoLevelCooperation);
+		return extDto;
 	}
 }
