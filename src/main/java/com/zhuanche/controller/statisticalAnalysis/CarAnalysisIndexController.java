@@ -124,8 +124,7 @@ public class CarAnalysisIndexController{
 	        }
 			if(StringUtil.isNotEmpty(carGroupId)){
 				if ("others".equals(carGroupId)){
-					String[] array = new String[]{"-1"};
-					paramMap.put("carGroupId", array);
+					paramMap.put("carGroupId", "-1");
 				}else {
 					paramMap.put("carGroupId", carGroupId);
 				}// 车辆类型  ??
