@@ -140,6 +140,14 @@ public class FeedBackController {
         try {
             Integer userId = currentLoginUser.getId();
             feedbackList = feedBackService.findDataListSelf(createTimeStart,createTimeEnd,manageStatus, userId);
+            if (null == feedbackList){
+                feedbackList = Lists.newArrayList();
+            }
+            feedbackList.forEach(value -> {
+                if (FeedBackManageStatusEnum.TO_ACCEPT.getCode() == value.getManageStatus()){
+                    value.setManageTime(null);
+                }
+            });
             total = (int) p.getTotal();
         } finally {
             PageHelper.clearPage();
