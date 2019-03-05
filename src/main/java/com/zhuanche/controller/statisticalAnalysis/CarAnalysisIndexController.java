@@ -76,10 +76,14 @@ public class CarAnalysisIndexController{
 		  if(null == visibleVehicleTypeIds){
 				return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID,"可见车辆类型ID参数不能为空");
 		  }
-		  // 全部车辆类型  ??
-		  String[] visibleVehicleTypeIdsStr = visibleVehicleTypeIds.split(",");
-		  paramMap.put("visibleVehicleTypeIds", visibleVehicleTypeIdsStr); // 可见车辆类型ID
-	      // 从大数据仓库获取统计数据
+		  // 前端新增其他车辆类型
+		  if (visibleVehicleTypeIds.equals("others")){
+		  	  paramMap.put("visibleVehicleTypeIds",-1);
+		  }else {
+			  String[] visibleVehicleTypeIdsStr = visibleVehicleTypeIds.split(",");
+			  paramMap.put("visibleVehicleTypeIds", visibleVehicleTypeIdsStr); // 可见车辆类型ID
+		  }
+		  // 从大数据仓库获取统计数据
 	      AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/carAnalysisDetail/carDetail",paramMap);
 	      return result;
 	  }
