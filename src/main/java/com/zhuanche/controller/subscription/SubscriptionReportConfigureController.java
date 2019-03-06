@@ -233,6 +233,30 @@ public class SubscriptionReportConfigureController {
         map.put( "6", "自营司机工资");
         map.put( "7", "红旗司机考勤");
         map.put( "8", "红旗司机订单");
+        map.put( "9", "12306");
+        map.put( "10", "差旅一号");
+        map.put( "11", "龙腾卡");
+        map.put( "12", "如家");
+        map.put( "13", "神舟携程商旅");
+        map.put( "14", "同程旅游");
+        map.put( "15", "途牛旅游");
+        map.put( "16", "梓如股份");
+        map.put( "17", "百度员工");
+        map.put( "18", "平安财酷");
+        map.put( "19", "国家电网");
+        map.put( "20", "海航");
+        map.put( "21", "红旗");
+        map.put( "22", "携程");
+        map.put( "23", "飞猪");
+        map.put( "24", "E代驾");
+        map.put( "25", "巴士管家");
+        map.put( "26", "百度地图");
+        map.put( "27", "飞常准");
+        map.put( "28", "哈啰出行");
+        map.put( "29", "高德");
+        map.put( "30", "阿里欢行");
+        map.put( "31", "东方航空");
+
         return AjaxResponse.success(map);
     }
 
