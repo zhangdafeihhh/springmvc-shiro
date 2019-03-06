@@ -237,10 +237,10 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
                 ddre.setActualPay(todayIncomeAmount.doubleValue());
                 // 当日载客里程
                 BigDecimal todayTravelMileage = new BigDecimal(String.valueOf(jsonObject.get("todayTravelMileage")));
-                ddre.setServiceMileage(todayTravelMileage.doubleValue());
+//                ddre.setServiceMileage(todayTravelMileage.doubleValue());
                 // 当日司机代付价外费
                 BigDecimal todayOtherFee = new BigDecimal(String.valueOf(jsonObject.get("todayOtherFee")));
-                ddre.setDriverOutPay(todayOtherFee.doubleValue());
+//                ddre.setDriverOutPay(todayOtherFee.doubleValue());
                 // 当日司机代收
                 BigDecimal todayDriverPay = new BigDecimal(String.valueOf(jsonObject.get("todayDriverPay")));
             }
