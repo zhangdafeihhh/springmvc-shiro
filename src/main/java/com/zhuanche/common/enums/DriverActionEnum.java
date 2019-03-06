@@ -51,6 +51,7 @@ public enum DriverActionEnum {
     CROSS_ORDER_TURN_ON(47, "开启跨级接单"),
     CROSS_ORDER_TURN_OFF(48, "关闭跨级接单"),
     AUTO_SERVICE(49, "自动开始服务"),
+    SINGLE_PATH_SPEED_FIRST(50, "默认导航策略：单路径，速度优先"),
     SINGLE_ROAD_COST(51, "单路径-费用优先,尽量避开收费道路，有可能起始点间必有收费路"),
     SINGLE_ROAD_DISTANCE(52, "单路径-距离优先,距离最短"),
     SINGLE_ROAD_NORMAL(53, "单路径-普通路优先,不走快速路，包含高速路"),
