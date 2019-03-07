@@ -20,7 +20,6 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import mapper.driver.SupplierExtDtoMapper;
 import mapper.driver.ex.SupplierExtDtoExMapper;
-import mapper.driver.ex.TwoLevelCooperationExMapper;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import mapper.rentcar.CarBizSupplierMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
@@ -65,9 +64,6 @@ public class CarBizSupplierService{
 
 	@Autowired
 	private CarAdmUserExMapper carAdmUserExMapper;
-
-	@Autowired
-	private TwoLevelCooperationExMapper twoLevelCooperationExMapper;
 
 	@Value("${commission.url}")
 	String commissionUrl;
@@ -234,6 +230,7 @@ public class CarBizSupplierService{
 		SupplierExtDto supplierExtDto = supplierExtDtoExMapper.selectBySupplierId(supplierId);
 		if (supplierExtDto != null) {
 			BeanUtils.copyProperties(supplierExtDto, vo);
+			vo.setSupplierId(supplierId);
 		}
 		if (vo.getCreateBy() != null && vo.getCreateBy() > Constants.ZERO){
 			String create = carAdmUserExMapper.queryNameById(vo.getCreateBy());
