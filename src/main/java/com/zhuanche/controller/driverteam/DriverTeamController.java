@@ -1,6 +1,7 @@
 package com.zhuanche.controller.driverteam;
 
 import com.alibaba.fastjson.JSON;
+import com.zhuanche.common.dingdingsync.DingdingAnno;
 import com.zhuanche.common.dutyEnum.ServiceReturnCodeEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
@@ -84,6 +85,7 @@ public class DriverTeamController{
 	@ResponseBody
 	@RequestMapping(value = "/saveOneDriverTeam")
 	@RequestFunction(menu = TEAM_GROUP_ADD)
+	@DingdingAnno(method = "insert",level = "2")
 	public AjaxResponse saveOneDriverTeam(CarDriverTeamDTO param){
 		logger.info("新增车队入参:"+ JSON.toJSONString(param));
 		int result = carDriverTeamService.saveOneDriverTeam(param);
@@ -104,6 +106,7 @@ public class DriverTeamController{
 	@ResponseBody
 	@RequestMapping(value = "/updateOneDriverTeam")
 	@RequestFunction(menu = TEAM_GROUP_UPDATE)
+	@DingdingAnno(method = "update",level = "2")
 	public AjaxResponse updateOneDriverTeam(CarDriverTeamDTO param){
 		logger.info("修改车队入参:"+ JSON.toJSONString(param));
 		if(Check.NuNObj(param) || Check.NuNObj(param.getId())){

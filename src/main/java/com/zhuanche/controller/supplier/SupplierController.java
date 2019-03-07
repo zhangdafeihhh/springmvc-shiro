@@ -2,6 +2,7 @@ package com.zhuanche.controller.supplier;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.zhuanche.common.dingdingsync.DingdingAnno;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RequestFunction;
@@ -74,6 +75,7 @@ public class SupplierController {
     @RequestMapping("/addSupplier")
     @ResponseBody
     @RequestFunction(menu = SUPPLIER_ADD)
+    @DingdingAnno(level = "1",method = "insert")
     public AjaxResponse addSupplier(CarBizSupplierVo supplier){
         return supplierService.saveSupplierInfo(supplier);
     }
@@ -81,6 +83,7 @@ public class SupplierController {
     @RequestMapping("/updateSupplier")
     @ResponseBody
     @RequestFunction(menu = SUPPLIER_UPDATE)
+    @DingdingAnno(level = "1",method = "update")
     public AjaxResponse updateSupplier(CarBizSupplierVo supplier){
         return supplierService.saveSupplierInfo(supplier);
     }
