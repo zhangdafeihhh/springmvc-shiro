@@ -304,10 +304,11 @@ public class CarBizSupplierService{
 
 	private SupplierExtDto generateSupplierExtDto(CarBizSupplierVo supplier, boolean create){
 		SupplierExtDto extDto = new SupplierExtDto();
+		BeanUtils.copyProperties(supplier, extDto);
+		extDto.setUpdateDate(new Date());
 		if (create) {
 			extDto.setCreateDate(new Date());
 		}
-		BeanUtils.copyProperties(supplier, extDto);
 		if (!modifyAccept(supplier)){
 			throw new IllegalArgumentException("结算信息输入错误");
 		}
