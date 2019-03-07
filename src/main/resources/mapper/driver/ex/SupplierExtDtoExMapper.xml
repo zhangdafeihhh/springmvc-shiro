@@ -10,7 +10,6 @@
     <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
     <result column="email" property="email" jdbcType="VARCHAR" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
-    <result column="two_level_cooperation" property="twoLevelCooperation" jdbcType="INTEGER" />
     <result column="settlement_type" property="settlementType" jdbcType="INTEGER" />
     <result column="settlement_cycle" property="settlementCycle" jdbcType="INTEGER" />
     <result column="settlement_day" property="settlementDay" jdbcType="INTEGER" />
@@ -22,7 +21,7 @@
   </resultMap>
   <sql id="Base_Column_List" >
     id, supplier_id, status, supplier_short_name, create_date, update_date, email, remark,
-    two_level_cooperation, settlement_type, settlement_cycle, settlement_day, settlement_account,
+    settlement_type, settlement_cycle, settlement_day, settlement_account,
     bank_account, bank_name, bank_identify, settlement_full_name
   </sql>
   <select id="queryExtDtoByIdList" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -49,9 +48,6 @@
       </if>
       <if test="email != null and email != ''">
         email = #{email},
-      </if>
-      <if test="twoLevelCooperation != null">
-        two_level_cooperation = #{twoLevelCooperation},
       </if>
       <if test="settlementType != null" >
         settlement_type = #{settlementType,jdbcType=INTEGER},
@@ -86,7 +82,6 @@
       id,
       supplier_short_name,
       email,
-      two_level_cooperation,
       settlement_type,
       settlement_cycle,
       settlement_day,

@@ -16,9 +16,6 @@ public class CarBizSupplierVo extends CarBizSupplier {
     private List<GroupInfo> groupList;
     private String createName;
     private String updateName;
-    //二级加盟类型字段 二级加盟类型id 二级加盟类型名称
-    private Integer twoLevelCooperation;
-    private String twoLevelCooperationName;
     //分佣结算化字段
     private Integer settlementType;
     private Integer settlementCycle;

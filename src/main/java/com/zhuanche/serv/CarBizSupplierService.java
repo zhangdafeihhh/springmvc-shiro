@@ -13,7 +13,6 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.entity.driver.SupplierExtDto;
-import com.zhuanche.entity.driver.TwoLevelCooperationDto;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.deiver.CarBizCarInfoTempService;
@@ -141,17 +140,13 @@ public class CarBizSupplierService{
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
 			supplier.setUpdateBy(currentLoginUser.getId());
 			supplier.setUpdateName(currentLoginUser.getName());
-            TwoLevelCooperationDto twoLevelCooperation = twoLevelCooperationExMapper.
-                    getTwoLevelCooperation(supplier.getCooperationType(), supplier.getTwoLevelCooperation());
-            int twoLevelId = twoLevelCooperation != null ? twoLevelCooperation.getId() : 0;
-            logger.info("二级加盟类型 twoLevelId : {}", twoLevelCooperation);
             if (supplier.getSupplierId() == null || supplier.getSupplierId() == 0){
 				method = Constants.CREATE;
 				supplier.setCreateBy(currentLoginUser.getId());
 				supplier.setCreateName(currentLoginUser.getName());
 				logger.info("新增供应商信息: supplierInfo {}", JSON.toJSONString(supplier));
 				try{
-					SupplierExtDto extDto = generateSupplierExtDto(supplier, twoLevelId, true);
+					SupplierExtDto extDto = generateSupplierExtDto(supplier, true);
 					carBizSupplierExMapper.insertSelective(supplier);
 					extDto.setSupplierId(supplier.getSupplierId());
 					supplierExtDtoMapper.insertSelective(extDto);
@@ -161,7 +156,7 @@ public class CarBizSupplierService{
 				}
 			}else {
             	try {
-					SupplierExtDto extDto = generateSupplierExtDto(supplier, twoLevelId, false);
+					SupplierExtDto extDto = generateSupplierExtDto(supplier, false);
 					int count = supplierExtDtoExMapper.selectCountBySupplierId(supplier.getSupplierId());
 					carBizSupplierExMapper.updateByPrimaryKeySelective(supplier);
 					logger.info("更新供应商信息: supplierInfo {}", JSON.toJSONString(supplier));
@@ -239,11 +234,6 @@ public class CarBizSupplierService{
 		SupplierExtDto supplierExtDto = supplierExtDtoExMapper.selectBySupplierId(supplierId);
 		if (supplierExtDto != null) {
 			BeanUtils.copyProperties(supplierExtDto, vo);
-			TwoLevelCooperationDto twoLevelCooperationDto;
-			if ((twoLevelCooperationDto = hasTwoLevelCooperation(supplierExtDto)) != null){
-				vo.setTwoLevelCooperationName(twoLevelCooperationDto.getCooperationName());
-				vo.setTwoLevelCooperation(twoLevelCooperationDto.getId());
-			}
 		}
 		if (vo.getCreateBy() != null && vo.getCreateBy() > Constants.ZERO){
 			String create = carAdmUserExMapper.queryNameById(vo.getCreateBy());
@@ -315,24 +305,7 @@ public class CarBizSupplierService{
 		return carBizSupplierExMapper.getSupplierNameById(supplierId);
 	}
 
-
-	/**
-	 * 根据供应商扩展信息补填二级加盟类型
-	 * @param supplierExtDto
-	 * @return
-	 */
-	private TwoLevelCooperationDto hasTwoLevelCooperation(SupplierExtDto supplierExtDto){
-		int id;
-		if (supplierExtDto.getTwoLevelCooperation() != null && (id = supplierExtDto.getTwoLevelCooperation()) > 0){
-			TwoLevelCooperationDto twoLevelCooperation = twoLevelCooperationExMapper.getTwoLevelCooperationById(id);
-			if (twoLevelCooperation != null){
-				return twoLevelCooperation;
-			}
-		}
-		return null;
-	}
-
-	private SupplierExtDto generateSupplierExtDto(CarBizSupplierVo supplier, int twoLevelCooperation, boolean create){
+	private SupplierExtDto generateSupplierExtDto(CarBizSupplierVo supplier, boolean create){
 		SupplierExtDto extDto = new SupplierExtDto();
 		if (create) {
 			extDto.setCreateDate(new Date());
@@ -341,8 +314,6 @@ public class CarBizSupplierService{
 		if (!modifyAccept(supplier)){
 			throw new IllegalArgumentException("结算信息输入错误");
 		}
-		extDto.setTwoLevelCooperation(twoLevelCooperation);
-		extDto.setSupplierId(supplier.getSupplierId());
 		return extDto;
 	}
 

@@ -10,7 +10,6 @@
     <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
     <result column="email" property="email" jdbcType="VARCHAR" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
-    <result column="two_level_cooperation" property="twoLevelCooperation" jdbcType="INTEGER" />
     <result column="settlement_type" property="settlementType" jdbcType="INTEGER" />
     <result column="settlement_cycle" property="settlementCycle" jdbcType="INTEGER" />
     <result column="settlement_day" property="settlementDay" jdbcType="INTEGER" />
@@ -22,7 +21,7 @@
   </resultMap>
   <sql id="Base_Column_List" >
     id, supplier_id, status, supplier_short_name, create_date, update_date, email, remark, 
-    two_level_cooperation, settlement_type, settlement_cycle, settlement_day, settlement_account, 
+    settlement_type, settlement_cycle, settlement_day, settlement_account,
     bank_account, bank_name, bank_identify, settlement_full_name
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -41,13 +40,13 @@
     </selectKey>
     insert into supplier_ext (supplier_id, status, supplier_short_name, 
       create_date, update_date, email, 
-      remark, two_level_cooperation, settlement_type, 
+      remark, settlement_type,
       settlement_cycle, settlement_day, settlement_account, 
       bank_account, bank_name, bank_identify, 
       settlement_full_name)
     values (#{supplierId,jdbcType=INTEGER}, #{status,jdbcType=TINYINT}, #{supplierShortName,jdbcType=VARCHAR}, 
       #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{email,jdbcType=VARCHAR}, 
-      #{remark,jdbcType=VARCHAR}, #{twoLevelCooperation,jdbcType=INTEGER}, #{settlementType,jdbcType=INTEGER}, 
+      #{remark,jdbcType=VARCHAR}, #{settlementType,jdbcType=INTEGER},
       #{settlementCycle,jdbcType=INTEGER}, #{settlementDay,jdbcType=INTEGER}, #{settlementAccount,jdbcType=VARCHAR}, 
       #{bankAccount,jdbcType=VARCHAR}, #{bankName,jdbcType=VARCHAR}, #{bankIdentify,jdbcType=VARCHAR}, 
       #{settlementFullName,jdbcType=VARCHAR})
@@ -78,9 +77,6 @@
       </if>
       <if test="remark != null" >
         remark,
-      </if>
-      <if test="twoLevelCooperation != null" >
-        two_level_cooperation,
       </if>
       <if test="settlementType != null" >
         settlement_type,
@@ -128,9 +124,6 @@
       </if>
       <if test="remark != null" >
         #{remark,jdbcType=VARCHAR},
-      </if>
-      <if test="twoLevelCooperation != null" >
-        #{twoLevelCooperation,jdbcType=INTEGER},
       </if>
       <if test="settlementType != null" >
         #{settlementType,jdbcType=INTEGER},
@@ -182,9 +175,6 @@
       <if test="remark != null" >
         remark = #{remark,jdbcType=VARCHAR},
       </if>
-      <if test="twoLevelCooperation != null" >
-        two_level_cooperation = #{twoLevelCooperation,jdbcType=INTEGER},
-      </if>
       <if test="settlementType != null" >
         settlement_type = #{settlementType,jdbcType=INTEGER},
       </if>
@@ -221,7 +211,6 @@
       update_date = #{updateDate,jdbcType=TIMESTAMP},
       email = #{email,jdbcType=VARCHAR},
       remark = #{remark,jdbcType=VARCHAR},
-      two_level_cooperation = #{twoLevelCooperation,jdbcType=INTEGER},
       settlement_type = #{settlementType,jdbcType=INTEGER},
       settlement_cycle = #{settlementCycle,jdbcType=INTEGER},
       settlement_day = #{settlementDay,jdbcType=INTEGER},
