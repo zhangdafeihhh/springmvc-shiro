@@ -2,10 +2,6 @@ package com.zhuanche.entity.driver;
 
 import java.util.Date;
 
-/**
- * 供应商信息扩展表对象
- * 参考  mp_driver supplier_ext表
- */
 public class SupplierExtDto {
     private Long id;
 
@@ -38,6 +34,8 @@ public class SupplierExtDto {
     private String bankName;
 
     private String bankIdentify;
+
+    private String settlementFullName;
 
     public Long getId() {
         return id;
@@ -165,5 +163,13 @@ public class SupplierExtDto {
 
     public void setBankIdentify(String bankIdentify) {
         this.bankIdentify = bankIdentify == null ? null : bankIdentify.trim();
+    }
+
+    public String getSettlementFullName() {
+        return settlementFullName;
+    }
+
+    public void setSettlementFullName(String settlementFullName) {
+        this.settlementFullName = settlementFullName == null ? null : settlementFullName.trim();
     }
 }

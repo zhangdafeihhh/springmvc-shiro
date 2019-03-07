@@ -18,11 +18,12 @@
     <result column="bank_account" property="bankAccount" jdbcType="VARCHAR" />
     <result column="bank_name" property="bankName" jdbcType="VARCHAR" />
     <result column="bank_identify" property="bankIdentify" jdbcType="VARCHAR" />
+    <result column="settlement_full_name" property="settlementFullName" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, supplier_id, status, supplier_short_name, create_date, update_date, email, remark,
     two_level_cooperation, settlement_type, settlement_cycle, settlement_day, settlement_account,
-    bank_account, bank_name, bank_identify
+    bank_account, bank_name, bank_identify, settlement_full_name
   </sql>
   <select id="queryExtDtoByIdList" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select
@@ -73,6 +74,9 @@
       <if test="bankIdentify != null" >
         bank_identify = #{bankIdentify,jdbcType=VARCHAR},
       </if>
+      <if test="settlementFullName != null" >
+        settlement_full_name = #{settlementFullName,jdbcType=VARCHAR},
+      </if>
     </set>
     where supplier_id = #{supplierId}
   </update>
@@ -89,7 +93,8 @@
       settlement_account,
       bank_account,
       bank_name,
-      bank_identify
+      bank_identify,
+      settlement_full_name
     from supplier_ext
     where supplier_id = #{supplierId}
   </select>

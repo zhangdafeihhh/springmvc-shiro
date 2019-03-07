@@ -26,6 +26,7 @@ import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import mapper.rentcar.CarBizSupplierMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -136,7 +137,7 @@ public class CarBizSupplierService{
 			if (supplier.getSupplierShortName() != null && supplier.getSupplierShortName().length() > 10){
 				return AjaxResponse.fail(RestErrorCode.GET_SUPPLIER_SHORT_NAME_INVALID);
 			}
-			String method = Constants.UPDATE;
+ 			String method = Constants.UPDATE;
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
 			supplier.setUpdateBy(currentLoginUser.getId());
 			supplier.setUpdateName(currentLoginUser.getName());
@@ -148,23 +149,32 @@ public class CarBizSupplierService{
 				method = Constants.CREATE;
 				supplier.setCreateBy(currentLoginUser.getId());
 				supplier.setCreateName(currentLoginUser.getName());
-				carBizSupplierExMapper.insertSelective(supplier);
 				logger.info("新增供应商信息: supplierInfo {}", JSON.toJSONString(supplier));
-				SupplierExtDto extDto = generateSupplierExtDto(supplier, twoLevelId, true);
-				supplierExtDtoMapper.insertSelective(extDto);
-				logger.info("新增供应商扩展信息：supplierExtInfo {}", JSON.toJSONString(extDto));
-			}else {
-				carBizSupplierExMapper.updateByPrimaryKeySelective(supplier);
-				logger.info("更新供应商信息: supplierInfo {}", JSON.toJSONString(supplier));
-				SupplierExtDto extDto = generateSupplierExtDto(supplier, twoLevelId, false);
-				int count = supplierExtDtoExMapper.selectCountBySupplierId(supplier.getSupplierId());
-				if (count == 0){
-					extDto.setCreateDate(new Date());
+				try{
+					SupplierExtDto extDto = generateSupplierExtDto(supplier, twoLevelId, true);
+					carBizSupplierExMapper.insertSelective(supplier);
+					extDto.setSupplierId(supplier.getSupplierId());
 					supplierExtDtoMapper.insertSelective(extDto);
-					logger.info("新增供应商扩展信息 : supplierExtInfo {}", JSON.toJSONString(extDto));
-				}else {
-					supplierExtDtoExMapper.updateBySupplierId(extDto);
-					logger.info("更新供应商扩展信息 : supplierExtInfo {}", JSON.toJSONString(extDto));
+					logger.info("新增供应商扩展信息：supplierExtInfo {}", JSON.toJSONString(extDto));
+				}catch (IllegalArgumentException e){
+					return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, e.getMessage());
+				}
+			}else {
+            	try {
+					SupplierExtDto extDto = generateSupplierExtDto(supplier, twoLevelId, false);
+					int count = supplierExtDtoExMapper.selectCountBySupplierId(supplier.getSupplierId());
+					carBizSupplierExMapper.updateByPrimaryKeySelective(supplier);
+					logger.info("更新供应商信息: supplierInfo {}", JSON.toJSONString(supplier));
+					if (count == 0) {
+						extDto.setCreateDate(new Date());
+						supplierExtDtoMapper.insertSelective(extDto);
+						logger.info("新增供应商扩展信息 : supplierExtInfo {}", JSON.toJSONString(extDto));
+					} else {
+						supplierExtDtoExMapper.updateBySupplierId(extDto);
+						logger.info("更新供应商扩展信息 : supplierExtInfo {}", JSON.toJSONString(extDto));
+					}
+				}catch (IllegalArgumentException e){
+            		return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, e.getMessage());
 				}
 			}
 			try{
@@ -324,12 +334,39 @@ public class CarBizSupplierService{
 
 	private SupplierExtDto generateSupplierExtDto(CarBizSupplierVo supplier, int twoLevelCooperation, boolean create){
 		SupplierExtDto extDto = new SupplierExtDto();
-
 		if (create) {
 			extDto.setCreateDate(new Date());
 		}
 		BeanUtils.copyProperties(supplier, extDto);
+		if (!modifyAccept(supplier)){
+			throw new IllegalArgumentException("结算信息输入错误");
+		}
 		extDto.setTwoLevelCooperation(twoLevelCooperation);
+		extDto.setSupplierId(supplier.getSupplierId());
 		return extDto;
+	}
+
+
+	private boolean modifyAccept(CarBizSupplierVo supplierVo){
+		boolean modifyAll = StringUtils.isNotBlank(supplierVo.getSettlementFullName()) &&
+				StringUtils.isNotBlank(supplierVo.getBankIdentify()) &&
+				StringUtils.isNotBlank(supplierVo.getBankName()) &&
+				StringUtils.isNotBlank(supplierVo.getBankAccount()) &&
+				StringUtils.isNotBlank(supplierVo.getSettlementAccount()) &&
+				Objects.nonNull(supplierVo.getSettlementCycle()) &&
+				Objects.nonNull(supplierVo.getSettlementType()) &&
+				Objects.nonNull(supplierVo.getSettlementDay())
+				;
+
+		boolean notModify = StringUtils.isBlank(supplierVo.getSettlementFullName()) &&
+				StringUtils.isBlank(supplierVo.getBankIdentify()) &&
+				StringUtils.isBlank(supplierVo.getBankName()) &&
+				StringUtils.isBlank(supplierVo.getBankAccount()) &&
+				StringUtils.isBlank(supplierVo.getSettlementAccount()) &&
+				Objects.isNull(supplierVo.getSettlementCycle()) &&
+				Objects.isNull(supplierVo.getSettlementType()) &&
+				Objects.isNull(supplierVo.getSettlementDay())
+				;
+		return modifyAll || notModify;
 	}
 }

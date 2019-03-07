@@ -27,4 +27,5 @@ public class CarBizSupplierVo extends CarBizSupplier {
     private String bankAccount;
     private String bankName;
     private String bankIdentify;
+    private String settlementFullName;
 }
