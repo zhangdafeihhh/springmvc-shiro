@@ -53,30 +53,36 @@ public class DingdingAspect {
                Object[] args = jointPoint.getArgs();
                Map<String,Object> map = new HashMap<>();
                for(Object obj : args){
-                   CarDriverTeamDTO teamDTO = (CarDriverTeamDTO) obj;
-                   String teamId = teamDTO.getId().toString();
-                   map.put("city",teamDTO.getCity());
-                   map.put("cityName",teamDTO.getCityName());
-                   map.put("supplier",teamDTO.getSupplier());
-                   map.put("teamName",teamDTO.getTeamName());
-                   map.put("teamId",teamDTO.getId());
-                   map.put("pId",teamDTO.getpId());
-                   map.put("openCloseFlag",teamDTO.getOpenCloseFlag());
-                   map.put("id",teamDTO.getId());
+                   if(obj instanceof CarDriverTeamDTO){
+                       CarDriverTeamDTO teamDTO = (CarDriverTeamDTO) obj;
+                       String teamId = teamDTO.getId().toString();
+                       map.put("city",teamDTO.getCity());
+                       map.put("cityName",teamDTO.getCityName());
+                       map.put("supplier",teamDTO.getSupplier());
+                       map.put("teamName",teamDTO.getTeamName());
+                       map.put("teamId",teamDTO.getId());
+                       map.put("pId",teamDTO.getpId());
+                       map.put("openCloseFlag",teamDTO.getOpenCloseFlag());
+                       map.put("id",teamDTO.getId());
 
-                   CommonRocketProducer.publishMessage("car_driver_team",dingdingAnno.method(),teamId,map);
-               }
+                       CommonRocketProducer.publishMessage("car_driver_team",dingdingAnno.method(),teamId,map);
+                   }
+                   }
+
            }if (dingdingAnno != null && "1".equals(dingdingAnno.level())){
                 Object[] args = jointPoint.getArgs();
                 Map<String,Object> map = new HashMap<>();
                 for(Object obj : args){
-                    CarBizSupplierVo supplierVo = (CarBizSupplierVo) obj;
-                    map.put("cityId",supplierVo.getSupplierCity());
-                    map.put("cityName",supplierVo.getSupplierCityName());
-                    map.put("supplierId",supplierVo.getSupplierId());
-                    map.put("supplierName",supplierVo.getSupplierFullName());
-                    map.put("cooperationType",supplierVo.getCooperationType());
-                    CommonRocketProducer.publishMessage("car_driver_supplier",dingdingAnno.method(),supplierVo.getSupplierId().toString(),map);
+                    if(obj instanceof CarBizSupplierVo){
+                        CarBizSupplierVo supplierVo = (CarBizSupplierVo) obj;
+                        map.put("cityId",supplierVo.getSupplierCity());
+                        map.put("cityName",supplierVo.getSupplierCityName());
+                        map.put("supplierId",supplierVo.getSupplierId());
+                        map.put("supplierName",supplierVo.getSupplierFullName());
+                        map.put("cooperationType",supplierVo.getCooperationType());
+                        CommonRocketProducer.publishMessage("car_driver_supplier",dingdingAnno.method(),supplierVo.getSupplierId().toString(),map);
+                    }
+
                 }
             }
         }
