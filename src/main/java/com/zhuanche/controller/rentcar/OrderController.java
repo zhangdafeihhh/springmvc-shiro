@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.zhuanche.common.util.TimeUtils;
 import com.zhuanche.common.web.RequestFunction;
+import com.zhuanche.serv.order.DriverFeeDetailService;
 import com.zhuanche.util.CommonStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -90,6 +91,9 @@ public class OrderController{
 	private CarBizCustomerMapper carBizCustomerMapper;
 	@Autowired
 	private CarBizCarInfoExMapper carBizCarInfoExMapper;
+
+	@Autowired
+	private DriverFeeDetailService driverFeeDetailService;
 
 	/**
 	    * 查询订单 列表
@@ -1131,8 +1135,11 @@ public class OrderController{
 			//pos机支付
 			result.setPosPay(carBizOrderSettle.getPosPay());
 		}
+		//设置司乘分离对象
+		result.setDriverCostDetailVO(driverFeeDetailService.getOrderDriverCostDetailVO(result.getOrderNo()));
 		return result;
 	}
+
 		
 		//订单时间流程赋值
 		public CarFactOrderInfo giveOrderTime(CarFactOrderInfo order){

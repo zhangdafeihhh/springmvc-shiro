@@ -427,6 +427,8 @@ public class CarFactOrderInfo extends BaseEntity {
 	private List<CarBizOrderWaitingPeriod> carBizOrderWaitingPeriodList;
 
 	private Integer driverPassengerPriceSeparate;
+
+	private OrderDriverCostDetailVO driverCostDetailVO;
 	
 	public String getMainOrderNo() {
 		return mainOrderNo;
@@ -2178,5 +2180,13 @@ public class CarFactOrderInfo extends BaseEntity {
 
 	public void setDriverPassengerPriceSeparate(Integer driverPassengerPriceSeparate) {
 		this.driverPassengerPriceSeparate = driverPassengerPriceSeparate;
+	}
+
+	public OrderDriverCostDetailVO getDriverCostDetailVO() {
+		return driverCostDetailVO;
+	}
+
+	public void setDriverCostDetailVO(OrderDriverCostDetailVO driverCostDetailVO) {
+		this.driverCostDetailVO = driverCostDetailVO;
 	}
 }
