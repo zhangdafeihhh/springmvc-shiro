@@ -55,7 +55,7 @@ public class DingdingAspect {
                for(Object obj : args){
                    if(obj instanceof CarDriverTeamDTO){
                        CarDriverTeamDTO teamDTO = (CarDriverTeamDTO) obj;
-                       String teamId = teamDTO.getId().toString();
+                       String teamId = teamDTO.getId()==null?null:teamDTO.getId().toString();
                        map.put("city",teamDTO.getCity());
                        map.put("cityName",teamDTO.getCityName());
                        map.put("supplier",teamDTO.getSupplier());
