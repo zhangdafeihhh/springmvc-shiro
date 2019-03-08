@@ -41,7 +41,7 @@ public enum MenuEnum {
     DRIVER_JOIN_PROMOTE_LIST(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_JOIN_MANAGE, MenuConstants.DRIVER_JOIN_PROMOTE, "加盟司机信息查询"),
     DRIVER_JOIN_PROMOTE_DETAIL(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_JOIN_MANAGE, MenuConstants.DRIVER_JOIN_PROMOTE, "加盟司机信息详情查看"),
     DRIVER_JOIN_PROMOTE_EXPORT(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_JOIN_MANAGE, MenuConstants.DRIVER_JOIN_PROMOTE, "加盟司机信息导出"),
-    DRIVER_JOIN_PROMOTE_INVITE(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_JOIN_MANAGE, MenuConstants.DRIVER_JOIN_PROMOTE, "重置用户密码"),
+    DRIVER_JOIN_PROMOTE_INVITE(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_JOIN_MANAGE, MenuConstants.DRIVER_JOIN_PROMOTE, "加盟推广链接生成"),
     DRIVER_JOIN_PROMOTE_IMAGE(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_JOIN_MANAGE, MenuConstants.DRIVER_JOIN_PROMOTE, "加盟司机证件信息查询"),
     DRIVER_JOIN_PROMOTE_RECORD(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_JOIN_MANAGE, MenuConstants.DRIVER_JOIN_PROMOTE, "加盟司机记录查询"),
 
