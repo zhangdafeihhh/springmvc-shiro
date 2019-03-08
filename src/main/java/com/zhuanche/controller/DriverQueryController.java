@@ -62,7 +62,9 @@ public class DriverQueryController {
             driverIdTeam = this.pingDriverIds(driverIds);
         }else if(StringUtils.isNotEmpty(teamIds) && !"null".equals(teamIds)){
             //把逗号分隔的字符串改为可以拼接的sql  例如'1','2','3'
-            List<CarRelateTeam> driverIdList = carRelateTeamExMapper.queryListByTeamIds(teamIds);
+            String[] teamId = teamIds.split(Constants.SEPERATER);
+            String teams = String.join(Constants.SEPERATER, teamId);
+            List<CarRelateTeam> driverIdList = carRelateTeamExMapper.queryListByTeamIds(teams);
             driverIdTeam = this.pingDriverIds(driverIdList);
         }
         return driverIdTeam;
