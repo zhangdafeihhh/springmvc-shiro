@@ -573,6 +573,11 @@ public class CarDriverTeamService{
 //			BeanUtils.copyProperties(record,paramDto);
 			record.setCreateBy(String.valueOf(WebSessionUtil.getCurrentLoginUser().getId()));
 			record.setShortName(paramDto.getShortName());
+			int code = carDriverTeamMapper.insertSelective(record);
+			if(code > 0){
+				//为后置通知添加参数
+				paramDto.setId(record.getId());
+			}
 			return carDriverTeamMapper.insertSelective(record);
 		}catch (Exception e){
 			logger.error("新增车队失败!", e );
