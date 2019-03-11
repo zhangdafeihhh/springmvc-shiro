@@ -67,13 +67,13 @@
         and r.driver_id in (${driverIds})
 	  </if>
 	  <if test="teamIds != null and teamIds != ''">
-        and car_team_id in (#{teamIds})
+        and car_team_id in (${teamIds})
 	  </if>
 	  <if test="suppliers != null and suppliers != ''">
-        and supplier_id in (#{suppliers})
+        and supplier_id in (${suppliers})
 	  </if>
       <if test="cities != null and cities != ''">
-        and city_id in (#{cities})
+        and city_id in (${cities})
 	  </if>
       <if test="statDateStart !=null and statDateStart !=''">
         <![CDATA[ and stat_date >=  #{statDateStart} ]]>
@@ -145,13 +145,13 @@
       and driver_id in (${driverIds})
     </if>
     <if test="teamIds != null and teamIds != '' " >
-      and car_team_id in (#{teamIds})
+      and car_team_id in (${teamIds})
     </if>
     <if test="suppliers != null and suppliers != '' " >
-      and supplier_id in (#{suppliers})
+      and supplier_id in (${suppliers})
     </if>
     <if test="cities != null and cities != '' " >
-      and city_id in (#{cities})
+      and city_id in (${cities})
     </if>
     <if test="statDateStart !=null and statDateStart !=''">
       <![CDATA[ and stat_date >=  #{statDateStart} ]]>
@@ -212,7 +212,7 @@
       and car_team_id in (${teamIds})
     </if>
     <if test="suppliers != null and suppliers != ''">
-      and supplier_id in (#{suppliers})
+      and supplier_id in (${suppliers})
     </if>
     <if test="cities != null and cities != '' " >
       and city_id in (${cities})
