@@ -36,7 +36,7 @@ public class DriverFeeDetailServiceImpl implements DriverFeeDetailService {
                 logger.error("查询计费接口返回为空");
                 return null;
             }
-            Integer resultCode = result.getInteger(Constants.RESULT);
+            Integer resultCode = result.getInteger(Constants.CODE);
             if (resultCode == null || resultCode != Constants.SUCCESS_CODE){
                 logger.info("查询计费司机详情无数据 响应结果: {}", result.toJSONString());
                 return null;
