@@ -67,11 +67,18 @@ public class OrderService{
 		httpParams.put( ORDER_SEARCH_API_V1_transId, transId  );
 		//预处理一下排序参数
 		if(orderBy !=null && orderBy.size()>0) {
-            List<OrderSearchOrderBy> orderByNew = orderBy.stream().filter(item -> StringUtils.isNotEmpty(item.getField()) && StringUtils.isNotEmpty(item.getOperator())).collect(Collectors.toList());
-            if (orderByNew.size() > 0){
-                httpParams.put("sort", JSON.toJSONString(orderByNew));
-            }
-        }
+			List<OrderSearchOrderBy> orderByNew = orderBy.stream().
+					filter(item -> {
+						if (item != null){
+							return StringUtils.isNotEmpty(item.getField()) && StringUtils.isNotEmpty(item.getOperator());
+						}
+						return false;
+					}).
+					collect(Collectors.toList());
+			if (orderByNew.size() > 0){
+				httpParams.put("sort", JSON.toJSONString(orderByNew));
+			}
+		}
 		String responseText = new RPCAPI().requestWithRetry(RPCAPI.HttpMethod.POST, ORDER_SEARCH_API_V1+"/order/v1/search", httpParams, null, "UTF-8");
 		httpParams.remove(ORDER_SEARCH_API_V1_transId);//清理掉
 		//接收响应，反序列化

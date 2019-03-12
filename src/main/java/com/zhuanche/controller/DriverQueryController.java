@@ -77,6 +77,7 @@ public class DriverQueryController {
      * @return String
      */
     public String pingSortName(String sortName) {
+        StringBuilder builder = new StringBuilder();
         String[] name = sortName.split("");
         int length = sortName.length();
         for (int i = 0; i < length; i++) {
@@ -85,10 +86,12 @@ public class DriverQueryController {
             }
         }
         try {
-            return String.join(Constants.SEPERATER, name);
+            for (String str: name){
+                builder.append(str);
+            }
         }catch (Exception e){
         }
-        return "";
+        return builder.toString();
     }
 
     /**
