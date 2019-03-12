@@ -11,10 +11,12 @@ import com.zhuanche.common.rocketmq.CommonRocketProducer;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
+import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.entity.driver.SupplierExtDto;
 import com.zhuanche.entity.driver.TwoLevelCooperationDto;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.MpOkHttpUtil;
+import com.zhuanche.request.DriverTeamRequest;
 import com.zhuanche.serv.deiver.CarBizCarInfoTempService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -24,8 +26,8 @@ import mapper.driver.ex.TwoLevelCooperationExMapper;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import mapper.rentcar.CarBizSupplierMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
+import mapper.rentcar.ex.CarBizDriverInfoExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +71,9 @@ public class CarBizSupplierService{
 
 	@Value("${commission.url}")
 	String commissionUrl;
+
+	@Autowired
+	private CarBizDriverInfoExMapper carBizDriverInfoExMapper;
 
 	/**查询供应商信息**/
 	@MasterSlaveConfigs(configs={
@@ -135,6 +140,8 @@ public class CarBizSupplierService{
 				return AjaxResponse.fail(RestErrorCode.GET_SUPPLIER_SHORT_NAME_INVALID);
 			}
 			String method = Constants.UPDATE;
+			Integer cooperationTypeNew = supplier.getCooperationType();
+			Integer cooperationTypeOld = null;
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
 			supplier.setUpdateBy(currentLoginUser.getId());
 			supplier.setUpdateName(currentLoginUser.getName());
@@ -155,6 +162,10 @@ public class CarBizSupplierService{
 				extDto.setTwoLevelCooperation(twoLevelId);
 				supplierExtDtoMapper.insertSelective(extDto);
 			}else {
+				CarBizSupplierVo vo = carBizSupplierExMapper.querySupplierById(supplier.getSupplierId());
+				if(vo!=null){
+					cooperationTypeOld = vo.getCooperationType();
+				}
 				carBizSupplierExMapper.updateByPrimaryKeySelective(supplier);
 				SupplierExtDto extDto = new SupplierExtDto();
 				extDto.setEmail(supplier.getEmail());
@@ -182,9 +193,35 @@ public class CarBizSupplierService{
 			}catch (Exception e){
 				logger.error(Constants.SUPPLIER_MQ_SEND_FAILED, e);
 			}
-			if (Constants.UPDATE.equals(method)){
+			if (Constants.UPDATE.equals(method) && cooperationTypeOld!=null && !cooperationTypeOld.equals(cooperationTypeNew)){
 				carBizDriverInfoService.updateDriverCooperationTypeBySupplierId(supplier.getSupplierId(), supplier.getCooperationType());
 				carBizCarInfoTempService.updateDriverCooperationTypeBySupplierId(supplier.getSupplierId(), supplier.getCooperationType());
+
+				try {
+					DriverTeamRequest driverTeamRequest = new DriverTeamRequest();
+					Set set=new HashSet();
+					set.add(supplier.getSupplierId());
+					driverTeamRequest.setSupplierIds(set);
+					//当前供应商底下的司机ID
+					List<CarDriverInfoDTO> limitsDrivers = carBizDriverInfoExMapper.queryListByLimits(driverTeamRequest);
+
+					if(limitsDrivers!=null && limitsDrivers.size()>0){
+						for (int i = 0; i < limitsDrivers.size(); i++) {
+							CarDriverInfoDTO carDriverInfoDTO = limitsDrivers.get(i);
+							if(carDriverInfoDTO==null){
+								continue;
+							}
+							try {
+								// 调用接口清除，key
+								carBizDriverInfoService.flashDriverInfo(Integer.parseInt(carDriverInfoDTO.getDriverId()));
+							} catch (Exception e) {
+								logger.info("司机driverId={},供应商修改加盟类型,调用清除接口异常={}", carDriverInfoDTO.getDriverId(), e.getMessage());
+							}
+						}
+					}
+				} catch (Exception e) {
+					logger.info("供应商修改加盟类型,调用清除接口异常={}", e.getMessage());
+				}
 			}
 			logger.info(Constants.SAVE_SUPPLIER_SUCCESS);
 			return AjaxResponse.success(Constants.SAVE_SUPPLIER_SUCCESS);
