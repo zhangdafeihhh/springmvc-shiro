@@ -503,6 +503,9 @@ public class CarDriverTeamService{
 			if(existsTeam != null && StringUtils.isNotEmpty(existsTeam.getSupplier())){
 				paramDto.setSupplier(existsTeam.getSupplier());
 			}
+			if(existsTeam != null && StringUtils.isNotEmpty(existsTeam.getTeamName())){
+				paramDto.setTeamName(existsTeam.getTeamName());
+			}
 			//开启关闭逻辑
 			if(paramDto.getOpenCloseFlag() !=0 && paramDto.getStatus() != existsTeam.getStatus()){
 				existsTeam.setStatus(paramDto.getOpenCloseFlag());
