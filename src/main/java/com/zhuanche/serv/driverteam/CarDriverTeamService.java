@@ -578,7 +578,7 @@ public class CarDriverTeamService{
 				//为后置通知添加参数
 				paramDto.setId(record.getId());
 			}
-			return carDriverTeamMapper.insertSelective(record);
+			return code;
 		}catch (Exception e){
 			logger.error("新增车队失败!", e );
 			return ServiceReturnCodeEnum.DEAL_FAILURE.getCode();
