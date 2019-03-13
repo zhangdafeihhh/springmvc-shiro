@@ -500,16 +500,19 @@ public class CarDriverTeamService{
 			if(Check.NuNObj(existsTeam)){
 				return ServiceReturnCodeEnum.NONE_RECODE_EXISTS.getCode();
 			}
+			if(existsTeam != null && StringUtils.isNotEmpty(existsTeam.getSupplier())){
+				paramDto.setSupplier(existsTeam.getSupplier());
+			}
 			//开启关闭逻辑
 			if(paramDto.getOpenCloseFlag() !=0 && paramDto.getStatus() != existsTeam.getStatus()){
 				existsTeam.setStatus(paramDto.getOpenCloseFlag());
-				if(existsTeam.getpId() != null){
+				if(existsTeam != null && existsTeam.getpId() != null){
 					paramDto.setpId(existsTeam.getpId());
 				}
 				return carDriverTeamMapper.updateByPrimaryKeySelective(existsTeam);
 			}else if(paramDto.getOpenCloseFlag() !=0 && paramDto.getStatus() == existsTeam.getStatus()){
 				existsTeam.setStatus(paramDto.getOpenCloseFlag());
-				if(existsTeam.getpId() != null){
+				if(existsTeam != null && existsTeam.getpId() != null){
 					paramDto.setpId(existsTeam.getpId());
 				}
 				return ServiceReturnCodeEnum.DEAL_SUCCESS.getCode();
