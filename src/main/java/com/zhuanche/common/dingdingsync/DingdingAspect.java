@@ -56,16 +56,26 @@ public class DingdingAspect {
                    if(obj instanceof CarDriverTeamDTO){
                        CarDriverTeamDTO teamDTO = (CarDriverTeamDTO) obj;
                        String teamId = teamDTO.getId()==null?null:teamDTO.getId().toString();
+                       String openFlag = teamDTO.getOpenCloseFlag() == null ? null: teamDTO.getOpenCloseFlag().toString();
                        map.put("city",teamDTO.getCity());
                        map.put("cityName",teamDTO.getCityName());
                        map.put("supplier",teamDTO.getSupplier());
                        map.put("teamName",teamDTO.getTeamName());
                        map.put("teamId",teamDTO.getId());
                        map.put("pId",teamDTO.getpId());
-                       map.put("openCloseFlag",teamDTO.getOpenCloseFlag());
+                       map.put("openCloseFlag",openFlag);
                        map.put("id",teamDTO.getId());
-
-                       CommonRocketProducer.publishMessage("car_driver_team",dingdingAnno.method(),teamId,map);
+                       String tag = "";
+                       if("0".equals(openFlag)){
+                           tag = "update";
+                       }else if("1".equals(openFlag)){
+                           tag = "insert";
+                       }else if("2".equals(openFlag)){
+                           tag = "delete";
+                       }else {
+                           tag = "update";
+                       }
+                       CommonRocketProducer.publishMessage("car_driver_team",tag,teamId,map);
                    }
                    }
 
