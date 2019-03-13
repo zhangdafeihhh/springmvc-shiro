@@ -503,8 +503,15 @@ public class CarDriverTeamService{
 			//开启关闭逻辑
 			if(paramDto.getOpenCloseFlag() !=0 && paramDto.getStatus() != existsTeam.getStatus()){
 				existsTeam.setStatus(paramDto.getOpenCloseFlag());
+				if(existsTeam.getpId() != null){
+					paramDto.setpId(existsTeam.getpId());
+				}
 				return carDriverTeamMapper.updateByPrimaryKeySelective(existsTeam);
 			}else if(paramDto.getOpenCloseFlag() !=0 && paramDto.getStatus() == existsTeam.getStatus()){
+				existsTeam.setStatus(paramDto.getOpenCloseFlag());
+				if(existsTeam.getpId() != null){
+					paramDto.setpId(existsTeam.getpId());
+				}
 				return ServiceReturnCodeEnum.DEAL_SUCCESS.getCode();
 			}
 			existsTeam.setUpdateDate(new Date());
