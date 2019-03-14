@@ -175,12 +175,17 @@ public class CarDriverTeamService{
 				if(!Check.NuNObj(existsGroup)){
 					result = carRelateGroupExMapper.deleteDriverFromGroup(existsGroup.getGroupId(),driverId);
 				}
-				//TODO 处理司机ID，发动司机变更MQ 从车队移除司机
-				this.asyncDutyService.processingData(driverId, String.valueOf(id), carDriverTeam.getTeamName(), 1);
+				//TODO 处理司机ID，发动司机变更MQ 从车队移除司机  车队移除
+				this.asyncDutyService.processingData(driverId, "", carDriverTeam.getTeamName(), 1);
 				return result;
 			}else{
 				//小组操作移除司机
-				return carRelateGroupExMapper.deleteDriverFromGroup(id,driverId);
+				  int code = carRelateGroupExMapper.deleteDriverFromGroup(id,driverId);
+				  if(code > 0){
+					  //TODO 处理司机ID，发动司机变更MQ 从班组移除司机
+					  this.asyncDutyService.processingData(driverId, String.valueOf(id), carDriverTeam.getTeamName(), 1);
+				  }
+				return code;
 			}
 		}catch (Exception e){
 			logger.error("车队:"+id + "移除司机"+driverId+"结果:"+JSON.toJSONString(e));
