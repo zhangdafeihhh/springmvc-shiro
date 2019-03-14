@@ -12,5 +12,9 @@
 	<bean id="commonRocketProducer"  class="com.zhuanche.common.rocketmq.CommonRocketProducer" init-method="init" destroy-method="destroy" scope="singleton">
 		<property name="namesrvAddr" value="${rocketmq.namesrvAddr}"/>
 	</bean>
+
+	<bean id="dingdingSupplierAndTeamProducer"  class="com.zhuanche.common.rocketmq.DingdingSupplierAndTeamProducer" init-method="init" destroy-method="destroy" scope="singleton">
+		<property name="namesrvAddr" value="${rocketmq.dingdingNamesrvAddr}"/>
+	</bean>
 <!-- 新的配置方式END -->
 </beans>

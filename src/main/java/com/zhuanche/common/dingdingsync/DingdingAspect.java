@@ -1,6 +1,7 @@
 package com.zhuanche.common.dingdingsync;
 
 import com.zhuanche.common.rocketmq.CommonRocketProducer;
+import com.zhuanche.common.rocketmq.DingdingSupplierAndTeamProducer;
 import com.zhuanche.controller.supplier.SupplierController;
 import com.zhuanche.dto.CarDriverTeamDTO;
 import com.zhuanche.entity.rentcar.CarBizSupplierVo;
@@ -75,7 +76,7 @@ public class DingdingAspect {
                        }else {
                            tag = "update";
                        }
-                       CommonRocketProducer.publishMessage("car_driver_team",tag,teamId,map);
+                       DingdingSupplierAndTeamProducer.publishMessage("car_driver_team",tag,teamId,map);
                    }
                    }
 
@@ -90,7 +91,7 @@ public class DingdingAspect {
                         map.put("supplierId",supplierVo.getSupplierId());
                         map.put("supplierName",supplierVo.getSupplierFullName());
                         map.put("cooperationType",supplierVo.getCooperationType());
-                        CommonRocketProducer.publishMessage("car_driver_supplier",dingdingAnno.method(),supplierVo.getSupplierId().toString(),map);
+                        DingdingSupplierAndTeamProducer.publishMessage("car_driver_supplier",dingdingAnno.method(),supplierVo.getSupplierId().toString(),map);
                     }
 
                 }
