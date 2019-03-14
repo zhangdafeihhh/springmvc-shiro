@@ -183,7 +183,7 @@ public class CarDriverTeamService{
 				  int code = carRelateGroupExMapper.deleteDriverFromGroup(id,driverId);
 				  if(code > 0){
 					  //TODO 处理司机ID，发动司机变更MQ 从班组移除司机
-					  this.asyncDutyService.processingData(driverId, String.valueOf(id), carDriverTeam.getTeamName(), 1);
+					  this.asyncDutyService.processingData(driverId, String.valueOf(carDriverTeam.getpId()), carDriverTeam.getTeamName(), 1);
 				  }
 				return code;
 			}
