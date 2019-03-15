@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -211,5 +212,14 @@ public class RPCAPI{
 	}
 	protected int getReadTimeout() {
 		return 60000;
+	}
+	
+	public static void main(String[] args) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("orderNo", "P190312125343055000");
+        params.put("isFix", 1);
+        params.put("isDriver", 1);
+		String detail = new RPCAPI().requestWithRetry(RPCAPI.HttpMethod.GET, "http://test-inside-charge.01zhuanche.com/orderCostdetailDriver/getCostDetailForH5", params, null, "UTF-8");
+		System.out.println(detail);
 	}
 }

@@ -1,5 +1,10 @@
 package com.zhuanche.controller.rentcar;
 
+import static com.zhuanche.common.enums.MenuEnum.MAIN_ORDER_DETAIL;
+import static com.zhuanche.common.enums.MenuEnum.ORDER_DETAIL;
+import static com.zhuanche.common.enums.MenuEnum.ORDER_LIST;
+import static com.zhuanche.common.enums.MenuEnum.ORDER_LIST_EXPORT;
+
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,16 +17,18 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.zhuanche.common.util.TimeUtils;
-import com.zhuanche.common.web.RequestFunction;
-import com.zhuanche.serv.order.DriverFeeDetailService;
-import com.zhuanche.util.CommonStringUtils;
+import mapper.rentcar.CarBizCustomerMapper;
+import mapper.rentcar.CarBizDriverInfoMapper;
+import mapper.rentcar.ex.CarBizCarInfoExMapper;
+import mapper.rentcar.ex.CarFactOrderExMapper;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -33,9 +40,14 @@ import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.rpc.RPCAPI;
+import com.zhuanche.common.rpc.RPCResponse;
+import com.zhuanche.common.util.TimeUtils;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.dto.DriverCostDetailVO;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarFactOrderInfoDTO;
@@ -51,17 +63,12 @@ import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.entity.rentcar.CarFactOrderInfo;
 import com.zhuanche.entity.rentcar.CarGroupEntity;
 import com.zhuanche.entity.rentcar.ServiceEntity;
+import com.zhuanche.serv.order.DriverFeeDetailService;
 import com.zhuanche.serv.order.OrderService;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
+import com.zhuanche.util.CommonStringUtils;
 import com.zhuanche.util.excel.CsvUtils;
-
-import mapper.rentcar.CarBizCustomerMapper;
-import mapper.rentcar.CarBizDriverInfoMapper;
-import mapper.rentcar.ex.CarBizCarInfoExMapper;
-import mapper.rentcar.ex.CarFactOrderExMapper;
-
-import static com.zhuanche.common.enums.MenuEnum.*;
 
 
 /**
@@ -94,6 +101,9 @@ public class OrderController{
 
 	@Autowired
 	private DriverFeeDetailService driverFeeDetailService;
+	
+    @Value("${ordercost.server.api.base.url}")
+	private String ORDERCOST_SERVICE_API_BASE_URL;
 
 	/**
 	    * 查询订单 列表
@@ -295,6 +305,50 @@ public class OrderController{
 	     return result;
 	 }
 
+	 /**
+	     * http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=21053623
+	     * 费用明细 For H5 司机端费用详情
+	     * <p>
+	     * orderNo/orderId传一个即可
+	     *
+	     * @param orderNo    订单号
+	     * @param orderId    订单id
+	     * @param buyoutFlag 0-非一口价 1-一口价
+	     */
+	 	@ResponseBody //TODO
+	 	@RequestMapping(value = "/queryDriverCostDetail", method = {RequestMethod.GET })
+	 	@RequiresPermissions(value = { "OrderList_look" } )
+	    public AjaxResponse getDriverCostDetail(String orderNo, int orderId, Integer buyoutFlag) {
+	 		logger.info("费用明细 For H5 司机端费用详情 start...params:orderNo={},orderId={},buyoutFlag={}",orderNo,orderId,buyoutFlag);
+	        if (StringUtils.isBlank(orderNo) && orderId != 0){
+				AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
+				ajaxResponse.setMsg("请求参数校验不通过");
+				return ajaxResponse;
+	        }
+	        Map<String, Object> params = new HashMap<>();
+	        params.put("orderNo", orderNo);
+	        params.put("orderId", orderId);
+	        params.put("isFix", buyoutFlag);
+	        params.put("isDriver", 1);
+	        String detail = new RPCAPI().requestWithRetry(RPCAPI.HttpMethod.GET, ORDERCOST_SERVICE_API_BASE_URL + "/orderCostdetailDriver/getCostDetailForH5", params, null, "UTF-8");
+	        if (detail == null) {
+	        	logger.error("查询/orderCostdetailDriver/getCostDetailForH5返回空，入参为：orderNo:" + orderNo + "  orderId:" + orderId + "  buyoutFlag:" + buyoutFlag);
+				AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
+				ajaxResponse.setMsg("查询得到的集合为空");
+				return ajaxResponse;
+	        }
+	        logger.info("调用计费查询司机费用明细接口返回：" + detail);
+	        RPCResponse detailResponse = RPCResponse.parse(detail);
+	        if (null == detailResponse || detailResponse.getCode() != 0 || detailResponse.getData() == null) {
+	        	logger.error("查询/orderCostdetailDriver/getCostDetailForH5返回空，入参为：orderNo:" + orderNo + "  orderId:" + orderId + "  buyoutFlag:" + buyoutFlag);
+				AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
+				ajaxResponse.setMsg("查询得到的集合为空");
+				return ajaxResponse;
+	        }
+	        DriverCostDetailVO resDto=JSON.parseObject(JSON.toJSONString(detailResponse.getData()), DriverCostDetailVO.class);
+	        logger.info("费用明细 For H5 司机端费用详情end resDto="+JSON.toJSONString(resDto));
+	        return AjaxResponse.success(resDto);
+	    }
 
 
 	/**
