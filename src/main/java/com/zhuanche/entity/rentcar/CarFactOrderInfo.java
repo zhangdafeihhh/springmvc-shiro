@@ -1,6 +1,7 @@
 package com.zhuanche.entity.rentcar;
 
 
+import com.zhuanche.dto.DriverCostDetailVO;
 import com.zhuanche.entity.common.BaseEntity;
 
 import java.util.Date;
@@ -429,6 +430,7 @@ public class CarFactOrderInfo extends BaseEntity {
 	private Integer driverPassengerPriceSeparate;
 
 	private OrderDriverCostDetailVO driverCostDetailVO;
+	private DriverCostDetailVO driverCostDetailVOH5;
 	
 	public String getMainOrderNo() {
 		return mainOrderNo;
@@ -2189,4 +2191,12 @@ public class CarFactOrderInfo extends BaseEntity {
 	public void setDriverCostDetailVO(OrderDriverCostDetailVO driverCostDetailVO) {
 		this.driverCostDetailVO = driverCostDetailVO;
 	}
+
+    public DriverCostDetailVO getDriverCostDetailVOH5() {
+        return driverCostDetailVOH5;
+    }
+
+    public void setDriverCostDetailVOH5(DriverCostDetailVO driverCostDetailVOH5) {
+        this.driverCostDetailVOH5 = driverCostDetailVOH5;
+    }
 }

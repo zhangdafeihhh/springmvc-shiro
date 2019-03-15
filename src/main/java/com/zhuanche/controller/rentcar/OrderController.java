@@ -101,9 +101,7 @@ public class OrderController{
 
 	@Autowired
 	private DriverFeeDetailService driverFeeDetailService;
-	
-    @Value("${ordercost.server.api.base.url}")
-	private String ORDERCOST_SERVICE_API_BASE_URL;
+
 
 	/**
 	    * 查询订单 列表
@@ -304,51 +302,6 @@ public class OrderController{
 	     AjaxResponse result = carFactOrderInfoService.queryOrderDataList(paramMap);
 	     return result;
 	 }
-
-	 /**
-	     * http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=21053623
-	     * 费用明细 For H5 司机端费用详情
-	     * <p>
-	     * orderNo/orderId传一个即可
-	     *
-	     * @param orderNo    订单号
-	     * @param orderId    订单id
-	     * @param buyoutFlag 0-非一口价 1-一口价
-	     */
-	 	@ResponseBody //TODO
-	 	@RequestMapping(value = "/queryDriverCostDetail", method = {RequestMethod.GET })
-	 	@RequiresPermissions(value = { "OrderList_look" } )
-	    public AjaxResponse getDriverCostDetail(String orderNo, int orderId, Integer buyoutFlag) {
-	 		logger.info("费用明细 For H5 司机端费用详情 start...params:orderNo={},orderId={},buyoutFlag={}",orderNo,orderId,buyoutFlag);
-	        if (StringUtils.isBlank(orderNo) && orderId != 0){
-				AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
-				ajaxResponse.setMsg("请求参数校验不通过");
-				return ajaxResponse;
-	        }
-	        Map<String, Object> params = new HashMap<>();
-	        params.put("orderNo", orderNo);
-	        params.put("orderId", orderId);
-	        params.put("isFix", buyoutFlag);
-	        params.put("isDriver", 1);
-	        String detail = new RPCAPI().requestWithRetry(RPCAPI.HttpMethod.GET, ORDERCOST_SERVICE_API_BASE_URL + "/orderCostdetailDriver/getCostDetailForH5", params, null, "UTF-8");
-	        if (detail == null) {
-	        	logger.error("查询/orderCostdetailDriver/getCostDetailForH5返回空，入参为：orderNo:" + orderNo + "  orderId:" + orderId + "  buyoutFlag:" + buyoutFlag);
-				AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
-				ajaxResponse.setMsg("查询得到的集合为空");
-				return ajaxResponse;
-	        }
-	        logger.info("调用计费查询司机费用明细接口返回：" + detail);
-	        RPCResponse detailResponse = RPCResponse.parse(detail);
-	        if (null == detailResponse || detailResponse.getCode() != 0 || detailResponse.getData() == null) {
-	        	logger.error("查询/orderCostdetailDriver/getCostDetailForH5返回空，入参为：orderNo:" + orderNo + "  orderId:" + orderId + "  buyoutFlag:" + buyoutFlag);
-				AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
-				ajaxResponse.setMsg("查询得到的集合为空");
-				return ajaxResponse;
-	        }
-	        DriverCostDetailVO resDto=JSON.parseObject(JSON.toJSONString(detailResponse.getData()), DriverCostDetailVO.class);
-	        logger.info("费用明细 For H5 司机端费用详情end resDto="+JSON.toJSONString(resDto));
-	        return AjaxResponse.success(resDto);
-	    }
 
 
 	/**
@@ -1191,6 +1144,7 @@ public class OrderController{
 		}
 		//设置司乘分离对象
 		result.setDriverCostDetailVO(driverFeeDetailService.getOrderDriverCostDetailVO(result.getOrderNo()));
+		result.setDriverCostDetailVOH5(driverFeeDetailService.getDriverCostDetail(result.getOrderNo(),Integer.parseInt(Long.toString(result.getOrderId())),result.getBuyoutFlag()));
 		return result;
 	}
 

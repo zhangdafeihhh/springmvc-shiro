@@ -1,7 +1,11 @@
 package com.zhuanche.serv.order.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.rpc.RPCAPI;
+import com.zhuanche.common.rpc.RPCResponse;
 import com.zhuanche.constant.Constants;
+import com.zhuanche.dto.DriverCostDetailVO;
 import com.zhuanche.entity.rentcar.OrderDriverCostDetailVO;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.order.DriverFeeDetailService;
@@ -21,6 +25,40 @@ public class DriverFeeDetailServiceImpl implements DriverFeeDetailService {
 
     private static final Logger logger = LoggerFactory.getLogger(DriverFeeDetailServiceImpl.class);
 
+    @Value("${ordercost.server.api.base.url}")
+    private String ORDERCOST_SERVICE_API_BASE_URL;
+
+    /**
+     * http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=21053623
+     * 费用明细 For H5 司机端费用详情
+     * <p>
+     * orderNo/orderId传一个即可
+     *
+     * @param orderNo    订单号
+     * @param orderId    订单id
+     * @param buyoutFlag 0-非一口价 1-一口价
+     */
+    public DriverCostDetailVO getDriverCostDetail(String orderNo, int orderId, Integer buyoutFlag) {
+        if (StringUtils.isBlank(orderNo) && orderId != 0)
+            return null;
+        Map<String, Object> params = new HashMap<>();
+        params.put("orderNo", orderNo);
+        params.put("orderId", orderId);
+        params.put("isFix", buyoutFlag);
+        params.put("isDriver", 1);
+        String detail = new RPCAPI().requestWithRetry(RPCAPI.HttpMethod.GET, ORDERCOST_SERVICE_API_BASE_URL + "/orderCostdetailDriver/getCostDetailForH5", params, null, "UTF-8");
+        if (detail == null) {
+            logger.error("查询/orderCostdetailDriver/getCostDetailForH5返回空，入参为：orderNo:" + orderNo + "  orderId:" + orderId + "  buyoutFlag:" + buyoutFlag);
+            return null;
+        }
+        logger.info("调用计费查询司机费用明细接口返回：" + detail);
+        RPCResponse detailResponse = RPCResponse.parse(detail);
+        if (null == detailResponse || detailResponse.getCode() != 0 || detailResponse.getData() == null) {
+            logger.error("查询/orderCostdetailDriver/getCostDetailForH5返回空，入参为：orderNo:" + orderNo + "  orderId:" + orderId + "  buyoutFlag:" + buyoutFlag);
+            return null;
+        }
+        return JSON.parseObject(JSON.toJSONString(detailResponse.getData()), DriverCostDetailVO.class);
+    }
 
     @Override
     public OrderDriverCostDetailVO getOrderDriverCostDetailVO(String orderNo){
