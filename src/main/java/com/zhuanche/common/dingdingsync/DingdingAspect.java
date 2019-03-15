@@ -67,15 +67,18 @@ public class DingdingAspect {
                        map.put("openCloseFlag",openFlag);
                        map.put("id",teamDTO.getId());
                        String tag = "";
-                       if("0".equals(openFlag)){
-                           tag = "update";
-                       }else if("1".equals(openFlag)){
-                           tag = "insert";
-                       }else if("2".equals(openFlag)){
-                           tag = "delete";
-                       }else {
-                           tag = "update";
+                       if(!"insert".equals(dingdingAnno.method())){
+                           if("0".equals(openFlag)){
+                               tag = "update";
+                           }else if("1".equals(openFlag)){
+                               tag = "insert";
+                           }else if("2".equals(openFlag)){
+                               tag = "delete";
+                           }else {
+                               tag = "update";
+                           }
                        }
+
                        DingdingSupplierAndTeamProducer.publishMessage("car_driver_team",tag,teamId,map);
                    }
                    }
