@@ -44,8 +44,8 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
     private CarBizSupplierExMapper carBizSupplierExMapper;
 
     @Autowired
-    @Qualifier("busOrderCostTemplate")
-    private MyRestTemplate busOrderCostTemplate;
+    @Qualifier("busOrderCostTurnoverTemplate")
+    private MyRestTemplate busOrderCostTurnoverTemplate;
 
 
     @Override
@@ -206,7 +206,7 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
     private void modifyDriverVolume(DriverDailyReportDTO ddre, String statDateStart) {
         if(StringUtils.isNotEmpty(statDateStart) && statDateStart.compareTo("2018-01-01") >0 ){
             String url = "/driverIncome/getDriverIncome?driverId="+ddre.getDriverId()+"&incomeDate=" + statDateStart;
-            String result = busOrderCostTemplate.getForObject(url, String.class);
+            String result = busOrderCostTurnoverTemplate.getForObject(url, String.class);
 
             Map<String, Object> resultMap = JSONObject.parseObject(result, HashMap.class);
             if (null == resultMap || !String.valueOf(resultMap.get("code")).equals("0")) {
@@ -281,12 +281,12 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
 //                //url = "/driverIncome/findDriverIncomes?driverIds="+drivers+"&inselectSuppierNameAndCityNameDayscomeDate="+startDate ;
 //            }
             url = "/driverIncome/findDriverDateIncomes";
-//            String result = busOrderCostTemplate.getForObject(url, String.class);
+//            String result = busOrderCostTurnoverTemplate.getForObject(url, String.class);
             Map<String, Object> paramMap = new HashMap<String, Object>();
             paramMap.put("driverIds", drivers);
             paramMap.put("startDate", statTime);
             paramMap.put("endDate", endTime);
-            String result = busOrderCostTemplate.postForObject(url, JSONObject.class, paramMap);
+            String result = busOrderCostTurnoverTemplate.postForObject(url, JSONObject.class, paramMap);
             long invokeEndTime = System.currentTimeMillis();
             logger.info("调用计费时长：" + (invokeEndTime-time));
             Map<String, Object> resultMap = JSONObject.parseObject(result, HashMap.class);
