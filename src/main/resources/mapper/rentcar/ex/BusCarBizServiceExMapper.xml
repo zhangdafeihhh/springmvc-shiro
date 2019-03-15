@@ -36,4 +36,17 @@
 		WHERE
 			service_name LIKE '%巴士%'
 	</select>
+
+	<select id="queryServiceTypeByIdSet" resultMap="BaseResultMap">
+		SELECT
+			<include refid="Base_Column_List"/>
+		FROM
+			car_biz_service
+		WHERE service_id IN
+		<foreach collection="serviceIds" separator="," close=")" open="(" item="item">
+			#{item}
+		</foreach>
+	</select>
+
+
 </mapper>

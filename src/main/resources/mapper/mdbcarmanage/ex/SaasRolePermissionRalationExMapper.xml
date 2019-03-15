@@ -35,4 +35,11 @@
         LEFT JOIN saas_role sr ON surr.role_id = sr.role_id
         WHERE sr.valid = 1 and user_id = #{userId}
   </select>
+  <select id="queryRoleCodeList" resultType="java.lang.String">
+    SELECT sr.role_code
+    FROM
+    saas_user_role_ralation surr
+    LEFT JOIN saas_role sr ON surr.role_id = sr.role_id
+    WHERE sr.valid = 1 and user_id = #{userId}
+  </select>
 </mapper>

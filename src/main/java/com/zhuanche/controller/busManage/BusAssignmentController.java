@@ -11,6 +11,10 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.zhuanche.common.enums.PermissionLevelEnum;
+import com.zhuanche.dto.BaseDTO;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.session.WebSessionUtil;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -742,6 +746,20 @@ public class BusAssignmentController {
             operList.add(process);
         }
         return operList;
+    }
+
+    /**
+     *  供应商角色：显示本供应商下未来三天内带服务的订单
+     *
+     *  运营角色：显示所有供应商下未来三天内带服务的订单
+     * @return
+     */
+    @RequestMapping("/queryUpcomingOrder")
+    @ResponseBody
+    public AjaxResponse queryUpcomingOrder(BaseDTO pageDTO) {
+        AjaxResponse response = busOrderService.queryUpcomingOrder(pageDTO);
+        System.out.println(JSON.toJSONString(response));
+        return response;
     }
 
 }
