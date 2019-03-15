@@ -36,6 +36,7 @@ import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.mdbcarmanage.ex.CarRelateGroupExMapper;
 import mapper.mdbcarmanage.ex.CarRelateTeamExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -514,9 +515,33 @@ public class CarDriverTeamService{
 			//开启关闭逻辑
 			if(paramDto.getOpenCloseFlag() !=0 && paramDto.getStatus() != existsTeam.getStatus()){
 				existsTeam.setStatus(paramDto.getOpenCloseFlag());
+				//关闭时候把下面的司机存入mq 如果是车队，司机存入供应商，如果是班组，司机存入车队
 				if(existsTeam != null && existsTeam.getpId() != null){
 					paramDto.setpId(existsTeam.getpId());
+
+					List<CarRelateGroup> groups = new ArrayList<>();
+					TeamGroupRequest teamGroupRequest = new TeamGroupRequest();
+					teamGroupRequest.setGroupId(String.valueOf(existsTeam.getId()));
+					groups = carRelateGroupExMapper.queryDriverGroupRelationList(teamGroupRequest);
+					if(CollectionUtils.isNotEmpty(groups)){
+						for (CarRelateGroup carRelateGroup : groups){
+							//班组下更新到车队下
+							this.asyncDutyService.processingData(carRelateGroup.getDriverId(), existsTeam.getpId().toString(), "", 0);
+						}
+					}
+				}else {
+					List<CarRelateGroup> teams = new ArrayList<>();
+					TeamGroupRequest teamGroupRequest = new TeamGroupRequest();
+					teamGroupRequest.setTeamId(String.valueOf(existsTeam.getId()));
+					teams = carRelateGroupExMapper.queryDriverGroupRelationList(teamGroupRequest);
+					if(CollectionUtils.isNotEmpty(teams)){
+						for(CarRelateGroup carRelateGroup : teams){
+							//车队下的司机更新到加盟商
+							this.asyncDutyService.processingData(carRelateGroup.getDriverId(), "", "", 0);
+						}
+					}
 				}
+
 				return carDriverTeamMapper.updateByPrimaryKeySelective(existsTeam);
 			}else if(paramDto.getOpenCloseFlag() !=0 && paramDto.getStatus() == existsTeam.getStatus()){
 				existsTeam.setStatus(paramDto.getOpenCloseFlag());
@@ -538,6 +563,8 @@ public class CarDriverTeamService{
 			return ServiceReturnCodeEnum.DEAL_FAILURE.getCode();
 		}
 	}
+
+
 
 	/**
 	 * @Desc:  新增车队1113
