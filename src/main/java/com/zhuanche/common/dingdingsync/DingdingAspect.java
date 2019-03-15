@@ -77,6 +77,8 @@ public class DingdingAspect {
                            }else {
                                tag = "update";
                            }
+                       }else {
+                           tag = "insert";
                        }
 
                        DingdingSupplierAndTeamProducer.publishMessage("car_driver_team",tag,teamId,map);
