@@ -756,9 +756,10 @@ public class BusAssignmentController {
      */
     @RequestMapping("/queryUpcomingOrder")
     @ResponseBody
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)})
     public AjaxResponse queryUpcomingOrder(BaseDTO pageDTO) {
         AjaxResponse response = busOrderService.queryUpcomingOrder(pageDTO);
-        System.out.println(JSON.toJSONString(response));
         return response;
     }
 
