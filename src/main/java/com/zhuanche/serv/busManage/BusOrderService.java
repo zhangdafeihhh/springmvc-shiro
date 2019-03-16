@@ -377,20 +377,25 @@ public class BusOrderService {
                 serviceMap.put(o.getServiceId(), o);
             });
 
-			busOrderHomepages.stream().sorted(Comparator.comparing(BusOrderHomepageVO::getBookingDate)
-					.thenComparing(BusOrderHomepageVO::getCreateDate).reversed())
-					.forEach(order -> {
+			List<BusOrderHomepageVO> collect = busOrderHomepages.stream().map(order -> {
 				CarBizCarGroup group = groupMap.get(order.getBookingGroupid());
-				CarBizService servcice=serviceMap.get(order.getServiceTypeId());
-				CarBizDriverInfo driver=driverMap.get(order.getDriverId());
-              if(group!=null){order.setBookingGroupName(group.getGroupName());}
-               if(servcice!=null){order.setServiceName(servcice.getServiceName());}
-               if(driver!=null){
-				   order.setDriverName(driver.getName());
-				   order.setDriverPhone(driver.getPhone());
-			   }
-            });
-			return AjaxResponse.success(new PageDTO(pageDTO.getPageNum(),pageDTO.getPageSize(),total,busOrderHomepages));
+				CarBizService servcice = serviceMap.get(order.getServiceTypeId());
+				CarBizDriverInfo driver = driverMap.get(order.getDriverId());
+				if (group != null) {
+					order.setBookingGroupName(group.getGroupName());
+				}
+				if (servcice != null) {
+					order.setServiceName(servcice.getServiceName());
+				}
+				if (driver != null) {
+					order.setDriverName(driver.getName());
+					order.setDriverPhone(driver.getPhone());
+				}
+				return order;
+			}).sorted(Comparator.comparing(BusOrderHomepageVO::getBookingDate)
+					.thenComparing(Comparator.comparing(BusOrderHomepageVO::getCreateDate)))
+					.collect(Collectors.toList());
+			return AjaxResponse.success(new PageDTO(pageDTO.getPageNum(),pageDTO.getPageSize(),total,collect));
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("[巴士saas首页查询列表]，异常 e:{}",e);
