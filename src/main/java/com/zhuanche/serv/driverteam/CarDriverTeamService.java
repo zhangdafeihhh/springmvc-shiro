@@ -516,7 +516,7 @@ public class CarDriverTeamService{
 			if(paramDto.getOpenCloseFlag() !=0 && paramDto.getStatus() != existsTeam.getStatus()){
 				existsTeam.setStatus(paramDto.getOpenCloseFlag());
 				//关闭时候把下面的司机存入mq 如果是车队，司机存入供应商，如果是班组，司机存入车队
-				if(existsTeam != null && existsTeam.getpId() != null){
+				if(existsTeam != null && existsTeam.getpId() != null  && existsTeam.getpId() > 0){
 					paramDto.setpId(existsTeam.getpId());
 
 					List<CarRelateGroup> groups = new ArrayList<>();
