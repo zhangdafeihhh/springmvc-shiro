@@ -249,9 +249,19 @@
 			car_biz_supplier s
 		LEFT JOIN car_biz_city c ON c.city_id = s.supplier_city
 		WHERE
-			<include refid="queryAndExportWhereSql"/>
-		ORDER BY
-			s.create_date DESC
+		s.supplier_type = 1
+		<if test="cityId != null">
+			AND s.supplier_city = #{cityId}
+		</if>
+		<if test="status != null">
+			AND s.`status` = #{status}
+		</if>
+		<if test="supplierIds != null and supplierIds.size>0">
+			AND s.supplier_id IN
+			<foreach collection="supplierRateIds" item="item" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
 	</select>
 	
 	<!-- 查询巴士供应商导出列表 -->
@@ -271,7 +281,19 @@
 		LEFT JOIN car_biz_city c ON c.city_id = s.supplier_city
 		LEFT JOIN car_biz_cooperation_type t ON t.id = s.cooperation_type
 		WHERE
-			<include refid="queryAndExportWhereSql"/>
+		s.supplier_type = 1
+		<if test="cityId != null">
+			AND s.supplier_city = #{cityId}
+		</if>
+		<if test="status != null">
+			AND s.`status` = #{status}
+		</if>
+		<if test="supplierIds != null and supplierIds.size>0">
+			AND s.supplier_id IN
+			<foreach collection="supplierRateIds" item="item" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
 	</select>
 	
 	<!-- 查询巴士供应商基础信息 -->

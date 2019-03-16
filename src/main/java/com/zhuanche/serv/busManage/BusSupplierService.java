@@ -514,95 +514,6 @@ public class BusSupplierService implements BusConst {
 	}
 
 	/**
-	 * @Title: queryBusSupplierPageList
-	 * @Description: 查询巴士供应商列表
-	 * @param queryDTO
-	 * @return List<BusSupplierPageVO>
-	 * @throws
-	 */
-	@SuppressWarnings("rawtypes")
-	@MasterSlaveConfigs(configs = { @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE),
-			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE) })
-	public List<BusSupplierPageVO> queryBusSupplierPageList(BusSupplierQueryDTO queryDTO) {
-		
-		logger.info("[ BusSupplierController-querySupplierPageList ] 查询供应商分页列表params={}", JSON.toJSONString(queryDTO));
-		
-		Integer pageNum = queryDTO.getPageNum();
-		Integer pageSize = queryDTO.getPageSize();
-		queryDTO.pageNum = null;
-		queryDTO.pageSize = null;
-		
-		// 一、查询快合同快到期供应商
-		List<BusSupplierPageVO> supplierIds = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
-		if (supplierIds.isEmpty()) {
-			return null;// 没有则走正常查询
-		}
-		Map<Object,Object> param = new HashMap<>();
-		param.put("supplierIds", supplierIds.stream().map(BusSupplierPageVO::getSupplierId).collect(Collectors.toList()));
-		List<BusSupplierPageVO> contractList = busBizSupplierDetailExMapper.querySupplierContractExpireSoonList(param);
-		if (contractList.isEmpty()) {
-			return null;// 没有则走正常查询
-		}
-		List<Integer> contractIds = contractList.stream().map(BusSupplierPageVO::getSupplierId).collect(Collectors.toList());
-		queryDTO.setContractIds(contractIds);
-		// 二、分页查询,并封装结果集(按区间分别查询:完全不在快到期区间、一部分在快到期区间、完全在快到期区间)
-		List<BusSupplierPageVO> contractSuppliers = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
-		int offset = (Math.max(pageNum, 1) - 1) * pageSize;
-		int limit = offset + pageSize;
-		List<BusSupplierPageVO> resultList = new ArrayList<>();
-		if (offset > contractSuppliers.size()) {
-			queryDTO.setContractIds(null);
-			queryDTO.setExcludeContractIds(contractIds);// 其它供应商(not in 上面的供应商)
-			List<BusSupplierPageVO> supplierList = null;
-			try(Page p = PageHelper.offsetPage(offset - contractSuppliers.size(), limit)) {
-				supplierList = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
-			}
-			supplierList.forEach(this::completeDetailInfo);// 补充巴士供应商其它信息
-			resultList.addAll(supplierList);
-		} else {
-			// 组合
-			List<BusSupplierPageVO> allContractList = new ArrayList<>();
-			for (BusSupplierPageVO carBizSupplier : contractSuppliers) {
-				for (BusSupplierPageVO busSupplierDetail : contractList) {
-					if (carBizSupplier.getSupplierId().equals(busSupplierDetail.getSupplierId())) {
-						carBizSupplier.setDeposit(busSupplierDetail.getDeposit());
-						carBizSupplier.setFranchiseFee(busSupplierDetail.getFranchiseFee());
-						carBizSupplier.setContractDateStart(busSupplierDetail.getContractDateStart());
-						carBizSupplier.setContractDateEnd(busSupplierDetail.getContractDateEnd());
-						carBizSupplier.setIsExpireSoon(busSupplierDetail.getIsExpireSoon());
-						allContractList.add(carBizSupplier);
-					}
-				}
-			}
-			// 排序
-			List<BusSupplierPageVO> orderedAllContractList = allContractList.stream()
-					.sorted(Comparator.comparing(BusSupplierPageVO::getContractDateEnd).reversed())
-					.collect(Collectors.toList());
-			if (limit > contractSuppliers.size()) {
-				// 合同快到期供应商
-				List<BusSupplierPageVO> subList = orderedAllContractList.subList(offset, contractSuppliers.size());
-				// 正常供应商
-				queryDTO.setContractIds(null);
-				queryDTO.setExcludeContractIds(contractIds);// 其它供应商(not in 上面的供应商)
-				List<BusSupplierPageVO> otherList = null;
-				try (Page p = PageHelper.offsetPage(0, limit - contractSuppliers.size())) {
-					otherList = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
-				}
-				otherList.forEach(this::completeDetailInfo);// 补充巴士供应商其它信息
-				
-				resultList.addAll(subList);
-				resultList.addAll(otherList);
-			} else {
-				// 合同快到期供应商
-				List<BusSupplierPageVO> subList = orderedAllContractList.subList(offset, limit);
-				resultList.addAll(subList);
-			}
-		}
-		
-		return resultList;
-	}
-
-	/**
 	 * @Title: completeDetailInfo
 	 * @Description: 补充巴士供应商信息
 	 * @param t 
@@ -635,10 +546,6 @@ public class BusSupplierService implements BusConst {
 	 */
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public List<BusSupplierExportVO> querySupplierExportList(BusSupplierQueryDTO queryDTO) {
-		if (queryDTO.getSupplierRate() != null
-				&& (queryDTO.getSupplierRateIds() == null || queryDTO.getSupplierRateIds().isEmpty())) {
-			return new ArrayList<>();
-		}
 		List<BusSupplierExportVO> supplierList = busCarBizSupplierExMapper.querySupplierExportList(queryDTO);
 		return supplierList;
 	}
