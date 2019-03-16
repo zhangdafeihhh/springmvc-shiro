@@ -1149,6 +1149,7 @@ public class OrderController{
 		//设置司乘分离对象
 		result.setDriverCostDetailVO(driverFeeDetailService.getOrderDriverCostDetailVO(result.getOrderNo()));
 		result.setDriverCostDetailVOH5(driverFeeDetailService.getDriverCostDetail(result.getOrderNo(),Integer.parseInt(Long.toString(result.getOrderId())),result.getBuyoutFlag()));
+        result.setOrderCostDetailInfo(driverFeeDetailService.getOrderCostDetailInfo(result.getOrderNo()));
 		return result;
 	}
 

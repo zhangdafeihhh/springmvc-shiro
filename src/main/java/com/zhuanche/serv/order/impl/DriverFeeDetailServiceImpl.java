@@ -6,6 +6,7 @@ import com.zhuanche.common.rpc.RPCAPI;
 import com.zhuanche.common.rpc.RPCResponse;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.DriverCostDetailVO;
+import com.zhuanche.entity.rentcar.OrderCostDetailInfo;
 import com.zhuanche.entity.rentcar.OrderDriverCostDetailVO;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.order.DriverFeeDetailService;
@@ -112,6 +113,41 @@ public class DriverFeeDetailServiceImpl implements DriverFeeDetailService {
             logger.error("调用计费批量查询司机费用详情失败", e);
         }
         return Collections.EMPTY_LIST;
+    }
+
+    /**
+     * 查询订单明细(批量)
+     *
+     * @param orderNos “P1439635871018071”，“P1439635928276329”
+     * @return
+     */
+    public List<OrderCostDetailInfo> getOrdersCostDetailInfo(String orderNos) {
+        if (StringUtils.isBlank(orderNos))
+            return null;
+        String orderInfo = new RPCAPI().requestWithRetry(RPCAPI.HttpMethod.GET, String.format(ORDERCOST_SERVICE_API_BASE_URL + "/orderCostdetail/%s", orderNos), null, null, "UTF-8");
+        if (StringUtils.isBlank(orderInfo) || orderInfo.equals("true\r\n")) {
+            logger.error("查询/getOrderCostDetailInfo，入参为：" + orderNos + "，返回空");
+            return null;
+        }
+        RPCResponse orderResponse = RPCResponse.parse(orderInfo);
+        if (null == orderResponse || orderResponse.getCode() != 0 || orderResponse.getData() == null) {
+            logger.info("查询订单明细，入参订单号：" + orderNos);
+            return null;
+        }
+        return JSON.parseArray(JSON.toJSONString(orderResponse.getData()), OrderCostDetailInfo.class);
+    }
+
+    /**
+     * 查询订单明细(单个)
+     *
+     * @param orderNo P1439635871018071
+     * @return
+     */
+    public OrderCostDetailInfo getOrderCostDetailInfo(String orderNo) {
+        List<OrderCostDetailInfo> list = getOrdersCostDetailInfo(orderNo);
+        if (null != list && list.size() > 0)
+            return list.get(0);
+        return null;
     }
 
 }
