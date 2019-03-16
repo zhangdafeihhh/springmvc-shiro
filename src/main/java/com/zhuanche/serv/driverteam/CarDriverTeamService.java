@@ -530,14 +530,14 @@ public class CarDriverTeamService{
 						}
 					}
 				}else {
-					List<CarRelateGroup> teams = new ArrayList<>();
+					List<CarRelateTeam> teams = new ArrayList<>();
 					TeamGroupRequest teamGroupRequest = new TeamGroupRequest();
 					teamGroupRequest.setTeamId(String.valueOf(existsTeam.getId()));
-					teams = carRelateGroupExMapper.queryDriverGroupRelationList(teamGroupRequest);
+					teams = carRelateTeamExMapper.queryDriverTeamRelationList(teamGroupRequest);
 					if(CollectionUtils.isNotEmpty(teams)){
-						for(CarRelateGroup carRelateGroup : teams){
+						for(CarRelateTeam carRelateTeam : teams){
 							//车队下的司机更新到加盟商
-							this.asyncDutyService.processingData(carRelateGroup.getDriverId(), "", "", 0);
+							this.asyncDutyService.processingData(carRelateTeam.getDriverId(), "", "", 0);
 						}
 					}
 				}
