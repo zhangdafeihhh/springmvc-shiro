@@ -87,33 +87,39 @@ public class DriverFeeDetailServiceImpl implements DriverFeeDetailService {
         return null;
     }
 
-    @Override
-    public List<OrderDriverCostDetailVO> getOrderDriverCostDetailVOBatch(List<String> orderNos){
-        if (orderNos == null || orderNos.isEmpty() || orderNos.size() > 200){
-            logger.error("orderNos 参数违法");
-            return Collections.EMPTY_LIST;
+    /**
+     * 根据订单号获取司机费用明细（批量）
+     *
+     * @param orderNos eg:B190202133826203001,B190202133826203001
+     * @return
+     */
+    public List<OrderDriverCostDetailVO> getOrderDriverCostDetailVOBatch(List<String> orderNos) {
+        if (null == orderNos || orderNos.size() == 0) {
+            logger.info("接口调用入参订单号为空");
+            return new ArrayList<>();
         }
-        try{
-            Map<String, Object> params = new HashMap<>(1);
-            String orders = String.join(",", orderNos);
-            params.put("orderNos", orders);
-            String url = DRIVER_FEE_SERVICE_API_BASE_URL + "/orderCost/getOrderDriverCostDetails";
-            JSONObject result = MpOkHttpUtil.okHttpGetBackJson(url, params, 1, "");
-            if (result == null){
-                logger.error("查询计费接口结果为空");
-                return Collections.EMPTY_LIST;
+        try {
+            Map<String, Object> httpParams = new HashMap<>();
+            httpParams.put("orderNos", String.join(",", orderNos));
+            String orderInfo = new RPCAPI().requestWithRetry(RPCAPI.HttpMethod.GET, DRIVER_FEE_SERVICE_API_BASE_URL + "/orderCost/findOrderDriverCostDetails", httpParams, null, "UTF-8");
+            if (orderInfo == null) {
+                logger.error("查询/orderCost/findOrderDriverCostDetails返回空，入参为：" + String.join(",", orderNos));
+                return new ArrayList<>();
             }
-            Integer resultCode = result.getInteger(Constants.RESULT);
-            if (resultCode == null || resultCode != Constants.SUCCESS_CODE){
-                logger.error("批量查询司机费用详情无数据,result : {}", result.toJSONString());
-                return Collections.EMPTY_LIST;
+            logger.info("调用计费查询司机费用明细接口返回：" + orderInfo);
+            RPCResponse orderResponse = RPCResponse.parse(orderInfo);
+            if (null == orderResponse || orderResponse.getCode() != 0 || orderResponse.getData() == null) {
+                logger.info("相关司机费用信息不存在，入参订单号：" + String.join(",", orderNos));
+                return new ArrayList<>();
             }
-            return result.getJSONArray(Constants.DATA).toJavaList(OrderDriverCostDetailVO.class);
-        }catch (Exception e){
-            logger.error("调用计费批量查询司机费用详情失败", e);
+            return JSON.parseArray(JSON.toJSONString(orderResponse.getData()), OrderDriverCostDetailVO.class);
+        } catch (Exception e) {
+            logger.error("查询/orderCost/getOrderDriverCostDetails异常:", e);
+            return new ArrayList<>();
         }
-        return Collections.EMPTY_LIST;
     }
+
+
 
     /**
      * 查询订单明细(批量)
