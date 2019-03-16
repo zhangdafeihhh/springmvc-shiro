@@ -916,8 +916,12 @@ public class OrderController{
 			Date   airlinePlanDate = new Date( orderInfoJson.getLongValue("airlinePlanDate") );
 			result.setAirlinePlanDate(airlinePlanDate);
 		}
-		result.setDriverPassengerPriceSeparate(orderInfoJson.getIntValue("isDriverPassengerPriceSeparate"));
-		//二、补全此订单的order_cost_detail
+//		result.setDriverPassengerPriceSeparate(orderInfoJson.getIntValue("isDriverPassengerPriceSeparate"));
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(orderInfoJson.getString("memo"))
+                && org.apache.commons.lang3.StringUtils.isNotBlank(JSON.parseObject(orderInfoJson.getString("memo")).getString("isDriverPassengerPriceSeparate")))
+            result.setDriverPassengerPriceSeparate(Integer.parseInt(JSON.parseObject(orderInfoJson.getString("memo")).getString("isDriverPassengerPriceSeparate")));
+
+        //二、补全此订单的order_cost_detail
 		CarFactOrderInfo  orderCostDetailData =  carFactOrderExMapper.selectOrderCostDetailByOrderId( Long.valueOf(orderId) );
 		if(orderCostDetailData!=null) {
 			result.setTravelTime(TimeUtils.milliToMinute(orderCostDetailData.getTravelTime() == null ? 0 : orderCostDetailData.getTravelTime()));
