@@ -1,21 +1,36 @@
 package com.zhuanche.serv.busManage;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.validation.constraints.NotNull;
-
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.rocketmq.CommonRocketProducer;
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.constants.BusConst;
+import com.zhuanche.dto.busManage.*;
+import com.zhuanche.entity.mdbcarmanage.BusBizSupplierDetail;
+import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
+import com.zhuanche.entity.rentcar.CarBizSupplier;
+import com.zhuanche.http.MpOkHttpUtil;
+import com.zhuanche.serv.CarBizDriverInfoService;
+import com.zhuanche.serv.CarBizSupplierService;
+import com.zhuanche.serv.mdbcarmanage.CarBizDriverInfoTempService;
+import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.excel.CsvUtils;
+import com.zhuanche.util.objcompare.CompareObjectUtils;
+import com.zhuanche.util.objcompare.entity.supplier.*;
+import com.zhuanche.vo.busManage.BusSupplierExportVO;
+import com.zhuanche.vo.busManage.BusSupplierInfoVO;
+import mapper.mdbcarmanage.CarAdmUserMapper;
+import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
+import mapper.mdbcarmanage.ex.BusBizSupplierDetailExMapper;
+import mapper.rentcar.CarBizSupplierMapper;
+import mapper.rentcar.ex.BusCarBizSupplierExMapper;
+import mapper.rentcar.ex.CarBizCityExMapper;
+import mapper.rentcar.ex.CarBizCooperationTypeExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,50 +43,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
-import com.zhuanche.common.database.MasterSlaveConfig;
-import com.zhuanche.common.database.MasterSlaveConfigs;
-import com.zhuanche.common.rocketmq.CommonRocketProducer;
-import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.constants.BusConst;
-import com.zhuanche.dto.busManage.BusSupplierBaseDTO;
-import com.zhuanche.dto.busManage.BusSupplierCommissionInfoDTO;
-import com.zhuanche.dto.busManage.BusSupplierDetailDTO;
-import com.zhuanche.dto.busManage.BusSupplierProrateDTO;
-import com.zhuanche.dto.busManage.BusSupplierQueryDTO;
-import com.zhuanche.dto.busManage.BusSupplierRebateDTO;
-import com.zhuanche.entity.mdbcarmanage.BusBizSupplierDetail;
-import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
-import com.zhuanche.entity.rentcar.CarBizSupplier;
-import com.zhuanche.http.MpOkHttpUtil;
-import com.zhuanche.serv.CarBizDriverInfoService;
-import com.zhuanche.serv.CarBizSupplierService;
-import com.zhuanche.serv.mdbcarmanage.CarBizDriverInfoTempService;
-import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.excel.CsvUtils;
-import com.zhuanche.util.objcompare.CompareObjectUtils;
-import com.zhuanche.util.objcompare.entity.supplier.BusSupplierBaseCO;
-import com.zhuanche.util.objcompare.entity.supplier.BusSupplierCommissionInfoCO;
-import com.zhuanche.util.objcompare.entity.supplier.BusSupplierDetailCO;
-import com.zhuanche.util.objcompare.entity.supplier.BusSupplierProrateCO;
-import com.zhuanche.util.objcompare.entity.supplier.BusSupplierRebateCO;
-import com.zhuanche.vo.busManage.BusSupplierExportVO;
-import com.zhuanche.vo.busManage.BusSupplierInfoVO;
-import com.zhuanche.vo.busManage.BusSupplierPageVO;
-
-import mapper.mdbcarmanage.CarAdmUserMapper;
-import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
-import mapper.mdbcarmanage.ex.BusBizSupplierDetailExMapper;
-import mapper.rentcar.CarBizSupplierMapper;
-import mapper.rentcar.ex.BusCarBizSupplierExMapper;
-import mapper.rentcar.ex.CarBizCityExMapper;
-import mapper.rentcar.ex.CarBizCooperationTypeExMapper;
+import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Service
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -544,7 +521,6 @@ public class BusSupplierService implements BusConst {
 	 * @return List<BusDriverInfoExportVO>
 	 * @throws
 	 */
-	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public List<BusSupplierExportVO> querySupplierExportList(BusSupplierQueryDTO queryDTO) {
 		List<BusSupplierExportVO> supplierList = busCarBizSupplierExMapper.querySupplierExportList(queryDTO);
 		return supplierList;
@@ -603,6 +579,8 @@ public class BusSupplierService implements BusConst {
 		List<Object> settleHeads = new ArrayList<>();// 结算信息
 		settleHeads.add("结算周期");
 		settleHeads.add("结算天数");
+		settleHeads.add("合同开始时间");
+		settleHeads.add("合同结束时间");
 		settleHeads.add("结算方式");
 		settleHeads.add("分佣类型");
 		for (int i = 1; i < maxCount2SupplierRate + 1; i++) {
@@ -623,6 +601,7 @@ public class BusSupplierService implements BusConst {
 		otherHeads.add("加盟费");
 		otherHeads.add("保证金");
 		otherHeads.add("是否提前结算");
+        otherHeads.add("提前结算金额");
 		otherHeads.add("是否有返点");
 		for (int i = 1; i < maxCount2RebateRate + 1; i++) {
 			otherHeads.add("返点比例"+i);
@@ -681,21 +660,7 @@ public class BusSupplierService implements BusConst {
 			String cooperationName = supplier.getCooperationName();
 			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(cooperationName, "")).append(",");
 
-			// // 七、合同开始时间
-			// Date contractDateStart = detail.getContractDateStart();
-//			String contractDateStartFormatter = "";
-//			if (contractDateStart != null) {
-//				contractDateStartFormatter = formatDate(FORMATTER_DATE_BY_HYPHEN, contractDateStart);
-//			}
-//			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(contractDateStartFormatter, "")).append(",");
-//			
-//			// 八、合同到期时间
-//			Date contractDateEnd = detail.getContractDateEnd();
-//			String contractDateEndFormatter = "";
-//			if (contractDateEnd != null) {
-//				contractDateEndFormatter = formatDate(FORMATTER_DATE_BY_HYPHEN, contractDateEnd);
-//			}
-//			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(contractDateEndFormatter, "")).append(",");
+
 
 			// ====================================结算信息===========================================
 			// 一、结算周期
@@ -715,8 +680,22 @@ public class BusSupplierService implements BusConst {
 			// 二、结算天数
 			String settleBillCycle = StringUtils.defaultIfBlank(settleInfo.getString("settleBillCycle"), "");
 			builder.append(CsvUtils.tab).append(settleBillCycle).append(",");
+             // 三、合同开始时间
+             Date contractDateStart = detail.getContractDateStart();
+			String contractDateStartFormatter = "";
+			if (contractDateStart != null) {
+				contractDateStartFormatter = formatDate(FORMATTER_DATE_BY_HYPHEN, contractDateStart);
+			}
+			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(contractDateStartFormatter, "")).append(",");
 
-			// 三、结算方式
+			// 四、合同到期时间
+			Date contractDateEnd = detail.getContractDateEnd();
+			String contractDateEndFormatter = "";
+			if (contractDateEnd != null) {
+				contractDateEndFormatter = formatDate(FORMATTER_DATE_BY_HYPHEN, contractDateEnd);
+			}
+			builder.append(CsvUtils.tab).append(StringUtils.defaultIfBlank(contractDateEndFormatter, "")).append(",");
+			// 五、结算方式
 			String settleType = Optional.ofNullable(settleInfo.getInteger("settleType")).map(value -> {
 				switch (value) {
 				case 0:
@@ -728,7 +707,7 @@ public class BusSupplierService implements BusConst {
 			}).orElse("");
 			builder.append(CsvUtils.tab).append(settleType).append(",");
 
-			// 四、分佣类型
+			// 六、分佣类型
 			String shareType = Optional.ofNullable(settleInfo.getInteger("shareType")).map(value -> {
 				switch (value) {
 				case 0:
@@ -743,7 +722,7 @@ public class BusSupplierService implements BusConst {
 				// 结算比例信息
 				JSONObject rate = (JSONObject) JSON.toJSON(object);
 
-				// 五、结算比例
+				// 七、结算比例
 				String supplierRate = StringUtils.defaultIfBlank(rate.getString("supplierRate"), "0.00");
 				builder.append(CsvUtils.tab).append(supplierRate).append(",");
 
@@ -807,7 +786,11 @@ public class BusSupplierService implements BusConst {
 			}).orElse("");
 			builder.append(CsvUtils.tab).append(isAdvance).append(",");
 
-			// 四、是否有返点
+			//四、提前结算金额
+            BigDecimal settleAmount = Optional.ofNullable(settleInfo.getBigDecimal("settleAmount")).orElse(BigDecimal.ZERO);
+            builder.append(CsvUtils.tab).append(settleAmount).append(",");
+
+            // 五、是否有返点
 			String isRebate = Optional.ofNullable(settleInfo.getInteger("isRebate")).map(value -> {
 				switch (value) {
 				case 0:
@@ -824,19 +807,19 @@ public class BusSupplierService implements BusConst {
 				// 结算比例信息
 				JSONObject rate = (JSONObject) JSON.toJSON(object);
 
-				// 五、返点比例
+				// 六、返点比例
 				String rebateRate = StringUtils.defaultIfBlank(rate.getString("rebateRate"), "0.00");
 				builder.append(CsvUtils.tab).append(rebateRate).append(",");
 
-				// 六、金额
+				// 七、金额
 				String maxMoney = StringUtils.defaultIfBlank(rate.getString("maxMoney"), "0.00");
 				builder.append(CsvUtils.tab).append(maxMoney).append(",");
 
-				// 七、生效起始时间
+				// 八、生效起始时间
 				String startTime = StringUtils.defaultIfBlank(rate.getString("startTime"), "");
 				builder.append(CsvUtils.tab).append(startTime).append(",");
 
-				// 八、生效结束时间
+				// 九、生效结束时间
 				String endTime = StringUtils.defaultIfBlank(rate.getString("endTime"), "");
 				builder.append(CsvUtils.tab).append(endTime).append(",");
 			});

@@ -8,7 +8,7 @@ import com.zhuanche.dto.BaseDTO;
 import lombok.Data;
 
 @Data
-public class BusSupplierQueryDTO extends BaseDTO {
+public class BusSupplierQueryDTO {
 
 	// ========================接口字段=======================
 

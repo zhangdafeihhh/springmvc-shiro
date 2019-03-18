@@ -1,22 +1,25 @@
 package com.zhuanche.controller.busManage;
 
-import java.net.URLEncoder;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.swing.text.html.Option;
-import javax.validation.constraints.NotNull;
-
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.dto.busManage.*;
 import com.zhuanche.entity.mdbcarmanage.BusBizSupplierDetail;
-import com.zhuanche.util.BeanUtil;
+import com.zhuanche.serv.busManage.BusBizChangeLogService;
+import com.zhuanche.serv.busManage.BusSupplierService;
+import com.zhuanche.util.excel.CsvUtils;
+import com.zhuanche.vo.busManage.BusSupplierExportVO;
+import com.zhuanche.vo.busManage.BusSupplierInfoVO;
+import com.zhuanche.vo.busManage.BusSupplierPageVO;
+import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
+import mapper.rentcar.ex.BusCarBizSupplierExMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.omg.CORBA.OBJECT_NOT_EXIST;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -29,32 +32,15 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.github.pagehelper.Page;
-import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
-import com.zhuanche.common.database.MasterSlaveConfig;
-import com.zhuanche.common.database.MasterSlaveConfigs;
-import com.zhuanche.common.paging.PageDTO;
-import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.dto.busManage.BusSupplierBaseDTO;
-import com.zhuanche.dto.busManage.BusSupplierCommissionInfoDTO;
-import com.zhuanche.dto.busManage.BusSupplierDetailDTO;
-import com.zhuanche.dto.busManage.BusSupplierProrateDTO;
-import com.zhuanche.dto.busManage.BusSupplierQueryDTO;
-import com.zhuanche.dto.busManage.BusSupplierRebateDTO;
-import com.zhuanche.serv.busManage.BusBizChangeLogService;
-import com.zhuanche.serv.busManage.BusSupplierService;
-import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.excel.CsvUtils;
-import com.zhuanche.vo.busManage.BusSupplierExportVO;
-import com.zhuanche.vo.busManage.BusSupplierInfoVO;
-import com.zhuanche.vo.busManage.BusSupplierPageVO;
-
-import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
-import mapper.rentcar.ex.BusCarBizSupplierExMapper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
+import java.net.URLEncoder;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/bus/supplier")
@@ -251,9 +237,13 @@ public class BusSupplierController {
 	 * @throws
 	 */
 	@RequestMapping(value = "/querySupplierPageList")
-	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
-	public AjaxResponse queryList(@Validated BusSupplierQueryDTO queryDTO) {
-        Double supplierRate = queryDTO.getSupplierRate();
+	@MasterSlaveConfigs(configs = { @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE),
+			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE) })
+	public AjaxResponse queryList(@Validated BusSupplierQueryDTO queryDTO,Integer pageNum,Integer pageSize) {
+			//不可使 BusSupplierQueryDTO 的属性中包含 pageNum，pageSize，否则会被默认分页 supportMethodsArguments=true
+			pageNum=(pageNum==null||pageNum<=0)?1:pageNum;
+			pageSize=(pageSize==null||pageSize<=0)?30:pageSize;
+		Double supplierRate = queryDTO.getSupplierRate();
         List<Integer> supplierIds=new ArrayList<>();
         if (supplierRate != null) {
             JSONArray supplierIdsByRate = busSupplierService.getSupplierByProrateRate(supplierRate);
@@ -262,7 +252,7 @@ public class BusSupplierController {
                 return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
             }
             if (supplierIdsByRate.isEmpty()) {
-                return AjaxResponse.success(new PageDTO(queryDTO.getPageNum(), queryDTO.getPageSize(), 0, supplierIds));
+                return AjaxResponse.success(new PageDTO(pageNum, pageSize, 0, supplierIds));
             }
             supplierIds=supplierIdsByRate.stream().map(o->(JSONObject)o).map(o->o.getInteger("supplierId")).filter(Objects::nonNull).collect(Collectors.toList());
         }
@@ -272,7 +262,7 @@ public class BusSupplierController {
         //主表信息
         List<BusSupplierPageVO> busSupplierPageVOS = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
         if(busSupplierPageVOS==null||busSupplierPageVOS.isEmpty()) {
-            return AjaxResponse.success(new PageDTO(queryDTO.getPageNum(), queryDTO.getPageSize(), 0, new ArrayList()));
+            return AjaxResponse.success(new PageDTO(pageNum, pageSize, 0, new ArrayList()));
         }
         //附表信息
         Set<Integer> supplierIdSet = busSupplierPageVOS.stream().map(BusSupplierPageVO::getSupplierId).collect(Collectors.toSet());
@@ -338,9 +328,9 @@ public class BusSupplierController {
         result.addAll(invalidSup);
         result.addAll(nullContractDateSup);
         int total = result.size();
-        int start=(queryDTO.getPageNum()-1)*queryDTO.getPageSize();
-        int end = start+queryDTO.getPageSize()>=total?total:start+queryDTO.getPageSize();
-        return AjaxResponse.success(new PageDTO(queryDTO.getPageNum(),queryDTO.getPageSize(),total,result.subList(start,end)));
+        int start=(pageNum-1)*pageSize;
+        int end = start+pageSize>=total?total:start+pageSize;
+        return AjaxResponse.success(new PageDTO(pageNum,pageSize,total,result.subList(start,end)));
     }
 
 	/**
@@ -354,6 +344,8 @@ public class BusSupplierController {
 	 * @throws
 	 */
 	@RequestMapping(value = "/exportSupplierList")
+	@MasterSlaveConfigs(configs = { @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE),
+			@MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE) })
 	public void exportSupplierList(@Validated BusSupplierQueryDTO queryDTO, HttpServletRequest request,
 			HttpServletResponse response) {
         long start = System.currentTimeMillis(); // 获取开始时间
