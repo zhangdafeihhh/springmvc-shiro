@@ -36,6 +36,7 @@ import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.mdbcarmanage.ex.CarRelateGroupExMapper;
 import mapper.mdbcarmanage.ex.CarRelateTeamExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -175,12 +176,17 @@ public class CarDriverTeamService{
 				if(!Check.NuNObj(existsGroup)){
 					result = carRelateGroupExMapper.deleteDriverFromGroup(existsGroup.getGroupId(),driverId);
 				}
-				//TODO 处理司机ID，发动司机变更MQ 从车队移除司机
-				this.asyncDutyService.processingData(driverId, String.valueOf(id), carDriverTeam.getTeamName(), 1);
+				//TODO 处理司机ID，发动司机变更MQ 从车队移除司机  车队移除
+				this.asyncDutyService.processingData(driverId, "", carDriverTeam.getTeamName(), 1);
 				return result;
 			}else{
 				//小组操作移除司机
-				return carRelateGroupExMapper.deleteDriverFromGroup(id,driverId);
+				  int code = carRelateGroupExMapper.deleteDriverFromGroup(id,driverId);
+				  if(code > 0){
+					  //TODO 处理司机ID，发动司机变更MQ 从班组移除司机
+					  this.asyncDutyService.processingData(driverId, String.valueOf(carDriverTeam.getpId()), carDriverTeam.getTeamName(), 1);
+				  }
+				return code;
 			}
 		}catch (Exception e){
 			logger.error("车队:"+id + "移除司机"+driverId+"结果:"+JSON.toJSONString(e));
@@ -500,11 +506,48 @@ public class CarDriverTeamService{
 			if(Check.NuNObj(existsTeam)){
 				return ServiceReturnCodeEnum.NONE_RECODE_EXISTS.getCode();
 			}
+			if(existsTeam != null && StringUtils.isNotEmpty(existsTeam.getSupplier())){
+				paramDto.setSupplier(existsTeam.getSupplier());
+			}
+			if(existsTeam != null && StringUtils.isNotEmpty(existsTeam.getTeamName())){
+				paramDto.setTeamName(existsTeam.getTeamName());
+			}
 			//开启关闭逻辑
 			if(paramDto.getOpenCloseFlag() !=0 && paramDto.getStatus() != existsTeam.getStatus()){
 				existsTeam.setStatus(paramDto.getOpenCloseFlag());
+				//关闭时候把下面的司机存入mq 如果是车队，司机存入供应商，如果是班组，司机存入车队
+				if(existsTeam != null && existsTeam.getpId() != null  && existsTeam.getpId() > 0){
+					paramDto.setpId(existsTeam.getpId());
+
+					List<CarRelateGroup> groups = new ArrayList<>();
+					TeamGroupRequest teamGroupRequest = new TeamGroupRequest();
+					teamGroupRequest.setGroupId(String.valueOf(existsTeam.getId()));
+					groups = carRelateGroupExMapper.queryDriverGroupRelationList(teamGroupRequest);
+					if(CollectionUtils.isNotEmpty(groups)){
+						for (CarRelateGroup carRelateGroup : groups){
+							//班组下更新到车队下
+							this.asyncDutyService.processingData(carRelateGroup.getDriverId(), existsTeam.getpId().toString(), "", 0);
+						}
+					}
+				}else {
+					List<CarRelateTeam> teams = new ArrayList<>();
+					TeamGroupRequest teamGroupRequest = new TeamGroupRequest();
+					teamGroupRequest.setTeamId(String.valueOf(existsTeam.getId()));
+					teams = carRelateTeamExMapper.queryDriverTeamRelationList(teamGroupRequest);
+					if(CollectionUtils.isNotEmpty(teams)){
+						for(CarRelateTeam carRelateTeam : teams){
+							//车队下的司机更新到加盟商
+							this.asyncDutyService.processingData(carRelateTeam.getDriverId(), "", "", 0);
+						}
+					}
+				}
+
 				return carDriverTeamMapper.updateByPrimaryKeySelective(existsTeam);
 			}else if(paramDto.getOpenCloseFlag() !=0 && paramDto.getStatus() == existsTeam.getStatus()){
+				existsTeam.setStatus(paramDto.getOpenCloseFlag());
+				if(existsTeam != null && existsTeam.getpId() != null){
+					paramDto.setpId(existsTeam.getpId());
+				}
 				return ServiceReturnCodeEnum.DEAL_SUCCESS.getCode();
 			}
 			existsTeam.setUpdateDate(new Date());
@@ -520,6 +563,8 @@ public class CarDriverTeamService{
 			return ServiceReturnCodeEnum.DEAL_FAILURE.getCode();
 		}
 	}
+
+
 
 	/**
 	 * @Desc:  新增车队1113
@@ -573,7 +618,12 @@ public class CarDriverTeamService{
 //			BeanUtils.copyProperties(record,paramDto);
 			record.setCreateBy(String.valueOf(WebSessionUtil.getCurrentLoginUser().getId()));
 			record.setShortName(paramDto.getShortName());
-			return carDriverTeamMapper.insertSelective(record);
+			int code = carDriverTeamMapper.insertSelective(record);
+			if(code > 0){
+				//为后置通知添加参数
+				paramDto.setId(record.getId());
+			}
+			return code;
 		}catch (Exception e){
 			logger.error("新增车队失败!", e );
 			return ServiceReturnCodeEnum.DEAL_FAILURE.getCode();
