@@ -34,6 +34,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**供应商信息 的 基本服务层**/
 @Service
@@ -79,6 +81,8 @@ public class CarBizSupplierService{
 
 	@Autowired
 	private CarBizCityExMapper carBizCityExMapper;
+
+	private static final ExecutorService es = Executors.newCachedThreadPool();
 
 	/**查询供应商信息**/
 	@MasterSlaveConfigs(configs={
@@ -203,16 +207,8 @@ public class CarBizSupplierService{
 				carBizCarInfoTempService.updateDriverCooperationTypeBySupplierId(supplier.getSupplierId(), supplier.getCooperationType());
 
 				try {
-					// 根据城市id获取城市名称
-					String cityName = carBizCityExMapper.queryNameById(supplier.getSupplierCity());
-					String url = driverServiceApiUrl + DRIVER_FLASH_REDIS_BY_SUPPLIERID_URL
-							+ "?supplierId=" + supplier.getSupplierId()
-							+ "&supplierName=" + supplier.getSupplierFullName()
-							+ "&cityId=" + supplier.getSupplierCity()
-							+ "&cityName=" + cityName
-							+ "&cooperationType=" + cooperationTypeNew;
-					String result = HttpClientUtil.buildGetRequest(url).execute();
-					logger.info("删除司机信息缓存,删除失败不影响业务,调用结果返回={}", result);
+					es.submit(new SupplierTasker(supplier.getSupplierId(), supplier.getSupplierFullName(),
+							supplier.getSupplierCity(), cooperationTypeNew));
 				} catch (Exception e) {
 					logger.info("供应商修改加盟类型,调用清除接口异常="+e.getMessage());
 				}
@@ -346,5 +342,38 @@ public class CarBizSupplierService{
 			}
 		}
 		return null;
+	}
+
+	class SupplierTasker implements Runnable{
+
+		private Integer supplierId;
+		private String supplierName;
+		private Integer cityId;
+		private Integer cooperationType;
+
+		public SupplierTasker(Integer supplierId, String supplierName, Integer cityId, Integer cooperationType){
+			this.supplierId = supplierId;
+			this.supplierName = supplierName;
+			this.cityId = cityId;
+			this.cooperationType = cooperationType;
+		}
+		@Override
+		public void run() {
+			try {
+				// 根据城市id获取城市名称
+				String cityName = carBizCityExMapper.queryNameById(cityId);
+				String url = driverServiceApiUrl + DRIVER_FLASH_REDIS_BY_SUPPLIERID_URL
+						+ "?supplierId=" + supplierId
+						+ "&supplierName=" + supplierName
+						+ "&cityId=" + cityId
+						+ "&cityName=" + cityName
+						+ "&cooperationType=" + cooperationType;
+				String result = HttpClientUtil.buildGetRequest(url).execute();
+				logger.info("删除司机信息缓存,删除失败不影响业务,调用结果返回={}", result);
+			} catch (Exception e) {
+				logger.info("供应商修改加盟类型,调用清除接口异常="+e.getMessage());
+			}
+
+		}
 	}
 }
