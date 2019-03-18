@@ -90,26 +90,26 @@ public class DriverFeeDetailServiceImpl implements DriverFeeDetailService {
     /**
      * 根据订单号获取司机费用明细（批量）
      *
-     * @param orderNos eg:B190202133826203001,B190202133826203001
+     * @param orderIds
      * @return
      */
-    public List<OrderDriverCostDetailVO> getOrderDriverCostDetailVOBatch(List<String> orderNos) {
-        if (null == orderNos || orderNos.size() == 0) {
+    public List<OrderDriverCostDetailVO> getOrderDriverCostDetailVOBatch(List<String> orderIds) {
+        if (null == orderIds || orderIds.size() == 0) {
             logger.info("接口调用入参订单号为空");
             return new ArrayList<>();
         }
         try {
             Map<String, Object> httpParams = new HashMap<>();
-            httpParams.put("orderNos", String.join(",", orderNos));
+            httpParams.put("orderIds", String.join(",", orderIds));
             String orderInfo = new RPCAPI().requestWithRetry(RPCAPI.HttpMethod.GET, DRIVER_FEE_SERVICE_API_BASE_URL + "/orderCost/findOrderDriverCostDetails", httpParams, null, "UTF-8");
             if (orderInfo == null) {
-                logger.error("查询/orderCost/findOrderDriverCostDetails返回空，入参为：" + String.join(",", orderNos));
+                logger.error("查询/orderCost/findOrderDriverCostDetails返回空，入参为：" + String.join(",", orderIds));
                 return new ArrayList<>();
             }
             logger.info("调用计费查询司机费用明细接口返回：" + orderInfo);
             RPCResponse orderResponse = RPCResponse.parse(orderInfo);
             if (null == orderResponse || orderResponse.getCode() != 0 || orderResponse.getData() == null) {
-                logger.info("相关司机费用信息不存在，入参订单号：" + String.join(",", orderNos));
+                logger.info("相关司机费用信息不存在，入参订单号：" + String.join(",", orderIds));
                 return new ArrayList<>();
             }
             return JSON.parseArray(JSON.toJSONString(orderResponse.getData()), OrderDriverCostDetailVO.class);

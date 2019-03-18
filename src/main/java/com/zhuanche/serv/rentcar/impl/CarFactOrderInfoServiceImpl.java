@@ -298,8 +298,8 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 	 * @param list
 	 */
 	private void fillDriverAmount(List<CarFactOrderInfoDTO> list) {
-		List<String> orderNos = list.stream().map(CarFactOrderInfoDTO::getOrderNo).collect(Collectors.toList());
-		List<OrderDriverCostDetailVO> driverCostDetails = driverFeeDetailService.getOrderDriverCostDetailVOBatch(orderNos);
+		List<String> orderIds = list.stream().map(CarFactOrderInfoDTO::getOrderId).collect(Collectors.toList());
+		List<OrderDriverCostDetailVO> driverCostDetails = driverFeeDetailService.getOrderDriverCostDetailVOBatch(orderIds);
 		Map<String, OrderDriverCostDetailVO> map = driverCostDetails.stream().collect(Collectors.toMap(OrderDriverCostDetailVO::getOrderNo, a -> a, (k1, k2) -> k1));
 		for (CarFactOrderInfoDTO vo : list) {
 			if (null != map.get(vo.getOrderNo()))
