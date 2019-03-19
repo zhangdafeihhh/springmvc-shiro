@@ -188,6 +188,7 @@ public class CarBizSupplierService{
 					JSONObject json = (JSONObject) JSONObject.parse(jsonString);
 					Map<String, Object> params = json.getInnerMap();
 					JSONObject result = MpOkHttpUtil.okHttpPostBackJson(settleApiUrl + "/api/settle/supplier/info/add", params, 1, "增加供应商信息");
+					logger.info("调用分佣接口增加供应商返回结果：{}",result.toJSONString());
 					if (result.getIntValue("code") != Constants.SUCCESS_CODE) {
 						String errorMsg = result.getString("msg");
 						logger.info("[ CarBizSupplierService-saveSupplierInfo ] 增加供应商调用分佣增加供应商接口出错,params={},errorMsg={}", params, errorMsg);
@@ -207,6 +208,7 @@ public class CarBizSupplierService{
 					settleMap.put("createName",supplier.getUpdateBy());
 				}
 				JSONObject result = MpOkHttpUtil.okHttpPostBackJson(settleApiUrl + "/api/settle/supplier/info/update", settleMap, 1, "增加供应商结算信息");
+				logger.info("调用分佣接口增加供应商结算信息返回结果：{}",result.toJSONString());
 				if (result.getIntValue("code") != Constants.SUCCESS_CODE) {
 					String errorMsg = result.getString("msg");
 					logger.info("[ CarBizSupplierService-saveSupplierInfo ] 增加供应商调用分佣修改结算接口出错,params={},errorMsg={}", settleMap, errorMsg);
