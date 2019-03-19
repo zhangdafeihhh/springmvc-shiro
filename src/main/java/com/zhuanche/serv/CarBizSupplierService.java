@@ -195,7 +195,7 @@ public class CarBizSupplierService{
 				}
 				Map<String,Object> settleMap = new HashMap<>();
 				if(supplier.getSettlementCycle()!=null){
-					settleMap.put("settlementCycle",supplier.getSettlementCycle());
+					settleMap.put("settleType",supplier.getSettlementCycle());
 				}
 				if(supplier.getSettlementDay()!=null){
 					settleMap.put("settleDay",supplier.getSettlementDay());
