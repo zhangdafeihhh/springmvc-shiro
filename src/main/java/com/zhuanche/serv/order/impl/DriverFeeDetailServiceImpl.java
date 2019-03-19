@@ -42,6 +42,10 @@ public class DriverFeeDetailServiceImpl implements DriverFeeDetailService {
     public DriverCostDetailVO getDriverCostDetail(String orderNo, int orderId, Integer buyoutFlag) {
         if (StringUtils.isBlank(orderNo) && orderId != 0)
             return null;
+        if(null == buyoutFlag){
+            OrderCostDetailInfo info = getOrderCostDetailInfo(orderNo);
+            buyoutFlag = info.getBuyOutFlag();
+        }
         Map<String, Object> params = new HashMap<>();
         params.put("orderNo", orderNo);
         params.put("orderId", orderId);
