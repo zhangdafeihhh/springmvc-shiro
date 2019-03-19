@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.type.TimeOfDayOrBuilder;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -67,6 +68,10 @@ public class CarBizSupplierService{
 
 	@Value("${commission.url}")
 	String commissionUrl;
+
+	@Value("${settle.api.url}")
+	String settleApiUrl;
+
 
 	/**查询供应商信息**/
 	@MasterSlaveConfigs(configs={
@@ -169,13 +174,45 @@ public class CarBizSupplierService{
 				}
 			}
 			try{
-				Map<String, Object> messageMap = new HashMap<String, Object>();
+            	//TODO 将老的发送mq的方式改为请求接口
+				/*Map<String, Object> messageMap = new HashMap<String, Object>();
 				messageMap.put("method",method);
 				Object json = JSON.toJSON(supplier);
 				messageMap.put("data", json);
 				String messageStr = JSON.toJSONStringWithDateFormat(messageMap, JSON.DEFFAULT_DATE_FORMAT);
 				logger.info("专车供应商，同步发送数据：" + messageStr);
-				CommonRocketProducer.publishMessage(Constants.SUPPLIER_TOPIC, method, String.valueOf(supplier.getSupplierId()), messageMap);
+				CommonRocketProducer.publishMessage(Constants.SUPPLIER_TOPIC, method, String.valueOf(supplier.getSupplierId()), messageMap);*/
+				if (Constants.CREATE.equals(method)) {
+					// 请求参数
+					String jsonString = JSON.toJSONStringWithDateFormat(supplier, JSON.DEFFAULT_DATE_FORMAT);
+					JSONObject json = (JSONObject) JSONObject.parse(jsonString);
+					Map<String, Object> params = json.getInnerMap();
+					JSONObject result = MpOkHttpUtil.okHttpPostBackJson(settleApiUrl + "/api/settle/supplier/info/add", params, 1, "增加供应商信息");
+					if (result.getIntValue("code") != Constants.SUCCESS_CODE) {
+						String errorMsg = result.getString("msg");
+						logger.info("[ CarBizSupplierService-saveSupplierInfo ] 增加供应商调用分佣增加供应商接口出错,params={},errorMsg={}", params, errorMsg);
+					}
+				}
+				Map<String,Object> settleMap = new HashMap<>();
+				if(supplier.getSettlementCycle()!=null){
+					settleMap.put("settlementCycle",supplier.getSettlementCycle());
+				}
+				if(supplier.getSettlementDay()!=null){
+					settleMap.put("settleDay",supplier.getSettlementDay());
+				}
+				if(supplier.getSupplierId()!=null){
+					settleMap.put("supplierId",supplier.getSupplierId());
+				}
+				if(supplier.getUpdateBy()!=null){
+					settleMap.put("createName",supplier.getUpdateBy());
+				}
+				JSONObject result = MpOkHttpUtil.okHttpPostBackJson(settleApiUrl + "/api/settle/supplier/info/update", settleMap, 1, "增加供应商结算信息");
+				if (result.getIntValue("code") != Constants.SUCCESS_CODE) {
+					String errorMsg = result.getString("msg");
+					logger.info("[ CarBizSupplierService-saveSupplierInfo ] 增加供应商调用分佣修改结算接口出错,params={},errorMsg={}", settleMap, errorMsg);
+				}
+
+
 			}catch (Exception e){
 				logger.error(Constants.SUPPLIER_MQ_SEND_FAILED, e);
 			}
