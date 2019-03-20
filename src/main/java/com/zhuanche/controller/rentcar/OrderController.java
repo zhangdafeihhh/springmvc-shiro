@@ -5,6 +5,7 @@ import static com.zhuanche.common.enums.MenuEnum.ORDER_DETAIL;
 import static com.zhuanche.common.enums.MenuEnum.ORDER_LIST;
 import static com.zhuanche.common.enums.MenuEnum.ORDER_LIST_EXPORT;
 
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -17,6 +18,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.zhuanche.entity.rentcar.*;
 import mapper.rentcar.CarBizCustomerMapper;
 import mapper.rentcar.CarBizDriverInfoMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
@@ -54,15 +56,6 @@ import com.zhuanche.dto.rentcar.CarFactOrderInfoDTO;
 import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
 import com.zhuanche.dto.rentcar.ServiceTypeDTO;
 import com.zhuanche.entity.driverOrderRecord.OrderTimeEntity;
-import com.zhuanche.entity.rentcar.CarBizCity;
-import com.zhuanche.entity.rentcar.CarBizCustomer;
-import com.zhuanche.entity.rentcar.CarBizDriverInfo;
-import com.zhuanche.entity.rentcar.CarBizOrderSettleEntity;
-import com.zhuanche.entity.rentcar.CarBizOrderWaitingPeriod;
-import com.zhuanche.entity.rentcar.CarBizSupplier;
-import com.zhuanche.entity.rentcar.CarFactOrderInfo;
-import com.zhuanche.entity.rentcar.CarGroupEntity;
-import com.zhuanche.entity.rentcar.ServiceEntity;
 import com.zhuanche.serv.order.DriverFeeDetailService;
 import com.zhuanche.serv.order.OrderService;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
@@ -1147,11 +1140,54 @@ public class OrderController{
 			result.setPosPay(carBizOrderSettle.getPosPay());
 		}
 		//设置司乘分离对象
+		OrderCostDetailInfo orderCostDetailInfo = driverFeeDetailService.getOrderCostDetailInfo(result.getOrderNo());
+
+		getOverTimeHtml(orderCostDetailInfo);//超套餐时长费
+		getOverMileageNumHtml(orderCostDetailInfo);//计算超套餐里程费
 		result.setDriverCostDetailVO(driverFeeDetailService.getOrderDriverCostDetailVO(result.getOrderNo()));
 		result.setDriverCostDetailVOH5(driverFeeDetailService.getDriverCostDetail(result.getOrderNo(),Integer.parseInt(Long.toString(result.getOrderId())),result.getBuyoutFlag()));
-        result.setOrderCostDetailInfo(driverFeeDetailService.getOrderCostDetailInfo(result.getOrderNo()));
+        result.setOrderCostDetailInfo(orderCostDetailInfo);
 		return result;
 	}
+
+    /**
+     * 超套餐时长详情
+     *
+     * @param orderCostDetailInfo
+     * @return
+     */
+    private void getOverTimeHtml(OrderCostDetailInfo orderCostDetailInfo) {
+        if (null == orderCostDetailInfo)
+            return;
+        if (orderCostDetailInfo.getOverTimePrice() != null)
+            orderCostDetailInfo.setOverTimeFee(orderCostDetailInfo.getOverMileageFee().add(new BigDecimal(String.valueOf(orderCostDetailInfo.getOverTimePrice()))));
+        if (null != orderCostDetailInfo.getCostDurationDetailDTOList() && orderCostDetailInfo.getCostDurationDetailDTOList().size() > 0) {
+            for (CostTimeDetailDTO detailDTO : orderCostDetailInfo.getCostDurationDetailDTOList())
+                orderCostDetailInfo.setOverTimeFee(orderCostDetailInfo.getOverMileageFee().add(detailDTO.getAmount()));
+        } else {
+            orderCostDetailInfo.setOverTimeFee(orderCostDetailInfo.getOverTimePrice().add(orderCostDetailInfo.getHotDurationFees()).add(orderCostDetailInfo.getNighitDurationFees()));
+        }
+    }
+
+    /**
+     * 超套餐里程详情
+     *
+     * @param orderCostDetailInfo
+     * @return
+     */
+    private void getOverMileageNumHtml(OrderCostDetailInfo orderCostDetailInfo) {
+        if (null == orderCostDetailInfo)
+            return ;
+        if (orderCostDetailInfo.getOverMileagePrice() != null)
+            orderCostDetailInfo.setOverMileageFee(orderCostDetailInfo.getOverMileageFee().add(new BigDecimal(String.valueOf(orderCostDetailInfo.getOverMileagePrice()))));
+        if (null != orderCostDetailInfo.getCostMileageDetailDTOList() && orderCostDetailInfo.getCostMileageDetailDTOList().size() > 0){
+            for (CostTimeDetailDTO detailDTO : orderCostDetailInfo.getCostMileageDetailDTOList()){
+                orderCostDetailInfo.setOverMileageFee(orderCostDetailInfo.getOverMileageFee().add(new BigDecimal(String.valueOf(detailDTO.getAmount()))));
+            }
+        }else {
+            orderCostDetailInfo.setOverMileageFee(orderCostDetailInfo.getOverMileagePrice().add(orderCostDetailInfo.getHotMileageFees()).add(orderCostDetailInfo.getNightDistancePrice()));
+        }
+    }
 
 		
 		//订单时间流程赋值
