@@ -258,4 +258,6 @@ public class OrderCostDetailInfo {
 
     private BigDecimal overMileageFee = new BigDecimal(0);//超套餐里程费
     private BigDecimal overTimeFee = new BigDecimal(0);//超套餐时长费
+    private BigDecimal overMileageTotal = BigDecimal.ZERO;//超套餐里程公里
+    private BigDecimal travelTimeShow = BigDecimal.ZERO;//超套餐时长
 }

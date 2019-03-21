@@ -1144,6 +1144,7 @@ public class OrderController{
 
 		getOverTimeHtml(orderCostDetailInfo);//超套餐时长费
 		getOverMileageNumHtml(orderCostDetailInfo);//计算超套餐里程费
+        calcOverMileageTotal(orderCostDetailInfo);
 		result.setDriverCostDetailVO(driverFeeDetailService.getOrderDriverCostDetailVO(result.getOrderNo()));
 		result.setDriverCostDetailVOH5(driverFeeDetailService.getDriverCostDetail(result.getOrderNo(),Integer.parseInt(Long.toString(result.getOrderId())),result.getBuyoutFlag()));
         result.setOrderCostDetailInfo(orderCostDetailInfo);
@@ -1159,12 +1160,15 @@ public class OrderController{
     private void getOverTimeHtml(OrderCostDetailInfo orderCostDetailInfo) {
         if (null == orderCostDetailInfo)
             return;
-        if (orderCostDetailInfo.getOverTimePrice() != null)
-            orderCostDetailInfo.setOverTimeFee(orderCostDetailInfo.getOverMileageFee().add(new BigDecimal(String.valueOf(orderCostDetailInfo.getOverTimePrice()))));
         if (null != orderCostDetailInfo.getCostDurationDetailDTOList() && orderCostDetailInfo.getCostDurationDetailDTOList().size() > 0) {
-            for (CostTimeDetailDTO detailDTO : orderCostDetailInfo.getCostDurationDetailDTOList())
-                orderCostDetailInfo.setOverTimeFee(orderCostDetailInfo.getOverMileageFee().add(detailDTO.getAmount()));
+            orderCostDetailInfo.setOverTimeFee(orderCostDetailInfo.getOverTimePrice());
+            orderCostDetailInfo.setTravelTimeShow(orderCostDetailInfo.getOverTimeNum());
+            for (CostTimeDetailDTO detailDTO : orderCostDetailInfo.getCostDurationDetailDTOList()){
+                orderCostDetailInfo.setTravelTimeShow(orderCostDetailInfo.getTravelTimeShow().add(detailDTO.getNumber()));
+                orderCostDetailInfo.setOverTimeFee(orderCostDetailInfo.getOverTimeFee().add(detailDTO.getAmount()));
+            }
         } else {
+            orderCostDetailInfo.setTravelTimeShow(orderCostDetailInfo.getOverTimeNum().add(new BigDecimal(orderCostDetailInfo.getHotDuration())).add(new BigDecimal(orderCostDetailInfo.getNighitDuration())));
             orderCostDetailInfo.setOverTimeFee(orderCostDetailInfo.getOverTimePrice().add(orderCostDetailInfo.getHotDurationFees()).add(orderCostDetailInfo.getNighitDurationFees()));
         }
     }
@@ -1186,6 +1190,17 @@ public class OrderController{
             }
         }else {
             orderCostDetailInfo.setOverMileageFee(orderCostDetailInfo.getOverMileagePrice().add(orderCostDetailInfo.getHotMileageFees()).add(orderCostDetailInfo.getNightDistancePrice()));
+        }
+    }
+
+    private void calcOverMileageTotal(OrderCostDetailInfo orderCostDetailInfo) {
+        if (null != orderCostDetailInfo.getCostMileageDetailDTOList() && orderCostDetailInfo.getCostMileageDetailDTOList().size() > 0){
+            orderCostDetailInfo.setOverMileageTotal(orderCostDetailInfo.getOverMileageNum());
+            for (CostTimeDetailDTO dto : orderCostDetailInfo.getCostMileageDetailDTOList()){
+                orderCostDetailInfo.setOverMileageTotal(orderCostDetailInfo.getOverMileageTotal().add(dto.getNumber()));
+            }
+        }else {
+            orderCostDetailInfo.setOverMileageTotal(orderCostDetailInfo.getOverMileageNum().add(new BigDecimal(orderCostDetailInfo.getHotMileage()).add(orderCostDetailInfo.getNightDistanceNum())));
         }
     }
 
