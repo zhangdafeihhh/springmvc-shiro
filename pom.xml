@@ -383,7 +383,6 @@
 			<properties>
 				<env.name>test</env.name>
 			</properties>
-
 		</profile>
 		<profile>
 			<id>pre</id>

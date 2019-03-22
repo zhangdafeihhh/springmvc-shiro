@@ -5,8 +5,10 @@ import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.constants.busManage.BusConstant;
 import com.zhuanche.constants.busManage.EnumFuel;
 import com.zhuanche.dto.busManage.BusCarSaveDTO;
@@ -14,7 +16,9 @@ import com.zhuanche.dto.busManage.BusInfoDTO;
 import com.zhuanche.dto.rentcar.CarMongoDTO;
 import com.zhuanche.entity.busManage.BusCarInfo;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
-import com.zhuanche.entity.rentcar.CarInfo;
+import com.zhuanche.entity.rentcar.CarBizCity;
+import com.zhuanche.entity.rentcar.CarBizSupplier;
+import com.zhuanche.mongo.busManage.BusInfoAudit;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
@@ -25,6 +29,7 @@ import com.zhuanche.vo.busManage.BusInfoVO;
 import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper;
 import mapper.rentcar.CarBizCarGroupMapper;
 import mapper.rentcar.ex.BusInfoExMapper;
+import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.lang.StringUtils;
@@ -35,11 +40,13 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 /**
@@ -63,10 +70,14 @@ public class BusInfoService {
     private CarBizSupplierExMapper supplierExMapper;
     @Autowired
     private CarBizCityExMapper cityExMapper;
+    @Autowired
+    private CarBizCarGroupExMapper groupExMapper;
     @Resource(name = "carMongoTemplate")
     private MongoTemplate carMongoTemplate;
     //存入mongoDB的Collection名称
+    //存入mongoDB的Collection名称
     private static String mongoCollectionName = "carInfoDTO";
+
 
     public PageInfo<BusInfoVO> queryList(BusInfoDTO infoDTO) {
         PageInfo<BusInfoVO> pageInfo = PageHelper.startPage(infoDTO.getPageNum(), infoDTO.getPageSize(), true).doSelectPageInfo(() -> busInfoExMapper.selectList(infoDTO));
@@ -76,6 +87,132 @@ public class BusInfoService {
     public BusDetailVO getDetail(Integer carId) {
         return busInfoExMapper.selectCarByCarId(carId);
     }
+
+    /**
+     * 保存车辆信息到审核表 （mongoDB）
+     * @param saveDTO
+     * @return
+     */
+    public AjaxResponse saveCarToAuditCollect(BusCarSaveDTO saveDTO) {
+        //创建mongDB 巴士审核colloection 对应的实体
+        BusInfoAudit busInfo = new BusInfoAudit();
+        BeanUtils.copyProperties(saveDTO,busInfo);
+        //补充默认字段
+        SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+        Integer userId = currentLoginUser.getId();
+        Date now = new Date();
+        busInfo.setCreateBy(userId);
+        busInfo.setCreateDate(now);
+        busInfo.setUpdateBy(userId);
+        busInfo.setUpdateDate(now);
+        //默认未审核
+        busInfo.setStatus(0);
+        //来源：0创建
+        busInfo.setStemFrom(0);
+        carMongoTemplate.insert(busInfo);
+        return AjaxResponse.success(null);
+    }
+
+
+public AjaxResponse queryAuditList(BusInfoDTO busDTO){
+    Query query = new Query().limit(busDTO.getPageSize());
+    if(busDTO.getCityId()!=null){
+        query.addCriteria(Criteria.where("cityId").is(busDTO.getCityId()));
+    }
+    Set<Integer> authOfSupplier = busDTO.getAuthOfSupplier();
+    if(authOfSupplier!=null&&authOfSupplier.size()>0){
+        query.addCriteria(Criteria.where("supplierId").in(authOfSupplier));
+    }
+    if(busDTO.getGroupId()!=null){
+        query.addCriteria(Criteria.where("groupId").is(busDTO.getGroupId()));
+    }
+    if(busDTO.getStatus()!=null){
+        query.addCriteria(Criteria.where("status").is(busDTO.getStatus()));
+    }
+    if(StringUtils.isNotBlank(busDTO.getLicensePlates())){
+        Pattern pattern=Pattern.compile("^.*"+busDTO.getLicensePlates()+".*$", Pattern.CASE_INSENSITIVE);
+        query.addCriteria(Criteria.where("licensePlates").regex(pattern));
+    }
+    Integer pageNum = busDTO.getPageNum();
+    Integer pageSize = busDTO.getPageSize();
+    int start = (pageNum-1)*pageSize;
+    query.skip(start-1<0?0:start);
+
+    List<BusInfoAudit> busInfoAudits = carMongoTemplate.find(query, BusInfoAudit.class);
+    long count = carMongoTemplate.count(query, BusInfoAudit.class);
+
+    if(busInfoAudits==null||busInfoAudits.isEmpty()){
+        return AjaxResponse.success(new PageDTO(pageNum,pageSize,count,busInfoAudits));
+    }
+    //补充展示字段
+    //城市
+    Set<Integer>cityIds=new HashSet<>();
+    Set<Integer>supplierIds=new HashSet<>();
+    Set<Integer> grouIds=new HashSet<>();
+    busInfoAudits.forEach(bus->{
+        if(bus.getCityId()!=null){cityIds.add(bus.getCityId());}
+        if(bus.getSupplierId()!=null){supplierIds.add(bus.getSupplierId());}
+        if(bus.getGroupId()!=null){grouIds.add(bus.getGroupId());}
+    });
+    List<CarBizCity> carBizCities = cityExMapper.queryNameByIds(cityIds);
+    Map<Integer, CarBizCity> cityMap = carBizCities.stream().collect(Collectors.toMap(CarBizCity::getCityId, (o -> o)));
+    List<CarBizSupplier> carBizSuppliers = supplierExMapper.findByIdSet(supplierIds);
+    Map<Integer, CarBizSupplier> supplierMap = carBizSuppliers.stream().collect(Collectors.toMap(CarBizSupplier::getSupplierId, (sup -> sup)));
+
+    List<CarBizCarGroup> groups = groupExMapper.queryCarGroupByIdSet(grouIds);
+    Map<Integer, CarBizCarGroup> groupMap = groups.stream().collect(Collectors.toMap(CarBizCarGroup::getGroupId, (gop -> gop)));
+
+    //补充字段
+    List<BusInfoVO> result=new ArrayList<>();
+    busInfoAudits.forEach(bus->{
+        BusInfoVO busInfoVO = new BusInfoVO();
+        BeanUtils.copyProperties(bus,busInfoVO);
+        CarBizCity carBizCity = cityMap.get(bus.getCityId());
+        if(carBizCity!=null){busInfoVO.setCityName(carBizCity.getCityName());}
+        CarBizSupplier carBizSupplier = supplierMap.get(bus.getSupplierId());
+        if(carBizCities!=null){busInfoVO.setSupplierName(carBizSupplier.getSupplierFullName());}
+        CarBizCarGroup group = groupMap.get(bus.getGroupId());
+        if(group!=null){busInfoVO.setGroupName(group.getGroupName());}
+        result.add(busInfoVO);
+    });
+    return AjaxResponse.success(new PageDTO(pageNum,pageSize,count,result));
+}
+
+
+    @RequestMapping("/audit")
+    @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER))
+    public AjaxResponse audit(@Verify(param="ids",rule="required")  String ids){
+        String[] split = ids.split(",");
+        if(split.length==0){
+            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
+        }
+        for(int i=0;i<split.length;i++){
+           Query query = new Query(Criteria.where("id").is(split[i]));
+            BusInfoAudit busAudit = carMongoTemplate.findOne(query, BusInfoAudit.class);
+            BusCarInfo carInfo = new BusCarInfo();
+            BeanUtils.copyProperties(busAudit, carInfo);
+            //补充默认字段
+            buidDefaultParam(carInfo);
+            SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+            Integer userId = currentLoginUser.getId();
+            //因为不填写车型所以默认为0
+            carInfo.setCarModelId(0);
+            //所属车主字段，默认供应商名称
+            String supplierName = supplierExMapper.getSupplierNameById(carInfo.getSupplierId());
+            carInfo.setVehicleOwner(supplierName);
+            //保存到mysql
+            int result = busInfoExMapper.insertCar(carInfo);
+            if(result>0){
+                Update update = new Update();
+                update.set("status",1);
+                carMongoTemplate.updateFirst(query, update, BusInfoAudit.class);
+                busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carInfo.getCarId()), "审核通过", new Date());
+            }
+        }
+        return AjaxResponse.success(null);
+    }
+
+
 
     @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER))
     public AjaxResponse saveCar(BusCarSaveDTO saveDTO) {
