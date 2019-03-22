@@ -17,9 +17,9 @@ public class CostTimeDetailDTO {
 
     private BigDecimal price;  //时间段单价
 
-    private BigDecimal amount;   //时间段金额
+    private BigDecimal amount=BigDecimal.ZERO;   //时间段金额
 
-    private BigDecimal number;  //数量   公里|分钟
+    private BigDecimal number= BigDecimal.ZERO;  //数量   公里|分钟
 
     private Integer type;  //类型 （1：里程 2：时长）
 
