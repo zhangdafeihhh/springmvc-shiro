@@ -13,10 +13,11 @@
     <result column="manage_status" property="manageStatus" jdbcType="INTEGER" />
     <result column="manage_time" property="manageTime" jdbcType="TIMESTAMP" />
     <result column="manage_content" property="manageContent" jdbcType="VARCHAR" />
+    <result column="feedback_type" property="feedbackType" jdbcType="INTEGER"/>
   </resultMap>
   <sql id="Base_Column_List" >
     id, feedback_content, sender_id, sender_name, manage_id, manage_name, create_time, 
-    update_time, manage_status, manage_time, manage_content
+    update_time, manage_status, manage_time, manage_content,feedback_type
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -31,11 +32,11 @@
     insert into feedback (feedback_content, sender_id, sender_name, 
       manage_id, manage_name, create_time, 
       update_time, manage_status, manage_time, 
-      manage_content)
+      manage_content,feedback_type)
     values (#{feedbackContent,jdbcType=VARCHAR}, #{senderId,jdbcType=INTEGER}, #{senderName,jdbcType=VARCHAR}, 
       #{manageId,jdbcType=INTEGER}, #{manageName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{manageStatus,jdbcType=INTEGER}, #{manageTime,jdbcType=TIMESTAMP}, 
-      #{manageContent,jdbcType=VARCHAR})
+      #{manageContent,jdbcType=VARCHAR},#{feedbackType})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.Feedback" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
@@ -73,6 +74,9 @@
       <if test="manageContent != null" >
         manage_content,
       </if>
+      <if test="feedbackType != null">
+        feedback_type,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="feedbackContent != null" >
@@ -104,6 +108,9 @@
       </if>
       <if test="manageContent != null" >
         #{manageContent,jdbcType=VARCHAR},
+      </if>
+      <if test="feedbackType != null">
+        #{feedbackType},
       </if>
     </trim>
   </insert>
@@ -140,6 +147,9 @@
       <if test="manageContent != null" >
         manage_content = #{manageContent,jdbcType=VARCHAR},
       </if>
+      <if test="feedbackType != null">
+        feedback_type = #{feedbackType}
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -154,7 +164,8 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       manage_status = #{manageStatus,jdbcType=INTEGER},
       manage_time = #{manageTime,jdbcType=TIMESTAMP},
-      manage_content = #{manageContent,jdbcType=VARCHAR}
+      manage_content = #{manageContent,jdbcType=VARCHAR},
+      feedback_type = #{feedbackType}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>
