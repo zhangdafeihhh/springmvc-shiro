@@ -260,4 +260,6 @@ public class OrderCostDetailInfo {
     private BigDecimal overTimeFee = new BigDecimal(0);//超套餐时长费
     private BigDecimal overMileageTotal = BigDecimal.ZERO;//超套餐里程公里
     private BigDecimal travelTimeShow = BigDecimal.ZERO;//超套餐时长
+    private BigDecimal costAmount = BigDecimal.ZERO;//容器费值
+    private String costName ;
 }
