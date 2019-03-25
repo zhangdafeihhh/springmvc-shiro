@@ -130,6 +130,8 @@ public final class RestErrorCode{
 	@ResultMessage("修改手机号与原手机号不可以相同")
 	public static final int PHONE_NEW_SAME                    = 3015;
 
+
+
 	@ResultMessage("周报查询时间段只能查询一个星期的时间")
 	public static final int ONLY_QUERY_WEEK                    = 3101;
 	@ResultMessage("月报查询时间段只能查询一个月份的时间")
@@ -140,6 +142,8 @@ public final class RestErrorCode{
 	public static final int ENDTIME_IS_NULL                    = 3104;
 	@ResultMessage("查询时间范围开始时间不能大于结束时间")
 	public static final int STARTTIME_GREATE_ENDTIME                    = 3105;
+	@ResultMessage("该司机没有被锁定")
+	public static final int DRIVER_NOT_LOCKED                           =3106;
 
 	//-----------------------------------------------业务参数：导入文件
 	@ResultMessage("文件异常")
