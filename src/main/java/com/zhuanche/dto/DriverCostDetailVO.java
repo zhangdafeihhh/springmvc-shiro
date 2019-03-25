@@ -7,6 +7,7 @@ public class DriverCostDetailVO {
     private List<CostDetail> detail;
     private List<CostDetail> detail2;
     private List<CostDetail> detailM;
+    private List<CostDetail> detailOther;
     private Integer groupId;
     private String groupName;
     private String rtnResult;
@@ -93,5 +94,12 @@ public class DriverCostDetailVO {
 	public void setTravelTimeStr(String travelTimeStr) {
 		this.travelTimeStr = travelTimeStr;
 	}
-    
+
+	public List<CostDetail> getDetailOther() {
+		return detailOther;
+	}
+
+	public void setDetailOther(List<CostDetail> detailOther) {
+		this.detailOther = detailOther;
+	}
 }
