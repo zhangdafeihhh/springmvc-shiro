@@ -133,7 +133,7 @@ public class BusCommonService {
 	}
 
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
-	public Set<Integer> getSupplierIds() {
+	public Set<Integer> getAuthSupplierIds() {
 		SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
 		//权限级别
 		Integer levelCode = currentLoginUser.getLevel();

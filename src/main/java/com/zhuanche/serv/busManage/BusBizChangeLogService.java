@@ -2,6 +2,7 @@ package com.zhuanche.serv.busManage;
 
 import java.util.Date;
 
+import mapper.mdbcarmanage.BusBizChangeLogMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,9 @@ public class BusBizChangeLogService implements BusConst {
 	@Autowired
 	private BusBizChangeLogExMapper busBizChangeLogExMapper;
 
+	@Autowired
+	private BusBizChangeLogMapper busBizChangeLogMapper;
+
 	/**
 	 * @Title: insertLog
 	 * @Description: 保存操作记录
@@ -64,6 +68,39 @@ public class BusBizChangeLogService implements BusConst {
 			log.setUpdateDate(updateDate);
 			log.setDescription(description);
 			return busBizChangeLogExMapper.insertLog(log);
+		} catch (Exception e) {
+			logger.error("[ BusBizChangeLogService-insertLog ] 保存操作记录异常,errorMsg={}", e.getMessage(), e);
+		}
+		return 0;
+	}
+	/**
+	 * @Title: insertLog
+	 * @Description: 保存操作记录
+	 * @param businessType
+	 * @param businessKey
+	 * @param updateDate
+	 * @return
+	 * @return int
+	 * @throws
+	 */
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.MASTER))
+	public int insertLog(BusinessType businessType, String businessKey,String description,Integer updateBy,String updateName, Date updateDate) {
+		try {
+			if (businessType == null || StringUtils.isBlank(businessKey)) {
+				return 0;
+			}
+			BusBizChangeLog log = new BusBizChangeLog();
+			if (updateDate == null) {
+				updateDate = new Date();
+			}
+			log.setBusinessType(businessType.businessType());
+			log.setBusinessKey(businessKey);
+			log.setUpdateBy(updateBy);
+			log.setUpdateName(updateName);
+			log.setUpdateDate(updateDate);
+			log.setCreateDate(updateDate);
+			log.setDescription(description);
+			return busBizChangeLogMapper.insert(log);
 		} catch (Exception e) {
 			logger.error("[ BusBizChangeLogService-insertLog ] 保存操作记录异常,errorMsg={}", e.getMessage(), e);
 		}

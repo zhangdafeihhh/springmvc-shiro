@@ -110,8 +110,11 @@ public class BusInfoController {
     }
 
     @RequestMapping("queryAuditList")
+    @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE))
     public AjaxResponse queryAuditList(BusInfoDTO busDTO){
-        Set<Integer> supplierIds = commonService.getSupplierIds();
+        logger.info(LOG_PRE + "查询车辆审核列表参数=" + JSON.toJSONString(busDTO));
+        //获取数据权限
+        Set<Integer> supplierIds = commonService.getAuthSupplierIds();
         if(supplierIds==null){
           return AjaxResponse.fail(RestErrorCode.PERMISSION_NOT_EXIST);
         }
@@ -124,15 +127,53 @@ public class BusInfoController {
            }
         }
         busDTO.setAuthOfSupplier(supplierIds);
-        return  busInfoService.queryAuditList(busDTO);
+        try {
+            AjaxResponse response = busInfoService.queryAuditList(busDTO);
+            return  response;
+        } catch (Exception e) {
+            logger.error(LOG_PRE + "查询车辆审核列表参数=" + JSON.toJSONString(busDTO)+" 异常，e：{}",e);
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
     }
 
     @RequestMapping("/audit")
+
     public AjaxResponse audit(@Verify(param="ids",rule="required")  String ids){
-        AjaxResponse audit = busInfoService.audit(ids);
-        return audit;
+        logger.info(LOG_PRE + " 审核车辆信息，参数：" + ids );
+        try {
+            AjaxResponse audit = busInfoService.audit(ids);
+            return audit;
+        } catch (Exception e) {
+            logger.error(LOG_PRE + " 审核车辆信息，参数：" + ids +" 异常：{}",e);
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
     }
 
+    @RequestMapping("getAuditDetail")
+
+    @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE))
+    public AjaxResponse getAuditDetail(@Verify(param="id",rule="required")String id){
+        logger.info(LOG_PRE + " 查询审核车辆信息详情，参数：" + id );
+        try {
+            AjaxResponse auditDetail = busInfoService.getAuditDetail(id);
+            return AjaxResponse.success(auditDetail);
+        } catch (Exception e) {
+            logger.error(LOG_PRE + " 查询审核车辆信息详情，参数：" + id+" 异常：{}",e);
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+    }
+    @RequestMapping("updateAuditCar")
+    public AjaxResponse updateAuditCar(BusCarSaveDTO saveDTO){
+        logger.info(LOG_PRE+" 修改审核信息，参数："+JSON.toJSONString(saveDTO));
+        try {
+            AjaxResponse response = busInfoService.updateAuditCar(saveDTO);
+            return AjaxResponse.success(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(LOG_PRE+" 修改审核信息，参数："+JSON.toJSONString(saveDTO)+" 异常：{}",e);
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+    }
     /**
      * @Description: 查询车辆详情
      * @Param: [carId]
@@ -156,6 +197,7 @@ public class BusInfoController {
     }
 
     @RequestMapping(value = "/saveCar", method = RequestMethod.POST)
+    @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER))
     public AjaxResponse saveCar(@Validated BusCarSaveDTO busCarSaveDTO) {
         logger.info(LOG_PRE + "保存车辆信息，参数=" + JSON.toJSONString(busCarSaveDTO));
         String fuelName = EnumFuel.getFuelNameByCode(busCarSaveDTO.getFueltype());
@@ -187,7 +229,7 @@ public class BusInfoController {
      */
     @RequestMapping(value = "/importBusInfo", method = RequestMethod.POST)
     @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
     })
     public AjaxResponse importBusInfo(Integer cityId,
                                       Integer supplierId,

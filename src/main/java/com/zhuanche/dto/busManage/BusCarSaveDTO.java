@@ -17,7 +17,7 @@ import java.util.Date;
  **/
 @Data
 public class BusCarSaveDTO implements Serializable {
-
+    private String id;
     private Integer carId;
     private Integer cityId;
     private Integer supplierId;
