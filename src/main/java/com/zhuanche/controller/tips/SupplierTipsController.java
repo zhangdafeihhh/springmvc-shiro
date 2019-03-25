@@ -56,7 +56,7 @@ public class SupplierTipsController {
 
 
     @RequestMapping(value = "/createTips",method = RequestMethod.POST)
-    @RequiresPermissions(value = {"SupplierTips"})
+    @RequiresPermissions(value = {"SupplierTipsCreate"})
     @ResponseBody
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
@@ -107,7 +107,7 @@ public class SupplierTipsController {
 
 
     @RequestMapping(value = "/editTips",method = RequestMethod.POST)
-    @RequiresPermissions(value = {"SupplierTips"})
+    @RequiresPermissions(value = {"SupplierTipsEdit"})
     @ResponseBody
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
@@ -160,7 +160,7 @@ public class SupplierTipsController {
 
 
     @RequestMapping(value = "/deleteTips",method = RequestMethod.POST)
-    @RequiresPermissions(value = {"SupplierTips"})
+    @RequiresPermissions(value = {"SupplierTipsDel"})
     @ResponseBody
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
