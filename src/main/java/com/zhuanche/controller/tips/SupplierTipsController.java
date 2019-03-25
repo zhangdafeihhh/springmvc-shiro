@@ -17,6 +17,7 @@ import com.zhuanche.util.HtmlFilterUtil;
 import mapper.mdbcarmanage.ex.CarBizTipsDocExMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,7 @@ public class SupplierTipsController {
 
 
     @RequestMapping(value = "/createTips",method = RequestMethod.POST)
+    @RequiresPermissions(value = {"SupplierTips"})
     @ResponseBody
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
@@ -105,6 +107,7 @@ public class SupplierTipsController {
 
 
     @RequestMapping(value = "/editTips",method = RequestMethod.POST)
+    @RequiresPermissions(value = {"SupplierTips"})
     @ResponseBody
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
@@ -157,6 +160,7 @@ public class SupplierTipsController {
 
 
     @RequestMapping(value = "/deleteTips",method = RequestMethod.POST)
+    @RequiresPermissions(value = {"SupplierTips"})
     @ResponseBody
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
