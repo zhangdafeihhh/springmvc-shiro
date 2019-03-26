@@ -49,7 +49,7 @@ public enum EnumServiceType {
         return null;
     }
 
-    public int value;
+    private int value;
     private String i18n;
 
     EnumServiceType(int value, String i18n) {

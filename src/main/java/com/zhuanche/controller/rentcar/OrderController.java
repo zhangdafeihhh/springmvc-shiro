@@ -1,5 +1,11 @@
 package com.zhuanche.controller.rentcar;
 
+import static com.zhuanche.common.enums.MenuEnum.MAIN_ORDER_DETAIL;
+import static com.zhuanche.common.enums.MenuEnum.ORDER_DETAIL;
+import static com.zhuanche.common.enums.MenuEnum.ORDER_LIST;
+import static com.zhuanche.common.enums.MenuEnum.ORDER_LIST_EXPORT;
+
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,14 +18,19 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.zhuanche.common.web.RequestFunction;
-import com.zhuanche.util.CommonStringUtils;
+import com.zhuanche.entity.rentcar.*;
+import mapper.rentcar.CarBizCustomerMapper;
+import mapper.rentcar.CarBizDriverInfoMapper;
+import mapper.rentcar.ex.CarBizCarInfoExMapper;
+import mapper.rentcar.ex.CarFactOrderExMapper;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,35 +42,26 @@ import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.rpc.RPCAPI;
+import com.zhuanche.common.rpc.RPCResponse;
+import com.zhuanche.common.util.TimeUtils;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.dto.DriverCostDetailVO;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarFactOrderInfoDTO;
 import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
 import com.zhuanche.dto.rentcar.ServiceTypeDTO;
-import com.zhuanche.entity.DriverOrderRecord.OrderTimeEntity;
-import com.zhuanche.entity.rentcar.CarBizCity;
-import com.zhuanche.entity.rentcar.CarBizCustomer;
-import com.zhuanche.entity.rentcar.CarBizDriverInfo;
-import com.zhuanche.entity.rentcar.CarBizOrderSettleEntity;
-import com.zhuanche.entity.rentcar.CarBizOrderWaitingPeriod;
-import com.zhuanche.entity.rentcar.CarBizSupplier;
-import com.zhuanche.entity.rentcar.CarFactOrderInfo;
-import com.zhuanche.entity.rentcar.CarGroupEntity;
-import com.zhuanche.entity.rentcar.ServiceEntity;
+import com.zhuanche.entity.driverOrderRecord.OrderTimeEntity;
+import com.zhuanche.serv.order.DriverFeeDetailService;
 import com.zhuanche.serv.order.OrderService;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
+import com.zhuanche.util.CommonStringUtils;
 import com.zhuanche.util.excel.CsvUtils;
-
-import mapper.rentcar.CarBizCustomerMapper;
-import mapper.rentcar.CarBizDriverInfoMapper;
-import mapper.rentcar.ex.CarBizCarInfoExMapper;
-import mapper.rentcar.ex.CarFactOrderExMapper;
-
-import static com.zhuanche.common.enums.MenuEnum.*;
 
 
 /**
@@ -89,6 +91,11 @@ public class OrderController{
 	private CarBizCustomerMapper carBizCustomerMapper;
 	@Autowired
 	private CarBizCarInfoExMapper carBizCarInfoExMapper;
+
+	@Autowired
+	private DriverFeeDetailService driverFeeDetailService;
+
+
 	/**
 	    * 查询订单 列表
 	    * @return
@@ -288,7 +295,6 @@ public class OrderController{
 	     AjaxResponse result = carFactOrderInfoService.queryOrderDataList(paramMap);
 	     return result;
 	 }
-
 
 
 	/**
@@ -726,6 +732,7 @@ public class OrderController{
      */
 	@ResponseBody
 	@RequestMapping(value = "/poolMainOrderview", method = { RequestMethod.POST,RequestMethod.GET })
+	@RequestFunction(menu = MAIN_ORDER_DETAIL)
 	public AjaxResponse driverOutageAddView(@Verify(param = "mainOrderNo",rule = "required")  String mainOrderNo) {
 		logger.info("主订单页面mainOrderNo:"+mainOrderNo);
 		CarPoolMainOrderDTO params = new CarPoolMainOrderDTO();
@@ -826,6 +833,7 @@ public class OrderController{
 	 
 	/**查询订单详情( 首先调用订单接口，然后再补全数据)**/
 	private CarFactOrderInfo getOrderInfo(String orderId, String orderNo) {
+		//TODO 司乘分离修改处
 		//-------------------------------------------------------------------------------------------------------------------------car_fact_order拆表开始BEGIN
 		SimpleDateFormat yyyyMMddHHmmssSDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		JSONObject orderInfoJson = orderService.getOrderInfo(orderId, orderNo );
@@ -834,9 +842,6 @@ public class OrderController{
 		}
 		orderId = ""+orderInfoJson.getIntValue("orderId");//重新赋下值
 
-		//System.out.println( ">>>>>>" + orderInfoJson );
-		//>>>>>>{"channelsNum":"partner-homeinns","factStartLongAddr":"安徽省 合肥市 包河区 徽州大道 靠近合肥南站 ","cityId":93,"factStartAddr":"安徽省 合肥市 包河区 徽州大道 靠近合肥南站 ","bookingEndAddr":"CBC拓基广场","cityName":"合肥","carGroupName":"畅享型","bookingEndLongAddr":"CBC拓基广场","buyoutPrice":53.0,"type":2,"bookingEndPoint":"117.171879,31.856586;117.178469,31.862267","laterMinute":0,"bookingGroupName":"畅享型","estimatedId":"1000","factStartPoint":"117.28889973958333,31.799595811631946;117.295479,31.805302","factDate":1538325568000,"factEndShortAddr":"安徽天正司法鉴定中心","businessId":20010453,"riderPhone":"15555331059","orderType":4,"status":50,"imei":"f4f6e38d-dd0e-49f4-8c72-706a9dea560d","goHomeStatus":0,"airportId":-1,"bookingDriverId":0,"factEndLongAddr":"安徽省 合肥市 蜀山区 井岗路 靠近CBC拓基广场 ","bookingStartShortAddr":"","pushDriverType":2,"bookingStartPoint":"117.290288,31.798983;117.29687,31.804675","bookingCurrentPoint":"null,","factEndPoint":"117.17165418836805,31.857140028211806;117.178244,31.862822","bookingStartLongAddr":"合肥南站","isOtherDrivers":1,"buyoutFlag":1,"memo":"{}","serviceTypeId":2,"licensePlates":"皖A6X984","bookingUserId":100047277,"receiveSMS":1,"riderName":"首旅如家乘车人","factEndDate":1538327131000,"bookingStartAddr":"合肥南站","payFlag":0,"version":"5.0","airlineStatus":"0","serviceTypeName":"预约用车","estimatedAmount":83.0,"bookingDateStr":"2018-10-01 00:30:00","driverId":321721,"carGroupId":43,"bookingUserPhone":"13228973156","createDate":1538320625000,"orderTypeName":"首旅如家","orderId":388510487,"bookingDate":1538325000000,"bookingGroupids":"43","agentId":"0","updateDate":1538334604000,"factEndAddr":"安徽省 合肥市 蜀山区 井岗路 靠近CBC拓基广场 ","factStartShortAddr":"肯德基(合肥南站)","bookingEndShortAddr":"","orderNo":"B5538320625920973","isOrderOthers":1}
-		//一、获取订单的基本信息
 		CarFactOrderInfo result = new CarFactOrderInfo();
 		result.setOrderId( orderInfoJson.getIntValue("orderId") );
 		result.setOrderNo(  orderInfoJson.getString("orderNo") );
@@ -904,10 +909,15 @@ public class OrderController{
 			Date   airlinePlanDate = new Date( orderInfoJson.getLongValue("airlinePlanDate") );
 			result.setAirlinePlanDate(airlinePlanDate);
 		}
-		//二、补全此订单的order_cost_detail
+//		result.setDriverPassengerPriceSeparate(orderInfoJson.getIntValue("isDriverPassengerPriceSeparate"));
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(orderInfoJson.getString("memo"))
+                && org.apache.commons.lang3.StringUtils.isNotBlank(JSON.parseObject(orderInfoJson.getString("memo")).getString("isDriverPassengerPriceSeparate")))
+            result.setDriverPassengerPriceSeparate(Integer.parseInt(JSON.parseObject(orderInfoJson.getString("memo")).getString("isDriverPassengerPriceSeparate")));
+
+        //二、补全此订单的order_cost_detail
 		CarFactOrderInfo  orderCostDetailData =  carFactOrderExMapper.selectOrderCostDetailByOrderId( Long.valueOf(orderId) );
 		if(orderCostDetailData!=null) {
-			result.setTravelTime(orderCostDetailData.getTravelTime());
+			result.setTravelTime(TimeUtils.milliToMinute(orderCostDetailData.getTravelTime() == null ? 0 : orderCostDetailData.getTravelTime()));
 			result.setTravelMileage(orderCostDetailData.getTravelMileage());
 			result.setNightdistancenum(orderCostDetailData.getNightdistancenum());
 			result.setNightdistanceprice(orderCostDetailData.getNightdistanceprice());
@@ -1129,8 +1139,71 @@ public class OrderController{
 			//pos机支付
 			result.setPosPay(carBizOrderSettle.getPosPay());
 		}
+		//设置司乘分离对象
+		OrderCostDetailInfo orderCostDetailInfo = driverFeeDetailService.getOrderCostDetailInfo(result.getOrderNo());
+
+		getOverTimeHtml(orderCostDetailInfo);//超套餐时长费
+		getOverMileageNumHtml(orderCostDetailInfo);//计算超套餐里程费
+        calcOverMileageTotal(orderCostDetailInfo);
+		result.setDriverCostDetailVO(driverFeeDetailService.getOrderDriverCostDetailVO(result.getOrderNo()));
+		result.setDriverCostDetailVOH5(driverFeeDetailService.getDriverCostDetail(result.getOrderNo(),Integer.parseInt(Long.toString(result.getOrderId())),result.getBuyoutFlag()));
+        result.setOrderCostDetailInfo(orderCostDetailInfo);
 		return result;
 	}
+
+    /**
+     * 超套餐时长详情
+     *
+     * @param orderCostDetailInfo
+     * @return
+     */
+    private void getOverTimeHtml(OrderCostDetailInfo orderCostDetailInfo) {
+        if (null == orderCostDetailInfo)
+            return;
+        if (null != orderCostDetailInfo.getCostDurationDetailDTOList() && orderCostDetailInfo.getCostDurationDetailDTOList().size() > 0) {
+            orderCostDetailInfo.setOverTimeFee(orderCostDetailInfo.getOverTimePrice());
+            orderCostDetailInfo.setTravelTimeShow(orderCostDetailInfo.getOverTimeNum());
+            for (CostTimeDetailDTO detailDTO : orderCostDetailInfo.getCostDurationDetailDTOList()){
+                orderCostDetailInfo.setTravelTimeShow(orderCostDetailInfo.getTravelTimeShow().add(detailDTO.getNumber()));
+                orderCostDetailInfo.setOverTimeFee(orderCostDetailInfo.getOverTimeFee().add(detailDTO.getAmount()));
+            }
+        } else {
+            orderCostDetailInfo.setTravelTimeShow(orderCostDetailInfo.getOverTimeNum().add(new BigDecimal(orderCostDetailInfo.getHotDuration())).add(new BigDecimal(orderCostDetailInfo.getNighitDuration())));
+            orderCostDetailInfo.setOverTimeFee(orderCostDetailInfo.getOverTimePrice().add(orderCostDetailInfo.getHotDurationFees()).add(orderCostDetailInfo.getNighitDurationFees()));
+        }
+    }
+
+    /**
+     * 超套餐里程详情
+     *
+     * @param orderCostDetailInfo
+     * @return
+     */
+    private void getOverMileageNumHtml(OrderCostDetailInfo orderCostDetailInfo) {
+        if (null == orderCostDetailInfo)
+            return ;
+        if (orderCostDetailInfo.getOverMileagePrice() != null)
+            orderCostDetailInfo.setOverMileageFee(orderCostDetailInfo.getOverMileageFee().add(new BigDecimal(String.valueOf(orderCostDetailInfo.getOverMileagePrice()))));
+        if (null != orderCostDetailInfo.getCostMileageDetailDTOList() && orderCostDetailInfo.getCostMileageDetailDTOList().size() > 0){
+            for (CostTimeDetailDTO detailDTO : orderCostDetailInfo.getCostMileageDetailDTOList()){
+                orderCostDetailInfo.setOverMileageFee(orderCostDetailInfo.getOverMileageFee().add(new BigDecimal(String.valueOf(detailDTO.getAmount()))));
+            }
+        }else {
+            orderCostDetailInfo.setOverMileageFee(orderCostDetailInfo.getOverMileagePrice().add(orderCostDetailInfo.getHotMileageFees()).add(orderCostDetailInfo.getNightDistancePrice()));
+        }
+    }
+
+    private void calcOverMileageTotal(OrderCostDetailInfo orderCostDetailInfo) {
+        if (null != orderCostDetailInfo.getCostMileageDetailDTOList() && orderCostDetailInfo.getCostMileageDetailDTOList().size() > 0){
+            orderCostDetailInfo.setOverMileageTotal(orderCostDetailInfo.getOverMileageNum());
+            for (CostTimeDetailDTO dto : orderCostDetailInfo.getCostMileageDetailDTOList()){
+                orderCostDetailInfo.setOverMileageTotal(orderCostDetailInfo.getOverMileageTotal().add(dto.getNumber()));
+            }
+        }else {
+            orderCostDetailInfo.setOverMileageTotal(orderCostDetailInfo.getOverMileageNum().add(new BigDecimal(orderCostDetailInfo.getHotMileage()).add(orderCostDetailInfo.getNightDistanceNum())));
+        }
+    }
+
 		
 		//订单时间流程赋值
 		public CarFactOrderInfo giveOrderTime(CarFactOrderInfo order){

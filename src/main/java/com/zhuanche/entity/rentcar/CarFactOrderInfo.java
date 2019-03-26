@@ -1,11 +1,11 @@
 package com.zhuanche.entity.rentcar;
 
 
-import java.text.NumberFormat;
+import com.zhuanche.dto.DriverCostDetailVO;
+import com.zhuanche.entity.common.BaseEntity;
+
 import java.util.Date;
 import java.util.List;
-
-import com.zhuanche.entity.common.BaseEntity;
 
 /**
  * 订单明细页面实体（老车管）
@@ -19,12 +19,12 @@ public class CarFactOrderInfo extends BaseEntity {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private java.lang.String riderName;
-	private java.lang.String riderPhone;
-	private java.lang.String serviceName;
+	private String riderName;
+	private String riderPhone;
+	private String serviceName;
 	private int cityId;
 	private Integer pushDriverType;
-	private java.lang.String cityName;
+	private String cityName;
 	private String bookingStartAddr;
 	private String bookingEndAddr;
 	private String bookingStartPoint;
@@ -268,13 +268,13 @@ public class CarFactOrderInfo extends BaseEntity {
 	// 订单创建时间
 	private String cretaeDate;
 	// 实际上车地点坐标
-	private java.lang.String factStartPoint;
+	private String factStartPoint;
 	// 实际下车地点坐标
-	private java.lang.String factEndPoint;
+	private String factEndPoint;
 	// 车组ID
-	private java.lang.Integer carGroupId;
+	private Integer carGroupId;
 	// 机场(航站楼)ID
-	private java.lang.Integer airportId;
+	private Integer airportId;
 	// 司机手机号
 	private String driverPhone;
 	// 优惠券金额
@@ -426,6 +426,12 @@ public class CarFactOrderInfo extends BaseEntity {
 
 	//等待时间明细
 	private List<CarBizOrderWaitingPeriod> carBizOrderWaitingPeriodList;
+
+	private Integer driverPassengerPriceSeparate;
+
+	private OrderDriverCostDetailVO driverCostDetailVO;
+	private DriverCostDetailVO driverCostDetailVOH5;
+	private OrderCostDetailInfo orderCostDetailInfo;
 	
 	public String getMainOrderNo() {
 		return mainOrderNo;
@@ -1910,20 +1916,7 @@ public class CarFactOrderInfo extends BaseEntity {
 	}
 
 	public Double getTravelTime() {
-		// 毫秒转分钟
-		if (this.travelTime == null || this.travelTime.longValue() == 0) {
-			return 0.0;
-		} else {
-			NumberFormat df = NumberFormat.getInstance();
-			df.setMaximumFractionDigits(2);
-			String timeStr = df.format(travelTime / 60000);
-			if (timeStr != null) {
-				if (timeStr.contains(",")) {
-					timeStr = timeStr.replace(",", "");
-				}
-			}
-			return Double.valueOf(timeStr);
-		}
+		return travelTime;
 	}
 
 	public void setTravelTime(Double travelTime) {
@@ -2183,7 +2176,36 @@ public class CarFactOrderInfo extends BaseEntity {
 	public void setOperatePerson(String operatePerson) {
 		this.operatePerson = operatePerson;
 	}
-	
-	
-	
+
+	public Integer getDriverPassengerPriceSeparate() {
+		return driverPassengerPriceSeparate;
+	}
+
+	public void setDriverPassengerPriceSeparate(Integer driverPassengerPriceSeparate) {
+		this.driverPassengerPriceSeparate = driverPassengerPriceSeparate;
+	}
+
+	public OrderDriverCostDetailVO getDriverCostDetailVO() {
+		return driverCostDetailVO;
+	}
+
+	public void setDriverCostDetailVO(OrderDriverCostDetailVO driverCostDetailVO) {
+		this.driverCostDetailVO = driverCostDetailVO;
+	}
+
+    public DriverCostDetailVO getDriverCostDetailVOH5() {
+        return driverCostDetailVOH5;
+    }
+
+    public void setDriverCostDetailVOH5(DriverCostDetailVO driverCostDetailVOH5) {
+        this.driverCostDetailVOH5 = driverCostDetailVOH5;
+    }
+
+    public OrderCostDetailInfo getOrderCostDetailInfo() {
+        return orderCostDetailInfo;
+    }
+
+    public void setOrderCostDetailInfo(OrderCostDetailInfo orderCostDetailInfo) {
+        this.orderCostDetailInfo = orderCostDetailInfo;
+    }
 }

@@ -26,7 +26,7 @@ public enum EnumOrder {
     ORDER_YIYI(10505, "订单异议"),
     ORDER_YIQUXIAO(10600, "已取消");
 
-    public int value;
+    private int value;
     private String i18n;
 
     EnumOrder(int value, String i18n) {
@@ -37,17 +37,14 @@ public enum EnumOrder {
     public String getI18n() {
         return this.i18n;
     }
-    public int getValue() {
-        return this.value;
-    }
 
     public String getValueStr() {
-        return String.valueOf(this.value);
+        return String.valueOf(value);
     }
     // 普通方法
     public static String getDis(int value) {
         for (EnumOrder status : EnumOrder.values()) {
-            if (status.getValue() == value) {
+            if (status.value == value) {
                 return status.getI18n();
             }
         }

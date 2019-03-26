@@ -19,7 +19,7 @@ import java.util.List;
  * @author wangshuai01@e6yun.com 2017年8月18日
  */
 public class CopyBeanUtil {
-    static Logger log = LoggerFactory.getLogger(CopyBeanUtil.class);
+    private static Logger log = LoggerFactory.getLogger(CopyBeanUtil.class);
 
     /**
      * 复制sour里属性不为空的值到obje为空的属性
@@ -29,7 +29,7 @@ public class CopyBeanUtil {
      * @param isCover 是否保留obje类里不为null的属性值(true为保留源值，属性为null则赋值)
      * @return obje
      */
-    public static Object Copy(Object obje, Object sour, boolean isCover) {
+    public static Object copy(Object obje, Object sour, boolean isCover) {
         Field[] fields = sour.getClass().getDeclaredFields();
         for (int i = 0, j = fields.length; i < j; i++) {
             String propertyName = fields[i].getName();
@@ -54,7 +54,7 @@ public class CopyBeanUtil {
      * @param isCover
      * @return obj
      */
-    public static Object CopyAndAdd(Object obj, Object sour, boolean isCover) {
+    public static Object copyAndAdd(Object obj, Object sour, boolean isCover) {
         Field[] fields = sour.getClass().getDeclaredFields();
         for (int i = 0, j = fields.length; i < j; i++) {
             String propertyName = fields[i].getName();

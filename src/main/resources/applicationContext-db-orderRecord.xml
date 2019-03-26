@@ -38,7 +38,7 @@
 	<bean id="orderRecord-sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="orderRecord-DataSource" />
 		<!-- 请修改此处：修改为实际的数据对象包路径 -->
-		<property name="typeAliasesPackage" value="com.zhuanche.entity.DriverOrderRecord" />
+		<property name="typeAliasesPackage" value="com.zhuanche.entity.driverOrderRecord" />
 		<!-- 请修改此处： 请修改为实际的mybatis环境配置文件位置 -->
 		<property name="configLocation" value="classpath:mybatis-conf.xml" />
         <!-- 分页插件 -->

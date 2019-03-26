@@ -139,7 +139,6 @@ public class CreditCardController {
     })
     public AjaxResponse relieveCreditCards(@Verify(param = "driverId", rule = "required") Integer driverId) {
 
-        Map<String, Object> resultMap = new HashMap<String, Object>();
         logger.info(LOGTAG + "司机driverId={},解绑信用卡（司机）", driverId);
         try {
             CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(driverId);

@@ -693,7 +693,10 @@ public class DriverVoEntity extends DriverEntity {
 	}
 	
 	@Override  
-    public boolean equals(Object obj) {  
+    public boolean equals(Object obj) {
+    	if (obj == null){
+    		return false;
+		}
 		DriverVoEntity s=(DriverVoEntity)obj;   
 	    return super.getPhone().equals(s.getPhone());   
     }   

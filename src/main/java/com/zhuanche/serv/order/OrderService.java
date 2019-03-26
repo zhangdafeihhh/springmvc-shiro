@@ -20,6 +20,18 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.util.*;
+import com.zhuanche.util.NumberUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**  调用订单的接口，集中在这个类中封装
  * 
@@ -48,22 +60,16 @@ public class OrderService{
 	
 	/**生成请求唯一标识**/
 	private static final String SEED_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	private static final Random rnd = new  SecureRandom();
+
 	private static String genTransId() {
 		int length = 8;//生成8位随机字符
-		StringBuffer sb = new StringBuffer( length  );
-		for(int i=0;i<length;i++) {
-			int index = rnd.nextInt( SEED_CHARS.length()  );
-			char cha = SEED_CHARS.charAt(index);
-			sb.append(cha);
-		}
-		return sb.toString()+"-SAAS";
+		return NumberUtil.genRandomCode(length, SEED_CHARS) +"-SAAS";
 	}
 	
 	/**调用order-search-api接口：通用的请求订单搜索ES服务的方法**/
-	public OrderSearchV1Response startOrderSearchV1( Map<String,Object> httpParams , List<OrderSearchOrderBy> orderby) {
+	public OrderSearchV1Response startOrderSearchV1( Map<String,Object> httpParams , List<OrderSearchOrderBy> orderBy) {
 		if(httpParams==null) {
-			httpParams = new HashMap<String,Object>();
+			httpParams = new HashMap<>();
 		}
 		if(httpParams.containsKey(ORDER_SEARCH_API_V1_transId)) {
 			log.error("严重错误：请求参数中不能含有系统参数名称：" + ORDER_SEARCH_API_V1_transId);
@@ -73,16 +79,17 @@ public class OrderService{
 		String transId = OrderService.genTransId();
 		httpParams.put( ORDER_SEARCH_API_V1_transId, transId  );
 		//预处理一下排序参数
-		if(orderby!=null && orderby.size()>0) {
-			List<OrderSearchOrderBy> orderbynewer = new ArrayList<OrderSearchOrderBy>(orderby.size());
-			for(OrderSearchOrderBy item:orderby) {
-				if( StringUtils.isNotEmpty(item.getField()) && StringUtils.isNotEmpty(item.getOperator()) ) {
-					orderbynewer.add(item);
-				}
-			}
-			if(orderbynewer.size()>0) {
-				String sort = JSON.toJSONString(orderbynewer);
-				httpParams.put("sort", sort);
+		if(orderBy !=null && orderBy.size()>0) {
+			List<OrderSearchOrderBy> orderByNew = orderBy.stream().
+					filter(item -> {
+						if (item != null){
+							return StringUtils.isNotEmpty(item.getField()) && StringUtils.isNotEmpty(item.getOperator());
+						}
+						return false;
+					}).
+					collect(Collectors.toList());
+			if (orderByNew.size() > 0){
+				httpParams.put("sort", JSON.toJSONString(orderByNew));
 			}
 		}
 		String responseText = new RPCAPI().requestWithRetry(RPCAPI.HttpMethod.POST, ORDER_SEARCH_API_V1+"/order/v1/search", httpParams, null, "UTF-8");
@@ -91,8 +98,7 @@ public class OrderService{
 		if(responseText==null) {
 			return null;
 		}
-		OrderSearchV1Response orderSearchV1Response = JSON.parseObject(responseText, OrderSearchV1Response.class);
-		return orderSearchV1Response;
+		return JSON.parseObject(responseText, OrderSearchV1Response.class);
 	}
 	
 	/**调用order-service-api接口：查询司机是否有待服务订单**/
@@ -142,8 +148,7 @@ public class OrderService{
 			log.info( "订单不存在。" );
 			return null;
 		}
-		JSONObject order = (JSONObject)orderResponse.getData();
-		return order;
+		return (JSONObject)orderResponse.getData();
 	}
 	/**调用order-api接口：根据orderId查询订单取消原因信息**/
 	public JSONObject getOrderCancelInfo(String orderId) {
@@ -162,8 +167,7 @@ public class OrderService{
 			log.info( "订单取消原因不存在。" );
 			return null;
 		}
-		JSONObject order = (JSONObject)orderResponse.getData();
-		return order;
+		return  (JSONObject)orderResponse.getData();
 	}
 
 	public JSONObject getOrderInfoByParams(String orderNo, String columns, String tag){
@@ -185,7 +189,7 @@ public class OrderService{
 		}
 		return null;
 	}
-	
+
 	
 
 	//--------------------------------------------------------------------------------------for debug

@@ -5,7 +5,7 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
-import com.zhuanche.entity.DriverPreparate.DriverPreparate;
+import com.zhuanche.entity.driverPreparate.DriverPreparate;
 import com.zhuanche.serv.driverPreparate.DriverPreparateService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.util.TextUtils;

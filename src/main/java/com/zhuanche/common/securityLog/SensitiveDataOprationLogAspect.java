@@ -75,12 +75,6 @@ public class SensitiveDataOprationLogAspect {
             String dateTime = DF.format(localDateTime);
             SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
             String user = currentLoginUser.getName();
-//		Object[] parames = jp.getArgs();// 获取目标方法体参数
-//        String params = parseParames(parames); // 解析目标方法体的参数
-//        String className = jp.getTarget().getClass().toString();// 获取目标类名
-//        className = className.substring(className.indexOf("com"));
-//        String signature = jp.getSignature().toString();// 获取目标方法签名
-//        String methodName = signature.substring(signature.lastIndexOf(".")+1, signature.indexOf("("));
 
             String ip = IpAddr.getIpAddr(httpServletRequest);// 用户IP
             log.info("[{}][{}][{}][{}][{}][{}][{}]",dateTime,ip,SYSTEM_NAME,user,sdol.primaryDataType(),sdol.secondaryDataType(),sdol.desc());
@@ -88,7 +82,7 @@ public class SensitiveDataOprationLogAspect {
             log.info(MessageFormat.format("es地址：{0},port:{1}",ElasticSearchInit.serviceIp,ElasticSearchInit.port));
             RestHighLevelClient highLevelClient = new RestHighLevelClient(
                     RestClient.builder(
-                            new HttpHost(ElasticSearchInit.serviceIp, new Integer(ElasticSearchInit.port), "http")));
+                            new HttpHost(ElasticSearchInit.serviceIp, Integer.parseInt(ElasticSearchInit.port), "http")));
             Map<String,Object> map = new LinkedHashMap<>();
             map.put("dateTime",dateTime);
             map.put("ip",ip);
@@ -127,7 +121,7 @@ public class SensitiveDataOprationLogAspect {
      * @return 解析后的方法参数   
      */    
     private String parseParames(Object[] parames) {     
-        StringBuffer sb = new StringBuffer();     
+        StringBuilder sb = new StringBuilder();
         for(int i=0; i<parames.length; i++){     
             if(parames[i] instanceof Object[] || parames[i] instanceof Collection){     
                 JSONArray json = JSONArray.fromObject(parames[i]);     

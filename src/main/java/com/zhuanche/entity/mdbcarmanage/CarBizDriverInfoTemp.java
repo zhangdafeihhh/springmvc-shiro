@@ -683,7 +683,10 @@ public class CarBizDriverInfoTemp extends BaseDriverInfoTemp {
     }
 
     @Override
-    public boolean equals(Object obj) {  
+    public boolean equals(Object obj) {
+    	if (obj == null){
+    		return false;
+		}
 		CarBizDriverInfoTemp s=(CarBizDriverInfoTemp)obj;
 	    return super.getPhone().equals(s.getPhone());   
     }   

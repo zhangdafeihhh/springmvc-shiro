@@ -4,10 +4,10 @@ import java.util.Calendar;
 
 public class IdCard {
     /** 中国公民身份证号码最小长度。 */
-    public  final int CHINA_ID_MIN_LENGTH = 15;
+    public static final int CHINA_ID_MIN_LENGTH = 15;
 
     /** 中国公民身份证号码最大长度。 */
-    public  final int CHINA_ID_MAX_LENGTH = 18;
+    public static final int CHINA_ID_MAX_LENGTH = 18;
     /**
      * 根据身份编号获取年龄
      *
@@ -20,7 +20,7 @@ public class IdCard {
         Calendar cal = Calendar.getInstance();
         String year = idCard.substring(6, 10);
         int iCurrYear = cal.get(Calendar.YEAR);
-        iAge = iCurrYear - Integer.valueOf(year);
+        iAge = iCurrYear - Integer.parseInt(year);
         return iAge;
     }
 

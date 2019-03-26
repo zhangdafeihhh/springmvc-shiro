@@ -1,4 +1,4 @@
-package com.zhuanche.serv.impl;
+package com.zhuanche.serv.driverdailyreport;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -14,11 +14,10 @@ import com.zhuanche.dto.driver.DriverIncome;
 import com.zhuanche.entity.mdbcarmanage.DriverDailyReport;
 import com.zhuanche.entity.mdbcarmanage.DriverDailyReportParams;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
-import com.zhuanche.serv.DriverDailyReportExService;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.MyRestTemplate;
-import mapper.mdbcarmanage.ex.DriverDailyReportExMapper;
+import mapper.mdbcarmanage.ex.DriverDailyReportV3ExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -33,84 +32,44 @@ import java.text.ParseException;
 import java.util.*;
 
 @Service
-public class DriverDailyReportExServiceImpl implements DriverDailyReportExService {
+public class DriverDailyReportV3Service {
 
-    private static final Logger logger = LoggerFactory.getLogger(DriverDailyReportExServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(DriverDailyReportV3Service.class);
 
     @Autowired
-    private DriverDailyReportExMapper driverDailyReportExMapper;
+    private DriverDailyReportV3ExMapper driverDailyReportV3ExMapper;
 
     @Autowired
     private CarBizSupplierExMapper carBizSupplierExMapper;
 
     @Autowired
-    @Qualifier("busOrderCostTurnoverTemplate")
-    private MyRestTemplate busOrderCostTurnoverTemplate;
+    @Qualifier("busOrderCostTemplate")
+    private MyRestTemplate busOrderCostTemplate;
 
-
-    @Override
     public PageInfo<DriverDailyReport> findDayDriverDailyReportByparam(DriverDailyReportParams params) {
         logger.info("查询工作报告，日报，参数为："+(params==null?"null": JSON.toJSONString(params)));
         PageHelper.startPage(params.getPage(), params.getPageSize(), true);
-        List<Integer> listDriverIds = this.driverDailyReportExMapper.queryDriverIds(params);
-        PageInfo<Integer> pageInfoDriver = new PageInfo<>(listDriverIds);
-        String driverIds = "";
-        if (listDriverIds != null && listDriverIds.size()>0){
-            for(Integer driverId : listDriverIds){
-                driverIds += driverId + Constants.SEPERATER;
-            }
-            if (StringUtils.isNotEmpty(driverIds)){
-                params.setDriverIds(driverIds.substring(0,driverIds.length()-1));
-            }
-        }
-
-        PageInfo<DriverDailyReport> pageInfo = null;
-        List<DriverDailyReport> list  = new ArrayList<DriverDailyReport>();
-        if (StringUtils.isNotEmpty(driverIds)){
-            list  = this.driverDailyReportExMapper.queryForListObject(params);
-        }
-        pageInfo = new PageInfo<>(list);
-        pageInfo.setTotal(pageInfoDriver.getTotal());
-        pageInfo.setPages(pageInfoDriver.getPages());
+        List<DriverDailyReport> list  = this.driverDailyReportV3ExMapper.queryForListObject(params);
+        PageInfo<DriverDailyReport> pageInfo = new PageInfo<>(list);
         return pageInfo;
     }
 
-    @Override
     public PageInfo<DriverDailyReport> findWeekDriverDailyReportByparam(DriverDailyReportParams params,String statDateStart,  String statDateEnd  ) {
-        try{
         PageHelper.startPage(params.getPage(), params.getPageSize(), true);
         logger.info("查询工作报告，周报，参数为："+(params==null?"null": JSON.toJSONString(params)));
-        List<Integer> listDriverIds = this.driverDailyReportExMapper.queryDriverIds(params);
-        PageInfo<Integer> pageInfoDriver = new PageInfo<>(listDriverIds);
-        String driverIds = "";
-        if (listDriverIds != null && listDriverIds.size()>0){
-            for(Integer driverId : listDriverIds){
-                driverIds += driverId + Constants.SEPERATER;
-            }
-            if (StringUtils.isNotEmpty(driverIds)){
-                params.setDriverIds(driverIds.substring(0,driverIds.length()-1));
-            }
-        }
-
-        PageInfo<DriverDailyReport> pageInfo = null;
-        List<DriverDailyReport> list  = new ArrayList<DriverDailyReport>();
-        if (StringUtils.isNotEmpty(driverIds)){
-            list  = this.driverDailyReportExMapper.queryWeekForListObject(params);
-        }
-        pageInfo = new PageInfo<>(list);
-        pageInfo.setTotal(pageInfoDriver.getTotal());
-        pageInfo.setPages(pageInfoDriver.getPages());
+        List<DriverDailyReport> list  = this.driverDailyReportV3ExMapper.queryWeekForListObject(params);
+        PageInfo<DriverDailyReport> pageInfo = new PageInfo<>(list);
         if(list!=null && list.size()>0){
             for (DriverDailyReport report: list) {
                 report.setStatDateStart(statDateStart);
                 report.setStatDateEnd(statDateEnd);
             }
         }
-
         return pageInfo;
-        }finally {
-            PageHelper.clearPage();
-        }
+    }
+
+    public List<DriverDailyReport> queryDriverReportData(DriverDailyReportParams params) {
+        return this.driverDailyReportV3ExMapper.queryDriverReportData(params);
     }
 
     /**
@@ -120,7 +79,6 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
      * @return
      * return: List<DriverDailyReportDTO>
      */
-    @Override
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
@@ -206,7 +164,7 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
     private void modifyDriverVolume(DriverDailyReportDTO ddre, String statDateStart) {
         if(StringUtils.isNotEmpty(statDateStart) && statDateStart.compareTo("2018-01-01") >0 ){
             String url = "/driverIncome/getDriverIncome?driverId="+ddre.getDriverId()+"&incomeDate=" + statDateStart;
-            String result = busOrderCostTurnoverTemplate.getForObject(url, String.class);
+            String result = busOrderCostTemplate.getForObject(url, String.class);
 
             Map<String, Object> resultMap = JSONObject.parseObject(result, HashMap.class);
             if (null == resultMap || !String.valueOf(resultMap.get("code")).equals("0")) {
@@ -237,10 +195,10 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
                 ddre.setActualPay(todayIncomeAmount.doubleValue());
                 // 当日载客里程
                 BigDecimal todayTravelMileage = new BigDecimal(String.valueOf(jsonObject.get("todayTravelMileage")));
-//                ddre.setServiceMileage(todayTravelMileage.doubleValue());
+                ddre.setServiceMileage(todayTravelMileage.doubleValue());
                 // 当日司机代付价外费
                 BigDecimal todayOtherFee = new BigDecimal(String.valueOf(jsonObject.get("todayOtherFee")));
-//                ddre.setDriverOutPay(todayOtherFee.doubleValue());
+                ddre.setDriverOutPay(todayOtherFee.doubleValue());
                 // 当日司机代收
                 BigDecimal todayDriverPay = new BigDecimal(String.valueOf(jsonObject.get("todayDriverPay")));
             }
@@ -268,19 +226,13 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
             long endTime = DateUtil.strDateParseLong(endDate);
             long time = System.currentTimeMillis();
             String url = "";
-//            if (Constants.WEEK.equals(type)){
-//                url = "/driverIncome/findDriverDateIncomes?driverIds=" + drivers + "&startDate=" + statTime + "&endDate=" + endTime;
-//            }else if(Constants.MONTH.equals(type)){
-//                url = "/driverIncome/findDriverDateIncomes?driverIds=" + drivers + "&startDate=" + statTime + "&endDate=" + endTime;
-//                //url = "/driverIncome/findDriverIncomes?driverIds="+drivers+"&inselectSuppierNameAndCityNameDayscomeDate="+startDate ;
-//            }
-            url = "/driverIncome/findDriverDateIncomes";
-//            String result = busOrderCostTurnoverTemplate.getForObject(url, String.class);
-            Map<String, Object> paramMap = new HashMap<String, Object>();
-            paramMap.put("driverIds", drivers);
-            paramMap.put("startDate", statTime);
-            paramMap.put("endDate", endTime);
-            String result = busOrderCostTurnoverTemplate.postForObject(url, JSONObject.class, paramMap);
+            if (Constants.WEEK.equals(type)){
+                url = "/driverIncome/findDriverDateIncomes?driverIds=" + drivers + "&startDate=" + statTime + "&endDate=" + endTime;
+            }else if(Constants.MONTH.equals(type)){
+                url = "/driverIncome/findDriverIncomes?driverIds="+drivers+"&incomeDate="+startDate ;
+            }
+            String result = busOrderCostTemplate.getForObject(url, String.class);
+
             long invokeEndTime = System.currentTimeMillis();
             logger.info("调用计费时长：" + (invokeEndTime-time));
             Map<String, Object> resultMap = JSONObject.parseObject(result, HashMap.class);
@@ -306,9 +258,11 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
                     // 当段日期完成订单量
                     DriverIncome driverObject = null;
                     try {
-                        Integer orderCounts = jsonObject.getInteger("orderCounts");
+                        Integer orderCounts = Constants.WEEK.equals(type)?
+                                jsonObject.getInteger("orderCounts"):jsonObject.getInteger("monthOrderCounts");
                         // 当段日期营业额
-                        BigDecimal incomeAmount = new BigDecimal(jsonObject.getString("incomeAmount"));
+                        BigDecimal incomeAmount = new BigDecimal(Constants.WEEK.equals(type)?
+                                jsonObject.getString("incomeAmount"):jsonObject.getString("monthIncomeAmount"));
 
                         driverObject = new DriverIncome(orderCounts, incomeAmount);
 
@@ -324,11 +278,4 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
         return maps;
     }
 
-    @Override
-    @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
-    })
-    public List<DriverDailyReport> queryDriverReportData(DriverDailyReportParams params){
-        return  this.driverDailyReportExMapper.queryDriverReportData(params);
-    }
 }
