@@ -48,8 +48,8 @@ public class FeedBackService {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
-    public List<Feedback> findDataList(String createTimeStart, String createTimeEnd, Integer manageStatus) {
-        return feedbackExMapper.findDataList(createTimeStart, createTimeEnd, manageStatus);
+    public List<Feedback> findDataList(String createTimeStart, String createTimeEnd, Integer manageStatus,Integer feedbackType) {
+        return feedbackExMapper.findDataList(createTimeStart, createTimeEnd, manageStatus,feedbackType);
     }
 
     @MasterSlaveConfigs(configs = {
@@ -161,8 +161,8 @@ public class FeedBackService {
      * @param userId
      * @return
      */
-    public List<Feedback> findDataListSelf(String createTimeStart, String createTimeEnd, Integer manageStatus, Integer userId) {
-        return feedbackExMapper.findDataListSelf(createTimeStart, createTimeEnd, manageStatus, userId);
+    public List<Feedback> findDataListSelf(String createTimeStart, String createTimeEnd, Integer manageStatus, Integer userId,Integer feedbackType) {
+        return feedbackExMapper.findDataListSelf(createTimeStart, createTimeEnd, manageStatus, userId, feedbackType);
     }
 
     private String getRemoteFileDir() {
