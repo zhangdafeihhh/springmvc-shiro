@@ -20,6 +20,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.zhuanche.vo.busManage.BusDriverDetailInfoVO;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -1350,4 +1351,14 @@ public class BusCarBizDriverInfoService implements BusConst {
         return carBizDriverInfoExMapper.resetIMEI(driverId);
     }
 
+    /**
+     * 根据巴士司机手机号查询巴士司机信息
+     * @param busDriverPhone
+     * @return
+     */
+    @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE))
+    public BusDriverDetailInfoVO selectByBusDriverPhone(String busDriverPhone){
+        BusDriverDetailInfoVO carBizDriverInfo = busCarBizDriverInfoExMapper.queryBusDriverInfoByPhone(busDriverPhone);
+        return carBizDriverInfo;
+    }
 }

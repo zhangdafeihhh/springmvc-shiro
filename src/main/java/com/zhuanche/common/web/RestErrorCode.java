@@ -202,6 +202,13 @@ public final class RestErrorCode{
 	@ResultMessage("文件上传大小超过限制")
 	public static final int FILE_SIZE_TOO_BIG = 20001;
 
+	//----------------------------------------------巴士业务
+	@ResultMessage("巴士服务城市权限校验不通过")
+	public static final int BUS_CITY_AUTH_FORBIDDEN =801;
+
+	@ResultMessage("巴士服务供应商权限校验不通过")
+	public static final int BUS_SUPPLIER_AUTH_FORBIDDEN =802;
+
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系
 	static{

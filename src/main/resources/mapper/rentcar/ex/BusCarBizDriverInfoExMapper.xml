@@ -753,4 +753,17 @@
 			#{item}
 		</foreach>
 	</select>
+	<select id="queryBusDriverInfoByPhone" parameterType="java.lang.String" resultType="com.zhuanche.vo.busManage.BusDriverDetailInfoVO">
+		SELECT
+		driver.driver_id AS driverId,
+		driver.name,
+		driver.phone,
+		driver.service_city as cityId,
+		sup.supplier_full_name supplierName,
+		driver.supplier_id AS supplierId
+		FROM
+		car_biz_driver_info driver
+		LEFT JOIN car_biz_supplier sup ON driver.supplier_id = sup.supplier_id
+		where driver.phone=#{busDriverPhone}
+	</select>
 </mapper>

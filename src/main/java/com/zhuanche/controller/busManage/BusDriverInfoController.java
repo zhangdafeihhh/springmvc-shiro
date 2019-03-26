@@ -91,7 +91,7 @@ public class BusDriverInfoController extends BusBaseController {
 	@SuppressWarnings("resource")
 	@RequestMapping(value = "/findDriverList")
 	public AjaxResponse findDriverList(@Validated BusDriverQueryDTO queryDTO) {
-		
+
 		logger.info("当前登录人信息={}", JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));
 
 		// 数据权限控制SSOLoginUser
