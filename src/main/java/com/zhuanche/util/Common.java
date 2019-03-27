@@ -61,7 +61,9 @@ public class Common {
 	public static final String COST_ORDER_DETAIL = "/orderCostdetail/getCostDetail";
 	
 	//订单接口提供，查询 订单列表
-    public static final String ORDER_ORDER_LIST_DATE = "/order/v1/search";
+    public static final String ORDER_ORDER_LIST_DATE1 = "/order/v1/search";
+
+	public static final String ORDER_ORDER_LIST_DATE_NEW = "/order/v2/search";
 		
 	// redis key prefix~~~~~~~~~~~~~~~~~~~~~~start~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	public static final String V2_D_G_I = "mp_rest_driver_";

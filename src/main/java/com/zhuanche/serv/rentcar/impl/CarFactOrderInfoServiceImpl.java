@@ -240,10 +240,12 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 	@Override
 	public AjaxResponse queryOrderDataList(Map<String, Object> paramMap) {
 		List<CarFactOrderInfoDTO> list = null;
-		String url = orderSearchUrl+Common.ORDER_ORDER_LIST_DATE;
+		String url = orderSearchUrl+Common.ORDER_ORDER_LIST_DATE_NEW;
 		try {
-			String result = orderApiTemplate.postForObject(Common.ORDER_ORDER_LIST_DATE,
+			String result = orderApiTemplate.postForObject(Common.ORDER_ORDER_LIST_DATE_NEW,
 					String.class, paramMap);
+
+			System.out.println("result:" + result);
 
 			JSONObject job = JSON.parseObject(result);
 			if (job == null) {
@@ -264,6 +266,15 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 						list.forEach( carFactOrderInfoDTO -> {
 							carFactOrderInfoDTO.setBookingUserPhone(CommonStringUtils.protectPhoneInfo(carFactOrderInfoDTO.getBookingUserPhone()));
 							carFactOrderInfoDTO.setRiderPhone(CommonStringUtils.protectPhoneInfo(carFactOrderInfoDTO.getRiderPhone()));
+							if("true".equals(carFactOrderInfoDTO.getFilterChannelOrder()) && "true".equals(carFactOrderInfoDTO.getNoFilterChannelOrder())){
+								carFactOrderInfoDTO.setChannelSource("3"); //既是渠道又是非渠道
+							}else if("true".equals(carFactOrderInfoDTO.getFilterChannelOrder())){
+								carFactOrderInfoDTO.setChannelSource("1");
+							}else if("true".equals(carFactOrderInfoDTO.getNoFilterChannelOrder())){
+								carFactOrderInfoDTO.setChannelSource("2");
+							}else {
+								carFactOrderInfoDTO.setChannelSource("0");
+							}
 						});
 						return AjaxResponse.success(jobres);
 					}
