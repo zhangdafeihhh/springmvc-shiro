@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.BusBizDriverViolatorsMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.BusBizDriverViolators" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="bus_driver_id" property="busDriverId" jdbcType="INTEGER" />
+    <result column="bus_driver_name" property="busDriverName" jdbcType="VARCHAR" />
+    <result column="bus_driver_phone" property="busDriverPhone" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+    <result column="group_id" property="groupId" jdbcType="INTEGER" />
+    <result column="group_name" property="groupName" jdbcType="VARCHAR" />
+    <result column="evaluate_score" property="evaluateScore" jdbcType="VARCHAR" />
+    <result column="id_number" property="idNumber" jdbcType="VARCHAR" />
+    <result column="punish_status" property="punishStatus" jdbcType="SMALLINT" />
+    <result column="punish_reason" property="punishReason" jdbcType="VARCHAR" />
+    <result column="punish_duration" property="punishDuration" jdbcType="INTEGER" />
+    <result column="punish_start_time" property="punishStartTime" jdbcType="TIMESTAMP" />
+    <result column="punish_end_time" property="punishEndTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="SMALLINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, bus_driver_id, bus_driver_name, bus_driver_phone, city_id, city_name, supplier_id, 
+    supplier_name, group_id, group_name, evaluate_score, id_number, punish_status, punish_reason, 
+    punish_duration, punish_start_time, punish_end_time, create_time, update_time, status
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bus_biz_driver_violators
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.BusBizDriverViolators" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into bus_biz_driver_violators (bus_driver_id, bus_driver_name, bus_driver_phone, 
+      city_id, city_name, supplier_id, 
+      supplier_name, group_id, group_name, 
+      evaluate_score, id_number, punish_status, 
+      punish_reason, punish_duration, punish_start_time, 
+      punish_end_time, create_time, update_time, 
+      status)
+    values (#{busDriverId,jdbcType=INTEGER}, #{busDriverName,jdbcType=VARCHAR}, #{busDriverPhone,jdbcType=VARCHAR}, 
+      #{cityId,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR}, #{supplierId,jdbcType=INTEGER}, 
+      #{supplierName,jdbcType=VARCHAR}, #{groupId,jdbcType=INTEGER}, #{groupName,jdbcType=VARCHAR}, 
+      #{evaluateScore,jdbcType=VARCHAR}, #{idNumber,jdbcType=VARCHAR}, #{punishStatus,jdbcType=SMALLINT}, 
+      #{punishReason,jdbcType=VARCHAR}, #{punishDuration,jdbcType=INTEGER}, #{punishStartTime,jdbcType=TIMESTAMP}, 
+      #{punishEndTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{status,jdbcType=SMALLINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.BusBizDriverViolators" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into bus_biz_driver_violators
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="busDriverId != null" >
+        bus_driver_id,
+      </if>
+      <if test="busDriverName != null" >
+        bus_driver_name,
+      </if>
+      <if test="busDriverPhone != null" >
+        bus_driver_phone,
+      </if>
+      <if test="cityId != null" >
+        city_id,
+      </if>
+      <if test="cityName != null" >
+        city_name,
+      </if>
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="supplierName != null" >
+        supplier_name,
+      </if>
+      <if test="groupId != null" >
+        group_id,
+      </if>
+      <if test="groupName != null" >
+        group_name,
+      </if>
+      <if test="evaluateScore != null" >
+        evaluate_score,
+      </if>
+      <if test="idNumber != null" >
+        id_number,
+      </if>
+      <if test="punishStatus != null" >
+        punish_status,
+      </if>
+      <if test="punishReason != null" >
+        punish_reason,
+      </if>
+      <if test="punishDuration != null" >
+        punish_duration,
+      </if>
+      <if test="punishStartTime != null" >
+        punish_start_time,
+      </if>
+      <if test="punishEndTime != null" >
+        punish_end_time,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="busDriverId != null" >
+        #{busDriverId,jdbcType=INTEGER},
+      </if>
+      <if test="busDriverName != null" >
+        #{busDriverName,jdbcType=VARCHAR},
+      </if>
+      <if test="busDriverPhone != null" >
+        #{busDriverPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null" >
+        #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierName != null" >
+        #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="groupId != null" >
+        #{groupId,jdbcType=INTEGER},
+      </if>
+      <if test="groupName != null" >
+        #{groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="evaluateScore != null" >
+        #{evaluateScore,jdbcType=VARCHAR},
+      </if>
+      <if test="idNumber != null" >
+        #{idNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="punishStatus != null" >
+        #{punishStatus,jdbcType=SMALLINT},
+      </if>
+      <if test="punishReason != null" >
+        #{punishReason,jdbcType=VARCHAR},
+      </if>
+      <if test="punishDuration != null" >
+        #{punishDuration,jdbcType=INTEGER},
+      </if>
+      <if test="punishStartTime != null" >
+        #{punishStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="punishEndTime != null" >
+        #{punishEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=SMALLINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.mdbcarmanage.BusBizDriverViolators" >
+    update bus_biz_driver_violators
+    <set >
+      <if test="busDriverId != null" >
+        bus_driver_id = #{busDriverId,jdbcType=INTEGER},
+      </if>
+      <if test="busDriverName != null" >
+        bus_driver_name = #{busDriverName,jdbcType=VARCHAR},
+      </if>
+      <if test="busDriverPhone != null" >
+        bus_driver_phone = #{busDriverPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null" >
+        city_name = #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierName != null" >
+        supplier_name = #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="groupId != null" >
+        group_id = #{groupId,jdbcType=INTEGER},
+      </if>
+      <if test="groupName != null" >
+        group_name = #{groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="evaluateScore != null" >
+        evaluate_score = #{evaluateScore,jdbcType=VARCHAR},
+      </if>
+      <if test="idNumber != null" >
+        id_number = #{idNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="punishStatus != null" >
+        punish_status = #{punishStatus,jdbcType=SMALLINT},
+      </if>
+      <if test="punishReason != null" >
+        punish_reason = #{punishReason,jdbcType=VARCHAR},
+      </if>
+      <if test="punishDuration != null" >
+        punish_duration = #{punishDuration,jdbcType=INTEGER},
+      </if>
+      <if test="punishStartTime != null" >
+        punish_start_time = #{punishStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="punishEndTime != null" >
+        punish_end_time = #{punishEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=SMALLINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.BusBizDriverViolators" >
+    update bus_biz_driver_violators
+    set bus_driver_id = #{busDriverId,jdbcType=INTEGER},
+      bus_driver_name = #{busDriverName,jdbcType=VARCHAR},
+      bus_driver_phone = #{busDriverPhone,jdbcType=VARCHAR},
+      city_id = #{cityId,jdbcType=INTEGER},
+      city_name = #{cityName,jdbcType=VARCHAR},
+      supplier_id = #{supplierId,jdbcType=INTEGER},
+      supplier_name = #{supplierName,jdbcType=VARCHAR},
+      group_id = #{groupId,jdbcType=INTEGER},
+      group_name = #{groupName,jdbcType=VARCHAR},
+      evaluate_score = #{evaluateScore,jdbcType=VARCHAR},
+      id_number = #{idNumber,jdbcType=VARCHAR},
+      punish_status = #{punishStatus,jdbcType=SMALLINT},
+      punish_reason = #{punishReason,jdbcType=VARCHAR},
+      punish_duration = #{punishDuration,jdbcType=INTEGER},
+      punish_start_time = #{punishStartTime,jdbcType=TIMESTAMP},
+      punish_end_time = #{punishEndTime,jdbcType=TIMESTAMP},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      status = #{status,jdbcType=SMALLINT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
