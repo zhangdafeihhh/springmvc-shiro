@@ -191,6 +191,12 @@ public class BusCarBizDriverInfoService implements BusConst {
     private BusDriverMongoService busDriverMongoService;
     @Autowired
     private BusCommonService commonService;
+
+    @Resource(name = "driverMongoTemplate")
+    private MongoTemplate driverMongoTemplate;
+
+    @Value("${car.rest.url}")
+    private String order_url ;
     /**
      * @param queryDTO
      * @return List<BusDriverInfoVO>

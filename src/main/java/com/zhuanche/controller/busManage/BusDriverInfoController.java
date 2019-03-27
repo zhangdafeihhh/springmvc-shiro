@@ -1,45 +1,23 @@
 package com.zhuanche.controller.busManage;
 
-import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
-
-import com.zhuanche.vo.busManage.*;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.constants.BusConst;
 import com.zhuanche.constants.busManage.BusConstant;
 import com.zhuanche.dto.busManage.BusDriverQueryDTO;
 import com.zhuanche.dto.busManage.BusDriverSaveDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
+import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.mongo.busManage.BusDriverInfoAudit;
 import com.zhuanche.serv.CarBizDriverInfoDetailService;
 import com.zhuanche.serv.CarBizDriverInfoService;
@@ -58,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -209,7 +188,7 @@ public class BusDriverInfoController extends BusBaseController {
 			//查询司机是否有服务中订单
 			/*Boolean isInService = busCarBizDriverInfoService.isInService(driverId);
 			if(isInService){
-			return AjaxResponse.fail(RestErrorCode.INFORMATION_NOT_COMPLETE);
+			return AjaxResponse.fail(RestErrorCode.IN_SERVICE);
 
 			}*/
 
