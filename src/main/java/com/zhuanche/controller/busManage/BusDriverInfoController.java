@@ -10,7 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.vo.busManage.*;
@@ -582,22 +584,24 @@ public class BusDriverInfoController extends BusBaseController {
 	 * @return
 	 */
     @RequestMapping("/unlock")
-    public AjaxResponse unlock(@Verify(param="phone",rule="mobile")String phone){
-    	Map<String,Object> param = new HashMap(2);
-    	param.put("phoneNumber",phone);
+    public AjaxResponse unlock(@Verify(param="phone",rule="mobile")String phone) {
+		Map<String, Object> param = new HashMap(2);
+		param.put("phoneNumber", phone);
 		try {
-			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(mp_rest_url + "/api/v1/driver/delete/busLockKey", param , 2000, "解除被锁定的司机");
+			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(mp_rest_url + "/api/v1/driver/delete/busLockKey", param, 2000, "解除被锁定的司机");
 			Integer code = result.getInteger("code");
-			if(code==0){
-                return AjaxResponse.success(null);
-            }else if(code==1102){
-                return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_LOCKED);
-            }else{
-                logger.error("解除司机锁定异常：参数:phone="+phone+" 结果："+JSON.toJSONString(result));
-                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-            }
+			if (code == 0) {
+				//发送短信
+				SmsSendUtil.sendTemplate(phone, 207,new ArrayList());
+				return AjaxResponse.success(null);
+			} else if (code == 1102) {
+				return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_LOCKED);
+			} else {
+				logger.error("解除司机锁定异常：参数:phone=" + phone + " 结果：" + JSON.toJSONString(result));
+				return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+			}
 		} catch (Exception e) {
-			logger.error("解除司机锁定异常：参数:phone="+phone+" e：{}",e);
+			logger.error("解除司机锁定异常：参数:phone=" + phone + " e：{}", e);
 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 		}
 	}

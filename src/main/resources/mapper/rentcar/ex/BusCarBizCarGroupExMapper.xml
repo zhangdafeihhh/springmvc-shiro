@@ -52,4 +52,38 @@
     ORDER BY
 	seat_num ASC
 	</select>
+
+	<select id="queryGroupByCityIds" resultType="java.util.HashMap">
+		SELECT
+		gop.group_id groupId,
+		gop.group_name groupName
+	FROM
+		car_biz_car_group gop
+	LEFT JOIN car_biz_car_group_city city ON gop.group_id = city.group_id
+	WHERE
+		STATUS = 1
+		AND type = 2
+		and
+		city.city_id IN
+		<foreach collection="cityIds" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+		ORDER BY
+		seat_num ASC
+</select>
+
+
+	<select id="queryGroupByIds" resultType="com.zhuanche.entity.rentcar.CarBizCarGroup">
+		SELECT
+		gop.group_id groupId,
+		gop.group_name groupName
+		FROM
+		car_biz_car_group gop
+		WHERE
+		gop.group_id IN
+		<foreach collection="groupIds" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</select>
+
 </mapper>

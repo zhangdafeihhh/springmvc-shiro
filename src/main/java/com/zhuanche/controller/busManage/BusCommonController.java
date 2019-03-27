@@ -92,7 +92,7 @@ public class BusCommonController {
      */
     @RequestMapping(value = "/groups")
     public AjaxResponse groups() {
-        List<Map<Object, Object>> groups = busCommonService.queryGroups();
+        List<Map<Object, Object>> groups = busCommonService.queryGroupsByAuth();
         return AjaxResponse.success(groups);
     }
 

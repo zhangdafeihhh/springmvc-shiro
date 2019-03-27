@@ -470,12 +470,6 @@ public class BusSettlementAdviceController {
         boolean isList = false;
         //每次查询的最大条数,订单组只支持每次查询30个
         dto.setPageSize(30);
-        //查询出所有的巴士车型类别
-        List<Map<Object, Object>> maps = busCommonService.queryGroups();
-        Map<Integer, String> groupMap = new HashMap<>(16);
-        maps.forEach(o -> {
-            groupMap.put(Integer.parseInt(String.valueOf(o.get("groupId"))), String.valueOf(o.get("groupName")));
-        });
         do {
             pageNum++;
             dto.setPageNum(pageNum);
@@ -512,7 +506,7 @@ public class BusSettlementAdviceController {
                         Integer accountType = o.getInteger("accountType");
                         return accountType!=null&&(accountType==5||accountType==6);})//5 巴士分佣收入 6修正订单 7修正账单, 5/6才能查出订单信息
                          .map(o -> o.getString("orderNo")).distinct().collect(Collectors.joining(","));
-            List<BusOrderExportVO> exportVOS = busAssignmentService.buidExportData(orderNos, groupMap, roleBoolean);
+            List<BusOrderExportVO> exportVOS = busAssignmentService.buidExportData(orderNos,roleBoolean);
             Map<String, BusOrderExportVO> orderMap = new HashMap<>();
             if (exportVOS != null) {
                 exportVOS.forEach(order -> orderMap.put(order.getOrderNo(), order));
