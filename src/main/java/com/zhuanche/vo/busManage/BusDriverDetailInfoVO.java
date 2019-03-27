@@ -21,6 +21,8 @@ public class BusDriverDetailInfoVO implements Serializable {
 
 	/** 司机年龄 **/
 	private Integer age;
+	/** 城市id **/
+	private Integer cityId;
 
 	/** 城市ID **/
 	private Integer serviceCity;
@@ -277,6 +279,10 @@ public class BusDriverDetailInfoVO implements Serializable {
 	public void setAge(Integer age) {
 		this.age = age;
 	}
+
+	public Integer getCityId() {return cityId;}
+
+	public void setCityId(Integer cityId) {this.cityId = cityId;}
 
 	public Integer getServiceCity() {
 		return serviceCity;

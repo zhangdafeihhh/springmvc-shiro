@@ -1,5 +1,31 @@
 package com.zhuanche.controller.busManage;
 
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
+
+import com.zhuanche.vo.busManage.*;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
@@ -72,6 +98,9 @@ public class BusDriverInfoController extends BusBaseController {
 	@Autowired
 	private BusCommonService commonService;
 
+	@Value("${driver.message.url}")
+	private String mp_rest_url;
+
 	/**
 	 * @Title: findDriverList
 	 * @Description: 查询司机列表
@@ -82,7 +111,7 @@ public class BusDriverInfoController extends BusBaseController {
 	@SuppressWarnings("resource")
 	@RequestMapping(value = "/findDriverList")
 	public AjaxResponse findDriverList(@Validated BusDriverQueryDTO queryDTO) {
-		
+
 		logger.info("当前登录人信息={}", JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));
 
 		// 数据权限控制SSOLoginUser
@@ -114,28 +143,6 @@ public class BusDriverInfoController extends BusBaseController {
 		return AjaxResponse.success(pageDTO);
 	}
 
-	/**
-	 * 查询司机审核列表
-	 * @param busDriverDTO
-	 * @return
-	 */
-	@RequestMapping("/queryBusDriverAuditList")
-	public AjaxResponse queryBusDriverAuditList(BusDriverQueryDTO busDriverDTO){
-		Set<Integer> supplierIds = commonService.getSupplierIds();
-		if(supplierIds==null){
-			return AjaxResponse.fail(RestErrorCode.PERMISSION_NOT_EXIST);
-		}
-		if(busDriverDTO.getSupplierId()!=null){
-			if(supplierIds.isEmpty()||supplierIds.contains(busDriverDTO.getSupplierId())){
-				supplierIds.clear();
-				supplierIds.add(busDriverDTO.getSupplierId());
-			}else{
-				return AjaxResponse.fail(RestErrorCode.PERMISSION_NOT_EXIST);
-			}
-		}
-		busDriverDTO.setAuthOfSupplier(supplierIds);
-		return  busCarBizDriverInfoService.queryBusDriverAuditList(busDriverDTO);
-	}
 	/**
 	 * @Title: saveDriver
 	 * @Description: 保存司机信息
@@ -669,4 +676,30 @@ public class BusDriverInfoController extends BusBaseController {
         return result;
     }
 
+	/**
+	 * 解锁
+	 * @return
+	 */
+    @RequestMapping("/unlock")
+    public AjaxResponse unlock(@Verify(param="phone",rule="mobile")String phone) {
+		Map<String, Object> param = new HashMap(2);
+		param.put("phoneNumber", phone);
+		try {
+			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(mp_rest_url + "/api/v1/driver/delete/busLockKey", param, 2000, "解除被锁定的司机");
+			Integer code = result.getInteger("code");
+			if (code == 0) {
+				//发送短信
+				SmsSendUtil.sendTemplate(phone, 207,new ArrayList());
+				return AjaxResponse.success(null);
+			} else if (code == 1102) {
+				return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_LOCKED);
+			} else {
+				logger.error("解除司机锁定异常：参数:phone=" + phone + " 结果：" + JSON.toJSONString(result));
+				return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+			}
+		} catch (Exception e) {
+			logger.error("解除司机锁定异常：参数:phone=" + phone + " e：{}", e);
+			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		}
+	}
 }

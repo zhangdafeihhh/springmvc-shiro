@@ -78,10 +78,13 @@ public class BusInfoAudit implements Serializable {
      */
     private Date carPurchaseDate;
 
-    /**
-     * 0审核，1已审核
-     */
+    /**状态 0无效，1有效，2逻辑删除，3三方车辆数据*/
     private Integer status;
+
+    /**
+     * 0未审核，1已审核
+     */
+    private Integer auditStatus;
 
     /**
      * 0 创建 1修改
@@ -100,10 +103,13 @@ public class BusInfoAudit implements Serializable {
      * 创建人
      */
     private Integer createBy;
+
+    private String createName;
     /**
      * 修改人
      */
     private Integer updateBy;
+    private String updateName;
     /**
      * 审核时间
      */
@@ -112,5 +118,7 @@ public class BusInfoAudit implements Serializable {
      * 审核人
      */
     private Integer auditor;
+    private String auditorName;
+
 
 }

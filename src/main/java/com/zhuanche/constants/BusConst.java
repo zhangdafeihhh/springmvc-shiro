@@ -201,9 +201,8 @@ public interface BusConst {
 
 		/** 查询订单详情 **/
 		String GET_ORDER_DETAIL = "/busOrder/getOrderDetail";
-
-		/** 巴士服务中订单 **/
-		String GET_SERVICE_ORDER = "/busOrder/getOrderDetail";
+		/** 查询司机或者车辆是否在服务中*/
+		String GET_SERVICE_ORDER="/busOrder/serviceOrder";
 	}
 
 	/**

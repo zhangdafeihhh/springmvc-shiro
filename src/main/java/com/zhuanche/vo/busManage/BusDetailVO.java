@@ -13,6 +13,7 @@ import java.util.Date;
  * @create: 2018-11-23 13:27
  **/
 public class BusDetailVO implements Serializable{
+    private String id;
     private Integer carId;
     private Integer cityId;
     private String cityName;

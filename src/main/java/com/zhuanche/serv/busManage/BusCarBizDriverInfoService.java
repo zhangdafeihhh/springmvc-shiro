@@ -191,11 +191,6 @@ public class BusCarBizDriverInfoService implements BusConst {
     private BusDriverMongoService busDriverMongoService;
     @Autowired
     private BusCommonService commonService;
-    @Value("${car.rest.url}")
-    private String order_url;
-
-    @Resource(name = "driverMongoTemplate")
-    private MongoTemplate driverMongoTemplate;
     /**
      * @param queryDTO
      * @return List<BusDriverInfoVO>
@@ -610,10 +605,10 @@ public class BusCarBizDriverInfoService implements BusConst {
             }
 
             // 获取当前用户Id
-            /*saveDTO.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
+            saveDTO.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
             saveDTO.setCreateDate(new Date());
             saveDTO.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
-            saveDTO.setUpdateDate(new Date());*/
+            saveDTO.setUpdateDate(new Date());
             saveDTO.setStatus(1);
             // 身份证号
             String idCardNo = saveDTO.getIdCardNo();
@@ -1243,8 +1238,8 @@ public class BusCarBizDriverInfoService implements BusConst {
                         failedCount++;// 失败条数+1
                         continue;
                     }
-                    //保存司机信息,存入审核列表
-                    AjaxResponse saveResult = this.saveAuditDriverToMongo(saveDTO);
+                    //保存司机信息
+                    AjaxResponse saveResult = this.saveDriver(saveDTO);
                     if (!saveResult.isSuccess()) {
                         errorMsgs.add("手机号=" + saveDTO.getPhone() + "保存出错，错误=" + saveResult.getMsg());
                         failedCount++;// 失败条数+1
@@ -1349,6 +1344,16 @@ public class BusCarBizDriverInfoService implements BusConst {
         return carBizDriverInfoExMapper.resetIMEI(driverId);
     }
 
+    /**
+     * 根据巴士司机手机号查询巴士司机信息
+     * @param busDriverPhone
+     * @return
+     */
+    @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE))
+    public BusDriverDetailInfoVO selectByBusDriverPhone(String busDriverPhone){
+        BusDriverDetailInfoVO carBizDriverInfo = busCarBizDriverInfoExMapper.queryBusDriverInfoByPhone(busDriverPhone);
+        return carBizDriverInfo;
+    }
     public AjaxResponse queryBusDriverAuditList(BusDriverQueryDTO busDriverDTO) {
         Query query = new Query().limit(busDriverDTO.getPageSize());
         //城市
