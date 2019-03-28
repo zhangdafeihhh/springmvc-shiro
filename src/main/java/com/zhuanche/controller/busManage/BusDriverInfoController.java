@@ -123,6 +123,28 @@ public class BusDriverInfoController extends BusBaseController {
 	}
 
 	/**
+	 * 查询司机审核列表
+	 * @param busDriverDTO
+	 * @return
+	 */
+	@RequestMapping("/findAuditDriverList")
+	public AjaxResponse findAuditDriverList(BusDriverQueryDTO busDriverDTO){
+		Set<Integer> supplierIds = commonService.getAuthSupplierIds();
+		if(supplierIds==null){
+			return AjaxResponse.fail(RestErrorCode.PERMISSION_NOT_EXIST);
+		}
+		if(busDriverDTO.getSupplierId()!=null){
+			if(supplierIds.isEmpty()||supplierIds.contains(busDriverDTO.getSupplierId())){
+				supplierIds.clear();
+				supplierIds.add(busDriverDTO.getSupplierId());
+			}else{
+				return AjaxResponse.fail(RestErrorCode.PERMISSION_NOT_EXIST);
+			}
+		}
+		busDriverDTO.setAuthOfSupplier(supplierIds);
+		return  busCarBizDriverInfoService.queryBusDriverAuditList(busDriverDTO);
+	}
+	/**
 	 * @Title: saveDriver
 	 * @Description: 保存司机信息
 	 * @param saveDTO
