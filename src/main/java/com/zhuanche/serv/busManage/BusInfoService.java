@@ -1,8 +1,10 @@
 package com.zhuanche.serv.busManage;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.mongodb.WriteResult;
+import com.sun.org.apache.regexp.internal.RE;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -10,6 +12,7 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.constants.BusConst;
 import com.zhuanche.constants.busManage.BusConstant;
 import com.zhuanche.constants.busManage.EnumFuel;
 import com.zhuanche.dto.busManage.BusCarSaveDTO;
@@ -19,10 +22,13 @@ import com.zhuanche.entity.busManage.BusCarInfo;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
+import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.mongo.busManage.BusInfoAudit;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.Common;
 import com.zhuanche.util.DateUtils;
+import com.zhuanche.util.SignUtils;
 import com.zhuanche.util.objcompare.CompareObjectUtils;
 import com.zhuanche.util.objcompare.entity.BusCarCompareEntity;
 import com.zhuanche.vo.busManage.BusDetailVO;
@@ -34,15 +40,19 @@ import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
+
 import javax.annotation.Resource;
 import java.text.ParseException;
 import java.util.*;
@@ -58,6 +68,9 @@ import java.util.stream.Collectors;
  **/
 @Service
 public class BusInfoService {
+
+
+    private static Logger logger = LoggerFactory.getLogger(BusInfoService.class);
 
     @Autowired
     private BusBizChangeLogService busBizChangeLogService;
@@ -75,6 +88,10 @@ public class BusInfoService {
     private CarBizCarGroupExMapper groupExMapper;
     @Resource(name = "carMongoTemplate")
     private MongoTemplate carMongoTemplate;
+
+    @Value("${car.rest.url}")
+    private String order_url ;
+
     //存入mongoDB的Collection名称
     //存入mongoDB的Collection名称
     private static String mongoCollectionName = "carInfoDTO";
@@ -239,8 +256,11 @@ public class BusInfoService {
                         update.set("auditDate", new Date());
                         update.set("auditorName",WebSessionUtil.getCurrentLoginUser().getName());
                         carMongoTemplate.updateFirst(query, update, BusInfoAudit.class);
-                        this.saveUpdateLog(detail, carInfo.getCarId());
-                        busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carInfo.getCarId()), "审核通过", new Date());
+                        String diff = this.saveUpdateLog(detail, carInfo.getCarId());
+                        if("".equals(diff)) {
+                            busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carInfo.getCarId()), diff, busAudit.getUpdateBy(), busAudit.getUpdateName(), busAudit.getUpdateDate());
+                            busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carInfo.getCarId()), "审核通过", new Date());
+                        }
                         success++;
                     }
                 }
@@ -365,6 +385,10 @@ public class BusInfoService {
         if (busDetail == null) {
             return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "车辆ID传入错误");
         }
+       /* boolean inService = this.isInService(busDetail.getLicensePlates());
+        if(inService){
+            return AjaxResponse.fail(RestErrorCode.IN_SERVICE);
+        }*/
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         Integer userId = currentLoginUser.getId();
         if (busDetail.getLicensePlates().equals(busCarSaveDTO.getLicensePlates()) && busDetail.getTransportnumber().equals(busCarSaveDTO.getTransportnumber())) {
@@ -376,7 +400,10 @@ public class BusInfoService {
             int result = updateCar2DB(carInfo);
             if (result > 0) {
                 //保存操作日志
-                saveUpdateLog(busDetail, busCarSaveDTO.getCarId());
+                String diff = saveUpdateLog(busDetail, busCarSaveDTO.getCarId());
+                if(!"".equals(diff)){
+                    busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(busCarSaveDTO.getCarId()), diff, new Date());
+                }
                 return AjaxResponse.success(null);
             }
         } else {
@@ -401,6 +428,31 @@ public class BusInfoService {
         return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
     }
 
+    private boolean isInService(String licensePlates){
+        //默认在服务中不能修改
+        boolean result= true;
+        Map<String,Object>param = new HashMap(2);
+        param.put("licensePlates",licensePlates);
+        param.put("businessId", Common.BUSINESSID);
+        String sign = SignUtils.createMD5Sign(param, Common.KEY);
+        param.put("sign",sign);
+        String url = order_url+ BusConst.Order.GET_SERVICE_ORDER;
+        String response = MpOkHttpUtil.okHttpPost(url, param, 3, "判断车辆是否在服务中");
+        logger.info("判断车辆是否在服务中："+response);
+        if(response!=null){
+            JSONObject res = JSONObject.parseObject(response);
+            if(res.getInteger("code")!=null&&res.getInteger("code")==0){
+                JSONObject data = res.getJSONObject("data");
+                Integer orderCount = data.getInteger("orderCount");
+                if(orderCount>0){
+                    result=true;
+                }else{
+                    result=false;
+                }
+            }
+        }
+        return result;
+    }
 
     private int updateCar2DB(BusCarInfo carInfo) {
         //所属车主字段，默认供应商名称
@@ -444,7 +496,7 @@ public class BusInfoService {
         return 0;
     }
 
-    private void saveUpdateLog(BusDetailVO oldDetail, Integer carId) {
+    private String saveUpdateLog(BusDetailVO oldDetail, Integer carId) {
         BusCarCompareEntity oldRecord = new BusCarCompareEntity();
         BeanUtils.copyProperties(oldDetail, oldRecord);
         oldRecord.setFuelName(EnumFuel.getFuelNameByCode(oldDetail.getFueltype()));
@@ -456,10 +508,13 @@ public class BusInfoService {
         newRecord.setStatus(carInfoNew.getStatus() == 1 ? "有效" : "无效");
         newRecord.setFuelName(EnumFuel.getFuelNameByCode(carInfoNew.getFueltype()));
         List<Object> objects = CompareObjectUtils.contrastObj(oldRecord, newRecord, null);
+
         if (objects.size() != 0) {
             String join = StringUtils.join(objects, ",");
-            busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carId), join, new Date());
+            return join;
+           // busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carId), join, new Date());
         }
+        return "";
     }
 
     /**

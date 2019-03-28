@@ -109,6 +109,20 @@ public class BusCommonService {
 		return busCarBizCarGroupExMapper.queryGroups();
 	}
 
+	public List<Map<Object, Object>> queryGroupsByAuth(){
+        SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+        Integer level = currentLoginUser.getLevel();
+        //全国权限
+        List<Map<Object, Object>> maps;
+        if(level==1){
+            maps = busCarBizCarGroupExMapper.queryGroups();
+        }else{
+            Set<Integer> cityIds = currentLoginUser.getCityIds();
+            maps= busCarBizCarGroupExMapper.queryGroupByCityIds(cityIds);
+        }
+        return maps;
+    }
+
 	/**
 	 * @return List<Map<Object,Object>>
 	 * @throws

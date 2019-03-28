@@ -1,17 +1,11 @@
 package com.zhuanche.dto.busManage;
 
-import java.util.Date;
-
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
-
+import com.zhuanche.common.web.datavalidate.custom.InArray;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.zhuanche.common.web.datavalidate.custom.InArray;
+import javax.validation.constraints.*;
+import java.util.Date;
 
 /**
  * car_biz_driver_info
@@ -19,6 +13,8 @@ import com.zhuanche.common.web.datavalidate.custom.InArray;
 public class BusDriverSaveDTO extends BusBaseStatisDTO {
 
 	// =====================接口入参字段====================
+	/**审核表物理主键*/
+	private String id;
 	/** 服务城市 */
 	@NotNull(message = "服务城市不能为空")
 	private Integer serviceCity;
@@ -249,6 +245,14 @@ public class BusDriverSaveDTO extends BusBaseStatisDTO {
 	private Integer oldSupplier;// 供应商
 
 	// ====================getter/setter==================
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public Integer getServiceCity() {
 		return serviceCity;

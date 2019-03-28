@@ -15,10 +15,13 @@ import com.zhuanche.common.enums.PermissionLevelEnum;
 import com.zhuanche.dto.BaseDTO;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.vo.busManage.BusOrderExportCutVO;
+import com.zhuanche.vo.busManage.BusOrderExportVO;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -167,8 +170,8 @@ public class BusAssignmentController {
         if (roleBoolean) {
             headArray = BusConstant.Order.ORDER_HEAD;
         } else {
-            headArray = new String[BusConstant.Order.ORDER_HEAD.length - 3];//无权导出企业信息
-            System.arraycopy(BusConstant.Order.ORDER_HEAD, 0, headArray, 0, BusConstant.Order.ORDER_HEAD.length - 3);
+            //无权导出企业信息（精简信息）
+            headArray = BusConstant.Order.CUT_ORDER_HEAD;
         }
         //构建文件标题
         List<String> headerList = new ArrayList<>();
@@ -179,16 +182,10 @@ public class BusAssignmentController {
         params.setPageSize(500);
         boolean isFirst = true;
         boolean isList = false;
-        //查询所有的巴士车型类别，减少访问数据库的次数
-        List<Map<Object, Object>> maps = commonService.queryGroups();
-        Map<Integer, String> groupMap = new HashMap<>(16);
-        maps.forEach(o -> {
-            groupMap.put(Integer.parseInt(String.valueOf(o.get("groupId"))), String.valueOf(o.get("groupName")));
-        });
         do {
             pageNum++;
             params.setPageNum(pageNum);
-            PageDTO pageDTO = busAssignmentService.buidExportData(params, groupMap, roleBoolean);
+            PageDTO pageDTO = busAssignmentService.buidExportData(params, roleBoolean);
             long total = pageDTO.getTotal();
             List result = pageDTO.getResult();
             int pages = pageDTO.getPages();
@@ -207,7 +204,16 @@ public class BusAssignmentController {
             }
             List<String> csvData = new ArrayList<>();
             result.forEach(o -> {
-                String s = busAssignmentService.fieldValueToString(o);
+                Object resultObj;
+                if(!roleBoolean){
+                    //导出精简版信息
+                    BusOrderExportCutVO busOrderExportVO = new BusOrderExportCutVO();
+                    BeanUtils.copyProperties(o,busOrderExportVO);
+                    resultObj=busOrderExportVO;
+                }else{
+                    resultObj=o;
+                }
+                String s = busAssignmentService.fieldValueToString(resultObj);
                 csvData.add(s);
             });
             utilEntity.exportCsvV2(response, csvData, headerList, fileName, isFirst, isList);
@@ -305,6 +311,9 @@ public class BusAssignmentController {
             if (driverInfo == null || carInfo == null) {
                 return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "司机或者车辆信息不存在");
             }
+            if(!driverInfo.getSupplierId().equals(carInfo.getSupplierId())){
+                return AjaxResponse.fail(RestErrorCode.CITY_SUPPLIER_CAR_DIFFER,"车辆和司机供应商信息不一致");
+            }
             String driverPhone = driverInfo.getPhone();
             String driverName = driverInfo.getName();
             // 车型类别ID
@@ -313,8 +322,6 @@ public class BusAssignmentController {
             String groupName = carInfo.getGroupName();
             // 车型类别名称
             String cityName = carInfo.getCityName();
-            // 供应商ID
-            Integer supplierId = carInfo.getSupplierId();
             //供应商手机号
             String dispatcherPhone = carInfo.getDispatcherPhone();
             // 车牌号
@@ -337,10 +344,6 @@ public class BusAssignmentController {
             if (StringUtils.isBlank(cityName)) {
                 return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "城市名称为空");
             }
-            if (supplierId == null) {
-                return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "供应商为空");
-            }
-            
             // 一、通知分佣账户
             busAssignmentService.orderNoToMaid(orderNo);
             
@@ -423,6 +426,9 @@ public class BusAssignmentController {
             if (driverInfo == null || carInfo == null) {
                 return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "司机或者车辆信息不存在");
             }
+            if(!driverInfo.getSupplierId().equals(carInfo.getSupplierId())){
+                return AjaxResponse.fail(RestErrorCode.CITY_SUPPLIER_CAR_DIFFER,"车辆和司机供应商信息不一致");
+            }
             String driverPhone = driverInfo.getPhone();
             String driverName = driverInfo.getName();
             // 车型类别ID
@@ -431,8 +437,6 @@ public class BusAssignmentController {
             String groupName = carInfo.getGroupName();
             // 车型类别名称
             String cityName = carInfo.getCityName();
-            // 供应商ID
-            Integer supplierId = carInfo.getSupplierId();
             // 车牌号
             String licensePlates = carInfo.getLicensePlates();
 
@@ -453,9 +457,6 @@ public class BusAssignmentController {
             }
             if (StringUtils.isBlank(cityName)) {
                 return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "城市名称为空");
-            }
-            if (supplierId == null) {
-                return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "供应商为空");
             }
 
             // 一、通知分佣账户
@@ -763,4 +764,23 @@ public class BusAssignmentController {
         return response;
     }
 
+    @RequestMapping("/checkOrderStatus")
+    @ResponseBody
+    public AjaxResponse checkOrderStatus(@Verify(param="orderNo",rule="required") String orderNo){
+        Map<String, Object> result = new HashMap<>(2);
+        boolean isContinue = false;
+        BusOrderDetail orderDetail = busOrderService.selectOrderDetail(orderNo);
+        if (orderDetail != null) {
+            Integer status = orderDetail.getStatus();
+            //是否可以被继续操作
+            //该订单未被指派，可以继续查看详情
+            if (status < 10105) {
+                isContinue = true;
+            }
+        } else {
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+        result.put("isContinue", isContinue);
+        return AjaxResponse.success(result);
+    }
 }

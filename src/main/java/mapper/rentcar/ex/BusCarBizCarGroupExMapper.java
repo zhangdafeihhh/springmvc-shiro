@@ -1,7 +1,11 @@
 package mapper.rentcar.ex;
 
+import com.zhuanche.entity.rentcar.CarBizCarGroup;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface BusCarBizCarGroupExMapper {
 	/**
@@ -12,4 +16,8 @@ public interface BusCarBizCarGroupExMapper {
 	 * @throws
 	 */
 	List<Map<Object, Object>> queryGroups();
+
+	List<Map<Object,Object>> queryGroupByCityIds(@Param("cityIds")Set<Integer> cityIds);
+
+	List<CarBizCarGroup> queryGroupByIds(@Param("groupIds")Set<Integer> groupIds);
 }

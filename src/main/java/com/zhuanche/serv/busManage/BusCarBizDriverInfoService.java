@@ -1,49 +1,14 @@
 package com.zhuanche.serv.busManage;
 
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.zhuanche.vo.busManage.BusDriverDetailInfoVO;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.FormulaEvaluator;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.mongodb.WriteResult;
 import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.rocketmq.CommonRocketProducer;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -58,14 +23,11 @@ import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 import com.zhuanche.entity.mdbcarmanage.CarBizAgreementCompany;
 import com.zhuanche.entity.mdbcarmanage.CarRelateGroup;
 import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
-import com.zhuanche.entity.rentcar.CarBizCarGroup;
-import com.zhuanche.entity.rentcar.CarBizCity;
-import com.zhuanche.entity.rentcar.CarBizCooperationType;
-import com.zhuanche.entity.rentcar.CarBizDriverAccount;
-import com.zhuanche.entity.rentcar.CarBizDriverInfo;
-import com.zhuanche.entity.rentcar.CarBizDriverInfoDetail;
-import com.zhuanche.entity.rentcar.CarBizSupplier;
+import com.zhuanche.entity.rentcar.*;
+import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.mongo.DriverMongo;
+import com.zhuanche.mongo.busManage.BusDriverInfoAudit;
+import com.zhuanche.mongo.busManage.BusInfoAudit;
 import com.zhuanche.serv.CarBizChatUserService;
 import com.zhuanche.serv.CarBizDriverInfoDetailService;
 import com.zhuanche.serv.CarBizDriverInfoService;
@@ -73,11 +35,16 @@ import com.zhuanche.serv.mdbcarmanage.CarBizDriverUpdateService;
 import com.zhuanche.serv.mongo.BusDriverMongoService;
 import com.zhuanche.serv.mongo.DriverMongoService;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.BeanUtil;
+import com.zhuanche.util.Common;
+import com.zhuanche.util.SignUtils;
 import com.zhuanche.util.ValidateUtils;
 import com.zhuanche.util.excel.CsvUtils;
+import com.zhuanche.util.objcompare.CompareObjectUtils;
+import com.zhuanche.util.objcompare.entity.BusDriverCompareEntity;
+import com.zhuanche.vo.busManage.BusDriverDetailInfoVO;
 import com.zhuanche.vo.busManage.BusDriverInfoExportVO;
 import com.zhuanche.vo.busManage.BusDriverInfoPageVO;
-
 import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.mdbcarmanage.CarRelateGroupMapper;
 import mapper.mdbcarmanage.CarRelateTeamMapper;
@@ -86,19 +53,45 @@ import mapper.mdbcarmanage.ex.CarBizAgreementCompanyExMapper;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.mdbcarmanage.ex.CarRelateGroupExMapper;
 import mapper.mdbcarmanage.ex.CarRelateTeamExMapper;
-import mapper.rentcar.CarBizCarGroupMapper;
-import mapper.rentcar.CarBizCityMapper;
-import mapper.rentcar.CarBizCooperationTypeMapper;
-import mapper.rentcar.CarBizDriverAccountMapper;
-import mapper.rentcar.CarBizDriverInfoMapper;
-import mapper.rentcar.CarBizSupplierMapper;
-import mapper.rentcar.ex.BusCarBizCustomerAppraisalStatisticsExMapper;
-import mapper.rentcar.ex.BusCarBizDriverInfoExMapper;
-import mapper.rentcar.ex.CarBizCarGroupExMapper;
-import mapper.rentcar.ex.CarBizCarInfoExMapper;
-import mapper.rentcar.ex.CarBizCityExMapper;
-import mapper.rentcar.ex.CarBizDriverInfoExMapper;
-import mapper.rentcar.ex.CarBizSupplierExMapper;
+import mapper.rentcar.*;
+import mapper.rentcar.ex.*;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName: BusCarBizDriverInfoService
@@ -198,6 +191,12 @@ public class BusCarBizDriverInfoService implements BusConst {
     private BusDriverMongoService busDriverMongoService;
     @Autowired
     private BusCommonService commonService;
+
+    @Resource(name = "driverMongoTemplate")
+    private MongoTemplate driverMongoTemplate;
+
+    @Value("${car.rest.url}")
+    private String order_url ;
     /**
      * @param queryDTO
      * @return List<BusDriverInfoVO>
@@ -1360,5 +1359,452 @@ public class BusCarBizDriverInfoService implements BusConst {
     public BusDriverDetailInfoVO selectByBusDriverPhone(String busDriverPhone){
         BusDriverDetailInfoVO carBizDriverInfo = busCarBizDriverInfoExMapper.queryBusDriverInfoByPhone(busDriverPhone);
         return carBizDriverInfo;
+    }
+    public AjaxResponse queryBusDriverAuditList(BusDriverQueryDTO busDriverDTO) {
+        Query query = new Query().limit(busDriverDTO.getPageSize());
+        //城市
+        if(busDriverDTO.getCityId()!=null){
+            query.addCriteria(Criteria.where("cityId").is(busDriverDTO.getCityId()));
+        }
+        //供应商权限
+        Set<Integer> authOfSupplier = busDriverDTO.getAuthOfSupplier();
+        if(authOfSupplier!=null&&authOfSupplier.size()>0){
+            query.addCriteria(Criteria.where("supplierId").in(authOfSupplier));
+        }
+        //车型类别
+        if(busDriverDTO.getGroupId()!=null){
+            query.addCriteria(Criteria.where("groupId").is(busDriverDTO.getGroupId()));
+        }
+        //司机姓名
+        if(StringUtils.isNotBlank(busDriverDTO.getName())){
+            query.addCriteria(Criteria.where("name").is(busDriverDTO.getName()));
+        }
+        //手机号
+        if(StringUtils.isNotBlank(busDriverDTO.getPhone())){
+            query.addCriteria(Criteria.where("phone").is(busDriverDTO.getPhone()));
+        }
+        if(busDriverDTO.getStatus()!=null){
+            query.addCriteria(Criteria.where("status").is(busDriverDTO.getStatus()));
+        }
+        query.addCriteria(Criteria.where("auditStatus").is(0));
+        Integer pageNum = busDriverDTO.getPageNum();
+        Integer pageSize = busDriverDTO.getPageSize();
+        int start = (pageNum-1)*pageSize;
+        query.skip(start-1<0?0:start);
+        List<BusDriverInfoAudit> busDriverInfoAudits = driverMongoTemplate.find(query, BusDriverInfoAudit.class);
+        long count = driverMongoTemplate.count(query, BusInfoAudit.class);
+
+        if(CollectionUtils.isEmpty(busDriverInfoAudits)){
+            return AjaxResponse.success(new PageDTO(pageNum,pageSize,count,busDriverInfoAudits));
+        }
+        //补充展示字段
+        //城市
+        Set<Integer>cityIds=new HashSet<>();
+        Set<Integer>supplierIds=new HashSet<>();
+        Set<Integer> grouIds=new HashSet<>();
+        busDriverInfoAudits.forEach(busDriver->{
+            if(busDriver.getServiceCity()!=null){cityIds.add(busDriver.getServiceCity());}
+            if(busDriver.getSupplierId()!=null){supplierIds.add(busDriver.getSupplierId());}
+            if(busDriver.getGroupId()!=null){grouIds.add(busDriver.getGroupId());}
+        });
+        List<CarBizCity> carBizCities = carBizCityExMapper.queryNameByIds(cityIds);
+        Map<Integer, CarBizCity> cityMap = carBizCities.stream().collect(Collectors.toMap(CarBizCity::getCityId, (o -> o)));
+        List<CarBizSupplier> carBizSuppliers = carBizSupplierExMapper.findByIdSet(supplierIds);
+        Map<Integer, CarBizSupplier> supplierMap = carBizSuppliers.stream().collect(Collectors.toMap(CarBizSupplier::getSupplierId, (sup -> sup)));
+
+        List<CarBizCarGroup> groups = carBizCarGroupExMapper.queryCarGroupByIdSet(grouIds);
+        Map<Integer, CarBizCarGroup> groupMap = groups.stream().collect(Collectors.toMap(CarBizCarGroup::getGroupId, (gop -> gop)));
+
+        //补充字段
+        List<BusDriverInfoPageVO> result=new ArrayList<>();
+        busDriverInfoAudits.forEach(busDriver->{
+            BusDriverInfoPageVO busDriverInfoVO = new BusDriverInfoPageVO();
+            BeanUtils.copyProperties(busDriver,busDriverInfoVO);
+            CarBizCity carBizCity = cityMap.get(busDriver.getServiceCity());
+            if(carBizCity!=null){busDriverInfoVO.setCityName(carBizCity.getCityName());}
+            CarBizSupplier carBizSupplier = supplierMap.get(busDriver.getSupplierId());
+            if(carBizCities!=null){busDriverInfoVO.setSupplierName(carBizSupplier.getSupplierFullName());}
+            CarBizCarGroup group = groupMap.get(busDriver.getGroupId());
+            if(group!=null){busDriverInfoVO.setGroupName(group.getGroupName());}
+            result.add(busDriverInfoVO);
+        });
+        return AjaxResponse.success(new PageDTO(pageNum,pageSize,count,result));
+    }
+
+    public AjaxResponse checkMongoInfo(BusDriverSaveDTO saveDTO) {
+        String id = saveDTO.getId();
+        Integer driverId = saveDTO.getDriverId();
+        String phone = saveDTO.getPhone();
+        String idCardNo = saveDTO.getIdCardNo();
+        Boolean had =this.checkMongoPhone(driverId,phone,id);
+        if (had) {
+            return AjaxResponse.fail(RestErrorCode.DRIVER_PHONE_EXIST);
+        }
+        had = this.checkMongoIdCardMo(driverId,idCardNo,id);
+        if (had) {
+            return AjaxResponse.fail(RestErrorCode.DRIVER_IDCARNO_EXIST);
+        }
+        return AjaxResponse.success(true);
+    }
+
+    /**
+     * 校验mongo中审核司机是否存在该身份证号司机
+     * @param driverId
+     * @param idCardNo
+     * @return
+     */
+    private Boolean checkMongoIdCardMo(Integer driverId, String idCardNo,String id) {
+        Query query = new Query();
+        //未审核司机
+        query.addCriteria(Criteria.where("auditStatus").is(0));
+        //有效司机
+        query.addCriteria(Criteria.where("status").is(1));
+        query.addCriteria(Criteria.where("idCardNo").is(idCardNo));
+        if(driverId != null){
+            query.addCriteria(Criteria.where("driverId").nin(driverId));
+        }
+        if(StringUtils.isNotBlank(id)){
+            query.addCriteria(Criteria.where("_id").nin(id));
+        }
+        List<BusDriverInfoAudit> busDriverInfoAudits = driverMongoTemplate.find(query, BusDriverInfoAudit.class);
+        if(CollectionUtils.isNotEmpty(busDriverInfoAudits)){
+            return true;
+        }
+        return  false;
+    }
+
+    /**
+     * 校验mongo中审核司机是否存在该手机号司机
+     * @param driverId
+     * @param phone
+     * @return
+     */
+    private Boolean checkMongoPhone(Integer driverId, String phone,String id) {
+        Query query = new Query();
+        //未审核司机
+        query.addCriteria(Criteria.where("auditStatus").is(0));
+        //有效司机
+        query.addCriteria(Criteria.where("status").is(1));
+        query.addCriteria(Criteria.where("phone").is(phone));
+        if(driverId != null){
+            query.addCriteria(Criteria.where("driverId").nin(driverId));
+        }
+        if(StringUtils.isNotBlank(id)){
+            query.addCriteria(Criteria.where("_id").nin(id));
+        }
+        List<BusDriverInfoAudit> busDriverInfoAudits = driverMongoTemplate.find(query, BusDriverInfoAudit.class);
+        if(CollectionUtils.isNotEmpty(busDriverInfoAudits)){
+            return true;
+        }
+        return  false;
+    }
+
+    /**
+     * 新增司机到审核列表
+     * @param saveDTO
+     * @return
+     */
+    public AjaxResponse saveAuditDriverToMongo(BusDriverSaveDTO saveDTO) {
+        logger.info("操作方式：新建,审核Mongo数据:" + JSON.toJSONString(saveDTO));
+
+        try {
+            saveDTO.setStatus(1);
+            // 身份证号
+            String idCardNo = saveDTO.getIdCardNo();
+            if ("X".equals(idCardNo.substring(idCardNo.length() - 1, idCardNo.length()))) {
+                idCardNo = idCardNo.toLowerCase();
+            }
+            saveDTO.setIdCardNo(idCardNo);
+            // 机动车驾驶证号
+            if (StringUtils.isBlank(saveDTO.getDriverlicensenumber())) {
+                saveDTO.setDriverlicensenumber(idCardNo);
+            }
+            BusDriverInfoAudit busDriverInfoAudit = BeanUtil.copyObject(saveDTO, BusDriverInfoAudit.class);
+            busDriverInfoAudit.setCreateDate(new Date());
+            busDriverInfoAudit.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
+            busDriverInfoAudit.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
+            busDriverInfoAudit.setUpdateDate(new Date());
+            //审核状态 未审核
+            busDriverInfoAudit.setAuditStatus(0);
+            //来源 创建
+            busDriverInfoAudit.setStemFrom(0);
+
+            driverMongoTemplate.insert(busDriverInfoAudit);
+
+            return AjaxResponse.success(null);
+        } catch (Exception e) {
+            logger.error("新增审核司机信息异常,error={}", e.getMessage(), e);
+            return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, "保存审核司机信息异常");
+        }
+    }
+
+    /**
+     * 新增修改司机到审核列表
+     * @param saveDTO
+     * @return
+     */
+    public AjaxResponse saveUpdateAuditDriverToMongo(BusDriverSaveDTO saveDTO) {
+        logger.info("操作方式：编辑,审核Mongo新数据:" + JSON.toJSONString(saveDTO));
+        try {
+            String idCardNo = saveDTO.getIdCardNo();
+            if ("X".equals(idCardNo.substring(idCardNo.length() - 1, idCardNo.length()))) {
+                idCardNo = idCardNo.toLowerCase();
+            }
+            saveDTO.setIdCardNo(idCardNo);
+            // 机动车驾驶证号
+            if (StringUtils.isBlank(saveDTO.getDriverlicensenumber())) {
+                saveDTO.setDriverlicensenumber(idCardNo);
+            }
+            BusDriverInfoAudit busDriverInfoAudit = BeanUtil.copyObject(saveDTO, BusDriverInfoAudit.class);
+            busDriverInfoAudit.setCreateDate(new Date());
+            busDriverInfoAudit.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
+            busDriverInfoAudit.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
+            busDriverInfoAudit.setUpdateDate(new Date());
+            //审核状态 未审核
+            busDriverInfoAudit.setAuditStatus(0);
+            //来源 修改
+            busDriverInfoAudit.setStemFrom(1);
+
+            driverMongoTemplate.insert(busDriverInfoAudit);
+
+            return AjaxResponse.success(null);
+        }catch (Exception e) {
+        logger.error("新增修改审核司机信息异常,error={}", e.getMessage(), e);
+        return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, "保存审核司机修改信息异常");
+        }
+
+
+    }
+
+    /**
+     * 审核列表司机修改
+     * @param saveDTO
+     * @return
+     */
+    public AjaxResponse updateAuditDriverToMongo(BusDriverSaveDTO saveDTO) {
+        logger.info("操作方式：编辑,审核Mongo修改数据:" + JSON.toJSONString(saveDTO));
+        try {
+            String idCardNo = saveDTO.getIdCardNo();
+            if ("X".equals(idCardNo.substring(idCardNo.length() - 1, idCardNo.length()))) {
+                idCardNo = idCardNo.toLowerCase();
+            }
+            saveDTO.setIdCardNo(idCardNo);
+            // 机动车驾驶证号
+            if (StringUtils.isBlank(saveDTO.getDriverlicensenumber())) {
+                saveDTO.setDriverlicensenumber(idCardNo);
+            }
+            Query query = Query.query(Criteria.where("_id").is(saveDTO.getId()));
+            BusDriverInfoAudit busDriverInfoAudit = driverMongoTemplate.findById(saveDTO.getId(),BusDriverInfoAudit.class);
+            if(busDriverInfoAudit != null){
+                Update update = new Update();
+                BeanUtils.copyProperties(saveDTO,busDriverInfoAudit);
+                busDriverInfoAudit.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
+                busDriverInfoAudit.setUpdateDate(new Date());
+
+                BeanWrapper beanWrapper = new BeanWrapperImpl(busDriverInfoAudit);
+                Field[] fields = busDriverInfoAudit.getClass().getDeclaredFields();
+                String name = null;
+                for (Field field : fields) {
+                    name = field.getName();
+                    if("serialVersionUID".equalsIgnoreCase(name)){
+                        continue;
+                    }
+                    if (null != beanWrapper.getPropertyValue(name)) {
+                        update.set(name, beanWrapper.getPropertyValue(name));
+                    }
+
+                }
+                driverMongoTemplate.updateFirst(query, update, BusDriverInfoAudit.class);
+                return AjaxResponse.success(null);
+            }else{
+                return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, "审核列表司机修改信息异常");
+            }
+        }catch (Exception e) {
+            logger.error("新增修改审核司机信息异常,error={}", e.getMessage(), e);
+            return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, "保存审核列表司机修改信息异常");
+        }
+    }
+
+    /**
+     * 审核列表司机审核
+     * @param ids
+     * @return
+     */
+    public AjaxResponse auditDriver(String ids) {
+        logger.info("操作方式：审核,审核司机:" + JSON.toJSONString(ids));
+        try{
+            String[] idArray = ids.split(",");
+            List<String> idList = Arrays.asList(idArray);
+            if(CollectionUtils.isEmpty(idList)){
+                return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "审核司机参数为空");
+            }
+            for (String id: idList) {
+                BusDriverInfoAudit busDriverInfoAudit = driverMongoTemplate.findById(id,BusDriverInfoAudit.class);
+                BusDriverSaveDTO saveDTO = BeanUtil.copyObject(busDriverInfoAudit, BusDriverSaveDTO.class);
+                this.completeInfo(saveDTO);
+                //修改审核表审核状态，审核人，审核时间
+                Query query = Query.query(Criteria.where("_id").is(id));
+                Update update = new Update();
+                update.set("auditStatus", 1);
+                update.set("auditor", WebSessionUtil.getCurrentLoginUser().getId());
+                update.set("auditDate", new Date());
+                AjaxResponse saveResult = AjaxResponse.success(null);
+                //写库操作
+                if(busDriverInfoAudit.getStemFrom() == 0){
+                    //新增司机审核通过审核
+                    saveDTO.setCreateBy(busDriverInfoAudit.getCreateBy());
+                    saveDTO.setCreateDate(busDriverInfoAudit.getCreateDate());
+                    saveDTO.setUpdateBy(busDriverInfoAudit.getUpdateBy());
+                    saveDTO.setUpdateDate(busDriverInfoAudit.getUpdateDate());
+                    this.saveDriver(saveDTO);
+                }else{
+                    //修改司机审核通过
+                    BusDriverDetailInfoVO data = this.findDriverInfoByDriverId(saveDTO.getDriverId());
+                    saveDTO.setCreateBy(null);
+                    saveDTO.setCreateDate(null);
+                    saveDTO.setUpdateBy(busDriverInfoAudit.getUpdateBy());
+                    saveDTO.setUpdateDate(busDriverInfoAudit.getUpdateDate());
+                    this.updateDriver(saveDTO);
+                    //插入修改记录
+                    this.saveUpdateLog(data,saveDTO.getDriverId());
+                }
+                //修改审核状态
+                WriteResult writeResult = driverMongoTemplate.updateFirst(query, update, BusDriverInfoAudit.class);
+                //插入审核记录
+                StringBuffer log = new StringBuffer();
+                log.append("司机审核通过：");
+                log.append("审核人id："+WebSessionUtil.getCurrentLoginUser().getId()+",");
+                log.append("审核人姓名：" +WebSessionUtil.getCurrentLoginUser().getLoginName()+",");
+                log.append("审核日期：" + new Date());
+                busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(saveDTO.getDriverId()),"司机审核通过："+log.toString(), new Date());
+            }
+            return AjaxResponse.success(null);
+        }catch (Exception e){
+            logger.error("审核司机异常,error={}", e.getMessage(), e);
+            return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, "审核司机异常");
+        }
+    }
+
+    /**
+     * 插入修改司机记录
+     * @param driverInfo
+     * @param driverId
+     */
+    public void saveUpdateLog(BusDriverDetailInfoVO driverInfo, Integer driverId) {
+        try {
+            BusDriverCompareEntity oldDriver = new BusDriverCompareEntity();
+            BeanUtils.copyProperties(driverInfo,oldDriver);
+            oldDriver.setStatus(driverInfo.getStatus()==1?"有效":"无效");
+            oldDriver.setGender(driverInfo.getGender()==0?"女":"男");
+            String oldLicenseType = this.getDrivingLicenseType(driverInfo.getDrivingLicenseType());
+            oldDriver.setDrivingLicenseType(oldLicenseType);
+            BusDriverCompareEntity newDriver=new BusDriverCompareEntity();
+            //查询最新的信息
+            BusDriverDetailInfoVO carBizDriverInfo  = findDriverInfoByDriverId(driverId);
+            BeanUtils.copyProperties(carBizDriverInfo,newDriver);
+            newDriver.setStatus(carBizDriverInfo.getStatus()==1?"有效":"无效");
+            newDriver.setGender(carBizDriverInfo.getGender()==0?"女":"男");
+            String newLicenseType = this.getDrivingLicenseType(carBizDriverInfo.getDrivingLicenseType());
+            newDriver.setDrivingLicenseType(newLicenseType);
+            List<Object> objects = CompareObjectUtils.contrastObj(oldDriver, newDriver, null);
+            if(objects.size()!=0){
+                String join = StringUtils.join(objects, ",");
+                busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId),join, new Date());
+            }
+        } catch (BeansException e) {
+            logger.error("[ BusDriverInfoController-saveUpdateLog ] 保存操作日志异常", e);
+        }
+    }
+
+    /**
+     * 查询司机信息
+     * @param driverId
+     * @return
+     */
+    private BusDriverDetailInfoVO findDriverInfoByDriverId(Integer driverId) {
+        CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(driverId);
+        if (carBizDriverInfo == null) {
+            return null;
+        }
+        BusDriverDetailInfoVO busDriverDetailInfoVO = BeanUtil.copyObject(carBizDriverInfo, BusDriverDetailInfoVO.class);
+        // 查询司机银行卡信息
+        CarBizDriverInfoDetailDTO carBizDriverInfoDetailDTO = carBizDriverInfoDetailService.selectByDriverId(driverId);
+        if (carBizDriverInfoDetailDTO != null) {
+            busDriverDetailInfoVO.setBankCardNumber(carBizDriverInfoDetailDTO.getBankCardNumber());
+            busDriverDetailInfoVO.setBankCardBank(carBizDriverInfoDetailDTO.getBankCardBank());
+        }
+        // 查询城市名称，供应商名称，服务类型，加盟类型
+        getBaseStatis(busDriverDetailInfoVO);
+        return busDriverDetailInfoVO;
+    }
+
+    /**
+     * 根据物理主键查询审核司机详情
+     * @param id
+     * @return
+     */
+    public BusDriverInfoAudit findAuditDriverInfoById( String id) {
+
+        BusDriverInfoAudit busDriverInfoAudit = driverMongoTemplate.findById(id,BusDriverInfoAudit.class);
+        return busDriverInfoAudit;
+    }
+
+    /**
+     * 校验司机是否有服务中订单
+     * @param driverId
+     * @return
+     */
+    public boolean isInService(Integer driverId){
+        //默认在服务中不能修改
+        boolean result= true;
+        Map<String,Object>param = new HashMap(2);
+        param.put("driverId",driverId);
+        param.put("businessId", Common.BUSINESSID);
+        String sign = SignUtils.createMD5Sign(param, Common.KEY);
+        param.put("sign",sign);
+        String url = order_url+ BusConst.Order.GET_SERVICE_ORDER;
+        String response = MpOkHttpUtil.okHttpPost(url, param, 3, "判断司机是否在服务中");
+        logger.info("判断司机是否在服务中："+response);
+        if(response!=null){
+            JSONObject res = JSONObject.parseObject(response);
+            if(res.getInteger("code")!=null&&res.getInteger("code")==0){
+                JSONObject data = res.getJSONObject("data");
+                Integer orderCount = data.getInteger("orderCount");
+                if(orderCount>0){
+                    result=true;
+                }else{
+                    result=false;
+                }
+            }
+        }
+        return result;
+    }
+
+    private String getDrivingLicenseType(String drivingLicenseType){
+        String value="";
+        switch (drivingLicenseType) {
+            case "1":
+                value = "A1";
+                break;
+            case "2":
+                value = "A2";
+                break;
+            case "3":
+                value = "B1";
+                break;
+            case "4":
+                value = "B2";
+                break;
+            case "5":
+                value = "C1";
+                break;
+            case "6":
+                value = "C2";
+                break;
+            default:
+                value = drivingLicenseType;
+                break;
+        }
+        return value;
     }
 }

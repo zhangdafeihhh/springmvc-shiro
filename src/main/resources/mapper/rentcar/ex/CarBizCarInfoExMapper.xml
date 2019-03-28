@@ -171,7 +171,7 @@
 		(g.type = 2 or gop.type = 2) AND
 		car_id != 0
 		<if test="licensePlates != null and licensePlates != ''">
-			and c.license_plates LIKE CONCAT(#{licensePlates},'%')
+			and c.license_plates LIKE CONCAT('%',#{licensePlates},'%')
 		</if>
 		<if test="invalidLicensePlatesList != null and !invalidLicensePlatesList.isEmpty()">
 			and c.license_plates not in

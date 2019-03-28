@@ -1,8 +1,8 @@
 package com.zhuanche.vo.busManage;
 
-import java.util.Date;
-
 import com.alibaba.fastjson.annotation.JSONField;
+
+import java.util.Date;
 
 /**
  * @ClassName: BusDriverInfoPageVO
@@ -13,6 +13,8 @@ import com.alibaba.fastjson.annotation.JSONField;
  */
 public class BusDriverInfoPageVO {
 
+	/**物理主键*/
+	private String id;
 	/** 司机ID **/
 	private Integer driverId;
 
@@ -57,6 +59,14 @@ public class BusDriverInfoPageVO {
 
 	/** 司机状态 **/
 	private Integer status;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public Integer getDriverId() {
 		return driverId;

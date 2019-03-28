@@ -7,6 +7,7 @@ public class BusDriverDetailInfoVO implements Serializable {
 
 	private static final long serialVersionUID = 3499280025355834858L;
 
+	private String id;
 	/** 司机ID **/
 	private Integer driverId;
 
