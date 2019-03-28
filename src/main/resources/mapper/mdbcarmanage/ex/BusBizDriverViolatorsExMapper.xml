@@ -31,19 +31,31 @@
   <sql id="queryViolatorsWhereSql">
     1=1
     <if test="busDriverName != null" >
-      AND bus_driver_name = #{busDriverName,jdbcType=VARCHAR},
+      AND bus_driver_name like '${busDriverName}%'
     </if>
     <if test="busDriverPhone != null" >
-      AND bus_driver_phone = #{busDriverPhone,jdbcType=VARCHAR},
+      AND bus_driver_phone like '${busDriverPhone}%'
     </if>
     <if test="cityId != null" >
-      AND city_id = #{cityId,jdbcType=INTEGER},
+      AND city_id = #{cityId,jdbcType=INTEGER}
     </if>
     <if test="supplierId != null" >
-      AND supplier_id = #{supplierId,jdbcType=INTEGER},
+      AND supplier_id = #{supplierId,jdbcType=INTEGER}
     </if>
     <if test="punishStatus != null" >
-      AND punish_status = #{punishStatus,jdbcType=SMALLINT},
+      AND punish_status = #{punishStatus}
+    </if>
+    <if test="authOfCity != null and authOfCity.size() > 0">
+      AND city_id IN
+      <foreach collection="authOfCity" open="(" close=")" separator="," item="item">
+        #{item}
+      </foreach>
+    </if>
+    <if test="authOfSupplier != null and authOfSupplier.size() > 0">
+      AND supplier_id IN
+      <foreach collection="authOfSupplier" open="(" close=")" separator="," item="item">
+        #{item}
+      </foreach>
     </if>
   </sql>
   <select id="selectDriverViolatorsByQueryDTO" resultMap="BaseResultMap" parameterType="com.zhuanche.dto.busManage.BusDriverViolatorsQueryDTO" >

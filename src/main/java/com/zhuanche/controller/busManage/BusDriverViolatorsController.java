@@ -1,9 +1,11 @@
 package com.zhuanche.controller.busManage;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.Page;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 
@@ -17,6 +19,7 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.vo.busManage.BusBizDriverViolatorsVO;
 import com.zhuanche.vo.busManage.BusDriverDetailInfoVO;
+import com.zhuanche.vo.busManage.BusDriverInfoPageVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +62,9 @@ public class BusDriverViolatorsController extends BusBaseController {
 			if(level==2){queryDTO.setAuthOfCity(user.getCityIds());}
 			if(level>=4){queryDTO.setAuthOfSupplier(user.getSupplierIds());}
 			List<BusBizDriverViolatorsVO> violatorsList = busCarViolatorsService.queryDriverViolatorsList(queryDTO);
-			return AjaxResponse.success(violatorsList);
+			Page<BusBizDriverViolatorsVO> page = (Page<BusBizDriverViolatorsVO>) violatorsList;
+			PageDTO pageDTO = new PageDTO(page.getPageNum(), page.getPageSize(), page.getTotal(), violatorsList);
+			return AjaxResponse.success(pageDTO);
 		}catch (Exception e){
 			logger.error("【获取违规司机处理列表】 error:",e);
 			return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, "获取违规司机处理列表程序异常");
