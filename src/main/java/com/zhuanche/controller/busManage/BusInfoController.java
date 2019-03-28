@@ -136,7 +136,7 @@ public class BusInfoController {
         }
     }
 
-    @RequestMapping("/audit")
+    @RequestMapping("/auditCar")
 
     public AjaxResponse audit(@Verify(param="ids",rule="required")  String ids){
         logger.info(LOG_PRE + " 审核车辆信息，参数：" + ids );
