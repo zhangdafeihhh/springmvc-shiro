@@ -93,4 +93,12 @@ public class BusCarViolatorsService implements BusConst {
         return violator;
     }
 
+    @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER))
+    public int recoverDriverStatus(Integer id){
+        return busBizDriverViolatorsExMapper.recoverDriverStatus(id);
+    }
+    @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE))
+    public BusBizDriverViolators selectByPrimaryKey(Integer id){
+        return  busBizDriverViolatorsMapper.selectByPrimaryKey(id);
+    }
 }
