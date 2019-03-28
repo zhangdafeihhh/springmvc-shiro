@@ -27,7 +27,9 @@ public interface BusBizChangeLogExMapper {
 		/** 司机 **/
 		DRIVER(200, "driverId"),
 		/** 车辆 **/
-		CAR(300, "carId");
+		CAR(300, "carId"),
+		/** 巴士违规处罚 **/
+		BUS_PUNISH(400, "violatorId");
 
 		/** 业务类型 **/
 		private Integer businessType;

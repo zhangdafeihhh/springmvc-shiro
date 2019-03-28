@@ -1,6 +1,7 @@
 package mapper.mdbcarmanage.ex;
 
 import com.zhuanche.dto.busManage.BusDriverViolatorsQueryDTO;
+import com.zhuanche.entity.mdbcarmanage.BusBizDriverViolators;
 import com.zhuanche.vo.busManage.BusBizDriverViolatorsVO;
 import org.apache.ibatis.annotations.Param;
 
@@ -15,4 +16,7 @@ public interface BusBizDriverViolatorsExMapper {
      * 将司机恢复正常状态
      */
     int recoverDriverStatus(@Param("id") Integer id);
+
+    Integer insertSelective(BusBizDriverViolators busBizDriverViolators);
+
 }

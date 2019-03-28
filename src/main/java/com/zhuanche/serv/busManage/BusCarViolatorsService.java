@@ -57,16 +57,16 @@ public class BusCarViolatorsService implements BusConst {
         return busBizDriverViolatorsExMapper.selectDriverViolatorsByQueryDTO(queryDTO);
     }
 
-    public boolean insertDriverViolator(BusDriverViolatorsSaveDTO saveDTO, BusDriverDetailInfoVO driverInfo){
+    public Integer insertDriverViolator(BusDriverViolatorsSaveDTO saveDTO, BusDriverDetailInfoVO driverInfo){
         try{
             BusBizDriverViolators violator=convertViolatorsBean(saveDTO,driverInfo);
             DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource", DynamicRoutingDataSource.DataSourceMode.MASTER);
-            Integer count=busBizDriverViolatorsMapper.insertSelective(violator);
-            return count==1;
+            busBizDriverViolatorsExMapper.insertSelective(violator);
+            return violator.getId();
         }catch (Exception e){
             e.printStackTrace();
             logger.error("【新增违规巴士司机】程序异常",e);
-            return false;
+            return null;
         }
     }
 
@@ -85,7 +85,8 @@ public class BusCarViolatorsService implements BusConst {
         Double evaluateScore=appraisalStatisticsExMapper.queryAvgAppraisal(driverInfo.getDriverId());
         violator.setEvaluateScore(String.valueOf(evaluateScore==null?0:evaluateScore));
         violator.setIdNumber(driverInfo.getIdCardNo());
-        violator.setPunishStatus(saveDTO.getPunishStatus()==null?(short)1:Short.parseShort(String.valueOf(saveDTO.getPunishStatus())));//默认1停运，暂不支持冻结
+        violator.setPunishStatus((short)0);
+        violator.setPunishType(saveDTO.getPunishType());
         violator.setPunishReason(saveDTO.getPunishReason());
         violator.setPunishDuration(saveDTO.getPunishDuration());
         violator.setPunishStartTime(saveDTO.getPunishStartTime());

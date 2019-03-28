@@ -98,8 +98,9 @@ public class BusDriverViolatorsController extends BusBaseController {
 				logger.info("【新增违规司机处罚】要新增违规处罚的巴士司机所属供应商不在当前登陆用户权限所包含的供应商范围内");
 				return AjaxResponse.failMsg(RestErrorCode.BUS_SUPPLIER_AUTH_FORBIDDEN, "要新增违规处罚的巴士司机所属供应商不在当前登陆用户权限所包含的供应商范围内，没有违规处罚权限");
 			}
-			boolean servRes=busCarViolatorsService.insertDriverViolator(saveDTO,driverInfo);
-			if(servRes){
+			Integer id=busCarViolatorsService.insertDriverViolator(saveDTO,driverInfo);
+			if(id!=null){
+				busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.BUS_PUNISH, String.valueOf(id), "创建处罚信息", new Date());
 				return AjaxResponse.success(1);
 			}else{
 				return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, "新增违规巴士司机违规处罚记录失败");
@@ -162,7 +163,7 @@ public class BusDriverViolatorsController extends BusBaseController {
 			//原始状态
 			Short punishStatus = violators.getPunishStatus();
 			String des = punishStatus == 1 ? "解除停运" : punishStatus == 2 ? "解除冻结" : "";
-			busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.DRIVER, String.valueOf(driverId), des, new Date());
+			busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.BUS_PUNISH, String.valueOf(violators.getId()), des, new Date());
 			return AjaxResponse.success(null);
 		} catch (Exception e) {
 			logger.error("【将违约司机恢复正常状态】参数：id=" + id + " 操作人：" + currentLoginUser.getName() + " 修改异常：e:{}", e);

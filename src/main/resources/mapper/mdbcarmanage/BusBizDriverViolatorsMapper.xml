@@ -14,19 +14,19 @@
     <result column="group_name" property="groupName" jdbcType="VARCHAR" />
     <result column="evaluate_score" property="evaluateScore" jdbcType="VARCHAR" />
     <result column="id_number" property="idNumber" jdbcType="VARCHAR" />
-    <result column="punish_status" property="punishStatus" jdbcType="SMALLINT" />
+    <result column="punish_type" property="punishType" jdbcType="SMALLINT" />
     <result column="punish_reason" property="punishReason" jdbcType="VARCHAR" />
     <result column="punish_duration" property="punishDuration" jdbcType="INTEGER" />
     <result column="punish_start_time" property="punishStartTime" jdbcType="TIMESTAMP" />
     <result column="punish_end_time" property="punishEndTime" jdbcType="TIMESTAMP" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
-    <result column="status" property="status" jdbcType="SMALLINT" />
+    <result column="punish_status" property="punishStatus" jdbcType="SMALLINT" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, bus_driver_id, bus_driver_name, bus_driver_phone, city_id, city_name, supplier_id, 
-    supplier_name, group_id, group_name, evaluate_score, id_number, punish_status, punish_reason, 
-    punish_duration, punish_start_time, punish_end_time, create_time, update_time, status
+    supplier_name, group_id, group_name, evaluate_score, id_number, punish_type, punish_reason, 
+    punish_duration, punish_start_time, punish_end_time, create_time, update_time, punish_status
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -41,17 +41,17 @@
     insert into bus_biz_driver_violators (bus_driver_id, bus_driver_name, bus_driver_phone, 
       city_id, city_name, supplier_id, 
       supplier_name, group_id, group_name, 
-      evaluate_score, id_number, punish_status, 
+      evaluate_score, id_number, punish_type, 
       punish_reason, punish_duration, punish_start_time, 
       punish_end_time, create_time, update_time, 
-      status)
+      punish_status)
     values (#{busDriverId,jdbcType=INTEGER}, #{busDriverName,jdbcType=VARCHAR}, #{busDriverPhone,jdbcType=VARCHAR}, 
       #{cityId,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR}, #{supplierId,jdbcType=INTEGER}, 
       #{supplierName,jdbcType=VARCHAR}, #{groupId,jdbcType=INTEGER}, #{groupName,jdbcType=VARCHAR}, 
-      #{evaluateScore,jdbcType=VARCHAR}, #{idNumber,jdbcType=VARCHAR}, #{punishStatus,jdbcType=SMALLINT}, 
+      #{evaluateScore,jdbcType=VARCHAR}, #{idNumber,jdbcType=VARCHAR}, #{punishType,jdbcType=SMALLINT}, 
       #{punishReason,jdbcType=VARCHAR}, #{punishDuration,jdbcType=INTEGER}, #{punishStartTime,jdbcType=TIMESTAMP}, 
       #{punishEndTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{status,jdbcType=SMALLINT})
+      #{punishStatus,jdbcType=SMALLINT})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.BusBizDriverViolators" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
@@ -92,8 +92,8 @@
       <if test="idNumber != null" >
         id_number,
       </if>
-      <if test="punishStatus != null" >
-        punish_status,
+      <if test="punishType != null" >
+        punish_type,
       </if>
       <if test="punishReason != null" >
         punish_reason,
@@ -113,8 +113,8 @@
       <if test="updateTime != null" >
         update_time,
       </if>
-      <if test="status != null" >
-        status,
+      <if test="punishStatus != null" >
+        punish_status,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -151,8 +151,8 @@
       <if test="idNumber != null" >
         #{idNumber,jdbcType=VARCHAR},
       </if>
-      <if test="punishStatus != null" >
-        #{punishStatus,jdbcType=SMALLINT},
+      <if test="punishType != null" >
+        #{punishType,jdbcType=SMALLINT},
       </if>
       <if test="punishReason != null" >
         #{punishReason,jdbcType=VARCHAR},
@@ -172,8 +172,8 @@
       <if test="updateTime != null" >
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="status != null" >
-        #{status,jdbcType=SMALLINT},
+      <if test="punishStatus != null" >
+        #{punishStatus,jdbcType=SMALLINT},
       </if>
     </trim>
   </insert>
@@ -213,8 +213,8 @@
       <if test="idNumber != null" >
         id_number = #{idNumber,jdbcType=VARCHAR},
       </if>
-      <if test="punishStatus != null" >
-        punish_status = #{punishStatus,jdbcType=SMALLINT},
+      <if test="punishType != null" >
+        punish_type = #{punishType,jdbcType=SMALLINT},
       </if>
       <if test="punishReason != null" >
         punish_reason = #{punishReason,jdbcType=VARCHAR},
@@ -234,8 +234,8 @@
       <if test="updateTime != null" >
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="status != null" >
-        status = #{status,jdbcType=SMALLINT},
+      <if test="punishStatus != null" >
+        punish_status = #{punishStatus,jdbcType=SMALLINT},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -253,14 +253,14 @@
       group_name = #{groupName,jdbcType=VARCHAR},
       evaluate_score = #{evaluateScore,jdbcType=VARCHAR},
       id_number = #{idNumber,jdbcType=VARCHAR},
-      punish_status = #{punishStatus,jdbcType=SMALLINT},
+      punish_type = #{punishType,jdbcType=SMALLINT},
       punish_reason = #{punishReason,jdbcType=VARCHAR},
       punish_duration = #{punishDuration,jdbcType=INTEGER},
       punish_start_time = #{punishStartTime,jdbcType=TIMESTAMP},
       punish_end_time = #{punishEndTime,jdbcType=TIMESTAMP},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      status = #{status,jdbcType=SMALLINT}
+      punish_status = #{punishStatus,jdbcType=SMALLINT}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

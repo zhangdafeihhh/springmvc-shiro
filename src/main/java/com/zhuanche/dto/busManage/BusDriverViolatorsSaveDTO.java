@@ -14,6 +14,7 @@ import java.util.Date;
 @Data
 public class BusDriverViolatorsSaveDTO extends BusBaseStatisDTO {
 
+
 	/** 手机号 **/
 	@NotBlank(message = "司机手机号不能为空")
 	@Length(min = 11, max = 11, message = "司机手机号必须为11位")
@@ -40,5 +41,5 @@ public class BusDriverViolatorsSaveDTO extends BusBaseStatisDTO {
 
 	/** 处罚状态非必填[1.停运 2.冻结] **/
 	@InArray(values = { "1" }, message = "处罚状态不在有效范围内[1.停运]")
-	private Integer punishStatus;
+	private short punishType;
 }
