@@ -759,11 +759,15 @@
 		driver.name,
 		driver.phone,
 		driver.service_city as cityId,
+		city.city_name as cityName,
+		driver.group_id as groupId,
+		g.group_name as groupName,
 		sup.supplier_full_name supplierName,
-		driver.supplier_id AS supplierId
+		driver.supplier_id AS supplierId,
+		driver.id_card_no as idCardNo
 		FROM
 		car_biz_driver_info driver
-		LEFT JOIN car_biz_supplier sup ON driver.supplier_id = sup.supplier_id
-		where driver.phone=#{busDriverPhone}
+		LEFT JOIN car_biz_supplier sup  ON driver.supplier_id = sup.supplier_id LEFT JOIN car_biz_city city on driver.service_city=city.city_id LEFT JOIN car_biz_car_group g on driver.group_id=g.group_id
+		where  sup.supplier_type=1 and driver.phone=#{busDriverPhone}
 	</select>
 </mapper>

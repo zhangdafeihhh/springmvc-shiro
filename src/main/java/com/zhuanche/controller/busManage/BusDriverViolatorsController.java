@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotNull;
@@ -47,7 +48,7 @@ public class BusDriverViolatorsController extends BusBaseController {
 	@Autowired
 	private BusCarViolatorsService busCarViolatorsService;
 
-	@RequestMapping(value = "/queryList.json")
+	@RequestMapping(value = "/queryList.json",method = RequestMethod.GET)
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE))
 	public AjaxResponse queryList(@Validated BusDriverViolatorsQueryDTO queryDTO) {
 		logger.info("【获取违规司机处理列表】start...params:queryDTO="+JSON.toJSONString(queryDTO));
@@ -65,22 +66,52 @@ public class BusDriverViolatorsController extends BusBaseController {
 		}
 	}
 
-	@RequestMapping(value = "/saveViolateDriver.json")
-	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE))
+	/**
+	 * @desc 新增违规司机处罚
+	 * @wiki http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=31809270
+	 * @param saveDTO
+	 * @return
+	 */
+	@RequestMapping(value = "/saveViolateDriver.json",method = RequestMethod.POST)
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public AjaxResponse saveViolateDriver(@Validated BusDriverViolatorsSaveDTO saveDTO) {
-		logger.info("【新增违规司机】start...params:saveDTO="+JSON.toJSONString(saveDTO));
+		logger.info("【新增违规司机处罚】start...params:saveDTO="+JSON.toJSONString(saveDTO));
 		try{
-			SSOLoginUser user=WebSessionUtil.getCurrentLoginUser();
-			logger.info("【新增违规司机】当前登录人信息={}", JSON.toJSONString(user));
-			Integer level=user.getLevel();//此用户数据权限等级(巴士包含 1全国 2城市 4供应商)
-			return AjaxResponse.success(1);
+			SSOLoginUser loginUser=WebSessionUtil.getCurrentLoginUser();
+			logger.info("【新增违规司机处罚】当前登录人信息={}", JSON.toJSONString(loginUser));
+			Integer level=loginUser.getLevel();//此用户数据权限等级(巴士包含 1全国 2城市 4供应商)
+			String busDriverPhone=saveDTO.getBusDriverPhone();
+			BusDriverDetailInfoVO driverInfo=busCarBizDriverInfoService.selectByBusDriverPhone(String.valueOf(busDriverPhone));
+			if(driverInfo==null){
+				return AjaxResponse.failMsg(RestErrorCode.DRIVER_NOT_EXIST, "巴士司机不存在");
+			}
+			if(level==2&&!loginUser.getCityIds().contains(driverInfo.getCityId())){
+				logger.info("【新增违规司机处罚】要新增违规处罚的巴士司机所属城市不在当前登陆用户权限[城市权限]所包含的城市范围内，没有违规处罚权限");
+				return AjaxResponse.failMsg(RestErrorCode.BUS_CITY_AUTH_FORBIDDEN, "要新增违规处罚的巴士司机所属城市不在当前登陆用户权限所包含的城市范围内，没有违规处罚权限");
+			}
+			if((level>=4)&&!loginUser.getSupplierIds().contains(driverInfo.getSupplierId())){
+				logger.info("【新增违规司机处罚】要新增违规处罚的巴士司机所属供应商不在当前登陆用户权限所包含的供应商范围内");
+				return AjaxResponse.failMsg(RestErrorCode.BUS_SUPPLIER_AUTH_FORBIDDEN, "要新增违规处罚的巴士司机所属供应商不在当前登陆用户权限所包含的供应商范围内，没有违规处罚权限");
+			}
+			boolean servRes=busCarViolatorsService.insertDriverViolator(saveDTO,driverInfo);
+			if(servRes){
+				return AjaxResponse.success(1);
+			}else{
+				return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, "新增违规巴士司机违规处罚记录失败");
+			}
 		}catch (Exception e){
-			logger.error("【新增违规司机】 error:",e);
-			return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, "新增违规司机程序异常");
+			logger.error("【新增违规司机处罚】 error:",e);
+			return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, "新增违规司机处罚后台程序异常");
 		}
 	}
 
-	@RequestMapping(value = "/getBusDriverName.json")
+	/**
+	 * @desc 通过巴士司机手机号获取司机姓名
+	 * @wiki http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=31812293
+	 * @param busDriverPhone
+	 * @return
+	 */
+	@RequestMapping(value = "/getBusDriverName.json",method = RequestMethod.GET)
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public AjaxResponse getBusDriverNameByPhone(@NotNull(message = "司机手机号不能为空") Long busDriverPhone){
 		logger.info("【根据手机号获取巴士司机姓名】start...param:busDriverPhone="+ busDriverPhone);
@@ -93,8 +124,8 @@ public class BusDriverViolatorsController extends BusBaseController {
 				return AjaxResponse.failMsg(RestErrorCode.DRIVER_NOT_EXIST, "巴士司机不存在");
 			}
 			if(level==2&&!loginUser.getCityIds().contains(driverInfo.getCityId())){
-				logger.info("【根据手机号获取巴士司机姓名】查询到的巴士司机所属城市不再当前登陆用户权限[城市权限]所包含的城市范围内");
-				return AjaxResponse.failMsg(RestErrorCode.BUS_CITY_AUTH_FORBIDDEN, "查询到的巴士司机所属城市不再当前登陆用户权限所包含的城市范围内");
+				logger.info("【根据手机号获取巴士司机姓名】查询到的巴士司机所属城市不在当前登陆用户权限[城市权限]所包含的城市范围内");
+				return AjaxResponse.failMsg(RestErrorCode.BUS_CITY_AUTH_FORBIDDEN, "查询到的巴士司机所属城市不在当前登陆用户权限所包含的城市范围内");
 			}
 			if((level>=4)&&!loginUser.getSupplierIds().contains(driverInfo.getSupplierId())){
 				logger.info("【根据手机号获取巴士司机姓名】查询到的巴士司机所属供应商不在当前登陆用户权限所包含的供应商范围内");
