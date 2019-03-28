@@ -68,7 +68,7 @@
   </select>
 
   <update id="recoverDriverStatus">
-    update bus_biz_driver_violators set punish_type = 0 where id = #{id}
+    update bus_biz_driver_violators set punish_status = 0 where id = #{id}
   </update>
 
   <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.BusBizDriverViolators" >

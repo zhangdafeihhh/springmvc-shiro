@@ -158,11 +158,9 @@ public class BusDriverViolatorsController extends BusBaseController {
 			}
 			int result = busCarViolatorsService.recoverDriverStatus(id);
 			logger.info("【将违约司机恢复正常状态】参数：id=" + id + " 操作人：" + currentLoginUser.getName() + " 结果：" + result);
-			//记录操作日志
-			Integer driverId = violators.getBusDriverId();
 			//原始状态
-			Short punishStatus = violators.getPunishStatus();
-			String des = punishStatus == 1 ? "解除停运" : punishStatus == 2 ? "解除冻结" : "";
+			Short punishType = violators.getPunishType();
+			String des = punishType == 1 ? "解除停运" : punishType == 2 ? "解除冻结" : "";
 			busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.BUS_PUNISH, String.valueOf(violators.getId()), des, new Date());
 			return AjaxResponse.success(null);
 		} catch (Exception e) {
