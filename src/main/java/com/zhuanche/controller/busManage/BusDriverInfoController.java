@@ -160,8 +160,11 @@ public class BusDriverInfoController extends BusBaseController {
 		AjaxResponse checkResult = busCarBizDriverInfoService.completeInfo(saveDTO);
 		//校验mongo中保存信息
 		AjaxResponse checkMongoResult = busCarBizDriverInfoService.checkMongoInfo(saveDTO);
-		if (!checkResult.isSuccess() || !checkMongoResult.isSuccess()) {
+		if (!checkResult.isSuccess()) {
 			return checkResult;
+		}
+		if(!checkMongoResult.isSuccess()){
+			return checkMongoResult;
 		}
 		
 		Integer driverId = saveDTO.getDriverId();
