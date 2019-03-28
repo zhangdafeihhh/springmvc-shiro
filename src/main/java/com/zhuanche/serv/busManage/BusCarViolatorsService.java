@@ -5,7 +5,9 @@ import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.constants.BusConst;
 import com.zhuanche.dto.busManage.BusDriverViolatorsQueryDTO;
+import com.zhuanche.entity.mdbcarmanage.BusBizDriverViolators;
 import com.zhuanche.vo.busManage.BusBizDriverViolatorsVO;
+import mapper.mdbcarmanage.BusBizDriverViolatorsMapper;
 import mapper.mdbcarmanage.ex.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +33,9 @@ public class BusCarViolatorsService implements BusConst {
     @Autowired
     private BusBizDriverViolatorsExMapper busBizDriverViolatorsExMapper;
 
+    @Autowired
+    private BusBizDriverViolatorsMapper busBizDriverViolatorsMapper;
+
     /**
      * @param queryDTO
      * @return List<BusBizDriverViolators>
@@ -46,5 +51,14 @@ public class BusCarViolatorsService implements BusConst {
 
     public boolean insertDriverViolator(){
         return false;
+    }
+
+    @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER))
+    public int recoverDriverStatus(Integer id){
+        return busBizDriverViolatorsExMapper.recoverDriverStatus(id);
+    }
+    @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE))
+    public BusBizDriverViolators selectByPrimaryKey(Integer id){
+       return  busBizDriverViolatorsMapper.selectByPrimaryKey(id);
     }
 }

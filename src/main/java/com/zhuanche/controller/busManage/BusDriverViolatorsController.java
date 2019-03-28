@@ -9,6 +9,7 @@ import com.zhuanche.common.web.RestErrorCode;
 
 import com.zhuanche.dto.busManage.BusDriverViolatorsQueryDTO;
 import com.zhuanche.dto.busManage.BusDriverViolatorsSaveDTO;
+import com.zhuanche.entity.mdbcarmanage.BusBizDriverViolators;
 import com.zhuanche.serv.busManage.BusBizChangeLogService;
 import com.zhuanche.serv.busManage.BusCarBizDriverInfoService;
 import com.zhuanche.serv.busManage.BusCarViolatorsService;
@@ -17,6 +18,7 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.vo.busManage.BusBizDriverViolatorsVO;
 import com.zhuanche.vo.busManage.BusDriverDetailInfoVO;
+import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.List;
 
 
@@ -47,7 +50,7 @@ public class BusDriverViolatorsController extends BusBaseController {
 	@Autowired
 	private BusCarViolatorsService busCarViolatorsService;
 
-	@RequestMapping(value = "/queryList.json")
+	@RequestMapping(value = "/queryList")
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE))
 	public AjaxResponse queryList(@Validated BusDriverViolatorsQueryDTO queryDTO) {
 		logger.info("【获取违规司机处理列表】start...params:queryDTO="+JSON.toJSONString(queryDTO));
@@ -65,7 +68,7 @@ public class BusDriverViolatorsController extends BusBaseController {
 		}
 	}
 
-	@RequestMapping(value = "/saveViolateDriver.json")
+	@RequestMapping(value = "/saveViolateDriver")
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE))
 	public AjaxResponse saveViolateDriver(@Validated BusDriverViolatorsSaveDTO saveDTO) {
 		logger.info("【新增违规司机】start...params:saveDTO="+JSON.toJSONString(saveDTO));
@@ -80,7 +83,7 @@ public class BusDriverViolatorsController extends BusBaseController {
 		}
 	}
 
-	@RequestMapping(value = "/getBusDriverName.json")
+	@RequestMapping(value = "/getBusDriverName")
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public AjaxResponse getBusDriverNameByPhone(@NotNull(message = "司机手机号不能为空") Long busDriverPhone){
 		logger.info("【根据手机号获取巴士司机姓名】start...param:busDriverPhone="+ busDriverPhone);
@@ -107,5 +110,31 @@ public class BusDriverViolatorsController extends BusBaseController {
 			return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, "根据手机号获取巴士司机姓名程序异常");
 		}
 	}
+	@RequestMapping(value = "/recover")
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.MASTER))
+	public AjaxResponse recover(Integer id) {
+		SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+		logger.info("【将违约司机恢复正常状态】参数：id=" + id + " 操作人：" + currentLoginUser.getName());
+		try {
+			BusBizDriverViolators violators = busCarViolatorsService.selectByPrimaryKey(id);
+			if (violators == null) {
+				logger.error("【将违约司机恢复正常状态】参数：id=" + id + " 操作人：" + currentLoginUser.getName() + " 不存在该记录");
+				return AjaxResponse.fail(RestErrorCode.USER_NOT_EXIST);
+			}
+			int result = busCarViolatorsService.recoverDriverStatus(id);
+			logger.info("【将违约司机恢复正常状态】参数：id=" + id + " 操作人：" + currentLoginUser.getName() + " 结果：" + result);
+			//记录操作日志
+			Integer driverId = violators.getBusDriverId();
+			//原始状态
+			Short punishStatus = violators.getPunishStatus();
+			String des = punishStatus == 1 ? "解除停运" : punishStatus == 2 ? "解除冻结" : "";
+			busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.DRIVER, String.valueOf(driverId), des, new Date());
+			return AjaxResponse.success(null);
+		} catch (Exception e) {
+			logger.error("【将违约司机恢复正常状态】参数：id=" + id + " 操作人：" + currentLoginUser.getName() + " 修改异常：e:{}", e);
+			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		}
+	}
+
 
 }
