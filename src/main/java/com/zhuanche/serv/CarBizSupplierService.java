@@ -187,6 +187,10 @@ public class CarBizSupplierService{
 					String jsonString = JSON.toJSONStringWithDateFormat(supplier, JSON.DEFFAULT_DATE_FORMAT);
 					JSONObject json = (JSONObject) JSONObject.parse(jsonString);
 					Map<String, Object> params = json.getInnerMap();
+					params.put("memo",supplier.getMemo()==null?"":supplier.getMemo());
+					params.put("isCommission",supplier.getIscommission()==null?2:supplier.getIscommission());
+					params.put("posPayFlag",supplier.getPospayflag()==null?0:supplier.getPospayflag());
+					params.put("settleDay",supplier.getSettlementDay()==null?0:supplier.getSettlementDay());
 					JSONObject result = MpOkHttpUtil.okHttpPostBackJson(settleApiUrl + "/api/settle/supplier/info/add", params, 1, "增加供应商信息");
 					logger.info("调用分佣接口增加供应商返回结果：{}",result.toJSONString());
 					if (result.getIntValue("code") != Constants.SUCCESS_CODE) {
