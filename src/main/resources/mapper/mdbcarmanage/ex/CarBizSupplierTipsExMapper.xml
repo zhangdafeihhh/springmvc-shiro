@@ -23,6 +23,7 @@
   </select>
 
 
+
   <insert id="createTips" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizSupplierTips" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
       SELECT LAST_INSERT_ID()
@@ -75,6 +76,7 @@
       </if>
     </trim>
   </insert>
+
 
 
   <update id="updateTips" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizSupplierTips" >

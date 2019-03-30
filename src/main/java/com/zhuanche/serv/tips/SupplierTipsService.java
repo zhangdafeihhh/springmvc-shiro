@@ -81,7 +81,10 @@ public class SupplierTipsService {
         int tipsId = 0;
         boolean isUpdate = false;
         if(id == null){
-            tipsId  = supplierTipsExMapper.createTips(supplierTips);
+           int code =  supplierTipsExMapper.createTips(supplierTips);
+           if(code > 0){
+               tipsId  =  supplierTips.getId();
+           }
         }else {
             supplierTips.setId(id);
             tipsId = supplierTipsExMapper.updateTips(supplierTips);
