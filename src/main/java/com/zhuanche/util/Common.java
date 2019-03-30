@@ -89,6 +89,10 @@ public class Common {
 	public static final String BATH_INPUT_DRIVER_OUTAGE_ALL = "/driverOutageAll/batchInputDriverOutageAllInfo";
 	//停运end
 
+	//车辆begin
+	public static final String SAVE_CAR = "/carV2/saveCar";
+	public static final String BATHINPUTCARINFO = "/carV2/batchInputCarInfo";
+	//车辆end
 	public static String getPath(HttpServletRequest request) {
 		String uploadDir =request.getSession().getServletContext().getRealPath("/");  
 		File f1 = new File(uploadDir);

@@ -54,7 +54,16 @@
     startDate,
     endDate,
     peak_times peakTimes,
-    CONCAT( startDate, '-', endDate, CASE WHEN peak_times = 1 THEN '(早高峰)' WHEN peak_times = 2 THEN '(晚高峰)' WHEN peak_times = 3 THEN '(其他时段1)' WHEN peak_times = 4 THEN '(其他时段2)' END ) AS times
+    CONCAT( startDate, '-', endDate,
+    CASE
+    WHEN peak_times = 1 THEN '(A:早高峰)'
+    WHEN peak_times = 2 THEN '(B:晚高峰)'
+    WHEN peak_times = 3 THEN '(X1:其他时段1)'
+    WHEN peak_times = 4 THEN '(X2:其他时段2)'
+    WHEN peak_times = 5 THEN '(C:非工作日早班)'
+    WHEN peak_times = 6 THEN '(D:非工作日晚班)'
+    WHEN peak_times = 7 THEN '(E:无障碍自由班)'
+    END ) AS times
     from car_driver_must_duty where 1=1
     <if test="cityId!=null">
       and city = #{cityId}

@@ -1,10 +1,13 @@
 package com.zhuanche.common.dutyEnum;
 
 public enum EnumDriverDutyTimeFlag {
-	DRIVEDUTYPEAKTIMES_ONE("m_1","早高峰"),
-	DRIVEDUTYPEAKTIMES_TWO("m_2","晚高峰"),
-	DRIVEDUTYPEAKTIMES_THREE("m_3","其他时段1"),
-	DRIVEDUTYPEAKTIMES_FOUR("m_4","其他时段2");
+	DRIVEDUTYPEAKTIMES_ONE("m_1","A:早高峰"),
+	DRIVEDUTYPEAKTIMES_TWO("m_2","B:晚高峰"),
+	DRIVEDUTYPEAKTIMES_THREE("m_3","X1:其他时段1"),
+	DRIVEDUTYPEAKTIMES_FOUR("m_4","X2:其他时段2"),
+	DRIVEDUTYPEAKTIMES_FIVE("m_5","C:非工作日早班"),
+	DRIVEDUTYPEAKTIMES_SIX("m_6","D:非工作日晚班"),
+	DRIVEDUTYPEAKTIMES_SEV("m_7","E:无障碍自由班");
 	
 	
 	private String key;
