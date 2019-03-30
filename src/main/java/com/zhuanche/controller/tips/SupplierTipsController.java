@@ -219,7 +219,7 @@ public class SupplierTipsController {
     @RequestMapping(value = "/detailTips")
     @ResponseBody
     @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
     })
     public AjaxResponse detailTips(@RequestParam(value = "id")Integer id){
         logger.info(MessageFormat.format("detailTips入参：id:{0}",id));
