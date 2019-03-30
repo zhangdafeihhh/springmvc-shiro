@@ -155,6 +155,7 @@ public class SupplierTipsController {
             return AjaxResponse.fail(RestErrorCode.TIPS_TITLE_EMOJI);
         }
 
+        tipsContent = EmojiFilter.filterEmoji(tipsContent);
 
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
 
