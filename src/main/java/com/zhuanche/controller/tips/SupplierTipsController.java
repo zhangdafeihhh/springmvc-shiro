@@ -227,7 +227,16 @@ public class SupplierTipsController {
         AjaxResponse response = AjaxResponse.success(null);
 
         try {
+            
             CarBizSupplierTipsDetail detail = tipsService.tipsDetail(id);
+
+            int code  = tipsService.addReadCount(id);
+
+            if(code > 0){
+                logger.info("阅读次数添加成功，ID：" + id);
+            }else {
+                logger.info("阅读次数添加失败：ID:" + id);
+            }
 
             response.setData(detail);
         } catch (MessageException e) {
