@@ -87,8 +87,11 @@ public class SupplierTipsService {
            }
         }else {
             supplierTips.setId(id);
-            tipsId = supplierTipsExMapper.updateTips(supplierTips);
-            isUpdate = true;
+            int code =  supplierTipsExMapper.updateTips(supplierTips);
+            if(code > 0){
+                tipsId = id;
+                isUpdate = true;
+            }
         }
         if(tipsId > 0){
 
