@@ -39,6 +39,7 @@
 		<property name="removeAbandonedTimeout" value="300" />
 		<!-- 关闭abanded连接时输出错误日志 -->
 		<property name="logAbandoned" value="false" />
-        
+        <!--支持emoji表情符号-->
+        <property name="connectionInitSqls" value="set names utf8mb4;"/>
     </bean>
 </beans>
