@@ -207,6 +207,10 @@ public final class RestErrorCode{
 	public static final int TIPS_CONTENT_MAX_LIMIT = 8100;
 	@ResultMessage("通知消息样式过于复杂")
 	public static final int TIPS_CONTENT_COMPEX = 8101;
+	@ResultMessage("标题含有emoji表情或者特殊符号")
+	public static final int TIPS_TITLE_EMOJI = 8102;
+	@ResultMessage("内容含有emoji表情或者特殊符号")
+	public static final int TIPS_CONTENT_EMOJI = 8103;
 
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系

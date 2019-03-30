@@ -13,6 +13,7 @@ import com.zhuanche.exception.MessageException;
 import com.zhuanche.serv.tips.SupplierTipsService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.EmojiFilter;
 import com.zhuanche.util.HtmlFilterUtil;
 import mapper.mdbcarmanage.ex.CarBizTipsDocExMapper;
 import org.apache.commons.io.FileUtils;
@@ -82,6 +83,17 @@ public class SupplierTipsController {
             return AjaxResponse.fail(RestErrorCode.TIPS_CONTENT_COMPEX);
         }
 
+        String filterEmojiTitle = EmojiFilter.filterEmoji(tipsTitle);
+
+
+        if(tipsTitle.length() > filterEmojiTitle.length()){
+            logger.info("标题含有emoji表情或者特殊符号");
+            return AjaxResponse.fail(RestErrorCode.TIPS_TITLE_EMOJI);
+        }
+
+        tipsContent = EmojiFilter.filterEmoji(tipsContent);
+
+
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
 
         Integer userId = loginUser.getId();
@@ -133,6 +145,16 @@ public class SupplierTipsController {
             logger.info("样式长度过于复杂");
             return AjaxResponse.fail(RestErrorCode.TIPS_CONTENT_COMPEX);
         }
+
+
+        String filterEmojiTitle = EmojiFilter.filterEmoji(tipsTitle);
+
+
+        if(tipsTitle.length() > filterEmojiTitle.length()){
+            logger.info("标题含有emoji表情或者特殊符号");
+            return AjaxResponse.fail(RestErrorCode.TIPS_TITLE_EMOJI);
+        }
+
 
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
 
