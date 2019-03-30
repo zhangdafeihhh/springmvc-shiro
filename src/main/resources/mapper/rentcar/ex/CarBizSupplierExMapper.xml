@@ -473,10 +473,10 @@
 
     <select id="querySupplierAllList" resultMap="ResultMapWithBLOBs" >
         select
-        <include refid="Base_Column_List" />
-        ,<include refid="Blob_Column_List" />
+        supplier_id, supplier_num, supplier_city, type, contacts, contacts_phone,
+        status, create_by, update_by, create_date, update_date, isCommission, posPayFlag,
+        cooperation_type, isTest, enterprise_type, address,memo
         ,(case status when 0 then CONCAT(supplier_full_name, "_无效") else supplier_full_name end ) supplier_full_name
-        supplier_full_name
         from car_biz_supplier
         where 1=1
         <if test="cityIds!=null and cityIds.size()>0">
