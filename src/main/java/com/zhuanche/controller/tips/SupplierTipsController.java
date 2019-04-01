@@ -83,7 +83,7 @@ public class SupplierTipsController {
             return AjaxResponse.fail(RestErrorCode.TIPS_CONTENT_COMPEX);
         }
 
-        String filterEmojiTitle = EmojiFilter.filterEmoji(tipsTitle);
+        String filterEmojiTitle = EmojiFilter.filterEmoji(tipsTitle+" ");
 
 
         if(tipsTitle.length() > filterEmojiTitle.length()){
@@ -91,7 +91,7 @@ public class SupplierTipsController {
             return AjaxResponse.fail(RestErrorCode.TIPS_TITLE_EMOJI);
         }
 
-        tipsContent = EmojiFilter.filterEmoji(tipsContent);
+        tipsContent = EmojiFilter.filterEmoji(tipsContent+" ");
 
 
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
@@ -147,7 +147,7 @@ public class SupplierTipsController {
         }
 
 
-        String filterEmojiTitle = EmojiFilter.filterEmoji(tipsTitle);
+        String filterEmojiTitle = EmojiFilter.filterEmoji(tipsTitle+" ");
 
 
         if(tipsTitle.length() > filterEmojiTitle.length()){
@@ -155,7 +155,7 @@ public class SupplierTipsController {
             return AjaxResponse.fail(RestErrorCode.TIPS_TITLE_EMOJI);
         }
 
-        tipsContent = EmojiFilter.filterEmoji(tipsContent);
+        tipsContent = EmojiFilter.filterEmoji(tipsContent + " ");
 
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
 
