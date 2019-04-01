@@ -1,18 +1,16 @@
 package com.zhuanche.dto.busManage;
 
 import com.zhuanche.dto.BaseDTO;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.util.Date;
-import java.util.Set;
+import lombok.Data;
 
 /**
  * @ClassName: BusDriverViolatorsQueryDTO
  * @Description: 违规司机处理查询DTO
  * @author: tianye
  * @date: 2019年03月25日 下午17:10:15
- * 
+ *
  */
+@Data
 public class BusDriverViolatorsQueryDTO extends BaseDTO {
 
     private String busDriverName;//巴士司机姓名
@@ -23,25 +21,7 @@ public class BusDriverViolatorsQueryDTO extends BaseDTO {
 
     private Integer supplierId;//巴士司机所属供应商id
 
-    private Short punishStatus;//处罚状态（0：正常 1：停运 2：冻结）
+    private Short punishType;//处罚类型 1停运 2冻结
 
-    public String getBusDriverName() {return busDriverName; }
-
-    public void setBusDriverName(String busDriverName) {this.busDriverName = busDriverName;}
-
-    public String getBusDriverPhone() {return busDriverPhone;}
-
-    public void setBusDriverPhone(String busDriverPhone) {this.busDriverPhone = busDriverPhone;}
-
-    public Integer getCityId() {return cityId;}
-
-    public void setCityId(Integer cityId) {this.cityId = cityId;}
-
-    public Integer getSupplierId() {return supplierId;}
-
-    public void setSupplierId(Integer supplierId) {this.supplierId = supplierId;}
-
-    public Short getPunishStatus() {return punishStatus;}
-
-    public void setPunishStatus(Short punishStatus) {this.punishStatus = punishStatus;}
+    private Short punishStatus;//处罚状态 0未处罚 1处罚生效
 }
