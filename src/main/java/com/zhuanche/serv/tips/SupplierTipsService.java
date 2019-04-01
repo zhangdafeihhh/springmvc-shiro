@@ -7,6 +7,7 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.entity.mdbcarmanage.*;
 import com.zhuanche.exception.MessageException;
+import com.zhuanche.util.Common;
 import com.zhuanche.util.dateUtil.DateUtil;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import mapper.mdbcarmanage.ex.CarBizSupplierTipsDtoExMapper;
@@ -61,6 +62,7 @@ public class SupplierTipsService {
      * @param tipsContent
      * @param userId
      * @param file
+     * @param docIdList   原来的文档idList
      * @param request
      * @return
      * @throws MessageException
@@ -70,7 +72,7 @@ public class SupplierTipsService {
                           String tipsTitle,
                           String tipsContent,
                           Integer userId,
-                          MultipartFile file,
+                          MultipartFile file,String docIdList,
                           HttpServletRequest request) throws MessageException{
 
 
@@ -100,9 +102,28 @@ public class SupplierTipsService {
           if(file != null && !file.isEmpty()){
 
               List<CarBizTipsDoc> tipsDocList = null;
+              List<Integer> docIds = new ArrayList();
               //获取上次文档====
-              if(isUpdate)
+              if(isUpdate){
                   tipsDocList = docExMapper.listTipsDoc(Long.valueOf(tipsId));
+                  if(StringUtils.isNotEmpty(docIdList)){
+                      String[] oldDocId = docIdList.split(Constants.SEPERATER);
+                      List<String> strDocId = Arrays.asList(oldDocId);
+                      for(CarBizTipsDoc carBizTipsDoc : tipsDocList){
+
+                          Integer doc = carBizTipsDoc.getId();
+                          if(strDocId.contains(doc.toString())){
+                              continue;
+                          }
+                          docIds.add(doc);
+                      }
+                  }else {
+                      for(CarBizTipsDoc carBizTipsDoc : tipsDocList){
+
+                          docIds.add(carBizTipsDoc.getId());
+                      }
+                  }
+              }
 
               MultipartHttpServletRequest req = (MultipartHttpServletRequest) request;
 
@@ -133,14 +154,14 @@ public class SupplierTipsService {
                           if (code > 0) {
                               logger.info("====doc文档上传成功====");
 
-                              if (CollectionUtils.isNotEmpty(tipsDocList)) {
-                                  Iterator<CarBizTipsDoc> iterator = tipsDocList.iterator();
+                              if (CollectionUtils.isNotEmpty(docIds)) {
+                                  Iterator<Integer> iterator = docIds.iterator();
                                   while (iterator.hasNext()) {
-                                      CarBizTipsDoc docDel = (CarBizTipsDoc) iterator.next();
-                                      logger.info("删除上次上传文档" + docDel.getId());
-                                      docExMapper.deleteByDocId(docDel.getId());
+                                      Integer docDelId = (Integer) iterator.next();
+                                      logger.info("删除上次上传文档" + docDelId);
+                                      docExMapper.deleteByDocId(docDelId);
                                   }
-                                  tipsDocList.clear();
+                                  docIds.clear();
                               }
                           } else {
                               logger.info("====doc上传文档失败======");

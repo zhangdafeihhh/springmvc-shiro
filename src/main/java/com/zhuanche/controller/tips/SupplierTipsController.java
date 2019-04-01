@@ -101,7 +101,7 @@ public class SupplierTipsController {
         AjaxResponse response = AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
 
         try {
-            int code = tipsService.createTips(null,tipsTitle,tipsContent,userId,file,request);
+            int code = tipsService.createTips(null,tipsTitle,tipsContent,userId,file,null,request);
 
             if(code > 0){
                 logger.info("小贴士添加成功");
@@ -128,8 +128,9 @@ public class SupplierTipsController {
                                    @RequestParam(value = "tipsTitle",required = false)String tipsTitle,
                                    @RequestParam(value = "tipsContent",required = false)String tipsContent,
                                    @RequestParam(value = "file",required = false) MultipartFile file,
+                                   @RequestParam(value = "docIdList",required = false)String docIdList,
                                    HttpServletRequest request){
-        logger.info(MessageFormat.format("editTips入参：tipsTitle:{0},tipsContent:{1},id:{2}",tipsTitle,tipsContent,id));
+        logger.info(MessageFormat.format("editTips入参：tipsTitle:{0},tipsContent:{1},id:{2},docIdList:{3}",tipsTitle,tipsContent,id,docIdList));
 
         if(id == null ||  StringUtils.isEmpty(tipsContent) || StringUtils.isEmpty(tipsTitle)){
             logger.info("editTips参数缺失.");
@@ -164,7 +165,7 @@ public class SupplierTipsController {
         AjaxResponse response = AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
 
         try {
-            int code = tipsService.createTips(id,tipsTitle,tipsContent,userId,file,request);
+            int code = tipsService.createTips(id,tipsTitle,tipsContent,userId,file,docIdList,request);
 
             if(code > 0){
                 logger.info("小贴士修改成功");
