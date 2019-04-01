@@ -99,10 +99,12 @@ public class SupplierTipsService {
 
           logger.info("小贴士主表数据成功");
 
+            List<CarBizTipsDoc> tipsDocList = null;
+            List<Integer> docIds = new ArrayList();
+
           if(file != null && !file.isEmpty()){
 
-              List<CarBizTipsDoc> tipsDocList = null;
-              List<Integer> docIds = new ArrayList();
+
               //获取上次文档====
               if(isUpdate){
                   tipsDocList = docExMapper.listTipsDoc(Long.valueOf(tipsId));
@@ -170,6 +172,36 @@ public class SupplierTipsService {
                       }
                   }
 
+              }
+          }else {
+              if(isUpdate){
+                  tipsDocList = docExMapper.listTipsDoc(Long.valueOf(tipsId));
+                  if(StringUtils.isNotEmpty(docIdList)){
+                      String[] oldDocId = docIdList.split(Constants.SEPERATER);
+                      List<String> strDocId = Arrays.asList(oldDocId);
+                      for(CarBizTipsDoc carBizTipsDoc : tipsDocList){
+
+                          Integer doc = carBizTipsDoc.getId();
+                          if(strDocId.contains(doc.toString())){
+                              continue;
+                          }
+                          docIds.add(doc);
+                      }
+                  }else {
+                      for(CarBizTipsDoc carBizTipsDoc : tipsDocList){
+
+                          docIds.add(carBizTipsDoc.getId());
+                      }
+                  }
+                  if (CollectionUtils.isNotEmpty(docIds)) {
+                      Iterator<Integer> iterator = docIds.iterator();
+                      while (iterator.hasNext()) {
+                          Integer docDelId = (Integer) iterator.next();
+                          logger.info("删除上次上传文档" + docDelId);
+                          docExMapper.deleteByDocId(docDelId);
+                      }
+                      docIds.clear();
+                  }
               }
           }
         }
