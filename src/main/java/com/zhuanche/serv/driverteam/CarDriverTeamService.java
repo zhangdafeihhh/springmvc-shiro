@@ -23,6 +23,7 @@ import com.zhuanche.request.DriverTeamRequest;
 import com.zhuanche.request.DutyParamRequest;
 import com.zhuanche.request.TeamGroupRequest;
 import com.zhuanche.serv.CarBizCityService;
+import com.zhuanche.serv.CarBizDriverInfoService;
 import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.serv.common.DataPermissionHelper;
@@ -102,6 +103,9 @@ public class CarDriverTeamService{
 	@Autowired
 	private AsyncDutyService asyncDutyService;
 
+	@Autowired
+	private CarBizDriverInfoService carBizDriverInfoService;
+
 	/**
 	 * @Desc: 更新车队班制排班信息
 	 * @param:
@@ -176,6 +180,12 @@ public class CarDriverTeamService{
 				if(!Check.NuNObj(existsGroup)){
 					result = carRelateGroupExMapper.deleteDriverFromGroup(existsGroup.getGroupId(),driverId);
 				}
+				try {
+					// 调用接口清除，key
+					carBizDriverInfoService.flashDriverInfo(driverId);
+				} catch (Exception e) {
+					logger.info("司机driverId={},修改,调用清除接口异常={}", driverId, e.getMessage());
+				}
 				//TODO 处理司机ID，发动司机变更MQ 从车队移除司机  车队移除
 				this.asyncDutyService.processingData(driverId, "", carDriverTeam.getTeamName(), 1);
 				return result;
@@ -183,6 +193,12 @@ public class CarDriverTeamService{
 				//小组操作移除司机
 				  int code = carRelateGroupExMapper.deleteDriverFromGroup(id,driverId);
 				  if(code > 0){
+					  try {
+						  // 调用接口清除，key
+						  carBizDriverInfoService.flashDriverInfo(driverId);
+					  } catch (Exception e) {
+						  logger.info("司机driverId={},修改,调用清除接口异常={}", driverId, e.getMessage());
+					  }
 					  //TODO 处理司机ID，发动司机变更MQ 从班组移除司机
 					  this.asyncDutyService.processingData(driverId, String.valueOf(carDriverTeam.getpId()), carDriverTeam.getTeamName(), 1);
 				  }
@@ -261,6 +277,12 @@ public class CarDriverTeamService{
 				if(Check.NuNObj(existsTeam)){
 					result += carRelateTeamMapper.insertSelective(team);
 				}
+			}
+			try {
+				// 调用接口清除，key
+				carBizDriverInfoService.flashDriverInfo(Integer.parseInt(driverId));
+			} catch (Exception e) {
+				logger.info("司机driverId={},修改,调用清除接口异常={}", driverId, e.getMessage());
 			}
 			//TODO 处理司机ID，发动司机变更MQ 从车队新增司机 driverId; driverTeam.getTeamId();driverTeam.getTeamName()
 			this.asyncDutyService.processingData(Integer.parseInt(driverId), String.valueOf(carDriverTeam.getId()), carDriverTeam.getTeamName(), 2);
@@ -525,6 +547,12 @@ public class CarDriverTeamService{
 					groups = carRelateGroupExMapper.queryDriverGroupRelationList(teamGroupRequest);
 					if(CollectionUtils.isNotEmpty(groups)){
 						for (CarRelateGroup carRelateGroup : groups){
+							try {
+								// 调用接口清除，key
+								carBizDriverInfoService.flashDriverInfo(carRelateGroup.getDriverId());
+							} catch (Exception e) {
+								logger.info("司机driverId={},修改,调用清除接口异常={}", carRelateGroup.getDriverId(), e.getMessage());
+							}
 							//班组下更新到车队下
 							this.asyncDutyService.processingData(carRelateGroup.getDriverId(), existsTeam.getpId().toString(), "", 0);
 						}
@@ -536,6 +564,12 @@ public class CarDriverTeamService{
 					teams = carRelateTeamExMapper.queryDriverTeamRelationList(teamGroupRequest);
 					if(CollectionUtils.isNotEmpty(teams)){
 						for(CarRelateTeam carRelateTeam : teams){
+							try {
+								// 调用接口清除，key
+								carBizDriverInfoService.flashDriverInfo(carRelateTeam.getDriverId());
+							} catch (Exception e) {
+								logger.info("司机driverId={},修改,调用清除接口异常={}", carRelateTeam.getDriverId(), e.getMessage());
+							}
 							//车队下的司机更新到加盟商
 							this.asyncDutyService.processingData(carRelateTeam.getDriverId(), "", "", 0);
 						}
