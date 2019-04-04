@@ -404,7 +404,7 @@ public class BusInfoService {
                 if(!"".equals(diff)){
                     busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(busCarSaveDTO.getCarId()), diff, new Date());
                 }
-                return AjaxResponse.success(null);
+                return AjaxResponse.success("修改成功");
             }
         } else {
             //校验新的车牌号是否已经存在
@@ -423,7 +423,7 @@ public class BusInfoService {
             //默认未审核
             busInfoAudit.setAuditStatus(0);
             carMongoTemplate.insert(busInfoAudit);
-            return AjaxResponse.success(null);
+            return AjaxResponse.success("车辆已进入审核");
         }
         return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
     }
