@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.mongodb.WriteResult;
-import com.sun.org.apache.regexp.internal.RE;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -423,7 +422,7 @@ public class BusInfoService {
             //默认未审核
             busInfoAudit.setAuditStatus(0);
             carMongoTemplate.insert(busInfoAudit);
-            return AjaxResponse.success("车辆已进入审核");
+            return AjaxResponse.success("保存成功，车辆已进入审核");
         }
         return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
     }

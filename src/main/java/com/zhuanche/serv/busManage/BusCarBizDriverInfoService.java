@@ -474,7 +474,7 @@ public class BusCarBizDriverInfoService implements BusConst {
                 logger.error("保存需要上报交通委的信息异常,error={}", e.getMessage(), e);
             }
 
-            return AjaxResponse.success(null);
+            return AjaxResponse.success("修改成功");
         } catch (Exception e) {
             logger.error("修改司机信息异常,error={}", e.getMessage(), e);
             return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, "修改司机信息异常");
@@ -707,7 +707,6 @@ public class BusCarBizDriverInfoService implements BusConst {
     /**
      * 查询城市名称，供应商名称，服务类型，加盟类型
      *
-     * @param saveDTO
      * @return
      */
     @MasterSlaveConfigs(configs = {@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE),
@@ -1567,7 +1566,7 @@ public class BusCarBizDriverInfoService implements BusConst {
 
             driverMongoTemplate.insert(busDriverInfoAudit);
 
-            return AjaxResponse.success(null);
+            return AjaxResponse.success("保存成功，司机进入审核");
         }catch (Exception e) {
         logger.error("新增修改审核司机信息异常,error={}", e.getMessage(), e);
         return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, "保存审核司机修改信息异常");
