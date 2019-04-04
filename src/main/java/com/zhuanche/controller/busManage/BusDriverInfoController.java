@@ -224,7 +224,7 @@ public class BusDriverInfoController extends BusBaseController {
 			AjaxResponse detail = findDriverInfoByDriverId(driverId);
 			BusDriverDetailInfoVO data =(BusDriverDetailInfoVO) detail.getData();
 			AjaxResponse response = null;
-			if(data.getPhone().equals(saveDTO.getPhone()) && data.getIdCardNo().equals(saveDTO.getIdCardNo()) && data.getXyDriverNumber().equals(saveDTO.getXyDriverNumber())){
+			if(saveDTO.getPhone().equals(data.getPhone()) && saveDTO.getIdCardNo().equals(data.getIdCardNo()) && saveDTO.getXyDriverNumber().equals(data.getXyDriverNumber())){
 				 //直接修改
 				response = busCarBizDriverInfoService.updateDriver(saveDTO);
 				if(response.isSuccess()){

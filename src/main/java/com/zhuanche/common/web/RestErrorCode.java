@@ -123,8 +123,7 @@ public final class RestErrorCode{
 	public static final int CITY_SUPPLIER_DIFFER                    = 3011;
 	@ResultMessage("车辆已经被绑定")
 	public static final int CAR_HAS_BIND                    = 3012;
-	@ResultMessage("所选城市和供应商、车辆信息不一致")
-	public static final int CITY_SUPPLIER_CAR_DIFFER                    = 3013;
+
 	@ResultMessage("服务类型不存在")
 	public static final int GROUP_NOT_EXIST                    = 3014;
 	@ResultMessage("修改手机号与原手机号不可以相同")
