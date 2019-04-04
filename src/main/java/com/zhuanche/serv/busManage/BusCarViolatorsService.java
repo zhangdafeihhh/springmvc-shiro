@@ -43,6 +43,8 @@ public class BusCarViolatorsService implements BusConst {
     @Autowired
     private BusCarBizCustomerAppraisalStatisticsExMapper appraisalStatisticsExMapper;
 
+    @Autowired
+    private BusCommonService busCommonService;
 
     /**
      * @param queryDTO
@@ -101,5 +103,19 @@ public class BusCarViolatorsService implements BusConst {
     @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE))
     public BusBizDriverViolators selectByPrimaryKey(Integer id){
         return  busBizDriverViolatorsMapper.selectByPrimaryKey(id);
+    }
+
+    /**
+     * 查询用户权限下当前被停运的司机列表
+     * @return
+     */
+    public List<BusBizDriverViolatorsVO> queryCurrentOutOfDriver(){
+        Set<Integer> authSupplierIds = busCommonService.getAuthSupplierIds();
+        if(authSupplierIds==null){
+            logger.error("[获得用户权限下当前被封禁的司机列表] 权限异常");
+            return null;
+        }
+        List<BusBizDriverViolatorsVO> violators = busBizDriverViolatorsExMapper.queryCurrentOutOfDriver(authSupplierIds);
+        return violators;
     }
 }

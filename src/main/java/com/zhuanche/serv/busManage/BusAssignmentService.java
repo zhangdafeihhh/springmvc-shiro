@@ -19,7 +19,9 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.zhuanche.entity.mdbcarmanage.BusBizDriverViolators;
 import com.zhuanche.entity.rentcar.*;
+import com.zhuanche.vo.busManage.*;
 import mapper.rentcar.ex.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -61,10 +63,6 @@ import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.MapUrlParamUtils;
 import com.zhuanche.util.MyRestTemplate;
 import com.zhuanche.util.SignUtils;
-import com.zhuanche.vo.busManage.BusDriverDetailInfoVO;
-import com.zhuanche.vo.busManage.BusOrderExVO;
-import com.zhuanche.vo.busManage.BusOrderExportVO;
-import com.zhuanche.vo.busManage.BusOrderVO;
 
 import mapper.mdbcarmanage.ex.BusOrderOperationTimeExMapper;
 import mapper.rentcar.CarBizServiceMapper;
@@ -109,6 +107,8 @@ public class BusAssignmentService {
 
     @Autowired
     private BusDriverMongoService busDriverMongoService;
+    @Autowired
+    private BusCarViolatorsService busCarViolatorsService;
 
     @Autowired
     @Qualifier("busAssignmentTemplate")
@@ -880,7 +880,7 @@ public class BusAssignmentService {
 
             // 返回数据
             JSONArray data = result.getJSONArray("data");
-            List<Integer> invalidDriverIds = new ArrayList<>();
+            Set<Integer> invalidDriverIds = new HashSet<>();
             if (data != null) {
                 for (int i = 0; i < data.size(); i++) {
                     JSONObject bean = data.getJSONObject(i);
@@ -895,6 +895,14 @@ public class BusAssignmentService {
             if (busDriverDTO.getGroupId() != null) {
                 int seatNum = carBizCarGroupExMapper.getSeatNumByGroupId(busDriverDTO.getGroupId());
                 richerDTO.setSeatNum(seatNum);
+            }
+            //查询被停运的司机
+            List<BusBizDriverViolatorsVO> violators = busCarViolatorsService.queryCurrentOutOfDriver();
+            if(violators!=null&&violators.size()>0) {
+                logger.info("[ BusAssignmentService-orderToDoListForDriver ] 当前因为停运不可以指派司机ID:{}", invalidDriverIds);
+                violators.forEach(o -> {
+                    invalidDriverIds.add(o.getBusDriverId());
+                });
             }
             // 不可用司机
             if (!invalidDriverIds.isEmpty()) {

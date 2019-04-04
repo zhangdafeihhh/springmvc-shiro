@@ -164,6 +164,8 @@ public class BusCommonService {
 				Set<Integer> supplierIdSet= supplierIds.stream().filter(Objects::nonNull).collect(Collectors.toSet());
 				return supplierIdSet;
 			case SUPPLIER:
+			case TEAM:
+			case GROUP:
 				Set<Integer> userSupplierSet = currentLoginUser.getSupplierIds();
 				return userSupplierSet;
 			default:

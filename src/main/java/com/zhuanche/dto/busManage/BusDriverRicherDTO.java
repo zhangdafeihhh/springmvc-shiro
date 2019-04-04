@@ -19,7 +19,7 @@ public class BusDriverRicherDTO extends BusDriverDTO {
 	// 可用司机ID
 	private List<Integer> driverIds;
 	// 不可用司机ID
-	private List<Integer> invalidDriverIds;
+	private Set<Integer> invalidDriverIds;
 	// 供应商ID集合
 	private Set<Integer> supplierIds;
 	// 座位数
@@ -41,11 +41,11 @@ public class BusDriverRicherDTO extends BusDriverDTO {
 		this.driverIds = driverIds;
 	}
 
-	public List<Integer> getInvalidDriverIds() {
+	public Set<Integer> getInvalidDriverIds() {
 		return invalidDriverIds;
 	}
 
-	public void setInvalidDriverIds(List<Integer> invalidDriverIds) {
+	public void setInvalidDriverIds(Set<Integer> invalidDriverIds) {
 		this.invalidDriverIds = invalidDriverIds;
 	}
 
