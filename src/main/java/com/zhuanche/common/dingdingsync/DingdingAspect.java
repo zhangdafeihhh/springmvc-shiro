@@ -96,7 +96,8 @@ public class DingdingAspect {
                         map.put("supplierId",supplierVo.getSupplierId());
                         map.put("supplierName",supplierVo.getSupplierFullName());
                         map.put("cooperationType",supplierVo.getCooperationType());
-                        DingdingSupplierAndTeamProducer.publishMessage("car_driver_supplier",dingdingAnno.method(),supplierVo.getSupplierId().toString(),map);
+                        DingdingSupplierAndTeamProducer.publishMessage("car_driver_supplier",dingdingAnno.method(),supplierVo.getSupplierId()==null?null:supplierVo.getSupplierId().toString(),map);
+                        //DingdingSupplierAndTeamProducer.publishMessage("car_driver_supplier",dingdingAnno.method(),supplierVo.getSupplierId().toString(),map);
                     }
 
                 }
