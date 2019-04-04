@@ -211,12 +211,10 @@ public class BusDriverInfoController extends BusBaseController {
 		if (driverId != null) {
 			logger.info("[ BusDriverInfoController-saveDriver ] 操作方式：编辑");
 			//查询司机是否有服务中订单
-			/*Boolean isInService = busCarBizDriverInfoService.isInService(driverId);
+			Boolean isInService = busCarBizDriverInfoService.isInService(driverId);
 			if(isInService){
-			return AjaxResponse.fail(RestErrorCode.IN_SERVICE);
-
-			}*/
-
+			return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR,"该司机有正在服务的订单，暂不能修改");
+			}
 			// 司机获取派单的接口，是否可以修改
 			Map<String, Object> updateDriverMap = carBizDriverInfoService.isUpdateDriver(driverId, phone);
 			if (updateDriverMap != null && "2".equals(updateDriverMap.get("result").toString())) {

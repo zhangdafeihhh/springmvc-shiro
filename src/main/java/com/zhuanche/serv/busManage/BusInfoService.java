@@ -384,10 +384,10 @@ public class BusInfoService {
         if (busDetail == null) {
             return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "车辆ID传入错误");
         }
-       /* boolean inService = this.isInService(busDetail.getLicensePlates());
+        boolean inService = this.isInService(busDetail.getLicensePlates());
         if(inService){
-            return AjaxResponse.fail(RestErrorCode.IN_SERVICE);
-        }*/
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR,"该车辆有正在服务的订单，暂不能修改");
+        }
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         Integer userId = currentLoginUser.getId();
         if (busDetail.getLicensePlates().equals(busCarSaveDTO.getLicensePlates()) && busDetail.getTransportnumber().equals(busCarSaveDTO.getTransportnumber())) {

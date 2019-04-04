@@ -144,8 +144,7 @@ public final class RestErrorCode{
 	public static final int STARTTIME_GREATE_ENDTIME                    = 3105;
 	@ResultMessage("该司机没有被锁定")
 	public static final int DRIVER_NOT_LOCKED                           =3106;
-	@ResultMessage("在服务中")
-	public static final int IN_SERVICE                                 =3107;
+
 	//-----------------------------------------------业务参数：导入文件
 	@ResultMessage("文件异常")
 	public static final int FILE_ERROR                    = 4001;
