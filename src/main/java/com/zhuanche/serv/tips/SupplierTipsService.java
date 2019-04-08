@@ -361,9 +361,9 @@ public class SupplierTipsService {
 
         String[] arrRange = range.split(Constants.SEPERATER);
         String start = startDate == null ? null : startDate;
-        String end = endDate;
+        String end = null;
         if(endDate != null){
-            DateUtil.getDayAfterDate(DateUtil.parseDate(endDate, Constants.DATE_FORMAT));
+            end = DateUtil.getDayAfterDate(DateUtil.parseDate(endDate, Constants.DATE_FORMAT));
         }
         Page page = PageHelper.startPage(pageNum,pageSize,true);
 
