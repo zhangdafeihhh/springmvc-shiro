@@ -1145,7 +1145,7 @@ public class OrderController{
 		getOverTimeHtml(orderCostDetailInfo);//超套餐时长费
 		getOverMileageNumHtml(orderCostDetailInfo);//计算超套餐里程费
         calcOverMileageTotal(orderCostDetailInfo);
-		result.setDriverCostDetailVO(driverFeeDetailService.getOrderDriverCostDetailVO(result.getOrderNo()));
+		result.setDriverCostDetailVO(driverFeeDetailService.getOrderDriverCostDetailVO(result.getOrderNo(), result.getOrderId()));
 		result.setDriverCostDetailVOH5(driverFeeDetailService.getDriverCostDetail(result.getOrderNo(),Integer.parseInt(Long.toString(result.getOrderId())),result.getBuyoutFlag()));
         result.setOrderCostDetailInfo(orderCostDetailInfo);
 		return result;

@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface DriverFeeDetailService {
 
-    OrderDriverCostDetailVO getOrderDriverCostDetailVO(String orderNo);
+    OrderDriverCostDetailVO getOrderDriverCostDetailVO(String orderNo, long orderId);
 
     DriverCostDetailVO getDriverCostDetail(String orderNo, int orderId, Integer buyoutFlag );
 

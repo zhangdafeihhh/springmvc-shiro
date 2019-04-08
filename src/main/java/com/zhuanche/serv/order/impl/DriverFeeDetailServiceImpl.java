@@ -66,13 +66,14 @@ public class DriverFeeDetailServiceImpl implements DriverFeeDetailService {
     }
 
     @Override
-    public OrderDriverCostDetailVO getOrderDriverCostDetailVO(String orderNo){
+    public OrderDriverCostDetailVO getOrderDriverCostDetailVO(String orderNo, long orderId){
         if (StringUtils.isBlank(orderNo)){
             return null;
         }
         try{
             Map<String, Object> params = new HashMap<>(1);
             params.put("orderNo", orderNo);
+            params.put("orderId", orderId);
             String url = DRIVER_FEE_SERVICE_API_BASE_URL + "/orderCost/getOrderDriverCostDetail";
             JSONObject result = MpOkHttpUtil.okHttpGetBackJson(url, params, 1, "");
             if (result == null){
