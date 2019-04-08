@@ -1391,7 +1391,7 @@ public class BusCarBizDriverInfoService implements BusConst {
         int start = (pageNum-1)*pageSize;
         query.skip(start-1<0?0:start);
         List<BusDriverInfoAudit> busDriverInfoAudits = driverMongoTemplate.find(query, BusDriverInfoAudit.class);
-        long count = driverMongoTemplate.count(query, BusInfoAudit.class);
+        long count = driverMongoTemplate.count(query, BusDriverInfoAudit.class);
 
         if(CollectionUtils.isEmpty(busDriverInfoAudits)){
             return AjaxResponse.success(new PageDTO(pageNum,pageSize,count,busDriverInfoAudits));
@@ -1507,7 +1507,6 @@ public class BusCarBizDriverInfoService implements BusConst {
         logger.info("操作方式：新建,审核Mongo数据:" + JSON.toJSONString(saveDTO));
 
         try {
-            saveDTO.setStatus(1);
             // 身份证号
             String idCardNo = saveDTO.getIdCardNo();
             if ("X".equals(idCardNo.substring(idCardNo.length() - 1, idCardNo.length()))) {
@@ -1669,6 +1668,7 @@ public class BusCarBizDriverInfoService implements BusConst {
                 }
                 //修改审核状态
                 WriteResult writeResult = driverMongoTemplate.updateFirst(query, update, BusDriverInfoAudit.class);
+                SimpleDateFormat f=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 //插入审核记录
                 StringBuffer log = new StringBuffer();
                 log.append("司机审核通过：");
