@@ -459,7 +459,7 @@ public class CitySupplierTeamCommonService {
         if(cityIds==null || cityIds.size()==0) {
             return new ArrayList<CarBizSupplier>();
         }
-        return carBizSupplierExMapper.querySuppliers(cityIds, null);
+        return carBizSupplierExMapper.querySupplierAllList(cityIds, null);
     }
 
     /**
