@@ -1243,8 +1243,8 @@ public class BusCarBizDriverInfoService implements BusConst {
                         failedCount++;// 失败条数+1
                         continue;
                     }
-                    //保存司机信息
-                    AjaxResponse saveResult = this.saveDriver(saveDTO);
+                    //保存司机信息,存入审核列表
+                    AjaxResponse saveResult = this.saveAuditDriverToMongo(saveDTO);
                     if (!saveResult.isSuccess()) {
                         errorMsgs.add("手机号=" + saveDTO.getPhone() + "保存出错，错误=" + saveResult.getMsg());
                         failedCount++;// 失败条数+1
