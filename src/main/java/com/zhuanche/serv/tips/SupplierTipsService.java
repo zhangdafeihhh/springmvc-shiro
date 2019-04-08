@@ -360,7 +360,7 @@ public class SupplierTipsService {
         }
 
         String[] arrRange = range.split(Constants.SEPERATER);
-        String start = startDate == null ? null : DateUtil.parseDate(startDate, Constants.DATE_FORMAT).toString();
+        String start = startDate == null ? null : startDate;
         String end = endDate;
         if(endDate != null){
             DateUtil.getDayAfterDate(DateUtil.parseDate(endDate, Constants.DATE_FORMAT));
