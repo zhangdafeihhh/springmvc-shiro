@@ -122,8 +122,8 @@
   </delete>
 
 
-  <update id="addReadCount" parameterType="java.lang.Integer" >
-    update car_biz_supplier_tips set read_count = read_count+1 WHERE id = #{id,jdbcType=INTEGER}
+  <update id="addReadCount" >
+    update car_biz_supplier_tips set read_count = read_count+1,update_time=#{updateTime} WHERE id = #{id,jdbcType=INTEGER}
   </update>
 
 </mapper>

@@ -3,6 +3,7 @@ package mapper.mdbcarmanage.ex;
 import com.zhuanche.entity.mdbcarmanage.CarBizSupplierTips;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface CarBizSupplierTipsExMapper {
@@ -22,7 +23,7 @@ public interface CarBizSupplierTipsExMapper {
     CarBizSupplierTips selectByPrimaryKey(Integer id);
 
 
-    int addReadCount(Integer id);
+    int addReadCount(@Param("id") Integer id, @Param("updateTime") Date updateTime);
 
 
 

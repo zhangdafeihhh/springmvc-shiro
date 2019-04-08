@@ -334,10 +334,10 @@ public class SupplierTipsService {
         }
     }
 
-    public int  addReadCount(Integer id) throws MessageException{
+    public int  addReadCount(Integer id,Date updateTime) throws MessageException{
 
         try {
-            return supplierTipsExMapper.addReadCount(id);
+            return supplierTipsExMapper.addReadCount(id,updateTime);
         } catch (Exception e) {
             throw new MessageException(RestErrorCode.UNKNOWN_ERROR,RestErrorCode.renderMsg(RestErrorCode.UNKNOWN_ERROR));
 

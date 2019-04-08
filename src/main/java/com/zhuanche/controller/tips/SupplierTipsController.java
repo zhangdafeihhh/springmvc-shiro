@@ -254,7 +254,7 @@ public class SupplierTipsController {
             
             CarBizSupplierTipsDetail detail = tipsService.tipsDetail(id);
 
-            int code  = tipsService.addReadCount(id);
+            int code  = tipsService.addReadCount(id,detail.getUpdateTime());
 
             if(code > 0){
                 logger.info("阅读次数添加成功，ID：" + id);
@@ -279,9 +279,10 @@ public class SupplierTipsController {
     public AjaxResponse readCountTips(@RequestParam(value = "id")Integer id){
         logger.info(MessageFormat.format("detailTips入参：id:{0}",id));
 
+        //此方法废弃
         AjaxResponse response = AjaxResponse.success(null);
 
-        try {
+        /*try {
             int code  = tipsService.addReadCount(id);
 
             if(code > 0){
@@ -292,7 +293,8 @@ public class SupplierTipsController {
             return response;
         } catch (MessageException e) {
             return AjaxResponse.fail(e.getCode());
-        }
+        }*/
+        return response;
     }
 
 
