@@ -360,6 +360,11 @@ public class CarBizSupplierService{
 
 
 	private boolean modifyAccept(CarBizSupplierVo supplierVo){
+	    //结算周期为(2-半月结 3-周结)时，前端不传结算日，赋默认值0
+        Integer settlementCycle = supplierVo.getSettlementCycle();
+	    if (settlementCycle == 2 || settlementCycle == 3){
+            supplierVo.setSettlementDay(0);
+        }
 		boolean modifyAll = StringUtils.isNotBlank(supplierVo.getSettlementFullName()) &&
 				StringUtils.isNotBlank(supplierVo.getBankIdentify()) &&
 				StringUtils.isNotBlank(supplierVo.getBankName()) &&
