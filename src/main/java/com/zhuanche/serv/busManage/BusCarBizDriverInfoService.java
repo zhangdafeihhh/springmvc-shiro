@@ -1363,7 +1363,7 @@ public class BusCarBizDriverInfoService implements BusConst {
         Query query = new Query().limit(busDriverDTO.getPageSize());
         //城市
         if(busDriverDTO.getCityId()!=null){
-            query.addCriteria(Criteria.where("cityId").is(busDriverDTO.getCityId()));
+            query.addCriteria(Criteria.where("serviceCity").is(busDriverDTO.getCityId()));
         }
         //供应商权限
         Set<Integer> authOfSupplier = busDriverDTO.getAuthOfSupplier();
