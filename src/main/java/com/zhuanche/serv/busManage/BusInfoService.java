@@ -592,7 +592,7 @@ public class BusInfoService {
         //只要是审核表中存在就一定重复
         Query query = new Query();
         query.addCriteria(Criteria.where("licensePlates").is(licensePlates));
-        query.addCriteria(Criteria.where("status").is(0));
+        query.addCriteria(Criteria.where("auditStatus").is(0));
         List<BusInfoAudit> busInfoAudits = carMongoTemplate.find(query, BusInfoAudit.class);
         if (result > 0 || (busInfoAudits != null && busInfoAudits.size() > 0)) {
             return true;
