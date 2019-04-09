@@ -234,7 +234,7 @@ public class BusInfoService {
                     int carId = saveCar2DB(carInfo);
                     if (carId > 0) {
                         Update update = new Update();
-                        update.set("status", 1);
+                        update.set("auditStatus", 1);
                         update.set("auditor", WebSessionUtil.getCurrentLoginUser().getId());
                         update.set("auditDate", new Date());
                         update.set("auditorName",WebSessionUtil.getCurrentLoginUser().getName());
@@ -250,7 +250,7 @@ public class BusInfoService {
                     int result = updateCar2DB(carInfo);
                     if (result > 0) {
                         Update update = new Update();
-                        update.set("status", 1);
+                        update.set("auditStatus", 1);
                         update.set("auditor", WebSessionUtil.getCurrentLoginUser().getId());
                         update.set("auditDate", new Date());
                         update.set("auditorName",WebSessionUtil.getCurrentLoginUser().getName());
