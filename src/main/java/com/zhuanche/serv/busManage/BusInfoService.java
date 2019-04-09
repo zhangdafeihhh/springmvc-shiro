@@ -154,7 +154,7 @@ public class BusInfoService {
             query.addCriteria(Criteria.where("licensePlates").regex(pattern));
         }
         //只查询未审核的数据
-        query.addCriteria(Criteria.where("status").is(0));
+        query.addCriteria(Criteria.where("auditStatus").is(0));
         Integer pageNum = busDTO.getPageNum();
         Integer pageSize = busDTO.getPageSize();
         int start = (pageNum - 1) * pageSize;
