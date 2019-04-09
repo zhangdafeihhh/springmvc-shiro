@@ -55,7 +55,8 @@
         #{item}
       </foreach>
     </if>
-    GROUP BY p.id,tips_title,p.create_time,tips_content
+    GROUP BY p.id,tips_title,p.update_time,tips_content
+    ORDER BY p.update_time desc
   </select>
 
 
@@ -84,7 +85,8 @@
         #{item}
       </foreach>
     </if>
-    GROUP BY p.id,tips_title,p.create_time,tips_content
+    GROUP BY p.id,tips_title,p.update_time,tips_content
+    ORDER BY p.update_time desc
   </select>
 
 
@@ -113,7 +115,8 @@
         #{item}
       </foreach>
     </if>
-    GROUP BY p.id,tips_title,p.create_time,tips_content
+    GROUP BY p.id,tips_title,p.update_time,tips_content
+    ORDER BY p.update_time desc
   </select>
 
 
