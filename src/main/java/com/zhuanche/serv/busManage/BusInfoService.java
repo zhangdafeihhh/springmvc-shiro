@@ -406,14 +406,12 @@ public class BusInfoService {
                 return AjaxResponse.success("修改成功");
             }
         } else {
-            //校验新的车牌号是否已经存在
-            List<BusInfoAudit> busInfoAudits = this.queryBusFromMongByPlates(busCarSaveDTO.getLicensePlates());
-            if (busInfoAudits!=null&&busInfoAudits.size()>0) {
-                return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "车牌号已经存在");
-            }
-            CarBizCarInfo busInfoByLicensePlates = busInfoExMapper.getBusInfoByLicensePlates(busCarSaveDTO.getLicensePlates());
-            if(busInfoByLicensePlates!=null&&!busInfoByLicensePlates.getCarId().equals(busCarSaveDTO.getCarId())){
-                return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "车牌号已经存在");
+            //如果修改了车牌号，校验新的车牌号是否存在
+            if(!busDetail.getLicensePlates().equals(busCarSaveDTO.getLicensePlates())){
+                boolean b = this.licensePlatesIfExist(busCarSaveDTO.getLicensePlates());
+                if (b) {
+                    return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "车牌号已经存在");
+                }
             }
             //进入审核列表
             BusInfoAudit busInfoAudit = new BusInfoAudit();
@@ -594,23 +592,18 @@ public class BusInfoService {
     public boolean licensePlatesIfExist(String licensePlates) {
         int result = busInfoExMapper.countLicensePlates(licensePlates);
         //只要是审核表中存在就一定重复
-        List<BusInfoAudit> busInfoAudits = this.queryBusFromMongByPlates(licensePlates);
+        Query query = new Query();
+        query.addCriteria(Criteria.where("licensePlates").is(licensePlates));
+        query.addCriteria(Criteria.where("auditStatus").is(0));
+        List<BusInfoAudit> busInfoAudits = carMongoTemplate.find(query, BusInfoAudit.class);
         if (result > 0 || (busInfoAudits != null && busInfoAudits.size() > 0)) {
             return true;
         }
         return false;
     }
 
-    public List<BusInfoAudit> queryBusFromMongByPlates(String licensePlates){
-        Query query = new Query();
-        query.addCriteria(Criteria.where("licensePlates").is(licensePlates));
-        query.addCriteria(Criteria.where("auditStatus").is(0));
-        return carMongoTemplate.find(query, BusInfoAudit.class);
-    }
-
     public String getLicensePlatesByCarId(Integer carId) {
         return busInfoExMapper.getLicensePlatesByCarId(carId);
     }
-
 
 }
