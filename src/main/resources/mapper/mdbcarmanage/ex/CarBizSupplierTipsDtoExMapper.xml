@@ -38,10 +38,10 @@
     INNER JOIN car_adm_user u on  p.user_id = u.user_id
     WHERE p.status = 1
     <if test="startDate != null" >
-      AND p.create_time &gt;=#{startDate}
+      AND p.update_time &gt;=#{startDate}
     </if>
     <if test="endDate != null" >
-      AND p.create_time &lt;= #{endDate}
+      AND p.update_time &lt;= #{endDate}
     </if>
     <if test="keyword != null and keyword != '' " >
       AND (LOCATE(#{keyword},p.tips_title) &gt; 0
@@ -71,10 +71,10 @@
     WHERE
     p.status = 1
     <if test="startDate != null" >
-      AND p.create_time &gt;=#{startDate}
+      AND p.update_time &gt;=#{startDate}
     </if>
     <if test="endDate != null" >
-      AND p.create_time &lt;= #{endDate}
+      AND p.update_time &lt;= #{endDate}
     </if>
     <if test="keyword != null" >
       AND LOCATE(#{keyword},p.tips_title) &gt; 0
@@ -100,10 +100,10 @@
     INNER JOIN car_adm_user u on  p.user_id = u.user_id
     WHERE p.status = 1
     <if test="startDate != null" >
-      AND p.create_time &gt;=#{startDate}
+      AND p.update_time &gt;=#{startDate}
     </if>
     <if test="endDate != null" >
-      AND p.create_time &lt;= #{endDate}
+      AND p.update_time &lt;= #{endDate}
     </if>
     <if test="keyword != null and keyword != '' " >
       AND p.id in
