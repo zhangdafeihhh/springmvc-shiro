@@ -90,12 +90,15 @@
     <if test="createDateEnd !=null and createDateEnd !=''">
       AND ca.create_at &lt;= #{createDateEnd}
     </if>
+    <if test="createDateEnd !=null and createDateEnd !=''">
+      AND ca.create_at &lt;= NOW()
+    </if>
 
     <if test="orderFinishTimeBegin !=null and orderFinishTimeBegin !=''">
-      AND ca.orderFinishTime &gt;= #{orderFinishTimeBegin}
+      AND ca.order_finish_time &gt;= #{orderFinishTimeBegin}
     </if>
     <if test="orderFinishTimeEnd !=null and orderFinishTimeEnd !=''">
-      AND ca.orderFinishTime &lt;= #{orderFinishTimeEnd}
+      AND ca.order_finish_time &lt;= #{orderFinishTimeEnd}
     </if>
 
     <if test="orderNo!=null and orderNo!=''">

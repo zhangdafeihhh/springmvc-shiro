@@ -168,6 +168,9 @@
     <if test="createDateEnd !=null and createDateEnd !=''">
       AND ca.create_date &lt;= #{createDateEnd}
     </if>
+    <if test="createDateEnd !=null and createDateEnd !=''">
+      AND ca.create_at &lt;= NOW()
+    </if>
     <if test="orderNo!=null and orderNo!=''">
       AND ca.order_no LIKE CONCAT(#{orderNo}, '%')
     </if>
