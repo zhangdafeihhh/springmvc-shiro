@@ -10,10 +10,19 @@
     <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
     <result column="email" property="email" jdbcType="VARCHAR" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
-    <result column="two_level_cooperation" property="twoLevelCooperation" jdbcType="INTEGER" />
+    <result column="settlement_type" property="settlementType" jdbcType="INTEGER" />
+    <result column="settlement_cycle" property="settlementCycle" jdbcType="INTEGER" />
+    <result column="settlement_day" property="settlementDay" jdbcType="INTEGER" />
+    <result column="settlement_account" property="settlementAccount" jdbcType="VARCHAR" />
+    <result column="bank_account" property="bankAccount" jdbcType="VARCHAR" />
+    <result column="bank_name" property="bankName" jdbcType="VARCHAR" />
+    <result column="bank_identify" property="bankIdentify" jdbcType="VARCHAR" />
+    <result column="settlement_full_name" property="settlementFullName" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, supplier_id, status, supplier_short_name, create_date, update_date, email, remark
+    id, supplier_id, status, supplier_short_name, create_date, update_date, email, remark,
+    settlement_type, settlement_cycle, settlement_day, settlement_account,
+    bank_account, bank_name, bank_identify, settlement_full_name
   </sql>
   <select id="queryExtDtoByIdList" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select
@@ -40,8 +49,29 @@
       <if test="email != null and email != ''">
         email = #{email},
       </if>
-      <if test="twoLevelCooperation != null">
-        two_level_cooperation = #{twoLevelCooperation},
+      <if test="settlementType != null" >
+        settlement_type = #{settlementType,jdbcType=INTEGER},
+      </if>
+      <if test="settlementCycle != null" >
+        settlement_cycle = #{settlementCycle,jdbcType=INTEGER},
+      </if>
+      <if test="settlementDay != null" >
+        settlement_day = #{settlementDay,jdbcType=INTEGER},
+      </if>
+      <if test="settlementAccount != null" >
+        settlement_account = #{settlementAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="bankAccount != null" >
+        bank_account = #{bankAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="bankName != null" >
+        bank_name = #{bankName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankIdentify != null" >
+        bank_identify = #{bankIdentify,jdbcType=VARCHAR},
+      </if>
+      <if test="settlementFullName != null" >
+        settlement_full_name = #{settlementFullName,jdbcType=VARCHAR},
       </if>
     </set>
     where supplier_id = #{supplierId}
@@ -52,8 +82,22 @@
       id,
       supplier_short_name,
       email,
-      two_level_cooperation
+      settlement_type,
+      settlement_cycle,
+      settlement_day,
+      settlement_account,
+      bank_account,
+      bank_name,
+      bank_identify,
+      settlement_full_name
     from supplier_ext
     where supplier_id = #{supplierId}
+  </select>
+
+  <select id="selectCountBySupplierId" parameterType="integer" resultType="integer">
+    select
+      count(1)
+    from supplier_ext
+      where supplier_id = #{supplierId}
   </select>
 </mapper>
