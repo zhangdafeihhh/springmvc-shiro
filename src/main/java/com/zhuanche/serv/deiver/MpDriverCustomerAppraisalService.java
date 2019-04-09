@@ -32,11 +32,19 @@ public class MpDriverCustomerAppraisalService {
         PageHelper.startPage(params.getPage(), params.getPageSize(), true);
         String createDateBegin = params.getCreateDateBegin();
         String createDateEnd = params.getCreateDateEnd();
+        String orderFinishTimeBegin = params.getOrderFinishTimeBegin();
+        String orderFinishTimeEnd = params.getOrderFinishTimeEnd();
         if (StringUtils.isNotEmpty(createDateBegin)){
             params.setCreateDateBegin(createDateBegin + " 00:00:00");
         }
         if (StringUtils.isNotEmpty(createDateEnd)){
             params.setCreateDateEnd(createDateEnd + " 23:59:59");
+        }
+        if (StringUtils.isNotEmpty(orderFinishTimeBegin)){
+            params.setOrderFinishTimeBegin(orderFinishTimeBegin + " 00:00:00");
+        }
+        if (StringUtils.isNotEmpty(orderFinishTimeEnd)){
+            params.setOrderFinishTimeEnd(orderFinishTimeEnd + " 23:59:59");
         }
         List<MpCarBizCustomerAppraisal> list  = customerAppraisalExMapper.queryForListObject(params);
         PageInfo<MpCarBizCustomerAppraisal> pageInfo = new PageInfo<>(list);
