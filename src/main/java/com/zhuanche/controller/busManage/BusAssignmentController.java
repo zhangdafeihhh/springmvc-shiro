@@ -312,7 +312,7 @@ public class BusAssignmentController {
                 return AjaxResponse.failMsg(RestErrorCode.UNKNOWN_ERROR, "司机或者车辆信息不存在");
             }
             if(!driverInfo.getSupplierId().equals(carInfo.getSupplierId())){
-                return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR,"车辆和司机供应商信息不一致");
+                return AjaxResponse.fail(RestErrorCode.CITY_SUPPLIER_CAR_DIFFER,"车辆和司机供应商信息不一致");
             }
             String driverPhone = driverInfo.getPhone();
             String driverName = driverInfo.getName();
