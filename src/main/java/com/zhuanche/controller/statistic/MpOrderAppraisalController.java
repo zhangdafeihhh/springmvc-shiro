@@ -9,6 +9,7 @@ import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RequestFunction;
+import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.controller.DriverQueryController;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalBean;
@@ -90,8 +91,8 @@ public class MpOrderAppraisalController extends DriverQueryController{
 										  String driverName,
 										  @Verify(param="driverPhone",rule="mobile") String driverPhone,
 										  String orderNo, Integer appraisalStatus,
-										  @Verify(param="createDateBegin",rule="required")String createDateBegin,
-										  @Verify(param="createDateEnd",rule="required")String createDateEnd,
+										  String createDateBegin,
+										  String createDateEnd,
 										  String orderFinishTimeBegin,
 										  String orderFinishTimeEnd,
 										  String evaluateScore,String sortName, String sortOrder,
@@ -112,6 +113,14 @@ public class MpOrderAppraisalController extends DriverQueryController{
 				return AjaxResponse.success(pageDTO);
 			}
 		}
+		//修改查询限制条件
+		if((StringUtils.isEmpty(createDateBegin) && StringUtils.isEmpty(createDateEnd)) &&
+				StringUtils.isEmpty(orderFinishTimeBegin) &&
+				StringUtils.isEmpty(orderFinishTimeEnd)){
+			log.info("评价时间】范围或【完成日期】范围至少限定一个，支持跨度31天");
+			return AjaxResponse.fail(RestErrorCode.PARAMS_NOT,RestErrorCode.renderMsg(RestErrorCode.PARAMS_NOT));
+		}
+
 		params.setDriverIds(driverList);
 		//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
 		params = this.chuliParams(params);

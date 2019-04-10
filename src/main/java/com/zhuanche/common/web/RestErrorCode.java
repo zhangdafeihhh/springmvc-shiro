@@ -212,6 +212,10 @@ public final class RestErrorCode{
 	@ResultMessage("内容含有emoji表情或者特殊符号")
 	public static final int TIPS_CONTENT_EMOJI = 8103;
 
+	@ResultMessage("【评价时间】范围或【完成日期】范围至少限定一个，支持跨度31天")
+	public static final int PARAMS_NOT = 8210;
+
+
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系
 	static{
