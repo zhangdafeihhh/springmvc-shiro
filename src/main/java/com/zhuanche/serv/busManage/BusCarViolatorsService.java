@@ -74,7 +74,10 @@ public class BusCarViolatorsService implements BusConst {
 
     private BusBizDriverViolators convertViolatorsBean(BusDriverViolatorsSaveDTO saveDTO, BusDriverDetailInfoVO driverInfo){
         BusBizDriverViolators violator=new BusBizDriverViolators();
-        Date petDate=DateUtils.afterNHoursDate(saveDTO.getPunishStartTime(),saveDTO.getPunishDuration());
+        String punishDuration=saveDTO.getPunishDuration();
+        int minutes=(int)(Double.parseDouble(punishDuration)*60);
+        logger.info("【新增违规巴士司机】minutes="+minutes);
+        Date petDate=DateUtils.afterNMinutesDate(saveDTO.getPunishStartTime(),minutes);
         violator.setBusDriverId(driverInfo.getDriverId());
         violator.setBusDriverName(driverInfo.getName());
         violator.setBusDriverPhone(saveDTO.getBusDriverPhone());
@@ -90,7 +93,7 @@ public class BusCarViolatorsService implements BusConst {
         violator.setPunishStatus((short)0);
         violator.setPunishType(saveDTO.getPunishType());
         violator.setPunishReason(saveDTO.getPunishReason());
-        violator.setPunishDuration(saveDTO.getPunishDuration());
+        violator.setPunishDuration(Double.parseDouble(punishDuration));
         violator.setPunishStartTime(saveDTO.getPunishStartTime());
         violator.setPunishEndTime(petDate);
         return violator;
