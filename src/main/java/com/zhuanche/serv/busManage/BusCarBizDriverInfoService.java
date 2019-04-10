@@ -1125,17 +1125,18 @@ public class BusCarBizDriverInfoService implements BusConst {
                                 idCardNo = idCardNo.toLowerCase();
                             }
 
+
                             if (reIdCarNo.indexOf(idCardNo) > 0) {
                                 errorMsgs.add(errorPrefix + "有重复身份证号");
                                 isTrue = false;
                                 break;
                             }
-
+                            Boolean hadIdCard = this.checkMongoIdCardMo(null, idCardNo, null);
                             reIdCarNo.append(idCardNo).append(",");
                             if (StringUtils.isEmpty(idCardNo) || !ValidateUtils.validateIdCarNo(idCardNo)) {
                                 errorMsgs.add(errorPrefix + "不合法");
                                 isTrue = false;
-                            } else if (carBizDriverInfoService.checkIdCardNo(idCardNo, null)) {
+                            } else if (carBizDriverInfoService.checkIdCardNo(idCardNo, null) || hadIdCard) {
                                 errorMsgs.add(errorPrefix + "已存在【" + idCardNo + "】的司机信息信息");
                                 isTrue = false;
                             } else {
@@ -1151,10 +1152,11 @@ public class BusCarBizDriverInfoService implements BusConst {
                                 break;
                             }
                             rePhone.append(phone);
+                            Boolean hadPhone = checkMongoPhone(null, phone, null);
                             if (StringUtils.isEmpty(phone) || !ValidateUtils.validatePhone(phone)) {
                                 errorMsgs.add(errorPrefix + "不合法");
                                 isTrue = false;
-                            } else if (carBizDriverInfoService.checkPhone(phone, null)) {
+                            } else if (carBizDriverInfoService.checkPhone(phone, null) || hadPhone) {
                                 errorMsgs.add(errorPrefix + "已存在【" + phone + "】的司机信息信息");
                                 isTrue = false;
                             } else {
@@ -1675,7 +1677,7 @@ public class BusCarBizDriverInfoService implements BusConst {
                 log.append("司机审核通过：");
                 log.append("审核人id："+WebSessionUtil.getCurrentLoginUser().getId()+",");
                 log.append("审核人姓名：" +WebSessionUtil.getCurrentLoginUser().getLoginName()+",");
-                log.append("审核日期：" + new Date());
+                log.append("审核日期：" + f.format(new Date()));
                 busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(saveDTO.getDriverId()),"司机审核通过："+log.toString(), new Date());
             }
             return AjaxResponse.success(null);
