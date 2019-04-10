@@ -6,6 +6,7 @@ import com.zhuanche.vo.busManage.BusBizDriverViolatorsVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 public interface BusBizDriverViolatorsExMapper {
 
@@ -18,5 +19,7 @@ public interface BusBizDriverViolatorsExMapper {
     int recoverDriverStatus(@Param("id") Integer id);
 
     Integer insertSelective(BusBizDriverViolators busBizDriverViolators);
+
+    List<BusBizDriverViolatorsVO> queryCurrentOutOfDriver(@Param("supplierIds") Set<Integer> supplierIds);
 
 }

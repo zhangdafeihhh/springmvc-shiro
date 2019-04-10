@@ -144,8 +144,7 @@ public final class RestErrorCode{
 	public static final int STARTTIME_GREATE_ENDTIME                    = 3105;
 	@ResultMessage("该司机没有被锁定")
 	public static final int DRIVER_NOT_LOCKED                           =3106;
-	@ResultMessage("在服务中")
-	public static final int IN_SERVICE                                 =3107;
+
 	//-----------------------------------------------业务参数：导入文件
 	@ResultMessage("文件异常")
 	public static final int FILE_ERROR                    = 4001;
@@ -213,6 +212,9 @@ public final class RestErrorCode{
 
 	@ResultMessage("巴士服务供应商权限校验不通过")
 	public static final int BUS_SUPPLIER_AUTH_FORBIDDEN =802;
+	@ResultMessage("正在服务中")
+	public static final int INT_SERVICE =803;
+
 
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系

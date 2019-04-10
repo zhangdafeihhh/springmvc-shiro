@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.mongodb.WriteResult;
-import com.sun.org.apache.regexp.internal.RE;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -20,6 +19,7 @@ import com.zhuanche.dto.busManage.BusInfoDTO;
 import com.zhuanche.dto.rentcar.CarMongoDTO;
 import com.zhuanche.entity.busManage.BusCarInfo;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
+import com.zhuanche.entity.rentcar.CarBizCarInfo;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.http.MpOkHttpUtil;
@@ -131,7 +131,7 @@ public class BusInfoService {
         //来源：0创建
         busInfo.setStemFrom(0);
         carMongoTemplate.insert(busInfo);
-        return AjaxResponse.success(null);
+        return AjaxResponse.success("保存成功，车辆已进入审核");
     }
 
 
@@ -155,7 +155,7 @@ public class BusInfoService {
             query.addCriteria(Criteria.where("licensePlates").regex(pattern));
         }
         //只查询未审核的数据
-        query.addCriteria(Criteria.where("status").is(0));
+        query.addCriteria(Criteria.where("auditStatus").is(0));
         Integer pageNum = busDTO.getPageNum();
         Integer pageSize = busDTO.getPageSize();
         int start = (pageNum - 1) * pageSize;
@@ -214,7 +214,6 @@ public class BusInfoService {
     }
 
 
-    @RequestMapping("/audit")
     @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER))
     public AjaxResponse audit(@Verify(param = "ids", rule = "required") String ids) {
         String[] split = ids.split(",");
@@ -235,7 +234,7 @@ public class BusInfoService {
                     int carId = saveCar2DB(carInfo);
                     if (carId > 0) {
                         Update update = new Update();
-                        update.set("status", 1);
+                        update.set("auditStatus", 1);
                         update.set("auditor", WebSessionUtil.getCurrentLoginUser().getId());
                         update.set("auditDate", new Date());
                         update.set("auditorName",WebSessionUtil.getCurrentLoginUser().getName());
@@ -251,13 +250,13 @@ public class BusInfoService {
                     int result = updateCar2DB(carInfo);
                     if (result > 0) {
                         Update update = new Update();
-                        update.set("status", 1);
+                        update.set("auditStatus", 1);
                         update.set("auditor", WebSessionUtil.getCurrentLoginUser().getId());
                         update.set("auditDate", new Date());
                         update.set("auditorName",WebSessionUtil.getCurrentLoginUser().getName());
                         carMongoTemplate.updateFirst(query, update, BusInfoAudit.class);
                         String diff = this.saveUpdateLog(detail, carInfo.getCarId());
-                        if("".equals(diff)) {
+                        if(!"".equals(diff)) {
                             busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carInfo.getCarId()), diff, busAudit.getUpdateBy(), busAudit.getUpdateName(), busAudit.getUpdateDate());
                             busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carInfo.getCarId()), "审核通过", new Date());
                         }
@@ -385,10 +384,10 @@ public class BusInfoService {
         if (busDetail == null) {
             return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "车辆ID传入错误");
         }
-       /* boolean inService = this.isInService(busDetail.getLicensePlates());
+        boolean inService = this.isInService(busDetail.getLicensePlates());
         if(inService){
-            return AjaxResponse.fail(RestErrorCode.IN_SERVICE);
-        }*/
+            return AjaxResponse.fail(RestErrorCode.INT_SERVICE);
+        }
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         Integer userId = currentLoginUser.getId();
         if (busDetail.getLicensePlates().equals(busCarSaveDTO.getLicensePlates()) && busDetail.getTransportnumber().equals(busCarSaveDTO.getTransportnumber())) {
@@ -404,13 +403,15 @@ public class BusInfoService {
                 if(!"".equals(diff)){
                     busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(busCarSaveDTO.getCarId()), diff, new Date());
                 }
-                return AjaxResponse.success(null);
+                return AjaxResponse.success("修改成功");
             }
         } else {
-            //校验新的车牌号是否已经存在
-            boolean b = this.licensePlatesIfExist(busCarSaveDTO.getLicensePlates());
-            if (b) {
-                return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "车牌号已经存在");
+            //如果修改了车牌号，校验新的车牌号是否存在
+            if(!busDetail.getLicensePlates().equals(busCarSaveDTO.getLicensePlates())){
+                boolean b = this.licensePlatesIfExist(busCarSaveDTO.getLicensePlates());
+                if (b) {
+                    return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "车牌号已经存在");
+                }
             }
             //进入审核列表
             BusInfoAudit busInfoAudit = new BusInfoAudit();
@@ -423,7 +424,7 @@ public class BusInfoService {
             //默认未审核
             busInfoAudit.setAuditStatus(0);
             carMongoTemplate.insert(busInfoAudit);
-            return AjaxResponse.success(null);
+            return AjaxResponse.success("保存成功，车辆已进入审核");
         }
         return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
     }
@@ -593,7 +594,7 @@ public class BusInfoService {
         //只要是审核表中存在就一定重复
         Query query = new Query();
         query.addCriteria(Criteria.where("licensePlates").is(licensePlates));
-        query.addCriteria(Criteria.where("status").is(0));
+        query.addCriteria(Criteria.where("auditStatus").is(0));
         List<BusInfoAudit> busInfoAudits = carMongoTemplate.find(query, BusInfoAudit.class);
         if (result > 0 || (busInfoAudits != null && busInfoAudits.size() > 0)) {
             return true;
@@ -604,6 +605,5 @@ public class BusInfoService {
     public String getLicensePlatesByCarId(Integer carId) {
         return busInfoExMapper.getLicensePlatesByCarId(carId);
     }
-
 
 }

@@ -18,6 +18,7 @@ import com.zhuanche.entity.busManage.BusCostDetail;
 import com.zhuanche.entity.busManage.BusOrderDetail;
 import com.zhuanche.entity.rentcar.CarBizService;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
+import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.busManage.*;
 import com.zhuanche.shiro.realm.SSOLoginUser;
@@ -29,20 +30,26 @@ import mapper.rentcar.CarBizServiceMapper;
 import mapper.rentcar.ex.BusCarBizDriverInfoExMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -86,6 +93,9 @@ public class BusSettlementAdviceController {
 
     @Autowired
     private CarBizCarGroupExMapper carBizCarGroupExMapper;
+
+    @Value("${order.pay.url}")
+    private String orderPayUrl;
 
 
     /**
@@ -642,7 +652,7 @@ public class BusSettlementAdviceController {
     }
 
     /**
-     * @param invoiceDTO
+     * @param BusSettlementPaymentDTO
      * @return AjaxResponse
      * @throws
      * @Title: paymentSave
@@ -651,6 +661,216 @@ public class BusSettlementAdviceController {
     @RequestMapping(value = "/payment/save")
     public AjaxResponse paymentSave(@Validated BusSettlementPaymentDTO paymentDTO) {
         return busSettlementAdviceService.savePaymentInfo(paymentDTO);
+    }
+
+    @RequestMapping(value = "/exportBillsSummary")
+    public void exportBillsSummary(@Verify(param = "supplierBillId",rule = "required") String supplierBillId,
+                                           HttpServletRequest request, HttpServletResponse response)throws Exception{
+        HashMap<String,Object> params=new HashMap<>();
+        params.put("supplierBillId",supplierBillId);
+        String fileName = BusConstant.buidFileName(request, "账单信息");
+        //创建工作簿
+        XSSFWorkbook wb=new XSSFWorkbook();
+
+
+        //创建表格
+        XSSFSheet sheet = wb.createSheet("流水汇总");
+        //内容居中
+        sheet.setHorizontallyCenter(true);
+        //页面打印
+        sheet.setFitToPage(true);
+
+
+        //创建头部样式
+        XSSFCellStyle titleStyle = wb.createCellStyle();
+        //对齐方式
+        titleStyle.setAlignment(HorizontalAlignment.CENTER);
+        titleStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        titleStyle.setWrapText(true);
+        //填充颜色索引
+        titleStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        //颜色填充样式
+        titleStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        //文字
+        XSSFFont titleFont = wb.createFont();
+        titleFont.setBold(true);
+        titleFont.setFontHeight((short)12);//文字尺寸
+        titleFont.setFontHeightInPoints((short)12);
+        titleStyle.setFont(titleFont);
+
+
+
+        //创建head样式
+        XSSFCellStyle head_style = wb.createCellStyle();
+        head_style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        head_style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        head_style.setBorderTop(BorderStyle.THIN);
+        head_style.setBorderBottom(BorderStyle.THIN);
+        head_style.setBorderLeft(BorderStyle.THIN);
+        head_style.setBorderRight(BorderStyle.THIN);
+        head_style.setTopBorderColor(IndexedColors.BLACK.getIndex());
+        head_style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        head_style.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        head_style.setRightBorderColor(IndexedColors.BLACK.getIndex());
+        head_style.setWrapText(true);
+        //文本水平居中显示
+        head_style.setAlignment(HorizontalAlignment.CENTER);
+        //文本竖直居中显示
+        head_style.setVerticalAlignment(VerticalAlignment.CENTER);
+        XSSFFont head_font = wb.createFont();
+        head_font.setBold(true);
+        head_style.setFont(head_font);
+
+        //内容样式
+        XSSFCellStyle style = wb.createCellStyle();
+        //文本水平居中显示
+        style.setAlignment(HorizontalAlignment.CENTER);
+        //文本竖直居中显示
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        //文本自动换行
+        style.setWrapText(true);
+
+        //生成Excel表单，需要给文本添加边框样式和颜色
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        //set border color
+        style.setTopBorderColor(IndexedColors.BLACK.getIndex());
+        style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        style.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        style.setRightBorderColor(IndexedColors.BLACK.getIndex());
+
+
+
+
+
+        XSSFRow title_row = sheet.createRow(0);
+        title_row.setHeightInPoints(50);
+        for(int i=0;i<6;i++){
+            sheet.setColumnWidth(i,8000);
+            XSSFCell title_cell = title_row.createCell(i);
+            title_cell.setCellStyle(titleStyle);
+        }
+        title_row.getCell(0).setCellValue("流水汇总");
+        //合并单元格
+        sheet.addMergedRegion(new CellRangeAddress(0,0,0,5));
+
+
+        ArrayList<String>head=new ArrayList<>(6);
+        head.add("订单实际计费金额");
+        head.add("司机代垫国家收费项目");
+        head.add("信息费比例");
+        head.add("实收信息费");
+        head.add("其他金额");
+        head.add("应结订单价款");
+        XSSFRow head_row = sheet.createRow(1);
+        XSSFRow context_row = sheet.createRow(2);
+        head_row.setHeightInPoints(20);
+        for(int i=0;i<head.size();i++){
+            XSSFCell cell = head_row.createCell(i);
+            cell.setCellValue(head.get(i));
+            cell.setCellStyle(head_style);
+            XSSFCell context_cell = context_row.createCell(i);
+            context_cell.setCellStyle(style);
+        }
+
+
+        ArrayList<String> bottom_context = new ArrayList<>();
+        bottom_context.add("订单金额汇总");
+        bottom_context.add("高速费+停车费");
+        bottom_context.add("结算比例");
+        bottom_context.add("(订单实际计费金额-司机代垫国家收费项目)*信息费比例");
+        bottom_context.add("账单调整金额为负时表示扣减");
+        bottom_context.add("订单实际计费金额-实收信息费");
+
+        XSSFRow bootom_row = sheet.createRow(3);
+        for (int i=0;i<bottom_context.size();i++){
+            XSSFCell cell = bootom_row.createCell(i);
+            cell.setCellValue(bottom_context.get(i));
+            cell.setCellStyle(style);
+        }
+
+        XSSFCellStyle remarks_Style = wb.createCellStyle();
+        remarks_Style.setAlignment(HorizontalAlignment.LEFT);
+        remarks_Style.setVerticalAlignment(VerticalAlignment.CENTER);
+        remarks_Style.setBorderTop(BorderStyle.NONE);
+        remarks_Style.setBorderBottom(BorderStyle.NONE);
+        remarks_Style.setBorderLeft(BorderStyle.NONE);
+        remarks_Style.setBorderRight(BorderStyle.NONE);
+        //填充颜色索引
+        remarks_Style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        //颜色填充样式
+        remarks_Style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        XSSFFont remarks_font = wb.createFont();
+        remarks_font.setFontHeight((short)9);
+        remarks_font.setFontHeightInPoints((short)9);
+        remarks_Style.setFont(remarks_font);
+
+        ArrayList<String>remarks = new ArrayList<>();
+        remarks.add("备注1：   订单价款=（订单实际计费金额-司机代垫国家收费项目）*（1-信息费比例）+司机代垫国家收费项目+其他金额");
+        remarks.add("备注2:    增值税专用发票开票信息：");
+        remarks.add("          名称：首约科技（北京）有限公司");
+        remarks.add("          纳税人识别号：91120118328676979R");
+        remarks.add("          地址、电话：北京市朝阳区枣营路加甲3号2幢6016室 010-65206159");
+        remarks.add("          开户行及账号：交通银行北京三元支行 110060635018800021058");
+        for(int i=0;i<remarks.size();i++){
+            int rowIdx =4+i;
+            sheet.addMergedRegion(new CellRangeAddress(rowIdx,rowIdx,0,5));
+            XSSFRow row = sheet.createRow(rowIdx);
+            if(rowIdx==4){
+                row.setHeightInPoints(70);
+            }else{
+                row.setHeightInPoints(20);
+            }
+            XSSFCell cell = row.createCell(0);
+            cell.setCellValue(remarks.get(i));
+            cell.setCellStyle(remarks_Style);
+        }
+
+        String url=orderPayUrl+"/settle/supplier/findOrderFlow?supplierBillId="+supplierBillId;
+        try {
+            String rpc_response = MpOkHttpUtil.okHttpGet(url, 3, "巴士账单汇总");
+            JSONObject reponse_json = JSONObject.parseObject(rpc_response);
+            Integer code = reponse_json.getInteger("code");
+            JSONObject data = reponse_json.getJSONObject("data");
+            if(code==0&&data!=null){
+                DecimalFormat decimalFormat = new DecimalFormat("#########0.##");
+                BigDecimal orderAmount = data.getBigDecimal("orderAmount");
+                context_row.getCell(0).setCellValue(decimalFormat.format(orderAmount));
+                BigDecimal driverPaymentAmount = data.getBigDecimal("driverPaymentAmount");
+                context_row.getCell(1).setCellValue(decimalFormat.format(driverPaymentAmount));
+                BigDecimal settleRatio = data.getBigDecimal("settleRatio");
+                context_row.getCell(2).setCellValue(decimalFormat.format(settleRatio));
+                BigDecimal factCollectAmount = data.getBigDecimal("factCollectAmount");
+                context_row.getCell(3).setCellValue(decimalFormat.format(factCollectAmount));
+                BigDecimal otherAmount = data.getBigDecimal("otherAmount");
+                context_row.getCell(4).setCellValue(decimalFormat.format(otherAmount));
+                BigDecimal shouldSettleAmount = data.getBigDecimal("shouldSettleAmount");
+                context_row.getCell(5).setCellValue(decimalFormat.format(shouldSettleAmount));
+
+                Integer supplierId = data.getInteger("supplierId");
+                CarBizSupplier carBizSupplier = supplierService.selectByPrimaryKey(supplierId);
+                String supplierName=carBizSupplier!=null?carBizSupplier.getSupplierFullName():"";
+                String title=supplierName+data.getString("startTime")+"-"+data.getString("endTime")+"流水汇总";
+                sheet.getRow(0).getCell(0).setCellValue(title);
+            }else{
+                logger.error("巴士账单汇总导出，返回失败，code={},msg={}",code,reponse_json.getString("msg"));
+                context_row.getCell(0).setCellValue("查询失败，稍后重试");
+            }
+        } catch (Exception e) {
+            logger.error("巴士账单汇总导出，调用接口异常：{}",e);
+            context_row.getCell(0).setCellValue("网络异常，稍后再试");
+        }
+
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment;filename="+fileName + ".xlsx");
+        response.addHeader("Pargam", "no-cache");
+        response.addHeader("Cache-Control", "no-cache");
+        ServletOutputStream out = response.getOutputStream();
+        wb.write(out);
+        out.flush();
+        out.close();
     }
 
 }

@@ -474,7 +474,7 @@ public class BusCarBizDriverInfoService implements BusConst {
                 logger.error("保存需要上报交通委的信息异常,error={}", e.getMessage(), e);
             }
 
-            return AjaxResponse.success(null);
+            return AjaxResponse.success("修改成功");
         } catch (Exception e) {
             logger.error("修改司机信息异常,error={}", e.getMessage(), e);
             return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, "修改司机信息异常");
@@ -707,7 +707,6 @@ public class BusCarBizDriverInfoService implements BusConst {
     /**
      * 查询城市名称，供应商名称，服务类型，加盟类型
      *
-     * @param saveDTO
      * @return
      */
     @MasterSlaveConfigs(configs = {@MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE),
@@ -1126,17 +1125,18 @@ public class BusCarBizDriverInfoService implements BusConst {
                                 idCardNo = idCardNo.toLowerCase();
                             }
 
+
                             if (reIdCarNo.indexOf(idCardNo) > 0) {
                                 errorMsgs.add(errorPrefix + "有重复身份证号");
                                 isTrue = false;
                                 break;
                             }
-
+                            Boolean hadIdCard = this.checkMongoIdCardMo(null, idCardNo, null);
                             reIdCarNo.append(idCardNo).append(",");
                             if (StringUtils.isEmpty(idCardNo) || !ValidateUtils.validateIdCarNo(idCardNo)) {
                                 errorMsgs.add(errorPrefix + "不合法");
                                 isTrue = false;
-                            } else if (carBizDriverInfoService.checkIdCardNo(idCardNo, null)) {
+                            } else if (carBizDriverInfoService.checkIdCardNo(idCardNo, null) || hadIdCard) {
                                 errorMsgs.add(errorPrefix + "已存在【" + idCardNo + "】的司机信息信息");
                                 isTrue = false;
                             } else {
@@ -1152,10 +1152,11 @@ public class BusCarBizDriverInfoService implements BusConst {
                                 break;
                             }
                             rePhone.append(phone);
+                            Boolean hadPhone = checkMongoPhone(null, phone, null);
                             if (StringUtils.isEmpty(phone) || !ValidateUtils.validatePhone(phone)) {
                                 errorMsgs.add(errorPrefix + "不合法");
                                 isTrue = false;
-                            } else if (carBizDriverInfoService.checkPhone(phone, null)) {
+                            } else if (carBizDriverInfoService.checkPhone(phone, null) || hadPhone) {
                                 errorMsgs.add(errorPrefix + "已存在【" + phone + "】的司机信息信息");
                                 isTrue = false;
                             } else {
@@ -1244,8 +1245,9 @@ public class BusCarBizDriverInfoService implements BusConst {
                         failedCount++;// 失败条数+1
                         continue;
                     }
-                    //保存司机信息
-                    AjaxResponse saveResult = this.saveDriver(saveDTO);
+                    saveDTO.setStatus(1);
+                    //保存司机信息,存入审核列表
+                    AjaxResponse saveResult = this.saveAuditDriverToMongo(saveDTO);
                     if (!saveResult.isSuccess()) {
                         errorMsgs.add("手机号=" + saveDTO.getPhone() + "保存出错，错误=" + saveResult.getMsg());
                         failedCount++;// 失败条数+1
@@ -1364,7 +1366,7 @@ public class BusCarBizDriverInfoService implements BusConst {
         Query query = new Query().limit(busDriverDTO.getPageSize());
         //城市
         if(busDriverDTO.getCityId()!=null){
-            query.addCriteria(Criteria.where("cityId").is(busDriverDTO.getCityId()));
+            query.addCriteria(Criteria.where("serviceCity").is(busDriverDTO.getCityId()));
         }
         //供应商权限
         Set<Integer> authOfSupplier = busDriverDTO.getAuthOfSupplier();
@@ -1392,7 +1394,7 @@ public class BusCarBizDriverInfoService implements BusConst {
         int start = (pageNum-1)*pageSize;
         query.skip(start-1<0?0:start);
         List<BusDriverInfoAudit> busDriverInfoAudits = driverMongoTemplate.find(query, BusDriverInfoAudit.class);
-        long count = driverMongoTemplate.count(query, BusInfoAudit.class);
+        long count = driverMongoTemplate.count(query, BusDriverInfoAudit.class);
 
         if(CollectionUtils.isEmpty(busDriverInfoAudits)){
             return AjaxResponse.success(new PageDTO(pageNum,pageSize,count,busDriverInfoAudits));
@@ -1508,7 +1510,6 @@ public class BusCarBizDriverInfoService implements BusConst {
         logger.info("操作方式：新建,审核Mongo数据:" + JSON.toJSONString(saveDTO));
 
         try {
-            saveDTO.setStatus(1);
             // 身份证号
             String idCardNo = saveDTO.getIdCardNo();
             if ("X".equals(idCardNo.substring(idCardNo.length() - 1, idCardNo.length()))) {
@@ -1567,7 +1568,7 @@ public class BusCarBizDriverInfoService implements BusConst {
 
             driverMongoTemplate.insert(busDriverInfoAudit);
 
-            return AjaxResponse.success(null);
+            return AjaxResponse.success("保存成功，司机进入审核");
         }catch (Exception e) {
         logger.error("新增修改审核司机信息异常,error={}", e.getMessage(), e);
         return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, "保存审核司机修改信息异常");
@@ -1670,12 +1671,13 @@ public class BusCarBizDriverInfoService implements BusConst {
                 }
                 //修改审核状态
                 WriteResult writeResult = driverMongoTemplate.updateFirst(query, update, BusDriverInfoAudit.class);
+                SimpleDateFormat f=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 //插入审核记录
                 StringBuffer log = new StringBuffer();
                 log.append("司机审核通过：");
                 log.append("审核人id："+WebSessionUtil.getCurrentLoginUser().getId()+",");
                 log.append("审核人姓名：" +WebSessionUtil.getCurrentLoginUser().getLoginName()+",");
-                log.append("审核日期：" + new Date());
+                log.append("审核日期：" + f.format(new Date()));
                 busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(saveDTO.getDriverId()),"司机审核通过："+log.toString(), new Date());
             }
             return AjaxResponse.success(null);

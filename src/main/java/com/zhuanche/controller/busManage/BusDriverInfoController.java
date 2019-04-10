@@ -211,12 +211,10 @@ public class BusDriverInfoController extends BusBaseController {
 		if (driverId != null) {
 			logger.info("[ BusDriverInfoController-saveDriver ] 操作方式：编辑");
 			//查询司机是否有服务中订单
-			/*Boolean isInService = busCarBizDriverInfoService.isInService(driverId);
+			Boolean isInService = busCarBizDriverInfoService.isInService(driverId);
 			if(isInService){
-			return AjaxResponse.fail(RestErrorCode.IN_SERVICE);
-
-			}*/
-
+			return AjaxResponse.fail(RestErrorCode.INT_SERVICE);
+			}
 			// 司机获取派单的接口，是否可以修改
 			Map<String, Object> updateDriverMap = carBizDriverInfoService.isUpdateDriver(driverId, phone);
 			if (updateDriverMap != null && "2".equals(updateDriverMap.get("result").toString())) {
@@ -226,7 +224,7 @@ public class BusDriverInfoController extends BusBaseController {
 			AjaxResponse detail = findDriverInfoByDriverId(driverId);
 			BusDriverDetailInfoVO data =(BusDriverDetailInfoVO) detail.getData();
 			AjaxResponse response = null;
-			if(data.getPhone().equals(saveDTO.getPhone()) && data.getIdCardNo().equals(saveDTO.getIdCardNo()) && data.getXyDriverNumber().equals(saveDTO.getXyDriverNumber())){
+			if(saveDTO.getPhone().equals(data.getPhone()) && saveDTO.getIdCardNo().equals(data.getIdCardNo()) && saveDTO.getXyDriverNumber().equals(data.getXyDriverNumber())){
 				 //直接修改
 				response = busCarBizDriverInfoService.updateDriver(saveDTO);
 				if(response.isSuccess()){

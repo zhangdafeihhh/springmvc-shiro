@@ -198,4 +198,22 @@
       </if>
     </trim>
   </insert>
+
+  <select id="queryCurrentOutOfDriver" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from
+    bus_biz_driver_violators
+    WHERE
+    punish_type=1
+    and
+    punish_start_time &lt;=now()
+    and punish_end_time &gt;=now()
+    <if test="supplierIds !=null and supplierIds.size()>0">
+      and supplier_id in
+      <foreach collection="supplierIds" close=")" open="(" item="item" separator=",">
+        #{item}
+      </foreach>
+    </if>
+  </select>
 </mapper>
