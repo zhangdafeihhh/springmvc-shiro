@@ -355,7 +355,7 @@ public class OrderController{
 	     logger.info("【运营管理-统计分析】查询订单 列表:queryOrderList");
 		 if(StringUtils.isEmpty(orderNo)){
 			 //【订单状态】选择“已完成”，必须限定【下单日期】范围或【完成日期】范围，支持跨度31天；
-			 if(StringUtils.isNotEmpty(statusStr) && "50".equals(statusStr))
+			 if(StringUtils.isNotEmpty(statusStr) && ("44".equals(statusStr) || "45".equals(statusStr) || "50".equals(statusStr) || "55".equals(statusStr)))
 			 {
 				 if(StringUtils.isEmpty(beginCreateDate) && StringUtils.isEmpty(endCreateDate) && StringUtils.isEmpty(beginCostEndDate) && StringUtils.isEmpty(endCostEndDate)){
 					 AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );

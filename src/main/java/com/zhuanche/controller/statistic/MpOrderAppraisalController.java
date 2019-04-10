@@ -176,11 +176,20 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			String driverName,
 			@Verify(param="driverPhone",rule="mobile")  String driverPhone,
 			String orderNo, Integer appraisalStatus,
-			@Verify(param="createDateBegin",rule="required")String createDateBegin,
-			@Verify(param="createDateEnd",rule="required")String createDateEnd,
+			String createDateBegin,
+			String createDateEnd,
 			String orderFinishTimeBegin,
 			String orderFinishTimeEnd,
 			String evaluateScore,String sortName, String sortOrder,HttpServletRequest request,HttpServletResponse response){
+
+		//修改查询限制条件
+		if((StringUtils.isEmpty(createDateBegin) && StringUtils.isEmpty(createDateEnd)) &&
+				StringUtils.isEmpty(orderFinishTimeBegin) &&
+				StringUtils.isEmpty(orderFinishTimeEnd)){
+			log.info("评价时间】范围或【完成日期】范围至少限定一个，支持跨度31天");
+			return AjaxResponse.fail(RestErrorCode.PARAMS_NOT,RestErrorCode.renderMsg(RestErrorCode.PARAMS_NOT));
+		}
+
 		int page =1;
 		int pageSize = CsvUtils.downPerSize;
 
