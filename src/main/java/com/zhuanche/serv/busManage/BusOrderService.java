@@ -298,7 +298,7 @@ public class BusOrderService {
 			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 			LocalDateTime now = LocalDateTime.now();
 			param.put("bookingDateBegin", now.format(dateTimeFormatter));
-			LocalDateTime localDateTime = now.plusHours(3);
+			LocalDateTime localDateTime = now.plusDays(3);
 			param.put("bookingDateEnd", localDateTime.format(dateTimeFormatter));
 			switch (enumByCode) {
                 case ALL:

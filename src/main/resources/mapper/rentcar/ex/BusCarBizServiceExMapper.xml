@@ -34,7 +34,7 @@
 		FROM
 			car_biz_service
 		WHERE
-			service_name LIKE '%巴士%'
+		status =1 and service_name LIKE '%巴士%'
 	</select>
 
 	<select id="queryServiceTypeByIdSet" resultMap="BaseResultMap">
