@@ -59,6 +59,7 @@ public class DriverEvaluateController{
 			* @param motorcadeId 车队ID	
 			* @param driverScore 司机评价分数	
 			* @param appScore APP评价分数	
+			* @param serviceTypeId 服务类型
 			* @param pageNo	页号
 			* @param pageSize	每页记录数
 		    * @return
@@ -75,6 +76,7 @@ public class DriverEvaluateController{
 	                                              String driverScore,
 	                                              String appScore,
 	                                              String classId,
+	                                              String serviceTypeId,
 	                                              @Verify(param = "queryDate",rule = "required") String queryDate,
 	                                              @Verify(param = "pageNo",rule = "required") Integer pageNo,
 	                                              @Verify(param = "pageSize",rule = "required") Integer pageSize
@@ -102,6 +104,8 @@ public class DriverEvaluateController{
 	        if (StringUtils.isNotEmpty(classId)){
 	        	paramMap.put("classId", classId);//班组id
 			}
+			if (StringUtils.isNotBlank(serviceTypeId))
+			    paramMap.put("serviceTypeId", serviceTypeId);//服务类型
 			paramMap.put("queryDate", queryDate);//查询日期
 			paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,orderCityId,allianceId,motorcadeId);
 			if(paramMap==null){
