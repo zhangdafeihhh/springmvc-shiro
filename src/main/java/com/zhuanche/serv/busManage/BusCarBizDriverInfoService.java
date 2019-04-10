@@ -1678,7 +1678,7 @@ public class BusCarBizDriverInfoService implements BusConst {
                 log.append("审核人id："+WebSessionUtil.getCurrentLoginUser().getId()+",");
                 log.append("审核人姓名：" +WebSessionUtil.getCurrentLoginUser().getLoginName()+",");
                 log.append("审核日期：" + f.format(new Date()));
-                busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(saveDTO.getDriverId()),"司机审核通过："+log.toString(), new Date());
+                busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(saveDTO.getDriverId()),log.toString(), new Date());
             }
             return AjaxResponse.success(null);
         }catch (Exception e){
