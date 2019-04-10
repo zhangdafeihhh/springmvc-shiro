@@ -257,11 +257,19 @@ public class BusSupplierController {
             supplierIds=supplierIdsByRate.stream().map(o->(JSONObject)o).map(o->o.getInteger("supplierId")).filter(Objects::nonNull).collect(Collectors.toList());
         }
         if(queryDTO.getSupplierId()!=null){
+        	if(supplierIds.size()>0){
+				boolean contains = supplierIds.contains(queryDTO.getSupplierId());
+				if(!contains){
+					return AjaxResponse.success(new PageDTO(pageNum,pageSize,0,new ArrayList()));
+				}
+				supplierIds.clear();
+			}
             supplierIds.add(queryDTO.getSupplierId());
         }
+        queryDTO.setSupplierIds(supplierIds);
         //主表信息
-        List<BusSupplierPageVO> busSupplierPageVOS = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
-        if(busSupplierPageVOS==null||busSupplierPageVOS.isEmpty()) {
+		List<BusSupplierPageVO> busSupplierPageVOS = busCarBizSupplierExMapper.querySupplierPageListByMaster(queryDTO);
+		if(busSupplierPageVOS==null||busSupplierPageVOS.isEmpty()) {
             return AjaxResponse.success(new PageDTO(pageNum, pageSize, 0, new ArrayList()));
         }
         //附表信息

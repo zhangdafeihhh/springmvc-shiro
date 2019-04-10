@@ -214,7 +214,7 @@
 		</if>
 		<if test="supplierIds != null and supplierIds.size>0">
 			AND s.supplier_id IN
-			<foreach collection="supplierRateIds" item="item" open="(" separator="," close=")">
+			<foreach collection="supplierIds" item="item" open="(" separator="," close=")">
 				#{item}
 			</foreach>
 		</if>
