@@ -42,7 +42,7 @@ public class BusBizDriverViolatorsVO {
 
     private String punishReason;
 
-    private Integer punishDuration;
+    private Double punishDuration;
 
     private Date punishStartTime;
 
