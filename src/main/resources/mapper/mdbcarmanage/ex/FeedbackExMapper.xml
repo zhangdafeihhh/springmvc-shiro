@@ -13,10 +13,11 @@
         <result column="manage_status" property="manageStatus" jdbcType="INTEGER"/>
         <result column="manage_time" property="manageTime" jdbcType="TIMESTAMP"/>
         <result column="manage_content" property="manageContent" jdbcType="VARCHAR"/>
+        <result column="feedback_type" property="feedbackType" jdbcType="INTEGER"/>
     </resultMap>
     <sql id="Base_Column_List">
     id, feedback_content, sender_id, sender_name, manage_id, manage_name, create_time, 
-    update_time, manage_status, manage_time, manage_content
+    update_time, manage_status, manage_time, manage_content,feedback_type
   </sql>
 
     <select id="findDataList" resultMap="BaseResultMap">
@@ -32,6 +33,9 @@
         </if>
         <if test="manageStatus != null">
             and manage_status = #{manageStatus}
+        </if>
+        <if test="feedbackType != null">
+            and feedback_type = #{feedbackType}
         </if>
         ORDER BY create_time DESC
     </select>
@@ -49,6 +53,9 @@
         </if>
         <if test="manageStatus != null">
             and manage_status = #{manageStatus}
+        </if>
+        <if test="feedbackType != null">
+            and feedback_type = #{feedbackType}
         </if>
         ORDER BY create_time DESC
     </select>

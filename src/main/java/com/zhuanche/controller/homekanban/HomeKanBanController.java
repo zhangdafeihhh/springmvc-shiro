@@ -1,10 +1,13 @@
 package com.zhuanche.controller.homekanban;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import com.zhuanche.constant.Constants;
+import com.zhuanche.entity.bigdata.SAASCoreIndexDto;
+import com.zhuanche.entity.bigdata.SAASIndexQuery;
+import com.zhuanche.util.dateUtil.DateUtil;
+import mapper.bigdata.ex.CarMeasureDayExMapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
 import org.apache.http.entity.ContentType;
@@ -68,6 +71,9 @@ public class HomeKanBanController {
 	
 	@Autowired
 	CitySupplierTeamService citySupplierTeamService;
+
+	@Autowired
+	private CarMeasureDayExMapper measureDayExMapper;
 
 	/** 日均运营车辆统计查询接口 **/
 	@RequestMapping("/operatingVehicleStatistics")
@@ -218,34 +224,27 @@ public class HomeKanBanController {
 			}
 		}
 		// 从大数据仓库获取统计数据
-		Map<String, Object> paramMap = Maps.newHashMap();
-		paramMap.put("startDate", startDate);
-		paramMap.put("endDate", endDate);
-		paramMap.put("allianceId", allianceId);
-		paramMap.put("motorcadeId", motorcadeId);
-		paramMap.put("visibleAllianceIds", visibleAllianceIds);
-		paramMap.put("visibleMotocadeIds", visibleMotocadeIds);
 		try {
-			String jsonString = JSON.toJSONString(paramMap);
-			String result = HttpClientUtil.buildPostRequest(coreIndicatorsUrl)
-					.setConnectTimeOut(CONNECT_TIMEOUT)
-					.setReadTimeOut(READ_TIMEOUT)
-					.setBody(jsonString)
-					.addHeader("Content-Type", ContentType.APPLICATION_JSON)
-					.execute();
-			JSONObject job = JSON.parseObject(result);
-			if (job == null) {
-				logger.error("调用大数据" + coreIndicatorsUrl + "返回结果为null");
-				return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+			List<String>  visibleList = null;
+			List<String>  visibleMotoIdsList = null;
+			if(visibleAllianceIds != null){
+				visibleList = Arrays.asList(visibleAllianceIds);
 			}
-			if (!job.getString(Constants.CODE).equals("0")) {
-				logger.error("调用大数据接口错误" + coreIndicatorsUrl + "返回code" + job.getString(Constants.CODE) + "返回错误信息: " + job.getString("message") );
-				return AjaxResponse.fail(Integer.parseInt(job.getString(Constants.CODE)), job.getString("message"));
+			if(visibleMotocadeIds != null){
+				visibleMotoIdsList = Arrays.asList(visibleMotocadeIds);
 			}
-			JSONObject jobj = JSON.parseObject(job.getString(Constants.DATA));
-			return AjaxResponse.success(jobj);
-		} catch (HttpException e) {
-			logger.error("调用大数据" + coreIndicatorsUrl + "异常", e);
+
+			long dateDiff = DateUtil.calDateDiff(startDate, endDate);
+
+			List<SAASCoreIndexDto> saasCoreIndexDtoList = measureDayExMapper.getCoreIndexStatistic(startDate,endDate,allianceId,motorcadeId,visibleList,visibleMotoIdsList,dateDiff);
+
+			if(CollectionUtils.isNotEmpty(saasCoreIndexDtoList)){
+				return AjaxResponse.success(saasCoreIndexDtoList.get(0));
+			}else {
+				return AjaxResponse.success(null);
+			}
+		} catch (Exception e) {
+			logger.error("查询首页统计错误异常", e);
 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 		}
 	}

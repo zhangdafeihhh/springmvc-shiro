@@ -288,6 +288,30 @@ public class CommonController {
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
     }
-    
+
+    /**
+     * @Desc: 查询城市供应列表,包括无效的
+     */
+    @RequestMapping("/suppliersAll")
+    @ResponseBody
+    public AjaxResponse suppliersAll(
+            @Verify(param = "cityId", rule = "required") Integer cityId,  String cityIds ){
+
+        Set<Integer> cityIdset = new HashSet<Integer>();
+        cityIdset.add(cityId);
+        if(StringUtils.isNotEmpty(cityIds)) {//当传入多个cityid时
+            Set<Integer> cityids = Stream.of(cityIds.split(",")).mapToInt( s -> {
+                if(StringUtils.isNotEmpty(s)) {
+                    return Integer.valueOf(s);
+                }else {
+                    return -1;
+                }
+            }).boxed().collect(Collectors.toSet());
+            cityIdset.addAll(cityids);
+        }
+
+        List<CarBizSupplier> carBizSuppliers = citySupplierTeamCommonService.querySupplierAllList( cityIdset );
+        return AjaxResponse.success(carBizSuppliers);
+    }
 }
 

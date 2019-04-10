@@ -65,6 +65,13 @@ public class CarFactOrderInfoDTO{
 	private String actualPayAmountDriver;
 
 	private CarFactOrderMemo memoObj;
+	//是否是渠道订单
+	private String filterChannelOrder;
+    //是否是非渠道订单
+	private String noFilterChannelOrder;
+    //渠道来源
+	private String channelSource;
+
 	public String getOrderNo() {
 		return orderNo;
 	}
@@ -287,6 +294,31 @@ public class CarFactOrderInfoDTO{
 
 	public void setActualPayAmountDriver(String actualPayAmountDriver) {
 		this.actualPayAmountDriver = actualPayAmountDriver;
+	}
+
+
+	public String getChannelSource() {
+		return channelSource;
+	}
+
+	public void setChannelSource(String channelSource) {
+		this.channelSource = channelSource;
+	}
+
+	public String getFilterChannelOrder() {
+		return filterChannelOrder;
+	}
+
+	public void setFilterChannelOrder(String filterChannelOrder) {
+		this.filterChannelOrder = filterChannelOrder;
+	}
+
+	public String getNoFilterChannelOrder() {
+		return noFilterChannelOrder;
+	}
+
+	public void setNoFilterChannelOrder(String noFilterChannelOrder) {
+		this.noFilterChannelOrder = noFilterChannelOrder;
 	}
 
 	/*

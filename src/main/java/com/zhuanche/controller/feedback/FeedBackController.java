@@ -22,6 +22,7 @@ import com.zhuanche.serv.feedback.FeedBackService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.FileUploadUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -80,6 +81,7 @@ public class FeedBackController {
             @RequestParam(value = "createTimeStart",required = false) String createTimeStart,
             @RequestParam(value = "createTimeEnd", required = false) String createTimeEnd,
             @RequestParam(value = "manageStatus",required = false) Integer manageStatus,
+            @RequestParam(value = "feedbackType",required = false) Integer feedbackType,
             @RequestParam(value = "pageNum", defaultValue = "0") Integer pageNum,
             @RequestParam(value = "pageSize", defaultValue = "30") Integer pageSize
             ){
@@ -88,7 +90,7 @@ public class FeedBackController {
         int total = 0;
         List<Feedback> feedbackList = null;
         try {
-            feedbackList = feedBackService.findDataList(createTimeStart,createTimeEnd,manageStatus);
+            feedbackList = feedBackService.findDataList(createTimeStart,createTimeEnd,manageStatus,feedbackType);
             if (null == feedbackList){
                 feedbackList = Lists.newArrayList();
             }
@@ -123,6 +125,7 @@ public class FeedBackController {
     //@RequiresPermissions("ProblemFeedbacks_look")
     public AjaxResponse dataListSelf(
             @RequestParam(value = "createTimeStart",required = false) String createTimeStart,
+            @RequestParam(value = "feedbackType",required = false) Integer feedbackType,
             @RequestParam(value = "createTimeEnd", required = false) String createTimeEnd,
             @RequestParam(value = "manageStatus",required = false) Integer manageStatus,
             @RequestParam(value = "pageNum", defaultValue = "0") Integer pageNum,
@@ -139,11 +142,11 @@ public class FeedBackController {
         List<Feedback> feedbackList = null;
         try {
             Integer userId = currentLoginUser.getId();
-            feedbackList = feedBackService.findDataListSelf(createTimeStart,createTimeEnd,manageStatus, userId);
-            if (null == feedbackList){
+            feedbackList = feedBackService.findDataListSelf(createTimeStart,createTimeEnd,manageStatus, userId,feedbackType);
+            if (CollectionUtils.isEmpty(feedbackList)){
                 feedbackList = Lists.newArrayList();
             }
-            feedbackList.forEach(value -> {
+            feedbackList.stream().forEach(value -> {
                 if (FeedBackManageStatusEnum.TO_ACCEPT.getCode() == value.getManageStatus()){
                     value.setManageTime(null);
                 }
@@ -152,7 +155,7 @@ public class FeedBackController {
         } finally {
             PageHelper.clearPage();
         }
-        if (null == feedbackList){
+        if (CollectionUtils.isEmpty(feedbackList)){
             feedbackList = Lists.newArrayList();
         }
         PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, feedbackList);
@@ -173,6 +176,7 @@ public class FeedBackController {
     @RequestFunction(menu = MenuEnum.PROBLEM_FEED_BACK_ADD)
     //@RequiresPermissions("PROBLEM_FEED_BACK_ADD")
     public AjaxResponse addFeedBack(
+            @Verify(param = "feedbackType",rule = "required") Integer feedbackType,
             @Verify(param = "feedbackContent",rule = "required") String feedbackContent,
             @RequestParam(value = "files",required = false) MultipartFile[] multipartFiles
     ){
@@ -200,6 +204,8 @@ public class FeedBackController {
             feedback.setSenderId(currentLoginUser.getId());
             //设置反馈人姓名
             feedback.setSenderName(currentLoginUser.getName());
+            //设置反馈类型
+            feedback.setFeedbackType(feedbackType);
 
             //设置时间
             Date currentDate = new Date();

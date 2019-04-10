@@ -262,8 +262,8 @@ public class  StatisticalAnalysisService {
 			String result = HttpClientUtil.buildPostRequest(url).setBody(jsonString).addHeader("Content-Type", ContentType.APPLICATION_JSON).setConnectTimeOut(CONNECT_TIMEOUT)
 					.setReadTimeOut(READ_TIMEOUT).execute();
 			logger.info("调用企业平台接口，result--" + result);
-			result = result.replaceAll("null", "\"\"");
-			result = result.replaceAll("NULL", "\"\"");
+			//result = result.replaceAll("null", "\"\"");
+			//result = result.replaceAll("NULL", "\"\"");
 			JSONObject job = JSON.parseObject(result);
 			if (job == null) {
 				logger.error("调用企业平台接口" + url + "返回结果为null");

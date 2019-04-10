@@ -1,10 +1,13 @@
 package com.zhuanche.common.dutyEnum;
 
 public enum EnumDriverDutyPeakTimes {
-	DRIVEDUTYPEAKTIMES_ONE(1,"早高峰"),
-	DRIVEDUTYPEAKTIMES_TWO(2,"晚高峰"),
-	DRIVEDUTYPEAKTIMES_THREE(3,"其他时段1"),
-	DRIVEDUTYPEAKTIMES_FOUR(4,"其他时段2");
+	DRIVEDUTYPEAKTIMES_ONE(1,"A:早高峰"),
+	DRIVEDUTYPEAKTIMES_TWO(2,"B:晚高峰"),
+	DRIVEDUTYPEAKTIMES_THREE(3,"X1:其他时段1"),
+	DRIVEDUTYPEAKTIMES_FOUR(4,"X2:其他时段2"),
+	DRIVEDUTYPEAKTIMES_FIVE(5,"C:非工作日早班"),
+	DRIVEDUTYPEAKTIMES_SIX(6,"D:非工作日晚班"),
+	DRIVEDUTYPEAKTIMES_SEV(7,"E:无障碍自由班");
 	
 	private int value;
 	private String key;

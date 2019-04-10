@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.bigdata.ex.CarMeasureDayExMapper" >
+  <!--<resultMap id="BaseResultMap" type="com.zhuanche" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="data_date" property="dataDate" jdbcType="VARCHAR" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+    <result column="supplier_type" property="supplierType" jdbcType="INTEGER" />
+    <result column="team_id" property="teamId" jdbcType="INTEGER" />
+    <result column="team_name" property="teamName" jdbcType="VARCHAR" />
+    <result column="car_group_id" property="carGroupId" jdbcType="INTEGER" />
+    <result column="car_group_name" property="carGroupName" jdbcType="VARCHAR" />
+    <result column="total_car_num" property="totalCarNum" jdbcType="INTEGER" />
+    <result column="free_car_num" property="freeCarNum" jdbcType="INTEGER" />
+    <result column="operate_car_num" property="operateCarNum" jdbcType="INTEGER" />
+    <result column="online_car_num" property="onlineCarNum" jdbcType="INTEGER" />
+    <result column="in_use_car_num" property="inUseCarNum" jdbcType="INTEGER" />
+    <result column="online_car_time" property="onlineCarTime" jdbcType="INTEGER" />
+    <result column="duty_8hours_num" property="duty8hoursNum" jdbcType="INTEGER" />
+    <result column="register_car_num" property="registerCarNum" jdbcType="INTEGER" />
+    <result column="activation_car_num" property="activationCarNum" jdbcType="INTEGER" />
+    <result column="fact_end_num" property="factEndNum" jdbcType="INTEGER" />
+    <result column="fact_end_amount" property="factEndAmount" jdbcType="INTEGER" />
+    <result column="order_num" property="orderNum" jdbcType="INTEGER" />
+    <result column="bind_order_num" property="bindOrderNum" jdbcType="INTEGER" />
+    <result column="evaluate_num" property="evaluateNum" jdbcType="INTEGER" />
+    <result column="bad_evaluate_num" property="badEvaluateNum" jdbcType="INTEGER" />
+    <result column="order_cnt_notchannel" property="orderCntNotchannel" jdbcType="INTEGER" />
+  </resultMap>-->
+
+  <!--<sql id="Base_Column_List" >
+    id, data_date, supplier_id, supplier_name, supplier_type, team_id, team_name, car_group_id,
+    car_group_name, total_car_num, free_car_num, operate_car_num, online_car_num, in_use_car_num,
+    online_car_time, duty_8hours_num, register_car_num, activation_car_num, fact_end_num,
+    fact_end_amount, order_num, bind_order_num, evaluate_num, bad_evaluate_num, order_cnt_notchannel
+  </sql>-->
+
+  <select id="getCoreIndexStatistic" resultType="com.zhuanche.entity.bigdata.SAASCoreIndexDto">
+    <![CDATA[
+        select
+            IFNULL(sum(order_cnt_notchannel),0) as orderCntNotchannel,
+            IFNULL(sum(bad_evaluate_num),0) as badEvaluateNum,
+			IFNULL(sum(bad_evaluate_all_num),0) as badEvaluateAllNum,
+            IFNULL(sum(register_car_num),0) as registVehicleAmount,
+            IFNULL(sum(activation_car_num),0) as activeVehicleAmount,
+            IFNULL(FORMAT(sum(online_car_num)/#{dateDiff},0),0) as onlineVehicleAvg,
+            IFNULL(FORMAT(sum(in_use_car_num)/#{dateDiff},0),0) as serviceVehicleAvg,
+            IFNULL(sum(fact_end_num),0) as completeOrderAmount,
+            IFNULL(FORMAT(sum(fact_end_amount),0),0) as incomeAmount,
+            IFNULL(FORMAT(sum(fact_end_num)/sum(in_use_car_num),1),0) as orderPerVehicle,
+            IFNULL(FORMAT(sum(fact_end_amount)/sum(in_use_car_num),0),0) as incomePerVehicle,
+            CONCAT(IFNULL(FORMAT(sum(bad_evaluate_num)*100/sum(order_cnt_notchannel),2),0),'%') as criticismRate
+        from bi_car_measure_day
+        ]]>
+    <where>
+      data_date between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}
+      <if test="visibleAllianceIds != null and visibleAllianceIds.size >0">
+        <if test="allianceId != null and allianceId != ''">
+          and supplier_id = #{allianceId}
+        </if>
+        <if test="allianceId == null or allianceId == ''">
+          and supplier_id in
+          <foreach item="item" index="index" collection="visibleAllianceIds" open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
+      </if>
+      <if test="visibleAllianceIds == null or visibleAllianceIds.size ==0">
+        <if test="allianceId != null and allianceId != ''">
+          and supplier_id = #{allianceId}
+        </if>
+      </if>
+
+      <if test="visibleMotocadeIds != null and visibleMotocadeIds.size >0">
+        <if test="motorcadeId != null and motorcadeId != ''">
+          and team_id = #{motorcadeId}
+        </if>
+        <if test="motorcadeId == null or motorcadeId == ''">
+          and team_id in
+          <foreach item="item" index="index" collection="visibleMotocadeIds" open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
+      </if>
+      <if test="visibleMotocadeIds == null or visibleMotocadeIds.size ==0">
+        <if test="motorcadeId != null and motorcadeId != ''">
+          and team_id = #{motorcadeId}
+        </if>
+      </if>
+    </where>
+  </select>
+
+</mapper>

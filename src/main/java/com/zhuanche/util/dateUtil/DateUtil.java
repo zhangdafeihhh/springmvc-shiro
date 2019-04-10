@@ -7,6 +7,8 @@ import com.zhuanche.util.Check;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1017,4 +1019,27 @@ public class DateUtil {
 		}
 		
 	}
+
+	public static long  calDateDiff(String startDate, String endDate){
+		long days=0;
+		try{
+			//解析日期
+			DateTimeFormatter f = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			LocalDate start = LocalDate.parse(startDate, f);
+			LocalDate end = LocalDate.parse(endDate, f);
+			LocalDate now = LocalDate.now();
+			long toE = end.toEpochDay()-now.toEpochDay();
+			if(toE>=0){
+				days = now.toEpochDay()-start.toEpochDay();
+			}else{
+				days = end.toEpochDay()-start.toEpochDay();
+				days++;
+			}
+
+		}catch (Exception e){
+			//logger.error("解析日期异常",e);
+		}
+		return days;
+	}
+
 }

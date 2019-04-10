@@ -202,6 +202,20 @@ public final class RestErrorCode{
 	@ResultMessage("文件上传大小超过限制")
 	public static final int FILE_SIZE_TOO_BIG = 20001;
 
+
+	@ResultMessage("小贴士内容超过最大字数限制")
+	public static final int TIPS_CONTENT_MAX_LIMIT = 8100;
+	@ResultMessage("通知消息样式过于复杂")
+	public static final int TIPS_CONTENT_COMPEX = 8101;
+	@ResultMessage("标题含有emoji表情或者特殊符号")
+	public static final int TIPS_TITLE_EMOJI = 8102;
+	@ResultMessage("内容含有emoji表情或者特殊符号")
+	public static final int TIPS_CONTENT_EMOJI = 8103;
+
+	@ResultMessage("【评价时间】范围或【完成日期】范围至少限定一个，支持跨度31天")
+	public static final int PARAMS_NOT = 8210;
+
+
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系
 	static{
