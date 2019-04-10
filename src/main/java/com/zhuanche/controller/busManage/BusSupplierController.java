@@ -318,7 +318,10 @@ public class BusSupplierController {
         List<BusSupplierPageVO> notExpiredSup = Optional.ofNullable(groupByTime.get(1)).orElse(new ArrayList());
         notExpiredSup = notExpiredSup.stream().sorted(Comparator.comparing(BusSupplierPageVO::getCreateDate).reversed()).collect(Collectors.toList());
 
-        //合同到期时间为空的情况
+        //无效供应商按照创建时间倒叙
+		invalidSup = invalidSup.stream().sorted(Comparator.comparing(BusSupplierPageVO::getCreateDate).reversed()).collect(Collectors.toList());
+
+		//合同到期时间为空的情况
 		List<BusSupplierPageVO> nullContractDateSup = Optional.ofNullable( groupByTime.get(-2)).orElse(new ArrayList<>());
 
 		List<BusSupplierPageVO> result=new ArrayList<>(busSupplierPageVOS.size());

@@ -582,7 +582,7 @@ public class BusSupplierService implements BusConst {
 		settleHeads.add("合同开始时间");
 		settleHeads.add("合同结束时间");
 		settleHeads.add("结算方式");
-		settleHeads.add("分佣类型");
+		settleHeads.add("结算类型");
 		for (int i = 1; i < maxCount2SupplierRate + 1; i++) {
 			settleHeads.add("结算比例"+i);
 			settleHeads.add("生效起始时间"+i);
