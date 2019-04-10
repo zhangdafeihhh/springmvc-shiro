@@ -16,7 +16,7 @@
     <result column="id_number" property="idNumber" jdbcType="VARCHAR" />
     <result column="punish_type" property="punishType" jdbcType="SMALLINT" />
     <result column="punish_reason" property="punishReason" jdbcType="VARCHAR" />
-    <result column="punish_duration" property="punishDuration" jdbcType="INTEGER" />
+    <result column="punish_duration" property="punishDuration" jdbcType="DOUBLE" />
     <result column="punish_start_time" property="punishStartTime" jdbcType="TIMESTAMP" />
     <result column="punish_end_time" property="punishEndTime" jdbcType="TIMESTAMP" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
@@ -45,6 +45,9 @@
     <if test="punishType != null" >
       AND punish_type = #{punishType}
     </if>
+    <if test="punishStatus != null" >
+      AND punish_status = #{punishStatus}
+    </if>
     <if test="authOfCity != null and authOfCity.size() > 0">
       AND city_id IN
       <foreach collection="authOfCity" open="(" close=")" separator="," item="item">
@@ -59,7 +62,7 @@
     </if>
   </sql>
   <select id="selectDriverViolatorsByQueryDTO" resultMap="BaseResultMap" parameterType="com.zhuanche.dto.busManage.BusDriverViolatorsQueryDTO" >
-    select 
+    select
     <include refid="Base_Column_List" />
     from bus_biz_driver_violators
     where
@@ -176,7 +179,7 @@
         #{punishReason,jdbcType=VARCHAR},
       </if>
       <if test="punishDuration != null" >
-        #{punishDuration,jdbcType=INTEGER},
+        #{punishDuration,jdbcType=DOUBLE},
       </if>
       <if test="punishStartTime != null" >
         #{punishStartTime,jdbcType=TIMESTAMP},

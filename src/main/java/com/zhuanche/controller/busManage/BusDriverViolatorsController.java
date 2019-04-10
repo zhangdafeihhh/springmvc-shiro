@@ -82,6 +82,19 @@ public class BusDriverViolatorsController extends BusBaseController {
 	public AjaxResponse saveViolateDriver(@Validated BusDriverViolatorsSaveDTO saveDTO) {
 		logger.info("【新增违规司机处罚】start...params:saveDTO="+JSON.toJSONString(saveDTO));
 		try{
+			if(saveDTO.getPunishType()!=1){
+				return AjaxResponse.failMsg(RestErrorCode.PARAMS_ERROR, "参数处罚状态不正确,目前只支持停运（1）处罚");
+			}
+			if("0".equals(saveDTO.getPunishDuration().trim())){
+				logger.info("【新增违规司机处罚】参数停运时长不能为0");
+				return AjaxResponse.failMsg(RestErrorCode.PARAMS_ERROR, "参数停运时长不能为0");
+			}
+			try{
+				Double.parseDouble(saveDTO.getPunishDuration().trim());
+			}catch (Exception e){
+				logger.error("【新增违规司机处罚】参数停运时长错误",e);
+				return AjaxResponse.failMsg(RestErrorCode.PARAMS_ERROR, "参数停运时长错误");
+			}
 			SSOLoginUser loginUser=WebSessionUtil.getCurrentLoginUser();
 			logger.info("【新增违规司机处罚】当前登录人信息={}", JSON.toJSONString(loginUser));
 			Integer level=loginUser.getLevel();//此用户数据权限等级(巴士包含 1全国 2城市 4供应商)

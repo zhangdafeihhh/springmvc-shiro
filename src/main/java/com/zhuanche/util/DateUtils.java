@@ -45,6 +45,29 @@ public class DateUtils {
 	}
 
 	/**
+	 * 得到N(N为小数)分钟后的日期
+	 */
+	public static Date afterNMinutesDate(Date theDate, int minutes) {
+		try {
+			if (theDate == null) {
+				return getCurrentDate();
+			}
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(theDate);
+			cal.add(Calendar.MINUTE, minutes);
+			return cal.getTime();
+		} catch (Exception e) {
+			return getCurrentDate(); // 如果无法转化，则返回默认格式的时间。
+		}
+	}
+
+	public static void main(String[] args) {
+		Date petDate=DateUtils.afterNMinutesDate(new Date(),60);
+		String a=DateUtils.formatDate(petDate,DateUtils.dateTimeFormat_parttern);
+		System.out.println(a);
+	}
+
+	/**
 	 * 返回当前日期 Date
 	 */
 	public static Date getCurrentDate() {

@@ -34,7 +34,7 @@ public class BusBizDriverViolators {
 
     private String punishReason;
 
-    private Integer punishDuration;
+    private Double punishDuration;
 
     private Date punishStartTime;
 

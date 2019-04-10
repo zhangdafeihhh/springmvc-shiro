@@ -36,10 +36,8 @@ public class BusDriverViolatorsSaveDTO extends BusBaseStatisDTO {
 
 	/** 停运时长 **/
 	@NotNull(message = "停运时长不能为空")
-	@Min(value=1,message = "停运时长不能小于1")
-	private Integer punishDuration;
+	private String punishDuration;
 
 	/** 处罚状态非必填[1.停运 2.冻结] **/
-	@InArray(values = { "1" }, message = "处罚状态不在有效范围内[1.停运]")
 	private short punishType;
 }
