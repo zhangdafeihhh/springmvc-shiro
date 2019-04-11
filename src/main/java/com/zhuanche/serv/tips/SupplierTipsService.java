@@ -8,6 +8,7 @@ import com.zhuanche.constant.Constants;
 import com.zhuanche.entity.mdbcarmanage.*;
 import com.zhuanche.exception.MessageException;
 import com.zhuanche.util.Common;
+import com.zhuanche.util.HtmlFilterUtil;
 import com.zhuanche.util.dateUtil.DateUtil;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import mapper.mdbcarmanage.ex.CarBizSupplierTipsDtoExMapper;
@@ -290,7 +291,16 @@ public class SupplierTipsService {
 
             PageHelper.clearPage();
 
-            PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, dtoList);
+            List<CarBizSupplierTipsDto> removeHtmlList = new ArrayList<>();
+
+            for(CarBizSupplierTipsDto dto : dtoList){
+                dto.setTipsTitle(HtmlFilterUtil.HTMLTagSpirit(dto.getTipsTitle()));
+                dto.setTipsContent(HtmlFilterUtil.HTMLTagSpirit(dto.getTipsContent()));
+                removeHtmlList.add(dto);
+            }
+
+
+            PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, removeHtmlList);
 
             return pageDTO;
         } catch (Exception e) {
@@ -380,7 +390,15 @@ public class SupplierTipsService {
         }
         int total = (int)page.getTotal();
 
-        return new PageDTO(pageNum,pageSize,total,listDto);
+        List<CarBizSupplierTipsDto> removeHtmlList = new ArrayList<>();
+
+        for(CarBizSupplierTipsDto dto : listDto){
+            dto.setTipsTitle(HtmlFilterUtil.HTMLTagSpirit(dto.getTipsTitle()));
+            dto.setTipsContent(HtmlFilterUtil.HTMLTagSpirit(dto.getTipsContent()));
+            removeHtmlList.add(dto);
+        }
+
+        return new PageDTO(pageNum,pageSize,total,removeHtmlList);
 
     }
 
