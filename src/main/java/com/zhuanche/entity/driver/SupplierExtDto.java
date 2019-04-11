@@ -19,7 +19,21 @@ public class SupplierExtDto {
 
     private String remark;
 
-    private Integer twoLevelCooperation;
+    private Integer settlementType;
+
+    private Integer settlementCycle;
+
+    private Integer settlementDay;
+
+    private String settlementAccount;
+
+    private String bankAccount;
+
+    private String bankName;
+
+    private String bankIdentify;
+
+    private String settlementFullName;
 
     public Long getId() {
         return id;
@@ -85,11 +99,67 @@ public class SupplierExtDto {
         this.remark = remark == null ? null : remark.trim();
     }
 
-    public Integer getTwoLevelCooperation() {
-        return twoLevelCooperation;
+    public Integer getSettlementType() {
+        return settlementType;
     }
 
-    public void setTwoLevelCooperation(Integer twoLevelCooperation) {
-        this.twoLevelCooperation = twoLevelCooperation;
+    public void setSettlementType(Integer settlementType) {
+        this.settlementType = settlementType;
+    }
+
+    public Integer getSettlementCycle() {
+        return settlementCycle;
+    }
+
+    public void setSettlementCycle(Integer settlementCycle) {
+        this.settlementCycle = settlementCycle;
+    }
+
+    public Integer getSettlementDay() {
+        return settlementDay;
+    }
+
+    public void setSettlementDay(Integer settlementDay) {
+        this.settlementDay = settlementDay;
+    }
+
+    public String getSettlementAccount() {
+        return settlementAccount;
+    }
+
+    public void setSettlementAccount(String settlementAccount) {
+        this.settlementAccount = settlementAccount == null ? null : settlementAccount.trim();
+    }
+
+    public String getBankAccount() {
+        return bankAccount;
+    }
+
+    public void setBankAccount(String bankAccount) {
+        this.bankAccount = bankAccount == null ? null : bankAccount.trim();
+    }
+
+    public String getBankName() {
+        return bankName;
+    }
+
+    public void setBankName(String bankName) {
+        this.bankName = bankName == null ? null : bankName.trim();
+    }
+
+    public String getBankIdentify() {
+        return bankIdentify;
+    }
+
+    public void setBankIdentify(String bankIdentify) {
+        this.bankIdentify = bankIdentify == null ? null : bankIdentify.trim();
+    }
+
+    public String getSettlementFullName() {
+        return settlementFullName;
+    }
+
+    public void setSettlementFullName(String settlementFullName) {
+        this.settlementFullName = settlementFullName == null ? null : settlementFullName.trim();
     }
 }

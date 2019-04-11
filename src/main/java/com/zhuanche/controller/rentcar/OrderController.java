@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
@@ -157,14 +158,15 @@ public class OrderController{
 	                                            String beginCostEndDate,
 	                                      		String endCostEndDate,
 	                                           @Verify(param = "pageNo",rule = "required") Integer pageNo,
-	                                           @Verify(param = "pageSize",rule = "required") Integer pageSize
+	                                           @Verify(param = "pageSize",rule = "required") Integer pageSize,
+											   @RequestParam(value = "channelSource",required = false,defaultValue = "0")String channelSource
 	                                           ){
 	     logger.info("【运营管理-统计分析】查询订单 列表:queryOrderList");
 	     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmssSS");
 	     String  transId =sdf.format(new Date());
 	     if(StringUtils.isEmpty(orderNo)){
 	     	//【订单状态】选择“已完成”，必须限定【下单日期】范围或【完成日期】范围，支持跨度31天；
-	     	if(StringUtils.isNotEmpty(statusStr) && "50".equals(statusStr))
+	     	if(StringUtils.isNotEmpty(statusStr) && ("44".equals(statusStr) || "45".equals(statusStr) || "50".equals(statusStr) || "55".equals(statusStr)))
 			{
 				if(StringUtils.isEmpty(beginCreateDate) && StringUtils.isEmpty(endCreateDate) && StringUtils.isEmpty(beginCostEndDate) && StringUtils.isEmpty(endCostEndDate)){
 					AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );
@@ -257,6 +259,13 @@ public class OrderController{
 	     paramMap.put("licensePlates", licensePlates);// 
 	     paramMap.put("orderNo", orderNo);//
 	     paramMap.put("type", orderType);//
+
+		 //渠道订单处理
+		 if("1".equals(channelSource)){
+			 paramMap.put("filterChannelOrder", "true");//渠道订单
+		 }else if("2".equals(channelSource)){
+			 paramMap.put("noFilterChannelOrder", "true");//非渠道订单
+		 }
 	     if(StringUtils.isNotEmpty(beginCreateDate)){
 	    	 paramMap.put("beginCreateDate", beginCreateDate+" 00:00:00");// 
 	     }
@@ -352,7 +361,7 @@ public class OrderController{
 	     logger.info("【运营管理-统计分析】查询订单 列表:queryOrderList");
 		 if(StringUtils.isEmpty(orderNo)){
 			 //【订单状态】选择“已完成”，必须限定【下单日期】范围或【完成日期】范围，支持跨度31天；
-			 if(StringUtils.isNotEmpty(statusStr) && "50".equals(statusStr))
+			 if(StringUtils.isNotEmpty(statusStr) && ("44".equals(statusStr) || "45".equals(statusStr) || "50".equals(statusStr) || "55".equals(statusStr)))
 			 {
 				 if(StringUtils.isEmpty(beginCreateDate) && StringUtils.isEmpty(endCreateDate) && StringUtils.isEmpty(beginCostEndDate) && StringUtils.isEmpty(endCostEndDate)){
 					 AjaxResponse ajaxResponse = AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID  );

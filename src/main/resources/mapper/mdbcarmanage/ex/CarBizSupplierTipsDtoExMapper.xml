@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.CarBizSupplierTipsDtoExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.CarBizSupplierTipsDto" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="tips_title" property="tipsTitle" jdbcType="VARCHAR" />
+    <result column="tips_content" property="tipsContent" jdbcType="VARCHAR" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="doc_name" property="docName" jdbcType="VARCHAR" />
+    <result column="doc_url" property="docUrl" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    p.id, p.tips_title, p.tips_content, u.user_name,d.doc_name,d.doc_url,
+    p.create_time, p.update_time,p.user_id
+  </sql>
+  <select id="listTips" resultMap="BaseResultMap" >
+    select
+    p.id, p.tips_title, p.tips_content, u.user_name,GROUP_CONCAT(d.doc_name) as  doc_name,
+    p.create_time, p.update_time,p.user_id
+    FROM car_biz_supplier_tips p LEFT JOIN car_biz_tips_doc d on p.id = d.tips_id
+    INNER JOIN car_adm_user u on  p.user_id = u.user_id
+    WHERE  1=1 AND p.status=1
+     group BY p.id
+    ORDER BY p.update_time DESC
+  </select>
+
+
+
+  <select id="searchTipsAndDoc" resultMap="BaseResultMap" >
+    SELECT
+    p.id, p.tips_title, p.tips_content, u.user_name,IFNULL(GROUP_CONCAT(DISTINCT d.doc_name),'') as  doc_name,
+    p.create_time, p.update_time,p.user_id
+    FROM car_biz_supplier_tips p
+    LEFT JOIN car_biz_tips_doc d on p.id = d.tips_id
+    INNER JOIN car_adm_user u on  p.user_id = u.user_id
+    WHERE p.status = 1
+    <if test="startDate != null" >
+      AND p.update_time &gt;=#{startDate}
+    </if>
+    <if test="endDate != null" >
+      AND p.update_time &lt;= #{endDate}
+    </if>
+    <if test="keyword != null and keyword != '' " >
+      AND (LOCATE(#{keyword},p.tips_title) &gt; 0
+      OR p.id in
+      (SELECT tips_id FROM car_biz_tips_doc WHERE LOCATE(#{keyword}, doc_name ) > 0 GROUP BY tips_id)
+      )
+    </if>
+    <if test="idList != null" >
+      AND p.user_id in
+      <foreach collection="idList" index="index" item="item" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+    </if>
+    GROUP BY p.id,tips_title,p.update_time,tips_content
+    ORDER BY p.update_time desc
+  </select>
+
+
+
+  <select id="searchTips" resultMap="BaseResultMap" >
+    SELECT
+    p.id, p.tips_title, p.tips_content, u.user_name,IFNULL(GROUP_CONCAT(DISTINCT d.doc_name),'') as  doc_name,
+    p.create_time, p.update_time,p.user_id
+    FROM car_biz_supplier_tips p
+    LEFT JOIN car_biz_tips_doc d on p.id = d.tips_id
+    INNER JOIN car_adm_user u on  p.user_id = u.user_id
+    WHERE
+    p.status = 1
+    <if test="startDate != null" >
+      AND p.update_time &gt;=#{startDate}
+    </if>
+    <if test="endDate != null" >
+      AND p.update_time &lt;= #{endDate}
+    </if>
+    <if test="keyword != null" >
+      AND LOCATE(#{keyword},p.tips_title) &gt; 0
+    </if>
+    <if test="idList != null" >
+      AND p.user_id in
+      <foreach collection="idList" index="index" item="item" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+    </if>
+    GROUP BY p.id,tips_title,p.update_time,tips_content
+    ORDER BY p.update_time desc
+  </select>
+
+
+
+  <select id="searchDoc" resultMap="BaseResultMap" >
+    SELECT
+    p.id, p.tips_title, p.tips_content, u.user_name,IFNULL(GROUP_CONCAT(DISTINCT d.doc_name),'') as  doc_name,
+    p.create_time, p.update_time,p.user_id
+    FROM car_biz_supplier_tips p
+    LEFT JOIN car_biz_tips_doc d on p.id = d.tips_id
+    INNER JOIN car_adm_user u on  p.user_id = u.user_id
+    WHERE p.status = 1
+    <if test="startDate != null" >
+      AND p.update_time &gt;=#{startDate}
+    </if>
+    <if test="endDate != null" >
+      AND p.update_time &lt;= #{endDate}
+    </if>
+    <if test="keyword != null and keyword != '' " >
+      AND p.id in
+      (SELECT tips_id FROM car_biz_tips_doc WHERE LOCATE(#{keyword}, doc_name ) > 0 GROUP BY tips_id)
+    </if>
+    <if test="idList != null" >
+      AND p.user_id in
+      <foreach collection="idList" index="index" item="item" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+    </if>
+    GROUP BY p.id,tips_title,p.update_time,tips_content
+    ORDER BY p.update_time desc
+  </select>
+
+
+
+</mapper>

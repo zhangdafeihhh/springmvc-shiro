@@ -43,4 +43,6 @@ public interface CarBizSupplierExMapper{
     int checkSupplierFullName(@Param("supplierName")String supplierName);
 
 	CarBizSupplierVo querySupplierById(@Param("supplierId") Integer supplierId);
+
+	List<CarBizSupplier> querySupplierAllList( @Param("cityIds") Set<Integer> cityIds , @Param("supplierIds") Set<Integer> supplierIds);
 }

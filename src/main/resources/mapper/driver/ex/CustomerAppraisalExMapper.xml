@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.ex.CustomerAppraisalExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.CustomerAppraisal" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="order_id" property="orderId" jdbcType="INTEGER" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="booking_customer_id" property="bookingCustomerId" jdbcType="INTEGER" />
+    <result column="booking_customer_phone" property="bookingCustomerPhone" jdbcType="VARCHAR" />
+    <result column="customer_lv" property="customerLv" jdbcType="INTEGER" />
+    <result column="rider_phone" property="riderPhone" jdbcType="VARCHAR" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="car_id" property="carId" jdbcType="INTEGER" />
+    <result column="evaluate_score" property="evaluateScore" jdbcType="VARCHAR" />
+    <result column="evaluate" property="evaluate" jdbcType="VARCHAR" />
+    <result column="create_at" property="createAt" jdbcType="TIMESTAMP" />
+    <result column="update_at" property="updateAt" jdbcType="TIMESTAMP" />
+    <result column="appraisal_status" property="appraisalStatus" jdbcType="BIT" />
+    <result column="remarks" property="remarks" jdbcType="VARCHAR" />
+    <result column="instrument_and_service" property="instrumentAndService" jdbcType="VARCHAR" />
+    <result column="environment_and_equipped" property="environmentAndEquipped" jdbcType="VARCHAR" />
+    <result column="efficiency_and_safety" property="efficiencyAndSafety" jdbcType="VARCHAR" />
+    <result column="memo" property="memo" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="platform_evaluate" property="platformEvaluate" jdbcType="VARCHAR" />
+    <result column="platform_evaluate_score" property="platformEvaluateScore" jdbcType="VARCHAR" />
+    <result column="platform_memo" property="platformMemo" jdbcType="VARCHAR" />
+    <result column="customer_ip" property="customerIp" jdbcType="VARCHAR" />
+    <result column="point" property="point" jdbcType="VARCHAR" />
+    <result column="pointBD" property="pointbd" jdbcType="VARCHAR" />
+    <result column="driver_phone" property="driverPhone" jdbcType="VARCHAR" />
+    <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="license_plates" property="licensePlates" jdbcType="VARCHAR" />
+    <result column="booking_customer_name" property="bookingCustomerName" jdbcType="VARCHAR" />
+    <result column="rider_name" property="riderName" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="TINYINT" />
+    <result column="order_type" property="orderType" jdbcType="INTEGER" />
+    <result column="service_type_id" property="serviceTypeId" jdbcType="INTEGER" />
+    <result column="service_type_name" property="serviceTypeName" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="order_create_time" property="orderCreateTime" jdbcType="TIMESTAMP" />
+    <result column="order_finish_time" property="orderFinishTime" jdbcType="TIMESTAMP" />
+    <result column="car_group_id" property="carGroupId" jdbcType="INTEGER" />
+    <result column="car_group_name" property="carGroupName" jdbcType="VARCHAR" />
+    <result column="business_id" property="businessId" jdbcType="INTEGER" />
+    <result column="business_name" property="businessName" jdbcType="VARCHAR" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, order_id, order_no, booking_customer_id, booking_customer_phone, customer_lv, 
+    rider_phone, driver_id, car_id, evaluate_score, evaluate, create_at, update_at, appraisal_status, 
+    remarks, instrument_and_service, environment_and_equipped, efficiency_and_safety, 
+    memo, create_by, update_by, platform_evaluate, platform_evaluate_score, platform_memo, 
+    customer_ip, point, pointBD, driver_phone, driver_name, license_plates, booking_customer_name, 
+    rider_name, type, order_type, service_type_id, service_type_name, city_id, city_name, 
+    order_create_time, order_finish_time, car_group_id, car_group_name, business_id, 
+    business_name, supplier_id, supplier_name
+  </sql>
+
+  <select id="queryForListObject" parameterType="com.zhuanche.entity.driver.MpCustomerAppraisalParams" resultType="com.zhuanche.entity.driver.MpCarBizCustomerAppraisal">
+    SELECT
+    ca.id AS appraisalId,
+    ca.order_no AS orderNo,
+    ca.create_at AS createDate,
+    ca.evaluate_score AS evaluateScore,
+    ca.evaluate AS evaluate,
+    ca.memo AS memo,
+    ca.driver_id AS driverId,
+    ca.driver_name AS driverName,
+    ca.driver_phone AS driverPhone,
+    ca.license_plates AS licensePlates,
+    ca.appraisal_status AS appraisalStatus,
+    ca.order_finish_time as orderFinishTime
+    FROM
+    customer_appraisal ca
+    WHERE
+    1 = 1
+    <if test="appraisalStatus!=null">
+      AND ca.appraisal_status = #{appraisalStatus}
+    </if>
+    <if test="evaluateScore !=null and evaluateScore !=''">
+      AND ca.evaluate_score in (${evaluateScore})
+    </if>
+    <if test="createDateBegin !=null and createDateBegin !=''">
+      AND ca.create_at &gt;= #{createDateBegin}
+    </if>
+    <if test="createDateEnd !=null and createDateEnd !=''">
+      AND ca.create_at &lt;= #{createDateEnd}
+    </if>
+    <if test="createDateEnd !=null and createDateEnd !=''">
+      AND ca.create_at &lt;= NOW()
+    </if>
+
+    <if test="orderFinishTimeBegin !=null and orderFinishTimeBegin !=''">
+      AND ca.order_finish_time &gt;= #{orderFinishTimeBegin}
+    </if>
+    <if test="orderFinishTimeEnd !=null and orderFinishTimeEnd !=''">
+      AND ca.order_finish_time &lt;= #{orderFinishTimeEnd}
+    </if>
+
+    <if test="orderNo!=null and orderNo!=''">
+      AND ca.order_no LIKE CONCAT(#{orderNo}, '%')
+    </if>
+    <if test="orderNos!=null and orderNos!=''">
+      AND ca.order_no in (${orderNos})
+    </if>
+    <if test="driverName!=null and driverName!=''">
+      AND ca.driver_name LIKE CONCAT(#{driverName}, '%')
+    </if>
+    <if test="driverPhone!=null and driverPhone!=''">
+      AND ca.driver_phone LIKE CONCAT(#{driverPhone}, '%')
+    </if>
+    <if test="driverIds!=null and driverIds!=''">
+      AND ca.driver_id in (${driverIds})
+    </if>
+    <if test="licensePlates!=null and licensePlates!=''">
+      AND ca.license_plates LIKE CONCAT(#{licensePlates}, '%')
+    </if>
+    <if test="cityId!=null and cityId!=''">
+      and ca.city_id = #{cityId}
+    </if>
+    <if test="cities !=null and cities !=''">
+      and ca.city_id in (${cities})
+    </if>
+    <if test="supplierId !=null and supplierId !=''">
+      and ca.supplier_id = #{supplierId}
+    </if>
+    <if test="suppliers !=null and suppliers !=''">
+      and ca.supplier_id in (${suppliers})
+    </if>
+    <if test="sortName ==null or sortName ==''">
+      ORDER BY
+      ca.create_at,ca.id DESC
+    </if>
+    <if test="sortName !=null and sortName !=''">
+      ORDER BY
+      ${sortName},ca.id ${sortOrder}
+    </if>
+  </select>
+
+
+</mapper>

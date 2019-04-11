@@ -1,18 +1,20 @@
 package com.zhuanche.controller.supplier;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.zhuanche.common.dingdingsync.DingdingAnno;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RequestFunction;
-import com.zhuanche.entity.driver.TwoLevelCooperationDto;
 import com.zhuanche.entity.rentcar.CarBizCooperationType;
 import com.zhuanche.entity.rentcar.CarBizSupplierQuery;
 import com.zhuanche.entity.rentcar.CarBizSupplierVo;
 import com.zhuanche.serv.CarBizCooperationTypeService;
 import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,6 +37,8 @@ public class SupplierController {
 
     @Resource
     private CarBizCooperationTypeService cooperationTypeService;
+
+    private static final Logger logger = LoggerFactory.getLogger(SupplierController.class);
 
     @RequestMapping("/datalist")
     @ResponseBody
@@ -60,6 +64,7 @@ public class SupplierController {
         queryParam.setEnterpriseType(enterpriseType);
         queryParam.setStatus(status);
         List<CarBizSupplierVo> list;
+        logger.info("查询供应商信息 参数:{}", JSON.toJSONString(queryParam));
         int total;
         Page p = PageHelper.startPage(pageNum, pageSize, true);
         try {
@@ -110,15 +115,5 @@ public class SupplierController {
     public AjaxResponse checkSupplierFullName(String supplierFullName){
         return supplierService.checkSupplierFullName(supplierFullName);
     }
-
-
-    @RequestMapping("/getTwoLevel")
-    @ResponseBody
-    @RequestFunction(menu = COOPERATION_TWO_LEVEL_LIST)
-    public AjaxResponse getTwoLevelCooperationTypeByCooperationId(@RequestParam Integer cooperationId){
-        List<TwoLevelCooperationDto> twoLevelCooperations = cooperationTypeService.queryTwoLevelCooperationType(cooperationId);
-        return AjaxResponse.success(twoLevelCooperations);
-    }
-
 
 }

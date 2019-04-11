@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.CarBizTipsDocMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.CarBizTipsDoc" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="doc_name" property="docName" jdbcType="VARCHAR" />
+    <result column="doc_url" property="docUrl" jdbcType="VARCHAR" />
+    <result column="tips_id" property="tipsId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, doc_name, doc_url, tips_id, create_time, update_time, status
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from car_biz_tips_doc
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizTipsDoc" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_biz_tips_doc (doc_name, doc_url, tips_id, 
+      create_time, update_time, status
+      )
+    values (#{docName,jdbcType=VARCHAR}, #{docUrl,jdbcType=VARCHAR}, #{tipsId,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizTipsDoc" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_biz_tips_doc
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="docName != null" >
+        doc_name,
+      </if>
+      <if test="docUrl != null" >
+        doc_url,
+      </if>
+      <if test="tipsId != null" >
+        tips_id,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="docName != null" >
+        #{docName,jdbcType=VARCHAR},
+      </if>
+      <if test="docUrl != null" >
+        #{docUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="tipsId != null" >
+        #{tipsId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizTipsDoc" >
+    update car_biz_tips_doc
+    <set >
+      <if test="docName != null" >
+        doc_name = #{docName,jdbcType=VARCHAR},
+      </if>
+      <if test="docUrl != null" >
+        doc_url = #{docUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="tipsId != null" >
+        tips_id = #{tipsId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizTipsDoc" >
+    update car_biz_tips_doc
+    set doc_name = #{docName,jdbcType=VARCHAR},
+      doc_url = #{docUrl,jdbcType=VARCHAR},
+      tips_id = #{tipsId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      status = #{status,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

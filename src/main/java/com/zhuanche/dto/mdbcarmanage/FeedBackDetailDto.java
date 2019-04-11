@@ -33,6 +33,8 @@ public class FeedBackDetailDto {
 
     private List<FeedbackDoc> feedbackDocList;
 
+    private Integer feedbackType;
+
     public static FeedBackDetailDto build(Feedback feedback,List<FeedbackDoc> feedbackDocs){
         FeedBackDetailDto feedBackDetailDto = new FeedBackDetailDto();
 
@@ -136,5 +138,13 @@ public class FeedBackDetailDto {
 
     public void setFeedbackDocList(List<FeedbackDoc> feedbackDocList) {
         this.feedbackDocList = feedbackDocList;
+    }
+
+    public Integer getFeedbackType() {
+        return feedbackType;
+    }
+
+    public void setFeedbackType(Integer feedbackType) {
+        this.feedbackType = feedbackType;
     }
 }

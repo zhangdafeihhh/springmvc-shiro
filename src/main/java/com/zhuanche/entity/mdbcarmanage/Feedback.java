@@ -25,6 +25,8 @@ public class Feedback {
 
     private String manageContent;
 
+    private Integer feedbackType;
+
     public Integer getId() {
         return id;
     }
@@ -111,5 +113,13 @@ public class Feedback {
 
     public void setManageContent(String manageContent) {
         this.manageContent = manageContent == null ? null : manageContent.trim();
+    }
+
+    public Integer getFeedbackType() {
+        return feedbackType;
+    }
+
+    public void setFeedbackType(Integer feedbackType) {
+        this.feedbackType = feedbackType;
     }
 }

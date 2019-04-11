@@ -9,11 +9,13 @@ public interface FeedbackExMapper {
 
     List<Feedback> findDataList(@Param("createTimeStart") String createTimeStart,
                                 @Param("createTimeEnd") String createTimeEnd,
-                                @Param("manageStatus") Integer manageStatus);
+                                @Param("manageStatus") Integer manageStatus,
+                                @Param("feedbackType") Integer feedbackType);
 
     List<Feedback> findDataListSelf(@Param("createTimeStart") String createTimeStart,
                                     @Param("createTimeEnd") String createTimeEnd,
                                     @Param("manageStatus") Integer manageStatus,
-                                    @Param("userId") Integer userId);
+                                    @Param("userId") Integer userId,
+                                    @Param("feedbackType") Integer feedbackType);
 
 }

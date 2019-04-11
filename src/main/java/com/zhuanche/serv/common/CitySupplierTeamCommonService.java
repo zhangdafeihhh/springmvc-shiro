@@ -459,7 +459,7 @@ public class CitySupplierTeamCommonService {
         if(cityIds==null || cityIds.size()==0) {
             return new ArrayList<CarBizSupplier>();
         }
-        return carBizSupplierExMapper.querySuppliers(cityIds, null);
+        return carBizSupplierExMapper.querySupplierAllList(cityIds, null);
     }
 
     /**
@@ -467,6 +467,27 @@ public class CitySupplierTeamCommonService {
      */
     public List<CarDriverTeam> getTeams(  Set<String> cityIds, Set<String> supplierIds ){
         return carDriverTeamExMapper.queryDriverTeam(cityIds, supplierIds, null);
+    }
+
+    /**
+     * @Desc: 根据城市ID，查询供应商列表（超级管理员可以查询出所有供应商、普通管理员只能查询自己数据权限内的供应商）
+     * @Author: lunan
+     * @Date: 2018/8/29
+     */
+    public List<CarBizSupplier> querySupplierAllList( Set<Integer> cityIds ){
+        if(cityIds==null || cityIds.size()==0) {
+            return new ArrayList<CarBizSupplier>();
+        }
+        //进行查询 (区分 超级管理员 、普通管理员 )
+        if( WebSessionUtil.isSupperAdmin() ) {
+            return carBizSupplierExMapper.querySupplierAllList(cityIds, null);
+        }else {
+            Set<Integer> supplierIds = WebSessionUtil.getCurrentLoginUser().getSupplierIds();
+            if(supplierIds.size()==0 ) {
+                return carBizSupplierExMapper.querySupplierAllList(cityIds, null);
+            }
+            return carBizSupplierExMapper.querySupplierAllList(cityIds, supplierIds);
+        }
     }
 }
 

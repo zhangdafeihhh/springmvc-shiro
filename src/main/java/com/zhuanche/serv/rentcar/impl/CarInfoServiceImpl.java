@@ -1,5 +1,6 @@
 package com.zhuanche.serv.rentcar.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Sets;
@@ -10,12 +11,12 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 import com.zhuanche.entity.rentcar.*;
+import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.serv.authc.UserManagementService;
 import com.zhuanche.serv.rentcar.CarInfoService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Common;
-import com.zhuanche.util.MyRestTemplate;
 import mapper.rentcar.CarSysDictionaryMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizModelExMapper;
@@ -24,15 +25,16 @@ import mapper.rentcar.ex.CarInfoExMapper;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpException;
+import org.apache.http.entity.ContentType;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,11 +61,12 @@ public class CarInfoServiceImpl implements CarInfoService {
     @Autowired
     private CarInfoExMapper carInfoExMapper;
 
-    @Autowired
-    @Qualifier("carApiTemplate")
-    private MyRestTemplate carApiTemplate;
+//    @Autowired
+//    @Qualifier("carApiTemplate")
+//    private MyRestTemplate carApiTemplate;
 
-
+    @Value("${mp.restapi.url}")
+    private String mpReatApiUrl;
 
     @Autowired
     private CarBizSupplierExMapper carBizSupplierExMapper;
@@ -1966,9 +1969,19 @@ public class CarInfoServiceImpl implements CarInfoService {
             JSONArray jsonarray = JSONArray.fromObject(carList2);
             String cars = jsonarray.toString();
             paramMap.put("carList", cars);
-            String url = "/webservice/carManage/batchInputCarInfo";
-            JSONObject jsonobject = carApiTemplate.postForObject(url,
-                    JSONObject.class, paramMap);
+//            String url = "/webservice/carManage/batchInputCarInfo";
+//            JSONObject jsonobject = carApiTemplate.postForObject(url,
+//                    JSONObject.class, paramMap);
+            String url = mpReatApiUrl + Common.BATHINPUTCARINFO;
+            String jsonObjectStr = null;
+            try {
+                jsonObjectStr = HttpClientUtil.buildPostRequest(url).addParams(paramMap).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
+            } catch (HttpException e) {
+                log.info("导入车辆调用接口 paramMap={},error={}", paramMap, e);
+            }
+            log.info("导入车辆调用解除接口 paramMap={}, result={}", paramMap, jsonObjectStr);
+            com.alibaba.fastjson.JSONObject jsonobject = JSON.parseObject(jsonObjectStr);
+
             // 返回为0 ==========不成功
             if ((int) jsonobject.get("result") == 0) {
                 log.info("接口返回为0 ==========导入不成功");
@@ -2096,8 +2109,18 @@ public class CarInfoServiceImpl implements CarInfoService {
         Map<String,Object> paramMap = new HashMap<String,Object>();
         JSONObject json = JSONObject.fromObject(params);
         paramMap.put("carInfo", json);
-        String url = "/webservice/carManage/saveCar";
-        result = carApiTemplate.postForObject(url,JSONObject.class,paramMap);
+//        String url = "/webservice/carManage/saveCar";
+//        result = carApiTemplate.postForObject(url,JSONObject.class,paramMap);
+        String url = mpReatApiUrl + Common.SAVE_CAR;
+        String jsonObjectStr = null;
+        try {
+            jsonObjectStr = HttpClientUtil.buildPostRequest(url).addParams(paramMap).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
+        } catch (HttpException e) {
+            log.info("保存车辆调用接口 paramMap={},error={}", paramMap, e);
+        }
+        log.info("保存车辆调用解除接口 paramMap={}, result={}", paramMap, jsonObjectStr);
+        com.alibaba.fastjson.JSONObject jsonobject = JSON.parseObject(jsonObjectStr);
+        result = jsonobject;
         return result;
     }
 
