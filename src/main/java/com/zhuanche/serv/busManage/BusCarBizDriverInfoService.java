@@ -615,7 +615,7 @@ public class BusCarBizDriverInfoService implements BusConst {
             saveDTO.setCreateDate(new Date());
             saveDTO.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
             saveDTO.setUpdateDate(new Date());
-            saveDTO.setStatus(1);
+            //saveDTO.setStatus(1);
             // 身份证号
             String idCardNo = saveDTO.getIdCardNo();
             if ("X".equals(idCardNo.substring(idCardNo.length() - 1, idCardNo.length()))) {
@@ -680,9 +680,11 @@ public class BusCarBizDriverInfoService implements BusConst {
      */
     @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.MASTER))
     public int saveDriverInfo(BusDriverSaveDTO saveDTO) {
+        logger.info("巴士司机入库操作开始-----------------");
 
         busCarBizDriverInfoExMapper.insertBusDriverInfo(saveDTO);
         Integer driverId = saveDTO.getDriverId();
+        logger.info("巴士司机入库操作完成-----------------司机id--{}",driverId);
 
         // 司机信息扩展表，司机银行卡号
         CarBizDriverInfoDetail carBizDriverInfoDetail = new CarBizDriverInfoDetail();

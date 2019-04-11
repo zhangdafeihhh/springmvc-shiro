@@ -31,7 +31,6 @@ import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.excel.ExportExcelUtil;
 import com.zhuanche.vo.busManage.*;
-import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper;
 import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -226,7 +225,7 @@ public class BusDriverInfoController extends BusBaseController {
 			AjaxResponse detail = findDriverInfoByDriverId(driverId);
 			BusDriverDetailInfoVO data =(BusDriverDetailInfoVO) detail.getData();
 			AjaxResponse response = null;
-			if(saveDTO.getPhone().equals(data.getPhone()) && saveDTO.getIdCardNo().equals(data.getIdCardNo()) && saveDTO.getXyDriverNumber().equals(data.getXyDriverNumber())){
+			if(saveDTO.getPhone().equals(data.getPhone()) && saveDTO.getIdCardNo().equalsIgnoreCase(data.getIdCardNo()) && saveDTO.getXyDriverNumber().equalsIgnoreCase(data.getXyDriverNumber())){
 				 //直接修改
 				response = busCarBizDriverInfoService.updateDriver(saveDTO);
 				if(response.isSuccess()){
