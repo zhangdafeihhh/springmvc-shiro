@@ -216,6 +216,10 @@ public class BusDriverInfoController extends BusBaseController {
 			if(isInService){
 			return AjaxResponse.fail(RestErrorCode.INT_SERVICE);
 			}
+			boolean auditStatus = busCarBizDriverInfoService.isAuditStatus(driverId);
+			if(auditStatus){
+				return AjaxResponse.fail(RestErrorCode.INT_AUDIT_STATUS);
+			}
 			// 司机获取派单的接口，是否可以修改
 			Map<String, Object> updateDriverMap = carBizDriverInfoService.isUpdateDriver(driverId, phone);
 			if (updateDriverMap != null && "2".equals(updateDriverMap.get("result").toString())) {

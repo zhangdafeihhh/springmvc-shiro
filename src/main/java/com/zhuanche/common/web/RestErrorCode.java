@@ -214,6 +214,8 @@ public final class RestErrorCode{
 	public static final int BUS_SUPPLIER_AUTH_FORBIDDEN =802;
 	@ResultMessage("正在服务中")
 	public static final int INT_SERVICE =803;
+	@ResultMessage("该数据正在审核中，暂时不能进行修改")
+	public static final int INT_AUDIT_STATUS=804;
 
 
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);

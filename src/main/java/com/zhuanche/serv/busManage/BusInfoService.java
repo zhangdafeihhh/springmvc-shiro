@@ -384,6 +384,10 @@ public class BusInfoService {
         if (busDetail == null) {
             return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "车辆ID传入错误");
         }
+        boolean auditStatus = this.isAuditStatus(busCarSaveDTO.getCarId());
+        if(auditStatus){
+            return AjaxResponse.fail(RestErrorCode.INT_AUDIT_STATUS);
+        }
         boolean inService = this.isInService(busDetail.getLicensePlates());
         if(inService){
             return AjaxResponse.fail(RestErrorCode.INT_SERVICE);
@@ -597,6 +601,17 @@ public class BusInfoService {
         query.addCriteria(Criteria.where("auditStatus").is(0));
         List<BusInfoAudit> busInfoAudits = carMongoTemplate.find(query, BusInfoAudit.class);
         if (result > 0 || (busInfoAudits != null && busInfoAudits.size() > 0)) {
+            return true;
+        }
+        return false;
+    }
+    public boolean isAuditStatus (Integer carId){
+        //判断审核表中，有没有待审核的数据
+        Query query = new Query();
+        query.addCriteria(Criteria.where("carId").is(carId));
+        query.addCriteria(Criteria.where("auditStatus").is(0));
+        List<BusInfoAudit> busInfoAudits = carMongoTemplate.find(query, BusInfoAudit.class);
+        if(busInfoAudits!=null&&busInfoAudits.size()>0){
             return true;
         }
         return false;

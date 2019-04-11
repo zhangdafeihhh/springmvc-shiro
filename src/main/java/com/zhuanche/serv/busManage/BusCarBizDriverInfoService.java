@@ -480,6 +480,17 @@ public class BusCarBizDriverInfoService implements BusConst {
             return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, "修改司机信息异常");
         }
     }
+    public  boolean isAuditStatus (Integer driverId){
+        //判断审核表中，有没有待审核的数据
+        Query query = new Query();
+        query.addCriteria(Criteria.where("driverId").is(driverId));
+        query.addCriteria(Criteria.where("auditStatus").is(0));
+        List<BusInfoAudit> busInfoAudits = driverMongoTemplate.find(query, BusInfoAudit.class);
+        if(busInfoAudits!=null&&busInfoAudits.size()>0){
+            return true;
+        }
+        return false;
+    }
 
     /**
      * 修改司机信息，操作司机信息扩展表
