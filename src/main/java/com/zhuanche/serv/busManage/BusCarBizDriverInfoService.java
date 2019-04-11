@@ -485,8 +485,8 @@ public class BusCarBizDriverInfoService implements BusConst {
         Query query = new Query();
         query.addCriteria(Criteria.where("driverId").is(driverId));
         query.addCriteria(Criteria.where("auditStatus").is(0));
-        List<BusInfoAudit> busInfoAudits = driverMongoTemplate.find(query, BusInfoAudit.class);
-        if(busInfoAudits!=null&&busInfoAudits.size()>0){
+        List<BusDriverInfoAudit> busDriverInfoAudits = driverMongoTemplate.find(query, BusDriverInfoAudit.class);
+        if(busDriverInfoAudits!=null&&busDriverInfoAudits.size()>0){
             return true;
         }
         return false;
