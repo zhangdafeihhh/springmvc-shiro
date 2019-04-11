@@ -899,10 +899,8 @@ public class BusAssignmentService {
             //查询被停运的司机
             List<BusBizDriverViolatorsVO> violators = busCarViolatorsService.queryCurrentOutOfDriver();
             if(violators!=null&&violators.size()>0) {
+                violators.forEach(o -> invalidDriverIds.add(o.getBusDriverId()));
                 logger.info("[ BusAssignmentService-orderToDoListForDriver ] 当前因为停运不可以指派司机ID:{}", invalidDriverIds);
-                violators.forEach(o -> {
-                    invalidDriverIds.add(o.getBusDriverId());
-                });
             }
             // 不可用司机
             if (!invalidDriverIds.isEmpty()) {
