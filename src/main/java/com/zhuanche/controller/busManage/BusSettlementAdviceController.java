@@ -50,6 +50,8 @@ import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -652,7 +654,7 @@ public class BusSettlementAdviceController {
     }
 
     /**
-     * @param BusSettlementPaymentDTO
+     * @param
      * @return AjaxResponse
      * @throws
      * @Title: paymentSave
@@ -776,21 +778,6 @@ public class BusSettlementAdviceController {
         }
 
 
-        ArrayList<String> bottom_context = new ArrayList<>();
-        bottom_context.add("订单金额汇总");
-        bottom_context.add("高速费+停车费");
-        bottom_context.add("结算比例");
-        bottom_context.add("(订单实际计费金额-司机代垫国家收费项目)*信息费比例");
-        bottom_context.add("账单调整金额为负时表示扣减");
-        bottom_context.add("订单实际计费金额-实收信息费");
-
-        XSSFRow bootom_row = sheet.createRow(3);
-        for (int i=0;i<bottom_context.size();i++){
-            XSSFCell cell = bootom_row.createCell(i);
-            cell.setCellValue(bottom_context.get(i));
-            cell.setCellStyle(style);
-        }
-
         XSSFCellStyle remarks_Style = wb.createCellStyle();
         remarks_Style.setAlignment(HorizontalAlignment.LEFT);
         remarks_Style.setVerticalAlignment(VerticalAlignment.CENTER);
@@ -815,10 +802,10 @@ public class BusSettlementAdviceController {
         remarks.add("          地址、电话：北京市朝阳区枣营路加甲3号2幢6016室 010-65206159");
         remarks.add("          开户行及账号：交通银行北京三元支行 110060635018800021058");
         for(int i=0;i<remarks.size();i++){
-            int rowIdx =4+i;
+            int rowIdx =3+i;
             sheet.addMergedRegion(new CellRangeAddress(rowIdx,rowIdx,0,5));
             XSSFRow row = sheet.createRow(rowIdx);
-            if(rowIdx==4){
+            if(rowIdx==3){
                 row.setHeightInPoints(70);
             }else{
                 row.setHeightInPoints(20);
@@ -852,7 +839,11 @@ public class BusSettlementAdviceController {
                 Integer supplierId = data.getInteger("supplierId");
                 CarBizSupplier carBizSupplier = supplierService.selectByPrimaryKey(supplierId);
                 String supplierName=carBizSupplier!=null?carBizSupplier.getSupplierFullName():"";
-                String title=supplierName+data.getString("startTime")+"-"+data.getString("endTime")+"流水汇总";
+                String startTime =data.getString("startTime");
+                String endTime = data.getString("endTime");
+                DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                String title=supplierName+" "+df.format(LocalDateTime.parse(startTime,df2))+"-"+df.format(LocalDateTime.parse(endTime,df2))+"流水汇总";
                 sheet.getRow(0).getCell(0).setCellValue(title);
             }else{
                 logger.error("巴士账单汇总导出，返回失败，code={},msg={}",code,reponse_json.getString("msg"));
