@@ -615,7 +615,7 @@ public class BusCarBizDriverInfoService implements BusConst {
             saveDTO.setCreateDate(new Date());
             saveDTO.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
             saveDTO.setUpdateDate(new Date());
-            saveDTO.setStatus(1);
+            //saveDTO.setStatus(1);
             // 身份证号
             String idCardNo = saveDTO.getIdCardNo();
             if ("X".equals(idCardNo.substring(idCardNo.length() - 1, idCardNo.length()))) {
