@@ -15,6 +15,7 @@ import com.zhuanche.constants.BusConst;
 import com.zhuanche.constants.busManage.BusConstant;
 import com.zhuanche.dto.busManage.BusDriverQueryDTO;
 import com.zhuanche.dto.busManage.BusDriverSaveDTO;
+import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.http.MpOkHttpUtil;
@@ -30,6 +31,7 @@ import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.excel.ExportExcelUtil;
 import com.zhuanche.vo.busManage.*;
+import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper;
 import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -692,6 +694,8 @@ public class BusDriverInfoController extends BusBaseController {
 			if (code == 0) {
 				//发送短信
 				SmsSendUtil.sendTemplate(phone, 207,new ArrayList());
+				CarBizDriverInfoDTO carBizDriverInfoDTO = carBizDriverInfoService.selectByPhone(phone);
+				busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(carBizDriverInfoDTO.getDriverId()), "司机解锁", new Date());
 				return AjaxResponse.success(null);
 			} else if (code == 1102) {
 				return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_LOCKED);
