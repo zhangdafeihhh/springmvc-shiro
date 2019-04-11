@@ -295,11 +295,11 @@ public class BusOrderService {
 			param.put("status", 10105);
 			param.put("pageNum",pageDTO.getPageNum());
 			param.put("pageSize",pageDTO.getPageSize());
-			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 			LocalDateTime now = LocalDateTime.now();
-			param.put("bookingDateBegin", now.format(dateTimeFormatter));
-			LocalDateTime localDateTime = now.plusDays(3);
-			param.put("bookingDateEnd", localDateTime.format(dateTimeFormatter));
+			param.put("bookingDateBeginStr", now.format(dateTimeFormatter));
+			LocalDateTime localDateTime = now.plusHours(72);
+			param.put("bookingDateEndStr", localDateTime.format(dateTimeFormatter));
 			switch (enumByCode) {
                 case ALL:
                     break;
