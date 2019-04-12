@@ -487,7 +487,7 @@ public class BusCarBizDriverInfoService implements BusConst {
         Query query = new Query();
         query.addCriteria(Criteria.where("driverId").is(driverId));
         query.addCriteria(Criteria.where("auditStatus").is(0));
-        List<BusDriverInfoAudit> busDriverInfoAudits = driverMongoTemplate.find(query, BusDriverInfoAudit.class);
+        List<BusDriverInfoAudit> busDriverInfoAudits = busMongoTemplate.find(query, BusDriverInfoAudit.class);
         if(busDriverInfoAudits!=null&&busDriverInfoAudits.size()>0){
             return true;
         }
@@ -1483,7 +1483,7 @@ public class BusCarBizDriverInfoService implements BusConst {
         if(StringUtils.isNotBlank(id)){
             query.addCriteria(Criteria.where("_id").nin(id));
         }
-        List<BusDriverInfoAudit> busDriverInfoAudits = driverMongoTemplate.find(query, BusDriverInfoAudit.class);
+        List<BusDriverInfoAudit> busDriverInfoAudits = busMongoTemplate.find(query, BusDriverInfoAudit.class);
         if(CollectionUtils.isNotEmpty(busDriverInfoAudits)){
             return true;
         }
