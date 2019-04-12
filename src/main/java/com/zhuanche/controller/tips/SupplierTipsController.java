@@ -36,6 +36,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -412,7 +414,11 @@ public class SupplierTipsController {
                     }
                 }
             }
-            response.setData(hasPermission);
+            Map<String,Integer> permissionMap = new HashMap<>();
+
+            permissionMap.put("hasPermission",hasPermission);
+
+            response.setData(permissionMap);
 
         } catch (Exception e) {
             logger.info("获取验证信息错误" + e.getMessage());
