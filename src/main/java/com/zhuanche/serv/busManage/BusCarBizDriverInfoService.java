@@ -1719,6 +1719,8 @@ public class BusCarBizDriverInfoService implements BusConst {
             String oldLicenseType = this.getDrivingLicenseType(driverInfo.getDrivingLicenseType());
             oldDriver.setDrivingLicenseType(oldLicenseType);
             BusDriverCompareEntity newDriver=new BusDriverCompareEntity();
+            //防止主从延迟，切换主库查询
+            DynamicRoutingDataSource.setMasterSlave("rentcar-DataSource", DataSourceMode.MASTER);
             //查询最新的信息
             BusDriverDetailInfoVO carBizDriverInfo  = findDriverInfoByDriverId(driverId);
             BeanUtils.copyProperties(carBizDriverInfo,newDriver);

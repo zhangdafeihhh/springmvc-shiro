@@ -49,6 +49,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -670,7 +671,15 @@ public class BusSettlementAdviceController {
                                            HttpServletRequest request, HttpServletResponse response)throws Exception{
         HashMap<String,Object> params=new HashMap<>();
         params.put("supplierBillId",supplierBillId);
-        String fileName = BusConstant.buidFileName(request, "账单信息");
+        String fileName = "账单信息" + com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern);
+        //获得浏览器信息并转换为大写
+        String agent = request.getHeader("User-Agent").toUpperCase();
+        //IE浏览器和Edge浏览器
+        if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO") > 0 && agent.indexOf("RV:11") > 0)) {
+            fileName = URLEncoder.encode(fileName, "UTF-8");
+        } else {  //其他浏览器
+            fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+        }
         //创建工作簿
         XSSFWorkbook wb=new XSSFWorkbook();
 
