@@ -1672,7 +1672,10 @@ public class BusCarBizDriverInfoService implements BusConst {
                     saveDTO.setCreateDate(busDriverInfoAudit.getCreateDate());
                     saveDTO.setUpdateBy(busDriverInfoAudit.getUpdateBy());
                     saveDTO.setUpdateDate(busDriverInfoAudit.getUpdateDate());
-                    this.saveDriver(saveDTO);
+                    AjaxResponse response = this.saveDriver(saveDTO);
+                    if(!response.isSuccess()){
+                        return response;
+                    }
                 }else{
                     //修改司机审核通过
                     BusDriverDetailInfoVO data = this.findDriverInfoByDriverId(saveDTO.getDriverId());
