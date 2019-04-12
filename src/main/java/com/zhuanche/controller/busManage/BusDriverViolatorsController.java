@@ -83,17 +83,23 @@ public class BusDriverViolatorsController extends BusBaseController {
 		logger.info("【新增违规司机处罚】start...params:saveDTO="+JSON.toJSONString(saveDTO));
 		try{
 			if(saveDTO.getPunishType()!=1){
-				return AjaxResponse.failMsg(RestErrorCode.PARAMS_ERROR, "参数处罚状态不正确,目前只支持停运（1）处罚");
+				return AjaxResponse.failMsg(RestErrorCode.PARAMS_ERROR, "参数处罚状态不正确,目前只支持停运处罚");
 			}
-			if("0".equals(saveDTO.getPunishDuration().trim())){
-				logger.info("【新增违规司机处罚】参数停运时长不能为0");
-				return AjaxResponse.failMsg(RestErrorCode.PARAMS_ERROR, "参数停运时长不能为0");
-			}
+			Double punishDuration;
 			try{
-				Double.parseDouble(saveDTO.getPunishDuration().trim());
+				punishDuration=Double.parseDouble(saveDTO.getPunishDuration().trim());
 			}catch (Exception e){
 				logger.error("【新增违规司机处罚】参数停运时长错误",e);
 				return AjaxResponse.failMsg(RestErrorCode.PARAMS_ERROR, "参数停运时长错误");
+			}
+			if(punishDuration<=0){
+				logger.info("【新增违规司机处罚】参数处罚时长不能为零或负数");
+				return AjaxResponse.failMsg(RestErrorCode.PARAMS_ERROR, "处罚时长不能为零或负数");
+			}
+			Date punishStartTime=saveDTO.getPunishStartTime();
+			if(punishStartTime.before(new Date())){
+				logger.info("【新增违规司机处罚】处罚开始时间不能早于当前时间");
+				return AjaxResponse.failMsg(RestErrorCode.PARAMS_ERROR, "处罚开始时间不能早于当前时间");
 			}
 			SSOLoginUser loginUser=WebSessionUtil.getCurrentLoginUser();
 			logger.info("【新增违规司机处罚】当前登录人信息={}", JSON.toJSONString(loginUser));
