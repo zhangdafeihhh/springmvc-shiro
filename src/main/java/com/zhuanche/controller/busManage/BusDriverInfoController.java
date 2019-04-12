@@ -233,7 +233,11 @@ public class BusDriverInfoController extends BusBaseController {
 				 //直接修改
 				response = busCarBizDriverInfoService.updateDriver(saveDTO);
 				if(response.isSuccess()){
+					logger.info("巴士司机修改成功，开始插入操作记录操作：driverId--{}",saveDTO.getDriverId());
 					busCarBizDriverInfoService.saveUpdateLog(data,driverId);
+					logger.info("巴士司机修改成功，插入操作记录操作完成：driverId--{}",saveDTO.getDriverId());
+				}else {
+					logger.info("巴士司机修改失败，无插入操作记录操作：driverId--{}",saveDTO.getDriverId());
 				}
 			}else{
 				//修改信息进入审核列表

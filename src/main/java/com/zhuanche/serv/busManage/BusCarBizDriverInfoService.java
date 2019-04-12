@@ -1729,7 +1729,11 @@ public class BusCarBizDriverInfoService implements BusConst {
             List<Object> objects = CompareObjectUtils.contrastObj(oldDriver, newDriver, null);
             if(objects.size()!=0){
                 String join = StringUtils.join(objects, ",");
+                logger.info("巴士司机入库操作开始，修改司机--{}，插入内容--{}",driverId,join);
                 busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId),join, new Date());
+                logger.info("巴士司机入库操作完成，修改司机--{}",driverId);
+            }else {
+                logger.info("巴士司机无信息进行修改，司机id--{}",driverId);
             }
         } catch (BeansException e) {
             logger.error("[ BusDriverInfoController-saveUpdateLog ] 保存操作日志异常", e);
