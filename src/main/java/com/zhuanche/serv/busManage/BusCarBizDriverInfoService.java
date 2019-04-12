@@ -194,6 +194,8 @@ public class BusCarBizDriverInfoService implements BusConst {
 
     @Resource(name = "driverMongoTemplate")
     private MongoTemplate driverMongoTemplate;
+    @Resource(name = "busMongoTemplate")
+    private MongoTemplate busMongoTemplate;
 
     @Value("${car.rest.url}")
     private String order_url ;
@@ -1406,8 +1408,8 @@ public class BusCarBizDriverInfoService implements BusConst {
         Integer pageSize = busDriverDTO.getPageSize();
         int start = (pageNum-1)*pageSize;
         query.skip(start-1<0?0:start);
-        List<BusDriverInfoAudit> busDriverInfoAudits = driverMongoTemplate.find(query, BusDriverInfoAudit.class);
-        long count = driverMongoTemplate.count(query, BusDriverInfoAudit.class);
+        List<BusDriverInfoAudit> busDriverInfoAudits = busMongoTemplate.find(query, BusDriverInfoAudit.class);
+        long count = busMongoTemplate.count(query, BusDriverInfoAudit.class);
 
         if(CollectionUtils.isEmpty(busDriverInfoAudits)){
             return AjaxResponse.success(new PageDTO(pageNum,pageSize,count,busDriverInfoAudits));
@@ -1507,7 +1509,7 @@ public class BusCarBizDriverInfoService implements BusConst {
         if(StringUtils.isNotBlank(id)){
             query.addCriteria(Criteria.where("_id").nin(id));
         }
-        List<BusDriverInfoAudit> busDriverInfoAudits = driverMongoTemplate.find(query, BusDriverInfoAudit.class);
+        List<BusDriverInfoAudit> busDriverInfoAudits = busMongoTemplate.find(query, BusDriverInfoAudit.class);
         if(CollectionUtils.isNotEmpty(busDriverInfoAudits)){
             return true;
         }
@@ -1543,7 +1545,7 @@ public class BusCarBizDriverInfoService implements BusConst {
             //来源 创建
             busDriverInfoAudit.setStemFrom(0);
 
-            driverMongoTemplate.insert(busDriverInfoAudit);
+            busMongoTemplate.insert(busDriverInfoAudit);
 
             return AjaxResponse.success(null);
         } catch (Exception e) {
@@ -1579,7 +1581,7 @@ public class BusCarBizDriverInfoService implements BusConst {
             //来源 修改
             busDriverInfoAudit.setStemFrom(1);
 
-            driverMongoTemplate.insert(busDriverInfoAudit);
+            busMongoTemplate.insert(busDriverInfoAudit);
 
             return AjaxResponse.success("保存成功，司机进入审核");
         }catch (Exception e) {
@@ -1608,7 +1610,7 @@ public class BusCarBizDriverInfoService implements BusConst {
                 saveDTO.setDriverlicensenumber(idCardNo);
             }
             Query query = Query.query(Criteria.where("_id").is(saveDTO.getId()));
-            BusDriverInfoAudit busDriverInfoAudit = driverMongoTemplate.findById(saveDTO.getId(),BusDriverInfoAudit.class);
+            BusDriverInfoAudit busDriverInfoAudit = busMongoTemplate.findById(saveDTO.getId(),BusDriverInfoAudit.class);
             if(busDriverInfoAudit != null){
                 Update update = new Update();
                 BeanUtils.copyProperties(saveDTO,busDriverInfoAudit);
@@ -1628,7 +1630,7 @@ public class BusCarBizDriverInfoService implements BusConst {
                     }
 
                 }
-                driverMongoTemplate.updateFirst(query, update, BusDriverInfoAudit.class);
+                busMongoTemplate.updateFirst(query, update, BusDriverInfoAudit.class);
                 return AjaxResponse.success(null);
             }else{
                 return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR, "审核列表司机修改信息异常");
@@ -1653,7 +1655,7 @@ public class BusCarBizDriverInfoService implements BusConst {
                 return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "审核司机参数为空");
             }
             for (String id: idList) {
-                BusDriverInfoAudit busDriverInfoAudit = driverMongoTemplate.findById(id,BusDriverInfoAudit.class);
+                BusDriverInfoAudit busDriverInfoAudit = busMongoTemplate.findById(id,BusDriverInfoAudit.class);
                 BusDriverSaveDTO saveDTO = BeanUtil.copyObject(busDriverInfoAudit, BusDriverSaveDTO.class);
                 this.completeInfo(saveDTO);
                 //修改审核表审核状态，审核人，审核时间
@@ -1683,7 +1685,7 @@ public class BusCarBizDriverInfoService implements BusConst {
                     this.saveUpdateLog(data,saveDTO.getDriverId());
                 }
                 //修改审核状态
-                WriteResult writeResult = driverMongoTemplate.updateFirst(query, update, BusDriverInfoAudit.class);
+                WriteResult writeResult = busMongoTemplate.updateFirst(query, update, BusDriverInfoAudit.class);
                 SimpleDateFormat f=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 //插入审核记录
                 StringBuffer log = new StringBuffer();
@@ -1760,7 +1762,7 @@ public class BusCarBizDriverInfoService implements BusConst {
      */
     public BusDriverInfoAudit findAuditDriverInfoById( String id) {
 
-        BusDriverInfoAudit busDriverInfoAudit = driverMongoTemplate.findById(id,BusDriverInfoAudit.class);
+        BusDriverInfoAudit busDriverInfoAudit = busMongoTemplate.findById(id,BusDriverInfoAudit.class);
         return busDriverInfoAudit;
     }
 

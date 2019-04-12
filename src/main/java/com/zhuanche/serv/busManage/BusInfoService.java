@@ -89,6 +89,9 @@ public class BusInfoService {
     @Resource(name = "carMongoTemplate")
     private MongoTemplate carMongoTemplate;
 
+    @Resource(name = "busMongoTemplate")
+    private MongoTemplate busMongoTemplage;
+
     @Value("${car.rest.url}")
     private String order_url ;
 
@@ -130,7 +133,7 @@ public class BusInfoService {
         busInfo.setAuditStatus(0);
         //来源：0创建
         busInfo.setStemFrom(0);
-        carMongoTemplate.insert(busInfo);
+        busMongoTemplage.insert(busInfo);
         return AjaxResponse.success("保存成功，车辆已进入审核");
     }
 
@@ -161,8 +164,8 @@ public class BusInfoService {
         int start = (pageNum - 1) * pageSize;
         query.skip(start - 1 < 0 ? 0 : start);
 
-        List<BusInfoAudit> busInfoAudits = carMongoTemplate.find(query, BusInfoAudit.class);
-        long count = carMongoTemplate.count(query, BusInfoAudit.class);
+        List<BusInfoAudit> busInfoAudits = busMongoTemplage.find(query, BusInfoAudit.class);
+        long count = busMongoTemplage.count(query, BusInfoAudit.class);
 
         if (busInfoAudits == null || busInfoAudits.isEmpty()) {
             return AjaxResponse.success(new PageDTO(pageNum, pageSize, count, busInfoAudits));
@@ -225,7 +228,7 @@ public class BusInfoService {
         try {
             for (int i = 0; i < split.length; i++) {
                 Query query = new Query(Criteria.where("id").is(split[i]));
-                BusInfoAudit busAudit = carMongoTemplate.findOne(query, BusInfoAudit.class);
+                BusInfoAudit busAudit = busMongoTemplage.findOne(query, BusInfoAudit.class);
                 Integer stemFrom = busAudit.getStemFrom();
                 BusCarInfo carInfo = new BusCarInfo();
                 BeanUtils.copyProperties(busAudit, carInfo);
@@ -238,7 +241,7 @@ public class BusInfoService {
                         update.set("auditor", WebSessionUtil.getCurrentLoginUser().getId());
                         update.set("auditDate", new Date());
                         update.set("auditorName",WebSessionUtil.getCurrentLoginUser().getName());
-                        carMongoTemplate.updateFirst(query, update, BusInfoAudit.class);
+                        busMongoTemplage.updateFirst(query, update, BusInfoAudit.class);
                         //保存操作日志
                         busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carId), "创建车辆", busAudit.getCreateBy(), busAudit.getCreateName(), busAudit.getCreateDate());
                         busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carId), "审核通过", new Date());
@@ -254,7 +257,7 @@ public class BusInfoService {
                         update.set("auditor", WebSessionUtil.getCurrentLoginUser().getId());
                         update.set("auditDate", new Date());
                         update.set("auditorName",WebSessionUtil.getCurrentLoginUser().getName());
-                        carMongoTemplate.updateFirst(query, update, BusInfoAudit.class);
+                        busMongoTemplage.updateFirst(query, update, BusInfoAudit.class);
                         String diff = this.saveUpdateLog(detail, carInfo.getCarId());
                         if(!"".equals(diff)) {
                             busBizChangeLogService.insertLog(BusBizChangeLogExMapper.BusinessType.CAR, String.valueOf(carInfo.getCarId()), diff, busAudit.getUpdateBy(), busAudit.getUpdateName(), busAudit.getUpdateDate());
@@ -275,7 +278,7 @@ public class BusInfoService {
 
     public AjaxResponse getAuditDetail(String id) {
         Query query = new Query(Criteria.where("id").is(id));
-        BusInfoAudit auditDetail = carMongoTemplate.findOne(query, BusInfoAudit.class);
+        BusInfoAudit auditDetail = busMongoTemplage.findOne(query, BusInfoAudit.class);
 
         BusDetailVO detail = new BusDetailVO();
         BeanUtils.copyProperties(auditDetail, detail);
@@ -294,7 +297,7 @@ public class BusInfoService {
 
     public AjaxResponse updateAuditCar(BusCarSaveDTO saveDTO) {
         Query query = new Query(Criteria.where("id").is(saveDTO.getId()));
-        BusInfoAudit detail = carMongoTemplate.findOne(query, BusInfoAudit.class);
+        BusInfoAudit detail = busMongoTemplage.findOne(query, BusInfoAudit.class);
         if (!detail.getLicensePlates().equals(saveDTO.getLicensePlates())) {
             //校验新车牌号是否存在
             boolean b = this.licensePlatesIfExist(saveDTO.getLicensePlates());
@@ -323,7 +326,7 @@ public class BusInfoService {
         update.set("updateBy", id);
         update.set("updateDate", new Date());
         update.set("updateName", currentLoginUser.getName());
-        WriteResult writeResult = carMongoTemplate.updateFirst(query, update, BusInfoAudit.class);
+        WriteResult writeResult = busMongoTemplage.updateFirst(query, update, BusInfoAudit.class);
         return AjaxResponse.success(null);
     }
 
@@ -427,7 +430,7 @@ public class BusInfoService {
             busInfoAudit.setStemFrom(1);
             //默认未审核
             busInfoAudit.setAuditStatus(0);
-            carMongoTemplate.insert(busInfoAudit);
+            busMongoTemplage.insert(busInfoAudit);
             return AjaxResponse.success("保存成功，车辆已进入审核");
         }
         return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
@@ -599,7 +602,7 @@ public class BusInfoService {
         Query query = new Query();
         query.addCriteria(Criteria.where("licensePlates").is(licensePlates));
         query.addCriteria(Criteria.where("auditStatus").is(0));
-        List<BusInfoAudit> busInfoAudits = carMongoTemplate.find(query, BusInfoAudit.class);
+        List<BusInfoAudit> busInfoAudits = busMongoTemplage.find(query, BusInfoAudit.class);
         if (result > 0 || (busInfoAudits != null && busInfoAudits.size() > 0)) {
             return true;
         }
@@ -610,7 +613,7 @@ public class BusInfoService {
         Query query = new Query();
         query.addCriteria(Criteria.where("carId").is(carId));
         query.addCriteria(Criteria.where("auditStatus").is(0));
-        List<BusInfoAudit> busInfoAudits = carMongoTemplate.find(query, BusInfoAudit.class);
+        List<BusInfoAudit> busInfoAudits = busMongoTemplage.find(query, BusInfoAudit.class);
         if(busInfoAudits!=null&&busInfoAudits.size()>0){
             return true;
         }

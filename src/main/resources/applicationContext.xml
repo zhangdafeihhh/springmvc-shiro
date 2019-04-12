@@ -40,6 +40,8 @@
     <import resource="applicationContext-mongodb-driver.xml"/>
     <!--配置mongo的服务(用户操作日志)-->
     <import resource="applicationContext-mongodb-userOperationLog.xml"/>
+    <!-- 配置bus mongo服务-->
+    <import resource="applicationContext-mongodb-bus.xml"/>
     <!--接口服务-->
     <import resource="applicationContext-ctx-restful.xml"/>
      <!--ftp服务器-->

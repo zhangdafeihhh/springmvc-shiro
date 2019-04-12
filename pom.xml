@@ -371,15 +371,16 @@
 	<profiles>
 		<profile>
 			<id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
 			<properties>
 				<env.name>dev</env.name>
 			</properties>
 		</profile>
 		<profile>
 			<id>test</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
+
 			<properties>
 				<env.name>test</env.name>
 			</properties>
