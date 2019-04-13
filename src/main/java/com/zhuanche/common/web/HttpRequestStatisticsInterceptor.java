@@ -1,6 +1,8 @@
 package com.zhuanche.common.web;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -15,6 +17,12 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.http.MpOkHttpUtil;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 import org.apache.commons.lang.StringUtils;
 import org.perf4j.StopWatch;
 import org.perf4j.slf4j.Slf4JStopWatch;
@@ -22,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -54,6 +63,8 @@ public class HttpRequestStatisticsInterceptor implements HandlerInterceptor,  In
 	public void setExcludeURIs(List<String> excludeURIs) {
 		this.excludeURIs = excludeURIs;
 	}
+
+
 	
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception{
@@ -103,6 +114,18 @@ public class HttpRequestStatisticsInterceptor implements HandlerInterceptor,  In
 		//URI 请求数计数器
 		AtomicLong atomicLong = URI_COUNTER.get(uri);
 		long costMiliseconds = System.currentTimeMillis()-startTimestamp;
+		if(costMiliseconds > 1000){
+			try {
+				String mess = MessageFormat.format("项目名称:{0},项目ip:{1},项目端口:{2},接口地址:{3},请求方式:{4},容器路径:{5}",
+						request.getContextPath(),request.getServerName(),request.getServerPort(),request.getRequestURI(),request.getMethod(),request.getServletPath());
+				log.info(mess);
+
+				DingdingAlarmUtil.sendDingdingAlerm(mess  + ",接口超时报警:" + costMiliseconds + "毫秒");
+			} catch (Exception e) {
+				log.info("钉钉告警消息异常!" + e.getMessage());
+			}
+		}
+
 		log.info("[HTTP_STATIS] "+ uri + " ,COST: "+ costMiliseconds + "ms, TOTAL_REQUEST: "+ atomicLong.get() );
 		stopWatch.stop(uri);
 		stopWatch = null;
@@ -210,4 +233,6 @@ public class HttpRequestStatisticsInterceptor implements HandlerInterceptor,  In
 		}
 		log.info(">>>>>>>>>>>>>>>>>>异步执行插入日志的线程启动成功！线程数量："+ insertLog2DBWorkers + "个");
 	}
+
+
 }
