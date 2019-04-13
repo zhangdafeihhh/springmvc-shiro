@@ -108,8 +108,8 @@ public class CustomExceptionAdvice {
 		String exceptionMessage = ex.getMessage() + " (ExceptionId: "+ExceptionId+")";
 		logger.error(exceptionMessage, ex );
 		try {
-			String mess = MessageFormat.format("项目名称:{0},项目ip:{1},项目端口:{2},接口地址:{3},请求方式:{4},容器路径:{5},错误信息:",
-					request.getContextPath(),request.getServerName(),request.getServerPort(),request.getRequestURI(),request.getMethod(),request.getServletPath());
+			String mess = MessageFormat.format("项目ip:{0},项目端口:{1},接口地址:{2},请求方式:{3},错误信息:",
+					request.getServerName(),request.getServerPort(),request.getRequestURI(),request.getMethod());
 			logger.info(mess);
 			DingdingAlarmUtil.sendDingdingAlerm(mess  + ex.getMessage());
 		} catch (Exception e) {

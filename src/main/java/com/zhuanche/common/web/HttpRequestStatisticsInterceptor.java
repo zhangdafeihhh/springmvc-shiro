@@ -116,8 +116,8 @@ public class HttpRequestStatisticsInterceptor implements HandlerInterceptor,  In
 		long costMiliseconds = System.currentTimeMillis()-startTimestamp;
 		if(costMiliseconds > 1000){
 			try {
-				String mess = MessageFormat.format("项目名称:{0},项目ip:{1},项目端口:{2},接口地址:{3},请求方式:{4},容器路径:{5}",
-						request.getContextPath(),request.getServerName(),request.getServerPort(),request.getRequestURI(),request.getMethod(),request.getServletPath());
+				String mess = MessageFormat.format("项目ip:{0},项目端口:{1},接口地址:{2},请求方式:{3}",
+						request.getServerName(),request.getServerPort(),request.getRequestURI(),request.getMethod());
 				log.info(mess);
 
 				DingdingAlarmUtil.sendDingdingAlerm(mess  + ",接口超时报警:" + costMiliseconds + "毫秒");
