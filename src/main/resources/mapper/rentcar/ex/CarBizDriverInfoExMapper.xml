@@ -337,6 +337,7 @@
     i.supplier_id supplieId,
     p.supplier_full_name AS supplierName,
     i.STATUS AS status,
+    e.`name` updateByName,
     i.id_card_no as idCardNo,
     i.age as age,
     i.superintend_no AS superintendNo,
@@ -352,6 +353,7 @@
     car_biz_driver_info i
     LEFT JOIN car_biz_city c ON c.city_id = i.service_city
     LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
+    LEFT JOIN car_sys_user e on e.user_id=i.update_by
     where 1=1
     <if test="driverIds!=null and driverIds.size()>0">
       and i.driver_id IN
