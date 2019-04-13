@@ -332,14 +332,11 @@
     i.phone AS phone,
     i.gender gender,
     i.NAME,
-    g.group_name AS carGroupName,
     c.city_name AS serviceCity,
     i.license_plates AS licensePlates,
     i.supplier_id supplieId,
     p.supplier_full_name AS supplierName,
     i.STATUS AS status,
-    d.`name` createByName,
-    e.`name` updateByName,
     i.id_card_no as idCardNo,
     i.age as age,
     i.superintend_no AS superintendNo,
@@ -354,12 +351,7 @@
     FROM
     car_biz_driver_info i
     LEFT JOIN car_biz_city c ON c.city_id = i.service_city
-    LEFT JOIN car_biz_car_info a ON a.license_plates = i.license_plates
     LEFT JOIN car_biz_supplier p ON i.supplier_id = p.supplier_id
-    LEFT JOIN car_biz_model m ON a.car_model_id = m.model_id
-    LEFT JOIN car_biz_car_group g ON m.group_id = g.group_id
-    left join car_sys_user d on d.user_id=i.create_by
-    left join car_sys_user e on e.user_id=i.update_by
     where 1=1
     <if test="driverIds!=null and driverIds.size()>0">
       and i.driver_id IN
