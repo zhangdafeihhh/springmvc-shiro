@@ -155,11 +155,17 @@ public class BusOrderService {
 					String bookingUserName = carBizCustomerExMapper.selectCustomerNameById(bookingUserId);
 					entity.setBookingUserName(bookingUserName);
 				}
-				// 查询预定车型名称
+				// 查询预定车型类别名称
 				String bookingGroupid = entity.getBookingGroupid();
 				if (StringUtils.isNotBlank(bookingGroupid)) {
 					String bookingGroupName = carBizCarGroupExMapper.getGroupNameByGroupId(Integer.valueOf(bookingGroupid));
 					entity.setBookingGroupName(bookingGroupName);
+				}
+				//查询实际指派车辆车型类别名
+				Integer carGroupId=entity.getCarGroupId();
+				if(carGroupId!=null){
+					String carGroupName = carBizCarGroupExMapper.getGroupNameByGroupId(carGroupId);
+					entity.setCarGroupName(carGroupName);
 				}
 			}
 		} catch (Exception e) {
