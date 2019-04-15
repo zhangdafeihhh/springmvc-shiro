@@ -189,14 +189,20 @@ public class BusAssignmentService {
                         order.setBookingGroupName(carBizCarGroupExMapper.getGroupNameByGroupId(Integer.valueOf(order.getBookingGroupid())));
                     }
 
-                    // d)订单类型名称
+                    //d)实际指派车型类别名称
+                    Integer carGroupId = order.getCarGroupId();
+                    if(carGroupId!=null){
+                        String carGroupName = carBizCarGroupExMapper.getGroupNameByGroupId(carGroupId);
+                        order.setCarGroupName(carGroupName);
+                    }
+                    // e)订单类型名称
                     if (order.getServiceTypeId() != null) {
                         CarBizService service = carBizServiceMapper.selectByPrimaryKey(order.getServiceTypeId());
                         if (service != null) {
                             order.setServiceTypeName(service.getServiceName());
                         }
                     }
-                    // d)预估里程
+                    // f)预估里程
                     if (busCostDetailList != null) {
                     	String orderNo = order.getOrderNo();
                     	if (StringUtils.isNotBlank(orderNo)) {
@@ -209,7 +215,7 @@ public class BusAssignmentService {
                     		});
                     	}
                     }
-                    // e)企业名称/企业折扣/付款类型
+                    // g)企业名称/企业折扣/付款类型
                     if (queryBusinessInfoBatch != null) {
                     	Integer businessId = order.getBusinessId();
                     	if (businessId != null) {
