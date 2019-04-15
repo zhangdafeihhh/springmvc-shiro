@@ -108,7 +108,7 @@ public class CustomExceptionAdvice {
 		String exceptionMessage = ex.getMessage() + " (ExceptionId: "+ExceptionId+")";
 		logger.error(exceptionMessage, ex );
 		try {
-			String mess = MessageFormat.format("项目ip:{0},项目端口:{1},接口地址:{2},请求方式:{3},错误信息:",
+			String mess = MessageFormat.format("异常报警:项目:{0},项目端口:{1},接口地址:{2},请求方式:{3},错误信息:",
 					request.getServerName(),request.getServerPort(),request.getRequestURI(),request.getMethod());
 			logger.info(mess);
 			DingdingAlarmUtil.sendDingdingAlerm(mess  + ex.getMessage());

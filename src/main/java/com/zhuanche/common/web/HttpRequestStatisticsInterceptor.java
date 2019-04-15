@@ -114,13 +114,13 @@ public class HttpRequestStatisticsInterceptor implements HandlerInterceptor,  In
 		//URI 请求数计数器
 		AtomicLong atomicLong = URI_COUNTER.get(uri);
 		long costMiliseconds = System.currentTimeMillis()-startTimestamp;
-		if(costMiliseconds > 1000){
+		if(costMiliseconds > 3000){
 			try {
-				String mess = MessageFormat.format("项目ip:{0},项目端口:{1},接口地址:{2},请求方式:{3}",
+				String mess = MessageFormat.format("接口超时报警:项目ip:{0},项目端口:{1},接口地址:{2},请求方式:{3}",
 						request.getServerName(),request.getServerPort(),request.getRequestURI(),request.getMethod());
 				log.info(mess);
 
-				DingdingAlarmUtil.sendDingdingAlerm(mess  + ",接口超时报警:" + costMiliseconds + "毫秒");
+				DingdingAlarmUtil.sendDingdingAlerm(mess  + ",超时时间:" + costMiliseconds + "毫秒");
 			} catch (Exception e) {
 				log.info("钉钉告警消息异常!" + e.getMessage());
 			}
