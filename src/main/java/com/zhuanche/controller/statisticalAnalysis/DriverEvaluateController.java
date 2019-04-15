@@ -129,6 +129,7 @@ public class DriverEvaluateController{
 			* @param motorcadeId 车队ID	
 			* @param driverScore 司机评价分数	
 			* @param appScore APP评价分数
+		    * @param serviceTypeId 服务类型
 		    * @return
 		  */
   	@RequestMapping(value = "/exportDriverEvaluateData", method = { RequestMethod.POST,RequestMethod.GET })
@@ -142,6 +143,7 @@ public class DriverEvaluateController{
 							            String driverScore,
 							            String appScore,
 							            String classId,
+                                        String serviceTypeId,
 							            @Verify(param = "queryDate",rule = "required") String queryDate,
 	                                    HttpServletRequest request,
 	                                    HttpServletResponse response){
@@ -169,6 +171,8 @@ public class DriverEvaluateController{
 	        if (StringUtils.isNotEmpty(classId)){
 	        	paramMap.put("classId", classId);//班组id
 			}
+			if (StringUtils.isNotBlank(serviceTypeId))
+			    paramMap.put("serviceTypeId", serviceTypeId);
 			paramMap.put("queryDate", queryDate);//查询日期
 	        // 数据权限设置
 			paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,orderCityId,allianceId,motorcadeId);
