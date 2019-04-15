@@ -3,6 +3,7 @@ package com.zhuanche.controller.tips;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.enums.PermissionLevelEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -16,6 +17,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.EmojiFilter;
 import com.zhuanche.util.HtmlFilterUtil;
 import mapper.mdbcarmanage.ex.CarBizTipsDocExMapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -34,6 +36,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -380,4 +385,45 @@ public class SupplierTipsController {
         }
     }
 
+
+    @RequestMapping(value = "/verifyLevel")
+    @ResponseBody
+    public AjaxResponse verifyLevel(){
+
+        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+
+        logger.info(MessageFormat.format("verifyLevel",loginUser));
+
+
+        //此方法废弃
+        AjaxResponse response = AjaxResponse.success(null);
+
+        try {
+            Integer hasPermission = 1;
+
+            Integer level = loginUser.getLevel();
+            Set<Integer> citys = loginUser.getCityIds();
+
+            if(level.equals(PermissionLevelEnum.CITY.getCode()) || level.equals(PermissionLevelEnum.SUPPLIER.getCode()) ||
+                    level.equals(PermissionLevelEnum.TEAM.getCode())){
+                if(CollectionUtils.isNotEmpty(citys) && citys.size() == 1){
+                    for (Integer city : citys) {
+                        if(city.equals(44)){
+                            hasPermission = 0;
+                        }
+                    }
+                }
+            }
+            Map<String,Integer> permissionMap = new HashMap<>();
+
+            permissionMap.put("hasPermission",hasPermission);
+
+            response.setData(permissionMap);
+
+        } catch (Exception e) {
+            logger.info("获取验证信息错误" + e.getMessage());
+        }
+
+        return response;
+    }
 }
