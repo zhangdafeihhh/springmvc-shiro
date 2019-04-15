@@ -1,12 +1,11 @@
 package com.zhuanche.common.web;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.text.MessageFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +13,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.http.MpOkHttpUtil;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 import org.apache.http.HttpStatus;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.slf4j.Logger;
@@ -42,6 +47,9 @@ public class CustomExceptionAdvice {
     private String loginpageUrl;  //前端UI登录页面
 	@Value("${homepage.url}")
 	private String homepageUrl; //前端UI首页页面
+
+	@Value("${dingding.token.url}")
+	private String dingdingTokenUrl;
 	
 	/**Hibernate Validator 参数校验不通过时**/
 	@ExceptionHandler( {BindException.class, MethodArgumentNotValidException.class })
@@ -99,7 +107,14 @@ public class CustomExceptionAdvice {
 		int ExceptionId = random.nextInt(2100000000);
 		String exceptionMessage = ex.getMessage() + " (ExceptionId: "+ExceptionId+")";
 		logger.error(exceptionMessage, ex );
-		
+		try {
+			String mess = MessageFormat.format("异常报警:项目:{0},项目端口:{1},接口地址:{2},请求方式:{3},错误信息:",
+					request.getServerName(),request.getServerPort(),request.getRequestURI(),request.getMethod());
+			logger.info(mess);
+			DingdingAlarmUtil.sendDingdingAlerm(mess  + ex.getMessage());
+		} catch (Exception e) {
+		  logger.info("钉钉告警消息异常!" + e.getMessage());
+		}
 		StringWriter sw = new StringWriter();
 		ex.printStackTrace(new PrintWriter(sw));
 		String exceptionDetail = sw.toString();
@@ -141,5 +156,6 @@ public class CustomExceptionAdvice {
 			}
 		}
 	}
+
 
 }
