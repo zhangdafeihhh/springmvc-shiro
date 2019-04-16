@@ -1,11 +1,14 @@
 package com.zhuanche.constants;
 
+import jdk.nashorn.internal.runtime.regexp.joni.Regex;
+
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 /**
  * @ClassName: BusConst
@@ -20,6 +23,8 @@ public interface BusConst {
 
 	/** 日期(yyyy-MM-dd) **/
 	String PATTERN_DATE_BY_HYPHEN = "([0-9]{3}[1-9]|[0-9]{2}[1-9][0-9]{1}|[0-9]{1}[1-9][0-9]{2}|[1-9][0-9]{3})-(((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01]))|((0[469]|11)-(0[1-9]|[12][0-9]|30))|(02-(0[1-9]|[1][0-9]|2[0-8])))";
+	/** 日期 时间(yyyy-MM-dd hh:mm:ss) **/
+	String  PATTERN_DATE_TIME_BY_HYPHEN="(((2[0-9][0-9][0-9]-(0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01]))|(20[0-3][0-9]-(0[2469]|11)-(0[1-9]|[12][0-9]|30))) (20|21|22|23|[0-1][0-9]):[0-5][0-9]:[0-5][0-9])$";
 
 	// ========================日期格式化器========================
 	DateTimeFormatter FORMATTER_DATE_BY_HYPHEN = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -201,6 +206,8 @@ public interface BusConst {
 
 		/** 查询订单详情 **/
 		String GET_ORDER_DETAIL = "/busOrder/getOrderDetail";
+		/** 查询司机或者车辆是否在服务中*/
+		String GET_SERVICE_ORDER="/busOrder/serviceOrder";
 	}
 
 	/**

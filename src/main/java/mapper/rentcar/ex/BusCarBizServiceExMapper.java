@@ -1,7 +1,11 @@
 package mapper.rentcar.ex;
 
+import com.zhuanche.entity.rentcar.CarBizService;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface BusCarBizServiceExMapper {
 
@@ -13,5 +17,7 @@ public interface BusCarBizServiceExMapper {
 	 * @throws
 	 */
 	List<Map<Object, Object>> queryServices();
+
+	List<CarBizService> queryServiceTypeByIdSet(@Param("serviceIds") Set<Integer> serviceIds);
 
 }

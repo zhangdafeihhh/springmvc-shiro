@@ -173,6 +173,19 @@
     <select id="getLicensePlatesByCarId" parameterType="java.lang.Integer" resultType="java.lang.String">
         select license_plates from car_biz_car_info where car_id = #{carId}
     </select>
+
+    <select id="getBusInfoByLicensePlates" parameterType="java.lang.String" resultMap="BasicCarBizCarInfoMap">
+         SELECT
+        car_id,
+        city_id,
+        supplier_id,
+        license_plates,
+        group_id
+    FROM
+        car_biz_car_info
+    WHERE
+        license_plates = #{licensePlates}
+    </select>
     <!--保存巴士车辆-->
     <insert id="insertCar" parameterType="com.zhuanche.entity.busManage.BusCarInfo">
         <selectKey keyProperty="carId" keyColumn="car_id" order="AFTER" resultType="java.lang.Integer">
@@ -772,5 +785,6 @@
         </set>
         where car_id = #{carId,jdbcType=INTEGER}
     </update>
+
 </mapper>
 

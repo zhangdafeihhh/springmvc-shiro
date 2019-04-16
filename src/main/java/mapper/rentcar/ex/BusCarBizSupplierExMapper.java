@@ -37,6 +37,7 @@ public interface BusCarBizSupplierExMapper {
 	 */
 	List<BusSupplierExportVO> querySupplierExportList(BusSupplierQueryDTO queryDTO);
 
+
 	/**
 	 * @Title: selectBusSupplierById
 	 * @Description: 查询巴士供应商基础信息

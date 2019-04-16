@@ -15,7 +15,64 @@ import java.util.Date;
  */
 public class DateUtils {
 
+	public static String dateTimeFormat_parttern = "yyyy-MM-dd HH:mm:ss";
 
+
+
+	public static Date parseDateStr(String dateStr,String parttern){
+		try{
+			SimpleDateFormat format =  new SimpleDateFormat(parttern);
+			return format.parse(dateStr);
+		}catch (Exception e){
+			return null;
+		}
+	}
+	/**
+	 * 得到N(N可以为负数)小时后的日期
+	 */
+	public static Date afterNHoursDate(Date theDate, int hous) {
+		try {
+			if (theDate == null) {
+				return getCurrentDate();
+			}
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(theDate);
+			cal.add(Calendar.HOUR_OF_DAY, hous);
+			return cal.getTime();
+		} catch (Exception e) {
+			return getCurrentDate(); // 如果无法转化，则返回默认格式的时间。
+		}
+	}
+
+	/**
+	 * 得到N(N为小数)分钟后的日期
+	 */
+	public static Date afterNMinutesDate(Date theDate, int minutes) {
+		try {
+			if (theDate == null) {
+				return getCurrentDate();
+			}
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(theDate);
+			cal.add(Calendar.MINUTE, minutes);
+			return cal.getTime();
+		} catch (Exception e) {
+			return getCurrentDate(); // 如果无法转化，则返回默认格式的时间。
+		}
+	}
+
+	public static void main(String[] args) {
+		Date petDate=DateUtils.afterNMinutesDate(new Date(),60);
+		String a=DateUtils.formatDate(petDate,DateUtils.dateTimeFormat_parttern);
+		System.out.println(a);
+	}
+
+	/**
+	 * 返回当前日期 Date
+	 */
+	public static Date getCurrentDate() {
+		return Calendar.getInstance().getTime();
+	}
 	/**
 	* 格式化当前日期为 'yyyyMMddHHmmss'.
 	*

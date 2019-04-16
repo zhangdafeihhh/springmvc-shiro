@@ -19,6 +19,10 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.zhuanche.entity.mdbcarmanage.BusBizDriverViolators;
+import com.zhuanche.entity.rentcar.*;
+import com.zhuanche.vo.busManage.*;
+import mapper.rentcar.ex.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,10 +53,6 @@ import com.zhuanche.entity.busManage.BusCostDetail;
 import com.zhuanche.entity.busManage.BusOrderPayExport;
 import com.zhuanche.entity.busManage.OrgCostInfo;
 import com.zhuanche.entity.mdbcarmanage.BusOrderOperationTime;
-import com.zhuanche.entity.rentcar.CarBizCustomer;
-import com.zhuanche.entity.rentcar.CarBizCustomerAppraisal;
-import com.zhuanche.entity.rentcar.CarBizCustomerAppraisalStatistics;
-import com.zhuanche.entity.rentcar.CarBizService;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.mongo.DriverMongo;
 import com.zhuanche.serv.mongo.BusDriverMongoService;
@@ -63,19 +63,9 @@ import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.MapUrlParamUtils;
 import com.zhuanche.util.MyRestTemplate;
 import com.zhuanche.util.SignUtils;
-import com.zhuanche.vo.busManage.BusDriverDetailInfoVO;
-import com.zhuanche.vo.busManage.BusOrderExVO;
-import com.zhuanche.vo.busManage.BusOrderExportVO;
-import com.zhuanche.vo.busManage.BusOrderVO;
 
 import mapper.mdbcarmanage.ex.BusOrderOperationTimeExMapper;
 import mapper.rentcar.CarBizServiceMapper;
-import mapper.rentcar.ex.BusCarBizCustomerAppraisalExMapper;
-import mapper.rentcar.ex.BusCarBizDriverInfoExMapper;
-import mapper.rentcar.ex.CarBizCarGroupExMapper;
-import mapper.rentcar.ex.CarBizCarInfoExMapper;
-import mapper.rentcar.ex.CarBizCustomerExMapper;
-import mapper.rentcar.ex.CarBizDriverInfoExMapper;
 
 @Service("busAssignmentService")
 public class BusAssignmentService {
@@ -106,6 +96,8 @@ public class BusAssignmentService {
     private BusCarBizCustomerAppraisalExMapper appraisalExMapper;
     @Autowired
     private BusOrderOperationTimeExMapper operationTimeExMapper;
+    @Autowired
+    private BusCarBizCarGroupExMapper busGroupExMapper;
 
     @Autowired
     private BusCarBizCustomerAppraisalService busCarBizCustomerAppraisalService;
@@ -115,6 +107,8 @@ public class BusAssignmentService {
 
     @Autowired
     private BusDriverMongoService busDriverMongoService;
+    @Autowired
+    private BusCarViolatorsService busCarViolatorsService;
 
     @Autowired
     @Qualifier("busAssignmentTemplate")
@@ -195,14 +189,20 @@ public class BusAssignmentService {
                         order.setBookingGroupName(carBizCarGroupExMapper.getGroupNameByGroupId(Integer.valueOf(order.getBookingGroupid())));
                     }
 
-                    // d)订单类型名称
+                    //d)实际指派车型类别名称
+                    Integer carGroupId = order.getCarGroupId();
+                    if(carGroupId!=null){
+                        String carGroupName = carBizCarGroupExMapper.getGroupNameByGroupId(carGroupId);
+                        order.setCarGroupName(carGroupName);
+                    }
+                    // e)订单类型名称
                     if (order.getServiceTypeId() != null) {
                         CarBizService service = carBizServiceMapper.selectByPrimaryKey(order.getServiceTypeId());
                         if (service != null) {
                             order.setServiceTypeName(service.getServiceName());
                         }
                     }
-                    // d)预估里程
+                    // f)预估里程
                     if (busCostDetailList != null) {
                     	String orderNo = order.getOrderNo();
                     	if (StringUtils.isNotBlank(orderNo)) {
@@ -215,7 +215,7 @@ public class BusAssignmentService {
                     		});
                     	}
                     }
-                    // e)企业名称/企业折扣/付款类型
+                    // g)企业名称/企业折扣/付款类型
                     if (queryBusinessInfoBatch != null) {
                     	Integer businessId = order.getBusinessId();
                     	if (businessId != null) {
@@ -248,7 +248,7 @@ public class BusAssignmentService {
      * @param permission 是不是巴士运营权限，只有巴士运营才能导出预定人的企业相关信息
      * @return
      */
-    public PageDTO buidExportData(BusOrderDTO params,Map<Integer, String> groupMap,boolean permission) {
+    public PageDTO buidExportData(BusOrderDTO params,boolean permission) {
         JSONObject result = queryOrderData(params);
         if (result == null) {
             return new PageDTO();
@@ -261,7 +261,7 @@ public class BusAssignmentService {
         if (orderList == null || orderList.isEmpty()) {
             return new PageDTO();
         }
-        List<BusOrderExportVO> export = this.addOtherResult4Export(orderList, groupMap, permission);
+        List<BusOrderExportVO> export = this.addOtherResult4Export(orderList,permission);
         PageDTO page = new PageDTO(params.getPageNum(), params.getPageSize(), total, export);
         return page;
     }
@@ -269,16 +269,15 @@ public class BusAssignmentService {
     /**
      * 传入最多30个订单号，返回符合导出条件的所有字段
      * @param orderNos 订单号，用英文逗号分隔，最多30个
-     * @param groupMap 巴士车型类别，因为只是配置，可以在调用前查出来，不必每次都访问数据库查询该配置
      * @param permission 是不是巴士运营权限，只有巴士运营才能导出预定人的企业相关信息
      * @return
      */
-    public List<BusOrderExportVO> buidExportData(String orderNos,Map<Integer, String> groupMap,boolean permission){
+    public List<BusOrderExportVO> buidExportData(String orderNos,boolean permission){
         List<BusOrderExVO> orderExVOS = queryOrderDetailByOrderNos(orderNos);
         if(orderExVOS==null||orderExVOS.isEmpty()){
             return null;
         }
-        List<BusOrderExportVO> busOrderExportVOS = this.addOtherResult4Export(orderExVOS, groupMap, permission);
+        List<BusOrderExportVO> busOrderExportVOS = this.addOtherResult4Export(orderExVOS, permission);
         return busOrderExportVOS;
     }
 
@@ -444,20 +443,16 @@ public class BusAssignmentService {
     /**
      * 导出订单详情时，封装其他信息 如司机姓名，供应商，计费信息，企业信息，评分信息
      */
-    private List<BusOrderExportVO> addOtherResult4Export(List<BusOrderExVO> orderList,Map<Integer, String> groupMap,boolean permission){
+    private List<BusOrderExportVO> addOtherResult4Export(List<BusOrderExVO> orderList,boolean permission){
         List<String> orderIdList = new ArrayList<>();
         List<String> orderNoList = new ArrayList<>();
-        //List<String> phoneList = new ArrayList<>();
         Set<Integer> businessIds=new HashSet<>();
         Set<Integer> userIds= new HashSet<>();
         Set<Integer> driverIds=new HashSet<>();
+        Set<Integer> groupIds=new HashSet();
         orderList.forEach(order -> {
             orderIdList.add(String.valueOf(order.getOrderId()));
             orderNoList.add(order.getOrderNo());
-          /*  String bookingUserPhone = order.getBookingUserPhone();
-            if(bookingUserPhone!=null){
-                phoneList.add(bookingUserPhone);
-            }*/
             Integer businessId = order.getBusinessId();
             //type==2代表是企业订单
             if(order.getType()==2&&businessId!=null){
@@ -473,7 +468,12 @@ public class BusAssignmentService {
             if (bookingUserId != null) {
                 userIds.add(bookingUserId);
             }
-
+            //预约车型ID
+            String bookingGroupid = order.getBookingGroupid();
+            if(bookingGroupid!=null){groupIds.add(bookingUserId);}
+            //实际指定车型ID
+            Integer carGroupId = order.getCarGroupId();
+            if(carGroupId!=null){groupIds.add(carGroupId);}
         });
         //批量查询司机信息和供应商名称
         Map<Integer,Map<String,Object>> driverInfoMap=new HashMap<>();
@@ -489,6 +489,10 @@ public class BusAssignmentService {
             List<CarBizCustomer> carBizCustomers = customerExMapper.selectBatchCusName(userIds);
             carBizCustomers.forEach(o->{userNames.put(o.getCustomerId(),o.getName());});
         }
+        //批量查询车型类别
+        Map<Integer,CarBizCarGroup>groupMap=new HashMap();
+        List<CarBizCarGroup> groups = busGroupExMapper.queryGroupByIds(groupIds);
+        groups.forEach(o->groupMap.put(o.getGroupId(),o));
         //批量调用计费接口
         String orderNos = StringUtils.join(orderNoList, ",");
         Map<String, BusCostDetail> orderCostMap = new HashMap<>(16);
@@ -575,7 +579,8 @@ public class BusAssignmentService {
                     logger.error("巴士导出订单解析groupId 异常");
                 }
                 if (groupId != 0) {
-                    orderExport.setBookingGroupName(groupMap.get(groupId));
+                    CarBizCarGroup group = groupMap.get(groupId);
+                    if(group!=null){orderExport.setBookingGroupName(group.getGroupName());}
                 }
             }
             orderExport.setFactGroupName(order.getCarGroupName());
@@ -881,7 +886,7 @@ public class BusAssignmentService {
 
             // 返回数据
             JSONArray data = result.getJSONArray("data");
-            List<Integer> invalidDriverIds = new ArrayList<>();
+            Set<Integer> invalidDriverIds = new HashSet<>();
             if (data != null) {
                 for (int i = 0; i < data.size(); i++) {
                     JSONObject bean = data.getJSONObject(i);
@@ -896,6 +901,12 @@ public class BusAssignmentService {
             if (busDriverDTO.getGroupId() != null) {
                 int seatNum = carBizCarGroupExMapper.getSeatNumByGroupId(busDriverDTO.getGroupId());
                 richerDTO.setSeatNum(seatNum);
+            }
+            //查询被停运的司机
+            List<BusBizDriverViolatorsVO> violators = busCarViolatorsService.queryCurrentOutOfDriver();
+            if(violators!=null&&violators.size()>0) {
+                violators.forEach(o -> invalidDriverIds.add(o.getBusDriverId()));
+                logger.info("[ BusAssignmentService-orderToDoListForDriver ] 当前因为停运不可以指派司机ID:{}", invalidDriverIds);
             }
             // 不可用司机
             if (!invalidDriverIds.isEmpty()) {

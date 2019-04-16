@@ -3,8 +3,10 @@ package mapper.rentcar.ex;
 
 import com.zhuanche.dto.busManage.BusInfoDTO;
 import com.zhuanche.entity.busManage.BusCarInfo;
+import com.zhuanche.entity.rentcar.CarBizCarInfo;
 import com.zhuanche.vo.busManage.BusDetailVO;
 import com.zhuanche.vo.busManage.BusInfoVO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -24,6 +26,8 @@ public interface BusInfoExMapper {
     int countLicensePlates(String licensePlates);
     /*通过车辆ID获取车牌号*/
     String getLicensePlatesByCarId(Integer carId);
+    /**通过手机号查询司机的基本信息*/
+    CarBizCarInfo getBusInfoByLicensePlates(@Param("licensePlates")String licensePlates);
 
 
 }

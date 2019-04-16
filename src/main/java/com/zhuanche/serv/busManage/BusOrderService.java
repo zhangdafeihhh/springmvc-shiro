@@ -1,17 +1,34 @@
 package com.zhuanche.serv.busManage;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.JSONArray;
+import com.zhuanche.common.enums.PermissionLevelEnum;
+import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.BaseController;
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.dto.BaseDTO;
 import com.zhuanche.entity.busManage.*;
+import com.zhuanche.entity.rentcar.CarBizCarGroup;
+import com.zhuanche.entity.rentcar.CarBizDriverInfo;
+import com.zhuanche.entity.rentcar.CarBizService;
 import com.zhuanche.http.MpOkHttpUtil;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.DateUtils;
+import com.zhuanche.vo.busManage.BusOrderHomepageVO;
+import mapper.rentcar.ex.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
@@ -25,11 +42,6 @@ import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import com.zhuanche.util.Common;
 import com.zhuanche.util.MyRestTemplate;
 import com.zhuanche.util.SignUtils;
-
-import mapper.rentcar.ex.CarBizCarGroupExMapper;
-import mapper.rentcar.ex.CarBizCarInfoExMapper;
-import mapper.rentcar.ex.CarBizCustomerExMapper;
-import mapper.rentcar.ex.CarBizDriverInfoExMapper;
 
 @Service("busOrderService")
 public class BusOrderService {
@@ -47,6 +59,12 @@ public class BusOrderService {
 
 	@Autowired
 	private CarBizCustomerExMapper carBizCustomerExMapper;
+	@Autowired
+	private BusCarBizSupplierExMapper busCarBizSupplierExMapper;
+	@Autowired
+	private BusCarBizDriverInfoExMapper busCarBizDriverInfoExMapper;
+	@Autowired
+	private BusCarBizServiceExMapper busCarBizServiceExMapper;
 
 	@Autowired
 	@Qualifier("carRestTemplate")
@@ -137,11 +155,17 @@ public class BusOrderService {
 					String bookingUserName = carBizCustomerExMapper.selectCustomerNameById(bookingUserId);
 					entity.setBookingUserName(bookingUserName);
 				}
-				// 查询预定车型名称
+				// 查询预定车型类别名称
 				String bookingGroupid = entity.getBookingGroupid();
 				if (StringUtils.isNotBlank(bookingGroupid)) {
 					String bookingGroupName = carBizCarGroupExMapper.getGroupNameByGroupId(Integer.valueOf(bookingGroupid));
 					entity.setBookingGroupName(bookingGroupName);
+				}
+				//查询实际指派车辆车型类别名
+				Integer carGroupId=entity.getCarGroupId();
+				if(carGroupId!=null){
+					String carGroupName = carBizCarGroupExMapper.getGroupNameByGroupId(carGroupId);
+					entity.setCarGroupName(carGroupName);
 				}
 			}
 		} catch (Exception e) {
@@ -241,41 +265,6 @@ public class BusOrderService {
 		}
 	}
 
-	/*public OrgCostInfo selectOrgInfo(String phone) {
-		//查询企业信息
-		Map<String, Object> paramMap = new HashMap(2);
-		paramMap.put("phone", phone);
-		try {
-			JSONObject orgResult = MpOkHttpUtil.okHttpPostBackJson(businessRestBaseUrl+BusConst.Payment.ORG_URL , paramMap, 2000, "巴士订单详情查询企业ID");
-			if (orgResult.getIntValue("code") != 0) {
-				logger.error("[ BusOrderService-selectOrgInfo ] 订单详情查询机构ID 接口出错,错误码:" + orgResult.getIntValue("code") + ",错误原因:" + orgResult.getString("msg"));
-				return null;
-			}
-			logger.error("[ BusOrderService-selectOrgInfo ] 订单详情查询机构ID 结果="+JSON.toJSONString(orgResult));
-			JSONObject dataJson = orgResult.getJSONObject("data");
-			OrganizationInfo orgInfo = JSONObject.toJavaObject(dataJson, OrganizationInfo.class);
-			//type =1 表示新机构用户
-			if(orgInfo == null || orgInfo.getType() !=1){
-				logger.error("[ BusOrderService-selectOrgInfo ] 订单详情查询机构ID 该用户非企业用户不再继续查询折扣信息 phone="+phone);
-				return null;
-			}
-			Map<String,Object> param=new HashMap(2);
-			param.put("businessId",orgInfo.getCompanyId());
-			//查询企业折扣信息
-			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(paymentBaseUrl+BusConst.Payment.ORG_COST_URL , param, 2000, "巴士订单详情查询企业折扣信息");
-			if(result.getIntValue("code")!=0){
-				logger.error("[ BusOrderService-selectOrgInfo ] 订单详情查询查询折扣信息 接口出错,错误码:" + orgResult.getIntValue("code") + ",错误原因:" + orgResult.getString("msg"));
-				return null;
-			}
-			JSONObject data = result.getJSONObject("data");
-			JSONObject businessJson = data.getJSONObject("businessRepDTO");
-			OrgCostInfo orgCostInfo = JSONObject.toJavaObject(businessJson, OrgCostInfo.class);
-			return orgCostInfo;
-		} catch (Exception e) {
-			logger.error("[ BusOrderService-selectOrgInfo ]订单详情查询机构id接口异常，{}", e);
-			return null;
-		}
-	}*/
 
 	public OrgCostInfo selectOrgInfo(Integer businessId) {
 			Map<String,Object> param=new HashMap(2);
@@ -296,4 +285,129 @@ public class BusOrderService {
 			return null;
 		}
 	}
+
+	/**  return new PageDTO(params.getPageNum(), params.getPageSize(), total, orderList);
+	 * 根据用户数据权限等级查询订单的基本信息列表
+	 */
+	public AjaxResponse queryUpcomingOrder(BaseDTO pageDTO) {
+		try {
+			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+			//权限级别
+			Integer levelCode = currentLoginUser.getLevel();
+			PermissionLevelEnum enumByCode = PermissionLevelEnum.getEnumByCode(levelCode);
+			Map<String, Object> param = new TreeMap<>();
+			//首页只显示待服务的订单
+			param.put("businessId",Common.BUSINESSID);
+			param.put("status", 10105);
+			param.put("pageNum",pageDTO.getPageNum());
+			param.put("pageSize",pageDTO.getPageSize());
+			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			LocalDateTime now = LocalDateTime.now();
+			param.put("bookingDateBeginStr", now.format(dateTimeFormatter));
+			LocalDateTime localDateTime = now.plusHours(72);
+			param.put("bookingDateEndStr", localDateTime.format(dateTimeFormatter));
+			switch (enumByCode) {
+                case ALL:
+                    break;
+                case CITY:
+                    //查询权限城市下的所有供应商ID
+                    Set<Integer> cityIds = currentLoginUser.getCityIds();
+                    Map<String, Set<Integer>> cityIdsMap = new HashMap<>();
+                    cityIdsMap.put("cityIds", cityIds);
+                    List<Integer> supplierIds = busCarBizSupplierExMapper.querySupplierIdByCitys(cityIdsMap);
+                    String supplierStr = supplierIds.stream().filter(Objects::nonNull).map(String::valueOf).collect(Collectors.joining(","));
+                    param.put("supplierIds", supplierStr);
+                    break;
+                case SUPPLIER:
+                    Set<Integer> userSupplierSet = currentLoginUser.getSupplierIds();
+                    String collect = userSupplierSet.stream().filter(Objects::nonNull).map(String::valueOf).collect(Collectors.joining(","));
+                    param.put("supplierIds", collect);
+                    break;
+                default:
+                	logger.error("[巴士saas首页查询列表] 权限错误 user="+JSON.toJSONString(currentLoginUser));
+                    return AjaxResponse.fail(RestErrorCode.HTTP_UNAUTHORIZED);
+            }
+			String sign = SignUtils.createMD5Sign(param, Common.KEY);
+			// 签名
+			param.put("sign", sign);
+			String response_txt = carRestTemplate.postForObject(BusConst.Order.SELECT_ORDER_LIST, JSONObject.class, param);
+			if (response_txt == null) {
+				logger.error("[巴士saas首页查询列表],订单接口没有响应值");
+                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+            }
+			JSONObject response = JSONObject.parseObject(response_txt);
+			if (response == null || response.getInteger("code") != 0 || response.get("data") == null) {
+				logger.error("[巴士saas首页查询列表],订单接口返回错误："+response_txt);
+                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+            }
+			JSONObject data = response.getJSONObject("data");
+			String dataList = data.getString("dataList");
+			long total = data.getLongValue("totalCount");
+			List<BusOrderHomepageVO> busOrderHomepages = JSONArray.parseArray(dataList, BusOrderHomepageVO.class);
+			if(busOrderHomepages.size()==0){
+                return AjaxResponse.success(new PageDTO(pageDTO.getPageNum(),pageDTO.getPageSize(),0,busOrderHomepages));
+            }
+			Set<Integer> serviceTypeIds = new HashSet<>();
+			Set<Integer> driverIds = new HashSet<>();
+			Set<Integer> bookingGroupIds = new HashSet();
+			busOrderHomepages.forEach(order -> {
+                if (order.getBookingGroupid() != null) {
+                    bookingGroupIds.add(order.getBookingGroupid());
+                }
+                if (order.getServiceTypeId() != null) {
+                    serviceTypeIds.add(order.getServiceTypeId());
+                }
+                if (order.getDriverId() != null) {
+                    driverIds.add(order.getDriverId());
+                }
+            });
+
+			List<CarBizCarGroup> groups = carBizCarGroupExMapper.queryCarGroupByIdSet(bookingGroupIds);
+			List<Map<String, Object>> drivers = busCarBizDriverInfoExMapper.queryDriverSimpleBatch(driverIds);
+			List<CarBizService> carBizServices = busCarBizServiceExMapper.queryServiceTypeByIdSet(serviceTypeIds);
+			Map<Integer, CarBizCarGroup> groupMap = new HashMap<>(groups.size());
+			Map<Integer, CarBizDriverInfo> driverMap = new HashMap<>(driverIds.size());
+			Map<Integer, CarBizService> serviceMap = new HashMap<>(carBizServices.size());
+
+			groups.forEach(o -> {
+                groupMap.put(o.getGroupId(), o);
+            });
+			drivers.forEach(o -> {
+                CarBizDriverInfo driverInfo = new CarBizDriverInfo();
+                driverInfo.setDriverId((Integer) o.get("driverId"));
+                driverInfo.setName((String) o.get("name"));
+                driverInfo.setPhone((String) o.get("phone"));
+                driverMap.put(driverInfo.getDriverId(), driverInfo);
+            });
+			carBizServices.forEach(o -> {
+                serviceMap.put(o.getServiceId(), o);
+            });
+
+			List<BusOrderHomepageVO> collect = busOrderHomepages.stream().map(order -> {
+				CarBizCarGroup group = groupMap.get(order.getBookingGroupid());
+				CarBizService servcice = serviceMap.get(order.getServiceTypeId());
+				CarBizDriverInfo driver = driverMap.get(order.getDriverId());
+				if (group != null) {
+					order.setBookingGroupName(group.getGroupName());
+				}
+				if (servcice != null) {
+					order.setServiceName(servcice.getServiceName());
+				}
+				if (driver != null) {
+					order.setDriverName(driver.getName());
+					order.setDriverPhone(driver.getPhone());
+				}
+				return order;
+			}).sorted(Comparator.comparing(BusOrderHomepageVO::getBookingDate)
+					.thenComparing(Comparator.comparing(BusOrderHomepageVO::getCreateDate)))
+					.collect(Collectors.toList());
+			return AjaxResponse.success(new PageDTO(pageDTO.getPageNum(),pageDTO.getPageSize(),total,collect));
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("[巴士saas首页查询列表]，异常 e:{}",e);
+			return AjaxResponse.failMsg(RestErrorCode.HTTP_SYSTEM_ERROR,"查询异常");
+
+		}
+	}
 }
+

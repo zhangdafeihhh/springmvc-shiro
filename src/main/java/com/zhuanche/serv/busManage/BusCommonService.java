@@ -1,14 +1,16 @@
 package com.zhuanche.serv.busManage;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSON;
+import com.zhuanche.common.enums.PermissionLevelEnum;
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import mapper.mdbcarmanage.ex.SaasRolePermissionRalationExMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
@@ -33,28 +35,37 @@ public class BusCommonService {
 
 	@Autowired
 	private BusBizChangeLogExMapper busBizChangeLogExMapper;
-	
+
 	@Autowired
 	private BusCarBizSupplierExMapper busCarBizSupplierExMapper;
-	
+
 	@Autowired
 	private BusCarBizCarGroupExMapper busCarBizCarGroupExMapper;
-	
+
 	@Autowired
 	private BusCarBizServiceExMapper busCarBizServiceExMapper;
 	@Autowired
 	private SaasRolePermissionRalationExMapper saasRolePermissionRalationExMapper;
-	
-	
 	/**
-	 * @param now 
-	 * @Title: queryChangeLogs
-	 * @Description: 查询操作日志
+	 * 巴士运营角色code
+	 */
+	@Value("${operator.role.code}")
+	private String operatorRoleCode;
+	/**
+	 * 巴士供应商角色code
+	 */
+	@Value("${supplier.role.code}")
+	private String supplierRoleCode;
+
+
+	/**
+	 * @param now
 	 * @param businessType
 	 * @param businessKey
-	 * @return 
 	 * @return List<BusBizChangeLog>
 	 * @throws
+	 * @Title: queryChangeLogs
+	 * @Description: 查询操作日志
 	 */
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE))
 	public List<Map<Object, Object>> queryChangeLogs(Integer businessType, String businessKey, Date date) {
@@ -66,12 +77,11 @@ public class BusCommonService {
 	}
 
 	/**
-	 * @Title: querySuppliers
-	 * @Description: 查询供应商
 	 * @param cityId
-	 * @return 
 	 * @return List<CarBizSupplier>
 	 * @throws
+	 * @Title: querySuppliers
+	 * @Description: 查询供应商
 	 */
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public List<Map<Object, Object>> querySuppliers(Integer cityId) {
@@ -89,23 +99,35 @@ public class BusCommonService {
 	}
 
 	/**
-	 * @Title: queryGroups
-	 * @Description: 查询巴士车型类别
-	 * @return 
 	 * @return List<CarBizCarGroup>
 	 * @throws
+	 * @Title: queryGroups
+	 * @Description: 查询巴士车型类别
 	 */
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public List<Map<Object, Object>> queryGroups() {
 		return busCarBizCarGroupExMapper.queryGroups();
 	}
 
+	public List<Map<Object, Object>> queryGroupsByAuth(){
+        SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+        Integer level = currentLoginUser.getLevel();
+        //全国权限
+        List<Map<Object, Object>> maps;
+        if(level==1){
+            maps = busCarBizCarGroupExMapper.queryGroups();
+        }else{
+            Set<Integer> cityIds = currentLoginUser.getCityIds();
+            maps= busCarBizCarGroupExMapper.queryGroupByCityIds(cityIds);
+        }
+        return maps;
+    }
+
 	/**
-	 * @Title: queryServices
-	 * @Description: 查询巴士服务类型
-	 * @return 
 	 * @return List<Map<Object,Object>>
 	 * @throws
+	 * @Title: queryServices
+	 * @Description: 查询巴士服务类型
 	 */
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public List<Map<Object, Object>> queryServices() {
@@ -117,11 +139,38 @@ public class BusCommonService {
 	 * 判断是否是巴士运营角色
 	 */
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE))
-	public boolean ifOperate(){
+	public boolean ifOperate() {
 		SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
-		List<String> strings = saasRolePermissionRalationExMapper.queryRoleNameList(currentLoginUser.getId());
-		boolean roleBoolean = strings.contains("巴士运营");
+		List<String> rolecodes = saasRolePermissionRalationExMapper.queryRoleCodeList(currentLoginUser.getId());
+		boolean roleBoolean = rolecodes.contains(operatorRoleCode);
 		return roleBoolean;
 	}
 
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
+	public Set<Integer> getAuthSupplierIds() {
+		SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+		//权限级别
+		Integer levelCode = currentLoginUser.getLevel();
+		PermissionLevelEnum enumByCode = PermissionLevelEnum.getEnumByCode(levelCode);
+		switch (enumByCode) {
+			case ALL:
+				return new HashSet<>();
+			case CITY:
+				//查询权限城市下的所有供应商ID
+				Set<Integer> cityIds = currentLoginUser.getCityIds();
+				Map<String, Set<Integer>> cityIdsMap = new HashMap<>();
+				cityIdsMap.put("cityIds", cityIds);
+				List<Integer> supplierIds = busCarBizSupplierExMapper.querySupplierIdByCitys(cityIdsMap);
+				Set<Integer> supplierIdSet= supplierIds.stream().filter(Objects::nonNull).collect(Collectors.toSet());
+				return supplierIdSet;
+			case SUPPLIER:
+			case TEAM:
+			case GROUP:
+				Set<Integer> userSupplierSet = currentLoginUser.getSupplierIds();
+				return userSupplierSet;
+			default:
+				return null;
+		}
+
+	}
 }

@@ -8,7 +8,7 @@ import com.zhuanche.dto.BaseDTO;
 import lombok.Data;
 
 @Data
-public class BusSupplierQueryDTO extends BaseDTO {
+public class BusSupplierQueryDTO {
 
 	// ========================接口字段=======================
 
@@ -30,11 +30,7 @@ public class BusSupplierQueryDTO extends BaseDTO {
 	// ========================业务字段=========================
 
 	/** 某分佣比例下的供应商ids **/
-	private List<Integer> supplierRateIds;
-	private List<Integer> excludeSupplierRateIds;
-	
-	/** 合同快到期的供应商ids **/
-	private List<Integer> contractIds;
-	private List<Integer> excludeContractIds;
+	private List<Integer> supplierIds;
+
 
 }

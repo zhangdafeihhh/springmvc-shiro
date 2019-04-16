@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.BusBizDriverViolatorsExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.vo.busManage.BusBizDriverViolatorsVO" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="bus_driver_id" property="busDriverId" jdbcType="INTEGER" />
+    <result column="bus_driver_name" property="busDriverName" jdbcType="VARCHAR" />
+    <result column="bus_driver_phone" property="busDriverPhone" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+    <result column="group_id" property="groupId" jdbcType="INTEGER" />
+    <result column="group_name" property="groupName" jdbcType="VARCHAR" />
+    <result column="evaluate_score" property="evaluateScore" jdbcType="VARCHAR" />
+    <result column="id_number" property="idNumber" jdbcType="VARCHAR" />
+    <result column="punish_type" property="punishType" jdbcType="SMALLINT" />
+    <result column="punish_reason" property="punishReason" jdbcType="VARCHAR" />
+    <result column="punish_duration" property="punishDuration" jdbcType="DOUBLE" />
+    <result column="punish_start_time" property="punishStartTime" jdbcType="TIMESTAMP" />
+    <result column="punish_end_time" property="punishEndTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="punish_status" property="punishStatus" jdbcType="SMALLINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, bus_driver_id, bus_driver_name, bus_driver_phone, city_id, city_name, supplier_id, 
+    supplier_name, group_id, group_name, evaluate_score, id_number, punish_type, punish_reason, 
+    punish_duration, punish_start_time, punish_end_time, create_time, update_time, punish_status
+  </sql>
+  <sql id="queryViolatorsWhereSql">
+    1=1
+    <if test="busDriverName != null" >
+      AND bus_driver_name like '${busDriverName}%'
+    </if>
+    <if test="busDriverPhone != null" >
+      AND bus_driver_phone like '${busDriverPhone}%'
+    </if>
+    <if test="cityId != null" >
+      AND city_id = #{cityId,jdbcType=INTEGER}
+    </if>
+    <if test="supplierId != null" >
+      AND supplier_id = #{supplierId,jdbcType=INTEGER}
+    </if>
+    <if test="punishType != null" >
+      AND punish_type = #{punishType}
+    </if>
+    <if test="punishStatus != null" >
+      AND punish_status = #{punishStatus}
+    </if>
+    <if test="authOfCity != null and authOfCity.size() > 0">
+      AND city_id IN
+      <foreach collection="authOfCity" open="(" close=")" separator="," item="item">
+        #{item}
+      </foreach>
+    </if>
+    <if test="authOfSupplier != null and authOfSupplier.size() > 0">
+      AND supplier_id IN
+      <foreach collection="authOfSupplier" open="(" close=")" separator="," item="item">
+        #{item}
+      </foreach>
+    </if>
+  </sql>
+  <select id="selectDriverViolatorsByQueryDTO" resultMap="BaseResultMap" parameterType="com.zhuanche.dto.busManage.BusDriverViolatorsQueryDTO" >
+    select
+    <include refid="Base_Column_List" />
+    from bus_biz_driver_violators
+    where
+    <include refid="queryViolatorsWhereSql"/>
+    order by update_time desc
+  </select>
+
+  <update id="recoverDriverStatus">
+    update bus_biz_driver_violators set punish_status = 3 where id = #{id}
+  </update>
+
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.BusBizDriverViolators" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into bus_biz_driver_violators
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="busDriverId != null" >
+        bus_driver_id,
+      </if>
+      <if test="busDriverName != null" >
+        bus_driver_name,
+      </if>
+      <if test="busDriverPhone != null" >
+        bus_driver_phone,
+      </if>
+      <if test="cityId != null" >
+        city_id,
+      </if>
+      <if test="cityName != null" >
+        city_name,
+      </if>
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="supplierName != null" >
+        supplier_name,
+      </if>
+      <if test="groupId != null" >
+        group_id,
+      </if>
+      <if test="groupName != null" >
+        group_name,
+      </if>
+      <if test="evaluateScore != null" >
+        evaluate_score,
+      </if>
+      <if test="idNumber != null" >
+        id_number,
+      </if>
+      <if test="punishType != null" >
+        punish_type,
+      </if>
+      <if test="punishReason != null" >
+        punish_reason,
+      </if>
+      <if test="punishDuration != null" >
+        punish_duration,
+      </if>
+      <if test="punishStartTime != null" >
+        punish_start_time,
+      </if>
+      <if test="punishEndTime != null" >
+        punish_end_time,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="punishStatus != null" >
+        punish_status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="busDriverId != null" >
+        #{busDriverId,jdbcType=INTEGER},
+      </if>
+      <if test="busDriverName != null" >
+        #{busDriverName,jdbcType=VARCHAR},
+      </if>
+      <if test="busDriverPhone != null" >
+        #{busDriverPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null" >
+        #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierName != null" >
+        #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="groupId != null" >
+        #{groupId,jdbcType=INTEGER},
+      </if>
+      <if test="groupName != null" >
+        #{groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="evaluateScore != null" >
+        #{evaluateScore,jdbcType=VARCHAR},
+      </if>
+      <if test="idNumber != null" >
+        #{idNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="punishType != null" >
+        #{punishType,jdbcType=SMALLINT},
+      </if>
+      <if test="punishReason != null" >
+        #{punishReason,jdbcType=VARCHAR},
+      </if>
+      <if test="punishDuration != null" >
+        #{punishDuration,jdbcType=DOUBLE},
+      </if>
+      <if test="punishStartTime != null" >
+        #{punishStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="punishEndTime != null" >
+        #{punishEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="punishStatus != null" >
+        #{punishStatus,jdbcType=SMALLINT},
+      </if>
+    </trim>
+  </insert>
+
+  <select id="queryCurrentOutOfDriver" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    FROM
+    bus_biz_driver_violators
+    WHERE
+    punish_type = 1
+    AND
+    punish_status = 1
+    <if test="supplierIds !=null and supplierIds.size()>0">
+      and supplier_id in
+      <foreach collection="supplierIds" close=")" open="(" item="item" separator=",">
+        #{item}
+      </foreach>
+    </if>
+  </select>
+</mapper>

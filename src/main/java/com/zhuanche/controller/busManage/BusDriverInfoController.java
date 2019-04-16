@@ -1,45 +1,25 @@
 package com.zhuanche.controller.busManage;
 
-import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
-
-import com.zhuanche.vo.busManage.*;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.constants.BusConst;
 import com.zhuanche.constants.busManage.BusConstant;
 import com.zhuanche.dto.busManage.BusDriverQueryDTO;
 import com.zhuanche.dto.busManage.BusDriverSaveDTO;
+import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
+import com.zhuanche.http.MpOkHttpUtil;
+import com.zhuanche.mongo.busManage.BusDriverInfoAudit;
 import com.zhuanche.serv.CarBizDriverInfoDetailService;
 import com.zhuanche.serv.CarBizDriverInfoService;
 import com.zhuanche.serv.busManage.BusBizChangeLogService;
@@ -50,10 +30,27 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.excel.ExportExcelUtil;
-import com.zhuanche.util.objcompare.CompareObjectUtils;
-import com.zhuanche.util.objcompare.entity.BusDriverCompareEntity;
-
+import com.zhuanche.vo.busManage.*;
 import mapper.mdbcarmanage.ex.BusBizChangeLogExMapper.BusinessType;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @RestController
 @RequestMapping("/bus/driverInfo")
@@ -81,6 +78,9 @@ public class BusDriverInfoController extends BusBaseController {
 	@Autowired
 	private BusCommonService commonService;
 
+	@Value("${driver.message.url}")
+	private String mp_rest_url;
+
 	/**
 	 * @Title: findDriverList
 	 * @Description: 查询司机列表
@@ -91,7 +91,7 @@ public class BusDriverInfoController extends BusBaseController {
 	@SuppressWarnings("resource")
 	@RequestMapping(value = "/findDriverList")
 	public AjaxResponse findDriverList(@Validated BusDriverQueryDTO queryDTO) {
-		
+
 		logger.info("当前登录人信息={}", JSON.toJSONString(WebSessionUtil.getCurrentLoginUser()));
 
 		// 数据权限控制SSOLoginUser
@@ -124,6 +124,28 @@ public class BusDriverInfoController extends BusBaseController {
 	}
 
 	/**
+	 * 查询司机审核列表
+	 * @param busDriverDTO
+	 * @return
+	 */
+	@RequestMapping("/findAuditDriverList")
+	public AjaxResponse findAuditDriverList(BusDriverQueryDTO busDriverDTO){
+		Set<Integer> supplierIds = commonService.getAuthSupplierIds();
+		if(supplierIds==null){
+			return AjaxResponse.fail(RestErrorCode.PERMISSION_NOT_EXIST);
+		}
+		if(busDriverDTO.getSupplierId()!=null){
+			if(supplierIds.isEmpty()||supplierIds.contains(busDriverDTO.getSupplierId())){
+				supplierIds.clear();
+				supplierIds.add(busDriverDTO.getSupplierId());
+			}else{
+				return AjaxResponse.fail(RestErrorCode.PERMISSION_NOT_EXIST);
+			}
+		}
+		busDriverDTO.setAuthOfSupplier(supplierIds);
+		return  busCarBizDriverInfoService.queryBusDriverAuditList(busDriverDTO);
+	}
+	/**
 	 * @Title: saveDriver
 	 * @Description: 保存司机信息
 	 * @param saveDTO
@@ -137,8 +159,13 @@ public class BusDriverInfoController extends BusBaseController {
 		
 		/** 补充默认信息(用户不想填但业务需要的字段)*/
 		AjaxResponse checkResult = busCarBizDriverInfoService.completeInfo(saveDTO);
+		//校验mongo中保存信息
+		AjaxResponse checkMongoResult = busCarBizDriverInfoService.checkMongoInfo(saveDTO);
 		if (!checkResult.isSuccess()) {
 			return checkResult;
+		}
+		if(!checkMongoResult.isSuccess()){
+			return checkMongoResult;
 		}
 		
 		Integer driverId = saveDTO.getDriverId();
@@ -184,6 +211,15 @@ public class BusDriverInfoController extends BusBaseController {
 
 		if (driverId != null) {
 			logger.info("[ BusDriverInfoController-saveDriver ] 操作方式：编辑");
+			//查询司机是否有服务中订单
+			Boolean isInService = busCarBizDriverInfoService.isInService(driverId);
+			if(isInService){
+			return AjaxResponse.fail(RestErrorCode.INT_SERVICE);
+			}
+			boolean auditStatus = busCarBizDriverInfoService.isAuditStatus(driverId);
+			if(auditStatus){
+				return AjaxResponse.fail(RestErrorCode.INT_AUDIT_STATUS);
+			}
 			// 司机获取派单的接口，是否可以修改
 			Map<String, Object> updateDriverMap = carBizDriverInfoService.isUpdateDriver(driverId, phone);
 			if (updateDriverMap != null && "2".equals(updateDriverMap.get("result").toString())) {
@@ -192,22 +228,97 @@ public class BusDriverInfoController extends BusBaseController {
 			//查询修改之前的数据
 			AjaxResponse detail = findDriverInfoByDriverId(driverId);
 			BusDriverDetailInfoVO data =(BusDriverDetailInfoVO) detail.getData();
-			AjaxResponse response = busCarBizDriverInfoService.updateDriver(saveDTO);
-			if(response.isSuccess()){
-				this.saveUpdateLog(data,driverId);
+			AjaxResponse response = null;
+			if(saveDTO.getPhone().equals(data.getPhone()) && saveDTO.getIdCardNo().equalsIgnoreCase(data.getIdCardNo()) && saveDTO.getXyDriverNumber().equalsIgnoreCase(data.getXyDriverNumber())){
+				 //直接修改
+				response = busCarBizDriverInfoService.updateDriver(saveDTO);
+				if(response.isSuccess()){
+					busCarBizDriverInfoService.saveUpdateLog(data,driverId);
+				}else {
+					logger.info("巴士司机修改失败，无插入操作记录操作：driverId--{}",saveDTO.getDriverId());
+				}
+			}else{
+				//修改信息进入审核列表
+				 response = busCarBizDriverInfoService.saveUpdateAuditDriverToMongo(saveDTO);
 			}
 			// 调用接口清除，key
 			carBizDriverInfoService.flashDriverInfo(driverId);
 			return response;
 		} else {
 			logger.info("[ BusDriverInfoController-saveDriver ] 操作方式：新建");
-			AjaxResponse response = busCarBizDriverInfoService.saveDriver(saveDTO);
+			AjaxResponse response = busCarBizDriverInfoService.saveAuditDriverToMongo(saveDTO);
+			//AjaxResponse response = busCarBizDriverInfoService.saveDriver(saveDTO);
 			return response;
 		}
 
 	}
 
-	private void saveUpdateLog(BusDriverDetailInfoVO driverInfo,Integer driverId){
+	/**
+	 * 根据物理主键查询审核司机详情
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value = "/findAuditDriverInfoById")
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
+	public AjaxResponse findAuditDriverInfoById(@NotNull(message = "主键id不能为空") String id) {
+		logger.info("[ BusDriverInfoController-findAuditDriverInfoById ] 操作方式：查询审核司机详情");
+		BusDriverInfoAudit busDriverInfoAudit = busCarBizDriverInfoService.findAuditDriverInfoById(id);
+		if (busDriverInfoAudit == null) {
+			return AjaxResponse.failMsg(RestErrorCode.DRIVER_NOT_EXIST, "司机不存在");
+		}
+		BusDriverDetailInfoVO busDriverDetailInfoVO = BeanUtil.copyObject(busDriverInfoAudit, BusDriverDetailInfoVO.class);
+		// 查询城市名称，供应商名称，服务类型，加盟类型
+		busCarBizDriverInfoService.getBaseStatis(busDriverDetailInfoVO);
+		return AjaxResponse.success(busDriverDetailInfoVO);
+
+
+	}
+	/**
+	 * 修改审核列表司机
+	 * @param saveDTO
+	 * @return
+	 */
+	@RequestMapping(value = "/updateAuditDriver")
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
+	public AjaxResponse updateAuditDriver(@Validated BusDriverSaveDTO saveDTO) {
+		//审核表司机物理主键
+		if(StringUtils.isBlank(saveDTO.getId())){
+			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
+		}
+		/** 补充默认信息(用户不想填但业务需要的字段)*/
+		AjaxResponse checkResult = busCarBizDriverInfoService.completeInfo(saveDTO);
+		if (!checkResult.isSuccess()) {
+			return checkResult;
+		}
+		//校验mongo中保存信息
+		AjaxResponse checkMongoResult = busCarBizDriverInfoService.checkMongoInfo(saveDTO);
+		if (!checkMongoResult.isSuccess()) {
+			return checkMongoResult;
+		}
+		logger.info("[ BusDriverInfoController-updateAuditDriver ] 操作方式：编辑审核司机");
+		AjaxResponse response = busCarBizDriverInfoService.updateAuditDriverToMongo(saveDTO);
+		return response;
+
+
+	}
+
+	/**
+	 * 审核司机
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value = "/auditDriver")
+	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
+	public AjaxResponse auditDriver(@NotNull(message = "主键id不能为空") String id) {
+
+		logger.info("[ BusDriverInfoController-auditDriver ] 操作方式：审核司机");
+		AjaxResponse response = busCarBizDriverInfoService.auditDriver(id);
+		return response;
+
+
+	}
+
+	/*private void saveUpdateLog(BusDriverDetailInfoVO driverInfo,Integer driverId){
 		try {
 			BusDriverCompareEntity oldDriver = new BusDriverCompareEntity();
 			BeanUtils.copyProperties(driverInfo,oldDriver);
@@ -232,9 +343,9 @@ public class BusDriverInfoController extends BusBaseController {
 		} catch (BeansException e) {
 			logger.error("[ BusDriverInfoController-saveUpdateLog ] 保存操作日志异常", e);
 		}
-	}
+	}*/
 
-	private String getDrivingLicenseType(String drivingLicenseType){
+	/*private String getDrivingLicenseType(String drivingLicenseType){
 		String value="";
 		switch (drivingLicenseType) {
 			case "1":
@@ -261,7 +372,7 @@ public class BusDriverInfoController extends BusBaseController {
 		}
 		return value;
 	}
-
+*/
 
 
 	/**
@@ -574,4 +685,32 @@ public class BusDriverInfoController extends BusBaseController {
         return result;
     }
 
+	/**
+	 * 解锁
+	 * @return
+	 */
+    @RequestMapping("/unlock")
+    public AjaxResponse unlock(@Verify(param="phone",rule="mobile")String phone) {
+		Map<String, Object> param = new HashMap(2);
+		param.put("phoneNumber", phone);
+		try {
+			JSONObject result = MpOkHttpUtil.okHttpPostBackJson(mp_rest_url + "/api/v1/driver/delete/busLockKey", param, 2000, "解除被锁定的司机");
+			Integer code = result.getInteger("code");
+			if (code == 0) {
+				//发送短信
+				SmsSendUtil.sendTemplate(phone, 207,new ArrayList());
+				CarBizDriverInfoDTO carBizDriverInfoDTO = carBizDriverInfoService.selectByPhone(phone);
+				busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(carBizDriverInfoDTO.getDriverId()), "司机解锁", new Date());
+				return AjaxResponse.success(null);
+			} else if (code == 1102) {
+				return AjaxResponse.fail(RestErrorCode.DRIVER_NOT_LOCKED);
+			} else {
+				logger.error("解除司机锁定异常：参数:phone=" + phone + " 结果：" + JSON.toJSONString(result));
+				return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+			}
+		} catch (Exception e) {
+			logger.error("解除司机锁定异常：参数:phone=" + phone + " e：{}", e);
+			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		}
+	}
 }

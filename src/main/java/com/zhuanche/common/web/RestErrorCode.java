@@ -130,6 +130,8 @@ public final class RestErrorCode{
 	@ResultMessage("修改手机号与原手机号不可以相同")
 	public static final int PHONE_NEW_SAME                    = 3015;
 
+
+
 	@ResultMessage("周报查询时间段只能查询一个星期的时间")
 	public static final int ONLY_QUERY_WEEK                    = 3101;
 	@ResultMessage("月报查询时间段只能查询一个月份的时间")
@@ -140,6 +142,8 @@ public final class RestErrorCode{
 	public static final int ENDTIME_IS_NULL                    = 3104;
 	@ResultMessage("查询时间范围开始时间不能大于结束时间")
 	public static final int STARTTIME_GREATE_ENDTIME                    = 3105;
+	@ResultMessage("该司机没有被锁定")
+	public static final int DRIVER_NOT_LOCKED                           =3106;
 
 	//-----------------------------------------------业务参数：导入文件
 	@ResultMessage("文件异常")
@@ -214,6 +218,19 @@ public final class RestErrorCode{
 
 	@ResultMessage("【评价时间】范围或【完成日期】范围至少限定一个，支持跨度31天")
 	public static final int PARAMS_NOT = 8210;
+
+	//----------------------------------------------巴士业务
+	@ResultMessage("巴士服务城市权限校验不通过")
+	public static final int BUS_CITY_AUTH_FORBIDDEN =801;
+
+	@ResultMessage("巴士服务供应商权限校验不通过")
+	public static final int BUS_SUPPLIER_AUTH_FORBIDDEN =802;
+	@ResultMessage("正在服务中")
+	public static final int INT_SERVICE =803;
+	@ResultMessage("该数据正在审核中，暂时不能进行修改")
+	public static final int INT_AUDIT_STATUS=804;
+	@ResultMessage("{0}")
+	public static final int BUS_COMMON_ERROR_CODE=805;
 
 
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);

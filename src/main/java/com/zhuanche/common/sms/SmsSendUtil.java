@@ -2,6 +2,9 @@ package com.zhuanche.common.sms;
 
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -12,7 +15,10 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import com.alibaba.fastjson.JSONArray;
+import com.zhuanche.http.MpOkHttpUtil;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -111,5 +117,29 @@ public final class SmsSendUtil{
 	  }catch(Exception ex) {
 		    log.info("发送短信="+mobile+"，异常！", ex );
 	  }
+  }
+
+  public static void sendTemplate(String mobile,Integer templateId,List param){
+	  String url            = properties.getProperty("template_short_message_url");
+	  String appkey     = properties.getProperty("short_message_appkey");
+	  String appsecret = properties.getProperty("short_message_appsecret");
+	  try {
+		  Long timestamp = System.currentTimeMillis();
+		  String sha1 = "appkey=" + appkey + "&mobile=" + mobile + "&params=" + param + "&templetId=" + templateId
+                  + "&timestamp=" + timestamp + "&appsecret=" + appsecret;
+		  String md5Hex = DigestUtils.md5Hex(sha1).toUpperCase();
+		  Map<String,Object> maps = new HashMap();
+		  maps.put("templetId",templateId);
+		  maps.put("appkey",appkey);
+		  maps.put("params",param);
+		  maps.put("mobile",mobile);
+		  maps.put("timestamp",timestamp);
+		  maps.put("sign",md5Hex);
+		  String responseBody = MpOkHttpUtil.okHttpPost(url,maps,0,mobile);
+		  log.info("发送短信="+mobile+", 响应："+responseBody);
+	  } catch (Exception e) {
+		  log.error("发送短信="+mobile+", 异常：{}",e);
+	  }
+
   }
 }

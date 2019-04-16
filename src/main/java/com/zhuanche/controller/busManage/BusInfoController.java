@@ -6,6 +6,7 @@ import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.enums.PermissionLevelEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -24,6 +25,7 @@ import com.zhuanche.serv.busManage.BusCommonService;
 import com.zhuanche.serv.busManage.BusInfoService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.Common;
 import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.dateUtil.DateUtil;
 import com.zhuanche.util.excel.CsvUtils;
@@ -53,7 +55,10 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -80,6 +85,9 @@ public class BusInfoController {
     @Autowired
     private BusCommonService commonService;
 
+    @Autowired
+    private CarBizCarGroupService carBizCarGroupService;
+
     private static final String licensePlateTemplate = "京A12345";
 
     /**
@@ -101,6 +109,71 @@ public class BusInfoController {
         return AjaxResponse.success(new PageDTO(busDTO.getPageNum(), busDTO.getPageSize(), Integer.parseInt(pageInfo.getTotal() + ""), pageInfo.getList()));
     }
 
+    @RequestMapping("queryAuditList")
+    @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE))
+    public AjaxResponse queryAuditList(BusInfoDTO busDTO){
+        logger.info(LOG_PRE + "查询车辆审核列表参数=" + JSON.toJSONString(busDTO));
+        //获取数据权限
+        Set<Integer> supplierIds = commonService.getAuthSupplierIds();
+        if(supplierIds==null){
+          return AjaxResponse.fail(RestErrorCode.PERMISSION_NOT_EXIST);
+        }
+        if(busDTO.getSupplierId()!=null){
+           if(supplierIds.isEmpty()||supplierIds.contains(busDTO.getSupplierId())){
+               supplierIds.clear();
+               supplierIds.add(busDTO.getSupplierId());
+           }else{
+              return AjaxResponse.fail(RestErrorCode.PERMISSION_NOT_EXIST);
+           }
+        }
+        busDTO.setAuthOfSupplier(supplierIds);
+        try {
+            AjaxResponse response = busInfoService.queryAuditList(busDTO);
+            return  response;
+        } catch (Exception e) {
+            logger.error(LOG_PRE + "查询车辆审核列表参数=" + JSON.toJSONString(busDTO)+" 异常，e：{}",e);
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+    }
+
+    @RequestMapping("/auditCar")
+
+    public AjaxResponse audit(@Verify(param="ids",rule="required")  String ids){
+        logger.info(LOG_PRE + " 审核车辆信息，参数：" + ids );
+        try {
+            AjaxResponse audit = busInfoService.audit(ids);
+            return audit;
+        } catch (Exception e) {
+            logger.error(LOG_PRE + " 审核车辆信息，参数：" + ids +" 异常：{}",e);
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+    }
+
+    @RequestMapping("getAuditDetail")
+
+    @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE))
+    public AjaxResponse getAuditDetail(@Verify(param="id",rule="required")String id){
+        logger.info(LOG_PRE + " 查询审核车辆信息详情，参数：" + id );
+        try {
+            AjaxResponse auditDetail = busInfoService.getAuditDetail(id);
+            return AjaxResponse.success(auditDetail);
+        } catch (Exception e) {
+            logger.error(LOG_PRE + " 查询审核车辆信息详情，参数：" + id+" 异常：{}",e);
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+    }
+    @RequestMapping("updateAuditCar")
+    public AjaxResponse updateAuditCar(BusCarSaveDTO saveDTO){
+        logger.info(LOG_PRE+" 修改审核信息，参数："+JSON.toJSONString(saveDTO));
+        try {
+            AjaxResponse response = busInfoService.updateAuditCar(saveDTO);
+            return AjaxResponse.success(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(LOG_PRE+" 修改审核信息，参数："+JSON.toJSONString(saveDTO)+" 异常：{}",e);
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+    }
     /**
      * @Description: 查询车辆详情
      * @Param: [carId]
@@ -124,158 +197,29 @@ public class BusInfoController {
     }
 
     @RequestMapping(value = "/saveCar", method = RequestMethod.POST)
+    @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER))
     public AjaxResponse saveCar(@Validated BusCarSaveDTO busCarSaveDTO) {
+        logger.info(LOG_PRE + "保存车辆信息，参数=" + JSON.toJSONString(busCarSaveDTO));
+        String fuelName = EnumFuel.getFuelNameByCode(busCarSaveDTO.getFueltype());
+        if (fuelName == null) {
+            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "燃料类型不存在");
+        }
+        CarBizCarGroup group = carBizCarGroupService.selectByPrimaryKey(busCarSaveDTO.getGroupId());
+        if (group == null) {
+            return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "服务类型有误");
+        }
         if (busCarSaveDTO.getCarId() == null) {
-            logger.info(LOG_PRE + "保存车辆信息，参数=" + JSON.toJSONString(busCarSaveDTO));
-            return busInfoService.saveCar(busCarSaveDTO);
+            boolean b = busInfoService.licensePlatesIfExist(busCarSaveDTO.getLicensePlates());
+            if (b) {
+                return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "车牌号已经存在");
+            }
+            return busInfoService.saveCarToAuditCollect(busCarSaveDTO);
         } else {
             logger.info(LOG_PRE + "修改车辆信息，参数=" + JSON.toJSONString(busCarSaveDTO));
             return busInfoService.updateCarById(busCarSaveDTO);
         }
 
     }
-
-    /**
-     * @Description: 导出车辆信息
-     * @Param: [busDTO, request, response]
-     * @return: void
-     * @Date: 2018/11/28
-     */
-    @RequestMapping("/exportBusInfo")
-    @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
-    })
-    public void exportCarInfo(BusInfoDTO busDTO, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        //从session中获取权限
-        SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
-        busDTO.setAuthOfCity(user.getCityIds());
-        busDTO.setAuthOfSupplier(user.getSupplierIds());
-        //导出信息指定每次查询的页数
-         busDTO.setPageSize(CsvUtils.downPerSize);
-        logger.info(LOG_PRE + "下载车辆信息参数=" + JSON.toJSONString(busDTO));
-        PageInfo<BusInfoVO> pageInfo = busInfoService.queryList(busDTO);
-        //文件标题
-        List<String> headerList = new ArrayList<>();
-        String head = StringUtils.join(CarConstant.TEMPLATE_HEAD, ",");
-        headerList.add(head);
-        String  fileName = BusConstant.buidFileName(request, CarConstant.FILE_NAME);
-        List<String> csvDataList = new ArrayList<>();
-        CsvUtils utilEntity = new CsvUtils();
-        long total = pageInfo.getTotal();
-        if (total == 0) {
-            csvDataList.add("没有符合条件的车辆");
-            utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, true, true);
-            return;
-        }
-        buidCSVdata(pageInfo.getList(), csvDataList);
-        //总页数
-        int pages = pageInfo.getPages();
-
-        if (pages == 1) {
-            utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, true, true);
-            return;
-        }
-        utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, true, false);
-        for (int i = 2; i <= pages; i++) {
-            csvDataList.clear();
-            busDTO.setPageNum(i);
-            List<BusInfoVO> list = busInfoService.queryList(busDTO).getList();
-            buidCSVdata(list, csvDataList);
-            if (i == pages) {
-                utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, false, true);
-            } else {
-                utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, false, false);
-            }
-        }
-    }
-
-    private void buidCSVdata(List<BusInfoVO> infoVOS, List<String> csvData) {
-        for (BusInfoVO info : infoVOS) {
-            String split = ",";
-            StringBuffer sb = new StringBuffer();
-            //        String[] TEMPLATE_HEAD={"城市","供应商","车牌号","车型类别名称","车辆颜色","燃料类别","运输证字号","车辆厂牌","具体车型（选填）","下次车检时间（选填）","下次维保时间（选填）","下次运营证检测时间（选填）","购买时间（选填）"};
-
-            String fuelName = EnumFuel.getFuelNameByCode(info.getFueltype());
-            sb.append(StringUtils.defaultString(info.getCityName())).append(split)
-                    .append(StringUtils.defaultString(info.getSupplierName())).append(split)
-                    .append(StringUtils.defaultString(info.getLicensePlates())).append(split)
-                    .append(StringUtils.defaultString(info.getGroupName())).append(split)
-                    .append(StringUtils.defaultString(info.getColor())).append(split)
-                    .append(StringUtils.defaultString(fuelName)).append(split)
-                    .append(StringUtils.defaultString(info.getTransportnumber())).append(split)
-                    .append(StringUtils.defaultString(info.getVehicleBrand())).append(split)
-                    .append(StringUtils.defaultString(info.getModelDetail())).append(split)
-                    .append(info.getNextInspectDate() == null ? StringUtils.EMPTY : DateUtils.formatDate(info.getNextInspectDate())).append(split)
-                    .append(info.getNextMaintenanceDate() == null ? StringUtils.EMPTY : DateUtils.formatDate(info.getNextMaintenanceDate())).append(split)
-                    .append(info.getNextOperationDate() == null ? StringUtils.EMPTY : DateUtils.formatDate(info.getNextOperationDate())).append(split)
-                    .append(info.getCarPurchaseDate() == null ? StringUtils.EMPTY : DateUtils.formatDate(info.getCarPurchaseDate()));
-            csvData.add(sb.toString());
-        }
-    }
-
-    /**
-     * @Description: 下载导入模板
-     * @Param: [request, response]
-     * @return: void
-     * @Date: 2018/11/28
-     */
-    @RequestMapping("/exportTemplate")
-    public void exportTemplate(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        String fileName = "巴士车辆导入模板";
-        List<Map<Object, Object>> maps = commonService.queryGroups();
-        String[] groupNames = new String[maps.size()];
-        for (int i = 0; i < maps.size(); i++) {
-            groupNames[i] = (String) maps.get(i).get("groupName");
-        }
-        String allFuelName = EnumFuel.getAllFuelName();
-        String[] fuelNames = allFuelName.split(",");
-        List<String[]> downdata = new ArrayList<>();
-        downdata.add(groupNames);
-        downdata.add(fuelNames);
-
-        //构建模板事例
-        List contentList = new ArrayList();
-        BusCarImportTemplateVO templateVO = new BusCarImportTemplateVO();
-        templateVO.setCityName("北京");
-        templateVO.setSupplierName("测试集团01");
-        templateVO.setLicensePlates(licensePlateTemplate);
-        templateVO.setGroupName("巴士18座");
-        templateVO.setColor("黄色");
-        templateVO.setFuelName("汽油");
-        templateVO.setVehicleBrand("宇通");
-        templateVO.setModelDetail("宇通ZK6908H9");
-        templateVO.setTransportnumber("粤交运管朝阳字123456 123456号");
-        SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
-        templateVO.setNextInspectDate(sf.parse("2008-01-01"));
-        templateVO.setNextMaintenanceDate(sf.parse("2019-01-01"));
-        templateVO.setNextOperationDate(sf.parse("2019-01-01"));
-        templateVO.setCarPurchaseDate(sf.parse("2011-01-01"));
-        //判断是否是运营角色
-        boolean roleBoolean = commonService.ifOperate();
-        //文件表头
-        String[] head = null;
-        //下拉框所在位置
-        String[] downRows = new String[2];
-        //如果是巴士运营角色,下载的模板包括城市和供应商
-        if (roleBoolean) {
-            head = CarConstant.TEMPLATE_HEAD;
-            downRows[0] = "3";
-            downRows[1] = "5";
-            contentList.add(templateVO);
-        } else {
-            //非运营角色下载的模板不包括城市和供应商
-            head = new String[CarConstant.TEMPLATE_HEAD.length - 2];
-            System.arraycopy(CarConstant.TEMPLATE_HEAD, 2, head, 0, CarConstant.TEMPLATE_HEAD.length - 2);
-            downRows[0] = "1";
-            downRows[1] = "3";
-            BusCarBaseImportTemplateVO busCarBaseImportTemplateVO = new BusCarBaseImportTemplateVO();
-            BeanUtils.copyProperties(templateVO, busCarBaseImportTemplateVO);
-            contentList.add(busCarBaseImportTemplateVO);
-        }
-
-        ExportExcelUtil.exportExcel(fileName, head, downdata, downRows, contentList, request, response);
-    }
-
 
     /**
      * @Description: 导入巴士车辆信息
@@ -285,12 +229,12 @@ public class BusInfoController {
      */
     @RequestMapping(value = "/importBusInfo", method = RequestMethod.POST)
     @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
     })
     public AjaxResponse importBusInfo(Integer cityId,
                                       Integer supplierId,
                                       MultipartFile file) throws Exception {
-        if (file.isEmpty() || cityId == null || supplierId == null) {
+        if (file==null||file.isEmpty() || cityId == null || supplierId == null) {
             return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, "有参数为空");
         }
         String supplierName = supplierService.getSupplierNameById(supplierId);
@@ -477,8 +421,8 @@ public class BusInfoController {
                         }
                         saveDTO.setFueltype(code);
                         break;
-                    //运输证字号
-                    case "运输证字号":
+                    //道路运输证号
+                    case "道路运输证号":
                         if (StringUtils.isBlank(value)) {
                             saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 为空");
                             validFlag = false;
@@ -566,7 +510,7 @@ public class BusInfoController {
                 saveDTO.setSupplierId(supplierId);
                 //默认有效
                 saveDTO.setStatus(1);
-                AjaxResponse response = busInfoService.saveCar(saveDTO);
+                AjaxResponse response = busInfoService.saveCarToAuditCollect(saveDTO);
                 if (response.isSuccess()) {
                     successCount++;
                 }
@@ -596,6 +540,152 @@ public class BusInfoController {
         });
         RedisCacheUtil.set(key, array, BusConstant.ERROR_IMPORT_KEY_EXPIRE);
     }
+
+    /**
+     * @Description: 下载导入模板
+     * @Param: [request, response]
+     * @return: void
+     * @Date: 2018/11/28
+     */
+    @RequestMapping("/exportTemplate")
+    public void exportTemplate(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String fileName = "巴士车辆导入模板";
+        List<Map<Object, Object>> maps = commonService.queryGroups();
+        String[] groupNames = new String[maps.size()];
+        for (int i = 0; i < maps.size(); i++) {
+            groupNames[i] = (String) maps.get(i).get("groupName");
+        }
+        String allFuelName = EnumFuel.getAllFuelName();
+        String[] fuelNames = allFuelName.split(",");
+        List<String[]> downdata = new ArrayList<>();
+        downdata.add(groupNames);
+        downdata.add(fuelNames);
+
+        //构建模板事例
+        List contentList = new ArrayList();
+        BusCarImportTemplateVO templateVO = new BusCarImportTemplateVO();
+        templateVO.setCityName("北京");
+        templateVO.setSupplierName("测试集团01");
+        templateVO.setLicensePlates(licensePlateTemplate);
+        templateVO.setGroupName("巴士18座");
+        templateVO.setColor("黄色");
+        templateVO.setFuelName("汽油");
+        templateVO.setVehicleBrand("宇通");
+        templateVO.setModelDetail("宇通ZK6908H9");
+        templateVO.setTransportnumber("粤交运管朝阳字123456 123456号");
+        SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+        templateVO.setNextInspectDate(sf.parse("2008-01-01"));
+        templateVO.setNextMaintenanceDate(sf.parse("2019-01-01"));
+        templateVO.setNextOperationDate(sf.parse("2019-01-01"));
+        templateVO.setCarPurchaseDate(sf.parse("2011-01-01"));
+        //判断是否是运营角色
+        boolean roleBoolean = commonService.ifOperate();
+        //文件表头
+        String[] head = null;
+        //下拉框所在位置
+        String[] downRows = new String[2];
+        //如果是巴士运营角色,下载的模板包括城市和供应商
+        if (roleBoolean) {
+            head = CarConstant.TEMPLATE_HEAD;
+            downRows[0] = "3";
+            downRows[1] = "5";
+            contentList.add(templateVO);
+        } else {
+            //非运营角色下载的模板不包括城市和供应商
+            head = new String[CarConstant.TEMPLATE_HEAD.length - 2];
+            System.arraycopy(CarConstant.TEMPLATE_HEAD, 2, head, 0, CarConstant.TEMPLATE_HEAD.length - 2);
+            downRows[0] = "1";
+            downRows[1] = "3";
+            BusCarBaseImportTemplateVO busCarBaseImportTemplateVO = new BusCarBaseImportTemplateVO();
+            BeanUtils.copyProperties(templateVO, busCarBaseImportTemplateVO);
+            contentList.add(busCarBaseImportTemplateVO);
+        }
+
+        ExportExcelUtil.exportExcel(fileName, head, downdata, downRows, contentList, request, response);
+    }
+
+
+    /**
+     * @Description: 导出车辆信息
+     * @Param: [busDTO, request, response]
+     * @return: void
+     * @Date: 2018/11/28
+     */
+    @RequestMapping("/exportBusInfo")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
+    public void exportCarInfo(BusInfoDTO busDTO, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        //从session中获取权限
+        SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+        busDTO.setAuthOfCity(user.getCityIds());
+        busDTO.setAuthOfSupplier(user.getSupplierIds());
+        //导出信息指定每次查询的页数
+         busDTO.setPageSize(CsvUtils.downPerSize);
+        logger.info(LOG_PRE + "下载车辆信息参数=" + JSON.toJSONString(busDTO));
+        PageInfo<BusInfoVO> pageInfo = busInfoService.queryList(busDTO);
+        //文件标题
+        List<String> headerList = new ArrayList<>();
+        String head = StringUtils.join(CarConstant.TEMPLATE_HEAD, ",");
+        headerList.add(head);
+        String  fileName = BusConstant.buidFileName(request, CarConstant.FILE_NAME);
+        List<String> csvDataList = new ArrayList<>();
+        CsvUtils utilEntity = new CsvUtils();
+        long total = pageInfo.getTotal();
+        if (total == 0) {
+            csvDataList.add("没有符合条件的车辆");
+            utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, true, true);
+            return;
+        }
+        buidCSVdata(pageInfo.getList(), csvDataList);
+        //总页数
+        int pages = pageInfo.getPages();
+
+        if (pages == 1) {
+            utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, true, true);
+            return;
+        }
+        utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, true, false);
+        for (int i = 2; i <= pages; i++) {
+            csvDataList.clear();
+            busDTO.setPageNum(i);
+            List<BusInfoVO> list = busInfoService.queryList(busDTO).getList();
+            buidCSVdata(list, csvDataList);
+            if (i == pages) {
+                utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, false, true);
+            } else {
+                utilEntity.exportCsvV2(response, csvDataList, headerList, fileName, false, false);
+            }
+        }
+    }
+
+    private void buidCSVdata(List<BusInfoVO> infoVOS, List<String> csvData) {
+        for (BusInfoVO info : infoVOS) {
+            String split = ",";
+            StringBuffer sb = new StringBuffer();
+            //        String[] TEMPLATE_HEAD={"城市","供应商","车牌号","车型类别名称","车辆颜色","燃料类别","运输证字号","车辆厂牌","具体车型（选填）","下次车检时间（选填）","下次维保时间（选填）","下次运营证检测时间（选填）","购买时间（选填）"};
+
+            String fuelName = EnumFuel.getFuelNameByCode(info.getFueltype());
+            sb.append(StringUtils.defaultString(info.getCityName())).append(split)
+                    .append(StringUtils.defaultString(info.getSupplierName())).append(split)
+                    .append(StringUtils.defaultString(info.getLicensePlates())).append(split)
+                    .append(StringUtils.defaultString(info.getGroupName())).append(split)
+                    .append(StringUtils.defaultString(info.getColor())).append(split)
+                    .append(StringUtils.defaultString(fuelName)).append(split)
+                    .append(StringUtils.defaultString(info.getTransportnumber())).append(split)
+                    .append(StringUtils.defaultString(info.getVehicleBrand())).append(split)
+                    .append(StringUtils.defaultString(info.getModelDetail())).append(split)
+                    .append(info.getNextInspectDate() == null ? StringUtils.EMPTY : DateUtils.formatDate(info.getNextInspectDate())).append(split)
+                    .append(info.getNextMaintenanceDate() == null ? StringUtils.EMPTY : DateUtils.formatDate(info.getNextMaintenanceDate())).append(split)
+                    .append(info.getNextOperationDate() == null ? StringUtils.EMPTY : DateUtils.formatDate(info.getNextOperationDate())).append(split)
+                    .append(info.getCarPurchaseDate() == null ? StringUtils.EMPTY : DateUtils.formatDate(info.getCarPurchaseDate()));
+            csvData.add(sb.toString());
+        }
+    }
+
+
+
+
 
     /**
      * 获取所有的燃料类型
