@@ -19,6 +19,7 @@ public class BusOrderHomepageVO {
     private Date bookingDate;
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Date createDate;
+    private String cityName;
     private Integer serviceTypeId;
     private String serviceName;
     private Integer driverId;

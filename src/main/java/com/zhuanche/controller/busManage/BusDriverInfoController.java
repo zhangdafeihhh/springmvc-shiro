@@ -3,6 +3,7 @@ package com.zhuanche.controller.busManage;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
+import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -234,6 +235,8 @@ public class BusDriverInfoController extends BusBaseController {
 				response = busCarBizDriverInfoService.updateDriver(saveDTO);
 				if(response.isSuccess()){
 					busCarBizDriverInfoService.saveUpdateLog(data,driverId);
+				}else {
+					logger.info("巴士司机修改失败，无插入操作记录操作：driverId--{}",saveDTO.getDriverId());
 				}
 			}else{
 				//修改信息进入审核列表
@@ -308,10 +311,24 @@ public class BusDriverInfoController extends BusBaseController {
 	@RequestMapping(value = "/auditDriver")
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public AjaxResponse auditDriver(@NotNull(message = "主键id不能为空") String id) {
+		String repeatCommitKey = "AUDIT_DRIVER_KEY" + id;
+		Long incr = RedisCacheUtil.incr(repeatCommitKey);
+		try{
+			if(incr == 1){
+				logger.info("[ BusDriverInfoController-auditDriver ] 操作方式：审核司机");
+				AjaxResponse response = busCarBizDriverInfoService.auditDriver(id);
+				return response;
+			}else {
+				return AjaxResponse.failMsg(RestErrorCode.BUS_COMMON_ERROR_CODE,"请勿重复点击");
+			}
+		}catch (Exception e){
+			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		}finally {
+			RedisCacheUtil.delete(repeatCommitKey);
+		}
 
-		logger.info("[ BusDriverInfoController-auditDriver ] 操作方式：审核司机");
-		AjaxResponse response = busCarBizDriverInfoService.auditDriver(id);
-		return response;
+
+
 
 
 	}

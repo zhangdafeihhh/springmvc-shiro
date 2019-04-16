@@ -227,8 +227,13 @@ public class BusInfoService {
         int success = 0;
         try {
             for (int i = 0; i < split.length; i++) {
-                Query query = new Query(Criteria.where("id").is(split[i]));
+                Query query = new Query();
+                query.addCriteria(Criteria.where("id").is(split[i]));
+                query.addCriteria(Criteria.where("auditStatus").is(0));
                 BusInfoAudit busAudit = busMongoTemplage.findOne(query, BusInfoAudit.class);
+                if(busAudit==null){
+                    continue;
+                }
                 Integer stemFrom = busAudit.getStemFrom();
                 BusCarInfo carInfo = new BusCarInfo();
                 BeanUtils.copyProperties(busAudit, carInfo);

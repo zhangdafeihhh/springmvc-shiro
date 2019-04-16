@@ -1655,11 +1655,16 @@ public class BusCarBizDriverInfoService implements BusConst {
                 return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "审核司机参数为空");
             }
             for (String id: idList) {
-                BusDriverInfoAudit busDriverInfoAudit = busMongoTemplate.findById(id,BusDriverInfoAudit.class);
+                Query query = new Query();
+                query.addCriteria(Criteria.where("id").is(id));
+                query.addCriteria(Criteria.where("auditStatus").is(0));
+                BusDriverInfoAudit busDriverInfoAudit = busMongoTemplate.findOne(query,BusDriverInfoAudit.class);
+                if(busDriverInfoAudit==null){
+                    continue;
+                }
                 BusDriverSaveDTO saveDTO = BeanUtil.copyObject(busDriverInfoAudit, BusDriverSaveDTO.class);
                 this.completeInfo(saveDTO);
                 //修改审核表审核状态，审核人，审核时间
-                Query query = Query.query(Criteria.where("_id").is(id));
                 Update update = new Update();
                 update.set("auditStatus", 1);
                 update.set("auditor", WebSessionUtil.getCurrentLoginUser().getId());
@@ -1672,7 +1677,10 @@ public class BusCarBizDriverInfoService implements BusConst {
                     saveDTO.setCreateDate(busDriverInfoAudit.getCreateDate());
                     saveDTO.setUpdateBy(busDriverInfoAudit.getUpdateBy());
                     saveDTO.setUpdateDate(busDriverInfoAudit.getUpdateDate());
-                    this.saveDriver(saveDTO);
+                    AjaxResponse response = this.saveDriver(saveDTO);
+                    if(!response.isSuccess()){
+                        return response;
+                    }
                 }else{
                     //修改司机审核通过
                     BusDriverDetailInfoVO data = this.findDriverInfoByDriverId(saveDTO.getDriverId());
@@ -1716,6 +1724,8 @@ public class BusCarBizDriverInfoService implements BusConst {
             String oldLicenseType = this.getDrivingLicenseType(driverInfo.getDrivingLicenseType());
             oldDriver.setDrivingLicenseType(oldLicenseType);
             BusDriverCompareEntity newDriver=new BusDriverCompareEntity();
+            //防止主从延迟，切换主库查询
+            DynamicRoutingDataSource.setMasterSlave("rentcar-DataSource", DataSourceMode.MASTER);
             //查询最新的信息
             BusDriverDetailInfoVO carBizDriverInfo  = findDriverInfoByDriverId(driverId);
             BeanUtils.copyProperties(carBizDriverInfo,newDriver);
@@ -1726,7 +1736,11 @@ public class BusCarBizDriverInfoService implements BusConst {
             List<Object> objects = CompareObjectUtils.contrastObj(oldDriver, newDriver, null);
             if(objects.size()!=0){
                 String join = StringUtils.join(objects, ",");
+                logger.info("巴士司机入库操作开始，修改司机--{}，插入内容--{}",driverId,join);
                 busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId),join, new Date());
+                logger.info("巴士司机入库操作完成，修改司机--{}",driverId);
+            }else {
+                logger.info("巴士司机无信息进行修改，司机id--{}",driverId);
             }
         } catch (BeansException e) {
             logger.error("[ BusDriverInfoController-saveUpdateLog ] 保存操作日志异常", e);

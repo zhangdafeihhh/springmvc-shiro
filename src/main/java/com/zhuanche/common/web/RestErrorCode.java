@@ -216,6 +216,9 @@ public final class RestErrorCode{
 	public static final int INT_SERVICE =803;
 	@ResultMessage("该数据正在审核中，暂时不能进行修改")
 	public static final int INT_AUDIT_STATUS=804;
+	@ResultMessage("{0}")
+	public static final int BUS_COMMON_ERROR_CODE=805;
+
 
 
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
