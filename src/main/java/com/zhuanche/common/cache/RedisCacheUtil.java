@@ -1,23 +1,12 @@
 package com.zhuanche.common.cache;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
+import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
+import redis.clients.jedis.*;
 
-import com.alibaba.fastjson.JSON;
-
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPoolConfig;
-import redis.clients.jedis.JedisSentinelPool;
-import redis.clients.jedis.Pipeline;
-import redis.clients.jedis.Response;
+import java.util.*;
 /**
  * 基于Redis sentinel（哨兵容灾部署）架构的分布式缓存实现
  * @author zhaoyali
@@ -264,6 +253,22 @@ public final class RedisCacheUtil{
             	jedis.close();
             }
         }
+	}
+
+	public static void expire(String key,int second){
+		if(key==null) {
+			return;
+		}
+		Jedis jedis = pool.getResource();
+		try{
+			jedis.expire(key,second);
+		} catch (Exception e) {
+			log.error("RedisCacheUtil have Exception", e);
+		}finally {
+			if(jedis!=null){
+				jedis.close();
+			}
+		}
 	}
 	//---------------------------------------------------------------------------------------------------------------------在上面封装常用的操作end
 }

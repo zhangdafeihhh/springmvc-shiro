@@ -27,7 +27,6 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Common;
 import com.zhuanche.util.DateUtils;
-import com.zhuanche.util.dateUtil.DateUtil;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.excel.ExportExcelUtil;
 import com.zhuanche.vo.busManage.*;
@@ -140,9 +139,16 @@ public class BusInfoController {
 
     public AjaxResponse audit(@Verify(param="ids",rule="required")  String ids){
         logger.info(LOG_PRE + " 审核车辆信息，参数：" + ids );
+        String repeatCommitKey = "AUDIT_BUS_CAR_KEY" + ids;
+        Long incr = RedisCacheUtil.incr(repeatCommitKey);
+        RedisCacheUtil.expire(repeatCommitKey,10);
         try {
-            AjaxResponse audit = busInfoService.audit(ids);
-            return audit;
+            if(incr == 1){
+                AjaxResponse audit = busInfoService.audit(ids);
+                return audit;
+            }else {
+                return AjaxResponse.failMsg(RestErrorCode.BUS_COMMON_ERROR_CODE,"请勿重复点击");
+            }
         } catch (Exception e) {
             logger.error(LOG_PRE + " 审核车辆信息，参数：" + ids +" 异常：{}",e);
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
@@ -199,6 +205,12 @@ public class BusInfoController {
     @RequestMapping(value = "/saveCar", method = RequestMethod.POST)
     @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER))
     public AjaxResponse saveCar(@Validated BusCarSaveDTO busCarSaveDTO) {
+        String repeatCommitKey = "SAVE_BUS_DRIVER_KEY" + busCarSaveDTO.getLicensePlates();
+        Long incr = RedisCacheUtil.incr(repeatCommitKey);
+        RedisCacheUtil.expire(repeatCommitKey,10);
+        if(incr != 1){
+            return AjaxResponse.failMsg(RestErrorCode.BUS_COMMON_ERROR_CODE,"请勿重复点击");
+        }
         logger.info(LOG_PRE + "保存车辆信息，参数=" + JSON.toJSONString(busCarSaveDTO));
         String fuelName = EnumFuel.getFuelNameByCode(busCarSaveDTO.getFueltype());
         if (fuelName == null) {

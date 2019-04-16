@@ -3,6 +3,7 @@ package com.zhuanche.controller.busManage;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
+import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -156,7 +157,13 @@ public class BusDriverInfoController extends BusBaseController {
 	@RequestMapping(value = "/saveDriver")
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public AjaxResponse saveDriver(@Validated BusDriverSaveDTO saveDTO) {
-		
+        String repeatCommitKey = "SAVE_BUS_DRIVER_KEY" + saveDTO.getPhone();
+        Long incr = RedisCacheUtil.incr(repeatCommitKey);
+        RedisCacheUtil.expire(repeatCommitKey,10);
+
+        if(incr != 1){
+            return AjaxResponse.failMsg(RestErrorCode.BUS_COMMON_ERROR_CODE,"请勿重复点击");
+        }
 		/** 补充默认信息(用户不想填但业务需要的字段)*/
 		AjaxResponse checkResult = busCarBizDriverInfoService.completeInfo(saveDTO);
 		//校验mongo中保存信息
@@ -310,12 +317,20 @@ public class BusDriverInfoController extends BusBaseController {
 	@RequestMapping(value = "/auditDriver")
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public AjaxResponse auditDriver(@NotNull(message = "主键id不能为空") String id) {
-
-		logger.info("[ BusDriverInfoController-auditDriver ] 操作方式：审核司机");
-		AjaxResponse response = busCarBizDriverInfoService.auditDriver(id);
-		return response;
-
-
+		String repeatCommitKey = "AUDIT_BUS_DRIVER_KEY" + id;
+		Long incr = RedisCacheUtil.incr(repeatCommitKey);
+        RedisCacheUtil.expire(repeatCommitKey,10);
+		try{
+			if(incr == 1){
+				logger.info("[ BusDriverInfoController-auditDriver ] 操作方式：审核司机");
+				AjaxResponse response = busCarBizDriverInfoService.auditDriver(id);
+				return response;
+			}else {
+				return AjaxResponse.failMsg(RestErrorCode.BUS_COMMON_ERROR_CODE,"请勿重复点击");
+			}
+		}catch (Exception e){
+			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		}
 	}
 
 	/*private void saveUpdateLog(BusDriverDetailInfoVO driverInfo,Integer driverId){

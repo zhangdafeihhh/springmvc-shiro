@@ -1655,11 +1655,16 @@ public class BusCarBizDriverInfoService implements BusConst {
                 return AjaxResponse.failMsg(RestErrorCode.HTTP_PARAM_INVALID, "审核司机参数为空");
             }
             for (String id: idList) {
-                BusDriverInfoAudit busDriverInfoAudit = busMongoTemplate.findById(id,BusDriverInfoAudit.class);
+                Query query = new Query();
+                query.addCriteria(Criteria.where("id").is(id));
+                query.addCriteria(Criteria.where("auditStatus").is(0));
+                BusDriverInfoAudit busDriverInfoAudit = busMongoTemplate.findOne(query,BusDriverInfoAudit.class);
+                if(busDriverInfoAudit==null){
+                    continue;
+                }
                 BusDriverSaveDTO saveDTO = BeanUtil.copyObject(busDriverInfoAudit, BusDriverSaveDTO.class);
                 this.completeInfo(saveDTO);
                 //修改审核表审核状态，审核人，审核时间
-                Query query = Query.query(Criteria.where("_id").is(id));
                 Update update = new Update();
                 update.set("auditStatus", 1);
                 update.set("auditor", WebSessionUtil.getCurrentLoginUser().getId());
