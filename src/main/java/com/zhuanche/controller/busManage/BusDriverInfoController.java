@@ -313,6 +313,7 @@ public class BusDriverInfoController extends BusBaseController {
 	public AjaxResponse auditDriver(@NotNull(message = "主键id不能为空") String id) {
 		String repeatCommitKey = "AUDIT_DRIVER_KEY" + id;
 		Long incr = RedisCacheUtil.incr(repeatCommitKey);
+        RedisCacheUtil.expire(repeatCommitKey,10);
 		try{
 			if(incr == 1){
 				logger.info("[ BusDriverInfoController-auditDriver ] 操作方式：审核司机");
@@ -323,14 +324,7 @@ public class BusDriverInfoController extends BusBaseController {
 			}
 		}catch (Exception e){
 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-		}finally {
-			RedisCacheUtil.delete(repeatCommitKey);
 		}
-
-
-
-
-
 	}
 
 	/*private void saveUpdateLog(BusDriverDetailInfoVO driverInfo,Integer driverId){
