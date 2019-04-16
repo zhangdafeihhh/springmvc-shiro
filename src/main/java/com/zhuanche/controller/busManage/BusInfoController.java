@@ -136,6 +136,7 @@ public class BusInfoController {
         logger.info(LOG_PRE + " 审核车辆信息，参数：" + ids );
         String repeatCommitKey = "AUDIT_BUS_CAR_KEY" + ids;
         Long incr = RedisCacheUtil.incr(repeatCommitKey);
+        RedisCacheUtil.expire(repeatCommitKey,10);
         try {
             if(incr == 1){
                 AjaxResponse audit = busInfoService.audit(ids);
@@ -147,8 +148,6 @@ public class BusInfoController {
         } catch (Exception e) {
             logger.error(LOG_PRE + " 审核车辆信息，参数：" + ids +" 异常：{}",e);
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-        }finally {
-            RedisCacheUtil.delete(repeatCommitKey);
         }
     }
 
