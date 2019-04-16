@@ -157,7 +157,13 @@ public class BusDriverInfoController extends BusBaseController {
 	@RequestMapping(value = "/saveDriver")
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public AjaxResponse saveDriver(@Validated BusDriverSaveDTO saveDTO) {
-		
+        String repeatCommitKey = "SAVE_BUS_DRIVER_KEY" + saveDTO.getPhone();
+        Long incr = RedisCacheUtil.incr(repeatCommitKey);
+        RedisCacheUtil.expire(repeatCommitKey,10);
+
+        if(incr != 1){
+            return AjaxResponse.failMsg(RestErrorCode.BUS_COMMON_ERROR_CODE,"请勿重复点击");
+        }
 		/** 补充默认信息(用户不想填但业务需要的字段)*/
 		AjaxResponse checkResult = busCarBizDriverInfoService.completeInfo(saveDTO);
 		//校验mongo中保存信息
@@ -311,7 +317,7 @@ public class BusDriverInfoController extends BusBaseController {
 	@RequestMapping(value = "/auditDriver")
 	@MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
 	public AjaxResponse auditDriver(@NotNull(message = "主键id不能为空") String id) {
-		String repeatCommitKey = "AUDIT_DRIVER_KEY" + id;
+		String repeatCommitKey = "AUDIT_BUS_DRIVER_KEY" + id;
 		Long incr = RedisCacheUtil.incr(repeatCommitKey);
         RedisCacheUtil.expire(repeatCommitKey,10);
 		try{

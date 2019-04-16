@@ -201,6 +201,12 @@ public class BusInfoController {
     @RequestMapping(value = "/saveCar", method = RequestMethod.POST)
     @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER))
     public AjaxResponse saveCar(@Validated BusCarSaveDTO busCarSaveDTO) {
+        String repeatCommitKey = "SAVE_BUS_DRIVER_KEY" + busCarSaveDTO.getLicensePlates();
+        Long incr = RedisCacheUtil.incr(repeatCommitKey);
+        RedisCacheUtil.expire(repeatCommitKey,10);
+        if(incr != 1){
+            return AjaxResponse.failMsg(RestErrorCode.BUS_COMMON_ERROR_CODE,"请勿重复点击");
+        }
         logger.info(LOG_PRE + "保存车辆信息，参数=" + JSON.toJSONString(busCarSaveDTO));
         String fuelName = EnumFuel.getFuelNameByCode(busCarSaveDTO.getFueltype());
         if (fuelName == null) {
