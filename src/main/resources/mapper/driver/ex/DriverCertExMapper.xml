@@ -26,4 +26,9 @@
 		FROM driver_cert
 		WHERE DRIVER_ID = #{driverId} AND IS_VALID = 1 AND TYPE = #{type}
   </select>
+  <select id="queryImageByDriverIdAndTypeNew" resultType="String" >
+		SELECT image
+		FROM driver_cert_opti
+		WHERE driver_id = #{driverId} AND is_valid = 1 AND type = #{type}
+  </select>
 </mapper>

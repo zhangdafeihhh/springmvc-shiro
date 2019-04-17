@@ -185,7 +185,7 @@ public class DriverVerifyService {
 		String image = "";
 		try {
 			logger.info("查询司机证件照片通过司机ID和证件照片类型,driverId=" + driverId);
-			image = driverCertExMapper.queryImageByDriverIdAndType(driverId, type);
+			image = driverCertExMapper.queryImageByDriverIdAndTypeNew(driverId, type);
 		} catch (Exception e) {
 			logger.error("查询司机证件照片通过司机ID和证件照片类型异常,driverId=" + driverId, e);
 		}
