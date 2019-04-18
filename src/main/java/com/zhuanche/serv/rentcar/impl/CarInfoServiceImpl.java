@@ -203,7 +203,7 @@ public class CarInfoServiceImpl implements CarInfoService {
             if(row1==null){
                 return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR, resultErrorMag1);
             }
-            for (int colIx = 0; colIx < 43; colIx++) {
+            for (int colIx = 0; colIx < 44; colIx++) {
                 Cell cell = row1.getCell(colIx); // 获取列对象
                 CellValue cellValue = evaluator.evaluate(cell); // 获取列属性
                 if (cell == null || cellValue == null) {
@@ -425,6 +425,11 @@ public class CarInfoServiceImpl implements CarInfoService {
                                 return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR, "43：以机动车行驶证为主列不正确");
                             }
                             break;
+                        case 44:
+                            if (!cellValue.getStringValue().contains("是否支持出租车发票打印")) {
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR, "44：以机动车行驶证为主列不正确");
+                            }
+                            break;
                     }
                 }
             }
@@ -447,7 +452,7 @@ public class CarInfoServiceImpl implements CarInfoService {
                 carBizCarInfo.setUpdateBy(currentLoginUser.getId());
                 Integer cityId = null;
                 // 车辆导入模板总共41 列
-                for (int colIx = 0; colIx < 43; colIx++) {
+                for (int colIx = 0; colIx < 44; colIx++) {
                     Cell cell = row.getCell(colIx); // 获取列对象
                     CellValue cellValue = evaluator.evaluate(cell); // 获取列属性
                     if((colIx + 1)==2){
@@ -1931,6 +1936,38 @@ public class CarInfoServiceImpl implements CarInfoService {
                                 carBizCarInfo.setVehicleType(vehicleType);
                             }
                             break;
+                        //是否支持出租车发票打印
+                        case 44:
+                            if (cellValue == null
+                                    || StringUtils.isEmpty(cellValue
+                                    .getStringValue())) {
+                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+                                returnVO.setLicensePlates(licensePlates);
+                                returnVO.setReson("第" + (rowIx + 1) + "行数据，第"
+                                        + (colIx + 1) + "列 【是否支持出租车发票打印】不能为空且单元格格式必须为文本");
+                                listException.add(returnVO);
+                                isTrue = false;
+                            } else {
+                                if ("是".equals(cellValue.getStringValue())||"否".equals(cellValue.getStringValue())){
+                                    // 是否支持出租车发票打印
+                                    if ("是".equals(cellValue.getStringValue())) {
+                                        carBizCarInfo.setTaxiInvoicePrint(1);
+                                    } else if ("否".equals(cellValue.getStringValue())){
+                                        carBizCarInfo.setTaxiInvoicePrint(0);
+                                    }else{
+                                        carBizCarInfo.setTaxiInvoicePrint(0);
+                                    }
+                                }else{
+                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+                                    returnVO.setLicensePlates(licensePlates);
+                                    returnVO.setReson("第" + (rowIx + 1) + "行数据，第"
+                                            + (colIx + 1) + "列 【是否支持出租车发票打印】为是|否");
+                                    listException.add(returnVO);
+                                    isTrue = false;
+                                }
+                            }
+                            break;
+
                     }// switch end
 
                 }// 循环列结束
@@ -2851,6 +2888,16 @@ public class CarInfoServiceImpl implements CarInfoService {
                 builder.append(carInfo.getDriverName() == null ? "" : carInfo.getDriverName()).append(",");
                 builder.append(carInfo.getVehicleOwner() == null ? "" : carInfo.getVehicleOwner()).append(",");
                 builder.append(carInfo.getVehicleType() == null ? "" : carInfo.getVehicleType());
+
+                Integer taxiInvoicePrint = carInfo.getTaxiInvoicePrint();
+                String  taxiInvoicePrintName = "未知";
+                if(null!=taxiInvoicePrint && taxiInvoicePrint==1){
+                    taxiInvoicePrintName = "是";
+                }else if(null!=taxiInvoicePrint && taxiInvoicePrint==0){
+                    taxiInvoicePrintName = "否";
+                }
+                builder.append(taxiInvoicePrintName).append(",");
+
                 casDataList.add(builder.toString());
             }
         }

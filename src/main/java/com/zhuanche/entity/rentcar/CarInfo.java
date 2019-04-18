@@ -234,6 +234,8 @@ public class CarInfo extends BaseEntity {
     /** 车辆图片 **/
     private String carPhotograph;
 
+    private Integer taxiInvoicePrint;
+
     public String getCarPhotograph() {
         return carPhotograph;
     }
@@ -1080,5 +1082,13 @@ public class CarInfo extends BaseEntity {
         setNextMaintenanceDate(sdf.format(DateUtils.parse(value, FORMAT_CAR_PURCHASE_DATE,
                 java.util.Date.class)));
         this.nextMaintenanceDateString = value;
+    }
+
+    public Integer getTaxiInvoicePrint() {
+        return taxiInvoicePrint;
+    }
+
+    public void setTaxiInvoicePrint(Integer taxiInvoicePrint) {
+        this.taxiInvoicePrint = taxiInvoicePrint;
     }
 }
