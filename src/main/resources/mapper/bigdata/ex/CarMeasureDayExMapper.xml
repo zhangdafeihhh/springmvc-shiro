@@ -36,6 +36,190 @@
     fact_end_amount, order_num, bind_order_num, evaluate_num, bad_evaluate_num, order_cnt_notchannel
   </sql>-->
 
+  <select id="getCarOnlineDuration"  resultType="com.zhuanche.entity.bigdata.StatisticSection">
+    <![CDATA[
+        select
+            DATE_FORMAT(data_date,'%Y/%m/%d') as date,
+            IFNULL(FORMAT(sum(online_car_time)/sum(online_car_num),0),0) as value
+        from bi_car_measure_day
+        ]]>
+    <where>
+      data_date between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}
+      <if test="visibleAllianceIds != null and visibleAllianceIds.size >0">
+        <if test="allianceId != null and allianceId != ''">
+          and supplier_id = #{allianceId}
+        </if>
+        <if test="allianceId == null or allianceId == ''">
+          and supplier_id in
+          <foreach item="item" index="index" collection="visibleAllianceIds" open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
+      </if>
+      <if test="visibleAllianceIds == null or visibleAllianceIds.size ==0">
+        <if test="allianceId != null and allianceId != ''">
+          and supplier_id = #{allianceId}
+        </if>
+      </if>
+
+      <if test="visibleMotocadeIds != null and visibleMotocadeIds.size >0">
+        <if test="motorcadeId != null and motorcadeId != ''">
+          and team_id = #{motorcadeId}
+        </if>
+        <if test="motorcadeId == null or motorcadeId == ''">
+          and team_id in
+          <foreach item="item" index="index" collection="visibleMotocadeIds" open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
+      </if>
+      <if test="visibleMotocadeIds == null or visibleMotocadeIds.size ==0">
+        <if test="motorcadeId != null and motorcadeId != ''">
+          and team_id = #{motorcadeId}
+        </if>
+      </if>
+      group by data_date
+    </where>
+  </select>
+
+  <select id="getCarOperateStatistics" resultType="com.zhuanche.entity.bigdata.StatisticSection">
+    <![CDATA[
+        select
+            DATE_FORMAT(data_date,'%Y/%m/%d') as date,
+            IFNULL(sum(in_use_car_num),0) as value
+        from bi_car_measure_day
+        ]]>
+    <where>
+      data_date between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}
+      <if test="visibleAllianceIds != null and visibleAllianceIds.size >0">
+        <if test="allianceId != null and allianceId != ''">
+          and supplier_id = #{allianceId}
+        </if>
+        <if test="allianceId == null or allianceId == ''">
+          and supplier_id in
+          <foreach item="item" index="index" collection="visibleAllianceIds" open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
+      </if>
+      <if test="visibleAllianceIds == null or visibleAllianceIds.size ==0">
+        <if test="allianceId != null and allianceId != ''">
+          and supplier_id = #{allianceId}
+        </if>
+      </if>
+
+      <if test="visibleMotocadeIds != null and visibleMotocadeIds.size >0">
+        <if test="motorcadeId != null and motorcadeId != ''">
+          and team_id = #{motorcadeId}
+        </if>
+        <if test="motorcadeId == null or motorcadeId == ''">
+          and team_id in
+          <foreach item="item" index="index" collection="visibleMotocadeIds" open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
+      </if>
+      <if test="visibleMotocadeIds == null or visibleMotocadeIds.size ==0">
+        <if test="motorcadeId != null and motorcadeId != ''">
+          and team_id = #{motorcadeId}
+        </if>
+      </if>
+      group by data_date
+    </where>
+  </select>
+
+  <select id="getOrderNumStatistic" resultType="com.zhuanche.entity.bigdata.StatisticSection">
+    <![CDATA[
+        select
+            DATE_FORMAT(data_date,'%Y/%m/%d') as date,
+            IFNULL(sum(order_num),0) as value
+        from bi_car_measure_day
+        ]]>
+    <where>
+      data_date between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}
+      <if test="visibleAllianceIds != null and visibleAllianceIds.size >0">
+        <if test="allianceId != null and allianceId != ''">
+          and supplier_id = #{allianceId}
+        </if>
+        <if test="allianceId == null or allianceId == ''">
+          and supplier_id in
+          <foreach item="item" index="index" collection="visibleAllianceIds" open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
+      </if>
+      <if test="visibleAllianceIds == null or visibleAllianceIds.size ==0">
+        <if test="allianceId != null and allianceId != ''">
+          and supplier_id = #{allianceId}
+        </if>
+      </if>
+
+      <if test="visibleMotocadeIds != null and visibleMotocadeIds.size >0">
+        <if test="motorcadeId != null and motorcadeId != ''">
+          and team_id = #{motorcadeId}
+        </if>
+        <if test="motorcadeId == null or motorcadeId == ''">
+          and team_id in
+          <foreach item="item" index="index" collection="visibleMotocadeIds" open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
+      </if>
+      <if test="visibleMotocadeIds == null or visibleMotocadeIds.size ==0">
+        <if test="motorcadeId != null and motorcadeId != ''">
+          and team_id = #{motorcadeId}
+        </if>
+      </if>
+      group by data_date
+    </where>
+  </select>
+
+  <select id="getServiceNegativeRate"  resultType="com.zhuanche.entity.bigdata.StatisticSection">
+    <![CDATA[
+        select
+            DATE_FORMAT(data_date,'%Y/%m/%d') as date,
+            CONCAT(IFNULL(FORMAT(sum(bad_evaluate_num)*100/sum(order_cnt_notchannel),2),0),'%') as value
+        from bi_car_measure_day
+        ]]>
+    <where>
+      data_date between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}
+      <if test="visibleAllianceIds != null and visibleAllianceIds.size >0">
+        <if test="allianceId != null and allianceId != ''">
+          and supplier_id = #{allianceId}
+        </if>
+        <if test="allianceId == null or allianceId == ''">
+          and supplier_id in
+          <foreach item="item" index="index" collection="visibleAllianceIds" open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
+      </if>
+      <if test="visibleAllianceIds == null or visibleAllianceIds.size ==0">
+        <if test="allianceId != null and allianceId != ''">
+          and supplier_id = #{allianceId}
+        </if>
+      </if>
+
+      <if test="visibleMotocadeIds != null and visibleMotocadeIds.size >0">
+        <if test="motorcadeId != null and motorcadeId != ''">
+          and team_id = #{motorcadeId}
+        </if>
+        <if test="motorcadeId == null or motorcadeId == ''">
+          and team_id in
+          <foreach item="item" index="index" collection="visibleMotocadeIds" open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
+      </if>
+      <if test="visibleMotocadeIds == null or visibleMotocadeIds.size ==0">
+        <if test="motorcadeId != null and motorcadeId != ''">
+          and team_id = #{motorcadeId}
+        </if>
+      </if>
+      group by data_date
+    </where>
+  </select>
+
   <select id="getCoreIndexStatistic" resultType="com.zhuanche.entity.bigdata.SAASCoreIndexDto">
     <![CDATA[
         select
