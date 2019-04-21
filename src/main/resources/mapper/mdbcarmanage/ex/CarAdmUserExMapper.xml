@@ -18,10 +18,11 @@
     <result column="phone" property="phone" jdbcType="VARCHAR" />
     <result column="group_ids" property="groupIds" jdbcType="VARCHAR" />
     <result column="level" property="level" jdbcType="INTEGER" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     user_id, account, user_name, password, role_id, account_type, status, remark, create_user, 
-    create_date, cities, suppliers, team_id, phone, group_ids,level
+    create_date, cities, suppliers, team_id, phone, group_ids,level,email
   </sql>
   
   <!-- 根据账户查询 -->
@@ -123,5 +124,11 @@
           from car_adm_user
         where user_id = #{userId}
     </select>
+
+    <update id="updateEmail" >
+        update car_adm_user  SET  email = #{email}
+
+        where user_id = #{userId,jdbcType=INTEGER}
+    </update>
 
 </mapper>

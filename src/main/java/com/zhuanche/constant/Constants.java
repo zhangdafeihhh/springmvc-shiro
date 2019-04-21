@@ -28,7 +28,13 @@ public final class Constants {
 	public static final String REDISKEYPREFIX_ISINDUTY = "redis_duty_is_induty";
 	public static final String REDISKEYPREFIX_ISDUTYTIME = "redis_duty_is_duty_time";
 	public static final String REDISKEYPREFIX_DRIVERDUTYINFO = "redis_duty_driver_duty_info";
-	
+
+
+	/******saas日报异步导出********/
+	public static final Integer SAAS_DAILY_EXCEL = 5;
+
+	/*******saas月报导出***********/
+	public static final Integer SAAS_MONTH_EXCEL = 6;
 	
 
 	public static final String yyyy_MM_dd_HH_mm_ss = "yyyy-MM-dd HH:mm:ss";

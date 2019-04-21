@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.bigdata.ex.BiDriverBusinessInfoSummaryReportExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.bigdata.BiDriverBusinessInfoSummaryReport" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="data_date" property="dataDate" jdbcType="VARCHAR" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="driver_phone" property="driverPhone" jdbcType="VARCHAR" />
+    <result column="cooperation_type" property="cooperationType" jdbcType="INTEGER" />
+    <result column="license_plates" property="licensePlates" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="driver_team_id" property="driverTeamId" jdbcType="INTEGER" />
+    <result column="driver_group_id" property="driverGroupId" jdbcType="INTEGER" />
+    <result column="car_group_id" property="carGroupId" jdbcType="INTEGER" />
+    <result column="create_date" property="createDate" jdbcType="VARCHAR" />
+    <result column="hire_date" property="hireDate" jdbcType="INTEGER" />
+    <result column="all_time" property="allTime" jdbcType="DECIMAL" />
+    <result column="all_time_days" property="allTimeDays" jdbcType="DECIMAL" />
+    <result column="business_volume" property="businessVolume" jdbcType="DECIMAL" />
+    <result column="fin_ord_cnt" property="finOrdCnt" jdbcType="INTEGER" />
+    <result column="bad_cnt" property="badCnt" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, data_date, driver_id, driver_name, driver_phone, cooperation_type, license_plates,
+    city_id, supplier_id, driver_team_id, driver_group_id, car_group_id, create_date,
+    hire_date, all_time, all_time_days, business_volume, fin_ord_cnt, bad_cnt
+  </sql>
+
+  <select id="querySummeryReport" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from bi_driver_business_info_summary_report
+    <include refid="Base_where" />
+
+    <if test="businessVolumeSort != null and businessVolumeSort != ''">
+      ORDER  BY business_volume ${sort}
+    </if>
+    <if test="finOrdCntSort != null and finOrdCntSort != ''">
+      ORDER  BY fin_ord_cnt ${sort}
+    </if>
+    <if test="badCntSort != null and badCntSort != ''">
+      ORDER  BY bad_cnt ${sort}
+    </if>
+  </select>
+
+
+  <sql id="Base_where">
+    <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR">
+
+      <if test="cityId != null and cityId != ''">
+        and city_id = #{cityId,jdbcType=INTEGER}
+      </if>
+      <if test="supplierId != null and supplierId != ''">
+        and supplier_id IN
+        <foreach collection="supplierId" open="(" close=")" separator="," item="supplier" >
+          #{supplier}
+        </foreach>
+      </if>
+      <if test="driverTeamId != null and driverTeamId != ''">
+        and team_id IN
+        <foreach collection="driverTeamId" open="(" close=")" separator="," item="teamId" >
+          #{teamId}
+        </foreach>
+      </if>
+
+
+      <if test="driverGroupId != null and driverGroupId != ''">
+        and driver_group_id IN
+        <foreach collection="driverGroupId" open="(" close=")" separator="," item="groupId" >
+          #{groupId}
+        </foreach>
+      </if>
+
+      <if test="driverPhone != null and driverPhone != ''">
+        and driver_phone = #{driverPhone,jdbcType=VARCHAR}
+      </if>
+
+      <if test="licensePlates != null and licensePlates != ''">
+        and license_plates = #{licensePlates,jdbcType=VARCHAR}
+      </if>
+
+
+      <!--<if test="currentDate != null and currentDate != ''">
+        and data_date &gt;=#{currentDate}
+      </if>-->
+
+    </trim>
+  </sql>
+
+</mapper>
