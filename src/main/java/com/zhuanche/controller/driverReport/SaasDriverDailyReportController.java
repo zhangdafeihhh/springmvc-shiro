@@ -14,6 +14,7 @@ import com.zhuanche.dto.CarDriverTeamDTO;
 import com.zhuanche.dto.bigdata.BiDriverBusinessInfoDayReportDTO;
 import com.zhuanche.dto.bigdata.BiDriverBusinessInfoMonthReportDTO;
 import com.zhuanche.dto.bigdata.BiDriverBusinessInfoSummaryReportDTO;
+import com.zhuanche.dto.bigdata.SaasReportParamDTO;
 import com.zhuanche.entity.bigdata.BiDriverBusinessInfoDayReport;
 import com.zhuanche.entity.bigdata.BiDriverBusinessInfoMonthReport;
 import com.zhuanche.entity.bigdata.BiDriverBusinessInfoSummaryReport;
@@ -135,8 +136,6 @@ public class SaasDriverDailyReportController {
             for(CarDriverTeamDTO carDriverTeamDTO : listTeam){
                 setGroup.add(carDriverTeamDTO.getId());
             }
-            //根据车队查询班组
-             //listGroup =  carBizCarGroupExMapper.queryCarGroupByIdSet(setGroup);
 
         }else {
             //根据供应商查询所有的车队
@@ -148,8 +147,6 @@ public class SaasDriverDailyReportController {
             for(CarDriverTeamDTO carDriverTeamDTO : listTeam){
                 setGroup.add(carDriverTeamDTO.getId());
             }
-            //根据车队查询班组
-           // listGroup =  carBizCarGroupExMapper.queryCarGroupByIdSet(setGroup);
         }
 
         List<CarBizCooperationType> cooperationTypeList = cooperationTypeExMapper.queryCarBizCooperationTypeList();
@@ -160,9 +157,7 @@ public class SaasDriverDailyReportController {
         for(CarDriverTeamDTO teamDTO : listTeam){
             supplierMap.put(teamDTO.getId(),teamDTO.getTeamName());
         }
-        /*for(CarBizCarGroup carGroup : listGroup){
-            supplierMap.put(carGroup.getGroupId(),carGroup.getGroupName());
-        }*/
+
         for(CarBizCooperationType type : cooperationTypeList){
             cooperMap.put(type.getId(),type.getCooperationName());
         }
@@ -234,7 +229,7 @@ public class SaasDriverDailyReportController {
     @ResponseBody
     @RequestMapping("saasDriverExportDaily")
     public AjaxResponse driverExportDaily(@Verify(param = "cityId",rule ="required")String cityId,
-                                 @Verify(param = "cityName",rule="cityName")String cityName,
+                                 @Verify(param = "cityName",rule="required")String cityName,
                                  @Param("supplierId")String supplierId,
                                  @Param("supplierName")String supplierName,
                                  @Param("teamId")String teamId,
@@ -245,13 +240,14 @@ public class SaasDriverDailyReportController {
                                  @Param("licensePlates")String licensePlates,
                                  @Param("beginDate")String beginDate,
                                  @Param("endDate")String endDate,
-                                 @Param("actualPayDesc")String actualPayDesc,
-                                 @Param("oddNumberDesc")String oddNumberDesc,
-                                 @Param("badNumDesc")String badNumDesc){
+                                 @Param("businessVolumeDesc")String businessVolumeDesc,
+                                 @Param("finOrdCntDesc")String finOrdCntDesc,
+                                 @Param("badCntDesc")String badCntDesc,
+                                 @Verify(param = "email",rule="required") @Param("email")String email){
 
         Map<String,String> map = Maps.newHashMap();
         try {
-            logger.info("导出司机周/月操作");
+            logger.info("导出司机日报操作");
            // logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"导出司机周/月列表2.0");
         } catch (Exception e) {
         }
@@ -263,73 +259,64 @@ public class SaasDriverDailyReportController {
         obj.put("auth_teamIds",loginUser.getTeamIds());
         obj.put("auth_userId",loginUser.getId());
         obj.put("auth_userName",loginUser.getLoginName());
-        obj.put("send_email",loginUser.getEmail());
+        obj.put("send_email",StringUtils.isNotBlank(loginUser.getEmail())?loginUser.getEmail():email);
         obj.put("excel_export_type", Constants.SAAS_DAILY_EXCEL);
 
         BiDriverBusinessInfoDayReportDTO dto = new BiDriverBusinessInfoDayReportDTO();
         dto.setCityId(Integer.valueOf(cityId));
         dto.setCityName(cityName);
-        dto.setSupplierId(Integer.valueOf(supplierId));
-        dto.setSupplierName(supplierName);
-        dto.setDriverTeamId(Integer.valueOf(teamId));
-        dto.setDriverTeamName(teamName);
-        dto.setDriverGroupId(Integer.valueOf(driverGroupId));
+        if(StringUtils.isNotBlank(supplierId)){
+            dto.setSupplierId(Integer.valueOf(supplierId));
+            dto.setSupplierName(supplierName);
+        }if (StringUtils.isNotBlank(teamId)){
+            dto.setDriverTeamId(Integer.valueOf(teamId));
+            dto.setDriverTeamName(teamName);
+        }if(StringUtils.isNotBlank(driverGroupId)){
+            dto.setDriverGroupId(Integer.valueOf(driverGroupId));
+            dto.setDriverGroupName(driverGroupName);
+        }
+        dto.setDriverPhone(driverPhone);
+        dto.setLicensePlates(licensePlates);
+
+        //dto.setBusinessVolume(Integer.valueOf(badCntDesc));
+
 
         obj.put("buiness_params",dto);
+
+
+        String year = beginDate.substring(0,4);
+        String month = beginDate.substring(5,7);
+        String day = beginDate.substring(8,10);
+
+        if(StringUtils.isNotEmpty(day)){
+            Integer intDay = Integer.valueOf(day);
+            if(intDay >= 26 && intDay <= 31){
+                month = String.valueOf(Integer.valueOf(month)+1);
+                if(month.length()==1){
+                    month = "0" + month;
+                }
+            }
+        }
+
+        String table = SaasConst.DAILYTABLE+ year + "_"+ month;
+
+        SaasReportParamDTO saasDTO = new SaasReportParamDTO(beginDate,endDate,null,table,1);
+
+        obj.put("saasReport",saasDTO);
         try{
             ExcelProducer.publishMessage("excel_export_producer","excel-mp-manage",null,obj);
             //ExcelProducer.sendMessage("excel_export_producer","excel-car-manager",obj);
             //维护用户的邮箱
             if(loginUser.getId() != null && loginUser.getAccountType() != null){
-                carAdmUserExMapper.updateEmail(loginUser.getEmail(),loginUser.getId());
+
+                carAdmUserExMapper.updateEmail(loginUser.getEmail()== null?email:loginUser.getEmail(),loginUser.getId());
             }
             map.put("code","200");
         }catch (Exception e){
             logger.error("saas日报发送错误:{}",e);
             map.put("code","500");
         }
-        return null;
-
-        /*List<CarBizSupplier> carBizSupplierList = null;
-        List<CarDriverTeamDTO> listTeam = null;
-        List<CarBizCarGroup> listGroup = null;
-        if(StringUtils.isEmpty(supplierId)){
-            //根据城市查询所有的供应商
-            Set<Integer> set = new HashSet<>();
-            set.add(Integer.valueOf(cityId));
-            carBizSupplierList = carBizSupplierExMapper.querySupplierName(set);
-            Set<String> suppliersSet = new HashSet<>();
-            for(CarBizSupplier carBizSupplier : carBizSupplierList){
-                suppliersSet.add(carBizSupplier.getSupplierId()== null ? null:carBizSupplier.getSupplierId().toString());
-            }
-
-            //根据供应商查询所有的车队
-            listTeam = carDriverTeamExMapper.queryDriverTeamAndGroup(null,suppliersSet,null);
-
-            Set<Integer> setGroup = new HashSet<>();
-            for(CarDriverTeamDTO carDriverTeamDTO : listTeam){
-                setGroup.add(carDriverTeamDTO.getId());
-            }
-            //根据车队查询班组
-            listGroup =  carBizCarGroupExMapper.queryCarGroupByIdSet(setGroup);
-        }else {
-            //根据供应商查询所有的车队
-            Set<String> suppliersSet = new HashSet<>();
-            suppliersSet.add(supplierId);
-
-            listTeam = carDriverTeamExMapper.queryDriverTeamAndGroup(null,suppliersSet,null);
-            Set<Integer> setGroup = new HashSet<>();
-            for(CarDriverTeamDTO carDriverTeamDTO : listTeam){
-                setGroup.add(carDriverTeamDTO.getId());
-            }
-            //根据车队查询班组
-            listGroup =  carBizCarGroupExMapper.queryCarGroupByIdSet(setGroup);
-        }
-
-
-
-
-        return null;*/
+        return AjaxResponse.success(null);
     }
 
 
@@ -451,7 +438,7 @@ public class SaasDriverDailyReportController {
     @ResponseBody
     @RequestMapping("saasDriverExportMonth")
     public AjaxResponse driverExportMonth(@Verify(param = "cityId",rule ="required")String cityId,
-                                          @Verify(param = "cityName",rule="cityName")String cityName,
+                                          @Verify(param = "cityName",rule="required")String cityName,
                                           @Param("supplierId")String supplierId,
                                           @Param("supplierName")String supplierName,
                                           @Param("teamId")String teamId,
@@ -460,17 +447,18 @@ public class SaasDriverDailyReportController {
                                           @Param("driverGroupName")String driverGroupName,
                                           @Param("driverPhone")String driverPhone,
                                           @Param("licensePlates")String licensePlates,
-                                          @Param("beginDate")String beginDate,
-                                          @Param("endDate")String endDate,
+                                          @Param("month")String month,
                                           @Param("actualPayDesc")String actualPayDesc,
                                           @Param("oddNumberDesc")String oddNumberDesc,
-                                          @Param("badNumDesc")String badNumDesc,BiDriverBusinessInfoDayReportDTO dto){
+                                          @Param("badNumDesc")String badNumDesc,
+                                          @Verify(param = "email",rule="required") @Param("email")String email){
 
         Map<String,String> map = Maps.newHashMap();
         try {
-            logger.info("导出司机周/月操作");
+            logger.info("导出司机月报操作");
             // logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"导出司机周/月列表2.0");
         } catch (Exception e) {
+
         }
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
         JSONObject obj = new JSONObject();
@@ -480,22 +468,48 @@ public class SaasDriverDailyReportController {
         obj.put("auth_teamIds",loginUser.getTeamIds());
         obj.put("auth_userId",loginUser.getId());
         obj.put("auth_userName",loginUser.getLoginName());
-        obj.put("send_email",loginUser.getEmail());
-        obj.put("excel_export_type", Constants.SAAS_DAILY_EXCEL);
+        obj.put("send_email",StringUtils.isNotBlank(loginUser.getEmail())?loginUser.getEmail():email);
+        obj.put("excel_export_type", Constants.SAAS_MONTH_EXCEL);
+
+        BiDriverBusinessInfoMonthReportDTO dto = new BiDriverBusinessInfoMonthReportDTO();
+        dto.setCityId(Integer.valueOf(cityId));
+        dto.setCityName(cityName);
+        if(StringUtils.isNotBlank(supplierId)){
+            dto.setSupplierId(Integer.valueOf(supplierId));
+            dto.setSupplierName(supplierName);
+        }if (StringUtils.isNotBlank(teamId)){
+            dto.setDriverTeamId(Integer.valueOf(teamId));
+            dto.setDriverTeamName(teamName);
+        }if(StringUtils.isNotBlank(driverGroupId)){
+            dto.setDriverGroupId(Integer.valueOf(driverGroupId));
+            dto.setDriverGroupName(driverGroupName);
+        }
+        dto.setDriverPhone(driverPhone);
+        dto.setLicensePlates(licensePlates);
+
+
         obj.put("buiness_params",dto);
+
+
+        String table = SaasConst.MONTHTABLE + month.replace("-","_");
+
+        SaasReportParamDTO saasDTO = new SaasReportParamDTO(null,null,month,table,2);
+
+        obj.put("saasReport",saasDTO);
         try{
             ExcelProducer.publishMessage("excel_export_producer","excel-mp-manage",null,obj);
             //ExcelProducer.sendMessage("excel_export_producer","excel-car-manager",obj);
             //维护用户的邮箱
             if(loginUser.getId() != null && loginUser.getAccountType() != null){
-                carAdmUserExMapper.updateEmail(loginUser.getEmail(),loginUser.getId());
+
+                carAdmUserExMapper.updateEmail(loginUser.getEmail()== null?email:loginUser.getEmail(),loginUser.getId());
             }
             map.put("code","200");
         }catch (Exception e){
-            logger.error("saas日报发送错误:{}",e);
+            logger.error("saas月报发送错误:{}",e);
             map.put("code","500");
         }
-        return null;
+        return AjaxResponse.success(null);
     }
 
 
@@ -609,6 +623,83 @@ public class SaasDriverDailyReportController {
         PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, summaryReportDTOList);
 
         return AjaxResponse.success(pageDTO);
-
     }
+
+
+
+    @ResponseBody
+    @RequestMapping("saasDriverExportSummary")
+    public AjaxResponse driverExportSummary(@Verify(param = "cityId",rule ="required")String cityId,
+                                          @Verify(param = "cityName",rule="required")String cityName,
+                                          @Param("supplierId")String supplierId,
+                                          @Param("supplierName")String supplierName,
+                                          @Param("teamId")String teamId,
+                                          @Param("teamName")String teamName,
+                                          @Param("driverGroupId")String driverGroupId,
+                                          @Param("driverGroupName")String driverGroupName,
+                                          @Param("driverPhone")String driverPhone,
+                                          @Param("licensePlates")String licensePlates,
+                                          @Param("actualPayDesc")String actualPayDesc,
+                                          @Param("oddNumberDesc")String oddNumberDesc,
+                                          @Param("badNumDesc")String badNumDesc,
+                                          @Verify(param = "email",rule="required") @Param("email")String email){
+
+        Map<String,String> map = Maps.newHashMap();
+        try {
+            logger.info("导出司机营业汇总操作");
+            // logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"导出司机周/月列表2.0");
+        } catch (Exception e) {
+
+        }
+        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+        JSONObject obj = new JSONObject();
+        obj.put("auth_account",loginUser.getAccountType());
+        obj.put("auth_cityIds",loginUser.getCityIds());
+        obj.put("auth_suppliers",loginUser.getSupplierIds());
+        obj.put("auth_teamIds",loginUser.getTeamIds());
+        obj.put("auth_userId",loginUser.getId());
+        obj.put("auth_userName",loginUser.getLoginName());
+        obj.put("send_email",StringUtils.isNotBlank(loginUser.getEmail())?loginUser.getEmail():email);
+        obj.put("excel_export_type", Constants.SAAS_SUMMARY_EXCEL);
+
+        BiDriverBusinessInfoSummaryReportDTO dto = new BiDriverBusinessInfoSummaryReportDTO();
+        dto.setCityId(Integer.valueOf(cityId));
+        dto.setCityName(cityName);
+        if(StringUtils.isNotBlank(supplierId)){
+            dto.setSupplierId(Integer.valueOf(supplierId));
+            dto.setSupplierName(supplierName);
+        }if (StringUtils.isNotBlank(teamId)){
+            dto.setDriverTeamId(Integer.valueOf(teamId));
+            dto.setDriverTeamName(teamName);
+        }if(StringUtils.isNotBlank(driverGroupId)){
+            dto.setDriverGroupId(Integer.valueOf(driverGroupId));
+            dto.setDriverGroupName(driverGroupName);
+        }
+        dto.setDriverPhone(driverPhone);
+        dto.setLicensePlates(licensePlates);
+
+
+        obj.put("buiness_params",dto);
+
+
+        //SaasReportParamDTO saasDTO = new SaasReportParamDTO(null,null,month,table,3);
+
+        //obj.put("saasReport",saasDTO);
+        try{
+            ExcelProducer.publishMessage("excel_export_producer","excel-mp-manage",null,obj);
+            //ExcelProducer.sendMessage("excel_export_producer","excel-car-manager",obj);
+            //维护用户的邮箱
+            if(loginUser.getId() != null && loginUser.getAccountType() != null){
+
+                carAdmUserExMapper.updateEmail(loginUser.getEmail()== null?email:loginUser.getEmail(),loginUser.getId());
+            }
+            map.put("code","200");
+        }catch (Exception e){
+            logger.error("saas营业汇总报表发送错误:{}",e);
+            map.put("code","500");
+        }
+        return AjaxResponse.success(null);
+    }
+
+
 }

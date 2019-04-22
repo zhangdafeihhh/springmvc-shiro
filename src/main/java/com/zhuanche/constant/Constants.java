@@ -35,7 +35,10 @@ public final class Constants {
 
 	/*******saas月报导出***********/
 	public static final Integer SAAS_MONTH_EXCEL = 6;
-	
+
+	/*******saas营业报表汇总导出***********/
+	public static final Integer SAAS_SUMMARY_EXCEL = 7;
+
 
 	public static final String yyyy_MM_dd_HH_mm_ss = "yyyy-MM-dd HH:mm:ss";
 
