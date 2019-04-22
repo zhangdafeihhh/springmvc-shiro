@@ -188,9 +188,11 @@ public class SaasDriverDailyReportController {
         String table = SaasConst.DAILYTABLE+ year + "_"+ month;
 
         String sort = "";
-        if(businessVolumeSort.equals("1") || finOrdCntSort.equals("1") || badCntSort.equals("1")){
+
+
+        if("1".equals(businessVolumeSort) || "1".equals(finOrdCntSort) || "1".equals(badCntSort)){
             sort = "desc";
-        }else if (businessVolumeSort.equals("2") || finOrdCntSort.equals("2") || badCntSort.equals("2")){
+        }else if ("2".equals(businessVolumeSort) || "2".equals(finOrdCntSort) || "2".equals(badCntSort)){
             sort = "asc";
         }
 
@@ -405,9 +407,9 @@ public class SaasDriverDailyReportController {
         String table = SaasConst.MONTHTABLE + month.replace("-","_");
 
         String sort = "";
-        if(businessVolumeSort.equals("1") || finOrdCntSort.equals("1") || badCntSort.equals("1")){
+        if("1".equals(businessVolumeSort) || "1".equals(finOrdCntSort) || "1".equals(badCntSort)){
             sort = "desc";
-        }else if (businessVolumeSort.equals("2") || finOrdCntSort.equals("2") || badCntSort.equals("2")){
+        }else if ("2".equals(businessVolumeSort) || "2".equals(finOrdCntSort) || "2".equals(badCntSort)){
             sort = "asc";
         }
 
@@ -571,9 +573,9 @@ public class SaasDriverDailyReportController {
         //String table = SaasConst.MONTHTABLE + month;
 
         String sort = "";
-        if(businessVolumeSort.equals("1") || finOrdCntSort.equals("1") || badCntSort.equals("1")){
+        if("1".equals(businessVolumeSort) || "1".equals(finOrdCntSort) || "1".equals(badCntSort)){
             sort = "desc";
-        }else if (businessVolumeSort.equals("2") || finOrdCntSort.equals("2") || badCntSort.equals("2")){
+        }else if ("2".equals(businessVolumeSort) || "2".equals(finOrdCntSort) || "2".equals(badCntSort)){
             sort = "asc";
         }
 

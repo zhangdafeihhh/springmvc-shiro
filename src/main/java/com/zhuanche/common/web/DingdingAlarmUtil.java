@@ -25,10 +25,17 @@ public class DingdingAlarmUtil {
 
     private static String dingdingTokenUrl;
 
+    private static String dingdingAlermSwitch;
+
 
     @Value("${dingding.token.url}")
     public  void setDingdingTokenUrl(String dingdingTokenUrl) {
         DingdingAlarmUtil.dingdingTokenUrl = dingdingTokenUrl;
+    }
+
+    @Value("${dingding.alerm.switch}")
+    public  void setDingdingAlermSwitch(String dingdingAlermSwitch) {
+        DingdingAlarmUtil.dingdingAlermSwitch = dingdingAlermSwitch;
     }
 
     private static Logger logger = LoggerFactory.getLogger(DingdingAlarmUtil.class);
@@ -51,6 +58,8 @@ public class DingdingAlarmUtil {
         atMobiles.put("atMobiles",jsonArray);
         jsonObject.put("at",isAtAll);
         jsonObject.put("at",atMobiles);
+        logger.info("钉钉开关：" + dingdingAlermSwitch);
+        if("true".equals(dingdingAlermSwitch)){
         MpOkHttpUtil.okHttpPostJsonAsync(dingdingTokenUrl, jsonObject.toJSONString(), 0, null, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -62,5 +71,6 @@ public class DingdingAlarmUtil {
                logger.info("钉钉消息发送成功!" + response.toString());
             }
         });
+        }
     }
 }
