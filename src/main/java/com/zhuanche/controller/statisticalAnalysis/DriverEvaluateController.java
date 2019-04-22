@@ -14,7 +14,10 @@ import com.zhuanche.entity.bigdata.SAASDriverEvaluateDetailDto;
 import com.zhuanche.entity.bigdata.SAASEvaluateDetailQuery;
 import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
+import com.zhuanche.util.dateUtil.DateUtil;
 import mapper.bigdata.ex.DriverEvaluateDetailExMapper;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
 import org.apache.http.entity.ContentType;
@@ -24,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -31,9 +35,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 import static com.zhuanche.common.enums.MenuEnum.DRIVER_EVALUATE_DETAIL;
 import static com.zhuanche.common.enums.MenuEnum.DRIVER_EVALUATE_EXPORT;
@@ -64,6 +70,11 @@ public class DriverEvaluateController{
 	 private StatisticalAnalysisService statisticalAnalysisService;
 	 @Autowired
 	 private DriverEvaluateDetailExMapper driverEvaluateDetailExMapper;
+
+	// 司机评价详情
+	private static final String DRIVEREVALUATEDETAIL_TITLE = "司机ID,司机姓名,车牌号,司机评分,司机所属城市名称,评价时间,司机类型名称,加盟商,车队名称,班组名称," +
+			"订单号,司机评价内容,备注,评价用户ID,会员级别名称,乘客姓名,订单来源名称,实际上车时间,订单完成时间," +
+			"实际上车地点,实际下车地点,APP评价分数,APP评价内容,APP评价备注,操作系统,操作系统版本,服务监督号,服务类型";
 		 /**
 		    * 查询对司机评级详情分析 列表
 		    * @param queryDate	查询日期
@@ -204,21 +215,37 @@ public class DriverEvaluateController{
 			if(paramMap==null){
 				return;
 			}
-	        String jsonString = JSON.toJSONString(paramMap);
-	        
-		   statisticalAnalysisService.exportCsvFromToPage(
-				response,
-				jsonString,
-			    evaluateExportUrl ,
-				new String("对司机评级详情分析".getBytes("gb2312"), "iso8859-1"),
-				request.getRealPath("/")+File.separator+"template"+File.separator+"driverEvaluate_info.csv");
+	        //String jsonString = JSON.toJSONString(paramMap);
+		  List<SAASDriverEvaluateDetailDto> driverEvaluateList = dataExportList(paramMap);
+		  OutputStream out=null;
+		  OutputStreamWriter osw=null;
+		  if (!CollectionUtils.isEmpty(driverEvaluateList)) {
+			  response.setHeader("Content-disposition", "attachment; filename=" + URLEncoder.encode("司机评价详情.csv", "UTF-8"));
+			  response.setContentType("text/csv;charset=utf-8");
+			  out = response.getOutputStream();
+			  out.write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}); // bom 头
+			  osw = new OutputStreamWriter(out, StandardCharsets.UTF_8);
+			  CSVFormat csvFormat = CSVFormat.DEFAULT.withHeader(DRIVEREVALUATEDETAIL_TITLE.split(","));
+			  CSVPrinter csvPrinter = new CSVPrinter(osw, csvFormat);
+			  for (SAASDriverEvaluateDetailDto dto : driverEvaluateList) {
+				  csvPrinter.printRecord(dto.getDriverId(), dto.getDriverName(), dto.getVehiclePlateNo(), dto.getDriverScore(), dto.getDriverCityName(), dto.getEvaluateTime(), dto.getDriverTypeName(), dto.getAllianceName(), dto.getMotorcardName(), dto.getClassName(),
+						  dto.getOrderNo(), dto.getDriverEvaluateText(), dto.getDriverEvaluateRemark(), dto.getEvaluateCustomerId(), dto.getMemberRankName(), dto.getCustomerName(), dto.getOrderSourceName(), dto.getActualAboardTime(), dto.getCompleteTime(),
+						  dto.getActualOnboardLocation(), dto.getActualDebusLocation(), dto.getAppScore(), dto.getAppEvaluateText(), dto.getAppRemark(), dto.getOsName(), dto.getOsVersion(), dto.getSupervisorNo(), dto.getServiceTypeName());
+			  }
+			  csvPrinter.flush();
+			  csvPrinter.close();
+			  osw.close();
+			  out.close();
+		  }else{
+		  	logger.info("导出无数据"+DateUtil.timestampFormat(new Date()));
+		  }
       } catch (Exception e) {
           e.printStackTrace();
       }
   }
 
 
-	/** 调用企业平台接口迁移改成直接查库 */
+	/** 调用企业平台接口迁移查询司机评价列表改成直接查库 */
 	public  AjaxResponse parseResultsQueryData(Map<String, Object> paramMap) {
 		try {
 			String jsonString = JSON.toJSONString(paramMap);
@@ -238,9 +265,25 @@ public class DriverEvaluateController{
 			}
 			return AjaxResponse.success(null);
 		} catch (Exception e) {
-			logger.error("调用bi数据库异常，"+SAAS_BI_DRIVER_EVALUATE_DETAIL, e);
+			logger.error("查询bi列表数据库异常，"+SAAS_BI_DRIVER_EVALUATE_DETAIL, e);
 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 		}
 	}
+
+    /** 调用企业平台接口迁移导出司机评价改成直接查库 */
+    public  List<SAASDriverEvaluateDetailDto> dataExportList(Map<String, Object> paramMap) {
+        try {
+            List<SAASDriverEvaluateDetailDto> resultList = new ArrayList<>();
+            String jsonString = JSON.toJSONString(paramMap);
+            logger.info("查询大数据库，参数--" + jsonString);
+            SAASEvaluateDetailQuery saasQuery = JSON.parseObject(jsonString,SAASEvaluateDetailQuery.class);
+            saasQuery.setTableName(SAAS_BI_DRIVER_EVALUATE_DETAIL + COMM + saasQuery.getQueryDate().replace("-", "_"));
+            resultList = driverEvaluateDetailExMapper.getDriverEvaluateDetailList(saasQuery);
+            return resultList;
+        } catch (Exception e) {
+            logger.error("查询bi导出数据库异常，"+SAAS_BI_DRIVER_EVALUATE_DETAIL, e);
+            return new ArrayList<>();
+        }
+    }
 
 }

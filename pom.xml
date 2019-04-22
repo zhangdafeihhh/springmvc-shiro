@@ -365,6 +365,11 @@
 			<version>3.0.0</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.6</version>
+		</dependency>
 	</dependencies>
 
 	<!-- 多环境配置BEGIN -->

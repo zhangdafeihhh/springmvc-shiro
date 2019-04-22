@@ -31,6 +31,8 @@ public class SAASDriverEvaluateDetailDto implements Serializable {
     private String supervisorNo;
     private String evaluateTime;
     private String className;
+    private String serviceTypeId;
+    private String serviceTypeName;
 
     public SAASDriverEvaluateDetailDto() {
     }
@@ -251,4 +253,19 @@ public class SAASDriverEvaluateDetailDto implements Serializable {
         this.className = className;
     }
 
+    public String getServiceTypeId() {
+        return serviceTypeId;
+    }
+
+    public void setServiceTypeId(String serviceTypeId) {
+        this.serviceTypeId = serviceTypeId;
+    }
+
+    public String getServiceTypeName() {
+        return serviceTypeName;
+    }
+
+    public void setServiceTypeName(String serviceTypeName) {
+        this.serviceTypeName = serviceTypeName;
+    }
 }
