@@ -443,22 +443,21 @@ public class CarBizSupplierService{
 		if(perString.contains("SupplierChange_modify1")){
 
 		}else if(perString.contains("SupplierChange_modify2")){
+			
+		}else if(perString.contains("SupplierChange_modify3")){
 			modifyAll =StringUtils.isNotBlank(supplierVo.getSettlementFullName()) &&
 					StringUtils.isNotBlank(supplierVo.getSettlementAccount()) &&
 					Objects.nonNull(supplierVo.getSettlementCycle()) &&
 					Objects.nonNull(supplierVo.getSettlementType()) &&
-					Objects.nonNull(supplierVo.getSettlementDay());
-			notModify =StringUtils.isBlank(supplierVo.getSettlementFullName()) &&
-					StringUtils.isBlank(supplierVo.getSettlementAccount()) &&
-					Objects.isNull(supplierVo.getSettlementCycle()) &&
-					Objects.isNull(supplierVo.getSettlementType()) &&
-					Objects.isNull(supplierVo.getSettlementDay());
-		}else if(perString.contains("SupplierChange_modify3")){
-			modifyAll =StringUtils.isNotBlank(supplierVo.getSettlementFullName()) &&
+					Objects.nonNull(supplierVo.getSettlementDay())&&
 					StringUtils.isNotBlank(supplierVo.getBankIdentify()) &&
 					StringUtils.isNotBlank(supplierVo.getBankName()) &&
 					StringUtils.isNotBlank(supplierVo.getBankAccount()) ;
 			notModify =StringUtils.isBlank(supplierVo.getSettlementFullName()) &&
+					StringUtils.isBlank(supplierVo.getSettlementAccount()) &&
+					Objects.isNull(supplierVo.getSettlementCycle()) &&
+					Objects.isNull(supplierVo.getSettlementType()) &&
+					Objects.isNull(supplierVo.getSettlementDay()) &&
 					StringUtils.isBlank(supplierVo.getBankIdentify()) &&
 					StringUtils.isBlank(supplierVo.getBankName()) &&
 					StringUtils.isBlank(supplierVo.getBankAccount());
