@@ -23,6 +23,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import mapper.driver.SupplierExtDtoMapper;
 import mapper.driver.ex.SupplierExtDtoExMapper;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
+import mapper.mdbcarmanage.ex.SaasPermissionExMapper;
 import mapper.rentcar.CarBizSupplierMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
@@ -81,6 +82,9 @@ public class CarBizSupplierService{
 
 	@Autowired
 	private CarBizCityExMapper carBizCityExMapper;
+
+	@Autowired
+	private SaasPermissionExMapper saasPermissionExMapper;
 
 	private static final ExecutorService es = Executors.newCachedThreadPool();
 
@@ -421,30 +425,46 @@ public class CarBizSupplierService{
 
 
 	private boolean modifyAccept(CarBizSupplierVo supplierVo){
-	    //结算周期为(2-半月结 3-周结)时，前端不传结算日，赋默认值0
-        Integer settlementCycle = supplierVo.getSettlementCycle();
-	    if (settlementCycle == 2 || settlementCycle == 3){
-            supplierVo.setSettlementDay(0);
-        }
-		boolean modifyAll = StringUtils.isNotBlank(supplierVo.getSettlementFullName()) &&
-				StringUtils.isNotBlank(supplierVo.getBankIdentify()) &&
-				StringUtils.isNotBlank(supplierVo.getBankName()) &&
-				StringUtils.isNotBlank(supplierVo.getBankAccount()) &&
-				StringUtils.isNotBlank(supplierVo.getSettlementAccount()) &&
-				Objects.nonNull(supplierVo.getSettlementCycle()) &&
-				Objects.nonNull(supplierVo.getSettlementType()) &&
-				Objects.nonNull(supplierVo.getSettlementDay())
-				;
 
-		boolean notModify = StringUtils.isBlank(supplierVo.getSettlementFullName()) &&
-				StringUtils.isBlank(supplierVo.getBankIdentify()) &&
-				StringUtils.isBlank(supplierVo.getBankName()) &&
-				StringUtils.isBlank(supplierVo.getBankAccount()) &&
-				StringUtils.isBlank(supplierVo.getSettlementAccount()) &&
-				Objects.isNull(supplierVo.getSettlementCycle()) &&
-				Objects.isNull(supplierVo.getSettlementType()) &&
-				Objects.isNull(supplierVo.getSettlementDay())
-				;
+		//结算周期为(2-半月结 3-周结)时，前端不传结算日，赋默认值0
+		Integer settlementCycle = supplierVo.getSettlementCycle();
+		if (settlementCycle == 2 || settlementCycle == 3){
+			supplierVo.setSettlementDay(0);
+		}
+
+		//根据不同的角色拥有的权限不同~
+		SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+		List<String> perString = saasPermissionExMapper.queryPermissionCodesOfUser(user.getId() );
+
+		boolean modifyAll = true;
+
+		boolean notModify = true;
+
+		if(perString.contains("SupplierChange_modify1")){
+
+		}else if(perString.contains("SupplierChange_modify2")){
+			modifyAll =StringUtils.isNotBlank(supplierVo.getSettlementFullName()) &&
+					StringUtils.isNotBlank(supplierVo.getSettlementAccount()) &&
+					Objects.nonNull(supplierVo.getSettlementCycle()) &&
+					Objects.nonNull(supplierVo.getSettlementType()) &&
+					Objects.nonNull(supplierVo.getSettlementDay());
+			notModify =StringUtils.isBlank(supplierVo.getSettlementFullName()) &&
+					StringUtils.isBlank(supplierVo.getSettlementAccount()) &&
+					Objects.isNull(supplierVo.getSettlementCycle()) &&
+					Objects.isNull(supplierVo.getSettlementType()) &&
+					Objects.isNull(supplierVo.getSettlementDay());
+		}else if(perString.contains("SupplierChange_modify3")){
+			modifyAll =StringUtils.isNotBlank(supplierVo.getSettlementFullName()) &&
+					StringUtils.isNotBlank(supplierVo.getBankIdentify()) &&
+					StringUtils.isNotBlank(supplierVo.getBankName()) &&
+					StringUtils.isNotBlank(supplierVo.getBankAccount()) ;
+			notModify =StringUtils.isBlank(supplierVo.getSettlementFullName()) &&
+					StringUtils.isBlank(supplierVo.getBankIdentify()) &&
+					StringUtils.isBlank(supplierVo.getBankName()) &&
+					StringUtils.isBlank(supplierVo.getBankAccount());
+		}
+
+
 		return modifyAll || notModify;
 	}
 }
