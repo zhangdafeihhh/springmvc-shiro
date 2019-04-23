@@ -428,7 +428,7 @@ public class CarBizSupplierService{
 
 		//结算周期为(2-半月结 3-周结)时，前端不传结算日，赋默认值0
 		Integer settlementCycle = supplierVo.getSettlementCycle();
-		if (settlementCycle == 2 || settlementCycle == 3){
+		if (settlementCycle  != null &&  (settlementCycle == 2 || settlementCycle == 3)){
 			supplierVo.setSettlementDay(0);
 		}
 
