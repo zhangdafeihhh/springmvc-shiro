@@ -44,7 +44,7 @@ public class UsernamePasswordRealm extends AuthorizingRealm {
 		loginUser.setLoginName( adMUser.getAccount() );//登录名
 		loginUser.setMobile( adMUser.getPhone() );         //手机号码
 		loginUser.setName( adMUser.getUserName() );    //真实姓名
-		loginUser.setEmail(  null ); //邮箱地址
+		loginUser.setEmail(adMUser.getEmail()); //邮箱地址
 		loginUser.setType( null );   //
 		loginUser.setStatus( adMUser.getStatus() );           //状态
 		loginUser.setAccountType( adMUser.getAccountType() );   //自有的帐号类型：[100 普通用户]、[900 管理员]
