@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.FinancialClueGoodsMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.FinancialClueGoods" >
+    <id column="clue_goods_id" property="clueGoodsId" jdbcType="INTEGER" />
+    <result column="clue_id" property="clueId" jdbcType="INTEGER" />
+    <result column="lease_term" property="leaseTerm" jdbcType="INTEGER" />
+    <result column="front_money" property="frontMoney" jdbcType="DECIMAL" />
+    <result column="rent_every_term" property="rentEveryTerm" jdbcType="DECIMAL" />
+    <result column="first_rent" property="firstRent" jdbcType="DECIMAL" />
+    <result column="security_deposit" property="securityDeposit" jdbcType="DECIMAL" />
+    <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
+    <result column="basics_vehicles_id" property="basicsVehiclesId" jdbcType="INTEGER" />
+    <result column="vehicles_detailed_name" property="vehiclesDetailedName" jdbcType="VARCHAR" />
+    <result column="brand_id" property="brandId" jdbcType="INTEGER" />
+    <result column="model_id" property="modelId" jdbcType="INTEGER" />
+    <result column="vehicle_style" property="vehicleStyle" jdbcType="VARCHAR" />
+    <result column="year_style" property="yearStyle" jdbcType="VARCHAR" />
+    <result column="energy_type" property="energyType" jdbcType="INTEGER" />
+    <result column="variable_box" property="variableBox" jdbcType="INTEGER" />
+    <result column="guidance_price" property="guidancePrice" jdbcType="DECIMAL" />
+    <result column="discharge" property="discharge" jdbcType="INTEGER" />
+    <result column="mileage" property="mileage" jdbcType="INTEGER" />
+    <result column="auto_home_url" property="autoHomeUrl" jdbcType="VARCHAR" />
+    <result column="length_width_height" property="lengthWidthHeight" jdbcType="VARCHAR" />
+    <result column="quality_assurance" property="qualityAssurance" jdbcType="VARCHAR" />
+    <result column="wheelbase" property="wheelbase" jdbcType="INTEGER" />
+    <result column="environmental_protection_standard" property="environmentalProtectionStandard" jdbcType="VARCHAR" />
+    <result column="fast_charging_time" property="fastChargingTime" jdbcType="INTEGER" />
+    <result column="slow_charging_time" property="slowChargingTime" jdbcType="INTEGER" />
+    <result column="fast_percentage" property="fastPercentage" jdbcType="DOUBLE" />
+    <result column="sales_target" property="salesTarget" jdbcType="TINYINT" />
+    <result column="goods_number" property="goodsNumber" jdbcType="VARCHAR" />
+    <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+    <result column="goods_type" property="goodsType" jdbcType="TINYINT" />
+    <result column="channel" property="channel" jdbcType="VARCHAR" />
+    <result column="keyword" property="keyword" jdbcType="VARCHAR" />
+    <result column="vehicle_age" property="vehicleAge" jdbcType="INTEGER" />
+    <result column="vehicle_properties" property="vehicleProperties" jdbcType="INTEGER" />
+    <result column="color" property="color" jdbcType="VARCHAR" />
+    <result column="additional_services_id" property="additionalServicesId" jdbcType="VARCHAR" />
+    <result column="additional_services_info" property="additionalServicesInfo" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    clue_goods_id, clue_id, lease_term, front_money, rent_every_term, first_rent, security_deposit, 
+    total_price, basics_vehicles_id, vehicles_detailed_name, brand_id, model_id, vehicle_style, 
+    year_style, energy_type, variable_box, guidance_price, discharge, mileage, auto_home_url, 
+    length_width_height, quality_assurance, wheelbase, environmental_protection_standard, 
+    fast_charging_time, slow_charging_time, fast_percentage, sales_target, goods_number, 
+    goods_name, goods_type, channel, keyword, vehicle_age, vehicle_properties, color, 
+    additional_services_id, additional_services_info, create_by, create_time, update_by, 
+    update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from financial_clue_goods
+    where clue_goods_id = #{clueGoodsId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from financial_clue_goods
+    where clue_goods_id = #{clueGoodsId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.driver.FinancialClueGoods" >
+    insert into financial_clue_goods (clue_goods_id, clue_id, lease_term, 
+      front_money, rent_every_term, first_rent, 
+      security_deposit, total_price, basics_vehicles_id, 
+      vehicles_detailed_name, brand_id, model_id, 
+      vehicle_style, year_style, energy_type, 
+      variable_box, guidance_price, discharge, 
+      mileage, auto_home_url, length_width_height, 
+      quality_assurance, wheelbase, environmental_protection_standard, 
+      fast_charging_time, slow_charging_time, fast_percentage, 
+      sales_target, goods_number, goods_name, 
+      goods_type, channel, keyword, 
+      vehicle_age, vehicle_properties, color, 
+      additional_services_id, additional_services_info, 
+      create_by, create_time, update_by, 
+      update_time)
+    values (#{clueGoodsId,jdbcType=INTEGER}, #{clueId,jdbcType=INTEGER}, #{leaseTerm,jdbcType=INTEGER}, 
+      #{frontMoney,jdbcType=DECIMAL}, #{rentEveryTerm,jdbcType=DECIMAL}, #{firstRent,jdbcType=DECIMAL}, 
+      #{securityDeposit,jdbcType=DECIMAL}, #{totalPrice,jdbcType=DECIMAL}, #{basicsVehiclesId,jdbcType=INTEGER}, 
+      #{vehiclesDetailedName,jdbcType=VARCHAR}, #{brandId,jdbcType=INTEGER}, #{modelId,jdbcType=INTEGER}, 
+      #{vehicleStyle,jdbcType=VARCHAR}, #{yearStyle,jdbcType=VARCHAR}, #{energyType,jdbcType=INTEGER}, 
+      #{variableBox,jdbcType=INTEGER}, #{guidancePrice,jdbcType=DECIMAL}, #{discharge,jdbcType=INTEGER}, 
+      #{mileage,jdbcType=INTEGER}, #{autoHomeUrl,jdbcType=VARCHAR}, #{lengthWidthHeight,jdbcType=VARCHAR}, 
+      #{qualityAssurance,jdbcType=VARCHAR}, #{wheelbase,jdbcType=INTEGER}, #{environmentalProtectionStandard,jdbcType=VARCHAR}, 
+      #{fastChargingTime,jdbcType=INTEGER}, #{slowChargingTime,jdbcType=INTEGER}, #{fastPercentage,jdbcType=DOUBLE}, 
+      #{salesTarget,jdbcType=TINYINT}, #{goodsNumber,jdbcType=VARCHAR}, #{goodsName,jdbcType=VARCHAR}, 
+      #{goodsType,jdbcType=TINYINT}, #{channel,jdbcType=VARCHAR}, #{keyword,jdbcType=VARCHAR}, 
+      #{vehicleAge,jdbcType=INTEGER}, #{vehicleProperties,jdbcType=INTEGER}, #{color,jdbcType=VARCHAR}, 
+      #{additionalServicesId,jdbcType=VARCHAR}, #{additionalServicesInfo,jdbcType=VARCHAR}, 
+      #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.FinancialClueGoods" >
+    insert into financial_clue_goods
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="clueGoodsId != null" >
+        clue_goods_id,
+      </if>
+      <if test="clueId != null" >
+        clue_id,
+      </if>
+      <if test="leaseTerm != null" >
+        lease_term,
+      </if>
+      <if test="frontMoney != null" >
+        front_money,
+      </if>
+      <if test="rentEveryTerm != null" >
+        rent_every_term,
+      </if>
+      <if test="firstRent != null" >
+        first_rent,
+      </if>
+      <if test="securityDeposit != null" >
+        security_deposit,
+      </if>
+      <if test="totalPrice != null" >
+        total_price,
+      </if>
+      <if test="basicsVehiclesId != null" >
+        basics_vehicles_id,
+      </if>
+      <if test="vehiclesDetailedName != null" >
+        vehicles_detailed_name,
+      </if>
+      <if test="brandId != null" >
+        brand_id,
+      </if>
+      <if test="modelId != null" >
+        model_id,
+      </if>
+      <if test="vehicleStyle != null" >
+        vehicle_style,
+      </if>
+      <if test="yearStyle != null" >
+        year_style,
+      </if>
+      <if test="energyType != null" >
+        energy_type,
+      </if>
+      <if test="variableBox != null" >
+        variable_box,
+      </if>
+      <if test="guidancePrice != null" >
+        guidance_price,
+      </if>
+      <if test="discharge != null" >
+        discharge,
+      </if>
+      <if test="mileage != null" >
+        mileage,
+      </if>
+      <if test="autoHomeUrl != null" >
+        auto_home_url,
+      </if>
+      <if test="lengthWidthHeight != null" >
+        length_width_height,
+      </if>
+      <if test="qualityAssurance != null" >
+        quality_assurance,
+      </if>
+      <if test="wheelbase != null" >
+        wheelbase,
+      </if>
+      <if test="environmentalProtectionStandard != null" >
+        environmental_protection_standard,
+      </if>
+      <if test="fastChargingTime != null" >
+        fast_charging_time,
+      </if>
+      <if test="slowChargingTime != null" >
+        slow_charging_time,
+      </if>
+      <if test="fastPercentage != null" >
+        fast_percentage,
+      </if>
+      <if test="salesTarget != null" >
+        sales_target,
+      </if>
+      <if test="goodsNumber != null" >
+        goods_number,
+      </if>
+      <if test="goodsName != null" >
+        goods_name,
+      </if>
+      <if test="goodsType != null" >
+        goods_type,
+      </if>
+      <if test="channel != null" >
+        channel,
+      </if>
+      <if test="keyword != null" >
+        keyword,
+      </if>
+      <if test="vehicleAge != null" >
+        vehicle_age,
+      </if>
+      <if test="vehicleProperties != null" >
+        vehicle_properties,
+      </if>
+      <if test="color != null" >
+        color,
+      </if>
+      <if test="additionalServicesId != null" >
+        additional_services_id,
+      </if>
+      <if test="additionalServicesInfo != null" >
+        additional_services_info,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="clueGoodsId != null" >
+        #{clueGoodsId,jdbcType=INTEGER},
+      </if>
+      <if test="clueId != null" >
+        #{clueId,jdbcType=INTEGER},
+      </if>
+      <if test="leaseTerm != null" >
+        #{leaseTerm,jdbcType=INTEGER},
+      </if>
+      <if test="frontMoney != null" >
+        #{frontMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="rentEveryTerm != null" >
+        #{rentEveryTerm,jdbcType=DECIMAL},
+      </if>
+      <if test="firstRent != null" >
+        #{firstRent,jdbcType=DECIMAL},
+      </if>
+      <if test="securityDeposit != null" >
+        #{securityDeposit,jdbcType=DECIMAL},
+      </if>
+      <if test="totalPrice != null" >
+        #{totalPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="basicsVehiclesId != null" >
+        #{basicsVehiclesId,jdbcType=INTEGER},
+      </if>
+      <if test="vehiclesDetailedName != null" >
+        #{vehiclesDetailedName,jdbcType=VARCHAR},
+      </if>
+      <if test="brandId != null" >
+        #{brandId,jdbcType=INTEGER},
+      </if>
+      <if test="modelId != null" >
+        #{modelId,jdbcType=INTEGER},
+      </if>
+      <if test="vehicleStyle != null" >
+        #{vehicleStyle,jdbcType=VARCHAR},
+      </if>
+      <if test="yearStyle != null" >
+        #{yearStyle,jdbcType=VARCHAR},
+      </if>
+      <if test="energyType != null" >
+        #{energyType,jdbcType=INTEGER},
+      </if>
+      <if test="variableBox != null" >
+        #{variableBox,jdbcType=INTEGER},
+      </if>
+      <if test="guidancePrice != null" >
+        #{guidancePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="discharge != null" >
+        #{discharge,jdbcType=INTEGER},
+      </if>
+      <if test="mileage != null" >
+        #{mileage,jdbcType=INTEGER},
+      </if>
+      <if test="autoHomeUrl != null" >
+        #{autoHomeUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="lengthWidthHeight != null" >
+        #{lengthWidthHeight,jdbcType=VARCHAR},
+      </if>
+      <if test="qualityAssurance != null" >
+        #{qualityAssurance,jdbcType=VARCHAR},
+      </if>
+      <if test="wheelbase != null" >
+        #{wheelbase,jdbcType=INTEGER},
+      </if>
+      <if test="environmentalProtectionStandard != null" >
+        #{environmentalProtectionStandard,jdbcType=VARCHAR},
+      </if>
+      <if test="fastChargingTime != null" >
+        #{fastChargingTime,jdbcType=INTEGER},
+      </if>
+      <if test="slowChargingTime != null" >
+        #{slowChargingTime,jdbcType=INTEGER},
+      </if>
+      <if test="fastPercentage != null" >
+        #{fastPercentage,jdbcType=DOUBLE},
+      </if>
+      <if test="salesTarget != null" >
+        #{salesTarget,jdbcType=TINYINT},
+      </if>
+      <if test="goodsNumber != null" >
+        #{goodsNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsName != null" >
+        #{goodsName,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsType != null" >
+        #{goodsType,jdbcType=TINYINT},
+      </if>
+      <if test="channel != null" >
+        #{channel,jdbcType=VARCHAR},
+      </if>
+      <if test="keyword != null" >
+        #{keyword,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleAge != null" >
+        #{vehicleAge,jdbcType=INTEGER},
+      </if>
+      <if test="vehicleProperties != null" >
+        #{vehicleProperties,jdbcType=INTEGER},
+      </if>
+      <if test="color != null" >
+        #{color,jdbcType=VARCHAR},
+      </if>
+      <if test="additionalServicesId != null" >
+        #{additionalServicesId,jdbcType=VARCHAR},
+      </if>
+      <if test="additionalServicesInfo != null" >
+        #{additionalServicesInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.driver.FinancialClueGoods" >
+    update financial_clue_goods
+    <set >
+      <if test="clueId != null" >
+        clue_id = #{clueId,jdbcType=INTEGER},
+      </if>
+      <if test="leaseTerm != null" >
+        lease_term = #{leaseTerm,jdbcType=INTEGER},
+      </if>
+      <if test="frontMoney != null" >
+        front_money = #{frontMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="rentEveryTerm != null" >
+        rent_every_term = #{rentEveryTerm,jdbcType=DECIMAL},
+      </if>
+      <if test="firstRent != null" >
+        first_rent = #{firstRent,jdbcType=DECIMAL},
+      </if>
+      <if test="securityDeposit != null" >
+        security_deposit = #{securityDeposit,jdbcType=DECIMAL},
+      </if>
+      <if test="totalPrice != null" >
+        total_price = #{totalPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="basicsVehiclesId != null" >
+        basics_vehicles_id = #{basicsVehiclesId,jdbcType=INTEGER},
+      </if>
+      <if test="vehiclesDetailedName != null" >
+        vehicles_detailed_name = #{vehiclesDetailedName,jdbcType=VARCHAR},
+      </if>
+      <if test="brandId != null" >
+        brand_id = #{brandId,jdbcType=INTEGER},
+      </if>
+      <if test="modelId != null" >
+        model_id = #{modelId,jdbcType=INTEGER},
+      </if>
+      <if test="vehicleStyle != null" >
+        vehicle_style = #{vehicleStyle,jdbcType=VARCHAR},
+      </if>
+      <if test="yearStyle != null" >
+        year_style = #{yearStyle,jdbcType=VARCHAR},
+      </if>
+      <if test="energyType != null" >
+        energy_type = #{energyType,jdbcType=INTEGER},
+      </if>
+      <if test="variableBox != null" >
+        variable_box = #{variableBox,jdbcType=INTEGER},
+      </if>
+      <if test="guidancePrice != null" >
+        guidance_price = #{guidancePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="discharge != null" >
+        discharge = #{discharge,jdbcType=INTEGER},
+      </if>
+      <if test="mileage != null" >
+        mileage = #{mileage,jdbcType=INTEGER},
+      </if>
+      <if test="autoHomeUrl != null" >
+        auto_home_url = #{autoHomeUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="lengthWidthHeight != null" >
+        length_width_height = #{lengthWidthHeight,jdbcType=VARCHAR},
+      </if>
+      <if test="qualityAssurance != null" >
+        quality_assurance = #{qualityAssurance,jdbcType=VARCHAR},
+      </if>
+      <if test="wheelbase != null" >
+        wheelbase = #{wheelbase,jdbcType=INTEGER},
+      </if>
+      <if test="environmentalProtectionStandard != null" >
+        environmental_protection_standard = #{environmentalProtectionStandard,jdbcType=VARCHAR},
+      </if>
+      <if test="fastChargingTime != null" >
+        fast_charging_time = #{fastChargingTime,jdbcType=INTEGER},
+      </if>
+      <if test="slowChargingTime != null" >
+        slow_charging_time = #{slowChargingTime,jdbcType=INTEGER},
+      </if>
+      <if test="fastPercentage != null" >
+        fast_percentage = #{fastPercentage,jdbcType=DOUBLE},
+      </if>
+      <if test="salesTarget != null" >
+        sales_target = #{salesTarget,jdbcType=TINYINT},
+      </if>
+      <if test="goodsNumber != null" >
+        goods_number = #{goodsNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsName != null" >
+        goods_name = #{goodsName,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsType != null" >
+        goods_type = #{goodsType,jdbcType=TINYINT},
+      </if>
+      <if test="channel != null" >
+        channel = #{channel,jdbcType=VARCHAR},
+      </if>
+      <if test="keyword != null" >
+        keyword = #{keyword,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleAge != null" >
+        vehicle_age = #{vehicleAge,jdbcType=INTEGER},
+      </if>
+      <if test="vehicleProperties != null" >
+        vehicle_properties = #{vehicleProperties,jdbcType=INTEGER},
+      </if>
+      <if test="color != null" >
+        color = #{color,jdbcType=VARCHAR},
+      </if>
+      <if test="additionalServicesId != null" >
+        additional_services_id = #{additionalServicesId,jdbcType=VARCHAR},
+      </if>
+      <if test="additionalServicesInfo != null" >
+        additional_services_info = #{additionalServicesInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where clue_goods_id = #{clueGoodsId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.FinancialClueGoods" >
+    update financial_clue_goods
+    set clue_id = #{clueId,jdbcType=INTEGER},
+      lease_term = #{leaseTerm,jdbcType=INTEGER},
+      front_money = #{frontMoney,jdbcType=DECIMAL},
+      rent_every_term = #{rentEveryTerm,jdbcType=DECIMAL},
+      first_rent = #{firstRent,jdbcType=DECIMAL},
+      security_deposit = #{securityDeposit,jdbcType=DECIMAL},
+      total_price = #{totalPrice,jdbcType=DECIMAL},
+      basics_vehicles_id = #{basicsVehiclesId,jdbcType=INTEGER},
+      vehicles_detailed_name = #{vehiclesDetailedName,jdbcType=VARCHAR},
+      brand_id = #{brandId,jdbcType=INTEGER},
+      model_id = #{modelId,jdbcType=INTEGER},
+      vehicle_style = #{vehicleStyle,jdbcType=VARCHAR},
+      year_style = #{yearStyle,jdbcType=VARCHAR},
+      energy_type = #{energyType,jdbcType=INTEGER},
+      variable_box = #{variableBox,jdbcType=INTEGER},
+      guidance_price = #{guidancePrice,jdbcType=DECIMAL},
+      discharge = #{discharge,jdbcType=INTEGER},
+      mileage = #{mileage,jdbcType=INTEGER},
+      auto_home_url = #{autoHomeUrl,jdbcType=VARCHAR},
+      length_width_height = #{lengthWidthHeight,jdbcType=VARCHAR},
+      quality_assurance = #{qualityAssurance,jdbcType=VARCHAR},
+      wheelbase = #{wheelbase,jdbcType=INTEGER},
+      environmental_protection_standard = #{environmentalProtectionStandard,jdbcType=VARCHAR},
+      fast_charging_time = #{fastChargingTime,jdbcType=INTEGER},
+      slow_charging_time = #{slowChargingTime,jdbcType=INTEGER},
+      fast_percentage = #{fastPercentage,jdbcType=DOUBLE},
+      sales_target = #{salesTarget,jdbcType=TINYINT},
+      goods_number = #{goodsNumber,jdbcType=VARCHAR},
+      goods_name = #{goodsName,jdbcType=VARCHAR},
+      goods_type = #{goodsType,jdbcType=TINYINT},
+      channel = #{channel,jdbcType=VARCHAR},
+      keyword = #{keyword,jdbcType=VARCHAR},
+      vehicle_age = #{vehicleAge,jdbcType=INTEGER},
+      vehicle_properties = #{vehicleProperties,jdbcType=INTEGER},
+      color = #{color,jdbcType=VARCHAR},
+      additional_services_id = #{additionalServicesId,jdbcType=VARCHAR},
+      additional_services_info = #{additionalServicesInfo,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where clue_goods_id = #{clueGoodsId,jdbcType=INTEGER}
+  </update>
+</mapper>

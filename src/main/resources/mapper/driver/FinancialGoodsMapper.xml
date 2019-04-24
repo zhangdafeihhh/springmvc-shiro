@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.FinancialGoodsMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.FinancialGoods" >
+    <id column="goods_id" property="goodsId" jdbcType="INTEGER" />
+    <result column="basics_vehicles_id" property="basicsVehiclesId" jdbcType="INTEGER" />
+    <result column="goods_number" property="goodsNumber" jdbcType="VARCHAR" />
+    <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+    <result column="sales_target" property="salesTarget" jdbcType="TINYINT" />
+    <result column="goods_type" property="goodsType" jdbcType="TINYINT" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="channel" property="channel" jdbcType="VARCHAR" />
+    <result column="reason" property="reason" jdbcType="VARCHAR" />
+    <result column="explain" property="explain" jdbcType="VARCHAR" />
+    <result column="picture_url" property="pictureUrl" jdbcType="VARCHAR" />
+    <result column="keyword" property="keyword" jdbcType="VARCHAR" />
+    <result column="vehicle_age" property="vehicleAge" jdbcType="INTEGER" />
+    <result column="mileage" property="mileage" jdbcType="INTEGER" />
+    <result column="vehicle_properties" property="vehicleProperties" jdbcType="INTEGER" />
+    <result column="color" property="color" jdbcType="VARCHAR" />
+    <result column="additional_services_id" property="additionalServicesId" jdbcType="VARCHAR" />
+    <result column="additional_services_info" property="additionalServicesInfo" jdbcType="VARCHAR" />
+    <result column="vehicle_style" property="vehicleStyle" jdbcType="INTEGER" />
+    <result column="stock" property="stock" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    goods_id, basics_vehicles_id, goods_number, goods_name, sales_target, goods_type, 
+    supplier_id, city_id, channel, reason, explain, picture_url, keyword, vehicle_age, 
+    mileage, vehicle_properties, color, additional_services_id, additional_services_info, 
+    vehicle_style, stock, status, create_by, create_time, update_by, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from financial_goods
+    where goods_id = #{goodsId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from financial_goods
+    where goods_id = #{goodsId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.driver.FinancialGoods" >
+    insert into financial_goods (goods_id, basics_vehicles_id, goods_number, 
+      goods_name, sales_target, goods_type, 
+      supplier_id, city_id, channel, 
+      reason, explain, picture_url, 
+      keyword, vehicle_age, mileage, 
+      vehicle_properties, color, additional_services_id, 
+      additional_services_info, vehicle_style, stock, 
+      status, create_by, create_time, 
+      update_by, update_time)
+    values (#{goodsId,jdbcType=INTEGER}, #{basicsVehiclesId,jdbcType=INTEGER}, #{goodsNumber,jdbcType=VARCHAR}, 
+      #{goodsName,jdbcType=VARCHAR}, #{salesTarget,jdbcType=TINYINT}, #{goodsType,jdbcType=TINYINT}, 
+      #{supplierId,jdbcType=INTEGER}, #{cityId,jdbcType=INTEGER}, #{channel,jdbcType=VARCHAR}, 
+      #{reason,jdbcType=VARCHAR}, #{explain,jdbcType=VARCHAR}, #{pictureUrl,jdbcType=VARCHAR}, 
+      #{keyword,jdbcType=VARCHAR}, #{vehicleAge,jdbcType=INTEGER}, #{mileage,jdbcType=INTEGER}, 
+      #{vehicleProperties,jdbcType=INTEGER}, #{color,jdbcType=VARCHAR}, #{additionalServicesId,jdbcType=VARCHAR}, 
+      #{additionalServicesInfo,jdbcType=VARCHAR}, #{vehicleStyle,jdbcType=INTEGER}, #{stock,jdbcType=INTEGER}, 
+      #{status,jdbcType=TINYINT}, #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.FinancialGoods" >
+    insert into financial_goods
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="goodsId != null" >
+        goods_id,
+      </if>
+      <if test="basicsVehiclesId != null" >
+        basics_vehicles_id,
+      </if>
+      <if test="goodsNumber != null" >
+        goods_number,
+      </if>
+      <if test="goodsName != null" >
+        goods_name,
+      </if>
+      <if test="salesTarget != null" >
+        sales_target,
+      </if>
+      <if test="goodsType != null" >
+        goods_type,
+      </if>
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="cityId != null" >
+        city_id,
+      </if>
+      <if test="channel != null" >
+        channel,
+      </if>
+      <if test="reason != null" >
+        reason,
+      </if>
+      <if test="explain != null" >
+        explain,
+      </if>
+      <if test="pictureUrl != null" >
+        picture_url,
+      </if>
+      <if test="keyword != null" >
+        keyword,
+      </if>
+      <if test="vehicleAge != null" >
+        vehicle_age,
+      </if>
+      <if test="mileage != null" >
+        mileage,
+      </if>
+      <if test="vehicleProperties != null" >
+        vehicle_properties,
+      </if>
+      <if test="color != null" >
+        color,
+      </if>
+      <if test="additionalServicesId != null" >
+        additional_services_id,
+      </if>
+      <if test="additionalServicesInfo != null" >
+        additional_services_info,
+      </if>
+      <if test="vehicleStyle != null" >
+        vehicle_style,
+      </if>
+      <if test="stock != null" >
+        stock,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="goodsId != null" >
+        #{goodsId,jdbcType=INTEGER},
+      </if>
+      <if test="basicsVehiclesId != null" >
+        #{basicsVehiclesId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsNumber != null" >
+        #{goodsNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsName != null" >
+        #{goodsName,jdbcType=VARCHAR},
+      </if>
+      <if test="salesTarget != null" >
+        #{salesTarget,jdbcType=TINYINT},
+      </if>
+      <if test="goodsType != null" >
+        #{goodsType,jdbcType=TINYINT},
+      </if>
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="cityId != null" >
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="channel != null" >
+        #{channel,jdbcType=VARCHAR},
+      </if>
+      <if test="reason != null" >
+        #{reason,jdbcType=VARCHAR},
+      </if>
+      <if test="explain != null" >
+        #{explain,jdbcType=VARCHAR},
+      </if>
+      <if test="pictureUrl != null" >
+        #{pictureUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="keyword != null" >
+        #{keyword,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleAge != null" >
+        #{vehicleAge,jdbcType=INTEGER},
+      </if>
+      <if test="mileage != null" >
+        #{mileage,jdbcType=INTEGER},
+      </if>
+      <if test="vehicleProperties != null" >
+        #{vehicleProperties,jdbcType=INTEGER},
+      </if>
+      <if test="color != null" >
+        #{color,jdbcType=VARCHAR},
+      </if>
+      <if test="additionalServicesId != null" >
+        #{additionalServicesId,jdbcType=VARCHAR},
+      </if>
+      <if test="additionalServicesInfo != null" >
+        #{additionalServicesInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleStyle != null" >
+        #{vehicleStyle,jdbcType=INTEGER},
+      </if>
+      <if test="stock != null" >
+        #{stock,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.driver.FinancialGoods" >
+    update financial_goods
+    <set >
+      <if test="basicsVehiclesId != null" >
+        basics_vehicles_id = #{basicsVehiclesId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsNumber != null" >
+        goods_number = #{goodsNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsName != null" >
+        goods_name = #{goodsName,jdbcType=VARCHAR},
+      </if>
+      <if test="salesTarget != null" >
+        sales_target = #{salesTarget,jdbcType=TINYINT},
+      </if>
+      <if test="goodsType != null" >
+        goods_type = #{goodsType,jdbcType=TINYINT},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="cityId != null" >
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="channel != null" >
+        channel = #{channel,jdbcType=VARCHAR},
+      </if>
+      <if test="reason != null" >
+        reason = #{reason,jdbcType=VARCHAR},
+      </if>
+      <if test="explain != null" >
+        explain = #{explain,jdbcType=VARCHAR},
+      </if>
+      <if test="pictureUrl != null" >
+        picture_url = #{pictureUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="keyword != null" >
+        keyword = #{keyword,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleAge != null" >
+        vehicle_age = #{vehicleAge,jdbcType=INTEGER},
+      </if>
+      <if test="mileage != null" >
+        mileage = #{mileage,jdbcType=INTEGER},
+      </if>
+      <if test="vehicleProperties != null" >
+        vehicle_properties = #{vehicleProperties,jdbcType=INTEGER},
+      </if>
+      <if test="color != null" >
+        color = #{color,jdbcType=VARCHAR},
+      </if>
+      <if test="additionalServicesId != null" >
+        additional_services_id = #{additionalServicesId,jdbcType=VARCHAR},
+      </if>
+      <if test="additionalServicesInfo != null" >
+        additional_services_info = #{additionalServicesInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleStyle != null" >
+        vehicle_style = #{vehicleStyle,jdbcType=INTEGER},
+      </if>
+      <if test="stock != null" >
+        stock = #{stock,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where goods_id = #{goodsId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.FinancialGoods" >
+    update financial_goods
+    set basics_vehicles_id = #{basicsVehiclesId,jdbcType=INTEGER},
+      goods_number = #{goodsNumber,jdbcType=VARCHAR},
+      goods_name = #{goodsName,jdbcType=VARCHAR},
+      sales_target = #{salesTarget,jdbcType=TINYINT},
+      goods_type = #{goodsType,jdbcType=TINYINT},
+      supplier_id = #{supplierId,jdbcType=INTEGER},
+      city_id = #{cityId,jdbcType=INTEGER},
+      channel = #{channel,jdbcType=VARCHAR},
+      reason = #{reason,jdbcType=VARCHAR},
+      explain = #{explain,jdbcType=VARCHAR},
+      picture_url = #{pictureUrl,jdbcType=VARCHAR},
+      keyword = #{keyword,jdbcType=VARCHAR},
+      vehicle_age = #{vehicleAge,jdbcType=INTEGER},
+      mileage = #{mileage,jdbcType=INTEGER},
+      vehicle_properties = #{vehicleProperties,jdbcType=INTEGER},
+      color = #{color,jdbcType=VARCHAR},
+      additional_services_id = #{additionalServicesId,jdbcType=VARCHAR},
+      additional_services_info = #{additionalServicesInfo,jdbcType=VARCHAR},
+      vehicle_style = #{vehicleStyle,jdbcType=INTEGER},
+      stock = #{stock,jdbcType=INTEGER},
+      status = #{status,jdbcType=TINYINT},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where goods_id = #{goodsId,jdbcType=INTEGER}
+  </update>
+</mapper>

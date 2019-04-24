@@ -232,7 +232,12 @@ public final class RestErrorCode{
 	@ResultMessage("{0}")
 	public static final int BUS_COMMON_ERROR_CODE=805;
 
-
+	//-------------------金融商品--start-------------------------
+	
+	@ResultMessage("查询车型库信息失败")
+	public static final int QUERY_BASICSVEHICLE_ERROR=20001;
+	
+	//-------------------金融商品--end---------------------------
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系
 	static{

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.DriverBrandMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.DriverBrand" >
+    <id column="ID" property="id" jdbcType="BIGINT" />
+    <result column="BRAND_NAME" property="brandName" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="TINYINT" />
+    <result column="BRAND_LOGO" property="brandLogo" jdbcType="VARCHAR" />
+    <result column="BRAND_TYPE" property="brandType" jdbcType="INTEGER" />
+    <result column="BRAND_SPELL" property="brandSpell" jdbcType="VARCHAR" />
+    <result column="CREATE_DATE" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="UPDATE_DATE" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, BRAND_NAME, STATUS, BRAND_LOGO, BRAND_TYPE, BRAND_SPELL, CREATE_DATE, UPDATE_DATE, 
+    REMARK
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from driver_brand
+    where ID = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from driver_brand
+    where ID = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.driver.DriverBrand" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into driver_brand (BRAND_NAME, STATUS, BRAND_LOGO, 
+      BRAND_TYPE, BRAND_SPELL, CREATE_DATE, 
+      UPDATE_DATE, REMARK)
+    values (#{brandName,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, #{brandLogo,jdbcType=VARCHAR}, 
+      #{brandType,jdbcType=INTEGER}, #{brandSpell,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.DriverBrand" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into driver_brand
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="brandName != null" >
+        BRAND_NAME,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="brandLogo != null" >
+        BRAND_LOGO,
+      </if>
+      <if test="brandType != null" >
+        BRAND_TYPE,
+      </if>
+      <if test="brandSpell != null" >
+        BRAND_SPELL,
+      </if>
+      <if test="createDate != null" >
+        CREATE_DATE,
+      </if>
+      <if test="updateDate != null" >
+        UPDATE_DATE,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="brandName != null" >
+        #{brandName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="brandLogo != null" >
+        #{brandLogo,jdbcType=VARCHAR},
+      </if>
+      <if test="brandType != null" >
+        #{brandType,jdbcType=INTEGER},
+      </if>
+      <if test="brandSpell != null" >
+        #{brandSpell,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.driver.DriverBrand" >
+    update driver_brand
+    <set >
+      <if test="brandName != null" >
+        BRAND_NAME = #{brandName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="brandLogo != null" >
+        BRAND_LOGO = #{brandLogo,jdbcType=VARCHAR},
+      </if>
+      <if test="brandType != null" >
+        BRAND_TYPE = #{brandType,jdbcType=INTEGER},
+      </if>
+      <if test="brandSpell != null" >
+        BRAND_SPELL = #{brandSpell,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.DriverBrand" >
+    update driver_brand
+    set BRAND_NAME = #{brandName,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=TINYINT},
+      BRAND_LOGO = #{brandLogo,jdbcType=VARCHAR},
+      BRAND_TYPE = #{brandType,jdbcType=INTEGER},
+      BRAND_SPELL = #{brandSpell,jdbcType=VARCHAR},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

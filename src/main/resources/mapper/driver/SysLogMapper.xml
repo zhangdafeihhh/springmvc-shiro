@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.SysLogMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.SysLog" >
+    <id column="sys_log_id" property="sysLogId" jdbcType="INTEGER" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="module" property="module" jdbcType="VARCHAR" />
+    <result column="method" property="method" jdbcType="VARCHAR" />
+    <result column="before_params" property="beforeParams" jdbcType="VARCHAR" />
+    <result column="operate_params" property="operateParams" jdbcType="VARCHAR" />
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="result_status" property="resultStatus" jdbcType="INTEGER" />
+    <result column="result_msg" property="resultMsg" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    sys_log_id, username, module, method, before_params, operate_params, start_time, 
+    end_time, result_status, result_msg
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from syslog
+    where sys_log_id = #{sysLogId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from syslog
+    where sys_log_id = #{sysLogId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.driver.SysLog" >
+    insert into syslog (sys_log_id, username, module, 
+      method, before_params, operate_params, 
+      start_time, end_time, result_status, 
+      result_msg)
+    values (#{sysLogId,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{module,jdbcType=VARCHAR}, 
+      #{method,jdbcType=VARCHAR}, #{beforeParams,jdbcType=VARCHAR}, #{operateParams,jdbcType=VARCHAR}, 
+      #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{resultStatus,jdbcType=INTEGER}, 
+      #{resultMsg,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.SysLog" >
+    insert into syslog
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="sysLogId != null" >
+        sys_log_id,
+      </if>
+      <if test="username != null" >
+        username,
+      </if>
+      <if test="module != null" >
+        module,
+      </if>
+      <if test="method != null" >
+        method,
+      </if>
+      <if test="beforeParams != null" >
+        before_params,
+      </if>
+      <if test="operateParams != null" >
+        operate_params,
+      </if>
+      <if test="startTime != null" >
+        start_time,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+      <if test="resultStatus != null" >
+        result_status,
+      </if>
+      <if test="resultMsg != null" >
+        result_msg,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="sysLogId != null" >
+        #{sysLogId,jdbcType=INTEGER},
+      </if>
+      <if test="username != null" >
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="module != null" >
+        #{module,jdbcType=VARCHAR},
+      </if>
+      <if test="method != null" >
+        #{method,jdbcType=VARCHAR},
+      </if>
+      <if test="beforeParams != null" >
+        #{beforeParams,jdbcType=VARCHAR},
+      </if>
+      <if test="operateParams != null" >
+        #{operateParams,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="resultStatus != null" >
+        #{resultStatus,jdbcType=INTEGER},
+      </if>
+      <if test="resultMsg != null" >
+        #{resultMsg,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.driver.SysLog" >
+    update syslog
+    <set >
+      <if test="username != null" >
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="module != null" >
+        module = #{module,jdbcType=VARCHAR},
+      </if>
+      <if test="method != null" >
+        method = #{method,jdbcType=VARCHAR},
+      </if>
+      <if test="beforeParams != null" >
+        before_params = #{beforeParams,jdbcType=VARCHAR},
+      </if>
+      <if test="operateParams != null" >
+        operate_params = #{operateParams,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="resultStatus != null" >
+        result_status = #{resultStatus,jdbcType=INTEGER},
+      </if>
+      <if test="resultMsg != null" >
+        result_msg = #{resultMsg,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where sys_log_id = #{sysLogId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.SysLog" >
+    update syslog
+    set username = #{username,jdbcType=VARCHAR},
+      module = #{module,jdbcType=VARCHAR},
+      method = #{method,jdbcType=VARCHAR},
+      before_params = #{beforeParams,jdbcType=VARCHAR},
+      operate_params = #{operateParams,jdbcType=VARCHAR},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      result_status = #{resultStatus,jdbcType=INTEGER},
+      result_msg = #{resultMsg,jdbcType=VARCHAR}
+    where sys_log_id = #{sysLogId,jdbcType=INTEGER}
+  </update>
+</mapper>
