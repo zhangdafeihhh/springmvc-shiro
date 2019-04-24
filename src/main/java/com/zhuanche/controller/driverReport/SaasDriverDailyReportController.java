@@ -34,6 +34,7 @@ import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCooperationTypeExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
@@ -378,18 +379,29 @@ public class SaasDriverDailyReportController {
 
         List<CarBizCooperationType> cooperationTypeList = cooperationTypeExMapper.queryCarBizCooperationTypeList();
         List<CarBizCarGroup> carGroupList = carBizCarGroupExMapper.queryGroupNameList();
-        for(CarBizSupplier supplier : carBizSupplierList){
-            supplierMap.put(supplier.getSupplierId(),supplier.getSupplierFullName());
+        if(CollectionUtils.isNotEmpty(carBizSupplierList)){
+            for(CarBizSupplier supplier : carBizSupplierList){
+                supplierMap.put(supplier.getSupplierId(),supplier.getSupplierFullName());
+            }
         }
-        for(CarDriverTeamDTO teamDTO : listTeam){
-            supplierMap.put(teamDTO.getId(),teamDTO.getTeamName());
+        if(CollectionUtils.isNotEmpty(listTeam)){
+            for(CarDriverTeamDTO teamDTO : listTeam){
+                supplierMap.put(teamDTO.getId(),teamDTO.getTeamName());
+            }
         }
-        for(CarBizCooperationType type : cooperationTypeList){
-            cooperMap.put(type.getId(),type.getCooperationName());
+
+        if(CollectionUtils.isNotEmpty(cooperationTypeList)){
+            for(CarBizCooperationType type : cooperationTypeList){
+                cooperMap.put(type.getId(),type.getCooperationName());
+            }
         }
-        for(CarBizCarGroup carGroup : carGroupList){
-            carGroupMap.put(carGroup.getGroupId(),carGroup.getGroupName());
+
+        if(CollectionUtils.isNotEmpty(carGroupList)){
+            for(CarBizCarGroup carGroup : carGroupList){
+                carGroupMap.put(carGroup.getGroupId(),carGroup.getGroupName());
+            }
         }
+
 
         String table = SaasConst.MONTHTABLE + month.replace("-","_");
 
