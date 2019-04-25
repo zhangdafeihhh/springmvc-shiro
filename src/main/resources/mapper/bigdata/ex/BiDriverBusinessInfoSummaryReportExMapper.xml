@@ -53,24 +53,15 @@
         and city_id = #{cityId,jdbcType=INTEGER}
       </if>
       <if test="supplierId != null and supplierId != ''">
-        and supplier_id IN
-        <foreach collection="supplierId" open="(" close=")" separator="," item="supplier" >
-          #{supplier}
-        </foreach>
+        and supplier_id = #{supplierId,jdbcType=INTEGER}
       </if>
       <if test="driverTeamId != null and driverTeamId != ''">
-        and team_id IN
-        <foreach collection="driverTeamId" open="(" close=")" separator="," item="teamId" >
-          #{teamId}
-        </foreach>
+        and team_id = #{driverTeamId,jdbcType=INTEGER}
       </if>
 
 
       <if test="driverGroupId != null and driverGroupId != ''">
-        and driver_group_id IN
-        <foreach collection="driverGroupId" open="(" close=")" separator="," item="groupId" >
-          #{groupId}
-        </foreach>
+        and driver_group_id = #{driverGroupId,jdbcType=INTEGER}
       </if>
 
       <if test="driverPhone != null and driverPhone != ''">
