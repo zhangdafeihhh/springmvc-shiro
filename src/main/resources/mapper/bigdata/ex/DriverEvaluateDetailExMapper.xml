@@ -18,7 +18,7 @@
     evaluate_score driverScore,
     driver_city_name driverCityName,
     evaluate_date evaluateTime,
-    case when driver_type = '5' then '自营' when driver_type is null then '' else '加盟' end  as driverTypeName,
+    driver_type_name driverTypeName,
     supplier_name allianceName,
     team_name motorcardName,
     driver_group_name className,
@@ -43,7 +43,9 @@
     platform_memo appRemark,
     platform osName,
     sys_version osVersion,
-    superintend_no supervisorNo
+    superintend_no supervisorNo,
+    service_type_id serviceTypeId,
+    service_type_name serviceTypeName
     FROM
     ${tableName}
     <where>
@@ -108,6 +110,9 @@
         <if test="orderCityId != null">
           AND order_city_id = #{orderCityId}
         </if>
+      </if>
+      <if test="serviceTypeId != null">
+        AND service_type_id = #{serviceTypeId}
       </if>
     </where>
   </select>
