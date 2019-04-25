@@ -297,6 +297,7 @@ public class HomeKanBanController {
 			}
 			String date = LocalDate.now().minusMonths(1).toString();
 			List<SAASDriverRankingDto> driverRankingSections = driverRankDetaiExlMapper.getDriverRanking(allianceId,motorcadeId,orderByColumnCode,orderByTypeCode,Integer.parseInt(topNum),visibleList,visibleMotoIdsList,date);
+			logger.info("司机排名统计查询数据库");
 			return AjaxResponse.success(driverRankingSections);
 		}catch (Exception e){
 			logger.error("查询首页日均运营车辆统计错误异常", e);
@@ -432,6 +433,7 @@ public class HomeKanBanController {
 	}
 
 	private SAASIndexQuery setVisibleData(){
+		logger.info("大数据接口迁移，组装数据");
 		SAASIndexQuery saas = new SAASIndexQuery();
 		// 供应商信息
 		String[] visibleAllianceIds = null;
