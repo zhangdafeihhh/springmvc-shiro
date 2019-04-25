@@ -20,6 +20,7 @@ import com.zhuanche.entity.bigdata.BiDriverBusinessInfoMonthReport;
 import com.zhuanche.entity.bigdata.BiDriverBusinessInfoSummaryReport;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.entity.rentcar.CarBizCooperationType;
+import com.zhuanche.entity.rentcar.CarBizModel;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -33,6 +34,7 @@ import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCooperationTypeExMapper;
+import mapper.rentcar.ex.CarBizModelExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -88,10 +90,10 @@ public class SaasDriverDailyReportController {
 
 
     @Autowired
-    private CarBizCooperationTypeExMapper cooperationTypeExMapper;
+    private CarBizModelExMapper carBizModelExMapper;  //具体车型
 
     @Autowired
-    private CarBizCarGroupExMapper carBizCarGroupExMapper;
+    private CarBizCarGroupExMapper carBizCarGroupExMapper;//司机服务类型
 
 
     @ResponseBody
@@ -117,7 +119,7 @@ public class SaasDriverDailyReportController {
         List<CarDriverTeamDTO> listTeam = null;
         Map<Integer,String> supplierMap = Maps.newHashMap();
         Map<Integer,String> teamMap = Maps.newHashMap();
-        Map<Integer,String> cooperMap = Maps.newHashMap();
+        Map<Integer,String> modelMap = Maps.newHashMap();
         Map<Integer,String> carGroupMap = Maps.newHashMap();
         if(StringUtils.isEmpty(supplierId)){
             //根据城市查询所有的供应商
@@ -150,7 +152,7 @@ public class SaasDriverDailyReportController {
             }
         }
 
-        List<CarBizCooperationType> cooperationTypeList = cooperationTypeExMapper.queryCarBizCooperationTypeList();
+        List<CarBizModel> carBizModelList = carBizModelExMapper.queryAllList();
         List<CarBizCarGroup> carGroupList = carBizCarGroupExMapper.queryGroupNameList();
         if(CollectionUtils.isNotEmpty(carBizSupplierList)){
             for(CarBizSupplier supplier : carBizSupplierList){
@@ -164,9 +166,9 @@ public class SaasDriverDailyReportController {
             }
         }
 
-        if(CollectionUtils.isNotEmpty(cooperationTypeList)){
-            for(CarBizCooperationType type : cooperationTypeList){
-                cooperMap.put(type.getId(),type.getCooperationName());
+        if(CollectionUtils.isNotEmpty(carBizModelList)){
+            for(CarBizModel type : carBizModelList){
+                modelMap.put(type.getModelId(),type.getModelName());
             }
         }
 
@@ -223,8 +225,8 @@ public class SaasDriverDailyReportController {
             dto.setCityName(cityName);
             dto.setSupplierName(StringUtils.isEmpty(supplierName)?supplierMap.get(dto.getSupplierId()):supplierName);
             dto.setDriverTeamName(StringUtils.isEmpty(teamName)?teamMap.get(dto.getDriverTeamId()):teamName);
-            dto.setDriverGroupName(StringUtils.isEmpty(driverGroupName)?teamMap.get(dto.getDriverGroupId()):driverGroupName);
-            dto.setCooperateName(cooperMap.get(dto.getCooperationType()));
+            dto.setDriverGroupName(modelMap.get(dto.getCooperationType()));
+            dto.setCooperateName(StringUtils.isEmpty(driverGroupName)?teamMap.get(dto.getDriverGroupId()):driverGroupName);
             dto.setCarGroupName(carGroupMap.get(dto.getCarGroupId()));
         }
         PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, dailyDtoList);
@@ -387,7 +389,7 @@ public class SaasDriverDailyReportController {
             }
         }
 
-        List<CarBizCooperationType> cooperationTypeList = cooperationTypeExMapper.queryCarBizCooperationTypeList();
+        List<CarBizModel> modelList = carBizModelExMapper.queryAllList();
         List<CarBizCarGroup> carGroupList = carBizCarGroupExMapper.queryGroupNameList();
         if(CollectionUtils.isNotEmpty(carBizSupplierList)){
             for(CarBizSupplier supplier : carBizSupplierList){
@@ -401,9 +403,9 @@ public class SaasDriverDailyReportController {
             }
         }
 
-        if(CollectionUtils.isNotEmpty(cooperationTypeList)){
-            for(CarBizCooperationType type : cooperationTypeList){
-                cooperMap.put(type.getId(),type.getCooperationName());
+        if(CollectionUtils.isNotEmpty(modelList)){
+            for(CarBizModel type : modelList){
+                cooperMap.put(type.getModelId(),type.getModelName());
             }
         }
 
@@ -444,8 +446,8 @@ public class SaasDriverDailyReportController {
             dto.setCityName(cityName);
             dto.setSupplierName(StringUtils.isEmpty(supplierName)?supplierMap.get(dto.getSupplierId()):supplierName);
             dto.setDriverTeamName(StringUtils.isEmpty(teamName)?teamMap.get(dto.getDriverTeamId()):teamName);
-            dto.setDriverGroupName(StringUtils.isEmpty(driverGroupName)?teamMap.get(dto.getDriverGroupId()):driverGroupName);
-            dto.setCooperateName(cooperMap.get(dto.getCooperationType()));
+            dto.setDriverGroupName(cooperMap.get(dto.getCooperationType()));
+            dto.setCooperateName(StringUtils.isEmpty(driverGroupName)?teamMap.get(dto.getDriverGroupId()):driverGroupName);
             dto.setCarGroupName(carGroupMap.get(dto.getCarGroupId()));
         }
         PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, monthDtoList);
@@ -592,7 +594,7 @@ public class SaasDriverDailyReportController {
             }
         }
 
-        List<CarBizCooperationType> cooperationTypeList = cooperationTypeExMapper.queryCarBizCooperationTypeList();
+        List<CarBizModel> carBizModelList = carBizModelExMapper.queryAllList();
         List<CarBizCarGroup> carGroupList = carBizCarGroupExMapper.queryGroupNameList();
         if(CollectionUtils.isNotEmpty(carBizSupplierList)){
             for(CarBizSupplier supplier : carBizSupplierList){
@@ -606,9 +608,9 @@ public class SaasDriverDailyReportController {
             }
         }
 
-        if(CollectionUtils.isNotEmpty(cooperationTypeList)){
-            for(CarBizCooperationType type : cooperationTypeList){
-                cooperMap.put(type.getId(),type.getCooperationName());
+        if(CollectionUtils.isNotEmpty(carBizModelList)){
+            for(CarBizModel type : carBizModelList){
+                cooperMap.put(type.getModelId(),type.getModelName());
             }
         }
 
@@ -650,8 +652,8 @@ public class SaasDriverDailyReportController {
             dto.setCityName(cityName);
             dto.setSupplierName(StringUtils.isEmpty(supplierName)?supplierMap.get(dto.getSupplierId()):supplierName);
             dto.setDriverTeamName(StringUtils.isEmpty(teamName)?teamMap.get(dto.getDriverTeamId()):teamName);
-            dto.setDriverGroupName(StringUtils.isEmpty(driverGroupName)?teamMap.get(dto.getDriverGroupId()):driverGroupName);
-            dto.setCooperateName(cooperMap.get(dto.getCooperationType()));
+            dto.setDriverGroupName(cooperMap.get(dto.getCooperationType()));
+            dto.setCooperateName(StringUtils.isEmpty(driverGroupName)?teamMap.get(dto.getDriverGroupId()):driverGroupName);
             dto.setCarGroupName(carGroupMap.get(dto.getCarGroupId()));
         }
         PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, summaryReportDTOList);
