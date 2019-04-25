@@ -18,6 +18,13 @@
     <result column="vehicle_age" property="vehicleAge" jdbcType="INTEGER" />
     <result column="mileage" property="mileage" jdbcType="INTEGER" />
     <result column="vehicle_properties" property="vehicleProperties" jdbcType="INTEGER" />
+    <result column="source_funds_id" property="sourceFundsId" jdbcType="INTEGER" />
+    <result column="lease_term" property="leaseTerm" jdbcType="INTEGER" />
+    <result column="rent_every_term" property="rentEveryTerm" jdbcType="DECIMAL" />
+    <result column="front_money" property="frontMoney" jdbcType="DECIMAL" />
+    <result column="first_rent" property="firstRent" jdbcType="DECIMAL" />
+    <result column="security_deposit" property="securityDeposit" jdbcType="DECIMAL" />
+    <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
     <result column="color" property="color" jdbcType="VARCHAR" />
     <result column="additional_services_id" property="additionalServicesId" jdbcType="VARCHAR" />
     <result column="additional_services_info" property="additionalServicesInfo" jdbcType="VARCHAR" />
@@ -32,7 +39,8 @@
   <sql id="Base_Column_List" >
     goods_id, basics_vehicles_id, goods_number, goods_name, sales_target, goods_type, 
     supplier_id, city_id, channel, reason, explain, picture_url, keyword, vehicle_age, 
-    mileage, vehicle_properties, color, additional_services_id, additional_services_info, 
+    mileage, vehicle_properties, source_funds_id, lease_term, rent_every_term, front_money, 
+    first_rent, security_deposit, total_price, color, additional_services_id, additional_services_info, 
     vehicle_style, stock, status, create_by, create_time, update_by, update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
@@ -51,19 +59,25 @@
       supplier_id, city_id, channel, 
       reason, explain, picture_url, 
       keyword, vehicle_age, mileage, 
-      vehicle_properties, color, additional_services_id, 
-      additional_services_info, vehicle_style, stock, 
-      status, create_by, create_time, 
-      update_by, update_time)
+      vehicle_properties, source_funds_id, lease_term, 
+      rent_every_term, front_money, first_rent, 
+      security_deposit, total_price, color, 
+      additional_services_id, additional_services_info, 
+      vehicle_style, stock, status, 
+      create_by, create_time, update_by, 
+      update_time)
     values (#{goodsId,jdbcType=INTEGER}, #{basicsVehiclesId,jdbcType=INTEGER}, #{goodsNumber,jdbcType=VARCHAR}, 
       #{goodsName,jdbcType=VARCHAR}, #{salesTarget,jdbcType=TINYINT}, #{goodsType,jdbcType=TINYINT}, 
       #{supplierId,jdbcType=INTEGER}, #{cityId,jdbcType=INTEGER}, #{channel,jdbcType=VARCHAR}, 
       #{reason,jdbcType=VARCHAR}, #{explain,jdbcType=VARCHAR}, #{pictureUrl,jdbcType=VARCHAR}, 
       #{keyword,jdbcType=VARCHAR}, #{vehicleAge,jdbcType=INTEGER}, #{mileage,jdbcType=INTEGER}, 
-      #{vehicleProperties,jdbcType=INTEGER}, #{color,jdbcType=VARCHAR}, #{additionalServicesId,jdbcType=VARCHAR}, 
-      #{additionalServicesInfo,jdbcType=VARCHAR}, #{vehicleStyle,jdbcType=INTEGER}, #{stock,jdbcType=INTEGER}, 
-      #{status,jdbcType=TINYINT}, #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+      #{vehicleProperties,jdbcType=INTEGER}, #{sourceFundsId,jdbcType=INTEGER}, #{leaseTerm,jdbcType=INTEGER}, 
+      #{rentEveryTerm,jdbcType=DECIMAL}, #{frontMoney,jdbcType=DECIMAL}, #{firstRent,jdbcType=DECIMAL}, 
+      #{securityDeposit,jdbcType=DECIMAL}, #{totalPrice,jdbcType=DECIMAL}, #{color,jdbcType=VARCHAR}, 
+      #{additionalServicesId,jdbcType=VARCHAR}, #{additionalServicesInfo,jdbcType=VARCHAR}, 
+      #{vehicleStyle,jdbcType=INTEGER}, #{stock,jdbcType=INTEGER}, #{status,jdbcType=TINYINT}, 
+      #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.FinancialGoods" >
     insert into financial_goods
@@ -115,6 +129,27 @@
       </if>
       <if test="vehicleProperties != null" >
         vehicle_properties,
+      </if>
+      <if test="sourceFundsId != null" >
+        source_funds_id,
+      </if>
+      <if test="leaseTerm != null" >
+        lease_term,
+      </if>
+      <if test="rentEveryTerm != null" >
+        rent_every_term,
+      </if>
+      <if test="frontMoney != null" >
+        front_money,
+      </if>
+      <if test="firstRent != null" >
+        first_rent,
+      </if>
+      <if test="securityDeposit != null" >
+        security_deposit,
+      </if>
+      <if test="totalPrice != null" >
+        total_price,
       </if>
       <if test="color != null" >
         color,
@@ -196,6 +231,27 @@
       <if test="vehicleProperties != null" >
         #{vehicleProperties,jdbcType=INTEGER},
       </if>
+      <if test="sourceFundsId != null" >
+        #{sourceFundsId,jdbcType=INTEGER},
+      </if>
+      <if test="leaseTerm != null" >
+        #{leaseTerm,jdbcType=INTEGER},
+      </if>
+      <if test="rentEveryTerm != null" >
+        #{rentEveryTerm,jdbcType=DECIMAL},
+      </if>
+      <if test="frontMoney != null" >
+        #{frontMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="firstRent != null" >
+        #{firstRent,jdbcType=DECIMAL},
+      </if>
+      <if test="securityDeposit != null" >
+        #{securityDeposit,jdbcType=DECIMAL},
+      </if>
+      <if test="totalPrice != null" >
+        #{totalPrice,jdbcType=DECIMAL},
+      </if>
       <if test="color != null" >
         #{color,jdbcType=VARCHAR},
       </if>
@@ -276,6 +332,27 @@
       <if test="vehicleProperties != null" >
         vehicle_properties = #{vehicleProperties,jdbcType=INTEGER},
       </if>
+      <if test="sourceFundsId != null" >
+        source_funds_id = #{sourceFundsId,jdbcType=INTEGER},
+      </if>
+      <if test="leaseTerm != null" >
+        lease_term = #{leaseTerm,jdbcType=INTEGER},
+      </if>
+      <if test="rentEveryTerm != null" >
+        rent_every_term = #{rentEveryTerm,jdbcType=DECIMAL},
+      </if>
+      <if test="frontMoney != null" >
+        front_money = #{frontMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="firstRent != null" >
+        first_rent = #{firstRent,jdbcType=DECIMAL},
+      </if>
+      <if test="securityDeposit != null" >
+        security_deposit = #{securityDeposit,jdbcType=DECIMAL},
+      </if>
+      <if test="totalPrice != null" >
+        total_price = #{totalPrice,jdbcType=DECIMAL},
+      </if>
       <if test="color != null" >
         color = #{color,jdbcType=VARCHAR},
       </if>
@@ -326,6 +403,13 @@
       vehicle_age = #{vehicleAge,jdbcType=INTEGER},
       mileage = #{mileage,jdbcType=INTEGER},
       vehicle_properties = #{vehicleProperties,jdbcType=INTEGER},
+      source_funds_id = #{sourceFundsId,jdbcType=INTEGER},
+      lease_term = #{leaseTerm,jdbcType=INTEGER},
+      rent_every_term = #{rentEveryTerm,jdbcType=DECIMAL},
+      front_money = #{frontMoney,jdbcType=DECIMAL},
+      first_rent = #{firstRent,jdbcType=DECIMAL},
+      security_deposit = #{securityDeposit,jdbcType=DECIMAL},
+      total_price = #{totalPrice,jdbcType=DECIMAL},
       color = #{color,jdbcType=VARCHAR},
       additional_services_id = #{additionalServicesId,jdbcType=VARCHAR},
       additional_services_info = #{additionalServicesInfo,jdbcType=VARCHAR},

@@ -1,5 +1,6 @@
 package com.zhuanche.entity.driver;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class FinancialGoods {
@@ -34,6 +35,20 @@ public class FinancialGoods {
     private Integer mileage;
 
     private Integer vehicleProperties;
+
+    private Integer sourceFundsId;
+
+    private Integer leaseTerm;
+
+    private BigDecimal rentEveryTerm;
+
+    private BigDecimal frontMoney;
+
+    private BigDecimal firstRent;
+
+    private BigDecimal securityDeposit;
+
+    private BigDecimal totalPrice;
 
     private String color;
 
@@ -181,6 +196,62 @@ public class FinancialGoods {
 
     public void setVehicleProperties(Integer vehicleProperties) {
         this.vehicleProperties = vehicleProperties;
+    }
+
+    public Integer getSourceFundsId() {
+        return sourceFundsId;
+    }
+
+    public void setSourceFundsId(Integer sourceFundsId) {
+        this.sourceFundsId = sourceFundsId;
+    }
+
+    public Integer getLeaseTerm() {
+        return leaseTerm;
+    }
+
+    public void setLeaseTerm(Integer leaseTerm) {
+        this.leaseTerm = leaseTerm;
+    }
+
+    public BigDecimal getRentEveryTerm() {
+        return rentEveryTerm;
+    }
+
+    public void setRentEveryTerm(BigDecimal rentEveryTerm) {
+        this.rentEveryTerm = rentEveryTerm;
+    }
+
+    public BigDecimal getFrontMoney() {
+        return frontMoney;
+    }
+
+    public void setFrontMoney(BigDecimal frontMoney) {
+        this.frontMoney = frontMoney;
+    }
+
+    public BigDecimal getFirstRent() {
+        return firstRent;
+    }
+
+    public void setFirstRent(BigDecimal firstRent) {
+        this.firstRent = firstRent;
+    }
+
+    public BigDecimal getSecurityDeposit() {
+        return securityDeposit;
+    }
+
+    public void setSecurityDeposit(BigDecimal securityDeposit) {
+        this.securityDeposit = securityDeposit;
+    }
+
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
     }
 
     public String getColor() {
