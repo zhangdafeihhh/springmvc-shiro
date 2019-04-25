@@ -1,5 +1,7 @@
 package com.zhuanche.entity.bigdata;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.math.BigDecimal;
 
 public class BiDriverBusinessInfoDayReport {
@@ -140,7 +142,7 @@ public class BiDriverBusinessInfoDayReport {
     }
 
     public void setUpOnlineTime(String upOnlineTime) {
-        this.upOnlineTime = upOnlineTime == null ? null : upOnlineTime.trim();
+        this.upOnlineTime = StringUtils.isEmpty(upOnlineTime) ? null : upOnlineTime.trim().substring(0,upOnlineTime.indexOf("."));
     }
 
     public String getDownOnlineTime() {
@@ -148,7 +150,7 @@ public class BiDriverBusinessInfoDayReport {
     }
 
     public void setDownOnlineTime(String downOnlineTime) {
-        this.downOnlineTime = downOnlineTime == null ? null : downOnlineTime.trim();
+        this.downOnlineTime = StringUtils.isEmpty(downOnlineTime) ? null : downOnlineTime.trim().substring(0,downOnlineTime.indexOf("."));
     }
 
     public BigDecimal getAllTime() {
