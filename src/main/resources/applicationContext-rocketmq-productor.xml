@@ -16,5 +16,9 @@
 	<bean id="dingdingSupplierAndTeamProducer"  class="com.zhuanche.common.rocketmq.DingdingSupplierAndTeamProducer" init-method="init" destroy-method="destroy" scope="singleton">
 		<property name="namesrvAddr" value="${rocketmq.dingdingNamesrvAddr}"/>
 	</bean>
+
+	<bean id="excelProducer" class="com.zhuanche.common.rocketmq.ExcelProducer" init-method="init" destroy-method="destroy" scope="singleton">
+		<property name="namesrvAddr" value="${rocketmq.excelNamesrvAddr}"/>
+	</bean>
 <!-- 新的配置方式END -->
 </beans>

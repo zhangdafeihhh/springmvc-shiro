@@ -26,4 +26,7 @@ public interface CarAdmUserExMapper {
     List<Integer> queryIdListByName(@Param("userName") String createUser);
 
     String queryNameById(@Param("userId")Integer userId);
+
+    int updateEmail(@Param("email")String email,@Param("userId")Integer userId);
+
 }

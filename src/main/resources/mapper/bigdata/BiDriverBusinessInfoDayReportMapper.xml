@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.bigdata.BiDriverBusinessInfoDayReportMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.bigdata.BiDriverBusinessInfoDayReport" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="data_date" property="dataDate" jdbcType="VARCHAR" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="driver_phone" property="driverPhone" jdbcType="VARCHAR" />
+    <result column="cooperation_type" property="cooperationType" jdbcType="INTEGER" />
+    <result column="license_plates" property="licensePlates" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="driver_team_id" property="driverTeamId" jdbcType="INTEGER" />
+    <result column="driver_group_id" property="driverGroupId" jdbcType="INTEGER" />
+    <result column="car_group_id" property="carGroupId" jdbcType="INTEGER" />
+    <result column="up_online_time" property="upOnlineTime" jdbcType="VARCHAR" />
+    <result column="down_online_time" property="downOnlineTime" jdbcType="VARCHAR" />
+    <result column="all_time" property="allTime" jdbcType="DECIMAL" />
+    <result column="business_volume" property="businessVolume" jdbcType="DECIMAL" />
+    <result column="fin_ord_cnt" property="finOrdCnt" jdbcType="INTEGER" />
+    <result column="bad_cnt" property="badCnt" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, data_date, driver_id, driver_name, driver_phone, cooperation_type, license_plates, 
+    city_id, supplier_id, driver_team_id, driver_group_id, car_group_id, up_online_time, 
+    down_online_time, all_time, business_volume, fin_ord_cnt, bad_cnt
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bi_driver_business_info_day_report_2019_04
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <insert id="insert" parameterType="com.zhuanche.entity.bigdata.BiDriverBusinessInfoDayReport" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into bi_driver_business_info_day_report_2019_04 (data_date, driver_id, driver_name, 
+      driver_phone, cooperation_type, license_plates, 
+      city_id, supplier_id, driver_team_id, 
+      driver_group_id, car_group_id, up_online_time, 
+      down_online_time, all_time, business_volume, 
+      fin_ord_cnt, bad_cnt)
+    values (#{dataDate,jdbcType=VARCHAR}, #{driverId,jdbcType=INTEGER}, #{driverName,jdbcType=VARCHAR}, 
+      #{driverPhone,jdbcType=VARCHAR}, #{cooperationType,jdbcType=INTEGER}, #{licensePlates,jdbcType=VARCHAR}, 
+      #{cityId,jdbcType=INTEGER}, #{supplierId,jdbcType=INTEGER}, #{driverTeamId,jdbcType=INTEGER}, 
+      #{driverGroupId,jdbcType=INTEGER}, #{carGroupId,jdbcType=INTEGER}, #{upOnlineTime,jdbcType=VARCHAR}, 
+      #{downOnlineTime,jdbcType=VARCHAR}, #{allTime,jdbcType=DECIMAL}, #{businessVolume,jdbcType=DECIMAL}, 
+      #{finOrdCnt,jdbcType=INTEGER}, #{badCnt,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.bigdata.BiDriverBusinessInfoDayReport" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into bi_driver_business_info_day_report_2019_04
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="dataDate != null" >
+        data_date,
+      </if>
+      <if test="driverId != null" >
+        driver_id,
+      </if>
+      <if test="driverName != null" >
+        driver_name,
+      </if>
+      <if test="driverPhone != null" >
+        driver_phone,
+      </if>
+      <if test="cooperationType != null" >
+        cooperation_type,
+      </if>
+      <if test="licensePlates != null" >
+        license_plates,
+      </if>
+      <if test="cityId != null" >
+        city_id,
+      </if>
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="driverTeamId != null" >
+        driver_team_id,
+      </if>
+      <if test="driverGroupId != null" >
+        driver_group_id,
+      </if>
+      <if test="carGroupId != null" >
+        car_group_id,
+      </if>
+      <if test="upOnlineTime != null" >
+        up_online_time,
+      </if>
+      <if test="downOnlineTime != null" >
+        down_online_time,
+      </if>
+      <if test="allTime != null" >
+        all_time,
+      </if>
+      <if test="businessVolume != null" >
+        business_volume,
+      </if>
+      <if test="finOrdCnt != null" >
+        fin_ord_cnt,
+      </if>
+      <if test="badCnt != null" >
+        bad_cnt,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="dataDate != null" >
+        #{dataDate,jdbcType=VARCHAR},
+      </if>
+      <if test="driverId != null" >
+        #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="driverName != null" >
+        #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="driverPhone != null" >
+        #{driverPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="cooperationType != null" >
+        #{cooperationType,jdbcType=INTEGER},
+      </if>
+      <if test="licensePlates != null" >
+        #{licensePlates,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="driverTeamId != null" >
+        #{driverTeamId,jdbcType=INTEGER},
+      </if>
+      <if test="driverGroupId != null" >
+        #{driverGroupId,jdbcType=INTEGER},
+      </if>
+      <if test="carGroupId != null" >
+        #{carGroupId,jdbcType=INTEGER},
+      </if>
+      <if test="upOnlineTime != null" >
+        #{upOnlineTime,jdbcType=VARCHAR},
+      </if>
+      <if test="downOnlineTime != null" >
+        #{downOnlineTime,jdbcType=VARCHAR},
+      </if>
+      <if test="allTime != null" >
+        #{allTime,jdbcType=DECIMAL},
+      </if>
+      <if test="businessVolume != null" >
+        #{businessVolume,jdbcType=DECIMAL},
+      </if>
+      <if test="finOrdCnt != null" >
+        #{finOrdCnt,jdbcType=INTEGER},
+      </if>
+      <if test="badCnt != null" >
+        #{badCnt,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.bigdata.BiDriverBusinessInfoDayReport" >
+    update bi_driver_business_info_day_report_2019_04
+    <set >
+      <if test="dataDate != null" >
+        data_date = #{dataDate,jdbcType=VARCHAR},
+      </if>
+      <if test="driverId != null" >
+        driver_id = #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="driverName != null" >
+        driver_name = #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="driverPhone != null" >
+        driver_phone = #{driverPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="cooperationType != null" >
+        cooperation_type = #{cooperationType,jdbcType=INTEGER},
+      </if>
+      <if test="licensePlates != null" >
+        license_plates = #{licensePlates,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="driverTeamId != null" >
+        driver_team_id = #{driverTeamId,jdbcType=INTEGER},
+      </if>
+      <if test="driverGroupId != null" >
+        driver_group_id = #{driverGroupId,jdbcType=INTEGER},
+      </if>
+      <if test="carGroupId != null" >
+        car_group_id = #{carGroupId,jdbcType=INTEGER},
+      </if>
+      <if test="upOnlineTime != null" >
+        up_online_time = #{upOnlineTime,jdbcType=VARCHAR},
+      </if>
+      <if test="downOnlineTime != null" >
+        down_online_time = #{downOnlineTime,jdbcType=VARCHAR},
+      </if>
+      <if test="allTime != null" >
+        all_time = #{allTime,jdbcType=DECIMAL},
+      </if>
+      <if test="businessVolume != null" >
+        business_volume = #{businessVolume,jdbcType=DECIMAL},
+      </if>
+      <if test="finOrdCnt != null" >
+        fin_ord_cnt = #{finOrdCnt,jdbcType=INTEGER},
+      </if>
+      <if test="badCnt != null" >
+        bad_cnt = #{badCnt,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.bigdata.BiDriverBusinessInfoDayReport" >
+    update bi_driver_business_info_day_report_2019_04
+    set data_date = #{dataDate,jdbcType=VARCHAR},
+      driver_id = #{driverId,jdbcType=INTEGER},
+      driver_name = #{driverName,jdbcType=VARCHAR},
+      driver_phone = #{driverPhone,jdbcType=VARCHAR},
+      cooperation_type = #{cooperationType,jdbcType=INTEGER},
+      license_plates = #{licensePlates,jdbcType=VARCHAR},
+      city_id = #{cityId,jdbcType=INTEGER},
+      supplier_id = #{supplierId,jdbcType=INTEGER},
+      driver_team_id = #{driverTeamId,jdbcType=INTEGER},
+      driver_group_id = #{driverGroupId,jdbcType=INTEGER},
+      car_group_id = #{carGroupId,jdbcType=INTEGER},
+      up_online_time = #{upOnlineTime,jdbcType=VARCHAR},
+      down_online_time = #{downOnlineTime,jdbcType=VARCHAR},
+      all_time = #{allTime,jdbcType=DECIMAL},
+      business_volume = #{businessVolume,jdbcType=DECIMAL},
+      fin_ord_cnt = #{finOrdCnt,jdbcType=INTEGER},
+      bad_cnt = #{badCnt,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
