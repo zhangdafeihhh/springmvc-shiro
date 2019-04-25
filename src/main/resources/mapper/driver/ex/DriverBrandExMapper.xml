@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.ex.DriverBrandExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.DriverBrand" >
+    <id column="ID" property="id" jdbcType="BIGINT" />
+    <result column="BRAND_NAME" property="brandName" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="TINYINT" />
+    <result column="BRAND_LOGO" property="brandLogo" jdbcType="VARCHAR" />
+    <result column="BRAND_TYPE" property="brandType" jdbcType="INTEGER" />
+    <result column="BRAND_SPELL" property="brandSpell" jdbcType="VARCHAR" />
+    <result column="CREATE_DATE" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="UPDATE_DATE" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, BRAND_NAME, STATUS, BRAND_LOGO, BRAND_TYPE, BRAND_SPELL, CREATE_DATE, UPDATE_DATE, 
+    REMARK
+  </sql>
+  <select id="queryDriverBrandList" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from driver_brand
+  </select>
+</mapper>

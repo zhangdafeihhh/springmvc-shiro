@@ -8,9 +8,9 @@ public class FinancialBasicsVehicles {
 
     private String vehiclesDetailedName;
 
-    private Integer brandId;
+    private Long brandId;
 
-    private Integer modelId;
+    private Long modelId;
 
     private String vehicleStyle;
 
@@ -68,19 +68,19 @@ public class FinancialBasicsVehicles {
         this.vehiclesDetailedName = vehiclesDetailedName == null ? null : vehiclesDetailedName.trim();
     }
 
-    public Integer getBrandId() {
+    public Long getBrandId() {
         return brandId;
     }
 
-    public void setBrandId(Integer brandId) {
+    public void setBrandId(Long brandId) {
         this.brandId = brandId;
     }
 
-    public Integer getModelId() {
+    public Long getModelId() {
         return modelId;
     }
 
-    public void setModelId(Integer modelId) {
+    public void setModelId(Long modelId) {
         this.modelId = modelId;
     }
 

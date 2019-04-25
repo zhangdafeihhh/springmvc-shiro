@@ -235,7 +235,7 @@ public final class RestErrorCode{
 	//-------------------金融商品--start-------------------------
 	
 	@ResultMessage("查询车型库信息失败")
-	public static final int QUERY_BASICSVEHICLE_ERROR=20001;
+	public static final int QUERY_BASICSVEHICLE_ERROR=80001;
 	
 	//-------------------金融商品--end---------------------------
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);

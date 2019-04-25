@@ -4,8 +4,8 @@
   <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.FinancialBasicsVehicles" >
     <id column="basics_vehicles_id" property="basicsVehiclesId" jdbcType="INTEGER" />
     <result column="vehicles_detailed_name" property="vehiclesDetailedName" jdbcType="VARCHAR" />
-    <result column="brand_id" property="brandId" jdbcType="INTEGER" />
-    <result column="model_id" property="modelId" jdbcType="INTEGER" />
+    <result column="brand_id" property="brandId" jdbcType="BIGINT" />
+    <result column="model_id" property="modelId" jdbcType="BIGINT" />
     <result column="vehicle_style" property="vehicleStyle" jdbcType="VARCHAR" />
     <result column="year_style" property="yearStyle" jdbcType="VARCHAR" />
     <result column="energy_type" property="energyType" jdbcType="INTEGER" />
@@ -55,7 +55,7 @@
       enable_status, create_by, create_time, 
       update_by, update_time)
     values (#{basicsVehiclesId,jdbcType=INTEGER}, #{vehiclesDetailedName,jdbcType=VARCHAR}, 
-      #{brandId,jdbcType=INTEGER}, #{modelId,jdbcType=INTEGER}, #{vehicleStyle,jdbcType=VARCHAR}, 
+      #{brandId,jdbcType=BIGINT}, #{modelId,jdbcType=BIGINT}, #{vehicleStyle,jdbcType=VARCHAR}, 
       #{yearStyle,jdbcType=VARCHAR}, #{energyType,jdbcType=INTEGER}, #{variableBox,jdbcType=INTEGER}, 
       #{guidancePrice,jdbcType=DECIMAL}, #{discharge,jdbcType=INTEGER}, #{mileage,jdbcType=INTEGER}, 
       #{autoHomeUrl,jdbcType=VARCHAR}, #{lengthWidthHeight,jdbcType=VARCHAR}, #{qualityAssurance,jdbcType=VARCHAR}, 
@@ -148,10 +148,10 @@
         #{vehiclesDetailedName,jdbcType=VARCHAR},
       </if>
       <if test="brandId != null" >
-        #{brandId,jdbcType=INTEGER},
+        #{brandId,jdbcType=BIGINT},
       </if>
       <if test="modelId != null" >
-        #{modelId,jdbcType=INTEGER},
+        #{modelId,jdbcType=BIGINT},
       </if>
       <if test="vehicleStyle != null" >
         #{vehicleStyle,jdbcType=VARCHAR},
@@ -222,10 +222,10 @@
         vehicles_detailed_name = #{vehiclesDetailedName,jdbcType=VARCHAR},
       </if>
       <if test="brandId != null" >
-        brand_id = #{brandId,jdbcType=INTEGER},
+        brand_id = #{brandId,jdbcType=BIGINT},
       </if>
       <if test="modelId != null" >
-        model_id = #{modelId,jdbcType=INTEGER},
+        model_id = #{modelId,jdbcType=BIGINT},
       </if>
       <if test="vehicleStyle != null" >
         vehicle_style = #{vehicleStyle,jdbcType=VARCHAR},
@@ -293,8 +293,8 @@
   <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.FinancialBasicsVehicles" >
     update financial_basics_vehicles
     set vehicles_detailed_name = #{vehiclesDetailedName,jdbcType=VARCHAR},
-      brand_id = #{brandId,jdbcType=INTEGER},
-      model_id = #{modelId,jdbcType=INTEGER},
+      brand_id = #{brandId,jdbcType=BIGINT},
+      model_id = #{modelId,jdbcType=BIGINT},
       vehicle_style = #{vehicleStyle,jdbcType=VARCHAR},
       year_style = #{yearStyle,jdbcType=VARCHAR},
       energy_type = #{energyType,jdbcType=INTEGER},
