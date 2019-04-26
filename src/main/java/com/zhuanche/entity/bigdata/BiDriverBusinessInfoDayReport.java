@@ -142,7 +142,8 @@ public class BiDriverBusinessInfoDayReport {
     }
 
     public void setUpOnlineTime(String upOnlineTime) {
-        this.upOnlineTime = StringUtils.isEmpty(upOnlineTime) ? null : upOnlineTime.trim().substring(0,upOnlineTime.indexOf("."));
+        this.upOnlineTime = StringUtils.isEmpty(upOnlineTime) ? null :
+                upOnlineTime.indexOf(".") > 0 ? upOnlineTime.trim().substring(0,upOnlineTime.indexOf(".")) : upOnlineTime.trim();
     }
 
     public String getDownOnlineTime() {
@@ -150,7 +151,8 @@ public class BiDriverBusinessInfoDayReport {
     }
 
     public void setDownOnlineTime(String downOnlineTime) {
-        this.downOnlineTime = StringUtils.isEmpty(downOnlineTime) ? null : downOnlineTime.trim().substring(0,downOnlineTime.indexOf("."));
+        this.downOnlineTime = StringUtils.isEmpty(downOnlineTime) ? null :
+                downOnlineTime.indexOf(".") > 0 ? downOnlineTime.trim().substring(0,downOnlineTime.indexOf(".")) : downOnlineTime.trim();
     }
 
     public BigDecimal getAllTime() {
