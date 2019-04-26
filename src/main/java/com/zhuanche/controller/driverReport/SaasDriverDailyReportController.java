@@ -225,8 +225,8 @@ public class SaasDriverDailyReportController {
             dto.setCityName(cityName);
             dto.setSupplierName(StringUtils.isEmpty(supplierName)?supplierMap.get(dto.getSupplierId()):supplierName);
             dto.setDriverTeamName(StringUtils.isEmpty(teamName)?teamMap.get(dto.getDriverTeamId()):teamName);
-            dto.setDriverGroupName(modelMap.get(dto.getCooperationType()));
-            dto.setCooperateName(StringUtils.isEmpty(driverGroupName)?teamMap.get(dto.getDriverGroupId()):driverGroupName);
+            dto.setDriverGroupName(StringUtils.isEmpty(driverGroupName)?teamMap.get(dto.getDriverGroupId()):driverGroupName);
+            dto.setCooperateName(modelMap.get(dto.getCooperationType()));
             dto.setCarGroupName(carGroupMap.get(dto.getCarGroupId()));
         }
         PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, dailyDtoList);
@@ -446,8 +446,8 @@ public class SaasDriverDailyReportController {
             dto.setCityName(cityName);
             dto.setSupplierName(StringUtils.isEmpty(supplierName)?supplierMap.get(dto.getSupplierId()):supplierName);
             dto.setDriverTeamName(StringUtils.isEmpty(teamName)?teamMap.get(dto.getDriverTeamId()):teamName);
-            dto.setDriverGroupName(cooperMap.get(dto.getCooperationType()));
-            dto.setCooperateName(StringUtils.isEmpty(driverGroupName)?teamMap.get(dto.getDriverGroupId()):driverGroupName);
+            dto.setDriverGroupName(StringUtils.isEmpty(driverGroupName)?teamMap.get(dto.getDriverGroupId()):driverGroupName);
+            dto.setCooperateName(cooperMap.get(dto.getCooperationType()));
             dto.setCarGroupName(carGroupMap.get(dto.getCarGroupId()));
         }
         PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, monthDtoList);
@@ -652,8 +652,8 @@ public class SaasDriverDailyReportController {
             dto.setCityName(cityName);
             dto.setSupplierName(StringUtils.isEmpty(supplierName)?supplierMap.get(dto.getSupplierId()):supplierName);
             dto.setDriverTeamName(StringUtils.isEmpty(teamName)?teamMap.get(dto.getDriverTeamId()):teamName);
-            dto.setDriverGroupName(cooperMap.get(dto.getCooperationType()));
-            dto.setCooperateName(StringUtils.isEmpty(driverGroupName)?teamMap.get(dto.getDriverGroupId()):driverGroupName);
+            dto.setDriverGroupName(StringUtils.isEmpty(driverGroupName)?teamMap.get(dto.getDriverGroupId()):driverGroupName);
+            dto.setCooperateName(cooperMap.get(dto.getCooperationType()));
             dto.setCarGroupName(carGroupMap.get(dto.getCarGroupId()));
         }
         PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, summaryReportDTOList);
