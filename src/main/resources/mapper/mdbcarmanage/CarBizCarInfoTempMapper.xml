@@ -335,6 +335,9 @@
       <if test="memo != null" >
         memo,
       </if>
+      <if test="taxiInvoicePrint !=null and taxiInvoicePrint !=''">
+        taxi_invoice_print,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="cityId != null" >
@@ -522,6 +525,9 @@
       </if>
       <if test="memo != null" >
         #{memo,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="taxiInvoicePrint !=null and taxiInvoicePrint !=''">
+        #{taxiInvoicePrint},
       </if>
     </trim>
   </insert>
