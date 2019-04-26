@@ -2850,7 +2850,7 @@ public class CarInfoServiceImpl implements CarInfoService {
                 builder.append(carInfo.getMemo() == null ? "" : carInfo.getMemo()).append(",");
                 builder.append(carInfo.getDriverName() == null ? "" : carInfo.getDriverName()).append(",");
                 builder.append(carInfo.getVehicleOwner() == null ? "" : carInfo.getVehicleOwner()).append(",");
-                builder.append(carInfo.getVehicleType() == null ? "" : carInfo.getVehicleType());
+                builder.append(carInfo.getVehicleType() == null ? "" : carInfo.getVehicleType()).append(",");
 
                 Integer taxiInvoicePrint = carInfo.getTaxiInvoicePrint();
                 String  taxiInvoicePrintName = "未知";
