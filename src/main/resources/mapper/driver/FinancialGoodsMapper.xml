@@ -9,10 +9,12 @@
     <result column="sales_target" property="salesTarget" jdbcType="TINYINT" />
     <result column="goods_type" property="goodsType" jdbcType="TINYINT" />
     <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_full_name" property="supplierFullName" jdbcType="VARCHAR" />
     <result column="city_id" property="cityId" jdbcType="INTEGER" />
-    <result column="channel" property="channel" jdbcType="VARCHAR" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="channel_id" property="channelId" jdbcType="INTEGER" />
     <result column="reason" property="reason" jdbcType="VARCHAR" />
-    <result column="explain" property="explain" jdbcType="VARCHAR" />
+    <result column="exp_info" property="expInfo" jdbcType="VARCHAR" />
     <result column="picture_url" property="pictureUrl" jdbcType="VARCHAR" />
     <result column="keyword" property="keyword" jdbcType="VARCHAR" />
     <result column="vehicle_age" property="vehicleAge" jdbcType="INTEGER" />
@@ -38,10 +40,11 @@
   </resultMap>
   <sql id="Base_Column_List" >
     goods_id, basics_vehicles_id, goods_number, goods_name, sales_target, goods_type, 
-    supplier_id, city_id, channel, reason, explain, picture_url, keyword, vehicle_age, 
-    mileage, vehicle_properties, source_funds_id, lease_term, rent_every_term, front_money, 
-    first_rent, security_deposit, total_price, color, additional_services_id, additional_services_info, 
-    vehicle_style, stock, status, create_by, create_time, update_by, update_time
+    supplier_id, supplier_full_name, city_id, city_name, channel_id, reason, exp_info, 
+    picture_url, keyword, vehicle_age, mileage, vehicle_properties, source_funds_id, 
+    lease_term, rent_every_term, front_money, first_rent, security_deposit, total_price, 
+    color, additional_services_id, additional_services_info, vehicle_style, stock, status, 
+    create_by, create_time, update_by, update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -54,37 +57,40 @@
     where goods_id = #{goodsId,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.zhuanche.entity.driver.FinancialGoods" >
-    insert into financial_goods (goods_id, basics_vehicles_id, goods_number, 
-      goods_name, sales_target, goods_type, 
-      supplier_id, city_id, channel, 
-      reason, explain, picture_url, 
-      keyword, vehicle_age, mileage, 
-      vehicle_properties, source_funds_id, lease_term, 
-      rent_every_term, front_money, first_rent, 
-      security_deposit, total_price, color, 
-      additional_services_id, additional_services_info, 
+    <selectKey resultType="java.lang.Integer" keyProperty="goodsId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into financial_goods (basics_vehicles_id, goods_number, goods_name, 
+      sales_target, goods_type, supplier_id, 
+      supplier_full_name, city_id, city_name, 
+      channel_id, reason, exp_info, 
+      picture_url, keyword, vehicle_age, 
+      mileage, vehicle_properties, source_funds_id, 
+      lease_term, rent_every_term, front_money, 
+      first_rent, security_deposit, total_price, 
+      color, additional_services_id, additional_services_info, 
       vehicle_style, stock, status, 
       create_by, create_time, update_by, 
       update_time)
-    values (#{goodsId,jdbcType=INTEGER}, #{basicsVehiclesId,jdbcType=INTEGER}, #{goodsNumber,jdbcType=VARCHAR}, 
-      #{goodsName,jdbcType=VARCHAR}, #{salesTarget,jdbcType=TINYINT}, #{goodsType,jdbcType=TINYINT}, 
-      #{supplierId,jdbcType=INTEGER}, #{cityId,jdbcType=INTEGER}, #{channel,jdbcType=VARCHAR}, 
-      #{reason,jdbcType=VARCHAR}, #{explain,jdbcType=VARCHAR}, #{pictureUrl,jdbcType=VARCHAR}, 
-      #{keyword,jdbcType=VARCHAR}, #{vehicleAge,jdbcType=INTEGER}, #{mileage,jdbcType=INTEGER}, 
-      #{vehicleProperties,jdbcType=INTEGER}, #{sourceFundsId,jdbcType=INTEGER}, #{leaseTerm,jdbcType=INTEGER}, 
-      #{rentEveryTerm,jdbcType=DECIMAL}, #{frontMoney,jdbcType=DECIMAL}, #{firstRent,jdbcType=DECIMAL}, 
-      #{securityDeposit,jdbcType=DECIMAL}, #{totalPrice,jdbcType=DECIMAL}, #{color,jdbcType=VARCHAR}, 
-      #{additionalServicesId,jdbcType=VARCHAR}, #{additionalServicesInfo,jdbcType=VARCHAR}, 
+    values (#{basicsVehiclesId,jdbcType=INTEGER}, #{goodsNumber,jdbcType=VARCHAR}, #{goodsName,jdbcType=VARCHAR}, 
+      #{salesTarget,jdbcType=TINYINT}, #{goodsType,jdbcType=TINYINT}, #{supplierId,jdbcType=INTEGER}, 
+      #{supplierFullName,jdbcType=VARCHAR}, #{cityId,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR}, 
+      #{channelId,jdbcType=INTEGER}, #{reason,jdbcType=VARCHAR}, #{expInfo,jdbcType=VARCHAR}, 
+      #{pictureUrl,jdbcType=VARCHAR}, #{keyword,jdbcType=VARCHAR}, #{vehicleAge,jdbcType=INTEGER}, 
+      #{mileage,jdbcType=INTEGER}, #{vehicleProperties,jdbcType=INTEGER}, #{sourceFundsId,jdbcType=INTEGER}, 
+      #{leaseTerm,jdbcType=INTEGER}, #{rentEveryTerm,jdbcType=DECIMAL}, #{frontMoney,jdbcType=DECIMAL}, 
+      #{firstRent,jdbcType=DECIMAL}, #{securityDeposit,jdbcType=DECIMAL}, #{totalPrice,jdbcType=DECIMAL}, 
+      #{color,jdbcType=VARCHAR}, #{additionalServicesId,jdbcType=VARCHAR}, #{additionalServicesInfo,jdbcType=VARCHAR}, 
       #{vehicleStyle,jdbcType=INTEGER}, #{stock,jdbcType=INTEGER}, #{status,jdbcType=TINYINT}, 
       #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, 
       #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.FinancialGoods" >
+    <selectKey resultType="java.lang.Integer" keyProperty="goodsId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
     insert into financial_goods
     <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="goodsId != null" >
-        goods_id,
-      </if>
       <if test="basicsVehiclesId != null" >
         basics_vehicles_id,
       </if>
@@ -103,17 +109,23 @@
       <if test="supplierId != null" >
         supplier_id,
       </if>
+      <if test="supplierFullName != null" >
+        supplier_full_name,
+      </if>
       <if test="cityId != null" >
         city_id,
       </if>
-      <if test="channel != null" >
-        channel,
+      <if test="cityName != null" >
+        city_name,
+      </if>
+      <if test="channelId != null" >
+        channel_id,
       </if>
       <if test="reason != null" >
         reason,
       </if>
-      <if test="explain != null" >
-        explain,
+      <if test="expInfo != null" >
+        exp_info,
       </if>
       <if test="pictureUrl != null" >
         picture_url,
@@ -183,9 +195,6 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="goodsId != null" >
-        #{goodsId,jdbcType=INTEGER},
-      </if>
       <if test="basicsVehiclesId != null" >
         #{basicsVehiclesId,jdbcType=INTEGER},
       </if>
@@ -204,17 +213,23 @@
       <if test="supplierId != null" >
         #{supplierId,jdbcType=INTEGER},
       </if>
+      <if test="supplierFullName != null" >
+        #{supplierFullName,jdbcType=VARCHAR},
+      </if>
       <if test="cityId != null" >
         #{cityId,jdbcType=INTEGER},
       </if>
-      <if test="channel != null" >
-        #{channel,jdbcType=VARCHAR},
+      <if test="cityName != null" >
+        #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="channelId != null" >
+        #{channelId,jdbcType=INTEGER},
       </if>
       <if test="reason != null" >
         #{reason,jdbcType=VARCHAR},
       </if>
-      <if test="explain != null" >
-        #{explain,jdbcType=VARCHAR},
+      <if test="expInfo != null" >
+        #{expInfo,jdbcType=VARCHAR},
       </if>
       <if test="pictureUrl != null" >
         #{pictureUrl,jdbcType=VARCHAR},
@@ -305,17 +320,23 @@
       <if test="supplierId != null" >
         supplier_id = #{supplierId,jdbcType=INTEGER},
       </if>
+      <if test="supplierFullName != null" >
+        supplier_full_name = #{supplierFullName,jdbcType=VARCHAR},
+      </if>
       <if test="cityId != null" >
         city_id = #{cityId,jdbcType=INTEGER},
       </if>
-      <if test="channel != null" >
-        channel = #{channel,jdbcType=VARCHAR},
+      <if test="cityName != null" >
+        city_name = #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="channelId != null" >
+        channel_id = #{channelId,jdbcType=INTEGER},
       </if>
       <if test="reason != null" >
         reason = #{reason,jdbcType=VARCHAR},
       </if>
-      <if test="explain != null" >
-        explain = #{explain,jdbcType=VARCHAR},
+      <if test="expInfo != null" >
+        exp_info = #{expInfo,jdbcType=VARCHAR},
       </if>
       <if test="pictureUrl != null" >
         picture_url = #{pictureUrl,jdbcType=VARCHAR},
@@ -394,10 +415,12 @@
       sales_target = #{salesTarget,jdbcType=TINYINT},
       goods_type = #{goodsType,jdbcType=TINYINT},
       supplier_id = #{supplierId,jdbcType=INTEGER},
+      supplier_full_name = #{supplierFullName,jdbcType=VARCHAR},
       city_id = #{cityId,jdbcType=INTEGER},
-      channel = #{channel,jdbcType=VARCHAR},
+      city_name = #{cityName,jdbcType=VARCHAR},
+      channel_id = #{channelId,jdbcType=INTEGER},
       reason = #{reason,jdbcType=VARCHAR},
-      explain = #{explain,jdbcType=VARCHAR},
+      exp_info = #{expInfo,jdbcType=VARCHAR},
       picture_url = #{pictureUrl,jdbcType=VARCHAR},
       keyword = #{keyword,jdbcType=VARCHAR},
       vehicle_age = #{vehicleAge,jdbcType=INTEGER},

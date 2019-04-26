@@ -106,5 +106,10 @@ public class FinancialBasicsVehiclesService {
 		return financialBasicsVehiclesDTO;
 	}
 
+	public List<FinancialBasicsVehicles> queryBasicsVehiclesAllList() {
+		List<FinancialBasicsVehicles> financialBasicsVehicles=financialBasicsVehiclesExMapper.queryBasicsVehiclesAllList();
+		return financialBasicsVehicles;
+	}
+
 }
   

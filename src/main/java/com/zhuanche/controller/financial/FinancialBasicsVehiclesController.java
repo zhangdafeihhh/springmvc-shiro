@@ -1,6 +1,7 @@
 package com.zhuanche.controller.financial;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -248,6 +249,22 @@ public class FinancialBasicsVehiclesController {
 		  financialBasicsVehicles.setEnableStatus(enableStatus);
 		  financialBasicsVehicles = financialBasicsVehiclesService.updateFinancialBasicsVehicles(financialBasicsVehicles);
 		  return AjaxResponse.success(true);
+	}
+	
+	
+	/**
+	 * queryBasicsVehiclesAllList:(查询全部车型库信息). <br/>  
+	 * @author baiyunlong
+	 * @return
+	 */
+	@RequestMapping(value = "/queryBasicsVehiclesAllList")
+	public AjaxResponse queryBasicsVehiclesAllList() {
+		try{
+			List<FinancialBasicsVehicles> financialBasicsVehicless = financialBasicsVehiclesService.queryBasicsVehiclesAllList();
+			return AjaxResponse.success(financialBasicsVehicless);
+		}catch(Exception e){
+			return AjaxResponse.fail(RestErrorCode.QUERY_BASICSVEHICLE_ERROR);
+		}
 	}
 }
   

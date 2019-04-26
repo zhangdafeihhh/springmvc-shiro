@@ -36,7 +36,7 @@ public final class FinancialConst {
 		/**
 		 * TOB
 		 */
-		public static final Byte IDENTITY_CHECK_TOB = 2;
+		public static final Byte SALES_TARGET_TOB = 2;
 	}
 
 	/**

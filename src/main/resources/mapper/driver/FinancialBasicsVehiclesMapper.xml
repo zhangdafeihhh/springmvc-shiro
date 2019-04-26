@@ -45,31 +45,32 @@
     where basics_vehicles_id = #{basicsVehiclesId,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.zhuanche.entity.driver.FinancialBasicsVehicles" >
-    insert into financial_basics_vehicles (basics_vehicles_id, vehicles_detailed_name, 
-      brand_id, model_id, vehicle_style, 
-      year_style, energy_type, variable_box, 
-      guidance_price, discharge, mileage, 
-      auto_home_url, length_width_height, quality_assurance, 
-      wheelbase, environmental_protection_standard, 
+    <selectKey resultType="java.lang.Integer" keyProperty="basicsVehiclesId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into financial_basics_vehicles (vehicles_detailed_name, brand_id, model_id, 
+      vehicle_style, year_style, energy_type, 
+      variable_box, guidance_price, discharge, 
+      mileage, auto_home_url, length_width_height, 
+      quality_assurance, wheelbase, environmental_protection_standard, 
       fast_charging_time, slow_charging_time, fast_percentage, 
       enable_status, create_by, create_time, 
       update_by, update_time)
-    values (#{basicsVehiclesId,jdbcType=INTEGER}, #{vehiclesDetailedName,jdbcType=VARCHAR}, 
-      #{brandId,jdbcType=BIGINT}, #{modelId,jdbcType=BIGINT}, #{vehicleStyle,jdbcType=VARCHAR}, 
-      #{yearStyle,jdbcType=VARCHAR}, #{energyType,jdbcType=INTEGER}, #{variableBox,jdbcType=INTEGER}, 
-      #{guidancePrice,jdbcType=DECIMAL}, #{discharge,jdbcType=INTEGER}, #{mileage,jdbcType=INTEGER}, 
-      #{autoHomeUrl,jdbcType=VARCHAR}, #{lengthWidthHeight,jdbcType=VARCHAR}, #{qualityAssurance,jdbcType=VARCHAR}, 
-      #{wheelbase,jdbcType=INTEGER}, #{environmentalProtectionStandard,jdbcType=VARCHAR}, 
+    values (#{vehiclesDetailedName,jdbcType=VARCHAR}, #{brandId,jdbcType=BIGINT}, #{modelId,jdbcType=BIGINT}, 
+      #{vehicleStyle,jdbcType=VARCHAR}, #{yearStyle,jdbcType=VARCHAR}, #{energyType,jdbcType=INTEGER}, 
+      #{variableBox,jdbcType=INTEGER}, #{guidancePrice,jdbcType=DECIMAL}, #{discharge,jdbcType=INTEGER}, 
+      #{mileage,jdbcType=INTEGER}, #{autoHomeUrl,jdbcType=VARCHAR}, #{lengthWidthHeight,jdbcType=VARCHAR}, 
+      #{qualityAssurance,jdbcType=VARCHAR}, #{wheelbase,jdbcType=INTEGER}, #{environmentalProtectionStandard,jdbcType=VARCHAR}, 
       #{fastChargingTime,jdbcType=INTEGER}, #{slowChargingTime,jdbcType=INTEGER}, #{fastPercentage,jdbcType=DOUBLE}, 
       #{enableStatus,jdbcType=TINYINT}, #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
       #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.FinancialBasicsVehicles" >
+    <selectKey resultType="java.lang.Integer" keyProperty="basicsVehiclesId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
     insert into financial_basics_vehicles
     <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="basicsVehiclesId != null" >
-        basics_vehicles_id,
-      </if>
       <if test="vehiclesDetailedName != null" >
         vehicles_detailed_name,
       </if>
@@ -141,9 +142,6 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="basicsVehiclesId != null" >
-        #{basicsVehiclesId,jdbcType=INTEGER},
-      </if>
       <if test="vehiclesDetailedName != null" >
         #{vehiclesDetailedName,jdbcType=VARCHAR},
       </if>

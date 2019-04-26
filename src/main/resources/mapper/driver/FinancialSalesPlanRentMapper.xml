@@ -30,23 +30,24 @@
     where sales_id = #{salesId,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.zhuanche.entity.driver.FinancialSalesPlanRent" >
-    insert into financial_sales_plan_rent (sales_id, goods_number, lease_term, 
-      front_money, rent_every_term, first_rent, 
-      security_deposit, total_price, create_by, 
-      create_time, update_by, update_time
-      )
-    values (#{salesId,jdbcType=INTEGER}, #{goodsNumber,jdbcType=VARCHAR}, #{leaseTerm,jdbcType=INTEGER}, 
-      #{frontMoney,jdbcType=DECIMAL}, #{rentEveryTerm,jdbcType=DECIMAL}, #{firstRent,jdbcType=DECIMAL}, 
-      #{securityDeposit,jdbcType=DECIMAL}, #{totalPrice,jdbcType=DECIMAL}, #{createBy,jdbcType=VARCHAR}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
-      )
+    <selectKey resultType="java.lang.Integer" keyProperty="salesId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into financial_sales_plan_rent (goods_number, lease_term, front_money, 
+      rent_every_term, first_rent, security_deposit, 
+      total_price, create_by, create_time, 
+      update_by, update_time)
+    values (#{goodsNumber,jdbcType=VARCHAR}, #{leaseTerm,jdbcType=INTEGER}, #{frontMoney,jdbcType=DECIMAL}, 
+      #{rentEveryTerm,jdbcType=DECIMAL}, #{firstRent,jdbcType=DECIMAL}, #{securityDeposit,jdbcType=DECIMAL}, 
+      #{totalPrice,jdbcType=DECIMAL}, #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.FinancialSalesPlanRent" >
+    <selectKey resultType="java.lang.Integer" keyProperty="salesId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
     insert into financial_sales_plan_rent
     <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="salesId != null" >
-        sales_id,
-      </if>
       <if test="goodsNumber != null" >
         goods_number,
       </if>
@@ -82,9 +83,6 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="salesId != null" >
-        #{salesId,jdbcType=INTEGER},
-      </if>
       <if test="goodsNumber != null" >
         #{goodsNumber,jdbcType=VARCHAR},
       </if>

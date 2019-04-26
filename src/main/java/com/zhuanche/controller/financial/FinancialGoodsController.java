@@ -3,6 +3,7 @@ package com.zhuanche.controller.financial;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,6 +13,7 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.financial.FinancialGoodsDTO;
 import com.zhuanche.dto.financial.FinancialGoodsParamDTO;
+import com.zhuanche.entity.driver.FinancialGoods;
 import com.zhuanche.serv.financial.FinancialGoodsService;
 
 /**
@@ -72,69 +74,13 @@ public class FinancialGoodsController {
 	
 	/**
 	 * saveFinancialGoods:(新增商品). <br/>  
-	 * @author baiyunlong
-	 * @param goodsName
-	 * @param salesTarget
-	 * @param goodsType
-	 * @param supplierId
-	 * @param cityId
-	 * @param channel
-	 * @param reason
-	 * @param explain
-	 * @param pictureUrl
-	 * @param keyword
-	 * @param vehicleAge
-	 * @param mileage
-	 * @param vehicleProperties
-	 * @param color
-	 * @param basicsVehiclesId
-	 * @param stock
-	 * @param sourceFundsId
-	 * @param leaseTerm
-	 * @param rentEveryTerm
-	 * @param firstRent
-	 * @param securityDeposit
-	 * @param totalPrice
-	 * @param frontMoney
-	 * @param additionalServicesId
-	 * @param additionalServicesInfo
-	 * @param additionalClause
 	 * @return
 	 */
 	@RequestMapping(value = "/saveFinancialGoods")
-	public AjaxResponse saveFinancialGoods(
-			/*String goodsName,
-			Byte salesTarget,
-			Byte goodsType,
-			Integer supplierId,
-			Integer cityId,
-			String channel,	
-			String reason,
-			String explain,
-			String pictureUrl,
-			String keyword,
-			Integer vehicleAge,
-			Integer mileage,
-			Integer vehicleProperties,
-			String color,
-			Integer basicsVehiclesId,
-			Integer stock,
-			
-			Integer sourceFundsId,
-			Integer leaseTerm,
-			BigDecimal rentEveryTerm,
-			BigDecimal firstRent,
-			BigDecimal securityDeposit,
-			BigDecimal totalPrice,
-			BigDecimal frontMoney,
-			
-			String additionalServicesId,
-			String additionalServicesInfo,
-			String additionalClause*/
+	public AjaxResponse saveFinancialGoods(@Validated
 			FinancialGoodsParamDTO financialGoodsParamDTO
 			) {
-		int i=financialGoodsService.saveFinancialGoods(financialGoodsParamDTO);
-		logger.info("");
+		FinancialGoods financialGoods=financialGoodsService.saveFinancialGoods(financialGoodsParamDTO);
 	    return AjaxResponse.success(true);
 	}
 	
@@ -148,8 +94,7 @@ public class FinancialGoodsController {
 	public AjaxResponse updateFinancialGoods(
 			FinancialGoodsParamDTO financialGoodsParamDTO
 			) {
-		int i=financialGoodsService.updateFinancialGoods(financialGoodsParamDTO);
-		logger.info("");
+		FinancialGoods financialGoods=financialGoodsService.updateFinancialGoods(financialGoodsParamDTO);
 	    return AjaxResponse.success(true);
 	}
 	
@@ -164,7 +109,6 @@ public class FinancialGoodsController {
 	public AjaxResponse updateFinancialGoodsByStatus(Integer goodsId,Byte status
 			) {
 		int i=financialGoodsService.updateFinancialGoodsByStatus(goodsId,status);
-		logger.info("");
 	    return AjaxResponse.success(true);
 	}
 	

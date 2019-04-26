@@ -66,14 +66,17 @@
     where clue_goods_id = #{clueGoodsId,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.zhuanche.entity.driver.FinancialClueGoods" >
-    insert into financial_clue_goods (clue_goods_id, clue_id, lease_term, 
-      front_money, rent_every_term, first_rent, 
-      security_deposit, total_price, basics_vehicles_id, 
-      vehicles_detailed_name, brand_id, model_id, 
-      vehicle_style, year_style, energy_type, 
-      variable_box, guidance_price, discharge, 
-      mileage, auto_home_url, length_width_height, 
-      quality_assurance, wheelbase, environmental_protection_standard, 
+    <selectKey resultType="java.lang.Integer" keyProperty="clueGoodsId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into financial_clue_goods (clue_id, lease_term, front_money, 
+      rent_every_term, first_rent, security_deposit, 
+      total_price, basics_vehicles_id, vehicles_detailed_name, 
+      brand_id, model_id, vehicle_style, 
+      year_style, energy_type, variable_box, 
+      guidance_price, discharge, mileage, 
+      auto_home_url, length_width_height, quality_assurance, 
+      wheelbase, environmental_protection_standard, 
       fast_charging_time, slow_charging_time, fast_percentage, 
       sales_target, goods_number, goods_name, 
       goods_type, channel, keyword, 
@@ -81,14 +84,14 @@
       additional_services_id, additional_services_info, 
       create_by, create_time, update_by, 
       update_time)
-    values (#{clueGoodsId,jdbcType=INTEGER}, #{clueId,jdbcType=INTEGER}, #{leaseTerm,jdbcType=INTEGER}, 
-      #{frontMoney,jdbcType=DECIMAL}, #{rentEveryTerm,jdbcType=DECIMAL}, #{firstRent,jdbcType=DECIMAL}, 
-      #{securityDeposit,jdbcType=DECIMAL}, #{totalPrice,jdbcType=DECIMAL}, #{basicsVehiclesId,jdbcType=INTEGER}, 
-      #{vehiclesDetailedName,jdbcType=VARCHAR}, #{brandId,jdbcType=INTEGER}, #{modelId,jdbcType=INTEGER}, 
-      #{vehicleStyle,jdbcType=VARCHAR}, #{yearStyle,jdbcType=VARCHAR}, #{energyType,jdbcType=INTEGER}, 
-      #{variableBox,jdbcType=INTEGER}, #{guidancePrice,jdbcType=DECIMAL}, #{discharge,jdbcType=INTEGER}, 
-      #{mileage,jdbcType=INTEGER}, #{autoHomeUrl,jdbcType=VARCHAR}, #{lengthWidthHeight,jdbcType=VARCHAR}, 
-      #{qualityAssurance,jdbcType=VARCHAR}, #{wheelbase,jdbcType=INTEGER}, #{environmentalProtectionStandard,jdbcType=VARCHAR}, 
+    values (#{clueId,jdbcType=INTEGER}, #{leaseTerm,jdbcType=INTEGER}, #{frontMoney,jdbcType=DECIMAL}, 
+      #{rentEveryTerm,jdbcType=DECIMAL}, #{firstRent,jdbcType=DECIMAL}, #{securityDeposit,jdbcType=DECIMAL}, 
+      #{totalPrice,jdbcType=DECIMAL}, #{basicsVehiclesId,jdbcType=INTEGER}, #{vehiclesDetailedName,jdbcType=VARCHAR}, 
+      #{brandId,jdbcType=INTEGER}, #{modelId,jdbcType=INTEGER}, #{vehicleStyle,jdbcType=VARCHAR}, 
+      #{yearStyle,jdbcType=VARCHAR}, #{energyType,jdbcType=INTEGER}, #{variableBox,jdbcType=INTEGER}, 
+      #{guidancePrice,jdbcType=DECIMAL}, #{discharge,jdbcType=INTEGER}, #{mileage,jdbcType=INTEGER}, 
+      #{autoHomeUrl,jdbcType=VARCHAR}, #{lengthWidthHeight,jdbcType=VARCHAR}, #{qualityAssurance,jdbcType=VARCHAR}, 
+      #{wheelbase,jdbcType=INTEGER}, #{environmentalProtectionStandard,jdbcType=VARCHAR}, 
       #{fastChargingTime,jdbcType=INTEGER}, #{slowChargingTime,jdbcType=INTEGER}, #{fastPercentage,jdbcType=DOUBLE}, 
       #{salesTarget,jdbcType=TINYINT}, #{goodsNumber,jdbcType=VARCHAR}, #{goodsName,jdbcType=VARCHAR}, 
       #{goodsType,jdbcType=TINYINT}, #{channel,jdbcType=VARCHAR}, #{keyword,jdbcType=VARCHAR}, 
@@ -98,11 +101,11 @@
       #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.FinancialClueGoods" >
+    <selectKey resultType="java.lang.Integer" keyProperty="clueGoodsId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
     insert into financial_clue_goods
     <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="clueGoodsId != null" >
-        clue_goods_id,
-      </if>
       <if test="clueId != null" >
         clue_id,
       </if>
@@ -228,9 +231,6 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="clueGoodsId != null" >
-        #{clueGoodsId,jdbcType=INTEGER},
-      </if>
       <if test="clueId != null" >
         #{clueId,jdbcType=INTEGER},
       </if>

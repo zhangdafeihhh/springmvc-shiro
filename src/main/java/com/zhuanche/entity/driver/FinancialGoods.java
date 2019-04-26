@@ -18,13 +18,17 @@ public class FinancialGoods {
 
     private Integer supplierId;
 
+    private String supplierFullName;
+
     private Integer cityId;
 
-    private String channel;
+    private String cityName;
+
+    private Integer channelId;
 
     private String reason;
 
-    private String explain;
+    private String expInfo;
 
     private String pictureUrl;
 
@@ -126,6 +130,14 @@ public class FinancialGoods {
         this.supplierId = supplierId;
     }
 
+    public String getSupplierFullName() {
+        return supplierFullName;
+    }
+
+    public void setSupplierFullName(String supplierFullName) {
+        this.supplierFullName = supplierFullName == null ? null : supplierFullName.trim();
+    }
+
     public Integer getCityId() {
         return cityId;
     }
@@ -134,12 +146,20 @@ public class FinancialGoods {
         this.cityId = cityId;
     }
 
-    public String getChannel() {
-        return channel;
+    public String getCityName() {
+        return cityName;
     }
 
-    public void setChannel(String channel) {
-        this.channel = channel == null ? null : channel.trim();
+    public void setCityName(String cityName) {
+        this.cityName = cityName == null ? null : cityName.trim();
+    }
+
+    public Integer getChannelId() {
+        return channelId;
+    }
+
+    public void setChannelId(Integer channelId) {
+        this.channelId = channelId;
     }
 
     public String getReason() {
@@ -150,12 +170,12 @@ public class FinancialGoods {
         this.reason = reason == null ? null : reason.trim();
     }
 
-    public String getExplain() {
-        return explain;
+    public String getExpInfo() {
+        return expInfo;
     }
 
-    public void setExplain(String explain) {
-        this.explain = explain == null ? null : explain.trim();
+    public void setExpInfo(String expInfo) {
+        this.expInfo = expInfo == null ? null : expInfo.trim();
     }
 
     public String getPictureUrl() {

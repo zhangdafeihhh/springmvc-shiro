@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.ex.FinancialGoodsExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.FinancialGoods" >
+    <id column="goods_id" property="goodsId" jdbcType="INTEGER" />
+    <result column="basics_vehicles_id" property="basicsVehiclesId" jdbcType="INTEGER" />
+    <result column="goods_number" property="goodsNumber" jdbcType="VARCHAR" />
+    <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+    <result column="sales_target" property="salesTarget" jdbcType="TINYINT" />
+    <result column="goods_type" property="goodsType" jdbcType="TINYINT" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_full_name" property="supplierFullName" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="channel_id" property="channelId" jdbcType="INTEGER" />
+    <result column="reason" property="reason" jdbcType="VARCHAR" />
+    <result column="exp_info" property="expInfo" jdbcType="VARCHAR" />
+    <result column="picture_url" property="pictureUrl" jdbcType="VARCHAR" />
+    <result column="keyword" property="keyword" jdbcType="VARCHAR" />
+    <result column="vehicle_age" property="vehicleAge" jdbcType="INTEGER" />
+    <result column="mileage" property="mileage" jdbcType="INTEGER" />
+    <result column="vehicle_properties" property="vehicleProperties" jdbcType="INTEGER" />
+    <result column="source_funds_id" property="sourceFundsId" jdbcType="INTEGER" />
+    <result column="lease_term" property="leaseTerm" jdbcType="INTEGER" />
+    <result column="rent_every_term" property="rentEveryTerm" jdbcType="DECIMAL" />
+    <result column="front_money" property="frontMoney" jdbcType="DECIMAL" />
+    <result column="first_rent" property="firstRent" jdbcType="DECIMAL" />
+    <result column="security_deposit" property="securityDeposit" jdbcType="DECIMAL" />
+    <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
+    <result column="color" property="color" jdbcType="VARCHAR" />
+    <result column="additional_services_id" property="additionalServicesId" jdbcType="VARCHAR" />
+    <result column="additional_services_info" property="additionalServicesInfo" jdbcType="VARCHAR" />
+    <result column="vehicle_style" property="vehicleStyle" jdbcType="INTEGER" />
+    <result column="stock" property="stock" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <resultMap id="BaseResultDtoMap" type="com.zhuanche.dto.financial.FinancialGoodsDTO" >
+    <id column="goods_id" property="goodsId" jdbcType="INTEGER" />
+    <result column="basics_vehicles_id" property="basicsVehiclesId" jdbcType="INTEGER" />
+    <result column="goods_number" property="goodsNumber" jdbcType="VARCHAR" />
+    <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+    <result column="sales_target" property="salesTarget" jdbcType="TINYINT" />
+    <result column="goods_type" property="goodsType" jdbcType="TINYINT" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_full_name" property="supplierFullName" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="channel_id" property="channelId" jdbcType="INTEGER" />
+    <result column="reason" property="reason" jdbcType="VARCHAR" />
+    <result column="exp_info" property="expInfo" jdbcType="VARCHAR" />
+    <result column="picture_url" property="pictureUrl" jdbcType="VARCHAR" />
+    <result column="keyword" property="keyword" jdbcType="VARCHAR" />
+    <result column="vehicle_age" property="vehicleAge" jdbcType="INTEGER" />
+    <result column="mileage" property="mileage" jdbcType="INTEGER" />
+    <result column="vehicle_properties" property="vehicleProperties" jdbcType="INTEGER" />
+    <result column="source_funds_id" property="sourceFundsId" jdbcType="INTEGER" />
+    <result column="lease_term" property="leaseTerm" jdbcType="INTEGER" />
+    <result column="rent_every_term" property="rentEveryTerm" jdbcType="DECIMAL" />
+    <result column="front_money" property="frontMoney" jdbcType="DECIMAL" />
+    <result column="first_rent" property="firstRent" jdbcType="DECIMAL" />
+    <result column="security_deposit" property="securityDeposit" jdbcType="DECIMAL" />
+    <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
+    <result column="color" property="color" jdbcType="VARCHAR" />
+    <result column="additional_services_id" property="additionalServicesId" jdbcType="VARCHAR" />
+    <result column="additional_services_info" property="additionalServicesInfo" jdbcType="VARCHAR" />
+    <result column="vehicle_style" property="vehicleStyle" jdbcType="INTEGER" />
+    <result column="stock" property="stock" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    goods_id, basics_vehicles_id, goods_number, goods_name, sales_target, goods_type, 
+    supplier_id, supplier_full_name, city_id, city_name, channel_id, reason, exp_info, 
+    picture_url, keyword, vehicle_age, mileage, vehicle_properties, source_funds_id, 
+    lease_term, rent_every_term, front_money, first_rent, security_deposit, total_price, 
+    color, additional_services_id, additional_services_info, vehicle_style, stock, status, 
+    create_by, create_time, update_by, update_time
+  </sql>
+  <select id="queryFinancialGoodsForList" resultMap="BaseResultDtoMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from financial_goods
+    <trim prefix="WHERE" prefixOverrides="AND|OR">
+		<if test="goodsName != null">
+			and goods_name = #{goodsName}
+		</if>
+		<if test="basicsVehiclesId != null">
+			and basics_vehicles_id = #{basicsVehiclesId}
+		</if>
+		<if test="salesTarget != null">
+			and sales_target = #{salesTarget}
+		</if>
+		<if test="supplierId != null">
+			and supplier_id = #{supplierId}
+		</if>
+		<if test="cityId != null">
+			and city_id = #{cityId}
+		</if>
+		<if test="status != null">
+			and status = #{status}
+		</if>
+	</trim>
+  </select>
+ 
+</mapper>

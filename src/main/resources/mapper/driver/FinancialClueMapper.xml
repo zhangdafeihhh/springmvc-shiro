@@ -33,25 +33,26 @@
     where clue_id = #{clueId,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.zhuanche.entity.driver.FinancialClue" >
-    insert into financial_clue (clue_id, clue_source, status, 
-      supplier_id, city_id, goods_number, 
-      goods_name, purpose_name, phone, 
-      whether, recommend, create_by, 
-      create_time, update_by, update_time
-      )
-    values (#{clueId,jdbcType=INTEGER}, #{clueSource,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, 
-      #{supplierId,jdbcType=INTEGER}, #{cityId,jdbcType=INTEGER}, #{goodsNumber,jdbcType=VARCHAR}, 
-      #{goodsName,jdbcType=VARCHAR}, #{purposeName,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
-      #{whether,jdbcType=TINYINT}, #{recommend,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
-      )
+    <selectKey resultType="java.lang.Integer" keyProperty="clueId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into financial_clue (clue_source, status, supplier_id, 
+      city_id, goods_number, goods_name, 
+      purpose_name, phone, whether, 
+      recommend, create_by, create_time, 
+      update_by, update_time)
+    values (#{clueSource,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, #{supplierId,jdbcType=INTEGER}, 
+      #{cityId,jdbcType=INTEGER}, #{goodsNumber,jdbcType=VARCHAR}, #{goodsName,jdbcType=VARCHAR}, 
+      #{purposeName,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{whether,jdbcType=TINYINT}, 
+      #{recommend,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.FinancialClue" >
+    <selectKey resultType="java.lang.Integer" keyProperty="clueId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
     insert into financial_clue
     <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="clueId != null" >
-        clue_id,
-      </if>
       <if test="clueSource != null" >
         clue_source,
       </if>
@@ -96,9 +97,6 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="clueId != null" >
-        #{clueId,jdbcType=INTEGER},
-      </if>
       <if test="clueSource != null" >
         #{clueSource,jdbcType=VARCHAR},
       </if>
