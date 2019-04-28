@@ -274,6 +274,9 @@ public class SaasDriverDailyReportController {
         obj.put("auth_userName",loginUser.getLoginName());
         obj.put("send_email",StringUtils.isNotBlank(email)?email:loginUser.getEmail());
         obj.put("excel_export_type", Constants.SAAS_DAILY_EXCEL);
+        obj.put("businessVolumeDesc",businessVolumeDesc);
+        obj.put("finOrdCntDesc",finOrdCntDesc);
+        obj.put("badCntDesc",badCntDesc);
 
         BiDriverBusinessInfoDayReportDTO dto = new BiDriverBusinessInfoDayReportDTO();
         dto.setCityId(Integer.valueOf(cityId));
@@ -473,9 +476,9 @@ public class SaasDriverDailyReportController {
                                           @Param("driverPhone")String driverPhone,
                                           @Param("licensePlates")String licensePlates,
                                           @Param("month")String month,
-                                          @Param("actualPayDesc")String actualPayDesc,
-                                          @Param("oddNumberDesc")String oddNumberDesc,
-                                          @Param("badNumDesc")String badNumDesc,
+                                          @Param("businessVolumeDesc")String businessVolumeDesc,
+                                          @Param("finOrdCntDesc")String finOrdCntDesc,
+                                          @Param("badCntDesc")String badCntDesc,
                                           @Verify(param = "email",rule="required") @Param("email")String email){
 
         Map<String,String> map = Maps.newHashMap();
@@ -495,6 +498,9 @@ public class SaasDriverDailyReportController {
         obj.put("auth_userName",loginUser.getLoginName());
         obj.put("send_email",StringUtils.isNotBlank(email)?email:loginUser.getEmail());
         obj.put("excel_export_type", Constants.SAAS_MONTH_EXCEL);
+        obj.put("businessVolumeDesc",businessVolumeDesc);
+        obj.put("finOrdCntDesc",finOrdCntDesc);
+        obj.put("badCntDesc",badCntDesc);
 
         BiDriverBusinessInfoMonthReportDTO dto = new BiDriverBusinessInfoMonthReportDTO();
         dto.setCityId(Integer.valueOf(cityId));
@@ -675,9 +681,9 @@ public class SaasDriverDailyReportController {
                                           @Param("driverGroupName")String driverGroupName,
                                           @Param("driverPhone")String driverPhone,
                                           @Param("licensePlates")String licensePlates,
-                                          @Param("actualPayDesc")String actualPayDesc,
-                                          @Param("oddNumberDesc")String oddNumberDesc,
-                                          @Param("badNumDesc")String badNumDesc,
+                                          @Param("businessVolumeDesc")String businessVolumeDesc,
+                                          @Param("finOrdCntDesc")String finOrdCntDesc,
+                                          @Param("badCntDesc")String badCntDesc,
                                           @Verify(param = "email",rule="required") @Param("email")String email){
 
         Map<String,String> map = Maps.newHashMap();
@@ -697,6 +703,9 @@ public class SaasDriverDailyReportController {
         obj.put("auth_userName",loginUser.getLoginName());
         obj.put("send_email",StringUtils.isNotBlank(email)?email:loginUser.getEmail());
         obj.put("excel_export_type", Constants.SAAS_SUMMARY_EXCEL);
+        obj.put("businessVolumeDesc",businessVolumeDesc);
+        obj.put("finOrdCntDesc",finOrdCntDesc);
+        obj.put("badCntDesc",badCntDesc);
 
         BiDriverBusinessInfoSummaryReportDTO dto = new BiDriverBusinessInfoSummaryReportDTO();
         dto.setCityId(Integer.valueOf(cityId));
