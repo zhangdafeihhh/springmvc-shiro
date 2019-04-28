@@ -1,22 +1,42 @@
 package com.zhuanche.controller.busManage;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.zhuanche.common.enums.PermissionLevelEnum;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.common.sms.SmsSendUtil;
+import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
+import com.zhuanche.constants.busManage.BusConstant;
 import com.zhuanche.dto.BaseDTO;
-import com.zhuanche.shiro.realm.SSOLoginUser;
-import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.dto.busManage.BusCarDTO;
+import com.zhuanche.dto.busManage.BusDriverDTO;
+import com.zhuanche.dto.busManage.BusOrderDTO;
+import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
+import com.zhuanche.entity.busManage.*;
+import com.zhuanche.entity.mdbcarmanage.BusOrderMessageTask;
+import com.zhuanche.entity.mdbcarmanage.BusOrderOperationTime;
+import com.zhuanche.entity.mdbcarmanage.CarBizOrderMessageTask;
+import com.zhuanche.entity.rentcar.CarBizDriverInfo;
+import com.zhuanche.serv.busManage.BusAssignmentService;
+import com.zhuanche.serv.busManage.BusCommonService;
+import com.zhuanche.serv.busManage.BusOrderService;
+import com.zhuanche.util.DateUtil;
+import com.zhuanche.util.DateUtils;
+import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.vo.busManage.BusOrderExportCutVO;
-import com.zhuanche.vo.busManage.BusOrderExportVO;
+import com.zhuanche.vo.busManage.OrderOperationProcessVO;
+import mapper.mdbcarmanage.BusOrderMessageTaskMapper;
+import mapper.mdbcarmanage.BusOrderOperationTimeMapper;
+import mapper.mdbcarmanage.CarBizOrderMessageTaskMapper;
+import mapper.mdbcarmanage.ex.BusOrderMessageTaskExMapper;
+import mapper.mdbcarmanage.ex.BusOrderOperationTimeExMapper;
+import mapper.mdbcarmanage.ex.SaasRolePermissionRalationExMapper;
+import mapper.rentcar.CarBizDriverInfoMapper;
+import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -29,43 +49,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
-import com.zhuanche.common.database.MasterSlaveConfig;
-import com.zhuanche.common.database.MasterSlaveConfigs;
-import com.zhuanche.common.paging.PageDTO;
-import com.zhuanche.common.sms.SmsSendUtil;
-import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.RestErrorCode;
-import com.zhuanche.common.web.Verify;
-import com.zhuanche.constants.busManage.BusConstant;
-import com.zhuanche.dto.busManage.BusCarDTO;
-import com.zhuanche.dto.busManage.BusDriverDTO;
-import com.zhuanche.dto.busManage.BusOrderDTO;
-import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
-import com.zhuanche.entity.busManage.Appraisal;
-import com.zhuanche.entity.busManage.BusCostDetail;
-import com.zhuanche.entity.busManage.BusOrderDetail;
-import com.zhuanche.entity.busManage.BusPayDetail;
-import com.zhuanche.entity.busManage.OrgCostInfo;
-import com.zhuanche.entity.mdbcarmanage.BusOrderOperationTime;
-import com.zhuanche.entity.mdbcarmanage.CarBizOrderMessageTask;
-import com.zhuanche.entity.rentcar.CarBizDriverInfo;
-import com.zhuanche.serv.busManage.BusAssignmentService;
-import com.zhuanche.serv.busManage.BusCommonService;
-import com.zhuanche.serv.busManage.BusOrderService;
-import com.zhuanche.util.DateUtil;
-import com.zhuanche.util.DateUtils;
-import com.zhuanche.util.excel.CsvUtils;
-import com.zhuanche.vo.busManage.OrderOperationProcessVO;
-
-import mapper.mdbcarmanage.BusOrderOperationTimeMapper;
-import mapper.mdbcarmanage.CarBizOrderMessageTaskMapper;
-import mapper.mdbcarmanage.ex.BusOrderOperationTimeExMapper;
-import mapper.mdbcarmanage.ex.SaasRolePermissionRalationExMapper;
-import mapper.rentcar.CarBizDriverInfoMapper;
-import mapper.rentcar.ex.CarBizCarInfoExMapper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
 
 @Controller("busAssignmentController")
 @RequestMapping(value = "/busAssignment")
@@ -98,6 +86,10 @@ public class BusAssignmentController {
 
     @Autowired
     private SaasRolePermissionRalationExMapper saasRolePermissionRalationExMapper;
+    @Autowired
+    private BusOrderMessageTaskMapper busOrderMessageTaskMapper;
+    @Autowired
+    private BusOrderMessageTaskExMapper busOrderMessageTaskExMapper;
 
     public interface OrderOperation {
         /**
@@ -367,6 +359,15 @@ public class BusAssignmentController {
 
                 // 指派时间-预约用车时间>24小时的,在截止用车前24小时的节点（误差不超过1小时），还需发送给乘客一条短信，告知司机姓名和电话
                 saveMessageTask(orderNo, bookingDate);
+                //修改延迟短信任务状态（不管有没有发送，改状态为已发送）
+                BusOrderMessageTask busOrderMessageTask = busOrderMessageTaskExMapper.selectByOrderNum(orderNo);
+                if(busOrderMessageTask != null){
+                    busOrderMessageTask.setStatus(1);
+                    busOrderMessageTask.setUpdateDate(new Date());
+                    busOrderMessageTaskMapper.updateByPrimaryKeySelective(busOrderMessageTask);
+                    logger.info("BusAssignmentController-巴士订单指派，修改短信任务状态成功，taskId--{}",busOrderMessageTask.getId());
+                }
+
             }
             orderOperationTime.setDirverPhone(driverPhone);
             orderOperationTime.setDriverName(driverName);
