@@ -6,8 +6,10 @@
     <result column="clue_source" property="clueSource" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="TINYINT" />
     <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_full_name" property="supplierFullName" jdbcType="VARCHAR" />
     <result column="city_id" property="cityId" jdbcType="INTEGER" />
-    <result column="goods_number" property="goodsNumber" jdbcType="VARCHAR" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="goods_id" property="goodsId" jdbcType="INTEGER" />
     <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
     <result column="purpose_name" property="purposeName" jdbcType="VARCHAR" />
     <result column="phone" property="phone" jdbcType="VARCHAR" />
@@ -19,8 +21,9 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    clue_id, clue_source, status, supplier_id, city_id, goods_number, goods_name, purpose_name, 
-    phone, whether, recommend, create_by, create_time, update_by, update_time
+    clue_id, clue_source, status, supplier_id, supplier_full_name, city_id, city_name, 
+    goods_id, goods_name, purpose_name, phone, whether, recommend, create_by, create_time, 
+    update_by, update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -37,15 +40,17 @@
       SELECT LAST_INSERT_ID()
     </selectKey>
     insert into financial_clue (clue_source, status, supplier_id, 
-      city_id, goods_number, goods_name, 
-      purpose_name, phone, whether, 
-      recommend, create_by, create_time, 
-      update_by, update_time)
+      supplier_full_name, city_id, city_name, 
+      goods_id, goods_name, purpose_name, 
+      phone, whether, recommend, 
+      create_by, create_time, update_by, 
+      update_time)
     values (#{clueSource,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, #{supplierId,jdbcType=INTEGER}, 
-      #{cityId,jdbcType=INTEGER}, #{goodsNumber,jdbcType=VARCHAR}, #{goodsName,jdbcType=VARCHAR}, 
-      #{purposeName,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{whether,jdbcType=TINYINT}, 
-      #{recommend,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+      #{supplierFullName,jdbcType=VARCHAR}, #{cityId,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR}, 
+      #{goodsId,jdbcType=INTEGER}, #{goodsName,jdbcType=VARCHAR}, #{purposeName,jdbcType=VARCHAR}, 
+      #{phone,jdbcType=VARCHAR}, #{whether,jdbcType=TINYINT}, #{recommend,jdbcType=VARCHAR}, 
+      #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.FinancialClue" >
     <selectKey resultType="java.lang.Integer" keyProperty="clueId" order="AFTER" >
@@ -62,11 +67,17 @@
       <if test="supplierId != null" >
         supplier_id,
       </if>
+      <if test="supplierFullName != null" >
+        supplier_full_name,
+      </if>
       <if test="cityId != null" >
         city_id,
       </if>
-      <if test="goodsNumber != null" >
-        goods_number,
+      <if test="cityName != null" >
+        city_name,
+      </if>
+      <if test="goodsId != null" >
+        goods_id,
       </if>
       <if test="goodsName != null" >
         goods_name,
@@ -106,11 +117,17 @@
       <if test="supplierId != null" >
         #{supplierId,jdbcType=INTEGER},
       </if>
+      <if test="supplierFullName != null" >
+        #{supplierFullName,jdbcType=VARCHAR},
+      </if>
       <if test="cityId != null" >
         #{cityId,jdbcType=INTEGER},
       </if>
-      <if test="goodsNumber != null" >
-        #{goodsNumber,jdbcType=VARCHAR},
+      <if test="cityName != null" >
+        #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsId != null" >
+        #{goodsId,jdbcType=INTEGER},
       </if>
       <if test="goodsName != null" >
         #{goodsName,jdbcType=VARCHAR},
@@ -153,11 +170,17 @@
       <if test="supplierId != null" >
         supplier_id = #{supplierId,jdbcType=INTEGER},
       </if>
+      <if test="supplierFullName != null" >
+        supplier_full_name = #{supplierFullName,jdbcType=VARCHAR},
+      </if>
       <if test="cityId != null" >
         city_id = #{cityId,jdbcType=INTEGER},
       </if>
-      <if test="goodsNumber != null" >
-        goods_number = #{goodsNumber,jdbcType=VARCHAR},
+      <if test="cityName != null" >
+        city_name = #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsId != null" >
+        goods_id = #{goodsId,jdbcType=INTEGER},
       </if>
       <if test="goodsName != null" >
         goods_name = #{goodsName,jdbcType=VARCHAR},
@@ -194,8 +217,10 @@
     set clue_source = #{clueSource,jdbcType=VARCHAR},
       status = #{status,jdbcType=TINYINT},
       supplier_id = #{supplierId,jdbcType=INTEGER},
+      supplier_full_name = #{supplierFullName,jdbcType=VARCHAR},
       city_id = #{cityId,jdbcType=INTEGER},
-      goods_number = #{goodsNumber,jdbcType=VARCHAR},
+      city_name = #{cityName,jdbcType=VARCHAR},
+      goods_id = #{goodsId,jdbcType=INTEGER},
       goods_name = #{goodsName,jdbcType=VARCHAR},
       purpose_name = #{purposeName,jdbcType=VARCHAR},
       phone = #{phone,jdbcType=VARCHAR},

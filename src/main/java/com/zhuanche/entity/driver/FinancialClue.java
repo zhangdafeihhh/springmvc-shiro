@@ -11,9 +11,13 @@ public class FinancialClue {
 
     private Integer supplierId;
 
+    private String supplierFullName;
+
     private Integer cityId;
 
-    private String goodsNumber;
+    private String cityName;
+
+    private Integer goodsId;
 
     private String goodsName;
 
@@ -65,6 +69,14 @@ public class FinancialClue {
         this.supplierId = supplierId;
     }
 
+    public String getSupplierFullName() {
+        return supplierFullName;
+    }
+
+    public void setSupplierFullName(String supplierFullName) {
+        this.supplierFullName = supplierFullName == null ? null : supplierFullName.trim();
+    }
+
     public Integer getCityId() {
         return cityId;
     }
@@ -73,12 +85,20 @@ public class FinancialClue {
         this.cityId = cityId;
     }
 
-    public String getGoodsNumber() {
-        return goodsNumber;
+    public String getCityName() {
+        return cityName;
     }
 
-    public void setGoodsNumber(String goodsNumber) {
-        this.goodsNumber = goodsNumber == null ? null : goodsNumber.trim();
+    public void setCityName(String cityName) {
+        this.cityName = cityName == null ? null : cityName.trim();
+    }
+
+    public Integer getGoodsId() {
+        return goodsId;
+    }
+
+    public void setGoodsId(Integer goodsId) {
+        this.goodsId = goodsId;
     }
 
     public String getGoodsName() {

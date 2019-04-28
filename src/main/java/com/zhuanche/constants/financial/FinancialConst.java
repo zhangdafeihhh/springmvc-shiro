@@ -110,4 +110,16 @@ public final class FinancialConst {
 		public static final Byte DELETE      = 2;
 	}
 
+	public static final class ClueStatus{
+		/**
+		 * 待分发
+		 */
+		public static final Byte UNTREATED = 0;
+		/**
+		 * 已分发
+		 */
+		public static final Byte PROCESSED = 1;
+		
+	}
+	
 }
