@@ -11,7 +11,9 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.common.web.datavalidate.sequence.SeqAll;
 import com.zhuanche.dto.financial.FinancialGoodsDTO;
+import com.zhuanche.dto.financial.FinancialGoodsInfoDTO;
 import com.zhuanche.dto.financial.FinancialGoodsParamDTO;
 import com.zhuanche.entity.driver.FinancialGoods;
 import com.zhuanche.serv.financial.FinancialGoodsService;
@@ -77,7 +79,7 @@ public class FinancialGoodsController {
 	 * @return
 	 */
 	@RequestMapping(value = "/saveFinancialGoods")
-	public AjaxResponse saveFinancialGoods(@Validated
+	public AjaxResponse saveFinancialGoods(@Validated(SeqAll.class)
 			FinancialGoodsParamDTO financialGoodsParamDTO
 			) {
 		FinancialGoods financialGoods=financialGoodsService.saveFinancialGoods(financialGoodsParamDTO);
@@ -91,9 +93,13 @@ public class FinancialGoodsController {
 	 * @return
 	 */
 	@RequestMapping(value = "/updateFinancialGoods")
-	public AjaxResponse updateFinancialGoods(
-			FinancialGoodsParamDTO financialGoodsParamDTO
+	public AjaxResponse updateFinancialGoods(@Validated(SeqAll.class) FinancialGoodsParamDTO financialGoodsParamDTO
 			) {
+		
+		if (financialGoodsParamDTO.getGoodsId()==null||financialGoodsParamDTO.getGoodsId()==0) {
+			return AjaxResponse.fail(RestErrorCode.GOODSIDISNULL);
+		}
+		
 		FinancialGoods financialGoods=financialGoodsService.updateFinancialGoods(financialGoodsParamDTO);
 	    return AjaxResponse.success(true);
 	}
@@ -106,7 +112,9 @@ public class FinancialGoodsController {
 	 * @return
 	 */
 	@RequestMapping(value = "/updateFinancialGoodsByStatus")
-	public AjaxResponse updateFinancialGoodsByStatus(Integer goodsId,Byte status
+	public AjaxResponse updateFinancialGoodsByStatus(
+			@Verify(param = "goodsId", rule = "required|min(1)")Integer goodsId,
+			@Verify(param = "status", rule = "required")Byte status
 			) {
 		int i=financialGoodsService.updateFinancialGoodsByStatus(goodsId,status);
 	    return AjaxResponse.success(true);
@@ -119,9 +127,9 @@ public class FinancialGoodsController {
 	 * @return
 	 */
 	@RequestMapping(value = "/queryFinancialGoodsById")
-	public AjaxResponse queryFinancialGoodsById(Integer goodsId
+	public AjaxResponse queryFinancialGoodsById(@Verify(param = "goodsId", rule = "required|min(1)")Integer goodsId
 			) {
-		FinancialGoodsDTO financialGoodsDTO=financialGoodsService.queryFinancialGoodsById(goodsId);
+		FinancialGoodsInfoDTO financialGoodsDTO=financialGoodsService.queryFinancialGoodsById(goodsId);
 		logger.info("");
 	    return AjaxResponse.success(financialGoodsDTO);
 	}

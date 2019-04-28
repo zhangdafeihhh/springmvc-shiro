@@ -3,6 +3,7 @@ package com.zhuanche.serv.financial;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ import com.zhuanche.common.util.FinancialUtil;
 import com.zhuanche.common.util.FinancialUtil.NumType;
 import com.zhuanche.constants.financial.FinancialConst.GoodsState;
 import com.zhuanche.dto.financial.FinancialGoodsDTO;
+import com.zhuanche.dto.financial.FinancialGoodsInfoDTO;
 import com.zhuanche.dto.financial.FinancialGoodsParamDTO;
 import com.zhuanche.entity.driver.FinancialAdditionalClause;
 import com.zhuanche.entity.driver.FinancialGoods;
@@ -29,6 +31,7 @@ import com.zhuanche.util.BeanUtil;
 import mapper.driver.FinancialAdditionalClauseMapper;
 import mapper.driver.FinancialGoodsClauseMapper;
 import mapper.driver.FinancialGoodsMapper;
+import mapper.driver.ex.FinancialAdditionalClauseExMapper;
 import mapper.driver.ex.FinancialGoodsClauseExMapper;
 import mapper.driver.ex.FinancialGoodsExMapper;
 
@@ -55,6 +58,9 @@ public class FinancialGoodsService {
 	
 	@Autowired
 	private FinancialAdditionalClauseMapper financialAdditionalClauseMapper;
+	
+	@Autowired
+	private FinancialAdditionalClauseExMapper financialAdditionalClauseExMapper;
 	
 	public PageDTO queryFinancialGoodsForList(Integer page, Integer pageSize, String goodsName,
 			Integer basicsVehiclesId, Byte salesTarget, Integer supplierId, Integer cityId, Byte status) {
@@ -126,11 +132,34 @@ public class FinancialGoodsService {
 		financialGoods.setUpdateBy(user.getName());
 		int i=financialGoodsMapper.updateByPrimaryKeySelective(financialGoods);
 		if (i>0) {
-			String additionalClause = financialGoodsParamDTO.getAdditionalClause();
-			List<FinancialGoodsClause> financialGoodsClauses=JSON.parseArray(additionalClause, FinancialGoodsClause.class);
-			for (FinancialGoodsClause financialGoodsClause : financialGoodsClauses) {
-				financialGoodsClause.setUpdateBy(user.getName());
-				financialGoodsClauseMapper.updateByPrimaryKeySelective(financialGoodsClause);
+			//删除附加条款
+			List<FinancialGoodsClause> financialGoodsClauseList = financialGoodsClauseExMapper.queryFinancialGoodsClauseListForGoodsId(financialGoods.getGoodsId());
+			
+			List<Integer> clauseIds= financialGoodsClauseList.stream().map(f -> f.getClauseId()).collect(Collectors.toList());
+			
+			int dfgc=financialGoodsClauseExMapper.deleteFinancialGoodsClause(financialGoods.getGoodsId());
+			
+			int dfac=financialAdditionalClauseExMapper.deleteByPrimaryKeyS(clauseIds);
+			
+			if (i>0) {
+					String additionalClause = financialGoodsParamDTO.getAdditionalClause();
+					if (StringUtils.isNotBlank(additionalClause)) {
+						List<FinancialAdditionalClause> financialAdditionalClauses=JSON.parseArray(additionalClause, FinancialAdditionalClause.class);
+					for (FinancialAdditionalClause financialAdditionalClause : financialAdditionalClauses) {
+						financialAdditionalClause.setCreateBy(user.getName());
+						financialAdditionalClause.setUpdateBy(user.getName());
+						int f=financialAdditionalClauseMapper.insertSelective(financialAdditionalClause);
+						if (f>0) {
+							FinancialGoodsClause financialGoodsClause = new FinancialGoodsClause();
+							financialGoodsClause.setGoodsNumber(financialGoods.getGoodsNumber());
+							financialGoodsClause.setGoodsId(financialGoods.getGoodsId());
+							financialGoodsClause.setClauseId(financialAdditionalClause.getClauseId());
+							financialGoodsClause.setCreateBy(user.getName());
+							financialGoodsClause.setUpdateBy(user.getName());
+							financialGoodsClauseMapper.insertSelective(financialGoodsClause);
+						}
+					}
+				}
 			}
 		}
 		return financialGoods;
@@ -146,10 +175,16 @@ public class FinancialGoodsService {
 		return i;
 	}
 
-	public FinancialGoodsDTO queryFinancialGoodsById(Integer goodsId) {
+	public FinancialGoodsInfoDTO queryFinancialGoodsById(Integer goodsId) {
 		FinancialGoods financialGoods = financialGoodsMapper.selectByPrimaryKey(goodsId);
-		FinancialGoodsDTO financialGoodsDTO=BeanUtil.copyObject(financialGoods, FinancialGoodsDTO.class);
-				
+		FinancialGoodsInfoDTO financialGoodsDTO=BeanUtil.copyObject(financialGoods, FinancialGoodsInfoDTO.class);
+		List<FinancialGoodsClause> financialGoodsClauseList = financialGoodsClauseExMapper.queryFinancialGoodsClauseListForGoodsId(financialGoods.getGoodsId());
+		
+		if (financialGoodsClauseList!=null && financialGoodsClauseList.size()>0) {
+			List<Integer> clauseIds= financialGoodsClauseList.stream().map(f -> f.getClauseId()).collect(Collectors.toList());
+			List<FinancialAdditionalClause> financialAdditionalClauses=financialAdditionalClauseExMapper.queryFinancialAdditionalClause(clauseIds);
+			financialGoodsDTO.setFinancialadditionalclauses(financialAdditionalClauses);
+		}
 		return financialGoodsDTO;
 	}
 

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.ex.FinancialAdditionalClauseExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.FinancialAdditionalClause" >
+    <id column="clause_id" property="clauseId" jdbcType="INTEGER" />
+    <result column="project_name" property="projectName" jdbcType="VARCHAR" />
+    <result column="clause" property="clause" jdbcType="VARCHAR" />
+    <result column="expenses" property="expenses" jdbcType="DECIMAL" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    clause_id, project_name, clause, expenses, create_by, create_time, update_by, update_time
+  </sql>
+  <delete id="deleteByPrimaryKeyS" parameterType="java.lang.Integer" >
+    delete from financial_additional_clause
+    where clause_id in 
+    <foreach collection="clauseIds" close=")" open="(" separator="," item="clauseId">
+			#{clauseId}
+	 </foreach>
+  </delete>
+ 
+  <select id="queryFinancialAdditionalClause" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from financial_additional_clause
+    where clause_id in 
+    <foreach collection="clauseIds" close=")" open="(" separator="," item="clauseId">
+			#{clauseId}
+	 </foreach>
+  </select>
+ 
+</mapper>

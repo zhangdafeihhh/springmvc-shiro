@@ -237,6 +237,9 @@ public final class RestErrorCode{
 	@ResultMessage("查询车型库信息失败")
 	public static final int QUERY_BASICSVEHICLE_ERROR=80001;
 	
+	@ResultMessage("修改商品信息ID参数不能为空")
+	public static final int GOODSIDISNULL=80002;
+	
 	//-------------------金融商品--end---------------------------
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系
