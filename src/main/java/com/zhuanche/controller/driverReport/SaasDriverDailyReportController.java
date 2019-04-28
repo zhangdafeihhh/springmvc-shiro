@@ -272,7 +272,7 @@ public class SaasDriverDailyReportController {
         obj.put("auth_teamIds",loginUser.getTeamIds());
         obj.put("auth_userId",loginUser.getId());
         obj.put("auth_userName",loginUser.getLoginName());
-        obj.put("send_email",StringUtils.isNotBlank(loginUser.getEmail())?loginUser.getEmail():email);
+        obj.put("send_email",StringUtils.isNotBlank(email)?email:loginUser.getEmail());
         obj.put("excel_export_type", Constants.SAAS_DAILY_EXCEL);
 
         BiDriverBusinessInfoDayReportDTO dto = new BiDriverBusinessInfoDayReportDTO();
@@ -322,7 +322,7 @@ public class SaasDriverDailyReportController {
             //维护用户的邮箱
             if(loginUser.getId() != null && loginUser.getAccountType() != null){
 
-                carAdmUserExMapper.updateEmail(loginUser.getEmail()== null?email:loginUser.getEmail(),loginUser.getId());
+                carAdmUserExMapper.updateEmail(email!= null?email:loginUser.getEmail(),loginUser.getId());
             }
             map.put("code","200");
         }catch (Exception e){
@@ -493,7 +493,7 @@ public class SaasDriverDailyReportController {
         obj.put("auth_teamIds",loginUser.getTeamIds());
         obj.put("auth_userId",loginUser.getId());
         obj.put("auth_userName",loginUser.getLoginName());
-        obj.put("send_email",StringUtils.isNotBlank(loginUser.getEmail())?loginUser.getEmail():email);
+        obj.put("send_email",StringUtils.isNotBlank(email)?email:loginUser.getEmail());
         obj.put("excel_export_type", Constants.SAAS_MONTH_EXCEL);
 
         BiDriverBusinessInfoMonthReportDTO dto = new BiDriverBusinessInfoMonthReportDTO();
@@ -527,7 +527,7 @@ public class SaasDriverDailyReportController {
             //维护用户的邮箱
             if(loginUser.getId() != null && loginUser.getAccountType() != null){
 
-                carAdmUserExMapper.updateEmail(loginUser.getEmail()== null?email:loginUser.getEmail(),loginUser.getId());
+                carAdmUserExMapper.updateEmail(email != null?email:loginUser.getEmail(),loginUser.getId());
             }
             map.put("code","200");
         }catch (Exception e){
@@ -695,7 +695,7 @@ public class SaasDriverDailyReportController {
         obj.put("auth_teamIds",loginUser.getTeamIds());
         obj.put("auth_userId",loginUser.getId());
         obj.put("auth_userName",loginUser.getLoginName());
-        obj.put("send_email",StringUtils.isNotBlank(loginUser.getEmail())?loginUser.getEmail():email);
+        obj.put("send_email",StringUtils.isNotBlank(email)?email:loginUser.getEmail());
         obj.put("excel_export_type", Constants.SAAS_SUMMARY_EXCEL);
 
         BiDriverBusinessInfoSummaryReportDTO dto = new BiDriverBusinessInfoSummaryReportDTO();
@@ -727,7 +727,7 @@ public class SaasDriverDailyReportController {
             //维护用户的邮箱
             if(loginUser.getId() != null && loginUser.getAccountType() != null){
 
-                carAdmUserExMapper.updateEmail(loginUser.getEmail()== null?email:loginUser.getEmail(),loginUser.getId());
+                carAdmUserExMapper.updateEmail(email != null?email:loginUser.getEmail(),loginUser.getId());
             }
             map.put("code","200");
         }catch (Exception e){
