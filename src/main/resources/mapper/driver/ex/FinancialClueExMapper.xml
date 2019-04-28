@@ -61,11 +61,17 @@
 		<if test="purposeName != null">
 				and vehicles_detailed_name = #{vehiclesDetailedName}
 		</if>
-		<if test="supplierId != null">
-				and supplier_id = #{supplierId}
+		<if test="supplierIds != null and supplierIds.size>0">
+			and supplier_id in
+			<foreach collection="supplierIds" close=")" open="(" separator="," item="supplierId">
+				#{supplierId}
+	 	   </foreach>
 		</if>
-		<if test="cityId != null">
-				and city_id = #{cityId}
+		<if test="cityIds != null and cityIds.size>0">
+			and city_id in
+		   <foreach collection="cityIds" close=")" open="(" separator="," item="cityId">
+				#{cityId}
+	 	   </foreach>
 		</if>
 		<if test="status!=null">
 				and status = #{status}
@@ -77,6 +83,7 @@
        			  and concat(#{endDate},' 23:59:59')>=create_time
         </if>
 	</trim>
+	order by clue_id desc
   </select>
  
 </mapper>

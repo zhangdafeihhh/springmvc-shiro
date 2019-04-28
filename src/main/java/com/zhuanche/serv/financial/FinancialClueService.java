@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,7 @@ public class FinancialClueService {
 	@Autowired
 	private FinancialClueGoodsExMapper financialClueGoodsExMapper;
 	public PageDTO queryfinancialClueForList(Integer page, Integer pageSize, String purposeName,Integer goodsId,
-			String startDate, String endDate, Integer supplierId, Integer cityId, Byte status) {
+			String startDate, String endDate, Set<Integer> supplierIds, Set<Integer> cityIds, Byte status) {
 		if(page==null || page.intValue()<=0) {
 			page = new Integer(1);
 		}
@@ -54,7 +55,7 @@ public class FinancialClueService {
     	Page p = PageHelper.startPage( page, pageSize, true );
     	try{
     		financialClueDTOs=financialClueExMapper.queryfinancialClueForList(purposeName,goodsId,
-    				startDate,endDate,supplierId,cityId,status);
+    				startDate,endDate,supplierIds,cityIds,status);
         	total  = (int)p.getTotal();
     	}catch (Exception e) {
     		logger.error("查询线索信息异常",e);

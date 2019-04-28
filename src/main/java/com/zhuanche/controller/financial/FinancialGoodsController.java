@@ -1,5 +1,10 @@
 package com.zhuanche.controller.financial;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +22,8 @@ import com.zhuanche.dto.financial.FinancialGoodsInfoDTO;
 import com.zhuanche.dto.financial.FinancialGoodsParamDTO;
 import com.zhuanche.entity.driver.FinancialGoods;
 import com.zhuanche.serv.financial.FinancialGoodsService;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.session.WebSessionUtil;
 
 /**
  * ClassName:FinancialGoodsController <br/>
@@ -61,8 +68,24 @@ public class FinancialGoodsController {
 				+ "--cityId--{},--status--{}",page,pageSize,goodsName,
 				basicsVehiclesId,salesTarget,supplierId,cityId,status);
 		try {
+			SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+		    
+			Set<Integer> cityIds=new HashSet<>();
+			Set<Integer> supplierIds=new HashSet<>();
+		    
+		    if(cityId != null){
+		    	cityIds.add(cityId);
+	        }else{
+	        	cityIds = user.getCityIds();
+	        }
+	        if(supplierId != null){
+	        	supplierIds.add(supplierId);
+	        }else{
+	        	supplierIds = user.getSupplierIds();
+	        }
+			
 			PageDTO pageDTO = financialGoodsService.queryFinancialGoodsForList(page,pageSize,goodsName,
-					basicsVehiclesId,salesTarget,supplierId,cityId,status);
+					basicsVehiclesId,salesTarget,supplierIds,cityIds,status);
 			return AjaxResponse.success(pageDTO);
 		} catch (Exception e) {
 			logger.error("--FinancialGoodsController--方法:queryFinancialGoodsForList--参数:"
@@ -133,4 +156,16 @@ public class FinancialGoodsController {
 		logger.info("");
 	    return AjaxResponse.success(financialGoodsDTO);
 	}
+	
+	
+	@RequestMapping(value = "/selectFinancialGoodsForList")
+	public AjaxResponse selectFinancialGoodsForList() {
+			SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+			Set<Integer> cityIds = user.getCityIds();
+			Set<Integer> supplierIds = user.getSupplierIds();
+			List<FinancialGoodsDTO> financialGoodsDTOs = financialGoodsService.selectFinancialGoodsForList(
+					supplierIds,cityIds);
+			return AjaxResponse.success(financialGoodsDTOs);
+	}
+	
 }

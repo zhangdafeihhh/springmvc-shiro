@@ -1,6 +1,8 @@
 package com.zhuanche.controller.financial;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +14,9 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
-import com.zhuanche.dto.financial.FinancialClueDTO;
 import com.zhuanche.serv.financial.FinancialClueService;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.session.WebSessionUtil;
 /**  
  * ClassName:FinancialClueController <br/>  
  * Date:     2019年4月23日 下午6:51:44 <br/>  
@@ -59,8 +62,25 @@ public class FinancialClueController {
 				+ "--supplierId--{},--cityId--{},--status--{}",page,pageSize,purposeName,
 				goodsId,startDate,endDate,supplierId,cityId,status);
 		try {
+			
+			SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+		    
+			Set<Integer> cityIds=new HashSet<>();
+			Set<Integer> supplierIds=new HashSet<>();
+		    
+		    if(cityId != null){
+		    	cityIds.add(cityId);
+	        }else{
+	        	cityIds = user.getCityIds();
+	        }
+	        if(supplierId != null){
+	        	supplierIds.add(supplierId);
+	        }else{
+	        	supplierIds = user.getSupplierIds();
+	        }
+			
 			PageDTO pageDTO = financialClueService.queryfinancialClueForList(page,pageSize,purposeName,
-					goodsId,startDate,endDate,supplierId,cityId,status);
+					goodsId,startDate,endDate,supplierIds,cityIds,status);
 			return AjaxResponse.success(pageDTO);
 		} catch (Exception e) {
 			logger.error("--FinancialClueController--方法:queryfinancialClueForList--参数:"

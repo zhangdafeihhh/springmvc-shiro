@@ -54,4 +54,6 @@
     <import resource="applicationContext-redis-driver.xml"/>
     <!--块钱的服务-->
     <import resource="applicationContext-kuaiqian.xml"/>
+    
+    <import resource="applicationContext-task.xml"/>
 </beans>

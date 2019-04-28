@@ -28,7 +28,7 @@ public class DriverVehicleController {
 	private DriverVehicleService driverVehicleService;
 	
 	@RequestMapping(value = "/queryDriverVehicleList")
-	public AjaxResponse queryDriverVehicleList(Integer brandId) {
+	public AjaxResponse queryDriverVehicleList(@Verify(param = "brandId", rule = "required|min(1)")Integer brandId) {
 		logger.info("请求--DriverVehicleController--方法queryDriverVehicleList--参数--");
 		List<DriverVehicle> driverVehicles=driverVehicleService.queryDriverVehicleList(brandId);
 		return AjaxResponse.success(driverVehicles);
