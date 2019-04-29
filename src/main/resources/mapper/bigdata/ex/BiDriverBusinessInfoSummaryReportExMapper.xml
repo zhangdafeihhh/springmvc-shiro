@@ -56,7 +56,7 @@
         and supplier_id = #{supplierId,jdbcType=INTEGER}
       </if>
       <if test="driverTeamId != null and driverTeamId != ''">
-        and team_id = #{driverTeamId,jdbcType=INTEGER}
+        and driver_team_id = #{driverTeamId,jdbcType=INTEGER}
       </if>
 
 

@@ -102,8 +102,8 @@ public class SaasDriverDailyReportController {
                                  @Verify(param = "cityName",rule="required")String cityName,
                                  @Param("supplierId")String supplierId,
                                  @Param("supplierName")String supplierName,
-                                 @Param("teamId")String teamId,
-                                 @Param("teamName")String teamName,
+                                 @Param("driverTeamId")String teamId,
+                                 @Param("driverTeamName")String teamName,
                                  @Param("driverGroupId")String driverGroupId,
                                  @Param("driverGroupName")String driverGroupName,
                                  @Param("driverPhone")String driverPhone,
@@ -119,8 +119,8 @@ public class SaasDriverDailyReportController {
         List<CarDriverTeamDTO> listTeam = null;
         Map<Integer,String> supplierMap = Maps.newHashMap();
         Map<Integer,String> teamMap = Maps.newHashMap();
-        Map<Integer,String> modelMap = Maps.newHashMap();
-        Map<Integer,String> carGroupMap = Maps.newHashMap();
+        Map<Integer,String> modelMap= Maps.newHashMap();
+        Map<Integer,String> carGroupMap  = Maps.newHashMap();
         if(StringUtils.isEmpty(supplierId)){
             //根据城市查询所有的供应商
             Set<Integer> set = new HashSet<>();
@@ -168,13 +168,13 @@ public class SaasDriverDailyReportController {
 
         if(CollectionUtils.isNotEmpty(carBizModelList)){
             for(CarBizModel type : carBizModelList){
-                modelMap.put(type.getModelId(),type.getModelName());
+                carGroupMap.put(type.getModelId(),type.getModelName());
             }
         }
 
         if(CollectionUtils.isNotEmpty(carGroupList)){
             for(CarBizCarGroup carGroup : carGroupList){
-                carGroupMap.put(carGroup.getGroupId(),carGroup.getGroupName());
+                modelMap.put(carGroup.getGroupId(),carGroup.getGroupName());
             }
         }
 
@@ -245,8 +245,8 @@ public class SaasDriverDailyReportController {
                                  @Verify(param = "cityName",rule="required")String cityName,
                                  @Param("supplierId")String supplierId,
                                  @Param("supplierName")String supplierName,
-                                 @Param("teamId")String teamId,
-                                 @Param("teamName")String teamName,
+                                 @Param("driverTeamId")String teamId,
+                                 @Param("driverTeamName")String teamName,
                                  @Param("driverGroupId")String driverGroupId,
                                  @Param("driverGroupName")String driverGroupName,
                                  @Param("driverPhone")String driverPhone,
@@ -343,8 +343,8 @@ public class SaasDriverDailyReportController {
                                  @Verify(param = "cityName",rule="required")String cityName,
                                  @Param("supplierId")String supplierId,
                                  @Param("supplierName")String supplierName,
-                                 @Param("teamId")String teamId,
-                                 @Param("teamName")String teamName,
+                                 @Param("driverTeamId")String teamId,
+                                 @Param("driverTeamName")String teamName,
                                  @Param("driverGroupId")String driverGroupId,
                                  @Param("driverGroupName")String driverGroupName,
                                  @Param("driverPhone")String driverPhone,
@@ -359,8 +359,8 @@ public class SaasDriverDailyReportController {
         List<CarDriverTeamDTO> listTeam = null;
         Map<Integer,String> supplierMap = Maps.newHashMap();
         Map<Integer,String> teamMap = Maps.newHashMap();
-        Map<Integer,String> cooperMap = Maps.newHashMap();
         Map<Integer,String> carGroupMap = Maps.newHashMap();
+        Map<Integer,String>  cooperMap= Maps.newHashMap();
         if(StringUtils.isEmpty(supplierId)){
             //根据城市查询所有的供应商
             Set<Integer> set = new HashSet<>();
@@ -408,13 +408,13 @@ public class SaasDriverDailyReportController {
 
         if(CollectionUtils.isNotEmpty(modelList)){
             for(CarBizModel type : modelList){
-                cooperMap.put(type.getModelId(),type.getModelName());
+                carGroupMap.put(type.getModelId(),type.getModelName());
             }
         }
 
         if(CollectionUtils.isNotEmpty(carGroupList)){
             for(CarBizCarGroup carGroup : carGroupList){
-                carGroupMap.put(carGroup.getGroupId(),carGroup.getGroupName());
+                cooperMap.put(carGroup.getGroupId(),carGroup.getGroupName());
             }
         }
 
@@ -469,8 +469,8 @@ public class SaasDriverDailyReportController {
                                           @Verify(param = "cityName",rule="required")String cityName,
                                           @Param("supplierId")String supplierId,
                                           @Param("supplierName")String supplierName,
-                                          @Param("teamId")String teamId,
-                                          @Param("teamName")String teamName,
+                                          @Param("driverTeamId")String teamId,
+                                          @Param("driverTeamName")String teamName,
                                           @Param("driverGroupId")String driverGroupId,
                                           @Param("driverGroupName")String driverGroupName,
                                           @Param("driverPhone")String driverPhone,
@@ -552,8 +552,8 @@ public class SaasDriverDailyReportController {
                                         @Verify(param = "cityName",rule="required")String cityName,
                                         @Param("supplierId")String supplierId,
                                         @Param("supplierName")String supplierName,
-                                        @Param("teamId")String teamId,
-                                        @Param("teamName")String teamName,
+                                        @Param("driverTeamId")String teamId,
+                                        @Param("driverTeamName")String teamName,
                                         @Param("driverGroupId")String driverGroupId,
                                         @Param("driverGroupName")String driverGroupName,
                                         @Param("driverPhone")String driverPhone,
@@ -616,13 +616,13 @@ public class SaasDriverDailyReportController {
 
         if(CollectionUtils.isNotEmpty(carBizModelList)){
             for(CarBizModel type : carBizModelList){
-                cooperMap.put(type.getModelId(),type.getModelName());
+                carGroupMap.put(type.getModelId(),type.getModelName());
             }
         }
 
         if(CollectionUtils.isNotEmpty(carGroupList)){
             for(CarBizCarGroup carGroup : carGroupList){
-                carGroupMap.put(carGroup.getGroupId(),carGroup.getGroupName());
+                cooperMap.put(carGroup.getGroupId(),carGroup.getGroupName());
             }
         }
 
@@ -675,8 +675,8 @@ public class SaasDriverDailyReportController {
                                           @Verify(param = "cityName",rule="required")String cityName,
                                           @Param("supplierId")String supplierId,
                                           @Param("supplierName")String supplierName,
-                                          @Param("teamId")String teamId,
-                                          @Param("teamName")String teamName,
+                                          @Param("driverTeamId")String teamId,
+                                          @Param("driverTeamName")String teamName,
                                           @Param("driverGroupId")String driverGroupId,
                                           @Param("driverGroupName")String driverGroupName,
                                           @Param("driverPhone")String driverPhone,
