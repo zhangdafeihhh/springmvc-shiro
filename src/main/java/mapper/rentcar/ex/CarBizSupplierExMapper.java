@@ -45,4 +45,8 @@ public interface CarBizSupplierExMapper{
 	CarBizSupplierVo querySupplierById(@Param("supplierId") Integer supplierId);
 
 	List<CarBizSupplier> querySupplierAllList( @Param("cityIds") Set<Integer> cityIds , @Param("supplierIds") Set<Integer> supplierIds);
+
+	/**查询供应商**/
+	List<CarBizSupplier> querySupplierName( @Param("cityIds") Set<Integer> cityIds);
+
 }

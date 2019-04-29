@@ -37,6 +37,8 @@ public class CarAdmUser implements Serializable{
 
     private Integer level;
 
+    private String email;
+
     public Integer getUserId() {
         return userId;
     }
@@ -163,5 +165,13 @@ public class CarAdmUser implements Serializable{
 
     public void setLevel(Integer level) {
         this.level = level;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

@@ -14,7 +14,7 @@ public interface CarBizCooperationTypeExMapper {
      * @return
      */
     List<CarBizCooperationType> queryCarBizCooperationTypeList();
-    
+
 	/**
 	 * @Title: queryNameById
 	 * @Description: 查询加盟类型名称
