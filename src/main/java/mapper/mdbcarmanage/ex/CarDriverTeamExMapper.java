@@ -18,6 +18,9 @@ public interface CarDriverTeamExMapper{
 
 	List<CarDriverTeamDTO> queryDriverTeamAndGroup(@Param("cityIds") Set<String> cityIds, @Param("supplierIds") Set<String> supplierIds , @Param("teamIds") Set<Integer>  teamIds );
 
+	List<CarDriverTeamDTO> queryDriverTeamAndGroupAll(@Param("cityIds") Set<String> cityIds, @Param("supplierIds") Set<String> supplierIds , @Param("teamIds") Set<Integer>  teamIds );
+
+
 	CarDriverTeam selectByCondition(DriverTeamRequest driverTeamRequest);
 
 	List<CarDriverTeam> queryForListByPid(DriverTeamRequest driverTeamRequest);

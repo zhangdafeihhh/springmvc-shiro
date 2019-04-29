@@ -133,7 +133,7 @@ public class SaasDriverDailyReportController {
            }
 
            //根据供应商查询所有的车队
-            listTeam = carDriverTeamExMapper.queryDriverTeamAndGroup(null,suppliersSet,null);
+            listTeam = carDriverTeamExMapper.queryDriverTeamAndGroupAll(null,suppliersSet,null);
 
             Set<Integer> setGroup = new HashSet<>();
             for(CarDriverTeamDTO carDriverTeamDTO : listTeam){
@@ -145,7 +145,7 @@ public class SaasDriverDailyReportController {
             Set<String> suppliersSet = new HashSet<>();
             suppliersSet.add(supplierId);
 
-            listTeam = carDriverTeamExMapper.queryDriverTeamAndGroup(null,suppliersSet,null);
+            listTeam = carDriverTeamExMapper.queryDriverTeamAndGroupAll(null,suppliersSet,null);
             Set<Integer> setGroup = new HashSet<>();
             for(CarDriverTeamDTO carDriverTeamDTO : listTeam){
                 setGroup.add(carDriverTeamDTO.getId());
@@ -373,7 +373,7 @@ public class SaasDriverDailyReportController {
             }
 
             //根据供应商查询所有的车队
-            listTeam = carDriverTeamExMapper.queryDriverTeamAndGroup(null,suppliersSet,null);
+            listTeam = carDriverTeamExMapper.queryDriverTeamAndGroupAll(null,suppliersSet,null);
 
             Set<Integer> setGroup = new HashSet<>();
             for(CarDriverTeamDTO carDriverTeamDTO : listTeam){
@@ -385,7 +385,7 @@ public class SaasDriverDailyReportController {
             Set<String> suppliersSet = new HashSet<>();
             suppliersSet.add(supplierId);
 
-            listTeam = carDriverTeamExMapper.queryDriverTeamAndGroup(null,suppliersSet,null);
+            listTeam = carDriverTeamExMapper.queryDriverTeamAndGroupAll(null,suppliersSet,null);
             Set<Integer> setGroup = new HashSet<>();
             for(CarDriverTeamDTO carDriverTeamDTO : listTeam){
                 setGroup.add(carDriverTeamDTO.getId());
@@ -581,7 +581,7 @@ public class SaasDriverDailyReportController {
             }
 
             //根据供应商查询所有的车队
-            listTeam = carDriverTeamExMapper.queryDriverTeamAndGroup(null,suppliersSet,null);
+            listTeam = carDriverTeamExMapper.queryDriverTeamAndGroupAll(null,suppliersSet,null);
 
             Set<Integer> setGroup = new HashSet<>();
             for(CarDriverTeamDTO carDriverTeamDTO : listTeam){
@@ -593,7 +593,7 @@ public class SaasDriverDailyReportController {
             Set<String> suppliersSet = new HashSet<>();
             suppliersSet.add(supplierId);
 
-            listTeam = carDriverTeamExMapper.queryDriverTeamAndGroup(null,suppliersSet,null);
+            listTeam = carDriverTeamExMapper.queryDriverTeamAndGroupAll(null,suppliersSet,null);
             Set<Integer> setGroup = new HashSet<>();
             for(CarDriverTeamDTO carDriverTeamDTO : listTeam){
                 setGroup.add(carDriverTeamDTO.getId());
