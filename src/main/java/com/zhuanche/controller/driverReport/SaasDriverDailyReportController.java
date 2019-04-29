@@ -102,8 +102,8 @@ public class SaasDriverDailyReportController {
                                  @Verify(param = "cityName",rule="required")String cityName,
                                  @Param("supplierId")String supplierId,
                                  @Param("supplierName")String supplierName,
-                                 @Param("driverTeamId")String teamId,
-                                 @Param("driverTeamName")String teamName,
+                                 @Param("driverTeamId")String driverTeamId,
+                                 @Param("driverTeamName")String driverTeamName,
                                  @Param("driverGroupId")String driverGroupId,
                                  @Param("driverGroupName")String driverGroupName,
                                  @Param("driverPhone")String driverPhone,
@@ -209,7 +209,7 @@ public class SaasDriverDailyReportController {
         try {
             Page page =  PageHelper.startPage(pageNum,pageSize,true);
             list = dayReportExMapper.queryDayReport(Integer.valueOf(cityId), StringUtils.isEmpty(supplierId)?null:Integer.valueOf(supplierId),
-                    StringUtils.isEmpty(teamId)?null:Integer.valueOf(teamId),StringUtils.isEmpty(driverGroupId)?null:Integer.valueOf(driverGroupId),
+                    StringUtils.isEmpty(driverTeamId)?null:Integer.valueOf(driverTeamId),StringUtils.isEmpty(driverGroupId)?null:Integer.valueOf(driverGroupId),
                     driverPhone,licensePlates,beginDate,endDate,businessVolumeSort,finOrdCntSort,badCntSort,sort,table);
 
             total = page.getTotal();
@@ -224,7 +224,7 @@ public class SaasDriverDailyReportController {
         for(BiDriverBusinessInfoDayReportDTO dto : dailyDtoList){
             dto.setCityName(cityName);
             dto.setSupplierName(StringUtils.isEmpty(supplierName)?supplierMap.get(dto.getSupplierId()):supplierName);
-            dto.setDriverTeamName(StringUtils.isEmpty(teamName)?teamMap.get(dto.getDriverTeamId()):teamName);
+            dto.setDriverTeamName(StringUtils.isEmpty(driverTeamName)?teamMap.get(dto.getDriverTeamId()):driverTeamName);
             dto.setDriverGroupName(StringUtils.isEmpty(driverGroupName)?teamMap.get(dto.getDriverGroupId()):driverGroupName);
             dto.setCooperateName(modelMap.get(dto.getCooperationType()));
             dto.setCarGroupName(carGroupMap.get(dto.getCarGroupId()));
@@ -245,8 +245,8 @@ public class SaasDriverDailyReportController {
                                  @Verify(param = "cityName",rule="required")String cityName,
                                  @Param("supplierId")String supplierId,
                                  @Param("supplierName")String supplierName,
-                                 @Param("driverTeamId")String teamId,
-                                 @Param("driverTeamName")String teamName,
+                                 @Param("driverTeamId")String driverTeamId,
+                                 @Param("driverTeamName")String driverTeamName,
                                  @Param("driverGroupId")String driverGroupId,
                                  @Param("driverGroupName")String driverGroupName,
                                  @Param("driverPhone")String driverPhone,
@@ -284,9 +284,9 @@ public class SaasDriverDailyReportController {
         if(StringUtils.isNotBlank(supplierId)){
             dto.setSupplierId(Integer.valueOf(supplierId));
             dto.setSupplierName(supplierName);
-        }if (StringUtils.isNotBlank(teamId)){
-            dto.setDriverTeamId(Integer.valueOf(teamId));
-            dto.setDriverTeamName(teamName);
+        }if (StringUtils.isNotBlank(driverTeamId)){
+            dto.setDriverTeamId(Integer.valueOf(driverTeamId));
+            dto.setDriverTeamName(driverTeamName);
         }if(StringUtils.isNotBlank(driverGroupId)){
             dto.setDriverGroupId(Integer.valueOf(driverGroupId));
             dto.setDriverGroupName(driverGroupName);
@@ -343,8 +343,8 @@ public class SaasDriverDailyReportController {
                                  @Verify(param = "cityName",rule="required")String cityName,
                                  @Param("supplierId")String supplierId,
                                  @Param("supplierName")String supplierName,
-                                 @Param("driverTeamId")String teamId,
-                                 @Param("driverTeamName")String teamName,
+                                 @Param("driverTeamId")String driverTeamId,
+                                 @Param("driverTeamName")String driverTeamName,
                                  @Param("driverGroupId")String driverGroupId,
                                  @Param("driverGroupName")String driverGroupName,
                                  @Param("driverPhone")String driverPhone,
@@ -433,7 +433,7 @@ public class SaasDriverDailyReportController {
         try {
             Page page =  PageHelper.startPage(pageNum,pageSize,true);
             monthReportlist = monthReportExMapper.queryMonthReport(Integer.valueOf(cityId), StringUtils.isEmpty(supplierId)?null:Integer.valueOf(supplierId),
-                    StringUtils.isEmpty(teamId)?null:Integer.valueOf(teamId),StringUtils.isEmpty(driverGroupId)?null:Integer.valueOf(driverGroupId),
+                    StringUtils.isEmpty(driverTeamId)?null:Integer.valueOf(driverTeamId),StringUtils.isEmpty(driverGroupId)?null:Integer.valueOf(driverGroupId),
                     driverPhone,licensePlates,month,businessVolumeSort,finOrdCntSort,badCntSort,sort,table);
 
             total = page.getTotal();
@@ -448,7 +448,7 @@ public class SaasDriverDailyReportController {
         for(BiDriverBusinessInfoMonthReportDTO dto : monthDtoList){
             dto.setCityName(cityName);
             dto.setSupplierName(StringUtils.isEmpty(supplierName)?supplierMap.get(dto.getSupplierId()):supplierName);
-            dto.setDriverTeamName(StringUtils.isEmpty(teamName)?teamMap.get(dto.getDriverTeamId()):teamName);
+            dto.setDriverTeamName(StringUtils.isEmpty(driverTeamName)?teamMap.get(dto.getDriverTeamId()):driverTeamName);
             dto.setDriverGroupName(StringUtils.isEmpty(driverGroupName)?teamMap.get(dto.getDriverGroupId()):driverGroupName);
             dto.setCooperateName(cooperMap.get(dto.getCooperationType()));
             dto.setCarGroupName(carGroupMap.get(dto.getCarGroupId()));
@@ -469,8 +469,8 @@ public class SaasDriverDailyReportController {
                                           @Verify(param = "cityName",rule="required")String cityName,
                                           @Param("supplierId")String supplierId,
                                           @Param("supplierName")String supplierName,
-                                          @Param("driverTeamId")String teamId,
-                                          @Param("driverTeamName")String teamName,
+                                          @Param("driverTeamId")String driverTeamId,
+                                          @Param("driverTeamName")String driverTeamName,
                                           @Param("driverGroupId")String driverGroupId,
                                           @Param("driverGroupName")String driverGroupName,
                                           @Param("driverPhone")String driverPhone,
@@ -508,9 +508,9 @@ public class SaasDriverDailyReportController {
         if(StringUtils.isNotBlank(supplierId)){
             dto.setSupplierId(Integer.valueOf(supplierId));
             dto.setSupplierName(supplierName);
-        }if (StringUtils.isNotBlank(teamId)){
-            dto.setDriverTeamId(Integer.valueOf(teamId));
-            dto.setDriverTeamName(teamName);
+        }if (StringUtils.isNotBlank(driverTeamId)){
+            dto.setDriverTeamId(Integer.valueOf(driverTeamId));
+            dto.setDriverTeamName(driverTeamName);
         }if(StringUtils.isNotBlank(driverGroupId)){
             dto.setDriverGroupId(Integer.valueOf(driverGroupId));
             dto.setDriverGroupName(driverGroupName);
@@ -552,8 +552,8 @@ public class SaasDriverDailyReportController {
                                         @Verify(param = "cityName",rule="required")String cityName,
                                         @Param("supplierId")String supplierId,
                                         @Param("supplierName")String supplierName,
-                                        @Param("driverTeamId")String teamId,
-                                        @Param("driverTeamName")String teamName,
+                                        @Param("driverTeamId")String driverTeamId,
+                                        @Param("driverTeamName")String driverTeamName,
                                         @Param("driverGroupId")String driverGroupId,
                                         @Param("driverGroupName")String driverGroupName,
                                         @Param("driverPhone")String driverPhone,
@@ -642,7 +642,7 @@ public class SaasDriverDailyReportController {
         try {
             Page page =  PageHelper.startPage(pageNum,pageSize,true);
             summaryReportList = summaryReportExMapper.querySummeryReport(Integer.valueOf(cityId), StringUtils.isEmpty(supplierId)?null:Integer.valueOf(supplierId),
-                    StringUtils.isEmpty(teamId)?null:Integer.valueOf(teamId),StringUtils.isEmpty(driverGroupId)?null:Integer.valueOf(driverGroupId),
+                    StringUtils.isEmpty(driverTeamId)?null:Integer.valueOf(driverTeamId),StringUtils.isEmpty(driverGroupId)?null:Integer.valueOf(driverGroupId),
                     driverPhone,licensePlates,currentDate,businessVolumeSort,finOrdCntSort,badCntSort,sort);
 
             total = page.getTotal();
@@ -657,7 +657,7 @@ public class SaasDriverDailyReportController {
         for(BiDriverBusinessInfoSummaryReportDTO dto : summaryReportDTOList){
             dto.setCityName(cityName);
             dto.setSupplierName(StringUtils.isEmpty(supplierName)?supplierMap.get(dto.getSupplierId()):supplierName);
-            dto.setDriverTeamName(StringUtils.isEmpty(teamName)?teamMap.get(dto.getDriverTeamId()):teamName);
+            dto.setDriverTeamName(StringUtils.isEmpty(driverTeamName)?teamMap.get(dto.getDriverTeamId()):driverTeamName);
             dto.setDriverGroupName(StringUtils.isEmpty(driverGroupName)?teamMap.get(dto.getDriverGroupId()):driverGroupName);
             dto.setCooperateName(cooperMap.get(dto.getCooperationType()));
             dto.setCarGroupName(carGroupMap.get(dto.getCarGroupId()));
@@ -675,8 +675,8 @@ public class SaasDriverDailyReportController {
                                           @Verify(param = "cityName",rule="required")String cityName,
                                           @Param("supplierId")String supplierId,
                                           @Param("supplierName")String supplierName,
-                                          @Param("driverTeamId")String teamId,
-                                          @Param("driverTeamName")String teamName,
+                                          @Param("driverTeamId")String driverTeamId,
+                                          @Param("driverTeamName")String driverTeamName,
                                           @Param("driverGroupId")String driverGroupId,
                                           @Param("driverGroupName")String driverGroupName,
                                           @Param("driverPhone")String driverPhone,
@@ -713,9 +713,9 @@ public class SaasDriverDailyReportController {
         if(StringUtils.isNotBlank(supplierId)){
             dto.setSupplierId(Integer.valueOf(supplierId));
             dto.setSupplierName(supplierName);
-        }if (StringUtils.isNotBlank(teamId)){
-            dto.setDriverTeamId(Integer.valueOf(teamId));
-            dto.setDriverTeamName(teamName);
+        }if (StringUtils.isNotBlank(driverTeamId)){
+            dto.setDriverTeamId(Integer.valueOf(driverTeamId));
+            dto.setDriverTeamName(driverTeamName);
         }if(StringUtils.isNotBlank(driverGroupId)){
             dto.setDriverGroupId(Integer.valueOf(driverGroupId));
             dto.setDriverGroupName(driverGroupName);
