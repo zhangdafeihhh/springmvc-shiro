@@ -1,7 +1,6 @@
 package com.zhuanche.controller.statistic;
 
 import com.alibaba.fastjson.JSON;
-import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
@@ -12,18 +11,14 @@ import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.controller.DriverQueryController;
-import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalBean;
+import com.zhuanche.entity.driver.DriverAppraisalAppeal;
 import com.zhuanche.entity.driver.MpCarBizCustomerAppraisal;
 import com.zhuanche.entity.driver.MpCustomerAppraisalParams;
-import com.zhuanche.entity.rentcar.CarBizCustomerAppraisal;
-import com.zhuanche.entity.rentcar.CarBizCustomerAppraisalParams;
-import com.zhuanche.entity.rentcar.DriverOutage;
-import com.zhuanche.serv.CarBizCustomerAppraisalExService;
+import com.zhuanche.serv.deiver.DriverAppraisalAppealService;
 import com.zhuanche.serv.deiver.MpDriverCustomerAppraisalService;
-import com.zhuanche.serv.rentcar.DriverOutageService;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.DateUtils;
+import com.zhuanche.util.dateUtil.DateUtil;
 import com.zhuanche.util.excel.CsvUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -36,10 +31,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.zhuanche.common.enums.MenuEnum.*;
 
@@ -55,27 +51,10 @@ public class MpOrderAppraisalController extends DriverQueryController{
 
 	@Autowired
 	private MpDriverCustomerAppraisalService mpDriverCustomerAppraisalService;
+	@Autowired
+	private DriverAppraisalAppealService appraisalAppealService;
 
 
-	/**
-	 * 订单评分查询
-	 * @param cityId 城市
-	 * @param supplierId 供应商
-	 * @param teamId 车队
-	 * @param groupIds 小组
-	 * @param driverName 司机姓名
-	 * @param driverPhone 司机手机号
-	 * @param orderNo 订单号
-	 * @param createDateBegin 开始时间
-	 * @param createDateEnd 结束时间
-	 * @param evaluateScore 司机评分
-	 * @param sortName 排序字段
-	 * @param sortOrder 排序
-	 * @param page 当前页
-	 * @param pageSize 当前展示页数
-	 * @param appraisalStatus 评论是否有效 0:有效 1:无效
-	 * @return AjaxResponse
-	 */
 	@ResponseBody
 	@RequestMapping("/orderAppraisalListData")
 	@RequiresPermissions(value = { "OrderScore_look" } )
@@ -95,71 +74,93 @@ public class MpOrderAppraisalController extends DriverQueryController{
 										  String createDateEnd,
 										  String orderFinishTimeBegin,
 										  String orderFinishTimeEnd,
+										  Integer isAllowedAppeal,
+										  Integer appealStatus,
 										  String evaluateScore,String sortName, String sortOrder,
 										  Integer page,
 										  @Verify(param = "pageSize",rule = "max(50)")Integer pageSize) {
-		MpCustomerAppraisalParams params = new MpCustomerAppraisalParams(cityId,supplierId,teamId,groupIds,driverName,driverPhone,orderNo,
-				createDateBegin,createDateEnd,evaluateScore,sortName,sortOrder,page,pageSize);
-		params.setAppraisalStatus(appraisalStatus);
-
-		int total = 0;
-		String driverList = "";
-		if(StringUtils.isNotEmpty(params.getGroupIds()) || StringUtils.isNotEmpty(params.getTeamId())){
-			driverList = super.queryAuthorityDriverIdsByTeamAndGroup(params.getTeamId(), params.getGroupIds());
-			if(driverList==null || "".equals(driverList)){
-				log.info("订单评价列表-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds());
-				log.info("订单评价列表-有选择车队查询条件-该车队下没有司机teamId=="+params.getTeamId());
-				PageDTO pageDTO = new PageDTO(params.getPage(), params.getPageSize(), total, null);
-				return AjaxResponse.success(pageDTO);
-			}
-		}
-		//修改查询限制条件
-		if((StringUtils.isEmpty(createDateBegin) && StringUtils.isEmpty(createDateEnd)) &&
-				StringUtils.isEmpty(orderFinishTimeBegin) &&
-				StringUtils.isEmpty(orderFinishTimeEnd)){
-			log.info("评价时间】范围或【完成日期】范围至少限定一个，支持跨度31天");
-			return AjaxResponse.fail(RestErrorCode.PARAMS_NOT,RestErrorCode.renderMsg(RestErrorCode.PARAMS_NOT));
-		}
-
-		params.setDriverIds(driverList);
-		//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
-		params = this.chuliParams(params);
-		//开始查询
-		List<MpCarBizCustomerAppraisal> list = null;
+		long startTime=System.currentTimeMillis();
 		try {
-			log.info("查询订单评分---参数："+params.toString());
+			//只能查询一个月的数据
+			if ((StringUtils.isEmpty(createDateBegin) && StringUtils.isEmpty(createDateEnd)) && StringUtils.isEmpty(orderFinishTimeBegin) && StringUtils.isEmpty(orderFinishTimeEnd)) {
+                log.info("【评价时间】范围或【完成日期】范围至少限定一个，支持跨度31天");
+                return AjaxResponse.fail(RestErrorCode.PARAMS_NOT, RestErrorCode.renderMsg(RestErrorCode.PARAMS_NOT));
+            }
+			//封装主表查询条件
+			MpCustomerAppraisalParams params = new MpCustomerAppraisalParams(cityId, supplierId, driverName, driverPhone, orderNo,
+					createDateBegin, createDateEnd,orderFinishTimeBegin,orderFinishTimeEnd,
+					evaluateScore, appraisalStatus,isAllowedAppeal, sortName, sortOrder);
+			log.info("订单评价列表,查询参数："+ JSON.toJSONString(params));
+			//如果选择了车队小组，先查询该车队小组下对应的DriverId
+			if (StringUtils.isNotEmpty(groupIds) || StringUtils.isNotEmpty(teamId)) {
+                String driverIds = super.queryAuthorityDriverIdsByTeamAndGroup(groupIds, teamId);
+                if (StringUtils.isNotBlank(driverIds)) {
+                    log.info("订单评价列表-有选择小组查询条件-该小组下没有司机groupId={},teamId={}", groupIds, teamId);
+                    return AjaxResponse.success(new PageDTO(page, pageSize, 0, new ArrayList()));
+                }
+                params.setDriverIds(driverIds);
+            }
+			if (appealStatus != null && appealStatus == 0) {
+                params.setIsAlreadyAppeal(0);
+            }
+			//整理权限
+			params = this.chuliParams(params);
 
-			//追加订单完成时间
-			params.setOrderFinishTimeBegin(orderFinishTimeBegin);
-			params.setOrderFinishTimeEnd(orderFinishTimeEnd);
-			PageInfo<MpCarBizCustomerAppraisal> pageInfo = mpDriverCustomerAppraisalService.findPageByparam(params);
-			list = pageInfo.getList();
-			total = (int)pageInfo.getTotal();
-		} catch (Exception e){
-			log.error("查询订单评分异常，参数为"+(params==null?"null": JSON.toJSONString(params)),e);
+			//判断是否有附表条件 appealStatus =0 可以转换为主表中的IsAlreadyAppeal = 0 查询主表信息
+			List<MpCarBizCustomerAppraisal> resultList = null;
+			long total = 0;
+			List<Integer> queryParam=null;
+			if (appealStatus == null || appealStatus == 0) {
+                //没有附表查询条件直接查询主表信息返回
+                params.setPage(page);
+                params.setPageSize(pageSize);
+                PageInfo<MpCarBizCustomerAppraisal> pageByparam = mpDriverCustomerAppraisalService.findPageByparam(params);
+                resultList = pageByparam.getList();
+                queryParam=resultList.stream().map(MpCarBizCustomerAppraisal::getAppraisalId).collect(Collectors.toList());
+                total = pageByparam.getTotal();
+                if(total==0){
+					return AjaxResponse.success(new PageDTO(page,pageSize,0,new ArrayList()));
+				}
+            } else {
+                List<Integer> mainTabIds = mpDriverCustomerAppraisalService.queryIds(params);
+                Set<Integer> slaveTabIds = appraisalAppealService.getAppraissalIdsByAppealStatus(appealStatus);
+                //求并集
+				mainTabIds.removeIf(o -> !slaveTabIds.contains(o));
+				if(mainTabIds.size()==0){
+					return AjaxResponse.success(new PageDTO(page,pageSize,0,new ArrayList()));
+				}
+				int start = (page - 1) * pageSize;
+                int end = start + pageSize;
+                queryParam = mainTabIds.subList((start <= 0) ? 0 : start, end >= mainTabIds.size() ? mainTabIds.size() : end);
+                total = mainTabIds.size();
+                resultList = mpDriverCustomerAppraisalService.queryByIds(queryParam);
+            }
+			//封装字段
+			List<DriverAppraisalAppeal> appeals = appraisalAppealService.queryBaseInfoByAppraisalIds(queryParam);
+			Map<Integer, DriverAppraisalAppeal> appealsMap = appeals.stream().collect(Collectors.toMap(o -> o.getAppraisalId(), O -> O));
+			resultList.forEach(o -> {
+                DriverAppraisalAppeal appeal = appealsMap.get(o.getAppraisalId());
+                if (appeal != null) {
+                    o.setAppealId(appeal.getId());
+                    //撤销状态不显示 申述时间
+                    if(appeal.getAppealStatus()!=4){
+						o.setAppealTime(appeal.getCreateTime());
+					}
+                    o.setAppealStatus(appeal.getAppealStatus());
+                } else {
+                    //申诉表中没有表明未申诉
+                    o.setAppealStatus(0);
+                }
+            });
+			log.info("订单评价列表 查询成功 耗时："+(System.currentTimeMillis()-startTime));
+			return AjaxResponse.success(new PageDTO(page,pageSize,total, resultList));
+		} catch (Exception e) {
+			log.error("订单评价列表 查询成功 耗时："+(System.currentTimeMillis()-startTime));
+			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 		}
-		PageDTO pageDTO = new PageDTO(params.getPage(), params.getPageSize(), total, list);
-		return AjaxResponse.success(pageDTO);
 	}
 
-	/**
-	 * 订单评分导出
-	 * @param cityId 城市
-	 * @param supplierId 供应商
-	 * @param teamId 车队
-	 * @param groupIds 小组
-	 * @param driverName 司机姓名
-	 * @param driverPhone 司机手机号
-	 * @param orderNo 订单号
-	 * @param createDateBegin 开始时间
-	 * @param createDateEnd 结束时间
-	 * @param evaluateScore 司机评分
-	 * @param sortName 排序字段
-	 * @param sortOrder 排序
-	 * @param request request
-	 * @param response response
-	 * @return
-	 */
+
 	@RequestMapping("/exportOrderAppraisal")
 	@RequiresPermissions(value = { "OrderScore_export" } )
 	@ResponseBody
@@ -168,7 +169,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			@MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
 	})
 	@RequestFunction(menu = ORDER_RANK_EXPORT)
-	public AjaxResponse exportOrderAppraisal(
+	public void exportOrderAppraisal(
 			@Verify(param="cityId",rule="required")String cityId,
 			@Verify(param="supplierId",rule="required") String supplierId,
 			String teamId,
@@ -176,140 +177,165 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			String driverName,
 			@Verify(param="driverPhone",rule="mobile")  String driverPhone,
 			String orderNo, Integer appraisalStatus,
+			Integer isAllowedAppeal,
+			Integer appealStatus,
 			String createDateBegin,
 			String createDateEnd,
 			String orderFinishTimeBegin,
 			String orderFinishTimeEnd,
 			String evaluateScore,String sortName, String sortOrder,HttpServletRequest request,HttpServletResponse response){
-
-		//修改查询限制条件
-		if((StringUtils.isEmpty(createDateBegin) && StringUtils.isEmpty(createDateEnd)) &&
-				StringUtils.isEmpty(orderFinishTimeBegin) &&
-				StringUtils.isEmpty(orderFinishTimeEnd)){
-			log.info("评价时间】范围或【完成日期】范围至少限定一个，支持跨度31天");
-			return AjaxResponse.fail(RestErrorCode.PARAMS_NOT,RestErrorCode.renderMsg(RestErrorCode.PARAMS_NOT));
-		}
-
-		int page =1;
-		int pageSize = CsvUtils.downPerSize;
-
-		List<String> headerList = new ArrayList<>();
-		headerList.add("司机姓名,司机手机,车牌号,订单号,评分,评价,备注,时间, 状态, 订单完成时间");
-
-		String fileName = "";
-		List<String> csvDataList = new ArrayList<>();
-		MpCustomerAppraisalParams params = null;
+		     CsvUtils entity = new CsvUtils();
+		    String fileName = this.getFileName(request, "订单评分");
+		    long startTime=System.currentTimeMillis();
 		try {
-			fileName = "订单评分"+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
-			String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
-			if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
-				fileName = URLEncoder.encode(fileName, "UTF-8");
-			} else {  //其他浏览器
-				fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+			//只能查询一个月的数据
+			if ((StringUtils.isEmpty(createDateBegin) && StringUtils.isEmpty(createDateEnd)) && StringUtils.isEmpty(orderFinishTimeBegin) && StringUtils.isEmpty(orderFinishTimeEnd)) {
+				ArrayList<String> errHead=new ArrayList<>();
+				errHead.add("【评价时间】范围或【完成日期】范围至少限定一个，支持跨度31天");
+				entity.exportCsvV2(response,null,errHead,fileName,true,true);
+				return;
 			}
 
-			CsvUtils entity = new CsvUtils();
-			params = new MpCustomerAppraisalParams(cityId,supplierId,teamId,groupIds,driverName,driverPhone,orderNo,
-					createDateBegin,createDateEnd,evaluateScore,sortName,sortOrder,page,pageSize);
-			params.setAppraisalStatus(appraisalStatus);
-
-			String driverList = "";
-			if(StringUtils.isNotEmpty(params.getGroupIds()) || StringUtils.isNotEmpty(params.getTeamId())){
-				driverList = super.queryAuthorityDriverIdsByTeamAndGroup(params.getTeamId(), params.getGroupIds());
-				if(driverList==null || "".equals(driverList)){
-					log.info("订单评价列表-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds());
-					log.info("订单评价列表-有选择车队查询条件-该车队下没有司机teamId=="+params.getTeamId());
-
-
-					csvDataList.add("没有查到符合条件的数据");
-					entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
+			//封装主表查询条件
+			MpCustomerAppraisalParams params = new MpCustomerAppraisalParams(cityId, supplierId, driverName, driverPhone, orderNo,
+					createDateBegin, createDateEnd,orderFinishTimeBegin,orderFinishTimeEnd,
+					evaluateScore, appraisalStatus,isAllowedAppeal, sortName, sortOrder);
+			log.info("订单评价列表,导出参数："+ JSON.toJSONString(params));
+			//如果选择了车队小组，先查询该车队小组下对应的DriverId
+			if (StringUtils.isNotEmpty(groupIds) || StringUtils.isNotEmpty(teamId)) {
+				String driverIds = super.queryAuthorityDriverIdsByTeamAndGroup(groupIds, teamId);
+				if (StringUtils.isNotBlank(driverIds)) {
+					ArrayList<String> errHead=new ArrayList<>();
+					errHead.add("暂无数据");
+					entity.exportCsvV2(response,null,errHead,fileName,true,true);
+					return;
 				}
+				params.setDriverIds(driverIds);
 			}
-			params.setDriverIds(driverList);
-			//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
+			//查询未申诉数据，转换为主表中的字段
+			if (appealStatus != null && appealStatus == 0) {
+				params.setIsAlreadyAppeal(0);
+			}
+			//整理权限
 			params = this.chuliParams(params);
+			List<Integer> mainTabIds = mpDriverCustomerAppraisalService.queryIds(params);
 
-			params.setOrderFinishTimeBegin(orderFinishTimeBegin);
-			params.setOrderFinishTimeEnd(orderFinishTimeEnd);
-			PageInfo<MpCarBizCustomerAppraisal> pageInfo = mpDriverCustomerAppraisalService.findPageByparam(params);
-
-			int totalPage = pageInfo.getPages();
-			log.info("导出订单评分，参数为"+JSON.toJSONString(params)+"第1页，共"+totalPage+"页");
-			if(totalPage == 0){
-				csvDataList.add("没有查到符合条件的数据");
-
-				entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
-			}else{
-				boolean isFirst = true;
-				boolean isLast = false;
-				List<MpCarBizCustomerAppraisal> rows = pageInfo.getList();
-				//数据转换
-				dataTrans(rows,csvDataList);
-				if(totalPage == 1){
-					isLast = true;
-				}
-				entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
-				isFirst = false;
-
-				for(int pageNumber=2; pageNumber <= totalPage; pageNumber++){
-					csvDataList = new ArrayList<>();
-					params.setPage(pageNumber);
-					log.info("导出订单评分，第"+pageNumber+"页，共"+totalPage+"页，参数为"+JSON.toJSONString(params));
-					pageInfo = mpDriverCustomerAppraisalService.findPageByparam(params);
-					if(pageNumber == totalPage){
-						isLast = true;
-					}
-					rows = pageInfo.getList();
-					dataTrans(rows,csvDataList);
-					entity.exportCsvV2(response,csvDataList,headerList,fileName,isFirst,isLast);
-				}
-				log.info("导出司机评分成功，参数为"+(params==null?"null": JSON.toJSONString(params)));
+			//查询附表
+			if (appealStatus != null && appealStatus != 0) {
+				Set<Integer> slaveTabIds = appraisalAppealService.getAppraissalIdsByAppealStatus(appealStatus);
+				//求并集
+				mainTabIds.removeIf(o -> !slaveTabIds.contains(o));
 			}
 
-		} catch (Exception e){
-			log.error("导出司机评分异常，参数为"+(params==null?"null": JSON.toJSONString(params)),e);
+			int total = mainTabIds.size();
+			if(total==0){
+				ArrayList<String> errHead=new ArrayList<>();
+				errHead.add("暂无数据");
+				entity.exportCsvV2(response,null,errHead,fileName,true,true);
+				return;
+			}
+			int pageSize=30;//TODO 测试先用30
+			int pages=total%pageSize==0?total/pageSize:total/pageSize+1;
+
+			ArrayList<String> headList=new ArrayList();
+			headList.add("司机姓名,司机手机,车牌号,订单号,评分,评价,备注,评价时间,订单完成时间,评分状态,是否允许申诉,申诉状态,申诉时间");
+			boolean isFirst=true;
+			boolean isLast=false;
+			for(int i=1;i<=pages;i++){
+				int start = (i-1)*pageSize;
+				int end = start+pageSize>mainTabIds.size()?mainTabIds.size():start+pageSize;
+				List<Integer> queryParam = mainTabIds.subList(start, end);
+				List<MpCarBizCustomerAppraisal> appraisals = mpDriverCustomerAppraisalService.queryByIds(queryParam);
+				List<DriverAppraisalAppeal> appeals = appraisalAppealService.queryBaseInfoByAppraisalIds(queryParam);
+				Map<Integer, DriverAppraisalAppeal> appealsMap = appeals.stream().collect(Collectors.toMap(o -> o.getAppraisalId(), O -> O));
+				List<String> data = dataTrans(appraisals, appealsMap);
+				entity.exportCsvV2(response,data,headList,fileName,isFirst,isLast);
+				isFirst=false;
+				if(i==pages-1){
+					isLast=true;
+				}
+			}
+			log.info("订单评分导出：total="+total+"耗时："+(System.currentTimeMillis()-startTime));
+		} catch (Exception e) {
+			ArrayList<String> errHead=new ArrayList<>();
+			errHead.add("请联系管理员");
+			try {
+				entity.exportCsvV2(response,null,errHead,fileName,true,true);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 
-		return AjaxResponse.success(null);
+
 	}
 
-	private void dataTrans(List<MpCarBizCustomerAppraisal> result, List<String>  csvDataList ){
-		if(null == result){
-			return;
+	private String getFileName(HttpServletRequest request,String fileName){
+		try {
+			fileName = fileName+ DateUtil.dateFormat(new Date(), DateUtil.intTimestampPattern)+".csv";
+			String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
+			if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
+                fileName = URLEncoder.encode(fileName, "UTF-8");
+            } else {  //其他浏览器
+                fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+            }
+		} catch (UnsupportedEncodingException e) {
+			log.error("格式化导出文件名异常"+e);
 		}
-		for(MpCarBizCustomerAppraisal s:result){
-			StringBuffer stringBuffer = new StringBuffer();
+		return fileName;
+	}
 
 
-			stringBuffer.append(s.getDriverName());
-			stringBuffer.append(",");
+	private List<String> dataTrans(List<MpCarBizCustomerAppraisal> result,Map<Integer, DriverAppraisalAppeal> appraisalMap){
+		List<String> list =new ArrayList<>();
+		for(MpCarBizCustomerAppraisal s:result) {
+			StringBuffer sb = new StringBuffer();
+			sb.append(s.getDriverName());
+			sb.append(",");
 
-			stringBuffer.append(s.getDriverPhone()==null?"":"\t"+s.getDriverPhone());
-			stringBuffer.append(",");
+			sb.append(s.getDriverPhone() == null ? "" : "\t" + s.getDriverPhone());
+			sb.append(",");
 
-			stringBuffer.append(s.getLicensePlates()==null?"":s.getLicensePlates());
-			stringBuffer.append(",");
+			sb.append(s.getLicensePlates() == null ? "" : s.getLicensePlates());
+			sb.append(",");
 
-			stringBuffer.append(s.getOrderNo());
-			stringBuffer.append(",");
+			sb.append(s.getOrderNo());
+			sb.append(",");
 
-			stringBuffer.append(s.getEvaluateScore()==null?"":s.getEvaluateScore());
-			stringBuffer.append(",");
+			sb.append(s.getEvaluateScore() == null ? "" : s.getEvaluateScore());
+			sb.append(",");
 
-			stringBuffer.append(StringUtils.isEmpty(s.getEvaluate())?"":s.getEvaluate().replaceAll(",","，"));
-			stringBuffer.append(",");
+			sb.append(StringUtils.isEmpty(s.getEvaluate()) ? "" : s.getEvaluate().replaceAll(",", "，"));
+			sb.append(",");
 
-			stringBuffer.append(s.getMemo()==null?"":s.getMemo().replaceAll(",","，").replaceAll(System.getProperty("line.separator"),"，"));//评价
-			stringBuffer.append(",");
+			sb.append(s.getMemo()==null?"":s.getMemo().replaceAll(",","，").replaceAll(System.getProperty("line.separator"),"，"));//评价
+			sb.append(",");
 
-			stringBuffer.append(DateUtils.formatDateTime_CN(s.getCreateDate()));
-			stringBuffer.append(",");
+			sb.append(DateUtils.formatDateTime_CN(s.getCreateDate()));
+			sb.append(",");
 
-			stringBuffer.append((s.getAppraisalStatus()!=null&&s.getAppraisalStatus()==0)?"有效":"无效");
+			sb.append(DateUtils.formatDateTime_CN(s.getOrderFinishTime()));
+			sb.append(",");
 
-			csvDataList.add(stringBuffer.toString());
+			sb.append((s.getAppraisalStatus()!=null&&s.getAppraisalStatus()==0)?"有效":"无效");
+			sb.append(",");
+
+			sb.append(s.getIsAllowedAppeal() == 0 ? "不可申诉" : "可申诉");
+			sb.append(",");
+
+			DriverAppraisalAppeal appeal = appraisalMap.get(s.getAppraisalId());
+			String appealTime = "";
+			int appealStatus = 0;
+			if (appeal != null) {
+				appealTime = DateUtils.formatDateTime_CN(appeal.getCreateTime());
+				appealStatus = appeal.getAppealStatus();
+			}
+			sb.append(AppealStatusEnum.getMsg(appealStatus)).append(",");
+			if(appealStatus!=4){
+				sb.append(appealTime);
+			}
+			list.add(sb.toString());
 		}
-
+			return list;
 	}
 
 	/**
@@ -332,6 +358,43 @@ public class MpOrderAppraisalController extends DriverQueryController{
 		}
 
 		return params;
+	}
+
+	enum AppealStatusEnum{
+		UN_APPEAL(0,"未审诉"),APPEALED(1,"已申诉"),APPEAL_SUCCESS(2,"申诉成功 "),APPEAL_FAIL(3,"申诉失败"),REVOKE_APPEAL(4,"撤销");
+
+		private int code;
+		private String msg;
+
+		AppealStatusEnum(int code, String msg) {
+			this.code = code;
+			this.msg = msg;
+		}
+
+		public int getCode() {
+			return code;
+		}
+
+		public void setCode(int code) {
+			this.code = code;
+		}
+
+		public String getMsg() {
+			return msg;
+		}
+
+		public void setMsg(String msg) {
+			this.msg = msg;
+		}
+
+		public static String getMsg(int code){
+			for (AppealStatusEnum status:AppealStatusEnum.values()) {
+				if(status.code==code){
+					return status.msg;
+				}
+			}
+			return "";
+		}
 	}
 
 }

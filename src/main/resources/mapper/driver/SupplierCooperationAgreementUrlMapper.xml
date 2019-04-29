@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.SupplierCooperationAgreementUrlMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.SupplierCooperationAgreementUrl" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="agreement_id" property="agreementId" jdbcType="BIGINT" />
+    <result column="file_name" property="fileName" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="create_name" property="createName" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, supplier_id, agreement_id, file_name, url, create_by, create_name, create_date, 
+    update_date
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from supplier_cooperation_agreement_url
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from supplier_cooperation_agreement_url
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.driver.SupplierCooperationAgreementUrl" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into supplier_cooperation_agreement_url (supplier_id, agreement_id, file_name, 
+      url, create_by, create_name, 
+      create_date, update_date)
+    values (#{supplierId,jdbcType=INTEGER}, #{agreementId,jdbcType=BIGINT}, #{fileName,jdbcType=VARCHAR}, 
+      #{url,jdbcType=VARCHAR}, #{createBy,jdbcType=INTEGER}, #{createName,jdbcType=VARCHAR}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.SupplierCooperationAgreementUrl" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into supplier_cooperation_agreement_url
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="agreementId != null" >
+        agreement_id,
+      </if>
+      <if test="fileName != null" >
+        file_name,
+      </if>
+      <if test="url != null" >
+        url,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createName != null" >
+        create_name,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="agreementId != null" >
+        #{agreementId,jdbcType=BIGINT},
+      </if>
+      <if test="fileName != null" >
+        #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null" >
+        #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="createName != null" >
+        #{createName,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.driver.SupplierCooperationAgreementUrl" >
+    update supplier_cooperation_agreement_url
+    <set >
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="agreementId != null" >
+        agreement_id = #{agreementId,jdbcType=BIGINT},
+      </if>
+      <if test="fileName != null" >
+        file_name = #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null" >
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="createName != null" >
+        create_name = #{createName,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.SupplierCooperationAgreementUrl" >
+    update supplier_cooperation_agreement_url
+    set supplier_id = #{supplierId,jdbcType=INTEGER},
+      agreement_id = #{agreementId,jdbcType=BIGINT},
+      file_name = #{fileName,jdbcType=VARCHAR},
+      url = #{url,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=INTEGER},
+      create_name = #{createName,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

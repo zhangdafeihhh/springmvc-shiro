@@ -27,6 +27,7 @@ public interface MenuConstants {
     String CAR_INFO_MANAGE = "车辆信息管理";
     String CAR_INFO_LIST = "车辆信息查询";
     String CAR_INFO_CHANGE_APPLY = "车辆信息修改申请";
+    String SUPPLIER_ACCOUNT_APPLIY_LIST = "加盟商更新审核";
 
     //运力管理
     String TRANSPORT_CAPACITY = "运力管理";

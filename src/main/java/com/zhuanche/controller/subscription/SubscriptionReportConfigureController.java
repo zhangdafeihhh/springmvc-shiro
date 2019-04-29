@@ -256,6 +256,13 @@ public class SubscriptionReportConfigureController {
         map.put( "29", "高德");
         map.put( "30", "阿里欢行");
         map.put( "31", "东方航空");
+        map.put( "32", "高铁管家");
+        map.put( "33", "平安财酷外部公司");
+        map.put( "34", "国铁吉讯");
+        map.put( "35", "中航信");
+        map.put( "36", "Hopetrip");
+        map.put( "37", "美团商企通");
+        map.put( "38", "航班管家");
 
         return AjaxResponse.success(map);
     }

@@ -1,6 +1,8 @@
 package com.zhuanche.entity.driver;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Set;
 
 public class MpCustomerAppraisalParams implements Serializable{
 
@@ -30,12 +32,26 @@ public class MpCustomerAppraisalParams implements Serializable{
 
     private String orderFinishTimeBegin;
     private String orderFinishTimeEnd;
-
-
     /**
      * 评论是否有效 0:有效 1:无效
      */
     private Integer appraisalStatus;
+    /**
+     * 是否允许申诉：是否可申诉：0：否 1：是
+     */
+    private Integer isAllowedAppeal;
+
+    /**
+     * 申诉状态  申诉状态：0:未申诉   1:已申诉（待审核） 2:申诉成功  3:申诉失败
+     */
+    private Integer appealStatus;
+
+    /**
+     * 是否已申诉
+     * */
+    private Integer isAlreadyAppeal;
+
+    private List<Integer> appraisalIds;
 
 
     public MpCustomerAppraisalParams(String cityId, String supplierId, String teamId, String groupIds, String driverName, String driverPhone, String orderNo,
@@ -52,6 +68,26 @@ public class MpCustomerAppraisalParams implements Serializable{
         this.evaluateScore = evaluateScore;
         this.page = page;
         this.pageSize = pageSize;
+        this.sortName = sortName;
+        this.sortorder = sortorder;
+    }
+
+    public MpCustomerAppraisalParams(String cityId, String supplierId, String driverName, String driverPhone, String orderNo,
+                                     String createDateBegin, String createDateEnd, String orderFinishTimeBegin,String orderFinishTimeEnd,
+                                     String evaluateScore,Integer appraisalStatus,
+                                     Integer isAllowedAppeal,String sortName, String sortorder) {
+        this.cityId = cityId;
+        this.supplierId = supplierId;
+        this.driverName = driverName;
+        this.driverPhone = driverPhone;
+        this.orderNo = orderNo;
+        this.createDateBegin = createDateBegin;
+        this.createDateEnd = createDateEnd;
+        this.orderFinishTimeBegin=orderFinishTimeBegin;
+        this.orderFinishTimeEnd=orderFinishTimeEnd;
+        this.evaluateScore = evaluateScore;
+        this.appraisalStatus=appraisalStatus;
+        this.isAllowedAppeal=isAllowedAppeal;
         this.sortName = sortName;
         this.sortorder = sortorder;
     }
@@ -242,6 +278,38 @@ public class MpCustomerAppraisalParams implements Serializable{
 
     public void setOrderFinishTimeEnd(String orderFinishTimeEnd) {
         this.orderFinishTimeEnd = orderFinishTimeEnd;
+    }
+
+    public Integer getIsAllowedAppeal() {
+        return isAllowedAppeal;
+    }
+
+    public void setIsAllowedAppeal(Integer isAllowedAppeal) {
+        this.isAllowedAppeal = isAllowedAppeal;
+    }
+
+    public Integer getAppealStatus() {
+        return appealStatus;
+    }
+
+    public void setAppealStatus(Integer appealStatus) {
+        this.appealStatus = appealStatus;
+    }
+
+    public Integer getIsAlreadyAppeal() {
+        return isAlreadyAppeal;
+    }
+
+    public void setIsAlreadyAppeal(Integer isAlreadyAppeal) {
+        this.isAlreadyAppeal = isAlreadyAppeal;
+    }
+
+    public List<Integer> getAppraisalIds() {
+        return appraisalIds;
+    }
+
+    public void setAppraisalIds(List<Integer> appraisalIds) {
+        this.appraisalIds = appraisalIds;
     }
 
     @Override

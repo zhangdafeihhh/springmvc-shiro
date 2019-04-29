@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.DriverAppraisalAppealMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.DriverAppraisalAppeal" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="appraisal_id" property="appraisalId" jdbcType="INTEGER" />
+    <result column="appraisal_status" property="appraisalStatus" jdbcType="INTEGER" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="order_id" property="orderId" jdbcType="INTEGER" />
+    <result column="booking_customer_name" property="bookingCustomerName" jdbcType="VARCHAR" />
+    <result column="booking_customer_phone" property="bookingCustomerPhone" jdbcType="VARCHAR" />
+    <result column="booking_customer_id" property="bookingCustomerId" jdbcType="INTEGER" />
+    <result column="rider_phone" property="riderPhone" jdbcType="VARCHAR" />
+    <result column="rider_name" property="riderName" jdbcType="VARCHAR" />
+    <result column="evaluate_score" property="evaluateScore" jdbcType="VARCHAR" />
+    <result column="evaluate" property="evaluate" jdbcType="VARCHAR" />
+    <result column="memo" property="memo" jdbcType="VARCHAR" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="driver_phone" property="driverPhone" jdbcType="VARCHAR" />
+    <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="license_plates" property="licensePlates" jdbcType="VARCHAR" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+    <result column="appeal_status" property="appealStatus" jdbcType="INTEGER" />
+    <result column="appeal_content" property="appealContent" jdbcType="VARCHAR" />
+    <result column="file_name" property="fileName" jdbcType="VARCHAR" />
+    <result column="audit_time" property="auditTime" jdbcType="TIMESTAMP" />
+    <result column="audit_remark" property="auditRemark" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="audit_name" property="auditName" jdbcType="VARCHAR" />
+    <result column="audit_by" property="auditBy" jdbcType="INTEGER" />
+    <result column="create_name" property="createName" jdbcType="VARCHAR" />
+    <result column="update_name" property="updateName" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.driver.DriverAppraisalAppeal" extends="BaseResultMap" >
+    <result column="url" property="url" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, appraisal_id, appraisal_status, order_no, order_id, booking_customer_name, booking_customer_phone, 
+    booking_customer_id, rider_phone, rider_name, evaluate_score, evaluate, memo, driver_id, 
+    driver_phone, driver_name, license_plates, city_name, city_id, supplier_id, supplier_name, 
+    appeal_status, appeal_content, file_name, audit_time, audit_remark, create_time, 
+    update_time, create_by, update_by, audit_name, audit_by, create_name, update_name
+  </sql>
+  <sql id="Blob_Column_List" >
+    url
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from driver_appraisal_appeal
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from driver_appraisal_appeal
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.driver.DriverAppraisalAppeal" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into driver_appraisal_appeal (appraisal_id, appraisal_status, order_no, 
+      order_id, booking_customer_name, booking_customer_phone, 
+      booking_customer_id, rider_phone, rider_name, 
+      evaluate_score, evaluate, memo, 
+      driver_id, driver_phone, driver_name, 
+      license_plates, city_name, city_id, 
+      supplier_id, supplier_name, appeal_status, 
+      appeal_content, file_name, audit_time, 
+      audit_remark, create_time, update_time, 
+      create_by, update_by, audit_name, 
+      audit_by, create_name, update_name, 
+      url)
+    values (#{appraisalId,jdbcType=INTEGER}, #{appraisalStatus,jdbcType=INTEGER}, #{orderNo,jdbcType=VARCHAR}, 
+      #{orderId,jdbcType=INTEGER}, #{bookingCustomerName,jdbcType=VARCHAR}, #{bookingCustomerPhone,jdbcType=VARCHAR}, 
+      #{bookingCustomerId,jdbcType=INTEGER}, #{riderPhone,jdbcType=VARCHAR}, #{riderName,jdbcType=VARCHAR}, 
+      #{evaluateScore,jdbcType=VARCHAR}, #{evaluate,jdbcType=VARCHAR}, #{memo,jdbcType=VARCHAR}, 
+      #{driverId,jdbcType=INTEGER}, #{driverPhone,jdbcType=VARCHAR}, #{driverName,jdbcType=VARCHAR}, 
+      #{licensePlates,jdbcType=VARCHAR}, #{cityName,jdbcType=VARCHAR}, #{cityId,jdbcType=INTEGER}, 
+      #{supplierId,jdbcType=INTEGER}, #{supplierName,jdbcType=VARCHAR}, #{appealStatus,jdbcType=INTEGER}, 
+      #{appealContent,jdbcType=VARCHAR}, #{fileName,jdbcType=VARCHAR}, #{auditTime,jdbcType=TIMESTAMP}, 
+      #{auditRemark,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{createBy,jdbcType=INTEGER}, #{updateBy,jdbcType=INTEGER}, #{auditName,jdbcType=VARCHAR}, 
+      #{auditBy,jdbcType=INTEGER}, #{createName,jdbcType=VARCHAR}, #{updateName,jdbcType=VARCHAR}, 
+      #{url,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.DriverAppraisalAppeal" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into driver_appraisal_appeal
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="appraisalId != null" >
+        appraisal_id,
+      </if>
+      <if test="appraisalStatus != null" >
+        appraisal_status,
+      </if>
+      <if test="orderNo != null" >
+        order_no,
+      </if>
+      <if test="orderId != null" >
+        order_id,
+      </if>
+      <if test="bookingCustomerName != null" >
+        booking_customer_name,
+      </if>
+      <if test="bookingCustomerPhone != null" >
+        booking_customer_phone,
+      </if>
+      <if test="bookingCustomerId != null" >
+        booking_customer_id,
+      </if>
+      <if test="riderPhone != null" >
+        rider_phone,
+      </if>
+      <if test="riderName != null" >
+        rider_name,
+      </if>
+      <if test="evaluateScore != null" >
+        evaluate_score,
+      </if>
+      <if test="evaluate != null" >
+        evaluate,
+      </if>
+      <if test="memo != null" >
+        memo,
+      </if>
+      <if test="driverId != null" >
+        driver_id,
+      </if>
+      <if test="driverPhone != null" >
+        driver_phone,
+      </if>
+      <if test="driverName != null" >
+        driver_name,
+      </if>
+      <if test="licensePlates != null" >
+        license_plates,
+      </if>
+      <if test="cityName != null" >
+        city_name,
+      </if>
+      <if test="cityId != null" >
+        city_id,
+      </if>
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="supplierName != null" >
+        supplier_name,
+      </if>
+      <if test="appealStatus != null" >
+        appeal_status,
+      </if>
+      <if test="appealContent != null" >
+        appeal_content,
+      </if>
+      <if test="fileName != null" >
+        file_name,
+      </if>
+      <if test="auditTime != null" >
+        audit_time,
+      </if>
+      <if test="auditRemark != null" >
+        audit_remark,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="auditName != null" >
+        audit_name,
+      </if>
+      <if test="auditBy != null" >
+        audit_by,
+      </if>
+      <if test="createName != null" >
+        create_name,
+      </if>
+      <if test="updateName != null" >
+        update_name,
+      </if>
+      <if test="url != null" >
+        url,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="appraisalId != null" >
+        #{appraisalId,jdbcType=INTEGER},
+      </if>
+      <if test="appraisalStatus != null" >
+        #{appraisalStatus,jdbcType=INTEGER},
+      </if>
+      <if test="orderNo != null" >
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="orderId != null" >
+        #{orderId,jdbcType=INTEGER},
+      </if>
+      <if test="bookingCustomerName != null" >
+        #{bookingCustomerName,jdbcType=VARCHAR},
+      </if>
+      <if test="bookingCustomerPhone != null" >
+        #{bookingCustomerPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="bookingCustomerId != null" >
+        #{bookingCustomerId,jdbcType=INTEGER},
+      </if>
+      <if test="riderPhone != null" >
+        #{riderPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="riderName != null" >
+        #{riderName,jdbcType=VARCHAR},
+      </if>
+      <if test="evaluateScore != null" >
+        #{evaluateScore,jdbcType=VARCHAR},
+      </if>
+      <if test="evaluate != null" >
+        #{evaluate,jdbcType=VARCHAR},
+      </if>
+      <if test="memo != null" >
+        #{memo,jdbcType=VARCHAR},
+      </if>
+      <if test="driverId != null" >
+        #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="driverPhone != null" >
+        #{driverPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="driverName != null" >
+        #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="licensePlates != null" >
+        #{licensePlates,jdbcType=VARCHAR},
+      </if>
+      <if test="cityName != null" >
+        #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierName != null" >
+        #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="appealStatus != null" >
+        #{appealStatus,jdbcType=INTEGER},
+      </if>
+      <if test="appealContent != null" >
+        #{appealContent,jdbcType=VARCHAR},
+      </if>
+      <if test="fileName != null" >
+        #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="auditTime != null" >
+        #{auditTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="auditRemark != null" >
+        #{auditRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="auditName != null" >
+        #{auditName,jdbcType=VARCHAR},
+      </if>
+      <if test="auditBy != null" >
+        #{auditBy,jdbcType=INTEGER},
+      </if>
+      <if test="createName != null" >
+        #{createName,jdbcType=VARCHAR},
+      </if>
+      <if test="updateName != null" >
+        #{updateName,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null" >
+        #{url,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.driver.DriverAppraisalAppeal" >
+    update driver_appraisal_appeal
+    <set >
+      <if test="appraisalId != null" >
+        appraisal_id = #{appraisalId,jdbcType=INTEGER},
+      </if>
+      <if test="appraisalStatus != null" >
+        appraisal_status = #{appraisalStatus,jdbcType=INTEGER},
+      </if>
+      <if test="orderNo != null" >
+        order_no = #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="orderId != null" >
+        order_id = #{orderId,jdbcType=INTEGER},
+      </if>
+      <if test="bookingCustomerName != null" >
+        booking_customer_name = #{bookingCustomerName,jdbcType=VARCHAR},
+      </if>
+      <if test="bookingCustomerPhone != null" >
+        booking_customer_phone = #{bookingCustomerPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="bookingCustomerId != null" >
+        booking_customer_id = #{bookingCustomerId,jdbcType=INTEGER},
+      </if>
+      <if test="riderPhone != null" >
+        rider_phone = #{riderPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="riderName != null" >
+        rider_name = #{riderName,jdbcType=VARCHAR},
+      </if>
+      <if test="evaluateScore != null" >
+        evaluate_score = #{evaluateScore,jdbcType=VARCHAR},
+      </if>
+      <if test="evaluate != null" >
+        evaluate = #{evaluate,jdbcType=VARCHAR},
+      </if>
+      <if test="memo != null" >
+        memo = #{memo,jdbcType=VARCHAR},
+      </if>
+      <if test="driverId != null" >
+        driver_id = #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="driverPhone != null" >
+        driver_phone = #{driverPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="driverName != null" >
+        driver_name = #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="licensePlates != null" >
+        license_plates = #{licensePlates,jdbcType=VARCHAR},
+      </if>
+      <if test="cityName != null" >
+        city_name = #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierName != null" >
+        supplier_name = #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="appealStatus != null" >
+        appeal_status = #{appealStatus,jdbcType=INTEGER},
+      </if>
+      <if test="appealContent != null" >
+        appeal_content = #{appealContent,jdbcType=VARCHAR},
+      </if>
+      <if test="fileName != null" >
+        file_name = #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="auditTime != null" >
+        audit_time = #{auditTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="auditRemark != null" >
+        audit_remark = #{auditRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="auditName != null" >
+        audit_name = #{auditName,jdbcType=VARCHAR},
+      </if>
+      <if test="auditBy != null" >
+        audit_by = #{auditBy,jdbcType=INTEGER},
+      </if>
+      <if test="createName != null" >
+        create_name = #{createName,jdbcType=VARCHAR},
+      </if>
+      <if test="updateName != null" >
+        update_name = #{updateName,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null" >
+        url = #{url,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zhuanche.entity.driver.DriverAppraisalAppeal" >
+    update driver_appraisal_appeal
+    set appraisal_id = #{appraisalId,jdbcType=INTEGER},
+      appraisal_status = #{appraisalStatus,jdbcType=INTEGER},
+      order_no = #{orderNo,jdbcType=VARCHAR},
+      order_id = #{orderId,jdbcType=INTEGER},
+      booking_customer_name = #{bookingCustomerName,jdbcType=VARCHAR},
+      booking_customer_phone = #{bookingCustomerPhone,jdbcType=VARCHAR},
+      booking_customer_id = #{bookingCustomerId,jdbcType=INTEGER},
+      rider_phone = #{riderPhone,jdbcType=VARCHAR},
+      rider_name = #{riderName,jdbcType=VARCHAR},
+      evaluate_score = #{evaluateScore,jdbcType=VARCHAR},
+      evaluate = #{evaluate,jdbcType=VARCHAR},
+      memo = #{memo,jdbcType=VARCHAR},
+      driver_id = #{driverId,jdbcType=INTEGER},
+      driver_phone = #{driverPhone,jdbcType=VARCHAR},
+      driver_name = #{driverName,jdbcType=VARCHAR},
+      license_plates = #{licensePlates,jdbcType=VARCHAR},
+      city_name = #{cityName,jdbcType=VARCHAR},
+      city_id = #{cityId,jdbcType=INTEGER},
+      supplier_id = #{supplierId,jdbcType=INTEGER},
+      supplier_name = #{supplierName,jdbcType=VARCHAR},
+      appeal_status = #{appealStatus,jdbcType=INTEGER},
+      appeal_content = #{appealContent,jdbcType=VARCHAR},
+      file_name = #{fileName,jdbcType=VARCHAR},
+      audit_time = #{auditTime,jdbcType=TIMESTAMP},
+      audit_remark = #{auditRemark,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      create_by = #{createBy,jdbcType=INTEGER},
+      update_by = #{updateBy,jdbcType=INTEGER},
+      audit_name = #{auditName,jdbcType=VARCHAR},
+      audit_by = #{auditBy,jdbcType=INTEGER},
+      create_name = #{createName,jdbcType=VARCHAR},
+      update_name = #{updateName,jdbcType=VARCHAR},
+      url = #{url,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.DriverAppraisalAppeal" >
+    update driver_appraisal_appeal
+    set appraisal_id = #{appraisalId,jdbcType=INTEGER},
+      appraisal_status = #{appraisalStatus,jdbcType=INTEGER},
+      order_no = #{orderNo,jdbcType=VARCHAR},
+      order_id = #{orderId,jdbcType=INTEGER},
+      booking_customer_name = #{bookingCustomerName,jdbcType=VARCHAR},
+      booking_customer_phone = #{bookingCustomerPhone,jdbcType=VARCHAR},
+      booking_customer_id = #{bookingCustomerId,jdbcType=INTEGER},
+      rider_phone = #{riderPhone,jdbcType=VARCHAR},
+      rider_name = #{riderName,jdbcType=VARCHAR},
+      evaluate_score = #{evaluateScore,jdbcType=VARCHAR},
+      evaluate = #{evaluate,jdbcType=VARCHAR},
+      memo = #{memo,jdbcType=VARCHAR},
+      driver_id = #{driverId,jdbcType=INTEGER},
+      driver_phone = #{driverPhone,jdbcType=VARCHAR},
+      driver_name = #{driverName,jdbcType=VARCHAR},
+      license_plates = #{licensePlates,jdbcType=VARCHAR},
+      city_name = #{cityName,jdbcType=VARCHAR},
+      city_id = #{cityId,jdbcType=INTEGER},
+      supplier_id = #{supplierId,jdbcType=INTEGER},
+      supplier_name = #{supplierName,jdbcType=VARCHAR},
+      appeal_status = #{appealStatus,jdbcType=INTEGER},
+      appeal_content = #{appealContent,jdbcType=VARCHAR},
+      file_name = #{fileName,jdbcType=VARCHAR},
+      audit_time = #{auditTime,jdbcType=TIMESTAMP},
+      audit_remark = #{auditRemark,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      create_by = #{createBy,jdbcType=INTEGER},
+      update_by = #{updateBy,jdbcType=INTEGER},
+      audit_name = #{auditName,jdbcType=VARCHAR},
+      audit_by = #{auditBy,jdbcType=INTEGER},
+      create_name = #{createName,jdbcType=VARCHAR},
+      update_name = #{updateName,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

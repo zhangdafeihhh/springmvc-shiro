@@ -8,8 +8,9 @@
     <result column="supplier_short_name" property="supplierShortName" jdbcType="VARCHAR" />
     <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
     <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
-    <result column="email" property="email" jdbcType="VARCHAR" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="two_level_cooperation" property="twoLevelCooperation" jdbcType="INTEGER" />
     <result column="settlement_type" property="settlementType" jdbcType="INTEGER" />
     <result column="settlement_cycle" property="settlementCycle" jdbcType="INTEGER" />
     <result column="settlement_day" property="settlementDay" jdbcType="INTEGER" />
@@ -18,17 +19,19 @@
     <result column="bank_name" property="bankName" jdbcType="VARCHAR" />
     <result column="bank_identify" property="bankIdentify" jdbcType="VARCHAR" />
     <result column="settlement_full_name" property="settlementFullName" jdbcType="VARCHAR" />
+    <result column="first_sign_time" property="firstSignTime" jdbcType="DATE" />
+    <result column="tax_rate" property="taxRate" jdbcType="VARCHAR" />
+    <result column="invoice_type" property="invoiceType" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, supplier_id, status, supplier_short_name, create_date, update_date, email, remark,
-    settlement_type, settlement_cycle, settlement_day, settlement_account,
-    bank_account, bank_name, bank_identify, settlement_full_name
+    id, supplier_id, status, supplier_short_name, create_date, update_date, remark, email,
+    two_level_cooperation, settlement_type, settlement_cycle, settlement_day, settlement_account,
+    bank_account, bank_name, bank_identify, settlement_full_name, first_sign_time, tax_rate,
+    invoice_type
   </sql>
   <select id="queryExtDtoByIdList" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select
-    supplier_id,
-    supplier_short_name,
-    email
+    <include refid="Base_Column_List" />
     from supplier_ext
     where supplier_id in
     <foreach item="item" index="index" collection="idList" open="(" separator="," close=")">
@@ -40,6 +43,7 @@
     update
       supplier_ext
     <set>
+      update_date = now(),
       <if test="status != null">
         status = #{status},
       </if>
@@ -73,6 +77,15 @@
       <if test="settlementFullName != null" >
         settlement_full_name = #{settlementFullName,jdbcType=VARCHAR},
       </if>
+      <if test="firstSignTime != null" >
+        first_sign_time = #{firstSignTime,jdbcType=DATE},
+      </if>
+      <if test="taxRate != null" >
+        tax_rate = #{taxRate,jdbcType=VARCHAR},
+      </if>
+      <if test="invoiceType != null" >
+        invoice_type = #{invoiceType,jdbcType=INTEGER},
+      </if>
     </set>
     where supplier_id = #{supplierId}
   </update>
@@ -89,7 +102,10 @@
       bank_account,
       bank_name,
       bank_identify,
-      settlement_full_name
+      settlement_full_name,
+      first_sign_time,
+      tax_rate,
+      invoice_type
     from supplier_ext
     where supplier_id = #{supplierId}
   </select>

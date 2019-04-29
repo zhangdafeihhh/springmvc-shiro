@@ -38,6 +38,8 @@ public enum MenuEnum {
     SUPPLIER_COOPERATION_TYPE(MenuConstants.CAR_MANAGE, MenuConstants.SUPPLIER_MANAGE, MenuConstants.SUPPLIER_MANAGE, "加盟商加盟类型"),
     COOPERATION_TWO_LEVEL_LIST(MenuConstants.CAR_MANAGE, MenuConstants.SUPPLIER_MANAGE, MenuConstants.SUPPLIER_MANAGE, "二级加盟类型查询"),
     SUPPLIER_CHECK_NAME(MenuConstants.CAR_MANAGE, MenuConstants.SUPPLIER_MANAGE, MenuConstants.SUPPLIER_MANAGE, "加盟商名称是否存在"),
+    SUPPLIER_ACCOUNT_APPLY_ADD(MenuConstants.CAR_MANAGE, MenuConstants.SUPPLIER_MANAGE, MenuConstants.SUPPLIER_MANAGE, "申请更新账户信息"),
+    SUPPLIER_LIST_EXPORT(MenuConstants.CAR_MANAGE, MenuConstants.SUPPLIER_MANAGE, MenuConstants.SUPPLIER_MANAGE, "加盟商导出"),
     //司机加盟管理接口
     DRIVER_JOIN_PROMOTE_LIST(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_JOIN_MANAGE, MenuConstants.DRIVER_JOIN_PROMOTE, "加盟司机信息查询"),
     DRIVER_JOIN_PROMOTE_DETAIL(MenuConstants.CAR_MANAGE, MenuConstants.DRIVER_JOIN_MANAGE, MenuConstants.DRIVER_JOIN_PROMOTE, "加盟司机信息详情查看"),
@@ -190,6 +192,11 @@ public enum MenuEnum {
     PROBLEM_FEED_BACK_MANAGE(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.PROBLEM_FEED_BACK,MenuConstants.PROBLEM_FEED_BACKS,"问题受理处理"),
     PROBLEM_FEED_BACK_DOWNLOAD(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.PROBLEM_FEED_BACK,MenuConstants.PROBLEM_FEED_BACKS,"问题受理文件下载"),
     REPORT_DOWNLOAD(MenuConstants.OPERATION_MANAGEMENT, MenuConstants.DATA_REPORT, MenuConstants.DATA_REPORT_DOWNLOAD, "数据报表下载"),
+
+    //加盟商更新审核
+    SUPPLIER_ACCOUNT_APPLIY_LIST(MenuConstants.CAR_MANAGE, MenuConstants.SUPPLIER_ACCOUNT_APPLIY_LIST, MenuConstants.SUPPLIER_ACCOUNT_APPLIY_LIST, "加盟商更新审核查询"),
+    SUPPLIER_ACCOUNT_APPLIY_EXAMINE(MenuConstants.CAR_MANAGE, MenuConstants.SUPPLIER_ACCOUNT_APPLIY_LIST, MenuConstants.SUPPLIER_ACCOUNT_APPLIY_LIST, "加盟商更新审核"),
+    SUPPLIER_ACCOUNT_APPLIY_DETAIL(MenuConstants.CAR_MANAGE, MenuConstants.SUPPLIER_ACCOUNT_APPLIY_LIST, MenuConstants.SUPPLIER_ACCOUNT_APPLIY_LIST, "加盟商更新审核详情"),
     ;
 
     private String levelOne;

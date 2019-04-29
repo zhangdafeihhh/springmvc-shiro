@@ -95,6 +95,10 @@ public class CustomerAppraisal {
 
     private String supplierName;
 
+    private Integer isAllowedAppeal;
+
+    private Integer isAlreadyAppeal;
+
     public Integer getId() {
         return id;
     }
@@ -461,5 +465,21 @@ public class CustomerAppraisal {
 
     public void setSupplierName(String supplierName) {
         this.supplierName = supplierName == null ? null : supplierName.trim();
+    }
+
+    public Integer getIsAllowedAppeal() {
+        return isAllowedAppeal;
+    }
+
+    public void setIsAllowedAppeal(Integer isAllowedAppeal) {
+        this.isAllowedAppeal = isAllowedAppeal;
+    }
+
+    public Integer getIsAlreadyAppeal() {
+        return isAlreadyAppeal;
+    }
+
+    public void setIsAlreadyAppeal(Integer isAlreadyAppeal) {
+        this.isAlreadyAppeal = isAlreadyAppeal;
     }
 }

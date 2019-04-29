@@ -73,7 +73,8 @@
     ca.driver_phone AS driverPhone,
     ca.license_plates AS licensePlates,
     ca.appraisal_status AS appraisalStatus,
-    ca.order_finish_time as orderFinishTime
+    ca.order_finish_time as orderFinishTime,
+    ca.is_allowed_appeal as isAllowedAppeal
     FROM
     customer_appraisal ca
     WHERE
@@ -119,6 +120,18 @@
     <if test="licensePlates!=null and licensePlates!=''">
       AND ca.license_plates LIKE CONCAT(#{licensePlates}, '%')
     </if>
+    <if test="isAllowedAppeal !=null">
+     and ca.is_allowed_appeal = #{isAllowedAppeal}
+    </if>
+    <if test="isAlreadyAppeal !=null">
+      and ca.is_already_appeal=#{isAlreadyAppeal}
+    </if>
+    <if test="appraisalIds!=null and appraisalIds.size()>0">
+      and ca.id in
+      <foreach collection="appraisalIds" item="IdItem" open="(" close=")" separator=",">
+        #{IdItem}
+      </foreach>
+    </if>
     <if test="cityId!=null and cityId!=''">
       and ca.city_id = #{cityId}
     </if>
@@ -142,4 +155,101 @@
   </select>
 
 
+  <select id="queryIds" resultType="int">
+    select
+    id
+    from customer_appraisal
+    <where>
+      <if test="appraisalStatus!=null">
+      AND appraisal_status = #{appraisalStatus}
+    </if>
+      <if test="evaluateScore !=null and evaluateScore !=''">
+        AND evaluate_score in (${evaluateScore})
+      </if>
+      <if test="createDateBegin !=null and createDateBegin !=''">
+        AND create_at &gt;= #{createDateBegin}
+      </if>
+      <if test="createDateEnd !=null and createDateEnd !=''">
+        AND create_at &lt;= #{createDateEnd}
+      </if>
+      <if test="createDateEnd !=null and createDateEnd !=''">
+        AND create_at &lt;= NOW()
+      </if>
+      <if test="orderFinishTimeBegin !=null and orderFinishTimeBegin !=''">
+        AND order_finish_time &gt;= #{orderFinishTimeBegin}
+      </if>
+      <if test="orderFinishTimeEnd !=null and orderFinishTimeEnd !=''">
+        AND order_finish_time &lt;= #{orderFinishTimeEnd}
+      </if>
+
+      <if test="orderNo!=null and orderNo!=''">
+        AND order_no LIKE CONCAT(#{orderNo}, '%')
+      </if>
+      <if test="orderNos!=null and orderNos!=''">
+        AND order_no in (${orderNos})
+      </if>
+      <if test="driverName!=null and driverName!=''">
+        AND driver_name LIKE CONCAT(#{driverName}, '%')
+      </if>
+      <if test="driverPhone!=null and driverPhone!=''">
+        AND driver_phone LIKE CONCAT(#{driverPhone}, '%')
+      </if>
+      <if test="driverIds!=null and driverIds!=''">
+        AND driver_id in (${driverIds})
+      </if>
+      <if test="licensePlates!=null and licensePlates!=''">
+        AND license_plates LIKE CONCAT(#{licensePlates}, '%')
+      </if>
+      <if test="isAllowedAppeal !=null">
+        and is_allowed_appeal = #{isAllowedAppeal}
+      </if>
+      <if test="isAlreadyAppeal !=null">
+        and is_already_appeal=#{isAlreadyAppeal}
+      </if>
+
+      <if test="cityId!=null and cityId!=''">
+        and city_id = #{cityId}
+      </if>
+      <if test="cities !=null and cities !=''">
+        and city_id in (${cities})
+      </if>
+      <if test="supplierId !=null and supplierId !=''">
+        and supplier_id = #{supplierId}
+      </if>
+      <if test="suppliers !=null and suppliers !=''">
+        and supplier_id in (${suppliers})
+      </if>
+      <if test="sortName ==null or sortName ==''">
+        ORDER BY
+        create_at,id DESC
+      </if>
+      <if test="sortName !=null and sortName !=''">
+        ORDER BY
+        ${sortName},id ${sortOrder}
+      </if>
+    </where>
+  </select>
+  <select id="queryByIds" resultType="com.zhuanche.entity.driver.MpCarBizCustomerAppraisal">
+  SELECT
+      id AS appraisalId,
+      order_no AS orderNo,
+      create_at AS createDate,
+      evaluate_score AS evaluateScore,
+      evaluate AS evaluate,
+      memo AS memo,
+      driver_id AS driverId,
+      driver_name AS driverName,
+      driver_phone AS driverPhone,
+      license_plates AS licensePlates,
+      appraisal_status AS appraisalStatus,
+      order_finish_time as orderFinishTime,
+      is_allowed_appeal as isAllowedAppeal
+      FROM
+      customer_appraisal
+      where
+      id in
+      <foreach collection="ids" close=")" open="(" separator="," item="idItem">
+        #{idItem}
+      </foreach>
+  </select>
 </mapper>

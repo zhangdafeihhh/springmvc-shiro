@@ -1,5 +1,7 @@
 package com.zhuanche.entity.driver;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -70,8 +72,28 @@ public class MpCarBizCustomerAppraisal implements Serializable{
      * 备用字段
      */
     private String remarks;
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    private Date orderFinishTime;
 
-    private String orderFinishTime;
+    /**
+     * 申诉表主键
+     */
+    private Integer appealId;
+    /**
+     * 申诉时间
+     */
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    private Date appealTime;
+    /**
+     * 申诉状态：0:未申诉   1:已申诉（待审核） 2:申诉成功  3:申诉失败 4：撤销申诉
+     */
+    private Integer appealStatus;
+    /**
+     * 是否允许申诉
+     */
+    private Integer isAllowedAppeal;
+
+
 
 
     public Integer getAppraisalId() {
@@ -306,11 +328,43 @@ public class MpCarBizCustomerAppraisal implements Serializable{
         this.remarks = remarks;
     }
 
-    public String getOrderFinishTime() {
+    public Date getOrderFinishTime() {
         return orderFinishTime;
     }
 
-    public void setOrderFinishTime(String orderFinishTime) {
+    public void setOrderFinishTime(Date orderFinishTime) {
         this.orderFinishTime = orderFinishTime;
+    }
+
+    public Integer getAppealId() {
+        return appealId;
+    }
+
+    public void setAppealId(Integer appealId) {
+        this.appealId = appealId;
+    }
+
+    public Date getAppealTime() {
+        return appealTime;
+    }
+
+    public void setAppealTime(Date appealTime) {
+        this.appealTime = appealTime;
+    }
+
+    public Integer getAppealStatus() {
+        return appealStatus;
+    }
+
+    public void setAppealStatus(Integer appealStatus) {
+        this.appealStatus = appealStatus;
+    }
+
+    public Integer getIsAllowedAppeal() {
+        return isAllowedAppeal;
+    }
+
+    public void setIsAllowedAppeal(Integer isAllowedAppeal) {
+        this.isAllowedAppeal = isAllowedAppeal;
     }
 }

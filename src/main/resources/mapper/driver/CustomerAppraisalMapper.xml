@@ -48,6 +48,8 @@
     <result column="business_name" property="businessName" jdbcType="VARCHAR" />
     <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
     <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+    <result column="is_allowed_appeal" property="isAllowedAppeal" jdbcType="INTEGER" />
+    <result column="is_already_appeal" property="isAlreadyAppeal" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, order_id, order_no, booking_customer_id, booking_customer_phone, customer_lv, 
@@ -57,7 +59,7 @@
     customer_ip, point, pointBD, driver_phone, driver_name, license_plates, booking_customer_name, 
     rider_name, type, order_type, service_type_id, service_type_name, city_id, city_name, 
     order_create_time, order_finish_time, car_group_id, car_group_name, business_id, 
-    business_name, supplier_id, supplier_name
+    business_name, supplier_id, supplier_name, is_allowed_appeal, is_already_appeal
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -88,7 +90,8 @@
       service_type_name, city_id, city_name, 
       order_create_time, order_finish_time, car_group_id, 
       car_group_name, business_id, business_name, 
-      supplier_id, supplier_name)
+      supplier_id, supplier_name, is_allowed_appeal, 
+      is_already_appeal)
     values (#{orderId,jdbcType=INTEGER}, #{orderNo,jdbcType=VARCHAR}, #{bookingCustomerId,jdbcType=INTEGER}, 
       #{bookingCustomerPhone,jdbcType=VARCHAR}, #{customerLv,jdbcType=INTEGER}, #{riderPhone,jdbcType=VARCHAR}, 
       #{driverId,jdbcType=INTEGER}, #{carId,jdbcType=INTEGER}, #{evaluateScore,jdbcType=VARCHAR}, 
@@ -104,7 +107,8 @@
       #{serviceTypeName,jdbcType=VARCHAR}, #{cityId,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR}, 
       #{orderCreateTime,jdbcType=TIMESTAMP}, #{orderFinishTime,jdbcType=TIMESTAMP}, #{carGroupId,jdbcType=INTEGER}, 
       #{carGroupName,jdbcType=VARCHAR}, #{businessId,jdbcType=INTEGER}, #{businessName,jdbcType=VARCHAR}, 
-      #{supplierId,jdbcType=INTEGER}, #{supplierName,jdbcType=VARCHAR})
+      #{supplierId,jdbcType=INTEGER}, #{supplierName,jdbcType=VARCHAR}, #{isAllowedAppeal,jdbcType=INTEGER}, 
+      #{isAlreadyAppeal,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.CustomerAppraisal" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
@@ -247,6 +251,12 @@
       <if test="supplierName != null" >
         supplier_name,
       </if>
+      <if test="isAllowedAppeal != null" >
+        is_allowed_appeal,
+      </if>
+      <if test="isAlreadyAppeal != null" >
+        is_already_appeal,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="orderId != null" >
@@ -383,6 +393,12 @@
       </if>
       <if test="supplierName != null" >
         #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="isAllowedAppeal != null" >
+        #{isAllowedAppeal,jdbcType=INTEGER},
+      </if>
+      <if test="isAlreadyAppeal != null" >
+        #{isAlreadyAppeal,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -524,6 +540,12 @@
       <if test="supplierName != null" >
         supplier_name = #{supplierName,jdbcType=VARCHAR},
       </if>
+      <if test="isAllowedAppeal != null" >
+        is_allowed_appeal = #{isAllowedAppeal,jdbcType=INTEGER},
+      </if>
+      <if test="isAlreadyAppeal != null" >
+        is_already_appeal = #{isAlreadyAppeal,jdbcType=INTEGER},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -573,7 +595,9 @@
       business_id = #{businessId,jdbcType=INTEGER},
       business_name = #{businessName,jdbcType=VARCHAR},
       supplier_id = #{supplierId,jdbcType=INTEGER},
-      supplier_name = #{supplierName,jdbcType=VARCHAR}
+      supplier_name = #{supplierName,jdbcType=VARCHAR},
+      is_allowed_appeal = #{isAllowedAppeal,jdbcType=INTEGER},
+      is_already_appeal = #{isAlreadyAppeal,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

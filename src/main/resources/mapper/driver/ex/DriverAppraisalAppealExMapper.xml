@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.ex.DriverAppraisalAppealExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.DriverAppraisalAppeal" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="appraisal_id" property="appraisalId" jdbcType="INTEGER" />
+    <result column="appraisal_status" property="appraisalStatus" jdbcType="INTEGER" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="order_id" property="orderId" jdbcType="INTEGER" />
+    <result column="booking_customer_name" property="bookingCustomerName" jdbcType="VARCHAR" />
+    <result column="booking_customer_phone" property="bookingCustomerPhone" jdbcType="VARCHAR" />
+    <result column="booking_customer_id" property="bookingCustomerId" jdbcType="INTEGER" />
+    <result column="rider_phone" property="riderPhone" jdbcType="VARCHAR" />
+    <result column="rider_name" property="riderName" jdbcType="VARCHAR" />
+    <result column="evaluate_score" property="evaluateScore" jdbcType="VARCHAR" />
+    <result column="evaluate" property="evaluate" jdbcType="VARCHAR" />
+    <result column="memo" property="memo" jdbcType="VARCHAR" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="driver_phone" property="driverPhone" jdbcType="VARCHAR" />
+    <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="license_plates" property="licensePlates" jdbcType="VARCHAR" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+    <result column="appeal_status" property="appealStatus" jdbcType="INTEGER" />
+    <result column="appeal_content" property="appealContent" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="audit_time" property="auditTime" jdbcType="TIMESTAMP" />
+    <result column="audit_remark" property="auditRemark" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="audit_name" property="auditName" jdbcType="VARCHAR" />
+    <result column="audit_by" property="auditBy" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, appraisal_id, appraisal_status, order_no, order_id, booking_customer_name, booking_customer_phone, 
+    booking_customer_id, rider_phone, rider_name, evaluate_score, evaluate, memo, driver_id, 
+    driver_phone, driver_name, license_plates, city_name, city_id, supplier_id, supplier_name, 
+    appeal_status, appeal_content, url, audit_time, audit_remark, create_time, update_time, 
+    create_by, update_by, audit_name, audit_by
+  </sql>
+    <select id="queryBaseInfoByAppraisalIds" resultMap="BaseResultMap">
+      SELECT
+      id,
+      appraisal_id,
+      appeal_status,
+      create_time
+  FROM
+      driver_appraisal_appeal
+  WHERE
+      appraisal_id IN
+      <foreach collection="appraisalIds" separator="," close=")" open="(" item="item">
+        #{item}
+      </foreach>
+    </select>
+
+  <select id="getDetail" resultType="com.zhuanche.vo.driver.DriverAppealDetailVO">
+      SELECT
+      id AS appealId,
+      driver_name AS driverName,
+      driver_phone AS driverPhone,
+      license_plates AS licensePlates,
+      order_no AS orderNo,
+      order_id AS orderId,
+      evaluate_score AS evaluateScore,
+      evaluate,
+      memo,
+      appeal_content AS appealContent,
+      url,
+      appeal_status AS appealStatus ,
+      audit_time as auditTime,
+      audit_remark AS auditRemark
+  FROM
+      driver_appraisal_appeal
+      where id = #{appealId}
+  </select>
+    <select id="getAppealStatus" resultType="int">
+        select appeal_status from driver_appraisal_appeal where id=#{appealId}
+    </select>
+    <select id="getAppealStatusByAppraisalId" resultType="com.zhuanche.entity.driver.DriverAppraisalAppeal">
+        select
+        id,
+        appeal_status as appealStatus
+        from driver_appraisal_appeal
+        where appraisal_id = #{appraisalId}
+    </select>
+    <select id="getAppraissalIdsByAppealStatus" resultType="int">
+        select appraisal_id from driver_appraisal_appeal where appeal_status =#{appealStatus}
+    </select>
+</mapper>

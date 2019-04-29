@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.SupplierCooperationAgreementMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.SupplierCooperationAgreement" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="agreement_number" property="agreementNumber" jdbcType="VARCHAR" />
+    <result column="agreement_start_time" property="agreementStartTime" jdbcType="DATE" />
+    <result column="agreement_end_time" property="agreementEndTime" jdbcType="DATE" />
+    <result column="margin_amount" property="marginAmount" jdbcType="DOUBLE" />
+    <result column="margin_account" property="marginAccount" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="create_name" property="createName" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, supplier_id, agreement_number, agreement_start_time, agreement_end_time, margin_amount, 
+    margin_account, create_by, create_name, create_date, update_date
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from supplier_cooperation_agreement
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from supplier_cooperation_agreement
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.driver.SupplierCooperationAgreement" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into supplier_cooperation_agreement (supplier_id, agreement_number, agreement_start_time, 
+      agreement_end_time, margin_amount, margin_account, 
+      create_by, create_name, create_date, 
+      update_date)
+    values (#{supplierId,jdbcType=INTEGER}, #{agreementNumber,jdbcType=VARCHAR}, #{agreementStartTime,jdbcType=DATE}, 
+      #{agreementEndTime,jdbcType=DATE}, #{marginAmount,jdbcType=DOUBLE}, #{marginAccount,jdbcType=VARCHAR}, 
+      #{createBy,jdbcType=INTEGER}, #{createName,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateDate,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.SupplierCooperationAgreement" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into supplier_cooperation_agreement
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="agreementNumber != null" >
+        agreement_number,
+      </if>
+      <if test="agreementStartTime != null" >
+        agreement_start_time,
+      </if>
+      <if test="agreementEndTime != null" >
+        agreement_end_time,
+      </if>
+      <if test="marginAmount != null" >
+        margin_amount,
+      </if>
+      <if test="marginAccount != null" >
+        margin_account,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createName != null" >
+        create_name,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="agreementNumber != null" >
+        #{agreementNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="agreementStartTime != null" >
+        #{agreementStartTime,jdbcType=DATE},
+      </if>
+      <if test="agreementEndTime != null" >
+        #{agreementEndTime,jdbcType=DATE},
+      </if>
+      <if test="marginAmount != null" >
+        #{marginAmount,jdbcType=DOUBLE},
+      </if>
+      <if test="marginAccount != null" >
+        #{marginAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="createName != null" >
+        #{createName,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.driver.SupplierCooperationAgreement" >
+    update supplier_cooperation_agreement
+    <set >
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="agreementNumber != null" >
+        agreement_number = #{agreementNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="agreementStartTime != null" >
+        agreement_start_time = #{agreementStartTime,jdbcType=DATE},
+      </if>
+      <if test="agreementEndTime != null" >
+        agreement_end_time = #{agreementEndTime,jdbcType=DATE},
+      </if>
+      <if test="marginAmount != null" >
+        margin_amount = #{marginAmount,jdbcType=DOUBLE},
+      </if>
+      <if test="marginAccount != null" >
+        margin_account = #{marginAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="createName != null" >
+        create_name = #{createName,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.SupplierCooperationAgreement" >
+    update supplier_cooperation_agreement
+    set supplier_id = #{supplierId,jdbcType=INTEGER},
+      agreement_number = #{agreementNumber,jdbcType=VARCHAR},
+      agreement_start_time = #{agreementStartTime,jdbcType=DATE},
+      agreement_end_time = #{agreementEndTime,jdbcType=DATE},
+      margin_amount = #{marginAmount,jdbcType=DOUBLE},
+      margin_account = #{marginAccount,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=INTEGER},
+      create_name = #{createName,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>
