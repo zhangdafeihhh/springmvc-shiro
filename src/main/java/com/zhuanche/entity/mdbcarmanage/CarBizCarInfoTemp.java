@@ -263,6 +263,8 @@ public class CarBizCarInfoTemp {
 
     private String vehiclesafe;
 
+    private Integer taxiInvoicePrint;
+
     public Integer getCarId() {
         return carId;
     }
@@ -1125,5 +1127,13 @@ public class CarBizCarInfoTemp {
 
     public void setVehiclesafe(String vehiclesafe) {
         this.vehiclesafe = vehiclesafe;
+    }
+
+    public Integer getTaxiInvoicePrint() {
+        return taxiInvoicePrint;
+    }
+
+    public void setTaxiInvoicePrint(Integer taxiInvoicePrint) {
+        this.taxiInvoicePrint = taxiInvoicePrint;
     }
 }

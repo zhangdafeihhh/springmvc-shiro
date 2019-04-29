@@ -76,6 +76,7 @@
     <result property="supplierName" column="supplier_full_name" />
     <result property="cityName" column="city_name" />
     <result property="groupName" column="group_name" />
+    <result column="taxiInvoicePrint" property="taxiInvoicePrint"/>
   </resultMap>
   <select id="selectCarInfoByLicensePlates" resultMap="BasicCarBizCarInfoVOMap" parameterType="com.zhuanche.entity.rentcar.CarInfo">
     	SELECT
@@ -234,7 +235,8 @@
     city.city_name  ,car.supplier_id  ,
     (case when car.driver_id =0 then 0 else 1 end)isFree,
     supplier.cooperation_type cooperationType,
-    driver.`name` as driverName
+    driver.`name` as driverName,
+    car.taxi_invoice_print as taxiInvoicePrint
     FROM
     car_biz_car_info car
     LEFT JOIN car_biz_driver_info driver ON driver.driver_id = car.driver_id
