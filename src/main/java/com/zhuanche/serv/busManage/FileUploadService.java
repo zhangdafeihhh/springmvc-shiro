@@ -95,7 +95,7 @@ public class FileUploadService {
 		}
 	}
 	
-	static class UploadResult {
+	public static class UploadResult {
 		public boolean success;
 		public String msg;
 		public String filePath;

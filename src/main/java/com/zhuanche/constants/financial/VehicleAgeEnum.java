@@ -2,6 +2,9 @@ package com.zhuanche.constants.financial;
 
 import java.util.List;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
 import lombok.Getter;
 
 /**
@@ -39,5 +42,21 @@ public enum VehicleAgeEnum implements IndexedEnum{
     public static VehicleAgeEnum indexOf(final int index) {
         return IndexedEnumUtil.valueOf(INDEXS, index);
     }
+    
+    /**
+     *将该枚举全部转化成json
+     * @return
+     */
+    public static String toJson(){
+        JSONArray jsonArray = new JSONArray();
+        for (VehicleAgeEnum e : VehicleAgeEnum.values()) {
+            JSONObject object = new JSONObject();
+            object.put("vehicleAge", e.getIndex());
+            object.put("vehicleAgeName", e.getVehicleAge());
+            jsonArray.add(object);
+        }
+        return jsonArray.toString();
+    }
+    
 }
   

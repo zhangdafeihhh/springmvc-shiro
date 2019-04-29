@@ -240,6 +240,8 @@ public final class RestErrorCode{
 	@ResultMessage("修改商品信息ID参数不能为空")
 	public static final int GOODSIDISNULL=80002;
 	
+	@ResultMessage("您好,请上传正确格式的文件")
+	public static final int CORRECT_FORMAT=80003;
 	//-------------------金融商品--end---------------------------
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系

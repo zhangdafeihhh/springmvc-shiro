@@ -2,6 +2,9 @@ package com.zhuanche.constants.financial;
 
 import java.util.List;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
 import lombok.Getter;
 
 /**
@@ -37,6 +40,21 @@ public enum MileageEnum implements IndexedEnum{
      */
     public static MileageEnum indexOf(final int index) {
         return IndexedEnumUtil.valueOf(INDEXS, index);
+    }
+    
+    /**
+     *将该枚举全部转化成json
+     * @return
+     */
+    public static String toJson(){
+        JSONArray jsonArray = new JSONArray();
+        for (MileageEnum e : MileageEnum.values()) {
+            JSONObject object = new JSONObject();
+            object.put("mileage", e.getIndex());
+            object.put("mileageName", e.getMileage());
+            jsonArray.add(object);
+        }
+        return jsonArray.toString();
     }
 }
   
