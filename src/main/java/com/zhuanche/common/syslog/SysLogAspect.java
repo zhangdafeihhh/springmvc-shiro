@@ -1,6 +1,7 @@
 package com.zhuanche.common.syslog;
 
 import com.alibaba.fastjson.JSON;
+import com.zhuanche.common.util.CompareObjUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.entity.driver.SysLog;
 import com.zhuanche.serv.syslog.SysLogService;
@@ -22,7 +23,6 @@ import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -136,6 +136,9 @@ public class SysLogAspect {
 				String serviceClass = sysLogAnn.serviceClass();
 				// 请求查询数据的方法
 				String queryMethod = sysLogAnn.queryMethod();
+				
+				String key = sysLogAnn.parameterKey();
+				
 				// 判断是否需要进行操作前的对象参数查询
 				if (StringUtils.isNotBlank(sysLogAnn.parameterKey())
 						&& StringUtils.isNotBlank(sysLogAnn.parameterType())
@@ -144,8 +147,6 @@ public class SysLogAspect {
 					boolean isArrayResult = sysLogAnn.paramIsArray();
 					// 参数类型
 					String paramType = sysLogAnn.parameterType();
-					String key = sysLogAnn.parameterKey();
-
 					if (isArrayResult) {// 批量操作
 						// JSONArray jsonarray = (JSONArray) object.get(key);
 						// 从请求的参数中解析出查询key对应的value值
@@ -196,10 +197,16 @@ public class SysLogAspect {
                             //操作流程成功
                         	sysLog.setResultMsg(requestResult.getMsg());
                             if(requestResult.getCode()==0){
+                            	Object obj = requestResult.getData();
+                            	JSONObject jsonObj = (JSONObject) JSON.toJSON(obj);
+                            	String syslogkey=jsonObj.getString(key);
+                            	sysLog.setLogKey(syslogkey);
                             	sysLog.setResultStatus(1);
                             }else{
                             	sysLog.setResultStatus(0);
                             }
+                           String remarks= CompareObjUtil.getRemarks(sysLogAnn.objClass(), sysLog.getBeforeParams(), sysLog.getOperateParams());
+                           logger.info(remarks);
                         }else{
                         	sysLog.setResultMsg("失败");
                         }
@@ -207,6 +214,7 @@ public class SysLogAspect {
                     //保存进数据库
                     sysLogService.saveLog(sysLog);
                 } catch (Throwable e) {
+                	sysLog.setResultStatus(0);
                 	sysLog.setEndTime(new Date());
                 	sysLog.setResultMsg(e.getMessage());
                 	sysLogService.saveLog(sysLog);

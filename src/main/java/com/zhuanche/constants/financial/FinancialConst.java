@@ -122,4 +122,36 @@ public final class FinancialConst {
 		
 	}
 	
+	/**车辆性质
+	 * ClassName: VehicleProperties <br/>  
+	 * Function: TODO ADD FUNCTION. <br/>  
+	 * Reason: TODO ADD REASON(可选). <br/>  
+	 * date: 2019年4月29日 下午7:29:49 <br/>  
+	 * @author baiyunlong  
+	 * @version FinancialConst
+	 */
+	public static final class VehicleProperties{
+		/**
+		 * 非营运
+		 */
+		public static final int VehicleProperties1 = 1;
+		/**
+		 * 出租客运
+		 */
+		public static final int VehicleProperties2 = 2;
+		/**
+		 * 租赁
+		 */
+		public static final int VehicleProperties3 = 3;
+		/**
+		 * 营转非
+		 */
+		public static final int VehicleProperties4 = 4;
+		/**
+		 * 出租转非
+		 */
+		public static final int VehicleProperties5 = 5;
+		
+	}
+	
 }

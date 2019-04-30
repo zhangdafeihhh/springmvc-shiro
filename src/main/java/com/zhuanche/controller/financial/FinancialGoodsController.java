@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,7 @@ public class FinancialGoodsController {
 	 * @param status
 	 * @return
 	 */
+	@RequiresPermissions(value = { "GoodsManage_look" } )
 	@RequestMapping(value = "/queryFinancialGoodsForList")
 	public AjaxResponse queryFinancialGoodsForList(
 			@Verify(param = "page", rule = "required|min(1)") Integer page,
@@ -101,6 +103,7 @@ public class FinancialGoodsController {
 	 * saveFinancialGoods:(新增商品). <br/>  
 	 * @return
 	 */
+	@RequiresPermissions(value = { "GoodsManage_save" } )
 	@RequestMapping(value = "/saveFinancialGoods")
 	public AjaxResponse saveFinancialGoods(@Validated(SeqAll.class)
 			FinancialGoodsParamDTO financialGoodsParamDTO
@@ -115,6 +118,7 @@ public class FinancialGoodsController {
 	 * @param financialGoodsParamDTO
 	 * @return
 	 */
+	@RequiresPermissions(value = { "GoodsManage_update" } )
 	@RequestMapping(value = "/updateFinancialGoods")
 	public AjaxResponse updateFinancialGoods(@Validated(SeqAll.class) FinancialGoodsParamDTO financialGoodsParamDTO
 			) {
@@ -134,6 +138,7 @@ public class FinancialGoodsController {
 	 * @param status
 	 * @return
 	 */
+	@RequiresPermissions(value = { "GoodsManage_updateStatus" } )
 	@RequestMapping(value = "/updateFinancialGoodsByStatus")
 	public AjaxResponse updateFinancialGoodsByStatus(
 			@Verify(param = "goodsId", rule = "required|min(1)")Integer goodsId,

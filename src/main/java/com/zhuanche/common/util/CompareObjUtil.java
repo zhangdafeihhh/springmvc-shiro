@@ -129,7 +129,7 @@ public class CompareObjUtil {
 			         Object beforeValue = beforeFields[i].get(beforeObj);
 			         Object afterValue = afterFields[i].get(afterObj);
 			         
-			             if((afterValue != null && !"".equals(afterValue) && !afterValue.equals(beforeValue)) || ((afterValue == null || "".equals(afterValue)) && beforeValue != null)){
+			             if((afterValue != null && !"".equals(afterValue) && !afterValue.equals(beforeValue)) /*|| ((afterValue == null || "".equals(afterValue)) && beforeValue != null)*/){
 			              	if (column!=null) {
 			 					stringbuilder.append(column.desc()+":");
 			 				}

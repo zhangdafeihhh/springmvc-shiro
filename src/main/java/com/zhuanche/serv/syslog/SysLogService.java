@@ -14,6 +14,7 @@ import com.github.pagehelper.PageHelper;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.syslog.SysLogAnn;
 import com.zhuanche.common.util.CompareObjUtil;
+import com.zhuanche.dto.financial.FinancialBasicsVehiclesDTO;
 import com.zhuanche.entity.driver.SysLog;
 import com.zhuanche.entity.driver.SysLogDTO;
 import com.zhuanche.util.BeanUtil;
@@ -46,9 +47,9 @@ public class SysLogService {
 	public void saveLog(SysLog sysLog) {
 		sysLogMapper.insertSelective(sysLog);
 	}
-	@SysLogAnn(module="系统日志",methods="系统日志更新",
+	/*@SysLogAnn(module="系统日志",methods="系统日志更新",
 		    serviceClass="sysLogService",queryMethod="querySysLog",parameterType="Integer",parameterKey="sysLogId",parameterObj="sysLog")
-	public void updateSysLog(SysLog sysLog) {
+*/	public void updateSysLog(SysLog sysLog) {
 		sysLogMapper.updateByPrimaryKeySelective(sysLog);
 	}
 
@@ -79,7 +80,7 @@ public class SysLogService {
     	List<SysLogDTO> sysLogDTOs = BeanUtil.copyList(sysLogs, SysLogDTO.class);
     	
     	for (SysLogDTO sysLogDTO : sysLogDTOs) {
-    		sysLogDTO.setRemarks(CompareObjUtil.getRemarks(SysLog.class, sysLogDTO.getBeforeParams(), sysLogDTO.getOperateParams()));
+    		sysLogDTO.setRemarks(CompareObjUtil.getRemarks(FinancialBasicsVehiclesDTO.class, sysLogDTO.getBeforeParams(), sysLogDTO.getOperateParams()));
 		}
     	
     	//返回

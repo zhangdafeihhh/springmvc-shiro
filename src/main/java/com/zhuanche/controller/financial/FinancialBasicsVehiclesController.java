@@ -1,8 +1,11 @@
 package com.zhuanche.controller.financial;
 
+import static com.zhuanche.common.enums.MenuEnum.DRIVER_INFO_LIST_EXPORT;
+
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.common.syslog.SysLogAnn;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.financial.FinancialBasicsVehiclesDTO;
@@ -38,7 +43,9 @@ public class FinancialBasicsVehiclesController {
      * @param energyType
      * @return
      */
+	@RequiresPermissions(value = { "BasicsVehiclesManage_look" } )
 	@RequestMapping(value = "/queryFinancialBasicsVehiclesForList")
+    @RequestFunction(menu = DRIVER_INFO_LIST_EXPORT)
 	public AjaxResponse queryFinancialBasicsVehiclesForList(
 			@Verify(param = "page", rule = "required|min(1)") Integer page,
 			@Verify(param = "pageSize", rule = "required|min(10)") Integer pageSize,
@@ -81,7 +88,9 @@ public class FinancialBasicsVehiclesController {
 	 * @param enableStatus
 	 * @return
 	 */
+	//@RequiresPermissions(value = { "BasicsVehiclesManage_save" } )
 	@RequestMapping(value = "/saveFinancialBasicsVehicles")
+	@SysLogAnn(module="FinancialBasicsVehicles",methods="saveFinancialBasicsVehicles",parameterType="Integer",parameterKey="basicsVehiclesId",objClass=FinancialBasicsVehiclesDTO.class )
 	public AjaxResponse saveFinancialBasicsVehicles(
 			@Verify(param = "vehiclesDetailedName", rule = "required")String vehiclesDetailedName,
 			@Verify(param = "brandId", rule = "required|min(1)")Long brandId,
@@ -131,8 +140,7 @@ public class FinancialBasicsVehiclesController {
 		  financialBasicsVehicles.setSlowChargingTime(slowChargingTime);
 		  financialBasicsVehicles.setFastPercentage(fastPercentage);
 		  financialBasicsVehicles = financialBasicsVehiclesService.saveFinancialBasicsVehicles(financialBasicsVehicles);
-		  
-		  return AjaxResponse.success(true);
+		  return AjaxResponse.success(financialBasicsVehicles);
 	}
 	
 	/**
@@ -141,6 +149,7 @@ public class FinancialBasicsVehiclesController {
 	 * @param basicsVehiclesId
 	 * @return
 	 */
+	@RequiresPermissions(value = { "BasicsVehiclesManage_ById" } )
 	@RequestMapping(value = "/queryFinancialBasicsVehiclesById")
 	public AjaxResponse queryFinancialBasicsVehiclesById(
 			@Verify(param = "basicsVehiclesId", rule = "required|min(1)")Integer basicsVehiclesId
@@ -175,7 +184,10 @@ public class FinancialBasicsVehiclesController {
 	 * @param enableStatus
 	 * @return
 	 */
+	//@RequiresPermissions(value = { "BasicsVehiclesManage_update" } )
 	@RequestMapping(value = "/updateFinancialBasicsVehicles")
+	@SysLogAnn(module="FinancialBasicsVehicles",methods="updateFinancialBasicsVehicles",
+    serviceClass="financialBasicsVehiclesService",queryMethod="queryFinancialBasicsVehiclesById",parameterType="Integer",parameterKey="basicsVehiclesId",objClass=FinancialBasicsVehiclesDTO.class )
 	public AjaxResponse updateFinancialBasicsVehicles(
 			@Verify(param = "basicsVehiclesId", rule = "required|min(1)")Integer basicsVehiclesId,
 			@Verify(param = "vehiclesDetailedName", rule = "required")String vehiclesDetailedName,
@@ -226,7 +238,7 @@ public class FinancialBasicsVehiclesController {
 		  financialBasicsVehicles.setSlowChargingTime(slowChargingTime);
 		  financialBasicsVehicles.setFastPercentage(fastPercentage);
 		  financialBasicsVehicles = financialBasicsVehiclesService.updateFinancialBasicsVehicles(financialBasicsVehicles);
-		  return AjaxResponse.success(true);
+		  return AjaxResponse.success(financialBasicsVehicles);
 	}
 	
 	
@@ -237,6 +249,7 @@ public class FinancialBasicsVehiclesController {
 	 * @param enableStatus
 	 * @return
 	 */
+	@RequiresPermissions(value = { "BasicsVehiclesManage_updateStatus" } )
 	@RequestMapping(value = "/updateFinancialBasicsVehiclesForStatus")
 	public AjaxResponse updateFinancialBasicsVehiclesForStatus(
 			@Verify(param = "basicsVehiclesId", rule = "required|min(1)")Integer basicsVehiclesId,

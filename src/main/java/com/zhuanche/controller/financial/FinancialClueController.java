@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,7 @@ public class FinancialClueController {
 	 * @param status
 	 * @return
 	 */
+	@RequiresPermissions(value = { "ClueManage_look" } )
 	@RequestMapping(value = "/queryfinancialClueForList")
 	public AjaxResponse queryfinancialClueForList(
 			@Verify(param = "page", rule = "required|min(1)") Integer page,

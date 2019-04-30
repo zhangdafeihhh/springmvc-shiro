@@ -9,6 +9,8 @@ public class SysLog {
 
     private String module;
 
+    private String logKey;
+
     private String method;
 
     private String beforeParams;
@@ -45,6 +47,14 @@ public class SysLog {
 
     public void setModule(String module) {
         this.module = module == null ? null : module.trim();
+    }
+
+    public String getLogKey() {
+        return logKey;
+    }
+
+    public void setLogKey(String logKey) {
+        this.logKey = logKey == null ? null : logKey.trim();
     }
 
     public String getMethod() {
