@@ -77,7 +77,7 @@
     FROM
     customer_appraisal ca
     WHERE
-    1 = 1
+      ca.create_at &lt;= NOW()
     <if test="appraisalStatus!=null">
       AND ca.appraisal_status = #{appraisalStatus}
     </if>
@@ -89,9 +89,6 @@
     </if>
     <if test="createDateEnd !=null and createDateEnd !=''">
       AND ca.create_at &lt;= #{createDateEnd}
-    </if>
-    <if test="createDateEnd !=null and createDateEnd !=''">
-      AND ca.create_at &lt;= NOW()
     </if>
 
     <if test="orderFinishTimeBegin !=null and orderFinishTimeBegin !=''">

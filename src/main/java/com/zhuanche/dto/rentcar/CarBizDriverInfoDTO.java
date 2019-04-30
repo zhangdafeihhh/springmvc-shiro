@@ -542,6 +542,13 @@ public class CarBizDriverInfoDTO extends Base {
     private Integer oldSupplier;//供应商
 
     private String activeDate;
+    private String incomeScore;//当前收入分
+
+    private String updateTime;//收入分更新时间
+
+    private String startUpdateTime;//收入分更新时间开始
+    private String endUpdateTime;//收入分更新时间结束
+
 
     public String getOldPhone() {
         return oldPhone;
@@ -1565,5 +1572,37 @@ public class CarBizDriverInfoDTO extends Base {
 
     public void setActiveDate(String activeDate) {
         this.activeDate = activeDate;
+    }
+
+    public String getIncomeScore() {
+        return incomeScore;
+    }
+
+    public void setIncomeScore(String incomeScore) {
+        this.incomeScore = incomeScore;
+    }
+
+    public String getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    public String getStartUpdateTime() {
+        return startUpdateTime;
+    }
+
+    public void setStartUpdateTime(String startUpdateTime) {
+        this.startUpdateTime = startUpdateTime;
+    }
+
+    public String getEndUpdateTime() {
+        return endUpdateTime;
+    }
+
+    public void setEndUpdateTime(String endUpdateTime) {
+        this.endUpdateTime = endUpdateTime;
     }
 }
