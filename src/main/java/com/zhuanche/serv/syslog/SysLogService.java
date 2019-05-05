@@ -3,9 +3,17 @@ package com.zhuanche.serv.syslog;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +22,12 @@ import com.github.pagehelper.PageHelper;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.syslog.SysLogAnn;
 import com.zhuanche.common.util.CompareObjUtil;
+import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.dto.financial.FinancialBasicsVehiclesDTO;
 import com.zhuanche.entity.driver.SysLog;
 import com.zhuanche.entity.driver.SysLogDTO;
+import com.zhuanche.mongo.SysSaveOrUpdateLog;
+import com.zhuanche.mongo.busManage.BusInfoAudit;
 import com.zhuanche.util.BeanUtil;
 
 import mapper.driver.SysLogMapper;
@@ -86,6 +97,30 @@ public class SysLogService {
     	//返回
     	return new PageDTO( page,pageSize,total,sysLogDTOs);
 	
+	}
+	
+    @Resource(name = "userOperationLogMongoTemplate")
+    private MongoTemplate mongoTemplate;
+
+	public PageDTO querySysLog(Integer page, Integer pageSize, String module,String logKey) {
+		 Query query = new Query().limit(pageSize);
+		 query.addCriteria(Criteria.where("module").is(module));
+		 query.addCriteria(Criteria.where("logKey").is(logKey));
+		 query.addCriteria(Criteria.where("method").in("update","save"));
+		 
+		 query.with(new Sort(new Order(Direction.DESC,"startTime")));    
+		 
+	     int start = (page - 1) * pageSize;
+	     query.skip(start - 1 < 0 ? 0 : start);
+		 List<SysSaveOrUpdateLog> list=mongoTemplate.find(query, SysSaveOrUpdateLog.class);
+		
+	     long count = mongoTemplate.count(query, SysSaveOrUpdateLog.class);
+
+	    if (list == null || list.isEmpty()) {
+	         return new PageDTO(page, pageSize, count, new ArrayList());
+	    }
+		
+		return new PageDTO( page,pageSize,count,list);
 	}
 }
   

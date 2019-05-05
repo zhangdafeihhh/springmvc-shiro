@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.zhuanche.common.util.CompareObjUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.entity.driver.SysLog;
+import com.zhuanche.mongo.SysSaveOrUpdateLog;
 import com.zhuanche.serv.syslog.SysLogService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.Method;
@@ -27,6 +29,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -52,6 +55,8 @@ public class SysLogAspect {
 	// 注入service,用来将日志信息保存在数据库
 	@Autowired
 	private SysLogService sysLogService;
+    @Resource(name = "userOperationLogMongoTemplate")
+    private MongoTemplate mongoTemplate;
 
 	// 定义切点 @Pointcut
 	// 在注解的位置切入代码
@@ -63,7 +68,7 @@ public class SysLogAspect {
 	@Around("logPoinCut()")
 	public Object around(ProceedingJoinPoint pjp) throws Throwable {
 		// 常见日志实体对象
-		SysLog sysLog = new SysLog();
+		SysSaveOrUpdateLog sysLog = new SysSaveOrUpdateLog();
 		// 获取登录用户账户
 		HttpServletRequest httpRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
 				.getRequest();
@@ -206,18 +211,23 @@ public class SysLogAspect {
                             	sysLog.setResultStatus(0);
                             }
                            String remarks= CompareObjUtil.getRemarks(sysLogAnn.objClass(), sysLog.getBeforeParams(), sysLog.getOperateParams());
+                           sysLog.setRemarks(remarks);
                            logger.info(remarks);
                         }else{
                         	sysLog.setResultMsg("失败");
                         }
 					}
                     //保存进数据库
-                    sysLogService.saveLog(sysLog);
+                   // sysLogService.saveLog(sysLog);
+                    if (StringUtils.isNotBlank(sysLog.getRemarks())) {
+                      mongoTemplate.insert(sysLog);
+					}
+                   
                 } catch (Throwable e) {
                 	sysLog.setResultStatus(0);
                 	sysLog.setEndTime(new Date());
                 	sysLog.setResultMsg(e.getMessage());
-                	sysLogService.saveLog(sysLog);
+                	//sysLogService.saveLog(sysLog);
                 }
 			} else {
 				// 没有包含注解

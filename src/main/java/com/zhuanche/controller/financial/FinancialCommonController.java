@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -17,6 +18,7 @@ import com.zhuanche.constants.financial.VehicleAgeEnum;
 import com.zhuanche.dto.financial.CarColorList;
 import com.zhuanche.serv.busManage.FileUploadService;
 import com.zhuanche.serv.busManage.FileUploadService.UploadResult;
+import com.zhuanche.serv.syslog.SysLogService;
 
 /**
  * ClassName:FinancialCommonController <br/>
@@ -33,6 +35,8 @@ public class FinancialCommonController {
 	@Autowired
 	private FileUploadService fileUploadService;
 
+    @Autowired
+    private SysLogService sysLogService;
 	/**
 	 * getVehicleAgeList:(). <br/>
 	 * 
@@ -88,4 +92,10 @@ public class FinancialCommonController {
 		}
 	}
 
+	@RequestMapping(value = "/querySysLog")
+	public AjaxResponse querySysLog(@Verify(param = "module", rule = "required")String module,
+			@Verify(param = "logKey", rule = "required") String logKey) {
+		PageDTO pageDTO = sysLogService.querySysLog(1,10,module,logKey);
+		return AjaxResponse.success(pageDTO);
+	}
 }
