@@ -53,9 +53,9 @@ public class DingdingAlarmUtil {
         JSONObject isAtAll = new JSONObject();
         isAtAll.put("atMobiles",false);
         JSONObject atMobiles = new JSONObject();
-        JSONArray jsonArray = new JSONArray();
+        /*JSONArray jsonArray = new JSONArray();
         jsonArray.add("13552448009");
-        atMobiles.put("atMobiles",jsonArray);
+        atMobiles.put("atMobiles",jsonArray);*/
         jsonObject.put("at",isAtAll);
         jsonObject.put("at",atMobiles);
         logger.info("钉钉开关：" + dingdingAlermSwitch);
