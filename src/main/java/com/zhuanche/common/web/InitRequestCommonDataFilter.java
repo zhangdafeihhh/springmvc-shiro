@@ -104,7 +104,7 @@ public class InitRequestCommonDataFilter extends OncePerRequestFilter {
 			}
 		}
 		if(ssoLogoutUrl==null) {//读取配置文件失败时的默认值
-			ssoLogoutUrl = "https://sso.01zhuanche.com/logout";
+			ssoLogoutUrl = "https://inside-sso.01zhuanche.com/logout";
 		}
 		if(cmsLogoutUrl==null) {//读取配置文件失败时的默认值
 			if(request.getServerPort()==80){
