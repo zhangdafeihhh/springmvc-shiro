@@ -112,7 +112,7 @@ public class DriverIncomeScoreController {
         }
         if (null != driverIds)
             carBizDriverInfoDTO.setDriverIds(driverIds);
-        else if (null != driverId){
+        else if (null != driverId) {
             driverIds = new HashSet<>();
             driverIds.add(driverId);
             carBizDriverInfoDTO.setDriverIds(driverIds);
@@ -186,7 +186,7 @@ public class DriverIncomeScoreController {
     @RequestMapping(value = "/incomeTypeList")
     public Object incomeTypeList() {
         List<DriverIncomeScoreTypeVo> list = driverIncomeScoreService.incomeTypeList();
-        PageDTO pageDTO = new PageDTO(1, 1, 1, list);
+        PageDTO pageDTO = new PageDTO(1, 1, null == list ? 0 : list.size(), list);
         return pageDTO;
     }
 
@@ -200,7 +200,7 @@ public class DriverIncomeScoreController {
     @RequestMapping(value = "/typeList")
     public Object typeList(String incomeType) {
         List<DriverIncomeScoreTypeVo> list = driverIncomeScoreService.typeList(incomeType);
-        PageDTO pageDTO = new PageDTO(1, 1, 1, list);
+        PageDTO pageDTO = new PageDTO(1, 1, null == list ? 0 : list.size(), list);
         return pageDTO;
     }
 
@@ -219,11 +219,11 @@ public class DriverIncomeScoreController {
     }
 
     private void fillDriverInfo(List<DriverIncomeScoreDetailDto> rows, String driverId) {
-        if (null == rows || rows.size()==0) return;
+        if (null == rows || rows.size() == 0) return;
         CarBizDriverInfoDTO info = carBizDriverInfoService.querySupplierIdAndNameByDriverId(Integer.parseInt(driverId));
-        for (DriverIncomeScoreDetailDto dto :rows){
+        for (DriverIncomeScoreDetailDto dto : rows) {
             dto.setDriverId(driverId);
-            if (null != info){
+            if (null != info) {
                 dto.setName(info.getName());
                 dto.setPhone(info.getPhone());
             }
