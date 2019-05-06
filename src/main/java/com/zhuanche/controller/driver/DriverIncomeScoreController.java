@@ -101,7 +101,7 @@ public class DriverIncomeScoreController {
         carBizDriverInfoDTO.setCityIds(permOfCity);
         carBizDriverInfoDTO.setSupplierIds(permOfSupplier);
         carBizDriverInfoDTO.setTeamIds(permOfTeam);
-        if (driverId != null) {
+        if (driverId != null && null != driverIds && driverIds.size() > 0) {
             if (driverIds.contains(driverId)) {
                 driverIds.clear();
                 driverIds.add(driverId);
@@ -110,7 +110,14 @@ public class DriverIncomeScoreController {
                 return AjaxResponse.success(pageDTO);
             }
         }
-        carBizDriverInfoDTO.setDriverIds(driverIds);
+        if (null != driverIds)
+            carBizDriverInfoDTO.setDriverIds(driverIds);
+        else if (null != driverId){
+            driverIds = new HashSet<>();
+            driverIds.add(driverId);
+            carBizDriverInfoDTO.setDriverIds(driverIds);
+        }
+
         Page p = PageHelper.startPage(page, pageSize, true);
         try {
             list = carBizDriverInfoService.queryDriverList(carBizDriverInfoDTO);
@@ -124,7 +131,7 @@ public class DriverIncomeScoreController {
         }
         fillIncomeScore(list);
         PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
-        System.out.println("time cost : " + (System.currentTimeMillis() - startTime));
+        logger.info("time cost : " + (System.currentTimeMillis() - startTime));
         return AjaxResponse.success(pageDTO);
     }
 
