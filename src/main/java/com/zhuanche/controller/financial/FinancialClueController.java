@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -46,6 +49,9 @@ public class FinancialClueController {
 	 * @return
 	 */
 	@RequiresPermissions(value = { "ClueManage_look" } )
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
+	} )
 	@RequestMapping(value = "/queryfinancialClueForList")
 	public AjaxResponse queryfinancialClueForList(
 			@Verify(param = "page", rule = "required|min(1)") Integer page,
@@ -100,6 +106,9 @@ public class FinancialClueController {
 	 * @param clueId
 	 * @return
 	 */
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
+	} )
 	@RequestMapping(value = "/queryfinancialClueById")
 	public AjaxResponse queryfinancialClueById(
 			@Verify(param = "clueId", rule = "required|min(1)") Integer clueId

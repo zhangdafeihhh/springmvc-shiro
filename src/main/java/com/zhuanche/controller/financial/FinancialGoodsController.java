@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +12,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -53,6 +55,9 @@ public class FinancialGoodsController {
 	 * @return
 	 */
 	@RequiresPermissions(value = { "GoodsManage_look" } )
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
+	} )
 	@RequestMapping(value = "/queryFinancialGoodsForList")
 	public AjaxResponse queryFinancialGoodsForList(
 			@Verify(param = "page", rule = "required|min(1)") Integer page,
@@ -104,6 +109,9 @@ public class FinancialGoodsController {
 	 * @return
 	 */
 	@RequiresPermissions(value = { "GoodsManage_save" } )
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.MASTER )
+	} )
 	@RequestMapping(value = "/saveFinancialGoods")
 	public AjaxResponse saveFinancialGoods(@Validated(SeqAll.class)
 			FinancialGoodsParamDTO financialGoodsParamDTO
@@ -119,6 +127,9 @@ public class FinancialGoodsController {
 	 * @return
 	 */
 	@RequiresPermissions(value = { "GoodsManage_update" } )
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.MASTER )
+	} )
 	@RequestMapping(value = "/updateFinancialGoods")
 	public AjaxResponse updateFinancialGoods(@Validated(SeqAll.class) FinancialGoodsParamDTO financialGoodsParamDTO
 			) {
@@ -139,6 +150,9 @@ public class FinancialGoodsController {
 	 * @return
 	 */
 	@RequiresPermissions(value = { "GoodsManage_updateStatus" } )
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.MASTER )
+	} )
 	@RequestMapping(value = "/updateFinancialGoodsByStatus")
 	public AjaxResponse updateFinancialGoodsByStatus(
 			@Verify(param = "goodsId", rule = "required|min(1)")Integer goodsId,
@@ -155,6 +169,9 @@ public class FinancialGoodsController {
 	 * @return
 	 */
 	@RequestMapping(value = "/queryFinancialGoodsById")
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
+	} )
 	public AjaxResponse queryFinancialGoodsById(@Verify(param = "goodsId", rule = "required|min(1)")Integer goodsId
 			) {
 		FinancialGoodsInfoDTO financialGoodsDTO=financialGoodsService.queryFinancialGoodsById(goodsId);
@@ -164,6 +181,9 @@ public class FinancialGoodsController {
 	
 	
 	@RequestMapping(value = "/selectFinancialGoodsForList")
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
+	} )
 	public AjaxResponse selectFinancialGoodsForList() {
 			SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
 			Set<Integer> cityIds = user.getCityIds();
@@ -172,5 +192,4 @@ public class FinancialGoodsController {
 					supplierIds,cityIds);
 			return AjaxResponse.success(financialGoodsDTOs);
 	}
-	
 }

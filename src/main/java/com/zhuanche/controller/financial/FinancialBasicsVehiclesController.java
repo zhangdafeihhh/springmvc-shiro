@@ -12,10 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.syslog.SysLogAnn;
 import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.financial.FinancialBasicsVehiclesDTO;
@@ -45,7 +47,9 @@ public class FinancialBasicsVehiclesController {
      */
 	@RequiresPermissions(value = { "BasicsVehiclesManage_look" } )
 	@RequestMapping(value = "/queryFinancialBasicsVehiclesForList")
-    @RequestFunction(menu = DRIVER_INFO_LIST_EXPORT)
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
+	} )
 	public AjaxResponse queryFinancialBasicsVehiclesForList(
 			@Verify(param = "page", rule = "required|min(1)") Integer page,
 			@Verify(param = "pageSize", rule = "required|min(10)") Integer pageSize,
@@ -90,6 +94,9 @@ public class FinancialBasicsVehiclesController {
 	 */
 	//@RequiresPermissions(value = { "BasicsVehiclesManage_save" } )
 	@RequestMapping(value = "/saveFinancialBasicsVehicles")
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.MASTER )
+	} )
 	@SysLogAnn(module="FinancialBasicsVehicles",methods="saveFinancialBasicsVehicles",parameterType="Integer",parameterKey="basicsVehiclesId",objClass=FinancialBasicsVehiclesDTO.class )
 	public AjaxResponse saveFinancialBasicsVehicles(
 			@Verify(param = "vehiclesDetailedName", rule = "required")String vehiclesDetailedName,
@@ -150,6 +157,9 @@ public class FinancialBasicsVehiclesController {
 	 * @return
 	 */
 	@RequiresPermissions(value = { "BasicsVehiclesManage_ById" } )
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
+	} )
 	@RequestMapping(value = "/queryFinancialBasicsVehiclesById")
 	public AjaxResponse queryFinancialBasicsVehiclesById(
 			@Verify(param = "basicsVehiclesId", rule = "required|min(1)")Integer basicsVehiclesId
@@ -186,6 +196,9 @@ public class FinancialBasicsVehiclesController {
 	 */
 	//@RequiresPermissions(value = { "BasicsVehiclesManage_update" } )
 	@RequestMapping(value = "/updateFinancialBasicsVehicles")
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.MASTER )
+	} )
 	@SysLogAnn(module="FinancialBasicsVehicles",methods="updateFinancialBasicsVehicles",
     serviceClass="financialBasicsVehiclesService",queryMethod="queryFinancialBasicsVehiclesById",parameterType="Integer",parameterKey="basicsVehiclesId",objClass=FinancialBasicsVehiclesDTO.class )
 	public AjaxResponse updateFinancialBasicsVehicles(
@@ -250,6 +263,9 @@ public class FinancialBasicsVehiclesController {
 	 * @return
 	 */
 	@RequiresPermissions(value = { "BasicsVehiclesManage_updateStatus" } )
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.MASTER )
+	} )
 	@RequestMapping(value = "/updateFinancialBasicsVehiclesForStatus")
 	public AjaxResponse updateFinancialBasicsVehiclesForStatus(
 			@Verify(param = "basicsVehiclesId", rule = "required|min(1)")Integer basicsVehiclesId,
@@ -270,6 +286,9 @@ public class FinancialBasicsVehiclesController {
 	 * @author baiyunlong
 	 * @return
 	 */
+	@MasterSlaveConfigs(configs={ 
+			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
+	} )
 	@RequestMapping(value = "/queryBasicsVehiclesAllList")
 	public AjaxResponse queryBasicsVehiclesAllList() {
 		try{
