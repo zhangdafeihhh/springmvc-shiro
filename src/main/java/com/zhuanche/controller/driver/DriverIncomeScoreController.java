@@ -139,7 +139,6 @@ public class DriverIncomeScoreController {
     /**
      * 更新记录列表
      *
-     * @param model
      * @param driver
      * @return
      */
