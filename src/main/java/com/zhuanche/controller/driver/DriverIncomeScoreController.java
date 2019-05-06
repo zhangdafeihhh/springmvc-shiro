@@ -185,9 +185,7 @@ public class DriverIncomeScoreController {
     @ResponseBody
     @RequestMapping(value = "/incomeTypeList")
     public Object incomeTypeList() {
-        List<DriverIncomeScoreTypeVo> list = driverIncomeScoreService.incomeTypeList();
-        PageDTO pageDTO = new PageDTO(1, 1, null == list ? 0 : list.size(), list);
-        return pageDTO;
+        return AjaxResponse.success(driverIncomeScoreService.incomeTypeList());
     }
 
     /**
@@ -199,9 +197,7 @@ public class DriverIncomeScoreController {
     @ResponseBody
     @RequestMapping(value = "/typeList")
     public Object typeList(String incomeType) {
-        List<DriverIncomeScoreTypeVo> list = driverIncomeScoreService.typeList(incomeType);
-        PageDTO pageDTO = new PageDTO(1, 1, null == list ? 0 : list.size(), list);
-        return pageDTO;
+        return AjaxResponse.success(driverIncomeScoreService.typeList(incomeType));
     }
 
     private void fillIncomeScore(List<CarBizDriverInfoDTO> rows) {
