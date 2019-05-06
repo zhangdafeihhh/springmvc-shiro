@@ -145,7 +145,7 @@ public class DriverIncomeScoreController {
      */
     @ResponseBody
     @RequestMapping(value = "/updateRecordData", method = {RequestMethod.POST})
-    public Object updateRecordData(ModelMap model, DriverVoEntity driver) {
+    public Object updateRecordData(DriverVoEntity driver) {
         int total = 0;
         List<DriverIncomeScoreRecordDto> list = new ArrayList<>();
         PageDTO pageDTO;
