@@ -147,12 +147,6 @@ public class DriverIncomeScoreController {
             return AjaxResponse.success(pageDTO);
         }
         list = driverIncomeScoreService.getIncomeScoreRecord(driver);
-//        DriverIncomeScoreRecordDto dto = new DriverIncomeScoreRecordDto();
-//        dto.setDriverId("111");
-//        dto.setIncomeScore("121212");
-//        dto.setAppendScore("222");
-//        list.add(dto);
-//        model.addAttribute("driverId", driver.getDriverId());
         pageDTO = new PageDTO(driver.getPage(), driver.getPagesize(), total, list);
         return AjaxResponse.success(pageDTO);
     }
@@ -168,15 +162,8 @@ public class DriverIncomeScoreController {
     @RequestMapping(value = "/incomeRecordDetailData", method = {RequestMethod.POST})
     public Object incomeRecordDetailData(ModelMap model, DriverIncomeRecordParams params) {
         Map<String, Object> map = driverIncomeScoreService.incomeDetailList(params);
-        List<DriverIncomeScoreRecordDto> rows = new ArrayList<>();//List<DriverIncomeScoreRecordDto>) map.get("data");
-        DriverIncomeScorePage page = new DriverIncomeScorePage();//(DriverIncomeScorePage) map.get("page");
-
-        DriverIncomeScoreRecordDto dto = new DriverIncomeScoreRecordDto();
-        dto.setDriverId("111");
-        dto.setIncomeScore("121212");
-        dto.setAppendScore("222");
-        rows.add(dto);
-
+        List<DriverIncomeScoreDetailDto> rows = (List<DriverIncomeScoreDetailDto>) map.get("data");
+        DriverIncomeScorePage page = (DriverIncomeScorePage) map.get("page");
         model.addAttribute("driverId", params.getDriverId());
         PageDTO pageDTO = new PageDTO(page.getPageNo(), page.getPageSize(), page.getTotal(), rows);
         return AjaxResponse.success(pageDTO);
