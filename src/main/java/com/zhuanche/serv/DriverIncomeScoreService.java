@@ -118,7 +118,7 @@ public class DriverIncomeScoreService {
         if (StringUtils.isNotBlank(body)) {
             DriverIncomeScoreResponse response = DriverIncomeScoreResponse.parse(body);
             if (null != response && response.getCode() == 0 && response.getData() != null) {
-                map.put("data", JSON.parseArray(JSON.toJSONString(response.getData()), DriverIncomeScoreDetailDto.class));//List<DriverIncomeScoreDetailDto>
+                map.put("data", JSON.parseArray(JSON.toJSONString(response.getData()), DriverIncomeScoreDetailDto.class));
                 map.put("page", JSONObject.parseObject(JSON.toJSONString(response.getPage()), DriverIncomeScorePage.class));
             }
         }

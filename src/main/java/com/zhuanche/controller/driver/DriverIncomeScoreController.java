@@ -172,6 +172,7 @@ public class DriverIncomeScoreController {
         List<DriverIncomeScoreDetailDto> rows = (List<DriverIncomeScoreDetailDto>) map.get("data");
         DriverIncomeScorePage page = (DriverIncomeScorePage) map.get("page");
         model.addAttribute("driverId", params.getDriverId());
+        fillDriverInfo(rows, params.getDriverId());
         PageDTO pageDTO = new PageDTO(page.getPageNo(), page.getPageSize(), page.getTotal(), rows);
         return AjaxResponse.success(pageDTO);
     }
@@ -184,7 +185,9 @@ public class DriverIncomeScoreController {
     @ResponseBody
     @RequestMapping(value = "/incomeTypeList")
     public Object incomeTypeList() {
-        return driverIncomeScoreService.incomeTypeList();
+        List<DriverIncomeScoreTypeVo> list = driverIncomeScoreService.incomeTypeList();
+        PageDTO pageDTO = new PageDTO(1, 1, 1, list);
+        return pageDTO;
     }
 
     /**
@@ -196,9 +199,10 @@ public class DriverIncomeScoreController {
     @ResponseBody
     @RequestMapping(value = "/typeList")
     public Object typeList(String incomeType) {
-        return driverIncomeScoreService.typeList(incomeType);
+        List<DriverIncomeScoreTypeVo> list = driverIncomeScoreService.typeList(incomeType);
+        PageDTO pageDTO = new PageDTO(1, 1, 1, list);
+        return pageDTO;
     }
-
 
     private void fillIncomeScore(List<CarBizDriverInfoDTO> rows) {
         Map<Integer, DriverIncomeScoreDto> map = driverIncomeScoreService.incomeList(rows.stream().map(CarBizDriverInfoDTO::getDriverId).collect(Collectors.toList()));
@@ -210,6 +214,18 @@ public class DriverIncomeScoreController {
             if (null != dto) {
                 info.setIncomeScore(dto.getIncomeScore());
                 info.setUpdateTime(df.format(new Date(dto.getUpdateTime())));
+            }
+        }
+    }
+
+    private void fillDriverInfo(List<DriverIncomeScoreDetailDto> rows, String driverId) {
+        if (null == rows || rows.size()==0) return;
+        CarBizDriverInfoDTO info = carBizDriverInfoService.querySupplierIdAndNameByDriverId(Integer.parseInt(driverId));
+        for (DriverIncomeScoreDetailDto dto :rows){
+            dto.setDriverId(driverId);
+            if (null != info){
+                dto.setName(info.getName());
+                dto.setPhone(info.getPhone());
             }
         }
     }
