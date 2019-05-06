@@ -77,7 +77,7 @@ public class SysLogService {
     	List<SysLog> sysLogs=null;
     	Page p = PageHelper.startPage( page, pageSize, true );
     	try{
-    		sysLogs=sysLogMapper.selectByPrimaryList();
+    		//sysLogs=sysLogMapper.selectByPrimaryList();
         	total  = (int)p.getTotal();
     	}catch (Exception e) {
     		logger.error("查询一级白名单信息异常",e);

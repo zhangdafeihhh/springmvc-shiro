@@ -40,6 +40,8 @@ public class FinancialBasicsVehicles {
 
     private Integer slowChargingTime;
 
+    private String imgUrl;
+
     private Double fastPercentage;
 
     private Byte enableStatus;
@@ -194,6 +196,14 @@ public class FinancialBasicsVehicles {
 
     public void setSlowChargingTime(Integer slowChargingTime) {
         this.slowChargingTime = slowChargingTime;
+    }
+
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl == null ? null : imgUrl.trim();
     }
 
     public Double getFastPercentage() {

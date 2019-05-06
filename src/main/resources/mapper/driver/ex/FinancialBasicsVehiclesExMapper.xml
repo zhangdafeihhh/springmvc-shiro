@@ -21,6 +21,7 @@
 	    <result column="environmental_protection_standard" property="environmentalProtectionStandard" jdbcType="VARCHAR" />
 	    <result column="fast_charging_time" property="fastChargingTime" jdbcType="INTEGER" />
 	    <result column="slow_charging_time" property="slowChargingTime" jdbcType="INTEGER" />
+	    <result column="img_url" property="imgUrl" jdbcType="VARCHAR" />
 	    <result column="fast_percentage" property="fastPercentage" jdbcType="DOUBLE" />
 	    <result column="enable_status" property="enableStatus" jdbcType="TINYINT" />
 	    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
@@ -49,6 +50,7 @@
 	    <result column="environmental_protection_standard" property="environmentalProtectionStandard" jdbcType="VARCHAR" />
 	    <result column="fast_charging_time" property="fastChargingTime" jdbcType="INTEGER" />
 	    <result column="slow_charging_time" property="slowChargingTime" jdbcType="INTEGER" />
+	    <result column="img_url" property="imgUrl" jdbcType="VARCHAR" />
 	    <result column="fast_percentage" property="fastPercentage" jdbcType="DOUBLE" />
 	    <result column="enable_status" property="enableStatus" jdbcType="TINYINT" />
 	    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
@@ -60,7 +62,7 @@
     basics_vehicles_id, vehicles_detailed_name, brand_id, model_id, vehicle_style, year_style, 
     energy_type, variable_box, guidance_price, discharge, mileage, auto_home_url, length_width_height, 
     quality_assurance, wheelbase, environmental_protection_standard, fast_charging_time, 
-    slow_charging_time, fast_percentage, enable_status, create_by, create_time, update_by, 
+    slow_charging_time, img_url,fast_percentage, enable_status, create_by, create_time, update_by, 
     update_time
 	</sql>
 	<select id="queryFinancialBasicsVehiclesForList" resultMap="BaseResultDtoMap">

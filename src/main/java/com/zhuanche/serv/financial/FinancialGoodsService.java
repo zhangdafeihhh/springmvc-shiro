@@ -23,6 +23,7 @@ import com.zhuanche.dto.financial.FinancialGoodsDTO;
 import com.zhuanche.dto.financial.FinancialGoodsInfoDTO;
 import com.zhuanche.dto.financial.FinancialGoodsParamDTO;
 import com.zhuanche.entity.driver.FinancialAdditionalClause;
+import com.zhuanche.entity.driver.FinancialBasicsVehicles;
 import com.zhuanche.entity.driver.FinancialGoods;
 import com.zhuanche.entity.driver.FinancialGoodsClause;
 import com.zhuanche.shiro.realm.SSOLoginUser;
@@ -30,11 +31,14 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 
 import mapper.driver.FinancialAdditionalClauseMapper;
+import mapper.driver.FinancialBasicsVehiclesMapper;
 import mapper.driver.FinancialGoodsClauseMapper;
 import mapper.driver.FinancialGoodsMapper;
 import mapper.driver.ex.FinancialAdditionalClauseExMapper;
 import mapper.driver.ex.FinancialGoodsClauseExMapper;
 import mapper.driver.ex.FinancialGoodsExMapper;
+import mapper.rentcar.ex.CarBizCityExMapper;
+import mapper.rentcar.ex.CarBizSupplierExMapper;
 
 /**  
  * ClassName:FinancialGoodsService <br/>  
@@ -62,6 +66,15 @@ public class FinancialGoodsService {
 	
 	@Autowired
 	private FinancialAdditionalClauseExMapper financialAdditionalClauseExMapper;
+	
+	@Autowired
+	private FinancialBasicsVehiclesMapper financialBasicsVehiclesMapper;
+	
+	@Autowired
+	private CarBizCityExMapper carBizCityExMapper;
+	
+	@Autowired
+	private CarBizSupplierExMapper carBizSupplierExMapper;
 	
 	public PageDTO queryFinancialGoodsForList(Integer page, Integer pageSize, String goodsName,
 			Integer basicsVehiclesId, Byte salesTarget, Set<Integer> supplierIds, Set<Integer> cityIds, Byte status) {
@@ -101,6 +114,18 @@ public class FinancialGoodsService {
 		financialGoods.setStatus(GoodsState.STAY_ON_THE_SHELF);
 		String goodsNumber = FinancialUtil.genLongNum(NumType.GOODS_SP);
 		financialGoods.setGoodsNumber(goodsNumber);
+		
+		FinancialBasicsVehicles financialBasicsVehicles = financialBasicsVehiclesMapper.selectByPrimaryKey(financialGoodsParamDTO.getBasicsVehiclesId());
+		
+		financialGoods.setBrandId(financialBasicsVehicles.getBrandId()); 
+		financialGoods.setModelId(financialBasicsVehicles.getModelId());
+		
+		String cityName = carBizCityExMapper.queryNameById(financialGoodsParamDTO.getCityId());
+		financialGoods.setCityName(cityName);
+		
+		String supplierFullName = carBizSupplierExMapper.getSupplierNameById(financialGoods.getSupplierId());
+		financialGoods.setSupplierFullName(supplierFullName);
+		
 		//financialGoods.setCreateTime(now);
 		//financialGoods.setUpdateTime(now);
 		int i=financialGoodsMapper.insertSelective(financialGoods);

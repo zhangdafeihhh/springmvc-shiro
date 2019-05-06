@@ -114,6 +114,7 @@ public class FinancialBasicsVehiclesController {
 			@Verify(param = "qualityAssurance", rule = "required")String qualityAssurance,
 			@Verify(param = "wheelbase", rule = "required")Integer wheelbase,
 			String environmentalProtectionStandard,
+			@Verify(param = "imgUrl", rule = "required") String imgUrl,
 			Integer fastChargingTime,
 			Integer slowChargingTime,
 			Double fastPercentage
@@ -146,6 +147,7 @@ public class FinancialBasicsVehiclesController {
 		  financialBasicsVehicles.setFastChargingTime(fastChargingTime);
 		  financialBasicsVehicles.setSlowChargingTime(slowChargingTime);
 		  financialBasicsVehicles.setFastPercentage(fastPercentage);
+		  financialBasicsVehicles.setImgUrl(imgUrl);
 		  financialBasicsVehicles = financialBasicsVehiclesService.saveFinancialBasicsVehicles(financialBasicsVehicles);
 		  return AjaxResponse.success(financialBasicsVehicles);
 	}
@@ -217,6 +219,7 @@ public class FinancialBasicsVehiclesController {
 			@Verify(param = "lengthWidthHeight", rule = "required")String lengthWidthHeight,
 			@Verify(param = "qualityAssurance", rule = "required")String qualityAssurance,
 			@Verify(param = "wheelbase", rule = "required")Integer wheelbase,
+			@Verify(param = "imgUrl", rule = "required") String imgUrl,
 			String environmentalProtectionStandard,
 			Integer fastChargingTime,
 			Integer slowChargingTime,
@@ -250,6 +253,7 @@ public class FinancialBasicsVehiclesController {
 		  financialBasicsVehicles.setFastChargingTime(fastChargingTime);
 		  financialBasicsVehicles.setSlowChargingTime(slowChargingTime);
 		  financialBasicsVehicles.setFastPercentage(fastPercentage);
+		  financialBasicsVehicles.setImgUrl(imgUrl);
 		  financialBasicsVehicles = financialBasicsVehiclesService.updateFinancialBasicsVehicles(financialBasicsVehicles);
 		  return AjaxResponse.success(financialBasicsVehicles);
 	}

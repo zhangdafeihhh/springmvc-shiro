@@ -6,6 +6,10 @@ import java.util.Date;
 public class FinancialGoods {
     private Integer goodsId;
 
+    private Long brandId;
+
+    private Long modelId;
+
     private Integer basicsVehiclesId;
 
     private String goodsNumber;
@@ -60,8 +64,6 @@ public class FinancialGoods {
 
     private String additionalServicesInfo;
 
-    private Integer vehicleStyle;
-
     private Integer stock;
 
     private Byte status;
@@ -80,6 +82,22 @@ public class FinancialGoods {
 
     public void setGoodsId(Integer goodsId) {
         this.goodsId = goodsId;
+    }
+
+    public Long getBrandId() {
+        return brandId;
+    }
+
+    public void setBrandId(Long brandId) {
+        this.brandId = brandId;
+    }
+
+    public Long getModelId() {
+        return modelId;
+    }
+
+    public void setModelId(Long modelId) {
+        this.modelId = modelId;
     }
 
     public Integer getBasicsVehiclesId() {
@@ -296,14 +314,6 @@ public class FinancialGoods {
 
     public void setAdditionalServicesInfo(String additionalServicesInfo) {
         this.additionalServicesInfo = additionalServicesInfo == null ? null : additionalServicesInfo.trim();
-    }
-
-    public Integer getVehicleStyle() {
-        return vehicleStyle;
-    }
-
-    public void setVehicleStyle(Integer vehicleStyle) {
-        this.vehicleStyle = vehicleStyle;
     }
 
     public Integer getStock() {

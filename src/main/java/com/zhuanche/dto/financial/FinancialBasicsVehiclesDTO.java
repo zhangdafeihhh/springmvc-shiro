@@ -55,7 +55,7 @@ public class FinancialBasicsVehiclesDTO{
     private Double fastPercentage;
 
     private Byte enableStatus;
-
+    private String imgUrl;
     private String createBy;
 
     private Date createTime;
@@ -321,7 +321,14 @@ public class FinancialBasicsVehiclesDTO{
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
 	}
-	
+
+	public String getImgUrl() {
+		return imgUrl;
+	}
+
+	public void setImgUrl(String imgUrl) {
+		this.imgUrl = imgUrl;
+	}
 	
 }
   

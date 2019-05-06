@@ -20,6 +20,7 @@
     <result column="environmental_protection_standard" property="environmentalProtectionStandard" jdbcType="VARCHAR" />
     <result column="fast_charging_time" property="fastChargingTime" jdbcType="INTEGER" />
     <result column="slow_charging_time" property="slowChargingTime" jdbcType="INTEGER" />
+    <result column="img_url" property="imgUrl" jdbcType="VARCHAR" />
     <result column="fast_percentage" property="fastPercentage" jdbcType="DOUBLE" />
     <result column="enable_status" property="enableStatus" jdbcType="TINYINT" />
     <result column="create_by" property="createBy" jdbcType="VARCHAR" />
@@ -31,8 +32,8 @@
     basics_vehicles_id, vehicles_detailed_name, brand_id, model_id, vehicle_style, year_style, 
     energy_type, variable_box, guidance_price, discharge, mileage, auto_home_url, length_width_height, 
     quality_assurance, wheelbase, environmental_protection_standard, fast_charging_time, 
-    slow_charging_time, fast_percentage, enable_status, create_by, create_time, update_by, 
-    update_time
+    slow_charging_time, img_url, fast_percentage, enable_status, create_by, create_time, 
+    update_by, update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -53,17 +54,19 @@
       variable_box, guidance_price, discharge, 
       mileage, auto_home_url, length_width_height, 
       quality_assurance, wheelbase, environmental_protection_standard, 
-      fast_charging_time, slow_charging_time, fast_percentage, 
-      enable_status, create_by, create_time, 
-      update_by, update_time)
+      fast_charging_time, slow_charging_time, img_url, 
+      fast_percentage, enable_status, create_by, 
+      create_time, update_by, update_time
+      )
     values (#{vehiclesDetailedName,jdbcType=VARCHAR}, #{brandId,jdbcType=BIGINT}, #{modelId,jdbcType=BIGINT}, 
       #{vehicleStyle,jdbcType=VARCHAR}, #{yearStyle,jdbcType=VARCHAR}, #{energyType,jdbcType=INTEGER}, 
       #{variableBox,jdbcType=INTEGER}, #{guidancePrice,jdbcType=DECIMAL}, #{discharge,jdbcType=INTEGER}, 
       #{mileage,jdbcType=INTEGER}, #{autoHomeUrl,jdbcType=VARCHAR}, #{lengthWidthHeight,jdbcType=VARCHAR}, 
       #{qualityAssurance,jdbcType=VARCHAR}, #{wheelbase,jdbcType=INTEGER}, #{environmentalProtectionStandard,jdbcType=VARCHAR}, 
-      #{fastChargingTime,jdbcType=INTEGER}, #{slowChargingTime,jdbcType=INTEGER}, #{fastPercentage,jdbcType=DOUBLE}, 
-      #{enableStatus,jdbcType=TINYINT}, #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+      #{fastChargingTime,jdbcType=INTEGER}, #{slowChargingTime,jdbcType=INTEGER}, #{imgUrl,jdbcType=VARCHAR}, 
+      #{fastPercentage,jdbcType=DOUBLE}, #{enableStatus,jdbcType=TINYINT}, #{createBy,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.FinancialBasicsVehicles" >
     <selectKey resultType="java.lang.Integer" keyProperty="basicsVehiclesId" order="AFTER" >
@@ -121,6 +124,9 @@
       </if>
       <if test="slowChargingTime != null" >
         slow_charging_time,
+      </if>
+      <if test="imgUrl != null" >
+        img_url,
       </if>
       <if test="fastPercentage != null" >
         fast_percentage,
@@ -192,6 +198,9 @@
       </if>
       <if test="slowChargingTime != null" >
         #{slowChargingTime,jdbcType=INTEGER},
+      </if>
+      <if test="imgUrl != null" >
+        #{imgUrl,jdbcType=VARCHAR},
       </if>
       <if test="fastPercentage != null" >
         #{fastPercentage,jdbcType=DOUBLE},
@@ -267,6 +276,9 @@
       <if test="slowChargingTime != null" >
         slow_charging_time = #{slowChargingTime,jdbcType=INTEGER},
       </if>
+      <if test="imgUrl != null" >
+        img_url = #{imgUrl,jdbcType=VARCHAR},
+      </if>
       <if test="fastPercentage != null" >
         fast_percentage = #{fastPercentage,jdbcType=DOUBLE},
       </if>
@@ -307,6 +319,7 @@
       environmental_protection_standard = #{environmentalProtectionStandard,jdbcType=VARCHAR},
       fast_charging_time = #{fastChargingTime,jdbcType=INTEGER},
       slow_charging_time = #{slowChargingTime,jdbcType=INTEGER},
+      img_url = #{imgUrl,jdbcType=VARCHAR},
       fast_percentage = #{fastPercentage,jdbcType=DOUBLE},
       enable_status = #{enableStatus,jdbcType=TINYINT},
       create_by = #{createBy,jdbcType=VARCHAR},

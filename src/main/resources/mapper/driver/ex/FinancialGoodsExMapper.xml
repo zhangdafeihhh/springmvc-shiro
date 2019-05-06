@@ -30,7 +30,6 @@
     <result column="color" property="color" jdbcType="VARCHAR" />
     <result column="additional_services_id" property="additionalServicesId" jdbcType="VARCHAR" />
     <result column="additional_services_info" property="additionalServicesInfo" jdbcType="VARCHAR" />
-    <result column="vehicle_style" property="vehicleStyle" jdbcType="INTEGER" />
     <result column="stock" property="stock" jdbcType="INTEGER" />
     <result column="status" property="status" jdbcType="TINYINT" />
     <result column="create_by" property="createBy" jdbcType="VARCHAR" />
@@ -68,7 +67,6 @@
     <result column="color" property="color" jdbcType="VARCHAR" />
     <result column="additional_services_id" property="additionalServicesId" jdbcType="VARCHAR" />
     <result column="additional_services_info" property="additionalServicesInfo" jdbcType="VARCHAR" />
-    <result column="vehicle_style" property="vehicleStyle" jdbcType="INTEGER" />
     <result column="stock" property="stock" jdbcType="INTEGER" />
     <result column="status" property="status" jdbcType="TINYINT" />
     <result column="create_by" property="createBy" jdbcType="VARCHAR" />
@@ -81,7 +79,7 @@
     supplier_id, supplier_full_name, city_id, city_name, channel_id, reason, exp_info, 
     picture_url, keyword, vehicle_age, mileage, vehicle_properties, source_funds_id, 
     lease_term, rent_every_term, front_money, first_rent, security_deposit, total_price, 
-    color, additional_services_id, additional_services_info, vehicle_style, stock, status, 
+    color, additional_services_id, additional_services_info, stock, status, 
     create_by, create_time, update_by, update_time
   </sql>
   <select id="queryFinancialGoodsForList" resultMap="BaseResultDtoMap" >

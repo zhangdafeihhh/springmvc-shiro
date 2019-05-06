@@ -75,8 +75,6 @@ public class FinancialGoodsInfoDTO{
 
     private String additionalServicesInfo;
 
-    private Integer vehicleStyle;
-
     private Integer stock;
 
     private Byte status;
@@ -335,12 +333,6 @@ public class FinancialGoodsInfoDTO{
 	}
 	public void setAdditionalServicesInfo(String additionalServicesInfo) {
 		this.additionalServicesInfo = additionalServicesInfo;
-	}
-	public Integer getVehicleStyle() {
-		return vehicleStyle;
-	}
-	public void setVehicleStyle(Integer vehicleStyle) {
-		this.vehicleStyle = vehicleStyle;
 	}
 	public Integer getStock() {
 		return stock;
