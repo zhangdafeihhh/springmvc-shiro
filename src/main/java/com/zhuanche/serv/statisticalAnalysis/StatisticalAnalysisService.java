@@ -7,6 +7,7 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.rentcar.CompleteOrderDTO;
+import com.zhuanche.entity.bigdata.SAASDriverEvaluateDetailDto;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.serv.common.CitySupplierTeamCommonService;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.*;
 
 @Service

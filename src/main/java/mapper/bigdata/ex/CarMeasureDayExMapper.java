@@ -2,6 +2,7 @@ package mapper.bigdata.ex;
 
 import com.zhuanche.entity.bigdata.SAASCoreIndexDto;
 import com.zhuanche.entity.bigdata.SAASIndexQuery;
+import com.zhuanche.entity.bigdata.StatisticSection;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -13,6 +14,14 @@ import java.util.List;
  * @Version 1.0
  */
 public interface CarMeasureDayExMapper {
+
+    List<StatisticSection> getCarOnlineDuration(SAASIndexQuery saasIndexQuery);
+
+    List<StatisticSection> getCarOperateStatistics(SAASIndexQuery saasIndexQuery);
+
+    List<StatisticSection> getOrderNumStatistic(SAASIndexQuery saasIndexQuery);
+
+    List<StatisticSection> getServiceNegativeRate(SAASIndexQuery saasIndexQuery);
 
     /**
      * 获取首页指标

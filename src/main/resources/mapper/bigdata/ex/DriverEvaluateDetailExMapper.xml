@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.bigdata.ex.DriverEvaluateDetailExMapper">
+  <sql id="Base_Column_List">
+    detail_id, data_date, order_no, evaluate_date, fact_date, fact_end_date, fact_start_addr, 
+    fact_end_addr, order_source, order_city_id, order_city_name, driver_city_id, driver_city_name, 
+    supplier_id, supplier_name, license_plates, driver_id, driver_name, driver_type, 
+    driver_type_name, driver_phoe, superintend_no, customer_id, customer_name, customer_phone, 
+    evaluate_score, evaluate, memo, platform_evaluate_score, platform_evaluate, platform_memo, 
+    version, sys_version, platform, team_id, team_name, class_rank, class_name, driver_group_id, 
+    driver_group_name
+  </sql>
+  <select id="getDriverEvaluateDetail" parameterType="com.zhuanche.entity.bigdata.SAASEvaluateDetailQuery" resultType="com.zhuanche.entity.bigdata.SAASDriverEvaluateDetailDto">
+    SELECT
+    driver_id driverId,
+    driver_name driverName,
+    license_plates vehiclePlateNo,
+    evaluate_score driverScore,
+    driver_city_name driverCityName,
+    evaluate_date evaluateTime,
+    driver_type_name driverTypeName,
+    supplier_name allianceName,
+    team_name motorcardName,
+    driver_group_name className,
+    order_no orderNo,
+    evaluate driverEvaluateText,
+    memo driverEvaluateRemark,
+    customer_id evaluateCustomerId,
+    class_name memberRankName,
+    customer_name customerName,
+    CASE order_source
+    WHEN 1 THEN '个人'
+    WHEN 2 THEN '渠道'
+    WHEN 3 THEN '机构'
+    WHEN 4 THEN '酒店'
+    END orderSourceName,
+    fact_date actualAboardTime,
+    fact_end_date completeTime,
+    fact_start_addr actualOnboardLocation,
+    fact_end_addr actualDebusLocation,
+    platform_evaluate appScore,
+    platform_evaluate_score appEvaluateText,
+    platform_memo appRemark,
+    platform osName,
+    sys_version osVersion,
+    superintend_no supervisorNo,
+    service_type_id serviceTypeId,
+    service_type_name serviceTypeName
+    FROM
+    ${tableName}
+    <where>
+      <if test="classId != null">
+        AND driver_group_id = #{classId}
+      </if>
+      <if test="driverTypeId != null">
+        AND driver_type = #{driverTypeId}
+      </if>
+      <if test="driverScore != null">
+        AND evaluate_score = #{driverScore}
+      </if>
+      <if test="appScore != null">
+        AND platform_evaluate = #{appScore}
+      </if>
+      <if test="visibleAllianceIds != null and visibleAllianceIds.size &gt;0">
+        <if test="allianceId != null and allianceId != ''">
+          and supplier_id = #{allianceId}
+        </if>
+        <if test="allianceId == null or allianceId == ''">
+          and supplier_id in
+          <foreach close=")" collection="visibleAllianceIds" index="index" item="item" open="(" separator=",">
+            #{item}
+          </foreach>
+        </if>
+      </if>
+      <if test="visibleAllianceIds == null or visibleAllianceIds.size ==0">
+        <if test="allianceId != null and allianceId != ''">
+          and supplier_id = #{allianceId}
+        </if>
+      </if>
+
+      <if test="visibleMotocadeIds != null and visibleMotocadeIds.size &gt;0">
+        <if test="motorcadeId != null and motorcadeId != ''">
+          and team_id = #{motorcadeId}
+        </if>
+        <if test="motorcadeId == null or motorcadeId == ''">
+          and team_id in
+          <foreach close=")" collection="visibleMotocadeIds" index="index" item="item" open="(" separator=",">
+            #{item}
+          </foreach>
+        </if>
+      </if>
+      <if test="visibleMotocadeIds == null or visibleMotocadeIds.size ==0">
+        <if test="motorcadeId != null and motorcadeId != ''">
+          and team_id = #{motorcadeId}
+        </if>
+      </if>
+
+      <if test="visibleCityIds != null  and visibleCityIds.size &gt;0">
+        <if test="orderCityId != null">
+          AND order_city_id = #{orderCityId}
+        </if>
+        <if test="orderCityId == null or orderCityId == ''">
+          AND order_city_id in
+          <foreach close=")" collection="visibleCityIds" index="index" item="id" open="(" separator=",">
+            #{id}
+          </foreach>
+        </if>
+      </if>
+      <if test="visibleCityIds == null or visibleCityIds.size ==0">
+        <if test="orderCityId != null">
+          AND order_city_id = #{orderCityId}
+        </if>
+      </if>
+      <if test="serviceTypeId != null">
+        AND service_type_id = #{serviceTypeId}
+      </if>
+    </where>
+  </select>
+
+  <select id="getDriverEvaluateDetailList" parameterType="com.zhuanche.entity.bigdata.SAASEvaluateDetailQuery" resultType="com.zhuanche.entity.bigdata.SAASDriverEvaluateDetailDto">
+    SELECT
+    driver_id driverId,
+    driver_name driverName,
+    license_plates vehiclePlateNo,
+    evaluate_score driverScore,
+    driver_city_name driverCityName,
+    evaluate_date evaluateTime,
+    driver_type_name driverTypeName,
+    supplier_name allianceName,
+    team_name motorcardName,
+    driver_group_name className,
+    order_no orderNo,
+    evaluate driverEvaluateText,
+    memo driverEvaluateRemark,
+    customer_id evaluateCustomerId,
+    class_name memberRankName,
+    customer_name customerName,
+    CASE order_source
+    WHEN 1 THEN '个人'
+    WHEN 2 THEN '渠道'
+    WHEN 3 THEN '机构'
+    WHEN 4 THEN '酒店'
+    END orderSourceName,
+    fact_date actualAboardTime,
+    fact_end_date completeTime,
+    fact_start_addr actualOnboardLocation,
+    fact_end_addr actualDebusLocation,
+    platform_evaluate appScore,
+    platform_evaluate_score appEvaluateText,
+    platform_memo appRemark,
+    platform osName,
+    sys_version osVersion,
+    superintend_no supervisorNo,
+    service_type_id serviceTypeId,
+    service_type_name serviceTypeName
+    FROM
+    ${tableName}
+    <where>
+      <if test="classId != null">
+        AND driver_group_id = #{classId}
+      </if>
+      <if test="driverTypeId != null">
+        AND driver_type = #{driverTypeId}
+      </if>
+      <if test="driverScore != null">
+        AND evaluate_score = #{driverScore}
+      </if>
+      <if test="appScore != null">
+        AND platform_evaluate = #{appScore}
+      </if>
+      <if test="visibleAllianceIds != null and visibleAllianceIds.size &gt;0">
+        <if test="allianceId != null and allianceId != ''">
+          and supplier_id = #{allianceId}
+        </if>
+        <if test="allianceId == null or allianceId == ''">
+          and supplier_id in
+          <foreach close=")" collection="visibleAllianceIds" index="index" item="item" open="(" separator=",">
+            #{item}
+          </foreach>
+        </if>
+      </if>
+      <if test="visibleAllianceIds == null or visibleAllianceIds.size ==0">
+        <if test="allianceId != null and allianceId != ''">
+          and supplier_id = #{allianceId}
+        </if>
+      </if>
+
+      <if test="visibleMotocadeIds != null and visibleMotocadeIds.size &gt;0">
+        <if test="motorcadeId != null and motorcadeId != ''">
+          and team_id = #{motorcadeId}
+        </if>
+        <if test="motorcadeId == null or motorcadeId == ''">
+          and team_id in
+          <foreach close=")" collection="visibleMotocadeIds" index="index" item="item" open="(" separator=",">
+            #{item}
+          </foreach>
+        </if>
+      </if>
+      <if test="visibleMotocadeIds == null or visibleMotocadeIds.size ==0">
+        <if test="motorcadeId != null and motorcadeId != ''">
+          and team_id = #{motorcadeId}
+        </if>
+      </if>
+
+      <if test="visibleCityIds != null  and visibleCityIds.size &gt;0">
+        <if test="orderCityId != null">
+          AND order_city_id = #{orderCityId}
+        </if>
+        <if test="orderCityId == null or orderCityId == ''">
+          AND order_city_id in
+          <foreach close=")" collection="visibleCityIds" index="index" item="id" open="(" separator=",">
+            #{id}
+          </foreach>
+        </if>
+      </if>
+      <if test="visibleCityIds == null or visibleCityIds.size ==0">
+        <if test="orderCityId != null">
+          AND order_city_id = #{orderCityId}
+        </if>
+      </if>
+      <if test="serviceTypeId != null">
+        AND service_type_id = #{serviceTypeId}
+      </if>
+    </where>
+    ORDER BY fact_end_date ASC
+  </select>
+</mapper>

@@ -1,12 +1,17 @@
 package com.zhuanche.controller.homekanban;
 
+import java.time.LocalDate;
 import java.util.*;
 
 import com.zhuanche.constant.Constants;
 import com.zhuanche.entity.bigdata.SAASCoreIndexDto;
+import com.zhuanche.entity.bigdata.SAASDriverRankingDto;
 import com.zhuanche.entity.bigdata.SAASIndexQuery;
+import com.zhuanche.entity.bigdata.StatisticSection;
+import com.zhuanche.serv.bigdata.AllianceIndexService;
 import com.zhuanche.util.dateUtil.DateUtil;
 import mapper.bigdata.ex.CarMeasureDayExMapper;
+import mapper.bigdata.ex.DriverRankDetaiExlMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
@@ -75,6 +80,12 @@ public class HomeKanBanController {
 	@Autowired
 	private CarMeasureDayExMapper measureDayExMapper;
 
+	@Autowired
+	private DriverRankDetaiExlMapper driverRankDetaiExlMapper;
+
+	@Autowired
+	AllianceIndexService allianceIndexService;
+
 	/** 日均运营车辆统计查询接口 **/
 	@RequestMapping("/operatingVehicleStatistics")
 	@ResponseBody
@@ -87,12 +98,29 @@ public class HomeKanBanController {
 			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
 		}
 		// 从大数据仓库获取统计数据
-		Map<String, Object> paramMap = Maps.newHashMap();
+		/*Map<String, Object> paramMap = Maps.newHashMap();
 		paramMap.put("startDate", startDate);
 		paramMap.put("endDate", endDate);
 		paramMap.put("allianceId", allianceId);
-		paramMap.put("motorcadeId", motorcadeId);
-		return parseResult(operatingVehicleUrl, paramMap);
+		paramMap.put("motorcadeId", motorcadeId);*/
+
+		try{
+			SAASIndexQuery saas = setVisibleData();
+			saas.setStartDate(startDate);
+			saas.setEndDate(endDate);
+			saas.setAllianceId(allianceId);
+			saas.setMotorcadeId(motorcadeId);
+			List<Map> resultList = allianceIndexService.getCarOperateStatistics(saas);
+			if(CollectionUtils.isNotEmpty(resultList)){
+				return AjaxResponse.success(resultList);
+			}else {
+				return AjaxResponse.success(new ArrayList<>());
+			}
+		}catch (Exception e){
+			logger.error("查询首页日均运营车辆统计错误异常", e);
+			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		}
+
 	}
 
 	/** 订单数量统计 **/
@@ -106,13 +134,28 @@ public class HomeKanBanController {
 			logger.warn("如果加盟商ID为空，不允许传入车队ID");
 			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
 		}
-		// 从大数据仓库获取统计数据
+		/*// 从大数据仓库获取统计数据
 		Map<String, Object> paramMap = Maps.newHashMap();
 		paramMap.put("startDate", startDate);
 		paramMap.put("endDate", endDate);
 		paramMap.put("allianceId", allianceId);
-		paramMap.put("motorcadeId", motorcadeId);
-		return parseResult(statisticsOrderUrl, paramMap);
+		paramMap.put("motorcadeId", motorcadeId);*/
+		try{
+			SAASIndexQuery saas = setVisibleData();
+			saas.setStartDate(startDate);
+			saas.setEndDate(endDate);
+			saas.setAllianceId(allianceId);
+			saas.setMotorcadeId(motorcadeId);
+			List<Map> resultList = allianceIndexService.getOrderNumStatistic(saas);
+			if(CollectionUtils.isNotEmpty(resultList)){
+				return AjaxResponse.success(resultList);
+			}else {
+				return AjaxResponse.success(new ArrayList<>());
+			}
+		}catch (Exception e){
+			logger.error("查询首页订单数量统计错误异常", e);
+			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		}
 	}
 
 	/** 服务差评率统计 **/
@@ -127,13 +170,29 @@ public class HomeKanBanController {
 			logger.warn("如果加盟商ID为空，不允许传入车队ID");
 			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
 		}
-		// 从大数据仓库获取统计数据
+		/*// 从大数据仓库获取统计数据
 		Map<String, Object> paramMap = Maps.newHashMap();
 		paramMap.put("startDate", startDate);
 		paramMap.put("endDate", endDate);
 		paramMap.put("allianceId", allianceId);
 		paramMap.put("motorcadeId", motorcadeId);
-		return parseResult(statisticsEvaluationUrl, paramMap);
+		return parseResult(statisticsEvaluationUrl, paramMap);*/
+		try{
+			SAASIndexQuery saas = setVisibleData();
+			saas.setStartDate(startDate);
+			saas.setEndDate(endDate);
+			saas.setAllianceId(allianceId);
+			saas.setMotorcadeId(motorcadeId);
+			List<Map> resultList = allianceIndexService.getServiceNegativeRate(saas);
+			if(CollectionUtils.isNotEmpty(resultList)){
+				return AjaxResponse.success(resultList);
+			}else {
+				return AjaxResponse.success(new ArrayList<>());
+			}
+		}catch (Exception e){
+			logger.error("查询首页订单数量统计错误异常", e);
+			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		}
 	}
 
 	/** 在线时长统计 **/
@@ -148,13 +207,29 @@ public class HomeKanBanController {
 			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
 		}
 		
-		// 从大数据仓库获取统计数据
+		/*// 从大数据仓库获取统计数据
 		Map<String, Object> paramMap = Maps.newHashMap();
 		paramMap.put("startDate", startDate);
 		paramMap.put("endDate", endDate);
 		paramMap.put("allianceId", allianceId);
 		paramMap.put("motorcadeId", motorcadeId);
-		return parseResult(onlineTimeUrl, paramMap);
+		return parseResult(onlineTimeUrl, paramMap);*/
+		try{
+			SAASIndexQuery saas = setVisibleData();
+			saas.setStartDate(startDate);
+			saas.setEndDate(endDate);
+			saas.setAllianceId(allianceId);
+			saas.setMotorcadeId(motorcadeId);
+			List<Map> resultList = allianceIndexService.getCarOnlineDuration(saas);
+			if(CollectionUtils.isNotEmpty(resultList)){
+				return AjaxResponse.success(resultList);
+			}else {
+				return AjaxResponse.success(new ArrayList<>());
+			}
+		}catch (Exception e){
+			logger.error("查询首页日均运营车辆统计错误异常", e);
+			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		}
 	}
 
 	/**
@@ -178,14 +253,56 @@ public class HomeKanBanController {
 			logger.warn("如果加盟商ID为空，不允许传入车队ID");
 			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
 		}
+		// 供应商信息
+		String[] visibleAllianceIds = null;
+		// 车队信息
+		String[] visibleMotocadeIds = null;
+		// 数据权限设置
+		if(WebSessionUtil.isSupperAdmin() == false){// 如果是普通管理员
+			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
+			Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取当前登录用户可见城市ID
+			// 如果城市id为空，代表可查全国所有数据
+			if(cityIds != null && cityIds.size() > 0){
+				Set<Integer> supplierIds = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
+				if(supplierIds == null || supplierIds.size() <= 0){
+					List<CarBizSupplier> querySupplierList = citySupplierTeamService.querySupplierList();// 获取用户可见的供应商信息
+					if(querySupplierList != null && querySupplierList.size() > 0){
+						for (CarBizSupplier carBizSupplier : querySupplierList) {
+							supplierIds.add(carBizSupplier.getSupplierId());
+						}
+					}
+				}
+				visibleAllianceIds = setToArray(supplierIds);
+				Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
+				visibleMotocadeIds = setToArray(teamIds);
+			}
+		}
 		// 从大数据仓库获取统计数据
-		Map<String, Object> paramMap = Maps.newHashMap();
+		/*Map<String, Object> paramMap = Maps.newHashMap();
 		paramMap.put("allianceId", allianceId);
 		paramMap.put("motorcadeId", motorcadeId);
 		paramMap.put("orderByColumnCode", orderByColumnCode);
 		paramMap.put("orderByTypeCode", orderByTypeCode);
 		paramMap.put("topNum", topNum);
-		return parseResult(vehicleTopUrl, paramMap);
+		return parseResult(vehicleTopUrl, paramMap);*/
+		try{
+
+			List<String>  visibleList = null;
+			List<String>  visibleMotoIdsList = null;
+			if(visibleAllianceIds != null){
+				visibleList = Arrays.asList(visibleAllianceIds);
+			}
+			if(visibleMotocadeIds != null){
+				visibleMotoIdsList = Arrays.asList(visibleMotocadeIds);
+			}
+			String date = LocalDate.now().minusMonths(1).toString();
+			List<SAASDriverRankingDto> driverRankingSections = driverRankDetaiExlMapper.getDriverRanking(allianceId,motorcadeId,orderByColumnCode,orderByTypeCode,Integer.parseInt(topNum),visibleList,visibleMotoIdsList,date);
+			logger.info("司机排名统计查询数据库");
+			return AjaxResponse.success(driverRankingSections);
+		}catch (Exception e){
+			logger.error("查询首页日均运营车辆统计错误异常", e);
+			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		}
 	}
 
 	/** 核心指标统计 **/
@@ -313,6 +430,40 @@ public class HomeKanBanController {
 			stra[i] = array[i].toString();
 		}
 		return stra;
+	}
+
+	private SAASIndexQuery setVisibleData(){
+		logger.info("大数据接口迁移，组装数据");
+		SAASIndexQuery saas = new SAASIndexQuery();
+		// 供应商信息
+		String[] visibleAllianceIds = null;
+		// 车队信息
+		String[] visibleMotocadeIds = null;
+		// 数据权限设置
+		if(WebSessionUtil.isSupperAdmin() == false){// 如果是普通管理员
+			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
+			Set<Integer> supplierIds = currentLoginUser.getSupplierIds();// 获取用户可见的供应商信息
+			Set<Integer> cityIds = currentLoginUser.getCityIds();// 获取当前登录用户可见城市ID
+			// 如果城市id为空，代表可查全国所有数据
+			if(cityIds != null && cityIds.size() > 0){
+				if(supplierIds == null || supplierIds.size() <= 0){
+					List<CarBizSupplier> querySupplierList = citySupplierTeamService.querySupplierList();// 获取用户可见的供应商信息
+					if(querySupplierList != null && querySupplierList.size() > 0){
+						for (CarBizSupplier carBizSupplier : querySupplierList) {
+							supplierIds.add(carBizSupplier.getSupplierId());
+						}
+					}
+				}
+				visibleAllianceIds = setToArray(supplierIds);
+				Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
+				visibleMotocadeIds = setToArray(teamIds);
+
+				saas.setVisibleAllianceIds(Arrays.asList(visibleAllianceIds));
+				saas.setVisibleMotocadeIds(Arrays.asList(visibleMotocadeIds));
+
+			}
+		}
+		return saas;
 	}
 	
 }

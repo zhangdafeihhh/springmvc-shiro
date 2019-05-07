@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.bigdata.ex.DriverRankDetaiExlMapper" >
+  <select id="getDriverRanking" resultType="com.zhuanche.entity.bigdata.SAASDriverRankingDto">
+    <![CDATA[
+        select
+            @rownum:=@rownum+1 AS serial,
+            driver_id as driverId,
+            driver_name as driverName,
+            team_name as motocadeName,
+            IFNULL(finished_order_num,0) as orderAmount,
+            CONCAT(IFNULL(FORMAT(bad_comment*100/total_comment,1),0),'%') as scoreAvg,
+            IFNULL(FORMAT(online_time,1),0) as serviceTimeAmount,
+            IFNULL(FORMAT(total_amount_7,1),0) as totalAmount7
+        from (SELECT @rownum:=0) r,bi_driver_rank_detail
+        ]]>
+    <where>
+      data_date >= #{date,jdbcType=DATE}
+      <if test="visibleAllianceIds != null and visibleAllianceIds.size >0">
+        <if test="allianceId != null and allianceId != ''">
+          and supplier_id = #{allianceId}
+        </if>
+        <if test="allianceId == null or allianceId == ''">
+          and supplier_id in
+          <foreach item="item" index="index" collection="visibleAllianceIds" open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
+      </if>
+      <if test="visibleAllianceIds == null or visibleAllianceIds.size ==0">
+        <if test="allianceId != null and allianceId != ''">
+          and supplier_id = #{allianceId}
+        </if>
+      </if>
+
+      <if test="visibleMotocadeIds != null and visibleMotocadeIds.size >0">
+        <if test="motorcadeId != null and motorcadeId != ''">
+          and team_id = #{motorcadeId}
+        </if>
+        <if test="motorcadeId == null or motorcadeId == ''">
+          and team_id in
+          <foreach item="item" index="index" collection="visibleMotocadeIds" open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
+      </if>
+      <if test="visibleMotocadeIds == null or visibleMotocadeIds.size ==0">
+        <if test="motorcadeId != null and motorcadeId != ''">
+          and team_id = #{motorcadeId}
+        </if>
+      </if>
+      <if test="orderByColumnCode == '1'.toString()">
+        order by finished_order_num
+      </if>
+      <if test="orderByColumnCode == '2'.toString()">
+        order by bad_comment/total_comment
+      </if>
+      <if test="orderByColumnCode == '3'.toString()">
+        order by online_time
+      </if>
+      <if test="orderByColumnCode == '4'.toString()">
+        order by total_amount_7
+      </if>
+      <if test="orderByTypeCode == '1'.toString()">
+        asc
+      </if>
+      <if test="orderByTypeCode == '2'.toString()">
+        desc
+      </if>
+      limit #{topNum ,jdbcType=INTEGER}
+    </where>
+  </select>
+</mapper>
