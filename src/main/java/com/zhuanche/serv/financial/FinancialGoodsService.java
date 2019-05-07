@@ -155,8 +155,21 @@ public class FinancialGoodsService {
 	public FinancialGoods updateFinancialGoods(FinancialGoodsParamDTO financialGoodsParamDTO) {
 		FinancialGoods financialGoods=BeanUtil.copyObject(financialGoodsParamDTO, FinancialGoods.class);
 		SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+		
+		FinancialBasicsVehicles financialBasicsVehicles = financialBasicsVehiclesMapper.selectByPrimaryKey(financialGoodsParamDTO.getBasicsVehiclesId());
+		
+		financialGoods.setBrandId(financialBasicsVehicles.getBrandId()); 
+		financialGoods.setModelId(financialBasicsVehicles.getModelId());
+		
+		String cityName = carBizCityExMapper.queryNameById(financialGoodsParamDTO.getCityId());
+		financialGoods.setCityName(cityName);
+		
+		String supplierFullName = carBizSupplierExMapper.getSupplierNameById(financialGoods.getSupplierId());
+		financialGoods.setSupplierFullName(supplierFullName);
+		
 		financialGoods.setUpdateBy(user.getName());
 		int i=financialGoodsMapper.updateByPrimaryKeySelective(financialGoods);
+		
 		if (i>0) {
 			//删除附加条款
 			List<FinancialGoodsClause> financialGoodsClauseList = financialGoodsClauseExMapper.queryFinancialGoodsClauseListForGoodsId(financialGoods.getGoodsId());

@@ -3,7 +3,7 @@
 <mapper namespace="mapper.driver.FinancialClueGoodsClauseMapper" >
   <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.FinancialClueGoodsClause" >
     <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="goods_number" property="goodsNumber" jdbcType="VARCHAR" />
+    <result column="goods_id" property="goodsId" jdbcType="INTEGER" />
     <result column="clue_id" property="clueId" jdbcType="INTEGER" />
     <result column="clause_id" property="clauseId" jdbcType="INTEGER" />
     <result column="create_by" property="createBy" jdbcType="VARCHAR" />
@@ -12,7 +12,7 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, goods_number, clue_id, clause_id, create_by, create_time, update_by, update_time
+    id, goods_id, clue_id, clause_id, create_by, create_time, update_by, update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -28,10 +28,10 @@
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into financial_clue_goods_clause (goods_number, clue_id, clause_id, 
+    insert into financial_clue_goods_clause (goods_id, clue_id, clause_id, 
       create_by, create_time, update_by, 
       update_time)
-    values (#{goodsNumber,jdbcType=VARCHAR}, #{clueId,jdbcType=INTEGER}, #{clauseId,jdbcType=INTEGER}, 
+    values (#{goodsId,jdbcType=INTEGER}, #{clueId,jdbcType=INTEGER}, #{clauseId,jdbcType=INTEGER}, 
       #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, 
       #{updateTime,jdbcType=TIMESTAMP})
   </insert>
@@ -41,8 +41,8 @@
     </selectKey>
     insert into financial_clue_goods_clause
     <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="goodsNumber != null" >
-        goods_number,
+      <if test="goodsId != null" >
+        goods_id,
       </if>
       <if test="clueId != null" >
         clue_id,
@@ -64,8 +64,8 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="goodsNumber != null" >
-        #{goodsNumber,jdbcType=VARCHAR},
+      <if test="goodsId != null" >
+        #{goodsId,jdbcType=INTEGER},
       </if>
       <if test="clueId != null" >
         #{clueId,jdbcType=INTEGER},
@@ -90,8 +90,8 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.driver.FinancialClueGoodsClause" >
     update financial_clue_goods_clause
     <set >
-      <if test="goodsNumber != null" >
-        goods_number = #{goodsNumber,jdbcType=VARCHAR},
+      <if test="goodsId != null" >
+        goods_id = #{goodsId,jdbcType=INTEGER},
       </if>
       <if test="clueId != null" >
         clue_id = #{clueId,jdbcType=INTEGER},
@@ -116,7 +116,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.FinancialClueGoodsClause" >
     update financial_clue_goods_clause
-    set goods_number = #{goodsNumber,jdbcType=VARCHAR},
+    set goods_id = #{goodsId,jdbcType=INTEGER},
       clue_id = #{clueId,jdbcType=INTEGER},
       clause_id = #{clauseId,jdbcType=INTEGER},
       create_by = #{createBy,jdbcType=VARCHAR},

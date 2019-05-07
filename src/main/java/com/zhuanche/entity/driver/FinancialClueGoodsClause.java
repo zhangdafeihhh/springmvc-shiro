@@ -5,7 +5,7 @@ import java.util.Date;
 public class FinancialClueGoodsClause {
     private Integer id;
 
-    private String goodsNumber;
+    private Integer goodsId;
 
     private Integer clueId;
 
@@ -27,12 +27,12 @@ public class FinancialClueGoodsClause {
         this.id = id;
     }
 
-    public String getGoodsNumber() {
-        return goodsNumber;
+    public Integer getGoodsId() {
+        return goodsId;
     }
 
-    public void setGoodsNumber(String goodsNumber) {
-        this.goodsNumber = goodsNumber == null ? null : goodsNumber.trim();
+    public void setGoodsId(Integer goodsId) {
+        this.goodsId = goodsId;
     }
 
     public Integer getClueId() {
