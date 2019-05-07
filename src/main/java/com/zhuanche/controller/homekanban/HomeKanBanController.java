@@ -457,10 +457,12 @@ public class HomeKanBanController {
 				visibleAllianceIds = setToArray(supplierIds);
 				Set<Integer> teamIds = currentLoginUser.getTeamIds();// 获取用户可见的车队信息
 				visibleMotocadeIds = setToArray(teamIds);
-
-				saas.setVisibleAllianceIds(Arrays.asList(visibleAllianceIds));
-				saas.setVisibleMotocadeIds(Arrays.asList(visibleMotocadeIds));
-
+				if(visibleAllianceIds!=null){
+					saas.setVisibleAllianceIds(Arrays.asList(visibleAllianceIds));
+				}
+				if(visibleMotocadeIds!=null){
+					saas.setVisibleMotocadeIds(Arrays.asList(visibleMotocadeIds));
+				}
 			}
 		}
 		return saas;
