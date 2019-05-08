@@ -117,7 +117,7 @@
                         "class": "%logger{20}",
                         "line": "%L",
                         "log_message": "%message",
-"loginUser": "%loginUser"
+"loginUser": "%X{loginUser}"
                         }
                     </pattern>
                 </pattern>
@@ -161,7 +161,7 @@
                         "line": "%L",
                         "log_message": "%message",
                         "stack_trace": "%exception",
-"loginUser": "%loginUser"
+                        "loginUser": "%X{loginUser}"
                         }
                     </pattern>
                 </pattern>
