@@ -9,6 +9,7 @@ import com.zhuanche.entity.bigdata.SAASDriverRankingDto;
 import com.zhuanche.entity.bigdata.SAASIndexQuery;
 import com.zhuanche.entity.bigdata.StatisticSection;
 import com.zhuanche.serv.bigdata.AllianceIndexService;
+import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.dateUtil.DateUtil;
 import mapper.bigdata.ex.CarMeasureDayExMapper;
 import mapper.bigdata.ex.DriverRankDetaiExlMapper;
@@ -206,20 +207,42 @@ public class HomeKanBanController {
 			logger.warn("如果加盟商ID为空，不允许传入车队ID");
 			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
 		}
-		
-		/*// 从大数据仓库获取统计数据
-		Map<String, Object> paramMap = Maps.newHashMap();
-		paramMap.put("startDate", startDate);
-		paramMap.put("endDate", endDate);
-		paramMap.put("allianceId", allianceId);
-		paramMap.put("motorcadeId", motorcadeId);
-		return parseResult(onlineTimeUrl, paramMap);*/
+		SAASIndexQuery saas = setVisibleData();
+		saas.setStartDate(startDate);
+		saas.setEndDate(endDate);
+		saas.setAllianceId(allianceId);
+		saas.setMotorcadeId(motorcadeId);
+		if(startDate!=null && endDate!=null){
+			Date searchStartDate = DateUtils.getDate(startDate);
+			Date searchEndDate = DateUtils.getDate(endDate);
+			Integer createGap = DateUtils.getIntervalDays(searchStartDate, searchEndDate);
+			if(createGap>14){
+				logger.info("查询日子区间大于14天："+createGap);
+				Date middleDate = DateUtils.addDays(searchStartDate,14);
+				try{
+					//第一次查询
+					//List<Map> resultList = new ArrayList<>();
+					saas.setStartDate(startDate);
+					saas.setEndDate(DateUtils.formatDateTime(middleDate));
+					List<Map> middleMap = allianceIndexService.getCarOnlineDuration(saas);
+					//第二次查询
+					saas.setStartDate(DateUtils.formatDateTime(DateUtils.addDays(middleDate,1)));
+					saas.setEndDate(endDate);
+					List<Map> resultList = allianceIndexService.getCarOnlineDuration(saas);
+					resultList.addAll(middleMap);
+					if(CollectionUtils.isNotEmpty(resultList)){
+						return AjaxResponse.success(resultList);
+					}else {
+						return AjaxResponse.success(new ArrayList<>());
+					}
+				}catch (Exception e){
+					logger.error("查询首页日均运营车辆统计错误异常", e);
+					return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+				}
+			}
+		}
+		logger.info("查询日子区间小于14天");
 		try{
-			SAASIndexQuery saas = setVisibleData();
-			saas.setStartDate(startDate);
-			saas.setEndDate(endDate);
-			saas.setAllianceId(allianceId);
-			saas.setMotorcadeId(motorcadeId);
 			List<Map> resultList = allianceIndexService.getCarOnlineDuration(saas);
 			if(CollectionUtils.isNotEmpty(resultList)){
 				return AjaxResponse.success(resultList);
@@ -230,6 +253,7 @@ public class HomeKanBanController {
 			logger.error("查询首页日均运营车辆统计错误异常", e);
 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 		}
+
 	}
 
 	/**
