@@ -19,13 +19,11 @@ import com.zhuanche.entity.bigdata.BiDriverBusinessInfoDayReport;
 import com.zhuanche.entity.bigdata.BiDriverBusinessInfoMonthReport;
 import com.zhuanche.entity.bigdata.BiDriverBusinessInfoSummaryReport;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
-import com.zhuanche.entity.rentcar.CarBizCooperationType;
 import com.zhuanche.entity.rentcar.CarBizModel;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
-import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.DateUtils;
 import mapper.bigdata.ex.BiDriverBusinessInfoDayReportExMapper;
 import mapper.bigdata.ex.BiDriverBusinessInfoMonthReportExMapper;
@@ -33,7 +31,6 @@ import mapper.bigdata.ex.BiDriverBusinessInfoSummaryReportExMapper;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
-import mapper.rentcar.ex.CarBizCooperationTypeExMapper;
 import mapper.rentcar.ex.CarBizModelExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.collections.CollectionUtils;
@@ -208,9 +205,15 @@ public class SaasDriverDailyReportController {
         List<BiDriverBusinessInfoDayReport> list = null;
         try {
             Page page =  PageHelper.startPage(pageNum,pageSize,true);
-            list = dayReportExMapper.queryDayReport(Integer.valueOf(cityId), StringUtils.isEmpty(supplierId)?null:Integer.valueOf(supplierId),
-                    StringUtils.isEmpty(driverTeamId)?null:Integer.valueOf(driverTeamId),StringUtils.isEmpty(driverGroupId)?null:Integer.valueOf(driverGroupId),
-                    driverPhone,licensePlates,beginDate,endDate,businessVolumeSort,finOrdCntSort,badCntSort,sort,table);
+
+            Set<Integer> setSuppliers = new HashSet<>();
+            Set<Integer> setTeamids = new HashSet<>();
+            Set<Integer> setGroups = new HashSet<>();
+            this.getSetData(supplierId,driverTeamId,driverGroupId,setSuppliers,setTeamids,setGroups);
+
+            list = dayReportExMapper.queryDayReport(Integer.valueOf(cityId), setSuppliers,
+                    setTeamids,setGroups,driverPhone,licensePlates,beginDate,endDate,businessVolumeSort,
+                    finOrdCntSort,badCntSort,sort,table);
 
             total = page.getTotal();
         } catch (NumberFormatException e) {
@@ -270,6 +273,7 @@ public class SaasDriverDailyReportController {
         obj.put("auth_cityIds",loginUser.getCityIds());
         obj.put("auth_suppliers",loginUser.getSupplierIds());
         obj.put("auth_teamIds",loginUser.getTeamIds());
+        obj.put("auth_groups",loginUser.getGroupIds());
         obj.put("auth_userId",loginUser.getId());
         obj.put("auth_userName",loginUser.getLoginName());
         obj.put("send_email",StringUtils.isNotBlank(email)?email:loginUser.getEmail());
@@ -432,9 +436,14 @@ public class SaasDriverDailyReportController {
         List<BiDriverBusinessInfoMonthReport> monthReportlist = null;
         try {
             Page page =  PageHelper.startPage(pageNum,pageSize,true);
-            monthReportlist = monthReportExMapper.queryMonthReport(Integer.valueOf(cityId), StringUtils.isEmpty(supplierId)?null:Integer.valueOf(supplierId),
-                    StringUtils.isEmpty(driverTeamId)?null:Integer.valueOf(driverTeamId),StringUtils.isEmpty(driverGroupId)?null:Integer.valueOf(driverGroupId),
-                    driverPhone,licensePlates,month,businessVolumeSort,finOrdCntSort,badCntSort,sort,table);
+            Set<Integer> setSuppliers = new HashSet<>();
+            Set<Integer> setTeamids = new HashSet<>();
+            Set<Integer> setGroups = new HashSet<>();
+            this.getSetData(supplierId,driverTeamId,driverGroupId,setSuppliers,setTeamids,setGroups);
+
+            monthReportlist = monthReportExMapper.queryMonthReport(Integer.valueOf(cityId),setSuppliers,
+                    setTeamids,setGroups, driverPhone,licensePlates,month,businessVolumeSort,
+                    finOrdCntSort,badCntSort,sort,table);
 
             total = page.getTotal();
         } catch (NumberFormatException e) {
@@ -494,6 +503,7 @@ public class SaasDriverDailyReportController {
         obj.put("auth_cityIds",loginUser.getCityIds());
         obj.put("auth_suppliers",loginUser.getSupplierIds());
         obj.put("auth_teamIds",loginUser.getTeamIds());
+        obj.put("auth_groups",loginUser.getGroupIds());
         obj.put("auth_userId",loginUser.getId());
         obj.put("auth_userName",loginUser.getLoginName());
         obj.put("send_email",StringUtils.isNotBlank(email)?email:loginUser.getEmail());
@@ -641,9 +651,14 @@ public class SaasDriverDailyReportController {
         List<BiDriverBusinessInfoSummaryReport> summaryReportList = null;
         try {
             Page page =  PageHelper.startPage(pageNum,pageSize,true);
-            summaryReportList = summaryReportExMapper.querySummeryReport(Integer.valueOf(cityId), StringUtils.isEmpty(supplierId)?null:Integer.valueOf(supplierId),
-                    StringUtils.isEmpty(driverTeamId)?null:Integer.valueOf(driverTeamId),StringUtils.isEmpty(driverGroupId)?null:Integer.valueOf(driverGroupId),
-                    driverPhone,licensePlates,currentDate,businessVolumeSort,finOrdCntSort,badCntSort,sort);
+            Set<Integer> setSuppliers = new HashSet<>();
+            Set<Integer> setTeamids = new HashSet<>();
+            Set<Integer> setGroups = new HashSet<>();
+            this.getSetData(supplierId,driverTeamId,driverGroupId,setSuppliers,setTeamids,setGroups);
+
+            summaryReportList = summaryReportExMapper.querySummeryReport(Integer.valueOf(cityId),setSuppliers,
+                    setTeamids,setGroups,driverPhone,licensePlates,currentDate,
+                    businessVolumeSort,finOrdCntSort,badCntSort,sort);
 
             total = page.getTotal();
         } catch (NumberFormatException e) {
@@ -699,6 +714,7 @@ public class SaasDriverDailyReportController {
         obj.put("auth_cityIds",loginUser.getCityIds());
         obj.put("auth_suppliers",loginUser.getSupplierIds());
         obj.put("auth_teamIds",loginUser.getTeamIds());
+        obj.put("auth_groups",loginUser.getGroupIds());
         obj.put("auth_userId",loginUser.getId());
         obj.put("auth_userName",loginUser.getLoginName());
         obj.put("send_email",StringUtils.isNotBlank(email)?email:loginUser.getEmail());
@@ -746,5 +762,48 @@ public class SaasDriverDailyReportController {
         return AjaxResponse.success(null);
     }
 
+    /**
+     * 根据数据权限作为查询条件
+     * @param supplierId
+     * @param teamId
+     * @param groupId
+     * @param setSupplierIds
+     * @param setTeamIds
+     * @param setGroupIds
+     */
+    private void getSetData(String supplierId,String teamId,String groupId,Set<Integer> setSupplierIds,
+                            Set<Integer> setTeamIds,Set<Integer> setGroupIds){
+        if(StringUtils.isNotEmpty(supplierId)){
+            setSupplierIds.add(Integer.valueOf(supplierId));
+        }else {
+            if(WebSessionUtil.getCurrentLoginUser().getAccountType()!= null && WebSessionUtil.getCurrentLoginUser().getAccountType() == 900){
 
+            }else {
+                setSupplierIds = WebSessionUtil.getCurrentLoginUser().getSupplierIds();
+
+            }
+        }
+
+        if(StringUtils.isNotEmpty(teamId)){
+            setTeamIds.add(Integer.valueOf(teamId));
+        }else {
+
+            if(WebSessionUtil.getCurrentLoginUser().getAccountType()!= null && WebSessionUtil.getCurrentLoginUser().getAccountType() == 900){
+
+            }else {
+                setTeamIds = WebSessionUtil.getCurrentLoginUser().getTeamIds();
+            }
+        }
+
+        if(StringUtils.isNotEmpty(groupId)){
+            setGroupIds.add(Integer.valueOf(groupId));
+        }else {
+
+            if(WebSessionUtil.getCurrentLoginUser().getAccountType()!= null && WebSessionUtil.getCurrentLoginUser().getAccountType() == 900){
+
+            }else {
+                setGroupIds = WebSessionUtil.getCurrentLoginUser().getGroupIds();
+            }
+        }
+    }
 }

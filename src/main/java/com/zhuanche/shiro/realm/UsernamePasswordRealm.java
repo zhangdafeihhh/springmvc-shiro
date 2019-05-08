@@ -83,6 +83,21 @@ public class UsernamePasswordRealm extends AuthorizingRealm {
 			}
 			loginUser.setTeamIds(ids);
 		}
+		/**此用户可以管理的班组ID**/
+		if(StringUtils.isNotEmpty(adMUser.getGroupIds())){
+			String[] idStrs = adMUser.getGroupIds().trim().split(",");
+			Set<Integer> ids = new HashSet<>(idStrs.length * 2 + 2);
+			for(String id : idStrs){
+				if(StringUtils.isNotEmpty(id)){
+					try {
+						ids.add(Integer.valueOf(id.trim()));
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			loginUser.setGroupIds(ids);
+		}
 		//---------------------------------------------------------------------------------------------------------数据权限END
 		logger.info( "[获取用户的身份认证信息]="+loginUser);
         return new SimpleAuthenticationInfo(loginUser, authenticationToken.getCredentials()  ,  this.getName() );

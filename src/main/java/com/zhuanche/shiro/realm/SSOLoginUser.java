@@ -31,6 +31,8 @@ public final class SSOLoginUser implements Serializable{
 	private Set<Integer> supplierIds = new HashSet<Integer>();
 	/**此用户可以管理的车队ID**/
 	private Set<Integer> teamIds = new HashSet<Integer>();
+	/**此用户可以管理的班组ID***/
+	private Set<Integer> groupIds = new HashSet<Integer>();
 	/**此用户数据权限等级(参考PermissionLevelEnum枚举类型 1全国 2城市 4供应商 8小队 16班组) **/
 	private Integer level;
 	//---------------------------------------------------------------------------------------------------------数据权限END
@@ -107,6 +109,14 @@ public final class SSOLoginUser implements Serializable{
 
 	public void setLevel(Integer level) {
 		this.level = level;
+	}
+
+	public Set<Integer> getGroupIds() {
+		return groupIds;
+	}
+
+	public void setGroupIds(Set<Integer> groupIds) {
+		this.groupIds = groupIds;
 	}
 
 	@Override
