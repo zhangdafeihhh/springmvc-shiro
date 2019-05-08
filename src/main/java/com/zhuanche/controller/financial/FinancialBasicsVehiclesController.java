@@ -97,7 +97,7 @@ public class FinancialBasicsVehiclesController {
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.MASTER )
 	} )
-	@SysLogAnn(module="FinancialBasicsVehicles",methods="saveFinancialBasicsVehicles",parameterType="Integer",parameterKey="basicsVehiclesId",objClass=FinancialBasicsVehiclesDTO.class )
+	@SysLogAnn(module="FinancialBasicsVehicles",methods="save",parameterType="Integer",parameterKey="basicsVehiclesId",objClass=FinancialBasicsVehiclesDTO.class )
 	public AjaxResponse saveFinancialBasicsVehicles(
 			@Verify(param = "vehiclesDetailedName", rule = "required")String vehiclesDetailedName,
 			@Verify(param = "brandId", rule = "required|min(1)")Long brandId,
@@ -201,7 +201,7 @@ public class FinancialBasicsVehiclesController {
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.MASTER )
 	} )
-	@SysLogAnn(module="FinancialBasicsVehicles",methods="updateFinancialBasicsVehicles",
+	@SysLogAnn(module="FinancialBasicsVehicles",methods="update",
     serviceClass="financialBasicsVehiclesService",queryMethod="queryFinancialBasicsVehiclesById",parameterType="Integer",parameterKey="basicsVehiclesId",objClass=FinancialBasicsVehiclesDTO.class )
 	public AjaxResponse updateFinancialBasicsVehicles(
 			@Verify(param = "basicsVehiclesId", rule = "required|min(1)")Integer basicsVehiclesId,

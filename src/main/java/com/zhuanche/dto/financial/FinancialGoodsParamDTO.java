@@ -3,6 +3,7 @@ package com.zhuanche.dto.financial;
 import java.math.BigDecimal;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
 
@@ -23,15 +24,16 @@ public class FinancialGoodsParamDTO {
 	@Length(groups=Seq1.class,max = 20, message = "商品名称不能最长不能超过20")
 	private String goodsName;
 	
-	@NotBlank(groups=Seq2.class,message = "销售对象不能为空")
+	@NotNull(groups=Seq2.class,message = "销售对象不能为空")
 	private Byte salesTarget;
-	@NotBlank(groups=Seq3.class,message = "商品类型不能为空")
+	
+	@NotNull(groups=Seq3.class,message = "商品类型不能为空")
 	private Byte goodsType;
-	@NotBlank(groups=Seq4.class,message = "供应商不能为空")
+	@NotNull(groups=Seq4.class,message = "供应商不能为空")
 	private Integer supplierId;
-	@NotBlank(groups=Seq5.class,message = "城市不能为空")
+	@NotNull(groups=Seq5.class,message = "城市不能为空")
 	private Integer cityId;
-	@NotBlank(groups=Seq6.class,message = "渠道不能为空")
+	@NotNull(groups=Seq6.class,message = "渠道不能为空")
 	private Integer channelId;	
 	private String reason;
 	private String expInfo;
@@ -40,17 +42,17 @@ public class FinancialGoodsParamDTO {
 	private String pictureUrl;
 	@Length(groups=Seq9.class,max = 256, message = "关键字最多不能超过256个字符")
 	private String keyword;
-	@NotBlank(groups=Seq10.class,message = "车龄不能为空")
+	@NotNull(groups=Seq10.class,message = "车龄不能为空")
 	private Integer vehicleAge;
-	@NotBlank(groups=Seq11.class,message = "里程不能为空")
+	@NotNull(groups=Seq11.class,message = "里程不能为空")
 	private Integer mileage;
-	@NotBlank(groups=Seq12.class,message = "车辆性质不能为空")
+	@NotNull(groups=Seq12.class,message = "车辆性质不能为空")
 	private Integer vehicleProperties;
 	
 	private String color;
-	@NotBlank(groups=Seq13.class,message = "车型车款不能为空")
+	@NotNull(groups=Seq13.class,message = "车型车款不能为空")
 	private Integer basicsVehiclesId;
-	@NotBlank(groups=Seq14.class,message = "销售库存不能为空")
+	@NotNull(groups=Seq14.class,message = "销售库存不能为空")
 	private Integer stock;
 	
 	private Integer sourceFundsId;

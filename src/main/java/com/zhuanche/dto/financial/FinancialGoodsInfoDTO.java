@@ -6,6 +6,7 @@ import java.util.List;
 import com.zhuanche.constants.financial.FinancialConst.GoodsState;
 import com.zhuanche.constants.financial.FinancialConst.GoodsTypeSelect;
 import com.zhuanche.constants.financial.FinancialConst.SalesTargetSelect;
+import com.zhuanche.common.syslog.Column;
 import com.zhuanche.constants.financial.MileageEnum;
 import com.zhuanche.constants.financial.VehicleAgeEnum;
 import com.zhuanche.entity.driver.FinancialAdditionalClause;
@@ -18,75 +19,70 @@ import com.zhuanche.entity.driver.FinancialGoods;
  */
 
 public class FinancialGoodsInfoDTO{
-	
+    @Column(desc="商品主键")
 	private Integer goodsId;
-
+    @Column(desc="车型车款ID")
     private Integer basicsVehiclesId;
-
     private String goodsNumber;
-
+    @Column(desc="商品名称")
     private String goodsName;
-
+    @Column(desc="销售对象")
     private Byte salesTarget;
-
+    @Column(desc="商品类型")
     private Byte goodsType;
-
+    @Column(desc="供应商ID")
     private Integer supplierId;
-
+    @Column(desc="供应商名称")
     private String supplierFullName;
-
+    @Column(desc="城市ID")
     private Integer cityId;
-
+    @Column(desc="城市名称")
     private String cityName;
-
+    @Column(desc="渠道ID")
     private Integer channelId;
-
+    @Column(desc="原因")
     private String reason;
-
+    @Column(desc="说明")
     private String expInfo;
-
+    @Column(desc="图片地址")
     private String pictureUrl;
-
+    @Column(desc="关键字")
     private String keyword;
-
+    @Column(desc="车龄")
     private Integer vehicleAge;
-
+    @Column(desc="里程")
     private Integer mileage;
-
+    @Column(desc="车辆性质")
     private Integer vehicleProperties;
-
+    @Column(desc="资金来源")
     private Integer sourceFundsId;
-
+    @Column(desc="租期")
     private Integer leaseTerm;
-
+    @Column(desc="每期租金（元）")
     private BigDecimal rentEveryTerm;
-
+    @Column(desc="定金")
     private BigDecimal frontMoney;
-
+    @Column(desc="首付租金（元）")
     private BigDecimal firstRent;
-
+    @Column(desc="保证金（元）")
     private BigDecimal securityDeposit;
-
+    @Column(desc="总售价（元）")
     private BigDecimal totalPrice;
-
+    @Column(desc="颜色")
     private String color;
-
+    @Column(desc="附加服务信息")
     private String additionalServicesId;
-
+    @Column(desc="附加服务信息说明")
     private String additionalServicesInfo;
-
+    @Column(desc="库存")
     private Integer stock;
-
     private Byte status;
-
     private String createBy;
-
     private Date createTime;
-
     private String updateBy;
-
+    @Column(desc="基础车型库ID")
     private Date updateTime;
-	
+    
 	private String vehiclesDetailedName;
 	private String goodsTypeName;
 	private String salesTargetName;

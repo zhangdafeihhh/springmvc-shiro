@@ -16,10 +16,12 @@ import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.common.syslog.SysLogAnn;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.common.web.datavalidate.sequence.SeqAll;
+import com.zhuanche.dto.financial.FinancialBasicsVehiclesDTO;
 import com.zhuanche.dto.financial.FinancialGoodsDTO;
 import com.zhuanche.dto.financial.FinancialGoodsInfoDTO;
 import com.zhuanche.dto.financial.FinancialGoodsParamDTO;
@@ -112,12 +114,13 @@ public class FinancialGoodsController {
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.MASTER )
 	} )
+	@SysLogAnn(module="FinancialGoods",methods="save",parameterType="Integer",parameterKey="goodsId",parameterObj="financialGoodsParamDTO",objClass=FinancialGoodsInfoDTO.class )
 	@RequestMapping(value = "/saveFinancialGoods")
 	public AjaxResponse saveFinancialGoods(@Validated(SeqAll.class)
 			FinancialGoodsParamDTO financialGoodsParamDTO
 			) {
 		FinancialGoods financialGoods=financialGoodsService.saveFinancialGoods(financialGoodsParamDTO);
-	    return AjaxResponse.success(true);
+	    return AjaxResponse.success(financialGoods);
 	}
 	
 	/**
@@ -131,6 +134,8 @@ public class FinancialGoodsController {
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.MASTER )
 	} )
 	@RequestMapping(value = "/updateFinancialGoods")
+	@SysLogAnn(module="FinancialGoods",methods="update",
+    serviceClass="financialGoodsService",queryMethod="queryFinancialGoodsById",parameterType="Integer",parameterKey="goodsId",parameterObj="financialGoodsParamDTO",objClass=FinancialGoodsInfoDTO.class )
 	public AjaxResponse updateFinancialGoods(@Validated(SeqAll.class) FinancialGoodsParamDTO financialGoodsParamDTO
 			) {
 		
@@ -139,7 +144,7 @@ public class FinancialGoodsController {
 		}
 		
 		FinancialGoods financialGoods=financialGoodsService.updateFinancialGoods(financialGoodsParamDTO);
-	    return AjaxResponse.success(true);
+	    return AjaxResponse.success(financialGoods);
 	}
 	
 	/**
