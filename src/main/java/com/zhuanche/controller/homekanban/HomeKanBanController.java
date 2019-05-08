@@ -227,7 +227,7 @@ public class HomeKanBanController {
 						saas.setEndDate(DateUtils.formatDateTime(middleDate));
 						List<Map> middleMap = allianceIndexService.getCarOnlineDuration(saas);
 						//第二次查询
-						saas.setStartDate(DateUtils.formatDateTime(DateUtils.addDays(middleDate,1)));
+						saas.setStartDate(DateUtils.formatDateTime(middleDate));
 						saas.setEndDate(endDate);
 						List<Map> resultList = allianceIndexService.getCarOnlineDuration(saas);
 						middleMap.addAll(resultList);
