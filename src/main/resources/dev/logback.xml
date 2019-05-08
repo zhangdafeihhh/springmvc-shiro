@@ -116,7 +116,8 @@
                         "thread": "%thread",
                         "class": "%logger{20}",
                         "line": "%L",
-                        "log_message": "%message"
+                        "log_message": "%message",
+"loginUser": "%loginUser"
                         }
                     </pattern>
                 </pattern>
@@ -159,7 +160,8 @@
                         "class": "%logger{20}",
                         "line": "%L",
                         "log_message": "%message",
-                        "stack_trace": "%exception"
+                        "stack_trace": "%exception",
+"loginUser": "%loginUser"
                         }
                     </pattern>
                 </pattern>
