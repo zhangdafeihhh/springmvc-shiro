@@ -15,6 +15,8 @@ import java.util.List;
  */
 public interface CarMeasureDayExMapper {
 
+    Integer getCarOnlineDurationMaxId(SAASIndexQuery saasIndexQuery);
+
     List<StatisticSection> getCarOnlineDuration(SAASIndexQuery saasIndexQuery);
 
     List<StatisticSection> getCarOperateStatistics(SAASIndexQuery saasIndexQuery);

@@ -36,6 +36,18 @@
     fact_end_amount, order_num, bind_order_num, evaluate_num, bad_evaluate_num, order_cnt_notchannel
   </sql>-->
 
+  <select id="getCarOnlineDurationMaxId"  resultType="java.lang.Integer">
+    <![CDATA[
+        select
+           min(id)
+        from bi_car_measure_day
+        ]]>
+    <where>
+      data_date = #{startDate,jdbcType=VARCHAR}
+    </where>
+  </select>
+
+
   <select id="getCarOnlineDuration"  resultType="com.zhuanche.entity.bigdata.StatisticSection">
     <![CDATA[
         select
@@ -45,6 +57,9 @@
         ]]>
     <where>
       data_date between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}
+      <if test="maxId != null">
+        and id > #{maxId}
+      </if>
       <if test="visibleAllianceIds != null and visibleAllianceIds.size >0">
         <if test="allianceId != null and allianceId != ''">
           and supplier_id = #{allianceId}
