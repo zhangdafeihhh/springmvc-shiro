@@ -27,11 +27,6 @@ public class AllianceIndexService{
      */
     public List<Map> getCarOnlineDuration(SAASIndexQuery saasIndexQuery){
         try {
-            Integer maxId = carMeasureDayExMapper.getCarOnlineDurationMaxId(saasIndexQuery);
-            if(maxId!=null){
-                logger.info("车均在线时长最大id:"+maxId);
-                saasIndexQuery.setMaxId(maxId);
-            }
             List<Map> result = new ArrayList();
             List<StatisticSection> statisticSections = carMeasureDayExMapper.getCarOnlineDuration(saasIndexQuery);
             if (!CollectionUtils.isEmpty(statisticSections)){
