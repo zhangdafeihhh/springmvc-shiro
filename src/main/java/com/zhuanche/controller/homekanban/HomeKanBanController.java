@@ -213,33 +213,38 @@ public class HomeKanBanController {
 		saas.setAllianceId(allianceId);
 		saas.setMotorcadeId(motorcadeId);
 		if(startDate!=null && endDate!=null){
-			Date searchStartDate = DateUtils.getDate(startDate);
-			Date searchEndDate = DateUtils.getDate(endDate);
-			Integer createGap = DateUtils.getIntervalDays(searchStartDate, searchEndDate);
-			if(createGap>14){
-				logger.info("查询日子区间大于14天："+createGap);
-				Date middleDate = DateUtils.addDays(searchStartDate,14);
-				try{
-					//第一次查询
-					//List<Map> resultList = new ArrayList<>();
-					saas.setStartDate(startDate);
-					saas.setEndDate(DateUtils.formatDateTime(middleDate));
-					List<Map> middleMap = allianceIndexService.getCarOnlineDuration(saas);
-					//第二次查询
-					saas.setStartDate(DateUtils.formatDateTime(DateUtils.addDays(middleDate,1)));
-					saas.setEndDate(endDate);
-					List<Map> resultList = allianceIndexService.getCarOnlineDuration(saas);
-					resultList.addAll(middleMap);
-					if(CollectionUtils.isNotEmpty(resultList)){
-						return AjaxResponse.success(resultList);
-					}else {
-						return AjaxResponse.success(new ArrayList<>());
+			try{
+				Date searchStartDate = DateUtils.getDate1(startDate);
+				Date searchEndDate = DateUtils.getDate1(endDate);
+				Integer createGap = DateUtils.getIntervalDays(searchStartDate, searchEndDate);
+				if(createGap>14){
+					logger.info("查询日子区间大于14天："+createGap);
+					Date middleDate = DateUtils.addDays(searchStartDate,14);
+					try{
+						//第一次查询
+						//List<Map> resultList = new ArrayList<>();
+						saas.setStartDate(startDate);
+						saas.setEndDate(DateUtils.formatDateTime(middleDate));
+						List<Map> middleMap = allianceIndexService.getCarOnlineDuration(saas);
+						//第二次查询
+						saas.setStartDate(DateUtils.formatDateTime(DateUtils.addDays(middleDate,1)));
+						saas.setEndDate(endDate);
+						List<Map> resultList = allianceIndexService.getCarOnlineDuration(saas);
+						resultList.addAll(middleMap);
+						if(CollectionUtils.isNotEmpty(resultList)){
+							return AjaxResponse.success(resultList);
+						}else {
+							return AjaxResponse.success(new ArrayList<>());
+						}
+					}catch (Exception e){
+						logger.error("查询首页日均运营车辆统计错误异常", e);
+						return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 					}
-				}catch (Exception e){
-					logger.error("查询首页日均运营车辆统计错误异常", e);
-					return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 				}
+			}catch (Exception e){
+				logger.error("按区间查询车辆在线时长异常",e);
 			}
+
 		}
 		logger.info("查询日子区间小于14天");
 		try{
