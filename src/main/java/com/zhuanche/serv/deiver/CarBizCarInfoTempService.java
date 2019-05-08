@@ -187,13 +187,14 @@ public class CarBizCarInfoTempService {
             // 检查模板是否正确
             Row row1 = sheet.getRow(0);
             if (row1 == null) {
-                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR, resultErrorMag1);
             }
             for (int colIx = 0; colIx < 44; colIx++) {
                 Cell cell = row1.getCell(colIx); // 获取列对象
                 CellValue cellValue = evaluator.evaluate(cell); // 获取列属性
-                if (cell == null || cellValue == null) {
-                    return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
+
+                if (cell == null || cellValue == null || StringUtils.isBlank(cellValue.getStringValue())) {
+                    return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR, "单元格格式必须为文本");
                 } else {
                     switch ((colIx + 1)) {
                         case 1:
@@ -1799,7 +1800,6 @@ public class CarBizCarInfoTempService {
                 if (isTrue && carBizCarInfo != null) {
                     try {
                         carBizCarInfoTempMapper.insertSelective(carBizCarInfo);
-                        return AjaxResponse.success(RestErrorCode.SUCCESS);
                     } catch (Exception e) {
                         log.info("导入车辆保存  error：" + e);
                         CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
