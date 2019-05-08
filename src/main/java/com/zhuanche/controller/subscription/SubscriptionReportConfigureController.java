@@ -263,6 +263,11 @@ public class SubscriptionReportConfigureController {
         map.put( "36", "Hopetrip");
         map.put( "37", "美团商企通");
         map.put( "38", "航班管家");
+        map.put( "39", "携程火车票");
+        map.put( "40", "南航");
+        map.put( "41", "美团");
+        map.put( "42", "航旅纵横");
+        map.put( "43", "八维通");
 
         return AjaxResponse.success(map);
     }
