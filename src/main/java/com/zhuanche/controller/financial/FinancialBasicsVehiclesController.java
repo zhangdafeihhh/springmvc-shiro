@@ -45,7 +45,7 @@ public class FinancialBasicsVehiclesController {
      * @param energyType
      * @return
      */
-	@RequiresPermissions(value = { "BasicsVehiclesManage_look" } )
+	@RequiresPermissions(value = { "CarTypeManage_look" } )
 	@RequestMapping(value = "/queryFinancialBasicsVehiclesForList")
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
@@ -92,7 +92,7 @@ public class FinancialBasicsVehiclesController {
 	 * @param enableStatus
 	 * @return
 	 */
-	//@RequiresPermissions(value = { "BasicsVehiclesManage_save" } )
+	@RequiresPermissions(value = { "CarTypeManage_save" } )
 	@RequestMapping(value = "/saveFinancialBasicsVehicles")
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.MASTER )
@@ -158,7 +158,7 @@ public class FinancialBasicsVehiclesController {
 	 * @param basicsVehiclesId
 	 * @return
 	 */
-	@RequiresPermissions(value = { "BasicsVehiclesManage_ById" } )
+	@RequiresPermissions(value = { "CarTypeManage_look" } )
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
 	} )
@@ -196,7 +196,7 @@ public class FinancialBasicsVehiclesController {
 	 * @param enableStatus
 	 * @return
 	 */
-	//@RequiresPermissions(value = { "BasicsVehiclesManage_update" } )
+	@RequiresPermissions(value = { "CarTypeManage_update" } )
 	@RequestMapping(value = "/updateFinancialBasicsVehicles")
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.MASTER )
@@ -266,7 +266,7 @@ public class FinancialBasicsVehiclesController {
 	 * @param enableStatus
 	 * @return
 	 */
-	@RequiresPermissions(value = { "BasicsVehiclesManage_updateStatus" } )
+	@RequiresPermissions(value = { "CarTypeManage_updateStatus" } )
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.MASTER )
 	} )

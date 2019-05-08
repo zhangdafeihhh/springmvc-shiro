@@ -54,7 +54,7 @@ public class FinancialGoodsController {
 	 * @param status
 	 * @return
 	 */
-	@RequiresPermissions(value = { "GoodsManage_look" } )
+	@RequiresPermissions(value = { "CommodityManage_look" } )
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
 	} )
@@ -108,7 +108,7 @@ public class FinancialGoodsController {
 	 * saveFinancialGoods:(新增商品). <br/>  
 	 * @return
 	 */
-	@RequiresPermissions(value = { "GoodsManage_save" } )
+	@RequiresPermissions(value = { "CommodityManage_save" } )
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.MASTER )
 	} )
@@ -126,7 +126,7 @@ public class FinancialGoodsController {
 	 * @param financialGoodsParamDTO
 	 * @return
 	 */
-	@RequiresPermissions(value = { "GoodsManage_update" } )
+	@RequiresPermissions(value = { "CommodityManage_update" } )
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.MASTER )
 	} )
@@ -149,7 +149,7 @@ public class FinancialGoodsController {
 	 * @param status
 	 * @return
 	 */
-	@RequiresPermissions(value = { "GoodsManage_updateStatus" } )
+	@RequiresPermissions(value = { "CommodityManage_updateStatus" } )
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.MASTER )
 	} )

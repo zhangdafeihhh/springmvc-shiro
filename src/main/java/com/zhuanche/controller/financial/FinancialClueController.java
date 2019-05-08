@@ -106,6 +106,7 @@ public class FinancialClueController {
 	 * @param clueId
 	 * @return
 	 */
+	@RequiresPermissions(value = { "ClueManage_look" } )
 	@MasterSlaveConfigs(configs={ 
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
 	} )
