@@ -44,9 +44,6 @@
         ]]>
     <where>
       data_date between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}
-      <if test="maxId != null">
-        and id > #{maxId}
-      </if>
       <if test="visibleAllianceIds != null and visibleAllianceIds.size >0">
         <if test="allianceId != null and allianceId != ''">
           and supplier_id = #{allianceId}
