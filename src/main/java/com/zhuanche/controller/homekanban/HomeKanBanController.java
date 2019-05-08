@@ -230,9 +230,9 @@ public class HomeKanBanController {
 						saas.setStartDate(DateUtils.formatDateTime(DateUtils.addDays(middleDate,1)));
 						saas.setEndDate(endDate);
 						List<Map> resultList = allianceIndexService.getCarOnlineDuration(saas);
-						resultList.addAll(middleMap);
-						if(CollectionUtils.isNotEmpty(resultList)){
-							return AjaxResponse.success(resultList);
+						middleMap.addAll(resultList);
+						if(CollectionUtils.isNotEmpty(middleMap)){
+							return AjaxResponse.success(middleMap);
 						}else {
 							return AjaxResponse.success(new ArrayList<>());
 						}
