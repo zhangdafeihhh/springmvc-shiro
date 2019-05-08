@@ -87,7 +87,7 @@
     <!-- Rest接口性能监测END -->
 
     <appender name="LOGSTASH_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${catalina.base}/logs/logstash.json</file>
+        <file>/u01/tomcat_docker_8080/logs/mp-manage-logstash.json</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>INFO</level>
             <onMatch>ACCEPT</onMatch>
@@ -95,7 +95,7 @@
         </filter>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!--日志文件输出的文件名-->
-            <FileNamePattern>${catalina.base}/logs/logstash.json.%d{yyyy-MM-dd}.%i</FileNamePattern>
+            <FileNamePattern>/u01/tomcat_docker_8080/logs/mp-manage-logstash.json.%d{yyyy-MM-dd}.%i</FileNamePattern>
             <!--日志文件最大的大小-->
             <maxFileSize>2024MB</maxFileSize>
             <!--日志文件保留天数-->
@@ -127,7 +127,7 @@
     </appender>
 
     <appender name="LOGSTASH_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${catalina.base}/logs/logstash_error.json</file>
+        <file>/u01/tomcat_docker_8080/logs/mp-manage-logstash_error.json</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level>
             <onMatch>ACCEPT</onMatch>
@@ -135,7 +135,7 @@
         </filter>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!--日志文件输出的文件名-->
-            <FileNamePattern>${catalina.base}/logs/logstash_error.json.%d{yyyy-MM-dd}.%i</FileNamePattern>
+            <FileNamePattern>/u01/tomcat_docker_8080/logs/mp-manage-logstash_error.json.%d{yyyy-MM-dd}.%i</FileNamePattern>
             <!--日志文件最大的大小-->
             <maxFileSize>2024MB</maxFileSize>
             <!--日志文件保留天数-->
