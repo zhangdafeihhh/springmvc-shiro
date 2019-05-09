@@ -115,4 +115,13 @@
 	order by goods_id desc
   </select>
  
+  
+   <select id="queryFinancialGoodsForObject" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from financial_goods
+    where basics_vehicles_id = #{basicsVehiclesId}
+      and supplier_id = #{supplierId}
+      and city_id = #{cityId}
+  </select>
 </mapper>

@@ -30,6 +30,8 @@ import com.zhuanche.serv.financial.FinancialGoodsService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 
+import mapper.driver.ex.FinancialGoodsExMapper;
+
 /**
  * ClassName:FinancialGoodsController <br/>
  * Date: 2019年4月23日 下午6:51:06 <br/>
@@ -42,7 +44,8 @@ public class FinancialGoodsController {
 	private static final Logger logger = LoggerFactory.getLogger(FinancialBasicsVehiclesController.class);
 	@Autowired
 	private FinancialGoodsService financialGoodsService;
-
+	@Autowired
+	private FinancialGoodsExMapper financialGoodsExMapper;
 	/**
 	 * queryFinancialGoodsForList:(查询商品列表). <br/>  
 	 * @author baiyunlong
@@ -119,6 +122,12 @@ public class FinancialGoodsController {
 	public AjaxResponse saveFinancialGoods(@Validated(SeqAll.class)
 			FinancialGoodsParamDTO financialGoodsParamDTO
 			) {
+		FinancialGoods goods=financialGoodsExMapper.queryFinancialGoodsForObject(financialGoodsParamDTO.getBasicsVehiclesId(),financialGoodsParamDTO.getCityId(),financialGoodsParamDTO.getSupplierId());
+		
+		if (goods!=null) {
+			return AjaxResponse.fail(RestErrorCode.GOODS_EXISTS);
+		}
+		
 		FinancialGoods financialGoods=financialGoodsService.saveFinancialGoods(financialGoodsParamDTO);
 	    return AjaxResponse.success(financialGoods);
 	}
@@ -142,7 +151,11 @@ public class FinancialGoodsController {
 		if (financialGoodsParamDTO.getGoodsId()==null||financialGoodsParamDTO.getGoodsId()==0) {
 			return AjaxResponse.fail(RestErrorCode.GOODSIDISNULL);
 		}
-		
+		FinancialGoods goods=financialGoodsExMapper.queryFinancialGoodsForObject(financialGoodsParamDTO.getBasicsVehiclesId(),financialGoodsParamDTO.getCityId(),financialGoodsParamDTO.getSupplierId());
+
+		if (goods!=null && goods.getGoodsId().intValue()!= financialGoodsParamDTO.getGoodsId().intValue()) {
+			return AjaxResponse.fail(RestErrorCode.GOODS_EXISTS);
+		}
 		FinancialGoods financialGoods=financialGoodsService.updateFinancialGoods(financialGoodsParamDTO);
 	    return AjaxResponse.success(financialGoods);
 	}

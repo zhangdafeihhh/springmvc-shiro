@@ -13,4 +13,6 @@ public interface FinancialBasicsVehiclesExMapper {
 			@Param("energyType")Integer energyType);
 
 	List<FinancialBasicsVehicles> queryBasicsVehiclesAllList();
+
+	FinancialBasicsVehicles queryFinancialBasicsVehiclesByName(@Param("vehiclesDetailedName")String vehiclesDetailedName);
 }

@@ -85,4 +85,11 @@
 		from financial_basics_vehicles
 	</select>
 	
+	
+	<select id="queryFinancialBasicsVehiclesByName" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from financial_basics_vehicles
+		where vehicles_detailed_name = #{vehiclesDetailedName}
+	</select>
 </mapper>

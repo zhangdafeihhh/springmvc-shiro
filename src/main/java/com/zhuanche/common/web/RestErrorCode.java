@@ -242,6 +242,12 @@ public final class RestErrorCode{
 	
 	@ResultMessage("您好,请上传正确格式的文件")
 	public static final int CORRECT_FORMAT=80003;
+	
+	@ResultMessage("车型车款已经存在")
+	public static final int BASICSVEHICLE_EXISTS=80004;
+	
+	@ResultMessage("同款车型商品已经存在")
+	public static final int GOODS_EXISTS=80005;
 	//-------------------金融商品--end---------------------------
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系

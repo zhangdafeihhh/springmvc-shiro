@@ -24,6 +24,8 @@ import com.zhuanche.dto.financial.FinancialBasicsVehiclesDTO;
 import com.zhuanche.entity.driver.FinancialBasicsVehicles;
 import com.zhuanche.serv.financial.FinancialBasicsVehiclesService;
 
+import mapper.driver.ex.FinancialBasicsVehiclesExMapper;
+
 /**  
  * ClassName:FinancialBasicsVehiclesController <br/>  
  * Date:     2019年4月23日 下午6:50:17 <br/>  
@@ -37,6 +39,9 @@ public class FinancialBasicsVehiclesController {
     
 	@Autowired
     private FinancialBasicsVehiclesService financialBasicsVehiclesService;
+	
+	@Autowired
+	private FinancialBasicsVehiclesExMapper financialBasicsVehiclesExMapper;
     /**
      * queryFinancialBasicsVehiclesForList:(查询车型库列表信息). <br/>  
      * @param page
@@ -128,6 +133,12 @@ public class FinancialBasicsVehiclesController {
 		  		,energyType,variableBox,guidancePrice,discharge,mileage,autoHomeUrl,lengthWidthHeight,qualityAssurance,
 				 wheelbase,environmentalProtectionStandard,fastChargingTime,slowChargingTime,fastPercentage);
 		  
+		  FinancialBasicsVehicles basicsVehicles=financialBasicsVehiclesExMapper.queryFinancialBasicsVehiclesByName(vehiclesDetailedName);
+		  
+          if (basicsVehicles!=null) {
+        	  return AjaxResponse.fail(RestErrorCode.BASICSVEHICLE_EXISTS);
+		  }
+				  
 		  FinancialBasicsVehicles financialBasicsVehicles=new FinancialBasicsVehicles();
 		  financialBasicsVehicles.setVehiclesDetailedName(vehiclesDetailedName);
 		  financialBasicsVehicles.setBrandId(brandId);
@@ -233,6 +244,12 @@ public class FinancialBasicsVehiclesController {
 			  		+ "--fastPercentage--{}",basicsVehiclesId,vehiclesDetailedName,brandId,modelId,vehicleStyle,yearStyle
 			  		,energyType,variableBox,guidancePrice,discharge,mileage,autoHomeUrl,lengthWidthHeight,qualityAssurance,
 					 wheelbase,environmentalProtectionStandard,fastChargingTime,slowChargingTime,fastPercentage);
+		  FinancialBasicsVehicles basicsVehicles=financialBasicsVehiclesExMapper.queryFinancialBasicsVehiclesByName(vehiclesDetailedName);
+		  
+          if (basicsVehicles!=null && basicsVehicles.getBasicsVehiclesId().intValue()!=basicsVehiclesId.intValue()) {
+        	  return AjaxResponse.fail(RestErrorCode.BASICSVEHICLE_EXISTS);
+		  }
+		  
 		  FinancialBasicsVehicles financialBasicsVehicles=new FinancialBasicsVehicles();
 		  financialBasicsVehicles.setBasicsVehiclesId(basicsVehiclesId);
 		  financialBasicsVehicles.setVehiclesDetailedName(vehiclesDetailedName);
