@@ -209,7 +209,9 @@ public class SaasDriverDailyReportController {
             Set<Integer> setSuppliers = new HashSet<>();
             Set<Integer> setTeamids = new HashSet<>();
             Set<Integer> setGroups = new HashSet<>();
-            this.getSetData(supplierId,driverTeamId,driverGroupId,setSuppliers,setTeamids,setGroups);
+            setSuppliers = this.getSupplierIds(supplierId,setSuppliers);
+            setTeamids = this.getTeamIds(driverTeamId,setTeamids);
+            setGroups = this.getGroupIds(driverGroupId,setGroups);
 
             list = dayReportExMapper.queryDayReport(Integer.valueOf(cityId), setSuppliers,
                     setTeamids,setGroups,driverPhone,licensePlates,beginDate,endDate,businessVolumeSort,
@@ -439,7 +441,9 @@ public class SaasDriverDailyReportController {
             Set<Integer> setSuppliers = new HashSet<>();
             Set<Integer> setTeamids = new HashSet<>();
             Set<Integer> setGroups = new HashSet<>();
-            this.getSetData(supplierId,driverTeamId,driverGroupId,setSuppliers,setTeamids,setGroups);
+            setSuppliers = this.getSupplierIds(supplierId,setSuppliers);
+            setTeamids = this.getTeamIds(driverTeamId,setTeamids);
+            setGroups = this.getGroupIds(driverGroupId,setGroups);
 
             monthReportlist = monthReportExMapper.queryMonthReport(Integer.valueOf(cityId),setSuppliers,
                     setTeamids,setGroups, driverPhone,licensePlates,month,businessVolumeSort,
@@ -654,7 +658,9 @@ public class SaasDriverDailyReportController {
             Set<Integer> setSuppliers = new HashSet<>();
             Set<Integer> setTeamids = new HashSet<>();
             Set<Integer> setGroups = new HashSet<>();
-            this.getSetData(supplierId,driverTeamId,driverGroupId,setSuppliers,setTeamids,setGroups);
+            setSuppliers = this.getSupplierIds(supplierId,setSuppliers);
+            setTeamids = this.getTeamIds(driverTeamId,setTeamids);
+            setGroups = this.getGroupIds(driverGroupId,setGroups);
 
             summaryReportList = summaryReportExMapper.querySummeryReport(Integer.valueOf(cityId),setSuppliers,
                     setTeamids,setGroups,driverPhone,licensePlates,currentDate,
@@ -765,14 +771,9 @@ public class SaasDriverDailyReportController {
     /**
      * 根据数据权限作为查询条件
      * @param supplierId
-     * @param teamId
-     * @param groupId
      * @param setSupplierIds
-     * @param setTeamIds
-     * @param setGroupIds
      */
-    private void getSetData(String supplierId,String teamId,String groupId,Set<Integer> setSupplierIds,
-                            Set<Integer> setTeamIds,Set<Integer> setGroupIds){
+    private Set<Integer> getSupplierIds(String supplierId,Set<Integer> setSupplierIds){
         if(StringUtils.isNotEmpty(supplierId)){
             setSupplierIds.add(Integer.valueOf(supplierId));
         }else {
@@ -783,6 +784,12 @@ public class SaasDriverDailyReportController {
 
             }
         }
+        return setSupplierIds;
+    }
+
+    private Set<Integer> getTeamIds(String teamId,
+                                    Set<Integer> setTeamIds){
+
 
         if(StringUtils.isNotEmpty(teamId)){
             setTeamIds.add(Integer.valueOf(teamId));
@@ -794,6 +801,10 @@ public class SaasDriverDailyReportController {
                 setTeamIds = WebSessionUtil.getCurrentLoginUser().getTeamIds();
             }
         }
+        return setTeamIds;
+    }
+
+    private Set<Integer> getGroupIds(String groupId,Set<Integer> setGroupIds){
 
         if(StringUtils.isNotEmpty(groupId)){
             setGroupIds.add(Integer.valueOf(groupId));
@@ -805,5 +816,7 @@ public class SaasDriverDailyReportController {
                 setGroupIds = WebSessionUtil.getCurrentLoginUser().getGroupIds();
             }
         }
+
+        return setGroupIds;
     }
 }
