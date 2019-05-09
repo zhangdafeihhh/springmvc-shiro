@@ -29,4 +29,5 @@ public class SAASIndexQuery {
     private List<String> visibleMotocadeIds;//可见车队ID
 
     private int dateDiff;//日期相差几天
+
 }
