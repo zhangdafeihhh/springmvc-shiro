@@ -4,6 +4,7 @@ import com.zhuanche.entity.bigdata.BiDriverBusinessInfoMonthReport;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 public interface BiDriverBusinessInfoMonthReportExMapper {
     /**
@@ -21,9 +22,9 @@ public interface BiDriverBusinessInfoMonthReportExMapper {
      * @return
      */
     List<BiDriverBusinessInfoMonthReport> queryMonthReport(@Param("cityId")Integer cityId,
-                                                       @Param("supplierId")Integer supplierId,
-                                                       @Param("driverTeamId")Integer driverTeamId,
-                                                       @Param("driverGroupId")Integer driverGroupId,
+                                                           @Param("supplierIds") Set<Integer> supplierIds,
+                                                           @Param("driverTeamIds") Set<Integer> driverTeamIds,
+                                                           @Param("driverGroupIds") Set<Integer> driverGroupIds,
                                                        @Param("driverPhone")String driverPhone,
                                                        @Param("licensePlates")String licensePlates,
                                                        @Param("month")String month,
