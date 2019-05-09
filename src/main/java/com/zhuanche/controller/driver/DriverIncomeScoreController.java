@@ -208,7 +208,8 @@ public class DriverIncomeScoreController {
             dto = map.get(info.getDriverId());
             if (null != dto) {
                 info.setIncomeScore(dto.getIncomeScore());
-                info.setUpdateTime(df.format(new Date(dto.getUpdateTime())));
+                if (null != dto.getUpdateTime())
+                    info.setUpdateTime(df.format(new Date(dto.getUpdateTime())));
             }
         }
     }
