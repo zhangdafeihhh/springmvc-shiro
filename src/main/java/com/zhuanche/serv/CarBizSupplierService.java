@@ -185,12 +185,13 @@ public class CarBizSupplierService{
 				return AjaxResponse.fail(RestErrorCode.GET_SUPPLIER_SHORT_NAME_INVALID);
 			}
 			String method = Constants.UPDATE;
-			Integer cooperationTypeNew = supplier.getCooperationType();
+//			Integer cooperationTypeNew = supplier.getCooperationType();
 			Integer cooperationTypeOld = null;
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
 			supplier.setUpdateBy(currentLoginUser.getId());
 			supplier.setUpdateName(currentLoginUser.getName());
             if (supplier.getSupplierId() == null || supplier.getSupplierId() == 0){
+            	//新增逻辑
 				method = Constants.CREATE;
 				supplier.setCreateBy(currentLoginUser.getId());
 				supplier.setCreateName(currentLoginUser.getName());
@@ -205,11 +206,24 @@ public class CarBizSupplierService{
 					return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, e.getMessage());
 				}
 			}else {
+            	//更新逻辑
             	try {
+            		//查询原始数据
                     CarBizSupplierVo vo = carBizSupplierExMapper.querySupplierById(supplier.getSupplierId());
-                    if(vo!=null){
-                        cooperationTypeOld = vo.getCooperationType();
+                    if(vo == null){
+                    	logger.info("更新CarBizSupplierVo时，根据SupplierId未查到数据 SupplierId={}",supplier.getSupplierId());
+						return AjaxResponse.fail(RestErrorCode.HTTP_NOT_FOUND);
                     }
+					cooperationTypeOld = vo.getCooperationType();
+
+                    //将本次隐藏掉的数据附上原值（与前端确认这些值都不传，为防止copy方法导致数据错误，在这里设置上原值）
+                    supplier.setStatus(vo.getStatus());
+                    supplier.setIscommission(vo.getIscommission());
+                    supplier.setPospayflag(vo.getPospayflag());
+                    supplier.setCooperationType(vo.getCooperationType());
+                    supplier.setEnterpriseType(vo.getEnterpriseType());
+                    supplier.setIsTwoShifts(vo.getIsTwoShifts());
+
 					SupplierExtDto extDto = generateSupplierExtDto(supplier, false);
 					int count = supplierExtDtoExMapper.selectCountBySupplierId(supplier.getSupplierId());
 					carBizSupplierExMapper.updateByPrimaryKeySelective(supplier);
@@ -226,6 +240,7 @@ public class CarBizSupplierService{
             		return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, e.getMessage());
 				}
 			}
+			Integer cooperationTypeNew = supplier.getCooperationType();
 
 			Integer supplierId = supplier.getSupplierId();
 			Integer userId = currentLoginUser.getId();

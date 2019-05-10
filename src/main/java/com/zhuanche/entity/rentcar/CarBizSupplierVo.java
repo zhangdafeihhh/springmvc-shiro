@@ -12,7 +12,7 @@ public class CarBizSupplierVo extends CarBizSupplier {
     private String supplierCityName;
     private String dispatcherPhone;
     private String cooperationName;
-    private Integer isTwoShifts;
+    private Integer isTwoShifts;//是否支持双班
     private String email;
     private String supplierShortName;
     //分佣协议
