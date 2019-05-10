@@ -7,8 +7,11 @@ import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.rpc.RPCAPI;
+import com.zhuanche.common.rpc.RPCResponse;
 import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.constant.Constants;
+import com.zhuanche.dto.driver.DriverIntegralDto;
 import com.zhuanche.dto.driver.DriverTeamRelationEntity;
 import com.zhuanche.dto.driver.DriverVoEntity;
 import com.zhuanche.serv.rentcar.IDriverService;
@@ -24,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -31,9 +35,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.zhuanche.common.enums.MenuEnum.DRIVER_RANK_INTEGRAL_EXPORT;
 import static com.zhuanche.common.enums.MenuEnum.DRIVER_RANK_INTEGRAL_LIST;
@@ -55,6 +59,9 @@ public class DriverIntegraController {
     @Autowired
     @Qualifier("driverIntegralApiTemplate")
     private MyRestTemplate driverIntegralApiTemplate;
+
+    @Value("driver.integral.url")
+    private String DRIVER_INTEGRAL;
 
 
     protected JSONObject gridJsonFormate(List<?> rows, long total) {
@@ -80,7 +87,6 @@ public class DriverIntegraController {
     public Object queryDriverIntegralListData(DriverVoEntity driverEntity) {
 
         try{
-            logger.info("queryDriverAppraisalListData:司机积分数据列表,参数为："+(driverEntity==null?"null": JSON.toJSONString(driverEntity)));
             // 权限
             SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
             Set<Integer> citieSet = currentLoginUser.getCityIds();
@@ -167,10 +173,7 @@ public class DriverIntegraController {
             paramMap.put("driverInfo", driverInfoList);
 
             jsonObj = driverIntegralApiTemplate.postForObject(url,driverInfoList,JSONObject.class);
-            logger.info("调用策略平台批量查询积分正常,耗时+"+(System.currentTimeMillis() - start)
-                    //+";参数为"+(driverInfoList==null?"": driverInfoList.toString())
-                    //+";返回结果为："+ (jsonObj == null ?"null":JSON.toJSONString(jsonObj))
-            );
+            logger.info("调用策略平台批量查询积分正常,耗时+"+(System.currentTimeMillis() - start));
             if (jsonObj != null) {
                 int code = jsonObj.getInteger("code");
                 if(code == 0) {
@@ -368,44 +371,57 @@ public class DriverIntegraController {
                     itemMap.put("flag_"+item.getInteger("driverId"),item);
                 }
             }
-            String driverId = null;
-            BigDecimal temp;
+            String driverId;
+            DriverIntegralDto dto;
+            Map<String, DriverIntegralDto>  driverIntegralDtoMap = getDriverIntegralInfoListNew(pageRows.stream().map(DriverVoEntity::getDriverId).collect(Collectors.toList()));
             for (DriverVoEntity driverVoEntity : pageRows) {
+                //设置当期、当日积分
+                if (null != driverIntegralDtoMap){
+                    dto = driverIntegralDtoMap.get(driverVoEntity.getDriverId());
+                    if (null != dto){
+                        driverVoEntity.setMonthIntegral(dto.getCurrentCycleIntegral());//设置司机当月积分
+                        driverVoEntity.setDayIntegral(dto.getCurrentDayIntegral());//设置司机当日积分
+                        driverVoEntity.setCalcuateCycle(dto.getCalcuateCycle());//设置等级计算周期
+                    }
+                }
                 driverId = driverVoEntity.getDriverId() ;
                 JSONObject driverIntegraInfo = itemMap.get("flag_"+driverId);
                 if(driverIntegraInfo != null){
-                    //设置司机当月积分
-                    if(StringUtils.isNotEmpty(driverIntegraInfo.getString("monthIntegral")) && !("null".equals(driverIntegraInfo.getString("monthIntegral")))) {
-                        try{
-                            temp = new BigDecimal(driverIntegraInfo.getString("monthIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
-                            driverVoEntity.setMonthIntegral(temp.toString());
-                        }catch (Exception e){
-                            logger.error("设置司机当月积分异常，driverId="+driverId+"，monthIntegral="+driverIntegraInfo.getString("monthIntegral"));
-                        }
-                    }
-                    //设置司机当日积分
-                    if(StringUtils.isNotEmpty(driverIntegraInfo.getString("todayIntegral")) && !("null".equals(driverIntegraInfo.getString("todayIntegral")))) {
-                        try{
-                            temp = new BigDecimal(driverIntegraInfo.getString("todayIntegral")).setScale(3, BigDecimal.ROUND_HALF_UP);
-                            driverVoEntity.setDayIntegral(temp.toString());
-                        }catch (Exception e){
-                            logger.error("设置司机当日积分异常，driverId="+driverId+"，todayIntegral="+driverIntegraInfo.getString("todayIntegral"));
-                        }
-
-                    }
                     //设置司机司机等级
                     if(StringUtils.isNotEmpty(driverIntegraInfo.getString("membershipName"))  && !("null".equals(driverIntegraInfo.getString("membershipName")))){
                         try{
                             driverVoEntity.setMembershipName(driverIntegraInfo.getString("membershipName"));
                         }catch (Exception e){
                             logger.error("设置司机等级异常，driverId="+driverId+"，membershipName="+driverIntegraInfo.getString("membershipName"));
-
                         }
                     }
                 }
             }
         }
     }
+
+    /**
+     * 查询当期积分，当日积分
+     * wiki http://inside-yapi.01zhuanche.com/project/187/interface/api/13279
+     * @param driverIds
+     * @return
+     */
+    private Map<String, DriverIntegralDto> getDriverIntegralInfoListNew(List driverIds) {
+        if (null == driverIds || driverIds.size() == 0)
+            return null;
+        String driverInfo = new RPCAPI().requestWithRetry(RPCAPI.HttpMethod.GET, String.format(DRIVER_INTEGRAL + "/integral/currentIntegralScore?driverIds=%s", String.join(",", driverIds)), null, null, "UTF-8");
+        if (StringUtils.isBlank(driverInfo) || driverInfo.equals("true\r\n"))
+            return null;
+        RPCResponse orderResponse = RPCResponse.parse(driverInfo);
+        if (null == orderResponse || orderResponse.getCode() != 0 || orderResponse.getData() == null)
+            return null;
+        List<DriverIntegralDto> list = JSON.parseArray(JSON.toJSONString(orderResponse.getData()), DriverIntegralDto.class);
+        Map<String, DriverIntegralDto> map = null;
+        if (null != list)
+            map = list.stream().collect(Collectors.toMap(DriverIntegralDto::getDriverId, a -> a, (k1, k2) -> k1));
+        return map;
+    }
+
     private void dataTrans(List<DriverVoEntity> list, List<String>  csvDataList ){
         if(null == list){
             return;
