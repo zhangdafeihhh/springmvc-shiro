@@ -88,7 +88,7 @@ public class Common {
 	public static final String UPDATE_DRIVER_OUTAGE_ALL = "/driverOutageAll/updateDriverOutagesAll";
 	public static final String BATH_INPUT_DRIVER_OUTAGE_ALL = "/driverOutageAll/batchInputDriverOutageAllInfo";
 	//停运end
-
+	public static final String DRIVER_WIDE_MQ = "/driverWideMq/sendDriverWideMq";
 	//车辆begin
 	public static final String SAVE_CAR = "/carV2/saveCar";
 	public static final String BATHINPUTCARINFO = "/carV2/batchInputCarInfo";

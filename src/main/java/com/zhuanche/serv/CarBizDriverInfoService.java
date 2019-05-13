@@ -44,6 +44,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
+import org.apache.http.entity.ContentType;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -179,6 +180,9 @@ public class CarBizDriverInfoService {
     @Autowired
     private OrderService orderService;
 
+    @Value("${mp.restapi.url}")
+    private String mpReatApiUrl;
+
     /**
      * 查询司机信息列表展示
      *
@@ -249,7 +253,19 @@ public class CarBizDriverInfoService {
             @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode=DataSourceMode.MASTER )
     } )
     public int resetIMEI(Integer driverId) {
-        return carBizDriverInfoExMapper.resetIMEI(driverId);
+        int i = carBizDriverInfoExMapper.resetIMEI(driverId);
+        try {
+            Map<String, Object> paramMap = new HashMap<String, Object>();
+            paramMap.put("driverId", driverId);
+
+            String url = mpReatApiUrl + Common.DRIVER_WIDE_MQ;
+            String jsonObjectStr = HttpClientUtil.buildPostRequest(url).addParams(paramMap).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
+            logger.info("driverId={}重置imei调用新增接口, result={}", driverId, jsonObjectStr);
+        } catch (HttpException e) {
+            logger.info("driverId={}重置imei调用接口, error={}", driverId, e);
+        }
+
+        return i;
     }
 
     /**
