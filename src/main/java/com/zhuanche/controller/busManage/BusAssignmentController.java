@@ -359,15 +359,16 @@ public class BusAssignmentController {
 
                 // 指派时间-预约用车时间>24小时的,在截止用车前24小时的节点（误差不超过1小时），还需发送给乘客一条短信，告知司机姓名和电话
                 saveMessageTask(orderNo, bookingDate);
-                //修改延迟短信任务状态（不管有没有发送，改状态为已发送）
-                BusOrderMessageTask busOrderMessageTask = busOrderMessageTaskExMapper.selectByOrderNum(orderNo);
-                if(busOrderMessageTask != null){
-                    busOrderMessageTask.setStatus(1);
-                    busOrderMessageTask.setUpdateDate(new Date());
-                    busOrderMessageTaskMapper.updateByPrimaryKeySelective(busOrderMessageTask);
-                    logger.info("BusAssignmentController-巴士订单指派，修改短信任务状态成功，taskId--{}",busOrderMessageTask.getId());
-                }
 
+
+            }
+            //修改延迟短信任务状态（不管有没有发送，改状态为已发送）
+            BusOrderMessageTask busOrderMessageTask = busOrderMessageTaskExMapper.selectByOrderNum(orderNo);
+            if(busOrderMessageTask != null){
+                busOrderMessageTask.setStatus(1);
+                busOrderMessageTask.setUpdateDate(new Date());
+                busOrderMessageTaskMapper.updateByPrimaryKeySelective(busOrderMessageTask);
+                logger.info("BusAssignmentController-巴士订单指派，修改短信任务状态成功，taskId--{}",busOrderMessageTask.getId());
             }
             orderOperationTime.setDirverPhone(driverPhone);
             orderOperationTime.setDriverName(driverName);
