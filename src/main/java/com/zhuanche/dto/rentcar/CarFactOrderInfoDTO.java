@@ -72,6 +72,8 @@ public class CarFactOrderInfoDTO{
     //渠道来源
 	private String channelSource;
 
+	private Integer serviceCity;
+
 	public String getOrderNo() {
 		return orderNo;
 	}
@@ -321,7 +323,14 @@ public class CarFactOrderInfoDTO{
 		this.noFilterChannelOrder = noFilterChannelOrder;
 	}
 
-	/*
+	public Integer getServiceCity() {
+		return serviceCity;
+	}
+
+	public void setServiceCity(Integer serviceCity) {
+		this.serviceCity = serviceCity;
+	}
+/*
     private String licensePlates;
 
     private String brand;
