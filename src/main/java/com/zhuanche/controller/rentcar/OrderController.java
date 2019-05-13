@@ -1,68 +1,51 @@
 package com.zhuanche.controller.rentcar;
 
-import static com.zhuanche.common.enums.MenuEnum.MAIN_ORDER_DETAIL;
-import static com.zhuanche.common.enums.MenuEnum.ORDER_DETAIL;
-import static com.zhuanche.common.enums.MenuEnum.ORDER_LIST;
-import static com.zhuanche.common.enums.MenuEnum.ORDER_LIST_EXPORT;
-
-import java.math.BigDecimal;
-import java.net.URLEncoder;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.zhuanche.entity.rentcar.*;
-import mapper.rentcar.CarBizCustomerMapper;
-import mapper.rentcar.CarBizDriverInfoMapper;
-import mapper.rentcar.ex.CarBizCarInfoExMapper;
-import mapper.rentcar.ex.CarFactOrderExMapper;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.util.StringUtil;
+import com.zhuanche.bo.order.OrderEstimatedRouteBo;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
-import com.zhuanche.common.rpc.RPCAPI;
-import com.zhuanche.common.rpc.RPCResponse;
 import com.zhuanche.common.util.TimeUtils;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
-import com.zhuanche.dto.DriverCostDetailVO;
-import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
-import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
-import com.zhuanche.dto.rentcar.CarFactOrderInfoDTO;
-import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
-import com.zhuanche.dto.rentcar.ServiceTypeDTO;
+import com.zhuanche.dto.rentcar.*;
 import com.zhuanche.entity.driverOrderRecord.OrderTimeEntity;
+import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.serv.order.DriverFeeDetailService;
 import com.zhuanche.serv.order.OrderService;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import com.zhuanche.util.CommonStringUtils;
 import com.zhuanche.util.excel.CsvUtils;
+import mapper.rentcar.CarBizCustomerMapper;
+import mapper.rentcar.CarBizDriverInfoMapper;
+import mapper.rentcar.ex.CarBizCarInfoExMapper;
+import mapper.rentcar.ex.CarFactOrderExMapper;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static com.zhuanche.common.enums.MenuEnum.*;
 
 
 /**
@@ -111,6 +94,7 @@ public class OrderController{
 	 * 输出wiki:
 	 * http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=21047320
 	 * @param serviceId
+	 * @param serviceCity 司机服务城市
 	 * @param airportIdnot
 	 * @param airportId
 	 * @param carGroupId
@@ -139,6 +123,7 @@ public class OrderController{
 	 @RequestFunction(menu = ORDER_LIST)
 	 public AjaxResponse queryOrderList(
 			 								   String serviceId,
+			 								   Integer serviceCity,
 			 								   String airportIdnot,
 			 								   String airportId,
 	 										   String carGroupId,
@@ -243,23 +228,24 @@ public class OrderController{
 			}
 		 }
 	     
-	     Map<String, Object> paramMap = new HashMap<String, Object>();
-		 paramMap.put("serviceId", serviceId);// 
-		 paramMap.put("airportId", airportId);//
-		 paramMap.put("airportIdnot", airportIdnot);//
-	     paramMap.put("carGroupId", carGroupId);// 
-	     paramMap.put("statusBatch", statusStr);//
-	     paramMap.put("cityId", cityId);//
-	     paramMap.put("supplierId", supplierId);//
-	     paramMap.put("teamId", teamId);// 
-	     paramMap.put("teamClassId", teamClassId);//
-	     paramMap.put("bookingUserName", bookingUserName);//
-	     paramMap.put("bookingUserPhone", bookingUserPhone);//
-	     paramMap.put("driverPhone", driverPhone);//
-	     paramMap.put("licensePlates", licensePlates);// 
-	     paramMap.put("orderNo", orderNo);//
-	     paramMap.put("type", orderType);//
-
+	     Map<String, Object> paramMap = new HashMap<>();
+		 paramMap.put("serviceId", serviceId);
+		 paramMap.put("airportId", airportId);
+		 paramMap.put("airportIdnot", airportIdnot);
+	     paramMap.put("carGroupId", carGroupId);
+	     paramMap.put("statusBatch", statusStr);
+	     paramMap.put("cityId", cityId);
+	     paramMap.put("supplierId", supplierId);
+	     paramMap.put("teamId", teamId);
+	     paramMap.put("teamClassId", teamClassId);
+	     paramMap.put("bookingUserName", bookingUserName);
+	     paramMap.put("bookingUserPhone", bookingUserPhone);
+	     paramMap.put("driverPhone", driverPhone);
+	     paramMap.put("licensePlates", licensePlates);
+	     paramMap.put("orderNo", orderNo);
+	     paramMap.put("type", orderType);
+		 //司机服务城市
+		 paramMap.put("serviceCity" , serviceCity);
 		 //渠道订单处理
 		 if("1".equals(channelSource)){
 			 paramMap.put("filterChannelOrder", "true");//渠道订单
@@ -267,22 +253,28 @@ public class OrderController{
 			 paramMap.put("noFilterChannelOrder", "true");//非渠道订单
 		 }
 	     if(StringUtils.isNotEmpty(beginCreateDate)){
-	    	 paramMap.put("beginCreateDate", beginCreateDate+" 00:00:00");// 
+	    	 paramMap.put("beginCreateDate", beginCreateDate+" 00:00:00");
 	     }
 	     if(StringUtils.isNotEmpty(endCreateDate)){
-	    	 paramMap.put("endCreateDate", endCreateDate+" 23:59:59");//
+	    	 paramMap.put("endCreateDate", endCreateDate+" 23:59:59");
 	     }
 	     if(StringUtils.isNotEmpty(beginCostEndDate)){
-	    	 paramMap.put("beginCostEndDate", beginCostEndDate+" 00:00:00");//
+	    	 paramMap.put("beginCostEndDate", beginCostEndDate+" 00:00:00");
 	     }
 	     if(StringUtils.isNotEmpty(endCostEndDate)){
-	    	 paramMap.put("endCostEndDate", endCostEndDate+" 23:59:59");//
+	    	 paramMap.put("endCostEndDate", endCostEndDate+" 23:59:59");
 	     }
-	     paramMap.put("transId", transId );//
-	     if(null != pageNo && pageNo > 0)
-	     paramMap.put("pageNo", pageNo);//页号
-	     if(null != pageSize && pageSize > 0)
-	     paramMap.put("pageSize", pageSize);//每页记录数
+	     paramMap.put("transId", transId );
+	     if(null != pageNo && pageNo > 0) {
+			 //页号
+			 paramMap.put("pageNo", pageNo);
+		 }
+
+	     if(null != pageSize && pageSize > 0) {
+			 //每页记录数
+			 paramMap.put("pageSize", pageSize);
+		 }
+
         /* String cityIdBatch,//下单城市id批量 多个用逗号分割
          String supplierIdBatch,//供应商id 多个用逗号
          String teamIdBatch,//车队ID多个用逗号分割 类似or操作
@@ -838,6 +830,42 @@ public class OrderController{
 	     List<ServiceTypeDTO> list = carFactOrderInfoService.selectServiceEntityList(new ServiceEntity());
 	     return list;
 	 }
+
+	/**
+	 * 司机端预估路线
+	 * @param oer
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping("/estimatedRoute")
+	public AjaxResponse getDriverClientEstimatedRoute(OrderEstimatedRouteBo oer) {
+		Map<String, String> result = new HashMap<>(1);
+		String driverId = oer.getDriverId();
+		String factDate = oer.getFactDate();
+		String factEndDate = oer.getFaceEndDate();
+		//司机端预估轨迹value=3
+		int value = 3;
+		String orderNo = oer.getOrderNo();
+		//订单的预估费用
+		Double estimatedAmount = oer.getEstimatedAmount();
+		//实际里程(公里)
+		Double travelMileage = oer.getTravelMileage();
+		//实际时长(分钟)
+		Double travelTimeShow = oer.getTravelTimeShow();
+		//乘客实际支付
+		Double actualPayAmount = oer.getActualPayAmount();
+		logger.info("司机端预估轨迹参数-estimatedAmount:{" + estimatedAmount + "},travelMileage:{" + travelMileage + "},travelTimeShow:{" + travelTimeShow + "},actualPayAmount:{" + actualPayAmount + "}");
+		logger.info("查询订单轨迹,driverId=" + driverId + ",factDate=" + factDate + ",factEndDate=" + factEndDate + ",value=" + value + "&orderNo=" + orderNo);
+		String url = "https://zcads.01zhuanche.com/pages";
+		long startTime = com.zhuanche.util.DateUtils.getDate(factDate).getTime();
+		long endTime = com.zhuanche.util.DateUtils.getDate(factEndDate).getTime();
+		url += "/track/track-play-org-new.html?startTime=" + startTime + "&endTime=" + endTime + "&driverId=" + driverId +
+				"&orgDistance=" + travelMileage + "&estimatedAmount=" + estimatedAmount + "" + "&orderNo=" + orderNo +
+				"&travelTime=" + travelTimeShow + "&totalAmount=" + actualPayAmount + "&changeDestinationStation=1&isEnd=1";
+
+		result.put("strValue", url);
+		return AjaxResponse.success(result);
+	}
 	
 	 
 	/**查询订单详情( 首先调用订单接口，然后再补全数据)**/
@@ -1308,4 +1336,6 @@ public class OrderController{
 		 public static double formatDouble(double d) {
 		        return (double)Math.round(d*100)/100;
 		 }
+
+
 	}
