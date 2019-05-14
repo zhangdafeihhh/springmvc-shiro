@@ -339,20 +339,24 @@ public class SysLogAspect {
 		// 参数值
 		Object[] args = joinPoint.getArgs();
 		Class<?>[] classes = new Class[args.length];
-		for (int k = 0; k < args.length; k++) {
+		Class<?> clazz = Class.forName(classType);
+		Map<String, Object> paramMap=LogAopUtil.getNameAndArgsMap(this.getClass(), clazz.getName(), methodName, args);
+		/*for (int k = 0; k < args.length; k++) {
 			// 对于接受参数中含有MultipartFile，ServletRequest，ServletResponse类型的特殊处理，我这里是直接返回了null。（如果不对这三种类型判断，会报异常）
 			if (args[k] instanceof MultipartFile || args[k] instanceof ServletRequest
 					|| args[k] instanceof ServletResponse) {
 				return null;
 			}
 
-			if (!args[k].getClass().isPrimitive()) {
+			if (args[k]!=null && !args[k].getClass().isPrimitive()) {
 				// 当方法参数是基础类型，但是获取到的是封装类型的就需要转化成基础类型
 				// String result = args[k].getClass().getName();
 				// Class s = map.get(result);
 				// 当方法参数是封装类型
 				Class s = args[k].getClass();
 				classes[k] = s == null ? args[k].getClass() : s;
+			}else{
+				classes[k]=null;
 			}
 		}
 		ParameterNameDiscoverer pnd = new DefaultParameterNameDiscoverer();
@@ -364,7 +368,7 @@ public class SysLogAspect {
 		HashMap<String, Object> paramMap = new HashMap();
 		for (int i = 0; i < parameterNames.length; i++) {
 			paramMap.put(parameterNames[i], args[i]);
-		}
+		}*/
 		return paramMap;
 
 	}
