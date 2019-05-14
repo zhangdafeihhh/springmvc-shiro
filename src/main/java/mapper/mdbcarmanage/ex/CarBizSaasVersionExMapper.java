@@ -2,6 +2,8 @@ package mapper.mdbcarmanage.ex;
 
 import com.zhuanche.entity.mdbcarmanage.CarBizSaasVersion;
 
+import java.util.List;
+
 /**
  * @Author: nysspring@163.com
  * @Description:
@@ -19,7 +21,5 @@ public interface CarBizSaasVersionExMapper {
 
     int updateByPrimaryKeySelective(CarBizSaasVersion record);
 
-    int updateByPrimaryKey(CarBizSaasVersion record);
-
-
+    List<CarBizSaasVersion> listVersion();
 }

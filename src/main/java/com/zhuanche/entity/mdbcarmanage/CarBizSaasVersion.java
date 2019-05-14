@@ -54,6 +54,19 @@ public class CarBizSaasVersion implements Serializable {
      */
     private Date updateDate;
 
+    /**
+     * 供应商城市id
+     */
+    private String cityId;
+
+    public String getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(String cityId) {
+        this.cityId = cityId;
+    }
+
     private static final long serialVersionUID = 1L;
 
     public Integer getId() {

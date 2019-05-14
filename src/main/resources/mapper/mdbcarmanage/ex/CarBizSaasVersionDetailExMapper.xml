@@ -114,4 +114,32 @@
       update_date = #{updateDate,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="listCarBizSaasVersionDetail" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from car_biz_saas_version_detail
+    <where>
+      <if test="versionId != null">
+        version_id = #{versionId,jdbcType=INTEGER}
+      </if>
+    </where>
+  </select>
+
+  <delete id="deleteBatch" parameterType="java.util.List">
+      delete from car_biz_saas_version_detail
+      where id IN (
+        <foreach collection="list" item="id" separator=",">
+          #{id,jdbcType=INTEGER}
+        </foreach>
+      )
+  </delete>
+
+  <delete id="deleteByVersionId">
+      delete from car_biz_saas_version_detail
+      where version_id = #{versionId}
+  </delete>
+
+
+
 </mapper>
