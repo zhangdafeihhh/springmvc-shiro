@@ -74,6 +74,8 @@ public class CarFactOrderInfoDTO{
 
 	private Integer serviceCity;
 
+	private String serviceCityName;
+
 	public String getOrderNo() {
 		return orderNo;
 	}
@@ -330,7 +332,16 @@ public class CarFactOrderInfoDTO{
 	public void setServiceCity(Integer serviceCity) {
 		this.serviceCity = serviceCity;
 	}
-/*
+
+	public String getServiceCityName() {
+		return serviceCityName;
+	}
+
+	public void setServiceCityName(String serviceCityName) {
+		this.serviceCityName = serviceCityName;
+	}
+
+	/*
     private String licensePlates;
 
     private String brand;

@@ -24,6 +24,7 @@ import com.zhuanche.util.excel.CsvUtils;
 import mapper.rentcar.CarBizCustomerMapper;
 import mapper.rentcar.CarBizDriverInfoMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
+import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarFactOrderExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -78,6 +79,9 @@ public class OrderController{
 
 	@Autowired
 	private DriverFeeDetailService driverFeeDetailService;
+
+	@Autowired
+	private CarBizCityExMapper cityExMapper;
 
 
 	/**
@@ -1003,6 +1007,10 @@ public class OrderController{
 			if(carBizDriverInfo!=null) {
 				result.setDrivername(carBizDriverInfo.getName());
 				result.setDriverphone(carBizDriverInfo.getPhone());
+				result.setServiceCity(carBizDriverInfo.getServiceCity());
+				String serviceCityName = cityExMapper.queryNameById(carBizDriverInfo.getServiceCity());
+				result.setServiceCityName(serviceCityName);
+
 			}
 		}
 		//五、补全此订单的预订人信息
