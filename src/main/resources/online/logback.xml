@@ -1,4 +1,6 @@
 <configuration>
+    <conversionRule conversionWord="ip" converterClass="com.zhuanche.util.IPLogConfig" />
+    <property name="appName" value="mp-manage"/>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %X{env} [%-5level] %X{reqId} %logger{36}%X{loginUser} %msg%n</pattern>
