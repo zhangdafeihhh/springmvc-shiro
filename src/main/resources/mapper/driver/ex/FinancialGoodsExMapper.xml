@@ -87,10 +87,10 @@
     <include refid="Base_Column_List" />
     from financial_goods
     <trim prefix="WHERE" prefixOverrides="AND|OR">
-		<if test="goodsName != null">
+		<if test="goodsName != null and  goodsName !=''">
 			and goods_name = #{goodsName}
 		</if>
-		<if test="basicsVehiclesId != null">
+		<if test="basicsVehiclesId != null and basicsVehiclesId!=0">
 			and basics_vehicles_id = #{basicsVehiclesId}
 		</if>
 		<if test="salesTarget != null">

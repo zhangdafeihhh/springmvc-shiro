@@ -70,7 +70,7 @@
 		<include refid="Base_Column_List" />
 		from financial_basics_vehicles
 		<trim prefix="WHERE" prefixOverrides="AND|OR">
-			<if test="vehiclesDetailedName != null">
+			<if test="vehiclesDetailedName != null and vehiclesDetailedName !=''">
 				and vehicles_detailed_name = #{vehiclesDetailedName}
 			</if>
 			<if test="energyType!=null">

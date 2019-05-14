@@ -52,13 +52,13 @@
     <include refid="Base_Column_List" />
     from financial_clue
     <trim prefix="WHERE" prefixOverrides="AND|OR">
-		<if test="purposeName != null">
+		<if test="purposeName != null and purposeName!=''">
 				and purpose_name = #{purposeName}
 		</if>
-		<if test="goodsId != null">
+		<if test="goodsId != null and goodsId!=0">
 				and goods_id = #{goodsId}
 		</if>
-		<if test="purposeName != null">
+		<if test="vehiclesDetailedName != null and vehiclesDetailedName!=''">
 				and vehicles_detailed_name = #{vehiclesDetailedName}
 		</if>
 		<if test="supplierIds != null and supplierIds.size>0">
