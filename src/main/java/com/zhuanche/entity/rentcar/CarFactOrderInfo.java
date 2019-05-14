@@ -432,6 +432,10 @@ public class CarFactOrderInfo extends BaseEntity {
 	private OrderDriverCostDetailVO driverCostDetailVO;
 	private DriverCostDetailVO driverCostDetailVOH5;
 	private OrderCostDetailInfo orderCostDetailInfo;
+
+	private Integer serviceCity;
+
+	private String serviceCityName;
 	
 	public String getMainOrderNo() {
 		return mainOrderNo;
@@ -2208,4 +2212,20 @@ public class CarFactOrderInfo extends BaseEntity {
     public void setOrderCostDetailInfo(OrderCostDetailInfo orderCostDetailInfo) {
         this.orderCostDetailInfo = orderCostDetailInfo;
     }
+
+	public Integer getServiceCity() {
+		return serviceCity;
+	}
+
+	public void setServiceCity(Integer serviceCity) {
+		this.serviceCity = serviceCity;
+	}
+
+	public String getServiceCityName() {
+		return serviceCityName;
+	}
+
+	public void setServiceCityName(String serviceCityName) {
+		this.serviceCityName = serviceCityName;
+	}
 }
