@@ -9,12 +9,13 @@
     <result column="version_detail" jdbcType="VARCHAR" property="versionDetail" />
     <result column="status" jdbcType="INTEGER" property="status" />
     <result column="create_userid" jdbcType="INTEGER" property="createUserid" />
+    <result column="city_id" jdbcType="VARCHAR" property="cityId" />
     <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
     <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
   </resultMap>
   <sql id="Base_Column_List">
     id, version, version_take_effect_date, version_summary, version_detail, `status`, 
-    create_userid, create_date, update_date
+    create_userid, city_id, create_date, update_date
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -29,14 +30,14 @@
   <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizSaasVersion">
     insert into car_biz_saas_version (id, version, version_take_effect_date, 
       version_summary, version_detail, `status`, 
-      create_userid, create_date, update_date
+      create_userid, city_id, create_date, update_date
       )
     values (#{id,jdbcType=INTEGER}, #{version,jdbcType=VARCHAR}, #{versionTakeEffectDate,jdbcType=TIMESTAMP}, 
       #{versionSummary,jdbcType=VARCHAR}, #{versionDetail,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
-      #{createUserid,jdbcType=INTEGER}, #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}
+      #{createUserid,jdbcType=INTEGER}, #{cityId,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizSaasVersion">
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizSaasVersion" useGeneratedKeys="true" keyProperty="id">
     insert into car_biz_saas_version
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -59,6 +60,9 @@
       </if>
       <if test="createUserid != null">
         create_userid,
+      </if>
+      <if test="cityId != null">
+        city_id,
       </if>
       <if test="createDate != null">
         create_date,
@@ -89,6 +93,9 @@
       <if test="createUserid != null">
         #{createUserid,jdbcType=INTEGER},
       </if>
+      <if test="cityId != null">
+        #{cityId,jdbcType=VARCHAR},
+      </if>
       <if test="createDate != null">
         #{createDate,jdbcType=TIMESTAMP},
       </if>
@@ -118,6 +125,9 @@
       <if test="createUserid != null">
         create_userid = #{createUserid,jdbcType=INTEGER},
       </if>
+      <if test="cityId != null">
+        city_id = #{cityId,jdbcType=VARCHAR},
+      </if>
       <if test="createDate != null">
         create_date = #{createDate,jdbcType=TIMESTAMP},
       </if>
@@ -127,16 +137,15 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizSaasVersion">
-    update car_biz_saas_version
-    set version = #{version,jdbcType=VARCHAR},
-      version_take_effect_date = #{versionTakeEffectDate,jdbcType=TIMESTAMP},
-      version_summary = #{versionSummary,jdbcType=VARCHAR},
-      version_detail = #{versionDetail,jdbcType=VARCHAR},
-      `status` = #{status,jdbcType=INTEGER},
-      create_userid = #{createUserid,jdbcType=INTEGER},
-      create_date = #{createDate,jdbcType=TIMESTAMP},
-      update_date = #{updateDate,jdbcType=TIMESTAMP}
-    where id = #{id,jdbcType=INTEGER}
-  </update>
+
+
+  <select id="listVersion" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from car_biz_saas_version
+    order by update_date desc
+  </select>
+
+
+
 </mapper>

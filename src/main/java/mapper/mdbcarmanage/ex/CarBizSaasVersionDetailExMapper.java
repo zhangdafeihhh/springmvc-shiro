@@ -2,6 +2,10 @@ package mapper.mdbcarmanage.ex;
 
 
 import com.zhuanche.entity.mdbcarmanage.CarBizSaasVersionDetail;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
 /**
  * @Author: nysspring@163.com
  * @Description:
@@ -21,4 +25,13 @@ public interface CarBizSaasVersionDetailExMapper {
 
     int updateByPrimaryKey(CarBizSaasVersionDetail record);
 
+    List<CarBizSaasVersionDetail> listCarBizSaasVersionDetail(@Param("versionId") Integer versionId);
+
+    /**
+     * 批量删除
+     * @param list
+     */
+    int deleteBatch(List<Integer> list);
+
+    int deleteByVersionId(@Param("versionId") Integer versionId);
 }
