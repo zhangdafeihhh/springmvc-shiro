@@ -460,6 +460,96 @@
     <include refid="allBaseColumnWhereList"/>
     order by update_date desc
   </select>
+
+  <select id="queryDriverListForSaas" resultType="com.zhuanche.dto.rentcar.CarBizDriverInfoDTO" >
+    SELECT
+    a.driver_id AS driverId,
+    a.name AS name,
+    a.phone AS phone,
+    a.license_plates AS licensePlates,
+    a.status AS status,
+    a.id_card_no AS idCardNo,
+    a.imei AS imei,
+    a.is_image AS isImage,
+    a.service_city AS serviceCity,
+    a.supplier_id AS supplierId,
+    a.group_id AS groupId,
+    a.cooperation_type AS cooperationType,
+    a.create_by AS createBy,
+    a.create_date AS createDate,
+    a.update_by AS updateBy,
+    a.update_date AS updateDate,
+    b.ext2 AS ext2,
+    b.ext3 AS ext3
+    FROM car_biz_driver_info a
+    LEFT JOIN car_biz_driver_info_detail b ON  a.driver_id = b.driver_id
+    <where>
+      <if test="ext2 != null" >
+        and b.ext2 = #{ext2,jdbcType=INTEGER}
+      </if>
+      <if test="ext3 != null" >
+        and b.ext3 = #{ext3,jdbcType=INTEGER}
+      </if>
+      <if test="phone != null and phone != ''" >
+        and a.phone LIKE CONCAT(#{phone},'%')
+      </if>
+      <if test="name != null and name != ''" >
+        and a.name LIKE CONCAT(#{name},'%')
+      </if>
+      <if test="licensePlates != null and licensePlates != ''" >
+        and a.license_plates LIKE CONCAT(#{licensePlates},'%')
+      </if>
+      <if test="status != null" >
+        and a.status = #{status,jdbcType=INTEGER}
+      </if>
+      <if test="groupId != null and groupId != ''" >
+        and a.group_id = #{groupId,jdbcType=INTEGER}
+      </if>
+      <if test="cooperationType != null and cooperationType != ''" >
+        and a.cooperation_type = #{cooperationType,jdbcType=INTEGER}
+      </if>
+      <if test="imei != null and imei != ''" >
+        and a.imei = #{imei,jdbcType=VARCHAR}
+      </if>
+      <if test="idCardNo != null and idCardNo != ''" >
+        and a.id_card_no = #{idCardNo,jdbcType=VARCHAR}
+      </if>
+      <if test="isImage != null" >
+        and a.is_image = #{isImage,jdbcType=INTEGER}
+      </if>
+      <if test="isTwoShifts != null" >
+        and a.is_two_shifts = #{isTwoShifts,jdbcType=INTEGER}
+      </if>
+      <if test="serviceCity != null and serviceCity != ''" >
+        and a.service_city = #{serviceCity,jdbcType=VARCHAR}
+      </if>
+      <if test="supplierId != null and supplierId != ''" >
+        and a.supplier_id = #{supplierId,jdbcType=VARCHAR}
+      </if>
+      <if test="cityIds!=null and cityIds.size()>0">
+        and a.service_city IN
+        <foreach collection="cityIds" open="(" close=")" separator="," item="cid">
+          #{cid}
+        </foreach>
+      </if>
+      <if test="supplierIds!=null and supplierIds.size()>0">
+        and a.supplier_id IN
+        <foreach collection="supplierIds" open="(" close=")" separator="," item="sid">
+          #{sid}
+        </foreach>
+      </if>
+      <if test="driverIds!=null and driverIds.size()>0">
+        and a.driver_id IN
+        <foreach collection="driverIds" open="(" close=")" separator="," item="did">
+          #{did}
+        </foreach>
+      </if>
+    </where>
+    ORDER BY a.update_date DESC
+  </select>
+
+
+
   <select id="checkPhone" resultType="java.lang.Integer" >
     select count(*)
     from car_biz_driver_info

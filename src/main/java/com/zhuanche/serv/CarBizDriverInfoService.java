@@ -192,6 +192,23 @@ public class CarBizDriverInfoService {
         return carBizDriverInfoExMapper.queryDriverList(params);
     }
 
+    /**
+     * 新增司机查询接口，需要连表查询，不希望修改老接口
+     *
+     * @param params
+     * @return
+     */
+    @MasterSlaveConfigs(configs={
+            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+    } )
+    public List<CarBizDriverInfoDTO> queryDriverListForSaas(CarBizDriverInfoDTO params) {
+        return carBizDriverInfoExMapper.queryDriverListForSaas(params);
+    }
+
+
+
+
+
     public PageInfo<CarBizDriverInfoDTO> queryDriverPage(CarBizDriverInfoDTO params,int pageNo,int pageSize) {
         PageHelper.startPage(pageNo, pageSize, true);
         List<CarBizDriverInfoDTO> list = carBizDriverInfoExMapper.queryDriverList(params);

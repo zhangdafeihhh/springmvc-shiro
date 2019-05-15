@@ -184,4 +184,6 @@ public interface CarBizDriverInfoExMapper {
     List<CarBizDriverInfoDTO> queryDriverIdsByActionVO(Map map);
 
     CarBizDriverInfoDTO queryDriverIdByActionVO(Map<String, Object> params);
+
+    List<CarBizDriverInfoDTO> queryDriverListForSaas(CarBizDriverInfoDTO params);
 }

@@ -96,6 +96,8 @@ public class DriverInfoController {
      * @param idCardNo 身份证号
      * @param isImage 是否维护形象
      * @param page 起始页，默认0
+     * @param ext2 合规状态 0不合规 1 合规
+     * @param ext3 合规类型 1:人证合规 2:车证合规 3:双证合规 4:不合规
      * @param pageSize 取N条，默认20
      * @return
      */
@@ -108,7 +110,7 @@ public class DriverInfoController {
     @SensitiveDataOperationLog(primaryDataType="司机数据",secondaryDataType="司机个人基本信息",desc="司机信息列表查询")
     @RequestFunction(menu = DRIVER_INFO_LIST)
     public AjaxResponse findDriverList(String name, String phone, String licensePlates, Integer status, Integer cityId, Integer supplierId,
-            Integer teamId, Integer teamGroupId, Integer groupId, Integer cooperationType, String imei, String idCardNo, Integer isImage,
+            Integer teamId, Integer teamGroupId, Integer groupId, Integer cooperationType, String imei, String idCardNo, Integer isImage,Integer ext2,Integer ext3,
             @RequestParam(value="page", defaultValue="0")Integer page,
             @Verify(param = "pageSize",rule = "max(50)")@RequestParam(value="pageSize", defaultValue="20")Integer pageSize) {
 
@@ -151,12 +153,16 @@ public class DriverInfoController {
         carBizDriverInfoDTO.setSupplierIds(permOfSupplier);
         carBizDriverInfoDTO.setTeamIds(permOfTeam);
         carBizDriverInfoDTO.setDriverIds(driverIds);
+        carBizDriverInfoDTO.setExt2(ext2);
+        carBizDriverInfoDTO.setExt3(ext3);
 
         Page p = PageHelper.startPage(page, pageSize, true);
         try {
-            list = carBizDriverInfoService.queryDriverList(carBizDriverInfoDTO);
+            list = carBizDriverInfoService.queryDriverListForSaas(carBizDriverInfoDTO);
             total = (int)p.getTotal();
-        } finally {
+        } catch (Exception e){
+            logger.info("查询司机信息异常carBizDriverInfoDTO={}，e={}",JSON.toJSONString(carBizDriverInfoDTO),e);
+        } finally{
             PageHelper.clearPage();
         }
         // 查询城市名称，供应商名称，服务类型，加盟类型
