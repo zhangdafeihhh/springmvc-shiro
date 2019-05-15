@@ -2,7 +2,9 @@ package com.zhuanche.serv.financial;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,6 +24,7 @@ import com.zhuanche.constants.financial.FinancialConst.GoodsState;
 import com.zhuanche.dto.financial.FinancialGoodsDTO;
 import com.zhuanche.dto.financial.FinancialGoodsInfoDTO;
 import com.zhuanche.dto.financial.FinancialGoodsParamDTO;
+import com.zhuanche.entity.driver.DriverVehicle;
 import com.zhuanche.entity.driver.FinancialAdditionalClause;
 import com.zhuanche.entity.driver.FinancialBasicsVehicles;
 import com.zhuanche.entity.driver.FinancialGoods;
@@ -35,6 +38,7 @@ import mapper.driver.FinancialBasicsVehiclesMapper;
 import mapper.driver.FinancialGoodsClauseMapper;
 import mapper.driver.FinancialGoodsMapper;
 import mapper.driver.ex.FinancialAdditionalClauseExMapper;
+import mapper.driver.ex.FinancialBasicsVehiclesExMapper;
 import mapper.driver.ex.FinancialGoodsClauseExMapper;
 import mapper.driver.ex.FinancialGoodsExMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
@@ -71,6 +75,9 @@ public class FinancialGoodsService {
 	private FinancialBasicsVehiclesMapper financialBasicsVehiclesMapper;
 	
 	@Autowired
+	private FinancialBasicsVehiclesExMapper financialBasicsVehiclesExMapper;
+	
+	@Autowired
 	private CarBizCityExMapper carBizCityExMapper;
 	
 	@Autowired
@@ -101,8 +108,33 @@ public class FinancialGoodsService {
     	if(financialGoodsDTOs==null || financialGoodsDTOs.size()==0) {
     		return new PageDTO(page, pageSize, total, new ArrayList());
     	}
+    	
+    	List<Integer> basicsVehiclesIds= financialGoodsDTOs.stream().map(f -> f.getBasicsVehiclesId()).collect(Collectors.toList());
+    	
+        Set set = new HashSet();
+        List<Integer> listbasicsVehiclesIds=new ArrayList<>();
+        set.addAll(basicsVehiclesIds);
+        listbasicsVehiclesIds.addAll(set);
+    	
+    	List<FinancialBasicsVehicles> financialBasicsVehicles=financialBasicsVehiclesExMapper.queryFinancialBasicsVehiclesList(listbasicsVehiclesIds);
+    	Map<Integer,FinancialBasicsVehicles> mapFinancialBasicsVehicles=this.getFinancialBasicsVehiclesMap(financialBasicsVehicles);
+    	if (mapFinancialBasicsVehicles!=null) {
+			for (int i = 0; i < financialGoodsDTOs.size(); i++) {
+				FinancialGoodsDTO financialGoodsDTO = financialGoodsDTOs.get(i);
+				financialGoodsDTO.setVehiclesDetailedName(mapFinancialBasicsVehicles.get(financialGoodsDTO.getBasicsVehiclesId())==null?"":mapFinancialBasicsVehicles.get(financialGoodsDTO.getBasicsVehiclesId()).getVehiclesDetailedName());
+			}
+		}
+    	
     	//返回
     	return new PageDTO(page,pageSize,total,financialGoodsDTOs);
+	}
+
+	private Map<Integer,FinancialBasicsVehicles> getFinancialBasicsVehiclesMap(List<FinancialBasicsVehicles> financialBasicsVehicles) {
+		if (financialBasicsVehicles==null || financialBasicsVehicles.size()==0) {
+			return null;
+		}
+		Map<Integer,FinancialBasicsVehicles> map=financialBasicsVehicles.stream().collect(Collectors.toMap(FinancialBasicsVehicles::getBasicsVehiclesId, o -> o ));
+		return map;
 	}
 
 	public FinancialGoods saveFinancialGoods(FinancialGoodsParamDTO financialGoodsParamDTO) {

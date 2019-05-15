@@ -15,4 +15,6 @@ public interface FinancialBasicsVehiclesExMapper {
 	List<FinancialBasicsVehicles> queryBasicsVehiclesAllList();
 
 	FinancialBasicsVehicles queryFinancialBasicsVehiclesByName(@Param("vehiclesDetailedName")String vehiclesDetailedName);
+
+	List<FinancialBasicsVehicles> queryFinancialBasicsVehiclesList(@Param("basicsVehiclesIds")List<Integer> basicsVehiclesIds);
 }

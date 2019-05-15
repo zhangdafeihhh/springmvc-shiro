@@ -92,4 +92,14 @@
 		from financial_basics_vehicles
 		where vehicles_detailed_name = #{vehiclesDetailedName}
 	</select>
+	
+	<select id="queryFinancialBasicsVehiclesList" resultMap="BaseResultMap">
+		select 
+	    <include refid="Base_Column_List" />
+	    from financial_basics_vehicles
+	    where basics_vehicles_id in
+			   <foreach collection="basicsVehiclesIds" close=")" open="(" separator="," item="basicsVehiclesId">
+					#{basicsVehiclesId}
+		 	   </foreach>
+	</select>
 </mapper>
