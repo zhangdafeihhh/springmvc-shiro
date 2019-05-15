@@ -20,6 +20,7 @@ import com.zhuanche.common.syslog.SysLogAnn;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.constants.financial.FinancialConst.EnableStatusSelect;
 import com.zhuanche.dto.financial.FinancialBasicsVehiclesDTO;
 import com.zhuanche.entity.driver.FinancialBasicsVehicles;
 import com.zhuanche.serv.financial.FinancialBasicsVehiclesService;
@@ -313,6 +314,7 @@ public class FinancialBasicsVehiclesController {
 	@RequestMapping(value = "/queryBasicsVehiclesAllList")
 	public AjaxResponse queryBasicsVehiclesAllList(Byte enableStatus) {
 		try{
+			enableStatus=EnableStatusSelect.ENABLESTATUS;
 			List<FinancialBasicsVehicles> financialBasicsVehicless = financialBasicsVehiclesService.queryBasicsVehiclesAllList(enableStatus);
 			return AjaxResponse.success(financialBasicsVehicless);
 		}catch(Exception e){
