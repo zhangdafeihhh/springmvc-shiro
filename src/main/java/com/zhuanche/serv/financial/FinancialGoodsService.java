@@ -143,7 +143,7 @@ public class FinancialGoodsService {
 		Date now=new Date();
 		financialGoods.setCreateBy(user.getName());
 		financialGoods.setUpdateBy(user.getName());
-		financialGoods.setStatus(GoodsState.STAY_ON_THE_SHELF);
+		financialGoods.setStatus(GoodsState.ON_SHELVES);
 		String goodsNumber = FinancialUtil.genLongNum(NumType.GOODS_SP);
 		financialGoods.setGoodsNumber(goodsNumber);
 		

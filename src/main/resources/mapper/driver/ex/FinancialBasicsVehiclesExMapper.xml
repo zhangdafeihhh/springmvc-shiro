@@ -83,6 +83,11 @@
 		select
 		<include refid="Base_Column_List" />
 		from financial_basics_vehicles
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="enableStatus != null">
+				and enable_status = #{enableStatus}
+			</if>
+		</trim>
 	</select>
 	
 	

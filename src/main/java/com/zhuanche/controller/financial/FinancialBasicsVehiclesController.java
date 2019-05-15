@@ -311,9 +311,9 @@ public class FinancialBasicsVehiclesController {
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.SLAVE )
 	} )
 	@RequestMapping(value = "/queryBasicsVehiclesAllList")
-	public AjaxResponse queryBasicsVehiclesAllList() {
+	public AjaxResponse queryBasicsVehiclesAllList(Byte enableStatus) {
 		try{
-			List<FinancialBasicsVehicles> financialBasicsVehicless = financialBasicsVehiclesService.queryBasicsVehiclesAllList();
+			List<FinancialBasicsVehicles> financialBasicsVehicless = financialBasicsVehiclesService.queryBasicsVehiclesAllList(enableStatus);
 			return AjaxResponse.success(financialBasicsVehicless);
 		}catch(Exception e){
 			return AjaxResponse.fail(RestErrorCode.QUERY_BASICSVEHICLE_ERROR);

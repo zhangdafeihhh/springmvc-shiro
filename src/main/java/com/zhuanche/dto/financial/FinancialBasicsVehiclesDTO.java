@@ -105,7 +105,7 @@ public class FinancialBasicsVehiclesDTO{
 	}
 
 	public String getEnergyTypeName() {
-		EnergyTypeEnum energyTypeEnum=EnergyTypeEnum.indexOf(getEnableStatus());
+		EnergyTypeEnum energyTypeEnum=EnergyTypeEnum.indexOf(getEnergyType());
 		if (energyTypeEnum!=null) {
 			energyTypeName=energyTypeEnum.getEnergyTypeName();
 		}

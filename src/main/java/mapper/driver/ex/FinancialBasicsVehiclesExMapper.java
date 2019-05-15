@@ -12,7 +12,7 @@ public interface FinancialBasicsVehiclesExMapper {
 	List<FinancialBasicsVehiclesDTO> queryFinancialBasicsVehiclesForList(@Param("vehiclesDetailedName") String vehiclesDetailedName,
 			@Param("energyType")Integer energyType);
 
-	List<FinancialBasicsVehicles> queryBasicsVehiclesAllList();
+	List<FinancialBasicsVehicles> queryBasicsVehiclesAllList(@Param("enableStatus")Byte enableStatus);
 
 	FinancialBasicsVehicles queryFinancialBasicsVehiclesByName(@Param("vehiclesDetailedName")String vehiclesDetailedName);
 

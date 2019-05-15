@@ -21,15 +21,20 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.common.web.datavalidate.sequence.SeqAll;
+import com.zhuanche.constants.financial.FinancialConst.EnableStatusSelect;
 import com.zhuanche.dto.financial.FinancialBasicsVehiclesDTO;
 import com.zhuanche.dto.financial.FinancialGoodsDTO;
 import com.zhuanche.dto.financial.FinancialGoodsInfoDTO;
 import com.zhuanche.dto.financial.FinancialGoodsParamDTO;
+import com.zhuanche.entity.driver.FinancialBasicsVehicles;
 import com.zhuanche.entity.driver.FinancialGoods;
 import com.zhuanche.serv.financial.FinancialGoodsService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 
+import mapper.driver.FinancialBasicsVehiclesMapper;
+import mapper.driver.FinancialGoodsMapper;
+import mapper.driver.ex.FinancialBasicsVehiclesExMapper;
 import mapper.driver.ex.FinancialGoodsExMapper;
 
 /**
@@ -44,8 +49,16 @@ public class FinancialGoodsController {
 	private static final Logger logger = LoggerFactory.getLogger(FinancialBasicsVehiclesController.class);
 	@Autowired
 	private FinancialGoodsService financialGoodsService;
+	
 	@Autowired
 	private FinancialGoodsExMapper financialGoodsExMapper;
+	
+	@Autowired
+	private FinancialGoodsMapper financialGoodsMapper;
+	
+	@Autowired
+	private FinancialBasicsVehiclesMapper financialBasicsVehiclesMapper;
+	
 	/**
 	 * queryFinancialGoodsForList:(查询商品列表). <br/>  
 	 * @author baiyunlong
@@ -176,6 +189,15 @@ public class FinancialGoodsController {
 			@Verify(param = "goodsId", rule = "required|min(1)")Integer goodsId,
 			@Verify(param = "status", rule = "required")Byte status
 			) {
+		
+		if (status==0) {
+			FinancialGoods financialGoods = financialGoodsMapper.selectByPrimaryKey(goodsId);
+			FinancialBasicsVehicles financialBasicsVehicles = financialBasicsVehiclesMapper.selectByPrimaryKey(financialGoods.getBasicsVehiclesId());
+		    if (financialBasicsVehicles!=null && financialBasicsVehicles.getEnableStatus()==EnableStatusSelect.DISCONTINUE) {
+		    	return AjaxResponse.fail(RestErrorCode.ENABLE_STATUS,financialBasicsVehicles.getVehiclesDetailedName());
+			}
+		}
+		
 		int i=financialGoodsService.updateFinancialGoodsByStatus(goodsId,status);
 	    return AjaxResponse.success(true);
 	}
