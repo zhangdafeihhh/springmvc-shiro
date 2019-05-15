@@ -202,8 +202,7 @@ public class DriverIntegraController {
     @RequestFunction(menu = DRIVER_RANK_INTEGRAL_EXPORT)
     public String queryDriverIntegralListDataDown(DriverVoEntity driverEntity, HttpServletRequest request, HttpServletResponse response) {
         driverEntity.setPage(1);
-        int pageSize = CsvUtils.downPerSize;
-        driverEntity.setPagesize(pageSize);
+        driverEntity.setPagesize(50);//策略当期积分接口一次支持50
         logger.info("queryDriverIntegralListDataDown:下载司机积分数据列表,参数为："+(driverEntity==null?"null": JSON.toJSONString(driverEntity)));
         if(driverEntity.getCityId() == 0){
             return "请选择城市";
@@ -248,7 +247,7 @@ public class DriverIntegraController {
                 teamIds = driverEntity.getTeamIds();
             }
 
-            List<DriverVoEntity> pageRows = new ArrayList<DriverVoEntity>();
+            List<DriverVoEntity> pageRows;
             long total = 0;
             driverEntity.setCities(cities);
             driverEntity.setSuppliers(suppliers);
@@ -263,7 +262,7 @@ public class DriverIntegraController {
             }
 
             List<String> headerList = new ArrayList<>();
-            headerList.add("城市,司机ID, 司机姓名,当前司机等级,手机号,供应商,车队,车牌号,当月积分,当日积分");
+            headerList.add("城市,司机ID, 司机姓名,当前司机等级,手机号,供应商,车队,车牌号,当期积分,当日积分");
             List<String> csvDataList  = new ArrayList<String>();
             if (StringUtils.isNotBlank(teamIds)) {
                 String[] teamId = teamIds.split(",");
@@ -333,7 +332,6 @@ public class DriverIntegraController {
                 driverEntity.setPage(pageNumber);
                 page = this.driverService.findPageDriver(driverEntity);
                 pageRows = page.getList();
-
                 //拼装当前页数据
                 generatePageData(  pageRows);
                 csvDataList  = new ArrayList<String>();
