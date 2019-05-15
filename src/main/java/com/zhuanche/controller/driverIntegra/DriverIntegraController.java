@@ -199,7 +199,7 @@ public class DriverIntegraController {
     @RequestFunction(menu = DRIVER_RANK_INTEGRAL_EXPORT)
     public String queryDriverIntegralListDataDown(DriverVoEntity driverEntity, HttpServletRequest request, HttpServletResponse response) {
         driverEntity.setPage(1);
-        int pageSize = CsvUtils.downPerSize;
+        int pageSize = 50;//策略接口查询当期积分一次支持50条
         driverEntity.setPagesize(pageSize);
         logger.info("queryDriverIntegralListDataDown:下载司机积分数据列表,参数为："+(driverEntity==null?"null": JSON.toJSONString(driverEntity)));
         if(driverEntity.getCityId() == 0){
@@ -260,7 +260,7 @@ public class DriverIntegraController {
             }
 
             List<String> headerList = new ArrayList<>();
-            headerList.add("城市,司机ID, 司机姓名,当前司机等级,手机号,供应商,车队,车牌号,当月积分,当日积分");
+            headerList.add("城市,司机ID, 司机姓名,当前司机等级,手机号,供应商,车队,车牌号,当期积分,当日积分");
             List<String> csvDataList  = new ArrayList<String>();
             if (StringUtils.isNotBlank(teamIds)) {
                 String[] teamId = teamIds.split(",");
@@ -348,7 +348,16 @@ public class DriverIntegraController {
         }
         return "下载失败，请联系管理员";
     }
+
+    /**
+     * 调用策略接口，查询当期积分
+     * @param pageRows
+     */
     private void generatePageData(List<DriverVoEntity> pageRows){
+        if (null == pageRows) return;
+
+
+
         if(pageRows != null){
             List<JSONObject> driverInfoList = new ArrayList<>();
             Map<String,JSONObject> itemMap = new HashMap<>();
