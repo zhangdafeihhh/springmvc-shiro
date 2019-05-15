@@ -187,6 +187,7 @@ public class CarBizSupplierService{
 			String method = Constants.UPDATE;
 			Integer cooperationTypeNew = supplier.getCooperationType();
 			Integer cooperationTypeOld = null;
+			String supplierNameOld = null;
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
 			supplier.setUpdateBy(currentLoginUser.getId());
 			supplier.setUpdateName(currentLoginUser.getName());
@@ -209,6 +210,7 @@ public class CarBizSupplierService{
                     CarBizSupplierVo vo = carBizSupplierExMapper.querySupplierById(supplier.getSupplierId());
                     if(vo!=null){
                         cooperationTypeOld = vo.getCooperationType();
+						supplierNameOld = vo.getSupplierFullName();
                     }
 					SupplierExtDto extDto = generateSupplierExtDto(supplier, false);
 					int count = supplierExtDtoExMapper.selectCountBySupplierId(supplier.getSupplierId());
@@ -332,7 +334,10 @@ public class CarBizSupplierService{
 			}catch (Exception e){
 				logger.error(Constants.SUPPLIER_MQ_SEND_FAILED, e);
 			}
-			if (Constants.UPDATE.equals(method) && cooperationTypeOld!=null && !cooperationTypeOld.equals(cooperationTypeNew)){
+			if (Constants.UPDATE.equals(method)
+					&& ((cooperationTypeOld!=null && !cooperationTypeOld.equals(cooperationTypeNew))
+			              || (StringUtils.isNotEmpty(supplierNameOld) && !supplierNameOld.equals(supplier.getSupplierFullName())))){
+
 				carBizDriverInfoService.updateDriverCooperationTypeBySupplierId(supplier.getSupplierId(), supplier.getCooperationType());
 				carBizCarInfoTempService.updateDriverCooperationTypeBySupplierId(supplier.getSupplierId(), supplier.getCooperationType());
 
