@@ -2,6 +2,7 @@ package com.zhuanche.dto.financial;
 
 import java.math.BigDecimal;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -56,8 +57,8 @@ public class FinancialGoodsParamDTO {
 	private Integer stock;
 	
 	private Integer sourceFundsId;
+	@Min(value = 1, message = "贷款期限不能小于1")
 	private Integer leaseTerm;
-	
 	
 	private BigDecimal rentEveryTerm;
 	private BigDecimal firstRent;

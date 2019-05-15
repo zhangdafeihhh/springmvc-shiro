@@ -1,6 +1,7 @@
 package com.zhuanche.controller.financial;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,7 @@ import com.zhuanche.constants.financial.VehicleAgeEnum;
 import com.zhuanche.dto.financial.CarColorList;
 import com.zhuanche.serv.busManage.FileUploadService;
 import com.zhuanche.serv.busManage.FileUploadService.UploadResult;
+import com.zhuanche.serv.busManage.FileUploadService.UploadResults;
 import com.zhuanche.serv.syslog.SysLogService;
 
 /**
@@ -86,6 +88,30 @@ public class FinancialCommonController {
 				return AjaxResponse.fail(RestErrorCode.CORRECT_FORMAT);
 			}
 		    UploadResult result = fileUploadService.uploadPublicStream(file.getInputStream(), fileName);
+		    return AjaxResponse.success(result);
+		} catch (IOException e) {
+			return AjaxResponse.fail(1);
+		}
+	}
+	
+	@RequestMapping(value = "/fileUploads")
+	public AjaxResponse fileUploads(MultipartFile[] files) {
+		try {
+			if (files==null&&files.length>5) {
+				return AjaxResponse.fail(RestErrorCode.CORRECT_FORMAT);
+			}
+			InputStream[] ins=new InputStream[files.length];
+			String[] fileNames=new String[files.length];
+			for (int i = 0; i < files.length; i++) {
+				ins[i]=files[i].getInputStream();
+				fileNames[i]=files[i].getOriginalFilename();
+				String fileName=fileNames[i];// 文件原名称
+				String type = fileName.indexOf(".")!=-1?fileName.substring(fileName.lastIndexOf(".")+1, fileName.length()):null;
+				if (!"GIF".equals(type.toUpperCase())&&!"PNG".equals(type.toUpperCase())&&!"JPG".equals(type.toUpperCase())) {
+					return AjaxResponse.fail(RestErrorCode.CORRECT_FORMAT);
+				}
+			}
+			UploadResults result = fileUploadService.uploadPublicStreams(ins, fileNames);
 		    return AjaxResponse.success(result);
 		} catch (IOException e) {
 			return AjaxResponse.fail(1);
