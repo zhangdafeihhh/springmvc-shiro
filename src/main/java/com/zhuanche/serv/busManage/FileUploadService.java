@@ -174,7 +174,7 @@ public class FileUploadService {
 			long end = System.currentTimeMillis();
 
 			JSONObject jsonResult = JSONObject.parseObject(result);
-			
+			logger.info("[ FileUploadService-uploadFile ] 上传文件接口返回信息:jsonResult={}", jsonResult);
 			if (jsonResult == null) {
 				uploadResults.setSuccess(false);
 				uploadResults.setMsg("上传文件失败");

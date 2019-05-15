@@ -110,6 +110,7 @@ public class FinancialCommonController {
 				if (!"GIF".equals(type.toUpperCase())&&!"PNG".equals(type.toUpperCase())&&!"JPG".equals(type.toUpperCase())) {
 					return AjaxResponse.fail(RestErrorCode.CORRECT_FORMAT);
 				}
+				logger.info("传入文件名称fileName--{}",fileName);
 			}
 			UploadResults result = fileUploadService.uploadPublicStreams(ins, fileNames);
 		    return AjaxResponse.success(result);
