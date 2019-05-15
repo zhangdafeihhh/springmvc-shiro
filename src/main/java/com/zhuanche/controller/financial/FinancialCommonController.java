@@ -97,7 +97,7 @@ public class FinancialCommonController {
 	@RequestMapping(value = "/fileUploads")
 	public AjaxResponse fileUploads(MultipartFile[] files) {
 		try {
-			if (files==null&&files.length>5) {
+			if (files==null ||files.length==0|| files.length>5) {
 				return AjaxResponse.fail(RestErrorCode.CORRECT_FORMAT);
 			}
 			InputStream[] ins=new InputStream[files.length];
