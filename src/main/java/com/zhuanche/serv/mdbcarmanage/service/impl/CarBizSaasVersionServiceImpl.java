@@ -9,6 +9,7 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.entity.mdbcarmanage.CarBizSaasVersion;
 import com.zhuanche.entity.mdbcarmanage.CarBizSaasVersionDetail;
+import com.zhuanche.entity.mdbcarmanage.VersionModel;
 import com.zhuanche.serv.mdbcarmanage.service.CarBizSaasVersionService;
 import mapper.mdbcarmanage.ex.CarBizSaasVersionDetailExMapper;
 import mapper.mdbcarmanage.ex.CarBizSaasVersionExMapper;
@@ -168,6 +169,35 @@ public class CarBizSaasVersionServiceImpl implements CarBizSaasVersionService{
         int j = carBizSaasVersionDetailExMapper.deleteByVersionId(versionId);
         LOGGER.info("删除version记录及附件表信息i={},j={}",i,j);
         return Boolean.TRUE;
+    }
+
+    @Override
+    public VersionModel versionDetail(Integer versionId) {
+        VersionModel versionModel = new VersionModel();
+        CarBizSaasVersion carBizSaasVersion = carBizSaasVersionExMapper.selectByPrimaryKey(versionId);
+        if(carBizSaasVersion != null){
+            versionModel.setId(carBizSaasVersion.getId());
+            versionModel.setVersion(carBizSaasVersion.getVersion());
+            versionModel.setVersionTakeEffectDate(carBizSaasVersion.getVersionTakeEffectDate());
+            versionModel.setVersionSummary(carBizSaasVersion.getVersionSummary());
+            versionModel.setVersionDetail(carBizSaasVersion.getVersionDetail());
+            versionModel.setStatus(carBizSaasVersion.getStatus());
+            versionModel.setCreateUserid(carBizSaasVersion.getCreateUserid());
+            versionModel.setCreateDate(carBizSaasVersion.getCreateDate());
+            versionModel.setUpdateDate(carBizSaasVersion.getUpdateDate());
+            versionModel.setCityId(carBizSaasVersion.getCityId());
+            List<CarBizSaasVersionDetail> detailList = carBizSaasVersionDetailExMapper.listCarBizSaasVersionDetail(versionId);
+            if(null != detailList && !detailList.isEmpty()){
+                versionModel.setVersionDetailList(detailList);
+            }
+            return versionModel;
+        }
+        return null;
+    }
+
+    @Override
+    public CarBizSaasVersionDetail selectDetailById(Integer detailId) {
+        return carBizSaasVersionDetailExMapper.selectByPrimaryKey(detailId);
     }
 
 

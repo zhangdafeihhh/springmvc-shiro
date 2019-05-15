@@ -7,14 +7,21 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.entity.mdbcarmanage.CarBizSaasVersion;
+import com.zhuanche.entity.mdbcarmanage.CarBizSaasVersionDetail;
+import com.zhuanche.entity.mdbcarmanage.VersionModel;
 import com.zhuanche.serv.mdbcarmanage.service.CarBizSaasVersionService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,6 +30,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.Date;
 
 /**
@@ -40,8 +50,17 @@ public class SaasVersionController {
     private CarBizSaasVersionService carBizSaasVersionService;
 
 
-
-
+    /**
+     * 创建版本记录及上传附件接口
+     * @param version
+     * @param versionSummary
+     * @param versionDetail
+     * @param cityIds
+     * @param versionTakeEffectDate
+     * @param file
+     * @param request
+     * @return
+     */
     @RequestMapping(value = "/createVersionRecord",method = RequestMethod.POST)
     @ResponseBody
     @MasterSlaveConfigs(configs = {
@@ -82,7 +101,19 @@ public class SaasVersionController {
     }
 
 
-
+    /**
+     * 编辑版本记录及附件接口
+     * @param version
+     * @param versionSummary
+     * @param versionDetail
+     * @param cityIds
+     * @param versionTakeEffectDate
+     * @param file
+     * @param request
+     * @param versionId
+     * @param detailIds
+     * @return
+     */
     @RequestMapping(value = "/editVersion",method = RequestMethod.POST)
     @ResponseBody
     @MasterSlaveConfigs(configs = {
@@ -127,6 +158,12 @@ public class SaasVersionController {
     }
 
 
+    /**
+     * 版本记录列表
+     * @param pageSize
+     * @param pageNum
+     * @return
+     */
     @RequestMapping(value = "/listVersion")
     @ResponseBody
     @MasterSlaveConfigs(configs = {
@@ -146,6 +183,67 @@ public class SaasVersionController {
     }
 
 
+    /**
+     * 版本记录详情
+     * @return
+     */
+    @RequestMapping(value = "/versionDetail")
+    @ResponseBody
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
+    public AjaxResponse versionDetail(Integer versionId){
+        LOGGER.info("versionDetail入参：versionId:{}",versionId);
+
+        try {
+            VersionModel versionModel = carBizSaasVersionService.versionDetail(versionId);
+            return AjaxResponse.success(versionModel);
+        } catch (Exception e) {
+            LOGGER.error("查询版本更新记录列表异常e={}",e);
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+    }
+
+
+
+    @RequestMapping(value="/downDetail")
+    public ResponseEntity<byte[]> downDetail(@RequestParam("detailId") Integer detailId)
+            throws Exception {
+        //下载文件路径
+        try {
+            CarBizSaasVersionDetail carBizSaasVersionDetail = carBizSaasVersionService.selectDetailById(detailId);
+            if(carBizSaasVersionDetail != null){
+                String fileUrl = carBizSaasVersionDetail.getDetailUrl();
+                String fileName = carBizSaasVersionDetail.getDetailName();
+                String path = "";  //服务器
+                File file = new File(path + File.separator + fileUrl);
+                HttpHeaders headers = new HttpHeaders();
+                String downloadFielName = new String(fileName.getBytes("UTF-8"));
+                String docName = downloadFielName.substring(downloadFielName.lastIndexOf(File.separator)+1);
+                headers.add("Content-Disposition", "attchement;filename="+ URLEncoder.encode(fileName,"UTF-8"));
+                headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+                return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(file),
+                        headers, HttpStatus.CREATED);
+
+            }
+
+        } catch (IOException e) {
+            LOGGER.info("下载错误：" + e.getMessage());
+        }
+        return null;
+    }
+
+
+
+
+
+
+
+    /**
+     * 删除版本记录及附件
+     * @param versionId
+     * @return
+     */
     @RequestMapping(value = "/deleteVersion",method = RequestMethod.POST)
     @ResponseBody
     @MasterSlaveConfigs(configs = {
@@ -168,6 +266,8 @@ public class SaasVersionController {
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
     }
+
+
 
 
 
