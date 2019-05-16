@@ -123,5 +123,6 @@
     where basics_vehicles_id = #{basicsVehiclesId}
       and supplier_id = #{supplierId}
       and city_id = #{cityId}
+      and status in (0,1)
   </select>
 </mapper>
