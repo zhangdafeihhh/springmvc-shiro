@@ -82,14 +82,14 @@ public class DriverIncomeScoreService {
     public List<DriverIncomeScoreRecordDto> getIncomeScoreRecord(DriverVoEntity dto) {
         Map<String, Object> map = new HashMap(3);
         map.put("driverId", dto.getDriverId());
-        map.put("startDate", dto.getStartUpdateTime());
-        map.put("endDate", dto.getEndUpdateTime());
+        map.put("startDate", dto.getStartDate());
+        map.put("endDate", dto.getEndDate());
         String body = new RPCAPI().requestWithRetry(RPCAPI.HttpMethod.POST, DRIVER_INTEGRAL + "/incomeScore/incomeRecordList", map, null, "UTF-8");
-        if (StringUtils.isBlank(body)) return null;
+        if (StringUtils.isBlank(body)) {return null;}
         RPCResponse response = RPCResponse.parse(body);
-        if (null == response || response.getCode() != 0 || response.getData() == null) return null;
+        if (null == response || response.getCode() != 0 || response.getData() == null) {return null;}
         List<DriverIncomeScoreRecordDto> list = JSON.parseArray(JSON.toJSONString(response.getData()), DriverIncomeScoreRecordDto.class);
-        if (null == list || list.size() == 0) return null;
+        if (null == list || list.size() == 0) {return null;}
         else {
             fillNamePhone(list, dto.getName(), dto.getPhone());
         }
