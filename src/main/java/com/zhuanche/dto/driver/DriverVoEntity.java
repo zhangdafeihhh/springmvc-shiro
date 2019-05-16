@@ -194,6 +194,24 @@ public class DriverVoEntity extends DriverEntity {
 
 	private String startUpdateTime;//收入分更新时间开始
 	private String endUpdateTime;//收入分更新时间结束
+	private String startDate;
+	private String endDate;
+
+	public String getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(String startDate) {
+		this.startDate = startDate;
+	}
+
+	public String getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
+	}
 
 	public String getIncomeScore() {
 		return incomeScore;
