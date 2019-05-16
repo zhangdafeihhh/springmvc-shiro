@@ -16,6 +16,7 @@ import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
+import com.zhuanche.dto.driver.TelescopeDriver;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
@@ -3789,6 +3790,108 @@ public class CarBizDriverInfoService {
         }
         return result;
     }
+
+
+    public CarBizDriverInfoDTO addTelescopeDriver(TelescopeDriver telescopeDriver){
+        boolean result = false;
+        String initPwd = String.valueOf((int)((Math.random()*9+1)*100000));
+        CarBizDriverInfoDTO carBizDriverInfoDTO = carBizDriverInfoExMapper.selectByPhone(telescopeDriver.getPhone());
+        if(null == carBizDriverInfoDTO){
+            CarBizDriverInfo carBizDriverInfo = new CarBizDriverInfo();
+            CarBizSupplier param = new CarBizSupplier();
+            param.setSupplierCity(Integer.valueOf(telescopeDriver.getDataCityIds().split(",")[0]));
+            CarBizCity carBizCity = carBizCityService.selectByPrimaryKey(Integer.valueOf(telescopeDriver.getDataCityIds().split(",")[0]));
+            CarBizSupplier carBizSupplier = carBizSupplierService.queryQianLiYanSupplierByCityId(param);
+            if(null == carBizSupplier){
+                carBizSupplier = new CarBizSupplier();
+                carBizSupplier.setSupplierCity(Integer.valueOf(telescopeDriver.getDataCityIds().split(",")[0]));
+                carBizSupplier.setSupplierNum("qianliyan");
+                carBizSupplier.setType(1);
+                carBizSupplier.setAddress("");
+                carBizSupplier.setContacts("于文超");
+                carBizSupplier.setContactsPhone("18611165319");
+                carBizSupplier.setCooperationType(5);
+                carBizSupplier.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
+                carBizSupplier.setCreateDate(new Date());
+                carBizSupplier.setEnterpriseType(2);
+                carBizSupplier.setIscommission(2);
+                carBizSupplier.setIstest(0);
+                carBizSupplier.setPospayflag(0);
+                carBizSupplier.setStatus(1);
+                carBizSupplier.setSupplierFullName("千里眼临时机构（"+carBizCity.getCityName()+")");
+                carBizSupplierMapper.insertSelective(carBizSupplier);
+                //MQ消息写入 供应商
+                try {
+                    String method = "CREATE";
+                    Map<String, Object> messageMap = new HashMap<String, Object>();
+                    messageMap.put("method",method);
+                    JSONObject json = JSONObject.fromObject(carBizSupplier);
+                    messageMap.put("data", json);
+                    String messageStr = JSONObject.fromObject(messageMap).toString();
+                    logger.info("专车供应商，同步发送数据：" + messageStr);
+                    CommonRocketProducer.publishMessage("vipSupplierTopic", method, String.valueOf(carBizSupplier.getSupplierId()), messageMap);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            carBizDriverInfo.setServiceCity(carBizSupplier.getSupplierCity());
+            carBizDriverInfo.setSupplierId(carBizSupplier.getSupplierId());
+            carBizDriverInfo.setCooperationType(Byte.valueOf(carBizSupplier.getCooperationType().toString()));
+            carBizDriverInfo.setPhone(telescopeDriver.getPhone());
+            carBizDriverInfo.setName(telescopeDriver.getName());
+            carBizDriverInfo.setStatus(1);
+            carBizDriverInfo.setPassword(Md5Util.md5(initPwd));
+            carBizDriverInfo.setGroupId(34);
+            carBizDriverInfo.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
+            carBizDriverInfo.setCreateDate(new Date());
+            carBizDriverInfo.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
+            carBizDriverInfo.setUpdateDate(new Date());
+            int insertResult = carBizDriverInfoMapper.insertSelective(carBizDriverInfo);
+            if(insertResult>0){
+                CarBizDriverInfoDTO driverInfoDTO = new CarBizDriverInfoDTO();
+                driverInfoDTO.setDriverId(carBizDriverInfo.getDriverId());
+                driverInfoDTO.setServiceCity(carBizSupplier.getSupplierCity());
+                driverInfoDTO.setSupplierId(carBizSupplier.getSupplierId());
+                driverInfoDTO.setPhone(telescopeDriver.getPhone());
+                driverInfoDTO.setName(telescopeDriver.getName());
+                driverInfoDTO.setStatus(1);
+                driverInfoDTO.setPassword(Md5Util.md5(initPwd));
+                driverInfoDTO.setCreateBy(WebSessionUtil.getCurrentLoginUser().getId());
+                driverInfoDTO.setCreateDate(new Date());
+                driverInfoDTO.setUpdateBy(WebSessionUtil.getCurrentLoginUser().getId());
+                driverInfoDTO.setUpdateDate(new Date());
+                driverInfoDTO.setCooperationType(carBizSupplier.getCooperationType());
+                driverInfoDTO.setGroupId(34);
+                // 更新mongoDB
+                DriverMongo driverMongo = driverMongoService.findByDriverId(carBizDriverInfo.getDriverId());
+                if (driverMongo != null) {
+                    driverMongoService.updateDriverMongo(driverInfoDTO);
+                } else {
+                    driverMongoService.saveDriverMongo(driverInfoDTO);
+                }
+                try {
+                    carBizChatUserService.insertChat(driverInfoDTO.getDriverId());
+                } catch (Exception e) {
+                    logger.error("开通千里眼账号carBizChatUserService.insertChat异常：",e);
+                }
+                if(result){
+                    try{
+                        //短信通知
+                        String text = telescopeDriver.getName() + "，您好！已为您成功开通“首汽约车司机端”千里眼管理账号。登录账号为："+telescopeDriver.getPhone()+"，初始密码为："+initPwd+"（为保障账户安全，请您登录后进行密码修改）";
+                        SmsSendUtil.send(telescopeDriver.getPhone() , text);
+                    }catch (Exception e){
+                        logger.error("开通千里眼账号短信通知异常：",e);
+                    }
+                }
+                return driverInfoDTO;
+            }
+
+        }else{
+            return carBizDriverInfoDTO;
+        }
+        return null;
+    }
+
 
     public void disableTelescopeDriver(CarAdmUser user){
         driverTelescopeUserExMapper.disableDriverTelescopeUser(user.getUserId());
