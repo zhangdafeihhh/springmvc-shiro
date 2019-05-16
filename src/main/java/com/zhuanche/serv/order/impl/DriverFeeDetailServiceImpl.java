@@ -87,7 +87,6 @@ public class DriverFeeDetailServiceImpl implements DriverFeeDetailService {
             }
             return result.getJSONObject(Constants.DATA).toJavaObject(OrderDriverCostDetailVO.class);
         }catch (Exception e){
-            logger.error("调用计费查询司机费用详情失败 orderNo = " + orderNo, e);
         }
         return null;
     }
