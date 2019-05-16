@@ -202,7 +202,8 @@ public class DriverIntegraController {
     @RequestFunction(menu = DRIVER_RANK_INTEGRAL_EXPORT)
     public String queryDriverIntegralListDataDown(DriverVoEntity driverEntity, HttpServletRequest request, HttpServletResponse response) {
         driverEntity.setPage(1);
-        driverEntity.setPagesize(50);//策略当期积分接口一次支持50
+        //策略当期积分接口一次支持50
+        driverEntity.setPagesize(50);
         logger.info("queryDriverIntegralListDataDown:下载司机积分数据列表,参数为："+(driverEntity==null?"null": JSON.toJSONString(driverEntity)));
         if(driverEntity.getCityId() == 0){
             return "请选择城市";
@@ -211,8 +212,8 @@ public class DriverIntegraController {
             return "请选择供应商";
         }
         try {
-            // 权限
-            SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
+            // 权限 获取当前登录用户信息
+            SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
             Set<Integer> citieSet = currentLoginUser.getCityIds();
             Set<Integer> supplierSet = currentLoginUser.getSupplierIds();
             Set<Integer> teamIdSet = currentLoginUser.getTeamIds();
@@ -254,8 +255,10 @@ public class DriverIntegraController {
             String driverIds = "";
 
             String fileName = "司机积分"+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
-            String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
-            if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
+            //获得浏览器信息并转换为大写
+            String agent = request.getHeader("User-Agent").toUpperCase();
+            //IE浏览器和Edge浏览器
+            if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {
                 fileName = URLEncoder.encode(fileName, "UTF-8");
             } else {  //其他浏览器
                 fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
