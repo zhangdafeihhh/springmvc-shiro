@@ -125,4 +125,13 @@
       and city_id = #{cityId}
       and status in (0,1)
   </select>
+  
+  <select id="queryFinancialGoodsByName" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from financial_goods
+    where goods_name = #{goodsName}
+      and status in (0,1)
+  </select>
+   
 </mapper>

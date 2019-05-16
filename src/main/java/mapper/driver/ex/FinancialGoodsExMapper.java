@@ -14,5 +14,7 @@ public interface FinancialGoodsExMapper {
 			@Param(value = "supplierIds")Set<Integer> supplierIds,@Param(value = "cityIds") Set<Integer> cityIds,@Param(value = "status") Byte status);
 
 	FinancialGoods queryFinancialGoodsForObject(@Param(value = "basicsVehiclesId")Integer basicsVehiclesId,@Param(value = "cityId")Integer cityId,@Param(value = "supplierId")Integer supplierId);
+
+	FinancialGoods queryFinancialGoodsByName(@Param(value = "goodsName")String goodsName);
    
 }

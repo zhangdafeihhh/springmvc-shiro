@@ -135,8 +135,9 @@ public class FinancialGoodsController {
 	public AjaxResponse saveFinancialGoods(@Validated(SeqAll.class)
 			FinancialGoodsParamDTO financialGoodsParamDTO
 			) {
-		FinancialGoods goods=financialGoodsExMapper.queryFinancialGoodsForObject(financialGoodsParamDTO.getBasicsVehiclesId(),financialGoodsParamDTO.getCityId(),financialGoodsParamDTO.getSupplierId());
-		
+		FinancialGoods goods=financialGoodsExMapper.queryFinancialGoodsByName(financialGoodsParamDTO.getGoodsName());
+/*		FinancialGoods goods=financialGoodsExMapper.queryFinancialGoodsForObject(financialGoodsParamDTO.getBasicsVehiclesId(),financialGoodsParamDTO.getCityId(),financialGoodsParamDTO.getSupplierId());
+		*/
 		if (goods!=null) {
 			return AjaxResponse.fail(RestErrorCode.GOODS_EXISTS);
 		}
@@ -164,8 +165,8 @@ public class FinancialGoodsController {
 		if (financialGoodsParamDTO.getGoodsId()==null||financialGoodsParamDTO.getGoodsId()==0) {
 			return AjaxResponse.fail(RestErrorCode.GOODSIDISNULL);
 		}
-		FinancialGoods goods=financialGoodsExMapper.queryFinancialGoodsForObject(financialGoodsParamDTO.getBasicsVehiclesId(),financialGoodsParamDTO.getCityId(),financialGoodsParamDTO.getSupplierId());
-
+		FinancialGoods goods=financialGoodsExMapper.queryFinancialGoodsByName(financialGoodsParamDTO.getGoodsName());
+/*		FinancialGoods goods=financialGoodsExMapper.queryFinancialGoodsForObject(financialGoodsParamDTO.getBasicsVehiclesId(),financialGoodsParamDTO.getCityId(),financialGoodsParamDTO.getSupplierId());*/
 		if (goods!=null && goods.getGoodsId().intValue()!= financialGoodsParamDTO.getGoodsId().intValue()) {
 			return AjaxResponse.fail(RestErrorCode.GOODS_EXISTS);
 		}

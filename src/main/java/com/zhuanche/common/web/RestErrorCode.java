@@ -246,7 +246,7 @@ public final class RestErrorCode{
 	@ResultMessage("车型车款已经存在")
 	public static final int BASICSVEHICLE_EXISTS=80004;
 	
-	@ResultMessage("同款车型商品已经存在")
+	@ResultMessage("商品已经存在")
 	public static final int GOODS_EXISTS=80005;
 	
 	@ResultMessage("很抱歉{0}车型车款已经停用！")
