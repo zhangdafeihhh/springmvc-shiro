@@ -8,10 +8,11 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.entity.busManage.BusOrderDetail;
 import com.zhuanche.entity.mdbcarmanage.CarBizSaasVersion;
 import com.zhuanche.entity.mdbcarmanage.CarBizSaasVersionDetail;
-import com.zhuanche.entity.rentcar.CarBizSupplierQuery;
+import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.mdbcarmanage.service.CarBizSaasVersionService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -40,9 +41,7 @@ import java.io.*;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author: nysspring@163.com
@@ -58,6 +57,9 @@ public class SaasVersionController {
     @Autowired
     private CarBizSaasVersionService carBizSaasVersionService;
 
+    @Autowired
+    private CarBizSupplierService carBizSupplierService;
+
 
     /**
      * 创建版本记录及上传附件接口
@@ -66,8 +68,6 @@ public class SaasVersionController {
      * @param versionDetail
      * @param cityIds
      * @param versionTakeEffectDate
-     * @param file
-     * @param request
      * @return
      */
     @RequestMapping(value = "/createVersionRecord",method = RequestMethod.POST)
@@ -78,16 +78,20 @@ public class SaasVersionController {
     public AjaxResponse createVersionRecord(String version,String versionSummary,String versionDetail,String cityIds,String versionTakeEffectDate){
 
         LOGGER.info("创建版本更细记录createVersionRecord入参:version={},versionSummary={},versionDetail={},cityIds={},versionTakeEffectDate={}",version,versionSummary,versionDetail,cityIds,versionTakeEffectDate);
-        if(StringUtils.isBlank(version) || StringUtils.isBlank(versionSummary)|| StringUtils.isBlank(versionDetail) || StringUtils.isBlank(cityIds) || versionTakeEffectDate == null){
+        if(StringUtils.isBlank(version) || StringUtils.isBlank(versionSummary)|| StringUtils.isBlank(versionDetail) || StringUtils.isBlank(cityIds) || StringUtils.isBlank(versionTakeEffectDate)){
             LOGGER.info("创建版本更新记录参数错误 version={}",version);
             return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
         }
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Date takeEffectDate = new Date();
+        Date takeEffectDate = null;
         try {
             takeEffectDate = sdf.parse(versionTakeEffectDate);
         } catch (ParseException e) {
             e.printStackTrace();
+            return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
+        }
+        if(takeEffectDate == null){
+            return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
         }
 
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
@@ -103,14 +107,32 @@ public class SaasVersionController {
         try {
             Boolean flag = carBizSaasVersionService.saveOrUpdateVersion(record);
             if (flag) {
-                //发送短信   根据城市id集合获取下属所有加盟商联系人  发送版本更新短信提醒
-//                String[] split = cityIds.split(",");
-//                LOGGER.info("发送短信");
-//                SmsSendUtil.send("18500410263", "【你好啊】，我是我是");
-//                CarBizSupplierQuery queryParam = new CarBizSupplierQuery();
-//                queryParam.setCityIds(cityIds);
+//                发送短信   根据城市id集合获取下属所有加盟商联系人  发送版本更新短信提醒
+                /**
+                 * 【首汽约车】（联系人姓）老板您好，首约加盟商服务平台刚于2019-05-06进行了V_1.7.0版本更新，本次更新主要包括：订单查询、司机查询等功能优化以及问题修复，访问版本记录可以查看完整更新说明，如有任何问题欢迎反馈。您的满意，我们的动力！
+                 */
+                String[] split = cityIds.split(Constants.SEPERATER);
+                List<Integer> list = new ArrayList<>();
+                for(int i = 0;i<split.length;i++){
+                    list.add(Integer.parseInt(split[i]));
+                }
+                LOGGER.info("发送短信list={}",list);
 
 
+                List<Map<String,String>> contactsList = carBizSupplierService.findContactsByCityIdList(list);
+                if(contactsList == null || contactsList.isEmpty()){
+                    LOGGER.info("当前城市id没有对应联系人cityidList={}",list);
+                    return AjaxResponse.success(null);
+                }
+                for (Map<String,String> map : contactsList){
+                    String contactName = map.get("contactName");
+                    String contactPhone = map.get("contactPhone");
+                    if(StringUtils.isNotBlank(contactName) && StringUtils.isNotBlank(contactPhone) && contactPhone.length() == 11){
+                        String smsContent = contactName +"老板您好，首约加盟商服务平台刚于"+ versionTakeEffectDate +"进行了"+ version +"版本更新，本次更新主要包括："+ versionSummary +"，访问版本记录可以查看完整更新说明，如有任何问题欢迎反馈。您的满意，我们的动力！";
+                        SmsSendUtil.send(contactPhone, smsContent);
+                        LOGGER.info("发送短信成功contactName={},contactPhone={}",contactName,contactPhone);
+                    }
+                }
 
             }
         }catch (Exception e){
@@ -128,10 +150,7 @@ public class SaasVersionController {
      * @param versionDetail
      * @param cityIds
      * @param versionTakeEffectDate
-     * @param file
-     * @param request
      * @param versionId
-     * @param detailIds
      * @return
      */
     @RequestMapping(value = "/editVersion",method = RequestMethod.POST)
@@ -139,14 +158,26 @@ public class SaasVersionController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
     })
-    public AjaxResponse editVersion(String version,String versionSummary,String versionDetail,String cityIds,Date versionTakeEffectDate,Integer versionId){
+    public AjaxResponse editVersion(String version,String versionSummary,String versionDetail,String cityIds,String versionTakeEffectDate,Integer versionId){
 
         LOGGER.info("创建版本更细记录createVersionRecord入参:version={},versionSummary={},versionDetail={},cityIds={}," +
                 "versionTakeEffectDate={},versionId={},detailIdList={}",version,versionSummary,versionDetail,cityIds,versionTakeEffectDate,versionId);
 
         if(StringUtils.isBlank(version) || StringUtils.isBlank(versionSummary)|| StringUtils.isBlank(versionDetail)
-                || StringUtils.isBlank(cityIds) || versionTakeEffectDate == null || versionId == null){
+                || StringUtils.isBlank(cityIds) || StringUtils.isBlank(versionTakeEffectDate) || versionId == null){
             LOGGER.info("更新版本更新记录参数错误 version={}",version);
+            return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date takeEffectDate = null;
+        try {
+            takeEffectDate = sdf.parse(versionTakeEffectDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
+        }
+        if(takeEffectDate == null){
             return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
         }
 
@@ -157,7 +188,7 @@ public class SaasVersionController {
         record.setVersion(version);
         record.setVersionSummary(versionSummary);
         record.setVersionDetail(versionDetail);
-        record.setVersionTakeEffectDate(versionTakeEffectDate);
+        record.setVersionTakeEffectDate(takeEffectDate);
         record.setCityId(cityIds);
         record.setCreateUserid(userId);
         record.setUpdateDate(new Date());
@@ -166,7 +197,7 @@ public class SaasVersionController {
             Boolean flag = carBizSaasVersionService.saveOrUpdateVersion(record);
             if (flag) {
                 //发送短信   根据城市id集合获取下属所有加盟商联系人  发送版本更新短信提醒
-                LOGGER.info("更新成功");
+                LOGGER.info("更新成功 versionId={}",versionId);
             }
         }catch (Exception e){
             LOGGER.error("创建版本记录异常 e={}",e);
