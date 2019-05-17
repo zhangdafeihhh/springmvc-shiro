@@ -318,33 +318,6 @@ public class SaasVersionController {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    @RequestMapping(value = "/deletetest",method = RequestMethod.POST)
-    @RequiresPermissions(value = {"SupplierTipsCreate"})
-    @ResponseBody
-    @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
-    })
-    public void delete(){
-
-
-
-
-    }
-
     @RequestMapping(value = "/uploadImg",method = RequestMethod.POST)
     @ResponseBody
     @MasterSlaveConfigs(configs = {
@@ -396,59 +369,6 @@ public class SaasVersionController {
         return JSON.toJSONString(resultMap);
     }
 
-
-
-
-
-
-
-
-
-    private Map<Object, Object> sendMessage(BusOrderDetail beforeBusOrder, BusOrderDetail afterBusOrder) {
-        Map<Object, Object> result = new HashMap<Object, Object>();
-        try {
-            // 预订上车时间
-            Date bookDate = beforeBusOrder.getBookingDate();
-            String bookingDate = DateUtils.formatDate(bookDate, DateUtil.LOCAL_FORMAT);
-
-            Date date = new Date();
-            long difference = bookDate.getTime() - date.getTime();
-            double subResult = difference * 1.0 / (1000 * 60 * 60);
-            if (subResult <= 24) {
-                // 预订人手机
-                String riderPhone = beforeBusOrder.getRiderPhone();
-                // 取消的司机手机号
-                String beforeDriverPhone = beforeBusOrder.getDriverPhone();
-                // 改派后司机姓名
-                String driverName = afterBusOrder.getDriverName();
-                // 改派后司机手机号
-                String afterDriverPhone = afterBusOrder.getDriverPhone();
-                // 改派后车牌号
-                String licensePlates = afterBusOrder.getLicensePlates();
-                // 预订上车地点
-                String bookingStartAddr = beforeBusOrder.getBookingStartAddr();
-                // 预订下车地点
-                String bookingEndAddr = beforeBusOrder.getBookingEndAddr();
-
-                String driverContext = "订单，" + bookingDate + "有乘客从" + bookingStartAddr + "到" + bookingEndAddr;
-                String beforeDriverContext = "尊敬的师傅您好，您的巴士指派" + driverContext + "，已被改派取消。";
-                String afterDriverContext = "尊敬的师傅您好，接到巴士服务" + driverContext + "，请您按时接送。";
-                String riderContext = "尊敬的用户您好，您预订的" + bookingDate + "的巴士服务订单已被改派成功，司机" + driverName + "，" + afterDriverPhone + "，车牌号" + licensePlates + "，将竭诚为您服务。";
-
-                // 乘客
-                SmsSendUtil.send(riderPhone, riderContext);
-                // 取消司机
-                SmsSendUtil.send(beforeDriverPhone, beforeDriverContext);
-                // 改派司机
-                SmsSendUtil.send(afterDriverPhone, afterDriverContext);
-            } else {
-                LOGGER.info("巴士改派司机-大于等于24小时，无需发送短信: orderNo = " + beforeBusOrder.getOrderNo() + ", bookingDate = " + bookingDate);
-            }
-        } catch (Exception e) {
-            LOGGER.error("巴士改派发送短信异常.", e);
-        }
-        return result;
-    }
 
     private String imgFileDir() {
         StringBuilder sb = new StringBuilder();
