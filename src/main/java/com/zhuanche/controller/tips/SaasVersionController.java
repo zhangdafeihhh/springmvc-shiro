@@ -312,7 +312,7 @@ public class SaasVersionController {
         //调用创建版本记录及附件接口
         try {
             String fileUrl = carBizSaasVersionService.uploadImg(file,request,imgFileDir());
-            String fileName = request.getScheme()+"://"+ request.getServerName()+"/saasVersion/getImg?fileName="+fileUrl;
+            String fileName = "https://"+ request.getServerName()+"/saasVersion/getImg.json?fileName="+fileUrl;
             return AjaxResponse.success(fileName);
         }catch (Exception e){
             LOGGER.error("上传的图片异常 e={}",e);
