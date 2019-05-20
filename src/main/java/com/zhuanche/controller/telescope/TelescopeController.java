@@ -3,6 +3,7 @@ package com.zhuanche.controller.telescope;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
+import com.zhuanche.common.enums.PermissionLevelEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.rocketmq.CommonRocketProducer;
 import com.zhuanche.common.sms.SmsSendUtil;
@@ -21,6 +22,7 @@ import com.zhuanche.serv.CarBizDriverInfoService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Md5Util;
 import com.zhuanche.vo.telescope.TelescopeUserVo;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,7 +97,7 @@ public class TelescopeController {
 	@RequestMapping("/addTelescopeUser")
 	@ResponseBody
     public AjaxResponse addTelescopeUser( Integer driverId, String name, String phone, String idCardNo, Integer cityId, Integer supplierId, Integer teamId, Integer teamGroupId ,
-										 String dataCityIds, String dataSupplierIds, String teamIds, String teamGrupIds ) throws Exception{
+										 String dataCityIds, String dataSupplierIds, String dataTeamIds, String dataGrupIds ) throws Exception{
 		if(null == driverId){
 			/**创建司机账号**/
 			TelescopeDriver telescopeDriver = new TelescopeDriver();
@@ -117,9 +119,20 @@ public class TelescopeController {
 		params.put("status",1);
 		params.put("dataCityIds",dataCityIds);
 		params.put("dataSupplierIds",dataSupplierIds);
-		params.put("teamIds",teamIds);
-		params.put("teamGrupIds",teamGrupIds);
+		params.put("dataTeamIds",dataTeamIds);
+		params.put("dataGrupIds",dataGrupIds);
 		params.put("createBy", WebSessionUtil.getCurrentLoginUser().getName());
+		if (StringUtils.isNotBlank(dataGrupIds)){
+			params.put("level",PermissionLevelEnum.GROUP.getCode());
+		}else if (StringUtils.isNotBlank(dataTeamIds)){
+			params.put("level",PermissionLevelEnum.TEAM.getCode());
+		}else if(StringUtils.isNotBlank(dataSupplierIds)){
+			params.put("level",PermissionLevelEnum.SUPPLIER.getCode());
+		}else if(StringUtils.isNotBlank(dataCityIds)){
+			params.put("level",PermissionLevelEnum.CITY.getCode());
+		}else {
+			params.put("level",PermissionLevelEnum.ALL.getCode());
+		}
 		JSONObject result = MpOkHttpUtil.okHttpPostBackJson(mpManageRestUrl + "/telescope/addTelescopeUser", params, 1, "新增千里眼权限用户");
 		logger.info("【新增千里眼权限用户】接口返回结果：{}",result.toJSONString());
 		if (result.getIntValue("code") != Constants.SUCCESS_CODE) {
