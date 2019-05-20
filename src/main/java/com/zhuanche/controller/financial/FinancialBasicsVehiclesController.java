@@ -107,15 +107,15 @@ public class FinancialBasicsVehiclesController {
 	@SysLogAnn(module="FinancialBasicsVehicles",methods="save",parameterType="Integer",parameterKey="basicsVehiclesId",objClass=FinancialBasicsVehiclesDTO.class )
 	public AjaxResponse saveFinancialBasicsVehicles(
 			@Verify(param = "vehiclesDetailedName", rule = "required")String vehiclesDetailedName,
-			@Verify(param = "brandId", rule = "required|min(1)")Long brandId,
-			@Verify(param = "modelId", rule = "required|min(1)")Long modelId,
+			@Verify(param = "brandId", rule = "required")Long brandId,
+			@Verify(param = "modelId", rule = "required")Long modelId,
 			@Verify(param = "vehicleStyle", rule = "required")String vehicleStyle,
 			@Verify(param = "yearStyle", rule = "required")String yearStyle,
 			@Verify(param = "energyType", rule = "required")Integer energyType,
 			@Verify(param = "variableBox", rule = "required")Integer variableBox,
 			@Verify(param = "guidancePrice", rule = "required")BigDecimal guidancePrice,
-			@Verify(param = "discharge", rule = "min(1)")Double discharge,
-			@Verify(param = "mileage", rule = "min(1)")Double mileage,
+			Double discharge,
+			Double mileage,
 			String autoHomeUrl,
 			@Verify(param = "lengthWidthHeight", rule = "required")String lengthWidthHeight,
 			@Verify(param = "qualityAssurance", rule = "required")String qualityAssurance,
@@ -125,7 +125,7 @@ public class FinancialBasicsVehiclesController {
 			Double fastChargingTime,
 			Double slowChargingTime,
 			Double fastPercentage
-			) throws Exception {
+			){
 		  logger.info("--请求FinancialBasicsVehiclesController--方法saveFinancialBasicsVehicles--参数:--vehiclesDetailedName--{},"
 		  		+ "--brandId--{},--modelId--{},--vehicleStyle--{},--yearStyle--{},"
 		  		+ "--energyType--{},--variableBox--{},--guidancePrice--{},--discharge--{},"
@@ -135,34 +135,39 @@ public class FinancialBasicsVehiclesController {
 		  		,energyType,variableBox,guidancePrice,discharge,mileage,autoHomeUrl,lengthWidthHeight,qualityAssurance,
 				 wheelbase,environmentalProtectionStandard,fastChargingTime,slowChargingTime,fastPercentage);
 		  
-		  FinancialBasicsVehicles basicsVehicles=financialBasicsVehiclesExMapper.queryFinancialBasicsVehiclesByName(vehiclesDetailedName);
-		  
-          if (basicsVehicles!=null) {
-        	  return AjaxResponse.fail(RestErrorCode.BASICSVEHICLE_EXISTS);
-		  }
-				  
-		  FinancialBasicsVehicles financialBasicsVehicles=new FinancialBasicsVehicles();
-		  financialBasicsVehicles.setVehiclesDetailedName(vehiclesDetailedName);
-		  financialBasicsVehicles.setBrandId(brandId);
-		  financialBasicsVehicles.setModelId(modelId);
-		  financialBasicsVehicles.setVehicleStyle(vehicleStyle);
-		  financialBasicsVehicles.setYearStyle(yearStyle);
-		  financialBasicsVehicles.setEnergyType(energyType);
-		  financialBasicsVehicles.setVariableBox(variableBox);
-		  financialBasicsVehicles.setGuidancePrice(guidancePrice);
-		  financialBasicsVehicles.setDischarge(discharge);
-		  financialBasicsVehicles.setMileage(mileage);
-		  financialBasicsVehicles.setAutoHomeUrl(autoHomeUrl);
-		  financialBasicsVehicles.setLengthWidthHeight(lengthWidthHeight);
-		  financialBasicsVehicles.setQualityAssurance(qualityAssurance);
-		  financialBasicsVehicles.setWheelbase(wheelbase);
-		  financialBasicsVehicles.setEnvironmentalProtectionStandard(environmentalProtectionStandard);
-		  financialBasicsVehicles.setFastChargingTime(fastChargingTime);
-		  financialBasicsVehicles.setSlowChargingTime(slowChargingTime);
-		  financialBasicsVehicles.setFastPercentage(fastPercentage);
-		  financialBasicsVehicles.setImgUrl(imgUrl);
-		  financialBasicsVehicles = financialBasicsVehiclesService.saveFinancialBasicsVehicles(financialBasicsVehicles);
-		  return AjaxResponse.success(financialBasicsVehicles);
+		  try {
+			FinancialBasicsVehicles basicsVehicles=financialBasicsVehiclesExMapper.queryFinancialBasicsVehiclesByName(vehiclesDetailedName);
+			  
+			  if (basicsVehicles!=null) {
+				  return AjaxResponse.fail(RestErrorCode.BASICSVEHICLE_EXISTS);
+			  }
+					  
+			  FinancialBasicsVehicles financialBasicsVehicles=new FinancialBasicsVehicles();
+			  financialBasicsVehicles.setVehiclesDetailedName(vehiclesDetailedName);
+			  financialBasicsVehicles.setBrandId(brandId);
+			  financialBasicsVehicles.setModelId(modelId);
+			  financialBasicsVehicles.setVehicleStyle(vehicleStyle);
+			  financialBasicsVehicles.setYearStyle(yearStyle);
+			  financialBasicsVehicles.setEnergyType(energyType);
+			  financialBasicsVehicles.setVariableBox(variableBox);
+			  financialBasicsVehicles.setGuidancePrice(guidancePrice);
+			  financialBasicsVehicles.setDischarge(discharge);
+			  financialBasicsVehicles.setMileage(mileage);
+			  financialBasicsVehicles.setAutoHomeUrl(autoHomeUrl);
+			  financialBasicsVehicles.setLengthWidthHeight(lengthWidthHeight);
+			  financialBasicsVehicles.setQualityAssurance(qualityAssurance);
+			  financialBasicsVehicles.setWheelbase(wheelbase);
+			  financialBasicsVehicles.setEnvironmentalProtectionStandard(environmentalProtectionStandard);
+			  financialBasicsVehicles.setFastChargingTime(fastChargingTime);
+			  financialBasicsVehicles.setSlowChargingTime(slowChargingTime);
+			  financialBasicsVehicles.setFastPercentage(fastPercentage);
+			  financialBasicsVehicles.setImgUrl(imgUrl);
+			  financialBasicsVehicles = financialBasicsVehiclesService.saveFinancialBasicsVehicles(financialBasicsVehicles);
+			  return AjaxResponse.success(financialBasicsVehicles);
+		} catch (Exception e) {
+			e.printStackTrace();  
+		}
+		return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 	}
 	
 	/**
