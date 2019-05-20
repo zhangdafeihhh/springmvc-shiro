@@ -159,15 +159,14 @@ public class CarBizSaasVersionServiceImpl implements CarBizSaasVersionService{
         return pageDTO;
     }
 
-    @Transactional
     @Override
     public Boolean deleteVersion(Integer versionId) {
         //删除主表
         int i = carBizSaasVersionExMapper.deleteByPrimaryKey(versionId);
         LOGGER.info("删除Version记录  id={}",versionId);
         //删除附件表  不一定有附件  所以j可以为0
-        int j = carBizSaasVersionDetailExMapper.deleteByVersionId(versionId);
-        LOGGER.info("删除version记录及附件表信息i={},j={}",i,j);
+//        int j = carBizSaasVersionDetailExMapper.deleteByVersionId(versionId);
+//        LOGGER.info("删除version记录及附件表信息i={},j={}",i,j);
         return Boolean.TRUE;
     }
 
@@ -198,6 +197,54 @@ public class CarBizSaasVersionServiceImpl implements CarBizSaasVersionService{
     @Override
     public CarBizSaasVersionDetail selectDetailById(Integer detailId) {
         return carBizSaasVersionDetailExMapper.selectByPrimaryKey(detailId);
+    }
+
+    @Override
+    public String uploadImg(MultipartFile file, HttpServletRequest request,String rootPath) {
+        LOGGER.info("********保存版本记录上传图片开始*********");
+        MultipartHttpServletRequest req = (MultipartHttpServletRequest) request;
+        //文件上传
+        Map<String, Object> mapResult = fileUploadVersion(file,rootPath);
+        LOGGER.info("***********上传版本记录附件结束***********");
+        Boolean ok = (Boolean) mapResult.get("ok");
+        if (ok == null || !ok) {
+            LOGGER.error("上传图片错误");
+            return null;
+        } else {
+            //上传成功后落库相关数据
+            String fileUrl = mapResult.get("fileName").toString();
+            return fileUrl;
+        }
+    }
+
+    @Override
+    public Boolean saveOrUpdateVersion(CarBizSaasVersion record) {
+        Boolean isUpdate = Boolean.FALSE;
+        if(record.getId() != null){
+            isUpdate = Boolean.TRUE;
+        }
+        LOGGER.info("新建或更新版本记录及附件  record={},isUpdate={}",JSON.toJSONString(record),isUpdate);
+        try {
+            if (!isUpdate) {
+                //新建
+                int i = carBizSaasVersionExMapper.insertSelective(record);
+                LOGGER.info("版本记录新增成功 record={},i={}", JSON.toJSONString(record), i);
+            } else {
+                //更新
+                int i = carBizSaasVersionExMapper.updateByPrimaryKeySelective(record);
+                LOGGER.info("版本记录更新成功 record={},i={}", JSON.toJSONString(record), i);
+            }
+        }catch (Exception e){
+            LOGGER.error("版本记录新建或更新时操作数据库异常 e={}",e);
+            throw new ServiceException(ExceptionCode.DB_OPTION_ERROR.getIndex(),ExceptionCode.DB_OPTION_ERROR.getErrMsg());
+        }
+
+        return true;
+    }
+
+    @Override
+    public CarBizSaasVersion selectVersionById(Integer versionId) {
+        return carBizSaasVersionExMapper.selectByPrimaryKey(versionId);
     }
 
 
@@ -251,6 +298,46 @@ public class CarBizSaasVersionServiceImpl implements CarBizSaasVersionService{
                 .append(File.separator);
         return sb.toString();
     }
+
+
+    /**
+     * 文件服务器上传
+     * @param file
+     * @return
+     */
+    public Map<String,Object> fileUploadVersion(MultipartFile file,String rootPath){
+        Map<String,Object> map = new HashMap<>();
+        if (!file.isEmpty()) {
+            try {
+                String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+                String uuid = UUID.randomUUID().toString();
+                String timeStamp = System.currentTimeMillis() + "";
+                // 文件存放服务端的位置
+                File filePath = new File(rootPath);
+
+                LOGGER.info("文件路径:" +rootPath);
+                if (!filePath.exists())
+                    filePath.mkdirs();
+                // 写文件到服务器
+                String  absoluteUrl = rootPath + uuid + "_" + timeStamp + "." + extension;
+                String newFileName = uuid + "_" + timeStamp + "." + extension;
+                File serverFile = new File(absoluteUrl);
+                file.transferTo(serverFile);
+                LOGGER.info("消息附件上传地址：" + absoluteUrl);
+                map.put("ok",true);
+                map.put("fileUrl",absoluteUrl);
+                map.put("fileName",newFileName);
+            } catch (Exception e) {
+                LOGGER.info("文件上传失败");
+            }
+        } else {
+            LOGGER.info("文件上传失败");
+        }
+        return map;
+    }
+
+
+
 
 
 

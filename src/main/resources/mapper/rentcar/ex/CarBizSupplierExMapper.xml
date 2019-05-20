@@ -509,4 +509,28 @@
         </if>
         order by supplier_city , supplier_id
     </select>
+
+    <!--查询城市对应的所有供应商联系人姓名和电话-->
+    <select id="findContactsByCityIdList" resultType="java.util.Map" >
+        select
+        t.contacts AS contactName,
+        t.contacts_phone AS contactPhone
+        from car_biz_supplier t
+        <where>
+            <if test="list != null and list.size()>0">
+                supplier_city IN
+                <foreach collection="list" open="(" close=")" separator="," item="cid" >
+                    #{cid}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+
+
+
+
+
+
+
 </mapper>

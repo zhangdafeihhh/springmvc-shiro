@@ -202,7 +202,8 @@ public class DriverIntegraController {
     @RequestFunction(menu = DRIVER_RANK_INTEGRAL_EXPORT)
     public String queryDriverIntegralListDataDown(DriverVoEntity driverEntity, HttpServletRequest request, HttpServletResponse response) {
         driverEntity.setPage(1);
-        driverEntity.setPagesize(50);//策略当期积分接口一次支持50
+        //策略当期积分接口一次支持50
+        driverEntity.setPagesize(50);
         logger.info("queryDriverIntegralListDataDown:下载司机积分数据列表,参数为："+(driverEntity==null?"null": JSON.toJSONString(driverEntity)));
         if(driverEntity.getCityId() == 0){
             return "请选择城市";
@@ -211,8 +212,8 @@ public class DriverIntegraController {
             return "请选择供应商";
         }
         try {
-            // 权限
-            SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
+            // 权限 获取当前登录用户信息
+            SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
             Set<Integer> citieSet = currentLoginUser.getCityIds();
             Set<Integer> supplierSet = currentLoginUser.getSupplierIds();
             Set<Integer> teamIdSet = currentLoginUser.getTeamIds();
@@ -254,8 +255,10 @@ public class DriverIntegraController {
             String driverIds = "";
 
             String fileName = "司机积分"+ com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
-            String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
-            if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
+            //获得浏览器信息并转换为大写
+            String agent = request.getHeader("User-Agent").toUpperCase();
+            //IE浏览器和Edge浏览器
+            if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {
                 fileName = URLEncoder.encode(fileName, "UTF-8");
             } else {  //其他浏览器
                 fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
@@ -377,9 +380,12 @@ public class DriverIntegraController {
                 if (null != driverIntegralDtoMap){
                     dto = driverIntegralDtoMap.get(driverVoEntity.getDriverId());
                     if (null != dto){
-                        driverVoEntity.setMonthIntegral(dto.getCurrentCycleIntegral());//设置司机当月积分
-                        driverVoEntity.setDayIntegral(dto.getCurrentDayIntegral());//设置司机当日积分
-                        driverVoEntity.setCalcuateCycle(dto.getCalcuateCycle());//设置等级计算周期
+                        //设置司机当月积分
+                        driverVoEntity.setMonthIntegral(dto.getCurrentCycleIntegral());
+                        //设置司机当日积分
+                        driverVoEntity.setDayIntegral(dto.getCurrentDayIntegral());
+                        //设置等级计算周期
+                        driverVoEntity.setCalcuateCycle(dto.getCalcuateCycle());
                     }
                 }
                 driverId = driverVoEntity.getDriverId() ;
@@ -405,18 +411,22 @@ public class DriverIntegraController {
      * @return
      */
     private Map<String, DriverIntegralDto> getDriverIntegralInfoListNew(List driverIds) {
-        if (null == driverIds || driverIds.size() == 0)
+        if (null == driverIds || driverIds.size() == 0) {
             return null;
+        }
         String driverInfo = new RPCAPI().requestWithRetry(RPCAPI.HttpMethod.GET, String.format(DRIVER_INTEGRAL + "/integral/currentIntegralScore?driverIds=%s", String.join(",", driverIds)), null, null, "UTF-8");
-        if (StringUtils.isBlank(driverInfo) || driverInfo.equals("true\r\n"))
+        if (StringUtils.isBlank(driverInfo) || driverInfo.equals("true\r\n")) {
             return null;
+        }
         RPCResponse orderResponse = RPCResponse.parse(driverInfo);
-        if (null == orderResponse || orderResponse.getCode() != 0 || orderResponse.getData() == null)
+        if (null == orderResponse || orderResponse.getCode() != 0 || orderResponse.getData() == null) {
             return null;
+        }
         List<DriverIntegralDto> list = JSON.parseArray(JSON.toJSONString(orderResponse.getData()), DriverIntegralDto.class);
         Map<String, DriverIntegralDto> map = null;
-        if (null != list)
+        if (null != list) {
             map = list.stream().collect(Collectors.toMap(DriverIntegralDto::getDriverId, a -> a, (k1, k2) -> k1));
+        }
         return map;
     }
 
@@ -424,12 +434,9 @@ public class DriverIntegraController {
         if(null == list){
             return;
         }
-//        int index  = 0;
+
         for(DriverVoEntity rowEntity:list){
             StringBuffer stringBuffer = new StringBuffer();
-//            index++;
-//            stringBuffer.append(index);
-//            stringBuffer.append(",");
 
             stringBuffer.append(rowEntity.getServiceCity()==null?"":rowEntity.getServiceCity());
             stringBuffer.append(",");

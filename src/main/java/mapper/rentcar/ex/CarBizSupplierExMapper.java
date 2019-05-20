@@ -49,4 +49,5 @@ public interface CarBizSupplierExMapper{
 	/**查询供应商**/
 	List<CarBizSupplier> querySupplierName( @Param("cityIds") Set<Integer> cityIds);
 
+	List<Map<String,String>> findContactsByCityIdList(List<Integer> list);
 }

@@ -551,6 +551,11 @@ public class CarBizSupplierService{
 		return extDto;
 	}
 
+	public List<Map<String, String>> findContactsByCityIdList(List<Integer> list) {
+		return carBizSupplierExMapper.findContactsByCityIdList(list);
+	}
+
+
 	class SupplierTasker implements Runnable{
 
 		private Integer supplierId;
