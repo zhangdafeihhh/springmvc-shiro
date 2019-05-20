@@ -127,7 +127,7 @@ public class SaasVersionController {
                     String contactPhone = map.get("contactPhone");
                     if(StringUtils.isNotBlank(contactName) && StringUtils.isNotBlank(contactPhone) && contactPhone.length() == 11){
                         String smsContent = contactName +"老板您好，首约加盟商服务平台刚于"+ versionTakeEffectDate +"进行了"+ version +"版本更新，本次更新主要包括："+ versionSummary +"，访问版本记录可以查看完整更新说明，如有任何问题欢迎反馈。您的满意，我们的动力！";
-                        SmsSendUtil.send(contactPhone, smsContent);
+//                        SmsSendUtil.send(contactPhone, smsContent);
                         LOGGER.info("发送短信成功contactName={},contactPhone={}",contactName,contactPhone);
                     }
                 }
