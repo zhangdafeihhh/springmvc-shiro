@@ -103,6 +103,8 @@ public class TelescopeController {
 			/**创建司机账号**/
 			TelescopeDriver telescopeDriver = new TelescopeDriver();
 			telescopeDriver.setPhone(phone);
+			telescopeDriver.setName(name);
+			telescopeDriver.setDataCityIds(dataCityIds);
 			CarBizDriverInfoDTO carBizDriverInfoDTO = carBizDriverInfoService.addTelescopeDriver(telescopeDriver);
 			if(null == carBizDriverInfoDTO){
 				return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
