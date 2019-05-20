@@ -9,15 +9,12 @@ import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
-import com.zhuanche.entity.busManage.BusOrderDetail;
 import com.zhuanche.entity.mdbcarmanage.CarBizSaasVersion;
 import com.zhuanche.entity.mdbcarmanage.CarBizSaasVersionDetail;
 import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.mdbcarmanage.service.CarBizSaasVersionService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.DateUtil;
-import com.zhuanche.util.DateUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -71,6 +68,7 @@ public class SaasVersionController {
      * @return
      */
     @RequestMapping(value = "/createVersionRecord",method = RequestMethod.POST)
+    @RequiresPermissions(value = {"VersionUpdateRecordCreate"})
     @ResponseBody
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
@@ -154,6 +152,7 @@ public class SaasVersionController {
      * @return
      */
     @RequestMapping(value = "/editVersion",method = RequestMethod.POST)
+    @RequiresPermissions(value = {"VersionUpdateRecordEdit"})
     @ResponseBody
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
@@ -296,6 +295,7 @@ public class SaasVersionController {
      * @return
      */
     @RequestMapping(value = "/deleteVersion",method = RequestMethod.POST)
+    @RequiresPermissions(value = {"VersionUpdateRecordDelete"})
     @ResponseBody
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
