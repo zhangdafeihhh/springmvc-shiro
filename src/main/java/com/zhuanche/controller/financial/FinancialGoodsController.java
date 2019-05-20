@@ -137,7 +137,7 @@ public class FinancialGoodsController {
 			FinancialGoodsParamDTO financialGoodsParamDTO
 			){
 		try {
-			FinancialGoods goods=financialGoodsExMapper.queryFinancialGoodsByName(financialGoodsParamDTO.getGoodsName());
+			FinancialGoods goods=financialGoodsExMapper.queryFinancialGoodsByName(financialGoodsParamDTO.getGoodsName().trim());
 /*		FinancialGoods goods=financialGoodsExMapper.queryFinancialGoodsForObject(financialGoodsParamDTO.getBasicsVehiclesId(),financialGoodsParamDTO.getCityId(),financialGoodsParamDTO.getSupplierId());
 			*/
 			if (goods!=null) {
@@ -173,7 +173,7 @@ public class FinancialGoodsController {
 			return AjaxResponse.fail(RestErrorCode.GOODSIDISNULL);
 		}
 		try {
-			FinancialGoods goods=financialGoodsExMapper.queryFinancialGoodsByName(financialGoodsParamDTO.getGoodsName());
+			FinancialGoods goods=financialGoodsExMapper.queryFinancialGoodsByName(financialGoodsParamDTO.getGoodsName().trim());
 /*		FinancialGoods goods=financialGoodsExMapper.queryFinancialGoodsForObject(financialGoodsParamDTO.getBasicsVehiclesId(),financialGoodsParamDTO.getCityId(),financialGoodsParamDTO.getSupplierId());*/
 			if (goods!=null && goods.getGoodsId().intValue()!= financialGoodsParamDTO.getGoodsId().intValue()) {
 				return AjaxResponse.fail(RestErrorCode.GOODS_EXISTS);

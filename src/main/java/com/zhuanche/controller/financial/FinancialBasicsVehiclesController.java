@@ -136,7 +136,7 @@ public class FinancialBasicsVehiclesController {
 				 wheelbase,environmentalProtectionStandard,fastChargingTime,slowChargingTime,fastPercentage);
 		  
 		  try {
-			FinancialBasicsVehicles basicsVehicles=financialBasicsVehiclesExMapper.queryFinancialBasicsVehiclesByName(vehiclesDetailedName);
+			FinancialBasicsVehicles basicsVehicles=financialBasicsVehiclesExMapper.queryFinancialBasicsVehiclesByName(vehiclesDetailedName.trim());
 			  
 			  if (basicsVehicles!=null) {
 				  return AjaxResponse.fail(RestErrorCode.BASICSVEHICLE_EXISTS);
@@ -253,7 +253,7 @@ public class FinancialBasicsVehiclesController {
 			  		,energyType,variableBox,guidancePrice,discharge,mileage,autoHomeUrl,lengthWidthHeight,qualityAssurance,
 					 wheelbase,environmentalProtectionStandard,fastChargingTime,slowChargingTime,fastPercentage);
 		  try {
-			FinancialBasicsVehicles basicsVehicles=financialBasicsVehiclesExMapper.queryFinancialBasicsVehiclesByName(vehiclesDetailedName);
+			FinancialBasicsVehicles basicsVehicles=financialBasicsVehiclesExMapper.queryFinancialBasicsVehiclesByName(vehiclesDetailedName.trim());
 			  
 			  if (basicsVehicles!=null && basicsVehicles.getBasicsVehiclesId().intValue()!=basicsVehiclesId.intValue()) {
 				  return AjaxResponse.fail(RestErrorCode.BASICSVEHICLE_EXISTS);
