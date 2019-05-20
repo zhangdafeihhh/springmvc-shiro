@@ -98,6 +98,7 @@ public class TelescopeController {
 	@ResponseBody
     public AjaxResponse addTelescopeUser( Integer driverId, String name, String phone, String idCardNo, Integer cityId, Integer supplierId, Integer teamId, Integer teamGroupId ,
 										 String dataCityIds, String dataSupplierIds, String dataTeamIds, String dataGrupIds ) throws Exception{
+		Map<String, Object> params = new HashMap<String, Object>();
 		if(null == driverId){
 			/**创建司机账号**/
 			TelescopeDriver telescopeDriver = new TelescopeDriver();
@@ -106,14 +107,16 @@ public class TelescopeController {
 			if(null == carBizDriverInfoDTO){
 				return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 			}
+			params.put("cityId",carBizDriverInfoDTO.getServiceCity());
+			params.put("supplierId",carBizDriverInfoDTO.getSupplierId());
+		}else{
+			params.put("cityId",cityId);
+			params.put("supplierId",supplierId);
 		}
-		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("driverId",driverId);
 		params.put("driverStatus",1);
 		params.put("name",name);
 		params.put("phone",phone);
-		params.put("cityId",cityId);
-		params.put("supplierId",supplierId);
 		params.put("teamId",teamId);
 		params.put("groupId",teamGroupId);
 		params.put("status",1);
