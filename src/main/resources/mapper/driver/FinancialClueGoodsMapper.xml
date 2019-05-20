@@ -19,15 +19,15 @@
     <result column="energy_type" property="energyType" jdbcType="INTEGER" />
     <result column="variable_box" property="variableBox" jdbcType="INTEGER" />
     <result column="guidance_price" property="guidancePrice" jdbcType="DECIMAL" />
-    <result column="discharge" property="discharge" jdbcType="INTEGER" />
+    <result column="discharge" property="discharge" jdbcType="DOUBLE" />
     <result column="mileage" property="mileage" jdbcType="INTEGER" />
     <result column="auto_home_url" property="autoHomeUrl" jdbcType="VARCHAR" />
     <result column="length_width_height" property="lengthWidthHeight" jdbcType="VARCHAR" />
     <result column="quality_assurance" property="qualityAssurance" jdbcType="VARCHAR" />
     <result column="wheelbase" property="wheelbase" jdbcType="INTEGER" />
     <result column="environmental_protection_standard" property="environmentalProtectionStandard" jdbcType="VARCHAR" />
-    <result column="fast_charging_time" property="fastChargingTime" jdbcType="INTEGER" />
-    <result column="slow_charging_time" property="slowChargingTime" jdbcType="INTEGER" />
+    <result column="fast_charging_time" property="fastChargingTime" jdbcType="DOUBLE" />
+    <result column="slow_charging_time" property="slowChargingTime" jdbcType="DOUBLE" />
     <result column="fast_percentage" property="fastPercentage" jdbcType="DOUBLE" />
     <result column="sales_target" property="salesTarget" jdbcType="TINYINT" />
     <result column="goods_number" property="goodsNumber" jdbcType="VARCHAR" />
@@ -89,10 +89,10 @@
       #{totalPrice,jdbcType=DECIMAL}, #{basicsVehiclesId,jdbcType=INTEGER}, #{vehiclesDetailedName,jdbcType=VARCHAR}, 
       #{brandId,jdbcType=INTEGER}, #{modelId,jdbcType=INTEGER}, #{vehicleStyle,jdbcType=VARCHAR}, 
       #{yearStyle,jdbcType=VARCHAR}, #{energyType,jdbcType=INTEGER}, #{variableBox,jdbcType=INTEGER}, 
-      #{guidancePrice,jdbcType=DECIMAL}, #{discharge,jdbcType=INTEGER}, #{mileage,jdbcType=INTEGER}, 
+      #{guidancePrice,jdbcType=DECIMAL}, #{discharge,jdbcType=DOUBLE}, #{mileage,jdbcType=INTEGER}, 
       #{autoHomeUrl,jdbcType=VARCHAR}, #{lengthWidthHeight,jdbcType=VARCHAR}, #{qualityAssurance,jdbcType=VARCHAR}, 
       #{wheelbase,jdbcType=INTEGER}, #{environmentalProtectionStandard,jdbcType=VARCHAR}, 
-      #{fastChargingTime,jdbcType=INTEGER}, #{slowChargingTime,jdbcType=INTEGER}, #{fastPercentage,jdbcType=DOUBLE}, 
+      #{fastChargingTime,jdbcType=DOUBLE}, #{slowChargingTime,jdbcType=DOUBLE}, #{fastPercentage,jdbcType=DOUBLE}, 
       #{salesTarget,jdbcType=TINYINT}, #{goodsNumber,jdbcType=VARCHAR}, #{goodsName,jdbcType=VARCHAR}, 
       #{goodsType,jdbcType=TINYINT}, #{channel,jdbcType=VARCHAR}, #{keyword,jdbcType=VARCHAR}, 
       #{vehicleAge,jdbcType=INTEGER}, #{vehicleProperties,jdbcType=INTEGER}, #{color,jdbcType=VARCHAR}, 
@@ -280,7 +280,7 @@
         #{guidancePrice,jdbcType=DECIMAL},
       </if>
       <if test="discharge != null" >
-        #{discharge,jdbcType=INTEGER},
+        #{discharge,jdbcType=DOUBLE},
       </if>
       <if test="mileage != null" >
         #{mileage,jdbcType=INTEGER},
@@ -301,10 +301,10 @@
         #{environmentalProtectionStandard,jdbcType=VARCHAR},
       </if>
       <if test="fastChargingTime != null" >
-        #{fastChargingTime,jdbcType=INTEGER},
+        #{fastChargingTime,jdbcType=DOUBLE},
       </if>
       <if test="slowChargingTime != null" >
-        #{slowChargingTime,jdbcType=INTEGER},
+        #{slowChargingTime,jdbcType=DOUBLE},
       </if>
       <if test="fastPercentage != null" >
         #{fastPercentage,jdbcType=DOUBLE},
@@ -408,7 +408,7 @@
         guidance_price = #{guidancePrice,jdbcType=DECIMAL},
       </if>
       <if test="discharge != null" >
-        discharge = #{discharge,jdbcType=INTEGER},
+        discharge = #{discharge,jdbcType=DOUBLE},
       </if>
       <if test="mileage != null" >
         mileage = #{mileage,jdbcType=INTEGER},
@@ -429,10 +429,10 @@
         environmental_protection_standard = #{environmentalProtectionStandard,jdbcType=VARCHAR},
       </if>
       <if test="fastChargingTime != null" >
-        fast_charging_time = #{fastChargingTime,jdbcType=INTEGER},
+        fast_charging_time = #{fastChargingTime,jdbcType=DOUBLE},
       </if>
       <if test="slowChargingTime != null" >
-        slow_charging_time = #{slowChargingTime,jdbcType=INTEGER},
+        slow_charging_time = #{slowChargingTime,jdbcType=DOUBLE},
       </if>
       <if test="fastPercentage != null" >
         fast_percentage = #{fastPercentage,jdbcType=DOUBLE},
@@ -503,15 +503,15 @@
       energy_type = #{energyType,jdbcType=INTEGER},
       variable_box = #{variableBox,jdbcType=INTEGER},
       guidance_price = #{guidancePrice,jdbcType=DECIMAL},
-      discharge = #{discharge,jdbcType=INTEGER},
+      discharge = #{discharge,jdbcType=DOUBLE},
       mileage = #{mileage,jdbcType=INTEGER},
       auto_home_url = #{autoHomeUrl,jdbcType=VARCHAR},
       length_width_height = #{lengthWidthHeight,jdbcType=VARCHAR},
       quality_assurance = #{qualityAssurance,jdbcType=VARCHAR},
       wheelbase = #{wheelbase,jdbcType=INTEGER},
       environmental_protection_standard = #{environmentalProtectionStandard,jdbcType=VARCHAR},
-      fast_charging_time = #{fastChargingTime,jdbcType=INTEGER},
-      slow_charging_time = #{slowChargingTime,jdbcType=INTEGER},
+      fast_charging_time = #{fastChargingTime,jdbcType=DOUBLE},
+      slow_charging_time = #{slowChargingTime,jdbcType=DOUBLE},
       fast_percentage = #{fastPercentage,jdbcType=DOUBLE},
       sales_target = #{salesTarget,jdbcType=TINYINT},
       goods_number = #{goodsNumber,jdbcType=VARCHAR},

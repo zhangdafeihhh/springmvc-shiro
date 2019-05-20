@@ -114,16 +114,16 @@ public class FinancialBasicsVehiclesController {
 			@Verify(param = "energyType", rule = "required")Integer energyType,
 			@Verify(param = "variableBox", rule = "required")Integer variableBox,
 			@Verify(param = "guidancePrice", rule = "required")BigDecimal guidancePrice,
-			@Verify(param = "discharge", rule = "min(1)")Integer discharge,
-			@Verify(param = "mileage", rule = "min(1)")Integer mileage,
+			@Verify(param = "discharge", rule = "min(1)")Double discharge,
+			@Verify(param = "mileage", rule = "min(1)")Double mileage,
 			String autoHomeUrl,
 			@Verify(param = "lengthWidthHeight", rule = "required")String lengthWidthHeight,
 			@Verify(param = "qualityAssurance", rule = "required")String qualityAssurance,
 			@Verify(param = "wheelbase", rule = "required")Integer wheelbase,
 			String environmentalProtectionStandard,
 			@Verify(param = "imgUrl", rule = "required") String imgUrl,
-			Integer fastChargingTime,
-			Integer slowChargingTime,
+			Double fastChargingTime,
+			Double slowChargingTime,
 			Double fastPercentage
 			) throws Exception {
 		  logger.info("--请求FinancialBasicsVehiclesController--方法saveFinancialBasicsVehicles--参数:--vehiclesDetailedName--{},"
@@ -227,16 +227,16 @@ public class FinancialBasicsVehiclesController {
 			@Verify(param = "energyType", rule = "required")Integer energyType,
 			@Verify(param = "variableBox", rule = "required")Integer variableBox,
 			@Verify(param = "guidancePrice", rule = "required")BigDecimal guidancePrice,
-			@Verify(param = "discharge", rule = "min(1)")Integer discharge,
-			@Verify(param = "mileage", rule = "min(1)")Integer mileage,
+			@Verify(param = "discharge", rule = "min(1)")Double discharge,
+			@Verify(param = "mileage", rule = "min(1)")Double mileage,
 			String autoHomeUrl,
 			@Verify(param = "lengthWidthHeight", rule = "required")String lengthWidthHeight,
 			@Verify(param = "qualityAssurance", rule = "required")String qualityAssurance,
 			@Verify(param = "wheelbase", rule = "required")Integer wheelbase,
 			@Verify(param = "imgUrl", rule = "required") String imgUrl,
 			String environmentalProtectionStandard,
-			Integer fastChargingTime,
-			Integer slowChargingTime,
+			Double fastChargingTime,
+			Double slowChargingTime,
 			Double fastPercentage
 			){
 		  logger.info("--请求FinancialBasicsVehiclesController--方法updateFinancialBasicsVehicles--参数:--basicsVehiclesId--{},--vehiclesDetailedName--{},"

@@ -22,9 +22,9 @@ public class FinancialBasicsVehicles {
 
     private BigDecimal guidancePrice;
 
-    private Integer discharge;
+    private Double discharge;
 
-    private Integer mileage;
+    private Double mileage;
 
     private String autoHomeUrl;
 
@@ -36,9 +36,9 @@ public class FinancialBasicsVehicles {
 
     private String environmentalProtectionStandard;
 
-    private Integer fastChargingTime;
+    private Double fastChargingTime;
 
-    private Integer slowChargingTime;
+    private Double slowChargingTime;
 
     private String imgUrl;
 
@@ -126,19 +126,19 @@ public class FinancialBasicsVehicles {
         this.guidancePrice = guidancePrice;
     }
 
-    public Integer getDischarge() {
+    public Double getDischarge() {
         return discharge;
     }
 
-    public void setDischarge(Integer discharge) {
+    public void setDischarge(Double discharge) {
         this.discharge = discharge;
     }
 
-    public Integer getMileage() {
+    public Double getMileage() {
         return mileage;
     }
 
-    public void setMileage(Integer mileage) {
+    public void setMileage(Double mileage) {
         this.mileage = mileage;
     }
 
@@ -182,19 +182,19 @@ public class FinancialBasicsVehicles {
         this.environmentalProtectionStandard = environmentalProtectionStandard == null ? null : environmentalProtectionStandard.trim();
     }
 
-    public Integer getFastChargingTime() {
+    public Double getFastChargingTime() {
         return fastChargingTime;
     }
 
-    public void setFastChargingTime(Integer fastChargingTime) {
+    public void setFastChargingTime(Double fastChargingTime) {
         this.fastChargingTime = fastChargingTime;
     }
 
-    public Integer getSlowChargingTime() {
+    public Double getSlowChargingTime() {
         return slowChargingTime;
     }
 
-    public void setSlowChargingTime(Integer slowChargingTime) {
+    public void setSlowChargingTime(Double slowChargingTime) {
         this.slowChargingTime = slowChargingTime;
     }
 

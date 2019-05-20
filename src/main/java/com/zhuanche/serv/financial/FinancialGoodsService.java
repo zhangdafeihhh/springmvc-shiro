@@ -211,7 +211,9 @@ public class FinancialGoodsService {
 			
 			int dfgc=financialGoodsClauseExMapper.deleteFinancialGoodsClause(financialGoods.getGoodsId());
 			
-			int dfac=financialAdditionalClauseExMapper.deleteByPrimaryKeyS(clauseIds);
+			if (clauseIds!=null && clauseIds.size()>0) {
+				int dfac=financialAdditionalClauseExMapper.deleteByPrimaryKeyS(clauseIds);
+			}
 			
 			if (i>0) {
 					String additionalClause = financialGoodsParamDTO.getAdditionalClause();

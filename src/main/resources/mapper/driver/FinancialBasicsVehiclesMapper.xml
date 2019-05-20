@@ -11,15 +11,15 @@
     <result column="energy_type" property="energyType" jdbcType="INTEGER" />
     <result column="variable_box" property="variableBox" jdbcType="INTEGER" />
     <result column="guidance_price" property="guidancePrice" jdbcType="DECIMAL" />
-    <result column="discharge" property="discharge" jdbcType="INTEGER" />
-    <result column="mileage" property="mileage" jdbcType="INTEGER" />
+    <result column="discharge" property="discharge" jdbcType="DOUBLE" />
+    <result column="mileage" property="mileage" jdbcType="DOUBLE" />
     <result column="auto_home_url" property="autoHomeUrl" jdbcType="VARCHAR" />
     <result column="length_width_height" property="lengthWidthHeight" jdbcType="VARCHAR" />
     <result column="quality_assurance" property="qualityAssurance" jdbcType="VARCHAR" />
     <result column="wheelbase" property="wheelbase" jdbcType="INTEGER" />
     <result column="environmental_protection_standard" property="environmentalProtectionStandard" jdbcType="VARCHAR" />
-    <result column="fast_charging_time" property="fastChargingTime" jdbcType="INTEGER" />
-    <result column="slow_charging_time" property="slowChargingTime" jdbcType="INTEGER" />
+    <result column="fast_charging_time" property="fastChargingTime" jdbcType="DOUBLE" />
+    <result column="slow_charging_time" property="slowChargingTime" jdbcType="DOUBLE" />
     <result column="img_url" property="imgUrl" jdbcType="VARCHAR" />
     <result column="fast_percentage" property="fastPercentage" jdbcType="DOUBLE" />
     <result column="enable_status" property="enableStatus" jdbcType="TINYINT" />
@@ -60,10 +60,10 @@
       )
     values (#{vehiclesDetailedName,jdbcType=VARCHAR}, #{brandId,jdbcType=BIGINT}, #{modelId,jdbcType=BIGINT}, 
       #{vehicleStyle,jdbcType=VARCHAR}, #{yearStyle,jdbcType=VARCHAR}, #{energyType,jdbcType=INTEGER}, 
-      #{variableBox,jdbcType=INTEGER}, #{guidancePrice,jdbcType=DECIMAL}, #{discharge,jdbcType=INTEGER}, 
-      #{mileage,jdbcType=INTEGER}, #{autoHomeUrl,jdbcType=VARCHAR}, #{lengthWidthHeight,jdbcType=VARCHAR}, 
+      #{variableBox,jdbcType=INTEGER}, #{guidancePrice,jdbcType=DECIMAL}, #{discharge,jdbcType=DOUBLE}, 
+      #{mileage,jdbcType=DOUBLE}, #{autoHomeUrl,jdbcType=VARCHAR}, #{lengthWidthHeight,jdbcType=VARCHAR}, 
       #{qualityAssurance,jdbcType=VARCHAR}, #{wheelbase,jdbcType=INTEGER}, #{environmentalProtectionStandard,jdbcType=VARCHAR}, 
-      #{fastChargingTime,jdbcType=INTEGER}, #{slowChargingTime,jdbcType=INTEGER}, #{imgUrl,jdbcType=VARCHAR}, 
+      #{fastChargingTime,jdbcType=DOUBLE}, #{slowChargingTime,jdbcType=DOUBLE}, #{imgUrl,jdbcType=VARCHAR}, 
       #{fastPercentage,jdbcType=DOUBLE}, #{enableStatus,jdbcType=TINYINT}, #{createBy,jdbcType=VARCHAR}, 
       #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
       )
@@ -173,10 +173,10 @@
         #{guidancePrice,jdbcType=DECIMAL},
       </if>
       <if test="discharge != null" >
-        #{discharge,jdbcType=INTEGER},
+        #{discharge,jdbcType=DOUBLE},
       </if>
       <if test="mileage != null" >
-        #{mileage,jdbcType=INTEGER},
+        #{mileage,jdbcType=DOUBLE},
       </if>
       <if test="autoHomeUrl != null" >
         #{autoHomeUrl,jdbcType=VARCHAR},
@@ -194,10 +194,10 @@
         #{environmentalProtectionStandard,jdbcType=VARCHAR},
       </if>
       <if test="fastChargingTime != null" >
-        #{fastChargingTime,jdbcType=INTEGER},
+        #{fastChargingTime,jdbcType=DOUBLE},
       </if>
       <if test="slowChargingTime != null" >
-        #{slowChargingTime,jdbcType=INTEGER},
+        #{slowChargingTime,jdbcType=DOUBLE},
       </if>
       <if test="imgUrl != null" >
         #{imgUrl,jdbcType=VARCHAR},
@@ -250,10 +250,10 @@
         guidance_price = #{guidancePrice,jdbcType=DECIMAL},
       </if>
       <if test="discharge != null" >
-        discharge = #{discharge,jdbcType=INTEGER},
+        discharge = #{discharge,jdbcType=DOUBLE},
       </if>
       <if test="mileage != null" >
-        mileage = #{mileage,jdbcType=INTEGER},
+        mileage = #{mileage,jdbcType=DOUBLE},
       </if>
       <if test="autoHomeUrl != null" >
         auto_home_url = #{autoHomeUrl,jdbcType=VARCHAR},
@@ -271,10 +271,10 @@
         environmental_protection_standard = #{environmentalProtectionStandard,jdbcType=VARCHAR},
       </if>
       <if test="fastChargingTime != null" >
-        fast_charging_time = #{fastChargingTime,jdbcType=INTEGER},
+        fast_charging_time = #{fastChargingTime,jdbcType=DOUBLE},
       </if>
       <if test="slowChargingTime != null" >
-        slow_charging_time = #{slowChargingTime,jdbcType=INTEGER},
+        slow_charging_time = #{slowChargingTime,jdbcType=DOUBLE},
       </if>
       <if test="imgUrl != null" >
         img_url = #{imgUrl,jdbcType=VARCHAR},
@@ -310,15 +310,15 @@
       energy_type = #{energyType,jdbcType=INTEGER},
       variable_box = #{variableBox,jdbcType=INTEGER},
       guidance_price = #{guidancePrice,jdbcType=DECIMAL},
-      discharge = #{discharge,jdbcType=INTEGER},
-      mileage = #{mileage,jdbcType=INTEGER},
+      discharge = #{discharge,jdbcType=DOUBLE},
+      mileage = #{mileage,jdbcType=DOUBLE},
       auto_home_url = #{autoHomeUrl,jdbcType=VARCHAR},
       length_width_height = #{lengthWidthHeight,jdbcType=VARCHAR},
       quality_assurance = #{qualityAssurance,jdbcType=VARCHAR},
       wheelbase = #{wheelbase,jdbcType=INTEGER},
       environmental_protection_standard = #{environmentalProtectionStandard,jdbcType=VARCHAR},
-      fast_charging_time = #{fastChargingTime,jdbcType=INTEGER},
-      slow_charging_time = #{slowChargingTime,jdbcType=INTEGER},
+      fast_charging_time = #{fastChargingTime,jdbcType=DOUBLE},
+      slow_charging_time = #{slowChargingTime,jdbcType=DOUBLE},
       img_url = #{imgUrl,jdbcType=VARCHAR},
       fast_percentage = #{fastPercentage,jdbcType=DOUBLE},
       enable_status = #{enableStatus,jdbcType=TINYINT},
