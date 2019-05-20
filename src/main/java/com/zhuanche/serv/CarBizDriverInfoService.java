@@ -20,6 +20,7 @@ import com.zhuanche.dto.driver.TelescopeDriver;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
+import com.zhuanche.dto.rentcar.DriverComplianceDTO;
 import com.zhuanche.entity.mdbcarmanage.*;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.HttpClientUtil;
@@ -3395,6 +3396,8 @@ public class CarBizDriverInfoService {
         List<CarDriverTeam>  carGroupDriverTeamList = null; //车队小组列表
         List<CarRelateTeam> driverTeamRelationEntityList = null;
 
+        List<DriverComplianceDTO> driverComplianceDTOList = null;
+
         Map<String,Integer> driverTeamMap = new HashMap<>();
         Map<String,Integer> driverGroupMap = new HashMap<>();
         if(!driveridSet.isEmpty()){
@@ -3433,6 +3436,13 @@ public class CarBizDriverInfoService {
                     carGroupDriverTeamList = carDriverTeamExMapper.queryTeamListByTemIdList(teamGroupIdList);
                 }
             }
+
+            /**
+             * 查询当前driverid的合规状态与合规类型
+             * ext3 合规类型 1:人证合规 2:车证合规 3:双证合规 4:不合规
+             * ext2 合规状态 0不合规 1 合规
+             */
+            driverComplianceDTOList = carBizDriverInfoExMapper.queryDriverComplianceDTOListByDriverIdSet(driveridSet);
         }
 
         //根据list组装Map
@@ -3443,6 +3453,16 @@ public class CarBizDriverInfoService {
         Map<String,CarDriverTeam> teamMap = new HashMap<>();
         Map<String,CarDriverTeam> teamGroupMap = new HashMap<>();
         Map<String,CarBizCarGroup> groupMap = new HashMap<>();
+
+        //合规map
+        Map<String,DriverComplianceDTO> driverComplianceDTOMap = new HashMap<>();
+
+        if(driverComplianceDTOList != null && !driverComplianceDTOList.isEmpty()){
+            for (DriverComplianceDTO item : driverComplianceDTOList){
+                driverComplianceDTOMap.put("t_" + item.getDriverId(),item);
+            }
+        }
+
 
         if(createUserList != null){
             for(CarAdmUser item : createUserList){
@@ -3493,9 +3513,18 @@ public class CarBizDriverInfoService {
         CarBizCarInfo carBizCarInfo = null;
         CarBizModel carBizModel = null;
         CarBizDriverInfoDTO dto = null;
+        DriverComplianceDTO driverComplianceDTO = null;
         for(CarBizDriverInfoDTO carBizDriverInfo:carBizDriverInfoList){
 
             driverId = carBizDriverInfo.getDriverId();
+
+            driverComplianceDTO = driverComplianceDTOMap.get("t_" + driverId);
+            if(driverComplianceDTO != null){
+                carBizDriverInfo.setExt2(driverComplianceDTO.getComplianceStatus());
+                carBizDriverInfo.setExt3(driverComplianceDTO.getComplianceKind());
+            }
+
+
             carBizSupplier = supplierMap.get("t_"+carBizDriverInfo.getSupplierId());
 
             if (carBizSupplier != null) {
@@ -3641,7 +3670,31 @@ public class CarBizDriverInfoService {
                 //小组
                 builder.append(dto.getTeamGroupName()==null?"":dto.getTeamGroupName()).append(",");
                 builder.append(dto.getDriverId()!=null?"\t"+dto.getDriverId()+"":"").append(",");
-                builder.append("\t").append(DateUtil.getTimeString(dto.getCreateDate()));
+                builder.append("\t").append(DateUtil.getTimeString(dto.getCreateDate())).append(",");
+
+                //司机合规信息
+                String complianceKind = "";//默认给空串  对应ext3  合规类型
+                String complianceStatus = ""; // 对应ext2  合规状态
+                Integer ext2 = dto.getExt2();
+                Integer ext3 = dto.getExt3();
+                //这里的值只有1234，所有使用==比较  1:人证合规 2:车证合规 3:双证合规 4:不合规
+                if(1 == ext2){
+                    complianceStatus = "合规";
+                }else if(0 == ext2){
+                    complianceStatus = "不合规";
+                }
+                if(1 == ext3){
+                    complianceKind = "人证合规";
+                }else if(2 == ext3){
+                    complianceKind = "车证合规";
+                }else if(3 == ext3){
+                    complianceKind = "双证合规";
+                }else if(4 == ext3){
+                    complianceKind = "不合规";
+                }
+                builder.append(complianceStatus).append(",");
+                builder.append(complianceKind);
+
 
                 exportStringList.add(builder.toString());
             }

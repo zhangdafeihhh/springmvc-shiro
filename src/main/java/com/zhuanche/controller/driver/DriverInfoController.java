@@ -304,7 +304,7 @@ public class DriverInfoController {
                     "驾照到期时间,档案编号,国籍,驾驶员民族,驾驶员婚姻状况,驾驶员外语能力,驾驶员学历,户口登记机关名称,户口住址或长住地址,驾驶员通信地址,驾驶员照片文件编号,机动车驾驶证号," +
                     "机动车驾驶证扫描件文件编号,初次领取驾驶证日期,是否巡游出租汽车驾驶员,网络预约出租汽车驾驶员资格证号,网络预约出租汽车驾驶员证初领日期,巡游出租汽车驾驶员资格证号," +
                     "网络预约出租汽车驾驶员证发证机构,资格证发证日期,初次领取资格证日期,资格证有效起始日期,资格证有效截止日期,注册日期,是否专职驾驶员,驾驶员合同（或协议）签署公司,有效合同时间," +
-                    "合同（或协议）有效期起,合同（或协议）有效期止,紧急情况联系人,紧急情况联系人电话,紧急情况联系人通讯地址,供应商,城市,车队,小组,司机id,创建时间");
+                    "合同（或协议）有效期起,合同（或协议）有效期止,紧急情况联系人,紧急情况联系人电话,紧急情况联系人通讯地址,供应商,城市,车队,小组,司机id,创建时间,合规状态,合规类型");
             String fileName = "司机信息" + com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
             String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
             if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器

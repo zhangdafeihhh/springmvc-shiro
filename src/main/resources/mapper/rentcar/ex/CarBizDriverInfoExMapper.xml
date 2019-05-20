@@ -549,6 +549,23 @@
   </select>
 
 
+  <select id="queryDriverComplianceDTOListByDriverIdSet" parameterType="java.util.Set" resultType="com.zhuanche.dto.rentcar.DriverComplianceDTO">
+    SELECT
+    driver_id AS driverId,
+    ext2 AS complianceStatus,
+    ext3 AS complianceKind
+    FROM car_biz_driver_info_detail
+    WHERE driver_id IN
+    <foreach collection="driverIdSet" open="(" close=")" separator="," item="did">
+      #{did}
+    </foreach>
+  </select>
+
+
+
+
+
+
 
   <select id="checkPhone" resultType="java.lang.Integer" >
     select count(*)
