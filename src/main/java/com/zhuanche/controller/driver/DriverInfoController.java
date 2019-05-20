@@ -833,7 +833,7 @@ public class DriverInfoController {
         boolean auth = false;
         TelescopeDriverInfo telescopeDriverInfo = new  TelescopeDriverInfo();
         CarBizDriverInfoDTO carBizDriverInfoDTO = carBizDriverInfoService.selectByPhone(phone);
-        logger.info("【查询千里眼司机信息】请求参数:phone={},carBizDriverInfoDTO={}",phone,carBizDriverInfoDTO);
+        logger.info("【查询千里眼司机信息】carBizDriverInfoDTO={}",carBizDriverInfoDTO);
         if(null == carBizDriverInfoDTO){
             telescopeDriverInfo.setAuth(auth);
             return AjaxResponse.success(telescopeDriverInfo);
@@ -846,7 +846,7 @@ public class DriverInfoController {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("driverId",carBizDriverInfoDTO.getDriverId());
         params.put("updateBy", WebSessionUtil.getCurrentLoginUser().getName());
-        com.alibaba.fastjson.JSONObject result = MpOkHttpUtil.okHttpPostBackJson(mpManageRestUrl + "/telescope/queryTelescopeUser", params, 1, "修改千里眼权限状态");
+        com.alibaba.fastjson.JSONObject result = MpOkHttpUtil.okHttpGetBackJson(mpManageRestUrl + "/telescope/queryTelescopeUser", params, 1, "查询千里眼用户信息");
         logger.info("【查询千里眼司机信息】接口返回结果：{}",result.toJSONString());
         if (result.getIntValue("code") != Constants.SUCCESS_CODE) {
             String errorMsg = result.getString("msg");
