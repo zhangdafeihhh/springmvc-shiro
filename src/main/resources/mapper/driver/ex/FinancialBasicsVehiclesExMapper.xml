@@ -12,15 +12,15 @@
 	    <result column="energy_type" property="energyType" jdbcType="INTEGER" />
 	    <result column="variable_box" property="variableBox" jdbcType="INTEGER" />
 	    <result column="guidance_price" property="guidancePrice" jdbcType="DECIMAL" />
-	    <result column="discharge" property="discharge" jdbcType="INTEGER" />
-	    <result column="mileage" property="mileage" jdbcType="INTEGER" />
+	    <result column="discharge" property="discharge" jdbcType="DOUBLE" />
+	    <result column="mileage" property="mileage" jdbcType="DOUBLE" />
 	    <result column="auto_home_url" property="autoHomeUrl" jdbcType="VARCHAR" />
 	    <result column="length_width_height" property="lengthWidthHeight" jdbcType="VARCHAR" />
 	    <result column="quality_assurance" property="qualityAssurance" jdbcType="VARCHAR" />
 	    <result column="wheelbase" property="wheelbase" jdbcType="INTEGER" />
 	    <result column="environmental_protection_standard" property="environmentalProtectionStandard" jdbcType="VARCHAR" />
-	    <result column="fast_charging_time" property="fastChargingTime" jdbcType="INTEGER" />
-	    <result column="slow_charging_time" property="slowChargingTime" jdbcType="INTEGER" />
+	    <result column="fast_charging_time" property="fastChargingTime" jdbcType="DOUBLE" />
+	    <result column="slow_charging_time" property="slowChargingTime" jdbcType="DOUBLE" />
 	    <result column="img_url" property="imgUrl" jdbcType="VARCHAR" />
 	    <result column="fast_percentage" property="fastPercentage" jdbcType="DOUBLE" />
 	    <result column="enable_status" property="enableStatus" jdbcType="TINYINT" />
@@ -41,15 +41,15 @@
 	    <result column="energy_type" property="energyType" jdbcType="INTEGER" />
 	    <result column="variable_box" property="variableBox" jdbcType="INTEGER" />
 	    <result column="guidance_price" property="guidancePrice" jdbcType="DECIMAL" />
-	    <result column="discharge" property="discharge" jdbcType="INTEGER" />
-	    <result column="mileage" property="mileage" jdbcType="INTEGER" />
+	    <result column="discharge" property="discharge" jdbcType="DOUBLE" />
+	    <result column="mileage" property="mileage" jdbcType="DOUBLE" />
 	    <result column="auto_home_url" property="autoHomeUrl" jdbcType="VARCHAR" />
 	    <result column="length_width_height" property="lengthWidthHeight" jdbcType="VARCHAR" />
 	    <result column="quality_assurance" property="qualityAssurance" jdbcType="VARCHAR" />
 	    <result column="wheelbase" property="wheelbase" jdbcType="INTEGER" />
 	    <result column="environmental_protection_standard" property="environmentalProtectionStandard" jdbcType="VARCHAR" />
-	    <result column="fast_charging_time" property="fastChargingTime" jdbcType="INTEGER" />
-	    <result column="slow_charging_time" property="slowChargingTime" jdbcType="INTEGER" />
+	    <result column="fast_charging_time" property="fastChargingTime" jdbcType="DOUBLE" />
+	    <result column="slow_charging_time" property="slowChargingTime" jdbcType="DOUBLE" />
 	    <result column="img_url" property="imgUrl" jdbcType="VARCHAR" />
 	    <result column="fast_percentage" property="fastPercentage" jdbcType="DOUBLE" />
 	    <result column="enable_status" property="enableStatus" jdbcType="TINYINT" />
