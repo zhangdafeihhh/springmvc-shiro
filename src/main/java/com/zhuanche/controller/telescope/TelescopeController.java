@@ -51,7 +51,7 @@ public class TelescopeController {
 	@RequestMapping(value = "/queryTelescopeUserForList" )
 	@ResponseBody
     public AjaxResponse queryTelescopeUserForList( Integer cityId, Integer supplierId, Integer teamId, Integer teamGroupId ,
-												   Integer status, String phone, Integer page, Integer pageSize){
+												   Integer status, String phone,Integer driverStatus, Integer page, Integer pageSize){
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("cityId",cityId);
 		params.put("supplierId",supplierId);
@@ -59,6 +59,7 @@ public class TelescopeController {
 		params.put("groupId",teamGroupId);
 		params.put("status",status);
 		params.put("phone",phone);
+		params.put("driverStatus",driverStatus);
 		params.put("page",page);
 		params.put("pageSize",pageSize);
 		JSONObject result = MpOkHttpUtil.okHttpGetBackJson(mpManageRestUrl + "/telescope/queryTelescopeUserForList", params, 1, "查询千里眼用户列表");
