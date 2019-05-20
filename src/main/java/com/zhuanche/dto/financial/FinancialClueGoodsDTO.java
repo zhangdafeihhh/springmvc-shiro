@@ -4,6 +4,7 @@ import com.zhuanche.constants.financial.VehicleAgeEnum;
 import com.zhuanche.constants.financial.FinancialConst.GoodsState;
 import com.zhuanche.constants.financial.FinancialConst.GoodsTypeSelect;
 import com.zhuanche.constants.financial.FinancialConst.SalesTargetSelect;
+import com.zhuanche.constants.financial.FinancialConst.VehicleProperties;
 import com.zhuanche.entity.driver.FinancialClueGoods;
 /**
  * ClassName:FinancialClueGoodsDTO <br/>  
@@ -18,7 +19,7 @@ public class FinancialClueGoodsDTO extends FinancialClueGoods{
 	private String salesTargetName;
 	private String vehicleAgeName;
 	private String mileageName;
-	
+	private String vehiclePropertiesName; 
 	public String getVehiclesDetailedName() {
 		return vehiclesDetailedName;
 	}
@@ -69,5 +70,27 @@ public class FinancialClueGoodsDTO extends FinancialClueGoods{
 	public void setMileageName(String mileageName) {
 		this.mileageName = mileageName;
 	}
+	public String getVehiclePropertiesName() {
+		if (getVehicleProperties()==VehicleProperties.VehicleProperties1) {
+			vehiclePropertiesName="非营运";
+		}
+		if (getVehicleProperties()==VehicleProperties.VehicleProperties2) {
+			vehiclePropertiesName="出租客运";
+		}
+		if (getVehicleProperties()==VehicleProperties.VehicleProperties3) {
+			vehiclePropertiesName="租赁";
+		}
+		if (getVehicleProperties()==VehicleProperties.VehicleProperties4) {
+			vehiclePropertiesName="营转非";
+		}
+		if (getVehicleProperties()==VehicleProperties.VehicleProperties5) {
+			vehiclePropertiesName="出租转非";
+		}
+		return vehiclePropertiesName;
+	}
+	public void setVehiclePropertiesName(String vehiclePropertiesName) {
+		this.vehiclePropertiesName = vehiclePropertiesName;
+	}
+	
 }
   

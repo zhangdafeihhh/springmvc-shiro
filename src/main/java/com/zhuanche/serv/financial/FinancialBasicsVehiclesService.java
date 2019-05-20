@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -75,8 +76,8 @@ public class FinancialBasicsVehiclesService {
     	return new PageDTO(page,pageSize,total,financialBasicsVehiclesDtos);
     	
 	}
-
-	public FinancialBasicsVehicles saveFinancialBasicsVehicles(FinancialBasicsVehicles financialBasicsVehicles) {
+	
+	public FinancialBasicsVehicles saveFinancialBasicsVehicles(FinancialBasicsVehicles financialBasicsVehicles) throws Exception{
 		SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
 		Date now=new Date();
 		financialBasicsVehicles.setCreateBy(user.getName());
@@ -88,7 +89,7 @@ public class FinancialBasicsVehiclesService {
 		return financialBasicsVehicles;
 	}
 
-	public FinancialBasicsVehicles updateFinancialBasicsVehicles(FinancialBasicsVehicles financialBasicsVehicles) {
+	public FinancialBasicsVehicles updateFinancialBasicsVehicles(FinancialBasicsVehicles financialBasicsVehicles) throws Exception{
 		SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
 		financialBasicsVehicles.setUpdateBy(user.getName());
 		int i=financialBasicsVehiclesMapper.updateByPrimaryKeySelective(financialBasicsVehicles);

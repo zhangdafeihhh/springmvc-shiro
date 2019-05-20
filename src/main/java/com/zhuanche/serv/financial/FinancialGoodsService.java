@@ -137,7 +137,7 @@ public class FinancialGoodsService {
 		return map;
 	}
 
-	public FinancialGoods saveFinancialGoods(FinancialGoodsParamDTO financialGoodsParamDTO) {
+	public FinancialGoods saveFinancialGoods(FinancialGoodsParamDTO financialGoodsParamDTO) throws Exception{
 		FinancialGoods financialGoods=BeanUtil.copyObject(financialGoodsParamDTO, FinancialGoods.class);
 		SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
 		Date now=new Date();
@@ -160,7 +160,8 @@ public class FinancialGoodsService {
 		
 		//financialGoods.setCreateTime(now);
 		//financialGoods.setUpdateTime(now);
-		int i=financialGoodsMapper.insertSelective(financialGoods);
+		int i = financialGoodsMapper.insertSelective(financialGoods);
+		
 		if (i>0) {
 			String additionalClause = financialGoodsParamDTO.getAdditionalClause();
 			if (StringUtils.isNotBlank(additionalClause)) {
@@ -184,7 +185,7 @@ public class FinancialGoodsService {
 		return financialGoods;
 	}
 
-	public FinancialGoods updateFinancialGoods(FinancialGoodsParamDTO financialGoodsParamDTO) {
+	public FinancialGoods updateFinancialGoods(FinancialGoodsParamDTO financialGoodsParamDTO) throws Exception{
 		FinancialGoods financialGoods=BeanUtil.copyObject(financialGoodsParamDTO, FinancialGoods.class);
 		SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
 		

@@ -125,6 +125,7 @@ public class FinancialGoodsController {
 	/**
 	 * saveFinancialGoods:(新增商品). <br/>  
 	 * @return
+	 * @throws Exception 
 	 */
 	@RequiresPermissions(value = { "CommodityManage_save" } )
 	@MasterSlaveConfigs(configs={ 
@@ -134,16 +135,21 @@ public class FinancialGoodsController {
 	@RequestMapping(value = "/saveFinancialGoods")
 	public AjaxResponse saveFinancialGoods(@Validated(SeqAll.class)
 			FinancialGoodsParamDTO financialGoodsParamDTO
-			) {
-		FinancialGoods goods=financialGoodsExMapper.queryFinancialGoodsByName(financialGoodsParamDTO.getGoodsName());
+			){
+		try {
+			FinancialGoods goods=financialGoodsExMapper.queryFinancialGoodsByName(financialGoodsParamDTO.getGoodsName());
 /*		FinancialGoods goods=financialGoodsExMapper.queryFinancialGoodsForObject(financialGoodsParamDTO.getBasicsVehiclesId(),financialGoodsParamDTO.getCityId(),financialGoodsParamDTO.getSupplierId());
-		*/
-		if (goods!=null) {
-			return AjaxResponse.fail(RestErrorCode.GOODS_EXISTS);
+			*/
+			if (goods!=null) {
+				return AjaxResponse.fail(RestErrorCode.GOODS_EXISTS);
+			}
+			
+			FinancialGoods financialGoods=financialGoodsService.saveFinancialGoods(financialGoodsParamDTO);
+			return AjaxResponse.success(financialGoods);
+		} catch (Exception e) {
+			e.printStackTrace();  
 		}
-		
-		FinancialGoods financialGoods=financialGoodsService.saveFinancialGoods(financialGoodsParamDTO);
-	    return AjaxResponse.success(financialGoods);
+		return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 	}
 	
 	/**
@@ -151,6 +157,7 @@ public class FinancialGoodsController {
 	 * @author baiyunlong
 	 * @param financialGoodsParamDTO
 	 * @return
+	 * @throws Exception 
 	 */
 	@RequiresPermissions(value = { "CommodityManage_update" } )
 	@MasterSlaveConfigs(configs={ 
@@ -165,13 +172,18 @@ public class FinancialGoodsController {
 		if (financialGoodsParamDTO.getGoodsId()==null||financialGoodsParamDTO.getGoodsId()==0) {
 			return AjaxResponse.fail(RestErrorCode.GOODSIDISNULL);
 		}
-		FinancialGoods goods=financialGoodsExMapper.queryFinancialGoodsByName(financialGoodsParamDTO.getGoodsName());
+		try {
+			FinancialGoods goods=financialGoodsExMapper.queryFinancialGoodsByName(financialGoodsParamDTO.getGoodsName());
 /*		FinancialGoods goods=financialGoodsExMapper.queryFinancialGoodsForObject(financialGoodsParamDTO.getBasicsVehiclesId(),financialGoodsParamDTO.getCityId(),financialGoodsParamDTO.getSupplierId());*/
-		if (goods!=null && goods.getGoodsId().intValue()!= financialGoodsParamDTO.getGoodsId().intValue()) {
-			return AjaxResponse.fail(RestErrorCode.GOODS_EXISTS);
+			if (goods!=null && goods.getGoodsId().intValue()!= financialGoodsParamDTO.getGoodsId().intValue()) {
+				return AjaxResponse.fail(RestErrorCode.GOODS_EXISTS);
+			}
+			FinancialGoods financialGoods=financialGoodsService.updateFinancialGoods(financialGoodsParamDTO);
+			return AjaxResponse.success(financialGoods);
+		} catch (Exception e) {
+			e.printStackTrace();  
 		}
-		FinancialGoods financialGoods=financialGoodsService.updateFinancialGoods(financialGoodsParamDTO);
-	    return AjaxResponse.success(financialGoods);
+		return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 	}
 	
 	/**

@@ -97,6 +97,7 @@ public class FinancialBasicsVehiclesController {
 	 * @param fastPercentage
 	 * @param enableStatus
 	 * @return
+	 * @throws Exception 
 	 */
 	@RequiresPermissions(value = { "CarTypeManage_save" } )
 	@RequestMapping(value = "/saveFinancialBasicsVehicles")
@@ -124,7 +125,7 @@ public class FinancialBasicsVehiclesController {
 			Integer fastChargingTime,
 			Integer slowChargingTime,
 			Double fastPercentage
-			) {
+			) throws Exception {
 		  logger.info("--请求FinancialBasicsVehiclesController--方法saveFinancialBasicsVehicles--参数:--vehiclesDetailedName--{},"
 		  		+ "--brandId--{},--modelId--{},--vehicleStyle--{},--yearStyle--{},"
 		  		+ "--energyType--{},--variableBox--{},--guidancePrice--{},--discharge--{},"
@@ -207,6 +208,7 @@ public class FinancialBasicsVehiclesController {
 	 * @param fastPercentage
 	 * @param enableStatus
 	 * @return
+	 * @throws Exception 
 	 */
 	@RequiresPermissions(value = { "CarTypeManage_update" } )
 	@RequestMapping(value = "/updateFinancialBasicsVehicles")
@@ -236,7 +238,7 @@ public class FinancialBasicsVehiclesController {
 			Integer fastChargingTime,
 			Integer slowChargingTime,
 			Double fastPercentage
-			) {
+			){
 		  logger.info("--请求FinancialBasicsVehiclesController--方法updateFinancialBasicsVehicles--参数:--basicsVehiclesId--{},--vehiclesDetailedName--{},"
 			  		+ "--brandId--{},--modelId--{},--vehicleStyle--{},--yearStyle--{},"
 			  		+ "--energyType--{},--variableBox--{},--guidancePrice--{},--discharge--{},"
@@ -245,35 +247,40 @@ public class FinancialBasicsVehiclesController {
 			  		+ "--fastPercentage--{}",basicsVehiclesId,vehiclesDetailedName,brandId,modelId,vehicleStyle,yearStyle
 			  		,energyType,variableBox,guidancePrice,discharge,mileage,autoHomeUrl,lengthWidthHeight,qualityAssurance,
 					 wheelbase,environmentalProtectionStandard,fastChargingTime,slowChargingTime,fastPercentage);
-		  FinancialBasicsVehicles basicsVehicles=financialBasicsVehiclesExMapper.queryFinancialBasicsVehiclesByName(vehiclesDetailedName);
-		  
-          if (basicsVehicles!=null && basicsVehicles.getBasicsVehiclesId().intValue()!=basicsVehiclesId.intValue()) {
-        	  return AjaxResponse.fail(RestErrorCode.BASICSVEHICLE_EXISTS);
-		  }
-		  
-		  FinancialBasicsVehicles financialBasicsVehicles=new FinancialBasicsVehicles();
-		  financialBasicsVehicles.setBasicsVehiclesId(basicsVehiclesId);
-		  financialBasicsVehicles.setVehiclesDetailedName(vehiclesDetailedName);
-		  financialBasicsVehicles.setBrandId(brandId);
-		  financialBasicsVehicles.setModelId(modelId);
-		  financialBasicsVehicles.setVehicleStyle(vehicleStyle);
-		  financialBasicsVehicles.setYearStyle(yearStyle);
-		  financialBasicsVehicles.setEnergyType(energyType);
-		  financialBasicsVehicles.setVariableBox(variableBox);
-		  financialBasicsVehicles.setGuidancePrice(guidancePrice);
-		  financialBasicsVehicles.setDischarge(discharge);
-		  financialBasicsVehicles.setMileage(mileage);
-		  financialBasicsVehicles.setAutoHomeUrl(autoHomeUrl);
-		  financialBasicsVehicles.setLengthWidthHeight(lengthWidthHeight);
-		  financialBasicsVehicles.setQualityAssurance(qualityAssurance);
-		  financialBasicsVehicles.setWheelbase(wheelbase);
-		  financialBasicsVehicles.setEnvironmentalProtectionStandard(environmentalProtectionStandard);
-		  financialBasicsVehicles.setFastChargingTime(fastChargingTime);
-		  financialBasicsVehicles.setSlowChargingTime(slowChargingTime);
-		  financialBasicsVehicles.setFastPercentage(fastPercentage);
-		  financialBasicsVehicles.setImgUrl(imgUrl);
-		  financialBasicsVehicles = financialBasicsVehiclesService.updateFinancialBasicsVehicles(financialBasicsVehicles);
-		  return AjaxResponse.success(financialBasicsVehicles);
+		  try {
+			FinancialBasicsVehicles basicsVehicles=financialBasicsVehiclesExMapper.queryFinancialBasicsVehiclesByName(vehiclesDetailedName);
+			  
+			  if (basicsVehicles!=null && basicsVehicles.getBasicsVehiclesId().intValue()!=basicsVehiclesId.intValue()) {
+				  return AjaxResponse.fail(RestErrorCode.BASICSVEHICLE_EXISTS);
+			  }
+			  
+			  FinancialBasicsVehicles financialBasicsVehicles=new FinancialBasicsVehicles();
+			  financialBasicsVehicles.setBasicsVehiclesId(basicsVehiclesId);
+			  financialBasicsVehicles.setVehiclesDetailedName(vehiclesDetailedName);
+			  financialBasicsVehicles.setBrandId(brandId);
+			  financialBasicsVehicles.setModelId(modelId);
+			  financialBasicsVehicles.setVehicleStyle(vehicleStyle);
+			  financialBasicsVehicles.setYearStyle(yearStyle);
+			  financialBasicsVehicles.setEnergyType(energyType);
+			  financialBasicsVehicles.setVariableBox(variableBox);
+			  financialBasicsVehicles.setGuidancePrice(guidancePrice);
+			  financialBasicsVehicles.setDischarge(discharge);
+			  financialBasicsVehicles.setMileage(mileage);
+			  financialBasicsVehicles.setAutoHomeUrl(autoHomeUrl);
+			  financialBasicsVehicles.setLengthWidthHeight(lengthWidthHeight);
+			  financialBasicsVehicles.setQualityAssurance(qualityAssurance);
+			  financialBasicsVehicles.setWheelbase(wheelbase);
+			  financialBasicsVehicles.setEnvironmentalProtectionStandard(environmentalProtectionStandard);
+			  financialBasicsVehicles.setFastChargingTime(fastChargingTime);
+			  financialBasicsVehicles.setSlowChargingTime(slowChargingTime);
+			  financialBasicsVehicles.setFastPercentage(fastPercentage);
+			  financialBasicsVehicles.setImgUrl(imgUrl);
+			  financialBasicsVehicles = financialBasicsVehiclesService.updateFinancialBasicsVehicles(financialBasicsVehicles);
+			  return AjaxResponse.success(financialBasicsVehicles);
+		} catch (Exception e) {
+			e.printStackTrace();  
+		}
+	    return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 	}
 	
 	
@@ -283,6 +290,7 @@ public class FinancialBasicsVehiclesController {
 	 * @param basicsVehiclesId
 	 * @param enableStatus
 	 * @return
+	 * @throws Exception 
 	 */
 	@RequiresPermissions(value = { "CarTypeManage_updateStatus" } )
 	@MasterSlaveConfigs(configs={ 
@@ -292,14 +300,19 @@ public class FinancialBasicsVehiclesController {
 	public AjaxResponse updateFinancialBasicsVehiclesForStatus(
 			@Verify(param = "basicsVehiclesId", rule = "required|min(1)")Integer basicsVehiclesId,
 			@Verify(param = "basicsVehiclesId", rule = "required")Byte enableStatus
-			) {
+			){
 		  logger.info("--请求FinancialBasicsVehiclesController--方法updateFinancialBasicsVehicles--参数:--basicsVehiclesId--{},--enableStatus--{}",
 			  		basicsVehiclesId,enableStatus);
-		  FinancialBasicsVehicles financialBasicsVehicles=new FinancialBasicsVehicles();
-		  financialBasicsVehicles.setBasicsVehiclesId(basicsVehiclesId);
-		  financialBasicsVehicles.setEnableStatus(enableStatus);
-		  financialBasicsVehicles = financialBasicsVehiclesService.updateFinancialBasicsVehicles(financialBasicsVehicles);
-		  return AjaxResponse.success(true);
+		  try {
+			  FinancialBasicsVehicles financialBasicsVehicles=new FinancialBasicsVehicles();
+			  financialBasicsVehicles.setBasicsVehiclesId(basicsVehiclesId);
+			  financialBasicsVehicles.setEnableStatus(enableStatus);
+			  financialBasicsVehicles = financialBasicsVehiclesService.updateFinancialBasicsVehicles(financialBasicsVehicles);
+			  return AjaxResponse.success(true);
+		} catch (Exception e) {
+			e.printStackTrace();  
+		}
+		return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 	}
 	
 	
