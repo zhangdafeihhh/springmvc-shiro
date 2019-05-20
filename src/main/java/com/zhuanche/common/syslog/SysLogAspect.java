@@ -127,7 +127,13 @@ public class SysLogAspect {
 				logger.info("----"+JSON.toJSON(mapparam).toString());
 				logger.info("--获取日志bean--"+sysLogAnn.parameterObj());
 				if (StringUtils.isNotBlank(sysLogAnn.parameterObj())) {
-					jsonParam = (JSONObject) JSON.toJSON(mapparam.get(0));
+					JSONObject jsonObjPa = (JSONObject) JSON.toJSON(mapparam);
+					for (Map.Entry<String, Object> entry : jsonObjPa.entrySet()) {
+						jsonParam=(JSONObject) entry.getValue();
+				         break;
+				    }
+
+					//jsonParam = (JSONObject) JSON.toJSON(mapparam.get(0));
 				} else {
 					jsonParam = new JSONObject(mapparam);
 				}
