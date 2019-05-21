@@ -89,7 +89,7 @@ public class FinancialGoodsInfoDTO{
 	private String vehicleAgeName;
 	private String mileageName;
 	private String statusName;
-	private List<FinancialAdditionalClause> financialAdditionalClauses;  
+	private List<FinancialAdditionalClause> additionalClauses;  
 	
 	public String getVehiclesDetailedName() {
 		return vehiclesDetailedName;
@@ -156,11 +156,12 @@ public class FinancialGoodsInfoDTO{
 	public void setStatusName(String statusName) {
 		this.statusName = statusName;
 	}
-	public List<FinancialAdditionalClause> getFinancialadditionalclauses() {
-		return financialAdditionalClauses;
+
+	public List<FinancialAdditionalClause> getAdditionalClauses() {
+		return additionalClauses;
 	}
-	public void setFinancialadditionalclauses(List<FinancialAdditionalClause> financialAdditionalClauses) {
-		this.financialAdditionalClauses = financialAdditionalClauses;
+	public void setAdditionalClauses(List<FinancialAdditionalClause> additionalClauses) {
+		this.additionalClauses = additionalClauses;
 	}
 	public Integer getGoodsId() {
 		return goodsId;
@@ -366,12 +367,7 @@ public class FinancialGoodsInfoDTO{
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
 	}
-	public List<FinancialAdditionalClause> getFinancialAdditionalClauses() {
-		return financialAdditionalClauses;
-	}
-	public void setFinancialAdditionalClauses(List<FinancialAdditionalClause> financialAdditionalClauses) {
-		this.financialAdditionalClauses = financialAdditionalClauses;
-	}
+
 	
 }
   

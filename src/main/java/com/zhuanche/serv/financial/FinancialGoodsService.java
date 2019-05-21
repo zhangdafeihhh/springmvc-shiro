@@ -257,7 +257,7 @@ public class FinancialGoodsService {
 		if (financialGoodsClauseList!=null && financialGoodsClauseList.size()>0) {
 			List<Integer> clauseIds= financialGoodsClauseList.stream().map(f -> f.getClauseId()).collect(Collectors.toList());
 			List<FinancialAdditionalClause> financialAdditionalClauses=financialAdditionalClauseExMapper.queryFinancialAdditionalClause(clauseIds);
-			financialGoodsDTO.setFinancialadditionalclauses(financialAdditionalClauses);
+			financialGoodsDTO.setAdditionalClauses(financialAdditionalClauses);
 		}
 		return financialGoodsDTO;
 	}
