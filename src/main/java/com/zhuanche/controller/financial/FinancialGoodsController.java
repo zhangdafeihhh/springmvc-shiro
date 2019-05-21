@@ -178,7 +178,7 @@ public class FinancialGoodsController {
 			if (goods!=null && goods.getGoodsId().intValue()!= financialGoodsParamDTO.getGoodsId().intValue()) {
 				return AjaxResponse.fail(RestErrorCode.GOODS_EXISTS);
 			}
-			FinancialGoods financialGoods=financialGoodsService.updateFinancialGoods(financialGoodsParamDTO);
+			FinancialGoods financialGoods=financialGoodsService.updateSFinancialGoods(financialGoodsParamDTO);
 			return AjaxResponse.success(financialGoods);
 		} catch (Exception e) {
 			e.printStackTrace();  
@@ -213,7 +213,7 @@ public class FinancialGoodsController {
 			}
 		}
 		
-		int i=financialGoodsService.updateFinancialGoodsByStatus(goodsId,status);
+		int i=financialGoodsService.updateSFinancialGoodsByStatus(goodsId,status);
 	    return AjaxResponse.success(true);
 	}
 	

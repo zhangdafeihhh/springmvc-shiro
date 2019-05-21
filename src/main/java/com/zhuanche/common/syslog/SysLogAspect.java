@@ -25,7 +25,9 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -66,14 +68,13 @@ public class SysLogAspect {
 	}
 
 	@Around("logPoinCut()")
-	public Object around(ProceedingJoinPoint pjp) throws Throwable {
+	public Object around(JoinPoint pjp) throws Throwable {
 		// 常见日志实体对象
 		SysSaveOrUpdateLog sysLog = new SysSaveOrUpdateLog();
 		// 获取登录用户账户
-		HttpServletRequest httpRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
 				.getRequest();
 		sysLog.setStartTime(new Date());
-
 		// 拦截的实体类，就是当前正在执行的controller
 		Object target = pjp.getTarget();
 		// 拦截的方法名称。当前正在执行的方法
@@ -82,9 +83,11 @@ public class SysLogAspect {
 		JSONArray operateParamArray = new JSONArray();
 		Object[] args = pjp.getArgs();
 		logger.info("--方法传入参数值--"+args.length+"值"+args);
-		String classType = pjp.getTarget().getClass().getName();
+		String classType = target.getClass().getName();
 		Class<?> clazz = Class.forName(classType);
+		logger.info("--classType--"+classType);
 		String clazzName = clazz.getName();
+		logger.info("--clazzName--"+clazzName);
 		String[] paramNames = LogAopUtil.getFieldsName(this.getClass(), clazzName, methodName);
 		logger.info("--方法传入参数名称--"+paramNames.length+"值"+paramNames);
 		
@@ -209,7 +212,7 @@ public class SysLogAspect {
 
                 try {
                     //执行页面请求模块方法，并返回
-                    object = pjp.proceed();
+                    object = ((ProceedingJoinPoint) pjp).proceed();
                     //获取系统时间
                     sysLog.setEndTime(new Date());
                     //将object 转化为controller封装返回的实体类：RequestResult
@@ -247,11 +250,11 @@ public class SysLogAspect {
                 }
 			} else {
 				// 没有包含注解
-				object = pjp.proceed();
+				object = ((ProceedingJoinPoint) pjp).proceed();
 			}
 		} else {
 			// 不需要拦截直接执行
-			object = pjp.proceed();
+			object = ((ProceedingJoinPoint) pjp).proceed();
 		}
 		return object;
 	}

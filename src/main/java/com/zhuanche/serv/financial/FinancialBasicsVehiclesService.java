@@ -89,7 +89,7 @@ public class FinancialBasicsVehiclesService {
 		return financialBasicsVehicles;
 	}
 
-	public FinancialBasicsVehicles updateFinancialBasicsVehicles(FinancialBasicsVehicles financialBasicsVehicles) throws Exception{
+	public FinancialBasicsVehicles updateSFinancialBasicsVehicles(FinancialBasicsVehicles financialBasicsVehicles) throws Exception{
 		SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
 		financialBasicsVehicles.setUpdateBy(user.getName());
 		int i=financialBasicsVehiclesMapper.updateByPrimaryKeySelective(financialBasicsVehicles);

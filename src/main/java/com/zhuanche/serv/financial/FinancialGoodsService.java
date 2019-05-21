@@ -185,7 +185,7 @@ public class FinancialGoodsService {
 		return financialGoods;
 	}
 
-	public FinancialGoods updateFinancialGoods(FinancialGoodsParamDTO financialGoodsParamDTO) throws Exception{
+	public FinancialGoods updateSFinancialGoods(FinancialGoodsParamDTO financialGoodsParamDTO) throws Exception{
 		FinancialGoods financialGoods=BeanUtil.copyObject(financialGoodsParamDTO, FinancialGoods.class);
 		SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
 		
@@ -239,7 +239,7 @@ public class FinancialGoodsService {
 		return financialGoods;
 	}
 
-	public int updateFinancialGoodsByStatus(Integer goodsId, Byte status) {
+	public int updateSFinancialGoodsByStatus(Integer goodsId, Byte status) {
 		SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
 		FinancialGoods financialGoods=new FinancialGoods();
 		financialGoods.setGoodsId(goodsId);

@@ -280,7 +280,7 @@ public class FinancialBasicsVehiclesController {
 			  financialBasicsVehicles.setSlowChargingTime(slowChargingTime);
 			  financialBasicsVehicles.setFastPercentage(fastPercentage);
 			  financialBasicsVehicles.setImgUrl(imgUrl);
-			  financialBasicsVehicles = financialBasicsVehiclesService.updateFinancialBasicsVehicles(financialBasicsVehicles);
+			  financialBasicsVehicles = financialBasicsVehiclesService.updateSFinancialBasicsVehicles(financialBasicsVehicles);
 			  return AjaxResponse.success(financialBasicsVehicles);
 		} catch (Exception e) {
 			e.printStackTrace();  
@@ -314,7 +314,7 @@ public class FinancialBasicsVehiclesController {
 			  FinancialBasicsVehicles financialBasicsVehicles=new FinancialBasicsVehicles();
 			  financialBasicsVehicles.setBasicsVehiclesId(basicsVehiclesId);
 			  financialBasicsVehicles.setEnableStatus(enableStatus);
-			  financialBasicsVehicles = financialBasicsVehiclesService.updateFinancialBasicsVehicles(financialBasicsVehicles);
+			  financialBasicsVehicles = financialBasicsVehiclesService.updateSFinancialBasicsVehicles(financialBasicsVehicles);
 			  return AjaxResponse.success(true);
 		} catch (Exception e) {
 			e.printStackTrace();  
