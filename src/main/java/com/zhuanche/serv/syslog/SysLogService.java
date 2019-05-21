@@ -106,7 +106,7 @@ public class SysLogService {
 		 Query query = new Query().limit(pageSize);
 		 query.addCriteria(Criteria.where("module").is(module));
 		 query.addCriteria(Criteria.where("logKey").is(logKey));
-		 query.addCriteria(Criteria.where("method").in("update","save"));
+		 query.addCriteria(Criteria.where("method").in("update","save","updateStatus"));
 		 
 		 query.with(new Sort(new Order(Direction.DESC,"startTime")));    
 		 

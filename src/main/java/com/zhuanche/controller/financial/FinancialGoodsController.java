@@ -198,6 +198,8 @@ public class FinancialGoodsController {
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.MASTER )
 	} )
 	@RequestMapping(value = "/updateFinancialGoodsByStatus")
+	@SysLogAnn(module="FinancialGoods",methods="updateStatus",
+    serviceClass="financialGoodsService",queryMethod="queryFinancialGoodsById",parameterType="Integer",parameterKey="goodsId",objClass=FinancialGoodsInfoDTO.class )
 	public AjaxResponse updateFinancialGoodsByStatus(
 			@Verify(param = "goodsId", rule = "required|min(1)")Integer goodsId,
 			@Verify(param = "status", rule = "required")Byte status

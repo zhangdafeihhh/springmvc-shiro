@@ -302,6 +302,8 @@ public class FinancialBasicsVehiclesController {
 			@MasterSlaveConfig(databaseTag="driver-DataSource",mode=DataSourceMode.MASTER )
 	} )
 	@RequestMapping(value = "/updateFinancialBasicsVehiclesForStatus")
+	@SysLogAnn(module="FinancialBasicsVehicles",methods="updateStatus",
+    serviceClass="financialBasicsVehiclesService",queryMethod="queryFinancialBasicsVehiclesById",parameterType="Integer",parameterKey="basicsVehiclesId",objClass=FinancialBasicsVehiclesDTO.class )
 	public AjaxResponse updateFinancialBasicsVehiclesForStatus(
 			@Verify(param = "basicsVehiclesId", rule = "required|min(1)")Integer basicsVehiclesId,
 			@Verify(param = "basicsVehiclesId", rule = "required")Byte enableStatus

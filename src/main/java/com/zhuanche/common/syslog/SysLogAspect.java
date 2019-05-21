@@ -130,7 +130,9 @@ public class SysLogAspect {
 					JSONObject jsonObjPa = (JSONObject) JSON.toJSON(mapparam);
 					for (Map.Entry<String, Object> entry : jsonObjPa.entrySet()) {
 						jsonParam=(JSONObject) entry.getValue();
-				         break;
+				         if (jsonParam != null) {
+				            break;
+				         }
 				    }
 
 					//jsonParam = (JSONObject) JSON.toJSON(mapparam.get(0));
