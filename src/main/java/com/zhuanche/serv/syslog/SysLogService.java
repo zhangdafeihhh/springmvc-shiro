@@ -114,12 +114,24 @@ public class SysLogService {
 	     query.skip(start - 1 < 0 ? 0 : start);
 		 List<SysSaveOrUpdateLog> list=mongoTemplate.find(query, SysSaveOrUpdateLog.class);
 		
+
 	     long count = mongoTemplate.count(query, SysSaveOrUpdateLog.class);
 
 	    if (list == null || list.isEmpty()) {
 	         return new PageDTO(page, pageSize, count, new ArrayList());
 	    }
-		
+		for (SysSaveOrUpdateLog sysSaveOrUpdateLog : list) {
+			String method="";
+			if ("update".equals(sysSaveOrUpdateLog.getMethod())) {
+				method="修改";
+			}if ("save".equals(sysSaveOrUpdateLog.getMethod())) {
+				method="新增";
+			}if ("updateStatus".equals(sysSaveOrUpdateLog.getMethod())) {
+				method="更新状态";
+			}
+			sysSaveOrUpdateLog.setMethod(method);
+		}
+	    
 		return new PageDTO( page,pageSize,count,list);
 	}
 }
