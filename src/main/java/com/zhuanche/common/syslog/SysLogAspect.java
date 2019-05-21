@@ -65,7 +65,7 @@ public class SysLogAspect {
 		logger.info("--point cut start--");
 	}
 
-	@AfterReturning("logPoinCut()")
+	@Around("logPoinCut()")
 	public Object around(ProceedingJoinPoint pjp) throws Throwable {
 		// 常见日志实体对象
 		SysSaveOrUpdateLog sysLog = new SysSaveOrUpdateLog();
