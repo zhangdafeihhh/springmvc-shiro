@@ -79,12 +79,19 @@ public class SysLogAspect {
 		// 拦截的方法名称。当前正在执行的方法
 		String methodName = pjp.getSignature().getName();
 		// 拦截的方法参数
-		// Object[] args = pjp.getArgs();
-		// String operateParam = JSON.toJSONString(args);
 		JSONArray operateParamArray = new JSONArray();
+		Object[] args = pjp.getArgs();
+		logger.info("--方法传入参数值--"+args.length+"值"+args);
+		String classType = pjp.getTarget().getClass().getName();
+		Class<?> clazz = Class.forName(classType);
+		String clazzName = clazz.getName();
+		String[] paramNames = LogAopUtil.getFieldsName(this.getClass(), clazzName, methodName);
+		logger.info("--方法传入参数名称--"+paramNames.length+"值"+paramNames);
+		
+		Map mapparam = getParamKeyValue(paramNames,args);
+		//Map mapparam = getFieldsName(pjp);
 
-		Map mapparam = getFieldsName(pjp);
-
+		// String operateParam = JSON.toJSONString(args);
 		/*
 		 * for (int i = 0; i < args.length; i++) { Object paramsObj = args[i];
 		 * //通过该方法可查询对应的object属于什么类型：String type =
@@ -228,7 +235,6 @@ public class SysLogAspect {
                         }
 					}
                     //保存进数据库
-                   // sysLogService.saveLog(sysLog);
                     if (StringUtils.isNotBlank(sysLog.getRemarks())) {
                       mongoTemplate.insert(sysLog);
 					}
@@ -248,6 +254,17 @@ public class SysLogAspect {
 			object = pjp.proceed();
 		}
 		return object;
+	}
+
+	private Map getParamKeyValue(String[] paramNames, Object[] args) {
+		Map<String, Object> nameAndArgs = new HashMap<String, Object>();
+		if (paramNames.length>0 && args.length>0) {
+			for (int i = 0; i < args.length; i++) {
+				logger.info("参数名:"+paramNames[i]+"参数值:"+ args[i]);
+				nameAndArgs.put(paramNames[i], args[i]);
+			}
+		}
+		return nameAndArgs;
 	}
 
 	/**
@@ -348,7 +365,7 @@ public class SysLogAspect {
 		String methodName = joinPoint.getSignature().getName();
 		// 参数值
 		Object[] args = joinPoint.getArgs();
-		Class<?>[] classes = new Class[args.length];
+
 		Class<?> clazz = Class.forName(classType);
 		Map<String, Object> paramMap=LogAopUtil.getNameAndArgsMap(this.getClass(), clazz.getName(), methodName, args);
 		/*for (int k = 0; k < args.length; k++) {
