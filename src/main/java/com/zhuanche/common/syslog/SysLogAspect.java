@@ -68,7 +68,7 @@ public class SysLogAspect {
 	}
 
 	@Around("logPoinCut()")
-	public Object around(JoinPoint pjp) throws Throwable {
+	public Object around(ProceedingJoinPoint pjp) throws Throwable {
 		// 常见日志实体对象
 		SysSaveOrUpdateLog sysLog = new SysSaveOrUpdateLog();
 		// 获取登录用户账户
@@ -212,7 +212,7 @@ public class SysLogAspect {
 
                 try {
                     //执行页面请求模块方法，并返回
-                    object = ((ProceedingJoinPoint) pjp).proceed();
+                    object = pjp.proceed();
                     //获取系统时间
                     sysLog.setEndTime(new Date());
                     //将object 转化为controller封装返回的实体类：RequestResult
@@ -250,11 +250,11 @@ public class SysLogAspect {
                 }
 			} else {
 				// 没有包含注解
-				object = ((ProceedingJoinPoint) pjp).proceed();
+				object = pjp.proceed();
 			}
 		} else {
 			// 不需要拦截直接执行
-			object = ((ProceedingJoinPoint) pjp).proceed();
+			object = pjp.proceed();
 		}
 		return object;
 	}
