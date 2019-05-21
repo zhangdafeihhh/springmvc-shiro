@@ -194,7 +194,7 @@ public class SysLogAspect {
 							}
 						}
 						// 在此处获取操作前的spring bean的查询方法
-						Object data = getOperateBeforeData(paramType, serviceClass, queryMethod, value);
+						Object data = getOperateBeforeData(paramType, serviceClass, queryMethod, value.trim());
 						JSONObject beforeParam = (JSONObject) JSON.toJSON(data);
 						sysLog.setBeforeParams(beforeParam.toJSONString());
 					}
