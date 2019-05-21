@@ -34,9 +34,9 @@ public class FinancialBasicsVehiclesDTO{
     @Column(desc="厂家指导价")
     private BigDecimal guidancePrice;
     @Column(desc="排量")
-    private Integer discharge;
+    private Double discharge;
     @Column(desc="续航里程")
-    private Integer mileage;
+    private Double mileage;
     @Column(desc="汽车之家")
     private String autoHomeUrl;
     @Column(desc="长宽高")
@@ -48,9 +48,9 @@ public class FinancialBasicsVehiclesDTO{
     @Column(desc="环保标准")
     private String environmentalProtectionStandard;
     @Column(desc="快充时间(小时)")
-    private Integer fastChargingTime;
+    private Double fastChargingTime;
     @Column(desc="慢充时间(小时)")
-    private Integer slowChargingTime;
+    private Double slowChargingTime;
     @Column(desc="快充电量 百分比")
     private Double fastPercentage;
 
@@ -202,22 +202,6 @@ public class FinancialBasicsVehiclesDTO{
 		this.guidancePrice = guidancePrice;
 	}
 
-	public Integer getDischarge() {
-		return discharge;
-	}
-
-	public void setDischarge(Integer discharge) {
-		this.discharge = discharge;
-	}
-
-	public Integer getMileage() {
-		return mileage;
-	}
-
-	public void setMileage(Integer mileage) {
-		this.mileage = mileage;
-	}
-
 	public String getAutoHomeUrl() {
 		return autoHomeUrl;
 	}
@@ -258,19 +242,35 @@ public class FinancialBasicsVehiclesDTO{
 		this.environmentalProtectionStandard = environmentalProtectionStandard;
 	}
 
-	public Integer getFastChargingTime() {
+	public Double getDischarge() {
+		return discharge;
+	}
+
+	public void setDischarge(Double discharge) {
+		this.discharge = discharge;
+	}
+
+	public Double getMileage() {
+		return mileage;
+	}
+
+	public void setMileage(Double mileage) {
+		this.mileage = mileage;
+	}
+
+	public Double getFastChargingTime() {
 		return fastChargingTime;
 	}
 
-	public void setFastChargingTime(Integer fastChargingTime) {
+	public void setFastChargingTime(Double fastChargingTime) {
 		this.fastChargingTime = fastChargingTime;
 	}
 
-	public Integer getSlowChargingTime() {
+	public Double getSlowChargingTime() {
 		return slowChargingTime;
 	}
 
-	public void setSlowChargingTime(Integer slowChargingTime) {
+	public void setSlowChargingTime(Double slowChargingTime) {
 		this.slowChargingTime = slowChargingTime;
 	}
 
