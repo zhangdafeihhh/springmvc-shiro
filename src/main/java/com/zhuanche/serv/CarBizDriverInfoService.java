@@ -3680,19 +3680,24 @@ public class CarBizDriverInfoService {
                 Integer ext2 = dto.getExt2();
                 Integer ext3 = dto.getExt3();
                 //这里的值只有1234，所有使用==比较  1:人证合规 2:车证合规 3:双证合规 4:不合规
-                if(1 == ext2){
-                    complianceStatus = "合规";
-                }else if(0 == ext2){
-                    complianceStatus = "不合规";
+                if(ext2 != null){
+                    if(1 == ext2){
+                        complianceStatus = "合规";
+                    }else if(0 == ext2){
+                        complianceStatus = "不合规";
+                    }
                 }
-                if(1 == ext3){
-                    complianceKind = "人证合规";
-                }else if(2 == ext3){
-                    complianceKind = "车证合规";
-                }else if(3 == ext3){
-                    complianceKind = "双证合规";
-                }else if(4 == ext3){
-                    complianceKind = "不合规";
+
+                if(ext3 != null){
+                    if(1 == ext3){
+                        complianceKind = "人证合规";
+                    }else if(2 == ext3){
+                        complianceKind = "车证合规";
+                    }else if(3 == ext3){
+                        complianceKind = "双证合规";
+                    }else if(4 == ext3){
+                        complianceKind = "不合规";
+                    }
                 }
                 builder.append(complianceStatus).append(",");
                 builder.append(complianceKind);
