@@ -134,6 +134,7 @@ public class SysLogAspect {
 			// 判断是否包含自定义的注解，说明一下这里的SystemLog就是我自己自定义的注解
 			if (method.isAnnotationPresent(SysLogAnn.class)) {
 				SysLogAnn sysLogAnn = method.getAnnotation(SysLogAnn.class);
+				String key = sysLogAnn.parameterKey();
 				JSONObject jsonParam = null;
 				logger.info("----"+JSON.toJSON(mapparam).toString());
 				logger.info("--获取日志bean--"+sysLogAnn.parameterObj());
@@ -150,6 +151,13 @@ public class SysLogAspect {
 				} else {
 					jsonParam = new JSONObject(mapparam);
 				}
+				if (jsonParam==null) {
+					// 不需要拦截直接执行
+					object = pjp.proceed();
+					return object;
+				}
+			  	String syslogkey=jsonParam.getString(key);
+			  	
 				operateParamArray.add(jsonParam);
 				sysLog.setOperateParams(jsonParam.toJSONString());
 
@@ -163,7 +171,7 @@ public class SysLogAspect {
 				// 请求查询数据的方法
 				String queryMethod = sysLogAnn.queryMethod();
 				
-				String key = sysLogAnn.parameterKey();
+				
 				
 				// 判断是否需要进行操作前的对象参数查询
 				if (StringUtils.isNotBlank(sysLogAnn.parameterKey())
@@ -223,9 +231,11 @@ public class SysLogAspect {
                             //操作流程成功
                         	sysLog.setResultMsg(requestResult.getMsg());
                             if(requestResult.getCode()==0){
-                            	Object obj = requestResult.getData();
-                            	JSONObject jsonObj = (JSONObject) JSON.toJSON(obj);
-                            	String syslogkey=jsonObj.getString(key);
+                            	if (StringUtils.isBlank(syslogkey)) {
+                            		Object obj = requestResult.getData();
+                                	JSONObject jsonObj = (JSONObject) JSON.toJSON(obj);
+                                	syslogkey=jsonObj.getString(key);
+								}
                             	sysLog.setLogKey(syslogkey);
                             	sysLog.setResultStatus(1);
                             }else{
