@@ -1239,14 +1239,19 @@ public class OrderController{
     }
 
     private void calcOverMileageTotal(OrderCostDetailInfo orderCostDetailInfo) {
-        if (null != orderCostDetailInfo.getCostMileageDetailDTOList() && orderCostDetailInfo.getCostMileageDetailDTOList().size() > 0){
-            orderCostDetailInfo.setOverMileageTotal(orderCostDetailInfo.getOverMileageNum());
-            for (CostTimeDetailDTO dto : orderCostDetailInfo.getCostMileageDetailDTOList()){
-                orderCostDetailInfo.setOverMileageTotal(orderCostDetailInfo.getOverMileageTotal().add(dto.getNumber()));
-            }
-        }else {
-            orderCostDetailInfo.setOverMileageTotal(orderCostDetailInfo.getOverMileageNum().add(new BigDecimal(orderCostDetailInfo.getHotMileage()).add(orderCostDetailInfo.getNightDistanceNum())));
-        }
+    	if (Objects.isNull(orderCostDetailInfo)){
+    		return ;
+		}else {
+			if (null != orderCostDetailInfo.getCostMileageDetailDTOList() && orderCostDetailInfo.getCostMileageDetailDTOList().size() > 0){
+				orderCostDetailInfo.setOverMileageTotal(orderCostDetailInfo.getOverMileageNum());
+				for (CostTimeDetailDTO dto : orderCostDetailInfo.getCostMileageDetailDTOList()){
+					orderCostDetailInfo.setOverMileageTotal(orderCostDetailInfo.getOverMileageTotal().add(dto.getNumber()));
+				}
+			}else {
+				orderCostDetailInfo.setOverMileageTotal(orderCostDetailInfo.getOverMileageNum().add(new BigDecimal(orderCostDetailInfo.getHotMileage()).add(orderCostDetailInfo.getNightDistanceNum())));
+			}
+		}
+
     }
 
 		

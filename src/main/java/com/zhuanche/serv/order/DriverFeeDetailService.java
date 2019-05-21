@@ -10,9 +10,10 @@ public interface DriverFeeDetailService {
 
     OrderDriverCostDetailVO getOrderDriverCostDetailVO(String orderNo, long orderId);
 
-    DriverCostDetailVO getDriverCostDetail(String orderNo, int orderId, Integer buyoutFlag );
 
     List<OrderDriverCostDetailVO> getOrderDriverCostDetailVOBatch(List<String> orderNos);
     List<OrderCostDetailInfo> getOrdersCostDetailInfo(String orderNos);
     OrderCostDetailInfo getOrderCostDetailInfo(String orderNo);
+
+    DriverCostDetailVO getDriverCostDetail(String orderNo, int orderId, Integer buyoutFlag);
 }

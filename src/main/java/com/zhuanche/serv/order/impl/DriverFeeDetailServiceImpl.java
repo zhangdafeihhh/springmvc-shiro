@@ -39,12 +39,18 @@ public class DriverFeeDetailServiceImpl implements DriverFeeDetailService {
      * @param orderId    订单id
      * @param buyoutFlag 0-非一口价 1-一口价
      */
+    @Override
     public DriverCostDetailVO getDriverCostDetail(String orderNo, int orderId, Integer buyoutFlag) {
-        if (StringUtils.isBlank(orderNo) && orderId != 0)
+        if (StringUtils.isBlank(orderNo) && orderId != 0) {
             return null;
+        }
         if(null == buyoutFlag){
             OrderCostDetailInfo info = getOrderCostDetailInfo(orderNo);
-            buyoutFlag = info.getBuyOutFlag();
+            if (Objects.nonNull(info)) {
+                buyoutFlag = info.getBuyOutFlag();
+            } else {
+                return null;
+            }
         }
         Map<String, Object> params = new HashMap<>();
         params.put("orderNo", orderNo);
@@ -85,7 +91,11 @@ public class DriverFeeDetailServiceImpl implements DriverFeeDetailService {
                 logger.info("查询计费司机详情无数据 响应结果: {}", result.toJSONString());
                 return null;
             }
-            return result.getJSONObject(Constants.DATA).toJavaObject(OrderDriverCostDetailVO.class);
+            JSONObject data = result.getJSONObject(Constants.DATA);
+            if (Objects.nonNull(data)) {
+                return data.toJavaObject(OrderDriverCostDetailVO.class);
+            }
+            return null;
         }catch (Exception e){
             logger.error("调用计费查询司机费用详情失败 orderNo = " + orderNo, e);
         }
@@ -154,10 +164,13 @@ public class DriverFeeDetailServiceImpl implements DriverFeeDetailService {
      * @param orderNo P1439635871018071
      * @return
      */
+    @Override
     public OrderCostDetailInfo getOrderCostDetailInfo(String orderNo) {
         List<OrderCostDetailInfo> list = getOrdersCostDetailInfo(orderNo);
-        if (null != list && list.size() > 0)
+        if (null != list && list.size() > 0) {
             return list.get(0);
+        }
+
         return null;
     }
 
