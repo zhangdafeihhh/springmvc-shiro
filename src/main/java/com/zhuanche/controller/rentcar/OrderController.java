@@ -32,6 +32,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -82,6 +83,9 @@ public class OrderController{
 
 	@Autowired
 	private CarBizCityExMapper cityExMapper;
+
+	@Value("${kefu.trajectory.url}")
+	private String kfDomain;
 
 
 	/**
@@ -848,7 +852,6 @@ public class OrderController{
 		String factDate = oer.getFactDate();
 		String factEndDate = oer.getFaceEndDate();
 		//司机端预估轨迹value=3
-		int value = 3;
 		String orderNo = oer.getOrderNo();
 		//订单的预估费用
 		Double estimatedAmount = oer.getEstimatedAmount();
@@ -859,8 +862,8 @@ public class OrderController{
 		//乘客实际支付
 		Double actualPayAmount = oer.getActualPayAmount();
 		logger.info("司机端预估轨迹参数-estimatedAmount:{" + estimatedAmount + "},travelMileage:{" + travelMileage + "},travelTimeShow:{" + travelTimeShow + "},actualPayAmount:{" + actualPayAmount + "}");
-		logger.info("查询订单轨迹,driverId=" + driverId + ",factDate=" + factDate + ",factEndDate=" + factEndDate + ",value=" + value + "&orderNo=" + orderNo);
-		String url = "https://zcads.01zhuanche.com/pages";
+		logger.info("查询司机端预估轨迹,driverId=" + driverId + ",factDate=" + factDate + ",factEndDate=" + factEndDate  + "&orderNo=" + orderNo);
+		String url = kfDomain;
 		long startTime = com.zhuanche.util.DateUtils.getDate(factDate).getTime();
 		long endTime = com.zhuanche.util.DateUtils.getDate(factEndDate).getTime();
 		url += "/track/track-play-org-new.html?startTime=" + startTime + "&endTime=" + endTime + "&driverId=" + driverId +
