@@ -88,9 +88,9 @@ public class SysLogAspect {
 		logger.info("--classType--"+classType);
 		String clazzName = clazz.getName();
 		logger.info("--clazzName--"+clazzName);
-		String[] paramNames = LogAopUtil.getFieldsName(this.getClass(), clazzName, methodName);
-		logger.info("--方法传入参数名称--"+paramNames.length+"值"+paramNames);
+		//String[] paramNames = LogAopUtil.getFieldsName(clazz, clazzName, methodName);
 		
+	    String[] paramNames = ((MethodSignature)pjp.getSignature()).getParameterNames(); // 参数名
 		Map mapparam = getParamKeyValue(paramNames,args);
 		//Map mapparam = getFieldsName(pjp);
 
@@ -124,6 +124,7 @@ public class SysLogAspect {
 		Method method = null;
 		try {
 			method = target.getClass().getMethod(methodName, parameterTypes);
+			
 		} catch (NoSuchMethodException e1) {
 			logger.error("ControllerLogAopAspect around error", e1);
 		} catch (SecurityException e1) {
