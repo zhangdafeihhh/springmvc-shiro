@@ -3,6 +3,7 @@ package com.zhuanche.serv.busManage;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -19,6 +20,7 @@ import com.zhuanche.serv.CarBizDriverInfoService;
 import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.mdbcarmanage.CarBizDriverInfoTempService;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.threads.ThreadSupplierTasker;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.objcompare.CompareObjectUtils;
 import com.zhuanche.util.objcompare.entity.supplier.*;
@@ -49,6 +51,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.*;
 
 @Service
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -97,6 +100,14 @@ public class BusSupplierService implements BusConst {
 	// ===============================巴士其它服务===================================
 	@Value("${order.pay.url}")
 	private String orderPayUrl;
+
+	@Value("${driver.server.api.url}")
+	private String driverServiceApiUrl;
+
+	private static ThreadFactory threadFactoryBuilder = new ThreadFactoryBuilder().setNameFormat("bus-update-CooperationType-%d").build();
+
+	private final static ExecutorService excutorService = new ThreadPoolExecutor(5,10,0L,
+			TimeUnit.MILLISECONDS,new LinkedBlockingDeque<Runnable>(50),threadFactoryBuilder,new ThreadPoolExecutor.AbortPolicy());
 
 	/**
 	 * @param rebateDTO 
@@ -158,6 +169,16 @@ public class BusSupplierService implements BusConst {
 		if (Method.UPDATE.equals(method)) {
 			carBizDriverInfoService.updateDriverCooperationTypeBySupplierId(baseDTO.getSupplierId(), baseDTO.getCooperationType());
 			carBizDriverInfoTempService.updateDriverCooperationTypeBySupplierId(baseDTO.getSupplierId(), baseDTO.getCooperationType());
+			//TODO 修改供应商的加盟类型需要发送driver_info的topic-Mq 消息
+			CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(baseDTO.getSupplierId());
+			if (carBizSupplier != null) {
+				try {
+					excutorService.submit(new ThreadSupplierTasker(carBizSupplier.getSupplierId(), carBizSupplier.getSupplierFullName(),
+							carBizSupplier.getSupplierCity(), baseDTO.getCooperationType(), carBizCityExMapper, driverServiceApiUrl));
+				} catch (Exception e) {
+					logger.info("供应商修改加盟类型,调用清除接口异常=" + e.getMessage());
+				}
+			}
 		}
 
 		// 四、调用分佣接口，修改分佣、返点信息

@@ -24,6 +24,7 @@ import com.zhuanche.entity.mdbcarmanage.CarBizAgreementCompany;
 import com.zhuanche.entity.mdbcarmanage.CarRelateGroup;
 import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.entity.rentcar.*;
+import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.mongo.DriverMongo;
 import com.zhuanche.mongo.busManage.BusDriverInfoAudit;
@@ -57,6 +58,8 @@ import mapper.rentcar.*;
 import mapper.rentcar.ex.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpException;
+import org.apache.http.entity.ContentType;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -199,6 +202,9 @@ public class BusCarBizDriverInfoService implements BusConst {
 
     @Value("${car.rest.url}")
     private String order_url ;
+
+    @Value("${mp.restapi.url}")
+    private String mpReatApiUrl;
     /**
      * @param queryDTO
      * @return List<BusDriverInfoVO>
@@ -1364,7 +1370,17 @@ public class BusCarBizDriverInfoService implements BusConst {
     public int resetIMEI(Integer driverId) {
         // 创建操作记录
        // busBizChangeLogService.insertLog(BusinessType.DRIVER, String.valueOf(driverId), new Date());
-        return carBizDriverInfoExMapper.resetIMEI(driverId);
+        int succtss = carBizDriverInfoExMapper.resetIMEI(driverId);
+        try {
+            Map<String, Object> paramMap = new HashMap<String, Object>();
+            paramMap.put("driverId", driverId);
+            String url = mpReatApiUrl + Common.DRIVER_WIDE_MQ;
+            String jsonObjectStr = HttpClientUtil.buildPostRequest(url).addParams(paramMap).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
+            logger.info("driverId={}重置imei调用新增接口, result={}", driverId, jsonObjectStr);
+        } catch (HttpException e) {
+            logger.info("driverId={}重置imei调用接口, error={}", driverId, e);
+        }
+        return succtss;
     }
 
     /**

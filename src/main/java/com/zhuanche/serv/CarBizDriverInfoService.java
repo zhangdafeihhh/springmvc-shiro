@@ -29,8 +29,10 @@ import com.zhuanche.serv.mdbcarmanage.CarBizDriverUpdateService;
 import com.zhuanche.serv.mongo.DriverMongoService;
 import com.zhuanche.serv.order.OrderService;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.Common;
 import com.zhuanche.util.DateUtil;
-import com.zhuanche.util.*;
+import com.zhuanche.util.Md5Util;
+import com.zhuanche.util.ValidateUtils;
 import com.zhuanche.util.encrypt.MD5Utils;
 import mapper.mdbcarmanage.*;
 import mapper.mdbcarmanage.ex.*;
@@ -3223,6 +3225,18 @@ public class CarBizDriverInfoService {
             driverMongoService.updateDriverCardInfo(map);
             if (rtn > 0) {
                 result.put("result", 1);
+                if(map != null && map.containsKey("driverId")){
+                    Integer driverId = Integer.valueOf(map.get("driverId").toString());
+                    try {
+                        Map<String, Object> paramMap = new HashMap<String, Object>();
+                        paramMap.put("driverId", driverId);
+                        String url = mpReatApiUrl + Common.DRIVER_WIDE_MQ;
+                        String jsonObjectStr = HttpClientUtil.buildPostRequest(url).addParams(paramMap).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
+                        logger.info("driverId={}解绑司机信用卡调用发送MQ接口, result={}", driverId, jsonObjectStr);
+                    } catch (HttpException e) {
+                        logger.info("driverId={}解绑司机信用卡调用发送MQ接口, error={}", driverId, e);
+                    }
+                }
             } else {
                 result.put("result", 0);
             }
