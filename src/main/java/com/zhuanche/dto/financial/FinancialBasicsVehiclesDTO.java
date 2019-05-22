@@ -71,7 +71,7 @@ public class FinancialBasicsVehiclesDTO{
 	private String variableBoxName;
 	
 	private String energyTypeName;
-	
+    @Column(desc="状态")
 	private String enableStatusName;
 
 	public String getBrandName() {
@@ -91,10 +91,10 @@ public class FinancialBasicsVehiclesDTO{
 	}
 
 	public String getVariableBoxName() {
-		if (getVariableBox()==1) {
+		if (getVariableBox()!=null && getVariableBox()==1) {
 			variableBoxName="自动";
 		}
-		if (getVariableBox()==0) {
+		if (getVariableBox()!=null && getVariableBox()==0) {
 			variableBoxName="手动";
 		}
 		return variableBoxName;
@@ -105,9 +105,11 @@ public class FinancialBasicsVehiclesDTO{
 	}
 
 	public String getEnergyTypeName() {
-		EnergyTypeEnum energyTypeEnum=EnergyTypeEnum.indexOf(getEnergyType());
-		if (energyTypeEnum!=null) {
-			energyTypeName=energyTypeEnum.getEnergyTypeName();
+		if (getEnergyType()!=null) {
+			EnergyTypeEnum energyTypeEnum=EnergyTypeEnum.indexOf(getEnergyType());
+			if (energyTypeEnum!=null) {
+				energyTypeName=energyTypeEnum.getEnergyTypeName();
+			}
 		}
 		return energyTypeName;
 	}
@@ -117,10 +119,10 @@ public class FinancialBasicsVehiclesDTO{
 	}
 
 	public String getEnableStatusName() {
-		if (getEnableStatus()==EnableStatusSelect.DISCONTINUE) {
+		if (getEnableStatus()!=null && getEnableStatus()==EnableStatusSelect.DISCONTINUE) {
 			enableStatusName="停用";
 		}
-		if (getEnableStatus()==EnableStatusSelect.ENABLESTATUS) {
+		if (getEnableStatus()!=null && getEnableStatus()==EnableStatusSelect.ENABLESTATUS) {
 			enableStatusName="启用";
 		}
 		return enableStatusName;

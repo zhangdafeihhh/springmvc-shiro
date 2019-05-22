@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.zhuanche.common.syslog.Column;
 import com.zhuanche.entity.driver.SysLog;
+import com.zhuanche.util.BeanUtil;
 
 /**  
  * ClassName:CompareObjUtil <br/>  
@@ -74,6 +75,7 @@ public class CompareObjUtil {
         StringBuilder stringbuilder=new StringBuilder();
    	    try {
 			Object afterObj=JSON.parseObject(afterStr, clazz);
+			afterObj=BeanUtil.copyObject(afterObj, clazz);
 			//取出属性
 			Field[] afterFields = afterObj.getClass().getDeclaredFields();
 			Field.setAccessible(afterFields, true);
@@ -87,9 +89,9 @@ public class CompareObjUtil {
 			            if(afterValue != null && !"".equals(afterValue)){
 			             	if (column!=null) {
 								stringbuilder.append(column.desc()+":");
+								stringbuilder.append(afterValue);
+				           	    stringbuilder.append(";");
 							}
-			           	     stringbuilder.append(afterValue);
-			           	     stringbuilder.append(";");
 			            }
 			    }
 			}
@@ -110,9 +112,9 @@ public class CompareObjUtil {
     	 StringBuilder stringbuilder=new StringBuilder();
          
     	 try {
-			Object beforeObj=JSON.parseObject(beforeStr, clazz);
+			 Object beforeObj=JSON.parseObject(beforeStr, clazz);
 			 Object afterObj=JSON.parseObject(afterStr, clazz);
-			
+			 afterObj=BeanUtil.copyObject(afterObj, clazz);
 			 if(!beforeObj.getClass().isAssignableFrom(afterObj.getClass())){
 			     throw new Exception("两个对象不相同，无法比较");
 			 }
@@ -132,12 +134,12 @@ public class CompareObjUtil {
 			             if((afterValue != null && !"".equals(afterValue) && !afterValue.equals(beforeValue)) /*|| ((afterValue == null || "".equals(afterValue)) && beforeValue != null)*/){
 			              	if (column!=null) {
 			 					stringbuilder.append(column.desc()+":");
+			 					beforeFields[i].getName();
+				            	stringbuilder.append(beforeValue);
+				            	stringbuilder.append("==>");
+				            	stringbuilder.append(afterValue);
+				            	stringbuilder.append(";");
 			 				}
-			            	 beforeFields[i].getName();
-			            	 stringbuilder.append(beforeValue);
-			            	 stringbuilder.append("==>");
-			            	 stringbuilder.append(afterValue);
-			            	 stringbuilder.append(";");
 			             }
 			     }
 			 }

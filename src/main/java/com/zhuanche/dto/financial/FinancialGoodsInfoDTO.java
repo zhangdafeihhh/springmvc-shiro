@@ -6,6 +6,7 @@ import java.util.List;
 import com.zhuanche.constants.financial.FinancialConst.GoodsState;
 import com.zhuanche.constants.financial.FinancialConst.GoodsTypeSelect;
 import com.zhuanche.constants.financial.FinancialConst.SalesTargetSelect;
+import com.zhuanche.constants.financial.FinancialConst.VehicleProperties;
 import com.zhuanche.common.syslog.Column;
 import com.zhuanche.constants.financial.MileageEnum;
 import com.zhuanche.constants.financial.VehicleAgeEnum;
@@ -26,9 +27,9 @@ public class FinancialGoodsInfoDTO{
     private String goodsNumber;
     @Column(desc="商品名称")
     private String goodsName;
-    @Column(desc="销售对象")
+
     private Byte salesTarget;
-    @Column(desc="商品类型")
+
     private Byte goodsType;
     @Column(desc="供应商ID")
     private Integer supplierId;
@@ -48,11 +49,8 @@ public class FinancialGoodsInfoDTO{
     private String pictureUrl;
     @Column(desc="关键字")
     private String keyword;
-    @Column(desc="车龄")
     private Integer vehicleAge;
-    @Column(desc="里程")
     private Integer mileage;
-    @Column(desc="车辆性质")
     private Integer vehicleProperties;
     @Column(desc="资金来源")
     private Integer sourceFundsId;
@@ -76,19 +74,26 @@ public class FinancialGoodsInfoDTO{
     private String additionalServicesInfo;
     @Column(desc="库存")
     private Integer stock;
+
     private Byte status;
     private String createBy;
     private Date createTime;
     private String updateBy;
-    @Column(desc="基础车型库ID")
     private Date updateTime;
-    
+    @Column(desc="车辆性质")
 	private String vehiclesDetailedName;
+    @Column(desc="商品类型")
 	private String goodsTypeName;
+    @Column(desc="销售对象")
 	private String salesTargetName;
+    @Column(desc="车龄")
 	private String vehicleAgeName;
+    @Column(desc="里程")
 	private String mileageName;
+    @Column(desc="状态")
 	private String statusName;
+    
+	private String vehiclePropertiesName; 
 	private List<FinancialAdditionalClause> additionalClauses;  
 	
 	public String getVehiclesDetailedName() {
@@ -98,10 +103,10 @@ public class FinancialGoodsInfoDTO{
 		this.vehiclesDetailedName = vehiclesDetailedName;
 	}
 	public String getGoodsTypeName() {
-		if (getGoodsType()==GoodsTypeSelect.GOODS_TYPE_FINANCING) {
+		if (getGoodsType()!=null && getGoodsType()==GoodsTypeSelect.GOODS_TYPE_FINANCING) {
 			goodsTypeName="融租";
 		}
-		if (getGoodsType()==GoodsTypeSelect.GOODS_TYPE_RENT) {
+		if (getGoodsType()!=null && getGoodsType()==GoodsTypeSelect.GOODS_TYPE_RENT) {
 			goodsTypeName="经租";
 		}
 		return goodsTypeName;
@@ -110,10 +115,10 @@ public class FinancialGoodsInfoDTO{
 		this.goodsTypeName = goodsTypeName;
 	}
 	public String getSalesTargetName() {
-		if (getSalesTarget()==SalesTargetSelect.SALES_TARGET_TOC) {
+		if (getSalesTarget()!=null && getSalesTarget()==SalesTargetSelect.SALES_TARGET_TOC) {
 			salesTargetName="ToC";
 		}
-		if (getSalesTarget()==SalesTargetSelect.SALES_TARGET_TOB) {
+		if (getSalesTarget()!=null && getSalesTarget()==SalesTargetSelect.SALES_TARGET_TOB) {
 			salesTargetName="ToB";
 		}
 		return salesTargetName;
@@ -122,9 +127,11 @@ public class FinancialGoodsInfoDTO{
 		this.salesTargetName = salesTargetName;
 	}
 	public String getVehicleAgeName() {
-		VehicleAgeEnum vehicleAgeEnum=VehicleAgeEnum.indexOf(getVehicleAge());
-		if (vehicleAgeEnum!=null) {
-			vehicleAgeName=vehicleAgeEnum.getVehicleAge();
+		if (getVehicleAge()!=null) {
+			VehicleAgeEnum vehicleAgeEnum=VehicleAgeEnum.indexOf(getVehicleAge());
+			if (vehicleAgeEnum!=null) {
+				vehicleAgeName=vehicleAgeEnum.getVehicleAge();
+			}
 		}
 		return vehicleAgeName;
 	}
@@ -132,9 +139,11 @@ public class FinancialGoodsInfoDTO{
 		this.vehicleAgeName = vehicleAgeName;
 	}
 	public String getMileageName() {
-		MileageEnum mileageEnum=MileageEnum.indexOf(getMileage());
-		if (mileageEnum!=null) {
-			mileageName=mileageEnum.getMileage();
+		if (getMileage()!=null) {
+			MileageEnum mileageEnum=MileageEnum.indexOf(getMileage());
+			if (mileageEnum!=null) {
+				mileageName=mileageEnum.getMileage();
+			}
 		}
 		return mileageName;
 	}
@@ -142,13 +151,13 @@ public class FinancialGoodsInfoDTO{
 		this.mileageName = mileageName;
 	}
 	public String getStatusName() {
-		if (getStatus()==GoodsState.STAY_ON_THE_SHELF) {
+		if (getStatus()!=null && getStatus()==GoodsState.STAY_ON_THE_SHELF) {
 			statusName="已上架";
 		}
-		if (getStatus()==GoodsState.ON_SHELVES) {
+		if (getStatus()!=null && getStatus()==GoodsState.ON_SHELVES) {
 			statusName="已下架";	
 		}
-		if (getStatus()==GoodsState.DELETE) {
+		if (getStatus()!=null && getStatus()==GoodsState.DELETE) {
 			statusName="删除";	
 		}
 		return statusName;
@@ -367,7 +376,27 @@ public class FinancialGoodsInfoDTO{
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
 	}
-
+	public String getVehiclePropertiesName() {
+		if (getVehicleProperties()!=null && getVehicleProperties()==VehicleProperties.VehicleProperties1) {
+			vehiclePropertiesName="非营运";
+		}
+		if (getVehicleProperties()!=null && getVehicleProperties()==VehicleProperties.VehicleProperties2) {
+			vehiclePropertiesName="出租客运";
+		}
+		if (getVehicleProperties()!=null && getVehicleProperties()==VehicleProperties.VehicleProperties3) {
+			vehiclePropertiesName="租赁";
+		}
+		if (getVehicleProperties()!=null && getVehicleProperties()==VehicleProperties.VehicleProperties4) {
+			vehiclePropertiesName="营转非";
+		}
+		if (getVehicleProperties()!=null && getVehicleProperties()==VehicleProperties.VehicleProperties5) {
+			vehiclePropertiesName="出租转非";
+		}
+		return vehiclePropertiesName;
+	}
+	public void setVehiclePropertiesName(String vehiclePropertiesName) {
+		this.vehiclePropertiesName = vehiclePropertiesName;
+	}
 	
 }
   
