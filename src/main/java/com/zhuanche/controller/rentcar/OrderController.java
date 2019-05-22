@@ -893,6 +893,7 @@ public class OrderController{
 		if(StringUtils.isEmpty( result.getChannelsNum()  ) ) {
 			result.setChannelsNum(  "0"  );
 		}
+		result.setEstimatedAmount(orderInfoJson.getDouble("estimatedAmount"));
 		result.setPayFlag(  orderInfoJson.getIntValue("payFlag")  );
 		result.setPushDriverType( orderInfoJson.getIntValue("pushDriverType") );
 		result.setRiderName( orderInfoJson.getString("riderName") );
