@@ -44,9 +44,9 @@ public final class RestErrorCode{
 	//-----------------------------------------------用户
 	@ResultMessage("获取验证码太频繁,请{0}分钟后重试")
 	public static final int GET_MSGCODE_EXCEED           = 1000;
-	@ResultMessage("用户不存在")
+	@ResultMessage("用户名或密码错误")
 	public static final int USER_NOT_EXIST                      = 1001;
-	@ResultMessage("用户密码不正确")
+	@ResultMessage("用户名或密码错误")
 	public static final int USER_PASSWORD_WRONG      = 1002;
 	@ResultMessage("用户已被禁用")
 	public static final int USER_INVALID                          = 1003;
