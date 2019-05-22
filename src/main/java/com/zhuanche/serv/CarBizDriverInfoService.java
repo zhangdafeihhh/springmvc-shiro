@@ -3770,7 +3770,7 @@ public class CarBizDriverInfoService {
                     logger.info("专车供应商，同步发送数据：" + messageStr);
                     CommonRocketProducer.publishMessage("vipSupplierTopic", method, String.valueOf(carBizSupplier.getSupplierId()), messageMap);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error("开通千里眼专车供应商"+carBizSupplier.getSupplierFullName()+"，同步发送数据异常：",e);
                 }
             }
             carBizDriverInfo.setServiceCity(carBizSupplier.getSupplierCity());
@@ -3801,6 +3801,8 @@ public class CarBizDriverInfoService {
                 driverInfoDTO.setUpdateDate(new Date());
                 driverInfoDTO.setCooperationType(carBizSupplier.getCooperationType());
                 driverInfoDTO.setGroupId(34);
+                //发送MQ
+                sendDriverToMq(driverInfoDTO, "INSERT");
                 // 更新mongoDB
                 DriverMongo driverMongo = driverMongoService.findByDriverId(carBizDriverInfo.getDriverId());
                 if (driverMongo != null) {
