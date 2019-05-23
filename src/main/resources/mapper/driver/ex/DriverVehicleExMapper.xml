@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.ex.DriverVehicleExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.DriverVehicle" >
+    <id column="ID" property="id" jdbcType="BIGINT" />
+    <result column="VEHICLE_NAME" property="vehicleName" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="TINYINT" />
+    <result column="VEHICLE_TYPE" property="vehicleType" jdbcType="INTEGER" />
+    <result column="BRAND_ID" property="brandId" jdbcType="BIGINT" />
+    <result column="VEHICLE_SPELL" property="vehicleSpell" jdbcType="VARCHAR" />
+    <result column="GROUP_ID" property="groupId" jdbcType="INTEGER" />
+    <result column="CREATE_DATE" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="UPDATE_DATE" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="brand_name" property="brandName" jdbcType="VARCHAR" />
+    <result column="origin_price" property="originPrice" jdbcType="DECIMAL" />
+    <result column="vehicle_level" property="vehicleLevel" jdbcType="VARCHAR" />
+    <result column="vehicle_length" property="vehicleLength" jdbcType="INTEGER" />
+    <result column="axles_length" property="axlesLength" jdbcType="INTEGER" />
+    <result column="vehicle_structure" property="vehicleStructure" jdbcType="VARCHAR" />
+    <result column="engine_displacement" property="engineDisplacement" jdbcType="INTEGER" />
+    <result column="air_inflow" property="airInflow" jdbcType="VARCHAR" />
+    <result column="vehicle_fuel" property="vehicleFuel" jdbcType="VARCHAR" />
+    <result column="group_name" property="groupName" jdbcType="VARCHAR" />
+    <result column="vehicle_flag" property="vehicleFlag" jdbcType="TINYINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, VEHICLE_NAME, STATUS, VEHICLE_TYPE, BRAND_ID, VEHICLE_SPELL, GROUP_ID, CREATE_DATE, 
+    UPDATE_DATE, REMARK, brand_name, origin_price, vehicle_level, vehicle_length, axles_length, 
+    vehicle_structure, engine_displacement, air_inflow, vehicle_fuel, group_name, vehicle_flag
+  </sql>
+  <select id="queryDriverVehicleList" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from driver_vehicle
+    <trim prefix="WHERE" prefixOverrides="AND|OR">
+	  <if test="brandId != null">
+		  and BRAND_ID = #{brandId}
+	  </if>
+	</trim>
+  </select>
+</mapper>

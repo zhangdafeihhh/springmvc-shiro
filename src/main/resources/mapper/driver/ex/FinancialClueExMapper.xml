@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.ex.FinancialClueExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.FinancialClue" >
+    <id column="clue_id" property="clueId" jdbcType="INTEGER" />
+    <result column="clue_source" property="clueSource" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_full_name" property="supplierFullName" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="goods_id" property="goodsId" jdbcType="INTEGER" />
+    <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+    <result column="purpose_name" property="purposeName" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="whether" property="whether" jdbcType="TINYINT" />
+    <result column="recommend" property="recommend" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <resultMap id="BaseResultDtoMap" type="com.zhuanche.dto.financial.FinancialClueDTO" >
+    <id column="clue_id" property="clueId" jdbcType="INTEGER" />
+    <result column="clue_source" property="clueSource" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_full_name" property="supplierFullName" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="goods_id" property="goodsId" jdbcType="INTEGER" />
+    <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+    <result column="purpose_name" property="purposeName" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="whether" property="whether" jdbcType="TINYINT" />
+    <result column="recommend" property="recommend" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    clue_id, clue_source, status, supplier_id, supplier_full_name, city_id, city_name, 
+    goods_id, goods_name, purpose_name, phone, whether, recommend, create_by, create_time, 
+    update_by, update_time
+  </sql>
+			
+  <select id="queryfinancialClueForList" resultMap="BaseResultDtoMap">
+    select 
+    <include refid="Base_Column_List" />
+    from financial_clue
+    <trim prefix="WHERE" prefixOverrides="AND|OR">
+		<if test="purposeName != null and purposeName!=''">
+				and purpose_name = #{purposeName}
+		</if>
+		<if test="goodsId != null and goodsId!=0">
+				and goods_id = #{goodsId}
+		</if>
+		<if test="supplierIds != null and supplierIds.size>0">
+			and supplier_id in
+			<foreach collection="supplierIds" close=")" open="(" separator="," item="supplierId">
+				#{supplierId}
+	 	   </foreach>
+		</if>
+		<if test="cityIds != null and cityIds.size>0">
+			and city_id in
+		   <foreach collection="cityIds" close=")" open="(" separator="," item="cityId">
+				#{cityId}
+	 	   </foreach>
+		</if>
+		<if test="status!=null">
+				and status = #{status}
+		</if>
+		<if test="startDate!=null and startDate!=''">
+        		 and create_time>=concat(#{startDate},' 00:00:00')
+ 	    </if>
+  		<if test="endDate!=null and endDate!=''">
+       			  and concat(#{endDate},' 23:59:59')>=create_time
+        </if>
+	</trim>
+	order by clue_id desc
+  </select>
+ 
+</mapper>

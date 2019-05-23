@@ -241,6 +241,26 @@ public final class RestErrorCode{
 	//----------------------------------------------供应商业务
 
 
+	//-------------------金融商品--start-------------------------
+	
+	@ResultMessage("查询车型库信息失败")
+	public static final int QUERY_BASICSVEHICLE_ERROR=80001;
+	
+	@ResultMessage("修改商品信息ID参数不能为空")
+	public static final int GOODSIDISNULL=80002;
+	
+	@ResultMessage("您好,请上传正确格式的文件")
+	public static final int CORRECT_FORMAT=80003;
+	
+	@ResultMessage("车型车款已经存在")
+	public static final int BASICSVEHICLE_EXISTS=80004;
+	
+	@ResultMessage("商品已经存在")
+	public static final int GOODS_EXISTS=80005;
+	
+	@ResultMessage("很抱歉{0}车型车款已经停用！")
+	public static final int ENABLE_STATUS=80006;
+	//-------------------金融商品--end---------------------------
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系
 	static{

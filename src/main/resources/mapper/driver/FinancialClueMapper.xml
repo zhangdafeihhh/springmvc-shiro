@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.FinancialClueMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.FinancialClue" >
+    <id column="clue_id" property="clueId" jdbcType="INTEGER" />
+    <result column="clue_source" property="clueSource" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_full_name" property="supplierFullName" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="goods_id" property="goodsId" jdbcType="INTEGER" />
+    <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+    <result column="purpose_name" property="purposeName" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="whether" property="whether" jdbcType="TINYINT" />
+    <result column="recommend" property="recommend" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    clue_id, clue_source, status, supplier_id, supplier_full_name, city_id, city_name, 
+    goods_id, goods_name, purpose_name, phone, whether, recommend, create_by, create_time, 
+    update_by, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from financial_clue
+    where clue_id = #{clueId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from financial_clue
+    where clue_id = #{clueId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.driver.FinancialClue" >
+    <selectKey resultType="java.lang.Integer" keyProperty="clueId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into financial_clue (clue_source, status, supplier_id, 
+      supplier_full_name, city_id, city_name, 
+      goods_id, goods_name, purpose_name, 
+      phone, whether, recommend, 
+      create_by, create_time, update_by, 
+      update_time)
+    values (#{clueSource,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, #{supplierId,jdbcType=INTEGER}, 
+      #{supplierFullName,jdbcType=VARCHAR}, #{cityId,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR}, 
+      #{goodsId,jdbcType=INTEGER}, #{goodsName,jdbcType=VARCHAR}, #{purposeName,jdbcType=VARCHAR}, 
+      #{phone,jdbcType=VARCHAR}, #{whether,jdbcType=TINYINT}, #{recommend,jdbcType=VARCHAR}, 
+      #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.FinancialClue" >
+    <selectKey resultType="java.lang.Integer" keyProperty="clueId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into financial_clue
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="clueSource != null" >
+        clue_source,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="supplierFullName != null" >
+        supplier_full_name,
+      </if>
+      <if test="cityId != null" >
+        city_id,
+      </if>
+      <if test="cityName != null" >
+        city_name,
+      </if>
+      <if test="goodsId != null" >
+        goods_id,
+      </if>
+      <if test="goodsName != null" >
+        goods_name,
+      </if>
+      <if test="purposeName != null" >
+        purpose_name,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="whether != null" >
+        whether,
+      </if>
+      <if test="recommend != null" >
+        recommend,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="clueSource != null" >
+        #{clueSource,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierFullName != null" >
+        #{supplierFullName,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null" >
+        #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsId != null" >
+        #{goodsId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsName != null" >
+        #{goodsName,jdbcType=VARCHAR},
+      </if>
+      <if test="purposeName != null" >
+        #{purposeName,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="whether != null" >
+        #{whether,jdbcType=TINYINT},
+      </if>
+      <if test="recommend != null" >
+        #{recommend,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.driver.FinancialClue" >
+    update financial_clue
+    <set >
+      <if test="clueSource != null" >
+        clue_source = #{clueSource,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierFullName != null" >
+        supplier_full_name = #{supplierFullName,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null" >
+        city_name = #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsId != null" >
+        goods_id = #{goodsId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsName != null" >
+        goods_name = #{goodsName,jdbcType=VARCHAR},
+      </if>
+      <if test="purposeName != null" >
+        purpose_name = #{purposeName,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="whether != null" >
+        whether = #{whether,jdbcType=TINYINT},
+      </if>
+      <if test="recommend != null" >
+        recommend = #{recommend,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where clue_id = #{clueId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.FinancialClue" >
+    update financial_clue
+    set clue_source = #{clueSource,jdbcType=VARCHAR},
+      status = #{status,jdbcType=TINYINT},
+      supplier_id = #{supplierId,jdbcType=INTEGER},
+      supplier_full_name = #{supplierFullName,jdbcType=VARCHAR},
+      city_id = #{cityId,jdbcType=INTEGER},
+      city_name = #{cityName,jdbcType=VARCHAR},
+      goods_id = #{goodsId,jdbcType=INTEGER},
+      goods_name = #{goodsName,jdbcType=VARCHAR},
+      purpose_name = #{purposeName,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      whether = #{whether,jdbcType=TINYINT},
+      recommend = #{recommend,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where clue_id = #{clueId,jdbcType=INTEGER}
+  </update>
+</mapper>

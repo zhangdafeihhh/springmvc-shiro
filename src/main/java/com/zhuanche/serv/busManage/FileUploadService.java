@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -95,7 +96,7 @@ public class FileUploadService {
 		}
 	}
 	
-	static class UploadResult {
+	public static class UploadResult {
 		public boolean success;
 		public String msg;
 		public String filePath;
@@ -136,5 +137,93 @@ public class FileUploadService {
 		return uploadFile(new InputStreamBody(in, filename), privateUrl);
 	}
 
+	
+	public UploadResults uploadPublicStreams(InputStream[] ins, String[] filenames) {
+		InputStreamBody[] contents=new InputStreamBody[ins.length];
+		for (int i = 0; i < ins.length; i++) {
+			InputStream inputStream = ins[i];
+			contents[i] =new InputStreamBody(inputStream, filenames[i]);
+		}
+		return uploadFileS(contents, publicUrl);
+	}
+	
+	/**
+	 * @param content
+	 * @param url
+	 * @param currentUser
+	 * @return
+	 */
+	private UploadResults uploadFileS(ContentBody[] contents, String url) {
+		UploadResults uploadResults = new UploadResults();
+		// 处理结果
+		SSOLoginUser currentUser = WebSessionUtil.getCurrentLoginUser();
+		try {
+			// 上传操作人
+			Integer userId = currentUser.getId();
+			String username = currentUser.getName();
+			// 上传图片参数
+			Map<String, Object> params = new HashMap<String, Object>();
+			for (ContentBody contentBody : contents) {
+				String filename = contentBody.getFilename();
+				params.put(filename, contentBody);
+			}
+			params.put("create_uid", userId);
+			
+			long start = System.currentTimeMillis();
+			String result = wwwApiTemplate.postMultipartData(url, String.class, params);
+			long end = System.currentTimeMillis();
+
+			JSONObject jsonResult = JSONObject.parseObject(result);
+			logger.info("[ FileUploadService-uploadFile ] 上传文件接口返回信息:jsonResult={}", jsonResult);
+			if (jsonResult == null) {
+				uploadResults.setSuccess(false);
+				uploadResults.setMsg("上传文件失败");
+				return uploadResults;
+			}
+			
+			if (1 == jsonResult.getIntValue("code")) {
+				 JSONArray filePaths = jsonResult.getJSONArray("data");
+			
+				logger.info("[ FileUploadService-uploadFile ] 上传文件接口返回路径:filePaths={}", filePaths.toString());
+				// 返回 filePath
+				uploadResults.setSuccess(true);
+				uploadResults.setData(filePaths);
+				return uploadResults;
+			}
+			
+		} catch (Exception e) {
+			logger.error("[ FileUploadService-uploadFile ] 上传文件接口处理异常", e);
+
+			return uploadResults;
+		}
+		return uploadResults;
+	}
+	
+	
+	
+	public static class UploadResults {
+		public boolean success;
+		public String msg;
+		public Object data;
+		
+		public boolean isSuccess() {
+			return success;
+		}
+		public void setSuccess(boolean success) {
+			this.success = success;
+		}
+		public String getMsg() {
+			return msg;
+		}
+		public void setMsg(String msg) {
+			this.msg = msg;
+		}
+		public Object getData() {
+			return data;
+		}
+		public void setData(Object data) {
+			this.data = data;
+		}
+	}
 
 }

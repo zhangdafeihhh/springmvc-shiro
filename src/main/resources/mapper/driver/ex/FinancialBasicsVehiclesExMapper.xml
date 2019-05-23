@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.ex.FinancialBasicsVehiclesExMapper">
+	<resultMap id="BaseResultDtoMap"
+		type="com.zhuanche.dto.financial.FinancialBasicsVehiclesDTO">
+		 <id column="basics_vehicles_id" property="basicsVehiclesId" jdbcType="INTEGER" />
+	    <result column="vehicles_detailed_name" property="vehiclesDetailedName" jdbcType="VARCHAR" />
+	    <result column="brand_id" property="brandId" jdbcType="BIGINT" />
+	    <result column="model_id" property="modelId" jdbcType="BIGINT" />
+	    <result column="vehicle_style" property="vehicleStyle" jdbcType="VARCHAR" />
+	    <result column="year_style" property="yearStyle" jdbcType="VARCHAR" />
+	    <result column="energy_type" property="energyType" jdbcType="INTEGER" />
+	    <result column="variable_box" property="variableBox" jdbcType="INTEGER" />
+	    <result column="guidance_price" property="guidancePrice" jdbcType="DECIMAL" />
+	    <result column="discharge" property="discharge" jdbcType="DOUBLE" />
+	    <result column="mileage" property="mileage" jdbcType="DOUBLE" />
+	    <result column="auto_home_url" property="autoHomeUrl" jdbcType="VARCHAR" />
+	    <result column="length_width_height" property="lengthWidthHeight" jdbcType="VARCHAR" />
+	    <result column="quality_assurance" property="qualityAssurance" jdbcType="VARCHAR" />
+	    <result column="wheelbase" property="wheelbase" jdbcType="INTEGER" />
+	    <result column="environmental_protection_standard" property="environmentalProtectionStandard" jdbcType="VARCHAR" />
+	    <result column="fast_charging_time" property="fastChargingTime" jdbcType="DOUBLE" />
+	    <result column="slow_charging_time" property="slowChargingTime" jdbcType="DOUBLE" />
+	    <result column="img_url" property="imgUrl" jdbcType="VARCHAR" />
+	    <result column="fast_percentage" property="fastPercentage" jdbcType="DOUBLE" />
+	    <result column="enable_status" property="enableStatus" jdbcType="TINYINT" />
+	    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+	    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+	    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+	    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<resultMap id="BaseResultMap"
+		type="com.zhuanche.entity.driver.FinancialBasicsVehicles">
+		 <id column="basics_vehicles_id" property="basicsVehiclesId" jdbcType="INTEGER" />
+	    <result column="vehicles_detailed_name" property="vehiclesDetailedName" jdbcType="VARCHAR" />
+	    <result column="brand_id" property="brandId" jdbcType="BIGINT" />
+	    <result column="model_id" property="modelId" jdbcType="BIGINT" />
+	    <result column="vehicle_style" property="vehicleStyle" jdbcType="VARCHAR" />
+	    <result column="year_style" property="yearStyle" jdbcType="VARCHAR" />
+	    <result column="energy_type" property="energyType" jdbcType="INTEGER" />
+	    <result column="variable_box" property="variableBox" jdbcType="INTEGER" />
+	    <result column="guidance_price" property="guidancePrice" jdbcType="DECIMAL" />
+	    <result column="discharge" property="discharge" jdbcType="DOUBLE" />
+	    <result column="mileage" property="mileage" jdbcType="DOUBLE" />
+	    <result column="auto_home_url" property="autoHomeUrl" jdbcType="VARCHAR" />
+	    <result column="length_width_height" property="lengthWidthHeight" jdbcType="VARCHAR" />
+	    <result column="quality_assurance" property="qualityAssurance" jdbcType="VARCHAR" />
+	    <result column="wheelbase" property="wheelbase" jdbcType="INTEGER" />
+	    <result column="environmental_protection_standard" property="environmentalProtectionStandard" jdbcType="VARCHAR" />
+	    <result column="fast_charging_time" property="fastChargingTime" jdbcType="DOUBLE" />
+	    <result column="slow_charging_time" property="slowChargingTime" jdbcType="DOUBLE" />
+	    <result column="img_url" property="imgUrl" jdbcType="VARCHAR" />
+	    <result column="fast_percentage" property="fastPercentage" jdbcType="DOUBLE" />
+	    <result column="enable_status" property="enableStatus" jdbcType="TINYINT" />
+	    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+	    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+	    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+	    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="Base_Column_List">
+    basics_vehicles_id, vehicles_detailed_name, brand_id, model_id, vehicle_style, year_style, 
+    energy_type, variable_box, guidance_price, discharge, mileage, auto_home_url, length_width_height, 
+    quality_assurance, wheelbase, environmental_protection_standard, fast_charging_time, 
+    slow_charging_time, img_url,fast_percentage, enable_status, create_by, create_time, update_by, 
+    update_time
+	</sql>
+	<select id="queryFinancialBasicsVehiclesForList" resultMap="BaseResultDtoMap">
+		select
+		<include refid="Base_Column_List" />
+		from financial_basics_vehicles
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="vehiclesDetailedName != null and vehiclesDetailedName !=''">
+				and vehicles_detailed_name = #{vehiclesDetailedName}
+			</if>
+			<if test="energyType!=null">
+				and energy_type = #{energyType}
+			</if>
+		</trim>
+
+	</select>
+	<select id="queryBasicsVehiclesAllList" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from financial_basics_vehicles
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="enableStatus != null">
+				and enable_status = #{enableStatus}
+			</if>
+		</trim>
+	</select>
+	
+	
+	<select id="queryFinancialBasicsVehiclesByName" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from financial_basics_vehicles
+		where vehicles_detailed_name = #{vehiclesDetailedName}
+	</select>
+	
+	<select id="queryFinancialBasicsVehiclesList" resultMap="BaseResultMap">
+		select 
+	    <include refid="Base_Column_List" />
+	    from financial_basics_vehicles
+	    where basics_vehicles_id in
+			   <foreach collection="basicsVehiclesIds" close=")" open="(" separator="," item="basicsVehiclesId">
+					#{basicsVehiclesId}
+		 	   </foreach>
+	</select>
+</mapper>

@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.DriverVehicleMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.DriverVehicle" >
+    <id column="ID" property="id" jdbcType="BIGINT" />
+    <result column="VEHICLE_NAME" property="vehicleName" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="TINYINT" />
+    <result column="VEHICLE_TYPE" property="vehicleType" jdbcType="INTEGER" />
+    <result column="BRAND_ID" property="brandId" jdbcType="BIGINT" />
+    <result column="VEHICLE_SPELL" property="vehicleSpell" jdbcType="VARCHAR" />
+    <result column="GROUP_ID" property="groupId" jdbcType="INTEGER" />
+    <result column="CREATE_DATE" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="UPDATE_DATE" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="brand_name" property="brandName" jdbcType="VARCHAR" />
+    <result column="origin_price" property="originPrice" jdbcType="DECIMAL" />
+    <result column="vehicle_level" property="vehicleLevel" jdbcType="VARCHAR" />
+    <result column="vehicle_length" property="vehicleLength" jdbcType="INTEGER" />
+    <result column="axles_length" property="axlesLength" jdbcType="INTEGER" />
+    <result column="vehicle_structure" property="vehicleStructure" jdbcType="VARCHAR" />
+    <result column="engine_displacement" property="engineDisplacement" jdbcType="INTEGER" />
+    <result column="air_inflow" property="airInflow" jdbcType="VARCHAR" />
+    <result column="vehicle_fuel" property="vehicleFuel" jdbcType="VARCHAR" />
+    <result column="group_name" property="groupName" jdbcType="VARCHAR" />
+    <result column="vehicle_flag" property="vehicleFlag" jdbcType="TINYINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, VEHICLE_NAME, STATUS, VEHICLE_TYPE, BRAND_ID, VEHICLE_SPELL, GROUP_ID, CREATE_DATE, 
+    UPDATE_DATE, REMARK, brand_name, origin_price, vehicle_level, vehicle_length, axles_length, 
+    vehicle_structure, engine_displacement, air_inflow, vehicle_fuel, group_name, vehicle_flag
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from driver_vehicle
+    where ID = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from driver_vehicle
+    where ID = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.driver.DriverVehicle" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into driver_vehicle (VEHICLE_NAME, STATUS, VEHICLE_TYPE, 
+      BRAND_ID, VEHICLE_SPELL, GROUP_ID, 
+      CREATE_DATE, UPDATE_DATE, REMARK, 
+      brand_name, origin_price, vehicle_level, 
+      vehicle_length, axles_length, vehicle_structure, 
+      engine_displacement, air_inflow, vehicle_fuel, 
+      group_name, vehicle_flag)
+    values (#{vehicleName,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, #{vehicleType,jdbcType=INTEGER}, 
+      #{brandId,jdbcType=BIGINT}, #{vehicleSpell,jdbcType=VARCHAR}, #{groupId,jdbcType=INTEGER}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, 
+      #{brandName,jdbcType=VARCHAR}, #{originPrice,jdbcType=DECIMAL}, #{vehicleLevel,jdbcType=VARCHAR}, 
+      #{vehicleLength,jdbcType=INTEGER}, #{axlesLength,jdbcType=INTEGER}, #{vehicleStructure,jdbcType=VARCHAR}, 
+      #{engineDisplacement,jdbcType=INTEGER}, #{airInflow,jdbcType=VARCHAR}, #{vehicleFuel,jdbcType=VARCHAR}, 
+      #{groupName,jdbcType=VARCHAR}, #{vehicleFlag,jdbcType=TINYINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.DriverVehicle" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into driver_vehicle
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="vehicleName != null" >
+        VEHICLE_NAME,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="vehicleType != null" >
+        VEHICLE_TYPE,
+      </if>
+      <if test="brandId != null" >
+        BRAND_ID,
+      </if>
+      <if test="vehicleSpell != null" >
+        VEHICLE_SPELL,
+      </if>
+      <if test="groupId != null" >
+        GROUP_ID,
+      </if>
+      <if test="createDate != null" >
+        CREATE_DATE,
+      </if>
+      <if test="updateDate != null" >
+        UPDATE_DATE,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+      <if test="brandName != null" >
+        brand_name,
+      </if>
+      <if test="originPrice != null" >
+        origin_price,
+      </if>
+      <if test="vehicleLevel != null" >
+        vehicle_level,
+      </if>
+      <if test="vehicleLength != null" >
+        vehicle_length,
+      </if>
+      <if test="axlesLength != null" >
+        axles_length,
+      </if>
+      <if test="vehicleStructure != null" >
+        vehicle_structure,
+      </if>
+      <if test="engineDisplacement != null" >
+        engine_displacement,
+      </if>
+      <if test="airInflow != null" >
+        air_inflow,
+      </if>
+      <if test="vehicleFuel != null" >
+        vehicle_fuel,
+      </if>
+      <if test="groupName != null" >
+        group_name,
+      </if>
+      <if test="vehicleFlag != null" >
+        vehicle_flag,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="vehicleName != null" >
+        #{vehicleName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="vehicleType != null" >
+        #{vehicleType,jdbcType=INTEGER},
+      </if>
+      <if test="brandId != null" >
+        #{brandId,jdbcType=BIGINT},
+      </if>
+      <if test="vehicleSpell != null" >
+        #{vehicleSpell,jdbcType=VARCHAR},
+      </if>
+      <if test="groupId != null" >
+        #{groupId,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="brandName != null" >
+        #{brandName,jdbcType=VARCHAR},
+      </if>
+      <if test="originPrice != null" >
+        #{originPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="vehicleLevel != null" >
+        #{vehicleLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleLength != null" >
+        #{vehicleLength,jdbcType=INTEGER},
+      </if>
+      <if test="axlesLength != null" >
+        #{axlesLength,jdbcType=INTEGER},
+      </if>
+      <if test="vehicleStructure != null" >
+        #{vehicleStructure,jdbcType=VARCHAR},
+      </if>
+      <if test="engineDisplacement != null" >
+        #{engineDisplacement,jdbcType=INTEGER},
+      </if>
+      <if test="airInflow != null" >
+        #{airInflow,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleFuel != null" >
+        #{vehicleFuel,jdbcType=VARCHAR},
+      </if>
+      <if test="groupName != null" >
+        #{groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleFlag != null" >
+        #{vehicleFlag,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.driver.DriverVehicle" >
+    update driver_vehicle
+    <set >
+      <if test="vehicleName != null" >
+        VEHICLE_NAME = #{vehicleName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="vehicleType != null" >
+        VEHICLE_TYPE = #{vehicleType,jdbcType=INTEGER},
+      </if>
+      <if test="brandId != null" >
+        BRAND_ID = #{brandId,jdbcType=BIGINT},
+      </if>
+      <if test="vehicleSpell != null" >
+        VEHICLE_SPELL = #{vehicleSpell,jdbcType=VARCHAR},
+      </if>
+      <if test="groupId != null" >
+        GROUP_ID = #{groupId,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null" >
+        CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="brandName != null" >
+        brand_name = #{brandName,jdbcType=VARCHAR},
+      </if>
+      <if test="originPrice != null" >
+        origin_price = #{originPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="vehicleLevel != null" >
+        vehicle_level = #{vehicleLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleLength != null" >
+        vehicle_length = #{vehicleLength,jdbcType=INTEGER},
+      </if>
+      <if test="axlesLength != null" >
+        axles_length = #{axlesLength,jdbcType=INTEGER},
+      </if>
+      <if test="vehicleStructure != null" >
+        vehicle_structure = #{vehicleStructure,jdbcType=VARCHAR},
+      </if>
+      <if test="engineDisplacement != null" >
+        engine_displacement = #{engineDisplacement,jdbcType=INTEGER},
+      </if>
+      <if test="airInflow != null" >
+        air_inflow = #{airInflow,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleFuel != null" >
+        vehicle_fuel = #{vehicleFuel,jdbcType=VARCHAR},
+      </if>
+      <if test="groupName != null" >
+        group_name = #{groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleFlag != null" >
+        vehicle_flag = #{vehicleFlag,jdbcType=TINYINT},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.DriverVehicle" >
+    update driver_vehicle
+    set VEHICLE_NAME = #{vehicleName,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=TINYINT},
+      VEHICLE_TYPE = #{vehicleType,jdbcType=INTEGER},
+      BRAND_ID = #{brandId,jdbcType=BIGINT},
+      VEHICLE_SPELL = #{vehicleSpell,jdbcType=VARCHAR},
+      GROUP_ID = #{groupId,jdbcType=INTEGER},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      brand_name = #{brandName,jdbcType=VARCHAR},
+      origin_price = #{originPrice,jdbcType=DECIMAL},
+      vehicle_level = #{vehicleLevel,jdbcType=VARCHAR},
+      vehicle_length = #{vehicleLength,jdbcType=INTEGER},
+      axles_length = #{axlesLength,jdbcType=INTEGER},
+      vehicle_structure = #{vehicleStructure,jdbcType=VARCHAR},
+      engine_displacement = #{engineDisplacement,jdbcType=INTEGER},
+      air_inflow = #{airInflow,jdbcType=VARCHAR},
+      vehicle_fuel = #{vehicleFuel,jdbcType=VARCHAR},
+      group_name = #{groupName,jdbcType=VARCHAR},
+      vehicle_flag = #{vehicleFlag,jdbcType=TINYINT}
+    where ID = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

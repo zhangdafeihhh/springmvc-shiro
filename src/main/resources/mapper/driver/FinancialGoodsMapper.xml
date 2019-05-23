@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.FinancialGoodsMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.FinancialGoods" >
+    <id column="goods_id" property="goodsId" jdbcType="INTEGER" />
+    <result column="brand_id" property="brandId" jdbcType="BIGINT" />
+    <result column="model_id" property="modelId" jdbcType="BIGINT" />
+    <result column="basics_vehicles_id" property="basicsVehiclesId" jdbcType="INTEGER" />
+    <result column="goods_number" property="goodsNumber" jdbcType="VARCHAR" />
+    <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+    <result column="sales_target" property="salesTarget" jdbcType="TINYINT" />
+    <result column="goods_type" property="goodsType" jdbcType="TINYINT" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_full_name" property="supplierFullName" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="channel_id" property="channelId" jdbcType="INTEGER" />
+    <result column="reason" property="reason" jdbcType="VARCHAR" />
+    <result column="exp_info" property="expInfo" jdbcType="VARCHAR" />
+    <result column="picture_url" property="pictureUrl" jdbcType="VARCHAR" />
+    <result column="keyword" property="keyword" jdbcType="VARCHAR" />
+    <result column="vehicle_age" property="vehicleAge" jdbcType="INTEGER" />
+    <result column="mileage" property="mileage" jdbcType="INTEGER" />
+    <result column="vehicle_properties" property="vehicleProperties" jdbcType="INTEGER" />
+    <result column="source_funds_id" property="sourceFundsId" jdbcType="INTEGER" />
+    <result column="lease_term" property="leaseTerm" jdbcType="INTEGER" />
+    <result column="rent_every_term" property="rentEveryTerm" jdbcType="DECIMAL" />
+    <result column="front_money" property="frontMoney" jdbcType="DECIMAL" />
+    <result column="first_rent" property="firstRent" jdbcType="DECIMAL" />
+    <result column="security_deposit" property="securityDeposit" jdbcType="DECIMAL" />
+    <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
+    <result column="color" property="color" jdbcType="VARCHAR" />
+    <result column="additional_services_id" property="additionalServicesId" jdbcType="VARCHAR" />
+    <result column="additional_services_info" property="additionalServicesInfo" jdbcType="VARCHAR" />
+    <result column="stock" property="stock" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    goods_id, brand_id, model_id, basics_vehicles_id, goods_number, goods_name, sales_target, 
+    goods_type, supplier_id, supplier_full_name, city_id, city_name, channel_id, reason, 
+    exp_info, picture_url, keyword, vehicle_age, mileage, vehicle_properties, source_funds_id, 
+    lease_term, rent_every_term, front_money, first_rent, security_deposit, total_price, 
+    color, additional_services_id, additional_services_info, stock, status, create_by, 
+    create_time, update_by, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from financial_goods
+    where goods_id = #{goodsId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from financial_goods
+    where goods_id = #{goodsId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.driver.FinancialGoods" >
+    <selectKey resultType="java.lang.Integer" keyProperty="goodsId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into financial_goods (brand_id, model_id, basics_vehicles_id, 
+      goods_number, goods_name, sales_target, 
+      goods_type, supplier_id, supplier_full_name, 
+      city_id, city_name, channel_id, 
+      reason, exp_info, picture_url, 
+      keyword, vehicle_age, mileage, 
+      vehicle_properties, source_funds_id, lease_term, 
+      rent_every_term, front_money, first_rent, 
+      security_deposit, total_price, color, 
+      additional_services_id, additional_services_info, 
+      stock, status, create_by, 
+      create_time, update_by, update_time
+      )
+    values (#{brandId,jdbcType=BIGINT}, #{modelId,jdbcType=BIGINT}, #{basicsVehiclesId,jdbcType=INTEGER}, 
+      #{goodsNumber,jdbcType=VARCHAR}, #{goodsName,jdbcType=VARCHAR}, #{salesTarget,jdbcType=TINYINT}, 
+      #{goodsType,jdbcType=TINYINT}, #{supplierId,jdbcType=INTEGER}, #{supplierFullName,jdbcType=VARCHAR}, 
+      #{cityId,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR}, #{channelId,jdbcType=INTEGER}, 
+      #{reason,jdbcType=VARCHAR}, #{expInfo,jdbcType=VARCHAR}, #{pictureUrl,jdbcType=VARCHAR}, 
+      #{keyword,jdbcType=VARCHAR}, #{vehicleAge,jdbcType=INTEGER}, #{mileage,jdbcType=INTEGER}, 
+      #{vehicleProperties,jdbcType=INTEGER}, #{sourceFundsId,jdbcType=INTEGER}, #{leaseTerm,jdbcType=INTEGER}, 
+      #{rentEveryTerm,jdbcType=DECIMAL}, #{frontMoney,jdbcType=DECIMAL}, #{firstRent,jdbcType=DECIMAL}, 
+      #{securityDeposit,jdbcType=DECIMAL}, #{totalPrice,jdbcType=DECIMAL}, #{color,jdbcType=VARCHAR}, 
+      #{additionalServicesId,jdbcType=VARCHAR}, #{additionalServicesInfo,jdbcType=VARCHAR}, 
+      #{stock,jdbcType=INTEGER}, #{status,jdbcType=TINYINT}, #{createBy,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.FinancialGoods" >
+    <selectKey resultType="java.lang.Integer" keyProperty="goodsId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into financial_goods
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="brandId != null" >
+        brand_id,
+      </if>
+      <if test="modelId != null" >
+        model_id,
+      </if>
+      <if test="basicsVehiclesId != null" >
+        basics_vehicles_id,
+      </if>
+      <if test="goodsNumber != null" >
+        goods_number,
+      </if>
+      <if test="goodsName != null" >
+        goods_name,
+      </if>
+      <if test="salesTarget != null" >
+        sales_target,
+      </if>
+      <if test="goodsType != null" >
+        goods_type,
+      </if>
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="supplierFullName != null" >
+        supplier_full_name,
+      </if>
+      <if test="cityId != null" >
+        city_id,
+      </if>
+      <if test="cityName != null" >
+        city_name,
+      </if>
+      <if test="channelId != null" >
+        channel_id,
+      </if>
+      <if test="reason != null" >
+        reason,
+      </if>
+      <if test="expInfo != null" >
+        exp_info,
+      </if>
+      <if test="pictureUrl != null" >
+        picture_url,
+      </if>
+      <if test="keyword != null" >
+        keyword,
+      </if>
+      <if test="vehicleAge != null" >
+        vehicle_age,
+      </if>
+      <if test="mileage != null" >
+        mileage,
+      </if>
+      <if test="vehicleProperties != null" >
+        vehicle_properties,
+      </if>
+      <if test="sourceFundsId != null" >
+        source_funds_id,
+      </if>
+      <if test="leaseTerm != null" >
+        lease_term,
+      </if>
+      <if test="rentEveryTerm != null" >
+        rent_every_term,
+      </if>
+      <if test="frontMoney != null" >
+        front_money,
+      </if>
+      <if test="firstRent != null" >
+        first_rent,
+      </if>
+      <if test="securityDeposit != null" >
+        security_deposit,
+      </if>
+      <if test="totalPrice != null" >
+        total_price,
+      </if>
+      <if test="color != null" >
+        color,
+      </if>
+      <if test="additionalServicesId != null" >
+        additional_services_id,
+      </if>
+      <if test="additionalServicesInfo != null" >
+        additional_services_info,
+      </if>
+      <if test="stock != null" >
+        stock,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="brandId != null" >
+        #{brandId,jdbcType=BIGINT},
+      </if>
+      <if test="modelId != null" >
+        #{modelId,jdbcType=BIGINT},
+      </if>
+      <if test="basicsVehiclesId != null" >
+        #{basicsVehiclesId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsNumber != null" >
+        #{goodsNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsName != null" >
+        #{goodsName,jdbcType=VARCHAR},
+      </if>
+      <if test="salesTarget != null" >
+        #{salesTarget,jdbcType=TINYINT},
+      </if>
+      <if test="goodsType != null" >
+        #{goodsType,jdbcType=TINYINT},
+      </if>
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierFullName != null" >
+        #{supplierFullName,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null" >
+        #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="channelId != null" >
+        #{channelId,jdbcType=INTEGER},
+      </if>
+      <if test="reason != null" >
+        #{reason,jdbcType=VARCHAR},
+      </if>
+      <if test="expInfo != null" >
+        #{expInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="pictureUrl != null" >
+        #{pictureUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="keyword != null" >
+        #{keyword,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleAge != null" >
+        #{vehicleAge,jdbcType=INTEGER},
+      </if>
+      <if test="mileage != null" >
+        #{mileage,jdbcType=INTEGER},
+      </if>
+      <if test="vehicleProperties != null" >
+        #{vehicleProperties,jdbcType=INTEGER},
+      </if>
+      <if test="sourceFundsId != null" >
+        #{sourceFundsId,jdbcType=INTEGER},
+      </if>
+      <if test="leaseTerm != null" >
+        #{leaseTerm,jdbcType=INTEGER},
+      </if>
+      <if test="rentEveryTerm != null" >
+        #{rentEveryTerm,jdbcType=DECIMAL},
+      </if>
+      <if test="frontMoney != null" >
+        #{frontMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="firstRent != null" >
+        #{firstRent,jdbcType=DECIMAL},
+      </if>
+      <if test="securityDeposit != null" >
+        #{securityDeposit,jdbcType=DECIMAL},
+      </if>
+      <if test="totalPrice != null" >
+        #{totalPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="color != null" >
+        #{color,jdbcType=VARCHAR},
+      </if>
+      <if test="additionalServicesId != null" >
+        #{additionalServicesId,jdbcType=VARCHAR},
+      </if>
+      <if test="additionalServicesInfo != null" >
+        #{additionalServicesInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="stock != null" >
+        #{stock,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.driver.FinancialGoods" >
+    update financial_goods
+    <set >
+      <if test="brandId != null" >
+        brand_id = #{brandId,jdbcType=BIGINT},
+      </if>
+      <if test="modelId != null" >
+        model_id = #{modelId,jdbcType=BIGINT},
+      </if>
+      <if test="basicsVehiclesId != null" >
+        basics_vehicles_id = #{basicsVehiclesId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsNumber != null" >
+        goods_number = #{goodsNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsName != null" >
+        goods_name = #{goodsName,jdbcType=VARCHAR},
+      </if>
+      <if test="salesTarget != null" >
+        sales_target = #{salesTarget,jdbcType=TINYINT},
+      </if>
+      <if test="goodsType != null" >
+        goods_type = #{goodsType,jdbcType=TINYINT},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierFullName != null" >
+        supplier_full_name = #{supplierFullName,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null" >
+        city_name = #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="channelId != null" >
+        channel_id = #{channelId,jdbcType=INTEGER},
+      </if>
+      <if test="reason != null" >
+        reason = #{reason,jdbcType=VARCHAR},
+      </if>
+      <if test="expInfo != null" >
+        exp_info = #{expInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="pictureUrl != null" >
+        picture_url = #{pictureUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="keyword != null" >
+        keyword = #{keyword,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleAge != null" >
+        vehicle_age = #{vehicleAge,jdbcType=INTEGER},
+      </if>
+      <if test="mileage != null" >
+        mileage = #{mileage,jdbcType=INTEGER},
+      </if>
+      <if test="vehicleProperties != null" >
+        vehicle_properties = #{vehicleProperties,jdbcType=INTEGER},
+      </if>
+      <if test="sourceFundsId != null" >
+        source_funds_id = #{sourceFundsId,jdbcType=INTEGER},
+      </if>
+      <if test="leaseTerm != null" >
+        lease_term = #{leaseTerm,jdbcType=INTEGER},
+      </if>
+      <if test="rentEveryTerm != null" >
+        rent_every_term = #{rentEveryTerm,jdbcType=DECIMAL},
+      </if>
+      <if test="frontMoney != null" >
+        front_money = #{frontMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="firstRent != null" >
+        first_rent = #{firstRent,jdbcType=DECIMAL},
+      </if>
+      <if test="securityDeposit != null" >
+        security_deposit = #{securityDeposit,jdbcType=DECIMAL},
+      </if>
+      <if test="totalPrice != null" >
+        total_price = #{totalPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="color != null" >
+        color = #{color,jdbcType=VARCHAR},
+      </if>
+      <if test="additionalServicesId != null" >
+        additional_services_id = #{additionalServicesId,jdbcType=VARCHAR},
+      </if>
+      <if test="additionalServicesInfo != null" >
+        additional_services_info = #{additionalServicesInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="stock != null" >
+        stock = #{stock,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where goods_id = #{goodsId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.FinancialGoods" >
+    update financial_goods
+    set brand_id = #{brandId,jdbcType=BIGINT},
+      model_id = #{modelId,jdbcType=BIGINT},
+      basics_vehicles_id = #{basicsVehiclesId,jdbcType=INTEGER},
+      goods_number = #{goodsNumber,jdbcType=VARCHAR},
+      goods_name = #{goodsName,jdbcType=VARCHAR},
+      sales_target = #{salesTarget,jdbcType=TINYINT},
+      goods_type = #{goodsType,jdbcType=TINYINT},
+      supplier_id = #{supplierId,jdbcType=INTEGER},
+      supplier_full_name = #{supplierFullName,jdbcType=VARCHAR},
+      city_id = #{cityId,jdbcType=INTEGER},
+      city_name = #{cityName,jdbcType=VARCHAR},
+      channel_id = #{channelId,jdbcType=INTEGER},
+      reason = #{reason,jdbcType=VARCHAR},
+      exp_info = #{expInfo,jdbcType=VARCHAR},
+      picture_url = #{pictureUrl,jdbcType=VARCHAR},
+      keyword = #{keyword,jdbcType=VARCHAR},
+      vehicle_age = #{vehicleAge,jdbcType=INTEGER},
+      mileage = #{mileage,jdbcType=INTEGER},
+      vehicle_properties = #{vehicleProperties,jdbcType=INTEGER},
+      source_funds_id = #{sourceFundsId,jdbcType=INTEGER},
+      lease_term = #{leaseTerm,jdbcType=INTEGER},
+      rent_every_term = #{rentEveryTerm,jdbcType=DECIMAL},
+      front_money = #{frontMoney,jdbcType=DECIMAL},
+      first_rent = #{firstRent,jdbcType=DECIMAL},
+      security_deposit = #{securityDeposit,jdbcType=DECIMAL},
+      total_price = #{totalPrice,jdbcType=DECIMAL},
+      color = #{color,jdbcType=VARCHAR},
+      additional_services_id = #{additionalServicesId,jdbcType=VARCHAR},
+      additional_services_info = #{additionalServicesInfo,jdbcType=VARCHAR},
+      stock = #{stock,jdbcType=INTEGER},
+      status = #{status,jdbcType=TINYINT},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where goods_id = #{goodsId,jdbcType=INTEGER}
+  </update>
+</mapper>
