@@ -850,7 +850,7 @@ public class OrderController{
 		Map<String, String> result = new HashMap<>(1);
 		String driverId = oer.getDriverId();
 		String factDate = oer.getFactDate();
-		String factEndDate = oer.getFaceEndDate();
+		String factEndDate = oer.getFactEndDate();
 		//司机端预估轨迹value=3
 		String orderNo = oer.getOrderNo();
 		//订单的预估费用
