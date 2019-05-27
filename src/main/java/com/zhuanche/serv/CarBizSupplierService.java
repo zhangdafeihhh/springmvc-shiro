@@ -709,8 +709,7 @@ public class CarBizSupplierService{
 			stringBuffer.append(s.getApplyStatus()!= null ? s.getApplyStatus()==1 ? "申请中" : "已更新" : "");
 			stringBuffer.append(",");
 
-			stringBuffer.append(s.getApplyCreateDate()!= null? ""
-					+ s.getApplyCreateDate() + "" : "");
+			stringBuffer.append(s.getApplyCreateDate() != null ? s.getApplyCreateDate() : "");
 			stringBuffer.append(",");
 
 			stringBuffer.append(s.getUpdateDate()!= null? ""

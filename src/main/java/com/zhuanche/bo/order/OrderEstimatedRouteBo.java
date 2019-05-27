@@ -9,7 +9,7 @@ public class OrderEstimatedRouteBo {
 
     private String driverId;
     private String factDate;
-    private String faceEndDate;
+    private String factEndDate;
 
     /**
      * 订单号
@@ -53,12 +53,12 @@ public class OrderEstimatedRouteBo {
         this.factDate = factDate;
     }
 
-    public String getFaceEndDate() {
-        return faceEndDate;
+    public String getFactEndDate() {
+        return factEndDate;
     }
 
-    public void setFaceEndDate(String faceEndDate) {
-        this.faceEndDate = faceEndDate;
+    public void setFactEndDate(String factEndDate) {
+        this.factEndDate = factEndDate;
     }
 
     public String getOrderNo() {

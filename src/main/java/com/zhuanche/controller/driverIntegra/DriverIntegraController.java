@@ -60,7 +60,7 @@ public class DriverIntegraController {
     @Qualifier("driverIntegralApiTemplate")
     private MyRestTemplate driverIntegralApiTemplate;
 
-    @Value("driver.integral.url")
+    @Value("${driver.integral.url}")
     private String DRIVER_INTEGRAL;
 
 

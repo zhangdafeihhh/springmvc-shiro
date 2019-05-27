@@ -484,12 +484,25 @@
     FROM car_biz_driver_info a
     LEFT JOIN car_biz_driver_info_detail b ON  a.driver_id = b.driver_id
     <where>
-      <if test="ext2 != null" >
-        and b.ext2 = #{ext2,jdbcType=INTEGER}
+      <if test="ext2 != null">
+        <if test="ext2 == 1" >
+          and b.ext2 = 1
+        </if>
+        <if test="ext2 == 0" >
+          and (b.ext2 = 0 OR b.ext2 IS NULL)
+        </if>
       </if>
+
       <if test="ext3 != null" >
-        and b.ext3 = #{ext3,jdbcType=INTEGER}
+        <if test="ext3 != 4" >
+          and b.ext3 = #{ext3,jdbcType=INTEGER}
+        </if>
+        <if test="ext3 == 4" >
+          and (b.ext3 = 4 OR b.ext3 IS NULL)
+        </if>
+
       </if>
+
       <if test="phone != null and phone != ''" >
         and a.phone LIKE CONCAT(#{phone},'%')
       </if>
