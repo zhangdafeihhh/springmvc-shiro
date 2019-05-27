@@ -172,26 +172,17 @@ public class TelescopeController {
 
 	@RequestMapping("/queryTelescopeUser")
 	@ResponseBody
-    public AjaxResponse queryTelescopeUser(){
-		TelescopeUserVo telescopeUserVo = new TelescopeUserVo();
-		telescopeUserVo.setDriverId(1000000);
-		telescopeUserVo.setName("于师傅");
-		telescopeUserVo.setPhone("13666666666");
-		telescopeUserVo.setDriverStatus(1);
-		telescopeUserVo.setStatus(1);
-		telescopeUserVo.setCityId(44);
-		telescopeUserVo.setCityName("北京");
-		telescopeUserVo.setSupplierId(111);
-		telescopeUserVo.setSupplierName("测试供应商");
-		telescopeUserVo.setTeamId(111);
-		telescopeUserVo.setTeamName("测试车队");
-		telescopeUserVo.setTeamGroupId(111);
-		telescopeUserVo.setTeamGroupName("测试小组");
-		telescopeUserVo.setPermissionCityIds("44");
-		telescopeUserVo.setPermissionSupplierIds("111");
-		telescopeUserVo.setPermissionTeamIds("111");
-		telescopeUserVo.setPermissionTeamGroupIds("111");
-		return AjaxResponse.success(telescopeUserVo);
+    public AjaxResponse queryTelescopeUser(Integer driverId){
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("driverId",driverId);
+		JSONObject result = MpOkHttpUtil.okHttpGetBackJson(mpManageRestUrl + "/telescope/queryTelescopeUser", params, 1, "查询千里眼用户信息");
+		logger.info("【查询千里眼用户信息】接口返回结果：{}",result.toJSONString());
+		if (result.getIntValue("code") != Constants.SUCCESS_CODE) {
+			String errorMsg = result.getString("msg");
+			logger.info("【查询千里眼用户信息】接口出错,params={},errorMsg={}", params, errorMsg);
+			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+		}
+		return AjaxResponse.success( result.get("data") );
 	}
 
 	
