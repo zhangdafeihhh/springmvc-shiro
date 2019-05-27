@@ -242,9 +242,7 @@ public class BusAssignmentService {
     }
 
     /**
-     * 根据页面选择条件导出订单信息
-     * @param params
-     * @param @param groupMap 巴士车型类别，因为只是配置，可以在调用前查出来，不必每次都访问数据库查询该配置
+     * @param params 根据页面选择条件导出订单信息
      * @param permission 是不是巴士运营权限，只有巴士运营才能导出预定人的企业相关信息
      * @return
      */
@@ -637,7 +635,7 @@ public class BusAssignmentService {
                 orderExport.setHotelFee(cost.getHotelFee());
                 orderExport.setMealFee(cost.getMealFee());
                 orderExport.setQtFee(cost.getQtFee());
-                orderExport.setSettleAmount(cost.getSettleAmount());
+                orderExport.setSettleOriginalAmount(cost.getSettleOriginalAmount());
             }
             if (pay != null) {
                 orderExport.setPayToolName(pay.getPayToolName());

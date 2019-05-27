@@ -1,5 +1,6 @@
 package com.zhuanche.serv.busManage;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -189,7 +190,6 @@ public class BusOrderService {
 			paramMap.put("orderId", orderId);
 			String response = busOrderCostTemplate.postForObject(BusConst.Charge.BUSS_BACK, JSONObject.class, paramMap);
 			JSONObject result = JSON.parseObject(response);
-			logger.info("[ BusOrderService-selectOrderCostDetail ] 查询订单详情，调用计费接口返回值={}", result);
 			int code = result.getIntValue("code");
 			String msg = result.getString("msg");
 			if (code == 1) {

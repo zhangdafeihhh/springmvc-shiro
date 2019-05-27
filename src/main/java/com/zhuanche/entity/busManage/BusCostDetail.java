@@ -207,6 +207,8 @@ public class BusCostDetail implements Serializable {
 	 * 代结算金额 行程完成后的支付金额 ---代收总金额
 	 */
 	private BigDecimal settleAmount = BigDecimal.ZERO;
+
+	private BigDecimal settleOriginalAmount=BigDecimal.ZERO;
 	/**
 	 * --代收结算类型。0-帐户支付 1-信用卡支付 2-司机代收 1000：微信扫码；2000：支付宝扫码；3000：微信APP；4000：支付宝APP
 	 */
@@ -784,4 +786,11 @@ public class BusCostDetail implements Serializable {
 		this.qtFee = qtFee;
 	}
 
+	public BigDecimal getSettleOriginalAmount() {
+		return settleOriginalAmount;
+	}
+
+	public void setSettleOriginalAmount(BigDecimal settleOriginalAmount) {
+		this.settleOriginalAmount = settleOriginalAmount;
+	}
 }

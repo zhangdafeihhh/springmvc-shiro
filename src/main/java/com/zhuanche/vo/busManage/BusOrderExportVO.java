@@ -119,9 +119,9 @@ public class BusOrderExportVO implements Serializable {
      */
     private Double estimatedAmountYuan;
     /**
-     * 代收费用
+     * 计费返回新字段settleOriginalAmount  代替 待结算金额 settleAmount
      */
-    private BigDecimal settleAmount;
+    private BigDecimal settleOriginalAmount;
 
     /**
      * 违约金额

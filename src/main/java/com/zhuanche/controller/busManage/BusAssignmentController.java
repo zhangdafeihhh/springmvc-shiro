@@ -647,15 +647,14 @@ public class BusAssignmentController {
         try {
             // 调用订单接口查询订单详情
             BusOrderDetail orderDetail = busOrderService.selectOrderDetail(orderNo);
-            logger.info("[ BusAssignmentController-saveMessageTask ] 订单详情 = {}", JSON.toJSONString(orderDetail));
             Integer orderId = orderDetail.getOrderId();
             // 调用计费接口
             BusCostDetail busCostDetail = busOrderService.selectOrderCostDetail(orderId);
-            logger.info("[ BusAssignmentController-saveMessageTask ] 计费详情 = {}", JSON.toJSONString(busCostDetail));
+            //计费返回新字段settleOriginalAmount  代替 待结算金额 settleAmount
+            busCostDetail.setSettleAmount(busCostDetail.getSettleOriginalAmount());
 
             // 调用支付接口
             BusPayDetail busPayDetail = busOrderService.selectOrderPayDetail(orderNo);
-            logger.info("[ BusAssignmentController-saveMessageTask ] 支付详情 = {}", JSON.toJSONString(busPayDetail));
 
             // 查询派单订单操作状态
             List<BusOrderOperationTime> orderOperations = busOrderOperationTimeExMapper.queryOperationByOrderId(orderId);
