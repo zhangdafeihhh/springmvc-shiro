@@ -9,6 +9,7 @@ import com.zhuanche.common.rocketmq.CommonRocketProducer;
 import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.common.web.Verify;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.driver.TelescopeDriver;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
@@ -29,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -52,8 +54,10 @@ public class TelescopeController {
 	/**查询千里眼用户列表**/
 	@RequestMapping(value = "/queryTelescopeUserForList" )
 	@ResponseBody
-    public AjaxResponse queryTelescopeUserForList( Integer cityId, Integer supplierId, Integer teamId, Integer teamGroupId ,
-												   Integer status, String phone,Integer driverStatus, Integer page, Integer pageSize){
+    public AjaxResponse queryTelescopeUserForList(Integer cityId, Integer supplierId, Integer teamId, Integer teamGroupId ,
+												  Integer status, String phone, Integer driverStatus,
+												  @RequestParam(value="page", defaultValue="0")Integer page,
+												  @Verify(param = "pageSize",rule = "max(50)")@RequestParam(value="pageSize", defaultValue="20")Integer pageSize){
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("cityId",cityId);
 		params.put("supplierId",supplierId);
@@ -151,12 +155,16 @@ public class TelescopeController {
 	/**修改千里眼用户权限**/
 	@RequestMapping("/updateTelescopeUser")
 	@ResponseBody
-    public AjaxResponse updateTelescopeUser(Integer driverId, String dataCityIds, String dataSupplierIds, String teamIds, String teamGrupIds){
+    public AjaxResponse updateTelescopeUser(Integer driverId, String dataCityIds, String dataSupplierIds, String teamIds, String teamGrupIds, Integer level){
 		Map<String, Object> params = new HashMap<String, Object>();
+		if(driverId == null){
+			return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
+		}
 		params.put("driverId",driverId);
 		params.put("dataCityIds",dataCityIds);
 		params.put("dataSupplierIds",dataSupplierIds);
 		params.put("teamIds",teamIds);
+		params.put("level",level);
 		params.put("teamGrupIds",teamGrupIds);
 		params.put("updateBy", WebSessionUtil.getCurrentLoginUser().getName());
 		JSONObject result = MpOkHttpUtil.okHttpPostBackJson(mpManageRestUrl + "/telescope/updateTelescopeUser", params, 1, "修改千里眼权限状态");
@@ -166,7 +174,6 @@ public class TelescopeController {
 			logger.info("【修改千里眼用户权限】接口出错,params={},errorMsg={}", params, errorMsg);
 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 		}
-//		return AjaxResponse.success( result.get("data") );
 		return AjaxResponse.success(null);
 	}
 
