@@ -114,7 +114,7 @@ public class HttpRequestStatisticsInterceptor implements HandlerInterceptor,  In
 		//URI 请求数计数器
 		AtomicLong atomicLong = URI_COUNTER.get(uri);
 		long costMiliseconds = System.currentTimeMillis()-startTimestamp;
-		if(costMiliseconds > 3000){
+		if(costMiliseconds > 10000){
 			try {
 				String mess = MessageFormat.format("接口超时报警:项目ip:{0},项目端口:{1},接口地址:{2},请求方式:{3}",
 						request.getServerName(),request.getServerPort(),request.getRequestURI(),request.getMethod());
