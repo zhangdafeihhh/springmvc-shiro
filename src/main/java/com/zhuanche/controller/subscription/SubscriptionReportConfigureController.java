@@ -268,6 +268,7 @@ public class SubscriptionReportConfigureController {
         map.put( "41", "美团");
         map.put( "42", "航旅纵横");
         map.put( "43", "八维通");
+        map.put( "44", "ToBC司机流水");
 
         return AjaxResponse.success(map);
     }
