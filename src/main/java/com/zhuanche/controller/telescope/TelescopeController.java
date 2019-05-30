@@ -155,7 +155,7 @@ public class TelescopeController {
 	/**修改千里眼用户权限**/
 	@RequestMapping("/updateTelescopeUser")
 	@ResponseBody
-    public AjaxResponse updateTelescopeUser(Integer driverId, String dataCityIds, String dataSupplierIds, String teamIds, String teamGrupIds, Integer level){
+    public AjaxResponse updateTelescopeUser(Integer driverId, String dataCityIds, String dataSupplierIds, String dataTeamIds, String dataGroupIds, Integer level){
 		Map<String, Object> params = new HashMap<String, Object>();
 		if(driverId == null){
 			return AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
@@ -163,9 +163,9 @@ public class TelescopeController {
 		params.put("driverId",driverId);
 		params.put("dataCityIds",dataCityIds);
 		params.put("dataSupplierIds",dataSupplierIds);
-		params.put("teamIds",teamIds);
+		params.put("dataTeamIds",dataTeamIds);
 		params.put("level",level);
-		params.put("teamGrupIds",teamGrupIds);
+		params.put("dataGroupIds",dataGroupIds);
 		params.put("updateBy", WebSessionUtil.getCurrentLoginUser().getName());
 		JSONObject result = MpOkHttpUtil.okHttpPostBackJson(mpManageRestUrl + "/telescope/updateTelescopeUser", params, 1, "修改千里眼权限状态");
 		logger.info("【修改千里眼用户权限】接口返回结果：{}",result.toJSONString());
