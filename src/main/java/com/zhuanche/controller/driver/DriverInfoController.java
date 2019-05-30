@@ -843,6 +843,7 @@ public class DriverInfoController {
         telescopeDriverInfo = BeanUtil.copyObject(carBizDriverInfoDTO, TelescopeDriverInfo.class);
         logger.info("【查询千里眼司机信息】请求参数:phone={},telescopeDriverInfo2={}",phone,telescopeDriverInfo);
         telescopeDriverInfo.setAuth(auth);
+        telescopeDriverInfo.setDriverStatus(carBizDriverInfoDTO.getStatus());
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("driverId",carBizDriverInfoDTO.getDriverId());
         params.put("updateBy", WebSessionUtil.getCurrentLoginUser().getName());
