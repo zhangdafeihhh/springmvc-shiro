@@ -810,7 +810,7 @@ public class CarBizDriverInfoService {
                     carBizDriverInfo.setTeamName(stringObjectMap.get("teamName").toString());
                 }
                 if(stringObjectMap.containsKey("teamGroupId") && stringObjectMap.get("teamGroupId")!=null ){
-                    carBizDriverInfo.setTeamId(Integer.parseInt(stringObjectMap.get("teamGroupId").toString()));
+                    carBizDriverInfo.setTeamGroupId(Integer.parseInt(stringObjectMap.get("teamGroupId").toString()));
                 }
                 if(stringObjectMap.containsKey("teamGroupName") && stringObjectMap.get("teamGroupName")!=null ){
                     carBizDriverInfo.setTeamGroupName(stringObjectMap.get("teamGroupName").toString());
