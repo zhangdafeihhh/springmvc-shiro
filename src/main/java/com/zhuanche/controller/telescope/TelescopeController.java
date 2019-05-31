@@ -151,7 +151,7 @@ public class TelescopeController {
 		String errorMsg = result.getString("msg");
 		logger.info("【新增千里眼权限用户】接口出错,params={},errorMsg={}", params, errorMsg);
 		if(result.getIntValue("code") == 1){
-			return AjaxResponse.fail(RestErrorCode.DRIVER_ACCOUNT_APPLY_EXIST,errorMsg);
+			return AjaxResponse.fail(RestErrorCode.DRIVER_ACCOUNT_APPLY_EXIST);
 		}else{
 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 		}
