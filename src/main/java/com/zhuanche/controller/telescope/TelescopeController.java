@@ -38,7 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 
-/**用户登录相关的功能**/
+/**千里眼用户权限相关的功能**/
 @Controller
 @RequestMapping("/telescope")
 public class TelescopeController {
