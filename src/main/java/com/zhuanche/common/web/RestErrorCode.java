@@ -243,7 +243,7 @@ public final class RestErrorCode{
 
 	//----------------------------------------------千里眼业务
 	@ResultMessage("该司机已绑定千里眼，不允许重复绑定！")
-	public static final int DRIVER_ACCOUNT_APPLY_EXIST=4001;
+	public static final int DRIVER_ACCOUNT_APPLY_EXIST=40001;
 	//----------------------------------------------千里眼业务
 
 
