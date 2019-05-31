@@ -302,7 +302,7 @@ public class DriverInfoTemporaryController extends BaseController {
         CarBizDriverInfoTemp entity = new CarBizDriverInfoTemp();
         entity.setDriverId(driverId);
         CarBizDriverInfoTemp rows = carBizDriverInfoTempService.queryForObject(entity);
-        if (rows.getDrivingLicenseType() != null) {
+        if (null!=rows && rows.getDrivingLicenseType() != null) {
             if (rows.getDrivingLicenseType().equals("1")) {
                 rows.setDrivingTypeString("A1");
             } else if (rows.getDrivingLicenseType().equals("2")) {
