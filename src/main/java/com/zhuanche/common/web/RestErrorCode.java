@@ -241,6 +241,12 @@ public final class RestErrorCode{
 	//----------------------------------------------供应商业务
 
 
+	//----------------------------------------------千里眼业务
+	@ResultMessage("该司机已绑定千里眼，不允许重复绑定！")
+	public static final int DRIVER_ACCOUNT_APPLY_EXIST=4001;
+	//----------------------------------------------千里眼业务
+
+
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系
 	static{
