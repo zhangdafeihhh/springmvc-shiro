@@ -179,12 +179,13 @@ public class DriverFeeDetailServiceImpl implements DriverFeeDetailService {
                 return new ArrayList<>();
             }
             logger.info("调用计费查询司机费用明细接口返回：" + orderInfo);
-            RPCResponse orderResponse = RPCResponse.parse(orderInfo);
-            if (null == orderResponse || orderResponse.getCode() != 0 || orderResponse.getData() == null) {
+            //RPCResponse orderResponse = RPCResponse.parse(orderInfo);
+            JSONObject orderResponse = JSON.parseObject(orderInfo);
+            if (null == orderResponse || orderResponse.getInteger("code") != 0 || orderResponse.getString("data") == null) {
                 logger.info("相关司机费用信息不存在，入参订单号：" + String.join(",", orderIds));
                 return new ArrayList<>();
             }
-            return JSON.parseArray(JSON.toJSONString(orderResponse.getData()), OrderDriverCostDetailVO.class);
+            return JSON.parseArray(JSON.toJSONString(orderResponse.getString("data")), OrderDriverCostDetailVO.class);
         } catch (Exception e) {
             logger.error("查询/orderCost/getOrderDriverCostDetails异常:", e);
             return new ArrayList<>();
