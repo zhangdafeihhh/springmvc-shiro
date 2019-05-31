@@ -247,6 +247,11 @@ public class CarBizSaasVersionServiceImpl implements CarBizSaasVersionService{
         return carBizSaasVersionExMapper.selectByPrimaryKey(versionId);
     }
 
+    @Override
+    public List<Map<String, String>> selectContactsSendMsg(Integer cityId) {
+        return carBizSaasVersionExMapper.selectContactsSendMsg(cityId);
+    }
+
 
     /**
      * 文件服务器上传

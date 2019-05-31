@@ -1,8 +1,10 @@
 package mapper.mdbcarmanage.ex;
 
 import com.zhuanche.entity.mdbcarmanage.CarBizSaasVersion;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: nysspring@163.com
@@ -22,4 +24,7 @@ public interface CarBizSaasVersionExMapper {
     int updateByPrimaryKeySelective(CarBizSaasVersion record);
 
     List<CarBizSaasVersion> listVersion();
+
+    List<Map<String,String>> selectContactsSendMsg(@Param("cityId") Integer cityId);
+
 }

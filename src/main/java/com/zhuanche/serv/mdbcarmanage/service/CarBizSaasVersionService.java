@@ -5,6 +5,7 @@ import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.entity.mdbcarmanage.CarBizSaasVersion;
 import com.zhuanche.entity.mdbcarmanage.CarBizSaasVersionDetail;
 import com.zhuanche.entity.mdbcarmanage.VersionModel;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,5 +41,7 @@ public interface CarBizSaasVersionService {
     Boolean saveOrUpdateVersion(CarBizSaasVersion record);
 
     CarBizSaasVersion selectVersionById(Integer versionId);
+
+    List<Map<String,String>> selectContactsSendMsg(Integer cityId);
 
 }
