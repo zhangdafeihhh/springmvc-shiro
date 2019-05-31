@@ -146,6 +146,15 @@
     order by update_date desc
   </select>
 
+  <select id="selectContactsSendMsg" resultType="java.util.Map">
+    select
+    user_name AS name,
+    phone AS phone,
+    cities AS cities
+    from car_adm_user
+    WHERE status = 200 AND cities LIKE CONCAT('%',#{cityId},'%')
+  </select>
+
 
 
 </mapper>

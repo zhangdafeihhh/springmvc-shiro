@@ -123,21 +123,56 @@ public class SaasVersionController {
                 }
                 LOGGER.info("发送短信list={}",list);
 
-
-                List<Map<String,String>> contactsList = carBizSupplierService.findContactsByCityIdList(list);
-                if(contactsList == null || contactsList.isEmpty()){
-                    LOGGER.info("当前城市id没有对应联系人cityidList={}",list);
-                    return AjaxResponse.success(null);
-                }
-                for (Map<String,String> map : contactsList){
-                    String contactName = map.get("contactName");
-                    String contactPhone = map.get("contactPhone");
-                    if(StringUtils.isNotBlank(contactName) && StringUtils.isNotBlank(contactPhone) && contactPhone.length() == 11){
-                        String smsContent = contactName +"老板您好，首约加盟商服务平台刚于"+ versionTakeEffectDate +"进行了"+ version +"版本更新，本次更新主要包括："+ versionSummary +"，访问版本记录可以查看完整更新说明，如有任何问题欢迎反馈。您的满意，我们的动力！";
-                        SmsSendUtil.send(contactPhone, smsContent);
-                        LOGGER.info("发送短信成功contactName={},contactPhone={}",contactName,contactPhone);
+                Map<String,String> msgMap = new HashMap<>();
+                if(list != null && !list.isEmpty()){
+                    for (Integer cityId : list){
+                        List<Map<String, String>> mapList = carBizSaasVersionService.selectContactsSendMsg(cityId);
+                        if(mapList != null && !mapList.isEmpty()){
+                            for(Map<String,String> map : mapList){
+                                String cities = map.get("cities");
+                                String[] split1 = cities.split(Constants.SEPERATER);
+                                List<String> list1 = Arrays.asList(split1);
+                                if(list1.contains(String.valueOf(cityId))){
+                                    String name = map.get("name");
+                                    String phone = map.get("phone");
+                                    msgMap.put(phone,name);
+                                }
+                            }
+                        }
                     }
+
+                    if(msgMap == null || msgMap.isEmpty()){
+                        LOGGER.info("当前城市id没有对应联系人cityidList={}",list);
+                        return AjaxResponse.success(null);
+                    }
+
+                    for (Map.Entry<String,String> entry : msgMap.entrySet()){
+                        String contactPhone = entry.getKey();
+                        String contactName = entry.getValue();
+                        if(StringUtils.isNotBlank(contactName) && StringUtils.isNotBlank(contactPhone) && contactPhone.length() == 11){
+                            String smsContent = contactName +"老板您好，首约加盟商服务平台刚于"+ versionTakeEffectDate +"进行了"+ version +"版本更新，本次更新主要包括："+ versionSummary +"，访问版本记录可以查看完整更新说明，如有任何问题欢迎反馈。您的满意，我们的动力！";
+                            SmsSendUtil.send(contactPhone, smsContent);
+                            LOGGER.info("发送短信成功contactName={},contactPhone={}",contactName,contactPhone);
+                        }
+
+                    }
+
                 }
+
+//                List<Map<String,String>> contactsList = carBizSupplierService.findContactsByCityIdList(list);
+//                if(contactsList == null || contactsList.isEmpty()){
+//                    LOGGER.info("当前城市id没有对应联系人cityidList={}",list);
+//                    return AjaxResponse.success(null);
+//                }
+//                for (Map<String,String> map : contactsList){
+//                    String contactName = map.get("contactName");
+//                    String contactPhone = map.get("contactPhone");
+//                    if(StringUtils.isNotBlank(contactName) && StringUtils.isNotBlank(contactPhone) && contactPhone.length() == 11){
+//                        String smsContent = contactName +"老板您好，首约加盟商服务平台刚于"+ versionTakeEffectDate +"进行了"+ version +"版本更新，本次更新主要包括："+ versionSummary +"，访问版本记录可以查看完整更新说明，如有任何问题欢迎反馈。您的满意，我们的动力！";
+//                        SmsSendUtil.send(contactPhone, smsContent);
+//                        LOGGER.info("发送短信成功contactName={},contactPhone={}",contactName,contactPhone);
+//                    }
+//                }
 
             }
         }catch (Exception e){
