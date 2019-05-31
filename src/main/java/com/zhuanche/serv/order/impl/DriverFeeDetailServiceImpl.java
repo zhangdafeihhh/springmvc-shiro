@@ -16,11 +16,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.*;
 
 @Service
 public class DriverFeeDetailServiceImpl implements DriverFeeDetailService {
 
+    private static ExecutorService executor = new ThreadPoolExecutor(5, 10, 10L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(20));
+    private static final int MAX_DEAL = 500;//对多数据进行分组，500条一组，一组使用一个线程进行执行
     @Value("${driver.fee.server.api.base.url}")
     private String DRIVER_FEE_SERVICE_API_BASE_URL;
 
@@ -102,10 +106,74 @@ public class DriverFeeDetailServiceImpl implements DriverFeeDetailService {
             logger.info("接口调用入参订单号为空");
             return new ArrayList<>();
         }
+        List<OrderDriverCostDetailVO> resultList = new ArrayList<>();
+        int times = (orderIds.size() + MAX_DEAL - 1) / MAX_DEAL;
+        CountDownLatch countDownLatch = new CountDownLatch(times);//一个同步辅助类，在完成一组正在其他线程中执行的操作之前，它允许一个或多个线程一直等待。
+        try {
+            for (int i = 0; i < times; i++) {
+                if (i == times - 1) {
+                    //查询指派改派时间
+                    executor.execute(new addListRunnable(orderIds.subList(i * MAX_DEAL, orderIds.size()), countDownLatch,resultList,i));//调用业务逻辑
+                } else {
+                    executor.execute(new addListRunnable(orderIds.subList(i * MAX_DEAL, (i + 1) * MAX_DEAL), countDownLatch,resultList,i));
+                }
+            }
+            countDownLatch.await();//一个线程(或者多个)， 等待另外N个线程完成某个事情之后才能执行
+        } catch (Exception e) {
+            e.printStackTrace();
+            }
+
+        return resultList;
+    }
+
+    private class addListRunnable implements Runnable{
+
+        private List<String> list;
+        private CountDownLatch countDownLatch;
+        private List<OrderDriverCostDetailVO> resultList;
+        private int times;
+        public addListRunnable(List<String> list,CountDownLatch countDownLatch,List<OrderDriverCostDetailVO> resultList,int times){
+            super();
+            this.list = list;
+            this.countDownLatch = countDownLatch;
+            this.resultList = resultList;
+            this.times = times;
+        }
+        @Override
+        public void run() {
+            try {
+                List<OrderDriverCostDetailVO> batchList = buildOrderDriverCostDetailBatch(list);
+                //resultList.addAll(batchList);
+                //模拟业务执行，这里并没有对list进行操作
+                //Thread.sleep(1000);
+                //System.out.println("当前线程为"+Thread.currentThread().getId());//输出当前线程id
+
+//                List<OrderDriverCostDetailVO> newList = new ArrayList<>();
+//                OrderDriverCostDetailVO v  = new OrderDriverCostDetailVO();
+//                v.setOrderId(times);
+//                v.setTotalAmount(new BigDecimal(1.0));
+//                newList.add(v);
+                synchronized (resultList){
+                    resultList.addAll(batchList);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }finally {
+                countDownLatch.countDown();//完成一次操作，计数减一
+            }
+
+        }
+
+    }
+
+
+    private List<OrderDriverCostDetailVO> buildOrderDriverCostDetailBatch(List<String> orderIds){
+
         try {
             Map<String, Object> httpParams = new HashMap<>();
             httpParams.put("orderIds", String.join(",", orderIds));
-            String orderInfo = new RPCAPI().requestWithRetry(RPCAPI.HttpMethod.GET, DRIVER_FEE_SERVICE_API_BASE_URL + "/orderCost/findOrderDriverCostDetails", httpParams, null, "UTF-8");
+            String orderInfo = new RPCAPI().requestWithRetry(RPCAPI.HttpMethod.GET, DRIVER_FEE_SERVICE_API_BASE_URL + "/orderCost/getBatchOrderAmountInfo", httpParams, null, "UTF-8");
             if (orderInfo == null) {
                 logger.error("查询/orderCost/findOrderDriverCostDetails返回空，入参为：" + String.join(",", orderIds));
                 return new ArrayList<>();
