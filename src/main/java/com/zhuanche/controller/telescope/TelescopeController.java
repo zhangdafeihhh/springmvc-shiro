@@ -115,11 +115,12 @@ public class TelescopeController {
 			}
 			params.put("cityId",carBizDriverInfoDTO.getServiceCity());
 			params.put("supplierId",carBizDriverInfoDTO.getSupplierId());
+			params.put("driverId",carBizDriverInfoDTO.getDriverId());
 		}else{
 			params.put("cityId",cityId);
 			params.put("supplierId",supplierId);
+			params.put("driverId",driverId);
 		}
-		params.put("driverId",driverId);
 		params.put("driverStatus",1);
 		params.put("name",name);
 		params.put("phone",phone);
