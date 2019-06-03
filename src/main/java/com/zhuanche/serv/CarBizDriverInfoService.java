@@ -3749,11 +3749,11 @@ public class CarBizDriverInfoService {
         CarBizDriverInfo carBizDriverInfo = new CarBizDriverInfo();
         CarBizSupplier param = new CarBizSupplier();
         param.setSupplierCity(Integer.valueOf(telescopeDriver.getDataCityIds().split(",")[0]));
-        CarBizCity carBizCity = carBizCityService.selectByPrimaryKey(Integer.valueOf(telescopeDriver.getDataCityIds().split(",")[0]));
+        CarBizCity carBizCity = carBizCityService.selectByPrimaryKey(telescopeDriver.getCityId());
         CarBizSupplier carBizSupplier = carBizSupplierService.queryQianLiYanSupplierByCityId(param);
         if(null == carBizSupplier){
             carBizSupplier = new CarBizSupplier();
-            carBizSupplier.setSupplierCity(Integer.valueOf(telescopeDriver.getDataCityIds().split(",")[0]));
+            carBizSupplier.setSupplierCity(telescopeDriver.getCityId());
             carBizSupplier.setSupplierNum("qianliyan");
             carBizSupplier.setType(1);
             carBizSupplier.setAddress("");

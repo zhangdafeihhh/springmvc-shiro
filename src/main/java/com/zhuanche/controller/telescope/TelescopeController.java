@@ -109,6 +109,7 @@ public class TelescopeController {
 			telescopeDriver.setPhone(phone);
 			telescopeDriver.setName(name);
 			telescopeDriver.setDataCityIds(dataCityIds);
+			telescopeDriver.setCityId(cityId);
 			CarBizDriverInfoDTO carBizDriverInfoDTO = carBizDriverInfoService.addTelescopeDriver(telescopeDriver);
 			if(null == carBizDriverInfoDTO){
 				return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
