@@ -38,7 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 
-/**用户登录相关的功能**/
+/**千里眼用户权限相关的功能**/
 @Controller
 @RequestMapping("/telescope")
 public class TelescopeController {
@@ -151,7 +151,7 @@ public class TelescopeController {
 		String errorMsg = result.getString("msg");
 		logger.info("【新增千里眼权限用户】接口出错,params={},errorMsg={}", params, errorMsg);
 		if(result.getIntValue("code") == 1){
-			return AjaxResponse.fail(RestErrorCode.DRIVER_ACCOUNT_APPLY_EXIST,errorMsg);
+			return AjaxResponse.fail(RestErrorCode.DRIVER_ACCOUNT_APPLY_EXIST);
 		}else{
 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 		}
