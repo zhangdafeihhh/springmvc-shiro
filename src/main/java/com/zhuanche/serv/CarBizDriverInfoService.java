@@ -3748,7 +3748,7 @@ public class CarBizDriverInfoService {
         }
         CarBizDriverInfo carBizDriverInfo = new CarBizDriverInfo();
         CarBizSupplier param = new CarBizSupplier();
-        param.setSupplierCity(Integer.valueOf(telescopeDriver.getDataCityIds().split(",")[0]));
+        param.setSupplierCity(telescopeDriver.getCityId());
         CarBizCity carBizCity = carBizCityService.selectByPrimaryKey(telescopeDriver.getCityId());
         CarBizSupplier carBizSupplier = carBizSupplierService.queryQianLiYanSupplierByCityId(param);
         if(null == carBizSupplier){
