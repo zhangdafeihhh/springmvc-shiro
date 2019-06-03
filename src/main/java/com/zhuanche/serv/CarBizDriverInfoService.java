@@ -773,6 +773,14 @@ public class CarBizDriverInfoService {
         if (carBizDriverInfo == null) {
             return carBizDriverInfo;
         }
+
+        if(carBizDriverInfo.getExt2() == null){
+            carBizDriverInfo.setExt2(0);
+        }
+        if(carBizDriverInfo.getExt3() == null){
+            carBizDriverInfo.setExt3(4);
+        }
+
         // 根据供应商ID查询供应商名称以及加盟类型
         CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(carBizDriverInfo.getSupplierId());
         if (carBizSupplier != null) {
