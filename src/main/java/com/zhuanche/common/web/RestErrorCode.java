@@ -44,9 +44,9 @@ public final class RestErrorCode{
 	//-----------------------------------------------用户
 	@ResultMessage("获取验证码太频繁,请{0}分钟后重试")
 	public static final int GET_MSGCODE_EXCEED           = 1000;
-	@ResultMessage("用户不存在")
+	@ResultMessage("用户名或密码错误")
 	public static final int USER_NOT_EXIST                      = 1001;
-	@ResultMessage("用户密码不正确")
+	@ResultMessage("用户名或密码错误")
 	public static final int USER_PASSWORD_WRONG      = 1002;
 	@ResultMessage("用户已被禁用")
 	public static final int USER_INVALID                          = 1003;
@@ -241,23 +241,29 @@ public final class RestErrorCode{
 	//----------------------------------------------供应商业务
 
 
+	//----------------------------------------------千里眼业务
+	@ResultMessage("该司机已绑定千里眼，不允许重复绑定！")
+	public static final int DRIVER_ACCOUNT_APPLY_EXIST=40001;
+	//----------------------------------------------千里眼业务
+
+
 	//-------------------金融商品--start-------------------------
-	
+
 	@ResultMessage("查询车型库信息失败")
 	public static final int QUERY_BASICSVEHICLE_ERROR=80001;
-	
+
 	@ResultMessage("修改商品信息ID参数不能为空")
 	public static final int GOODSIDISNULL=80002;
-	
+
 	@ResultMessage("您好,请上传正确格式的文件")
 	public static final int CORRECT_FORMAT=80003;
-	
+
 	@ResultMessage("车型车款已经存在")
 	public static final int BASICSVEHICLE_EXISTS=80004;
-	
+
 	@ResultMessage("商品已经存在")
 	public static final int GOODS_EXISTS=80005;
-	
+
 	@ResultMessage("很抱歉{0}车型车款已经停用！")
 	public static final int ENABLE_STATUS=80006;
 	//-------------------金融商品--end---------------------------

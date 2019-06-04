@@ -425,7 +425,7 @@ public class SaasDriverDailyReportController {
         }
 
 
-        String table = SaasConst.MONTHTABLE + month.replace("-","_");
+        String table = this.getTable( cityId, month);
 
         String sort = "";
         if("1".equals(businessVolumeSort) || "1".equals(finOrdCntSort) || "1".equals(badCntSort)){
@@ -536,7 +536,7 @@ public class SaasDriverDailyReportController {
         obj.put("buiness_params",dto);
 
 
-        String table = SaasConst.MONTHTABLE + month.replace("-","_");
+        String table = this.getTable( cityId, month);
 
         SaasReportParamDTO saasDTO = new SaasReportParamDTO(null,null,month,table,2);
 
@@ -818,5 +818,14 @@ public class SaasDriverDailyReportController {
         }
 
         return setGroupIds;
+    }
+
+    private String getTable (String cityId, String month){
+        String table = SaasConst.MONTHTABLE + month.replace("-","_");
+
+        if(StringUtils.isNotBlank(cityId) && "44".equals(cityId)) {
+            table = SaasConst.MONTHTABLEBEIJING + month.replace("-","_");
+        }
+        return table;
     }
 }

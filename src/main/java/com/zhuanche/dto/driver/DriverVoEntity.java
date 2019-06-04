@@ -188,6 +188,18 @@ public class DriverVoEntity extends DriverEntity {
      *司机等级 
      */
     private String membershipName;
+
+	private Integer calcuateCycle;//等级计算周期，1按周计算，2按月计算
+
+	public Integer getCalcuateCycle() {
+		return calcuateCycle;
+	}
+
+	public void setCalcuateCycle(Integer calcuateCycle) {
+		this.calcuateCycle = calcuateCycle;
+	}
+
+	public String getMembershipName() {
 	private String incomeScore;//当前收入分
 
 	private String updateTime;//收入分更新时间

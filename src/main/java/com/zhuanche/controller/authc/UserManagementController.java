@@ -4,7 +4,6 @@ import com.zhuanche.common.enums.PermissionLevelEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RequestFunction;
-import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 import com.zhuanche.serv.CarBizDriverInfoService;
@@ -72,9 +71,6 @@ public class UserManagementController {
 //			return AjaxResponse.fail(RestErrorCode.PHONE_EXIST );
 //		}
 		AjaxResponse ajaxResponse = userManagementService.addUser(user);
-		if(addTelescope!=null && addTelescope.compareTo(1)==0){
-			carBizDriverInfoService.addTelescopeDriver(user);
-		}
 		return ajaxResponse;
 	}
 	
@@ -115,11 +111,6 @@ public class UserManagementController {
 		newUser.setSuppliers( supplierIds );
 		newUser.setTeamId( teamIds );
 		newUser.setGroupIds(groupIds);
-		if(addTelescope!=null && addTelescope.compareTo(1)==0){
-			carBizDriverInfoService.addTelescopeDriver(newUser);
-		}else{
-			carBizDriverInfoService.disableTelescopeDriver(newUser);
-		}
 		return userManagementService.changeUser(newUser);
 	}
 	

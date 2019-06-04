@@ -85,6 +85,8 @@ public final class SaasConst {
 
 	public static final String MONTHTABLE = "bi_driver_business_info_month_report_";
 
+	public static final String MONTHTABLEBEIJING = "bi_saas_driver_month_report_";
+
 //	public static void main( String[] args ) {
 //		boolean res = "5,66,465,0,46".matches("^([0-9]+,)*[0-9]+$");
 //		System.out.println( res  );

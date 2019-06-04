@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.zhuanche.dto.rentcar.DriverComplianceDTO;
 import com.zhuanche.entity.driver.DriverActionVO;
 import org.apache.ibatis.annotations.Param;
 
@@ -184,4 +185,14 @@ public interface CarBizDriverInfoExMapper {
     List<CarBizDriverInfoDTO> queryDriverIdsByActionVO(Map map);
 
     CarBizDriverInfoDTO queryDriverIdByActionVO(Map<String, Object> params);
+
+    List<CarBizDriverInfoDTO> queryDriverListForSaas(CarBizDriverInfoDTO params);
+
+    /**
+     * 导出时避免多次查询
+     * 查询司机的合规状态和类型
+     * @param driverIdSet
+     * @return
+     */
+    List<DriverComplianceDTO> queryDriverComplianceDTOListByDriverIdSet(@Param("driverIdSet") Set<Integer> driverIdSet);
 }

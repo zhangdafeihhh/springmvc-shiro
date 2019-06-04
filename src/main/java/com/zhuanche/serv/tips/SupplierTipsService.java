@@ -123,7 +123,7 @@ public class SupplierTipsService {
                   }else {
                       for(CarBizTipsDoc carBizTipsDoc : tipsDocList){
 
-                          docIds.add(carBizTipsDoc.getId());
+                          docIds.add(carBizTipsDoc.getId());//yao
                       }
                   }
               }

@@ -482,11 +482,13 @@ public class CarBizDriverInfoDTO extends Base {
 
     /**
      * 可扩展2
+     * 合规状态 0不合规 1 合规'
      */
     private Integer ext2;
 
     /**
      * 可扩展3
+     * 1:人证合规 2:车证合规 3:双证合规 4:不合规
      */
     private Integer ext3;
 

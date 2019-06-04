@@ -16,6 +16,7 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.driver.TelescopeDriverInfo;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
@@ -23,6 +24,7 @@ import com.zhuanche.entity.mdbcarmanage.DriverTelescopeUser;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
+import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.*;
 import com.zhuanche.serv.authc.UserManagementService;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
@@ -35,6 +37,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -80,6 +83,9 @@ public class DriverInfoController {
     @Autowired
     private UserManagementService userManagementService;
 
+    @Value("${mp-manage-rest.url}")
+    String mpManageRestUrl;
+
     /**
      * 司机信息列表（有分页）
      * @param name 司机姓名
@@ -96,6 +102,8 @@ public class DriverInfoController {
      * @param idCardNo 身份证号
      * @param isImage 是否维护形象
      * @param page 起始页，默认0
+     * @param ext2 合规状态 0不合规 1 合规
+     * @param ext3 合规类型 1:人证合规 2:车证合规 3:双证合规 4:不合规
      * @param pageSize 取N条，默认20
      * @return
      */
@@ -108,7 +116,7 @@ public class DriverInfoController {
     @SensitiveDataOperationLog(primaryDataType="司机数据",secondaryDataType="司机个人基本信息",desc="司机信息列表查询")
     @RequestFunction(menu = DRIVER_INFO_LIST)
     public AjaxResponse findDriverList(String name, String phone, String licensePlates, Integer status, Integer cityId, Integer supplierId,
-            Integer teamId, Integer teamGroupId, Integer groupId, Integer cooperationType, String imei, String idCardNo, Integer isImage,
+            Integer teamId, Integer teamGroupId, Integer groupId, Integer cooperationType, String imei, String idCardNo, Integer isImage,Integer ext2,Integer ext3,
             @RequestParam(value="page", defaultValue="0")Integer page,
             @Verify(param = "pageSize",rule = "max(50)")@RequestParam(value="pageSize", defaultValue="20")Integer pageSize) {
 
@@ -151,12 +159,16 @@ public class DriverInfoController {
         carBizDriverInfoDTO.setSupplierIds(permOfSupplier);
         carBizDriverInfoDTO.setTeamIds(permOfTeam);
         carBizDriverInfoDTO.setDriverIds(driverIds);
+        carBizDriverInfoDTO.setExt2(ext2);
+        carBizDriverInfoDTO.setExt3(ext3);
 
         Page p = PageHelper.startPage(page, pageSize, true);
         try {
-            list = carBizDriverInfoService.queryDriverList(carBizDriverInfoDTO);
+            list = carBizDriverInfoService.queryDriverListForSaas(carBizDriverInfoDTO);
             total = (int)p.getTotal();
-        } finally {
+        } catch (Exception e){
+            logger.info("查询司机信息异常carBizDriverInfoDTO={}，e={}",JSON.toJSONString(carBizDriverInfoDTO),e);
+        } finally{
             PageHelper.clearPage();
         }
         // 查询城市名称，供应商名称，服务类型，加盟类型
@@ -298,7 +310,7 @@ public class DriverInfoController {
                     "驾照到期时间,档案编号,国籍,驾驶员民族,驾驶员婚姻状况,驾驶员外语能力,驾驶员学历,户口登记机关名称,户口住址或长住地址,驾驶员通信地址,驾驶员照片文件编号,机动车驾驶证号," +
                     "机动车驾驶证扫描件文件编号,初次领取驾驶证日期,是否巡游出租汽车驾驶员,网络预约出租汽车驾驶员资格证号,网络预约出租汽车驾驶员证初领日期,巡游出租汽车驾驶员资格证号," +
                     "网络预约出租汽车驾驶员证发证机构,资格证发证日期,初次领取资格证日期,资格证有效起始日期,资格证有效截止日期,注册日期,是否专职驾驶员,驾驶员合同（或协议）签署公司,有效合同时间," +
-                    "合同（或协议）有效期起,合同（或协议）有效期止,紧急情况联系人,紧急情况联系人电话,紧急情况联系人通讯地址,供应商,城市,车队,小组,司机id,创建时间");
+                    "合同（或协议）有效期起,合同（或协议）有效期止,紧急情况联系人,紧急情况联系人电话,紧急情况联系人通讯地址,供应商,城市,车队,小组,司机id,创建时间,合规状态,合规类型");
             String fileName = "司机信息" + com.zhuanche.util.dateUtil.DateUtil.dateFormat(new Date(), com.zhuanche.util.dateUtil.DateUtil.intTimestampPattern)+".csv";
             String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
             if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
@@ -816,31 +828,34 @@ public class DriverInfoController {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
     })
-    public AjaxResponse findTelescopeDriverInfo(String phone,Integer userId) {
-        logger.info("【查询千里眼司机信息】请求参数:phone={},userId={}",phone,userId);
+    public AjaxResponse findTelescopeDriverInfo(String phone) {
+        logger.info("【查询千里眼司机信息】请求参数:phone={},userId={}");
         boolean auth = false;
         TelescopeDriverInfo telescopeDriverInfo = new  TelescopeDriverInfo();
-        if(userId!=null){
-            DriverTelescopeUser driverTelescopeUser = userManagementService.selectTelescopeUserByUserId(userId);
-            logger.info("【查询千里眼司机信息】请求参数:phone={},userId={},telescopeDriverInfo={}",phone,userId,telescopeDriverInfo);
-            if(null!=driverTelescopeUser && driverTelescopeUser.getStatus()==1){
-                auth = true;
-            }
-            if(null!=driverTelescopeUser){
-                CarBizDriverInfo carBizDriverInfo = carBizDriverInfoService.selectByPrimaryKey(driverTelescopeUser.getDriverId());
-                logger.info("【查询千里眼司机信息】请求参数:phone={},userId={},carBizDriverInfo={}",phone,userId,carBizDriverInfo);
-                if(null!=carBizDriverInfo && carBizDriverInfo.getStatus()==1){
-                    phone = carBizDriverInfo.getPhone();
-                }
-            }
-        }
         CarBizDriverInfoDTO carBizDriverInfoDTO = carBizDriverInfoService.selectByPhone(phone);
-        logger.info("【查询千里眼司机信息】请求参数:phone={},userId={},carBizDriverInfoDTO={}",phone,userId,carBizDriverInfoDTO);
-        if(null != carBizDriverInfoDTO){
-            // 查询城市名称，供应商名称，服务类型，加盟类型
-            carBizDriverInfoDTO = carBizDriverInfoService.getBaseStatis(carBizDriverInfoDTO);
-            telescopeDriverInfo = BeanUtil.copyObject(carBizDriverInfoDTO, TelescopeDriverInfo.class);
-            logger.info("【查询千里眼司机信息】请求参数:phone={},userId={},telescopeDriverInfo2={}",phone,userId,telescopeDriverInfo);
+        logger.info("【查询千里眼司机信息】carBizDriverInfoDTO={}",carBizDriverInfoDTO);
+        if(null == carBizDriverInfoDTO){
+            telescopeDriverInfo.setAuth(auth);
+            return AjaxResponse.success(telescopeDriverInfo);
+        }
+        // 查询城市名称，供应商名称，服务类型，加盟类型
+        carBizDriverInfoDTO = carBizDriverInfoService.getBaseStatis(carBizDriverInfoDTO);
+        telescopeDriverInfo = BeanUtil.copyObject(carBizDriverInfoDTO, TelescopeDriverInfo.class);
+        logger.info("【查询千里眼司机信息】请求参数:phone={},telescopeDriverInfo2={}",phone,telescopeDriverInfo);
+        telescopeDriverInfo.setAuth(auth);
+        telescopeDriverInfo.setDriverStatus(carBizDriverInfoDTO.getStatus());
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("driverId",carBizDriverInfoDTO.getDriverId());
+        params.put("updateBy", WebSessionUtil.getCurrentLoginUser().getName());
+        com.alibaba.fastjson.JSONObject result = MpOkHttpUtil.okHttpGetBackJson(mpManageRestUrl + "/telescope/queryTelescopeUser", params, 1, "查询千里眼用户信息");
+        logger.info("【查询千里眼司机信息】接口返回结果：{}",result.toJSONString());
+        if (result.getIntValue("code") != Constants.SUCCESS_CODE) {
+            String errorMsg = result.getString("msg");
+            logger.info("【查询千里眼司机信息】接口出错,params={},errorMsg={}", params, errorMsg);
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+        if(StringUtils.isNotEmpty(result.getString("data"))){
+            auth = true;
         }
         telescopeDriverInfo.setAuth(auth);
         return AjaxResponse.success(telescopeDriverInfo);

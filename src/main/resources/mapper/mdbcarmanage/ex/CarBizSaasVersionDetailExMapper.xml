@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.mdbcarmanage.ex.CarBizSaasVersionDetailExMapper">
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.CarBizSaasVersionDetail">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="version_id" jdbcType="INTEGER" property="versionId" />
+    <result column="detail_name" jdbcType="VARCHAR" property="detailName" />
+    <result column="detail_url" jdbcType="VARCHAR" property="detailUrl" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, version_id, detail_name, detail_url, `status`, create_date, update_date
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from car_biz_saas_version_detail
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from car_biz_saas_version_detail
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizSaasVersionDetail">
+    insert into car_biz_saas_version_detail (id, version_id, detail_name, 
+      detail_url, `status`, create_date, 
+      update_date)
+    values (#{id,jdbcType=INTEGER}, #{versionId,jdbcType=INTEGER}, #{detailName,jdbcType=VARCHAR}, 
+      #{detailUrl,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateDate,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizSaasVersionDetail">
+    insert into car_biz_saas_version_detail
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="versionId != null">
+        version_id,
+      </if>
+      <if test="detailName != null">
+        detail_name,
+      </if>
+      <if test="detailUrl != null">
+        detail_url,
+      </if>
+      <if test="status != null">
+        `status`,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="updateDate != null">
+        update_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="versionId != null">
+        #{versionId,jdbcType=INTEGER},
+      </if>
+      <if test="detailName != null">
+        #{detailName,jdbcType=VARCHAR},
+      </if>
+      <if test="detailUrl != null">
+        #{detailUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null">
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizSaasVersionDetail">
+    update car_biz_saas_version_detail
+    <set>
+      <if test="versionId != null">
+        version_id = #{versionId,jdbcType=INTEGER},
+      </if>
+      <if test="detailName != null">
+        detail_name = #{detailName,jdbcType=VARCHAR},
+      </if>
+      <if test="detailUrl != null">
+        detail_url = #{detailUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        `status` = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null">
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.CarBizSaasVersionDetail">
+    update car_biz_saas_version_detail
+    set version_id = #{versionId,jdbcType=INTEGER},
+      detail_name = #{detailName,jdbcType=VARCHAR},
+      detail_url = #{detailUrl,jdbcType=VARCHAR},
+      `status` = #{status,jdbcType=INTEGER},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="listCarBizSaasVersionDetail" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from car_biz_saas_version_detail
+    <where>
+      <if test="versionId != null">
+        version_id = #{versionId,jdbcType=INTEGER}
+      </if>
+    </where>
+  </select>
+
+  <delete id="deleteBatch" parameterType="java.util.List">
+      delete from car_biz_saas_version_detail
+      where id IN (
+        <foreach collection="list" item="id" separator=",">
+          #{id,jdbcType=INTEGER}
+        </foreach>
+      )
+  </delete>
+
+  <delete id="deleteByVersionId">
+      delete from car_biz_saas_version_detail
+      where version_id = #{versionId}
+  </delete>
+
+
+
+</mapper>

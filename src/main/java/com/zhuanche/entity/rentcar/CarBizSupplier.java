@@ -17,7 +17,7 @@ public class CarBizSupplier {
 
     private String contactsPhone;
 
-    private Integer status;
+    private Integer status;//是否有效
 
     private Integer createBy;
 
@@ -27,15 +27,15 @@ public class CarBizSupplier {
 
     private Date updateDate;
 
-    private Integer iscommission;
+    private Integer iscommission;//是否显示提成
 
-    private Integer pospayflag;
+    private Integer pospayflag;//pos关闭 打开
 
-    private Integer cooperationType;
+    private Integer cooperationType;//加盟类型
 
     private Integer istest;
 
-    private Integer enterpriseType;
+    private Integer enterpriseType;///客运企业非客运企业
 
     private String address;
 
