@@ -199,7 +199,7 @@ public class DriverVoEntity extends DriverEntity {
 		this.calcuateCycle = calcuateCycle;
 	}
 
-	public String getMembershipName() {
+
 	private String incomeScore;//当前收入分
 
 	private String updateTime;//收入分更新时间
