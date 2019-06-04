@@ -773,6 +773,14 @@ public class CarBizDriverInfoService {
         if (carBizDriverInfo == null) {
             return carBizDriverInfo;
         }
+
+        if(carBizDriverInfo.getExt2() == null){
+            carBizDriverInfo.setExt2(0);
+        }
+        if(carBizDriverInfo.getExt3() == null){
+            carBizDriverInfo.setExt3(4);
+        }
+
         // 根据供应商ID查询供应商名称以及加盟类型
         CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(carBizDriverInfo.getSupplierId());
         if (carBizSupplier != null) {
@@ -3740,12 +3748,12 @@ public class CarBizDriverInfoService {
         }
         CarBizDriverInfo carBizDriverInfo = new CarBizDriverInfo();
         CarBizSupplier param = new CarBizSupplier();
-        param.setSupplierCity(Integer.valueOf(telescopeDriver.getDataCityIds().split(",")[0]));
-        CarBizCity carBizCity = carBizCityService.selectByPrimaryKey(Integer.valueOf(telescopeDriver.getDataCityIds().split(",")[0]));
+        param.setSupplierCity(telescopeDriver.getCityId());
+        CarBizCity carBizCity = carBizCityService.selectByPrimaryKey(telescopeDriver.getCityId());
         CarBizSupplier carBizSupplier = carBizSupplierService.queryQianLiYanSupplierByCityId(param);
         if(null == carBizSupplier){
             carBizSupplier = new CarBizSupplier();
-            carBizSupplier.setSupplierCity(Integer.valueOf(telescopeDriver.getDataCityIds().split(",")[0]));
+            carBizSupplier.setSupplierCity(telescopeDriver.getCityId());
             carBizSupplier.setSupplierNum("qianliyan");
             carBizSupplier.setType(1);
             carBizSupplier.setAddress("");
