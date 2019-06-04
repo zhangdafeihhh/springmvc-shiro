@@ -246,6 +246,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 	public AjaxResponse queryOrderDataList(Map<String, Object> paramMap) {
 		List<CarFactOrderInfoDTO> list = null;
 		String url = orderSearchUrl+Common.ORDER_ORDER_LIST_DATE_NEW;
+		logger.info("调用订单查询接口/order/v2/search查询条件" + JSONObject.toJSONString(paramMap));
 		try {
 			String result = orderApiTemplate.postForObject(Common.ORDER_ORDER_LIST_DATE_NEW,
 					String.class, paramMap);

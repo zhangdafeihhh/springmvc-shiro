@@ -297,9 +297,11 @@ public class OrderController{
 	    	 logger.info("visibleMotorcadeIdstoString"+paramMap.get("visibleMotorcadeIds").toString().replaceAll("\\[", "").replaceAll("\\]", ""));
 			paramMap.put("teamIdBatch", paramMap.get("visibleMotorcadeIds").toString().replaceAll("\\[", "").replaceAll("\\]", "")); // 可见车队ID
 		}
-		if(paramMap.get("visibleCityIds")!=null){
-			paramMap.put("cityIdBatch", paramMap.get("visibleCityIds").toString().replaceAll("\\[", "").replaceAll("\\]", "")); //可见城市ID
-		}
+		 //由于页面条件将cityId换成serviceCity查询订单的所有关于cityId的条件都去掉
+//		if(paramMap.get("visibleCityIds")!=null){
+//			paramMap.put("cityIdBatch", paramMap.get("visibleCityIds").toString().replaceAll("\\[", "").replaceAll("\\]", "")); //可见城市ID
+//		}
+
 		 // 从订单组取统计数据
 	     AjaxResponse result = carFactOrderInfoService.queryOrderDataList(paramMap);
 	     return result;
