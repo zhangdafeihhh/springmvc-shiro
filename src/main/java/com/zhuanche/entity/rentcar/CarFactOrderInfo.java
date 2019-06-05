@@ -436,7 +436,17 @@ public class CarFactOrderInfo extends BaseEntity {
 	private Integer serviceCity;
 
 	private String serviceCityName;
-	
+
+	private String shunLuDan;
+
+	public String getShunLuDan() {
+		return shunLuDan;
+	}
+
+	public void setShunLuDan(String shunLuDan) {
+		this.shunLuDan = shunLuDan;
+	}
+
 	public String getMainOrderNo() {
 		return mainOrderNo;
 	}
