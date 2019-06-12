@@ -76,7 +76,7 @@ public enum DriverActionEnum {
     MANUAL_CHARGING_WAIT(81, "手动开始计费等候"),
     MANUAL_CHARGING_END(82, "手动结束计费等候"),
     AUTO_CHARGING_END(83, "自动结束计费等候"),
-    PASSENGER_ABOARD(84, "接到乘客"),
+    PASSENGER_ABOARD(84, "服务中结束等待"),
     ;
 
     private int actionId;
