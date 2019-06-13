@@ -422,12 +422,12 @@
 			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
-				<excludes>
-					<exclude>dev/*</exclude>
-					<exclude>test/*</exclude>
-					<exclude>pre/*</exclude>
-					<exclude>online/*</exclude>
-				</excludes>
+				<!--<excludes>-->
+					<!--<exclude>dev/*</exclude>-->
+					<!--<exclude>test/*</exclude>-->
+					<!--<exclude>pre/*</exclude>-->
+					<!--<exclude>online/*</exclude>-->
+				<!--</excludes>-->
 			</resource>
 			<!-- 包含当前环境下的*.properties (保持目录结构 ) -->
 			<resource>
