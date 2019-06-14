@@ -64,7 +64,6 @@
     <root level="INFO">
         <!-- <appender-ref ref="STDOUT"/> --><!-- 在本地开发时，需要打开注释 -->
         <appender-ref ref="FILE"/>
-        <appender-ref ref="STDOUT"/>
     </root>
     
     <!-- Rest接口性能监测BEGIN -->
