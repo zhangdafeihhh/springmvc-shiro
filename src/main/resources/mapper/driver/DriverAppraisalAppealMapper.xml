@@ -36,6 +36,7 @@
     <result column="audit_by" property="auditBy" jdbcType="INTEGER" />
     <result column="create_name" property="createName" jdbcType="VARCHAR" />
     <result column="update_name" property="updateName" jdbcType="VARCHAR" />
+    <result column="callback_status" property="callbackStatus" jdbcType="INTEGER" />
   </resultMap>
   <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.driver.DriverAppraisalAppeal" extends="BaseResultMap" >
     <result column="url" property="url" jdbcType="LONGVARCHAR" />
@@ -45,7 +46,8 @@
     booking_customer_id, rider_phone, rider_name, evaluate_score, evaluate, memo, driver_id, 
     driver_phone, driver_name, license_plates, city_name, city_id, supplier_id, supplier_name, 
     appeal_status, appeal_content, file_name, audit_time, audit_remark, create_time, 
-    update_time, create_by, update_by, audit_name, audit_by, create_name, update_name
+    update_time, create_by, update_by, audit_name, audit_by, create_name, update_name, 
+    callback_status
   </sql>
   <sql id="Blob_Column_List" >
     url
@@ -77,7 +79,7 @@
       audit_remark, create_time, update_time, 
       create_by, update_by, audit_name, 
       audit_by, create_name, update_name, 
-      url)
+      callback_status, url)
     values (#{appraisalId,jdbcType=INTEGER}, #{appraisalStatus,jdbcType=INTEGER}, #{orderNo,jdbcType=VARCHAR}, 
       #{orderId,jdbcType=INTEGER}, #{bookingCustomerName,jdbcType=VARCHAR}, #{bookingCustomerPhone,jdbcType=VARCHAR}, 
       #{bookingCustomerId,jdbcType=INTEGER}, #{riderPhone,jdbcType=VARCHAR}, #{riderName,jdbcType=VARCHAR}, 
@@ -89,7 +91,7 @@
       #{auditRemark,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
       #{createBy,jdbcType=INTEGER}, #{updateBy,jdbcType=INTEGER}, #{auditName,jdbcType=VARCHAR}, 
       #{auditBy,jdbcType=INTEGER}, #{createName,jdbcType=VARCHAR}, #{updateName,jdbcType=VARCHAR}, 
-      #{url,jdbcType=LONGVARCHAR})
+      #{callbackStatus,jdbcType=INTEGER}, #{url,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.DriverAppraisalAppeal" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
@@ -196,6 +198,9 @@
       <if test="updateName != null" >
         update_name,
       </if>
+      <if test="callbackStatus != null" >
+        callback_status,
+      </if>
       <if test="url != null" >
         url,
       </if>
@@ -299,6 +304,9 @@
       </if>
       <if test="updateName != null" >
         #{updateName,jdbcType=VARCHAR},
+      </if>
+      <if test="callbackStatus != null" >
+        #{callbackStatus,jdbcType=INTEGER},
       </if>
       <if test="url != null" >
         #{url,jdbcType=LONGVARCHAR},
@@ -407,6 +415,9 @@
       <if test="updateName != null" >
         update_name = #{updateName,jdbcType=VARCHAR},
       </if>
+      <if test="callbackStatus != null" >
+        callback_status = #{callbackStatus,jdbcType=INTEGER},
+      </if>
       <if test="url != null" >
         url = #{url,jdbcType=LONGVARCHAR},
       </if>
@@ -448,6 +459,7 @@
       audit_by = #{auditBy,jdbcType=INTEGER},
       create_name = #{createName,jdbcType=VARCHAR},
       update_name = #{updateName,jdbcType=VARCHAR},
+      callback_status = #{callbackStatus,jdbcType=INTEGER},
       url = #{url,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -485,7 +497,8 @@
       audit_name = #{auditName,jdbcType=VARCHAR},
       audit_by = #{auditBy,jdbcType=INTEGER},
       create_name = #{createName,jdbcType=VARCHAR},
-      update_name = #{updateName,jdbcType=VARCHAR}
+      update_name = #{updateName,jdbcType=VARCHAR},
+      callback_status = #{callbackStatus,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

@@ -71,6 +71,8 @@ public class DriverAppraisalAppeal {
 
     private String updateName;
 
+    private Integer callbackStatus;
+
     private String url;
 
     public Integer getId() {
@@ -343,6 +345,14 @@ public class DriverAppraisalAppeal {
 
     public void setUpdateName(String updateName) {
         this.updateName = updateName == null ? null : updateName.trim();
+    }
+
+    public Integer getCallbackStatus() {
+        return callbackStatus;
+    }
+
+    public void setCallbackStatus(Integer callbackStatus) {
+        this.callbackStatus = callbackStatus;
     }
 
     public String getUrl() {

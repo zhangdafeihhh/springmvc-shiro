@@ -93,8 +93,10 @@ public class MpCarBizCustomerAppraisal implements Serializable{
      */
     private Integer isAllowedAppeal;
 
-
-
+    /**
+     * 是否已回访 0 未回访 1 已回访
+     */
+    private Integer callbackStatus;
 
     public Integer getAppraisalId() {
         return appraisalId;
@@ -366,5 +368,13 @@ public class MpCarBizCustomerAppraisal implements Serializable{
 
     public void setIsAllowedAppeal(Integer isAllowedAppeal) {
         this.isAllowedAppeal = isAllowedAppeal;
+    }
+
+    public Integer getCallbackStatus() {
+        return callbackStatus;
+    }
+
+    public void setCallbackStatus(Integer callbackStatus) {
+        this.callbackStatus = callbackStatus;
     }
 }

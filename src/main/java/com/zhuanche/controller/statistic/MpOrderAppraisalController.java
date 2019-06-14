@@ -78,6 +78,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 										  Integer appealStatus,
 										  String evaluateScore,String sortName, String sortOrder,
 										  Integer page,
+										  Integer callbackStatus,
 										  @Verify(param = "pageSize",rule = "max(50)")Integer pageSize) {
 		long startTime=System.currentTimeMillis();
 		try {
@@ -110,7 +111,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			List<MpCarBizCustomerAppraisal> resultList = null;
 			long total = 0;
 			List<Integer> queryParam=null;
-			if (appealStatus == null || appealStatus == 0) {
+			if ((appealStatus == null || appealStatus == 0) && (callbackStatus == null) ) {
                 //没有附表查询条件直接查询主表信息返回
                 params.setPage(page);
                 params.setPageSize(pageSize);
@@ -123,7 +124,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 				}
             } else {
                 List<Integer> mainTabIds = mpDriverCustomerAppraisalService.queryIds(params);
-                Set<Integer> slaveTabIds = appraisalAppealService.getAppraissalIdsByAppealStatus(appealStatus);
+                Set<Integer> slaveTabIds = appraisalAppealService.getAppraissalIdsByAppealStatus(appealStatus , callbackStatus);
                 //求并集
 				mainTabIds.removeIf(o -> !slaveTabIds.contains(o));
 				if(mainTabIds.size()==0){
@@ -142,7 +143,12 @@ public class MpOrderAppraisalController extends DriverQueryController{
                 DriverAppraisalAppeal appeal = appealsMap.get(o.getAppraisalId());
                 if (appeal != null) {
                     o.setAppealId(appeal.getId());
-                    //撤销状态不显示 申述时间
+					if (Objects.nonNull(appeal.getCallbackStatus())) {
+						o.setCallbackStatus(appeal.getCallbackStatus());
+					}else {
+						o.setCallbackStatus(0);
+					}
+					//撤销状态不显示 申述时间
                     if(appeal.getAppealStatus()!=4){
 						o.setAppealTime(appeal.getCreateTime());
 					}
@@ -155,7 +161,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			log.info("订单评价列表 查询成功 耗时："+(System.currentTimeMillis()-startTime));
 			return AjaxResponse.success(new PageDTO(page,pageSize,total, resultList));
 		} catch (Exception e) {
-			log.error("订单评价列表 查询成功 耗时："+(System.currentTimeMillis()-startTime));
+			log.error("订单评价列表异常 耗时："+(System.currentTimeMillis()-startTime));
 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 		}
 	}
@@ -183,6 +189,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			String createDateEnd,
 			String orderFinishTimeBegin,
 			String orderFinishTimeEnd,
+			Integer callbackStatus,
 			String evaluateScore,String sortName, String sortOrder,HttpServletRequest request,HttpServletResponse response){
 		     CsvUtils entity = new CsvUtils();
 		    String fileName = this.getFileName(request, "订单评分");
@@ -221,8 +228,8 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			List<Integer> mainTabIds = mpDriverCustomerAppraisalService.queryIds(params);
 
 			//查询附表
-			if (appealStatus != null && appealStatus != 0) {
-				Set<Integer> slaveTabIds = appraisalAppealService.getAppraissalIdsByAppealStatus(appealStatus);
+			if ((appealStatus != null && appealStatus != 0) || (callbackStatus != null)) {
+				Set<Integer> slaveTabIds = appraisalAppealService.getAppraissalIdsByAppealStatus(appealStatus , callbackStatus);
 				//求并集
 				mainTabIds.removeIf(o -> !slaveTabIds.contains(o));
 			}
