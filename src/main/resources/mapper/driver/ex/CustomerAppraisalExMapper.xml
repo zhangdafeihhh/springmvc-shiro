@@ -241,6 +241,7 @@
       appraisal_status AS appraisalStatus,
       order_finish_time as orderFinishTime,
       is_allowed_appeal as isAllowedAppeal
+      is_already_appeal isAlreadyAppeal
       FROM
       customer_appraisal
       where

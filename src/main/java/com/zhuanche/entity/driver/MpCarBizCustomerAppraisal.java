@@ -93,10 +93,20 @@ public class MpCarBizCustomerAppraisal implements Serializable{
      */
     private Integer isAllowedAppeal;
 
+    private Integer isAlreadyAppeal;
+
     /**
      * 是否已回访 0 未回访 1 已回访
      */
     private Integer callbackStatus;
+
+    public Integer getIsAlreadyAppeal() {
+        return isAlreadyAppeal;
+    }
+
+    public void setIsAlreadyAppeal(Integer isAlreadyAppeal) {
+        this.isAlreadyAppeal = isAlreadyAppeal;
+    }
 
     public Integer getAppraisalId() {
         return appraisalId;

@@ -245,7 +245,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			int pages=total%pageSize==0?total/pageSize:total/pageSize+1;
 
 			ArrayList<String> headList=new ArrayList();
-			if (cityId == "44") {
+			if ("44".equals(cityId)) {
 				headList.add("司机姓名,司机手机,车牌号,订单号,评分,标签,评价内容,评分状态,申诉状态,回访状态");
 			}else {
 				headList.add("司机姓名,司机手机,车牌号,订单号,评分,评价,备注,评价时间,订单完成时间,评分状态,是否允许申诉,申诉状态,申诉时间");
@@ -325,14 +325,18 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			sb.append(s.getMemo()==null?"":s.getMemo().replaceAll(",","，").replaceAll(System.getProperty("line.separator"),"，"));
 			sb.append(",");
 
+			//北京的差评申诉单独处理
 			if (cityId == 44) {
 				sb.append(s.getAppraisalStatus());
 				sb.append(",");
-
-				sb.append(AppealStatusEnum.getMsg(s.getAppealStatus() == null ? 0 : s.getAppealStatus())).append(",");
+				if (s.getIsAlreadyAppeal() == 0) {
+					sb.append("未申诉");
+				}else {
+					sb.append(AppealStatusEnum.getMsg(s.getAppealStatus() == null ? 0 : s.getAppealStatus())).append(",");
+				}
 				sb.append(",");
 
-				sb.append(s.getCallbackStatus());
+				sb.append(s.getCallbackStatus()==null || s.getCallbackStatus() == 0 ? "未回访" : "已回访");
 				sb.append(",");
 			}else {
 				sb.append(DateUtils.formatDateTime_CN(s.getCreateDate()));
@@ -346,17 +350,17 @@ public class MpOrderAppraisalController extends DriverQueryController{
 
 				sb.append(s.getIsAllowedAppeal() == 0 ? "不可申诉" : "可申诉");
 				sb.append(",");
-			}
-			DriverAppraisalAppeal appeal = appraisalMap.get(s.getAppraisalId());
-			String appealTime = "";
-			int appealStatus = 0;
-			if (appeal != null) {
-				appealTime = DateUtils.formatDateTime_CN(appeal.getCreateTime());
-				appealStatus = appeal.getAppealStatus();
-			}
-			sb.append(AppealStatusEnum.getMsg(appealStatus)).append(",");
-			if(appealStatus!=4){
-				sb.append(appealTime);
+				DriverAppraisalAppeal appeal = appraisalMap.get(s.getAppraisalId());
+				String appealTime = "";
+				int appealStatus = 0;
+				if (appeal != null) {
+					appealTime = DateUtils.formatDateTime_CN(appeal.getCreateTime());
+					appealStatus = appeal.getAppealStatus();
+				}
+				sb.append(AppealStatusEnum.getMsg(appealStatus)).append(",");
+				if(appealStatus!=4){
+					sb.append(appealTime);
+				}
 			}
 			list.add(sb.toString());
 		}
