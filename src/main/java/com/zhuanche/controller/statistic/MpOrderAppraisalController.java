@@ -269,6 +269,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			}
 			log.info("订单评分导出：total="+total+"耗时："+(System.currentTimeMillis()-startTime));
 		} catch (Exception e) {
+			log.error("订单评分导出异常" , e);
 			ArrayList<String> errHead=new ArrayList<>();
 			errHead.add("请联系管理员");
 			try {
