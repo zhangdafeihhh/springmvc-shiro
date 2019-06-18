@@ -908,6 +908,7 @@ public class OrderController{
 		result.setBookingEndPoint(  orderInfoJson.getString("bookingEndPoint") );
 		result.setFactStartAddr( orderInfoJson.getString("factStartAddr") );
 		result.setFactEndAddr(  orderInfoJson.getString("factEndAddr") );
+		result.setShunLuDan(orderInfoJson.getString("shunLuDan"));
 		if(orderInfoJson.containsKey("factDate") && orderInfoJson.getLongValue("factDate")>0 ) {//实际上车时间
 			Date   factDate = new Date( orderInfoJson.getLongValue("factDate") );
 			String factDatestr = yyyyMMddHHmmssSDF.format(factDate);
