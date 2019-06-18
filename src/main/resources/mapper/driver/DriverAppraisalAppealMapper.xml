@@ -37,6 +37,11 @@
     <result column="create_name" property="createName" jdbcType="VARCHAR" />
     <result column="update_name" property="updateName" jdbcType="VARCHAR" />
     <result column="callback_status" property="callbackStatus" jdbcType="INTEGER" />
+    <result column="callback_remark" property="callbackRemark" jdbcType="VARCHAR" />
+    <result column="callback_time" property="callbackTime" jdbcType="TIMESTAMP" />
+    <result column="callback_user" property="callbackUser" jdbcType="VARCHAR" />
+    <result column="video_url" property="videoUrl" jdbcType="VARCHAR" />
+    <result column="video_file_name" property="videoFileName" jdbcType="VARCHAR" />
   </resultMap>
   <resultMap id="ResultMapWithBLOBs" type="com.zhuanche.entity.driver.DriverAppraisalAppeal" extends="BaseResultMap" >
     <result column="url" property="url" jdbcType="LONGVARCHAR" />
@@ -47,7 +52,7 @@
     driver_phone, driver_name, license_plates, city_name, city_id, supplier_id, supplier_name, 
     appeal_status, appeal_content, file_name, audit_time, audit_remark, create_time, 
     update_time, create_by, update_by, audit_name, audit_by, create_name, update_name, 
-    callback_status
+    callback_status, callback_remark, callback_time, callback_user, video_url, video_file_name
   </sql>
   <sql id="Blob_Column_List" >
     url
@@ -79,7 +84,9 @@
       audit_remark, create_time, update_time, 
       create_by, update_by, audit_name, 
       audit_by, create_name, update_name, 
-      callback_status, url)
+      callback_status, callback_remark, callback_time, 
+      callback_user, video_url, video_file_name, 
+      url)
     values (#{appraisalId,jdbcType=INTEGER}, #{appraisalStatus,jdbcType=INTEGER}, #{orderNo,jdbcType=VARCHAR}, 
       #{orderId,jdbcType=INTEGER}, #{bookingCustomerName,jdbcType=VARCHAR}, #{bookingCustomerPhone,jdbcType=VARCHAR}, 
       #{bookingCustomerId,jdbcType=INTEGER}, #{riderPhone,jdbcType=VARCHAR}, #{riderName,jdbcType=VARCHAR}, 
@@ -91,7 +98,9 @@
       #{auditRemark,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
       #{createBy,jdbcType=INTEGER}, #{updateBy,jdbcType=INTEGER}, #{auditName,jdbcType=VARCHAR}, 
       #{auditBy,jdbcType=INTEGER}, #{createName,jdbcType=VARCHAR}, #{updateName,jdbcType=VARCHAR}, 
-      #{callbackStatus,jdbcType=INTEGER}, #{url,jdbcType=LONGVARCHAR})
+      #{callbackStatus,jdbcType=INTEGER}, #{callbackRemark,jdbcType=VARCHAR}, #{callbackTime,jdbcType=TIMESTAMP}, 
+      #{callbackUser,jdbcType=VARCHAR}, #{videoUrl,jdbcType=VARCHAR}, #{videoFileName,jdbcType=VARCHAR}, 
+      #{url,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.DriverAppraisalAppeal" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
@@ -201,6 +210,21 @@
       <if test="callbackStatus != null" >
         callback_status,
       </if>
+      <if test="callbackRemark != null" >
+        callback_remark,
+      </if>
+      <if test="callbackTime != null" >
+        callback_time,
+      </if>
+      <if test="callbackUser != null" >
+        callback_user,
+      </if>
+      <if test="videoUrl != null" >
+        video_url,
+      </if>
+      <if test="videoFileName != null" >
+        video_file_name,
+      </if>
       <if test="url != null" >
         url,
       </if>
@@ -307,6 +331,21 @@
       </if>
       <if test="callbackStatus != null" >
         #{callbackStatus,jdbcType=INTEGER},
+      </if>
+      <if test="callbackRemark != null" >
+        #{callbackRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="callbackTime != null" >
+        #{callbackTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="callbackUser != null" >
+        #{callbackUser,jdbcType=VARCHAR},
+      </if>
+      <if test="videoUrl != null" >
+        #{videoUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="videoFileName != null" >
+        #{videoFileName,jdbcType=VARCHAR},
       </if>
       <if test="url != null" >
         #{url,jdbcType=LONGVARCHAR},
@@ -418,6 +457,21 @@
       <if test="callbackStatus != null" >
         callback_status = #{callbackStatus,jdbcType=INTEGER},
       </if>
+      <if test="callbackRemark != null" >
+        callback_remark = #{callbackRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="callbackTime != null" >
+        callback_time = #{callbackTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="callbackUser != null" >
+        callback_user = #{callbackUser,jdbcType=VARCHAR},
+      </if>
+      <if test="videoUrl != null" >
+        video_url = #{videoUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="videoFileName != null" >
+        video_file_name = #{videoFileName,jdbcType=VARCHAR},
+      </if>
       <if test="url != null" >
         url = #{url,jdbcType=LONGVARCHAR},
       </if>
@@ -460,6 +514,11 @@
       create_name = #{createName,jdbcType=VARCHAR},
       update_name = #{updateName,jdbcType=VARCHAR},
       callback_status = #{callbackStatus,jdbcType=INTEGER},
+      callback_remark = #{callbackRemark,jdbcType=VARCHAR},
+      callback_time = #{callbackTime,jdbcType=TIMESTAMP},
+      callback_user = #{callbackUser,jdbcType=VARCHAR},
+      video_url = #{videoUrl,jdbcType=VARCHAR},
+      video_file_name = #{videoFileName,jdbcType=VARCHAR},
       url = #{url,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -498,7 +557,12 @@
       audit_by = #{auditBy,jdbcType=INTEGER},
       create_name = #{createName,jdbcType=VARCHAR},
       update_name = #{updateName,jdbcType=VARCHAR},
-      callback_status = #{callbackStatus,jdbcType=INTEGER}
+      callback_status = #{callbackStatus,jdbcType=INTEGER},
+      callback_remark = #{callbackRemark,jdbcType=VARCHAR},
+      callback_time = #{callbackTime,jdbcType=TIMESTAMP},
+      callback_user = #{callbackUser,jdbcType=VARCHAR},
+      video_url = #{videoUrl,jdbcType=VARCHAR},
+      video_file_name = #{videoFileName,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

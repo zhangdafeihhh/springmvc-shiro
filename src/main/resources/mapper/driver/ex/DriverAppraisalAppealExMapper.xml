@@ -37,15 +37,20 @@
         <result column="create_name" property="createName" jdbcType="VARCHAR" />
         <result column="update_name" property="updateName" jdbcType="VARCHAR" />
         <result column="callback_status" property="callbackStatus" jdbcType="INTEGER" />
+        <result column="callback_remark" property="callbackRemark" jdbcType="VARCHAR" />
+        <result column="callback_time" property="callbackTime" jdbcType="TIMESTAMP" />
+        <result column="callback_user" property="callbackUser" jdbcType="VARCHAR" />
+        <result column="video_url" property="videoUrl" jdbcType="VARCHAR" />
+        <result column="video_file_name" property="videoFileName" jdbcType="VARCHAR" />
         <result column="url" property="url" jdbcType="LONGVARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
-    id, appraisal_id, appraisal_status, order_no, order_id, booking_customer_name, booking_customer_phone, 
-    booking_customer_id, rider_phone, rider_name, evaluate_score, evaluate, memo, driver_id, 
-    driver_phone, driver_name, license_plates, city_name, city_id, supplier_id, supplier_name, 
+    id, appraisal_id, appraisal_status, order_no, order_id, booking_customer_name, booking_customer_phone,
+    booking_customer_id, rider_phone, rider_name, evaluate_score, evaluate, memo, driver_id,
+    driver_phone, driver_name, license_plates, city_name, city_id, supplier_id, supplier_name,
     appeal_status, appeal_content, file_name, audit_time, audit_remark, create_time,
     update_time, create_by, update_by, audit_name, audit_by, create_name, update_name,
-    callback_status,url
+    callback_status, callback_remark, callback_time, callback_user, video_url, video_file_name,url
   </sql>
     <select id="queryBaseInfoByAppraisalIds" resultMap="BaseResultMap">
       SELECT
@@ -53,7 +58,8 @@
       appraisal_id,
       appeal_status,
       create_time,
-      callback_status
+      callback_status ,
+      audit_time
   FROM
       driver_appraisal_appeal
   WHERE
@@ -78,7 +84,13 @@
       url,
       appeal_status AS appealStatus ,
       audit_time as auditTime,
-      audit_remark AS auditRemark
+      audit_remark AS auditRemark,
+      callback_status callbackStatus,
+      callback_remark callbackRemark,
+      callback_time callbackTime,
+      callback_user callbackUser,
+      video_url videoUrl,
+      video_file_name videoFileName
   FROM
       driver_appraisal_appeal
       where id = #{appealId}

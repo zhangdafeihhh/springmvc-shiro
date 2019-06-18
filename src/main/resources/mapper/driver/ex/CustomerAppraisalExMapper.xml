@@ -74,7 +74,8 @@
     ca.license_plates AS licensePlates,
     ca.appraisal_status AS appraisalStatus,
     ca.order_finish_time as orderFinishTime,
-    ca.is_allowed_appeal as isAllowedAppeal
+    ca.is_allowed_appeal as isAllowedAppeal,
+    ca.city_id AS cityId
     FROM
     customer_appraisal ca
     WHERE
@@ -241,7 +242,8 @@
       appraisal_status AS appraisalStatus,
       order_finish_time as orderFinishTime,
       is_allowed_appeal as isAllowedAppeal,
-      is_already_appeal isAlreadyAppeal
+      is_already_appeal isAlreadyAppeal,
+      city_id cityId
       FROM
       customer_appraisal
       where
