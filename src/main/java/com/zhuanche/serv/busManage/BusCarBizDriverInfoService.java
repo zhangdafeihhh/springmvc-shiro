@@ -10,6 +10,7 @@ import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.rocketmq.CommonRocketProducer;
+import com.zhuanche.common.rocketmq.DriverWideRocketProducer;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constants.BusConst;
@@ -973,6 +974,8 @@ public class BusCarBizDriverInfoService implements BusConst {
 
             Integer driverId = saveDTO.getDriverId();
             logger.info("专车司机driverId={}，同步发送数据={}", driverId, JSON.toJSONString(messageMap));
+            //TODO 20190619新增一组修改司机信息发送MQ
+            DriverWideRocketProducer.publishMessage(DriverWideRocketProducer.TOPIC, method, String.valueOf(driverId), messageMap);
             CommonRocketProducer.publishMessage("driver_info", method, String.valueOf(driverId), messageMap);
         } catch (Exception e) {
             logger.error("发送MQ异常,method={},error={}", method, e.getMessage(), e);

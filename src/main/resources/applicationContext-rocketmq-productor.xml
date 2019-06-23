@@ -20,5 +20,10 @@
 	<bean id="excelProducer" class="com.zhuanche.common.rocketmq.ExcelProducer" init-method="init" destroy-method="destroy" scope="singleton">
 		<property name="namesrvAddr" value="${rocketmq.excelNamesrvAddr}"/>
 	</bean>
+	<!--修改司机信息发送MQ同步司机宽表-->
+	<bean id="driverWideRocketProducer" class="com.zhuanche.common.rocketmq.DriverWideRocketProducer" init-method="init" destroy-method="destroy">
+		<property name="namesrvAddr" value="${rocketmq.driverwide.namesrvAddr}" />
+	</bean>
+	<!--修改司机信息发送MQ同步司机宽表-->
 <!-- 新的配置方式END -->
 </beans>

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.dutyEnum.EnumDriverDutyTimeFlag;
 import com.zhuanche.common.rocketmq.CommonRocketProducer;
+import com.zhuanche.common.rocketmq.DriverWideRocketProducer;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.dto.driver.CarDriverDayDutyDTO;
@@ -490,6 +491,8 @@ public class AsyncDutyService {
 
 			String messageStr = JSONObject.fromObject(messageMap).toString();
 			logger.info("专车司机，同步发送数据：" + messageStr);
+			//TODO 20190619新增一组修改司机信息发送MQ
+			DriverWideRocketProducer.publishMessage(DriverWideRocketProducer.TOPIC, method, String.valueOf(driver.getDriverId()), messageMap);
 			CommonRocketProducer.publishMessage("driver_info", method,String.valueOf(driver.getDriverId()),messageMap);
 		} catch (Exception e) {
 			e.printStackTrace();
