@@ -16,6 +16,17 @@
 			connect-timeout="${mongo.maxWaitTime}"
 		/>
 	</mongo:mongo>
+
+	<!--司机宽表mongodbclient-->
+	<mongo:mongo id="driverWidemongoClient"  replica-set="${mongo.driverwide.host}">
+		<mongo:options
+				auto-connect-retry="${mongo.autoConnectRetry}"
+				connections-per-host="50"
+				threads-allowed-to-block-for-connection-multiplier="${mongo.threadsAllowedToBlockForConnectionMultiplier}"
+				max-wait-time="${mongo.maxWaitTime}"
+				connect-timeout="${mongo.maxWaitTime}"
+		/>
+	</mongo:mongo>
 	
 	<!-- Spring提供的mongodb操作模板 driverDB库 -->
 	<bean id="driverMongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
@@ -27,6 +38,13 @@
 	<bean id="carMongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
 		<constructor-arg name="mongoDbFactory">
 			<mongo:db-factory dbname="${mogo.carDataBase}"  mongo-ref="mongoClient"/>
+		</constructor-arg>
+	</bean>
+
+	<!-- 司机宽表 DriverWideTableDB库 -->
+	<bean id="driverWideMongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory">
+			<mongo:db-factory dbname="${mongo.driverwide.database}"  mongo-ref="driverWidemongoClient"/>
 		</constructor-arg>
 	</bean>
 </beans>

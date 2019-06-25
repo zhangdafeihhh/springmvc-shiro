@@ -28,6 +28,7 @@ import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.serv.common.DataPermissionHelper;
 import com.zhuanche.serv.driverScheduling.AsyncDutyService;
+import com.zhuanche.serv.driverwide.DriverWideMongoService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
 import mapper.mdbcarmanage.CarDriverTeamMapper;
@@ -105,6 +106,9 @@ public class CarDriverTeamService{
 
 	@Autowired
 	private CarBizDriverInfoService carBizDriverInfoService;
+
+	@Autowired
+	private DriverWideMongoService driverWideMongoService;
 
 	/**
 	 * @Desc: 更新车队班制排班信息
@@ -513,9 +517,8 @@ public class CarDriverTeamService{
 	 * @Date: 2018/8/30
 	 */
 	public int updateOneDriverTeam(CarDriverTeamDTO paramDto){
-
+		CarDriverTeam existsTeam = null;
 		try{
-			CarDriverTeam existsTeam = null;
 			DynamicRoutingDataSource.DataSourceMode mdbcarManageMode = DynamicRoutingDataSource.getMasterSlave("mdbcarmanage-DataSource");
 			logger.info("-updateOneDriverTeam-mdb-datasource-first1={}",DynamicRoutingDataSource.getMasterSlave("mdbcarmanage-DataSource"));
 			try{
@@ -536,7 +539,7 @@ public class CarDriverTeamService{
 				paramDto.setTeamName(existsTeam.getTeamName());
 			}
 			//开启关闭逻辑
-			if(paramDto.getOpenCloseFlag() !=0 && paramDto.getStatus() != existsTeam.getStatus()){
+			if(paramDto.getOpenCloseFlag() !=0 && !paramDto.getStatus().equals(existsTeam.getStatus())){
 				existsTeam.setStatus(paramDto.getOpenCloseFlag());
 				//关闭时候把下面的司机存入mq 如果是车队，司机存入供应商，如果是班组，司机存入车队
 				if(existsTeam != null && existsTeam.getpId() != null  && existsTeam.getpId() > 0){
@@ -576,9 +579,9 @@ public class CarDriverTeamService{
 						}
 					}
 				}
-
-				return carDriverTeamMapper.updateByPrimaryKeySelective(existsTeam);
-			}else if(paramDto.getOpenCloseFlag() !=0 && paramDto.getStatus() == existsTeam.getStatus()){
+				int result = carDriverTeamMapper.updateByPrimaryKeySelective(existsTeam);;
+				return result;
+			}else if(paramDto.getOpenCloseFlag() !=0 && paramDto.getStatus().equals(existsTeam.getStatus())){
 				existsTeam.setStatus(paramDto.getOpenCloseFlag());
 				if(existsTeam != null && existsTeam.getpId() != null){
 					paramDto.setpId(existsTeam.getpId());
@@ -592,10 +595,30 @@ public class CarDriverTeamService{
 			existsTeam.setCharge3(paramDto.getCharge3());
 			existsTeam.setRemark(paramDto.getRemark());
 			existsTeam.setShortName(paramDto.getShortName());
-			return carDriverTeamMapper.updateByPrimaryKeySelective(existsTeam);
+			int result = carDriverTeamMapper.updateByPrimaryKeySelective(existsTeam);
+			return result;
 		}catch (Exception e){
 			logger.error("更新车队失败!", e );
 			return ServiceReturnCodeEnum.DEAL_FAILURE.getCode();
+		}finally {
+			//处理更改车队或者小组名称同步司机宽表mongo
+			if(existsTeam != null){
+				if(existsTeam.getpId() != null){
+					//修改小组名称业务
+					if(StringUtils.isNotBlank(existsTeam.getTeamName()) && !existsTeam.getTeamName().equals(paramDto.getTeamName())){
+						if(StringUtils.isNotBlank(paramDto.getTeamName())){
+							driverWideMongoService.updateTeamGroupNameByTeamGroupId(existsTeam.getId(),paramDto.getTeamName(),existsTeam.getTeamName());
+						}
+					}
+				}else{
+					//修改车队名称业务
+					if(StringUtils.isNotBlank(existsTeam.getTeamName()) && !existsTeam.getTeamName().equals(paramDto.getTeamName())){
+						if(StringUtils.isNotBlank(paramDto.getTeamName())){
+							driverWideMongoService.updateTeamNameByTeamId(existsTeam.getId(),paramDto.getTeamName(),existsTeam.getTeamName());
+						}
+					}
+				}
+			}
 		}
 	}
 
