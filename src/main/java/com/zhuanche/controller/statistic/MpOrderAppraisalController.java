@@ -335,8 +335,6 @@ public class MpOrderAppraisalController extends DriverQueryController{
 				}else {
 					sb.append(AppealStatusEnum.getMsg(s.getAppealStatus() == null ? 0 : s.getAppealStatus())).append(",");
 				}
-				sb.append(",");
-
 				sb.append(s.getCallbackStatus()==null || s.getCallbackStatus() == 0 ? "未回访" : "已回访");
 				sb.append(",");
 			}else {
@@ -391,7 +389,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 	}
 
 	enum AppealStatusEnum{
-		UN_APPEAL(0,"未审诉"),APPEALED(1,"已申诉"),APPEAL_SUCCESS(2,"申诉成功 "),APPEAL_FAIL(3,"申诉失败"),REVOKE_APPEAL(4,"撤销");
+		UN_APPEAL(0,"未申诉"),APPEALED(1,"已申诉"),APPEAL_SUCCESS(2,"申诉成功 "),APPEAL_FAIL(3,"申诉失败"),REVOKE_APPEAL(4,"撤销");
 
 		private int code;
 		private String msg;
