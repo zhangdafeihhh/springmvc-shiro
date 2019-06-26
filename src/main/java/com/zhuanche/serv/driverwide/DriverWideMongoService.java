@@ -1,7 +1,10 @@
 package com.zhuanche.serv.driverwide;
 
 import com.mongodb.WriteResult;
+import com.zhuanche.dto.CarDriverTeamDTO;
+import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
 import com.zhuanche.mongo.driverwidemongo.DriverWideMongo;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +61,32 @@ public class DriverWideMongoService {
             logger.info("根据车队id修改小组名称,teamGroupId:{},newTeamGroupName：{},oldTeamGroupName:{},条数:{}", teamGroupId, newTeamGroupName, oldTeamGroupName, writeResult.getN());
         } catch (Exception e) {
             logger.info("根据车队id修改小组名称异常teamGroupId:{},newTeamGroupName：{},oldTeamGroupName:{},error:{}", teamGroupId, newTeamGroupName, oldTeamGroupName, e);
+        }
+    }
+
+    /***
+     * 根据pid判断是修改车队名称还是小组名称
+     * @param existsTeam
+     * @param paramDto
+     */
+    public void updateTeamNameAndTeamGrpupName(CarDriverTeam existsTeam,CarDriverTeamDTO paramDto){
+        //处理更改车队或者小组名称同步司机宽表mongo
+        if(existsTeam != null){
+            if(existsTeam.getpId() != null){
+                //修改小组名称业务
+                if(StringUtils.isNotBlank(existsTeam.getTeamName()) && !existsTeam.getTeamName().equals(paramDto.getTeamName())){
+                    if(StringUtils.isNotBlank(paramDto.getTeamName())){
+                        this.updateTeamGroupNameByTeamGroupId(existsTeam.getId(),paramDto.getTeamName(),existsTeam.getTeamName());
+                    }
+                }
+            }else{
+                //修改车队名称业务
+                if(StringUtils.isNotBlank(existsTeam.getTeamName()) && !existsTeam.getTeamName().equals(paramDto.getTeamName())){
+                    if(StringUtils.isNotBlank(paramDto.getTeamName())){
+                        this.updateTeamNameByTeamId(existsTeam.getId(),paramDto.getTeamName(),existsTeam.getTeamName());
+                    }
+                }
+            }
         }
     }
 }

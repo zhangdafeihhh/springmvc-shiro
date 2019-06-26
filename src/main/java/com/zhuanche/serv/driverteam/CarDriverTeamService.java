@@ -580,6 +580,11 @@ public class CarDriverTeamService{
 					}
 				}
 				int result = carDriverTeamMapper.updateByPrimaryKeySelective(existsTeam);;
+				try{
+					driverWideMongoService.updateTeamNameAndTeamGrpupName(existsTeam,paramDto);
+				}catch (Exception e){
+					logger.error("更新司机宽表mongodb异常:{}",e);
+				}
 				return result;
 			}else if(paramDto.getOpenCloseFlag() !=0 && paramDto.getStatus().equals(existsTeam.getStatus())){
 				existsTeam.setStatus(paramDto.getOpenCloseFlag());
@@ -596,29 +601,15 @@ public class CarDriverTeamService{
 			existsTeam.setRemark(paramDto.getRemark());
 			existsTeam.setShortName(paramDto.getShortName());
 			int result = carDriverTeamMapper.updateByPrimaryKeySelective(existsTeam);
+			try{
+				driverWideMongoService.updateTeamNameAndTeamGrpupName(existsTeam,paramDto);
+			}catch (Exception e){
+				logger.error("更新司机宽表mongodb异常:{}",e);
+			}
 			return result;
 		}catch (Exception e){
 			logger.error("更新车队失败!", e );
 			return ServiceReturnCodeEnum.DEAL_FAILURE.getCode();
-		}finally {
-			//处理更改车队或者小组名称同步司机宽表mongo
-			if(existsTeam != null){
-				if(existsTeam.getpId() != null){
-					//修改小组名称业务
-					if(StringUtils.isNotBlank(existsTeam.getTeamName()) && !existsTeam.getTeamName().equals(paramDto.getTeamName())){
-						if(StringUtils.isNotBlank(paramDto.getTeamName())){
-							driverWideMongoService.updateTeamGroupNameByTeamGroupId(existsTeam.getId(),paramDto.getTeamName(),existsTeam.getTeamName());
-						}
-					}
-				}else{
-					//修改车队名称业务
-					if(StringUtils.isNotBlank(existsTeam.getTeamName()) && !existsTeam.getTeamName().equals(paramDto.getTeamName())){
-						if(StringUtils.isNotBlank(paramDto.getTeamName())){
-							driverWideMongoService.updateTeamNameByTeamId(existsTeam.getId(),paramDto.getTeamName(),existsTeam.getTeamName());
-						}
-					}
-				}
-			}
 		}
 	}
 
