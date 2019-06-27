@@ -78,6 +78,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 										  Integer appealStatus,
 										  String evaluateScore,String sortName, String sortOrder,
 										  Integer page,
+										  Integer callbackStatus,
 										  @Verify(param = "pageSize",rule = "max(50)")Integer pageSize) {
 		long startTime=System.currentTimeMillis();
 		try {
@@ -110,7 +111,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			List<MpCarBizCustomerAppraisal> resultList = null;
 			long total = 0;
 			List<Integer> queryParam=null;
-			if (appealStatus == null || appealStatus == 0) {
+			if ((appealStatus == null || appealStatus == 0) && (callbackStatus == null) ) {
                 //没有附表查询条件直接查询主表信息返回
                 params.setPage(page);
                 params.setPageSize(pageSize);
@@ -123,7 +124,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 				}
             } else {
                 List<Integer> mainTabIds = mpDriverCustomerAppraisalService.queryIds(params);
-                Set<Integer> slaveTabIds = appraisalAppealService.getAppraissalIdsByAppealStatus(appealStatus);
+                Set<Integer> slaveTabIds = appraisalAppealService.getAppraissalIdsByAppealStatus(appealStatus , callbackStatus);
                 //求并集
 				mainTabIds.removeIf(o -> !slaveTabIds.contains(o));
 				if(mainTabIds.size()==0){
@@ -142,7 +143,12 @@ public class MpOrderAppraisalController extends DriverQueryController{
                 DriverAppraisalAppeal appeal = appealsMap.get(o.getAppraisalId());
                 if (appeal != null) {
                     o.setAppealId(appeal.getId());
-                    //撤销状态不显示 申述时间
+					if (Objects.nonNull(appeal.getCallbackStatus())) {
+						o.setCallbackStatus(appeal.getCallbackStatus());
+					}else {
+						o.setCallbackStatus(0);
+					}
+					//撤销状态不显示 申述时间
                     if(appeal.getAppealStatus()!=4){
 						o.setAppealTime(appeal.getCreateTime());
 					}
@@ -155,7 +161,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			log.info("订单评价列表 查询成功 耗时："+(System.currentTimeMillis()-startTime));
 			return AjaxResponse.success(new PageDTO(page,pageSize,total, resultList));
 		} catch (Exception e) {
-			log.error("订单评价列表 查询成功 耗时："+(System.currentTimeMillis()-startTime));
+			log.error("订单评价列表异常 耗时："+(System.currentTimeMillis()-startTime));
 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 		}
 	}
@@ -183,6 +189,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			String createDateEnd,
 			String orderFinishTimeBegin,
 			String orderFinishTimeEnd,
+			Integer callbackStatus,
 			String evaluateScore,String sortName, String sortOrder,HttpServletRequest request,HttpServletResponse response){
 		     CsvUtils entity = new CsvUtils();
 		    String fileName = this.getFileName(request, "订单评分");
@@ -221,8 +228,8 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			List<Integer> mainTabIds = mpDriverCustomerAppraisalService.queryIds(params);
 
 			//查询附表
-			if (appealStatus != null && appealStatus != 0) {
-				Set<Integer> slaveTabIds = appraisalAppealService.getAppraissalIdsByAppealStatus(appealStatus);
+			if ((appealStatus != null && appealStatus != 0) || (callbackStatus != null)) {
+				Set<Integer> slaveTabIds = appraisalAppealService.getAppraissalIdsByAppealStatus(appealStatus , callbackStatus);
 				//求并集
 				mainTabIds.removeIf(o -> !slaveTabIds.contains(o));
 			}
@@ -234,11 +241,16 @@ public class MpOrderAppraisalController extends DriverQueryController{
 				entity.exportCsvV2(response,null,errHead,fileName,true,true);
 				return;
 			}
-			int pageSize=30;//TODO 测试先用30
+			int pageSize=30;
 			int pages=total%pageSize==0?total/pageSize:total/pageSize+1;
 
 			ArrayList<String> headList=new ArrayList();
-			headList.add("司机姓名,司机手机,车牌号,订单号,评分,评价,备注,评价时间,订单完成时间,评分状态,是否允许申诉,申诉状态,申诉时间");
+			if ("44".equals(cityId)) {
+				headList.add("司机姓名,司机手机,车牌号,订单号,评分,标签,评价内容,评分状态,申诉状态,回访状态");
+			}else {
+				headList.add("司机姓名,司机手机,车牌号,订单号,评分,评价,备注,评价时间,订单完成时间,评分状态,是否允许申诉,申诉状态,申诉时间");
+			}
+
 			boolean isFirst=true;
 			boolean isLast=false;
 			for(int i=1;i<=pages;i++){
@@ -248,7 +260,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 				List<MpCarBizCustomerAppraisal> appraisals = mpDriverCustomerAppraisalService.queryByIds(queryParam);
 				List<DriverAppraisalAppeal> appeals = appraisalAppealService.queryBaseInfoByAppraisalIds(queryParam);
 				Map<Integer, DriverAppraisalAppeal> appealsMap = appeals.stream().collect(Collectors.toMap(o -> o.getAppraisalId(), O -> O));
-				List<String> data = dataTrans(appraisals, appealsMap);
+				List<String> data = dataTrans(appraisals, appealsMap , Integer.valueOf(cityId));
 				entity.exportCsvV2(response,data,headList,fileName,isFirst,isLast);
 				isFirst=false;
 				if(i==pages-1){
@@ -257,12 +269,13 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			}
 			log.info("订单评分导出：total="+total+"耗时："+(System.currentTimeMillis()-startTime));
 		} catch (Exception e) {
+			log.error("订单评分导出异常" , e);
 			ArrayList<String> errHead=new ArrayList<>();
 			errHead.add("请联系管理员");
 			try {
 				entity.exportCsvV2(response,null,errHead,fileName,true,true);
 			} catch (IOException e1) {
-				e1.printStackTrace();
+				log.error("订单评分导出异常" , e);
 			}
 		}
 
@@ -272,10 +285,13 @@ public class MpOrderAppraisalController extends DriverQueryController{
 	private String getFileName(HttpServletRequest request,String fileName){
 		try {
 			fileName = fileName+ DateUtil.dateFormat(new Date(), DateUtil.intTimestampPattern)+".csv";
-			String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
-			if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
+			//获得浏览器信息并转换为大写
+			String agent = request.getHeader("User-Agent").toUpperCase();
+			//IE浏览器和Edge浏览器
+			if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {
                 fileName = URLEncoder.encode(fileName, "UTF-8");
-            } else {  //其他浏览器
+            } else {
+				//其他浏览器
                 fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
             }
 		} catch (UnsupportedEncodingException e) {
@@ -285,7 +301,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 	}
 
 
-	private List<String> dataTrans(List<MpCarBizCustomerAppraisal> result,Map<Integer, DriverAppraisalAppeal> appraisalMap){
+	private List<String> dataTrans(List<MpCarBizCustomerAppraisal> result,Map<Integer, DriverAppraisalAppeal> appraisalMap , Integer cityId){
 		List<String> list =new ArrayList<>();
 		for(MpCarBizCustomerAppraisal s:result) {
 			StringBuffer sb = new StringBuffer();
@@ -306,32 +322,44 @@ public class MpOrderAppraisalController extends DriverQueryController{
 
 			sb.append(StringUtils.isEmpty(s.getEvaluate()) ? "" : s.getEvaluate().replaceAll(",", "，"));
 			sb.append(",");
-
-			sb.append(s.getMemo()==null?"":s.getMemo().replaceAll(",","，").replaceAll(System.getProperty("line.separator"),"，"));//评价
+			//评价
+			sb.append(s.getMemo()==null?"":s.getMemo().replaceAll(",","，").replaceAll(System.getProperty("line.separator"),"，"));
 			sb.append(",");
 
-			sb.append(DateUtils.formatDateTime_CN(s.getCreateDate()));
-			sb.append(",");
+			//北京的差评申诉单独处理
+			if (cityId == 44) {
+				sb.append((s.getAppraisalStatus()!=null&&s.getAppraisalStatus()==0)?"有效":"无效");
+				sb.append(",");
+				if (s.getIsAlreadyAppeal() == 0) {
+					sb.append("未申诉").append(",");
+				}else {
+					sb.append(AppealStatusEnum.getMsg(s.getAppealStatus() == null ? 0 : s.getAppealStatus())).append(",");
+				}
+				sb.append(s.getCallbackStatus()==null || s.getCallbackStatus() == 0 ? "未回访" : "已回访");
+				sb.append(",");
+			}else {
+				sb.append(DateUtils.formatDateTime_CN(s.getCreateDate()));
+				sb.append(",");
 
-			sb.append(DateUtils.formatDateTime_CN(s.getOrderFinishTime()));
-			sb.append(",");
+				sb.append(DateUtils.formatDateTime_CN(s.getOrderFinishTime()));
+				sb.append(",");
 
-			sb.append((s.getAppraisalStatus()!=null&&s.getAppraisalStatus()==0)?"有效":"无效");
-			sb.append(",");
+				sb.append((s.getAppraisalStatus()!=null&&s.getAppraisalStatus()==0)?"有效":"无效");
+				sb.append(",");
 
-			sb.append(s.getIsAllowedAppeal() == 0 ? "不可申诉" : "可申诉");
-			sb.append(",");
-
-			DriverAppraisalAppeal appeal = appraisalMap.get(s.getAppraisalId());
-			String appealTime = "";
-			int appealStatus = 0;
-			if (appeal != null) {
-				appealTime = DateUtils.formatDateTime_CN(appeal.getCreateTime());
-				appealStatus = appeal.getAppealStatus();
-			}
-			sb.append(AppealStatusEnum.getMsg(appealStatus)).append(",");
-			if(appealStatus!=4){
-				sb.append(appealTime);
+				sb.append(s.getIsAllowedAppeal() == 0 ? "不可申诉" : "可申诉");
+				sb.append(",");
+				DriverAppraisalAppeal appeal = appraisalMap.get(s.getAppraisalId());
+				String appealTime = "";
+				int appealStatus = 0;
+				if (appeal != null) {
+					appealTime = DateUtils.formatDateTime_CN(appeal.getCreateTime());
+					appealStatus = appeal.getAppealStatus();
+				}
+				sb.append(AppealStatusEnum.getMsg(appealStatus)).append(",");
+				if(appealStatus!=4){
+					sb.append(appealTime);
+				}
 			}
 			list.add(sb.toString());
 		}
@@ -361,7 +389,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 	}
 
 	enum AppealStatusEnum{
-		UN_APPEAL(0,"未审诉"),APPEALED(1,"已申诉"),APPEAL_SUCCESS(2,"申诉成功 "),APPEAL_FAIL(3,"申诉失败"),REVOKE_APPEAL(4,"撤销");
+		UN_APPEAL(0,"未申诉"),APPEALED(1,"已申诉"),APPEAL_SUCCESS(2,"申诉成功 "),APPEAL_FAIL(3,"申诉失败"),REVOKE_APPEAL(4,"撤销");
 
 		private int code;
 		private String msg;

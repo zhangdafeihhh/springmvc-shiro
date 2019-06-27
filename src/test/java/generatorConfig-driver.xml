@@ -19,16 +19,16 @@
 		</javaTypeResolver>
 
 		<!-- po实体类代码位置 -->
-		<javaModelGenerator targetPackage="com.zhuanche.entity.driver"  targetProject="C:\myCode\mp-manage\src\main\java">
+		<javaModelGenerator targetPackage="com.zhuanche.entity.driver"  targetProject="C:\workspace\mp-manage\src\main\java">
 			<property name="enableSubPackages" value="true" />
 			<property name="trimStrings" value="true" />
 		</javaModelGenerator>
 		<!-- sql代码的xml映射文件位置 -->
-		<sqlMapGenerator targetPackage="mapper.driver" targetProject="C:\myCode\mp-manage\src\main\resources">
+		<sqlMapGenerator targetPackage="mapper.driver" targetProject="C:\workspace\mp-manage\src\main\resources">
 			<property name="enableSubPackages" value="true" />
 		</sqlMapGenerator>
 		<!-- mapper接口位置 -->
-		<javaClientGenerator type="XMLMAPPER" targetPackage="mapper.driver"  targetProject="C:\myCode\mp-manage\src\main\java">
+		<javaClientGenerator type="XMLMAPPER" targetPackage="mapper.driver"  targetProject="C:\workspace\mp-manage\src\main\java">
 			<property name="enableSubPackages" value="true" />
 		</javaClientGenerator>
 

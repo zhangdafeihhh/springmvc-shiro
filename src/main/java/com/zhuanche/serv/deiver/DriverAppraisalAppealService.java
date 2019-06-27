@@ -115,10 +115,10 @@ public class DriverAppraisalAppealService {
     @MasterSlaveConfigs(configs = {
             @MasterSlaveConfig(databaseTag = "driver-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
-    public Set<Integer> getAppraissalIdsByAppealStatus(Integer appealStatus){
+    public Set<Integer> getAppraissalIdsByAppealStatus(Integer appealStatus , Integer callbackStatus){
         Set<Integer> result=null;
         try {
-            result = appealExMapper.getAppraissalIdsByAppealStatus(appealStatus);
+            result = appealExMapper.getAppraissalIdsByAppealStatus(appealStatus , callbackStatus);
         } catch (Exception e) {
            logger.error("根据审核状态查询评分ID异常，e:{}",e);
         }

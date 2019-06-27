@@ -4,6 +4,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 public class MpCarBizCustomerAppraisal implements Serializable{
 
@@ -93,8 +94,30 @@ public class MpCarBizCustomerAppraisal implements Serializable{
      */
     private Integer isAllowedAppeal;
 
+    private Integer isAlreadyAppeal;
 
+    /**
+     * 是否已回访 0 未回访 1 已回访
+     */
+    private Integer callbackStatus;
 
+    private Integer cityId;
+
+    public Integer getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(Integer cityId) {
+        this.cityId = cityId;
+    }
+
+    public Integer getIsAlreadyAppeal() {
+        return isAlreadyAppeal;
+    }
+
+    public void setIsAlreadyAppeal(Integer isAlreadyAppeal) {
+        this.isAlreadyAppeal = isAlreadyAppeal;
+    }
 
     public Integer getAppraisalId() {
         return appraisalId;
@@ -366,5 +389,16 @@ public class MpCarBizCustomerAppraisal implements Serializable{
 
     public void setIsAllowedAppeal(Integer isAllowedAppeal) {
         this.isAllowedAppeal = isAllowedAppeal;
+    }
+
+    public Integer getCallbackStatus() {
+        if (Objects.isNull(callbackStatus)) {
+            callbackStatus = 0;
+        }
+        return callbackStatus;
+    }
+
+    public void setCallbackStatus(Integer callbackStatus) {
+        this.callbackStatus = callbackStatus;
     }
 }

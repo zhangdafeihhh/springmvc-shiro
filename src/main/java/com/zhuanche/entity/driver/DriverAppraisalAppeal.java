@@ -71,6 +71,18 @@ public class DriverAppraisalAppeal {
 
     private String updateName;
 
+    private Integer callbackStatus;
+
+    private String callbackRemark;
+
+    private Date callbackTime;
+
+    private String callbackUser;
+
+    private String videoUrl;
+
+    private String videoFileName;
+
     private String url;
 
     public Integer getId() {
@@ -343,6 +355,54 @@ public class DriverAppraisalAppeal {
 
     public void setUpdateName(String updateName) {
         this.updateName = updateName == null ? null : updateName.trim();
+    }
+
+    public Integer getCallbackStatus() {
+        return callbackStatus;
+    }
+
+    public void setCallbackStatus(Integer callbackStatus) {
+        this.callbackStatus = callbackStatus;
+    }
+
+    public String getCallbackRemark() {
+        return callbackRemark;
+    }
+
+    public void setCallbackRemark(String callbackRemark) {
+        this.callbackRemark = callbackRemark == null ? null : callbackRemark.trim();
+    }
+
+    public Date getCallbackTime() {
+        return callbackTime;
+    }
+
+    public void setCallbackTime(Date callbackTime) {
+        this.callbackTime = callbackTime;
+    }
+
+    public String getCallbackUser() {
+        return callbackUser;
+    }
+
+    public void setCallbackUser(String callbackUser) {
+        this.callbackUser = callbackUser == null ? null : callbackUser.trim();
+    }
+
+    public String getVideoUrl() {
+        return videoUrl;
+    }
+
+    public void setVideoUrl(String videoUrl) {
+        this.videoUrl = videoUrl == null ? null : videoUrl.trim();
+    }
+
+    public String getVideoFileName() {
+        return videoFileName;
+    }
+
+    public void setVideoFileName(String videoFileName) {
+        this.videoFileName = videoFileName == null ? null : videoFileName.trim();
     }
 
     public String getUrl() {

@@ -21,7 +21,7 @@ public interface DriverAppraisalAppealExMapper {
 
     DriverAppraisalAppeal getAppealStatusByAppraisalId(@Param(value = "appraisalId") Integer appraisalId);
 
-    Set<Integer> getAppraissalIdsByAppealStatus(@Param("appealStatus") Integer appealStatus);
+    Set<Integer> getAppraissalIdsByAppealStatus(@Param("appealStatus") Integer appealStatus , @Param("callbackStatus") Integer callbackStatus);
 
 
 }
