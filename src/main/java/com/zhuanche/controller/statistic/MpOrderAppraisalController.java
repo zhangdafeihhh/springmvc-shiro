@@ -331,7 +331,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 				sb.append((s.getAppraisalStatus()!=null&&s.getAppraisalStatus()==0)?"有效":"无效");
 				sb.append(",");
 				if (s.getIsAlreadyAppeal() == 0) {
-					sb.append("未申诉");
+					sb.append("未申诉").append(",");
 				}else {
 					sb.append(AppealStatusEnum.getMsg(s.getAppealStatus() == null ? 0 : s.getAppealStatus())).append(",");
 				}
