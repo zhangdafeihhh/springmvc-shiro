@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.DriverApplyAdvanceOperationLogMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.DriverApplyAdvanceOperationLog" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="driver_apply_advance_id" property="driverApplyAdvanceId" jdbcType="INTEGER" />
+    <result column="order_num" property="orderNum" jdbcType="VARCHAR" />
+    <result column="operation_id" property="operationId" jdbcType="INTEGER" />
+    <result column="operation_name" property="operationName" jdbcType="VARCHAR" />
+    <result column="operation_action" property="operationAction" jdbcType="VARCHAR" />
+    <result column="operation_remark" property="operationRemark" jdbcType="VARCHAR" />
+    <result column="enclosure_url" property="enclosureUrl" jdbcType="VARCHAR" />
+    <result column="operation_date" property="operationDate" jdbcType="TIMESTAMP" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, driver_apply_advance_id, order_num, operation_id, operation_name, operation_action, 
+    operation_remark, enclosure_url, operation_date, create_date, update_date
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from driver_apply_advance_operation_log
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.DriverApplyAdvanceOperationLog" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into driver_apply_advance_operation_log (driver_apply_advance_id, order_num, operation_id, 
+      operation_name, operation_action, operation_remark, 
+      enclosure_url, operation_date, create_date, 
+      update_date)
+    values (#{driverApplyAdvanceId,jdbcType=INTEGER}, #{orderNum,jdbcType=VARCHAR}, #{operationId,jdbcType=INTEGER}, 
+      #{operationName,jdbcType=VARCHAR}, #{operationAction,jdbcType=VARCHAR}, #{operationRemark,jdbcType=VARCHAR}, 
+      #{enclosureUrl,jdbcType=VARCHAR}, #{operationDate,jdbcType=TIMESTAMP}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateDate,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.DriverApplyAdvanceOperationLog" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into driver_apply_advance_operation_log
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="driverApplyAdvanceId != null" >
+        driver_apply_advance_id,
+      </if>
+      <if test="orderNum != null" >
+        order_num,
+      </if>
+      <if test="operationId != null" >
+        operation_id,
+      </if>
+      <if test="operationName != null" >
+        operation_name,
+      </if>
+      <if test="operationAction != null" >
+        operation_action,
+      </if>
+      <if test="operationRemark != null" >
+        operation_remark,
+      </if>
+      <if test="enclosureUrl != null" >
+        enclosure_url,
+      </if>
+      <if test="operationDate != null" >
+        operation_date,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="driverApplyAdvanceId != null" >
+        #{driverApplyAdvanceId,jdbcType=INTEGER},
+      </if>
+      <if test="orderNum != null" >
+        #{orderNum,jdbcType=VARCHAR},
+      </if>
+      <if test="operationId != null" >
+        #{operationId,jdbcType=INTEGER},
+      </if>
+      <if test="operationName != null" >
+        #{operationName,jdbcType=VARCHAR},
+      </if>
+      <if test="operationAction != null" >
+        #{operationAction,jdbcType=VARCHAR},
+      </if>
+      <if test="operationRemark != null" >
+        #{operationRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="enclosureUrl != null" >
+        #{enclosureUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="operationDate != null" >
+        #{operationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.mdbcarmanage.DriverApplyAdvanceOperationLog" >
+    update driver_apply_advance_operation_log
+    <set >
+      <if test="driverApplyAdvanceId != null" >
+        driver_apply_advance_id = #{driverApplyAdvanceId,jdbcType=INTEGER},
+      </if>
+      <if test="orderNum != null" >
+        order_num = #{orderNum,jdbcType=VARCHAR},
+      </if>
+      <if test="operationId != null" >
+        operation_id = #{operationId,jdbcType=INTEGER},
+      </if>
+      <if test="operationName != null" >
+        operation_name = #{operationName,jdbcType=VARCHAR},
+      </if>
+      <if test="operationAction != null" >
+        operation_action = #{operationAction,jdbcType=VARCHAR},
+      </if>
+      <if test="operationRemark != null" >
+        operation_remark = #{operationRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="enclosureUrl != null" >
+        enclosure_url = #{enclosureUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="operationDate != null" >
+        operation_date = #{operationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.DriverApplyAdvanceOperationLog" >
+    update driver_apply_advance_operation_log
+    set driver_apply_advance_id = #{driverApplyAdvanceId,jdbcType=INTEGER},
+      order_num = #{orderNum,jdbcType=VARCHAR},
+      operation_id = #{operationId,jdbcType=INTEGER},
+      operation_name = #{operationName,jdbcType=VARCHAR},
+      operation_action = #{operationAction,jdbcType=VARCHAR},
+      operation_remark = #{operationRemark,jdbcType=VARCHAR},
+      enclosure_url = #{enclosureUrl,jdbcType=VARCHAR},
+      operation_date = #{operationDate,jdbcType=TIMESTAMP},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.DriverApplyAdvanceOperationLogExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.DriverApplyAdvanceOperationLog" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="driver_apply_advance_id" property="driverApplyAdvanceId" jdbcType="INTEGER" />
+    <result column="order_num" property="orderNum" jdbcType="VARCHAR" />
+    <result column="operation_id" property="operationId" jdbcType="INTEGER" />
+    <result column="operation_name" property="operationName" jdbcType="VARCHAR" />
+    <result column="operation_action" property="operationAction" jdbcType="VARCHAR" />
+    <result column="operation_remark" property="operationRemark" jdbcType="VARCHAR" />
+    <result column="enclosure_url" property="enclosureUrl" jdbcType="VARCHAR" />
+    <result column="operation_date" property="operationDate" jdbcType="TIMESTAMP" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, driver_apply_advance_id, order_num, operation_id, operation_name, operation_action, 
+    operation_remark, enclosure_url, operation_date, create_date, update_date
+  </sql>
+  <select id="querySuccessApplyLogByOrderNum" resultMap="BaseResultMap" parameterType="java.util.List" >
+    select
+    <include refid="Base_Column_List" />
+    from driver_apply_advance_operation_log
+    where
+    operation_action = '申诉通过'
+    AND
+    order_num IN
+    <foreach collection="orderNumList" open="(" close=")" separator=","  item="item">
+      #{item}
+    </foreach>
+  </select>
+</mapper>

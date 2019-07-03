@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.DriverApplyAdvanceAuditExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.DriverApplyAdvanceAudit" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="order_num" property="orderNum" jdbcType="VARCHAR" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="driver_phone" property="driverPhone" jdbcType="VARCHAR" />
+    <result column="plate_num" property="plateNum" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="cooperation_type" property="cooperationType" jdbcType="INTEGER" />
+    <result column="cooperation_name" property="cooperationName" jdbcType="VARCHAR" />
+    <result column="order_status" property="orderStatus" jdbcType="INTEGER" />
+    <result column="risk_status" property="riskStatus" jdbcType="INTEGER" />
+    <result column="advance_payment_money" property="advancePaymentMoney" jdbcType="DECIMAL" />
+    <result column="advance_payment_status" property="advancePaymentStatus" jdbcType="INTEGER" />
+    <result column="service_finish_date" property="serviceFinishDate" jdbcType="TIMESTAMP" />
+    <result column="order_start_address" property="orderStartAddress" jdbcType="VARCHAR" />
+    <result column="order_end_address" property="orderEndAddress" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, order_num, driver_id, driver_name, driver_phone, plate_num, city_id, city_name, 
+    cooperation_type, cooperation_name, order_status, risk_status, advance_payment_money, 
+    advance_payment_status, service_finish_date, order_start_address, order_end_address, 
+    create_date, update_date
+  </sql>
+  <select id="queryListDataByOrderNum" resultMap="BaseResultMap" parameterType="java.util.List" >
+    select
+    <include refid="Base_Column_List" />
+    from driver_apply_advance_audit
+    where order_num IN
+    <foreach collection="orderNumList" open="(" close=")" separator=","  item="item">
+      #{item}
+    </foreach>
+  </select>
+</mapper>

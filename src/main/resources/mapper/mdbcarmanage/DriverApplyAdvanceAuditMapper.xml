@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.DriverApplyAdvanceAuditMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.DriverApplyAdvanceAudit" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="order_num" property="orderNum" jdbcType="VARCHAR" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="driver_phone" property="driverPhone" jdbcType="VARCHAR" />
+    <result column="plate_num" property="plateNum" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="cooperation_type" property="cooperationType" jdbcType="INTEGER" />
+    <result column="cooperation_name" property="cooperationName" jdbcType="VARCHAR" />
+    <result column="order_status" property="orderStatus" jdbcType="INTEGER" />
+    <result column="risk_status" property="riskStatus" jdbcType="INTEGER" />
+    <result column="advance_payment_money" property="advancePaymentMoney" jdbcType="DECIMAL" />
+    <result column="advance_payment_status" property="advancePaymentStatus" jdbcType="INTEGER" />
+    <result column="service_finish_date" property="serviceFinishDate" jdbcType="TIMESTAMP" />
+    <result column="order_start_address" property="orderStartAddress" jdbcType="VARCHAR" />
+    <result column="order_end_address" property="orderEndAddress" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, order_num, driver_id, driver_name, driver_phone, plate_num, city_id, city_name, 
+    cooperation_type, cooperation_name, order_status, risk_status, advance_payment_money, 
+    advance_payment_status, service_finish_date, order_start_address, order_end_address, 
+    create_date, update_date
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from driver_apply_advance_audit
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.DriverApplyAdvanceAudit" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into driver_apply_advance_audit (order_num, driver_id, driver_name, 
+      driver_phone, plate_num, city_id, 
+      city_name, cooperation_type, cooperation_name, 
+      order_status, risk_status, advance_payment_money, 
+      advance_payment_status, service_finish_date, 
+      order_start_address, order_end_address, create_date, 
+      update_date)
+    values (#{orderNum,jdbcType=VARCHAR}, #{driverId,jdbcType=INTEGER}, #{driverName,jdbcType=VARCHAR}, 
+      #{driverPhone,jdbcType=VARCHAR}, #{plateNum,jdbcType=VARCHAR}, #{cityId,jdbcType=INTEGER}, 
+      #{cityName,jdbcType=VARCHAR}, #{cooperationType,jdbcType=INTEGER}, #{cooperationName,jdbcType=VARCHAR}, 
+      #{orderStatus,jdbcType=INTEGER}, #{riskStatus,jdbcType=INTEGER}, #{advancePaymentMoney,jdbcType=DECIMAL}, 
+      #{advancePaymentStatus,jdbcType=INTEGER}, #{serviceFinishDate,jdbcType=TIMESTAMP}, 
+      #{orderStartAddress,jdbcType=VARCHAR}, #{orderEndAddress,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateDate,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.DriverApplyAdvanceAudit" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into driver_apply_advance_audit
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="orderNum != null" >
+        order_num,
+      </if>
+      <if test="driverId != null" >
+        driver_id,
+      </if>
+      <if test="driverName != null" >
+        driver_name,
+      </if>
+      <if test="driverPhone != null" >
+        driver_phone,
+      </if>
+      <if test="plateNum != null" >
+        plate_num,
+      </if>
+      <if test="cityId != null" >
+        city_id,
+      </if>
+      <if test="cityName != null" >
+        city_name,
+      </if>
+      <if test="cooperationType != null" >
+        cooperation_type,
+      </if>
+      <if test="cooperationName != null" >
+        cooperation_name,
+      </if>
+      <if test="orderStatus != null" >
+        order_status,
+      </if>
+      <if test="riskStatus != null" >
+        risk_status,
+      </if>
+      <if test="advancePaymentMoney != null" >
+        advance_payment_money,
+      </if>
+      <if test="advancePaymentStatus != null" >
+        advance_payment_status,
+      </if>
+      <if test="serviceFinishDate != null" >
+        service_finish_date,
+      </if>
+      <if test="orderStartAddress != null" >
+        order_start_address,
+      </if>
+      <if test="orderEndAddress != null" >
+        order_end_address,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="orderNum != null" >
+        #{orderNum,jdbcType=VARCHAR},
+      </if>
+      <if test="driverId != null" >
+        #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="driverName != null" >
+        #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="driverPhone != null" >
+        #{driverPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="plateNum != null" >
+        #{plateNum,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null" >
+        #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="cooperationType != null" >
+        #{cooperationType,jdbcType=INTEGER},
+      </if>
+      <if test="cooperationName != null" >
+        #{cooperationName,jdbcType=VARCHAR},
+      </if>
+      <if test="orderStatus != null" >
+        #{orderStatus,jdbcType=INTEGER},
+      </if>
+      <if test="riskStatus != null" >
+        #{riskStatus,jdbcType=INTEGER},
+      </if>
+      <if test="advancePaymentMoney != null" >
+        #{advancePaymentMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="advancePaymentStatus != null" >
+        #{advancePaymentStatus,jdbcType=INTEGER},
+      </if>
+      <if test="serviceFinishDate != null" >
+        #{serviceFinishDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderStartAddress != null" >
+        #{orderStartAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="orderEndAddress != null" >
+        #{orderEndAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.mdbcarmanage.DriverApplyAdvanceAudit" >
+    update driver_apply_advance_audit
+    <set >
+      <if test="orderNum != null" >
+        order_num = #{orderNum,jdbcType=VARCHAR},
+      </if>
+      <if test="driverId != null" >
+        driver_id = #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="driverName != null" >
+        driver_name = #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="driverPhone != null" >
+        driver_phone = #{driverPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="plateNum != null" >
+        plate_num = #{plateNum,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null" >
+        city_name = #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="cooperationType != null" >
+        cooperation_type = #{cooperationType,jdbcType=INTEGER},
+      </if>
+      <if test="cooperationName != null" >
+        cooperation_name = #{cooperationName,jdbcType=VARCHAR},
+      </if>
+      <if test="orderStatus != null" >
+        order_status = #{orderStatus,jdbcType=INTEGER},
+      </if>
+      <if test="riskStatus != null" >
+        risk_status = #{riskStatus,jdbcType=INTEGER},
+      </if>
+      <if test="advancePaymentMoney != null" >
+        advance_payment_money = #{advancePaymentMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="advancePaymentStatus != null" >
+        advance_payment_status = #{advancePaymentStatus,jdbcType=INTEGER},
+      </if>
+      <if test="serviceFinishDate != null" >
+        service_finish_date = #{serviceFinishDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderStartAddress != null" >
+        order_start_address = #{orderStartAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="orderEndAddress != null" >
+        order_end_address = #{orderEndAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.DriverApplyAdvanceAudit" >
+    update driver_apply_advance_audit
+    set order_num = #{orderNum,jdbcType=VARCHAR},
+      driver_id = #{driverId,jdbcType=INTEGER},
+      driver_name = #{driverName,jdbcType=VARCHAR},
+      driver_phone = #{driverPhone,jdbcType=VARCHAR},
+      plate_num = #{plateNum,jdbcType=VARCHAR},
+      city_id = #{cityId,jdbcType=INTEGER},
+      city_name = #{cityName,jdbcType=VARCHAR},
+      cooperation_type = #{cooperationType,jdbcType=INTEGER},
+      cooperation_name = #{cooperationName,jdbcType=VARCHAR},
+      order_status = #{orderStatus,jdbcType=INTEGER},
+      risk_status = #{riskStatus,jdbcType=INTEGER},
+      advance_payment_money = #{advancePaymentMoney,jdbcType=DECIMAL},
+      advance_payment_status = #{advancePaymentStatus,jdbcType=INTEGER},
+      service_finish_date = #{serviceFinishDate,jdbcType=TIMESTAMP},
+      order_start_address = #{orderStartAddress,jdbcType=VARCHAR},
+      order_end_address = #{orderEndAddress,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
