@@ -179,7 +179,7 @@ public class DriverAdvancePaymentService {
         HashMap<String, Object> orderMap = Maps.newHashMap();
         orderMap.put("orderNo", orderNumStr);
         orderMap.put("bId", "27");
-        String columns = "order_no,fact_end_date";
+        String columns = "order_no,fact_end_date,order_id";
         orderMap.put("columns", columns);
         try {
             orderMap.put("sign", MD5Utils.getMD5DigestBase64(SignatureUtils.getMD5Sign(orderMap, ORDER_SERVICE_API_SIGNKEY)));
