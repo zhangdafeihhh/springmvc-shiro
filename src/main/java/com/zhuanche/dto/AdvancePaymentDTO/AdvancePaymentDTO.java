@@ -18,7 +18,7 @@ public class AdvancePaymentDTO extends BaseDTO {
     //垫付状态 0 失败 1成功
     private Integer status;
     //垫付类型
-    private String platformPayType;
+    private Integer platformPayType;
     //垫付时间
     private String createTime;
     //垫付人
@@ -26,7 +26,7 @@ public class AdvancePaymentDTO extends BaseDTO {
     //垫付原因
     private String reason;
     //订单完成时间
-    private String orderFinishiTime;
+    private String orderFinishTime;
     //订单原始金额
     private BigDecimal orderMoney;
     //城市
@@ -47,6 +47,8 @@ public class AdvancePaymentDTO extends BaseDTO {
     private String endTimeStr;
     //订单id
     private Long orderId;
+
+    private String createTimeStr;
 
     public Long getOrderId() {
         return orderId;
@@ -104,13 +106,6 @@ public class AdvancePaymentDTO extends BaseDTO {
         this.status = status;
     }
 
-    public String getPlatformPayType() {
-        return platformPayType;
-    }
-
-    public void setPlatformPayType(String platformPayType) {
-        this.platformPayType = platformPayType;
-    }
 
     public String getCreateTime() {
         return createTime;
@@ -136,12 +131,28 @@ public class AdvancePaymentDTO extends BaseDTO {
         this.reason = reason;
     }
 
-    public String getOrderFinishiTime() {
-        return orderFinishiTime;
+    public Integer getPlatformPayType() {
+        return platformPayType;
     }
 
-    public void setOrderFinishiTime(String orderFinishiTime) {
-        this.orderFinishiTime = orderFinishiTime;
+    public void setPlatformPayType(Integer platformPayType) {
+        this.platformPayType = platformPayType;
+    }
+
+    public String getOrderFinishTime() {
+        return orderFinishTime;
+    }
+
+    public void setOrderFinishTime(String orderFinishTime) {
+        this.orderFinishTime = orderFinishTime;
+    }
+
+    public String getCreateTimeStr() {
+        return createTimeStr;
+    }
+
+    public void setCreateTimeStr(String createTimeStr) {
+        this.createTimeStr = createTimeStr;
     }
 
     public BigDecimal getOrderMoney() {

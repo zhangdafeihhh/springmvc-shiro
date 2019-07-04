@@ -71,29 +71,21 @@ public class DriverAdvancePaymentService {
             Map<String, Object> dataMap = JSONObject.parseObject(queryResult.get("data").toString(), Map.class);
             Integer totalSize = 0;
             List<AdvancePaymentDTO> dtoList = Lists.newArrayList();
-            if (dataMap.get("total") != null) {
-                totalSize = Integer.parseInt(String.valueOf(dataMap.get("total")));
+            if (dataMap.get("totalPageSize") != null) {
+                totalSize = Integer.parseInt(String.valueOf(dataMap.get("totalPageSize")));
             }
             if (totalSize == 0) {
                 return AjaxResponse.success(new PageDTO());
             }
-            /* AdvancePaymentDTO adto = new AdvancePaymentDTO();
-               adto.setOrderId(139915902l);
-               adto.setTradeOrderNo("BS201812100225138983");
-               adto.setMoney(45.5);
-               adto.setCreateTime("2019-07-02 12:12:12");
-               adto.setStatus(1);
-               adto.setPlatformPayType("系统垫付");
-               adto.setReason("哈哈哈");
-               dtoList.add(adto);*/
+
             logger.info("driverApplyAdvanceAuditService-查询司机垫付记录，param--{}", params);
             dtoList = JSONArray.parseArray(String.valueOf(dataMap.get("repDTOList")), AdvancePaymentDTO.class);
-            /*for (AdvancePaymentDTO dto:dtoList){
+            for (AdvancePaymentDTO dto:dtoList){
                    Date createDate = new Date(dto.getCreateTime());
                    SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                    String createTimeStr = sf.format(createDate);
                    dto.setCreateTimeStr(createTimeStr);
-               }*/
+               }
             try {
                 if (CollectionUtils.isNotEmpty(dtoList)) {
                     List<String> orderNums = dtoList.stream().map(p -> p.getTradeOrderNo()).collect(Collectors.toList());
@@ -225,7 +217,7 @@ public class DriverAdvancePaymentService {
                     Date endDate = new Date(endDateL);
                     SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     String endDateStr = sf.format(endDate);
-                    dto.setOrderFinishiTime(endDateStr);
+                    dto.setOrderFinishTime(endDateStr);
                 }
                 dto.setOrderId(shortDTO.getOrderId());
             }

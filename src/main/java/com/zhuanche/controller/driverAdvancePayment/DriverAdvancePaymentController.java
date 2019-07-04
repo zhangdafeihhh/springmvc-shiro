@@ -45,7 +45,8 @@ public class DriverAdvancePaymentController {
                                            @RequestParam(value = "tradeOrderNo", required = false, defaultValue = "") String tradeOrderNo,
                                            @RequestParam(value = "status", required = false) Integer status,
                                            @RequestParam(value = "startTimeStr", required = true) String startTimeStr,
-                                           @RequestParam(value = "endTimeStr", required = true) String endTimeStr) {
+                                           @RequestParam(value = "endTimeStr", required = true) String endTimeStr,
+                                            Integer total) {
         logger.info("DriverAdvancePaymentController--查询司机垫付列表列表");
         try {
             Map<String, Object> params = Maps.newHashMap();
@@ -55,8 +56,14 @@ public class DriverAdvancePaymentController {
             if (StringUtils.isNotBlank(tradeOrderNo)) {
                 params.put("orderNo", tradeOrderNo);
             }
+            if(page >1 && total==null){
+                return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
+            }
             if (status != null) {
                 params.put("status", status);
+            }
+            if(total!= null && total != 0){
+                params.put("totalPageSize",total);
             }
             params.put("pageNo", page);
             params.put("page", pageSize);
