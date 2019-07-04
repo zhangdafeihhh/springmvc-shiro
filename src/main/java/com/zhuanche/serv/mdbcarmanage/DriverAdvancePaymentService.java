@@ -63,7 +63,7 @@ public class DriverAdvancePaymentService {
     public AjaxResponse queryAdvancePaymentList(Map<String, Object> params) {
 
         try {
-            JSONObject queryResult = MpOkHttpUtil.okHttpPostBackJson(prorateNewUrl + "/platform/pay/detail/by/driverId", params, 0, "查询司机垫付记录");
+            JSONObject queryResult = MpOkHttpUtil.okHttpPostBackJson(prorateNewUrl + "/backstage/query/platform/pay/detail", params, 0, "查询司机垫付记录");
             if (0 != queryResult.getInteger("code")) {
                 logger.info("driverApplyAdvanceAuditService-查询司机垫付记录，param--{}，失败信息--{}", params, queryResult.toJSONString());
                 return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
