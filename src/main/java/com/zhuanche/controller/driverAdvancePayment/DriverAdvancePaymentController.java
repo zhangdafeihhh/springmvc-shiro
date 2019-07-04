@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Map;
 
@@ -38,12 +39,12 @@ public class DriverAdvancePaymentController {
      * @param endTimeStr
      * @return
      */
+    @ResponseBody
     @RequestMapping(value = "/advancePaymentList")
     public AjaxResponse advancePaymentList(@RequestParam(value = "page", defaultValue = "1") Integer page,
                                            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
                                            @RequestParam(value = "driverId", required = true) Long driverId,
-                                           @RequestParam(value = "tradeOrderNo", required = false, defaultValue = "") String tradeOrderNo,
-                                           @RequestParam(value = "status", required = false) Integer status,
+                                            String tradeOrderNo, Integer status,
                                            @RequestParam(value = "startTimeStr", required = true) String startTimeStr,
                                            @RequestParam(value = "endTimeStr", required = true) String endTimeStr,
                                             Integer total) {
@@ -66,7 +67,7 @@ public class DriverAdvancePaymentController {
                 params.put("totalPageSize",total);
             }
             params.put("pageNo", page);
-            params.put("page", pageSize);
+            params.put("pageSize", pageSize);
             AjaxResponse response = driverAdvancePaymentService.queryAdvancePaymentList(params);
             return response;
         } catch (Exception e) {
