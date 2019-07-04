@@ -54,7 +54,7 @@ public class DriverAdvancePaymentController {
             params.put("startTimeStr", startTimeStr + " 00:00:00");
             params.put("endTimeStr", endTimeStr + " 23:59:59");
             if (StringUtils.isNotBlank(tradeOrderNo)) {
-                params.put("orderNo", tradeOrderNo);
+                params.put("tradeOrderNo", tradeOrderNo);
             }
             if(page >1 && total==null){
                 return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
