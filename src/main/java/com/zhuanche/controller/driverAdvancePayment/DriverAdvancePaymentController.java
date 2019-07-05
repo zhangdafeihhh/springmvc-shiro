@@ -33,7 +33,7 @@ public class DriverAdvancePaymentController {
      * @param page
      * @param pageSize
      * @param driverId
-     * @param tradeOrderNo
+     * @param orderNo
      * @param status
      * @param startTimeStr
      * @param endTimeStr
@@ -44,18 +44,19 @@ public class DriverAdvancePaymentController {
     public AjaxResponse advancePaymentList(@RequestParam(value = "page", defaultValue = "1") Integer page,
                                            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
                                            @RequestParam(value = "driverId", required = true) Long driverId,
-                                            String tradeOrderNo, Integer status,
+                                           @RequestParam(value = "orderNo", required = false)String orderNo,
+                                           @RequestParam(value = "status", required = false)Integer status,
                                            @RequestParam(value = "startTimeStr", required = true) String startTimeStr,
                                            @RequestParam(value = "endTimeStr", required = true) String endTimeStr,
-                                            Integer total) {
+                                           @RequestParam(value = "total", required = false)Integer total) {
         logger.info("DriverAdvancePaymentController--查询司机垫付列表列表");
         try {
             Map<String, Object> params = Maps.newHashMap();
             params.put("driverId", driverId);
             params.put("startTimeStr", startTimeStr + " 00:00:00");
             params.put("endTimeStr", endTimeStr + " 23:59:59");
-            if (StringUtils.isNotBlank(tradeOrderNo)) {
-                params.put("tradeOrderNo", tradeOrderNo);
+            if (StringUtils.isNotBlank(orderNo)) {
+                params.put("tradeOrderNo", orderNo);
             }
             if(page >1 && total==null){
                 return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
@@ -72,7 +73,7 @@ public class DriverAdvancePaymentController {
             return response;
         } catch (Exception e) {
             logger.error("查询车辆审核列表参数:page--{},pageSize--{},driverId--{},tradeOrderNo--{},status--{}" +
-                    "startTimeStr--{},endTimeStr--{}", page, pageSize, driverId, tradeOrderNo, status, startTimeStr, endTimeStr, e);
+                    "startTimeStr--{},endTimeStr--{}", page, pageSize, driverId, orderNo, status, startTimeStr, endTimeStr, e);
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
     }
