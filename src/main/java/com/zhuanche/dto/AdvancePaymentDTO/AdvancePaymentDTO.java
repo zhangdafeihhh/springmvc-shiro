@@ -20,7 +20,7 @@ public class AdvancePaymentDTO extends BaseDTO {
     //垫付类型
     private Integer platformPayType;
     //垫付时间
-    private String createTime;
+    private Long createTime;
     //垫付人
     private String createName;
     //垫付原因
@@ -107,11 +107,11 @@ public class AdvancePaymentDTO extends BaseDTO {
     }
 
 
-    public String getCreateTime() {
+    public Long getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(String createTime) {
+    public void setCreateTime(Long createTime) {
         this.createTime = createTime;
     }
 

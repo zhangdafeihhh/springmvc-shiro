@@ -127,7 +127,7 @@ public class DriverAdvancePaymentService {
             } catch (Exception e) {
                 logger.info("driverApplyAdvanceAuditService-封装订单信息异常", e);
             }
-            PageDTO pageDto = new PageDTO((int) params.get("page"), (int) params.get("pageNo"), totalSize, dtoList);
+            PageDTO pageDto = new PageDTO((int) params.get("pageNo"), (int) params.get("pageSize"), totalSize, dtoList);
             return AjaxResponse.success(pageDto);
         } catch (Exception e) {
             logger.error("driverApplyAdvanceAuditService-查询司机垫付记录异常", e);
