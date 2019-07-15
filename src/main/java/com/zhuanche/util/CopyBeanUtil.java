@@ -347,8 +347,7 @@ public class CopyBeanUtil {
     	ci.setAmount(132.1);
     	ci.setDriverId("1");
     	copyByIgnoreCase(orderDTO,ci,true);
-    	System.out.println(orderDTO.getCreatedate());
-    	System.out.println(orderDTO.getDriverId());
+     	System.out.println(orderDTO.getDriverId());
     }
 
 }

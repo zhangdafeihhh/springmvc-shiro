@@ -68,34 +68,28 @@ public class DistrictController {
         Map<String, Object> result = Maps.newHashMap();
         
         String a = request.getRequestURI();
-    	System.out.println(  a );
-    	
+
     	demoService.sayhello();
-    	System.out.println( System.getenv("env.name") );
 
     	String key = "ADSFSFSFSFSDFS090SF0000000SSS";
     	
     	RedisCacheUtil.set(key, "YALI", 20);
     	String value = RedisCacheUtil.get(key, String.class);
-        System.out.println( value );
-        
+
         CarBizDistrict obj = new CarBizDistrict();
         obj.setCityId(10086);
         obj.setCityName("中山市");
         RedisCacheUtil.set(key,   obj );
         CarBizDistrict value2 = RedisCacheUtil.get(key, CarBizDistrict.class);
-        System.out.println( value2 );
-        
+
         RedisCacheUtil.delete(key);
         
         Long cnt = RedisCacheUtil.incr(key);
          cnt = RedisCacheUtil.incr(key);
          cnt = RedisCacheUtil.incr(key);
          cnt = RedisCacheUtil.incr(key);
-         System.out.println( cnt );
-         cnt = RedisCacheUtil.decr(key);
-         System.out.println( cnt );
-         
+          cnt = RedisCacheUtil.decr(key);
+
          RedisCacheUtil.delete(key);
         
         

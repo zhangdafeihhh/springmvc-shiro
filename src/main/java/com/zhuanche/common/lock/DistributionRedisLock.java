@@ -9,12 +9,16 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 import com.zhuanche.common.cache.RedisCacheUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 基于Redis实现的简易分布式锁
  * @author zhaoyali
  */
 public final class DistributionRedisLock{
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	private static final  Set<String>  LOCKED_NAMES    = new ConcurrentSkipListSet<String>();//用于保存已经获取到的锁名称      
 	private static final  Random   random              = new Random();
 	/**获取锁时的超时时间(单位:毫秒)**/
@@ -100,7 +104,7 @@ public final class DistributionRedisLock{
             long expires = System.currentTimeMillis() + LOCK_EXPIRE_TIMEOUT + 1;
             boolean ok = setNX(expires);
             if (ok) {
-				System.out.println(Thread.currentThread().getName()+":获得锁成功，通过setNX");
+				logger.info(Thread.currentThread().getName()+":获得锁成功，通过setNX");
 				LOCKED_NAMES.add(lockname);
                 locked = true;
                 return locked;
@@ -112,7 +116,7 @@ public final class DistributionRedisLock{
             	RedisLockValue oldRedisLockValue = getSet(expires);
                 //最先设置的获取锁
             	if (oldRedisLockValue != null && oldRedisLockValue.getToken().equals(redisLockValue.getToken())) {
-    				System.out.println(Thread.currentThread().getName()+":获得锁成功，通过getSet");
+            		logger.info(Thread.currentThread().getName()+":获得锁成功，通过getSet");
     				LOCKED_NAMES.add(lockname);
             		locked = true;
                     return locked;
@@ -148,7 +152,7 @@ public final class DistributionRedisLock{
     		if(redisLockValue!=null && System.currentTimeMillis() < redisLockValue.getExpireTime()){
     			RedisCacheUtil.delete(lockname);
     		}
-    		System.out.println(Thread.currentThread().getName()+":释放锁失功");
+    		logger.info(Thread.currentThread().getName()+":释放锁失功");
     	}
     }
     /**

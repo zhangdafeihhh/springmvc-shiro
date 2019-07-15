@@ -177,8 +177,7 @@ public class DriverDailyReportExServiceImpl implements DriverDailyReportExServic
                 long endTime = System.currentTimeMillis();
 
                 long totalTime = (endTime-startTime);
-                System.out.println("远程时长：" +(totalTime));
-            }else{
+             }else{
                 long startTime = System.currentTimeMillis();
                 if (!CollectionUtils.isEmpty(list) && StringUtils.isNotEmpty(stringBuffer.toString())){
                     String drivers = stringBuffer.substring(0,stringBuffer.length()-1).toString();

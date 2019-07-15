@@ -44,19 +44,19 @@ public class BigDataFtpUtil {
 		ftpClient = new FTPClient();
 		ftpClient.setControlEncoding("utf-8");
 		try {
-			System.out.println("connecting...ftp服务器:"+this.hostname+":"+this.port);
+			logger.info("connecting...ftp服务器:"+this.hostname+":"+this.port);
 			ftpClient.connect(hostname, port); //连接ftp服务器
 			ftpClient.login(username, password); //登录ftp服务器
 			ftpClient.setBufferSize(1024);//可以控制上传或下载的速度
 			int replyCode = ftpClient.getReplyCode(); //是否成功登录服务器
 			if(!FTPReply.isPositiveCompletion(replyCode)){
-				System.out.println("connect failed...ftp服务器:"+this.hostname+":"+this.port);
+				logger.info("connect failed...ftp服务器:"+this.hostname+":"+this.port);
 			}
-			System.out.println("connect successfu...ftp服务器:"+this.hostname+":"+this.port);
+			logger.info("connect successfu...ftp服务器:"+this.hostname+":"+this.port);
 		}catch (MalformedURLException e) {
-			e.printStackTrace();
-		}catch (IOException e) {
-			e.printStackTrace();
+			logger.error("ftp上传异常",e);
+ 		}catch (IOException e) {
+			logger.error("ftp上传异常",e);
 		}
 	}
 
@@ -71,7 +71,7 @@ public class BigDataFtpUtil {
 		boolean flag = false;
 		InputStream inputStream = null;
 		try{
-			System.out.println("开始上传文件");
+			logger.info("开始上传文件");
 			inputStream = new FileInputStream(new File(originfilename));
 			initFtpClient();
 			ftpClient.setFileType(ftpClient.BINARY_FILE_TYPE);
@@ -82,23 +82,22 @@ public class BigDataFtpUtil {
 			inputStream.close();
 			ftpClient.logout();
 			flag = true;
-			System.out.println("上传文件成功");
+			logger.info("上传文件成功");
 		}catch (Exception e) {
-			System.out.println("上传文件失败");
-			e.printStackTrace();
+			logger.info("上传文件失败",e);
 		}finally{
 			if(ftpClient.isConnected()){
 				try{
 					ftpClient.disconnect();
 				}catch(IOException e){
-					e.printStackTrace();
+					logger.info("上传文件错误",e);
 				}
 			}
 			if(null != inputStream){
 				try {
 					inputStream.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					logger.info("上传文件错误",e);
 				}
 			}
 		}
@@ -114,8 +113,7 @@ public class BigDataFtpUtil {
 	public boolean uploadFile( String pathname, String fileName,InputStream inputStream){
 		boolean flag = false;
 		try{
-			System.out.println("开始上传文件");
-			initFtpClient();
+ 			initFtpClient();
 			ftpClient.setFileType(ftpClient.BINARY_FILE_TYPE);
 			CreateDirecroty(pathname);
 			ftpClient.makeDirectory(pathname);
@@ -124,23 +122,21 @@ public class BigDataFtpUtil {
 			inputStream.close();
 			ftpClient.logout();
 			flag = true;
-			System.out.println("上传文件成功");
-		}catch (Exception e) {
-			System.out.println("上传文件失败");
-			e.printStackTrace();
-		}finally{
+ 		}catch (Exception e) {
+			logger.info("",e);
+ 		}finally{
 			if(ftpClient.isConnected()){
 				try{
 					ftpClient.disconnect();
 				}catch(IOException e){
-					e.printStackTrace();
+					logger.info("",e);
 				}
 			}
 			if(null != inputStream){
 				try {
 					inputStream.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					logger.info("",e);
 				}
 			}
 		}
@@ -152,10 +148,10 @@ public class BigDataFtpUtil {
 		try {
 			flag = ftpClient.changeWorkingDirectory(directory);
 			if (flag) {
-				System.out.println("进入文件夹" + directory + " 成功！");
+				logger.info("进入文件夹" + directory + " 成功！");
 
 			} else {
-				System.out.println("进入文件夹" + directory + " 失败！开始创建文件夹");
+				logger.info("进入文件夹" + directory + " 失败！开始创建文件夹");
 			}
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
@@ -186,8 +182,7 @@ public class BigDataFtpUtil {
 					if (makeDirectory(subDirectory)) {
 						changeWorkingDirectory(subDirectory);
 					} else {
-						System.out.println("创建目录[" + subDirectory + "]失败");
-						changeWorkingDirectory(subDirectory);
+ 						changeWorkingDirectory(subDirectory);
 					}
 				} else {
 					changeWorkingDirectory(subDirectory);
@@ -220,13 +215,12 @@ public class BigDataFtpUtil {
 		try {
 			flag = ftpClient.makeDirectory(dir);
 			if (flag) {
-				System.out.println("创建文件夹" + dir + " 成功！");
-
+ 				logger.info("创建文件夹" + dir + " 成功！");
 			} else {
-				System.out.println("创建文件夹" + dir + " 失败！");
-			}
+				logger.info("创建文件夹" + dir + " 失败！");
+ 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("创建文件夹异常",e);
 		}
 		return flag;
 	}
@@ -240,7 +234,7 @@ public class BigDataFtpUtil {
 		boolean flag = false;
 		OutputStream os=null;
 		try {
-			System.out.println("开始下载文件");
+			logger.info("开始下载文件");
 			initFtpClient();
 			//切换FTP目录
 			ftpClient.changeWorkingDirectory(pathname);
@@ -255,16 +249,15 @@ public class BigDataFtpUtil {
 			}
 			ftpClient.logout();
 			flag = true;
-			System.out.println("下载文件成功");
+			logger.info("下载文件成功");
 		} catch (Exception e) {
-			System.out.println("下载文件失败");
-			e.printStackTrace();
+			logger.error("下载文件失败",e);
 		} finally{
 			if(ftpClient.isConnected()){
 				try{
 					ftpClient.disconnect();
 				}catch(IOException e){
-					e.printStackTrace();
+					logger.info("文件下载异常",e);
 				}
 			}
 			if(null != os){
@@ -285,23 +278,22 @@ public class BigDataFtpUtil {
 	public boolean deleteFile(String pathname, String filename){
 		boolean flag = false;
 		try {
-			System.out.println("开始删除文件");
-			initFtpClient();
+			logger.info("开始删除文件");
+ 			initFtpClient();
 			//切换FTP目录
 			ftpClient.changeWorkingDirectory(pathname);
 			ftpClient.dele(filename);
 			ftpClient.logout();
 			flag = true;
-			System.out.println("删除文件成功");
+			logger.info("删除文件成功");
 		} catch (Exception e) {
-			System.out.println("删除文件失败");
-			e.printStackTrace();
+			logger.info("删除文件失败",e);
 		} finally {
 			if(ftpClient.isConnected()){
 				try{
 					ftpClient.disconnect();
 				}catch(IOException e){
-					e.printStackTrace();
+					logger.info("删除文件异常",e);
 				}
 			}
 		}
@@ -315,7 +307,7 @@ public class BigDataFtpUtil {
 	public InputStream downloadFile(String pathname, String filename){
 		InputStream in = null;
 		try {
-			System.out.println("开始下载文件");
+			logger.info("开始下载文件");
 			initFtpClient();
 			//切换FTP目录
 			ftpClient.setBufferSize(1024);//可以控制上传或下载的速度
@@ -334,14 +326,13 @@ public class BigDataFtpUtil {
 //			ftpClient.logout();
 //			System.out.println("下载文件成功");
 		} catch (Exception e) {
-			System.out.println("下载文件失败");
-			e.printStackTrace();
+			logger.info("下载文件失败",e);
 		} finally{
 			if(ftpClient.isConnected()){
 				try{
 					ftpClient.disconnect();
 				}catch(IOException e){
-					e.printStackTrace();
+					logger.error("连接异常",e);
 				}
 			}
 //			if(null != in){

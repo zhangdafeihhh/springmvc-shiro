@@ -41,8 +41,8 @@ public class CompareObjUtil {
             for(int i=0; i<beforeFields.length; i++){
             	Column column=beforeFields[i].getAnnotation(Column.class);
             	if (column!=null) {
-					System.out.println(column.desc());
-				}
+
+ 				}
                 Object beforeValue = beforeFields[i].get(beforeObj);
                 Object afterValue = afterFields[i].get(afterObj);
                     if((beforeValue != null && !"".equals(beforeValue) && !beforeValue.equals(afterValue)) || ((beforeValue == null || "".equals(beforeValue)) && afterValue != null)){

@@ -114,8 +114,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 			String sign = java.net.URLEncoder.encode(
 					Base64.encodeBase64String(DigestUtils.md5(param.toString())), "UTF-8");
 			url += "&sign="+sign;
-			 
-			System.out.println(url);
+
 			
 			String result = HttpClientUtil.buildGetRequest(url).addHeader("Content-Type", ContentType.APPLICATION_JSON).setConnectTimeOut(CONNECT_TIMEOUT)
 					.setReadTimeOut(READ_TIMEOUT).execute();
@@ -161,8 +160,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 					Base64.encodeBase64String(DigestUtils.md5(param.toString())), "UTF-8");
 			url += "&sign="+sign;
 			 
-			System.out.println(url);
-			
+
 			String result = HttpClientUtil.buildGetRequest(url).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
 			JSONObject job = JSON.parseObject(result);
 			if (job == null) {
@@ -179,7 +177,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 				rows =  JSONArray.parseArray(subOrderList, CarFactOrderInfo.class);   
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+		   logger.info("查询异常" + e);
 		}
 		return rows;
 	}
@@ -198,8 +196,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 			result = HttpClientUtil.buildPostRequest(url).addParams(paramMap).addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
 		} catch (Exception e) {
 			logger.error("调用LBS查询LBS提供的轨迹坐标" + url + "异常", e);
-			e.printStackTrace();
-		}
+ 		}
 		return result;
 	}
 	
@@ -231,8 +228,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 			}
 		} catch (HttpException e) {
 			logger.error("调用计费接口" + url + "异常", e);
-			e.printStackTrace();
-		}
+ 		}
 		return result;
 	}
 	
@@ -251,7 +247,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 			String result = orderApiTemplate.postForObject(Common.ORDER_ORDER_LIST_DATE_NEW,
 					String.class, paramMap);
 
-			System.out.println("result:" + result);
+			logger.info("result:" + result);
 
 			JSONObject job = JSON.parseObject(result);
 			if (job == null) {
@@ -290,8 +286,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 			}
 		} catch (Exception e) {
 			logger.error("调用订单接口" + url + "异常", e);
-			e.printStackTrace();
-			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+ 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 		}
 		return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 	}

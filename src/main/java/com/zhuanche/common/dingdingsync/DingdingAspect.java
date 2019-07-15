@@ -103,6 +103,5 @@ public class DingdingAspect {
                 }
             }
         }
-        System.out.println(jointPoint.getSignature().getName());
-    }
+     }
 }

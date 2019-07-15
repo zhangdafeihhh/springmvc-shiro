@@ -219,8 +219,8 @@ public class SaasDriverDailyReportController {
 
             total = page.getTotal();
         } catch (NumberFormatException e) {
-            e.printStackTrace();
-        }finally {
+            logger.info("",e);
+         }finally {
             PageHelper.clearPage();
         }
 
@@ -451,7 +451,7 @@ public class SaasDriverDailyReportController {
 
             total = page.getTotal();
         } catch (NumberFormatException e) {
-            e.printStackTrace();
+            logger.info("",e);
         }finally {
             PageHelper.clearPage();
         }

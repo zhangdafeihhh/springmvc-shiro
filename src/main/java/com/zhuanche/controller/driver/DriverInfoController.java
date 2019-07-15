@@ -176,7 +176,6 @@ public class DriverInfoController {
             carBizDriverInfoService.getBaseStatis(driver);
         }
         PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
-        System.out.println("time cost : " + (System.currentTimeMillis() - startTime) );
         return AjaxResponse.success(pageDTO);
     }
 
