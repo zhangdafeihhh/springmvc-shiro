@@ -61,6 +61,7 @@ public class DriverFeeDetailServiceImpl implements DriverFeeDetailService {
         params.put("orderId", orderId);
         params.put("isFix", buyoutFlag);
         params.put("isDriver", 1);
+        params.put("source",6);
         String detail = new RPCAPI().requestWithRetry(RPCAPI.HttpMethod.GET, ORDERCOST_SERVICE_API_BASE_URL + "/orderCostdetailDriver/getCostDetailForH5", params, null, "UTF-8");
         if (detail == null) {
             logger.error("查询/orderCostdetailDriver/getCostDetailForH5返回空，入参为：orderNo:" + orderNo + "  orderId:" + orderId + "  buyoutFlag:" + buyoutFlag);
