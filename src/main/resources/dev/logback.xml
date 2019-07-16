@@ -65,21 +65,9 @@
 
     <root level="INFO">
          <appender-ref ref="STDOUT"/> <!-- 在本地开发时，需要打开注释 -->
-        <appender-ref ref="AsyncRollingFile"/>
+        <appender-ref ref="FILE"/>
     </root>
 
-    <!-- 异步输出 -->
-    <appender name="AsyncRollingFile" class="ch.qos.logback.classic.AsyncAppender">
-        <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
-        <discardingThreshold>0</discardingThreshold>
-        <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
-        <queueSize>2048</queueSize>
-        <!--
-         <IncludeCallerData>true</IncludeCallerData>
-         -->
-        <!-- 添加附加的appender,最多只能添加一个 -->
-        <appender-ref ref="FILE"/>
-    </appender>
 
 
     <!-- Rest接口性能监测BEGIN -->
