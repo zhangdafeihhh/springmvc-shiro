@@ -17,7 +17,7 @@
         </rollingPolicy>
         <encoder>
             <!--异步日志默认开启 线上关闭 -->
-            <immediateFlush>false</immediateFlush>
+            <immediateFlush>true</immediateFlush>
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %X{env} [%-5level] %X{reqId} %logger{36}%X{loginUser} %msg%n</pattern>
         </encoder>
     </appender>
