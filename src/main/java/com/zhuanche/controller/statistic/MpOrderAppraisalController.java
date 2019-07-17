@@ -92,9 +92,15 @@ public class MpOrderAppraisalController extends DriverQueryController{
 					createDateBegin, createDateEnd,orderFinishTimeBegin,orderFinishTimeEnd,
 					evaluateScore, appraisalStatus,isAllowedAppeal, sortName, sortOrder);
 			log.info("订单评价列表,查询参数："+ JSON.toJSONString(params));
+
+			//车队id如果 为空，将用户的车队id赋值
+			if(StringUtils.isEmpty(teamId)){
+				Set<Integer> teamIds2 = WebSessionUtil.getCurrentLoginUser().getTeamIds();
+				teamId = (teamIds2 != null && teamIds2.size()>0) ? StringUtils.join(teamIds2.toArray(), ",") : "";
+			}
 			//如果选择了车队小组，先查询该车队小组下对应的DriverId
 			if (StringUtils.isNotEmpty(groupIds) || StringUtils.isNotEmpty(teamId)) {
-                String driverIds = super.queryAuthorityDriverIdsByTeamAndGroup(groupIds, teamId);
+                String driverIds = super.queryAuthorityDriverIdsByTeamAndGroup(teamId, groupIds);
                 if (StringUtils.isNotBlank(driverIds)) {
                     log.info("订单评价列表-有选择小组查询条件-该小组下没有司机groupId={},teamId={}", groupIds, teamId);
                     return AjaxResponse.success(new PageDTO(page, pageSize, 0, new ArrayList()));
@@ -208,9 +214,15 @@ public class MpOrderAppraisalController extends DriverQueryController{
 					createDateBegin, createDateEnd,orderFinishTimeBegin,orderFinishTimeEnd,
 					evaluateScore, appraisalStatus,isAllowedAppeal, sortName, sortOrder);
 			log.info("订单评价列表,导出参数："+ JSON.toJSONString(params));
+
+			//车队id如果 为空，将用户的车队id赋值
+			if(StringUtils.isEmpty(teamId)){
+				Set<Integer> teamIds2 = WebSessionUtil.getCurrentLoginUser().getTeamIds();
+				teamId = (teamIds2 != null && teamIds2.size()>0) ? StringUtils.join(teamIds2.toArray(), ",") : "";
+			}
 			//如果选择了车队小组，先查询该车队小组下对应的DriverId
 			if (StringUtils.isNotEmpty(groupIds) || StringUtils.isNotEmpty(teamId)) {
-				String driverIds = super.queryAuthorityDriverIdsByTeamAndGroup(groupIds, teamId);
+				String driverIds = super.queryAuthorityDriverIdsByTeamAndGroup(teamId, groupIds);
 				if (StringUtils.isNotBlank(driverIds)) {
 					ArrayList<String> errHead=new ArrayList<>();
 					errHead.add("暂无数据");
