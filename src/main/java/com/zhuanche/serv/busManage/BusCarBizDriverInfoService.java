@@ -1129,7 +1129,7 @@ public class BusCarBizDriverInfoService implements BusConst {
                         // 车型类别（巴士xx座）
                         case "车型类别(必填)":
                             String groupName = StringUtils.deleteWhitespace(cellValue);
-                            CarBizCarGroup carBizCarGroup = carBizCarGroupExMapper.queryGroupByGroupName(groupName);
+                            CarBizCarGroup carBizCarGroup = carBizCarGroupExMapper.queryGroupByGroupNameAndStatus(groupName,1);
                             if (carBizCarGroup == null) {
                                 errorMsgs.add(errorPrefix + "系统暂时没有该车型类别——" + groupName);
                                 isTrue = false;

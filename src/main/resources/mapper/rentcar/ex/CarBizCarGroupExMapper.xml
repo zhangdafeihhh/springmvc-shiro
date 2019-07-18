@@ -41,6 +41,14 @@
     from car_biz_car_group
     where group_name = #{groupName,jdbcType=VARCHAR}
   </select>
+    <select id="queryGroupByGroupNameAndStatus" resultMap="ResultMapWithBLOBs" >
+        select
+        <include refid="Base_Column_List" />
+        ,
+        <include refid="Blob_Column_List" />
+        from car_biz_car_group
+        where group_name = #{groupName,jdbcType=VARCHAR} AND status = #{status,jdbcType=INTEGER}
+    </select>
   <select id="queryForObjectByGroupName" resultType="com.zhuanche.entity.rentcar.CarBizCarGroup" parameterType="com.zhuanche.entity.rentcar.CarBizCarGroup">
       SELECT
       g.group_id groupId,
