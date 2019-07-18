@@ -6,7 +6,6 @@ import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
-import com.zhuanche.common.enums.PermissionLevelEnum;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -25,11 +24,11 @@ import com.zhuanche.serv.busManage.BusCommonService;
 import com.zhuanche.serv.busManage.BusInfoService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.Common;
 import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.excel.ExportExcelUtil;
 import com.zhuanche.vo.busManage.*;
+import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -54,10 +53,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 /**
@@ -86,6 +82,8 @@ public class BusInfoController {
 
     @Autowired
     private CarBizCarGroupService carBizCarGroupService;
+    @Autowired
+    private CarBizCarGroupExMapper carBizCarGroupExMapper;
 
     private static final String licensePlateTemplate = "京A12345";
 
@@ -396,7 +394,7 @@ public class BusInfoController {
                             validFlag = false;
                             break;
                         }
-                        CarBizCarGroup group = groupService.queryGroupByGroupName(value);
+                        CarBizCarGroup group = carBizCarGroupExMapper.queryGroupByGroupNameAndStatus(value,1);
                         if (group == null) {
                             saveErrorMsg(errList, rowIdx, colIdx, heads[colIdx] + " 不存在");
                             validFlag = false;
