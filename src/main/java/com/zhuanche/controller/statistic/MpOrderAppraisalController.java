@@ -101,7 +101,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			//如果选择了车队小组，先查询该车队小组下对应的DriverId
 			if (StringUtils.isNotEmpty(groupIds) || StringUtils.isNotEmpty(teamId)) {
                 String driverIds = super.queryAuthorityDriverIdsByTeamAndGroup(teamId, groupIds);
-                if (StringUtils.isNotBlank(driverIds)) {
+                if (StringUtils.isBlank(driverIds)) {
                     log.info("订单评价列表-有选择小组查询条件-该小组下没有司机groupId={},teamId={}", groupIds, teamId);
                     return AjaxResponse.success(new PageDTO(page, pageSize, 0, new ArrayList()));
                 }
