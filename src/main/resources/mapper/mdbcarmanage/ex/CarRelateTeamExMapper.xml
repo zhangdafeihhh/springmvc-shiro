@@ -141,7 +141,7 @@
 		FROM
 			car_relate_team
 		WHERE 1=1
-				AND team_id in (#{teamIds})
+				AND team_id in (${teamIds})
 	</select>
 
 	<select id="queryListByGroupIds" resultType="com.zhuanche.entity.mdbcarmanage.CarRelateTeam">
