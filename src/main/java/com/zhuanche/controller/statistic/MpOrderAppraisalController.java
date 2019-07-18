@@ -223,7 +223,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			//如果选择了车队小组，先查询该车队小组下对应的DriverId
 			if (StringUtils.isNotEmpty(groupIds) || StringUtils.isNotEmpty(teamId)) {
 				String driverIds = super.queryAuthorityDriverIdsByTeamAndGroup(teamId, groupIds);
-				if (StringUtils.isNotBlank(driverIds)) {
+				if (StringUtils.isBlank(driverIds)) {
 					ArrayList<String> errHead=new ArrayList<>();
 					errHead.add("暂无数据");
 					entity.exportCsvV2(response,null,errHead,fileName,true,true);
