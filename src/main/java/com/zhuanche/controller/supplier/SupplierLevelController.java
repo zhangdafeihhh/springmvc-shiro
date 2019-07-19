@@ -39,15 +39,17 @@ public class SupplierLevelController {
 
     @ResponseBody
     @RequestMapping("/importsupplierleveladditional")
-    public AjaxResponse importCarStatus(@RequestParam(value = "filename", required = true)String filename, HttpServletRequest request){
+    public AjaxResponse importCarStatus(@RequestParam(value = "filename", required = true)String filename,
+                                        @RequestParam(value = "month", required = true)String month,
+                                        HttpServletRequest request){
 
         logger.info("导入供应商等级信息:参数filename=" + filename);
-        Map<String, Object> result = _doPareImportData(  filename,     request);
+        Map<String, Object> result = _doPareImportData(  filename, month,    request);
         if(result.get("error")==Boolean.TRUE){
 
             return AjaxResponse.fail(-1,result);
         }else{
-            List<SupplierLevelAdditionalDto> supplierLevelAdditionalDtos = (List<SupplierLevelAdditionalDto>) result.get("dataList");
+            List<SupplierLevelAdditional> supplierLevelAdditionalDtos = (List<SupplierLevelAdditional>) result.get("dataList");
             supplierLevelService.doImportSupplierLevelAdditional(supplierLevelAdditionalDtos);
 
             return AjaxResponse.success(Constants.SUPPLIER_NAME_AVAILABLE);
@@ -58,7 +60,7 @@ public class SupplierLevelController {
 
     }
 
-    private Map<String, Object> _doPareImportData(String filename,   HttpServletRequest request){
+    private Map<String, Object> _doPareImportData(String filename,String month,   HttpServletRequest request){
 
 
         String path  = Common.getPath(request);
@@ -67,8 +69,8 @@ public class SupplierLevelController {
         Map<String, Object> result = new HashMap<String, Object>();
         String download = null;
         List<JSONObject> listException = new ArrayList<>();
-        List<SupplierLevelAdditional> importList = new ArrayList<>();
-        List<SupplierLevelAdditionalDto> supplierLevelAdditionalDtoList = new ArrayList<>();
+
+        List<SupplierLevelAdditional> supplierLevelAdditionalDtoList = new ArrayList<>();
         try {
             InputStream is = new FileInputStream(DRIVERINFO);
             Workbook workbook = null;
@@ -79,8 +81,7 @@ public class SupplierLevelController {
                 workbook = new XSSFWorkbook(is);
             }
             Sheet sheet = workbook.getSheetAt(0);
-            FormulaEvaluator evaluator = workbook.getCreationHelper()
-                    .createFormulaEvaluator();
+
             // 检查模板是否正确
             Row row1 = sheet.getRow(0);
             if(row1==null){
@@ -99,7 +100,7 @@ public class SupplierLevelController {
             String supplierName = null;
             String itemName = null;
             String itemValue = null;
-            Integer supplierLevelId = null;
+
 
 
             for (int rowIx = minRowIx; rowIx <= maxRowIx; rowIx++) {
@@ -108,12 +109,13 @@ public class SupplierLevelController {
                 supplierName = row.getCell(0).getStringCellValue();
                 itemName = row.getCell(1).getStringCellValue();
                 itemValue = row.getCell(2).getStringCellValue();
-                ImportCheckEntity checkResult = checkEntity(rowIx,supplierName,itemName,itemValue);
+                ImportCheckEntity checkResult = checkEntity(rowIx,supplierName,itemName,itemValue,month);
 
 
                 if(checkResult.getResult()){
-                    SupplierLevelAdditionalDto entity = new SupplierLevelAdditionalDto();
-                    entity.setSupplierName(supplierName);
+                    SupplierLevelAdditional entity = new SupplierLevelAdditional();
+
+                    //TODO 根据供应商和月份来获得供应商等级的ID
                     entity.setItemName(itemName);
                     entity.setItemValue(new BigDecimal(itemValue));
                     supplierLevelAdditionalDtoList.add(entity);
@@ -175,7 +177,7 @@ public class SupplierLevelController {
         return result;
     }
 
-    public ImportCheckEntity checkEntity(Integer rowNum,String supplierName,String itemName,String itemValue){
+    public ImportCheckEntity checkEntity(Integer rowNum,String supplierName,String itemName,String itemValue,String month){
         ImportCheckEntity result = new ImportCheckEntity();
         result.setResult(true);
         return result;

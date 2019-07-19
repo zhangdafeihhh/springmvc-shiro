@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 @Service
 public class SupplierLevelServiceImpl  implements  SupplierLevelService{
@@ -119,7 +120,24 @@ public class SupplierLevelServiceImpl  implements  SupplierLevelService{
     }
 
     @Override
-    public void doImportSupplierLevelAdditional(List<SupplierLevelAdditionalDto> list) {
+    public void doImportSupplierLevelAdditional(List<SupplierLevelAdditional> list) {
+
+        if(list != null){
+            logger.info("导入供应商附加分，条目数量为"+list.size());
+            Date now = new Date();
+            SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+            Integer userId = currentLoginUser.getId();
+            String userName = currentLoginUser.getName();
+            for(SupplierLevelAdditional item : list){
+                item.setCreateTime(now);
+                item.setUpdateTime(now);
+                item.setCreateBy(userName);
+                item.setUpdateBy(userName);
+                supplierLevelAdditionalMapper.insertSelective(item);
+            }
+        }else{
+            logger.info("导入供应商附加分，但是list为null");
+        }
 
     }
 }

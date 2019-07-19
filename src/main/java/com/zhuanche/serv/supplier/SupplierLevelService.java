@@ -42,5 +42,5 @@ public interface SupplierLevelService {
      * 批量导入附加分
      * @param list
      */
-    public void doImportSupplierLevelAdditional(List<SupplierLevelAdditionalDto> list);
+    public void doImportSupplierLevelAdditional(List<SupplierLevelAdditional> list);
 }
