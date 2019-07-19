@@ -1,10 +1,13 @@
 package com.zhuanche.controller.supplier;
 
+import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.CommonConfig;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.ImportCheckEntity;
 import com.zhuanche.dto.driver.SupplierLevelAdditionalDto;
+import com.zhuanche.entity.driver.SupplierLevel;
 import com.zhuanche.entity.driver.SupplierLevelAdditional;
 import com.zhuanche.serv.supplier.SupplierLevelService;
 import com.zhuanche.util.Common;
@@ -17,11 +20,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.math.BigDecimal;
 import java.util.*;
@@ -36,6 +42,115 @@ public class SupplierLevelController {
     @Autowired
     private SupplierLevelService supplierLevelService;
 
+
+    @RequestMapping(value="dopager",method= {RequestMethod.GET,RequestMethod.POST})
+    @ResponseBody
+    public AjaxResponse findPage(
+            @RequestParam(value = "pageno", required = false,defaultValue = "0")int pageno,
+            @RequestParam(value = "pagesize", required = false,defaultValue = "20")int pagesize,
+            SupplierLevel entity,
+            HttpServletRequest request, HttpServletResponse response, ModelMap modelMap){
+        try{
+            logger.info("查询供应商等级，参数为：pageno="+pageno+",pagesize="+pagesize+",entity="+ JSON.toJSONString(entity));
+            PageInfo<SupplierLevel>  pageInfo =   supplierLevelService.findPage(pageno,pagesize,entity);
+            return AjaxResponse.success(pageInfo);
+        }catch (Exception e){
+            logger.error("查询供应商等级失败，参数为：pageno="+pageno+",pagesize="+pagesize+",entity="+ JSON.toJSONString(entity),e);
+            return AjaxResponse.fail(-1,"查询失败");
+        }
+    }
+
+    /**
+     * 发布供应商等级
+     * @param ids
+     * @param request
+     * @param response
+     * @param modelMap
+     * @return
+     */
+    @RequestMapping(value="doPublishSupplierLevel",method= {RequestMethod.GET,RequestMethod.POST})
+    @ResponseBody
+    public AjaxResponse doPublishSupplierLevel(
+            @RequestParam(value = "ids", required = true)String ids,
+            HttpServletRequest request, HttpServletResponse response, ModelMap modelMap){
+        try{
+            logger.info("发布供应商等级，参数为：ids="+ids );
+            if(StringUtils.isEmpty(ids)){
+
+                return AjaxResponse.fail(-2,"参数ids为空");
+            }else{
+                String[]idArray = ids.split(",");
+                List<Integer> integerIdList = new ArrayList<>();
+                for(int i=0;i<idArray.length;i++){
+                    integerIdList.add(Integer.parseInt(idArray[i]));
+                }
+                supplierLevelService.doPublishSupplierLevel(integerIdList);
+                return AjaxResponse.success(Boolean.TRUE);
+            }
+
+        }catch (Exception e){
+            logger.error("发布供应商等级异常，参数为：ids="+ids ,e);
+            return AjaxResponse.fail(-1,"发布供应商等级异常");
+        }
+    }
+
+    @RequestMapping(value="doUnPublishSupplierLevel",method= {RequestMethod.GET,RequestMethod.POST})
+    @ResponseBody
+    public AjaxResponse doUnPublishSupplierLevel(
+            @RequestParam(value = "ids", required = true)String ids,
+            HttpServletRequest request, HttpServletResponse response, ModelMap modelMap){
+        try{
+            logger.info("取消发布供应商等级，参数为：ids="+ids );
+            if(StringUtils.isEmpty(ids)){
+
+                return AjaxResponse.fail(-2,"参数ids为空");
+            }else{
+                String[]idArray = ids.split(",");
+                List<Integer> integerIdList = new ArrayList<>();
+                for(int i=0;i<idArray.length;i++){
+                    integerIdList.add(Integer.parseInt(idArray[i]));
+                }
+                supplierLevelService.doUnPublishSupplierLevel(integerIdList);
+                return AjaxResponse.success(Boolean.TRUE);
+            }
+
+        }catch (Exception e){
+            logger.error("取消发布供应商等级异常，参数为：ids="+ids ,e);
+            return AjaxResponse.fail(-1,"取消发布供应商等级异常");
+        }
+    }
+
+    @RequestMapping(value="findSupplierLevelAdditionalBySupplierLevelId",method= {RequestMethod.GET,RequestMethod.POST})
+    @ResponseBody
+    public AjaxResponse findSupplierLevelAdditionalBySupplierLevelId(
+            @RequestParam(value = "supplierLevelId", required = true)Integer supplierLevelId,
+            HttpServletRequest request, HttpServletResponse response, ModelMap modelMap){
+        try{
+            logger.info("根据供应商等级id查询供应商附加分信息，参数为：supplierLevelId="+supplierLevelId );
+            List<SupplierLevelAdditional> list =    supplierLevelService.findSupplierLevelAdditionalBySupplierLevelId(supplierLevelId);
+            return AjaxResponse.success(list);
+
+        }catch (Exception e){
+            logger.error("根据供应商等级id查询供应商附加分信息异常，参数为：supplierLevelId="+supplierLevelId ,e);
+            return AjaxResponse.fail(-1,"根据供应商等级id查询供应商附加分信息异常");
+        }
+    }
+
+    @RequestMapping(value="dodeletebysupplierlevelid",method= {RequestMethod.GET,RequestMethod.POST})
+    @ResponseBody
+    public AjaxResponse dodeletebysupplierlevelid(
+            @RequestParam(value = "supplierLevelAdditionalId", required = true)Integer supplierLevelAdditionalId,
+            HttpServletRequest request, HttpServletResponse response, ModelMap modelMap){
+        try{
+            logger.info("根据供应商等级附加分的id进行删除附加分，参数为：supplierLevelAdditionalId="+supplierLevelAdditionalId );
+            supplierLevelService.doDeleteBySupplierLevelId(supplierLevelAdditionalId);
+            return AjaxResponse.success(Boolean.TRUE);
+
+        }catch (Exception e){
+            logger.error("根据供应商等级附加分的id进行删除附加分异常，参数为：supplierLevelAdditionalId="+supplierLevelAdditionalId ,e);
+            return AjaxResponse.fail(-1,"根据供应商等级附加分的id进行删除附加分异常");
+        }
+    }
 
     @ResponseBody
     @RequestMapping("/importsupplierleveladditional")
@@ -52,7 +167,7 @@ public class SupplierLevelController {
             List<SupplierLevelAdditional> supplierLevelAdditionalDtos = (List<SupplierLevelAdditional>) result.get("dataList");
             supplierLevelService.doImportSupplierLevelAdditional(supplierLevelAdditionalDtos);
 
-            return AjaxResponse.success(Constants.SUPPLIER_NAME_AVAILABLE);
+            return AjaxResponse.success(Boolean.TRUE);
         }
 
         //error
