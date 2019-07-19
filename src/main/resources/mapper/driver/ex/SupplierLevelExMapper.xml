@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.driver.ex.SupplierLevelExMapper">
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.SupplierLevel">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="supplier_id" jdbcType="INTEGER" property="supplierId" />
+    <result column="supplier_name" jdbcType="VARCHAR" property="supplierName" />
+    <result column="city_id" jdbcType="INTEGER" property="cityId" />
+    <result column="city_name" jdbcType="VARCHAR" property="cityName" />
+    <result column="start_time" jdbcType="DATE" property="startTime" />
+    <result column="end_time" jdbcType="DATE" property="endTime" />
+    <result column="month" jdbcType="VARCHAR" property="month" />
+    <result column="scale_score" jdbcType="DECIMAL" property="scaleScore" />
+    <result column="service_score" jdbcType="DECIMAL" property="serviceScore" />
+    <result column="efficiency_score" jdbcType="DECIMAL" property="efficiencyScore" />
+    <result column="additional_score" jdbcType="DECIMAL" property="additionalScore" />
+    <result column="grade_score" jdbcType="DECIMAL" property="gradeScore" />
+    <result column="grade_level" jdbcType="VARCHAR" property="gradeLevel" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="states" jdbcType="INTEGER" property="states" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, supplier_id, supplier_name, city_id, city_name, start_time, end_time, `month`,
+    scale_score, service_score, efficiency_score, additional_score, grade_score, grade_level,
+    create_time, update_time, states
+  </sql>
+  <select id="findPage" parameterType="com.zhuanche.entity.driver.SupplierLevel" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from supplier_level
+    <where>
+      <if test="cityId!=null">
+        AND city_id = #{cityId}
+      </if>
+      <if test="supplierId!=null">
+        AND supplier_id = #{supplierId}
+      </if>
+      <if test="month!=null">
+        AND month = #{month}
+      </if>
+      <if test="states!=null">
+        AND states = #{states}
+      </if>
+    </where>
+  </select>
+
+  <update id="doPublishSupplierLevel" parameterType="java.util.Map">
+    update supplier_level
+    set  states = 2
+    where states = 1 and id in
+    <foreach collection="list" open="(" close=")" separator="," item="id" >
+      #{id}
+    </foreach>
+  </update>
+
+  <update id="doUnPublishSupplierLevel" parameterType="java.util.Map">
+    update supplier_level
+    set  states = 1
+    where states = 2 and id in
+    <foreach collection="list" open="(" close=")" separator="," item="id" >
+      #{id}
+    </foreach>
+  </update>
+
+</mapper>
