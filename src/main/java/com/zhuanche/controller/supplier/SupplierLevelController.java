@@ -12,9 +12,14 @@ import com.zhuanche.entity.driver.SupplierLevelAdditional;
 import com.zhuanche.serv.supplier.SupplierLevelService;
 import com.zhuanche.util.Common;
 import com.zhuanche.util.excel.CsvUtils;
+import com.zhuanche.util.excel.CsvUtils2File;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.POIXMLDocument;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -26,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -173,21 +179,6 @@ public class SupplierLevelController {
         }
     }
 
-//    @RequestMapping(value="dodeletebysupplierleveladditionalid",method= {RequestMethod.GET,RequestMethod.POST})
-//    @ResponseBody
-//    public AjaxResponse dodeletebysupplierlevelid(
-//            @RequestParam(value = "supplierLevelAdditionalId", required = true)Integer supplierLevelAdditionalId,
-//            HttpServletRequest request, HttpServletResponse response, ModelMap modelMap){
-//        try{
-//            logger.info("根据供应商等级附加分的id进行删除附加分，参数为：supplierLevelAdditionalId="+supplierLevelAdditionalId );
-//            supplierLevelService.doDeleteBySupplierLevelAdditionalId(supplierLevelAdditionalId);
-//            return AjaxResponse.success(Boolean.TRUE);
-//
-//        }catch (Exception e){
-//            logger.error("根据供应商等级附加分的id进行删除附加分异常，参数为：supplierLevelAdditionalId="+supplierLevelAdditionalId ,e);
-//            return AjaxResponse.fail(-1,"根据供应商等级附加分的id进行删除附加分异常");
-//        }
-//    }
     @RequestMapping(value="export",method= {RequestMethod.GET,RequestMethod.POST})
     @ResponseBody
     public AjaxResponse export(
@@ -400,23 +391,27 @@ public class SupplierLevelController {
 
     /**
      * 导入供应商附加分
-     * @param filename
+     * @param file
      * @param month
      * @param request
      * @return
      */
     @ResponseBody
     @RequestMapping("/importsupplierleveladditional")
-    public AjaxResponse importCarStatus(@RequestParam(value = "filename", required = true)String filename,
+    public AjaxResponse importCarStatus(
+                //@RequestParam(value = "filename", required = true)String filename,
+                MultipartFile file,
                                         @RequestParam(value = "month", required = true)String month,
                                         HttpServletRequest request){
 
-        logger.info("导入供应商等级信息:参数filename=" + filename);
+        logger.info("导入供应商等级信息:month=" + month+",fileSize="+(file==null?"null":file.getSize()));
         //解析要导入的文档
-        Map<String, Object> result = _doPareImportData(  filename, month,    request);
+        Map<String, Object> result = _doPareImportData(    file, month,    request);
         //有异常则标识导入失败
         if(result.get("error")==Boolean.TRUE){
-            return AjaxResponse.fail(-1,result);
+            AjaxResponse errorAjaxResponse = AjaxResponse.fail(-1,"导入失败");
+            errorAjaxResponse.setData(result);
+            return errorAjaxResponse;
         }else{
             //无异常则数据入库
             List<SupplierLevelAdditional> supplierLevelAdditionalDtos = (List<SupplierLevelAdditional>) result.get("dataList");
@@ -444,21 +439,19 @@ public class SupplierLevelController {
         }
     }
 
-    private Map<String, Object> _doPareImportData(String filename,String month,   HttpServletRequest request){
+    private Map<String, Object> _doPareImportData(MultipartFile file,String month,   HttpServletRequest request){
 
 
-        String path  = Common.getPath(request);
-        String dirPath = path+filename;
-        File DRIVERINFO = new File(dirPath);
+
         Map<String, Object> result = new HashMap<String, Object>();
         String download = null;
         List<JSONObject> listException = new ArrayList<>();
 
         List<SupplierLevelAdditional> supplierLevelAdditionalDtoList = new ArrayList<>();
         try {
-            InputStream is = new FileInputStream(DRIVERINFO);
+            InputStream is = file.getInputStream();
             Workbook workbook = null;
-            String fileType = filename.split("\\.")[1];
+            String fileType = file.getOriginalFilename().split("\\.")[1];
             if (fileType.equals("xls")) {
                 workbook = new HSSFWorkbook(is);
             } else if (fileType.equals("xlsx")) {
@@ -478,21 +471,51 @@ public class SupplierLevelController {
 
             int minRowIx = 1;// 过滤掉标题，从第一行开始导入数据
             int maxRowIx = sheet.getLastRowNum(); // 要导入数据的总条数
-            // int successCount = 0;// 成功导入条数
 
             Boolean haveError = false;
             String supplierName = null;
             String itemName = null;
             String itemValue = null;
 
-
+            Cell cell0 =null;
+            Cell cell1 =null;
+            Cell cell2 =null;
             for (int rowIx = minRowIx; rowIx <= maxRowIx; rowIx++) {
+                  cell0 =null;
+                  cell1 =null;
+                  cell2 =null;
+
                 Row row = sheet.getRow(rowIx); // 获取行对象
+                cell0 = row.getCell(0);
+                cell1 = row.getCell(1);
+                cell2 = row.getCell(2);
+                if(cell0 == null){
+                    supplierName = null;
+                }else{
+                    supplierName = cell0.getStringCellValue();
+                }
+                if(StringUtils.isEmpty(supplierName)){
+                    continue;
+                }
 
-                supplierName = row.getCell(0).getStringCellValue();
+                if(cell1 == null){
+                    itemName = null;
+                }else{
+                    itemName = cell1.getStringCellValue();
+                }
+                if(StringUtils.isEmpty(itemName)){
+                    continue;
+                }
 
-                itemName = row.getCell(1).getStringCellValue();
-                itemValue = row.getCell(2).getStringCellValue();
+                if(cell2 == null){
+                    itemValue = null;
+                }else{
+                    itemValue = cell2.getNumericCellValue()+"";
+                }
+
+
+
+
                 ImportCheckEntity checkResult = checkEntity(rowIx,supplierName,itemName,itemValue,month);
 
 
@@ -506,9 +529,9 @@ public class SupplierLevelController {
                 }else {
                     //数据无效
                     JSONObject error = new JSONObject();
-                    error.put("supplierName","");
-                    error.put("itemName","");
-                    error.put("itemValue","");
+                    error.put("supplierName",supplierName);
+                    error.put("itemName",itemName);
+                    error.put("itemValue",itemValue);
                     error.put("errorReason",checkResult.getReason());
 
                     listException.add(error);
@@ -518,25 +541,21 @@ public class SupplierLevelController {
 
             }
 
-            Workbook wb = null;
+//            Workbook wb = null;
             try {
                 // 将错误列表导出
                 if (listException.size() > 0) {
                     Date now = new Date();
-                    wb = exportExcel(request.getServletContext().getRealPath("/")+ "template" + File.separator + "supplierLevel_exception"+now.getTime()+".xlsx", listException);
-                    download = exportExcelFromTempletToLoacl(request, wb,
-                            new String("ERROR".getBytes("utf-8"), "iso8859-1"));
+                    //保存文件
+                    String fileName =  new String("ERROR".getBytes("utf-8"), "iso8859-1");
+
+                    download = "/template/error/" + fileName + buildRandom(2) + "_"+ System.currentTimeMillis() + ".csv";
+                   boolean exportResult = exportExcel(CommonConfig.ERROR_BASE_FILE+download, listException);
+               
+
                 }
             } catch (Exception e) {
                 logger.error("导入供应商等级的附加分异常" ,e);
-            }finally {
-                if (listException.size() > 0) {
-                    try {
-                        wb.close();
-                    } catch (IOException e) {
-                        logger.error("导入供应商等级的附加分异常" ,e);
-                    }
-                }
             }
         } catch (Exception e) {
             logger.error("车辆状态文件导入异常" ,e);
@@ -553,13 +572,27 @@ public class SupplierLevelController {
 
         if(listException.size() == 0){
             result.put("error", false);
+            result.put("dataList", supplierLevelAdditionalDtoList);
         }else {
             result.put("error", true);
-            result.put("dataList", supplierLevelAdditionalDtoList);
+
         }
         return result;
     }
 
+    public static Workbook create(InputStream in) throws
+            IOException, InvalidFormatException {
+        if (!in.markSupported()) {
+            in = new PushbackInputStream(in, 8);
+        }
+        if (POIFSFileSystem.hasPOIFSHeader(in)) {
+            return new HSSFWorkbook(in);
+        }
+        if (POIXMLDocument.hasOOXMLHeader(in)) {
+            return new XSSFWorkbook(OPCPackage.open(in));
+        }
+        throw new IllegalArgumentException("你的excel版本目前poi解析不了");
+    }
     public ImportCheckEntity checkEntity(Integer rowNum,String supplierName,String itemName,String itemValue,String month){
         ImportCheckEntity result = new ImportCheckEntity();
         result.setResult(true);
@@ -593,42 +626,34 @@ public class SupplierLevelController {
         }
         return result;
     }
-    public Workbook exportExcel(String path,
+    public boolean exportExcel(String path,
                                 List<JSONObject> list) throws Exception {
-        FileInputStream io = new FileInputStream(path);
-        // 创建 excel
-        Workbook wb = new XSSFWorkbook(io);
+
+
 
         if (list != null && list.size() > 0) {
-            Sheet sheet = wb.getSheetAt(0);
-
+            File f = new File(path);
+            List<String > errorList = new ArrayList<>();
             int i = 0;
             for (JSONObject s : list) {
-                Row row = sheet.createRow(i + 1);
-                row.createCell(0).setCellValue(s.getString("supplierName"));
-                row.createCell(1).setCellValue(s.getString("itemName"));
-                row.createCell(1).setCellValue(s.getString("itemValue"));
-                row.createCell(1).setCellValue(s.getString("errorReason"));
+                StringBuffer stringBuffer = new StringBuffer();
+                stringBuffer.append(s.containsKey("supplierName")? s.getString("supplierName"):"");
+                stringBuffer.append(",");
+                stringBuffer.append(s.containsKey("itemName")?s.getString("itemName"):"");
+                stringBuffer.append(",");
+                stringBuffer.append(s.containsKey("itemValue")?s.getString("itemValue"):"");
+                stringBuffer.append(",");
+                stringBuffer.append(s.containsKey("errorReason")?s.getString("errorReason"):"");
+                errorList.add(stringBuffer.toString());
                 i++;
             }
+
+            CsvUtils2File.exportCsv(f,errorList);
         }
-        return wb;
+        return true;
     }
 
-    public String exportExcelFromTempletToLoacl(HttpServletRequest request,
-                                                Workbook wb, String fileName) throws Exception {
-        if (StringUtils.isEmpty(fileName)) {
-           throw new RuntimeException("fileName不能为空");
-        }
-        // 生成文件相对路径
-        String fileURI = "/template/error/" + fileName + buildRandom(2) + "_"
-                + System.currentTimeMillis() + ".xlsx";
 
-        FileOutputStream fos = new FileOutputStream(CommonConfig.ERROR_BASE_FILE + fileURI);
-        wb.write(fos);
-        fos.close();
-        return fileURI;
-    }
     public int buildRandom(int length) {
         int num = 1;
         double random = Math.random();
