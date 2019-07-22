@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -238,7 +239,20 @@ public class DriverDailyReportController extends DriverQueryController {
 		searchParam.put("sortOrder",sortOrder);
 		searchParam.put("groupIds",groupIds);
 		searchParam.put("reportType",reportType);
+		Integer userId = WebSessionUtil.getCurrentLoginUser().getId();
+		String key = userId + searchParam.toString();
 
+		String str = RedisCacheUtil.get(key,String.class);
+		try {
+			if(str != null){
+                log.info("当前请求是重复请求！请求参数：" + str);
+                return "";
+            }
+
+			RedisCacheUtil.set(key,key,5);
+		} catch (Exception e) {
+			log.error("缓存错误",e);
+		}
 
 		//默认报告类型为日报
 		String fileTag = "";
