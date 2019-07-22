@@ -114,7 +114,7 @@ public class SupplierLevelServiceImpl  implements  SupplierLevelService{
     }
 
     @Override
-    public void doDeleteBySupplierLevelId(Integer supplierLevelAdditionalId) {
+    public void doDeleteBySupplierLevelAdditionalId(Integer supplierLevelAdditionalId) {
         logger.info("删除供应商的附加信息，supplierLevelAdditionalId="+supplierLevelAdditionalId);
         supplierLevelAdditionalMapper.deleteByPrimaryKey(supplierLevelAdditionalId);
     }
@@ -139,5 +139,16 @@ public class SupplierLevelServiceImpl  implements  SupplierLevelService{
             logger.info("导入供应商附加分，但是list为null");
         }
 
+    }
+
+    @Override
+    public SupplierLevel findByMonthAndSupplierName(String month, String supplierName) {
+        SupplierLevel entity = supplierLevelexMapper.findByMonthAndSupplierName(month,supplierName);
+        return entity;
+    }
+
+    @Override
+    public SupplierLevelAdditional findBySupplierLevelIdAndSupplierLevelAdditionalName(Integer supplierLevelId, String supplierLevelAdditionalName) {
+        return supplierLevelAdditionalExMapper.findBySupplierLevelIdAndSupplierLevelAdditionalName(supplierLevelId,supplierLevelAdditionalName);
     }
 }

@@ -10,4 +10,6 @@ import java.util.List;
 public interface SupplierLevelAdditionalExMapper {
 
     List<SupplierLevelAdditional> findbySupplierLevelId(@Param("supplierLevelId") Integer supplierLevelId );
+
+    SupplierLevelAdditional findBySupplierLevelIdAndSupplierLevelAdditionalName(@Param("supplierLevelId") Integer supplierLevelId, @Param("itemName") String itemName);
 }

@@ -16,4 +16,6 @@ public interface SupplierLevelAdditionalMapper {
     int updateByPrimaryKeySelective(SupplierLevelAdditional record);
 
     int updateByPrimaryKey(SupplierLevelAdditional record);
+
+    SupplierLevelAdditional findBySupplierLevelIdAndSupplierLevelAdditionalName(Integer supplierLevelId, String supplierLevelAdditionalName);
 }

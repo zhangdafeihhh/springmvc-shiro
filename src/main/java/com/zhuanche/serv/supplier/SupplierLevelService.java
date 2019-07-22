@@ -36,11 +36,22 @@ public interface SupplierLevelService {
      * 删除供应商等级-附加分项目
      * @param supplierLevelAdditionalId
      */
-    public void doDeleteBySupplierLevelId(Integer supplierLevelAdditionalId);
+    public void doDeleteBySupplierLevelAdditionalId(Integer supplierLevelAdditionalId);
 
     /**
      * 批量导入附加分
      * @param list
      */
     public void doImportSupplierLevelAdditional(List<SupplierLevelAdditional> list);
+
+    /**
+     * 根据供应商名称和月份来查询供应商等级信息
+     * @param month
+     * @param supplierName
+     * @return
+     */
+    SupplierLevel findByMonthAndSupplierName(String month, String supplierName);
+
+
+    public SupplierLevelAdditional findBySupplierLevelIdAndSupplierLevelAdditionalName(Integer supplierLevelId,String supplierLevelAdditionalName);
 }

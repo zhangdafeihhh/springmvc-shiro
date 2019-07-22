@@ -7,6 +7,8 @@ public class ImportCheckEntity {
 
     private Integer rowNum;
 
+    private Integer foreignId;
+
     //失败原因
     private String reason;
 
@@ -32,5 +34,13 @@ public class ImportCheckEntity {
 
     public void setRowNum(Integer rowNum) {
         this.rowNum = rowNum;
+    }
+
+    public Integer getForeignId() {
+        return foreignId;
+    }
+
+    public void setForeignId(Integer foreignId) {
+        this.foreignId = foreignId;
     }
 }

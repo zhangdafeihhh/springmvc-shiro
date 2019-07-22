@@ -14,4 +14,6 @@ public interface SupplierLevelExMapper {
     void doPublishSupplierLevel(@Param("list") List<Integer> idList);
 
     void doUnPublishSupplierLevel(@Param("list") List<Integer> idList);
+
+    SupplierLevel findByMonthAndSupplierName(@Param("month")String month,@Param("supplierName") String supplierName);
 }

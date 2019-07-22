@@ -22,4 +22,11 @@
     where supplier_level_id = #{supplierLevelId,jdbcType=INTEGER}
   </select>
 
+  <select id="findBySupplierLevelIdAndSupplierLevelAdditionalName" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from supplier_level_additional
+    where supplier_level_id = #{supplierLevelId,jdbcType=INTEGER} and item_name=#{itemName}
+  </select>
+
 </mapper>

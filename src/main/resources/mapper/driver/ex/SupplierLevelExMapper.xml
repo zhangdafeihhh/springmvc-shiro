@@ -63,4 +63,11 @@
     </foreach>
   </update>
 
+  <select id="findByMonthAndSupplierName" parameterType="com.zhuanche.entity.driver.SupplierLevel" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from supplier_level where  month = #{month} and  supplier_name = #{supplierName}
+
+  </select>
+
 </mapper>
