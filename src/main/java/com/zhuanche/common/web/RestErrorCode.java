@@ -145,6 +145,9 @@ public final class RestErrorCode{
 	@ResultMessage("该司机没有被锁定")
 	public static final int DRIVER_NOT_LOCKED                           =3106;
 
+	@ResultMessage("月份大于当前月份")
+	public static final int MONTH_IS_BIG                           =3300;
+
 	//-----------------------------------------------业务参数：导入文件
 	@ResultMessage("文件异常")
 	public static final int FILE_ERROR                    = 4001;

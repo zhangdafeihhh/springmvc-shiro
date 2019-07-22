@@ -7,6 +7,7 @@ import com.google.common.collect.Maps;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.rocketmq.ExcelProducer;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.constants.SaasConst;
@@ -34,6 +35,7 @@ import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizModelExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
+import okhttp3.internal.http2.ErrorCode;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
@@ -364,7 +366,13 @@ public class SaasDriverDailyReportController {
                                  @Verify(param="pageNum",rule="required|min(1)") Integer pageNum,
                                  @Verify(param="pageSize",rule="required|min(10)") Integer pageSize){
         //如果月份大于当前月份 直接返回错误信息
+        String requestMonth = month+"-01";
 
+        boolean bl = DateUtil.isBig(requestMonth);
+        if (!bl){
+            logger.info("月份大于当前日期");
+            return AjaxResponse.fail(RestErrorCode.MONTH_IS_BIG);
+        }
 
         List<CarBizSupplier> carBizSupplierList = null;
         List<CarDriverTeamDTO> listTeam = null;
