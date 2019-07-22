@@ -241,6 +241,7 @@ public class DateUtil {
 		return date.getTime();
 	}
 
+
 	/**
 	 * 得到本月的第一天
 	 * @author lunan
@@ -342,6 +343,23 @@ public class DateUtil {
 		ca.set(Calendar.DAY_OF_MONTH, 1);
 		ca.roll(Calendar.DAY_OF_MONTH, -1);
 		return getDateFormat().format(ca.getTime());
+	}
+
+	/**
+	 * 指定的 日期 yyyy-MM-dd 和当前日期作比较
+	 * @param str
+	 * @return
+	 */
+	public static boolean  isBig(String str){
+		String lastDay = getLastDayOfMonth(parseDate(str,dateFormatPattern));
+		String nowDate =getLastDayOfMonth(new Date());
+		Long last = formatDateToLong(lastDay);
+		Long now = formatDateToLong(nowDate);
+		if(last - now <= 0){
+			return  true;
+		}
+		return false;
+
 	}
 	/**
 	 * 获取指定日期所在月的最后一天
@@ -911,7 +929,9 @@ public class DateUtil {
     }
 
 	public static void main(String[] args) throws Exception{
-		System.out.println(getMonthSpace("2017-08-23","2017-12-12"));
+		System.out.println(isBig("2019-01-29"));
+		System.out.println(System.currentTimeMillis());
+		//System.out.println(getMonthSpace("2017-08-23","2017-12-12"));
 	}
 
 

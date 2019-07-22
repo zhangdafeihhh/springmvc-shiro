@@ -25,6 +25,7 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.DateUtils;
+import com.zhuanche.util.dateUtil.DateUtil;
 import mapper.bigdata.ex.BiDriverBusinessInfoDayReportExMapper;
 import mapper.bigdata.ex.BiDriverBusinessInfoMonthReportExMapper;
 import mapper.bigdata.ex.BiDriverBusinessInfoSummaryReportExMapper;
@@ -266,6 +267,7 @@ public class SaasDriverDailyReportController {
         Map<String,String> map = Maps.newHashMap();
         try {
             logger.info("导出司机日报操作");
+
            // logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"导出司机周/月列表2.0");
         } catch (Exception e) {
         }
@@ -361,6 +363,9 @@ public class SaasDriverDailyReportController {
                                  @Param("badCntSort")String badCntSort,
                                  @Verify(param="pageNum",rule="required|min(1)") Integer pageNum,
                                  @Verify(param="pageSize",rule="required|min(10)") Integer pageSize){
+        //如果月份大于当前月份 直接返回错误信息
+
+
         List<CarBizSupplier> carBizSupplierList = null;
         List<CarDriverTeamDTO> listTeam = null;
         Map<Integer,String> supplierMap = Maps.newHashMap();
@@ -497,9 +502,17 @@ public class SaasDriverDailyReportController {
         Map<String,String> map = Maps.newHashMap();
         try {
             logger.info("导出司机月报操作");
+            String requestMonth = month+"-01";
+
+            boolean bl = DateUtil.isBig(requestMonth);
+            if (!bl){
+                logger.info("月份大于当前日期");
+                return AjaxResponse.success(null);
+
+            }
             // logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"导出司机周/月列表2.0");
         } catch (Exception e) {
-
+            map.put("code","200");
         }
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
         JSONObject obj = new JSONObject();
@@ -710,6 +723,7 @@ public class SaasDriverDailyReportController {
         Map<String,String> map = Maps.newHashMap();
         try {
             logger.info("导出司机营业汇总操作");
+            return AjaxResponse.success(null);
             // logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"导出司机周/月列表2.0");
         } catch (Exception e) {
 
