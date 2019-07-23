@@ -354,24 +354,15 @@ public class BusAssignmentService {
         Integer supplierId = params.getSupplierId();
         Set<Integer> authOfCity = WebSessionUtil.getCurrentLoginUser().getCityIds(); // 普通管理员可以管理的所有城市ID
         Set<Integer> authOfSupplier = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); // 普通管理员可以管理的所有供应商ID
-        if (cityId == null && authOfCity != null) {
-            int size = authOfCity.size();
-            if (size == 1) {
-                authOfCity.stream().findFirst().ifPresent(params::setCityId);
-            } else {
-                cityIds = StringUtils.join(authOfCity, ",");
-            }
-        }
-        if (Integer.valueOf(10103).equals(params.getStatus())) {// 指派列表不限制供应商
-            params.setSupplierId(null);
-            supplierIds = null;
+        if (Integer.valueOf(10103).equals(params.getStatus())) {
+            // 指派列表不限制供应商
+            //params.setSupplierId(null);
+            //supplierIds = null;
             //指派列表根据供应商过滤订单
             SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
             boolean accountIsAdmin = WebSessionUtil.isSupperAdmin();
-            Set<Integer> cityIdList = user.getCityIds();
-            Set<Integer> supplierIdList = user.getSupplierIds();
-            String citiesStr = cityIdList.stream().map( c -> String.valueOf(c) ).collect(Collectors.joining(","));
-            String suppliersStr = supplierIdList.stream().map( c -> String.valueOf(c) ).collect(Collectors.joining(","));
+            String citiesStr = authOfCity.stream().map( c -> String.valueOf(c) ).collect(Collectors.joining(","));
+            String suppliersStr = authOfSupplier.stream().map( c -> String.valueOf(c) ).collect(Collectors.joining(","));
             if (!accountIsAdmin && StringUtils.isNotBlank(citiesStr)) {
                 Integer serviceCityId = params.getCityId();
                 if (serviceCityId != null) {
@@ -392,7 +383,7 @@ public class BusAssignmentService {
                 if (StringUtils.isBlank(suppliersStr)) {
                     // 查询该城市下的所有的供应商
                     Map<String,Set<Integer>> cityIdsMap = Maps.newHashMap();
-                    cityIdsMap.put("cityIds",cityIdList);
+                    cityIdsMap.put("cityIds",authOfCity);
                     List<Integer> supplierIdByCitys = busCarBizSupplierExMapper.querySupplierIdByCitys(cityIdsMap);
                     suppliersStr = supplierIdByCitys.stream().map( c -> String.valueOf(c) ).collect(Collectors.joining(","));
                 }
@@ -415,6 +406,14 @@ public class BusAssignmentService {
                 params.setCrossDomainBusinessIds(StringUtils.defaultIfBlank(StringUtils.join(remoteBindList, ","), StringUtils.EMPTY));
             }
         } else if (supplierId == null && authOfSupplier != null) {
+            if (cityId == null && authOfCity != null) {
+                int size = authOfCity.size();
+                if (size == 1) {
+                    authOfCity.stream().findFirst().ifPresent(params::setCityId);
+                } else {
+                    cityIds = StringUtils.join(authOfCity, ",");
+                }
+            }
             int size = authOfSupplier.size();
             if (size == 1) {
                 authOfSupplier.stream().findFirst().ifPresent(params::setSupplierId);
