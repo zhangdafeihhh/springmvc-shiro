@@ -1,40 +1,11 @@
 package com.zhuanche.serv.busManage;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import com.zhuanche.entity.mdbcarmanage.BusBizDriverViolators;
-import com.zhuanche.entity.rentcar.*;
-import com.zhuanche.vo.busManage.*;
-import mapper.rentcar.ex.*;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -44,28 +15,39 @@ import com.zhuanche.constants.busManage.EnumOrder;
 import com.zhuanche.constants.busManage.EnumOrderType;
 import com.zhuanche.constants.busManage.EnumPayType;
 import com.zhuanche.constants.busManage.EnumServiceType;
-import com.zhuanche.dto.busManage.BusCarDTO;
-import com.zhuanche.dto.busManage.BusCarRicherDTO;
-import com.zhuanche.dto.busManage.BusDriverDTO;
-import com.zhuanche.dto.busManage.BusDriverRicherDTO;
-import com.zhuanche.dto.busManage.BusOrderDTO;
+import com.zhuanche.dto.busManage.*;
 import com.zhuanche.entity.busManage.BusCostDetail;
 import com.zhuanche.entity.busManage.BusOrderPayExport;
 import com.zhuanche.entity.busManage.OrgCostInfo;
 import com.zhuanche.entity.mdbcarmanage.BusOrderOperationTime;
+import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.mongo.DriverMongo;
 import com.zhuanche.serv.mongo.BusDriverMongoService;
+import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.BeanUtil;
-import com.zhuanche.util.Common;
-import com.zhuanche.util.DateUtils;
-import com.zhuanche.util.MapUrlParamUtils;
-import com.zhuanche.util.MyRestTemplate;
-import com.zhuanche.util.SignUtils;
-
+import com.zhuanche.util.*;
+import com.zhuanche.vo.busManage.*;
 import mapper.mdbcarmanage.ex.BusOrderOperationTimeExMapper;
 import mapper.rentcar.CarBizServiceMapper;
+import mapper.rentcar.ex.*;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service("busAssignmentService")
 public class BusAssignmentService {
@@ -109,6 +91,8 @@ public class BusAssignmentService {
     private BusDriverMongoService busDriverMongoService;
     @Autowired
     private BusCarViolatorsService busCarViolatorsService;
+    @Autowired
+    private BusCarBizSupplierExMapper busCarBizSupplierExMapper;
 
     @Autowired
     @Qualifier("busAssignmentTemplate")
@@ -138,6 +122,8 @@ public class BusAssignmentService {
      */
     private String ORDER_INFO_URL="/busOrder/selectOrderInfo";
 
+    private static String COMPANY_SUPPLIER_URL="/api/v1/inside/company/supplier/findCompanyAll";
+
 
 
     /**
@@ -150,6 +136,54 @@ public class BusAssignmentService {
     @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
     public PageDTO selectList(BusOrderDTO params) {
         try {
+            SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+            boolean accountIsAdmin = WebSessionUtil.isSupperAdmin();
+            Set<Integer> cityIds = user.getCityIds();
+            Set<Integer> supplierIds = user.getSupplierIds();
+            String citiesStr = cityIds.stream().map( c -> String.valueOf(c) ).collect(Collectors.joining(","));
+            String suppliersStr = supplierIds.stream().map( c -> String.valueOf(c) ).collect(Collectors.joining(","));
+            if (!accountIsAdmin && StringUtils.isNotBlank(citiesStr)) {
+                Integer cityId = params.getCityId();
+                if (cityId != null) {
+                    String[] cities = citiesStr.split(",");
+                    boolean cityFlag = false;
+                    for (String c : cities) {
+                        if (String.valueOf(cityId).equals(c)) {
+                            cityFlag = true;
+                            break;
+                        }
+                    }
+                    if (!cityFlag) {
+                        logger.warn(user.getName()+ " 没有查询该城市的权限，cityId=：" + cityId);
+                        return new PageDTO(params.getPageNum(), params.getPageSize(), 0, Lists.newArrayList());
+                    }
+                }
+                // 如果城市权限不为空，但是供应商权限为空，查询城市权限下所有的供应商
+                if (StringUtils.isBlank(suppliersStr)) {
+                    // 查询该城市下的所有的供应商
+                    Map<String,Set<Integer>> cityIdsMap = Maps.newHashMap();
+                    cityIdsMap.put("cityIds",cityIds);
+                    List<Integer> supplierIdByCitys = busCarBizSupplierExMapper.querySupplierIdByCitys(cityIdsMap);
+                    suppliersStr = supplierIdByCitys.stream().map( c -> String.valueOf(c) ).collect(Collectors.joining(","));
+                }
+                // 将该用户权限下的所有供应商，传入企业接口查询所有跟该企业绑定的供应商，以及 所有存在绑定关系的企业
+                Map<String,Object> supplierParam = Maps.newHashMap();
+                supplierParam.put("supplierIds",suppliersStr);
+                String url = businessRestBaseUrl + COMPANY_SUPPLIER_URL ;
+                JSONObject company = MpOkHttpUtil.okHttpGetBackJson(url, supplierParam, 3000, "指派列表调用企业接口");
+                logger.info("指派列表调用企业接口返回结果=" + JSON.toJSONString(company));
+                if (company == null || company.getInteger("code") == null || company.getInteger("code") != 0) {
+                    return new PageDTO();
+                }
+                JSONObject data = company.getJSONObject("data");
+                JSONArray allList = data.getJSONArray("allList");
+                JSONArray supplierOfList = data.getJSONArray("supplierOfList");// 权限供应商下绑定的企业ID
+                JSONArray remoteBindList = data.getJSONArray("remoteBindList");
+
+                params.setBusinessIds(StringUtils.defaultIfBlank(StringUtils.join(allList, ","), StringUtils.EMPTY));
+                params.setSpecialBusinessIds(StringUtils.defaultIfBlank(StringUtils.join(supplierOfList, ","), StringUtils.EMPTY));
+                params.setCrossDomainBusinessIds(StringUtils.defaultIfBlank(StringUtils.join(remoteBindList, ","), StringUtils.EMPTY));
+            }
             JSONObject result = queryOrderData(params);
             if (result == null) {
                 return new PageDTO();
