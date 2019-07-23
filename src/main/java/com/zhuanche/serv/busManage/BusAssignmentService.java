@@ -460,8 +460,9 @@ public class BusAssignmentService {
         logger.info("[ BusAssignmentService-selectList ] 请求参数   paramMap={}", paramMap);
 
         // 请求接口
-        String response = carRestTemplate.postForObject(BusConst.Order.SELECT_ORDER_LIST, JSONObject.class, paramMap);
-        JSONObject result = JSON.parseObject(response);
+        JSONObject result = MpOkHttpUtil.okHttpGetBackJson(ORDER_API_URL + BusConst.Order.SELECT_ORDER_LIST, paramMap, 3000, "查询订单列表");
+        //String response = carRestTemplate.postForObject(BusConst.Order.SELECT_ORDER_LIST, JSONObject.class, paramMap);
+        //JSONObject result = JSON.parseObject(response);
         int code = result.getIntValue("code");
         String msg = result.getString("msg");
 
