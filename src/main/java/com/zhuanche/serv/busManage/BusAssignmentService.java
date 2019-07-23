@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
@@ -136,54 +135,7 @@ public class BusAssignmentService {
     @MasterSlaveConfigs(configs = @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE))
     public PageDTO selectList(BusOrderDTO params) {
         try {
-            SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
-            boolean accountIsAdmin = WebSessionUtil.isSupperAdmin();
-            Set<Integer> cityIds = user.getCityIds();
-            Set<Integer> supplierIds = user.getSupplierIds();
-            String citiesStr = cityIds.stream().map( c -> String.valueOf(c) ).collect(Collectors.joining(","));
-            String suppliersStr = supplierIds.stream().map( c -> String.valueOf(c) ).collect(Collectors.joining(","));
-            if (!accountIsAdmin && StringUtils.isNotBlank(citiesStr)) {
-                Integer cityId = params.getCityId();
-                if (cityId != null) {
-                    String[] cities = citiesStr.split(",");
-                    boolean cityFlag = false;
-                    for (String c : cities) {
-                        if (String.valueOf(cityId).equals(c)) {
-                            cityFlag = true;
-                            break;
-                        }
-                    }
-                    if (!cityFlag) {
-                        logger.warn(user.getName()+ " 没有查询该城市的权限，cityId=：" + cityId);
-                        return new PageDTO(params.getPageNum(), params.getPageSize(), 0, Lists.newArrayList());
-                    }
-                }
-                // 如果城市权限不为空，但是供应商权限为空，查询城市权限下所有的供应商
-                if (StringUtils.isBlank(suppliersStr)) {
-                    // 查询该城市下的所有的供应商
-                    Map<String,Set<Integer>> cityIdsMap = Maps.newHashMap();
-                    cityIdsMap.put("cityIds",cityIds);
-                    List<Integer> supplierIdByCitys = busCarBizSupplierExMapper.querySupplierIdByCitys(cityIdsMap);
-                    suppliersStr = supplierIdByCitys.stream().map( c -> String.valueOf(c) ).collect(Collectors.joining(","));
-                }
-                // 将该用户权限下的所有供应商，传入企业接口查询所有跟该企业绑定的供应商，以及 所有存在绑定关系的企业
-                Map<String,Object> supplierParam = Maps.newHashMap();
-                supplierParam.put("supplierIds",suppliersStr);
-                String url = businessRestBaseUrl + COMPANY_SUPPLIER_URL ;
-                JSONObject company = MpOkHttpUtil.okHttpGetBackJson(url, supplierParam, 3000, "指派列表调用企业接口");
-                logger.info("指派列表调用企业接口返回结果=" + JSON.toJSONString(company));
-                if (company == null || company.getInteger("code") == null || company.getInteger("code") != 0) {
-                    return new PageDTO();
-                }
-                JSONObject data = company.getJSONObject("data");
-                JSONArray allList = data.getJSONArray("allList");
-                JSONArray supplierOfList = data.getJSONArray("supplierOfList");// 权限供应商下绑定的企业ID
-                JSONArray remoteBindList = data.getJSONArray("remoteBindList");
 
-                params.setBusinessIds(StringUtils.defaultIfBlank(StringUtils.join(allList, ","), StringUtils.EMPTY));
-                params.setSpecialBusinessIds(StringUtils.defaultIfBlank(StringUtils.join(supplierOfList, ","), StringUtils.EMPTY));
-                params.setCrossDomainBusinessIds(StringUtils.defaultIfBlank(StringUtils.join(remoteBindList, ","), StringUtils.EMPTY));
-            }
             JSONObject result = queryOrderData(params);
             if (result == null) {
                 return new PageDTO();
@@ -413,6 +365,55 @@ public class BusAssignmentService {
         if (Integer.valueOf(10103).equals(params.getStatus())) {// 指派列表不限制供应商
             params.setSupplierId(null);
             supplierIds = null;
+            //指派列表根据供应商过滤订单
+            SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+            boolean accountIsAdmin = WebSessionUtil.isSupperAdmin();
+            Set<Integer> cityIdList = user.getCityIds();
+            Set<Integer> supplierIdList = user.getSupplierIds();
+            String citiesStr = cityIdList.stream().map( c -> String.valueOf(c) ).collect(Collectors.joining(","));
+            String suppliersStr = supplierIdList.stream().map( c -> String.valueOf(c) ).collect(Collectors.joining(","));
+            if (!accountIsAdmin && StringUtils.isNotBlank(citiesStr)) {
+                Integer serviceCityId = params.getCityId();
+                if (serviceCityId != null) {
+                    String[] cities = citiesStr.split(",");
+                    boolean cityFlag = false;
+                    for (String c : cities) {
+                        if (String.valueOf(cityId).equals(c)) {
+                            cityFlag = true;
+                            break;
+                        }
+                    }
+                    if (!cityFlag) {
+                        logger.warn(user.getName()+ " 没有查询该城市的权限，cityId=：" + cityId);
+                        return null;
+                    }
+                }
+                // 如果城市权限不为空，但是供应商权限为空，查询城市权限下所有的供应商
+                if (StringUtils.isBlank(suppliersStr)) {
+                    // 查询该城市下的所有的供应商
+                    Map<String,Set<Integer>> cityIdsMap = Maps.newHashMap();
+                    cityIdsMap.put("cityIds",cityIdList);
+                    List<Integer> supplierIdByCitys = busCarBizSupplierExMapper.querySupplierIdByCitys(cityIdsMap);
+                    suppliersStr = supplierIdByCitys.stream().map( c -> String.valueOf(c) ).collect(Collectors.joining(","));
+                }
+                // 将该用户权限下的所有供应商，传入企业接口查询所有跟该企业绑定的供应商，以及 所有存在绑定关系的企业
+                Map<String,Object> supplierParam = Maps.newHashMap();
+                supplierParam.put("supplierIds",suppliersStr);
+                String url = businessRestBaseUrl + COMPANY_SUPPLIER_URL ;
+                JSONObject company = MpOkHttpUtil.okHttpGetBackJson(url, supplierParam, 3000, "指派列表调用企业接口");
+                logger.info("指派列表调用企业接口返回结果=" + JSON.toJSONString(company));
+                if (company == null || company.getInteger("code") == null || company.getInteger("code") != 0) {
+                    return null;
+                }
+                JSONObject data = company.getJSONObject("data");
+                JSONArray allList = data.getJSONArray("allList");
+                JSONArray supplierOfList = data.getJSONArray("supplierOfList");// 权限供应商下绑定的企业ID
+                JSONArray remoteBindList = data.getJSONArray("remoteBindList");
+
+                params.setBusinessIds(StringUtils.defaultIfBlank(StringUtils.join(allList, ","), StringUtils.EMPTY));
+                params.setSpecialBusinessIds(StringUtils.defaultIfBlank(StringUtils.join(supplierOfList, ","), StringUtils.EMPTY));
+                params.setCrossDomainBusinessIds(StringUtils.defaultIfBlank(StringUtils.join(remoteBindList, ","), StringUtils.EMPTY));
+            }
         } else if (supplierId == null && authOfSupplier != null) {
             int size = authOfSupplier.size();
             if (size == 1) {
