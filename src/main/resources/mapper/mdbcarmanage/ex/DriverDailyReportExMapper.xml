@@ -61,7 +61,7 @@
         and license_plates like CONCAT(#{licensePlates},'%')
       </if>
       <if test="driverName != null and driverName != '' " >
-        and driver_name = ${driverName}
+        and driver_name = '${driverName}'
       </if>
       <if test="driverIds != null and driverIds != '' ">
         and r.driver_id in (${driverIds})
@@ -139,7 +139,7 @@
       and license_plates like CONCAT(#{licensePlates},'%')
     </if>
     <if test="driverName != null and driverName != '' " >
-      and driver_name = ${driverName}
+      and driver_name = '${driverName}'
     </if>
     <if test="driverIds != null and driverIds != '' " >
       and driver_id in (${driverIds})
@@ -203,7 +203,7 @@
       and license_plates like '${licensePlates}%'
     </if>
     <if test="driverName != null and driverName != '' " >
-      and driver_name = ${driverName}
+      and driver_name = '${driverName}'
     </if>
     <if test="driverIds != null and driverIds != '' " >
       and driver_id in (${driverIds})
