@@ -262,4 +262,8 @@ public class OrderCostDetailInfo {
     private BigDecimal travelTimeShow = BigDecimal.ZERO;//超套餐时长
     private BigDecimal costAmount = BigDecimal.ZERO;//容器费值
     private String costName ;
+
+    private  BigDecimal systemDispatchFee = BigDecimal.ZERO;//平台调度费
+
+
 }
