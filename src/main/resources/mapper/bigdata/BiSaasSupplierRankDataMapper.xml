@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.bigdata.BiSaasSupplierRankDataMapper">
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.bigdata.BiSaasSupplierRankData">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="start_time" jdbcType="VARCHAR" property="startTime" />
+    <result column="end_time" jdbcType="VARCHAR" property="endTime" />
+    <result column="data_month" jdbcType="VARCHAR" property="dataMonth" />
+    <result column="settle_day" jdbcType="INTEGER" property="settleDay" />
+    <result column="supplier_id" jdbcType="INTEGER" property="supplierId" />
+    <result column="supplier_name" jdbcType="VARCHAR" property="supplierName" />
+    <result column="channel_discount_driver" jdbcType="DECIMAL" property="channelDiscountDriver" />
+    <result column="fact_order_driver_cnt" jdbcType="INTEGER" property="factOrderDriverCnt" />
+    <result column="bad_evaluate_num" jdbcType="INTEGER" property="badEvaluateNum" />
+    <result column="order_cnt_notchannel" jdbcType="INTEGER" property="orderCntNotchannel" />
+    <result column="bad_evaluate_rate" jdbcType="DECIMAL" property="badEvaluateRate" />
+    <result column="fact_order_driver_cnt_hb" jdbcType="INTEGER" property="factOrderDriverCntHb" />
+    <result column="fact_order_driver_cnt_hb_rate" jdbcType="DECIMAL" property="factOrderDriverCntHbRate" />
+    <result column="scale_score" jdbcType="INTEGER" property="scaleScore" />
+    <result column="efficiency_score" jdbcType="INTEGER" property="efficiencyScore" />
+    <result column="service_score" jdbcType="INTEGER" property="serviceScore" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, start_time, end_time, data_month, settle_day, supplier_id, supplier_name, channel_discount_driver, 
+    fact_order_driver_cnt, bad_evaluate_num, order_cnt_notchannel, bad_evaluate_rate, 
+    fact_order_driver_cnt_hb, fact_order_driver_cnt_hb_rate, scale_score, efficiency_score, 
+    service_score
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from bi_saas_supplier_rank_data
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from bi_saas_supplier_rank_data
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.bigdata.BiSaasSupplierRankData">
+    insert into bi_saas_supplier_rank_data (id, start_time, end_time, 
+      data_month, settle_day, supplier_id, 
+      supplier_name, channel_discount_driver, fact_order_driver_cnt, 
+      bad_evaluate_num, order_cnt_notchannel, bad_evaluate_rate, 
+      fact_order_driver_cnt_hb, fact_order_driver_cnt_hb_rate, 
+      scale_score, efficiency_score, service_score
+      )
+    values (#{id,jdbcType=INTEGER}, #{startTime,jdbcType=VARCHAR}, #{endTime,jdbcType=VARCHAR}, 
+      #{dataMonth,jdbcType=VARCHAR}, #{settleDay,jdbcType=INTEGER}, #{supplierId,jdbcType=INTEGER}, 
+      #{supplierName,jdbcType=VARCHAR}, #{channelDiscountDriver,jdbcType=DECIMAL}, #{factOrderDriverCnt,jdbcType=INTEGER}, 
+      #{badEvaluateNum,jdbcType=INTEGER}, #{orderCntNotchannel,jdbcType=INTEGER}, #{badEvaluateRate,jdbcType=DECIMAL}, 
+      #{factOrderDriverCntHb,jdbcType=INTEGER}, #{factOrderDriverCntHbRate,jdbcType=DECIMAL}, 
+      #{scaleScore,jdbcType=INTEGER}, #{efficiencyScore,jdbcType=INTEGER}, #{serviceScore,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.bigdata.BiSaasSupplierRankData">
+    insert into bi_saas_supplier_rank_data
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="startTime != null">
+        start_time,
+      </if>
+      <if test="endTime != null">
+        end_time,
+      </if>
+      <if test="dataMonth != null">
+        data_month,
+      </if>
+      <if test="settleDay != null">
+        settle_day,
+      </if>
+      <if test="supplierId != null">
+        supplier_id,
+      </if>
+      <if test="supplierName != null">
+        supplier_name,
+      </if>
+      <if test="channelDiscountDriver != null">
+        channel_discount_driver,
+      </if>
+      <if test="factOrderDriverCnt != null">
+        fact_order_driver_cnt,
+      </if>
+      <if test="badEvaluateNum != null">
+        bad_evaluate_num,
+      </if>
+      <if test="orderCntNotchannel != null">
+        order_cnt_notchannel,
+      </if>
+      <if test="badEvaluateRate != null">
+        bad_evaluate_rate,
+      </if>
+      <if test="factOrderDriverCntHb != null">
+        fact_order_driver_cnt_hb,
+      </if>
+      <if test="factOrderDriverCntHbRate != null">
+        fact_order_driver_cnt_hb_rate,
+      </if>
+      <if test="scaleScore != null">
+        scale_score,
+      </if>
+      <if test="efficiencyScore != null">
+        efficiency_score,
+      </if>
+      <if test="serviceScore != null">
+        service_score,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="startTime != null">
+        #{startTime,jdbcType=VARCHAR},
+      </if>
+      <if test="endTime != null">
+        #{endTime,jdbcType=VARCHAR},
+      </if>
+      <if test="dataMonth != null">
+        #{dataMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="settleDay != null">
+        #{settleDay,jdbcType=INTEGER},
+      </if>
+      <if test="supplierId != null">
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierName != null">
+        #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="channelDiscountDriver != null">
+        #{channelDiscountDriver,jdbcType=DECIMAL},
+      </if>
+      <if test="factOrderDriverCnt != null">
+        #{factOrderDriverCnt,jdbcType=INTEGER},
+      </if>
+      <if test="badEvaluateNum != null">
+        #{badEvaluateNum,jdbcType=INTEGER},
+      </if>
+      <if test="orderCntNotchannel != null">
+        #{orderCntNotchannel,jdbcType=INTEGER},
+      </if>
+      <if test="badEvaluateRate != null">
+        #{badEvaluateRate,jdbcType=DECIMAL},
+      </if>
+      <if test="factOrderDriverCntHb != null">
+        #{factOrderDriverCntHb,jdbcType=INTEGER},
+      </if>
+      <if test="factOrderDriverCntHbRate != null">
+        #{factOrderDriverCntHbRate,jdbcType=DECIMAL},
+      </if>
+      <if test="scaleScore != null">
+        #{scaleScore,jdbcType=INTEGER},
+      </if>
+      <if test="efficiencyScore != null">
+        #{efficiencyScore,jdbcType=INTEGER},
+      </if>
+      <if test="serviceScore != null">
+        #{serviceScore,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.bigdata.BiSaasSupplierRankData">
+    update bi_saas_supplier_rank_data
+    <set>
+      <if test="startTime != null">
+        start_time = #{startTime,jdbcType=VARCHAR},
+      </if>
+      <if test="endTime != null">
+        end_time = #{endTime,jdbcType=VARCHAR},
+      </if>
+      <if test="dataMonth != null">
+        data_month = #{dataMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="settleDay != null">
+        settle_day = #{settleDay,jdbcType=INTEGER},
+      </if>
+      <if test="supplierId != null">
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierName != null">
+        supplier_name = #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="channelDiscountDriver != null">
+        channel_discount_driver = #{channelDiscountDriver,jdbcType=DECIMAL},
+      </if>
+      <if test="factOrderDriverCnt != null">
+        fact_order_driver_cnt = #{factOrderDriverCnt,jdbcType=INTEGER},
+      </if>
+      <if test="badEvaluateNum != null">
+        bad_evaluate_num = #{badEvaluateNum,jdbcType=INTEGER},
+      </if>
+      <if test="orderCntNotchannel != null">
+        order_cnt_notchannel = #{orderCntNotchannel,jdbcType=INTEGER},
+      </if>
+      <if test="badEvaluateRate != null">
+        bad_evaluate_rate = #{badEvaluateRate,jdbcType=DECIMAL},
+      </if>
+      <if test="factOrderDriverCntHb != null">
+        fact_order_driver_cnt_hb = #{factOrderDriverCntHb,jdbcType=INTEGER},
+      </if>
+      <if test="factOrderDriverCntHbRate != null">
+        fact_order_driver_cnt_hb_rate = #{factOrderDriverCntHbRate,jdbcType=DECIMAL},
+      </if>
+      <if test="scaleScore != null">
+        scale_score = #{scaleScore,jdbcType=INTEGER},
+      </if>
+      <if test="efficiencyScore != null">
+        efficiency_score = #{efficiencyScore,jdbcType=INTEGER},
+      </if>
+      <if test="serviceScore != null">
+        service_score = #{serviceScore,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.bigdata.BiSaasSupplierRankData">
+    update bi_saas_supplier_rank_data
+    set start_time = #{startTime,jdbcType=VARCHAR},
+      end_time = #{endTime,jdbcType=VARCHAR},
+      data_month = #{dataMonth,jdbcType=VARCHAR},
+      settle_day = #{settleDay,jdbcType=INTEGER},
+      supplier_id = #{supplierId,jdbcType=INTEGER},
+      supplier_name = #{supplierName,jdbcType=VARCHAR},
+      channel_discount_driver = #{channelDiscountDriver,jdbcType=DECIMAL},
+      fact_order_driver_cnt = #{factOrderDriverCnt,jdbcType=INTEGER},
+      bad_evaluate_num = #{badEvaluateNum,jdbcType=INTEGER},
+      order_cnt_notchannel = #{orderCntNotchannel,jdbcType=INTEGER},
+      bad_evaluate_rate = #{badEvaluateRate,jdbcType=DECIMAL},
+      fact_order_driver_cnt_hb = #{factOrderDriverCntHb,jdbcType=INTEGER},
+      fact_order_driver_cnt_hb_rate = #{factOrderDriverCntHbRate,jdbcType=DECIMAL},
+      scale_score = #{scaleScore,jdbcType=INTEGER},
+      efficiency_score = #{efficiencyScore,jdbcType=INTEGER},
+      service_score = #{serviceScore,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

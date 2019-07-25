@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.bigdata.BiSaasSupplierRankDataMapper">
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.bigdata.BiSaasSupplierRankData">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="start_time" jdbcType="VARCHAR" property="startTime" />
+    <result column="end_time" jdbcType="VARCHAR" property="endTime" />
+    <result column="data_month" jdbcType="VARCHAR" property="dataMonth" />
+    <result column="settle_day" jdbcType="INTEGER" property="settleDay" />
+    <result column="supplier_id" jdbcType="INTEGER" property="supplierId" />
+    <result column="supplier_name" jdbcType="VARCHAR" property="supplierName" />
+    <result column="channel_discount_driver" jdbcType="DECIMAL" property="channelDiscountDriver" />
+    <result column="fact_order_driver_cnt" jdbcType="INTEGER" property="factOrderDriverCnt" />
+    <result column="bad_evaluate_num" jdbcType="INTEGER" property="badEvaluateNum" />
+    <result column="order_cnt_notchannel" jdbcType="INTEGER" property="orderCntNotchannel" />
+    <result column="bad_evaluate_rate" jdbcType="DECIMAL" property="badEvaluateRate" />
+    <result column="fact_order_driver_cnt_hb" jdbcType="INTEGER" property="factOrderDriverCntHb" />
+    <result column="fact_order_driver_cnt_hb_rate" jdbcType="DECIMAL" property="factOrderDriverCntHbRate" />
+    <result column="scale_score" jdbcType="INTEGER" property="scaleScore" />
+    <result column="efficiency_score" jdbcType="INTEGER" property="efficiencyScore" />
+    <result column="service_score" jdbcType="INTEGER" property="serviceScore" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, start_time, end_time, data_month, settle_day, supplier_id, supplier_name, channel_discount_driver, 
+    fact_order_driver_cnt, bad_evaluate_num, order_cnt_notchannel, bad_evaluate_rate, 
+    fact_order_driver_cnt_hb, fact_order_driver_cnt_hb_rate, scale_score, efficiency_score, 
+    service_score
+  </sql>
+  <select id="findByParam" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from bi_saas_supplier_rank_data
+    where supplier_id = #{supplierId,jdbcType=INTEGER} and  start_time = #{settleStartTime,jdbcType=Date}
+    and  end_time = #{settleEndTime,jdbcType=Date}
+  </select>
+
+</mapper>
