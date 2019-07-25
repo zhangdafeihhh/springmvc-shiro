@@ -1,10 +1,10 @@
 package com.zhuanche.serv.supplier;
 
 import com.github.pagehelper.PageInfo;
-import com.zhuanche.dto.driver.SupplierLevelAdditionalDto;
 import com.zhuanche.entity.driver.SupplierLevel;
 import com.zhuanche.entity.driver.SupplierLevelAdditional;
 
+import java.util.Date;
 import java.util.List;
 
 public interface SupplierLevelService {
@@ -54,4 +54,12 @@ public interface SupplierLevelService {
 
 
     public SupplierLevelAdditional findBySupplierLevelIdAndSupplierLevelAdditionalName(Integer supplierLevelId,String supplierLevelAdditionalName);
+
+
+    /**
+     * 根据结算日期生成“供应商等级分”，约定是"结算日+8天"开始计算结算信息，由于大数据组无法通过mq来通知这边哪些供应商的数据已经，所以这边采用
+     * "定时任务+结算日+8天"的方案来实现，保证大数据组已经把数据生成的前提下进行计算这边的数据业务
+     * @param searchDae  对应大数据组的生成日期
+     */
+    public void doGenerateByDate(Date searchDae);
 }

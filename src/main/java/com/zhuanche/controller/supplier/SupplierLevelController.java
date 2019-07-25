@@ -551,7 +551,7 @@ public class SupplierLevelController {
 
                     download = "/template/error/" + fileName + buildRandom(2) + "_"+ System.currentTimeMillis() + ".csv";
                    boolean exportResult = exportExcel(CommonConfig.ERROR_BASE_FILE+download, listException);
-               
+
 
                 }
             } catch (Exception e) {

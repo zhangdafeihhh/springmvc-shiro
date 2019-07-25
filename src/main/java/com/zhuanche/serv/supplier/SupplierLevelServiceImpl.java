@@ -2,8 +2,6 @@ package com.zhuanche.serv.supplier;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.zhuanche.dto.driver.SupplierLevelAdditionalDto;
-import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
 import com.zhuanche.entity.driver.SupplierLevel;
 import com.zhuanche.entity.driver.SupplierLevelAdditional;
 import com.zhuanche.shiro.realm.SSOLoginUser;
@@ -150,5 +148,10 @@ public class SupplierLevelServiceImpl  implements  SupplierLevelService{
     @Override
     public SupplierLevelAdditional findBySupplierLevelIdAndSupplierLevelAdditionalName(Integer supplierLevelId, String supplierLevelAdditionalName) {
         return supplierLevelAdditionalExMapper.findBySupplierLevelIdAndSupplierLevelAdditionalName(supplierLevelId,supplierLevelAdditionalName);
+    }
+
+    @Override
+    public void doGenerateByDate(Date searchDae) {
+
     }
 }
