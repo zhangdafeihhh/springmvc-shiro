@@ -1121,6 +1121,9 @@ public class OrderController{
 			//长途费(元) ， 空驶费(元)
 			Double longDistancePrice = Double.valueOf(String.valueOf(costDetailJson.get("longDistancePrice")==null?"0.00":costDetailJson.get("longDistancePrice")));
 			Double actualPayAmount = Double.valueOf(String.valueOf(costDetailJson.get("actualPayAmount")==null?"0.00":costDetailJson.get("actualPayAmount")));
+			//司机信息服务费
+			BigDecimal driverInfoServiceFee = costDetailJson.getBigDecimal("driverInfoServiceFee");
+			result.setDriverInfoServiceFee(driverInfoServiceFee == null ? BigDecimal.ZERO.setScale(2) : driverInfoServiceFee);
 			result.setDistantNum(longDistanceNum);
 			result.setDistantFee(longDistancePrice);
 			result.setLongDistanceNum(longDistanceNum);

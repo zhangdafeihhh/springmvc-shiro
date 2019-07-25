@@ -38,11 +38,11 @@
 		                        <value>PrettyFormat</value>
 		                    </list>
 		                </property>
-		                <property name="serializeFilters">
-							<list>
-								<bean class="com.zhuanche.common.web.fastjson.filter.BigDecimalFilter"></bean>
-							</list>
-						</property>
+		                <!--<property name="serializeFilters">-->
+							<!--<list>-->
+								<!--<bean class="com.zhuanche.common.web.fastjson.filter.BigDecimalFilter"></bean>-->
+							<!--</list>-->
+						<!--</property>-->
                 	</bean>
                 </property>
             </bean>
