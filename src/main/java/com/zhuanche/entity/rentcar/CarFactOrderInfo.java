@@ -4,7 +4,6 @@ package com.zhuanche.entity.rentcar;
 import com.zhuanche.dto.DriverCostDetailVO;
 import com.zhuanche.entity.common.BaseEntity;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -439,19 +438,6 @@ public class CarFactOrderInfo extends BaseEntity {
 	private String serviceCityName;
 
 	private String shunLuDan;
-
-	/**
-	 * 司机信息服务费
-	 */
-	private BigDecimal driverInfoServiceFee;
-
-	public BigDecimal getDriverInfoServiceFee() {
-		return driverInfoServiceFee;
-	}
-
-	public void setDriverInfoServiceFee(BigDecimal driverInfoServiceFee) {
-		this.driverInfoServiceFee = driverInfoServiceFee;
-	}
 
 	public String getShunLuDan() {
 		return shunLuDan;
