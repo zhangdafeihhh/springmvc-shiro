@@ -149,6 +149,8 @@ public final class RestErrorCode{
 	public static final int MONTH_IS_BIG                           =3300;
 	@ResultMessage("请选择2019年后的日期")
 	public static final int CHOOSE_BAD_DATE                           =3301;
+	@ResultMessage("请选择2019年后的日期")
+	public static final int CHOOSE_BAD_MONTH                           =3302;
 
 	//-----------------------------------------------业务参数：导入文件
 	@ResultMessage("文件异常")
