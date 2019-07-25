@@ -1,10 +1,14 @@
 package com.zhuanche.serv.supplier;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhuanche.entity.bigdata.BiSaasSupplierRankData;
 import com.zhuanche.entity.driver.SupplierLevel;
 import com.zhuanche.entity.driver.SupplierLevelAdditional;
+import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.serv.bigdata.BiSaasSupplierRankDataService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -14,15 +18,22 @@ import mapper.driver.SupplierLevelAdditionalMapper;
 import mapper.driver.SupplierLevelMapper;
 import mapper.driver.ex.SupplierLevelAdditionalExMapper;
 import mapper.driver.ex.SupplierLevelExMapper;
+import mapper.rentcar.CarBizSupplierMapper;
+import mapper.rentcar.ex.CarBizCityExMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 @Service
 public class SupplierLevelServiceImpl  implements  SupplierLevelService{
 
@@ -45,6 +56,11 @@ public class SupplierLevelServiceImpl  implements  SupplierLevelService{
 
     @Autowired
     public BiSaasSupplierRankDataService biSaasSupplierRankDataService;
+    @Autowired
+    private CarBizSupplierMapper carBizSupplierMapper ;
+
+    @Autowired
+    private CarBizCityExMapper carBizCityExMapper;
 
     @Override
     public PageInfo<SupplierLevel> findPage(int pageNo, int pageSize, SupplierLevel params) {
@@ -163,34 +179,102 @@ public class SupplierLevelServiceImpl  implements  SupplierLevelService{
     }
 
     @Override
-    public void doGenerateByDate(Integer supplierId,Date settleStartTime,Date settleEndTime,int cityId,String cityNmae,String supplierName) {
+    public void doGenerateByDate(String month) throws ParseException {
 
+        int pageNo  = 1;
+        int pageSize = 20;
+        PageInfo<BiSaasSupplierRankData> pageInfo =  biSaasSupplierRankDataService.findPage(pageNo,pageSize,month);
+        if(pageInfo != null){
+            int pages = pageInfo.getPages();
+            List<BiSaasSupplierRankData>  list = null;
 
-        BiSaasSupplierRankData  rankData = biSaasSupplierRankDataService.findByParam(supplierId,settleStartTime,settleEndTime);
-        if(rankData == null){
+            Map<String,CarBizSupplier> carBizSupplierCache = new HashMap<>();
+            Map<String,String> citynameCache = new HashMap<>();
+
+            SupplierLevel dbSupplierLevel = null;
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");// 24小时制
-            logger.info("根据参数查询大数据组数据，没有查到对应数据，参数为:supplierId="+supplierId+",settleStartTime="+sdf.format(settleStartTime)+",settleEndTime="+sdf.format(settleEndTime));
-        }else {
+            for(pageNo = 1; pageNo<=pages;pageNo++){
+                pageInfo =  biSaasSupplierRankDataService.findPage(pageNo,pageSize,month);
+                list = pageInfo.getList();
+                if(list != null  && list.size() >= 1){
+                    CarBizSupplier supplier = null;
+                    String cityname = null;
+                    for(BiSaasSupplierRankData rankData : list){
+                        SupplierLevel supplierLevel = new SupplierLevel();
+                        supplierLevel.setMonth(rankData.getDataMonth());
+                        if(carBizSupplierCache.containsKey(""+supplierLevel.getSupplierId())){
+                            supplier = carBizSupplierCache.get(""+supplierLevel.getSupplierId());
+                        }else{
+                            supplier =  carBizSupplierMapper.selectByPrimaryKey(supplierLevel.getSupplierId());
+                            carBizSupplierCache.put(""+supplierLevel.getSupplierId(),supplier);
+                        }
 
-            SupplierLevel supplierLevel = new SupplierLevel();
-            supplierLevel.setMonth(rankData.getDataMonth());
-            supplierLevel.setCityId(cityId);
-            supplierLevel.setCityName(cityNmae);
-            supplierLevel.setSupplierName(supplierName);
-            supplierLevel.setStartTime(settleStartTime);
-            supplierLevel.setEndTime(settleEndTime);
-            supplierLevel.setScaleScore(new BigDecimal(rankData.getScaleScore()));
-            supplierLevel.setEfficiencyScore(new BigDecimal(rankData.getEfficiencyScore()));
-            supplierLevel.setServiceScore(new BigDecimal(rankData.getServiceScore()));
-            supplierLevel.setAdditionalScore(BigDecimal.ZERO);
+                        if(citynameCache.containsKey(""+supplier.getSupplierCity())){
+                            cityname = citynameCache.get(""+supplier.getSupplierCity());
+                        }else {
+                            cityname = carBizCityExMapper.queryNameById(supplier.getSupplierCity());
+                            citynameCache.put(""+supplier.getSupplierCity(),cityname);
+                        }
 
-            //（规模分*35%+效率分*30%+服务分*35%）+附加分
-            BigDecimal levelScore = calculationLevelScore(supplierLevel.getScaleScore(),supplierLevel.getEfficiencyScore(),supplierLevel.getServiceScore(),supplierLevel.getAdditionalScore());
-            supplierLevel.setGradeScore(levelScore);
-            supplierLevel.setStates();
+                        supplierLevel.setCityId(supplierLevel.getSupplierId());
+                        supplierLevel.setCityName(cityname);
+                        supplierLevel.setSupplierName(supplier.getSupplierFullName());
+                        supplierLevel.setStartTime(sdf.parse(rankData.getStartTime()));
+                        supplierLevel.setEndTime(sdf.parse(rankData.getEndTime()));
+                        supplierLevel.setScaleScore(new BigDecimal(rankData.getScaleScore()));
+                        supplierLevel.setEfficiencyScore(new BigDecimal(rankData.getEfficiencyScore()));
+                        supplierLevel.setServiceScore(new BigDecimal(rankData.getServiceScore()));
+                        supplierLevel.setAdditionalScore(BigDecimal.ZERO);
+
+                        //（规模分*35%+效率分*30%+服务分*35%）+附加分
+                        BigDecimal levelScore = calculationLevelScore(supplierLevel.getScaleScore(),supplierLevel.getEfficiencyScore(),supplierLevel.getServiceScore(),supplierLevel.getAdditionalScore());
+                        supplierLevel.setGradeScore(levelScore);
+                        supplierLevel.setStates(1);
+
+                        Date now = new Date();
+
+                        supplierLevel.setUpdateTime(now);
+
+                        dbSupplierLevel = supplierLevelexMapper.findByMonthAndSupplierName(month,supplierLevel.getSupplierName());
+                        if(dbSupplierLevel == null){
+                            supplierLevel.setCreateTime(now);
+                            supplierLevelMapper.insertSelective(supplierLevel);
+
+                        }else{
+                            supplierLevelMapper.updateByPrimaryKeySelective(supplierLevel);
+                        }
+                    }
+                }
+            }
         }
+    }
 
+    @Override
+    public void doSaveSupplierLevelAdditionScore(String delIds, String saveJson) {
 
+        SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+        Integer userId = currentLoginUser.getId();
+        String userName = currentLoginUser.getName();
+        if(StringUtils.isNoneEmpty(delIds)){
+          String[] delIdArray =  delIds.split(",");
+          for(String id:delIdArray){
+              supplierLevelAdditionalMapper.deleteByPrimaryKey(new Integer(id));
+          }
+        }
+        if(StringUtils.isNoneEmpty(saveJson)){
+            JSONArray jsonArray = JSONArray.parseArray(saveJson);
+            int length = jsonArray.size();
+            JSONObject item = null;
+            Date now = new Date();
+            for(int i=0;i<length;i++){
+                item = jsonArray.getJSONObject(i);
+                SupplierLevelAdditional supplierLevelAdditional = JSON.parseObject(item.toJSONString(),SupplierLevelAdditional.class);
+                supplierLevelAdditional.setUpdateTime(now);
+                supplierLevelAdditional.setUpdateBy(userName);
+                supplierLevelAdditionalMapper.updateByPrimaryKeySelective(supplierLevelAdditional);
+
+            }
+        }
     }
 
     private BigDecimal calculationLevelScore(BigDecimal scaleScore,BigDecimal efficiencyScore,BigDecimal serviceScore,BigDecimal additionScore){

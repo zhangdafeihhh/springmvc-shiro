@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="mapper.bigdata.BiSaasSupplierRankDataMapper">
+<mapper namespace="mapper.bigdata.ex.BiSaasSupplierRankDataExMapper">
   <resultMap id="BaseResultMap" type="com.zhuanche.entity.bigdata.BiSaasSupplierRankData">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="start_time" jdbcType="VARCHAR" property="startTime" />
@@ -30,8 +30,15 @@
     select 
     <include refid="Base_Column_List" />
     from bi_saas_supplier_rank_data
-    where supplier_id = #{supplierId,jdbcType=INTEGER} and  start_time = #{settleStartTime,jdbcType=Date}
-    and  end_time = #{settleEndTime,jdbcType=Date}
+    where supplier_id = #{supplierId,jdbcType=INTEGER} and  start_time = #{settleStartTime,jdbcType=DATE}
+    and  end_time = #{settleEndTime,jdbcType=DATE}
+  </select>
+
+  <select id="findByMonth" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from bi_saas_supplier_rank_data
+    where data_month = #{month}
   </select>
 
 </mapper>

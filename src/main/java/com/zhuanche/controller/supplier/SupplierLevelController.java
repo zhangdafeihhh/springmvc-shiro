@@ -4,13 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.CommonConfig;
 import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.ImportCheckEntity;
-import com.zhuanche.dto.driver.SupplierLevelAdditionalDto;
 import com.zhuanche.entity.driver.SupplierLevel;
 import com.zhuanche.entity.driver.SupplierLevelAdditional;
 import com.zhuanche.serv.supplier.SupplierLevelService;
-import com.zhuanche.util.Common;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.excel.CsvUtils2File;
 import net.sf.json.JSONObject;
@@ -20,7 +17,10 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,81 +87,104 @@ public class SupplierLevelController {
         }
     }
 
+        @RequestMapping(value="doSaveSupplierLevelAdditionScore",method= {RequestMethod.GET,RequestMethod.POST})
+        @ResponseBody
+        public AjaxResponse doSaveSupplierLevelAdditionScore(
+                @RequestParam(value = "delIds", required = false)String delIds,
+                @RequestParam(value = "saveJson", required = false)String saveJson,
+                HttpServletRequest request, HttpServletResponse response, ModelMap modelMap){
+            try{
+                logger.info("保存修改附加分，参数为：delIds="+delIds+";saveJson="+saveJson );
+                if(StringUtils.isEmpty(delIds) &&StringUtils.isEmpty(saveJson) ){
+                    return AjaxResponse.failMsg(-2,"参数错误，delIds和saveJson不能同时为空");
+                }
+                else{
+
+                    supplierLevelService.doSaveSupplierLevelAdditionScore(delIds,saveJson);
+                }
+                return AjaxResponse.success(Boolean.TRUE);
+
+
+            }catch (Exception e){
+                logger.error("保存修改附加分异常，参数为：delIds="+delIds+";saveJson="+saveJson );
+                return AjaxResponse.failMsg(-1,"保存修改附加分异常");
+            }
+        }
+
     /**
      * 发布供应商等级
-     * @param ids
      * @param request
      * @param response
      * @param modelMap
      * @return
      */
-    @RequestMapping(value="doPublishSupplierLevel",method= {RequestMethod.GET,RequestMethod.POST})
-    @ResponseBody
-    public AjaxResponse doPublishSupplierLevel(
-            @RequestParam(value = "ids", required = true)String ids,
-            HttpServletRequest request, HttpServletResponse response, ModelMap modelMap){
-        try{
-            logger.info("发布供应商等级，参数为：ids="+ids );
-            if(StringUtils.isEmpty(ids)){
+//    @RequestMapping(value="doPublishSupplierLevel",method= {RequestMethod.GET,RequestMethod.POST})
+//    @ResponseBody
+//    public AjaxResponse doPublishSupplierLevel(
+//            @RequestParam(value = "ids", required = true)String ids,
+//            HttpServletRequest request, HttpServletResponse response, ModelMap modelMap){
+//        try{
+//            logger.info("发布供应商等级，参数为：ids="+ids );
+//            if(StringUtils.isEmpty(ids)){
+//
+//                return AjaxResponse.fail(-2,"参数ids为空");
+//            }else{
+//                String[]idArray = ids.split(",");
+//                List<Integer> integerIdList = new ArrayList<>();
+//                for(int i=0;i<idArray.length;i++){
+//                    integerIdList.add(Integer.parseInt(idArray[i]));
+//                }
+//                supplierLevelService.doPublishSupplierLevel(integerIdList);
+//                return AjaxResponse.success(Boolean.TRUE);
+//            }
+//
+//        }catch (Exception e){
+//            logger.error("发布供应商等级异常，参数为：ids="+ids ,e);
+//            return AjaxResponse.fail(-1,"发布供应商等级异常");
+//        }
+//    }
 
-                return AjaxResponse.fail(-2,"参数ids为空");
-            }else{
-                String[]idArray = ids.split(",");
-                List<Integer> integerIdList = new ArrayList<>();
-                for(int i=0;i<idArray.length;i++){
-                    integerIdList.add(Integer.parseInt(idArray[i]));
-                }
-                supplierLevelService.doPublishSupplierLevel(integerIdList);
-                return AjaxResponse.success(Boolean.TRUE);
-            }
+//    @RequestMapping(value="doUnPublishSupplierLevel",method= {RequestMethod.GET,RequestMethod.POST})
+//    @ResponseBody
+//    public AjaxResponse doUnPublishSupplierLevel(
+//            @RequestParam(value = "ids", required = true)String ids,
+//            HttpServletRequest request, HttpServletResponse response, ModelMap modelMap){
+//        try{
+//            logger.info("取消发布供应商等级，参数为：ids="+ids );
+//            if(StringUtils.isEmpty(ids)){
+//
+//                return AjaxResponse.fail(-2,"参数ids为空");
+//            }else{
+//                String[]idArray = ids.split(",");
+//                List<Integer> integerIdList = new ArrayList<>();
+//                for(int i=0;i<idArray.length;i++){
+//                    integerIdList.add(Integer.parseInt(idArray[i]));
+//                }
+//                supplierLevelService.doUnPublishSupplierLevel(integerIdList);
+//                return AjaxResponse.success(Boolean.TRUE);
+//            }
+//
+//        }catch (Exception e){
+//            logger.error("取消发布供应商等级异常，参数为：ids="+ids ,e);
+//            return AjaxResponse.fail(-1,"取消发布供应商等级异常");
+//        }
+//    }
 
-        }catch (Exception e){
-            logger.error("发布供应商等级异常，参数为：ids="+ids ,e);
-            return AjaxResponse.fail(-1,"发布供应商等级异常");
-        }
-    }
-
-    @RequestMapping(value="doUnPublishSupplierLevel",method= {RequestMethod.GET,RequestMethod.POST})
-    @ResponseBody
-    public AjaxResponse doUnPublishSupplierLevel(
-            @RequestParam(value = "ids", required = true)String ids,
-            HttpServletRequest request, HttpServletResponse response, ModelMap modelMap){
-        try{
-            logger.info("取消发布供应商等级，参数为：ids="+ids );
-            if(StringUtils.isEmpty(ids)){
-
-                return AjaxResponse.fail(-2,"参数ids为空");
-            }else{
-                String[]idArray = ids.split(",");
-                List<Integer> integerIdList = new ArrayList<>();
-                for(int i=0;i<idArray.length;i++){
-                    integerIdList.add(Integer.parseInt(idArray[i]));
-                }
-                supplierLevelService.doUnPublishSupplierLevel(integerIdList);
-                return AjaxResponse.success(Boolean.TRUE);
-            }
-
-        }catch (Exception e){
-            logger.error("取消发布供应商等级异常，参数为：ids="+ids ,e);
-            return AjaxResponse.fail(-1,"取消发布供应商等级异常");
-        }
-    }
-
-    @RequestMapping(value="doDeleteBySupplierLevelAdditionalId",method= {RequestMethod.GET,RequestMethod.POST})
-    @ResponseBody
-    public AjaxResponse doDeleteBySupplierLevelAdditionalId(
-            @RequestParam(value = "id", required = true)Integer id,
-            HttpServletRequest request, HttpServletResponse response, ModelMap modelMap){
-        try{
-            logger.info("根据供应商附加分id进行删除附加分，参数为：id="+id );
-            supplierLevelService.doDeleteBySupplierLevelAdditionalId(id);
-            return AjaxResponse.success(Boolean.TRUE);
-
-        }catch (Exception e){
-            logger.error("根据供应商附加分id进行删除附加分，参数为：id="+id ,e);
-            return AjaxResponse.fail(-1,"根据供应商附加分id进行删除附加分异常");
-        }
-    }
+//    @RequestMapping(value="doDeleteBySupplierLevelAdditionalId",method= {RequestMethod.GET,RequestMethod.POST})
+//    @ResponseBody
+//    public AjaxResponse doDeleteBySupplierLevelAdditionalId(
+//            @RequestParam(value = "id", required = true)Integer id,
+//            HttpServletRequest request, HttpServletResponse response, ModelMap modelMap){
+//        try{
+//            logger.info("根据供应商附加分id进行删除附加分，参数为：id="+id );
+//            supplierLevelService.doDeleteBySupplierLevelAdditionalId(id);
+//            return AjaxResponse.success(Boolean.TRUE);
+//
+//        }catch (Exception e){
+//            logger.error("根据供应商附加分id进行删除附加分，参数为：id="+id ,e);
+//            return AjaxResponse.fail(-1,"根据供应商附加分id进行删除附加分异常");
+//        }
+//    }
 
     @RequestMapping(value="findSupplierLevelAdditionalBySupplierLevelId",method= {RequestMethod.GET,RequestMethod.POST})
     @ResponseBody
@@ -398,7 +421,7 @@ public class SupplierLevelController {
      */
     @ResponseBody
     @RequestMapping("/importsupplierleveladditional")
-    public AjaxResponse importCarStatus(
+    public AjaxResponse importsupplierleveladditional(
                 //@RequestParam(value = "filename", required = true)String filename,
                 MultipartFile file,
                                         @RequestParam(value = "month", required = true)String month,
@@ -427,21 +450,36 @@ public class SupplierLevelController {
 
     @RequestMapping("/downloadtemplate")
     public void template( HttpServletRequest request,HttpServletResponse response){
-
         logger.info("下载供应商附加分导入模板");
         try {
-
             String path = request.getRealPath("/") + File.separator + "template"   + File.separator + "supplierlevelAdditional.xlsx";
-
             this.fileDownload(request,response,path);
         } catch (Exception e) {
             logger.error("下载供应商附加分导入模板异常", e);
         }
     }
 
+
+    /**
+     * 供给测试使用
+     * @param request
+     * @param response
+     * @param month
+     */
+    @RequestMapping("/doGenerateByDate")
+    public AjaxResponse doGenerateByDate( HttpServletRequest request,HttpServletResponse response,String month){
+        logger.info("生成供应商等级分：month="+month);
+        try {
+            supplierLevelService.doGenerateByDate(month);
+
+            return AjaxResponse.success("成功");
+        } catch (Exception e) {
+            logger.error("生成供应商等级分异常,month="+month, e);
+            return AjaxResponse.failMsg(-1,"异常");
+        }
+    }
+
     private Map<String, Object> _doPareImportData(MultipartFile file,String month,   HttpServletRequest request){
-
-
 
         Map<String, Object> result = new HashMap<String, Object>();
         String download = null;
@@ -513,11 +551,7 @@ public class SupplierLevelController {
                     itemValue = cell2.getNumericCellValue()+"";
                 }
 
-
-
-
                 ImportCheckEntity checkResult = checkEntity(rowIx,supplierName,itemName,itemValue,month);
-
 
                 if(checkResult.getResult()){
                     SupplierLevelAdditional entity = new SupplierLevelAdditional();
@@ -593,7 +627,7 @@ public class SupplierLevelController {
         }
         throw new IllegalArgumentException("你的excel版本目前poi解析不了");
     }
-    public ImportCheckEntity checkEntity(Integer rowNum,String supplierName,String itemName,String itemValue,String month){
+    private ImportCheckEntity checkEntity(Integer rowNum,String supplierName,String itemName,String itemValue,String month){
         ImportCheckEntity result = new ImportCheckEntity();
         result.setResult(true);
 
@@ -682,7 +716,7 @@ public class SupplierLevelController {
     /*
      * 下载
      */
-    public void fileDownload(HttpServletRequest request, HttpServletResponse response,String path) {
+    private void fileDownload(HttpServletRequest request, HttpServletResponse response,String path) {
 
         File file = new File(path);// path是根据日志路径和文件名拼接出来的
         String filename = file.getName();// 获取日志文件名称

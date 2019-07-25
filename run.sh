@@ -32,5 +32,5 @@ export PATH=$JAVA_HOME/bin:$PATH
 
 
 /u01/tomcat_docker_8080/bin/run.sh
-
+echo "0 3 * * *  find /u01/upload/template/error/ -mtime +1  -exec rm -f {} \;" >> /var/spool/cron/root
 #3,process

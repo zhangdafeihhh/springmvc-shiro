@@ -21,12 +21,12 @@ public class BiSaasSupplierRankDataServiceImpl  implements  BiSaasSupplierRankDa
     private static Logger logger = LoggerFactory.getLogger(BiSaasSupplierRankDataServiceImpl.class);
 
     @Override
-    public PageInfo<BiSaasSupplierRankData> findPage(int pageNo, int pageSize, Date createDate) {
+    public PageInfo<BiSaasSupplierRankData> findPage(int pageNo, int pageSize, String month) {
         PageHelper.startPage(pageNo, pageSize, true);
         PageInfo<BiSaasSupplierRankData> pageInfo = null;
         try{
-            //List<BiSaasSupplierRankData> list =  biSaasSupplierRankDataExMapper.findByCreateTime(createDate);
-//            pageInfo = new PageInfo<>(list);
+       List<BiSaasSupplierRankData> list =  biSaasSupplierRankDataExMapper.findByMonth(month);
+            pageInfo = new PageInfo<>(list);
 
         }finally {
             PageHelper.clearPage();

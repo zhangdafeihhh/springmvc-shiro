@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.zhuanche.entity.driver.SupplierLevel;
 import com.zhuanche.entity.driver.SupplierLevelAdditional;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -57,11 +58,14 @@ public interface SupplierLevelService {
 
 
     /**
-     * 根据结算日期生成“供应商等级分”，约定是"结算日+8天"开始计算结算信息，由于大数据组无法通过mq来通知这边哪些供应商的数据已经，所以这边采用
-     * "定时任务+结算日+8天"的方案来实现，保证大数据组已经把数据生成的前提下进行计算这边的数据业务
-     * @param supplierId  供应商id
-     * @param settleStartTime  结算开始日期
-     * @param settleEndTime  结算结束日期
+     * @param month  供应商id
      */
-    public void doGenerateByDate(Integer supplierId,Date settleStartTime,Date settleEndTime);
+    public void doGenerateByDate(String month ) throws ParseException;
+
+    /**
+     * 保存修改后的附加分
+     * @param delIds
+     * @param saveJson
+     */
+    void doSaveSupplierLevelAdditionScore(String delIds, String saveJson);
 }

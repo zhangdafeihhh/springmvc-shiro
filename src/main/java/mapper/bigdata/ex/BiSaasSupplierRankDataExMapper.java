@@ -12,4 +12,6 @@ public interface BiSaasSupplierRankDataExMapper {
 
 
      BiSaasSupplierRankData findByParam(@Param("supplierId")Integer supplierId, @Param("settleStartTime")Date settleStartTime,@Param("settleEndTime") Date settleEndTime);
+
+    List<BiSaasSupplierRankData> findByMonth(@Param("month")String month);
 }
