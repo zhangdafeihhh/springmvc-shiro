@@ -250,7 +250,7 @@ public class SupplierLevelServiceImpl  implements  SupplierLevelService{
     }
 
     @Override
-    public void doSaveSupplierLevelAdditionScore(String delIds, String saveJson) {
+    public void doSaveSupplierLevelAdditionScore(Integer supplierLevelId,String delIds, String saveJson) {
 
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         Integer userId = currentLoginUser.getId();
@@ -261,11 +261,13 @@ public class SupplierLevelServiceImpl  implements  SupplierLevelService{
               supplierLevelAdditionalMapper.deleteByPrimaryKey(new Integer(id));
           }
         }
+        Date now = new Date();
+        BigDecimal additionScore = BigDecimal.ZERO;
         if(StringUtils.isNoneEmpty(saveJson)){
             JSONArray jsonArray = JSONArray.parseArray(saveJson);
             int length = jsonArray.size();
             JSONObject item = null;
-            Date now = new Date();
+
             for(int i=0;i<length;i++){
                 item = jsonArray.getJSONObject(i);
                 SupplierLevelAdditional supplierLevelAdditional = JSON.parseObject(item.toJSONString(),SupplierLevelAdditional.class);
@@ -273,15 +275,25 @@ public class SupplierLevelServiceImpl  implements  SupplierLevelService{
                 supplierLevelAdditional.setUpdateBy(userName);
                 supplierLevelAdditionalMapper.updateByPrimaryKeySelective(supplierLevelAdditional);
 
+                additionScore = additionScore.add(supplierLevelAdditional.getItemValue());
+
             }
         }
+        //重新计算该供应商等级的等级分
+        //（规模分*35%+效率分*30%+服务分*35%）+附加分
+        SupplierLevel supplierLevel = supplierLevelMapper.selectByPrimaryKey(supplierLevelId);
+        BigDecimal additionalScore = calculationLevelScore(supplierLevel.getScaleScore(),supplierLevel.getEfficiencyScore(),supplierLevel.getServiceScore(),  additionScore);
+        supplierLevel.setAdditionalScore(additionalScore);
+        supplierLevel.setUpdateTime(now);
+        supplierLevelMapper.updateByPrimaryKeySelective(supplierLevel);
     }
 
     private BigDecimal calculationLevelScore(BigDecimal scaleScore,BigDecimal efficiencyScore,BigDecimal serviceScore,BigDecimal additionScore){
 //        （规模分*35%+效率分*30%+服务分*35%）+附加分
         BigDecimal levelScore = new BigDecimal("0.35").multiply(scaleScore)
                 .add(   new BigDecimal("0.30").multiply(efficiencyScore ))
-                .add(   new BigDecimal("0.35").multiply(serviceScore )).add(additionScore);
+                .add(   new BigDecimal("0.35").multiply(serviceScore ))
+                .add(additionScore);
         return levelScore;
     }
 }

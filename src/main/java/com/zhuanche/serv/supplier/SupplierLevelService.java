@@ -67,5 +67,5 @@ public interface SupplierLevelService {
      * @param delIds
      * @param saveJson
      */
-    void doSaveSupplierLevelAdditionScore(String delIds, String saveJson);
+    void doSaveSupplierLevelAdditionScore(Integer supplierLevelId,String delIds, String saveJson);
 }

@@ -90,6 +90,7 @@ public class SupplierLevelController {
         @RequestMapping(value="doSaveSupplierLevelAdditionScore",method= {RequestMethod.GET,RequestMethod.POST})
         @ResponseBody
         public AjaxResponse doSaveSupplierLevelAdditionScore(
+                @RequestParam(value = "supplierLevelId", required = true)Integer supplierLevelId,
                 @RequestParam(value = "delIds", required = false)String delIds,
                 @RequestParam(value = "saveJson", required = false)String saveJson,
                 HttpServletRequest request, HttpServletResponse response, ModelMap modelMap){
@@ -100,7 +101,7 @@ public class SupplierLevelController {
                 }
                 else{
 
-                    supplierLevelService.doSaveSupplierLevelAdditionScore(delIds,saveJson);
+                    supplierLevelService.doSaveSupplierLevelAdditionScore(supplierLevelId,delIds,saveJson);
                 }
                 return AjaxResponse.success(Boolean.TRUE);
 
