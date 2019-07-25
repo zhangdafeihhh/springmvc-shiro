@@ -285,6 +285,7 @@ public class SaasDriverDailyReportController {
             }
 
 
+
            // logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"导出司机周/月列表2.0");
         } catch (Exception e) {
         }
@@ -387,6 +388,12 @@ public class SaasDriverDailyReportController {
         if (!bl){
             logger.info("月份大于当前日期");
             return AjaxResponse.fail(RestErrorCode.MONTH_IS_BIG);
+        }
+
+        boolean isLess = DateUtil.isLess(requestMonth,"2019-01-01");
+        if (!isLess){
+            logger.info("请选择2019年后的月份");
+            return AjaxResponse.fail(RestErrorCode.CHOOSE_BAD_MONTH);
         }
 
         List<CarBizSupplier> carBizSupplierList = null;
@@ -531,8 +538,15 @@ public class SaasDriverDailyReportController {
             if (!bl){
                 logger.info("月份大于当前日期");
                 return AjaxResponse.success(null);
-
             }
+
+            boolean isLess = DateUtil.isLess(requestMonth,"2019-01-01");
+            if (!isLess){
+                logger.info("请选择2019年后的月份");
+                return AjaxResponse.fail(RestErrorCode.CHOOSE_BAD_MONTH);
+            }
+
+
             // logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"导出司机周/月列表2.0");
         } catch (Exception e) {
             map.put("code","200");
