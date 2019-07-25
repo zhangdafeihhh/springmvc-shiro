@@ -123,7 +123,7 @@ public class CarDriverDutyService {
 						return pageInfo;
 					}else {
 						Set<Integer> teamIdSet = new HashSet<>();
-						teamIdSet.contains(dutyParamRequest.getTeamId());
+						teamIdSet.add(dutyParamRequest.getTeamId());
 						Set<Integer> driverIdSet = DriverUtils.getDriverIdsByUserTeamsV2(  carDriverTeamService , teamIdSet);
 						if( driverIdSet == null || driverIdSet.isEmpty()){
 							PageInfo<CarDriverDayDutyDTO> pageInfo = new PageInfo<>(new ArrayList<>());

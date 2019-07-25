@@ -115,6 +115,15 @@ public class SaasDriverDailyReportController {
                                  @Param("badCntSort")String badCntSort,
                                  @Verify(param="pageNum",rule="required|min(1)") Integer pageNum,
                                  @Verify(param="pageSize",rule="required|min(10)") Integer pageSize){
+
+
+        boolean bl = DateUtil.isLess(beginDate,"2019-01-01");
+        if (!bl){
+            logger.info("请选择2019年后的日期");
+            return AjaxResponse.fail(RestErrorCode.CHOOSE_BAD_DATE);
+        }
+
+
         List<CarBizSupplier> carBizSupplierList = null;
         List<CarDriverTeamDTO> listTeam = null;
         Map<Integer,String> supplierMap = Maps.newHashMap();
@@ -269,6 +278,12 @@ public class SaasDriverDailyReportController {
         Map<String,String> map = Maps.newHashMap();
         try {
             logger.info("导出司机日报操作");
+            boolean bl = DateUtil.isLess(beginDate,"2019-01-01");
+            if (!bl){
+                logger.info("请选择2019年后的日期");
+                return AjaxResponse.fail(RestErrorCode.CHOOSE_BAD_DATE);
+            }
+
 
            // logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"导出司机周/月列表2.0");
         } catch (Exception e) {

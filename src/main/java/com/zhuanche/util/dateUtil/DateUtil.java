@@ -361,6 +361,24 @@ public class DateUtil {
 		return false;
 
 	}
+
+
+	/**
+	 * 指定的 日期 yyyy-MM-dd 和当前日期作比较
+	 * @param
+	 * @return
+	 */
+	public static boolean  isLess(String date,String beforeDate){
+		Long last = formatDateToLong(date);
+		Long before = formatDateToLong(beforeDate);
+		if(last - before >= 0){
+			return  true;
+		}
+		return false;
+
+	}
+
+
 	/**
 	 * 获取指定日期所在月的最后一天
 	 * @author lunan

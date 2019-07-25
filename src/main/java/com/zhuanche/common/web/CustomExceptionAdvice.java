@@ -23,6 +23,7 @@ import org.apache.http.HttpStatus;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -108,8 +109,9 @@ public class CustomExceptionAdvice {
 		String exceptionMessage = ex.getMessage() + " (ExceptionId: "+ExceptionId+")";
 		logger.error(exceptionMessage, ex );
 		try {
-			String mess = MessageFormat.format("异常报警:项目:{0},项目端口:{1},接口地址:{2},请求方式:{3},错误信息:",
-					request.getServerName(),request.getServerPort(),request.getRequestURI(),request.getMethod());
+			String mess = MessageFormat.format("异常报警:项目:{0},tracdId:{1},项目端口:{2},接口地址:{3},请求方式:{4},错误信息:",
+					request.getServerName(),MDC.get("traceId"),request.getServerPort(),request.getRequestURI(),request.getMethod());
+
 			logger.info(mess);
 			DingdingAlarmUtil.sendDingdingAlerm(mess  + ex.getMessage());
 		} catch (Exception e) {
