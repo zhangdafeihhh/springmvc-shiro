@@ -110,7 +110,7 @@ public class CustomExceptionAdvice {
 		logger.error(exceptionMessage, ex );
 		try {
 			String mess = MessageFormat.format("异常报警:项目:{0},tracdId:{1},项目端口:{2},接口地址:{3},请求方式:{4},错误信息:",
-					request.getServerName(),MDC.get("traceId"),request.getServerPort(),request.getRequestURI(),request.getMethod());
+					request.getServerName(),MDC.get("reqId"),request.getServerPort(),request.getRequestURI(),request.getMethod());
 
 			logger.info(mess);
 			DingdingAlarmUtil.sendDingdingAlerm(mess  + ex.getMessage());
