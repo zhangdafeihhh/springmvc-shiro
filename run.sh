@@ -10,6 +10,12 @@ export PATH=$JAVA_HOME/bin:$PATH
 
 #2,start tomcat
 
+if [ "${START_ENV}" = "dev" ]; then
+    java -classpath $CONF_DIR:$LIB_JARS -javaagent:/u01/pinpoint-agent/pinpoint-bootstrap-1.8.4.jar $JAVA_MEM_OPTS -Dcatalina.base=$DEPLOY_DIR com.alibaba.dubbo.container.Main > $STDOUT_FILE 2>&1
+else
+    java -classpath $CONF_DIR:$LIB_JARS $JAVA_MEM_OPTS -Dcatalina.base=$DEPLOY_DIR com.alibaba.dubbo.container.Main > $STDOUT_FILE 2>&1
+fi
+
 #if [ "${START_ENV}" = "dev" ]; then
 #   cd /u01/tomcat_docker_8080/webapps/ROOT
 #   cp -rfp ./WEB-INF/classes/dev/*  ./WEB-INF/classes/
