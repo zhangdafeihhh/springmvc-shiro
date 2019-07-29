@@ -42,6 +42,18 @@ public class BusOrderDTO extends BaseDTO {
 	private String factEndDateEnd;
 	// 订单状态
 	private Integer status;
+	/**
+	 * 所有供应商下关联的businessId
+	 */
+	private String businessIds;
+	/**
+	 * 指定供应商下关联的businessId
+	 */
+	private String specialBusinessIds;
+	/**
+	 * 当前城市下企业跨地区绑定的businessId
+	 */
+	private String crossDomainBusinessIds;
 
 	public String getOrderNo() {
 		return orderNo;
@@ -191,4 +203,27 @@ public class BusOrderDTO extends BaseDTO {
 		super.pageSize = pageSize == null ? 20 : pageSize;
 	}
 
+	public String getBusinessIds() {
+		return businessIds;
+	}
+
+	public void setBusinessIds(String businessIds) {
+		this.businessIds = businessIds;
+	}
+
+	public String getSpecialBusinessIds() {
+		return specialBusinessIds;
+	}
+
+	public void setSpecialBusinessIds(String specialBusinessIds) {
+		this.specialBusinessIds = specialBusinessIds;
+	}
+
+	public String getCrossDomainBusinessIds() {
+		return crossDomainBusinessIds;
+	}
+
+	public void setCrossDomainBusinessIds(String crossDomainBusinessIds) {
+		this.crossDomainBusinessIds = crossDomainBusinessIds;
+	}
 }
