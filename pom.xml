@@ -380,6 +380,30 @@
 			<artifactId>javax.el</artifactId>
 			<version>2.2.6</version>
 		</dependency>
+
+		<dependency>
+			<artifactId>sq-component-startup</artifactId>
+			<groupId>com.sq</groupId>
+			<version>1.0.16</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-context</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-beans</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
 
 	<!-- 多环境配置BEGIN -->
@@ -442,6 +466,7 @@
 				<filtering>false</filtering>
 				<includes>
 					<include>logback.xml</include>
+					<include>config-manager.properties</include>
 					<include>*.jks</include>
 				</includes>
 			</resource>

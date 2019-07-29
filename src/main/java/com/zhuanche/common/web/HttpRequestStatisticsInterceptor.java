@@ -19,6 +19,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.le.config.dict.Dicts;
+import com.sq.monitor.pojo.dto.dingding.DingTextDTO;
+import com.sq.monitor.utils.DingDingUtil;
 import com.zhuanche.http.MpOkHttpUtil;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -114,13 +117,21 @@ public class HttpRequestStatisticsInterceptor implements HandlerInterceptor,  In
 		//URI 请求数计数器
 		AtomicLong atomicLong = URI_COUNTER.get(uri);
 		long costMiliseconds = System.currentTimeMillis()-startTimestamp;
-		if(costMiliseconds > 10000){
+		int dingding_alerm_switch = Dicts.getInt("dingding_alerm_switch", 0);
+		String dingding_token_url = Dicts.getString("dingding_token_url", "https://oapi.dingtalk.com/robot/send?access_token=747d5c066ec3b79c229721eff222aa1dd63a813be5e810dd934b1c284097ab39");
+		int dingding_alerm_timeout = Dicts.getInt("dingding_alerm_timeout", 3000);
+		if(dingding_alerm_switch == 0){
+			log.debug("报警开关关闭，不发送钉钉报警通知");
+		}else if(costMiliseconds > dingding_alerm_timeout){
 			try {
-				String mess = MessageFormat.format("接口超时报警:项目ip:{0},tracdId:{1},项目端口:{2},接口地址:{3},请求方式:{4}",
-						request.getServerName(),MDC.get("reqId"),request.getServerPort(),request.getRequestURI(),request.getMethod());
+				DingTextDTO dingTextDTO = new DingTextDTO();
+				dingTextDTO.setTitle("mp-restapi接口超时报警");
+				String mess = MessageFormat.format("接口超时报警:项目ip:{0},tracdId:{1},项目端口:{2},接口地址:{3},请求方式:{4},超时时间:{5}毫秒",
+						request.getServerName(),MDC.get("reqId"),request.getServerPort(),request.getRequestURI(),request.getMethod(),costMiliseconds);
 				log.info(mess);
-
-				DingdingAlarmUtil.sendDingdingAlerm(mess  + ",超时时间:" + costMiliseconds + "毫秒");
+				dingTextDTO.setContent(mess);
+				DingDingUtil.sendMessage(dingTextDTO,dingding_token_url);
+//				DingdingAlarmUtil.sendDingdingAlerm(mess  + ",超时时间:" + costMiliseconds + "毫秒");
 			} catch (Exception e) {
 				log.info("钉钉告警消息异常!" + e.getMessage());
 			}
