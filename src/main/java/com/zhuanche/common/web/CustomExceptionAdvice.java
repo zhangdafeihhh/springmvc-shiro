@@ -19,6 +19,7 @@ import com.le.config.dict.Dicts;
 import com.sq.monitor.pojo.dto.dingding.DingTextDTO;
 import com.sq.monitor.utils.DingDingUtil;
 import com.zhuanche.http.MpOkHttpUtil;
+import com.zhuanche.util.IPUtil;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -119,14 +120,11 @@ public class CustomExceptionAdvice {
 			logger.debug("报警开关关闭，不发送钉钉报警通知");
 		}else{
 			try {
-				DingTextDTO dingTextDTO = new DingTextDTO();
-				dingTextDTO.setTitle("mp-restapi接口超时报警");
-				String mess = MessageFormat.format("接口超时报警:项目ip:{0},tracdId:{1},项目端口:{2},接口地址:{3},请求方式:{4},错误信息:{5}",
-						request.getServerName(),MDC.get("reqId"),request.getServerPort(),request.getRequestURI(),request.getMethod(),ex.getMessage());
-
+				String envName = request.getServletContext().getInitParameter("env.name");
+				String mess = MessageFormat.format("接口异常报警:项目:{0},环境:{1},IP:{2},traceId:{3},接口地址:{4},请求方式:{5},错误信息:{6}",
+						"mp-manage",envName, IPUtil.initIp(),MDC.get("reqId"),request.getRequestURI(),request.getMethod(),ex.getMessage());
 				logger.info(mess);
-				dingTextDTO.setContent(mess);
-				DingDingUtil.sendMessage(dingTextDTO,dingding_token_url);
+				DingdingAlarmUtil.sendDingdingAlerm(mess,dingding_token_url);
 			} catch (Exception e) {
 				logger.info("钉钉告警消息异常!" + e.getMessage());
 			}
