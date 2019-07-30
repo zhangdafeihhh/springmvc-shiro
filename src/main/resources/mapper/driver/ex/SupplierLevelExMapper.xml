@@ -70,4 +70,18 @@
 
   </select>
 
+  <select id="findOrderByMonthOrderByGradeScore" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select
+   id
+    from supplier_level where  month = #{month}
+    order by grade_score desc
+  </select>
+
+
+  <select id="findSupplierLevelScoreBySupplierId" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from supplier_level where  supplier_id = #{supplierId}
+    order by month  desc limit 1
+  </select>
 </mapper>

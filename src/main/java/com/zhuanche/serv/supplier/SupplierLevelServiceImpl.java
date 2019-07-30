@@ -29,10 +29,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class SupplierLevelServiceImpl  implements  SupplierLevelService{
@@ -154,13 +151,40 @@ public class SupplierLevelServiceImpl  implements  SupplierLevelService{
             SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
             Integer userId = currentLoginUser.getId();
             String userName = currentLoginUser.getName();
+            Map<String,BigDecimal> supplierLevelCache = new HashMap<>();
             for(SupplierLevelAdditional item : list){
                 item.setCreateTime(now);
                 item.setUpdateTime(now);
                 item.setCreateBy(userName);
                 item.setUpdateBy(userName);
                 supplierLevelAdditionalMapper.insertSelective(item);
+
+                if(supplierLevelCache.containsKey(""+item.getSupplierLevelId())){
+                    supplierLevelCache.put(""+item.getSupplierLevelId(),supplierLevelCache.get(""+item.getSupplierLevelId()).add(item.getItemValue()));
+                }else {
+                    supplierLevelCache.put(""+item.getSupplierLevelId(), item.getItemValue());
+                }
             }
+            Set<String> keySet = supplierLevelCache.keySet();
+            Iterator<String> is = keySet.iterator();
+            String supplierLevelIdString = null;
+            SupplierLevel supplierLevel = null;
+            BigDecimal additionalScore = null;
+            while(is.hasNext()){
+                supplierLevelIdString = is.next();
+                additionalScore = supplierLevelCache.get(supplierLevelIdString);
+                supplierLevel = supplierLevelMapper.selectByPrimaryKey(new Integer(supplierLevelIdString));
+                BigDecimal levelScore = calculationLevelScore(supplierLevel.getScaleScore(),supplierLevel.getEfficiencyScore(),supplierLevel.getServiceScore(),additionalScore);
+                //等级分
+                supplierLevel.setGradeScore(levelScore);
+                //附加分
+                supplierLevel.setAdditionalScore(additionalScore);
+                supplierLevel.setUpdateTime(now);
+                supplierLevelMapper.updateByPrimaryKeySelective(supplierLevel);
+
+            }
+
+
         }else{
             logger.info("导入供应商附加分，但是list为null");
         }
@@ -180,73 +204,8 @@ public class SupplierLevelServiceImpl  implements  SupplierLevelService{
 
     @Override
     public void doGenerateByDate(String month) throws ParseException {
+        //迁移到mp-job里通过传参可完成触发
 
-        int pageNo  = 1;
-        int pageSize = 20;
-        PageInfo<BiSaasSupplierRankData> pageInfo =  biSaasSupplierRankDataService.findPage(pageNo,pageSize,month);
-        if(pageInfo != null){
-            int pages = pageInfo.getPages();
-            List<BiSaasSupplierRankData>  list = null;
-
-            Map<String,CarBizSupplier> carBizSupplierCache = new HashMap<>();
-            Map<String,String> citynameCache = new HashMap<>();
-
-            SupplierLevel dbSupplierLevel = null;
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");// 24小时制
-            for(pageNo = 1; pageNo<=pages;pageNo++){
-                pageInfo =  biSaasSupplierRankDataService.findPage(pageNo,pageSize,month);
-                list = pageInfo.getList();
-                if(list != null  && list.size() >= 1){
-                    CarBizSupplier supplier = null;
-                    String cityname = null;
-                    for(BiSaasSupplierRankData rankData : list){
-                        SupplierLevel supplierLevel = new SupplierLevel();
-                        supplierLevel.setMonth(rankData.getDataMonth());
-                        if(carBizSupplierCache.containsKey(""+supplierLevel.getSupplierId())){
-                            supplier = carBizSupplierCache.get(""+supplierLevel.getSupplierId());
-                        }else{
-                            supplier =  carBizSupplierMapper.selectByPrimaryKey(supplierLevel.getSupplierId());
-                            carBizSupplierCache.put(""+supplierLevel.getSupplierId(),supplier);
-                        }
-
-                        if(citynameCache.containsKey(""+supplier.getSupplierCity())){
-                            cityname = citynameCache.get(""+supplier.getSupplierCity());
-                        }else {
-                            cityname = carBizCityExMapper.queryNameById(supplier.getSupplierCity());
-                            citynameCache.put(""+supplier.getSupplierCity(),cityname);
-                        }
-
-                        supplierLevel.setCityId(supplierLevel.getSupplierId());
-                        supplierLevel.setCityName(cityname);
-                        supplierLevel.setSupplierName(supplier.getSupplierFullName());
-                        supplierLevel.setStartTime(sdf.parse(rankData.getStartTime()));
-                        supplierLevel.setEndTime(sdf.parse(rankData.getEndTime()));
-                        supplierLevel.setScaleScore(new BigDecimal(rankData.getScaleScore()));
-                        supplierLevel.setEfficiencyScore(new BigDecimal(rankData.getEfficiencyScore()));
-                        supplierLevel.setServiceScore(new BigDecimal(rankData.getServiceScore()));
-                        supplierLevel.setAdditionalScore(BigDecimal.ZERO);
-
-                        //（规模分*35%+效率分*30%+服务分*35%）+附加分
-                        BigDecimal levelScore = calculationLevelScore(supplierLevel.getScaleScore(),supplierLevel.getEfficiencyScore(),supplierLevel.getServiceScore(),supplierLevel.getAdditionalScore());
-                        supplierLevel.setGradeScore(levelScore);
-                        supplierLevel.setStates(1);
-
-                        Date now = new Date();
-
-                        supplierLevel.setUpdateTime(now);
-
-                        dbSupplierLevel = supplierLevelexMapper.findByMonthAndSupplierName(month,supplierLevel.getSupplierName());
-                        if(dbSupplierLevel == null){
-                            supplierLevel.setCreateTime(now);
-                            supplierLevelMapper.insertSelective(supplierLevel);
-
-                        }else{
-                            supplierLevelMapper.updateByPrimaryKeySelective(supplierLevel);
-                        }
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -282,10 +241,27 @@ public class SupplierLevelServiceImpl  implements  SupplierLevelService{
         //重新计算该供应商等级的等级分
         //（规模分*35%+效率分*30%+服务分*35%）+附加分
         SupplierLevel supplierLevel = supplierLevelMapper.selectByPrimaryKey(supplierLevelId);
-        BigDecimal additionalScore = calculationLevelScore(supplierLevel.getScaleScore(),supplierLevel.getEfficiencyScore(),supplierLevel.getServiceScore(),  additionScore);
-        supplierLevel.setAdditionalScore(additionalScore);
+        BigDecimal gradeScore = calculationLevelScore(supplierLevel.getScaleScore(),supplierLevel.getEfficiencyScore(),supplierLevel.getServiceScore(),  additionScore);
+        //修改等级分
+        supplierLevel.setGradeScore(gradeScore);
+        //修改附加分
+        supplierLevel.setAdditionalScore(additionScore);
         supplierLevel.setUpdateTime(now);
         supplierLevelMapper.updateByPrimaryKeySelective(supplierLevel);
+    }
+
+    /**
+     * 排名并发布
+     * @param month
+     */
+    @Override
+    public void doSeqence(String month) {
+        //迁移到mp-job里通过传参可完成触发
+    }
+
+    @Override
+    public SupplierLevel findSupplierLevelScoreBySupplierId(int supplierId) {
+        return supplierLevelexMapper.findSupplierLevelScoreBySupplierId(supplierId);
     }
 
     private BigDecimal calculationLevelScore(BigDecimal scaleScore,BigDecimal efficiencyScore,BigDecimal serviceScore,BigDecimal additionScore){

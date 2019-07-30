@@ -86,6 +86,21 @@ public class SupplierLevelController {
             return AjaxResponse.fail(-1,"查询失败");
         }
     }
+    @RequestMapping(value="findAddditionalScoreBySupplierId",method= {RequestMethod.GET,RequestMethod.POST})
+    @ResponseBody
+    public AjaxResponse findAddditionalScoreBySupplierId(
+            @RequestParam(value = "supplierId", required = true)int supplierId,
+
+            HttpServletRequest request, HttpServletResponse response, ModelMap modelMap){
+        try{
+            logger.info("根据供应商Id查询供应商等级，参数为：supplierId="+supplierId);
+            SupplierLevel entity =    supplierLevelService.findSupplierLevelScoreBySupplierId(supplierId);
+            return AjaxResponse.success(entity);
+        }catch (Exception e){
+            logger.error("根据供应商Id查询供应商等级异常，参数为：supplierId="+supplierId,e);
+            return AjaxResponse.fail(-1,"查询失败");
+        }
+    }
 
         @RequestMapping(value="doSaveSupplierLevelAdditionScore",method= {RequestMethod.GET,RequestMethod.POST})
         @ResponseBody
@@ -100,7 +115,6 @@ public class SupplierLevelController {
                     return AjaxResponse.failMsg(-2,"参数错误，delIds和saveJson不能同时为空");
                 }
                 else{
-
                     supplierLevelService.doSaveSupplierLevelAdditionScore(supplierLevelId,delIds,saveJson);
                 }
                 return AjaxResponse.success(Boolean.TRUE);
@@ -373,7 +387,6 @@ public class SupplierLevelController {
                                 stringBuffer.append(",");
 
                                 stringBuffer.append(itemAddition.getItemValue());
-
                             }
                         }else{
 
@@ -444,9 +457,6 @@ public class SupplierLevelController {
             return AjaxResponse.success(Boolean.TRUE);
         }
 
-        //error
-       // result = this.carAssetDailyService.importCarInfo(params,  request);
-
     }
 
     @RequestMapping("/downloadtemplate")
@@ -461,13 +471,14 @@ public class SupplierLevelController {
     }
 
 
-    /**
+    /**拉取大数据的数据，开始本地创建数据
      * 供给测试使用
      * @param request
      * @param response
      * @param month
      */
     @RequestMapping("/doGenerateByDate")
+    @ResponseBody
     public AjaxResponse doGenerateByDate( HttpServletRequest request,HttpServletResponse response,String month){
         logger.info("生成供应商等级分：month="+month);
         try {
@@ -476,6 +487,25 @@ public class SupplierLevelController {
             return AjaxResponse.success("成功");
         } catch (Exception e) {
             logger.error("生成供应商等级分异常,month="+month, e);
+            return AjaxResponse.failMsg(-1,"异常");
+        }
+    }
+    /**
+     * 供给测试使用
+     * @param request
+     * @param response
+     * @param month
+     */
+    @RequestMapping("/doSeqence")
+    @ResponseBody
+    public AjaxResponse doSeqence( HttpServletRequest request,HttpServletResponse response,String month){
+        logger.info("排名并发布：month="+month);
+        try {
+            supplierLevelService.doSeqence(month);
+
+            return AjaxResponse.success("成功");
+        } catch (Exception e) {
+            logger.error("排名并发布异常,month="+month, e);
             return AjaxResponse.failMsg(-1,"异常");
         }
     }
@@ -506,8 +536,6 @@ public class SupplierLevelController {
                 result.put("msg", "导入模板错误");
                 return result;
             }
-
-
             int minRowIx = 1;// 过滤掉标题，从第一行开始导入数据
             int maxRowIx = sheet.getLastRowNum(); // 要导入数据的总条数
 
@@ -519,6 +547,7 @@ public class SupplierLevelController {
             Cell cell0 =null;
             Cell cell1 =null;
             Cell cell2 =null;
+            Map<String,Integer> rowItemCache = new HashMap<>();
             for (int rowIx = minRowIx; rowIx <= maxRowIx; rowIx++) {
                   cell0 =null;
                   cell1 =null;
@@ -552,7 +581,7 @@ public class SupplierLevelController {
                     itemValue = cell2.getNumericCellValue()+"";
                 }
 
-                ImportCheckEntity checkResult = checkEntity(rowIx,supplierName,itemName,itemValue,month);
+                ImportCheckEntity checkResult = checkEntity(rowIx,supplierName,itemName,itemValue,month,rowItemCache);
 
                 if(checkResult.getResult()){
                     SupplierLevelAdditional entity = new SupplierLevelAdditional();
@@ -570,10 +599,8 @@ public class SupplierLevelController {
                     error.put("errorReason",checkResult.getReason());
 
                     listException.add(error);
-
                     haveError = true;
                 }
-
             }
 
 //            Workbook wb = null;
@@ -586,8 +613,6 @@ public class SupplierLevelController {
 
                     download = "/template/error/" + fileName + buildRandom(2) + "_"+ System.currentTimeMillis() + ".csv";
                    boolean exportResult = exportExcel(CommonConfig.ERROR_BASE_FILE+download, listException);
-
-
                 }
             } catch (Exception e) {
                 logger.error("导入供应商等级的附加分异常" ,e);
@@ -628,44 +653,50 @@ public class SupplierLevelController {
         }
         throw new IllegalArgumentException("你的excel版本目前poi解析不了");
     }
-    private ImportCheckEntity checkEntity(Integer rowNum,String supplierName,String itemName,String itemValue,String month){
+    private ImportCheckEntity checkEntity(Integer rowNum,String supplierName,String itemName,String itemValue,String month,Map<String,Integer> rowItemCache){
         ImportCheckEntity result = new ImportCheckEntity();
         result.setResult(true);
 
-        SupplierLevel supplierLevel =   supplierLevelService.findByMonthAndSupplierName(month,supplierName);
-        if(supplierLevel == null){
+        if(rowItemCache.containsKey(supplierName+"_"+itemName)){
             result.setResult(false);
-            result.setReason("供应商无等级分记录");
-        }else if(supplierLevel.getStates() != 1){
-            result.setResult(false);
-            result.setReason("供应商无待发布的等级分记录");
-        }else {
-            Integer supplierLevelId = supplierLevel.getId();
+            result.setReason("该供应商的这个类目重复出现");
+        }else{
+            rowItemCache.put(supplierName+"_"+itemName,rowNum);
 
-            SupplierLevelAdditional additional =  supplierLevelService.findBySupplierLevelIdAndSupplierLevelAdditionalName(supplierLevelId,itemName);
-            if(additional != null){
+            SupplierLevel supplierLevel =   supplierLevelService.findByMonthAndSupplierName(month,supplierName);
+            if(supplierLevel == null){
                 result.setResult(false);
-                result.setReason("该附加项已存在");
+                result.setReason("供应商无等级分记录");
+            }else if(supplierLevel.getStates() != 1){
+                result.setResult(false);
+                result.setReason("供应商无待发布的等级分记录");
             }else {
-                if(StringUtils.isEmpty(itemValue)){
+                Integer supplierLevelId = supplierLevel.getId();
+
+                SupplierLevelAdditional additional =  supplierLevelService.findBySupplierLevelIdAndSupplierLevelAdditionalName(supplierLevelId,itemName);
+                if(additional != null){
                     result.setResult(false);
-                    result.setReason("供应商的附加分不能为空");
-                } else if(itemValue.trim().equals("0")){
-                    result.setResult(false);
-                    result.setReason("供应商的附加分不能为0");
+                    result.setReason("该附加项已存在");
                 }else {
-                    result.setResult(true);
-                    result.setForeignId(supplierLevel.getId());
+                    if(StringUtils.isEmpty(itemValue)){
+                        result.setResult(false);
+                        result.setReason("供应商的附加分不能为空");
+                    } else if(itemValue.trim().equals("0")){
+                        result.setResult(false);
+                        result.setReason("供应商的附加分不能为0");
+                    }else {
+                        result.setResult(true);
+                        result.setForeignId(supplierLevel.getId());
+                    }
                 }
             }
         }
+
+
         return result;
     }
     public boolean exportExcel(String path,
                                 List<JSONObject> list) throws Exception {
-
-
-
         if (list != null && list.size() > 0) {
             File f = new File(path);
             List<String > errorList = new ArrayList<>();

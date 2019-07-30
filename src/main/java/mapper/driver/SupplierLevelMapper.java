@@ -16,4 +16,6 @@ public interface SupplierLevelMapper {
     int updateByPrimaryKeySelective(SupplierLevel record);
 
     int updateByPrimaryKey(SupplierLevel record);
+
+
 }

@@ -68,4 +68,17 @@ public interface SupplierLevelService {
      * @param saveJson
      */
     void doSaveSupplierLevelAdditionScore(Integer supplierLevelId,String delIds, String saveJson);
+
+    /**
+     * 将某个月的进行排序
+     * @param month
+     */
+    public void doSeqence(String month);
+
+    /**
+     * 根据供应商id查询最近的等级分
+     * @param supplierId
+     * @return
+     */
+    SupplierLevel findSupplierLevelScoreBySupplierId(int supplierId);
 }
