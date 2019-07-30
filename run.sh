@@ -10,6 +10,7 @@ export PATH=$JAVA_HOME/bin:$PATH
 
 #2,start tomcat
 
+
 #if [ "${START_ENV}" = "dev" ]; then
 #   cd /u01/tomcat_docker_8080/webapps/ROOT
 #   cp -rfp ./WEB-INF/classes/dev/*  ./WEB-INF/classes/
