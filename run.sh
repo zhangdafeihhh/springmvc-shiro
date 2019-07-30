@@ -30,7 +30,7 @@ export PATH=$JAVA_HOME/bin:$PATH
 #   cp -rfp ./WEB-INF/classes/online/*  ./WEB-INF/classes/
 #fi
 
-
-/u01/tomcat_docker_8080/bin/run.sh
 echo "0 3 * * *  find /u01/upload/template/error/ -mtime +1  -exec rm -f {} \;" >> /var/spool/cron/root
+/u01/tomcat_docker_8080/bin/run.sh
+
 #3,process
