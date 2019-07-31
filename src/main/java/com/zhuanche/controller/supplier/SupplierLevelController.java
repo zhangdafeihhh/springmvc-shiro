@@ -560,7 +560,10 @@ public class SupplierLevelController {
                 if(cell0 == null){
                     supplierName = null;
                 }else{
-                    supplierName = cell0.getStringCellValue().trim();
+                    supplierName = cell0.getStringCellValue();
+                    if(supplierName != null){
+                        supplierName = supplierName.trim();
+                    }
                 }
                 if(StringUtils.isEmpty(supplierName)){
                     continue;
@@ -569,7 +572,10 @@ public class SupplierLevelController {
                 if(cell1 == null){
                     itemName = null;
                 }else{
-                    itemName = cell1.getStringCellValue().trim();
+                    itemName = cell1.getStringCellValue();
+                    if(itemName != null){
+                        itemName = itemName.trim();
+                    }
                 }
                 if(StringUtils.isEmpty(itemName)){
                     continue;
