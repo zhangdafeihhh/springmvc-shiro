@@ -446,7 +446,7 @@ public class SupplierLevelController {
         Map<String, Object> result = _doPareImportData(    file, month,    request);
         //有异常则标识导入失败
         if(result.get("error")==Boolean.TRUE){
-            AjaxResponse errorAjaxResponse = AjaxResponse.fail(-2,"上传数据中有问题,点击下载查看");
+            AjaxResponse errorAjaxResponse = AjaxResponse.fail(0,"上传数据中有问题,点击下载查看");
             errorAjaxResponse.setData(result);
             return errorAjaxResponse;
         }else{
@@ -560,7 +560,7 @@ public class SupplierLevelController {
                 if(cell0 == null){
                     supplierName = null;
                 }else{
-                    supplierName = cell0.getStringCellValue();
+                    supplierName = cell0.getStringCellValue().trim();
                 }
                 if(StringUtils.isEmpty(supplierName)){
                     continue;
@@ -569,7 +569,7 @@ public class SupplierLevelController {
                 if(cell1 == null){
                     itemName = null;
                 }else{
-                    itemName = cell1.getStringCellValue();
+                    itemName = cell1.getStringCellValue().trim();
                 }
                 if(StringUtils.isEmpty(itemName)){
                     continue;
