@@ -442,20 +442,27 @@ public class SupplierLevelController {
                                         HttpServletRequest request){
 
         logger.info("导入供应商等级信息:month=" + month+",fileSize="+(file==null?"null":file.getSize()));
-        //解析要导入的文档
-        Map<String, Object> result = _doPareImportData(    file, month,    request);
-        //有异常则标识导入失败
-        if(result.get("error")==Boolean.TRUE){
-            AjaxResponse errorAjaxResponse = AjaxResponse.fail(0,"上传数据中有问题,点击下载查看");
-            errorAjaxResponse.setData(result);
-            return errorAjaxResponse;
-        }else{
-            //无异常则数据入库
-            List<SupplierLevelAdditional> supplierLevelAdditionalDtos = (List<SupplierLevelAdditional>) result.get("dataList");
-            supplierLevelService.doImportSupplierLevelAdditional(supplierLevelAdditionalDtos);
+        try{
+            //解析要导入的文档
+            Map<String, Object> result = _doPareImportData(    file, month,    request);
+            //有异常则标识导入失败
+            if(result.get("error")==Boolean.TRUE){
+                AjaxResponse errorAjaxResponse = AjaxResponse.fail(0,"上传数据中有问题,点击下载查看");
+                errorAjaxResponse.setData(result);
+                return errorAjaxResponse;
+            }else{
+                //无异常则数据入库
+                List<SupplierLevelAdditional> supplierLevelAdditionalDtos = (List<SupplierLevelAdditional>) result.get("dataList");
+                supplierLevelService.doImportSupplierLevelAdditional(supplierLevelAdditionalDtos);
 
-            return AjaxResponse.success(Boolean.TRUE);
+                return AjaxResponse.success(Boolean.TRUE);
+            }
+        }catch (Exception e){
+            logger.error("导入供应商等级信息异常:month=" + month+",fileSize="+(file==null?"null":file.getSize()));
+            AjaxResponse errorAjaxResponse = AjaxResponse.failMsg(-1,"上传数据中有问题,点击下载查看");
+            return errorAjaxResponse;
         }
+
 
     }
 
