@@ -67,7 +67,7 @@ public interface SupplierLevelService {
      * @param delIds
      * @param saveJson
      */
-    void doSaveSupplierLevelAdditionScore(Integer supplierLevelId,String delIds, String saveJson);
+    SupplierLevel doSaveSupplierLevelAdditionScore(Integer supplierLevelId,String delIds, String saveJson);
 
     /**
      * 将某个月的进行排序

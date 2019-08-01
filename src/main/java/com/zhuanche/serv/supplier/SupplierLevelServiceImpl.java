@@ -209,7 +209,7 @@ public class SupplierLevelServiceImpl  implements  SupplierLevelService{
     }
 
     @Override
-    public void doSaveSupplierLevelAdditionScore(Integer supplierLevelId,String delIds, String saveJson) {
+    public SupplierLevel doSaveSupplierLevelAdditionScore(Integer supplierLevelId,String delIds, String saveJson) {
 
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         Integer userId = currentLoginUser.getId();
@@ -248,6 +248,8 @@ public class SupplierLevelServiceImpl  implements  SupplierLevelService{
         supplierLevel.setAdditionalScore(additionScore);
         supplierLevel.setUpdateTime(now);
         supplierLevelMapper.updateByPrimaryKeySelective(supplierLevel);
+
+        return supplierLevel;
     }
 
     /**

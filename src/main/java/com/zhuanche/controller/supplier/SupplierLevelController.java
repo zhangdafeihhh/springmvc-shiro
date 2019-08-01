@@ -115,17 +115,14 @@ public class SupplierLevelController {
                     return AjaxResponse.failMsg(-2,"参数错误，delIds和saveJson不能同时为空");
                 }
                 else{
-                    supplierLevelService.doSaveSupplierLevelAdditionScore(supplierLevelId,delIds,saveJson);
+                    SupplierLevel result =   supplierLevelService.doSaveSupplierLevelAdditionScore(supplierLevelId,delIds,saveJson);
+                    return AjaxResponse.success(result);
                 }
-                return AjaxResponse.success(Boolean.TRUE);
-
-
             }catch (Exception e){
                 logger.error("保存修改附加分异常，参数为：delIds="+delIds+";saveJson="+saveJson );
                 return AjaxResponse.failMsg(-1,"保存修改附加分异常");
             }
         }
-
     /**
      * 发布供应商等级
      * @param request
