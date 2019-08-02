@@ -19,6 +19,7 @@ import com.zhuanche.dto.DriverDailyReportDTO;
 import com.zhuanche.entity.mdbcarmanage.DriverDailyReport;
 import com.zhuanche.entity.mdbcarmanage.DriverDailyReportParams;
 import com.zhuanche.serv.DriverDailyReportExService;
+import com.zhuanche.shiro.cache.RedisCache;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtil;
@@ -108,47 +109,79 @@ public class DriverDailyReportController extends DriverQueryController {
 				return AjaxResponse.fail(RestErrorCode.ONLY_QUERY_ONE_MONTH);
 			}
 		}
-		//初始化查询参数
-		DriverDailyReportParams params = new DriverDailyReportParams(licensePlates,driverName,driverIds,teamIds,suppliers,cities,statDateStart,statDateEnd,sortName,sortOrder,groupIds,page,pageSize);
 
-		log.info("司机周报列表数据:queryDriverDailyReportData，参数："+(params==null?"null": JSON.toJSONString(params)));
-		int total = 0;
-		//判断权限   如果司机id为空为查询列表页
-		if(StringUtils.isEmpty(params.getDriverIds())){
-			String driverList = "";
-			//如果页面输入了小组id
-			if(StringUtils.isNotEmpty(params.getGroupIds())){
-				//通过小组id查询司机id, 如果用户
-				driverList = super.queryAuthorityDriverIdsByTeamAndGroup(null, String.valueOf(params.getGroupIds()));
-				//如果该小组下无司机，返回空
-				if(StringUtils.isEmpty(driverList)){
-					log.info("司机日报列表-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds());
-					PageDTO pageDTO = new PageDTO(params.getPage(), params.getPageSize(), total, null);
-					return AjaxResponse.success(pageDTO);
-				}
-			}
-			params.setDriverIds(driverList);
-		}
-		//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
-		params = this.chuliDriverDailyReportEntity(params);
-		List<DriverDailyReport> x = null;
-		//开始查询
-		PageInfo<DriverDailyReport> pages = null;
-		if ( reportType==0 ) {
-			pages = driverDailyReportExService.findDayDriverDailyReportByparam(params);
-		}else{
-			pages = driverDailyReportExService.findWeekDriverDailyReportByparam(params,  statDateStart,    statDateEnd);
+		SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+		Integer userId = currentLoginUser.getId();
+		String loginName = currentLoginUser.getLoginName();
+
+		StringBuffer stringBuffer = new StringBuffer();
+		stringBuffer.append(userId).append(licensePlates).append(driverName).append(driverIds).append(teamIds).append(suppliers)
+				.append(cities).append(statDateStart).append(statDateEnd).append(sortName).append(sortOrder).append(groupIds).append(page).append(pageSize).append(reportType).append(loginName);
+		String key = "query_driver_report_" + stringBuffer.toString().replaceAll("null","");
+		PageDTO redisPageDTO =  RedisCacheUtil.get(key,PageDTO.class);
+		if(redisPageDTO != null){
+			return AjaxResponse.success(redisPageDTO);
 		}
 
-		//如果不为空，进行查询供应商名称
-		List<DriverDailyReportDTO> dtoList = driverDailyReportExService.selectSuppierNameAndCityNameDays(pages.getList(),reportType,statDateStart,statDateEnd);
-		PageDTO pageDTO =  new PageDTO();
-		pageDTO.setPage(params.getPage());
-		pageDTO.setPageSize(params.getPageSize());
-		pageDTO.setTotal(new Integer(pages.getTotal()+""));
-		pageDTO.setResult(dtoList);
+		if(RedisCacheUtil.exist(key) && RedisCacheUtil.get(key,PageDTO.class) == null){
+			log.info("查询过于频繁");
 
-		return AjaxResponse.success(pageDTO);
+			return AjaxResponse.success("查询中...");
+		}
+
+		if(!RedisCacheUtil.exist(key)){
+			RedisCacheUtil.set(key,null);
+		}
+
+		PageDTO pageResultDTO = null;
+
+		try {
+			//初始化查询参数
+			DriverDailyReportParams params = new DriverDailyReportParams(licensePlates,driverName,driverIds,teamIds,suppliers,cities,statDateStart,statDateEnd,sortName,sortOrder,groupIds,page,pageSize);
+
+			log.info("司机周报列表数据:queryDriverDailyReportData，参数："+(params==null?"null": JSON.toJSONString(params)));
+			int total = 0;
+			//判断权限   如果司机id为空为查询列表页
+			if(StringUtils.isEmpty(params.getDriverIds())){
+                String driverList = "";
+                //如果页面输入了小组id
+                if(StringUtils.isNotEmpty(params.getGroupIds())){
+                    //通过小组id查询司机id, 如果用户
+                    driverList = super.queryAuthorityDriverIdsByTeamAndGroup(null, String.valueOf(params.getGroupIds()));
+                    //如果该小组下无司机，返回空
+                    if(StringUtils.isEmpty(driverList)){
+                        log.info("司机日报列表-有选择小组查询条件-该小组下没有司机groupId=="+params.getGroupIds());
+                        PageDTO pageDTO = new PageDTO(params.getPage(), params.getPageSize(), total, null);
+                        return AjaxResponse.success(pageDTO);
+                    }
+                }
+                params.setDriverIds(driverList);
+            }
+			//根据 参数重新整理 入参条件 ,如果页面没有传入参数，则使用该用户绑定的权限
+			params = this.chuliDriverDailyReportEntity(params);
+			List<DriverDailyReport> x = null;
+			//开始查询
+			PageInfo<DriverDailyReport> pages = null;
+			if ( reportType==0 ) {
+                pages = driverDailyReportExService.findDayDriverDailyReportByparam(params);
+            }else{
+                pages = driverDailyReportExService.findWeekDriverDailyReportByparam(params,  statDateStart,    statDateEnd);
+            }
+
+			//如果不为空，进行查询供应商名称
+			List<DriverDailyReportDTO> dtoList = driverDailyReportExService.selectSuppierNameAndCityNameDays(pages.getList(),reportType,statDateStart,statDateEnd);
+			pageResultDTO = new PageDTO();
+			pageResultDTO.setPage(params.getPage());
+			pageResultDTO.setPageSize(params.getPageSize());
+			pageResultDTO.setTotal(new Integer(pages.getTotal()+""));
+			pageResultDTO.setResult(dtoList);
+			RedisCacheUtil.set(key,pageResultDTO,3600);//缓存1个小时
+		} catch (Exception e) {
+			log.info("查询异常",e);
+			RedisCacheUtil.delete(key);
+		}
+
+		return AjaxResponse.success(pageResultDTO);
 	}
 
 
