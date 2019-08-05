@@ -120,18 +120,21 @@ public class DriverDailyReportController extends DriverQueryController {
 				.append(cities).append(statDateStart).append(statDateEnd).append(sortName).append(sortOrder).append(groupIds).append(page).append(pageSize).append(reportType).append(loginName);
 		String key = RedisKeyUtils.DAILY_REPORT_KEY + stringBuffer.toString().replaceAll("null","");
 		PageDTO redisPageDTO =  RedisCacheUtil.get(key,PageDTO.class);
-		if(redisPageDTO != null){
-			return AjaxResponse.success(redisPageDTO);
-		}
-
-		if(RedisCacheUtil.exist(key) && RedisCacheUtil.get(key,PageDTO.class) == null){
+		if(redisPageDTO != null && redisPageDTO.getPage() == 0 ){
 			log.info("查询过于频繁");
-
 			return AjaxResponse.success("查询中...");
+
+			//return AjaxResponse.success(redisPageDTO);
+		}
+		
+		if(!RedisCacheUtil.exist(key)){
+			RedisCacheUtil.set(key,new PageDTO());
 		}
 
-		if(!RedisCacheUtil.exist(key)){
-			RedisCacheUtil.set(key,null);
+		try {
+			Thread.sleep(10000000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 
 		PageDTO pageResultDTO = null;
