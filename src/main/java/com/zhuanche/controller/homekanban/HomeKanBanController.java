@@ -450,6 +450,41 @@ public class HomeKanBanController {
 			logger.warn("如果加盟商ID为空，不允许传入车队ID");
 			return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID);
 		}
+
+		String key = null;
+
+		try {
+			//如果城市权限为空（说明是全国的权限），且数据权限为全国 则缓存一天数据。如果不是，缓存key值为当前登录用户+时间+allianceId+motorcadeId
+			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
+
+			key = "";
+			StringBuffer stringBuffer = new StringBuffer();
+
+
+			if(CollectionUtils.isEmpty(currentLoginUser.getCityIds()) && currentLoginUser.getLevel().equals(PermissionLevelEnum.ALL.getCode())){
+				//
+				key = RedisKeyUtils.CORE_STATISTICS + stringBuffer.append(startDate).append(endDate).append(allianceId).append(motorcadeId).toString().replaceAll("null","");
+				List<Map> resultList = RedisCacheUtil.get(key,List.class);
+				if(RedisCacheUtil.exist(key) && resultList != null){
+					return  AjaxResponse.success(resultList);
+				}
+			}else {
+				key = RedisKeyUtils.CORE_STATISTICS + stringBuffer.append(currentLoginUser.getId()).append(startDate).append(endDate)
+						.append(allianceId).append(motorcadeId).toString().replaceAll("null","");
+				List<Map> resultList = RedisCacheUtil.get(key,List.class);
+				if(RedisCacheUtil.exist(key) && resultList != null){
+					return AjaxResponse.success(resultList);
+				}
+			}
+		} catch (Exception e) {
+			logger.error("缓存查询错误",e);
+		}
+
+
+
+
+
+
 		// 供应商信息
 		String[] visibleAllianceIds = null;
 		// 车队信息
@@ -490,6 +525,7 @@ public class HomeKanBanController {
 			List<SAASCoreIndexDto> saasCoreIndexDtoList = measureDayExMapper.getCoreIndexStatistic(startDate,endDate,allianceId,motorcadeId,visibleList,visibleMotoIdsList,dateDiff);
 
 			if(CollectionUtils.isNotEmpty(saasCoreIndexDtoList)){
+				RedisCacheUtil.set(key,saasCoreIndexDtoList.get(0),3600*24);
 				return AjaxResponse.success(saasCoreIndexDtoList.get(0));
 			}else {
 				return AjaxResponse.success(null);
