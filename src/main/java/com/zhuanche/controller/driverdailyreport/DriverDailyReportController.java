@@ -10,6 +10,7 @@ import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.common.util.RedisKeyUtils;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
@@ -117,7 +118,7 @@ public class DriverDailyReportController extends DriverQueryController {
 		StringBuffer stringBuffer = new StringBuffer();
 		stringBuffer.append(userId).append(licensePlates).append(driverName).append(driverIds).append(teamIds).append(suppliers)
 				.append(cities).append(statDateStart).append(statDateEnd).append(sortName).append(sortOrder).append(groupIds).append(page).append(pageSize).append(reportType).append(loginName);
-		String key = "query_driver_report_" + stringBuffer.toString().replaceAll("null","");
+		String key = RedisKeyUtils.DAILY_REPORT_KEY + stringBuffer.toString().replaceAll("null","");
 		PageDTO redisPageDTO =  RedisCacheUtil.get(key,PageDTO.class);
 		if(redisPageDTO != null){
 			return AjaxResponse.success(redisPageDTO);

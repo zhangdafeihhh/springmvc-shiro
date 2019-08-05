@@ -3,6 +3,9 @@ package com.zhuanche.controller.homekanban;
 import java.time.LocalDate;
 import java.util.*;
 
+import com.zhuanche.common.cache.RedisCacheUtil;
+import com.zhuanche.common.enums.PermissionLevelEnum;
+import com.zhuanche.common.util.RedisKeyUtils;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.entity.bigdata.SAASCoreIndexDto;
 import com.zhuanche.entity.bigdata.SAASDriverRankingDto;
@@ -104,6 +107,34 @@ public class HomeKanBanController {
 		paramMap.put("endDate", endDate);
 		paramMap.put("allianceId", allianceId);
 		paramMap.put("motorcadeId", motorcadeId);*/
+		String key = null;
+
+		try {
+			//如果城市权限为空（说明是全国的权限），且数据权限为全国 则缓存一天数据。如果不是，缓存key值为当前登录用户+时间+allianceId+motorcadeId
+			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
+
+			key = "";
+			StringBuffer stringBuffer = new StringBuffer();
+
+
+			if(CollectionUtils.isEmpty(currentLoginUser.getCityIds()) && currentLoginUser.getLevel().equals(PermissionLevelEnum.ALL.getCode())){
+                //
+                key = RedisKeyUtils.VEHICLE_STATISTICS + stringBuffer.append(startDate).append(endDate).append(allianceId).append(motorcadeId).toString().replaceAll("null","");
+                List<Map> resultList = RedisCacheUtil.get(key,List.class);
+                if(RedisCacheUtil.exist(key) && resultList != null){
+                    return  AjaxResponse.success(resultList);
+                }
+            }else {
+                key = RedisKeyUtils.VEHICLE_STATISTICS + stringBuffer.append(currentLoginUser.getId()).append(startDate).append(endDate)
+                        .append(allianceId).append(motorcadeId).toString().replaceAll("null","");
+                List<Map> resultList = RedisCacheUtil.get(key,List.class);
+                if(RedisCacheUtil.exist(key) && resultList != null){
+                    return AjaxResponse.success(resultList);
+                }
+            }
+		} catch (Exception e) {
+			logger.error("缓存查询错误",e);
+		}
 
 		try{
 			SAASIndexQuery saas = setVisibleData();
@@ -113,6 +144,9 @@ public class HomeKanBanController {
 			saas.setMotorcadeId(motorcadeId);
 			List<Map> resultList = allianceIndexService.getCarOperateStatistics(saas);
 			if(CollectionUtils.isNotEmpty(resultList)){
+
+				RedisCacheUtil.set(key,resultList,3600*24);
+
 				return AjaxResponse.success(resultList);
 			}else {
 				return AjaxResponse.success(new ArrayList<>());
@@ -141,6 +175,38 @@ public class HomeKanBanController {
 		paramMap.put("endDate", endDate);
 		paramMap.put("allianceId", allianceId);
 		paramMap.put("motorcadeId", motorcadeId);*/
+
+		String key = null;
+
+		try {
+			//如果城市权限为空（说明是全国的权限），且数据权限为全国 则缓存一天数据。如果不是，缓存key值为当前登录用户+时间+allianceId+motorcadeId
+			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
+
+			key = "";
+			StringBuffer stringBuffer = new StringBuffer();
+
+
+			if(CollectionUtils.isEmpty(currentLoginUser.getCityIds()) && currentLoginUser.getLevel().equals(PermissionLevelEnum.ALL.getCode())){
+				//
+				key = RedisKeyUtils.ORDER_STATISTICS + stringBuffer.append(startDate).append(endDate).append(allianceId).append(motorcadeId).toString().replaceAll("null","");
+				List<Map> resultList = RedisCacheUtil.get(key,List.class);
+				if(RedisCacheUtil.exist(key) && resultList != null){
+					return  AjaxResponse.success(resultList);
+				}
+			}else {
+				key = RedisKeyUtils.ORDER_STATISTICS + stringBuffer.append(currentLoginUser.getId()).append(startDate).append(endDate)
+						.append(allianceId).append(motorcadeId).toString().replaceAll("null","");
+				List<Map> resultList = RedisCacheUtil.get(key,List.class);
+				if(RedisCacheUtil.exist(key) && resultList != null){
+					return AjaxResponse.success(resultList);
+				}
+			}
+		} catch (Exception e) {
+			logger.error("缓存查询错误",e);
+		}
+
+
+
 		try{
 			SAASIndexQuery saas = setVisibleData();
 			saas.setStartDate(startDate);
@@ -149,6 +215,9 @@ public class HomeKanBanController {
 			saas.setMotorcadeId(motorcadeId);
 			List<Map> resultList = allianceIndexService.getOrderNumStatistic(saas);
 			if(CollectionUtils.isNotEmpty(resultList)){
+
+				RedisCacheUtil.set(key,resultList,3600*24);
+
 				return AjaxResponse.success(resultList);
 			}else {
 				return AjaxResponse.success(new ArrayList<>());
@@ -178,6 +247,39 @@ public class HomeKanBanController {
 		paramMap.put("allianceId", allianceId);
 		paramMap.put("motorcadeId", motorcadeId);
 		return parseResult(statisticsEvaluationUrl, paramMap);*/
+
+
+		String key = null;
+
+		try {
+			//如果城市权限为空（说明是全国的权限），且数据权限为全国 则缓存一天数据。如果不是，缓存key值为当前登录用户+时间+allianceId+motorcadeId
+			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();// 获取当前登录用户信息
+
+			key = "";
+			StringBuffer stringBuffer = new StringBuffer();
+
+
+			if(CollectionUtils.isEmpty(currentLoginUser.getCityIds()) && currentLoginUser.getLevel().equals(PermissionLevelEnum.ALL.getCode())){
+				//
+				key = RedisKeyUtils.SERVICE_RATE_STATISTIS + stringBuffer.append(startDate).append(endDate).append(allianceId).append(motorcadeId).toString().replaceAll("null","");
+				List<Map> resultList = RedisCacheUtil.get(key,List.class);
+				if(RedisCacheUtil.exist(key) && resultList != null){
+					return  AjaxResponse.success(resultList);
+				}
+			}else {
+				key = RedisKeyUtils.SERVICE_RATE_STATISTIS + stringBuffer.append(currentLoginUser.getId()).append(startDate).append(endDate)
+						.append(allianceId).append(motorcadeId).toString().replaceAll("null","");
+				List<Map> resultList = RedisCacheUtil.get(key,List.class);
+				if(RedisCacheUtil.exist(key) && resultList != null){
+					return AjaxResponse.success(resultList);
+				}
+			}
+		} catch (Exception e) {
+			logger.error("缓存查询错误",e);
+		}
+
+
+
 		try{
 			SAASIndexQuery saas = setVisibleData();
 			saas.setStartDate(startDate);
@@ -186,6 +288,9 @@ public class HomeKanBanController {
 			saas.setMotorcadeId(motorcadeId);
 			List<Map> resultList = allianceIndexService.getServiceNegativeRate(saas);
 			if(CollectionUtils.isNotEmpty(resultList)){
+
+				RedisCacheUtil.set(key,resultList,3600*24);
+
 				return AjaxResponse.success(resultList);
 			}else {
 				return AjaxResponse.success(new ArrayList<>());
@@ -496,5 +601,6 @@ public class HomeKanBanController {
 		}
 		return saas;
 	}
-	
+
+
 }
