@@ -122,20 +122,13 @@ public class DriverDailyReportController extends DriverQueryController {
 		PageDTO redisPageDTO =  RedisCacheUtil.get(key,PageDTO.class);
 		if(redisPageDTO != null && redisPageDTO.getPage() == 0 ){
 			log.info("查询过于频繁");
-			return AjaxResponse.success("查询中...");
-
-			//return AjaxResponse.success(redisPageDTO);
+			return AjaxResponse.success("查询过于频繁，结果查询中...");
 		}
 		
 		if(!RedisCacheUtil.exist(key)){
 			RedisCacheUtil.set(key,new PageDTO());
 		}
 
-		try {
-			Thread.sleep(10000000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 
 		PageDTO pageResultDTO = null;
 
