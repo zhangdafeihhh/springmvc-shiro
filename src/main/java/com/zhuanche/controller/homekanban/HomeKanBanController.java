@@ -464,9 +464,9 @@ public class HomeKanBanController {
 			if(CollectionUtils.isEmpty(currentLoginUser.getCityIds()) && currentLoginUser.getLevel().equals(PermissionLevelEnum.ALL.getCode())){
 				//
 				key = RedisKeyUtils.CORE_STATISTICS + stringBuffer.append(startDate).append(endDate).append(allianceId).append(motorcadeId).toString().replaceAll("null","");
-				List<Map> resultList = RedisCacheUtil.get(key,List.class);
-				if(RedisCacheUtil.exist(key) && resultList != null){
-					return  AjaxResponse.success(resultList);
+				SAASCoreIndexDto saasCoreIndexDto = RedisCacheUtil.get(key,SAASCoreIndexDto.class);
+				if(RedisCacheUtil.exist(key) && saasCoreIndexDto != null){
+					return  AjaxResponse.success(saasCoreIndexDto);
 				}
 			}else {
 				key = RedisKeyUtils.CORE_STATISTICS + stringBuffer.append(currentLoginUser.getId()).append(startDate).append(endDate)
