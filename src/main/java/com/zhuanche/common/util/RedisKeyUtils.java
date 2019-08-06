@@ -17,4 +17,10 @@ public class RedisKeyUtils {
     public static final String SERVICE_RATE_STATISTIS = "service_evaluation_rate_statistics_"; //服务差评率
 
     public static final String CORE_STATISTICS = "core_indicators_statistics"; //核心指标统计
+
+    public static final String SAAS_DAILY_REPORT = "saas_daily_report_"; //saas月报查询
+
+    public static final String SAAS_MONTH_REPORT = "saas_month_report_"; //saas月报查询
+
+    public static final String SAAS_SUMMARY_REPORT = "saas_summary_report_"; //saas月报查询
 }

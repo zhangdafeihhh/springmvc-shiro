@@ -119,14 +119,21 @@ public class DriverDailyReportController extends DriverQueryController {
 		stringBuffer.append(userId).append(licensePlates).append(driverName).append(driverIds).append(teamIds).append(suppliers)
 				.append(cities).append(statDateStart).append(statDateEnd).append(sortName).append(sortOrder).append(groupIds).append(page).append(pageSize).append(reportType).append(loginName);
 		String key = RedisKeyUtils.DAILY_REPORT_KEY + stringBuffer.toString().replaceAll("null","");
+		log.info("缓存key值：" + key);
 		PageDTO redisPageDTO =  RedisCacheUtil.get(key,PageDTO.class);
 		if(redisPageDTO != null && redisPageDTO.getPage() == 0 ){
 			log.info("查询过于频繁");
 			return AjaxResponse.success("查询过于频繁，结果查询中...");
 		}
-		
+
+		if(RedisCacheUtil.exist(key) && redisPageDTO != null && redisPageDTO.getPage() > 0){
+			log.info("缓存获取结果");
+			return AjaxResponse.success(redisPageDTO);
+		}
+
 		if(!RedisCacheUtil.exist(key)){
-			RedisCacheUtil.set(key,new PageDTO());
+			//如果1分钟内还没有查询到结果 有可能是后面的报错了 重新查询
+			RedisCacheUtil.set(key,new PageDTO(),60);
 		}
 
 
