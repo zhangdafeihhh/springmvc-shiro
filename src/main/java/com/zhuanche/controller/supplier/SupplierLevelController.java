@@ -444,8 +444,8 @@ public class SupplierLevelController {
             Map<String, Object> result = _doPareImportData(    file, month,    request);
             //有异常则标识导入失败
             if(result.get("error")==Boolean.TRUE){
-                AjaxResponse errorAjaxResponse = AjaxResponse.fail(0,"上传数据中有问题,点击下载查看");
-                errorAjaxResponse.setData(result);
+                AjaxResponse errorAjaxResponse = AjaxResponse.success(result);
+                errorAjaxResponse.setMsg("上传数据中有问题,点击下载查看");
                 return errorAjaxResponse;
             }else{
                 //无异常则数据入库
