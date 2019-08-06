@@ -471,13 +471,14 @@ public class HomeKanBanController {
 			}else {
 				key = RedisKeyUtils.CORE_STATISTICS + stringBuffer.append(currentLoginUser.getId()).append(startDate).append(endDate)
 						.append(allianceId).append(motorcadeId).toString().replaceAll("null","");
-				List<Map> resultList = RedisCacheUtil.get(key,List.class);
-				if(RedisCacheUtil.exist(key) && resultList != null){
-					return AjaxResponse.success(resultList);
+				SAASCoreIndexDto saasCoreIndexDto = RedisCacheUtil.get(key,SAASCoreIndexDto.class);
+				if(RedisCacheUtil.exist(key) && saasCoreIndexDto != null){
+					return AjaxResponse.success(saasCoreIndexDto);
 				}
 			}
 		} catch (Exception e) {
 			logger.error("缓存查询错误",e);
+			RedisCacheUtil.delete(key);
 		}
 
 
