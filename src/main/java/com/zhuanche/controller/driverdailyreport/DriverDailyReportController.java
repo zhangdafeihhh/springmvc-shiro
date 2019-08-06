@@ -179,7 +179,7 @@ public class DriverDailyReportController extends DriverQueryController {
 			pageResultDTO.setPageSize(params.getPageSize());
 			pageResultDTO.setTotal(new Integer(pages.getTotal()+""));
 			pageResultDTO.setResult(dtoList);
-			RedisCacheUtil.set(key,pageResultDTO,3600);//缓存1个小时
+			RedisCacheUtil.set(key,pageResultDTO,3600*24);//缓存24个小时
 		} catch (Exception e) {
 			log.info("查询异常",e);
 			RedisCacheUtil.delete(key);
