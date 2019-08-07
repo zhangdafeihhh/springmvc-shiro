@@ -4,8 +4,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Maps;
+import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.rocketmq.ExcelProducer;
+import com.zhuanche.common.util.RedisKeyUtils;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -122,6 +124,37 @@ public class SaasDriverDailyReportController {
             logger.info("请选择2019年后的日期");
             return AjaxResponse.fail(RestErrorCode.CHOOSE_BAD_DATE);
         }
+
+
+
+        String key = "";
+        try {
+            StringBuffer stringBuffer = new StringBuffer();
+            SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+            Integer userId = currentLoginUser.getId();
+            key = RedisKeyUtils.SAAS_DAILY_REPORT + stringBuffer.append(userId).append(cityId).append(cityName).append(supplierId).append(supplierName)
+                    .append(driverTeamId).append(driverTeamName).append(driverGroupId).append(driverGroupName)
+                    .append(driverPhone).append(licensePlates).append(beginDate).append(endDate).append(businessVolumeSort).append(finOrdCntSort)
+                    .append(badCntSort).append(pageNum).append(pageSize).toString().replaceAll("null","");
+            PageDTO pageDTOCache = RedisCacheUtil.get(key,PageDTO.class);
+
+            if(RedisCacheUtil.exist(key) && pageDTOCache != null && pageDTOCache.getPage() == 0){
+                logger.info("查询过于频繁");
+                return AjaxResponse.success("saas日报查询过于频繁，结果查询中...");
+            }
+
+            if(RedisCacheUtil.exist(key) && pageDTOCache != null && pageDTOCache.getPage() > 0){
+                return AjaxResponse.success(pageDTOCache);
+            }
+
+            if(!RedisCacheUtil.exist(key)){
+                //如果没有在缓存里面，默认查询一分钟
+                RedisCacheUtil.set(key,new PageDTO(),60);
+            }
+        } catch (Exception e) {
+            logger.info("缓存查询失败",e);
+        }
+
 
 
         List<CarBizSupplier> carBizSupplierList = null;
@@ -247,8 +280,13 @@ public class SaasDriverDailyReportController {
             dto.setCarGroupName(carGroupMap.get(dto.getCarGroupId()));
         }
         PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, dailyDtoList);
+        try {
+            RedisCacheUtil.set(key,pageDTO,3600*24);
+        } catch (Exception e) {
+            logger.info("设置缓存失败",e);
+        }
 
-       return AjaxResponse.success(pageDTO);
+        return AjaxResponse.success(pageDTO);
 
     }
 
@@ -396,6 +434,37 @@ public class SaasDriverDailyReportController {
             return AjaxResponse.fail(RestErrorCode.CHOOSE_BAD_MONTH);
         }
 
+
+
+        String key = "";
+        try {
+            StringBuffer stringBuffer = new StringBuffer();
+            SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+            Integer userId = currentLoginUser.getId();
+            key = RedisKeyUtils.SAAS_MONTH_REPORT + stringBuffer.append(userId).append(cityId).append(cityName).append(supplierId).append(supplierName)
+                    .append(driverTeamId).append(driverTeamName).append(driverGroupId).append(driverGroupName)
+                    .append(driverPhone).append(licensePlates).append(month).append(businessVolumeSort).append(finOrdCntSort)
+                    .append(badCntSort).append(pageNum).append(pageSize).toString().replaceAll("null","");
+            PageDTO pageDTOCache = RedisCacheUtil.get(key,PageDTO.class);
+
+            if(RedisCacheUtil.exist(key) && pageDTOCache != null && pageDTOCache.getPage() == 0){
+                logger.info("查询过于频繁");
+                return AjaxResponse.success("saas月报查询过于频繁，结果查询中...");
+            }
+
+            if(RedisCacheUtil.exist(key) && pageDTOCache != null && pageDTOCache.getPage() > 0){
+                return AjaxResponse.success(pageDTOCache);
+            }
+
+            if(!RedisCacheUtil.exist(key)){
+                //如果没有在缓存里面，默认查询一分钟
+                RedisCacheUtil.set(key,new PageDTO(),60);
+            }
+        } catch (Exception e) {
+            logger.info("缓存查询失败",e);
+        }
+
+
         List<CarBizSupplier> carBizSupplierList = null;
         List<CarDriverTeamDTO> listTeam = null;
         Map<Integer,String> supplierMap = Maps.newHashMap();
@@ -502,6 +571,11 @@ public class SaasDriverDailyReportController {
             dto.setCarGroupName(carGroupMap.get(dto.getCarGroupId()));
         }
         PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, monthDtoList);
+        try {
+            RedisCacheUtil.set(key,pageDTO,3600*24);
+        } catch (Exception e) {
+            logger.info("缓存设置失败",e);
+        }
 
         return AjaxResponse.success(pageDTO);
 
@@ -627,6 +701,37 @@ public class SaasDriverDailyReportController {
                                         @Param("badCntSort")String badCntSort,
                                         @Verify(param="pageNum",rule="required|min(1)") Integer pageNum,
                                         @Verify(param="pageSize",rule="required|min(10)") Integer pageSize){
+
+
+        String key = "";
+        try {
+            StringBuffer stringBuffer = new StringBuffer();
+            SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
+            Integer userId = currentLoginUser.getId();
+            key = RedisKeyUtils.SAAS_SUMMARY_REPORT + stringBuffer.append(userId).append(cityId).append(cityName).append(supplierId).append(supplierName)
+                    .append(driverTeamId).append(driverTeamName).append(driverGroupId).append(driverGroupName)
+                    .append(driverPhone).append(licensePlates).append(businessVolumeSort).append(finOrdCntSort)
+                    .append(badCntSort).append(pageNum).append(pageSize).toString().replaceAll("null","");
+            PageDTO pageDTOCache = RedisCacheUtil.get(key,PageDTO.class);
+
+            if(RedisCacheUtil.exist(key) && pageDTOCache != null && pageDTOCache.getPage() == 0){
+                logger.info("查询过于频繁");
+                return AjaxResponse.success("saas汇总查询过于频繁，结果查询中...");
+            }
+
+            if(RedisCacheUtil.exist(key) && pageDTOCache != null && pageDTOCache.getPage() > 0){
+                return AjaxResponse.success(pageDTOCache);
+            }
+
+            if(!RedisCacheUtil.exist(key)){
+                //如果没有在缓存里面，默认查询一分钟
+                RedisCacheUtil.set(key,new PageDTO(),60);
+            }
+        } catch (Exception e) {
+            logger.info("缓存查询失败",e);
+        }
+
+
         List<CarBizSupplier> carBizSupplierList = null;
         List<CarDriverTeamDTO> listTeam = null;
         Map<Integer,String> supplierMap = Maps.newHashMap();
@@ -734,6 +839,11 @@ public class SaasDriverDailyReportController {
             dto.setCarGroupName(carGroupMap.get(dto.getCarGroupId()));
         }
         PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, summaryReportDTOList);
+        try {
+            RedisCacheUtil.set(key,pageDTO,3600*24);
+        } catch (Exception e) {
+            logger.info("saas汇总缓存失败",e);
+        }
 
         return AjaxResponse.success(pageDTO);
     }
@@ -763,8 +873,11 @@ public class SaasDriverDailyReportController {
             return AjaxResponse.success(null);
             // logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"导出司机周/月列表2.0");
         } catch (Exception e) {
-
+            logger.info("查询失败",e);
         }
+
+
+
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
         JSONObject obj = new JSONObject();
         obj.put("auth_account",loginUser.getAccountType());

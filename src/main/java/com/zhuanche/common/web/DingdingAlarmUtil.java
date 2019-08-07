@@ -22,28 +22,12 @@ import java.io.IOException;
 @Component
 public class DingdingAlarmUtil {
 
-
-    private static String dingdingTokenUrl;
-
-    private static String dingdingAlermSwitch;
-
-
-    @Value("${dingding.token.url}")
-    public  void setDingdingTokenUrl(String dingdingTokenUrl) {
-        DingdingAlarmUtil.dingdingTokenUrl = dingdingTokenUrl;
-    }
-
-    @Value("${dingding.alerm.switch}")
-    public  void setDingdingAlermSwitch(String dingdingAlermSwitch) {
-        DingdingAlarmUtil.dingdingAlermSwitch = dingdingAlermSwitch;
-    }
-
     private static Logger logger = LoggerFactory.getLogger(DingdingAlarmUtil.class);
 
     /**
-     * 钉钉报警
+     * 发送钉钉消息
      */
-    public static void sendDingdingAlerm(String message){
+    public static void sendDingdingAlerm(String message, String dingding_token_url){
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("msgtype","text");
@@ -58,9 +42,7 @@ public class DingdingAlarmUtil {
         atMobiles.put("atMobiles",jsonArray);*/
         jsonObject.put("at",isAtAll);
         jsonObject.put("at",atMobiles);
-        logger.info("钉钉开关：" + dingdingAlermSwitch);
-        if("true".equals(dingdingAlermSwitch)){
-        MpOkHttpUtil.okHttpPostJsonAsync(dingdingTokenUrl, jsonObject.toJSONString(), 0, null, new Callback() {
+        MpOkHttpUtil.okHttpPostJsonAsync(dingding_token_url, jsonObject.toJSONString(), 0, null, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 logger.info("钉钉消息发送失败！失败信息:" + e.getMessage());
@@ -68,9 +50,8 @@ public class DingdingAlarmUtil {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-               logger.info("钉钉消息发送成功!" + response.toString());
+                logger.info("钉钉消息发送成功!" + response.toString());
             }
         });
-        }
     }
 }

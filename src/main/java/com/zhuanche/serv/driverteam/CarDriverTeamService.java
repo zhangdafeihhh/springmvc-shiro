@@ -712,8 +712,8 @@ public class CarDriverTeamService{
 		PageInfo<CarDriverTeamDTO> pageInfo =null;
 		try{
 			pageInfo =
-					PageHelper.startPage(driverTeamRequest.getPageNo(), driverTeamRequest.getPageSize(), true).doSelectPageInfo(()
-							-> carDriverTeamExMapper.queryDriverTeamAndGroup(commonRequest.getCityIds(), commonRequest.getSupplierIds(), commonRequest.getTeamIds()));
+					PageHelper.startPage(driverTeamRequest.getPageNo(), driverTeamRequest.getPageSize(), true)
+							.doSelectPageInfo(() -> carDriverTeamExMapper.queryDriverTeamAndGroup(commonRequest.getCityIds(), commonRequest.getSupplierIds(), commonRequest.getTeamIds()));
 //			driverTeams = carDriverTeamExMapper.queryDriverTeam(cityIds, supplierIds, teamIds);
 			driverTeams = pageInfo.getList();
 			total = (int)pageInfo.getTotal();
@@ -722,7 +722,7 @@ public class CarDriverTeamService{
 			return new PageDTO();
 		}finally {
 			PageHelper.clearPage();
-			System.gc();
+			//System.gc();
 		}
 		if(driverTeams==null || driverTeams.size()==0) {
 			return new PageDTO();

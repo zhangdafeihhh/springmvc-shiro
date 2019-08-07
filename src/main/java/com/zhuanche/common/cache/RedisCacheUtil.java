@@ -271,4 +271,28 @@ public final class RedisCacheUtil{
 		}
 	}
 	//---------------------------------------------------------------------------------------------------------------------在上面封装常用的操作end
+
+	/**
+	 * 判断key是否存在
+	 * @param key
+	 * @return
+	 */
+	public static Boolean exist(String key){
+		Boolean bl = false;
+		if(key == null){
+			return bl;
+		}
+		Jedis jedis = pool.getResource();
+		try {
+			bl = jedis.exists(key);
+		} catch (Exception e) {
+			log.error("RedisCacheUtil have Exception",e);
+		}finally {
+			if(jedis != null){
+				jedis.close();
+			}
+		}
+		return bl;
+	}
+
 }

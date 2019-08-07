@@ -1,28 +1,11 @@
 package com.zhuanche.common.web;
 
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.zhuanche.http.MpOkHttpUtil;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
+import com.le.config.dict.Dicts;
+import com.zhuanche.mongo.UserOperationLog;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.IPUtil;
+import com.zhuanche.util.IpAddr;
 import org.apache.commons.lang.StringUtils;
 import org.perf4j.StopWatch;
 import org.perf4j.slf4j.Slf4JStopWatch;
@@ -30,16 +13,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.zhuanche.mongo.UserOperationLog;
-import com.zhuanche.shiro.realm.SSOLoginUser;
-import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.IpAddr;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**HTTP 打印请求参数、打印请求状况统计
  * @author zhaoyali
@@ -114,13 +101,18 @@ public class HttpRequestStatisticsInterceptor implements HandlerInterceptor,  In
 		//URI 请求数计数器
 		AtomicLong atomicLong = URI_COUNTER.get(uri);
 		long costMiliseconds = System.currentTimeMillis()-startTimestamp;
-		if(costMiliseconds > 10000){
+		int dingding_alerm_switch = Dicts.getInt("dingding_alerm_switch", 0);
+		String dingding_token_url = Dicts.getString("dingding_token_url", "https://oapi.dingtalk.com/robot/send?access_token=747d5c066ec3b79c229721eff222aa1dd63a813be5e810dd934b1c284097ab39");
+		int dingding_alerm_timeout = Dicts.getInt("dingding_alerm_timeout", 3000);
+		if(dingding_alerm_switch == 0){
+			log.debug("报警开关关闭，不发送钉钉报警通知");
+		}else if(costMiliseconds > dingding_alerm_timeout){
 			try {
-				String mess = MessageFormat.format("接口超时报警:项目ip:{0},tracdId:{1},项目端口:{2},接口地址:{3},请求方式:{4}",
-						request.getServerName(),MDC.get("traceId"),request.getServerPort(),request.getRequestURI(),request.getMethod());
+				String envName = request.getServletContext().getInitParameter("env.name");
+				String mess = MessageFormat.format("接口超时报警:项目:{0},环境:{1},IP:{2},traceId:{3},接口地址:{4},请求方式:{5},超时时间:{6}毫秒",
+						"mp-manage",envName, IPUtil.initIp(),MDC.get("reqId"),request.getRequestURI(),request.getMethod(),costMiliseconds);
 				log.info(mess);
-
-				DingdingAlarmUtil.sendDingdingAlerm(mess  + ",超时时间:" + costMiliseconds + "毫秒");
+				DingdingAlarmUtil.sendDingdingAlerm(mess,dingding_token_url);
 			} catch (Exception e) {
 				log.info("钉钉告警消息异常!" + e.getMessage());
 			}
