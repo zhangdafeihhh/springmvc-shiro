@@ -408,6 +408,8 @@ public class BusInfoService {
             BeanUtils.copyProperties(busCarSaveDTO, carInfo);
             carInfo.setUpdateBy(userId);
             carInfo.setUpdateDate(new Date());
+            //修改数据的时候将modelId 置为0
+            carInfo.setCarModelId(0);
             int result = updateCar2DB(carInfo);
             if (result > 0) {
                 //保存操作日志
