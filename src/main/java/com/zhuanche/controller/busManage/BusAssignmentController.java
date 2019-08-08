@@ -647,6 +647,14 @@ public class BusAssignmentController {
         try {
             // 调用订单接口查询订单详情
             BusOrderDetail orderDetail = busOrderService.selectOrderDetail(orderNo);
+            
+            Integer status = orderDetail.getStatus();
+            //是否可以被继续操作
+            //该订单未被指派，可以继续查看详情
+            if (status>=10105) {
+            	return AjaxResponse.fail(RestErrorCode.BUS_COMMON_ERROR_CODE, "该订单已经被指派,禁止查看详情");
+            }
+            
             Integer orderId = orderDetail.getOrderId();
             // 调用计费接口
             BusCostDetail busCostDetail = busOrderService.selectOrderCostDetail(orderId);
