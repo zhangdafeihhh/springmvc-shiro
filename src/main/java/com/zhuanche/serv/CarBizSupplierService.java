@@ -329,7 +329,6 @@ public class CarBizSupplierService{
             		return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, e.getMessage());
 				}
 			}
-			Integer cooperationTypeNew = supplier.getCooperationType();
 
 			Integer supplierId = supplier.getSupplierId();
 			Integer userId = currentLoginUser.getId();
