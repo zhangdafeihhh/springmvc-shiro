@@ -14,6 +14,7 @@ import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.driver.DriverIntegralDto;
 import com.zhuanche.dto.driver.DriverTeamRelationEntity;
 import com.zhuanche.dto.driver.DriverVoEntity;
+import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.rentcar.IDriverService;
 import com.zhuanche.serv.rentcar.IDriverTeamRelationService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
@@ -423,7 +424,9 @@ public class DriverIntegraController {
         if (null == driverIds || driverIds.size() == 0) {
             return null;
         }
-        String driverInfo = new RPCAPI().requestWithRetry(RPCAPI.HttpMethod.GET, String.format(DRIVER_INTEGRAL + "/integral/currentIntegralScore?driverIds=%s", String.join(",", driverIds)), null, null, "UTF-8");
+       // String driverInfo = new RPCAPI().requestWithRetry(RPCAPI.HttpMethod.GET, String.format(DRIVER_INTEGRAL + "/integral/currentIntegralScore?driverIds=%s", String.join(",", driverIds)), null, null, "UTF-8");
+        //修改为okhttp调用
+        String driverInfo = MpOkHttpUtil.okHttpGet(String.format(DRIVER_INTEGRAL + "/integral/currentIntegralScore?driverIds=%s", String.join(",", driverIds)),0,null);
         if (StringUtils.isBlank(driverInfo) || driverInfo.equals("true\r\n")) {
             return null;
         }
