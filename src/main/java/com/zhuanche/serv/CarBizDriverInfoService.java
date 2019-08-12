@@ -3872,4 +3872,8 @@ public class CarBizDriverInfoService {
 	    return carBizDriverInfoExMapper.querySupplierIdAndNameByDriverId(driverId);
     }
 
+    public List<CarBizDriverInfoDTO> queryCarBizDriverListBySupplierId(Integer supplierId){
+        return carBizDriverInfoExMapper.queryCarBizDriverListBySupplierId(supplierId);
+    }
+
 }

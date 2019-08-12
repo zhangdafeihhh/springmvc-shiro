@@ -15,6 +15,7 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.driver.supplier.SupplierCooperationAgreementDTO;
+import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.entity.driver.*;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.HttpClientUtil;
@@ -34,6 +35,10 @@ import mapper.rentcar.CarBizSupplierMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -98,6 +104,9 @@ public class CarBizSupplierService{
 
 	@Value("${settle.api.url}")
 	String settleApiUrl;
+
+	@Value("${driver.integral.url}")
+	private String driverIntegeralUrl;
 
 	@Autowired
 	private SupplierAccountApplyExMapper supplierAccountApplyExMapper;
@@ -237,6 +246,85 @@ public class CarBizSupplierService{
 						supplierExtDtoExMapper.updateBySupplierId(extDto);
 						logger.info("更新供应商扩展信息 : supplierExtInfo {}", JSON.toJSONString(extDto));
 					}
+
+
+					//异步调用代理层接口，供应商信息修改为臻享时候，或者由臻享修改为其他类型时候，附加分修改为系统自动加分或者减分
+					try {
+						if(vo.getCooperationType() >0 && vo.getCooperationType()==18 && supplier.getCooperationType() > 0 && supplier.getCooperationType() != 18){
+                            //减分
+                            List<CarBizDriverInfoDTO> driverList =queryCarBizDriverListBySupplierId(supplier.getSupplierId());
+                            if(CollectionUtils.isNotEmpty(driverList)){
+                                if(driverList.size() < 200){
+                                    JSONArray jsonArray = new JSONArray();
+                                    for(CarBizDriverInfoDTO entity : driverList){
+                                        JSONObject jsonObject = getSubJSONObject(entity.getDriverId());
+                                        jsonArray.add(jsonObject);
+                                    }
+                                    sendAsync(jsonArray.toJSONString());
+                                }else {
+                                    int reqCount = driverList.size()/200;
+                                    while (reqCount>0){
+                                        JSONArray jsonArray = new JSONArray();
+                                        for(int i = 200*(reqCount-1);i<200*reqCount;i++){
+                                            JSONObject jsonObject = getSubJSONObject(driverList.get(i).getDriverId());
+                                            jsonArray.add(jsonObject);
+                                        }
+                                        sendAsync(jsonArray.toJSONString());
+                                        reqCount--;
+                                    }
+                                    //如果没有整除
+                                    if(driverList.size()%200!=0){
+                                        count = driverList.size()/200;
+                                        JSONArray jsonArray = new JSONArray();
+                                        for(int m = 200*reqCount;m<driverList.size();m++){
+                                            JSONObject jsonObject = getSubJSONObject(driverList.get(m).getDriverId());
+                                            jsonArray.add(jsonObject);
+                                        }
+                                        sendAsync(jsonArray.toJSONString());
+                                    }
+
+                                }
+                            }
+                        }else if(vo.getCooperationType() >0 && vo.getCooperationType() !=18 && supplier.getCooperationType() > 0 && supplier.getCooperationType() == 18){
+                            List<CarBizDriverInfoDTO> driverList =queryCarBizDriverListBySupplierId(supplier.getSupplierId());
+                            if(CollectionUtils.isNotEmpty(driverList)){
+                                if(driverList.size() < 200){
+                                    JSONArray jsonArray = new JSONArray();
+                                    for(CarBizDriverInfoDTO entity : driverList){
+                                        JSONObject jsonObject = getAddJSONObject(entity.getDriverId());
+                                        jsonArray.add(jsonObject);
+                                    }
+                                    sendAsync(jsonArray.toJSONString());
+                                }else {
+                                    int reqCount = driverList.size()/200;
+                                    while (reqCount>0){
+                                        JSONArray jsonArray = new JSONArray();
+                                        for(int i = 200*(reqCount-1);i<200*reqCount;i++){
+                                            JSONObject jsonObject = getAddJSONObject(driverList.get(i).getDriverId());
+                                            jsonArray.add(jsonObject);
+                                        }
+                                        sendAsync(jsonArray.toJSONString());
+                                        reqCount--;
+                                    }
+                                    //如果没有整除
+                                    if(driverList.size()%200!=0){
+                                        count = driverList.size()/200;
+                                        JSONArray jsonArray = new JSONArray();
+                                        for(int m = 200*reqCount;m<driverList.size();m++){
+                                            JSONObject jsonObject = getSubJSONObject(driverList.get(m).getDriverId());
+                                            jsonArray.add(jsonObject);
+                                        }
+                                        sendAsync(jsonArray.toJSONString());
+                                    }
+
+                                }
+                            }
+                        }
+					} catch (Exception e) {
+						logger.error("修改供应商变更为臻享后加减分异常",e);
+					}
+
+
 				}catch (IllegalArgumentException e){
             		return AjaxResponse.fail(RestErrorCode.HTTP_PARAM_INVALID, e.getMessage());
 				}
@@ -793,4 +881,59 @@ public class CarBizSupplierService{
 			csvDataList.add(stringBuffer.toString());
 		}
 	}
+
+	/**
+	 * 获取供应商下的司机
+	 * @param supplierId
+	 * @return
+	 */
+	private List<CarBizDriverInfoDTO> queryCarBizDriverListBySupplierId(Integer supplierId){
+		return carBizDriverInfoService.queryCarBizDriverListBySupplierId(supplierId);
+	}
+
+	/**
+	 * 加盟商由臻享改为其他减分
+	 * @param driverId
+	 * @return
+	 */
+	private JSONObject getSubJSONObject(Integer driverId){
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("driverId",driverId);
+		jsonObject.put("driverProp",2);
+		jsonObject.put("preState",1);
+		jsonObject.put("curState",0);
+		return jsonObject;
+	}
+
+	/**
+	 * 加盟商变更为臻享类型加分
+	 * @param driverId
+	 * @return
+	 */
+	private JSONObject getAddJSONObject(Integer driverId){
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("driverId",driverId);
+		jsonObject.put("driverProp",2);
+		jsonObject.put("preState",0);
+		jsonObject.put("curState",1);
+		return jsonObject;
+	}
+	/**
+	 * 异步批量调用
+	 * @param jsonStr
+	 */
+	private void sendAsync(String jsonStr){
+		MpOkHttpUtil.okHttpPostJsonAsync(driverIntegeralUrl+"/incomeScore/driverPropsChange", jsonStr, 0, null, new Callback() {
+			@Override
+			public void onFailure(Call call, IOException e) {
+				logger.info("批量回调失败");
+			}
+
+			@Override
+			public void onResponse(Call call, Response response) throws IOException {
+				logger.info("批量回调成功");
+			}
+		});
+	}
+
 }

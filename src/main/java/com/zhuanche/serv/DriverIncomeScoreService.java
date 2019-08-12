@@ -1,16 +1,25 @@
 package com.zhuanche.serv;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.rpc.DriverIncomeScoreResponse;
 import com.zhuanche.common.rpc.RPCAPI;
 import com.zhuanche.common.rpc.RPCResponse;
+import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.dto.driver.DriverVoEntity;
+import com.zhuanche.dto.mdbcarmanage.ScoreDetailDTO;
 import com.zhuanche.dto.rentcar.*;
+import com.zhuanche.http.MpOkHttpUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +31,14 @@ import java.util.stream.Collectors;
 @Service
 public class DriverIncomeScoreService {
 
+
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Value("${driver.integral.url}")
     private String DRIVER_INTEGRAL;
+
+    @Autowired
+    private CarBizDriverInfoService carBizDriverInfoService;
 
     /**
      * 车管批量查询司机当前出行分信息
@@ -130,5 +145,45 @@ public class DriverIncomeScoreService {
             dto.setPhone(phone);
             dto.setName(name);
         }
+    }
+
+
+
+    public List<ScoreDetailDTO>  getScoreDetailDTO(Integer driverId,String day){
+
+        List<ScoreDetailDTO> list = new ArrayList<>();
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("driverId",driverId);
+        jsonObject.put("day",day);
+        jsonObject.put("sortState",0);
+        String result = MpOkHttpUtil.okHttpPostToJson(DRIVER_INTEGRAL+"/incomeScore/tripScoreDetails",jsonObject.toJSONString(),0,null);
+        if(StringUtils.isEmpty(result)){
+            logger.info("调用代理层返回结果为空");
+            return list;
+        }
+
+        CarBizDriverInfoDTO info = carBizDriverInfoService.querySupplierIdAndNameByDriverId(driverId);
+
+        JSONArray jsonArray = JSONObject.parseArray(result);
+        if(jsonArray.size() > 0){
+            for(int i = 0;i<jsonArray.size();i++){
+                JSONObject jsonResult = (JSONObject) jsonArray.get(i);
+                ScoreDetailDTO scoreDetailDTO = new ScoreDetailDTO();
+                if(jsonResult.get("day") != null && jsonResult.get("tripScoreOfDay") != null && jsonResult.get("isCollect")!= null){
+                    String scoreDetailDate = jsonResult.getString("day");
+                    String hourScore = jsonResult.getBigDecimal("tripScoreOfDay").toString();
+                    Boolean isTotal  = jsonResult.getBoolean("isCollect");
+                    scoreDetailDTO.setDriverId(driverId);
+                    scoreDetailDTO.setHourScore(hourScore);
+                    scoreDetailDTO.setScoreDetailDate(scoreDetailDate);
+                    scoreDetailDTO.setIsTotal(isTotal==true?1:0);
+                    scoreDetailDTO.setName(info.getName());
+                    scoreDetailDTO.setPhone(info.getPhone());
+                    list.add(scoreDetailDTO);
+                }
+            }
+        }
+        return list;
     }
 }
