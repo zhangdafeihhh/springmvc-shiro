@@ -925,7 +925,7 @@ public class CarBizSupplierService{
 	private void sendAsync(String jsonStr){
 		Map<String,Object> map = Maps.newHashMap();
 		map.put("driversStr",jsonStr);
-		MpOkHttpUtil.okHttpPostAsync("", map, 0, null, new Callback() {
+		MpOkHttpUtil.okHttpPostAsync(driverIntegeralUrl+"/incomeScore/driverPropsChange", map, 0, null, new Callback() {
 			@Override
 			public void onFailure(Call call, IOException e) {
 				logger.info("批量回调失败");
