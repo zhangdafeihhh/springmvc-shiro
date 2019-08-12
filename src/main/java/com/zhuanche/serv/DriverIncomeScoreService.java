@@ -3,6 +3,7 @@ package com.zhuanche.serv;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Maps;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.rpc.DriverIncomeScoreResponse;
 import com.zhuanche.common.rpc.RPCAPI;
@@ -153,11 +154,13 @@ public class DriverIncomeScoreService {
 
         List<ScoreDetailDTO> list = new ArrayList<>();
 
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("driverId",driverId);
-        jsonObject.put("day",day);
-        jsonObject.put("sortState",0);
-        String result = MpOkHttpUtil.okHttpPostToJson(DRIVER_INTEGRAL+"/incomeScore/tripScoreDetails",jsonObject.toJSONString(),0,null);
+       // JSONObject jsonObject = new JSONObject();
+        Map<String,Object> map = Maps.newHashMap();
+        map.put("driverId",driverId);
+        map.put("day",day);
+        map.put("sortState",0);
+        String result = MpOkHttpUtil.okHttpPost(DRIVER_INTEGRAL+"/incomeScore/tripScoreDetails",map,0,null);
+        //String result = MpOkHttpUtil.okHttpPostToJson(DRIVER_INTEGRAL+"/incomeScore/tripScoreDetails",jsonObject.toJSONString(),0,null);
         if(StringUtils.isEmpty(result)){
             logger.info("调用代理层返回结果为空");
             return list;
@@ -165,14 +168,16 @@ public class DriverIncomeScoreService {
 
         CarBizDriverInfoDTO info = carBizDriverInfoService.querySupplierIdAndNameByDriverId(driverId);
 
-        JSONArray jsonArray = JSONObject.parseArray(result);
-        if(jsonArray.size() > 0){
+        JSONObject jsonRes = JSONObject.parseObject(result);
+        if(jsonRes.get("code") != null && jsonRes.getInteger("code")==0){
+            String data = jsonRes.getString("data");
+            JSONArray jsonArray = JSONArray.parseArray(data);
             for(int i = 0;i<jsonArray.size();i++){
                 JSONObject jsonResult = (JSONObject) jsonArray.get(i);
                 ScoreDetailDTO scoreDetailDTO = new ScoreDetailDTO();
-                if(jsonResult.get("day") != null && jsonResult.get("tripScoreOfDay") != null && jsonResult.get("isCollect")!= null){
+                if(jsonResult.get("day") != null && jsonResult.get("dayServiceTimeScore") != null && jsonResult.get("isCollect")!= null){
                     String scoreDetailDate = jsonResult.getString("day");
-                    String hourScore = jsonResult.getBigDecimal("tripScoreOfDay").toString();
+                    String hourScore = jsonResult.getBigDecimal("dayServiceTimeScore").toString();
                     Boolean isTotal  = jsonResult.getBoolean("isCollect");
                     scoreDetailDTO.setDriverId(driverId);
                     scoreDetailDTO.setHourScore(hourScore);
@@ -183,6 +188,8 @@ public class DriverIncomeScoreService {
                     list.add(scoreDetailDTO);
                 }
             }
+        }else {
+            logger.info("调用代理层接口返回结果数据异常",jsonRes);
         }
         return list;
     }

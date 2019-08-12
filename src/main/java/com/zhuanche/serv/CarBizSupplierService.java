@@ -194,7 +194,7 @@ public class CarBizSupplierService{
 				return AjaxResponse.fail(RestErrorCode.GET_SUPPLIER_SHORT_NAME_INVALID);
 			}
 			String method = Constants.UPDATE;
-//			Integer cooperationTypeNew = supplier.getCooperationType();
+			Integer cooperationTypeNew = supplier.getCooperationType();
 			Integer cooperationTypeOld = null;
 			String supplierNameOld = null;
 			SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
@@ -231,7 +231,7 @@ public class CarBizSupplierService{
                     supplier.setStatus(vo.getStatus());
                     supplier.setIscommission(vo.getIscommission());
                     supplier.setPospayflag(vo.getPospayflag());
-                    supplier.setCooperationType(vo.getCooperationType());
+                   // supplier.setCooperationType(vo.getCooperationType());
                     supplier.setEnterpriseType(vo.getEnterpriseType());
                     supplier.setIsTwoShifts(vo.getIsTwoShifts());
 					SupplierExtDto extDto = generateSupplierExtDto(supplier, false);
@@ -274,7 +274,7 @@ public class CarBizSupplierService{
                                     }
                                     //如果没有整除
                                     if(driverList.size()%200!=0){
-                                        count = driverList.size()/200;
+										reqCount = driverList.size()/200;
                                         JSONArray jsonArray = new JSONArray();
                                         for(int m = 200*reqCount;m<driverList.size();m++){
                                             JSONObject jsonObject = getSubJSONObject(driverList.get(m).getDriverId());
@@ -308,7 +308,7 @@ public class CarBizSupplierService{
                                     }
                                     //如果没有整除
                                     if(driverList.size()%200!=0){
-                                        count = driverList.size()/200;
+										reqCount = driverList.size()/200;
                                         JSONArray jsonArray = new JSONArray();
                                         for(int m = 200*reqCount;m<driverList.size();m++){
                                             JSONObject jsonObject = getSubJSONObject(driverList.get(m).getDriverId());
@@ -923,7 +923,9 @@ public class CarBizSupplierService{
 	 * @param jsonStr
 	 */
 	private void sendAsync(String jsonStr){
-		MpOkHttpUtil.okHttpPostJsonAsync(driverIntegeralUrl+"/incomeScore/driverPropsChange", jsonStr, 0, null, new Callback() {
+		Map<String,Object> map = Maps.newHashMap();
+		map.put("driversStr",jsonStr);
+		MpOkHttpUtil.okHttpPostAsync("", map, 0, null, new Callback() {
 			@Override
 			public void onFailure(Call call, IOException e) {
 				logger.info("批量回调失败");
@@ -933,6 +935,7 @@ public class CarBizSupplierService{
 			public void onResponse(Call call, Response response) throws IOException {
 				logger.info("批量回调成功");
 			}
+
 		});
 	}
 
