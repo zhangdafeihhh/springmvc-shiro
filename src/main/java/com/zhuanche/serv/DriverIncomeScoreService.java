@@ -150,8 +150,8 @@ public class DriverIncomeScoreService {
 
 
 
-    public List<ScoreDetailDTO>  getScoreDetailDTO(Integer driverId,String day){
-
+    public Map<String,Object> getScoreDetailDTO(Integer driverId,String day,Long scoreDate,String tripScore){
+        Map<String,Object> resultMap = Maps.newHashMap();
         List<ScoreDetailDTO> list = new ArrayList<>();
 
        // JSONObject jsonObject = new JSONObject();
@@ -163,7 +163,7 @@ public class DriverIncomeScoreService {
         //String result = MpOkHttpUtil.okHttpPostToJson(DRIVER_INTEGRAL+"/incomeScore/tripScoreDetails",jsonObject.toJSONString(),0,null);
         if(StringUtils.isEmpty(result)){
             logger.info("调用代理层返回结果为空");
-            return list;
+            return resultMap;
         }
 
         CarBizDriverInfoDTO info = carBizDriverInfoService.querySupplierIdAndNameByDriverId(driverId);
@@ -171,26 +171,55 @@ public class DriverIncomeScoreService {
         JSONObject jsonRes = JSONObject.parseObject(result);
         if(jsonRes.get("code") != null && jsonRes.getInteger("code")==0){
             String data = jsonRes.getString("data");
-            JSONArray jsonArray = JSONArray.parseArray(data);
-            for(int i = 0;i<jsonArray.size();i++){
-                JSONObject jsonResult = (JSONObject) jsonArray.get(i);
-                ScoreDetailDTO scoreDetailDTO = new ScoreDetailDTO();
-                if(jsonResult.get("day") != null && jsonResult.get("dayServiceTimeScore") != null && jsonResult.get("isCollect")!= null){
-                    String scoreDetailDate = jsonResult.getString("day");
-                    String hourScore = jsonResult.getBigDecimal("dayServiceTimeScore").toString();
-                    Boolean isTotal  = jsonResult.getBoolean("isCollect");
-                    scoreDetailDTO.setDriverId(driverId);
-                    scoreDetailDTO.setHourScore(hourScore);
-                    scoreDetailDTO.setScoreDetailDate(scoreDetailDate);
-                    scoreDetailDTO.setIsTotal(isTotal==true?1:0);
-                    scoreDetailDTO.setName(info.getName());
-                    scoreDetailDTO.setPhone(info.getPhone());
-                    list.add(scoreDetailDTO);
+            JSONObject jsonObject = JSONObject.parseObject(data);
+            if(jsonObject != null && jsonObject.get("dayDetailArray") != null) {
+                JSONArray jsonArray = JSONArray.parseArray(jsonObject.get("dayDetailArray").toString());
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    JSONObject jsonResult = (JSONObject) jsonArray.get(i);
+                    ScoreDetailDTO scoreDetailDTO = new ScoreDetailDTO();
+                    if (jsonResult.get("day") != null && jsonResult.get("dayServiceTimeScore") != null && jsonResult.get("isCollect") != null) {
+                        String scoreDetailDate = jsonResult.getString("day");
+                        String hourScore = jsonResult.getBigDecimal("dayServiceTimeScore").toString();
+                        Boolean isTotal = jsonResult.getBoolean("isCollect");
+                        scoreDetailDTO.setDriverId(driverId);
+                        scoreDetailDTO.setHourScore(hourScore);
+                        scoreDetailDTO.setScoreDetailDate(scoreDetailDate);
+                        scoreDetailDTO.setIsTotal(isTotal == true ? 1 : 0);
+                        scoreDetailDTO.setName(info.getName());
+                        scoreDetailDTO.setPhone(info.getPhone());
+                        list.add(scoreDetailDTO);
+                    }
                 }
+                resultMap.put("scoreDetailDTO",list);
             }
+
+            if(jsonObject.get("finishOrderDay") != null){
+                String finishOrderDay = jsonObject.getBigDecimal("finishOrderDay").toString();
+                resultMap.put("finishOrderDay",finishOrderDay);
+            }if(jsonObject.get("calScoreDay") != null){
+                String calScoreDay = jsonObject.getBigDecimal("calScoreDay").toString();
+                resultMap.put("calScoreDay",calScoreDay);
+            }if(jsonObject.get("baseTripScore") != null){
+                String baseTripScore = jsonObject.getBigDecimal("baseTripScore").toString();
+                resultMap.put("baseTripScore",baseTripScore);
+            }if(jsonObject.get("dispatchRollDay") != null){
+                String dispatchRollDay = jsonObject.getBigDecimal("dispatchRollDay").toString();
+                resultMap.put("dispatchRollDay",dispatchRollDay);
+            }if(jsonObject.get("sumOfDispatchScore") != null){
+                String sumOfDispatchScore = jsonObject.getBigDecimal("sumOfDispatchScore").toString();
+                resultMap.put("sumOfDispatchScore",sumOfDispatchScore);
+            }if(jsonObject.get("sumOfTripScore") != null){
+                String sumOfTripScore = jsonObject.getBigDecimal("sumOfTripScore").toString();
+                resultMap.put("sumOfTripScore",sumOfTripScore);
+            }
+            resultMap.put("driverId",driverId);
+            resultMap.put("dispatchTime",scoreDate);
+            resultMap.put("scoreDate",day);
+            resultMap.put("tripScore",tripScore);
+
         }else {
             logger.info("调用代理层接口返回结果数据异常",jsonRes);
         }
-        return list;
+        return resultMap;
     }
 }

@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -246,28 +247,32 @@ public class DriverIncomeScoreController {
     @ResponseBody
     public AjaxResponse scoreDetail(@Verify(param = "driverId",rule = "required") Integer driverId,
                                     @Verify(param = "scoreDate",rule = "required") Long scoreDate,
+                                    @Verify(param = "tripScore",rule = "required")String tripScore,
                                     @RequestParam(value = "pageSize",required = false,defaultValue = "100")Integer pageSize,
                                     @RequestParam(value = "pageNum",required = false,defaultValue = "1")Integer pageNum){
-        logger.info(MessageFormat.format("时长分详情入参：driverId:{0},scoreDate:{1}",driverId,scoreDate));
+        logger.info(MessageFormat.format("时长分详情入参：driverId:{0},scoreDate:{1},tripScore:{2}",driverId,scoreDate,tripScore));
 
         String day = DateUtils.convertLongToString(scoreDate,DateUtils.date_format);
 
         PageDTO pageDTO = new PageDTO(pageNum,pageSize,0,null);
+        Map<String,Object> map = Maps.newHashMap();
 
 
         try {
-            List<ScoreDetailDTO> list = driverIncomeScoreService.getScoreDetailDTO(driverId,day);
+            map = driverIncomeScoreService.getScoreDetailDTO(driverId,day,scoreDate,tripScore);
 
-            if(CollectionUtils.isEmpty(list)){
-                return AjaxResponse.success(pageDTO);
+            if(map.get("scoreDetailDTO") == null){
+                return AjaxResponse.success(map);
             }else {
+                List<ScoreDetailDTO> list = (List<ScoreDetailDTO>) map.get("scoreDetailDTO");
                 pageDTO = new PageDTO(pageNum,pageSize,list.size(),list);
+                map.put("result",pageDTO);
+                map.remove("scoreDetailDTO");
             }
         } catch (Exception e) {
             logger.error("获取时长分详情异常",e);
         }
-
-        return AjaxResponse.success(pageDTO);
+        return AjaxResponse.success(map);
 
     }
 }
