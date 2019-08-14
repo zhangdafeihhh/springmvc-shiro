@@ -404,6 +404,12 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<!--添加sq error的日志-->
+		<dependency>
+			<groupId>com.sq</groupId>
+			<artifactId>sq-component-log</artifactId>
+			<version>1.0.20</version>
+		</dependency>
 	</dependencies>
 
 	<!-- 多环境配置BEGIN -->
