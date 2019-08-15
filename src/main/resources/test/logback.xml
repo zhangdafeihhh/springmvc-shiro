@@ -172,7 +172,7 @@
                     <pattern>
                         {
                         "log_request_time": "%d{yyyy-MM-dd HH:mm:ss.SSS}",
-                        "traceId": "%X{reqId}",
+                        "traceId": "%X{traceId}",
                         "level": "%level",
                         "service": "${appName:-}",
                         "host": "%ip",
@@ -215,7 +215,7 @@
                 <pattern>
                     <pattern>{
                         "log_request_time": "%d{yyyy-MM-dd HH:mm:ss.SSS}",
-                        "traceId": "%X{reqId}",
+                        "traceId": "%X{traceId}",
                         "level": "%level",
                         "service": "${appName:-}",
                         "host": "%ip",

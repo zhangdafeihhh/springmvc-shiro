@@ -62,7 +62,7 @@ public class InitRequestCommonDataFilter extends OncePerRequestFilter {
 		if(reqId==null || "".equals(reqId.trim())  ) {
 			reqId = this.genRequestId(6);
 		}
-		MDC.put("reqId", reqId);
+		MDC.put("traceId", reqId);
 		
 		//二、多环境信息
 		if(envName==null) {

@@ -122,7 +122,7 @@ public class CustomExceptionAdvice {
 			try {
 				String envName = request.getServletContext().getInitParameter("env.name");
 				String mess = MessageFormat.format("接口异常报警:项目:{0},环境:{1},IP:{2},traceId:{3},接口地址:{4},请求方式:{5},错误信息:{6}",
-						"mp-manage",envName, IPUtil.initIp(),MDC.get("reqId"),request.getRequestURI(),request.getMethod(),ex.getMessage());
+						"mp-manage",envName, IPUtil.initIp(),MDC.get("traceId"),request.getRequestURI(),request.getMethod(),ex.getMessage());
 				logger.info(mess);
 				DingdingAlarmUtil.sendDingdingAlerm(mess,dingding_token_url);
 			} catch (Exception e) {

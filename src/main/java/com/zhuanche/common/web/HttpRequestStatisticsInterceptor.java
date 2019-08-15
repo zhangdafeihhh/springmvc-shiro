@@ -110,7 +110,7 @@ public class HttpRequestStatisticsInterceptor implements HandlerInterceptor,  In
 			try {
 				String envName = request.getServletContext().getInitParameter("env.name");
 				String mess = MessageFormat.format("接口超时报警:项目:{0},环境:{1},IP:{2},traceId:{3},接口地址:{4},请求方式:{5},超时时间:{6}毫秒",
-						"mp-manage",envName, IPUtil.initIp(),MDC.get("reqId"),request.getRequestURI(),request.getMethod(),costMiliseconds);
+						"mp-manage",envName, IPUtil.initIp(),MDC.get("traceId"),request.getRequestURI(),request.getMethod(),costMiliseconds);
 				log.info(mess);
 				DingdingAlarmUtil.sendDingdingAlerm(mess,dingding_token_url);
 			} catch (Exception e) {
@@ -173,7 +173,7 @@ public class HttpRequestStatisticsInterceptor implements HandlerInterceptor,  In
         }else {
         	opLog.setRequestType("HTTP");
         }
-        opLog.setRequestId(MDC.get("reqId"));                                       //请求流水ID
+        opLog.setRequestId(MDC.get("traceId"));                                       //请求流水ID
 		StringBuffer queryString = new StringBuffer();                             
 		Enumeration<String> paramNames = request.getParameterNames();
 		while( paramNames!=null && paramNames.hasMoreElements() ) {
