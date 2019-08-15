@@ -89,6 +89,20 @@
         </encoder>
     </appender>
 
+    <!--perf log-->
+    <appender name="perfLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>/u01/tomcat_docker_8080/logs/perf.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/u01/tomcat_docker_8080/logs/history/%d{yyyyMM,aux}/perf.log.%d{yyyyMMdd}</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
 
     <logger name="com.zhuanche.common.securityLog" level="INFO" additivity="false">
         <appender-ref ref="securityLog"/>
@@ -264,6 +278,48 @@
         <!-- 添加附加的appender,最多只能添加一个 -->
         <appender-ref ref="LOGSTASHERROR"/>
     </appender>
+
+
+    <!--perf监控-->
+    <appender name="perfLogFile" class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold >0</discardingThreshold>
+        <queueSize>512</queueSize>
+        <!-- 添加附加的appender,最多只能添加一个 -->
+        <appender-ref ref ="perfLog"/>
+    </appender>
+
+
+    <!--perf error appender -->
+    <appender name="errorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <File>/u01/tomcat_docker_8080/logs/mp-manage.error.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>/u01/tomcat_docker_8080/logs/history/%d{yyyyMM,aux}/mp-manage.error.log.%d{yyyyMMdd}</FileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{15} [%M:%L] %X{traceId} - %msg%n
+            </pattern>
+        </encoder>
+        <!--以下为插件部分-->
+        <filter class="com.sq.log.LogbackPerfErrorFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+            <errorSwitch>false</errorSwitch>
+        </filter>
+    </appender>
+
+
+
+
+    <!--perf log 用于grafana展示-->
+    <logger name="speed4j" level="info" additivity="false">
+        <appender-ref ref="perfLogFile"/>
+    </logger>
 
 
     <logger name="com.zhuanche" level="INFO" addtivity="true">
