@@ -563,7 +563,7 @@ public class DriverMonthDutyService {
 					}
 				}else {
 					teamIds = new HashSet<>();
-					teamIds.add(Integer.parseInt(param.getTeamId()));
+					/*teamIds.add(Integer.parseInt(param.getTeamId()));*/
 					Set<Integer> authDriverIds = DriverUtils.getDriverIdsByUserTeamsV2(carDriverTeamService,teamIds);
 					if(authDriverIds != null && !authDriverIds.isEmpty()){
 						param.setDriverIds(authDriverIds);

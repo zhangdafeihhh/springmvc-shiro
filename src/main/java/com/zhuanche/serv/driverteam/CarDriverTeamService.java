@@ -47,6 +47,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * @description: 车队设置
@@ -234,7 +238,7 @@ public class CarDriverTeamService{
 		}
 
 		DynamicRoutingDataSource.DataSourceMode mdbcarManageMode = DynamicRoutingDataSource.getMasterSlave("mdbcarmanage-DataSource");
-		CarDriverTeam carDriverTeam = null;
+		 CarDriverTeam carDriverTeam = null;
 		try{
 			DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource", DynamicRoutingDataSource.DataSourceMode.SLAVE);
 			carDriverTeam = carDriverTeamMapper.selectByPrimaryKey(driverTeamRequest.getTeamId());
@@ -282,14 +286,25 @@ public class CarDriverTeamService{
 					result += carRelateTeamMapper.insertSelective(team);
 				}
 			}
-			try {
-				// 调用接口清除，key
-				carBizDriverInfoService.flashDriverInfo(Integer.parseInt(driverId));
-			} catch (Exception e) {
-				logger.info("司机driverId={},修改,调用清除接口异常={}", driverId, e.getMessage());
-			}
-			//TODO 处理司机ID，发动司机变更MQ 从车队新增司机 driverId; driverTeam.getTeamId();driverTeam.getTeamName()
-			this.asyncDutyService.processingData(Integer.parseInt(driverId), String.valueOf(carDriverTeam.getId()), carDriverTeam.getTeamName(), 2);
+
+			ExecutorService executor = Executors.newCachedThreadPool();
+			CarDriverTeam copyCarDriverTeam = carDriverTeam;
+			Future<Integer> future = executor.submit(new Callable<Integer>() {
+				@Override
+				public Integer call() throws Exception {
+					try {
+						// 调用接口清除，key
+						carBizDriverInfoService.flashDriverInfo(Integer.parseInt(driverId));
+					} catch (Exception e) {
+						logger.info("司机driverId={},修改,调用清除接口异常={}", driverId, e.getMessage());
+					}
+					//TODO 处理司机ID，发动司机变更MQ 从车队新增司机 driverId; driverTeam.getTeamId();driverTeam.getTeamName()
+					asyncDutyService.processingData(Integer.parseInt(driverId), String.valueOf(copyCarDriverTeam.getId()), copyCarDriverTeam.getTeamName(), 2);
+					logger.info("mq异步发送成功");
+					return 1;
+				}
+			});
+
 		}
 
 		return result;

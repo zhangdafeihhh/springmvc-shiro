@@ -107,15 +107,19 @@ public class HttpRequestStatisticsInterceptor implements HandlerInterceptor,  In
 		if(dingding_alerm_switch == 0){
 			log.debug("报警开关关闭，不发送钉钉报警通知");
 		}else if(costMiliseconds > dingding_alerm_timeout){
-			try {
-				String envName = request.getServletContext().getInitParameter("env.name");
-				String mess = MessageFormat.format("接口超时报警:项目:{0},环境:{1},IP:{2},traceId:{3},接口地址:{4},请求方式:{5},超时时间:{6}毫秒",
-						"mp-manage",envName, IPUtil.initIp(),MDC.get("reqId"),request.getRequestURI(),request.getMethod(),costMiliseconds);
-				log.info(mess);
-				DingdingAlarmUtil.sendDingdingAlerm(mess,dingding_token_url);
-			} catch (Exception e) {
-				log.info("钉钉告警消息异常!" + e.getMessage());
+			//屏蔽exportDriverReportData 和 queryDriverReportData 超时报警
+			if(!request.getMethod().contains("exportDriverReportData") && !request.getMethod().contains("queryDriverReportData")){
+				try {
+					String envName = request.getServletContext().getInitParameter("env.name");
+					String mess = MessageFormat.format("接口超时报警:项目:{0},环境:{1},IP:{2},traceId:{3},接口地址:{4},请求方式:{5},超时时间:{6}毫秒",
+							"mp-manage",envName, IPUtil.initIp(),MDC.get("reqId"),request.getRequestURI(),request.getMethod(),costMiliseconds);
+					log.info(mess);
+					DingdingAlarmUtil.sendDingdingAlerm(mess,dingding_token_url);
+				} catch (Exception e) {
+					log.info("钉钉告警消息异常!" + e.getMessage());
+				}
 			}
+
 		}
 
 		log.info("[HTTP_STATIS] "+ uri + " ,COST: "+ costMiliseconds + "ms, TOTAL_REQUEST: "+ atomicLong.get() );
