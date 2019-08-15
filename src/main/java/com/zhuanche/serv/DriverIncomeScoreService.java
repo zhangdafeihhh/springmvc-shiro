@@ -211,11 +211,12 @@ public class DriverIncomeScoreService {
             }if(jsonObject.get("sumOfTripScore") != null){
                 String sumOfTripScore = jsonObject.getBigDecimal("sumOfTripScore").toString();
                 resultMap.put("sumOfTripScore",sumOfTripScore);
+            }if(jsonObject.get("collectScore") != null){
+                resultMap.put("tripScore",jsonObject.get("collectScore").toString());
             }
             resultMap.put("driverId",driverId);
             resultMap.put("dispatchTime",scoreDate);
             resultMap.put("scoreDate",day);
-            resultMap.put("tripScore",tripScore);
 
         }else {
             logger.info("调用代理层接口返回结果数据异常",jsonRes);
