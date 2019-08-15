@@ -410,6 +410,20 @@
 			<artifactId>sq-component-log</artifactId>
 			<version>1.0.20</version>
 		</dependency>
+		<!--接入perf监控-->
+		<dependency>
+			<groupId>com.sq</groupId>
+			<artifactId>config-manger-spring-boot-starter</artifactId>
+			<version>1.0.19</version>
+		</dependency>
+
+		<dependency>
+			<groupId>sq-arch</groupId>
+			<artifactId>sq-okHttp</artifactId>
+			<version>1.2.6</version>
+		</dependency>
+
+
 	</dependencies>
 
 	<!-- 多环境配置BEGIN -->
