@@ -8,6 +8,7 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.entity.driver.CustomerAppraisal;
 import com.zhuanche.entity.driver.DriverAppraisalAppeal;
+import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.deiver.DriverAppraisalAppealService;
 import com.zhuanche.serv.deiver.MpDriverCustomerAppraisalService;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -167,7 +168,8 @@ public class DriverAppraisalAppealController {
         Map<String, Object> param = new HashedMap(1);
         String url = restApiUri + "/driverAppeal/getAppealRecordDetail";
         param.put("appealId", appealId);
-        String request = rpcapi.request(RPCAPI.HttpMethod.GET, url, param, null, "UTF-8");
+        String request = MpOkHttpUtil.okHttpGet(url,param,0,null);
+       // String request = rpcapi.request(RPCAPI.HttpMethod.GET, url, param, null, "UTF-8");
         logger.info("rest 查询司机申诉详情查询结果 msg=" + request);
 
         if (request == null) {
