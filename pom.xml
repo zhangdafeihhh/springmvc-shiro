@@ -99,7 +99,7 @@
 		<dependency>
 			<groupId>com.zhuanche</groupId>
 			<artifactId>mp-util</artifactId>
-			<version>1.0.0.1-SNAPSHOT</version>
+			<version>1.0.0.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>net.logstash.logback</groupId>
@@ -405,11 +405,11 @@
 			</exclusions>
 		</dependency>
 		<!--添加sq error的日志-->
-		<dependency>
+<!--		<dependency>
 			<groupId>com.sq</groupId>
 			<artifactId>sq-component-log</artifactId>
 			<version>1.0.20</version>
-		</dependency>
+		</dependency>-->
 		<!--接入perf监控-->
 		<dependency>
 			<groupId>com.sq</groupId>
