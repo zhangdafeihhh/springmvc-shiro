@@ -99,7 +99,7 @@
 		<dependency>
 			<groupId>com.zhuanche</groupId>
 			<artifactId>mp-util</artifactId>
-			<version>0.0.9-SNAPSHOT</version>
+			<version>1.0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>net.logstash.logback</groupId>
