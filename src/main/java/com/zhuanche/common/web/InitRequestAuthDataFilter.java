@@ -45,7 +45,10 @@ public class InitRequestAuthDataFilter extends OncePerRequestFilter {
 		}
 		MDC.put(TRACE_KEY, reqId);
 		/**防止MDC 多次生成，引入的sq-component-log 有拦截 header 头信息**/
-		request.setAttribute("X-Request-Id",reqId);
+
+		response.setHeader("X-Request-Id",reqId);
+
+		logger.info("header:" + request.getHeader("X-Request-Id"));
 
 		filterChain.doFilter(request, response);
 
