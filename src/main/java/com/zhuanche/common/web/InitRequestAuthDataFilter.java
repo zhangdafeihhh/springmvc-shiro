@@ -36,9 +36,9 @@ public class InitRequestAuthDataFilter extends OncePerRequestFilter {
 
 
 		//先从param里取，没有的话从header里取，还没有的话再创建
-		String reqId = request.getParameter("x_requestId");
+		String reqId = request.getParameter("X-Request-Id");
 		if(reqId==null || "".equals(reqId.trim())  ) {
-			reqId = request.getHeader("traceId");
+			reqId = request.getHeader("X-Request-Id");
 		}
 		if(reqId==null || "".equals(reqId.trim())  ) {
 			reqId =   UUID.randomUUID().toString().replace("-", "");
@@ -47,6 +47,6 @@ public class InitRequestAuthDataFilter extends OncePerRequestFilter {
 
 		filterChain.doFilter(request, response);
 
-		//MDC.remove(TRACE_KEY);
+		MDC.remove(TRACE_KEY);
 	}
 }
