@@ -44,6 +44,8 @@ public class InitRequestAuthDataFilter extends OncePerRequestFilter {
 			reqId =   UUID.randomUUID().toString().replace("-", "");
 		}
 		MDC.put(TRACE_KEY, reqId);
+		/**防止MDC 多次生成，引入的sq-component-log 有拦截 header 头信息**/
+		request.setAttribute("X-Request-Id",reqId);
 
 		filterChain.doFilter(request, response);
 
