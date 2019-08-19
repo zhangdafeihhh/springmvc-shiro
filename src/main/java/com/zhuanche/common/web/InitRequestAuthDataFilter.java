@@ -20,7 +20,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 public class InitRequestAuthDataFilter extends OncePerRequestFilter {
 
 	// log 追踪ID
-	private final static String TRACE_KEY = "traceId";
+	private final static String TRACE_KEY = "X-Request-Id";
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)throws ServletException, IOException {
