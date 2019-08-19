@@ -95,7 +95,6 @@ public class HttpRequestStatisticsInterceptor implements HandlerInterceptor,  In
 	@Override
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)	throws Exception {
 		//读出初始时间
-		log.info("告警方法:" +request.getMethod());
 		long startTimestamp  = (long)request.getAttribute(HTTP_REQUEST_START_TIMESTAMP);
 		StopWatch stopWatch = (Slf4JStopWatch)request.getAttribute(HTTP_REQUEST_STOP_WATCH);
 		String uri = request.getRequestURI();
@@ -109,7 +108,7 @@ public class HttpRequestStatisticsInterceptor implements HandlerInterceptor,  In
 			log.debug("报警开关关闭，不发送钉钉报警通知");
 		}else if(costMiliseconds > dingding_alerm_timeout){
 			//屏蔽exportDriverReportData 和 queryDriverReportData 超时报警
-			if(!request.getMethod().contains("exportDriverReportData") && !request.getMethod().contains("queryDriverReportData")){
+			if(!request.getRequestURI().contains("exportDriverReportData") && !request.getRequestURI().contains("queryDriverReportData")){
 				try {
 					String envName = request.getServletContext().getInitParameter("env.name");
 					String mess = MessageFormat.format("接口超时报警:项目:{0},环境:{1},IP:{2},traceId:{3},接口地址:{4},请求方式:{5},超时时间:{6}毫秒",
