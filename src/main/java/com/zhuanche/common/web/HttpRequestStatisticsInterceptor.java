@@ -95,6 +95,7 @@ public class HttpRequestStatisticsInterceptor implements HandlerInterceptor,  In
 	@Override
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)	throws Exception {
 		//读出初始时间
+		log.info("告警方法:" +request.getMethod());
 		long startTimestamp  = (long)request.getAttribute(HTTP_REQUEST_START_TIMESTAMP);
 		StopWatch stopWatch = (Slf4JStopWatch)request.getAttribute(HTTP_REQUEST_STOP_WATCH);
 		String uri = request.getRequestURI();
