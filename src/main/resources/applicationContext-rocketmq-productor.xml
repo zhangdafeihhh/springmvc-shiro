@@ -13,12 +13,22 @@
 		<property name="namesrvAddr" value="${rocketmq.namesrvAddr}"/>
 	</bean>
 
+	<!--双写MQ-->
+	<bean id="commonRocketProducerDouble"  class="com.zhuanche.common.rocketmq.CommonRocketProducer" init-method="init" destroy-method="destroy" scope="singleton">
+		<property name="namesrvAddr" value="${rocketmq.new.namesrvAddr}"/>
+	</bean>
+
 	<bean id="dingdingSupplierAndTeamProducer"  class="com.zhuanche.common.rocketmq.DingdingSupplierAndTeamProducer" init-method="init" destroy-method="destroy" scope="singleton">
 		<property name="namesrvAddr" value="${rocketmq.dingdingNamesrvAddr}"/>
 	</bean>
 
 	<bean id="excelProducer" class="com.zhuanche.common.rocketmq.ExcelProducer" init-method="init" destroy-method="destroy" scope="singleton">
 		<property name="namesrvAddr" value="${rocketmq.excelNamesrvAddr}"/>
+	</bean>
+
+	<!--双写MQ-->
+	<bean id="excelProducerDouble" class="com.zhuanche.common.rocketmq.ExcelProducer" init-method="init" destroy-method="destroy" scope="singleton">
+		<property name="namesrvAddr" value="${rocketmq.new.excelNamesrvAddr}"/>
 	</bean>
 	<!--修改司机信息发送MQ同步司机宽表-->
 	<bean id="driverWideRocketProducer" class="com.zhuanche.common.rocketmq.DriverWideRocketProducer" init-method="init" destroy-method="destroy">

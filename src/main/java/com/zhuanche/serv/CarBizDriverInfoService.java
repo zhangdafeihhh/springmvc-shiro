@@ -12,6 +12,7 @@ import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.rocketmq.CommonRocketProducer;
+import com.zhuanche.common.rocketmq.CommonRocketProducerDouble;
 import com.zhuanche.common.rocketmq.DriverWideRocketProducer;
 import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
@@ -61,6 +62,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -642,6 +645,11 @@ public class CarBizDriverInfoService {
             //TODO 20190619新增一组修改司机信息发送MQ
             DriverWideRocketProducer.publishMessage(DriverWideRocketProducer.TOPIC, method, String.valueOf(carBizDriverInfoDTO.getDriverId()), messageMap);
             CommonRocketProducer.publishMessage("driver_info", method, String.valueOf(carBizDriverInfoDTO.getDriverId()), messageMap);
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            String envName = request.getServletContext().getInitParameter("env.name");
+            if (Objects.nonNull(envName) && Arrays.asList(new String[]{"online","prod"}).contains(envName)){
+                CommonRocketProducerDouble.publishMessage("driver_info", method, String.valueOf(carBizDriverInfoDTO.getDriverId()), messageMap);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -3810,6 +3818,11 @@ public class CarBizDriverInfoService {
                 String messageStr = JSONObject.fromObject(messageMap).toString();
                 logger.info("专车供应商，同步发送数据：" + messageStr);
                 CommonRocketProducer.publishMessage("vipSupplierTopic", method, String.valueOf(carBizSupplier.getSupplierId()), messageMap);
+                HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+                String envName = request.getServletContext().getInitParameter("env.name");
+                if (Objects.nonNull(envName) && Arrays.asList(new String[]{"online","prod"}).contains(envName)){
+                    CommonRocketProducerDouble.publishMessage("vipSupplierTopic", method, String.valueOf(carBizSupplier.getSupplierId()), messageMap);
+                }
             } catch (Exception e) {
                 logger.error("开通千里眼专车供应商"+carBizSupplier.getSupplierFullName()+"，同步发送数据异常：",e);
             }

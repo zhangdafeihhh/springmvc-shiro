@@ -7,6 +7,7 @@ import com.google.common.collect.Maps;
 import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.rocketmq.ExcelProducer;
+import com.zhuanche.common.rocketmq.ExcelProducerDouble;
 import com.zhuanche.common.util.RedisKeyUtils;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -47,7 +48,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
@@ -385,6 +389,8 @@ public class SaasDriverDailyReportController {
         obj.put("saasReport",saasDTO);
         try{
             ExcelProducer.publishMessage("excel_export_producer","excel-mp-manage",null,obj);
+
+            this.sendDoubleMq(obj);
             //ExcelProducer.sendMessage("excel_export_producer","excel-car-manager",obj);
             //维护用户的邮箱
             if(loginUser.getId() != null && loginUser.getAccountType() != null){
@@ -667,6 +673,9 @@ public class SaasDriverDailyReportController {
         obj.put("saasReport",saasDTO);
         try{
             ExcelProducer.publishMessage("excel_export_producer","excel-mp-manage",null,obj);
+
+            this.sendDoubleMq(obj);
+
             //ExcelProducer.sendMessage("excel_export_producer","excel-car-manager",obj);
             //维护用户的邮箱
             if(loginUser.getId() != null && loginUser.getAccountType() != null){
@@ -919,6 +928,9 @@ public class SaasDriverDailyReportController {
         try{
             ExcelProducer.publishMessage("excel_export_producer","excel-mp-manage",null,obj);
             //ExcelProducer.sendMessage("excel_export_producer","excel-car-manager",obj);
+
+            this.sendDoubleMq(obj);
+
             //维护用户的邮箱
             if(loginUser.getId() != null && loginUser.getAccountType() != null){
 
@@ -991,5 +1003,13 @@ public class SaasDriverDailyReportController {
             table = SaasConst.MONTHTABLEBEIJING + month.replace("-","_");
         }
         return table;
+    }
+
+    private void sendDoubleMq(JSONObject obj){
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String envName = request.getServletContext().getInitParameter("env.name");
+        if (Objects.nonNull(envName) && Arrays.asList(new String[]{"online","prod"}).contains(envName)){
+            ExcelProducerDouble.publishMessage("excel_export_producer","excel-mp-manage",null,obj);
+        }
     }
 }

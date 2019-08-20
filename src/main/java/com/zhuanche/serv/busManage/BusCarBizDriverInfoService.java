@@ -10,6 +10,7 @@ import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.rocketmq.CommonRocketProducer;
+import com.zhuanche.common.rocketmq.CommonRocketProducerDouble;
 import com.zhuanche.common.rocketmq.DriverWideRocketProducer;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -79,6 +80,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -977,6 +980,11 @@ public class BusCarBizDriverInfoService implements BusConst {
             //TODO 20190619新增一组修改司机信息发送MQ
             DriverWideRocketProducer.publishMessage(DriverWideRocketProducer.TOPIC, method, String.valueOf(driverId), messageMap);
             CommonRocketProducer.publishMessage("driver_info", method, String.valueOf(driverId), messageMap);
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            String envName = request.getServletContext().getInitParameter("env.name");
+            if (Objects.nonNull(envName) && Arrays.asList(new String[]{"online","prod"}).contains(envName)){
+                CommonRocketProducerDouble.publishMessage("driver_info",method,String.valueOf(driverId),messageMap);
+            }
         } catch (Exception e) {
             logger.error("发送MQ异常,method={},error={}", method, e.getMessage(), e);
         }

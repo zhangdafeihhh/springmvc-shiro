@@ -8,6 +8,7 @@ import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.rocketmq.CommonRocketProducer;
+import com.zhuanche.common.rocketmq.CommonRocketProducerDouble;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constants.BusConst;
@@ -44,7 +45,10 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -284,6 +288,11 @@ public class BusSupplierService implements BusConst {
 		msgMap.put("data", JSON.toJSONString(data));
 		logger.info("专车供应商，同步发送数据：", JSON.toJSONString(msgMap));
 		CommonRocketProducer.publishMessage("vipSupplierTopic", method, String.valueOf(supplierId), msgMap);
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+		String envName = request.getServletContext().getInitParameter("env.name");
+		if (Objects.nonNull(envName) && Arrays.asList(new String[]{"online","prod"}).contains(envName)){
+			CommonRocketProducerDouble.publishMessage("vipSupplierTopic", method, String.valueOf(supplierId), msgMap);
+		}
 	}
 
 	/**
