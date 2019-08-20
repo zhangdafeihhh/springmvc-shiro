@@ -1196,7 +1196,7 @@ public class OrderController{
 		}
 		//设置司乘分离对象
 		OrderCostDetailInfo orderCostDetailInfo = driverFeeDetailService.getOrderCostDetailInfo(result.getOrderNo());
-
+		orderCostDetailInfo.setAccountSettleAmount(orderCostDetailInfo.getChargeSettleAmount().add(orderCostDetailInfo.getGiftSettleAmount()));
 		getOverTimeHtml(orderCostDetailInfo);//超套餐时长费
 		getOverMileageNumHtml(orderCostDetailInfo);//计算超套餐里程费
         calcOverMileageTotal(orderCostDetailInfo);

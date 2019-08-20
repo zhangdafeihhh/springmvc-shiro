@@ -265,5 +265,11 @@ public class OrderCostDetailInfo {
 
     private  BigDecimal systemDispatchFee = BigDecimal.ZERO;//平台调度费
 
+    private BigDecimal dynamicDoublyFee = BigDecimal.ZERO;//  动态加价 金额
+    private BigDecimal cleanFee  = BigDecimal.ZERO;//  基础清洁费
+    private BigDecimal deepCleanFee = BigDecimal.ZERO;//  深度清洁费
+    private BigDecimal cleanDeepFeeCount  = BigDecimal.ZERO;//清洁费总计=（基础清洁费+深度清洁费）
+    private Integer cleanFeeFree = 0;//是否减免清洁费 0：不减免 1：减免
+
 
 }
