@@ -43,6 +43,63 @@
             <pattern>%d{yyyy-MM-dd HH:mm:ss:SSS}%msg%n</pattern>
         </encoder>
     </appender>
+
+    <!--打印sq_error.json日志-->
+    <appender name="LOGSTASHERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/u01/tomcat_docker_8080/logs/sq_error.json</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--日志文件输出的文件名-->
+            <FileNamePattern>/u01/tomcat_docker_8080/logs/sq_error.json.%d{yyyy-MM-dd}.%i</FileNamePattern>
+            <!--日志文件最大的大小-->
+            <maxFileSize>1024MB</maxFileSize>
+            <!--日志文件保留天数-->
+            <maxHistory>15</maxHistory>
+            <totalSizeCap>20GB</totalSizeCap>
+
+        </rollingPolicy>
+
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <jsonFactoryDecorator class="com.zhuanche.util.MyJsonFactoryDecorator"/>
+                <providers>
+                    <timestamp>
+                        <pattern>yyyy-MM-dd'T'HH:mm:ss.SSSZZ</pattern>
+                    </timestamp>
+                    <pattern>
+                        <pattern>
+                            {
+                            "traceId": "%X{traceId}",
+                            "level": "%level",
+                            "service": "${appName:-}",
+                            "host": "%ip",
+                            "thread": "%thread",
+                            "class": "%logger{40}",
+                            "line": "%L",
+                            "message": "%message",
+                            "error":" %exception" <!--错误日志打印异常栈-->
+                            }
+                        </pattern>
+                    </pattern>
+                </providers>
+        </encoder>
+    </appender>
+
+    <!--perf log-->
+    <appender name="perfLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>/u01/tomcat_docker_8080/logs/perf.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/u01/tomcat_docker_8080/logs/history/%d{yyyyMM,aux}/perf.log.%d{yyyyMMdd}</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] - %msg%n</pattern>
+        </encoder>
+    </appender>
     
     <logger name="com.zhuanche.http" level="info" additivity="false">
         <appender-ref ref="thirdFile"/>
@@ -113,7 +170,7 @@
                     <pattern>
                         {
                         "log_request_time": "%d{yyyy-MM-dd HH:mm:ss.SSS}",
-                        "traceId": "%X{reqId}",
+                        "traceId": "%X{traceId}",
                         "level": "%level",
                         "service": "${appName:-}",
                         "host": "%ip",
@@ -204,6 +261,64 @@
         <!-- 添加附加的appender,最多只能添加一个 -->
         <appender-ref ref="LOGSTASH_ERROR"/>
     </appender>
+
+    <!-- sq_error.json -->
+
+    <appender name="AsyncLogStashErrorFile" class="ch.qos.logback.classic.AsyncAppender">
+
+        <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+        <queueSize>2048</queueSize>
+        <!--
+         <IncludeCallerData>true</IncludeCallerData>
+         -->
+        <!-- 添加附加的appender,最多只能添加一个 -->
+        <appender-ref ref="LOGSTASHERROR"/>
+    </appender>
+
+    <!--perf监控-->
+    <appender name="perfLogFile" class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold >0</discardingThreshold>
+        <queueSize>512</queueSize>
+        <!-- 添加附加的appender,最多只能添加一个 -->
+        <appender-ref ref ="perfLog"/>
+    </appender>
+
+
+    <!--perf error appender -->
+    <appender name="errorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <File>/u01/tomcat_docker_8080/logs/mp-manage.error.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>/u01/tomcat_docker_8080/logs/history/%d{yyyyMM,aux}/mp-manage.error.log.%d{yyyyMMdd}</FileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{15} [%M:%L] %X{traceId} - %msg%n
+            </pattern>
+        </encoder>
+        <!--以下为插件部分-->
+        <filter class="com.sq.log.LogbackPerfErrorFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+            <errorSwitch>false</errorSwitch>
+        </filter>
+    </appender>
+
+
+
+
+    <!--perf log 用于grafana展示-->
+    <logger name="speed4j" level="info" additivity="false">
+        <appender-ref ref="perfLogFile"/>
+    </logger>
+
+
     <logger name="com.zhuanche" level="INFO" addtivity="true">
         <appender-ref ref="AsyncLogStashInfoFile"/>
         <appender-ref ref="AsyncLogStashErrorFile"/>

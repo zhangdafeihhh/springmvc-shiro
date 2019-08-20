@@ -20,7 +20,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 public class InitRequestAuthDataFilter extends OncePerRequestFilter {
 
 	// log 追踪ID
-	private final static String TRACE_KEY = "reqId";
+	private final static String TRACE_KEY = "X-Request-Id";
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)throws ServletException, IOException {
@@ -36,14 +36,21 @@ public class InitRequestAuthDataFilter extends OncePerRequestFilter {
 
 
 		//先从param里取，没有的话从header里取，还没有的话再创建
-		String reqId = request.getParameter("x_requestId");
+		String reqId = request.getParameter("X-Request-Id");
 		if(reqId==null || "".equals(reqId.trim())  ) {
-			reqId = request.getHeader("x_requestId");
+			reqId = request.getHeader("X-Request-Id");
 		}
 		if(reqId==null || "".equals(reqId.trim())  ) {
 			reqId =   UUID.randomUUID().toString().replace("-", "");
 		}
 		MDC.put(TRACE_KEY, reqId);
+		//该traceId是让日志打印出来的key值
+		MDC.put("traceId",reqId);
+		/**防止MDC 多次生成，引入的sq-component-log 有拦截 header 头信息**/
+		
+
+
+		logger.info("header:" + request.getHeader("X-Request-Id"));
 
 		filterChain.doFilter(request, response);
 

@@ -57,12 +57,12 @@ public class InitRequestCommonDataFilter extends OncePerRequestFilter {
 		//一、请求流水号(用于日志,实现对请求进行统一编号，方便于进行排查业务日志)
 		String reqId = request.getParameter("x_requestId");
 		if(reqId==null || "".equals(reqId.trim())  ) {
-			reqId = request.getHeader("x_requestId");
+			reqId = request.getHeader("traceId");
 		}
 		if(reqId==null || "".equals(reqId.trim())  ) {
 			reqId = this.genRequestId(6);
 		}
-		MDC.put("reqId", reqId);
+		MDC.put("traceId", reqId);
 		
 		//二、多环境信息
 		if(envName==null) {

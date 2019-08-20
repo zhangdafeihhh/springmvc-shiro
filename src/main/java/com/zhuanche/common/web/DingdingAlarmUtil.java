@@ -2,7 +2,7 @@ package com.zhuanche.common.web;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.zhuanche.http.MpOkHttpUtil;
+import com.sq.common.okhttp.OkHttpUtil;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -42,7 +42,8 @@ public class DingdingAlarmUtil {
         atMobiles.put("atMobiles",jsonArray);*/
         jsonObject.put("at",isAtAll);
         jsonObject.put("at",atMobiles);
-        MpOkHttpUtil.okHttpPostJsonAsync(dingding_token_url, jsonObject.toJSONString(), 0, null, new Callback() {
+
+        OkHttpUtil.getIntance().doPostJsonAsync(dingding_token_url, null, jsonObject.toJSONString(), new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 logger.info("钉钉消息发送失败！失败信息:" + e.getMessage());
@@ -51,7 +52,21 @@ public class DingdingAlarmUtil {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 logger.info("钉钉消息发送成功!" + response.toString());
+
             }
         });
+
+/*        MpOkHttpUtil.okHttpPostJsonAsync(dingding_token_url, jsonObject.toJSONString(), 0, null, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+                logger.info("钉钉消息发送失败！失败信息:" + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                logger.info("钉钉消息发送成功!" + response.toString());
+            }
+        });*/
     }
 }

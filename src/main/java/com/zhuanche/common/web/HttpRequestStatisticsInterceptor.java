@@ -177,7 +177,7 @@ public class HttpRequestStatisticsInterceptor implements HandlerInterceptor,  In
         }else {
         	opLog.setRequestType("HTTP");
         }
-        opLog.setRequestId(MDC.get("reqId"));                                       //请求流水ID
+        opLog.setRequestId(MDC.get("traceId"));                                       //请求流水ID
 		StringBuffer queryString = new StringBuffer();                             
 		Enumeration<String> paramNames = request.getParameterNames();
 		while( paramNames!=null && paramNames.hasMoreElements() ) {
