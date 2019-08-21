@@ -290,6 +290,11 @@ public class SupplierLevelController {
                             stringBuffer.append(item.getAdditionalScore());
                         }
                         stringBuffer.append(",");
+
+                        if(item.getGradeScore() != null){
+                            stringBuffer.append(item.getGradeScore());
+                        }
+                        stringBuffer.append(",");
                         if(item.getGradeLevel() != null){
                             stringBuffer.append(item.getGradeLevel());
                         }
@@ -442,8 +447,12 @@ public class SupplierLevelController {
         try{
             //解析要导入的文档
             Map<String, Object> result = _doPareImportData(    file, month,    request);
-            //有异常则标识导入失败
-            if(result.get("error")==Boolean.TRUE){
+            if(Integer.parseInt(result.get("result").toString()) == -1){
+                AjaxResponse errorAjaxResponse = AjaxResponse.failMsg(-2,"请使用模板");
+                errorAjaxResponse.setMsg("请使用模板");
+                return errorAjaxResponse;
+            }else if(result.get("error")==Boolean.TRUE){
+                //有异常则标识导入失败
                 AjaxResponse errorAjaxResponse = AjaxResponse.success(result);
                 errorAjaxResponse.setMsg("上传数据中有问题,点击下载查看");
                 return errorAjaxResponse;
@@ -517,6 +526,7 @@ public class SupplierLevelController {
     private Map<String, Object> _doPareImportData(MultipartFile file,String month,   HttpServletRequest request){
 
         Map<String, Object> result = new HashMap<String, Object>();
+        result.put("result", 1);
         String download = null;
         List<JSONObject> listException = new ArrayList<>();
 
@@ -538,8 +548,38 @@ public class SupplierLevelController {
                 logger.info("导入模板错误L1");
                 result.put("result", -1);
                 result.put("msg", "导入模板错误");
+
                 return result;
             }
+
+            Cell cell0 =null;
+            Cell cell1 =null;
+            Cell cell2 =null;
+
+            cell0 = row1.getCell(0);
+            cell1 = row1.getCell(1);
+            cell2 = row1.getCell(2);
+            String cell0V = null;
+            String cell1V = null;
+            String cell2V = null;
+            try {
+                  cell0V = cell0.getStringCellValue();
+                  cell1V = cell1.getStringCellValue();
+                 cell2V = cell2.getStringCellValue();
+                if (!"供应商名称".equals(cell0V) || !"附加项目".equals(cell1V) || !"附加分".equals(cell2V)) {
+                    logger.info("导入模板错误L2，列名不一致。第一列名称为：" + cell0V + ",第二列名称为：" + cell1V + ",第三列名称为" + cell2V);
+                    result.put("result", -1);
+                    result.put("msg", "导入模板错误");
+                    return result;
+                }
+            }catch (Exception e){
+                logger.info("导入模板错误L3，列名不一致。第一列名称为：" + cell0V + ",第二列名称为：" + cell1V + ",第三列名称为" + cell2V);
+                result.put("result", -1);
+                result.put("msg", "导入模板错误");
+                return result;
+            }
+
+
             int minRowIx = 1;// 过滤掉标题，从第一行开始导入数据
             int maxRowIx = sheet.getLastRowNum(); // 要导入数据的总条数
 
@@ -548,9 +588,7 @@ public class SupplierLevelController {
             String itemName = null;
             String itemValue = null;
 
-            Cell cell0 =null;
-            Cell cell1 =null;
-            Cell cell2 =null;
+
             Map<String,Integer> rowItemCache = new HashMap<>();
             for (int rowIx = minRowIx; rowIx <= maxRowIx; rowIx++) {
                   cell0 =null;
@@ -625,10 +663,10 @@ public class SupplierLevelController {
                    boolean exportResult = exportExcel(CommonConfig.ERROR_BASE_FILE+download, listException);
                 }
             } catch (Exception e) {
-                logger.error("导入供应商等级的附加分异常" ,e);
+                logger.error("导入供应商等级的附加分异常V1" ,e);
             }
         } catch (Exception e) {
-            logger.error("车辆状态文件导入异常" ,e);
+            logger.error("导入供应商等级的附加分异常V2" ,e);
         }
 
         if (!"".equals(download) && download != null) {

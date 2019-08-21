@@ -81,7 +81,7 @@
   <select id="findSupplierLevelScoreBySupplierId" parameterType="java.util.Map" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
-    from supplier_level where  supplier_id = #{supplierId}
+    from supplier_level where  supplier_id = #{supplierId} and `states`= 2
     order by month  desc limit 1
   </select>
 </mapper>
