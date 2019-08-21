@@ -2,6 +2,7 @@ package com.zhuanche.controller.supplier;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Maps;
 import com.zhuanche.common.CommonConfig;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.dto.ImportCheckEntity;
@@ -10,6 +11,9 @@ import com.zhuanche.entity.driver.SupplierLevelAdditional;
 import com.zhuanche.serv.supplier.SupplierLevelService;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.excel.CsvUtils2File;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
+import jxl.write.WriteException;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.POIXMLDocument;
@@ -17,10 +21,8 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -659,8 +661,11 @@ public class SupplierLevelController {
                     //保存文件
                     String fileName =  new String("ERROR".getBytes("utf-8"), "iso8859-1");
 
-                    download = "/template/error/" + fileName + buildRandom(2) + "_"+ System.currentTimeMillis() + ".csv";
-                   boolean exportResult = exportExcel(CommonConfig.ERROR_BASE_FILE+download, listException);
+                    download = "/template/error/" + fileName + buildRandom(2) + "_"+ System.currentTimeMillis() + ".xlsx";
+
+                    List<String> titles = new ArrayList<>();
+
+                    writeExcel(CommonConfig.ERROR_BASE_FILE+download,"错误信息",titles,listException);
                 }
             } catch (Exception e) {
                 logger.error("导入供应商等级的附加分异常V1" ,e);
@@ -743,29 +748,110 @@ public class SupplierLevelController {
 
         return result;
     }
-    public boolean exportExcel(String path,
-                                List<JSONObject> list) throws Exception {
-        if (list != null && list.size() > 0) {
-            File f = new File(path);
-            List<String > errorList = new ArrayList<>();
-            int i = 0;
-            for (JSONObject s : list) {
-                StringBuffer stringBuffer = new StringBuffer();
-                stringBuffer.append(s.containsKey("supplierName")? s.getString("supplierName"):"");
-                stringBuffer.append(",");
-                stringBuffer.append(s.containsKey("itemName")?s.getString("itemName"):"");
-                stringBuffer.append(",");
-                stringBuffer.append(s.containsKey("itemValue")?s.getString("itemValue"):"");
-                stringBuffer.append(",");
-                stringBuffer.append(s.containsKey("errorReason")?s.getString("errorReason"):"");
-                errorList.add(stringBuffer.toString());
-                i++;
+
+
+    /**
+     * 获取后缀
+     * @param filepath filepath 文件全路径
+     */
+    private static String getSuffiex(String filepath) {
+        if (StringUtils.isBlank(filepath)) {
+            return "";
+        }
+        int index = filepath.lastIndexOf(".");
+        if (index == -1) {
+            return "";
+        }
+        return filepath.substring(index + 1, filepath.length());
+    }
+
+    /**
+     * 创建Excel文件
+     * @param filepath filepath 文件全路径
+     * @param sheetName 新Sheet页的名字
+     * @param titles 表头
+     * @param values 每行的单元格
+     */
+    public static boolean writeExcel(String filepath, String sheetName, List<String> titles,
+                                     List<JSONObject> values) throws IOException {
+        boolean success = false;
+        OutputStream outputStream = null;
+        if (StringUtils.isBlank(filepath)) {
+            throw new IllegalArgumentException("文件路径不能为空");
+        } else {
+            String suffiex = getSuffiex(filepath);
+            if (StringUtils.isBlank(suffiex)) {
+                throw new IllegalArgumentException("文件后缀不能为空");
+            }
+            Workbook workbook;
+            if ("xls".equals(suffiex.toLowerCase())) {
+                workbook = new HSSFWorkbook();
+            } else {
+                workbook = new XSSFWorkbook();
+            }
+            // 生成一个表格
+            Sheet sheet;
+            if (StringUtils.isBlank(sheetName)) {
+                // name 为空则使用默认值
+                sheet = workbook.createSheet();
+            } else {
+                sheet = workbook.createSheet(sheetName);
+            }
+            // 设置表格默认列宽度为15个字节
+            sheet.setDefaultColumnWidth((short) 15);
+            // 生成样式
+
+            // 创建标题行
+            Row row = null;
+
+            // 写入正文
+            Iterator<JSONObject> iterator = values.iterator();
+            // 行号
+            int index = 0;
+
+            String supplierName = null;
+            String itemName = null;
+            String itemValue = null;
+            String errorReason = null;
+            for(JSONObject s:values){
+                row = sheet.createRow(index);
+                Cell cell0 = row.createCell(0);
+                Cell cell1 = row.createCell(1);
+                Cell cell2 = row.createCell(2);
+                Cell cell3 = row.createCell(3);
+
+                supplierName = s.containsKey("supplierName")? s.getString("supplierName"):"";
+                itemName = s.containsKey("itemName")? s.getString("itemName"):"";
+                itemValue = s.containsKey("itemValue")? s.getString("itemValue"):"";
+                errorReason = s.containsKey("errorReason")? s.getString("errorReason"):"";
+
+
+                cell0.setCellValue(supplierName);
+                cell1.setCellValue(itemName);
+                cell2.setCellValue(itemValue);
+                cell3.setCellValue(errorReason);
+
+                index++;
             }
 
-            CsvUtils2File.exportCsv(f,errorList);
+
+            try {
+                outputStream = new FileOutputStream(filepath);
+                workbook.write(outputStream);
+                success = true;
+            } finally {
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+                if (workbook != null) {
+                    workbook.close();
+                }
+            }
+            return success;
         }
-        return true;
     }
+
+
 
 
     public int buildRandom(int length) {
