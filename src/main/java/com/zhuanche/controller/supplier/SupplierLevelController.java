@@ -378,9 +378,10 @@ public class SupplierLevelController {
                     List<String> stringList = new ArrayList<>();
                     for(SupplierLevel item : dataList){
                         additionList = supplierLevelService.findSupplierLevelAdditionalBySupplierLevelId(item.getId());
-                        StringBuffer stringBuffer = new StringBuffer();
+
                         if(additionList != null && additionList.size() >= 1){
                             for(SupplierLevelAdditional itemAddition:additionList){
+                                StringBuffer stringBuffer = new StringBuffer();
                                 stringBuffer.append(StringUtils.isEmpty(item.getSupplierName())?"":item.getSupplierName());
                                 stringBuffer.append(",");
 
@@ -395,7 +396,7 @@ public class SupplierLevelController {
                                 stringList.add(stringBuffer.toString());
                             }
                         }else{
-
+                            StringBuffer stringBuffer = new StringBuffer();
                             stringBuffer.append(StringUtils.isEmpty(item.getSupplierName())?"":item.getSupplierName());
                             stringBuffer.append(",");
 
