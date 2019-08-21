@@ -588,7 +588,7 @@ public class SupplierLevelController {
             Boolean haveError = false;
             String supplierName = null;
             String itemName = null;
-            String itemValue = null;
+            Double itemValue = null;
 
 
             Map<String,Integer> rowItemCache = new HashMap<>();
@@ -628,7 +628,7 @@ public class SupplierLevelController {
                 if(cell2 == null){
                     itemValue = null;
                 }else{
-                    itemValue = cell2.getNumericCellValue()+"";
+                    itemValue = cell2.getNumericCellValue() ;
                 }
 
                 ImportCheckEntity checkResult = checkEntity(rowIx,supplierName,itemName,itemValue,month,rowItemCache);
@@ -706,7 +706,7 @@ public class SupplierLevelController {
         }
         throw new IllegalArgumentException("你的excel版本目前poi解析不了");
     }
-    private ImportCheckEntity checkEntity(Integer rowNum,String supplierName,String itemName,String itemValue,String month,Map<String,Integer> rowItemCache){
+    private ImportCheckEntity checkEntity(Integer rowNum,String supplierName,String itemName,Double itemValue,String month,Map<String,Integer> rowItemCache){
         ImportCheckEntity result = new ImportCheckEntity();
         result.setResult(true);
 
@@ -731,10 +731,10 @@ public class SupplierLevelController {
                     result.setResult(false);
                     result.setReason("该附加项已存在");
                 }else {
-                    if(StringUtils.isEmpty(itemValue)){
+                    if(itemValue == null){
                         result.setResult(false);
                         result.setReason("供应商的附加分不能为空");
-                    } else if(itemValue.trim().equals("0")){
+                    } else if(itemValue == 0){
                         result.setResult(false);
                         result.setReason("供应商的附加分不能为0");
                     }else {
