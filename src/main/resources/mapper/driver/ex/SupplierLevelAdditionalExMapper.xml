@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.driver.ex.SupplierLevelAdditionalExMapper">
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.SupplierLevelAdditional">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="supplier_level_id" jdbcType="INTEGER" property="supplierLevelId" />
+    <result column="item_name" jdbcType="VARCHAR" property="itemName" />
+    <result column="item_value" jdbcType="DECIMAL" property="itemValue" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, supplier_level_id, item_name, item_value, create_time, update_time, create_by, 
+    update_by
+  </sql>
+  <select id="findbySupplierLevelId" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from supplier_level_additional
+    where supplier_level_id = #{supplierLevelId,jdbcType=INTEGER}
+  </select>
+
+  <select id="findBySupplierLevelIdAndSupplierLevelAdditionalName" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from supplier_level_additional
+    where supplier_level_id = #{supplierLevelId,jdbcType=INTEGER} and item_name=#{itemName}
+  </select>
+
+</mapper>
