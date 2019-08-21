@@ -379,14 +379,14 @@ public class SupplierLevelController {
                     for(SupplierLevel item : dataList){
                         additionList = supplierLevelService.findSupplierLevelAdditionalBySupplierLevelId(item.getId());
                         StringBuffer stringBuffer = new StringBuffer();
-                        if(additionList != null){
-
-                            stringBuffer.append(StringUtils.isEmpty(item.getSupplierName())?"":item.getSupplierName());
-                            stringBuffer.append(",");
-
-                            stringBuffer.append(StringUtils.isEmpty(item.getMonth())?"":item.getMonth());
-                            stringBuffer.append(",");
+                        if(additionList != null && additionList.size() >= 1){
                             for(SupplierLevelAdditional itemAddition:additionList){
+                                stringBuffer.append(StringUtils.isEmpty(item.getSupplierName())?"":item.getSupplierName());
+                                stringBuffer.append(",");
+
+                                stringBuffer.append(StringUtils.isEmpty(item.getMonth())?"":item.getMonth());
+                                stringBuffer.append(",");
+
                                 stringBuffer.append(itemAddition.getItemName());
                                 stringBuffer.append(",");
 
