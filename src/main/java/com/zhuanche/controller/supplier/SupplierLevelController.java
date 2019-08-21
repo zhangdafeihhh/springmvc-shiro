@@ -391,6 +391,8 @@ public class SupplierLevelController {
                                 stringBuffer.append(",");
 
                                 stringBuffer.append(itemAddition.getItemValue());
+
+                                stringList.add(stringBuffer.toString());
                             }
                         }else{
 
@@ -400,13 +402,11 @@ public class SupplierLevelController {
                             stringBuffer.append(StringUtils.isEmpty(item.getMonth())?"":item.getMonth());
                             stringBuffer.append(",");
                             stringBuffer.append(",");
+                            stringList.add(stringBuffer.toString());
                         }
 
 
 
-
-
-                        stringList.add(stringBuffer.toString());
                     }
                     if(pageno == 1){
                         isFirst = true;
