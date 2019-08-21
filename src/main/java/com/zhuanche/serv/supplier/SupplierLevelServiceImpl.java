@@ -174,9 +174,10 @@ public class SupplierLevelServiceImpl  implements  SupplierLevelService{
                 supplierLevelIdString = is.next();
                 additionalScore = supplierLevelCache.get(supplierLevelIdString);
                 supplierLevel = supplierLevelMapper.selectByPrimaryKey(new Integer(supplierLevelIdString));
-                BigDecimal levelScore = calculationLevelScore(supplierLevel.getScaleScore(),supplierLevel.getEfficiencyScore(),supplierLevel.getServiceScore(),additionalScore);
+                BigDecimal gradeScore = calculationLevelScore(supplierLevel.getScaleScore(),supplierLevel.getEfficiencyScore(),supplierLevel.getServiceScore(),additionalScore);
+                gradeScore = gradeScore.setScale(2,BigDecimal.ROUND_HALF_DOWN);
                 //等级分
-                supplierLevel.setGradeScore(levelScore);
+                supplierLevel.setGradeScore(gradeScore);
                 //附加分
                 supplierLevel.setAdditionalScore(additionalScore);
                 supplierLevel.setUpdateTime(now);
@@ -242,6 +243,7 @@ public class SupplierLevelServiceImpl  implements  SupplierLevelService{
         //（规模分*35%+效率分*30%+服务分*35%）+附加分
         SupplierLevel supplierLevel = supplierLevelMapper.selectByPrimaryKey(supplierLevelId);
         BigDecimal gradeScore = calculationLevelScore(supplierLevel.getScaleScore(),supplierLevel.getEfficiencyScore(),supplierLevel.getServiceScore(),  additionScore);
+        gradeScore = gradeScore.setScale(2,BigDecimal.ROUND_HALF_DOWN);
         //修改等级分
         supplierLevel.setGradeScore(gradeScore);
         //修改附加分
