@@ -13,6 +13,7 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.constant.Constants;
+import com.zhuanche.constant.EnvUtils;
 import com.zhuanche.constants.SaasConst;
 import com.zhuanche.dto.CarDriverTeamDTO;
 import com.zhuanche.dto.bigdata.BiDriverBusinessInfoDayReportDTO;
@@ -1006,8 +1007,7 @@ public class SaasDriverDailyReportController {
     }
 
     private void sendDoubleMq(JSONObject obj){
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String envName = request.getServletContext().getInitParameter("env.name");
+        String envName = EnvUtils.ENVIMENT;
         if (Objects.nonNull(envName) && Arrays.asList(new String[]{"online","prod"}).contains(envName)){
             ExcelProducerDouble.publishMessage("excel_export_producer","excel-mp-manage",null,obj);
         }

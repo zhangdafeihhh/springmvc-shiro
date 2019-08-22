@@ -11,6 +11,7 @@ import com.zhuanche.common.rocketmq.CommonRocketProducer;
 import com.zhuanche.common.rocketmq.CommonRocketProducerDouble;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.constant.EnvUtils;
 import com.zhuanche.constants.BusConst;
 import com.zhuanche.dto.busManage.*;
 import com.zhuanche.entity.mdbcarmanage.BusBizSupplierDetail;
@@ -288,8 +289,7 @@ public class BusSupplierService implements BusConst {
 		msgMap.put("data", JSON.toJSONString(data));
 		logger.info("专车供应商，同步发送数据：", JSON.toJSONString(msgMap));
 		CommonRocketProducer.publishMessage("vipSupplierTopic", method, String.valueOf(supplierId), msgMap);
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-		String envName = request.getServletContext().getInitParameter("env.name");
+		String envName = EnvUtils.ENVIMENT;
 		if (Objects.nonNull(envName) && Arrays.asList(new String[]{"online","prod"}).contains(envName)){
 			CommonRocketProducerDouble.publishMessage("vipSupplierTopic", method, String.valueOf(supplierId), msgMap);
 		}
