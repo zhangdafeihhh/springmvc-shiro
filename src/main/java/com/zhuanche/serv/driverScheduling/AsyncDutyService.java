@@ -8,6 +8,7 @@ import com.zhuanche.common.rocketmq.CommonRocketProducerDouble;
 import com.zhuanche.common.rocketmq.DriverWideRocketProducer;
 import com.zhuanche.common.rocketmq.ExcelProducerDouble;
 import com.zhuanche.constant.Constants;
+import com.zhuanche.constant.EnvUtils;
 import com.zhuanche.dto.CarDriverInfoDTO;
 import com.zhuanche.dto.driver.CarDriverDayDutyDTO;
 import com.zhuanche.dto.driverDuty.CarDriverDurationDTO;
@@ -499,8 +500,7 @@ public class AsyncDutyService {
 			//TODO 20190619新增一组修改司机信息发送MQ
 			DriverWideRocketProducer.publishMessage(DriverWideRocketProducer.TOPIC, method, String.valueOf(driver.getDriverId()), messageMap);
 			CommonRocketProducer.publishMessage("driver_info", method,String.valueOf(driver.getDriverId()),messageMap);
-			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-			String envName = request.getServletContext().getInitParameter("env.name");
+			String envName = EnvUtils.ENVIMENT;
 			if (Objects.nonNull(envName) && Arrays.asList(new String[]{"online","prod"}).contains(envName)){
 				CommonRocketProducerDouble.publishMessage("driver_info",method,String.valueOf(driver.getDriverId()),messageMap);
 			}

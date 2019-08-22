@@ -14,6 +14,7 @@ import com.zhuanche.common.rocketmq.CommonRocketProducerDouble;
 import com.zhuanche.common.rocketmq.DriverWideRocketProducer;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.constant.EnvUtils;
 import com.zhuanche.constants.BusConst;
 import com.zhuanche.constants.busManage.BusConstant;
 import com.zhuanche.dto.busManage.BusBaseStatisDTO;
@@ -980,8 +981,7 @@ public class BusCarBizDriverInfoService implements BusConst {
             //TODO 20190619新增一组修改司机信息发送MQ
             DriverWideRocketProducer.publishMessage(DriverWideRocketProducer.TOPIC, method, String.valueOf(driverId), messageMap);
             CommonRocketProducer.publishMessage("driver_info", method, String.valueOf(driverId), messageMap);
-            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-            String envName = request.getServletContext().getInitParameter("env.name");
+            String envName = EnvUtils.ENVIMENT;
             if (Objects.nonNull(envName) && Arrays.asList(new String[]{"online","prod"}).contains(envName)){
                 CommonRocketProducerDouble.publishMessage("driver_info",method,String.valueOf(driverId),messageMap);
             }

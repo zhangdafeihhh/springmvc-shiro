@@ -18,6 +18,7 @@ import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
+import com.zhuanche.constant.EnvUtils;
 import com.zhuanche.dto.driver.TelescopeDriver;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
@@ -645,8 +646,7 @@ public class CarBizDriverInfoService {
             //TODO 20190619新增一组修改司机信息发送MQ
             DriverWideRocketProducer.publishMessage(DriverWideRocketProducer.TOPIC, method, String.valueOf(carBizDriverInfoDTO.getDriverId()), messageMap);
             CommonRocketProducer.publishMessage("driver_info", method, String.valueOf(carBizDriverInfoDTO.getDriverId()), messageMap);
-            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-            String envName = request.getServletContext().getInitParameter("env.name");
+            String envName = EnvUtils.ENVIMENT;
             if (Objects.nonNull(envName) && Arrays.asList(new String[]{"online","prod"}).contains(envName)){
                 CommonRocketProducerDouble.publishMessage("driver_info", method, String.valueOf(carBizDriverInfoDTO.getDriverId()), messageMap);
             }
@@ -3818,8 +3818,7 @@ public class CarBizDriverInfoService {
                 String messageStr = JSONObject.fromObject(messageMap).toString();
                 logger.info("专车供应商，同步发送数据：" + messageStr);
                 CommonRocketProducer.publishMessage("vipSupplierTopic", method, String.valueOf(carBizSupplier.getSupplierId()), messageMap);
-                HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-                String envName = request.getServletContext().getInitParameter("env.name");
+                String envName = EnvUtils.ENVIMENT;
                 if (Objects.nonNull(envName) && Arrays.asList(new String[]{"online","prod"}).contains(envName)){
                     CommonRocketProducerDouble.publishMessage("vipSupplierTopic", method, String.valueOf(carBizSupplier.getSupplierId()), messageMap);
                 }
