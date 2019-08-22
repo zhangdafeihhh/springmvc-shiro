@@ -666,6 +666,12 @@ public class SupplierLevelController {
 
                     List<String> titles = new ArrayList<>();
 
+                    //判断目录是否存在，不存在则新建
+                    File dir = new File(CommonConfig.ERROR_BASE_FILE+"/template/error/");
+                    if(!dir.exists()){
+                        dir.mkdirs();
+                    }
+
                     writeExcel(CommonConfig.ERROR_BASE_FILE+download,"错误信息",titles,listException);
                 }
             } catch (Exception e) {
