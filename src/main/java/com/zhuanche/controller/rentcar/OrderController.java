@@ -1137,18 +1137,20 @@ public class OrderController{
 		if (pojoList != null) {
 			for (int i = 0; i < pojoList.size(); i++) {
 				CarFactOrderInfo info = pojoList.get(i);
-				if (info.getCostTypeName().contains("停车")) {
-					result.setCostTypeNameTc(info.getCostTypeName());
-					result.setCostTypeNameTcPrice(info.getCost());
-				} else if (info.getCostTypeName().contains("高速")) {
-					result.setCostTypeNameGs(info.getCostTypeName());
-					result.setCostTypeNameGsPrice(info.getCost());
-				} else if (info.getCostTypeName().contains("机场")) {
-					result.setCostTypeNameJc(info.getCostTypeName());
-					result.setCostTypeNameJcPrice(info.getCost());
-				} else if (info.getCostTypeName().contains("食宿")) {
-					result.setCostTypeNameYj(info.getCostTypeName());
-					result.setCostTypeNameYjPrice(info.getCost());
+				if(info.getCostTypeName()!=null){
+					if (info.getCostTypeName().contains("停车")) {
+						result.setCostTypeNameTc(info.getCostTypeName());
+						result.setCostTypeNameTcPrice(info.getCost());
+					} else if (info.getCostTypeName().contains("高速")) {
+						result.setCostTypeNameGs(info.getCostTypeName());
+						result.setCostTypeNameGsPrice(info.getCost());
+					} else if (info.getCostTypeName().contains("机场")) {
+						result.setCostTypeNameJc(info.getCostTypeName());
+						result.setCostTypeNameJcPrice(info.getCost());
+					} else if (info.getCostTypeName().contains("食宿")) {
+						result.setCostTypeNameYj(info.getCostTypeName());
+						result.setCostTypeNameYjPrice(info.getCost());
+					}
 				}
 			}
 		}
@@ -1196,7 +1198,7 @@ public class OrderController{
 		}
 		//设置司乘分离对象
 		OrderCostDetailInfo orderCostDetailInfo = driverFeeDetailService.getOrderCostDetailInfo(result.getOrderNo());
-
+		orderCostDetailInfo.setCleanDeepFeeCount(orderCostDetailInfo.getCleanFee().add(orderCostDetailInfo.getDeepCleanFee()));
 		getOverTimeHtml(orderCostDetailInfo);//超套餐时长费
 		getOverMileageNumHtml(orderCostDetailInfo);//计算超套餐里程费
         calcOverMileageTotal(orderCostDetailInfo);
