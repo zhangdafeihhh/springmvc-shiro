@@ -319,5 +319,6 @@
     <logger name="com.zhuanche" level="INFO" addtivity="true">
         <appender-ref ref="AsyncLogStashInfoFile"/>
         <appender-ref ref="AsyncLogStashErrorFile"/>
+        <appender-ref ref="errorLog"/>
     </logger>
 </configuration>
