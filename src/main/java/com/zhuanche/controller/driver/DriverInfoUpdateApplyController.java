@@ -89,7 +89,7 @@ public class DriverInfoUpdateApplyController {
     @RequestMapping(value = "/findDriverInfoUpdateList")
 	@RequiresPermissions(value = { "FranchiserDriverChange_look" , "SupplierCarModifyApply_look" } ,logical=Logical.OR )
     @MasterSlaveConfigs(configs = {
-            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DataSourceMode.SLAVE)
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE)
     })
     @RequestFunction(menu = DRIVER_INFO_CHANGE_APPLY_LIST)
     public AjaxResponse findDriverInfoUpdateList(String name, String phone, String idCardNo, String licensePlates, Integer status, Integer cityId,
