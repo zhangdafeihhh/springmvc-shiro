@@ -27,7 +27,7 @@
 	</bean>
 
 	<!--双写MQ-->
-	<bean id="excelProducerDouble" class="com.zhuanche.common.rocketmq.ExcelProducer" init-method="init" destroy-method="destroy" scope="singleton">
+	<bean id="excelProducerDouble" class="com.zhuanche.common.rocketmq.ExcelProducerDouble" init-method="init" destroy-method="destroy" scope="singleton">
 		<property name="namesrvAddr" value="${rocketmq.new.excelNamesrvAddr}"/>
 	</bean>
 	<!--修改司机信息发送MQ同步司机宽表-->
