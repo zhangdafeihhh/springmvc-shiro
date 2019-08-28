@@ -108,7 +108,7 @@ public class DriverOrderInfoController {
                     JSONObject gpgData = responseObject.getJSONObject("result");
                     return AjaxResponse.success(gpgData);
                 }else {
-                    logger.error("监控-指标汇总查询接口-请求参数" + JSON.toJSONString(param)+",返回结果为："+responseObject.toJSONString());
+                    logger.info("监控-指标汇总查询接口-请求参数" + JSON.toJSONString(param)+",返回结果为："+responseObject.toJSONString());
                 }
             }
             return AjaxResponse.success(null);
