@@ -14,7 +14,7 @@
 	</bean>
 
 	<!--双写MQ-->
-	<bean id="commonRocketProducerDouble"  class="com.zhuanche.common.rocketmq.CommonRocketProducer" init-method="init" destroy-method="destroy" scope="singleton">
+	<bean id="commonRocketProducerDouble"  class="com.zhuanche.common.rocketmq.CommonRocketProducerDouble" init-method="init" destroy-method="destroy" scope="singleton">
 		<property name="namesrvAddr" value="${rocketmq.new.namesrvAddr}"/>
 	</bean>
 
