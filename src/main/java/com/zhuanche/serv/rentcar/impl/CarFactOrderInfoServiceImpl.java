@@ -120,11 +120,11 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 					.setReadTimeOut(READ_TIMEOUT).execute();
 			JSONObject job = JSON.parseObject(result);
 			if (job == null) {
-				logger.error("调用订单接口，根据子订单号查询主订单" + url + "返回结果为null");
+				logger.info("调用订单接口，根据子订单号查询主订单" + url + "返回结果为null");
 				return "";
 			}
 			if (!job.getString("code").equals("0")) {
-				logger.error("调用订单接口，根据子订单号查询主订单" + url + "返回结果为code"+job.getString("code").equals("0"));
+				logger.info("调用订单接口，根据子订单号查询主订单" + url + "返回结果为code"+job.getString("code").equals("0"));
 				return "";
 			}
 			JSONObject jsonResult = JSON.parseObject(job.getString("data"));
