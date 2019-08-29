@@ -105,11 +105,11 @@ public class LbsController {
                         JSONObject gpgData = responseObject.getJSONObject("data");
                         return AjaxResponse.success(gpgData);
                     }else {
-                        logger.error("监控-查看车辆GPS轨迹-返回状态码为："+responseEntity.getStatusCode().toString()+";请求参数" + JSON.toJSONString(paramMap)+",返回结果为："+responseObject.toJSONString());
+                        logger.info("监控-查看车辆GPS轨迹-返回状态码为："+responseEntity.getStatusCode().toString()+";请求参数" + JSON.toJSONString(paramMap)+",返回结果为："+responseObject.toJSONString());
                     }
                 }
             }else{
-                logger.error("监控-查看车辆GPS轨迹-返回状态码为："+responseEntity.getStatusCode().toString()+";请求参数" + JSON.toJSONString(paramMap));
+                logger.info("监控-查看车辆GPS轨迹-返回状态码为："+responseEntity.getStatusCode().toString()+";请求参数" + JSON.toJSONString(paramMap));
             }
             return AjaxResponse.fail(RestErrorCode.MONITOR_GPS_FAIL,"nodata");
         } catch (Exception e) {
