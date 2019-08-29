@@ -1878,11 +1878,11 @@ public class CarBizCarInfoTempService {
             // 检查模板是否正确
             Row row1 = sheet.getRow(0);
             if (row1 == null) {
-                log.error("车辆（巴士）信息导入，excel表头为空");
+                log.info("车辆（巴士）信息导入，excel表头为空");
                 return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
             }
             if (row1.getLastCellNum() != BusConstant.BusExcel.BUS_EXCLE_TITLE.length) {
-                log.error("车辆（巴士）信息导入，excel表头个数错误");
+                log.info("车辆（巴士）信息导入，excel表头个数错误");
                 return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
             }
             for (int colIx = 0; colIx < row1.getLastCellNum(); colIx++) {
@@ -1893,7 +1893,7 @@ public class CarBizCarInfoTempService {
                 } else {
                     String stringValue = cellValue.getStringValue();
                     if (!stringValue.contains(BusConstant.BusExcel.BUS_EXCLE_TITLE[colIx])) {
-                        log.error("车辆（巴士）信息导入，excel表头有错误，错误表头=" + stringValue);
+                        log.info("车辆（巴士）信息导入，excel表头有错误，错误表头=" + stringValue);
                         return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR,resultErrorMag1);
                     }
                 }

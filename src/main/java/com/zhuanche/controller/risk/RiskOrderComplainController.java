@@ -286,7 +286,7 @@ public class RiskOrderComplainController {
                     Map<String,Object>  result = this.upload(onemultipartFile);
                     Boolean ok = (Boolean) result.get("ok");
                     if (ok== null || !ok){
-                        logger.error("风控-上传订单附件-未调用调用风控 url:"+"/attachment/manager/addAttachment.do");
+                        logger.info("风控-上传订单附件-未调用调用风控 url:"+"/attachment/manager/addAttachment.do");
 
                     }else {
                         String relationship =  this.addAttachmentRelationship(onemultipartFile.getOriginalFilename(),orderNo, (String) result.get("oppositeUrl"));
@@ -320,7 +320,7 @@ public class RiskOrderComplainController {
         paramMap.put("createEmp", 1);
 
         String url = "/attachment/manager/addAttachment.do";
-        logger.error("风控-上传订单附件-调用风控 url:"+url);
+        logger.info("风控-上传订单附件-调用风控 url:"+url);
 
         String result =riskOrderCompalinTemplate.postForObject(url,
                 String.class, paramMap);
@@ -338,7 +338,7 @@ public class RiskOrderComplainController {
             Map<String, Object> paramMap = new HashMap<String, Object>();
             paramMap.put("id", attachmentId);
             String url = "/attachment/manager/deleteAttachmentById.do";
-            logger.error("风控-删除订单附件-调用风控 url:"+url);
+            logger.info("风控-删除订单附件-调用风控 url:"+url);
             String result =riskOrderCompalinTemplate.postForObject(url,
                     String.class, paramMap);
             return AjaxResponse.success(null);

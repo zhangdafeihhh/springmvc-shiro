@@ -153,7 +153,7 @@ public class MonitorOrderController {
                     pageData.put("data",newPageList);
                     return AjaxResponse.success(pageData);
                 }else {
-                    logger.error("监控-查询司机订单列表-请求参数" + JSON.toJSONString(param)+",返回结果为："+responseObject.toJSONString() +",url="+url);
+                    logger.info("监控-查询司机订单列表-请求参数" + JSON.toJSONString(param)+",返回结果为："+responseObject.toJSONString() +",url="+url);
                 }
             }
             return AjaxResponse.success(null);

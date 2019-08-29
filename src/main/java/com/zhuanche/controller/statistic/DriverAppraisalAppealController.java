@@ -109,11 +109,11 @@ public class DriverAppraisalAppealController {
             if (updateResult > 0) {
                 return AjaxResponse.success(null);
             } else {
-                logger.error("司机保存申诉记录接口，修改评分表isApeal状态失败 appraisalId=" + appraisalId);
+                logger.info("司机保存申诉记录接口，修改评分表isApeal状态失败 appraisalId=" + appraisalId);
                 return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
             }
         }else{
-            logger.error("司机保存申诉记录接口，修改申诉记录表失败 appraisalId=" + appraisalId);
+            logger.info("司机保存申诉记录接口，修改申诉记录表失败 appraisalId=" + appraisalId);
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
     }
@@ -148,7 +148,7 @@ public class DriverAppraisalAppealController {
             if (response.getIntValue("code") == 1) {
                 return AjaxResponse.success(response.getJSONArray("data").getJSONObject(0));
             }
-            logger.error("传入司机申诉附件错误，msg=" + response.getString("msg"));
+            logger.info("传入司机申诉附件错误，msg=" + response.getString("msg"));
         } catch (Exception e) {
             logger.error("传入司机申诉附件，接口调用异常e:{}", e);
         } finally {

@@ -88,7 +88,7 @@ public class DriverFeeDetailServiceImpl implements DriverFeeDetailService {
             String url = DRIVER_FEE_SERVICE_API_BASE_URL + "/orderCost/getOrderDriverCostDetail";
             JSONObject result = MpOkHttpUtil.okHttpGetBackJson(url, params, 1, "");
             if (result == null){
-                logger.error("查询计费接口返回为空");
+                logger.info("查询计费接口返回为空");
                 return null;
             }
             Integer resultCode = result.getInteger(Constants.CODE);

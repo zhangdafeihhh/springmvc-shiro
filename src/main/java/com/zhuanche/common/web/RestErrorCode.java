@@ -288,7 +288,7 @@ public final class RestErrorCode{
 				int resultCode = field.getInt(null);
 				if (codeMsgMappings.containsKey(resultCode)) {//错误码定义发生冲突
 					String text = "["+RestErrorCode.class.getName()+"]错误码定义发生冲突，应用进程已经退出，请解决冲突并重启服务！";
-					log.error(text);
+					log.info(text);
 					System.exit(-1);
 				}
 				String resultMsg = annotation.value();
