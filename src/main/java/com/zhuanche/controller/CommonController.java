@@ -237,7 +237,7 @@ public class CommonController {
  	        			.addHeader("Content-Type", ContentType.APPLICATION_FORM_URLENCODED).execute();
 			JSONObject job = JSON.parseObject(resultStr);
 			if (job == null) {
-				logger.error("调用订单接口" + url + "返回结果为null");
+				logger.info("调用订单接口" + url + "返回结果为null");
 				return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 			}
 			if (!job.getString("code").equals("0")) {

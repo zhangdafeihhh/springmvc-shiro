@@ -155,7 +155,7 @@ public class CarAnalysisIndexController{
 						JSONObject gpgData = responseObject.getJSONObject("result");
 						return AjaxResponse.success(gpgData);
 					}else {
-						logger.error("【运营管理-统计分析】车辆分析指标趋势异常-请求参数" + JSON.toJSONString(paramMap)+",请求url："+httpUrl+",返回结果为："+(responseObject == null?"null":responseObject.toJSONString()));
+						logger.info("【运营管理-统计分析】车辆分析指标趋势异常-请求参数" + JSON.toJSONString(paramMap)+",请求url："+httpUrl+",返回结果为："+(responseObject == null?"null":responseObject.toJSONString()));
 					}
 				}
 				return AjaxResponse.success(null);

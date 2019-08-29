@@ -32,7 +32,7 @@ public class CSVUtil {
      */
     public static void write(FileOutputStream outputStream, Map<String,String> fields, Class<?> clz, List data) {
         if(fields == null || clz == null) {
-            logger.error("导出数据时入参为空");
+            logger.info("导出数据时入参为空");
             return;
         }
         try {

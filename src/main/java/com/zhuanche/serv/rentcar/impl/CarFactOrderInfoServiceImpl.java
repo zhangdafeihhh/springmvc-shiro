@@ -164,11 +164,11 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 			String result = HttpClientUtil.buildGetRequest(url).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
 			JSONObject job = JSON.parseObject(result);
 			if (job == null) {
-				logger.error("调用订单接口，根据子订单号查询主订单" + url + "返回结果为null");
+				logger.info("调用订单接口，根据子订单号查询主订单" + url + "返回结果为null");
 				return null;
 			}
 			if (!job.getString("code").equals("0")) {
-				logger.error("根据主订单号查询子订单出错,错误码:" + url + "返回结果为code"+job.getString("code").equals("0"));
+				logger.info("根据主订单号查询子订单出错,错误码:" + url + "返回结果为code"+job.getString("code").equals("0"));
 				return null;
 			}
 			JSONObject jsonResult = JSON.parseObject(job.getString("data"));
@@ -214,7 +214,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 			result = HttpClientUtil.buildGetRequest(url).addHeader("Content-Type", ContentType.APPLICATION_JSON).execute();
 			JSONObject job = JSON.parseObject(result);
 			if (job == null) {
-				logger.error("调用计费接口" + url + "返回结果为null");
+				logger.info("调用计费接口" + url + "返回结果为null");
 				return "";
 			}
 			if (!job.getString("code").equals("0")) {
@@ -251,7 +251,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 
 			JSONObject job = JSON.parseObject(result);
 			if (job == null) {
-				logger.error("调用订单接口" + url + "返回结果为null");
+				logger.info("调用订单接口" + url + "返回结果为null");
 				return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 			}
 			if (!job.getString("code").equals("0")) {

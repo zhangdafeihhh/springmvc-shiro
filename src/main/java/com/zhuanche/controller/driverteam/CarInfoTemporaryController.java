@@ -456,7 +456,7 @@ public class CarInfoTemporaryController extends BaseController {
                                     @Verify(param = "oldSupplierId",rule="required") Integer oldSupplierId,
                                     @RequestParam(value = "vehicleDrivingLicense",required = false) String vehicleDrivingLicense,
                                     @RequestParam(value = "carPhotograph",required = false) String carPhotograph) {
-        log.error("修改Id:"+carId);
+        log.info("修改Id:"+carId);
         CarBizCarInfoTemp carBizCarInfoTemp = new CarBizCarInfoTemp();
         carBizCarInfoTemp.setCarId(carId);
         carBizCarInfoTemp.setLicensePlates(licensePlates);

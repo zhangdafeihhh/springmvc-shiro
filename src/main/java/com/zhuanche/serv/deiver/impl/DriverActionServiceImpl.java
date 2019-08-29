@@ -101,7 +101,7 @@ public class DriverActionServiceImpl implements DriverActionService {
                 params.put("orderNo", orderNo);
             }
         } else {
-            logger.error("司机信息查询失败,查询参数 {}", ((JSONObject)JSONObject.toJSON(params)).toJSONString());
+            logger.info("司机信息查询失败,查询参数 {}", ((JSONObject)JSONObject.toJSON(params)).toJSONString());
             throw new PermissionException("司机信息不存在");
         }
         List<DriverActionVO> list;
@@ -125,7 +125,7 @@ public class DriverActionServiceImpl implements DriverActionService {
             hasDataPermission(driverInfoDTO, loginUser);
             return transferDataType(actionDtoExMapper.queryActionTimeLine(tableName, driverActionVO.getDriverId(), driverActionVO.getTime()), driverInfoDTO);
         } else {
-            logger.error("司机信息查询失败,查询参数 {}", ((JSONObject)JSONObject.toJSON(params)).toJSONString());
+            logger.info("司机信息查询失败,查询参数 {}", ((JSONObject)JSONObject.toJSON(params)).toJSONString());
             throw new PermissionException("司机信息不存在");
         }
     }

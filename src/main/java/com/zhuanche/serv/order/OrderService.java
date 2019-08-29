@@ -72,7 +72,7 @@ public class OrderService{
 			httpParams = new HashMap<>();
 		}
 		if(httpParams.containsKey(ORDER_SEARCH_API_V1_transId)) {
-			log.error("严重错误：请求参数中不能含有系统参数名称：" + ORDER_SEARCH_API_V1_transId);
+			log.info("严重错误：请求参数中不能含有系统参数名称：" + ORDER_SEARCH_API_V1_transId);
 			return null;
 		}
 		//开始请求

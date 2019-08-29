@@ -27,7 +27,7 @@ public final class CustomExceptionResolver implements HandlerExceptionResolver{
 	public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object arg2, Exception ex){
 		int ExceptionId = random.nextInt(2100000000);
 		String exceptionMessage = ex.getMessage() + " (ExceptionId: "+ExceptionId+")";
-		log.error(exceptionMessage, ex );
+		log.info(exceptionMessage, ex );
 		
 		StringWriter sw = new StringWriter();
 		ex.printStackTrace(new PrintWriter(sw));

@@ -575,11 +575,11 @@ public class HomeKanBanController {
 					.execute();
 			JSONObject job = JSON.parseObject(result);
 			if (job == null) {
-				logger.error("调用大数据" + url + "返回结果为null");
+				logger.info("调用大数据" + url + "返回结果为null");
 				return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 			}
 			if (!job.getString(Constants.CODE).equals("0")) {
-				logger.error("调用大数据接口错误" + url + "返回code" + job.getString(Constants.CODE) + "返回错误信息: " + job.getString("message") );
+				logger.info("调用大数据接口错误" + url + "返回code" + job.getString(Constants.CODE) + "返回错误信息: " + job.getString("message") );
 				return AjaxResponse.fail(Integer.parseInt(job.getString(Constants.CODE)), job.getString("message"));
 			}
 			JSONArray resultArray = JSON.parseArray(job.getString(Constants.DATA));
