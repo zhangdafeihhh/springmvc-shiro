@@ -4,7 +4,6 @@ import java.util.Date;
 
 public class DriverInfoLicenseUpdateApply {
     private Integer id;
-
     /**
      * 司机ID
      */
@@ -16,14 +15,14 @@ public class DriverInfoLicenseUpdateApply {
     private String driverName;
 
     /**
+     * 司机手机号
+     */
+    private String driverPhone;
+
+    /**
      * 车牌号
      */
     private String licensePlates;
-
-    /**
-     * 身份证号
-     */
-    private String idCardNo;
 
     /**
      * 城市id
@@ -56,11 +55,6 @@ public class DriverInfoLicenseUpdateApply {
     private String teamName;
 
     /**
-     * 司机手机号(原)
-     */
-    private String driverPhone;
-
-    /**
      * 车型 关联车型表(原)
      */
     private Integer carModelId;
@@ -84,21 +78,6 @@ public class DriverInfoLicenseUpdateApply {
      * 车辆颜色(原)
      */
     private String color;
-
-    /**
-     * 司机身份证号(新,车辆修改申请所需)
-     */
-    private String idCardNoNew;
-
-    /**
-     * 司机名称(新,车辆修改申请所需)
-     */
-    private String driverNameNew;
-
-    /**
-     * 手机号(新,司机修改申请所需)
-     */
-    private String driverPhoneNew;
 
     /**
      * 车型 关联车型表(新,车辆修改申请所需)
@@ -126,9 +105,29 @@ public class DriverInfoLicenseUpdateApply {
     private String colorNew;
 
     /**
-     * 操作状态[10 草稿 20 审核中 30 审核失败  40 等待验车 50 已通知验车 60 验车未通过 70 验车通过]
+     * 操作状态[10 初始态 20 草稿 30 审核中 40 审核失败  50 等待验车 60 已通知验车 70 验车未通过 80 验车通过]
      */
     private Integer status;
+
+    /**
+     * 资料提交成功时间
+     */
+    private Date submitTime;
+
+    /**
+     * 审核时间
+     */
+    private Date auditTime;
+
+    /**
+     * 验真结果
+     */
+    private String verifyReason;
+
+    /**
+     * 通知验车时间
+     */
+    private Date notifyTime;
 
     /**
      * 操作人ID
@@ -156,14 +155,14 @@ public class DriverInfoLicenseUpdateApply {
     private String updateName;
 
     /**
-     * 处理意见
-     */
-    private String operateReason;
-
-    /**
      * 更新时间
      */
     private Date updateTime;
+
+    /**
+     * 处理意见
+     */
+    private String operateReason;
 
     /**
      * 车辆所有人(原)
@@ -226,14 +225,9 @@ public class DriverInfoLicenseUpdateApply {
     private String frameNo;
 
     /**
-     * 新车辆识别码
+     * 车辆识别码(新)
      */
     private String frameNoNew;
-
-    /**
-     * 验真结果
-     */
-    private String verifyReason;
 
     /**
      * 车辆更换状态 0：未更换 1：已更换
@@ -244,6 +238,16 @@ public class DriverInfoLicenseUpdateApply {
      * 司机换车方式 0：新绑车辆 1：更换车辆
      */
     private Integer changeWay;
+
+    /**
+     * 品牌名称
+     */
+    private String brandName;
+
+    /**
+     * 车型名称
+     */
+    private String modelName;
 
     public Integer getId() {
         return id;
@@ -269,20 +273,20 @@ public class DriverInfoLicenseUpdateApply {
         this.driverName = driverName == null ? null : driverName.trim();
     }
 
+    public String getDriverPhone() {
+        return driverPhone;
+    }
+
+    public void setDriverPhone(String driverPhone) {
+        this.driverPhone = driverPhone == null ? null : driverPhone.trim();
+    }
+
     public String getLicensePlates() {
         return licensePlates;
     }
 
     public void setLicensePlates(String licensePlates) {
         this.licensePlates = licensePlates == null ? null : licensePlates.trim();
-    }
-
-    public String getIdCardNo() {
-        return idCardNo;
-    }
-
-    public void setIdCardNo(String idCardNo) {
-        this.idCardNo = idCardNo == null ? null : idCardNo.trim();
     }
 
     public Integer getCityId() {
@@ -333,14 +337,6 @@ public class DriverInfoLicenseUpdateApply {
         this.teamName = teamName == null ? null : teamName.trim();
     }
 
-    public String getDriverPhone() {
-        return driverPhone;
-    }
-
-    public void setDriverPhone(String driverPhone) {
-        this.driverPhone = driverPhone == null ? null : driverPhone.trim();
-    }
-
     public Integer getCarModelId() {
         return carModelId;
     }
@@ -379,30 +375,6 @@ public class DriverInfoLicenseUpdateApply {
 
     public void setColor(String color) {
         this.color = color == null ? null : color.trim();
-    }
-
-    public String getIdCardNoNew() {
-        return idCardNoNew;
-    }
-
-    public void setIdCardNoNew(String idCardNoNew) {
-        this.idCardNoNew = idCardNoNew == null ? null : idCardNoNew.trim();
-    }
-
-    public String getDriverNameNew() {
-        return driverNameNew;
-    }
-
-    public void setDriverNameNew(String driverNameNew) {
-        this.driverNameNew = driverNameNew == null ? null : driverNameNew.trim();
-    }
-
-    public String getDriverPhoneNew() {
-        return driverPhoneNew;
-    }
-
-    public void setDriverPhoneNew(String driverPhoneNew) {
-        this.driverPhoneNew = driverPhoneNew == null ? null : driverPhoneNew.trim();
     }
 
     public Integer getCarModelIdNew() {
@@ -453,6 +425,38 @@ public class DriverInfoLicenseUpdateApply {
         this.status = status;
     }
 
+    public Date getSubmitTime() {
+        return submitTime;
+    }
+
+    public void setSubmitTime(Date submitTime) {
+        this.submitTime = submitTime;
+    }
+
+    public Date getAuditTime() {
+        return auditTime;
+    }
+
+    public void setAuditTime(Date auditTime) {
+        this.auditTime = auditTime;
+    }
+
+    public String getVerifyReason() {
+        return verifyReason;
+    }
+
+    public void setVerifyReason(String verifyReason) {
+        this.verifyReason = verifyReason == null ? null : verifyReason.trim();
+    }
+
+    public Date getNotifyTime() {
+        return notifyTime;
+    }
+
+    public void setNotifyTime(Date notifyTime) {
+        this.notifyTime = notifyTime;
+    }
+
     public Integer getCreateId() {
         return createId;
     }
@@ -493,20 +497,20 @@ public class DriverInfoLicenseUpdateApply {
         this.updateName = updateName == null ? null : updateName.trim();
     }
 
-    public String getOperateReason() {
-        return operateReason;
-    }
-
-    public void setOperateReason(String operateReason) {
-        this.operateReason = operateReason == null ? null : operateReason.trim();
-    }
-
     public Date getUpdateTime() {
         return updateTime;
     }
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getOperateReason() {
+        return operateReason;
+    }
+
+    public void setOperateReason(String operateReason) {
+        this.operateReason = operateReason == null ? null : operateReason.trim();
     }
 
     public String getVehicleOwner() {
@@ -613,14 +617,6 @@ public class DriverInfoLicenseUpdateApply {
         this.frameNoNew = frameNoNew == null ? null : frameNoNew.trim();
     }
 
-    public String getVerifyReason() {
-        return verifyReason;
-    }
-
-    public void setVerifyReason(String verifyReason) {
-        this.verifyReason = verifyReason == null ? null : verifyReason.trim();
-    }
-
     public Integer getChangeStatus() {
         return changeStatus;
     }
@@ -635,5 +631,21 @@ public class DriverInfoLicenseUpdateApply {
 
     public void setChangeWay(Integer changeWay) {
         this.changeWay = changeWay;
+    }
+
+    public String getBrandName() {
+        return brandName;
+    }
+
+    public void setBrandName(String brandName) {
+        this.brandName = brandName == null ? null : brandName.trim();
+    }
+
+    public String getModelName() {
+        return modelName;
+    }
+
+    public void setModelName(String modelName) {
+        this.modelName = modelName == null ? null : modelName.trim();
     }
 }
