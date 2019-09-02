@@ -75,9 +75,6 @@
       <if test="driverPhone !=null and driverPhone !=''">
         AND driver_phone = #{driverPhone}
       </if>
-      <if test="idCardNo !=null and idCardNo !=''">
-        AND id_card_no = #{idCardNo}
-      </if>
       <if test="licensePlates !=null and licensePlates !=''">
         AND license_plates = #{licensePlates}
       </if>
