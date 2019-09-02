@@ -511,7 +511,8 @@ public class DriverInfoTemporaryController extends BaseController {
         entity.setServiceCity(String.valueOf(cityId));
         entity.setSupplierId(supplierId);
         entity.setLicensePlates(licensePlates);
-        entity.setGroupId(String.valueOf(groupId));
+       // entity.setGroupId(String.valueOf(groupId));
+        entity.setGroupId("43"); //根据产品陈海宁的需求，导入和新增司机信息时统一修改为畅享型 fht 2019-09-01
         entity.setBankCardNumber(StringUtils.isNotBlank(bankCardNumber)?bankCardNumber:null);
         entity.setBankCardBank(StringUtils.isNotBlank(bankCardBank)?bankCardBank:null);
         entity.setMemo(StringUtils.isNotBlank(memo)?memo:null);

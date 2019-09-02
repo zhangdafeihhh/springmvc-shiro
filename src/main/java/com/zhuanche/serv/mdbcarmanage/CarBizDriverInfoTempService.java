@@ -777,28 +777,23 @@ public class CarBizDriverInfoTempService {
                             break;
                         // 车型类别
                         case 12:
-                            if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
+                            //司机groupId与车辆分离
+                            //根据产品陈海宁的需求，导入和新增统一修改为畅享型 fht 2019-09-01
+                            String groupName = "畅享型";
+                            //String groupName= cellValue.getStringValue();
+                            //导入时候统一修改为畅享型
+                            CarBizCarGroup group1 = new CarBizCarGroup();
+                            group1.setGroupName(groupName);
+                            CarBizCarGroup group = carBizCarGroupExMapper.queryForObjectByGroupName(group1);
+                            if(group!=null && group.getGroupId()!=null){
+                                driver.setGroupid(group.getGroupId());
+                                driver.setCarGroupName(groupName);
+                            }else{
                                 CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                                 returnVO.setReson("第" +  (rowIx+1) + "行数据，第" + (colIx + 1)
-                                        + "列 【车型类别】不能为空且单元格格式必须为文本");
+                                        + "列 【车型类别】没有"+groupName);
                                 listException.add(returnVO);
                                 isTrue = false;
-                            } else {
-                                //司机groupId与车辆分离
-                                String groupName= cellValue.getStringValue();
-                                CarBizCarGroup group1 = new CarBizCarGroup();
-                                group1.setGroupName(groupName);
-                                CarBizCarGroup group = carBizCarGroupExMapper.queryForObjectByGroupName(group1);
-                                if(group!=null && group.getGroupId()!=null){
-                                    driver.setGroupid(group.getGroupId());
-                                    driver.setCarGroupName(cellValue.getStringValue());
-                                }else{
-                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                    returnVO.setReson("第" +  (rowIx+1) + "行数据，第" + (colIx + 1)
-                                            + "列 【车型类别】没有"+groupName);
-                                    listException.add(returnVO);
-                                    isTrue = false;
-                                }
                             }
                             break;
                         // 驾照类型
