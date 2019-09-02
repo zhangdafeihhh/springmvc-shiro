@@ -44,7 +44,6 @@ public class DriverInfoLicenseUpdateApplyController {
      * 司机\车辆修改申请信息列表（有分页）
      * @param name 司机姓名
      * @param phone 司机手机号
-     * @param idCardNo 身份证号
      * @param status 状态
      * @param cityId 城市ID
      * @param supplierId 供应商ID
@@ -64,7 +63,7 @@ public class DriverInfoLicenseUpdateApplyController {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DataSourceMode.SLAVE)
     })
     @RequestFunction(menu = DRIVER_INFO_CHANGE_APPLY_LIST)
-    public AjaxResponse findDriverInfoLicenseUpdateList(String name, String phone, String idCardNo, String licensePlates,
+    public AjaxResponse findDriverInfoLicenseUpdateList(String name, String phone, String licensePlates,
                                                         Integer status, Integer cityId, Integer supplierId, Integer teamId,
                                                         Integer teamGroupId, String createDateBegin, String createDateEnd,
                                                         Integer changeStatus, Integer initiatorType,
@@ -79,7 +78,6 @@ public class DriverInfoLicenseUpdateApplyController {
         DriverInfoLicenseUpdateApplyDTO licenseUpdateApplyDTO = new DriverInfoLicenseUpdateApplyDTO();
         licenseUpdateApplyDTO.setDriverName(name);
         licenseUpdateApplyDTO.setDriverPhone(phone);
-        licenseUpdateApplyDTO.setIdCardNo(idCardNo);
         licenseUpdateApplyDTO.setLicensePlates(licensePlates);
         licenseUpdateApplyDTO.setStatus(status);
         licenseUpdateApplyDTO.setCityId(cityId);

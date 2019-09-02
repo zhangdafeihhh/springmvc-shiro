@@ -5,36 +5,36 @@
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="driver_id" property="driverId" jdbcType="INTEGER" />
     <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="driver_phone" property="driverPhone" jdbcType="VARCHAR" />
     <result column="license_plates" property="licensePlates" jdbcType="VARCHAR" />
-    <result column="id_card_no" property="idCardNo" jdbcType="VARCHAR" />
     <result column="city_id" property="cityId" jdbcType="INTEGER" />
     <result column="city_name" property="cityName" jdbcType="VARCHAR" />
     <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
     <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
     <result column="team_id" property="teamId" jdbcType="INTEGER" />
     <result column="team_name" property="teamName" jdbcType="VARCHAR" />
-    <result column="driver_phone" property="driverPhone" jdbcType="VARCHAR" />
     <result column="car_model_id" property="carModelId" jdbcType="INTEGER" />
     <result column="car_model_name" property="carModelName" jdbcType="VARCHAR" />
     <result column="car_purchase_date" property="carPurchaseDate" jdbcType="TIMESTAMP" />
     <result column="model_detail" property="modelDetail" jdbcType="VARCHAR" />
     <result column="color" property="color" jdbcType="VARCHAR" />
-    <result column="id_card_no_new" property="idCardNoNew" jdbcType="VARCHAR" />
-    <result column="driver_name_new" property="driverNameNew" jdbcType="VARCHAR" />
-    <result column="driver_phone_new" property="driverPhoneNew" jdbcType="VARCHAR" />
     <result column="car_model_id_new" property="carModelIdNew" jdbcType="INTEGER" />
     <result column="car_model_name_new" property="carModelNameNew" jdbcType="VARCHAR" />
     <result column="car_purchase_date_new" property="carPurchaseDateNew" jdbcType="TIMESTAMP" />
     <result column="model_detail_new" property="modelDetailNew" jdbcType="VARCHAR" />
     <result column="color_new" property="colorNew" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="submit_time" property="submitTime" jdbcType="TIMESTAMP" />
+    <result column="audit_time" property="auditTime" jdbcType="TIMESTAMP" />
+    <result column="verify_reason" property="verifyReason" jdbcType="VARCHAR" />
+    <result column="notify_time" property="notifyTime" jdbcType="TIMESTAMP" />
     <result column="create_id" property="createId" jdbcType="INTEGER" />
     <result column="create_name" property="createName" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_id" property="updateId" jdbcType="INTEGER" />
     <result column="update_name" property="updateName" jdbcType="VARCHAR" />
-    <result column="operate_reason" property="operateReason" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="operate_reason" property="operateReason" jdbcType="VARCHAR" />
     <result column="vehicle_owner" property="vehicleOwner" jdbcType="VARCHAR" />
     <result column="vehicle_registration_date" property="vehicleRegistrationDate" jdbcType="VARCHAR" />
     <result column="vehicle_driving_license" property="vehicleDrivingLicense" jdbcType="VARCHAR" />
@@ -48,20 +48,21 @@
     <result column="car_rent_protocol" property="carRentProtocol" jdbcType="VARCHAR" />
     <result column="frame_no" property="frameNo" jdbcType="VARCHAR" />
     <result column="frame_no_new" property="frameNoNew" jdbcType="VARCHAR" />
-    <result column="verify_reason" property="verifyReason" jdbcType="VARCHAR" />
     <result column="change_status" property="changeStatus" jdbcType="INTEGER" />
     <result column="change_way" property="changeWay" jdbcType="INTEGER" />
+    <result column="brand_name" property="brandName" jdbcType="VARCHAR" />
+    <result column="model_name" property="modelName" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, driver_id, driver_name, license_plates, id_card_no, city_id, city_name, supplier_id,
-    supplier_name, team_id, team_name, driver_phone, car_model_id, car_model_name, car_purchase_date,
-    model_detail, color, id_card_no_new, driver_name_new, driver_phone_new, car_model_id_new,
-    car_model_name_new, car_purchase_date_new, model_detail_new, color_new, status, create_id,
-    create_name, create_time, update_id, update_name, operate_reason, update_time, vehicle_owner,
-    vehicle_registration_date, vehicle_driving_license, vehicle_photo_group, vehicle_owner_new,
-    vehicle_registration_date_new, vehicle_driving_license_new, vehicle_photo_group_new,
-    initiator_type, license_plates_new, car_rent_protocol, frame_no, frame_no_new, verify_reason,
-    change_status, change_way
+    id, driver_id, driver_name, driver_phone, license_plates, city_id, city_name, supplier_id,
+    supplier_name, team_id, team_name, car_model_id, car_model_name, car_purchase_date,
+    model_detail, color, car_model_id_new, car_model_name_new, car_purchase_date_new,
+    model_detail_new, color_new, status, submit_time, audit_time, verify_reason, notify_time,
+    create_id, create_name, create_time, update_id, update_name, update_time, operate_reason,
+    vehicle_owner, vehicle_registration_date, vehicle_driving_license, vehicle_photo_group,
+    vehicle_owner_new, vehicle_registration_date_new, vehicle_driving_license_new, vehicle_photo_group_new,
+    initiator_type, license_plates_new, car_rent_protocol, frame_no, frame_no_new, change_status,
+    change_way, brand_name, model_name
   </sql>
   <!-- mapper基础标准: 当前表所有字段查询条件集 -->
   <sql id="allBaseColumnWhereList" >
