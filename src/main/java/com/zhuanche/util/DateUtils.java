@@ -1,5 +1,6 @@
 package com.zhuanche.util;
 
+import org.omg.CORBA.PUBLIC_MEMBER;
 import org.springframework.util.StringUtils;
 
 import java.sql.Timestamp;
@@ -16,6 +17,8 @@ import java.util.Date;
 public class DateUtils {
 
 	public static String dateTimeFormat_parttern = "yyyy-MM-dd HH:mm:ss";
+
+	public static final String date_format = "yyyy-MM-dd";
 
 
 
@@ -679,6 +682,14 @@ public class DateUtils {
 				throw new RuntimeException("add days is error.");
 			}
 		}
+
+		//将long类型的转化为指定的格式
+	public static String convertLongToString(Long time,String pattern){
+		Timestamp timestamp = new Timestamp(time);
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+		String str = simpleDateFormat.format(timestamp);
+		return str;
+	}
 
 
 }

@@ -1,16 +1,26 @@
 package com.zhuanche.serv;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Maps;
+import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.rpc.DriverIncomeScoreResponse;
 import com.zhuanche.common.rpc.RPCAPI;
 import com.zhuanche.common.rpc.RPCResponse;
+import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.dto.driver.DriverVoEntity;
+import com.zhuanche.dto.mdbcarmanage.ScoreDetailDTO;
 import com.zhuanche.dto.rentcar.*;
+import com.zhuanche.http.MpOkHttpUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +32,14 @@ import java.util.stream.Collectors;
 @Service
 public class DriverIncomeScoreService {
 
+
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Value("${driver.integral.url}")
     private String DRIVER_INTEGRAL;
+
+    @Autowired
+    private CarBizDriverInfoService carBizDriverInfoService;
 
     /**
      * 车管批量查询司机当前出行分信息
@@ -130,5 +146,81 @@ public class DriverIncomeScoreService {
             dto.setPhone(phone);
             dto.setName(name);
         }
+    }
+
+
+
+    public Map<String,Object> getScoreDetailDTO(Integer driverId,String day,Long scoreDate,String tripScore){
+        Map<String,Object> resultMap = Maps.newHashMap();
+        List<ScoreDetailDTO> list = new ArrayList<>();
+
+       // JSONObject jsonObject = new JSONObject();
+        Map<String,Object> map = Maps.newHashMap();
+        map.put("driverId",driverId);
+        map.put("day",day);
+        map.put("sortState",0);
+        String result = MpOkHttpUtil.okHttpPost(DRIVER_INTEGRAL+"/incomeScore/tripScoreDetails",map,0,null);
+        //String result = MpOkHttpUtil.okHttpPostToJson(DRIVER_INTEGRAL+"/incomeScore/tripScoreDetails",jsonObject.toJSONString(),0,null);
+        if(StringUtils.isEmpty(result)){
+            logger.info("调用代理层返回结果为空");
+            return resultMap;
+        }
+
+        CarBizDriverInfoDTO info = carBizDriverInfoService.querySupplierIdAndNameByDriverId(driverId);
+
+        JSONObject jsonRes = JSONObject.parseObject(result);
+        if(jsonRes.get("code") != null && jsonRes.getInteger("code")==0){
+            String data = jsonRes.getString("data");
+            JSONObject jsonObject = JSONObject.parseObject(data);
+            if(jsonObject != null && jsonObject.get("dayDetailArray") != null) {
+                JSONArray jsonArray = JSONArray.parseArray(jsonObject.get("dayDetailArray").toString());
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    JSONObject jsonResult = (JSONObject) jsonArray.get(i);
+                    ScoreDetailDTO scoreDetailDTO = new ScoreDetailDTO();
+                    if (jsonResult.get("day") != null && jsonResult.get("dayServiceTimeScore") != null && jsonResult.get("isCollect") != null) {
+                        String scoreDetailDate = jsonResult.getString("day");
+                        String hourScore = jsonResult.getBigDecimal("dayServiceTimeScore").toString();
+                        Boolean isTotal = jsonResult.getBoolean("isCollect");
+                        scoreDetailDTO.setDriverId(driverId);
+                        scoreDetailDTO.setHourScore(hourScore);
+                        scoreDetailDTO.setScoreDetailDate(scoreDetailDate);
+                        scoreDetailDTO.setIsTotal(isTotal == true ? 1 : 0);
+                        scoreDetailDTO.setName(info.getName());
+                        scoreDetailDTO.setPhone(info.getPhone());
+                        list.add(scoreDetailDTO);
+                    }
+                }
+                resultMap.put("scoreDetailDTO",list);
+            }
+
+            if(jsonObject.get("finishOrderDay") != null){
+                String finishOrderDay = jsonObject.getBigDecimal("finishOrderDay").toString();
+                resultMap.put("finishOrderDay",finishOrderDay);
+            }if(jsonObject.get("calScoreDay") != null){
+                String calScoreDay = jsonObject.getBigDecimal("calScoreDay").toString();
+                resultMap.put("calScoreDay",calScoreDay);
+            }if(jsonObject.get("baseTripScore") != null){
+                String baseTripScore = jsonObject.getBigDecimal("baseTripScore").toString();
+                resultMap.put("baseTripScore",baseTripScore);
+            }if(jsonObject.get("dispatchRollDay") != null){
+                String dispatchRollDay = jsonObject.getBigDecimal("dispatchRollDay").toString();
+                resultMap.put("dispatchRollDay",dispatchRollDay);
+            }if(jsonObject.get("sumOfDispatchScore") != null){
+                String sumOfDispatchScore = jsonObject.getBigDecimal("sumOfDispatchScore").toString();
+                resultMap.put("sumOfDispatchScore",sumOfDispatchScore);
+            }if(jsonObject.get("sumOfTripScore") != null){
+                String sumOfTripScore = jsonObject.getBigDecimal("sumOfTripScore").toString();
+                resultMap.put("sumOfTripScore",sumOfTripScore);
+            }if(jsonObject.get("collectScore") != null){
+                resultMap.put("tripScore",jsonObject.get("collectScore").toString());
+            }
+            resultMap.put("driverId",driverId);
+            resultMap.put("dispatchTime",scoreDate);
+            resultMap.put("scoreDate",day);
+
+        }else {
+            logger.info("调用代理层接口返回结果数据异常",jsonRes);
+        }
+        return resultMap;
     }
 }

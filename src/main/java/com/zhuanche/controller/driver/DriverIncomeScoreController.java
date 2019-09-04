@@ -1,21 +1,30 @@
 package com.zhuanche.controller.driver;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RequestFunction;
+import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.driver.DriverVoEntity;
+import com.zhuanche.dto.mdbcarmanage.ScoreDetailDTO;
 import com.zhuanche.dto.rentcar.*;
+import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.*;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.DateUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.rest.RestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -224,5 +234,45 @@ public class DriverIncomeScoreController {
                 dto.setPhone(info.getPhone());
             }
         }
+    }
+
+
+    /**
+     * 收入分详情
+     * @param driverId
+     * @param scoreDate
+     * @return
+     */
+    @RequestMapping("/scoreDetail")
+    @ResponseBody
+    public AjaxResponse scoreDetail(@Verify(param = "driverId",rule = "required") Integer driverId,
+                                    @Verify(param = "scoreDate",rule = "required") Long scoreDate,
+                                    @Verify(param = "tripScore",rule = "required")String tripScore,
+                                    @RequestParam(value = "pageSize",required = false,defaultValue = "100")Integer pageSize,
+                                    @RequestParam(value = "pageNum",required = false,defaultValue = "1")Integer pageNum){
+        logger.info(MessageFormat.format("时长分详情入参：driverId:{0},scoreDate:{1},tripScore:{2}",driverId,scoreDate,tripScore));
+
+        String day = DateUtils.convertLongToString(scoreDate,DateUtils.date_format);
+
+        PageDTO pageDTO = new PageDTO(pageNum,pageSize,0,null);
+        Map<String,Object> map = Maps.newHashMap();
+
+
+        try {
+            map = driverIncomeScoreService.getScoreDetailDTO(driverId,day,scoreDate,tripScore);
+
+            if(map.get("scoreDetailDTO") == null){
+                return AjaxResponse.success(map);
+            }else {
+                List<ScoreDetailDTO> list = (List<ScoreDetailDTO>) map.get("scoreDetailDTO");
+                pageDTO = new PageDTO(pageNum,pageSize,list.size(),list);
+                map.put("result",pageDTO);
+                map.remove("scoreDetailDTO");
+            }
+        } catch (Exception e) {
+            logger.error("获取时长分详情异常",e);
+        }
+        return AjaxResponse.success(map);
+
     }
 }
