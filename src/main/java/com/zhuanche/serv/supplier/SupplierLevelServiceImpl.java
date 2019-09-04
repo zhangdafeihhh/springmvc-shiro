@@ -170,10 +170,16 @@ public class SupplierLevelServiceImpl  implements  SupplierLevelService{
             String supplierLevelIdString = null;
             SupplierLevel supplierLevel = null;
             BigDecimal additionalScore = null;
+            BigDecimal dbAdditionalScore = null;
             while(is.hasNext()){
                 supplierLevelIdString = is.next();
                 additionalScore = supplierLevelCache.get(supplierLevelIdString);
                 supplierLevel = supplierLevelMapper.selectByPrimaryKey(new Integer(supplierLevelIdString));
+                dbAdditionalScore = supplierLevel.getAdditionalScore();
+                //兼容已有附加分的场景
+                if(dbAdditionalScore != null){
+                    additionalScore = dbAdditionalScore.add(additionalScore);
+                }
                 BigDecimal gradeScore = calculationLevelScore(supplierLevel.getScaleScore(),supplierLevel.getEfficiencyScore(),supplierLevel.getServiceScore(),additionalScore);
                 gradeScore = gradeScore.setScale(2,BigDecimal.ROUND_HALF_DOWN);
                 //等级分
