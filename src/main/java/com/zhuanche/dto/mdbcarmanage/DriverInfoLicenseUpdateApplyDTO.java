@@ -63,6 +63,8 @@ public class DriverInfoLicenseUpdateApplyDTO extends Base {
      */
     private String teamName;
 
+    private Integer carId;
+
     /**
      * 车型 关联车型表(原)
      */
@@ -357,6 +359,14 @@ public class DriverInfoLicenseUpdateApplyDTO extends Base {
     @Override
     public void setTeamName(String teamName) {
         this.teamName = teamName;
+    }
+
+    public Integer getCarId() {
+        return carId;
+    }
+
+    public void setCarId(Integer carId) {
+        this.carId = carId;
     }
 
     public Integer getCarModelId() {

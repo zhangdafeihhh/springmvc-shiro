@@ -13,6 +13,7 @@
     <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
     <result column="team_id" property="teamId" jdbcType="INTEGER" />
     <result column="team_name" property="teamName" jdbcType="VARCHAR" />
+    <result column="car_id" property="carId" jdbcType="INTEGER" />
     <result column="car_model_id" property="carModelId" jdbcType="INTEGER" />
     <result column="car_model_name" property="carModelName" jdbcType="VARCHAR" />
     <result column="car_purchase_date" property="carPurchaseDate" jdbcType="TIMESTAMP" />
@@ -56,7 +57,7 @@
   </resultMap>
   <sql id="Base_Column_List" >
     id, driver_id, driver_name, driver_phone, license_plates, city_id, city_name, supplier_id, 
-    supplier_name, team_id, team_name, car_model_id, car_model_name, car_purchase_date, 
+    supplier_name, team_id, team_name, car_id, car_model_id, car_model_name, car_purchase_date, 
     model_detail, color, car_model_id_new, car_model_name_new, car_purchase_date_new, 
     model_detail_new, color_new, status, submit_time, audit_time, verify_reason, notify_time, 
     create_id, create_name, create_time, update_id, update_name, update_time, operate_reason, 
@@ -78,16 +79,17 @@
     insert into driver_info_license_update_apply (driver_id, driver_name, driver_phone, 
       license_plates, city_id, city_name, 
       supplier_id, supplier_name, team_id, 
-      team_name, car_model_id, car_model_name, 
-      car_purchase_date, model_detail, color, 
-      car_model_id_new, car_model_name_new, car_purchase_date_new, 
-      model_detail_new, color_new, status, 
-      submit_time, audit_time, verify_reason, 
-      notify_time, create_id, create_name, 
-      create_time, update_id, update_name, 
-      update_time, operate_reason, vehicle_owner, 
-      vehicle_registration_date, vehicle_driving_license, 
-      vehicle_photo_group, vehicle_owner_new, vehicle_registration_date_new, 
+      team_name, car_id, car_model_id, 
+      car_model_name, car_purchase_date, model_detail, 
+      color, car_model_id_new, car_model_name_new, 
+      car_purchase_date_new, model_detail_new, color_new, 
+      status, submit_time, audit_time, 
+      verify_reason, notify_time, create_id, 
+      create_name, create_time, update_id, 
+      update_name, update_time, operate_reason, 
+      vehicle_owner, vehicle_registration_date, 
+      vehicle_driving_license, vehicle_photo_group, 
+      vehicle_owner_new, vehicle_registration_date_new, 
       vehicle_driving_license_new, vehicle_photo_group_new, 
       initiator_type, license_plates_new, car_rent_protocol, 
       frame_no, frame_no_new, change_status, 
@@ -96,16 +98,17 @@
     values (#{driverId,jdbcType=INTEGER}, #{driverName,jdbcType=VARCHAR}, #{driverPhone,jdbcType=VARCHAR}, 
       #{licensePlates,jdbcType=VARCHAR}, #{cityId,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR}, 
       #{supplierId,jdbcType=INTEGER}, #{supplierName,jdbcType=VARCHAR}, #{teamId,jdbcType=INTEGER}, 
-      #{teamName,jdbcType=VARCHAR}, #{carModelId,jdbcType=INTEGER}, #{carModelName,jdbcType=VARCHAR}, 
-      #{carPurchaseDate,jdbcType=TIMESTAMP}, #{modelDetail,jdbcType=VARCHAR}, #{color,jdbcType=VARCHAR}, 
-      #{carModelIdNew,jdbcType=INTEGER}, #{carModelNameNew,jdbcType=VARCHAR}, #{carPurchaseDateNew,jdbcType=TIMESTAMP}, 
-      #{modelDetailNew,jdbcType=VARCHAR}, #{colorNew,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
-      #{submitTime,jdbcType=TIMESTAMP}, #{auditTime,jdbcType=TIMESTAMP}, #{verifyReason,jdbcType=VARCHAR}, 
-      #{notifyTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=INTEGER}, #{createName,jdbcType=VARCHAR}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateId,jdbcType=INTEGER}, #{updateName,jdbcType=VARCHAR}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{operateReason,jdbcType=VARCHAR}, #{vehicleOwner,jdbcType=VARCHAR}, 
-      #{vehicleRegistrationDate,jdbcType=VARCHAR}, #{vehicleDrivingLicense,jdbcType=VARCHAR}, 
-      #{vehiclePhotoGroup,jdbcType=VARCHAR}, #{vehicleOwnerNew,jdbcType=VARCHAR}, #{vehicleRegistrationDateNew,jdbcType=VARCHAR}, 
+      #{teamName,jdbcType=VARCHAR}, #{carId,jdbcType=INTEGER}, #{carModelId,jdbcType=INTEGER}, 
+      #{carModelName,jdbcType=VARCHAR}, #{carPurchaseDate,jdbcType=TIMESTAMP}, #{modelDetail,jdbcType=VARCHAR}, 
+      #{color,jdbcType=VARCHAR}, #{carModelIdNew,jdbcType=INTEGER}, #{carModelNameNew,jdbcType=VARCHAR}, 
+      #{carPurchaseDateNew,jdbcType=TIMESTAMP}, #{modelDetailNew,jdbcType=VARCHAR}, #{colorNew,jdbcType=VARCHAR}, 
+      #{status,jdbcType=INTEGER}, #{submitTime,jdbcType=TIMESTAMP}, #{auditTime,jdbcType=TIMESTAMP}, 
+      #{verifyReason,jdbcType=VARCHAR}, #{notifyTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=INTEGER}, 
+      #{createName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateId,jdbcType=INTEGER}, 
+      #{updateName,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{operateReason,jdbcType=VARCHAR}, 
+      #{vehicleOwner,jdbcType=VARCHAR}, #{vehicleRegistrationDate,jdbcType=VARCHAR}, 
+      #{vehicleDrivingLicense,jdbcType=VARCHAR}, #{vehiclePhotoGroup,jdbcType=VARCHAR}, 
+      #{vehicleOwnerNew,jdbcType=VARCHAR}, #{vehicleRegistrationDateNew,jdbcType=VARCHAR}, 
       #{vehicleDrivingLicenseNew,jdbcType=VARCHAR}, #{vehiclePhotoGroupNew,jdbcType=VARCHAR}, 
       #{initiatorType,jdbcType=INTEGER}, #{licensePlatesNew,jdbcType=VARCHAR}, #{carRentProtocol,jdbcType=VARCHAR}, 
       #{frameNo,jdbcType=VARCHAR}, #{frameNoNew,jdbcType=VARCHAR}, #{changeStatus,jdbcType=INTEGER}, 
@@ -147,6 +150,9 @@
       </if>
       <if test="teamName != null" >
         team_name,
+      </if>
+      <if test="carId != null" >
+        car_id,
       </if>
       <if test="carModelId != null" >
         car_model_id,
@@ -299,6 +305,9 @@
       </if>
       <if test="teamName != null" >
         #{teamName,jdbcType=VARCHAR},
+      </if>
+      <if test="carId != null" >
+        #{carId,jdbcType=INTEGER},
       </if>
       <if test="carModelId != null" >
         #{carModelId,jdbcType=INTEGER},
@@ -455,6 +464,9 @@
       <if test="teamName != null" >
         team_name = #{teamName,jdbcType=VARCHAR},
       </if>
+      <if test="carId != null" >
+        car_id = #{carId,jdbcType=INTEGER},
+      </if>
       <if test="carModelId != null" >
         car_model_id = #{carModelId,jdbcType=INTEGER},
       </if>
@@ -590,6 +602,7 @@
       supplier_name = #{supplierName,jdbcType=VARCHAR},
       team_id = #{teamId,jdbcType=INTEGER},
       team_name = #{teamName,jdbcType=VARCHAR},
+      car_id = #{carId,jdbcType=INTEGER},
       car_model_id = #{carModelId,jdbcType=INTEGER},
       car_model_name = #{carModelName,jdbcType=VARCHAR},
       car_purchase_date = #{carPurchaseDate,jdbcType=TIMESTAMP},

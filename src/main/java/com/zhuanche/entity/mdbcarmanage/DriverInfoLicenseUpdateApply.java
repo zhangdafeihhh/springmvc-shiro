@@ -4,249 +4,105 @@ import java.util.Date;
 
 public class DriverInfoLicenseUpdateApply {
     private Integer id;
-    /**
-     * 司机ID
-     */
+
     private Integer driverId;
 
-    /**
-     * 司机名称
-     */
     private String driverName;
 
-    /**
-     * 司机手机号
-     */
     private String driverPhone;
 
-    /**
-     * 车牌号
-     */
     private String licensePlates;
 
-    /**
-     * 城市id
-     */
     private Integer cityId;
 
-    /**
-     * 城市名称
-     */
     private String cityName;
 
-    /**
-     * 供应商ID
-     */
     private Integer supplierId;
 
-    /**
-     * 供应商名称
-     */
     private String supplierName;
 
-    /**
-     * 车队ID
-     */
     private Integer teamId;
 
-    /**
-     * 车队名称
-     */
     private String teamName;
 
-    /**
-     * 车型 关联车型表(原)
-     */
+    private Integer carId;
+
     private Integer carModelId;
 
-    /**
-     * 车型名称(原)
-     */
     private String carModelName;
 
-    /**
-     * 购买日期(原)
-     */
     private Date carPurchaseDate;
 
-    /**
-     * 具体车型(原)
-     */
     private String modelDetail;
 
-    /**
-     * 车辆颜色(原)
-     */
     private String color;
 
-    /**
-     * 车型 关联车型表(新,车辆修改申请所需)
-     */
     private Integer carModelIdNew;
 
-    /**
-     * 车型名称(新,车辆修改申请所需)
-     */
     private String carModelNameNew;
 
-    /**
-     * 购买日期(新,车辆修改申请所需)
-     */
     private Date carPurchaseDateNew;
 
-    /**
-     * 具体车型(新,车辆修改申请所需)
-     */
     private String modelDetailNew;
 
-    /**
-     * 车辆颜色(新,车辆修改申请所需)
-     */
     private String colorNew;
 
-    /**
-     * 操作状态[10 初始态 20 草稿 30 审核中 40 审核失败  50 等待验车 60 已通知验车 70 验车未通过 80 验车通过]
-     */
     private Integer status;
 
-    /**
-     * 资料提交成功时间
-     */
     private Date submitTime;
 
-    /**
-     * 审核时间
-     */
     private Date auditTime;
 
-    /**
-     * 验真结果
-     */
     private String verifyReason;
 
-    /**
-     * 通知验车时间
-     */
     private Date notifyTime;
 
-    /**
-     * 操作人ID
-     */
     private Integer createId;
 
-    /**
-     * 操作人姓名
-     */
     private String createName;
 
-    /**
-     * 创建时间
-     */
     private Date createTime;
 
-    /**
-     * 操作人ID
-     */
     private Integer updateId;
 
-    /**
-     * 操作人姓名
-     */
     private String updateName;
 
-    /**
-     * 更新时间
-     */
     private Date updateTime;
 
-    /**
-     * 处理意见
-     */
     private String operateReason;
 
-    /**
-     * 车辆所有人(原)
-     */
     private String vehicleOwner;
 
-    /**
-     * 车辆注册日期(原)
-     */
     private String vehicleRegistrationDate;
 
-    /**
-     * 行驶证扫描件(原)
-     */
     private String vehicleDrivingLicense;
 
-    /**
-     * 人车合影扫描件(原)
-     */
     private String vehiclePhotoGroup;
 
-    /**
-     * 车辆所有人(新)
-     */
     private String vehicleOwnerNew;
 
-    /**
-     * 车辆注册日期(新)
-     */
     private String vehicleRegistrationDateNew;
 
-    /**
-     * 行驶证扫描件(新)
-     */
     private String vehicleDrivingLicenseNew;
 
-    /**
-     * 人车合影扫描件(新)
-     */
     private String vehiclePhotoGroupNew;
 
-    /**
-     * 发起方类型  1：加盟商  2：司机
-     */
     private Integer initiatorType;
 
-    /**
-     * 新车牌号
-     */
     private String licensePlatesNew;
 
-    /**
-     * 租车协议
-     */
     private String carRentProtocol;
 
-    /**
-     * 老车辆识别码
-     */
     private String frameNo;
 
-    /**
-     * 车辆识别码(新)
-     */
     private String frameNoNew;
 
-    /**
-     * 车辆更换状态 0：未更换 1：已更换
-     */
     private Integer changeStatus;
 
-    /**
-     * 司机换车方式 0：新绑车辆 1：更换车辆
-     */
     private Integer changeWay;
 
-    /**
-     * 品牌名称
-     */
     private String brandName;
 
-    /**
-     * 车型名称
-     */
     private String modelName;
 
     private String memo;
@@ -337,6 +193,14 @@ public class DriverInfoLicenseUpdateApply {
 
     public void setTeamName(String teamName) {
         this.teamName = teamName == null ? null : teamName.trim();
+    }
+
+    public Integer getCarId() {
+        return carId;
+    }
+
+    public void setCarId(Integer carId) {
+        this.carId = carId;
     }
 
     public Integer getCarModelId() {

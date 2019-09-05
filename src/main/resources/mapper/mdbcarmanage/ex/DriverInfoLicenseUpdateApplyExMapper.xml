@@ -13,6 +13,7 @@
     <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
     <result column="team_id" property="teamId" jdbcType="INTEGER" />
     <result column="team_name" property="teamName" jdbcType="VARCHAR" />
+    <result column="car_id" property="carId" jdbcType="INTEGER" />
     <result column="car_model_id" property="carModelId" jdbcType="INTEGER" />
     <result column="car_model_name" property="carModelName" jdbcType="VARCHAR" />
     <result column="car_purchase_date" property="carPurchaseDate" jdbcType="TIMESTAMP" />
@@ -56,7 +57,7 @@
   </resultMap>
   <sql id="Base_Column_List" >
     id, driver_id, driver_name, driver_phone, license_plates, city_id, city_name, supplier_id,
-    supplier_name, team_id, team_name, car_model_id, car_model_name, car_purchase_date,
+    supplier_name, team_id, team_name, car_id, car_model_id, car_model_name, car_purchase_date,
     model_detail, color, car_model_id_new, car_model_name_new, car_purchase_date_new,
     model_detail_new, color_new, status, submit_time, audit_time, verify_reason, notify_time,
     create_id, create_name, create_time, update_id, update_name, update_time, operate_reason,
