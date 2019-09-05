@@ -39,6 +39,7 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="goods_type" property="goodsType" jdbcType="TINYINT" />
   </resultMap>
   
   <sql id="Base_Column_List" >
@@ -49,38 +50,43 @@
 			
   <select id="queryfinancialClueForList" resultMap="BaseResultDtoMap">
     select 
-    <include refid="Base_Column_List" />
-    from financial_clue
+    	f1.clue_id, f1.clue_source, f1.status, f1.supplier_id, f1.supplier_full_name, f1.city_id, f1.city_name, 
+	    f1.goods_id, f1.goods_name, f1.purpose_name, f1.phone, f1.whether, f1.recommend, f1.create_by, f1.create_time, 
+	    f1.update_by, f1.update_time,f2.goods_type
+    FROM financial_clue f1 LEFT JOIN financial_clue_goods f2 ON f1.clue_id=f2.clue_id
     <trim prefix="WHERE" prefixOverrides="AND|OR">
 		<if test="purposeName != null and purposeName!=''">
-				and purpose_name = #{purposeName}
+				and f1.purpose_name = #{purposeName}
 		</if>
 		<if test="goodsId != null and goodsId!=0">
-				and goods_id = #{goodsId}
+				and f1.goods_id = #{goodsId}
 		</if>
 		<if test="supplierIds != null and supplierIds.size>0">
-			and supplier_id in
+			and f1.supplier_id in
 			<foreach collection="supplierIds" close=")" open="(" separator="," item="supplierId">
 				#{supplierId}
 	 	   </foreach>
 		</if>
 		<if test="cityIds != null and cityIds.size>0">
-			and city_id in
+			and f1.city_id in
 		   <foreach collection="cityIds" close=")" open="(" separator="," item="cityId">
 				#{cityId}
 	 	   </foreach>
 		</if>
 		<if test="status!=null">
-				and status = #{status}
+				and f1.status = #{status}
 		</if>
 		<if test="startDate!=null and startDate!=''">
-        		 and create_time>=concat(#{startDate},' 00:00:00')
+        		 and f1.create_time>=concat(#{startDate},' 00:00:00')
  	    </if>
   		<if test="endDate!=null and endDate!=''">
-       			  and concat(#{endDate},' 23:59:59')>=create_time
+       			  and concat(#{endDate},' 23:59:59')>=f1.create_time
         </if>
+        <if test="goodsType != null">
+			and f2.goods_type = #{goodsType}
+		</if>
 	</trim>
-	order by clue_id desc
+	order by f1.clue_id desc
   </select>
  
 </mapper>

@@ -1,6 +1,7 @@
 package com.zhuanche.dto.financial;
 
 import com.zhuanche.constants.financial.FinancialConst.ClueStatus;
+import com.zhuanche.constants.financial.FinancialConst.GoodsTypeSelect;
 import com.zhuanche.entity.driver.FinancialClue;
 
 /**  
@@ -12,6 +13,8 @@ import com.zhuanche.entity.driver.FinancialClue;
 public class FinancialClueDTO extends FinancialClue{
 	private String statusName;
 	private String whetherName;
+    private Byte goodsType;
+	private String goodsTypeName;
 	public String getStatusName() {
 		if (getStatus()==ClueStatus.PROCESSED) {
 			statusName="已分发";
@@ -36,7 +39,24 @@ public class FinancialClueDTO extends FinancialClue{
 	public void setWhetherName(String whetherName) {
 		this.whetherName = whetherName;
 	}
-	
+	public Byte getGoodsType() {
+		return goodsType;
+	}
+	public void setGoodsType(Byte goodsType) {
+		this.goodsType = goodsType;
+	}
+	public String getGoodsTypeName() {
+		if (getGoodsType()!=null && getGoodsType()==GoodsTypeSelect.GOODS_TYPE_FINANCING) {
+			goodsTypeName="融租";
+		}
+		if (getGoodsType()!=null && getGoodsType()==GoodsTypeSelect.GOODS_TYPE_RENT) {
+			goodsTypeName="经租";
+		}
+		return goodsTypeName;
+	}
+	public void setGoodsTypeName(String goodsTypeName) {
+		this.goodsTypeName = goodsTypeName;
+	}
 	
 }
   

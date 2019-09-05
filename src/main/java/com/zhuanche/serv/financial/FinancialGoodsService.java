@@ -84,7 +84,7 @@ public class FinancialGoodsService {
 	private CarBizSupplierExMapper carBizSupplierExMapper;
 	
 	public PageDTO queryFinancialGoodsForList(Integer page, Integer pageSize, String goodsName,
-			Integer basicsVehiclesId, Byte salesTarget, Set<Integer> supplierIds, Set<Integer> cityIds, Byte status) {
+			Integer basicsVehiclesId, Byte salesTarget, Set<Integer> supplierIds, Set<Integer> cityIds, Byte status,Byte goodsType) {
 		
 		if(page==null || page.intValue()<=0) {
 			page = new Integer(1);
@@ -97,7 +97,7 @@ public class FinancialGoodsService {
     	List<FinancialGoodsDTO> financialGoodsDTOs=null;
     	Page p = PageHelper.startPage( page, pageSize, true );
     	try{
-    		financialGoodsDTOs=financialGoodsExMapper.queryFinancialGoodsForList(goodsName,basicsVehiclesId,salesTarget,supplierIds,cityIds,status);
+    		financialGoodsDTOs=financialGoodsExMapper.queryFinancialGoodsForList(goodsName,basicsVehiclesId,salesTarget,supplierIds,cityIds,status,goodsType);
         	total  = (int)p.getTotal();
     	}catch (Exception e) {
     		logger.error("查询商品信息列表异常",e);
@@ -263,7 +263,7 @@ public class FinancialGoodsService {
 	}
 
 	public List<FinancialGoodsDTO> selectFinancialGoodsForList(Set<Integer> supplierIds, Set<Integer> cityIds) {
-		List<FinancialGoodsDTO> financialGoodsDTOs = financialGoodsExMapper.queryFinancialGoodsForList(null,null,null,supplierIds,cityIds,null);
+		List<FinancialGoodsDTO> financialGoodsDTOs = financialGoodsExMapper.queryFinancialGoodsForList(null,null,null,supplierIds,cityIds,null,null);
 		return financialGoodsDTOs;
 	}
 
