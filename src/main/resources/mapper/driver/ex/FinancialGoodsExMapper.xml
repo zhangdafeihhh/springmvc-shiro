@@ -96,6 +96,9 @@
 		<if test="salesTarget != null">
 			and sales_target = #{salesTarget}
 		</if>
+		<if test="goodsType != null">
+			and goods_type = #{goodsType}
+		</if>
 		<if test="supplierIds != null and supplierIds.size>0">
 			and supplier_id in
 			<foreach collection="supplierIds" close=")" open="(" separator="," item="supplierId">

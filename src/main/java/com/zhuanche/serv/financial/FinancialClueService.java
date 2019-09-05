@@ -42,7 +42,7 @@ public class FinancialClueService {
 	@Autowired
 	private FinancialClueGoodsExMapper financialClueGoodsExMapper;
 	public PageDTO queryfinancialClueForList(Integer page, Integer pageSize, String purposeName,Integer goodsId,
-			String startDate, String endDate, Set<Integer> supplierIds, Set<Integer> cityIds, Byte status) {
+			String startDate, String endDate, Set<Integer> supplierIds, Set<Integer> cityIds, Byte status,Byte goodsType) {
 		if(page==null || page.intValue()<=0) {
 			page = new Integer(1);
 		}
@@ -55,7 +55,7 @@ public class FinancialClueService {
     	Page p = PageHelper.startPage( page, pageSize, true );
     	try{
     		financialClueDTOs=financialClueExMapper.queryfinancialClueForList(purposeName,goodsId,
-    				startDate,endDate,supplierIds,cityIds,status);
+    				startDate,endDate,supplierIds,cityIds,status,goodsType);
         	total  = (int)p.getTotal();
     	}catch (Exception e) {
     		logger.error("查询线索信息异常",e);

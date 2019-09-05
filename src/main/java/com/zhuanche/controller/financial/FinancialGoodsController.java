@@ -85,13 +85,14 @@ public class FinancialGoodsController {
 			Byte salesTarget,
 			Integer supplierId,
 			Integer cityId,
-			Byte status
+			Byte status,
+			Byte goodsType
 			) {
 		logger.info("--FinancialGoodsController--方法:queryFinancialGoodsForList--参数:"
 				+ "--page--{},--pageSize--{},--goodsName--{}"
 				+ "--basicsVehiclesId--{},--salesTarget--{},--supplierId--{}"
-				+ "--cityId--{},--status--{}",page,pageSize,goodsName,
-				basicsVehiclesId,salesTarget,supplierId,cityId,status);
+				+ "--cityId--{},--status--{},--goodsType--{}",page,pageSize,goodsName,
+				basicsVehiclesId,salesTarget,supplierId,cityId,status,goodsType);
 		try {
 			SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
 		    
@@ -110,14 +111,14 @@ public class FinancialGoodsController {
 	        }
 			
 			PageDTO pageDTO = financialGoodsService.queryFinancialGoodsForList(page,pageSize,goodsName,
-					basicsVehiclesId,salesTarget,supplierIds,cityIds,status);
+					basicsVehiclesId,salesTarget,supplierIds,cityIds,status,goodsType);
 			return AjaxResponse.success(pageDTO);
 		} catch (Exception e) {
 			logger.error("--FinancialGoodsController--方法:queryFinancialGoodsForList--参数:"
 					+ "--page--{},--pageSize--{},--goodsName--{}"
 					+ "--basicsVehiclesId--{},--salesTarget--{},--supplierId--{}"
-					+ "--cityId--{},--status--{}",page,pageSize,goodsName,
-					basicsVehiclesId,salesTarget,supplierId,cityId,status);
+					+ "--cityId--{},--status--{},--goodsType--{},异常--{}",page,pageSize,goodsName,
+					basicsVehiclesId,salesTarget,supplierId,cityId,status,goodsType,e);
 			return AjaxResponse.fail(RestErrorCode.QUERY_BASICSVEHICLE_ERROR);
 		}
 	}

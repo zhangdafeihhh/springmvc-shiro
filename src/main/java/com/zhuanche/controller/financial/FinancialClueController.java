@@ -62,13 +62,14 @@ public class FinancialClueController {
 			String endDate,
 			@Verify(param = "supplierId", rule = "min(1)")Integer supplierId,
 			@Verify(param = "cityId", rule = "min(1)")Integer cityId,
-			Byte status
+			Byte status,
+			Byte goodsType
 			) {
 		logger.info("--FinancialClueController--方法:queryfinancialClueForList--参数:"
 				+ "--page--{},--pageSize--{},--purposeName--{}"
 				+ "--goodsId--{},--startDate--{},--endDate--{}"
-				+ "--supplierId--{},--cityId--{},--status--{}",page,pageSize,purposeName,
-				goodsId,startDate,endDate,supplierId,cityId,status);
+				+ "--supplierId--{},--cityId--{},--status--{},--goodsType--{}",page,pageSize,purposeName,
+				goodsId,startDate,endDate,supplierId,cityId,status,goodsType);
 		try {
 			
 			SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
@@ -88,14 +89,14 @@ public class FinancialClueController {
 	        }
 			
 			PageDTO pageDTO = financialClueService.queryfinancialClueForList(page,pageSize,purposeName,
-					goodsId,startDate,endDate,supplierIds,cityIds,status);
+					goodsId,startDate,endDate,supplierIds,cityIds,status,goodsType);
 			return AjaxResponse.success(pageDTO);
 		} catch (Exception e) {
 			logger.error("--FinancialClueController--方法:queryfinancialClueForList--参数:"
 					+ "--page--{},--pageSize--{},--purposeName--{}"
 					+ "--goodsId--{},--startDate--{},--endDate--{}"
-					+ "--supplierId--{},--cityId--{},--status--{}",page,pageSize,purposeName,
-					goodsId,startDate,endDate,supplierId,cityId,status);
+					+ "--supplierId--{},--cityId--{},--status--{},--goodsType--{},异常信息--{}",page,pageSize,purposeName,
+					goodsId,startDate,endDate,supplierId,cityId,status,goodsType,e);
 			return AjaxResponse.fail(RestErrorCode.QUERY_BASICSVEHICLE_ERROR);
 		}
 	}

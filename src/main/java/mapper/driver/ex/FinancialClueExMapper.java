@@ -11,6 +11,6 @@ public interface FinancialClueExMapper {
 
 	List<FinancialClueDTO> queryfinancialClueForList(@Param(value = "purposeName") String purposeName,@Param(value = "goodsId") Integer goodsId,
 			@Param(value = "startDate")String startDate,@Param(value = "endDate")String endDate,@Param(value = "supplierIds")Set<Integer> supplierIds,
-			@Param(value = "cityIds")Set<Integer> cityIds,@Param(value = "status") Byte status);
+			@Param(value = "cityIds")Set<Integer> cityIds,@Param(value = "status") Byte status,@Param(value = "goodsType") Byte goodsType);
 	
 }
