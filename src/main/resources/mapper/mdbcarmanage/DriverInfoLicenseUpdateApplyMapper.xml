@@ -52,6 +52,7 @@
     <result column="change_way" property="changeWay" jdbcType="INTEGER" />
     <result column="brand_name" property="brandName" jdbcType="VARCHAR" />
     <result column="model_name" property="modelName" jdbcType="VARCHAR" />
+    <result column="memo" property="memo" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, driver_id, driver_name, driver_phone, license_plates, city_id, city_name, supplier_id, 
@@ -62,7 +63,7 @@
     vehicle_owner, vehicle_registration_date, vehicle_driving_license, vehicle_photo_group, 
     vehicle_owner_new, vehicle_registration_date_new, vehicle_driving_license_new, vehicle_photo_group_new, 
     initiator_type, license_plates_new, car_rent_protocol, frame_no, frame_no_new, change_status, 
-    change_way, brand_name, model_name
+    change_way, brand_name, model_name, memo
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -70,10 +71,6 @@
     from driver_info_license_update_apply
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
-    delete from driver_info_license_update_apply
-    where id = #{id,jdbcType=INTEGER}
-  </delete>
   <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.DriverInfoLicenseUpdateApply" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
       SELECT LAST_INSERT_ID()
@@ -94,8 +91,8 @@
       vehicle_driving_license_new, vehicle_photo_group_new, 
       initiator_type, license_plates_new, car_rent_protocol, 
       frame_no, frame_no_new, change_status, 
-      change_way, brand_name, model_name
-      )
+      change_way, brand_name, model_name, 
+      memo)
     values (#{driverId,jdbcType=INTEGER}, #{driverName,jdbcType=VARCHAR}, #{driverPhone,jdbcType=VARCHAR}, 
       #{licensePlates,jdbcType=VARCHAR}, #{cityId,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR}, 
       #{supplierId,jdbcType=INTEGER}, #{supplierName,jdbcType=VARCHAR}, #{teamId,jdbcType=INTEGER}, 
@@ -112,8 +109,8 @@
       #{vehicleDrivingLicenseNew,jdbcType=VARCHAR}, #{vehiclePhotoGroupNew,jdbcType=VARCHAR}, 
       #{initiatorType,jdbcType=INTEGER}, #{licensePlatesNew,jdbcType=VARCHAR}, #{carRentProtocol,jdbcType=VARCHAR}, 
       #{frameNo,jdbcType=VARCHAR}, #{frameNoNew,jdbcType=VARCHAR}, #{changeStatus,jdbcType=INTEGER}, 
-      #{changeWay,jdbcType=INTEGER}, #{brandName,jdbcType=VARCHAR}, #{modelName,jdbcType=VARCHAR}
-      )
+      #{changeWay,jdbcType=INTEGER}, #{brandName,jdbcType=VARCHAR}, #{modelName,jdbcType=VARCHAR}, 
+      #{memo,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.DriverInfoLicenseUpdateApply" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
@@ -268,6 +265,9 @@
       <if test="modelName != null" >
         model_name,
       </if>
+      <if test="memo != null" >
+        memo,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="driverId != null" >
@@ -416,6 +416,9 @@
       </if>
       <if test="modelName != null" >
         #{modelName,jdbcType=VARCHAR},
+      </if>
+      <if test="memo != null" >
+        #{memo,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -569,6 +572,9 @@
       <if test="modelName != null" >
         model_name = #{modelName,jdbcType=VARCHAR},
       </if>
+      <if test="memo != null" >
+        memo = #{memo,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -622,7 +628,8 @@
       change_status = #{changeStatus,jdbcType=INTEGER},
       change_way = #{changeWay,jdbcType=INTEGER},
       brand_name = #{brandName,jdbcType=VARCHAR},
-      model_name = #{modelName,jdbcType=VARCHAR}
+      model_name = #{modelName,jdbcType=VARCHAR},
+      memo = #{memo,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

@@ -258,6 +258,8 @@ public class DriverInfoLicenseUpdateApplyDTO extends Base {
      */
     private String modelName;
 
+    private String memo;
+
     private String createDateBegin;
     private String createDateEnd;
 
@@ -687,5 +689,13 @@ public class DriverInfoLicenseUpdateApplyDTO extends Base {
 
     public void setCreateDateEnd(String createDateEnd) {
         this.createDateEnd = createDateEnd;
+    }
+
+    public String getMemo() {
+        return memo;
+    }
+
+    public void setMemo(String memo) {
+        this.memo = memo == null ? null : memo.trim();
     }
 }

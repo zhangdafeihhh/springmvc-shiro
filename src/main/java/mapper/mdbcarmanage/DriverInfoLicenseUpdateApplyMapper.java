@@ -3,8 +3,6 @@ package mapper.mdbcarmanage;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoLicenseUpdateApply;
 
 public interface DriverInfoLicenseUpdateApplyMapper {
-    int deleteByPrimaryKey(Integer id);
-
     int insert(DriverInfoLicenseUpdateApply record);
 
     int insertSelective(DriverInfoLicenseUpdateApply record);

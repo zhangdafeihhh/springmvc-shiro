@@ -249,6 +249,8 @@ public class DriverInfoLicenseUpdateApply {
      */
     private String modelName;
 
+    private String memo;
+
     public Integer getId() {
         return id;
     }
@@ -647,5 +649,13 @@ public class DriverInfoLicenseUpdateApply {
 
     public void setModelName(String modelName) {
         this.modelName = modelName == null ? null : modelName.trim();
+    }
+
+    public String getMemo() {
+        return memo;
+    }
+
+    public void setMemo(String memo) {
+        this.memo = memo == null ? null : memo.trim();
     }
 }

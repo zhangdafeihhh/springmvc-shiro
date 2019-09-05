@@ -52,6 +52,7 @@
     <result column="change_way" property="changeWay" jdbcType="INTEGER" />
     <result column="brand_name" property="brandName" jdbcType="VARCHAR" />
     <result column="model_name" property="modelName" jdbcType="VARCHAR" />
+    <result column="memo" property="memo" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, driver_id, driver_name, driver_phone, license_plates, city_id, city_name, supplier_id,
@@ -62,7 +63,7 @@
     vehicle_owner, vehicle_registration_date, vehicle_driving_license, vehicle_photo_group,
     vehicle_owner_new, vehicle_registration_date_new, vehicle_driving_license_new, vehicle_photo_group_new,
     initiator_type, license_plates_new, car_rent_protocol, frame_no, frame_no_new, change_status,
-    change_way, brand_name, model_name
+    change_way, brand_name, model_name, memo
   </sql>
   <!-- mapper基础标准: 当前表所有字段查询条件集 -->
   <sql id="allBaseColumnWhereList" >
