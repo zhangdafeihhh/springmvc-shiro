@@ -12,8 +12,8 @@ import lombok.Getter;
  */
 @Getter
 public enum AdditionalServicesEnum implements IndexedEnum{
-	COMPULSORY_INSURANCE(1,"包交强险"),
-	BUSINESS_INSURANCE(2,"包商业险"),
+	COMPULSORY_INSURANCE(1,"交强险"),
+	BUSINESS_INSURANCE(2,"商业险"),
 	DAILY_MAINTENANCE(3,"包日常保养"),
 	MAINTENANCE(4,"包维修"),
 	LICENSE_PLATE(5,"包上牌"),
