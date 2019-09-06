@@ -22,7 +22,7 @@ public enum MileageEnum implements IndexedEnum{
 	Mileage2(3,"10000～20000公里"),
 	Mileage3(4,"20000～100000公里"),
 	Mileage4(5,"100000公里以上"),
-	Mileage5(6,"0-20000公里以上");
+	Mileage5(6,"0～20000公里");
     private int index;
     private String mileage;
     

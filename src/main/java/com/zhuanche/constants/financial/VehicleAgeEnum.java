@@ -23,7 +23,7 @@ public enum VehicleAgeEnum implements IndexedEnum{
 	VEHICLEAGE3(4,"12～24个月"),
 	VEHICLEAGE4(5,"24～36个月"),
 	VEHICLEAGE5(6,"36个月以上"),
-	VEHICLEAGE6(7,"0~3年以上");
+	VEHICLEAGE6(7,"0~3年");
     private int index;
     private String vehicleAge;
     
