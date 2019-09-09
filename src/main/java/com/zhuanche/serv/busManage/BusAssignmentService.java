@@ -805,7 +805,7 @@ public class BusAssignmentService {
             int code = result.getIntValue("code");
             String msg = result.getString("msg");
             if (code != 0) {
-                logger.error("[ BusAssignmentService-queryBusinessInfoBatch ] 批量查询企业信息,错误码:{},错误原因:{}", code, msg);
+                logger.info("[ BusAssignmentService-queryBusinessInfoBatch ] 批量查询企业信息,错误码:{},错误原因:{}", code, msg);
                 return null;
             }
             JSONArray jsonArray = result.getJSONArray("data");
