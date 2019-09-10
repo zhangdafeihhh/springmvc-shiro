@@ -1,5 +1,6 @@
 package com.zhuanche.controller.driverjoin;
 
+import com.google.common.collect.Maps;
 import com.zhuanche.common.web.RequestFunction;
 import org.apache.http.HttpException;
 import org.slf4j.Logger;
@@ -14,6 +15,8 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.http.HttpClientUtil;
+
+import java.util.Map;
 
 import static com.zhuanche.common.enums.MenuEnum.DRIVER_JOIN_PROMOTE_INVITE;
 
@@ -43,16 +46,27 @@ public class DriverInvitationController {
 	@RequestFunction(menu = DRIVER_JOIN_PROMOTE_INVITE)
 	public AjaxResponse makeShortUrl(@Verify(param="supplierId", rule = "required")String supplierId){
 		logger.info("供应商短链接生成,supplierId="+supplierId);
-        String url = DRIVER_JOIN_URL+supplierId;
-		String shortUrl  = null;
+		JSONArray parseArray = null;
 		try {
-			shortUrl = HttpClientUtil.buildGetRequest(SINA_API + url).setLimitResult(1).execute();
-			logger.info("供应商短链接生成,supplierId={},result={}",supplierId,shortUrl);
-		} catch (HttpException e) {
-			logger.error("供应商短链接生成异常",e);
-			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-		}
-		JSONArray parseArray = JSON.parseArray((shortUrl));
+			String url = DRIVER_JOIN_URL+supplierId;
+			String shortUrl  = null;
+			try {
+                shortUrl = HttpClientUtil.buildGetRequest(SINA_API + url).setLimitResult(1).execute();
+                logger.info("供应商短链接生成,supplierId={},result={}",supplierId,shortUrl);
+            } catch (HttpException e) {
+                logger.error("供应商短链接生成异常",e);
+                return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+            }
+			parseArray = JSON.parseArray((shortUrl));
+		} catch (Exception e) {
+			logger.info("地址生成失败");
+			parseArray = new JSONArray();
+			Map<String,Object> map = Maps.newHashMap();
+			map.put("url_long",DRIVER_JOIN_URL+supplierId);
+			map.put("type",0);
+			parseArray.add(map);
+			logger.info("连接地址生成失败，重新生成：" + parseArray);
+ 		}
 		return AjaxResponse.success(parseArray);
 	}
 }
