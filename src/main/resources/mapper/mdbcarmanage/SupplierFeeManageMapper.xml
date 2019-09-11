@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.SupplierFeeManageMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.SupplierFeeManage" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="fee_order_no" property="feeOrderNo" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="settle_start_date" property="settleStartDate" jdbcType="TIMESTAMP" />
+    <result column="settle_end_date" property="settleEndDate" jdbcType="TIMESTAMP" />
+    <result column="total_flow" property="totalFlow" jdbcType="VARCHAR" />
+    <result column="flow_amount" property="flowAmount" jdbcType="VARCHAR" />
+    <result column="wind_control_amount" property="windControlAmount" jdbcType="VARCHAR" />
+    <result column="extra_charge" property="extraCharge" jdbcType="VARCHAR" />
+    <result column="cancel_charge" property="cancelCharge" jdbcType="VARCHAR" />
+    <result column="total_amount_water" property="totalAmountWater" jdbcType="VARCHAR" />
+    <result column="scale_efficient" property="scaleEfficient" jdbcType="VARCHAR" />
+    <result column="total_flow_last_month" property="totalFlowLastMonth" jdbcType="VARCHAR" />
+    <result column="flow_increase" property="flowIncrease" jdbcType="VARCHAR" />
+    <result column="growth_factor" property="growthFactor" jdbcType="VARCHAR" />
+    <result column="bad_ratings" property="badRatings" jdbcType="VARCHAR" />
+    <result column="month_commission" property="monthCommission" jdbcType="VARCHAR" />
+    <result column="exclude_commission" property="excludeCommission" jdbcType="VARCHAR" />
+    <result column="deduction_amount_last_month" property="deductionAmountLastMonth" jdbcType="VARCHAR" />
+    <result column="total" property="total" jdbcType="VARCHAR" />
+    <result column="compliance_driver_award" property="complianceDriverAward" jdbcType="VARCHAR" />
+    <result column="others" property="others" jdbcType="VARCHAR" />
+    <result column="bad_ratings_award" property="badRatingsAward" jdbcType="VARCHAR" />
+    <result column="amount_assessment_sum" property="amountAssessmentSum" jdbcType="VARCHAR" />
+    <result column="inspection_fines" property="inspectionFines" jdbcType="VARCHAR" />
+    <result column="total_manage_fees" property="totalManageFees" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="amount_status" property="amountStatus" jdbcType="INTEGER" />
+    <result column="payment_time" property="paymentTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="create_user" property="createUser" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, fee_order_no, city_id, supplier_name, supplier_id, settle_start_date, settle_end_date, 
+    total_flow, flow_amount, wind_control_amount, extra_charge, cancel_charge, total_amount_water, 
+    scale_efficient, total_flow_last_month, flow_increase, growth_factor, bad_ratings, 
+    month_commission, exclude_commission, deduction_amount_last_month, total, compliance_driver_award, 
+    others, bad_ratings_award, amount_assessment_sum, inspection_fines, total_manage_fees, 
+    status, amount_status, payment_time, create_time, update_time, create_user
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from supplier_fee_manage
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.SupplierFeeManage" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into supplier_fee_manage (fee_order_no, city_id, supplier_name, 
+      supplier_id, settle_start_date, settle_end_date, 
+      total_flow, flow_amount, wind_control_amount, 
+      extra_charge, cancel_charge, total_amount_water, 
+      scale_efficient, total_flow_last_month, flow_increase, 
+      growth_factor, bad_ratings, month_commission, 
+      exclude_commission, deduction_amount_last_month, 
+      total, compliance_driver_award, others, 
+      bad_ratings_award, amount_assessment_sum, inspection_fines, 
+      total_manage_fees, status, amount_status, 
+      payment_time, create_time, update_time, 
+      create_user)
+    values (#{feeOrderNo,jdbcType=VARCHAR}, #{cityId,jdbcType=INTEGER}, #{supplierName,jdbcType=VARCHAR}, 
+      #{supplierId,jdbcType=INTEGER}, #{settleStartDate,jdbcType=TIMESTAMP}, #{settleEndDate,jdbcType=TIMESTAMP}, 
+      #{totalFlow,jdbcType=VARCHAR}, #{flowAmount,jdbcType=VARCHAR}, #{windControlAmount,jdbcType=VARCHAR}, 
+      #{extraCharge,jdbcType=VARCHAR}, #{cancelCharge,jdbcType=VARCHAR}, #{totalAmountWater,jdbcType=VARCHAR}, 
+      #{scaleEfficient,jdbcType=VARCHAR}, #{totalFlowLastMonth,jdbcType=VARCHAR}, #{flowIncrease,jdbcType=VARCHAR}, 
+      #{growthFactor,jdbcType=VARCHAR}, #{badRatings,jdbcType=VARCHAR}, #{monthCommission,jdbcType=VARCHAR}, 
+      #{excludeCommission,jdbcType=VARCHAR}, #{deductionAmountLastMonth,jdbcType=VARCHAR}, 
+      #{total,jdbcType=VARCHAR}, #{complianceDriverAward,jdbcType=VARCHAR}, #{others,jdbcType=VARCHAR}, 
+      #{badRatingsAward,jdbcType=VARCHAR}, #{amountAssessmentSum,jdbcType=VARCHAR}, #{inspectionFines,jdbcType=VARCHAR}, 
+      #{totalManageFees,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{amountStatus,jdbcType=INTEGER}, 
+      #{paymentTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{createUser,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.SupplierFeeManage" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into supplier_fee_manage
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="feeOrderNo != null" >
+        fee_order_no,
+      </if>
+      <if test="cityId != null" >
+        city_id,
+      </if>
+      <if test="supplierName != null" >
+        supplier_name,
+      </if>
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="settleStartDate != null" >
+        settle_start_date,
+      </if>
+      <if test="settleEndDate != null" >
+        settle_end_date,
+      </if>
+      <if test="totalFlow != null" >
+        total_flow,
+      </if>
+      <if test="flowAmount != null" >
+        flow_amount,
+      </if>
+      <if test="windControlAmount != null" >
+        wind_control_amount,
+      </if>
+      <if test="extraCharge != null" >
+        extra_charge,
+      </if>
+      <if test="cancelCharge != null" >
+        cancel_charge,
+      </if>
+      <if test="totalAmountWater != null" >
+        total_amount_water,
+      </if>
+      <if test="scaleEfficient != null" >
+        scale_efficient,
+      </if>
+      <if test="totalFlowLastMonth != null" >
+        total_flow_last_month,
+      </if>
+      <if test="flowIncrease != null" >
+        flow_increase,
+      </if>
+      <if test="growthFactor != null" >
+        growth_factor,
+      </if>
+      <if test="badRatings != null" >
+        bad_ratings,
+      </if>
+      <if test="monthCommission != null" >
+        month_commission,
+      </if>
+      <if test="excludeCommission != null" >
+        exclude_commission,
+      </if>
+      <if test="deductionAmountLastMonth != null" >
+        deduction_amount_last_month,
+      </if>
+      <if test="total != null" >
+        total,
+      </if>
+      <if test="complianceDriverAward != null" >
+        compliance_driver_award,
+      </if>
+      <if test="others != null" >
+        others,
+      </if>
+      <if test="badRatingsAward != null" >
+        bad_ratings_award,
+      </if>
+      <if test="amountAssessmentSum != null" >
+        amount_assessment_sum,
+      </if>
+      <if test="inspectionFines != null" >
+        inspection_fines,
+      </if>
+      <if test="totalManageFees != null" >
+        total_manage_fees,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="amountStatus != null" >
+        amount_status,
+      </if>
+      <if test="paymentTime != null" >
+        payment_time,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="createUser != null" >
+        create_user,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="feeOrderNo != null" >
+        #{feeOrderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierName != null" >
+        #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="settleStartDate != null" >
+        #{settleStartDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="settleEndDate != null" >
+        #{settleEndDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="totalFlow != null" >
+        #{totalFlow,jdbcType=VARCHAR},
+      </if>
+      <if test="flowAmount != null" >
+        #{flowAmount,jdbcType=VARCHAR},
+      </if>
+      <if test="windControlAmount != null" >
+        #{windControlAmount,jdbcType=VARCHAR},
+      </if>
+      <if test="extraCharge != null" >
+        #{extraCharge,jdbcType=VARCHAR},
+      </if>
+      <if test="cancelCharge != null" >
+        #{cancelCharge,jdbcType=VARCHAR},
+      </if>
+      <if test="totalAmountWater != null" >
+        #{totalAmountWater,jdbcType=VARCHAR},
+      </if>
+      <if test="scaleEfficient != null" >
+        #{scaleEfficient,jdbcType=VARCHAR},
+      </if>
+      <if test="totalFlowLastMonth != null" >
+        #{totalFlowLastMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="flowIncrease != null" >
+        #{flowIncrease,jdbcType=VARCHAR},
+      </if>
+      <if test="growthFactor != null" >
+        #{growthFactor,jdbcType=VARCHAR},
+      </if>
+      <if test="badRatings != null" >
+        #{badRatings,jdbcType=VARCHAR},
+      </if>
+      <if test="monthCommission != null" >
+        #{monthCommission,jdbcType=VARCHAR},
+      </if>
+      <if test="excludeCommission != null" >
+        #{excludeCommission,jdbcType=VARCHAR},
+      </if>
+      <if test="deductionAmountLastMonth != null" >
+        #{deductionAmountLastMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="total != null" >
+        #{total,jdbcType=VARCHAR},
+      </if>
+      <if test="complianceDriverAward != null" >
+        #{complianceDriverAward,jdbcType=VARCHAR},
+      </if>
+      <if test="others != null" >
+        #{others,jdbcType=VARCHAR},
+      </if>
+      <if test="badRatingsAward != null" >
+        #{badRatingsAward,jdbcType=VARCHAR},
+      </if>
+      <if test="amountAssessmentSum != null" >
+        #{amountAssessmentSum,jdbcType=VARCHAR},
+      </if>
+      <if test="inspectionFines != null" >
+        #{inspectionFines,jdbcType=VARCHAR},
+      </if>
+      <if test="totalManageFees != null" >
+        #{totalManageFees,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="amountStatus != null" >
+        #{amountStatus,jdbcType=INTEGER},
+      </if>
+      <if test="paymentTime != null" >
+        #{paymentTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUser != null" >
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.mdbcarmanage.SupplierFeeManage" >
+    update supplier_fee_manage
+    <set >
+      <if test="feeOrderNo != null" >
+        fee_order_no = #{feeOrderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierName != null" >
+        supplier_name = #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="settleStartDate != null" >
+        settle_start_date = #{settleStartDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="settleEndDate != null" >
+        settle_end_date = #{settleEndDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="totalFlow != null" >
+        total_flow = #{totalFlow,jdbcType=VARCHAR},
+      </if>
+      <if test="flowAmount != null" >
+        flow_amount = #{flowAmount,jdbcType=VARCHAR},
+      </if>
+      <if test="windControlAmount != null" >
+        wind_control_amount = #{windControlAmount,jdbcType=VARCHAR},
+      </if>
+      <if test="extraCharge != null" >
+        extra_charge = #{extraCharge,jdbcType=VARCHAR},
+      </if>
+      <if test="cancelCharge != null" >
+        cancel_charge = #{cancelCharge,jdbcType=VARCHAR},
+      </if>
+      <if test="totalAmountWater != null" >
+        total_amount_water = #{totalAmountWater,jdbcType=VARCHAR},
+      </if>
+      <if test="scaleEfficient != null" >
+        scale_efficient = #{scaleEfficient,jdbcType=VARCHAR},
+      </if>
+      <if test="totalFlowLastMonth != null" >
+        total_flow_last_month = #{totalFlowLastMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="flowIncrease != null" >
+        flow_increase = #{flowIncrease,jdbcType=VARCHAR},
+      </if>
+      <if test="growthFactor != null" >
+        growth_factor = #{growthFactor,jdbcType=VARCHAR},
+      </if>
+      <if test="badRatings != null" >
+        bad_ratings = #{badRatings,jdbcType=VARCHAR},
+      </if>
+      <if test="monthCommission != null" >
+        month_commission = #{monthCommission,jdbcType=VARCHAR},
+      </if>
+      <if test="excludeCommission != null" >
+        exclude_commission = #{excludeCommission,jdbcType=VARCHAR},
+      </if>
+      <if test="deductionAmountLastMonth != null" >
+        deduction_amount_last_month = #{deductionAmountLastMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="total != null" >
+        total = #{total,jdbcType=VARCHAR},
+      </if>
+      <if test="complianceDriverAward != null" >
+        compliance_driver_award = #{complianceDriverAward,jdbcType=VARCHAR},
+      </if>
+      <if test="others != null" >
+        others = #{others,jdbcType=VARCHAR},
+      </if>
+      <if test="badRatingsAward != null" >
+        bad_ratings_award = #{badRatingsAward,jdbcType=VARCHAR},
+      </if>
+      <if test="amountAssessmentSum != null" >
+        amount_assessment_sum = #{amountAssessmentSum,jdbcType=VARCHAR},
+      </if>
+      <if test="inspectionFines != null" >
+        inspection_fines = #{inspectionFines,jdbcType=VARCHAR},
+      </if>
+      <if test="totalManageFees != null" >
+        total_manage_fees = #{totalManageFees,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="amountStatus != null" >
+        amount_status = #{amountStatus,jdbcType=INTEGER},
+      </if>
+      <if test="paymentTime != null" >
+        payment_time = #{paymentTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUser != null" >
+        create_user = #{createUser,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.SupplierFeeManage" >
+    update supplier_fee_manage
+    set fee_order_no = #{feeOrderNo,jdbcType=VARCHAR},
+      city_id = #{cityId,jdbcType=INTEGER},
+      supplier_name = #{supplierName,jdbcType=VARCHAR},
+      supplier_id = #{supplierId,jdbcType=INTEGER},
+      settle_start_date = #{settleStartDate,jdbcType=TIMESTAMP},
+      settle_end_date = #{settleEndDate,jdbcType=TIMESTAMP},
+      total_flow = #{totalFlow,jdbcType=VARCHAR},
+      flow_amount = #{flowAmount,jdbcType=VARCHAR},
+      wind_control_amount = #{windControlAmount,jdbcType=VARCHAR},
+      extra_charge = #{extraCharge,jdbcType=VARCHAR},
+      cancel_charge = #{cancelCharge,jdbcType=VARCHAR},
+      total_amount_water = #{totalAmountWater,jdbcType=VARCHAR},
+      scale_efficient = #{scaleEfficient,jdbcType=VARCHAR},
+      total_flow_last_month = #{totalFlowLastMonth,jdbcType=VARCHAR},
+      flow_increase = #{flowIncrease,jdbcType=VARCHAR},
+      growth_factor = #{growthFactor,jdbcType=VARCHAR},
+      bad_ratings = #{badRatings,jdbcType=VARCHAR},
+      month_commission = #{monthCommission,jdbcType=VARCHAR},
+      exclude_commission = #{excludeCommission,jdbcType=VARCHAR},
+      deduction_amount_last_month = #{deductionAmountLastMonth,jdbcType=VARCHAR},
+      total = #{total,jdbcType=VARCHAR},
+      compliance_driver_award = #{complianceDriverAward,jdbcType=VARCHAR},
+      others = #{others,jdbcType=VARCHAR},
+      bad_ratings_award = #{badRatingsAward,jdbcType=VARCHAR},
+      amount_assessment_sum = #{amountAssessmentSum,jdbcType=VARCHAR},
+      inspection_fines = #{inspectionFines,jdbcType=VARCHAR},
+      total_manage_fees = #{totalManageFees,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      amount_status = #{amountStatus,jdbcType=INTEGER},
+      payment_time = #{paymentTime,jdbcType=TIMESTAMP},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      create_user = #{createUser,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
