@@ -37,6 +37,9 @@ public class DriverInvitationController {
 
 	/**司机加盟注册链接**/
 	private static final String DRIVER_JOIN_URL = "https://monline.01zhuanche.com/driverRegister/register.html?source=supplier-invite%26supplier=";
+	/**司机加盟**/
+	private static final String DRIVER_JOIN_URL_LONG = "https://monline.01zhuanche.com/driverRegister/register.html?source=supplier-invite&supplier=";
+
 	/**SINA提供短链接生成服务**/
 	private static final String SINA_API = "http://api.t.sina.com.cn/short_url/shorten.json?source=1681459862&url_long=";
 	
@@ -62,7 +65,7 @@ public class DriverInvitationController {
 			logger.info("地址生成失败");
 			parseArray = new JSONArray();
 			Map<String,Object> map = Maps.newHashMap();
-			map.put("url_long",DRIVER_JOIN_URL+supplierId);
+			map.put("url_long",DRIVER_JOIN_URL_LONG+supplierId);
 			map.put("type",0);
 			parseArray.add(map);
 			logger.info("连接地址生成失败，重新生成：" + parseArray);
