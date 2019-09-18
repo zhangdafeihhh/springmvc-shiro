@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="mapper.mdbcarmanage.ex.SupplierFeeRecordExMapper" >
+<mapper namespace="mapper.mdbcarmanage.ex.SupplierFeeManageExMapper" >
   <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.SupplierFeeManage" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="fee_order_no" property="feeOrderNo" jdbcType="VARCHAR" />
@@ -47,7 +47,7 @@
   </sql>
 
 
-  <select id="feeManageList" resultMap="BaseResultMap" parameterType="com.zhuanche.entity.mdbcarmanage.dtos.SupplierFeeManageDTO" >
+  <select id="feeManageList" resultMap="BaseResultMap" parameterType="com.zhuanche.dto.mdbcarmanage.SupplierFeeManageDto" >
     select
     id,
     fee_order_no,
@@ -88,16 +88,16 @@
     LEFT JOIN car_biz_city c  ON t.city_id = c.city_id
     where 1=1
     <if test="cityId != null and cityId != ''" >
-      AND  city_id = #{cityId}
+      AND  t.city_id = #{cityId}
     </if>
     <if test="supplierId != null" >
-      AND  supplier_id = #{supplierId}
+      AND  t.supplier_id = #{supplierId}
     </if>
     <if test="status != null" >
-      AND  status = #{status}
+      AND  t.status = #{status}
     </if>
     <if test="amountStatus != null" >
-      AND  amount_status = #{amountStatus}
+      AND  t.amount_status = #{amountStatus}
     </if>
 
     <if test="settleStartDate != null and settleStartDate != ''" >
@@ -114,5 +114,14 @@
       <![CDATA[ and payment_time <= STR_TO_DATE(#{paymentEndTime},"%Y-%m-%d") ]]>
     </if>
 
+  </select>
+
+
+
+  <select id="feeOrderDetail" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from supplier_fee_manage
+    where fee_order_no = #{feeOrderNo,jdbcType=INTEGER}
   </select>
 </mapper>

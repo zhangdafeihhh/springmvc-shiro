@@ -2,7 +2,7 @@ package com.zhuanche.serv.mdbcarmanage.service.impl;
 
 import com.zhuanche.dto.mdbcarmanage.SupplierFeeManageDto;
 import com.zhuanche.entity.mdbcarmanage.SupplierFeeManage;
-import com.zhuanche.serv.mdbcarmanage.SupplierFeeService;
+import com.zhuanche.serv.mdbcarmanage.service.SupplierFeeService;
 import mapper.mdbcarmanage.ex.SupplierFeeManageExMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ import java.util.List;
  * @Version 1.0
  */
 @Service
-public class SupplierFeeServiceImpl implements SupplierFeeService{
+public class SupplierFeeServiceImpl implements SupplierFeeService {
 
     @Autowired
     private SupplierFeeManageExMapper exMapper;

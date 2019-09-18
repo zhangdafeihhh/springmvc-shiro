@@ -1,19 +1,14 @@
 package mapper.mdbcarmanage.ex;
 
 import com.zhuanche.entity.mdbcarmanage.SupplierFeeRecord;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 public interface SupplierFeeRecordExMapper {
+
     int insertFeeRecord(SupplierFeeRecord record);
 
-    List<SupplierFeeRecord> listRecord(String feeOrderNo);
+    List<SupplierFeeRecord> listRecord(@Param("feeOrderNo") String feeOrderNo);
 
-    int insertSelective(SupplierFeeRecord record);
-
-    SupplierFeeRecord selectByPrimaryKey(Integer id);
-
-    int updateByPrimaryKeySelective(SupplierFeeRecord record);
-
-    int updateByPrimaryKey(SupplierFeeRecord record);
 }

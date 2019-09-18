@@ -22,6 +22,10 @@ public class SupplierFeeManageDto {
 
     private Integer amountStatus;
 
+    private String paymentStartTime;
+
+    private String paymentEndTime;
+
     public String getFeeOrderNo() {
         return feeOrderNo;
     }
@@ -92,5 +96,21 @@ public class SupplierFeeManageDto {
 
     public void setAmountStatus(Integer amountStatus) {
         this.amountStatus = amountStatus;
+    }
+
+    public String getPaymentStartTime() {
+        return paymentStartTime;
+    }
+
+    public void setPaymentStartTime(String paymentStartTime) {
+        this.paymentStartTime = paymentStartTime;
+    }
+
+    public String getPaymentEndTime() {
+        return paymentEndTime;
+    }
+
+    public void setPaymentEndTime(String paymentEndTime) {
+        this.paymentEndTime = paymentEndTime;
     }
 }

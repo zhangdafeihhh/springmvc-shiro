@@ -17,13 +17,6 @@
     id, operate, operate_user, operate_id, remark, fee_order_no, status, supplier_address, 
     create_time, update_time
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select 
-    <include refid="Base_Column_List" />
-    from supplier_fee_record
-    where id = #{id,jdbcType=INTEGER}
-  </select>
-
   <select id="listRecord" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
     <include refid="Base_Column_List" />
@@ -45,114 +38,5 @@
       #{supplierAddress,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.SupplierFeeRecord" >
-    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
-      SELECT LAST_INSERT_ID()
-    </selectKey>
-    insert into supplier_fee_record
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="operate != null" >
-        operate,
-      </if>
-      <if test="operateUser != null" >
-        operate_user,
-      </if>
-      <if test="operateId != null" >
-        operate_id,
-      </if>
-      <if test="remark != null" >
-        remark,
-      </if>
-      <if test="feeOrderNo != null" >
-        fee_order_no,
-      </if>
-      <if test="status != null" >
-        status,
-      </if>
-      <if test="supplierAddress != null" >
-        supplier_address,
-      </if>
-      <if test="createTime != null" >
-        create_time,
-      </if>
-      <if test="updateTime != null" >
-        update_time,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="operate != null" >
-        #{operate,jdbcType=VARCHAR},
-      </if>
-      <if test="operateUser != null" >
-        #{operateUser,jdbcType=VARCHAR},
-      </if>
-      <if test="operateId != null" >
-        #{operateId,jdbcType=INTEGER},
-      </if>
-      <if test="remark != null" >
-        #{remark,jdbcType=VARCHAR},
-      </if>
-      <if test="feeOrderNo != null" >
-        #{feeOrderNo,jdbcType=VARCHAR},
-      </if>
-      <if test="status != null" >
-        #{status,jdbcType=INTEGER},
-      </if>
-      <if test="supplierAddress != null" >
-        #{supplierAddress,jdbcType=VARCHAR},
-      </if>
-      <if test="createTime != null" >
-        #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateTime != null" >
-        #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.mdbcarmanage.SupplierFeeRecord" >
-    update supplier_fee_record
-    <set >
-      <if test="operate != null" >
-        operate = #{operate,jdbcType=VARCHAR},
-      </if>
-      <if test="operateUser != null" >
-        operate_user = #{operateUser,jdbcType=VARCHAR},
-      </if>
-      <if test="operateId != null" >
-        operate_id = #{operateId,jdbcType=INTEGER},
-      </if>
-      <if test="remark != null" >
-        remark = #{remark,jdbcType=VARCHAR},
-      </if>
-      <if test="feeOrderNo != null" >
-        fee_order_no = #{feeOrderNo,jdbcType=VARCHAR},
-      </if>
-      <if test="status != null" >
-        status = #{status,jdbcType=INTEGER},
-      </if>
-      <if test="supplierAddress != null" >
-        supplier_address = #{supplierAddress,jdbcType=VARCHAR},
-      </if>
-      <if test="createTime != null" >
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateTime != null" >
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-    </set>
-    where id = #{id,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.SupplierFeeRecord" >
-    update supplier_fee_record
-    set operate = #{operate,jdbcType=VARCHAR},
-      operate_user = #{operateUser,jdbcType=VARCHAR},
-      operate_id = #{operateId,jdbcType=INTEGER},
-      remark = #{remark,jdbcType=VARCHAR},
-      fee_order_no = #{feeOrderNo,jdbcType=VARCHAR},
-      status = #{status,jdbcType=INTEGER},
-      supplier_address = #{supplierAddress,jdbcType=VARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
-    where id = #{id,jdbcType=INTEGER}
-  </update>
+
 </mapper>
