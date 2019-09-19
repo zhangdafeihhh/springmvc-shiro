@@ -230,9 +230,9 @@ public class SupplierFeeController {
             //每栏的值 注意行数要和上面的对应要不然导出的pdf显示不出来。如果要显示多行
             PdfPCell cell1 = new PdfPCell(new Paragraph(manage.getSupplierName(),topfont));
             table1.addCell(cell1);
-            PdfPCell cell2= new PdfPCell(new Paragraph(DateUtils.formatDate(manage.getSettleStartDate()),topfont));
+            PdfPCell cell2= new PdfPCell(new Paragraph(DateUtils.formatDate(manage.getSettleStartDate(),DateUtils.dateTimeFormat_parttern),topfont));
             table1.addCell(cell2);
-            PdfPCell cell3= new PdfPCell(new Paragraph(DateUtils.formatDate(manage.getSettleEndDate()),topfont));
+            PdfPCell cell3= new PdfPCell(new Paragraph(DateUtils.formatDate(manage.getSettleEndDate(),DateUtils.dateTimeFormat_parttern),topfont));
             table1.addCell(cell3);
             PdfPCell cell4= new PdfPCell(new Paragraph(manage.getTotalFlow(),topfont));
             table1.addCell(cell4);

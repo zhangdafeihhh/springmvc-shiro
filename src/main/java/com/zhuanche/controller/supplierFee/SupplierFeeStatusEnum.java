@@ -8,7 +8,7 @@ package com.zhuanche.controller.supplierFee;
  */
 public enum SupplierFeeStatusEnum {
 
-    NORMAL(1,"金额确认"),
+    NORMAL(1,"金额正常"),
     UNNORMAL(2,"金额异议");
 
     private int code;
