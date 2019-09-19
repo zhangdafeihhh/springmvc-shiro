@@ -2,18 +2,13 @@ package com.zhuanche.controller.supplierFee;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-/*import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Phrase;*/
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
-import com.zhuanche.common.securityLog.SensitiveDataOperationLog;
 import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.mdbcarmanage.SupplierFeeManageDetailDto;
@@ -24,32 +19,23 @@ import com.zhuanche.serv.mdbcarmanage.service.SupplierFeeRecordService;
 import com.zhuanche.serv.mdbcarmanage.service.SupplierFeeService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.DateUtils;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
-
-import static com.zhuanche.common.enums.MenuEnum.DRIVER_JOIN_PROMOTE_LIST;
 
 /**
  * @Author fanht
@@ -84,20 +70,26 @@ public class SupplierFeeController {
                                          Integer cityId, Integer supplierId,
                                         Integer status, Integer amountStatus, String settleStartDate,
                                         String settleEndDate,String paymentStartTime,String paymentEndTime){
-        logger.info(MessageFormat.format("查询司机线上化入参:pageSize:%s,pageNum:%s,cityId:%s,supplierId:%s,status:%s," +
-                "amountStatus:%s,settleStartDate:%s,settleEndDate:%s,paymentStartTime:%s,paymentEndTime:%s",pageSize,
+        logger.info(MessageFormat.format("查询司机线上化入参:pageSize:%s,pageNum:{0},cityId:{1},supplierId:{2},status:{3}," +
+                "amountStatus:{4},settleStartDate:{5},settleEndDate:{6},paymentStartTime:{7},paymentEndTime:{8}",pageSize,
                 pageNum,cityId,supplierId,status,amountStatus,settleStartDate,settleEndDate,paymentStartTime,paymentEndTime));
 
-        SupplierFeeManageDto feeManageDto = new SupplierFeeManageDto();
-        feeManageDto.setCityId(cityId);
-        feeManageDto.setSettleStartDate(settleStartDate);
-        feeManageDto.setSettleEndDate(settleEndDate);
-        feeManageDto.setAmountStatus(amountStatus);
-        feeManageDto.setStatus(status);
-        Page page = PageHelper.startPage(pageNum,pageSize);
-        List<SupplierFeeManage> feeManageList = supplierFeeService.queryListData(feeManageDto);
-        PageHelper.clearPage();
-        PageDTO pageDTO = new PageDTO(pageNum, pageSize, page.getTotal(), feeManageList);
+        PageDTO pageDTO = null;
+        try {
+            SupplierFeeManageDto feeManageDto = new SupplierFeeManageDto();
+            feeManageDto.setCityId(cityId);
+            feeManageDto.setSettleStartDate(settleStartDate);
+            feeManageDto.setSettleEndDate(settleEndDate);
+            feeManageDto.setAmountStatus(amountStatus);
+            feeManageDto.setStatus(status);
+            Page page = PageHelper.startPage(pageNum,pageSize);
+            List<SupplierFeeManage> feeManageList = supplierFeeService.queryListData(feeManageDto);
+            PageHelper.clearPage();
+            pageDTO = new PageDTO(pageNum, pageSize, page.getTotal(), feeManageList);
+        } catch (Exception e) {
+            logger.error("查询司机参数化失败",e);
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+        }
         return AjaxResponse.success(pageDTO);
     }
 
@@ -114,16 +106,22 @@ public class SupplierFeeController {
     } )
     public AjaxResponse supplierFeeDetail(@Verify(param = "feeOrderNo",rule = "required") String feeOrderNo){
 
-        logger.info("获取详情接口入参:" + feeOrderNo);
+        logger.info("获取加盟商线上化详情接口入参:" + feeOrderNo);
 
-        SupplierFeeManage supplierFeeManage = supplierFeeService.queryByOrderNo(feeOrderNo);
-        SupplierFeeManageDetailDto detailDto = new SupplierFeeManageDetailDto();
-        if(supplierFeeManage!=null){
-            BeanUtils.copyProperties(supplierFeeManage,detailDto);
-            List<SupplierFeeRecord> recordList = recordService.listRecord(feeOrderNo);
-            if(CollectionUtils.isNotEmpty(recordList)){
-                detailDto.setSupplierFeeRecordList(recordList);
+        SupplierFeeManageDetailDto detailDto = null;
+        try {
+            SupplierFeeManage supplierFeeManage = supplierFeeService.queryByOrderNo(feeOrderNo);
+            detailDto = new SupplierFeeManageDetailDto();
+            if(supplierFeeManage!=null){
+                BeanUtils.copyProperties(supplierFeeManage,detailDto);
+                List<SupplierFeeRecord> recordList = recordService.listRecord(feeOrderNo);
+                if(CollectionUtils.isNotEmpty(recordList)){
+                    detailDto.setSupplierFeeRecordList(recordList);
+                }
             }
+        } catch (BeansException e) {
+            logger.error("获取线上化异常",e);
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
 
         return AjaxResponse.success(detailDto);
@@ -139,37 +137,43 @@ public class SupplierFeeController {
     @MasterSlaveConfigs(configs={
             @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.MASTER)
     } )
-    public AjaxResponse supplierFeeOpe(Integer status,String remark,String feeOrderNo){
+    public AjaxResponse supplierFeeOpe(@Verify(param = "status",rule = "required") Integer status,
+                                       @Verify(param = "remark",rule = "required") String remark,
+                                       @Verify(param = "feeOrderNo",rule = "required") String feeOrderNo){
+        logger.info("供应商线上化确认操作，入参：" + status,remark,feeOrderNo);
         SSOLoginUser ssoLoginUser = WebSessionUtil.getCurrentLoginUser();
         if(null == ssoLoginUser){
             return AjaxResponse.fail(RestErrorCode.HTTP_INVALID_SESSION);
         }
         Integer loginId = ssoLoginUser.getId();
         String userName = ssoLoginUser.getLoginName();
+        try {
+            SupplierFeeRecord record = new SupplierFeeRecord();
+            if(status == 1){
+                record.setOperate(SupplierFeeStatusEnum.NORMAL.getMsg());
+            }else {
+                record.setOperate(SupplierFeeStatusEnum.UNNORMAL.getMsg());
+            }
+            record.setCreateTime(new Date());
+            record.setUpdateTime(new Date());
+            record.setOperateId(loginId);
+            record.setStatus(status);
+            record.setRemark(remark);
+            record.setOperateUser(userName);
+            record.setSupplierAddress("空");
+            record.setFeeOrderNo(feeOrderNo);
 
+            int code =  recordService.insertFeeRecord(record);
 
-        SupplierFeeRecord record = new SupplierFeeRecord();
-        if(status == 1){
-            record.setOperate(SupplierFeeStatusEnum.NORMAL.getMsg());
-        }else {
-            record.setOperate(SupplierFeeStatusEnum.UNNORMAL.getMsg());
+            if(code > 0){
+                logger.info("数据插入success");
+            }else {
+                logger.info("数据插入error");
+            }
+        } catch (Exception e) {
+            logger.info("供应商线上化操作异常",e);
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
-        record.setCreateTime(new Date());
-        record.setUpdateTime(new Date());
-        record.setOperateId(loginId);
-        record.setStatus(status);
-        record.setRemark(remark);
-        record.setOperateUser(userName);
-        record.setSupplierAddress("空");
-        record.setFeeOrderNo(feeOrderNo);
-
-       int code =  recordService.insertFeeRecord(record);
-
-       if(code > 0){
-           logger.info("数据插入success");
-       }else {
-           logger.info("数据插入error");
-       }
 
         return AjaxResponse.success(null);
     }
@@ -281,7 +285,6 @@ public class SupplierFeeController {
             table1.addCell(cell24);
 
            document.add(table1);//将表格加入到document中
-           // document.add(table2);
             document.add(blankRow1);
             document.close();
             ba.writeTo(outputStream);
@@ -294,52 +297,6 @@ public class SupplierFeeController {
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
 
-        //注意：使用下面的方法 由于模板有问题，导致一直找不到form表单的内容
-        /*  // 模板路径
-        String templatePath =  "/Users/fan/workspace/mp-manage/src/main/webapp/upload/supplierFeePDF-1.pdf";
-        // 生成的新文件路径
-       String newPDFPath =  "/Users/fan/workspace/mp-manage/src/main/webapp/upload/supplierFeePDF-2.pdf";
-      PdfReader reader;
-        FileOutputStream out;
-        ByteArrayOutputStream bos;
-        PdfStamper stamper;
-        try {
-            out = new FileOutputStream(newPDFPath);// 输出流
-            reader = new PdfReader(templatePath);// 读取pdf模板
-            bos = new ByteArrayOutputStream();
-            stamper = new PdfStamper(reader, bos);
-            AcroFields form = stamper.getAcroFields();
-            *//*String[] str = {manage.getSupplierName(), DateUtils.formatDate(manage.getSettleStartDate()),DateUtils.formatDate(manage.getSettleEndDate()),
-            manage.getFlowAmount()};*//*
-            String[] str = { "123456789", "TOP__ONE", "男", "1991-01-01", "130222111133338888", "河北省保定市" };
-            java.util.Iterator<String> it = form.getFields().keySet().iterator();
-
-            *//*for(int i = 0;i<feeManageList.size();i++){
-                SupplierFeeManage feeManage = feeManageList.get(i);
-
-                form.setField(null,feeManage.getSupplierName());
-            }*//*
-
-            int i = 0;
-            while (it.hasNext()) {
-                String name = it.next().toString();
-                System.out.println(name);
-                form.setField(name, str[i++]);
-            }
-            stamper.setFormFlattening(true);// 如果为false那么生成的PDF文件还能编辑，一定要设为true
-            stamper.close();
-            Document doc = new Document();
-            PdfCopy copy = new PdfCopy(doc, out);
-            doc.open();
-            PdfImportedPage importPage = copy.getImportedPage(new PdfReader(bos.toByteArray()), 1);
-            copy.addPage(importPage);
-            doc.close();
-        } catch (IOException e) {
-            System.out.println(1);
-        } catch (DocumentException e) {
-            System.out.println(2);
-        }
-*/
         return AjaxResponse.success(null);
     }
 
