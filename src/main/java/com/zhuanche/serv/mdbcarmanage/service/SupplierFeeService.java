@@ -17,4 +17,6 @@ public interface SupplierFeeService {
     List<SupplierFeeManage> queryListData(SupplierFeeManageDto manageDto);
 
     SupplierFeeManage queryByOrderNo(@Param("feeOrderNO") String feeOrderNo);
+
+    int updateStatusByFeeOrderNo(String feeOrderNo,int amountStatus);
 }

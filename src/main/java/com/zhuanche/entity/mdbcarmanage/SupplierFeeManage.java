@@ -73,6 +73,8 @@ public class SupplierFeeManage {
 
     private String cityName;
 
+    private Date amountStatusTime; //金额异议处理时间
+
     public Integer getId() {
         return id;
     }
@@ -351,5 +353,13 @@ public class SupplierFeeManage {
 
     public void setCityName(String cityName) {
         this.cityName = cityName;
+    }
+
+    public Date getAmountStatusTime() {
+        return amountStatusTime;
+    }
+
+    public void setAmountStatusTime(Date amountStatusTime) {
+        this.amountStatusTime = amountStatusTime;
     }
 }

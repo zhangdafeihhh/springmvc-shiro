@@ -166,6 +166,10 @@ public class SupplierFeeController {
             int code =  recordService.insertFeeRecord(record);
 
             if(code > 0){
+              int feeCode =   supplierFeeService.updateStatusByFeeOrderNo(feeOrderNo,status);
+              if(feeCode > 0 ){
+                  logger.info("更新状态成功");
+              }
                 logger.info("数据插入success");
             }else {
                 logger.info("数据插入error");
@@ -219,6 +223,9 @@ public class SupplierFeeController {
 
             PdfPTable table1 = new PdfPTable(titles.length); //创建一个表格,参数为一行有几栏
             int width1[] = {250,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300,300};//每栏的宽度
+            table1.setKeepTogether(false);
+            table1.setHorizontalAlignment(Element.ALIGN_LEFT);
+            table1.setWidthPercentage(100);//设置表格大小为可用空白区域的300%
             table1.setWidths(width1); //设置宽度
 
             //首行
