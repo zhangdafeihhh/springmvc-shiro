@@ -71,6 +71,8 @@ public class SupplierFeeManage {
 
     private String createUser;
 
+    private String cityName;
+
     public Integer getId() {
         return id;
     }
@@ -341,5 +343,13 @@ public class SupplierFeeManage {
 
     public void setCreateUser(String createUser) {
         this.createUser = createUser == null ? null : createUser.trim();
+    }
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
     }
 }
