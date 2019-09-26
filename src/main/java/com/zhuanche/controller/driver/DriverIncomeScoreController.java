@@ -127,23 +127,70 @@ public class DriverIncomeScoreController {
             driverIds.add(driverId);
             carBizDriverInfoDTO.setDriverIds(driverIds);
         }
-
-        Page p = PageHelper.startPage(page, pageSize, true);
-        try {
-            list = carBizDriverInfoService.queryDriverList(carBizDriverInfoDTO);
-            total = (int) p.getTotal();
-        } finally {
-            PageHelper.clearPage();
-        }
-        // 查询城市名称，供应商名称，服务类型，加盟类型
-        for (CarBizDriverInfoDTO driver : list) {
-            carBizDriverInfoService.getBaseStatis(driver);
-        }
-        fillIncomeScore(list);
-        PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
+        PageDTO pageDTO = carBizDriverInfoService.queryDriverIncomeScoreListData(page,pageSize,carBizDriverInfoDTO);
         logger.info("time cost : " + (System.currentTimeMillis() - startTime));
         return AjaxResponse.success(pageDTO);
     }
+    @ResponseBody
+    @RequestMapping(value = "/downdriverIncomeScoreListData")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
+    @RequestFunction(menu = DRIVER_INFO_LIST)
+    public AjaxResponse downdriverIncomeScoreListData( @Verify(param = "email", rule = "required")String email,Integer driverId, String phone, String licensePlates, Integer cityId, Integer supplierId,
+                                               Integer teamId, @RequestParam(value = "page", defaultValue = "0") Integer page,
+                                               @Verify(param = "pageSize", rule = "max(50)") @RequestParam(value = "pageSize", defaultValue = "20") Integer pageSize) {
+
+        long startTime = System.currentTimeMillis();
+        // 数据权限控制SSOLoginUser
+        Set<Integer> permOfCity = WebSessionUtil.getCurrentLoginUser().getCityIds(); //普通管理员可以管理的所有城市ID
+        Set<Integer> permOfSupplier = WebSessionUtil.getCurrentLoginUser().getSupplierIds(); //普通管理员可以管理的所有供应商ID
+        Set<Integer> permOfTeam = WebSessionUtil.getCurrentLoginUser().getTeamIds(); //普通管理员可以管理的所有车队ID
+        int total = 0;
+        List<CarBizDriverInfoDTO> list = Lists.newArrayList();
+        Set<Integer> driverIds = null;
+        Boolean had = false;
+        if (teamId != null || (permOfTeam != null && permOfTeam.size() > 0)) {
+            had = true;
+            driverIds = carDriverTeamService.selectDriverIdsByTeamIdAndGroupId(null, teamId, permOfTeam);
+        }
+        if (had && (driverIds == null || driverIds.size() == 0)) {
+            logger.info(LOGTAG + "查询teamId={},permOfTeam={}没有司机信息", teamId, permOfTeam);
+            PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
+            return AjaxResponse.success(pageDTO);
+        }
+        CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();
+        carBizDriverInfoDTO.setPhone(phone);
+        carBizDriverInfoDTO.setLicensePlates(licensePlates);
+        carBizDriverInfoDTO.setServiceCity(cityId);
+        carBizDriverInfoDTO.setSupplierId(supplierId);
+        carBizDriverInfoDTO.setTeamId(teamId);
+        //数据权限
+        carBizDriverInfoDTO.setCityIds(permOfCity);
+        carBizDriverInfoDTO.setSupplierIds(permOfSupplier);
+        carBizDriverInfoDTO.setTeamIds(permOfTeam);
+        if (driverId != null && null != driverIds && driverIds.size() > 0) {
+            if (driverIds.contains(driverId)) {
+                driverIds.clear();
+                driverIds.add(driverId);
+            } else {
+                PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
+                return AjaxResponse.success(pageDTO);
+            }
+        }
+        if (null != driverIds)
+            carBizDriverInfoDTO.setDriverIds(driverIds);
+        else if (null != driverId) {
+            driverIds = new HashSet<>();
+            driverIds.add(driverId);
+            carBizDriverInfoDTO.setDriverIds(driverIds);
+        }
+        carBizDriverInfoService.exportdriverIncomeScoreListData(page,pageSize,carBizDriverInfoDTO,email);
+        logger.info("time cost : " + (System.currentTimeMillis() - startTime));
+        return AjaxResponse.success(null);
+    }
+
+
 
 
     /**
@@ -209,20 +256,7 @@ public class DriverIncomeScoreController {
         return AjaxResponse.success(driverIncomeScoreService.typeList(incomeType));
     }
 
-    private void fillIncomeScore(List<CarBizDriverInfoDTO> rows) {
-        Map<Integer, DriverIncomeScoreDto> map = driverIncomeScoreService.incomeList(rows.stream().map(CarBizDriverInfoDTO::getDriverId).collect(Collectors.toList()));
-        if (null == map) return;
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:dd");
-        DriverIncomeScoreDto dto;
-        for (CarBizDriverInfoDTO info : rows) {
-            dto = map.get(info.getDriverId());
-            if (null != dto) {
-                info.setIncomeScore(dto.getIncomeScore());
-                if (null != dto.getUpdateTime())
-                    info.setUpdateTime(df.format(new Date(dto.getUpdateTime())));
-            }
-        }
-    }
+
 
     private void fillDriverInfo(List<DriverIncomeScoreDetailDto> rows, String driverId) {
         if (null == rows || rows.size() == 0) return;

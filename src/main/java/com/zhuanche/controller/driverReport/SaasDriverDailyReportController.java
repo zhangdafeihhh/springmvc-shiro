@@ -334,15 +334,15 @@ public class SaasDriverDailyReportController {
         }
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
         JSONObject obj = new JSONObject();
-        obj.put("auth_account",loginUser.getAccountType());
+        obj.put("auth_account",loginUser.getAccountType());//必填
         obj.put("auth_cityIds",loginUser.getCityIds());
         obj.put("auth_suppliers",loginUser.getSupplierIds());
         obj.put("auth_teamIds",loginUser.getTeamIds());
         obj.put("auth_groups",loginUser.getGroupIds());
         obj.put("auth_userId",loginUser.getId());
         obj.put("auth_userName",loginUser.getLoginName());
-        obj.put("send_email",StringUtils.isNotBlank(email)?email:loginUser.getEmail());
-        obj.put("excel_export_type", Constants.SAAS_DAILY_EXCEL);
+        obj.put("send_email",StringUtils.isNotBlank(email)?email:loginUser.getEmail());//必填
+        obj.put("excel_export_type", Constants.SAAS_DAILY_EXCEL);//必填
         obj.put("businessVolumeSort",businessVolumeSort);
         obj.put("finOrdCntSort",finOrdCntSort);
         obj.put("badCntSort",badCntSort);

@@ -2,6 +2,7 @@ package com.zhuanche.serv;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
@@ -11,6 +12,7 @@ import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.rocketmq.CommonRocketProducer;
 import com.zhuanche.common.rocketmq.CommonRocketProducerDouble;
 import com.zhuanche.common.rocketmq.DriverWideRocketProducer;
@@ -20,10 +22,7 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.constant.EnvUtils;
 import com.zhuanche.dto.driver.TelescopeDriver;
-import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
-import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
-import com.zhuanche.dto.rentcar.CarBizDriverInfoDetailDTO;
-import com.zhuanche.dto.rentcar.DriverComplianceDTO;
+import com.zhuanche.dto.rentcar.*;
 import com.zhuanche.entity.mdbcarmanage.*;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.HttpClientUtil;
@@ -76,6 +75,7 @@ import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CarBizDriverInfoService {
@@ -106,6 +106,12 @@ public class CarBizDriverInfoService {
 
     @Value("${order.sign.key}")
     String signKey;
+
+    @Autowired
+    private CarBizDriverInfoService carBizDriverInfoService;
+
+    @Autowired
+    private DriverIncomeScoreService driverIncomeScoreService;
 
     @Autowired
     private CarBizDriverInfoMapper carBizDriverInfoMapper;
@@ -203,6 +209,46 @@ public class CarBizDriverInfoService {
     } )
     public List<CarBizDriverInfoDTO> queryDriverList(CarBizDriverInfoDTO params) {
         return carBizDriverInfoExMapper.queryDriverList(params);
+    }
+
+    @MasterSlaveConfigs(configs={
+            @MasterSlaveConfig(databaseTag="rentcar-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
+    } )
+    public PageDTO  queryDriverIncomeScoreListData(int page,int pageSize,CarBizDriverInfoDTO carBizDriverInfoDTO) {
+        Page p = PageHelper.startPage(page, pageSize, true);
+        List<CarBizDriverInfoDTO> list = null;
+        int total = 0;
+        try {
+            list = this.queryDriverList(carBizDriverInfoDTO);
+            total = (int) p.getTotal();
+        } finally {
+            PageHelper.clearPage();
+        }
+        // 查询城市名称，供应商名称，服务类型，加盟类型
+        for (CarBizDriverInfoDTO driver : list) {
+            carBizDriverInfoService.getBaseStatis(driver);
+        }
+        fillIncomeScore(list);
+        PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
+        return pageDTO;
+    }
+    //异步导出司机派单分
+    public void exportdriverIncomeScoreListData(Integer page, Integer pageSize, CarBizDriverInfoDTO carBizDriverInfoDTO, String email) {
+    }
+
+    private void fillIncomeScore(List<CarBizDriverInfoDTO> rows) {
+        Map<Integer, DriverIncomeScoreDto> map = driverIncomeScoreService.incomeList(rows.stream().map(CarBizDriverInfoDTO::getDriverId).collect(Collectors.toList()));
+        if (null == map) return;
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:dd");
+        DriverIncomeScoreDto dto;
+        for (CarBizDriverInfoDTO info : rows) {
+            dto = map.get(info.getDriverId());
+            if (null != dto) {
+                info.setIncomeScore(dto.getIncomeScore());
+                if (null != dto.getUpdateTime())
+                    info.setUpdateTime(df.format(new Date(dto.getUpdateTime())));
+            }
+        }
     }
 
     /**
