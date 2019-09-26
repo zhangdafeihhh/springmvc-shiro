@@ -232,9 +232,7 @@ public class CarBizDriverInfoService {
         PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
         return pageDTO;
     }
-    //异步导出司机派单分
-    public void exportdriverIncomeScoreListData(Integer page, Integer pageSize, CarBizDriverInfoDTO carBizDriverInfoDTO, String email) {
-    }
+
 
     private void fillIncomeScore(List<CarBizDriverInfoDTO> rows) {
         Map<Integer, DriverIncomeScoreDto> map = driverIncomeScoreService.incomeList(rows.stream().map(CarBizDriverInfoDTO::getDriverId).collect(Collectors.toList()));

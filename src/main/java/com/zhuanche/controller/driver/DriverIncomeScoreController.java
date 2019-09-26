@@ -1,5 +1,6 @@
 package com.zhuanche.controller.driver;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
@@ -10,18 +11,22 @@ import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.common.rocketmq.ExcelProducer;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.driver.DriverVoEntity;
 import com.zhuanche.dto.mdbcarmanage.ScoreDetailDTO;
 import com.zhuanche.dto.rentcar.*;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.*;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
+import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
+import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.rest.RestResponse;
@@ -59,6 +64,10 @@ public class DriverIncomeScoreController {
 
     @Autowired
     private DriverIncomeScoreService driverIncomeScoreService;
+
+    @Autowired
+    private CarAdmUserExMapper carAdmUserExMapper;
+
 
     /**
      * 司机收入分信息列表（有分页）
@@ -159,6 +168,7 @@ public class DriverIncomeScoreController {
             PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
             return AjaxResponse.success(pageDTO);
         }
+
         CarBizDriverInfoDTO carBizDriverInfoDTO = new CarBizDriverInfoDTO();
         carBizDriverInfoDTO.setPhone(phone);
         carBizDriverInfoDTO.setLicensePlates(licensePlates);
@@ -174,8 +184,8 @@ public class DriverIncomeScoreController {
                 driverIds.clear();
                 driverIds.add(driverId);
             } else {
-                PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
-                return AjaxResponse.success(pageDTO);
+//                PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
+                return AjaxResponse.failMsg(-1,"您无权查看该司机的信息");
             }
         }
         if (null != driverIds)
@@ -185,9 +195,39 @@ public class DriverIncomeScoreController {
             driverIds.add(driverId);
             carBizDriverInfoDTO.setDriverIds(driverIds);
         }
-        carBizDriverInfoService.exportdriverIncomeScoreListData(page,pageSize,carBizDriverInfoDTO,email);
-        logger.info("time cost : " + (System.currentTimeMillis() - startTime));
-        return AjaxResponse.success(null);
+
+        JSONObject obj = new JSONObject();
+        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+        obj.put("auth_account",loginUser.getAccountType());//必填
+        obj.put("excel_export_type", Constants.SAAS_DRIVER_DISPATCH);//必填
+        obj.put("send_email",  StringUtils.isNotEmpty(email)?email:loginUser.getEmail());//必填
+        obj.put("auth_cityIds",loginUser.getCityIds());
+        obj.put("auth_suppliers",loginUser.getSupplierIds());
+        obj.put("auth_teamIds",loginUser.getTeamIds());
+        obj.put("auth_groups",loginUser.getGroupIds());
+        obj.put("auth_userId",loginUser.getId());
+        obj.put("auth_userName",loginUser.getLoginName());
+
+
+        obj.put("buiness_params", JSON.toJSONString(carBizDriverInfoDTO));
+
+
+        try{
+            ExcelProducer.publishMessage("excel_export_producer","excel-mp-manage",null,obj);
+
+
+            //维护用户的邮箱
+            if(loginUser.getId() != null && loginUser.getAccountType() != null){
+
+                carAdmUserExMapper.updateEmail(email!= null?email:loginUser.getEmail(),loginUser.getId());
+            }
+            return AjaxResponse.success("请到邮箱中查询导出信息");
+        }catch (Exception e){
+            logger.error("导出司机派单信息失败:{}",e);
+
+            return AjaxResponse.failMsg(500,"导出司机派单信息失败");
+        }
+
     }
 
 
