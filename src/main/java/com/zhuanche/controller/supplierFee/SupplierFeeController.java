@@ -20,6 +20,8 @@ import com.zhuanche.serv.mdbcarmanage.service.SupplierFeeService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
+import com.zhuanche.util.dateUtil.DateUtil;
+import com.zhuanche.util.excel.CsvUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +33,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -184,15 +192,15 @@ public class SupplierFeeController {
 
 
     /**
-     * 导出对账单
+     * 导出对账单-PDF
      * @return
      */
-    @RequestMapping("/exportSupplierFeeData")
+    @RequestMapping("/exportPDFSupplierFeeData")
     @ResponseBody
     @MasterSlaveConfigs(configs={
             @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE)
     } )
-    public AjaxResponse exportSupplierFeeData(HttpServletResponse response,
+    public AjaxResponse exportPDFSupplierFeeData(HttpServletResponse response,
                                               ServletOutputStream outputStream,
                                               String feeOrderNo){
         logger.info(MessageFormat.format("查询司机线上化入参:feeOrderNo:{0}",feeOrderNo));
@@ -307,4 +315,124 @@ public class SupplierFeeController {
         return AjaxResponse.success(null);
     }
 
+    /**
+     * 导出对账单-EXCEL
+     * @return
+     */
+    @RequestMapping("/exportSupplierFeeData")
+    @ResponseBody
+    @MasterSlaveConfigs(configs={
+            @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    } )
+    public AjaxResponse exportSupplierFeeData(HttpServletResponse response,HttpServletRequest request,
+                                              String feeOrderNo){
+        logger.info(MessageFormat.format("导出对账单:feeOrderNo:{0}",feeOrderNo));
+        try {
+            SupplierFeeManage manage = supplierFeeService.queryByOrderNo(feeOrderNo);
+            List<String> headerList = new ArrayList<>();
+            String titles = "供应商名称,结算开始日期,结算结束日期,总流水,流水金额,风控金额,价外费,取消费,流水合计金额,规模系数,上月总流水,流水增幅,增长系数,差评率,当月佣金,剔除佣金,上月暂扣金额,合计," +
+                    "合规司机奖励,其他,差评罚金,扣款差评数量,稽查罚金,管理费合计";
+            headerList.add(titles);
+
+            String fileName = "对账单信息" + DateUtil.dateFormat(new Date(), DateUtil.intTimestampPattern)+".csv";
+            String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
+            try {
+                if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO")>0 && agent.indexOf("RV:11")>0)) {  //IE浏览器和Edge浏览器
+                    fileName = URLEncoder.encode(fileName, "UTF-8");
+                } else {  //其他浏览器
+                    fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+                }
+            } catch (UnsupportedEncodingException e) {
+                logger.info("导出对账单异常" +e);
+            }
+
+            boolean isLast = true;
+            boolean isFirst = true;
+
+            CsvUtils entity = new CsvUtils();
+            List<String> listStr = new ArrayList<>();
+            listStr = getData(manage,listStr);
+
+            try {
+                entity.exportCsvV2(response,listStr,headerList,fileName,isFirst,isLast);
+            } catch (IOException e) {
+                logger.error("导出异常",e);
+            }
+        } catch (Exception e) {
+            logger.error("导出对账单异常",e);
+
+        }
+        return AjaxResponse.success(null);
+    }
+
+
+    private List<String> getData(SupplierFeeManage manage,List<String> listStr){
+        StringBuilder builder = new StringBuilder();
+        builder.append(manage.getSupplierName() != null ? manage.getSupplierName():"");
+        builder.append(",");
+        builder.append(manage.getSettleStartDate() != null ? DateUtils.formatDate(manage.getSettleStartDate(),DateUtils.dateTimeFormat_parttern) : "");
+        builder.append(",");
+        builder.append(manage.getSettleEndDate() != null ? DateUtils.formatDate(manage.getSettleEndDate(),DateUtils.dateTimeFormat_parttern) : "");
+        builder.append(",");
+        builder.append(manage.getTotalFlow() != null ? manage.getTotalFlow() : "");
+        builder.append(",");
+        builder.append(manage.getFlowAmount() != null ? manage.getFlowAmount() : "");
+        builder.append(",");
+        builder.append(manage.getWindControlAmount() != null ? manage.getWindControlAmount() : "");
+        builder.append(",");
+
+        builder.append(manage.getExtraCharge() != null ? manage.getExtraCharge() : "");
+        builder.append(",");
+
+        builder.append(manage.getCancelCharge() != null ? manage.getCancelCharge() : "");
+        builder.append(",");
+
+        builder.append(manage.getTotalAmountWater() != null ? manage.getTotalAmountWater() : "");
+        builder.append(",");
+
+        builder.append(manage.getScaleEfficient() != null ? manage.getScaleEfficient() : "");
+        builder.append(",");
+
+        builder.append(manage.getTotalFlowLastMonth() != null ? manage.getTotalFlowLastMonth() : "");
+        builder.append(",");
+
+        builder.append(manage.getFlowIncrease() != null ? manage.getFlowIncrease() : "");
+        builder.append(",");
+
+        builder.append(manage.getGrowthFactor() != null ? manage.getGrowthFactor() : "");
+        builder.append(",");
+
+        builder.append(manage.getBadRatings() != null ? manage.getBadRatings() : "");
+        builder.append(",");
+
+        builder.append(manage.getMonthCommission() != null ? manage.getMonthCommission() : "");
+        builder.append(",");
+
+        builder.append(manage.getExcludeCommission() != null ? manage.getExcludeCommission() : "");
+        builder.append(",");
+
+        builder.append(manage.getDeductionAmountLastMonth() != null ? manage.getDeductionAmountLastMonth() : "");
+        builder.append(",");
+
+        builder.append(manage.getTotal() != null ? manage.getTotal() : "");
+        builder.append(",");
+
+        builder.append(manage.getComplianceDriverAward() != null ? manage.getComplianceDriverAward() : "");
+        builder.append(",");
+
+        builder.append(manage.getOthers() != null ? manage.getOthers() : "");
+        builder.append(",");
+
+        builder.append(manage.getBadRatingsAward() != null ? manage.getBadRatingsAward() : "");
+        builder.append(",");
+        builder.append(manage.getAmountAssessmentSum() != null ? manage.getAmountAssessmentSum() : "");
+        builder.append(",");
+        builder.append(manage.getInspectionFines() != null ? manage.getInspectionFines() : "");
+        builder.append(",");
+        builder.append(manage.getTotalManageFees() != null ? manage.getTotalManageFees() : "");
+        builder.append(",");
+        listStr.add(builder.toString());
+        return listStr;
+
+    }
 }
