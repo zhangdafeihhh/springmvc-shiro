@@ -3,6 +3,8 @@ package com.zhuanche.serv.mdbcarmanage.service.impl;
 import com.zhuanche.dto.mdbcarmanage.SupplierFeeManageDto;
 import com.zhuanche.entity.mdbcarmanage.SupplierFeeManage;
 import com.zhuanche.serv.mdbcarmanage.service.SupplierFeeService;
+import com.zhuanche.util.DateUtil;
+import com.zhuanche.util.DateUtils;
 import mapper.mdbcarmanage.ex.SupplierFeeManageExMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,12 @@ public class SupplierFeeServiceImpl implements SupplierFeeService {
                 if(manage.getAmountStatusTime().getTime() <0){
                     manage.setAmountStatusTime(null);
                 }
+
+                String start = DateUtils.formatDate(manage.getSettleStartDate(),"yyyy-MM-dd") ;
+                manage.setSettleStartDate(DateUtils.parseDateStr(start,"yyyy-MM-dd"));
+                String end = DateUtils.formatDate(manage.getSettleEndDate(),"yyyy-MM-dd");
+                manage.setSettleEndDate(DateUtils.parseDateStr(end,"yyyy-MM-dd"));
+
             }
         }
         return manageList;

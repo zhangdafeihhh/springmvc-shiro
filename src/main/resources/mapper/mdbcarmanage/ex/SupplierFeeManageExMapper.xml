@@ -103,10 +103,10 @@
     </if>
 
     <if test="settleStartDate != null and settleStartDate != ''" >
-      <![CDATA[ and settle_start_date >=   STR_TO_DATE(#{settleStartDate},"%Y-%m-%d") ]]>
+      <![CDATA[ and create_time >=   STR_TO_DATE(#{settleStartDate},"%Y-%m-%d") ]]>
     </if>
     <if test="settleEndDate != null and settleEndDate != ''" >
-      <![CDATA[ and settle_end_date <=  STR_TO_DATE(#{settleEndDate},"%Y-%m-%d")   ]]>
+      <![CDATA[ and create_time <=  STR_TO_DATE(#{settleEndDate},"%Y-%m-%d")   ]]>
     </if>
 
     <if test="paymentStartTime != null and  paymentStartTime != ''" >
@@ -116,6 +116,7 @@
       <![CDATA[ and payment_time <= STR_TO_DATE(#{paymentEndTime},"%Y-%m-%d") ]]>
     </if>
 
+    ORDER BY  payment_time DESC
   </select>
 
 
