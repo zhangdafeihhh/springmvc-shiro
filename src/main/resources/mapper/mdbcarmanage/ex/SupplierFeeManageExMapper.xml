@@ -116,7 +116,7 @@
       <![CDATA[ and payment_time <= STR_TO_DATE(#{paymentEndTime},"%Y-%m-%d") ]]>
     </if>
 
-    ORDER BY  payment_time DESC
+    ORDER BY  create_time DESC
   </select>
 
 

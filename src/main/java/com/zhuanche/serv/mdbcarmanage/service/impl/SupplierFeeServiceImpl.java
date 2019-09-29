@@ -38,10 +38,14 @@ public class SupplierFeeServiceImpl implements SupplierFeeService {
                     manage.setAmountStatusTime(null);
                 }
 
-                String start = DateUtils.formatDate(manage.getSettleStartDate(),"yyyy-MM-dd") ;
-                manage.setSettleStartDate(DateUtils.parseDateStr(start,"yyyy-MM-dd"));
-                String end = DateUtils.formatDate(manage.getSettleEndDate(),"yyyy-MM-dd");
-                manage.setSettleEndDate(DateUtils.parseDateStr(end,"yyyy-MM-dd"));
+                if(manage.getSettleStartDate() != null){
+                    String start = DateUtils.formatDate(manage.getSettleStartDate(),"yyyy-MM-dd") ;
+                    manage.setSettleStartDateStr(start);
+                }
+                if(manage.getSettleEndDate() != null){
+                    String end = DateUtils.formatDate(manage.getSettleEndDate(),"yyyy-MM-dd");
+                    manage.setSettleEndDateStr(end);
+                }
 
             }
         }

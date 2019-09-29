@@ -75,6 +75,11 @@ public class SupplierFeeManage {
 
     private Date amountStatusTime; //金额异议处理时间
 
+    private String settleStartDateStr;
+
+    private String settleEndDateStr;
+
+
     public Integer getId() {
         return id;
     }
@@ -361,5 +366,21 @@ public class SupplierFeeManage {
 
     public void setAmountStatusTime(Date amountStatusTime) {
         this.amountStatusTime = amountStatusTime;
+    }
+
+    public String getSettleStartDateStr() {
+        return settleStartDateStr;
+    }
+
+    public void setSettleStartDateStr(String settleStartDateStr) {
+        this.settleStartDateStr = settleStartDateStr;
+    }
+
+    public String getSettleEndDateStr() {
+        return settleEndDateStr;
+    }
+
+    public void setSettleEndDateStr(String settleEndDateStr) {
+        this.settleEndDateStr = settleEndDateStr;
     }
 }
