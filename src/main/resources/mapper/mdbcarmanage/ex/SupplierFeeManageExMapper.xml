@@ -93,7 +93,7 @@
     <if test="cityIds != null and cityIds != ''" >
       AND  t.city_id  in (${cityIds})
     </if>
-    <if test="supplierIds != null" >
+    <if test="supplierIds != null and supplierIds != ''" >
       AND  t.supplier_id in (${supplierIds})
     </if>
 
