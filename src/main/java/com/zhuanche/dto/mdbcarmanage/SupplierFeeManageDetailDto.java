@@ -81,6 +81,10 @@ public class SupplierFeeManageDetailDto {
 
     private String createUser;
 
+    private String settleStartDateStr;
+
+    private String settleEndDateStr;
+
     private List<SupplierFeeRecord> supplierFeeRecordList;
 
     public Integer getId() {
@@ -361,5 +365,21 @@ public class SupplierFeeManageDetailDto {
 
     public void setSupplierFeeRecordList(List<SupplierFeeRecord> supplierFeeRecordList) {
         this.supplierFeeRecordList = supplierFeeRecordList;
+    }
+
+    public String getSettleStartDateStr() {
+        return settleStartDateStr;
+    }
+
+    public void setSettleStartDateStr(String settleStartDateStr) {
+        this.settleStartDateStr = settleStartDateStr;
+    }
+
+    public String getSettleEndDateStr() {
+        return settleEndDateStr;
+    }
+
+    public void setSettleEndDateStr(String settleEndDateStr) {
+        this.settleEndDateStr = settleEndDateStr;
     }
 }
