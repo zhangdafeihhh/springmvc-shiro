@@ -54,7 +54,16 @@ public class SupplierFeeServiceImpl implements SupplierFeeService {
 
     @Override
     public SupplierFeeManage queryByOrderNo(String feeOrderNo) {
-        return exMapper.feeOrderDetail(feeOrderNo);
+        SupplierFeeManage manage = exMapper.feeOrderDetail(feeOrderNo);
+        if(manage.getSettleStartDate() != null){
+            String start = DateUtils.formatDate(manage.getSettleStartDate(),"yyyy-MM-dd") ;
+            manage.setSettleStartDateStr(start);
+        }
+        if(manage.getSettleEndDate() != null){
+            String end = DateUtils.formatDate(manage.getSettleEndDate(),"yyyy-MM-dd");
+            manage.setSettleEndDateStr(end);
+        }
+        return manage;
     }
 
     @Override
