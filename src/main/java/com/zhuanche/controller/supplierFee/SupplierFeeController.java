@@ -101,6 +101,7 @@ public class SupplierFeeController {
             feeManageDto.setPaymentStartTime(paymentStartTime);
             feeManageDto.setPaymentEndTime(paymentEndTime);
             feeManageDto.setAmountStatus(amountStatus);
+            feeManageDto.setSupplierId(supplierId);
             feeManageDto.setStatus(status);
             Page page = PageHelper.startPage(pageNum,pageSize);
             List<SupplierFeeManage> feeManageList = supplierFeeService.queryListData(feeManageDto);
