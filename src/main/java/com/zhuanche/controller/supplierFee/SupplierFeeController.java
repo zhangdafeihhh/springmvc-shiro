@@ -23,6 +23,7 @@ import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.dateUtil.DateUtil;
 import com.zhuanche.util.excel.CsvUtils;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -84,7 +85,16 @@ public class SupplierFeeController {
 
         PageDTO pageDTO = null;
         try {
+            SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
             SupplierFeeManageDto feeManageDto = new SupplierFeeManageDto();
+
+            if (!WebSessionUtil.isSupperAdmin()){
+                String sessionCityIds = StringUtils.join(user.getCityIds().toArray(), ",");
+                String sessionSuppliers = StringUtils.join(user.getSupplierIds().toArray(), ",");
+                feeManageDto.setCityIds(sessionCityIds);
+                feeManageDto.setSupplierIds(sessionSuppliers);
+            }
+            
             feeManageDto.setCityId(cityId);
             feeManageDto.setSettleStartDate(settleStartDate);
             feeManageDto.setSettleEndDate(settleEndDate);

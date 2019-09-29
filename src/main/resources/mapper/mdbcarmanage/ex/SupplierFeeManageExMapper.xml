@@ -89,6 +89,14 @@
     from supplier_fee_manage t
     LEFT JOIN car_biz_city c  ON t.city_id = c.city_id
     where 1=1
+
+    <if test="cityIds != null and cityIds != ''" >
+      AND  t.city_id  in (${cityIds})
+    </if>
+    <if test="supplierIds != null" >
+      AND  t.supplier_id in (${supplierIds})
+    </if>
+
     <if test="cityId != null and cityId != ''" >
       AND  t.city_id = #{cityId}
     </if>

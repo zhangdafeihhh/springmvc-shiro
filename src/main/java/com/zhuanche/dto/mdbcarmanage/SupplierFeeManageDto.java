@@ -26,6 +26,10 @@ public class SupplierFeeManageDto {
 
     private String paymentEndTime;
 
+    private String cityIds;
+
+    private String supplierIds;
+
     public String getFeeOrderNo() {
         return feeOrderNo;
     }
@@ -112,5 +116,21 @@ public class SupplierFeeManageDto {
 
     public void setPaymentEndTime(String paymentEndTime) {
         this.paymentEndTime = paymentEndTime;
+    }
+
+    public String getCityIds() {
+        return cityIds;
+    }
+
+    public void setCityIds(String cityIds) {
+        this.cityIds = cityIds;
+    }
+
+    public String getSupplierIds() {
+        return supplierIds;
+    }
+
+    public void setSupplierIds(String supplierIds) {
+        this.supplierIds = supplierIds;
     }
 }
