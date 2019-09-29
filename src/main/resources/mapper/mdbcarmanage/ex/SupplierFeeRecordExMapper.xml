@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.SupplierFeeRecordExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.SupplierFeeRecord" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="operate" property="operate" jdbcType="VARCHAR" />
+    <result column="operate_user" property="operateUser" jdbcType="VARCHAR" />
+    <result column="operate_id" property="operateId" jdbcType="INTEGER" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="fee_order_no" property="feeOrderNo" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="supplier_address" property="supplierAddress" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, operate, operate_user, operate_id, remark, fee_order_no, status, supplier_address, 
+    create_time, update_time
+  </sql>
+  <select id="listRecord" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from supplier_fee_record
+    where fee_order_no = #{feeOrderNo,jdbcType=VARCHAR}
+  </select>
+
+
+  <insert id="insertFeeRecord" parameterType="com.zhuanche.entity.mdbcarmanage.SupplierFeeRecord" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into supplier_fee_record (operate, operate_user, operate_id, 
+      remark, fee_order_no, status, 
+      supplier_address, create_time, update_time
+      )
+    values (#{operate,jdbcType=VARCHAR}, #{operateUser,jdbcType=VARCHAR}, #{operateId,jdbcType=INTEGER}, 
+      #{remark,jdbcType=VARCHAR}, #{feeOrderNo,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      #{supplierAddress,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+
+</mapper>
