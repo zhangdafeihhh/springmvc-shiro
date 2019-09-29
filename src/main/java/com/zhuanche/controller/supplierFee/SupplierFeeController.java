@@ -88,6 +88,8 @@ public class SupplierFeeController {
             feeManageDto.setCityId(cityId);
             feeManageDto.setSettleStartDate(settleStartDate);
             feeManageDto.setSettleEndDate(settleEndDate);
+            feeManageDto.setPaymentStartTime(paymentStartTime);
+            feeManageDto.setPaymentEndTime(paymentEndTime);
             feeManageDto.setAmountStatus(amountStatus);
             feeManageDto.setStatus(status);
             Page page = PageHelper.startPage(pageNum,pageSize);
