@@ -103,7 +103,11 @@
     <if test="supplierId != null" >
       AND  t.supplier_id = #{supplierId}
     </if>
-    <if test="status != null" >
+    <if test="status != null and status == 3"   >
+      AND  t.status in (3,7)
+    </if>
+
+    <if test="status != null and status != 3"   >
       AND  t.status = #{status}
     </if>
     <if test="amountStatus != null" >
