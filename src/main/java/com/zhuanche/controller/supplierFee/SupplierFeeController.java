@@ -386,14 +386,9 @@ public class SupplierFeeController {
         StringBuilder builder = new StringBuilder();
         builder.append(manage.getSupplierName() != null ? manage.getSupplierName():"");
         builder.append(",");
-        builder.append(manage.getSettleStartDate() != null ? DateUtils.formatDate(manage.getSettleStartDate(),DateUtils.dateTimeFormat_parttern) : "");
+        builder.append(manage.getSettleStartDate() != null ? DateUtils.formatDate(manage.getSettleStartDate(),DateUtils.date_format) : "");
         builder.append(",");
-        if(manage.getSettleEndDate() != null){
-            String str = DateUtils.formatDate(manage.getSettleEndDate(),DateUtils.date_format);
-            builder.append(str + " 23:59:59");
-        }else {
-            builder.append("");
-        }
+        builder.append(manage.getSettleEndDate() != null ? DateUtils.formatDate(manage.getSettleEndDate(),DateUtils.date_format) : "");
         builder.append(",");
         builder.append(manage.getTotalFlow() != null ? manage.getTotalFlow() : "");
         builder.append(",");
