@@ -135,6 +135,11 @@ public class SupplierFeeController {
             detailDto = new SupplierFeeManageDetailDto();
             if(supplierFeeManage!=null){
                 BeanUtils.copyProperties(supplierFeeManage,detailDto);
+                detailDto.setScaleEfficient(this.getTwoPoint(detailDto.getScaleEfficient()));
+                detailDto.setFlowIncrease(this.getTwoPoint(detailDto.getFlowIncrease()));
+                detailDto.setGrowthFactor(this.getTwoPoint(detailDto.getGrowthFactor()));
+                detailDto.setBadRatings(this.getTwoPoint(detailDto.getBadRatings()));
+
                 List<SupplierFeeRecord> recordList = recordService.listRecord(feeOrderNo);
                 if(CollectionUtils.isNotEmpty(recordList)){
                     detailDto.setSupplierFeeRecordList(recordList);
