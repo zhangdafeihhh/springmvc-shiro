@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="driver_phone" property="driverPhone" jdbcType="VARCHAR" />
+    <result column="license_plates" property="licensePlates" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+    <result column="team_id" property="teamId" jdbcType="INTEGER" />
+    <result column="team_name" property="teamName" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="create_name" property="createName" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="update_name" property="updateName" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, driver_id, driver_name, driver_phone, license_plates, city_id, city_name, supplier_id, 
+    supplier_name, team_id, team_name, status, create_by, create_name, create_time, update_by, 
+    update_name, update_time
+  </sql>
+  <select id="queryDriver" resultMap="BaseResultMap"  >
+    SELECT t.supplier_name,t.id,t.driver_name,t.license_plates,t.driver_phone,m.main_order_no,m.main_name,m.main_time
+     FROM driver_info_inter_city t INNER JOIN main_order_inter_city m
+    on t.driver_id =  m.driver_id
+    WHERE m.status =1
+    <if test="supplierId!=null and supplierId!=''">
+      and t.supplier_id = #{supplierId}
+    </if>
+    <if test="driverId!=null and driverId!=''">
+      and t.driver_id = #{driverId}
+    </if>
+    <if test="driverPhone!=null and driverPhone!=''">
+      and t.driver_phone = #{driverPhone}
+    </if>
+    <if test="licensePlates!=null and licensePlates!=''">
+      and t.license_plates = #{licensePlates}
+    </if>
+  </select>
+</mapper>

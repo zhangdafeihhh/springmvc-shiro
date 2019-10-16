@@ -253,6 +253,10 @@ public final class RestErrorCode{
 	public static final int DRIVER_ACCOUNT_APPLY_EXIST=40001;
 	//----------------------------------------------千里眼业务
 
+	//------------------------------------------------新城际拼车业务
+	@ResultMessage("该地点不含有城际拼车的线路")
+	public static final int UNDEFINED_LINE = 50000;
+	//------------------------------------------------
 
 	//-------------------金融商品--start-------------------------
 
