@@ -343,7 +343,7 @@ public class SupplierFeeController {
         try {
             SupplierFeeManage manage = supplierFeeService.queryByOrderNo(feeOrderNo);
             List<String> headerList = new ArrayList<>();
-            String titles = "供应商名称,结算开始日期,结算结束日期,总流水,流水金额,风控金额,价外费,取消费,流水合计金额,规模系数,上月总流水,流水增幅,增长系数,差评率,当月佣金,剔除佣金,上月暂扣金额,合计," +
+            String titles = "供应商名称,结算开始日期,结算结束日期,总流水,流水金额,风控金额,价外费,取消费,流水合计金额,规模系数,上月有效司机数量,有效司机数量增幅,运力系数,差评率,当月佣金,剔除佣金,上月暂扣金额,合计," +
                     "合规司机奖励,其他,差评罚金,扣款差评数量,稽查罚金,管理费合计";
             headerList.add(titles);
 
@@ -406,19 +406,19 @@ public class SupplierFeeController {
         builder.append(manage.getTotalAmountWater() != null ? manage.getTotalAmountWater() : "");
         builder.append(",");
 
-        builder.append(manage.getScaleEfficient() != null ? manage.getScaleEfficient() : "");
+        builder.append(manage.getScaleEfficient() != null ? this.getTwoPoint(manage.getScaleEfficient()): "");
         builder.append(",");
 
         builder.append(manage.getTotalFlowLastMonth() != null ? manage.getTotalFlowLastMonth() : "");
         builder.append(",");
 
-        builder.append(manage.getFlowIncrease() != null ? manage.getFlowIncrease() : "");
+        builder.append(manage.getFlowIncrease() != null ? this.getTwoPoint(manage.getFlowIncrease()) : "");
         builder.append(",");
 
-        builder.append(manage.getGrowthFactor() != null ? manage.getGrowthFactor() : "");
+        builder.append(manage.getGrowthFactor() != null ? this.getTwoPoint(manage.getGrowthFactor()) : "");
         builder.append(",");
 
-        builder.append(manage.getBadRatings() != null ? manage.getBadRatings() : "");
+        builder.append(manage.getBadRatings() != null ? this.getTwoPoint(manage.getBadRatings()) : "");
         builder.append(",");
 
         builder.append(manage.getMonthCommission() != null ? manage.getMonthCommission() : "");
@@ -450,5 +450,21 @@ public class SupplierFeeController {
         listStr.add(builder.toString());
         return listStr;
 
+    }
+
+    /**
+     * 截取小数点后两位小数
+     * @param param
+     * @return
+     */
+    private String getTwoPoint(String param){
+        if(StringUtils.isEmpty(param)){
+            return "";
+        }
+        if(param.indexOf(".")>0){
+            int index =param.indexOf(".");
+            param = param.substring(0,index+3)+"%";
+        }
+        return param;
     }
 }
