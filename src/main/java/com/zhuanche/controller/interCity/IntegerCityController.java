@@ -13,8 +13,11 @@ import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.Common;
 import com.zhuanche.util.MyRestTemplate;
 import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +28,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -54,9 +60,6 @@ public class IntegerCityController {
     @Value("${lbs.url}")
     private String lbsUrl;
 
-    @Autowired
-    @Qualifier("carRestTemplate")
-    private MyRestTemplate carRestTemplate;
 
     /**
      * 订单查询
@@ -86,6 +89,7 @@ public class IntegerCityController {
      * @return
      */
     @RequestMapping(value = "/orderQuery",method = RequestMethod.GET)
+    @ResponseBody
     public AjaxResponse orderQuery(@Verify(param = "pageNum",rule = "required") Integer pageNum,
                                    @Verify(param = "pageSize",rule = "required") Integer pageSize,
                                    Integer cityId,
@@ -141,8 +145,12 @@ public class IntegerCityController {
         map.put("beginCostStartDate",beginCostStartDate);
         map.put("beginCostEndDate",beginCostEndDate);
         map.put("riderPhone",riderPhone);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmssSS");
+        String  transId =sdf.format(new Date());
+        map.put("transId",transId);
 
         String url = esOrderDataSaasUrl +"/order/v1/search";
+
 
         //功能是给运营开放的，不需要权限处理
         String result =  MpOkHttpUtil.okHttpGet(url,map,0,null);
@@ -153,13 +161,15 @@ public class IntegerCityController {
             int code = jsonObject.getIntValue("code");
             //0表示有结果返回
             if(code == 0){
-                JSONArray resultData = jsonObject.getJSONArray("data");
-                if(resultData != null && resultData.size() > 0){
+                //JSONArray resultData = jsonObject.getJSONArray("data");
+                JSONObject jsonData = jsonObject.getJSONObject("data");
+                if(jsonData != null && jsonData.get("data") != null) {
+                    JSONArray array = jsonData.getJSONArray("data");
                     JSONObject jsonResult = new JSONObject();
-                    for(int i=0;i<resultData.size();i++){
-                        jsonResult = resultData.getJSONObject(i);
-                       /* JSONObject jsonReturn = new JSONObject();
-                        jsonReturn.put("orderId",jsonReturn.get("orderId"));*/
+                    for (int i = 0; i < array.size(); i++) {
+                        jsonResult = array.getJSONObject(i);
+                        /*JSONObject jsonReturn = new JSONObject();
+                        jsonReturn.put("orderId", jsonResult.get("orderId"));*/
                         resultArray.add(jsonResult);
                     }
                 }
@@ -188,6 +198,7 @@ public class IntegerCityController {
      * @param boardingGetOffY
      * @return
      */
+    @RequestMapping(value = "handOperateAddOrderSetp1",method = RequestMethod.POST)
     public AjaxResponse handOperateAddOrderSetp1(@Verify(param = "reserveName",rule = "required") String reserveName,
                                             String reservePhone,
                                             Integer isSameRider,
@@ -305,6 +316,7 @@ public class IntegerCityController {
      * 编辑订单
      * @return
      */
+    @RequestMapping(value = "/editOrder",method = RequestMethod.POST)
     public AjaxResponse editOrder(@Verify(param = "reserveName",rule = "required") String reserveName,
                                   String orderNo,
                                   String reservePhone,
@@ -386,6 +398,7 @@ public class IntegerCityController {
      * 取消订单
      * @return
      */
+    @RequestMapping(value = "cancelOrder",method = RequestMethod.POST)
     public AjaxResponse cancelOrder(String orderNo){
         Map<String,Object> map = Maps.newHashMap();
         map.put("sign","sign");
@@ -455,6 +468,7 @@ public class IntegerCityController {
      * @param startTime
      * @return
      */
+    @RequestMapping(value = "/addMainOrder",method = RequestMethod.POST)
     public AjaxResponse addMainOrder(String orderNo,
                                      Integer driverId,
                                      String driverName,

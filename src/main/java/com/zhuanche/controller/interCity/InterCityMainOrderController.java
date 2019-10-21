@@ -17,12 +17,16 @@ import com.zhuanche.common.web.datavalidate.custom.IdCard;
 import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
 import com.zhuanche.entity.mdbcarmanage.MainOrderInterCity;
 import com.zhuanche.entity.orderPlatform.CarFactOrderInfoEntity;
+import com.zhuanche.entity.rentcar.DriverEntity;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.util.Common;
 import com.zhuanche.util.MyRestTemplate;
 import mapper.orderPlatform.ex.PoolMainOrderExMapper;
+import mapper.rentcar.ex.CarBizDriverInfoExMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +59,9 @@ public class InterCityMainOrderController {
     @Autowired
     @Qualifier("carRestTemplate")
     private MyRestTemplate carRestTemplate;
+
+    @Autowired
+    private CarBizDriverInfoExMapper driverInfoExMapper;
 
     /**
      * 订单查询
@@ -95,7 +102,31 @@ public class InterCityMainOrderController {
                                        String beginCostEndDate){
 
         Page page = PageHelper.startPage(pageNum,pageSize);
+
+
+        StringBuffer sb =new StringBuffer();
+        if(supplierId  != null || StringUtils.isNotEmpty(driverName) || StringUtils.isNotEmpty(driverPhone) || StringUtils.isNotEmpty(licensePlates)){
+            DriverEntity driverEntity = new DriverEntity();
+            driverEntity.setName(driverName);
+            driverEntity.setPhone(driverPhone);
+            driverEntity.setLicensePlates(licensePlates);
+            driverEntity.setSupplierId(supplierId);
+            List<DriverEntity> list =  driverInfoExMapper.queryDriverIdBySupplierId(driverEntity);
+            if(CollectionUtils.isNotEmpty(list)){
+                for (DriverEntity entity : list){
+                    sb.append(entity.getDriverId()).append(",");
+                }
+            }
+
+        }
+
         CarPoolMainOrderDTO dto = new CarPoolMainOrderDTO();
+
+        if(StringUtils.isNotEmpty(sb.toString())){
+            String driverIds = sb.toString().substring(0,sb.toString().length()-1);
+            dto.setDriverIds(driverIds);
+        }
+
         dto.setCityId(cityId);
         dto.setSupplierId(supplierId);
         dto.setStatus(orderState);
@@ -127,7 +158,7 @@ public class InterCityMainOrderController {
     })
     public AjaxResponse mainOrderDetail(String mainOrderNo){
         logger.info("获取拼车单订单详情入参:mainOrderNo" + mainOrderNo);
-        List<CarFactOrderInfoEntity> rows = new ArrayList<CarFactOrderInfoEntity>();
+       // List<CarFactOrderInfoEntity> rows = new ArrayList<CarFactOrderInfoEntity>();
         try {
             String url = Common.GET_MAIN_ORDER + "?businessId=" + Common.BUSSINESSID + "&isShowSubOrderList=0&mainOrderNo=" + mainOrderNo;
             // 参数：订单号 、业务线id
@@ -152,12 +183,13 @@ public class InterCityMainOrderController {
                 if (data==null || data.isEmpty()) {
                     AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
                 }
-                AjaxResponse.success(data);
+               return AjaxResponse.success(data);
             }
         } catch (Exception e) {
             logger.error("根据主订单查询子订单信息异常" ,e);
+           return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
-        return AjaxResponse.success(rows);
+        return AjaxResponse.success(null);
     }
 
     private List<CarFactOrderInfoEntity> convent(JSONArray jsonArrayData) {

@@ -1972,4 +1972,25 @@
         limit 1
     </select>
 
+  <select id="queryDriverIdBySupplierId" parameterType="com.zhuanche.entity.rentcar.DriverEntity" resultType="com.zhuanche.entity.rentcar.DriverEntity">
+    SELECT
+    driver_id AS driverId
+    FROM
+    car_biz_driver_info
+    where status= 1
+    <if test="phone!=null and phone!=''">
+      and phone = #{phone}
+    </if>
+    <if test="supplierId!=null and supplierId!=''">
+      and supplier_id = #{supplierId}
+    </if>
+    <if test="suppliers!=null and suppliers!=''">
+      and supplier_id in (${suppliers})
+    </if>
+    <if test="licensePlates!=null and licensePlates!=''">
+      and license_plates = #{licensePlates}
+    </if>
+  </select>
+
+
 </mapper>

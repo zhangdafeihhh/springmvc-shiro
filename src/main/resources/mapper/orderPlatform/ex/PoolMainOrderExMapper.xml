@@ -51,14 +51,14 @@
 			<if test="cityId != null and cityId != ''" >
 				and city_id = #{cityId,jdbcType=INTEGER}
 			</if>
-			<if test="supplierId != null and supplierId != ''" >
+			<!--<if test="supplierId != null and supplierId != ''" >
 				and supplier_id = #{supplierId,jdbcType=INTEGER}
-			</if>
+			</if>-->
 			<if test="status != null and status != ''" >
 				and status = #{status,jdbcType=INTEGER}
 			</if>
-			<if test="driverId != null and driverId != ''" >
-				and driver_id = #{driverId,jdbcType=INTEGER}
+			<if test="driverIds != null and driverIds != ''" >
+				and driver_id in (${driverId,jdbcType=INTEGER})
 			</if>
 
 			<if test="driverPhone != null and driverPhone != ''" >
@@ -88,6 +88,7 @@
 		<include refid="Base_Column_List"/>
 		from carpool_main_order
 		<include refid="allBaseColumnWhereList" />
+		ORDER BY update_date DESC
 	</select>
 	
 </mapper>
