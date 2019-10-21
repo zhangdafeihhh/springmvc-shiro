@@ -5,5 +5,5 @@ public interface PoolMainOrderMapper {
 	   /**
      * 
      */
-    public CarPoolMainOrderDTO queryCarpoolMainForObject(CarPoolMainOrderDTO params);
+    CarPoolMainOrderDTO queryCarpoolMainForObject(CarPoolMainOrderDTO params);
 }

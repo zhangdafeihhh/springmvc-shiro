@@ -1,12 +1,40 @@
 package com.zhuanche.controller.interCity;
 
+import co.elastic.apm.shaded.bytebuddy.asm.Advice;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Lists;
+import com.zhuanche.common.database.DynamicRoutingDataSource;
+import com.zhuanche.common.database.MasterSlaveConfig;
+import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.common.web.datavalidate.custom.IdCard;
+import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
+import com.zhuanche.entity.mdbcarmanage.MainOrderInterCity;
+import com.zhuanche.entity.orderPlatform.CarFactOrderInfoEntity;
+import com.zhuanche.http.MpOkHttpUtil;
+import com.zhuanche.util.Common;
+import com.zhuanche.util.MyRestTemplate;
+import mapper.orderPlatform.ex.PoolMainOrderExMapper;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Author fanht
@@ -20,6 +48,13 @@ public class InterCityMainOrderController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
+
+    @Autowired
+    private PoolMainOrderExMapper exMapper;
+
+    @Autowired
+    @Qualifier("carRestTemplate")
+    private MyRestTemplate carRestTemplate;
 
     /**
      * 订单查询
@@ -39,6 +74,11 @@ public class InterCityMainOrderController {
      * @param beginCostEndDate 订单完成结束时间
      * @return
      */
+    @RequestMapping("/mainOrderQuery")
+    @ResponseBody
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     public AjaxResponse mainOrderQuery(@Verify(param = "pageNum",rule = "required") Integer pageNum,
                                        @Verify(param = "pageSize",rule = "required") Integer pageSize,
                                        Integer cityId,
@@ -54,8 +94,24 @@ public class InterCityMainOrderController {
                                        String beginCostStartDate,
                                        String beginCostEndDate){
 
-
-        return null;
+        Page page = PageHelper.startPage(pageNum,pageSize);
+        CarPoolMainOrderDTO dto = new CarPoolMainOrderDTO();
+        dto.setCityId(cityId);
+        dto.setSupplierId(supplierId);
+        dto.setStatus(orderState);
+        dto.setServiceTypeId(serviceType);
+        dto.setDriverName(driverName);
+        dto.setDriverPhone(driverPhone);
+        dto.setLicensePlates(licensePlates);
+        dto.setMainOrderNo(mainOrderNo);
+        dto.setCreateDateBegin(beginCreateDate);
+        dto.setCreateDateEnd(endCreateDate);
+        dto.setDriverStartDateStr(beginCostStartDate);
+        dto.setDriverEndDateStr(beginCostEndDate);
+        List<CarPoolMainOrderDTO> dtoList = exMapper.queryCarpoolMainList(dto);
+        int total = (int)page.getTotal();
+        PageDTO pageDTO =  new PageDTO(pageNum,pageSize,total,dtoList);
+        return AjaxResponse.success(pageDTO);
     }
 
 
@@ -65,8 +121,54 @@ public class InterCityMainOrderController {
      * @return
      */
     @RequestMapping(value = "/mainOrderDetail",method = RequestMethod.GET)
+    @ResponseBody
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
     public AjaxResponse mainOrderDetail(String mainOrderNo){
         logger.info("获取拼车单订单详情入参:mainOrderNo" + mainOrderNo);
-        return null;
+        List<CarFactOrderInfoEntity> rows = new ArrayList<CarFactOrderInfoEntity>();
+        try {
+            String url = Common.GET_MAIN_ORDER + "?businessId=" + Common.BUSSINESSID + "&isShowSubOrderList=0&mainOrderNo=" + mainOrderNo;
+            // 参数：订单号 、业务线id
+            StringBuffer param = new StringBuffer("");
+            param.append("businessId=" + Common.BUSSINESSID + "&isShowSubOrderList=0&");
+            param.append("mainOrderNo=" + mainOrderNo  + '&');
+            param.append("key=" + Common.MAIN_ORDER_KEY);
+            String sign = Base64.encodeBase64String(DigestUtils.md5(param.toString()));
+            url += "&sign="+sign;
+
+
+            JSONObject result = carRestTemplate.getForObject(url,JSONObject.class);
+            //JSONObject result = MpOkHttpUtil.okHttpPostToJsonBackJson(url,null,0,null);
+            int code = result.getIntValue("code");
+            String msg = result.getString("msg");
+            if (code == 1) {
+                logger.info("根据主订单号查询子订单出错,错误码:" + code + ",错误原因:" + msg);
+                return  AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+            }
+            if (code == 0) {
+                JSONObject data = result.getJSONObject("data");
+                if (data==null || data.isEmpty()) {
+                    AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+                }
+                AjaxResponse.success(data);
+            }
+        } catch (Exception e) {
+            logger.error("根据主订单查询子订单信息异常" ,e);
+        }
+        return AjaxResponse.success(rows);
+    }
+
+    private List<CarFactOrderInfoEntity> convent(JSONArray jsonArrayData) {
+        List<CarFactOrderInfoEntity> list = Lists.newArrayList();
+        for(int i=0;i<jsonArrayData.size();i++) {
+            JSONObject data = jsonArrayData.getJSONObject(i);
+            CarFactOrderInfoEntity entity = new CarFactOrderInfoEntity();
+            entity.setOrderId(Integer.parseInt(data.getString("orderId")));
+            entity.setOrderno(data.getString("orderNo"));
+            list.add(entity);
+        }
+        return list;
     }
 }

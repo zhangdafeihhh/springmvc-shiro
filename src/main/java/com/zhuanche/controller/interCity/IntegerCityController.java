@@ -1,9 +1,11 @@
 package com.zhuanche.controller.interCity;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.sq.common.okhttp.OkHttpUtil;
+import com.zhuanche.common.enums.OrderStateEnum;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -11,11 +13,13 @@ import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.MyRestTemplate;
 import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -43,6 +47,16 @@ public class IntegerCityController {
 
     @Autowired
     private DriverInfoInterCityExMapper infoInterCityExMapper;
+
+    @Value("${config.url}")
+    private String configUrl;
+
+    @Value("${lbs.url}")
+    private String lbsUrl;
+
+    @Autowired
+    @Qualifier("carRestTemplate")
+    private MyRestTemplate carRestTemplate;
 
     /**
      * 订单查询
@@ -157,7 +171,23 @@ public class IntegerCityController {
     }
 
 
-
+    /**
+     * 步骤1
+     * @param reserveName
+     * @param reservePhone
+     * @param isSameRider
+     * @param riderName
+     * @param riderPhone
+     * @param riderCount 乘客数
+     * @param boardingTime
+     * @param boardingCityId
+     * @param boardingGetOnX
+     * @param boardingGetOnY
+     * @param boardingGetOffCityId
+     * @param boardingGetOffX
+     * @param boardingGetOffY
+     * @return
+     */
     public AjaxResponse handOperateAddOrderSetp1(@Verify(param = "reserveName",rule = "required") String reserveName,
                                             String reservePhone,
                                             Integer isSameRider,
@@ -172,7 +202,9 @@ public class IntegerCityController {
                                             String boardingGetOffX,
                                             String boardingGetOffY
                                             ){
-        logger.info("手动录入订单步骤1入参,{0},{1},{2},{3},{4},{5},{6},{7}");
+        logger.info(MessageFormat.format("手动录入订单步骤1入参,{0},{1},{2},{3},{4},{5},{6},{7}",reserveName,reservePhone,
+                isSameRider,riderName,riderPhone,riderCount,boardingTime,boardingCityId,boardingGetOnX,boardingGetOnY,boardingGetOffCityId,
+                boardingGetOffX,boardingGetOffY));
 
         //
         //根据横纵坐标获取围栏，根据围栏获取路线
@@ -273,7 +305,80 @@ public class IntegerCityController {
      * 编辑订单
      * @return
      */
-    public AjaxResponse editOrder(){
+    public AjaxResponse editOrder(@Verify(param = "reserveName",rule = "required") String reserveName,
+                                  String orderNo,
+                                  String reservePhone,
+                                  Integer isSameRider,
+                                  String riderName,
+                                  String riderPhone,
+                                  Integer riderCount,
+                                  String boardingTime,
+                                  Integer boardingCityId,
+                                  String boardingGetOnX,
+                                  String boardingGetOnY,
+                                  String boardingGetOffCityId,
+                                  String boardingGetOffX,
+                                  String boardingGetOffY){
+
+        //根据上下车地址判断是否在城际列车配置的范围内
+        String queryLbsUrl = lbsUrl + "/division/location";
+        Map<String,Object> queryLbsMap = Maps.newHashMap();
+        queryLbsMap.put("lng",boardingGetOnX);
+        queryLbsMap.put("lat",boardingGetOnY);
+        queryLbsMap.put("inCoordType","mars");//高德
+        String weilanIdX = "";
+
+        String result = MpOkHttpUtil.okHttpGet(queryLbsUrl,queryLbsMap,0,null);
+        if(StringUtils.isNotBlank(result)){
+            JSONObject jsonObject = JSON.parseObject(result);
+            if(jsonObject.get("code") != null && jsonObject.getInteger("code") == 0){
+                JSONObject jsonData = jsonObject.getJSONObject("data");
+                if(jsonData != null && jsonData.get("id") != null){
+                    weilanIdX = jsonData.getString("id");
+                }
+            }
+        }
+
+        String weilanIdY = "";
+
+        Map<String,Object> queryLbsMapY = Maps.newHashMap();
+        queryLbsMapY.put("lng",boardingGetOffX);
+        queryLbsMapY.put("lat",boardingGetOffY);
+        queryLbsMapY.put("inCoordType","mars");//高德
+        String resultY = MpOkHttpUtil.okHttpGet(queryLbsUrl,queryLbsMapY,0,null);
+        if(StringUtils.isNotBlank(resultY)){
+            JSONObject jsonObject =JSON.parseObject(resultY);
+            if(jsonObject.get("code") != null && jsonObject.getInteger("code") == 0){
+                JSONObject jsonData = jsonObject.getJSONObject("data");
+                if(jsonData != null && jsonData.get("id") != null){
+                    weilanIdY = jsonData.getString("id");
+                }
+            }
+        }
+
+        Map<String,Object> map = Maps.newHashMap();
+        map.put("sign","sign");
+        map.put("businessId","businessId");
+        map.put("orderNo",orderNo);
+        map.put("pushDriverType", OrderStateEnum.MANUAL_ASSIGNMENT.getCode());//订单指派司机类型(1 系统强派| 2 司机抢单| 3 后台人工指派)
+        map.put("factStartAddr",boardingCityId);
+        map.put("factStartPoint",weilanIdX);//根据坐标轴获取围栏id
+        map.put("factEndAddr",weilanIdY);//
+        map.put("carGroupId","carGroupId");
+        map.put("driverId",null);
+        map.put("licensePlates",null);
+        map.put("receiveSMS",1);//预订人是否接收短信(1 接收 2 不接受)
+
+        String url = esOrderDataSaasUrl + "/order/carpool/updateSubOrder/";
+        String editResult = MpOkHttpUtil.okHttpPost(url,map,0,null);
+        if(StringUtils.isNotBlank(editResult)){
+            JSONObject jsonObject = JSONObject.parseObject(editResult);
+            if(jsonObject.get("code") != null && jsonObject.getInteger("code") == 1){
+
+            }
+        }
+
+
         return null;
     }
 
@@ -281,22 +386,21 @@ public class IntegerCityController {
      * 取消订单
      * @return
      */
-    public AjaxResponse cancelOrder(){
+    public AjaxResponse cancelOrder(String orderNo){
+        Map<String,Object> map = Maps.newHashMap();
+        map.put("sign","sign");
+        map.put("businessId","businessId");
+        map.put("orderNo",orderNo);
+        map.put("cancelReasonId",24);//固定取消原有
+        map.put("memo","加盟商调度员手动取消");
+        map.put("cancelType",2); //1-乘客；2-平台；3-客服；4-司机
+        map.put("cancelStatus",11);//平台取消任意值
+
         return null;
     }
 
 
 
-    /**
-     * 改派订单
-     * @param orderNo
-     * @param driverId
-     * @param mainOrderNo
-     * @return
-     */
-    public AjaxResponse orderReassignment(String orderNo,Integer driverId,String mainOrderNo){
-        return null;
-    }
 
 
     /**
@@ -340,26 +444,37 @@ public class IntegerCityController {
     }
 
 
-    public AjaxResponse addMainOrder(Integer supplierId,
+    /**
+     * 添加主单
+     * @param orderNo
+     * @param driverId
+     * @param driverName
+     * @param driverPhone
+     * @param licensePlates
+     * @param carGroupId
+     * @param startTime
+     * @return
+     */
+    public AjaxResponse addMainOrder(String orderNo,
                                      Integer driverId,
                                      String driverName,
                                      String driverPhone,
                                      String licensePlates,
-                                      String trip,
+                                     String carGroupId,
                                      String startTime){
 
         logger.info("");
         //调用订单组接口
         Map<String,Object> map = Maps.newHashMap();
-        map.put("",);
-        map.put("",);
-        map.put("",);
-        map.put("",);
-        map.put("",);
-        map.put("",);
-        map.put("",);
-        map.put("",);
-        map.put("",);
+        map.put("sign","sign");
+        map.put("businessId","businessId");
+        map.put("mainOrderNo",null);
+        map.put("orderNo",orderNo);
+        map.put("driverId",driverId);
+        map.put("driverName",driverName);
+        map.put("driverPhone",driverPhone);
+        map.put("licensePlates",licensePlates);
+        map.put("carGroupId",carGroupId);
         String url = esOrderDataSaasUrl + "";
         String result = MpOkHttpUtil.okHttpPost(url,map,0,null);
         if(StringUtils.isNotBlank(result)){
@@ -370,27 +485,28 @@ public class IntegerCityController {
     }
 
     //获取行程接口
-    public AjaxResponse getTrips(){
-        //获取行程
+    public AjaxResponse getTrips(String boardingGetOnX,
+                                 String boardingGetOnY){
+        //获取行程  调用配置中心的接口
+
+        String result = configUrl+"/intercityCarUse/getLineSupplier";
+
+        Map<String,Object> map = Maps.newHashMap();
+        map.put("areaStartRangeId",boardingGetOnX);
+
         return AjaxResponse.success(null);
     }
 
 
     /**
      * 派单
-     * @param reserveName
-     * @param reservePhone
-     * @param isSameRider
-     * @param riderName
-     * @param riderPhone
-     * @param riderCount
-     * @param boardingTime
-     * @param boardingCityId
-     * @param boardingGetOnX
-     * @param boardingGetOnY
-     * @param boardingGetOffCityId
-     * @param boardingGetOffX
-     * @param boardingGetOffY
+     * @param mainOrderNo
+     * @param orderNo
+     * @param driverId
+     * @param driverName
+     * @param driverPhone
+     * @param licensePlates
+     * @param carGroupId
      * @return
      */
     public AjaxResponse handOperateAddOrderSetp2(String mainOrderNo,
@@ -424,4 +540,18 @@ public class IntegerCityController {
         return null;
     }
 
+
+
+    //根据车辆类型获取座位数
+    private int seatCount(String groupId){
+        if(StringUtils.isEmpty(groupId)){
+            return 4;
+        }
+        if(groupId.equals(OrderStateEnum.BUSINESSWELL.getCode()) ||
+                groupId.equals(OrderStateEnum.BUSINESS7.getCode())){
+            return 6;
+        }else {
+            return 4;
+        }
+    }
 }
