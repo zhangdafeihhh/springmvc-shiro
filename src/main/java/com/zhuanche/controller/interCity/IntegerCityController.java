@@ -135,7 +135,7 @@ public class IntegerCityController {
                 endCreateDate,beginCostStartDate,beginCostEndDate,riderPhone));
 
         Map<String,Object> map = Maps.newHashMap();
-        map.put("pageNum",pageNum);
+        map.put("pageNo",pageNum);
         map.put("pageSize",pageSize);
         map.put("cityId",cityId);
         map.put("supplierId",supplierId);
@@ -216,7 +216,7 @@ public class IntegerCityController {
     @RequestMapping(value = "/handOperateAddOrderSetp1",method = RequestMethod.POST)
     @ResponseBody
     public AjaxResponse handOperateAddOrderSetp1(@Verify(param = "reserveName",rule = "required") String reserveName,
-                                            String reservePhone,
+                                            @Verify(param = "reservePhone",rule = "required") String reservePhone,
                                             Integer isSameRider,
                                             String riderName,
                                             String riderPhone,
@@ -227,7 +227,9 @@ public class IntegerCityController {
                                             String boardingGetOnY,
                                             String boardingGetOffCityId,
                                             String boardingGetOffX,
-                                            String boardingGetOffY
+                                            String boardingGetOffY,
+                                            String startCityName,
+                                            String endCityName
                                             ){
         logger.info(MessageFormat.format("手动录入订单步骤1入参,{0},{1},{2},{3},{4},{5},{6},{7}",reserveName,reservePhone,
                 isSameRider,riderName,riderPhone,riderCount,boardingTime,boardingCityId,boardingGetOnX,boardingGetOnY,boardingGetOffCityId,
@@ -309,16 +311,18 @@ public class IntegerCityController {
 
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
         Map<String,Object> map = Maps.newHashMap();
-        long currentTime = System.currentTimeMillis();
+        Date bookDate = DateUtils.getDate(boardingTime,"yyyy-MM-dd HH:mm:ss");
+
+        long bookingDate = bookDate.getTime();
         StringBuffer sb = new StringBuffer();
         map.put("businessId",Common.BUSSINESSID);//业务线ID
         sb.append("businessId=" + Common.BUSSINESSID+ '&');
         map.put("type","1");//普通用户订单
         sb.append("type=1"+ '&');
-        map.put("clientType",10);//订单类型
-        sb.append("clientType=10"  + '&');
-        map.put("bookingDate", currentTime);//预定日期（时间戳）
-        sb.append("bookingDate=" + currentTime  + '&');
+        map.put("clientType",28);//订单类型
+        sb.append("clientType=28"  + '&');
+        map.put("bookingDate", bookingDate);//预定日期（时间戳）
+        sb.append("bookingDate=" + bookingDate  + '&');
         map.put("riderName",riderName);
         sb.append("riderName=" + riderName  + '&');
         map.put("riderPhone",riderPhone);
@@ -347,8 +351,8 @@ public class IntegerCityController {
         sb.append("coordinate=GD"   + '&');
         map.put("bookingUserId",loginUser.getId());
         sb.append("bookingUserId=" + loginUser.getId()  + '&');
-        map.put("bookingUserPhone",loginUser.getMobile());
-        sb.append("bookingUserPhone=" + loginUser.getMobile()  + '&');
+        map.put("bookingUserPhone",reservePhone);
+        sb.append("bookingUserPhone=" + reservePhone  + '&');
         map.put("buyoutFlag","0");
         sb.append("buyoutFlag=0" + '&');
         map.put("buyoutPrice","1");
@@ -363,6 +367,22 @@ public class IntegerCityController {
         sb.append("couponId=111" + '&');
         map.put("estimatedAmount","111");//预估金额
         sb.append("estimatedAmount=111" + '&');
+
+        map.put("startCityId",boardingCityId);
+        sb.append("startCityId="+boardingCityId).append("&");
+        map.put("startCityName",startCityName);
+        sb.append("startCityName="+startCityName).append("&");
+        map.put("endCityId",boardingGetOffCityId);
+        sb.append("endCityId="+boardingGetOffCityId).append("&");
+        map.put("endCityName",endCityName);
+        sb.append("endCityName="+endCityName).append("&");
+
+        String getOn = boardingGetOnX + ";" + boardingGetOnY;
+        String getOff = boardingGetOffX + ";" + boardingGetOffY;
+        map.put("bookingStartPoint",getOn);
+        sb.append("bookingStartPoint="+getOn).append("&");
+        map.put("bookingEndPoint",getOff);
+        sb.append("bookingEndPoint="+getOff).append("&");
 
 
         List<String> list = this.list(sb.toString());
@@ -429,18 +449,36 @@ public class IntegerCityController {
             if(0 == code){
              JSONObject jsonData =  jsonObject.getJSONObject("data");
                 InterCityOrderDTO dto = new InterCityOrderDTO();
+
+                String bookingUserPhone = jsonData.get("bookingUserPhone")==null?"":jsonData.getString("bookingUserPhone");
+
+                String riderPhone = jsonData.get("riderPhone") == null ? "" : jsonData.getString("riderPhone");
                 dto.setReserveName(jsonData.getString(""));
-                dto.setReservePhone(jsonData.get("bookingUserPhone")==null?"":jsonData.getString("bookingUserPhone"));
+                dto.setReservePhone(bookingUserPhone);
                 dto.setRiderName(jsonData.get("riderName") == null ?"":jsonData.getString("riderName"));
-                dto.setRiderPhone(jsonData.get("riderPhone") == null ? "" : jsonData.getString("riderPhone"));
+                dto.setRiderPhone(riderPhone);
                 dto.setRiderCount(jsonData.get("factDriverId") == null ? 0 : jsonData.getInteger("factDriverId"));
                 dto.setBoardingTime(jsonData.get("bookingDate") == null ? "" : jsonData.getString("bookingDate"));
-                dto.setBoardingCityId(jsonData.get("cityId") == null ? "" : jsonData.getString("cityId"));
-                dto.setBoardingGetOffCityId(jsonData.get("bookingStartAddr") == null ? "" : jsonData.getString("bookingStartAddr"));
                 dto.setBoardingGetOffCityId(jsonData.get("bookingEndAddr") == null ? "" : jsonData.getString("bookingEndAddr"));
                 dto.setBookingStartPoint(jsonData.get("bookingStartPoint") == null ? "" : jsonData.getString("bookingStartPoint"));
                 dto.setBookingEndPoint(jsonData.get("bookingEndPoint") == null ? "" : jsonData.getString("bookingEndPoint"));
                 dto.setStatus(jsonData.get("status") == null ? null : jsonData.getInteger("status"));
+                if(jsonData != null && jsonData.get("memo") != null){
+                    JSONObject jsonMemo = jsonData.getJSONObject("memo");
+                    dto.setBoardingCityId(jsonMemo.get("startCityId") == null ? "":jsonMemo.getString("startCityId"));
+                    dto.setBoardingGetOffCityId(jsonMemo.get("endCityId") == null ?"":jsonMemo.getString("endCityId"));
+                    dto.setBoardingCityName(jsonMemo.get("startCityName") == null ? "":jsonMemo.getString("startCityName"));
+                    dto.setBoardingGetOffCityName(jsonMemo.get("endCityName") == null ? "":jsonMemo.getString("endCityName"));
+                }
+                if(StringUtils.isNotEmpty(bookingUserPhone) && StringUtils.isNotEmpty(riderPhone)){
+                    if(bookingUserPhone.equals(riderPhone)){
+                        dto.setIsSameRider(1);//1相同 0 不同
+                    }else {
+                        dto.setIsSameRider(0);
+                    }
+                }else {
+                    dto.setIsSameRider(0);
+                }
                 return AjaxResponse.success(dto);
             }
         }
