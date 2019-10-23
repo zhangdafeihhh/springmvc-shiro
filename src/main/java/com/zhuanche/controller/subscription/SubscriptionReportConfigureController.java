@@ -270,7 +270,16 @@ public class SubscriptionReportConfigureController {
         map.put( "43", "八维通");
         map.put( "44", "ToBC司机流水");
         map.put( "45", "身边惠");
-        
+        map.put( "46", "美付宝");
+        map.put( "47", "九洲港");
+        map.put( "48", "行游网");
+        map.put( "49", "国航");
+        map.put( "50", "114票务");
+        map.put( "51", "上海酷屏");
+        map.put( "52", "heycars");
+        map.put( "53", "微油");
+        map.put( "54", "如家随叫随到");
+
         return AjaxResponse.success(map);
     }
 
