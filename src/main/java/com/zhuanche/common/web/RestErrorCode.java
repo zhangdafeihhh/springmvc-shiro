@@ -256,6 +256,27 @@ public final class RestErrorCode{
 	//------------------------------------------------新城际拼车业务
 	@ResultMessage("该地点不含有城际拼车的线路")
 	public static final int UNDEFINED_LINE = 50000;
+
+	@ResultMessage("获取上车点地址失败")
+	public static final int GET_ON_ADDRESS_FAILED = 50010;
+
+	@ResultMessage("获取下车点地址失败")
+	public static final int GET_OFF_ADDRESS_FAILED = 50011;
+
+	@ResultMessage("绑定主单失败")
+	public static final int BIND_MAIN_FAILED = 50100;
+	@ResultMessage("改派订单失败")
+	public static final int CHANGE_MAIN_FAILED = 50101;
+
+	@ResultMessage("更新子订单失败")
+	public static final int UPDATE_SUB_ORDER_FAILED = 50301;
+
+	@ResultMessage("未获取到订单数据")
+	public static final int ORDER_DETAIL_UNDEFINED = 50302;
+
+	@ResultMessage("取消订单失败")
+	public static final int CANCEL_FAILED = 50200;
+
 	//------------------------------------------------
 
 	//-------------------金融商品--start-------------------------

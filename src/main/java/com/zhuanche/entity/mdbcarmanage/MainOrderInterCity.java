@@ -15,6 +15,12 @@ public class MainOrderInterCity {
 
     private Integer status;
 
+    private String mainName;
+
+    private String mainTime;
+
+    private String opePhone;
+
     public Integer getId() {
         return id;
     }
@@ -61,5 +67,29 @@ public class MainOrderInterCity {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public String getMainName() {
+        return mainName;
+    }
+
+    public void setMainName(String mainName) {
+        this.mainName = mainName;
+    }
+
+    public String getMainTime() {
+        return mainTime;
+    }
+
+    public void setMainTime(String mainTime) {
+        this.mainTime = mainTime;
+    }
+
+    public String getOpePhone() {
+        return opePhone;
+    }
+
+    public void setOpePhone(String opePhone) {
+        this.opePhone = opePhone;
     }
 }
