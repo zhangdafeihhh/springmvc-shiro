@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.enums.OrderStateEnum;
+import com.zhuanche.common.util.SignUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -13,9 +14,7 @@ import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
-import com.zhuanche.util.Common;
-import com.zhuanche.util.MyRestTemplate;
-import com.zhuanche.util.SignatureUtils;
+import com.zhuanche.util.*;
 import com.zhuanche.util.encrypt.MD5Utils;
 import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
 import org.apache.commons.codec.binary.Base64;
@@ -70,6 +69,9 @@ public class IntegerCityController {
     @Autowired
     private DriverInfoInterCityExMapper infoInterCityExMapper;
 
+    @Value("${lbs.token}")
+    private String lbsToken;
+
 
 
     /**
@@ -106,7 +108,7 @@ public class IntegerCityController {
                                    Integer cityId,
                                    Integer supplierId,
                                    Integer orderState,
-                                   Integer orderPushDriverType,
+                                   Integer pushDriverType,
                                    Integer serviceType,
                                    Integer orderType,
                                    Integer airportId,
@@ -128,7 +130,7 @@ public class IntegerCityController {
                 "{4},orderPushDriverType:{5},serviceType:{6},orderType:{7},airportId:{8},orderSource:{9},driverName:" +
                 "{10},driverPhone:{11},licensePlates:{12},reserveName:{13},reservePhone:{14},riderName:{15},orderNo:{16}," +
                 "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostStartDate{20},beginCostEndDate{21},riderPhone:{22}",pageNum,
-                pageSize,cityId,supplierId,orderState,orderPushDriverType,serviceType,orderType,airportId,orderSource,
+                pageSize,cityId,supplierId,orderState,pushDriverType,serviceType,orderType,airportId,orderSource,
                 driverName,driverPhone,licensePlates,reserveName,reservePhone,riderName,orderNo,mainOrderNo,beginCreateDate,
                 endCreateDate,beginCostStartDate,beginCostEndDate,riderPhone));
 
@@ -138,7 +140,7 @@ public class IntegerCityController {
         map.put("cityId",cityId);
         map.put("supplierId",supplierId);
         map.put("orderState",orderState);
-        map.put("orderPushDriverType",orderPushDriverType);
+        map.put("orderPushDriverType",pushDriverType);
         map.put("serviceType",serviceType);
         map.put("orderType",orderType);
         map.put("airportId",airportId);
@@ -174,21 +176,23 @@ public class IntegerCityController {
             if(code == 0){
                 //JSONArray resultData = jsonObject.getJSONArray("data");
                 JSONObject jsonData = jsonObject.getJSONObject("data");
+
                 if(jsonData != null && jsonData.get("data") != null) {
-                    JSONArray array = jsonData.getJSONArray("data");
+                    return AjaxResponse.success(jsonData);
+                    /*JSONArray array = jsonData.getJSONArray("data");
                     JSONObject jsonResult = new JSONObject();
                     for (int i = 0; i < array.size(); i++) {
                         jsonResult = array.getJSONObject(i);
-                        /*JSONObject jsonReturn = new JSONObject();
-                        jsonReturn.put("orderId", jsonResult.get("orderId"));*/
+                        *//*JSONObject jsonReturn = new JSONObject();
+                        jsonReturn.put("orderId", jsonResult.get("orderId"));*//*
                         resultArray.add(jsonResult);
-                    }
+                    }*/
                 }
             }
         }
 
         //调用订单组接口查询
-        return AjaxResponse.success(resultArray);
+        return AjaxResponse.success(null);
     }
 
 
@@ -232,12 +236,24 @@ public class IntegerCityController {
         //
         //根据横纵坐标获取围栏，根据围栏获取路线
         Map<String,Object> mapX = Maps.newHashMap();
-        mapX.put("lng",boardingGetOnX);
-        mapX.put("lat",boardingGetOnY);
+
+        mapX.put("token",lbsToken);
+
+
+        mapX.put("cityId",boardingCityId);
+        mapX.put("x",boardingGetOnX);
+        mapX.put("y",boardingGetOnY);
+       /* mapX.put("lng",boardingGetOnX);
+        mapX.put("lat",boardingGetOnY);*/
 
         String getOnId = "";
+
+        //String resultX = MpOkHttpUtil.okHttpPost(lbsUrl+"/area/getAreaByCoordinate",mapX,0,null);
+
+
+
         String resultX = MpOkHttpUtil.okHttpGet(lbsUrl + "/division/entrance",mapX,0,null);
-        if(resultX != null){
+        /*if(resultX != null){
             JSONObject jsonObject = JSONObject.parseObject(resultX);
             if(jsonObject.get("code") != null && jsonObject.getInteger("code") == 0){
                 JSONObject jsonData = jsonObject.getJSONObject("data");
@@ -250,7 +266,7 @@ public class IntegerCityController {
         if(StringUtils.isEmpty(getOnId)){
             logger.info("获取上车点失败");
             return AjaxResponse.fail(RestErrorCode.GET_ON_ADDRESS_FAILED);
-        }
+        }*/
 
 
         Map<String,Object> mapY = Maps.newHashMap();
@@ -261,7 +277,7 @@ public class IntegerCityController {
         String resultY = MpOkHttpUtil.okHttpGet(lbsUrl+"/division/entrance",mapY,0,null);
 
         String getOffId = "";
-        if(resultX  != null){
+        /*if(resultX  != null){
             JSONObject jsonObject = JSONObject.parseObject(resultY);
             if(jsonObject.get("code") != null && jsonObject.getInteger("code") == 0){
                 JSONObject jsonData = jsonObject.getJSONObject("data");
@@ -274,9 +290,9 @@ public class IntegerCityController {
         if(StringUtils.isEmpty(getOffId)){
             logger.info("获取下车点失败");
             return AjaxResponse.fail(RestErrorCode.GET_OFF_ADDRESS_FAILED);
-        }
+        }*/
 
-        Integer areaStartRangId = Integer.valueOf(getOnId);
+       /* Integer areaStartRangId = Integer.valueOf(getOnId);
         Integer areaEndRangId = Integer.valueOf(getOffId);
         String areaUrl = configUrl + "/intercityCarUse/getLineSupplier?areaStartRangeId="+areaStartRangId+"&areaEndRangeId="+areaEndRangId;
         String areaResult = MpOkHttpUtil.okHttpGet(areaUrl,null,0,null);
@@ -288,7 +304,7 @@ public class IntegerCityController {
                 logger.info("对应坐标没有线路");
                 return  AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
             }
-        }
+        }*/
 
 
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
@@ -739,8 +755,10 @@ public class IntegerCityController {
         List<String> listParam = new ArrayList<>();
          map.put("businessId",Common.BUSSINESSID);
         listParam.add("businessId="+ Common.BUSSINESSID);
-       /*map.put("mainOrderNo",mainOrderNo);
-        listParam.add("mainOrderNo="+mainOrderNo);*/
+        if(StringUtils.isNotEmpty(mainOrderNo)){
+            map.put("mainOrderNo",mainOrderNo);
+            listParam.add("mainOrderNo="+mainOrderNo);
+        }
         map.put("orderNo",orderNo);
         listParam.add("orderNo="+orderNo);
         map.put("driverId",driverId);
