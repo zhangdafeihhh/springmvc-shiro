@@ -16,6 +16,7 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.driver.SubscriptionReportConfigureDTO;
 import com.zhuanche.entity.driver.SubscriptionReport;
+import com.zhuanche.entity.driver.SubscriptionReportType;
 import com.zhuanche.entity.mdbcarmanage.CarDriverTeam;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
@@ -23,6 +24,7 @@ import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.serv.subscription.SubscriptionReportConfigureService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BigDataFtpUtil;
+import mapper.driver.ex.SubscriptionReportTypeExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -39,9 +41,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -64,6 +64,9 @@ public class SubscriptionReportConfigureController {
 
     @Autowired
     private CitySupplierTeamCommonService citySupplierTeamCommonService;
+
+    @Autowired
+    private SubscriptionReportTypeExMapper subscriptionReportTypeExMapper;
 
     /**
      * 数据报表订阅
@@ -225,61 +228,10 @@ public class SubscriptionReportConfigureController {
     @RequestFunction(menu = REPORT_TYPE_LIST)
     public AjaxResponse querySubscriptionName() {
         JSONObject map = new JSONObject();
-        map.put( "1", "工资明细");
-        map.put( "2", "完单详情");
-        map.put( "3", "积分");
-        map.put( "4", "数单奖");
-        map.put( "5", "对账数据");
-        map.put( "6", "自营司机工资");
-        map.put( "7", "红旗司机考勤");
-        map.put( "8", "红旗司机订单");
-        map.put( "9", "12306");
-        map.put( "10", "差旅一号");
-        map.put( "11", "龙腾卡");
-        map.put( "12", "如家");
-        map.put( "13", "神舟携程商旅");
-        map.put( "14", "同程旅游");
-        map.put( "15", "途牛旅游");
-        map.put( "16", "梓如股份");
-        map.put( "17", "百度员工");
-        map.put( "18", "平安财酷");
-        map.put( "19", "国家电网");
-        map.put( "20", "海航");
-        map.put( "21", "红旗");
-        map.put( "22", "携程");
-        map.put( "23", "飞猪");
-        map.put( "24", "E代驾");
-        map.put( "25", "巴士管家");
-        map.put( "26", "百度地图");
-        map.put( "27", "飞常准");
-        map.put( "28", "哈啰出行");
-        map.put( "29", "高德");
-        map.put( "30", "阿里欢行");
-        map.put( "31", "东方航空");
-        map.put( "32", "高铁管家");
-        map.put( "33", "平安财酷外部公司");
-        map.put( "34", "国铁吉讯");
-        map.put( "35", "中航信");
-        map.put( "36", "Hopetrip");
-        map.put( "37", "美团商企通");
-        map.put( "38", "航班管家");
-        map.put( "39", "携程火车票");
-        map.put( "40", "南航");
-        map.put( "41", "美团");
-        map.put( "42", "航旅纵横");
-        map.put( "43", "八维通");
-        map.put( "44", "ToBC司机流水");
-        map.put( "45", "身边惠");
-        map.put( "46", "美付宝");
-        map.put( "47", "九洲港");
-        map.put( "48", "行游网");
-        map.put( "49", "国航");
-        map.put( "50", "114票务");
-        map.put( "51", "上海酷屏");
-        map.put( "52", "heycars");
-        map.put( "53", "微油");
-        map.put( "54", "如家随叫随到");
-
+        List<SubscriptionReportType> list = subscriptionReportTypeExMapper.findList();
+        list.forEach(ele -> {
+            map.put(ele.getReportId().toString(), ele.getReportName());
+        });
         return AjaxResponse.success(map);
     }
 
