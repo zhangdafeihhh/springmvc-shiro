@@ -38,6 +38,17 @@ public class InterCityOrderDTO {
 
     private Integer status;//订单状态
 
+    private Integer type;//服务类型
+
+
+    private long createTime;//下单时间
+
+    private String boardOnAddr;//上车地点
+
+    private String boardOffAddr;//下车地点
+
+
+
     public String getReserveName() {
         return reserveName;
     }

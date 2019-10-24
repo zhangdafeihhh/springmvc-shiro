@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.enums.OrderStateEnum;
-import com.zhuanche.common.util.SignUtil;
+import com.zhuanche.common.util.LbsSignUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -24,11 +24,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import sun.java2d.pipe.AAShapePipe;
 
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
@@ -73,6 +75,8 @@ public class IntegerCityController {
     private String lbsToken;
 
 
+    @Value("${search.url}")
+    private String searchUrl;
 
     /**
      * 订单查询
@@ -235,64 +239,80 @@ public class IntegerCityController {
                 isSameRider,riderName,riderPhone,riderCount,boardingTime,boardingCityId,boardingGetOnX,boardingGetOnY,boardingGetOffCityId,
                 boardingGetOffX,boardingGetOffY));
 
-        //
+
         //根据横纵坐标获取围栏，根据围栏获取路线
         Map<String,Object> mapX = Maps.newHashMap();
 
         mapX.put("token",lbsToken);
 
-
-        mapX.put("cityId",boardingCityId);
-        mapX.put("x",boardingGetOnX);
-        mapX.put("y",boardingGetOnY);
-       /* mapX.put("lng",boardingGetOnX);
-        mapX.put("lat",boardingGetOnY);*/
-
+        JSONArray array = new JSONArray();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("cityId",boardingCityId);
+        jsonObject.put("x",boardingGetOnX);
+        jsonObject.put("y",boardingGetOnY);
+        array.add(jsonObject);
+        mapX.put("coordinateList",array.toString());
+        String lbsSign = LbsSignUtil.sign(mapX,lbsToken);
+        mapX.put("sign",lbsSign);
+        String lbsResult = MpOkHttpUtil.okHttpPost(lbsUrl + "/area/getAreaByCoordinate",mapX,0,null);
         String getOnId = "";
+        if(StringUtils.isNotEmpty(lbsResult)){
+            JSONObject jsonResult = JSONObject.parseObject(lbsResult);
+            if(jsonResult.get("code") == null || jsonResult.getInteger("code") != 0 ||
+                    jsonResult.get("data") == null) {
+                logger.info("获取上车点失败");
+                return AjaxResponse.fail(RestErrorCode.GET_ON_ADDRESS_FAILED);
+            }
 
-        //String resultX = MpOkHttpUtil.okHttpPost(lbsUrl+"/area/getAreaByCoordinate",mapX,0,null);
+            JSONArray arrayData = jsonResult.getJSONArray("data");
+            if(arrayData == null){
+                logger.info("获取上车区域失败");
+                return AjaxResponse.fail(RestErrorCode.GET_ON_ADDRESS_FAILED);
+            }
 
-
-
-        String resultX = MpOkHttpUtil.okHttpGet(lbsUrl + "/division/entrance",mapX,0,null);
-        /*if(resultX != null){
-            JSONObject jsonObject = JSONObject.parseObject(resultX);
-            if(jsonObject.get("code") != null && jsonObject.getInteger("code") == 0){
-                JSONObject jsonData = jsonObject.getJSONObject("data");
-                if(jsonData != null && jsonData.get("id") != null){
-                    getOnId = jsonData.getString("id");
+            for(int i  =0;i<arrayData.size();i++){
+                JSONObject lbsRes = arrayData.getJSONObject(i);
+                if(lbsRes.get("areaId") != null){
+                    getOnId = lbsRes.getString("areaId")+",";
                 }
+
             }
         }
-
-        if(StringUtils.isEmpty(getOnId)){
-            logger.info("获取上车点失败");
-            return AjaxResponse.fail(RestErrorCode.GET_ON_ADDRESS_FAILED);
-        }*/
+        System.out.println(getOnId);
 
 
         Map<String,Object> mapY = Maps.newHashMap();
 
-        mapY.put("lng",boardingGetOffX);
-        mapY.put("lat",boardingGetOffY);
-
-        String resultY = MpOkHttpUtil.okHttpGet(lbsUrl+"/division/entrance",mapY,0,null);
+        mapY.put("token",lbsToken);
+        JSONArray arrayY = new JSONArray();
+        JSONObject jsonY = new JSONObject();
+        jsonY.put("areaId",boardingGetOffCityId);
+        jsonY.put("x",boardingGetOffX);
+        jsonY.put("y",boardingGetOffY);
+        arrayY.add(jsonY);
+        String resultY = MpOkHttpUtil.okHttpGet(lbsUrl+"/area/getAreaByCoordinate",mapY,0,null);
 
         String getOffId = "";
-        /*if(resultX  != null){
-            JSONObject jsonObject = JSONObject.parseObject(resultY);
-            if(jsonObject.get("code") != null && jsonObject.getInteger("code") == 0){
-                JSONObject jsonData = jsonObject.getJSONObject("data");
-                if(jsonData != null && jsonData.get("id") != null){
-                    getOffId = jsonData.getString("id");
-                }
+
+        if(resultY != null ){
+            JSONObject jsonResultY = JSONObject.parseObject(resultY);
+            if(jsonResultY.get("code") == null || jsonResultY.getInteger("code") != 0 ||
+                    jsonResultY.get("data") == null){
+                 logger.info("获取下车点失败");
+                return AjaxResponse.fail(RestErrorCode.GET_OFF_ADDRESS_FAILED);
+            }
+
+            JSONArray jsonArray = jsonResultY.getJSONArray("data");
+            if(jsonArray.size() == 0){
+                logger.info("获取下车点失败");
+                return AjaxResponse.fail(RestErrorCode.GET_OFF_ADDRESS_FAILED);
+            }
+
+            for(int i = 0;i<jsonArray.size();i++){
+                JSONObject jsonObj = jsonArray.getJSONObject(i);
+                getOffId = jsonObj.getString("areaId")+",";
             }
         }
-
-        if(StringUtils.isEmpty(getOffId)){
-            logger.info("获取下车点失败");
-            return AjaxResponse.fail(RestErrorCode.GET_OFF_ADDRESS_FAILED);
-        }*/
 
        /* Integer areaStartRangId = Integer.valueOf(getOnId);
         Integer areaEndRangId = Integer.valueOf(getOffId);
@@ -704,48 +724,6 @@ public class IntegerCityController {
         return AjaxResponse.success(interCityList);
     }
 
-
-    /**
-     * 添加主单
-     * @param orderNo
-     * @param driverId
-     * @param driverName
-     * @param driverPhone
-     * @param licensePlates
-     * @param carGroupId
-     * @param startTime
-     * @return
-     */
-   /* @RequestMapping(value = "/addMainOrder",method = RequestMethod.POST)
-    public AjaxResponse addMainOrder(String orderNo,
-                                     Integer driverId,
-                                     String driverName,
-                                     String driverPhone,
-                                     String licensePlates,
-                                     String carGroupId,
-                                     String startTime){
-
-        logger.info("");
-        //调用订单组接口
-        Map<String,Object> map = Maps.newHashMap();
-        map.put("sign","sign");
-        map.put("businessId","businessId");
-        map.put("mainOrderNo",null);
-        map.put("orderNo",orderNo);
-        map.put("driverId",driverId);
-        map.put("driverName",driverName);
-        map.put("driverPhone",driverPhone);
-        map.put("licensePlates",licensePlates);
-        map.put("carGroupId",carGroupId);
-        String url = esOrderDataSaasUrl + "";
-        String result = MpOkHttpUtil.okHttpPost(url,map,0,null);
-        if(StringUtils.isNotBlank(result)){
-
-        }
-
-        return null;
-    }*/
-
     //获取行程接口
     public AjaxResponse getTrips(String boardingGetOnX,
                                  String boardingGetOnY){
@@ -950,5 +928,94 @@ public class IntegerCityController {
             strList.add(strArr[i]);
         }
        return strList;
+    }
+
+
+    /**
+     * 搜索接口
+     * @param type 0(周边搜索) 2(精确查找）
+     * @param platform H5 3
+     * @param cityName 城市简称
+     * @param cityId 城市id
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/inputtips")
+    public AjaxResponse inputtips(@Verify(param = "type",rule = "required")String type,
+                                  @Verify(param = "platform",rule = "required")String platform,
+                                  @Verify(param = "cityName",rule = "required")String cityName,
+                                  @Verify(param = "cityId",rule = "required")String cityId,
+                                  String inCoordType,
+                                  String cityLimit,
+                                  String userId,
+                                  String mobile,
+                                  Integer soType,
+                                  Integer serviceType,
+                                  String lang,
+                                  String version,
+                                  String redPacket){
+        logger.info("精确查询");
+        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+        Map<String,Object> map = Maps.newHashMap();
+        map.put("type",type);
+        map.put("platform",platform);
+        map.put("sessionId",loginUser+"_" +System.currentTimeMillis());
+        map.put("cityName",cityName);
+        map.put("cityId",cityId);
+        if(StringUtils.isNotEmpty(inCoordType)){
+            map.put("inCoordType",inCoordType);
+        }
+        if(StringUtils.isNotEmpty(cityLimit)){
+            map.put("cityLimit",cityLimit);
+        }
+        if(StringUtils.isNotEmpty(userId)){
+            map.put("userId",userId);
+        }
+        if(StringUtils.isNotEmpty(mobile)){
+            map.put("mobile",mobile);
+        }
+        if(soType != null){
+            map.put("soType",soType);
+        }
+        if(serviceType != null){
+            map.put("serviceType",serviceType);
+        }
+        if(StringUtils.isNotEmpty(lang)){
+            map.put("lang",lang);
+        }
+        if(StringUtils.isNotEmpty(version)){
+            map.put("version",version);
+        }
+        if(StringUtils.isNotEmpty(redPacket)){
+            map.put("redPacket",redPacket);
+        }
+        String url = searchUrl+"/assistant/inputtips";
+
+        String result = MpOkHttpUtil.okHttpGet(url,map,0,null);
+        if(StringUtils.isNotEmpty(result)){
+            return AjaxResponse.success(result);
+        }
+        return AjaxResponse.success(null);
+    }
+
+
+
+    @ResponseBody
+    @RequestMapping(value = "/regeo",method = RequestMethod.GET)
+    public AjaxResponse regeo(String lng,
+                              String lat,
+                              String platform){
+        logger.info("查询逆地理编码");
+        Map<String,Object> map = Maps.newHashMap();
+        map.put("lng",lng);
+        map.put("lat",lat);
+        map.put("platform",platform);
+        String url = searchUrl + "/geocode/regeo";
+        String result = MpOkHttpUtil.okHttpGet(url,map,0,null);
+        if(StringUtils.isNotEmpty(result)){
+            return AjaxResponse.success(result);
+        }
+        return AjaxResponse.success(null);
+
     }
 }

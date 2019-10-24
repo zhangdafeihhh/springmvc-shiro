@@ -9,11 +9,11 @@ import java.util.TreeMap;
 
 /**
  * @Author fanht
- * @Description
+ * @Description lbs加密验签
  * @Date 2019/10/23 下午2:45
  * @Version 1.0
  */
-public class SignUtil {
+public class LbsSignUtil {
 
     /**
      *
