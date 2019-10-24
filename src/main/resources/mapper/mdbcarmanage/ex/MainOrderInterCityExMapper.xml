@@ -16,24 +16,12 @@
     id, driver_id, main_order_no, create_time, update_time, status, main_name, main_time, 
     ope_phone
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select 
-    <include refid="Base_Column_List" />
-    from main_order_inter_city
-    where id = #{id,jdbcType=INTEGER}
-  </select>
-  <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.MainOrderInterCity" >
-    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
-      SELECT LAST_INSERT_ID()
-    </selectKey>
-    insert into main_order_inter_city (driver_id, main_order_no, create_time, 
-      update_time, status, main_name, 
-      main_time, ope_phone)
-    values (#{driverId,jdbcType=INTEGER}, #{mainOrderNo,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER}, #{mainName,jdbcType=VARCHAR}, 
-      #{mainTime,jdbcType=VARCHAR}, #{opePhone,jdbcType=VARCHAR})
-  </insert>
-  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.MainOrderInterCity" >
+  <update id="updateMainTime">
+    update main_order_inter_city SET main_time =#{mainTime}
+    where main_order_no = #{mainOrderNo}
+  </update>
+
+  <insert id="addMainOrderNo" parameterType="com.zhuanche.entity.mdbcarmanage.MainOrderInterCity" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
       SELECT LAST_INSERT_ID()
     </selectKey>
@@ -69,7 +57,7 @@
         #{driverId,jdbcType=INTEGER},
       </if>
       <if test="mainOrderNo != null" >
-        #{mainOrderNo,jdbcType=VARCHAR},
+        #{mainOrderNo,jdbcType=INTEGER},
       </if>
       <if test="createTime != null" >
         #{createTime,jdbcType=TIMESTAMP},
@@ -91,46 +79,5 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.mdbcarmanage.MainOrderInterCity" >
-    update main_order_inter_city
-    <set >
-      <if test="driverId != null" >
-        driver_id = #{driverId,jdbcType=INTEGER},
-      </if>
-      <if test="mainOrderNo != null" >
-        main_order_no = #{mainOrderNo,jdbcType=VARCHAR},
-      </if>
-      <if test="createTime != null" >
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateTime != null" >
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="status != null" >
-        status = #{status,jdbcType=INTEGER},
-      </if>
-      <if test="mainName != null" >
-        main_name = #{mainName,jdbcType=VARCHAR},
-      </if>
-      <if test="mainTime != null" >
-        main_time = #{mainTime,jdbcType=VARCHAR},
-      </if>
-      <if test="opePhone != null" >
-        ope_phone = #{opePhone,jdbcType=VARCHAR},
-      </if>
-    </set>
-    where id = #{id,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.MainOrderInterCity" >
-    update main_order_inter_city
-    set driver_id = #{driverId,jdbcType=INTEGER},
-      main_order_no = #{mainOrderNo,jdbcType=VARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      status = #{status,jdbcType=INTEGER},
-      main_name = #{mainName,jdbcType=VARCHAR},
-      main_time = #{mainTime,jdbcType=VARCHAR},
-      ope_phone = #{opePhone,jdbcType=VARCHAR}
-    where id = #{id,jdbcType=INTEGER}
-  </update>
+
 </mapper>

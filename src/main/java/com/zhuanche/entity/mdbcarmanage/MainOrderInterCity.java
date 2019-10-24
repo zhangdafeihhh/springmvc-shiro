@@ -7,7 +7,7 @@ public class MainOrderInterCity {
 
     private Integer driverId;
 
-    private Integer mainOrderNo;
+    private String mainOrderNo;
 
     private Date createTime;
 
@@ -37,12 +37,12 @@ public class MainOrderInterCity {
         this.driverId = driverId;
     }
 
-    public Integer getMainOrderNo() {
+    public String getMainOrderNo() {
         return mainOrderNo;
     }
 
-    public void setMainOrderNo(Integer mainOrderNo) {
-        this.mainOrderNo = mainOrderNo;
+    public void setMainOrderNo(String mainOrderNo) {
+        this.mainOrderNo = mainOrderNo == null ? null : mainOrderNo.trim();
     }
 
     public Date getCreateTime() {
@@ -74,7 +74,7 @@ public class MainOrderInterCity {
     }
 
     public void setMainName(String mainName) {
-        this.mainName = mainName;
+        this.mainName = mainName == null ? null : mainName.trim();
     }
 
     public String getMainTime() {
@@ -82,7 +82,7 @@ public class MainOrderInterCity {
     }
 
     public void setMainTime(String mainTime) {
-        this.mainTime = mainTime;
+        this.mainTime = mainTime == null ? null : mainTime.trim();
     }
 
     public String getOpePhone() {
@@ -90,6 +90,6 @@ public class MainOrderInterCity {
     }
 
     public void setOpePhone(String opePhone) {
-        this.opePhone = opePhone;
+        this.opePhone = opePhone == null ? null : opePhone.trim();
     }
 }

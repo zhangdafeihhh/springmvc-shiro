@@ -263,10 +263,16 @@ public final class RestErrorCode{
 	@ResultMessage("获取下车点地址失败")
 	public static final int GET_OFF_ADDRESS_FAILED = 50011;
 
+	@ResultMessage("预订人注册失败")
+	public static final int REGISTER_BY_PHONE = 50012;
+
 	@ResultMessage("绑定主单失败")
 	public static final int BIND_MAIN_FAILED = 50100;
 	@ResultMessage("改派订单失败")
 	public static final int CHANGE_MAIN_FAILED = 50101;
+
+	@ResultMessage("获取主单失败")
+	public static final int FAILED_GET_MAIN_ORDER = 50102;
 
 	@ResultMessage("更新子订单失败")
 	public static final int UPDATE_SUB_ORDER_FAILED = 50301;
@@ -279,6 +285,8 @@ public final class RestErrorCode{
 
 	@ResultMessage("关键字不能为空")
 	public static final int KEYWORDS_IS_NOT_NULL = 50501;
+
+
 
 	//------------------------------------------------
 
