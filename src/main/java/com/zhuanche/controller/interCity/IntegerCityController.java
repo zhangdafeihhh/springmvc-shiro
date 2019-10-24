@@ -17,6 +17,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.*;
 import com.zhuanche.util.encrypt.MD5Utils;
 import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
+import okhttp3.internal.http2.ErrorCode;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -24,13 +25,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import sun.java2d.pipe.AAShapePipe;
 
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
@@ -78,6 +77,9 @@ public class IntegerCityController {
     @Value("${search.url}")
     private String searchUrl;
 
+    @Value("${center.url}")
+    private String centerUrl;
+
     /**
      * 订单查询
      * @param pageNum
@@ -85,7 +87,7 @@ public class IntegerCityController {
      * @param cityId
      * @param supplierId
      * @param orderState 待指派、待服务、已出发、已上车、服务中、已送达、已完成、已取消
-     * @param orderPushDriverType 订单指派方式  绑单、抢单；
+     * @param pushDriverType 订单指派方式  绑单、抢单；
      * @param serviceType 服务类别: 新城际拼车、新城际包车
      * @param orderType 普通订单、机构用车
      * @param airportId 是否拼车单
@@ -165,7 +167,6 @@ public class IntegerCityController {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmssSS");
         String  transId =sdf.format(new Date());
         map.put("transId",transId);
-
         String url = esOrderDataSaasUrl +"/order/v1/search";
 
 
@@ -178,23 +179,12 @@ public class IntegerCityController {
             int code = jsonObject.getIntValue("code");
             //0表示有结果返回
             if(code == 0){
-                //JSONArray resultData = jsonObject.getJSONArray("data");
                 JSONObject jsonData = jsonObject.getJSONObject("data");
-
                 if(jsonData != null && jsonData.get("data") != null) {
                     return AjaxResponse.success(jsonData);
-                    /*JSONArray array = jsonData.getJSONArray("data");
-                    JSONObject jsonResult = new JSONObject();
-                    for (int i = 0; i < array.size(); i++) {
-                        jsonResult = array.getJSONObject(i);
-                        *//*JSONObject jsonReturn = new JSONObject();
-                        jsonReturn.put("orderId", jsonResult.get("orderId"));*//*
-                        resultArray.add(jsonResult);
-                    }*/
                 }
             }
         }
-
         //调用订单组接口查询
         return AjaxResponse.success(null);
     }
@@ -241,7 +231,7 @@ public class IntegerCityController {
 
 
         //根据横纵坐标获取围栏，根据围栏获取路线
-        Map<String,Object> mapX = Maps.newHashMap();
+        /*Map<String,Object> mapX = Maps.newHashMap();
 
         mapX.put("token",lbsToken);
 
@@ -278,10 +268,10 @@ public class IntegerCityController {
 
             }
         }
-        System.out.println(getOnId);
+        System.out.println(getOnId);*/
 
 
-        Map<String,Object> mapY = Maps.newHashMap();
+        /*Map<String,Object> mapY = Maps.newHashMap();
 
         mapY.put("token",lbsToken);
         JSONArray arrayY = new JSONArray();
@@ -312,7 +302,7 @@ public class IntegerCityController {
                 JSONObject jsonObj = jsonArray.getJSONObject(i);
                 getOffId = jsonObj.getString("areaId")+",";
             }
-        }
+        }*/
 
        /* Integer areaStartRangId = Integer.valueOf(getOnId);
         Integer areaEndRangId = Integer.valueOf(getOffId);
@@ -326,6 +316,18 @@ public class IntegerCityController {
                 logger.info("对应坐标没有线路");
                 return  AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
             }
+        }*/
+
+
+       //根据乘客人获取乘客userId
+        /*if(StringUtils.isNotEmpty(reservePhone)){
+            String url =  "/api/customer/regist";
+            Map<String,Object> map = Maps.newHashMap();
+            map.put("phone",reservePhone);
+            map.put("registerSource",2);
+            map.put("channelNum","新城际订单渠道");
+            //获取乘客id
+            String registerResult = MpOkHttpUtil.okHttpGet(centerUrl+url,map,0,null);
         }*/
 
 
@@ -945,6 +947,7 @@ public class IntegerCityController {
                                   @Verify(param = "platform",rule = "required")String platform,
                                   @Verify(param = "cityName",rule = "required")String cityName,
                                   @Verify(param = "cityId",rule = "required")String cityId,
+                                  @Verify(param = "channel",rule = "required")String channel,
                                   String inCoordType,
                                   String cityLimit,
                                   String userId,
@@ -953,13 +956,15 @@ public class IntegerCityController {
                                   Integer serviceType,
                                   String lang,
                                   String version,
-                                  String redPacket){
+                                  String redPacket,
+                                  String keywords){
         logger.info("精确查询");
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
         Map<String,Object> map = Maps.newHashMap();
         map.put("type",type);
         map.put("platform",platform);
-        map.put("sessionId",loginUser+"_" +System.currentTimeMillis());
+        map.put("channel",channel);
+        map.put("sessionId",loginUser.getId()+"_" +System.currentTimeMillis());
         map.put("cityName",cityName);
         map.put("cityId",cityId);
         if(StringUtils.isNotEmpty(inCoordType)){
@@ -989,11 +994,25 @@ public class IntegerCityController {
         if(StringUtils.isNotEmpty(redPacket)){
             map.put("redPacket",redPacket);
         }
+        if(StringUtils.isNotEmpty(keywords)){
+            map.put("keywords",keywords);
+        }
+
+        if(type!= null && ("1".equals(type) || "2".equals(type))){
+            if(StringUtils.isEmpty(keywords)){
+                return AjaxResponse.fail(RestErrorCode.KEYWORDS_IS_NOT_NULL);
+            }
+        }
         String url = searchUrl+"/assistant/inputtips";
 
         String result = MpOkHttpUtil.okHttpGet(url,map,0,null);
         if(StringUtils.isNotEmpty(result)){
-            return AjaxResponse.success(result);
+            JSONObject jsonResult = JSONObject.parseObject(result);
+            if(jsonResult.get("code") != null && jsonResult.getInteger("code")==0){
+                return AjaxResponse.success(jsonResult.get("data"));
+            }else {
+                return AjaxResponse.failMsg(jsonResult.getIntValue("code"),jsonResult.getString("msg"));
+            }
         }
         return AjaxResponse.success(null);
     }
@@ -1013,7 +1032,12 @@ public class IntegerCityController {
         String url = searchUrl + "/geocode/regeo";
         String result = MpOkHttpUtil.okHttpGet(url,map,0,null);
         if(StringUtils.isNotEmpty(result)){
-            return AjaxResponse.success(result);
+            JSONObject jsonResult = JSONObject.parseObject(result);
+            if(jsonResult.get("code") != null && jsonResult.getInteger("code")==0){
+                return AjaxResponse.success(jsonResult.get("data"));
+            }else {
+                return AjaxResponse.failMsg(jsonResult.getIntValue("code"),jsonResult.getString("msg"));
+            }
         }
         return AjaxResponse.success(null);
 
