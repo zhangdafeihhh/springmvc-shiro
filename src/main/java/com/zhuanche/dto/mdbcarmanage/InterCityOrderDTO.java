@@ -40,14 +40,14 @@ public class InterCityOrderDTO {
 
     private Integer type;//服务类型
 
+    private String orderTime;//下单时间
 
-    private long createTime;//下单时间
 
     private String boardOnAddr;//上车地点
 
     private String boardOffAddr;//下车地点
 
-
+    private Integer cityId;
 
     public String getReserveName() {
         return reserveName;
@@ -167,5 +167,46 @@ public class InterCityOrderDTO {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
+    public String getOrderTime() {
+        return orderTime;
+    }
+
+    public void setOrderTime(String orderTime) {
+        this.orderTime = orderTime;
+    }
+
+
+    public String getBoardOnAddr() {
+        return boardOnAddr;
+    }
+
+    public void setBoardOnAddr(String boardOnAddr) {
+        this.boardOnAddr = boardOnAddr;
+    }
+
+    public String getBoardOffAddr() {
+        return boardOffAddr;
+    }
+
+    public void setBoardOffAddr(String boardOffAddr) {
+        this.boardOffAddr = boardOffAddr;
+    }
+
+    public Integer getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(Integer cityId) {
+        this.cityId = cityId;
     }
 }
