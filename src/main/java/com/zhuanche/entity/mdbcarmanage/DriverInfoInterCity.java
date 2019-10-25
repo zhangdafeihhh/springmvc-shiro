@@ -39,6 +39,8 @@ public class DriverInfoInterCity {
 
     private Date updateTime;
 
+    private Integer groupId;
+
     public Integer getId() {
         return id;
     }
@@ -181,5 +183,13 @@ public class DriverInfoInterCity {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Integer getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(Integer groupId) {
+        this.groupId = groupId;
     }
 }

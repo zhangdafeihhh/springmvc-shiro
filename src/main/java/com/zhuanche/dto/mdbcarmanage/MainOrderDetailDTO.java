@@ -18,6 +18,8 @@ public class MainOrderDetailDTO extends DriverInfoInterCity{
 
     private String mainOrderTime;
 
+    private String subRouteName;//子单路线名称
+
     public String getMainOrder() {
         return mainOrder;
     }
@@ -48,5 +50,13 @@ public class MainOrderDetailDTO extends DriverInfoInterCity{
 
     public void setMainOrderTime(String mainOrderTime) {
         this.mainOrderTime = mainOrderTime;
+    }
+
+    public String getSubRouteName() {
+        return subRouteName;
+    }
+
+    public void setSubRouteName(String subRouteName) {
+        this.subRouteName = subRouteName;
     }
 }
