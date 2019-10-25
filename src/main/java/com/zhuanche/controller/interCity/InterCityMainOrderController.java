@@ -158,7 +158,6 @@ public class InterCityMainOrderController {
     })
     public AjaxResponse mainOrderDetail(String mainOrderNo){
         logger.info("获取拼车单订单详情入参:mainOrderNo" + mainOrderNo);
-       // List<CarFactOrderInfoEntity> rows = new ArrayList<CarFactOrderInfoEntity>();
         try {
             String url = Common.GET_MAIN_ORDER + "?businessId=" + Common.BUSSINESSID + "&isShowSubOrderList=0&mainOrderNo=" + mainOrderNo;
             // 参数：订单号 、业务线id
@@ -171,7 +170,6 @@ public class InterCityMainOrderController {
 
 
             JSONObject result = carRestTemplate.getForObject(url,JSONObject.class);
-            //JSONObject result = MpOkHttpUtil.okHttpPostToJsonBackJson(url,null,0,null);
             int code = result.getIntValue("code");
             String msg = result.getString("msg");
             if (code == 1) {

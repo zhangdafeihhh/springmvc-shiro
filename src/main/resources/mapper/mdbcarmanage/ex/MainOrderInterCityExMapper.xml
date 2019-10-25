@@ -25,59 +25,12 @@
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into main_order_inter_city
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="driverId != null" >
-        driver_id,
-      </if>
-      <if test="mainOrderNo != null" >
-        main_order_no,
-      </if>
-      <if test="createTime != null" >
-        create_time,
-      </if>
-      <if test="updateTime != null" >
-        update_time,
-      </if>
-      <if test="status != null" >
-        status,
-      </if>
-      <if test="mainName != null" >
-        main_name,
-      </if>
-      <if test="mainTime != null" >
-        main_time,
-      </if>
-      <if test="opePhone != null" >
-        ope_phone,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="driverId != null" >
-        #{driverId,jdbcType=INTEGER},
-      </if>
-      <if test="mainOrderNo != null" >
-        #{mainOrderNo,jdbcType=INTEGER},
-      </if>
-      <if test="createTime != null" >
-        #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateTime != null" >
-        #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="status != null" >
-        #{status,jdbcType=INTEGER},
-      </if>
-      <if test="mainName != null" >
-        #{mainName,jdbcType=VARCHAR},
-      </if>
-      <if test="mainTime != null" >
-        #{mainTime,jdbcType=VARCHAR},
-      </if>
-      <if test="opePhone != null" >
-        #{opePhone,jdbcType=VARCHAR},
-      </if>
-    </trim>
+    insert into main_order_inter_city (driver_id, main_order_no, create_time,
+    update_time, status, main_name,
+    main_time, ope_phone)
+    values (#{driverId,jdbcType=INTEGER}, #{mainOrderNo,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+    #{updateTime,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER}, #{mainName,jdbcType=VARCHAR},
+    #{mainTime,jdbcType=VARCHAR}, #{opePhone,jdbcType=VARCHAR})
   </insert>
 
 </mapper>

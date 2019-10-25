@@ -266,6 +266,9 @@ public final class RestErrorCode{
 	@ResultMessage("预订人注册失败")
 	public static final int REGISTER_BY_PHONE = 50012;
 
+	@ResultMessage("上下车点不再围栏区域")
+	public static final int ADD_NOT_RIGHT = 50013;
+
 	@ResultMessage("绑定主单失败")
 	public static final int BIND_MAIN_FAILED = 50100;
 	@ResultMessage("改派订单失败")

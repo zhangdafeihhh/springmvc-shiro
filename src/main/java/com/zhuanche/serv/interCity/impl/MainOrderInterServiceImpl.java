@@ -3,6 +3,7 @@ package com.zhuanche.serv.interCity.impl;
 import com.zhuanche.entity.mdbcarmanage.MainOrderInterCity;
 import com.zhuanche.serv.interCity.MainOrderInterService;
 import mapper.mdbcarmanage.ex.MainOrderInterCityExMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -14,7 +15,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class MainOrderInterServiceImpl implements MainOrderInterService {
 
+    @Autowired
     private MainOrderInterCityExMapper exMapper;
+
     @Override
     public int updateMainTime(String mainOrderNo, String mainTime) {
         return exMapper.updateMainTime(mainOrderNo,mainTime);

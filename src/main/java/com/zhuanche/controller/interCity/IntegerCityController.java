@@ -1,6 +1,5 @@
 package com.zhuanche.controller.interCity;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
@@ -319,6 +318,11 @@ public class IntegerCityController {
             }
         }
 
+        if(StringUtils.isEmpty(getOnId) || StringUtils.isEmpty(getOffId)){
+            logger.info("上下车点不再围栏区域");
+            return AjaxResponse.fail(RestErrorCode.ADD_NOT_RIGHT);
+        }
+
         Integer areaStartRangId = Integer.valueOf(getOnId);
         Integer areaEndRangId = Integer.valueOf(getOffId);
         String areaUrl = configUrl + "/intercityCarUse/getLineSupplier?areaStartRangeId="+areaStartRangId+"&areaEndRangeId="+areaEndRangId;
@@ -380,10 +384,10 @@ public class IntegerCityController {
             map.put("riderPhone",reservePhone);
             sb.append("riderPhone=" + reservePhone).append(SYSMOL);
         }else {
-            map.put("riderName",riderName);
-            sb.append("riderName=" + riderName).append(SYSMOL);
-            map.put("riderPhone",riderPhone);
-            sb.append("riderPhone=" + riderPhone).append(SYSMOL);
+            map.put("riderName",reserveName);
+            sb.append("riderName=" + reserveName).append(SYSMOL);
+            map.put("riderPhone",reservePhone);
+            sb.append("riderPhone=" + reservePhone).append(SYSMOL);
         }
 
         map.put("cityId",boardingCityId);
@@ -959,7 +963,9 @@ public class IntegerCityController {
                                                  String crossCityStartTime,
                                                  String routeName){
         //派单
-        logger.info("派单接口入参:");
+        logger.info("派单接口入参:mainOrderNo="+ mainOrderNo + ",orderNo:"+orderNo
+        +",driverId:"+driverId + ",driverName:"+ driverName + ",driverPhone:"+driverPhone+",licensePlates:"+licensePlates
+        +",groupId:"+groupId+",crossCityStartTime:"+crossCityStartTime+",routeName:"+routeName);
         Map<String,Object> map = Maps.newHashMap();
         List<String> listParam = new ArrayList<>();
          map.put("businessId",Common.BUSSINESSID);
@@ -978,11 +984,14 @@ public class IntegerCityController {
         listParam.add("driverPhone="+driverPhone);
         map.put("licensePlates",licensePlates);
         listParam.add("licensePlates="+licensePlates);
-        map.put("carGroupId",groupId);
-        listParam.add("carGroupId="+groupId);
-        int carSeatNums = seatCount(groupId);
-        map.put("carSeatNums",carSeatNums);
-        listParam.add("carSeatNums="+carSeatNums);
+        if(StringUtils.isNotEmpty(groupId)){
+            map.put("carGroupId",groupId);
+            listParam.add("carGroupId="+groupId);
+            int carSeatNums = seatCount(groupId);
+            map.put("carSeatNums",carSeatNums);
+            listParam.add("carSeatNums="+carSeatNums);
+        }
+
         if(StringUtils.isNotEmpty(crossCityStartTime)){
             map.put("crossCityStartTime",crossCityStartTime);
             listParam.add("crossCityStartTime="+crossCityStartTime);
@@ -1021,10 +1030,11 @@ public class IntegerCityController {
                     main.setMainOrderNo(jsonData.getString("mainOrderNo"));
                     SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
                     main.setOpePhone(user.getMobile());
-                   int code = interService.addMainOrderNo(main);
+                    int code = interService.addMainOrderNo(main);
                     if(code > 0){
                         return AjaxResponse.success(null);
                     }
+
                     return AjaxResponse.fail(RestErrorCode.FAILED_GET_MAIN_ORDER);
                 }
 
