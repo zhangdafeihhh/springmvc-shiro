@@ -21,6 +21,39 @@ public class MainOrderInterCity {
 
     private String opePhone;
 
+
+    public enum orderState{
+
+         NOTSETOUT(1,"未出发"),
+         SETOUT(2,"已出发");
+
+
+        private int code;
+
+        private String msg;
+
+        orderState(int code, String msg) {
+            this.code = code;
+            this.msg = msg;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public void setCode(int code) {
+            this.code = code;
+        }
+
+        public String getMsg() {
+            return msg;
+        }
+
+        public void setMsg(String msg) {
+            this.msg = msg;
+        }
+    }
+
     public Integer getId() {
         return id;
     }
