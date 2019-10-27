@@ -13,6 +13,7 @@ import com.zhuanche.dto.mdbcarmanage.MainOrderDetailDTO;
 import com.zhuanche.entity.mdbcarmanage.MainOrderInterCity;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.interCity.MainOrderInterService;
+import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.*;
@@ -84,6 +85,9 @@ public class IntegerCityController {
     @Autowired
     private MainOrderInterService interService;
 
+    @Autowired
+    private CarFactOrderInfoService carFactOrderInfoService;
+
     private static final String SYSMOL = "&";
 
     /**
@@ -97,7 +101,7 @@ public class IntegerCityController {
      * @param serviceType 服务类别: 新城际拼车、新城际包车
      * @param orderType 普通订单、机构用车
      * @param airportId 是否拼车单
-     * @param orderSource 订单来源 线上订单、手动录单、扫码订单
+     * @param orderSource 订单来源 线上订单、手动录单、扫码订单  订单查询时候无此字段
      * @param driverName 司机姓名
      * @param driverPhone 司机手机号
      * @param licensePlates 司机车牌号
@@ -139,9 +143,9 @@ public class IntegerCityController {
                                    String beginCostEndDate,
                                    String riderPhone){
         logger.info(MessageFormat.format("订单查询入参:pageNum:{0},pageSize:{1},cityId:{2},supplierId:{3},orderState:" +
-                "{4},orderPushDriverType:{5},serviceType:{6},orderType:{7},airportId:{8},orderSource:{9},driverName:" +
-                "{10},driverPhone:{11},licensePlates:{12},reserveName:{13},reservePhone:{14},riderName:{15},orderNo:{16}," +
-                "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostStartDate{20},beginCostEndDate{21},riderPhone:{22}",pageNum,
+                        "{4},orderPushDriverType:{5},serviceType:{6},orderType:{7},airportId:{8},orderSource:{9},driverName:" +
+                        "{10},driverPhone:{11},licensePlates:{12},reserveName:{13},reservePhone:{14},riderName:{15},orderNo:{16}," +
+                        "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostStartDate{20},beginCostEndDate{21},riderPhone:{22}",pageNum,
                 pageSize,cityId,supplierId,orderState,pushDriverType,serviceType,orderType,airportId,orderSource,
                 driverName,driverPhone,licensePlates,reserveName,reservePhone,riderName,orderNo,mainOrderNo,beginCreateDate,
                 endCreateDate,beginCostStartDate,beginCostEndDate,riderPhone));
@@ -162,17 +166,17 @@ public class IntegerCityController {
         map.put("pageSize",pageSize);
         map.put("cityId",cityId);
         map.put("supplierId",supplierId);
-        map.put("orderState",orderState);
-        map.put("orderPushDriverType",pushDriverType);
-        map.put("serviceType",serviceType);
+        map.put("status",orderState);
+        map.put("pushDriverType",pushDriverType);
+        map.put("serviceTypeId",serviceType);
         map.put("orderType",orderType);
         map.put("airportId",airportId);
         map.put("orderSource",orderSource);
         map.put("driverName",driverName);
         map.put("driverPhone",driverPhone);
         map.put("licensePlates",licensePlates);
-        map.put("reserveName",reserveName);
-        map.put("reservePhone",reservePhone);
+        map.put("bookingUserName",reserveName);
+        map.put("bookingUserPhone",reservePhone);
         map.put("riderName",riderName);
         map.put("orderNo",orderNo);
         map.put("mainOrderNo",mainOrderNo);
@@ -238,7 +242,7 @@ public class IntegerCityController {
                                                  @Verify(param = "boardingGetOffY",rule = "required")String boardingGetOffY,
                                                  @Verify(param = "startCityName",rule = "required")String startCityName,
                                                  @Verify(param = "endCityName",rule = "required")String endCityName
-                                            ){
+    ){
         logger.info(MessageFormat.format("手动录入订单步骤1入参,{0},{1},{2},{3},{4},{5},{6},{7}",reserveName,reservePhone,
                 isSameRider,riderName,riderPhone,riderCount,boardingTime,boardingCityId,boardingGetOnX,boardingGetOnY,boardingGetOffCityId,
                 boardingGetOffX,boardingGetOffY));
@@ -321,10 +325,10 @@ public class IntegerCityController {
                 map.put("riderPhone",reservePhone);
                 sb.append("riderPhone=" + reservePhone).append(SYSMOL);
             }else {
-                map.put("riderName",reserveName);
-                sb.append("riderName=" + reserveName).append(SYSMOL);
-                map.put("riderPhone",reservePhone);
-                sb.append("riderPhone=" + reservePhone).append(SYSMOL);
+                map.put("riderName",riderName);
+                sb.append("riderName=" + riderName).append(SYSMOL);
+                map.put("riderPhone",riderPhone);
+                sb.append("riderPhone=" + riderPhone).append(SYSMOL);
             }
 
             map.put("cityId",boardingCityId);
@@ -451,7 +455,7 @@ public class IntegerCityController {
             if(jsonObject != null && jsonObject.get("code") !=null){
                 Integer code = jsonObject.getIntValue("code");
                 if(0 == code){
-                 JSONObject jsonData =  jsonObject.getJSONObject("data");
+                    JSONObject jsonData =  jsonObject.getJSONObject("data");
                     InterCityOrderDTO dto = new InterCityOrderDTO();
                     String bookingUserPhone = jsonData.get("bookingUserPhone")==null?"":jsonData.getString("bookingUserPhone");
                     String riderPhone = jsonData.get("riderPhone") == null ? "" : jsonData.getString("riderPhone");
@@ -489,7 +493,8 @@ public class IntegerCityController {
                         dto.setIsSameRider(0);
                     }
                     //线路名称
-                    dto.setRoutName(dto.getBoardingCityName()+"-"+dto.getBoardingGetOffCityName());
+                    dto.setOrderNo(orderNo);
+                    dto.setRouteName(dto.getBoardingCityName()+"-"+dto.getBoardingGetOffCityName());
                     //获取预订人
                     Map<String,Object> bookMap = Maps.newHashMap();
                     bookMap.put("orderNo",orderNo);
@@ -506,6 +511,16 @@ public class IntegerCityController {
 
                         }
                     }
+
+                    try {
+                        String mainOrderNo = carFactOrderInfoService.getMainOrderBySubOrderNo(orderNo);
+                        if(StringUtils.isNotEmpty(mainOrderNo)){
+                            dto.setMainOrderNo(mainOrderNo);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
 
                     return AjaxResponse.success(dto);
                 }
@@ -560,7 +575,7 @@ public class IntegerCityController {
             if(boardOffResponse.getCode() != RestErrorCode.SUCCESS){
                 return boardOffResponse;
             }
-             getOffId = boardOffResponse.getData().toString();
+            getOffId = boardOffResponse.getData().toString();
         }
 
         if(StringUtils.isNotEmpty(getOnId) && StringUtils.isNotEmpty(getOffId)){
@@ -851,11 +866,11 @@ public class IntegerCityController {
                                                  String routeName){
         //派单
         logger.info("派单接口入参:mainOrderNo="+ mainOrderNo + ",orderNo:"+orderNo
-        +",driverId:"+driverId + ",driverName:"+ driverName + ",driverPhone:"+driverPhone+",licensePlates:"+licensePlates
-        +",groupId:"+groupId+",crossCityStartTime:"+crossCityStartTime+",routeName:"+routeName);
+                +",driverId:"+driverId + ",driverName:"+ driverName + ",driverPhone:"+driverPhone+",licensePlates:"+licensePlates
+                +",groupId:"+groupId+",crossCityStartTime:"+crossCityStartTime+",routeName:"+routeName);
         Map<String,Object> map = Maps.newHashMap();
         List<String> listParam = new ArrayList<>();
-         map.put("businessId",Common.BUSSINESSID);
+        map.put("businessId",Common.BUSSINESSID);
         listParam.add("businessId="+ Common.BUSSINESSID);
         if(StringUtils.isNotEmpty(mainOrderNo)){
             map.put("mainOrderNo",mainOrderNo);
@@ -960,14 +975,14 @@ public class IntegerCityController {
     @RequestMapping("/updateOtherMainOrder")
     @ResponseBody
     public AjaxResponse updateOtherMainOrder( String mainOrderNo,
-                                             @Verify(param = "orderNo",rule = "required")  String orderNo,
-                                             @Verify(param = "driverId",rule = "required")   Integer driverId,
-                                             @Verify(param = "driverPhone",rule = "required") String driverPhone,
-                                             @Verify(param = "licensePlates",rule = "required")  String licensePlates,
-                                             @Verify(param = "cityId",rule = "required") Integer cityId,
-                                             @Verify(param = "groupId",rule = "required") String groupId,
-                                                 String crossCityStartTime,
-                                                 String routeName){
+                                              @Verify(param = "orderNo",rule = "required")  String orderNo,
+                                              @Verify(param = "driverId",rule = "required")   Integer driverId,
+                                              @Verify(param = "driverPhone",rule = "required") String driverPhone,
+                                              @Verify(param = "licensePlates",rule = "required")  String licensePlates,
+                                              @Verify(param = "cityId",rule = "required") Integer cityId,
+                                              @Verify(param = "groupId",rule = "required") String groupId,
+                                              String crossCityStartTime,
+                                              String routeName){
         //派单
         logger.info("派单接口入参:");
         Map<String,Object> map = Maps.newHashMap();
@@ -975,8 +990,8 @@ public class IntegerCityController {
         map.put("businessId",Common.BUSSINESSID);
         listParam.add("businessId="+ Common.BUSSINESSID);
         if(StringUtils.isNotEmpty(mainOrderNo)){
-        map.put("mainOrderNo",mainOrderNo);
-        listParam.add("mainOrderNo="+mainOrderNo);
+            map.put("mainOrderNo",mainOrderNo);
+            listParam.add("mainOrderNo="+mainOrderNo);
         }
         map.put("orderNo",orderNo);
         listParam.add("orderNo="+orderNo);
@@ -1005,7 +1020,7 @@ public class IntegerCityController {
 
         StringBuilder sbSort = new StringBuilder();
         for(String str : listParam){
-        sbSort.append(str).append("&");
+            sbSort.append(str).append("&");
         }
 
         String md5Before = sbSort.toString().substring(0,sbSort.toString().length()-1);
@@ -1074,7 +1089,7 @@ public class IntegerCityController {
         for(int i = 0;i<strArr.length;i++){
             strList.add(strArr[i]);
         }
-       return strList;
+        return strList;
     }
 
 

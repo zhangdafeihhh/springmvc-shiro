@@ -49,8 +49,11 @@ public class InterCityOrderDTO {
 
     private Integer cityId;
 
-    private String routName;
+    private String routeName;
 
+    private String mainOrderNo;
+
+    private String orderNo;
 
 
     public String getReserveName() {
@@ -215,11 +218,27 @@ public class InterCityOrderDTO {
     }
 
 
-    public String getRoutName() {
-        return routName;
+    public String getRouteName() {
+        return routeName;
     }
 
-    public void setRoutName(String routName) {
-        this.routName = routName;
+    public void setRouteName(String routeName) {
+        this.routeName = routeName;
+    }
+
+    public String getMainOrderNo() {
+        return mainOrderNo;
+    }
+
+    public void setMainOrderNo(String mainOrderNo) {
+        this.mainOrderNo = mainOrderNo;
+    }
+
+    public String getOrderNo() {
+        return orderNo;
+    }
+
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
     }
 }
