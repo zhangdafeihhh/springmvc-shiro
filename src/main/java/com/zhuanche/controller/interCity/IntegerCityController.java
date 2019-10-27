@@ -526,10 +526,12 @@ public class IntegerCityController {
                                 if(inter != null){
                                     dto.setDriverId(mainOrderInterCity.getDriverId());
                                     dto.setSupplierId(inter.getSupplierId());
+                                    dto.setSupplierName(inter.getSupplierName());
                                     dto.setDriverName(inter.getDriverName());
                                     dto.setDriverPhone(inter.getDriverPhone());
                                     dto.setLicensePlates(inter.getLicensePlates());
                                     dto.setCityName(inter.getCityName());
+
                                 }
                             }
                         }
@@ -894,7 +896,7 @@ public class IntegerCityController {
                                                  String crossCityStartTime,
                                                  String routeName){
         //派单
-        logger.info("派单接口入参:mainOrderNo="+ mainOrderNo + ",orderNo:"+orderNo
+        logger.info("指派接口入参:mainOrderNo="+ mainOrderNo + ",orderNo:"+orderNo
                 +",driverId:"+driverId + ",driverName:"+ driverName + ",driverPhone:"+driverPhone+",licensePlates:"+licensePlates
                 +",groupId:"+groupId+",crossCityStartTime:"+crossCityStartTime+",routeName:"+routeName);
         Map<String,Object> map = Maps.newHashMap();
