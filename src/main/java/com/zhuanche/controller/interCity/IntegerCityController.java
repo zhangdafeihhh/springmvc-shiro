@@ -670,16 +670,6 @@ public class IntegerCityController {
             list.add("riderPhone=" + riderPhone);
         }
 
-        if(StringUtils.isNotEmpty(riderName)){
-            map.put("riderName",riderName);
-            list.add("riderName="+riderName);
-        }
-
-
-        if(StringUtils.isNotEmpty(riderPhone)){
-            map.put("riderPhone",riderPhone);
-            list.add("riderPhone="+riderPhone);
-        }
 
 
         if(StringUtils.isNotEmpty(boardingTime)){
