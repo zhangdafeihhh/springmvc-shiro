@@ -569,7 +569,9 @@ public class IntegerCityController {
                                   String boardingGetOffX,
                                   String boardingGetOffY,
                                   String mainOrderNo,
-                                  Integer status){
+                                  Integer status,
+                                  String startCityName,
+                                  String endCityName){
 
         //根据上下车地址判断是否在城际列车配置的范围内
         //根据横纵坐标获取围栏，根据围栏获取路线
@@ -667,7 +669,7 @@ public class IntegerCityController {
         }
 
 
-        if("1".equals(isSameRider)){
+        if(1==isSameRider){
             map.put("riderName",reserveName);
             list.add("riderName=" + reserveName);
             map.put("riderPhone",reservePhone);
@@ -677,6 +679,16 @@ public class IntegerCityController {
             list.add("riderName=" + riderName);
             map.put("riderPhone",riderPhone);
             list.add("riderPhone=" + riderPhone);
+        }
+
+        if(StringUtils.isNotEmpty(startCityName)){
+            map.put("bookingStartAddr",startCityName);
+            list.add("bookingStartAddr=" + startCityName);
+        }
+
+        if(StringUtils.isNotEmpty(endCityName)){
+            map.put("bookingEndAddr",endCityName);
+            list.add("bookingEndAddr=" + endCityName);
         }
 
 
