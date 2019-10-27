@@ -528,6 +528,7 @@ public class IntegerCityController {
                                     dto.setSupplierId(inter.getSupplierId());
                                     dto.setSupplierName(inter.getSupplierName());
                                     dto.setDriverName(inter.getDriverName());
+                                    dto.setSupplierName(inter.getSupplierName());
                                     dto.setDriverPhone(inter.getDriverPhone());
                                     dto.setLicensePlates(inter.getLicensePlates());
                                     dto.setCityName(inter.getCityName());
