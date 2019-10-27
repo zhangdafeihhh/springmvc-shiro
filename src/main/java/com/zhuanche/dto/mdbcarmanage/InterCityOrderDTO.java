@@ -49,6 +49,10 @@ public class InterCityOrderDTO {
 
     private Integer cityId;
 
+    private String routName;
+
+
+
     public String getReserveName() {
         return reserveName;
     }
@@ -208,5 +212,14 @@ public class InterCityOrderDTO {
 
     public void setCityId(Integer cityId) {
         this.cityId = cityId;
+    }
+
+
+    public String getRoutName() {
+        return routName;
+    }
+
+    public void setRoutName(String routName) {
+        this.routName = routName;
     }
 }

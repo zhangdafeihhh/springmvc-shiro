@@ -471,6 +471,7 @@ public class IntegerCityController {
                     dto.setBoardOffAddr(jsonData.get("bookingEndAddr") == null ? null : jsonData.getString("bookingEndAddr"));
                     dto.setCityId(jsonData.get("cityId") == null ? null : jsonData.getInteger("cityId"));
 
+
                     if(jsonData != null && jsonData.get("memo") != null){
                         JSONObject jsonMemo = jsonData.getJSONObject("memo");
                         dto.setBoardingCityId(jsonMemo.get("startCityId") == null ? "":jsonMemo.getString("startCityId"));
@@ -487,6 +488,8 @@ public class IntegerCityController {
                     }else {
                         dto.setIsSameRider(0);
                     }
+                    //线路名称
+                    dto.setRoutName(dto.getBoardingCityName()+"-"+dto.getBoardingGetOffCityName());
                     //获取预订人
                     Map<String,Object> bookMap = Maps.newHashMap();
                     bookMap.put("orderNo",orderNo);
