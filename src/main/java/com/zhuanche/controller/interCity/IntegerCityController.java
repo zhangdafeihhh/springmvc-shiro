@@ -651,6 +651,15 @@ public class IntegerCityController {
             list.add("factDriverId="+riderCount);
         }
 
+        if(StringUtils.isNotEmpty(getOn)){
+            map.put("bookingStartPoint",getOn);
+            list.add("bookingStartPoint="+getOn);
+        }
+
+        if(StringUtils.isNotEmpty(getOff)){
+            map.put("bookingEndPoint",getOff);
+            list.add("bookingEndPoint="+getOff);
+        }
 
         if(StringUtils.isNotEmpty(reservePhone)){
             map.put("bookingUserPhone",reservePhone);
@@ -709,7 +718,9 @@ public class IntegerCityController {
             JSONObject updateResult = JSONObject.parseObject(editResult);
             if(updateResult.get("code") != null && updateResult.getInteger("code") == 0){
                 logger.info("更新成功");
-                return AjaxResponse.success(null);
+                JSONObject editJson = new JSONObject();
+                editJson.put("orderNo",orderNo);
+                return AjaxResponse.success(editJson);
             }
         }
 
