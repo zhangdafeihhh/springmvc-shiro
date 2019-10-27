@@ -10,4 +10,6 @@ public interface MainOrderInterCityExMapper {
 
     int addMainOrderNo(MainOrderInterCity record);
 
+    MainOrderInterCity queryMainOrder(@Param("mainOrderNo") String mainOrderNo);
+
 }

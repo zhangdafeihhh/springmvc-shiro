@@ -14,4 +14,5 @@ public interface DriverInfoInterCityExMapper {
                                          @Param("driverPhone")String driverPhone,
                                          @Param("licensePlates")String licensePlates);
 
+    DriverInfoInterCity getByDriverId(@Param("driverId") Integer driverId);
 }

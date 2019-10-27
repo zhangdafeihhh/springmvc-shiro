@@ -10,6 +10,7 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.mdbcarmanage.InterCityOrderDTO;
 import com.zhuanche.dto.mdbcarmanage.MainOrderDetailDTO;
+import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.entity.mdbcarmanage.MainOrderInterCity;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.interCity.MainOrderInterService;
@@ -516,6 +517,21 @@ public class IntegerCityController {
                         String mainOrderNo = carFactOrderInfoService.getMainOrderBySubOrderNo(orderNo);
                         if(StringUtils.isNotEmpty(mainOrderNo)){
                             dto.setMainOrderNo(mainOrderNo);
+                            //如果主单号不为空，根据主单号获取主单信息以及司机信息
+                            MainOrderInterCity mainOrderInterCity = interService.queryMainOrder(mainOrderNo);
+                            if(mainOrderInterCity != null && mainOrderInterCity.getDriverId() != null){
+                                dto.setRouteName(mainOrderInterCity.getMainName());
+                                dto.setMainTime(mainOrderInterCity.getMainTime());
+                                DriverInfoInterCity inter = infoInterCityExMapper.getByDriverId(mainOrderInterCity.getDriverId());
+                                if(inter != null){
+                                    dto.setDriverId(mainOrderInterCity.getDriverId());
+                                    dto.setSupplierId(inter.getSupplierId());
+                                    dto.setDriverName(inter.getDriverName());
+                                    dto.setDriverPhone(inter.getDriverPhone());
+                                    dto.setLicensePlates(inter.getLicensePlates());
+                                    dto.setCityName(inter.getCityName());
+                                }
+                            }
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

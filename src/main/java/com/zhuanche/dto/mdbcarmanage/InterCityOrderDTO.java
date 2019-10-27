@@ -56,6 +56,29 @@ public class InterCityOrderDTO {
     private String orderNo;
 
 
+
+
+    private Integer driverId;
+
+    private String driverName;
+
+    private String driverPhone;
+
+    private String licensePlates;
+
+
+    private String cityName;
+
+    private Integer supplierId;
+
+    private String supplierName;
+
+
+    private String mainTime;
+
+
+
+
     public String getReserveName() {
         return reserveName;
     }
@@ -240,5 +263,69 @@ public class InterCityOrderDTO {
 
     public void setOrderNo(String orderNo) {
         this.orderNo = orderNo;
+    }
+
+    public Integer getDriverId() {
+        return driverId;
+    }
+
+    public void setDriverId(Integer driverId) {
+        this.driverId = driverId;
+    }
+
+    public String getDriverName() {
+        return driverName;
+    }
+
+    public void setDriverName(String driverName) {
+        this.driverName = driverName;
+    }
+
+    public String getDriverPhone() {
+        return driverPhone;
+    }
+
+    public void setDriverPhone(String driverPhone) {
+        this.driverPhone = driverPhone;
+    }
+
+    public String getLicensePlates() {
+        return licensePlates;
+    }
+
+    public void setLicensePlates(String licensePlates) {
+        this.licensePlates = licensePlates;
+    }
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
+
+    public Integer getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(Integer supplierId) {
+        this.supplierId = supplierId;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    public String getMainTime() {
+        return mainTime;
+    }
+
+    public void setMainTime(String mainTime) {
+        this.mainTime = mainTime;
     }
 }

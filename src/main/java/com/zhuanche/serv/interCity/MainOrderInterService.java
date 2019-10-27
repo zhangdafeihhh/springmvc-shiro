@@ -14,4 +14,6 @@ public interface MainOrderInterService {
     int updateMainTime(String mainOrderNo, String mainTime);
 
     int addMainOrderNo(MainOrderInterCity record);
+
+    MainOrderInterCity queryMainOrder(String mainOrderNo);
 }

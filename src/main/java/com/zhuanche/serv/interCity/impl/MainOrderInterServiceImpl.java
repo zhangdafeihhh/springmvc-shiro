@@ -27,4 +27,9 @@ public class MainOrderInterServiceImpl implements MainOrderInterService {
     public int addMainOrderNo(MainOrderInterCity record) {
         return exMapper.addMainOrderNo(record);
     }
+
+    @Override
+    public MainOrderInterCity queryMainOrder(String mainOrderNo) {
+        return exMapper.queryMainOrder(mainOrderNo);
+    }
 }
