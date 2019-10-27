@@ -320,7 +320,7 @@ public class IntegerCityController {
             sb.append("clientType=28").append(SYSMOL);
             map.put("bookingDate", bookingDate);//预定日期（时间戳）
             sb.append("bookingDate=" + bookingDate).append(SYSMOL);
-            if("1".equals(isSameRider)){
+            if(isSameRider==1){
                 map.put("riderName",reserveName);
                 sb.append("riderName=" + reserveName).append(SYSMOL);
                 map.put("riderPhone",reservePhone);
