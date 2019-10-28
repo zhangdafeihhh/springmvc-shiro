@@ -242,8 +242,9 @@ public class IntegerCityController {
                                                  @Verify(param = "boardingGetOffX",rule = "required")String boardingGetOffX,
                                                  @Verify(param = "boardingGetOffY",rule = "required")String boardingGetOffY,
                                                  @Verify(param = "startCityName",rule = "required")String startCityName,
-                                                 @Verify(param = "endCityName",rule = "required")String endCityName
-    ){
+                                                 @Verify(param = "endCityName",rule = "required")String endCityName,
+                                                 @Verify(param = "bookingStartAddr",rule = "required")String bookingStartAddr,
+                                                 @Verify(param = "bookingEndAddr",rule = "required")String bookingEndAddr){
         logger.info(MessageFormat.format("手动录入订单步骤1入参,{0},{1},{2},{3},{4},{5},{6},{7}",reserveName,reservePhone,
                 isSameRider,riderName,riderPhone,riderCount,boardingTime,boardingCityId,boardingGetOnX,boardingGetOnY,boardingGetOffCityId,
                 boardingGetOffX,boardingGetOffY));
@@ -377,6 +378,15 @@ public class IntegerCityController {
             sb.append("startCityId="+boardingCityId).append(SYSMOL);
             map.put("startCityName",startCityName);
             sb.append("startCityName="+startCityName).append(SYSMOL);
+
+            map.put("bookingStartAddr",bookingStartAddr);
+            sb.append("bookingStartAddr="+bookingStartAddr).append(SYSMOL);
+
+            map.put("bookingEndAddr",bookingEndAddr);
+            sb.append("bookingEndAddr="+bookingEndAddr).append(SYSMOL);
+
+
+
             map.put("endCityId",boardingGetOffCityId);
             sb.append("endCityId="+boardingGetOffCityId).append(SYSMOL);
             map.put("endCityName",endCityName);
@@ -572,7 +582,9 @@ public class IntegerCityController {
                                   String mainOrderNo,
                                   Integer status,
                                   String startCityName,
-                                  String endCityName){
+                                  String endCityName,
+                                  String bookingStartAddr,
+                                  String bookingEndAddr){
 
         //根据上下车地址判断是否在城际列车配置的范围内
         //根据横纵坐标获取围栏，根据围栏获取路线
@@ -683,14 +695,31 @@ public class IntegerCityController {
         }
 
         if(StringUtils.isNotEmpty(startCityName)){
-            map.put("bookingStartAddr",startCityName);
-            list.add("bookingStartAddr=" + startCityName);
+            map.put("startCityName",startCityName);
+            list.add("startCityName=" + startCityName);
         }
 
         if(StringUtils.isNotEmpty(endCityName)){
-            map.put("bookingEndAddr",endCityName);
-            list.add("bookingEndAddr=" + endCityName);
+            map.put("endCityName",endCityName);
+            list.add("endCityName=" + endCityName);
         }
+
+
+        if(StringUtils.isNotEmpty(bookingStartAddr)){
+            map.put("bookingStartAddr",bookingStartAddr);
+            list.add("bookingStartAddr=" + bookingStartAddr);
+
+        }
+
+        if(StringUtils.isNotEmpty(bookingEndAddr)){
+            map.put("bookingEndAddr",bookingEndAddr);
+            list.add("bookingEndAddr=" + bookingEndAddr);
+        }
+
+
+
+
+
 
 
 

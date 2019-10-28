@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
@@ -15,12 +16,14 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.common.web.datavalidate.custom.IdCard;
 import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
+import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.entity.mdbcarmanage.MainOrderInterCity;
 import com.zhuanche.entity.orderPlatform.CarFactOrderInfoEntity;
 import com.zhuanche.entity.rentcar.DriverEntity;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.util.Common;
 import com.zhuanche.util.MyRestTemplate;
+import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
 import mapper.orderPlatform.ex.PoolMainOrderExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
 import org.apache.commons.codec.binary.Base64;
@@ -39,6 +42,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author fanht
@@ -61,8 +65,9 @@ public class InterCityMainOrderController {
     private MyRestTemplate carRestTemplate;
 
     @Autowired
-    private CarBizDriverInfoExMapper driverInfoExMapper;
+    private DriverInfoInterCityExMapper infoInterCityExMapper;
 
+    private static final String SPLIT = ",";
     /**
      * 订单查询
      * @param pageNum
@@ -101,23 +106,22 @@ public class InterCityMainOrderController {
                                        String beginCostStartDate,
                                        String beginCostEndDate){
 
-        Page page = PageHelper.startPage(pageNum,pageSize);
-
-
+        //Page page = PageHelper.startPage(pageNum,pageSize);
         StringBuffer sb =new StringBuffer();
+        Map<Integer,DriverInfoInterCity> map = Maps.newHashMap();
+        boolean hasQuery = false;
         if(supplierId  != null || StringUtils.isNotEmpty(driverName) || StringUtils.isNotEmpty(driverPhone) || StringUtils.isNotEmpty(licensePlates)){
-            DriverEntity driverEntity = new DriverEntity();
-            driverEntity.setName(driverName);
-            driverEntity.setPhone(driverPhone);
-            driverEntity.setLicensePlates(licensePlates);
-            driverEntity.setSupplierId(supplierId);
-            List<DriverEntity> list =  driverInfoExMapper.queryDriverIdBySupplierId(driverEntity);
-            if(CollectionUtils.isNotEmpty(list)){
-                for (DriverEntity entity : list){
-                    sb.append(entity.getDriverId()).append(",");
-                }
+            List<DriverInfoInterCity> listDriver = infoInterCityExMapper.queryMainOrderDrivers(cityId,supplierId,driverName,
+                    driverPhone,licensePlates,null);
+            hasQuery = true;
+            if(CollectionUtils.isNotEmpty(listDriver)){
+               for(DriverInfoInterCity driver : listDriver){
+                   sb.append(driver.getDriverId()).append(SPLIT);
+                   map.put(driver.getDriverId(),driver);
+               }
+            }else {
+                return AjaxResponse.success(new PageDTO(pageNum,pageSize,0,null));
             }
-
         }
 
         CarPoolMainOrderDTO dto = new CarPoolMainOrderDTO();
@@ -126,21 +130,76 @@ public class InterCityMainOrderController {
             String driverIds = sb.toString().substring(0,sb.toString().length()-1);
             dto.setDriverIds(driverIds);
         }
-
         dto.setCityId(cityId);
-        dto.setSupplierId(supplierId);
         dto.setStatus(orderState);
         dto.setServiceTypeId(serviceType);
-        dto.setDriverName(driverName);
-        dto.setDriverPhone(driverPhone);
-        dto.setLicensePlates(licensePlates);
         dto.setMainOrderNo(mainOrderNo);
         dto.setCreateDateBegin(beginCreateDate);
         dto.setCreateDateEnd(endCreateDate);
         dto.setDriverStartDateStr(beginCostStartDate);
         dto.setDriverEndDateStr(beginCostEndDate);
+        Page pageQuery = null;
+        /*if(StringUtils.isNotEmpty(sb.toString())){
+        }*/
+
+        pageQuery = PageHelper.startPage(pageNum,pageSize);
+
         List<CarPoolMainOrderDTO> dtoList = exMapper.queryCarpoolMainList(dto);
-        int total = (int)page.getTotal();
+        //如果查询条件是直接查询订单的库，需要回显
+        if(!hasQuery && CollectionUtils.isNotEmpty(dtoList)){
+            StringBuilder orderSb = new StringBuilder();
+            for(CarPoolMainOrderDTO orderDTO : dtoList){
+                orderSb.append(orderDTO.getDriverId()).append(SPLIT);
+            }
+            String driverIds = null;
+            if(StringUtils.isNotEmpty(orderSb.toString())){
+                 driverIds = orderSb.toString().substring(0,orderSb.toString().length()-1);
+            }
+
+            List<DriverInfoInterCity> listDriver = infoInterCityExMapper.queryMainOrderDrivers(null,null,null,
+                    null,null,driverIds);
+            if(CollectionUtils.isNotEmpty(listDriver)){
+                for(DriverInfoInterCity driver : listDriver){
+                    map.put(driver.getDriverId(),driver);
+                }
+            }
+
+            for(CarPoolMainOrderDTO mainOrder : dtoList){
+                DriverInfoInterCity driver =   map.get(mainOrder.getDriverId());
+                if(driver != null){
+                    mainOrder.setSupplierName(driver.getDriverName());
+                    mainOrder.setSupplierId(driver.getSupplierId());
+                    mainOrder.setDriverName(driver.getDriverName());
+                    mainOrder.setDriverPhone(driver.getDriverPhone());
+                    mainOrder.setLicensePlates(driver.getLicensePlates());
+                    mainOrder.setCityName(driver.getCityName());
+                }
+            }
+
+
+        }else {
+            for(CarPoolMainOrderDTO mainOrder : dtoList){
+                DriverInfoInterCity driver =   map.get(mainOrder.getDriverId());
+                if(driver != null){
+                    mainOrder.setSupplierName(driver.getDriverName());
+                    mainOrder.setSupplierId(driver.getSupplierId());
+                    mainOrder.setDriverName(driver.getDriverName());
+                    mainOrder.setDriverPhone(driver.getDriverPhone());
+                    mainOrder.setLicensePlates(driver.getLicensePlates());
+                    mainOrder.setCityName(driver.getCityName());
+                }
+            }
+        }
+
+        int total = 0;
+        total = (int)pageQuery.getTotal();
+
+        /*if(StringUtils.isNotEmpty(sb.toString())){
+        }else {
+            total = (int)page.getTotal();
+        }
+    */
+
         PageDTO pageDTO =  new PageDTO(pageNum,pageSize,total,dtoList);
         return AjaxResponse.success(pageDTO);
     }

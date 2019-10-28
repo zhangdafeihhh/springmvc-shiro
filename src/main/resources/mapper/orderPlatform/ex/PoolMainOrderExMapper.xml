@@ -58,12 +58,12 @@
 				and status = #{status,jdbcType=INTEGER}
 			</if>
 			<if test="driverIds != null and driverIds != ''" >
-				and driver_id in (${driverId,jdbcType=INTEGER})
+				and driver_id in (${driverIds})
 			</if>
 
-			<if test="driverPhone != null and driverPhone != ''" >
+			<!--<if test="driverPhone != null and driverPhone != ''" >
 				and driverPhone = #{driver_phone,jdbcType=INTEGER}
-			</if>
+			</if>-->
 			<if test="licensePlates != null and licensePlates != ''" >
 				and license_plates = #{licensePlates,jdbcType=VARCHAR}
 			</if>
