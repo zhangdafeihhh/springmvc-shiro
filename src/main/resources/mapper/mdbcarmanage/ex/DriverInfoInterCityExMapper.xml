@@ -37,7 +37,7 @@
       and t.supplier_id = #{supplierId}
     </if>
     <if test="driverName!=null and driverName!=''">
-      and t.driver_name  LIKE  '%${driverName}%'
+      and t.driver_name  LIKE  CONCAT(#{driverName}, '%')
     </if>
     <if test="driverPhone!=null and driverPhone!=''">
       and t.driver_phone = #{driverPhone}
@@ -52,5 +52,32 @@
     <include refid="Base_Column_List" />
     from driver_info_inter_city
     where driver_id = #{driverId,jdbcType=INTEGER} limit 1
+  </select>
+
+
+  <select id="queryMainOrderDrivers" resultType="com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity">
+    SELECT t.city_id as cityId,t.city_name as cityName, t.group_id as groupId, t.supplier_name as supplierName,t.id,t.driver_name as driverName,t.license_plates as licensePlates,t.driver_id as driverId,
+    t.driver_phone as driverPhone
+    FROM driver_info_inter_city t
+    WHERE 1=1
+    <if test="cityId!=null and cityId!=''">
+      and t.city_id = #{cityId}
+    </if>
+    <if test="supplierId!=null and supplierId!=''">
+      and t.supplier_id = #{supplierId}
+    </if>
+    <if test="driverName!=null and driverName!=''">
+      and t.driver_name  = #{driverName}
+    </if>
+    <if test="driverPhone!=null and driverPhone!=''">
+      and t.driver_phone = #{driverPhone}
+    </if>
+    <if test="licensePlates!=null and licensePlates!=''">
+      and t.license_plates = #{licensePlates}
+    </if>
+
+    <if test="driverIds!=null and driverIds!=''">
+      and t.driver_id  in (${driverIds})
+    </if>
   </select>
 </mapper>
