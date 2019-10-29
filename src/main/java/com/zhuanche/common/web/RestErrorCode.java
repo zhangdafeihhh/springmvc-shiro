@@ -269,6 +269,12 @@ public final class RestErrorCode{
 	@ResultMessage("上下车点不再围栏区域")
 	public static final int ADD_NOT_RIGHT = 50013;
 
+	@ResultMessage("未匹配到线路")
+	public static final int UNFINDED_LINE = 50014;
+
+	@ResultMessage("未获取到预估价")
+	public static final int UNGET_PRICE = 50015;
+
 	@ResultMessage("绑定主单失败")
 	public static final int BIND_MAIN_FAILED = 50100;
 	@ResultMessage("改派订单失败")
