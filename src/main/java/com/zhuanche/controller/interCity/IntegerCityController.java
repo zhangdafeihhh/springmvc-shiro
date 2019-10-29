@@ -335,7 +335,7 @@ public class IntegerCityController {
                 return configRouteRes;
             }
 
-           JSONObject jsonRoute = (JSONObject) configRouteRes.getData();
+            JSONObject jsonRoute = (JSONObject) configRouteRes.getData();
             if(jsonRoute != null && jsonRoute.get("lineId") != null){
                 ruleId = jsonRoute.get("lineId").toString();
             }
@@ -639,11 +639,13 @@ public class IntegerCityController {
                                 if(inter != null){
                                     dto.setDriverId(mainOrderInterCity.getDriverId());
                                     dto.setSupplierId(inter.getSupplierId());
+                                    dto.setSupplierName(inter.getSupplierName());
                                     dto.setDriverName(inter.getDriverName());
                                     dto.setSupplierName(inter.getSupplierName());
                                     dto.setDriverPhone(inter.getDriverPhone());
                                     dto.setLicensePlates(inter.getLicensePlates());
                                     dto.setCityName(inter.getCityName());
+
                                 }
                             }
                         }
@@ -654,8 +656,8 @@ public class IntegerCityController {
 
                     //获取行程名称
                     if(dto.getCarGroup() != null){
-                       String carName =  carBizCarGroupExMapper.getGroupNameByGroupId(Integer.valueOf(dto.getCarGroup()));
-                       dto.setCarGroupName(carName);
+                        String carName =  carBizCarGroupExMapper.getGroupNameByGroupId(Integer.valueOf(dto.getCarGroup()));
+                        dto.setCarGroupName(carName);
                     }
                     return AjaxResponse.success(dto);
                 }
@@ -787,7 +789,7 @@ public class IntegerCityController {
         try {
             elsRes = this.getOrderEstimatedAmount620(Long.valueOf(boardingTime),boardingCityId,68,riderPhone,
                     ruleId,customerId,boardingGetOffX,boardingGetOffY,riderCount,String.valueOf(carGroup),boardingGetOnX,
-                                        boardingGetOnY, isSameRider);
+                    boardingGetOnY, isSameRider);
         } catch (Exception e) {
             logger.error("获取预估价异常");
             return AjaxResponse.fail(RestErrorCode.UNGET_PRICE);
@@ -1041,7 +1043,38 @@ public class IntegerCityController {
 
         logger.info(MessageFormat.format("查询城际拼车司机入参：supplierId:{0},driverName:{1},driverPhpne:{2},license:{3}",supplierId,
                 driverName,driverPhone,license));
-        List<MainOrderDetailDTO> interCityList = infoInterCityExMapper.queryDriver(supplierId,driverName,driverPhone,license);
+
+
+        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+
+        List<MainOrderDetailDTO> interCityList = null;
+        if(loginUser.getAccountType() != 900){
+            Set<Integer> citiesSet = loginUser.getCityIds();
+            Set<Integer> suppliersSet = loginUser.getSupplierIds();
+
+            /*StringBuilder cityBuilder = new StringBuilder();
+            if(citiesSet != null){
+                List<Integer> listCity = new ArrayList<>(citiesSet);
+                for(int i = 0;i<listCity.size();i++){
+                    cityBuilder.append(listCity.get(i)).append(SPLIT);
+                }
+            }
+            StringBuilder supplierBuilder = new StringBuilder();
+            if(suppliersSet != null){
+                List<Integer> listSupplier = new ArrayList<>(suppliersSet);
+                for(int i = 0;i<listSupplier.size();i++){
+                    supplierBuilder.append(listSupplier.get(i)).append(SPLIT);
+                }
+            }
+         */
+            interCityList = infoInterCityExMapper.queryDriver(cityId,supplierId,driverName,driverPhone,license,citiesSet,suppliersSet);
+
+        }else{
+            interCityList = infoInterCityExMapper.queryDriver(cityId,supplierId,driverName,driverPhone,license,null,null);
+        }
+
+
+
         //剩余车位数
         String url = "/order/carpool/getCrossCityMainOrder";
 
@@ -1123,7 +1156,7 @@ public class IntegerCityController {
                                                  String crossCityStartTime,
                                                  String routeName){
         //派单
-        logger.info("派单接口入参:mainOrderNo="+ mainOrderNo + ",orderNo:"+orderNo
+        logger.info("指派接口入参:mainOrderNo="+ mainOrderNo + ",orderNo:"+orderNo
                 +",driverId:"+driverId + ",driverName:"+ driverName + ",driverPhone:"+driverPhone+",licensePlates:"+licensePlates
                 +",groupId:"+groupId+",crossCityStartTime:"+crossCityStartTime+",routeName:"+routeName);
         Map<String,Object> map = Maps.newHashMap();
@@ -1344,7 +1377,7 @@ public class IntegerCityController {
     private int seatCount(Integer groupId){
         int seatNum = 0;
         try {
-             seatNum = carBizCarGroupExMapper.getSeatNumByGroupId(groupId);
+            seatNum = carBizCarGroupExMapper.getSeatNumByGroupId(groupId);
         } catch (NumberFormatException e) {
             logger.error("获取座位号失败"+e);
         }
@@ -1685,7 +1718,7 @@ public class IntegerCityController {
                                                     String startPoint,
                                                     String endPoint,
                                                     Integer isRemainder
-                                                    ) throws Exception {
+    ) throws Exception {
         try {
             Map<String,Object> map = Maps.newHashMap();
             map.put("duration",0);//预估时长
@@ -1754,11 +1787,11 @@ public class IntegerCityController {
                                 if(StringUtils.isNotEmpty(carpoolingKeyStr)){
                                     logger.info(carpoolingKeyStr);
                                     if(carpoolingKeyStr.indexOf("-")>0){
-                                      String poolingArr[] =  carpoolingKeyStr.split("-");
-                                      if(poolingArr.length>0){
-                                          chargeJSON.put("estimatedAmount",poolingArr[0]);
-                                          return AjaxResponse.success(chargeJSON);
-                                      }
+                                        String poolingArr[] =  carpoolingKeyStr.split("-");
+                                        if(poolingArr.length>0){
+                                            chargeJSON.put("estimatedAmount",poolingArr[0]);
+                                            return AjaxResponse.success(chargeJSON);
+                                        }
                                     }
                                 }
                             }
