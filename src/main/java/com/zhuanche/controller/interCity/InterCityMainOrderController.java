@@ -19,12 +19,14 @@ import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.entity.mdbcarmanage.MainOrderInterCity;
 import com.zhuanche.entity.orderPlatform.CarFactOrderInfoEntity;
+import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.entity.rentcar.DriverEntity;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.util.Common;
 import com.zhuanche.util.MyRestTemplate;
 import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
 import mapper.orderPlatform.ex.PoolMainOrderExMapper;
+import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -66,6 +68,9 @@ public class InterCityMainOrderController {
 
     @Autowired
     private DriverInfoInterCityExMapper infoInterCityExMapper;
+
+    @Autowired
+    private CarBizCarGroupExMapper carBizCarGroupExMapper;
 
     private static final String SPLIT = ",";
     /**
@@ -259,5 +264,15 @@ public class InterCityMainOrderController {
             list.add(entity);
         }
         return list;
+    }
+
+
+
+    @RequestMapping(method = RequestMethod.GET,value = "/getAllSeats")
+    @ResponseBody
+    public AjaxResponse getAllSeats(){
+        logger.info("获取所有的座位数");
+        List<CarBizCarGroup> listAll = carBizCarGroupExMapper.queryAllGroup();
+        return AjaxResponse.success(listAll);
     }
 }

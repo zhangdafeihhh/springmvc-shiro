@@ -78,6 +78,12 @@ public class InterCityOrderDTO {
 
     private String carGroup;
 
+    private String bookingStartShortAddr;//上车短地址
+
+    private String bookingEndShortAddr;//下车短地址
+
+
+    private String carGroupName;//车型名称
 
 
 
@@ -337,5 +343,29 @@ public class InterCityOrderDTO {
 
     public void setCarGroup(String carGroup) {
         this.carGroup = carGroup;
+    }
+
+    public String getBookingStartShortAddr() {
+        return bookingStartShortAddr;
+    }
+
+    public void setBookingStartShortAddr(String bookingStartShortAddr) {
+        this.bookingStartShortAddr = bookingStartShortAddr;
+    }
+
+    public String getBookingEndShortAddr() {
+        return bookingEndShortAddr;
+    }
+
+    public void setBookingEndShortAddr(String bookingEndShortAddr) {
+        this.bookingEndShortAddr = bookingEndShortAddr;
+    }
+
+    public String getCarGroupName() {
+        return carGroupName;
+    }
+
+    public void setCarGroupName(String carGroupName) {
+        this.carGroupName = carGroupName;
     }
 }

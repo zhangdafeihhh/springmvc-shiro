@@ -20,6 +20,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.*;
 import com.zhuanche.util.encrypt.MD5Utils;
 import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
+import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -82,6 +83,8 @@ public class IntegerCityController {
     @Autowired
     private DriverInfoInterCityExMapper infoInterCityExMapper;
 
+    @Autowired
+    private CarBizCarGroupExMapper carBizCarGroupExMapper;
 
     @Autowired
     private MainOrderInterService interService;
@@ -292,7 +295,9 @@ public class IntegerCityController {
                                                  @Verify(param = "endCityName",rule = "required")String endCityName,
                                                  @Verify(param = "bookingStartAddr",rule = "required")String bookingStartAddr,
                                                  @Verify(param = "bookingEndAddr",rule = "required")String bookingEndAddr,
-                                                 @Verify(param = "carGroup",rule = "required") Integer carGroup){
+                                                 @Verify(param = "carGroup",rule = "required") Integer carGroup,
+                                                 @Verify(param = "bookingStartShortAddr",rule = "required") String bookingStartShortAddr,
+                                                 @Verify(param = "bookingEndShortAddr",rule = "required")String bookingEndShortAddr){
         logger.info(MessageFormat.format("手动录入订单步骤1入参,{0},{1},{2},{3},{4},{5},{6},{7}",reserveName,reservePhone,
                 isSameRider,riderName,riderPhone,riderCount,boardingTime,boardingCityId,boardingGetOnX,boardingGetOnY,boardingGetOffCityId,
                 boardingGetOffX,boardingGetOffY));
@@ -323,7 +328,7 @@ public class IntegerCityController {
 
             AjaxResponse  configRouteRes = this.hasRoute(getOnId,getOffId);
 
-            String ruleId = "1";
+            String ruleId = "";
 
             if(configRouteRes.getCode() != RestErrorCode.SUCCESS){
                 logger.info("根据围栏id未获取到配置路线");
@@ -468,10 +473,20 @@ public class IntegerCityController {
             map.put("bookingEndAddr",bookingEndAddr);
             sb.append("bookingEndAddr="+bookingEndAddr).append(SYSMOL);
 
+            map.put("bookingStartShortAddr",bookingStartShortAddr);
+            sb.append("bookingStartShortAddr="+bookingStartShortAddr).append(SYSMOL);
+
+            map.put("bookingEndShortAddr",bookingEndShortAddr);
+            sb.append("bookingEndShortAddr="+bookingEndShortAddr).append(SYSMOL);
+
+
+
             map.put("endCityId",boardingGetOffCityId);
             sb.append("endCityId="+boardingGetOffCityId).append(SYSMOL);
             map.put("endCityName",endCityName);
             sb.append("endCityName="+endCityName).append(SYSMOL);
+
+
 
             String getOn = boardingGetOnX + ";" + boardingGetOnY;
             String getOff = boardingGetOffX + ";" + boardingGetOffY;
@@ -637,6 +652,11 @@ public class IntegerCityController {
                     }
 
 
+                    //获取行程名称
+                    if(dto.getCarGroup() != null){
+                       String carName =  carBizCarGroupExMapper.getGroupNameByGroupId(Integer.valueOf(dto.getCarGroup()));
+                       dto.setCarGroupName(carName);
+                    }
                     return AjaxResponse.success(dto);
                 }
             }
@@ -673,7 +693,9 @@ public class IntegerCityController {
                                   String endCityName,
                                   String bookingStartAddr,
                                   String bookingEndAddr,
-                                  String carGroup){
+                                  String carGroup,
+                                  String bookingStartShortAddr,
+                                  String bookingEndShortAddr){
 
         //根据上下车地址判断是否在城际列车配置的范围内
         //根据横纵坐标获取围栏，根据围栏获取路线
@@ -712,10 +734,64 @@ public class IntegerCityController {
         String getOff = boardingGetOffX + ";" + boardingGetOffY;
 
 
+        AjaxResponse  configRouteRes = this.hasRoute(getOnId,getOffId);
+
+        String ruleId = "";
+
+        if(configRouteRes.getCode() != RestErrorCode.SUCCESS){
+            logger.info("根据围栏id未获取到配置路线");
+            return configRouteRes;
+        }
+
+        JSONObject jsonRoute = (JSONObject) configRouteRes.getData();
+        if(jsonRoute != null && jsonRoute.get("lineId") != null){
+            ruleId = jsonRoute.get("lineId").toString();
+        }
+
+        if(StringUtils.isEmpty(ruleId)){
+            logger.info("未获取到可配置线路");
+            return AjaxResponse.fail(RestErrorCode.UNFINDED_LINE);
+        }
+        //根据乘客人获取乘客userId
+        Integer customerId = 0;
+        if(StringUtils.isNotEmpty(reservePhone)){
+            String url =  "/api/customer/regist";
+            Map<String,Object> map = Maps.newHashMap();
+            map.put("phone",reservePhone);
+            map.put("registerSource",2);
+            map.put("channelNum","新城际订单渠道");
+            //获取乘客id
+            String registerResult = MpOkHttpUtil.okHttpPost(centerUrl+url,map,0,null);
+            if(StringUtils.isNotEmpty(registerResult)){
+                JSONObject jsonResult = JSONObject.parseObject(registerResult);
+                if(jsonResult.get("code") == null || jsonResult.getInteger("code") != 0){
+                    logger.info("根据乘客获取customer失败");
+                    return AjaxResponse.fail(RestErrorCode.REGISTER_BY_PHONE);
+                }
+                JSONObject data = jsonResult.getJSONObject("data");
+                customerId = data.getInteger("customerId");
+            }
+        }
+
+        if(customerId == null || customerId  == 0 ){
+            logger.info("根据乘客获取customer失败");
+            return AjaxResponse.fail(RestErrorCode.REGISTER_BY_PHONE);
+        }
+
+
+
+
+
         //获取预估价
-        /*AjaxResponse elsRes = this.getOrderEstimatedAmount620(bookingDate,boardingCityId,68,riderPhone,
-                ruleId,customerId,boardingGetOffX,boardingGetOffY,riderCount,String.valueOf(carGroup),boardingGetOnX,boardingGetOffY,
-                isSameRider);
+        AjaxResponse elsRes = null;
+        try {
+            elsRes = this.getOrderEstimatedAmount620(Long.valueOf(boardingTime),boardingCityId,68,riderPhone,
+                    ruleId,customerId,boardingGetOffX,boardingGetOffY,riderCount,String.valueOf(carGroup),boardingGetOnX,
+                                        boardingGetOnY, isSameRider);
+        } catch (Exception e) {
+            logger.error("获取预估价异常");
+            return AjaxResponse.fail(RestErrorCode.UNGET_PRICE);
+        }
         if(elsRes.getCode() != RestErrorCode.SUCCESS){
             logger.info("未获取到预估价");
             return AjaxResponse.fail(RestErrorCode.UNGET_PRICE);
@@ -725,11 +801,17 @@ public class IntegerCityController {
         //获取预估金额
         String estimatedAmount = jsonEst.getString("estimatedAmount");
         String estimatedKey = jsonEst.getString("estimatedKey");
-        */
-
 
         Map<String,Object> map = Maps.newHashMap();
         List<String> list = new ArrayList<>();
+
+
+        map.put("estimatedAmount",estimatedAmount);//预估金额
+        list.add("estimatedAmount="+estimatedAmount);
+        map.put("buyoutPrice",estimatedAmount); //预估价
+        list.add("buyoutPrice="+estimatedAmount);
+
+
         map.put("businessId",Common.BUSSINESSID);
         list.add("businessId="+Common.BUSSINESSID);
         map.put("orderNo",orderNo);
@@ -841,6 +923,19 @@ public class IntegerCityController {
             map.put("groupIds", carGroup);
             list.add("groupIds="+carGroup);
         }
+
+        if(StringUtils.isNotEmpty(bookingStartShortAddr)){
+            map.put("bookingStartShortAddr", bookingStartShortAddr);
+            list.add("bookingStartShortAddr="+bookingStartShortAddr);
+        }
+
+        if(StringUtils.isNotEmpty(bookingEndShortAddr)){
+            map.put("bookingEndShortAddr", bookingEndShortAddr);
+            list.add("bookingEndShortAddr="+bookingEndShortAddr);
+        }
+
+
+
         map.put("status",status);
         list.add("status="+status);
 
@@ -963,7 +1058,7 @@ public class IntegerCityController {
                         Integer passengerNums = jsonData.getInteger("passengerNums");
                         Integer groupId = jsonData.getInteger("groupId");
                         //如果是商务6座，默认是6个位置否则是4个
-                        Integer maxSeat = this.seatCount(groupId.toString());
+                        Integer maxSeat = this.seatCount(groupId);
                         //剩余座位数
                         Integer remainSeat = maxSeat-passengerNums;
                         if(remainSeat<=0){
@@ -973,7 +1068,7 @@ public class IntegerCityController {
                     }
                 }
             } else {
-                detailDTO.setRemainSeats(seatCount(detailDTO.getGroupId().toString()));
+                detailDTO.setRemainSeats(seatCount(detailDTO.getGroupId()));
             }
         }
 
@@ -1052,7 +1147,7 @@ public class IntegerCityController {
         if(StringUtils.isNotEmpty(groupId)){
             map.put("carGroupId",groupId);
             listParam.add("carGroupId="+groupId);
-            int carSeatNums = seatCount(groupId);
+            int carSeatNums = seatCount(Integer.valueOf(groupId));
             map.put("carSeatNums",carSeatNums);
             listParam.add("carSeatNums="+carSeatNums);
         }
@@ -1156,9 +1251,7 @@ public class IntegerCityController {
             if(mainOrderNo.equals(curMainOrderNo)){
                 curMainOrderNo = null;
             }
-
         }
-
 
         Map<String,Object> map = Maps.newHashMap();
         List<String> listParam = new ArrayList<>();
@@ -1245,17 +1338,17 @@ public class IntegerCityController {
     }
 
 
+
+
     //根据车辆类型获取座位数
-    private int seatCount(String groupId){
-        if(StringUtils.isEmpty(groupId)){
-            return 4;
+    private int seatCount(Integer groupId){
+        int seatNum = 0;
+        try {
+             seatNum = carBizCarGroupExMapper.getSeatNumByGroupId(groupId);
+        } catch (NumberFormatException e) {
+            logger.error("获取座位号失败"+e);
         }
-        if(groupId.equals(OrderStateEnum.BUSINESSWELL.getCode()) ||
-                groupId.equals(OrderStateEnum.BUSINESS7.getCode())){
-            return 6;
-        }else {
-            return 4;
-        }
+        return seatNum;
     }
 
     private List<String> list(String str){
@@ -1685,6 +1778,8 @@ public class IntegerCityController {
 
         return AjaxResponse.fail(RestErrorCode.UNGET_PRICE);
     }
+
+
 
 
 
