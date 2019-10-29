@@ -76,6 +76,8 @@ public class InterCityOrderDTO {
 
     private String mainTime;
 
+    private String carGroup;
+
 
 
 
@@ -327,5 +329,13 @@ public class InterCityOrderDTO {
 
     public void setMainTime(String mainTime) {
         this.mainTime = mainTime;
+    }
+
+    public String getCarGroup() {
+        return carGroup;
+    }
+
+    public void setCarGroup(String carGroup) {
+        this.carGroup = carGroup;
     }
 }

@@ -392,8 +392,8 @@ public class IntegerCityController {
             map.put("businessId",Common.BUSSINESSID);//业务线ID
             sb.append("businessId=" + Common.BUSSINESSID).append(SYSMOL);
 
-/*            map.put("estimatedKey",estimatedKey);
-            sb.append("estimatedKey="+estimatedKey).append(SYSMOL);*/
+            map.put("estimatedKey",estimatedKey);
+            sb.append("estimatedKey="+estimatedKey).append(SYSMOL);
 
             map.put("type","1");//普通用户订单
             sb.append("type=1").append(SYSMOL);
@@ -547,8 +547,8 @@ public class IntegerCityController {
             }
             map.put("sign",sign);
 
-
-            JSONObject jsonObject =MpOkHttpUtil.okHttpGetBackJson(orderServiceUrl + "/orderMain/getOrderByOrderNo", map, 0, "查询订单列表");
+            //wiki地址
+            JSONObject jsonObject =MpOkHttpUtil.okHttpGetBackJson(orderServiceUrl + "/orderMain/getOrderByOrderNo", map, 0, "查询订单详情");
 
             if(jsonObject != null && jsonObject.get("code") !=null){
                 Integer code = jsonObject.getIntValue("code");
@@ -572,6 +572,7 @@ public class IntegerCityController {
                     dto.setBoardOnAddr(jsonData.get("bookingStartAddr") == null ? null : jsonData.getString("bookingStartAddr"));
                     dto.setBoardOffAddr(jsonData.get("bookingEndAddr") == null ? null : jsonData.getString("bookingEndAddr"));
                     dto.setCityId(jsonData.get("cityId") == null ? null : jsonData.getInteger("cityId"));
+                    dto.setCarGroup(jsonData.get("bookingGroupIds") == null ? null : jsonData.getString("bookingGroupIds"));
 
 
                     if(jsonData != null && jsonData.get("memo") != null){
@@ -640,7 +641,7 @@ public class IntegerCityController {
                 }
             }
         } catch (Exception e) {
-            logger.error("编辑订单失败",e);
+            logger.error("获取订单失败",e);
         }
 
         return AjaxResponse.fail(RestErrorCode.ORDER_DETAIL_UNDEFINED);
@@ -671,7 +672,8 @@ public class IntegerCityController {
                                   String startCityName,
                                   String endCityName,
                                   String bookingStartAddr,
-                                  String bookingEndAddr){
+                                  String bookingEndAddr,
+                                  String carGroup){
 
         //根据上下车地址判断是否在城际列车配置的范围内
         //根据横纵坐标获取围栏，根据围栏获取路线
@@ -706,10 +708,25 @@ public class IntegerCityController {
         }
 
 
-
-
         String getOn = boardingGetOnX + ";" + boardingGetOnY;
         String getOff = boardingGetOffX + ";" + boardingGetOffY;
+
+
+        //获取预估价
+        /*AjaxResponse elsRes = this.getOrderEstimatedAmount620(bookingDate,boardingCityId,68,riderPhone,
+                ruleId,customerId,boardingGetOffX,boardingGetOffY,riderCount,String.valueOf(carGroup),boardingGetOnX,boardingGetOffY,
+                isSameRider);
+        if(elsRes.getCode() != RestErrorCode.SUCCESS){
+            logger.info("未获取到预估价");
+            return AjaxResponse.fail(RestErrorCode.UNGET_PRICE);
+        }
+
+        JSONObject jsonEst = (JSONObject) elsRes.getData();
+        //获取预估金额
+        String estimatedAmount = jsonEst.getString("estimatedAmount");
+        String estimatedKey = jsonEst.getString("estimatedKey");
+        */
+
 
         Map<String,Object> map = Maps.newHashMap();
         List<String> list = new ArrayList<>();
@@ -803,13 +820,6 @@ public class IntegerCityController {
             list.add("bookingEndAddr=" + bookingEndAddr);
         }
 
-
-
-
-
-
-
-
         if(StringUtils.isNotEmpty(boardingTime)){
             Date crossCityStartTime = DateUtils.getDate(boardingTime,"yyyy-MM-dd HH:mm:ss");
             map.put("crossCityStartTime",crossCityStartTime.getTime());
@@ -826,8 +836,15 @@ public class IntegerCityController {
             map.put("endCityId", boardingGetOffCityId);
             list.add("endCityId="+boardingGetOffCityId);
         }
+
+        if(StringUtils.isNotEmpty(carGroup)){
+            map.put("groupIds", carGroup);
+            list.add("groupIds="+carGroup);
+        }
         map.put("status",status);
         list.add("status="+status);
+
+
 
 
         Collections.sort(list);
@@ -1592,7 +1609,7 @@ public class IntegerCityController {
             map.put("endPointLo",endPointLo);//下车地点经度
             map.put("endPointLa",endPointLa);//下车地点纬度
             map.put("channel","zhuanche");
-            map.put("groups",34+":"+riderCount); //车型id：乘车人数（34:1,35:1）  车型
+            map.put("groups",group+":"+riderCount); //车型id：乘车人数（34:1,35:1）  车型
 
 
             map.put("isDesign","0");//是否指定司机（0-否 1-是）
