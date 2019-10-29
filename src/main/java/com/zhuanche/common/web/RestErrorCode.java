@@ -275,6 +275,9 @@ public final class RestErrorCode{
 	@ResultMessage("未获取到预估价")
 	public static final int UNGET_PRICE = 50015;
 
+	@ResultMessage("创建子单失败")
+	public static final int FAILED_CREATE_SUB_ORDER = 50020;
+
 	@ResultMessage("绑定主单失败")
 	public static final int BIND_MAIN_FAILED = 50100;
 	@ResultMessage("改派订单失败")
