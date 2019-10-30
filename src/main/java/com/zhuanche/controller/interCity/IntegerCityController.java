@@ -1,5 +1,6 @@
 package com.zhuanche.controller.interCity;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
@@ -654,6 +655,53 @@ public class IntegerCityController {
                         e.printStackTrace();
                     }
 
+                    //获取上下车的短地址 wiki http://inside-yapi.01zhuanche.com/project/19/interface/api/9519
+
+
+                    Map<String,Object> shortMap = Maps.newHashMap();
+                    List<String> shortList = new ArrayList<>();
+                    shortMap.put("bId",Common.BUSSINESSID);
+                    shortList.add("bId="+Common.BUSSINESSID);
+                    shortMap.put("orderNo",orderNo);
+                    shortList.add("orderNo="+orderNo);
+                    shortMap.put("columns","order_address");
+                    shortList.add("columns=order_address");
+
+                    Collections.sort(shortList);
+                    shortList.add("key="+Common.MAIN_ORDER_KEY);
+
+                    String shortSign = null;
+                    try {
+                        shortSign = MD5Utils.getMD5DigestBase64(SignatureUtils.getMD5Sign(shortMap, Common.MAIN_ORDER_KEY));
+                    } catch (NoSuchAlgorithmException e) {
+                        e.printStackTrace();
+                    }
+                    shortMap.put("sign",shortSign);
+
+                    //wiki地址
+                    JSONObject jsonShort =MpOkHttpUtil.okHttpGetBackJson(orderServiceUrl + "/orderMain/getOrderSpecifiedByOrderNo", shortMap, 0, "获取上下车地址");
+
+
+
+                    /*String shortUrl = "/orderMain/getOrderSpecifiedByOrderNo";
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("businessId="+Common.BUSSINESSID+"&orderNo="+orderNo).append("&key="+Common.MAIN_ORDER_KEY);
+                    String shortSign = Base64.encodeBase64String(DigestUtils.md5(sb.toString()));
+                    shortUrl += "?businessId="+Common.BUSSINESSID+"&orderNo="+orderNo+"&sign="+shortSign;
+
+
+                    JSONObject shortJSONResult = carRestTemplate.getForObject(shortUrl,JSONObject.class);*/
+                    logger.info("=============获取订单短地址结果=============" + jsonShort.toString());
+                    if(jsonShort!=null && jsonShort.get("code") != null){
+                        if(jsonShort.getInteger("code") == 0 && jsonShort.get("data") != null){
+                            JSONObject jsonAddress = jsonShort.getJSONObject("data");
+                            if(jsonAddress != null && jsonAddress.get("orderAddress")!=null){
+                                JSONObject jsonDetailAdd = jsonAddress.getJSONObject("orderAddress");
+                                dto.setBookingStartShortAddr(jsonDetailAdd.get("bookingStartShortAddr") == null ? "": jsonDetailAdd.getString("bookingStartShortAddr"));
+                                dto.setBookingEndShortAddr(jsonDetailAdd.get("bookingEndShortAddr") == null ? "": jsonDetailAdd.getString("bookingEndShortAddr"));
+                            }
+                        }
+                    }
 
                     //获取行程名称
                     if(dto.getCarGroup() != null){
@@ -813,6 +861,9 @@ public class IntegerCityController {
         list.add("estimatedAmount="+estimatedAmount);
         map.put("buyoutPrice",estimatedAmount); //预估价
         list.add("buyoutPrice="+estimatedAmount);
+        map.put("estimatedKey",estimatedKey);
+        list.add("estimatedKey="+estimatedKey);
+
 
 
         map.put("businessId",Common.BUSSINESSID);
@@ -979,46 +1030,58 @@ public class IntegerCityController {
     @ResponseBody
     public AjaxResponse cancelOrder(@Verify(param ="orderNo",rule = "required") String orderNo,
                                     @Verify(param ="status",rule = "required") Integer status){
-        Map<String,Object> map = Maps.newHashMap();
-        List<String> listStr = new ArrayList<>();
-        map.put("businessId",Common.BUSSINESSID);
-        listStr.add("businessId="+Common.BUSSINESSID);
-        map.put("orderNo",orderNo);
-        listStr.add("orderNo="+orderNo);
-        map.put("cancelReasonId",24);//固定取消原因
-        listStr.add("cancelReasonId="+24);
-        map.put("memo","加盟商调度员手动取消");
-        listStr.add("memo=加盟商调度员手动取消");
-        map.put("cancelType",853); //1-乘客；2-平台；3-客服；4-司机
-        listStr.add("cancelType=853");
-        map.put("cancelStatus",11);//平台取消任意值
-        listStr.add("cancelStatus=11");
+        logger.info("=============取消订单入参:orderNo：" + orderNo+",status:" + status +"==============");
+        try {
+            Map<String,Object> map = Maps.newHashMap();
+            List<String> listStr = new ArrayList<>();
+            map.put("businessId",Common.BUSSINESSID);
+            listStr.add("businessId="+Common.BUSSINESSID);
+            map.put("orderNo",orderNo);
+            listStr.add("orderNo="+orderNo);
+            map.put("cancelReasonId",24);//固定取消原因
+            listStr.add("cancelReasonId="+24);
+            map.put("memo","加盟商调度员手动取消");
+            listStr.add("memo=加盟商调度员手动取消");
+            map.put("cancelType",853); //1-乘客；2-平台；3-客服；4-司机
+            listStr.add("cancelType=853");
+            map.put("cancelStatus",11);//平台取消任意值
+            listStr.add("cancelStatus=11");
 
 
-        Collections.sort(listStr);
-        listStr.add("key="+Common.MAIN_ORDER_KEY);
+            Collections.sort(listStr);
+            listStr.add("key="+Common.MAIN_ORDER_KEY);
 
-        StringBuilder sb = new StringBuilder();
-        for(String str : listStr){
-            sb.append(str).append(SYSMOL);
-        }
-        String param = sb.toString().substring(0,sb.toString().length()-1);
-        String sign = Base64.encodeBase64String(DigestUtils.md5(param));
-        map.put("sign",sign);
-
-        String url = "/order/carpool/inDispatcherCancelSubOrder";
-        if(status > 13){
-            url = "/order/carpool/syncCancelSubOrder";
-        }
-        String result = carRestTemplate.postForObject(url,JSONObject.class,map);
-        logger.info("取消订单返回结果:" + result);
-        if(StringUtils.isNotEmpty(result)){
-            JSONObject jsonResult = JSONObject.parseObject(result);
-            if(jsonResult != null && jsonResult.get("code") != null && jsonResult.getInteger("code") == 0){
-                logger.info("取消订单成功");
-                return  AjaxResponse.success(null);
+            StringBuilder sb = new StringBuilder();
+            for(String str : listStr){
+                sb.append(str).append(SYSMOL);
             }
+            String param = sb.toString().substring(0,sb.toString().length()-1);
+            String sign = Base64.encodeBase64String(DigestUtils.md5(param));
+            map.put("sign",sign);
+
+            String url = "/order/carpool/inDispatcherCancelSubOrder";
+            if(status > 13){
+                url = "/order/carpool/syncCancelSubOrder";
+            }
+            String result = carRestTemplate.postForObject(url,JSONObject.class,map);
+            logger.info("============取消订单返回结果:" + result);
+            if(StringUtils.isNotEmpty(result)){
+                JSONObject jsonResult = JSONObject.parseObject(result);
+                if(jsonResult != null && jsonResult.get("code") != null && jsonResult.getInteger("code") == 0){
+                    logger.info("取消订单成功");
+                    //return  AjaxResponse.success(null);
+                }
+            }
+        } catch (Exception e) {
+            logger.info("调用订单获取取消费异常"+ e);
+            return AjaxResponse.fail(RestErrorCode.CANCEL_FAILED);
+
         }
+
+        //调用计费取消费接口http://inside-yapi.01zhuanche.com/project/88/interface/api/16255
+        
+
+
         return AjaxResponse.fail(RestErrorCode.CANCEL_FAILED);
     }
 
@@ -1273,99 +1336,104 @@ public class IntegerCityController {
                                               @Verify(param = "licensePlates",rule = "required")  String licensePlates,
                                               @Verify(param = "cityId",rule = "required") Integer cityId,
                                               @Verify(param = "groupId",rule = "required") String groupId,
-                                              String crossCityStartTime,
+                                              String orderTime,
                                               String routeName){
         //派单
-        logger.info(MessageFormat.format("",mainOrderNo));
+        logger.info(MessageFormat.format("改派入参：mainOrderNo:{0},orderNo:{1},driverId:{2},driverPhone:{3},licensePlates{4},cityId{5}" +
+                ",groupId:{6},orderTime:{7},routeName:{8}",mainOrderNo,orderNo,driverId,driverPhone,licensePlates,cityId,groupId,orderTime,
+                routeName));
 
         /**todo 如果乘客指派成功后，又去给这个司机创建主单，需要给这个司机重新创建主单并记录起来**/
-        if(StringUtils.isNotEmpty(mainOrderNo)){
-            //当前子单的主单号
-            String curMainOrderNo = carFactOrderInfoService.getMainOrderBySubOrderNo(orderNo);
-            if(mainOrderNo.equals(curMainOrderNo)){
-                curMainOrderNo = null;
-            }
-        }
-
-        Map<String,Object> map = Maps.newHashMap();
-        List<String> listParam = new ArrayList<>();
-        map.put("businessId",Common.BUSSINESSID);
-        listParam.add("businessId="+ Common.BUSSINESSID);
-        if(StringUtils.isNotEmpty(mainOrderNo)){
-            map.put("mainOrderNo",mainOrderNo);
-            listParam.add("mainOrderNo="+mainOrderNo);
-        }
-        map.put("orderNo",orderNo);
-        listParam.add("orderNo="+orderNo);
-        map.put("driverId",driverId);
-        listParam.add("driverId="+driverId);
-        map.put("licensePlates",licensePlates);
-        listParam.add("licensePlates="+licensePlates);
-        map.put("groupId",groupId);
-        listParam.add("groupId="+groupId);
-        map.put("cityId",cityId);
-        listParam.add("cityId="+cityId);
-        if(StringUtils.isNotEmpty(routeName)){
-            map.put("routeName",routeName);
-            listParam.add("routeName="+routeName);
-
-        }
-
-        if(StringUtils.isNotEmpty(driverPhone)){
-            map.put("driverPhone",driverPhone);
-            listParam.add("driverPhone="+driverPhone);
-        }
-
-        Collections.sort(listParam);
-        listParam.add("key="+Common.MAIN_ORDER_KEY);
-
-
-        StringBuilder sbSort = new StringBuilder();
-        for(String str : listParam){
-            sbSort.append(str).append("&");
-        }
-
-        String md5Before = sbSort.toString().substring(0,sbSort.toString().length()-1);
-        String sign = Base64.encodeBase64String(DigestUtils.md5(md5Before));
-        map.put("sign",sign);
-
-
-
-        String url = "/order/carpool/crossCityOrderReassign";
-        System.out.println(url);
-
-
-
-        String result = carRestTemplate.postForObject(url,JSONObject.class,map);
-        logger.info("改派结果result:" + result);
-        if(StringUtils.isNotBlank(result)){
-            JSONObject jsonResult = JSONObject.parseObject(result);
-            if(jsonResult.get("code") != null && jsonResult.getInteger("code") == 0){
-                logger.info("改派成功");
-                //如果是新增或者改派，需要将
-                if(StringUtils.isEmpty(mainOrderNo)){
-                    JSONObject jsonData = jsonResult.getJSONObject("data");
-                    MainOrderInterCity main = new MainOrderInterCity();
-                    main.setDriverId(driverId);
-                    main.setCreateTime(new Date());
-                    main.setUpdateTime(new Date());
-                    main.setMainName(routeName);
-                    main.setStatus(MainOrderInterCity.orderState.NOTSETOUT.getCode());
-                    main.setMainOrderNo(jsonData.getString("mainOrderNo"));
-                    SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
-                    main.setOpePhone(user.getMobile());
-                    main.setMainTime(crossCityStartTime);
-                    int code = interService.addMainOrderNo(main);
-                    if(code > 0){
-                        return AjaxResponse.success(null);
-                    }
-                    return AjaxResponse.fail(RestErrorCode.FAILED_GET_MAIN_ORDER);
+        try {
+            if(StringUtils.isNotEmpty(mainOrderNo)){
+                //当前子单的主单号
+                String curMainOrderNo = carFactOrderInfoService.getMainOrderBySubOrderNo(orderNo);
+                if(mainOrderNo.equals(curMainOrderNo)){
+                    curMainOrderNo = null;
                 }
-                return AjaxResponse.success(null);
-            }else {
-                logger.info("改派未成功");
-                return AjaxResponse.failMsg(jsonResult.getIntValue("code"),jsonResult.getString("msg"));
             }
+
+            Map<String,Object> map = Maps.newHashMap();
+            List<String> listParam = new ArrayList<>();
+            map.put("businessId",Common.BUSSINESSID);
+            listParam.add("businessId="+ Common.BUSSINESSID);
+            if(StringUtils.isNotEmpty(mainOrderNo)){
+                map.put("mainOrderNo",mainOrderNo);
+                listParam.add("mainOrderNo="+mainOrderNo);
+            }
+            map.put("orderNo",orderNo);
+            listParam.add("orderNo="+orderNo);
+            map.put("driverId",driverId);
+            listParam.add("driverId="+driverId);
+            map.put("licensePlates",licensePlates);
+            listParam.add("licensePlates="+licensePlates);
+            map.put("groupId",groupId);
+            listParam.add("groupId="+groupId);
+            map.put("cityId",cityId);
+            listParam.add("cityId="+cityId);
+            if(StringUtils.isNotEmpty(routeName)){
+                map.put("routeName",routeName);
+                listParam.add("routeName="+routeName);
+
+            }
+
+            if(StringUtils.isNotEmpty(driverPhone)){
+                map.put("driverPhone",driverPhone);
+                listParam.add("driverPhone="+driverPhone);
+            }
+
+            Collections.sort(listParam);
+            listParam.add("key="+Common.MAIN_ORDER_KEY);
+
+
+            StringBuilder sbSort = new StringBuilder();
+            for(String str : listParam){
+                sbSort.append(str).append("&");
+            }
+
+            String md5Before = sbSort.toString().substring(0,sbSort.toString().length()-1);
+            String sign = Base64.encodeBase64String(DigestUtils.md5(md5Before));
+            map.put("sign",sign);
+
+
+            String url = "/order/carpool/crossCityOrderReassign";
+            System.out.println(url);
+
+
+            String result = carRestTemplate.postForObject(url,JSONObject.class,map);
+            logger.info("改派结果result:" + result);
+            if(StringUtils.isNotBlank(result)){
+                JSONObject jsonResult = JSONObject.parseObject(result);
+                if(jsonResult.get("code") != null && jsonResult.getInteger("code") == 0){
+                    logger.info("改派成功");
+                    //如果是新增或者改派，需要将
+                    if(StringUtils.isEmpty(mainOrderNo)){
+                        JSONObject jsonData = jsonResult.getJSONObject("data");
+                        MainOrderInterCity main = new MainOrderInterCity();
+                        main.setDriverId(driverId);
+                        main.setCreateTime(new Date());
+                        main.setUpdateTime(new Date());
+                        main.setMainName(routeName);
+                        main.setStatus(MainOrderInterCity.orderState.NOTSETOUT.getCode());
+                        main.setMainOrderNo(jsonData.getString("mainOrderNo"));
+                        SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+                        main.setOpePhone(user.getMobile());
+                        main.setMainTime(orderTime);
+                        int code = interService.addMainOrderNo(main);
+                        if(code > 0){
+                            return AjaxResponse.success(null);
+                        }
+                        return AjaxResponse.fail(RestErrorCode.FAILED_GET_MAIN_ORDER);
+                    }
+                    return AjaxResponse.success(null);
+                }else {
+                    logger.info("改派未成功");
+                    return AjaxResponse.failMsg(jsonResult.getIntValue("code"),jsonResult.getString("msg"));
+                }
+            }
+        } catch (Exception e) {
+            logger.error("派单异常"+e);
+            return AjaxResponse.fail(RestErrorCode.CHANGE_MAIN_FAILED);
         }
 
         return AjaxResponse.fail(RestErrorCode.CHANGE_MAIN_FAILED);
@@ -1797,10 +1865,10 @@ public class IntegerCityController {
             map.put("useExpandFee",false);//是否启用价格策略用户感知功能 默认false
             //map.put("areaId",);//重庆万州需求。如果有这个ID城市就用areaId
             JSONObject jsoParam = new JSONObject();
-            jsoParam.put("test",jsoParam);
+            jsoParam.put("=============调用预估价入参=============", JSON.toJSON(map));
             logger.info(jsoParam.toJSONString());
             String result = MpOkHttpUtil.okHttpPost(orderServerUrl+"/passenger/orderEstimatedAmount620",map,0,null);
-            logger.info("调用预估赶回结果" + result);
+            logger.info("=============调用预估返回结果=============" + result);
             if(StringUtils.isNotEmpty(result)){
                 JSONObject jsonResult = JSONObject.parseObject(result);
                 if(jsonResult.get("code") != null && jsonResult.getInteger("code") == 0){
