@@ -337,6 +337,7 @@ public class IntegerCityController {
 
             JSONObject jsonRoute = (JSONObject) configRouteRes.getData();
             if(jsonRoute != null && jsonRoute.get("lineId") != null){
+                //JSONObject righRoute = jsonRoute.getJSONObject("data");
                 ruleId = jsonRoute.get("lineId").toString();
             }
 
@@ -1645,7 +1646,7 @@ public class IntegerCityController {
                     SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
                     Set<Integer> cities = loginUser.getCityIds();
                     Set<Integer> suppliers = loginUser.getSupplierIds();
-                    if(cities.size()>0 && suppliers.size()>0){
+                    if(suppliers.size()>0){
                         JSONObject jsonData = jsonResult.getJSONObject("data");
                         HashSet<Integer> hashSet = new HashSet<>(suppliers);
                         boolean bl = false;
@@ -1672,6 +1673,37 @@ public class IntegerCityController {
                         if(!bl){
                             return  AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
                         }
+                    }else if(cities.size()>0){//如果是城市级别的
+                        JSONObject jsonData = jsonResult.getJSONObject("data");
+                        HashSet<Integer> hashSet = new HashSet<>(cities);
+                        boolean bl = false;
+                        if(jsonData.get("cityId") != null ){
+                            String citys = jsonData.getString("cityId");
+                            String[] interCity = citys.split(",");
+
+                            LinkedList<Integer> linkedList = new LinkedList<>();
+                            for(int i = 0;i<interCity.length;i++){
+                                linkedList.add(Integer.valueOf(interCity[i]));
+                            }
+                            Iterator<Integer> iterator = linkedList.iterator();
+                            while (iterator.hasNext()){
+                                if(hashSet.contains(iterator.next())){
+                                    logger.info("包含有路线");
+                                    jsonRoute.put("lineId",jsonData.getIntValue("lineId"));
+                                    jsonRoute.put("lineName",jsonData.getString("lineName"));
+                                    bl = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if(!bl){
+                            return  AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
+                        }
+                    }else {
+                        JSONObject jsonData = jsonResult.getJSONObject("data");
+                        jsonRoute.put("lineId",jsonData.getIntValue("lineId"));
+                        jsonRoute.put("lineName",jsonData.getString("lineName"));
                     }
 
                     logger.info("该坐标含有线路");
