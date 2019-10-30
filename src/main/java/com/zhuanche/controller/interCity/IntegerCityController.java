@@ -241,7 +241,7 @@ public class IntegerCityController {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmssSS");
         String  transId =sdf.format(new Date());
         map.put("transId",transId);
-        String url = esOrderDataSaasUrl +"/order/v1/search";
+        String url = esOrderDataSaasUrl +"/order/v2/search";
 
         String result =  MpOkHttpUtil.okHttpGet(url,map,0,null);
         if(StringUtils.isNotEmpty(result)){
