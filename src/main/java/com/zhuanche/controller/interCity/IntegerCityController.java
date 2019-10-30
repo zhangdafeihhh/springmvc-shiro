@@ -165,32 +165,43 @@ public class IntegerCityController {
 
         String serviceCityBatch = "";
         String supplierIdBatch = "";
-        if(loginUser.getAccountType() != 900){
-            Set<Integer> citiesSet = loginUser.getCityIds();
-            Set<Integer> suppliersSet = loginUser.getSupplierIds();
+        
+        
+        Set<Integer> citiesSet = loginUser.getCityIds();
+        Set<Integer> suppliersSet = loginUser.getSupplierIds();
 
-            StringBuilder cityBuilder = new StringBuilder();
-            if(citiesSet != null){
-                List<Integer> listCity = new ArrayList<>(citiesSet);
-                for(int i = 0;i<listCity.size();i++){
-                    cityBuilder.append(listCity.get(i)).append(SPLIT);
-                }
+        if(cityId != null){
+        	citiesSet.add(cityId);
+        }else{
+        	citiesSet = loginUser.getCityIds();
+        }
+        if(supplierId != null){
+        	suppliersSet.add(supplierId);
+        }else{
+        	suppliersSet = loginUser.getSupplierIds();
+        }
+        
+        StringBuilder cityBuilder = new StringBuilder();
+        if(citiesSet != null){
+            List<Integer> listCity = new ArrayList<>(citiesSet);
+            for(int i = 0;i<listCity.size();i++){
+                cityBuilder.append(listCity.get(i)).append(SPLIT);
             }
-            StringBuilder supplierBuilder = new StringBuilder();
-            if(suppliersSet != null){
-                List<Integer> listSupplier = new ArrayList<>(suppliersSet);
-                for(int i = 0;i<listSupplier.size();i++){
-                    supplierBuilder.append(listSupplier.get(i)).append(SPLIT);
-                }
+        }
+        StringBuilder supplierBuilder = new StringBuilder();
+        if(suppliersSet != null){
+            List<Integer> listSupplier = new ArrayList<>(suppliersSet);
+            for(int i = 0;i<listSupplier.size();i++){
+                supplierBuilder.append(listSupplier.get(i)).append(SPLIT);
             }
+        }
+        
+        if(StringUtils.isNotEmpty(cityBuilder.toString())){
+            serviceCityBatch = cityBuilder.toString().substring(0,cityBuilder.toString().length()-1);
+        }
 
-            if(StringUtils.isNotEmpty(cityBuilder.toString())){
-                serviceCityBatch = cityBuilder.toString().substring(0,cityBuilder.toString().length()-1);
-            }
-
-            if(StringUtils.isNotEmpty(supplierBuilder.toString())){
-                supplierIdBatch = supplierBuilder.toString().substring(0,supplierBuilder.toString().length()-1);
-            }
+        if(StringUtils.isNotEmpty(supplierBuilder.toString())){
+            supplierIdBatch = supplierBuilder.toString().substring(0,supplierBuilder.toString().length()-1);
         }
 
 
@@ -198,8 +209,8 @@ public class IntegerCityController {
         Map<String,Object> map = Maps.newHashMap();
         map.put("pageNo",pageNum);
         map.put("pageSize",pageSize);
-        map.put("cityId",cityId);
-        map.put("supplierId",supplierId);
+        /*map.put("cityId",cityId);
+        map.put("supplierId",supplierId);*/
         map.put("status",orderState);
         map.put("pushDriverType",pushDriverType);
         map.put("serviceTypeId",serviceType);
@@ -226,7 +237,7 @@ public class IntegerCityController {
             map.put("cityIdBatch",serviceCityBatch);
         }
 
-        if(StringUtils.isNotEmpty(supplierIdBatch)){
+        if(StringUtils.isNotEmpty(supplierIdBatch) && supplierId!=-1){
             map.put("supplierIdBatch",supplierIdBatch);
         }
 
