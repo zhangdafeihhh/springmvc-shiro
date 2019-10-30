@@ -448,8 +448,8 @@ public class IntegerCityController {
             sb.append("bookingUserId=" + customerId).append(SYSMOL);
             map.put("bookingUserPhone",reservePhone);
             sb.append("bookingUserPhone=" + reservePhone).append(SYSMOL);
-            map.put("buyoutFlag","0");
-            sb.append("buyoutFlag=0").append(SYSMOL);
+            map.put("buyoutFlag","1");
+            sb.append("buyoutFlag=1").append(SYSMOL);
             map.put("buyoutPrice",estimatedAmount); //预估价
             sb.append("buyoutPrice="+estimatedAmount).append(SYSMOL);
             map.put("carpoolMark",1);//拼车标识(0:不拼车，1:拼车)
@@ -1207,12 +1207,12 @@ public class IntegerCityController {
                                                  @Verify(param = "orderNo",rule = "required")String driverPhone,
                                                  @Verify(param = "orderNo",rule = "required") String licensePlates,
                                                  @Verify(param = "orderNo",rule = "required")String groupId,
-                                                 String crossCityStartTime,
+                                                 String orderTime,
                                                  String routeName){
         //派单
         logger.info("指派接口入参:mainOrderNo="+ mainOrderNo + ",orderNo:"+orderNo
                 +",driverId:"+driverId + ",driverName:"+ driverName + ",driverPhone:"+driverPhone+",licensePlates:"+licensePlates
-                +",groupId:"+groupId+",crossCityStartTime:"+crossCityStartTime+",routeName:"+routeName);
+                +",groupId:"+groupId+",orderTime:"+orderTime+",routeName:"+routeName);
         Map<String,Object> map = Maps.newHashMap();
         List<String> listParam = new ArrayList<>();
         map.put("businessId",Common.BUSSINESSID);
@@ -1239,8 +1239,8 @@ public class IntegerCityController {
             listParam.add("carSeatNums="+carSeatNums);
         }
 
-        if(StringUtils.isNotEmpty(crossCityStartTime)){
-            Date startTime = DateUtils.getDate(crossCityStartTime,"yyyy-MM-dd HH:mm:ss");
+        if(StringUtils.isNotEmpty(orderTime)){
+            Date startTime = DateUtils.getDate(orderTime,"yyyy-MM-dd HH:mm:ss");
             map.put("crossCityStartTime",startTime.getTime());
             listParam.add("crossCityStartTime="+startTime.getTime());
         }
@@ -1282,7 +1282,7 @@ public class IntegerCityController {
                     main.setMainOrderNo(jsonData.getString("mainOrderNo"));
                     SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
                     main.setOpePhone(user.getMobile());
-                    main.setMainTime(crossCityStartTime);
+                    main.setMainTime(orderTime);
                     int code = interService.addMainOrderNo(main);
                     if(code > 0){
                         logger.info("=========子单绑定主单入库成功=======");
