@@ -8,31 +8,31 @@ package com.zhuanche.dto.mdbcarmanage;
  */
 public class InterCityOrderDTO {
 
-    private String bookingUserId;
+    private String bookingUserId; //预订人userId
 
-    private String reserveName;
+    private String reserveName; //预订人名称
 
-    private String reservePhone;
+    private String reservePhone;//预订人手机
 
-    private Integer isSameRider;
+    private Integer isSameRider;//乘车人手机是否和预订人相同 1 相同 0 不相同
 
-    private String riderName;
+    private String riderName;//乘车人姓名
 
     private String riderPhone;
 
-    private Integer riderCount;
+    private Integer riderCount;//乘车人数
 
-    private String boardingTime;
+    private String boardingTime;//预约时间
 
-    private String boardingCityId;
+    private String boardingCityId;//预约城市id
 
     private String boardingCityName;
 
-    private String boardingGetOffCityId;
+    private String boardingGetOffCityId;//预约下车城市id
 
     private String boardingGetOffCityName;
 
-    private String bookingStartPoint;
+    private String bookingStartPoint;//预约开始下车坐标点
 
     private String bookingEndPoint;
 
@@ -76,7 +76,9 @@ public class InterCityOrderDTO {
 
     private String mainTime;
 
-    private String carGroup;
+    private String carGroup;//车型
+
+    private Integer seatNum;//车型对应的座位数
 
     private String bookingStartShortAddr;//上车短地址
 
@@ -85,6 +87,7 @@ public class InterCityOrderDTO {
 
     private String carGroupName;//车型名称
 
+    private String ruleId;//乘车线路id
 
 
     public String getReserveName() {
@@ -367,5 +370,21 @@ public class InterCityOrderDTO {
 
     public void setCarGroupName(String carGroupName) {
         this.carGroupName = carGroupName;
+    }
+
+    public String getRuleId() {
+        return ruleId;
+    }
+
+    public void setRuleId(String ruleId) {
+        this.ruleId = ruleId;
+    }
+
+    public Integer getSeatNum() {
+        return seatNum;
+    }
+
+    public void setSeatNum(Integer seatNum) {
+        this.seatNum = seatNum;
     }
 }

@@ -294,6 +294,8 @@ public final class RestErrorCode{
 
 	@ResultMessage("取消订单失败")
 	public static final int CANCEL_FAILED = 50200;
+	@ResultMessage("计费违约金取消失败")
+	public static final int CHARGE_CANCEL_FAILED = 50201;
 
 	@ResultMessage("关键字不能为空")
 	public static final int KEYWORDS_IS_NOT_NULL = 50501;

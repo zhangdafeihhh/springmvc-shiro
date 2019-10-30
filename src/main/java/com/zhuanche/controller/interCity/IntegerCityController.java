@@ -94,14 +94,14 @@ public class IntegerCityController {
     private CarFactOrderInfoService carFactOrderInfoService;
 
     @Value("${ordercost.server.api.base.url}")
-    private String orderServerUrl;
+    private String orderCostUrl;
 
     private static final String SYSMOL = "&";
 
     private static final String SPLIT = ",";
 
     /**
-     * 订单查询 wiki：http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=21047769
+     * 订单查询 wiki：http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=31813392
      * @param pageNum
      * @param pageSize
      * @param cityId
@@ -310,7 +310,7 @@ public class IntegerCityController {
             AjaxResponse boardResponse = hasBoardRoutRights(boardingCityId,boardingGetOnX,boardingGetOnY);
 
             if(boardResponse.getCode() != RestErrorCode.SUCCESS){
-                logger.info("获取上车点围栏为空,入参:boardingGetOnX" +boardingGetOnX + ",boardingGetOnY:"+boardingGetOnY);
+                logger.info("=============获取上车点围栏为空,入参:boardingGetOnX" +boardingGetOnX + ",boardingGetOnY:"+boardingGetOnY);
                 return boardResponse;
             }
 
@@ -318,7 +318,7 @@ public class IntegerCityController {
             AjaxResponse boardOffResponse = hasBoardOffRoutRights(boardingGetOffCityId,boardingGetOffX,boardingGetOffY);
 
             if(boardOffResponse.getCode() != RestErrorCode.SUCCESS){
-                logger.info("获取下车点围栏为空,入参:boardingGetOffX" +boardingGetOffX + ",boardingGetOffY:"+boardingGetOffY);
+                logger.info("=============获取下车点围栏为空,入参:boardingGetOffX" +boardingGetOffX + ",boardingGetOffY:"+boardingGetOffY);
 
                 return boardOffResponse;
             }
@@ -332,7 +332,7 @@ public class IntegerCityController {
             String ruleId = "";
 
             if(configRouteRes.getCode() != RestErrorCode.SUCCESS){
-                logger.info("根据围栏id未获取到配置路线");
+                logger.info("=========根据围栏id未获取到配置路线========");
                 return configRouteRes;
             }
 
@@ -343,7 +343,7 @@ public class IntegerCityController {
             }
 
             if(StringUtils.isEmpty(ruleId)){
-                logger.info("未获取到可配置线路");
+                logger.info("==========未获取到可配置线路=======");
                 return AjaxResponse.fail(RestErrorCode.UNFINDED_LINE);
             }
             //根据乘客人获取乘客userId
@@ -564,7 +564,7 @@ public class IntegerCityController {
             }
             map.put("sign",sign);
             logger.info("==================获取订单详情入参：" + JSONObject.toJSONString(map));
-            //wiki地址
+            //wiki地址 http://inside-yapi.01zhuanche.com/project/19/interface/api/3561
             JSONObject jsonObject =MpOkHttpUtil.okHttpGetBackJson(orderServiceUrl + "/orderMain/getOrderByOrderNo", map, 0, "查询订单详情");
 
             if(jsonObject != null && jsonObject.get("code") !=null){
@@ -590,7 +590,10 @@ public class IntegerCityController {
                     dto.setBoardOffAddr(jsonData.get("bookingEndAddr") == null ? null : jsonData.getString("bookingEndAddr"));
                     dto.setCityId(jsonData.get("cityId") == null ? null : jsonData.getInteger("cityId"));
                     dto.setCarGroup(jsonData.get("bookingGroupIds") == null ? null : jsonData.getString("bookingGroupIds"));
-
+                    if(dto.getCarGroup()!=null){
+                        Integer seatNum = this.seatCount(Integer.valueOf(dto.getCarGroup()));
+                        dto.setSeatNum(seatNum);
+                    }
 
                     if(jsonData != null && jsonData.get("memo") != null){
                         JSONObject jsonMemo = jsonData.getJSONObject("memo");
@@ -1019,8 +1022,17 @@ public class IntegerCityController {
     @RequestMapping(value = "/cancelOrder",method = RequestMethod.POST)
     @ResponseBody
     public AjaxResponse cancelOrder(@Verify(param ="orderNo",rule = "required") String orderNo,
-                                    @Verify(param ="status",rule = "required") Integer status){
+                                    @Verify(param ="status",rule = "required") Integer status,
+                                    @Verify(param = "cityId",rule = "required")Integer cityId,
+                                    @Verify(param = "serviceTypeId",rule = "required")Integer serviceTypeId,
+                                    @Verify(param = "carGroupId",rule = "required")Integer carGroupId,
+                                    @Verify(param = "bookingUserPhone",rule = "required")String bookingUserPhone,
+                                    @Verify(param = "ruleId",rule = "required")Integer ruleId){
         logger.info("=============取消订单入参:orderNo：" + orderNo+",status:" + status +"==============");
+
+        logger.info(MessageFormat.format("取消接口入参:orderNo:{0},status:{1},cityId:{2},serviceTypeId:{3}," +
+                "carGroupId:{4},bookingUserPhone:{5},ruleId:{6}",orderNo,status,cityId,serviceTypeId,carGroupId,
+                bookingUserPhone,ruleId));
         try {
             Map<String,Object> map = Maps.newHashMap();
             List<String> listStr = new ArrayList<>();
@@ -1069,8 +1081,30 @@ public class IntegerCityController {
         }
 
         //调用计费取消费接口http://inside-yapi.01zhuanche.com/project/88/interface/api/16255
-        
-
+        /*try {
+            Map<String,Object> chargeMap = Maps.newHashMap();
+            chargeMap.put("orderNo",orderNo);
+            chargeMap.put("cityId",cityId);
+            chargeMap.put("serviceTypeId",serviceTypeId);
+            chargeMap.put("carGroupId",carGroupId);
+            chargeMap.put("orderStatus",status);
+            chargeMap.put("bookingUserPhone",bookingUserPhone);
+            chargeMap.put("ruleId",ruleId);
+            chargeMap.put("pinSuccess","1");
+            logger.info("=======调用计费接口入参=========="+JSONObject.toJSONString(chargeMap));
+            String chargeResult = MpOkHttpUtil.okHttpPost(orderServiceUrl+"/cancel/carpool/payCancelDamage",chargeMap,
+                    0,null);
+            logger.info("========调用计费取消接口返回结果========" + chargeResult);
+            if(StringUtils.isNotEmpty(chargeResult)){
+                JSONObject chargeJson = JSONObject.parseObject(chargeResult);
+                if(chargeJson.get("code")!=null && chargeJson.getInteger("code") == 0){
+                    logger.info("调用计费取消接口成功");
+                    return AjaxResponse.success(null);
+                }
+            }
+        } catch (Exception e) {
+            return AjaxResponse.fail(RestErrorCode.CHARGE_CANCEL_FAILED);
+        }*/
 
         return AjaxResponse.fail(RestErrorCode.CANCEL_FAILED);
     }
@@ -1106,21 +1140,6 @@ public class IntegerCityController {
             Set<Integer> citiesSet = loginUser.getCityIds();
             Set<Integer> suppliersSet = loginUser.getSupplierIds();
 
-            /*StringBuilder cityBuilder = new StringBuilder();
-            if(citiesSet != null){
-                List<Integer> listCity = new ArrayList<>(citiesSet);
-                for(int i = 0;i<listCity.size();i++){
-                    cityBuilder.append(listCity.get(i)).append(SPLIT);
-                }
-            }
-            StringBuilder supplierBuilder = new StringBuilder();
-            if(suppliersSet != null){
-                List<Integer> listSupplier = new ArrayList<>(suppliersSet);
-                for(int i = 0;i<listSupplier.size();i++){
-                    supplierBuilder.append(listSupplier.get(i)).append(SPLIT);
-                }
-            }
-         */
             interCityList = infoInterCityExMapper.queryDriver(cityId,supplierId,driverName,driverPhone,license,citiesSet,suppliersSet);
 
         }else{
@@ -1194,7 +1213,7 @@ public class IntegerCityController {
      * @param driverPhone
      * @param licensePlates
      * @param groupId
-     * @param crossCityStartTime 如果司机主单为空，主单的行程时间和路线不能为空
+     * @param orderTime 如果司机主单为空，主单的行程时间和路线不能为空
      * @param routeName
      * @return
      */
@@ -1857,7 +1876,7 @@ public class IntegerCityController {
             JSONObject jsoParam = new JSONObject();
             jsoParam.put("=============调用预估价入参=============", JSON.toJSON(map));
             logger.info(jsoParam.toJSONString());
-            String result = MpOkHttpUtil.okHttpPost(orderServerUrl+"/passenger/orderEstimatedAmount620",map,0,null);
+            String result = MpOkHttpUtil.okHttpPost(orderCostUrl+"/passenger/orderEstimatedAmount620",map,0,null);
             logger.info("=============调用预估返回结果=============" + result);
             if(StringUtils.isNotEmpty(result)){
                 JSONObject jsonResult = JSONObject.parseObject(result);

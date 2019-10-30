@@ -16,6 +16,7 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.common.web.datavalidate.custom.IdCard;
 import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
+import com.zhuanche.dto.rentcar.CityDto;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.entity.mdbcarmanage.MainOrderInterCity;
 import com.zhuanche.entity.orderPlatform.CarFactOrderInfoEntity;
@@ -27,6 +28,7 @@ import com.zhuanche.util.MyRestTemplate;
 import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
 import mapper.orderPlatform.ex.PoolMainOrderExMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
+import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizDriverInfoExMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -71,6 +73,9 @@ public class InterCityMainOrderController {
 
     @Autowired
     private CarBizCarGroupExMapper carBizCarGroupExMapper;
+
+    @Autowired
+    private CarBizCityExMapper carBizCityExMapper;
 
     private static final String SPLIT = ",";
     /**
@@ -274,5 +279,18 @@ public class InterCityMainOrderController {
         logger.info("获取所有的座位数");
         List<CarBizCarGroup> listAll = carBizCarGroupExMapper.queryAllGroup();
         return AjaxResponse.success(listAll);
+    }
+
+
+    /**
+     * 获取所有有效城市 不带权限
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.GET,value = "/getAllCity")
+    @ResponseBody
+    public AjaxResponse getAllCity(){
+        logger.info("获取所有有效城市");
+        List<CityDto> queryAllCity = carBizCityExMapper.selectAllCity();
+        return AjaxResponse.success(queryAllCity);
     }
 }

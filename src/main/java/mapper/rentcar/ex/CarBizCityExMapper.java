@@ -1,5 +1,6 @@
 package mapper.rentcar.ex;
 
+import com.zhuanche.dto.rentcar.CityDto;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import org.apache.ibatis.annotations.Param;
 
@@ -25,5 +26,8 @@ public interface CarBizCityExMapper{
     List<CarBizCity> queryNameByCityIds(@Param("cityIds")  String cityIds );
 	
 	List<String> getCityList(@Param("cityIds") Set<String> cityIds);
+
+	/**获取所有的有效城市**/
+	List<CityDto> selectAllCity();
 
 }
