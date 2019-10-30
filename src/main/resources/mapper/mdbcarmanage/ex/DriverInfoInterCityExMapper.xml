@@ -74,7 +74,6 @@
     FROM driver_info_inter_city t LEFT JOIN main_order_inter_city m
     on t.driver_id =  m.driver_id
     WHERE  1=1
-    GROUP BY t.driver_id
 
 
     <if test="cityId!=null and sucityIdpplierId!=''">
@@ -107,6 +106,7 @@
       </foreach>
     </if>
 
+    GROUP BY t.driver_id
 
 
 
