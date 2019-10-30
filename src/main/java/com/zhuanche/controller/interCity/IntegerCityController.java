@@ -543,7 +543,7 @@ public class IntegerCityController {
     @RequestMapping("/subOrderByQuery")
     public AjaxResponse subOrderByQuery(@Verify(param = "orderNo",rule = "required") String orderNo){
 
-        logger.info("获取订单详情入参orderNo:" + orderNo);
+        logger.info("==================获取订单详情入参orderNo:" + orderNo);
 
         try {
             Map<String,Object> map = Maps.newHashMap();
@@ -563,7 +563,7 @@ public class IntegerCityController {
                 e.printStackTrace();
             }
             map.put("sign",sign);
-
+            logger.info("==================获取订单详情入参：" + JSONObject.toJSONString(map));
             //wiki地址
             JSONObject jsonObject =MpOkHttpUtil.okHttpGetBackJson(orderServiceUrl + "/orderMain/getOrderByOrderNo", map, 0, "查询订单详情");
 
@@ -615,6 +615,7 @@ public class IntegerCityController {
                     Map<String,Object> bookMap = Maps.newHashMap();
                     bookMap.put("orderNo",orderNo);
                     bookMap.put("name","bookingUserName");
+                    logger.info("====================获取预订人名称入参：" + JSONObject.toJSONString(bookMap));
                     String bookingResult = MpOkHttpUtil.okHttpGet(orderServiceUrl+"/order/byFields/find",bookMap,0,null);
                     if(StringUtils.isNotEmpty(bookingResult)){
                         JSONObject jsonBook = JSONObject.parseObject(bookingResult);
@@ -678,19 +679,8 @@ public class IntegerCityController {
                     }
                     shortMap.put("sign",shortSign);
 
-                    //wiki地址
+                    //wiki地址 http://inside-yapi.01zhuanche.com/project/19/interface/api/9519
                     JSONObject jsonShort =MpOkHttpUtil.okHttpGetBackJson(orderServiceUrl + "/orderMain/getOrderSpecifiedByOrderNo", shortMap, 0, "获取上下车地址");
-
-
-
-                    /*String shortUrl = "/orderMain/getOrderSpecifiedByOrderNo";
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("businessId="+Common.BUSSINESSID+"&orderNo="+orderNo).append("&key="+Common.MAIN_ORDER_KEY);
-                    String shortSign = Base64.encodeBase64String(DigestUtils.md5(sb.toString()));
-                    shortUrl += "?businessId="+Common.BUSSINESSID+"&orderNo="+orderNo+"&sign="+shortSign;
-
-
-                    JSONObject shortJSONResult = carRestTemplate.getForObject(shortUrl,JSONObject.class);*/
                     logger.info("=============获取订单短地址结果=============" + jsonShort.toString());
                     if(jsonShort!=null && jsonShort.get("code") != null){
                         if(jsonShort.getInteger("code") == 0 && jsonShort.get("data") != null){
@@ -1069,7 +1059,7 @@ public class IntegerCityController {
                 JSONObject jsonResult = JSONObject.parseObject(result);
                 if(jsonResult != null && jsonResult.get("code") != null && jsonResult.getInteger("code") == 0){
                     logger.info("取消订单成功");
-                    //return  AjaxResponse.success(null);
+                    return  AjaxResponse.success(null);
                 }
             }
         } catch (Exception e) {
