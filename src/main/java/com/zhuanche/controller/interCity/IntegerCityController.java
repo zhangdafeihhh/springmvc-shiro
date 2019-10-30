@@ -335,8 +335,9 @@ public class IntegerCityController {
                 return configRouteRes;
             }
 
-           JSONObject jsonRoute = (JSONObject) configRouteRes.getData();
+            JSONObject jsonRoute = (JSONObject) configRouteRes.getData();
             if(jsonRoute != null && jsonRoute.get("lineId") != null){
+                //JSONObject righRoute = jsonRoute.getJSONObject("data");
                 ruleId = jsonRoute.get("lineId").toString();
             }
 
@@ -656,8 +657,8 @@ public class IntegerCityController {
 
                     //获取行程名称
                     if(dto.getCarGroup() != null){
-                       String carName =  carBizCarGroupExMapper.getGroupNameByGroupId(Integer.valueOf(dto.getCarGroup()));
-                       dto.setCarGroupName(carName);
+                        String carName =  carBizCarGroupExMapper.getGroupNameByGroupId(Integer.valueOf(dto.getCarGroup()));
+                        dto.setCarGroupName(carName);
                     }
                     return AjaxResponse.success(dto);
                 }
@@ -789,7 +790,7 @@ public class IntegerCityController {
         try {
             elsRes = this.getOrderEstimatedAmount620(Long.valueOf(boardingTime),boardingCityId,68,riderPhone,
                     ruleId,customerId,boardingGetOffX,boardingGetOffY,riderCount,String.valueOf(carGroup),boardingGetOnX,
-                                        boardingGetOnY, isSameRider);
+                    boardingGetOnY, isSameRider);
         } catch (Exception e) {
             logger.error("获取预估价异常");
             return AjaxResponse.fail(RestErrorCode.UNGET_PRICE);
@@ -1043,7 +1044,38 @@ public class IntegerCityController {
 
         logger.info(MessageFormat.format("查询城际拼车司机入参：supplierId:{0},driverName:{1},driverPhpne:{2},license:{3}",supplierId,
                 driverName,driverPhone,license));
-        List<MainOrderDetailDTO> interCityList = infoInterCityExMapper.queryDriver(supplierId,driverName,driverPhone,license);
+
+
+        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+
+        List<MainOrderDetailDTO> interCityList = null;
+        if(loginUser.getAccountType() != 900){
+            Set<Integer> citiesSet = loginUser.getCityIds();
+            Set<Integer> suppliersSet = loginUser.getSupplierIds();
+
+            /*StringBuilder cityBuilder = new StringBuilder();
+            if(citiesSet != null){
+                List<Integer> listCity = new ArrayList<>(citiesSet);
+                for(int i = 0;i<listCity.size();i++){
+                    cityBuilder.append(listCity.get(i)).append(SPLIT);
+                }
+            }
+            StringBuilder supplierBuilder = new StringBuilder();
+            if(suppliersSet != null){
+                List<Integer> listSupplier = new ArrayList<>(suppliersSet);
+                for(int i = 0;i<listSupplier.size();i++){
+                    supplierBuilder.append(listSupplier.get(i)).append(SPLIT);
+                }
+            }
+         */
+            interCityList = infoInterCityExMapper.queryDriver(cityId,supplierId,driverName,driverPhone,license,citiesSet,suppliersSet);
+
+        }else{
+            interCityList = infoInterCityExMapper.queryDriver(cityId,supplierId,driverName,driverPhone,license,null,null);
+        }
+
+
+
         //剩余车位数
         String url = "/order/carpool/getCrossCityMainOrder";
 
@@ -1346,7 +1378,7 @@ public class IntegerCityController {
     private int seatCount(Integer groupId){
         int seatNum = 0;
         try {
-             seatNum = carBizCarGroupExMapper.getSeatNumByGroupId(groupId);
+            seatNum = carBizCarGroupExMapper.getSeatNumByGroupId(groupId);
         } catch (NumberFormatException e) {
             logger.error("获取座位号失败"+e);
         }
@@ -1614,7 +1646,7 @@ public class IntegerCityController {
                     SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
                     Set<Integer> cities = loginUser.getCityIds();
                     Set<Integer> suppliers = loginUser.getSupplierIds();
-                    if(cities.size()>0 && suppliers.size()>0){
+                    if(suppliers.size()>0){
                         JSONObject jsonData = jsonResult.getJSONObject("data");
                         HashSet<Integer> hashSet = new HashSet<>(suppliers);
                         boolean bl = false;
@@ -1641,6 +1673,37 @@ public class IntegerCityController {
                         if(!bl){
                             return  AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
                         }
+                    }else if(cities.size()>0){//如果是城市级别的
+                        JSONObject jsonData = jsonResult.getJSONObject("data");
+                        HashSet<Integer> hashSet = new HashSet<>(cities);
+                        boolean bl = false;
+                        if(jsonData.get("cityId") != null ){
+                            String citys = jsonData.getString("cityId");
+                            String[] interCity = citys.split(",");
+
+                            LinkedList<Integer> linkedList = new LinkedList<>();
+                            for(int i = 0;i<interCity.length;i++){
+                                linkedList.add(Integer.valueOf(interCity[i]));
+                            }
+                            Iterator<Integer> iterator = linkedList.iterator();
+                            while (iterator.hasNext()){
+                                if(hashSet.contains(iterator.next())){
+                                    logger.info("包含有路线");
+                                    jsonRoute.put("lineId",jsonData.getIntValue("lineId"));
+                                    jsonRoute.put("lineName",jsonData.getString("lineName"));
+                                    bl = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if(!bl){
+                            return  AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
+                        }
+                    }else {
+                        JSONObject jsonData = jsonResult.getJSONObject("data");
+                        jsonRoute.put("lineId",jsonData.getIntValue("lineId"));
+                        jsonRoute.put("lineName",jsonData.getString("lineName"));
                     }
 
                     logger.info("该坐标含有线路");
@@ -1687,7 +1750,7 @@ public class IntegerCityController {
                                                     String startPoint,
                                                     String endPoint,
                                                     Integer isRemainder
-                                                    ) throws Exception {
+    ) throws Exception {
         try {
             Map<String,Object> map = Maps.newHashMap();
             map.put("duration",0);//预估时长
@@ -1756,11 +1819,11 @@ public class IntegerCityController {
                                 if(StringUtils.isNotEmpty(carpoolingKeyStr)){
                                     logger.info(carpoolingKeyStr);
                                     if(carpoolingKeyStr.indexOf("-")>0){
-                                      String poolingArr[] =  carpoolingKeyStr.split("-");
-                                      if(poolingArr.length>0){
-                                          chargeJSON.put("estimatedAmount",poolingArr[0]);
-                                          return AjaxResponse.success(chargeJSON);
-                                      }
+                                        String poolingArr[] =  carpoolingKeyStr.split("-");
+                                        if(poolingArr.length>0){
+                                            chargeJSON.put("estimatedAmount",poolingArr[0]);
+                                            return AjaxResponse.success(chargeJSON);
+                                        }
                                     }
                                 }
                             }

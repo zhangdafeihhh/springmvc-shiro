@@ -120,10 +120,10 @@ public class InterCityMainOrderController {
                     driverPhone,licensePlates,null);
             hasQuery = true;
             if(CollectionUtils.isNotEmpty(listDriver)){
-               for(DriverInfoInterCity driver : listDriver){
-                   sb.append(driver.getDriverId()).append(SPLIT);
-                   map.put(driver.getDriverId(),driver);
-               }
+                for(DriverInfoInterCity driver : listDriver){
+                    sb.append(driver.getDriverId()).append(SPLIT);
+                    map.put(driver.getDriverId(),driver);
+                }
             }else {
                 return AjaxResponse.success(new PageDTO(pageNum,pageSize,0,null));
             }
@@ -158,7 +158,7 @@ public class InterCityMainOrderController {
             }
             String driverIds = null;
             if(StringUtils.isNotEmpty(orderSb.toString())){
-                 driverIds = orderSb.toString().substring(0,orderSb.toString().length()-1);
+                driverIds = orderSb.toString().substring(0,orderSb.toString().length()-1);
             }
 
             List<DriverInfoInterCity> listDriver = infoInterCityExMapper.queryMainOrderDrivers(null,null,null,
@@ -245,11 +245,11 @@ public class InterCityMainOrderController {
                 if (data==null || data.isEmpty()) {
                     AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
                 }
-               return AjaxResponse.success(data);
+                return AjaxResponse.success(data);
             }
         } catch (Exception e) {
             logger.error("根据主订单查询子订单信息异常" ,e);
-           return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
         return AjaxResponse.success(null);
     }
