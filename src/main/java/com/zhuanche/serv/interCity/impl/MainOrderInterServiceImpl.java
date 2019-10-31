@@ -32,4 +32,9 @@ public class MainOrderInterServiceImpl implements MainOrderInterService {
     public MainOrderInterCity queryMainOrder(String mainOrderNo) {
         return exMapper.queryMainOrder(mainOrderNo);
     }
+
+    @Override
+    public int updateMainOrderState(String mainOrderNo) {
+        return exMapper.updateMainOrderState(mainOrderNo);
+    }
 }

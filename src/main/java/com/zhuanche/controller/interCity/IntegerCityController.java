@@ -213,9 +213,11 @@ public class IntegerCityController {
         map.put("supplierId",supplierId);*/
         map.put("status",orderState);
         map.put("pushDriverType",pushDriverType);
-        map.put("serviceTypeId",serviceType);
+        map.put("serviceTypeBatch",68);
         map.put("orderType",orderSource);
+/*
         map.put("type",serviceType);
+*/
         map.put("airportId",airportId);
         //map.put("orderSource",orderSource);
         map.put("driverName",driverName);
@@ -1303,19 +1305,27 @@ public class IntegerCityController {
                 logger.info("子单绑定主单成功");
                 JSONObject jsonData = jsonResult.getJSONObject("data");
                 if(jsonData != null && jsonData.get("mainOrderNo") != null){
-                    MainOrderInterCity main = new MainOrderInterCity();
-                    main.setDriverId(driverId);
-                    main.setCreateTime(new Date());
-                    main.setUpdateTime(new Date());
-                    main.setMainName(routeName);
-                    main.setStatus(MainOrderInterCity.orderState.NOTSETOUT.getCode());
-                    main.setMainOrderNo(jsonData.getString("mainOrderNo"));
-                    SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
-                    main.setOpePhone(user.getMobile());
-                    main.setMainTime(orderTime);
-                    int code = interService.addMainOrderNo(main);
+                   MainOrderInterCity queryMain = interService.queryMainOrder(jsonData.getString("mainOrderNo"));
+                    int code = 0;
+                   if(queryMain != null && queryMain.getId()>0){
+                       code = interService.updateMainOrderState(mainOrderNo);
+                   }else {
+                       MainOrderInterCity main = new MainOrderInterCity();
+                       main.setDriverId(driverId);
+                       main.setCreateTime(new Date());
+                       main.setUpdateTime(new Date());
+                       main.setMainName(routeName);
+                       main.setStatus(MainOrderInterCity.orderState.NOTSETOUT.getCode());
+                       main.setMainOrderNo(jsonData.getString("mainOrderNo"));
+                       SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+                       main.setOpePhone(user.getMobile());
+                       main.setMainTime(orderTime);
+                       code = interService.addMainOrderNo(main);
+                   }
+
+
                     if(code > 0){
-                        logger.info("=========子单绑定主单入库成功=======");
+                        logger.info("=========子单绑定主单成功=======");
                         return AjaxResponse.success(null);
                     }
 
@@ -1429,23 +1439,33 @@ public class IntegerCityController {
                     //如果是新增或者改派，需要将
                     if(StringUtils.isEmpty(mainOrderNo)){
                         JSONObject jsonData = jsonResult.getJSONObject("data");
-                        MainOrderInterCity main = new MainOrderInterCity();
-                        main.setDriverId(driverId);
-                        main.setCreateTime(new Date());
-                        main.setUpdateTime(new Date());
-                        main.setMainName(routeName);
-                        main.setStatus(MainOrderInterCity.orderState.NOTSETOUT.getCode());
-                        main.setMainOrderNo(jsonData.getString("mainOrderNo"));
-                        SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
-                        main.setOpePhone(user.getMobile());
-                        main.setMainTime(orderTime);
-                        int code = interService.addMainOrderNo(main);
+                        int code =0;
+                         MainOrderInterCity main = new MainOrderInterCity();
+                            main.setDriverId(driverId);
+                            main.setCreateTime(new Date());
+                            main.setUpdateTime(new Date());
+                            main.setMainName(routeName);
+                            main.setStatus(MainOrderInterCity.orderState.NOTSETOUT.getCode());
+                            main.setMainOrderNo(jsonData.getString("mainOrderNo"));
+                            SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+                            main.setOpePhone(user.getMobile());
+                            main.setMainTime(orderTime);
+                            code = interService.addMainOrderNo(main);
+
                         if(code > 0){
                             return AjaxResponse.success(null);
                         }
                         return AjaxResponse.fail(RestErrorCode.FAILED_GET_MAIN_ORDER);
+                    }else {
+                        MainOrderInterCity queryMainOrder  = interService.queryMainOrder(mainOrderNo);
+                        if(queryMainOrder != null && queryMainOrder.getId()>0){
+                           int code = interService.updateMainOrderState(mainOrderNo);
+                            if(code > 0){
+                                return AjaxResponse.success(null);
+                            }
+                        }
                     }
-                    return AjaxResponse.success(null);
+                    return AjaxResponse.fail(RestErrorCode.CHANGE_MAIN_FAILED);
                 }else {
                     logger.info("改派未成功");
                     return AjaxResponse.failMsg(jsonResult.getIntValue("code"),jsonResult.getString("msg"));
