@@ -166,10 +166,8 @@ public class IntegerCityController {
         String serviceCityBatch = "";
         String supplierIdBatch = "";
         
-        
-        Set<Integer> citiesSet = loginUser.getCityIds();
-        Set<Integer> suppliersSet = loginUser.getSupplierIds();
-
+        Set<Integer> citiesSet = new HashSet<>();
+        Set<Integer> suppliersSet = new HashSet<>();
         if(cityId != null){
         	citiesSet.add(cityId);
         }else{
@@ -237,10 +235,13 @@ public class IntegerCityController {
             map.put("cityIdBatch",serviceCityBatch);
         }
 
-        if(StringUtils.isNotEmpty(supplierIdBatch) && supplierId!=-1){
+        if(StringUtils.isNotEmpty(supplierIdBatch) && (supplierId!=null && supplierId!=-1)){
             map.put("supplierIdBatch",supplierIdBatch);
         }
-
+        
+        if (serviceType==null) {
+        	map.put("serviceTypeIdBatch", "68");
+        }
         //添加排序字段
         JSONObject jsonSort = new JSONObject();
         jsonSort.put("field","createDate");
