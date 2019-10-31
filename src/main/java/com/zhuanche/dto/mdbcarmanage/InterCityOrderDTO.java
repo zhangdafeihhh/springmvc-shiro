@@ -38,7 +38,9 @@ public class InterCityOrderDTO {
 
     private Integer status;//订单状态
 
-    private Integer type;//服务类型
+    private Integer type;//类型 不确定
+
+    private Integer serviceTypeId;//服务类型
 
     private String orderTime;//下单时间
 
@@ -386,5 +388,13 @@ public class InterCityOrderDTO {
 
     public void setSeatNum(Integer seatNum) {
         this.seatNum = seatNum;
+    }
+
+    public Integer getServiceTypeId() {
+        return serviceTypeId;
+    }
+
+    public void setServiceTypeId(Integer serviceTypeId) {
+        this.serviceTypeId = serviceTypeId;
     }
 }

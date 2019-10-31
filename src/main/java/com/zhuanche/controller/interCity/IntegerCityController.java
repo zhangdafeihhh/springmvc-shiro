@@ -604,6 +604,7 @@ public class IntegerCityController {
                     dto.setBoardOffAddr(jsonData.get("bookingEndAddr") == null ? null : jsonData.getString("bookingEndAddr"));
                     dto.setCityId(jsonData.get("cityId") == null ? null : jsonData.getInteger("cityId"));
                     dto.setCarGroup(jsonData.get("bookingGroupIds") == null ? null : jsonData.getString("bookingGroupIds"));
+                    dto.setServiceTypeId(jsonData.get("serviceTypeId") == null ? 0 : jsonData.getInteger("serviceTypeId"));
                     if(dto.getCarGroup()!=null){
                         Integer seatNum = this.seatCount(Integer.valueOf(dto.getCarGroup()));
                         dto.setSeatNum(seatNum);
@@ -615,6 +616,7 @@ public class IntegerCityController {
                         dto.setBoardingGetOffCityId(jsonMemo.get("endCityId") == null ?"":jsonMemo.getString("endCityId"));
                         dto.setBoardingCityName(jsonMemo.get("startCityName") == null ? "":jsonMemo.getString("startCityName"));
                         dto.setBoardingGetOffCityName(jsonMemo.get("endCityName") == null ? "":jsonMemo.getString("endCityName"));
+                        dto.setRuleId(jsonMemo.get("ruleId") == null ? "0": jsonMemo.getString("ruleId"));
                     }
                     if(StringUtils.isNotEmpty(bookingUserPhone) && StringUtils.isNotEmpty(riderPhone)){
                         if(bookingUserPhone.equals(riderPhone)){
@@ -1085,7 +1087,7 @@ public class IntegerCityController {
                 JSONObject jsonResult = JSONObject.parseObject(result);
                 if(jsonResult != null && jsonResult.get("code") != null && jsonResult.getInteger("code") == 0){
                     logger.info("取消订单成功");
-                    return  AjaxResponse.success(null);
+                    //return  AjaxResponse.success(null);
                 }
             }
         } catch (Exception e) {
@@ -1095,7 +1097,7 @@ public class IntegerCityController {
         }
 
         //调用计费取消费接口http://inside-yapi.01zhuanche.com/project/88/interface/api/16255
-        /*try {
+        try {
             Map<String,Object> chargeMap = Maps.newHashMap();
             chargeMap.put("orderNo",orderNo);
             chargeMap.put("cityId",cityId);
@@ -1118,7 +1120,7 @@ public class IntegerCityController {
             }
         } catch (Exception e) {
             return AjaxResponse.fail(RestErrorCode.CHARGE_CANCEL_FAILED);
-        }*/
+        }
 
         return AjaxResponse.fail(RestErrorCode.CANCEL_FAILED);
     }
