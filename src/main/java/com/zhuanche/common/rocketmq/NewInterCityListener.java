@@ -24,7 +24,7 @@ public class NewInterCityListener implements MessageListenerOrderly {
     public ConsumeOrderlyStatus consumeMessage(List<MessageExt> msgs, ConsumeOrderlyContext context) {
         try {
             for (MessageExt msg : msgs) {
-                logger.info("consumer order start...messageId:{}; body:{}", msg.getMsgId(), msg.getBody());
+                logger.info("consumer order start...messageId:{}", msg.getMsgId());
                 String topic = msg.getTopic();
                 if(StringUtils.isBlank(topic)){
                     logger.info("topic is null");
