@@ -359,9 +359,9 @@ public class IntegerCityController {
             map.put("cityIdBatch",serviceCityBatch);
         }
         
-        if (serviceType==null) {
-        	map.put("serviceTypeIdBatch", "68");
-        }
+
+        map.put("serviceTypeIdBatch", "68");
+
         String supplierIdBatch = "";
         if (!WebSessionUtil.isSupperAdmin()) {
         	Set<Integer> suppliersSet = loginUser.getSupplierIds();
@@ -380,10 +380,9 @@ public class IntegerCityController {
 				}
     		}
 		}
-/*        if(StringUtils.isNotEmpty(supplierIdBatch)){
-            map.put("supplierIdBatch",supplierIdBatch);
-        }*/
-        
+
+        map.put("supplierIdBatch","0");
+
         //添加排序字段
         JSONObject jsonSort = new JSONObject();
         jsonSort.put("field","createDate");
