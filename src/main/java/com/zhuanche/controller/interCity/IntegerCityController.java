@@ -1108,7 +1108,7 @@ public class IntegerCityController {
             chargeMap.put("ruleId",ruleId);
             chargeMap.put("pinSuccess","1");
             logger.info("=======调用计费接口入参=========="+JSONObject.toJSONString(chargeMap));
-            String chargeResult = MpOkHttpUtil.okHttpPost(orderServiceUrl+"/cancel/carpool/payCancelDamage",chargeMap,
+            String chargeResult = MpOkHttpUtil.okHttpPost(orderCostUrl+"/cancel/carpool/payCancelDamage",chargeMap,
                     0,null);
             logger.info("========调用计费取消接口返回结果========" + chargeResult);
             if(StringUtils.isNotEmpty(chargeResult)){
