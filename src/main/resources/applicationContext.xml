@@ -33,7 +33,7 @@
     <!-- 配置队列生产者(RocketMQ) -->
     <import resource="applicationContext-rocketmq-productor.xml"/>
     <!-- 配置队列消费者(RocketMQ) -->
-    <!-- <import resource="applicationContext-rocketmq-consumer.xml"/> -->
+     <import resource="applicationContext-rocketmq-consumer.xml"/>
     <!-- 配置短信 -->
     <import resource="applicationContext-sms.xml"/>
     <!-- 配置SpringMVC -->

@@ -48,9 +48,9 @@ public class NewInterCityListener implements MessageListenerOrderly {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("NewInterCityListener exception:", e);
+            return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         }
-
-        return null;
+        return ConsumeOrderlyStatus.SUCCESS;
     }
 }
