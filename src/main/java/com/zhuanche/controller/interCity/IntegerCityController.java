@@ -235,7 +235,7 @@ public class IntegerCityController {
             map.put("cityIdBatch",serviceCityBatch);
         }
 
-        if(StringUtils.isNotEmpty(supplierIdBatch) && (supplierId!=null && supplierId!=-1)){
+        if(StringUtils.isNotEmpty(supplierIdBatch)){
             map.put("supplierIdBatch",supplierIdBatch);
         }
         
