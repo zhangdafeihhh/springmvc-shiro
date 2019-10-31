@@ -339,14 +339,14 @@ public class CommonController {
             }).boxed().collect(Collectors.toSet());
             cityIdset.addAll(cityids);
         }
-        List<CarBizSupplier> carBizSuppliersAll=new ArrayList<CarBizSupplier>();
+/*        List<CarBizSupplier> carBizSuppliersAll=new ArrayList<CarBizSupplier>();
         CarBizSupplier carBizSupplier=new CarBizSupplier();
         carBizSupplier.setSupplierId(-1);
         carBizSupplier.setSupplierFullName("抢单");
-        carBizSuppliersAll.add(carBizSupplier);
+        carBizSuppliersAll.add(carBizSupplier);*/
         List<CarBizSupplier> carBizSuppliers = citySupplierTeamCommonService.querySupplierAllList( cityIdset );
-        carBizSuppliersAll.addAll(carBizSuppliers);
-        return AjaxResponse.success(carBizSuppliersAll);
+        /*carBizSuppliersAll.addAll(carBizSuppliers);*/
+        return AjaxResponse.success(carBizSuppliers);
     }
 }
 
