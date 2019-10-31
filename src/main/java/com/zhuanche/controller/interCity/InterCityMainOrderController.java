@@ -48,10 +48,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author fanht
@@ -272,12 +269,14 @@ public class InterCityMainOrderController {
 
     private void fillAttr(JSONObject data) {
 //        子订单编号 orderId
-       Integer createDate = data.getInteger("createDate");
-       Integer driverEndDate = data.getInteger("driverEndDate");
-       Integer driverStartDate = data.getInteger("driverStartDate");
+       Long createDate = data.getLongValue("createDate");
+        Long driverEndDate = data.getLongValue("driverEndDate");
+        Long driverStartDate = data.getLongValue("driverStartDate");
+        Long updateDate = data.getLongValue("updateDate");
         //        下单时间  createDateStr
        data.put("createDateStr", DateUtil.getSdf("yyyy-MM-dd HH:mm:ss").format(new Date(createDate)));
-       data.put("driverArriveTime", DateUtil.getSdf("yyyy-MM-dd HH:mm:ss").format(new Date(driverEndDate)));
+       data.put("updateDateStr", DateUtil.getSdf("yyyy-MM-dd HH:mm:ss").format(new Date(updateDate)));
+       data.put("driverEndDateStr", DateUtil.getSdf("yyyy-MM-dd HH:mm:ss").format(new Date(driverEndDate)));
         //        开始服务时间 driverStartDateStr
        data.put("driverStartDateStr", DateUtil.getSdf("yyyy-MM-dd HH:mm:ss").format(new Date(driverStartDate)));
         //        服务类型 serviceTypeName
@@ -291,6 +290,16 @@ public class InterCityMainOrderController {
        data.put("driverPhone",driverInfoDTO.getPhone());
         //        车型 modelDetail
        data.put("modelDetail", carFactOrderInfoService.selectModelNameByLicensePlates(data.getString("licensePlates")));
+        String tableName="car_biz_driver_record_"+data.getString("createDateStr").split(" ")[0];
+        Map<String,String> paraMap=new HashMap<String, String>();
+        paraMap.put("orderNo", data.getString("mainOrderNo"));
+        paraMap.put("tableName", tableName.replace("-", "_") );
+        try {
+
+            data.put("schedule", carFactOrderInfoService.queryDriverOrderRecord(paraMap));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private List<CarFactOrderInfoEntity> convent(JSONArray jsonArrayData) {
