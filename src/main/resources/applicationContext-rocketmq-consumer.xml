@@ -21,4 +21,18 @@
 		<property name="messageListener"  ref="consumeOrderChangeForStatisticsListener"/><!-- 业务消息处理实现类 -->
 	</bean>
 	<!-- 订单状态变化时，统计相关的数据END -->
+
+    <!--城际拼车监听-->
+	<bean id="newInterCity"  class="com.zhuanche.common.rocketmq.CommonRocketConsumer" init-method="init" destroy-method="destroy" scope="singleton">
+		<property name="groupName" value="mp-newInterCity"/><!-- 消费组名称,注意：相同的组名在同一个JVM中只能配置为一个 -->
+		<property name="namesrvAddr" value="${rocketmqcity.namesrvAddr}"/><!-- RocketMQ命名服务地址 -->
+		<property name="consumeFromWhere" value="CONSUME_FROM_LAST_OFFSET"/><!-- 消费起点 -->
+		<property name="messageModel" value="CLUSTERING"/><!-- 消费模式 -->
+		<property name="topic" value="car_fact_order_canal_new"/><!-- RocketMQ TOPIC -->
+		<property name="messageBatchMaxSize" value="10"/><!-- 每次消费消息的最大数量 -->
+		<property name="threads" value="2"/><!-- 并发消费线程数 -->
+        <property name="messageListener" >
+            <bean class="com.zhuanche.common.rocketmq.NewInterCityListener"/>
+        </property>
+	</bean>
 </beans>

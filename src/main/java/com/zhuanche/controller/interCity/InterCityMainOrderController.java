@@ -294,12 +294,7 @@ public class InterCityMainOrderController {
         Map<String,String> paraMap=new HashMap<String, String>();
         paraMap.put("orderNo", data.getString("mainOrderNo"));
         paraMap.put("tableName", tableName.replace("-", "_") );
-        try {
 
-            data.put("schedule", carFactOrderInfoService.queryDriverOrderRecord(paraMap));
-        }catch (Exception e){
-            e.printStackTrace();
-        }
     }
 
     private List<CarFactOrderInfoEntity> convent(JSONArray jsonArrayData) {
