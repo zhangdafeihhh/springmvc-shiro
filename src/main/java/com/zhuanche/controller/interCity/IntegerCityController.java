@@ -766,8 +766,10 @@ public class IntegerCityController {
             if(boardResponse.getCode() != RestErrorCode.SUCCESS){
                 return boardResponse;
             }
-            boardResponse.getData().toString();
+            getOnId  = boardResponse.getData().toString();
         }
+
+
 
         String  getOffId = "";
 
@@ -862,9 +864,9 @@ public class IntegerCityController {
         String estimatedAmount = jsonEst.getString("estimatedAmount");
         String estimatedKey = jsonEst.getString("estimatedKey");
 
+
         Map<String,Object> map = Maps.newHashMap();
         List<String> list = new ArrayList<>();
-
 
         map.put("estimatedAmount",estimatedAmount);//预估金额
         list.add("estimatedAmount="+estimatedAmount);
@@ -932,15 +934,28 @@ public class IntegerCityController {
 
 
         if(1==isSameRider){
-            map.put("riderName",reserveName);
-            list.add("riderName=" + reserveName);
-            map.put("riderPhone",reservePhone);
-            list.add("riderPhone=" + reservePhone);
+            if(StringUtils.isNotEmpty(reserveName)){
+                map.put("riderName",reserveName);
+                list.add("riderName=" + reserveName);
+            }
+            if(StringUtils.isNotEmpty(reservePhone)){
+                map.put("riderPhone",reservePhone);
+                list.add("riderPhone=" + reservePhone);
+            }
+
+
         }else {
-            map.put("riderName",riderName);
-            list.add("riderName=" + riderName);
-            map.put("riderPhone",riderPhone);
-            list.add("riderPhone=" + riderPhone);
+            if(StringUtils.isNotEmpty(riderName)){
+                map.put("riderName",riderName);
+                list.add("riderName=" + riderName);
+            }
+
+            if(StringUtils.isNotEmpty(riderPhone)){
+                map.put("riderPhone",riderPhone);
+                list.add("riderPhone=" + riderPhone);
+            }
+
+
         }
 
         if(StringUtils.isNotEmpty(startCityName)){
@@ -1164,11 +1179,12 @@ public class IntegerCityController {
 
 
 
-        //剩余车位数
-        String url = "/order/carpool/getCrossCityMainOrder";
+
 
         for(MainOrderDetailDTO detailDTO : interCityList){
             if(StringUtils.isNotEmpty(detailDTO.getMainOrder())){
+                //剩余车位数
+                String url = "/order/carpool/getCrossCityMainOrder";
                 StringBuilder sb = new StringBuilder();
                 sb.append("businessId="+Common.BUSSINESSID+"&mainOrderNo="+detailDTO.getMainOrder()).append("&key="+Common.MAIN_ORDER_KEY);
                 String sign = Base64.encodeBase64String(DigestUtils.md5(sb.toString()));
@@ -1311,7 +1327,7 @@ public class IntegerCityController {
                    MainOrderInterCity queryMain = interService.queryMainOrder(jsonData.getString("mainOrderNo"));
                     int code = 0;
                    if(queryMain != null && queryMain.getId()>0){
-                       code = interService.updateMainOrderState(mainOrderNo);
+                       code = interService.updateMainOrderState(mainOrderNo,1);
                    }else {
                        MainOrderInterCity main = new MainOrderInterCity();
                        main.setDriverId(driverId);
@@ -1462,7 +1478,7 @@ public class IntegerCityController {
                     }else {
                         MainOrderInterCity queryMainOrder  = interService.queryMainOrder(mainOrderNo);
                         if(queryMainOrder != null && queryMainOrder.getId()>0){
-                           int code = interService.updateMainOrderState(mainOrderNo);
+                           int code = interService.updateMainOrderState(mainOrderNo,1);
                             if(code > 0){
                                 return AjaxResponse.success(null);
                             }
@@ -1471,7 +1487,9 @@ public class IntegerCityController {
                     return AjaxResponse.fail(RestErrorCode.CHANGE_MAIN_FAILED);
                 }else {
                     logger.info("改派未成功");
-                    return AjaxResponse.failMsg(jsonResult.getIntValue("code"),jsonResult.getString("msg"));
+                    return AjaxResponse.fail(RestErrorCode.CHANGE_MAIN_FAILED);
+
+                    //return AjaxResponse.failMsg(jsonResult.getIntValue("code"),jsonResult.getString("msg"));
                 }
             }
         } catch (Exception e) {

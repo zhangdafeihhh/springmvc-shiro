@@ -29,11 +29,27 @@
 		<property name="consumeFromWhere" value="CONSUME_FROM_LAST_OFFSET"/><!-- 消费起点 -->
 		<property name="messageModel" value="CLUSTERING"/><!-- 消费模式 -->
 		<property name="topic" value="car_fact_order_canal_new"/><!-- RocketMQ TOPIC -->
-        <property name="tags" value="1_13 || 2_13"/>
+        <property name="tags" value="*"/>
 		<property name="messageBatchMaxSize" value="10"/><!-- 每次消费消息的最大数量 -->
 		<property name="threads" value="2"/><!-- 并发消费线程数 -->
         <property name="messageListener" >
-            <bean class="com.zhuanche.common.rocketmq.NewInterCityListener"/>
+            <bean class="com.zhuanche.common.listen.NewInterCityListener"/>
         </property>
+	</bean>
+
+
+	<!--城际拼车监听主订单-->
+	<bean id="mainInterCityConsumer"  class="com.zhuanche.common.rocketmq.MainInterCityConsumer" init-method="init" destroy-method="destroy" scope="singleton">
+		<property name="groupName" value="mainListenerConsumer"/><!-- 消费组名称,注意：相同的组名在同一个JVM中只能配置为一个 -->
+		<property name="namesrvAddr" value="${rocketmqMain.namesrvAddr}"/><!-- RocketMQ命名服务地址 -->
+		<property name="consumeFromWhere" value="CONSUME_FROM_LAST_OFFSET"/><!-- 消费起点 -->
+		<property name="messageModel" value="CLUSTERING"/><!-- 消费模式 -->
+		<property name="topic" value="carpool_mainorder"/><!-- RocketMQ TOPIC -->
+		<property name="tags" value="*"/>
+		<property name="messageBatchMaxSize" value="10"/><!-- 每次消费消息的最大数量 -->
+		<property name="threads" value="2"/><!-- 并发消费线程数 -->
+		<property name="messageListener" >
+			<bean class="com.zhuanche.common.listen.MainInterCityListener"/>
+		</property>
 	</bean>
 </beans>

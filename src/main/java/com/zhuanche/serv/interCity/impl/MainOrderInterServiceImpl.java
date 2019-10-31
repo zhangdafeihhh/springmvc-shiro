@@ -34,7 +34,7 @@ public class MainOrderInterServiceImpl implements MainOrderInterService {
     }
 
     @Override
-    public int updateMainOrderState(String mainOrderNo) {
-        return exMapper.updateMainOrderState(mainOrderNo);
+    public int updateMainOrderState(String mainOrderNo,Integer status) {
+        return exMapper.updateMainOrderState(mainOrderNo,status);
     }
 }

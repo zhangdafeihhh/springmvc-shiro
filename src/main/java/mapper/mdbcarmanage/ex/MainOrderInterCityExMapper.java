@@ -12,6 +12,7 @@ public interface MainOrderInterCityExMapper {
 
     MainOrderInterCity queryMainOrder(@Param("mainOrderNo") String mainOrderNo);
 
-    int updateMainOrderState(@Param("mainOrderNo") String mainOrderNo);
+    int updateMainOrderState(@Param("mainOrderNo") String mainOrderNo,
+                             @Param("status") Integer status);
 
 }

@@ -41,8 +41,11 @@
   </select>
 
   <update id="updateMainOrderState">
-    update main_order_inter_city SET status = 1
+    update main_order_inter_city SET status = #{status}
     where main_order_no = #{mainOrderNo}
   </update>
+
+
+
 
 </mapper>
