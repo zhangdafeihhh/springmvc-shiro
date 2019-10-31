@@ -1,5 +1,7 @@
 package com.zhuanche.util;
 
+import com.google.common.collect.Maps;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -8,10 +10,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 一些公用的日期方法
@@ -27,6 +26,8 @@ public class DateUtil {
 	public static final DateTimeFormatter DATE_SIMPLE_FORMAT = DateTimeFormatter.ofPattern(DATE_FORMAT);
 	public static final DateTimeFormatter DATE_MONTH_FORMAT = DateTimeFormatter.ofPattern(MONTH_FORMAT);
 	public static final DateTimeFormatter CONCISE_SIMPLE_TIME_FORMAT = DateTimeFormatter.ofPattern(CONCISE_TIME_FORMAT);
+	private static Map<String, ThreadLocal<SimpleDateFormat>> sdfMap = Maps.newHashMapWithExpectedSize(2);
+    private static final Object lockObj = new Object();
 	/**返回yyyy-MM-dd HH:mm:ss格式的字符串时间*/
 	public static String createTimeString(){
 		return TIME_SIMPLE_FORMAT.format(LocalDateTime.now());
@@ -489,5 +490,28 @@ public class DateUtil {
 		ZoneId zoneId = ZoneId.systemDefault();
 		return LocalDate.from(accessor).atStartOfDay(zoneId).toInstant().toEpochMilli();
 	}
+    public static SimpleDateFormat getSdf(final String pattern) {
+        ThreadLocal<SimpleDateFormat> tl = sdfMap.get(pattern);
+        // 此处的双重判断和同步是为了防止sdfMap这个单例被多次put重复的sdf
+        if (tl == null) {
+            synchronized (lockObj) {
+                tl = sdfMap.get(pattern);
+                if (tl == null) {
+                    // 只有Map中还没有这个pattern的sdf才会生成新的sdf并放入map
+                    // 这里是关键,使用ThreadLocal<SimpleDateFormat>替代原来直接new SimpleDateFormat
+                    tl = new ThreadLocal<SimpleDateFormat>() {
 
+                        @Override
+                        protected SimpleDateFormat initialValue() {
+                            // pattern: " + pattern);
+                            return new SimpleDateFormat(pattern);
+                        }
+                    };
+                    // 把这个线程安全的对象放到对应key 为[pattern] 中去
+                    sdfMap.put(pattern, tl);
+                }
+            }
+        }
+        return tl.get();
+    }
 }

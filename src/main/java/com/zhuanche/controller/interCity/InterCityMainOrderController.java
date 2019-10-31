@@ -15,6 +15,7 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.common.web.datavalidate.custom.IdCard;
+import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.dto.rentcar.CarPoolMainOrderDTO;
 import com.zhuanche.dto.rentcar.CityDto;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
@@ -23,7 +24,10 @@ import com.zhuanche.entity.orderPlatform.CarFactOrderInfoEntity;
 import com.zhuanche.entity.rentcar.CarBizCarGroup;
 import com.zhuanche.entity.rentcar.DriverEntity;
 import com.zhuanche.http.MpOkHttpUtil;
+import com.zhuanche.serv.CarBizCityService;
+import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.util.Common;
+import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.MyRestTemplate;
 import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
 import mapper.orderPlatform.ex.PoolMainOrderExMapper;
@@ -45,6 +49,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -76,6 +81,11 @@ public class InterCityMainOrderController {
 
     @Autowired
     private CarBizCityExMapper carBizCityExMapper;
+    @Autowired
+    private CarFactOrderInfoService carFactOrderInfoService;
+    @Autowired
+    private CarBizCityService carBizCityService;
+
 
     private static final String SPLIT = ",";
     /**
@@ -250,6 +260,7 @@ public class InterCityMainOrderController {
                 if (data==null || data.isEmpty()) {
                     AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
                 }
+                fillAttr(data);
                 return AjaxResponse.success(data);
             }
         } catch (Exception e) {
@@ -257,6 +268,29 @@ public class InterCityMainOrderController {
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
         return AjaxResponse.success(null);
+    }
+
+    private void fillAttr(JSONObject data) {
+//        子订单编号 orderId
+       Integer createDate = data.getInteger("createDate");
+       Integer driverEndDate = data.getInteger("driverEndDate");
+       Integer driverStartDate = data.getInteger("driverStartDate");
+        //        下单时间  createDateStr
+       data.put("createDateStr", DateUtil.getSdf("yyyy-MM-dd HH:mm:ss").format(new Date(createDate)));
+       data.put("driverArriveTime", DateUtil.getSdf("yyyy-MM-dd HH:mm:ss").format(new Date(driverEndDate)));
+        //        开始服务时间 driverStartDateStr
+       data.put("driverStartDateStr", DateUtil.getSdf("yyyy-MM-dd HH:mm:ss").format(new Date(driverStartDate)));
+        //        服务类型 serviceTypeName
+       data.put("serviceTypeName",carFactOrderInfoService.serviceTypeName(data.getInteger("serviceTypeId")));
+        //        城市 cityName
+       data.put("cityName", carBizCityService.selectByPrimaryKey(data.getInteger("cityId")).getCityName());
+        //        司机姓名 driverName
+        CarBizDriverInfoDTO driverInfoDTO = carFactOrderInfoService.querySupplierIdAndNameByDriverId(data.getInteger("driverId"));
+       data.put("driverName",driverInfoDTO.getName());
+        //        司机手机 driverPhone
+       data.put("driverPhone",driverInfoDTO.getPhone());
+        //        车型 modelDetail
+       data.put("modelDetail", carFactOrderInfoService.selectModelNameByLicensePlates(data.getString("licensePlates")));
     }
 
     private List<CarFactOrderInfoEntity> convent(JSONArray jsonArrayData) {
