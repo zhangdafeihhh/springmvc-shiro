@@ -11,6 +11,8 @@ public class CityDto {
 
     private String cityName;
 
+    private String code;
+
     public Integer getCityId() {
         return cityId;
     }
@@ -25,5 +27,13 @@ public class CityDto {
 
     public void setCityName(String cityName) {
         this.cityName = cityName;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }

@@ -126,7 +126,7 @@
 	</select>
 
     <select id="selectAllCity" resultType="com.zhuanche.dto.rentcar.CityDto">
-        select t.city_id as cityId,t.city_name cityName from car_biz_city t
+        select t.city_id as cityId,t.city_name cityName,t.code as code from car_biz_city t
         where status=1
     </select>
   </mapper>

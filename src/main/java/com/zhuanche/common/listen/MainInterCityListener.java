@@ -6,14 +6,11 @@ import com.alibaba.rocketmq.client.consumer.listener.ConsumeOrderlyStatus;
 import com.alibaba.rocketmq.client.consumer.listener.MessageListenerOrderly;
 import com.alibaba.rocketmq.common.message.MessageExt;
 import com.google.common.collect.Maps;
-import com.zhuanche.common.sms.SmsSendUtil;
-import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.controller.interCity.InterCityUtils;
+import com.zhuanche.controller.driver.YueAoTongPhoneConfig;
+import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.entity.mdbcarmanage.MainOrderInterCity;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.interCity.MainOrderInterService;
-import com.zhuanche.shiro.realm.SSOLoginUser;
-import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Common;
 import com.zhuanche.util.SignatureUtils;
 import com.zhuanche.util.encrypt.MD5Utils;
@@ -45,8 +42,15 @@ public class MainInterCityListener implements MessageListenerOrderly {
     @Autowired
     private MainOrderInterService interService;
 
+
+    @Autowired
+    private DriverInfoInterCityExMapper driverInfoInterCityExMapper;
+
     @Value("${order.server.api.base.url}")
     private String orderServiceUrl;
+
+    @Autowired
+    private YueAoTongPhoneConfigExMapper yueAoTongPhoneConfigExMapper;
 
 
 
@@ -99,9 +103,6 @@ public class MainInterCityListener implements MessageListenerOrderly {
                                         }
                                     }
 
-
-
-
                                     String orderTime = "";
                                     Map<String,Object> map = Maps.newHashMap();
                                     List<String> strList = new ArrayList<>();
@@ -131,6 +132,20 @@ public class MainInterCityListener implements MessageListenerOrderly {
                                         }
                                     }
 
+                                    String opePhone = null;
+                                    if(dispatcherPhone == null){
+                                        //根据司机id获取供应商id
+                                     DriverInfoInterCity city =  driverInfoInterCityExMapper.getByDriverId(Integer.valueOf(driverId));
+                                     if(city != null && city.getSupplierId()>0){
+                                         YueAoTongPhoneConfig config = this.queryOpePhone(city.getSupplierId().toString());
+                                         if(config == null){
+                                             opePhone = "13552448009";
+                                         }else {
+                                             opePhone = config.getPhone();
+                                         }
+                                     }
+                                    }
+
                                     MainOrderInterCity main = new MainOrderInterCity();
                                     main.setDriverId(Integer.valueOf(driverId));
                                     main.setCreateTime(new Date());
@@ -138,7 +153,7 @@ public class MainInterCityListener implements MessageListenerOrderly {
                                     main.setMainName(routeName);
                                     main.setStatus(MainOrderInterCity.orderState.NOTSETOUT.getCode());
                                     main.setMainOrderNo(mainOrderNo);
-                                    main.setOpePhone(dispatcherPhone.toString());
+                                    main.setOpePhone(dispatcherPhone == null ?opePhone : dispatcherPhone.toString());
                                     main.setMainTime(orderTime);
                                     code = interService.addMainOrderNo(main);
                                 }
@@ -165,4 +180,19 @@ public class MainInterCityListener implements MessageListenerOrderly {
         }
         return ConsumeOrderlyStatus.SUCCESS;
     }
+
+    /**
+     * 根据供应商id获取手机号
+     *
+     * @param suppliers
+     * @return
+     */
+    private YueAoTongPhoneConfig queryOpePhone(String suppliers ) {
+        List<YueAoTongPhoneConfig> list = yueAoTongPhoneConfigExMapper.findBySupplierId(suppliers);
+        if(CollectionUtils.isNotEmpty(list)){
+            return list.get(0);
+        }
+        return null;
+    }
+
 }
