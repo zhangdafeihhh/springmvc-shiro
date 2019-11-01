@@ -382,7 +382,9 @@ public class IntegerCityController {
 	            String lineIds=this.getLineIdBySupplierIds(supplierIdBatch);
 	            if (StringUtils.isNotBlank(lineIds)) {
 	            	map.put("ruleIdBatch", lineIds);
-				}
+				}else{
+                    map.put("ruleIdBatch", "-1");
+                }
     		}
 		}
 
