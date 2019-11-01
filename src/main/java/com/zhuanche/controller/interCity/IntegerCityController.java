@@ -662,8 +662,8 @@ public class IntegerCityController {
 
 
 
-            String getOn = boardingGetOnX + ";" + boardingGetOnY;
-            String getOff = boardingGetOffX + ";" + boardingGetOffY;
+            String getOn = boardingGetOnX + "," + boardingGetOnY;
+            String getOff = boardingGetOffX + "," + boardingGetOffY;
             map.put("bookingStartPoint",getOn);
             sb.append("bookingStartPoint="+getOn).append(SYSMOL);
             map.put("bookingEndPoint",getOff);
@@ -950,8 +950,8 @@ public class IntegerCityController {
         }
 
 
-        String getOn = boardingGetOnX + ";" + boardingGetOnY;
-        String getOff = boardingGetOffX + ";" + boardingGetOffY;
+        String getOn = boardingGetOnX + "," + boardingGetOnY;
+        String getOff = boardingGetOffX + "," + boardingGetOffY;
 
 
         AjaxResponse  configRouteRes = this.hasRoute(getOnId,getOffId);

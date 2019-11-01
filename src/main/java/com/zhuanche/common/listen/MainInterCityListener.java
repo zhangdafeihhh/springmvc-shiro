@@ -81,7 +81,7 @@ public class MainInterCityListener implements MessageListenerOrderly {
 
                 if(StringUtils.isNotBlank(mainOrderNo)) {
                     if (StringUtils.isNotBlank(driverId)) {
-                        logger.info("===========mq监听发送短信开始===================");
+                        logger.info("===========mq监听修改司机开始===================");
                         if (serviceTypeId==68) {
 
                             if(MAIN_STATUS == status){
@@ -170,7 +170,7 @@ public class MainInterCityListener implements MessageListenerOrderly {
                              }
                             }
                         }
-                        logger.info("===========mq发送短信结束==============");
+                        logger.info("===========mq更新主单状态结束==============");
                     }
                 }
             }
