@@ -1477,6 +1477,9 @@ public class IntegerCityController {
             map.put("routeName",routeName);
             listParam.add("routeName="+routeName);
         }
+        //添加调度员手机号
+        map.put("dispatcherPhone",WebSessionUtil.getCurrentLoginUser().getMobile());
+        listParam.add("driverPhone="+WebSessionUtil.getCurrentLoginUser().getMobile());
 
         Collections.sort(listParam);
         listParam.add("key="+Common.MAIN_ORDER_KEY);
@@ -1595,6 +1598,10 @@ public class IntegerCityController {
             listParam.add("licensePlates="+licensePlates);
             map.put("groupId",groupId);
             listParam.add("groupId="+groupId);
+            int carSeatNums = seatCount(Integer.valueOf(groupId));
+                map.put("carSeatNums",carSeatNums);
+                listParam.add("carSeatNums="+carSeatNums);
+
             map.put("cityId",cityId);
             listParam.add("cityId="+cityId);
             if(StringUtils.isNotEmpty(routeName)){
@@ -1607,6 +1614,10 @@ public class IntegerCityController {
                 map.put("driverPhone",driverPhone);
                 listParam.add("driverPhone="+driverPhone);
             }
+
+            //添加调度员手机号
+            map.put("dispatcherPhone",WebSessionUtil.getCurrentLoginUser().getMobile());
+            listParam.add("driverPhone="+WebSessionUtil.getCurrentLoginUser().getMobile());
 
             Collections.sort(listParam);
             listParam.add("key="+Common.MAIN_ORDER_KEY);

@@ -72,6 +72,8 @@ public class MainInterCityListener implements MessageListenerOrderly {
                 Integer status = jsonObject.get("status") == null ? null : jsonObject.getInteger("status");
                 String firstOrderId = jsonObject.get("firstOrderId") == null ?  null : jsonObject.getString("firstOrderId");
                 JSONObject jsonMemo = jsonObject.get("memo") == null ? null : jsonObject.getJSONObject("memo");
+                JSONObject dispatcherPhone = jsonObject.get("dispatcherPhone") == null ? null : jsonObject.getJSONObject("dispatcherPhone");
+
 
                 if(StringUtils.isNotBlank(mainOrderNo)) {
                     if (StringUtils.isNotBlank(driverId)) {
@@ -136,8 +138,7 @@ public class MainInterCityListener implements MessageListenerOrderly {
                                     main.setMainName(routeName);
                                     main.setStatus(MainOrderInterCity.orderState.NOTSETOUT.getCode());
                                     main.setMainOrderNo(mainOrderNo);
-                                    SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
-                                    main.setOpePhone(user.getMobile());
+                                    main.setOpePhone(dispatcherPhone.toString());
                                     main.setMainTime(orderTime);
                                     code = interService.addMainOrderNo(main);
                                 }
