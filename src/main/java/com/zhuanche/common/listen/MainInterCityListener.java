@@ -27,7 +27,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /**
- * 监听下单发短信
+ * 监听主单状态更新
  *
  * @author admin
  */
@@ -79,8 +79,8 @@ public class MainInterCityListener implements MessageListenerOrderly {
                 JSONObject dispatcherPhone = jsonObject.get("dispatcherPhone") == null ? null : jsonObject.getJSONObject("dispatcherPhone");
 
 
-                if(StringUtils.isNotBlank(mainOrderNo)) {
-                    if (StringUtils.isNotBlank(driverId)) {
+                if(StringUtils.isNotBlank(mainOrderNo) ) {
+                    if (StringUtils.isNotBlank(driverId) && serviceTypeId != null) {
                         logger.info("===========mq监听修改司机开始===================");
                         if (serviceTypeId==68) {
 

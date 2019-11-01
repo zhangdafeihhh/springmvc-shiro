@@ -29,7 +29,7 @@
 		<property name="consumeFromWhere" value="CONSUME_FROM_LAST_OFFSET"/><!-- 消费起点 -->
 		<property name="messageModel" value="CLUSTERING"/><!-- 消费模式 -->
 		<property name="topic" value="car_fact_order_canal_new"/><!-- RocketMQ TOPIC -->
-        <property name="tags" value="*"/>
+        <property name="tags" value="13"/>
 		<property name="messageBatchMaxSize" value="10"/><!-- 每次消费消息的最大数量 -->
 		<property name="threads" value="2"/><!-- 并发消费线程数 -->
         <property name="messageListener" >
@@ -45,7 +45,7 @@
 		<property name="consumeFromWhere" value="CONSUME_FROM_LAST_OFFSET"/><!-- 消费起点 -->
 		<property name="messageModel" value="CLUSTERING"/><!-- 消费模式 -->
 		<property name="topic" value="carpool_mainorder"/><!-- RocketMQ TOPIC -->
-		<property name="tags" value="*"/>
+		<property name="tags" value="15 || 60 || 30"/>
 		<property name="messageBatchMaxSize" value="10"/><!-- 每次消费消息的最大数量 -->
 		<property name="threads" value="2"/><!-- 并发消费线程数 -->
 		<property name="messageListener" >

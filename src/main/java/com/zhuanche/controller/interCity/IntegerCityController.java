@@ -1363,7 +1363,7 @@ public class IntegerCityController {
         for(MainOrderDetailDTO detailDTO : interCityList){
             if(StringUtils.isNotEmpty(detailDTO.getMainOrder())){
                 //剩余车位数
-                String url = "/order/carpool/getCrossCityMainOrder";
+                String url = "/order/carpool/getCrossCityMainOrdersubOrderByQuery";
                 StringBuilder sb = new StringBuilder();
                 sb.append("businessId="+Common.BUSSINESSID+"&mainOrderNo="+detailDTO.getMainOrder()).append("&key="+Common.MAIN_ORDER_KEY);
                 String sign = Base64.encodeBase64String(DigestUtils.md5(sb.toString()));
