@@ -1480,8 +1480,10 @@ public class IntegerCityController {
             listParam.add("routeName="+routeName);
         }
         //添加调度员手机号
-        map.put("dispatcherPhone",WebSessionUtil.getCurrentLoginUser().getMobile());
-        listParam.add("driverPhone="+WebSessionUtil.getCurrentLoginUser().getMobile());
+        if(WebSessionUtil.getCurrentLoginUser().getMobile() != null){
+            map.put("dispatcherPhone",WebSessionUtil.getCurrentLoginUser().getMobile());
+            listParam.add("dispatcherPhone="+WebSessionUtil.getCurrentLoginUser().getMobile());
+        }
 
         Collections.sort(listParam);
         listParam.add("key="+Common.MAIN_ORDER_KEY);
@@ -1618,8 +1620,11 @@ public class IntegerCityController {
             }
 
             //添加调度员手机号
-            map.put("dispatcherPhone",WebSessionUtil.getCurrentLoginUser().getMobile());
-            listParam.add("driverPhone="+WebSessionUtil.getCurrentLoginUser().getMobile());
+            if(WebSessionUtil.getCurrentLoginUser().getMobile() != null){
+                map.put("dispatcherPhone",WebSessionUtil.getCurrentLoginUser().getMobile());
+                listParam.add("dispatcherPhone="+WebSessionUtil.getCurrentLoginUser().getMobile());
+            }
+
 
             Collections.sort(listParam);
             listParam.add("key="+Common.MAIN_ORDER_KEY);
