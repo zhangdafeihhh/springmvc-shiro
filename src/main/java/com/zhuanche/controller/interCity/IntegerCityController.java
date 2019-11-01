@@ -1331,20 +1331,32 @@ public class IntegerCityController {
 
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
 
-        List<MainOrderDetailDTO> interCityList = null;
-        if(loginUser.getAccountType() != 900){
+
+     /*    List<MainOrderDetailDTO> interCityList = null;
+     if(loginUser.getAccountType() != 900){
             Set<Integer> citiesSet = loginUser.getCityIds();
             Set<Integer> suppliersSet = loginUser.getSupplierIds();
 
             interCityList = infoInterCityExMapper.queryDriver(cityId,supplierId,driverName,driverPhone,license,citiesSet,suppliersSet);
 
         }else{
-            interCityList = infoInterCityExMapper.queryDriver(cityId,supplierId,driverName,driverPhone,license,null,null);
+        }*/
+
+        Set<Integer> cityIds=new HashSet<>();
+        Set<Integer> supplierIds=new HashSet<>();
+
+        if(cityId != null){
+            cityIds.add(cityId);
+        }else{
+            cityIds = loginUser.getCityIds();
+        }
+        if(supplierId != null){
+            supplierIds.add(supplierId);
+        }else{
+            supplierIds = loginUser.getSupplierIds();
         }
 
-
-
-
+        List<MainOrderDetailDTO> interCityList = infoInterCityExMapper.queryDriver(null,null,driverName,driverPhone,license,cityIds,supplierIds);
 
         for(MainOrderDetailDTO detailDTO : interCityList){
             if(StringUtils.isNotEmpty(detailDTO.getMainOrder())){
