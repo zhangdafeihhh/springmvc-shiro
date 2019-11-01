@@ -15,6 +15,7 @@ import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.entity.mdbcarmanage.MainOrderInterCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.http.MpOkHttpUtil;
+import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.serv.interCity.MainOrderInterService;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
@@ -95,6 +96,10 @@ public class IntegerCityController {
 
     @Autowired
     private CarFactOrderInfoService carFactOrderInfoService;
+    @Autowired
+    private CitySupplierTeamCommonService citySupplierTeamCommonService;
+    @Autowired
+    private CarBizSupplierService carBizSupplierService;
 
     @Value("${ordercost.server.api.base.url}")
     private String orderCostUrl;
@@ -499,6 +504,7 @@ public class IntegerCityController {
                 logger.info("==========未获取到可配置线路=======");
                 return AjaxResponse.fail(RestErrorCode.UNFINDED_LINE);
             }
+
             //根据乘客人获取乘客userId
             Integer customerId = 0;
             if(StringUtils.isNotEmpty(reservePhone)){
@@ -613,6 +619,15 @@ public class IntegerCityController {
             sb.append("ruleId="+ruleId).append(SYSMOL);
             map.put("supplierId",supplierId);
             sb.append("supplierId="+supplierId).append(SYSMOL);
+
+            if(StringUtils.isNotBlank(supplierId)){
+                CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(Integer.parseInt(supplierId));
+                if(carBizSupplier!=null){
+                    map.put("supplierFullName",carBizSupplier.getSupplierFullName());
+                    sb.append("supplierFullName="+carBizSupplier.getSupplierFullName()).append(SYSMOL);
+                }
+            }
+
             map.put("couponId","111");
             sb.append("couponId=111").append(SYSMOL);
             map.put("estimatedAmount",estimatedAmount);//预估金额
@@ -940,7 +955,7 @@ public class IntegerCityController {
         AjaxResponse  configRouteRes = this.hasRoute(getOnId,getOffId);
 
         String ruleId = "";
-
+        String supplierId="";
         if(configRouteRes.getCode() != RestErrorCode.SUCCESS){
             logger.info("根据围栏id未获取到配置路线");
             return configRouteRes;
@@ -949,6 +964,7 @@ public class IntegerCityController {
         JSONObject jsonRoute = (JSONObject) configRouteRes.getData();
         if(jsonRoute != null && jsonRoute.get("lineId") != null){
             ruleId = jsonRoute.get("lineId").toString();
+            supplierId = jsonRoute.get("supplierId").toString();
         }
 
         if(StringUtils.isEmpty(ruleId)){
@@ -1153,12 +1169,20 @@ public class IntegerCityController {
             list.add("bookingEndShortAddr="+bookingEndShortAddr);
         }
 
+        map.put("supplierId",supplierId);
+        list.add("supplierId="+supplierId);
+
+        if(StringUtils.isNotBlank(supplierId)){
+            CarBizSupplier carBizSupplier = carBizSupplierService.selectByPrimaryKey(Integer.parseInt(supplierId));
+            if(carBizSupplier!=null){
+                map.put("supplierFullName",carBizSupplier.getSupplierFullName());
+                list.add("supplierFullName="+carBizSupplier.getSupplierFullName());
+            }
+        }
 
 
         map.put("status",status);
         list.add("status="+status);
-
-
 
 
         Collections.sort(list);
@@ -1894,8 +1918,8 @@ public class IntegerCityController {
         }
         return AjaxResponse.success(getOffId);
     }
-    @Autowired
-    private CitySupplierTeamCommonService citySupplierTeamCommonService;
+
+
     /**
      * 是否有配置的线路 http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=40172935
      * @param getOnId
