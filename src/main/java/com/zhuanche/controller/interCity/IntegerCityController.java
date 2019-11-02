@@ -1549,7 +1549,7 @@ public class IntegerCityController {
         } else {
             return AjaxResponse.fail(RestErrorCode.FAILED_GET_MAIN_ORDER);
         }
-        return AjaxResponse.success(null);
+        
     }
 
 
