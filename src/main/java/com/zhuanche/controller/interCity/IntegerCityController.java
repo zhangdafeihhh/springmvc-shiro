@@ -1676,7 +1676,7 @@ public class IntegerCityController {
                             }else {
                                 MainOrderInterCity queryMainOrder  = interService.queryMainOrder(mainOrderNo);
                                 if(queryMainOrder != null && queryMainOrder.getId()>0){
-                                    int code = interService.updateMainOrderState(mainOrderNo,1);
+                                    int code = interService.updateMainOrderState(mainOrderNo,1,WebSessionUtil.getCurrentLoginUser().getMobile());
                                     if(code > 0){
                                         logger.info("=============异步更新数据成功=========");
                                         return String.valueOf(code);
