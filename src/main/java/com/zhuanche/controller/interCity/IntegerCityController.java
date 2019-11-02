@@ -1007,11 +1007,16 @@ public class IntegerCityController {
             return AjaxResponse.fail(RestErrorCode.REGISTER_BY_PHONE);
         }
 
+        Date longTimeDate = new Date();
+        if (StringUtils.isNotEmpty(boardingTime)) {
+            longTimeDate = DateUtils.getDate(boardingTime, "yyyy-MM-dd HH:mm:ss");
+         }
+
 
         //获取预估价
         AjaxResponse elsRes = null;
         try {
-            elsRes = this.getOrderEstimatedAmount620(Long.valueOf(boardingTime), boardingCityId, 68, riderPhone,
+            elsRes = this.getOrderEstimatedAmount620(Long.valueOf(longTimeDate.getTime()), boardingCityId, 68, riderPhone,
                     ruleId, customerId, boardingGetOffX, boardingGetOffY, riderCount, String.valueOf(carGroup), boardingGetOnX,
                     boardingGetOnY, isSameRider);
         } catch (Exception e) {
