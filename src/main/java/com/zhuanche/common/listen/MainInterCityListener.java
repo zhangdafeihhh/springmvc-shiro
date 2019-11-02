@@ -1,5 +1,6 @@
 package com.zhuanche.common.listen;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.rocketmq.client.consumer.listener.ConsumeOrderlyContext;
 import com.alibaba.rocketmq.client.consumer.listener.ConsumeOrderlyStatus;
@@ -128,12 +129,16 @@ public class MainInterCityListener implements MessageListenerOrderly {
                                         if(orderJSON != null && orderJSON.get("code") !=null) {
                                             int orderCode = orderJSON.getIntValue("code");
                                             if (0 == orderCode) {
-                                                JSONObject jsonData =  orderJSON.getJSONObject("data");
-                                                orderTime= jsonData.get("bookingDate") == null ? "" : jsonData.getString("bookingDate");
-                                                if(orderTime!= null){
-                                                    orderTime = DateUtils.format(Long.valueOf(orderTime),"yyyy-MM-dd HH:mm:ss");
-                                                    logger.info("获取订单时间orderTime:" + orderTime);
+                                                JSONArray jsonArray =  orderJSON.getJSONArray("data");
+                                                if(jsonArray != null && jsonArray.size() > 0){
+                                                    JSONObject jsonData = (JSONObject) jsonArray.get(0);
+                                                    orderTime= jsonData.get("bookingDate") == null ? "" : jsonData.getString("bookingDateStr");
+                                                    if(orderTime!= null){
+                                                        orderTime = DateUtils.format(Long.valueOf(orderTime),"yyyy-MM-dd HH:mm:ss");
+                                                        logger.info("获取订单时间orderTime:" + orderTime);
+                                                    }
                                                 }
+
                                             }
                                         }
                                     }
