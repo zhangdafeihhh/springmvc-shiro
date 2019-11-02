@@ -25,6 +25,7 @@ import com.zhuanche.util.*;
 import com.zhuanche.util.encrypt.MD5Utils;
 import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
+import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -104,6 +105,10 @@ public class IntegerCityController {
     private CitySupplierTeamCommonService citySupplierTeamCommonService;
     @Autowired
     private CarBizSupplierService carBizSupplierService;
+
+
+    @Autowired
+    private CarBizCarInfoExMapper carBizCarInfoExMapper;
 
     @Value("${ordercost.server.api.base.url}")
     private String orderCostUrl;
@@ -544,7 +549,6 @@ public class IntegerCityController {
             Date bookDate = DateUtils.getDate(boardingTime, "yyyy-MM-dd HH:mm:ss");
 
             long bookingDate = bookDate.getTime();
-
 
             //获取预估价
             AjaxResponse elsRes = this.getOrderEstimatedAmount620(bookingDate, boardingCityId, 68, riderPhone,
@@ -1494,19 +1498,21 @@ public class IntegerCityController {
             JSONObject jsonResult = JSONObject.parseObject(result);
             if (jsonResult.get("code") != null && jsonResult.getInteger("code") == 0) {
                 logger.info("子单绑定主单成功");
-
+                String mobile = WebSessionUtil.getCurrentLoginUser().getMobile();
                 ExecutorService executor = Executors.newCachedThreadPool();
                 Future<String> future = executor.submit(new Callable<String>() {
                     @Override
                     public String call() throws Exception {
+                        logger.info("=================异步处理开始============" + jsonResult.getJSONObject("data"));
                         JSONObject jsonData = jsonResult.getJSONObject("data");
                         try {
                             if (jsonData != null && jsonData.get("mainOrderNo") != null) {
                                 String newMainOrderNo = jsonData.getString("mainOrderNo");
                                 MainOrderInterCity queryMain = interService.queryMainOrder(newMainOrderNo);
+                                logger.info("========查询结果=======" + JSONObject.toJSONString(queryMain));
                                 int code = 0;
                                 if (queryMain != null && queryMain.getId() > 0) {
-                                    code = interService.updateMainOrderState(newMainOrderNo, 1,WebSessionUtil.getCurrentLoginUser().getMobile());
+                                    code = interService.updateMainOrderState(newMainOrderNo, 1,mobile);
                                 } else {
                                     MainOrderInterCity main = new MainOrderInterCity();
                                     main.setDriverId(driverId);
@@ -1515,8 +1521,7 @@ public class IntegerCityController {
                                     main.setMainName(routeName);
                                     main.setStatus(MainOrderInterCity.orderState.NOTSETOUT.getCode());
                                     main.setMainOrderNo(newMainOrderNo);
-                                    SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
-                                    main.setOpePhone(user.getMobile());
+                                    main.setOpePhone(mobile);
                                     main.setMainTime(orderTime);
                                     code = interService.addMainOrderNo(main);
                                 }
@@ -1536,6 +1541,9 @@ public class IntegerCityController {
                 return AjaxResponse.success(null);
 
 
+            }else {
+                logger.info("子单指派主单返回信息========" + jsonResult.toString());
+                return AjaxResponse.failMsg(jsonResult.getIntValue("code"),jsonResult.getString("msg"));
             }
 
         } else {
@@ -1649,11 +1657,13 @@ public class IntegerCityController {
                 JSONObject jsonResult = JSONObject.parseObject(result);
                 if(jsonResult.get("code") != null && jsonResult.getInteger("code") == 0){
                     logger.info("改派成功");
+                    String mobile = WebSessionUtil.getCurrentLoginUser().getMobile();
                     ExecutorService executor = Executors.newCachedThreadPool();
                     Future<String> future = executor.submit(new Callable<String>() {
                         @Override
                         public String call() throws Exception {
                             //如果是新增或者改派，需要将
+                            logger.info("==============异步改派开始===========" + jsonResult.getJSONObject("data"));
                             if(StringUtils.isEmpty(mainOrderNo)){
                                 JSONObject jsonData = jsonResult.getJSONObject("data");
                                 int code =0;
@@ -1664,8 +1674,7 @@ public class IntegerCityController {
                                 main.setMainName(routeName);
                                 main.setStatus(MainOrderInterCity.orderState.NOTSETOUT.getCode());
                                 main.setMainOrderNo(jsonData.getString("mainOrderNo"));
-                                SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
-                                main.setOpePhone(user.getMobile());
+                                main.setOpePhone(mobile);
                                 main.setMainTime(orderTime);
                                 code = interService.addMainOrderNo(main);
 
@@ -1675,8 +1684,9 @@ public class IntegerCityController {
                                 }
                             }else {
                                 MainOrderInterCity queryMainOrder  = interService.queryMainOrder(mainOrderNo);
+                                logger.info("=========更新数据=======" + JSONObject.toJSONString(queryMainOrder));
                                 if(queryMainOrder != null && queryMainOrder.getId()>0){
-                                    int code = interService.updateMainOrderState(mainOrderNo,1,WebSessionUtil.getCurrentLoginUser().getMobile());
+                                    int code = interService.updateMainOrderState(mainOrderNo,1,mobile);
                                     if(code > 0){
                                         logger.info("=============异步更新数据成功=========");
                                         return String.valueOf(code);

@@ -106,8 +106,11 @@ public class MainInterCityListener implements MessageListenerOrderly {
                                         List<String> strList = new ArrayList<>();
                                         map.put("bId", Common.BUSSINESSID);
                                         strList.add("bId="+Common.BUSSINESSID);
-                                        map.put("orderNo",firstOrderId);
-                                        strList.add("orderNo="+firstOrderId);
+                                        map.put("orderId",firstOrderId);
+                                        strList.add("orderId="+firstOrderId);
+                                        map.put("columns","booking_date");
+                                        strList.add("columns=booking_date");
+
 
                                         Collections.sort(strList);
                                         strList.add("key="+Common.MAIN_ORDER_KEY);
@@ -120,7 +123,7 @@ public class MainInterCityListener implements MessageListenerOrderly {
                                         }
                                         map.put("sign",sign);
                                         logger.info("==================获取订单详情入参：" + JSONObject.toJSONString(map));
-                                        JSONObject orderJSON = MpOkHttpUtil.okHttpGetBackJson(orderServiceUrl + "/orderMain/getOrderByOrderNo", map, 0, "查询订单详情");
+                                        JSONObject orderJSON = MpOkHttpUtil.okHttpGetBackJson(orderServiceUrl + "/orderMain/getOrdersByOrderNo", map, 0, "查询订单详情");
                                         logger.info("===========获取订单返回数据====" + orderJSON.toString());
                                         if(orderJSON != null && orderJSON.get("code") !=null) {
                                             int orderCode = orderJSON.getIntValue("code");

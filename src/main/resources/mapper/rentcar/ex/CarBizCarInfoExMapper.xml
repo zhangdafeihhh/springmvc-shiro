@@ -245,6 +245,13 @@
 		WHERE
 			info.car_id = #{carId}
 	</select>
-  
+
+
+	<select id="groupIdByDriverId" resultType="java.lang.Integer"   parameterType="java.lang.Integer" >
+		select group_id
+		from car_biz_car_info
+		where driver_id = #{driverId}
+	</select>
+
 </mapper>
 
