@@ -14,6 +14,6 @@ public interface MainOrderInterCityExMapper {
 
     int updateMainOrderState(@Param("mainOrderNo") String mainOrderNo,
                              @Param("status") Integer status,
-                             @Param("phone") Integer phone);
+                             @Param("phone") String phone);
 
 }
