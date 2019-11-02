@@ -1015,7 +1015,7 @@ public class IntegerCityController {
                     ruleId, customerId, boardingGetOffX, boardingGetOffY, riderCount, String.valueOf(carGroup), boardingGetOnX,
                     boardingGetOnY, isSameRider);
         } catch (Exception e) {
-            logger.error("获取预估价异常");
+            logger.error("获取预估价异常",e);
             return AjaxResponse.fail(RestErrorCode.UNGET_PRICE);
         }
         if (elsRes.getCode() != RestErrorCode.SUCCESS) {
