@@ -93,44 +93,48 @@ public class MainInterCityListener implements MessageListenerOrderly {
                                     code = interService.updateMainOrderState(mainOrderNo,1,null);
                                 }else {
                                     String routeName = "";
+                                    String  orderTime = "";
                                     if(jsonMemo != null){
                                         if(jsonMemo.get("routeName") != null){
                                             routeName = jsonMemo.getString("routeName");
+                                            orderTime = jsonMemo.get("crossCityStartTime") == null ? "" : jsonMemo.getString("crossCityStartTime");
                                         }
                                     }
 
-                                    String orderTime = "";
-                                    Map<String,Object> map = Maps.newHashMap();
-                                    List<String> strList = new ArrayList<>();
-                                    map.put("bId", Common.BUSSINESSID);
-                                    strList.add("bId="+Common.BUSSINESSID);
-                                    map.put("orderNo",firstOrderId);
-                                    strList.add("orderNo="+firstOrderId);
+                                    if(StringUtils.isEmpty(orderTime)){//获取线路时间
+                                        Map<String,Object> map = Maps.newHashMap();
+                                        List<String> strList = new ArrayList<>();
+                                        map.put("bId", Common.BUSSINESSID);
+                                        strList.add("bId="+Common.BUSSINESSID);
+                                        map.put("orderNo",firstOrderId);
+                                        strList.add("orderNo="+firstOrderId);
 
-                                    Collections.sort(strList);
-                                    strList.add("key="+Common.MAIN_ORDER_KEY);
+                                        Collections.sort(strList);
+                                        strList.add("key="+Common.MAIN_ORDER_KEY);
 
-                                    String sign = null;
-                                    try {
-                                        sign = MD5Utils.getMD5DigestBase64(SignatureUtils.getMD5Sign(map, Common.MAIN_ORDER_KEY));
-                                    } catch (NoSuchAlgorithmException e) {
-                                        e.printStackTrace();
-                                    }
-                                    map.put("sign",sign);
-                                    logger.info("==================获取订单详情入参：" + JSONObject.toJSONString(map));
-                                    JSONObject orderJSON = MpOkHttpUtil.okHttpGetBackJson(orderServiceUrl + "/orderMain/getOrderByOrderNo", map, 0, "查询订单详情");
-                                    logger.info("===========获取订单返回数据====" + orderJSON.toString());
-                                    if(orderJSON != null && orderJSON.get("code") !=null) {
-                                        int orderCode = orderJSON.getIntValue("code");
-                                        if (0 == orderCode) {
-                                            JSONObject jsonData =  orderJSON.getJSONObject("data");
-                                            orderTime= jsonData.get("bookingDate") == null ? "" : jsonData.getString("bookingDate");
-                                            if(orderTime!= null){
-                                                orderTime = DateUtils.format(Long.valueOf(orderTime),"yyyy-MM-dd HH:mm:ss");
-                                                logger.info("获取订单时间orderTime:" + orderTime);
+                                        String sign = null;
+                                        try {
+                                            sign = MD5Utils.getMD5DigestBase64(SignatureUtils.getMD5Sign(map, Common.MAIN_ORDER_KEY));
+                                        } catch (NoSuchAlgorithmException e) {
+                                            e.printStackTrace();
+                                        }
+                                        map.put("sign",sign);
+                                        logger.info("==================获取订单详情入参：" + JSONObject.toJSONString(map));
+                                        JSONObject orderJSON = MpOkHttpUtil.okHttpGetBackJson(orderServiceUrl + "/orderMain/getOrderByOrderNo", map, 0, "查询订单详情");
+                                        logger.info("===========获取订单返回数据====" + orderJSON.toString());
+                                        if(orderJSON != null && orderJSON.get("code") !=null) {
+                                            int orderCode = orderJSON.getIntValue("code");
+                                            if (0 == orderCode) {
+                                                JSONObject jsonData =  orderJSON.getJSONObject("data");
+                                                orderTime= jsonData.get("bookingDate") == null ? "" : jsonData.getString("bookingDate");
+                                                if(orderTime!= null){
+                                                    orderTime = DateUtils.format(Long.valueOf(orderTime),"yyyy-MM-dd HH:mm:ss");
+                                                    logger.info("获取订单时间orderTime:" + orderTime);
+                                                }
                                             }
                                         }
                                     }
+
 
                                     String opePhone = null;
                                     if(dispatcherPhone == null){
