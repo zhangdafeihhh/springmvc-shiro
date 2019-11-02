@@ -41,7 +41,7 @@
   </select>
 
   <update id="updateMainOrderState">
-    update main_order_inter_city SET status = #{status}
+    update main_order_inter_city
     <set >
       <if test="status != null" >
         status = #{status},
