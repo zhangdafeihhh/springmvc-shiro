@@ -62,7 +62,7 @@ public class DriverInfoInterCity {
     }
 
     public void setDriverName(String driverName) {
-        this.driverName = driverName == null ? null : driverName.trim();
+        this.driverName = driverName;
     }
 
     public String getDriverPhone() {
@@ -70,7 +70,7 @@ public class DriverInfoInterCity {
     }
 
     public void setDriverPhone(String driverPhone) {
-        this.driverPhone = driverPhone == null ? null : driverPhone.trim();
+        this.driverPhone = driverPhone;
     }
 
     public String getLicensePlates() {
@@ -78,7 +78,7 @@ public class DriverInfoInterCity {
     }
 
     public void setLicensePlates(String licensePlates) {
-        this.licensePlates = licensePlates == null ? null : licensePlates.trim();
+        this.licensePlates = licensePlates;
     }
 
     public Integer getCityId() {
@@ -94,7 +94,7 @@ public class DriverInfoInterCity {
     }
 
     public void setCityName(String cityName) {
-        this.cityName = cityName == null ? null : cityName.trim();
+        this.cityName = cityName;
     }
 
     public Integer getSupplierId() {
@@ -110,7 +110,7 @@ public class DriverInfoInterCity {
     }
 
     public void setSupplierName(String supplierName) {
-        this.supplierName = supplierName == null ? null : supplierName.trim();
+        this.supplierName = supplierName;
     }
 
     public Integer getTeamId() {
@@ -126,7 +126,7 @@ public class DriverInfoInterCity {
     }
 
     public void setTeamName(String teamName) {
-        this.teamName = teamName == null ? null : teamName.trim();
+        this.teamName = teamName;
     }
 
     public Integer getStatus() {
@@ -150,7 +150,7 @@ public class DriverInfoInterCity {
     }
 
     public void setCreateName(String createName) {
-        this.createName = createName == null ? null : createName.trim();
+        this.createName = createName;
     }
 
     public Date getCreateTime() {
@@ -174,7 +174,7 @@ public class DriverInfoInterCity {
     }
 
     public void setUpdateName(String updateName) {
-        this.updateName = updateName == null ? null : updateName.trim();
+        this.updateName = updateName;
     }
 
     public Date getUpdateTime() {

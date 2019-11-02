@@ -1508,10 +1508,11 @@ public class IntegerCityController {
                 logger.info("子单绑定主单成功");
                 JSONObject jsonData = jsonResult.getJSONObject("data");
                 if(jsonData != null && jsonData.get("mainOrderNo") != null){
-                   MainOrderInterCity queryMain = interService.queryMainOrder(jsonData.getString("mainOrderNo"));
+                    String newMainOrderNo = jsonData.getString("mainOrderNo");
+                   MainOrderInterCity queryMain = interService.queryMainOrder(newMainOrderNo);
                     int code = 0;
                    if(queryMain != null && queryMain.getId()>0){
-                       code = interService.updateMainOrderState(mainOrderNo,1);
+                       code = interService.updateMainOrderState(newMainOrderNo,1);
                    }else {
                        MainOrderInterCity main = new MainOrderInterCity();
                        main.setDriverId(driverId);
@@ -1519,7 +1520,7 @@ public class IntegerCityController {
                        main.setUpdateTime(new Date());
                        main.setMainName(routeName);
                        main.setStatus(MainOrderInterCity.orderState.NOTSETOUT.getCode());
-                       main.setMainOrderNo(jsonData.getString("mainOrderNo"));
+                       main.setMainOrderNo(newMainOrderNo);
                        SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
                        main.setOpePhone(user.getMobile());
                        main.setMainTime(orderTime);
