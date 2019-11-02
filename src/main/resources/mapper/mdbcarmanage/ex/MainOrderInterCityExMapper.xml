@@ -37,7 +37,7 @@
     select
     <include refid="Base_Column_List" />
     from main_order_inter_city
-    where main_order_no = #{mainOrderNo,jdbcType=INTEGER}  limit 1 ORDER BY  create_time DESC
+    where main_order_no = #{mainOrderNo,jdbcType=INTEGER}  ORDER BY  create_time DESC limit 1
   </select>
 
   <update id="updateMainOrderState">

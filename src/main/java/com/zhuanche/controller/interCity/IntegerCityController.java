@@ -458,7 +458,8 @@ public class IntegerCityController {
                                                  @Verify(param = "carGroup",rule = "required") Integer carGroup,
                                                  @Verify(param = "bookingStartShortAddr",rule = "required") String bookingStartShortAddr,
                                                  @Verify(param = "bookingEndShortAddr",rule = "required")String bookingEndShortAddr){
-        logger.info(MessageFormat.format("手动录入订单步骤1入参,{0},{1},{2},{3},{4},{5},{6},{7}",reserveName,reservePhone,
+        logger.info(MessageFormat.format("手动录入订单步骤1入参,{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}," +
+                        "{10},{11},{12},{13}",reserveName,reservePhone,
                 isSameRider,riderName,riderPhone,riderCount,boardingTime,boardingCityId,boardingGetOnX,boardingGetOnY,boardingGetOffCityId,
                 boardingGetOffX,boardingGetOffY));
 
@@ -1332,17 +1333,6 @@ public class IntegerCityController {
 
 
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-
-
-     /*    List<MainOrderDetailDTO> interCityList = null;
-     if(loginUser.getAccountType() != 900){
-            Set<Integer> citiesSet = loginUser.getCityIds();
-            Set<Integer> suppliersSet = loginUser.getSupplierIds();
-
-            interCityList = infoInterCityExMapper.queryDriver(cityId,supplierId,driverName,driverPhone,license,citiesSet,suppliersSet);
-
-        }else{
-        }*/
 
         Set<Integer> cityIds=new HashSet<>();
         Set<Integer> supplierIds=new HashSet<>();
