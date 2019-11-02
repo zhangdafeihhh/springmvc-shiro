@@ -18,6 +18,7 @@ import mapper.driver.ex.YueAoTongPhoneConfigExMapper;
 import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tools.ant.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,17 +90,12 @@ public class MainInterCityListener implements MessageListenerOrderly {
                                 MainOrderInterCity queryMain = interService.queryMainOrder(mainOrderNo);
                                 int code = 0;
                                 if(queryMain != null && queryMain.getId()>0){
-                                    code = interService.updateMainOrderState(mainOrderNo,1);
+                                    code = interService.updateMainOrderState(mainOrderNo,1,null);
                                 }else {
                                     String routeName = "";
                                     if(jsonMemo != null){
-                                        if(jsonMemo.get("startCityName") != null){
-                                            String startCityName = jsonMemo.getString("startCityName");
-                                            routeName = startCityName;
-                                        }
-                                        if(jsonMemo.get("endCityName") != null){
-                                            String endCityName = jsonMemo.getString("endCityName");
-                                            routeName = "-" +endCityName;
+                                        if(jsonMemo.get("routeName") != null){
+                                            routeName = jsonMemo.getString("routeName");
                                         }
                                     }
 
@@ -123,12 +119,16 @@ public class MainInterCityListener implements MessageListenerOrderly {
                                     map.put("sign",sign);
                                     logger.info("==================获取订单详情入参：" + JSONObject.toJSONString(map));
                                     JSONObject orderJSON = MpOkHttpUtil.okHttpGetBackJson(orderServiceUrl + "/orderMain/getOrderByOrderNo", map, 0, "查询订单详情");
-
+                                    logger.info("===========获取订单返回数据====" + orderJSON.toString());
                                     if(orderJSON != null && orderJSON.get("code") !=null) {
-                                        Integer orderCode = orderJSON.getIntValue("code");
+                                        int orderCode = orderJSON.getIntValue("code");
                                         if (0 == orderCode) {
                                             JSONObject jsonData =  orderJSON.getJSONObject("data");
                                             orderTime= jsonData.get("bookingDate") == null ? "" : jsonData.getString("bookingDate");
+                                            if(orderTime!= null){
+                                                orderTime = DateUtils.format(Long.valueOf(orderTime),"yyyy-MM-dd HH:mm:ss");
+                                                logger.info("获取订单时间orderTime:" + orderTime);
+                                            }
                                         }
                                     }
 
@@ -164,7 +164,7 @@ public class MainInterCityListener implements MessageListenerOrderly {
                             }
 
                             if(SERVICE_STATUS == status || CANCEL_STATUS == status){
-                             int code =   interService.updateMainOrderState(mainOrderNo,2);
+                             int code =   interService.updateMainOrderState(mainOrderNo,2,null);
                              if(code > 0){
                                  logger.info("更新主单状态成功" );
                              }

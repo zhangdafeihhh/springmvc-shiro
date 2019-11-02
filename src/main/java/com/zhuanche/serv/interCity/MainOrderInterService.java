@@ -17,5 +17,5 @@ public interface MainOrderInterService {
 
     MainOrderInterCity queryMainOrder(String mainOrderNo);
 
-    int updateMainOrderState(String mainOrderNo,Integer status);
+    int updateMainOrderState(String mainOrderNo,Integer status,String phone);
 }

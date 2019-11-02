@@ -42,6 +42,14 @@
 
   <update id="updateMainOrderState">
     update main_order_inter_city SET status = #{status}
+    <set >
+      <if test="status != null" >
+        status = #{status},
+      </if>
+      <if test="phone != phone" >
+        ope_phone = #{phone},
+      </if>
+    </set>
     where main_order_no = #{mainOrderNo}
   </update>
 

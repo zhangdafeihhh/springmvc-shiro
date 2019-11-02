@@ -13,6 +13,7 @@ public interface MainOrderInterCityExMapper {
     MainOrderInterCity queryMainOrder(@Param("mainOrderNo") String mainOrderNo);
 
     int updateMainOrderState(@Param("mainOrderNo") String mainOrderNo,
-                             @Param("status") Integer status);
+                             @Param("status") Integer status,
+                             @Param("phone") Integer phone);
 
 }
