@@ -228,7 +228,7 @@ public class IntegerCityController {
         map.put("supplierId",supplierId);*/
         map.put("status", orderState);
         map.put("pushDriverType", pushDriverType);
-        map.put("serviceTypeBatch", 68);
+        map.put("serviceTypeIdBatch", 68);
         map.put("orderType", orderSource);
 /*
         map.put("type",serviceType);
@@ -258,9 +258,9 @@ public class IntegerCityController {
             map.put("supplierIdBatch", supplierIdBatch);
         }
 
-        if (serviceType == null) {
+        /*if (serviceType == null) {
             map.put("serviceTypeIdBatch", "68");
-        }
+        }*/
         //添加排序字段
         JSONObject jsonSort = new JSONObject();
         jsonSort.put("field", "createDate");
