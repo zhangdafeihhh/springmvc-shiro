@@ -1458,7 +1458,25 @@ public class IntegerCityController {
         listParam.add("driverPhone=" + driverPhone);
         map.put("licensePlates", licensePlates);
         listParam.add("licensePlates=" + licensePlates);
-        if (StringUtils.isNotEmpty(groupId)) {
+        //todo 获取座位数不是根据第一次的车型 而是根据司机id获取最新的
+        /*if (StringUtils.isNotEmpty(groupId)) {
+            map.put("carGroupId", groupId);
+            listParam.add("carGroupId=" + groupId);
+            int carSeatNums = seatCount(Integer.valueOf(groupId));
+            map.put("carSeatNums", carSeatNums);
+            listParam.add("carSeatNums=" + carSeatNums);
+        }*/
+
+        //根据driverId获取groupId
+        Integer newDriverId = carBizCarInfoExMapper.groupIdByDriverId(driverId);
+        if(newDriverId != null && newDriverId>0){
+            map.put("carGroupId", groupId);
+            listParam.add("carGroupId=" + groupId);
+            int carSeatNums = seatCount(Integer.valueOf(groupId));
+            map.put("carSeatNums", carSeatNums);
+            listParam.add("carSeatNums=" + carSeatNums);
+        }else {
+            logger.info("==========获取司机座位数为空========= 使用用户选择的车型");
             map.put("carGroupId", groupId);
             listParam.add("carGroupId=" + groupId);
             int carSeatNums = seatCount(Integer.valueOf(groupId));
@@ -1612,11 +1630,24 @@ public class IntegerCityController {
             listParam.add("driverId="+driverId);
             map.put("licensePlates",licensePlates);
             listParam.add("licensePlates="+licensePlates);
-            map.put("groupId",groupId);
-            listParam.add("groupId="+groupId);
-            int carSeatNums = seatCount(Integer.valueOf(groupId));
-                map.put("carSeatNums",carSeatNums);
-                listParam.add("carSeatNums="+carSeatNums);
+
+
+            //根据driverId获取groupId
+            Integer newDriverId = carBizCarInfoExMapper.groupIdByDriverId(driverId);
+            if(newDriverId != null && newDriverId>0){
+                map.put("groupId", groupId);
+                listParam.add("groupId=" + groupId);
+                int carSeatNums = seatCount(Integer.valueOf(groupId));
+                map.put("carSeatNums", carSeatNums);
+                listParam.add("carSeatNums=" + carSeatNums);
+            }else {
+                logger.info("==========获取司机座位数为空========= 使用用户选择的车型");
+                map.put("groupId", groupId);
+                listParam.add("groupId=" + groupId);
+                int carSeatNums = seatCount(Integer.valueOf(groupId));
+                map.put("carSeatNums", carSeatNums);
+                listParam.add("carSeatNums=" + carSeatNums);
+            }
 
             map.put("cityId",cityId);
             listParam.add("cityId="+cityId);
@@ -1630,6 +1661,8 @@ public class IntegerCityController {
                 map.put("driverPhone",driverPhone);
                 listParam.add("driverPhone="+driverPhone);
             }
+
+
 
             //添加调度员手机号
             if(WebSessionUtil.getCurrentLoginUser().getMobile() != null){
