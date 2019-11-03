@@ -132,7 +132,7 @@ public class MainInterCityListener implements MessageListenerOrderly {
                                                 JSONArray jsonArray =  orderJSON.getJSONArray("data");
                                                 if(jsonArray != null && jsonArray.size() > 0){
                                                     JSONObject jsonData = (JSONObject) jsonArray.get(0);
-                                                    orderTime= jsonData.get("bookingDate") == null ? "" : jsonData.getString("bookingDateStr");
+                                                    orderTime= jsonData.get("bookingDate") == null ? "" : jsonData.getString("bookingDate");
                                                     if(orderTime!= null){
                                                         orderTime = DateUtils.format(Long.valueOf(orderTime),"yyyy-MM-dd HH:mm:ss");
                                                         logger.info("获取订单时间orderTime:" + orderTime);
