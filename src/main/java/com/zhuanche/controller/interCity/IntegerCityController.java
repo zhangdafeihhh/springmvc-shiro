@@ -1360,7 +1360,7 @@ public class IntegerCityController {
             supplierIds = loginUser.getSupplierIds();
         }
 
-        Page page = PageHelper.startPage(pageNum,pageSize);
+        //Page page = PageHelper.startPage(pageNum,pageSize);
         List<MainOrderDetailDTO> interCityList = infoInterCityExMapper.queryDriver(cityId, supplierId, driverName, driverPhone, license, cityIds, supplierIds);
 
         for (MainOrderDetailDTO detailDTO : interCityList) {
@@ -1392,11 +1392,16 @@ public class IntegerCityController {
                     }
                 }
             } else {
-                detailDTO.setRemainSeats(seatCount(detailDTO.getGroupId()));
+                Integer groupId =  carBizCarInfoExMapper.groupIdByDriverId(detailDTO.getDriverId());
+                if(groupId == 0){
+                    groupId = 41;//防止车管groupId为0的情况
+                }
+                Integer maxSeat = seatCount(groupId);
+                detailDTO.setRemainSeats(maxSeat);
             }
         }
-        int total = (int) page.getTotal();
-        PageDTO pageDTO = new PageDTO(pageNum,pageSize,total,interCityList);
+        //int total = (int) page.getTotal();
+        //PageDTO pageDTO = new PageDTO(pageNum,pageSize,total,interCityList);
 
         return AjaxResponse.success(interCityList);
     }
