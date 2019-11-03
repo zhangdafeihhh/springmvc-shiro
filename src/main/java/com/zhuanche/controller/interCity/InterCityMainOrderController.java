@@ -274,11 +274,11 @@ public class InterCityMainOrderController {
         Long driverStartDate = data.getLongValue("driverStartDate");
         Long updateDate = data.getLongValue("updateDate");
         //        下单时间  createDateStr
-       data.put("createDateStr", DateUtil.getSdf("yyyy-MM-dd HH:mm:ss").format(new Date(createDate)));
-       data.put("updateDateStr", DateUtil.getSdf("yyyy-MM-dd HH:mm:ss").format(new Date(updateDate)));
-       data.put("driverEndDateStr", DateUtil.getSdf("yyyy-MM-dd HH:mm:ss").format(new Date(driverEndDate)));
+       data.put("createDateStr",createDate<=0?null: DateUtil.getSdf("yyyy-MM-dd HH:mm:ss").format(new Date(createDate)));
+       data.put("updateDateStr",updateDate<=0?null: DateUtil.getSdf("yyyy-MM-dd HH:mm:ss").format(new Date(updateDate)));
+       data.put("driverEndDateStr", driverEndDate<=0?null:DateUtil.getSdf("yyyy-MM-dd HH:mm:ss").format(new Date(driverEndDate)));
         //        开始服务时间 driverStartDateStr
-       data.put("driverStartDateStr", DateUtil.getSdf("yyyy-MM-dd HH:mm:ss").format(new Date(driverStartDate)));
+       data.put("driverStartDateStr", driverStartDate<=0?null:DateUtil.getSdf("yyyy-MM-dd HH:mm:ss").format(new Date(driverStartDate)));
         //        服务类型 serviceTypeName
        data.put("serviceTypeName",carFactOrderInfoService.serviceTypeName(data.getInteger("serviceTypeId")));
         //        城市 cityName
