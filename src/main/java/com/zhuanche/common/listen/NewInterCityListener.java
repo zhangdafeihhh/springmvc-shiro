@@ -69,34 +69,40 @@ public class NewInterCityListener implements MessageListenerOrderly {
 
                         InterCityUtils utils = new InterCityUtils();
                         String[] on = bookingStartPoint.split(",");
-                        String x = on[0];
-                        String y = on[1];
-                        String boardOn = utils.hasBoardRoutRights(startCityId,x,y);
-                        if(StringUtils.isNotEmpty(boardOn)){
-                            String[] off = bookingEndPoint.split(",");
-                            String offX = off[0];
-                            String offY = off[1];
-                            String boardOff = utils.hasBoardOffRoutRights(endCityId,offX,offY);
-                            String route = utils.hasRoute(boardOn,boardOff);
-                            if(StringUtils.isNotEmpty(route)){
-                                JSONObject jsonSupplier = JSONObject.parseObject(route);
-                                logger.info("==========路线不在范围内============");
-                                if(jsonSupplier.get("supplierId") != null){
-                                    String suppliers = jsonObject.getString("supplierId");
-                                    List<YueAoTongPhoneConfig> opePhone = this.queryOpePhone(suppliers);
-                                    if(CollectionUtils.isNotEmpty(opePhone)){
-                                        //TODO:调用发短信接口
-                                        for(YueAoTongPhoneConfig config : opePhone){
-                                            String phone = config.getPhone();
-                                            logger.info("=====发送短信开始======");
-                                            SmsSendUtil.send(phone,"您好，有一个跨城订单，请登录后台及时抢单");
+                        logger.info("=========获取坐标做的数据=====" + JSONObject.toJSONString(on));
+                        if(on.length >0) {
+                            String x = on[0];
+                            String y = on[1];
+                            String boardOn = utils.hasBoardRoutRights(startCityId, x, y);
+
+                            if (StringUtils.isNotEmpty(boardOn)) {
+                                String[] off = bookingEndPoint.split(",");
+
+                                if(off.length > 0){
+                                    String offX = off[0];
+                                    String offY = off[1];
+                                    String boardOff = utils.hasBoardOffRoutRights(endCityId, offX, offY);
+                                    String route = utils.hasRoute(boardOn, boardOff);
+                                    if (StringUtils.isNotEmpty(route)) {
+                                        JSONObject jsonSupplier = JSONObject.parseObject(route);
+                                        logger.info("==========路线不在范围内============");
+                                        if (jsonSupplier.get("supplierId") != null) {
+                                            String suppliers = jsonObject.getString("supplierId");
+                                            List<YueAoTongPhoneConfig> opePhone = this.queryOpePhone(suppliers);
+                                            if (CollectionUtils.isNotEmpty(opePhone)) {
+                                                //TODO:调用发短信接口
+                                                for (YueAoTongPhoneConfig config : opePhone) {
+                                                    String phone = config.getPhone();
+                                                    logger.info("=====发送短信开始======");
+                                                    SmsSendUtil.send(phone, "您好，有一个跨城订单，请登录后台及时抢单");
+                                                }
+                                            }
                                         }
                                     }
                                 }
+
                             }
                         }
-
-
                         logger.info("===========mq发送短信结束==============");
                     }
                 }
