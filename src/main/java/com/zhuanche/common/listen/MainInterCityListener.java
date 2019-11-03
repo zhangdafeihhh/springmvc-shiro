@@ -98,6 +98,11 @@ public class MainInterCityListener implements MessageListenerOrderly {
                                     if(jsonMemo != null){
                                         if(jsonMemo.get("routeName") != null){
                                             routeName = jsonMemo.getString("routeName");
+                                            if(StringUtils.isEmpty(routeName)){
+                                                String startName = jsonMemo.getString("startCityName");
+                                                String endName = jsonMemo.getString("endCityName");
+                                                routeName = startName + "-" + endName;
+                                            }
                                             orderTime = jsonMemo.get("crossCityStartTime") == null ? "" : jsonMemo.getString("crossCityStartTime");
                                         }
                                     }
