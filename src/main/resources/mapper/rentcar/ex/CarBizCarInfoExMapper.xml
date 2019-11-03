@@ -249,8 +249,9 @@
 
 	<select id="groupIdByDriverId" resultType="java.lang.Integer"   parameterType="java.lang.Integer" >
 
-SELECT m.group_id as groupId  FROM car_biz_car_info t INNER JOIN car_biz_model m on
- t.car_model_id = m.model_id WHERE t.driver_id = #{driverId}
+		select t.group_id as groupId
+		from car_biz_driver_info t
+		where   driver_id = #{driverId}
 	</select>
 
 </mapper>
