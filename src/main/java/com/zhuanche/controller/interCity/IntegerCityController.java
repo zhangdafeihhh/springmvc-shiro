@@ -1392,12 +1392,11 @@ public class IntegerCityController {
                     }
                 }
             } else {
-                Integer groupId =  carBizCarInfoExMapper.groupIdByDriverId(detailDTO.getDriverId());
+                /*Integer groupId =  carBizCarInfoExMapper.groupIdByDriverId(detailDTO.getDriverId());
                 if(groupId == 0){
                     groupId = 41;//防止车管groupId为0的情况
-                }
-                Integer maxSeat = seatCount(groupId);
-                detailDTO.setRemainSeats(maxSeat);
+                }*/
+                detailDTO.setRemainSeats(seatCount(detailDTO.getGroupId()));
             }
         }
         int total = (int) page.getTotal();
