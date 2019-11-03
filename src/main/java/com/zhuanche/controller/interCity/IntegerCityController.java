@@ -1360,7 +1360,7 @@ public class IntegerCityController {
             supplierIds = loginUser.getSupplierIds();
         }
 
-        Page page = PageHelper.startPage(pageNum,pageSize);
+        //Page page = PageHelper.startPage(pageNum,pageSize);
         List<MainOrderDetailDTO> interCityList = infoInterCityExMapper.queryDriver(cityId, supplierId, driverName, driverPhone, license, cityIds, supplierIds);
 
         for (MainOrderDetailDTO detailDTO : interCityList) {
@@ -1378,7 +1378,11 @@ public class IntegerCityController {
                         Integer passengerNums = jsonData.getInteger("passengerNums");
                         //Integer groupId = jsonData.getInteger("groupId");
                         //根据司机driverId获取最新的车型以及座位数
-                        Integer maxSeat =  carBizCarInfoExMapper.groupIdByDriverId(detailDTO.getDriverId());
+                        Integer groupId =  carBizCarInfoExMapper.groupIdByDriverId(detailDTO.getDriverId());
+                        if(groupId == 0){
+                            groupId = jsonData.getInteger("groupId");//防止车管groupId为0的情况
+                        }
+                        Integer maxSeat = seatCount(groupId);
                         //剩余座位数
                         Integer remainSeat = maxSeat - passengerNums;
                         if (remainSeat <= 0) {
@@ -1391,10 +1395,10 @@ public class IntegerCityController {
                 detailDTO.setRemainSeats(seatCount(detailDTO.getGroupId()));
             }
         }
-        int total = (int) page.getTotal();
-        PageDTO pageDTO = new PageDTO(pageNum,pageSize,total,interCityList);
+        //int total = (int) page.getTotal();
+        //PageDTO pageDTO = new PageDTO(pageNum,pageSize,total,interCityList);
 
-        return AjaxResponse.success(pageDTO);
+        return AjaxResponse.success(interCityList);
     }
 
 
