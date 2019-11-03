@@ -3,8 +3,11 @@ package com.zhuanche.controller.interCity;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.enums.OrderStateEnum;
+import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.util.LbsSignUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -37,6 +40,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
@@ -140,7 +144,7 @@ public class IntegerCityController {
      * @param mainOrderNo        主订单号
      * @param beginCreateDate    下单开始时间
      * @param endCreateDate      下单结束时间
-     * @param beginCostStartDate 订单完成开始时间
+     * @param endCostEndDate 订单完成开始时间
      * @param beginCostEndDate   订单完成结束时间
      * @param riderPhone         乘车人手机号
      * @return
@@ -1332,7 +1336,9 @@ public class IntegerCityController {
                                     Integer supplierId,
                                     String driverName,
                                     String driverPhone,
-                                    String license) {
+                                    String license,
+                                    @RequestParam(value = "pageNum", defaultValue = "1")Integer pageNum,
+                                    @RequestParam(value = "pageSize", defaultValue = "10")Integer pageSize) {
 
         logger.info(MessageFormat.format("查询城际拼车司机入参：supplierId:{0},driverName:{1},driverPhpne:{2},license:{3}", supplierId,
                 driverName, driverPhone, license));
@@ -1354,6 +1360,7 @@ public class IntegerCityController {
             supplierIds = loginUser.getSupplierIds();
         }
 
+        Page page = PageHelper.startPage(pageNum,pageSize);
         List<MainOrderDetailDTO> interCityList = infoInterCityExMapper.queryDriver(cityId, supplierId, driverName, driverPhone, license, cityIds, supplierIds);
 
         for (MainOrderDetailDTO detailDTO : interCityList) {
@@ -1384,8 +1391,10 @@ public class IntegerCityController {
                 detailDTO.setRemainSeats(seatCount(detailDTO.getGroupId()));
             }
         }
+        int total = (int) page.getTotal();
+        PageDTO pageDTO = new PageDTO(pageNum,pageSize,total,interCityList);
 
-        return AjaxResponse.success(interCityList);
+        return AjaxResponse.success(pageDTO);
     }
 
 

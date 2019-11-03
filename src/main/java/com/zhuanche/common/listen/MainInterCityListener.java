@@ -98,13 +98,23 @@ public class MainInterCityListener implements MessageListenerOrderly {
                                     if(jsonMemo != null){
                                         if(jsonMemo.get("routeName") != null){
                                             routeName = jsonMemo.getString("routeName");
-                                            if(StringUtils.isEmpty(routeName)){
-                                                String startName = jsonMemo.getString("startCityName");
-                                                String endName = jsonMemo.getString("endCityName");
-                                                routeName = startName + "-" + endName;
-                                            }
+
                                             orderTime = jsonMemo.get("crossCityStartTime") == null ? "" : jsonMemo.getString("crossCityStartTime");
                                         }
+
+
+                                        if(StringUtils.isEmpty(routeName)){
+                                            String startName = "";
+                                            if(jsonMemo.get("startCityName") != null){
+                                                startName = jsonMemo.getString("startCityName");
+                                            }
+                                            String endName = "";
+                                            if(jsonMemo.get("endCityName") != null){
+                                                 endName = jsonMemo.getString("endCityName");
+                                            }
+                                            routeName = startName + "-" + endName;
+                                        }
+
                                     }
 
                                     if(StringUtils.isEmpty(orderTime)){//获取线路时间
