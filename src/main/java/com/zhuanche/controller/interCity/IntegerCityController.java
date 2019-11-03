@@ -1402,7 +1402,7 @@ public class IntegerCityController {
         int total = (int) page.getTotal();
         PageDTO pageDTO = new PageDTO(pageNum,pageSize,total,interCityList);
 
-        return AjaxResponse.success(interCityList);
+        return AjaxResponse.success(pageDTO);
     }
 
 
