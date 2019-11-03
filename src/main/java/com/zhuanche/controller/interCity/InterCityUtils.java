@@ -192,7 +192,7 @@ public class InterCityUtils {
                 if (jsonResult.get("data") != null && jsonResult.get("data") != "") {
 
                     JSONObject jsonData = jsonResult.getJSONObject("data");
-                    jsonRoute.put("supplierId", jsonData.getIntValue("supplierId"));
+                    jsonRoute.put("supplierId", jsonData.getString("supplierId"));
 
                     logger.info("该坐标含有线路");
                 } else {
@@ -206,6 +206,66 @@ public class InterCityUtils {
         }
         return jsonRoute.toString();
 
+    }
+
+
+
+    public static String testHasBoardOffRoutRights(Integer boardingGetOffCityId, String boardingGetOffX, String boardingGetOffY){
+        Map<String,Object> mapY = Maps.newHashMap();
+
+        mapY.put("token","fadca09abaac445e38bb76d86466181a");
+        JSONArray arrayY = new JSONArray();
+        JSONObject jsonY = new JSONObject();
+        jsonY.put("cityId",boardingGetOffCityId);
+        jsonY.put("x",boardingGetOffX);
+        jsonY.put("y",boardingGetOffY);
+        arrayY.add(jsonY);
+        mapY.put("coordinateList",arrayY.toString());
+        String lbsSignY = LbsSignUtil.sign(mapY,"fadca09abaac445e38bb76d86466181a");
+        mapY.put("sign",lbsSignY);
+
+        String resultY = MpOkHttpUtil.okHttpGet("http://test-inside-area-service.01zhuanche.com/area/getAreaByCoordinate",mapY,0,null);
+        System.out.println("========" + resultY);
+        String getOffId = "";
+
+        if(resultY != null ){
+            JSONObject jsonResultY = JSONObject.parseObject(resultY);
+            if(jsonResultY.get("code") == null || jsonResultY.getInteger("code") != 0 ||
+                    jsonResultY.get("data") == null){
+               // logger.info("获取下车点失败");
+                return null;
+            }
+
+            JSONArray jsonArray = jsonResultY.getJSONArray("data");
+            if(jsonArray.size() == 0){
+                //logger.info("获取下车点失败");
+                return null;
+            }
+
+
+            for(int i  =0;i<jsonArray.size();i++){
+                JSONObject lbsRes = jsonArray.getJSONObject(0);
+                if(lbsRes.get("areaId") != null){
+                    getOffId = lbsRes.getString("areaId");
+                    break;
+                }
+            }
+        }
+
+        if(StringUtils.isEmpty(getOffId)){
+            //logger.info("上下车点不再围栏区域");
+            return null;
+        }
+        System.out.println("=======getOffId:" + getOffId);
+        return getOffId;
+    }
+
+    public static void main(String[] args) {
+        //116.46269989013672,39.943695068359375;116.469304,39.949344
+        String bookingStartPoint = "116.46269989013672,39.943695068359375;116.469304,39.949344";
+        String[] on = bookingStartPoint.split(",");
+        System.out.println("=========获取坐标做的数据=====" + JSONObject.toJSONString(on));
+        System.out.println(testHasBoardOffRoutRights(44,"116.46269989013672","39.943695068359375"));
     }
 
 }
