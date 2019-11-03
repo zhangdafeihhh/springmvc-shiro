@@ -1354,7 +1354,7 @@ public class IntegerCityController {
             supplierIds = loginUser.getSupplierIds();
         }
 
-        List<MainOrderDetailDTO> interCityList = infoInterCityExMapper.queryDriver(null, null, driverName, driverPhone, license, cityIds, supplierIds);
+        List<MainOrderDetailDTO> interCityList = infoInterCityExMapper.queryDriver(cityId, supplierId, driverName, driverPhone, license, cityIds, supplierIds);
 
         for (MainOrderDetailDTO detailDTO : interCityList) {
             if (StringUtils.isNotEmpty(detailDTO.getMainOrder())) {
@@ -1369,9 +1369,9 @@ public class IntegerCityController {
                     if (jsonResult.get("code") != null && jsonResult.getInteger("code") == 0) {
                         JSONObject jsonData = jsonResult.getJSONObject("data");
                         Integer passengerNums = jsonData.getInteger("passengerNums");
-                        Integer groupId = jsonData.getInteger("groupId");
-                        //如果是商务6座，默认是6个位置否则是4个
-                        Integer maxSeat = this.seatCount(groupId);
+                        //Integer groupId = jsonData.getInteger("groupId");
+                        //根据司机driverId获取最新的车型以及座位数
+                        Integer maxSeat =  carBizCarInfoExMapper.groupIdByDriverId(detailDTO.getDriverId());
                         //剩余座位数
                         Integer remainSeat = maxSeat - passengerNums;
                         if (remainSeat <= 0) {
