@@ -1396,7 +1396,7 @@ public class IntegerCityController {
                 if(groupId == 0){
                     groupId = 41;//防止车管groupId为0的情况
                 }
-                detailDTO.setRemainSeats(seatCount(detailDTO.getGroupId()));
+                detailDTO.setRemainSeats(groupId);
             }
         }
         int total = (int) page.getTotal();
