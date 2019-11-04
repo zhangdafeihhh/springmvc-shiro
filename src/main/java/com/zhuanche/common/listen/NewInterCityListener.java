@@ -123,7 +123,9 @@ public class NewInterCityListener implements MessageListenerOrderly {
 
                                                         List<Integer> saasList = new ArrayList<>();
                                                         for(int k = 0;k<saasArr.length;k++){
-                                                            saasList.add(Integer.valueOf(saasArr[k]));
+                                                            if(StringUtils.isNotEmpty(saasArr[k])){
+                                                                saasList.add(Integer.valueOf(saasArr[k]));
+                                                            }
                                                         }
                                                         if(saasList.retainAll(mapSupplier)){
                                                             String phone = user.getPhone();
