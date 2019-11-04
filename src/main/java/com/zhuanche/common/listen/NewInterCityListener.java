@@ -5,10 +5,13 @@ import com.alibaba.rocketmq.client.consumer.listener.ConsumeOrderlyContext;
 import com.alibaba.rocketmq.client.consumer.listener.ConsumeOrderlyStatus;
 import com.alibaba.rocketmq.client.consumer.listener.MessageListenerOrderly;
 import com.alibaba.rocketmq.common.message.MessageExt;
+import com.google.common.collect.Maps;
 import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.controller.driver.YueAoTongPhoneConfig;
 import com.zhuanche.controller.interCity.InterCityUtils;
+import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 import mapper.driver.ex.YueAoTongPhoneConfigExMapper;
+import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -16,7 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 监听下单发短信
@@ -33,6 +38,9 @@ public class NewInterCityListener implements MessageListenerOrderly {
 
     @Autowired
     private YueAoTongPhoneConfigExMapper yueAoTongPhoneConfigExMapper;
+
+    @Autowired
+    private CarAdmUserExMapper exMapper;
 
 
     @Override
@@ -101,15 +109,29 @@ public class NewInterCityListener implements MessageListenerOrderly {
                                                 logger.info("==========路线在范围内============");
                                                 if (jsonSupplier.get("supplierId") != null) {
                                                     String suppliers = jsonSupplier.getString("supplierId");
-                                                    List<YueAoTongPhoneConfig> opePhone = this.queryOpePhone(suppliers);
-                                                    if (CollectionUtils.isNotEmpty(opePhone)) {
-                                                        //TODO:调用发短信接口
-                                                        for (YueAoTongPhoneConfig config : opePhone) {
-                                                            String phone = config.getPhone();
+                                                    String[] supplierArr = suppliers.split(",");
+                                                    List<Integer> mapSupplier = new ArrayList<>();
+
+                                                    for(int i =0 ;i<supplierArr.length;i++){
+                                                        mapSupplier.add(Integer.valueOf(supplierArr[i]));
+                                                    }
+
+                                                    List<CarAdmUser> listAdm = exMapper.selectUsersByLevel(4);//查询所有的供应商
+                                                    for(CarAdmUser user : listAdm){
+                                                        String saasSupplier = user.getSuppliers();
+                                                        String[] saasArr = saasSupplier.split(",");
+
+                                                        List<Integer> saasList = new ArrayList<>();
+                                                        for(int k = 0;k<saasArr.length;k++){
+                                                            saasList.add(Integer.valueOf(saasArr[k]));
+                                                        }
+                                                        if(saasList.retainAll(mapSupplier)){
+                                                            String phone = user.getPhone();
                                                             logger.info("=====发送短信开始======");
                                                             SmsSendUtil.send(phone, "您好，有一个跨城订单，请登录后台及时抢单");
                                                         }
                                                     }
+
                                                 }
                                             }
                                         }
