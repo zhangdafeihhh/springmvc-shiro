@@ -113,8 +113,13 @@ public class NewInterCityListener implements MessageListenerOrderly {
                                                     if (CollectionUtils.isNotEmpty(opePhone)) {
                                                         //TODO:调用发短信接口
                                                         for (YueAoTongPhoneConfig config : opePhone) {
+
                                                             String phone = config.getPhone();
-                                                            logger.info("=====发送短信开始======");
+                                                            if(phone.contains(",")){
+                                                                String arr[] = phone.split(",");
+                                                                phone = arr[0];
+                                                            }
+                                                            logger.info("=====发送短信开始======" + phone);
                                                             SmsSendUtil.send(phone, "您好，有一个城际订单，请登录后台及时抢单");
                                                         }
                                                     }

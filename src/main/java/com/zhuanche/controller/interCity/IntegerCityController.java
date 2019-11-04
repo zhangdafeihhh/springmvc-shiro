@@ -1733,36 +1733,42 @@ public class IntegerCityController {
                         public String call() throws Exception {
                             //如果是新增或者改派，需要将
                             logger.info("==============异步改派开始===========" + jsonResult.getJSONObject("data"));
-                            if(StringUtils.isEmpty(mainOrderNo)){
-                                JSONObject jsonData = jsonResult.getJSONObject("data");
-                                int code =0;
-                                MainOrderInterCity main = new MainOrderInterCity();
-                                main.setDriverId(driverId);
-                                main.setCreateTime(new Date());
-                                main.setUpdateTime(new Date());
-                                main.setMainName(routeName);
-                                main.setStatus(MainOrderInterCity.orderState.NOTSETOUT.getCode());
-                                main.setMainOrderNo(jsonData.getString("mainOrderNo"));
-                                main.setOpePhone(mobile);
-                                main.setMainTime(orderTime);
-                                code = interService.addMainOrderNo(main);
+                            try {
+                                if(StringUtils.isEmpty(mainOrderNo)){
+                                    JSONObject jsonData = jsonResult.getJSONObject("data");
+                                    int code =0;
+                                    MainOrderInterCity main = new MainOrderInterCity();
+                                    main.setDriverId(driverId);
+                                    main.setCreateTime(new Date());
+                                    main.setUpdateTime(new Date());
+                                    main.setMainName(routeName);
+                                    main.setStatus(MainOrderInterCity.orderState.NOTSETOUT.getCode());
+                                    main.setMainOrderNo(jsonData.getString("mainOrderNo"));
+                                    main.setOpePhone(mobile);
+                                    main.setMainTime(orderTime);
+                                    logger.info("改派入库数据：" + JSONObject.toJSONString(main));
+                                    code = interService.addMainOrderNo(main);
 
-                                if(code > 0){
-                                    logger.info("=============异步插入数据成功=========");
-                                    return String.valueOf(code);
-                                }
-                            }else {
-                                MainOrderInterCity queryMainOrder  = interService.queryMainOrder(mainOrderNo);
-                                logger.info("=========更新数据=======" + JSONObject.toJSONString(queryMainOrder));
-                                if(queryMainOrder != null && queryMainOrder.getId()>0){
-                                    int code = interService.updateMainOrderState(mainOrderNo,1,mobile);
                                     if(code > 0){
-                                        logger.info("=============异步更新数据成功=========");
+                                        logger.info("=============异步插入数据成功=========");
                                         return String.valueOf(code);
                                     }
+                                }else {
+                                    MainOrderInterCity queryMainOrder  = interService.queryMainOrder(mainOrderNo);
+                                    logger.info("=========更新数据=======" + JSONObject.toJSONString(queryMainOrder));
+                                    if(queryMainOrder != null && queryMainOrder.getId()>0){
+                                        int code = interService.updateMainOrderState(mainOrderNo,1,mobile);
+                                        if(code > 0){
+                                            logger.info("=============异步更新数据成功=========");
+                                            return String.valueOf(code);
+                                        }
+                                    }
                                 }
-                            }
-                            return "=============子单绑定异常==========";
+                            } catch (Exception e) {
+
+                                return "=============子单绑定异常==========" + e;
+                             }
+                             return "=============改派结束==========";
                         }
                     });
 
