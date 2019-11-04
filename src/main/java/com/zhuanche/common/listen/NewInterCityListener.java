@@ -109,6 +109,18 @@ public class NewInterCityListener implements MessageListenerOrderly {
                                                 logger.info("==========路线在范围内============");
                                                 if (jsonSupplier.get("supplierId") != null) {
                                                     String suppliers = jsonSupplier.getString("supplierId");
+                                                    List<YueAoTongPhoneConfig> opePhone = this.queryOpePhone(suppliers);
+                                                    if (CollectionUtils.isNotEmpty(opePhone)) {
+                                                        //TODO:调用发短信接口
+                                                        for (YueAoTongPhoneConfig config : opePhone) {
+                                                            String phone = config.getPhone();
+                                                            logger.info("=====发送短信开始======");
+                                                            SmsSendUtil.send(phone, "您好，有一个跨城订单，请登录后台及时抢单");
+                                                        }
+                                                    }
+                                                }
+                                                /*if (jsonSupplier.get("supplierId") != null) {
+                                                    String suppliers = jsonSupplier.getString("supplierId");
                                                     String[] supplierArr = suppliers.split(",");
                                                     List<Integer> mapSupplier = new ArrayList<>();
 
@@ -134,7 +146,7 @@ public class NewInterCityListener implements MessageListenerOrderly {
                                                         }
                                                     }
 
-                                                }
+                                                }*/
                                             }
                                         }
 
