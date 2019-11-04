@@ -115,7 +115,7 @@ public class NewInterCityListener implements MessageListenerOrderly {
                                                         for (YueAoTongPhoneConfig config : opePhone) {
                                                             String phone = config.getPhone();
                                                             logger.info("=====发送短信开始======");
-                                                            SmsSendUtil.send(phone, "您好，有一个跨城订单，请登录后台及时抢单");
+                                                            SmsSendUtil.send(phone, "您好，有一个城际订单，请登录后台及时抢单");
                                                         }
                                                     }
                                                 }
