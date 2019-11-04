@@ -775,7 +775,18 @@ public class IntegerCityController {
                             dto.setBookingStartPoint(jsonPoint);
                         }
                     }
-                    dto.setBookingEndPoint(jsonData.get("bookingEndPoint") == null ? "" : jsonData.getString("bookingEndPoint"));
+
+                    String jsonEnd = jsonData.get("bookingEndPoint") == null ? "" : jsonData.getString("bookingEndPoint");
+                    if(StringUtils.isNotEmpty(jsonEnd)){
+                        if(jsonEnd.contains(";")){
+                            String[]  arr = jsonEnd.split(";");
+                            if(arr.length>0){
+                                dto.setBookingEndPoint(arr[0]);
+                            }
+                        }else {
+                            dto.setBookingEndPoint(jsonEnd);
+                        }
+                    }
                     dto.setStatus(jsonData.get("status") == null ? null : jsonData.getInteger("status"));
                     dto.setOrderTime(jsonData.get("createDate") == null ? null : jsonData.getString("createDate"));
                     dto.setType(jsonData.get("type") == null ? null : jsonData.getInteger("type"));
@@ -1746,9 +1757,9 @@ public class IntegerCityController {
                                     main.setMainOrderNo(jsonData.getString("mainOrderNo"));
                                     main.setOpePhone(mobile);
                                     main.setMainTime(orderTime);
-                                    logger.info("改派入库数据：" + JSONObject.toJSONString(main));
+                                    logger.info("=====改派入库数据：" + JSONObject.toJSONString(main));
                                     code = interService.addMainOrderNo(main);
-
+                                    logger.info("=====改派后入库code:" + code);
                                     if(code > 0){
                                         logger.info("=============异步插入数据成功=========");
                                         return String.valueOf(code);

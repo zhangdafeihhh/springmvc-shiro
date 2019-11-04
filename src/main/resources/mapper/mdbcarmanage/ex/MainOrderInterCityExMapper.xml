@@ -22,9 +22,6 @@
   </update>
 
   <insert id="addMainOrderNo" parameterType="com.zhuanche.entity.mdbcarmanage.MainOrderInterCity" >
-    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
-      SELECT LAST_INSERT_ID()
-    </selectKey>
     insert into main_order_inter_city (driver_id, main_order_no, create_time,
     update_time, status, main_name,
     main_time, ope_phone)
