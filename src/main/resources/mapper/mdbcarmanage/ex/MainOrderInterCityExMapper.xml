@@ -46,7 +46,7 @@
       <if test="status != null" >
         status = #{status},
       </if>
-      <if test="phone != phone" >
+      <if test="phone != null" >
         ope_phone = #{phone},
       </if>
     </set>
