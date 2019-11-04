@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.MainOrderInterCityExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.MainOrderInterCity" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="main_order_no" property="mainOrderNo" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="main_name" property="mainName" jdbcType="VARCHAR" />
+    <result column="main_time" property="mainTime" jdbcType="VARCHAR" />
+    <result column="ope_phone" property="opePhone" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, driver_id, main_order_no, create_time, update_time, status, main_name, main_time, 
+    ope_phone
+  </sql>
+  <update id="updateMainTime">
+    update main_order_inter_city SET main_time =#{mainTime}
+    where main_order_no = #{mainOrderNo}
+  </update>
+
+  <insert id="addMainOrderNo" parameterType="com.zhuanche.entity.mdbcarmanage.MainOrderInterCity" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into main_order_inter_city (driver_id, main_order_no, create_time,
+    update_time, status, main_name,
+    main_time, ope_phone)
+    values (#{driverId,jdbcType=INTEGER}, #{mainOrderNo,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+    #{updateTime,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER}, #{mainName,jdbcType=VARCHAR},
+    #{mainTime,jdbcType=VARCHAR}, #{opePhone,jdbcType=VARCHAR})
+  </insert>
+
+  <select id="queryMainOrder" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from main_order_inter_city
+    where main_order_no = #{mainOrderNo,jdbcType=INTEGER}  ORDER BY  create_time DESC limit 1
+  </select>
+
+  <update id="updateMainOrderState">
+    update main_order_inter_city
+    <set >
+      <if test="status != null" >
+        status = #{status},
+      </if>
+      <if test="phone != phone" >
+        ope_phone = #{phone},
+      </if>
+    </set>
+    where main_order_no = #{mainOrderNo}
+  </update>
+
+
+
+
+</mapper>

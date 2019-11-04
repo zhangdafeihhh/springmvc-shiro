@@ -92,6 +92,7 @@ public class Common {
 	//车辆begin
 	public static final String SAVE_CAR = "/carV2/saveCar";
 	public static final String BATHINPUTCARINFO = "/carV2/batchInputCarInfo";
+
 	//车辆end
 	public static String getPath(HttpServletRequest request) {
 		String uploadDir =request.getSession().getServletContext().getRealPath("/");  

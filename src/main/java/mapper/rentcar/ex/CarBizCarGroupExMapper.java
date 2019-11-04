@@ -46,4 +46,7 @@ public interface CarBizCarGroupExMapper {
     List<CarBizCarGroup> queryGroupNameByIds(@Param("idList")List<Integer> idList);
 
     CarBizCarGroup queryGroupByGroupNameAndStatus (@Param("groupName") String groupName,@Param("status")Integer status);
+
+    List<CarBizCarGroup> queryAllGroup();
+
 }

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.ex.YueAoTongPhoneConfigExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.controller.driver.YueAoTongPhoneConfig" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="delete_status" property="deleteStatus" jdbcType="TINYINT" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="update_user" property="updateUser" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="create_user" property="createUser" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, city_id, city_name, supplier_id, supplier_name, phone, delete_status, update_time,
+    update_user, create_time, create_user
+  </sql>
+  <select id="findAll" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from yueAoTong_phone_config
+    where delete_status = 0
+  </select>
+  <select id="findBySupplierId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select phone
+    from yueAoTong_phone_config
+    where 1=1 and  supplier_id  in (${supplierIds})and delete_status = 0
+  </select>
+</mapper>

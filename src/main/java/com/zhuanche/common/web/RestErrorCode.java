@@ -253,6 +253,56 @@ public final class RestErrorCode{
 	public static final int DRIVER_ACCOUNT_APPLY_EXIST=40001;
 	//----------------------------------------------千里眼业务
 
+	//------------------------------------------------新城际拼车业务
+	@ResultMessage("该地点不含有城际拼车的线路")
+	public static final int UNDEFINED_LINE = 50000;
+
+	@ResultMessage("获取上车点地址失败")
+	public static final int GET_ON_ADDRESS_FAILED = 50010;
+
+	@ResultMessage("获取下车点地址失败")
+	public static final int GET_OFF_ADDRESS_FAILED = 50011;
+
+	@ResultMessage("预订人注册失败")
+	public static final int REGISTER_BY_PHONE = 50012;
+
+	@ResultMessage("上下车点不再围栏区域")
+	public static final int ADD_NOT_RIGHT = 50013;
+
+	@ResultMessage("未匹配到线路")
+	public static final int UNFINDED_LINE = 50014;
+
+	@ResultMessage("未获取到预估价")
+	public static final int UNGET_PRICE = 50015;
+
+	@ResultMessage("创建子单失败")
+	public static final int FAILED_CREATE_SUB_ORDER = 50020;
+
+	@ResultMessage("绑定主单失败")
+	public static final int BIND_MAIN_FAILED = 50100;
+	@ResultMessage("改派订单失败")
+	public static final int CHANGE_MAIN_FAILED = 50101;
+
+	@ResultMessage("获取主单失败")
+	public static final int FAILED_GET_MAIN_ORDER = 50102;
+
+	@ResultMessage("更新子订单失败")
+	public static final int UPDATE_SUB_ORDER_FAILED = 50301;
+
+	@ResultMessage("未获取到订单数据")
+	public static final int ORDER_DETAIL_UNDEFINED = 50302;
+
+	@ResultMessage("取消订单失败")
+	public static final int CANCEL_FAILED = 50200;
+	@ResultMessage("计费违约金取消失败")
+	public static final int CHARGE_CANCEL_FAILED = 50201;
+
+	@ResultMessage("关键字不能为空")
+	public static final int KEYWORDS_IS_NOT_NULL = 50501;
+
+
+
+	//------------------------------------------------
 
 	//-------------------金融商品--start-------------------------
 

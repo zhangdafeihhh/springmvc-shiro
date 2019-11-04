@@ -443,22 +443,21 @@
 			<artifactId>itext-asian</artifactId>
 			<version>5.2.0</version>
 		</dependency>
-	</dependencies>
+    </dependencies>
 
 	<!-- 多环境配置BEGIN -->
 	<profiles>
 		<profile>
 			<id>dev</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
 			<properties>
 				<env.name>dev</env.name>
 			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 		</profile>
 		<profile>
 			<id>test</id>
-
 			<properties>
 				<env.name>test</env.name>
 			</properties>

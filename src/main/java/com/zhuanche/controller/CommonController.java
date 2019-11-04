@@ -313,5 +313,40 @@ public class CommonController {
         List<CarBizSupplier> carBizSuppliers = citySupplierTeamCommonService.querySupplierAllList( cityIdset );
         return AjaxResponse.success(carBizSuppliers);
     }
+    
+    /**
+     * 
+     * suppliersIntegerAll:(城际拼车专用). <br/>  
+     * @author baiyunlong
+     * @param cityId
+     * @param cityIds
+     * @return
+     */
+    @RequestMapping("/suppliersIntegerAll")
+    @ResponseBody
+    public AjaxResponse suppliersIntegerAll(
+            @Verify(param = "cityId", rule = "required") Integer cityId,  String cityIds ){
+
+        Set<Integer> cityIdset = new HashSet<Integer>();
+        cityIdset.add(cityId);
+        if(StringUtils.isNotEmpty(cityIds)) {//当传入多个cityid时
+            Set<Integer> cityids = Stream.of(cityIds.split(",")).mapToInt( s -> {
+                if(StringUtils.isNotEmpty(s)) {
+                    return Integer.valueOf(s);
+                }else {
+                    return -1;
+                }
+            }).boxed().collect(Collectors.toSet());
+            cityIdset.addAll(cityids);
+        }
+/*        List<CarBizSupplier> carBizSuppliersAll=new ArrayList<CarBizSupplier>();
+        CarBizSupplier carBizSupplier=new CarBizSupplier();
+        carBizSupplier.setSupplierId(-1);
+        carBizSupplier.setSupplierFullName("抢单");
+        carBizSuppliersAll.add(carBizSupplier);*/
+        List<CarBizSupplier> carBizSuppliers = citySupplierTeamCommonService.querySupplierAllList( cityIdset );
+        /*carBizSuppliersAll.addAll(carBizSuppliers);*/
+        return AjaxResponse.success(carBizSuppliers);
+    }
 }
 

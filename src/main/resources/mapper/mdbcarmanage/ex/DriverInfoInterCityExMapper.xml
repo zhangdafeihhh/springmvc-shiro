@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="driver_phone" property="driverPhone" jdbcType="VARCHAR" />
+    <result column="license_plates" property="licensePlates" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+    <result column="team_id" property="teamId" jdbcType="INTEGER" />
+    <result column="team_name" property="teamName" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="create_name" property="createName" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+    <result column="update_name" property="updateName" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="group_id" property="groupId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, driver_id, driver_name, driver_phone, license_plates, city_id, city_name, supplier_id, 
+    supplier_name, team_id, team_name, status, create_by, create_name, create_time, update_by, 
+    update_name, update_time,group_id
+  </sql>
+  <select id="queryDriver" resultType="com.zhuanche.dto.mdbcarmanage.MainOrderDetailDTO" >
+    SELECT  t.city_id as cityId,t.city_name as cityName, t.group_id as groupId, t.supplier_name as supplierName,t.id,t.driver_name as driverName,t.license_plates as licensePlates,t.driver_id as driverId,
+    t.driver_phone as driverPhone,
+    case WHEN m.`status`=1 THEN m.main_order_no  ELSE '' END mainOrder,
+    case WHEN m.`status`=1 THEN m.main_name  ELSE '' END subRouteName,
+    case WHEN m.`status`=1 THEN m.main_time  ELSE '' END mainOrderTime
+    FROM main_order_inter_city m inner JOIN  driver_info_inter_city t
+    on t.driver_id =  m.driver_id
+    WHERE 1=1   and m.status=1 and t.status =1
+    <if test="cityId!=null and cityId!=''">
+      and t.city_id = #{cityId}
+    </if>
+    <if test="supplierId!=null and supplierId!=''">
+      and t.supplier_id = #{supplierId}
+    </if>
+    <if test="driverName!=null and driverName!=''">
+      and t.driver_name = #{driverName}
+    </if>
+    <if test="driverPhone!=null and driverPhone!=''">
+      and t.driver_phone = #{driverPhone}
+    </if>
+    <if test="licensePlates!=null and licensePlates!=''">
+      and t.license_plates = #{licensePlates}
+    </if>
+    <if test="cityIds != null and cityIds.size()>0">
+      and city_id in
+      <foreach collection="cityIds" item="item" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+    </if>
+
+
+    <if test="supplierIds != null and supplierIds.size()>0">
+      and supplier_id in
+      <foreach collection="supplierIds" item="item" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+    </if>
+
+
+    UNION
+    SELECT t.city_id as cityId,t.city_name as cityName, t.group_id as groupId, t.supplier_name as supplierName,t.id,t.driver_name as driverName,t.license_plates as licensePlates,t.driver_id as driverId,
+    t.driver_phone as driverPhone,
+    case WHEN m.`status`=1 THEN m.main_order_no  ELSE '' END mainOrder,
+    case WHEN m.`status`=1 THEN m.main_name  ELSE '' END subRouteName,
+    case WHEN m.`status`=1 THEN m.main_time  ELSE '' END mainOrderTime
+    FROM driver_info_inter_city t LEFT JOIN main_order_inter_city m
+    on t.driver_id =  m.driver_id
+    WHERE  1=1  and t.status =1
+
+
+    <if test="cityId!=null and cityId!=''">
+      and t.city_id = #{cityId}
+    </if>
+    <if test="supplierId!=null and supplierId!=''">
+      and t.supplier_id = #{supplierId}
+    </if>
+    <if test="driverName!=null and driverName!=''">
+      and t.driver_name = #{driverName}
+    </if>
+    <if test="driverPhone!=null and driverPhone!=''">
+      and t.driver_phone = #{driverPhone}
+    </if>
+    <if test="licensePlates!=null and licensePlates!=''">
+      and t.license_plates = #{licensePlates}
+    </if>
+    <if test="cityIds != null and cityIds.size()>0">
+      and city_id in
+      <foreach collection="cityIds" item="item" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+    </if>
+
+
+    <if test="supplierIds != null and supplierIds.size()>0">
+      and supplier_id in
+      <foreach collection="supplierIds" item="item" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+    </if>
+
+    GROUP BY t.driver_id
+
+
+
+  </select>
+
+  <select id="getByDriverId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from driver_info_inter_city
+    where driver_id = #{driverId,jdbcType=INTEGER} limit 1
+  </select>
+
+
+  <select id="queryMainOrderDrivers" resultType="com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity">
+    SELECT t.city_id as cityId,t.city_name as cityName, t.group_id as groupId, t.supplier_name as supplierName,t.id,t.driver_name as driverName,t.license_plates as licensePlates,t.driver_id as driverId,
+    t.driver_phone as driverPhone
+    FROM driver_info_inter_city t
+    WHERE 1=1
+    <if test="cityId!=null and cityId!=''">
+      and t.city_id = #{cityId}
+    </if>
+    <if test="supplierId!=null and supplierId!=''">
+      and t.supplier_id = #{supplierId}
+    </if>
+    <if test="driverName!=null and driverName!=''">
+      and t.driver_name  = #{driverName}
+    </if>
+    <if test="driverPhone!=null and driverPhone!=''">
+      and t.driver_phone = #{driverPhone}
+    </if>
+    <if test="licensePlates!=null and licensePlates!=''">
+      and t.license_plates = #{licensePlates}
+    </if>
+
+    <if test="driverIds!=null and driverIds!=''">
+      and t.driver_id  in (${driverIds})
+    </if>
+  </select>
+
+
+
+
+
+
+</mapper>

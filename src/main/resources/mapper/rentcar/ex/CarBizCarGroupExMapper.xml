@@ -161,4 +161,14 @@
             #{item}
         </foreach>
     </select>
+
+
+    <select id="queryAllGroup" resultMap="BaseResultMap">
+        select
+        group_id,
+        group_name,
+        seat_num
+        from
+        car_biz_car_group
+    </select>
 </mapper>

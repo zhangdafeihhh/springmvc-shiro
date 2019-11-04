@@ -79,4 +79,7 @@ public interface CarBizCarInfoExMapper {
 	CarBizCarInfoDTO selectCarCitySupplierInfoByCarId(Integer carId);
 
 	CarBizCarInfoDTO  selectBasicCarInfo(Integer carId);
+
+	/**根据司机id查询车型**/
+	Integer groupIdByDriverId(@Param("driverId")Integer driverId);
 }

@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.zhuanche.dto.rentcar.DriverComplianceDTO;
 import com.zhuanche.entity.driver.DriverActionVO;
+import com.zhuanche.entity.rentcar.DriverEntity;
 import org.apache.ibatis.annotations.Param;
 
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
@@ -195,4 +196,6 @@ public interface CarBizDriverInfoExMapper {
      * @return
      */
     List<DriverComplianceDTO> queryDriverComplianceDTOListByDriverIdSet(@Param("driverIdSet") Set<Integer> driverIdSet);
+
+    List<DriverEntity> queryDriverIdBySupplierId(DriverEntity driverEntity);
 }
