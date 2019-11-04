@@ -764,7 +764,17 @@ public class IntegerCityController {
                     dto.setRiderCount(jsonData.get("factDriverId") == null ? 0 : jsonData.getInteger("factDriverId"));
                     dto.setBoardingTime(jsonData.get("bookingDate") == null ? "" : jsonData.getString("bookingDate"));
                     dto.setBoardingGetOffCityId(jsonData.get("bookingEndAddr") == null ? "" : jsonData.getString("bookingEndAddr"));
-                    dto.setBookingStartPoint(jsonData.get("bookingStartPoint") == null ? "" : jsonData.getString("bookingStartPoint"));
+                    String jsonPoint = jsonData.get("bookingStartPoint") == null ? "" : jsonData.getString("bookingStartPoint");
+                    if(StringUtils.isNotEmpty(jsonPoint)){
+                        if(jsonPoint.contains(";")){
+                            String[] arr = jsonPoint.split(";");
+                            if(arr.length >0){
+                                dto.setBookingStartPoint(arr[0]);
+                            }
+                        }else {
+                            dto.setBookingStartPoint(jsonPoint);
+                        }
+                    }
                     dto.setBookingEndPoint(jsonData.get("bookingEndPoint") == null ? "" : jsonData.getString("bookingEndPoint"));
                     dto.setStatus(jsonData.get("status") == null ? null : jsonData.getInteger("status"));
                     dto.setOrderTime(jsonData.get("createDate") == null ? null : jsonData.getString("createDate"));
