@@ -1485,11 +1485,11 @@ public class IntegerCityController {
         }*/
 
         //根据driverId获取groupId
-        Integer newDriverId = carBizCarInfoExMapper.groupIdByDriverId(driverId);
-        if(newDriverId != null && newDriverId>0){
-            map.put("carGroupId", groupId);
-            listParam.add("carGroupId=" + groupId);
-            int carSeatNums = seatCount(Integer.valueOf(groupId));
+        Integer newGroupId = carBizCarInfoExMapper.groupIdByDriverId(driverId);
+        if(newGroupId != null && newGroupId>0){
+            map.put("carGroupId", newGroupId);
+            listParam.add("carGroupId=" + newGroupId);
+            int carSeatNums = seatCount(Integer.valueOf(newGroupId));
             map.put("carSeatNums", carSeatNums);
             listParam.add("carSeatNums=" + carSeatNums);
         }else {
@@ -1650,11 +1650,11 @@ public class IntegerCityController {
 
 
             //根据driverId获取groupId
-            Integer newDriverId = carBizCarInfoExMapper.groupIdByDriverId(driverId);
-            if(newDriverId != null && newDriverId>0){
-                map.put("groupId", groupId);
-                listParam.add("groupId=" + groupId);
-                int carSeatNums = seatCount(Integer.valueOf(groupId));
+            Integer newGroupId = carBizCarInfoExMapper.groupIdByDriverId(driverId);
+            if(newGroupId != null && newGroupId>0){
+                map.put("groupId", newGroupId);
+                listParam.add("groupId=" + newGroupId);
+                int carSeatNums = seatCount(Integer.valueOf(newGroupId));
                 map.put("carSeatNums", carSeatNums);
                 listParam.add("carSeatNums=" + carSeatNums);
             }else {
