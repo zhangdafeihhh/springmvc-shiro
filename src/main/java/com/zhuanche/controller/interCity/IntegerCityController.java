@@ -1598,6 +1598,15 @@ public class IntegerCityController {
                             }
                         } catch (Exception e) {
                             logger.error("子单绑定异常=======" + e);
+                            String newMainOrderNo = jsonData.getString("mainOrderNo");
+                            MainOrderInterCity queryMain = interService.queryMainOrder(newMainOrderNo);
+                            logger.info("补录子单绑定开始====" + JSONObject.toJSONString(queryMain));
+                            if (queryMain != null && queryMain.getId() > 0) {
+                               int code =  interService.updateMainOrderState(newMainOrderNo, 1,mobile);
+                               if(code > 0){
+                                   logger.info("=====补录异常成功=====");
+                               }
+                            }
                         }
                         return "=============子单绑定异常==========";
                     }
@@ -1743,10 +1752,15 @@ public class IntegerCityController {
                         @Override
                         public String call() throws Exception {
                             //如果是新增或者改派，需要将
+
                             logger.info("==============异步改派开始===========" + jsonResult.getJSONObject("data"));
                             try {
-                                if(StringUtils.isEmpty(mainOrderNo)){
-                                    JSONObject jsonData = jsonResult.getJSONObject("data");
+                                JSONObject jsonData = jsonResult.getJSONObject("data");
+                                String newMainOrderNo = jsonData.getString("mainOrderNo");
+
+                                MainOrderInterCity queryMainOrder  = interService.queryMainOrder(newMainOrderNo);
+
+                                if(queryMainOrder == null || queryMainOrder.getId() == 0){
                                     int code =0;
                                     MainOrderInterCity main = new MainOrderInterCity();
                                     main.setDriverId(driverId);
@@ -1754,7 +1768,7 @@ public class IntegerCityController {
                                     main.setUpdateTime(new Date());
                                     main.setMainName(routeName);
                                     main.setStatus(MainOrderInterCity.orderState.NOTSETOUT.getCode());
-                                    main.setMainOrderNo(jsonData.getString("mainOrderNo"));
+                                    main.setMainOrderNo(newMainOrderNo);
                                     main.setOpePhone(mobile);
                                     main.setMainTime(orderTime);
                                     logger.info("=====改派入库数据：" + JSONObject.toJSONString(main));
@@ -1765,10 +1779,9 @@ public class IntegerCityController {
                                         return String.valueOf(code);
                                     }
                                 }else {
-                                    MainOrderInterCity queryMainOrder  = interService.queryMainOrder(mainOrderNo);
                                     logger.info("=========更新数据=======" + JSONObject.toJSONString(queryMainOrder));
                                     if(queryMainOrder != null && queryMainOrder.getId()>0){
-                                        int code = interService.updateMainOrderState(mainOrderNo,1,mobile);
+                                        int code = interService.updateMainOrderState(newMainOrderNo,1,mobile);
                                         if(code > 0){
                                             logger.info("=============异步更新数据成功=========");
                                             return String.valueOf(code);
@@ -1776,6 +1789,20 @@ public class IntegerCityController {
                                     }
                                 }
                             } catch (Exception e) {
+                                System.out.println("更新数据异常：补录更新数据" );
+
+                                JSONObject jsonData = jsonResult.getJSONObject("data");
+                                String newMainOrderNo = jsonData.getString("mainOrderNo");
+
+                                MainOrderInterCity queryMainOrder  = interService.queryMainOrder(newMainOrderNo);
+
+                                if(queryMainOrder != null && queryMainOrder.getId()>0){
+                                    int code = interService.updateMainOrderState(newMainOrderNo,1,mobile);
+                                    if(code > 0){
+                                        logger.info("=============异步更新数据成功=========");
+                                        return String.valueOf(code);
+                                    }
+                                }
 
                                 return "=============子单绑定异常==========" + e;
                              }

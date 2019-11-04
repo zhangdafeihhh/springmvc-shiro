@@ -80,10 +80,10 @@ public class MainInterCityListener implements MessageListenerOrderly {
                 JSONObject jsonMemo = jsonObject.get("memo") == null ? null : jsonObject.getJSONObject("memo");
 
                 JSONObject dispatcherPhone = null;
-                if(jsonMemo != null){
+                /*if(jsonMemo != null){
                     dispatcherPhone = jsonMemo.get("dispatcherPhone") == null ? null : jsonMemo.getJSONObject("dispatcherPhone");
 
-                }
+                }*/
 
 
                 if(StringUtils.isNotBlank(mainOrderNo) ) {
