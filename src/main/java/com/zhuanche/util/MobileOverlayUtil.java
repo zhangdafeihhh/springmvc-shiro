@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author admin
  */
 public class MobileOverlayUtil {
-    private static final String OVERLAY = "XXXX";
+    private static final String OVERLAY = "****";
     private static final int START = 3;
     private static final int END = 7;
 
