@@ -11,6 +11,7 @@ import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
 import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
+import com.zhuanche.util.MobileOverlayUtil;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.rentcar.ex.CarBizCustomerAppraisalExMapper;
 import mapper.rentcar.ex.CarBizCustomerAppraisalStatisticsExMapper;
@@ -135,6 +136,7 @@ public class CustomerAppraisalService {
                     item.setIdCardNo(driverInfotemp.getIdCardNo());
                     item.setCityId(driverInfotemp.getServiceCity());
                 }
+                item.setDriverPhone(MobileOverlayUtil.doOverlayPhone(item.getDriverPhone()));
             }
             List<CarRelateTeam> relateTeams = carDriverTeamExMapper.queryDriverTeamListByDriverIds(ids);
             relateTeams.forEach( carRelateTeam -> {

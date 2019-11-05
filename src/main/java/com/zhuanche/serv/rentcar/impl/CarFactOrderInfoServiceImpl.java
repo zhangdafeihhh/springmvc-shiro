@@ -17,6 +17,7 @@ import com.zhuanche.serv.order.DriverFeeDetailService;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.util.Common;
 import com.zhuanche.util.CommonStringUtils;
+import com.zhuanche.util.MobileOverlayUtil;
 import com.zhuanche.util.MyRestTemplate;
 import mapper.driverOrderRecord.DriverOrderRecordMapper;
 import mapper.orderPlatform.PoolMainOrderMapper;
@@ -277,6 +278,7 @@ public class CarFactOrderInfoServiceImpl implements CarFactOrderInfoService {
 							}else {
 								carFactOrderInfoDTO.setChannelSource("0");
 							}
+							carFactOrderInfoDTO.setDriverPhone(MobileOverlayUtil.doOverlayPhone(carFactOrderInfoDTO.getDriverPhone()));
 						});
 						fillDriverAmount(list);
 						setCarFactOrderMemo(list);
