@@ -7,6 +7,7 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.entity.driverPreparate.DriverPreparate;
 import com.zhuanche.serv.driverPreparate.DriverPreparateService;
+import com.zhuanche.util.MobileOverlayUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.util.TextUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -73,7 +74,16 @@ public class DriverPreparateController {
 			}
 		}
 		PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
+		overLayPhone(list);
 		return AjaxResponse.success(pageDTO);
+	}
+
+	private void overLayPhone(List<DriverPreparate> list) {
+		if (Objects.nonNull(list)){
+			for (DriverPreparate driverPreparate : list) {
+				driverPreparate.setDriverPhone(MobileOverlayUtil.doOverlayPhone(driverPreparate.getDriverPhone()));
+			}
+		}
 	}
 
 	/**

@@ -17,6 +17,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.DriverUtils;
+import com.zhuanche.util.MobileOverlayUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -121,7 +122,16 @@ public class DriverOutageController {
         }
         //查数据
         rows = driverOutageService.queryForListObject(params);
+        overLayPhone(rows);
         return AjaxResponse.success(new PageDTO(params.getPage(), params.getPagesize(), total, BeanUtil.copyList(rows, DriverOutageDTO.class)));
+    }
+
+    private void overLayPhone(List<DriverOutage> rows) {
+        if (Objects.nonNull(rows)){
+            for (DriverOutage row : rows) {
+                row.setDriverPhone(MobileOverlayUtil.doOverlayPhone(row.getDriverPhone()));
+            }
+        }
     }
 
     /**
