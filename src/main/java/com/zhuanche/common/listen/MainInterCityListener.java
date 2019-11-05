@@ -60,7 +60,7 @@ public class MainInterCityListener implements MessageListenerOrderly {
     public ConsumeOrderlyStatus consumeMessage(List<MessageExt> msgs, ConsumeOrderlyContext context) {
         try {
             for (MessageExt msg : msgs) {
-                logger.info("consumer order start...messageId:{}; body:{}", msg.getMsgId(), msg.getBody());
+                logger.info("MainInterCityListen consumer order start...messageId:{}", msg.getMsgId());
                 String topic = msg.getTopic();
                 if(StringUtils.isBlank(topic)){
                     logger.info("topic is null");
@@ -88,7 +88,7 @@ public class MainInterCityListener implements MessageListenerOrderly {
 
                 if(StringUtils.isNotBlank(mainOrderNo) ) {
                     if (StringUtils.isNotBlank(driverId) && serviceTypeId != null) {
-                        logger.info("===========mq监听修改司机开始===================");
+                        logger.info("===========监听城际拼车状态开始===================");
                         if (serviceTypeId==68) {
 
                             if(MAIN_STATUS == status){
