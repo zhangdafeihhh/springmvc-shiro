@@ -202,23 +202,31 @@ public class IntegerCityController {
         }
 
         StringBuilder cityBuilder = new StringBuilder();
-        if (citiesSet != null) {
+        if (citiesSet != null && citiesSet.size()>0) {
             List<Integer> listCity = new ArrayList<>(citiesSet);
             for (int i = 0; i < listCity.size(); i++) {
                 cityBuilder.append(listCity.get(i)).append(SPLIT);
             }
         }
         StringBuilder supplierBuilder = new StringBuilder();
-        if (suppliersSet != null) {
+        if (suppliersSet != null && suppliersSet.size()>0) {
             List<Integer> listSupplier = new ArrayList<>(suppliersSet);
             for (int i = 0; i < listSupplier.size(); i++) {
                 supplierBuilder.append(listSupplier.get(i)).append(SPLIT);
             }
+        }else{
+            if (!WebSessionUtil.isSupperAdmin() && citiesSet.size()>0) {
+                List<CarBizSupplier> carBizSuppliers=citySupplierTeamCommonService.querySupplierAllList(citiesSet);
+                List<Integer> supplierIds= carBizSuppliers.stream().map(f -> f.getSupplierId()).collect(Collectors.toList());
+                for (int i = 0; i < supplierIds.size(); i++) {
+                    supplierBuilder.append(supplierIds.get(i)).append(SPLIT);
+                }
+            }
         }
 
-        if (StringUtils.isNotEmpty(cityBuilder.toString())) {
+/*        if (StringUtils.isNotEmpty(cityBuilder.toString())) {
             serviceCityBatch = cityBuilder.toString().substring(0, cityBuilder.toString().length() - 1);
-        }
+        }*/
 
         if (StringUtils.isNotEmpty(supplierBuilder.toString())) {
             supplierIdBatch = supplierBuilder.toString().substring(0, supplierBuilder.toString().length() - 1);
@@ -254,9 +262,9 @@ public class IntegerCityController {
         map.put("riderPhone", riderPhone);
 
         //根据不同权限添加过滤条件
-        if (StringUtils.isNotEmpty(serviceCityBatch)) {
+/*        if (StringUtils.isNotEmpty(serviceCityBatch)) {
             map.put("cityIdBatch", serviceCityBatch);
-        }
+        }*/
 
         if (StringUtils.isNotEmpty(supplierIdBatch)) {
             map.put("supplierIdBatch", supplierIdBatch);
@@ -339,7 +347,7 @@ public class IntegerCityController {
         } else {
             citiesSet = loginUser.getCityIds();
         }
-        StringBuilder cityBuilder = new StringBuilder();
+/*        StringBuilder cityBuilder = new StringBuilder();
         if (citiesSet != null) {
             List<Integer> listCity = new ArrayList<>(citiesSet);
             for (int i = 0; i < listCity.size(); i++) {
@@ -349,7 +357,7 @@ public class IntegerCityController {
 
         if (StringUtils.isNotEmpty(cityBuilder.toString())) {
             serviceCityBatch = cityBuilder.toString().substring(0, cityBuilder.toString().length() - 1);
-        }
+        }*/
 
         Map<String, Object> map = Maps.newHashMap();
         map.put("pageNo", pageNum);
@@ -373,9 +381,9 @@ public class IntegerCityController {
         map.put("riderPhone", riderPhone);
 
         //根据不同权限添加过滤条件
-        if (StringUtils.isNotEmpty(serviceCityBatch)) {
+/*        if (StringUtils.isNotEmpty(serviceCityBatch)) {
             map.put("cityIdBatch", serviceCityBatch);
-        }
+        }*/
 
 
         map.put("serviceTypeIdBatch", "68");
