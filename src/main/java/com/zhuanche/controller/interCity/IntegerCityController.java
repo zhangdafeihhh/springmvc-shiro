@@ -236,17 +236,11 @@ public class IntegerCityController {
         Map<String, Object> map = Maps.newHashMap();
         map.put("pageNo", pageNum);
         map.put("pageSize", pageSize);
-        /*map.put("cityId",cityId);
-        map.put("supplierId",supplierId);*/
         map.put("status", orderState);
         map.put("pushDriverType", pushDriverType);
         map.put("serviceTypeIdBatch", 68);
         map.put("orderType", orderSource);
-/*
-        map.put("type",serviceType);
-*/
         map.put("airportId", airportId);
-        //map.put("orderSource",orderSource);
         map.put("driverName", driverName);
         map.put("driverPhone", driverPhone);
         map.put("licensePlates", licensePlates);
@@ -270,9 +264,6 @@ public class IntegerCityController {
             map.put("supplierIdBatch", supplierIdBatch);
         }
 
-        /*if (serviceType == null) {
-            map.put("serviceTypeIdBatch", "68");
-        }*/
         //添加排序字段
         JSONObject jsonSort = new JSONObject();
         jsonSort.put("field", "createDate");
@@ -588,7 +579,7 @@ public class IntegerCityController {
             sb.append("type=1").append(SYSMOL);
             map.put("bookingUserName", reserveName);
             sb.append("bookingUserName=" + reserveName).append(SYSMOL);
-            map.put("clientType", 28);//订单类型
+            map.put("clientType", 28);//订单类型 28 手动录单 http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=37118198
             sb.append("clientType=28").append(SYSMOL);
             map.put("bookingDate", bookingDate);//预定日期（时间戳）
             sb.append("bookingDate=" + bookingDate).append(SYSMOL);
@@ -606,7 +597,7 @@ public class IntegerCityController {
 
             map.put("cityId", boardingCityId);
             sb.append("cityId=" + boardingCityId).append(SYSMOL);
-            map.put("serviceTypeId", 68);
+            map.put("serviceTypeId", 68);//新城际拼车
             sb.append("serviceTypeId=68").append(SYSMOL);
             map.put("payFlag", "1");//付款人标识 0-预订人付款，1-乘车人付款，2-门童代人叫车乘车人是自己且乘车人付款，-1-机构付款
             sb.append("payFlag=1").append(SYSMOL);
@@ -651,7 +642,7 @@ public class IntegerCityController {
                 }
             }
 
-            map.put("couponId", "111");
+            map.put("couponId", "111");//优惠券id
             sb.append("couponId=111").append(SYSMOL);
             map.put("estimatedAmount", estimatedAmount);//预估金额
             sb.append("estimatedAmount=" + estimatedAmount).append(SYSMOL);
@@ -2338,7 +2329,6 @@ public class IntegerCityController {
 			    if (jsonResult!=null && jsonResult.getInteger("code")==0) {
 					if (jsonResult.get("data")!=null) {
 						return jsonResult.get("data").toString();
-						
 					}
 				}
 			}

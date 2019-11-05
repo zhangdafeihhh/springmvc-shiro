@@ -47,7 +47,7 @@ public class NewInterCityListener implements MessageListenerOrderly {
     public ConsumeOrderlyStatus consumeMessage(List<MessageExt> msgs, ConsumeOrderlyContext context) {
         try {
             for (MessageExt msg : msgs) {
-                logger.info("consumer order start...messageId:{}", msg.getMsgId());
+                logger.info("NewInterCityListener consumer order start...messageId:{}", msg.getMsgId());
                 String topic = msg.getTopic();
                 if(StringUtils.isBlank(topic)){
                     logger.info("topic is null");
@@ -124,34 +124,6 @@ public class NewInterCityListener implements MessageListenerOrderly {
                                                         }
                                                     }
                                                 }
-                                                /*if (jsonSupplier.get("supplierId") != null) {
-                                                    String suppliers = jsonSupplier.getString("supplierId");
-                                                    String[] supplierArr = suppliers.split(",");
-                                                    List<Integer> mapSupplier = new ArrayList<>();
-
-                                                    for(int i =0 ;i<supplierArr.length;i++){
-                                                        mapSupplier.add(Integer.valueOf(supplierArr[i]));
-                                                    }
-
-                                                    List<CarAdmUser> listAdm = exMapper.selectUsersByLevel(4);//查询所有的供应商
-                                                    for(CarAdmUser user : listAdm){
-                                                        String saasSupplier = user.getSuppliers();
-                                                        String[] saasArr = saasSupplier.split(",");
-
-                                                        List<Integer> saasList = new ArrayList<>();
-                                                        for(int k = 0;k<saasArr.length;k++){
-                                                            if(StringUtils.isNotEmpty(saasArr[k])){
-                                                                saasList.add(Integer.valueOf(saasArr[k]));
-                                                            }
-                                                        }
-                                                        if(saasList.retainAll(mapSupplier)){
-                                                            String phone = user.getPhone();
-                                                            logger.info("=====发送短信开始======");
-                                                            SmsSendUtil.send(phone, "您好，有一个跨城订单，请登录后台及时抢单");
-                                                        }
-                                                    }
-
-                                                }*/
                                             }
                                         }
 
