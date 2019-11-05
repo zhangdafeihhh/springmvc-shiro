@@ -170,8 +170,8 @@ public class MainInterCityListener implements MessageListenerOrderly {
                                      DriverInfoInterCity city =  driverInfoInterCityExMapper.getByDriverId(Integer.valueOf(driverId));
                                      if(city != null && city.getSupplierId()>0){
                                          YueAoTongPhoneConfig config = this.queryOpePhone(city.getSupplierId().toString());
-                                         if(config == null){
-                                             opePhone = "13552448009";
+                                         if(config == null || StringUtils.isEmpty(config.getPhone())){
+                                             opePhone = city.getDriverPhone();//如果车管配置的手机为空，则留当前司机的手机号
                                          }else {
                                              opePhone = config.getPhone();
                                          }
