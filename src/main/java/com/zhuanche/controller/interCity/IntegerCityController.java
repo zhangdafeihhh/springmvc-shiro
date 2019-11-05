@@ -1189,8 +1189,8 @@ public class IntegerCityController {
         }
 
         if (StringUtils.isNotEmpty(carGroup)) {
-            map.put("carGroupId", carGroup);
-            list.add("carGroupId=" + carGroup);
+            map.put("groupIds", carGroup);
+            list.add("groupIds=" + carGroup);
         }
 
         if (StringUtils.isNotEmpty(bookingStartShortAddr)) {
