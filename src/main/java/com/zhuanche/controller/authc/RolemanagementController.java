@@ -3,7 +3,9 @@ package com.zhuanche.controller.authc;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.zhuanche.common.syslog.SysLogAnn;
 import com.zhuanche.common.web.RequestFunction;
+import com.zhuanche.dto.mdbcarmanage.CarAdmUserDto;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,7 @@ public class RolemanagementController{
 	@RequestMapping("/addSaasRole")
 	@RequiresPermissions(value = { "ADD_SAAS_ROLE" } )
 	@RequestFunction(menu = ROLE_ADD)
+	@SysLogAnn(module="RoleManage",methods="addSaasRole",parameterType="Integer",parameterKey="roleId",objClass= SaasRole.class )
 	public AjaxResponse addSaasRole( @Verify(param="roleCode",rule="required") String roleCode,  @Verify(param="roleName",rule="required") String roleName) {
 		SaasRole role = new SaasRole();
 		role.setRoleCode(roleCode.trim());

@@ -50,7 +50,7 @@ public class RoleManagementService{
 		//保存
 		role.setValid(true);
 		saasRoleMapper.insertSelective(role);
-		return AjaxResponse.success( null );
+		return AjaxResponse.success( role );
 	}
 
 	/**二、禁用一个角色**/

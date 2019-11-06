@@ -1,10 +1,13 @@
 package com.zhuanche.entity.mdbcarmanage;
 
+import com.zhuanche.common.syslog.Column;
+
 public class SaasRole {
+    @Column(desc="角色ID")
     private Integer roleId;
-
+    @Column(desc="角色代码")
     private String roleCode;
-
+    @Column(desc="角色名称")
     private String roleName;
 
     private Boolean valid;
