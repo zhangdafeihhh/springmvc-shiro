@@ -88,7 +88,11 @@ public class NewInterCityListener implements MessageListenerOrderly {
                         logger.info("=========获取坐标做的数据=====" + JSONObject.toJSONString(on));
                         if(on.length >0 && startCityId>0 && endCityId>0 ) {
                             String boardFirstAdd = on[0];
+                            if(StringUtils.isEmpty(boardFirstAdd)){
+                                continue;
+                            }
                             String[] boardPoint = boardFirstAdd.split(",");
+
                             if(boardPoint.length > 0){
                                 String x = boardPoint[0];
                                 String y = boardPoint[1];

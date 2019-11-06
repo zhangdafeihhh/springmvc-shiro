@@ -10,9 +10,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.zhuanche.common.enums.PermissionLevelEnum;
+import com.zhuanche.dto.mdbcarmanage.CarAdmUserDto;
 import com.zhuanche.entity.mdbcarmanage.DriverTelescopeUser;
 import mapper.mdbcarmanage.ex.DriverTelescopeUserExMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -114,8 +116,10 @@ public class UserManagementService{
 		//短信通知
 		String text = user.getUserName() + "，您好！已为您成功开通“首约加盟商服务平台”管理员账号。登录账号为："+user.getAccount()+"，初始密码为："+initPassword+"（为保障账户安全，请您登录后进行密码修改）";
     	SmsSendUtil.send( user.getPhone() , text);
-		
-		return AjaxResponse.success( null );
+
+		//兼容增加用户时要使用log,但是原来成功时返回值的data为null.这里适当改造了下。
+
+		return AjaxResponse.success( this.findByPrimaryKeyV2(user.getUserId()) );
 	}
 
 	/**二、禁用一个用户**/
@@ -351,4 +355,23 @@ public class UserManagementService{
 		DriverTelescopeUser driverTelescopeUser = driverTelescopeUserExMapper.selectTelescopeUserByUserId(userId);
 		return driverTelescopeUser;
 	}
+
+	public CarAdmUser findByPrimaryKey(Integer id ){
+		return carAdmUserMapper.selectByPrimaryKey(id);
+	}
+
+	public CarAdmUserDto findByPrimaryKeyV2 (Integer id ){
+		CarAdmUser dbEntity = carAdmUserMapper.selectByPrimaryKey(id);
+		if(dbEntity == null){
+			return null;
+		}
+		CarAdmUserDto entity = new CarAdmUserDto();
+		BeanUtils.copyProperties(dbEntity,entity);
+		entity.setCityIds(dbEntity.getCities());
+		entity.setSupplierIds(dbEntity.getSuppliers());
+		entity.setTeamIds(dbEntity.getTeamId());
+		return entity;
+	}
+
+
 }

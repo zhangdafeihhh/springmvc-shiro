@@ -151,6 +151,16 @@ public class SysLogAspect {
 				} else {
 					jsonParam = new JSONObject(mapparam);
 				}
+				if (StringUtils.isNotBlank(sysLogAnn.extendParam())) {
+					JSONObject extendParam = JSON.parseObject(sysLogAnn.extendParam());
+					if(jsonParam == null){
+						jsonParam = extendParam;
+					}else {
+						extendParam.putAll(jsonParam);
+						jsonParam = extendParam;
+					}
+
+				}
 				if (jsonParam==null) {
 					// 不需要拦截直接执行
 					object = pjp.proceed();
@@ -233,6 +243,9 @@ public class SysLogAspect {
                             if(requestResult.getCode()==0){
                             	if (StringUtils.isBlank(syslogkey)) {
                             		Object obj = requestResult.getData();
+                            		if(obj == null){
+                            			logger.info("需要在返回值的data里增加返回对象");
+									}
                                 	JSONObject jsonObj = (JSONObject) JSON.toJSON(obj);
                                 	syslogkey=jsonObj.getString(key);
 								}

@@ -33,6 +33,9 @@ public @interface SysLogAnn {
 	boolean paramIsArray() default false;
 	/** 对象参数名*/
 	String parameterObj() default "";
+
+	//扩展的参数，满足enable,disable等只传id，但是少状态的场景。参数为json格式字符串
+	String extendParam() default "";
 	
 	Class objClass();
 }

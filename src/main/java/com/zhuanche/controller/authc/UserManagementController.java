@@ -1,21 +1,32 @@
 package com.zhuanche.controller.authc;
 
+import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.enums.PermissionLevelEnum;
 import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.common.syslog.SysLogAnn;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.dto.financial.FinancialBasicsVehiclesDTO;
+import com.zhuanche.dto.financial.FinancialGoodsInfoDTO;
+import com.zhuanche.dto.mdbcarmanage.CarAdmUserDto;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
+import com.zhuanche.mongo.SysSaveOrUpdateLog;
 import com.zhuanche.serv.CarBizDriverInfoService;
 import com.zhuanche.serv.authc.UserManagementService;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.session.WebSessionUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static com.zhuanche.common.enums.MenuEnum.*;
@@ -28,11 +39,15 @@ public class UserManagementController {
 
 	@Autowired
 	private CarBizDriverInfoService carBizDriverInfoService;
+
+	@Resource(name = "userOperationLogMongoTemplate")
+	private MongoTemplate mongoTemplate;
 	
 	/**一、增加一个用户**/
 	@RequestMapping("/addUser")
 	@RequiresPermissions(value = { "ADD_USER" } )
 	@RequestFunction(menu = USER_ADD)
+	@SysLogAnn(module="CarAdmUser",methods="addUser",parameterType="Integer",parameterKey="userId",objClass= CarAdmUserDto.class )
 	public AjaxResponse addUser( 
 			@Verify(param="account",rule="required|RegExp(^[a-zA-Z0-9_\\-]{3,30}$)") String account, 
 			@Verify(param="userName",rule="required") String userName, 
@@ -71,6 +86,8 @@ public class UserManagementController {
 //			return AjaxResponse.fail(RestErrorCode.PHONE_EXIST );
 //		}
 		AjaxResponse ajaxResponse = userManagementService.addUser(user);
+
+
 		return ajaxResponse;
 	}
 	
@@ -78,6 +95,8 @@ public class UserManagementController {
 	@RequestMapping("/disableUser")
 	@RequiresPermissions(value = { "DISABLE_USER" } )
 	@RequestFunction(menu = USER_DISABLE)
+	@SysLogAnn(module="CarAdmUser",methods="enableUser",
+			serviceClass="userManagementService",queryMethod="findByPrimaryKey",parameterType="Integer",parameterKey="userId",objClass=CarAdmUser.class ,extendParam="{status:100}")
 	public AjaxResponse disableUser ( @Verify(param="userId",rule="required|min(1)") Integer userId ) {
 		return userManagementService.disableUser(userId);
 	}
@@ -86,14 +105,18 @@ public class UserManagementController {
 	@RequestMapping("/enableUser")
 	@RequiresPermissions(value = { "ENABLE_USER" } )
 	@RequestFunction(menu = USER_ENABLE)
+	@SysLogAnn(module="CarAdmUser",methods="enableUser",
+			serviceClass="userManagementService",queryMethod="findByPrimaryKey",parameterType="Integer",parameterKey="userId",objClass=CarAdmUser.class ,extendParam="{status:200}")
 	public AjaxResponse enableUser ( @Verify(param="userId",rule="required|min(1)") Integer userId ) {
 		return userManagementService.enableUser(userId);
 	}
 	
 	/**四、修改一个用户**/
+
 	@RequestMapping("/changeUser")
 	@RequiresPermissions(value = { "CHANGE_USER" } )
 	@RequestFunction(menu = USER_UPDATE)
+	@SysLogAnn(module="CarAdmUser",methods="changeUser",parameterType="Integer",parameterKey="userId",objClass= CarAdmUserDto.class ,serviceClass="userManagementService",queryMethod="findByPrimaryKeyV2")
 	public 	AjaxResponse changeUser( 
 			@Verify(param="userId",rule="required|min(1)") Integer userId, 
 			@Verify(param="userName",rule="required") String userName, 
@@ -101,8 +124,8 @@ public class UserManagementController {
 			@RequestParam("cityIds") String cityIds,
 			@RequestParam("supplierIds") String supplierIds,
 			@RequestParam("teamIds") String teamIds,
-			@RequestParam("groupIds") String groupIds,
-			Integer addTelescope) {
+			@RequestParam("groupIds") String groupIds) {//去掉了未使用的参数addTelescope
+
 		CarAdmUser newUser = new CarAdmUser();
 		newUser.setUserId(userId);
 		newUser.setUserName(userName.trim());
@@ -128,6 +151,9 @@ public class UserManagementController {
 	@RequiresPermissions(value = { "SAVE_ROLEIDS_OF_USER" } )
 	@RequestFunction(menu = USER_ROLE_SAVE)
 	public AjaxResponse saveRoleIds( @Verify(param="userId",rule="required|min(1)") Integer userId,  @Verify(param="roleIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String roleIds) {
+		SysSaveOrUpdateLog sysLog = new SysSaveOrUpdateLog();
+		sysLog.setStartTime(new Date());
+
 		List<Integer> newroleIds = new ArrayList<Integer>();
 		if(roleIds!=null) {
 			String[]  ids = roleIds.split(",");
@@ -143,7 +169,31 @@ public class UserManagementController {
 				}
 			}
 		}
-		return userManagementService.saveRoleIds(userId, newroleIds);
+		AjaxResponse rep = userManagementService.saveRoleIds(userId, newroleIds);
+
+
+		if(rep.getCode() == 0){
+			JSONObject jsonParam = new JSONObject();
+			jsonParam.put("userId",userId);
+			jsonParam.put("roleIds",roleIds);
+
+			SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+			sysLog.setUsername(user.getName());
+			sysLog.setModule("CarAdmUser");
+			sysLog.setMethod("saveRoleIds");
+			sysLog.setOperateParams(jsonParam.toJSONString());
+			sysLog.setLogKey(userId+"");
+			sysLog.setEndTime(new Date());
+			sysLog.setResultMsg("成功");
+			sysLog.setResultStatus(1);
+
+
+			mongoTemplate.insert(sysLog);
+		}
+
+
+
+		return rep;
 	}
 	
 	/**八、查询用户列表**/

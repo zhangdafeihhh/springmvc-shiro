@@ -1,14 +1,20 @@
 package com.zhuanche.entity.mdbcarmanage;
 
+import com.zhuanche.common.syslog.Column;
+
 import java.io.Serializable;
 import java.util.Date;
 
 public class CarAdmUser implements Serializable{
     private static final long serialVersionUID = -1373760761780841082L;
+
+    @Column(desc="用户ID")
     private Integer userId;
 
+    @Column(desc="登录账号")
     private String account;
 
+    @Column(desc="用户名")
     private String userName;
 
     private String password;
@@ -17,6 +23,7 @@ public class CarAdmUser implements Serializable{
 
     private Integer accountType;
 
+    @Column(desc="状态")
     private Integer status;
 
     private String remark;

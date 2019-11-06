@@ -423,12 +423,6 @@
 			<version>1.4.6</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.sq</groupId>
-			<artifactId>sq-component-log</artifactId>
-			<version>1.0.20</version>
-		</dependency>
-
 
 		<!--生成PDF-->
 		<dependency>
