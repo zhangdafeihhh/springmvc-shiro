@@ -110,7 +110,7 @@ public class RoleManagementService{
 		//执行
 		saasRoleMapper.updateByPrimaryKeySelective(newrole);
 		redisSessionDAO.clearRelativeSession(null, newrole.getRoleId(), null);//自动清理用户会话
-		return AjaxResponse.success( null );
+		return AjaxResponse.success( newrole );
 	}
 	
 	/**五、查询一个角色中的权限（返回的数据格式：列表、树形）**/
