@@ -97,7 +97,7 @@ public class RolemanagementController{
 	@RequestMapping("/savePermissionIds")
 	@RequiresPermissions(value = { "SAVE_ROLE_PERMISSIONIDS" } )
 	@RequestFunction(menu = ROLE_PERMISSION_SAVE)
-	@SysLogAnn(module="RoleManage",methods="savePermissionIds",parameterType="Integer",parameterKey="roleId",objClass= SaasRole.class )
+	@SysLogAnn(module="RoleManage",methods="savePermissionIds",parameterType="Integer",parameterKey="roleId",objClass= SaasRole.class ,serviceClass="roleManagementService",queryMethod="findByPrimaryKeyV2")
 	public AjaxResponse savePermissionIds(@Verify(param="roleId",rule="required|min(1)") Integer roleId, @Verify(param="permissionIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String permissionIds) {
 		List<Integer> newPermissionIds = new ArrayList<Integer>();
 		if(StringUtils.isNotEmpty(permissionIds) ) {
