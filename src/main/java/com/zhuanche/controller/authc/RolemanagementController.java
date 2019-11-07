@@ -63,7 +63,7 @@ public class RolemanagementController{
 	@RequestMapping("/changeRole")
 	@RequiresPermissions(value = { "CHANGE_SAAS_ROLE" } )
 	@RequestFunction(menu = ROLE_UPDATE)
-	@SysLogAnn(module="RoleManage",methods="changeSaasRole",parameterType="Integer",parameterKey="roleId",objClass= SaasRole.class )
+	@SysLogAnn(module="RoleManage",methods="changeSaasRole",parameterType="Integer",parameterKey="roleId",objClass= SaasRole.class ,serviceClass="roleManagementService",queryMethod="findByPrimaryKeyV2")
 	public 	AjaxResponse changeRole( @Verify(param="roleId",rule="required|min(1)") Integer roleId , @Verify(param="roleCode",rule="required")  String roleCode,  @Verify(param="roleName",rule="required") String roleName ) {
 		SaasRole roleForupdate = new SaasRole();
 		roleForupdate.setRoleId(roleId);

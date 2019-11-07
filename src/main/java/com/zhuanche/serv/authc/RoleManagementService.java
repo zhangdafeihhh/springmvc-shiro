@@ -3,7 +3,10 @@ package com.zhuanche.serv.authc;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.zhuanche.dto.mdbcarmanage.CarAdmUserDto;
+import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -266,5 +269,15 @@ public class RoleManagementService{
 
 	public List<String> getAllRoleName(Integer userId) {
 		return saasRolePermissionRalationExMapper.queryRoleNameList(userId);
+	}
+
+	public SaasRole findByPrimaryKeyV2 (Integer id ){
+		SaasRole dbEntity = saasRoleMapper.selectByPrimaryKey(id);
+		if(dbEntity == null){
+			return null;
+		}
+		SaasRole entity = new SaasRole();
+		BeanUtils.copyProperties(dbEntity,entity);
+		return entity;
 	}
 }
