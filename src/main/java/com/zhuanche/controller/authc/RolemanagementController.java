@@ -45,6 +45,7 @@ public class RolemanagementController{
 	@RequestMapping("/disableSaasRole")
 	@RequiresPermissions(value = { "DISABLE_SAAS_ROLE" } )
 	@RequestFunction(menu = ROLE_DISABLE)
+	@SysLogAnn(module="RoleManage",methods="disableSaasRole",parameterType="Integer",parameterKey="roleId",objClass= SaasRole.class )
 	public AjaxResponse disableSaasRole ( @Verify(param="roleId",rule="required|min(1)") Integer roleId ) {
 		return roleManagementService.disableSaasRole(roleId);
 	}
@@ -53,6 +54,7 @@ public class RolemanagementController{
 	@RequestMapping("/enableSaasRole")
 	@RequiresPermissions(value = { "ENABLE_SAAS_ROLE" } )
 	@RequestFunction(menu = ROLE_ENABLE)
+	@SysLogAnn(module="RoleManage",methods="enableSaasRole",parameterType="Integer",parameterKey="roleId",objClass= SaasRole.class )
 	public AjaxResponse enableSaasRole ( @Verify(param="roleId",rule="required|min(1)") Integer roleId ) {
 		return roleManagementService.enableSaasRole(roleId);
 	}
@@ -61,6 +63,7 @@ public class RolemanagementController{
 	@RequestMapping("/changeRole")
 	@RequiresPermissions(value = { "CHANGE_SAAS_ROLE" } )
 	@RequestFunction(menu = ROLE_UPDATE)
+	@SysLogAnn(module="RoleManage",methods="changeSaasRole",parameterType="Integer",parameterKey="roleId",objClass= SaasRole.class )
 	public 	AjaxResponse changeRole( @Verify(param="roleId",rule="required|min(1)") Integer roleId , @Verify(param="roleCode",rule="required")  String roleCode,  @Verify(param="roleName",rule="required") String roleName ) {
 		SaasRole roleForupdate = new SaasRole();
 		roleForupdate.setRoleId(roleId);
@@ -94,6 +97,7 @@ public class RolemanagementController{
 	@RequestMapping("/savePermissionIds")
 	@RequiresPermissions(value = { "SAVE_ROLE_PERMISSIONIDS" } )
 	@RequestFunction(menu = ROLE_PERMISSION_SAVE)
+	@SysLogAnn(module="RoleManage",methods="savePermissionIds",parameterType="Integer",parameterKey="roleId",objClass= SaasRole.class )
 	public AjaxResponse savePermissionIds(@Verify(param="roleId",rule="required|min(1)") Integer roleId, @Verify(param="permissionIds",rule="RegExp(^([0-9]+,)*[0-9]+$)") String permissionIds) {
 		List<Integer> newPermissionIds = new ArrayList<Integer>();
 		if(StringUtils.isNotEmpty(permissionIds) ) {
