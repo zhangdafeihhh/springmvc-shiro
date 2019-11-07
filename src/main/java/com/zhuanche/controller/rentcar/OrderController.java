@@ -23,6 +23,7 @@ import com.zhuanche.util.CommonStringUtils;
 import com.zhuanche.util.excel.CsvUtils;
 import mapper.rentcar.CarBizCustomerMapper;
 import mapper.rentcar.CarBizDriverInfoMapper;
+import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarFactOrderExMapper;
@@ -83,6 +84,9 @@ public class OrderController{
 
 	@Autowired
 	private CarBizCityExMapper cityExMapper;
+
+	@Autowired
+	private CarBizCarGroupExMapper carGroupExMapper;
 
 	@Value("${kefu.trajectory.url}")
 	private String kfDomain;
@@ -1205,6 +1209,13 @@ public class OrderController{
 		result.setDriverCostDetailVO(driverFeeDetailService.getOrderDriverCostDetailVO(result.getOrderNo(), result.getOrderId()));
 		result.setDriverCostDetailVOH5(driverFeeDetailService.getDriverCostDetail(result.getOrderNo(),Integer.parseInt(Long.toString(result.getOrderId())),result.getBuyoutFlag()));
         result.setOrderCostDetailInfo(orderCostDetailInfo);
+        //添加实际司机车型 fanhongtao 2019-11-07
+		if(result.getDriverCostDetailVOH5() != null && result.getDriverCostDetailVOH5().getGroupId() != null){
+			Integer factGroupId = result.getDriverCostDetailVOH5().getGroupId();
+			result.setFactBookingGroupId(factGroupId);
+			String factGroupName = carGroupExMapper.getGroupNameByGroupId(factGroupId);
+			result.setFactGroupName(factGroupName);
+		}
 		return result;
 	}
 
