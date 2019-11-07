@@ -45,7 +45,7 @@ public class RolemanagementController{
 	@RequestMapping("/disableSaasRole")
 	@RequiresPermissions(value = { "DISABLE_SAAS_ROLE" } )
 	@RequestFunction(menu = ROLE_DISABLE)
-	@SysLogAnn(module="RoleManage",methods="disableSaasRole",parameterType="Integer",parameterKey="roleId",objClass= SaasRole.class )
+	@SysLogAnn(module="RoleManage",methods="disableSaasRole",parameterType="Integer",parameterKey="roleId",objClass= SaasRole.class,serviceClass="roleManagementService",queryMethod="findByPrimaryKeyV2" )
 	public AjaxResponse disableSaasRole ( @Verify(param="roleId",rule="required|min(1)") Integer roleId ) {
 		return roleManagementService.disableSaasRole(roleId);
 	}
@@ -54,7 +54,7 @@ public class RolemanagementController{
 	@RequestMapping("/enableSaasRole")
 	@RequiresPermissions(value = { "ENABLE_SAAS_ROLE" } )
 	@RequestFunction(menu = ROLE_ENABLE)
-	@SysLogAnn(module="RoleManage",methods="enableSaasRole",parameterType="Integer",parameterKey="roleId",objClass= SaasRole.class )
+	@SysLogAnn(module="RoleManage",methods="enableSaasRole",parameterType="Integer",parameterKey="roleId",objClass= SaasRole.class,serviceClass="roleManagementService",queryMethod="findByPrimaryKeyV2" )
 	public AjaxResponse enableSaasRole ( @Verify(param="roleId",rule="required|min(1)") Integer roleId ) {
 		return roleManagementService.enableSaasRole(roleId);
 	}
