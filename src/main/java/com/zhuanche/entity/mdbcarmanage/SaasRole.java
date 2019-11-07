@@ -9,6 +9,8 @@ public class SaasRole {
     private String roleCode;
     @Column(desc="角色名称")
     private String roleName;
+    @Column(desc="导航菜单Id")
+    private String permissionIds;
 
     private Boolean valid;
 
@@ -42,5 +44,13 @@ public class SaasRole {
 
     public void setValid(Boolean valid) {
         this.valid = valid;
+    }
+
+    public String getPermissionIds() {
+        return permissionIds;
+    }
+
+    public void setPermissionIds(String permissionIds) {
+        this.permissionIds = permissionIds;
     }
 }
