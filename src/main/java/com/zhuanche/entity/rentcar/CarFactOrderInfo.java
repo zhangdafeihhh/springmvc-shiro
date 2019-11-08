@@ -445,6 +445,12 @@ public class CarFactOrderInfo extends BaseEntity {
 	 */
 	private BigDecimal driverInfoServiceFee;
 
+	/**实际乘车人车型id**/
+	private Integer factBookingGroupId;
+
+	/**实际乘车人车型名称**/
+	private String factBookingGroupName;
+
 	public BigDecimal getDriverInfoServiceFee() {
 		return driverInfoServiceFee;
 	}
@@ -2251,5 +2257,22 @@ public class CarFactOrderInfo extends BaseEntity {
 
 	public void setServiceCityName(String serviceCityName) {
 		this.serviceCityName = serviceCityName;
+	}
+
+
+	public String getFactBookingGroupName() {
+		return factBookingGroupName;
+	}
+
+	public void setFactBookingGroupName(String factBookingGroupName) {
+		this.factBookingGroupName = factBookingGroupName;
+	}
+
+	public Integer getFactBookingGroupId() {
+		return factBookingGroupId;
+	}
+
+	public void setFactBookingGroupId(Integer factBookingGroupId) {
+		this.factBookingGroupId = factBookingGroupId;
 	}
 }
