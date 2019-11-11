@@ -29,7 +29,7 @@
     <result column="bad_ratings_award" property="badRatingsAward" jdbcType="VARCHAR" />
     <result column="amount_assessment_sum" property="amountAssessmentSum" jdbcType="VARCHAR" />
     <result column="inspection_fines" property="inspectionFines" jdbcType="VARCHAR" />
-    <result column="total_manage_fees" property="totalManageFees" jdbcType="VARCHAR" />
+    <result column="total_manage_fees" property="totalManageFees" jdbcType="VARCHAR" />N
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="amount_status" property="amountStatus" jdbcType="INTEGER" />
     <result column="payment_time" property="paymentTime" jdbcType="TIMESTAMP" />
@@ -37,6 +37,7 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="create_user" property="createUser" jdbcType="VARCHAR" />
     <result column="amount_status_time" property="amountStatusTime" jdbcType="TIMESTAMP" />
+    <result column="supplier_full_name" property="supplierFullame" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, fee_order_no, city_id, supplier_name, supplier_id, settle_start_date, settle_end_date, 
@@ -44,7 +45,7 @@
     scale_efficient, total_flow_last_month, flow_increase, growth_factor, bad_ratings, 
     month_commission, exclude_commission, deduction_amount_last_month, total, compliance_driver_award, 
     others, bad_ratings_award, amount_assessment_sum, inspection_fines, total_manage_fees, 
-    status, amount_status, payment_time, create_time, update_time, create_user,amount_status_time
+    status, amount_status, payment_time, create_time, update_time, create_user,amount_status_time,supplier_full_name
   </sql>
 
 
@@ -85,10 +86,15 @@
     update_time,
     create_user,
     amount_status_time,
-    c.city_name AS cityName
+    c.city_name AS cityName,
+    t.supplier_full_name
     from supplier_fee_manage t
     LEFT JOIN car_biz_city c  ON t.city_id = c.city_id
     where 1=1
+
+    <if test="supplierFeeManage != null and supplierFeeManage != ''" >
+      AND  t.supplier_fee_manage  = #{supplierFeeManage}
+    </if>
 
     <if test="cityIds != null and cityIds != ''" >
       AND  t.city_id  in (${cityIds})

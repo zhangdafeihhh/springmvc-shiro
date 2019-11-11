@@ -79,6 +79,7 @@ public class SupplierFeeManage {
 
     private String settleEndDateStr;
 
+    private String supplierFullName;
 
     public Integer getId() {
         return id;
@@ -382,5 +383,13 @@ public class SupplierFeeManage {
 
     public void setSettleEndDateStr(String settleEndDateStr) {
         this.settleEndDateStr = settleEndDateStr;
+    }
+
+    public String getSupplierFullName() {
+        return supplierFullName;
+    }
+
+    public void setSupplierFullName(String supplierFullName) {
+        this.supplierFullName = supplierFullName;
     }
 }
