@@ -370,7 +370,7 @@ public class SupplierFeeController {
 
             SupplierFeeCsvUtils entity = new SupplierFeeCsvUtils();
             List<String> listStr = new ArrayList<>();
-            listStr = getData(manage,listStr);
+            listStr = getData(manage,listStr,titles);
             List<String> footerList = new ArrayList<>();
             footerList = this.footerList(footerList);
             try {
@@ -386,93 +386,268 @@ public class SupplierFeeController {
     }
 
 
-    private List<String> getData(SupplierFeeManage manage,List<String> listStr){
+    private List<String> getData(SupplierFeeManage manage,List<String> listStr,String title){
 
 
 
         StringBuilder builder = new StringBuilder();
-        builder.append(manage.getSerialNumber() != null ? manage.getSerialNumber():"").append(",");
-        builder.append(manage.getSupplierName() != null ? manage.getSupplierName():"");
-        builder.append(",");
-        builder.append(manage.getSupplierFullName() != null ? manage.getSupplierFullName() : "").append(",");
-        builder.append(manage.getTotalFlow() != null ? manage.getTotalFlow() : "");
-        builder.append(",");
-        builder.append(manage.getTurnoverDrivers() != null ? manage.getTurnoverDrivers() : "").append(",");
-        builder.append(manage.getFlowAmount() != null ? manage.getFlowAmount() : "");
-        builder.append(",");
-        builder.append(manage.getWindControlAmount() != null ? manage.getWindControlAmount() : "");
-        builder.append(",");
+        if(StringUtils.isEmpty(manage.getSerialNumber())){
+            title.replaceAll("序号,","");
+        }else {
+            builder.append(manage.getSerialNumber()).append(",");
+        }
 
-        builder.append(manage.getExtraCharge() != null ? manage.getExtraCharge() : "");
-        builder.append(",");
 
-        builder.append(manage.getCancelCharge() != null ? manage.getCancelCharge() : "");
-        builder.append(",");
+        if(StringUtils.isEmpty(manage.getSupplierName() )){
+            title.replaceAll("合作商,","");
 
-        builder.append(manage.getTotalAmountWater() != null ? manage.getTotalAmountWater() : "");
-        builder.append(",");
+        }else {
+            builder.append(manage.getSupplierName());
+            builder.append(",");
+        }
 
-        builder.append(manage.getScaleEfficient() != null ? this.getTwoPoint(manage.getScaleEfficient()): "");
-        builder.append(",");
 
-        builder.append(manage.getTotalFlowLastMonth() != null ? manage.getTotalFlowLastMonth() : "");
-        builder.append(",");
+        if(StringUtils.isEmpty(manage.getSupplierFullName())){
+            title.replaceAll("合作商全称,","");
+        }else {
+            builder.append(manage.getSupplierFullName() != null ? manage.getSupplierFullName() : "").append(",");
 
-        builder.append(manage.getFlowIncrease() != null ? this.getTwoPoint(manage.getFlowIncrease()) : "");
-        builder.append(",");
+        }
 
-        builder.append(manage.getGrowthFactor() != null ? this.getTwoPoint(manage.getGrowthFactor()) : "");
-        builder.append(",");
 
-        builder.append(manage.getTotalDriverContribution() != null ? manage.getTotalDriverContribution() : "").append(",");
-
-        builder.append(manage.getTotalComplianceAwards() != null ? manage.getTotalComplianceAwards() : "").append(",");
-
-        builder.append(manage.getMonthCommission() != null ? manage.getMonthCommission() : "");
-        builder.append(",");
-
-        builder.append(manage.getBadRatings() != null ? this.getTwoPoint(manage.getBadRatings()) : "");
-        builder.append(",");
-
-        builder.append(manage.getNumberOfActiveDrivers() != null ? manage.getNumberOfActiveDrivers() : "").append(",");
-
-        builder.append(manage.getExcludeCommission() != null ? manage.getExcludeCommission() : "");
-        builder.append(",");
-
-        builder.append(manage.getDeductionAmountLastMonth() != null ? manage.getDeductionAmountLastMonth() : "");
-        builder.append(",");
-
-        builder.append(manage.getIsReissue() != null ? manage.getIsReissue() : "").append(",");
-
-        builder.append(manage.getTotal() != null ? manage.getTotal() : "");
-        builder.append(",");
-
-        builder.append(manage.getComplianceDriverAward() != null ? manage.getComplianceDriverAward() : "");
-        builder.append(",");
+        if(StringUtils.isEmpty(manage.getTotalFlow())){
+            title.replaceAll("总营业额,","");
+        }else {
+            builder.append(manage.getTotalFlow() != null ? manage.getTotalFlow() : "");
+            builder.append(",");
+        }
 
 
 
-        builder.append(manage.getBadRatingsAward() != null ? manage.getBadRatingsAward() : "");
-        builder.append(",");
-        builder.append(manage.getAmountAssessmentSum() != null ? manage.getAmountAssessmentSum() : "");
-        builder.append(",");
 
-        builder.append(manage.getGardenAward() != null ? manage.getGardenAward() : "").append(",");
+        if(StringUtils.isEmpty(manage.getTurnoverDrivers())){
+            title.replaceAll("入围司机营业额,","");
 
-        builder.append(manage.getOtherIncreaseAmount() != null ? manage.getOtherIncreaseAmount() : "").append(",");
+        }else {
+            builder.append(manage.getTurnoverDrivers() != null ? manage.getTurnoverDrivers() : "").append(",");
 
-        builder.append(manage.getInspectionFines() != null ? manage.getInspectionFines() : "");
-        builder.append(",");
+        }
+        if(StringUtils.isEmpty(manage.getFlowAmount())){
+            title.replaceAll("流水金额,","");
+        }else {
+            builder.append(manage.getFlowAmount() != null ? manage.getFlowAmount() : "");
+            builder.append(",");
+        }
 
-        builder.append(manage.getOthers() != null ? manage.getOthers() : "");
-        builder.append(",");
 
-        builder.append(manage.getTotalManageFees() != null ? manage.getTotalManageFees() : "");
-        builder.append(",");
-        builder.append(manage.getSettleStartDate() != null ? DateUtils.formatDate(manage.getSettleStartDate(),DateUtils.date_format) : "");
-        builder.append(",");
-        builder.append(manage.getSettleEndDate() != null ? DateUtils.formatDate(manage.getSettleEndDate(),DateUtils.date_format) : "");
-        builder.append(",");
+        if(StringUtils.isEmpty(manage.getWindControlAmount())){
+            title.replaceAll("风控金额,","");
+        }else {
+            builder.append(manage.getWindControlAmount() != null ? manage.getWindControlAmount() : "");
+            builder.append(",");
+        }
+
+
+
+        if(StringUtils.isEmpty(manage.getExtraCharge())){
+            title.replaceAll("价外费,","");
+        }else {
+            builder.append(manage.getExtraCharge() != null ? manage.getExtraCharge() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getCancelCharge())){
+            title.replaceAll("取消费,","");
+        }else {
+            builder.append(manage.getCancelCharge() != null ? manage.getCancelCharge() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getTotalAmountWater())){
+            title.replaceAll("流水合计金额,","");
+        }else {
+            builder.append(manage.getTotalAmountWater() != null ? manage.getTotalAmountWater() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getScaleEfficient())){
+            title.replaceAll("规模系数,","");
+        }else {
+            builder.append(manage.getScaleEfficient() != null ? this.getTwoPoint(manage.getScaleEfficient()): "");
+            builder.append(",");
+
+        }
+
+        if(StringUtils.isEmpty(manage.getTotalFlowLastMonth())){
+            title.replaceAll("上月总流水,","");
+        }else {
+            builder.append(manage.getTotalFlowLastMonth() != null ? manage.getTotalFlowLastMonth() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getFlowIncrease())){
+            title.replaceAll("流水增幅,","");
+        }else {
+            builder.append(manage.getFlowIncrease() != null ? this.getTwoPoint(manage.getFlowIncrease()) : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getGrowthFactor())){
+            title.replaceAll("增长系数,","");
+        }else {
+            builder.append(manage.getGrowthFactor() != null ? this.getTwoPoint(manage.getGrowthFactor()) : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getTotalDriverContribution())){
+            title.replaceAll("司机贡献金合计,","");
+        }else {
+            builder.append(manage.getTotalDriverContribution() != null ? manage.getTotalDriverContribution() : "").append(",");
+
+        }
+
+        if(StringUtils.isEmpty(manage.getTotalComplianceAwards())){
+            title.replaceAll("合规奖励合计,","");
+        }else {
+            builder.append(manage.getTotalComplianceAwards() != null ? manage.getTotalComplianceAwards() : "").append(",");
+
+        }
+
+        if(StringUtils.isEmpty(manage.getMonthCommission())){
+            title.replaceAll("佣金合计,","");
+        }else {
+            builder.append(manage.getMonthCommission() != null ? manage.getMonthCommission() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getBadRatings())){
+            title.replaceAll("差评率,","");
+        }else {
+            builder.append(manage.getBadRatings() != null ? this.getTwoPoint(manage.getBadRatings()) : "");
+            builder.append(",");
+        }
+
+
+        if(manage.getNumberOfActiveDrivers() == null){
+            title.replaceAll("活跃司机数量,","");
+        }else {
+            builder.append(manage.getNumberOfActiveDrivers() != null ? manage.getNumberOfActiveDrivers() : "").append(",");
+
+        }
+
+        if(StringUtils.isEmpty(manage.getExcludeCommission())){
+            title.replaceAll("剔除佣金,","");
+        }else {
+            builder.append(manage.getExcludeCommission() != null ? manage.getExcludeCommission() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getDeductionAmountLastMonth() )){
+            title.replaceAll("上月暂扣金额,","");
+        }else {
+            builder.append(manage.getDeductionAmountLastMonth() != null ? manage.getDeductionAmountLastMonth() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getIsReissue())){
+            title.replaceAll("是否补发,","");
+        }else {
+            builder.append(manage.getIsReissue() != null ? manage.getIsReissue() : "").append(",");
+
+        }
+
+        if(StringUtils.isEmpty(manage.getTotal() )){
+            title.replaceAll("合计,","");
+        }else {
+            builder.append(manage.getTotal() != null ? manage.getTotal() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getComplianceDriverAward())){
+            title.replaceAll("合规司机奖励,","");
+        }else {
+            builder.append(manage.getComplianceDriverAward() != null ? manage.getComplianceDriverAward() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getBadRatingsAward())){
+            title.replaceAll("差评罚金,","");
+        }else {
+            builder.append(manage.getBadRatingsAward() != null ? manage.getBadRatingsAward() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getAmountAssessmentSum())){
+            title.replaceAll("扣款差评数量,","");
+        }else {
+            builder.append(manage.getAmountAssessmentSum() != null ? manage.getAmountAssessmentSum() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getGardenAward())){
+            title.replaceAll("花园权益奖励,","");
+        }else {
+            builder.append(manage.getGardenAward() != null ? manage.getGardenAward() : "").append(",");
+
+        }
+
+        if(StringUtils.isEmpty(manage.getOtherIncreaseAmount())){
+            title.replaceAll("其它增加金额,","");
+        }else {
+            builder.append(manage.getOtherIncreaseAmount() != null ? manage.getOtherIncreaseAmount() : "").append(",");
+
+        }
+
+        if(StringUtils.isEmpty(manage.getInspectionFines())){
+            title.replaceAll("稽查罚金,","");
+        }else {
+            builder.append(manage.getInspectionFines() != null ? manage.getInspectionFines() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getOthers())){
+            title.replaceAll("其它扣款项,","");
+        }else {
+            builder.append(manage.getOthers() != null ? manage.getOthers() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getTotalManageFees())){
+            title.replaceAll("管理费合计,","");
+        }else {
+            builder.append(manage.getTotalManageFees() != null ? manage.getTotalManageFees() : "");
+            builder.append(",");
+        }
+
+        if(manage.getSettleStartDate() == null){
+            title.replaceAll("结算开始日期,","");
+        }else {
+            builder.append(manage.getSettleStartDate() != null ? DateUtils.formatDate(manage.getSettleStartDate(),DateUtils.date_format) : "");
+            builder.append(",");
+        }
+
+        if(manage.getSettleEndDate() == null){
+            title.replaceAll("结算结束日期,","");
+        }else {
+            builder.append(manage.getSettleEndDate() != null ? DateUtils.formatDate(manage.getSettleEndDate(),DateUtils.date_format) : "");
+            builder.append(",");
+        }
+
         listStr.add(builder.toString());
         return listStr;
 
