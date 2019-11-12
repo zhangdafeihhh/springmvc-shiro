@@ -2,6 +2,7 @@ package com.zhuanche.controller.supplierFee;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Maps;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
@@ -42,9 +43,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -351,7 +350,7 @@ public class SupplierFeeController {
             String titles = "序号,合作商,合作商全称,总营业额,入围司机营业额,流水金额,风控金额,价外费,取消费,流水合计金额,规模系数,上月总流水,流水增幅,增长系数,司机贡献金合计," +
                     "合规奖励合计,佣金合计,差评率,活跃司机数量,剔除佣金,上月暂扣金额,是否补发,合计," +
                     "合规司机奖励,差评罚金,扣款差评数量,花园权益奖励,其它增加金额,稽查罚金,其它扣款项,管理费合计,结算开始日期,结算结束日期";
-            headerList.add(titles);
+
 
             String fileName = "对账单信息" + DateUtil.dateFormat(new Date(), DateUtil.intTimestampPattern)+".csv";
             String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
@@ -370,7 +369,11 @@ public class SupplierFeeController {
 
             SupplierFeeCsvUtils entity = new SupplierFeeCsvUtils();
             List<String> listStr = new ArrayList<>();
-            listStr = getData(manage,listStr,titles);
+            Map<String,Object> map = getData(manage,listStr,titles);
+            listStr = (List<String>) map.get("listStr");
+            titles = (String) map.get("title");
+            logger.info("titles:" + titles);
+            headerList.add(titles);
             List<String> footerList = new ArrayList<>();
             footerList = this.footerList(footerList);
             try {
@@ -386,9 +389,9 @@ public class SupplierFeeController {
     }
 
 
-    private List<String> getData(SupplierFeeManage manage,List<String> listStr,String title){
+    private Map<String,Object> getData(SupplierFeeManage manage,List<String> listStr,String title){
 
-
+        Map<String,Object> mapData = Maps.newHashMap();
 
         StringBuilder builder = new StringBuilder();
         if(StringUtils.isEmpty(manage.getSerialNumber())){
@@ -649,7 +652,9 @@ public class SupplierFeeController {
         }
 
         listStr.add(builder.toString());
-        return listStr;
+        mapData.put("listStr",listStr);
+        mapData.put("title",title);
+        return mapData;
 
     }
 
