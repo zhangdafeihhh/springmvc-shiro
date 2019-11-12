@@ -79,9 +79,35 @@ public class SupplierFeeManage {
 
     private String settleEndDateStr;
 
+    private String turnoverDrivers;
+
+    private String totalDriverContribution;
+
+    private String totalComplianceAwards;
+
+    private Integer numberOfActiveDrivers;
+
+    private String rejectionAmount;
+
+    private String isReissue;
+
+    private String otherIncreaseAmount;
+
+    private String gardenAward;
+
     private String supplierFullName;
 
-    private String supplierFullame;
+    private String serialNumber;//序号
+
+    private String operateUser;//验票操作人
+
+    private String verifyStartDate;//验票开始时间
+
+    private String verifyEndDate; //验票结束时间
+
+    private String handOverStartDate;//交票开始时间
+
+    private String handOverEndDate;//交票结束时间
 
     public Integer getId() {
         return id;
@@ -395,11 +421,115 @@ public class SupplierFeeManage {
         this.supplierFullName = supplierFullName;
     }
 
-    public String getSupplierFullame() {
-        return supplierFullame;
+    public String getTurnoverDrivers() {
+        return turnoverDrivers;
     }
 
-    public void setSupplierFullame(String supplierFullame) {
-        this.supplierFullame = supplierFullame;
+    public void setTurnoverDrivers(String turnoverDrivers) {
+        this.turnoverDrivers = turnoverDrivers;
+    }
+
+    public String getTotalDriverContribution() {
+        return totalDriverContribution;
+    }
+
+    public void setTotalDriverContribution(String totalDriverContribution) {
+        this.totalDriverContribution = totalDriverContribution;
+    }
+
+    public String getTotalComplianceAwards() {
+        return totalComplianceAwards;
+    }
+
+    public void setTotalComplianceAwards(String totalComplianceAwards) {
+        this.totalComplianceAwards = totalComplianceAwards;
+    }
+
+    public Integer getNumberOfActiveDrivers() {
+        return numberOfActiveDrivers;
+    }
+
+    public void setNumberOfActiveDrivers(Integer numberOfActiveDrivers) {
+        this.numberOfActiveDrivers = numberOfActiveDrivers;
+    }
+
+    public String getRejectionAmount() {
+        return rejectionAmount;
+    }
+
+    public void setRejectionAmount(String rejectionAmount) {
+        this.rejectionAmount = rejectionAmount;
+    }
+
+    public String getIsReissue() {
+        return isReissue;
+    }
+
+    public void setIsReissue(String isReissue) {
+        this.isReissue = isReissue;
+    }
+
+    public String getOtherIncreaseAmount() {
+        return otherIncreaseAmount;
+    }
+
+    public void setOtherIncreaseAmount(String otherIncreaseAmount) {
+        this.otherIncreaseAmount = otherIncreaseAmount;
+    }
+
+    public String getGardenAward() {
+        return gardenAward;
+    }
+
+    public void setGardenAward(String gardenAward) {
+        this.gardenAward = gardenAward;
+    }
+
+    public String getSerialNumber() {
+        return serialNumber;
+    }
+
+    public void setSerialNumber(String serialNumber) {
+        this.serialNumber = serialNumber;
+    }
+
+    public String getOperateUser() {
+        return operateUser;
+    }
+
+    public void setOperateUser(String operateUser) {
+        this.operateUser = operateUser;
+    }
+
+    public String getVerifyStartDate() {
+        return verifyStartDate;
+    }
+
+    public void setVerifyStartDate(String verifyStartDate) {
+        this.verifyStartDate = verifyStartDate;
+    }
+
+    public String getVerifyEndDate() {
+        return verifyEndDate;
+    }
+
+    public void setVerifyEndDate(String verifyEndDate) {
+        this.verifyEndDate = verifyEndDate;
+    }
+
+    public String getHandOverStartDate() {
+        return handOverStartDate;
+    }
+
+    public void setHandOverStartDate(String handOverStartDate) {
+        this.handOverStartDate = handOverStartDate;
+    }
+
+    public String getHandOverEndDate() {
+        return handOverEndDate;
+    }
+
+    public void setHandOverEndDate(String handOverEndDate) {
+        this.handOverEndDate = handOverEndDate;
     }
 }

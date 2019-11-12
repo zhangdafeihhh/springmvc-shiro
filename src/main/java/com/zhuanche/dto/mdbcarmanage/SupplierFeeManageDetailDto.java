@@ -85,6 +85,8 @@ public class SupplierFeeManageDetailDto {
 
     private String settleEndDateStr;
 
+    private String supplierFullName;//供应商全称
+
     private List<SupplierFeeRecord> supplierFeeRecordList;
 
     public Integer getId() {
@@ -381,5 +383,13 @@ public class SupplierFeeManageDetailDto {
 
     public void setSettleEndDateStr(String settleEndDateStr) {
         this.settleEndDateStr = settleEndDateStr;
+    }
+
+    public String getSupplierFullName() {
+        return supplierFullName;
+    }
+
+    public void setSupplierFullName(String supplierFullName) {
+        this.supplierFullName = supplierFullName;
     }
 }

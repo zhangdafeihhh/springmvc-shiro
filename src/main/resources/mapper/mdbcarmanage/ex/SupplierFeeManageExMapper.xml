@@ -37,7 +37,19 @@
      <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
      <result column="create_user" property="createUser" jdbcType="VARCHAR" />
      <result column="amount_status_time" property="amountStatusTime" jdbcType="TIMESTAMP" />
-     <result column="supplier_full_name" property="supplierFullame" jdbcType="VARCHAR" />
+    <result column="payment_time" property="paymentTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="create_user" property="createUser" jdbcType="VARCHAR" />
+    <result column="turnover_drivers" property="turnoverDrivers" jdbcType="VARCHAR" />
+    <result column="total_driver_contribution" property="totalDriverContribution" jdbcType="VARCHAR" />
+    <result column="total_compliance_awards" property="totalComplianceAwards" jdbcType="VARCHAR" />
+    <result column="number_of_active_drivers" property="numberOfActiveDrivers" jdbcType="INTEGER" />
+    <result column="rejection_amount" property="rejectionAmount" jdbcType="VARCHAR" />
+    <result column="is_reissue" property="isReissue" jdbcType="VARCHAR" />
+    <result column="other_increase_amount" property="otherIncreaseAmount" jdbcType="VARCHAR" />
+    <result column="garden_award" property="gardenAward" jdbcType="VARCHAR" />
+    <result column="supplier_full_name" property="supplierFullName" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, fee_order_no, city_id, supplier_name, supplier_id, settle_start_date, settle_end_date, 
@@ -45,7 +57,10 @@
     scale_efficient, total_flow_last_month, flow_increase, growth_factor, bad_ratings, 
     month_commission, exclude_commission, deduction_amount_last_month, total, compliance_driver_award, 
     others, bad_ratings_award, amount_assessment_sum, inspection_fines, total_manage_fees, 
-    status, amount_status, payment_time, create_time, update_time, create_user,amount_status_time,supplier_full_name
+    status, amount_status, payment_time, create_time, update_time, create_user,amount_status_time,
+    turnover_drivers, total_driver_contribution, total_compliance_awards,
+    number_of_active_drivers, rejection_amount, is_reissue, other_increase_amount, garden_award,
+    supplier_full_name
   </sql>
 
 

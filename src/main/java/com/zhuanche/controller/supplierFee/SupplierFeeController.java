@@ -139,7 +139,6 @@ public class SupplierFeeController {
                 detailDto.setFlowIncrease(this.getTwoPoint(detailDto.getFlowIncrease()));
                 detailDto.setGrowthFactor(this.getTwoPoint(detailDto.getGrowthFactor()));
                 detailDto.setBadRatings(this.getTwoPoint(detailDto.getBadRatings()));
-
                 List<SupplierFeeRecord> recordList = recordService.listRecord(feeOrderNo);
                 if(CollectionUtils.isNotEmpty(recordList)){
                     detailDto.setSupplierFeeRecordList(recordList);
@@ -348,8 +347,9 @@ public class SupplierFeeController {
         try {
             SupplierFeeManage manage = supplierFeeService.queryByOrderNo(feeOrderNo);
             List<String> headerList = new ArrayList<>();
-            String titles = "供应商名称,结算开始日期,结算结束日期,总流水,流水金额,风控金额,价外费,取消费,流水合计金额,规模系数,上月有效司机数量,有效司机数量增幅,运力系数,差评率,当月佣金,剔除佣金,上月暂扣金额,合计," +
-                    "合规司机奖励,其他,差评罚金,扣款差评数量,稽查罚金,管理费合计";
+            String titles = "序号,合作商,合作商全称,总营业额,入围司机营业额,流水金额,风控金额,价外费,取消费,流水合计金额,规模系数,上月总流水,流水增幅,增长系数,司机贡献金合计," +
+                    "合规奖励合计,佣金合计,差评率,活跃司机数量,剔除佣金,上月暂扣金额,是否补发,合计," +
+                    "合规司机奖励,差评罚金,扣款差评数量,花园权益奖励,其它增加金额,稽查罚金,其它扣款项,管理费合计,结算开始日期,结算结束日期";
             headerList.add(titles);
 
             String fileName = "对账单信息" + DateUtil.dateFormat(new Date(), DateUtil.intTimestampPattern)+".csv";
@@ -389,14 +389,13 @@ public class SupplierFeeController {
 
 
         StringBuilder builder = new StringBuilder();
+        builder.append(manage.getSerialNumber() != null ? manage.getSerialNumber():"").append(",");
         builder.append(manage.getSupplierName() != null ? manage.getSupplierName():"");
         builder.append(",");
-        builder.append(manage.getSettleStartDate() != null ? DateUtils.formatDate(manage.getSettleStartDate(),DateUtils.date_format) : "");
-        builder.append(",");
-        builder.append(manage.getSettleEndDate() != null ? DateUtils.formatDate(manage.getSettleEndDate(),DateUtils.date_format) : "");
-        builder.append(",");
+        builder.append(manage.getSupplierFullName() != null ? manage.getSupplierFullName() : "").append(",");
         builder.append(manage.getTotalFlow() != null ? manage.getTotalFlow() : "");
         builder.append(",");
+        builder.append(manage.getTurnoverDrivers() != null ? manage.getTurnoverDrivers() : "").append(",");
         builder.append(manage.getFlowAmount() != null ? manage.getFlowAmount() : "");
         builder.append(",");
         builder.append(manage.getWindControlAmount() != null ? manage.getWindControlAmount() : "");
@@ -423,11 +422,17 @@ public class SupplierFeeController {
         builder.append(manage.getGrowthFactor() != null ? this.getTwoPoint(manage.getGrowthFactor()) : "");
         builder.append(",");
 
-        builder.append(manage.getBadRatings() != null ? this.getTwoPoint(manage.getBadRatings()) : "");
-        builder.append(",");
+        builder.append(manage.getTotalDriverContribution() != null ? manage.getTotalDriverContribution() : "").append(",");
+
+        builder.append(manage.getTotalComplianceAwards() != null ? manage.getTotalComplianceAwards() : "").append(",");
 
         builder.append(manage.getMonthCommission() != null ? manage.getMonthCommission() : "");
         builder.append(",");
+
+        builder.append(manage.getBadRatings() != null ? this.getTwoPoint(manage.getBadRatings()) : "");
+        builder.append(",");
+
+        builder.append(manage.getNumberOfActiveDrivers() != null ? manage.getNumberOfActiveDrivers() : "").append(",");
 
         builder.append(manage.getExcludeCommission() != null ? manage.getExcludeCommission() : "");
         builder.append(",");
@@ -435,22 +440,36 @@ public class SupplierFeeController {
         builder.append(manage.getDeductionAmountLastMonth() != null ? manage.getDeductionAmountLastMonth() : "");
         builder.append(",");
 
+        builder.append(manage.getIsReissue() != null ? manage.getIsReissue() : "").append(",");
+
         builder.append(manage.getTotal() != null ? manage.getTotal() : "");
         builder.append(",");
 
         builder.append(manage.getComplianceDriverAward() != null ? manage.getComplianceDriverAward() : "");
         builder.append(",");
 
-        builder.append(manage.getOthers() != null ? manage.getOthers() : "");
-        builder.append(",");
+
 
         builder.append(manage.getBadRatingsAward() != null ? manage.getBadRatingsAward() : "");
         builder.append(",");
         builder.append(manage.getAmountAssessmentSum() != null ? manage.getAmountAssessmentSum() : "");
         builder.append(",");
+
+        builder.append(manage.getGardenAward() != null ? manage.getGardenAward() : "").append(",");
+
+        builder.append(manage.getOtherIncreaseAmount() != null ? manage.getOtherIncreaseAmount() : "").append(",");
+
         builder.append(manage.getInspectionFines() != null ? manage.getInspectionFines() : "");
         builder.append(",");
+
+        builder.append(manage.getOthers() != null ? manage.getOthers() : "");
+        builder.append(",");
+
         builder.append(manage.getTotalManageFees() != null ? manage.getTotalManageFees() : "");
+        builder.append(",");
+        builder.append(manage.getSettleStartDate() != null ? DateUtils.formatDate(manage.getSettleStartDate(),DateUtils.date_format) : "");
+        builder.append(",");
+        builder.append(manage.getSettleEndDate() != null ? DateUtils.formatDate(manage.getSettleEndDate(),DateUtils.date_format) : "");
         builder.append(",");
         listStr.add(builder.toString());
         return listStr;
