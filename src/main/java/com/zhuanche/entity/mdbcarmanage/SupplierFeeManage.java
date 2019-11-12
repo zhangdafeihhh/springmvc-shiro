@@ -81,6 +81,8 @@ public class SupplierFeeManage {
 
     private String supplierFullName;
 
+    private String supplierFullame;
+
     public Integer getId() {
         return id;
     }
@@ -391,5 +393,13 @@ public class SupplierFeeManage {
 
     public void setSupplierFullName(String supplierFullName) {
         this.supplierFullName = supplierFullName;
+    }
+
+    public String getSupplierFullame() {
+        return supplierFullame;
+    }
+
+    public void setSupplierFullame(String supplierFullame) {
+        this.supplierFullame = supplierFullame;
     }
 }

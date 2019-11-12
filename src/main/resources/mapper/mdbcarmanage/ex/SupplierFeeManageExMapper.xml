@@ -14,30 +14,30 @@
     <result column="wind_control_amount" property="windControlAmount" jdbcType="VARCHAR" />
     <result column="extra_charge" property="extraCharge" jdbcType="VARCHAR" />
     <result column="cancel_charge" property="cancelCharge" jdbcType="VARCHAR" />
-    <result column="total_amount_water" property="totalAmountWater" jdbcType="VARCHAR" />
-    <result column="scale_efficient" property="scaleEfficient" jdbcType="VARCHAR" />
-    <result column="total_flow_last_month" property="totalFlowLastMonth" jdbcType="VARCHAR" />
-    <result column="flow_increase" property="flowIncrease" jdbcType="VARCHAR" />
-    <result column="growth_factor" property="growthFactor" jdbcType="VARCHAR" />
-    <result column="bad_ratings" property="badRatings" jdbcType="VARCHAR" />
-    <result column="month_commission" property="monthCommission" jdbcType="VARCHAR" />
-    <result column="exclude_commission" property="excludeCommission" jdbcType="VARCHAR" />
-    <result column="deduction_amount_last_month" property="deductionAmountLastMonth" jdbcType="VARCHAR" />
-    <result column="total" property="total" jdbcType="VARCHAR" />
-    <result column="compliance_driver_award" property="complianceDriverAward" jdbcType="VARCHAR" />
-    <result column="others" property="others" jdbcType="VARCHAR" />
-    <result column="bad_ratings_award" property="badRatingsAward" jdbcType="VARCHAR" />
-    <result column="amount_assessment_sum" property="amountAssessmentSum" jdbcType="VARCHAR" />
-    <result column="inspection_fines" property="inspectionFines" jdbcType="VARCHAR" />
-    <result column="total_manage_fees" property="totalManageFees" jdbcType="VARCHAR" />N
-    <result column="status" property="status" jdbcType="INTEGER" />
-    <result column="amount_status" property="amountStatus" jdbcType="INTEGER" />
-    <result column="payment_time" property="paymentTime" jdbcType="TIMESTAMP" />
-    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
-    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
-    <result column="create_user" property="createUser" jdbcType="VARCHAR" />
-    <result column="amount_status_time" property="amountStatusTime" jdbcType="TIMESTAMP" />
-    <result column="supplier_full_name" property="supplierFullame" jdbcType="VARCHAR" />
+     <result column="total_amount_water" property="totalAmountWater" jdbcType="VARCHAR" />
+     <result column="scale_efficient" property="scaleEfficient" jdbcType="VARCHAR" />
+     <result column="total_flow_last_month" property="totalFlowLastMonth" jdbcType="VARCHAR" />
+     <result column="flow_increase" property="flowIncrease" jdbcType="VARCHAR" />
+     <result column="growth_factor" property="growthFactor" jdbcType="VARCHAR" />
+     <result column="bad_ratings" property="badRatings" jdbcType="VARCHAR" />
+     <result column="month_commission" property="monthCommission" jdbcType="VARCHAR" />
+     <result column="exclude_commission" property="excludeCommission" jdbcType="VARCHAR" />
+     <result column="deduction_amount_last_month" property="deductionAmountLastMonth" jdbcType="VARCHAR" />
+     <result column="total" property="total" jdbcType="VARCHAR" />
+     <result column="compliance_driver_award" property="complianceDriverAward" jdbcType="VARCHAR" />
+     <result column="others" property="others" jdbcType="VARCHAR" />
+     <result column="bad_ratings_award" property="badRatingsAward" jdbcType="VARCHAR" />
+     <result column="amount_assessment_sum" property="amountAssessmentSum" jdbcType="VARCHAR" />
+     <result column="inspection_fines" property="inspectionFines" jdbcType="VARCHAR" />
+     <result column="total_manage_fees" property="totalManageFees" jdbcType="VARCHAR" />
+     <result column="status" property="status" jdbcType="INTEGER" />
+     <result column="amount_status" property="amountStatus" jdbcType="INTEGER" />
+     <result column="payment_time" property="paymentTime" jdbcType="TIMESTAMP" />
+     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+     <result column="create_user" property="createUser" jdbcType="VARCHAR" />
+     <result column="amount_status_time" property="amountStatusTime" jdbcType="TIMESTAMP" />
+     <result column="supplier_full_name" property="supplierFullame" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, fee_order_no, city_id, supplier_name, supplier_id, settle_start_date, settle_end_date, 
