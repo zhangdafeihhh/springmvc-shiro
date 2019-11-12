@@ -22,6 +22,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.dateUtil.DateUtil;
 import com.zhuanche.util.excel.CsvUtils;
+import com.zhuanche.util.excel.SupplierFeeCsvUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -367,12 +368,13 @@ public class SupplierFeeController {
             boolean isLast = true;
             boolean isFirst = true;
 
-            CsvUtils entity = new CsvUtils();
+            SupplierFeeCsvUtils entity = new SupplierFeeCsvUtils();
             List<String> listStr = new ArrayList<>();
             listStr = getData(manage,listStr);
-
+            List<String> footerList = new ArrayList<>();
+            footerList = this.footerList(footerList);
             try {
-                entity.exportCsvV2(response,listStr,headerList,fileName,isFirst,isLast);
+                entity.exportCsvV2(response,listStr,headerList,fileName,isFirst,isLast,footerList);
             } catch (IOException e) {
                 logger.error("导出异常",e);
             }
@@ -476,6 +478,21 @@ public class SupplierFeeController {
 
     }
 
+
+    private List<String> footerList(List<String> footerList){
+        footerList.add("增值税普通发票开票信息：");
+        footerList.add("名称:首约科技（北京）有限公司天津分公司");
+        footerList.add("纳税人识别号:91120106MA05LCJU5H");
+        footerList.add("地址、电话:天津市滨海新区临港经济区临港怡湾广场3-208-05/06 022-27763608");
+        footerList.add("开户行及账号:中国工商银行空港经济区空港第一支行 0302098009100096236");
+        footerList.add("\n");
+        footerList.add("\n");
+        footerList.add("邮寄地址:");
+        footerList.add("北京市朝阳区枣营路甲3号 首汽大厦3层");
+        footerList.add("合作商运营部收");
+        footerList.add("13810675102");
+        return footerList;
+    }
     /**
      * 截取小数点后两位小数
      * @param param
