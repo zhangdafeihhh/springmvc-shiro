@@ -107,9 +107,6 @@
     LEFT JOIN car_biz_city c  ON t.city_id = c.city_id
     where 1=1
 
-    <if test="supplierFeeManage != null and supplierFeeManage != ''" >
-      AND  t.supplier_fee_manage  = #{supplierFeeManage}
-    </if>
 
     <if test="cityIds != null and cityIds != ''" >
       AND  t.city_id  in (${cityIds})
