@@ -147,10 +147,11 @@ public class OrderController{
 	                                           String licensePlates, 
 	                                           String orderNo, 
 	                                           String orderType,
-	                                          String beginCreateDate,
+	                                           String beginCreateDate,
 	                                           String endCreateDate,
-	                                            String beginCostEndDate,
-	                                      		String endCostEndDate,
+											   String beginCostEndDate,
+											   String endCostEndDate,
+											   Integer driverId,
 	                                           @Verify(param = "pageNo",rule = "required") Integer pageNo,
 	                                           @Verify(param = "pageSize",rule = "required") Integer pageSize,
 											   @RequestParam(value = "channelSource",required = false,defaultValue = "0")String channelSource
@@ -249,7 +250,11 @@ public class OrderController{
 	     paramMap.put("teamClassId", teamClassId);
 	     paramMap.put("bookingUserName", bookingUserName);
 	     paramMap.put("bookingUserPhone", bookingUserPhone);
-	     paramMap.put("driverPhone", driverPhone);
+	     if(null == driverId || driverId.intValue()<1){
+			 paramMap.put("driverPhone", driverPhone);
+		 }else{
+			 paramMap.put("driverId", driverId);
+		 }
 	     paramMap.put("licensePlates", licensePlates);
 	     paramMap.put("orderNo", orderNo);
 	     paramMap.put("type", orderType);
