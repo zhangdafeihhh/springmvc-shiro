@@ -1,7 +1,5 @@
 package com.zhuanche.dto.mdbcarmanage;
 
-import java.util.Date;
-
 public class SupplierFeeManageDto {
 
     private String feeOrderNo;
