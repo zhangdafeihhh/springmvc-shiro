@@ -26,6 +26,7 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.*;
 import com.zhuanche.util.encrypt.MD5Utils;
+import jdk.internal.util.xml.impl.SAXParserImpl;
 import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
@@ -500,7 +501,7 @@ public class IntegerCityController {
 
             String getOffId = boardOffResponse.getData().toString();
 
-            AjaxResponse configRouteRes = this.hasRoute(getOnId, getOffId);
+            AjaxResponse configRouteRes = this.anyRoute(getOnId, getOffId);
 
             String ruleId = "";
             String supplierId = "";
@@ -973,7 +974,7 @@ public class IntegerCityController {
         }
 
         if (StringUtils.isNotEmpty(getOnId) && StringUtils.isNotEmpty(getOffId)) {
-            AjaxResponse configRouteRes = this.hasRoute(getOnId, getOffId);
+            AjaxResponse configRouteRes = this.anyRoute(getOnId, getOffId);
 
             if (configRouteRes.getCode() != RestErrorCode.SUCCESS) {
                 logger.info("根据围栏id未获取到配置路线");
@@ -986,7 +987,7 @@ public class IntegerCityController {
         String getOff = boardingGetOffX + "," + boardingGetOffY;
 
 
-        AjaxResponse configRouteRes = this.hasRoute(getOnId, getOffId);
+        AjaxResponse configRouteRes = this.anyRoute(getOnId, getOffId);
 
         String ruleId = "";
         String supplierId = "";
@@ -2004,10 +2005,9 @@ public class IntegerCityController {
             }
 
             for(int i  =0;i<arrayData.size();i++){
-                JSONObject lbsRes = arrayData.getJSONObject(0);
+                JSONObject lbsRes = arrayData.getJSONObject(i);
                 if(lbsRes.get("areaId") != null){
-                    getOnId = lbsRes.getString("areaId");
-                    break;
+                    getOnId += lbsRes.getString("areaId") + SPLIT;
                 }
 
             }
@@ -2018,7 +2018,7 @@ public class IntegerCityController {
             return AjaxResponse.fail(RestErrorCode.ADD_NOT_RIGHT);
         }
 
-        return AjaxResponse.success(getOnId);
+        return AjaxResponse.success(getOnId.substring(0,getOnId.length()-1));
     }
 
 
@@ -2063,10 +2063,9 @@ public class IntegerCityController {
 
 
             for(int i  =0;i<jsonArray.size();i++){
-                JSONObject lbsRes = jsonArray.getJSONObject(0);
+                JSONObject lbsRes = jsonArray.getJSONObject(i);
                 if(lbsRes.get("areaId") != null){
-                    getOffId = lbsRes.getString("areaId");
-                    break;
+                    getOffId += lbsRes.getString("areaId") + SPLIT;
                 }
             }
         }
@@ -2075,9 +2074,34 @@ public class IntegerCityController {
             logger.info("上下车点不再围栏区域");
             return AjaxResponse.fail(RestErrorCode.ADD_NOT_RIGHT);
         }
-        return AjaxResponse.success(getOffId);
+        return AjaxResponse.success(getOffId.substring(0,getOffId.length()-1));
     }
 
+
+    /**
+     * 任意一条路线匹配就行
+     * @param getOnIds
+     * @param getOffIds
+     * @return
+     */
+    private AjaxResponse  anyRoute(String getOnIds,String getOffIds){
+
+        int count = 0;
+        String[] getOnId = getOnIds.split(SPLIT);
+        String[] getOffId = getOffIds.split(SPLIT);
+        for(int i = 0;i<getOnId.length;i++){
+            for(int j = 0;j<getOffId.length;j++){
+                count ++;
+                AjaxResponse response =  hasRoute(getOnId[i],getOffId[j]);
+                if(response.getCode() == 0){
+                    logger.info("匹配线路成功：线路上下车围栏id:" + getOnId[i],getOffId[j]+",查询次数：" + count);
+                    return response;
+                }
+            }
+        }
+        logger.info("未查询到匹配的线路,查询次数:" + count);
+        return AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
+    }
 
     /**
      * 是否有配置的线路 http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=40172935
@@ -2183,7 +2207,7 @@ public class IntegerCityController {
             }
         } catch (NumberFormatException e) {
             logger.error("获取线路异常" + e.getMessage());
-            return AjaxResponse.success(RestErrorCode.UNDEFINED_LINE);
+            return AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
         }
         return AjaxResponse.success(jsonRoute);
     }
