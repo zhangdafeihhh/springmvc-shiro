@@ -14,6 +14,7 @@ import com.zhuanche.entity.rentcar.DriverOutage;
 import com.zhuanche.serv.rentcar.DriverOutageService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
+import com.zhuanche.util.MobileOverlayUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
@@ -26,10 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.zhuanche.common.enums.MenuEnum.DRIVER_FOREVER_STOP_MANAGE;
 
@@ -91,7 +89,16 @@ public class DriverOutageAllController {
         }
         //查数据
         rows = driverOutageService.queryAllForListObject(params);
+        overLayPhone(rows);
         return AjaxResponse.success(new PageDTO(params.getPage(), params.getPagesize(), total, BeanUtil.copyList(rows, DriverOutageAllDTO.class)));
+    }
+
+    private void overLayPhone(List<DriverOutage> rows) {
+        if (Objects.nonNull(rows)){
+            for (DriverOutage row : rows) {
+                row.setDriverPhone(MobileOverlayUtil.doOverlayPhone(row.getDriverPhone()));
+            }
+        }
     }
 
     @RequestMapping(value="/saveDriverOutage")

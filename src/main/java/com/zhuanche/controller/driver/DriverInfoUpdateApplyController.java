@@ -26,6 +26,7 @@ import com.zhuanche.serv.rentcar.CarBizModelService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.Check;
+import com.zhuanche.util.MobileOverlayUtil;
 import com.zhuanche.util.ValidateUtils;
 import mapper.mdbcarmanage.ex.CarRelateTeamExMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +44,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static com.zhuanche.common.enums.MenuEnum.*;
@@ -131,7 +133,16 @@ public class DriverInfoUpdateApplyController {
             PageHelper.clearPage();
         }
         PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
+        overLayPhone(list);
         return AjaxResponse.success(pageDTO);
+    }
+
+    private void overLayPhone(List<DriverInfoUpdateApplyDTO> list) {
+        if (Objects.nonNull(list)){
+            for (DriverInfoUpdateApplyDTO driverInfoUpdateApplyDTO : list) {
+                driverInfoUpdateApplyDTO.setDriverPhone(MobileOverlayUtil.doOverlayPhone(driverInfoUpdateApplyDTO.getDriverPhone()));
+            }
+        }
     }
 
     /**

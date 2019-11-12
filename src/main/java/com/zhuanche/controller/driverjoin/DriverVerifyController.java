@@ -1,15 +1,14 @@
 package com.zhuanche.controller.driverjoin;
 
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.constant.Constants;
+import com.zhuanche.util.MobileOverlayUtil;
 import com.zhuanche.util.dateUtil.DateUtil;
 import com.zhuanche.util.excel.CsvUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,7 +97,16 @@ public class DriverVerifyController {
 		// 分页查询司机加盟注册信息
 		pageDto = driverVerifyService.queryDriverVerifyList(page, pageSize, cityId, supplier, mobile, verifyStatus,
 				createDateBegin, createDateEnd);
+        overLayPhone(pageDto.getResult());
 		return AjaxResponse.success(pageDto);
+	}
+
+	private void overLayPhone(List<DriverVerifyDto> result) {
+		if (Objects.nonNull(result)){
+			for (DriverVerifyDto driverVerifyDto : result) {
+				driverVerifyDto.setMobile(MobileOverlayUtil.doOverlayPhone(driverVerifyDto.getMobile()));
+			}
+		}
 	}
 
 	@RequestMapping("/exportDriverVerifyData")

@@ -19,6 +19,7 @@ import com.zhuanche.serv.mdbcarmanage.CarBizDriverInfoTempService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
+import com.zhuanche.util.MobileOverlayUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
@@ -35,10 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.zhuanche.common.enums.MenuEnum.*;
 
@@ -176,7 +174,16 @@ public class DriverInfoTemporaryController extends BaseController {
         }
         List<CarBizDriverInfoTempDTO> carBizDriverInfoTempDTOList = BeanUtil.copyList(carBizDriverInfoTemps,CarBizDriverInfoTempDTO.class);
         PageDTO pageDto = new PageDTO(page,pageSize,(int)total,carBizDriverInfoTempDTOList);
+        overLayPhone(carBizDriverInfoTempDTOList);
         return AjaxResponse.success(pageDto);
+    }
+
+    private void overLayPhone(List<CarBizDriverInfoTempDTO> result) {
+        if (Objects.nonNull(result)){
+            for (CarBizDriverInfoTempDTO carBizDriverInfoTempDTO : result) {
+                carBizDriverInfoTempDTO.setPhone(MobileOverlayUtil.doOverlayPhone(carBizDriverInfoTempDTO.getPhone()));
+            }
+        }
     }
 
     /**
