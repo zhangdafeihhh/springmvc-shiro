@@ -74,7 +74,7 @@ public class SupplierFeeCsvUtils {
             }
             if(footerList != null && !footerList.isEmpty()){
                 for(String data : footerList){
-                    bw.write(data+"\n");
+                    bw.write(data+"\r\n");
                 }
             }
             isSucess=true;
