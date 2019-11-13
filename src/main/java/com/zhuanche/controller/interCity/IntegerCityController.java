@@ -948,6 +948,11 @@ public class IntegerCityController {
                                   String bookingStartShortAddr,
                                   String bookingEndShortAddr) {
 
+        logger.info(MessageFormat.format("编辑订单入参:orderNo{0},reserveName{1},reservePhone{2},isSameRider{3},riderName{4},riderPhone{5}," +
+                "riderCount:{6},boardingTime{7},boardingCityId{8},boardingGetOnX{9},boardingGetOnY{10},boardingGetOffCityId{11}," +
+                "boardingGetOffX:{12},boardingGetOffY:{13},",orderNo,reserveName,reservePhone,isSameRider,riderName,riderPhone,riderCount,
+                boardingTime,boardingCityId,boardingGetOnX,boardingGetOnY,boardingGetOffCityId,boardingGetOffX,boardingGetOffY,mainOrderNo,
+                status,startCityName,endCityName,bookingStartAddr,bookingEndAddr,carGroup,bookingStartShortAddr,bookingEndShortAddr));
         //根据上下车地址判断是否在城际列车配置的范围内
         //根据横纵坐标获取围栏，根据围栏获取路线
         String getOnId = "";
@@ -1230,6 +1235,7 @@ public class IntegerCityController {
         String sign = Base64.encodeBase64String(DigestUtils.md5(param));
         map.put("sign", sign);
         String url = "/order/carpool/updateCrossCityOrder";
+        logger.info("编辑入参：" + JSONObject.toJSONString(map));
         String editResult = carRestTemplate.postForObject(url, JSONObject.class, map);
         logger.info("编辑结果：" + editResult);
         if (StringUtils.isNotBlank(editResult)) {
