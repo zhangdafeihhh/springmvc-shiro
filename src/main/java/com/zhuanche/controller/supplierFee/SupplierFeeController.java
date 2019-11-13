@@ -347,7 +347,7 @@ public class SupplierFeeController {
             SupplierFeeManage manage = supplierFeeService.queryByOrderNo(feeOrderNo);
             List<String> headerList = new ArrayList<>();
             String titles = "序号,合作商,合作商全称,总营业额,入围司机营业额,流水金额,风控金额,价外费,取消费,流水合计金额,规模系数,上月总流水,流水增幅,增长系数,司机贡献金合计," +
-                    "合规奖励合计,佣金合计,差评率,活跃司机数量,剔除佣金,上月暂扣金额,是否补发,合计," +
+                    "合规奖励合计,佣金合计,差评率,活跃司机数量,剔除佣金,上月暂扣金额,是否补发,合计费用," +
                     "合规司机奖励,差评罚金,扣款差评数量,花园权益奖励,其它增加金额,稽查罚金,其它扣款项,管理费合计,结算开始日期,结算结束日期";
 
 
@@ -372,7 +372,9 @@ public class SupplierFeeController {
             listStr = (List<String>) map.get("listStr");
             String newTitle = (String) map.get("title");
             logger.info("newTitle:" + newTitle);
-            headerList.add(newTitle);
+            //将合计费用修改为合计
+            String addTitle = newTitle.replaceAll("合计费用","合计");
+            headerList.add(addTitle);
             List<String> footerList = new ArrayList<>();
             footerList = this.footerList(footerList);
             try {
@@ -568,7 +570,7 @@ public class SupplierFeeController {
         }
 
         if(StringUtils.isEmpty(manage.getTotal() )){
-            title = title.replaceAll("合计,","");
+            title = title.replaceAll("合计费用,","");
         }else {
             builder.append(manage.getTotal() != null ? manage.getTotal() : "");
             builder.append(",");
