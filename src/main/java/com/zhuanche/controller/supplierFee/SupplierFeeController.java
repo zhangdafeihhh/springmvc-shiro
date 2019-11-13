@@ -539,7 +539,7 @@ public class SupplierFeeController {
         }
 
 
-        if(manage.getNumberOfActiveDrivers() == null || manage.getNumberOfActiveDrivers() == 0){
+        if(manage.getNumberOfActiveDrivers() == null){
             title = title.replaceAll("活跃司机数量,","");
         }else {
             builder.append(manage.getNumberOfActiveDrivers() != null ? manage.getNumberOfActiveDrivers() : "").append(",");
