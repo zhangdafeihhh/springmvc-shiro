@@ -2093,7 +2093,8 @@ public class IntegerCityController {
                 count ++;
                 AjaxResponse response =  hasRoute(getOnId[i],getOffId[j]);
                 if(response.getCode() == 0){
-                    logger.info("匹配线路成功：线路上下车围栏id:" + getOnId[i],getOffId[j]+",查询次数：" + count);
+                    logger.info("匹配线路成功：线路上车围栏id:" + getOnId[i]+",下车围栏id："+getOffId[j]+",查询次数：" + count
+                    +",返回结果:" + JSONObject.toJSONString(response.getData()));
                     return response;
                 }
             }
