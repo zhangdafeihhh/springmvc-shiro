@@ -26,7 +26,6 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.*;
 import com.zhuanche.util.encrypt.MD5Utils;
-import jdk.internal.util.xml.impl.SAXParserImpl;
 import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
