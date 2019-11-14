@@ -14,4 +14,7 @@ public interface SupplierFeeManageExMapper {
     SupplierFeeManage feeOrderDetail(String feeOrderNo);
 
     int updateStatusByFeeOrderNo(@Param("feeOrderNo") String feeOrderNo,@Param("amountStatus") int amountStatus);
+
+    int updateStatusAndAmount(@Param("feeOrderNo") String feeOrderNo,@Param("amountStatus") int amountStatus,@Param("status")int status);
+
 }

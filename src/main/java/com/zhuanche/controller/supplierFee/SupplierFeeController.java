@@ -2,6 +2,7 @@ package com.zhuanche.controller.supplierFee;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Maps;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
@@ -21,7 +22,8 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.dateUtil.DateUtil;
-import com.zhuanche.util.excel.CsvUtils;
+import com.zhuanche.util.excel.SupplierFeeCsvUtils;
+import mapper.mdbcarmanage.ex.SupplierFeeManageExMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -41,9 +43,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -77,10 +77,10 @@ public class SupplierFeeController {
     public AjaxResponse listSupplierFee( @RequestParam(value = "pageSize",required = false,defaultValue = "10")Integer pageSize,
                                          @RequestParam(value = "pageNum",required = false,defaultValue = "1")Integer pageNum,
                                          Integer cityId, Integer supplierId,
-                                        Integer status, Integer amountStatus, String settleStartDate,
-                                        String settleEndDate,String paymentStartTime,String paymentEndTime){
+                                         Integer status, Integer amountStatus, String settleStartDate,
+                                         String settleEndDate,String paymentStartTime,String paymentEndTime){
         logger.info(MessageFormat.format("查询司机线上化入参:pageSize:%s,pageNum:{0},cityId:{1},supplierId:{2},status:{3}," +
-                "amountStatus:{4},settleStartDate:{5},settleEndDate:{6},paymentStartTime:{7},paymentEndTime:{8}",pageSize,
+                        "amountStatus:{4},settleStartDate:{5},settleEndDate:{6},paymentStartTime:{7},paymentEndTime:{8}",pageSize,
                 pageNum,cityId,supplierId,status,amountStatus,settleStartDate,settleEndDate,paymentStartTime,paymentEndTime));
 
         PageDTO pageDTO = null;
@@ -94,7 +94,7 @@ public class SupplierFeeController {
                 feeManageDto.setCityIds(sessionCityIds);
                 feeManageDto.setSupplierIds(sessionSuppliers);
             }
-            
+
             feeManageDto.setCityId(cityId);
             feeManageDto.setSettleStartDate(settleStartDate);
             feeManageDto.setSettleEndDate(settleEndDate);
@@ -139,7 +139,6 @@ public class SupplierFeeController {
                 detailDto.setFlowIncrease(this.getTwoPoint(detailDto.getFlowIncrease()));
                 detailDto.setGrowthFactor(this.getTwoPoint(detailDto.getGrowthFactor()));
                 detailDto.setBadRatings(this.getTwoPoint(detailDto.getBadRatings()));
-
                 List<SupplierFeeRecord> recordList = recordService.listRecord(feeOrderNo);
                 if(CollectionUtils.isNotEmpty(recordList)){
                     detailDto.setSupplierFeeRecordList(recordList);
@@ -165,7 +164,8 @@ public class SupplierFeeController {
     } )
     public AjaxResponse supplierFeeOpe(@Verify(param = "status",rule = "required") Integer status,
                                        @Verify(param = "remark",rule = "required") String remark,
-                                       @Verify(param = "feeOrderNo",rule = "required") String feeOrderNo){
+                                       @Verify(param = "feeOrderNo",rule = "required") String feeOrderNo,
+                                       @Verify(param = "amountStatus",rule = "required")Integer amountStatus){
         logger.info("供应商线上化确认操作，入参：" + status,remark,feeOrderNo);
         SSOLoginUser ssoLoginUser = WebSessionUtil.getCurrentLoginUser();
         if(null == ssoLoginUser){
@@ -175,11 +175,8 @@ public class SupplierFeeController {
         String userName = ssoLoginUser.getLoginName();
         try {
             SupplierFeeRecord record = new SupplierFeeRecord();
-            if(status == 1){
-                record.setOperate(SupplierFeeStatusEnum.NORMAL.getMsg());
-            }else {
-                record.setOperate(SupplierFeeStatusEnum.UNNORMAL.getMsg());
-            }
+
+            record.setOperate(SupplierFeeManageEnum.getFeeStatus(status).getMsg());
             record.setCreateTime(new Date());
             record.setUpdateTime(new Date());
             record.setOperateId(loginId);
@@ -192,10 +189,15 @@ public class SupplierFeeController {
             int code =  recordService.insertFeeRecord(record);
 
             if(code > 0){
-              int feeCode =   supplierFeeService.updateStatusByFeeOrderNo(feeOrderNo,status);
-              if(feeCode > 0 ){
-                  logger.info("更新状态成功");
-              }
+                int feeCode = 0;
+                if(status == 0){
+                    feeCode = supplierFeeService.updateStatusAndAmount(feeOrderNo,amountStatus,status);
+                }else {
+                    feeCode = supplierFeeService.updateStatusByFeeOrderNo(feeOrderNo,amountStatus);
+                }
+                if(feeCode > 0 ){
+                    logger.info("更新状态成功");
+                }
                 logger.info("数据插入success");
             }else {
                 logger.info("数据插入error");
@@ -219,8 +221,8 @@ public class SupplierFeeController {
             @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE)
     } )
     public AjaxResponse exportPDFSupplierFeeData(HttpServletResponse response,
-                                              ServletOutputStream outputStream,
-                                              String feeOrderNo){
+                                                 ServletOutputStream outputStream,
+                                                 String feeOrderNo){
         logger.info(MessageFormat.format("查询司机线上化入参:feeOrderNo:{0}",feeOrderNo));
         response.setContentType("application/pdf;charset=ISO8859-1");
         response.setHeader("Content-disposition", "attachment; filename="+"supplierFeePDF-1.pdf");
@@ -228,7 +230,7 @@ public class SupplierFeeController {
 
 
         String[] titles = { "供应商名称", "结算开始日期", "结算结束日期", "总流水", "流水金额", "风控金额","价外费","取消费","流水合计金额",
-        "规模系数","上月总流水","流水增幅","增长系数","差评率","当月佣金","剔除佣金","上月暂扣金额","合计","合规司机奖励","其他","差评罚金","扣款差评数量","稽查罚金","管理费合计"};
+                "规模系数","上月总流水","流水增幅","增长系数","差评率","当月佣金","剔除佣金","上月暂扣金额","合计","合规司机奖励","其他","差评罚金","扣款差评数量","稽查罚金","管理费合计"};
         try {
             ByteArrayOutputStream ba = new ByteArrayOutputStream();
             Document document = new Document(PageSize.A3); // Step 1—Create a Document.
@@ -317,7 +319,7 @@ public class SupplierFeeController {
             PdfPCell cell24= new PdfPCell(new Paragraph(manage.getTotalManageFees(),topfont));
             table1.addCell(cell24);
 
-           document.add(table1);//将表格加入到document中
+            document.add(table1);//将表格加入到document中
             document.add(blankRow1);
             document.close();
             ba.writeTo(outputStream);
@@ -348,9 +350,10 @@ public class SupplierFeeController {
         try {
             SupplierFeeManage manage = supplierFeeService.queryByOrderNo(feeOrderNo);
             List<String> headerList = new ArrayList<>();
-            String titles = "供应商名称,结算开始日期,结算结束日期,总流水,流水金额,风控金额,价外费,取消费,流水合计金额,规模系数,上月有效司机数量,有效司机数量增幅,运力系数,差评率,当月佣金,剔除佣金,上月暂扣金额,合计," +
-                    "合规司机奖励,其他,差评罚金,扣款差评数量,稽查罚金,管理费合计";
-            headerList.add(titles);
+            String titles = "序号,合作商,合作商全称,总营业额,入围司机营业额,流水金额,风控金额,价外费,取消费,流水合计金额,规模系数,上月总流水,流水增幅,增长系数,司机贡献金合计," +
+                    "合规奖励合计,佣金合计,差评率,活跃司机数量,剔除佣金,上月暂扣金额,是否补发,合计费用," +
+                    "合规司机奖励,差评罚金,扣款差评数量,花园权益奖励,其它增加金额,稽查罚金,其它扣款项,管理费合计,结算开始日期,结算结束日期";
+
 
             String fileName = "对账单信息" + DateUtil.dateFormat(new Date(), DateUtil.intTimestampPattern)+".csv";
             String agent = request.getHeader("User-Agent").toUpperCase(); //获得浏览器信息并转换为大写
@@ -367,12 +370,19 @@ public class SupplierFeeController {
             boolean isLast = true;
             boolean isFirst = true;
 
-            CsvUtils entity = new CsvUtils();
+            SupplierFeeCsvUtils entity = new SupplierFeeCsvUtils();
             List<String> listStr = new ArrayList<>();
-            listStr = getData(manage,listStr);
-
+            Map<String,Object> map = getData(manage,listStr,titles);
+            listStr = (List<String>) map.get("listStr");
+            String newTitle = (String) map.get("title");
+            logger.info("newTitle:" + newTitle);
+            //将合计费用修改为合计
+            String addTitle = newTitle.replaceAll("合计费用","合计");
+            headerList.add(addTitle);
+            List<String> footerList = new ArrayList<>();
+            footerList = this.footerList(footerList);
             try {
-                entity.exportCsvV2(response,listStr,headerList,fileName,isFirst,isLast);
+                entity.exportCsvV2(response,listStr,headerList,fileName,isFirst,isLast,footerList);
             } catch (IOException e) {
                 logger.error("导出异常",e);
             }
@@ -384,79 +394,290 @@ public class SupplierFeeController {
     }
 
 
-    private List<String> getData(SupplierFeeManage manage,List<String> listStr){
+    private Map<String,Object> getData(SupplierFeeManage manage,List<String> listStr,String title){
 
-
+        Map<String,Object> mapData = Maps.newHashMap();
 
         StringBuilder builder = new StringBuilder();
-        builder.append(manage.getSupplierName() != null ? manage.getSupplierName():"");
-        builder.append(",");
-        builder.append(manage.getSettleStartDate() != null ? DateUtils.formatDate(manage.getSettleStartDate(),DateUtils.date_format) : "");
-        builder.append(",");
-        builder.append(manage.getSettleEndDate() != null ? DateUtils.formatDate(manage.getSettleEndDate(),DateUtils.date_format) : "");
-        builder.append(",");
-        builder.append(manage.getTotalFlow() != null ? manage.getTotalFlow() : "");
-        builder.append(",");
-        builder.append(manage.getFlowAmount() != null ? manage.getFlowAmount() : "");
-        builder.append(",");
-        builder.append(manage.getWindControlAmount() != null ? manage.getWindControlAmount() : "");
-        builder.append(",");
+        if(StringUtils.isEmpty(manage.getSerialNumber())){
+            title = title.replaceAll("序号,","");
+        }else {
+            builder.append(manage.getSerialNumber()).append(",");
+        }
 
-        builder.append(manage.getExtraCharge() != null ? manage.getExtraCharge() : "");
-        builder.append(",");
 
-        builder.append(manage.getCancelCharge() != null ? manage.getCancelCharge() : "");
-        builder.append(",");
+        if(StringUtils.isEmpty(manage.getSupplierName() )){
+            title = title.replaceAll("合作商,","");
 
-        builder.append(manage.getTotalAmountWater() != null ? manage.getTotalAmountWater() : "");
-        builder.append(",");
+        }else {
+            builder.append(manage.getSupplierName());
+            builder.append(",");
+        }
 
-        builder.append(manage.getScaleEfficient() != null ? this.getTwoPoint(manage.getScaleEfficient()): "");
-        builder.append(",");
 
-        builder.append(manage.getTotalFlowLastMonth() != null ? manage.getTotalFlowLastMonth() : "");
-        builder.append(",");
+        if(StringUtils.isEmpty(manage.getSupplierFullName())){
+            title = title.replaceAll("合作商全称,","");
+        }else {
+            builder.append(manage.getSupplierFullName() != null ? manage.getSupplierFullName() : "").append(",");
 
-        builder.append(manage.getFlowIncrease() != null ? this.getTwoPoint(manage.getFlowIncrease()) : "");
-        builder.append(",");
+        }
 
-        builder.append(manage.getGrowthFactor() != null ? this.getTwoPoint(manage.getGrowthFactor()) : "");
-        builder.append(",");
 
-        builder.append(manage.getBadRatings() != null ? this.getTwoPoint(manage.getBadRatings()) : "");
-        builder.append(",");
+        if(StringUtils.isEmpty(manage.getTotalFlow())){
+            title = title.replaceAll("总营业额,","");
+        }else {
+            builder.append(manage.getTotalFlow() != null ? manage.getTotalFlow() : "");
+            builder.append(",");
+        }
 
-        builder.append(manage.getMonthCommission() != null ? manage.getMonthCommission() : "");
-        builder.append(",");
 
-        builder.append(manage.getExcludeCommission() != null ? manage.getExcludeCommission() : "");
-        builder.append(",");
 
-        builder.append(manage.getDeductionAmountLastMonth() != null ? manage.getDeductionAmountLastMonth() : "");
-        builder.append(",");
 
-        builder.append(manage.getTotal() != null ? manage.getTotal() : "");
-        builder.append(",");
+        if(StringUtils.isEmpty(manage.getTurnoverDrivers())){
+            title = title.replaceAll("入围司机营业额,","");
 
-        builder.append(manage.getComplianceDriverAward() != null ? manage.getComplianceDriverAward() : "");
-        builder.append(",");
+        }else {
+            builder.append(manage.getTurnoverDrivers() != null ? manage.getTurnoverDrivers() : "").append(",");
 
-        builder.append(manage.getOthers() != null ? manage.getOthers() : "");
-        builder.append(",");
+        }
+        if(StringUtils.isEmpty(manage.getFlowAmount())){
+            title = title.replaceAll("流水金额,","");
+        }else {
+            builder.append(manage.getFlowAmount() != null ? manage.getFlowAmount() : "");
+            builder.append(",");
+        }
 
-        builder.append(manage.getBadRatingsAward() != null ? manage.getBadRatingsAward() : "");
-        builder.append(",");
-        builder.append(manage.getAmountAssessmentSum() != null ? manage.getAmountAssessmentSum() : "");
-        builder.append(",");
-        builder.append(manage.getInspectionFines() != null ? manage.getInspectionFines() : "");
-        builder.append(",");
-        builder.append(manage.getTotalManageFees() != null ? manage.getTotalManageFees() : "");
-        builder.append(",");
+
+        if(StringUtils.isEmpty(manage.getWindControlAmount())){
+            title = title.replaceAll("风控金额,","");
+        }else {
+            builder.append(manage.getWindControlAmount() != null ? manage.getWindControlAmount() : "");
+            builder.append(",");
+        }
+
+
+
+        if(StringUtils.isEmpty(manage.getExtraCharge())){
+            title = title.replaceAll("价外费,","");
+        }else {
+            builder.append(manage.getExtraCharge() != null ? manage.getExtraCharge() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getCancelCharge())){
+            title = title.replaceAll("取消费,","");
+        }else {
+            builder.append(manage.getCancelCharge() != null ? manage.getCancelCharge() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getTotalAmountWater())){
+            title = title.replaceAll("流水合计金额,","");
+        }else {
+            builder.append(manage.getTotalAmountWater() != null ? manage.getTotalAmountWater() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getScaleEfficient())){
+            title = title.replaceAll("规模系数,","");
+        }else {
+            builder.append(manage.getScaleEfficient() != null ? this.getTwoPoint(manage.getScaleEfficient()): "");
+            builder.append(",");
+
+        }
+
+        if(StringUtils.isEmpty(manage.getTotalFlowLastMonth())){
+            title = title.replaceAll("上月总流水,","");
+        }else {
+            builder.append(manage.getTotalFlowLastMonth() != null ? manage.getTotalFlowLastMonth() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getFlowIncrease())){
+            title = title.replaceAll("流水增幅,","");
+        }else {
+            builder.append(manage.getFlowIncrease() != null ? this.getTwoPoint(manage.getFlowIncrease()) : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getGrowthFactor())){
+            title = title.replaceAll("增长系数,","");
+        }else {
+            builder.append(manage.getGrowthFactor() != null ? this.getTwoPoint(manage.getGrowthFactor()) : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getTotalDriverContribution())){
+            title = title.replaceAll("司机贡献金合计,","");
+        }else {
+            builder.append(manage.getTotalDriverContribution() != null ? manage.getTotalDriverContribution() : "").append(",");
+
+        }
+
+        if(StringUtils.isEmpty(manage.getTotalComplianceAwards())){
+            title = title.replaceAll("合规奖励合计,","");
+        }else {
+            builder.append(manage.getTotalComplianceAwards() != null ? manage.getTotalComplianceAwards() : "").append(",");
+
+        }
+
+        if(StringUtils.isEmpty(manage.getMonthCommission())){
+            title = title.replaceAll("佣金合计,","");
+        }else {
+            builder.append(manage.getMonthCommission() != null ? manage.getMonthCommission() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getBadRatings())){
+            title = title.replaceAll("差评率,","");
+        }else {
+            builder.append(manage.getBadRatings() != null ? this.getTwoPoint(manage.getBadRatings()) : "");
+            builder.append(",");
+        }
+
+
+        if(manage.getNumberOfActiveDrivers() == null){
+            title = title.replaceAll("活跃司机数量,","");
+        }else {
+            builder.append(manage.getNumberOfActiveDrivers() != null ? manage.getNumberOfActiveDrivers() : "").append(",");
+
+        }
+
+        if(StringUtils.isEmpty(manage.getExcludeCommission())){
+            title = title.replaceAll("剔除佣金,","");
+        }else {
+            builder.append(manage.getExcludeCommission() != null ? manage.getExcludeCommission() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getDeductionAmountLastMonth() )){
+            title = title.replaceAll("上月暂扣金额,","");
+        }else {
+            builder.append(manage.getDeductionAmountLastMonth() != null ? manage.getDeductionAmountLastMonth() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getIsReissue())){
+            title = title.replaceAll("是否补发,","");
+        }else {
+            builder.append(manage.getIsReissue() != null ? manage.getIsReissue() : "").append(",");
+
+        }
+
+        if(StringUtils.isEmpty(manage.getTotal() )){
+            title = title.replaceAll("合计费用,","");
+        }else {
+            builder.append(manage.getTotal() != null ? manage.getTotal() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getComplianceDriverAward())){
+            title = title.replaceAll("合规司机奖励,","");
+        }else {
+            builder.append(manage.getComplianceDriverAward() != null ? manage.getComplianceDriverAward() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getBadRatingsAward())){
+            title = title.replaceAll("差评罚金,","");
+        }else {
+            builder.append(manage.getBadRatingsAward() != null ? manage.getBadRatingsAward() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getAmountAssessmentSum())){
+            title = title.replaceAll("扣款差评数量,","");
+        }else {
+            builder.append(manage.getAmountAssessmentSum() != null ? manage.getAmountAssessmentSum() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getGardenAward())){
+            title = title.replaceAll("花园权益奖励,","");
+        }else {
+            builder.append(manage.getGardenAward() != null ? manage.getGardenAward() : "").append(",");
+
+        }
+
+        if(StringUtils.isEmpty(manage.getOtherIncreaseAmount())){
+            title = title.replaceAll("其它增加金额,","");
+        }else {
+            builder.append(manage.getOtherIncreaseAmount() != null ? manage.getOtherIncreaseAmount() : "").append(",");
+
+        }
+
+        if(StringUtils.isEmpty(manage.getInspectionFines())){
+            title = title.replaceAll("稽查罚金,","");
+        }else {
+            builder.append(manage.getInspectionFines() != null ? manage.getInspectionFines() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getOthers())){
+            title = title.replaceAll("其它扣款项,","");
+        }else {
+            builder.append(manage.getOthers() != null ? manage.getOthers() : "");
+            builder.append(",");
+        }
+
+
+        if(StringUtils.isEmpty(manage.getTotalManageFees())){
+            title = title.replaceAll("管理费合计,","");
+        }else {
+            builder.append(manage.getTotalManageFees() != null ? manage.getTotalManageFees() : "");
+            builder.append(",");
+        }
+
+        if(manage.getSettleStartDate() == null){
+            title = title.replaceAll("结算开始日期,","");
+        }else {
+            builder.append(manage.getSettleStartDate() != null ? DateUtils.formatDate(manage.getSettleStartDate(),DateUtils.date_format) : "");
+            builder.append(",");
+        }
+
+        if(manage.getSettleEndDate() == null){
+            title = title.replaceAll("结算结束日期,","");
+        }else {
+            builder.append(manage.getSettleEndDate() != null ? DateUtils.formatDate(manage.getSettleEndDate(),DateUtils.date_format) : "");
+            builder.append(",");
+        }
+
         listStr.add(builder.toString());
-        return listStr;
+        mapData.put("listStr",listStr);
+        mapData.put("title",title);
+        return mapData;
 
     }
 
+
+    private List<String> footerList(List<String> footerList){
+        footerList.add("\n");
+        footerList.add("增值税普通发票开票信息：");
+        footerList.add("名称:首约科技（北京）有限公司天津分公司");
+        footerList.add("纳税人识别号:91120106MA05LCJU5H");
+        footerList.add("地址、电话:天津市滨海新区临港经济区临港怡湾广场3-208-05/06 022-27763608");
+        footerList.add("开户行及账号:中国工商银行空港经济区空港第一支行 0302098009100096236");
+        footerList.add("\n");
+        footerList.add("邮寄地址:");
+        footerList.add("北京市朝阳区枣营路甲3号 首汽大厦3层");
+        footerList.add("合作商运营部收:13810675102");
+        footerList.add("");
+        return footerList;
+    }
     /**
      * 截取小数点后两位小数
      * @param param
