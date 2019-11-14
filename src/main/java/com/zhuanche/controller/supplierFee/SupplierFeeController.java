@@ -23,6 +23,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.dateUtil.DateUtil;
 import com.zhuanche.util.excel.SupplierFeeCsvUtils;
+import mapper.mdbcarmanage.ex.SupplierFeeManageExMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -76,10 +77,10 @@ public class SupplierFeeController {
     public AjaxResponse listSupplierFee( @RequestParam(value = "pageSize",required = false,defaultValue = "10")Integer pageSize,
                                          @RequestParam(value = "pageNum",required = false,defaultValue = "1")Integer pageNum,
                                          Integer cityId, Integer supplierId,
-                                        Integer status, Integer amountStatus, String settleStartDate,
-                                        String settleEndDate,String paymentStartTime,String paymentEndTime){
+                                         Integer status, Integer amountStatus, String settleStartDate,
+                                         String settleEndDate,String paymentStartTime,String paymentEndTime){
         logger.info(MessageFormat.format("查询司机线上化入参:pageSize:%s,pageNum:{0},cityId:{1},supplierId:{2},status:{3}," +
-                "amountStatus:{4},settleStartDate:{5},settleEndDate:{6},paymentStartTime:{7},paymentEndTime:{8}",pageSize,
+                        "amountStatus:{4},settleStartDate:{5},settleEndDate:{6},paymentStartTime:{7},paymentEndTime:{8}",pageSize,
                 pageNum,cityId,supplierId,status,amountStatus,settleStartDate,settleEndDate,paymentStartTime,paymentEndTime));
 
         PageDTO pageDTO = null;
@@ -93,7 +94,7 @@ public class SupplierFeeController {
                 feeManageDto.setCityIds(sessionCityIds);
                 feeManageDto.setSupplierIds(sessionSuppliers);
             }
-            
+
             feeManageDto.setCityId(cityId);
             feeManageDto.setSettleStartDate(settleStartDate);
             feeManageDto.setSettleEndDate(settleEndDate);
@@ -163,7 +164,8 @@ public class SupplierFeeController {
     } )
     public AjaxResponse supplierFeeOpe(@Verify(param = "status",rule = "required") Integer status,
                                        @Verify(param = "remark",rule = "required") String remark,
-                                       @Verify(param = "feeOrderNo",rule = "required") String feeOrderNo){
+                                       @Verify(param = "feeOrderNo",rule = "required") String feeOrderNo,
+                                       @Verify(param = "amountStatus",rule = "required")Integer amountStatus){
         logger.info("供应商线上化确认操作，入参：" + status,remark,feeOrderNo);
         SSOLoginUser ssoLoginUser = WebSessionUtil.getCurrentLoginUser();
         if(null == ssoLoginUser){
@@ -173,11 +175,8 @@ public class SupplierFeeController {
         String userName = ssoLoginUser.getLoginName();
         try {
             SupplierFeeRecord record = new SupplierFeeRecord();
-            if(status == 1){
-                record.setOperate(SupplierFeeStatusEnum.NORMAL.getMsg());
-            }else {
-                record.setOperate(SupplierFeeStatusEnum.UNNORMAL.getMsg());
-            }
+
+            record.setOperate(SupplierFeeManageEnum.getFeeStatus(status).getMsg());
             record.setCreateTime(new Date());
             record.setUpdateTime(new Date());
             record.setOperateId(loginId);
@@ -190,10 +189,15 @@ public class SupplierFeeController {
             int code =  recordService.insertFeeRecord(record);
 
             if(code > 0){
-              int feeCode =   supplierFeeService.updateStatusByFeeOrderNo(feeOrderNo,status);
-              if(feeCode > 0 ){
-                  logger.info("更新状态成功");
-              }
+                int feeCode = 0;
+                if(status == 0){
+                    feeCode = supplierFeeService.updateStatusAndAmount(feeOrderNo,amountStatus,status);
+                }else {
+                    feeCode = supplierFeeService.updateStatusByFeeOrderNo(feeOrderNo,amountStatus);
+                }
+                if(feeCode > 0 ){
+                    logger.info("更新状态成功");
+                }
                 logger.info("数据插入success");
             }else {
                 logger.info("数据插入error");
@@ -217,8 +221,8 @@ public class SupplierFeeController {
             @MasterSlaveConfig(databaseTag="mdbcarmanage-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE)
     } )
     public AjaxResponse exportPDFSupplierFeeData(HttpServletResponse response,
-                                              ServletOutputStream outputStream,
-                                              String feeOrderNo){
+                                                 ServletOutputStream outputStream,
+                                                 String feeOrderNo){
         logger.info(MessageFormat.format("查询司机线上化入参:feeOrderNo:{0}",feeOrderNo));
         response.setContentType("application/pdf;charset=ISO8859-1");
         response.setHeader("Content-disposition", "attachment; filename="+"supplierFeePDF-1.pdf");
@@ -226,7 +230,7 @@ public class SupplierFeeController {
 
 
         String[] titles = { "供应商名称", "结算开始日期", "结算结束日期", "总流水", "流水金额", "风控金额","价外费","取消费","流水合计金额",
-        "规模系数","上月总流水","流水增幅","增长系数","差评率","当月佣金","剔除佣金","上月暂扣金额","合计","合规司机奖励","其他","差评罚金","扣款差评数量","稽查罚金","管理费合计"};
+                "规模系数","上月总流水","流水增幅","增长系数","差评率","当月佣金","剔除佣金","上月暂扣金额","合计","合规司机奖励","其他","差评罚金","扣款差评数量","稽查罚金","管理费合计"};
         try {
             ByteArrayOutputStream ba = new ByteArrayOutputStream();
             Document document = new Document(PageSize.A3); // Step 1—Create a Document.
@@ -315,7 +319,7 @@ public class SupplierFeeController {
             PdfPCell cell24= new PdfPCell(new Paragraph(manage.getTotalManageFees(),topfont));
             table1.addCell(cell24);
 
-           document.add(table1);//将表格加入到document中
+            document.add(table1);//将表格加入到document中
             document.add(blankRow1);
             document.close();
             ba.writeTo(outputStream);

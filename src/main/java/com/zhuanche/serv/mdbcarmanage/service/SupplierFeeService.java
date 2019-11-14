@@ -19,4 +19,6 @@ public interface SupplierFeeService {
     SupplierFeeManage queryByOrderNo(@Param("feeOrderNO") String feeOrderNo);
 
     int updateStatusByFeeOrderNo(String feeOrderNo,int amountStatus);
+
+    int updateStatusAndAmount(String feeOrderNo,int amountStatus,int status);
 }

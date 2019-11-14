@@ -160,6 +160,11 @@
   </select>
 
   <update id="updateStatusByFeeOrderNo" >
+    update supplier_fee_manage SET amount_status = #{amountStatus}
+    WHERE fee_order_no =#{feeOrderNo}
+  </update>
+
+  <update id="updateStatusAndAmount" >
     update supplier_fee_manage SET status = 1,amount_status = #{amountStatus}
     WHERE fee_order_no =#{feeOrderNo}
   </update>
