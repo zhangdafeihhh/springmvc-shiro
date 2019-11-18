@@ -350,7 +350,7 @@ public class SupplierFeeController {
         try {
             SupplierFeeManage manage = supplierFeeService.queryByOrderNo(feeOrderNo);
             List<String> headerList = new ArrayList<>();
-            String titles = "序号,合作商,合作商全称,'',结算开始日期,结算结束日期,总营业额,入围司机营业额,流水金额,风控金额,价外费,取消费,流水合计金额,规模系数,上月总流水,流水增幅,增长系数,司机贡献金合计," +
+            String titles = "序号,合作商,合作商全称,这列为空,结算开始日期,结算结束日期,总营业额,入围司机营业额,流水金额,风控金额,价外费,取消费,流水合计金额,规模系数,上月总流水,流水增幅,增长系数,司机贡献金合计," +
                     "合规奖励合计,佣金合计,差评率,活跃司机数量,剔除佣金,上月暂扣金额,是否补发,合计费用," +
                     "合规司机奖励,差评罚金,扣款差评数量,花园权益奖励,其它增加金额,稽查罚金,其它扣款项,管理费合计";
 
@@ -418,7 +418,9 @@ public class SupplierFeeController {
 
         if(StringUtils.isEmpty(manage.getSupplierFullName())){
             title = title.replaceAll("合作商全称,","");
+            title = title.replaceAll("这列为空,","");
         }else {
+            title = title.replaceAll("这列为空,",",");
             builder.append(manage.getSupplierFullName() != null ? manage.getSupplierFullName() : "").append(",");
             builder.append("").append(",");
         }
@@ -677,6 +679,7 @@ public class SupplierFeeController {
 
         //将合计费用修改为合计  替换会出现替换多个情况
         String addTitle = title.replaceAll("合计费用","合计");
+        //addTitle = addTitle.replaceAll("这列为空","");
         String[] titleStr = addTitle.split(",");
         List<String> headList = new ArrayList<>();
         String  headStr ="";
