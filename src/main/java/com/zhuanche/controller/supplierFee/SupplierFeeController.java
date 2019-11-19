@@ -375,7 +375,7 @@ public class SupplierFeeController {
             List<String> listStr = new ArrayList<>();
             Map<String,Object> map = getData(manage,listStr,titles);
             listStr = (List<String>) map.get("listStr");
-            headerList= (List<String>) map.get("headList");
+            //headerList= (List<String>) map.get("headList");
            /* String newTitle = (String) map.get("title");*/
             int length = (int) map.get("length");
             logger.info("headerList:" + JSONObject.toJSONString(headerList));
@@ -400,11 +400,13 @@ public class SupplierFeeController {
 
         Map<String,Object> mapData = Maps.newHashMap();
 
+        List<String> headList = new ArrayList<>();
         StringBuilder builder = new StringBuilder();
         if(StringUtils.isEmpty(manage.getSerialNumber())){
             title = title.replaceAll("序号,","");
         }else {
             builder.append(manage.getSerialNumber()).append(",");
+            listStr.add("序号:"+manage.getSerialNumber());
         }
 
 
@@ -414,6 +416,7 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getSupplierName());
             builder.append(",");
+            listStr.add("合作商:"+manage.getSupplierName());
         }
 
 
@@ -424,6 +427,8 @@ public class SupplierFeeController {
             title = title.replaceAll("这列为空,",",");
             builder.append(manage.getSupplierFullName() != null ? manage.getSupplierFullName() : "").append(",");
             builder.append("").append(",");
+            listStr.add("合作商全称:"+manage.getSupplierFullName());
+
         }
 
 
@@ -432,6 +437,8 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getSettleStartDate() != null ? DateUtils.formatDate(manage.getSettleStartDate(),DateUtils.date_format) : "");
             builder.append(",");
+            listStr.add("结算开始日期:"+manage.getSettleStartDate() != null ? DateUtils.formatDate(manage.getSettleStartDate(),DateUtils.date_format) : "");
+
         }
 
         if(manage.getSettleEndDate() == null){
@@ -439,6 +446,8 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getSettleEndDate() != null ? DateUtils.formatDate(manage.getSettleEndDate(),DateUtils.date_format) : "");
             builder.append(",");
+            listStr.add("结算结束日期:"+manage.getSettleEndDate() != null ? DateUtils.formatDate(manage.getSettleEndDate(),DateUtils.date_format) : "");
+
         }
 
 
@@ -447,6 +456,8 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getTotalFlow() != null ? manage.getTotalFlow() : "");
             builder.append(",");
+            listStr.add("总营业额:"+manage.getTotalFlow());
+
         }
 
 
@@ -457,6 +468,7 @@ public class SupplierFeeController {
 
         }else {
             builder.append(manage.getTurnoverDrivers() != null ? manage.getTurnoverDrivers() : "").append(",");
+            listStr.add("入围司机营业额:"+manage.getTurnoverDrivers());
 
         }
         if(StringUtils.isEmpty(manage.getFlowAmount())){
@@ -464,6 +476,8 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getFlowAmount() != null ? manage.getFlowAmount() : "");
             builder.append(",");
+            listStr.add("流水金额:"+manage.getFlowAmount());
+
         }
 
 
@@ -472,6 +486,8 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getWindControlAmount() != null ? manage.getWindControlAmount() : "");
             builder.append(",");
+            listStr.add("风控金额:"+manage.getWindControlAmount());
+
         }
 
 
@@ -481,6 +497,8 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getExtraCharge() != null ? manage.getExtraCharge() : "");
             builder.append(",");
+            listStr.add("价外费:"+manage.getExtraCharge());
+
         }
 
 
@@ -489,6 +507,8 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getCancelCharge() != null ? manage.getCancelCharge() : "");
             builder.append(",");
+            listStr.add("取消费:"+manage.getCancelCharge());
+
         }
 
 
@@ -497,6 +517,8 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getTotalAmountWater() != null ? manage.getTotalAmountWater() : "");
             builder.append(",");
+            listStr.add("流水合计金额:"+manage.getTotalAmountWater());
+
         }
 
 
@@ -505,6 +527,7 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getScaleEfficient() != null ? this.getTwoPoint(manage.getScaleEfficient()): "");
             builder.append(",");
+            listStr.add("规模系数:"+manage.getScaleEfficient());
 
         }
 
@@ -513,6 +536,8 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getTotalFlowLastMonth() != null ? manage.getTotalFlowLastMonth() : "");
             builder.append(",");
+            listStr.add("上月总流水:"+manage.getTotalFlowLastMonth());
+
         }
 
 
@@ -521,6 +546,8 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getFlowIncrease() != null ? this.getTwoPoint(manage.getFlowIncrease()) : "");
             builder.append(",");
+            listStr.add("流水增幅:"+manage.getFlowIncrease());
+
         }
 
 
@@ -529,6 +556,8 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getGrowthFactor() != null ? this.getTwoPoint(manage.getGrowthFactor()) : "");
             builder.append(",");
+            listStr.add("增长系数:"+manage.getGrowthFactor());
+
         }
 
 
@@ -536,6 +565,7 @@ public class SupplierFeeController {
             title = title.replaceAll("司机贡献金合计,","");
         }else {
             builder.append(manage.getTotalDriverContribution() != null ? manage.getTotalDriverContribution() : "").append(",");
+            listStr.add("司机贡献金合计:"+manage.getTotalDriverContribution());
 
         }
 
@@ -543,6 +573,7 @@ public class SupplierFeeController {
             title = title.replaceAll("合规奖励合计,","");
         }else {
             builder.append(manage.getTotalComplianceAwards() != null ? manage.getTotalComplianceAwards() : "").append(",");
+            listStr.add("合规奖励合计:"+manage.getTotalComplianceAwards());
 
         }
 
@@ -551,6 +582,8 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getMonthCommission() != null ? manage.getMonthCommission() : "");
             builder.append(",");
+            listStr.add("佣金合计:"+manage.getMonthCommission());
+
         }
 
 
@@ -559,6 +592,8 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getBadRatings() != null ? this.getTwoPoint(manage.getBadRatings()) : "");
             builder.append(",");
+            listStr.add("差评率:"+manage.getBadRatings());
+
         }
 
 
@@ -566,6 +601,7 @@ public class SupplierFeeController {
             title = title.replaceAll("活跃司机数量,","");
         }else {
             builder.append(manage.getNumberOfActiveDrivers() != null ? manage.getNumberOfActiveDrivers() : "").append(",");
+            listStr.add("活跃司机数量:"+manage.getNumberOfActiveDrivers());
 
         }
 
@@ -574,6 +610,8 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getExcludeCommission() != null ? manage.getExcludeCommission() : "");
             builder.append(",");
+            listStr.add("剔除佣金:"+manage.getExcludeCommission());
+
         }
 
 
@@ -582,6 +620,8 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getDeductionAmountLastMonth() != null ? manage.getDeductionAmountLastMonth() : "");
             builder.append(",");
+            listStr.add("上月暂扣金额:"+manage.getDeductionAmountLastMonth());
+
         }
 
 
@@ -589,7 +629,7 @@ public class SupplierFeeController {
             title = title.replaceAll("是否补发,","");
         }else {
             builder.append(manage.getIsReissue() != null ? manage.getIsReissue() : "").append(",");
-
+            listStr.add("是否补发:"+manage.getIsReissue());
         }
 
         if(StringUtils.isEmpty(manage.getTotal() )){
@@ -597,6 +637,7 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getTotal() != null ? manage.getTotal() : "");
             builder.append(",");
+            listStr.add("合计费用:"+manage.getTotal());
         }
 
 
@@ -605,6 +646,8 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getComplianceDriverAward() != null ? manage.getComplianceDriverAward() : "");
             builder.append(",");
+            listStr.add("合规司机奖励:"+manage.getComplianceDriverAward());
+
         }
 
 
@@ -613,6 +656,8 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getBadRatingsAward() != null ? manage.getBadRatingsAward() : "");
             builder.append(",");
+            listStr.add("差评罚金:"+manage.getBadRatingsAward());
+
         }
 
 
@@ -621,6 +666,8 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getAmountAssessmentSum() != null ? manage.getAmountAssessmentSum() : "");
             builder.append(",");
+            listStr.add("扣款差评数量:"+manage.getAmountAssessmentSum());
+
         }
 
 
@@ -628,6 +675,7 @@ public class SupplierFeeController {
             title = title.replaceAll("花园权益奖励,","");
         }else {
             builder.append(manage.getGardenAward() != null ? manage.getGardenAward() : "").append(",");
+            listStr.add("花园权益奖励:"+manage.getGardenAward());
 
         }
 
@@ -635,6 +683,7 @@ public class SupplierFeeController {
             title = title.replaceAll("其它增加金额,","");
         }else {
             builder.append(manage.getOtherIncreaseAmount() != null ? manage.getOtherIncreaseAmount() : "").append(",");
+            listStr.add("其它增加金额:"+manage.getOtherIncreaseAmount());
 
         }
 
@@ -643,6 +692,8 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getInspectionFines() != null ? manage.getInspectionFines() : "");
             builder.append(",");
+            listStr.add("稽查罚金:"+manage.getInspectionFines());
+
         }
 
 
@@ -651,6 +702,8 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getOthers() != null ? manage.getOthers() : "");
             builder.append(",");
+            listStr.add("其它扣款项:"+manage.getOthers());
+
         }
 
 
@@ -659,12 +712,14 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getTotalManageFees() != null ? manage.getTotalManageFees() : "");
             builder.append(",");
+            listStr.add("管理费合计:"+manage.getTotalManageFees());
+
         }
 
 
 
         //实现特定的业务需求 每隔7行换行
-        String value  = builder.toString().substring(0,builder.length()-1);
+        /*String value  = builder.toString().substring(0,builder.length()-1);
         String[] valueStr = value.split(",");
         String str = "";
         for(int k = 0;k<valueStr.length;k++){
@@ -674,6 +729,9 @@ public class SupplierFeeController {
                 str = "";
             }
             str += valueStr[k]+",";
+            if(k==valueStr.length-1 && StringUtils.isNotEmpty(str)){
+                listStr.add(str.substring(0,str.length()-1));
+            }
         }
 
 
@@ -682,7 +740,7 @@ public class SupplierFeeController {
         String addTitle = title.replaceAll("合计费用","合计");
         //addTitle = addTitle.replaceAll("这列为空","");
         String[] titleStr = addTitle.split(",");
-        List<String> headList = new ArrayList<>();
+
         String  headStr ="";
         for(int m = 0;m<titleStr.length;m++){
             int zhengchu = m%7;
@@ -691,7 +749,11 @@ public class SupplierFeeController {
                 headStr = "";
             }
             headStr += titleStr[m]+",";
-        }
+
+            if(m==valueStr.length-1 && StringUtils.isNotEmpty(headStr)){
+                headList.add(headStr.substring(0,headStr.length()-1));
+            }
+        }*/
 
 
         mapData.put("listStr",listStr);

@@ -62,11 +62,18 @@ public class SupplierFeeCsvUtils {
 
             if(isFirst){
                 if(headdataList!=null && !headdataList.isEmpty()){
+
                     for(int k = 0;k<length;k++){
-                        String head = headdataList.get(k).replaceAll(",","\t\t\t\t\t\t\t\t,");
-                        bw.write(head+"\r\n");
-                        String value = dataList.get(k).replaceAll(",","\t\t\t\t\t\t\t\t,");
-                        bw.write(value+"\r\n");
+                        //String head = headdataList.get(k).replaceAll(",","\r\r\r\r\r\r\r\r,");
+                                            bw.write(headdataList.get(k)+"\r\n");
+                       // String value = dataList.get(k).replaceAll(",","\r\r\r\r\r\r\r\r,");
+                       // bw.write(value+"\r\n");
+                    }
+                }
+
+                if(dataList!=null && !dataList.isEmpty()){
+                    for(String str : dataList){
+                        bw.write(str+"\r\n");
                     }
                 }
             }
