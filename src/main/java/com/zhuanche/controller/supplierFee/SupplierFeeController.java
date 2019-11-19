@@ -437,7 +437,7 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getSettleStartDate() != null ? DateUtils.formatDate(manage.getSettleStartDate(),DateUtils.date_format) : "");
             builder.append(",");
-            listStr.add("结算开始日期:"+manage.getSettleStartDate());
+            listStr.add("结算开始日期:"+manage.getSettleStartDate() != null ? DateUtils.formatDate(manage.getSettleStartDate(),DateUtils.date_format) : "");
 
         }
 
@@ -446,7 +446,7 @@ public class SupplierFeeController {
         }else {
             builder.append(manage.getSettleEndDate() != null ? DateUtils.formatDate(manage.getSettleEndDate(),DateUtils.date_format) : "");
             builder.append(",");
-            listStr.add("结算结束日期:"+manage.getSettleEndDate());
+            listStr.add("结算结束日期:"+manage.getSettleEndDate() != null ? DateUtils.formatDate(manage.getSettleEndDate(),DateUtils.date_format) : "");
 
         }
 
