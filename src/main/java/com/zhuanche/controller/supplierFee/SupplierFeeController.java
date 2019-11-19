@@ -374,8 +374,8 @@ public class SupplierFeeController {
             SupplierFeeCsvUtils entity = new SupplierFeeCsvUtils();
             List<String> listStr = new ArrayList<>();
             Map<String,Object> map = getData(manage,listStr,titles);
-            //listStr = (List<String>) map.get("listStr");
-            headerList= (List<String>) map.get("headList");
+            listStr = (List<String>) map.get("listStr");
+            //headerList= (List<String>) map.get("headList");
            /* String newTitle = (String) map.get("title");*/
             int length = (int) map.get("length");
             logger.info("headerList:" + JSONObject.toJSONString(headerList));
