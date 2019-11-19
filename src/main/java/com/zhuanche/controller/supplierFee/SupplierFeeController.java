@@ -674,6 +674,9 @@ public class SupplierFeeController {
                 str = "";
             }
             str += valueStr[k]+",";
+            if(k==valueStr.length-1 && zhengshu != 0){
+                listStr.add(str.substring(0,str.length()-1));
+            }
         }
 
 
@@ -691,6 +694,10 @@ public class SupplierFeeController {
                 headStr = "";
             }
             headStr += titleStr[m]+",";
+
+            if(m==valueStr.length-1 && zhengchu != 0){
+                headList.add(headStr.substring(0,headStr.length()-1));
+            }
         }
 
 
