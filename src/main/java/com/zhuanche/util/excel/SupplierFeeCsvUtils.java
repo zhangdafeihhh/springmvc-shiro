@@ -34,7 +34,7 @@ public class SupplierFeeCsvUtils {
     public  boolean exportCsvV2(HttpServletResponse response,
                                     List<String> dataList,
                                     List<String> headdataList,
-                                    String  fileName,boolean isFirst,boolean islast,List<String> footerList) throws IOException {
+                                    String  fileName,boolean isFirst,boolean islast,List<String> footerList,int length) throws IOException {
 
         boolean isSucess=false;
         OutputStreamWriter osw = this.getOsw();
@@ -62,16 +62,14 @@ public class SupplierFeeCsvUtils {
 
             if(isFirst){
                 if(headdataList!=null && !headdataList.isEmpty()){
-                    for(String data : headdataList){
-                        bw.write(data+"\r\n");
+                    for(int k = 0;k<length;k++){
+                        bw.write(headdataList.get(k)+"\r\n");
+                        bw.write(dataList.get(k)+"\r\n");
+
                     }
                 }
             }
-            if(dataList!=null && !dataList.isEmpty()){
-                for(String data : dataList){
-                    bw.write(data+"\r\n");
-                }
-            }
+
             if(footerList != null && !footerList.isEmpty()){
                 for(String data : footerList){
                     bw.write(data+"\r\n");

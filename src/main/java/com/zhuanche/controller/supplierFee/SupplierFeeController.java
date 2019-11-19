@@ -1,5 +1,6 @@
 package com.zhuanche.controller.supplierFee;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Maps;
@@ -23,7 +24,6 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.dateUtil.DateUtil;
 import com.zhuanche.util.excel.SupplierFeeCsvUtils;
-import mapper.mdbcarmanage.ex.SupplierFeeManageExMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -229,8 +229,9 @@ public class SupplierFeeController {
         SupplierFeeManage manage = supplierFeeService.queryByOrderNo(feeOrderNo);
 
 
-        String[] titles = { "供应商名称", "结算开始日期", "结算结束日期", "总流水", "流水金额", "风控金额","价外费","取消费","流水合计金额",
-                "规模系数","上月总流水","流水增幅","增长系数","差评率","当月佣金","剔除佣金","上月暂扣金额","合计","合规司机奖励","其他","差评罚金","扣款差评数量","稽查罚金","管理费合计"};
+        String[] titles = { "          供应商名称", "          结算开始日期", "          结算结束日期", "          总流水", "          流水金额", "          风控金额","          价外费","          取消费",
+                "          流水合计金额", "          规模系数","          上月总流水","          流水增幅","          增长系数","          差评率","          当月佣金","          剔除佣金","          上月暂扣金额",
+                "          合计","          合规司机奖励","          其他","          差评罚金","          扣款差评数量","          稽查罚金","          管理费合计"};
         try {
             ByteArrayOutputStream ba = new ByteArrayOutputStream();
             Document document = new Document(PageSize.A3); // Step 1—Create a Document.
@@ -350,9 +351,9 @@ public class SupplierFeeController {
         try {
             SupplierFeeManage manage = supplierFeeService.queryByOrderNo(feeOrderNo);
             List<String> headerList = new ArrayList<>();
-            String titles = "序号,合作商,合作商全称,总营业额,入围司机营业额,流水金额,风控金额,价外费,取消费,流水合计金额,规模系数,上月总流水,流水增幅,增长系数,司机贡献金合计," +
+            String titles = "序号,合作商,合作商全称,这列为空,结算开始日期,结算结束日期,总营业额,入围司机营业额,流水金额,风控金额,价外费,取消费,流水合计金额,规模系数,上月总流水,流水增幅,增长系数,司机贡献金合计," +
                     "合规奖励合计,佣金合计,差评率,活跃司机数量,剔除佣金,上月暂扣金额,是否补发,合计费用," +
-                    "合规司机奖励,差评罚金,扣款差评数量,花园权益奖励,其它增加金额,稽查罚金,其它扣款项,管理费合计,结算开始日期,结算结束日期";
+                    "合规司机奖励,差评罚金,扣款差评数量,花园权益奖励,其它增加金额,稽查罚金,其它扣款项,管理费合计";
 
 
             String fileName = "对账单信息" + DateUtil.dateFormat(new Date(), DateUtil.intTimestampPattern)+".csv";
@@ -374,15 +375,16 @@ public class SupplierFeeController {
             List<String> listStr = new ArrayList<>();
             Map<String,Object> map = getData(manage,listStr,titles);
             listStr = (List<String>) map.get("listStr");
-            String newTitle = (String) map.get("title");
-            logger.info("newTitle:" + newTitle);
-            //将合计费用修改为合计
-            String addTitle = newTitle.replaceAll("合计费用","合计");
-            headerList.add(addTitle);
+            headerList= (List<String>) map.get("headList");
+           /* String newTitle = (String) map.get("title");*/
+            int length = (int) map.get("length");
+            logger.info("headerList:" + JSONObject.toJSONString(headerList));
+
             List<String> footerList = new ArrayList<>();
             footerList = this.footerList(footerList);
             try {
-                entity.exportCsvV2(response,listStr,headerList,fileName,isFirst,isLast,footerList);
+
+                entity.exportCsvV2(response,listStr,headerList,fileName,isFirst,isLast,footerList,length);
             } catch (IOException e) {
                 logger.error("导出异常",e);
             }
@@ -417,9 +419,26 @@ public class SupplierFeeController {
 
         if(StringUtils.isEmpty(manage.getSupplierFullName())){
             title = title.replaceAll("合作商全称,","");
+            title = title.replaceAll("这列为空,","");
         }else {
+            title = title.replaceAll("这列为空,",",");
             builder.append(manage.getSupplierFullName() != null ? manage.getSupplierFullName() : "").append(",");
+            builder.append("").append(",");
+        }
 
+
+        if(manage.getSettleStartDate() == null){
+            title = title.replaceAll("结算开始日期,","");
+        }else {
+            builder.append(manage.getSettleStartDate() != null ? DateUtils.formatDate(manage.getSettleStartDate(),DateUtils.date_format) : "");
+            builder.append(",");
+        }
+
+        if(manage.getSettleEndDate() == null){
+            title = title.replaceAll("结算结束日期,","");
+        }else {
+            builder.append(manage.getSettleEndDate() != null ? DateUtils.formatDate(manage.getSettleEndDate(),DateUtils.date_format) : "");
+            builder.append(",");
         }
 
 
@@ -642,23 +661,42 @@ public class SupplierFeeController {
             builder.append(",");
         }
 
-        if(manage.getSettleStartDate() == null){
-            title = title.replaceAll("结算开始日期,","");
-        }else {
-            builder.append(manage.getSettleStartDate() != null ? DateUtils.formatDate(manage.getSettleStartDate(),DateUtils.date_format) : "");
-            builder.append(",");
+
+
+        //实现特定的业务需求 每隔7行换行
+        String value  = builder.toString().substring(0,builder.length()-1);
+        String[] valueStr = value.split(",");
+        String str = "";
+        for(int k = 0;k<valueStr.length;k++){
+            int zhengshu = k%7;
+            while (zhengshu==0 && StringUtils.isNotEmpty(str)){
+                listStr.add(str.substring(0,str.length()-1));
+                str = "";
+            }
+            str += valueStr[k]+",";
         }
 
-        if(manage.getSettleEndDate() == null){
-            title = title.replaceAll("结算结束日期,","");
-        }else {
-            builder.append(manage.getSettleEndDate() != null ? DateUtils.formatDate(manage.getSettleEndDate(),DateUtils.date_format) : "");
-            builder.append(",");
+
+
+        //将合计费用修改为合计  替换会出现替换多个情况
+        String addTitle = title.replaceAll("合计费用","合计");
+        //addTitle = addTitle.replaceAll("这列为空","");
+        String[] titleStr = addTitle.split(",");
+        List<String> headList = new ArrayList<>();
+        String  headStr ="";
+        for(int m = 0;m<titleStr.length;m++){
+            int zhengchu = m%7;
+            while (zhengchu == 0 && StringUtils.isNotEmpty(headStr)){
+                headList.add(headStr.substring(0,headStr.length()-1));
+                headStr = "";
+            }
+            headStr += titleStr[m]+",";
         }
 
-        listStr.add(builder.toString());
+
         mapData.put("listStr",listStr);
-        mapData.put("title",title);
+        mapData.put("headList",headList);
+        mapData.put("length",listStr.size()<=headList.size()? listStr.size(): headList.size());//容错
         return mapData;
 
     }
