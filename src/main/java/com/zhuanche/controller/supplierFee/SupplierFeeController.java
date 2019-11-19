@@ -674,7 +674,7 @@ public class SupplierFeeController {
                 str = "";
             }
             str += valueStr[k]+",";
-            if(k==valueStr.length-1 && zhengshu != 0){
+            if(k==valueStr.length-1 && StringUtils.isNotEmpty(str)){
                 listStr.add(str.substring(0,str.length()-1));
             }
         }
@@ -695,7 +695,7 @@ public class SupplierFeeController {
             }
             headStr += titleStr[m]+",";
 
-            if(m==valueStr.length-1 && zhengchu != 0){
+            if(m==valueStr.length-1 && StringUtils.isNotEmpty(headStr)){
                 headList.add(headStr.substring(0,headStr.length()-1));
             }
         }
