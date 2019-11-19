@@ -1,6 +1,7 @@
 package com.zhuanche.controller.driverScheduling;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.zhuanche.common.dutyEnum.ServiceReturnCodeEnum;
 import com.zhuanche.common.paging.PageDTO;
@@ -23,6 +24,7 @@ import com.zhuanche.serv.driverScheduling.CarDriverShiftsService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
+import com.zhuanche.util.MobileOverlayUtil;
 import com.zhuanche.util.dateUtil.DateUtil;
 import com.zhuanche.util.excel.CsvUtils;
 import org.apache.commons.collections.map.HashedMap;
@@ -462,7 +464,9 @@ public class DriverSchController {
             }
             long start = System.currentTimeMillis();
             PageInfo<CarDriverDayDutyDTO> pageInfos = carDriverDutyService.queryDriverDayDutyList(param);
-
+            pageInfos.getList().forEach(elem -> {
+                elem.setPhone(MobileOverlayUtil.doOverlayPhone(elem.getPhone()));
+            });
             PageDTO pageDTO = new PageDTO();
 			pageDTO.setTotal((int)pageInfos.getTotal());
 			pageDTO.setResult(pageInfos.getList());
