@@ -229,8 +229,9 @@ public class SupplierFeeController {
         SupplierFeeManage manage = supplierFeeService.queryByOrderNo(feeOrderNo);
 
 
-        String[] titles = { "供应商名称", "结算开始日期", "结算结束日期", "总流水", "流水金额", "风控金额","价外费","取消费","流水合计金额",
-                "规模系数","上月总流水","流水增幅","增长系数","差评率","当月佣金","剔除佣金","上月暂扣金额","合计","合规司机奖励","其他","差评罚金","扣款差评数量","稽查罚金","管理费合计"};
+        String[] titles = { "          供应商名称", "          结算开始日期", "          结算结束日期", "          总流水", "          流水金额", "          风控金额","          价外费","          取消费",
+                "          流水合计金额", "          规模系数","          上月总流水","          流水增幅","          增长系数","          差评率","          当月佣金","          剔除佣金","          上月暂扣金额",
+                "          合计","          合规司机奖励","          其他","          差评罚金","          扣款差评数量","          稽查罚金","          管理费合计"};
         try {
             ByteArrayOutputStream ba = new ByteArrayOutputStream();
             Document document = new Document(PageSize.A3); // Step 1—Create a Document.
