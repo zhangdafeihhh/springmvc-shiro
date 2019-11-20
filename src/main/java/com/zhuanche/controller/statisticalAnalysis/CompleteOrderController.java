@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.zhuanche.common.web.RequestFunction;
+import com.zhuanche.util.MobileOverlayUtil;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,6 +137,7 @@ public class CompleteOrderController{
                     JSONObject element = (JSONObject) o;
                     element.put(Constants.BOOKING_USER_PHONE, CommonStringUtils.protectPhoneInfo(element.getString(Constants.BOOKING_USER_PHONE)));
                     element.put(Constants.RIDER_PHONE, CommonStringUtils.protectPhoneInfo(element.getString(Constants.RIDER_PHONE)));
+                    element.put(Constants.DRIVER_PHONE, MobileOverlayUtil.doOverlayPhone(element.getString(Constants.DRIVER_PHONE)));
                 });
             }
 		    return result;

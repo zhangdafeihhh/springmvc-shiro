@@ -19,6 +19,7 @@ import com.zhuanche.request.DutyParamRequest;
 import com.zhuanche.request.TeamGroupRequest;
 import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.util.Check;
+import com.zhuanche.util.MobileOverlayUtil;
 import mapper.mdbcarmanage.ex.CarDriverMustDutyExMapper;
 import mapper.mdbcarmanage.ex.CarDutyDurationExMapper;
 import mapper.mdbcarmanage.ex.CarRelateGroupExMapper;
@@ -201,6 +202,7 @@ public class CarDriverShiftsService {
 					carDriverInfoDTO.setCarGroupName(group.getTeamName());
 					carDriverInfoDTO.setGroupId(group.getGroupId());
 				}
+				carDriverInfoDTO.setPhone(MobileOverlayUtil.doOverlayPhone(carDriverInfoDTO.getPhone()));
 			}
 			PageDTO pageDTO = new PageDTO();
 			pageDTO.setResult(driverInfoList);

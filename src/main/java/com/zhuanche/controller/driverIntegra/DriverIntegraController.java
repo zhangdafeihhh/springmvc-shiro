@@ -20,6 +20,7 @@ import com.zhuanche.serv.rentcar.IDriverTeamRelationService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Common;
+import com.zhuanche.util.MobileOverlayUtil;
 import com.zhuanche.util.MyRestTemplate;
 import com.zhuanche.util.excel.CsvUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -151,6 +152,7 @@ public class DriverIntegraController {
             rows = page.getList();
             //组装当前页对象
             generatePageData(rows);
+            overLayPhone(rows);
             return this.gridJsonFormate(rows, total);
         }catch (Exception e){
             logger.error("司机积分数据列表异常,参数为："+(driverEntity==null?"null": JSON.toJSONString(driverEntity)),e);
@@ -158,6 +160,14 @@ public class DriverIntegraController {
             ret.put("code",1);
             ret.put("msg","失败");
             return  ret;
+        }
+    }
+
+    private void overLayPhone(List<DriverVoEntity> rows) {
+        if (Objects.nonNull(rows)){
+            for (DriverVoEntity row : rows) {
+                row.setPhone(MobileOverlayUtil.doOverlayPhone(row.getPhone()));
+            }
         }
     }
 

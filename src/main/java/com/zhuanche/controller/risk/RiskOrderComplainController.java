@@ -13,6 +13,7 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.FtpUtil;
 import com.zhuanche.util.FtpUtils;
+import com.zhuanche.util.MobileOverlayUtil;
 import com.zhuanche.util.MyRestTemplate;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -123,6 +124,12 @@ public class RiskOrderComplainController {
                     JSONObject retPageData = responseObject.getJSONObject("data");
                     int totalRecord = retPageData.getInteger("totalRecord");
                     JSONArray arrayList = retPageData.getJSONArray("dataList") ;
+                    if(totalRecord>0){
+                        arrayList.forEach(elem -> {
+                            JSONObject jsonData = (JSONObject) elem;
+                            jsonData.put("driverPhone", MobileOverlayUtil.doOverlayPhone(jsonData.getString("driverPhone")));
+                        });
+                    }
                     pageData.put("Rows",arrayList);
                     pageData.put("Total",totalRecord);
                 }

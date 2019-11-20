@@ -26,6 +26,7 @@ import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
+import com.zhuanche.util.MobileOverlayUtil;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -137,9 +138,19 @@ public class DriverIncomeScoreController {
             carBizDriverInfoDTO.setDriverIds(driverIds);
         }
         PageDTO pageDTO = carBizDriverInfoService.queryDriverIncomeScoreListData(page,pageSize,carBizDriverInfoDTO);
+        overLayPhone(pageDTO.getResult());
         logger.info("time cost : " + (System.currentTimeMillis() - startTime));
         return AjaxResponse.success(pageDTO);
     }
+
+    private void overLayPhone(List<CarBizDriverInfoDTO> result) {
+        if (Objects.nonNull(result)){
+            for (CarBizDriverInfoDTO driverInfoDTO : result) {
+                driverInfoDTO.setPhone(MobileOverlayUtil.doOverlayPhone(driverInfoDTO.getPhone()));
+            }
+        }
+    }
+
     @ResponseBody
     @RequestMapping(value = "/downdriverIncomeScoreListData")
     @MasterSlaveConfigs(configs = {

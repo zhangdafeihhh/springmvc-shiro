@@ -30,6 +30,7 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
 import com.zhuanche.util.DateUtils;
+import com.zhuanche.util.MobileOverlayUtil;
 import com.zhuanche.util.dateUtil.DateUtil;
 import mapper.bigdata.ex.BiDriverBusinessInfoDayReportExMapper;
 import mapper.bigdata.ex.BiDriverBusinessInfoMonthReportExMapper;
@@ -103,6 +104,7 @@ public class SaasDriverDailyReportController {
     private CarBizCarGroupExMapper carBizCarGroupExMapper;//司机服务类型
 
 
+    /**查询司机营业日报数据**/
     @ResponseBody
     @RequestMapping("saasDriverDaily")
     public AjaxResponse response(@Verify(param = "cityId",rule ="required")String cityId,
@@ -283,6 +285,7 @@ public class SaasDriverDailyReportController {
             dto.setDriverGroupName(StringUtils.isEmpty(driverGroupName)?teamMap.get(dto.getDriverGroupId()):driverGroupName);
             dto.setCooperateName(modelMap.get(dto.getCooperationType()));
             dto.setCarGroupName(carGroupMap.get(dto.getCarGroupId()));
+            dto.setDriverPhone(MobileOverlayUtil.doOverlayPhone(dto.getDriverPhone()));
         }
         PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, dailyDtoList);
         try {
@@ -298,7 +301,7 @@ public class SaasDriverDailyReportController {
 
 
 
-
+    /**导出司机营业日报数据**/
     @ResponseBody
     @RequestMapping("saasDriverExportDaily")
     public AjaxResponse driverExportDaily(@Verify(param = "cityId",rule ="required")String cityId,
@@ -407,7 +410,7 @@ public class SaasDriverDailyReportController {
     }
 
 
-
+    /**查询司机营业月报数据**/
     @ResponseBody
     @RequestMapping("saasMonthReport")
     public AjaxResponse saasMonthReport(@Verify(param = "cityId",rule ="required")String cityId,
@@ -576,6 +579,7 @@ public class SaasDriverDailyReportController {
             dto.setDriverGroupName(StringUtils.isEmpty(driverGroupName)?teamMap.get(dto.getDriverGroupId()):driverGroupName);
             dto.setCooperateName(cooperMap.get(dto.getCooperationType()));
             dto.setCarGroupName(carGroupMap.get(dto.getCarGroupId()));
+            dto.setDriverPhone(MobileOverlayUtil.doOverlayPhone(dto.getDriverPhone()));
         }
         PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, monthDtoList);
         try {
@@ -591,7 +595,7 @@ public class SaasDriverDailyReportController {
 
 
 
-
+    /**导出司机营业月报数据**/
     @ResponseBody
     @RequestMapping("saasDriverExportMonth")
     public AjaxResponse driverExportMonth(@Verify(param = "cityId",rule ="required")String cityId,
@@ -693,7 +697,7 @@ public class SaasDriverDailyReportController {
 
 
 
-
+    /**查询司机营业汇总数据**/
     @ResponseBody
     @RequestMapping("saasSummaryReport")
     public AjaxResponse saasSummaryReport(@Verify(param = "cityId",rule ="required")String cityId,
@@ -847,6 +851,7 @@ public class SaasDriverDailyReportController {
             dto.setDriverGroupName(StringUtils.isEmpty(driverGroupName)?teamMap.get(dto.getDriverGroupId()):driverGroupName);
             dto.setCooperateName(cooperMap.get(dto.getCooperationType()));
             dto.setCarGroupName(carGroupMap.get(dto.getCarGroupId()));
+            dto.setDriverPhone(MobileOverlayUtil.doOverlayPhone(dto.getDriverPhone()));
         }
         PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, summaryReportDTOList);
         try {
@@ -860,6 +865,7 @@ public class SaasDriverDailyReportController {
 
 
 
+    /**导出司机营业汇总数据**/
     @ResponseBody
     @RequestMapping("saasDriverExportSummary")
     public AjaxResponse driverExportSummary(@Verify(param = "cityId",rule ="required")String cityId,

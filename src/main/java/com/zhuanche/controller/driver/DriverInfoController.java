@@ -30,6 +30,7 @@ import com.zhuanche.serv.authc.UserManagementService;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.BeanUtil;
+import com.zhuanche.util.MobileOverlayUtil;
 import com.zhuanche.util.excel.CsvUtils;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -176,7 +177,16 @@ public class DriverInfoController {
             carBizDriverInfoService.getBaseStatis(driver);
         }
         PageDTO pageDTO = new PageDTO(page, pageSize, total, list);
+        overLayPhone(list);
         return AjaxResponse.success(pageDTO);
+    }
+
+    private void overLayPhone(List<CarBizDriverInfoDTO> list) {
+        if (Objects.nonNull(list)){
+            for (CarBizDriverInfoDTO driverInfoDTO : list) {
+                driverInfoDTO.setPhone(MobileOverlayUtil.doOverlayPhone(driverInfoDTO.getPhone()));
+            }
+        }
     }
 
     /**

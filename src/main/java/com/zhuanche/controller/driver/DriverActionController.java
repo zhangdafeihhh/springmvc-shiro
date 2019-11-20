@@ -10,6 +10,7 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.entity.driver.DriverActionVO;
 import com.zhuanche.exception.PermissionException;
 import com.zhuanche.serv.deiver.DriverActionService;
+import com.zhuanche.util.MobileOverlayUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
@@ -23,7 +24,9 @@ import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.zhuanche.common.enums.MenuEnum.*;
 
@@ -56,6 +59,7 @@ public class DriverActionController {
         try {
             String table = transferTableName(driverActionVO.getTime());
             PageDTO actionList = actionService.getActionList(driverActionVO, table, orderNo, pageNum, pageSize);
+            overLayPhone(actionList.getResult());
             return AjaxResponse.success(actionList);
         }
         catch (IllegalArgumentException e){
@@ -66,6 +70,14 @@ public class DriverActionController {
         }
         catch (Exception e){
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+    }
+
+    private void overLayPhone(List<DriverActionVO> result) {
+        if (Objects.nonNull(result)){
+            for (DriverActionVO driverActionVO : result) {
+                driverActionVO.setDriverPhone(MobileOverlayUtil.doOverlayPhone(driverActionVO.getDriverPhone()));
+            }
         }
     }
 

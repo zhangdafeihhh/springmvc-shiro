@@ -94,6 +94,9 @@ public class Common {
 	public static final String BATHINPUTCARINFO = "/carV2/batchInputCarInfo";
 
 	//车辆end
+
+	//车管访问driverMogo服务需要的businessId
+	public static final String DRIVER_MONGO_HTTP_BUSINESSID = "9f260ae13ec0adbceef9edc88fa746a9";
 	public static String getPath(HttpServletRequest request) {
 		String uploadDir =request.getSession().getServletContext().getRealPath("/");  
 		File f1 = new File(uploadDir);

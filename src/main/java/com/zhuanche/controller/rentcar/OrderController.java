@@ -20,6 +20,7 @@ import com.zhuanche.serv.order.OrderService;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import com.zhuanche.util.CommonStringUtils;
+import com.zhuanche.util.MobileOverlayUtil;
 import com.zhuanche.util.excel.CsvUtils;
 import mapper.rentcar.CarBizCustomerMapper;
 import mapper.rentcar.CarBizDriverInfoMapper;
@@ -150,10 +151,11 @@ public class OrderController{
 	                                           String licensePlates, 
 	                                           String orderNo, 
 	                                           String orderType,
-	                                          String beginCreateDate,
+	                                           String beginCreateDate,
 	                                           String endCreateDate,
-	                                            String beginCostEndDate,
-	                                      		String endCostEndDate,
+											   String beginCostEndDate,
+											   String endCostEndDate,
+											   Integer driverId,
 	                                           @Verify(param = "pageNo",rule = "required") Integer pageNo,
 	                                           @Verify(param = "pageSize",rule = "required") Integer pageSize,
 											   @RequestParam(value = "channelSource",required = false,defaultValue = "0")String channelSource
@@ -252,7 +254,11 @@ public class OrderController{
 	     paramMap.put("teamClassId", teamClassId);
 	     paramMap.put("bookingUserName", bookingUserName);
 	     paramMap.put("bookingUserPhone", bookingUserPhone);
-	     paramMap.put("driverPhone", driverPhone);
+	     if(null == driverId || driverId.intValue()<1){
+			 paramMap.put("driverPhone", driverPhone);
+		 }else{
+			 paramMap.put("driverId", driverId);
+		 }
 	     paramMap.put("licensePlates", licensePlates);
 	     paramMap.put("orderNo", orderNo);
 	     paramMap.put("type", orderType);
@@ -1017,7 +1023,6 @@ public class OrderController{
 			CarBizDriverInfo carBizDriverInfo = carBizDriverInfoMapper.selectByPrimaryKey(Integer.valueOf(result.getDriverId()));
 			if(carBizDriverInfo!=null) {
 				result.setDrivername(carBizDriverInfo.getName());
-				result.setDriverphone(carBizDriverInfo.getPhone());
 				result.setServiceCity(carBizDriverInfo.getServiceCity());
 				String serviceCityName = cityExMapper.queryNameById(carBizDriverInfo.getServiceCity());
 				result.setServiceCityName(serviceCityName);

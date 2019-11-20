@@ -17,6 +17,7 @@ import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.serv.driverScheduling.DriverMonthDutyService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.Check;
+import com.zhuanche.util.MobileOverlayUtil;
 import com.zhuanche.util.PageUtils;
 import com.zhuanche.util.dateUtil.DateUtil;
 import com.zhuanche.util.excel.CsvUtils;
@@ -379,7 +380,16 @@ public class DriverMonthDutyController {
         PageDTO pageDTO = new PageDTO();
         pageDTO.setResult(pageInfo.getList());
         pageDTO.setTotal(new Integer(""+pageInfo.getTotal()));
+        overLayPhone(pageInfo.getList());
         return AjaxResponse.success(pageDTO);
+    }
+
+    private void overLayPhone(List<CarDriverMonthDTO> list) {
+        if (Objects.nonNull(list)){
+            for (CarDriverMonthDTO carDriverMonthDTO : list) {
+                carDriverMonthDTO.setDriverPhone(MobileOverlayUtil.doOverlayPhone(carDriverMonthDTO.getDriverPhone()));
+            }
+        }
     }
 
     /** 

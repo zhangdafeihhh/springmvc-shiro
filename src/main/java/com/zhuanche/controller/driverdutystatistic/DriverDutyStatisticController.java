@@ -21,6 +21,7 @@ import com.zhuanche.entity.mdblog.StatisticDutyHalfParams;
 import com.zhuanche.serv.DriverDutyStatisticService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.MobileOverlayUtil;
 import com.zhuanche.util.excel.CsvUtils;
 import mapper.mdblog.ex.StatisticDutyHalfExMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +42,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import static com.zhuanche.common.enums.MenuEnum.*;
 
@@ -155,7 +157,16 @@ public class DriverDutyStatisticController extends DriverQueryController{
 		//数据转换
 		List<DriverDutyStatisticDTO> dtoList = driverDutyStatisticService.selectSuppierNameAndCityName(list);
 		PageDTO pageDTO = new PageDTO(params.getPage(), params.getPageSize(), total, dtoList);
+		overLayPhone(dtoList);
 		return AjaxResponse.success(pageDTO);
+	}
+
+	private void overLayPhone(List<DriverDutyStatisticDTO> dtoList) {
+		if (Objects.nonNull(dtoList)){
+			for (DriverDutyStatisticDTO driverDutyStatisticDTO : dtoList) {
+				driverDutyStatisticDTO.setPhone(MobileOverlayUtil.doOverlayPhone(driverDutyStatisticDTO.getPhone()));
+			}
+		}
 	}
 
 	/**

@@ -18,6 +18,7 @@ import com.zhuanche.serv.deiver.DriverAppraisalAppealService;
 import com.zhuanche.serv.deiver.MpDriverCustomerAppraisalService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
+import com.zhuanche.util.MobileOverlayUtil;
 import com.zhuanche.util.dateUtil.DateUtil;
 import com.zhuanche.util.excel.CsvUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -163,6 +164,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
                     //申诉表中没有表明未申诉
                     o.setAppealStatus(0);
                 }
+                o.setDriverPhone(MobileOverlayUtil.doOverlayPhone(o.getDriverPhone()));
             });
 			log.info("订单评价列表 查询成功 耗时："+(System.currentTimeMillis()-startTime));
 			return AjaxResponse.success(new PageDTO(page,pageSize,total, resultList));
@@ -320,7 +322,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 			sb.append(s.getDriverName());
 			sb.append(",");
 
-			sb.append(s.getDriverPhone() == null ? "" : "\t" + s.getDriverPhone());
+			sb.append(s.getDriverPhone() == null ? "" : "\t" + MobileOverlayUtil.doOverlayPhone(s.getDriverPhone()));
 			sb.append(",");
 
 			sb.append(s.getLicensePlates() == null ? "" : s.getLicensePlates());

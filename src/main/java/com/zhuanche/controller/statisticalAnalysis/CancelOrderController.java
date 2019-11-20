@@ -12,6 +12,7 @@ import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.rentcar.CancelOrderDTO;
 import com.zhuanche.serv.statisticalAnalysis.StatisticalAnalysisService;
 import com.zhuanche.util.CommonStringUtils;
+import com.zhuanche.util.MobileOverlayUtil;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,6 +137,7 @@ public class CancelOrderController{
 					JSONObject element = (JSONObject) o;
 					element.put(Constants.BOOKING_USER_PHONE, CommonStringUtils.protectPhoneInfo(element.getString(Constants.BOOKING_USER_PHONE)));
 					element.put(Constants.RIDER_PHONE, CommonStringUtils.protectPhoneInfo(element.getString(Constants.RIDER_PHONE)));
+					element.put(Constants.DRIVER_PHONE, MobileOverlayUtil.doOverlayPhone(element.getString(Constants.DRIVER_PHONE)));
 				});
 			}
 	        return result;

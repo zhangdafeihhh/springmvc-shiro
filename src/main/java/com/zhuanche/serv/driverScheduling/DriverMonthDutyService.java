@@ -22,6 +22,7 @@ import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.util.Check;
 import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.DriverUtils;
+import com.zhuanche.util.MobileOverlayUtil;
 import mapper.mdbcarmanage.CarDriverMonthDutyMapper;
 import mapper.mdbcarmanage.ex.CarDriverMonthDutyExMapper;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
@@ -632,6 +633,7 @@ public class DriverMonthDutyService {
 				if(!Check.NuNObj(info)){
 					month.setStatus(info.getStatus());
 				}
+				month.setDriverPhone(MobileOverlayUtil.doOverlayPhone(month.getDriverPhone()));
 			}
 
 			return pageInfo;
