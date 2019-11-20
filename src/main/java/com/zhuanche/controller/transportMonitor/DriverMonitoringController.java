@@ -1,8 +1,11 @@
 package com.zhuanche.controller.transportMonitor;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.transportMonitor.IndexMonitorDriverStatisticsDto;
+import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.transportMonitor.DriverMonitoringService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -26,9 +29,13 @@ public class DriverMonitoringController {
      * @param cityId
      * @return
      */
-    @RequestMapping(value = "/area")
-    public AjaxResponse area(@Verify(param = "cityId", rule = "required|min(1)") Integer cityId){
-        return null;
+    @RequestMapping(value = "/getBizdistrict")
+    public AjaxResponse getBizdistrict(@Verify(param = "cityId", rule = "required|min(1)") Integer cityId){
+        JSONObject data = driverMonitoringService.getBizdistrict(cityId);
+        if(null != data){
+            return AjaxResponse.success(data);
+        }
+        return AjaxResponse.fail(-1,"查询失败");
     }
 
     /**
@@ -36,30 +43,36 @@ public class DriverMonitoringController {
      * @param cityId
      * @return
      */
-    @RequestMapping(value = "/beehive")
-    public AjaxResponse beehive(@Verify(param = "cityId", rule = "required|min(1)") Integer cityId){
-        return null;
+    @RequestMapping(value = "/getHotspotDistrict")
+    public AjaxResponse getHotspotDistrict(@Verify(param = "cityId", rule = "required|min(1)") Integer cityId){
+        JSONObject data = driverMonitoringService.getHotspotDistrict(cityId);
+        if(null != data){
+            return AjaxResponse.success(data);
+        }
+        return AjaxResponse.fail(-1,"查询失败");
     }
 
     /**司机实时位置
      * @param cityId
-     * @param driverStatus
-     * @param carType
-     * @param driverType
      * @param supplierId
-     * @param carTeam
+     * @param carTeamId
      * @return
      */
     @RequestMapping(value = "/trajectory")
     public AjaxResponse trajectory(
             @Verify(param = "cityId", rule = "required|min(1)") Integer cityId,
-            Integer driverStatus,
-            Integer carType,
-            Integer driverType,
             Integer supplierId,
-            Integer carTeam
+            Integer carTeamId
     ){
-        return null;
+        if(null == supplierId){}
+        if(null == carTeamId){}
+        String supplierIds = "";
+        String carTeamIds = "";
+        JSONArray data = driverMonitoringService.trajectory(cityId, supplierIds, carTeamIds);
+        if(null != data){
+            return AjaxResponse.success(data);
+        }
+        return AjaxResponse.fail(-1,"查询失败");
     }
 
     /**司机信息
@@ -68,28 +81,40 @@ public class DriverMonitoringController {
      */
     @RequestMapping(value = "/driverInfo")
     public AjaxResponse driverInfo(@Verify(param = "driverId", rule = "required|min(1)") Integer driverId){
-        return null;
+        JSONObject data = driverMonitoringService.driverInfo(driverId);
+        if(null != data){
+            return AjaxResponse.success(data);
+        }
+        return AjaxResponse.fail(-1,"查询失败");
     }
 
     /**低效司机列表
      * @param cityId
      * @param supplierId
-     * @param teamId
+     * @param carTeamId
      * @return
      */
     @RequestMapping(value = "/efficiency")
     public AjaxResponse efficiency(
             @Verify(param = "cityId", rule = "required|min(1)") Integer cityId,
             Integer supplierId,
-            Integer teamId
+            Integer carTeamId
     ){
-        return null;
+        if(null == supplierId){}
+        if(null == carTeamId){}
+        String supplierIds = "";
+        String carTeamIds = "";
+        JSONArray data = driverMonitoringService.efficiency(cityId, supplierIds, carTeamIds);
+        if(null != data){
+            return AjaxResponse.success(data);
+        }
+        return AjaxResponse.fail(-1,"查询失败");
     }
 
     /**空闲司机列表
      * @param cityId
      * @param supplierId
-     * @param teamId
+     * @param carTeamId
      * @param freeTime
      * @param finishedOrder
      * @param finishedAmount
@@ -99,12 +124,20 @@ public class DriverMonitoringController {
     public AjaxResponse abnormity(
             @Verify(param = "cityId", rule = "required|min(1)") Integer cityId,
             Integer supplierId,
-            Integer teamId,
+            Integer carTeamId,
             Integer freeTime,
             Integer finishedOrder,
             Integer finishedAmount
     ){
-        return null;
+        if(null == supplierId){}
+        if(null == carTeamId){}
+        String supplierIds = "";
+        String carTeamIds = "";
+        JSONArray data = driverMonitoringService.abnormity(cityId, supplierIds, carTeamIds, freeTime, finishedOrder, finishedAmount);
+        if(null != data){
+            return AjaxResponse.success(data);
+        }
+        return AjaxResponse.fail(-1,"查询失败");
     }
 
 

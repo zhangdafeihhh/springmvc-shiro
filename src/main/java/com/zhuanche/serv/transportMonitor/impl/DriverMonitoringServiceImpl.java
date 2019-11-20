@@ -1,6 +1,10 @@
 package com.zhuanche.serv.transportMonitor.impl;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.dto.transportMonitor.IndexMonitorDriverStatisticsDto;
+import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.mongo.SaasIndexMonitorDriverStatistics;
 import com.zhuanche.serv.transportMonitor.DriverMonitoringService;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -25,6 +29,19 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
 
     @Resource(name = "driverMongoTemplate")
     private MongoTemplate driverMongoTemplate;
+
+    String  shangquanApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/driverMonitoring/areaNew";
+
+    String  fengchaoApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/driverMonitoring/beehiveNew";
+
+    String  trajectoryApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/saasCenter/trajectory";
+
+    String  driverInfoApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/saasCenter/driverInfo";
+
+    String  efficiencyApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/saasCenter/efficiency";
+
+    String  abnormityApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/saasCenter/abnormity";
+
 
     /**
      * @param cityId
@@ -98,6 +115,64 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
             }
         }
         return dto;
+    }
+
+    @Override
+    public JSONObject getBizdistrict(Integer cityId) {
+        JSONObject result = MpOkHttpUtil.okHttpGetBackJson(shangquanApiUrl+"?cityId="+cityId,1,"");
+        return result;
+    }
+
+    @Override
+    public JSONObject getHotspotDistrict(Integer cityId) {
+        JSONObject result = MpOkHttpUtil.okHttpGetBackJson(fengchaoApiUrl+"?cityId="+cityId,1,"");
+        int status = result.getInteger("status");
+        if(status==1){
+            return result.getJSONObject("info");
+        }
+        return null;
+    }
+
+    @Override
+    public JSONArray trajectory(Integer cityId, String supplierIds, String carTeamIds) {
+//        JSONObject result = MpOkHttpUtil.okHttpGetBackJson(trajectoryApiUrl+"?cityId="+cityId+"&supplierIds="+supplierIds+"&carTeamIds="+carTeamIds,1,"");
+        JSONObject result = MpOkHttpUtil.okHttpGetBackJson(trajectoryApiUrl+"?cityId="+cityId,1,"");
+        int status = result.getInteger("status");
+        if(status==1){
+            return result.getJSONArray("info");
+        }
+        return null;
+    }
+
+    @Override
+    public JSONObject driverInfo(Integer driverId) {
+        JSONObject result = MpOkHttpUtil.okHttpGetBackJson(driverInfoApiUrl+"?driverId="+driverId,1,"");
+        int status = result.getInteger("status");
+        if(status==1){
+            return result.getJSONObject("info");
+        }
+        return null;
+    }
+
+    @Override
+    public JSONArray efficiency(Integer cityId, String supplierIds, String carTeamIds) {
+//        JSONObject result = MpOkHttpUtil.okHttpGetBackJson(efficiencyApiUrl+"?cityId="+cityId+"&supplierIds="+supplierIds+"&carTeamIds="+carTeamIds,1,"");
+        JSONObject result = MpOkHttpUtil.okHttpGetBackJson(efficiencyApiUrl+"?cityId="+cityId,1,"");
+        if(null == result.get("status")){
+            return result.getJSONArray("data");
+        }
+        return null;
+    }
+
+    @Override
+    public JSONArray abnormity(Integer cityId, String supplierIds, String carTeamIds, Integer freeTime, Integer finishedOrder, Integer finishedAmount) {
+//        String params = "?cityId="+cityId+"&supplierIds="+supplierIds+"&carTeamIds="+carTeamIds+"&freeTime="+freeTime+"&finishedOrder"+freeTime+"&finishedAmount";
+        String params = "?cityId="+cityId;
+        JSONObject result = MpOkHttpUtil.okHttpGetBackJson(abnormityApiUrl+params,1,"");
+        if(null == result.get("status")){
+            return result.getJSONArray("data");
+        }
+        return null;
     }
 
     /**
