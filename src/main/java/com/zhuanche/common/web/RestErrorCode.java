@@ -266,7 +266,7 @@ public final class RestErrorCode{
 	@ResultMessage("预订人注册失败")
 	public static final int REGISTER_BY_PHONE = 50012;
 
-	@ResultMessage("上下车点不再围栏区域")
+	@ResultMessage("上下车点不在围栏区域")
 	public static final int ADD_NOT_RIGHT = 50013;
 
 	@ResultMessage("未匹配到线路")
