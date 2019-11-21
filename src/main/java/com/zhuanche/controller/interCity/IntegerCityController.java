@@ -556,7 +556,7 @@ public class IntegerCityController {
 
             //获取预估价
             String[] ruleStr = ruleId.split(",");
-
+            String[] supplierStr=supplierId.split(",");
             AjaxResponse elsRes = null;
             for(int i = 0;i<ruleStr.length;i++){
                 elsRes = this.getOrderEstimatedAmount620(bookingDate, boardingCityId, 68, riderPhone,
@@ -571,6 +571,7 @@ public class IntegerCityController {
                     if(bigDecimal.compareTo(BigDecimal.ZERO) == 1){
                         logger.info("=========获取到了合适的预估价==========");
                         ruleId = ruleStr[i]; //获取到预估价
+                        supplierId = supplierStr[i];
                         break;
                     }
                 }
@@ -1075,6 +1076,7 @@ public class IntegerCityController {
 
         //获取预估价
         String[] ruleStr = ruleId.split(",");
+        String[] supplierStr=supplierId.split(",");
 
         //获取多条线路的
         for(int i = 0;i<ruleStr.length;i++){
@@ -1091,6 +1093,7 @@ public class IntegerCityController {
                     if(bigDecimal.compareTo(BigDecimal.ZERO) == 1){
                         logger.info("=========获取到了合适的预估价==========");
                         ruleId = ruleStr[i]; //获取到预估价
+                        supplierId = supplierStr[i];
                         break;
                     }
                 }
@@ -2150,6 +2153,7 @@ public class IntegerCityController {
      */
     private AjaxResponse  anyRoute(String getOnIds,String getOffIds){
         StringBuilder builderLines = new StringBuilder();
+        StringBuilder builderSupplierId = new StringBuilder();
         int count = 0;
         String[] getOnId = getOnIds.split(SPLIT);
         String[] getOffId = getOffIds.split(SPLIT);
@@ -2162,6 +2166,7 @@ public class IntegerCityController {
                     +",返回结果:" + JSONObject.toJSONString(response.getData()));
                     JSONObject jsonRes = (JSONObject) response.getData();
                     builderLines.append(jsonRes.getString("lineId")).append(",");
+                    builderSupplierId.append(jsonRes.getString("supplierId")).append(",");
                     //return response;
                 }
             }
@@ -2172,6 +2177,7 @@ public class IntegerCityController {
         }else {
             JSONObject jsonRoute = new JSONObject();
             jsonRoute.put("lineId",builderLines.toString().substring(0,builderLines.toString().length()-1));
+            jsonRoute.put("supplierId",builderSupplierId.toString().substring(0,builderSupplierId.toString().length()-1));
             return AjaxResponse.success(jsonRoute);
         }
 
