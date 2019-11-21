@@ -3,15 +3,12 @@ package com.zhuanche.serv.transportMonitor;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.web.AjaxResponse;
-import com.zhuanche.common.web.Verify;
-import com.zhuanche.dto.transportMonitor.IndexMonitorDriverStatisticsDto;
+import com.zhuanche.common.web.AjaxResponse;
 
-import java.util.Set;
 
 public interface DriverMonitoringService {
-    IndexMonitorDriverStatisticsDto queryIndexMonitorDriverStatistics(Integer cityId, Set<Integer> supplierIds, Set<Integer> teamIds);
-
-
+/*    IndexMonitorDriverStatisticsDto queryIndexMonitorDriverStatistics(Integer cityId, Set<Integer> supplierIds, Set<Integer> teamIds);
+    boolean outsideDriverSendMsg(Integer cityId, Set< Integer> supplierIds, Set< Integer> teamIds);*/
     JSONObject getBizdistrict(Integer cityId);
 
     JSONObject getHotspotDistrict(Integer cityId);
@@ -36,4 +33,8 @@ public interface DriverMonitoringService {
             Integer finishedOrder,
             Integer finishedAmount
     );
+
+    AjaxResponse getTransportStatics(Integer cityId, String supplierIds, String teamIds);
+    boolean sendPushMsg(Integer cityId, String supplierIds, String teamIds);
+
 }

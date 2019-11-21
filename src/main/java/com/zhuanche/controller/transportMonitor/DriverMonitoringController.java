@@ -3,6 +3,7 @@ package com.zhuanche.controller.transportMonitor;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.transportMonitor.IndexMonitorDriverStatisticsDto;
 import com.zhuanche.http.MpOkHttpUtil;
@@ -10,12 +11,17 @@ import com.zhuanche.serv.transportMonitor.DriverMonitoringService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 运力监控
@@ -23,8 +29,12 @@ import java.util.Set;
 @RestController
 @RequestMapping(value = "/api/driverMonitoring")
 public class DriverMonitoringController {
+    private Logger logger = LoggerFactory.getLogger(DriverMonitoringController.class);
     @Autowired
     private DriverMonitoringService driverMonitoringService;
+
+    @Autowired
+    private RedisTemplate <String, Serializable > redisTemplate;
     /**查询商圈
      * @param cityId
      * @return
@@ -154,11 +164,61 @@ public class DriverMonitoringController {
             Integer teamId
             //String currentTime
     ){
-        Set<Integer> supplierIds = getSupplierIds(supplierId);
-        Set<Integer> teamIds = getTeamIds(teamId);
-        IndexMonitorDriverStatisticsDto indexMonitorDriverStatisticsDto=driverMonitoringService.queryIndexMonitorDriverStatistics(cityId,supplierIds,teamIds);
-        return AjaxResponse.success(indexMonitorDriverStatisticsDto);
+        String supplierIds = getSupplierIdsStr(supplierId);
+        String teamIds = getTeamIdsStr(teamId);
+        //IndexMonitorDriverStatisticsDto indexMonitorDriverStatisticsDto=driverMonitoringService.queryIndexMonitorDriverStatistics(cityId,supplierIds,teamIds);
+        AjaxResponse ajaxResponse=driverMonitoringService.getTransportStatics(cityId,supplierIds,teamIds);
+        return ajaxResponse;
     }
+
+
+    /**
+     * @param cityId
+     * @param supplierId
+     * @param teamId
+     * @return
+     */
+    @RequestMapping(value = "/outsideDriverSendMsg")
+    public AjaxResponse outsideDriverSendMsg(
+            @Verify(param = "cityId", rule = "required|min(1)") Integer cityId,
+            Integer supplierId,
+            Integer teamId
+    ){
+        SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+        Serializable redisValue = redisTemplate.opsForValue().get("sendMsg_key_" + user.getLoginName());
+        if(redisValue!=null){
+            return AjaxResponse.fail(RestErrorCode.SEND_MSG_LOCK);
+        }
+
+        String redis_sendMsg_count = "sendMsg_count_"+user.getLoginName();
+        long score = System.currentTimeMillis();
+        //zset内部是按分数来排序的，这里用当前时间做分数
+        redisTemplate.opsForZSet().add(redis_sendMsg_count, String.valueOf(score), score);
+        //统计60分钟内发送消息次数
+        int statistics = 60;
+        redisTemplate.expire(redis_sendMsg_count, statistics, TimeUnit.MINUTES);
+
+        //统计用户60分钟内发送消息次数
+        long max = score;
+        long min = max - (statistics * 60 * 1000);
+        long count = redisTemplate.opsForZSet().count(redis_sendMsg_count, min, max);
+
+        int countLimit = 3;
+        logger.info("用户"+user.getLoginName()+"在"+statistics+"分钟内第"+count+"次进行发送消息操作");
+        if(count  > countLimit) {
+            logger.info("用户"+user.getLoginName()+"在"+statistics+"次进行发送消息操作"+count+"次,超过限制"+countLimit+",需要等待"+statistics+"分钟");
+            return AjaxResponse.fail(RestErrorCode.SEND_MSG_COUNT,statistics);
+        }
+
+        String supplierIds = getSupplierIdsStr(supplierId);
+        String teamIds = getTeamIdsStr(teamId);
+        boolean b=driverMonitoringService.sendPushMsg(cityId,supplierIds,teamIds);
+        if(b){
+            redisTemplate.opsForValue().set("sendMsg_key_" + user.getLoginName(), user.getLoginName(), 60 * 10, TimeUnit.SECONDS);
+        }
+        return AjaxResponse.success(b);
+    }
+
 
     /**
      * 获取可以查看供应商集合
@@ -202,5 +262,50 @@ public class DriverMonitoringController {
             teamIds = StringUtils.join(teamIdSet, ",");
         }*/
         return teamIdSet;
+    }
+
+
+    /**
+     * 获取可以查看供应商集合
+     * @param supplierId
+     * @return
+     */
+    public String getSupplierIdsStr(Integer supplierId){
+        String supplierIds="";
+        SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+
+        Set <Integer> supplierIdSet=new HashSet <>();
+
+        if(supplierId != null){
+            supplierIdSet.add(supplierId);
+        }else{
+            supplierIdSet = user.getSupplierIds();
+        }
+
+        if(supplierIdSet!=null && supplierIdSet.size()>0){
+            supplierIds = StringUtils.join(supplierIdSet, ",");
+        }
+        return supplierIds;
+    }
+
+    /**
+     * 获取可以查询车队集合
+     * @param teamId
+     * @return
+     */
+    public String getTeamIdsStr(Integer teamId){
+        String teamIds="";
+        SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+        Set <Integer> teamIdSet=new HashSet <>();
+
+        if(teamId != null){
+            teamIdSet.add(teamId);
+        }else{
+            teamIdSet = user.getTeamIds();
+        }
+        if(teamIdSet!=null && teamIdSet.size()>0){
+            teamIds = StringUtils.join(teamIdSet, ",");
+        }
+        return teamIds;
     }
 }
