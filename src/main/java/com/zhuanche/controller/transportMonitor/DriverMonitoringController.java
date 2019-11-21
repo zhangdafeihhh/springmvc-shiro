@@ -212,7 +212,7 @@ public class DriverMonitoringController {
 
         String supplierIds = getSupplierIdsStr(supplierId);
         String teamIds = getTeamIdsStr(teamId);
-        boolean b=driverMonitoringService.SendPushMsg(cityId,supplierIds,teamIds);
+        boolean b=driverMonitoringService.sendPushMsg(cityId,supplierIds,teamIds);
         if(b){
             redisTemplate.opsForValue().set("sendMsg_key_" + user.getLoginName(), user.getLoginName(), 60 * 10, TimeUnit.SECONDS);
         }

@@ -35,6 +35,6 @@ public interface DriverMonitoringService {
     );
 
     AjaxResponse getTransportStatics(Integer cityId, String supplierIds, String teamIds);
-    boolean SendPushMsg(Integer cityId, String supplierIds, String teamIds);
+    boolean sendPushMsg(Integer cityId, String supplierIds, String teamIds);
 
 }
