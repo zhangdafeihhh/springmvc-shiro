@@ -298,11 +298,15 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
             map.put("supplierIds",supplierIds);
         }
         if (StringUtils.isNotEmpty(teamIds)){
-            map.put("teamIds",teamIds);
+            map.put("carTeamIds",teamIds);
         }
         logger.info("----获取司机运力入参：" + JSONObject.toJSONString(map));
-        JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(BIGDATA_ATHENA_URL + "/xxx/xxx", map, 0, "司机运力查询");
-        return AjaxResponse.success(jsonObject);
+        JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(BIGDATA_ATHENA_URL + "/api/inside/getTransportStatics", map, 0, "司机运力查询");
+        if(jsonObject!=null && 1 == jsonObject.getInteger("status")){
+            JSONObject data = (JSONObject) jsonObject.get("info");
+            return AjaxResponse.success(data);
+        }
+        return AjaxResponse.success(null);
     }
 
     /**
@@ -321,7 +325,7 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
             map.put("supplierIds",supplierIds);
         }
         if (StringUtils.isNotEmpty(teamIds)){
-            map.put("teamIds",teamIds);
+            map.put("carTeamIds",teamIds);
         }
         logger.info("----获取圈外空闲司机入参：" + JSONObject.toJSONString(map));
         JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(BIGDATA_ATHENA_URL + "/xxx/xxx", map, 0, "圈外空闲司机查询");
@@ -336,6 +340,11 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
     private static final String APP_SECRET = "5D88D5B7B21547A8968C3B3669F69AEE";
 
     public boolean sendDriverMessage(List<OutCycleDriverList> list){
+
+            if(list==null || list.size()==0){
+                return true;
+            }
+
             String  rediskey = "outcycle_drivers_" + APP_KEY;
             int templateId = 1601;
             //第一步获取authToken
@@ -406,7 +415,7 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
     public long getMsgId(String authToken,long templateId){
         long msgId=0;
         JSONObject customizedParams = new JSONObject();
-        customizedParams.put("content", "");
+        customizedParams.put("content", "您当前处于商圈外，商圈内订单较多，建议您前往商圈内接单，请前往首约司机APP—首页—商圈外;看商圈和您所在位置.");
         Map headerParams = new HashMap();
         headerParams.put("authToken", authToken);
         TreeMap<String, Object> map1 = new TreeMap<String, Object>();
