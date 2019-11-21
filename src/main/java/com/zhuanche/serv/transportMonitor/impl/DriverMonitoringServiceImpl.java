@@ -2,6 +2,7 @@ package com.zhuanche.serv.transportMonitor.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Maps;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.dto.transportMonitor.IndexMonitorDriverStatisticsDto;
@@ -10,6 +11,10 @@ import com.zhuanche.mongo.OutCycleDriverList;
 import com.zhuanche.mongo.SaasIndexMonitorDriverStatistics;
 import com.zhuanche.serv.transportMonitor.DriverMonitoringService;
 import com.zhuanche.util.DateUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -23,14 +28,11 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class DriverMonitoringServiceImpl implements DriverMonitoringService {
-
+    private static final Logger logger = LoggerFactory.getLogger(DriverMonitoringServiceImpl.class);
 /*    @Resource(name = "bigDateDriverDBMongoTemplate")
     private MongoTemplate driverMongoTemplate;*/
 
@@ -46,6 +48,8 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
 
     String  abnormityApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/saasCenter/abnormity";
 
+    @Value("${bigdata.athena.url}")
+    private String BIGDATA_ATHENA_URL;
     /**
      * @param cityId
      * @param supplierIds
@@ -236,13 +240,49 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
         return false;
     }*/
 
+    /**
+     * 司机运力查询
+     * @param cityId
+     * @param supplierIds
+     * @param teamIds
+     * @return
+     */
     @Override
     public AjaxResponse getTransportStatics(Integer cityId, String supplierIds, String teamIds) {
-        return null;
+        Map <String, Object> map = Maps.newHashMap();
+        map.put("cityId",cityId);
+        if (StringUtils.isNotEmpty(supplierIds)){
+            map.put("supplierIds",supplierIds);
+        }
+        if (StringUtils.isNotEmpty(teamIds)){
+            map.put("teamIds",teamIds);
+        }
+        logger.info("----获取司机运力入参：" + JSONObject.toJSONString(map));
+        JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(BIGDATA_ATHENA_URL + "/xxx/xxx", map, 0, "司机运力查询");
+        return AjaxResponse.success(jsonObject);
     }
 
+    /**
+     * 查询圈外空闲司机并发送socket
+     * @param cityId
+     * @param supplierIds
+     * @param teamIds
+     * @return
+     */
     @Override
     public boolean SendPushMsg(Integer cityId, String supplierIds, String teamIds) {
+
+        Map <String, Object> map = Maps.newHashMap();
+        map.put("cityId",cityId);
+        if (StringUtils.isNotEmpty(supplierIds)){
+            map.put("supplierIds",supplierIds);
+        }
+        if (StringUtils.isNotEmpty(teamIds)){
+            map.put("teamIds",teamIds);
+        }
+        logger.info("----获取圈外空闲司机入参：" + JSONObject.toJSONString(map));
+        JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(BIGDATA_ATHENA_URL + "/xxx/xxx", map, 0, "圈外空闲司机查询");
+
         return false;
     }
 }
