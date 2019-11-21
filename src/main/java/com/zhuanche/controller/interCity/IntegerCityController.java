@@ -42,6 +42,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
@@ -566,6 +568,13 @@ public class IntegerCityController {
             //获取预估金额
             String estimatedAmount = jsonEst.getString("estimatedAmount");
             String estimatedKey = jsonEst.getString("estimatedKey");
+            logger.info("获取到预估金额:" + estimatedAmount);
+            //判断预估价是否大于0
+            BigDecimal bigDecimal = new BigDecimal(estimatedAmount);
+            if(bigDecimal.compareTo(BigDecimal.ZERO) != 1){
+                logger.info("获取到的预估金额为0");
+                return AjaxResponse.fail(RestErrorCode.UN_SUPPORT_CAR);
+            }
 
 
             StringBuffer sb = new StringBuffer();
@@ -1061,6 +1070,14 @@ public class IntegerCityController {
         //获取预估金额
         String estimatedAmount = jsonEst.getString("estimatedAmount");
         String estimatedKey = jsonEst.getString("estimatedKey");
+
+        logger.info("获取到预估金额:" + estimatedAmount);
+        //判断预估价是否大于0
+        BigDecimal bigDecimal = new BigDecimal(estimatedAmount);
+        if(bigDecimal.compareTo(BigDecimal.ZERO) != 1){
+            logger.info("获取到的预估金额为0");
+            return AjaxResponse.fail(RestErrorCode.UN_SUPPORT_CAR);
+        }
 
 
         Map<String, Object> map = Maps.newHashMap();

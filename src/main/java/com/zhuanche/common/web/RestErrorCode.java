@@ -275,6 +275,9 @@ public final class RestErrorCode{
 	@ResultMessage("未获取到预估价")
 	public static final int UNGET_PRICE = 50015;
 
+	@ResultMessage("线路不支持所选的车型")
+	public static final int UN_SUPPORT_CAR = 50016;
+
 	@ResultMessage("创建子单失败")
 	public static final int FAILED_CREATE_SUB_ORDER = 50020;
 
