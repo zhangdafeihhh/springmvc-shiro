@@ -15,7 +15,10 @@ public interface DriverMonitoringService {
 
 
 
-    JSONArray trajectory(Integer cityId, String supplierIds, String carTeamIds);
+    JSONArray trajectory(Integer cityId, String supplierIds, String carTeamIds,
+                         Integer carType,
+                         Integer driverStatus,
+                         String licensePlates);
 
     JSONObject driverInfo(Integer driverId);
 

@@ -2,6 +2,7 @@ package com.zhuanche.controller.transportMonitor;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.le.config.dict.Dicts;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -72,13 +74,14 @@ public class DriverMonitoringController {
     public AjaxResponse trajectory(
             @Verify(param = "cityId", rule = "required|min(1)") Integer cityId,
             Integer supplierId,
-            Integer carTeamId
+            Integer carTeamId,
+            Integer carType,
+            Integer driverStatus,
+            String licensePlates
     ){
-        if(null == supplierId){}
-        if(null == carTeamId){}
-        String supplierIds = "";
-        String carTeamIds = "";
-        JSONArray data = driverMonitoringService.trajectory(cityId, supplierIds, carTeamIds);
+        String supplierIds = getSupplierIdsStr(supplierId);
+        String carTteamIds = getTeamIdsStr(carTeamId);
+        JSONArray data = driverMonitoringService.trajectory(cityId, supplierIds, carTteamIds, carType, driverStatus, licensePlates);
         if(null != data){
             return AjaxResponse.success(data);
         }
@@ -110,11 +113,9 @@ public class DriverMonitoringController {
             Integer supplierId,
             Integer carTeamId
     ){
-        if(null == supplierId){}
-        if(null == carTeamId){}
-        String supplierIds = "";
-        String carTeamIds = "";
-        JSONArray data = driverMonitoringService.efficiency(cityId, supplierIds, carTeamIds);
+        String supplierIds = getSupplierIdsStr(supplierId);
+        String carTteamIds = getTeamIdsStr(carTeamId);
+        JSONArray data = driverMonitoringService.efficiency(cityId, supplierIds, carTteamIds);
         if(null != data){
             return AjaxResponse.success(data);
         }
@@ -139,11 +140,9 @@ public class DriverMonitoringController {
             Integer finishedOrder,
             Integer finishedAmount
     ){
-        if(null == supplierId){}
-        if(null == carTeamId){}
-        String supplierIds = "";
-        String carTeamIds = "";
-        JSONArray data = driverMonitoringService.abnormity(cityId, supplierIds, carTeamIds, freeTime, finishedOrder, finishedAmount);
+        String supplierIds = getSupplierIdsStr(supplierId);
+        String carTteamIds = getTeamIdsStr(carTeamId);
+        JSONArray data = driverMonitoringService.abnormity(cityId, supplierIds, carTteamIds, freeTime, finishedOrder, finishedAmount);
         if(null != data){
             return AjaxResponse.success(data);
         }
@@ -219,6 +218,28 @@ public class DriverMonitoringController {
         return AjaxResponse.success(b);
     }
 
+
+    /**
+     * @return
+     */
+    @RequestMapping(value = "/auth")
+    public AjaxResponse auth(){
+        SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+        Set<Integer> userCityIds = user.getCityIds();
+        String authCityIdStr = Dicts.getString("driverMonitoring_authCityIdStr", "44,66,79,82,84,107,119,72,93,94,101,67,78,95,71,111,113,81,109,80,83");
+        String[] strArray = authCityIdStr.split(",");
+        List<String> strList =  java.util.Arrays.asList(strArray);
+        Set<String> authCityIdSet = new HashSet<>(strList);
+        for (String cityId : authCityIdSet) {
+           if(userCityIds.contains(Integer.valueOf(cityId))){
+               userCityIds.remove(Integer.valueOf(cityId));
+           }
+        }
+        if(userCityIds.isEmpty()){
+            return AjaxResponse.success(false);
+        }
+        return AjaxResponse.success(true);
+    }
 
     /**
      * 获取可以查看供应商集合
