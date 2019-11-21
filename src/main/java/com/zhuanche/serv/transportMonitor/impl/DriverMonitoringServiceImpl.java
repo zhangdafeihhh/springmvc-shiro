@@ -265,8 +265,12 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
             map.put("teamIds",teamIds);
         }
         logger.info("----获取司机运力入参：" + JSONObject.toJSONString(map));
-        JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(BIGDATA_ATHENA_URL + "/xxx/xxx", map, 0, "司机运力查询");
-        return AjaxResponse.success(jsonObject);
+        JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(BIGDATA_ATHENA_URL + "/api/inside/getTransportStatics", map, 0, "司机运力查询");
+        if(jsonObject!=null && 1 == jsonObject.getInteger("status")){
+            JSONObject data = (JSONObject) jsonObject.get("info");
+            return AjaxResponse.success(data);
+        }
+        return AjaxResponse.success(null);
     }
 
     /**
