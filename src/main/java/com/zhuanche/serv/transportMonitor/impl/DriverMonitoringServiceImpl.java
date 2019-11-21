@@ -41,8 +41,8 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
 /*    @Resource(name = "bigDateDriverDBMongoTemplate")
     private MongoTemplate driverMongoTemplate;*/
 
-    @Value("${bigdata.smart.url}")
-    private String bigdataSmartUrl;
+    @Value("${bigdata.athena.url}")
+    private String BIGDATA_ATHENA_URL;
 
     @Value("${driver.message.send.url}")
     private String driverMessageSendUrl;
@@ -132,14 +132,14 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
 
     @Override
     public JSONObject getBizdistrict(Integer cityId) {
-        String  shangquanApiUrl=bigdataSmartUrl+"/api/inside/driverMonitoring/areaNew";
+        String  shangquanApiUrl=BIGDATA_ATHENA_URL+"/api/inside/driverMonitoring/areaNew";
         JSONObject result = MpOkHttpUtil.okHttpGetBackJson(shangquanApiUrl+"?cityId="+cityId,1,"");
         return result;
     }
 
     @Override
     public JSONObject getHotspotDistrict(Integer cityId) {
-        String  fengchaoApiUrl=bigdataSmartUrl+"/api/inside/driverMonitoring/beehiveNew";
+        String  fengchaoApiUrl=BIGDATA_ATHENA_URL+"/api/inside/driverMonitoring/beehiveNew";
         JSONObject result = MpOkHttpUtil.okHttpGetBackJson(fengchaoApiUrl+"?cityId="+cityId,1,"");
         int status = result.getInteger("status");
         if(status==1){
@@ -150,7 +150,7 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
 
     @Override
     public JSONArray trajectory(Integer cityId, String supplierIds, String carTeamIds) {
-        String  trajectoryApiUrl=bigdataSmartUrl+"/api/inside/saasCenter/trajectory";
+        String  trajectoryApiUrl=BIGDATA_ATHENA_URL+"/api/inside/saasCenter/trajectory";
 //        JSONObject result = MpOkHttpUtil.okHttpGetBackJson(trajectoryApiUrl+"?cityId="+cityId+"&supplierIds="+supplierIds+"&carTeamIds="+carTeamIds,1,"");
         JSONObject result = MpOkHttpUtil.okHttpGetBackJson(trajectoryApiUrl+"?cityId="+cityId,1,"");
         int status = result.getInteger("status");
@@ -162,7 +162,7 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
 
     @Override
     public JSONObject driverInfo(Integer driverId) {
-        String  driverInfoApiUrl=bigdataSmartUrl+"/api/inside/saasCenter/driverInfo";
+        String  driverInfoApiUrl=BIGDATA_ATHENA_URL+"/api/inside/saasCenter/driverInfo";
         JSONObject result = MpOkHttpUtil.okHttpGetBackJson(driverInfoApiUrl+"?driverId="+driverId,1,"");
         int status = result.getInteger("status");
         if(status==1){
@@ -173,7 +173,7 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
 
     @Override
     public JSONArray efficiency(Integer cityId, String supplierIds, String carTeamIds) {
-        String  efficiencyApiUrl=bigdataSmartUrl+"/api/inside/saasCenter/efficiency";
+        String  efficiencyApiUrl=BIGDATA_ATHENA_URL+"/api/inside/saasCenter/efficiency";
 //        JSONObject result = MpOkHttpUtil.okHttpGetBackJson(efficiencyApiUrl+"?cityId="+cityId+"&supplierIds="+supplierIds+"&carTeamIds="+carTeamIds,1,"");
         JSONObject result = MpOkHttpUtil.okHttpGetBackJson(efficiencyApiUrl+"?cityId="+cityId,1,"");
         if(null == result.get("status")){
@@ -184,7 +184,7 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
 
     @Override
     public JSONArray abnormity(Integer cityId, String supplierIds, String carTeamIds, Integer freeTime, Integer finishedOrder, Integer finishedAmount) {
-        String  abnormityApiUrl=bigdataSmartUrl+"/api/inside/saasCenter/abnormity";
+        String  abnormityApiUrl=BIGDATA_ATHENA_URL+"/api/inside/saasCenter/abnormity";
 //        String params = "?cityId="+cityId+"&supplierIds="+supplierIds+"&carTeamIds="+carTeamIds+"&freeTime="+freeTime+"&finishedOrder"+freeTime+"&finishedAmount";
         String params = "?cityId="+cityId;
         JSONObject result = MpOkHttpUtil.okHttpGetBackJson(abnormityApiUrl+params,1,"");
