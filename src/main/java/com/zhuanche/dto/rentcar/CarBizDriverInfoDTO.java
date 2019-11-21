@@ -551,6 +551,10 @@ public class CarBizDriverInfoDTO extends Base {
     private String startUpdateTime;//收入分更新时间开始
     private String endUpdateTime;//收入分更新时间结束
 
+    private String serviceScore;//服务分
+    private String tripScore;//时长分
+    private String appendScore;//附加分
+
 
     public String getOldPhone() {
         return oldPhone;
@@ -1606,5 +1610,29 @@ public class CarBizDriverInfoDTO extends Base {
 
     public void setEndUpdateTime(String endUpdateTime) {
         this.endUpdateTime = endUpdateTime;
+    }
+
+    public String getServiceScore() {
+        return serviceScore;
+    }
+
+    public void setServiceScore(String serviceScore) {
+        this.serviceScore = serviceScore;
+    }
+
+    public String getTripScore() {
+        return tripScore;
+    }
+
+    public void setTripScore(String tripScore) {
+        this.tripScore = tripScore;
+    }
+
+    public String getAppendScore() {
+        return appendScore;
+    }
+
+    public void setAppendScore(String appendScore) {
+        this.appendScore = appendScore;
     }
 }

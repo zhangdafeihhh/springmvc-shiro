@@ -243,6 +243,9 @@ public class CarBizDriverInfoService {
             dto = map.get(info.getDriverId());
             if (null != dto) {
                 info.setIncomeScore(dto.getIncomeScore());
+                info.setServiceScore(dto.getServiceScore());
+                info.setTripScore(dto.getTripScore());
+                info.setAppendScore(dto.getAppendScore());
                 if (null != dto.getUpdateTime())
                     info.setUpdateTime(df.format(new Date(dto.getUpdateTime())));
             }
