@@ -11,6 +11,7 @@ import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.mongo.OutCycleDriverList;
 import com.zhuanche.mongo.SaasIndexMonitorDriverStatistics;
 import com.zhuanche.serv.transportMonitor.DriverMonitoringService;
+import org.springframework.beans.factory.annotation.Value;
 import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.encrypt.MD5Utils;
 import org.apache.commons.lang3.StringUtils;
@@ -39,18 +40,6 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
     private static final Logger logger = LoggerFactory.getLogger(DriverMonitoringServiceImpl.class);
 /*    @Resource(name = "bigDateDriverDBMongoTemplate")
     private MongoTemplate driverMongoTemplate;*/
-
-    String  shangquanApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/driverMonitoring/areaNew";
-
-    String  fengchaoApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/driverMonitoring/beehiveNew";
-
-    String  trajectoryApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/saasCenter/trajectory";
-
-    String  driverInfoApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/saasCenter/driverInfo";
-
-    String  efficiencyApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/saasCenter/efficiency";
-
-    String  abnormityApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/saasCenter/abnormity";
 
     @Value("${bigdata.athena.url}")
     private String BIGDATA_ATHENA_URL;
@@ -143,12 +132,14 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
 
     @Override
     public JSONObject getBizdistrict(Integer cityId) {
+        String  shangquanApiUrl=BIGDATA_ATHENA_URL+"/api/inside/driverMonitoring/areaNew";
         JSONObject result = MpOkHttpUtil.okHttpGetBackJson(shangquanApiUrl+"?cityId="+cityId,1,"");
         return result;
     }
 
     @Override
     public JSONObject getHotspotDistrict(Integer cityId) {
+        String  fengchaoApiUrl=BIGDATA_ATHENA_URL+"/api/inside/driverMonitoring/beehiveNew";
         JSONObject result = MpOkHttpUtil.okHttpGetBackJson(fengchaoApiUrl+"?cityId="+cityId,1,"");
         int status = result.getInteger("status");
         if(status==1){
@@ -159,6 +150,7 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
 
     @Override
     public JSONArray trajectory(Integer cityId, String supplierIds, String carTeamIds) {
+        String  trajectoryApiUrl=BIGDATA_ATHENA_URL+"/api/inside/saasCenter/trajectory";
 //        JSONObject result = MpOkHttpUtil.okHttpGetBackJson(trajectoryApiUrl+"?cityId="+cityId+"&supplierIds="+supplierIds+"&carTeamIds="+carTeamIds,1,"");
         JSONObject result = MpOkHttpUtil.okHttpGetBackJson(trajectoryApiUrl+"?cityId="+cityId,1,"");
         int status = result.getInteger("status");
@@ -170,6 +162,7 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
 
     @Override
     public JSONObject driverInfo(Integer driverId) {
+        String  driverInfoApiUrl=BIGDATA_ATHENA_URL+"/api/inside/saasCenter/driverInfo";
         JSONObject result = MpOkHttpUtil.okHttpGetBackJson(driverInfoApiUrl+"?driverId="+driverId,1,"");
         int status = result.getInteger("status");
         if(status==1){
@@ -180,6 +173,7 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
 
     @Override
     public JSONArray efficiency(Integer cityId, String supplierIds, String carTeamIds) {
+        String  efficiencyApiUrl=BIGDATA_ATHENA_URL+"/api/inside/saasCenter/efficiency";
 //        JSONObject result = MpOkHttpUtil.okHttpGetBackJson(efficiencyApiUrl+"?cityId="+cityId+"&supplierIds="+supplierIds+"&carTeamIds="+carTeamIds,1,"");
         JSONObject result = MpOkHttpUtil.okHttpGetBackJson(efficiencyApiUrl+"?cityId="+cityId,1,"");
         if(null == result.get("status")){
@@ -190,6 +184,7 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
 
     @Override
     public JSONArray abnormity(Integer cityId, String supplierIds, String carTeamIds, Integer freeTime, Integer finishedOrder, Integer finishedAmount) {
+        String  abnormityApiUrl=BIGDATA_ATHENA_URL+"/api/inside/saasCenter/abnormity";
 //        String params = "?cityId="+cityId+"&supplierIds="+supplierIds+"&carTeamIds="+carTeamIds+"&freeTime="+freeTime+"&finishedOrder"+freeTime+"&finishedAmount";
         String params = "?cityId="+cityId;
         JSONObject result = MpOkHttpUtil.okHttpGetBackJson(abnormityApiUrl+params,1,"");
