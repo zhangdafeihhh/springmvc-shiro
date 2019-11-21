@@ -257,7 +257,7 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
             map.put("supplierIds",supplierIds);
         }
         if (StringUtils.isNotEmpty(teamIds)){
-            map.put("teamIds",teamIds);
+            map.put("carTeamIds",teamIds);
         }
         logger.info("----获取司机运力入参：" + JSONObject.toJSONString(map));
         JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(BIGDATA_ATHENA_URL + "/api/inside/getTransportStatics", map, 0, "司机运力查询");
@@ -284,7 +284,7 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
             map.put("supplierIds",supplierIds);
         }
         if (StringUtils.isNotEmpty(teamIds)){
-            map.put("teamIds",teamIds);
+            map.put("carTeamIds",teamIds);
         }
         logger.info("----获取圈外空闲司机入参：" + JSONObject.toJSONString(map));
         JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(BIGDATA_ATHENA_URL + "/xxx/xxx", map, 0, "圈外空闲司机查询");
