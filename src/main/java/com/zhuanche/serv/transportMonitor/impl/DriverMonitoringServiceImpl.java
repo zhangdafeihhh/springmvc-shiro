@@ -34,6 +34,18 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
 /*    @Resource(name = "bigDateDriverDBMongoTemplate")
     private MongoTemplate driverMongoTemplate;*/
 
+    String  shangquanApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/driverMonitoring/areaNew";
+
+    String  fengchaoApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/driverMonitoring/beehiveNew";
+
+    String  trajectoryApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/saasCenter/trajectory";
+
+    String  driverInfoApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/saasCenter/driverInfo";
+
+    String  efficiencyApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/saasCenter/efficiency";
+
+    String  abnormityApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/saasCenter/abnormity";
+
     /**
      * @param cityId
      * @param supplierIds
@@ -177,13 +189,7 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
     }
 
 
-
-    /*    *//**
-     * 计算除法
-     * @param dividend
-     * @param divisor
-     * @return
-     *//*
+    /*
     public BigDecimal getRate(Integer dividend,Integer divisor){
         if (dividend==null || dividend==0 || divisor ==0 ||divisor==null){
             return BigDecimal.ZERO;
