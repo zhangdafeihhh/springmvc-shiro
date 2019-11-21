@@ -226,10 +226,7 @@ public class DriverMonitoringController {
     public AjaxResponse auth(){
         SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
         Set<Integer> userCityIds = user.getCityIds();
-        String authCityIdStr = Dicts.getString("driverMonitoring_authCityIdStr", "44,66,79,82,84,107,119,72,93,94,101,67,78,95,71,111,113,81,109,80,83");
-        String[] strArray = authCityIdStr.split(",");
-        List<String> strList =  java.util.Arrays.asList(strArray);
-        Set<String> authCityIdSet = new HashSet<>(strList);
+        Set<String> authCityIdSet = getAuthCityId();
         for (String cityId : authCityIdSet) {
            if(userCityIds.contains(Integer.valueOf(cityId))){
                userCityIds.remove(Integer.valueOf(cityId));
@@ -328,5 +325,14 @@ public class DriverMonitoringController {
             teamIds = StringUtils.join(teamIdSet, ",");
         }
         return teamIds;
+    }
+
+
+    public Set<String> getAuthCityId(){
+        String authCityIdStr = Dicts.getString("driverMonitoring_authCityIdStr", "44,66,79,82,84,107,119,72,93,94,101,67,78,95,71,111,113,81,109,80,83");
+        String[] strArray = authCityIdStr.split(",");
+        List<String> strList =  java.util.Arrays.asList(strArray);
+        Set<String> authCityIdSet = new HashSet<>(strList);
+        return authCityIdSet;
     }
 }
