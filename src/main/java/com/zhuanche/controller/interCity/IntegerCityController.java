@@ -2062,13 +2062,13 @@ public class IntegerCityController {
             if(jsonResult.get("code") == null || jsonResult.getInteger("code") != 0 ||
                     jsonResult.get("data") == null) {
                 logger.info("获取上车点失败");
-                return AjaxResponse.fail(RestErrorCode.GET_ON_ADDRESS_FAILED);
+                return AjaxResponse.fail(RestErrorCode.ADD_NOT_RIGHT);
             }
 
             JSONArray arrayData = jsonResult.getJSONArray("data");
             if(arrayData == null){
                 logger.info("获取上车区域失败");
-                return AjaxResponse.fail(RestErrorCode.GET_ON_ADDRESS_FAILED);
+                return AjaxResponse.fail(RestErrorCode.ADD_NOT_RIGHT);
             }
 
             for(int i  =0;i<arrayData.size();i++){
@@ -2119,13 +2119,13 @@ public class IntegerCityController {
             if(jsonResultY.get("code") == null || jsonResultY.getInteger("code") != 0 ||
                     jsonResultY.get("data") == null){
                 logger.info("获取下车点失败");
-                return AjaxResponse.fail(RestErrorCode.GET_OFF_ADDRESS_FAILED);
+                return AjaxResponse.fail(RestErrorCode.ADD_NOT_RIGHT);
             }
 
             JSONArray jsonArray = jsonResultY.getJSONArray("data");
             if(jsonArray.size() == 0){
                 logger.info("获取下车点失败");
-                return AjaxResponse.fail(RestErrorCode.GET_OFF_ADDRESS_FAILED);
+                return AjaxResponse.fail(RestErrorCode.ADD_NOT_RIGHT);
             }
 
 
