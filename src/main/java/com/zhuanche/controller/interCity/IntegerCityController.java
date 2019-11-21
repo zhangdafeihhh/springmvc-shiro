@@ -513,7 +513,6 @@ public class IntegerCityController {
 
             JSONObject jsonRoute = (JSONObject) configRouteRes.getData();
             if (jsonRoute != null && jsonRoute.get("lineId") != null) {
-                //JSONObject righRoute = jsonRoute.getJSONObject("data");
                 ruleId = jsonRoute.get("lineId").toString();
                 supplierId = jsonRoute.get("supplierId").toString();
             }
@@ -556,9 +555,27 @@ public class IntegerCityController {
             long bookingDate = bookDate.getTime();
 
             //获取预估价
-            AjaxResponse elsRes = this.getOrderEstimatedAmount620(bookingDate, boardingCityId, 68, riderPhone,
-                    ruleId, customerId, boardingGetOffX, boardingGetOffY, riderCount, String.valueOf(carGroup), boardingGetOnX, boardingGetOffY,
-                    isSameRider);
+            String[] ruleStr = ruleId.split(",");
+
+            AjaxResponse elsRes = null;
+            for(int i = 0;i<ruleStr.length;i++){
+                elsRes = this.getOrderEstimatedAmount620(bookingDate, boardingCityId, 68, riderPhone,
+                        ruleStr[i], customerId, boardingGetOffX, boardingGetOffY, riderCount, String.valueOf(carGroup), boardingGetOnX, boardingGetOffY,
+                        isSameRider);
+                if(elsRes.getCode() == RestErrorCode.SUCCESS){
+                    JSONObject jsonEst = (JSONObject) elsRes.getData();
+                    //获取预估金额
+                    String estimatedAmount = jsonEst.getString("estimatedAmount");
+                    //判断预估价是否大于0
+                    BigDecimal bigDecimal = new BigDecimal(estimatedAmount);
+                    if(bigDecimal.compareTo(BigDecimal.ZERO) == 1){
+                        logger.info("=========获取到了合适的预估价==========");
+                        ruleId = ruleStr[i]; //获取到预估价
+                        break;
+                    }
+                }
+            }
+
             if (elsRes.getCode() != RestErrorCode.SUCCESS) {
                 logger.info("未获取到预估价");
                 return AjaxResponse.fail(RestErrorCode.UNGET_PRICE);
@@ -1010,6 +1027,8 @@ public class IntegerCityController {
         }
 
         JSONObject jsonRoute = (JSONObject) configRouteRes.getData();
+
+
         if (jsonRoute != null && jsonRoute.get("lineId") != null) {
             ruleId = jsonRoute.get("lineId").toString();
             supplierId = jsonRoute.get("supplierId").toString();
@@ -1053,18 +1072,41 @@ public class IntegerCityController {
 
         //获取预估价
         AjaxResponse elsRes = null;
-        try {
-            elsRes = this.getOrderEstimatedAmount620(Long.valueOf(longTimeDate.getTime()), boardingCityId, 68, riderPhone,
-                    ruleId, customerId, boardingGetOffX, boardingGetOffY, riderCount, String.valueOf(carGroup), boardingGetOnX,
-                    boardingGetOnY, isSameRider);
-        } catch (Exception e) {
-            logger.error("获取预估价异常",e);
-            return AjaxResponse.fail(RestErrorCode.UNGET_PRICE);
+
+        //获取预估价
+        String[] ruleStr = ruleId.split(",");
+
+        //获取多条线路的
+        for(int i = 0;i<ruleStr.length;i++){
+            try {
+                elsRes = this.getOrderEstimatedAmount620(Long.valueOf(longTimeDate.getTime()), boardingCityId, 68, riderPhone,
+                        ruleStr[i], customerId, boardingGetOffX, boardingGetOffY, riderCount, String.valueOf(carGroup), boardingGetOnX,
+                        boardingGetOnY, isSameRider);
+                if(elsRes.getCode() == RestErrorCode.SUCCESS){
+                    JSONObject jsonEst = (JSONObject) elsRes.getData();
+                    //获取预估金额
+                    String estimatedAmount = jsonEst.getString("estimatedAmount");
+                    //判断预估价是否大于0
+                    BigDecimal bigDecimal = new BigDecimal(estimatedAmount);
+                    if(bigDecimal.compareTo(BigDecimal.ZERO) == 1){
+                        logger.info("=========获取到了合适的预估价==========");
+                        ruleId = ruleStr[i]; //获取到预估价
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("获取预估价异常",e);
+                return AjaxResponse.fail(RestErrorCode.UNGET_PRICE);
+            }
+
         }
+
+
         if (elsRes.getCode() != RestErrorCode.SUCCESS) {
             logger.info("未获取到预估价");
             return AjaxResponse.fail(RestErrorCode.UNGET_PRICE);
         }
+
 
         JSONObject jsonEst = (JSONObject) elsRes.getData();
         //获取预估金额
@@ -2107,7 +2149,7 @@ public class IntegerCityController {
      * @return
      */
     private AjaxResponse  anyRoute(String getOnIds,String getOffIds){
-
+        StringBuilder builderLines = new StringBuilder();
         int count = 0;
         String[] getOnId = getOnIds.split(SPLIT);
         String[] getOffId = getOffIds.split(SPLIT);
@@ -2118,12 +2160,21 @@ public class IntegerCityController {
                 if(response.getCode() == 0){
                     logger.info("匹配线路成功：线路上车围栏id:" + getOnId[i]+",下车围栏id："+getOffId[j]+",查询次数：" + count
                     +",返回结果:" + JSONObject.toJSONString(response.getData()));
-                    return response;
+                    JSONObject jsonRes = (JSONObject) response.getData();
+                    builderLines.append(jsonRes.getString("lineId")).append(",");
+                    //return response;
                 }
             }
         }
-        logger.info("未查询到匹配的线路,查询次数:" + count);
-        return AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
+        if(StringUtils.isEmpty(builderLines.toString())){
+            logger.info("未查询到匹配的线路,查询次数:" + count);
+            return AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
+        }else {
+            JSONObject jsonRoute = new JSONObject();
+            jsonRoute.put("lineId",builderLines.toString().substring(0,builderLines.toString().length()-1));
+            return AjaxResponse.success(jsonRoute);
+        }
+
     }
 
     /**
