@@ -3,10 +3,13 @@ package com.zhuanche.serv.transportMonitor.impl;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhuanche.common.web.AjaxResponse;
+import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.dto.transportMonitor.IndexMonitorDriverStatisticsDto;
 import com.zhuanche.http.MpOkHttpUtil;
+import com.zhuanche.mongo.OutCycleDriverList;
 import com.zhuanche.mongo.SaasIndexMonitorDriverStatistics;
 import com.zhuanche.serv.transportMonitor.DriverMonitoringService;
+import com.zhuanche.util.DateUtil;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -21,27 +24,15 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 @Service
 public class DriverMonitoringServiceImpl implements DriverMonitoringService {
 
-    @Resource(name = "driverMongoTemplate")
-    private MongoTemplate driverMongoTemplate;
-
-    String  shangquanApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/driverMonitoring/areaNew";
-
-    String  fengchaoApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/driverMonitoring/beehiveNew";
-
-    String  trajectoryApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/saasCenter/trajectory";
-
-    String  driverInfoApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/saasCenter/driverInfo";
-
-    String  efficiencyApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/saasCenter/efficiency";
-
-    String  abnormityApiUrl="http://pre-inside-bigdata-athena.01zhuanche.com/api/inside/saasCenter/abnormity";
-
+/*    @Resource(name = "bigDateDriverDBMongoTemplate")
+    private MongoTemplate driverMongoTemplate;*/
 
     /**
      * @param cityId
@@ -49,7 +40,7 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
      * @param teamIds
      * @return
      */
-    @Override
+    /*@Override
     public IndexMonitorDriverStatisticsDto queryIndexMonitorDriverStatistics(Integer cityId, Set <Integer> supplierIds, Set<Integer> teamIds) {
         Query query = new Query().limit(1);
         query.addCriteria(Criteria.where("cityId").is(cityId));
@@ -77,7 +68,7 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
                 c.and("driverTeamId").in(teamIds);
             }
             operations.add(Aggregation.match(c));
-            operations.add(Aggregation.group("cityId")
+            operations.add(Aggregation.group("cityId","minTime")
                     .max("minTime").as("minTime")
                     .sum("inCycleTotalOnlineCnt").as("inCycleTotalOnlineCnt")
                     .sum("inCycleTotalServingCnt").as("inCycleTotalServingCnt")
@@ -98,24 +89,34 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
             List <IndexMonitorDriverStatisticsDto> listIndexMonitorDriverStatistics = g.getMappedResults();
             if (listIndexMonitorDriverStatistics!=null && listIndexMonitorDriverStatistics.size()>0){
                 dto = listIndexMonitorDriverStatistics.get(0);
-                /**上线司机 运力在圈率=*/
+                *//**上线司机 运力在圈率=*//*
                 dto.setOnLineInCycleRate(getRate(dto.getInCycleTotalOnlineCnt(),dto.getTotalOnlineCnt()).setScale(3,BigDecimal.ROUND_DOWN));
-                /**服务中司机 运力在圈率*/
+                *//**服务中司机 运力在圈率*//*
                 dto.setServingInCycleRate(getRate(dto.getInCycleTotalServingCnt(),dto.getTotalServingCnt()).setScale(3,BigDecimal.ROUND_DOWN));
-                /**空闲司机 运力在圈率*/
+                *//**空闲司机 运力在圈率*//*
                 dto.setFreeInCycleRate(getRate(dto.getInCycleTotalFreeCnt(),dto.getTotalFreeCnt()).setScale(3,BigDecimal.ROUND_DOWN));
-                /**线下听单司机 运力在圈率*/
+                *//**线下听单司机 运力在圈率*//*
                 dto.setOffLineInCycleRate(getRate(dto.getInCycleTotalOfflineCnt(),dto.getTotalOfflineCnt()).setScale(3,BigDecimal.ROUND_DOWN));
-                /**全城运营率*/
+                *//**全城运营率*//*
                 dto.setCityOperatingRate(getRate(dto.getInCycleTotalServingCnt(),dto.getTotalOnlineCnt()).setScale(3,BigDecimal.ROUND_DOWN));
-                /**圈内运营率*/
+                *//**圈内运营率*//*
                 dto.setWithinCircleOperatingRate(getRate(dto.getTotalServingCnt(),dto.getInCycleTotalOnlineCnt()).setScale(3,BigDecimal.ROUND_DOWN));
-                /**圈外运营率*/
+                *//**圈外运营率*//*
                 dto.setOutSideCircleOperatingRate(getRate(dto.getOutCycleTotalServingCnt(),dto.getOutCycleTotalOnlineCnt()).setScale(3,BigDecimal.ROUND_DOWN));
             }
         }
         return dto;
-    }
+    }*/
+
+
+
+
+
+
+
+
+
+
 
     @Override
     public JSONObject getBizdistrict(Integer cityId) {
@@ -175,18 +176,67 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
         return null;
     }
 
-    /**
+
+
+    /*    *//**
      * 计算除法
      * @param dividend
      * @param divisor
      * @return
-     */
+     *//*
     public BigDecimal getRate(Integer dividend,Integer divisor){
         if (dividend==null || dividend==0 || divisor ==0 ||divisor==null){
             return BigDecimal.ZERO;
         }
         BigDecimal rate = new BigDecimal(dividend/divisor);
         return rate;
+    }*/
+
+
+  /*  @Override
+    public boolean outsideDriverSendMsg(Integer cityId, Set < Integer > supplierIds, Set < Integer > teamIds) {
+
+        Query query = new Query().limit(1);
+        query.addCriteria(Criteria.where("cityId").is(cityId));
+        if (supplierIds!=null && supplierIds.size()>0){
+            query.addCriteria(Criteria.where("driverTeamId").in(supplierIds));
+        }
+        if (teamIds!=null && teamIds.size()>0){
+            query.addCriteria(Criteria.where("supplierId").in(teamIds));
+        }
+        String nowMinTime = DateUtil.beforeHalfHour(new Date(), 10, "yyyyMMddHHmm");
+        query.addCriteria(Criteria.where("minTime").gte(nowMinTime));
+        query.with(new Sort(new Order(Direction.DESC,"minTime")));
+        query.skip(0);
+        IndexMonitorDriverStatisticsDto dto =null;
+        List<OutCycleDriverList> list=driverMongoTemplate.find(query, OutCycleDriverList.class);
+        OutCycleDriverList outCycleDriverList = list.get(0);
+        String minTime = outCycleDriverList.getMinTime();
+
+        Query queryParam = new Query().limit(1000);
+        query.addCriteria(Criteria.where("cityId").is(cityId));
+        if (supplierIds!=null && supplierIds.size()>0){
+            queryParam.addCriteria(Criteria.where("driverTeamId").in(supplierIds));
+        }
+        if (teamIds!=null && teamIds.size()>0){
+            queryParam.addCriteria(Criteria.where("supplierId").in(teamIds));
+        }
+        queryParam.addCriteria(Criteria.where("minTime").is(minTime));
+
+        queryParam.with(new Sort(new Order(Direction.DESC,"minTime")));
+
+        long count = driverMongoTemplate.count(query, OutCycleDriverList.class);
+
+        return false;
+    }*/
+
+    @Override
+    public AjaxResponse getTransportStatics(Integer cityId, String supplierIds, String teamIds) {
+        return null;
     }
 
+    @Override
+    public boolean SendPushMsg(Integer cityId, String supplierIds, String teamIds) {
+        return false;
+    }
 }
