@@ -186,7 +186,7 @@ public class DriverMonitoringController {
     ){
         logger.info("--给圈外空闲司机发送消息入参--cityId--{}--,--supplierId--{}--,--teamId--{}--",cityId,supplierId,teamId);
 
-        SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+       /* SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
         Serializable redisValue = redisTemplate.opsForValue().get("sendMsg_key_" + user.getLoginName());
         if(redisValue!=null){
             return AjaxResponse.fail(RestErrorCode.SEND_MSG_LOCK);
@@ -211,13 +211,13 @@ public class DriverMonitoringController {
             logger.info("用户"+user.getLoginName()+"在"+statistics+"次进行发送消息操作"+count+"次,超过限制"+countLimit+",需要等待"+statistics+"分钟");
             return AjaxResponse.fail(RestErrorCode.SEND_MSG_COUNT,statistics);
         }
-
+*/
         String supplierIds = getSupplierIdsStr(supplierId);
         String teamIds = getTeamIdsStr(teamId);
         boolean b=driverMonitoringService.sendPushMsg(cityId,supplierIds,teamIds);
-        if(b){
+        /*if(b){
             redisTemplate.opsForValue().set("sendMsg_key_" + user.getLoginName(), user.getLoginName(), 60 * 10, TimeUnit.SECONDS);
-        }
+        }*/
         return AjaxResponse.success(b);
     }
 

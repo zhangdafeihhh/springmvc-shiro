@@ -15,7 +15,7 @@ public class OutCycleDriverList  implements Serializable {
     private Integer type         ;
     private Integer supplierId   ;
     private Integer driverTeamId ;
-    private Date createTime      ;
+    //private Date createTime      ;
 
     public String getId() {
         return id;
@@ -97,11 +97,4 @@ public class OutCycleDriverList  implements Serializable {
         this.driverTeamId = driverTeamId;
     }
 
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
 }
