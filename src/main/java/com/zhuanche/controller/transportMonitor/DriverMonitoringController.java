@@ -227,6 +227,9 @@ public class DriverMonitoringController {
     public AjaxResponse auth(){
         SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
         Set<Integer> userCityIds = user.getCityIds();
+        if(userCityIds.isEmpty()){
+            return AjaxResponse.success(true);
+        }
         Set<String> authCityIdSet = getAuthCityId();
         for (String cityId : authCityIdSet) {
            if(userCityIds.contains(Integer.valueOf(cityId))){
