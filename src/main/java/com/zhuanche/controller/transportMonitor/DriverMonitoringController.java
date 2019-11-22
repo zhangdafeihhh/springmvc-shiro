@@ -151,7 +151,7 @@ public class DriverMonitoringController {
     }
 
 
-    /**
+    /**司机运力统计数据查询
      * @param cityId
      * @param supplierId
      * @param teamId
@@ -164,6 +164,7 @@ public class DriverMonitoringController {
             Integer teamId
             //String currentTime
     ){
+        logger.info("--查询司机运力数据入参--cityId--{}--,--supplierId--{}--,--teamId--{}--",cityId,supplierId,teamId);
         String supplierIds = getSupplierIdsStr(supplierId);
         String teamIds = getTeamIdsStr(teamId);
         //IndexMonitorDriverStatisticsDto indexMonitorDriverStatisticsDto=driverMonitoringService.queryIndexMonitorDriverStatistics(cityId,supplierIds,teamIds);
@@ -172,7 +173,7 @@ public class DriverMonitoringController {
     }
 
 
-    /**
+    /**圈外空闲司机消息提醒
      * @param cityId
      * @param supplierId
      * @param teamId
@@ -184,6 +185,8 @@ public class DriverMonitoringController {
             Integer supplierId,
             Integer teamId
     ){
+        logger.info("--给圈外空闲司机发送消息入参--cityId--{}--,--supplierId--{}--,--teamId--{}--",cityId,supplierId,teamId);
+
         SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
         Serializable redisValue = redisTemplate.opsForValue().get("sendMsg_key_" + user.getLoginName());
         if(redisValue!=null){

@@ -286,18 +286,63 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
         if (StringUtils.isNotEmpty(teamIds)){
             map.put("carTeamIds",teamIds);
         }
-        logger.info("----获取圈外空闲司机入参：" + JSONObject.toJSONString(map));
-        JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(BIGDATA_ATHENA_URL + "/xxx/xxx", map, 0, "圈外空闲司机查询");
+        int pageNum = 0;
+        int pageSize=1000;
+        map.put("pageNum",0);
+        map.put("pageSize",pageSize);
 
-
-
-        return false;
+        List<OutCycleDriverList> sendMsglist=new ArrayList <>();
+        List<OutCycleDriverList> list=getTrajectory(map);
+        if(list!=null && list.size()>0){
+            sendMsglist.addAll(list);
+            if (list.size()==pageSize){
+                for (; ; ) {
+                    map.put("pageNum", pageNum++);
+                    list = getTrajectory(map);
+                    if(list!=null && list.size()>0){
+                        sendMsglist.addAll(list);
+                        if(list.size()!=pageSize){
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        /**调用消息中心发送消息*/
+        boolean b=sendDriverMessage(sendMsglist);
+        return b;
     }
+
+   public List<OutCycleDriverList> getTrajectory(Map<String,Object> map){
+       List<OutCycleDriverList> list=null;
+       try {
+           logger.info("----获取圈外空闲司机入参：" + JSONObject.toJSONString(map));
+           JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(BIGDATA_ATHENA_URL + "/api/inside/saasCenter/trajectory", map, 0, "圈外空闲司机查询");
+           if (jsonObject.getInteger("status")==1 && jsonObject.getJSONObject("info")!=null){
+               JSONObject info = jsonObject.getJSONObject("info");
+               JSONObject content = jsonObject.getJSONObject("content");
+               if(content!=null){
+                   list=JSONObject.parseArray(content.toString(),OutCycleDriverList.class);
+               }
+           }
+       } catch (Exception e) {
+           logger.error("--获取圈外空闲司机异常--入参--{},--异常--{}",JSONObject.toJSONString(map),e);
+       } finally {
+           logger.info("--获取圈外空闲司机返回结果数据size--{}",list==null?"":list.size());
+           return list;
+       }
+    }
+
 
     private static final String LOGTAG = "[运力监控圈外司机]:";
     private static final String APP_KEY = "AABE8EEE8F49492CADF1C178B2294BEE";
     private static final String APP_SECRET = "5D88D5B7B21547A8968C3B3669F69AEE";
 
+    /**
+     * 结果集发送socket
+     * @param list
+     * @return
+     */
     public boolean sendDriverMessage(List<OutCycleDriverList> list){
 
             if(list==null || list.size()==0){
