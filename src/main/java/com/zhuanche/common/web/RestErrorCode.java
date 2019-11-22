@@ -326,7 +326,13 @@ public final class RestErrorCode{
 
 	@ResultMessage("很抱歉{0}车型车款已经停用！")
 	public static final int ENABLE_STATUS=80006;
+
 	//-------------------金融商品--end---------------------------
+
+	@ResultMessage("请稍后再试,禁止频繁使用！")
+	public static final int SEND_MSG_LOCK=90001;
+	@ResultMessage("圈外司机消息通知频繁,请{0}分钟后再次发送")
+	public static final int SEND_MSG_COUNT=90002;
 	private static final Logger log = LoggerFactory.getLogger(RestErrorCode.class);
 	private static Map<Integer,String> codeMsgMappings  = new HashMap<Integer,String>();//错误码与错误文字的映射关系
 	static{

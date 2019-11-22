@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.util.StringUtil;
+import com.le.config.dict.Dicts;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
@@ -347,6 +348,27 @@ public class CommonController {
         List<CarBizSupplier> carBizSuppliers = citySupplierTeamCommonService.querySupplierAllList( cityIdset );
         /*carBizSuppliersAll.addAll(carBizSuppliers);*/
         return AjaxResponse.success(carBizSuppliers);
+    }
+
+
+    @RequestMapping("/transportCitys")
+    @ResponseBody
+    public AjaxResponse getTransportCitys(){
+        List<CarBizCity> carBizCities = citySupplierTeamCommonService.queryCityList();
+
+        String authCityIdStr = Dicts.getString("driverMonitoring_authCityIdStr", "44,66,79,82,84,107,119,72,93,94,101,67,78,95,71,111,113,81,109,80,83");
+        if(StringUtils.isNotEmpty(authCityIdStr)){
+            List<Integer> cityIds = Arrays.asList(authCityIdStr.split(",")).stream().map(s -> Integer.parseInt(s.trim())).collect(Collectors.toList());
+            Iterator<CarBizCity> it = carBizCities.iterator();
+            while (it.hasNext()){
+                CarBizCity carBizCity= it.next();
+                if (!cityIds.contains(carBizCity.getCityId())){
+                    it.remove();
+                }
+            }
+        }
+
+        return AjaxResponse.success(carBizCities);
     }
 }
 
