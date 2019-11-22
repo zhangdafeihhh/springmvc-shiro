@@ -338,21 +338,21 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
         if(list!=null && list.size()>0){
             sendMsglist.addAll(list);
             if (list.size()==pageSize){*/
-                String minTime="";
-                for (; ; ) {
-                    map.put("pageNum", pageNum++);
-                    map.put("minTime",minTime);
-                    list = getTrajectory(map);
-                    if(list!=null && list.size()>0){
-                        if (StringUtils.isEmpty(minTime)){
-                            minTime=list.get(0).getMinTime();
-                        }
-                        sendMsglist.addAll(list);
-                        if(list.size()!=pageSize){
-                            break;
-                        }
-                    }
+        String minTime="";
+        for (; ; ) {
+            map.put("pageNum", pageNum++);
+            map.put("minTime",minTime);
+            list = getTrajectory(map);
+            if(list!=null && list.size()>0){
+                if (StringUtils.isEmpty(minTime)){
+                    minTime=list.get(0).getMinTime();
                 }
+                sendMsglist.addAll(list);
+                if(list.size()!=pageSize){
+                    break;
+                }
+            }
+        }
          /*   }
         }*/
         /**调用消息中心发送消息*/
@@ -360,31 +360,31 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
         return b;
     }
 
-   public List<OutCycleDriverList> getTrajectory(Map<String,Object> map){
-       List<OutCycleDriverList> list=null;
-       try {
-           logger.info("----获取圈外空闲司机入参：" + JSONObject.toJSONString(map));
-           JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(BIGDATA_ATHENA_URL + "/api/inside/saasCenter/getOutCycleDriverList", map, 0, "圈外空闲司机查询");
-           logger.info("----获取圈外空闲司机返回接口：" + JSONObject.toJSONString(jsonObject));
-           if (jsonObject.getInteger("status")==1 && jsonObject.get("info")!=null){
-               JSONObject info = jsonObject.getJSONObject("info");
-               Object content = info.get("content");
-               if(content!=null){
-                   list=JSONObject.parseArray(content.toString(),OutCycleDriverList.class);
-               }
-           }
-       } catch (Exception e) {
-           logger.error("--获取圈外空闲司机异常--入参--{},--异常--{}",JSONObject.toJSONString(map),e);
-       } finally {
-           logger.info("--获取圈外空闲司机返回结果数据size--{}",list==null?"":list.size());
-           return list;
-       }
+    public List<OutCycleDriverList> getTrajectory(Map<String,Object> map){
+        List<OutCycleDriverList> list=null;
+        try {
+            logger.info("----获取圈外空闲司机入参：" + JSONObject.toJSONString(map));
+            JSONObject jsonObject = MpOkHttpUtil.okHttpGetBackJson(BIGDATA_ATHENA_URL + "/api/inside/saasCenter/getOutCycleDriverList", map, 0, "圈外空闲司机查询");
+            logger.info("----获取圈外空闲司机返回接口：" + JSONObject.toJSONString(jsonObject));
+            if (jsonObject.getInteger("status")==1 && jsonObject.get("info")!=null){
+                JSONObject info = jsonObject.getJSONObject("info");
+                Object content = info.get("content");
+                if(content!=null){
+                    list=JSONObject.parseArray(content.toString(),OutCycleDriverList.class);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("--获取圈外空闲司机异常--入参--{},--异常--{}",JSONObject.toJSONString(map),e);
+        } finally {
+            logger.info("--获取圈外空闲司机返回结果数据size--{}",list==null?"":list.size());
+            return list;
+        }
     }
 
 
     private static final String LOGTAG = "[运力监控圈外司机]:";
-    private static final String APP_KEY = "AABE8EEE8F49492CADF1C178B2294BEE";
-    private static final String APP_SECRET = "5D88D5B7B21547A8968C3B3669F69AEE";
+    private static final String APP_KEY = "82BFBBA6C03247A2A5BCEFB9BD3EBB1F";
+    private static final String APP_SECRET = "3D7F14CB41144D6EA5D9C6795CE788CD";
 
     /**
      * 结果集发送socket
@@ -392,37 +392,37 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
      * @return
      */
     public boolean sendDriverMessage(List<OutCycleDriverList> list){
-            if(list==null || list.size()==0){
-                return true;
-            }
-            String  rediskey = "outcycle_drivers_" + APP_KEY;
-            int templateId = 2101;
-            //第一步获取authToken
-            String authToken = RedisCacheUtil.get(rediskey, String.class);
-            logger.info(LOGTAG + "发送站内信,查询redis结果authToken={1}", authToken);
-            if (StringUtils.isEmpty(authToken)) {
-                authToken=getToken(rediskey);
-                if (StringUtils.isBlank(authToken)) {
-                    logger.info(LOGTAG + "发送站内信,获取保存消息中心authToken={1}失败", authToken);
-                    return false;
-                }
-            }
-            //第二步获取msgId
-            Long msgId=getMsgId(authToken,templateId);
-            if (msgId==null||msgId==0){
-                logger.info(LOGTAG + "发送站内信,获取msgId={},authToken={}失败",msgId, authToken);
+        if(list==null || list.size()==0){
+            return true;
+        }
+        String  rediskey = "outcycle_drivers_" + APP_KEY;
+        int templateId = 2101;
+        //第一步获取authToken
+        String authToken = RedisCacheUtil.get(rediskey, String.class);
+        logger.info(LOGTAG + "发送站内信,查询redis结果authToken={1}", authToken);
+        if (StringUtils.isEmpty(authToken)) {
+            authToken=getToken(rediskey);
+            if (StringUtils.isBlank(authToken)) {
+                logger.info(LOGTAG + "发送站内信,获取保存消息中心authToken={1}失败", authToken);
                 return false;
             }
-            int total=list.size();
-            int pageSize=500;
-            int pageCount = total % pageSize == 0 ? total / pageSize : total / pageSize + 1;
-            for (int i=1;i<=pageCount;i++){
-                List<OutCycleDriverList> listDriver=datepaging(list,i,pageSize);
-                List<Integer> listdriverId= listDriver.stream().map(f -> f.getDriverId()).collect(Collectors.toList());
-                String driverIds = StringUtils.join(listdriverId, ",");
-                //第三步获取msgId
-                pushToList(authToken,msgId,driverIds);
-            }
+        }
+        //第二步获取msgId
+        Long msgId=getMsgId(authToken,templateId);
+        if (msgId==null||msgId==0){
+            logger.info(LOGTAG + "发送站内信,获取msgId={},authToken={}失败",msgId, authToken);
+            return false;
+        }
+        int total=list.size();
+        int pageSize=500;
+        int pageCount = total % pageSize == 0 ? total / pageSize : total / pageSize + 1;
+        for (int i=1;i<=pageCount;i++){
+            List<OutCycleDriverList> listDriver=datepaging(list,i,pageSize);
+            List<Integer> listdriverId= listDriver.stream().map(f -> f.getDriverId()).collect(Collectors.toList());
+            String driverIds = StringUtils.join(listdriverId, ",");
+            //第三步获取msgId
+            pushToList(authToken,msgId,driverIds);
+        }
         return true;
     }
 
@@ -439,6 +439,7 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
             long currentTimeMillis = System.currentTimeMillis();
             map.put("timestamp", currentTimeMillis);
             map.put("sign", MD5Utils.getMD5DigestHex(APP_KEY + currentTimeMillis + APP_SECRET));
+            logger.info("--发送消息获取token入参--：" + JSONObject.toJSONString(map));
             Map<String, Object> obj = MpOkHttpUtil.okHttpPostBackMap(driverMessageSendUrl + "/v1/auth", map, 0, "圈外空闲司机消息");
             logger.info(LOGTAG + "发送站内信, 获取保存消息中心authToken={1}", obj);
             if (obj != null) {
@@ -471,8 +472,10 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
         map1.put("customizedParams", customizedParams);
         map1.put("extraMsg", "");
         try {
+            logger.info("--发送消息获取msgId入参--：" + JSONObject.toJSONString(map1));
             JSONObject jsonObj = MpOkHttpUtil.okHttpPostBackJson(driverMessageSendUrl + "/v1/message/saveMsgBody",
                     map1, 0, null, headerParams);
+            logger.info(LOGTAG + "--发送站内信, 获取msgId返回结果--{}", jsonObj);
             if(jsonObj!=null && "0".equals(jsonObj.getString("code"))){
                 msgId=jsonObj.getLong("msgId");
             }
@@ -500,12 +503,15 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
         mapFin.put("driverIds",driverIds);
         JSONObject result =null;
         try {
+            logger.info("--批量发送消息入参--：" + JSONObject.toJSONString(mapFin));
             result = MpOkHttpUtil.okHttpPostBackJson(driverMessageSendUrl + "/v1/message/driver/pushToList",
                     mapFin, 0, null, headerParams);
+            logger.info(LOGTAG + "--最终发送站内信返回结果--{}", result);
         } catch (Exception e){
             logger.error("--批量推送消息异常--司机ID集合-{}--{}",driverIds,e);
         }
         finally {
+
             return result;
         }
     }
