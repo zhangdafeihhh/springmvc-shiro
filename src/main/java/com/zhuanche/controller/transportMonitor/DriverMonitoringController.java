@@ -171,7 +171,6 @@ public class DriverMonitoringController {
         return ajaxResponse;
     }
 
-
     /**圈外空闲司机消息提醒
      * @param cityId
      * @param supplierId
@@ -256,10 +255,6 @@ public class DriverMonitoringController {
         }else{
             supplierIdSet = user.getSupplierIds();
         }
-
-       /* if(supplierIdSet.size()>0){
-            supplierIds = StringUtils.join(supplierIdSet, ",");
-        }*/
         return supplierIdSet;
     }
 
@@ -278,9 +273,6 @@ public class DriverMonitoringController {
         }else{
             teamIdSet = user.getTeamIds();
         }
-        /*if(teamIdSet.size()>0){
-            teamIds = StringUtils.join(teamIdSet, ",");
-        }*/
         return teamIdSet;
     }
 

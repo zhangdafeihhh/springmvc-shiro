@@ -392,11 +392,9 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
      * @return
      */
     public boolean sendDriverMessage(List<OutCycleDriverList> list){
-
             if(list==null || list.size()==0){
                 return true;
             }
-
             String  rediskey = "outcycle_drivers_" + APP_KEY;
             int templateId = 2101;
             //第一步获取authToken
@@ -409,14 +407,12 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
                     return false;
                 }
             }
-
             //第二步获取msgId
             Long msgId=getMsgId(authToken,templateId);
             if (msgId==null||msgId==0){
                 logger.info(LOGTAG + "发送站内信,获取msgId={},authToken={}失败",msgId, authToken);
                 return false;
             }
-
             int total=list.size();
             int pageSize=500;
             int pageCount = total % pageSize == 0 ? total / pageSize : total / pageSize + 1;
@@ -452,7 +448,7 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
                 }
             }
         } catch (NoSuchAlgorithmException e) {
-            logger.info("发送消息push异常",e);
+            logger.error("发送消息push异常",e);
         }finally {
             return authToken;
         }
@@ -481,7 +477,7 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
                 msgId=jsonObj.getLong("msgId");
             }
         } catch (Exception e){
-
+            logger.error("--发送消息获取msgId异常--{}",e);
         }
         finally {
             return msgId;
@@ -507,6 +503,7 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
             result = MpOkHttpUtil.okHttpPostBackJson(driverMessageSendUrl + "/v1/message/driver/pushToList",
                     mapFin, 0, null, headerParams);
         } catch (Exception e){
+            logger.error("--批量推送消息异常--司机ID集合-{}--{}",driverIds,e);
         }
         finally {
             return result;
