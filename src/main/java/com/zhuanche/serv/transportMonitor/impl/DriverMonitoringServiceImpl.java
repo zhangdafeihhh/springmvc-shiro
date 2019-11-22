@@ -149,10 +149,29 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
     }
 
     @Override
-    public JSONArray trajectory(Integer cityId, String supplierIds, String carTeamIds) {
+    public JSONArray trajectory(Integer cityId, String supplierIds, String carTeamIds,
+                                Integer carType,
+                                Integer driverStatus,
+                                String licensePlates) {
         String  trajectoryApiUrl=BIGDATA_ATHENA_URL+"/api/inside/saasCenter/trajectory";
-//        JSONObject result = MpOkHttpUtil.okHttpGetBackJson(trajectoryApiUrl+"?cityId="+cityId+"&supplierIds="+supplierIds+"&carTeamIds="+carTeamIds,1,"");
-        JSONObject result = MpOkHttpUtil.okHttpGetBackJson(trajectoryApiUrl+"?cityId="+cityId,1,"");
+        StringBuilder params = new StringBuilder();
+        params.append("?cityId=").append(cityId);
+        if(StringUtils.isNotEmpty(supplierIds)){
+            params.append("&supplierIds=").append(supplierIds);
+        }
+        if(StringUtils.isNotEmpty(carTeamIds)){
+            params.append("&carTeamIds=").append(carTeamIds);
+        }
+        if(null != carType){
+            params.append("&carType=").append(carType);
+        }
+        if(null != driverStatus){
+            params.append("&driverStatus=").append(driverStatus);
+        }
+        if(StringUtils.isNotEmpty(licensePlates)){
+            params.append("&licensePlates=").append(licensePlates);
+        }
+        JSONObject result = MpOkHttpUtil.okHttpGetBackJson(trajectoryApiUrl+params.toString(),1,"");
         int status = result.getInteger("status");
         if(status==1){
             return result.getJSONArray("info");
@@ -174,8 +193,15 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
     @Override
     public JSONArray efficiency(Integer cityId, String supplierIds, String carTeamIds) {
         String  efficiencyApiUrl=BIGDATA_ATHENA_URL+"/api/inside/saasCenter/efficiency";
-//        JSONObject result = MpOkHttpUtil.okHttpGetBackJson(efficiencyApiUrl+"?cityId="+cityId+"&supplierIds="+supplierIds+"&carTeamIds="+carTeamIds,1,"");
-        JSONObject result = MpOkHttpUtil.okHttpGetBackJson(efficiencyApiUrl+"?cityId="+cityId,1,"");
+        StringBuilder params = new StringBuilder();
+        params.append("?cityId=").append(cityId);
+        if(StringUtils.isNotEmpty(supplierIds)){
+            params.append("&supplierIds=").append(supplierIds);
+        }
+        if(StringUtils.isNotEmpty(carTeamIds)){
+            params.append("&carTeamIds=").append(carTeamIds);
+        }
+        JSONObject result = MpOkHttpUtil.okHttpGetBackJson(efficiencyApiUrl+params.toString(),1,"");
         if(null == result.get("status")){
             return result.getJSONArray("data");
         }
@@ -185,9 +211,24 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
     @Override
     public JSONArray abnormity(Integer cityId, String supplierIds, String carTeamIds, Integer freeTime, Integer finishedOrder, Integer finishedAmount) {
         String  abnormityApiUrl=BIGDATA_ATHENA_URL+"/api/inside/saasCenter/abnormity";
-//        String params = "?cityId="+cityId+"&supplierIds="+supplierIds+"&carTeamIds="+carTeamIds+"&freeTime="+freeTime+"&finishedOrder"+freeTime+"&finishedAmount";
-        String params = "?cityId="+cityId;
-        JSONObject result = MpOkHttpUtil.okHttpGetBackJson(abnormityApiUrl+params,1,"");
+        StringBuilder params = new StringBuilder();
+        params.append("?cityId=").append(cityId);
+        if(StringUtils.isNotEmpty(supplierIds)){
+            params.append("&supplierIds=").append(supplierIds);
+        }
+        if(StringUtils.isNotEmpty(carTeamIds)){
+            params.append("&carTeamIds=").append(carTeamIds);
+        }
+        if(null != freeTime){
+            params.append("&freeTime=").append(freeTime);
+        }
+        if(null != finishedOrder){
+            params.append("&finishedOrder=").append(finishedOrder);
+        }
+        if(null != finishedAmount){
+            params.append("&finishedAmount=").append(finishedAmount);
+        }
+        JSONObject result = MpOkHttpUtil.okHttpGetBackJson(abnormityApiUrl+params.toString(),1,"");
         if(null == result.get("status")){
             return result.getJSONArray("data");
         }
