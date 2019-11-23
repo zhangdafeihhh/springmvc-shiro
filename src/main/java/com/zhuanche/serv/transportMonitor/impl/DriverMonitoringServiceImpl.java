@@ -199,7 +199,7 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
             params.append("&supplierIds=").append(supplierIds);
         }
         if(StringUtils.isNotEmpty(carTeamIds)){
-            params.append("&carTeamIds=").append(carTeamIds);
+            params.append("&teamIds=").append(carTeamIds);
         }
         JSONObject result = MpOkHttpUtil.okHttpGetBackJson(efficiencyApiUrl+params.toString(),1,"");
         if(null == result.get("status")){
@@ -217,7 +217,7 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
             params.append("&supplierIds=").append(supplierIds);
         }
         if(StringUtils.isNotEmpty(carTeamIds)){
-            params.append("&carTeamIds=").append(carTeamIds);
+            params.append("&teamIds=").append(carTeamIds);
         }
         if(null != freeTime){
             params.append("&freeTime=").append(freeTime);
