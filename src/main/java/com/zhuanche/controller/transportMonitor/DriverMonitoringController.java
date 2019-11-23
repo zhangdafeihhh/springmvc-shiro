@@ -104,17 +104,17 @@ public class DriverMonitoringController {
     /**低效司机列表
      * @param cityId
      * @param supplierId
-     * @param carTeamId
+     * @param teamId
      * @return
      */
     @RequestMapping(value = "/efficiency")
     public AjaxResponse efficiency(
             @Verify(param = "cityId", rule = "required|min(1)") Integer cityId,
             Integer supplierId,
-            Integer carTeamId
+            Integer teamId
     ){
         String supplierIds = getSupplierIdsStr(supplierId);
-        String carTteamIds = getTeamIdsStr(carTeamId);
+        String carTteamIds = getTeamIdsStr(teamId);
         JSONArray data = driverMonitoringService.efficiency(cityId, supplierIds, carTteamIds);
         if(null != data){
             return AjaxResponse.success(data);
@@ -125,7 +125,7 @@ public class DriverMonitoringController {
     /**空闲司机列表
      * @param cityId
      * @param supplierId
-     * @param carTeamId
+     * @param teamId
      * @param freeTime
      * @param finishedOrder
      * @param finishedAmount
@@ -135,13 +135,13 @@ public class DriverMonitoringController {
     public AjaxResponse abnormity(
             @Verify(param = "cityId", rule = "required|min(1)") Integer cityId,
             Integer supplierId,
-            Integer carTeamId,
+            Integer teamId,
             Integer freeTime,
             Integer finishedOrder,
             Integer finishedAmount
     ){
         String supplierIds = getSupplierIdsStr(supplierId);
-        String carTteamIds = getTeamIdsStr(carTeamId);
+        String carTteamIds = getTeamIdsStr(teamId);
         JSONArray data = driverMonitoringService.abnormity(cityId, supplierIds, carTteamIds, freeTime, finishedOrder, finishedAmount);
         if(null != data){
             return AjaxResponse.success(data);
