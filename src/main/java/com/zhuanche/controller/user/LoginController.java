@@ -1,5 +1,6 @@
 package com.zhuanche.controller.user;
 
+import com.le.config.dict.Dicts;
 import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.database.MasterSlaveConfig;
@@ -23,6 +24,7 @@ import com.zhuanche.util.PasswordUtil;
 import mapper.mdbcarmanage.CarAdmUserMapper;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import mapper.mdbcarmanage.ex.SaasPermissionExMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -369,12 +371,52 @@ public class LoginController{
 		}
 		//递归
 		List<SaasPermissionDTO> childrenDtos = BeanUtil.copyList(childrenPos, SaasPermissionDTO.class);
-		for( SaasPermissionDTO childrenDto : childrenDtos ) {
-			List<SaasPermissionDTO> childs = this.getChildren( permissionIds, childrenDto.getPermissionId() ,  permissionTypes );
- 			childrenDto.setChildPermissions(childs);
-		}
+
+		/**实时运力监控 权限过滤**/
+        Iterator<SaasPermissionDTO> iterator = childrenDtos.iterator();
+        while (iterator.hasNext()) {
+            SaasPermissionDTO childrenDto = iterator.next();
+            if (childrenDto.getPermissionCode().equals("Capacity") && !authCapacity()) {
+                iterator.remove();
+            }
+            List<SaasPermissionDTO> childs = this.getChildren( permissionIds, childrenDto.getPermissionId() ,  permissionTypes );
+            childrenDto.setChildPermissions(childs);
+        }
 		return childrenDtos;
 	}
 	//-------------------------------------------------------------------------------------------------------------------------------------当前登录用户信息END
+
+
+
+
+    /**
+     * @return
+     */
+    public boolean authCapacity(){
+        SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+        Set<Integer> userCityIds = user.getCityIds();
+        if(userCityIds.isEmpty()){
+            return true;
+        }
+        Set<String> authCityIdSet = getAuthCityId();
+        for (String cityId : authCityIdSet) {
+            if(userCityIds.contains(Integer.valueOf(cityId))){
+                userCityIds.remove(Integer.valueOf(cityId));
+            }
+        }
+        if(userCityIds.isEmpty()){
+            return false;
+        }
+        return true;
+    }
+
+
+    public Set<String> getAuthCityId(){
+        String authCityIdStr = Dicts.getString("driverMonitoring_authCityIdStr", "44,66,79,82,84,107,119,72,93,94,101,67,78,95,71,111,113,81,109,80,83");
+        String[] strArray = authCityIdStr.split(",");
+        List<String> strList =  java.util.Arrays.asList(strArray);
+        Set<String> authCityIdSet = new HashSet<>(strList);
+        return authCityIdSet;
+    }
 	
 }
