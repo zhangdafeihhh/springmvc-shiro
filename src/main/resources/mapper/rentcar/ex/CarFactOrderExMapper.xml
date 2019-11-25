@@ -391,7 +391,7 @@
 	<!-- 此订单的car_biz_partner_pay_detail -->
 	<select id="selectPartnerPayAmount" resultType="java.lang.Double"	parameterType="java.lang.String">
 		SELECT IFNULL(partner.pay_amount,0)
-		FROM car_biz_partner_pay_detail partner WHERE partner.order_no=#{orderNo} 
+		FROM car_biz_partner_pay_detail partner WHERE partner.order_no=#{orderNo}  limit 1
 	</select>
 	<!-- 此订单的dissent -->
 	<select id="selectDissent" resultMap="CarFactOrderInfoMap"	parameterType="java.lang.Long">
