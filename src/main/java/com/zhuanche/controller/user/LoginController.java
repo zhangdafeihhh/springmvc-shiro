@@ -378,6 +378,7 @@ public class LoginController{
             SaasPermissionDTO childrenDto = iterator.next();
             if (childrenDto.getPermissionCode().equals("Capacity") && !authCapacity()) {
                 iterator.remove();
+				continue;
             }
             List<SaasPermissionDTO> childs = this.getChildren( permissionIds, childrenDto.getPermissionId() ,  permissionTypes );
             childrenDto.setChildPermissions(childs);
