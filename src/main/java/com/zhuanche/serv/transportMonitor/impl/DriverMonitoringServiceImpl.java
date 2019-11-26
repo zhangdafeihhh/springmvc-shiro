@@ -399,11 +399,11 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
         int templateId = 2101;
         //第一步获取authToken
         String authToken = RedisCacheUtil.get(rediskey, String.class);
-        logger.info(LOGTAG + "发送站内信,查询redis结果authToken={1}", authToken);
+        logger.info(LOGTAG + "发送站内信,查询redis结果authToken={}", authToken);
         if (StringUtils.isEmpty(authToken)) {
             authToken=getToken(rediskey);
             if (StringUtils.isBlank(authToken)) {
-                logger.info(LOGTAG + "发送站内信,获取保存消息中心authToken={1}失败", authToken);
+                logger.info(LOGTAG + "发送站内信,获取保存消息中心authToken={}失败", authToken);
                 return false;
             }
         }
@@ -441,7 +441,7 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
             map.put("sign", MD5Utils.getMD5DigestHex(APP_KEY + currentTimeMillis + APP_SECRET));
             logger.info("--发送消息获取token入参--：" + JSONObject.toJSONString(map));
             Map<String, Object> obj = MpOkHttpUtil.okHttpPostBackMap(driverMessageSendUrl + "/v1/auth", map, 0, "圈外空闲司机消息");
-            logger.info(LOGTAG + "发送站内信, 获取保存消息中心authToken={1}", obj);
+            logger.info(LOGTAG + "发送站内信, 获取保存消息中心authToken={}", obj);
             if (obj != null) {
                 authToken = (String) obj.get("authToken");
                 if(StringUtils.isNotEmpty(authToken)){
@@ -499,7 +499,6 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
         headerParams.put("authToken", authToken);
         TreeMap<String, Object> mapFin = new TreeMap<String, Object>();
         mapFin.put("msgId",msgId);
-        mapFin.put("phones","");
         mapFin.put("driverIds",driverIds);
         JSONObject result =null;
         try {
