@@ -402,13 +402,10 @@ public class LoginController{
         Set<String> authCityIdSet = getAuthCityId();
         for (String cityId : authCityIdSet) {
             if(userCityIds.contains(Integer.valueOf(cityId))){
-                userCityIds.remove(Integer.valueOf(cityId));
+				return true;
             }
         }
-        if(userCityIds.isEmpty()){
-            return false;
-        }
-        return true;
+        return false;
     }
 
 
