@@ -190,6 +190,7 @@ public class InterCityMainOrderController {
                     mainOrder.setDriverPhone(driver.getDriverPhone());
                     mainOrder.setLicensePlates(driver.getLicensePlates());
                     mainOrder.setCityName(driver.getCityName());
+                    mainOrder.setRouteName(driver.getMainName());
                 }
             }
 
@@ -204,6 +205,7 @@ public class InterCityMainOrderController {
                     mainOrder.setDriverPhone(driver.getDriverPhone());
                     mainOrder.setLicensePlates(driver.getLicensePlates());
                     mainOrder.setCityName(driver.getCityName());
+                    mainOrder.setRouteName(driver.getMainName());
                 }
             }
         }

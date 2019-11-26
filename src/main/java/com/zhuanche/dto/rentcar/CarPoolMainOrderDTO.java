@@ -52,6 +52,8 @@ public class CarPoolMainOrderDTO extends CarPoolMainOrderEntity {
     private String createDateStr;
     private String updateDateStr;
 
+    private String routeName;//线路名称
+
     public String getDriverStartDateStr() {
         return driverStartDateStr;
     }
@@ -202,7 +204,15 @@ public class CarPoolMainOrderDTO extends CarPoolMainOrderEntity {
 		return carFactOrderInfoList;
 	}
 
-	public void setCarFactOrderInfoList(List<CarFactOrderInfo> carFactOrderInfoList) {
+    public String getRouteName() {
+        return routeName;
+    }
+
+    public void setRouteName(String routeName) {
+        this.routeName = routeName;
+    }
+
+    public void setCarFactOrderInfoList(List<CarFactOrderInfo> carFactOrderInfoList) {
 		this.carFactOrderInfoList = carFactOrderInfoList;
 	}
 
