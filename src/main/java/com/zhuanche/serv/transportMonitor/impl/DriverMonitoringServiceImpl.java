@@ -173,10 +173,14 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
         }
         JSONObject result = MpOkHttpUtil.okHttpGetBackJson(trajectoryApiUrl+params.toString(),1,"");
         int status = result.getInteger("status");
-        if(status==1){
-            return result.getJSONArray("info");
+        if(status!=1){
+            return null;
         }
-        return null;
+        try{
+            return result.getJSONArray("info");
+        }catch(Exception e){
+            return new JSONArray();
+        }
     }
 
     @Override
@@ -202,10 +206,14 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
             params.append("&teamIds=").append(carTeamIds);
         }
         JSONObject result = MpOkHttpUtil.okHttpGetBackJson(efficiencyApiUrl+params.toString(),1,"");
-        if(null == result.get("status")){
-            return result.getJSONArray("data");
+        if(null == result.get("data")){
+            return null;
         }
-        return null;
+        try{
+            return result.getJSONArray("data");
+        }catch(Exception e){
+            return new JSONArray();
+        }
     }
 
     @Override
@@ -229,10 +237,14 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
             params.append("&finishedAmount=").append(finishedAmount);
         }
         JSONObject result = MpOkHttpUtil.okHttpGetBackJson(abnormityApiUrl+params.toString(),1,"");
-        if(null == result.get("status")){
-            return result.getJSONArray("data");
+        if(null == result.get("data")){
+            return null;
         }
-        return null;
+        try{
+            return result.getJSONArray("data");
+        }catch(Exception e){
+            return new JSONArray();
+        }
     }
 
 
