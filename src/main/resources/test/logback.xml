@@ -111,6 +111,12 @@
     <logger name="com.zhuanche.http" level="info" additivity="false">
         <appender-ref ref="thirdFile"/>
     </logger>
+    <logger name="com.sq.common.okhttp.logger" level="INFO" additivity="false">
+        <appender-ref ref="thirdFile"/>
+    </logger>
+    <logger name="com.sq.common.okhttp.logtrace" level="INFO" additivity="false">
+        <appender-ref ref="thirdFile"/>
+    </logger>
 
     <logger name="com.alibaba" level="INFO"/>
     <logger name="jdbc.sqltiming" level="INFO"/>
