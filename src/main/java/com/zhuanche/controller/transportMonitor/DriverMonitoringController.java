@@ -67,20 +67,20 @@ public class DriverMonitoringController {
     /**司机实时位置
      * @param cityId
      * @param supplierId
-     * @param carTeamId
+     * @param teamId
      * @return
      */
     @RequestMapping(value = "/trajectory")
     public AjaxResponse trajectory(
             @Verify(param = "cityId", rule = "required|min(1)") Integer cityId,
             Integer supplierId,
-            Integer carTeamId,
+            Integer teamId,
             Integer carType,
             Integer driverStatus,
             String licensePlates
     ){
         String supplierIds = getSupplierIdsStr(supplierId);
-        String carTteamIds = getTeamIdsStr(carTeamId);
+        String carTteamIds = getTeamIdsStr(teamId);
         JSONArray data = driverMonitoringService.trajectory(cityId, supplierIds, carTteamIds, carType, driverStatus, licensePlates);
         if(null != data){
             return AjaxResponse.success(data);
