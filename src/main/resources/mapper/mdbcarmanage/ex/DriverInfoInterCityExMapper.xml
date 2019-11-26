@@ -124,7 +124,7 @@
 
   <select id="queryMainOrderDrivers" resultType="com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity">
     SELECT t.city_id as cityId,t.city_name as cityName, t.group_id as groupId, t.supplier_name as supplierName,t.id,t.driver_name as driverName,t.license_plates as licensePlates,t.driver_id as driverId,
-    t.driver_phone as driverPhone,t.main_name as  mainName
+    t.driver_phone as driverPhone
     FROM driver_info_inter_city t
     WHERE 1=1
     <if test="cityId!=null and cityId!=''">

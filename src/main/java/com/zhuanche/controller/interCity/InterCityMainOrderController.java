@@ -30,6 +30,7 @@ import com.zhuanche.util.Common;
 import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.MyRestTemplate;
 import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
+import mapper.mdbcarmanage.ex.MainOrderInterCityExMapper;
 import mapper.orderPlatform.ex.PoolMainOrderExMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCityExMapper;
@@ -83,6 +84,8 @@ public class InterCityMainOrderController {
     @Autowired
     private CarBizCityService carBizCityService;
 
+    @Autowired
+    private MainOrderInterCityExMapper mainOrderInterCityExMapper;
 
     private static final String SPLIT = ",";
     /**
@@ -190,7 +193,10 @@ public class InterCityMainOrderController {
                     mainOrder.setDriverPhone(driver.getDriverPhone());
                     mainOrder.setLicensePlates(driver.getLicensePlates());
                     mainOrder.setCityName(driver.getCityName());
-                    mainOrder.setRouteName(driver.getMainName());
+                    if(StringUtils.isNotEmpty(mainOrder.getMainOrderNo())){
+                        MainOrderInterCity orderInterCity = mainOrderInterCityExMapper.queryMainOrder(mainOrder.getMainOrderNo());
+                        mainOrder.setRouteName(orderInterCity != null ? orderInterCity.getMainName() : "");
+                    }
                 }
             }
 
@@ -205,7 +211,10 @@ public class InterCityMainOrderController {
                     mainOrder.setDriverPhone(driver.getDriverPhone());
                     mainOrder.setLicensePlates(driver.getLicensePlates());
                     mainOrder.setCityName(driver.getCityName());
-                    mainOrder.setRouteName(driver.getMainName());
+                    if(StringUtils.isNotEmpty(mainOrder.getMainOrderNo())){
+                        MainOrderInterCity orderInterCity = mainOrderInterCityExMapper.queryMainOrder(mainOrder.getMainOrderNo());
+                        mainOrder.setRouteName(orderInterCity != null ? orderInterCity.getMainName() : "");
+                    }
                 }
             }
         }

@@ -41,8 +41,6 @@ public class DriverInfoInterCity {
 
     private Integer groupId;
 
-    private String mainName;//线路名称
-
     public Integer getId() {
         return id;
     }
@@ -195,11 +193,4 @@ public class DriverInfoInterCity {
         this.groupId = groupId;
     }
 
-    public String getMainName() {
-        return mainName;
-    }
-
-    public void setMainName(String mainName) {
-        this.mainName = mainName;
-    }
 }
