@@ -845,7 +845,24 @@ public class IntegerCityController {
                     }
                     //线路名称
                     dto.setOrderNo(orderNo);
-                    dto.setRouteName(dto.getBoardingCityName() + "-" + dto.getBoardingGetOffCityName());
+                    if(StringUtils.isNotEmpty(dto.getRuleId())){
+                        Map<String,Object> jsonRouteMap = Maps.newHashMap();
+                        jsonRouteMap.put("lineIds",dto.getRuleId());
+                        String routeResult = MpOkHttpUtil.okHttpGet(configUrl+"/intercityCarUse/getLineNameByIds",jsonRouteMap,0,null);
+                        logger.info("==============调用配置后台获取线路结果=========" + JSONObject.toJSONString(routeResult));
+                        if(StringUtils.isNotEmpty(routeResult)){
+                            JSONObject  jsonRoute = JSONObject.parseObject(routeResult);
+                            if(jsonRoute.get("code") != null && jsonRoute.getInteger("code") == 0){
+                                JSONArray routeArray = jsonRoute.getJSONArray("data");
+                                if(routeArray != null && routeArray.size()>0){
+                                    JSONObject jsonObjRoute = (JSONObject) routeArray.get(0);
+                                    String routeName = jsonObjRoute.get("lineName") == null ? "": jsonObjRoute.getString("lineName");
+                                    dto.setRouteName(routeName);
+                                }
+                            }
+                        }
+                    }
+                    //dto.setRouteName(dto.getBoardingCityName() + "-" + dto.getBoardingGetOffCityName());
                     //获取预订人
                     Map<String, Object> bookMap = Maps.newHashMap();
                     bookMap.put("orderNo", orderNo);
