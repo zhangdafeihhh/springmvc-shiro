@@ -1,0 +1,495 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.SupplierExtMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.SupplierExt" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="supplier_short_name" property="supplierShortName" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="two_level_cooperation" property="twoLevelCooperation" jdbcType="INTEGER" />
+    <result column="settlement_type" property="settlementType" jdbcType="INTEGER" />
+    <result column="settlement_cycle" property="settlementCycle" jdbcType="INTEGER" />
+    <result column="settlement_day" property="settlementDay" jdbcType="INTEGER" />
+    <result column="settlement_account" property="settlementAccount" jdbcType="VARCHAR" />
+    <result column="bank_account" property="bankAccount" jdbcType="VARCHAR" />
+    <result column="bank_name" property="bankName" jdbcType="VARCHAR" />
+    <result column="bank_identify" property="bankIdentify" jdbcType="VARCHAR" />
+    <result column="settlement_full_name" property="settlementFullName" jdbcType="VARCHAR" />
+    <result column="first_sign_time" property="firstSignTime" jdbcType="DATE" />
+    <result column="tax_rate" property="taxRate" jdbcType="VARCHAR" />
+    <result column="invoice_type" property="invoiceType" jdbcType="INTEGER" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="main_city_id" property="mainCityId" jdbcType="INTEGER" />
+    <result column="large_area" property="largeArea" jdbcType="VARCHAR" />
+    <result column="cooperation_mode" property="cooperationMode" jdbcType="INTEGER" />
+    <result column="garden_plan_level" property="gardenPlanLevel" jdbcType="INTEGER" />
+    <result column="sign_sponsor" property="signSponsor" jdbcType="VARCHAR" />
+    <result column="contract_time" property="contractTime" jdbcType="VARCHAR" />
+    <result column="car_number" property="carNumber" jdbcType="INTEGER" />
+    <result column="month_water" property="monthWater" jdbcType="VARCHAR" />
+    <result column="amount_deposit" property="amountDeposit" jdbcType="VARCHAR" />
+    <result column="receive_account" property="receiveAccount" jdbcType="VARCHAR" />
+    <result column="account_user" property="accountUser" jdbcType="VARCHAR" />
+    <result column="deposit_receipt" property="depositReceipt" jdbcType="VARCHAR" />
+    <result column="cancellation_date" property="cancellationDate" jdbcType="VARCHAR" />
+    <result column="refund_status" property="refundStatus" jdbcType="VARCHAR" />
+    <result column="company_date" property="companyDate" jdbcType="VARCHAR" />
+    <result column="legal_name" property="legalName" jdbcType="VARCHAR" />
+    <result column="bank_pic_url" property="bankPicUrl" jdbcType="VARCHAR" />
+    <result column="offical_seal_url" property="officalSealUrl" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, supplier_id, status, supplier_short_name, create_date, update_date, email, remark, 
+    two_level_cooperation, settlement_type, settlement_cycle, settlement_day, settlement_account, 
+    bank_account, bank_name, bank_identify, settlement_full_name, first_sign_time, tax_rate, 
+    invoice_type, city_id, main_city_id, large_area, cooperation_mode, garden_plan_level, 
+    sign_sponsor, contract_time, car_number, month_water, amount_deposit, receive_account, 
+    account_user, deposit_receipt, cancellation_date, refund_status, company_date, legal_name, 
+    bank_pic_url, offical_seal_url
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from supplier_ext
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from supplier_ext
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.driver.SupplierExt" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into supplier_ext (supplier_id, status, supplier_short_name, 
+      create_date, update_date, email, 
+      remark, two_level_cooperation, settlement_type, 
+      settlement_cycle, settlement_day, settlement_account, 
+      bank_account, bank_name, bank_identify, 
+      settlement_full_name, first_sign_time, tax_rate, 
+      invoice_type, city_id, main_city_id, 
+      large_area, cooperation_mode, garden_plan_level, 
+      sign_sponsor, contract_time, car_number, 
+      month_water, amount_deposit, receive_account, 
+      account_user, deposit_receipt, cancellation_date, 
+      refund_status, company_date, legal_name, 
+      bank_pic_url, offical_seal_url)
+    values (#{supplierId,jdbcType=INTEGER}, #{status,jdbcType=TINYINT}, #{supplierShortName,jdbcType=VARCHAR}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{email,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{twoLevelCooperation,jdbcType=INTEGER}, #{settlementType,jdbcType=INTEGER}, 
+      #{settlementCycle,jdbcType=INTEGER}, #{settlementDay,jdbcType=INTEGER}, #{settlementAccount,jdbcType=VARCHAR}, 
+      #{bankAccount,jdbcType=VARCHAR}, #{bankName,jdbcType=VARCHAR}, #{bankIdentify,jdbcType=VARCHAR}, 
+      #{settlementFullName,jdbcType=VARCHAR}, #{firstSignTime,jdbcType=DATE}, #{taxRate,jdbcType=VARCHAR}, 
+      #{invoiceType,jdbcType=INTEGER}, #{cityId,jdbcType=INTEGER}, #{mainCityId,jdbcType=INTEGER}, 
+      #{largeArea,jdbcType=VARCHAR}, #{cooperationMode,jdbcType=INTEGER}, #{gardenPlanLevel,jdbcType=INTEGER}, 
+      #{signSponsor,jdbcType=VARCHAR}, #{contractTime,jdbcType=VARCHAR}, #{carNumber,jdbcType=INTEGER}, 
+      #{monthWater,jdbcType=VARCHAR}, #{amountDeposit,jdbcType=VARCHAR}, #{receiveAccount,jdbcType=VARCHAR}, 
+      #{accountUser,jdbcType=VARCHAR}, #{depositReceipt,jdbcType=VARCHAR}, #{cancellationDate,jdbcType=VARCHAR}, 
+      #{refundStatus,jdbcType=VARCHAR}, #{companyDate,jdbcType=VARCHAR}, #{legalName,jdbcType=VARCHAR}, 
+      #{bankPicUrl,jdbcType=VARCHAR}, #{officalSealUrl,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.SupplierExt" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into supplier_ext
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="supplierShortName != null" >
+        supplier_short_name,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="email != null" >
+        email,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="twoLevelCooperation != null" >
+        two_level_cooperation,
+      </if>
+      <if test="settlementType != null" >
+        settlement_type,
+      </if>
+      <if test="settlementCycle != null" >
+        settlement_cycle,
+      </if>
+      <if test="settlementDay != null" >
+        settlement_day,
+      </if>
+      <if test="settlementAccount != null" >
+        settlement_account,
+      </if>
+      <if test="bankAccount != null" >
+        bank_account,
+      </if>
+      <if test="bankName != null" >
+        bank_name,
+      </if>
+      <if test="bankIdentify != null" >
+        bank_identify,
+      </if>
+      <if test="settlementFullName != null" >
+        settlement_full_name,
+      </if>
+      <if test="firstSignTime != null" >
+        first_sign_time,
+      </if>
+      <if test="taxRate != null" >
+        tax_rate,
+      </if>
+      <if test="invoiceType != null" >
+        invoice_type,
+      </if>
+      <if test="cityId != null" >
+        city_id,
+      </if>
+      <if test="mainCityId != null" >
+        main_city_id,
+      </if>
+      <if test="largeArea != null" >
+        large_area,
+      </if>
+      <if test="cooperationMode != null" >
+        cooperation_mode,
+      </if>
+      <if test="gardenPlanLevel != null" >
+        garden_plan_level,
+      </if>
+      <if test="signSponsor != null" >
+        sign_sponsor,
+      </if>
+      <if test="contractTime != null" >
+        contract_time,
+      </if>
+      <if test="carNumber != null" >
+        car_number,
+      </if>
+      <if test="monthWater != null" >
+        month_water,
+      </if>
+      <if test="amountDeposit != null" >
+        amount_deposit,
+      </if>
+      <if test="receiveAccount != null" >
+        receive_account,
+      </if>
+      <if test="accountUser != null" >
+        account_user,
+      </if>
+      <if test="depositReceipt != null" >
+        deposit_receipt,
+      </if>
+      <if test="cancellationDate != null" >
+        cancellation_date,
+      </if>
+      <if test="refundStatus != null" >
+        refund_status,
+      </if>
+      <if test="companyDate != null" >
+        company_date,
+      </if>
+      <if test="legalName != null" >
+        legal_name,
+      </if>
+      <if test="bankPicUrl != null" >
+        bank_pic_url,
+      </if>
+      <if test="officalSealUrl != null" >
+        offical_seal_url,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="supplierShortName != null" >
+        #{supplierShortName,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="twoLevelCooperation != null" >
+        #{twoLevelCooperation,jdbcType=INTEGER},
+      </if>
+      <if test="settlementType != null" >
+        #{settlementType,jdbcType=INTEGER},
+      </if>
+      <if test="settlementCycle != null" >
+        #{settlementCycle,jdbcType=INTEGER},
+      </if>
+      <if test="settlementDay != null" >
+        #{settlementDay,jdbcType=INTEGER},
+      </if>
+      <if test="settlementAccount != null" >
+        #{settlementAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="bankAccount != null" >
+        #{bankAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="bankName != null" >
+        #{bankName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankIdentify != null" >
+        #{bankIdentify,jdbcType=VARCHAR},
+      </if>
+      <if test="settlementFullName != null" >
+        #{settlementFullName,jdbcType=VARCHAR},
+      </if>
+      <if test="firstSignTime != null" >
+        #{firstSignTime,jdbcType=DATE},
+      </if>
+      <if test="taxRate != null" >
+        #{taxRate,jdbcType=VARCHAR},
+      </if>
+      <if test="invoiceType != null" >
+        #{invoiceType,jdbcType=INTEGER},
+      </if>
+      <if test="cityId != null" >
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="mainCityId != null" >
+        #{mainCityId,jdbcType=INTEGER},
+      </if>
+      <if test="largeArea != null" >
+        #{largeArea,jdbcType=VARCHAR},
+      </if>
+      <if test="cooperationMode != null" >
+        #{cooperationMode,jdbcType=INTEGER},
+      </if>
+      <if test="gardenPlanLevel != null" >
+        #{gardenPlanLevel,jdbcType=INTEGER},
+      </if>
+      <if test="signSponsor != null" >
+        #{signSponsor,jdbcType=VARCHAR},
+      </if>
+      <if test="contractTime != null" >
+        #{contractTime,jdbcType=VARCHAR},
+      </if>
+      <if test="carNumber != null" >
+        #{carNumber,jdbcType=INTEGER},
+      </if>
+      <if test="monthWater != null" >
+        #{monthWater,jdbcType=VARCHAR},
+      </if>
+      <if test="amountDeposit != null" >
+        #{amountDeposit,jdbcType=VARCHAR},
+      </if>
+      <if test="receiveAccount != null" >
+        #{receiveAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="accountUser != null" >
+        #{accountUser,jdbcType=VARCHAR},
+      </if>
+      <if test="depositReceipt != null" >
+        #{depositReceipt,jdbcType=VARCHAR},
+      </if>
+      <if test="cancellationDate != null" >
+        #{cancellationDate,jdbcType=VARCHAR},
+      </if>
+      <if test="refundStatus != null" >
+        #{refundStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="companyDate != null" >
+        #{companyDate,jdbcType=VARCHAR},
+      </if>
+      <if test="legalName != null" >
+        #{legalName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankPicUrl != null" >
+        #{bankPicUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="officalSealUrl != null" >
+        #{officalSealUrl,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.driver.SupplierExt" >
+    update supplier_ext
+    <set >
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="supplierShortName != null" >
+        supplier_short_name = #{supplierShortName,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="twoLevelCooperation != null" >
+        two_level_cooperation = #{twoLevelCooperation,jdbcType=INTEGER},
+      </if>
+      <if test="settlementType != null" >
+        settlement_type = #{settlementType,jdbcType=INTEGER},
+      </if>
+      <if test="settlementCycle != null" >
+        settlement_cycle = #{settlementCycle,jdbcType=INTEGER},
+      </if>
+      <if test="settlementDay != null" >
+        settlement_day = #{settlementDay,jdbcType=INTEGER},
+      </if>
+      <if test="settlementAccount != null" >
+        settlement_account = #{settlementAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="bankAccount != null" >
+        bank_account = #{bankAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="bankName != null" >
+        bank_name = #{bankName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankIdentify != null" >
+        bank_identify = #{bankIdentify,jdbcType=VARCHAR},
+      </if>
+      <if test="settlementFullName != null" >
+        settlement_full_name = #{settlementFullName,jdbcType=VARCHAR},
+      </if>
+      <if test="firstSignTime != null" >
+        first_sign_time = #{firstSignTime,jdbcType=DATE},
+      </if>
+      <if test="taxRate != null" >
+        tax_rate = #{taxRate,jdbcType=VARCHAR},
+      </if>
+      <if test="invoiceType != null" >
+        invoice_type = #{invoiceType,jdbcType=INTEGER},
+      </if>
+      <if test="cityId != null" >
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="mainCityId != null" >
+        main_city_id = #{mainCityId,jdbcType=INTEGER},
+      </if>
+      <if test="largeArea != null" >
+        large_area = #{largeArea,jdbcType=VARCHAR},
+      </if>
+      <if test="cooperationMode != null" >
+        cooperation_mode = #{cooperationMode,jdbcType=INTEGER},
+      </if>
+      <if test="gardenPlanLevel != null" >
+        garden_plan_level = #{gardenPlanLevel,jdbcType=INTEGER},
+      </if>
+      <if test="signSponsor != null" >
+        sign_sponsor = #{signSponsor,jdbcType=VARCHAR},
+      </if>
+      <if test="contractTime != null" >
+        contract_time = #{contractTime,jdbcType=VARCHAR},
+      </if>
+      <if test="carNumber != null" >
+        car_number = #{carNumber,jdbcType=INTEGER},
+      </if>
+      <if test="monthWater != null" >
+        month_water = #{monthWater,jdbcType=VARCHAR},
+      </if>
+      <if test="amountDeposit != null" >
+        amount_deposit = #{amountDeposit,jdbcType=VARCHAR},
+      </if>
+      <if test="receiveAccount != null" >
+        receive_account = #{receiveAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="accountUser != null" >
+        account_user = #{accountUser,jdbcType=VARCHAR},
+      </if>
+      <if test="depositReceipt != null" >
+        deposit_receipt = #{depositReceipt,jdbcType=VARCHAR},
+      </if>
+      <if test="cancellationDate != null" >
+        cancellation_date = #{cancellationDate,jdbcType=VARCHAR},
+      </if>
+      <if test="refundStatus != null" >
+        refund_status = #{refundStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="companyDate != null" >
+        company_date = #{companyDate,jdbcType=VARCHAR},
+      </if>
+      <if test="legalName != null" >
+        legal_name = #{legalName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankPicUrl != null" >
+        bank_pic_url = #{bankPicUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="officalSealUrl != null" >
+        offical_seal_url = #{officalSealUrl,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.SupplierExt" >
+    update supplier_ext
+    set supplier_id = #{supplierId,jdbcType=INTEGER},
+      status = #{status,jdbcType=TINYINT},
+      supplier_short_name = #{supplierShortName,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      email = #{email,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      two_level_cooperation = #{twoLevelCooperation,jdbcType=INTEGER},
+      settlement_type = #{settlementType,jdbcType=INTEGER},
+      settlement_cycle = #{settlementCycle,jdbcType=INTEGER},
+      settlement_day = #{settlementDay,jdbcType=INTEGER},
+      settlement_account = #{settlementAccount,jdbcType=VARCHAR},
+      bank_account = #{bankAccount,jdbcType=VARCHAR},
+      bank_name = #{bankName,jdbcType=VARCHAR},
+      bank_identify = #{bankIdentify,jdbcType=VARCHAR},
+      settlement_full_name = #{settlementFullName,jdbcType=VARCHAR},
+      first_sign_time = #{firstSignTime,jdbcType=DATE},
+      tax_rate = #{taxRate,jdbcType=VARCHAR},
+      invoice_type = #{invoiceType,jdbcType=INTEGER},
+      city_id = #{cityId,jdbcType=INTEGER},
+      main_city_id = #{mainCityId,jdbcType=INTEGER},
+      large_area = #{largeArea,jdbcType=VARCHAR},
+      cooperation_mode = #{cooperationMode,jdbcType=INTEGER},
+      garden_plan_level = #{gardenPlanLevel,jdbcType=INTEGER},
+      sign_sponsor = #{signSponsor,jdbcType=VARCHAR},
+      contract_time = #{contractTime,jdbcType=VARCHAR},
+      car_number = #{carNumber,jdbcType=INTEGER},
+      month_water = #{monthWater,jdbcType=VARCHAR},
+      amount_deposit = #{amountDeposit,jdbcType=VARCHAR},
+      receive_account = #{receiveAccount,jdbcType=VARCHAR},
+      account_user = #{accountUser,jdbcType=VARCHAR},
+      deposit_receipt = #{depositReceipt,jdbcType=VARCHAR},
+      cancellation_date = #{cancellationDate,jdbcType=VARCHAR},
+      refund_status = #{refundStatus,jdbcType=VARCHAR},
+      company_date = #{companyDate,jdbcType=VARCHAR},
+      legal_name = #{legalName,jdbcType=VARCHAR},
+      bank_pic_url = #{bankPicUrl,jdbcType=VARCHAR},
+      offical_seal_url = #{officalSealUrl,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

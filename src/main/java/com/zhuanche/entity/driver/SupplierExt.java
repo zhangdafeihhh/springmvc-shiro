@@ -2,205 +2,84 @@ package com.zhuanche.entity.driver;
 
 import java.util.Date;
 
-/**
- * supplier_ext
- * @author
- */
-public class SupplierExtDto {
+public class SupplierExt {
     private Long id;
 
-    /**
-     * 供应商id
-     */
     private Integer supplierId;
 
-    /**
-     * 状态 1启用 0禁用
-     */
     private Byte status;
 
-    /**
-     * 供应商简称
-     */
     private String supplierShortName;
 
-    /**
-     * 创建时间
-     */
     private Date createDate;
 
-    /**
-     * 修改时间
-     */
     private Date updateDate;
 
-    /**
-     * 备注
-     */
-    private String remark;
-
-    /**
-     * 邮箱
-     */
     private String email;
 
-    /**
-     * 二级加盟类型id
-     */
+    private String remark;
+
     private Integer twoLevelCooperation;
 
-    /**
-     * 结算类型 0 无效类型 1自主结算 2 对公结算 3其他
-     */
     private Integer settlementType;
 
-    /**
-     * 结算周期 0 无效周期 1月结 2 半月结 3 周结
-     */
     private Integer settlementCycle;
 
-    /**
-     * 结算日 0为无效结算日
-     */
     private Integer settlementDay;
 
-    /**
-     * 打款账户名称
-     */
     private String settlementAccount;
 
-    /**
-     * 打款银行账号
-     */
     private String bankAccount;
 
-    /**
-     * 开户行名称
-     */
     private String bankName;
 
-    /**
-     * 联行号
-     */
     private String bankIdentify;
 
-    /**
-     * 结算供应商全称
-     */
     private String settlementFullName;
 
-    /**
-     * 首次签约时间
-     */
     private Date firstSignTime;
 
-    /**
-     * 税率 3%、6%、9%、10%、13%、16%
-     */
     private String taxRate;
 
-    /**
-     * 发票类型 0.无效发票类型 1.专票、2.普票、3.电子发票（普票）
-     */
     private Integer invoiceType;
 
-
-    /**
-     *
-     */
     private Integer cityId;
 
-    /**
-     *
-     */
     private Integer mainCityId;
 
-    /**
-     *大区
-     */
     private String largeArea;
 
-    /**
-     *合作模式 1 自主、2 非自主；
-     */
     private Integer cooperationMode;
 
-    /**
-     * 花园计划等级 1 LV1、2 LV2、3 LV3、4 LV4、5 LV5、6 金牌；
-     */
     private Integer gardenPlanLevel;
 
-    /**
-     * 签约发起人
-     */
     private String signSponsor;
 
-    /**
-     * 签约时间
-     */
     private String contractTime;
 
-    /**
-     * 90天加车数
-     */
     private Integer carNumber;
 
-    /**
-     * 90天加车数
-     */
     private String monthWater;
 
-    /**
-     * 保证金金额
-     */
     private String amountDeposit;
 
-    /**
-     * 收款账户
-     */
     private String receiveAccount;
 
-    /**
-     * 打款户名
-     */
     private String accountUser;
 
-    /**
-     * 收款账户
-     */
     private String depositReceipt;
 
-    /**
-     * 解约日期
-     */
     private String cancellationDate;
 
-    /**
-     * 退款情况
-     */
     private String refundStatus;
 
-    /**
-     * 公司成立日期
-     */
     private String companyDate;
 
-    /**
-     * 法人姓名
-     */
     private String legalName;
 
-    /**
-     * 最新开户许可证/印鉴卡
-     */
     private String bankPicUrl;
 
-    /**
-     * 加盖公章
-     */
     private String officalSealUrl;
-
-
 
     public Long getId() {
         return id;
@@ -250,20 +129,20 @@ public class SupplierExtDto {
         this.updateDate = updateDate;
     }
 
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark == null ? null : remark.trim();
-    }
-
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email == null ? null : email.trim();
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark == null ? null : remark.trim();
     }
 
     public Integer getTwoLevelCooperation() {
@@ -383,7 +262,7 @@ public class SupplierExtDto {
     }
 
     public void setLargeArea(String largeArea) {
-        this.largeArea = largeArea;
+        this.largeArea = largeArea == null ? null : largeArea.trim();
     }
 
     public Integer getCooperationMode() {
@@ -407,7 +286,7 @@ public class SupplierExtDto {
     }
 
     public void setSignSponsor(String signSponsor) {
-        this.signSponsor = signSponsor;
+        this.signSponsor = signSponsor == null ? null : signSponsor.trim();
     }
 
     public String getContractTime() {
@@ -415,7 +294,7 @@ public class SupplierExtDto {
     }
 
     public void setContractTime(String contractTime) {
-        this.contractTime = contractTime;
+        this.contractTime = contractTime == null ? null : contractTime.trim();
     }
 
     public Integer getCarNumber() {
@@ -431,7 +310,7 @@ public class SupplierExtDto {
     }
 
     public void setMonthWater(String monthWater) {
-        this.monthWater = monthWater;
+        this.monthWater = monthWater == null ? null : monthWater.trim();
     }
 
     public String getAmountDeposit() {
@@ -439,7 +318,7 @@ public class SupplierExtDto {
     }
 
     public void setAmountDeposit(String amountDeposit) {
-        this.amountDeposit = amountDeposit;
+        this.amountDeposit = amountDeposit == null ? null : amountDeposit.trim();
     }
 
     public String getReceiveAccount() {
@@ -447,7 +326,7 @@ public class SupplierExtDto {
     }
 
     public void setReceiveAccount(String receiveAccount) {
-        this.receiveAccount = receiveAccount;
+        this.receiveAccount = receiveAccount == null ? null : receiveAccount.trim();
     }
 
     public String getAccountUser() {
@@ -455,7 +334,7 @@ public class SupplierExtDto {
     }
 
     public void setAccountUser(String accountUser) {
-        this.accountUser = accountUser;
+        this.accountUser = accountUser == null ? null : accountUser.trim();
     }
 
     public String getDepositReceipt() {
@@ -463,7 +342,7 @@ public class SupplierExtDto {
     }
 
     public void setDepositReceipt(String depositReceipt) {
-        this.depositReceipt = depositReceipt;
+        this.depositReceipt = depositReceipt == null ? null : depositReceipt.trim();
     }
 
     public String getCancellationDate() {
@@ -471,7 +350,7 @@ public class SupplierExtDto {
     }
 
     public void setCancellationDate(String cancellationDate) {
-        this.cancellationDate = cancellationDate;
+        this.cancellationDate = cancellationDate == null ? null : cancellationDate.trim();
     }
 
     public String getRefundStatus() {
@@ -479,7 +358,7 @@ public class SupplierExtDto {
     }
 
     public void setRefundStatus(String refundStatus) {
-        this.refundStatus = refundStatus;
+        this.refundStatus = refundStatus == null ? null : refundStatus.trim();
     }
 
     public String getCompanyDate() {
@@ -487,7 +366,7 @@ public class SupplierExtDto {
     }
 
     public void setCompanyDate(String companyDate) {
-        this.companyDate = companyDate;
+        this.companyDate = companyDate == null ? null : companyDate.trim();
     }
 
     public String getLegalName() {
@@ -495,7 +374,7 @@ public class SupplierExtDto {
     }
 
     public void setLegalName(String legalName) {
-        this.legalName = legalName;
+        this.legalName = legalName == null ? null : legalName.trim();
     }
 
     public String getBankPicUrl() {
@@ -503,7 +382,7 @@ public class SupplierExtDto {
     }
 
     public void setBankPicUrl(String bankPicUrl) {
-        this.bankPicUrl = bankPicUrl;
+        this.bankPicUrl = bankPicUrl == null ? null : bankPicUrl.trim();
     }
 
     public String getOfficalSealUrl() {
@@ -511,6 +390,6 @@ public class SupplierExtDto {
     }
 
     public void setOfficalSealUrl(String officalSealUrl) {
-        this.officalSealUrl = officalSealUrl;
+        this.officalSealUrl = officalSealUrl == null ? null : officalSealUrl.trim();
     }
 }
