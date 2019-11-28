@@ -1560,12 +1560,12 @@ public class IntegerCityController {
                                                  @Verify(param = "orderNo", rule = "required") String driverPhone,
                                                  @Verify(param = "orderNo", rule = "required") String licensePlates,
                                                  @Verify(param = "orderNo", rule = "required") String groupId,
-                                                 String orderTime,
+                                                 String crossCityStartTime,
                                                  String routeName) {
         //派单
         logger.info("指派接口入参:mainOrderNo=" + mainOrderNo + ",orderNo:" + orderNo
                 + ",driverId:" + driverId + ",driverName:" + driverName + ",driverPhone:" + driverPhone + ",licensePlates:" + licensePlates
-                + ",groupId:" + groupId + ",orderTime:" + orderTime + ",routeName:" + routeName);
+                + ",groupId:" + groupId + ",crossCityStartTime:" + crossCityStartTime + ",routeName:" + routeName);
         Map<String, Object> map = Maps.newHashMap();
         List<String> listParam = new ArrayList<>();
         map.put("businessId", Common.BUSSINESSID);
@@ -1610,8 +1610,8 @@ public class IntegerCityController {
             listParam.add("carSeatNums=" + carSeatNums);
         }
 
-        if (StringUtils.isNotEmpty(orderTime)) {
-            Date startTime = DateUtils.getDate(orderTime, "yyyy-MM-dd HH:mm:ss");
+        if (StringUtils.isNotEmpty(crossCityStartTime)) {
+            Date startTime = DateUtils.getDate(crossCityStartTime, "yyyy-MM-dd HH:mm:ss");
             map.put("crossCityStartTime", startTime.getTime());
             listParam.add("crossCityStartTime=" + startTime.getTime());
         }
@@ -1671,7 +1671,7 @@ public class IntegerCityController {
                                     main.setStatus(MainOrderInterCity.orderState.NOTSETOUT.getCode());
                                     main.setMainOrderNo(newMainOrderNo);
                                     main.setOpePhone(mobile);
-                                    main.setMainTime(orderTime);
+                                    main.setMainTime(crossCityStartTime);
                                     code = interService.addMainOrderNo(main);
                                 }
                                 if (code > 0) {
@@ -1734,11 +1734,11 @@ public class IntegerCityController {
                                               @Verify(param = "licensePlates",rule = "required")  String licensePlates,
                                               @Verify(param = "cityId",rule = "required") Integer cityId,
                                               @Verify(param = "groupId",rule = "required") String groupId,
-                                              String orderTime,
+                                              String crossCityStartTime,
                                               String routeName){
         //派单
         logger.info(MessageFormat.format("改派入参：mainOrderNo:{0},orderNo:{1},driverId:{2},driverPhone:{3},licensePlates{4},cityId{5}" +
-                ",groupId:{6},orderTime:{7},routeName:{8}",mainOrderNo,orderNo,driverId,driverPhone,licensePlates,cityId,groupId,orderTime,
+                ",groupId:{6},crossCityStartTime:{7},routeName:{8}",mainOrderNo,orderNo,driverId,driverPhone,licensePlates,cityId,groupId,crossCityStartTime,
                 routeName));
 
         /**todo 如果乘客指派成功后，又去给这个司机创建主单，需要给这个司机重新创建主单并记录起来**/
@@ -1854,7 +1854,7 @@ public class IntegerCityController {
                                     main.setStatus(MainOrderInterCity.orderState.NOTSETOUT.getCode());
                                     main.setMainOrderNo(newMainOrderNo);
                                     main.setOpePhone(mobile);
-                                    main.setMainTime(orderTime);
+                                    main.setMainTime(crossCityStartTime);
                                     logger.info("=====改派入库数据：" + JSONObject.toJSONString(main));
                                     code = interService.addMainOrderNo(main);
                                     logger.info("=====改派后入库code:" + code);
