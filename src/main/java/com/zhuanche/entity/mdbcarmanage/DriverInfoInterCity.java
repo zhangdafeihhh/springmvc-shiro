@@ -192,4 +192,5 @@ public class DriverInfoInterCity {
     public void setGroupId(Integer groupId) {
         this.groupId = groupId;
     }
+
 }
