@@ -59,27 +59,29 @@ public class SupplierExt {
 
     private Integer carNumber;
 
-    private String monthWater;
+    private String lowLimitMonthWater;
 
     private String amountDeposit;
 
     private String receiveAccount;
 
+    private Date cancellationDate;
+
     private String accountUser;
 
     private String depositReceipt;
 
-    private String cancellationDate;
+    private Date companyDate;
 
     private String refundStatus;
-
-    private String companyDate;
 
     private String legalName;
 
     private String bankPicUrl;
 
     private String officalSealUrl;
+
+    private Integer needDepositReceipt;
 
     public Long getId() {
         return id;
@@ -305,12 +307,12 @@ public class SupplierExt {
         this.carNumber = carNumber;
     }
 
-    public String getMonthWater() {
-        return monthWater;
+    public String getLowLimitMonthWater() {
+        return lowLimitMonthWater;
     }
 
-    public void setMonthWater(String monthWater) {
-        this.monthWater = monthWater == null ? null : monthWater.trim();
+    public void setLowLimitMonthWater(String lowLimitMonthWater) {
+        this.lowLimitMonthWater = lowLimitMonthWater == null ? null : lowLimitMonthWater.trim();
     }
 
     public String getAmountDeposit() {
@@ -329,6 +331,14 @@ public class SupplierExt {
         this.receiveAccount = receiveAccount == null ? null : receiveAccount.trim();
     }
 
+    public Date getCancellationDate() {
+        return cancellationDate;
+    }
+
+    public void setCancellationDate(Date cancellationDate) {
+        this.cancellationDate = cancellationDate;
+    }
+
     public String getAccountUser() {
         return accountUser;
     }
@@ -345,12 +355,12 @@ public class SupplierExt {
         this.depositReceipt = depositReceipt == null ? null : depositReceipt.trim();
     }
 
-    public String getCancellationDate() {
-        return cancellationDate;
+    public Date getCompanyDate() {
+        return companyDate;
     }
 
-    public void setCancellationDate(String cancellationDate) {
-        this.cancellationDate = cancellationDate == null ? null : cancellationDate.trim();
+    public void setCompanyDate(Date companyDate) {
+        this.companyDate = companyDate;
     }
 
     public String getRefundStatus() {
@@ -359,14 +369,6 @@ public class SupplierExt {
 
     public void setRefundStatus(String refundStatus) {
         this.refundStatus = refundStatus == null ? null : refundStatus.trim();
-    }
-
-    public String getCompanyDate() {
-        return companyDate;
-    }
-
-    public void setCompanyDate(String companyDate) {
-        this.companyDate = companyDate == null ? null : companyDate.trim();
     }
 
     public String getLegalName() {
@@ -391,5 +393,13 @@ public class SupplierExt {
 
     public void setOfficalSealUrl(String officalSealUrl) {
         this.officalSealUrl = officalSealUrl == null ? null : officalSealUrl.trim();
+    }
+
+    public Integer getNeedDepositReceipt() {
+        return needDepositReceipt;
+    }
+
+    public void setNeedDepositReceipt(Integer needDepositReceipt) {
+        this.needDepositReceipt = needDepositReceipt;
     }
 }

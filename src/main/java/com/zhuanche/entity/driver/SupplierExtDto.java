@@ -173,7 +173,7 @@ public class SupplierExtDto {
     /**
      * 解约日期
      */
-    private String cancellationDate;
+    private Date cancellationDate;
 
     /**
      * 退款情况
@@ -183,7 +183,7 @@ public class SupplierExtDto {
     /**
      * 公司成立日期
      */
-    private String companyDate;
+    private Date companyDate;
 
     /**
      * 法人姓名
@@ -466,13 +466,7 @@ public class SupplierExtDto {
         this.depositReceipt = depositReceipt;
     }
 
-    public String getCancellationDate() {
-        return cancellationDate;
-    }
 
-    public void setCancellationDate(String cancellationDate) {
-        this.cancellationDate = cancellationDate;
-    }
 
     public String getRefundStatus() {
         return refundStatus;
@@ -482,11 +476,19 @@ public class SupplierExtDto {
         this.refundStatus = refundStatus;
     }
 
-    public String getCompanyDate() {
+    public Date getCancellationDate() {
+        return cancellationDate;
+    }
+
+    public void setCancellationDate(Date cancellationDate) {
+        this.cancellationDate = cancellationDate;
+    }
+
+    public Date getCompanyDate() {
         return companyDate;
     }
 
-    public void setCompanyDate(String companyDate) {
+    public void setCompanyDate(Date companyDate) {
         this.companyDate = companyDate;
     }
 

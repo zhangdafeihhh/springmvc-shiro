@@ -159,7 +159,7 @@ public class SupplierAccountApplyService {
                 if(carBizCity!=null){
                     applyDTO.setCityName(carBizCity.getCityName());
                 }
-                CarBizSupplier carBizSupplier = carBizSupplierMapper.selectByPrimaryKey(apply.getSupplierId());
+                  carBizSupplier = carBizSupplierMapper.selectByPrimaryKey(apply.getSupplierId());
                 if(carBizSupplier!=null){
                     applyDTO.setSupplierName(carBizSupplier.getSupplierFullName());
                 }
