@@ -12,11 +12,13 @@ import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.rocketmq.ExcelProducer;
+import com.zhuanche.common.rocketmq.ExcelProducerDouble;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.constant.Constants;
+import com.zhuanche.constant.EnvUtils;
 import com.zhuanche.dto.driver.DriverVoEntity;
 import com.zhuanche.dto.mdbcarmanage.ScoreDetailDTO;
 import com.zhuanche.dto.rentcar.*;
@@ -222,6 +224,8 @@ public class DriverIncomeScoreController {
 
         try{
             ExcelProducer.publishMessage("excel_export_producer","excel-mp-manage",null,obj);
+            //双发
+            this.sendDoubleMq(obj);
             //维护用户的邮箱
             if(loginUser.getId() != null && loginUser.getAccountType() != null){
 
@@ -234,6 +238,12 @@ public class DriverIncomeScoreController {
             return AjaxResponse.failMsg(500,"导出司机派单信息失败");
         }
 
+    }
+    private void sendDoubleMq(JSONObject obj){
+        String envName = EnvUtils.ENVIMENT;
+        if (Objects.nonNull(envName) && Arrays.asList(new String[]{"online","prod"}).contains(envName)){
+            ExcelProducerDouble.publishMessage("excel_export_producer","excel-mp-manage",null,obj);
+        }
     }
 
     /**
