@@ -16,4 +16,10 @@ import java.util.List;
 public interface SupplierRecordService {
 
     List<SupplierExtDto> extDtoList(SupplierExtDto dto);
+
+    SupplierExtDto extDtoDetail(Integer supplierId);
+
+    int editExtDto(SupplierExtDto dto);
+
+    SupplierExtDto recordDetail(Integer id);
 }

@@ -62,17 +62,28 @@
     ORDER BY t.update_date DESC
   </select>
 
+  <select id="extDtoDetail" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from supplier_ext
+    where supplier_id = #{supplierId,jdbcType=BIGINT}
+  </select>
 
-  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.driver.SupplierExt" >
+
+
+  <select id="recordDetail" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from supplier_ext
+    where supplier_id = #{supplierId,jdbcType=BIGINT}
+  </select>
+  <update id="editExtDto" parameterType="com.zhuanche.entity.driver.SupplierExt" >
     update supplier_ext
     <set >
       <if test="supplierId != null" >
         supplier_id = #{supplierId,jdbcType=INTEGER},
       </if>
-      <if test="status != null" >
-        status = #{status,jdbcType=TINYINT},
-      </if>
-      <if test="supplierShortName != null" >
+       <if test="supplierShortName != null" >
         supplier_short_name = #{supplierShortName,jdbcType=VARCHAR},
       </if>
       <if test="createDate != null" >
@@ -183,46 +194,5 @@
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.SupplierExt" >
-    update supplier_ext
-    set supplier_id = #{supplierId,jdbcType=INTEGER},
-      status = #{status,jdbcType=TINYINT},
-      supplier_short_name = #{supplierShortName,jdbcType=VARCHAR},
-      create_date = #{createDate,jdbcType=TIMESTAMP},
-      update_date = #{updateDate,jdbcType=TIMESTAMP},
-      email = #{email,jdbcType=VARCHAR},
-      remark = #{remark,jdbcType=VARCHAR},
-      two_level_cooperation = #{twoLevelCooperation,jdbcType=INTEGER},
-      settlement_type = #{settlementType,jdbcType=INTEGER},
-      settlement_cycle = #{settlementCycle,jdbcType=INTEGER},
-      settlement_day = #{settlementDay,jdbcType=INTEGER},
-      settlement_account = #{settlementAccount,jdbcType=VARCHAR},
-      bank_account = #{bankAccount,jdbcType=VARCHAR},
-      bank_name = #{bankName,jdbcType=VARCHAR},
-      bank_identify = #{bankIdentify,jdbcType=VARCHAR},
-      settlement_full_name = #{settlementFullName,jdbcType=VARCHAR},
-      first_sign_time = #{firstSignTime,jdbcType=DATE},
-      tax_rate = #{taxRate,jdbcType=VARCHAR},
-      invoice_type = #{invoiceType,jdbcType=INTEGER},
-      city_id = #{cityId,jdbcType=INTEGER},
-      main_city_id = #{mainCityId,jdbcType=INTEGER},
-      large_area = #{largeArea,jdbcType=VARCHAR},
-      cooperation_mode = #{cooperationMode,jdbcType=INTEGER},
-      garden_plan_level = #{gardenPlanLevel,jdbcType=VARCHAR},
-      sign_sponsor = #{signSponsor,jdbcType=VARCHAR},
-      contract_time = #{contractTime,jdbcType=VARCHAR},
-      amount_deposit = #{amountDeposit,jdbcType=VARCHAR},
-      receive_account = #{receiveAccount,jdbcType=VARCHAR},
-      cancellation_date = #{cancellationDate,jdbcType=TIMESTAMP},
-      account_user = #{accountUser,jdbcType=VARCHAR},
-      deposit_receipt = #{depositReceipt,jdbcType=VARCHAR},
-      company_date = #{companyDate,jdbcType=TIMESTAMP},
-      refund_status = #{refundStatus,jdbcType=VARCHAR},
-      legal_name = #{legalName,jdbcType=VARCHAR},
-      bank_pic_url = #{bankPicUrl,jdbcType=VARCHAR},
-      offical_seal_url = #{officalSealUrl,jdbcType=VARCHAR},
-      need_deposit_receipt = #{needDepositReceipt,jdbcType=INTEGER},
-      applier_status = #{applierStatus,jdbcType=INTEGER}
-    where id = #{id,jdbcType=BIGINT}
-  </update>
+
 </mapper>

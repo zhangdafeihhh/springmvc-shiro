@@ -129,7 +129,7 @@ public class SupplierExtDto {
     /**
      * 花园计划等级 1 LV1、2 LV2、3 LV3、4 LV4、5 LV5、6 金牌；
      */
-    private Integer gardenPlanLevel;
+    private String gardenPlanLevel;
 
     /**
      * 签约发起人
@@ -200,6 +200,12 @@ public class SupplierExtDto {
      * 加盖公章
      */
     private String officalSealUrl;
+
+    /**
+     * 申请更新状态
+     */
+    private Integer applierStatus;
+
 
 
     private Set<Integer> cityIds;
@@ -398,11 +404,11 @@ public class SupplierExtDto {
         this.cooperationMode = cooperationMode;
     }
 
-    public Integer getGardenPlanLevel() {
+    public String getGardenPlanLevel() {
         return gardenPlanLevel;
     }
 
-    public void setGardenPlanLevel(Integer gardenPlanLevel) {
+    public void setGardenPlanLevel(String gardenPlanLevel) {
         this.gardenPlanLevel = gardenPlanLevel;
     }
 
@@ -534,5 +540,13 @@ public class SupplierExtDto {
 
     public void setSupplierIds(Set<Integer> supplierIds) {
         this.supplierIds = supplierIds;
+    }
+
+    public Integer getApplierStatus() {
+        return applierStatus;
+    }
+
+    public void setApplierStatus(Integer applierStatus) {
+        this.applierStatus = applierStatus;
     }
 }
