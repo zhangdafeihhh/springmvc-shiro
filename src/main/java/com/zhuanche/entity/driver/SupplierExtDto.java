@@ -1,6 +1,7 @@
 package com.zhuanche.entity.driver;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * supplier_ext
@@ -200,6 +201,9 @@ public class SupplierExtDto {
      */
     private String officalSealUrl;
 
+
+    private Set<Integer> cityIds;
+    private Set<Integer> supplierIds;
 
 
     public Long getId() {
@@ -514,5 +518,21 @@ public class SupplierExtDto {
 
     public void setOfficalSealUrl(String officalSealUrl) {
         this.officalSealUrl = officalSealUrl;
+    }
+
+    public Set<Integer> getCityIds() {
+        return cityIds;
+    }
+
+    public void setCityIds(Set<Integer> cityIds) {
+        this.cityIds = cityIds;
+    }
+
+    public Set<Integer> getSupplierIds() {
+        return supplierIds;
+    }
+
+    public void setSupplierIds(Set<Integer> supplierIds) {
+        this.supplierIds = supplierIds;
     }
 }

@@ -51,15 +51,11 @@ public class SupplierExt {
 
     private Integer cooperationMode;
 
-    private Integer gardenPlanLevel;
+    private String gardenPlanLevel;
 
     private String signSponsor;
 
     private String contractTime;
-
-    private Integer carNumber;
-
-    private String lowLimitMonthWater;
 
     private String amountDeposit;
 
@@ -82,6 +78,8 @@ public class SupplierExt {
     private String officalSealUrl;
 
     private Integer needDepositReceipt;
+
+    private Integer applierStatus;
 
     public Long getId() {
         return id;
@@ -275,12 +273,12 @@ public class SupplierExt {
         this.cooperationMode = cooperationMode;
     }
 
-    public Integer getGardenPlanLevel() {
+    public String getGardenPlanLevel() {
         return gardenPlanLevel;
     }
 
-    public void setGardenPlanLevel(Integer gardenPlanLevel) {
-        this.gardenPlanLevel = gardenPlanLevel;
+    public void setGardenPlanLevel(String gardenPlanLevel) {
+        this.gardenPlanLevel = gardenPlanLevel == null ? null : gardenPlanLevel.trim();
     }
 
     public String getSignSponsor() {
@@ -297,22 +295,6 @@ public class SupplierExt {
 
     public void setContractTime(String contractTime) {
         this.contractTime = contractTime == null ? null : contractTime.trim();
-    }
-
-    public Integer getCarNumber() {
-        return carNumber;
-    }
-
-    public void setCarNumber(Integer carNumber) {
-        this.carNumber = carNumber;
-    }
-
-    public String getLowLimitMonthWater() {
-        return lowLimitMonthWater;
-    }
-
-    public void setLowLimitMonthWater(String lowLimitMonthWater) {
-        this.lowLimitMonthWater = lowLimitMonthWater == null ? null : lowLimitMonthWater.trim();
     }
 
     public String getAmountDeposit() {
@@ -401,5 +383,13 @@ public class SupplierExt {
 
     public void setNeedDepositReceipt(Integer needDepositReceipt) {
         this.needDepositReceipt = needDepositReceipt;
+    }
+
+    public Integer getApplierStatus() {
+        return applierStatus;
+    }
+
+    public void setApplierStatus(Integer applierStatus) {
+        this.applierStatus = applierStatus;
     }
 }

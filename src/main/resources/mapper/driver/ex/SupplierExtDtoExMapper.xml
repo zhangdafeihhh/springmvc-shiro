@@ -116,4 +116,13 @@
     from supplier_ext
       where supplier_id = #{supplierId}
   </select>
+
+
+
+  <select id="selectRecord" parameterType="com.zhuanche.entity.driver.SupplierExtDto" resultType="com.zhuanche.entity.driver.SupplierExtDto">
+    SELECT t.*,a.*  FROM supplier_ext t
+    INNER JOIN supplier_cooperation_agreement a on t.supplier_id = a.supplier_id
+    INNER JOIN supplier_account_apply p on a.supplier_id = p.supplier_id
+    GROUP BY t.supplier_id ORDER BY t.update_date DESC;
+  </select>
 </mapper>
