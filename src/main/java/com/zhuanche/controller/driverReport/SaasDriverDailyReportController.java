@@ -886,8 +886,7 @@ public class SaasDriverDailyReportController {
         Map<String,String> map = Maps.newHashMap();
         try {
             logger.info("导出司机营业汇总操作");
-            return AjaxResponse.success(null);
-            // logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"导出司机周/月列表2.0");
+             //logService.insertLog(com.zhuanche.security.tool.Constants.LOG_TYPE_QUERY,"导出司机周/月列表2.0");
         } catch (Exception e) {
             logger.info("查询失败",e);
         }
