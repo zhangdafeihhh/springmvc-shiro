@@ -731,7 +731,16 @@ public class IntegerCityController {
             JSONObject orderResult = JSONObject.parseObject(result);
             if (orderResult.get("code") != null && orderResult.getInteger("code") == 0) {
                 JSONObject jsonData = orderResult.getJSONObject("data");
-                return AjaxResponse.success(jsonData);
+                logger.info("========创建订单返回结果========" + jsonData.toString());
+                //解析data里面的数据
+                Integer returnCode  = jsonData.get("returnCode") == null ? null : jsonData.getInteger("returnCode");
+                if(returnCode != null && returnCode == 0){
+                    return AjaxResponse.success(jsonData);
+                }
+                else if(returnCode != null && returnCode == 249){
+                    logger.info("有一笔进行中的订单");
+                    return AjaxResponse.fail(RestErrorCode.HAS_SUB_ORDER);
+                }
             }
         } catch (Exception e) {
             logger.error("创建子订单失败", e);

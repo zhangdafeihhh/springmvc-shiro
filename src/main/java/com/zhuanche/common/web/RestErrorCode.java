@@ -281,6 +281,9 @@ public final class RestErrorCode{
 	@ResultMessage("创建子单失败")
 	public static final int FAILED_CREATE_SUB_ORDER = 50020;
 
+	@ResultMessage("有一笔进行中的订单")
+	public static final int HAS_SUB_ORDER = 50021;
+
 	@ResultMessage("绑定主单失败")
 	public static final int BIND_MAIN_FAILED = 50100;
 	@ResultMessage("改派订单失败")
