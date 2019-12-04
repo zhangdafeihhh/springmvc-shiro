@@ -1,6 +1,7 @@
 package com.zhuanche.entity.driver;
 
 import java.util.Date;
+import java.util.List;
 
 public class SupplierAccountApply {
     private Long id;
@@ -74,6 +75,11 @@ public class SupplierAccountApply {
      * 最后更新时间
      */
     private Date updateDate;
+
+    /**
+     * 更新失败信息
+     */
+    private List<SupplierCheckFail> list;
 
     public Long getId() {
         return id;
@@ -193,5 +199,13 @@ public class SupplierAccountApply {
 
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
+    }
+
+    public List<SupplierCheckFail> getList() {
+        return list;
+    }
+
+    public void setList(List<SupplierCheckFail> list) {
+        this.list = list;
     }
 }

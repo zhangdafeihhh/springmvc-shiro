@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="mapper.driver.SupplierExtMapper" >
+<mapper namespace="mapper.driver.ex.SupplierExtExMapper" >
   <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.SupplierExt" >
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
@@ -52,14 +52,20 @@
     offical_seal_url, need_deposit_receipt, applier_status
   </sql>
   <select id="extDtoList" resultMap="com.zhuanche.entity.driver.SupplierExtDto" parameterType="com.zhuanche.entity.driver.SupplierExtDto" >
-    select 
-    <include refid="Base_Column_List" />
-    from supplier_ext t
-    INNER JOIN supplier_cooperation_agreement a on t.supplier_id = a.supplier_id
-    INNER JOIN supplier_account_apply p on a.supplier_id = p.supplier_id
-    where id = #{id,jdbcType=BIGINT}
-    GROUP BY t.supplier_id
-    ORDER BY t.update_date DESC
+      SELECT t.id as id,
+      t.supplier_id as supplierId,
+      t.supplier_short_name as supplierShortName,
+      t.cooperation_mode as cooperationMode,
+      t.garden_plan_level as gardenPlanLevel,
+      t.applier_status as applierStatus,
+      a.agreement_start_time as agreementStartTime,
+      a.agreement_end_time as agreementEndTime,
+      a.car_number as carNumber,
+      a.low_limit_month_water as lowLimitMonthWater,
+      a.margin_amount as marginAmount
+      FROM supplier_ext t
+      INNER JOIN supplier_cooperation_agreement a on t.supplier_id = a.supplier_id
+      INNER JOIN supplier_account_apply p on a.supplier_id = p.supplier_id GROUP BY t.supplier_id ORDER BY t.update_date DESC;
   </select>
 
   <select id="extDtoDetail" resultMap="BaseResultMap" parameterType="java.lang.Integer" >

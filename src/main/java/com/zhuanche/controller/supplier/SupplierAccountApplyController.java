@@ -13,11 +13,14 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.driver.supplier.SupplierAccountApplyDTO;
 import com.zhuanche.entity.driver.SupplierAccountApply;
+import com.zhuanche.entity.driver.SupplierCheckFail;
 import com.zhuanche.serv.supplier.SupplierAccountApplyService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import mapper.driver.ex.SupplierCheckFailExMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,6 +39,9 @@ public class SupplierAccountApplyController {
 
     @Resource
     private SupplierAccountApplyService supplierAccountApplyService;
+
+    @Autowired
+    private SupplierCheckFailExMapper exMapper;
 
     /**
      * 根据供应商查询所有申请修改信息
@@ -86,6 +92,8 @@ public class SupplierAccountApplyController {
     public AjaxResponse querySupplierAccountApplyById(@Verify(param = "id",rule="required") Long id){
         logger.info("[供应商申请修改账户信息]根据供应商查询所有申请修改信息 id={}", id);
         SupplierAccountApply supplierAccountApply = supplierAccountApplyService.selectByPrimaryKey(id);
+        List<SupplierCheckFail> list = exMapper.failList(supplierAccountApply.getSupplierId());
+        supplierAccountApply.setList(list);
         return AjaxResponse.success(supplierAccountApply);
     }
 

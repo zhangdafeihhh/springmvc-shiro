@@ -151,7 +151,7 @@ public class SupplierRecordController {
      */
     @RequestMapping("/supplierRecodeDetail")
     @ResponseBody
-    public AjaxResponse supplierRecodeDetail(@Verify(param = "supplierId",rule = "required") Integer id){
+    public AjaxResponse supplierRecodeDetail(@Verify(param = "id",rule = "required") Integer id){
         SupplierExtDto dto = new SupplierExtDto();
         try {
 
@@ -161,6 +161,53 @@ public class SupplierRecordController {
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
 
+        return  AjaxResponse.success(dto);
+    }
+
+
+    /**
+     * 账号信息
+     * @param id
+     * @return
+     */
+    @RequestMapping("/bankCountDetail")
+    @ResponseBody
+    public AjaxResponse bankCountDetail(@Verify(param = "id",rule = "required") Integer id){
+        SupplierExtDto dto = new SupplierExtDto();
+        try {
+
+            dto = recordService.extDtoDetail(id);
+        } catch (Exception e) {
+            logger.error("查询异常" + e);
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+        }
+
+        return  AjaxResponse.success(dto);
+    }
+
+
+
+    /**
+     * 账号信息
+     * @param id
+     * @return
+     */
+    @RequestMapping("/bankCountEdit")
+    @ResponseBody
+    public AjaxResponse bankCountEdit(@Verify(param = "id",rule = "required") Integer id,
+                                      @Verify(param = "bankName",rule = "required") String bankName,
+                                      @Verify(param = "bankAccount",rule = "required") String bankAccount,
+                                      @Verify(param = "settlementAccount",rule = "required") String  settlementAccount,
+                                      @Verify(param = "bankIdentify",rule = "required") String bankIdentify,
+                                      @Verify(param = "bankPicUrl",rule = "required") String bankPicUrl,
+                                      @Verify(param = "officalSealUrl",rule = "required") String officalSealUrl){
+        SupplierExtDto dto = new SupplierExtDto();
+        try {
+            int code  = recordService.editExtDto(dto);
+        } catch (Exception e) {
+            logger.error("查询异常" + e);
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+        }
         return  AjaxResponse.success(dto);
     }
 }
