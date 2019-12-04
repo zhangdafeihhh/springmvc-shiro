@@ -1332,12 +1332,37 @@ public class IntegerCityController {
                 logger.info("更新成功");
                 JSONObject editJson = new JSONObject();
                 editJson.put("orderNo", orderNo);
+                //调用计费接口，防止修改时候座位数不同步导致的价格不一样
+
+                try {
+                    Map<String,Object> chargeMap = Maps.newHashMap();
+                    chargeMap.put("orderNo",orderNo);
+                    chargeMap.put("bookingUserId",customerId);
+                    chargeMap.put("cityId",boardingCityId); //
+                    chargeMap.put("bookingDate",boardingTime);
+                    chargeMap.put("bookingStartPoint",getOn); //
+                    chargeMap.put("bookingEndPoint",getOff);//
+                    chargeMap.put("serviceTypeId",68);//
+                    chargeMap.put("estimatedKey",estimatedKey);
+                    chargeMap.put("bookingGroupId",carGroup);//
+                    chargeMap.put("riderPhone",riderPhone);
+                    chargeMap.put("channelsNum","saas"); //saas标志
+                    chargeMap.put("bid",30);
+
+                    String chargeResult = MpOkHttpUtil.okHttpPost(orderCostUrl+"/scfl/updateEstimateInfo",chargeMap,0,null);
+                    logger.info("调用计费返回结果:" + chargeResult);
+                } catch (Exception e) {
+                    logger.info("调用计费接口异常:" + e);
+                }
+
+
                 return AjaxResponse.success(editJson);
             }
         }
 
         return AjaxResponse.fail(RestErrorCode.UPDATE_SUB_ORDER_FAILED);
     }
+
 
     /**
      * 取消订单
