@@ -96,6 +96,9 @@ public class IntegerCityController {
     @Value("${center.url}")
     private String centerUrl;
 
+    @Value("${driver.fee.server.api.base.url}")
+    private String driverFeeServiceApiBaseUrl;
+
     @Autowired
     private DriverInfoInterCityExMapper infoInterCityExMapper;
 
@@ -1349,7 +1352,7 @@ public class IntegerCityController {
                     chargeMap.put("channelsNum","saas"); //saas标志
                     chargeMap.put("bid",30);
 
-                    String chargeResult = MpOkHttpUtil.okHttpPost(orderCostUrl+"/scfl/updateEstimateInfo",chargeMap,0,null);
+                    String chargeResult = MpOkHttpUtil.okHttpPost(driverFeeServiceApiBaseUrl+"/scfl/updateEstimateInfo",chargeMap,0,null);
                     logger.info("调用计费返回结果:" + chargeResult);
                 } catch (Exception e) {
                     logger.info("调用计费接口异常:" + e);
