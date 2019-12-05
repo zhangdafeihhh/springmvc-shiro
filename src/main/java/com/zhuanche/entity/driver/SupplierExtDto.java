@@ -207,6 +207,10 @@ public class SupplierExtDto {
     private Integer applierStatus;
 
 
+    private String cityName; //城市名称
+
+    private String mainCityName;//主城名称
+
 
     private Set<Integer> cityIds;
     private Set<Integer> supplierIds;
@@ -548,5 +552,21 @@ public class SupplierExtDto {
 
     public void setApplierStatus(Integer applierStatus) {
         this.applierStatus = applierStatus;
+    }
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
+
+    public String getMainCityName() {
+        return mainCityName;
+    }
+
+    public void setMainCityName(String mainCityName) {
+        this.mainCityName = mainCityName;
     }
 }

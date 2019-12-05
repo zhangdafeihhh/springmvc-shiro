@@ -86,7 +86,8 @@ public class SupplierAccountApplyService {
     public AjaxResponse updateSupplierAccountApplyStatua(Long id, Integer cityId, Integer supplierId,
                                                          String settlementAccount, String bankAccount,
                                                          String bankName, String bankIdentify,
-                                                         String settlementFullName){
+                                                         String settlementFullName,String bankPicUrl,
+                                                         String officalSealUrl){
 
 
         SupplierAccountApply apply = supplierAccountApplyMapper.selectByPrimaryKey(id);
@@ -108,6 +109,8 @@ public class SupplierAccountApplyService {
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         params.setUpdateBy(currentLoginUser.getId());
         params.setUpdateName(currentLoginUser.getName());
+        params.setBankPicUrl(bankPicUrl);
+        params.setOfficalSealUrl(officalSealUrl);
         //切换主库
         DynamicRoutingDataSource.setMasterSlave("driver-DataSource", DataSourceMode.MASTER);
         int i = supplierAccountApplyMapper.updateByPrimaryKeySelective(params);

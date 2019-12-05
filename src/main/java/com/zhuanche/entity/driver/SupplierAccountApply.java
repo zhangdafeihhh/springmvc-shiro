@@ -6,79 +6,38 @@ import java.util.List;
 public class SupplierAccountApply {
     private Long id;
 
-    /**
-     * 城市id
-     */
     private Integer cityId;
 
-    /**
-     * 供应商id
-     */
     private Integer supplierId;
 
-    /**
-     * 申请状态 1申请中 2已更新
-     */
     private Byte status;
 
-    /**
-     * 打款账户名称
-     */
     private String settlementAccount;
 
-    /**
-     * 打款银行账号
-     */
     private String bankAccount;
 
-    /**
-     * 开户行名称
-     */
     private String bankName;
 
-    /**
-     * 联行号
-     */
     private String bankIdentify;
 
-    /**
-     * 结算供应商全称
-     */
     private String settlementFullName;
 
-    /**
-     * 创建人id
-     */
     private Integer createBy;
 
-    /**
-     * 创建人
-     */
     private String createName;
 
-    /**
-     * 创建时间
-     */
     private Date createDate;
 
-    /**
-     * 修改人id
-     */
     private Integer updateBy;
 
-    /**
-     * 修改人
-     */
     private String updateName;
 
-    /**
-     * 最后更新时间
-     */
     private Date updateDate;
 
-    /**
-     * 更新失败信息
-     */
+    private String bankPicUrl;
+
+    private String officalSealUrl;
+
     private List<SupplierCheckFail> list;
 
     public Long getId() {
@@ -199,6 +158,22 @@ public class SupplierAccountApply {
 
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
+    }
+
+    public String getBankPicUrl() {
+        return bankPicUrl;
+    }
+
+    public void setBankPicUrl(String bankPicUrl) {
+        this.bankPicUrl = bankPicUrl == null ? null : bankPicUrl.trim();
+    }
+
+    public String getOfficalSealUrl() {
+        return officalSealUrl;
+    }
+
+    public void setOfficalSealUrl(String officalSealUrl) {
+        this.officalSealUrl = officalSealUrl == null ? null : officalSealUrl.trim();
     }
 
     public List<SupplierCheckFail> getList() {

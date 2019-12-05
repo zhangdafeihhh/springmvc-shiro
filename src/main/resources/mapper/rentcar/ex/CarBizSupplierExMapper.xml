@@ -530,6 +530,23 @@
 
 
 
+    <!-- 查询一个城市的所有供应商 -->
+    <select id="queryByCityOrSupplierName" resultMap="BaseResultMap" >
+        select
+        supplier_id
+        from car_biz_supplier
+        where 1=1
+        <if test="cityIds!=null and cityIds.size()>0">
+            and supplier_city IN
+            <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
+                #{cid}
+            </foreach>
+        </if>
+
+        <if test="supplierFullName != null" >
+            AND supplier_full_name = #{supplierFullName,jdbcType=VARCHAR}
+        </if>
+     </select>
 
 
 

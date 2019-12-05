@@ -65,14 +65,38 @@
       a.margin_amount as marginAmount
       FROM supplier_ext t
       INNER JOIN supplier_cooperation_agreement a on t.supplier_id = a.supplier_id
-      INNER JOIN supplier_account_apply p on a.supplier_id = p.supplier_id GROUP BY t.supplier_id ORDER BY t.update_date DESC;
+      INNER JOIN supplier_account_apply p on a.supplier_id = p.supplier_id
+      WHERE  1=1
+            <if test="supplierIds != null and supplierIds.size()>0">
+              AND t.supplier_id in
+              <foreach item="item" index="index" collection="supplierIds" open="(" separator="," close=")">
+                #{item}
+              </foreach>
+            </if>
+            <if test="mainCityId != null">
+              and t.main_city_id = #{mainCityId}
+            </if>
+            <if test="cooperationMode != null">
+              and t.cooperation_mode = #{cooperationMode}
+            </if>
+            <if test="gardenPlanLevel != null">
+              and t.garden_plan_level = #{gardenPlanLevel}
+            </if>
+            <if test="applierStatus != null">
+              AND t.applier_status = #{applierStatus}
+            </if>
+      GROUP BY t.supplier_id ORDER BY t.update_date DESC;
   </select>
 
-  <select id="extDtoDetail" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select
-    <include refid="Base_Column_List" />
-    from supplier_ext
-    where supplier_id = #{supplierId,jdbcType=BIGINT}
+  <select id="extDtoDetail" resultMap="com.zhuanche.entity.driver.SupplierExtDto" parameterType="java.lang.Integer" >
+    SELECT  t.supplier_short_name as supplierShortName,
+			t.cooperation_mode as cooperationMode,
+      t.garden_plan_level as gardenPlanLevel,
+      t.applier_status as applierStatus,
+			t.first_sign_time as firstSignTime,
+			t.amount_deposit as amountDeposit,
+			t.email as email
+      FROM supplier_ext t WHERE  id = #{id,jdbcType=BIGINT}
   </select>
 
 

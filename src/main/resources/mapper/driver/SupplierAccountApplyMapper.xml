@@ -17,11 +17,13 @@
     <result column="update_by" property="updateBy" jdbcType="INTEGER" />
     <result column="update_name" property="updateName" jdbcType="VARCHAR" />
     <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="bank_pic_url" property="bankPicUrl" jdbcType="VARCHAR" />
+    <result column="offical_seal_url" property="officalSealUrl" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, city_id, supplier_id, status, settlement_account, bank_account, bank_name, bank_identify, 
     settlement_full_name, create_by, create_name, create_date, update_by, update_name, 
-    update_date
+    update_date, bank_pic_url, offical_seal_url
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -41,12 +43,14 @@
       settlement_account, bank_account, bank_name, 
       bank_identify, settlement_full_name, create_by, 
       create_name, create_date, update_by, 
-      update_name, update_date)
+      update_name, update_date, bank_pic_url, 
+      offical_seal_url)
     values (#{cityId,jdbcType=INTEGER}, #{supplierId,jdbcType=INTEGER}, #{status,jdbcType=TINYINT}, 
       #{settlementAccount,jdbcType=VARCHAR}, #{bankAccount,jdbcType=VARCHAR}, #{bankName,jdbcType=VARCHAR}, 
       #{bankIdentify,jdbcType=VARCHAR}, #{settlementFullName,jdbcType=VARCHAR}, #{createBy,jdbcType=INTEGER}, 
       #{createName,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=INTEGER}, 
-      #{updateName,jdbcType=VARCHAR}, #{updateDate,jdbcType=TIMESTAMP})
+      #{updateName,jdbcType=VARCHAR}, #{updateDate,jdbcType=TIMESTAMP}, #{bankPicUrl,jdbcType=VARCHAR}, 
+      #{officalSealUrl,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.SupplierAccountApply" >
     <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
@@ -96,6 +100,12 @@
       <if test="updateDate != null" >
         update_date,
       </if>
+      <if test="bankPicUrl != null" >
+        bank_pic_url,
+      </if>
+      <if test="officalSealUrl != null" >
+        offical_seal_url,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="cityId != null" >
@@ -139,6 +149,12 @@
       </if>
       <if test="updateDate != null" >
         #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="bankPicUrl != null" >
+        #{bankPicUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="officalSealUrl != null" >
+        #{officalSealUrl,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -187,6 +203,12 @@
       <if test="updateDate != null" >
         update_date = #{updateDate,jdbcType=TIMESTAMP},
       </if>
+      <if test="bankPicUrl != null" >
+        bank_pic_url = #{bankPicUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="officalSealUrl != null" >
+        offical_seal_url = #{officalSealUrl,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -205,7 +227,9 @@
       create_date = #{createDate,jdbcType=TIMESTAMP},
       update_by = #{updateBy,jdbcType=INTEGER},
       update_name = #{updateName,jdbcType=VARCHAR},
-      update_date = #{updateDate,jdbcType=TIMESTAMP}
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      bank_pic_url = #{bankPicUrl,jdbcType=VARCHAR},
+      offical_seal_url = #{officalSealUrl,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>

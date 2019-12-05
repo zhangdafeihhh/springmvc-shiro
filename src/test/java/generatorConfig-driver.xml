@@ -51,7 +51,7 @@
 			<property name="useActualColumnNames" value="false" />
 			<generatedKey column="id" sqlStatement="MySql" identity="true" />
 		</table> -->
-		<table tableName="supplier_check_fail" domainObjectName="SupplierCheckFail"
+		<table tableName="supplier_account_apply" domainObjectName="SupplierAccountApply"
 			enableSelectByExample="false" enableDeleteByExample="false"
 			enableCountByExample="false" enableUpdateByExample="false">
 			<property name="useActualColumnNames" value="false" />
