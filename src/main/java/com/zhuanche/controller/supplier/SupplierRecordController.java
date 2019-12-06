@@ -210,7 +210,9 @@ public class SupplierRecordController {
             SupplierAccountApply supplierAccountApply = applyExMapper.selectApplyBySupplierId(supplierId);
             List<SupplierAccountApply> supplierAccountApplyList = new ArrayList<>();
             supplierAccountApplyList.add(supplierAccountApply);
-            supplier.setApplyList(supplierAccountApplyList);
+            if(CollectionUtils.isNotEmpty(supplierAccountApplyList)){
+                supplier.setApplyList(supplierAccountApplyList.get(0));
+            }
 
             List<SupplierExperience> experienceList = experienceExMapper.selectAllBySupplierId(supplierId);
 

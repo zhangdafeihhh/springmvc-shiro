@@ -97,7 +97,7 @@ public class CarBizSupplierVo extends CarBizSupplier {
     private Integer status;
 
 
-    private List<SupplierAccountApply> applyList;
+    private SupplierAccountApply applyList;
 
 
     public String getSupplierCityName() {
@@ -366,11 +366,11 @@ public class CarBizSupplierVo extends CarBizSupplier {
         this.status = status;
     }
 
-    public List<SupplierAccountApply> getApplyList() {
+    public SupplierAccountApply getApplyList() {
         return applyList;
     }
 
-    public void setApplyList(List<SupplierAccountApply> applyList) {
+    public void setApplyList(SupplierAccountApply applyList) {
         this.applyList = applyList;
     }
 
