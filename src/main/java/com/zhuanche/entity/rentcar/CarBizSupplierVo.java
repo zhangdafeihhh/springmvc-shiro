@@ -2,6 +2,7 @@ package com.zhuanche.entity.rentcar;
 
 import com.zhuanche.dto.driver.supplier.SupplierCooperationAgreementDTO;
 import com.zhuanche.entity.driver.SupplierAccountApply;
+import com.zhuanche.entity.driver.SupplierCooperationAgreement;
 import com.zhuanche.entity.driver.SupplierExperience;
 import lombok.Data;
 
@@ -69,6 +70,8 @@ public class CarBizSupplierVo extends CarBizSupplier {
     private Byte applyStatus;
 
     private List<SupplierCooperationAgreementDTO> agreementList;
+
+    private List<SupplierCooperationAgreement> cooperationAgreementList;
 
     private List<SupplierExperience> experienceList;
 
@@ -371,5 +374,11 @@ public class CarBizSupplierVo extends CarBizSupplier {
         this.applyList = applyList;
     }
 
+    public List<SupplierCooperationAgreement> getCooperationAgreementList() {
+        return cooperationAgreementList;
+    }
 
+    public void setCooperationAgreementList(List<SupplierCooperationAgreement> cooperationAgreementList) {
+        this.cooperationAgreementList = cooperationAgreementList;
+    }
 }

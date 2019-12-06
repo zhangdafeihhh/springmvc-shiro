@@ -51,7 +51,7 @@
     account_user, deposit_receipt, company_date, refund_status, legal_name, bank_pic_url, 
     offical_seal_url, need_deposit_receipt, applier_status
   </sql>
-  <select id="extDtoList" resultMap="com.zhuanche.entity.driver.SupplierExtDto" parameterType="com.zhuanche.entity.driver.SupplierExtDto" >
+  <select id="extDtoList" resultType="com.zhuanche.entity.driver.SupplierExtDto" parameterType="com.zhuanche.entity.driver.SupplierExtDto" >
       SELECT t.id as id,
       t.supplier_id as supplierId,
       t.supplier_short_name as supplierShortName,
@@ -85,10 +85,10 @@
             <if test="applierStatus != null">
               AND t.applier_status = #{applierStatus}
             </if>
-      GROUP BY t.supplier_id ORDER BY t.update_date DESC;
+      GROUP BY t.supplier_id ORDER BY t.update_date DESC
   </select>
 
-  <select id="extDtoDetail" resultMap="com.zhuanche.entity.driver.SupplierExtDto" parameterType="java.lang.Integer" >
+  <select id="extDtoDetail" resultType="com.zhuanche.entity.driver.SupplierExtDto" parameterType="java.lang.Integer" >
     SELECT  t.supplier_short_name as supplierShortName,
 			t.cooperation_mode as cooperationMode,
       t.garden_plan_level as gardenPlanLevel,
@@ -96,7 +96,7 @@
 			t.first_sign_time as firstSignTime,
 			t.amount_deposit as amountDeposit,
 			t.email as email
-      FROM supplier_ext t WHERE  id = #{id,jdbcType=BIGINT}
+      FROM supplier_ext t WHERE  t.supplier_id = #{supplierId,jdbcType=BIGINT}
   </select>
 
 

@@ -7,7 +7,9 @@ import com.github.pagehelper.util.StringUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.dto.driver.supplier.SupplierCooperationAgreementDTO;
 import com.zhuanche.entity.driver.SupplierAccountApply;
+import com.zhuanche.entity.driver.SupplierCooperationAgreement;
 import com.zhuanche.entity.driver.SupplierExperience;
 import com.zhuanche.entity.driver.SupplierExtDto;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
@@ -16,6 +18,7 @@ import com.zhuanche.entity.rentcar.CarBizSupplierVo;
 import com.zhuanche.serv.supplier.SupplierRecordService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import mapper.driver.ex.SupplierAccountApplyExMapper;
+import mapper.driver.ex.SupplierCooperationAgreementExMapper;
 import mapper.driver.ex.SupplierExperienceExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.collections.CollectionUtils;
@@ -58,6 +61,9 @@ public class SupplierRecordController {
 
     @Autowired
     private SupplierExperienceExMapper experienceExMapper;
+
+    @Autowired
+    private SupplierCooperationAgreementExMapper agreementExMapper;
     /**
      *
      * @param supplierId
@@ -159,7 +165,7 @@ public class SupplierRecordController {
         try {
             dto.setSupplierId(supplierId);
             dto.setEmail(email);
-            dto = recordService.extDtoDetail(supplierId);
+            int code = recordService.editExtDto(dto);
             CarBizSupplierVo supplier = new CarBizSupplierVo();
             supplier.setContacts(contacts);
             supplier.setContactsPhone(contactsPhone);
@@ -172,7 +178,7 @@ public class SupplierRecordController {
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
 
-        return  AjaxResponse.success(dto);
+        return  AjaxResponse.success(null);
     }
 
 
@@ -210,6 +216,9 @@ public class SupplierRecordController {
 
             supplier.setExperienceList(experienceList);
 
+            List<SupplierCooperationAgreement> agreementList = agreementExMapper.selectAllBySupplierId(supplierId);
+            supplier.setCooperationAgreementList(agreementList);
+
         } catch (Exception e) {
             logger.error("查询异常" + e);
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
@@ -246,49 +255,32 @@ public class SupplierRecordController {
 
     /**
      * 账号信息
-     * @param id
+     * @param
      * @return
      */
     @RequestMapping("/bankCountEdit")
     @ResponseBody
-    public AjaxResponse bankCountEdit(@Verify(param = "id",rule = "required") Integer id,
+    public AjaxResponse bankCountEdit(@Verify(param = "supplierId",rule = "required") Integer supplierId,
                                       @Verify(param = "bankName",rule = "required") String bankName,
                                       @Verify(param = "bankAccount",rule = "required") String bankAccount,
                                       @Verify(param = "settlementAccount",rule = "required") String  settlementAccount,
                                       @Verify(param = "bankIdentify",rule = "required") String bankIdentify,
                                       @Verify(param = "bankPicUrl",rule = "required") String bankPicUrl,
                                       @Verify(param = "officalSealUrl",rule = "required") String officalSealUrl){
-        SupplierExtDto dto = new SupplierExtDto();
+        SupplierAccountApply accountApply = new SupplierAccountApply();
         try {
-            int code  = recordService.editExtDto(dto);
+            accountApply.setSupplierId(supplierId);
+            accountApply.setBankName(bankName);
+            accountApply.setBankAccount(bankAccount);
+            accountApply.setSettlementAccount(settlementAccount);
+            accountApply.setBankIdentify(bankIdentify);
+            accountApply.setBankPicUrl(bankPicUrl);
+            accountApply.setOfficalSealUrl(officalSealUrl);
+            int code  = applyExMapper.updateByPrimaryKey(accountApply);
         } catch (Exception e) {
             logger.error("查询异常" + e);
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
-        return  AjaxResponse.success(dto);
-    }
-
-    /**
-     * 账号信息
-     * @param id
-     * @return
-     */
-    @RequestMapping("/gardenPlanDetail")
-    @ResponseBody
-    public AjaxResponse gardenPlanDetail(@Verify(param = "id",rule = "required") Integer id,
-                                      @Verify(param = "bankName",rule = "required") String bankName,
-                                      @Verify(param = "bankAccount",rule = "required") String bankAccount,
-                                      @Verify(param = "settlementAccount",rule = "required") String  settlementAccount,
-                                      @Verify(param = "bankIdentify",rule = "required") String bankIdentify,
-                                      @Verify(param = "bankPicUrl",rule = "required") String bankPicUrl,
-                                      @Verify(param = "officalSealUrl",rule = "required") String officalSealUrl){
-        SupplierExtDto dto = new SupplierExtDto();
-        try {
-            int code  = recordService.editExtDto(dto);
-        } catch (Exception e) {
-            logger.error("查询异常" + e);
-            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
-        }
-        return  AjaxResponse.success(dto);
+        return  AjaxResponse.success(null);
     }
 }

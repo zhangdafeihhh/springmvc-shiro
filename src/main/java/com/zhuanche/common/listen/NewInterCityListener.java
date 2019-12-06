@@ -93,7 +93,7 @@ public class NewInterCityListener implements MessageListenerOrderly {
                             }
                             String[] boardPoint = boardFirstAdd.split(",");
 
-                            if(boardPoint.length > 0){
+                            if(boardPoint.length > 1){
                                 String x = boardPoint[0];
                                 String y = boardPoint[1];
                                 String boardOn = utils.hasBoardRoutRights(startCityId, x, y);
