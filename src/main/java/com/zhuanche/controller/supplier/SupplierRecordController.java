@@ -16,6 +16,7 @@ import com.zhuanche.entity.rentcar.CarBizSupplierVo;
 import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.supplier.SupplierRecordService;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.DateUtils;
 import mapper.driver.ex.SupplierAccountApplyExMapper;
 import mapper.driver.ex.SupplierCooperationAgreementExMapper;
 import mapper.driver.ex.SupplierExperienceExMapper;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.text.DateFormat;
 import java.util.*;
 
 /**
@@ -227,7 +229,7 @@ public class SupplierRecordController {
                 supplier.setCooperationName(dto.getCooperationMode() == null ? "" :  dto.getCooperationMode().toString());
                 supplier.setGardenPlanLevel(dto.getGardenPlanLevel());
                 supplier.setStatus(dto.getStatus() == null ? 0 : Integer.valueOf(dto.getStatus()));
-                supplier.setFirstSignTime(dto.getFirstSignTime()== null ? "" : dto.getFirstSignTime().toString());
+                supplier.setFirstSignTime(dto.getFirstSignTime()== null ? "" : DateUtils.formatDate(dto.getFirstSignTime(),"yyyy-MM-dd hh:mm:ss"));
                 supplier.setMarginAmount(StringUtil.isEmpty(dto.getAmountDeposit())  ? 0.00 : Double.valueOf(dto.getAmountDeposit()));
                 supplier.setEmail(dto.getEmail());
             }
