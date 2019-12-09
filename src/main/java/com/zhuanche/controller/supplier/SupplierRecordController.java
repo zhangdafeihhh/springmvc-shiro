@@ -4,22 +4,22 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.util.StringUtil;
+import com.google.common.collect.Maps;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.driver.supplier.SupplierCooperationAgreementDTO;
-import com.zhuanche.entity.driver.SupplierAccountApply;
-import com.zhuanche.entity.driver.SupplierCooperationAgreement;
-import com.zhuanche.entity.driver.SupplierExperience;
-import com.zhuanche.entity.driver.SupplierExtDto;
+import com.zhuanche.entity.driver.*;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.entity.rentcar.CarBizSupplierQuery;
 import com.zhuanche.entity.rentcar.CarBizSupplierVo;
+import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.supplier.SupplierRecordService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import mapper.driver.ex.SupplierAccountApplyExMapper;
 import mapper.driver.ex.SupplierCooperationAgreementExMapper;
 import mapper.driver.ex.SupplierExperienceExMapper;
+import mapper.driver.ex.SupplierLevelExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -32,10 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @Author fanht
@@ -64,6 +61,13 @@ public class SupplierRecordController {
 
     @Autowired
     private SupplierCooperationAgreementExMapper agreementExMapper;
+
+    @Autowired
+    private SupplierLevelExMapper supplierLevelexMapper;
+
+    @Autowired
+    private CarBizSupplierService supplierService;
+
     /**
      *
      * @param supplierId
@@ -114,6 +118,27 @@ public class SupplierRecordController {
 
             Page page = PageHelper.startPage(pageNum,pageSize,true);
             List<SupplierExtDto> list =  recordService.extDtoList(supplierExtDto);
+            //获取城市名称、供应商名称
+            CarBizSupplierQuery queryParam = new CarBizSupplierQuery();
+            Set<Integer> setSuppliers = new HashSet<>();
+            for(SupplierExtDto dto : list){
+                setSuppliers.add(dto.getSupplierId());
+            }
+            queryParam.setSupplierIds(setSuppliers);
+            List<CarBizSupplierVo> voList = supplierService.findSupplierListByPage(queryParam);
+            Map<Integer,CarBizSupplierVo> mapVo = Maps.newHashMap();
+            for(CarBizSupplierVo vo : voList){
+                mapVo.put(vo.getSupplierId(),vo);
+            }
+            for(SupplierExtDto dto : list){
+                if(null != mapVo.get(dto.getSupplierId()) ){
+                    CarBizSupplierVo vo = mapVo.get(dto.getSupplierId());
+                    dto.setSupplierName(vo.getSupplierFullName());
+                    dto.setCityName(vo.getSupplierCityName());
+                    dto.setMainCityName(vo.getMainCityName());
+                }
+            }
+
             pageDto = new PageInfo<>(list);
         } catch (Exception e) {
             logger.error("查询异常" + e);
@@ -221,6 +246,11 @@ public class SupplierRecordController {
             List<SupplierCooperationAgreement> agreementList = agreementExMapper.selectAllBySupplierId(supplierId);
             supplier.setCooperationAgreementList(agreementList);
 
+            SupplierLevel params = new SupplierLevel();
+            params.setSupplierId(supplierId);
+            List<SupplierLevel> list =  supplierLevelexMapper.findPage(params);
+            supplier.setLevelList(list);
+
         } catch (Exception e) {
             logger.error("查询异常" + e);
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
@@ -239,12 +269,16 @@ public class SupplierRecordController {
     public AjaxResponse bankCountDetail(@Verify(param = "supplierId",rule = "required") Integer supplierId){
         SupplierExtDto dto = new SupplierExtDto();
         try {
+            CarBizSupplierVo vo = supplierExMapper.querySupplierById(supplierId);
             SupplierAccountApply apply = applyExMapper.selectApplyStatusBySupplierId(supplierId);
+
             dto.setBankAccount(apply.getBankAccount());
             dto.setBankName(apply.getBankName());
             dto.setBankIdentify(apply.getBankIdentify());
             dto.setBankPicUrl(apply.getBankPicUrl());
             dto.setOfficalSealUrl(apply.getOfficalSealUrl());
+            dto.setSupplierName(vo != null ? vo.getSupplierFullName() : "");
+            dto.setAccountApplyId(apply.getId());
         } catch (Exception e) {
             logger.error("查询异常" + e);
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
@@ -262,7 +296,8 @@ public class SupplierRecordController {
      */
     @RequestMapping("/bankCountEdit")
     @ResponseBody
-    public AjaxResponse bankCountEdit(@Verify(param = "supplierId",rule = "required") Integer supplierId,
+    public AjaxResponse bankCountEdit(@Verify(param = "id",rule = "required") Long id,
+                                      @Verify(param = "supplierId",rule = "required") Integer supplierId,
                                       @Verify(param = "bankName",rule = "required") String bankName,
                                       @Verify(param = "bankAccount",rule = "required") String bankAccount,
                                       @Verify(param = "settlementAccount",rule = "required") String  settlementAccount,
@@ -277,10 +312,11 @@ public class SupplierRecordController {
             accountApply.setSettlementAccount(settlementAccount);
             accountApply.setBankIdentify(bankIdentify);
             accountApply.setBankPicUrl(bankPicUrl);
+            accountApply.setId(id);
             accountApply.setOfficalSealUrl(officalSealUrl);
             int code  = applyExMapper.updateByPrimaryKey(accountApply);
         } catch (Exception e) {
-            logger.error("查询异常" + e);
+            logger.error("更新异常" + e);
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }
         return  AjaxResponse.success(null);

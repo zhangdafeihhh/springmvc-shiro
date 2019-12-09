@@ -211,7 +211,9 @@ public class SupplierExtDto {
 
     private String mainCityName;//主城名称
 
+    private String supplierName; //合作商
 
+    private Long accountApplyId;//supplier_account_apply 表主键id
     private Set<Integer> cityIds;
     private Set<Integer> supplierIds;
 
@@ -568,5 +570,21 @@ public class SupplierExtDto {
 
     public void setMainCityName(String mainCityName) {
         this.mainCityName = mainCityName;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    public Long getAccountApplyId() {
+        return accountApplyId;
+    }
+
+    public void setAccountApplyId(Long accountApplyId) {
+        this.accountApplyId = accountApplyId;
     }
 }

@@ -4,6 +4,7 @@ import com.zhuanche.dto.driver.supplier.SupplierCooperationAgreementDTO;
 import com.zhuanche.entity.driver.SupplierAccountApply;
 import com.zhuanche.entity.driver.SupplierCooperationAgreement;
 import com.zhuanche.entity.driver.SupplierExperience;
+import com.zhuanche.entity.driver.SupplierLevel;
 import lombok.Data;
 
 import java.util.Date;
@@ -99,6 +100,10 @@ public class CarBizSupplierVo extends CarBizSupplier {
 
     private SupplierAccountApply applyList;
 
+    /**
+     * 加盟商等级历史记录
+     */
+    private List<SupplierLevel> levelList;
 
     public String getSupplierCityName() {
         return supplierCityName;
@@ -380,5 +385,13 @@ public class CarBizSupplierVo extends CarBizSupplier {
 
     public void setCooperationAgreementList(List<SupplierCooperationAgreement> cooperationAgreementList) {
         this.cooperationAgreementList = cooperationAgreementList;
+    }
+
+    public List<SupplierLevel> getLevelList() {
+        return levelList;
+    }
+
+    public void setLevelList(List<SupplierLevel> levelList) {
+        this.levelList = levelList;
     }
 }

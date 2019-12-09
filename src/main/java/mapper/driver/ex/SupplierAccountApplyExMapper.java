@@ -20,4 +20,7 @@ public interface SupplierAccountApplyExMapper {
 
     int updateByPrimaryKey(SupplierAccountApply record);
 
+    int updateBySupplier(SupplierAccountApply record);
+
+
 }
