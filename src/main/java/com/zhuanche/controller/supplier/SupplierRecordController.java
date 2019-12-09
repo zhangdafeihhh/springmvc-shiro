@@ -220,7 +220,7 @@ public class SupplierRecordController {
 
         try {
             SupplierExtDto dto = new SupplierExtDto();
-            dto = recordService.extDtoDetail(id);
+            dto = recordService.extDtoDetail(supplierId);
             //根据supplierId 获取城市、合作商 负责人、联系电话
             if(dto != null){
                 supplier.setMainCityName(dto.getMainCityName());
