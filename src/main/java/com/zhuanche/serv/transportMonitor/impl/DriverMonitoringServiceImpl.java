@@ -363,6 +363,9 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
                 if(list.size()!=pageSize){
                     break;
                 }
+            }else {
+                logger.info("============未获取到数据,跳出循环==============");
+                break;
             }
         }
          /*   }
