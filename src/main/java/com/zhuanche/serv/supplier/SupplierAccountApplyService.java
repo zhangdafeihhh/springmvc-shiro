@@ -87,11 +87,11 @@ public class SupplierAccountApplyService {
                                                          String settlementAccount, String bankAccount,
                                                          String bankName, String bankIdentify,
                                                          String settlementFullName,String bankPicUrl,
-                                                         String officalSealUrl){
+                                                         String officalSealUrl,Integer status){
 
 
         SupplierAccountApply apply = supplierAccountApplyMapper.selectByPrimaryKey(id);
-        if(apply==null || apply.getStatus()!=1){
+        if(apply==null){
             return AjaxResponse.fail(RestErrorCode.SUPPLIER_ACCOUNT_APPLY_UPDATE);
         }
 
@@ -105,7 +105,7 @@ public class SupplierAccountApplyService {
         params.setBankName(bankName);
         params.setBankIdentify(bankIdentify);
         params.setSettlementFullName(settlementFullName);
-        params.setStatus((byte)2);
+        params.setStatus((byte)status.intValue());
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         params.setUpdateBy(currentLoginUser.getId());
         params.setUpdateName(currentLoginUser.getName());

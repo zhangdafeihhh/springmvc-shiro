@@ -92,8 +92,13 @@ public class SupplierAccountApplyController {
     public AjaxResponse querySupplierAccountApplyById(@Verify(param = "id",rule="required") Long id){
         logger.info("[供应商申请修改账户信息]根据供应商查询所有申请修改信息 id={}", id);
         SupplierAccountApply supplierAccountApply = supplierAccountApplyService.selectByPrimaryKey(id);
-        List<SupplierCheckFail> list = exMapper.failList(supplierAccountApply.getSupplierId());
-        supplierAccountApply.setList(list);
+        try {
+            List<SupplierCheckFail> list = exMapper.failList(supplierAccountApply.getSupplierId());
+            supplierAccountApply.setList(list);
+        } catch (Exception e) {
+            logger.error("根据id获取供应商账号信息异常" + e);
+            e.printStackTrace();
+        }
         return AjaxResponse.success(supplierAccountApply);
     }
 
@@ -162,15 +167,16 @@ public class SupplierAccountApplyController {
                                        @Verify(param = "bankIdentify",rule="required") String bankIdentify,
                                        @Verify(param = "settlementFullName",rule="required") String settlementFullName,
                                        @Verify(param = "bankPicUrl",rule = "required")String bankPicUrl,
-                                       @Verify(param = "officalSealUrl",rule = "required")String officalSealUrl){
+                                       @Verify(param = "officalSealUrl",rule = "required")String officalSealUrl,
+                                       @Verify(param = "status",rule = "required")Integer status){
 
         logger.info("[供应商申请修改账户信息]申请修改信息审核 id={}, cityId={}, supplierId={}, settlementAccount={}, bankAccount={}, " +
-                        "bankName={}, bankIdentify={}, settlementFullName={},bankPicUrl={},officalSealUrl={}",
+                        "bankName={}, bankIdentify={}, settlementFullName={},bankPicUrl={},officalSealUrl={},status ={}",
                 id, cityId, supplierId, settlementAccount, bankAccount, bankName, bankIdentify, settlementFullName,
-                bankPicUrl,officalSealUrl);
+                bankPicUrl,officalSealUrl,status);
 
         return supplierAccountApplyService.updateSupplierAccountApplyStatua(id, cityId, supplierId, settlementAccount,
-                bankAccount, bankName, bankIdentify, settlementFullName,bankPicUrl,officalSealUrl);
+                bankAccount, bankName, bankIdentify, settlementFullName,bankPicUrl,officalSealUrl,status);
     }
 
     /**
