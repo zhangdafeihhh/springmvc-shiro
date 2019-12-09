@@ -224,11 +224,11 @@ public class SupplierRecordController {
             //根据supplierId 获取城市、合作商 负责人、联系电话
             if(dto != null){
                 supplier.setMainCityName(dto.getMainCityName());
-                supplier.setCooperationName(dto.getCooperationMode().toString());
+                supplier.setCooperationName(dto.getCooperationMode() == null ? "" :  dto.getCooperationMode().toString());
                 supplier.setGardenPlanLevel(dto.getGardenPlanLevel());
-                supplier.setStatus(Integer.valueOf(dto.getStatus()));
-                supplier.setFirstSignTime(dto.getFirstSignTime().toString());
-                supplier.setMarginAmount(Double.valueOf(dto.getAmountDeposit()));
+                supplier.setStatus(dto.getStatus() == null ? 0 : Integer.valueOf(dto.getStatus()));
+                supplier.setFirstSignTime(dto.getFirstSignTime()== null ? "" : dto.getFirstSignTime().toString());
+                supplier.setMarginAmount(dto.getAmountDeposit() == null ? 0.00 : Double.valueOf(dto.getAmountDeposit()));
                 supplier.setEmail(dto.getEmail());
             }
 
