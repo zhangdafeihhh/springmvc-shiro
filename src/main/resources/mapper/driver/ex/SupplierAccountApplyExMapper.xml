@@ -17,11 +17,15 @@
     <result column="update_by" property="updateBy" jdbcType="INTEGER" />
     <result column="update_name" property="updateName" jdbcType="VARCHAR" />
     <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+
+    <result column="bank_pic_url" property="bankPicUrl" jdbcType="VARCHAR" />
+    <result column="offical_seal_url" property="officalSealUrl" jdbcType="VARCHAR" />
+
   </resultMap>
   <sql id="Base_Column_List" >
     id, city_id, supplier_id, status, settlement_account, bank_account, bank_name, bank_identify,
     settlement_full_name, create_by, create_name, create_date, update_by, update_name, 
-    update_date
+    update_date,bank_pic_url,offical_seal_url
   </sql>
   <sql id="Base_where">
     <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR">
