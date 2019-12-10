@@ -124,6 +124,7 @@ public class SupplierAccountApplyService {
             supplierExtDto.setBankName(bankName);
             supplierExtDto.setBankIdentify(bankIdentify);
             supplierExtDto.setSettlementFullName(settlementFullName);
+            supplierExtDto.setApplierStatus(status);
 
             int count = supplierExtDtoExMapper.selectCountBySupplierId(supplierId);
             logger.info("供应商 申请修改信息审核 查询扩展表是否已存在={}", count);
