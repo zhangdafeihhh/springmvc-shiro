@@ -18,10 +18,7 @@ import com.zhuanche.serv.supplier.SupplierRecordService;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.DateUtils;
-import mapper.driver.ex.SupplierAccountApplyExMapper;
-import mapper.driver.ex.SupplierCooperationAgreementExMapper;
-import mapper.driver.ex.SupplierExperienceExMapper;
-import mapper.driver.ex.SupplierLevelExMapper;
+import mapper.driver.ex.*;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -70,6 +67,9 @@ public class SupplierRecordController {
 
     @Autowired
     private CarBizSupplierService supplierService;
+
+    @Autowired
+    private SupplierCheckFailExMapper exMapper;
 
     /**
      *
@@ -296,7 +296,11 @@ public class SupplierRecordController {
             dto.setOfficalSealUrl(apply.getOfficalSealUrl());
             dto.setSupplierName(vo != null ? vo.getSupplierFullName() : "");
             dto.setAccountApplyId(apply.getId());
-        } catch (Exception e) {
+            List<SupplierCheckFail> list = exMapper.failList(supplierId);
+            if(CollectionUtils.isNotEmpty(list)){
+                dto.setList(list);
+            }
+          } catch (Exception e) {
             logger.error("查询异常" + e);
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
         }

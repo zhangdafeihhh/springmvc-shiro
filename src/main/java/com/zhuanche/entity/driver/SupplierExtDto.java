@@ -1,6 +1,7 @@
 package com.zhuanche.entity.driver;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -228,6 +229,11 @@ public class SupplierExtDto {
      * 供应商全称
      */
     private String supplierFullName;
+
+    /**
+     * 加盟商审核记录
+     */
+    private List<SupplierCheckFail> list;
 
     public Long getId() {
         return id;
@@ -629,5 +635,13 @@ public class SupplierExtDto {
 
     public void setSupplierFullName(String supplierFullName) {
         this.supplierFullName = this.getSupplierShortName();
+    }
+
+    public List<SupplierCheckFail> getList() {
+        return list;
+    }
+
+    public void setList(List<SupplierCheckFail> list) {
+        this.list = list;
     }
 }
