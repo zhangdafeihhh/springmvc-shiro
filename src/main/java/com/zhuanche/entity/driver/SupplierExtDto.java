@@ -224,6 +224,11 @@ public class SupplierExtDto {
     private String limitLowMonthWater;//月流水下限
 
 
+    /**
+     * 供应商全称
+     */
+    private String supplierFullName;
+
     public Long getId() {
         return id;
     }
@@ -575,7 +580,7 @@ public class SupplierExtDto {
     }
 
     public void setMainCityName(String mainCityName) {
-        this.mainCityName = mainCityName;
+        this.mainCityName = this.getCityName();
     }
 
     public String getSupplierName() {
@@ -616,5 +621,13 @@ public class SupplierExtDto {
 
     public void setLimitLowMonthWater(String limitLowMonthWater) {
         this.limitLowMonthWater = limitLowMonthWater;
+    }
+
+    public String getSupplierFullName() {
+        return supplierFullName;
+    }
+
+    public void setSupplierFullName(String supplierFullName) {
+        this.supplierFullName = this.getSupplierShortName();
     }
 }

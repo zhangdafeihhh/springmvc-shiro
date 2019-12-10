@@ -122,10 +122,11 @@ public class SupplierRecordController {
             Page page = PageHelper.startPage(pageNum,pageSize,true);
             List<SupplierExtDto> list =  recordService.extDtoList(supplierExtDto);
             for(SupplierExtDto dto : list){
+                //dto.setSupplierFullName(dto.getSupplierShortName());
                 SupplierCooperationAgreement agreement = agreementExMapper.queryBySupplierId(dto.getSupplierId());
                 if(agreement != null){
                     dto.setAgreementStartTime(agreement.getAgreementStartTime() != null ? DateUtils.formatDate(agreement.getAgreementStartTime()):"");
-                    dto.setAgreementEndTime(agreement.getAgreementEndTime() != null ? DateUtils.formatDateTime(agreement.getAgreementEndTime()) : "");
+                    dto.setAgreementEndTime(agreement.getAgreementEndTime()     != null ? DateUtils.formatDate(agreement.getAgreementEndTime()) : "");
                     dto.setCarNumber(StringUtil.isEmpty(agreement.getCarNumber() )?  0 : Integer.valueOf(agreement.getCarNumber() ));
                     dto.setLimitLowMonthWater(agreement.getLowLimitMonthWater());
                 }
