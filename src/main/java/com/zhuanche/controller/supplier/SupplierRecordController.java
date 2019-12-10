@@ -122,7 +122,8 @@ public class SupplierRecordController {
             Page page = PageHelper.startPage(pageNum,pageSize,true);
             List<SupplierExtDto> list =  recordService.extDtoList(supplierExtDto);
             for(SupplierExtDto dto : list){
-                //dto.setSupplierFullName(dto.getSupplierShortName());
+                dto.setSupplierFullName(dto.getSupplierShortName());
+                dto.setMainCityName(dto.getCityName());
                 SupplierCooperationAgreement agreement = agreementExMapper.queryBySupplierId(dto.getSupplierId());
                 if(agreement != null){
                     dto.setAgreementStartTime(agreement.getAgreementStartTime() != null ? DateUtils.formatDate(agreement.getAgreementStartTime()):"");
