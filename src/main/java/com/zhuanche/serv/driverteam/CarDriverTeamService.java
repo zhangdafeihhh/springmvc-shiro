@@ -283,6 +283,12 @@ public class CarDriverTeamService{
 					DynamicRoutingDataSource.setMasterSlave("mdbcarmanage-DataSource",mdbcarManageMode);
 				}
 				if(Check.NuNObj(existsTeam)){
+					//先删除在插入 防止 重复插入 导致的唯一约束异常
+					try {
+						carRelateTeamExMapper.deleteByDriverId(team.getDriverId());
+					} catch (Exception e) {
+						logger.info("删除异常" + e);
+					}
 					result += carRelateTeamMapper.insertSelective(team);
 				}
 			}

@@ -457,7 +457,10 @@
     ,
     <include refid="Blob_Column_List" />
     from car_biz_driver_info
+    WHERE  driver_id in (
+    SELECT driver_id  FROM car_biz_driver_info
     <include refid="allBaseColumnWhereList"/>
+    )
     order by update_date desc
   </select>
 
