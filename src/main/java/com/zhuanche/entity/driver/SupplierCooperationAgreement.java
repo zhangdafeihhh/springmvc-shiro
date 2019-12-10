@@ -25,6 +25,12 @@ public class SupplierCooperationAgreement {
 
     private Date updateDate;
 
+    private String carNumber;
+
+    private String lowLimitMonthWater;
+
+    private Integer status;
+
     public Long getId() {
         return id;
     }
@@ -111,5 +117,29 @@ public class SupplierCooperationAgreement {
 
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
+    }
+
+    public String getCarNumber() {
+        return carNumber;
+    }
+
+    public void setCarNumber(String carNumber) {
+        this.carNumber = carNumber;
+    }
+
+    public String getLowLimitMonthWater() {
+        return lowLimitMonthWater;
+    }
+
+    public void setLowLimitMonthWater(String lowLimitMonthWater) {
+        this.lowLimitMonthWater = lowLimitMonthWater;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 }
