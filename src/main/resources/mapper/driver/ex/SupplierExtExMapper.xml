@@ -96,7 +96,9 @@
       t.applier_status as applierStatus,
 			t.first_sign_time as firstSignTime,
 			t.amount_deposit as amountDeposit,
-			t.email as email
+			t.email as email,
+			t.bank_pic_url as bankPicUrl,
+			t.offical_seal_url as officalSealUrl
       FROM supplier_ext t WHERE  t.supplier_id = #{supplierId,jdbcType=BIGINT}
   </select>
 
