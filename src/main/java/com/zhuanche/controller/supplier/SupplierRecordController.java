@@ -291,6 +291,7 @@ public class SupplierRecordController {
             dto.setBankAccount(apply.getBankAccount());
             dto.setBankName(apply.getBankName());
             dto.setBankIdentify(apply.getBankIdentify());
+            dto.setSettlementAccount(apply.getSettlementAccount());
             dto.setBankPicUrl(apply.getBankPicUrl());
             dto.setOfficalSealUrl(apply.getOfficalSealUrl());
             dto.setSupplierName(vo != null ? vo.getSupplierFullName() : "");
