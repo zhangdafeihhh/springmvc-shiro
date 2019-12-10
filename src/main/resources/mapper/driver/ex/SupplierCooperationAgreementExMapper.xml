@@ -40,6 +40,17 @@
     order by update_date desc
   </select>
 
+
+  <select id="queryBySupplierId" resultType="com.zhuanche.entity.driver.SupplierCooperationAgreement" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from supplier_cooperation_agreement
+    where supplier_id = #{supplierId,jdbcType=INTEGER}
+    order by update_date desc limit 1
+  </select>
+
+
+
   <delete id="deleteBySupplierId" parameterType="java.lang.Integer" >
     delete from supplier_cooperation_agreement
     where supplier_id = #{supplierId,jdbcType=INTEGER}

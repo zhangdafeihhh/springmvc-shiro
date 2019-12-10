@@ -16,6 +16,7 @@ import com.zhuanche.entity.rentcar.CarBizSupplierVo;
 import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.supplier.SupplierRecordService;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.DateUtils;
 import mapper.driver.ex.SupplierAccountApplyExMapper;
 import mapper.driver.ex.SupplierCooperationAgreementExMapper;
@@ -120,6 +121,15 @@ public class SupplierRecordController {
 
             Page page = PageHelper.startPage(pageNum,pageSize,true);
             List<SupplierExtDto> list =  recordService.extDtoList(supplierExtDto);
+            for(SupplierExtDto dto : list){
+                SupplierCooperationAgreement agreement = agreementExMapper.queryBySupplierId(dto.getSupplierId());
+                if(agreement != null){
+                    dto.setAgreementStartTime(agreement.getAgreementStartTime() != null ? DateUtils.formatDate(agreement.getAgreementStartTime()):"");
+                    dto.setAgreementEndTime(agreement.getAgreementEndTime() != null ? DateUtils.formatDateTime(agreement.getAgreementEndTime()) : "");
+                    dto.setCarNumber(StringUtil.isEmpty(agreement.getCarNumber() )?  0 : Integer.valueOf(agreement.getCarNumber() ));
+                    dto.setLimitLowMonthWater(agreement.getLowLimitMonthWater());
+                }
+            }
             //获取城市名称、供应商名称
             CarBizSupplierQuery queryParam = new CarBizSupplierQuery();
             Set<Integer> setSuppliers = new HashSet<>();
@@ -140,6 +150,8 @@ public class SupplierRecordController {
                     dto.setMainCityName(vo.getMainCityName());
                 }
             }
+
+
 
             pageDto = new PageInfo<>(list);
         } catch (Exception e) {

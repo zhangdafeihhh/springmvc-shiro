@@ -217,6 +217,12 @@ public class SupplierExtDto {
     private Set<Integer> cityIds;
     private Set<Integer> supplierIds;
 
+    private String agreementStartTime;//协议开始日期
+
+    private String agreementEndTime;//协议终止日期
+
+    private String limitLowMonthWater;//月流水下限
+
 
     public Long getId() {
         return id;
@@ -586,5 +592,29 @@ public class SupplierExtDto {
 
     public void setAccountApplyId(Long accountApplyId) {
         this.accountApplyId = accountApplyId;
+    }
+
+    public String getAgreementStartTime() {
+        return agreementStartTime;
+    }
+
+    public void setAgreementStartTime(String agreementStartTime) {
+        this.agreementStartTime = agreementStartTime;
+    }
+
+    public String getAgreementEndTime() {
+        return agreementEndTime;
+    }
+
+    public void setAgreementEndTime(String agreementEndTime) {
+        this.agreementEndTime = agreementEndTime;
+    }
+
+    public String getLimitLowMonthWater() {
+        return limitLowMonthWater;
+    }
+
+    public void setLimitLowMonthWater(String limitLowMonthWater) {
+        this.limitLowMonthWater = limitLowMonthWater;
     }
 }
