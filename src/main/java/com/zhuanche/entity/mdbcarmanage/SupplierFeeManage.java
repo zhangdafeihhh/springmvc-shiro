@@ -109,6 +109,10 @@ public class SupplierFeeManage {
 
     private String handOverEndDate;//交票结束时间
 
+    private String generalizationfficient;//推广系数
+
+    private String cityManageRating; //城市经理评级
+
     public Integer getId() {
         return id;
     }
@@ -531,5 +535,21 @@ public class SupplierFeeManage {
 
     public void setHandOverEndDate(String handOverEndDate) {
         this.handOverEndDate = handOverEndDate;
+    }
+
+    public String getGeneralizationfficient() {
+        return generalizationfficient;
+    }
+
+    public void setGeneralizationfficient(String generalizationfficient) {
+        this.generalizationfficient = generalizationfficient;
+    }
+
+    public String getCityManageRating() {
+        return cityManageRating;
+    }
+
+    public void setCityManageRating(String cityManageRating) {
+        this.cityManageRating = cityManageRating;
     }
 }
