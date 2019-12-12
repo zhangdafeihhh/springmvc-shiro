@@ -235,10 +235,7 @@ public class SupplierExtDto {
      */
     private List<SupplierCheckFail> list;
 
-    /**
-     * 供应商状态 1 审核中 2 审核通过 3  驳回
-     */
-    private String applierStatus;
+
 
     public Long getId() {
         return id;
@@ -649,8 +646,5 @@ public class SupplierExtDto {
     public void setList(List<SupplierCheckFail> list) {
         this.list = list;
     }
-
-    public void setApplierStatus(String applierStatus) {
-        this.applierStatus = applierStatus;
-    }
+    
 }
