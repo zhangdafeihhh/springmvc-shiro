@@ -336,6 +336,13 @@ public class SupplierRecordController {
             accountApply.setId(id);
             accountApply.setOfficalSealUrl(officalSealUrl);
             int code  = applyExMapper.updateByPrimaryKey(accountApply);
+            if(code > 0){
+                SupplierExtDto dto = new SupplierExtDto();
+                dto.setSupplierId(supplierId);
+                dto.setSupplierId(1);
+                recordService.editExtStatus(dto);
+            }
+
         } catch (Exception e) {
             logger.error("更新异常" + e);
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);

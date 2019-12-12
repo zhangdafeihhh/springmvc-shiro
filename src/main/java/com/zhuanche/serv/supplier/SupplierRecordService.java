@@ -22,4 +22,6 @@ public interface SupplierRecordService {
     int editExtDto(SupplierExtDto dto);
 
     SupplierExtDto recordDetail(Integer id);
+
+    int editExtStatus(SupplierExtDto dto);
 }

@@ -39,4 +39,9 @@ public class SupplierRecordServiceImpl implements SupplierRecordService{
     public SupplierExtDto recordDetail(Integer id) {
         return extExMapper.recordDetail(id);
     }
+
+    @Override
+    public int editExtStatus(SupplierExtDto dto) {
+        return extExMapper.editExtStatus(dto);
+    }
 }

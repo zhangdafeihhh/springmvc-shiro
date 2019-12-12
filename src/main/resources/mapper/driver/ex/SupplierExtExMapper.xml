@@ -121,4 +121,15 @@
     supplier_id = #{supplierId,jdbcType=INTEGER}
   </update>
 
+
+    <update id="editExtStatus" parameterType="com.zhuanche.entity.driver.SupplierExtDto" >
+        update supplier_ext
+        <set >
+            <if test="applierStatus != null" >
+                applier_status = #{applierStatus,jdbcType=INTEGER},
+            </if>
+        </set>
+        where
+        supplier_id = #{supplierId,jdbcType=INTEGER}
+    </update>
 </mapper>

@@ -18,5 +18,6 @@ public interface SupplierExtExMapper {
 
     SupplierExtDto recordDetail(@Param("id") Integer id);
 
+    int editExtStatus(SupplierExtDto dto);
 
 }
