@@ -133,25 +133,25 @@ public class IntegerCityController {
      * @param pageSize
      * @param cityId
      * @param supplierId
-     * @param orderState         待指派、待服务、已出发、已上车、服务中、已送达、已完成、已取消
-     * @param pushDriverType     订单指派方式  绑单、抢单；
-     * @param serviceType        服务类别: 新城际拼车、新城际包车
-     * @param orderType          普通订单、机构用车
-     * @param airportId          是否拼车单
-     * @param orderSource        订单来源 线上订单、手动录单、扫码订单  订单查询时候无此字段
-     * @param driverName         司机姓名
-     * @param driverPhone        司机手机号
-     * @param licensePlates      司机车牌号
-     * @param reserveName        预订人名称
-     * @param reservePhone       预订人手机号
-     * @param riderName          乘车人名称
-     * @param orderNo            子订单号
-     * @param mainOrderNo        主订单号
-     * @param beginCreateDate    下单开始时间
-     * @param endCreateDate      下单结束时间
-     * @param endCostEndDate 订单完成开始时间
-     * @param beginCostEndDate   订单完成结束时间
-     * @param riderPhone         乘车人手机号
+     * @param orderState       待指派、待服务、已出发、已上车、服务中、已送达、已完成、已取消
+     * @param pushDriverType   订单指派方式  绑单、抢单；
+     * @param serviceType      服务类别: 新城际拼车、新城际包车
+     * @param orderType        普通订单、机构用车
+     * @param airportId        是否拼车单
+     * @param orderSource      订单来源 线上订单、手动录单、扫码订单  订单查询时候无此字段
+     * @param driverName       司机姓名
+     * @param driverPhone      司机手机号
+     * @param licensePlates    司机车牌号
+     * @param reserveName      预订人名称
+     * @param reservePhone     预订人手机号
+     * @param riderName        乘车人名称
+     * @param orderNo          子订单号
+     * @param mainOrderNo      主订单号
+     * @param beginCreateDate  下单开始时间
+     * @param endCreateDate    下单结束时间
+     * @param endCostEndDate   订单完成开始时间
+     * @param beginCostEndDate 订单完成结束时间
+     * @param riderPhone       乘车人手机号
      * @return
      */
     @RequestMapping(value = "/orderQuery", method = RequestMethod.GET)
@@ -207,22 +207,22 @@ public class IntegerCityController {
         }
 
         StringBuilder cityBuilder = new StringBuilder();
-        if (citiesSet != null && citiesSet.size()>0) {
+        if (citiesSet != null && citiesSet.size() > 0) {
             List<Integer> listCity = new ArrayList<>(citiesSet);
             for (int i = 0; i < listCity.size(); i++) {
                 cityBuilder.append(listCity.get(i)).append(SPLIT);
             }
         }
         StringBuilder supplierBuilder = new StringBuilder();
-        if (suppliersSet != null && suppliersSet.size()>0) {
+        if (suppliersSet != null && suppliersSet.size() > 0) {
             List<Integer> listSupplier = new ArrayList<>(suppliersSet);
             for (int i = 0; i < listSupplier.size(); i++) {
                 supplierBuilder.append(listSupplier.get(i)).append(SPLIT);
             }
-        }else{
-            if (!WebSessionUtil.isSupperAdmin() && citiesSet.size()>0) {
-                List<CarBizSupplier> carBizSuppliers=citySupplierTeamCommonService.querySupplierAllList(citiesSet);
-                List<Integer> supplierIds= carBizSuppliers.stream().map(f -> f.getSupplierId()).collect(Collectors.toList());
+        } else {
+            if (!WebSessionUtil.isSupperAdmin() && citiesSet.size() > 0) {
+                List<CarBizSupplier> carBizSuppliers = citySupplierTeamCommonService.querySupplierAllList(citiesSet);
+                List<Integer> supplierIds = carBizSuppliers.stream().map(f -> f.getSupplierId()).collect(Collectors.toList());
                 for (int i = 0; i < supplierIds.size(); i++) {
                     supplierBuilder.append(supplierIds.get(i)).append(SPLIT);
                 }
@@ -406,7 +406,6 @@ public class IntegerCityController {
         }
 
         map.put("supplierIdBatch", "0");
-
         //添加排序字段
         JSONObject jsonSort = new JSONObject();
         jsonSort.put("field", "createDate");
@@ -559,19 +558,19 @@ public class IntegerCityController {
 
             //获取预估价
             String[] ruleStr = ruleId.split(",");
-            String[] supplierStr=supplierId.split(",");
+            String[] supplierStr = supplierId.split(",");
             AjaxResponse elsRes = null;
-            for(int i = 0;i<ruleStr.length;i++){
+            for (int i = 0; i < ruleStr.length; i++) {
                 elsRes = this.getOrderEstimatedAmount620(bookingDate, boardingCityId, 68, riderPhone,
                         ruleStr[i], customerId, boardingGetOffX, boardingGetOffY, riderCount, String.valueOf(carGroup), boardingGetOnX, boardingGetOffY,
                         isSameRider);
-                if(elsRes.getCode() == RestErrorCode.SUCCESS){
+                if (elsRes.getCode() == RestErrorCode.SUCCESS) {
                     JSONObject jsonEst = (JSONObject) elsRes.getData();
                     //获取预估金额
                     String estimatedAmount = jsonEst.getString("estimatedAmount");
                     //判断预估价是否大于0
                     BigDecimal bigDecimal = new BigDecimal(estimatedAmount);
-                    if(bigDecimal.compareTo(BigDecimal.ZERO) == 1){
+                    if (bigDecimal.compareTo(BigDecimal.ZERO) == 1) {
                         logger.info("=========获取到了合适的预估价==========");
                         ruleId = ruleStr[i]; //获取到预估价
                         supplierId = supplierStr[i];
@@ -592,7 +591,7 @@ public class IntegerCityController {
             logger.info("获取到预估金额:" + estimatedAmount);
             //判断预估价是否大于0
             BigDecimal bigDecimal = new BigDecimal(estimatedAmount);
-            if(bigDecimal.compareTo(BigDecimal.ZERO) != 1){
+            if (bigDecimal.compareTo(BigDecimal.ZERO) != 1) {
                 logger.info("获取到的预估金额为0");
                 return AjaxResponse.fail(RestErrorCode.UN_SUPPORT_CAR);
             }
@@ -735,12 +734,11 @@ public class IntegerCityController {
             if (orderResult.get("code") != null && orderResult.getInteger("code") == 0) {
                 JSONObject jsonData = orderResult.getJSONObject("data");
                 logger.info("========创建订单返回结果========" + jsonData.toString());
-                 //解析data里面的数据
-                Integer returnCode  = jsonData.get("returnCode") == null ? null : jsonData.getInteger("returnCode");
-                if(returnCode != null && returnCode == 0){
+                //解析data里面的数据
+                Integer returnCode = jsonData.get("returnCode") == null ? null : jsonData.getInteger("returnCode");
+                if (returnCode != null && returnCode == 0) {
                     return AjaxResponse.success(jsonData);
-                }
-                else if(returnCode != null && returnCode == 249){
+                } else if (returnCode != null && returnCode == 249) {
                     logger.info("有一笔进行中的订单");
                     return AjaxResponse.fail(RestErrorCode.HAS_SUB_ORDER);
                 }
@@ -803,25 +801,25 @@ public class IntegerCityController {
                     dto.setBoardingTime(jsonData.get("bookingDate") == null ? "" : jsonData.getString("bookingDate"));
                     dto.setBoardingGetOffCityId(jsonData.get("bookingEndAddr") == null ? "" : jsonData.getString("bookingEndAddr"));
                     String jsonPoint = jsonData.get("bookingStartPoint") == null ? "" : jsonData.getString("bookingStartPoint");
-                    if(StringUtils.isNotEmpty(jsonPoint)){
-                        if(jsonPoint.contains(";")){
+                    if (StringUtils.isNotEmpty(jsonPoint)) {
+                        if (jsonPoint.contains(";")) {
                             String[] arr = jsonPoint.split(";");
-                            if(arr.length >0){
+                            if (arr.length > 0) {
                                 dto.setBookingStartPoint(arr[0]);
                             }
-                        }else {
+                        } else {
                             dto.setBookingStartPoint(jsonPoint);
                         }
                     }
 
                     String jsonEnd = jsonData.get("bookingEndPoint") == null ? "" : jsonData.getString("bookingEndPoint");
-                    if(StringUtils.isNotEmpty(jsonEnd)){
-                        if(jsonEnd.contains(";")){
-                            String[]  arr = jsonEnd.split(";");
-                            if(arr.length>0){
+                    if (StringUtils.isNotEmpty(jsonEnd)) {
+                        if (jsonEnd.contains(";")) {
+                            String[] arr = jsonEnd.split(";");
+                            if (arr.length > 0) {
                                 dto.setBookingEndPoint(arr[0]);
                             }
-                        }else {
+                        } else {
                             dto.setBookingEndPoint(jsonEnd);
                         }
                     }
@@ -857,18 +855,18 @@ public class IntegerCityController {
                     }
                     //线路名称
                     dto.setOrderNo(orderNo);
-                    if(StringUtils.isNotEmpty(dto.getRuleId())){
-                        Map<String,Object> jsonRouteMap = Maps.newHashMap();
-                        jsonRouteMap.put("lineIds",dto.getRuleId());
-                        String routeResult = MpOkHttpUtil.okHttpGet(configUrl+"/intercityCarUse/getLineNameByIds",jsonRouteMap,0,null);
+                    if (StringUtils.isNotEmpty(dto.getRuleId())) {
+                        Map<String, Object> jsonRouteMap = Maps.newHashMap();
+                        jsonRouteMap.put("lineIds", dto.getRuleId());
+                        String routeResult = MpOkHttpUtil.okHttpGet(configUrl + "/intercityCarUse/getLineNameByIds", jsonRouteMap, 0, null);
                         logger.info("==============调用配置后台获取线路结果=========" + JSONObject.toJSONString(routeResult));
-                        if(StringUtils.isNotEmpty(routeResult)){
-                            JSONObject  jsonRoute = JSONObject.parseObject(routeResult);
-                            if(jsonRoute.get("code") != null && jsonRoute.getInteger("code") == 0){
+                        if (StringUtils.isNotEmpty(routeResult)) {
+                            JSONObject jsonRoute = JSONObject.parseObject(routeResult);
+                            if (jsonRoute.get("code") != null && jsonRoute.getInteger("code") == 0) {
                                 JSONArray routeArray = jsonRoute.getJSONArray("data");
-                                if(routeArray != null && routeArray.size()>0){
+                                if (routeArray != null && routeArray.size() > 0) {
                                     JSONObject jsonObjRoute = (JSONObject) routeArray.get(0);
-                                    String routeName = jsonObjRoute.get("lineName") == null ? "": jsonObjRoute.getString("lineName");
+                                    String routeName = jsonObjRoute.get("lineName") == null ? "" : jsonObjRoute.getString("lineName");
                                     dto.setRouteName(routeName);
                                 }
                             }
@@ -1005,10 +1003,10 @@ public class IntegerCityController {
                                   String bookingEndShortAddr) {
 
         logger.info(MessageFormat.format("编辑订单入参:orderNo{0},reserveName{1},reservePhone{2},isSameRider{3},riderName{4},riderPhone{5}," +
-                "riderCount:{6},boardingTime{7},boardingCityId{8},boardingGetOnX{9},boardingGetOnY{10},boardingGetOffCityId{11}," +
-                "boardingGetOffX:{12},boardingGetOffY:{13},",orderNo,reserveName,reservePhone,isSameRider,riderName,riderPhone,riderCount,
-                boardingTime,boardingCityId,boardingGetOnX,boardingGetOnY,boardingGetOffCityId,boardingGetOffX,boardingGetOffY,mainOrderNo,
-                status,startCityName,endCityName,bookingStartAddr,bookingEndAddr,carGroup,bookingStartShortAddr,bookingEndShortAddr));
+                        "riderCount:{6},boardingTime{7},boardingCityId{8},boardingGetOnX{9},boardingGetOnY{10},boardingGetOffCityId{11}," +
+                        "boardingGetOffX:{12},boardingGetOffY:{13},", orderNo, reserveName, reservePhone, isSameRider, riderName, riderPhone, riderCount,
+                boardingTime, boardingCityId, boardingGetOnX, boardingGetOnY, boardingGetOffCityId, boardingGetOffX, boardingGetOffY, mainOrderNo,
+                status, startCityName, endCityName, bookingStartAddr, bookingEndAddr, carGroup, bookingStartShortAddr, bookingEndShortAddr));
         //根据上下车地址判断是否在城际列车配置的范围内
         //根据横纵坐标获取围栏，根据围栏获取路线
         String getOnId = "";
@@ -1097,7 +1095,7 @@ public class IntegerCityController {
         Date longTimeDate = new Date();
         if (StringUtils.isNotEmpty(boardingTime)) {
             longTimeDate = DateUtils.getDate(boardingTime, "yyyy-MM-dd HH:mm:ss");
-         }
+        }
 
 
         //获取预估价
@@ -1105,21 +1103,21 @@ public class IntegerCityController {
 
         //获取预估价
         String[] ruleStr = ruleId.split(",");
-        String[] supplierStr=supplierId.split(",");
+        String[] supplierStr = supplierId.split(",");
 
         //获取多条线路的
-        for(int i = 0;i<ruleStr.length;i++){
+        for (int i = 0; i < ruleStr.length; i++) {
             try {
                 elsRes = this.getOrderEstimatedAmount620(Long.valueOf(longTimeDate.getTime()), boardingCityId, 68, riderPhone,
                         ruleStr[i], customerId, boardingGetOffX, boardingGetOffY, riderCount, String.valueOf(carGroup), boardingGetOnX,
                         boardingGetOnY, isSameRider);
-                if(elsRes.getCode() == RestErrorCode.SUCCESS){
+                if (elsRes.getCode() == RestErrorCode.SUCCESS) {
                     JSONObject jsonEst = (JSONObject) elsRes.getData();
                     //获取预估金额
                     String estimatedAmount = jsonEst.getString("estimatedAmount");
                     //判断预估价是否大于0
                     BigDecimal bigDecimal = new BigDecimal(estimatedAmount);
-                    if(bigDecimal.compareTo(BigDecimal.ZERO) == 1){
+                    if (bigDecimal.compareTo(BigDecimal.ZERO) == 1) {
                         logger.info("=========获取到了合适的预估价==========");
                         ruleId = ruleStr[i]; //获取到预估价
                         supplierId = supplierStr[i];
@@ -1127,7 +1125,7 @@ public class IntegerCityController {
                     }
                 }
             } catch (Exception e) {
-                logger.error("获取预估价异常",e);
+                logger.error("获取预估价异常", e);
                 return AjaxResponse.fail(RestErrorCode.UNGET_PRICE);
             }
 
@@ -1148,7 +1146,7 @@ public class IntegerCityController {
         logger.info("获取到预估金额:" + estimatedAmount);
         //判断预估价是否大于0
         BigDecimal bigDecimal = new BigDecimal(estimatedAmount);
-        if(bigDecimal.compareTo(BigDecimal.ZERO) != 1){
+        if (bigDecimal.compareTo(BigDecimal.ZERO) != 1) {
             logger.info("获取到的预估金额为0");
             return AjaxResponse.fail(RestErrorCode.UN_SUPPORT_CAR);
         }
@@ -1338,21 +1336,21 @@ public class IntegerCityController {
                 //调用计费接口，防止修改时候座位数不同步导致的价格不一样
 
                 try {
-                    Map<String,Object> chargeMap = Maps.newHashMap();
-                    chargeMap.put("orderNo",orderNo);
-                    chargeMap.put("bookingUserId",customerId);
-                    chargeMap.put("cityId",boardingCityId); //
-                    chargeMap.put("bookingDate",boardingTime);
-                    chargeMap.put("bookingStartPoint",getOn); //
-                    chargeMap.put("bookingEndPoint",getOff);//
-                    chargeMap.put("serviceTypeId",68);//
-                    chargeMap.put("estimatedKey",estimatedKey);
-                    chargeMap.put("bookingGroupId",carGroup);//
-                    chargeMap.put("riderPhone",riderPhone);
-                    chargeMap.put("channelsNum","saas"); //saas标志
-                    chargeMap.put("bid",30);
+                    Map<String, Object> chargeMap = Maps.newHashMap();
+                    chargeMap.put("orderNo", orderNo);
+                    chargeMap.put("bookingUserId", customerId);
+                    chargeMap.put("cityId", boardingCityId); //
+                    chargeMap.put("bookingDate", boardingTime);
+                    chargeMap.put("bookingStartPoint", getOn); //
+                    chargeMap.put("bookingEndPoint", getOff);//
+                    chargeMap.put("serviceTypeId", 68);//
+                    chargeMap.put("estimatedKey", estimatedKey);
+                    chargeMap.put("bookingGroupId", carGroup);//
+                    chargeMap.put("riderPhone", riderPhone);
+                    chargeMap.put("channelsNum", "saas"); //saas标志
+                    chargeMap.put("bid", 30);
 
-                    String chargeResult = MpOkHttpUtil.okHttpPost(driverFeeServiceApiBaseUrl+"/scfl/updateEstimateInfo",chargeMap,0,null);
+                    String chargeResult = MpOkHttpUtil.okHttpPost(driverFeeServiceApiBaseUrl + "/scfl/updateEstimateInfo", chargeMap, 0, null);
                     logger.info("调用计费返回结果:" + chargeResult);
                 } catch (Exception e) {
                     logger.info("调用计费接口异常:" + e);
@@ -1452,7 +1450,7 @@ public class IntegerCityController {
                 JSONObject jsonResult = JSONObject.parseObject(result);
                 if (jsonResult != null && jsonResult.get("code") != null && jsonResult.getInteger("code") == 0) {
                     logger.info("取消订单成功");
-                    return  AjaxResponse.success(null);
+                    return AjaxResponse.success(null);
                 }
             }
         } catch (Exception e) {
@@ -1460,7 +1458,6 @@ public class IntegerCityController {
             return AjaxResponse.fail(RestErrorCode.CANCEL_FAILED);
 
         }
-
 
 
         return AjaxResponse.fail(RestErrorCode.CANCEL_FAILED);
@@ -1483,8 +1480,8 @@ public class IntegerCityController {
                                     String driverName,
                                     String driverPhone,
                                     String license,
-                                    @RequestParam(value = "pageNum", defaultValue = "1")Integer pageNum,
-                                    @RequestParam(value = "pageSize", defaultValue = "10")Integer pageSize) {
+                                    @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
+                                    @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
 
         logger.info(MessageFormat.format("查询城际拼车司机入参：supplierId:{0},driverName:{1},driverPhpne:{2},license:{3}", supplierId,
                 driverName, driverPhone, license));
@@ -1506,7 +1503,7 @@ public class IntegerCityController {
             supplierIds = loginUser.getSupplierIds();
         }
 
-        Page page = PageHelper.startPage(pageNum,pageSize);
+        Page page = PageHelper.startPage(pageNum, pageSize);
         List<MainOrderDetailDTO> interCityList = infoInterCityExMapper.queryDriver(cityId, supplierId, driverName, driverPhone, license, cityIds, supplierIds);
 
         for (MainOrderDetailDTO detailDTO : interCityList) {
@@ -1524,8 +1521,8 @@ public class IntegerCityController {
                         Integer passengerNums = jsonData.getInteger("passengerNums");
                         //Integer groupId = jsonData.getInteger("groupId");
                         //根据司机driverId获取最新的车型以及座位数
-                        Integer groupId =  carBizCarInfoExMapper.groupIdByDriverId(detailDTO.getDriverId());
-                        if(groupId == 0){
+                        Integer groupId = carBizCarInfoExMapper.groupIdByDriverId(detailDTO.getDriverId());
+                        if (groupId == 0) {
                             groupId = jsonData.getInteger("groupId");//防止车管groupId为0的情况
                         }
                         Integer maxSeat = seatCount(groupId);
@@ -1538,15 +1535,15 @@ public class IntegerCityController {
                     }
                 }
             } else {
-                Integer groupId =  carBizCarInfoExMapper.groupIdByDriverId(detailDTO.getDriverId());
-                if(groupId == 0){
+                Integer groupId = carBizCarInfoExMapper.groupIdByDriverId(detailDTO.getDriverId());
+                if (groupId == 0) {
                     groupId = 41;//防止车管groupId为0的情况
                 }
                 detailDTO.setRemainSeats(seatCount(groupId));
             }
         }
         int total = (int) page.getTotal();
-        PageDTO pageDTO = new PageDTO(pageNum,pageSize,total,interCityList);
+        PageDTO pageDTO = new PageDTO(pageNum, pageSize, total, interCityList);
 
         return AjaxResponse.success(pageDTO);
     }
@@ -1632,13 +1629,13 @@ public class IntegerCityController {
 
         //根据driverId获取groupId
         Integer newGroupId = carBizCarInfoExMapper.groupIdByDriverId(driverId);
-        if(newGroupId != null && newGroupId>0){
+        if (newGroupId != null && newGroupId > 0) {
             map.put("carGroupId", newGroupId);
             listParam.add("carGroupId=" + newGroupId);
             int carSeatNums = seatCount(Integer.valueOf(newGroupId));
             map.put("carSeatNums", carSeatNums);
             listParam.add("carSeatNums=" + carSeatNums);
-        }else {
+        } else {
             logger.info("==========获取司机座位数为空========= 使用用户选择的车型");
             map.put("carGroupId", groupId);
             listParam.add("carGroupId=" + groupId);
@@ -1698,7 +1695,7 @@ public class IntegerCityController {
                                 logger.info("========查询结果=======" + JSONObject.toJSONString(queryMain));
                                 int code = 0;
                                 if (queryMain != null && queryMain.getId() > 0) {
-                                    code = interService.updateMainOrderState(newMainOrderNo, 1,mobile);
+                                    code = interService.updateMainOrderState(newMainOrderNo, 1, mobile);
                                 } else {
                                     MainOrderInterCity main = new MainOrderInterCity();
                                     main.setDriverId(driverId);
@@ -1723,10 +1720,10 @@ public class IntegerCityController {
                             MainOrderInterCity queryMain = interService.queryMainOrder(newMainOrderNo);
                             logger.info("补录子单绑定开始====" + JSONObject.toJSONString(queryMain));
                             if (queryMain != null && queryMain.getId() > 0) {
-                               int code =  interService.updateMainOrderState(newMainOrderNo, 1,mobile);
-                               if(code > 0){
-                                   logger.info("=====补录异常成功=====");
-                               }
+                                int code = interService.updateMainOrderState(newMainOrderNo, 1, mobile);
+                                if (code > 0) {
+                                    logger.info("=====补录异常成功=====");
+                                }
                             }
                         }
                         return "=============子单绑定异常==========";
@@ -1736,24 +1733,21 @@ public class IntegerCityController {
                 return AjaxResponse.success(null);
 
 
-            }else {
+            } else {
                 logger.info("子单指派主单返回信息========" + jsonResult.toString());
-                return AjaxResponse.failMsg(jsonResult.getIntValue("code"),jsonResult.getString("msg"));
+                return AjaxResponse.failMsg(jsonResult.getIntValue("code"), jsonResult.getString("msg"));
             }
 
         } else {
             return AjaxResponse.fail(RestErrorCode.FAILED_GET_MAIN_ORDER);
         }
-        
+
     }
-
-
-
-
 
 
     /**
      * 改派
+     *
      * @param mainOrderNo
      * @param orderNo
      * @param driverId
@@ -1764,55 +1758,55 @@ public class IntegerCityController {
      */
     @RequestMapping("/updateOtherMainOrder")
     @ResponseBody
-    public AjaxResponse updateOtherMainOrder( String mainOrderNo,
-                                              @Verify(param = "orderNo",rule = "required")  String orderNo,
-                                              @Verify(param = "driverId",rule = "required")   Integer driverId,
-                                              @Verify(param = "driverPhone",rule = "required") String driverPhone,
-                                              @Verify(param = "licensePlates",rule = "required")  String licensePlates,
-                                              @Verify(param = "cityId",rule = "required") Integer cityId,
-                                              @Verify(param = "groupId",rule = "required") String groupId,
-                                              String crossCityStartTime,
-                                              String routeName){
+    public AjaxResponse updateOtherMainOrder(String mainOrderNo,
+                                             @Verify(param = "orderNo", rule = "required") String orderNo,
+                                             @Verify(param = "driverId", rule = "required") Integer driverId,
+                                             @Verify(param = "driverPhone", rule = "required") String driverPhone,
+                                             @Verify(param = "licensePlates", rule = "required") String licensePlates,
+                                             @Verify(param = "cityId", rule = "required") Integer cityId,
+                                             @Verify(param = "groupId", rule = "required") String groupId,
+                                             String crossCityStartTime,
+                                             String routeName) {
         //派单
         logger.info(MessageFormat.format("改派入参：mainOrderNo:{0},orderNo:{1},driverId:{2},driverPhone:{3},licensePlates{4},cityId{5}" +
-                ",groupId:{6},crossCityStartTime:{7},routeName:{8}",mainOrderNo,orderNo,driverId,driverPhone,licensePlates,cityId,groupId,crossCityStartTime,
+                        ",groupId:{6},crossCityStartTime:{7},routeName:{8}", mainOrderNo, orderNo, driverId, driverPhone, licensePlates, cityId, groupId, crossCityStartTime,
                 routeName));
 
         /**todo 如果乘客指派成功后，又去给这个司机创建主单，需要给这个司机重新创建主单并记录起来**/
         try {
-            if(StringUtils.isNotEmpty(mainOrderNo)){
+            if (StringUtils.isNotEmpty(mainOrderNo)) {
                 //当前子单的主单号
                 String curMainOrderNo = carFactOrderInfoService.getMainOrderBySubOrderNo(orderNo);
-                if(mainOrderNo.equals(curMainOrderNo)){
+                if (mainOrderNo.equals(curMainOrderNo)) {
                     curMainOrderNo = null;
                 }
             }
 
-            Map<String,Object> map = Maps.newHashMap();
+            Map<String, Object> map = Maps.newHashMap();
             List<String> listParam = new ArrayList<>();
-            map.put("businessId",Common.BUSSINESSID);
-            listParam.add("businessId="+ Common.BUSSINESSID);
-            if(StringUtils.isNotEmpty(mainOrderNo)){
-                map.put("mainOrderNo",mainOrderNo);
-                listParam.add("mainOrderNo="+mainOrderNo);
+            map.put("businessId", Common.BUSSINESSID);
+            listParam.add("businessId=" + Common.BUSSINESSID);
+            if (StringUtils.isNotEmpty(mainOrderNo)) {
+                map.put("mainOrderNo", mainOrderNo);
+                listParam.add("mainOrderNo=" + mainOrderNo);
             }
-            map.put("orderNo",orderNo);
-            listParam.add("orderNo="+orderNo);
-            map.put("driverId",driverId);
-            listParam.add("driverId="+driverId);
-            map.put("licensePlates",licensePlates);
-            listParam.add("licensePlates="+licensePlates);
+            map.put("orderNo", orderNo);
+            listParam.add("orderNo=" + orderNo);
+            map.put("driverId", driverId);
+            listParam.add("driverId=" + driverId);
+            map.put("licensePlates", licensePlates);
+            listParam.add("licensePlates=" + licensePlates);
 
 
             //根据driverId获取groupId
             Integer newGroupId = carBizCarInfoExMapper.groupIdByDriverId(driverId);
-            if(newGroupId != null && newGroupId>0){
+            if (newGroupId != null && newGroupId > 0) {
                 map.put("groupId", newGroupId);
                 listParam.add("groupId=" + newGroupId);
                 int carSeatNums = seatCount(Integer.valueOf(newGroupId));
                 map.put("carSeatNums", carSeatNums);
                 listParam.add("carSeatNums=" + carSeatNums);
-            }else {
+            } else {
                 logger.info("==========获取司机座位数为空========= 使用用户选择的车型");
                 map.put("groupId", groupId);
                 listParam.add("groupId=" + groupId);
@@ -1821,51 +1815,50 @@ public class IntegerCityController {
                 listParam.add("carSeatNums=" + carSeatNums);
             }
 
-            map.put("cityId",cityId);
-            listParam.add("cityId="+cityId);
-            if(StringUtils.isNotEmpty(routeName)){
-                map.put("routeName",routeName);
-                listParam.add("routeName="+routeName);
+            map.put("cityId", cityId);
+            listParam.add("cityId=" + cityId);
+            if (StringUtils.isNotEmpty(routeName)) {
+                map.put("routeName", routeName);
+                listParam.add("routeName=" + routeName);
 
             }
 
-            if(StringUtils.isNotEmpty(driverPhone)){
-                map.put("driverPhone",driverPhone);
-                listParam.add("driverPhone="+driverPhone);
+            if (StringUtils.isNotEmpty(driverPhone)) {
+                map.put("driverPhone", driverPhone);
+                listParam.add("driverPhone=" + driverPhone);
             }
-
 
 
             //添加调度员手机号
-            if(WebSessionUtil.getCurrentLoginUser().getMobile() != null){
-                map.put("dispatcherPhone",WebSessionUtil.getCurrentLoginUser().getMobile());
-                listParam.add("dispatcherPhone="+WebSessionUtil.getCurrentLoginUser().getMobile());
+            if (WebSessionUtil.getCurrentLoginUser().getMobile() != null) {
+                map.put("dispatcherPhone", WebSessionUtil.getCurrentLoginUser().getMobile());
+                listParam.add("dispatcherPhone=" + WebSessionUtil.getCurrentLoginUser().getMobile());
             }
 
 
             Collections.sort(listParam);
-            listParam.add("key="+Common.MAIN_ORDER_KEY);
+            listParam.add("key=" + Common.MAIN_ORDER_KEY);
 
 
             StringBuilder sbSort = new StringBuilder();
-            for(String str : listParam){
+            for (String str : listParam) {
                 sbSort.append(str).append("&");
             }
 
-            String md5Before = sbSort.toString().substring(0,sbSort.toString().length()-1);
+            String md5Before = sbSort.toString().substring(0, sbSort.toString().length() - 1);
             String sign = Base64.encodeBase64String(DigestUtils.md5(md5Before));
-            map.put("sign",sign);
+            map.put("sign", sign);
 
 
             String url = "/order/carpool/crossCityOrderReassign";
             System.out.println(url);
 
 
-            String result = carRestTemplate.postForObject(url,JSONObject.class,map);
+            String result = carRestTemplate.postForObject(url, JSONObject.class, map);
             logger.info("改派结果result:" + result);
-            if(StringUtils.isNotBlank(result)){
+            if (StringUtils.isNotBlank(result)) {
                 JSONObject jsonResult = JSONObject.parseObject(result);
-                if(jsonResult.get("code") != null && jsonResult.getInteger("code") == 0){
+                if (jsonResult.get("code") != null && jsonResult.getInteger("code") == 0) {
                     logger.info("改派成功");
                     String mobile = WebSessionUtil.getCurrentLoginUser().getMobile();
                     ExecutorService executor = Executors.newCachedThreadPool();
@@ -1879,10 +1872,10 @@ public class IntegerCityController {
                                 JSONObject jsonData = jsonResult.getJSONObject("data");
                                 String newMainOrderNo = jsonData.getString("mainOrderNo");
 
-                                MainOrderInterCity queryMainOrder  = interService.queryMainOrder(newMainOrderNo);
+                                MainOrderInterCity queryMainOrder = interService.queryMainOrder(newMainOrderNo);
 
-                                if(queryMainOrder == null || queryMainOrder.getId() == 0){
-                                    int code =0;
+                                if (queryMainOrder == null || queryMainOrder.getId() == 0) {
+                                    int code = 0;
                                     MainOrderInterCity main = new MainOrderInterCity();
                                     main.setDriverId(driverId);
                                     main.setCreateTime(new Date());
@@ -1895,51 +1888,51 @@ public class IntegerCityController {
                                     logger.info("=====改派入库数据：" + JSONObject.toJSONString(main));
                                     code = interService.addMainOrderNo(main);
                                     logger.info("=====改派后入库code:" + code);
-                                    if(code > 0){
+                                    if (code > 0) {
                                         logger.info("=============异步插入数据成功=========");
                                         return String.valueOf(code);
                                     }
-                                }else {
+                                } else {
                                     logger.info("=========更新数据=======" + JSONObject.toJSONString(queryMainOrder));
-                                    if(queryMainOrder != null && queryMainOrder.getId()>0){
-                                        int code = interService.updateMainOrderState(newMainOrderNo,1,mobile);
-                                        if(code > 0){
+                                    if (queryMainOrder != null && queryMainOrder.getId() > 0) {
+                                        int code = interService.updateMainOrderState(newMainOrderNo, 1, mobile);
+                                        if (code > 0) {
                                             logger.info("=============异步更新数据成功=========");
                                             return String.valueOf(code);
                                         }
                                     }
                                 }
                             } catch (Exception e) {
-                                System.out.println("更新数据异常：补录更新数据" );
+                                System.out.println("更新数据异常：补录更新数据");
 
                                 JSONObject jsonData = jsonResult.getJSONObject("data");
                                 String newMainOrderNo = jsonData.getString("mainOrderNo");
 
-                                MainOrderInterCity queryMainOrder  = interService.queryMainOrder(newMainOrderNo);
+                                MainOrderInterCity queryMainOrder = interService.queryMainOrder(newMainOrderNo);
 
-                                if(queryMainOrder != null && queryMainOrder.getId()>0){
-                                    int code = interService.updateMainOrderState(newMainOrderNo,1,mobile);
-                                    if(code > 0){
+                                if (queryMainOrder != null && queryMainOrder.getId() > 0) {
+                                    int code = interService.updateMainOrderState(newMainOrderNo, 1, mobile);
+                                    if (code > 0) {
                                         logger.info("=============异步更新数据成功=========");
                                         return String.valueOf(code);
                                     }
                                 }
 
                                 return "=============子单绑定异常==========" + e;
-                             }
-                             return "=============改派结束==========";
+                            }
+                            return "=============改派结束==========";
                         }
                     });
 
 
                     return AjaxResponse.success(null);
-                }else {
+                } else {
                     logger.info("改派未成功");
                     return AjaxResponse.fail(RestErrorCode.CHANGE_MAIN_FAILED);
                 }
             }
         } catch (Exception e) {
-            logger.error("派单异常"+e);
+            logger.error("派单异常" + e);
             return AjaxResponse.fail(RestErrorCode.CHANGE_MAIN_FAILED);
         }
 
@@ -1947,26 +1940,24 @@ public class IntegerCityController {
     }
 
 
-
-
     //根据车辆类型获取座位数
-    private int seatCount(Integer groupId){
+    private int seatCount(Integer groupId) {
         int seatNum = 0;
         try {
             seatNum = carBizCarGroupExMapper.getSeatNumByGroupId(groupId);
         } catch (NumberFormatException e) {
-            logger.error("获取座位号失败"+e);
+            logger.error("获取座位号失败" + e);
         }
         return seatNum;
     }
 
-    private List<String> list(String str){
-        if(StringUtils.isEmpty(str)){
+    private List<String> list(String str) {
+        if (StringUtils.isEmpty(str)) {
             return null;
         }
         List<String> strList = new ArrayList<>();
         String[] strArr = str.split("&");
-        for(int i = 0;i<strArr.length;i++){
+        for (int i = 0; i < strArr.length; i++) {
             strList.add(strArr[i]);
         }
         return strList;
@@ -1975,19 +1966,20 @@ public class IntegerCityController {
 
     /**
      * 搜索接口
-     * @param type 0(周边搜索) 2(精确查找）
+     *
+     * @param type     0(周边搜索) 2(精确查找）
      * @param platform H5 3
      * @param cityName 城市简称
-     * @param cityId 城市id
+     * @param cityId   城市id
      * @return
      */
     @ResponseBody
     @RequestMapping("/inputtips")
-    public AjaxResponse inputtips(@Verify(param = "type",rule = "required")String type,
-                                  @Verify(param = "platform",rule = "required")String platform,
-                                  @Verify(param = "cityName",rule = "required")String cityName,
-                                  @Verify(param = "cityId",rule = "required")String cityId,
-                                  @Verify(param = "channel",rule = "required")String channel,
+    public AjaxResponse inputtips(@Verify(param = "type", rule = "required") String type,
+                                  @Verify(param = "platform", rule = "required") String platform,
+                                  @Verify(param = "cityName", rule = "required") String cityName,
+                                  @Verify(param = "cityId", rule = "required") String cityId,
+                                  @Verify(param = "channel", rule = "required") String channel,
                                   String inCoordType,
                                   String cityLimit,
                                   String userId,
@@ -1997,61 +1989,61 @@ public class IntegerCityController {
                                   String lang,
                                   String version,
                                   String redPacket,
-                                  String keywords){
+                                  String keywords) {
         logger.info("精确查询");
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-        Map<String,Object> map = Maps.newHashMap();
-        map.put("type",type);
-        map.put("platform",platform);
-        map.put("channel",channel);
-        map.put("sessionId",loginUser.getId()+"_" +System.currentTimeMillis());
-        map.put("cityName",cityName);
-        map.put("cityId",cityId);
-        if(StringUtils.isNotEmpty(inCoordType)){
-            map.put("inCoordType",inCoordType);
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("type", type);
+        map.put("platform", platform);
+        map.put("channel", channel);
+        map.put("sessionId", loginUser.getId() + "_" + System.currentTimeMillis());
+        map.put("cityName", cityName);
+        map.put("cityId", cityId);
+        if (StringUtils.isNotEmpty(inCoordType)) {
+            map.put("inCoordType", inCoordType);
         }
-        if(StringUtils.isNotEmpty(cityLimit)){
-            map.put("cityLimit",cityLimit);
+        if (StringUtils.isNotEmpty(cityLimit)) {
+            map.put("cityLimit", cityLimit);
         }
-        if(StringUtils.isNotEmpty(userId)){
-            map.put("userId",userId);
+        if (StringUtils.isNotEmpty(userId)) {
+            map.put("userId", userId);
         }
-        if(StringUtils.isNotEmpty(mobile)){
-            map.put("mobile",mobile);
+        if (StringUtils.isNotEmpty(mobile)) {
+            map.put("mobile", mobile);
         }
-        if(soType != null){
-            map.put("soType",soType);
+        if (soType != null) {
+            map.put("soType", soType);
         }
-        if(serviceType != null){
-            map.put("serviceType",serviceType);
+        if (serviceType != null) {
+            map.put("serviceType", serviceType);
         }
-        if(StringUtils.isNotEmpty(lang)){
-            map.put("lang",lang);
+        if (StringUtils.isNotEmpty(lang)) {
+            map.put("lang", lang);
         }
-        if(StringUtils.isNotEmpty(version)){
-            map.put("version",version);
+        if (StringUtils.isNotEmpty(version)) {
+            map.put("version", version);
         }
-        if(StringUtils.isNotEmpty(redPacket)){
-            map.put("redPacket",redPacket);
+        if (StringUtils.isNotEmpty(redPacket)) {
+            map.put("redPacket", redPacket);
         }
-        if(StringUtils.isNotEmpty(keywords)){
-            map.put("keywords",keywords);
+        if (StringUtils.isNotEmpty(keywords)) {
+            map.put("keywords", keywords);
         }
 
-        if(type!= null && ("1".equals(type) || "2".equals(type))){
-            if(StringUtils.isEmpty(keywords)){
+        if (type != null && ("1".equals(type) || "2".equals(type))) {
+            if (StringUtils.isEmpty(keywords)) {
                 return AjaxResponse.fail(RestErrorCode.KEYWORDS_IS_NOT_NULL);
             }
         }
-        String url = searchUrl+"/assistant/inputtips";
+        String url = searchUrl + "/assistant/inputtips";
 
-        String result = MpOkHttpUtil.okHttpGet(url,map,0,null);
-        if(StringUtils.isNotEmpty(result)){
+        String result = MpOkHttpUtil.okHttpGet(url, map, 0, null);
+        if (StringUtils.isNotEmpty(result)) {
             JSONObject jsonResult = JSONObject.parseObject(result);
-            if(jsonResult.get("code") != null && jsonResult.getInteger("code")==0){
+            if (jsonResult.get("code") != null && jsonResult.getInteger("code") == 0) {
                 return AjaxResponse.success(jsonResult.get("data"));
-            }else {
-                return AjaxResponse.failMsg(jsonResult.getIntValue("code"),jsonResult.getString("msg"));
+            } else {
+                return AjaxResponse.failMsg(jsonResult.getIntValue("code"), jsonResult.getString("msg"));
             }
         }
         return AjaxResponse.success(null);
@@ -2060,29 +2052,30 @@ public class IntegerCityController {
 
     /**
      * 调用lbs地图接口 wiki http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=328062
+     *
      * @param lng
      * @param lat
      * @param platform
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = "/regeo",method = RequestMethod.GET)
+    @RequestMapping(value = "/regeo", method = RequestMethod.GET)
     public AjaxResponse regeo(String lng,
                               String lat,
-                              String platform){
+                              String platform) {
         logger.info("查询逆地理编码");
-        Map<String,Object> map = Maps.newHashMap();
-        map.put("lng",lng);
-        map.put("lat",lat);
-        map.put("platform",platform);
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("lng", lng);
+        map.put("lat", lat);
+        map.put("platform", platform);
         String url = searchUrl + "/geocode/regeo";
-        String result = MpOkHttpUtil.okHttpGet(url,map,0,null);
-        if(StringUtils.isNotEmpty(result)){
+        String result = MpOkHttpUtil.okHttpGet(url, map, 0, null);
+        if (StringUtils.isNotEmpty(result)) {
             JSONObject jsonResult = JSONObject.parseObject(result);
-            if(jsonResult.get("code") != null && jsonResult.getInteger("code")==0){
+            if (jsonResult.get("code") != null && jsonResult.getInteger("code") == 0) {
                 return AjaxResponse.success(jsonResult.get("data"));
-            }else {
-                return AjaxResponse.failMsg(jsonResult.getIntValue("code"),jsonResult.getString("msg"));
+            } else {
+                return AjaxResponse.failMsg(jsonResult.getIntValue("code"), jsonResult.getString("msg"));
             }
         }
         return AjaxResponse.success(null);
@@ -2091,133 +2084,136 @@ public class IntegerCityController {
 
     /**
      * 判断上车点 是否在围栏区域 wiki:http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=11178396
+     *
      * @param boardingCityId
      * @param boardingGetOnX
      * @param boardingGetOnY
      * @return
      */
-    private AjaxResponse hasBoardRoutRights(Integer boardingCityId,String boardingGetOnX,String boardingGetOnY){
+    private AjaxResponse hasBoardRoutRights(Integer boardingCityId, String boardingGetOnX, String boardingGetOnY) {
         //根据横纵坐标获取围栏，根据围栏获取路线
-        Map<String,Object> mapX = Maps.newHashMap();
-        mapX.put("token",lbsToken);
+        Map<String, Object> mapX = Maps.newHashMap();
+        mapX.put("token", lbsToken);
         JSONArray array = new JSONArray();
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("cityId",boardingCityId);
-        jsonObject.put("x",boardingGetOnX);
-        jsonObject.put("y",boardingGetOnY);
+        jsonObject.put("cityId", boardingCityId);
+        jsonObject.put("x", boardingGetOnX);
+        jsonObject.put("y", boardingGetOnY);
         array.add(jsonObject);
-        mapX.put("coordinateList",array.toString());
-        String lbsSign = LbsSignUtil.sign(mapX,lbsToken);
-        mapX.put("sign",lbsSign);
-        String lbsResult = MpOkHttpUtil.okHttpPost(lbsUrl + "/area/getAreaByCoordinate",mapX,0,null);
+        mapX.put("coordinateList", array.toString());
+        String lbsSign = LbsSignUtil.sign(mapX, lbsToken);
+        mapX.put("sign", lbsSign);
+        String lbsResult = MpOkHttpUtil.okHttpPost(lbsUrl + "/area/getAreaByCoordinate", mapX, 0, null);
         String getOnId = "";
-        if(StringUtils.isNotEmpty(lbsResult)){
+        if (StringUtils.isNotEmpty(lbsResult)) {
             JSONObject jsonResult = JSONObject.parseObject(lbsResult);
-            if(jsonResult.get("code") == null || jsonResult.getInteger("code") != 0 ||
+            if (jsonResult.get("code") == null || jsonResult.getInteger("code") != 0 ||
                     jsonResult.get("data") == null) {
                 logger.info("获取上车点失败");
                 return AjaxResponse.fail(RestErrorCode.ADD_NOT_RIGHT);
             }
 
             JSONArray arrayData = jsonResult.getJSONArray("data");
-            if(arrayData == null){
+            if (arrayData == null) {
                 logger.info("获取上车区域失败");
                 return AjaxResponse.fail(RestErrorCode.ADD_NOT_RIGHT);
             }
 
-            for(int i  =0;i<arrayData.size();i++){
+            for (int i = 0; i < arrayData.size(); i++) {
                 JSONObject lbsRes = arrayData.getJSONObject(i);
-                if(lbsRes.get("areaId") != null){
+                if (lbsRes.get("areaId") != null) {
                     getOnId += lbsRes.getString("areaId") + SPLIT;
                 }
 
             }
         }
 
-        if(StringUtils.isEmpty(getOnId)){
+        if (StringUtils.isEmpty(getOnId)) {
             logger.info("上下车点不再围栏区域");
             return AjaxResponse.fail(RestErrorCode.ADD_NOT_RIGHT);
         }
 
-        return AjaxResponse.success(getOnId.substring(0,getOnId.length()-1));
+        return AjaxResponse.success(getOnId.substring(0, getOnId.length() - 1));
     }
 
 
     /**
      * 判断下车点是否在围栏区域 wiki:http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=11178396
+     *
      * @param boardingGetOffCityId
      * @param boardingGetOffX
      * @param boardingGetOffY
      * @return
      */
-    private AjaxResponse hasBoardOffRoutRights(Integer boardingGetOffCityId,String boardingGetOffX,String boardingGetOffY){
-        Map<String,Object> mapY = Maps.newHashMap();
+    private AjaxResponse hasBoardOffRoutRights(Integer boardingGetOffCityId, String boardingGetOffX, String boardingGetOffY) {
+        Map<String, Object> mapY = Maps.newHashMap();
 
-        mapY.put("token",lbsToken);
+        mapY.put("token", lbsToken);
         JSONArray arrayY = new JSONArray();
         JSONObject jsonY = new JSONObject();
-        jsonY.put("cityId",boardingGetOffCityId);
-        jsonY.put("x",boardingGetOffX);
-        jsonY.put("y",boardingGetOffY);
+        jsonY.put("cityId", boardingGetOffCityId);
+        jsonY.put("x", boardingGetOffX);
+        jsonY.put("y", boardingGetOffY);
         arrayY.add(jsonY);
-        mapY.put("coordinateList",arrayY.toString());
-        String lbsSignY = LbsSignUtil.sign(mapY,lbsToken);
-        mapY.put("sign",lbsSignY);
+        mapY.put("coordinateList", arrayY.toString());
+        String lbsSignY = LbsSignUtil.sign(mapY, lbsToken);
+        mapY.put("sign", lbsSignY);
 
-        String resultY = MpOkHttpUtil.okHttpGet(lbsUrl+"/area/getAreaByCoordinate",mapY,0,null);
+        String resultY = MpOkHttpUtil.okHttpGet(lbsUrl + "/area/getAreaByCoordinate", mapY, 0, null);
 
         String getOffId = "";
 
-        if(resultY != null ){
+        if (resultY != null) {
             JSONObject jsonResultY = JSONObject.parseObject(resultY);
-            if(jsonResultY.get("code") == null || jsonResultY.getInteger("code") != 0 ||
-                    jsonResultY.get("data") == null){
+            if (jsonResultY.get("code") == null || jsonResultY.getInteger("code") != 0 ||
+                    jsonResultY.get("data") == null) {
                 logger.info("获取下车点失败");
                 return AjaxResponse.fail(RestErrorCode.ADD_NOT_RIGHT);
             }
 
             JSONArray jsonArray = jsonResultY.getJSONArray("data");
-            if(jsonArray.size() == 0){
+            if (jsonArray.size() == 0) {
                 logger.info("获取下车点失败");
                 return AjaxResponse.fail(RestErrorCode.ADD_NOT_RIGHT);
             }
 
 
-            for(int i  =0;i<jsonArray.size();i++){
+            for (int i = 0; i < jsonArray.size(); i++) {
                 JSONObject lbsRes = jsonArray.getJSONObject(i);
-                if(lbsRes.get("areaId") != null){
+                if (lbsRes.get("areaId") != null) {
                     getOffId += lbsRes.getString("areaId") + SPLIT;
                 }
             }
         }
 
-        if(StringUtils.isEmpty(getOffId)){
+        if (StringUtils.isEmpty(getOffId)) {
             logger.info("上下车点不再围栏区域");
             return AjaxResponse.fail(RestErrorCode.ADD_NOT_RIGHT);
         }
-        return AjaxResponse.success(getOffId.substring(0,getOffId.length()-1));
+        return AjaxResponse.success(getOffId.substring(0, getOffId.length() - 1));
     }
 
 
     /**
      * 任意一条路线匹配就行
+     *
      * @param getOnIds
      * @param getOffIds
      * @return
      */
-    private AjaxResponse  anyRoute(String getOnIds,String getOffIds){
+    private AjaxResponse anyRoute(String getOnIds, String getOffIds) {
         StringBuilder builderLines = new StringBuilder();
         StringBuilder builderSupplierId = new StringBuilder();
         int count = 0;
         String[] getOnId = getOnIds.split(SPLIT);
         String[] getOffId = getOffIds.split(SPLIT);
-        for(int i = 0;i<getOnId.length;i++){
-            for(int j = 0;j<getOffId.length;j++){
-                count ++;
-                AjaxResponse response =  hasRoute(getOnId[i],getOffId[j]);
-                if(response.getCode() == 0){
-                    logger.info("匹配线路成功：线路上车围栏id:" + getOnId[i]+",下车围栏id："+getOffId[j]+",查询次数：" + count
-                    +",返回结果:" + JSONObject.toJSONString(response.getData()));
+        for (int i = 0; i < getOnId.length; i++) {
+            for (int j = 0; j < getOffId.length; j++) {
+                count++;
+                AjaxResponse response = hasRoute(getOnId[i], getOffId[j]);
+                if (response.getCode() == 0) {
+                    logger.info("匹配线路成功：线路上车围栏id:" + getOnId[i] + ",下车围栏id：" + getOffId[j] + ",查询次数：" + count
+                            + ",返回结果:" + JSONObject.toJSONString(response.getData()));
                     JSONObject jsonRes = (JSONObject) response.getData();
                     builderLines.append(jsonRes.getString("lineId")).append(",");
                     builderSupplierId.append(jsonRes.getString("supplierId")).append(",");
@@ -2225,13 +2221,13 @@ public class IntegerCityController {
                 }
             }
         }
-        if(StringUtils.isEmpty(builderLines.toString())){
+        if (StringUtils.isEmpty(builderLines.toString())) {
             logger.info("未查询到匹配的线路,查询次数:" + count);
             return AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
-        }else {
+        } else {
             JSONObject jsonRoute = new JSONObject();
-            jsonRoute.put("lineId",builderLines.toString().substring(0,builderLines.toString().length()-1));
-            jsonRoute.put("supplierId",builderSupplierId.toString().substring(0,builderSupplierId.toString().length()-1));
+            jsonRoute.put("lineId", builderLines.toString().substring(0, builderLines.toString().length() - 1));
+            jsonRoute.put("supplierId", builderSupplierId.toString().substring(0, builderSupplierId.toString().length() - 1));
             return AjaxResponse.success(jsonRoute);
         }
 
@@ -2239,69 +2235,70 @@ public class IntegerCityController {
 
     /**
      * 是否有配置的线路 http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=40172935
+     *
      * @param getOnId
      * @param getOffId
      * @return
      */
-    private AjaxResponse hasRoute(String getOnId,String getOffId){
+    private AjaxResponse hasRoute(String getOnId, String getOffId) {
         JSONObject jsonRoute = new JSONObject();
         try {
             Integer areaStartRangId = Integer.valueOf(getOnId);
             Integer areaEndRangId = Integer.valueOf(getOffId);
-            String areaUrl = configUrl + "/intercityCarUse/getLineSupplier?areaStartRangeId="+areaStartRangId+"&areaEndRangeId="+areaEndRangId;
+            String areaUrl = configUrl + "/intercityCarUse/getLineSupplier?areaStartRangeId=" + areaStartRangId + "&areaEndRangeId=" + areaEndRangId;
 
-            String areaResult = MpOkHttpUtil.okHttpGet(areaUrl,null,0,null);
-            if(StringUtils.isNotEmpty(areaResult)){
+            String areaResult = MpOkHttpUtil.okHttpGet(areaUrl, null, 0, null);
+            if (StringUtils.isNotEmpty(areaResult)) {
                 JSONObject jsonResult = JSONObject.parseObject(areaResult);
-                if(jsonResult.get("data") != null && jsonResult.get("data") != ""){
+                if (jsonResult.get("data") != null && jsonResult.get("data") != "") {
                     //添加权限验证 管理员直接过去
                     SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
                     Set<Integer> cities = loginUser.getCityIds();
                     Set<Integer> suppliers = loginUser.getSupplierIds();
                     JSONObject jsonData = jsonResult.getJSONObject("data");
-                    if (jsonData.getString("supplierId")==null) {
-                    	 logger.info("对应坐标没有线路");
-                         return  AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
-					}
+                    if (jsonData.getString("supplierId") == null) {
+                        logger.info("对应坐标没有线路");
+                        return AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
+                    }
                     String supp = jsonData.getString("supplierId");
                     String[] inteSupp = supp.split(",");
 
                     LinkedList<Integer> linkedList = new LinkedList<>();
-                    for(int i = 0;i<inteSupp.length;i++){
+                    for (int i = 0; i < inteSupp.length; i++) {
                         linkedList.add(Integer.valueOf(inteSupp[i]));
                     }
                     boolean bl = false;
-                    if(suppliers.size()>0){
+                    if (suppliers.size() > 0) {
                         HashSet<Integer> hashSet = new HashSet<>(suppliers);
-                        if(jsonData.get("supplierId") != null ){
+                        if (jsonData.get("supplierId") != null) {
                             Iterator<Integer> iterator = linkedList.iterator();
-                            while (iterator.hasNext()){
-                            	Integer supplierId = iterator.next();
-                                if(hashSet.contains(supplierId)){
+                            while (iterator.hasNext()) {
+                                Integer supplierId = iterator.next();
+                                if (hashSet.contains(supplierId)) {
                                     logger.info("包含有路线");
-                                    jsonRoute.put("lineId",jsonData.getIntValue("lineId"));
-                                    jsonRoute.put("lineName",jsonData.getString("lineName"));
-                                    jsonRoute.put("supplierId",supplierId);
+                                    jsonRoute.put("lineId", jsonData.getIntValue("lineId"));
+                                    jsonRoute.put("lineName", jsonData.getString("lineName"));
+                                    jsonRoute.put("supplierId", supplierId);
                                     bl = true;
                                     break;
                                 }
                             }
                         }
 
-                        if(!bl){
-                            return  AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
+                        if (!bl) {
+                            return AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
                         }
-                    }else if(cities.size()>0){//如果是城市级别的
-                    	
-                    	List<CarBizSupplier> carBizSuppliers=citySupplierTeamCommonService.querySupplierAllList(cities);
-                    	List<Integer> supplierIds= carBizSuppliers.stream().map(f -> f.getSupplierId()).collect(Collectors.toList());
-                    	supplierIds.retainAll(linkedList);
-                    	if (supplierIds.size()>0) {
-                    		jsonRoute.put("lineId",jsonData.getIntValue("lineId"));
-                            jsonRoute.put("lineName",jsonData.getString("lineName"));
-                            jsonRoute.put("supplierId",supplierIds.get(0));
+                    } else if (cities.size() > 0) {//如果是城市级别的
+
+                        List<CarBizSupplier> carBizSuppliers = citySupplierTeamCommonService.querySupplierAllList(cities);
+                        List<Integer> supplierIds = carBizSuppliers.stream().map(f -> f.getSupplierId()).collect(Collectors.toList());
+                        supplierIds.retainAll(linkedList);
+                        if (supplierIds.size() > 0) {
+                            jsonRoute.put("lineId", jsonData.getIntValue("lineId"));
+                            jsonRoute.put("lineName", jsonData.getString("lineName"));
+                            jsonRoute.put("supplierId", supplierIds.get(0));
                             bl = true;
-						}
+                        }
                         /*HashSet<Integer> hashSet = new HashSet<>(cities);
                         boolean bl = false;
                         if(jsonData.get("cityId") != null ){
@@ -2324,19 +2321,19 @@ public class IntegerCityController {
                             }
                         }*/
 
-                        if(!bl){
-                            return  AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
+                        if (!bl) {
+                            return AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
                         }
-                    }else {
-                        jsonRoute.put("lineId",jsonData.getIntValue("lineId"));
-                        jsonRoute.put("lineName",jsonData.getString("lineName"));
-                        jsonRoute.put("supplierId",linkedList.get(0));
+                    } else {
+                        jsonRoute.put("lineId", jsonData.getIntValue("lineId"));
+                        jsonRoute.put("lineName", jsonData.getString("lineName"));
+                        jsonRoute.put("supplierId", linkedList.get(0));
                     }
 
                     logger.info("该坐标含有线路");
-                }else {
+                } else {
                     logger.info("对应坐标没有线路");
-                    return  AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
+                    return AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
                 }
             }
         } catch (NumberFormatException e) {
@@ -2349,6 +2346,7 @@ public class IntegerCityController {
 
     /**
      * 调用预估价 wiki: http://inside-yapi.01zhuanche.com/project/88/interface/api/3957
+     *
      * @param cityId
      * @param serviceType
      * @param riderPhone
@@ -2379,76 +2377,76 @@ public class IntegerCityController {
                                                     Integer isRemainder
     ) throws Exception {
         try {
-            Map<String,Object> map = Maps.newHashMap();
-            map.put("duration",0);//预估时长
-            map.put("distance",0);//预估里程
-            map.put("tolls",0);//高速费
-            map.put("bookingDate",bookingDate/1000);//预定时间  单位是秒
-            map.put("cityId",cityId); //cityId是哪个
-            map.put("serviceType",serviceType);
-            map.put("riderPhone",riderPhone);
-            map.put("ruleId",ruleId);//拼车规则id
-            map.put("payFlag",1); //支付类型（0-预定人 1-乘车人）
-            map.put("customerId",customerId); //预订人的id
-            map.put("isPing",1);//是否是拼车（0-否  1-是）
-            map.put("endPointLo",endPointLo);//下车地点经度
-            map.put("endPointLa",endPointLa);//下车地点纬度
-            map.put("channel","zhuanche");
-            map.put("groups",group+":"+riderCount); //车型id：乘车人数（34:1,35:1）  车型
+            Map<String, Object> map = Maps.newHashMap();
+            map.put("duration", 0);//预估时长
+            map.put("distance", 0);//预估里程
+            map.put("tolls", 0);//高速费
+            map.put("bookingDate", bookingDate / 1000);//预定时间  单位是秒
+            map.put("cityId", cityId); //cityId是哪个
+            map.put("serviceType", serviceType);
+            map.put("riderPhone", riderPhone);
+            map.put("ruleId", ruleId);//拼车规则id
+            map.put("payFlag", 1); //支付类型（0-预定人 1-乘车人）
+            map.put("customerId", customerId); //预订人的id
+            map.put("isPing", 1);//是否是拼车（0-否  1-是）
+            map.put("endPointLo", endPointLo);//下车地点经度
+            map.put("endPointLa", endPointLa);//下车地点纬度
+            map.put("channel", "zhuanche");
+            map.put("groups", group + ":" + riderCount); //车型id：乘车人数（34:1,35:1）  车型
 
 
-            map.put("isDesign","0");//是否指定司机（0-否 1-是）
-            map.put("startPoint",startPoint);
-            map.put("endPoint",endPoint);
+            map.put("isDesign", "0");//是否指定司机（0-否 1-是）
+            map.put("startPoint", startPoint);
+            map.put("endPoint", endPoint);
 
-            map.put("isShort",0); //是否简洁版本（0-否 1-是）
-            map.put("chargeType",0);//是否是公务卡（0-否 1-是）
-            map.put("isProxy",isRemainder==0?0:1);//是否代人叫车（0-否  1-是）根据选择
+            map.put("isShort", 0); //是否简洁版本（0-否 1-是）
+            map.put("chargeType", 0);//是否是公务卡（0-否 1-是）
+            map.put("isProxy", isRemainder == 0 ? 0 : 1);//是否代人叫车（0-否  1-是）根据选择
 
-            map.put("lineType",1);//线路类型（0-往返 1-单程） 周边游使用
-            map.put("lineId",null); //线路id 周边游使用 ruleId那个是线路？？？
-            map.put("versionId","7.0.1");
-            map.put("carType",1); //carType
-            map.put("ridePhone",riderPhone);
-            map.put("oldCouponId",-1);//之前选择的优惠券id，没有选择过传-1
+            map.put("lineType", 1);//线路类型（0-往返 1-单程） 周边游使用
+            map.put("lineId", null); //线路id 周边游使用 ruleId那个是线路？？？
+            map.put("versionId", "7.0.1");
+            map.put("carType", 1); //carType
+            map.put("ridePhone", riderPhone);
+            map.put("oldCouponId", -1);//之前选择的优惠券id，没有选择过传-1
 
 
-            map.put("autoCouponFlag",1);//是否手动选券 = 1：没有手动选券，2：手动选过券
+            map.put("autoCouponFlag", 1);//是否手动选券 = 1：没有手动选券，2：手动选过券
 
-            map.put("choiceGroupId",-1);//是否手动选券 = 1：没有手动选券，2：手动选过券
-            map.put("pickUpCost",0);//接机员费用 默认0 非接机员0 1是接机员
-            map.put("numberOfDays",0);//多日接送:新增天数
-            map.put("numberOfCarpoolSeats",riderCount);//疑问 是总座位不是？
-            map.put("isUseAmountSign",true);//是否是一口价  true  false
-            map.put("source",null);//如果是费用预估页 为h5
-            map.put("useExpandFee",false);//是否启用价格策略用户感知功能 默认false
+            map.put("choiceGroupId", -1);//是否手动选券 = 1：没有手动选券，2：手动选过券
+            map.put("pickUpCost", 0);//接机员费用 默认0 非接机员0 1是接机员
+            map.put("numberOfDays", 0);//多日接送:新增天数
+            map.put("numberOfCarpoolSeats", riderCount);//疑问 是总座位不是？
+            map.put("isUseAmountSign", true);//是否是一口价  true  false
+            map.put("source", null);//如果是费用预估页 为h5
+            map.put("useExpandFee", false);//是否启用价格策略用户感知功能 默认false
             //map.put("areaId",);//重庆万州需求。如果有这个ID城市就用areaId
             JSONObject jsoParam = new JSONObject();
             jsoParam.put("=============调用预估价入参=============", JSON.toJSON(map));
             logger.info(jsoParam.toJSONString());
-            String result = MpOkHttpUtil.okHttpPost(orderCostUrl+"/passenger/orderEstimatedAmount620",map,0,null);
+            String result = MpOkHttpUtil.okHttpPost(orderCostUrl + "/passenger/orderEstimatedAmount620", map, 0, null);
             logger.info("=============调用预估返回结果=============" + result);
-            if(StringUtils.isNotEmpty(result)){
+            if (StringUtils.isNotEmpty(result)) {
                 JSONObject jsonResult = JSONObject.parseObject(result);
-                if(jsonResult.get("code") != null && jsonResult.getInteger("code") == 0){
+                if (jsonResult.get("code") != null && jsonResult.getInteger("code") == 0) {
                     JSONObject jsonData = jsonResult.getJSONObject("data");
-                    if(jsonData != null && jsonData.get("estimated") != null && jsonData.get("estimatedKey") != null){
+                    if (jsonData != null && jsonData.get("estimated") != null && jsonData.get("estimatedKey") != null) {
                         //获取estimatedKey 给计费
                         JSONObject chargeJSON = new JSONObject();
                         String estimatedKey = jsonData.getString("estimatedKey");
-                        chargeJSON.put("estimatedKey",estimatedKey);
+                        chargeJSON.put("estimatedKey", estimatedKey);
                         JSONArray arrayEst = jsonData.getJSONArray("estimated");
-                        if(arrayEst != null && arrayEst.size() > 0){
+                        if (arrayEst != null && arrayEst.size() > 0) {
                             JSONObject jsonEsti = arrayEst.getJSONObject(0);
-                            if(jsonEsti!= null && jsonEsti.get("pingSign")!=null){
-                                String  carpoolingKey = jsonEsti.getString("pingSign");
+                            if (jsonEsti != null && jsonEsti.get("pingSign") != null) {
+                                String carpoolingKey = jsonEsti.getString("pingSign");
                                 String carpoolingKeyStr = ChargeDecrypt.decrypt(carpoolingKey);
-                                if(StringUtils.isNotEmpty(carpoolingKeyStr)){
+                                if (StringUtils.isNotEmpty(carpoolingKeyStr)) {
                                     logger.info(carpoolingKeyStr);
-                                    if(carpoolingKeyStr.indexOf("-")>0){
-                                        String poolingArr[] =  carpoolingKeyStr.split("-");
-                                        if(poolingArr.length>0){
-                                            chargeJSON.put("estimatedAmount",poolingArr[0]);
+                                    if (carpoolingKeyStr.indexOf("-") > 0) {
+                                        String poolingArr[] = carpoolingKeyStr.split("-");
+                                        if (poolingArr.length > 0) {
+                                            chargeJSON.put("estimatedAmount", poolingArr[0]);
                                             return AjaxResponse.success(chargeJSON);
                                         }
                                     }
@@ -2473,30 +2471,186 @@ public class IntegerCityController {
 
 
     private String getLineIdBySupplierIds(String supplierIdBatch) {
-    	if (StringUtils.isBlank(supplierIdBatch)) {
-    		return "";
-		}
-    	try {
-			String linesUrl = configUrl + "/intercityCarUse/getLineIdBySupplierIds";
-			Map<String,Object> params = Maps.newHashMap();
-			params.put("supplierIds", supplierIdBatch);
-			String lineResult = MpOkHttpUtil.okHttpGet(linesUrl,params,1,null);
-			logger.info("配置中心供应商--{}查询路线ID集合返回结果集--{}",supplierIdBatch,lineResult);
-			if(StringUtils.isNotEmpty(lineResult)){
-			    JSONObject jsonResult = JSONObject.parseObject(lineResult);
-			    if (jsonResult!=null && jsonResult.getInteger("code")==0) {
-					if (jsonResult.get("data")!=null) {
-						return jsonResult.get("data").toString();
-					}
-				}
-			}
-		} catch (Exception e) {
-			 logger.error("查询配置路线ID异常" + e);
-			return "";
-		}
-		return "";
-	}
+        if (StringUtils.isBlank(supplierIdBatch)) {
+            return "";
+        }
+        try {
+            String linesUrl = configUrl + "/intercityCarUse/getLineIdBySupplierIds";
+            Map<String, Object> params = Maps.newHashMap();
+            params.put("supplierIds", supplierIdBatch);
+            String lineResult = MpOkHttpUtil.okHttpGet(linesUrl, params, 1, null);
+            logger.info("配置中心供应商--{}查询路线ID集合返回结果集--{}", supplierIdBatch, lineResult);
+            if (StringUtils.isNotEmpty(lineResult)) {
+                JSONObject jsonResult = JSONObject.parseObject(lineResult);
+                if (jsonResult != null && jsonResult.getInteger("code") == 0) {
+                    if (jsonResult.get("data") != null) {
+                        return jsonResult.get("data").toString();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("查询配置路线ID异常" + e);
+            return "";
+        }
+        return "";
+    }
 
 
+    /**
+     * 语音播报最近30条数据
+     * @param pageNum
+     * @param pageSize
+     * @param cityId
+     * @param orderState
+     * @param pushDriverType
+     * @param serviceType
+     * @param orderType
+     * @param airportId
+     * @param orderSource
+     * @param driverName
+     * @param driverPhone
+     * @param licensePlates
+     * @param reserveName
+     * @param reservePhone
+     * @param riderName
+     * @param orderNo
+     * @param mainOrderNo
+     * @param beginCreateDate
+     * @param endCreateDate
+     * @param beginCostStartDate
+     * @param beginCostEndDate
+     * @param riderPhone
+     * @return
+     */
+    @RequestMapping(value = "/newOrderNotice", method = RequestMethod.GET)
+    @ResponseBody
+    public AjaxResponse newOrderNotice(Integer pageNum,
+                                       Integer pageSize,
+                                       Integer cityId,
+                                       Integer orderState,
+                                       Integer pushDriverType,
+                                       Integer serviceType,
+                                       Integer orderType,
+                                       Integer airportId,
+                                       Integer orderSource,
+                                       String driverName,
+                                       String driverPhone,
+                                       String licensePlates,
+                                       String reserveName,
+                                       String reservePhone,
+                                       String riderName,
+                                       String orderNo,
+                                       String mainOrderNo,
+                                       String beginCreateDate,
+                                       String endCreateDate,
+                                       String beginCostStartDate,
+                                       String beginCostEndDate,
+                                       String riderPhone) {
+        logger.info(MessageFormat.format("订单查询入参:pageNum:{0},pageSize:{1},cityId:{2},orderState:" +
+                        "{4},orderPushDriverType:{5},serviceType:{6},orderType:{7},airportId:{8},orderSource:{9},driverName:" +
+                        "{10},driverPhone:{11},licensePlates:{12},reserveName:{13},reservePhone:{14},riderName:{15},orderNo:{16}," +
+                        "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostStartDate{20},beginCostEndDate{21},riderPhone:{22}", pageNum,
+                pageSize, cityId, orderState, pushDriverType, serviceType, orderType, airportId, orderSource,
+                driverName, driverPhone, licensePlates, reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate,
+                endCreateDate, beginCostStartDate, beginCostEndDate, riderPhone));
+        Long currentTime = System.currentTimeMillis();
+        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+        Set<Integer> citiesSet = new HashSet<>();
+        if (cityId != null) {
+            citiesSet.add(cityId);
+        } else {
+            citiesSet = loginUser.getCityIds();
+        }
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("pageNo", 1);
+        map.put("pageSize", 1000);
+        map.put("status", 13);
+        map.put("pushDriverType", pushDriverType);
+        map.put("orderType", orderSource);
+        map.put("airportId", airportId);
+        map.put("driverName", driverName);
+        map.put("driverPhone", driverPhone);
+        map.put("licensePlates", licensePlates);
+        map.put("bookingUserName", reserveName);
+        map.put("bookingUserPhone", reservePhone);
+        map.put("riderName", riderName);
+        map.put("orderNo", orderNo);
+        map.put("mainOrderNo", mainOrderNo);
+        map.put("beginCreateDate", beginCreateDate);
+        map.put("endCreateDate", endCreateDate);
+        map.put("beginCostEndDate", beginCostStartDate);
+        map.put("endCostEndDate", beginCostEndDate);
+        map.put("riderPhone", riderPhone);
+        map.put("serviceTypeIdBatch", "68");
 
+        String supplierIdBatch = "";
+        if (!WebSessionUtil.isSupperAdmin()) {
+            Set<Integer> suppliersSet = loginUser.getSupplierIds();
+            if (suppliersSet != null && suppliersSet.size() > 0) {
+                StringBuilder supplierBuilder = new StringBuilder();
+                for (Integer supplierId : suppliersSet) {
+                    supplierBuilder.append(supplierId).append(SPLIT);
+                }
+                if (StringUtils.isNotEmpty(supplierBuilder.toString())) {
+                    supplierIdBatch = supplierBuilder.toString().substring(0, supplierBuilder.toString().length() - 1);
+                }
+                String lineIds = this.getLineIdBySupplierIds(supplierIdBatch);
+                if (StringUtils.isNotBlank(lineIds)) {
+                    map.put("ruleIdBatch", lineIds);
+                } else {
+                    map.put("ruleIdBatch", "-1");
+                }
+            }
+        }
+
+        map.put("supplierIdBatch", "0");
+
+        //添加排序字段
+        JSONObject jsonSort = new JSONObject();
+        jsonSort.put("field", "createDate");
+        jsonSort.put("operator", "desc");
+        JSONArray arraySort = new JSONArray();
+        arraySort.add(jsonSort);
+        map.put("sort", arraySort.toString());
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmssSS");
+        String transId = sdf.format(new Date());
+        map.put("transId", transId);
+        String url = esOrderDataSaasUrl + "/order/v2/search";
+
+        String result = MpOkHttpUtil.okHttpGet(url, map, 0, null);
+        if (StringUtils.isNotEmpty(result)) {
+            JSONObject jsonObject = JSONObject.parseObject(result);
+            int code = jsonObject.getIntValue("code");
+            //0表示有结果返回
+            if (code == 0) {
+                JSONObject jsonData = jsonObject.getJSONObject("data");
+                JSONArray arrayList = new JSONArray();
+                if (jsonData != null && jsonData.get("data") != null) {
+                    JSONArray arrayData = JSONArray.parseArray(jsonData.get("data").toString());
+                    for (int i = 0; i < arrayData.size(); i++) {
+                        JSONObject resultObject = arrayData.getJSONObject(i);
+                        if (resultObject.get("createDate") != null) {
+                            String createDate = resultObject.get("createDate").toString();
+                            Long createLong = DateUtils.getDate(createDate, "yyyy-MM-dd HH:mm:ss").getTime();
+                            if (currentTime - createLong <= 30000) {
+                                String lineName = resultObject.get("lineName") == null ? "" : resultObject.get("lineName").toString();
+                                String resultOrderNo = resultObject.get("orderNo") == null ? "" : resultObject.get("orderNo").toString();
+                                String bookingDate = resultObject.get("bookingDate") == null ? "" : resultObject.get("bookingDate").toString();
+                                String customerNumber = resultObject.get("factDriverId") == null ? "" : resultObject.get("factDriverId").toString();
+                                JSONObject objectNotice = new JSONObject();
+                                objectNotice.put("lineName", lineName);
+                                objectNotice.put("orderNo", resultOrderNo);
+                                objectNotice.put("bookingDate", bookingDate);
+                                objectNotice.put("customerNumber", customerNumber);
+                                arrayList.add(objectNotice);
+                            }
+                        }
+                    }
+                    return AjaxResponse.success(arrayData);
+                }
+            }
+        }
+        return AjaxResponse.success(null);
+    }
 }
