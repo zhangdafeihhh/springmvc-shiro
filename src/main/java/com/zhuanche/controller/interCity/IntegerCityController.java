@@ -2647,7 +2647,7 @@ public class IntegerCityController {
                             }
                         }
                     }
-                    return AjaxResponse.success(arrayData);
+                    return AjaxResponse.success(arrayList);
                 }
             }
         }
