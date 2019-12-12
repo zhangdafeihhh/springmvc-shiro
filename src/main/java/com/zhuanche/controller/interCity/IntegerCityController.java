@@ -2633,6 +2633,7 @@ public class IntegerCityController {
                         if (resultObject.get("createDate") != null) {
                             String createDate = resultObject.get("createDate").toString();
                             Long createLong = DateUtils.getDate(createDate, "yyyy-MM-dd HH:mm:ss").getTime();
+                            System.out.println(currentTime - createLong);
                             if (currentTime - createLong <= 30000) {
                                 String lineName = resultObject.get("lineName") == null ? "" : resultObject.get("lineName").toString();
                                 String resultOrderNo = resultObject.get("orderNo") == null ? "" : resultObject.get("orderNo").toString();
