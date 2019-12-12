@@ -339,7 +339,7 @@ public class SupplierRecordController {
             if(code > 0){
                 SupplierExtDto dto = new SupplierExtDto();
                 dto.setSupplierId(supplierId);
-                dto.setSupplierId(1);
+                dto.setApplierStatus(1);
                 recordService.editExtStatus(dto);
             }
 
