@@ -510,7 +510,7 @@
         and a.phone LIKE CONCAT(#{phone},'%')
       </if>
       <if test="name != null and name != ''" >
-        and a.name LIKE CONCAT(#{name},'%')
+        and a.name = #{name}
       </if>
       <if test="licensePlates != null and licensePlates != ''" >
         and a.license_plates LIKE CONCAT(#{licensePlates},'%')
