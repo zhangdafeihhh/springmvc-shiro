@@ -20,7 +20,7 @@
   </select>
 
 
-  <select id="failList" resultType="com.zhuanche.entity.driver.SupplierCheckFail"  parameterType="java.lang.Integer" >
+  <select id="failList" resultMap="BaseResultMap"  parameterType="java.lang.Integer" >
     select
     <include refid="Base_Column_List" />
     from supplier_check_fail
