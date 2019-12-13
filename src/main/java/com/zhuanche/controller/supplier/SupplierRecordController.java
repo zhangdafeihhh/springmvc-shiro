@@ -133,7 +133,7 @@ public class SupplierRecordController {
             List<SupplierExtDto> list =  recordService.extDtoList(supplierExtDto);
             for(SupplierExtDto dto : list){
                 dto.setSupplierFullName(dto.getSupplierShortName());
-                dto.setMainCityName(dto.getCityId() == 0 ? "" :  cityMap.get(dto.getCityId()));
+                dto.setMainCityName(dto.getCityId() == null ? "" :  cityMap.get(dto.getCityId()));
                 SupplierCooperationAgreement agreement = agreementExMapper.queryBySupplierId(dto.getSupplierId());
                 if(agreement != null){
                     dto.setAgreementStartTime(agreement.getAgreementStartTime() != null ? DateUtils.formatDate(agreement.getAgreementStartTime()):"");
