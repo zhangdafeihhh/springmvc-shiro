@@ -297,6 +297,7 @@ public class SupplierRecordController {
             dto.setBankPicUrl(apply.getBankPicUrl());
             dto.setOfficalSealUrl(apply.getOfficalSealUrl());
             dto.setSupplierName(vo != null ? vo.getSupplierFullName() : "");
+            dto.setSettlementAccount(apply.getSettlementAccount());
             dto.setAccountApplyId(apply.getId());
             List<SupplierCheckFail> list = exMapper.failList(supplierId);
             if(CollectionUtils.isNotEmpty(list)){
