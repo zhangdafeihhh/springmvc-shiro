@@ -9,6 +9,7 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.driver.supplier.SupplierCooperationAgreementDTO;
+import com.zhuanche.dto.rentcar.CityDto;
 import com.zhuanche.entity.driver.*;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.entity.rentcar.CarBizSupplierQuery;
@@ -19,6 +20,7 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.DateUtils;
 import mapper.driver.ex.*;
+import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -71,6 +73,9 @@ public class SupplierRecordController {
     @Autowired
     private SupplierCheckFailExMapper exMapper;
 
+
+    @Autowired
+    private CarBizCityExMapper carBizCityExMapper;
     /**
      *
      * @param supplierId
@@ -119,11 +124,16 @@ public class SupplierRecordController {
             supplierExtDto.setGardenPlanLevel(gradeLevel);
             supplierExtDto.setApplierStatus(applierStatus);
 
+            List<CityDto> cityDtoList =  carBizCityExMapper.selectAllCity();
+            Map<Integer,String> cityMap = Maps.newHashMap();
+            for(CityDto cityDto : cityDtoList){
+                cityMap.put(cityDto.getCityId(),cityDto.getCityName());
+            }
             Page page = PageHelper.startPage(pageNum,pageSize,true);
             List<SupplierExtDto> list =  recordService.extDtoList(supplierExtDto);
             for(SupplierExtDto dto : list){
                 dto.setSupplierFullName(dto.getSupplierShortName());
-                dto.setMainCityName(dto.getCityName());
+                dto.setMainCityName(dto.getCityId() == 0 ? "" :  cityMap.get(dto.getCityId()));
                 SupplierCooperationAgreement agreement = agreementExMapper.queryBySupplierId(dto.getSupplierId());
                 if(agreement != null){
                     dto.setAgreementStartTime(agreement.getAgreementStartTime() != null ? DateUtils.formatDate(agreement.getAgreementStartTime()):"");
@@ -149,7 +159,7 @@ public class SupplierRecordController {
                     CarBizSupplierVo vo = mapVo.get(dto.getSupplierId());
                     dto.setSupplierName(vo.getSupplierFullName());
                     dto.setCityName(vo.getSupplierCityName());
-                    dto.setMainCityName(vo.getMainCityName());
+                    //dto.setMainCityName(vo.getMainCityName());
                 }
             }
 
