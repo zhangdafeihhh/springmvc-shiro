@@ -130,6 +130,7 @@ public class SupplierRecordController {
                     dto.setAgreementEndTime(agreement.getAgreementEndTime()     != null ? DateUtils.formatDate(agreement.getAgreementEndTime()) : "");
                     dto.setCarNumber(StringUtil.isEmpty(agreement.getCarNumber() )?  0 : Integer.valueOf(agreement.getCarNumber() ));
                     dto.setLimitLowMonthWater(agreement.getLowLimitMonthWater());
+                    dto.setAmountDeposit(agreement.getMarginAccount());
                 }
             }
             //获取城市名称、供应商名称
