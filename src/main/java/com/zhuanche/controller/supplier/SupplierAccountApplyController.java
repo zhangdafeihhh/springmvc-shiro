@@ -168,15 +168,16 @@ public class SupplierAccountApplyController {
                                        @Verify(param = "settlementFullName",rule="required") String settlementFullName,
                                        @Verify(param = "bankPicUrl",rule = "required")String bankPicUrl,
                                        @Verify(param = "officalSealUrl",rule = "required")String officalSealUrl,
-                                       @Verify(param = "status",rule = "required")Integer status){
+                                       @Verify(param = "status",rule = "required")Integer status,
+                                       String remark){
 
         logger.info("[供应商申请修改账户信息]申请修改信息审核 id={}, cityId={}, supplierId={}, settlementAccount={}, bankAccount={}, " +
-                        "bankName={}, bankIdentify={}, settlementFullName={},bankPicUrl={},officalSealUrl={},status ={}",
+                        "bankName={}, bankIdentify={}, settlementFullName={},bankPicUrl={},officalSealUrl={},status ={},remark={}",
                 id, cityId, supplierId, settlementAccount, bankAccount, bankName, bankIdentify, settlementFullName,
-                bankPicUrl,officalSealUrl,status);
+                bankPicUrl,officalSealUrl,status,remark);
 
         return supplierAccountApplyService.updateSupplierAccountApplyStatua(id, cityId, supplierId, settlementAccount,
-                bankAccount, bankName, bankIdentify, settlementFullName,bankPicUrl,officalSealUrl,status);
+                bankAccount, bankName, bankIdentify, settlementFullName,bankPicUrl,officalSealUrl,status,remark);
     }
 
     /**

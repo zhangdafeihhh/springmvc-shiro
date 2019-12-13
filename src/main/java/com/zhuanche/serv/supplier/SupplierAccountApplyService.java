@@ -11,6 +11,7 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.driver.supplier.SupplierAccountApplyDTO;
 import com.zhuanche.entity.driver.SupplierAccountApply;
+import com.zhuanche.entity.driver.SupplierCheckFail;
 import com.zhuanche.entity.driver.SupplierExtDto;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
@@ -28,6 +29,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -53,6 +55,9 @@ public class SupplierAccountApplyService {
 
     @Autowired
     private SupplierExtDtoMapper supplierExtDtoMapper;
+
+    @Autowired
+    private SupplierCheckFailService failService;
 
     @MasterSlaveConfigs(configs={
             @MasterSlaveConfig(databaseTag="driver-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
@@ -87,7 +92,7 @@ public class SupplierAccountApplyService {
                                                          String settlementAccount, String bankAccount,
                                                          String bankName, String bankIdentify,
                                                          String settlementFullName,String bankPicUrl,
-                                                         String officalSealUrl,Integer status){
+                                                         String officalSealUrl,Integer status,String remark){
 
 
         SupplierAccountApply apply = supplierAccountApplyMapper.selectByPrimaryKey(id);
@@ -135,6 +140,14 @@ public class SupplierAccountApplyService {
             } else {
                 supplierExtDtoExMapper.updateBySupplierId(supplierExtDto);
                 logger.info("更新供应商扩展信息 : supplierExtInfo {}", JSON.toJSONString(supplierExtDto));
+            }
+            if(status == 3){
+                SupplierCheckFail fail = new SupplierCheckFail();
+                fail.setStatus(status);
+                fail.setRemark(remark);
+                fail.setCreateTime(new Date());
+                fail.setUpdateTime(new Date());
+                failService.insert(fail);
             }
             return AjaxResponse.success(null);
         } else {
