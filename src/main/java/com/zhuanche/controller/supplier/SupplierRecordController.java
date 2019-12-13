@@ -339,6 +339,7 @@ public class SupplierRecordController {
             accountApply.setBankPicUrl(bankPicUrl);
             accountApply.setId(id);
             accountApply.setOfficalSealUrl(officalSealUrl);
+            accountApply.setStatus((byte) 1);
             int code  = applyExMapper.updateByPrimaryKey(accountApply);
             if(code > 0){
                 SupplierExtDto dto = new SupplierExtDto();
