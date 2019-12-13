@@ -63,7 +63,8 @@
       a.car_number as carNumber,
       a.low_limit_month_water as lowLimitMonthWater,
       a.margin_amount as marginAmount,
-      p.id as accountApplyId
+      p.id as accountApplyId,
+      t.amount_deposit as amountDeposit
       FROM supplier_ext t
       LEFT JOIN supplier_cooperation_agreement a on t.supplier_id = a.supplier_id
       LEFT JOIN supplier_account_apply p on a.supplier_id = p.supplier_id
