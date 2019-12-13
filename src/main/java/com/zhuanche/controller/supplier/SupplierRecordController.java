@@ -289,6 +289,7 @@ public class SupplierRecordController {
             SupplierAccountApply apply = applyExMapper.selectApplyStatusBySupplierId(supplierId);
             dto = recordService.extDtoDetail(supplierId);
             dto.setCityId(vo.getSupplierCity());
+            dto.setSupplierFullName(vo.getSupplierFullName());
             dto.setBankAccount(apply.getBankAccount());
             dto.setBankName(apply.getBankName());
             dto.setBankIdentify(apply.getBankIdentify());
