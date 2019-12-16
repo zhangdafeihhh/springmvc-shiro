@@ -392,10 +392,10 @@ public class SupplierRecordController {
                   accountApply.setCityId(vo.getSupplierCity());
                   accountApply.setSettlementFullName(vo.getSupplierFullName());
                   accountApply.setUpdateBy(loginUser.getId());
-                  accountApply.setUpdateName(loginUser.getLoginName());
+                  accountApply.setUpdateName(loginUser.getName());
                   accountApply.setUpdateDate(new Date());
                   accountApply.setCreateBy(loginUser.getId());
-                  accountApply.setCreateName(loginUser.getLoginName());
+                  accountApply.setCreateName(loginUser.getName());
                   accountApply.setCreateDate(new Date());
                   code = applyExMapper.insert(accountApply);
               }
