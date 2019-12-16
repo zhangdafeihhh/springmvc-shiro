@@ -298,7 +298,6 @@ public class SupplierRecordController {
             CarBizSupplierVo vo = supplierExMapper.querySupplierById(supplierId);
             SupplierAccountApply apply = applyExMapper.selectApplyStatusBySupplierId(supplierId);
             dto = recordService.extDtoDetail(supplierId);
-            dto.setCityId(vo.getSupplierCity());
             if(apply != null){
                 dto.setBankAccount(apply.getBankAccount());
                 dto.setBankName(apply.getBankName());
@@ -310,8 +309,12 @@ public class SupplierRecordController {
                 dto.setSettlementFullName(apply.getSettlementFullName());
                 dto.setAccountApplyId(apply.getId());
             }
-            dto.setSupplierFullName(vo.getSupplierFullName());
-            dto.setSupplierName(vo != null ? vo.getSupplierFullName() : "");
+            if(vo != null){
+                dto.setSupplierFullName(vo.getSupplierFullName());
+                dto.setSupplierName(vo.getSupplierFullName());
+                dto.setCityId(vo.getSupplierCity());
+            }
+
 
             List<SupplierCheckFail> list = exMapper.failList(supplierId);
             if(CollectionUtils.isNotEmpty(list)){

@@ -142,12 +142,17 @@ public class SupplierAccountApplyService {
                 logger.info("更新供应商扩展信息 : supplierExtInfo {}", JSON.toJSONString(supplierExtDto));
             }
 
+            try {
                 SupplierCheckFail fail = new SupplierCheckFail();
                 fail.setStatus(status);
                 fail.setRemark(remark);
+                fail.setSupplierId(supplierId);
                 fail.setCreateTime(new Date());
                 fail.setUpdateTime(new Date());
                 failService.insert(fail);
+            } catch (Exception e) {
+                logger.info("入库异常" + e);
+            }
 
             return AjaxResponse.success(null);
         } else {
