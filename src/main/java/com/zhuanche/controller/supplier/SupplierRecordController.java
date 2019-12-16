@@ -383,7 +383,7 @@ public class SupplierRecordController {
             accountApply.setStatus((byte) 1);
 
             int code  = 0;
-            if(id > 0){
+            if(id != null &&  id > 0){
               code =  applyExMapper.updateByPrimaryKey(accountApply);
             }else {
               CarBizSupplierVo vo =  supplierExMapper.querySupplierById(supplierId);
