@@ -141,14 +141,14 @@ public class SupplierAccountApplyService {
                 supplierExtDtoExMapper.updateBySupplierId(supplierExtDto);
                 logger.info("更新供应商扩展信息 : supplierExtInfo {}", JSON.toJSONString(supplierExtDto));
             }
-            if(status == 3){
+
                 SupplierCheckFail fail = new SupplierCheckFail();
                 fail.setStatus(status);
                 fail.setRemark(remark);
                 fail.setCreateTime(new Date());
                 fail.setUpdateTime(new Date());
                 failService.insert(fail);
-            }
+
             return AjaxResponse.success(null);
         } else {
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);

@@ -299,17 +299,20 @@ public class SupplierRecordController {
             SupplierAccountApply apply = applyExMapper.selectApplyStatusBySupplierId(supplierId);
             dto = recordService.extDtoDetail(supplierId);
             dto.setCityId(vo.getSupplierCity());
+            if(apply != null){
+                dto.setBankAccount(apply.getBankAccount());
+                dto.setBankName(apply.getBankName());
+                dto.setBankIdentify(apply.getBankIdentify());
+                dto.setSettlementAccount(apply.getSettlementAccount());
+                dto.setBankPicUrl(apply.getBankPicUrl());
+                dto.setOfficalSealUrl(apply.getOfficalSealUrl());
+                dto.setSettlementAccount(apply.getSettlementAccount());
+                dto.setSettlementFullName(apply.getSettlementFullName());
+                dto.setAccountApplyId(apply.getId());
+            }
             dto.setSupplierFullName(vo.getSupplierFullName());
-            dto.setBankAccount(apply.getBankAccount());
-            dto.setBankName(apply.getBankName());
-            dto.setBankIdentify(apply.getBankIdentify());
-            dto.setSettlementAccount(apply.getSettlementAccount());
-            dto.setBankPicUrl(apply.getBankPicUrl());
-            dto.setOfficalSealUrl(apply.getOfficalSealUrl());
             dto.setSupplierName(vo != null ? vo.getSupplierFullName() : "");
-            dto.setSettlementAccount(apply.getSettlementAccount());
-            dto.setSettlementFullName(apply.getSettlementFullName());
-            dto.setAccountApplyId(apply.getId());
+
             List<SupplierCheckFail> list = exMapper.failList(supplierId);
             if(CollectionUtils.isNotEmpty(list)){
                 dto.setList(list);

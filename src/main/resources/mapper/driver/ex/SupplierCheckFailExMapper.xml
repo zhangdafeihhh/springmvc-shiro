@@ -28,7 +28,7 @@
   </select>
 
 
-  <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.SupplierCheckFail" >
+  <insert id="insert" parameterType="com.zhuanche.entity.driver.SupplierCheckFail" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
       SELECT LAST_INSERT_ID()
     </selectKey>
