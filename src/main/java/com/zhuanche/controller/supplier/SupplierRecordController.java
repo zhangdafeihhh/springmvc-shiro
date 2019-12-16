@@ -133,8 +133,10 @@ public class SupplierRecordController {
             List<SupplierExtDto> list =  recordService.extDtoList(supplierExtDto);
             for(SupplierExtDto dto : list){
                 dto.setSupplierFullName(dto.getSupplierShortName());
-                dto.setMainCityName(dto.getMainCityId() == null ? "" :  cityMap.get(dto.getMainCityId()));
-                SupplierCooperationAgreement agreement = agreementExMapper.queryBySupplierId(dto.getSupplierId());
+                if(dto.getMainCityId() > 0){
+                    dto.setMainCityName(cityMap.get(dto.getMainCityId()));
+                 }
+                 SupplierCooperationAgreement agreement = agreementExMapper.queryBySupplierId(dto.getSupplierId());
                 if(agreement != null){
                     dto.setAgreementStartTime(agreement.getAgreementStartTime() != null ? DateUtils.formatDate(agreement.getAgreementStartTime()):"");
                     dto.setAgreementEndTime(agreement.getAgreementEndTime()     != null ? DateUtils.formatDate(agreement.getAgreementEndTime()) : "");
@@ -256,6 +258,7 @@ public class SupplierRecordController {
                 supplier.setFirstSignTime(dto.getFirstSignTime()== null ? "" : DateUtils.formatDate(dto.getFirstSignTime(),"yyyy-MM-dd hh:mm:ss"));
                 supplier.setMarginAmount(StringUtil.isEmpty(dto.getAmountDeposit())  ? 0.00 : Double.valueOf(dto.getAmountDeposit()));
                 supplier.setEmail(dto.getEmail());
+                supplier.setSupplierShortName(supplier.getSupplierFullName());
             }
 
             SupplierAccountApply supplierAccountApply = applyExMapper.selectApplyBySupplierId(supplierId);

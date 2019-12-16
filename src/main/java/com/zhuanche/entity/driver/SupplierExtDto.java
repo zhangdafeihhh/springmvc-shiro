@@ -588,7 +588,7 @@ public class SupplierExtDto {
     }
 
     public void setMainCityName(String mainCityName) {
-        this.mainCityName = this.getCityName();
+        this.mainCityName = this.mainCityName;
     }
 
     public String getSupplierName() {
