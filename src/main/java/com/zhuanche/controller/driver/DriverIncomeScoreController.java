@@ -13,7 +13,6 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.constant.Constants;
-import com.zhuanche.constant.EnvUtils;
 import com.zhuanche.dto.driver.DriverVoEntity;
 import com.zhuanche.dto.mdbcarmanage.ScoreDetailDTO;
 import com.zhuanche.dto.rentcar.*;
@@ -191,9 +190,9 @@ public class DriverIncomeScoreController {
                 return AjaxResponse.failMsg(-1,"您无权查看该司机的信息");
             }
         }
-        if (null != driverIds)
+        if (null != driverIds){
             carBizDriverInfoDTO.setDriverIds(driverIds);
-        else if (null != driverId) {
+        }else if (null != driverId) {
             driverIds = new HashSet<>();
             driverIds.add(driverId);
             carBizDriverInfoDTO.setDriverIds(driverIds);
@@ -216,7 +215,7 @@ public class DriverIncomeScoreController {
         try{
 
             //删除发送03组的mq,改成发送08组的mq
-            this.sendDoubleMq(obj);
+            this.sendDoubleMq(obj,loginUser.getId());
 
             //维护用户的邮箱
             if(loginUser.getId() != null && loginUser.getAccountType() != null){
@@ -231,11 +230,8 @@ public class DriverIncomeScoreController {
         }
 
     }
-    private void sendDoubleMq(JSONObject obj){
-        String envName = EnvUtils.ENVIMENT;
-        if (Objects.nonNull(envName) && Arrays.asList(new String[]{"online","prod"}).contains(envName)){
-            ExcelProducerDouble.publishMessage("excel_export_producer","excel-mp-manage",null,obj);
-        }
+    private void sendDoubleMq(JSONObject obj,Integer userId){
+        ExcelProducerDouble.publishMessage("excel_export_producer","excel-mp-manage",userId != null ? String.valueOf(userId) : "default",obj);
     }
 
     /**

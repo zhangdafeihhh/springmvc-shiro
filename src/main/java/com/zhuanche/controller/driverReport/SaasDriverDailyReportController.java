@@ -6,14 +6,12 @@ import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.paging.PageDTO;
-import com.zhuanche.common.rocketmq.ExcelProducer;
 import com.zhuanche.common.rocketmq.ExcelProducerDouble;
 import com.zhuanche.common.util.RedisKeyUtils;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.constant.Constants;
-import com.zhuanche.constant.EnvUtils;
 import com.zhuanche.constants.SaasConst;
 import com.zhuanche.dto.CarDriverTeamDTO;
 import com.zhuanche.dto.bigdata.BiDriverBusinessInfoDayReportDTO;
@@ -40,7 +38,6 @@ import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizModelExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
-import okhttp3.internal.http2.ErrorCode;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
@@ -50,10 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
@@ -393,7 +387,7 @@ public class SaasDriverDailyReportController {
         obj.put("saasReport",saasDTO);
         try{
             //删除发送03组的mq,改成发送08组的mq
-            this.sendDoubleMq(obj);
+            this.sendDoubleMq(obj,loginUser.getId());
 
             //维护用户的邮箱
             if(loginUser.getId() != null && loginUser.getAccountType() != null){
@@ -677,7 +671,7 @@ public class SaasDriverDailyReportController {
         obj.put("saasReport",saasDTO);
         try{
             //删除发送03组的mq,改成发送08组的mq
-            this.sendDoubleMq(obj);
+            this.sendDoubleMq(obj,loginUser.getId());
 
             //维护用户的邮箱
             if(loginUser.getId() != null && loginUser.getAccountType() != null){
@@ -926,7 +920,7 @@ public class SaasDriverDailyReportController {
 
         try{
             //删除发送03组的mq,改成发送08组的mq
-            this.sendDoubleMq(obj);
+            this.sendDoubleMq(obj,loginUser.getId());
 
             //维护用户的邮箱
             if(loginUser.getId() != null && loginUser.getAccountType() != null){
@@ -1002,10 +996,7 @@ public class SaasDriverDailyReportController {
         return table;
     }
 
-    private void sendDoubleMq(JSONObject obj){
-        String envName = EnvUtils.ENVIMENT;
-        if (Objects.nonNull(envName) && Arrays.asList(new String[]{"online","prod"}).contains(envName)){
-            ExcelProducerDouble.publishMessage("excel_export_producer","excel-mp-manage",null,obj);
-        }
+    private void sendDoubleMq(JSONObject obj,Integer userId){
+        ExcelProducerDouble.publishMessage("excel_export_producer","excel-mp-manage",userId != null ? String.valueOf(userId) : "default",obj);
     }
 }
