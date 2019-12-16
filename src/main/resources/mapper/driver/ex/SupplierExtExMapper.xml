@@ -76,16 +76,16 @@
                 #{item}
               </foreach>
             </if>
-            <if test="mainCityId != null">
+            <if test="mainCityId != null and mainCityId != '' ">
               and t.main_city_id = #{mainCityId}
             </if>
-            <if test="cooperationMode != null">
+            <if test="cooperationMode != null and cooperationMode != ''">
               and t.cooperation_mode = #{cooperationMode}
             </if>
-            <if test="gardenPlanLevel != null">
+            <if test="gardenPlanLevel != null and gardenPlanLevel != ''">
               and t.garden_plan_level = #{gardenPlanLevel}
             </if>
-            <if test="applierStatus != null">
+            <if test="applierStatus != null and applierStatus != ''">
               AND t.applier_status = #{applierStatus}
             </if>
       GROUP BY t.supplier_id ORDER BY t.update_date DESC
