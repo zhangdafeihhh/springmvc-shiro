@@ -543,7 +543,7 @@
             </foreach>
         </if>
 
-        <if test="supplierFullName != null" >
+        <if test="supplierFullName != null and supplierFullName != ''" >
             AND supplier_full_name = #{supplierFullName,jdbcType=VARCHAR}
         </if>
      </select>

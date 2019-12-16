@@ -105,6 +105,8 @@ public class CarBizSupplierVo extends CarBizSupplier {
      */
     private List<SupplierLevel> levelList;
 
+    private String supplierName;//
+
     public String getSupplierCityName() {
         return supplierCityName;
     }
@@ -393,5 +395,13 @@ public class CarBizSupplierVo extends CarBizSupplier {
 
     public void setLevelList(List<SupplierLevel> levelList) {
         this.levelList = levelList;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
     }
 }

@@ -92,7 +92,9 @@
   </select>
 
   <select id="extDtoDetail" resultType="com.zhuanche.entity.driver.SupplierExtDto" parameterType="java.lang.Integer" >
-    SELECT  t.supplier_short_name as supplierShortName,
+    SELECT t.id as id,
+           t.main_city_id as mainCityId,
+           t.supplier_short_name as supplierShortName,
 			t.cooperation_mode as cooperationMode,
       t.garden_plan_level as gardenPlanLevel,
       t.applier_status as applierStatus,
@@ -100,7 +102,12 @@
 			t.amount_deposit as amountDeposit,
 			t.email as email,
 			t.bank_pic_url as bankPicUrl,
-			t.offical_seal_url as officalSealUrl
+			t.offical_seal_url as officalSealUrl,
+			t.settlement_account as settlementAccount,
+			t.bank_name as bankName,
+			t.bank_account as bankAccount,
+			t.bank_identify as bankIdentify,
+			t.settlement_full_name as settlementFullName
       FROM supplier_ext t WHERE  t.supplier_id = #{supplierId,jdbcType=BIGINT}
   </select>
 

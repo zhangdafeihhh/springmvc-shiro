@@ -252,13 +252,29 @@ public class SupplierRecordController {
             //根据supplierId 获取城市、合作商 负责人、联系电话
             if(dto != null){
                 supplier.setMainCityName(dto.getMainCityName());
-                supplier.setCooperationName(dto.getCooperationMode() == null ? "" :  dto.getCooperationMode().toString());
+                if(dto.getCooperationMode() == 1 ){
+                    supplier.setCooperationName(SupplierExtDto.modelEnum.COOPERATEION_FREE.getName());
+                }else if(dto.getCooperationMode() == 2){
+                    supplier.setCooperationName(SupplierExtDto.modelEnum.COOPERATEION_UNFREE.getName());
+                }else {
+                    supplier.setCooperationName("");
+                }
                 supplier.setGardenPlanLevel(dto.getGardenPlanLevel());
                 supplier.setStatus(dto.getStatus() == null ? 0 : Integer.valueOf(dto.getStatus()));
                 supplier.setFirstSignTime(dto.getFirstSignTime()== null ? "" : DateUtils.formatDate(dto.getFirstSignTime(),"yyyy-MM-dd hh:mm:ss"));
                 supplier.setMarginAmount(StringUtil.isEmpty(dto.getAmountDeposit())  ? 0.00 : Double.valueOf(dto.getAmountDeposit()));
                 supplier.setEmail(dto.getEmail());
-                supplier.setSupplierShortName(supplier.getSupplierFullName());
+                supplier.setSupplierShortName(dto.getSupplierShortName());
+                supplier.setSupplierName(dto.getSupplierShortName());
+
+                List<CityDto> cityDtoList =  carBizCityExMapper.selectAllCity();
+                Map<Integer,String> cityMap = Maps.newHashMap();
+                for(CityDto cityDto : cityDtoList){
+                    cityMap.put(cityDto.getCityId(),cityDto.getCityName());
+                }
+                if(dto.getMainCityId() > 0 ){
+                    supplier.setMainCityName(cityMap.get(dto.getMainCityId()));
+                }
             }
 
             SupplierAccountApply supplierAccountApply = applyExMapper.selectApplyBySupplierId(supplierId);
@@ -308,7 +324,6 @@ public class SupplierRecordController {
                 dto.setSettlementAccount(apply.getSettlementAccount());
                 dto.setBankPicUrl(apply.getBankPicUrl());
                 dto.setOfficalSealUrl(apply.getOfficalSealUrl());
-                dto.setSettlementAccount(apply.getSettlementAccount());
                 dto.setSettlementFullName(apply.getSettlementFullName());
                 dto.setAccountApplyId(apply.getId());
             }
