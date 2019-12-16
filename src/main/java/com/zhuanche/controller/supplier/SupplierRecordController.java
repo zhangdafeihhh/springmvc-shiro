@@ -88,8 +88,7 @@ public class SupplierRecordController {
      */
     @RequestMapping("/recordList")
     @ResponseBody
-    public AjaxResponse recordList(Integer supplierId,
-                                   Integer cityId,
+    public AjaxResponse recordList(Integer cityId,
                                    Integer mainCityId,
                                    Integer cooperationMode,
                                    String gradeLevel,
@@ -112,6 +111,11 @@ public class SupplierRecordController {
                      for(CarBizSupplier supplier : queryByCityOrSupplierName){
                          setSupplier.add(supplier.getSupplierId());
                      }
+                     supplierExtDto.setSupplierIds(setSupplier);
+                 }else {
+                     //如果根据供应商查询出来为空
+                     Set<Integer> setSupplier = new HashSet<>();
+                     setSupplier.add(0);
                      supplierExtDto.setSupplierIds(setSupplier);
                  }
             }else {
@@ -161,12 +165,8 @@ public class SupplierRecordController {
                     CarBizSupplierVo vo = mapVo.get(dto.getSupplierId());
                     dto.setSupplierName(vo.getSupplierFullName());
                     dto.setCityName(vo.getSupplierCityName());
-                    //dto.setMainCityName(vo.getMainCityName());
                 }
             }
-
-
-
             pageDto = new PageInfo<>(list);
         } catch (Exception e) {
             logger.error("查询异常" + e);
