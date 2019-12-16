@@ -275,6 +275,11 @@ public class SupplierRecordController {
                 if(dto.getMainCityId() > 0 ){
                     supplier.setMainCityName(cityMap.get(dto.getMainCityId()));
                 }
+                //花园计划等级
+                SupplierLevel level = supplierLevelexMapper.findSupplierLevelScoreBySupplierId(supplierId);
+                if(level != null && StringUtils.isNotEmpty(level.getGradeLevel())){
+                    supplier.setGardenPlanLevel(level.getGradeLevel());
+                }
             }
 
             SupplierAccountApply supplierAccountApply = applyExMapper.selectApplyBySupplierId(supplierId);
@@ -295,6 +300,7 @@ public class SupplierRecordController {
             params.setSupplierId(supplierId);
             List<SupplierLevel> list =  supplierLevelexMapper.findPage(params);
             supplier.setLevelList(list);
+
 
         } catch (Exception e) {
             logger.error("查询异常" + e);
