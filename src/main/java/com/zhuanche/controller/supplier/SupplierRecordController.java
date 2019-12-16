@@ -16,6 +16,7 @@ import com.zhuanche.entity.rentcar.CarBizSupplierQuery;
 import com.zhuanche.entity.rentcar.CarBizSupplierVo;
 import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.supplier.SupplierRecordService;
+import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.DateUtils;
@@ -361,7 +362,7 @@ public class SupplierRecordController {
      */
     @RequestMapping("/bankCountEdit")
     @ResponseBody
-    public AjaxResponse bankCountEdit(@Verify(param = "id",rule = "required") Long id,
+    public AjaxResponse bankCountEdit(Long id,
                                       @Verify(param = "supplierId",rule = "required") Integer supplierId,
                                       @Verify(param = "bankName",rule = "required") String bankName,
                                       @Verify(param = "bankAccount",rule = "required") String bankAccount,
@@ -380,7 +381,27 @@ public class SupplierRecordController {
             accountApply.setId(id);
             accountApply.setOfficalSealUrl(officalSealUrl);
             accountApply.setStatus((byte) 1);
-            int code  = applyExMapper.updateByPrimaryKey(accountApply);
+
+            int code  = 0;
+            if(id > 0){
+              code =  applyExMapper.updateByPrimaryKey(accountApply);
+            }else {
+              CarBizSupplierVo vo =  supplierExMapper.querySupplierById(supplierId);
+              if(vo != null){
+                  SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+                  accountApply.setCityId(vo.getSupplierCity());
+                  accountApply.setSettlementFullName(vo.getSupplierFullName());
+                  accountApply.setUpdateBy(loginUser.getId());
+                  accountApply.setUpdateName(loginUser.getLoginName());
+                  accountApply.setUpdateDate(new Date());
+                  accountApply.setCreateBy(loginUser.getId());
+                  accountApply.setCreateName(loginUser.getLoginName());
+                  accountApply.setCreateDate(new Date());
+                  code = applyExMapper.insert(accountApply);
+              }
+            }
+
+
             if(code > 0){
                 SupplierExtDto dto = new SupplierExtDto();
                 dto.setSupplierId(supplierId);

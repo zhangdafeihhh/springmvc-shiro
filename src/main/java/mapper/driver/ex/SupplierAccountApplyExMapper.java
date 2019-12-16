@@ -22,5 +22,6 @@ public interface SupplierAccountApplyExMapper {
 
     int updateBySupplier(SupplierAccountApply record);
 
+    int insert(SupplierAccountApply record);
 
 }
