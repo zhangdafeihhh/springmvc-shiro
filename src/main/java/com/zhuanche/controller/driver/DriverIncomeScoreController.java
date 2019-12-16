@@ -1,38 +1,31 @@
 package com.zhuanche.controller.driver;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
-import com.zhuanche.common.rocketmq.ExcelProducer;
 import com.zhuanche.common.rocketmq.ExcelProducerDouble;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RequestFunction;
-import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.constant.EnvUtils;
 import com.zhuanche.dto.driver.DriverVoEntity;
 import com.zhuanche.dto.mdbcarmanage.ScoreDetailDTO;
 import com.zhuanche.dto.rentcar.*;
-import com.zhuanche.http.MpOkHttpUtil;
-import com.zhuanche.serv.*;
+import com.zhuanche.serv.CarBizDriverInfoService;
+import com.zhuanche.serv.DriverIncomeScoreService;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
 import com.zhuanche.util.MobileOverlayUtil;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.elasticsearch.rest.RestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.zhuanche.common.enums.MenuEnum.DRIVER_INFO_LIST;
 
@@ -223,9 +214,10 @@ public class DriverIncomeScoreController {
 
 
         try{
-            ExcelProducer.publishMessage("excel_export_producer","excel-mp-manage",null,obj);
-            //双发
+
+            //删除发送03组的mq,改成发送08组的mq
             this.sendDoubleMq(obj);
+
             //维护用户的邮箱
             if(loginUser.getId() != null && loginUser.getAccountType() != null){
 

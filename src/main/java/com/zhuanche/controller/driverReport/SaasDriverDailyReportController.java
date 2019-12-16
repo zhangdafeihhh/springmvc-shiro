@@ -392,10 +392,9 @@ public class SaasDriverDailyReportController {
 
         obj.put("saasReport",saasDTO);
         try{
-            ExcelProducer.publishMessage("excel_export_producer","excel-mp-manage",null,obj);
-
+            //删除发送03组的mq,改成发送08组的mq
             this.sendDoubleMq(obj);
-            //ExcelProducer.sendMessage("excel_export_producer","excel-car-manager",obj);
+
             //维护用户的邮箱
             if(loginUser.getId() != null && loginUser.getAccountType() != null){
 
@@ -677,11 +676,9 @@ public class SaasDriverDailyReportController {
 
         obj.put("saasReport",saasDTO);
         try{
-            ExcelProducer.publishMessage("excel_export_producer","excel-mp-manage",null,obj);
-
+            //删除发送03组的mq,改成发送08组的mq
             this.sendDoubleMq(obj);
 
-            //ExcelProducer.sendMessage("excel_export_producer","excel-car-manager",obj);
             //维护用户的邮箱
             if(loginUser.getId() != null && loginUser.getAccountType() != null){
 
@@ -927,14 +924,8 @@ public class SaasDriverDailyReportController {
 
         obj.put("buiness_params",dto);
 
-
-        //SaasReportParamDTO saasDTO = new SaasReportParamDTO(null,null,month,table,3);
-
-        //obj.put("saasReport",saasDTO);
         try{
-            ExcelProducer.publishMessage("excel_export_producer","excel-mp-manage",null,obj);
-            //ExcelProducer.sendMessage("excel_export_producer","excel-car-manager",obj);
-
+            //删除发送03组的mq,改成发送08组的mq
             this.sendDoubleMq(obj);
 
             //维护用户的邮箱
