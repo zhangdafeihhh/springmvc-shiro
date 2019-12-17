@@ -284,10 +284,8 @@ public class SupplierRecordController {
             }
 
             SupplierAccountApply supplierAccountApply = applyExMapper.selectApplyBySupplierId(supplierId);
-            List<SupplierAccountApply> supplierAccountApplyList = new ArrayList<>();
-            supplierAccountApplyList.add(supplierAccountApply);
-            if(CollectionUtils.isNotEmpty(supplierAccountApplyList)){
-                supplier.setApplyList(supplierAccountApplyList.get(0));
+              if(supplierAccountApply != null &&  supplierAccountApply.getId()>0 ){
+                supplier.setApplyList(supplierAccountApply);
             }else {
                 supplierAccountApply.setBankName(dto.getBankName());
                 supplierAccountApply.setBankAccount(dto.getBankAccount());
