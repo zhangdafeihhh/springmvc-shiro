@@ -7,10 +7,15 @@ import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.dto.transportMonitor.IndexMonitorDriverStatisticsDto;
+import com.zhuanche.entity.driver.DriverMonitoringLog;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.mongo.OutCycleDriverList;
 import com.zhuanche.mongo.SaasIndexMonitorDriverStatistics;
 import com.zhuanche.serv.transportMonitor.DriverMonitoringService;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.session.WebSessionUtil;
+import mapper.driver.DriverMonitoringLogMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import com.zhuanche.util.DateUtil;
 import com.zhuanche.util.encrypt.MD5Utils;
@@ -401,6 +406,8 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
     private static final String APP_KEY = "82BFBBA6C03247A2A5BCEFB9BD3EBB1F";
     private static final String APP_SECRET = "3D7F14CB41144D6EA5D9C6795CE788CD";
 
+    @Autowired
+    private DriverMonitoringLogMapper driverMonitoringLogMapper;
     /**
      * 结果集发送socket
      * @param list
@@ -438,6 +445,12 @@ public class DriverMonitoringServiceImpl implements DriverMonitoringService {
             //第三步获取msgId
             pushToList(authToken,msgId,driverIds);
         }
+        SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+        DriverMonitoringLog driverMonitoringLog=new DriverMonitoringLog();
+        driverMonitoringLog.setMsgid(msgId.toString());
+        driverMonitoringLog.setOperationAccount(user.getLoginName());
+        driverMonitoringLog.setOperator(user.getName());
+        driverMonitoringLogMapper.insertSelective(driverMonitoringLog);
         return true;
     }
 
