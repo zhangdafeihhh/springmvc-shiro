@@ -84,7 +84,7 @@
               and t.cooperation_mode = #{cooperationMode}
             </if>
             <if test="gardenPlanLevel != null and gardenPlanLevel != ''">
-              and t.garden_plan_level = #{gardenPlanLevel}
+              and l.grade_level  = #{gardenPlanLevel}
             </if>
             <if test="applierStatus != null and applierStatus != ''">
               AND t.applier_status = #{applierStatus}
