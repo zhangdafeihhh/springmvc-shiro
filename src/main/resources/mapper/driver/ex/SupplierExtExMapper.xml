@@ -56,7 +56,7 @@
       t.supplier_id as supplierId,
       t.supplier_short_name as supplierShortName,
       t.cooperation_mode as cooperationMode,
-      t.garden_plan_level as gardenPlanLevel,
+      l.grade_level as gardenPlanLevel,
       t.applier_status as applierStatus,
       a.agreement_start_time as agreementStartTime,
       a.agreement_end_time as agreementEndTime,
@@ -69,6 +69,7 @@
       FROM supplier_ext t
       LEFT JOIN supplier_cooperation_agreement a on t.supplier_id = a.supplier_id
       LEFT JOIN supplier_account_apply p on a.supplier_id = p.supplier_id
+      LEFT JOIN supplier_level l on t.supplier_id = l.supplier_id
       WHERE  1=1
             <if test="supplierIds != null and supplierIds.size()>0">
               AND t.supplier_id in

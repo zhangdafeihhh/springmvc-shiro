@@ -544,7 +544,7 @@
         </if>
 
         <if test="supplierFullName != null and supplierFullName != ''" >
-            AND supplier_full_name = #{supplierFullName,jdbcType=VARCHAR}
+            and supplier_full_name like concat(#{supplierFullName,jdbcType=VARCHAR},'%')
         </if>
      </select>
 

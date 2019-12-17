@@ -79,7 +79,6 @@ public class SupplierRecordController {
     private CarBizCityExMapper carBizCityExMapper;
     /**
      *
-     * @param supplierId
      * @param cityId
      * @param mainCityId
      * @param cooperationMode 合作模式 1 自主 2 非自主
