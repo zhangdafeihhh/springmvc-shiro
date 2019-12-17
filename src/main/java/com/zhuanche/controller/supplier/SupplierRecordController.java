@@ -288,6 +288,12 @@ public class SupplierRecordController {
             supplierAccountApplyList.add(supplierAccountApply);
             if(CollectionUtils.isNotEmpty(supplierAccountApplyList)){
                 supplier.setApplyList(supplierAccountApplyList.get(0));
+            }else {
+                supplierAccountApply.setBankName(dto.getBankName());
+                supplierAccountApply.setBankAccount(dto.getBankAccount());
+                supplierAccountApply.setSettlementAccount(dto.getSettlementAccount());
+                supplierAccountApply.setBankIdentify(dto.getBankIdentify());
+                supplier.setApplyList(supplierAccountApply);
             }
 
             List<SupplierExperience> experienceList = experienceExMapper.selectAllBySupplierId(supplierId);
