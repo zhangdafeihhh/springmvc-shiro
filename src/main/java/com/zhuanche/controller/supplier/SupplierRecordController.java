@@ -287,6 +287,7 @@ public class SupplierRecordController {
               if(supplierAccountApply != null &&  supplierAccountApply.getId()>0 ){
                 supplier.setApplyList(supplierAccountApply);
             }else {
+                  supplierAccountApply = new SupplierAccountApply();
                 supplierAccountApply.setBankName(dto.getBankName());
                 supplierAccountApply.setBankAccount(dto.getBankAccount());
                 supplierAccountApply.setSettlementAccount(dto.getSettlementAccount());
