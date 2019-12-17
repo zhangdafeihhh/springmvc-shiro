@@ -2634,7 +2634,7 @@ public class IntegerCityController {
                             String createDate = resultObject.get("createDate").toString();
                             Long createLong = DateUtils.getDate(createDate, "yyyy-MM-dd HH:mm:ss").getTime();
                             System.out.println(currentTime - createLong);
-                            if (currentTime - createLong <= 30000) {
+                            if (currentTime - createLong <= 15000) {
                                 String lineName = resultObject.get("lineName") == null ? "" : resultObject.get("lineName").toString();
                                 String resultOrderNo = resultObject.get("orderNo") == null ? "" : resultObject.get("orderNo").toString();
                                 String bookingDate = resultObject.get("bookingDate") == null ? "" : resultObject.get("bookingDate").toString();
