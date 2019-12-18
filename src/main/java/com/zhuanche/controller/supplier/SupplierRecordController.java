@@ -395,7 +395,7 @@ public class SupplierRecordController {
               if(vo != null){
                   SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
                   accountApply.setCityId(vo.getSupplierCity());
-                  accountApply.setSettlementFullName(vo.getSupplierFullName());
+                  accountApply.setSettlementFullName(settlementFullName);
                   accountApply.setUpdateBy(loginUser.getId());
                   accountApply.setUpdateName(loginUser.getName());
                   accountApply.setUpdateDate(new Date());
