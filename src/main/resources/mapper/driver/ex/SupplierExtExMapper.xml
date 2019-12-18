@@ -52,7 +52,10 @@
     offical_seal_url, need_deposit_receipt, applier_status
   </sql>
   <select id="extDtoList" resultType="com.zhuanche.entity.driver.SupplierExtDto" parameterType="com.zhuanche.entity.driver.SupplierExtDto" >
-      SELECT t.id as id,
+      SELECT t.id ,t.supplierId,t.supplierShortName, t.cooperationMode,t.gardenPlanLevel,
+      t.applierStatus, t.agreementStartTime, t.agreementEndTime,
+      t.carNumber, t.lowLimitMonthWater, t.marginAmount,
+      t.accountApplyId, t.amountDeposit, t.mainCityId FROM (SELECT t.id as id,
       t.supplier_id as supplierId,
       t.supplier_short_name as supplierShortName,
       t.cooperation_mode as cooperationMode,
@@ -70,10 +73,10 @@
       LEFT JOIN supplier_cooperation_agreement a on t.supplier_id = a.supplier_id
       LEFT JOIN supplier_account_apply p on a.supplier_id = p.supplier_id
       LEFT JOIN supplier_level l on t.supplier_id = l.supplier_id
-      WHERE  1=1
-            <if test="supplierIds != null and supplierIds.size()>0">
-              AND t.supplier_id in
-              <foreach item="item" index="index" collection="supplierIds" open="(" separator="," close=")">
+      WHERE 1=1
+      <if test="supplierIds != null and supplierIds.size()>0">AND t.supplier_id in
+          <foreach item
+                           ="item" index="index" collection="supplierIds" open="(" separator="," close=")">
                 #{item}
               </foreach>
             </if>
@@ -89,7 +92,10 @@
             <if test="applierStatus != null and applierStatus != ''">
               AND t.applier_status = #{applierStatus}
             </if>
-      GROUP BY t.supplier_id ORDER BY t.update_date DESC
+
+      ORDER BY l.update_time desc
+      )t
+      GROUP BY t.supplierId
   </select>
 
   <select id="extDtoDetail" resultType="com.zhuanche.entity.driver.SupplierExtDto" parameterType="java.lang.Integer" >
