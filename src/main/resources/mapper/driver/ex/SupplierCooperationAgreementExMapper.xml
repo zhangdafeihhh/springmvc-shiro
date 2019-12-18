@@ -13,10 +13,15 @@
     <result column="create_name" property="createName" jdbcType="VARCHAR" />
     <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
     <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="margin_account" property="marginAccount" jdbcType="VARCHAR" />
+    <result column="car_number" property="carNumber" jdbcType="VARCHAR" />
+    <result column="low_limit_month_water" property="lowLimitMonthWater" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+
   </resultMap>
   <sql id="Base_Column_List" >
     id, supplier_id, agreement_number, agreement_start_time, agreement_end_time, margin_amount, 
-    margin_account, create_by, create_name, create_date, update_date
+    margin_account, create_by, create_name, create_date, update_date,car_number,low_limit_month_water,status
   </sql>
   <select id="selectLastAgreementBySupplierId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -34,6 +39,17 @@
     where supplier_id = #{supplierId,jdbcType=INTEGER}
     order by update_date desc
   </select>
+
+
+  <select id="queryBySupplierId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from supplier_cooperation_agreement
+    where supplier_id = #{supplierId,jdbcType=INTEGER}
+    order by update_date desc limit 1
+  </select>
+
+
 
   <delete id="deleteBySupplierId" parameterType="java.lang.Integer" >
     delete from supplier_cooperation_agreement

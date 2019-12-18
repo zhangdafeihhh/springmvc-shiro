@@ -8,12 +8,14 @@ import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.dto.ImportCheckEntity;
 import com.zhuanche.entity.driver.SupplierLevel;
 import com.zhuanche.entity.driver.SupplierLevelAdditional;
+import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.serv.supplier.SupplierLevelService;
 import com.zhuanche.util.excel.CsvUtils;
 import com.zhuanche.util.excel.CsvUtils2File;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
+import mapper.rentcar.ex.CarBizSupplierExMapper;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.POIXMLDocument;
@@ -52,6 +54,9 @@ public class SupplierLevelController {
 
     @Autowired
     private SupplierLevelService supplierLevelService;
+
+    @Autowired
+    private CarBizSupplierExMapper supplierExMapper;
 
 
     @RequestMapping(value="dopager",method= {RequestMethod.GET,RequestMethod.POST})
@@ -97,6 +102,13 @@ public class SupplierLevelController {
         try{
             logger.info("根据供应商Id查询供应商等级，参数为：supplierId="+supplierId);
             SupplierLevel entity =    supplierLevelService.findSupplierLevelScoreBySupplierId(supplierId);
+            String supplierName = supplierExMapper.getSupplierNameById(supplierId);
+            if(entity == null){
+                entity = new SupplierLevel();
+                entity.setSupplierName(supplierName);
+            }else {
+                entity.setSupplierName(supplierName);
+            }
             return AjaxResponse.success(entity);
         }catch (Exception e){
             logger.error("根据供应商Id查询供应商等级异常，参数为：supplierId="+supplierId,e);

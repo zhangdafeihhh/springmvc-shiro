@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.ex.SupplierExtExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.SupplierExt" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="supplier_short_name" property="supplierShortName" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="two_level_cooperation" property="twoLevelCooperation" jdbcType="INTEGER" />
+    <result column="settlement_type" property="settlementType" jdbcType="INTEGER" />
+    <result column="settlement_cycle" property="settlementCycle" jdbcType="INTEGER" />
+    <result column="settlement_day" property="settlementDay" jdbcType="INTEGER" />
+    <result column="settlement_account" property="settlementAccount" jdbcType="VARCHAR" />
+    <result column="bank_account" property="bankAccount" jdbcType="VARCHAR" />
+    <result column="bank_name" property="bankName" jdbcType="VARCHAR" />
+    <result column="bank_identify" property="bankIdentify" jdbcType="VARCHAR" />
+    <result column="settlement_full_name" property="settlementFullName" jdbcType="VARCHAR" />
+    <result column="first_sign_time" property="firstSignTime" jdbcType="DATE" />
+    <result column="tax_rate" property="taxRate" jdbcType="VARCHAR" />
+    <result column="invoice_type" property="invoiceType" jdbcType="INTEGER" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="main_city_id" property="mainCityId" jdbcType="INTEGER" />
+    <result column="large_area" property="largeArea" jdbcType="VARCHAR" />
+    <result column="cooperation_mode" property="cooperationMode" jdbcType="INTEGER" />
+    <result column="garden_plan_level" property="gardenPlanLevel" jdbcType="VARCHAR" />
+    <result column="sign_sponsor" property="signSponsor" jdbcType="VARCHAR" />
+    <result column="contract_time" property="contractTime" jdbcType="VARCHAR" />
+    <result column="amount_deposit" property="amountDeposit" jdbcType="VARCHAR" />
+    <result column="receive_account" property="receiveAccount" jdbcType="VARCHAR" />
+    <result column="cancellation_date" property="cancellationDate" jdbcType="TIMESTAMP" />
+    <result column="account_user" property="accountUser" jdbcType="VARCHAR" />
+    <result column="deposit_receipt" property="depositReceipt" jdbcType="VARCHAR" />
+    <result column="company_date" property="companyDate" jdbcType="TIMESTAMP" />
+    <result column="refund_status" property="refundStatus" jdbcType="VARCHAR" />
+    <result column="legal_name" property="legalName" jdbcType="VARCHAR" />
+    <result column="bank_pic_url" property="bankPicUrl" jdbcType="VARCHAR" />
+    <result column="offical_seal_url" property="officalSealUrl" jdbcType="VARCHAR" />
+    <result column="need_deposit_receipt" property="needDepositReceipt" jdbcType="INTEGER" />
+    <result column="applier_status" property="applierStatus" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, supplier_id, status, supplier_short_name, create_date, update_date, email, remark, 
+    two_level_cooperation, settlement_type, settlement_cycle, settlement_day, settlement_account, 
+    bank_account, bank_name, bank_identify, settlement_full_name, first_sign_time, tax_rate, 
+    invoice_type, city_id, main_city_id, large_area, cooperation_mode, garden_plan_level, 
+    sign_sponsor, contract_time, amount_deposit, receive_account, cancellation_date, 
+    account_user, deposit_receipt, company_date, refund_status, legal_name, bank_pic_url, 
+    offical_seal_url, need_deposit_receipt, applier_status
+  </sql>
+  <select id="extDtoList" resultType="com.zhuanche.entity.driver.SupplierExtDto" parameterType="com.zhuanche.entity.driver.SupplierExtDto" >
+      SELECT t.id as id,
+      t.supplier_id as supplierId,
+      t.supplier_short_name as supplierShortName,
+      t.cooperation_mode as cooperationMode,
+      l.grade_level as gardenPlanLevel,
+      t.applier_status as applierStatus,
+      a.agreement_start_time as agreementStartTime,
+      a.agreement_end_time as agreementEndTime,
+      a.car_number as carNumber,
+      a.low_limit_month_water as lowLimitMonthWater,
+      a.margin_amount as marginAmount,
+      p.id as accountApplyId,
+      t.amount_deposit as amountDeposit,
+      t.main_city_id as mainCityId
+      FROM supplier_ext t
+      LEFT JOIN supplier_cooperation_agreement a on t.supplier_id = a.supplier_id
+      LEFT JOIN supplier_account_apply p on a.supplier_id = p.supplier_id
+      LEFT JOIN supplier_level l on t.supplier_id = l.supplier_id
+      WHERE  1=1
+            <if test="supplierIds != null and supplierIds.size()>0">
+              AND t.supplier_id in
+              <foreach item="item" index="index" collection="supplierIds" open="(" separator="," close=")">
+                #{item}
+              </foreach>
+            </if>
+            <if test="mainCityId != null and mainCityId != '' ">
+              and t.main_city_id = #{mainCityId}
+            </if>
+            <if test="cooperationMode != null and cooperationMode != ''">
+              and t.cooperation_mode = #{cooperationMode}
+            </if>
+            <if test="gardenPlanLevel != null and gardenPlanLevel != ''">
+              and l.grade_level  = #{gardenPlanLevel}
+            </if>
+            <if test="applierStatus != null and applierStatus != ''">
+              AND t.applier_status = #{applierStatus}
+            </if>
+      GROUP BY t.supplier_id ORDER BY t.update_date DESC
+  </select>
+
+  <select id="extDtoDetail" resultType="com.zhuanche.entity.driver.SupplierExtDto" parameterType="java.lang.Integer" >
+    SELECT t.id as id,
+           t.main_city_id as mainCityId,
+           t.supplier_short_name as supplierShortName,
+			t.cooperation_mode as cooperationMode,
+      t.garden_plan_level as gardenPlanLevel,
+      t.applier_status as applierStatus,
+			t.first_sign_time as firstSignTime,
+			t.amount_deposit as amountDeposit,
+			t.email as email,
+			t.bank_pic_url as bankPicUrl,
+			t.offical_seal_url as officalSealUrl,
+			t.settlement_account as settlementAccount,
+			t.bank_name as bankName,
+			t.bank_account as bankAccount,
+			t.bank_identify as bankIdentify,
+			t.settlement_full_name as settlementFullName
+      FROM supplier_ext t WHERE  t.supplier_id = #{supplierId,jdbcType=BIGINT}
+  </select>
+
+
+
+  <select id="recordDetail" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from supplier_ext
+    where supplier_id = #{supplierId,jdbcType=BIGINT}
+  </select>
+  <update id="editExtDto" parameterType="com.zhuanche.entity.driver.SupplierExtDto" >
+    update supplier_ext
+    <set >
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where
+    supplier_id = #{supplierId,jdbcType=INTEGER}
+  </update>
+
+
+    <update id="editExtStatus" parameterType="com.zhuanche.entity.driver.SupplierExtDto" >
+        update supplier_ext
+        <set >
+            <if test="applierStatus != null" >
+                applier_status = #{applierStatus,jdbcType=INTEGER},
+            </if>
+        </set>
+        where
+        supplier_id = #{supplierId,jdbcType=INTEGER}
+    </update>
+</mapper>

@@ -11,6 +11,7 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.driver.supplier.SupplierAccountApplyDTO;
 import com.zhuanche.entity.driver.SupplierAccountApply;
+import com.zhuanche.entity.driver.SupplierCheckFail;
 import com.zhuanche.entity.driver.SupplierExtDto;
 import com.zhuanche.entity.rentcar.CarBizCity;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
@@ -28,6 +29,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -53,6 +55,9 @@ public class SupplierAccountApplyService {
 
     @Autowired
     private SupplierExtDtoMapper supplierExtDtoMapper;
+
+    @Autowired
+    private SupplierCheckFailService failService;
 
     @MasterSlaveConfigs(configs={
             @MasterSlaveConfig(databaseTag="driver-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
@@ -86,11 +91,12 @@ public class SupplierAccountApplyService {
     public AjaxResponse updateSupplierAccountApplyStatua(Long id, Integer cityId, Integer supplierId,
                                                          String settlementAccount, String bankAccount,
                                                          String bankName, String bankIdentify,
-                                                         String settlementFullName){
+                                                         String settlementFullName,String bankPicUrl,
+                                                         String officalSealUrl,Integer status,String remark){
 
 
         SupplierAccountApply apply = supplierAccountApplyMapper.selectByPrimaryKey(id);
-        if(apply==null || apply.getStatus()!=1){
+        if(apply==null){
             return AjaxResponse.fail(RestErrorCode.SUPPLIER_ACCOUNT_APPLY_UPDATE);
         }
 
@@ -104,10 +110,12 @@ public class SupplierAccountApplyService {
         params.setBankName(bankName);
         params.setBankIdentify(bankIdentify);
         params.setSettlementFullName(settlementFullName);
-        params.setStatus((byte)2);
+        params.setStatus((byte)status.intValue());
         SSOLoginUser currentLoginUser = WebSessionUtil.getCurrentLoginUser();
         params.setUpdateBy(currentLoginUser.getId());
         params.setUpdateName(currentLoginUser.getName());
+        params.setBankPicUrl(bankPicUrl);
+        params.setOfficalSealUrl(officalSealUrl);
         //切换主库
         DynamicRoutingDataSource.setMasterSlave("driver-DataSource", DataSourceMode.MASTER);
         int i = supplierAccountApplyMapper.updateByPrimaryKeySelective(params);
@@ -121,6 +129,7 @@ public class SupplierAccountApplyService {
             supplierExtDto.setBankName(bankName);
             supplierExtDto.setBankIdentify(bankIdentify);
             supplierExtDto.setSettlementFullName(settlementFullName);
+            supplierExtDto.setApplierStatus(status);
 
             int count = supplierExtDtoExMapper.selectCountBySupplierId(supplierId);
             logger.info("供应商 申请修改信息审核 查询扩展表是否已存在={}", count);
@@ -132,6 +141,19 @@ public class SupplierAccountApplyService {
                 supplierExtDtoExMapper.updateBySupplierId(supplierExtDto);
                 logger.info("更新供应商扩展信息 : supplierExtInfo {}", JSON.toJSONString(supplierExtDto));
             }
+
+            try {
+                SupplierCheckFail fail = new SupplierCheckFail();
+                fail.setStatus(status);
+                fail.setRemark(remark);
+                fail.setSupplierId(supplierId);
+                fail.setCreateTime(new Date());
+                fail.setUpdateTime(new Date());
+                failService.insert(fail);
+            } catch (Exception e) {
+                logger.info("入库异常" + e);
+            }
+
             return AjaxResponse.success(null);
         } else {
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);

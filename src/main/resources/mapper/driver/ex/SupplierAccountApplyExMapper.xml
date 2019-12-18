@@ -17,11 +17,15 @@
     <result column="update_by" property="updateBy" jdbcType="INTEGER" />
     <result column="update_name" property="updateName" jdbcType="VARCHAR" />
     <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+
+    <result column="bank_pic_url" property="bankPicUrl" jdbcType="VARCHAR" />
+    <result column="offical_seal_url" property="officalSealUrl" jdbcType="VARCHAR" />
+
   </resultMap>
   <sql id="Base_Column_List" >
     id, city_id, supplier_id, status, settlement_account, bank_account, bank_name, bank_identify,
     settlement_full_name, create_by, create_name, create_date, update_by, update_name, 
-    update_date
+    update_date,bank_pic_url,offical_seal_url
   </sql>
   <sql id="Base_where">
     <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR">
@@ -80,5 +84,219 @@
     order by update_date desc
     limit 1
   </select>
+
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.SupplierAccountApply" >
+    update supplier_account_apply
+    <set >
+      <if test="cityId != null" >
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="settlementAccount != null" >
+        settlement_account = #{settlementAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="bankAccount != null" >
+        bank_account = #{bankAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="bankName != null" >
+        bank_name = #{bankName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankIdentify != null" >
+        bank_identify = #{bankIdentify,jdbcType=VARCHAR},
+      </if>
+      <if test="settlementFullName != null" >
+        settlement_full_name = #{settlementFullName,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="createName != null" >
+        create_name = #{createName,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="updateName != null" >
+        update_name = #{updateName,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="bankPicUrl != null" >
+        bank_pic_url = #{bankPicUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="officalSealUrl != null" >
+        offical_seal_url = #{officalSealUrl,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+
+  <update id="updateBySupplier" parameterType="com.zhuanche.entity.driver.SupplierAccountApply" >
+    update supplier_account_apply
+    <set >
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="settlementAccount != null" >
+        settlement_account = #{settlementAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="bankAccount != null" >
+        bank_account = #{bankAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="bankName != null" >
+        bank_name = #{bankName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankIdentify != null" >
+        bank_identify = #{bankIdentify,jdbcType=VARCHAR},
+      </if>
+      <if test="settlementFullName != null" >
+        settlement_full_name = #{settlementFullName,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="createName != null" >
+        create_name = #{createName,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="updateName != null" >
+        update_name = #{updateName,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="bankPicUrl != null" >
+        bank_pic_url = #{bankPicUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="officalSealUrl != null" >
+        offical_seal_url = #{officalSealUrl,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where         supplier_id = #{supplierId,jdbcType=INTEGER}
+  </update>
+
+
+  <insert id="insert" parameterType="com.zhuanche.entity.driver.SupplierAccountApply" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into supplier_account_apply
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="cityId != null" >
+        city_id,
+      </if>
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="settlementAccount != null" >
+        settlement_account,
+      </if>
+      <if test="bankAccount != null" >
+        bank_account,
+      </if>
+      <if test="bankName != null" >
+        bank_name,
+      </if>
+      <if test="bankIdentify != null" >
+        bank_identify,
+      </if>
+      <if test="settlementFullName != null" >
+        settlement_full_name,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createName != null" >
+        create_name,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="updateName != null" >
+        update_name,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="bankPicUrl != null" >
+        bank_pic_url,
+      </if>
+      <if test="officalSealUrl != null" >
+        offical_seal_url,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="cityId != null" >
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="settlementAccount != null" >
+        #{settlementAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="bankAccount != null" >
+        #{bankAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="bankName != null" >
+        #{bankName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankIdentify != null" >
+        #{bankIdentify,jdbcType=VARCHAR},
+      </if>
+      <if test="settlementFullName != null" >
+        #{settlementFullName,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="createName != null" >
+        #{createName,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="updateName != null" >
+        #{updateName,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="bankPicUrl != null" >
+        #{bankPicUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="officalSealUrl != null" >
+        #{officalSealUrl,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+
 
 </mapper>

@@ -13,11 +13,14 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.driver.supplier.SupplierAccountApplyDTO;
 import com.zhuanche.entity.driver.SupplierAccountApply;
+import com.zhuanche.entity.driver.SupplierCheckFail;
 import com.zhuanche.serv.supplier.SupplierAccountApplyService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
+import mapper.driver.ex.SupplierCheckFailExMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,6 +39,9 @@ public class SupplierAccountApplyController {
 
     @Resource
     private SupplierAccountApplyService supplierAccountApplyService;
+
+    @Autowired
+    private SupplierCheckFailExMapper exMapper;
 
     /**
      * 根据供应商查询所有申请修改信息
@@ -86,6 +92,13 @@ public class SupplierAccountApplyController {
     public AjaxResponse querySupplierAccountApplyById(@Verify(param = "id",rule="required") Long id){
         logger.info("[供应商申请修改账户信息]根据供应商查询所有申请修改信息 id={}", id);
         SupplierAccountApply supplierAccountApply = supplierAccountApplyService.selectByPrimaryKey(id);
+        try {
+            List<SupplierCheckFail> list = exMapper.failList(supplierAccountApply.getSupplierId());
+            supplierAccountApply.setList(list);
+        } catch (Exception e) {
+            logger.error("根据id获取供应商账号信息异常" + e);
+            e.printStackTrace();
+        }
         return AjaxResponse.success(supplierAccountApply);
     }
 
@@ -152,14 +165,19 @@ public class SupplierAccountApplyController {
                                        @Verify(param = "bankAccount",rule="required") String bankAccount,
                                        @Verify(param = "bankName",rule="required") String bankName,
                                        @Verify(param = "bankIdentify",rule="required") String bankIdentify,
-                                       @Verify(param = "settlementFullName",rule="required") String settlementFullName){
+                                       @Verify(param = "settlementFullName",rule="required") String settlementFullName,
+                                       @Verify(param = "bankPicUrl",rule = "required")String bankPicUrl,
+                                       @Verify(param = "officalSealUrl",rule = "required")String officalSealUrl,
+                                       @Verify(param = "status",rule = "required")Integer status,
+                                       String remark){
 
         logger.info("[供应商申请修改账户信息]申请修改信息审核 id={}, cityId={}, supplierId={}, settlementAccount={}, bankAccount={}, " +
-                        "bankName={}, bankIdentify={}, settlementFullName={}",
-                id, cityId, supplierId, settlementAccount, bankAccount, bankName, bankIdentify, settlementFullName);
+                        "bankName={}, bankIdentify={}, settlementFullName={},bankPicUrl={},officalSealUrl={},status ={},remark={}",
+                id, cityId, supplierId, settlementAccount, bankAccount, bankName, bankIdentify, settlementFullName,
+                bankPicUrl,officalSealUrl,status,remark);
 
         return supplierAccountApplyService.updateSupplierAccountApplyStatua(id, cityId, supplierId, settlementAccount,
-                bankAccount, bankName, bankIdentify, settlementFullName);
+                bankAccount, bankName, bankIdentify, settlementFullName,bankPicUrl,officalSealUrl,status,remark);
     }
 
     /**

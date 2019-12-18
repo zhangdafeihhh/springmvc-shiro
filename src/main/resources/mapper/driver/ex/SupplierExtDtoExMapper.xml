@@ -22,12 +22,13 @@
     <result column="first_sign_time" property="firstSignTime" jdbcType="DATE" />
     <result column="tax_rate" property="taxRate" jdbcType="VARCHAR" />
     <result column="invoice_type" property="invoiceType" jdbcType="INTEGER" />
+    <result column="applier_status" property="applierStatus" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, supplier_id, status, supplier_short_name, create_date, update_date, remark, email,
     two_level_cooperation, settlement_type, settlement_cycle, settlement_day, settlement_account,
     bank_account, bank_name, bank_identify, settlement_full_name, first_sign_time, tax_rate,
-    invoice_type
+    invoice_type,applier_status
   </sql>
   <select id="queryExtDtoByIdList" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select
@@ -86,6 +87,9 @@
       <if test="invoiceType != null" >
         invoice_type = #{invoiceType,jdbcType=INTEGER},
       </if>
+      <if test="applierStatus != null" >
+        applier_status = #{applierStatus,jdbcType=INTEGER},
+      </if>
     </set>
     where supplier_id = #{supplierId}
   </update>
@@ -115,5 +119,14 @@
       count(1)
     from supplier_ext
       where supplier_id = #{supplierId}
+  </select>
+
+
+
+  <select id="selectRecord" parameterType="com.zhuanche.entity.driver.SupplierExtDto" resultType="com.zhuanche.entity.driver.SupplierExtDto">
+    SELECT t.*,a.*  FROM supplier_ext t
+    INNER JOIN supplier_cooperation_agreement a on t.supplier_id = a.supplier_id
+    INNER JOIN supplier_account_apply p on a.supplier_id = p.supplier_id
+    GROUP BY t.supplier_id ORDER BY t.update_date DESC;
   </select>
 </mapper>

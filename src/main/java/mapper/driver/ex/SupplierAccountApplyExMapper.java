@@ -18,4 +18,10 @@ public interface SupplierAccountApplyExMapper {
 
     SupplierAccountApply selectApplyStatusBySupplierId(@Param("supplierId") Integer supplierId);
 
+    int updateByPrimaryKey(SupplierAccountApply record);
+
+    int updateBySupplier(SupplierAccountApply record);
+
+    int insert(SupplierAccountApply record);
+
 }
