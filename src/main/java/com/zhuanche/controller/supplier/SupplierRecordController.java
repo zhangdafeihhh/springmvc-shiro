@@ -291,6 +291,7 @@ public class SupplierRecordController {
                 supplierAccountApply.setBankAccount(dto.getBankAccount());
                 supplierAccountApply.setSettlementAccount(dto.getSettlementAccount());
                 supplierAccountApply.setBankIdentify(dto.getBankIdentify());
+                supplierAccountApply.setSettlementFullName(dto.getSettlementFullName());
                 supplier.setApplyList(supplierAccountApply);
             }
 
@@ -370,7 +371,7 @@ public class SupplierRecordController {
                                       @Verify(param = "supplierId",rule = "required") Integer supplierId,
                                       @Verify(param = "bankName",rule = "required") String bankName,
                                       @Verify(param = "bankAccount",rule = "required") String bankAccount,
-                                      @Verify(param = "settlementAccount",rule = "required") String  settlementAccount,
+                                      @Verify(param = "settlementFullName",rule = "required") String  settlementFullName,
                                       @Verify(param = "bankIdentify",rule = "required") String bankIdentify,
                                       @Verify(param = "bankPicUrl",rule = "required") String bankPicUrl,
                                       @Verify(param = "officalSealUrl",rule = "required") String officalSealUrl){
@@ -379,7 +380,7 @@ public class SupplierRecordController {
             accountApply.setSupplierId(supplierId);
             accountApply.setBankName(bankName);
             accountApply.setBankAccount(bankAccount);
-            accountApply.setSettlementAccount(settlementAccount);
+            accountApply.setSettlementFullName(settlementFullName);
             accountApply.setBankIdentify(bankIdentify);
             accountApply.setBankPicUrl(bankPicUrl);
             accountApply.setId(id);
