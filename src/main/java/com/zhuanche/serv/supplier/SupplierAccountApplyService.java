@@ -89,7 +89,7 @@ public class SupplierAccountApplyService {
             @MasterSlaveConfig(databaseTag="driver-DataSource",mode= DynamicRoutingDataSource.DataSourceMode.SLAVE )
     } )
     public AjaxResponse updateSupplierAccountApplyStatua(Long id, Integer cityId, Integer supplierId,
-                                                         String settlementAccount, String bankAccount,
+                                                          String bankAccount,
                                                          String bankName, String bankIdentify,
                                                          String settlementFullName,String bankPicUrl,
                                                          String officalSealUrl,Integer status,String remark){
@@ -105,7 +105,9 @@ public class SupplierAccountApplyService {
         params.setId(id);
         params.setCityId(cityId);
         params.setSupplierId(supplierId);
+/*
         params.setSettlementAccount(settlementAccount);
+*/
         params.setBankAccount(bankAccount);
         params.setBankName(bankName);
         params.setBankIdentify(bankIdentify);
@@ -124,7 +126,9 @@ public class SupplierAccountApplyService {
             //更新供应商扩展表账户信息
             SupplierExtDto supplierExtDto = new SupplierExtDto();
             supplierExtDto.setSupplierId(supplierId);
+/*
             supplierExtDto.setSettlementAccount(settlementAccount);
+*/
             supplierExtDto.setBankAccount(bankAccount);
             supplierExtDto.setBankName(bankName);
             supplierExtDto.setBankIdentify(bankIdentify);

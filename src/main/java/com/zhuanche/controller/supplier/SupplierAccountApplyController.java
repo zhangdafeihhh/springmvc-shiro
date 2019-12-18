@@ -161,7 +161,6 @@ public class SupplierAccountApplyController {
     public AjaxResponse updateSupplier(@Verify(param = "id",rule="required") Long id,
                                        @Verify(param = "cityId",rule="required") Integer cityId,
                                        @Verify(param = "supplierId",rule="required") Integer supplierId,
-                                       @Verify(param = "settlementAccount",rule="required") String settlementAccount,
                                        @Verify(param = "bankAccount",rule="required") String bankAccount,
                                        @Verify(param = "bankName",rule="required") String bankName,
                                        @Verify(param = "bankIdentify",rule="required") String bankIdentify,
@@ -171,12 +170,12 @@ public class SupplierAccountApplyController {
                                        @Verify(param = "status",rule = "required")Integer status,
                                        String remark){
 
-        logger.info("[供应商申请修改账户信息]申请修改信息审核 id={}, cityId={}, supplierId={}, settlementAccount={}, bankAccount={}, " +
+        logger.info("[供应商申请修改账户信息]申请修改信息审核 id={}, cityId={}, supplierId={}, bankAccount={}, " +
                         "bankName={}, bankIdentify={}, settlementFullName={},bankPicUrl={},officalSealUrl={},status ={},remark={}",
-                id, cityId, supplierId, settlementAccount, bankAccount, bankName, bankIdentify, settlementFullName,
+                id, cityId, supplierId,  bankAccount, bankName, bankIdentify, settlementFullName,
                 bankPicUrl,officalSealUrl,status,remark);
 
-        return supplierAccountApplyService.updateSupplierAccountApplyStatua(id, cityId, supplierId, settlementAccount,
+        return supplierAccountApplyService.updateSupplierAccountApplyStatua(id, cityId, supplierId,
                 bankAccount, bankName, bankIdentify, settlementFullName,bankPicUrl,officalSealUrl,status,remark);
     }
 
