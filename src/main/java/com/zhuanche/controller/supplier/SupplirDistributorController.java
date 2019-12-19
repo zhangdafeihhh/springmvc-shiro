@@ -17,10 +17,10 @@ import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.DateUtils;
 import mapper.rentcar.ex.CarBizCityExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.http.HttpException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -104,14 +104,8 @@ public class SupplirDistributorController {
             dto.setUpdateTimeStr(DateUtils.formatDate(list.getUpdateTime(),DateUtils.dateTimeFormat_parttern));
             dto.setCityName(map.get(list.getCityId()));
             setSupplier.add(list.getSupplierId());
-            try {
-                BeanUtils.copyProperties(list,dto);
+            BeanUtils.copyProperties(list,dto);
 
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
             listDTO.add(dto);
         });
 

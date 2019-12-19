@@ -31,13 +31,26 @@
     where 1=1
 
     <if test="cityId != null" >
-      city_id = #{cityId,jdbcType=INTEGER},
+      AND city_id = #{cityId,jdbcType=INTEGER}
     </if>
     <if test="supplierId != null" >
-      supplier_id = #{supplierId,jdbcType=INTEGER},
+      AND supplier_id = #{supplierId,jdbcType=INTEGER}
     </if>
     <if test="distributorName != null" >
-      distributor_name = #{distributorName,jdbcType=VARCHAR},
+      AND distributor_name = #{distributorName,jdbcType=VARCHAR}
+    </if>
+
+    <if test="cityIds !=null and cityIds.size()>0">
+      and city_id  IN
+      <foreach collection="cityIds" open="(" close=")" separator="," item="cid">
+        #{cid}
+      </foreach>
+    </if>
+    <if test="supplierIds !=null and supplierIds.size()>0">
+      and supplier_id IN
+      <foreach collection="supplierIds" open="(" close=")" separator="," item="sid">
+        #{sid}
+      </foreach>
     </if>
   </select>
 
