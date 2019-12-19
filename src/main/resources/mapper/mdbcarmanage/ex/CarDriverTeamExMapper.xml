@@ -354,4 +354,37 @@
     </select>
 
 
+    <!-- 查询车队列表(根据城市ID，供应商ID、车队ID  )返回车队和车队下的小组 -->
+    <select id="queryTeamIdBySupplierIds" resultType="com.zhuanche.dto.CarDriverTeamDTO" >
+        select
+        id,
+        team_name AS teamName,
+        create_by AS createBy,
+        create_date AS createDate,
+        update_by AS updateBy,
+        update_date AS updateDate ,
+        city AS city,
+        supplier AS supplier,
+        remark,
+        status,
+        p_id pId,
+        charge1, charge2, charge3,
+        short_name AS shortName
+        from car_driver_team
+        where p_id IS NOT NULL
+        <if test="cityIds!=null and cityIds.size()>0">
+            and city IN
+            <foreach collection="cityIds" open="(" close=")" separator="," item="cid" >
+                #{cid}
+            </foreach>
+        </if>
+        <if test="supplierIds!=null and supplierIds.size()>0">
+            and supplier IN
+            <foreach collection="supplierIds" open="(" close=")" separator="," item="sid" >
+                #{sid}
+            </foreach>
+        </if>
+        order by city, id
+    </select>
+
 </mapper>
