@@ -226,7 +226,7 @@ public class SupplirDistributorController {
             logger.error("生成短连接异常" + e);
             return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
         }
-        logger.info("供应商短链接生成,supplierId={},result={}",supplierId,shortUrl);
+        logger.info("供应商短链接生成,shortUrl=",shortUrl);
 
         return AjaxResponse.success(shortUrl);
     }
