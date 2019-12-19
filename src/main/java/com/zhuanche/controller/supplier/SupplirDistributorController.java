@@ -2,10 +2,12 @@ package com.zhuanche.controller.supplier;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.dto.mdbcarmanage.SupplierAllDistributorDTO;
 import com.zhuanche.dto.mdbcarmanage.SupplierDistributorDTO;
 import com.zhuanche.dto.rentcar.CityDto;
 import com.zhuanche.entity.mdbcarmanage.SupplierDistributor;
@@ -26,8 +28,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -70,55 +70,62 @@ public class SupplirDistributorController {
                 "pageNum:{3},pageSize:{4}",cityId,supplierId,distributorId,pageNum,pageSize));
         SupplierDistributor distributor = new SupplierDistributor();
 
-        if(cityId != null || supplierId != null || distributorId != null){
-            if(cityId != null){
-                distributor.setCityId(cityId);
-            }
-
-            if(supplierId != null){
-                distributor.setSupplierId(supplierId);
-            }
-
-            if(distributorId != null){
-                distributor.setId(distributorId);
-            }
-        }else {
-            SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
-            distributor.setCityIds(loginUser.getCityIds());
-            distributor.setSupplierIds(loginUser.getSupplierIds());
-         }
-
-        Page page = PageHelper.startPage(pageNum,pageSize);
-        List<SupplierDistributor> distributorList = distributorService.distributorList(distributor);
         List<SupplierDistributorDTO> listDTO = new ArrayList<>();
+        try {
+            if(cityId != null || supplierId != null || distributorId != null){
+                if(cityId != null){
+                    distributor.setCityId(cityId);
+                }
 
-        List<CityDto>  cityDtoList =  cityExMapper.selectAllCity();
-        Map<Integer,String> map = Maps.newHashMap();
-        cityDtoList.forEach(city -> {
-            map.put(city.getCityId(),city.getCityName());
-        });
-        Set<Integer> setSupplier = new HashSet<>();
-        distributorList.forEach(list ->{
-            SupplierDistributorDTO dto = new SupplierDistributorDTO();
-            dto.setCreateTimeStr(DateUtils.formatDate(list.getCreateTime(),DateUtils.dateTimeFormat_parttern));
-            dto.setUpdateTimeStr(DateUtils.formatDate(list.getUpdateTime(),DateUtils.dateTimeFormat_parttern));
-            dto.setCityName(map.get(list.getCityId()));
-            setSupplier.add(list.getSupplierId());
-            BeanUtils.copyProperties(list,dto);
+                if(supplierId != null){
+                    distributor.setSupplierId(supplierId);
+                }
 
-            listDTO.add(dto);
-        });
+                if(distributorId != null){
+                    distributor.setId(distributorId);
+                }
+            }else {
+                SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+                distributor.setCityIds(loginUser.getCityIds());
+                distributor.setSupplierIds(loginUser.getSupplierIds());
+             }
 
-        List<CarBizSupplier> supplierList = supplierExMapper.queryNamesByIds(setSupplier);
-        Map<Integer,String> mapSupplier = Maps.newHashMap();
-        supplierList.forEach(supplier ->{
-            mapSupplier.put(supplier.getSupplierId(),supplier.getSupplierFullName());
-        });
+            Page page = PageHelper.startPage(pageNum,pageSize);
+            List<SupplierDistributor> distributorList = distributorService.distributorList(distributor);
 
-        listDTO.forEach(o ->{
-            o.setSupplierName(mapSupplier.get(o.getSupplierId()));
-        });
-        return AjaxResponse.success(listDTO);
+            List<CityDto>  cityDtoList =  cityExMapper.selectAllCity();
+            Map<Integer,String> map = Maps.newHashMap();
+            cityDtoList.forEach(city -> {
+                map.put(city.getCityId(),city.getCityName());
+            });
+            Set<Integer> setSupplier = new HashSet<>();
+            distributorList.forEach(list ->{
+                SupplierDistributorDTO dto = new SupplierDistributorDTO();
+                dto.setCreateTimeStr(DateUtils.formatDate(list.getCreateTime(),DateUtils.dateTimeFormat_parttern));
+                dto.setUpdateTimeStr(DateUtils.formatDate(list.getUpdateTime(),DateUtils.dateTimeFormat_parttern));
+                dto.setCityName(map.get(list.getCityId()));
+                setSupplier.add(list.getSupplierId());
+                BeanUtils.copyProperties(list,dto);
+
+                listDTO.add(dto);
+            });
+
+            List<CarBizSupplier> supplierList = supplierExMapper.queryNamesByIds(setSupplier);
+            Map<Integer,String> mapSupplier = Maps.newHashMap();
+            supplierList.forEach(supplier ->{
+                mapSupplier.put(supplier.getSupplierId(),supplier.getSupplierFullName());
+            });
+
+            listDTO.forEach(o ->{
+                o.setSupplierName(mapSupplier.get(o.getSupplierId()));
+            });
+        } catch (Exception e) {
+            logger.error("查询异常" + e);
+        }
+
+        PageInfo<SupplierDistributorDTO> pageInfo = new PageInfo<>(listDTO);
+
+        return AjaxResponse.success(pageInfo);
     }
 
 
@@ -223,5 +230,33 @@ public class SupplirDistributorController {
         logger.info("供应商短链接生成,shortUrl=",shortUrl);
 
         return AjaxResponse.success(shortUrl);
+    }
+
+
+
+    @RequestMapping("/distributorBySupplierId")
+    @ResponseBody
+    public AjaxResponse distributorBySupplierId(@Verify(param = "supplierId",rule = "required") Integer supplierId){
+        logger.info("获取供应商下的分销商入参：supplierId:",supplierId);
+
+        List<SupplierAllDistributorDTO> listDto = new ArrayList<>();
+        try {
+            SupplierDistributor distributor = new SupplierDistributor();
+            distributor.setSupplierId(supplierId);
+            List<SupplierDistributor> distributorList = distributorService.distributorList(distributor);
+            listDto = new ArrayList<>();
+
+            List<SupplierAllDistributorDTO> finalListDto = listDto;
+            distributorList.forEach(o ->{
+                SupplierAllDistributorDTO distributorDTO = new SupplierAllDistributorDTO();
+                BeanUtils.copyProperties(o,distributorDTO);
+                finalListDto.add(distributorDTO);
+            });
+        } catch (Exception e) {
+            logger.error("查询异常" + e);
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+
+        return AjaxResponse.success(listDto);
     }
 }

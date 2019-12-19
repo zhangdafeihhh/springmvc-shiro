@@ -178,14 +178,15 @@ public class IntegerCityController {
                                    String endCreateDate,
                                    String beginCostEndDate,
                                    String endCostEndDate,
-                                   String riderPhone) {
+                                   String riderPhone,
+                                   String distributorId) {
         logger.info(MessageFormat.format("订单查询入参:pageNum:{0},pageSize:{1},cityId:{2},supplierId:{3},orderState:" +
                         "{4},orderPushDriverType:{5},serviceType:{6},orderType:{7},airportId:{8},orderSource:{9},driverName:" +
                         "{10},driverPhone:{11},licensePlates:{12},reserveName:{13},reservePhone:{14},riderName:{15},orderNo:{16}," +
-                        "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostEndDate{20},endCostEndDate{21},riderPhone:{22}", pageNum,
+                        "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostEndDate{20},endCostEndDate{21},riderPhone:{22},distributorId:{23}", pageNum,
                 pageSize, cityId, supplierId, orderState, pushDriverType, serviceType, orderType, airportId, orderSource,
                 driverName, driverPhone, licensePlates, reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate,
-                endCreateDate, beginCostEndDate, endCostEndDate, riderPhone));
+                endCreateDate, beginCostEndDate, endCostEndDate, riderPhone,distributorId));
 
 
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
@@ -259,6 +260,7 @@ public class IntegerCityController {
         map.put("beginCostEndDate", beginCostEndDate);
         map.put("endCostEndDate", endCostEndDate);
         map.put("riderPhone", riderPhone);
+        map.put("distributorId", distributorId);
 
         //根据不同权限添加过滤条件
 /*        if (StringUtils.isNotEmpty(serviceCityBatch)) {
@@ -322,14 +324,15 @@ public class IntegerCityController {
                                         String endCreateDate,
                                         String beginCostStartDate,
                                         String beginCostEndDate,
-                                        String riderPhone) {
+                                        String riderPhone,
+                                        String distributorId) {
         logger.info(MessageFormat.format("订单查询入参:pageNum:{0},pageSize:{1},cityId:{2},orderState:" +
                         "{4},orderPushDriverType:{5},serviceType:{6},orderType:{7},airportId:{8},orderSource:{9},driverName:" +
                         "{10},driverPhone:{11},licensePlates:{12},reserveName:{13},reservePhone:{14},riderName:{15},orderNo:{16}," +
-                        "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostStartDate{20},beginCostEndDate{21},riderPhone:{22}", pageNum,
+                        "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostStartDate{20},beginCostEndDate{21},riderPhone:{22},distributorId:{23}", pageNum,
                 pageSize, cityId, orderState, pushDriverType, serviceType, orderType, airportId, orderSource,
                 driverName, driverPhone, licensePlates, reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate,
-                endCreateDate, beginCostStartDate, beginCostEndDate, riderPhone));
+                endCreateDate, beginCostStartDate, beginCostEndDate, riderPhone,distributorId));
 
 
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
@@ -375,6 +378,7 @@ public class IntegerCityController {
         map.put("beginCostEndDate", beginCostStartDate);
         map.put("endCostEndDate", beginCostEndDate);
         map.put("riderPhone", riderPhone);
+        map.put("distributorId", distributorId);
 
         //根据不同权限添加过滤条件
 /*        if (StringUtils.isNotEmpty(serviceCityBatch)) {
