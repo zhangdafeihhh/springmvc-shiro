@@ -1,5 +1,7 @@
 package com.zhuanche.controller.supplier;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -221,15 +223,25 @@ public class SupplirDistributorController {
         String qrUrl =String.format(H5_NEW_CITY_URL,supplierId,id);
         logger.info("生成短连接地址："+ qrUrl);
         String shortUrl = null;
+        JSONArray parseArray = null;
+
         try {
             shortUrl = HttpClientUtil.buildGetRequest(SINA_API + qrUrl).setLimitResult(1).execute();
-        } catch (HttpException e) {
-            logger.error("生成短连接异常" + e);
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-        }
-        logger.info("供应商短链接生成,shortUrl=",shortUrl);
+            parseArray = JSON.parseArray((shortUrl));
 
-        return AjaxResponse.success(shortUrl);
+        } catch (Exception e) {
+            logger.error("生成短连接异常" + e);
+            parseArray = new JSONArray();
+            Map<String,Object> map = Maps.newHashMap();
+            map.put("url_long",qrUrl);
+            map.put("type",0);
+            parseArray.add(map);
+            logger.info("连接地址生成失败，重新生成：" + parseArray);
+            return AjaxResponse.success(parseArray);
+        }
+        logger.info("供应商短链接生成,shortUrl=",parseArray.toJSONString());
+
+        return AjaxResponse.success(parseArray);
     }
 
 
