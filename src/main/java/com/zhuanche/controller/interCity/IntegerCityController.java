@@ -16,12 +16,14 @@ import com.zhuanche.dto.mdbcarmanage.InterCityOrderDTO;
 import com.zhuanche.dto.mdbcarmanage.MainOrderDetailDTO;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.entity.mdbcarmanage.MainOrderInterCity;
+import com.zhuanche.entity.mdbcarmanage.SupplierDistributor;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.CarBizSupplierService;
 import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.serv.interCity.MainOrderInterService;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
+import com.zhuanche.serv.supplier.SupplierDistributorService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.*;
@@ -31,6 +33,7 @@ import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,6 +121,9 @@ public class IntegerCityController {
 
     @Autowired
     private CarBizCarInfoExMapper carBizCarInfoExMapper;
+
+    @Autowired
+    private SupplierDistributorService distributorService;
 
     @Value("${ordercost.server.api.base.url}")
     private String orderCostUrl;
@@ -292,7 +298,9 @@ public class IntegerCityController {
             if (code == 0) {
                 JSONObject jsonData = jsonObject.getJSONObject("data");
                 if (jsonData != null && jsonData.get("data") != null) {
-                    return AjaxResponse.success(jsonData);
+                    //解析里面的内容获取分销商名称
+                    return this.response(jsonData);
+                   // return AjaxResponse.success(jsonData);
                 }
             }
         }
@@ -431,12 +439,68 @@ public class IntegerCityController {
             if (code == 0) {
                 JSONObject jsonData = jsonObject.getJSONObject("data");
                 if (jsonData != null && jsonData.get("data") != null) {
-                    return AjaxResponse.success(jsonData);
+
+                    return this.response(jsonData);
                 }
             }
         }
         //调用订单组接口查询
         return AjaxResponse.success(null);
+    }
+
+
+    /**
+     * 获取分销商名称
+     * @param jsonData
+     * @return
+     */
+    private AjaxResponse response(JSONObject jsonData){
+        try {
+            JSONArray jsonArray = jsonData.getJSONArray("data");
+            if(jsonArray != null && jsonArray.size()>0){
+                Set<Integer> distributorIds = new HashSet<>();
+                jsonArray.forEach(array ->{
+                    JSONObject disObject = (JSONObject) array;
+                    if(disObject.get("distributorId") != null && disObject.getInteger("distributorId") > 0){
+                        distributorIds.add(disObject.getInteger("distributorId"));
+                    }
+                });
+
+                List<SupplierDistributor> distributorList =  distributorService.distributorList(distributorIds);
+                Map<Integer,String> mapDis = Maps.newHashMap();
+                if(CollectionUtils.isNotEmpty(distributorList)){
+                    distributorList.forEach(list ->{
+                        mapDis.put(list.getId(),list.getDistributorName());
+                    });
+                }
+
+                JSONObject jsonResult = new JSONObject();
+                JSONArray jsonDisArray = new JSONArray();
+
+                jsonArray.forEach(array -> {
+                    JSONObject disObject = (JSONObject) array;
+                    if(disObject.get("distributorId") != null && disObject.getInteger("distributorId") > 0){
+                        disObject.put("distributorName",mapDis.get(disObject.getInteger("distributorId")));
+                    }else {
+                        disObject.put("distributorName","");
+                    }
+                    jsonDisArray.add(disObject);
+                });
+
+                jsonResult.put("data",jsonDisArray);
+                jsonResult.put("total",jsonData.get("total"));
+                jsonResult.put("pageNo",jsonData.get("pageNo"));
+                jsonResult.put("totalPage",jsonData.get("totalPage"));
+                jsonResult.put("pageSize",jsonData.get("pageSize"));
+
+                return AjaxResponse.success(jsonResult);
+            }
+
+        } catch (Exception e) {
+            logger.error("根据id获取分销商异常" + e);
+        }
+
+        return  AjaxResponse.success(jsonData);
     }
 
     /**

@@ -1,8 +1,10 @@
 package mapper.mdbcarmanage.ex;
 
 import com.zhuanche.entity.mdbcarmanage.SupplierDistributor;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 public interface SupplierDistributorExMapper {
 
@@ -13,4 +15,6 @@ public interface SupplierDistributorExMapper {
     int updateByPrimaryKeySelective(SupplierDistributor record);
 
     List<SupplierDistributor> distributorList(SupplierDistributor distributor);
+
+    List<SupplierDistributor> getDistributorNames(@Param("ids") Set<Integer> ids);
 }

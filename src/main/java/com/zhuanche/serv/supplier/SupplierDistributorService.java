@@ -3,6 +3,7 @@ package com.zhuanche.serv.supplier;
 import com.zhuanche.entity.mdbcarmanage.SupplierDistributor;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Author fanht
@@ -19,4 +20,7 @@ public interface SupplierDistributorService {
     int update(SupplierDistributor distributor);
 
     SupplierDistributor queryById(Integer id);
+
+    List<SupplierDistributor> distributorList(Set<Integer> ids);
+
 }

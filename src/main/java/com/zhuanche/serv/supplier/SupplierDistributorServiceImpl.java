@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Author fanht
@@ -37,5 +38,10 @@ public class SupplierDistributorServiceImpl implements SupplierDistributorServic
     @Override
     public SupplierDistributor queryById(Integer id) {
         return exMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public List<SupplierDistributor> distributorList(Set<Integer> ids) {
+        return exMapper.getDistributorNames(ids);
     }
 }

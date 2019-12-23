@@ -24,7 +24,7 @@
     where id = #{id,jdbcType=INTEGER}
   </select>
 
-  <select id="distributorList" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  <select id="distributorList" resultMap="BaseResultMap" parameterType="com.zhuanche.entity.mdbcarmanage.SupplierDistributor" >
     select
     <include refid="Base_Column_List" />
     from supplier_distributor
@@ -152,4 +152,19 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+  <select id="getDistributorNames" resultMap="BaseResultMap" >
+    select
+    id,distributor_name
+    from supplier_distributor
+    where 1=1
+    <if test="ids !=null and ids.size()>0">
+      and id IN
+      <foreach collection="ids" open="(" close=")" separator="," item="id">
+        #{id}
+      </foreach>
+    </if>
+  </select>
+
 </mapper>
