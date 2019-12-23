@@ -36,8 +36,8 @@
     <if test="supplierId != null" >
       AND supplier_id = #{supplierId,jdbcType=INTEGER}
     </if>
-    <if test="distributorName != null" >
-      AND distributor_name = #{distributorName,jdbcType=VARCHAR}
+    <if test="id != null" >
+      AND id = #{id,jdbcType=VARCHAR}
     </if>
 
     <if test="cityIds !=null and cityIds.size()>0">
