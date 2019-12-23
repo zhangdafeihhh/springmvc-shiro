@@ -418,7 +418,7 @@ public class IntegerCityController {
             }
         }
 
-        map.put("supplierIdBatch", supplierIdBatch);
+        map.put("supplierIdBatch", "");
         //添加排序字段
         JSONObject jsonSort = new JSONObject();
         jsonSort.put("field", "createDate");
