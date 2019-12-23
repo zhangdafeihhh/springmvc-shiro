@@ -52,6 +52,7 @@
         #{sid}
       </foreach>
     </if>
+    ORDER  BY  update_time  DESC 
   </select>
 
 
