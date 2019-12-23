@@ -16,6 +16,7 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.dto.driver.supplier.SupplierCooperationAgreementDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
+import com.zhuanche.dto.rentcar.CarBizSupplierDTO;
 import com.zhuanche.entity.driver.*;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.HttpClientUtil;
@@ -40,6 +41,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -937,5 +939,16 @@ public class CarBizSupplierService{
 
 		});
 	}
+
+
+	/**
+	 * 根据供应商查询名称
+	 * @param supplierIds
+	 * @return
+	 */
+	public List<CarBizSupplier> queryNamesByIds(Set<Integer> supplierIds){
+		return carBizSupplierExMapper.queryNamesByIds(supplierIds);
+	}
+
 
 }

@@ -14,6 +14,7 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.mdbcarmanage.InterCityOrderDTO;
 import com.zhuanche.dto.mdbcarmanage.MainOrderDetailDTO;
+import com.zhuanche.dto.rentcar.CarBizSupplierDTO;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.entity.mdbcarmanage.MainOrderInterCity;
 import com.zhuanche.entity.mdbcarmanage.SupplierDistributor;
@@ -417,7 +418,7 @@ public class IntegerCityController {
             }
         }
 
-        map.put("supplierIdBatch", "0");
+        map.put("supplierIdBatch", supplierIdBatch);
         //添加排序字段
         JSONObject jsonSort = new JSONObject();
         jsonSort.put("field", "createDate");
@@ -439,7 +440,6 @@ public class IntegerCityController {
             if (code == 0) {
                 JSONObject jsonData = jsonObject.getJSONObject("data");
                 if (jsonData != null && jsonData.get("data") != null) {
-
                     return this.response(jsonData);
                 }
             }
@@ -459,20 +459,41 @@ public class IntegerCityController {
             JSONArray jsonArray = jsonData.getJSONArray("data");
             if(jsonArray != null && jsonArray.size()>0){
                 Set<Integer> distributorIds = new HashSet<>();
+
+                Set<Integer> supplierIds = new HashSet<>();
+
                 jsonArray.forEach(array ->{
                     JSONObject disObject = (JSONObject) array;
                     if(disObject.get("distributorId") != null && disObject.getInteger("distributorId") > 0){
                         distributorIds.add(disObject.getInteger("distributorId"));
                     }
+
+                    if(disObject.get("supplierId") != null && disObject.getInteger("supplierId") > 0){
+                        supplierIds.add(disObject.getInteger("supplierId"));
+                    }
                 });
 
-                List<SupplierDistributor> distributorList =  distributorService.distributorList(distributorIds);
                 Map<Integer,String> mapDis = Maps.newHashMap();
-                if(CollectionUtils.isNotEmpty(distributorList)){
-                    distributorList.forEach(list ->{
-                        mapDis.put(list.getId(),list.getDistributorName());
-                    });
+
+                if(CollectionUtils.isNotEmpty(distributorIds)){
+                    List<SupplierDistributor> distributorList =  distributorService.distributorList(distributorIds);
+                    if(CollectionUtils.isNotEmpty(distributorList)){
+                        distributorList.forEach(list ->{
+                            mapDis.put(list.getId(),list.getDistributorName());
+                        });
+                    }
                 }
+
+                Map<Integer,String> supplierMap = Maps.newHashMap();
+                if(CollectionUtils.isNotEmpty(supplierIds)){
+                    List<CarBizSupplier> queryNameBySupplierIds = carBizSupplierService.queryNamesByIds(supplierIds);
+                    if(CollectionUtils.isNotEmpty(queryNameBySupplierIds)){
+                        queryNameBySupplierIds.forEach(supplierList -> {
+                            supplierMap.put(supplierList.getSupplierId(),supplierList.getSupplierFullName());
+                        });
+                    }
+                }
+
 
                 JSONObject jsonResult = new JSONObject();
                 JSONArray jsonDisArray = new JSONArray();
@@ -484,6 +505,11 @@ public class IntegerCityController {
                     }else {
                         disObject.put("distributorName","");
                     }
+
+                    if(disObject.get("supplierId") != null && disObject.getInteger("supplierId") > 0){
+                        disObject.put("supplierFullName",supplierMap.get(disObject.getInteger("supplierId")));
+                    }
+
                     jsonDisArray.add(disObject);
                 });
 
