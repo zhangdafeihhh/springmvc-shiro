@@ -278,6 +278,27 @@ public class DriverDailyReportController extends DriverQueryController {
 		searchParam.put("reportType",reportType);
 
 
+		SSOLoginUser loginUser = new SSOLoginUser();
+		Integer userId = loginUser.getId();
+		String loginName = loginUser.getLoginName();
+
+		StringBuffer stringBuffer = new StringBuffer();
+		stringBuffer.append(userId).append(licensePlates).append(driverName).append(driverIds).append(teamIds).append(suppliers)
+				.append(cities).append(statDateStart).append(statDateEnd).append(sortName).append(sortOrder).append(groupIds).append(reportType).append(loginName);
+		String key = RedisKeyUtils.DAILY_REPORT_KEY + stringBuffer.toString().replaceAll("null","");
+		log.info("导出的缓存key值：" + key);
+		String exportStr =  RedisCacheUtil.get(key,String.class);
+		if(exportStr != null ){
+			log.info("导出点击过于频繁");
+			return "";
+		}
+
+		if(!RedisCacheUtil.exist(key)){
+			//如果5s内还没有结果 有可能是后面的报错了 重新查询
+			RedisCacheUtil.set(key,"导出中",5);
+		}
+
+
 		//默认报告类型为日报
 		String fileTag = "";
 		reportType = reportType == null ? 0 : reportType;
@@ -289,21 +310,25 @@ public class DriverDailyReportController extends DriverQueryController {
 			//如果是周报，但是开始时间和结束时间不再同一周，不可以
 			if (statDateStart.compareTo(statDateEnd) > 0 ){
 //				return AjaxResponse.fail(RestErrorCode.STARTTIME_GREATE_ENDTIME);
+				RedisCacheUtil.delete(key);
 				return "";
 			}
 			if (!DateUtil.isWeekSame(statDateStart,statDateEnd)){
 //				return AjaxResponse.fail(RestErrorCode.ONLY_QUERY_WEEK);
+				RedisCacheUtil.delete(key);
 				return "";
 			}
 		}else if (reportType.equals(2)){
 			fileTag = "工作报告月报";
 			if (statDateStart.compareTo(statDateEnd) > 0 ){
 //				return AjaxResponse.fail(RestErrorCode.STARTTIME_GREATE_ENDTIME);
+				RedisCacheUtil.delete(key);
 				return "";
 			}
 			//如果是月报，但是开始时间和结束时间不再同一月，不可以
 			if (!statDateStart.substring(0,7).equals(statDateEnd.substring(0,7))){
 //				return AjaxResponse.fail(RestErrorCode.ONLY_QUERY_ONE_MONTH);
+				RedisCacheUtil.delete(key);
 				return "";
 			}
 		}
@@ -350,6 +375,7 @@ public class DriverDailyReportController extends DriverQueryController {
 							e.printStackTrace();
 						}
 //						return AjaxResponse.success("没有查到符合条件的数据");
+						RedisCacheUtil.delete(key);
 						return "没有查到符合条件的数据";
 
 					}
@@ -452,9 +478,12 @@ public class DriverDailyReportController extends DriverQueryController {
 				long  end = System.currentTimeMillis();
 				log.info("工作报告导出-查询耗时："+(end-start)+"毫秒");
 			}
+			RedisCacheUtil.delete(key);
+
 			return "";
 		} catch (Exception e) {
 			log.error("导出失败哦，参数为："+(searchParam.toJSONString()),e);
+			RedisCacheUtil.delete(key);
 			return "";
 		}
 	}

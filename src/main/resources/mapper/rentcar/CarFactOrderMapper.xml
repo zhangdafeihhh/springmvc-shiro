@@ -89,7 +89,7 @@
   <sql id="Blob_Column_List" >
     memo
   </sql>
-  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+  <!--<select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
     ,
@@ -900,5 +900,5 @@
       estimated_id = #{estimatedId,jdbcType=VARCHAR},
       agent_id = #{agentId,jdbcType=INTEGER}
     where order_id = #{orderId,jdbcType=INTEGER}
-  </update>
+  </update>-->
 </mapper>

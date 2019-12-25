@@ -2697,7 +2697,7 @@ public class IntegerCityController {
             }
         }
 
-        map.put("supplierIdBatch", "0");
+        map.put("supplierIdBatch", "");
 
         //添加排序字段
         JSONObject jsonSort = new JSONObject();

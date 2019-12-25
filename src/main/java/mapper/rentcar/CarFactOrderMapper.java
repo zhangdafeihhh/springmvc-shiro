@@ -3,7 +3,7 @@ package mapper.rentcar;
 import com.zhuanche.entity.rentcar.CarFactOrder;
 
 public interface CarFactOrderMapper {
-    int deleteByPrimaryKey(Integer orderId);
+/*    int deleteByPrimaryKey(Integer orderId);
 
     int insert(CarFactOrder record);
 
@@ -15,5 +15,5 @@ public interface CarFactOrderMapper {
 
     int updateByPrimaryKeyWithBLOBs(CarFactOrder record);
 
-    int updateByPrimaryKey(CarFactOrder record);
+    int updateByPrimaryKey(CarFactOrder record);*/
 }
