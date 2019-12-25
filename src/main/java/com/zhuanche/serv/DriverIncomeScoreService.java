@@ -175,12 +175,10 @@ public class DriverIncomeScoreService {
                 for (int i = 0; i < jsonArray.size(); i++) {
                     JSONObject jsonResult = (JSONObject) jsonArray.get(i);
                     ScoreDetailDTO scoreDetailDTO = new ScoreDetailDTO();
-                    if (jsonResult.get("day") != null && jsonResult.get("dayServiceTimeScore") != null && jsonResult.get("isCollect") != null) {
+                    if (jsonResult.get("day") != null && jsonResult.get("isCollect") != null) {
                         String scoreDetailDate = jsonResult.getString("day");
-                        String hourScore = jsonResult.getBigDecimal("dayServiceTimeScore").toString();
                         Boolean isTotal = jsonResult.getBoolean("isCollect");
                         scoreDetailDTO.setDriverId(driverId);
-                        scoreDetailDTO.setHourScore(hourScore);
                         scoreDetailDTO.setScoreDetailDate(scoreDetailDate);
                         scoreDetailDTO.setIsTotal(isTotal == true ? 1 : 0);
                         scoreDetailDTO.setName(info.getName());
