@@ -295,7 +295,7 @@ public class DriverDailyReportController extends DriverQueryController {
 
 		if(!RedisCacheUtil.exist(key)){
 			//如果5s内还没有结果 有可能是后面的报错了 重新查询
-			RedisCacheUtil.set(key,"导出中",5);
+			RedisCacheUtil.set(key,"导出中",10);
 		}
 
 
@@ -400,6 +400,7 @@ public class DriverDailyReportController extends DriverQueryController {
 						CsvUtils entity = new CsvUtils();
 						entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
 //						return AjaxResponse.success("没有查到符合条件的数据");
+						RedisCacheUtil.delete(key);
 						return "没有查到符合条件的数据";
 					}
 					int pages = pageInfos.getPages();//临时计算总页数
@@ -443,6 +444,7 @@ public class DriverDailyReportController extends DriverQueryController {
 						csvDataList.add("没有查到符合条件的数据");
 						CsvUtils entity = new CsvUtils();
 						entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
+						RedisCacheUtil.delete(key);
 						return "";
 					}
 
@@ -479,7 +481,6 @@ public class DriverDailyReportController extends DriverQueryController {
 				log.info("工作报告导出-查询耗时："+(end-start)+"毫秒");
 			}
 			RedisCacheUtil.delete(key);
-
 			return "";
 		} catch (Exception e) {
 			log.error("导出失败哦，参数为："+(searchParam.toJSONString()),e);
