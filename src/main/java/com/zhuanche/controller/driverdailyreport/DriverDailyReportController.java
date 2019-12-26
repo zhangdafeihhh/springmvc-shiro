@@ -358,7 +358,7 @@ public class DriverDailyReportController extends DriverQueryController {
 
 			if(!RedisCacheUtil.exist(key)){
 				//如果5s内还没有结果 有可能是后面的报错了 重新查询
-				RedisCacheUtil.set(key,"导出中",10);
+				RedisCacheUtil.set(key,"导出中",30);
 			}
 
 
