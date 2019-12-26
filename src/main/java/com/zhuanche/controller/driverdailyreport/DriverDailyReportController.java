@@ -286,18 +286,6 @@ public class DriverDailyReportController extends DriverQueryController {
 		stringBuffer.append(userId).append(licensePlates).append(driverName).append(driverIds).append(teamIds).append(suppliers)
 				.append(cities).append(statDateStart).append(statDateEnd).append(sortName).append(sortOrder).append(groupIds).append(reportType).append(loginName);
 		String key = RedisKeyUtils.DAILY_REPORT_KEY + stringBuffer.toString().replaceAll("null","");
-		log.info("导出的缓存key值：" + key);
-		String exportStr =  RedisCacheUtil.get(key,String.class);
-		if(exportStr != null ){
-			log.info("导出点击过于频繁");
-			return "";
-		}
-
-		if(!RedisCacheUtil.exist(key)){
-			//如果5s内还没有结果 有可能是后面的报错了 重新查询
-			RedisCacheUtil.set(key,"导出中",10);
-		}
-
 
 		//默认报告类型为日报
 		String fileTag = "";
@@ -355,6 +343,20 @@ public class DriverDailyReportController extends DriverQueryController {
 			}
 
 			DriverDailyReportParams params = new DriverDailyReportParams(licensePlates,driverName,driverIds,teamIds,suppliers,cities,statDateStart,statDateEnd,sortName,sortOrder,groupIds,null,null);
+
+
+
+			log.info("导出的缓存key值：" + key);
+			String exportStr =  RedisCacheUtil.get(key,String.class);
+			if(exportStr != null ){
+				log.info("点击导出按钮过于频繁,正在导出中");
+				return "点击导出按钮过于频繁,正在导出中";
+			}
+
+			if(!RedisCacheUtil.exist(key)){
+				//如果5s内还没有结果 有可能是后面的报错了 重新查询
+				RedisCacheUtil.set(key,"导出中",10);
+			}
 
 
 			List<DriverDailyReportDTO> rows = new ArrayList<>();
