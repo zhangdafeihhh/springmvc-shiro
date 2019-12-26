@@ -351,6 +351,8 @@ public class DriverDailyReportController extends DriverQueryController {
 			if(exportStr != null ){
 				log.info("点击导出按钮过于频繁,正在导出中");
 				csvDataList.add("点击导出按钮过于频繁,数据正在导出中");
+				CsvUtils entity = new CsvUtils();
+				entity.exportCsvV2(response,csvDataList,headerList,fileName,true,true);
 				return "点击导出按钮过于频繁,正在导出中";
 			}
 
