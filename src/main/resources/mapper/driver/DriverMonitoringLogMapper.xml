@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.driver.DriverMonitoringLogMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.driver.DriverMonitoringLog" >
+    <id column="monitor_id" property="monitorId" jdbcType="BIGINT" />
+    <result column="msgId" property="msgid" jdbcType="VARCHAR" />
+    <result column="operator" property="operator" jdbcType="VARCHAR" />
+    <result column="operation_account" property="operationAccount" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    monitor_id, msgId, operator, operation_account, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from driver_monitoring_log
+    where monitor_id = #{monitorId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from driver_monitoring_log
+    where monitor_id = #{monitorId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.zhuanche.entity.driver.DriverMonitoringLog" >
+    <selectKey resultType="java.lang.Long" keyProperty="monitorId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into driver_monitoring_log (msgId, operator, operation_account, 
+      create_time, update_time)
+    values (#{msgid,jdbcType=VARCHAR}, #{operator,jdbcType=VARCHAR}, #{operationAccount,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.driver.DriverMonitoringLog" >
+    <selectKey resultType="java.lang.Long" keyProperty="monitorId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into driver_monitoring_log
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="msgid != null" >
+        msgId,
+      </if>
+      <if test="operator != null" >
+        operator,
+      </if>
+      <if test="operationAccount != null" >
+        operation_account,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="msgid != null" >
+        #{msgid,jdbcType=VARCHAR},
+      </if>
+      <if test="operator != null" >
+        #{operator,jdbcType=VARCHAR},
+      </if>
+      <if test="operationAccount != null" >
+        #{operationAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.driver.DriverMonitoringLog" >
+    update driver_monitoring_log
+    <set >
+      <if test="msgid != null" >
+        msgId = #{msgid,jdbcType=VARCHAR},
+      </if>
+      <if test="operator != null" >
+        operator = #{operator,jdbcType=VARCHAR},
+      </if>
+      <if test="operationAccount != null" >
+        operation_account = #{operationAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where monitor_id = #{monitorId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.driver.DriverMonitoringLog" >
+    update driver_monitoring_log
+    set msgId = #{msgid,jdbcType=VARCHAR},
+      operator = #{operator,jdbcType=VARCHAR},
+      operation_account = #{operationAccount,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where monitor_id = #{monitorId,jdbcType=BIGINT}
+  </update>
+</mapper>
