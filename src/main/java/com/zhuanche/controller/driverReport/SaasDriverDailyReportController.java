@@ -233,6 +233,14 @@ public class SaasDriverDailyReportController {
                 if(month.length()==1){
                     month = "0" + month;
                 }
+
+                Integer intMonth =  Integer.valueOf(month);
+                if(intMonth >= 13){
+                    month = "01";
+                    Integer intYear = Integer.valueOf(year);
+                    intYear++;
+                    year = String.valueOf(intYear);
+                }
             }
         }
 
@@ -374,9 +382,19 @@ public class SaasDriverDailyReportController {
             Integer intDay = Integer.valueOf(day);
             if(intDay >= 26 && intDay <= 31){
                 month = String.valueOf(Integer.valueOf(month)+1);
+
                 if(month.length()==1){
                     month = "0" + month;
                 }
+
+                Integer intMonth =  Integer.valueOf(month);
+                if(intMonth >= 13){
+                    month = "01";
+                    Integer intYear = Integer.valueOf(year);
+                    intYear++;
+                    year = String.valueOf(intYear);
+                }
+
             }
         }
 
