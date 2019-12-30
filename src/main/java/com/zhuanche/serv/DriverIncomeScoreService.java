@@ -154,13 +154,11 @@ public class DriverIncomeScoreService {
         Map<String,Object> resultMap = Maps.newHashMap();
         List<ScoreDetailDTO> list = new ArrayList<>();
 
-       // JSONObject jsonObject = new JSONObject();
         Map<String,Object> map = Maps.newHashMap();
         map.put("driverId",driverId);
         map.put("day",day);
         map.put("sortState",0);
         String result = MpOkHttpUtil.okHttpPost(DRIVER_INTEGRAL+"/incomeScore/tripScoreDetails",map,0,null);
-        //String result = MpOkHttpUtil.okHttpPostToJson(DRIVER_INTEGRAL+"/incomeScore/tripScoreDetails",jsonObject.toJSONString(),0,null);
         if(StringUtils.isEmpty(result)){
             logger.info("调用代理层返回结果为空");
             return resultMap;
@@ -177,16 +175,20 @@ public class DriverIncomeScoreService {
                 for (int i = 0; i < jsonArray.size(); i++) {
                     JSONObject jsonResult = (JSONObject) jsonArray.get(i);
                     ScoreDetailDTO scoreDetailDTO = new ScoreDetailDTO();
-                    if (jsonResult.get("day") != null && jsonResult.get("dayServiceTimeScore") != null && jsonResult.get("isCollect") != null) {
+                    if (jsonResult.get("day") != null && jsonResult.get("isCollect") != null) {
                         String scoreDetailDate = jsonResult.getString("day");
-                        String hourScore = jsonResult.getBigDecimal("dayServiceTimeScore").toString();
                         Boolean isTotal = jsonResult.getBoolean("isCollect");
                         scoreDetailDTO.setDriverId(driverId);
-                        scoreDetailDTO.setHourScore(hourScore);
                         scoreDetailDTO.setScoreDetailDate(scoreDetailDate);
                         scoreDetailDTO.setIsTotal(isTotal == true ? 1 : 0);
                         scoreDetailDTO.setName(info.getName());
                         scoreDetailDTO.setPhone(info.getPhone());
+                        scoreDetailDTO.setDayOfFuWuSC(jsonResult.getBigDecimal("dayOfFuWuSC"));
+                        scoreDetailDTO.setDayOfKongXianSC(jsonResult.getBigDecimal("dayOfKongXianSC"));
+                        scoreDetailDTO.setDayOfTeShuJL(jsonResult.getBigDecimal("dayOfTeShuJL"));
+                        scoreDetailDTO.setDayOfXinRenSC(jsonResult.getBigDecimal("dayOfXinRenSC"));
+                        scoreDetailDTO.setDayOfDiaoDu(jsonResult.getBigDecimal("dayOfDiaoDu"));
+                        scoreDetailDTO.setDayOfYingDa(jsonResult.getBigDecimal("dayOfYingDa"));
                         list.add(scoreDetailDTO);
                     }
                 }
@@ -214,6 +216,34 @@ public class DriverIncomeScoreService {
             }if(jsonObject.get("collectScore") != null){
                 resultMap.put("tripScore",jsonObject.get("collectScore").toString());
             }
+            if (jsonObject.get("dayTripScore") != null){
+                resultMap.put("dayTripScore",jsonObject.get("dayTripScore").toString());
+            }
+            if (jsonObject.get("sumOfFuWuSC") != null){
+                resultMap.put("sumOfFuWuSC",jsonObject.get("sumOfFuWuSC").toString());
+            }
+            if (jsonObject.get("sumOfKongXianSC") != null){
+                resultMap.put("sumOfKongXianSC",jsonObject.get("sumOfKongXianSC").toString());
+            }
+            if (jsonObject.get("sumOfTeShuJL") != null){
+                resultMap.put("sumOfTeShuJL",jsonObject.get("sumOfTeShuJL").toString());
+            }
+            if (jsonObject.get("sumOfXinRenSC") != null){
+                resultMap.put("sumOfXinRenSC",jsonObject.get("sumOfXinRenSC").toString());
+            }
+            if (jsonObject.get("sumOfDiaoDu") != null){
+                resultMap.put("sumOfDiaoDu",jsonObject.get("sumOfDiaoDu").toString());
+            }
+            if (jsonObject.get("sumOfYingDa") != null){
+                resultMap.put("sumOfYingDa",jsonObject.get("sumOfYingDa").toString());
+            }
+            if (jsonObject.get("rollbackDay") != null){
+                resultMap.put("rollbackDay",jsonObject.get("rollbackDay").toString());
+            }
+            if (jsonObject.get("topValDay") != null){
+                resultMap.put("topValDay",jsonObject.get("topValDay").toString());
+            }
+
             resultMap.put("driverId",driverId);
             resultMap.put("dispatchTime",scoreDate);
             resultMap.put("scoreDate",day);
