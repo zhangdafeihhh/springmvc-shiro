@@ -116,9 +116,9 @@
 			t.bank_name as bankName,
 			t.bank_account as bankAccount,
 			t.bank_identify as bankIdentify,
-			t.settlement_full_name as settlementFullName
+			t.settlement_full_name as settlementFullName,
 			t.customer_phone as customerPhone,
-			t.customer_ine_number as customerLineNumber
+			t.customer_line_number as customerLineNumber
       FROM supplier_ext t WHERE  t.supplier_id = #{supplierId,jdbcType=BIGINT}
   </select>
 
