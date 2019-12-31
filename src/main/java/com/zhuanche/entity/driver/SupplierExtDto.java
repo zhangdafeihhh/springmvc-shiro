@@ -235,6 +235,16 @@ public class SupplierExtDto {
      */
     private List<SupplierCheckFail> list;
 
+    /**
+     *客服电话
+     */
+    private String customerPhone;
+
+    /**
+     *客服座机号
+     */
+    private String customerLineNumber;
+
 
     public enum modelEnum{
         COOPERATEION_FREE(1,"自主"),
@@ -674,5 +684,20 @@ public class SupplierExtDto {
     public void setList(List<SupplierCheckFail> list) {
         this.list = list;
     }
-    
+
+    public String getCustomerPhone() {
+        return customerPhone;
+    }
+
+    public void setCustomerPhone(String customerPhone) {
+        this.customerPhone = customerPhone;
+    }
+
+    public String getCustomerLineNumber() {
+        return customerLineNumber;
+    }
+
+    public void setCustomerLineNumber(String customerLineNumber) {
+        this.customerLineNumber = customerLineNumber;
+    }
 }

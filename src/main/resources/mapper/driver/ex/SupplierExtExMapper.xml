@@ -41,6 +41,8 @@
     <result column="offical_seal_url" property="officalSealUrl" jdbcType="VARCHAR" />
     <result column="need_deposit_receipt" property="needDepositReceipt" jdbcType="INTEGER" />
     <result column="applier_status" property="applierStatus" jdbcType="INTEGER" />
+    <result column="customer_phone" property="customerPhone" jdbcType="VARCHAR" />
+    <result column="customer_line_number" property="customerLineNumber" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, supplier_id, status, supplier_short_name, create_date, update_date, email, remark, 
@@ -132,6 +134,12 @@
       <if test="email != null" >
         email = #{email,jdbcType=VARCHAR},
       </if>
+      <if test="customerPhone != null" >
+          customer_phone = #{customerPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="customerLineNumber != null" >
+          customer_line_number = #{customerLineNumber,jdbcType=VARCHAR},
+      </if>
     </set>
     where
     supplier_id = #{supplierId,jdbcType=INTEGER}
@@ -148,4 +156,10 @@
         where
         supplier_id = #{supplierId,jdbcType=INTEGER}
     </update>
+
+    <select id="listSupplierExtDto" resultType="java.lang.String" parameterType="java.lang.String" >
+        select customer_phone as customerPhone
+        from supplier_ext
+        where 1=1 and  supplier_id  in (${supplierIds})
+    </select>
 </mapper>

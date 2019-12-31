@@ -24,7 +24,7 @@
     from yueAoTong_phone_config
     where delete_status = 0
   </select>
-  <select id="findBySupplierId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  <select id="findBySupplierId" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select phone
     from yueAoTong_phone_config
     where 1=1 and  supplier_id  in (${supplierIds})and delete_status = 0

@@ -20,4 +20,6 @@ public interface SupplierExtExMapper {
 
     int editExtStatus(SupplierExtDto dto);
 
+    List<String> listSupplierExtDto(@Param("supplierIds") String supplierIds);
+
 }
