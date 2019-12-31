@@ -192,6 +192,8 @@ public class SupplierRecordController {
              SupplierExtDto dto = recordService.extDtoDetail(supplierId);
              if(dto != null ){
                  supplierVo.setEmail(dto.getEmail());
+                 supplierVo.setCustomerPhone(dto.getCustomerPhone());
+                 supplierVo.setCustomerLineNumber(dto.getCustomerLineNumber());
              }
          } catch (Exception e) {
             logger.error("查询异常" + e);
