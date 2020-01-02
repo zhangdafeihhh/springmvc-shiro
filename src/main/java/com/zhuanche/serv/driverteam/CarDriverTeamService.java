@@ -560,7 +560,7 @@ public class CarDriverTeamService{
 				paramDto.setTeamName(existsTeam.getTeamName());
 			}
 			//开启关闭逻辑
-			if(paramDto.getOpenCloseFlag() !=0 && !paramDto.getStatus().equals(existsTeam.getStatus())){
+			if(paramDto.getOpenCloseFlag() !=0 && !paramDto.getOpenCloseFlag().equals(existsTeam.getStatus())){
 				existsTeam.setStatus(paramDto.getOpenCloseFlag());
 				//关闭时候把下面的司机存入mq 如果是车队，司机存入供应商，如果是班组，司机存入车队
 				if(existsTeam != null && existsTeam.getpId() != null  && existsTeam.getpId() > 0){
@@ -607,7 +607,7 @@ public class CarDriverTeamService{
 					logger.error("更新司机宽表mongodb异常:{}",e);
 				}
 				return result;
-			}else if(paramDto.getOpenCloseFlag() !=0 && paramDto.getStatus().equals(existsTeam.getStatus())){
+			}else if(paramDto.getOpenCloseFlag() !=0 && paramDto.getOpenCloseFlag().equals(existsTeam.getStatus())){
 				existsTeam.setStatus(paramDto.getOpenCloseFlag());
 				if(existsTeam != null && existsTeam.getpId() != null){
 					paramDto.setpId(existsTeam.getpId());
