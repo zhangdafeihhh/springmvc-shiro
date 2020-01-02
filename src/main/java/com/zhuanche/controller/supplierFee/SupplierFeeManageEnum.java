@@ -12,7 +12,7 @@ public enum  SupplierFeeManageEnum {
     BECONFIRMED(0,"待确认"),
     WAITINGTICKET(1,"待验票"),
     FAILEDTICKET(2,"验票失败"),
-    SUBSTITUTETICKET(3,"代交发票");
+    SUBSTITUTETICKET(3,"待交财务");
 
 
     private int code;
