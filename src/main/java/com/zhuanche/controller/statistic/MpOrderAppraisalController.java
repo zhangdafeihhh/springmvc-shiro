@@ -2,10 +2,12 @@ package com.zhuanche.controller.statistic;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
+import com.zhuanche.common.cache.RedisCacheUtil;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.paging.PageDTO;
+import com.zhuanche.common.util.RedisKeyUtils;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RequestFunction;
 import com.zhuanche.common.web.RestErrorCode;
@@ -82,6 +84,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
 										  Integer callbackStatus,
 										  @Verify(param = "pageSize",rule = "max(50)")Integer pageSize) {
 		long startTime=System.currentTimeMillis();
+		String queryKey = RedisKeyUtils.MP_ORDER_APPRAISAL;
 		try {
 			//只能查询一个月的数据
 			if ((StringUtils.isEmpty(createDateBegin) && StringUtils.isEmpty(createDateEnd)) && StringUtils.isEmpty(orderFinishTimeBegin) && StringUtils.isEmpty(orderFinishTimeEnd)) {
@@ -116,6 +119,23 @@ public class MpOrderAppraisalController extends DriverQueryController{
 
 			//判断是否有附表条件 appealStatus =0 可以转换为主表中的IsAlreadyAppeal = 0 查询主表信息
 			List<MpCarBizCustomerAppraisal> resultList = null;
+
+			Integer currentId = WebSessionUtil.getCurrentLoginUser().getId();
+
+			 queryKey = queryKey + currentId + JSON.toJSONString(params);
+
+			//PageDTO redisPageDTO =  RedisCacheUtil.get(queryKey,PageDTO.class);
+
+			//此处是缓存查询条件，结果是实时的不能缓存查询结果
+
+			if(RedisCacheUtil.exist(queryKey)){
+				log.info("点击过于频繁");
+				return AjaxResponse.success("点击过于频繁");
+			}
+
+			//缓存查询条件10s  如果有返回结果 则删除key
+			RedisCacheUtil.set(queryKey,queryKey,10);
+
 			long total = 0;
 			List<Integer> queryParam=null;
 			if ((appealStatus == null || appealStatus == 0) && (callbackStatus == null) ) {
@@ -127,6 +147,8 @@ public class MpOrderAppraisalController extends DriverQueryController{
                 queryParam=resultList.stream().map(MpCarBizCustomerAppraisal::getAppraisalId).collect(Collectors.toList());
                 total = pageByparam.getTotal();
                 if(total==0){
+                	//删除查询条件
+					RedisCacheUtil.delete(queryKey);
 					return AjaxResponse.success(new PageDTO(page,pageSize,0,new ArrayList()));
 				}
             } else {
@@ -135,6 +157,7 @@ public class MpOrderAppraisalController extends DriverQueryController{
                 //求并集
 				mainTabIds.removeIf(o -> !slaveTabIds.contains(o));
 				if(mainTabIds.size()==0){
+					RedisCacheUtil.delete(queryKey);
 					return AjaxResponse.success(new PageDTO(page,pageSize,0,new ArrayList()));
 				}
 				int start = (page - 1) * pageSize;
@@ -167,9 +190,11 @@ public class MpOrderAppraisalController extends DriverQueryController{
                 o.setDriverPhone(MobileOverlayUtil.doOverlayPhone(o.getDriverPhone()));
             });
 			log.info("订单评价列表 查询成功 耗时："+(System.currentTimeMillis()-startTime));
+			RedisCacheUtil.delete(queryKey);
 			return AjaxResponse.success(new PageDTO(page,pageSize,total, resultList));
 		} catch (Exception e) {
 			log.error("订单评价列表异常 耗时："+(System.currentTimeMillis()-startTime));
+			RedisCacheUtil.delete(queryKey);
 			return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
 		}
 	}

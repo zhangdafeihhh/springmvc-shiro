@@ -23,4 +23,7 @@ public class RedisKeyUtils {
     public static final String SAAS_MONTH_REPORT = "saas_month_report_"; //saas月报查询
 
     public static final String SAAS_SUMMARY_REPORT = "saas_summary_report_"; //saas汇总查询
+
+    public static final String MP_ORDER_APPRAISAL = "mp_order_appraisal_"; //司机评价查询
+
 }

@@ -1479,31 +1479,7 @@ public class IntegerCityController {
                         "carGroupId:{4},bookingUserPhone:{5},ruleId:{6}", orderNo, status, cityId, serviceTypeId, carGroupId,
                 bookingUserPhone, ruleId));
 
-        //调用计费取消费接口http://inside-yapi.01zhuanche.com/project/88/interface/api/16255
-        try {
-            Map<String, Object> chargeMap = Maps.newHashMap();
-            chargeMap.put("orderNo", orderNo);
-            chargeMap.put("cityId", cityId);
-            chargeMap.put("serviceTypeId", serviceTypeId);
-            chargeMap.put("carGroupId", carGroupId);
-            chargeMap.put("orderStatus", status);
-            chargeMap.put("bookingUserPhone", bookingUserPhone);
-            chargeMap.put("ruleId", ruleId);
-            chargeMap.put("pinSuccess", "1");
-            logger.info("=======调用计费接口入参==========" + JSONObject.toJSONString(chargeMap));
-            String chargeResult = MpOkHttpUtil.okHttpPost(orderCostUrl + "/cancel/carpool/payCancelDamage", chargeMap,
-                    0, null);
-            logger.info("========调用计费取消接口返回结果========" + chargeResult);
-            if (StringUtils.isNotEmpty(chargeResult)) {
-                JSONObject chargeJson = JSONObject.parseObject(chargeResult);
-                if (chargeJson.get("code") != null && chargeJson.getInteger("code") == 0) {
-                    logger.info("调用计费取消接口成功");
-                    //return AjaxResponse.success(null);
-                }
-            }
-        } catch (Exception e) {
-            return AjaxResponse.fail(RestErrorCode.CHARGE_CANCEL_FAILED);
-        }
+
 
 
         try {
@@ -1544,7 +1520,7 @@ public class IntegerCityController {
                 JSONObject jsonResult = JSONObject.parseObject(result);
                 if (jsonResult != null && jsonResult.get("code") != null && jsonResult.getInteger("code") == 0) {
                     logger.info("取消订单成功");
-                    return AjaxResponse.success(null);
+                    //return AjaxResponse.success(null);
                 }
             }
         } catch (Exception e) {
@@ -1553,6 +1529,32 @@ public class IntegerCityController {
 
         }
 
+
+        //调用计费取消费接口http://inside-yapi.01zhuanche.com/project/88/interface/api/16255
+        try {
+            Map<String, Object> chargeMap = Maps.newHashMap();
+            chargeMap.put("orderNo", orderNo);
+            chargeMap.put("cityId", cityId);
+            chargeMap.put("serviceTypeId", serviceTypeId);
+            chargeMap.put("carGroupId", carGroupId);
+            chargeMap.put("orderStatus", status);
+            chargeMap.put("bookingUserPhone", bookingUserPhone);
+            chargeMap.put("ruleId", ruleId);
+            chargeMap.put("pinSuccess", "1");
+            logger.info("=======调用计费接口入参==========" + JSONObject.toJSONString(chargeMap));
+            String chargeResult = MpOkHttpUtil.okHttpPost(orderCostUrl + "/cancel/carpool/payCancelDamage", chargeMap,
+                    0, null);
+            logger.info("========调用计费取消接口返回结果========" + chargeResult);
+            if (StringUtils.isNotEmpty(chargeResult)) {
+                JSONObject chargeJson = JSONObject.parseObject(chargeResult);
+                if (chargeJson.get("code") != null && chargeJson.getInteger("code") == 0) {
+                    logger.info("调用计费取消接口成功");
+                    return AjaxResponse.success(null);
+                }
+            }
+        } catch (Exception e) {
+            return AjaxResponse.fail(RestErrorCode.CHARGE_CANCEL_FAILED);
+        }
 
         return AjaxResponse.fail(RestErrorCode.CANCEL_FAILED);
     }

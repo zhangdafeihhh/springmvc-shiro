@@ -114,7 +114,8 @@
 			t.bank_name as bankName,
 			t.bank_account as bankAccount,
 			t.bank_identify as bankIdentify,
-			t.settlement_full_name as settlementFullName
+			t.settlement_full_name as settlementFullName,
+			t.status
       FROM supplier_ext t WHERE  t.supplier_id = #{supplierId,jdbcType=BIGINT}
   </select>
 
