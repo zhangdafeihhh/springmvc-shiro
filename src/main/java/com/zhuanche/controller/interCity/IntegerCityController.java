@@ -1521,6 +1521,9 @@ public class IntegerCityController {
                 if (jsonResult != null && jsonResult.get("code") != null && jsonResult.getInteger("code") == 0) {
                     logger.info("取消订单成功");
                     //return AjaxResponse.success(null);
+                }else {
+                    logger.info("已上车，无法取消，请联系客服电话10105678" );
+                    return AjaxResponse.fail(RestErrorCode.ORDER_CANCEL_FAILED);
                 }
             }
         } catch (Exception e) {

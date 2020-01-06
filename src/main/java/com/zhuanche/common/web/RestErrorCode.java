@@ -303,8 +303,13 @@ public final class RestErrorCode{
 	@ResultMessage("计费违约金取消失败")
 	public static final int CHARGE_CANCEL_FAILED = 50201;
 
+	@ResultMessage("已上车，无法取消，请联系客服电话10105678")
+	public static final int ORDER_CANCEL_FAILED = 50203;
+
 	@ResultMessage("关键字不能为空")
 	public static final int KEYWORDS_IS_NOT_NULL = 50501;
+
+
 
 
 
