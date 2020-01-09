@@ -2766,6 +2766,7 @@ public class IntegerCityController {
 
         //获取调度员手机号
         private String getOpePhone(Integer driverId){
+            logger.info("==========获取到的调度员手机号入参driverId=====" + driverId);
                 String opePhone = null;
                  //根据司机id获取供应商id
                 DriverInfoInterCity city =  infoInterCityExMapper.getByDriverId(driverId);
@@ -2788,6 +2789,7 @@ public class IntegerCityController {
                 if(StringUtils.isEmpty(opePhone)){
                     opePhone = WebSessionUtil.getCurrentLoginUser().getMobile();
                 }
+                logger.info("==========获取到的调度员手机号=====" + opePhone);
                 return opePhone;
         }
 
