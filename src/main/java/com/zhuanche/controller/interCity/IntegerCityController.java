@@ -107,6 +107,10 @@ public class IntegerCityController {
     @Value("${driver.fee.server.api.base.url}")
     private String driverFeeServiceApiBaseUrl;
 
+
+    @Value("${assign.url}")
+    private String assignUrl;
+
     @Autowired
     private DriverInfoInterCityExMapper infoInterCityExMapper;
 
@@ -1968,8 +1972,17 @@ public class IntegerCityController {
             if (StringUtils.isNotBlank(result)) {
                 JSONObject jsonResult = JSONObject.parseObject(result);
                 if (jsonResult.get("code") != null && jsonResult.getInteger("code") == 0) {
-                    logger.info("改派成功");
-                    //String mobile = WebSessionUtil.getCurrentLoginUser().getMobile();
+                    logger.info("=====改派成功====== 手动改派通知派单接口===入参:orderNo:" + orderNo + ",driverId:" + driverId);
+                    try {
+                        Map<String,Object> mapParam = Maps.newHashMap();
+                        mapParam.put("orderNo",orderNo);
+                        mapParam.put("driverId",driverId);
+                        String reassignResult = MpOkHttpUtil.okHttpPost(assignUrl +"/v2/carpooling/reassignResult",mapParam,0,null);
+                        logger.info("==========调用派单改派接口结果=======" + JSONObject.toJSONString(reassignResult));
+                    } catch (Exception e) {
+                        logger.error("====调用派单改派接口异常==" + e);
+                    }
+
                     ExecutorService executor = Executors.newCachedThreadPool();
                     Future<String> future = executor.submit(new Callable<String>() {
                         @Override
