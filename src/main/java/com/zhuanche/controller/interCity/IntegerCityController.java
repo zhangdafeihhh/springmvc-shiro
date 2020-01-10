@@ -111,6 +111,9 @@ public class IntegerCityController {
     @Value("${assign.url}")
     private String assignUrl;
 
+    @Value("${driver.businessId}")
+    private String driverBusinessId;
+
     @Autowired
     private DriverInfoInterCityExMapper infoInterCityExMapper;
 
@@ -1964,7 +1967,6 @@ public class IntegerCityController {
 
 
             String url = "/order/carpool/crossCityOrderReassign";
-            System.out.println(url);
 
 
             String result = carRestTemplate.postForObject(url, JSONObject.class, map);
@@ -1975,8 +1977,10 @@ public class IntegerCityController {
                     logger.info("=====改派成功====== 手动改派通知派单接口===入参:orderNo:" + orderNo + ",driverId:" + driverId);
                     try {
                         Map<String,Object> mapParam = Maps.newHashMap();
-                        mapParam.put("orderNo",orderNo);
                         mapParam.put("driverId",driverId);
+                        mapParam.put("orderNo",orderNo);
+                        mapParam.put("businessId","BusinessPlatform");
+                        mapParam.put("sign",SignatureUtils.sign(mapParam,driverBusinessId));
                         String reassignResult = MpOkHttpUtil.okHttpPost(assignUrl +"/v2/carpooling/reassignResult",mapParam,0,null);
                         logger.info("==========调用派单改派接口结果=======" + JSONObject.toJSONString(reassignResult));
                     } catch (Exception e) {
