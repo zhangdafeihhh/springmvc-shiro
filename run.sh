@@ -10,7 +10,6 @@ export PATH=$JAVA_HOME/bin:$PATH
 
 dIP=`/sbin/ifconfig | awk '/inet / {if(match($2,"addr")) {print substr($2,6)} else {print $2}}' | head -1`
 
-
 #2,start tomcat
 
 
@@ -27,8 +26,7 @@ dIP=`/sbin/ifconfig | awk '/inet / {if(match($2,"addr")) {print substr($2,6)} el
 if [ "${START_ENV}" = "pre" ]; then
    cd /u01/tomcat_docker_8080/webapps/ROOT
    cp -rfp ./WEB-INF/classes/pre/*  ./WEB-INF/classes/
-   echo 'export CATALINA_OPTS="$CATALINA_OPTS -javaagent:/opt/jacocoagent.jar=includes=*,output=tcpserver,port=8044,address=${dIP}"' >>
-    /u01/tomcat_docker_8080/bin/config.pre
+   echo 'export CATALINA_OPTS="$CATALINA_OPTS -javaagent:/opt/jacocoagent.jar=includes=*,output=tcpserver,port=8044,address=${dIP}"' >> /u01/tomcat_docker_8080/bin/config.pre
 fi
 
 #if [ "${START_ENV}" = "online" ]; then
