@@ -44,4 +44,9 @@ public class SupplierRecordServiceImpl implements SupplierRecordService{
     public int editExtStatus(SupplierExtDto dto) {
         return extExMapper.editExtStatus(dto);
     }
+
+    @Override
+    public List<String> listSupplierExtDto(String supplierIds) {
+        return extExMapper.listSupplierExtDto(supplierIds);
+    }
 }

@@ -24,4 +24,6 @@ public interface SupplierRecordService {
     SupplierExtDto recordDetail(Integer id);
 
     int editExtStatus(SupplierExtDto dto);
+
+    List<String> listSupplierExtDto(String supplierIds);
 }

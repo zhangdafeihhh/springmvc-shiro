@@ -192,6 +192,8 @@ public class SupplierRecordController {
              SupplierExtDto dto = recordService.extDtoDetail(supplierId);
              if(dto != null ){
                  supplierVo.setEmail(dto.getEmail());
+                 supplierVo.setCustomerPhone(dto.getCustomerPhone());
+                 supplierVo.setCustomerLineNumber(dto.getCustomerLineNumber());
              }
          } catch (Exception e) {
             logger.error("查询异常" + e);
@@ -213,11 +215,15 @@ public class SupplierRecordController {
                                    @Verify(param = "contacts",rule = "required") String contacts,
                                    @Verify(param = "contactsPhone",rule = "required") String contactsPhone,
                                    @Verify(param = "email",rule = "required") String email,
-                                   @Verify(param = "address",rule = "required") String address){
+                                   @Verify(param = "address",rule = "required") String address,
+                                   @Verify(param = "customerPhone",rule = "required")String customerPhone,
+                                   String customerLineNumber){
         SupplierExtDto dto = new SupplierExtDto();
         try {
             dto.setSupplierId(supplierId);
             dto.setEmail(email);
+            dto.setCustomerPhone(customerPhone);
+            dto.setCustomerLineNumber(customerLineNumber);
             int code = recordService.editExtDto(dto);
             CarBizSupplierVo supplier = new CarBizSupplierVo();
             supplier.setContacts(contacts);

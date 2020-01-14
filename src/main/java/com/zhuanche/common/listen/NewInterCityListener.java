@@ -10,6 +10,7 @@ import com.zhuanche.common.sms.SmsSendUtil;
 import com.zhuanche.controller.driver.YueAoTongPhoneConfig;
 import com.zhuanche.controller.interCity.InterCityUtils;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
+import com.zhuanche.serv.supplier.SupplierRecordService;
 import mapper.driver.ex.YueAoTongPhoneConfigExMapper;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
 import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
@@ -41,6 +42,9 @@ public class NewInterCityListener implements MessageListenerOrderly {
 
     @Autowired
     private CarAdmUserExMapper exMapper;
+
+    @Autowired
+    private SupplierRecordService recordService;
 
 
     @Override
@@ -113,20 +117,29 @@ public class NewInterCityListener implements MessageListenerOrderly {
                                                 logger.info("==========路线在范围内============");
                                                 if (jsonSupplier.get("supplierId") != null) {
                                                     String suppliers = jsonSupplier.getString("supplierId");
-                                                    List<YueAoTongPhoneConfig> opePhone = this.queryOpePhone(suppliers);
-                                                    if (CollectionUtils.isNotEmpty(opePhone)) {
-                                                        //TODO:调用发短信接口
-                                                        for (YueAoTongPhoneConfig config : opePhone) {
+                                                    List<String> supplierPhone = this.querySupplierPhone(suppliers);
+                                                    if(CollectionUtils.isNotEmpty(supplierPhone)){
+                                                        supplierPhone.forEach(str ->{
+                                                            logger.info("=====获取到的供应商手机号======" + str + ",发送短信开始=====");
+                                                            SmsSendUtil.send(str, "您好，有一个城际订单，请登录后台及时抢单");
+                                                        });
+                                                    }else {
+                                                        List<YueAoTongPhoneConfig> opePhone = this.queryOpePhone(suppliers);
+                                                        if (CollectionUtils.isNotEmpty(opePhone)) {
+                                                            //TODO:调用发短信接口
+                                                            for (YueAoTongPhoneConfig config : opePhone) {
 
-                                                            String phone = config.getPhone();
-                                                            if(phone.contains(",")){
-                                                                String arr[] = phone.split(",");
-                                                                phone = arr[0];
+                                                                String phone = config.getPhone();
+                                                                if(phone.contains(",")){
+                                                                    String arr[] = phone.split(",");
+                                                                    phone = arr[0];
+                                                                }
+                                                                logger.info("=====发送短信开始======" + phone);
+                                                                SmsSendUtil.send(phone, "您好，有一个城际订单，请登录后台及时抢单");
                                                             }
-                                                            logger.info("=====发送短信开始======" + phone);
-                                                            SmsSendUtil.send(phone, "您好，有一个城际订单，请登录后台及时抢单");
                                                         }
                                                     }
+
                                                 }
                                             }
                                         }
@@ -157,5 +170,16 @@ public class NewInterCityListener implements MessageListenerOrderly {
     private List<YueAoTongPhoneConfig>  queryOpePhone(String suppliers ) {
             List<YueAoTongPhoneConfig> list = yueAoTongPhoneConfigExMapper.findBySupplierId(suppliers);
            return list;
+    }
+
+    /**
+     * 根据供应商id获取手机号
+     *
+     * @param suppliers
+     * @return
+     */
+    private List<String>  querySupplierPhone(String suppliers ) {
+        List<String> list = recordService.listSupplierExtDto(suppliers);
+        return list;
     }
 }

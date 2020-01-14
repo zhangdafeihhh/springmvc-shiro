@@ -12,9 +12,11 @@ import com.zhuanche.common.util.LbsSignUtil;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.common.web.Verify;
+import com.zhuanche.controller.driver.YueAoTongPhoneConfig;
 import com.zhuanche.dto.mdbcarmanage.InterCityOrderDTO;
 import com.zhuanche.dto.mdbcarmanage.MainOrderDetailDTO;
 import com.zhuanche.dto.rentcar.CarBizSupplierDTO;
+import com.zhuanche.entity.driver.SupplierExtDto;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.entity.mdbcarmanage.MainOrderInterCity;
 import com.zhuanche.entity.mdbcarmanage.SupplierDistributor;
@@ -25,10 +27,12 @@ import com.zhuanche.serv.common.CitySupplierTeamCommonService;
 import com.zhuanche.serv.interCity.MainOrderInterService;
 import com.zhuanche.serv.rentcar.CarFactOrderInfoService;
 import com.zhuanche.serv.supplier.SupplierDistributorService;
+import com.zhuanche.serv.supplier.SupplierRecordService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.*;
 import com.zhuanche.util.encrypt.MD5Utils;
+import mapper.driver.ex.YueAoTongPhoneConfigExMapper;
 import mapper.mdbcarmanage.ex.DriverInfoInterCityExMapper;
 import mapper.rentcar.ex.CarBizCarGroupExMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
@@ -103,6 +107,13 @@ public class IntegerCityController {
     @Value("${driver.fee.server.api.base.url}")
     private String driverFeeServiceApiBaseUrl;
 
+
+    @Value("${assign.url}")
+    private String assignUrl;
+
+    @Value("${driver.businessId}")
+    private String driverBusinessId;
+
     @Autowired
     private DriverInfoInterCityExMapper infoInterCityExMapper;
 
@@ -126,8 +137,14 @@ public class IntegerCityController {
     @Autowired
     private SupplierDistributorService distributorService;
 
+    @Autowired
+    private SupplierRecordService recordService;
+
     @Value("${ordercost.server.api.base.url}")
     private String orderCostUrl;
+
+    @Autowired
+    private YueAoTongPhoneConfigExMapper yueAoTongPhoneConfigExMapper;
 
     private static final String SYSMOL = "&";
 
@@ -1680,7 +1697,7 @@ public class IntegerCityController {
      * @param driverPhone
      * @param licensePlates
      * @param groupId
-     * @param orderTime     如果司机主单为空，主单的行程时间和路线不能为空
+     * @param      如果司机主单为空，主单的行程时间和路线不能为空
      * @param routeName
      * @return
      */
@@ -1753,11 +1770,15 @@ public class IntegerCityController {
             map.put("routeName", routeName);
             listParam.add("routeName=" + routeName);
         }
+
+        String dispatcherPhone = getOpePhone(driverId);
+
         //添加调度员手机号
         if (WebSessionUtil.getCurrentLoginUser().getMobile() != null) {
-            map.put("dispatcherPhone", WebSessionUtil.getCurrentLoginUser().getMobile());
-            listParam.add("dispatcherPhone=" + WebSessionUtil.getCurrentLoginUser().getMobile());
+            map.put("dispatcherPhone", dispatcherPhone);
+            listParam.add("dispatcherPhone=" + dispatcherPhone);
         }
+
 
         Collections.sort(listParam);
         listParam.add("key=" + Common.MAIN_ORDER_KEY);
@@ -1780,7 +1801,7 @@ public class IntegerCityController {
             JSONObject jsonResult = JSONObject.parseObject(result);
             if (jsonResult.get("code") != null && jsonResult.getInteger("code") == 0) {
                 logger.info("子单绑定主单成功");
-                String mobile = WebSessionUtil.getCurrentLoginUser().getMobile();
+                //String mobile = WebSessionUtil.getCurrentLoginUser().getMobile();
                 ExecutorService executor = Executors.newCachedThreadPool();
                 Future<String> future = executor.submit(new Callable<String>() {
                     @Override
@@ -1794,7 +1815,7 @@ public class IntegerCityController {
                                 logger.info("========查询结果=======" + JSONObject.toJSONString(queryMain));
                                 int code = 0;
                                 if (queryMain != null && queryMain.getId() > 0) {
-                                    code = interService.updateMainOrderState(newMainOrderNo, 1, mobile);
+                                    code = interService.updateMainOrderState(newMainOrderNo, 1, dispatcherPhone);
                                 } else {
                                     MainOrderInterCity main = new MainOrderInterCity();
                                     main.setDriverId(driverId);
@@ -1803,7 +1824,7 @@ public class IntegerCityController {
                                     main.setMainName(routeName);
                                     main.setStatus(MainOrderInterCity.orderState.NOTSETOUT.getCode());
                                     main.setMainOrderNo(newMainOrderNo);
-                                    main.setOpePhone(mobile);
+                                    main.setOpePhone(dispatcherPhone);
                                     main.setMainTime(crossCityStartTime);
                                     code = interService.addMainOrderNo(main);
                                 }
@@ -1819,7 +1840,7 @@ public class IntegerCityController {
                             MainOrderInterCity queryMain = interService.queryMainOrder(newMainOrderNo);
                             logger.info("补录子单绑定开始====" + JSONObject.toJSONString(queryMain));
                             if (queryMain != null && queryMain.getId() > 0) {
-                                int code = interService.updateMainOrderState(newMainOrderNo, 1, mobile);
+                                int code = interService.updateMainOrderState(newMainOrderNo, 1, dispatcherPhone);
                                 if (code > 0) {
                                     logger.info("=====补录异常成功=====");
                                 }
@@ -1927,11 +1948,12 @@ public class IntegerCityController {
                 listParam.add("driverPhone=" + driverPhone);
             }
 
+            String dispatcherPhone = getOpePhone(driverId);
 
             //添加调度员手机号
-            if (WebSessionUtil.getCurrentLoginUser().getMobile() != null) {
-                map.put("dispatcherPhone", WebSessionUtil.getCurrentLoginUser().getMobile());
-                listParam.add("dispatcherPhone=" + WebSessionUtil.getCurrentLoginUser().getMobile());
+            if (dispatcherPhone != null) {
+                map.put("dispatcherPhone", dispatcherPhone);
+                listParam.add("dispatcherPhone=" + dispatcherPhone);
             }
 
 
@@ -1950,7 +1972,6 @@ public class IntegerCityController {
 
 
             String url = "/order/carpool/crossCityOrderReassign";
-            System.out.println(url);
 
 
             String result = carRestTemplate.postForObject(url, JSONObject.class, map);
@@ -1958,8 +1979,19 @@ public class IntegerCityController {
             if (StringUtils.isNotBlank(result)) {
                 JSONObject jsonResult = JSONObject.parseObject(result);
                 if (jsonResult.get("code") != null && jsonResult.getInteger("code") == 0) {
-                    logger.info("改派成功");
-                    String mobile = WebSessionUtil.getCurrentLoginUser().getMobile();
+                    logger.info("=====改派成功====== 手动改派通知派单接口===入参:orderNo:" + orderNo + ",driverId:" + driverId);
+                    try {
+                        Map<String,Object> mapParam = Maps.newHashMap();
+                        mapParam.put("driverId",driverId);
+                        mapParam.put("orderNo",orderNo);
+                        mapParam.put("businessId","BusinessPlatform");
+                        mapParam.put("sign",SignatureUtils.sign(mapParam,driverBusinessId));
+                        String reassignResult = MpOkHttpUtil.okHttpPost(assignUrl +"/v2/carpooling/reassignResult",mapParam,0,null);
+                        logger.info("==========调用派单改派接口结果=======" + JSONObject.toJSONString(reassignResult));
+                    } catch (Exception e) {
+                        logger.error("====调用派单改派接口异常==" + e);
+                    }
+
                     ExecutorService executor = Executors.newCachedThreadPool();
                     Future<String> future = executor.submit(new Callable<String>() {
                         @Override
@@ -1982,7 +2014,7 @@ public class IntegerCityController {
                                     main.setMainName(routeName);
                                     main.setStatus(MainOrderInterCity.orderState.NOTSETOUT.getCode());
                                     main.setMainOrderNo(newMainOrderNo);
-                                    main.setOpePhone(mobile);
+                                    main.setOpePhone(dispatcherPhone);
                                     main.setMainTime(crossCityStartTime);
                                     logger.info("=====改派入库数据：" + JSONObject.toJSONString(main));
                                     code = interService.addMainOrderNo(main);
@@ -1994,7 +2026,7 @@ public class IntegerCityController {
                                 } else {
                                     logger.info("=========更新数据=======" + JSONObject.toJSONString(queryMainOrder));
                                     if (queryMainOrder != null && queryMainOrder.getId() > 0) {
-                                        int code = interService.updateMainOrderState(newMainOrderNo, 1, mobile);
+                                        int code = interService.updateMainOrderState(newMainOrderNo, 1, dispatcherPhone);
                                         if (code > 0) {
                                             logger.info("=============异步更新数据成功=========");
                                             return String.valueOf(code);
@@ -2010,7 +2042,7 @@ public class IntegerCityController {
                                 MainOrderInterCity queryMainOrder = interService.queryMainOrder(newMainOrderNo);
 
                                 if (queryMainOrder != null && queryMainOrder.getId() > 0) {
-                                    int code = interService.updateMainOrderState(newMainOrderNo, 1, mobile);
+                                    int code = interService.updateMainOrderState(newMainOrderNo, 1, dispatcherPhone);
                                     if (code > 0) {
                                         logger.info("=============异步更新数据成功=========");
                                         return String.valueOf(code);
@@ -2753,4 +2785,48 @@ public class IntegerCityController {
         }
         return AjaxResponse.success(null);
     }
+
+        //获取调度员手机号
+        private String getOpePhone(Integer driverId){
+            logger.info("==========获取到的调度员手机号入参driverId=====" + driverId);
+                String opePhone = null;
+                 //根据司机id获取供应商id
+                DriverInfoInterCity city =  infoInterCityExMapper.getByDriverId(driverId);
+                if(city != null && city.getSupplierId()>0){
+                    SupplierExtDto dto = recordService.extDtoDetail(city.getSupplierId());
+                    if(dto != null && StringUtils.isNotEmpty(dto.getCustomerPhone())){
+                        opePhone = StringUtils.isNotEmpty(dto.getCustomerLineNumber())?dto.getCustomerPhone() + "/" + dto.getCustomerLineNumber():dto.getCustomerPhone();
+                    }else {
+
+                        YueAoTongPhoneConfig config = this.queryOpePhone(city.getSupplierId().toString());
+                        if(config == null || StringUtils.isEmpty(config.getPhone())){
+                            opePhone = city.getDriverPhone();//如果车管配置的手机为空，则留当前司机的手机号
+                        }else {
+                            opePhone = config.getPhone();
+                        }
+
+                    }
+
+                }
+                if(StringUtils.isEmpty(opePhone)){
+                    opePhone = WebSessionUtil.getCurrentLoginUser().getMobile();
+                }
+                logger.info("==========获取到的调度员手机号=====" + opePhone);
+                return opePhone;
+        }
+
+    /**
+     * 根据供应商id获取手机号
+     *
+     * @param suppliers
+     * @return
+     */
+    private YueAoTongPhoneConfig queryOpePhone(String suppliers ) {
+        List<YueAoTongPhoneConfig> list = yueAoTongPhoneConfigExMapper.findBySupplierId(suppliers);
+        if(CollectionUtils.isNotEmpty(list)){
+            return list.get(0);
+        }
+        return null;
+    }
+
 }

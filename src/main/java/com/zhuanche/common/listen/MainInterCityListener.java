@@ -8,10 +8,12 @@ import com.alibaba.rocketmq.client.consumer.listener.MessageListenerOrderly;
 import com.alibaba.rocketmq.common.message.MessageExt;
 import com.google.common.collect.Maps;
 import com.zhuanche.controller.driver.YueAoTongPhoneConfig;
+import com.zhuanche.entity.driver.SupplierExtDto;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoInterCity;
 import com.zhuanche.entity.mdbcarmanage.MainOrderInterCity;
 import com.zhuanche.http.MpOkHttpUtil;
 import com.zhuanche.serv.interCity.MainOrderInterService;
+import com.zhuanche.serv.supplier.SupplierRecordService;
 import com.zhuanche.util.Common;
 import com.zhuanche.util.SignatureUtils;
 import com.zhuanche.util.encrypt.MD5Utils;
@@ -54,7 +56,8 @@ public class MainInterCityListener implements MessageListenerOrderly {
     @Autowired
     private YueAoTongPhoneConfigExMapper yueAoTongPhoneConfigExMapper;
 
-
+    @Autowired
+    private SupplierRecordService recordService;
 
     @Override
     public ConsumeOrderlyStatus consumeMessage(List<MessageExt> msgs, ConsumeOrderlyContext context) {
@@ -169,12 +172,20 @@ public class MainInterCityListener implements MessageListenerOrderly {
                                         //根据司机id获取供应商id
                                      DriverInfoInterCity city =  driverInfoInterCityExMapper.getByDriverId(Integer.valueOf(driverId));
                                      if(city != null && city.getSupplierId()>0){
-                                         YueAoTongPhoneConfig config = this.queryOpePhone(city.getSupplierId().toString());
-                                         if(config == null || StringUtils.isEmpty(config.getPhone())){
-                                             opePhone = city.getDriverPhone();//如果车管配置的手机为空，则留当前司机的手机号
-                                         }else {
-                                             opePhone = config.getPhone();
-                                         }
+                                        SupplierExtDto dto = recordService.extDtoDetail(city.getSupplierId());
+                                        if(dto != null && StringUtils.isNotEmpty(dto.getCustomerPhone())){
+                                            opePhone = StringUtils.isNotEmpty(dto.getCustomerLineNumber())?dto.getCustomerPhone() + "/" + dto.getCustomerLineNumber():dto.getCustomerPhone();
+                                        }else {
+
+                                            YueAoTongPhoneConfig config = this.queryOpePhone(city.getSupplierId().toString());
+                                            if(config == null || StringUtils.isEmpty(config.getPhone())){
+                                                opePhone = city.getDriverPhone();//如果车管配置的手机为空，则留当前司机的手机号
+                                            }else {
+                                                opePhone = config.getPhone();
+                                            }
+
+                                        }
+
                                      }
                                     }
 

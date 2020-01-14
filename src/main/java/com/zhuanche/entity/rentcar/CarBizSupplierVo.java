@@ -107,6 +107,16 @@ public class CarBizSupplierVo extends CarBizSupplier {
 
     private String supplierName;//
 
+    /**
+     *客服电话
+     */
+    private String customerPhone;
+
+    /**
+     *客服座机号
+     */
+    private String customerLineNumber;
+
     public String getSupplierCityName() {
         return supplierCityName;
     }
@@ -403,5 +413,21 @@ public class CarBizSupplierVo extends CarBizSupplier {
 
     public void setSupplierName(String supplierName) {
         this.supplierName = supplierName;
+    }
+
+    public String getCustomerPhone() {
+        return customerPhone;
+    }
+
+    public void setCustomerPhone(String customerPhone) {
+        this.customerPhone = customerPhone;
+    }
+
+    public String getCustomerLineNumber() {
+        return customerLineNumber;
+    }
+
+    public void setCustomerLineNumber(String customerLineNumber) {
+        this.customerLineNumber = customerLineNumber;
     }
 }
