@@ -186,14 +186,17 @@ public class IntegerCityController {
                                    String beginCostEndDate,
                                    String endCostEndDate,
                                    String riderPhone,
-                                   String distributorId) {
+                                   String distributorId,
+                                   Integer ruleId,
+                                   String bookingDateDesc,
+                                   String bookdingDateAsc) {
         logger.info(MessageFormat.format("订单查询入参:pageNum:{0},pageSize:{1},cityId:{2},supplierId:{3},orderState:" +
                         "{4},orderPushDriverType:{5},serviceType:{6},orderType:{7},airportId:{8},orderSource:{9},driverName:" +
                         "{10},driverPhone:{11},licensePlates:{12},reserveName:{13},reservePhone:{14},riderName:{15},orderNo:{16}," +
                         "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostEndDate{20},endCostEndDate{21},riderPhone:{22},distributorId:{23}", pageNum,
                 pageSize, cityId, supplierId, orderState, pushDriverType, serviceType, orderType, airportId, orderSource,
                 driverName, driverPhone, licensePlates, reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate,
-                endCreateDate, beginCostEndDate, endCostEndDate, riderPhone,distributorId));
+                endCreateDate, beginCostEndDate, endCostEndDate, riderPhone,distributorId,ruleId));
 
 
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
@@ -268,6 +271,7 @@ public class IntegerCityController {
         map.put("endCostEndDate", endCostEndDate);
         map.put("riderPhone", riderPhone);
         map.put("distributorId", distributorId);
+        map.put("ruleIdBatch",ruleId);
 
         //根据不同权限添加过滤条件
 /*        if (StringUtils.isNotEmpty(serviceCityBatch)) {
@@ -280,8 +284,16 @@ public class IntegerCityController {
 
         //添加排序字段
         JSONObject jsonSort = new JSONObject();
-        jsonSort.put("field", "createDate");
-        jsonSort.put("operator", "desc");
+        if(StringUtils.isNotEmpty(bookingDateDesc)){
+            jsonSort.put("field", "bookingDate");
+            jsonSort.put("operator", "desc");
+        } else if(StringUtils.isNotEmpty(bookdingDateAsc)){
+            jsonSort.put("field", "bookingDate");
+            jsonSort.put("operator", "asc");
+        }else {
+            jsonSort.put("field", "createDate");
+            jsonSort.put("operator", "desc");
+        }
         JSONArray arraySort = new JSONArray();
         arraySort.add(jsonSort);
         map.put("sort", arraySort.toString());
@@ -2753,4 +2765,41 @@ public class IntegerCityController {
         }
         return AjaxResponse.success(null);
     }
+
+
+    //获取所有的线路名称和id
+    @RequestMapping("/getRuleAndNames")
+    @ResponseBody
+    public AjaxResponse getRuleAndNames(){
+        logger.info("====获取所有线路和名称=====start");
+        try {
+            Map<String,Object> requestMap = new HashMap<>();
+            requestMap.put("lineModel",2);
+
+            String configResult = MpOkHttpUtil.okHttpPost(configUrl+ "/intercityCarUse/getIntercityCarSharingList",requestMap,0,null);
+
+            logger.info("=====获取结果===" + configResult);
+            Map<Integer,String> configMap = new HashMap<>();
+            if(!org.springframework.util.StringUtils.isEmpty(configResult)){
+                JSONObject jsonResult = JSONObject.parseObject(configResult);
+                if(jsonResult.get("code") != null && jsonResult.getInteger("code") == 0){
+                    String jsonData =  jsonResult.get("data").toString();
+                    JSONArray jsonArray = JSONArray.parseArray(jsonData);
+                    jsonArray.forEach(json ->{
+                        JSONObject jsonObject = (JSONObject) json;
+                        configMap.put(jsonObject.get("lineId") != null ? jsonObject.getInteger("lineId") : 0,
+                                jsonObject.get("lineName") != null ? jsonObject.getString("lineName") : "");
+                    });
+                }
+            }
+            logger.info("==========获取配置后台线路end==============" + JSONObject.toJSONString(configMap));
+            return AjaxResponse.success(configMap);
+        } catch (Exception e) {
+            logger.info("获取配置后台线路异常" + e);
+            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
+        }
+
+
+    }
+
 }
