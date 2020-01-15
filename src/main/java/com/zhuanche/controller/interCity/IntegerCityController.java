@@ -188,15 +188,15 @@ public class IntegerCityController {
                                    String riderPhone,
                                    String distributorId,
                                    Integer ruleId,
-                                   String bookingDateDesc,
-                                   String bookdingDateAsc) {
+                                   String bookingDateSort) {
         logger.info(MessageFormat.format("订单查询入参:pageNum:{0},pageSize:{1},cityId:{2},supplierId:{3},orderState:" +
                         "{4},orderPushDriverType:{5},serviceType:{6},orderType:{7},airportId:{8},orderSource:{9},driverName:" +
                         "{10},driverPhone:{11},licensePlates:{12},reserveName:{13},reservePhone:{14},riderName:{15},orderNo:{16}," +
-                        "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostEndDate{20},endCostEndDate{21},riderPhone:{22},distributorId:{23}", pageNum,
+                        "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostEndDate{20},endCostEndDate{21},riderPhone:{22},distributorId:{23}," +
+                        "bookingDateSort:{24}", pageNum,
                 pageSize, cityId, supplierId, orderState, pushDriverType, serviceType, orderType, airportId, orderSource,
                 driverName, driverPhone, licensePlates, reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate,
-                endCreateDate, beginCostEndDate, endCostEndDate, riderPhone,distributorId,ruleId));
+                endCreateDate, beginCostEndDate, endCostEndDate, riderPhone,distributorId,ruleId,bookingDateSort));
 
 
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
@@ -284,10 +284,10 @@ public class IntegerCityController {
 
         //添加排序字段
         JSONObject jsonSort = new JSONObject();
-        if(StringUtils.isNotEmpty(bookingDateDesc)){
+        if(StringUtils.isNotEmpty(bookingDateSort) && "1".equals(bookingDateSort)){
             jsonSort.put("field", "bookingDate");
             jsonSort.put("operator", "desc");
-        } else if(StringUtils.isNotEmpty(bookdingDateAsc)){
+        } else if(StringUtils.isNotEmpty(bookingDateSort) && "2".equals(bookingDateSort)){
             jsonSort.put("field", "bookingDate");
             jsonSort.put("operator", "asc");
         }else {
@@ -346,14 +346,16 @@ public class IntegerCityController {
                                         String beginCostStartDate,
                                         String beginCostEndDate,
                                         String riderPhone,
-                                        String distributorId) {
+                                        String distributorId,
+                                        String bookingDateSort) {
         logger.info(MessageFormat.format("订单查询入参:pageNum:{0},pageSize:{1},cityId:{2},orderState:" +
                         "{4},orderPushDriverType:{5},serviceType:{6},orderType:{7},airportId:{8},orderSource:{9},driverName:" +
                         "{10},driverPhone:{11},licensePlates:{12},reserveName:{13},reservePhone:{14},riderName:{15},orderNo:{16}," +
-                        "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostStartDate{20},beginCostEndDate{21},riderPhone:{22},distributorId:{23}", pageNum,
+                        "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostStartDate{20},beginCostEndDate{21}," +
+                        "riderPhone:{22},distributorId:{23},bookingDateSort:{24}", pageNum,
                 pageSize, cityId, orderState, pushDriverType, serviceType, orderType, airportId, orderSource,
                 driverName, driverPhone, licensePlates, reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate,
-                endCreateDate, beginCostStartDate, beginCostEndDate, riderPhone,distributorId));
+                endCreateDate, beginCostStartDate, beginCostEndDate, riderPhone,distributorId,bookingDateSort));
 
 
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
@@ -433,8 +435,16 @@ public class IntegerCityController {
         map.put("supplierIdBatch", "");
         //添加排序字段
         JSONObject jsonSort = new JSONObject();
-        jsonSort.put("field", "createDate");
-        jsonSort.put("operator", "desc");
+        if(StringUtils.isNotEmpty(bookingDateSort) && "1".equals(bookingDateSort)){
+            jsonSort.put("field", "bookingDate");
+            jsonSort.put("operator", "desc");
+        } else if(StringUtils.isNotEmpty(bookingDateSort) && "2".equals(bookingDateSort)){
+            jsonSort.put("field", "bookingDate");
+            jsonSort.put("operator", "asc");
+        }else {
+            jsonSort.put("field", "createDate");
+            jsonSort.put("operator", "desc");
+        }
         JSONArray arraySort = new JSONArray();
         arraySort.add(jsonSort);
         map.put("sort", arraySort.toString());
@@ -2768,9 +2778,9 @@ public class IntegerCityController {
 
 
     //获取所有的线路名称和id
-    @RequestMapping("/getRuleAndNames")
+    @RequestMapping("/getRuleIdAndNames")
     @ResponseBody
-    public AjaxResponse getRuleAndNames(){
+    public AjaxResponse getRuleIdAndNames(){
         logger.info("====获取所有线路和名称=====start");
         try {
             Map<String,Object> requestMap = new HashMap<>();
