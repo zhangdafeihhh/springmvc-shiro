@@ -203,14 +203,17 @@ public class IntegerCityController {
                                    String beginCostEndDate,
                                    String endCostEndDate,
                                    String riderPhone,
-                                   String distributorId) {
+                                   String distributorId,
+                                   String lineName,
+                                   String bookingDateSort) {
         logger.info(MessageFormat.format("订单查询入参:pageNum:{0},pageSize:{1},cityId:{2},supplierId:{3},orderState:" +
                         "{4},orderPushDriverType:{5},serviceType:{6},orderType:{7},airportId:{8},orderSource:{9},driverName:" +
                         "{10},driverPhone:{11},licensePlates:{12},reserveName:{13},reservePhone:{14},riderName:{15},orderNo:{16}," +
-                        "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostEndDate{20},endCostEndDate{21},riderPhone:{22},distributorId:{23}", pageNum,
+                        "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostEndDate{20},endCostEndDate{21},riderPhone:{22},distributorId:{23}," +
+                        "bookingDateSort:{24}", pageNum,
                 pageSize, cityId, supplierId, orderState, pushDriverType, serviceType, orderType, airportId, orderSource,
                 driverName, driverPhone, licensePlates, reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate,
-                endCreateDate, beginCostEndDate, endCostEndDate, riderPhone,distributorId));
+                endCreateDate, beginCostEndDate, endCostEndDate, riderPhone,distributorId,lineName,bookingDateSort));
 
 
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
@@ -286,6 +289,15 @@ public class IntegerCityController {
         map.put("riderPhone", riderPhone);
         map.put("distributorId", distributorId);
 
+        if(StringUtils.isNotEmpty(lineName)){
+            String ruleBatch = this.getRuleIdBatch(lineName);
+            if(StringUtils.isEmpty(ruleBatch)){
+                logger.info("=====未查询到匹配的线路====");
+                return AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
+            }
+            map.put("ruleIdBatch",ruleBatch);
+        }
+
         //根据不同权限添加过滤条件
 /*        if (StringUtils.isNotEmpty(serviceCityBatch)) {
             map.put("cityIdBatch", serviceCityBatch);
@@ -297,8 +309,16 @@ public class IntegerCityController {
 
         //添加排序字段
         JSONObject jsonSort = new JSONObject();
-        jsonSort.put("field", "createDate");
-        jsonSort.put("operator", "desc");
+        if(StringUtils.isNotEmpty(bookingDateSort) && "1".equals(bookingDateSort)){
+            jsonSort.put("field", "bookingDate");
+            jsonSort.put("operator", "desc");
+        } else if(StringUtils.isNotEmpty(bookingDateSort) && "2".equals(bookingDateSort)){
+            jsonSort.put("field", "bookingDate");
+            jsonSort.put("operator", "asc");
+        }else {
+            jsonSort.put("field", "createDate");
+            jsonSort.put("operator", "desc");
+        }
         JSONArray arraySort = new JSONArray();
         arraySort.add(jsonSort);
         map.put("sort", arraySort.toString());
@@ -351,14 +371,16 @@ public class IntegerCityController {
                                         String beginCostStartDate,
                                         String beginCostEndDate,
                                         String riderPhone,
-                                        String distributorId) {
+                                        String distributorId,
+                                        String bookingDateSort) {
         logger.info(MessageFormat.format("订单查询入参:pageNum:{0},pageSize:{1},cityId:{2},orderState:" +
                         "{4},orderPushDriverType:{5},serviceType:{6},orderType:{7},airportId:{8},orderSource:{9},driverName:" +
                         "{10},driverPhone:{11},licensePlates:{12},reserveName:{13},reservePhone:{14},riderName:{15},orderNo:{16}," +
-                        "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostStartDate{20},beginCostEndDate{21},riderPhone:{22},distributorId:{23}", pageNum,
+                        "mainOrderNo:{17},beginCreateDate:{18},endCreateDate{19},beginCostStartDate{20},beginCostEndDate{21}," +
+                        "riderPhone:{22},distributorId:{23},bookingDateSort:{24}", pageNum,
                 pageSize, cityId, orderState, pushDriverType, serviceType, orderType, airportId, orderSource,
                 driverName, driverPhone, licensePlates, reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate,
-                endCreateDate, beginCostStartDate, beginCostEndDate, riderPhone,distributorId));
+                endCreateDate, beginCostStartDate, beginCostEndDate, riderPhone,distributorId,bookingDateSort));
 
 
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
@@ -406,6 +428,8 @@ public class IntegerCityController {
         map.put("riderPhone", riderPhone);
         map.put("distributorId", distributorId);
 
+
+
         //根据不同权限添加过滤条件
 /*        if (StringUtils.isNotEmpty(serviceCityBatch)) {
             map.put("cityIdBatch", serviceCityBatch);
@@ -438,8 +462,16 @@ public class IntegerCityController {
         map.put("supplierIdBatch", "");
         //添加排序字段
         JSONObject jsonSort = new JSONObject();
-        jsonSort.put("field", "createDate");
-        jsonSort.put("operator", "desc");
+        if(StringUtils.isNotEmpty(bookingDateSort) && "1".equals(bookingDateSort)){
+            jsonSort.put("field", "bookingDate");
+            jsonSort.put("operator", "desc");
+        } else if(StringUtils.isNotEmpty(bookingDateSort) && "2".equals(bookingDateSort)){
+            jsonSort.put("field", "bookingDate");
+            jsonSort.put("operator", "asc");
+        }else {
+            jsonSort.put("field", "createDate");
+            jsonSort.put("operator", "desc");
+        }
         JSONArray arraySort = new JSONArray();
         arraySort.add(jsonSort);
         map.put("sort", arraySort.toString());
@@ -2823,10 +2855,49 @@ public class IntegerCityController {
      */
     private YueAoTongPhoneConfig queryOpePhone(String suppliers ) {
         List<YueAoTongPhoneConfig> list = yueAoTongPhoneConfigExMapper.findBySupplierId(suppliers);
-        if(CollectionUtils.isNotEmpty(list)){
+        if (CollectionUtils.isNotEmpty(list)) {
             return list.get(0);
         }
         return null;
+    }
+
+    //获取所有的线路名称和id
+
+    public String getRuleIdBatch(String lineName){
+        logger.info("====获取所有线路和名称=====start");
+        StringBuffer stringBuffer = new StringBuffer();
+        try {
+            Map<String,Object> requestMap = new HashMap<>();
+            requestMap.put("lineModel",2);
+            if(StringUtils.isNotEmpty(lineName)){
+                requestMap.put("lineName",lineName);
+            }
+
+            String configResult = MpOkHttpUtil.okHttpPost(configUrl+ "/intercityCarUse/getIntercityCarSharingList",requestMap,0,null);
+
+            logger.info("=====获取结果===" + configResult);
+            Map<Integer,String> configMap = new HashMap<>();
+            if(!org.springframework.util.StringUtils.isEmpty(configResult)){
+                JSONObject jsonResult = JSONObject.parseObject(configResult);
+                if(jsonResult.get("code") != null && jsonResult.getInteger("code") == 0){
+                    String jsonData =  jsonResult.get("data").toString();
+                    JSONArray jsonArray = JSONArray.parseArray(jsonData);
+                    jsonArray.forEach(json ->{
+                        JSONObject jsonObject = (JSONObject) json;
+                        if(jsonObject.get("lineId") != null ){
+                            stringBuffer.append(jsonObject.get("lineId")).append(",");
+                        }
+                    });
+                }
+            }
+            logger.info("==========获取配置后台线路end==============" + JSONObject.toJSONString(configMap));
+          } catch (Exception e) {
+            logger.info("获取配置后台线路异常" + e);
+         }
+         if(stringBuffer.length()>0){
+            return stringBuffer.substring(0,stringBuffer.length());
+         }
+         return null;
     }
 
 }

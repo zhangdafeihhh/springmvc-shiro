@@ -1,4 +1,4 @@
-FROM registry.01zhuanche.com/devops/jdk1.8_tomcat_8:v0.4
+FROM registry.01zhuanche.com/devops/jdk1.8_tomcat_8:v0.5
 
 MAINTAINER lixiaolong@01zhuanche.com
 

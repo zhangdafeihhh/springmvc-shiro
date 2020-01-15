@@ -129,6 +129,7 @@ public class CompleteOrderController{
 		    String jsonString = JSON.toJSONString(paramMap);
 		    logger.info("【运营管理-统计分析】完成订单列表请求参数--"+jsonString);
 		    //从大数据仓库获取统计数据
+            logger.info("调用请求域名:" + (saasBigdataApiUrl+"/completeOrderDetail/queryList"));
 		    AjaxResponse result = statisticalAnalysisService.parseResult(saasBigdataApiUrl+"/completeOrderDetail/queryList",paramMap);
             if (result.isSuccess()){
                 JSONObject data =  (JSONObject) result.getData();
