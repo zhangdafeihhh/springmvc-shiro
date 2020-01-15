@@ -187,7 +187,7 @@ public class IntegerCityController {
                                    String endCostEndDate,
                                    String riderPhone,
                                    String distributorId,
-                                   Integer ruleId,
+                                   String lineName,
                                    String bookingDateSort) {
         logger.info(MessageFormat.format("订单查询入参:pageNum:{0},pageSize:{1},cityId:{2},supplierId:{3},orderState:" +
                         "{4},orderPushDriverType:{5},serviceType:{6},orderType:{7},airportId:{8},orderSource:{9},driverName:" +
@@ -196,7 +196,7 @@ public class IntegerCityController {
                         "bookingDateSort:{24}", pageNum,
                 pageSize, cityId, supplierId, orderState, pushDriverType, serviceType, orderType, airportId, orderSource,
                 driverName, driverPhone, licensePlates, reserveName, reservePhone, riderName, orderNo, mainOrderNo, beginCreateDate,
-                endCreateDate, beginCostEndDate, endCostEndDate, riderPhone,distributorId,ruleId,bookingDateSort));
+                endCreateDate, beginCostEndDate, endCostEndDate, riderPhone,distributorId,lineName,bookingDateSort));
 
 
         SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
@@ -271,7 +271,15 @@ public class IntegerCityController {
         map.put("endCostEndDate", endCostEndDate);
         map.put("riderPhone", riderPhone);
         map.put("distributorId", distributorId);
-        map.put("ruleIdBatch",ruleId);
+
+        if(StringUtils.isNotEmpty(lineName)){
+            String ruleBatch = this.getRuleIdBatch(lineName);
+            if(StringUtils.isEmpty(ruleBatch)){
+                logger.info("=====未查询到匹配的线路====");
+                return AjaxResponse.fail(RestErrorCode.UNDEFINED_LINE);
+            }
+            map.put("ruleIdBatch",ruleBatch);
+        }
 
         //根据不同权限添加过滤条件
 /*        if (StringUtils.isNotEmpty(serviceCityBatch)) {
@@ -402,6 +410,8 @@ public class IntegerCityController {
         map.put("endCostEndDate", beginCostEndDate);
         map.put("riderPhone", riderPhone);
         map.put("distributorId", distributorId);
+
+
 
         //根据不同权限添加过滤条件
 /*        if (StringUtils.isNotEmpty(serviceCityBatch)) {
@@ -2778,13 +2788,16 @@ public class IntegerCityController {
 
 
     //获取所有的线路名称和id
-    @RequestMapping("/getRuleIdAndNames")
-    @ResponseBody
-    public AjaxResponse getRuleIdAndNames(){
+
+    public String getRuleIdBatch(String lineName){
         logger.info("====获取所有线路和名称=====start");
+        StringBuffer stringBuffer = new StringBuffer();
         try {
             Map<String,Object> requestMap = new HashMap<>();
             requestMap.put("lineModel",2);
+            if(StringUtils.isNotEmpty(lineName)){
+                requestMap.put("lineName",lineName);
+            }
 
             String configResult = MpOkHttpUtil.okHttpPost(configUrl+ "/intercityCarUse/getIntercityCarSharingList",requestMap,0,null);
 
@@ -2797,19 +2810,20 @@ public class IntegerCityController {
                     JSONArray jsonArray = JSONArray.parseArray(jsonData);
                     jsonArray.forEach(json ->{
                         JSONObject jsonObject = (JSONObject) json;
-                        configMap.put(jsonObject.get("lineId") != null ? jsonObject.getInteger("lineId") : 0,
-                                jsonObject.get("lineName") != null ? jsonObject.getString("lineName") : "");
+                        if(jsonObject.get("lineId") != null ){
+                            stringBuffer.append(jsonObject.get("lineId")).append(",");
+                        }
                     });
                 }
             }
             logger.info("==========获取配置后台线路end==============" + JSONObject.toJSONString(configMap));
-            return AjaxResponse.success(configMap);
-        } catch (Exception e) {
+          } catch (Exception e) {
             logger.info("获取配置后台线路异常" + e);
-            return AjaxResponse.fail(RestErrorCode.HTTP_SYSTEM_ERROR);
-        }
-
-
+         }
+         if(stringBuffer.length()>0){
+            return stringBuffer.substring(0,stringBuffer.length());
+         }
+         return null;
     }
 
 }

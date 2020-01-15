@@ -309,6 +309,9 @@ public final class RestErrorCode{
 	@ResultMessage("关键字不能为空")
 	public static final int KEYWORDS_IS_NOT_NULL = 50501;
 
+	@ResultMessage("未查询到匹配的线路")
+	public static final int UN_DEFINDED_LINE = 50801;
+
 
 
 
