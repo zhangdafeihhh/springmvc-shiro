@@ -9,4 +9,8 @@ import java.util.List;
 public interface IDriverService <DriverEntity> {
 
     PageInfo<DriverVoEntity> findPageDriver(DriverVoEntity params);
+
+    List<Integer> queryDriverIdsByName(String name);
+
+    List<Integer> queryDriverIdsByPhone(String phone);
 }

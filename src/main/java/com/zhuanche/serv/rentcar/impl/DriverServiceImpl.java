@@ -69,5 +69,14 @@ public class DriverServiceImpl implements IDriverService<DriverEntity> {
         return  pageInfo;
     }
 
+    @Override
+    public List<Integer> queryDriverIdsByName(String name) {
+        return carBizDriverInfoExMapper.queryDriverIdsByName(name);
+    }
+
+    @Override
+    public List<Integer> queryDriverIdsByPhone(String phone) {
+        return carBizDriverInfoExMapper.queryDriverIdsByPhone(phone);
+    }
 
 }

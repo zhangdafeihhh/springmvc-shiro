@@ -91,22 +91,6 @@ public class SupplierController {
         return AjaxResponse.success(pageDTO);
     }
 
-    @RequestMapping("/addSupplier")
-    @ResponseBody
-    @RequestFunction(menu = SUPPLIER_ADD)
-    @DingdingAnno(level = "1",method = "insert")
-    public AjaxResponse addSupplier(CarBizSupplierVo supplier){
-        return supplierService.saveSupplierInfo(supplier);
-    }
-
-    @RequestMapping("/updateSupplier")
-    @ResponseBody
-    @RequestFunction(menu = SUPPLIER_UPDATE)
-    @DingdingAnno(level = "1",method = "update")
-    public AjaxResponse updateSupplier(CarBizSupplierVo supplier){
-        return supplierService.saveSupplierInfo(supplier);
-    }
-
     @RequestMapping("/cooperationType")
     @ResponseBody
     @RequestFunction(menu = SUPPLIER_COOPERATION_TYPE)

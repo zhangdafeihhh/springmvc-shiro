@@ -1995,5 +1995,25 @@
     </if>
   </select>
 
+  <!--根据司机id查询司机信息-->
+  <select id="findAllDriverIdsBySupplierId" resultType="java.lang.Integer" parameterType="java.util.HashMap">
+    SELECT
+    info.driver_id
+    FROM
+    car_biz_driver_info AS info
+    WHERE info.driver_id &gt; #{bigDriverId} and info.supplier_id =  #{supplierId}
+    order by info.driver_id asc
+    LIMIT #{pageSize}
+  </select>
 
+
+  <!--根据司机id查询司机信息-->
+  <select id="queryDriverIdsByName" resultType="java.lang.Integer" parameterType="java.lang.String">
+    SELECT driver_id FROM car_biz_driver_info WHERE name =  #{name}
+  </select>
+
+  <!--根据司机id查询司机信息-->
+  <select id="queryDriverIdsByPhone" resultType="java.lang.Integer" parameterType="java.lang.String">
+    SELECT driver_id FROM car_biz_driver_info WHERE phone =  #{phone}
+  </select>
 </mapper>
