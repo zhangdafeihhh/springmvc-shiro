@@ -16,12 +16,14 @@ import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
 import com.zhuanche.util.HtmlFilterUtil;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
+import mapper.mdbcarmanage.ex.CarMessageReceiverExMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -61,6 +63,9 @@ public class MessageManagerController {
     @Autowired
     private CarAdmUserExMapper carAdmUserExMapper;
 
+    @Autowired
+    private CarMessageReceiverExMapper receiverExMapper;
+
 
     /**
      * 发送消息接口
@@ -83,7 +88,7 @@ public class MessageManagerController {
             @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
     })
     public AjaxResponse postMessage(@RequestParam(value = "messageId",required = false)Integer messageId,
-                                    @RequestParam(value = "status",required = true) Integer status,
+                                    @Verify(param = "status",rule = "required") Integer status,
                                     @RequestParam(value = "creater",required = false) String creater,
                                     @RequestParam(value = "messageTitle",required = false) String messageTitle,
                                     @RequestParam(value = "messageContent",required = false) String messageContent,
@@ -94,12 +99,15 @@ public class MessageManagerController {
                                     @RequestParam(value = "docName",required = false) String docName,
                                     @RequestParam(value = "docUrl",required = false) String docUrl,
                                     @RequestParam(value = "file",required = false) MultipartFile file,
-                                    HttpServletRequest request){
+                                    HttpServletRequest request,
+                                    @Verify(param = "publicRange",rule = "required") Integer publicRange,
+                                    String messageGroupIds){
 
         logger.info(MessageFormat.format("postMessage入参：status:{0},creater:{1},messageTitle:{2},messageContent:{3}," +
-                "level:{4},cities:{5},suppliers:{6},teamId{7},docName:{8},docUrl:{9},messageId:{10}",
+                "level:{4},cities:{5},suppliers:{6},teamId{7},docName:{8},docUrl:{9},messageId:{10},publicRange:{11}" +
+                        ",messageGroupIds:{12}",
                 String.valueOf(status),creater,messageTitle,messageContent,String.valueOf(level),cities,
-                suppliers,teamId,docName,docUrl,messageId));
+                suppliers,teamId,docName,docUrl,messageId,publicRange,messageGroupIds));
 
         if (StringUtils.isBlank(creater) || StringUtils.isBlank(String.valueOf(status)) ){
             logger.info("消息为发布状态，必传参数为空");
@@ -119,7 +127,7 @@ public class MessageManagerController {
 
         }
 
-        if(status.equals(CarMessagePost.Status.publish)){
+        if(CarMessagePost.Status.publish.equals(status)){
           if (StringUtils.isBlank(creater) || StringUtils.isBlank(messageTitle) || StringUtils.isBlank(messageContent)
                   || StringUtils.isBlank(String.valueOf(level)) ){
               logger.info("消息为发布状态，必传参数为空");
@@ -130,7 +138,7 @@ public class MessageManagerController {
         AjaxResponse response = AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
         try {
             int code = messageService.postMessage(messageId,status, Integer.valueOf(creater), messageTitle, messageContent, level, cities, suppliers, teamId, docName, docUrl,
-                    file,request);
+                    file,request,publicRange,messageGroupIds);
 
             if (code > 0){
                 logger.info("消息发送成功");
@@ -174,7 +182,9 @@ public class MessageManagerController {
                                            @RequestParam(value = "docName",required = false) String docName,
                                            @RequestParam(value = "docUrl",required = false) String docUrl,
                                            @RequestParam(value = "file",required = false) MultipartFile file,
-                                           HttpServletRequest request){
+                                           HttpServletRequest request,
+                                           Integer publicRange,
+                                           String messageGroupIds){
         logger.info(MessageFormat.format("updateDraftMessage入参：status:{0},creater:{1},messageTitle:{2},messageContent:{3}," +
                         "level:{4},cities:{5},suppliers:{6},teamId{7},docName:{8},docUrl:{9}",
                 String.valueOf(status),creater,messageTitle,messageContent,String.valueOf(level),cities,
@@ -198,7 +208,7 @@ public class MessageManagerController {
         AjaxResponse response = AjaxResponse.fail(RestErrorCode.PARAMS_ERROR);
         try {
             int code = messageService.postMessage(Integer.valueOf(messageId),status, Integer.valueOf(creater), messageTitle, messageContent, level, cities, suppliers, teamId, docName, docUrl,
-                    file,request);
+                    file,request,publicRange,messageGroupIds);
             if (code > 0){
                 logger.info("消息发送成功");
                 return AjaxResponse.success(null);
@@ -398,6 +408,29 @@ public class MessageManagerController {
     }
 
 
+
+    @RequestMapping(value = "/newMessageSearch",method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
+    public AjaxResponse newMessageSearch(String keyword,
+                                      String startDate,String endDate, String createUser,Integer status,
+                                      @RequestParam(value = "pageSize",defaultValue = "10") Integer pageSize,
+                                      @RequestParam(value = "pageNum",defaultValue = "1") Integer pageNum) {
+        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+        Integer userId = loginUser.getId();
+        List<Integer> idList = null;
+        if (StringUtils.isNotBlank(createUser)){
+            idList = carAdmUserExMapper.queryIdListByName(createUser);
+        }
+        PageDTO pageDTO = messageService.newMessageSearch(status,keyword,
+                startDate, endDate, idList, pageSize, pageNum, userId);
+        return AjaxResponse.success(pageDTO);
+    }
+
+
+
     @RequestMapping(value="/download")
     public ResponseEntity<byte[]> download(@RequestParam("fileUrl") String fileUrl)
             throws Exception {
@@ -424,4 +457,24 @@ public class MessageManagerController {
     }
 
 
+    //回复操作
+    /*@RequestMapping(value = "/replyMessage")
+    @ResponseBody
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.MASTER)
+    })
+    public AjaxResponse replyMessage(@Verify(param = "replyContent",rule = "required") String replyContent,
+                                     @Verify(param = "id",rule = "id")Integer id){
+        logger.info(MessageFormat.format("replyMessage入参:replyContent:{0},id:{1}",replyContent,id));
+        try {
+            Integer code = receiverExMapper.replyMessage(replyContent,id);
+            if (code != null && code>0){
+                return AjaxResponse.success(null);
+            }else {
+                return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+             }
+        } catch (MessageException e) {
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+        }
+    }*/
 }

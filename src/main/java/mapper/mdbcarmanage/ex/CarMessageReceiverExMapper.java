@@ -1,6 +1,7 @@
 package mapper.mdbcarmanage.ex;
 
 import com.zhuanche.dto.mdbcarmanage.CarMessagePostDto;
+import com.zhuanche.entity.mdbcarmanage.CarMessageGroup;
 import com.zhuanche.entity.mdbcarmanage.CarMessageReceiver;
 import org.apache.ibatis.annotations.Param;
 
@@ -70,4 +71,11 @@ public interface CarMessageReceiverExMapper {
     List<CarMessagePostDto> queryDataInAttachment(@Param("keyword") String keyword, @Param("startDate") Date startDate, @Param("endDate") Date endDate,
                                                   @Param("idList") List<Integer> idList, @Param("userId") Integer userId,
                                                   @Param("offset") Integer offset, @Param("limit") Integer limit);
+
+    Integer messagePostDtoCount(@Param("receiveUserId") Integer receiveUserId,
+                                     @Param("messageId") Integer messageId);
+
+    List<CarMessagePostDto> newSearchMessage(@Param("status") Integer status,@Param("keyword") String keyword, @Param("startDate") Date startDate, @Param("endDate") Date endDate,
+                                             @Param("idList") List<Integer> idList, @Param("userId") Integer userId);
+
 }

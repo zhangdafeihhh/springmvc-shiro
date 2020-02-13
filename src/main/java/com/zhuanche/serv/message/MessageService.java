@@ -123,7 +123,9 @@ public class MessageService {
                            String docName,
                            String docUrl,
                            MultipartFile file,
-                           HttpServletRequest request) throws MessageException{
+                           HttpServletRequest request,
+                           Integer publicRange,
+                           String messageGroupIds) throws MessageException{
         try {
             try {
                 CarMessagePost post = new CarMessagePost();
@@ -136,7 +138,10 @@ public class MessageService {
                 post.setStatus(status);
                 post.setSuppliers(suppliers);
                 post.setTeamids(teamId);
-
+                post.setPublicRange(publicRange);
+                if(publicRange != null && publicRange == 1){
+                    post.setMessageGroupIds(messageGroupIds);
+                }
 
                 boolean isUpdate = false;
                 if (messageId == null) {
@@ -159,7 +164,12 @@ public class MessageService {
                         Future<String> future = executor.submit(new Callable<String>() {
                             @Override
                             public String call() throws Exception {
-                              int code =  receiveService.sendMessage(newMessageId,level,cities,suppliers,teamId);
+                                int code = 0;
+                                if(publicRange != null && publicRange == 1){
+                                    code = receiveService.sendMessageByGroup(newMessageId,messageGroupIds);
+                                }else {
+                                    code  =  receiveService.sendMessage(newMessageId,level,cities,suppliers,teamId);
+                                }
                               logger.info("异步发送消息" + code);
                               return String.valueOf(code);
                             }
@@ -784,6 +794,51 @@ public class MessageService {
         }
         return new PageDTO(pageNum, pageSize, count, data);
     }
+
+
+
+
+
+    public PageDTO newMessageSearch(Integer status,String keyword, String startDate,
+                                 String endDate, List<Integer> idList, Integer pageSize, Integer pageNum, Integer userId) {
+        try {
+            int count = 0;
+            Date start = (startDate != null) ? DateUtil.parseDate(startDate, Constants.DATE_FORMAT) : null;
+            Date end = endDate != null ? DateUtil.parseDate(endDate, Constants.DATE_FORMAT) : null ;
+            if (end != null){
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(end);
+                calendar.add(Calendar.DAY_OF_MONTH, 1);
+                end = calendar.getTime();
+            }
+
+            List<CarMessagePostDto> data = new ArrayList<>();
+            if (idList != null && idList.size() == 0){
+                return new PageDTO(pageNum, pageSize, count, data);
+            }
+
+            Page page = PageHelper.startPage(pageNum,pageSize);
+            data = receiverExMapper.newSearchMessage(status,keyword , start, end, idList, userId);
+
+            SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+
+            data.forEach(dto ->{
+            if (dto.getMessageStatus().equals(CarMessagePost.Status.publish.getMessageStatus())){
+                dto.setMessageStatus(user.getId().equals(dto.getCreateId()) ?
+                        CarMessagePost.Status.publish.getMessageStatus() : CarMessagePost.Status.receive.getMessageStatus());
+            }
+            });
+            count = (int) page.getTotal();
+
+            return new PageDTO(pageNum, pageSize, count, data);
+        } catch (Exception e) {
+            logger.error("查询异常" + e);
+        }
+        return new PageDTO(pageNum, pageSize, 0, null);
+    }
+
+
+
 
     /**
      * 判断查询回复用户是否是消息发布者

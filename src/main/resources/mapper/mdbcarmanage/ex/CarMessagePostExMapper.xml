@@ -13,6 +13,9 @@
     <result column="teamIds" property="teamids" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+
+    <result column="publicRange" property="public_range" jdbcType="INTEGER" />
+    <result column="messageGroupIds" property="message_group_ids" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, mesage_title, message_content, user_id, status, level, cities, suppliers,
@@ -87,6 +90,12 @@
       <if test="updateTime != null" >
         update_time,
       </if>
+      <if test="publicRange != null" >
+        public_range,
+      </if>
+      <if test="messageGroupIds != null" >
+        message_group_ids,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="mesageTitle != null" >
@@ -118,6 +127,12 @@
       </if>
       <if test="updateTime != null" >
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="publicRange != null" >
+        #{publicRange,jdbcType=INTEGER},
+      </if>
+      <if test="messageGroupIds != null" >
+        #{messageGroupIds,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -194,6 +209,13 @@
       <if test="updateTime != null" >
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="publicRange != null" >
+        #{publicRange,jdbcType=INTEGER},
+      </if>
+      <if test="messageGroupIds != null" >
+        #{messageGroupIds,jdbcType=VARCHAR},
+      </if>
+
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>

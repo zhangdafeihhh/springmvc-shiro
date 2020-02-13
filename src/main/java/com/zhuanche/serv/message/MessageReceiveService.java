@@ -1,11 +1,14 @@
 package com.zhuanche.serv.message;
 
+import com.google.common.collect.Lists;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.constant.Constants;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
+import com.zhuanche.entity.mdbcarmanage.CarMessageGroup;
 import com.zhuanche.entity.mdbcarmanage.CarMessageReceiver;
 import com.zhuanche.exception.MessageException;
 import mapper.mdbcarmanage.ex.CarAdmUserExMapper;
+import mapper.mdbcarmanage.ex.CarMessageGroupExMapper;
 import mapper.mdbcarmanage.ex.CarMessageReceiverExMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -31,6 +34,9 @@ public class MessageReceiveService {
 
     @Autowired
     private CarAdmUserExMapper exMapper;
+
+    @Autowired
+    private CarMessageGroupExMapper groupExMapper;
 
     public int sendMessage(Integer messageId,Integer level,String cities,
                            String suppliers,String teamId) throws MessageException{
@@ -108,6 +114,26 @@ public class MessageReceiveService {
     }
 
 
+    public int sendMessageByGroup(Integer messageId,String messageGroups) throws MessageException{
+        List<Integer> ids = Lists.newArrayList();
+        String[] str = org.springframework.util.StringUtils.tokenizeToStringArray(messageGroups,Constants.SEPERATER);
+        for(int k = 0;k<str.length;k++){
+            ids.add(Integer.valueOf(str[k]));
+        }
+        try {
+            List<CarMessageGroup> groupList = groupExMapper.getGroupByIds(ids);
+            groupList.forEach(group ->{
+                sendMessage(messageId,group.getLevel(),group.getCities(),group.getSuppliers(),group.getTeamids());
+            });
+        } catch (Exception e) {
+            logger.error("发送组消息异常" + e);
+            return  0;
+        }
+
+        return 1;
+
+    }
+
     private int insertByLevel(Integer level,Integer messageId,String cities){
         Set<CarAdmUser> sendList = new HashSet<>();
         //查询出所有符合等级的用户
@@ -166,7 +192,11 @@ public class MessageReceiveService {
                 receiver.setReceiveUserId(admUser.getUserId());
                 receiver.setUpdateTime(new Date());
                 receiver.setIsSender("1");
-                receiverMapper.insert(receiver);
+                //插入之前根据接受用户id和messageId做验重
+                int messagePostDtoCount = receiverMapper.messagePostDtoCount(admUser.getUserId(),messageId);
+                if(messagePostDtoCount == 0){
+                    receiverMapper.insert(receiver);
+                }
             } catch (Exception e) {
                 logger.info("向字表发送消息异常" + e.getMessage());
                 throw new MessageException(RestErrorCode.UNKNOWN_ERROR,RestErrorCode.renderMsg(RestErrorCode.UNKNOWN_ERROR));

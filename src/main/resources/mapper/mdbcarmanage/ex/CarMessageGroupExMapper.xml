@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="mapper.mdbcarmanage.ex.CarMessageGroupExMapper" >
+  <resultMap id="BaseResultMap" type="com.zhuanche.entity.mdbcarmanage.CarMessageGroup" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="group_name" property="groupName" jdbcType="VARCHAR" />
+    <result column="group_desc" property="groupDesc" jdbcType="VARCHAR" />
+    <result column="level" property="level" jdbcType="INTEGER" />
+    <result column="cities" property="cities" jdbcType="VARCHAR" />
+    <result column="suppliers" property="suppliers" jdbcType="VARCHAR" />
+    <result column="teamIds" property="teamids" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="creater" property="creater" jdbcType="VARCHAR" />
+    <result column="creater_id" property="createrId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, group_name, group_desc, level, cities, suppliers, teamIds, status, creater, creater_id, 
+    create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from car_message_group
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+
+  <select id="searchGroup" resultMap="BaseResultMap" parameterType="com.zhuanche.entity.mdbcarmanage.CarMessageGroup" >
+    select
+    <include refid="Base_Column_List" />
+    from car_message_group
+    where 1=1
+    <if test="groupName != null and groupName != ''" >
+      and  LOCATE(#{groupName},group_name)
+    </if>
+
+    <if test="status != null and status != ''" >
+      and status = #{status}
+    </if>
+
+    <if test="creater != null and creater != ''" >
+      and  LOCATE(#{creater},creater)
+    </if>
+
+    <if test="beginCreateTime != null and beginCreateTime != ''" >
+        <![CDATA[ AND create_time >=  concat(#{beginCreateTime},' 00:00:00') ]]>
+    </if>
+
+    <if test="endCreateTime != null and endCreateTime != ''" >
+       <![CDATA[ AND create_time <=  concat(#{beginCreateTime},' 00:00:00') ]]>
+    </if>
+  </select>
+
+
+  <insert id="insert" parameterType="com.zhuanche.entity.mdbcarmanage.CarMessageGroup" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_message_group (group_name, group_desc, level, 
+      cities, suppliers, teamIds, 
+      status, creater, creater_id, 
+      create_time, update_time)
+    values (#{groupName,jdbcType=VARCHAR}, #{groupDesc,jdbcType=VARCHAR}, #{level,jdbcType=INTEGER}, 
+      #{cities,jdbcType=VARCHAR}, #{suppliers,jdbcType=VARCHAR}, #{teamids,jdbcType=VARCHAR}, 
+      #{status,jdbcType=INTEGER}, #{creater,jdbcType=VARCHAR}, #{createrId,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarMessageGroup" >
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into car_message_group
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="groupName != null" >
+        group_name,
+      </if>
+      <if test="groupDesc != null" >
+        group_desc,
+      </if>
+      <if test="level != null" >
+        level,
+      </if>
+      <if test="cities != null" >
+        cities,
+      </if>
+      <if test="suppliers != null" >
+        suppliers,
+      </if>
+      <if test="teamids != null" >
+        teamIds,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="creater != null" >
+        creater,
+      </if>
+      <if test="createrId != null" >
+        creater_id,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="groupName != null" >
+        #{groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="groupDesc != null" >
+        #{groupDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null" >
+        #{level,jdbcType=INTEGER},
+      </if>
+      <if test="cities != null" >
+        #{cities,jdbcType=VARCHAR},
+      </if>
+      <if test="suppliers != null" >
+        #{suppliers,jdbcType=VARCHAR},
+      </if>
+      <if test="teamids != null" >
+        #{teamids,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="creater != null" >
+        #{creater,jdbcType=VARCHAR},
+      </if>
+      <if test="createrId != null" >
+        #{createrId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhuanche.entity.mdbcarmanage.CarMessageGroup" >
+    update car_message_group
+    <set >
+      <if test="groupName != null" >
+        group_name = #{groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="groupDesc != null" >
+        group_desc = #{groupDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null" >
+        level = #{level,jdbcType=INTEGER},
+      </if>
+      <if test="cities != null" >
+        cities = #{cities,jdbcType=VARCHAR},
+      </if>
+      <if test="suppliers != null" >
+        suppliers = #{suppliers,jdbcType=VARCHAR},
+      </if>
+      <if test="teamids != null" >
+        teamIds = #{teamids,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="creater != null" >
+        creater = #{creater,jdbcType=VARCHAR},
+      </if>
+      <if test="createrId != null" >
+        creater_id = #{createrId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhuanche.entity.mdbcarmanage.CarMessageGroup" >
+    update car_message_group
+    set group_name = #{groupName,jdbcType=VARCHAR},
+      group_desc = #{groupDesc,jdbcType=VARCHAR},
+      level = #{level,jdbcType=INTEGER},
+      cities = #{cities,jdbcType=VARCHAR},
+      suppliers = #{suppliers,jdbcType=VARCHAR},
+      teamIds = #{teamids,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      creater = #{creater,jdbcType=VARCHAR},
+      creater_id = #{createrId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <update id="editStatusGroup" >
+    UPDATE car_message_group SET  status = #{status} WHERE id= #{id}
+  </update>
+  <select id="isRepeatGroupName" parameterType="java.lang.String" resultType="java.lang.Integer">
+    select id from car_message_group
+    where 1=1 and    group_name = #{groupName}
+  </select>
+
+
+  <select id="getGroupByIds" parameterType="java.util.List" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from car_message_group
+    where 1=1 and id in
+    <foreach collection="ids" open="(" close=")" separator="," item="id">
+      #{id}
+    </foreach>
+
+  </select>
+
+</mapper>
