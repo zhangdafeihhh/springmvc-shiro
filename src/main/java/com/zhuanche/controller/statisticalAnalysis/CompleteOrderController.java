@@ -73,6 +73,7 @@ public class CompleteOrderController{
 	                                              String motorcardId,
 	                                              String hotelId,
 	                                              String driverId,
+	                                              Integer distributorId,
 	                                              @Verify(param = "pageNo",rule = "required") Integer pageNo,
 	                                              @Verify(param = "pageSize",rule = "required") Integer pageSize){
 	        logger.info("【运营管理-统计分析】完成订单列表数据:queryCompleteOrderData");
@@ -113,6 +114,9 @@ public class CompleteOrderController{
             }
             if (StringUtil.isNotEmpty(driverId)) {
                 paramMap.put("driverId", driverId);//司机ID
+            }
+            if(distributorId != null){
+                paramMap.put("distributorId",distributorId);
             }
             // 数据权限设置
             paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap, cityId, allianceId, motorcardId);

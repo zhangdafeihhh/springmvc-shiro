@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
@@ -271,4 +272,51 @@ public class SupplirDistributorController {
 
         return AjaxResponse.success(listDto);
     }
+
+
+    /**
+     * 获取当前用户下或者某个城市下的合作商
+     * @param cityId
+     * @return
+     */
+    @RequestMapping("/distributorAll")
+    @ResponseBody
+    public AjaxResponse distributorAll(Integer cityId){
+
+        logger.info(MessageFormat.format("查询分销商列表入参:cityId:",cityId));
+
+        SupplierDistributor distributor = new SupplierDistributor();
+
+        try {
+            if(cityId != null ){
+                if(cityId != null){
+                    distributor.setCityId(cityId);
+                }
+            }else {
+                SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+                distributor.setCityIds(loginUser.getCityIds());
+                distributor.setSupplierIds(loginUser.getSupplierIds());
+            }
+
+            List<SupplierDistributor> distributorList = distributorService.distributorList(distributor);
+
+            Map<Integer,String> mapStr = Maps.newHashMap();
+
+            distributorList.forEach(disList ->{
+                mapStr.put(disList.getId(),disList.getDistributorName());
+            });
+
+            return AjaxResponse.success(mapStr);
+
+        } catch (Exception e) {
+
+            logger.error("查询异常" + e);
+
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+
+        }
+
+
+    }
+
 }
