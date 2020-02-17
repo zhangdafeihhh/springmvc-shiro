@@ -3,7 +3,7 @@
 <mapper namespace="mapper.rentcar.ex.CarBizCustomerAppraisalExMapper" >
   <resultMap id="BaseResultMap" type="com.zhuanche.dto.rentcar.CarBizCustomerAppraisalDTO" >
     <id column="appraisal_id" property="appraisalId" jdbcType="INTEGER" />
-    <result column="order_id" property="orderId" jdbcType="INTEGER" />
+    <result column="order_id" property="orderId" jdbcType="LONG" />
     <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
     <result column="booking_customer_id" property="bookingCustomerId" jdbcType="INTEGER" />
     <result column="booking_customer_phone" property="bookingCustomerPhone" jdbcType="VARCHAR" />

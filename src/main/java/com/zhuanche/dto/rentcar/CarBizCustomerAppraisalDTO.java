@@ -10,7 +10,7 @@ public class CarBizCustomerAppraisalDTO extends Base {
 
     private Integer appraisalId;
 
-    private Integer orderId;
+    private Long orderId;
 
     private String orderNo;
 
@@ -87,11 +87,11 @@ public class CarBizCustomerAppraisalDTO extends Base {
         this.appraisalId = appraisalId;
     }
 
-    public Integer getOrderId() {
+    public Long getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(Integer orderId) {
+    public void setOrderId(Long orderId) {
         this.orderId = orderId;
     }
 
