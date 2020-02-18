@@ -2,6 +2,7 @@ package com.zhuanche.controller.supplier;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -300,13 +301,17 @@ public class SupplirDistributorController {
 
             List<SupplierDistributor> distributorList = distributorService.distributorList(distributor);
 
-            Map<Integer,String> mapStr = Maps.newHashMap();
+            JSONArray jsonArray = new JSONArray();
+
 
             distributorList.forEach(disList ->{
-                mapStr.put(disList.getId(),disList.getDistributorName());
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("id",disList.getId());
+                jsonObject.put("distributorName",disList.getDistributorName());
+                jsonArray.add(jsonObject);
             });
 
-            return AjaxResponse.success(mapStr);
+            return AjaxResponse.success(jsonArray);
 
         } catch (Exception e) {
 
