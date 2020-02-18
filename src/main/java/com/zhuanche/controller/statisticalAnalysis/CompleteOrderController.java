@@ -181,6 +181,7 @@ public class CompleteOrderController{
                                          String motorcardId,
                                          String hotelId,
                                          String driverId,
+                                         Integer distributorId,
                                          HttpServletRequest request,
                                          HttpServletResponse response){
     	    try{
@@ -222,6 +223,9 @@ public class CompleteOrderController{
                 }
                 if(StringUtil.isNotEmpty(driverId)){
                     paramMap.put("driverId", driverId);//司机ID
+                }
+                if(distributorId != null){
+                    paramMap.put("distributorId",distributorId);
                 }
 
 		  		paramMap = statisticalAnalysisService.getCurrentLoginUserParamMap(paramMap,cityId,allianceId,motorcardId);
