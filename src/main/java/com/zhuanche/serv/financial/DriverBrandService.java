@@ -28,7 +28,7 @@ public class DriverBrandService {
 
 	@PostConstruct
 	private void init() {
-		driverBrandList = driverBrandExMapper.queryDriverBrandList();
+		driverBrandList = driverBrandExMapper.queryDriverBrandList(null);
 		for (DriverBrand driverBrand : driverBrandList) {
 			driverBrandMap.put(driverBrand.getId(), driverBrand);
 		}
@@ -56,8 +56,8 @@ public class DriverBrandService {
 	}
 	
 	
-	public List<DriverBrand> queryDriverBrandList() {
-		List<DriverBrand> list=driverBrandExMapper.queryDriverBrandList();
+	public List<DriverBrand> queryDriverBrandList(String brandName) {
+		List<DriverBrand> list=driverBrandExMapper.queryDriverBrandList(brandName);
 		return list;
 	}
 

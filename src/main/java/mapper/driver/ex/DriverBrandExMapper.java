@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Param;
 
 public interface DriverBrandExMapper {
 
-	List<DriverBrand> queryDriverBrandList();
+	List<DriverBrand> queryDriverBrandList(@Param("brandName") String brandName);
 
     DriverBrand queryDriverBrandByName(@Param("brandName") String brandName);
 }

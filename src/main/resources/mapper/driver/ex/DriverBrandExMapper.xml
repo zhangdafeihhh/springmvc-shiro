@@ -20,6 +20,11 @@
     select 
     <include refid="Base_Column_List" />
     from driver_brand
+      where STATUS =1
+    <if test="brandName != null and brandName != ''">
+     and  BRAND_NAME  LIKE '${brandName}%'
+    </if>
+
   </select>
 
   <select id="queryDriverBrandByName" resultMap="BaseResultMap" parameterType="map">
