@@ -132,10 +132,24 @@ public class CarInfoTemporaryController extends BaseController {
                 Map<String, Object> result = super.querySupplierName(carBizCarInfoTemp.getCityId(), carBizCarInfoTemp.getSupplierId());
                 carBizCarInfoTemp.setCityName((String)result.get("cityName"));
                 carBizCarInfoTemp.setSupplierName((String)result.get("supplierName"));
-                CarBizModel carBizModel = carBizModelService.selectByPrimaryKey(carBizCarInfoTemp.getCarModelId());
-                if(carBizModel!=null){
-                    carBizCarInfoTemp.setModeName(carBizModel.getModelName());
+                if(carBizCarInfoTemp.getCarModelId() != null){
+                    CarBizModel carBizModel = carBizModelService.selectByPrimaryKey(carBizCarInfoTemp.getCarModelId());
+                    if(carBizModel!=null){
+                        carBizCarInfoTemp.setModeName(carBizModel.getModelName());
+                    }
+                    DriverVehicle driverVehicle = driverVehicleService.queryByModelId(carBizCarInfoTemp.getCarModelId());
+                    if(driverVehicle != null){
+                        Long brandId =   driverVehicle.getBrandId();
+                        carBizCarInfoTemp.setNewBrandId(brandId);
+                        if(brandId != null){
+                            DriverBrand driverBrand = driverBrandService.getDriverBrandByPrimaryKey(brandId);
+                            if(driverBrand != null){
+                                carBizCarInfoTemp.setNewBrandName(driverBrand.getBrandName());
+                            }
+                        }
+                    }
                 }
+
             }
         }
         List<CarBizCarInfoTempDTO> carBizCarInfoTempDTOList = BeanUtil.copyList(carBizCarInfoTempList,CarBizCarInfoTempDTO.class);

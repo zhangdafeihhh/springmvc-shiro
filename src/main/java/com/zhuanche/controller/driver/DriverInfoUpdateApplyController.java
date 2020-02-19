@@ -152,6 +152,18 @@ public class DriverInfoUpdateApplyController {
         if (Objects.nonNull(list)){
             for (DriverInfoUpdateApplyDTO driverInfoUpdateApplyDTO : list) {
                 driverInfoUpdateApplyDTO.setDriverPhone(MobileOverlayUtil.doOverlayPhone(driverInfoUpdateApplyDTO.getDriverPhone()));
+
+                DriverVehicle driverVehicle = driverVehicleService.queryByModelId(driverInfoUpdateApplyDTO.getCarModelId());
+                if(driverVehicle != null){
+                    Long brandId =   driverVehicle.getBrandId();
+                    driverInfoUpdateApplyDTO.setNewBrandId(brandId);
+                    if(brandId != null){
+                        DriverBrand driverBrand = driverBrandService.getDriverBrandByPrimaryKey(brandId);
+                        if(driverBrand != null){
+                            driverInfoUpdateApplyDTO.setNewBrandName(driverBrand.getBrandName());
+                        }
+                    }
+                }
             }
         }
     }
