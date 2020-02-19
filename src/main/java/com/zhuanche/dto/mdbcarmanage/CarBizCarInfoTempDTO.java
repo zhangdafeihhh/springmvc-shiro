@@ -289,6 +289,9 @@ public class CarBizCarInfoTempDTO {
 
     private String vehiclesafe;
 
+    private Long newBrandId = null;
+    private String newBrandName = null;
+
     public Integer getCarId() {
         return carId;
     }
@@ -1255,5 +1258,22 @@ public class CarBizCarInfoTempDTO {
 
     public void setVehiclesafe(String vehiclesafe) {
         this.vehiclesafe = vehiclesafe;
+    }
+
+
+    public Long getNewBrandId() {
+        return newBrandId;
+    }
+
+    public void setNewBrandId(Long newBrandId) {
+        this.newBrandId = newBrandId;
+    }
+
+    public String getNewBrandName() {
+        return newBrandName;
+    }
+
+    public void setNewBrandName(String newBrandName) {
+        this.newBrandName = newBrandName;
     }
 }

@@ -10,4 +10,5 @@ public interface DriverVehicleExMapper {
 
 	List<DriverVehicle> queryDriverVehicleList(@Param(value = "brandId") Integer brandId);
 
+    DriverVehicle queryByModelId(@Param(value = "modelId") Integer modelId);
 }

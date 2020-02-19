@@ -71,6 +71,10 @@ public class DriverInfoUpdateApply {
 
     private Date updateTime;
 
+    private Long newBrandId;
+
+    private String newBrandName;
+
     public Integer getId() {
         return id;
     }
@@ -341,5 +345,22 @@ public class DriverInfoUpdateApply {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+
+    public Long getNewBrandId() {
+        return newBrandId;
+    }
+
+    public void setNewBrandId(Long newBrandId) {
+        this.newBrandId = newBrandId;
+    }
+
+    public String getNewBrandName() {
+        return newBrandName;
+    }
+
+    public void setNewBrandName(String newBrandName) {
+        this.newBrandName = newBrandName;
     }
 }

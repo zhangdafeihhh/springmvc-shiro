@@ -21,4 +21,10 @@
     <include refid="Base_Column_List" />
     from driver_brand
   </select>
+
+  <select id="queryDriverBrandByName" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from driver_brand where BRAND_NAME = #{brandName}
+  </select>
 </mapper>

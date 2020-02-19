@@ -60,5 +60,9 @@ public class DriverBrandService {
 		List<DriverBrand> list=driverBrandExMapper.queryDriverBrandList();
 		return list;
 	}
+
+	public DriverBrand queryDriverBrandByName(String brandName) {
+			return driverBrandExMapper.queryDriverBrandByName(brandName);
+	}
 }
   

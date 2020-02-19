@@ -15,12 +15,16 @@ import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.mdbcarmanage.DriverInfoUpdateApplyDTO;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
+import com.zhuanche.entity.driver.DriverBrand;
+import com.zhuanche.entity.driver.DriverVehicle;
 import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoUpdateApply;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.entity.rentcar.CarBizModel;
 import com.zhuanche.serv.CarBizCarInfoService;
 import com.zhuanche.serv.CarBizDriverInfoService;
+import com.zhuanche.serv.financial.DriverBrandService;
+import com.zhuanche.serv.financial.DriverVehicleService;
 import com.zhuanche.serv.mdbcarmanage.DriverInfoUpdateService;
 import com.zhuanche.serv.rentcar.CarBizModelService;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -70,6 +74,13 @@ public class DriverInfoUpdateApplyController {
 
     @Autowired
     private CarRelateTeamExMapper carRelateTeamExMapper;
+
+
+    @Autowired
+    private DriverVehicleService driverVehicleService;
+
+    @Autowired
+    private DriverBrandService driverBrandService;
 
     /**
      * 司机\车辆修改申请信息列表（有分页）
@@ -159,6 +170,22 @@ public class DriverInfoUpdateApplyController {
     public AjaxResponse findDriverInfoUpdateById(@Verify(param = "id", rule = "required") Integer id) {
 
         DriverInfoUpdateApply driverInfoUpdateApply = driverInfoUpdateService.selectByPrimaryKey(id);
+        if(driverInfoUpdateApply != null){
+            if(driverInfoUpdateApply.getCarModelId() != null){
+                DriverVehicle driverVehicle = driverVehicleService.queryByModelId(driverInfoUpdateApply.getCarModelId());
+                if(driverVehicle != null){
+                    Long brandId =   driverVehicle.getBrandId();
+                    driverInfoUpdateApply.setNewBrandId(brandId);
+                    if(brandId != null){
+                        DriverBrand driverBrand = driverBrandService.getDriverBrandByPrimaryKey(brandId);
+                        if(driverBrand != null){
+                            driverInfoUpdateApply.setNewBrandName(driverBrand.getBrandName());
+                        }
+                    }
+                }
+            }
+
+        }
         return AjaxResponse.success(driverInfoUpdateApply);
     }
 

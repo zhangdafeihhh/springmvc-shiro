@@ -39,7 +39,7 @@
         from
         car_biz_model
         where model_id in
-        <foreach collection="list" open="(" close=")" separator="," item="item">
+        <foreach collection="collection" open="(" close=")" separator="," item="item">
             #{item }
         </foreach>
     </select>

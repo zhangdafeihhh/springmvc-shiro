@@ -10,9 +10,13 @@ import com.zhuanche.common.database.DynamicRoutingDataSource.DataSourceMode;
 import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.*;
 import com.zhuanche.dto.mdbcarmanage.CarBizCarInfoTempDTO;
+import com.zhuanche.entity.driver.DriverBrand;
+import com.zhuanche.entity.driver.DriverVehicle;
 import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
 import com.zhuanche.entity.rentcar.CarBizModel;
 import com.zhuanche.serv.deiver.CarBizCarInfoTempService;
+import com.zhuanche.serv.financial.DriverBrandService;
+import com.zhuanche.serv.financial.DriverVehicleService;
 import com.zhuanche.serv.rentcar.CarBizModelService;
 import com.zhuanche.shiro.constants.BusConstant;
 import com.zhuanche.shiro.realm.SSOLoginUser;
@@ -55,6 +59,12 @@ public class CarInfoTemporaryController extends BaseController {
 
 	@Autowired
     private CarBizModelService carBizModelService;
+
+    @Autowired
+    private DriverVehicleService driverVehicleService;
+
+    @Autowired
+    private DriverBrandService driverBrandService;
 
     /**
      * 加盟商车辆查询
@@ -198,14 +208,34 @@ public class CarInfoTemporaryController extends BaseController {
         Map<String,Object> params = Maps.newHashMap();
         params.put("carId",carId);
         CarBizCarInfoTemp carBizCarInfoTemp = carBizCarInfoTempService.queryForObject(params);
+
+
         if(carBizCarInfoTemp != null){
             Map<String, Object> result = super.querySupplierName(carBizCarInfoTemp.getCityId(), carBizCarInfoTemp.getSupplierId());
             carBizCarInfoTemp.setCityName((String)result.get("cityName"));
             carBizCarInfoTemp.setSupplierName((String)result.get("supplierName"));
-            CarBizModel carBizModel = carBizModelService.selectByPrimaryKey(carBizCarInfoTemp.getCarModelId());
-            if(carBizModel!=null){
-                carBizCarInfoTemp.setModeName(carBizModel.getModelName());
+
+            Integer carModelId = carBizCarInfoTemp.getCarModelId();
+            if(carModelId != null){
+                CarBizModel carBizModel = carBizModelService.selectByPrimaryKey(carBizCarInfoTemp.getCarModelId());
+                if(carBizModel!=null){
+                    carBizCarInfoTemp.setModeName(carBizModel.getModelName());
+                }
+
+                DriverVehicle driverVehicle = driverVehicleService.queryByModelId(carBizCarInfoTemp.getCarModelId());
+                if(driverVehicle != null){
+                    Long brandId =   driverVehicle.getBrandId();
+                    carBizCarInfoTemp.setNewBrandId(brandId);
+                    if(brandId != null){
+                        DriverBrand driverBrand = driverBrandService.getDriverBrandByPrimaryKey(brandId);
+                        if(driverBrand != null){
+                            carBizCarInfoTemp.setNewBrandName(driverBrand.getBrandName());
+                        }
+                    }
+                }
+
             }
+
         }else{
             return AjaxResponse.fail(RestErrorCode.BUS_NOT_EXIST);
         }
