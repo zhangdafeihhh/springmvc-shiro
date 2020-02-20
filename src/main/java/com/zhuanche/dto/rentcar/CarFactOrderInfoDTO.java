@@ -85,9 +85,13 @@ public class CarFactOrderInfoDTO{
 	public String getPushDriverType() {
 		if("2".equals(pushDriverType)){
     		return "抢单";
-    	} else if("1".equals(pushDriverType) || "3".equals(pushDriverType)){
-    		return "绑单";
-    	}else{
+    	} else if("1".equals(pushDriverType) ){
+    		return "系统派单";
+    	}else if("3".equals(pushDriverType)){
+			return "后台指派 ";
+		}else if("4".equals(pushDriverType)){
+			return "强绑";
+		}else{
     		return "";
     	}
 	}
