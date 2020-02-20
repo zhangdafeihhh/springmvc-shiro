@@ -114,6 +114,9 @@ public class CarInfo extends BaseEntity {
     private String groupName; // 车型名称
     private Integer groupId; // 车型Id
 
+    private Long newBrandId = null;
+    private String newBrandName = null;
+
 
     @SuppressWarnings("unused")
     private String purchaseDateString;//购车时间的String
@@ -1090,5 +1093,21 @@ public class CarInfo extends BaseEntity {
 
     public void setTaxiInvoicePrint(Integer taxiInvoicePrint) {
         this.taxiInvoicePrint = taxiInvoicePrint;
+    }
+
+    public Long getNewBrandId() {
+        return newBrandId;
+    }
+
+    public void setNewBrandId(Long newBrandId) {
+        this.newBrandId = newBrandId;
+    }
+
+    public String getNewBrandName() {
+        return newBrandName;
+    }
+
+    public void setNewBrandName(String newBrandName) {
+        this.newBrandName = newBrandName;
     }
 }

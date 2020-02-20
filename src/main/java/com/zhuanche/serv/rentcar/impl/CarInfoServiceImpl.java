@@ -9,10 +9,14 @@ import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.entity.driver.DriverBrand;
+import com.zhuanche.entity.driver.DriverVehicle;
 import com.zhuanche.entity.mdbcarmanage.CarAdmUser;
 import com.zhuanche.entity.rentcar.*;
 import com.zhuanche.http.HttpClientUtil;
 import com.zhuanche.serv.authc.UserManagementService;
+import com.zhuanche.serv.financial.DriverBrandService;
+import com.zhuanche.serv.financial.DriverVehicleService;
 import com.zhuanche.serv.rentcar.CarInfoService;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -85,6 +89,11 @@ public class CarInfoServiceImpl implements CarInfoService {
     private UserManagementService userManagementService;
 
 
+    @Autowired
+    private DriverVehicleService driverVehicleService;
+
+    @Autowired
+    private DriverBrandService driverBrandService;
 
 
     @Override
@@ -100,7 +109,29 @@ public class CarInfoServiceImpl implements CarInfoService {
         PageHelper.startPage(pageNo, pageSize, true);
         List<CarInfo> list =   carInfoExMapper.selectList(params);
         PageInfo<CarInfo> pageInfo = new PageInfo<>(list);
+
+        if(pageInfo.getList() != null){
+            for(CarInfo entity :pageInfo.getList()){
+                packageEntity(entity);
+            }
+        }
         return pageInfo;
+    }
+
+    public void packageEntity(CarInfo entity){
+        if(entity.getCarModelId() != null){
+            DriverVehicle driverVehicle = driverVehicleService.queryByModelId(entity.getCarModelId());
+            if(driverVehicle != null){
+                Long brandId =   driverVehicle.getBrandId();
+                entity.setNewBrandId(brandId);
+                if(brandId != null){
+                    DriverBrand driverBrand = driverBrandService.getDriverBrandByPrimaryKey(brandId);
+                    if(driverBrand != null){
+                        entity.setNewBrandName(driverBrand.getBrandName());
+                    }
+                }
+            }
+        }
     }
 
 
