@@ -48,7 +48,7 @@
     </if>
 
     <if test="endCreateTime != null and endCreateTime != ''" >
-       <![CDATA[ AND create_time <=  concat(#{beginCreateTime},' 00:00:00') ]]>
+       <![CDATA[ AND create_time <=  concat(#{endCreateTime},' 00:00:00') ]]>
     </if>
   </select>
 

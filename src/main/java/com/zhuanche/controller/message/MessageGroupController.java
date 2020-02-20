@@ -119,7 +119,7 @@ public class MessageGroupController {
                 "cities:{3},suppliers:{4},teamId:{5},id:{6}",groupName,groupDesc,level,cities,suppliers,teamId,id));
         try {
             Integer searchId = groupService.isRepeatGroupName(groupName);
-            if(searchId != null ){
+            if(searchId != null && searchId > 0){
                 if(searchId != id){
                     logger.info("分组名称已存在");
                     return AjaxResponse.fail(RestErrorCode.MESSAGE_GROUP_EXIST);
