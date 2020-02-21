@@ -3,15 +3,19 @@ package com.zhuanche.serv;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.le.config.dict.Dicts;
+import com.sq.component.utils.CollectionUtils;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalDTO;
 import com.zhuanche.dto.rentcar.CarBizCustomerAppraisalStatisticsDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
+import com.zhuanche.entity.driver.CustomerAppraisal;
 import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.serv.driverteam.CarDriverTeamService;
 import com.zhuanche.util.MobileOverlayUtil;
+import mapper.driver.CustomerAppraisalMapper;
 import mapper.mdbcarmanage.ex.CarDriverTeamExMapper;
 import mapper.rentcar.ex.CarBizCustomerAppraisalExMapper;
 import mapper.rentcar.ex.CarBizCustomerAppraisalStatisticsExMapper;
@@ -21,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.google.common.collect.Lists;
 
 import java.util.*;
 
@@ -41,6 +46,8 @@ public class CustomerAppraisalService {
     private CarBizDriverInfoExMapper carBizDriverInfoExMapper;
     @Autowired
     private CarDriverTeamExMapper carDriverTeamExMapper;
+    @Autowired
+    private CustomerAppraisalMapper customerAppraisalMapper;
 
     /**
      * 查询订单评分信息
@@ -51,7 +58,52 @@ public class CustomerAppraisalService {
             @MasterSlaveConfig(databaseTag = "rentcar-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
     })
     public List<CarBizCustomerAppraisalDTO> queryCustomerAppraisalList(CarBizCustomerAppraisalDTO carBizCustomerAppraisalDTO) {
+
+        //乘客评价司机迁移配置中心 开关控制 customer_appraisal
+        String appraisalStatus = Dicts.getString("customer_appraisal", "true");
+        if ("true".equals(appraisalStatus)){
+            //司机评价迁移 查询mp-driver库
+            try{
+                List<CustomerAppraisal> list = customerAppraisalMapper.queryCustomerAppraisalList(carBizCustomerAppraisalDTO);
+                return turnAppraisalDTO(list);
+            }catch (Exception e){
+                log.error("CustomerAppraisalService.queryCustomerAppraisalList异常",e);
+                return null;
+            }
+
+        }
+
         return carBizCustomerAppraisalExMapper.queryCustomerAppraisalList(carBizCustomerAppraisalDTO);
+    }
+
+    //转换实体类
+    public List<CarBizCustomerAppraisalDTO> turnAppraisalDTO(List<CustomerAppraisal> customerAppraisalList){
+
+        if(CollectionUtils.isEmpty(customerAppraisalList)){
+            return Lists.newArrayList();
+        }
+
+        List<CarBizCustomerAppraisalDTO> list = Lists.newArrayListWithCapacity(customerAppraisalList.size());
+
+        customerAppraisalList.forEach(x -> {
+            CarBizCustomerAppraisalDTO dto = new CarBizCustomerAppraisalDTO();
+            dto.setOrderNo(x.getOrderNo());
+            dto.setCreateDate(x.getCreateAt());
+            dto.setInstrumentAndService(x.getInstrumentAndService());
+            dto.setEnvironmentAndEquipped(x.getEnvironmentAndEquipped());
+            dto.setEfficiencyAndSafety(x.getEfficiencyAndSafety());
+            dto.setEvaluateScore(x.getEvaluateScore());
+            dto.setEvaluate(x.getEvaluate());
+            dto.setMemo(x.getMemo());
+            dto.setDriverId(x.getDriverId());
+            dto.setDriverName(x.getDriverName());
+            dto.setDriverPhone(x.getDriverPhone());
+            dto.setLicensePlates(x.getLicensePlates());
+
+            list.add(dto);
+        });
+
+        return list;
     }
 
     /**
@@ -73,6 +125,12 @@ public class CustomerAppraisalService {
      * @return
      */
     public List<CarBizCustomerAppraisalDTO> queryDriverAppraisalDetail(CarBizCustomerAppraisalDTO carBizCustomerAppraisalDTO) {
+        //乘客评价司机迁移配置中心 开关控制 customer_appraisal
+        String appraisalStatus = Dicts.getString("customer_appraisal", "true");
+        if ("true".equals(appraisalStatus)){
+            return customerAppraisalMapper.queryDriverAppraisalDetail(carBizCustomerAppraisalDTO);
+        }
+
         return carBizCustomerAppraisalExMapper.queryDriverAppraisalDetail(carBizCustomerAppraisalDTO);
     }
 
