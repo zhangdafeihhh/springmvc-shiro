@@ -5,6 +5,7 @@ import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.entity.driver.DriverBrand;
 import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
 import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
+import com.zhuanche.entity.rentcar.CarBizModel;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.entity.rentcar.CarImportExceptionEntity;
 import com.zhuanche.serv.financial.DriverBrandService;
@@ -17,6 +18,7 @@ import com.zhuanche.util.Common;
 import mapper.mdbcarmanage.CarBizCarInfoTempMapper;
 import mapper.mdbcarmanage.ex.CarBizCarInfoTempExMapper;
 import mapper.mdbcarmanage.ex.CarBizDriverInfoTempExMapper;
+import mapper.rentcar.CarBizModelMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarBizModelExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
@@ -58,6 +60,9 @@ public class CarBizCarInfoTempService {
 
     @Autowired
     private CarBizModelExMapper carBizModelExMapper;
+
+    @Autowired
+    private CarBizModelMapper carBizModelMapper;
 
     @Autowired
     private CarBizCarInfoExMapper carBizCarInfoExMapper;
@@ -560,6 +565,10 @@ public class CarBizCarInfoTempService {
                                     isTrue = false;
                                 } else {
                                     carBizCarInfo.setCarModelId(carModelId);
+                                    CarBizModel carBizModelEntity = carBizModelMapper.selectByPrimaryKey(carModelId);
+                                    if (carBizModelEntity != null){
+                                        carBizCarInfo.setModelDetail(carBizModelEntity.getModelName());
+                                    }
                                 }
                             }
                             break;
