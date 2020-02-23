@@ -1,5 +1,7 @@
 package com.zhuanche.controller.message;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
@@ -216,6 +218,40 @@ public class MessageGroupController {
             PageDTO pageDTO = new PageDTO(pageNum,pageSize,total,messageGroupList);
 
             return AjaxResponse.success(pageDTO);
+
+        } catch (Exception e) {
+            return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);
+        }
+    }
+
+
+
+
+    @ResponseBody
+    @RequestMapping(value = "/allGroup")
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource",mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
+    public AjaxResponse allGroup(){
+        logger.info("查询所有的消息组入参:");
+        try {
+            CarMessageGroup group = new CarMessageGroup();
+
+            group.setStatus(1);
+
+
+            List<CarMessageGroup> messageGroupList = groupService.searchGroup(group);
+
+            JSONArray jsonArray = new JSONArray();
+
+            messageGroupList.forEach(list ->{
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("id",list.getId());
+                jsonObject.put("groupName",list.getGroupName());
+                jsonArray.add(jsonObject);
+            });
+
+            return AjaxResponse.success(jsonArray);
 
         } catch (Exception e) {
             return AjaxResponse.fail(RestErrorCode.UNKNOWN_ERROR);

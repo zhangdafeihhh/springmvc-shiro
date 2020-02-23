@@ -50,6 +50,7 @@
     <if test="endCreateTime != null and endCreateTime != ''" >
        <![CDATA[ AND create_time <=  concat(#{endCreateTime},' 00:00:00') ]]>
     </if>
+    ORDER BY create_time DESC
   </select>
 
 
