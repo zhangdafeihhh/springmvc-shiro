@@ -540,6 +540,7 @@ public class CarBizCarInfoTempService {
                                     isTrue = false;
                                 }else {
                                     carBizCarInfo.setNewBrandId(Long.parseLong(""+driverBrandEntity.getId()));
+                                    carBizCarInfo.setNewBrandName(driverBrandEntity.getBrandName());
                                 }
                             }
                             break;
@@ -567,7 +568,8 @@ public class CarBizCarInfoTempService {
                                     carBizCarInfo.setCarModelId(carModelId);
                                     CarBizModel carBizModelEntity = carBizModelMapper.selectByPrimaryKey(carModelId);
                                     if (carBizModelEntity != null){
-                                        carBizCarInfo.setModelDetail(carBizModelEntity.getModelName());
+                                        carBizCarInfo.setModelDetail(carBizModelEntity.getModelName()); 
+                                        carBizCarInfo.setModelDetail((carBizCarInfo.getNewBrandName()==null?"":carBizCarInfo.getNewBrandName())+carBizModelEntity.getModelName());
                                     }
                                 }
                             }
