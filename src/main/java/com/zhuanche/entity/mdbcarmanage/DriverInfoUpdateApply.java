@@ -75,6 +75,11 @@ public class DriverInfoUpdateApply {
 
     private String newBrandName;
 
+
+    private Long newBrandIdNew;
+
+    private String newBrandNameNew;
+
     public Integer getId() {
         return id;
     }
@@ -362,5 +367,21 @@ public class DriverInfoUpdateApply {
 
     public void setNewBrandName(String newBrandName) {
         this.newBrandName = newBrandName;
+    }
+
+    public Long getNewBrandIdNew() {
+        return newBrandIdNew;
+    }
+
+    public void setNewBrandIdNew(Long newBrandIdNew) {
+        this.newBrandIdNew = newBrandIdNew;
+    }
+
+    public String getNewBrandNameNew() {
+        return newBrandNameNew;
+    }
+
+    public void setNewBrandNameNew(String newBrandNameNew) {
+        this.newBrandNameNew = newBrandNameNew;
     }
 }

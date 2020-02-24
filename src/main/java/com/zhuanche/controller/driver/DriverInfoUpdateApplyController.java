@@ -164,6 +164,19 @@ public class DriverInfoUpdateApplyController {
                         }
                     }
                 }
+                if(driverInfoUpdateApplyDTO.getCarModelIdNew() != null){
+                    DriverVehicle driverVehicle2 = driverVehicleService.queryByModelId(driverInfoUpdateApplyDTO.getCarModelIdNew());
+                    if(driverVehicle2 != null){
+                        Long brandId2 =   driverVehicle2.getBrandId();
+                        driverInfoUpdateApplyDTO.setNewBrandIdNew(brandId2);
+                        if(brandId2 != null){
+                            DriverBrand driverBrand2 = driverBrandService.getDriverBrandByPrimaryKey(brandId2);
+                            if(driverBrand2 != null){
+                                driverInfoUpdateApplyDTO.setNewBrandNameNew(driverBrand2.getBrandName());
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -182,22 +195,6 @@ public class DriverInfoUpdateApplyController {
     public AjaxResponse findDriverInfoUpdateById(@Verify(param = "id", rule = "required") Integer id) {
 
         DriverInfoUpdateApply driverInfoUpdateApply = driverInfoUpdateService.selectByPrimaryKey(id);
-        if(driverInfoUpdateApply != null){
-            if(driverInfoUpdateApply.getCarModelId() != null){
-                DriverVehicle driverVehicle = driverVehicleService.queryByModelId(driverInfoUpdateApply.getCarModelId());
-                if(driverVehicle != null){
-                    Long brandId =   driverVehicle.getBrandId();
-                    driverInfoUpdateApply.setNewBrandId(brandId);
-                    if(brandId != null){
-                        DriverBrand driverBrand = driverBrandService.getDriverBrandByPrimaryKey(brandId);
-                        if(driverBrand != null){
-                            driverInfoUpdateApply.setNewBrandName(driverBrand.getBrandName());
-                        }
-                    }
-                }
-            }
-
-        }
         return AjaxResponse.success(driverInfoUpdateApply);
     }
 
