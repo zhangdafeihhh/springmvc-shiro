@@ -568,7 +568,7 @@ public class CarBizCarInfoTempService {
                                     carBizCarInfo.setCarModelId(carModelId);
                                     CarBizModel carBizModelEntity = carBizModelMapper.selectByPrimaryKey(carModelId);
                                     if (carBizModelEntity != null){
-                                        carBizCarInfo.setModelDetail(carBizModelEntity.getModelName()); 
+                                        carBizCarInfo.setModelDetail(carBizModelEntity.getModelName());
                                         carBizCarInfo.setModelDetail((carBizCarInfo.getNewBrandName()==null?"":carBizCarInfo.getNewBrandName())+carBizModelEntity.getModelName());
                                     }
                                 }
