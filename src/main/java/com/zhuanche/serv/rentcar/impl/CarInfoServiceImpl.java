@@ -2400,7 +2400,9 @@ public class CarInfoServiceImpl implements CarInfoService {
 
     @Override
     public CarInfo selectCarInfoByCarId(CarInfo params) {
-        return carInfoExMapper.selectCarInfoByCarId(params);
+        CarInfo  entity =  carInfoExMapper.selectCarInfoByCarId(params);
+        packageEntity(entity);
+        return entity;
     }
 
     @Override
