@@ -15,12 +15,16 @@ import com.zhuanche.common.web.Verify;
 import com.zhuanche.dto.mdbcarmanage.DriverInfoUpdateApplyDTO;
 import com.zhuanche.dto.rentcar.CarBizCarInfoDTO;
 import com.zhuanche.dto.rentcar.CarBizDriverInfoDTO;
+import com.zhuanche.entity.driver.DriverBrand;
+import com.zhuanche.entity.driver.DriverVehicle;
 import com.zhuanche.entity.mdbcarmanage.CarRelateTeam;
 import com.zhuanche.entity.mdbcarmanage.DriverInfoUpdateApply;
 import com.zhuanche.entity.rentcar.CarBizDriverInfo;
 import com.zhuanche.entity.rentcar.CarBizModel;
 import com.zhuanche.serv.CarBizCarInfoService;
 import com.zhuanche.serv.CarBizDriverInfoService;
+import com.zhuanche.serv.financial.DriverBrandService;
+import com.zhuanche.serv.financial.DriverVehicleService;
 import com.zhuanche.serv.mdbcarmanage.DriverInfoUpdateService;
 import com.zhuanche.serv.rentcar.CarBizModelService;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -70,6 +74,13 @@ public class DriverInfoUpdateApplyController {
 
     @Autowired
     private CarRelateTeamExMapper carRelateTeamExMapper;
+
+
+    @Autowired
+    private DriverVehicleService driverVehicleService;
+
+    @Autowired
+    private DriverBrandService driverBrandService;
 
     /**
      * 司机\车辆修改申请信息列表（有分页）
@@ -141,6 +152,31 @@ public class DriverInfoUpdateApplyController {
         if (Objects.nonNull(list)){
             for (DriverInfoUpdateApplyDTO driverInfoUpdateApplyDTO : list) {
                 driverInfoUpdateApplyDTO.setDriverPhone(MobileOverlayUtil.doOverlayPhone(driverInfoUpdateApplyDTO.getDriverPhone()));
+
+                DriverVehicle driverVehicle = driverVehicleService.queryByModelId(driverInfoUpdateApplyDTO.getCarModelId());
+                if(driverVehicle != null){
+                    Long brandId =   driverVehicle.getBrandId();
+                    driverInfoUpdateApplyDTO.setNewBrandId(brandId);
+                    if(brandId != null){
+                        DriverBrand driverBrand = driverBrandService.getDriverBrandByPrimaryKey(brandId);
+                        if(driverBrand != null){
+                            driverInfoUpdateApplyDTO.setNewBrandName(driverBrand.getBrandName());
+                        }
+                    }
+                }
+                if(driverInfoUpdateApplyDTO.getCarModelIdNew() != null){
+                    DriverVehicle driverVehicle2 = driverVehicleService.queryByModelId(driverInfoUpdateApplyDTO.getCarModelIdNew());
+                    if(driverVehicle2 != null){
+                        Long brandId2 =   driverVehicle2.getBrandId();
+                        driverInfoUpdateApplyDTO.setNewBrandIdNew(brandId2);
+                        if(brandId2 != null){
+                            DriverBrand driverBrand2 = driverBrandService.getDriverBrandByPrimaryKey(brandId2);
+                            if(driverBrand2 != null){
+                                driverInfoUpdateApplyDTO.setNewBrandNameNew(driverBrand2.getBrandName());
+                            }
+                        }
+                    }
+                }
             }
         }
     }

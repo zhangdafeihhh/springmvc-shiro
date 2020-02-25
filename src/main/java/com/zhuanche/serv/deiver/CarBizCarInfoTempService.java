@@ -2,10 +2,14 @@ package com.zhuanche.serv.deiver;
 
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
+import com.zhuanche.entity.driver.DriverBrand;
 import com.zhuanche.entity.mdbcarmanage.CarBizCarInfoTemp;
 import com.zhuanche.entity.mdbcarmanage.CarBizDriverInfoTemp;
+import com.zhuanche.entity.rentcar.CarBizModel;
 import com.zhuanche.entity.rentcar.CarBizSupplier;
 import com.zhuanche.entity.rentcar.CarImportExceptionEntity;
+import com.zhuanche.serv.financial.DriverBrandService;
+import com.zhuanche.serv.financial.DriverVehicleService;
 import com.zhuanche.shiro.constants.BusConstant;
 import com.zhuanche.shiro.realm.SSOLoginUser;
 import com.zhuanche.shiro.session.WebSessionUtil;
@@ -14,6 +18,7 @@ import com.zhuanche.util.Common;
 import mapper.mdbcarmanage.CarBizCarInfoTempMapper;
 import mapper.mdbcarmanage.ex.CarBizCarInfoTempExMapper;
 import mapper.mdbcarmanage.ex.CarBizDriverInfoTempExMapper;
+import mapper.rentcar.CarBizModelMapper;
 import mapper.rentcar.ex.CarBizCarInfoExMapper;
 import mapper.rentcar.ex.CarBizModelExMapper;
 import mapper.rentcar.ex.CarBizSupplierExMapper;
@@ -57,10 +62,19 @@ public class CarBizCarInfoTempService {
     private CarBizModelExMapper carBizModelExMapper;
 
     @Autowired
+    private CarBizModelMapper carBizModelMapper;
+
+    @Autowired
     private CarBizCarInfoExMapper carBizCarInfoExMapper;
 
     @Autowired
     private CarBizSupplierExMapper carBizSupplierExMapper;
+
+    @Autowired
+    private DriverVehicleService driverVehicleService;
+
+    @Autowired
+    private DriverBrandService driverBrandService;
     /**
      * 分页查询
      * @param params
@@ -218,20 +232,25 @@ public class CarBizCarInfoTempService {
                             }
                             break;
                         case 5:
-                            if (!cellValue.getStringValue().contains("供应商")) {
-                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"供应商不正确");
+                            if (!cellValue.getStringValue().contains("合作商")) {
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"合作商不正确");
                             }
                             break;
                         case 6:
-                            if (!cellValue.getStringValue().contains("车型")) {
+                            if (!cellValue.getStringValue().contains("品牌")) {
                                 return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"车型不正确");
                             }
                             break;
                         case 7:
-                            if (!cellValue.getStringValue().contains("具体车型")) {
-                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"具体车型不正确");
+                            if (!cellValue.getStringValue().contains("车型")) {
+                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"车型不正确");
                             }
                             break;
+//                        case 7:
+//                            if (!cellValue.getStringValue().contains("具体车型")) {
+//                                return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"具体车型不正确");
+//                            }
+//                            break;
                         case 8:
                             if (!cellValue.getStringValue().contains("购买日期")) {
                                 return AjaxResponse.fail(RestErrorCode.FILE_IMPORT_ERROR,"购买日期不正确");
@@ -500,8 +519,33 @@ public class CarBizCarInfoTempService {
                         // 供应商
                         case 5:
                             break;
-                        // 车型
+                        // 品牌
                         case 6:
+                            if (cellValue == null|| StringUtils.isEmpty(cellValue.getStringValue())) {
+                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+                                returnVO.setLicensePlates(licensePlates);
+                                returnVO.setReson("第" + (rowIx + 1) + "行数据，第"
+                                        + (colIx + 1) + "列 【品牌】不能为空且单元格格式必须为文本");
+                                listException.add(returnVO);
+                                isTrue = false;
+                            } else {
+                                DriverBrand driverBrandEntity = driverBrandService.queryDriverBrandByName(cellValue.getStringValue());
+                                if(driverBrandEntity == null){
+                                    CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+                                    returnVO.setLicensePlates(licensePlates);
+                                    returnVO.setReson("第" + (rowIx + 1)
+                                            + "行数据，第" + (colIx + 1)
+                                            + "列 【品牌】无效");
+                                    listException.add(returnVO);
+                                    isTrue = false;
+                                }else {
+                                    carBizCarInfo.setNewBrandId(Long.parseLong(""+driverBrandEntity.getId()));
+                                    carBizCarInfo.setNewBrandName(driverBrandEntity.getBrandName());
+                                }
+                            }
+                            break;
+                        // 车型
+                        case 7:
                             if (cellValue == null || StringUtils.isEmpty(cellValue.getStringValue())) {
                                 CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
                                 returnVO.setLicensePlates(licensePlates);
@@ -522,25 +566,30 @@ public class CarBizCarInfoTempService {
                                     isTrue = false;
                                 } else {
                                     carBizCarInfo.setCarModelId(carModelId);
+                                    CarBizModel carBizModelEntity = carBizModelMapper.selectByPrimaryKey(carModelId);
+                                    if (carBizModelEntity != null){
+                                        carBizCarInfo.setModelDetail(carBizModelEntity.getModelName());
+                                        carBizCarInfo.setModelDetail((carBizCarInfo.getNewBrandName()==null?"":carBizCarInfo.getNewBrandName())+carBizModelEntity.getModelName());
+                                    }
                                 }
                             }
                             break;
                         // 具体车型
-                        case 7:
-                            if (cellValue == null
-                                    || StringUtils.isEmpty(cellValue
-                                    .getStringValue())) {
-                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
-                                returnVO.setLicensePlates(licensePlates);
-                                returnVO.setReson("第" + (rowIx + 1) + "行数据，第"
-                                        + (colIx + 1) + "列 【具体车型】不能为空且单元格格式必须为文本");
-                                listException.add(returnVO);
-                                isTrue = false;
-                            } else {
-                                String modelDetail = Common.replaceBlank(cellValue.getStringValue());
-                                carBizCarInfo.setModelDetail(modelDetail);
-                            }
-                            break;
+//                        case 7:
+//                            if (cellValue == null
+//                                    || StringUtils.isEmpty(cellValue
+//                                    .getStringValue())) {
+//                                CarImportExceptionEntity returnVO = new CarImportExceptionEntity();
+//                                returnVO.setLicensePlates(licensePlates);
+//                                returnVO.setReson("第" + (rowIx + 1) + "行数据，第"
+//                                        + (colIx + 1) + "列 【具体车型】不能为空且单元格格式必须为文本");
+//                                listException.add(returnVO);
+//                                isTrue = false;
+//                            } else {
+//                                String modelDetail = Common.replaceBlank(cellValue.getStringValue());
+//                                carBizCarInfo.setModelDetail(modelDetail);
+//                            }
+//                            break;
                         // 购买日期
                         case 8:
                             if (cellValue == null

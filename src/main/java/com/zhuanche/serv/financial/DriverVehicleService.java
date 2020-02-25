@@ -72,5 +72,8 @@ public class DriverVehicleService {
 		return list;
 	}
 
+	public DriverVehicle queryByModelId(Integer modelId) {
+		return driverVehicleExMapper.queryByModelId(modelId);
+	}
 }
   

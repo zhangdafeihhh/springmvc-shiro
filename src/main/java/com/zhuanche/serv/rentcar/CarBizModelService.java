@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -27,5 +28,10 @@ public class CarBizModelService {
 
     public List<CarBizModel> queryAllList(){
     	return carBizModelExMapper.queryAllList();
+	}
+
+
+	public List<CarBizModel> findByIdSet(Set<Integer> carModelIdSet){
+		return carBizModelExMapper.findByIdSet(carModelIdSet);
 	}
 }

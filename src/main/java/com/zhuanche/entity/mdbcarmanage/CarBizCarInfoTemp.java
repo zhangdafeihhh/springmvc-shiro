@@ -265,6 +265,10 @@ public class CarBizCarInfoTemp {
 
     private Integer taxiInvoicePrint;
 
+
+    private Long newBrandId = null;
+    private String newBrandName = null;
+
     public Integer getCarId() {
         return carId;
     }
@@ -1135,5 +1139,21 @@ public class CarBizCarInfoTemp {
 
     public void setTaxiInvoicePrint(Integer taxiInvoicePrint) {
         this.taxiInvoicePrint = taxiInvoicePrint;
+    }
+
+    public Long getNewBrandId() {
+        return newBrandId;
+    }
+
+    public void setNewBrandId(Long newBrandId) {
+        this.newBrandId = newBrandId;
+    }
+
+    public String getNewBrandName() {
+        return newBrandName;
+    }
+
+    public void setNewBrandName(String newBrandName) {
+        this.newBrandName = newBrandName;
     }
 }

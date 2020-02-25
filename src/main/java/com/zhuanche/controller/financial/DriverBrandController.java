@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.zhuanche.common.web.AjaxResponse;
@@ -26,9 +27,9 @@ public class DriverBrandController {
 	private DriverBrandService driverBrandService;
 	
 	@RequestMapping(value = "/queryDriverBrandList")
-	public AjaxResponse queryDriverBrandList() {
+	public AjaxResponse queryDriverBrandList(@RequestParam(value = "brandName",required = false,defaultValue = "") String brandName) {
 		logger.info("DriverBrandController--queryDriverBrandList--");
-		List<DriverBrand> driverBrands=driverBrandService.queryDriverBrandList();
+		List<DriverBrand> driverBrands=driverBrandService.queryDriverBrandList(brandName);
 		return AjaxResponse.success(driverBrands);
 	}
 }

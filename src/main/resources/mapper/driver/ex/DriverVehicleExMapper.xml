@@ -23,11 +23,14 @@
     <result column="vehicle_fuel" property="vehicleFuel" jdbcType="VARCHAR" />
     <result column="group_name" property="groupName" jdbcType="VARCHAR" />
     <result column="vehicle_flag" property="vehicleFlag" jdbcType="TINYINT" />
+    <result column="model_id" property="modelId" jdbcType="BIGINT" />
+
   </resultMap>
   <sql id="Base_Column_List" >
     ID, VEHICLE_NAME, STATUS, VEHICLE_TYPE, BRAND_ID, VEHICLE_SPELL, GROUP_ID, CREATE_DATE, 
     UPDATE_DATE, REMARK, brand_name, origin_price, vehicle_level, vehicle_length, axles_length, 
     vehicle_structure, engine_displacement, air_inflow, vehicle_fuel, group_name, vehicle_flag
+    ,model_id
   </sql>
   <select id="queryDriverVehicleList" resultMap="BaseResultMap" >
     select 
@@ -38,5 +41,16 @@
 		  and BRAND_ID = #{brandId}
 	  </if>
 	</trim>
+  </select>
+
+  <select id="queryByModelId" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from driver_vehicle
+    <trim prefix="WHERE" prefixOverrides="AND|OR">
+      <if test="modelId != null">
+        and model_id = #{modelId}
+      </if>
+    </trim>
   </select>
 </mapper>

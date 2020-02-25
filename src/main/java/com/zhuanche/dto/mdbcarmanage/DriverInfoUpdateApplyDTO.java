@@ -182,6 +182,12 @@ public class DriverInfoUpdateApplyDTO extends Base {
     private String createDateBegin;
     private String createDateEnd;
 
+    private Long newBrandId = null;
+    private String newBrandName = null;
+
+    private Long newBrandIdNew;
+    private String newBrandNameNew;
+
     public String getCreateDateBegin() {
         return createDateBegin;
     }
@@ -420,6 +426,38 @@ public class DriverInfoUpdateApplyDTO extends Base {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Long getNewBrandId() {
+        return newBrandId;
+    }
+
+    public void setNewBrandId(Long newBrandId) {
+        this.newBrandId = newBrandId;
+    }
+
+    public String getNewBrandName() {
+        return newBrandName;
+    }
+
+    public void setNewBrandName(String newBrandName) {
+        this.newBrandName = newBrandName;
+    }
+
+    public Long getNewBrandIdNew() {
+        return newBrandIdNew;
+    }
+
+    public void setNewBrandIdNew(Long newBrandIdNew) {
+        this.newBrandIdNew = newBrandIdNew;
+    }
+
+    public String getNewBrandNameNew() {
+        return newBrandNameNew;
+    }
+
+    public void setNewBrandNameNew(String newBrandNameNew) {
+        this.newBrandNameNew = newBrandNameNew;
     }
 
     @Override
