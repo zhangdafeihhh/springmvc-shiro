@@ -14,12 +14,12 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
 
-    <result column="publicRange" property="public_range" jdbcType="INTEGER" />
-    <result column="messageGroupIds" property="message_group_ids" jdbcType="VARCHAR" />
+    <result column="public_range" property="publicRange" jdbcType="INTEGER" />
+    <result column="message_group_ids" property="messageGroupIds" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, mesage_title, message_content, user_id, status, level, cities, suppliers,
-    teamIds, create_time, update_time,publicRange,messageGroupIds
+    teamIds, create_time, update_time,public_range,message_group_ids
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -212,10 +212,10 @@
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="publicRange != null" >
-        #{publicRange,jdbcType=INTEGER},
+        public_range = #{publicRange,jdbcType=INTEGER},
       </if>
       <if test="messageGroupIds != null" >
-        #{messageGroupIds,jdbcType=VARCHAR},
+        message_groupIds = #{messageGroupIds,jdbcType=VARCHAR},
       </if>
 
     </set>

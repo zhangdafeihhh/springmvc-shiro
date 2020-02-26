@@ -391,167 +391,171 @@ public class MessageService {
         try {
             CarMessagePost carMessagePost = postExMapper.selectByPrimaryKey(Long.valueOf(messageId));
 
-            CarMessageDetailDto detailDto = new CarMessageDetailDto(
-                    carMessagePost.getMesageTitle(),carMessagePost.getMessageContent(),
-                    carMessagePost.getCreateTime(),carMessagePost.getUpdateTime());
+            if(carMessagePost != null) {
 
-            detailDto.setLevel(carMessagePost.getLevel().toString());
-            detailDto.setCities(carMessagePost.getCities());
-            detailDto.setSuppliers(carMessagePost.getSuppliers());
-            detailDto.setTeamids(carMessagePost.getTeamids());
-            detailDto.setPublicRange(carMessagePost.getPublicRange());
-            detailDto.setMessageGroupIds(carMessagePost.getMessageGroupIds());
-            String str = Integer.toBinaryString(carMessagePost.getLevel());
-            String levelToStr = "";
-            String[] levelStr = {"1","2","4","8"};
-            for(int t = 0; t < str.length(); t++){
-                char c = str.charAt(t);
-                if (c=='1'){
-                    levelToStr += levelStr[str.length()-t-1] +",";
-                }
-            }
-            if (StringUtils.isNotBlank(levelToStr)){
-                detailDto.setLevelToStr(levelToStr.substring(0,levelToStr.length()-1));
-            }
-            //创建人才能查看阅读记录
-            SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
+                CarMessageDetailDto detailDto = new CarMessageDetailDto(
+                        carMessagePost.getMesageTitle(), carMessagePost.getMessageContent(),
+                        carMessagePost.getCreateTime(), carMessagePost.getUpdateTime());
 
-            if (user.getId().equals(carMessagePost.getUserId())){
-
-            //有时间了再做优化
-            switch (carMessagePost.getLevel()){
-                case Constants.CONTRY:
-                    detailDto.setLevelName(CarMessagePost.Level.contry.getName());
-                    break;
-                case Constants.CITY:
-                    detailDto.setLevelName(CarMessagePost.Level.city.getName());
-                    detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
-                    break;
-                case Constants.CONTRYANDCITY:
-                    detailDto.setLevelName(CarMessagePost.Level.contryAndCity.getName());
-                    detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
-                    break;
-                case Constants.SUPPY:
-                    detailDto.setLevelName(CarMessagePost.Level.suppy.getName());
-                    detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
-                    break;
-                case Constants.CONTRYANDSUPPY:
-                    detailDto.setLevelName(CarMessagePost.Level.contryAndSuppy.getName());
-                    detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
-                    break;
-                case Constants.CITYANDSUPPY:
-                    detailDto.setLevelName(CarMessagePost.Level.cityAndSuppy.getName());
-                    detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
-                    detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
-                    break;
-                case Constants.CONTRYANDCITYANDSUPPY:
-                    detailDto.setLevelName(CarMessagePost.Level.contryAndCityAndSuppy.getName());
-                    detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
-                    detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
-                    break;
-                case Constants.TEAM:
-                    detailDto.setLevelName(CarMessagePost.Level.team.getName());
-                    detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
-                    break;
-                case Constants.CONTRYANDTEAM:
-                    detailDto.setLevelName(CarMessagePost.Level.contryAndTeam.getName());
-                    detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
-                    break;
-                case Constants.CITYANDTEAM:
-                    detailDto.setLevelName(CarMessagePost.Level.cityAndTeam.getName());
-                    detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
-                    detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
-                    break;
-                case Constants.CONTRYANDCITYANDTEAM:
-                    detailDto.setLevelName(CarMessagePost.Level.contryAndCityAndTeam.getName());
-                    detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
-                    detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
-                    break;
-                case Constants.SUPPYANDTEAM:
-                    detailDto.setLevelName(CarMessagePost.Level.suppyAndTeam.getName());
-                    detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
-                    detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
-                    break;
-                case Constants.CONTRYANDSUPPYANDTEAM:
-                    detailDto.setLevelName(CarMessagePost.Level.contryAndSuppyAndTeam.getName());
-                    detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
-                    detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
-                    break;
-                case Constants.CITYANDSUPPYANDTEAM:
-                    detailDto.setLevelName(CarMessagePost.Level.cityAndSuppyAndTeam.getName());
-                    detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
-                    detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
-                    detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
-                    break;
-                case Constants.CONTRYANDCITYANDSUPPYANDTEAM:
-                    detailDto.setLevelName(CarMessagePost.Level.counryAndCityAndSuppyAndTeam.getName());
-                    detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
-                    detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(),carMessagePost.getSuppliers()));
-                    detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(),carMessagePost.getSuppliers(),carMessagePost.getTeamids()));
-                    break;
-                default:
-                    detailDto.setLevelName(CarMessagePost.Level.contry.getName());
-
-            }
-
-
-                //已读
-                List<CarMessageReceiver> list = receiverExMapper.carMessageReceiverList(messageId,null,CarMessageReceiver.ReadStatus.read.getValue());
-                List<Integer> listUsers = new ArrayList<>();
-                for (CarMessageReceiver receiver : list){
-                    listUsers.add(receiver.getReceiveUserId());
-                }
-                List<CarAdmUser> carAdmUserList = new ArrayList<>();
-                if (CollectionUtils.isNotEmpty(listUsers)){
-                    carAdmUserList = carAdmUserExMapper.queryUsers(listUsers,null,null,null,null);
-                }
-
-                Map<Integer,String> mapUser = new HashMap<>();
-                for (CarAdmUser carAdmUser : carAdmUserList){
-                    mapUser.put(carAdmUser.getUserId(),carAdmUser.getUserName());
-                }
-                List<ReadRecordDto> readRecordDtoList = new ArrayList<>();
-                for (CarMessageReceiver receiver : list){
-                    ReadRecordDto readRecordDto  = new ReadRecordDto(mapUser.get(receiver.getReceiveUserId()),receiver.getUpdateTime());
-                    readRecordDtoList.add(readRecordDto);
-                }
-
-                detailDto.setReadRecord(readRecordDtoList);
-            }
-
-
-            List<CarMessageDoc> listDoc;
-            listDoc = docExMapper.listDoc(Long.valueOf(messageId));
-            List<MessageDocDto> messageDocDtoList = new ArrayList<>();
-            for (CarMessageDoc doc  : listDoc){
-                MessageDocDto messageDocDto = new MessageDocDto(doc.getDocName(),doc.getDocUrl());
-                messageDocDtoList.add(messageDocDto);
-            }
-            detailDto.setMessageDocDto(messageDocDtoList);
-            List<Integer> createUser = new ArrayList<>();
-            createUser.add(carMessagePost.getUserId());
-            List<CarAdmUser> createrList = carAdmUserExMapper.queryUsers(createUser,null,null,null,null);
-            if (CollectionUtils.isNotEmpty(createrList)){
-                detailDto.setCreateUser(createrList.get(0).getUserName());
-                detailDto.setPhone(createrList.get(0).getPhone());
-            }
-            detailDto.setId(messageId.longValue());
-
-            try {
-                List<CarMessageReceiver> listUnRead = receiverExMapper.carMessageReceiverList(messageId,userId,CarMessageReceiver.ReadStatus.unRead.getValue());
-                if (CollectionUtils.isNotEmpty(listUnRead)){
-                    int code = receiverExMapper.updateReadState(listUnRead.get(0).getId());
-                    if (code > 0){
-                        logger.info("状态更改成功");
-                    }else {
-                       logger.info("状态更改失败");
+                detailDto.setLevel(carMessagePost.getLevel().toString());
+                detailDto.setCities(carMessagePost.getCities());
+                detailDto.setSuppliers(carMessagePost.getSuppliers());
+                detailDto.setTeamids(carMessagePost.getTeamids());
+                detailDto.setPublicRange(carMessagePost.getPublicRange());
+                detailDto.setMessageGroupIds(carMessagePost.getMessageGroupIds());
+                String str = Integer.toBinaryString(carMessagePost.getLevel());
+                String levelToStr = "";
+                String[] levelStr = {"1", "2", "4", "8"};
+                for (int t = 0; t < str.length(); t++) {
+                    char c = str.charAt(t);
+                    if (c == '1') {
+                        levelToStr += levelStr[str.length() - t - 1] + ",";
                     }
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                if (StringUtils.isNotBlank(levelToStr)) {
+                    detailDto.setLevelToStr(levelToStr.substring(0, levelToStr.length() - 1));
+                }
+                //创建人才能查看阅读记录
+                SSOLoginUser user = WebSessionUtil.getCurrentLoginUser();
 
-            return detailDto;
+                if (user.getId().equals(carMessagePost.getUserId())) {
+
+                    //有时间了再做优化
+                    switch (carMessagePost.getLevel()) {
+                        case Constants.CONTRY:
+                            detailDto.setLevelName(CarMessagePost.Level.contry.getName());
+                            break;
+                        case Constants.CITY:
+                            detailDto.setLevelName(CarMessagePost.Level.city.getName());
+                            detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
+                            break;
+                        case Constants.CONTRYANDCITY:
+                            detailDto.setLevelName(CarMessagePost.Level.contryAndCity.getName());
+                            detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
+                            break;
+                        case Constants.SUPPY:
+                            detailDto.setLevelName(CarMessagePost.Level.suppy.getName());
+                            detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(), carMessagePost.getSuppliers()));
+                            break;
+                        case Constants.CONTRYANDSUPPY:
+                            detailDto.setLevelName(CarMessagePost.Level.contryAndSuppy.getName());
+                            detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(), carMessagePost.getSuppliers()));
+                            break;
+                        case Constants.CITYANDSUPPY:
+                            detailDto.setLevelName(CarMessagePost.Level.cityAndSuppy.getName());
+                            detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
+                            detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(), carMessagePost.getSuppliers()));
+                            break;
+                        case Constants.CONTRYANDCITYANDSUPPY:
+                            detailDto.setLevelName(CarMessagePost.Level.contryAndCityAndSuppy.getName());
+                            detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
+                            detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(), carMessagePost.getSuppliers()));
+                            break;
+                        case Constants.TEAM:
+                            detailDto.setLevelName(CarMessagePost.Level.team.getName());
+                            detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(), carMessagePost.getSuppliers(), carMessagePost.getTeamids()));
+                            break;
+                        case Constants.CONTRYANDTEAM:
+                            detailDto.setLevelName(CarMessagePost.Level.contryAndTeam.getName());
+                            detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(), carMessagePost.getSuppliers(), carMessagePost.getTeamids()));
+                            break;
+                        case Constants.CITYANDTEAM:
+                            detailDto.setLevelName(CarMessagePost.Level.cityAndTeam.getName());
+                            detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
+                            detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(), carMessagePost.getSuppliers(), carMessagePost.getTeamids()));
+                            break;
+                        case Constants.CONTRYANDCITYANDTEAM:
+                            detailDto.setLevelName(CarMessagePost.Level.contryAndCityAndTeam.getName());
+                            detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
+                            detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(), carMessagePost.getSuppliers(), carMessagePost.getTeamids()));
+                            break;
+                        case Constants.SUPPYANDTEAM:
+                            detailDto.setLevelName(CarMessagePost.Level.suppyAndTeam.getName());
+                            detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(), carMessagePost.getSuppliers()));
+                            detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(), carMessagePost.getSuppliers(), carMessagePost.getTeamids()));
+                            break;
+                        case Constants.CONTRYANDSUPPYANDTEAM:
+                            detailDto.setLevelName(CarMessagePost.Level.contryAndSuppyAndTeam.getName());
+                            detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(), carMessagePost.getSuppliers()));
+                            detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(), carMessagePost.getSuppliers(), carMessagePost.getTeamids()));
+                            break;
+                        case Constants.CITYANDSUPPYANDTEAM:
+                            detailDto.setLevelName(CarMessagePost.Level.cityAndSuppyAndTeam.getName());
+                            detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
+                            detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(), carMessagePost.getSuppliers()));
+                            detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(), carMessagePost.getSuppliers(), carMessagePost.getTeamids()));
+                            break;
+                        case Constants.CONTRYANDCITYANDSUPPYANDTEAM:
+                            detailDto.setLevelName(CarMessagePost.Level.counryAndCityAndSuppyAndTeam.getName());
+                            detailDto.setCitiesName(this.getCityNames(carMessagePost.getCities()));
+                            detailDto.setSuppliersName(this.getSupplierNames(carMessagePost.getCities(), carMessagePost.getSuppliers()));
+                            detailDto.setTeamidsName(this.getTeamNames(carMessagePost.getCities(), carMessagePost.getSuppliers(), carMessagePost.getTeamids()));
+                            break;
+                        default:
+                            detailDto.setLevelName(CarMessagePost.Level.contry.getName());
+
+                    }
+
+
+                    //已读
+                    List<CarMessageReceiver> list = receiverExMapper.carMessageReceiverList(messageId, null, CarMessageReceiver.ReadStatus.read.getValue());
+                    List<Integer> listUsers = new ArrayList<>();
+                    for (CarMessageReceiver receiver : list) {
+                        listUsers.add(receiver.getReceiveUserId());
+                    }
+                    List<CarAdmUser> carAdmUserList = new ArrayList<>();
+                    if (CollectionUtils.isNotEmpty(listUsers)) {
+                        carAdmUserList = carAdmUserExMapper.queryUsers(listUsers, null, null, null, null);
+                    }
+
+                    Map<Integer, String> mapUser = new HashMap<>();
+                    for (CarAdmUser carAdmUser : carAdmUserList) {
+                        mapUser.put(carAdmUser.getUserId(), carAdmUser.getUserName());
+                    }
+                    List<ReadRecordDto> readRecordDtoList = new ArrayList<>();
+                    for (CarMessageReceiver receiver : list) {
+                        ReadRecordDto readRecordDto = new ReadRecordDto(mapUser.get(receiver.getReceiveUserId()), receiver.getUpdateTime());
+                        readRecordDtoList.add(readRecordDto);
+                    }
+
+                    detailDto.setReadRecord(readRecordDtoList);
+                }
+
+
+                List<CarMessageDoc> listDoc;
+                listDoc = docExMapper.listDoc(Long.valueOf(messageId));
+                List<MessageDocDto> messageDocDtoList = new ArrayList<>();
+                for (CarMessageDoc doc : listDoc) {
+                    MessageDocDto messageDocDto = new MessageDocDto(doc.getDocName(), doc.getDocUrl());
+                    messageDocDtoList.add(messageDocDto);
+                }
+                detailDto.setMessageDocDto(messageDocDtoList);
+                List<Integer> createUser = new ArrayList<>();
+                createUser.add(carMessagePost.getUserId());
+                List<CarAdmUser> createrList = carAdmUserExMapper.queryUsers(createUser, null, null, null, null);
+                if (CollectionUtils.isNotEmpty(createrList)) {
+                    detailDto.setCreateUser(createrList.get(0).getUserName());
+                    detailDto.setPhone(createrList.get(0).getPhone());
+                }
+                detailDto.setId(messageId.longValue());
+
+                try {
+                    List<CarMessageReceiver> listUnRead = receiverExMapper.carMessageReceiverList(messageId, userId, CarMessageReceiver.ReadStatus.unRead.getValue());
+                    if (CollectionUtils.isNotEmpty(listUnRead)) {
+                        int code = receiverExMapper.updateReadState(listUnRead.get(0).getId());
+                        if (code > 0) {
+                            logger.info("状态更改成功");
+                        } else {
+                            logger.info("状态更改失败");
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+                return detailDto;
+            }
         } catch (Exception e) {
             throw new MessageException(RestErrorCode.UNKNOWN_ERROR,RestErrorCode.renderMsg(RestErrorCode.UNKNOWN_ERROR));
         }
