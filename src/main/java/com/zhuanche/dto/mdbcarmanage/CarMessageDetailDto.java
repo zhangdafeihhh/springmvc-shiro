@@ -53,6 +53,12 @@ public class CarMessageDetailDto {
     /**附件对象**/
     private List<MessageDocDto> messageDocDto;
 
+    /**发布范围1.通知分组 2 通知范围**/
+    private Integer publicRange;
+    /**通知分组时候选择的组ids**/
+    private String messageGroupIds;
+
+
 
     public CarMessageDetailDto(String messageTitle, String messageContent, Date createTime, Date updateTime) {
         this.messageTitle = messageTitle;
@@ -213,6 +219,22 @@ public class CarMessageDetailDto {
 
     public void setLevelToStr(String levelToStr) {
         this.levelToStr = levelToStr;
+    }
+
+    public Integer getPublicRange() {
+        return publicRange;
+    }
+
+    public void setPublicRange(Integer publicRange) {
+        this.publicRange = publicRange;
+    }
+
+    public String getMessageGroupIds() {
+        return messageGroupIds;
+    }
+
+    public void setMessageGroupIds(String messageGroupIds) {
+        this.messageGroupIds = messageGroupIds;
     }
 
     @Override

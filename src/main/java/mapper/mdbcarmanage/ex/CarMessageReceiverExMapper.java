@@ -78,4 +78,7 @@ public interface CarMessageReceiverExMapper {
     List<CarMessagePostDto> newSearchMessage(@Param("status") Integer status,@Param("keyword") String keyword, @Param("startDate") Date startDate, @Param("endDate") Date endDate,
                                              @Param("idList") List<Integer> idList, @Param("userId") Integer userId);
 
+    int replyMessage(@Param("messageId")Integer messageId,@Param("receiveUserId")Integer receiveUserId,@Param("status")Integer status);
+
+
 }

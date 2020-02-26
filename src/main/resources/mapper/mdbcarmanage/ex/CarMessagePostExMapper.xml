@@ -19,7 +19,7 @@
   </resultMap>
   <sql id="Base_Column_List" >
     id, mesage_title, message_content, user_id, status, level, cities, suppliers,
-    teamIds, create_time, update_time
+    teamIds, create_time, update_time,publicRange,messageGroupIds
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -171,7 +171,9 @@
       suppliers = #{suppliers,jdbcType=VARCHAR},
       teamIds = #{teamids,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+            public_range = #{publicRange,jdbcType=INTEGER},
+                  message_group_ids = #{messageGroupIds,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
 

@@ -399,6 +399,8 @@ public class MessageService {
             detailDto.setCities(carMessagePost.getCities());
             detailDto.setSuppliers(carMessagePost.getSuppliers());
             detailDto.setTeamids(carMessagePost.getTeamids());
+            detailDto.setPublicRange(carMessagePost.getPublicRange());
+            detailDto.setMessageGroupIds(carMessagePost.getMessageGroupIds());
             String str = Integer.toBinaryString(carMessagePost.getLevel());
             String levelToStr = "";
             String[] levelStr = {"1","2","4","8"};

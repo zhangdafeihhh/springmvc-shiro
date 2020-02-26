@@ -3,10 +3,13 @@ package com.zhuanche.controller.message;
 import com.zhuanche.common.database.DynamicRoutingDataSource;
 import com.zhuanche.common.database.MasterSlaveConfig;
 import com.zhuanche.common.database.MasterSlaveConfigs;
+import com.zhuanche.common.paging.PageDTO;
 import com.zhuanche.common.web.AjaxResponse;
 import com.zhuanche.common.web.RestErrorCode;
 import com.zhuanche.exception.MessageException;
 import com.zhuanche.serv.message.MessageReceiveService;
+import com.zhuanche.shiro.realm.SSOLoginUser;
+import com.zhuanche.shiro.session.WebSessionUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,9 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.MessageFormat;
+import java.util.List;
 
 /**
  * @Author fanht
@@ -69,4 +74,28 @@ public class MessageReceiveController {
         return response;
 
     }
+
+
+    @RequestMapping(value = "/replyQueryList",method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @MasterSlaveConfigs(configs = {
+            @MasterSlaveConfig(databaseTag = "mdbcarmanage-DataSource", mode = DynamicRoutingDataSource.DataSourceMode.SLAVE)
+    })
+    public AjaxResponse replyQueryList(String senderName,Integer status,
+                                         String noticeStartTime,String noticeEndTime,
+                                         String createStartTime,String createEndTime,
+                                         String replyStartTime,String replyEndTime,
+                                         @RequestParam(value = "pageSize",defaultValue = "10") Integer pageSize,
+                                         @RequestParam(value = "pageNum",defaultValue = "1") Integer pageNum) {
+        SSOLoginUser loginUser = WebSessionUtil.getCurrentLoginUser();
+        /*Integer userId = loginUser.getId();
+        List<Integer> idList = null;
+        if (StringUtils.isNotBlank(createUser)){
+            idList = carAdmUserExMapper.queryIdListByName(createUser);
+        }
+        PageDTO pageDTO = messageService.newMessageSearch(status,keyword,
+                startDate, endDate, idList, pageSize, pageNum, userId);*/
+        return AjaxResponse.success(null);
+    }
+
 }

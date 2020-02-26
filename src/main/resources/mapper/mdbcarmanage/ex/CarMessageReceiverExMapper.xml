@@ -80,6 +80,13 @@
     where id = #{id,jdbcType=BIGINT}
   </update>
 
+
+  <update id="replyMessage" >
+    update car_message_receiver
+    set status = #{status}, update_time = now()
+    where receive_user_id = #{receiveUserId}
+    and message_id = #{messageId}
+  </update>
   <select id="queryAllCount" resultType="java.lang.Integer" >
     SELECT COUNT(DISTINCT(cmp.id)) as total FROM car_message_post cmp
     LEFT JOIN car_message_receiver cmr ON cmp.id = cmr.message_id
