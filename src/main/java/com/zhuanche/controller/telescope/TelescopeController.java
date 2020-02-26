@@ -68,7 +68,7 @@ public class TelescopeController {
 		params.put("driverStatus",driverStatus);
 		params.put("page",page);
 		params.put("pageSize",pageSize);
-		JSONObject result = MpOkHttpUtil.okHttpGetBackJson( "http://pre-inside-manage-rest.01zhuanche.com/telescope/queryTelescopeUserForList", params, 1, "查询千里眼用户列表");
+		JSONObject result = MpOkHttpUtil.okHttpGetBackJson( mpManageRestUrl+"/telescope/queryTelescopeUserForList", params, 1, "查询千里眼用户列表");
 		logger.info("【查询千里眼用户列表】接口返回结果：{}",result.toJSONString());
 		if (result.getIntValue("code") != Constants.SUCCESS_CODE) {
 			String errorMsg = result.getString("msg");
